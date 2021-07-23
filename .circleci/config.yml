@@ -1,0 +1,290 @@
+version: 2.1
+orbs:
+  slack: circleci/slack@3.2.0
+
+commands:
+  setup:
+    description: 'Setup Machine'
+    steps:
+      - restore_cache:
+          keys:
+            - npm-cache
+      - run:
+          name: 'Set environment variables'
+          command: |
+            touch $BASH_ENV
+            if [[ "${CIRCLE_BRANCH}" == "salesforce-master" ]]; then echo 'export MASTER=true' >> $BASH_ENV; fi
+            if [[ "${CIRCLE_BRANCH}" == "salesforce-develop" ]]; then echo 'export DEVELOP=true' >> $BASH_ENV; fi
+            if [[ "${CIRCLE_BRANCH}" =~ ^release- ]]; then echo 'export RELEASE=true' >> $BASH_ENV; fi
+            echo 'export DETECT_CHROMEDRIVER_VERSION=true' >> $BASH_ENV;
+            source $BASH_ENV
+      - run:
+          name: 'Install Dependencies'
+          command: |
+            # Add Chrome to apt sources
+            wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
+            sudo sh -c 'echo "deb http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list'
+
+            # Install system dependencies
+            sudo apt-get update
+            sudo apt-get install python-dev python-pip google-chrome-stable time
+            sudo pip install -U pip setuptools
+            sudo pip install awscli==1.18.85 datadog==0.40.1
+            sudo npm install -g npm@6.14.4
+
+            # Add a dogrc so we can submit metrics to datadog
+            printf "[Connection]\napikey = $DATADOG_API_KEY\nappkey =\n" > ~/.dogrc
+
+            # Install node dependencies
+            node ./scripts/gtime.js monorepo_install npm ci
+
+            # Build the PWA
+            npm run lerna -- run analyze-build --scope "scaffold-pwa"
+
+            # Report bundle sizes
+            node ./scripts/report-bundle-size.js
+
+            # Add credentials file at ~/.mobify so we can upload to Mobify Cloud
+            npm run save-credentials --prefix packages/pwa -- --user "${MOBIFY_CLIENT_USER}" --key "${MOBIFY_CLIENT_API_KEY}"
+
+            # Check that packages are all using the same versions of compilers, etc.
+            node ./scripts/check-dependencies.js
+
+            # Install Snyk CLI
+            sudo npm install -g snyk
+
+            # Run snyk auth - authenticate snyk using environment variables to add the token
+            snyk auth $SNYK_TOKEN
+
+            # Install Lighthouse CI CLI
+            sudo npm install -g @lhci/cli
+      - save_cache:
+          key: npm-cache
+          paths:
+            - /root/.npm
+
+  runtests:
+    description: 'Run tests'
+    parameters:
+      enableIntegrationTests:
+          description: 'Enable expensive integration tests'
+          default: true
+          type: boolean
+      cwd:
+        description: 'The directory to execute the tests from'
+        default: ${PWD}
+        type: string
+    steps:
+      - run:
+          name: 'Run tests'
+          command: |
+            cd << parameters.cwd >>
+
+            # Note: Each of these test commands need to be exposed on the monorepo
+            # root and *also* on the PWA package. This section is run on both.
+
+            # Ensure bundlesize is in check
+            npm run test:max-file-size
+
+            # Always run fast unit tests
+            npm run test
+
+            # End to end tests on nightly builds only
+            if [[ $NIGHTLY ]]; then
+              npm run test:e2e-ci
+            fi
+
+            # Only run expensive integration tests on these branches
+            if [[ (<< parameters.enableIntegrationTests >> == "true") && ( $MASTER || $DEVELOP || $RELEASE ) ]]; then
+              npm run test:integration
+            fi
+  smoketestscripts:
+    description: 'Smoke test scripts'
+    parameters:
+      dir:
+        description: 'The path to a project to test'
+        default: './packages/pwa'
+        type: string
+    steps:
+      - run:
+          name: 'Smoke test scripts'
+          command: |
+            # Basic smoke-tests for uncommonly run scripts in a project
+            node /home/circleci/project/scripts/smoke-test-npm-scripts.js --dir << parameters.dir >>
+  lighthouse-ci:
+    description: 'Run Lighthouse CI on the PWA'
+    steps:
+      - run:
+          name: Run Lighthouse CI on the PWA
+          command: |
+            npm run test:lighthouse --prefix packages/pwa
+  checkclean:
+    description: 'Check Repository Clean'
+    steps:
+      - run:
+          name: Check Repository Clean
+          command: |
+              # Print status for debugging on CircleCI.
+              git status
+              # Fail the build if any step leaves uncommitted changes in the repo
+              # that would prevent Lerna from publishing (Lerna gets this right).
+              git diff --exit-code
+
+jobs:
+  testNode12:
+    docker:
+      - image: circleci/node:12-stretch-browsers
+    steps:
+      - checkout
+      - setup
+      - runtests
+      - lighthouse-ci
+      - smoketestscripts
+      - run:
+          name: Push Bundle
+          command: |
+              if [[ $DEVELOP || $RELEASE ]]; then
+                target=staging
+              elif [[ $MASTER ]]; then
+                target=production
+              else
+                target=""
+              fi
+
+              if [[ $target ]]; then
+                npm run push --prefix packages/pwa -- --message "build ${CIRCLE_BUILD_NUM} on ${CIRCLE_BRANCH} (${CIRCLE_SHA1})" --target $target
+              fi
+      - checkclean
+      - run:
+          name: Publish to NPM
+          command: |
+              # Add NPM token to allow publishing from Circle
+              echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > ~/.npmrc
+
+              if [[ $MASTER || $RELEASE ]]; then
+                # Publish all changed packages. The "from-package" arg means "look
+                # at the version numbers in each package.json file and if that doesn't
+                # exist on NPM, publish"
+                npm run lerna -- publish from-package --yes
+              fi
+
+              # Cleanup
+              rm ~/.npmrc
+      - store_test_results:
+          path: packages/pwa/tests/reports
+          when: always
+      - store_artifacts:
+          path: packages/pwa/tests/screenshots
+          when: always
+      - slack/status:
+          fail_only: true
+          only_for_branches: salesforce-master,salesforce-develop
+  testNode14:
+    docker:
+      - image: circleci/node:14-stretch-browsers
+    steps:
+      - checkout
+      - setup
+      - runtests:
+          enableIntegrationTests: false
+      - smoketestscripts
+      - checkclean
+      - store_test_results:
+          path: packages/pwa/tests/reports
+          when: always
+      - store_artifacts:
+          path: packages/pwa/tests/screenshots
+          when: always
+      - slack/status:
+          fail_only: true
+          only_for_branches: salesforce-master,salesforce-develop
+  generatedSFCCProjectTest:
+    docker:
+      - image: circleci/node:12-stretch-browsers
+    steps:
+      - checkout
+      - setup
+      - run:
+          name: Generate project
+          environment:
+            GENERATOR_PRESET: 'test-project'
+          command: |
+            node ./scripts/gtime.js generated_project_install \
+                node packages/pwa-kit-create-app/scripts/create-mobify-app-dev.js --outputDir /tmp/project
+
+            cd /tmp/project
+            npm run prod:build
+      - run:
+          name: Audit Generated Project
+          environment:
+          command: |
+            # This is the *most* important audit step, much more than the
+            # "whole monorepo" one above - bear in mind that SDK users probably
+            # don't care if eg. our docs site uses a vulnerable dependency.
+            #
+            # Treat failures here seriously and try to fix them before just bumping
+            # thresholds. These vulnerabilities create a really bad impression with our
+            # users during sales or in the early stages of a project.
+            #
+            # REMINDER: Have you bumped up our alpha versions? If you recently fixed some
+            # vulnerabilities, you will need to increment the alpha versions (so that
+            # publishing them to the local npm repo would be successful).
+
+            if [[ "${CIRCLE_BRANCH}" == "salesforce-master" ]]; then
+              snyk monitor --ignore-policy --remote-repo-url='https://github.com/mobify/mobify-platform-sdks.git' --project-name='generated-scaffold-pwa' --org='mobify'
+            fi
+      - run:
+          name: Count Generated Project Dependencies
+          environment:
+          command: |
+            MAX_PACKAGES="3050"
+            total=$(./scripts/count-dependencies.js /tmp/project)
+              if [ "$total" -gt "$MAX_PACKAGES" ]; then
+                  echo "Error: Found $total installed packages (max $MAX_PACKAGES).";
+                  exit 1;
+              else
+                  echo "Error: Found $total installed packages (max $MAX_PACKAGES).";
+              fi
+            dog metric post mobify_platform_sdks.generated_project_total_packages $total
+      - runtests:
+          cwd: /tmp/project
+      - smoketestscripts:
+          dir: /tmp/project
+      - slack/status:
+          fail_only: true
+          only_for_branches: salesforce-master,salesforce-develop
+      - run:
+          name: Push Bundle
+          command: |
+            if [[ $DEVELOP ]]; then
+              target='generated-pwa'
+            else
+              target=""
+            fi
+            if [[ $target ]]; then
+              cd /tmp/project
+              npm run push -- --message "Generated PWA build ${CIRCLE_BUILD_NUM} on ${CIRCLE_BRANCH} (${CIRCLE_SHA1})" --target $target
+            fi
+
+workflows:
+  version: 2
+  test:
+    jobs:
+      - testNode12
+      - testNode14
+      - generatedSFCCProjectTest
+  nightly-build:
+    triggers:
+      - schedule:
+          cron: "0 8 * * *"
+          filters:
+            branches:
+              only:
+                - salesforce-develop
+    jobs:
+      - testNode12:
+          context: nightly-build
+      - testNode14:
+          context: nightly-build
+      - generatedSFCCProjectTest:
+          context: nightly-build

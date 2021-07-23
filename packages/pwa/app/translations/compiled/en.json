@@ -1,0 +1,1688 @@
+{
+  "+O5yEM": [
+    {
+      "type": 0,
+      "value": "Promotions Applied"
+    }
+  ],
+  "+dLAnb": [
+    {
+      "type": 0,
+      "value": "Estimated Total"
+    }
+  ],
+  "/kLqfV": [
+    {
+      "type": 0,
+      "value": "This is a gift."
+    }
+  ],
+  "/vJwLB": [
+    {
+      "type": 0,
+      "value": "Please enter your email address"
+    }
+  ],
+  "0g/1TG": [
+    {
+      "type": 0,
+      "value": "Continue to Payment"
+    }
+  ],
+  "0yGJXJ": [
+    {
+      "type": 0,
+      "value": "Password must contain at least one lowercase letter"
+    }
+  ],
+  "1b9Q93": [
+    {
+      "type": 0,
+      "value": "You will receive an email at "
+    },
+    {
+      "children": [
+        {
+          "type": 1,
+          "value": "email"
+        }
+      ],
+      "type": 8,
+      "value": "b"
+    },
+    {
+      "type": 0,
+      "value": " with a link to reset your password shortly."
+    }
+  ],
+  "1yoQ91": [
+    {
+      "type": 0,
+      "value": "No Wishlist Items"
+    }
+  ],
+  "25WwxF": [
+    {
+      "type": 0,
+      "value": "Don't have an account?"
+    }
+  ],
+  "2BHb6K": [
+    {
+      "type": 0,
+      "value": "Applied promotions info"
+    }
+  ],
+  "2SvpuI": [
+    {
+      "type": 0,
+      "value": "Log in here"
+    }
+  ],
+  "2bGejb": [
+    {
+      "type": 0,
+      "value": "My Account"
+    }
+  ],
+  "2gr0DV": [
+    {
+      "type": 0,
+      "value": "1 item added to wishlist"
+    }
+  ],
+  "2tqQFl": [
+    {
+      "type": 0,
+      "value": "Cart"
+    }
+  ],
+  "3NVyN7": [
+    {
+      "type": 0,
+      "value": "Please enter your first name"
+    }
+  ],
+  "3gXwAV": [
+    {
+      "type": 0,
+      "value": "Sign in to retrieve your saved items or continue shopping"
+    }
+  ],
+  "3kJE8G": [
+    {
+      "type": 0,
+      "value": "Something went wrong. Try again."
+    }
+  ],
+  "3rGMFt": [
+    {
+      "type": 0,
+      "value": "Sale"
+    }
+  ],
+  "47FYwb": [
+    {
+      "type": 0,
+      "value": "Cancel"
+    }
+  ],
+  "4JYnp2": [
+    {
+      "type": 0,
+      "value": "Ordered: "
+    },
+    {
+      "type": 1,
+      "value": "date"
+    }
+  ],
+  "5JcXdV": [
+    {
+      "type": 0,
+      "value": "Create Account"
+    }
+  ],
+  "5S2I6Q": [
+    {
+      "type": 0,
+      "value": "Incorrect username or password, please try again."
+    }
+  ],
+  "5sg7KC": [
+    {
+      "type": 0,
+      "value": "Password"
+    }
+  ],
+  "6DCLcI": [
+    {
+      "type": 0,
+      "value": "Please enter a valid date"
+    }
+  ],
+  "7PMLfK": [
+    {
+      "type": 0,
+      "value": "Order Total"
+    }
+  ],
+  "7xscgD": [
+    {
+      "type": 0,
+      "value": "Delivery Details"
+    }
+  ],
+  "8iXlvA": [
+    {
+      "type": 0,
+      "value": "Save & Continue"
+    }
+  ],
+  "8j72eG": [
+    {
+      "type": 0,
+      "value": "Please provide a new password"
+    }
+  ],
+  "8pvKg1": [
+    {
+      "type": 0,
+      "value": "Payment Details"
+    }
+  ],
+  "9Npj92": [
+    {
+      "type": 0,
+      "value": "Enter your email to receive instructions on how to reset your password"
+    }
+  ],
+  "A8Tnga": [
+    {
+      "type": 0,
+      "value": "Credit Card"
+    }
+  ],
+  "AYIKp4": [
+    {
+      "type": 0,
+      "value": "Already have an account? Log in"
+    }
+  ],
+  "Au/ysp": [
+    {
+      "type": 0,
+      "value": "This is a secure SSL encrypted payment."
+    }
+  ],
+  "AwzkSM": [
+    {
+      "type": 0,
+      "value": "Tax"
+    }
+  ],
+  "B/orA3": [
+    {
+      "type": 0,
+      "value": "Promotions"
+    }
+  ],
+  "B5/YE0": [
+    {
+      "type": 0,
+      "value": "Profile updated"
+    }
+  ],
+  "BAoId6": [
+    {
+      "type": 0,
+      "value": "Please enter your phone number"
+    }
+  ],
+  "BlJFo9": [
+    {
+      "type": 0,
+      "value": "This email already has an account."
+    }
+  ],
+  "Cm91xY": [
+    {
+      "type": 0,
+      "value": "Complete The Set"
+    }
+  ],
+  "CyOkb5": [
+    {
+      "type": 0,
+      "value": "Promo Code"
+    }
+  ],
+  "D+bY29": [
+    {
+      "type": 0,
+      "value": "Shipping Method"
+    }
+  ],
+  "D8RblK": [
+    {
+      "type": 0,
+      "value": "Do you have a promo code?"
+    }
+  ],
+  "DP5VOH": [
+    {
+      "type": 0,
+      "value": "Shipping Address"
+    }
+  ],
+  "DPrDhw": [
+    {
+      "type": 0,
+      "value": "Add New Payment Method"
+    }
+  ],
+  "EKKW2e": [
+    {
+      "type": 0,
+      "value": "1 uppercase letter"
+    }
+  ],
+  "EOUB63": [
+    {
+      "type": 0,
+      "value": "Only "
+    },
+    {
+      "type": 1,
+      "value": "stockLevel"
+    },
+    {
+      "type": 0,
+      "value": " Left!"
+    }
+  ],
+  "EWw/tK": [
+    {
+      "type": 0,
+      "value": "Apply"
+    }
+  ],
+  "Ev6SEF": [
+    {
+      "type": 0,
+      "value": "New Password"
+    }
+  ],
+  "F62y+K": [
+    {
+      "type": 0,
+      "value": "Sign Out"
+    }
+  ],
+  "G/yZLu": [
+    {
+      "type": 0,
+      "value": "Remove"
+    }
+  ],
+  "GH9wCg": [
+    {
+      "type": 0,
+      "value": "Please provide a valid promo code"
+    }
+  ],
+  "GretYf": [
+    {
+      "type": 0,
+      "value": "Current Password"
+    }
+  ],
+  "Gu0oq5": [
+    {
+      "type": 0,
+      "value": "1 special character (example: , S ! % #)"
+    }
+  ],
+  "I866h3": [
+    {
+      "type": 0,
+      "value": "Password must contain at least one number"
+    }
+  ],
+  "IUXVjJ": [
+    {
+      "type": 0,
+      "value": "Continue Shopping"
+    }
+  ],
+  "Ihg+6O": [
+    {
+      "type": 0,
+      "value": "Let's get started"
+    }
+  ],
+  "ItDqLZ": [
+    {
+      "type": 1,
+      "value": "count"
+    },
+    {
+      "type": 0,
+      "value": " items"
+    }
+  ],
+  "IyXU3R": [
+    {
+      "type": 0,
+      "value": "Please enter a valid card number"
+    }
+  ],
+  "JAcwxt": [
+    {
+      "type": 0,
+      "value": "Order Number"
+    }
+  ],
+  "JQ1EGX": [
+    {
+      "type": 0,
+      "value": "Promotions applied"
+    }
+  ],
+  "JWbGSW": [
+    {
+      "type": 0,
+      "value": "Shipped to: "
+    },
+    {
+      "type": 1,
+      "value": "name"
+    }
+  ],
+  "KV/9Hv": [
+    {
+      "type": 0,
+      "value": "Questions"
+    }
+  ],
+  "Kz7I2o": [
+    {
+      "type": 0,
+      "value": "Password updated"
+    }
+  ],
+  "L8seEc": [
+    {
+      "type": 0,
+      "value": "Subtotal"
+    }
+  ],
+  "MPcjO/": [
+    {
+      "type": 0,
+      "value": "Are you sure you want to sign out? You will need to sign back in to proceed with your current order."
+    }
+  ],
+  "MnpUD7": [
+    {
+      "type": 0,
+      "value": "View details"
+    }
+  ],
+  "Mv2pEb": [
+    {
+      "type": 0,
+      "value": "Continue shopping and add items to your wishlist"
+    }
+  ],
+  "NTgwLi": [
+    {
+      "type": 0,
+      "value": "Place Order"
+    }
+  ],
+  "NymXNv": [
+    {
+      "type": 0,
+      "value": "New Payment Method Saved"
+    }
+  ],
+  "O3zHDW": [
+    {
+      "type": 1,
+      "value": "submitButtonLabel"
+    }
+  ],
+  "O8DHNx": [
+    {
+      "type": 0,
+      "value": "Check the code and try again, it may already be applied or the promo has expired"
+    }
+  ],
+  "O95R3Z": [
+    {
+      "type": 0,
+      "value": "Phone"
+    }
+  ],
+  "O9nLUc": [
+    {
+      "type": 0,
+      "value": "Please select your "
+    },
+    {
+      "type": 1,
+      "value": "stateOrProvince"
+    }
+  ],
+  "ONNUqG": [
+    {
+      "type": 0,
+      "value": "By creating an account, you agree to Salesforce’s "
+    },
+    {
+      "children": [
+        {
+          "type": 0,
+          "value": "Privacy Policy"
+        }
+      ],
+      "type": 8,
+      "value": "policy"
+    },
+    {
+      "type": 0,
+      "value": " and "
+    },
+    {
+      "children": [
+        {
+          "type": 0,
+          "value": "Terms & Conditions"
+        }
+      ],
+      "type": 8,
+      "value": "terms"
+    }
+  ],
+  "OUPaUZ": [
+    {
+      "type": 1,
+      "value": "count"
+    },
+    {
+      "type": 0,
+      "value": " items"
+    }
+  ],
+  "OVAmhz": [
+    {
+      "type": 0,
+      "value": "Back to cart"
+    }
+  ],
+  "OVvfLK": [
+    {
+      "type": 0,
+      "value": "You're now signed in"
+    }
+  ],
+  "Olgsm/": [
+    {
+      "type": 0,
+      "value": "Create an account for faster checkout"
+    }
+  ],
+  "OrvEHn": [
+    {
+      "type": 0,
+      "value": "Product Detail"
+    }
+  ],
+  "P5ouV8": [
+    {
+      "type": 0,
+      "value": "Please enter your security code"
+    }
+  ],
+  "PBSfL4": [
+    {
+      "type": 0,
+      "value": "Please enter a valid name"
+    }
+  ],
+  "PNj3WE": [
+    {
+      "type": 0,
+      "value": "Review Order"
+    }
+  ],
+  "PRlD0A": [
+    {
+      "type": 0,
+      "value": "Shipping"
+    }
+  ],
+  "PlBReU": [
+    {
+      "type": 0,
+      "value": "Log out"
+    }
+  ],
+  "Pwi/Wk": [
+    {
+      "type": 0,
+      "value": "New In"
+    }
+  ],
+  "Q6wcZ5": [
+    {
+      "type": 0,
+      "value": "First Name"
+    }
+  ],
+  "QRowXV": [
+    {
+      "type": 0,
+      "value": "Something went wrong. Try again!"
+    }
+  ],
+  "QclMUn": [
+    {
+      "type": 0,
+      "value": "Please select your country"
+    }
+  ],
+  "Qpxx+l": [
+    {
+      "type": 0,
+      "value": "New Arrivals"
+    }
+  ],
+  "Ri//8C": [
+    {
+      "type": 0,
+      "value": "Add to Cart"
+    }
+  ],
+  "SQJto2": [
+    {
+      "type": 0,
+      "value": "Sign in"
+    }
+  ],
+  "SeGQoh": [
+    {
+      "type": 0,
+      "value": "Address Updated"
+    }
+  ],
+  "Seanpx": [
+    {
+      "type": 0,
+      "value": "Required"
+    }
+  ],
+  "SmKUxZ": [
+    {
+      "type": 0,
+      "value": "Add a new address method for faster checkout"
+    }
+  ],
+  "Solm6E": [
+    {
+      "type": 0,
+      "value": "Zip Code"
+    }
+  ],
+  "T/K9MQ": [
+    {
+      "type": 0,
+      "value": "promo applied"
+    }
+  ],
+  "TBI5GJ": [
+    {
+      "type": 0,
+      "value": "This "
+    },
+    {
+      "type": 1,
+      "value": "length"
+    },
+    {
+      "type": 0,
+      "value": "-digit code can be found on the "
+    },
+    {
+      "type": 1,
+      "value": "side"
+    },
+    {
+      "type": 0,
+      "value": " of your card."
+    }
+  ],
+  "TE4fIS": [
+    {
+      "type": 0,
+      "value": "City"
+    }
+  ],
+  "TR+DHM": [
+    {
+      "type": 0,
+      "value": "Or return to"
+    }
+  ],
+  "TSYROF": [
+    {
+      "type": 0,
+      "value": "You haven't placed an order yet"
+    }
+  ],
+  "TdTXXf": [
+    {
+      "type": 0,
+      "value": "Learn more"
+    }
+  ],
+  "TemVby": [
+    {
+      "type": 0,
+      "value": "Full Name"
+    }
+  ],
+  "Ty4jOO": [
+    {
+      "type": 0,
+      "value": "1 number"
+    }
+  ],
+  "Ub+AGc": [
+    {
+      "type": 0,
+      "value": "Sign In"
+    }
+  ],
+  "UqKMjl": [
+    {
+      "type": 0,
+      "value": "Postal Code"
+    }
+  ],
+  "V+9Zzz": [
+    {
+      "type": 0,
+      "value": "Size & Fit"
+    }
+  ],
+  "V+R4NC": [
+    {
+      "type": 0,
+      "value": "Add Payment Method"
+    }
+  ],
+  "V/JHlm": [
+    {
+      "type": 0,
+      "value": "Forgot password?"
+    }
+  ],
+  "V2AxNc": [
+    {
+      "type": 0,
+      "value": "Add to Wishlist"
+    }
+  ],
+  "VSlYv6": [
+    {
+      "type": 0,
+      "value": "Quantity:"
+    }
+  ],
+  "W/5hwr": [
+    {
+      "type": 0,
+      "value": "Something went wrong. Please try again."
+    }
+  ],
+  "WHgdsk": [
+    {
+      "type": 0,
+      "value": "Out of stock"
+    }
+  ],
+  "XBfvKN": [
+    {
+      "type": 0,
+      "value": "Order History"
+    }
+  ],
+  "XQPWe6": [
+    {
+      "type": 0,
+      "value": "Once you place an order the details will show up here"
+    }
+  ],
+  "YDGR5k": [
+    {
+      "type": 0,
+      "value": "No Saved Payment Methods"
+    }
+  ],
+  "Yy/yDL": [
+    {
+      "type": 0,
+      "value": "Reset password"
+    }
+  ],
+  "YzZa8+": [
+    {
+      "type": 0,
+      "value": "My Profile"
+    }
+  ],
+  "ZJkXve": [
+    {
+      "type": 0,
+      "value": "Sign me up for Salesforce emails (you can unsubscribe at any time)"
+    }
+  ],
+  "ZMphaV": [
+    {
+      "type": 0,
+      "value": "Promotion applied"
+    }
+  ],
+  "Zhsl4Z": [
+    {
+      "type": 0,
+      "value": "Back to Order History"
+    }
+  ],
+  "aheQdn": [
+    {
+      "type": 0,
+      "value": "Last Name"
+    }
+  ],
+  "au3Vns": [
+    {
+      "offset": 0,
+      "options": {
+        "=0": {
+          "value": [
+            {
+              "type": 0,
+              "value": "0 items"
+            }
+          ]
+        },
+        "one": {
+          "value": [
+            {
+              "type": 7
+            },
+            {
+              "type": 0,
+              "value": " item"
+            }
+          ]
+        },
+        "other": {
+          "value": [
+            {
+              "type": 7
+            },
+            {
+              "type": 0,
+              "value": " items"
+            }
+          ]
+        }
+      },
+      "pluralType": "cardinal",
+      "type": 6,
+      "value": "itemCount"
+    }
+  ],
+  "bTjwXj": [
+    {
+      "type": 0,
+      "value": "Welcome Back"
+    }
+  ],
+  "bXv4wB": [
+    {
+      "type": 0,
+      "value": "Shop New Arrivals"
+    }
+  ],
+  "bhUBy4": [
+    {
+      "type": 0,
+      "value": "Save & Continue to Shipping Method"
+    }
+  ],
+  "c1zaMK": [
+    {
+      "type": 0,
+      "value": "Please enter your address"
+    }
+  ],
+  "c7/79+": [
+    {
+      "type": 0,
+      "value": "Billing Address"
+    }
+  ],
+  "cChish": [
+    {
+      "type": 0,
+      "value": "8 characters minimum"
+    }
+  ],
+  "cUwO+6": [
+    {
+      "type": 0,
+      "value": "Add New Card"
+    }
+  ],
+  "dUxyza": [
+    {
+      "type": 0,
+      "value": "Reviews"
+    }
+  ],
+  "e6Ph5+": [
+    {
+      "type": 0,
+      "value": "Address"
+    }
+  ],
+  "eKEL/g": [
+    {
+      "type": 0,
+      "value": "Pending"
+    }
+  ],
+  "f9teca": [
+    {
+      "type": 0,
+      "value": "Province"
+    }
+  ],
+  "fCRlK5": [
+    {
+      "type": 0,
+      "value": "We will send an email to "
+    },
+    {
+      "children": [
+        {
+          "type": 1,
+          "value": "email"
+        }
+      ],
+      "type": 8,
+      "value": "b"
+    },
+    {
+      "type": 0,
+      "value": " with your confirmation number and receipt shortly."
+    }
+  ],
+  "fE3ujL": [
+    {
+      "type": 0,
+      "value": "Order Details"
+    }
+  ],
+  "fIHFDI": [
+    {
+      "type": 0,
+      "value": "Add New Address"
+    }
+  ],
+  "fWz2xP": [
+    {
+      "type": 0,
+      "value": "Please enter your expiry date"
+    }
+  ],
+  "ffE6Xw": [
+    {
+      "type": 0,
+      "value": "Password must contain at least 8 characters"
+    }
+  ],
+  "footer.column.account": [
+    {
+      "type": 0,
+      "value": "Account"
+    }
+  ],
+  "footer.column.customer_support": [
+    {
+      "type": 0,
+      "value": "Customer Support"
+    }
+  ],
+  "footer.column.our_company": [
+    {
+      "type": 0,
+      "value": "Our Company"
+    }
+  ],
+  "footer.link.about_us": [
+    {
+      "type": 0,
+      "value": "About Us"
+    }
+  ],
+  "footer.link.contact_us": [
+    {
+      "type": 0,
+      "value": "Contact Us"
+    }
+  ],
+  "footer.link.order_status": [
+    {
+      "type": 0,
+      "value": "Order Status"
+    }
+  ],
+  "footer.link.privacy_policy": [
+    {
+      "type": 0,
+      "value": "Privacy Policy"
+    }
+  ],
+  "footer.link.returns_exchanges": [
+    {
+      "type": 0,
+      "value": "Returns & Exchanges"
+    }
+  ],
+  "footer.link.shipping": [
+    {
+      "type": 0,
+      "value": "Shipping"
+    }
+  ],
+  "footer.link.signin_create_account": [
+    {
+      "type": 0,
+      "value": "Sign in or Create Account"
+    }
+  ],
+  "footer.link.site_map": [
+    {
+      "type": 0,
+      "value": "Site Map"
+    }
+  ],
+  "footer.link.store_locator": [
+    {
+      "type": 0,
+      "value": "Store Locator"
+    }
+  ],
+  "footer.link.terms_conditions": [
+    {
+      "type": 0,
+      "value": "Terms & Conditions"
+    }
+  ],
+  "footer.message.copyright": [
+    {
+      "type": 0,
+      "value": "2021 Salesforce or its affiliates. All rights reserved. This is a demo store only. Orders made WILL NOT be processed."
+    }
+  ],
+  "footer.subscribe.button.sign_up": [
+    {
+      "type": 0,
+      "value": "Sign Up"
+    }
+  ],
+  "footer.subscribe.description.sign_up": [
+    {
+      "type": 0,
+      "value": "Sign up to stay in the loop about the hottest deals"
+    }
+  ],
+  "footer.subscribe.heading.first_to_know": [
+    {
+      "type": 0,
+      "value": "Be the first to know"
+    }
+  ],
+  "fuzq0p": [
+    {
+      "type": 0,
+      "value": "Checkout as guest"
+    }
+  ],
+  "gg6vZx": [
+    {
+      "type": 0,
+      "value": "Shop by Category"
+    }
+  ],
+  "hCj9FS": [
+    {
+      "type": 0,
+      "value": "Please enter your name as shown on your card"
+    }
+  ],
+  "hDI+JM": [
+    {
+      "type": 0,
+      "value": "Sort by"
+    }
+  ],
+  "header.button.assistive_msg.logo": [
+    {
+      "type": 0,
+      "value": "Logo"
+    }
+  ],
+  "header.button.assistive_msg.menu": [
+    {
+      "type": 0,
+      "value": "Menu"
+    }
+  ],
+  "header.button.assistive_msg.my_account": [
+    {
+      "type": 0,
+      "value": "My account"
+    }
+  ],
+  "header.button.assistive_msg.my_cart": [
+    {
+      "type": 0,
+      "value": "My cart"
+    }
+  ],
+  "header.search.field.value.placeholder": [
+    {
+      "type": 0,
+      "value": "Search for products..."
+    }
+  ],
+  "homepage.message.welcome": [
+    {
+      "type": 0,
+      "value": "Hello World"
+    }
+  ],
+  "hp3uqR": [
+    {
+      "type": 0,
+      "value": "Wishlist"
+    }
+  ],
+  "huqKGl": [
+    {
+      "type": 0,
+      "value": "Create account"
+    }
+  ],
+  "iPMbLb": [
+    {
+      "type": 0,
+      "value": "Please select a payment method."
+    }
+  ],
+  "iiYrag": [
+    {
+      "type": 0,
+      "value": "Please enter your password"
+    }
+  ],
+  "ipwTkh": [
+    {
+      "type": 0,
+      "value": "Same as shipping address"
+    }
+  ],
+  "ivNR8s": [
+    {
+      "type": 0,
+      "value": "Order Summary"
+    }
+  ],
+  "jvo0vs": [
+    {
+      "type": 0,
+      "value": "Save"
+    }
+  ],
+  "kVzyDt": [
+    {
+      "type": 0,
+      "value": "Thank you for your order!"
+    }
+  ],
+  "knAdWV": [
+    {
+      "type": 0,
+      "value": "Top Sellers"
+    }
+  ],
+  "ku+mDU": [
+    {
+      "type": 0,
+      "value": "State"
+    }
+  ],
+  "lKv8ex": [
+    {
+      "type": 0,
+      "value": "Default"
+    }
+  ],
+  "llHgJz": [
+    {
+      "type": 0,
+      "value": "Welcome "
+    },
+    {
+      "type": 1,
+      "value": "name"
+    },
+    {
+      "type": 0,
+      "value": ","
+    }
+  ],
+  "login-redirect.message.welcome": [
+    {
+      "type": 0,
+      "value": "Login Redirect"
+    }
+  ],
+  "m/CSCf": [
+    {
+      "type": 0,
+      "value": "Add a new payment method for faster checkout"
+    }
+  ],
+  "mXiD5u": [
+    {
+      "type": 0,
+      "value": "Phone Number"
+    }
+  ],
+  "mYx8sv": [
+    {
+      "type": 0,
+      "value": "Account Details"
+    }
+  ],
+  "mfahwZ": [
+    {
+      "type": 0,
+      "value": "Recently Viewed"
+    }
+  ],
+  "mobile_navigation.actions.sign_in": [
+    {
+      "type": 0,
+      "value": "Sign In"
+    }
+  ],
+  "mobile_navigation.actions.store_locator": [
+    {
+      "type": 0,
+      "value": "Store Locator"
+    }
+  ],
+  "mobile_navigation.categories.shop_all": [
+    {
+      "type": 0,
+      "value": "Shop All"
+    }
+  ],
+  "mobile_navigation.links.customer_support": [
+    {
+      "type": 0,
+      "value": "Customer Support"
+    }
+  ],
+  "mobile_navigation.links.customer_support.contact_us": [
+    {
+      "type": 0,
+      "value": "Contact Us"
+    }
+  ],
+  "mobile_navigation.links.customer_support.shipping_and_returns": [
+    {
+      "type": 0,
+      "value": "Shipping & Returns"
+    }
+  ],
+  "mobile_navigation.links.out_company": [
+    {
+      "type": 0,
+      "value": "Our Company"
+    }
+  ],
+  "mobile_navigation.links.out_company.about_us": [
+    {
+      "type": 0,
+      "value": "About Us"
+    }
+  ],
+  "mobile_navigation.links.privacy_and_security": [
+    {
+      "type": 0,
+      "value": "Privacy & Security"
+    }
+  ],
+  "mobile_navigation.links.privacy_and_security.privacy_policy": [
+    {
+      "type": 0,
+      "value": "Privacy Policy"
+    }
+  ],
+  "mobile_navigation.links.privacy_and_security.stie_map": [
+    {
+      "type": 0,
+      "value": "Site Map"
+    }
+  ],
+  "mobile_navigation.links.privacy_and_security.terms_and_conditions": [
+    {
+      "type": 0,
+      "value": "Terms & Conditions"
+    }
+  ],
+  "nA8PRt": [
+    {
+      "type": 0,
+      "value": "1 lowercase letter"
+    }
+  ],
+  "nFQbxh": [
+    {
+      "type": 0,
+      "value": "Payment Method"
+    }
+  ],
+  "nYi7Xz": [
+    {
+      "type": 0,
+      "value": "Your Cart is Empty"
+    }
+  ],
+  "o1QPc9": [
+    {
+      "type": 0,
+      "value": "Tracking Number"
+    }
+  ],
+  "o40Ymt": [
+    {
+      "type": 0,
+      "value": "Please enter a valid security code"
+    }
+  ],
+  "oLpv29": [
+    {
+      "type": 0,
+      "value": "Please enter a valid email address"
+    }
+  ],
+  "odTkf5": [
+    {
+      "type": 0,
+      "value": "Back to sign in"
+    }
+  ],
+  "odXlk8": [
+    {
+      "type": 0,
+      "value": "Log in"
+    }
+  ],
+  "offline_banner.message": [
+    {
+      "type": 0,
+      "value": "You're currently browsing in offline mode"
+    }
+  ],
+  "p2EAP0": [
+    {
+      "type": 0,
+      "value": "Promotion removed"
+    }
+  ],
+  "pQ2F3h": [
+    {
+      "type": 0,
+      "value": "Edit Shipping Address"
+    }
+  ],
+  "pS9/Sw": [
+    {
+      "type": 0,
+      "value": "Please enter your card number"
+    }
+  ],
+  "pagination.actions.current_page_verb": [
+    {
+      "type": 0,
+      "value": "of"
+    }
+  ],
+  "pagination.actions.next": [
+    {
+      "type": 0,
+      "value": "Next"
+    }
+  ],
+  "pagination.actions.prev": [
+    {
+      "type": 0,
+      "value": "Prev"
+    }
+  ],
+  "product_list_page.no_results": [
+    {
+      "type": 0,
+      "value": "We couldn’t find anything for "
+    },
+    {
+      "type": 1,
+      "value": "category"
+    },
+    {
+      "type": 0,
+      "value": ". Try searching for a product or "
+    },
+    {
+      "type": 1,
+      "value": "link"
+    },
+    {
+      "type": 0,
+      "value": "."
+    }
+  ],
+  "product_list_page.no_results.contact_us": [
+    {
+      "type": 0,
+      "value": "contact us"
+    }
+  ],
+  "py3qts": [
+    {
+      "type": 0,
+      "value": "New Address Saved"
+    }
+  ],
+  "qGl7SR": [
+    {
+      "type": 0,
+      "value": "Please create a password"
+    }
+  ],
+  "qVGRIE": [
+    {
+      "type": 0,
+      "value": "Quantity"
+    }
+  ],
+  "rkxMdY": [
+    {
+      "offset": 0,
+      "options": {
+        "=0": {
+          "value": [
+            {
+              "type": 0,
+              "value": "0 items"
+            }
+          ]
+        },
+        "one": {
+          "value": [
+            {
+              "type": 7
+            },
+            {
+              "type": 0,
+              "value": " item"
+            }
+          ]
+        },
+        "other": {
+          "value": [
+            {
+              "type": 7
+            },
+            {
+              "type": 0,
+              "value": " items"
+            }
+          ]
+        }
+      },
+      "pluralType": "cardinal",
+      "type": 6,
+      "value": "itemCount"
+    },
+    {
+      "type": 0,
+      "value": " in cart"
+    }
+  ],
+  "s/qo4z": [
+    {
+      "type": 0,
+      "value": "Please enter your last name"
+    }
+  ],
+  "s7dATg": [
+    {
+      "type": 0,
+      "value": "Edit cart"
+    }
+  ],
+  "sy+pv5": [
+    {
+      "type": 0,
+      "value": "Email"
+    }
+  ],
+  "tf1lIh": [
+    {
+      "type": 0,
+      "value": "Free"
+    }
+  ],
+  "tiVXug": [
+    {
+      "type": 0,
+      "value": "Please enter your city"
+    }
+  ],
+  "tpMVg1": [
+    {
+      "type": 0,
+      "value": "Lighter layers for lighter days."
+    }
+  ],
+  "uCk8r+": [
+    {
+      "type": 0,
+      "value": "Already have an account?"
+    }
+  ],
+  "uE6ELS": [
+    {
+      "type": 0,
+      "value": "Not provided"
+    }
+  ],
+  "uSpe21": [
+    {
+      "type": 0,
+      "value": "Edit Address"
+    }
+  ],
+  "uV4+68": [
+    {
+      "type": 0,
+      "value": "Please enter your "
+    },
+    {
+      "type": 1,
+      "value": "postalOrZip"
+    }
+  ],
+  "unUv/E": [
+    {
+      "type": 0,
+      "value": "You Might Also Like"
+    }
+  ],
+  "v898P+": [
+    {
+      "type": 0,
+      "value": "You May Also Like"
+    }
+  ],
+  "vONi+O": [
+    {
+      "type": 0,
+      "value": "Country"
+    }
+  ],
+  "vrBTnC": [
+    {
+      "type": 0,
+      "value": "Do you want to send this as a gift?"
+    }
+  ],
+  "vvTcAr": [
+    {
+      "type": 0,
+      "value": "Create an account and get first access to the very best products, inspiration and community."
+    }
+  ],
+  "wBVQL7": [
+    {
+      "type": 0,
+      "value": "Password must contain at least one uppercase letter"
+    }
+  ],
+  "wEQDC6": [
+    {
+      "type": 0,
+      "value": "Edit"
+    }
+  ],
+  "x6hxSH": [
+    {
+      "type": 0,
+      "value": "Something's not right with your email or password. Try again."
+    }
+  ],
+  "xBrtnx": [
+    {
+      "type": 0,
+      "value": "Addresses"
+    }
+  ],
+  "xD3Bn3": [
+    {
+      "type": 0,
+      "value": "Quantity: "
+    },
+    {
+      "type": 1,
+      "value": "quantity"
+    }
+  ],
+  "xHP4/6": [
+    {
+      "type": 0,
+      "value": "Password Reset"
+    }
+  ],
+  "xYH2SF": [
+    {
+      "type": 0,
+      "value": "No Saved Addresses"
+    }
+  ],
+  "xg14pg": [
+    {
+      "type": 0,
+      "value": "Add Address"
+    }
+  ],
+  "xl27nc": [
+    {
+      "type": 0,
+      "value": "Reset Password"
+    }
+  ],
+  "xuTqgN": [
+    {
+      "type": 0,
+      "value": "Payment Methods"
+    }
+  ],
+  "y/sA02": [
+    {
+      "type": 0,
+      "value": "Most Viewed"
+    }
+  ],
+  "z+Zrln": [
+    {
+      "type": 0,
+      "value": "Set as default"
+    }
+  ],
+  "z34C7B": [
+    {
+      "type": 0,
+      "value": "Password must contain at least one special character"
+    }
+  ],
+  "z3Qj9h": [
+    {
+      "type": 0,
+      "value": "Proceed to Checkout"
+    }
+  ],
+  "zHi6BD": [
+    {
+      "type": 0,
+      "value": "Please enter 2-letter state/province"
+    }
+  ],
+  "zODu/+": [
+    {
+      "type": 0,
+      "value": "ea"
+    }
+  ],
+  "zXbRZR": [
+    {
+      "type": 0,
+      "value": "Order Number: "
+    },
+    {
+      "type": 1,
+      "value": "orderNumber"
+    }
+  ]
+}
