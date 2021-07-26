@@ -56,6 +56,7 @@ const Home = () => {
                 })}
                 marginBottom="16"
             />
+            <h1>[DO NOT MERGE PR] Testing Circle CI configuration</h1>
             <Section
                 title={intl.formatMessage({
                     defaultMessage: 'Shop by Category'
