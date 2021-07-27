@@ -288,3 +288,4 @@ workflows:
           context: nightly-build
       - generatedSFCCProjectTest:
           context: nightly-build
+
