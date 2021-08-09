@@ -42,23 +42,23 @@ const buildMarkerPlugin = new BuildMarkerPlugin({
 
 const replacements = [
     {
-        path: join('pwa-kit-react-sdk', 'dist', 'ssr', 'universal', 'components', '_app-config'),
+        path: join('pwa-kit-react-sdk', 'ssr', 'universal', 'components', '_app-config'),
         newPath: resolve('.', 'app', 'components', '_app-config', 'index.jsx')
     },
     {
-        path: join('pwa-kit-react-sdk', 'dist', 'ssr', 'universal', 'components', '_document'),
+        path: join('pwa-kit-react-sdk', 'ssr', 'universal', 'components', '_document'),
         newPath: resolve('.', 'app', 'components', '_document', 'index.jsx')
     },
     {
-        path: join('pwa-kit-react-sdk', 'dist', 'ssr', 'universal', 'components', '_app'),
+        path: join('pwa-kit-react-sdk', 'ssr', 'universal', 'components', '_app'),
         newPath: resolve('.', 'app', 'components', '_app', 'index.jsx')
     },
     {
-        path: join('pwa-kit-react-sdk', 'dist', 'ssr', 'universal', 'components', '_error'),
+        path: join('pwa-kit-react-sdk', 'ssr', 'universal', 'components', '_error'),
         newPath: resolve('.', 'app', 'components', '_error', 'index.jsx')
     },
     {
-        path: join('pwa-kit-react-sdk', 'dist', 'ssr', 'universal', 'routes'),
+        path: join('pwa-kit-react-sdk', 'ssr', 'universal', 'routes'),
         newPath: resolve('.', 'app', 'routes.jsx')
     }
 ].filter(({newPath}) => fs.existsSync(newPath))
