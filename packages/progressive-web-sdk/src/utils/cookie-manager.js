@@ -1,7 +1,10 @@
 /* * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
 /* Copyright (c) 2019 Mobify Research & Development Inc. All rights reserved. */
 /* * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
-
+/**
+ * @module progressive-web-sdk/dist/utils/cookie-manager
+ * @private
+ */
 const POLL_TIME_INTERVAL = 50
 const POLL_TIME_LIMIT = 3000
 

@@ -1,6 +1,9 @@
 /* * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
 /* Copyright (c) 2019 Mobify Research & Development Inc. All rights reserved. */
 /* * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
+/**
+ * @module progressive-web-sdk/dist/utils/typecheck
+ */
 
 /**
  * Validates a value against a runtype. If the value does not match the provided

@@ -1,7 +1,9 @@
 /* * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
 /* Copyright (c) 2019 Mobify Research & Development Inc. All rights reserved. */
 /* * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
-
+/**
+ * @module progressive-web-sdk/dist/utils/ssr-loader-utils
+ */
 /*
  Utilities for the SSR Loader. The utilities in this file are, in general,
  NOT intended to be used in any other part of the SDK.

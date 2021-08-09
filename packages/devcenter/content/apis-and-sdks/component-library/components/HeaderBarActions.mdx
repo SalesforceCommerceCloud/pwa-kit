@@ -1,0 +1,44 @@
+---
+title: HeaderBarActions
+metaTitle: HeaderBarActions
+metaDescription: HeaderBarActions
+---
+
+import PropsTable from '../../../../src/components/propstable'
+import Tabs from 'progressive-web-sdk/dist/components/tabs/tabs'
+import TabsPanel from 'progressive-web-sdk/dist/components/tabs/tabs-panel'
+
+<div>
+
+This contains the actions in `HeaderBar` such as menu and search. It gives developers the flexibility of adding other components as its content. Common components used inside `HeaderBarActions` are `Button` and `Icon`.
+
+Related components: [HeaderBar](HeaderBar) and [HeaderBarTitle](HeaderBarTitle).
+
+</div>
+
+<div onClick={(e) => {e.stopPropagation()}}>
+<Tabs activeIndex={0} className="devcenter">
+<TabsPanel title="Code" onClick={(e) => {e.stopPropagation()}}>
+
+### JavaScript imports
+
+```jsx
+import {HeaderBar, 
+        HeaderBarActions, 
+        HeaderBarTitle
+       } from 'progressive-web-sdk/dist/components/header-bar'
+```
+
+### SCSS import
+
+```scss
+@import 'node_modules/progressive-web-sdk/dist/components/header-bar/base';
+```
+
+### Props table
+
+<PropsTable propMetaData={props.componentMetadata.childrenComponentProp} />
+
+</TabsPanel>
+</Tabs>
+</div>

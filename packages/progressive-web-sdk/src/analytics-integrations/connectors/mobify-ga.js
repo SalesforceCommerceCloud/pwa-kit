@@ -1,15 +1,17 @@
 /* * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
 /* Copyright (c) 2019 Mobify Research & Development Inc. All rights reserved. */
 /* * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
-/** @module */
+/** @module progressive-web-sdk/dist/analytics-integrations/connectors/mobify-ga
+ * @private
+ **/
 import {GoogleAnalyticsConnector} from './google-analytics'
 import {PAGEVIEW, ADDTOCART, REMOVEFROMCART} from '../types'
 
 /**
  * A Connector for Mobify's Google Analytics.
  *
- * @implements {module:interface.AnalyticsConnector}
- * @extends {module:connectors/google-analytics.GoogleAnalyticsConnector}
+ * @implements {module:progressive-web-sdk/dist/analytics-integrations/interface.AnalyticsConnector}
+ * @extends {module:progressive-web-sdk/dist/analytics-integrations/connectors/google-tag-manager.GoogleAnalyticsConnector}
  */
 export class MobifyGoogleAnalyticsConnector extends GoogleAnalyticsConnector {
     /**

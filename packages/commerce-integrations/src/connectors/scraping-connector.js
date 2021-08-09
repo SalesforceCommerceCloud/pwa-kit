@@ -1,3 +1,8 @@
+/**
+ * @module @mobify/commerce-integrations/dist/connectors/scraping-connector
+ * @private
+ */
+
 import request from 'superagent'
 import * as cj from 'cookiejar'
 
@@ -102,7 +107,7 @@ export class ScrapingConnector {
      *
      *    `["a=b; domain=example.com; path=/", "c=d; domain=example2.com; path=/"]`
      *
-     * @returns {Array.<String>}
+     * @returns {string[]}
      */
     getCookies() {
         if (!this.inBrowser()) {

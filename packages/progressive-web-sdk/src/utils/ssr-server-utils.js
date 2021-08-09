@@ -1,6 +1,9 @@
 /* * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
 /* Copyright (c) 2019 Mobify Research & Development Inc. All rights reserved. */
 /* * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
+/**
+ * @module progressive-web-sdk/dist/utils/ssr-server-utils
+ */
 import crypto from 'crypto'
 import uncss from 'uncss'
 import path from 'path'

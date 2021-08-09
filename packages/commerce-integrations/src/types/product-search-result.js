@@ -6,17 +6,6 @@ import PropTypes from 'prop-types'
 import {Image} from './image'
 import {VariationProperty} from './variation-property'
 
-/**
- * @memberOf module:types
- * @typedef {Object} ProductSearchResult
- * @property {Boolean} available Whether the product is available for order.
- * @property {String} productId The product id.
- * @property {String} productName The product name.
- * @property {Number} price The product price.
- * @property {Number} rating The product rating.
- * @property {module:types.Image} defaultImage The product main image.
- * @property {Array.<module:types.VariationProperty>} variationProperties The product variations.
- */
 export const ProductSearchResult = {
     available: PropTypes.bool.isRequired,
     productId: PropTypes.string.isRequired,
@@ -26,3 +15,15 @@ export const ProductSearchResult = {
     defaultImage: PropTypes.shape(Image).isRequired,
     variationProperties: PropTypes.arrayOf(PropTypes.shape(VariationProperty))
 }
+
+/**
+ * @memberOf module:@mobify/commerce-integrations/dist/types
+ * @typedef {Object} ProductSearchResult
+ * @property {Boolean} available Whether the product is available for order.
+ * @property {String} productId The product id.
+ * @property {String} productName The product name.
+ * @property {Number} price The product price.
+ * @property {Number} rating The product rating.
+ * @property {module:@mobify/commerce-integrations/dist/types.Image} defaultImage The product main image.
+ * @property {Array.<module:@mobify/commerce-integrations/dist/types.VariationProperty>} variationProperties The product variations.
+ */

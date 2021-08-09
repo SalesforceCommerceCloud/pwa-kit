@@ -4,13 +4,6 @@
 
 import PropTypes from 'prop-types'
 
-/**
- * @memberOf module:types
- * @typedef {Object} PaymentMethod
- * @property {String} id The payment method id.
- * @property {String} name The payment method name.
- * @property {Array<Object>} types The different types of the particular payment method. (For example, a credit card payment method can have types Visa and Mastercard.)
- */
 export const PaymentMethod = {
     id: PropTypes.string.isRequired,
     name: PropTypes.string,
@@ -21,3 +14,11 @@ export const PaymentMethod = {
         })
     )
 }
+
+/**
+ * @memberOf module:@mobify/commerce-integrations/dist/types
+ * @typedef {Object} PaymentMethod
+ * @property {String} id The payment method id.
+ * @property {String} name The payment method name.
+ * @property {Array<Object>} types The different types of the particular payment method. (For example, a credit card payment method can have types Visa and Mastercard.)
+ */

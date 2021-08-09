@@ -4,8 +4,9 @@
 import Validator from 'validator'
 import {makeValidator} from './validators'
 
+export const Email = makeValidator(Validator.isEmail, 'Not a valid Email Address.')
+
 /**
- * @memberOf module:types
+ * @memberOf module:@mobify/commerce-integrations/dist/types
  * @typedef {String} Email
  */
-export const Email = makeValidator(Validator.isEmail, 'Not a valid Email Address.')

@@ -1,0 +1,121 @@
+---
+title: HeaderBar
+metaTitle: HeaderBar
+metaDescription: HeaderBar
+---
+
+import HeaderBar from 'progressive-web-sdk/dist/components/header-bar/header-bar'
+import PropsTable from '../../../../src/components/propstable'
+import logo from './logo-mobify-white.png'
+import Tabs from 'progressive-web-sdk/dist/components/tabs/tabs'
+import TabsPanel from 'progressive-web-sdk/dist/components/tabs/tabs-panel'
+
+<div class="component-intro">
+
+Header bars are used in Progressive Web Apps (PWAs) and native apps to contain wayfinding and global site navigation controls. The header tells the user where they are within the site, and offers links to the most important sections.
+
+</div>
+
+`HeaderBar` is a component that can contain actions (`HeaderBarActions`)
+and a title (`HeaderBarTitle`).
+
+Related components: [HeaderBarActions](HeaderBarActions) and [HeaderBarTitle](HeaderBarTitle).
+
+<div onClick={(e) => {e.stopPropagation()}}>
+<Tabs activeIndex={0} className="devcenter">
+<TabsPanel title="Code" onClick={(e) => {e.stopPropagation()}}>
+
+### JavaScript imports
+
+```jsx
+import {HeaderBar, 
+        HeaderBarActions, 
+        HeaderBarTitle
+       } from 'progressive-web-sdk/dist/components/header-bar'
+```
+
+### SCSS import
+
+```scss
+@import 'node_modules/progressive-web-sdk/dist/components/header-bar/base';
+```
+
+### Props table
+
+<PropsTable propMetaData={props.componentMetadata.childrenComponentProp} />
+
+### Basic example
+
+```jsx react-live=true
+<HeaderBar>
+    <HeaderBarActions>Menu</HeaderBarActions>
+    <HeaderBarActions>Search</HeaderBarActions>
+    <HeaderBarTitle>Logo</HeaderBarTitle>
+    <HeaderBarActions>Stores</HeaderBarActions>
+    <HeaderBarActions>Cart</HeaderBarActions>
+</HeaderBar>
+```
+
+### Complex example
+
+```jsx react-live=true
+<HeaderBar>
+    <HeaderBarActions>
+        <Button className="pw--blank u-padding-sm">
+            <IconLabel iconName="menu" label="Menu" />
+        </Button>
+    </HeaderBarActions>
+    <HeaderBarActions>
+        <Button className="pw--blank u-padding-sm">
+            <IconLabel iconName="search" label="Search" />
+        </Button>
+    </HeaderBarActions>
+    <HeaderBarTitle href="http://www.mobify.com">
+        <img src={logo} alt="Mobify Logo" height="28" />
+    </HeaderBarTitle>
+    <HeaderBarActions>
+        <Button className="pw--blank u-padding-sm">
+            <IconLabel iconName="location" label="Stores" />
+        </Button>
+    </HeaderBarActions>
+    <HeaderBarActions>
+        <Button className="pw--blank u-padding-sm">
+            <IconLabel iconName="cart" label="Cart" />
+        </Button>
+    </HeaderBarActions>
+</HeaderBar>
+```
+
+</TabsPanel>
+<TabsPanel title="Design" class="markdown">
+
+### Screenshot
+
+![](./images/components/header-bar/headerbar-uikit.png)
+
+### Potential uses
+
+-   Typically, a header is composed of buttons (icons with labels) and a logo.
+-   In PWAs, header bars tend to remain the same globally, as a user may deep link from search or social media and begin their experience from any page.
+-   For native apps, header bars are more focused. They tend to reflect the current page, and offer links that are related to the task at hand.
+-   Header bars are typically `position:fixed` to the top of the viewport.
+-   Header bars typically hold the website logo, a menu to access the product catalogue, a link to the shopping cart, and a search field.
+-   Links to Stores and My Account are also commonly found in the header bar.
+-   Users browsing a PWA in full screen mode (after adding the PWA to their home screen) may require some adjustment to the header bar in order to balance the loss of the back button and sharing functions from the browser chrome.
+
+### Accessibility
+
+-   Don't assume that all users understand the meaning of your icons. Include labels beneath icons help improve comprehension.
+-   Reduce the vertical space occupied by fixed elements, but make sure they remain larger than the minimum tap target (typically 44px).
+
+### Best practices
+
+-   Variable depending on available actions.
+-   Fixed header bars are encouraged for PWAs, as they play a role in creating an app-like experience. They also allow users to have instant access to their shopping carts.
+-   Fixed header bars reduce the space available to display the current task. To mitigate this, ensure that your fixed header bar takes up the minimal vertical space.
+-   Design your fixed header bar to be as simple as possible to ensure it doesn't distract users from their current task.
+-   Often the header bar will adopt a background color that matches the brand color. This is useful as it helps users to distinguish your site from others.
+
+</TabsPanel>
+</Tabs>
+</div>

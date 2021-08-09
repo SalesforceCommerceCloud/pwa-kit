@@ -1,0 +1,167 @@
+---
+title: APIs & SDKs
+metaTitle: APIs & SDKs
+metaDescription: Complete reference documentation for Mobify’s APIs and SDKs, including Analytics Integrations, Commerce Integrations, our React Component Library, the Mobify Cloud API, and the Progressive Web SDK.
+column: 2
+---
+
+import Layout from '../../src/components/Layout'
+import {Grid} from '@theme-ui/components'
+import {Card as DevCenterCard} from '../../src/components/CardComponent'
+
+Here you'll find reference documentation (classes, interfaces, methods, function parameters, HTTP endpoints, etc.) for all of the following Mobify technologies.
+
+<Grid gap={'xl'} columns={[1, null, 2]} paddingBottom={2}>
+    <DevCenterCard
+        title="Progressive Web SDK Overview"
+        description="Learn more about what's included in Mobify's core SDK."
+        cardLink="/apis-and-sdks/progressive-web-sdk/"
+    />
+    <DevCenterCard
+        title="Component Library"
+        description="Over 70 React components optimized for ecommerce and accessibility, included in the Progressive Web SDK."
+        cardLink="/apis-and-sdks/component-library/"
+    />
+    <DevCenterCard
+        title="Analytics Integrations"
+        description="An extensible data layer for interacting with client-side analytics services, included in the Progressive Web SDK."
+        linkGroups={{
+            null: [
+                {
+                    title: 'Overview',
+                    slug:
+                        '/apis-and-sdks/progressive-web-sdk/analytics-integrations/overview'
+                },
+                {
+                    title: 'AnalyticsManager Class',
+                    slug:
+                        '/apis-and-sdks/progressive-web-sdk/analytics-integrations/analytics-manager'
+                },
+                {
+                    title: 'Interface (AnalyticsConnector)',
+                    slug:
+                        '/apis-and-sdks/progressive-web-sdk/analytics-integrations/interface'
+                },
+                {
+                    title: 'Engagement Engine Connector',
+                    slug:
+                        '/apis-and-sdks/progressive-web-sdk/analytics-integrations/connectors/engagement-engine'
+                },
+                {
+                    title: 'Google Analytics Connector',
+                    slug:
+                        '/apis-and-sdks/progressive-web-sdk/analytics-integrations/connectors/google-analytics'
+                },
+                {
+                    title: 'Google Tag Manager Connector',
+                    slug:
+                        '/apis-and-sdks/progressive-web-sdk/analytics-integrations/connectors/google-tag-manager'
+                },
+                {
+                    title: 'Data Types',
+                    slug: '/apis-and-sdks/progressive-web-sdk/analytics-integrations/types'
+                },
+                {
+                    title: 'Error Types',
+                    slug: '/apis-and-sdks/progressive-web-sdk/analytics-integrations/errors'
+                },
+                {
+                    title: 'Utilities',
+                    slug: '/apis-and-sdks/progressive-web-sdk/analytics-integrations/utils'
+                }
+            ]
+        }}
+    />
+    <DevCenterCard
+        title="Commerce Integrations"
+        description="Mobify Platform's data layer for integrating ecommerce backends."
+        linkGroups={{
+            null: [
+                {
+                    title: 'Overview',
+                    slug: '/apis-and-sdks/commerce-integrations/overview'
+                },
+                {
+                    title: 'Interface (CommerceConnector)',
+                    slug: '/apis-and-sdks/commerce-integrations/connectors/interfaces'
+                },
+                {
+                    title: 'Hybris Connector',
+                    slug: '/apis-and-sdks/commerce-integrations/connectors/hybris'
+                },
+                {
+                    title: 'Salesforce Commerce Cloud Connector',
+                    slug: '/apis-and-sdks/commerce-integrations/connectors/sfcc'
+                },
+                {
+                    title: 'Data Types',
+                    slug: '/apis-and-sdks/commerce-integrations/types'
+                },
+                {
+                    title: 'Error Types',
+                    slug: '/apis-and-sdks/commerce-integrations/errors'
+                }
+            ]
+        }}
+    />
+    <DevCenterCard
+        title="Mobify Cloud API"
+        description="RESTful API for managing how apps are deployed on Mobify Cloud."
+        linkGroups={{
+            null: [
+                {
+                    title: 'Cache invalidation',
+                    slug: '/apis-and-sdks/mobify-cloud/rest-api#cache-invalidation'
+                },
+                {
+                    title: 'Clone redirects',
+                    slug: '/apis-and-sdks/mobify-cloud/rest-api#clone-redirects'
+                },
+                {
+                    title: 'Create redirect',
+                    slug: '/apis-and-sdks/mobify-cloud/rest-api#create-redirect'
+                },
+                {
+                    title: 'Delete redirect',
+                    slug: '/apis-and-sdks/mobify-cloud/rest-api#delete-redirect'
+                },
+                {
+                    title: 'List redirects',
+                    slug: '/apis-and-sdks/mobify-cloud/rest-api#list-redirects'
+                },
+                {
+                    title: 'Read redirect',
+                    slug: '/apis-and-sdks/mobify-cloud/rest-api#read-redirect'
+                },
+                {
+                    title: 'Update redirect',
+                    slug: '/apis-and-sdks/mobify-cloud/rest-api#update-redirect'
+                },
+                {
+                    title: 'Create target',
+                    slug: '/apis-and-sdks/mobify-cloud/rest-api#create-target'
+                },
+                {
+                    title: 'Delete target',
+                    slug: '/apis-and-sdks/mobify-cloud/rest-api#delete-target'
+                },
+                {
+                    title: 'Deploy a bundle',
+                    slug: '/apis-and-sdks/mobify-cloud/rest-api#deploy-a-bundle'
+                },
+                {
+                    title: 'List targets',
+                    slug: '/apis-and-sdks/mobify-cloud/rest-api#list-targets'
+                },
+                {
+                    title: 'Read target',
+                    slug: '/apis-and-sdks/mobify-cloud/rest-api#read-target'
+                },
+                {
+                    title: 'Update target',
+                    slug: '/apis-and-sdks/mobify-cloud/rest-api#update-target'
+                }
+            ]
+        }}
+    />
+</Grid>

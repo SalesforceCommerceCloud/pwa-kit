@@ -1,0 +1,85 @@
+---
+title: BazaarvoiceReview
+metaTitle: BazaarvoiceReview
+metaDescription: BazaarvoiceReview
+---
+
+import PropsTable from '../../../../src/components/propstable'
+import Tabs from 'progressive-web-sdk/dist/components/tabs/tabs'
+import TabsPanel from 'progressive-web-sdk/dist/components/tabs/tabs-panel'
+
+<div class="component-intro">
+
+This component makes it easier to integrate [Bazaarvoice reviews](https://www.bazaarvoice.com/ratings-and-reviews/) into your PWA. It allows you to render the reviews for a product based on a product ID.
+
+</div>
+
+<div onClick={(e) => {e.stopPropagation()}}>
+<Tabs activeIndex={0} className="devcenter">
+<TabsPanel title="Code" onClick={(e) => {e.stopPropagation()}}>
+
+### JavaScript import
+
+```javascript static
+import BazaarvoiceReview from 'progressive-web-sdk/dist/components/bazaarvoice-review'
+```
+
+### SCSS import
+
+```scss
+@import 'node_modules/progressive-web-sdk/dist/components/bazaarvoice-review/base';
+```
+
+### Props table
+
+<PropsTable propMetaData={props.componentMetadata.childrenComponentProp} />
+
+### Basic example
+
+The following example will render the Bazaarvoice reviews for the given product ID. If you need to make visual modifications to the appearance of these reviews, override the default CSS styles.
+
+```jsx static
+<BazaarvoiceReview productId={productId} apiSrc={src} />
+```
+
+### BazaarVoice API v2
+
+The `BazaarvoiceReview` component supports version 2 of the BazaarVoice API.
+To use version 2, the prop `apiVersion='2'` needs to be set
+and the `apiSrc` needs to be updated to the API v2 URL, like this:
+
+```jsx static
+<BazaarvoiceReview productId={productId} apiSrc={src} apiVersion="2" />
+```
+
+### Custom components
+
+The `BazaarvoiceReview` component ensures that the Bazaarvoice API script is only loaded once, regardless of how many `BazaarvoiceReview` components are mounted. This is done using a [higher order component](https://reactjs.org/docs/higher-order-components.html) called `BazaarvoiceWrapper`.
+
+It's possible to use `BazaarvoiceWrapper` to create your own custom Bazaarvoice components. You may want to do this to add a `BazaarvoiceQuestions` component, for example. Your custom component would look something like this:
+
+```jsx static
+import bazaarvoiceWrapper from 'progressive-web-sdk/dist/components/bazaarvoice-wrapper'
+
+class CustomBazaarvoiceComponent extends React.Component {
+    componentDidMount() {
+        // Perform any necessary setup, such as calling window.$BV.ui
+    }
+
+    render() {
+        // Render the required container here
+    }
+}
+
+export default bazaarvoiceWrapper(CustomBazaarvoiceComponent)
+```
+
+You could then use your `CustomBazaarvoiceComponent` like this:
+
+```jsx static
+<CustomBazaarvoiceComponent apiSrc={src} {...additionalProps} />
+```
+
+</TabsPanel>
+</Tabs>
+</div>

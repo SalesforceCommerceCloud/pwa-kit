@@ -1,6 +1,6 @@
 {
   "name": "progressive-web-sdk",
-  "version": "1.18.1",
+  "version": "1.19.0",
   "description": "A set of libraries and components which make up the SDK for Progressive Web",
   "main": "dist/index.js",
   "bin": {
@@ -13,7 +13,7 @@
     "sdk-get-routes": "bin/get-routes.js"
   },
   "engines": {
-    "node": "^10.17.0"
+    "node": "^10.17.0 || ^12.0.0"
   },
   "files": [
     "bin",
@@ -141,7 +141,7 @@
     "@babel/preset-env": "^7.4.5",
     "@babel/preset-react": "^7.0.0",
     "@babel/register": "^7.4.4",
-    "@mobify/documentation-theme": "^1.18.1",
+    "@mobify/documentation-theme": "^1.19.0",
     "autoprefixer": "6.7.7",
     "aws-lambda-test-utils": "^1.3.0",
     "babel-jest": "^24.8.0",

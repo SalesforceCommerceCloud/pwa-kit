@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="66px" height="66px" viewBox="0 0 66 66" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 64 (93537) - https://sketch.com -->
+    <title>icon/release-notes</title>
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <filter x="-41.7%" y="-41.7%" width="183.3%" height="183.3%" filterUnits="objectBoundingBox" id="filter-1">
+            <feOffset dx="0" dy="1" in="SourceAlpha" result="shadowOffsetOuter1"></feOffset>
+            <feGaussianBlur stdDeviation="4.5" in="shadowOffsetOuter1" result="shadowBlurOuter1"></feGaussianBlur>
+            <feColorMatrix values="0 0 0 0 0.0549019608   0 0 0 0 0.0431372549   0 0 0 0 0.290196078  0 0 0 0.4 0" type="matrix" in="shadowBlurOuter1" result="shadowMatrixOuter1"></feColorMatrix>
+            <feMerge>
+                <feMergeNode in="shadowMatrixOuter1"></feMergeNode>
+                <feMergeNode in="SourceGraphic"></feMergeNode>
+            </feMerge>
+        </filter>
+        <linearGradient x1="0%" y1="0%" x2="100%" y2="100%" id="linearGradient-2">
+            <stop stop-color="#0099FF" offset="0%"></stop>
+            <stop stop-color="#4E439B" offset="100%"></stop>
+        </linearGradient>
+        <path d="M13.6388889,3.33333333 C14.16,3.33333333 14.6633333,3.51555556 15.0633333,3.84888889 L15.0633333,3.84888889 L20.7011111,8.55555556 C20.9533333,8.76666667 21.1,9.07888889 21.1,9.40888889 L21.1,9.40888889 L21.1,9.98777778 L21.1111111,11.1166667 L21.1111111,21.1111111 C21.1111111,22.3377778 20.1166667,23.3333333 18.8888889,23.3333333 L18.8888889,23.3333333 L7.77777778,23.3333333 C6.55,23.3333333 5.55555556,22.3377778 5.55555556,21.1111111 L5.55555556,21.1111111 L5.55555556,5.55555556 C5.55555556,4.32777778 6.55,3.33333333 7.77777778,3.33333333 L7.77777778,3.33333333 Z M13.3545125,5.55533333 L13.3333529,9.10165547 C13.3297487,9.70572077 13.8241466,10.2031148 14.4376781,10.2031148 L14.4376781,10.2031148 L18.8823365,10.2031148 L13.3545125,5.55533333 Z" id="path-3"></path>
+    </defs>
+    <g id="R3-Updates" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="card/medium/icon" transform="translate(-23.000000, -24.000000)">
+            <g id="icon/background/shadow" transform="translate(32.000000, 32.000000)">
+                <g id="bg" filter="url(#filter-1)" stroke-width="1" fill-rule="evenodd" fill="url(#linearGradient-2)">
+                    <circle id="Oval-2" cx="24" cy="24" r="24"></circle>
+                </g>
+                <g id="icon/doc" transform="translate(10.666667, 10.666667)">
+                    <mask id="mask-4" fill="white">
+                        <use xlink:href="#path-3"></use>
+                    </mask>
+                    <use fill="#FFFFFF" fill-rule="evenodd" xlink:href="#path-3"></use>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

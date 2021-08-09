@@ -225,9 +225,15 @@ class Carousel extends React.PureComponent {
                 // If we don't need to animate,
                 // just go directly to the new position
                 const newIndexes = this.calculateIndexes(position)
-                this.setState({
-                    ...newIndexes
-                })
+                const {onSlideMove} = this.props
+                this.setState(
+                    {
+                        ...newIndexes
+                    },
+                    () => {
+                        onSlideMove(newIndexes.currentIndex)
+                    }
+                )
             } else {
                 const {itemWidth, currentIndex} = this.state
                 const newDeltaX = (currentIndex - position) * itemWidth

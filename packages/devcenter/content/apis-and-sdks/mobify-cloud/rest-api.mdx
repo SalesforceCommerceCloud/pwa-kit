@@ -1,0 +1,84 @@
+---
+title: REST API
+metaTitle: Mobify Cloud REST API
+metaDescription: Reference material for the RESTful Mobify Cloud API. Includes endpoint parameters and code examples.
+category: Mobify Cloud REST API
+subcategory: Overview
+---
+import startCase from 'lodash/startCase'
+
+<CloudApiWrapper>
+    {props.edges.map(({node, i}) => {
+        return (
+            <div key={node.id + i}>
+                <div dangerouslySetInnerHTML={{__html: node.description}} />
+                {node.paths.map((item, i) => {
+                    const operationName = startCase(item.operationId)
+                    return (
+                        <div key={item.operationId}>
+                            <h2 id={operationName}>{operationName}</h2>
+                            <div dangerouslySetInnerHTML={{__html: item.description}} />
+                            <pre>
+                                <code>{`${item.verb.toUpperCase()} ${
+                                    item.fullPath
+                                }`}</code>
+                            </pre>
+                            <h3>URL Parameters</h3>
+                            <div>
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Field</th>
+                                            <th>Type</th>
+                                            <th>Description</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {item.parameters.map((item, i) => (
+                                            <tr key={i}>
+                                                <td>{item.name}</td>
+                                                <td>{item.schema.type}</td>
+                                                <td>
+                                                    {item.required
+                                                        ? 'Required. '
+                                                        : 'Optional. '}
+                                                    <span dangerouslySetInnerHTML={{__html: item.description}} />
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                            {item.requestBody.length > 0 && (
+                                <div>
+                                    <h3>Request Body</h3>
+                                    <SchemaTable
+                                        properties={item.requestBody[0].properties}
+                                        required={item.requestBody[0].required}
+                                    />
+                                    {item.requestBody[0].example && item.requestBody[0].example.length > 2 && (
+                                        <div>
+                                            <h3>Request example</h3>
+                                            <pre><code className='language-json'>{item.requestBody[0].example}</code></pre>
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+                            <h3>Response</h3>
+                            <div>
+                                <span>{item.response.statusCode}</span>
+                                <span dangerouslySetInnerHTML={{__html: item.response.description}} />
+                            </div>
+                            {item.response.example && item.response.example.length > 2 && (
+                                <>
+                                    <h3>Success response</h3>
+                                    <pre><code className='language-json'>{item.response.example}</code></pre>
+                                </>
+                            )}
+                        </div>
+                    )
+                })}
+            </div>
+        )
+    })}
+</CloudApiWrapper>

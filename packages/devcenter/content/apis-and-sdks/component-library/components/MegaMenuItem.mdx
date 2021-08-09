@@ -1,0 +1,161 @@
+---
+title: MegaMenuItem
+metaTitle: MegaMenuItem
+metaDescription: MegaMenuItem
+---
+
+import MegaMenuItem from 'progressive-web-sdk/dist/components/mega-menu-item'
+import PropsTable from '../../../../src/components/propstable'
+import Tabs from 'progressive-web-sdk/dist/components/tabs/tabs'
+import TabsPanel from 'progressive-web-sdk/dist/components/tabs/tabs-panel'
+
+<div class="component-intro">
+
+By itself, the `MegaMenuItem` renders a simple block link (and possibly an
+additional block of children links) that's intended for use in other
+components. In fact, it's the default component used when the `MegaMenu`
+component renders its list of navigation items.
+
+This component may seem similar to the [NavItem](NavItem) component used in `NavMenu`.
+However, this `MegaMenuItem` component is different in two important ways:
+
+1. `MegaMenuItem` can have `content` as well as nested children.
+2. `MegaMenuItem` tracks its active state in its internal state, rather than
+   with props. The active state is triggered by mouse hovers, touch taps, or with keyboard focus.
+
+If you want to use your own custom component instead of `MegaMenuItem`, you can do so by using the `MegaMenu`'s `itemFactory` callback.
+
+Related components: [Nav](Nav) and [MegaMenu](MegaMenu).
+
+</div>
+
+<div onClick={(e) => {e.stopPropagation()}}>
+<Tabs activeIndex={0} className="devcenter">
+<TabsPanel title="Code" onClick={(e) => {e.stopPropagation()}}>
+
+### JavaScript import
+
+```jsx
+import MegaMenuItem from 'progressive-web-sdk/dist/components/mega-menu'
+```
+
+### SCSS import
+
+```scss
+@import 'node_modules/progressive-web-sdk/dist/components/mega-menu-item/base';
+```
+
+### Props table
+
+<PropsTable propMetaData={props.componentMetadata.childrenComponentProp} />
+
+### Basic example
+
+The simplest way to use the `MegaMenuItem` is to pass it `content`.
+
+```jsx react-live=true
+<MegaMenuItem content="Home page" />
+```
+
+### With href
+
+This prop can be used to render `MegaMenuItem` as a link.
+
+```jsx react-live=true
+<MegaMenuItem content="Home page" href="/" />
+```
+
+### With children
+
+Passing `children` to the `MegaMenuItem` component (usually other instances of `MegaMenuItem`), it will render them after the `content`.
+
+```jsx react-live=true
+<MegaMenuItem content="Parent Item">
+    <MegaMenuItem content="Child Item 1" />
+    <MegaMenuItem content="Child Item 2" />
+    <MegaMenuItem content="Child Item 3" />
+</MegaMenuItem>
+```
+
+### With afterContent
+
+```jsx react-live=true
+<div>
+    <MegaMenuItem content="Parent Item" afterContent={<Icon name="chevron-right" />} />
+
+    <MegaMenuItem content="Parent Item" afterContent={<Icon name="chevron-right" />} />
+</div>
+```
+
+### With beforeContent
+
+```jsx react-live=true
+<div>
+    <MegaMenuItem content="Parent Item" beforeContent={<Icon name="user" />} />
+
+    <MegaMenuItem content="Parent Item" beforeContent={<Icon name="search" />} />
+</div>
+```
+
+### With navigate
+
+The `navigate` prop is an event handler (for `click`, `mouseEnter`, `mouseLeave`, and `focus` events) that invokes the `Nav` component's `onPathChange` callback. When a `MegaMenu` renders its `MegaMenuItem`s, it automatically passes a handler to the `navigate` prop. While it's possible to manually define `navigate` handlers, it's not recommended.
+
+```jsx react-live=true
+<MegaMenuItem
+    content="Parent Item"
+    navigate={(eventName) => {
+        console.log(`triggered: custom handler for ${eventName} event`)
+    }}
+/>
+```
+
+Instead, understand that `navigate` is passed a value from `MegaMenu` automatically. See the example below.
+
+_(Notice that in the example below, it appears as if there are **no** instances of `MegaMenuItem`, but in fact they are automatically rendered by `MegaMenu`.)_
+
+```jsx react-live=true
+class StatefulExample extends React.Component {
+    constructor() {
+        this.state = {
+            path: '/'
+        }
+    }
+
+    changePath(path) {
+        console.log('This callback is invoked when navigate() gets called!')
+        this.setState({path: path})
+    }
+
+    render() {
+        const root = {
+            title: 'Demonstration',
+            path: '/',
+            children: [
+                {
+                    title: 'Activating triggers navigate and sets path',
+                    path: '/a/'
+                },
+                {
+                    title: 'Activating triggers navigate and sets path',
+                    path: '/b/'
+                },
+                {
+                    title: 'Activating triggers navigate and sets path',
+                    path: '/c/'
+                }
+            ]
+        }
+
+        return (
+            <Nav root={root} path={this.state.path} onPathChange={this.changePath.bind(this)}>
+                <MegaMenu />
+            </Nav>
+        )
+    }
+}
+```
+
+</TabsPanel>
+</Tabs>
+</div>

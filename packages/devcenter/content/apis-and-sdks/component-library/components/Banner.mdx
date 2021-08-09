@@ -1,0 +1,94 @@
+---
+title: Banner
+metaTitle: Banner
+metaDescription: Banner
+---
+
+import Banner from 'progressive-web-sdk/dist/components/banner'
+import PropsTable from '../../../../src/components/propstable'
+import Tabs from 'progressive-web-sdk/dist/components/tabs/tabs'
+import TabsPanel from 'progressive-web-sdk/dist/components/tabs/tabs-panel'
+
+<div class="component-intro">
+
+Banners are used to display timely information in an attention-grabbing position and style.
+
+Typically, banners will notify the user of the status of a previous action or display a state, such as offline mode.
+
+</div>
+
+<div onClick={(e) => {e.stopPropagation()}}>
+<Tabs activeIndex={0} className="devcenter">
+<TabsPanel title="Code" onClick={(e) => {e.stopPropagation()}}>
+
+### JavaScript import
+
+```jsx
+import Banner from 'progressive-web-sdk/dist/components/banner'
+```
+
+### SCSS import
+
+```scss
+@import 'node_modules/progressive-web-sdk/dist/components/banner/base';
+```
+
+### Props table
+
+<PropsTable propMetaData={props.componentMetadata.childrenComponentProp} />
+
+### Basic example
+
+```jsx react-live=true
+<Banner icon="info" title="info">
+    Save 20% on your order with the code SAVEBIG
+</Banner>
+```
+
+### Using isAlert Banner
+
+```jsx react-live=true
+<Banner isAlert href="http://www.mobify.com" icon="info" title="info">
+    You are currently offline.
+</Banner>
+```
+
+### With a custom icon
+
+```jsx react-live=true
+<Banner icon="help" title="help">
+    Did you know you can save 20% on your order with the code SAVEBIG?
+</Banner>
+```
+
+</TabsPanel>
+<TabsPanel title="Design" class="markdown">
+
+### Screenshot
+
+![](./images/components/banner/banner-uikit.png)
+
+### Potential uses
+
+-   Displaying the availability of a promo code or other promotional messaging.
+-   Notifying the user that they're browsing in offline mode.
+-   Alerting the user that a form has _not_ been submitted due to errors.
+
+### Accessibility
+
+-   Be sure to check the contrast of text on background color to ensure it passes a11y guidelines. [Use this handy tool to guide you](http://www.contrastchecker.com).
+-   Use green for success and red for failure, however do not rely on color alone. Be sure to include icons, and be clear in your language.
+
+### Best practices
+
+-   On tap, a user can follow a link to a url with further information.
+-   On tap, an action can be set to open a modal which contains further information.
+-   Usually there will be multiple variations of background color and icon.
+-   Common places to position a banner include at the top of the page, below the header bar or fixed to the bottom of the viewport.
+-   If a banner is being used for success/failure messaging, it should be attention-grabbing in color.
+-   If a banner is used for promotional messaging site-wide, it should use a color which does not distract from the main actions on the page.
+-   Banner messages should contain very few words and be clear. If there is more information required to explain the message, this should be accessible from another page or modal window.
+
+</TabsPanel>
+</Tabs>
+</div>

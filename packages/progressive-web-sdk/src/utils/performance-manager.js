@@ -1,7 +1,10 @@
 /* * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
 /* Copyright (c) 2019 Mobify Research & Development Inc. All rights reserved. */
 /* * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
-
+/**
+ * @module progressive-web-sdk/dist/utils/performance-manager
+ * @private
+ */
 /*
  This file contains the PerformanceManager code.
  The PerformanceManager doesn't have one single "initialize" call,
@@ -17,6 +20,8 @@ import {runningServerSide} from './utils'
 
 /**
  * Debug log helper to avoid duplicating strings
+ * @param what
+ * @param flag
  */
 const isOrIsNotBusy = (what, flag) => `${what} is ${flag ? '' : 'not '}busy`
 

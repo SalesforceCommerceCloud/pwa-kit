@@ -1,0 +1,82 @@
+---
+title: ExposeApiBase
+metaTitle: ExposeApiBase
+metaDescription: ExposeApiBase
+---
+
+import ExposeApiBase from 'progressive-web-sdk/dist/components/expose-api-base'
+import Button from 'progressive-web-sdk/dist/components/button/'
+import PropsTable from '../../../../src/components/propstable'
+import Tabs from 'progressive-web-sdk/dist/components/tabs/tabs'
+import TabsPanel from 'progressive-web-sdk/dist/components/tabs/tabs-panel'
+
+<div class="component-intro">
+
+This is a base component to expose PWA API to the javascript `window` scope.
+
+</div>
+
+<div onClick={(e) => {e.stopPropagation()}}>
+<Tabs activeIndex={0} className="devcenter">
+<TabsPanel title="Code" onClick={(e) => {e.stopPropagation()}}>
+
+### JavaScript import
+```jsx
+import ExposeApiBase from 'progressive-web-sdk/dist/components/expose-api-base/'
+```
+
+### Basic example
+
+In `web/app/containers/app/container.jsx`, add the following
+
+```jsx static
+...
+import ExposeApiBase from 'progressive-web-sdk/dist/components/expose-api-base/'
+...
+
+    render() {
+        ...
+        return (
+            <Lockup>
+            ...
+                <ExposeApiBase />
+            </Lockup>
+        )
+    }
+...
+```
+
+Preview the project, open web developer console and run the following
+
+```js static
+window.Progressive.api.navigate('/')
+```
+
+The PWA should navigate to home page if it is not on home page.
+
+### Extend ExposeApiBase
+
+Extend off the ExposeApiBase to add more PWA api into the window scope.
+
+```jsx static
+import ExposeApiBase from 'progressive-web-sdk/dist/components/expose-api-base/'
+
+class ExposeApi extends ExposeApiBase {
+    buildProgressiveApi() {
+        return {
+            ...super.buildProgressiveApi(),     // Keeping the navigate function
+            test: () => {
+                console.log('test')
+            }
+        }
+    }
+}
+
+export default ExposeApi
+```
+
+Include the above component in the `app` container.
+
+</TabsPanel>
+</Tabs>
+</div>

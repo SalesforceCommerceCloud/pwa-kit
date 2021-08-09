@@ -188,7 +188,7 @@ Accordion.defaultProps = {
 
 Accordion.propTypes = {
     /**
-     * This list of <AccordionItem>s you'd like to display.
+     * This list of `AccordionItem`s you'd like to display.
      */
     children: PropTypes.node,
 

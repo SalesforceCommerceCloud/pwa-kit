@@ -1,0 +1,44 @@
+---
+title: SwatchItem
+metaTitle: SwatchItem
+metaDescription: SwatchItem
+---
+
+import Swatch from 'progressive-web-sdk/dist/components/swatch/swatch'
+import SwatchItem from 'progressive-web-sdk/dist/components/swatch/swatch-item'
+import Image from 'progressive-web-sdk/dist/components/image'
+import PropsTable from '../../../../src/components/propstable'
+import Tabs from 'progressive-web-sdk/dist/components/tabs/tabs'
+import TabsPanel from 'progressive-web-sdk/dist/components/tabs/tabs-panel'
+
+<div class="component-intro">
+
+This component is used to display items inside a `Swatch` component.
+
+Related component: [Swatch](Swatch).
+
+</div>
+
+<div onClick={(e) => {e.stopPropagation()}}>
+<Tabs activeIndex={0} className="devcenter">
+<TabsPanel title="Code" onClick={(e) => {e.stopPropagation()}}>
+
+### JavaScript import
+
+```jsx
+import {Swatch, SwatchItem} from 'progressive-web-sdk/dist/components/swatch'
+```
+
+### SCSS import
+
+```scss
+@import 'node_modules/progressive-web-sdk/dist/components/swatch/base';
+```
+
+### Props table
+
+<PropsTable propMetaData={props.componentMetadata.childrenComponentProp} />
+
+</TabsPanel>
+</Tabs>
+</div>

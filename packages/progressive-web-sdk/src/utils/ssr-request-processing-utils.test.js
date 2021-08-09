@@ -29,7 +29,7 @@ describe('Query parameter tests', () => {
         const qp = new QueryParameters(qs)
         expect(qp.parameters.length).toEqual(6)
         expect(qp.keys.length).toEqual(6)
-        expect(qp.toString()).toEqual('CMP=1&xyz=2&a&b=&&c=.')
+        expect(qp.toString()).toEqual('cmp=1&xyz=2&a&b=&&c=.')
 
         expect(qp.parameters[0].key).toEqual('cmp')
         expect(qp.parameters[0].originalKey).toEqual('CMP')
@@ -83,10 +83,6 @@ describe('Query parameter tests', () => {
             {
                 original: '%2d%5f%2e%21%7e%2a%27%28%29',
                 escaped: "-_.!~*'()"
-            },
-            {
-                original: 'Casing-Should-Be-Preserved',
-                escaped: 'Casing-Should-Be-Preserved'
             }
         ]
         test_cases.forEach((data) => {

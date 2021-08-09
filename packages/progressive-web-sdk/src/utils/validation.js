@@ -1,6 +1,9 @@
 /* * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
 /* Copyright (c) 2019 Mobify Research & Development Inc. All rights reserved. */
 /* * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
+/**
+ * @module progressive-web-sdk/dist/utils/validation
+ */
 
 import isPostalCode from 'validator/lib/isPostalCode'
 import isCreditCard from 'validator/lib/isCreditCard'

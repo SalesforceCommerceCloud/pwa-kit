@@ -1,7 +1,10 @@
 /* * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
 /* Copyright (c) 2018 Mobify Research & Development Inc. All rights reserved. */
 /* * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
-/** @module */
+/**
+ * @module @mobify/commerce-integrations/dist/connectors/demo-connector
+ * @private
+ */
 
 import * as errors from '../errors'
 
@@ -21,13 +24,17 @@ const delay = (duration = 500) =>
         }, duration)
     })
 
+/**
+ * This is a demo connector used to test Mobify's scaffold. It returns canned
+ * responses, rather than making real network requests.
+ */
 export class DemoConnector {
     /**
      * Given a configuration in the form of a plain object, this method returns
      * a new DemoConnector instance.
      *
      * @param {Object} config
-     * @returns {module:demo.SalesforceConnector} The new DemoConnector instance.
+     * @returns {module:@mobify/commerce-integrations/dist/connectors/demo-connector.DemoConnector} The new DemoConnector instance.
      */
     static fromConfig(config) {
         return new this.prototype.constructor(config)

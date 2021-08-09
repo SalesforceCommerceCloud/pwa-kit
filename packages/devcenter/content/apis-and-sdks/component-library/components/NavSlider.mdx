@@ -1,0 +1,125 @@
+---
+title: NavSlider
+metaTitle: NavSlider
+metaDescription: NavSlider
+---
+
+import NavSlider from 'progressive-web-sdk/dist/components/nav-slider'
+import PropsTable from '../../../../src/components/propstable'
+import Tabs from 'progressive-web-sdk/dist/components/tabs/tabs'
+import TabsPanel from 'progressive-web-sdk/dist/components/tabs/tabs-panel'
+
+<div class="component-intro">
+
+The `NavSlider` component is a helper component that's designed for customizing the slide-in and slide-out animations used when traversing items in the [Nav](Nav) component. You can use `NavSlider` to create fully-custom versions of the [NavHeader](NavHeader) and [NavMenu](NavMenu) components.
+
+To take full advantage of the `NavSlider`, it should be used with the [TransitionGroup](https://github.com/reactjs/react-transition-group) component.
+
+Related components: [Nav](Nav), [NavHeader](NavHeader), [NavItem](NavItem), [NavMenu](NavMenu), and [NavSlider](NavSlider).
+
+</div>
+
+<div onClick={(e) => {e.stopPropagation()}}>
+<Tabs activeIndex={0} className="devcenter">
+<TabsPanel title="Code" onClick={(e) => {e.stopPropagation()}}>
+
+### JavaScript import
+
+```jsx
+import NavSlider from 'progressive-web-sdk/dist/components/nav-slider'
+```
+
+### SCSS import
+
+```scss
+@import 'node_modules/progressive-web-sdk/dist/components/nav-slider/base';
+```
+
+### Props table
+
+<PropsTable propMetaData={props.componentMetadata.childrenComponentProp} />
+
+### Basic example
+
+You may notice that our custom component in this example doesn't have any fancy animations. We'll get to that in an example further down!
+
+```jsx static
+/**
+ * First we must import the third party
+ * `TransitionGroup` component.
+ */
+const TransitionGroup = require('react-transition-group')
+
+const CustomHeader = (props, context) => {
+    /**
+     * Notice that we use `expanded` and `expandedPath`
+     * that we received from the `context`.
+     */
+    const {expanded, expandedPath} = context
+
+    /**
+     * While in this example we do not make use of
+     * `props`, it is available if you need it.
+     */
+    return (
+        <TransitionGroup>
+            <NavSlider key={expandedPath}>
+                <h2>
+                    {expanded && expanded.title || ''}
+                </h2>
+            </NavSlider>
+        </TransitionGroup>
+    )
+}
+
+/**
+ * We must ensure that `CustomHeader` inherits
+ * `childContextTypes` from `Nav`, otherwise it will not
+ * receive its `context`.
+ */
+ CustomHeader.contextTypes = Nav.childContextTypes
+
+
+const initialState = {path: '/'}
+const onPathChange = (path) => {
+    setState({path: path})
+}
+const root = {
+    title:"See My Custom Header?",
+    path:"/",
+    children: [{
+        title:"Men's Clothing",
+        path:"/mens-clothing/",
+        children: [
+            {title: "Jeans", path: "/mens-clothing/jeans/"},
+            {title: "Polos", path: "/mens-clothing/polos/"},
+            {title: "Shorts", path: "/mens-clothing/shorts/"}
+        ]
+    }]
+}
+
+<Nav
+    root={root}
+    path={state.path}
+    onPathChange={onPathChange}
+>
+    <CustomHeader />
+    <NavMenu />
+</Nav>
+```
+
+By itself, `NavSlider` doesn't look like much. Instead, we must use it in combination with components like [TransitionGroup](https://github.com/reactjs/react-transition-group). A common use case will be to use these two components together to create a custom [NavHeader](NavHeader) component, used in an instance of [Nav](Nav).
+
+The example above shows how to create a custom component and apply it into a `Nav` component with a fully functional navigation tree. It's important to understand that a custom component must take both `props` and `context` as arguments in order to work correctly. These are automatically supplied by the `Nav` component, but must be enabled with the following:
+
+```jsx static
+const CustomHeader = (props, context) => {
+    // define the custom header component here...
+}
+// Supply the context to our custom component...
+CustomHeader.contextTypes = Nav.childContextTypes
+```
+
+</TabsPanel>
+</Tabs>
+</div>

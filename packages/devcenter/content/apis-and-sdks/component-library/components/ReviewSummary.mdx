@@ -1,0 +1,90 @@
+---
+title: ReviewSummary
+metaTitle: ReviewSummary
+metaDescription: ReviewSummary
+---
+
+import ReviewSummary from 'progressive-web-sdk/dist/components/review-summary'
+import PropsTable from '../../../../src/components/propstable'
+import Tabs from 'progressive-web-sdk/dist/components/tabs/tabs'
+import TabsPanel from 'progressive-web-sdk/dist/components/tabs/tabs-panel'
+
+<div class="component-intro">
+
+A review summary typically appears on the product details page to display a summary of all the product reviews submitted by customers.
+
+The `ReviewSummary` component shows the average rating and summary using the `Rating` and `Image` components.
+
+</div>
+
+<div onClick={(e) => {e.stopPropagation()}}>
+<Tabs activeIndex={0} className="devcenter">
+<TabsPanel title="Code" onClick={(e) => {e.stopPropagation()}}>
+
+### JavaScript import
+
+```jsx
+import ReviewSummary from 'progressive-web-sdk/dist/components/review-summary'
+```
+
+### SCSS import
+
+```scss
+@import 'node_modules/progressive-web-sdk/dist/components/review-summary/base';
+```
+
+### Props table
+
+<PropsTable propMetaData={props.componentMetadata.childrenComponentProp} />
+
+### Basic example
+
+```jsx react-live=true
+<ReviewSummary
+    ratingProps={{
+        className: 'pw--solid',
+        count: 3,
+        total: 5
+    }}
+    imageProps={{
+        src: 'https://i.pinimg.com/564x/72/4b/6d/724b6dbf91c378a53d6890bb525c1aa9.jpg',
+        width: '88px',
+        height: '88px',
+        alt: 'cat'
+    }}
+    summary="3/5 stars"
+    text="71% of 12 reviewers would recommend this product to a friend."
+/>
+```
+
+</TabsPanel>
+<TabsPanel title="Design" class="markdown">
+
+### Related components
+- [Review](Review)
+- [Rating](Rating)
+
+### Screenshot
+
+![](./images/components/review-summary/reviewsummary-uikit.png)
+
+### Potential uses
+
+-   Listed at the top of a set of Product reviews on the product details page.
+-   On the product details page, to give the user a quick idea of other customers' satisfaction levels before choosing to read individual reviews.
+
+### Accessibility
+
+-   If the number of reviews is not a link, make that clear by removing any link color or underline attribute.
+
+### Best practices
+
+-   Most commonly the summary appears above a set of product reviews and is not interactive.
+-   Sometimes a button may be used below the summary to "Read all reviews", which would open a modal window containing the reviews.
+-   `ReviewsSummary` will typically contain a [`Rating`](Rating) and details of how many customers have reviewed the product.
+-   A product thumbnail image is optional. It's useful when the review applies to a particular (colored) product option.
+-   Some review summaries may include more detailed content, such as pros and cons.
+
+</TabsPanel>
+</Tabs>
+</div>

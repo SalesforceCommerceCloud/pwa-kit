@@ -1,5 +1,10 @@
 /* eslint no-unused-vars: 0 */ // Interfaces are empty, disable for whole file
-/** @module */
+/**
+ * The `interfaces` module contains the `CommerceConnector` interface that
+ * is used to implement a connector for an ecommerce backend system.
+ * It also contains the `ParserHooks` interface used in a connector.
+ * @module @mobify/commerce-integrations/dist/connectors/interfaces
+ */
 
 /**
  * A generic interface for API based or web-scraping ecommerce Connectors.
@@ -33,10 +38,10 @@ export class CommerceConnector {
      *
      * @param {String} username
      * @param {String} password
-     * @return {Promise<module:types.Customer>}.
+     * @return {Promise<module:@mobify/commerce-integrations/dist/types.Customer>}
      *
-     * @throws {module:errors.InvalidArgumentError} Will throw an error if the username or password aren't provided for type registered.
-     * @throws {module:errors.ForbiddenError} Will throw an error if the customer credentials are incorrect.
+     * @throws {module:@mobify/commerce-integrations/dist/errors.InvalidArgumentError} Will throw an error if the username or password aren't provided for type registered.
+     * @throws {module:@mobify/commerce-integrations/dist/errors.ForbiddenError} Will throw an error if the customer credentials are incorrect.
      */
     login(username, password) {
         throw new Error('Not implemented')
@@ -47,7 +52,7 @@ export class CommerceConnector {
      *
      * @return {Promise<undefined>}
      *
-     * @throws {module:errors.ServerError} Will throw an error if there was a server-side error.
+     * @throws {module:@mobify/commerce-integrations/dist/errors.ServerError} Will throw an error if there was a server-side error.
      */
     logout() {
         throw new Error('Not implemented')
@@ -56,9 +61,9 @@ export class CommerceConnector {
     /**
      * Refresh a session token, on backends that support refresh.
      *
-     * @return {Promise<module:types.Customer>}
+     * @return {Promise<module:@mobify/commerce-integrations/dist/types.Customer>}
      *
-     * @throws {module:errors.ForbiddenError} Will throw an error if authorization credentials are incorrect
+     * @throws {module:@mobify/commerce-integrations/dist/errors.ForbiddenError} Will throw an error if authorization credentials are incorrect
      */
     refreshSession() {
         throw new Error('Not implemented')
@@ -69,9 +74,9 @@ export class CommerceConnector {
      *
      * @param {String} id Customer Id
      * @param {Object} [opts] Options object
-     * @return {Promise<module:types.Customer>}
+     * @return {Promise<module:@mobify/commerce-integrations/dist/types.Customer>}
      *
-     * @throws {module:errors.ServerError} Throw generic error if server has error.
+     * @throws {module:@mobify/commerce-integrations/dist/errors.ServerError} Throw generic error if server has error.
      */
     getCustomer(id, opts = {}) {
         throw new Error('Not implemented')
@@ -80,9 +85,9 @@ export class CommerceConnector {
     /**
      * Search for products, given a productSearchRequest object.
      *
-     * @param {module:types.ProductSearchRequest} productSearchRequest Search query
+     * @param {module:@mobify/commerce-integrations/dist/types.ProductSearchRequest} productSearchRequest Search query
      * @param {Object} [opts] Options object
-     * @return {Promise<module:types.ProductSearch>}
+     * @return {Promise<module:@mobify/commerce-integrations/dist/types.ProductSearch>}
      */
     searchProducts(productSearchRequest, opts = {}) {
         throw new Error('Not implemented')
@@ -93,7 +98,7 @@ export class CommerceConnector {
      *
      * @param {String} id The product id.
      * @param {Object} [opts] Options object
-     * @return {Promise<module:types.Product>}.
+     * @return {Promise<module:@mobify/commerce-integrations/dist/types.Product>}
      */
     getProduct(id, opts = {}) {
         throw new Error('Not implemented')
@@ -110,7 +115,7 @@ export class CommerceConnector {
      *
      * @param {Array<String>} ids The product ids.
      * @param {Object} [opts] Options object
-     * @return {Promise<module:types.ProductList>}.
+     * @return {Promise<module:@mobify/commerce-integrations/dist/types.ProductList>}
      */
     getProducts(ids, opts = {}) {
         throw new Error('Not implemented')
@@ -123,7 +128,7 @@ export class CommerceConnector {
      * @param {String} id The id of the store
      * @param {Object} [opts] Options object
      *
-     * @return {Promise<module:types.Store>}.
+     * @return {Promise<module:@mobify/commerce-integrations/dist/types.Store>}
      */
     getStore(id, opts = {}) {
         throw new Error('Not implemented')
@@ -134,7 +139,7 @@ export class CommerceConnector {
      *
      * @param {String} id
      * @param {Object} [opts] object
-     * @returns {Promise<module:types.Category>}
+     * @returns {Promise<module:@mobify/commerce-integrations/dist/types.Category>}
      */
     getCategory(id, opts = {}) {
         throw new Error('Not implemented')
@@ -149,9 +154,9 @@ export class CommerceConnector {
      * Invalid ids are ignored and results are not guaranteed to be returned in the
      * order requested.
      *
-     * @param {Array<String>} ids
+     * @param {string[]} ids
      * @param {Object} [opts] object
-     * @returns {Promise<module:types.CategoryList>}
+     * @returns {Promise<module:@mobify/commerce-integrations/dist/types.CategoryList>}
      */
     getCategories(ids, opts = {}) {
         throw new Error('Not implemented')
@@ -160,9 +165,9 @@ export class CommerceConnector {
     /**
      * Searches for Stores (ie. physical retail-outlets).
      *
-     * @param {module:types.StoreSearchRequest} storeSearchRequest
+     * @param {module:@mobify/commerce-integrations/dist/types.StoreSearchRequest} storeSearchRequest
      * @param {Object} [opts] Options object
-     * @returns {Promise<module:types.StoreSearchResult>}
+     * @returns {Promise<module:@mobify/commerce-integrations/dist/types.StoreSearchResult>}
      */
     searchStores(storeSearchRequest, opts = {}) {
         throw new Error('Not implemented')
@@ -171,9 +176,9 @@ export class CommerceConnector {
     /**
      * Creates a new cart with an optional cart object.
      *
-     * @param {module:types.Cart} oldCcart The cart you'd like to migrate to the new cart
+     * @param {module:@mobify/commerce-integrations/dist/types.Cart} oldCcart The cart you'd like to migrate to the new cart
      * @param {Object} [opts] object
-     * @return {Promise<module:types.Cart>}
+     * @return {Promise<module:@mobify/commerce-integrations/dist/types.Cart>}
      *
      * @throws Could not create cart.
      */
@@ -186,7 +191,7 @@ export class CommerceConnector {
      *
      * @param {String} cartId The id of the cart you want to retrieve
      * @param {Object} [opts] object
-     * @returns {Promise<module:types.Cart>}
+     * @returns {Promise<module:@mobify/commerce-integrations/dist/types.Cart>}
      */
     getCart(cartId, opts = {}) {
         throw new Error('Not implemented')
@@ -206,10 +211,10 @@ export class CommerceConnector {
 
     /**
      * Adds a cart item to cart.
-     * @param {module:types.Cart} cart The cart to add the cart item to.
-     * @param {module:types.CartItem} cartItem The cart item to add.
+     * @param {module:@mobify/commerce-integrations/dist/types.Cart} cart The cart to add the cart item to.
+     * @param {module:@mobify/commerce-integrations/dist/types.CartItem} cartItem The cart item to add.
      * @param {Object} opts
-     * @return {Promise<module:types.Cart>}
+     * @return {Promise<module:@mobify/commerce-integrations/dist/types.Cart>}
      */
     addCartItem(cart, cartItem, opts = {}) {
         throw new Error('Not implemented')
@@ -217,10 +222,10 @@ export class CommerceConnector {
 
     /**
      * Remove a cart item from the cart.
-     * @param {module:types.Cart} cart The cart to remove the cart item from.
+     * @param {module:@mobify/commerce-integrations/dist/types.Cart} cart The cart to remove the cart item from.
      * @param {String} cartItemId The id of the cart item to remove.
      * @param {Object} opts
-     * @return {Promise<module:types.Cart>}
+     * @return {Promise<module:@mobify/commerce-integrations/dist/types.Cart>}
      */
     removeCartItem(cart, cartItemId, opts = {}) {
         throw new Error('Not implemented')
@@ -228,10 +233,10 @@ export class CommerceConnector {
 
     /**
      * Update an existing cart item in the cart.
-     * @param {module:types.Cart} cart The cart to containing the cart item to update.
-     * @param {module:types.CartItem} cartItem The cart item to update.
+     * @param {module:@mobify/commerce-integrations/dist/types.Cart} cart The cart to containing the cart item to update.
+     * @param {module:@mobify/commerce-integrations/dist/types.CartItem} cartItem The cart item to update.
      * @param {Object} opts
-     * @return {Promise<module:types.Cart>}
+     * @return {Promise<module:@mobify/commerce-integrations/dist/types.Cart>}
      */
     updateCartItem(cart, cartItem, opts = {}) {
         throw new Error('Not implemented')
@@ -239,10 +244,10 @@ export class CommerceConnector {
 
     /**
      * Set the shipping address on the cart.
-     * @param {module:types.Cart} cart The cart to update the shipping address for.
-     * @param {module:types.OrderAddress} shippingAddress The new or modified address.
+     * @param {module:@mobify/commerce-integrations/dist/types.Cart} cart The cart to update the shipping address for.
+     * @param {module:@mobify/commerce-integrations/dist/types.OrderAddress} shippingAddress The new or modified address.
      * @param {Object} opts
-     * @return {Promise<module:types.Cart>}
+     * @return {Promise<module:@mobify/commerce-integrations/dist/types.Cart>}
      */
     setShippingAddress(cart, shippingAddress, opts = {}) {
         throw new Error('Not implemented')
@@ -250,10 +255,10 @@ export class CommerceConnector {
 
     /**
      * Set the billing address on the cart.
-     * @param {module:types.Cart} cart The cart to update the billing address for.
-     * @param {module:types.OrderAddress} billingAddress The new or modified address.
+     * @param {module:@mobify/commerce-integrations/dist/types.Cart} cart The cart to update the billing address for.
+     * @param {module:@mobify/commerce-integrations/dist/types.OrderAddress} billingAddress The new or modified address.
      * @param {Object} opts
-     * @return {Promise<module:types.Cart>}
+     * @return {Promise<module:@mobify/commerce-integrations/dist/types.Cart>}
      */
     setBillingAddress(cart, billingAddress, opts = {}) {
         throw new Error('Not implemented')
@@ -261,10 +266,10 @@ export class CommerceConnector {
 
     /**
      * Add a supported payment type to the cart
-     * @param {module:types.Cart} cart The cart to remove the payment from.
-     * @param {module:types.Payment} payment The payment to add.
+     * @param {module:@mobify/commerce-integrations/dist/types.Cart} cart The cart to remove the payment from.
+     * @param {module:@mobify/commerce-integrations/dist/types.Payment} payment The payment to add.
      * @param {Object} opts
-     * @return {Promise<module:types.Cart>}
+     * @return {Promise<module:@mobify/commerce-integrations/dist/types.Cart>}
      */
     setPayment(cart, payment, opts = {}) {
         throw new Error('Not implemented')
@@ -272,9 +277,9 @@ export class CommerceConnector {
 
     /**
      * Get all the available shipping methods given the cart details.
-     * @param {module:types.Cart} cart The cart to determinen avaialble shipping methods for.
+     * @param {module:@mobify/commerce-integrations/dist/types.Cart} cart The cart to determinen avaialble shipping methods for.
      * @param {Object} opts
-     * @return {Promise<Array.<module:types.ShippingMethod>>}
+     * @return {Promise<Array.<module:@mobify/commerce-integrations/dist/types.ShippingMethod>>}
      */
     getShippingMethods(cart, opts = {}) {
         throw new Error('Not implemented')
@@ -282,10 +287,10 @@ export class CommerceConnector {
 
     /**
      * Set the shipping method for the cart.
-     * @param {module:types.Cart} cart The cart to set the shipping method for.
-     * @param {module:types.ShippingMethod} shippingMethod The shipping method to set.
+     * @param {module:@mobify/commerce-integrations/dist/types.Cart} cart The cart to set the shipping method for.
+     * @param {module:@mobify/commerce-integrations/dist/types.ShippingMethod} shippingMethod The shipping method to set.
      * @param {Object} opts
-     * @return {Promise<module:types.Cart>}
+     * @return {Promise<module:@mobify/commerce-integrations/dist/types.Cart>}
      */
     setShippingMethod(cart, shippingMethod, opts = {}) {
         throw new Error('Not implemented')
@@ -293,10 +298,10 @@ export class CommerceConnector {
 
     /**
      * Set the customer information.
-     * @param {module:types.Cart} cart The customer's cart.
-     * @param {module:types.CustomerInformation} customerInformation The new or modified customer information.
+     * @param {module:@mobify/commerce-integrations/dist/types.Cart} cart The customer's cart.
+     * @param {module:@mobify/commerce-integrations/dist/types.CustomerInformation} customerInformation The new or modified customer information.
      * @param {Object} opts
-     * @return {Promise<module:types.Cart>}
+     * @return {Promise<module:@mobify/commerce-integrations/dist/types.Cart>}
      */
     setCustomerInformation(cart, customerInformation, opts = {}) {
         throw new Error('Not implemented')
@@ -304,9 +309,9 @@ export class CommerceConnector {
 
     /**
      * Get the available payment methods for the cart.
-     * @param {module:types.Cart} cart The customer's cart.
+     * @param {module:@mobify/commerce-integrations/dist/types.Cart} cart The customer's cart.
      * @param {Object} opts
-     * @return {Promise<Array<module:types.PaymentMethod>>}
+     * @return {Promise<Array<module:@mobify/commerce-integrations/dist/types.PaymentMethod>>}
      */
     getPaymentMethods(cart, opts = {}) {
         throw new Error('Not implemented')
@@ -314,9 +319,9 @@ export class CommerceConnector {
 
     /**
      * Create a new order using a given cart.
-     * @param {module:types.Cart} cart The customer's cart.
+     * @param {module:@mobify/commerce-integrations/dist/types.Cart} cart The customer's cart.
      * @param {Object} opts
-     * @return {Promise<module:types.Order>}.
+     * @return {Promise<module:@mobify/commerce-integrations/dist/types.Order>}
      */
     createOrder(cart, opts = {}) {
         throw new Error('Not implemented')
@@ -327,7 +332,7 @@ export class CommerceConnector {
      *
      * @param {String} id The order id.
      * @param {Object} [opts] Options object
-     * @return {Promise<module:types.Order>}.
+     * @return {Promise<module:@mobify/commerce-integrations/dist/types.Order>}
      */
     getOrder(id, opts = {}) {
         throw new Error('Not implemented')
@@ -344,7 +349,7 @@ export class CommerceConnector {
      *
      * @param {Array<String>} ids The order ids.
      * @param {Object} [opts] Options object
-     * @return {Promise<module:types.OrderList>}.
+     * @return {Promise<module:@mobify/commerce-integrations/dist/types.OrderList>}
      */
     getOrders(ids, opts = {}) {
         throw new Error('Not implemented')
@@ -354,10 +359,10 @@ export class CommerceConnector {
      *
      * Add a coupon to the cart by it's code.
      *
-     * @param {module:types.Cart} cart The customer's cart.
+     * @param {module:@mobify/commerce-integrations/dist/types.Cart} cart The customer's cart.
      * @param {Object} couponEntry The coupon.
      * @param {Object} opts Options object.
-     * @return {Promise<module:types.Cart>}
+     * @return {Promise<module:@mobify/commerce-integrations/dist/types.Cart>}
      */
     addCouponEntry(cart, couponEntry, opts = {}) {
         throw new Error('Not implemented')
@@ -367,10 +372,10 @@ export class CommerceConnector {
      *
      * Removes a coupon from the cart by its coupon entry id.
      *
-     * @param {module:types.Cart} cart The customer's cart.
+     * @param {module:@mobify/commerce-integrations/dist/types.Cart} cart The customer's cart.
      * @param {Object} couponEntryId The coupon entry id.
      * @param {Object} opts Options object.
-     * @return {Promise<module:types.Cart>}
+     * @return {Promise<module:@mobify/commerce-integrations/dist/types.Cart>}
      */
     removeCouponEntry(cart, couponEntryId, opts = {}) {
         throw new Error('Not implemented')

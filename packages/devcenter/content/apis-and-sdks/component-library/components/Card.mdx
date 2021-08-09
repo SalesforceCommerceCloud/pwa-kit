@@ -1,0 +1,56 @@
+---
+title: Card
+metaTitle: Card
+metaDescription: Card
+---
+
+import Card from 'progressive-web-sdk/dist/components/card'
+import PropsTable from '../../../../src/components/propstable'
+import Tabs from 'progressive-web-sdk/dist/components/tabs/tabs'
+import TabsPanel from 'progressive-web-sdk/dist/components/tabs/tabs-panel'
+
+<div class="component-intro">
+
+The `Card` component is used to show content in a card with a header and footer.
+
+</div>
+
+<div onClick={(e) => {e.stopPropagation()}}>
+<Tabs activeIndex={0} className="devcenter">
+<TabsPanel title="Code" onClick={(e) => {e.stopPropagation()}}>
+
+### JavaScript import
+
+```jsx
+import Card from '../components/card'
+```
+
+### Props table
+
+<PropsTable propMetaData={props.componentMetadata.childrenComponentProp} />
+
+### Basic example
+
+```jsx react-live=true
+<Card
+    header={<h1>Header</h1>}
+    children={<div>Lorem ipsum dolor sit amet, consectetur adipiscing elit</div>}
+    footer={<div>Footer</div>}
+/>
+```
+
+### With borders and shadow
+
+```jsx react-live=true
+<Card
+    header={<h1>Header</h1>}
+    children={<div>Children content with shadow and borders</div>}
+    footer={<div>Footer</div>}
+    hasShadow
+    hasBorder
+/>
+```
+
+</TabsPanel>
+</Tabs>
+</div>

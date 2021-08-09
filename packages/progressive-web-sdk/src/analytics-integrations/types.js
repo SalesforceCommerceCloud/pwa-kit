@@ -1,11 +1,17 @@
 /* * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
 /* Copyright (c) 2019 Mobify Research & Development Inc. All rights reserved. */
 /* * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
-/** @module */
 /**
  * @fileOverview Analytics Types and Schemas
+ * @module progressive-web-sdk/dist/analytics-integrations/types
+ */
+
+/**
+ * @private
  */
 import {ValidationError} from './errors'
+;('') // eslint-disable-line
+// TODO: https://github.com/jsdoc/jsdoc/issues/1718
 
 /**
  * Analytics type 'pageview'. Uses schema: `pageview`.
@@ -144,7 +150,7 @@ export const uiInteraction = {
 }
 
 /**
- * Performace schema
+ * Performance schema
  *
  * @typedef {Object} performance
  * @property {String} bundle - (required) the bundle type eg. `production`, `development`.
@@ -289,7 +295,7 @@ export const locale = {
  * @param {Object} spec The specification used to validate the object.
  * @param {Object} object The object to validate.
  *
- * @throws {module:analytics-integrations/errors.ValidationError}
+ *
  * @private
  */
 export const validate = (spec, object) => {

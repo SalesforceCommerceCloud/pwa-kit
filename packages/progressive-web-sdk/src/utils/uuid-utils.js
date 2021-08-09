@@ -1,7 +1,9 @@
 /* * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
 /* Copyright (c) 2019 Mobify Research & Development Inc. All rights reserved. */
 /* * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
-
+/**
+ * @module progressive-web-sdk/dist/utils/uuid
+ */
 /**
  * Outputs a UUID. Credit to a user on Stack Overflow for this approach:
  * https://stackoverflow.com/questions/105034/create-guid-uuid-in-javascript

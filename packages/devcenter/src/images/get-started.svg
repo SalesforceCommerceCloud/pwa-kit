@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="66px" height="66px" viewBox="0 0 66 66" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 64 (93537) - https://sketch.com -->
+    <title>icon/getting-started</title>
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <filter x="-41.7%" y="-41.7%" width="183.3%" height="183.3%" filterUnits="objectBoundingBox" id="filter-1">
+            <feOffset dx="0" dy="1" in="SourceAlpha" result="shadowOffsetOuter1"></feOffset>
+            <feGaussianBlur stdDeviation="4.5" in="shadowOffsetOuter1" result="shadowBlurOuter1"></feGaussianBlur>
+            <feColorMatrix values="0 0 0 0 0.0549019608   0 0 0 0 0.0431372549   0 0 0 0 0.290196078  0 0 0 0.4 0" type="matrix" in="shadowBlurOuter1" result="shadowMatrixOuter1"></feColorMatrix>
+            <feMerge>
+                <feMergeNode in="shadowMatrixOuter1"></feMergeNode>
+                <feMergeNode in="SourceGraphic"></feMergeNode>
+            </feMerge>
+        </filter>
+        <linearGradient x1="0%" y1="0%" x2="100%" y2="100%" id="linearGradient-2">
+            <stop stop-color="#4CB944" offset="0%"></stop>
+            <stop stop-color="#005C83" offset="100%"></stop>
+        </linearGradient>
+    </defs>
+    <g id="R3-Updates" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="card/medium/icon" transform="translate(-23.000000, -24.000000)">
+            <g id="icon/background/shadow" transform="translate(32.000000, 32.000000)">
+                <g id="bg" filter="url(#filter-1)" stroke-width="1" fill="url(#linearGradient-2)">
+                    <circle id="Oval-2" cx="24" cy="24" r="24"></circle>
+                </g>
+                <g id="icon/getting-started" transform="translate(10.666667, 10.666667)" fill="#FFFFFF">
+                    <path d="M13.3333333,2.22222222 C19.4698306,2.22222222 24.4444444,7.19683611 24.4444444,13.3333333 C24.4444444,19.4698306 19.4698306,24.4444444 13.3333333,24.4444444 C7.19683611,24.4444444 2.22222222,19.4698306 2.22222222,13.3333333 C2.22222222,7.19683611 7.19683611,2.22222222 13.3333333,2.22222222 Z M14.9289099,6.04204448 C15.0646624,5.20610054 14.3859002,5.06677655 14.0691445,5.71695517 C12.6211185,8.41055233 10.9920893,11.1970321 9.45356169,13.8906293 C9.18205682,14.4014839 9.31780925,14.7265732 9.95132062,14.7265732 C10.8563369,14.7265732 11.8971055,14.6801319 12.8021218,14.7265732 C12.6211185,16.5842265 12.032858,18.7205276 11.7161023,20.6246222 C11.5803499,21.4605661 12.259112,21.5998901 12.6211185,20.9497115 C14.0691445,18.209673 15.6981737,15.4696345 17.1914505,12.7760374 C17.5082062,12.2187414 17.327203,11.8936521 16.7389424,11.8936521 C15.7886754,11.8936521 14.7931575,11.9865348 13.8881413,11.8936521 C14.0691445,10.1288815 14.6121542,7.85325636 14.9289099,6.04204448 Z"></path>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

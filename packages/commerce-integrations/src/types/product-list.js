@@ -5,15 +5,16 @@
 import PropTypes from 'prop-types'
 import {Product} from './product'
 
-/**
- * @memberOf module:types
- * @typedef {Object} ProductList
- * @property {Number} count.
- * @property {Array.<module:types.Product>} data.
- * @property {Number} total.
- */
 export const ProductList = {
     count: PropTypes.number,
     data: PropTypes.arrayOf(PropTypes.shape(Product)),
     total: PropTypes.number
 }
+
+/**
+ * @memberOf module:@mobify/commerce-integrations/dist/types
+ * @typedef {Object} ProductList
+ * @property {Number} count.
+ * @property {Array.<module:@mobify/commerce-integrations/dist/types.Product>} data.
+ * @property {Number} total.
+ */

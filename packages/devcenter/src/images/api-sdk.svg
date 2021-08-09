@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="66px" height="66px" viewBox="0 0 66 66" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 64 (93537) - https://sketch.com -->
+    <title>icon/api-sdk</title>
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <filter x="-41.7%" y="-41.7%" width="183.3%" height="183.3%" filterUnits="objectBoundingBox" id="filter-1">
+            <feOffset dx="0" dy="1" in="SourceAlpha" result="shadowOffsetOuter1"></feOffset>
+            <feGaussianBlur stdDeviation="4.5" in="shadowOffsetOuter1" result="shadowBlurOuter1"></feGaussianBlur>
+            <feColorMatrix values="0 0 0 0 0.0549019608   0 0 0 0 0.0431372549   0 0 0 0 0.290196078  0 0 0 0.4 0" type="matrix" in="shadowBlurOuter1" result="shadowMatrixOuter1"></feColorMatrix>
+            <feMerge>
+                <feMergeNode in="shadowMatrixOuter1"></feMergeNode>
+                <feMergeNode in="SourceGraphic"></feMergeNode>
+            </feMerge>
+        </filter>
+        <linearGradient x1="0%" y1="0%" x2="100%" y2="100%" id="linearGradient-2">
+            <stop stop-color="#FF852C" offset="0%"></stop>
+            <stop stop-color="#DC0A3C" offset="100%"></stop>
+        </linearGradient>
+    </defs>
+    <g id="R3-Updates" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="card/medium/icon" transform="translate(-23.000000, -24.000000)">
+            <g id="icon/background/shadow" transform="translate(32.000000, 32.000000)">
+                <g id="bg" filter="url(#filter-1)" fill="url(#linearGradient-2)">
+                    <circle id="Oval-2" cx="24" cy="24" r="24"></circle>
+                </g>
+                <g id="icon/API-&amp;-SDK" transform="translate(10.666667, 10.666667)" fill="#FFFFFF">
+                    <g id="icon/terminal" transform="translate(2.222222, 4.444444)">
+                        <path d="M4.74398935,4.19000369 C5.45363287,3.42768638 6.61982614,3.40046544 7.36134133,4.13064056 L7.36134133,4.13064056 L14.0280052,10.6953504 C14.7628975,11.419004 14.8115984,12.6222642 14.140783,13.408381 C13.4428517,14.2262746 12.2333188,14.2827664 11.468371,13.529517 L11.468371,13.529517 L6.13856209,8.27973856 L0.752395209,14.0669456 C0.0660500221,14.8042353 -1.04108482,14.8503159 -1.78002872,14.2051874 L-1.78002872,14.2051874 L-1.92267451,14.0669456 C-2.62606656,13.3113438 -2.62606656,12.1071071 -1.92267451,11.3515053 L-1.92267451,11.3515053 Z" id="Path" transform="translate(6.081527, 9.128472) rotate(-270.000000) translate(-6.081527, -9.128472) "></path>
+                        <path d="M19.5798023,13.8907748 C20.5860046,13.8907748 21.4016928,14.706463 21.4016928,15.7126653 C21.4016928,16.7188676 20.5860046,17.5345558 19.5798023,17.5345558 L19.5798023,17.5345558 L10.8558584,17.5345558 C9.84965606,17.5345558 9.03396791,16.7188676 9.03396791,15.7126653 C9.03396791,14.706463 9.84965606,13.8907748 10.8558584,13.8907748 L10.8558584,13.8907748 Z" id="Path"></path>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

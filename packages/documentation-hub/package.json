@@ -1,6 +1,6 @@
 {
   "name": "mobify-documentation-hub",
-  "version": "1.18.1",
+  "version": "1.19.0",
   "homepage": "http://docs.mobify.com/",
   "description": "Mobify's Documentation Hub!",
   "author": "Mobify (www.mobify.com)",
@@ -11,13 +11,13 @@
     "deployDocs": "node ./scripts/deployDocs.js"
   },
   "dependencies": {
-    "harp": "0.30.0",
+    "harp": "^0.32.0",
     "remark-cli": "2.0.0",
     "remark-lint": "5.0.1",
     "remark-preset-lint-recommended": "1.0.0"
   },
   "devDependencies": {
-    "@mobify/documentation-theme": "^1.18.1",
+    "@mobify/documentation-theme": "^1.19.0",
     "mobify-code-style": "^2.8.4"
   }
 }

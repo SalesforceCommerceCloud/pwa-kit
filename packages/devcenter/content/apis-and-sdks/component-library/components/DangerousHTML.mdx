@@ -1,0 +1,51 @@
+---
+title: DangerousHTML
+metaTitle: DangerousHTML
+metaDescription: DangerousHTML
+---
+
+import DangerousHTML from 'progressive-web-sdk/dist/components/dangerous-html'
+import PropsTable from '../../../../src/components/propstable'
+import Tabs from 'progressive-web-sdk/dist/components/tabs/tabs'
+import TabsPanel from 'progressive-web-sdk/dist/components/tabs/tabs-panel'
+
+<div class="component-intro">
+
+The `DangerousHTML` component is a wrapper for the `dangerouslySetInnerHTML` prop on React
+components. The purpose of that is to include markup from another source within
+the React tree. That source can be a string, an AJAX response, etc.
+
+A feature of `DangerousHTML` is that it prevents successive re-rendering of
+elements that use dangerouslySetInnerHTML. Check that the html string has
+changed before attempting to render.
+
+We recommend you avoid using `DangerousHTML` if at all
+possible. It's named this way for a reason, so **use with caution**.
+
+</div>
+
+<div onClick={(e) => {e.stopPropagation()}}>
+<Tabs activeIndex={0} className="devcenter">
+<TabsPanel title="Code" onClick={(e) => {e.stopPropagation()}}>
+
+### JavaScript import
+
+```jsx
+import DangerousHTML from 'progressive-web-sdk/dist/components/dangerous-html'
+```
+
+### Props table
+
+<PropsTable propMetaData={props.componentMetadata.childrenComponentProp} />
+
+### Basic example
+
+```jsx react-live=true
+<DangerousHTML html="<strong>A string of<br />HTML</strong>">
+    {(htmlObj) => <div dangerouslySetInnerHTML={htmlObj} />}
+</DangerousHTML>
+```
+
+</TabsPanel>
+</Tabs>
+</div>

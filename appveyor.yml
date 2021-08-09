@@ -6,7 +6,9 @@ image:
 
 # Set environment to the required version of node
 environment:
-  nodejs_version: "10"
+  matrix:
+    - NODE_AND_NPM_VERSIONS: "10:6.14.4"
+    - NODE_AND_NPM_VERSIONS: "12:6.14.4"
 
 branches:
   only:
@@ -18,11 +20,15 @@ install:
   # Install compatible version of chrome driver
   # - choco install googlechrome --version 76.0.3809.132
 
-  # Get node version as listed in the enviroment
-  - ps: Install-Product node $env:nodejs_version
+  # Get node version as listed in the environment
+  - ps: |
+      $node_version = $env:NODE_AND_NPM_VERSIONS.Split(":")[0]
+      Install-Product node $node_version x64
 
-  # Install npm version 5.7.1
-  - npm install -g npm@5.7.1
+  # Install npm
+  - ps: |
+      $npm_package = "npm@" + $env:NODE_AND_NPM_VERSIONS.Split(":")[1]
+      npm install -g $npm_package
 
   # Install the node dependencies
   - npm ci

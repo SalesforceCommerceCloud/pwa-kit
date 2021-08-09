@@ -29,7 +29,7 @@ commands:
             sudo apt-get update
             sudo apt-get install python-dev python-pip google-chrome-stable time
             sudo pip install awscli==1.18.85 datadog==0.36.0
-            sudo npm install -g npm@6.11.3
+            sudo npm install -g npm@6.14.4
 
             # Add a dogrc so we can submit metrics to datadog
             printf "[Connection]\napikey = $DATADOG_API_KEY\nappkey =\n" > ~/.dogrc
@@ -81,20 +81,15 @@ commands:
             if [[ $MASTER || $DEVELOP || $RELEASE ]]; then
               npm run test:integration
             fi
-
-jobs:
-  test:
-    docker:
-      - image: circleci/node:10-stretch-browsers
+  countdependencies:
+    description: 'Count package.json dependencies'
     steps:
-      - checkout
-      - setup
       - run:
           name: Count package.json dependencies
           command: |
               # Quick and dirty check of number of dependencies. We want to
               # start bringing these down - many are duplicated.
-              MAX_PACKAGES="335"
+              MAX_PACKAGES="389"
 
               uniques=$(ls ./package.json ./packages/*/package.json | xargs -I _ -n 1 \
                   node -e "const p = require('_'); console.log(Object.keys(p.dependencies || {}).join('\n')); console.log(Object.keys(p.devDependencies || {}).join('\n'))" \
@@ -113,11 +108,14 @@ jobs:
 
               dog metric post mobify_platform_sdks.monorepo_total_packages $total
               dog metric post mobify_platform_sdks.monorepo_unique_packages $uniques
+  runaudits:
+    description: 'Run NPM Audits'
+    steps:
       - run:
           name: Run NPM Audits
           command: |
               set +e
-              results=$(node ./scripts/audit.js --max-critical 0 --max-high=10)
+              results=$(node ./scripts/audit.js --max-critical 0 --max-high=25)
               exitCode=$?
               set -e
 
@@ -125,6 +123,47 @@ jobs:
               echo "$results" | awk '{ print "mobify_platform_sdks.vulnerabilities_"$1 " "$2 }' | xargs -n2 bash -c 'dog metric post "$1" $2' bash
 
               exit $exitCode
+  checkclean:
+    description: 'Check Repository Clean'
+    steps:
+      - run:
+          name: Check Repository Clean
+          command: |
+              # Print status for debugging on CircleCI.
+              git status
+              # Fail the build if any step leaves uncommitted changes in the repo
+              # that would prevent Lerna from publishing (Lerna gets this right).
+              git diff --exit-code
+
+jobs:
+  testNode10:
+    docker:
+      - image: circleci/node:10-stretch-browsers
+    steps:
+      - checkout
+      - setup
+      - countdependencies
+      - runaudits
+      - runtests
+      - checkclean
+      - store_test_results:
+          path: packages/pwa/tests/reports
+          when: always
+      - store_artifacts:
+          path: packages/pwa/tests/screenshots
+          when: always
+      - slack/status:
+          fail_only: true
+          only_for_branches: master,develop
+
+  testNode12:
+    docker:
+      - image: circleci/node:12-stretch-browsers
+    steps:
+      - checkout
+      - setup
+      - countdependencies
+      - runaudits
       - runtests
       - run:
           name: Publish Docs
@@ -155,14 +194,7 @@ jobs:
                 npm run push --prefix packages/pwa -- --message "build ${CIRCLE_BUILD_NUM} on ${CIRCLE_BRANCH} (${CIRCLE_SHA1})" --target $target
               fi
 
-      - run:
-          name: Check Repository Clean
-          command: |
-              # Print status for debugging on CircleCI.
-              git status
-              # Fail the build if any step leaves uncommitted changes in the repo
-              # that would prevent Lerna from publishing (Lerna gets this right).
-              git diff --exit-code
+      - checkclean
       - run:
           name: Publish to NPM
           command: |
@@ -216,5 +248,6 @@ workflows:
   version: 2
   test:
     jobs:
-      - test
+      - testNode10
+      - testNode12
       - generatedProjectTest

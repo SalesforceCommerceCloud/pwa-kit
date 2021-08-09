@@ -1,4 +1,6 @@
-/** @module */
+/**
+ * @module @mobify/commerce-integrations/dist/connectors/merlins
+ */
 import {ScrapingConnector} from './scraping-connector'
 import * as errors from '../errors'
 import * as cj from 'cookiejar'
@@ -9,7 +11,7 @@ const ROOT_CATEGORY = 'root'
  * Takes commerce-integrations Integer type and returns the URL
  * representation used to view a product details page on the website.
  *
- * @param {module:types.Integer} id
+ * @param {module:@mobify/commerce-integrations/dist/types.Integer} id
  * @returns {String}
  * @private
  */
@@ -31,7 +33,7 @@ const titleCase = (str) =>
  * commerce-integrations VariationPropertyValue type
  *
  * @param {Object} data
- * @returns {module:types.VariationPropertyValue}
+ * @returns {module:@mobify/commerce-integrations/dist/types.VariationPropertyValue}
  * @private
  */
 const parseVariationPropertyValue = ({label, id}) => ({
@@ -44,7 +46,7 @@ const parseVariationPropertyValue = ({label, id}) => ({
  * commerce-integrations VariationProperty type
  *
  * @param {Object} data
- * @returns {module:types.VariationProperty}
+ * @returns {module:@mobify/commerce-integrations/dist/types.VariationProperty}
  * @private
  */
 const parseVariationProperty = ({code, label, options = []}) => ({
@@ -58,7 +60,7 @@ const parseVariationProperty = ({code, label, options = []}) => ({
  * commerce-integrations Variation type
  *
  * @param {Object} data
- * @returns {module:types.Variation}
+ * @returns {module:@mobify/commerce-integrations/dist/types.Variation}
  * @private
  */
 const parseVariation = (id, upc, value, config) => {
@@ -91,7 +93,7 @@ const parseVariation = (id, upc, value, config) => {
  * Image type.
  *
  * @param {Object} data
- * @returns {Array.<module:types.Image>}
+ * @returns {Array.<module:@mobify/commerce-integrations/dist/types.Image>}
  * @private
  */
 const parseImageSet = ({caption, full, thumb}) => {
@@ -118,7 +120,7 @@ const parseImageSet = ({caption, full, thumb}) => {
  * Takes a document object and parses out a commerce-integrations Product type
  *
  * @param {Object} htmlDoc a {@link https://developer.mozilla.org/en-US/docs/Web/API/Document|Document} object
- * @returns {Promise<module:types.Product>}
+ * @returns {Promise<module:@mobify/commerce-integrations/dist/types.Product>}
  * @private
  */
 const parseProduct = (htmlDoc) => {
@@ -226,7 +228,7 @@ const transformCartItem = (cartItem) => ({
 /**
  * A connector for www.merlinspotions.com, using screen-scraping.
  *
- * @implements {module:connectors/interfaces.CommerceConnector}
+ * @implements {module:@mobify/commerce-integrations/dist/connectors/interfaces.CommerceConnector}
  */
 export class MerlinsConnector extends ScrapingConnector {
     constructor({window, basePath, dondeGeoBasePath, dondeApiBasePath, cookieDomainRewrites}) {
@@ -295,8 +297,8 @@ export class MerlinsConnector extends ScrapingConnector {
     /**
      * Register a new customer account and login.
      *
-     * @param {module:types/CustomerRegistration} data
-     * @return {Promise<module:types/Customer>}
+     * @param {module:@mobify/commerce-integrations/dist/types.CustomerRegistration} data
+     * @return {Promise<module:@mobify/commerce-integrations/dist/types.Customer>}
      */
     registerCustomer(data) {
         const defaults = {newLetterSignup: false, rememberMe: false}
@@ -402,7 +404,7 @@ export class MerlinsConnector extends ScrapingConnector {
      *
      * @param {Object} config
      *
-     * @returns {module:types.MerlinsConnector} The new MerlinsConnector instance.
+     * @returns {module:@mobify/commerce-integrations/dist/types.MerlinsConnector} The new MerlinsConnector instance.
      */
     static fromConfig(config) {
         return new this.prototype.constructor(config)
@@ -444,7 +446,7 @@ export class MerlinsConnector extends ScrapingConnector {
      * Takes a OCAPI Product object and parses it into a commerce-integrations Product type.
      * @param {Object} data a OCAPI {@link https://documentation.demandware.com/DOC1/topic/com.demandware.dochelp/OCAPI/18.3/shop/Documents/Product.html|Product} document
      *
-     * @returns {Promise<module:types.Store>}
+     * @returns {Promise<module:@mobify/commerce-integrations/dist/types.Store>}
      */
     parseProduct(data) {
         return parseProduct(data)
@@ -1153,7 +1155,7 @@ export class MerlinsConnector extends ScrapingConnector {
      *
      * @param {Object} htmlDoc a {@link https://developer.mozilla.org/en-US/docs/Web/API/Element|Element} object
      *
-     * @returns {Promise<module:types.Category>}
+     * @returns {Promise<module:@mobify/commerce-integrations/dist/types.Category>}
      */
     parseCategory(categoryEl) {
         const anchorEl = categoryEl.querySelector('a')
@@ -1169,7 +1171,7 @@ export class MerlinsConnector extends ScrapingConnector {
      * Takes commerce-integrations ProductSearchRequest type and returns the URL
      * representation used to query the website.
      *
-     * @param {module:types.ProductSearchRequest} productSearchRequest
+     * @param {module:@mobify/commerce-integrations/dist/types.ProductSearchRequest} productSearchRequest
      *
      * @returns {String}
      */
@@ -1209,7 +1211,7 @@ export class MerlinsConnector extends ScrapingConnector {
      *
      * @param {Object} productEl a {@link https://developer.mozilla.org/en-US/docs/Web/API/Element|Element} object
      *
-     * @returns {module:types.ProductSearchResult}
+     * @returns {module:@mobify/commerce-integrations/dist/types.ProductSearchResult}
      */
     parseProductSearchResult(productEl) {
         const linkEl = productEl.querySelector('.product-item-link')
@@ -1255,7 +1257,7 @@ export class MerlinsConnector extends ScrapingConnector {
      *
      * @param {Object} sortEl a {@link https://developer.mozilla.org/en-US/docs/Web/API/Element|Element} object
      *
-     * @returns {Array.<module:types.SortOption>}
+     * @returns {Array.<module:@mobify/commerce-integrations/dist/types.SortOption>}
      */
     parseSortingOptions(sortEl) {
         const optionEls = sortEl.querySelectorAll('option')
@@ -1271,7 +1273,7 @@ export class MerlinsConnector extends ScrapingConnector {
      *
      * @param {Object} optionEl a {@link https://developer.mozilla.org/en-US/docs/Web/API/Element|Element} object
      *
-     * @returns {module:types.Filter}
+     * @returns {module:@mobify/commerce-integrations/dist/types.Filter}
      */
     parseFilter(optionEl) {
         const label = optionEl.querySelector('.filter-options-title').textContent
@@ -1307,7 +1309,7 @@ export class MerlinsConnector extends ScrapingConnector {
      * @param {Object} selectedEl a {@link https://developer.mozilla.org/en-US/docs/Web/API/Element|Element} object
      * @param {String} currentUrl The current page url used to help determine filter values.
      *
-     * @returns {module:types.Filter}
+     * @returns {module:@mobify/commerce-integrations/dist/types.Filter}
      */
     parseSelectedFilter(selectedEl, currentUrl) {
         // Use an anchor to parse out the search string
@@ -1339,7 +1341,7 @@ export class MerlinsConnector extends ScrapingConnector {
      * @param {Object} selectedFiltersEl a {@link https://developer.mozilla.org/en-US/docs/Web/API/Element|Element} object
      * @param {String} currentUrl The current page url used to help determine filter values.
      *
-     * @returns {Array.<module:types.Filter>}
+     * @returns {Array.<module:@mobify/commerce-integrations/dist/types.Filter>}
      */
     parseSelectedFilters(selectedFiltersEl, currentUrl) {
         const selectedEls = selectedFiltersEl.querySelectorAll('.items .item')
@@ -1353,7 +1355,7 @@ export class MerlinsConnector extends ScrapingConnector {
      * @param {Object} filterOptionsEl a {@link https://developer.mozilla.org/en-US/docs/Web/API/Element|Element} object
      * @param {String} currentUrl The current page url used to help determine filter values.
      *
-     * @returns {Array.<module:types.Filter>}
+     * @returns {Array.<module:@mobify/commerce-integrations/dist/types.Filter>}
      */
     parseFilters(filterOptionsEl, currentUrl) {
         // Note: Merlin's Potion's is unique in the way that it handles filters, normally

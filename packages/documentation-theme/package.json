@@ -1,6 +1,6 @@
 {
   "name": "@mobify/documentation-theme",
-  "version": "1.18.1",
+  "version": "1.19.0",
   "description": "Jade template theme for Mobify documentation",
   "main": "index.js",
   "bin": {
@@ -19,13 +19,13 @@
   "author": "dev@mobify.com",
   "license": "ISC",
   "devDependencies": {
-    "node-sass": "^4.9.3",
+    "node-sass": "^4.12.0",
     "prismjs": "1.8.4"
   },
   "dependencies": {
     "commander": "2.13.0",
     "fs-extra": "5.0.0",
     "glob": "7.1.2",
-    "harp": "0.30.0"
+    "harp": "^0.32.0"
   }
 }

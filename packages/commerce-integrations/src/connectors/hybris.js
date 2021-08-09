@@ -1,4 +1,9 @@
-/** @module */
+/**
+ * The `hybris` module contains the `HybrisConnector` class, an implementation of the
+ * `CommerceConnector` interface using the Omni Channel Connect API (OCC API) for
+ * connecting to SAP Hybris Commerce.
+ * @module @mobify/commerce-integrations/dist/connectors/hybris
+ */
 
 import * as hybris from 'hybris-occ-client'
 import * as errors from '../errors'
@@ -8,10 +13,10 @@ import URL from 'url-parse'
 const clone = (x) => JSON.parse(JSON.stringify(x))
 
 /**
- * A connector for the Hybris API.
+ * A Commerce Integrations connector for SAP Hybris Commerce backends.
  *
- * @implements {module:connectors/interfaces.CommerceConnector}
- * @implements {module:connectors/interfaces.ParserHooks}
+ * @implements {module:@mobify/commerce-integrations/dist/connectors/interfaces.CommerceConnector}
+ * @implements {module:@mobify/commerce-integrations/dist/connectors/interfaces.ParserHooks}
  */
 export class HybrisConnector {
     constructor({client, catalogId, catalogVersionId, authentication}) {
@@ -37,8 +42,8 @@ export class HybrisConnector {
     /**
      * Register a new customer account and login.
      *
-     * @param {module:types/HybrisCustomerRegistration} data
-     * @return {Promise<module:types/Customer>}
+     * @param {module:@mobify/commerce-integrations/dist/types.HybrisCustomerRegistration} data
+     * @return {Promise<module:@mobify/commerce-integrations/dist/types.Customer>}
      */
     registerCustomer(data) {
         const api = new hybris.UsersApi(this.client)
@@ -153,8 +158,8 @@ export class HybrisConnector {
     }
 
     /**
-     * Get current authentications object, which can be used to
-     * save/restore auth state, eg. for server-side usage.
+     * Get the current authentications object, which can be used to
+     * save and restore auth state.
      *
      * @return {Object}
      */
@@ -164,7 +169,7 @@ export class HybrisConnector {
 
     /**
      * Set the current authentications object, as returned from getAuthentications.
-     * Use to save/restore auth state, eg. for server-side usage.
+     * Use to save and restore auth state.
      *
      * @param {Object} authentications
      */
@@ -348,11 +353,11 @@ export class HybrisConnector {
     }
 
     /**
-     * Takes an array of OCAPI Category objects and parses it into an
+     * Takes an array of OCC API Category objects and parses it into an
      * commerce-integrations Category type.
-     * @param {Object[]} categories an array of OCAPI {@link https://mobify.github.io/hybris-occ-client/module-models_CategoryHierarchy.html|Category} document
+     * @param {Object[]} categories an array of OCC API {@link https://mobify.github.io/hybris-occ-client/module-models_CategoryHierarchy.html|Category} document
      *
-     * @returns {Promise<module:types.Category>}
+     * @returns {Promise<module:@mobify/commerce-integrations/dist/types.Category>}
      */
     /* eslint-disable camelcase */
     parseCategories(categories) {
@@ -364,11 +369,11 @@ export class HybrisConnector {
     }
 
     /**
-     * Takes an OCAPI Category objects and parses it into an
+     * Takes an OCC API Category objects and parses it into an
      * commerce-integrations Category type.
-     * @param {Object[]} categories an OCAPI {@link https://mobify.github.io/hybris-occ-client/module-models_CategoryHierarchy.html|Category} document
+     * @param {Object[]} categories An OCC API {@link https://mobify.github.io/hybris-occ-client/module-models_CategoryHierarchy.html|Category} document
      *
-     * @returns {Promise<module:types.Category>}
+     * @returns {Promise<module:@mobify/commerce-integrations/dist/types.Category>}
      */
     parseCategory({id, name, subcategories}) {
         const category = {
@@ -476,10 +481,10 @@ export class HybrisConnector {
     }
 
     /**
-     * Takes a OCAPI ImageGroup object and parses it into a commerce-integrations ImageSet type.
-     * @param {Object} data a OCAPI {@link https://documentation.demandware.com/DOC1/topic/com.demandware.dochelp/OCAPI/18.3/shop/Documents/ImageGroup.html|ImageGroup} document
+     * Takes an OCC API ImageGroup object and parses it into a commerce-integrations ImageSet type.
+     * @param {Object} data An OCC API {@link https://help.sap.com/doc/0e9065bfffdf4877a5aac1bf4ff9c32c/1811/en-US/ycommercewebservices/index.html#_productwsdto} document
      *
-     * @returns {Promise<module:types.ImageSet>}
+     * @returns {Promise<module:@mobify/commerce-integrations/dist/types.ImageSet>}
      */
     /* eslint-disable camelcase */
     parseImageSets(variation) {
@@ -513,10 +518,10 @@ export class HybrisConnector {
     /* eslint-enable camelcase */
 
     /**
-     * Takes a OCC Product object and parses it into a commerce-integrations Product type.
-     * @param {Object} data a OCC product document
+     * Takes an OCC Product object and parses it into a commerce-integrations Product type.
+     * @param {Object} data An OCC product document
      *
-     * @returns {Promise<module:types.Product>}
+     * @returns {Promise<module:@mobify/commerce-integrations/dist/types.Product>}
      */
     /* eslint-disable camelcase */
     parseProduct({code, name, description, categories, price, variantOptions}, variations = []) {
@@ -631,10 +636,10 @@ export class HybrisConnector {
     }
 
     /**
-     * Takes a OCCAPI WeekdayOpeningDay object and parses it into a commerce-integrations Store.hours type.
-     * @param {Object} hours a OCCAPI {@link https://help.hybris.com/6.7.0/api/ycommercewebservices/index.html#_weekdayopeningdaywsdto|WeekdayOpneningDay} document
+     * Takes an OCC API WeekdayOpeningDay object and parses it into a commerce-integrations Store.hours type.
+     * @param {Object} hours An OCC API {@link https://help.hybris.com/6.7.0/api/ycommercewebservices/index.html#_weekdayopeningdaywsdto|WeekdayOpneningDay} document
      *
-     * @returns {Promise<module:types.Store.hours>}
+     * @returns {Promise<module:@mobify/commerce-integrations/dist/types.Store.hours>}
      */
     parseOpeningHours(hours) {
         const parsedHours = {}
@@ -649,10 +654,10 @@ export class HybrisConnector {
     }
 
     /**
-     * Takes a OCCAPI PointOfService object and parses it into a commerce-integrations Store type.
-     * @param {Object} data a OCCAPI {@link https://help.hybris.com/6.7.0/api/ycommercewebservices/index.html#_pointofservicewsdto|PointOfService} document
+     * Takes an OCC API PointOfService object and parses it into a commerce-integrations Store type.
+     * @param {Object} data An OCC API {@link https://help.hybris.com/6.7.0/api/ycommercewebservices/index.html#_pointofservicewsdto|PointOfService} document
      *
-     * @returns {Promise<module:types.Store>}
+     * @returns {Promise<module:@mobify/commerce-integrations/dist/types.Store>}
      */
     parseGetStore(data) {
         const d = data
@@ -1138,13 +1143,13 @@ export class HybrisConnector {
 
     /**
      * Add a supported payment type to the cart
-     * @param {module:types.Cart} cart The cart to add the payment to.
-     * @param {module:types.Payment} payment The payment to add.
+     * @param {module:@mobify/commerce-integrations/dist/types.Cart} cart The cart to add the payment to
+     * @param {module:@mobify/commerce-integrations/dist/types.Payment} payment The payment to add
      * @param {Object} opts
-     * @return {Promise<module:types.Cart>}
+     * @return {Promise<module:@mobify/commerce-integrations/dist/types.Cart>}
      *
      * Need to set a billing address before setting a payment.
-     * Must call setCustomerInformation() to add an email before setting payment for an anonymous user.
+     * Must call setCustomerInformation() to add an email before setting payment for an anonymous cart.user.
      * cart.paymentDetails.number will be returned as undefined and set as a masked number in cart.paymentDetails.maskedNumber.
      */
     setPayment(cart, payment, opts = {}) {
@@ -1203,10 +1208,10 @@ export class HybrisConnector {
 
     /**
      * Set the customer information.
-     * @param {module:types.Cart} cart The customer's cart.
-     * @param {module:types.CustomerInformation} customerInformation The new or modified customer information.
+     * @param {module:@mobify/commerce-integrations/dist/types.Cart} cart The customer's cart
+     * @param {module:@mobify/commerce-integrations/dist/types.CustomerInformation} customerInformation The new or modified customer information
      * @param {Object} opts
-     * @return {Promise<module:types.Cart>}
+     * @return {Promise<module:@mobify/commerce-integrations/dist/types.Cart>}
      *
      * Email can be set for a guest user but not a registered user.
      */
@@ -1272,10 +1277,6 @@ export class HybrisConnector {
 
     /**
      * Set the billing address on the cart.
-     * @param {module:types.Cart} cart The cart to update the billing address for.
-     * @param {module:types.OrderAddress} billingAddress The new or modified address.
-     * @param {Object} opts
-     * @return {Promise<module:types.Cart>}
      *
      * Billing Address model : this order address needs to have a titleCode defined.
      * The default titleCodes are: ['mr', 'ms', 'miss', 'mrs', 'dr', 'rev']
@@ -1283,6 +1284,10 @@ export class HybrisConnector {
      *
      * If the billing address is set before adding a payment, the billing address will not yet be saved in the hybris instance.
      * Instead, the billing address will be saved in the hybris instance upon setting a payment.
+     * @param {module:@mobify/commerce-integrations/dist/types.Cart} cart The cart to update the billing address for
+     * @param {module:@mobify/commerce-integrations/dist/types.OrderAddress} billingAddress The new or modified address
+     * @param {Object} opts
+     * @return {Promise<module:@mobify/commerce-integrations/dist/types.Cart>}
      */
     setBillingAddress(cart, billingAddress, opts = {}) {
         if (!cart) {
@@ -1355,10 +1360,10 @@ export class HybrisConnector {
 
     /**
      * Set the shipping method for the cart.
-     * @param {module:types.Cart} cart The cart to set the shipping method for.
-     * @param {module:types.ShippingMethod} shippingMethod The shipping method to set.
+     * @param {module:@mobify/commerce-integrations/dist/types.Cart} cart The cart to set the shipping method for
+     * @param {module:@mobify/commerce-integrations/dist/types.ShippingMethod} shippingMethod The shipping method to setid
      * @param {Object} opts
-     * @return {Promise<module:types.Cart>}
+     * @return {Promise<module:@mobify/commerce-integrations/dist/types.Cart>}
      *
      * Must call setCustomerInformation() to add an email before setting payment for a guest user.
      */
@@ -1428,9 +1433,9 @@ export class HybrisConnector {
 
     /**
      * Get the available payment methods for the cart
-     * @param {module:types.Cart} cart The customer's cart.
+     * @param {module:@mobify/commerce-integrations/dist/types.Cart} cart The customer's cart
      * @param {Object} opts
-     * @return {Promise<Array.module:types.PaymentMethod>}
+     * @return {Promise<Array.module:@mobify/commerce-integrations/dist/types.PaymentMethod>}
      *
      * Hybris only supports payments by credit card attained from their cardtypes endpoint
      * so this command will return only one payment method with the id 'CREDIT_CARD', name 'Credit Card'

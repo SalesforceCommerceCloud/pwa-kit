@@ -3,8 +3,9 @@
 /* * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
 import {makeValidator} from './validators'
 
+export const Integer = makeValidator(Number.isInteger, 'Not an Integer.')
+
 /**
- * @memberOf module:types
+ * @memberOf module:@mobify/commerce-integrations/dist/types
  * @typedef {Number} Integer
  */
-export const Integer = makeValidator(Number.isInteger, 'Not an Integer.')

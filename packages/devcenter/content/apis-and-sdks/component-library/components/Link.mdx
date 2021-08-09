@@ -1,0 +1,112 @@
+---
+title: Link
+metaTitle: Link
+metaDescription: Link
+---
+
+import Link from 'progressive-web-sdk/dist/components/link'
+import PropsTable from '../../../../src/components/propstable'
+import Tabs from 'progressive-web-sdk/dist/components/tabs/tabs'
+import TabsPanel from 'progressive-web-sdk/dist/components/tabs/tabs-panel'
+
+<div class="component-intro">
+
+Converts a path string to a react-router Link component. It can take the path string either as child elements or as
+a `text` prop.
+
+If no href is passed, the link is rendered with a `#` href.
+The list of routes from your project is automatically used to make decisions
+whether the component renders a react-route link or an anchor tag.
+
+</div>
+
+<div onClick={(e) => {e.stopPropagation()}}>
+<Tabs activeIndex={0} className="devcenter">
+<TabsPanel title="Code" onClick={(e) => {e.stopPropagation()}}>
+
+### JavaScript import
+
+```jsx
+import Link from 'progressive-web-sdk/dist/components/link'
+```
+
+### SCSS import
+
+```scss
+@import 'node_modules/progressive-web-sdk/dist/components/link/link';
+```
+
+### Props table
+
+<PropsTable propMetaData={props.componentMetadata.childrenComponentProp} />
+
+### Basic example
+
+```jsx react-live=true
+<Link href="http://mobify.com/">Mobify</Link>
+```
+
+### With child elements
+
+```jsx react-live=true
+<Link href="http://mobify.com/">
+    <i>MOBIFY!</i>
+</Link>
+```
+
+### With prop text
+
+```jsx react-live=true
+<Link href="http://google.com/" text="Go to Google" />
+```
+
+### With no href
+
+```jsx react-live=true
+<Link text="No URL provided" />
+```
+
+### With an onClick handler
+
+```jsx react-live=true
+<Link
+    text="Click me!"
+    onClick={(e) => {
+        alert('Clicked'), e.preventDefault()
+    }}
+/>
+```
+
+### With hover (onEnter and onLeave) handlers
+
+```jsx react-live=true
+class StatefulExample extends React.Component {
+    constructor() {
+        this.state = {
+            isHovering: false
+        }
+    }
+
+    hoverOn() {
+        this.setState({isHovering: true})
+    }
+
+    hoverOff() {
+        this.setState({isHovering: false})
+    }
+
+    render() {
+        return (
+            <Link
+                text={this.state.isHovering ? 'Hovering! 🐭' : 'Hover Me!'}
+                onMouseEnter={this.hoverOn.bind(this)}
+                onMouseLeave={this.hoverOff.bind(this)}
+            />
+        )
+    }
+}
+```
+
+</TabsPanel>
+</Tabs>
+</div>

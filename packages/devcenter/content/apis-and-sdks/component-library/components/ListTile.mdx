@@ -1,0 +1,192 @@
+---
+title: ListTile
+metaTitle: ListTile
+metaDescription: ListTile
+---
+
+import ListTile from 'progressive-web-sdk/dist/components/list-tile'
+import PropsTable from '../../../../src/components/propstable'
+import Tabs from 'progressive-web-sdk/dist/components/tabs/tabs'
+import TabsPanel from 'progressive-web-sdk/dist/components/tabs/tabs-panel'
+
+<div class="component-intro">
+
+The `ListTile` component is a container to display text and links. Typically used in the `List` component, it can also have actions that may be displayed before and/or after the text.
+
+</div>
+
+<div onClick={(e) => {e.stopPropagation()}}>
+<Tabs activeIndex={0} className="devcenter">
+<TabsPanel title="Code" onClick={(e) => {e.stopPropagation()}}>
+
+### JavaScript import
+
+```jsx
+import ListTile from 'progressive-web-sdk/dist/components/list-tile'
+```
+
+### SCSS import
+
+```scss
+@import 'node_modules/progressive-web-sdk/dist/components/list-tile/base';
+```
+
+### Props table
+
+<PropsTable propMetaData={props.componentMetadata.childrenComponentProp} />
+
+### Basic example
+
+```jsx react-live=true
+<ListTile>This is a ListTile component</ListTile>
+```
+
+### With actions
+
+ListTile components can have a `startAction` and/or an `endAction` prop passed to it.
+
+```jsx react-live=true
+<div>
+    <ListTile startAction={<Icon name="cart" />}>
+        <div>
+            ListItem with <code>startAction</code> only
+        </div>
+    </ListTile>
+
+    <ListTile endAction={<Button className="pw--blank" icon="lock" />}>
+        <div>
+            ListItem with <code>endAction</code> only
+        </div>
+    </ListTile>
+
+    <ListTile
+        startAction={<Button className="pw--blank" icon="user" />}
+        endAction={<Button className="pw--blank" icon="chevron-right" />}
+    >
+        <div>
+            ListItem with <code>startAction</code> and <code>endAction</code>
+        </div>
+    </ListTile>
+</div>
+```
+
+### With href
+
+```jsx react-live=true
+<div>
+    <ListTile href="http://www.mobify.com">
+        <div>
+            ListTile with an <code>href</code> prop. Notice the change in color!
+        </div>
+    </ListTile>
+
+    <ListTile
+        href="http://www.mobify.com"
+        startAction={<Icon name="basket" />}
+        endAction={<Button className="pw--blank" icon="star" />}
+    >
+        <div>
+            Notice how the secondary action is included in the anchor. If you wish to change this
+            behavior, see the example below.
+        </div>
+    </ListTile>
+
+    <ListTile
+        startAction={
+            <Button
+                className="pw--blank u-link-color"
+                href="http://www.mobify.com"
+                icon="chevron-left"
+            />
+        }
+        endAction={
+            <Button
+                className="pw--blank u-link-color"
+                href="http://www.mobify.com"
+                icon="chevron-right"
+            />
+        }
+    >
+        Elements inside can be their own anchors.
+    </ListTile>
+</div>
+```
+
+### With includeEndActionInPrimary set to false
+
+By default, `endAction` is wrapped by the `pw-list-tile__primary` wrapper. We've chosen this behavior because in most cases, clicking on the `ListTile` and on the `endAction` should have the same effect. This can be altered by applying `includeEndActionInPrimary={false}`, like this:
+
+```jsx react-live=true
+<ListTile
+    includeEndActionInPrimary={false}
+    href="http://www.mobify.com"
+    endAction={<Button className="pw--blank" icon="chevron-right" />}
+>
+    <div>
+        ListTile with the <code>endAction</code> outside of the primary container
+    </div>
+</ListTile>
+```
+
+### With hover events
+
+```jsx react-live=true
+class StatefulExample extends React.Component {
+    constructor() {
+        this.state = {
+            isHovering: false
+        }
+    }
+
+    hoverOn() {
+        this.setState({isHovering: true})
+    }
+
+    hoverOff() {
+        this.setState({isHovering: false})
+    }
+
+    render() {
+        return (
+            <div>
+                <ListTile
+                    onMouseEnter={this.hoverOn.bind(this)}
+                    onMouseLeave={this.hoverOff.bind(this)}
+                    endAction={this.state.isHovering ? '🐭' : '🧀'}
+                >
+                    <div>Hover Me!</div>
+                </ListTile>
+            </div>
+        )
+    }
+}
+```
+
+</TabsPanel>
+<TabsPanel title="Design" class="markdown">
+
+### Related components
+Related component: [List](List)
+
+### Screenshot
+
+![](./images/components/list-tile/listtile-uikit.png)
+
+### Potential uses
+
+-   To provide the user with a number of navigation options to find categories and sub-categories within the site.
+-   Typically used on the home page to contain category and sub-category navigation.
+-   Graphic elements representing each category are often included.
+
+### Accessibility
+
+-   Ensure `ListTiles` are separated with enough space to conform to minimum tap target requirements (usually 44px).
+-   Do not rely on icons or imagery alone to describe the section, always support graphical elements with text.
+
+### Best practices
+
+-   Typically the graphic element is placed to the left of the text element. This helps to better connect the two elements when viewed on wider screen widths.
+
+</TabsPanel>
+</Tabs>
+</div>

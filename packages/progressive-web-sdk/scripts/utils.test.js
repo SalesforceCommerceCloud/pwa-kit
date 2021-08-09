@@ -9,6 +9,7 @@ const path = require('path')
 const os = require('os')
 const rimraf = require('rimraf')
 const Promise = require('bluebird')
+const pkg = require('../package.json')
 
 jest.mock('git-rev-sync')
 const git = require('git-rev-sync')
@@ -25,8 +26,7 @@ afterEach(() => {
 
 test('getRequestHeaders sets the User-Agent header', () => {
     const result = Utils.getRequestHeaders()
-
-    expect(result['User-Agent']).toMatch(/^progressive-web-sdk#\d+\.\d+\.\d+(-\w+\.\d+)?$/)
+    expect(result['User-Agent']).toBe(`progressive-web-sdk#${pkg.version}`)
 })
 
 test('getRequestHeaders copies over headers from the passed object', () => {

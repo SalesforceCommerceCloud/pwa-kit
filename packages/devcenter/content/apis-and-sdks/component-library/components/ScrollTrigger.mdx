@@ -1,0 +1,105 @@
+---
+title: ScrollTrigger
+metaTitle: ScrollTrigger
+metaDescription: ScrollTrigger
+---
+
+import ScrollTrigger from 'progressive-web-sdk/dist/components/scroll-trigger'
+import PropsTable from '../../../../src/components/propstable'
+import Tabs from 'progressive-web-sdk/dist/components/tabs/tabs'
+import TabsPanel from 'progressive-web-sdk/dist/components/tabs/tabs-panel'
+
+<div class="component-intro">
+
+The `ScrollTrigger` component allows you to register callbacks for when it's scrolled into or out of view.
+
+</div>
+
+<div onClick={(e) => {e.stopPropagation()}}>
+<Tabs activeIndex={0} className="devcenter">
+<TabsPanel title="Code" onClick={(e) => {e.stopPropagation()}}>
+
+### JavaScript import
+
+```jsx
+import ScrollTrigger from 'progressive-web-sdk/dist/components/scroll-trigger'
+```
+
+### SCSS import
+
+```scss
+@import 'node_modules/progressive-web-sdk/dist/components/scroll-trigger/base';
+```
+
+### Props table
+
+<PropsTable propMetaData={props.componentMetadata.childrenComponentProp} />
+
+### Basic example
+
+```jsx react-live=true
+class StatefulExample extends React.Component {
+    constructor() {
+        this.state = {
+            inView: false
+        }
+    }
+
+    render() {
+        return (
+            <div>
+                <div style={{height: '200px'}}>
+                    {this.state.inView ? 'The cat is visible!' : 'The cat is not visible.'}
+                </div>
+                <ScrollTrigger
+                    onEnter={() => this.setState({inView: true})}
+                    onLeave={() => this.setState({inView: false})}
+                >
+                    <Image
+src="https://s-media-cache-ak0.pinimg.com/564x/72/4b/6d/724b6dbf91c378a53d6890bb525c1aa9.jpg"
+                        alt="Cat"
+                    />
+                </ScrollTrigger>
+            </div>
+        )
+    }
+}
+```
+
+### With offset
+
+A negative `offsetTop` can be used to do something before the content has been scrolled into view:
+
+```jsx react-live=true
+class StatefulExample extends React.Component {
+    constructor() {
+        this.state = {
+            inView: false
+        }
+    }
+
+    render() {
+        return (
+            <div>
+                <div style={{height: '200px'}}>
+                    {this.state.inView ? 'The cat is visible!' : 'The cat is not visible.'}
+                </div>
+                <ScrollTrigger
+                    onEnter={() => this.setState({inView: true})}
+                    onLeave={() => this.setState({inView: false})}
+                    offsetTop={-100}
+                >
+                    <Image
+src="https://s-media-cache-ak0.pinimg.com/564x/72/4b/6d/724b6dbf91c378a53d6890bb525c1aa9.jpg"
+                        alt="Cat"
+                    />
+                </ScrollTrigger>
+            </div>
+        )
+    }
+}
+```
+
+</TabsPanel>
+</Tabs>
+</div>

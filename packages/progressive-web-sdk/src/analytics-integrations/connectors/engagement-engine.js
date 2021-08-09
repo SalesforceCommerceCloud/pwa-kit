@@ -1,7 +1,14 @@
+/* eslint-disable */
+
 /* * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
 /* Copyright (c) 2019 Mobify Research & Development Inc. All rights reserved. */
 /* * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
-/** @module */
+/**
+ * The `engagement-engine` module contains the `EngagementEngineConnector` class,
+ * an implementation of the `AnalyticsConnector` interface, used for connecting
+ * to Mobify's Engagement Engine provider.
+ * @module progressive-web-sdk/dist/analytics-integrations/connectors/engagement-engine
+ */
 import {
     PAGEVIEW,
     OFFLINE,
@@ -20,6 +27,9 @@ import {
     LOCALE
 } from '../types'
 
+// This is a workaround for jsdoc bug, please see https://github.com/jsdoc/jsdoc/issues/1718
+    ; ('')
+
 const PLATFORMS = {
     UPWA: 'UPWA',
     PWA: 'PWA',
@@ -30,7 +40,7 @@ const PLATFORMS = {
 /**
  * An analytics Connector for Mobify's analytics backend, the Engagement Engine.
  *
- * @implements {module:interface.AnalyticsConnector}
+ * @implements {module:progressive-web-sdk/dist/analytics-integrations/interface.AnalyticsConnector}
  */
 export class EngagementEngineConnector {
     /**

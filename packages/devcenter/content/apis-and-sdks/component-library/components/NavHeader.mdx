@@ -1,0 +1,303 @@
+---
+title: NavHeader
+metaTitle: NavHeader
+metaDescription: NavHeader
+---
+
+import NavHeader from 'progressive-web-sdk/dist/components/nav-header'
+import PropsTable from '../../../../src/components/propstable'
+import Tabs from 'progressive-web-sdk/dist/components/tabs/tabs'
+import TabsPanel from 'progressive-web-sdk/dist/components/tabs/tabs-panel'
+
+<div class="component-intro">
+
+The `NavHeader` component is responsible for rendering a header bar inside a `Nav` component. It automatically displays meta information about the navigation tree such as which navigation node is presently active. In addition, `NavHeader` displays UI that can be, for example, used to navigate the tree backwards, or to display buttons that can be used to close a navigation modal.
+
+`NavHeader` cannot be used by itself. It must be inserted into a `Nav` component.
+
+</div>
+
+<div onClick={(e) => {e.stopPropagation()}}>
+<Tabs activeIndex={0} className="devcenter">
+<TabsPanel title="Code" onClick={(e) => {e.stopPropagation()}}>
+
+### JavaScript import
+
+```jsx
+import NavHeader from 'progressive-web-sdk/dist/components/nav-header/'
+```
+
+### SCSS import
+
+```scss
+@import 'node_modules/progressive-web-sdk/dist/components/nav/base';
+```
+
+### Props table
+
+<PropsTable propMetaData={props.componentMetadata.childrenComponentProp} />
+
+### Basic example
+
+The example below demonstrates the bare minimum code needed to render the `NavHeader` component. However, it's not fully functional (nothing changes, buttons don't do anything, etc.). The examples further below will build upon this example, showing how to add functionality.
+
+```jsx react-live=true
+<Nav
+    root={{
+        title: 'Store',
+        path: '/'
+    }}
+>
+    <NavHeader />
+</Nav>
+```
+
+This next example introduces the necessary features that give `NavHeader` the functionality to display the current route. Notice how by adding children to the `root` object and by introducing the `NavMenu` component, the header then updates automatically as you traverse the navigation tree. These features are described in complete detail in the [`Nav` component's documentation](Nav).
+
+```jsx react-live=true
+class StatefulExample extends React.Component {
+    constructor() {
+        this.state = {
+            path: '/'
+        }
+    }
+
+    changePath(path) {
+        this.setState({path: path})
+    }
+
+    render() {
+        // Notice that we added new children to the `root` so
+        // we can traverse the navigation tree a little deeper.
+        const root = {
+            title: 'Store',
+            path: '/',
+            children: [
+                {
+                    title: "Men's Clothing",
+                    path: '/mens-clothing/',
+                    children: [
+                        {title: 'Jeans', path: '/mens-clothing/jeans/'},
+                        {title: 'Polos', path: '/mens-clothing/polos/'},
+                        {title: 'Shorts', path: '/mens-clothing/shorts/'}
+                    ]
+                }
+            ]
+        }
+
+        return (
+            // Notice below that we added the `NavMenu` component.
+            // This adds the UI that is necessary to actually
+            // interact with and traverse the navigation tree.
+            <Nav root={root} path={this.state.path} onPathChange={this.changePath.bind(this)}>
+                <NavHeader />
+                <NavMenu />
+            </Nav>
+        )
+    }
+}
+```
+
+### Custom animations
+
+The `NavHeader` component controls how its internals (such as the `pw-nav-header__title` element) animate in and out as the user traverses the navigation tree. The animation can be customized by passing in an `animationProperties` object whose valid keys and values are described in the [`NavSlider`'s prop documentation](NavSlider).
+
+As an example:
+
+```javascript static
+const animationProperties = {
+    className: 'pw--my-custom-animation-class',
+    duration: 400,
+    easing: 'cubic-bezier(0.68, -0.55, 0.265, 1.55)',
+    id: 'my-custom-id'
+}
+```
+
+```jsx react-live=true
+class StatefulExample extends React.Component {
+    constructor() {
+        this.state = {
+            path: '/'
+        }
+    }
+
+    changePath(path) {
+        this.setState({path: path})
+    }
+
+    render() {
+        // Notice that we added new children to the `root` so
+        // we can traverse the navigation tree a little deeper.
+        const root = {
+            title: 'Watch Me Bounce!',
+            path: '/',
+            children: [
+                {
+                    title: 'Animated Header!',
+                    path: '/animated/',
+                    children: [
+                        {
+                            title: 'Click "back" button to see animation again',
+                            path: '/mens-clothing/jeans/'
+                        }
+                    ]
+                }
+            ]
+        }
+
+        const animationProperties = {
+            className: 'pw--my-custom-animation-class',
+            duration: 400,
+            easing: 'cubic-bezier(0.68, -0.55, 0.265, 1.55)',
+            id: 'my-custom-id'
+        }
+
+        return (
+            <Nav root={root} path={this.state.path} onPathChange={this.changePath.bind(this)}>
+                <NavHeader animationProperties={animationProperties} />
+                <NavMenu />
+            </Nav>
+        )
+    }
+}
+```
+
+### Using custom back and close buttons
+
+The `startContent` and `endContent` props can be used to define custom "back" and "close" buttons. The values of these props can be text, or they can be a React node. Either way, click handlers are automatically included. If you pass in a `Button`, you don't have to add your own handler. The traversal of the navigation tree is taken care of automatically.
+
+Take special care to test and ensure your implementation is accessible to keyboard and screen reader users.
+
+```jsx react-live=true
+class StatefulExample extends React.Component {
+    constructor() {
+        this.state = {
+            path: '/'
+        }
+    }
+
+    changePath(path) {
+        this.setState({path: path})
+    }
+
+    render() {
+        // Notice that we added new children to the `root` so
+        // we can traverse the navigation tree a little deeper.
+        const root = {
+            title: 'Store',
+            path: '/',
+            children: [
+                {
+                    title: "Men's Clothing",
+                    path: '/mens-clothing/',
+                    children: [
+                        {title: 'Casual Shirts', path: '/mens-clothing/casual-shirts/'},
+                        {title: 'Coats and Jackets', path: '/mens-clothing/coats-and-jackets/'},
+                        {title: 'Jeans', path: '/mens-clothing/jeans/'},
+                        {title: 'Polos', path: '/mens-clothing/polos/'},
+                        {title: 'Shorts', path: '/mens-clothing/shorts/'}
+                    ]
+                }
+            ]
+        }
+
+        // New start and end elements to be used in the `NavHeader`
+        const startContent = <div className="u-link-color">Back?</div>
+        const endContent = (
+            <div className="u-link-color">
+                <IconLabel label="Close" iconName="close" iconSize="" />
+            </div>
+        )
+
+        return (
+            <Nav root={root} path={this.state.path} onPathChange={this.changePath.bind(this)}>
+                <NavHeader startContent={startContent} endContent={endContent} />
+                <NavMenu />
+            </Nav>
+        )
+    }
+}
+```
+
+### Using the onClose prop
+
+The `onClose` prop is available to the developer so they can hook in the ability to trigger any behavior. Perhaps the most common use case is to use `onClose` to trigger an event or state change that closes the navigation if it's inside a [Sheet component](Sheet)
+
+```jsx react-live=true
+/**
+ * This custom onClick handler can be used to, for example,
+ * trigger an event or state change that closes the navigation.
+ */
+
+<Nav
+    root={{
+        title: 'Store',
+        path: '/'
+    }}
+>
+    <NavHeader onClose={() => alert('Close the navigation!')} />
+</Nav>
+```
+
+### Using the onTitleClick prop
+
+The `onTitleClick` prop works in a similar way as the `onClose` prop. It's triggered when a user clicks on the title.
+
+```jsx react-live=true
+/**
+ * This custom onTitleClick callback handler can be used to trigger
+ * an event or a state change that closes the navigation.
+ * The callback provides two arguments: `title` and `path`.
+ * These arguments come from the NavHeader component's `expanded` prop object.
+ */
+
+<Nav
+    root={{
+        title: 'Store',
+        path: '/'
+    }}
+>
+    <NavHeader
+        onTitleClick={(title, path) => {
+            alert(`${title} is clicked!`)
+            alert(`Current path is ${path}!`)
+        }}
+    />
+</Nav>
+```
+
+</TabsPanel>
+<TabsPanel title="Design" class="markdown">
+
+### Related components
+- [Nav](Nav)
+- [NavItem](NavItem)
+- [NavMenu](NavMenu)
+- [NavSlider](NavSlider)
+
+### Screenshot
+
+![](./images/components/nav-header/navheader-uikit.png)
+
+### Potential uses
+
+-   Within the `Nav` component as a top header bar containing the close button.
+-   Within the `Nav` component after a user has selected a top level category.
+-   At the top of a navigation tier, providing a link to go back to the previous level.
+-   Links to language switching.
+
+### Accessibility
+
+-   If using a background color, ensure the font color of the category heading passes color contrast guidelines. Grey on Grey is very difficult to read unless the contrast is very high.
+-   If using an x icon for the close button, consider the user's ability to understand the icon. If you're in doubt, support the icon with a text label.
+
+### Best practices
+
+-   If you're using a smaller version of the customer logo in the main site header, the NavHeader can be a good place to use a larger version.
+-   Use a left chevron, the word "Back" or both to communicate the action of moving back a level.
+-   Visually help the user understand that the header is not a navigation item by giving it a different background color.
+-   It can visually aid the hierarchy to use a heavier font weight for the current category.
+
+</TabsPanel>
+</Tabs>
+</div>

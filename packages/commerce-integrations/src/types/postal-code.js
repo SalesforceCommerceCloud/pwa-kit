@@ -5,11 +5,12 @@
 import Validator from 'validator'
 import {makeValidator} from './validators'
 
-/**
- * @memberOf module:types
- * @typedef {String} PostalCode
- */
 export const PostalCode = makeValidator(
     (x) => Validator.isPostalCode(x, 'any'),
     'Not a valid Postal Code.'
 )
+
+/**
+ * @memberOf module:@mobify/commerce-integrations/dist/types
+ * @typedef {String} PostalCode
+ */

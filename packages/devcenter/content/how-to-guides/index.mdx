@@ -1,0 +1,56 @@
+---
+title: How-To Guides
+metaTitle: How-To Guides
+metaDescription: Tactical articles that guide you through specific tasks using the Mobify Platform. Find best practices, general advice, and step-by-step solutions with lots of code examples.
+column: 2
+---
+
+import {Grid} from '@theme-ui/components'
+import {Card as DevCenterCard} from '../../src/components/CardComponent'
+
+These guides will walk you through specific tasks using the Mobify Platform.
+
+You'll find best practices, general advice from real projects, and step-by-step solutions with code examples.
+
+## Featured Guides
+
+
+Here's quickest way to find our newest and most popular guides.
+
+<Grid gap={'xl'} columns={[1, null, 3]}>
+{props.featuredCategories.map(({frontmatter, fields}) => (
+<DevCenterCard
+key={frontmatter.title}
+altTitle={frontmatter.title}
+description={frontmatter.metaDescription}
+cardLink={fields.slug}
+/>
+))}
+</Grid>
+
+## All Guides
+
+Browse by category to see all the guides we've published. (Or use the search bar at the top of the page to find it fast.)
+
+<Grid gap={'xl'} columns={[1, null, 2]} paddingBottom={2}>
+<DevCenterCard
+title={props.categoryMap['Design'].title}
+description="Best practices to help optimize the user experience."
+linkGroups={props.categoryMap['Design'].linkMap}
+/>
+<DevCenterCard
+title={props.categoryMap['Guides'].title}
+description="Get in-depth help on a variety of topics related to building an ecommerce PWA with the Mobify Platform."
+linkGroups={props.categoryMap['Guides'].linkMap}
+/>
+<DevCenterCard
+title={props.categoryMap['Upgrades'].title}
+description="Step-by-step instructions for upgrading key project dependencies."
+linkGroups={props.categoryMap['Upgrades'].linkMap}
+/>
+<DevCenterCard
+title={props.categoryMap['Testing'].title}
+description="Best practices for testing single-page apps, including automated and manual methods."
+linkGroups={props.categoryMap['Testing'].linkMap}
+/>
+</Grid>

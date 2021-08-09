@@ -2,7 +2,7 @@ import {CookieJar, CookieAccessInfo} from 'cookiejar'
 import {ScrapingConnector} from './scraping-connector'
 
 describe(`Cookie utilities`, () => {
-    const byName = (a, b) => a.name > b.name
+    const byName = (a, b) => (a.name > b.name ? 1 : -1)
     const toObj = (cookie) => Object.assign({}, cookie)
 
     test('cloneCookieJar should clone a cookie jar', () => {

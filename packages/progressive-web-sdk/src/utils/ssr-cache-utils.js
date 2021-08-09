@@ -1,6 +1,10 @@
 /* * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
 /* Copyright (c) 2019 Mobify Research & Development Inc. All rights reserved. */
 /* * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
+/**
+ * @module progressive-web-sdk/dist/utils/ssr-cache-utils
+ */
+
 const fs = require('fs')
 const os = require('os')
 const path = require('path')

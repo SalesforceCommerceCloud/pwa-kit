@@ -3,11 +3,12 @@
 /* * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
 import {makeValidator} from './validators'
 
-/**
- * @memberOf module:types
- * @typedef {Number} Longitude
- */
 export const Longitude = makeValidator(
     (x) => typeof x === 'number' && x <= 180.0 && x >= -180.0,
     'Not a Longitude.'
 )
+
+/**
+ * @memberOf module:@mobify/commerce-integrations/dist/types
+ * @typedef {Number} Longitude
+ */

@@ -1,0 +1,65 @@
+---
+title: DebugInfo
+metaTitle: DebugInfo
+metaDescription: DebugInfo
+---
+
+import AddToHomescreenIosBanner from 'progressive-web-sdk/dist/components/debug-info'
+import Button from 'progressive-web-sdk/dist/components/button/'
+import PropsTable from '../../../../src/components/propstable'
+import Tabs from 'progressive-web-sdk/dist/components/tabs/tabs'
+import TabsPanel from 'progressive-web-sdk/dist/components/tabs/tabs-panel'
+
+<div class="component-intro">
+
+`DebugInfo` assists developers by bringing key information about the build together into one place:
+* `bundleID` of the build
+* `Origin` of the build
+* `RenderPhase`, the build’s current rendering phase
+* `ProgressiveWebSDK`, version of the Mobify Platform
+* Build info events
+
+</div>
+
+<div onClick={(e) => {e.stopPropagation()}}>
+<Tabs activeIndex={0} className="devcenter">
+<TabsPanel title="Code" onClick={(e) => {e.stopPropagation()}}>
+
+### JavaScript import
+```jsx
+import DebugInfo from 'progressive-web-sdk/dist/components/debug-info'
+```
+
+### SCSS import
+
+```scss
+@import 'node_modules/progressive-web-sdk/dist/components/debug-info/base';
+```
+
+### Basic example
+
+<figure class="u-text-align-center" style="background-color: #fafafa;">
+
+![](./images/components/debug-info/debug-info.png)
+<figcaption>Debug Info example without SSR timing information</figcaption>
+</figure>
+
+<figure class="u-text-align-center" style="background-color: #fafafa;">
+
+![](./images/components/debug-info/debug-info-opened.png)
+<figcaption>Debug Info example without SSR timing information</figcaption>
+</figure>
+
+<Callout type="info">
+
+**Note:** SSR Timing information is only available on Mobify server-side rendered Progressive Web App (PWA) builds.
+</Callout>
+
+The default Component implementation:
+```jsx static
+    <DebugInfo />
+```
+
+</TabsPanel>
+</Tabs>
+</div>

@@ -3,11 +3,12 @@
 /* * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
 import {makeValidator} from './validators'
 
-/**
- * @memberOf module:types
- * @typedef {Number} PositiveInteger
- */
 export const PositiveInteger = makeValidator(
     (x) => Number.isInteger(x) && x >= 0,
     'Not an Integer.'
 )
+
+/**
+ * @memberOf module:@mobify/commerce-integrations/dist/types
+ * @typedef {Number} PositiveInteger
+ */

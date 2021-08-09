@@ -1,7 +1,12 @@
 /* * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
 /* Copyright (c) 2019 Mobify Research & Development Inc. All rights reserved. */
 /* * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
-/** @module */
+/**
+ * The `google-analytics` module contains the `GoogleAnalyticsConnector` class,
+ * an implementation of the `AnalyticsConnector` interface, used for connecting
+ * to Google Analytics.
+ * @module progressive-web-sdk/dist/analytics-integrations/connectors/google-analytics
+ */
 import {
     PAGEVIEW,
     PRODUCTIMPRESSION,
@@ -13,10 +18,13 @@ import {
 } from '../types'
 import {loadScript} from '../utils'
 
+// This is a workaround for jsdoc bug
+// please see https://github.com/jsdoc/jsdoc/issues/1718
+;('')
+/* eslint-enable */
+
 /**
- * A Connector for Analytics Provider: Google Analytics.
- *
- * @implements {module:interface.AnalyticsConnector}
+ * @implements {module:progressive-web-sdk/dist/analytics-integrations/interface.AnalyticsConnector}
  */
 export class GoogleAnalyticsConnector {
     /**

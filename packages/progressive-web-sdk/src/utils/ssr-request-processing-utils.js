@@ -1,7 +1,9 @@
 /* * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
 /* Copyright (c) 2019 Mobify Research & Development Inc. All rights reserved. */
 /* * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
-
+/**
+ * @module progressive-web-sdk/dist/utils/ssr-request-processing-utils
+ */
 /*
  There are some special requirements for this module, which is used in the
  SDK and also in Lambda@Edge functions run by CloudFront. Specifically:
@@ -11,6 +13,8 @@
  */
 
 import {escape, unescape} from 'querystring'
+;('') // eslint-disable-line
+// TODO: https://github.com/jsdoc/jsdoc/issues/1718
 
 /**
  * A class that represents and can manipulate a parsed
@@ -146,10 +150,11 @@ export class QueryParameters {
      */
     toString() {
         return this._parameters
-            .map((parameter) => {
-                const k = escape(unescape(parameter.originalKey))
-                return parameter.value === null ? k : `${k}=${escape(parameter.value)}`
-            })
+            .map((parameter) =>
+                parameter.value === null
+                    ? escape(parameter.key)
+                    : `${escape(parameter.key)}=${escape(parameter.value)}`
+            )
             .join('&')
     }
 }

@@ -1,0 +1,254 @@
+---
+title: Overview
+metaTitle: Analytics Integrations
+metaDescription: An overview of the Mobify Platform’s data layer for interacting with client-side analytics services.
+type: 'doc'
+category: Analytics Integrations
+subcategory: Overview
+---
+
+<Callout type='warning'>
+
+**Important:** Analytics Integrations is our <em>new</em> Analytics API within progressive-web-sdk, released on July 3rd, 2019. Analytics Integrations gives Mobify Platform engineers full visibility into the analytics events being fired in the PWA, and full control over their analytics implementation. If your project requires it, you can still use the legacy Analytics Manager and <a href="./legacy-analytics-manager">access the documentation</a> for now.
+
+</Callout>
+
+## Introduction
+
+Analytics Integrations is a data layer for interacting with client-side analytics services in your PWA. It centralizes code for tracking analytics events and queues events while offline:
+
+```javascript
+import {AnalyticsManager} from 'progressive-web-sdk/dist/analytics-integrations/analytics-manager'
+import {GoogleAnalyticsConnector} from 'progressive-web-sdk/dist/analytics-integrations/connectors/google-analytics.js'
+import {PAGEVIEW} from 'progressive-web-sdk/dist/analytics-integrations/types'
+
+const analyticsManager = new AnalyticsManager({
+    connectors: [
+        new GoogleAnalyticsConnector({
+            trackerName: 'myTracker',
+            trackerId: 'UA-123'
+        })
+    ]
+})
+
+analyticsManager.track(PAGEVIEW, {
+    templateName: 'product-details-page'
+})
+```
+
+The [AnalyticsManager](/apis-and-sdks/progressive-web-sdk/analytics-integrations/analytics-manager) instance sends events to its connectors. Each connector forwards the event to an analytics service, like Google Analytics or Adobe Analytics. Events are the named JavaScript objects containing analytics data that connectors send to their analytics service.
+
+## Connectors
+
+Connectors are classes that implement the [AnalyticsConnector](/apis-and-sdks/progressive-web-sdk/analytics-integrations/interface) interface. They send events to an analytics service, and load any scripts that are needed to use the analytics service. Here is an example of a connector set up to Google Analytics:
+
+```javascript
+import {PAGEVIEW} from 'progressive-web-sdk/dist/analytics-integrations/types'
+import {loadScript} from 'progressive-web-sdk/dist/analytics-integrations/utils'
+
+export class GoogleAnalyticsConnector {
+    // Returns a Promise which resolves when scripts required
+    // to interact with the analytics service are loaded.
+    load() {
+        return loadScript('https://www.google-analytics.com/analytics.js').then(() => {
+            const ga = (this.ga = window.ga)
+            ga('create', 'UA-123', {name: 'myTracker'})
+            return Promise.resolve()
+        })
+    }
+
+    // Forward events to the analytics service.
+    track(type, data) {
+        switch (type) {
+            case PAGEVIEW:
+                this.tracker.send('pageview', data)
+                break
+            default:
+                return null
+        }
+        return data
+    }
+}
+```
+
+Analytics Integrations provides these pre-built connectors:
+
+-   [Google Analytics Connector](/apis-and-sdks/progressive-web-sdk/analytics-integrations/connectors/google-analytics)
+-   [Google Tag Manager Connector](/apis-and-sdks/progressive-web-sdk/analytics-integrations/connectors/google-tag-manager)
+-   [Mobify Engagement Engine Connector](/apis-and-sdks/progressive-web-sdk/analytics-integrations/connectors/engagement-engine)
+
+## Events
+
+Calling `AnalyticsManager.track(eventType, eventData)` sends an event, like this:
+
+```javascript
+import {PAGEVIEW} from 'progressive-web-sdk/dist/analytics-integrations/types'
+import {analyticsManager} from 'pwa/app/analytics/index'
+
+const eventType = PAGEVIEW
+const eventData = {
+    templateName: 'product-details-page'
+}
+
+analyticsManager.track(eventType, eventData)
+```
+
+This example includes two constants:
+
+-   `eventType` is an arbitrary string used to identify a class of events.
+-   `eventData` is an object of meta information that gives context to the event.
+
+Analytics Integrations defines several [data types](/apis-and-sdks/progressive-web-sdk/analytics-integrations/types) for events.
+
+### Declarative syntax for tracking user interface events
+
+Using `AnalyticsManager.track()`, you can track UI interactions such as button clicks:
+
+```javascript
+import {UIINTERACTION} from 'progressive-web-sdk/dist/analytics-integrations/types'
+import {analyticsManager} from 'pwa/app/analytics/index'
+
+const TrackingButton = () => (
+    <button
+        onclick={() => {
+            analyticsManager.track(UIINTERACTION, {
+                subject: 'user',
+                action: 'Click',
+                object: 'Button',
+                name: 'promo-call-to-action',
+                content: '50off-promo'
+            })
+        }}
+    />
+)
+```
+
+However, this syntax can get verbose if you're tracking many events. The declarative syntax reduces repetition by allowing you to use HTML data attributes to track events:
+
+```javascript
+const TrackingButton = () => (
+    <button data-analytics-name="promo-call-to-action" data-analytics-content="50off-promo" />
+)
+```
+
+Adding `data-analytics-name` and `data-analytics-content` will automatically track a [UIINTERACTION](/apis-and-sdks/progressive-web-sdk/analytics-integrations/types/#module-colon-progressive-web-sdk-slash-dist-slash-analytics-integrations-slash-types-tilde-UIINTERACTION) event for any `focus`, `change`, and `click` events that occur on your element or its children element.
+
+-   `data-analytics-name`: a required attribute that sets the `name` property of event data. It helps identify which element was used.
+-   `data-analytics-content`: an optional attribute that sets the `context` property of event data. As the name implies, this attribute helps provide context about the event. The `select` elements, and the `checkbox` and `radio` `input` elements are automatically set with a boolean value.
+
+In the example above, the data properties `subject`, `action`, and `object` are not included because they’re automatically set with values from the [JavaScript Event](https://www.w3schools.com/js/js_events.asp) triggered. You can read more about all the event data properties in the [data types](/apis-and-sdks/progressive-web-sdk/analytics-integrations/types) reference.
+
+### Automatic event validation
+
+Analytics Integrations offers automatic event validation, ensuring that incoming event data matches its corresponding data type schema. The automatic validation occurs when your PWA is run in a non-production environment, or when the [debug flag](#debugging-the-analyticsmanager-class) is set to `true`.
+
+### Tracking events while offline
+
+Analytics Integrations also includes offline queuing. When the browser is offline, tracked events are queued. When the browser is able to reconnect to the network, events are flushed from the queue to connectors in the order in which they occurred.
+
+## Implementing the AnalyticsManager class
+
+The scaffold already includes a starting implementation of `AnalyticsManager`:
+
+-   Within `<PROJECT_DIR>/app/analytics/index.js`, the function `getAnalyticsManager()` returns a singleton instance of [AnalyticsManager](/apis-and-sdks/progressive-web-sdk/analytics-integrations/analytics-manager).
+-   By default, the implementation already tracks the [PAGEVIEW](/apis-and-sdks/progressive-web-sdk/analytics-integrations/types/#module-colon-progressive-web-sdk-slash-dist-slash-analytics-integrations-slash-types-tilde-PAGEVIEW), [PERFORMANCE](/apis-and-sdks/progressive-web-sdk/analytics-integrations/types/#module-colon-progressive-web-sdk-slash-dist-slash-analytics-integrations-slash-types-tilde-PERFORMANCE), [UIINTERACTION](/apis-and-sdks/progressive-web-sdk/analytics-integrations/types#module-colon-progressive-web-sdk-slash-dist-slash-analytics-integrations-slash-types-tilde-UIINTERACTION), [ERROR](/apis-and-sdks/progressive-web-sdk/analytics-integrations/types#module-colon-progressive-web-sdk-slash-dist-slash-analytics-integrations-slash-types-tilde-ERROR), and [OFFLINE](/apis-and-sdks/progressive-web-sdk/analytics-integrations/types#module-colon-progressive-web-sdk-slash-dist-slash-analytics-integrations-slash-types-tilde-OFFLINE) events.
+
+### Using Redux with the AnalyticsManager class
+
+If you’re using Redux in your app, you may want to couple Redux actions with analytics events. However, Redux actions may be used in many places across your app, and calling `AnalyticsManager.track()` in each place can be tedious and error-prone.
+
+Instead, you can implement a [Redux middleware](https://redux.js.org/advanced/middleware) to call `AnalyticsManager.track()` in one spot for each action.
+
+Given this Redux action:
+
+```javascript
+// app/actions.js
+export const PAGE = 'PAGE'
+
+export const onPageview = (templateName) => {
+    type: PAGE,
+    payload: {
+        templateName
+    }
+}
+```
+
+You can create an analytics middleware like this:
+
+```javascript
+// app/analytics/middleware.js
+import {getAnalyticsManager} from './index'
+import {PAGE} from '../actions'
+import {PAGEVIEW} from 'progressive-web-sdk/dist/analytics-integrations/types'
+
+const analyticsManager = getAnalyticsManager() // your analyticsManager instance.
+
+const analyticsMiddleware = (store) => (next) => (action) => {
+    const {payload, type} = action
+
+    switch (type) {
+        case PAGE:
+            analyticsManager.track(PAGEVIEW, {
+                templateName: payload.templateName
+            })
+            break
+        default:
+            break
+    }
+    return next(action)
+}
+
+export default analyticsMiddleware
+```
+
+Include your middleware using the Redux method `applyMiddleware()` when creating your store, like this:
+
+```javascript
+// app/store.js
+import {createStore, applyMiddleware} from 'redux'
+import analyticsMiddleware from './analytics/middleware'
+
+// Reducer
+export const reducer = (state, action) => {
+   const {type, payload} = action
+
+   switch (type) {
+       case PAGE: {
+           return {
+               ...state,
+               cart: payload
+           }
+       }
+       default:
+           return state
+   }
+}
+
+const store = createStore(reducer, {}, applyMiddleware(analyticsMiddleware))
+```
+
+### Debugging the AnalyticsManager class
+
+To debug tracked events, turn on the debug flag to print logs to your browser console.
+
+There are two ways to enable the debug flag:
+
+**1. Using the DEBUG environment variable**
+
+When you start your dev server, you can set the environment variable `DEBUG` with this command:
+
+```bash
+DEBUG=true npm run start
+```
+
+**2. Directly in code:**
+
+The debug flag is set when creating an instance of `AnalyticsManager`, so you can modify it directly like this:
+
+```javascript
+import {AnalyticsManager} from 'progressive-web-sdk/dist/analytics-integrations/analytics-manager'
+
+const analyticsManager = new AnalyticsManager({debug: true})
+```
+
+That's it! After reading this article, you've gotten to know all the key concepts you'll need to integrate analytics services into your Mobify PWA. For further reading, check out our article on [Validating Analytics Data During Launch](/how-to-guides/categories/guides/validating-analytics).

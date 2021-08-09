@@ -96,7 +96,6 @@ and any experimental functions that should not have the experimental warning any
     * For **Stable** Releases
         - Run the following to update the version `npm run bump-version -- [major / minor]`
         - Manually update the CHANGELOG.md files for each of the packages. Squash all the previous prerelease version numbers.
-        - Update the `docs/public/versions.json` and `docs/public/release-dates.json` and append the new version number.
     * For **Hotfix** Releases run the following `npm run bump-version -- patch`
 5. Deploy the release Branch by pushing the release branch to github. CircleCI will then be running its integration tests and publishing the packages and docs when it passes. Any issues that come up, fix it on the release branch.
     * Check progress on CircleCI to make sure publishing finishes.

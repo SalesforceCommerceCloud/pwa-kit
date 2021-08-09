@@ -2,6 +2,9 @@
 /* Copyright (c) 2019 Mobify Research & Development Inc. All rights reserved. */
 /* * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
 
+/**
+ * @module progressive-web-sdk/dist/utils/universal-utils
+ */
 import {render, hydrate} from 'react-dom'
 import {VIEWPORT_SIZE_NAMES} from '../ssr/constants'
 import {setIsServerSideOrHydratingFlag} from '../store/app/actions'

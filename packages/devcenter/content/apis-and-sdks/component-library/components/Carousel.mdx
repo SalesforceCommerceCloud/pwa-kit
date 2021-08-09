@@ -1,0 +1,191 @@
+---
+title: Carousel
+metaTitle: Carousel
+metaDescription: Carousel
+---
+
+import Carousel from 'progressive-web-sdk/dist/components/carousel'
+import CarouselItem from 'progressive-web-sdk/dist/components/carousel/carousel-item'
+import Image from 'progressive-web-sdk/dist/components/image'
+import Price from 'progressive-web-sdk/dist/components/price'
+import PropsTable from '../../../../src/components/propstable'
+import Tabs from 'progressive-web-sdk/dist/components/tabs/tabs'
+import TabsPanel from 'progressive-web-sdk/dist/components/tabs/tabs-panel'
+
+<div class="component-intro">
+
+A carousel is used to display a series of content in a slideshow format. It shows one item at a time and allows users to cycle through the items by swiping, or using their next/previous button.
+
+Image Carousels allow the display of multiple images in a constrained space, typically with controls to allow the user to flip between them.
+
+The `Carousel` component is a wrapper that contains [CarouselItem](CarouselItem) components.
+
+Related component: [CarouselItem](CarouselItem).
+
+</div>
+
+<div onClick={(e) => {e.stopPropagation()}}>
+<Tabs activeIndex={0} className="devcenter">
+<TabsPanel title="Code" onClick={(e) => {e.stopPropagation()}}>
+
+### JavaScript imports
+
+```jsx
+import Carousel from 'progressive-web-sdk/dist/components/carousel'
+import CarouselItem from 'progressive-web-sdk/dist/components/carousel/carousel-item'
+```
+
+### SCSS import
+
+```scss
+@import 'node_modules/progressive-web-sdk/dist/components/carousel/base';
+```
+
+### Props table
+
+<PropsTable propMetaData={props.componentMetadata.childrenComponentProp} />
+
+### Basic example
+
+```jsx react-live=true
+class Example extends React.Component {
+    constructor() {
+        this.cat1 =
+            'https://s-media-cache-ak0.pinimg.com/564x/72/4b/6d/724b6d' +
+            'bf91c378a53d6890bb525c1aa9.jpg'
+        this.cat2 =
+            'https://s-media-cache-ak0.pinimg.com/564x/af/f7/43/aff743' +
+            '479fc29789d2231329453b1abc.jpg'
+        this.cat3 =
+            'http://res.cloudinary.com/monsterpetsupplies/image/upload/' +
+            'c_pad,w_500,h_500/v1456507382/Product/Boris_Side_On_Eating_Sealed_' +
+            'Pet_Bowl_2.jpg'
+    }
+
+    render() {
+        return (
+            <Carousel
+                previousIcon="chevron-left"
+                nextIcon="chevron-right"
+                iconSize="medium"
+                buttonClass="pw--secondary"
+            >
+                <CarouselItem>
+                    <Image src={this.cat1} alt="Cat eating a treat" draggable="false" />
+                </CarouselItem>
+
+                <CarouselItem>
+                    <Image src={this.cat2} alt="Cat looking at the camera" draggable="false" />
+                </CarouselItem>
+
+                <CarouselItem>
+                    <Image src={this.cat3} alt="Two cats cuddling" draggable="false" />
+                </CarouselItem>
+            </Carousel>
+        )
+    }
+}
+```
+
+### With arbitrary content
+
+```jsx react-live=true
+class Example extends React.Component {
+    constructor() {
+        this.product1 =
+            'https://www.merlinspotions.com/media/catalog/product/' +
+            'cache/1/small_image/240x300/beff4985b56e3afdbeabfc89641a4582/' +
+            'e/y/eye-of-newt-1.jpg'
+        this.product2 =
+            'https://www.merlinspotions.com/media/catalog/product/' +
+            'cache/1/small_image/240x300/beff4985b56e3afdbeabfc89641a4582/' +
+            'u/n/unicorn-blood-1.jpg'
+        this.product3 =
+            'https://www.merlinspotions.com/media/catalog/product/' +
+            'cache/1/small_image/240x300/beff4985b56e3afdbeabfc89641a4582/' +
+            'a/g/aging-potion-1.jpg'
+        this.product4 =
+            'https://www.merlinspotions.com/media/catalog/product/' +
+            'cache/1/small_image/240x300/beff4985b56e3afdbeabfc89641a4582/' +
+            'd/r/dragon-tonic-1.jpg'
+    }
+
+    render() {
+        return (
+            <div>
+                <Carousel
+                    previousIcon="chevron-left"
+                    nextIcon="chevron-right"
+                    iconSize="medium"
+                    buttonClass="pw--secondary"
+                >
+                    <CarouselItem>
+                        <div className="u-text-height-single u-flexbox">
+                            <div className="u-flex">
+                                <Image src={this.product1} alt="Eye of Newt" draggable="false" />
+                                <div>Eye of Newt</div>
+                                <Price className="u-margin-top-sm" current="$12.00" />
+                            </div>
+
+                            <div className="u-flex">
+                                <Image src={this.product2} alt="Unicorn Blood" draggable="false" />
+                                <div>Unicorn Blood</div>
+                                <Price
+                                    className="u-margin-top-sm"
+                                    current="$20.00"
+                                    previous="$25.00"
+                                />
+                            </div>
+                        </div>
+                    </CarouselItem>
+
+                    <CarouselItem>
+                        <div className="u-text-height-single u-flexbox">
+                            <div className="u-flex">
+                                <Image src={this.product3} alt="Aging Potion" draggable="false" />
+                                <div>Aging Potion</div>
+                                <Price className="u-margin-top-sm" current="$25.00" />
+                            </div>
+
+                            <div className="u-flex">
+                                <Image src={this.product4} alt="Dragon Tonic" draggable="false" />
+                                <div>Dragon Tonic</div>
+                                <Price className="u-margin-top-sm" current="$60.00" />
+                            </div>
+                        </div>
+                    </CarouselItem>
+                </Carousel>
+            </div>
+        )
+    }
+}
+```
+
+</TabsPanel>
+<TabsPanel title="Design" class="markdown">
+
+### Screenshot
+
+![](./images/components/carousel/carousel-uikit.png)
+
+### Potential uses
+
+-   On a product details page, to enable the display of multiple images.
+-   On a homepage, to rotate through promotional graphics.
+
+### Accessibility
+
+-   Carousels typically contain images controlled on the client side. In order to ensure an accessible color contrast, navigation controls should be positioned on top of a suitable background color.
+-   If you're using Pips, ensure the active and non-active states are differentiated by more than opacity or color. For example, use a different border, or a variation in size.
+
+### Best practices
+
+-   Tapping on-screen controls can be used to scroll forward and backward through the selection of images.
+-   Swiping left and right can also be used to scroll forward and backward through the selection of images.
+-   Using swiping to advance images is useful and expected behavior, but it's still good practice to provide visual indicators of user actions, such as previous/next arrow indicators.
+-   It's best to indicate the number of elements in a carousel. You can do that using Pips (multiple dots positioned below the carousel), a thumbnail gallery, or a text indicator (such as "1 of 4").
+-   Consider using a carousel for a single image if you expect other images may be added in the future.
+
+</TabsPanel>
+</Tabs>
+</div>

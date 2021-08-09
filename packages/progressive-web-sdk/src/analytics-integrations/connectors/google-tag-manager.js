@@ -1,14 +1,24 @@
 /* * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
 /* Copyright (c) 2019 Mobify Research & Development Inc. All rights reserved. */
 /* * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
-/** @module */
+/**
+ * The `google-tag-manager` module contains the GoogleTagManagerConnector class,
+ * an implementation of the `AnalyticsConnector` interface, used for connecting
+ * to Google Tag Manager.
+ * @module progressive-web-sdk/dist/analytics-integrations/connectors/google-tag-manager
+ */
 import {PAGEVIEW, PURCHASE} from '../types'
 import {loadScript} from '../utils'
+
+// This is a workaround for a jsdoc bug
+// please see https://github.com/jsdoc/jsdoc/issues/1718
+;('')
+/* eslint-enable */
 
 /**
  * A Connector for the Analytics Provider: Google Tag Manager.
  *
- * @implements {module:interface.AnalyticsConnector}
+ * @implements {module:progressive-web-sdk/dist/analytics-integrations/interface.AnalyticsConnector}
  */
 export class GoogleTagManagerConnector {
     /**

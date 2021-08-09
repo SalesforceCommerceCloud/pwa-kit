@@ -1,4 +1,8 @@
-/** @module */
+/**
+ * The `errors` module contains any error type classes used by
+ * Commerce Integrations.
+ * @module @mobify/commerce-integrations/dist/errors
+ */
 
 export class ConnectorError extends Error {
     constructor(statusCode, message) {

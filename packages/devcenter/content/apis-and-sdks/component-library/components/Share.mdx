@@ -1,0 +1,110 @@
+---
+title: Share
+metaTitle: Share
+metaDescription: Share
+---
+
+import Share from 'progressive-web-sdk/dist/components/share'
+import PropsTable from '../../../../src/components/propstable'
+import Tabs from 'progressive-web-sdk/dist/components/tabs/tabs'
+import TabsPanel from 'progressive-web-sdk/dist/components/tabs/tabs-panel'
+
+<div class="component-intro">
+
+The `Share` component provides a way for Progressive Web App (PWA) users to share the URL of their current page via email, text message, or social media. It uses the WebShare API if it's supported on the user's device and falls back to a limited web implementation.
+
+</div>
+
+<div onClick={(e) => {e.stopPropagation()}}>
+<Tabs activeIndex={0} className="devcenter">
+<TabsPanel title="Code" onClick={(e) => {e.stopPropagation()}}>
+
+### JavaScript import
+
+```jsx
+import Share from 'progressive-web-sdk/dist/components/share'
+```
+
+### SCSS import
+
+```scss
+@import 'node_modules/progressive-web-sdk/dist/components/share/base';
+```
+
+### Props table
+
+<PropsTable propMetaData={props.componentMetadata.childrenComponentProp} />
+
+### Basic example
+
+```jsx react-live=true
+class StatefulExample extends React.Component {
+    constructor() {
+        this.state = {
+            open: false
+        }
+    }
+
+    render() {
+        return (
+            <Share
+                open={this.state.open}
+                onShow={() => this.setState({open: true})}
+                onDismiss={() => this.setState({open: false})}
+            />
+        )
+    }
+}
+```
+
+### With triggerElement
+
+The `triggerElement` prop allows for an existing or custom component to trigger the `Share` sheet.
+
+_With a custom component_
+
+```jsx react-live=true
+class StatefulExample extends React.Component {
+    constructor() {
+        this.state = {
+            open: false
+        }
+    }
+
+    render() {
+        return (
+            <Share
+                open={this.state.open}
+                onShow={() => this.setState({open: true})}
+                onDismiss={() => this.setState({open: false})}
+                triggerElement={
+                    <button>
+                        <IconLabel label="Share" iconName="share" />
+                    </button>
+                }
+            />
+        )
+    }
+}
+```
+
+</TabsPanel>
+<TabsPanel title="Design" class="markdown">
+
+### Screenshot
+
+![](./images/components/share/share-ui-kit.png)
+
+### Potential uses
+
+-   The UI associated with the share interaction is most commonly found on the product details page.
+-   Typically used after the share interaction, from within the overflow menu. For apps launched from the homescreen, this is usually found in the header bar.
+
+### Best practices
+
+-   Any prompt to share should be presented inline, next to the content that a user may want to share. For products, sharing should be presented as a secondary action, prioritizing the UI for adding the item to the user's cart or wishlist.
+-   Use [Google's Material Design Icons](https://material.io/icons/) for the actions within the share dialogue to match the UI of the device.
+
+</TabsPanel>
+</Tabs>
+</div>

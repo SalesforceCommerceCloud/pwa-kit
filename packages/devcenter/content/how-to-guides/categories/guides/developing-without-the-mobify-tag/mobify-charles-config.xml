@@ -1,0 +1,80 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<?charles serialisation-version='2.0' ?>
+<charles-export>
+  <proxyConfiguration>
+    <sslLocations>
+      <locationPatterns>
+        <locationMatch>
+          <location>
+            <host>www.example.com</host>
+          </location>
+          <enabled>true</enabled>
+        </locationMatch>
+      </locationPatterns>
+    </sslLocations>
+  </proxyConfiguration>
+  <toolConfiguration>
+    <configs>
+      <entry>
+        <string>Rewrite</string>
+        <rewrite>
+          <toolEnabled>true</toolEnabled>
+          <debugging>true</debugging>
+          <sets>
+            <rewriteSet>
+              <active>true</active>
+              <name>Mobify Tag</name>
+              <hosts>
+                <locationPatterns>
+                  <locationMatch>
+                    <location>
+                      <host>www.example.com</host>
+                    </location>
+                    <enabled>true</enabled>
+                  </locationMatch>
+                </locationPatterns>
+              </hosts>
+              <rules>
+                <rewriteRule>
+                  <active>true</active>
+                  <ruleType>7</ruleType>
+                  <matchValue>&lt;head(.*?)&gt;</matchValue>
+                  <matchHeaderRegex>false</matchHeaderRegex>
+                  <matchValueRegex>false</matchValueRegex>
+                  <matchRequest>false</matchRequest>
+                  <matchResponse>true</matchResponse>
+                  <newValue>&lt;head$1&gt;&lt;!-- Replace with Mobify Tag from cloud.mobify.com --&gt;</newValue>
+                  <newHeaderRegex>false</newHeaderRegex>
+                  <newValueRegex>false</newValueRegex>
+                  <matchWholeValue>false</matchWholeValue>
+                  <caseSensitive>false</caseSensitive>
+                  <replaceType>1</replaceType>
+                </rewriteRule>
+              </rules>
+            </rewriteSet>
+          </sets>
+        </rewrite>
+      </entry>
+      <entry>
+        <string>Map Remote</string>
+        <map>
+          <toolEnabled>true</toolEnabled>
+          <mappings>
+            <mapMapping>
+              <sourceLocation>
+                <host>www.example.com</host>
+                <path>service-worker-loader.js</path>
+              </sourceLocation>
+              <destLocation>
+                <host>dev.mobify.com</host>
+                <path>/progressive-web/latest/guides/developing-without-the-mobify-tag/service-worker-loader.js</path>
+              </destLocation>
+              <preserveHostHeader>false</preserveHostHeader>
+              <enabled>true</enabled>
+            </mapMapping>
+          </mappings>
+        </map>
+      </entry>
+    </configs>
+  </toolConfiguration>
+</charles-export>

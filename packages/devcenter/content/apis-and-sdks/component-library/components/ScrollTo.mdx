@@ -1,0 +1,52 @@
+---
+title: ScrollTo
+metaTitle: ScrollTo
+metaDescription: ScrollTo
+---
+
+import Button from 'progressive-web-sdk/dist/components/button'
+import Icon from 'progressive-web-sdk/dist/components/icon'
+import ScrollTo from 'progressive-web-sdk/dist/components/scroll-to'
+import PropsTable from '../../../../src/components/propstable'
+import Tabs from 'progressive-web-sdk/dist/components/tabs/tabs'
+import TabsPanel from 'progressive-web-sdk/dist/components/tabs/tabs-panel'
+
+<div class="component-intro">
+
+A wrapper component for [Button](Button) that allows you to scroll to different points on the page. This component can be passed either a page height (in pixels) or an element selector as its target. If multiple elements are found with the target selector, it will scroll to the first one returned by `querySelectorAll()`.
+
+</div>
+
+<div onClick={(e) => {e.stopPropagation()}}>
+<Tabs activeIndex={0} className="devcenter">
+<TabsPanel title="Code" onClick={(e) => {e.stopPropagation()}}>
+
+### JavaScript import
+
+```jsx
+import ScrollTo from 'progressive-web-sdk/dist/components/scroll-to'
+```
+
+### SCSS import
+
+```scss
+@import 'node_modules/progressive-web-sdk/dist/components/scroll-to/base';
+```
+
+### Props table
+
+<PropsTable propMetaData={props.componentMetadata.childrenComponentProp} />
+
+### Basic example
+
+Scroll to the top of the page (target height of 0) with custom duration.
+
+```jsx react-live=true
+<ScrollTo target={0} duration={200}>
+    <Button>Click to go to the top of the page</Button>
+</ScrollTo>
+```
+
+</TabsPanel>
+</Tabs>
+</div>

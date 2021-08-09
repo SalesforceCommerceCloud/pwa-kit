@@ -2,6 +2,9 @@
 /* Copyright (c) 2019 Mobify Research & Development Inc. All rights reserved. */
 /* * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
 
+/**
+ * @module progressive-web-sdk/dist/utils/utils
+ */
 // This file contains functions used by the app 'loader.js'. It should be kept
 // as small as possible to reduce the size of the loader.
 

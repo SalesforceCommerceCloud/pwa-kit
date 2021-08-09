@@ -1,0 +1,105 @@
+---
+title: Home
+metaTitle: Home
+metaDescription: The Mobify DevCenter contains everything you need to know to build and maintain your ecommerce front-end with the Mobify Platform.
+column: 1
+---
+
+import {Grid, Container, Heading, Text} from '@theme-ui/components'
+import * as Colors from '../src/gatsby-plugin-theme-ui/colors'
+import {Card as DevCenterCard} from '../src/components/CardComponent'
+import apiIcon from '../src/images/api-sdk.svg'
+import getStartedIcon from '../src/images/get-started.svg'
+import guidesIcon from '../src/images/guides.svg'
+import releaseNotesIcon from '../src/images/release-notes.svg'
+
+<Container variant='homepage_container' sx={{backgroundColor: 'background', px: [0, 0, 'exlg'], pt: 0, pb: 0}}>
+
+# DevCenter Home
+
+<Container sx={{fontSize: ['lg', 'xl', 'xl'], lineHeight: 1.25, fontWeight: 'thin'}}>
+    This site is a collection of technical documentation to help you build and maintain an ecommerce
+    storefront with the Mobify Platform.
+</Container>
+
+<Grid gap={'xl'} columns={[1, null, 2]} paddingTop={'xxl'} paddingBottom={0}>
+    <DevCenterCard
+        title="Get Started"
+        description="Includes installation instructions and overviews of the key technologies that make up the Mobify Platform."
+        cardLink={props.mobifyPlatformMap['Get Started'].slug}
+        icon={getStartedIcon}
+    />
+    <DevCenterCard
+        title={props.mobifyPlatformMap['How-To Guides'].title}
+        description="Tactical articles that guide you through specific tasks using the Mobify Platform. Find best practices, general advice, and step-by-step solutions with lots of code examples."
+        cardLink={props.mobifyPlatformMap['How-To Guides'].slug}
+        icon={guidesIcon}
+    />
+    <DevCenterCard
+        title={props.mobifyPlatformMap['APIs & SDKs'].title}
+        description="Complete reference documentation for Mobify’s APIs and SDKs, including Analytics Integrations, Commerce Integrations, our React Component Library, the Mobify Cloud API, and the Progressive Web SDK."
+        cardLink={props.mobifyPlatformMap['APIs & SDKs'].slug}
+        icon={apiIcon}
+    />
+    <DevCenterCard
+        title="Release Notes"
+        description="Keep up with new features and improvements to the Mobify Platform."
+        cardLink="/release-notes"
+        icon={releaseNotesIcon}
+    />
+</Grid>
+
+</Container>
+
+<Container variant="homepage_container" sx={{backgroundColor: 'lightOrange', py: 'exlg'}}>
+    <Heading variant="homepage_header" as="h2">
+        Mobify Platform Essentials
+    </Heading>
+    <Text variant="homepage_heading_description">
+        First time here? Here are the essential pages from each section of the DevCenter.
+    </Text>
+    <Grid gap={'xl'} columns={[1, null, 3]} paddingBottom={0}>
+        {props.mobifyEssentialsGetStarted.map(({title, metaDescription, slug}) => (
+            <DevCenterCard
+                key={slug}
+                label="GET STARTED"
+                altTitle={title}
+                description={metaDescription}
+                cardLink={slug}
+            />
+        ))}
+        {props.mobifyEssentialsApisAndSdks.map(({title, category, metaDescription, slug}) => (
+            <DevCenterCard
+                key={slug}
+                label="APIs & SDKS"
+                altTitle={title === 'Utility Functions' ? title : category}
+                description={metaDescription}
+                cardLink={slug}
+            />
+        ))}
+    </Grid>
+</Container>
+
+<Container variant="homepage_container" sx={{backgroundColor: 'lightPurple', mb: 0, py: 'exlg'}}>
+    <Heading variant="homepage_header" as="h2">
+        Legacy Products
+    </Heading>
+    <Text variant="homepage_heading_description">
+        The following technologies are still supported by Mobify, but are no longer included in the
+        Mobify Platform.
+    </Text>
+    <Grid gap={'xl'} columns={[1, null, 3]} paddingBottom={0}>
+        <DevCenterCard
+            altTitle="Adaptive.js"
+            description="Adaptive.js is the JavaScript framework that powers Mobify's Web Experience Framework for building amazing mobile frontends without changing your backend"
+            cardLink="http://adaptivejs.mobify.com/"
+            isCardLinkExternal={true}
+        />
+        <DevCenterCard
+            altTitle="Astro"
+            description="Deliver the best of native iOS and Android apps to your most loyal customers seeking you out in the app stores."
+            cardLink="http://astro.mobify.com/"
+            isCardLinkExternal={true}
+        />
+    </Grid>
+</Container>

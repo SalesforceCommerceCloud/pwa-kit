@@ -1,0 +1,97 @@
+---
+title: Overview
+metaTitle: Component Library Overview
+metaDescription: Complete reference for the React components included in the Progressive Web SDK. Access props tables, import statements, code examples, and design considerations.
+category: Component Library
+subcategory: Overview
+column: 2
+---
+
+import Accordion from 'progressive-web-sdk/dist/components/accordion/accordion'
+import AccordionItem from 'progressive-web-sdk/dist/components/accordion/accordion-item'
+import Button from 'progressive-web-sdk/dist/components/button/'
+import Tabs from 'progressive-web-sdk/dist/components/tabs/tabs'
+import TabsPanel from 'progressive-web-sdk/dist/components/tabs/tabs-panel'
+
+<div class="component-intro">
+
+The Mobify Platform includes an extensive library of React components for creating your storefront. Each component has been optimized for responsive design and supports best practices for usability and accessibility.
+
+We also offer a Sketch file that includes symbols for creating mockups using our components. See our guide to [Using the Mobify UI Kit](../how-to-guides/categories/design/mobify-ui-kit) for more information.
+
+Select a component or template from the sidebar navigation to access props tables, import statements, code examples, and design considerations.
+
+</div>
+
+## Featured components
+
+- [Accordion](/apis-and-sdks/component-library/components/Accordion)
+- [Badge](/apis-and-sdks/component-library/components/Badge)
+- [Banner](/apis-and-sdks/component-library/components/Banner)
+- [Button](/apis-and-sdks/component-library/components/Button)
+- [Card](/apis-and-sdks/component-library/components/Card)
+- [Carousel](/apis-and-sdks/component-library/components/Carousel)
+- [Image](/apis-and-sdks/component-library/components/Image)
+- [Link](/apis-and-sdks/component-library/components/Link)
+- [MegaMenu](/apis-and-sdks/component-library/components/MegaMenu)
+- [Nav](/apis-and-sdks/component-library/components/Nav)
+- [Rating](/apis-and-sdks/component-library/components/Rating)
+- [Ratio](/apis-and-sdks/component-library/components/Ratio)
+- [Sheet](/apis-and-sdks/component-library/components/Sheet)
+- [SkeletonBlock](/apis-and-sdks/component-library/components/SkeletonBlock)
+- [Swatch](/apis-and-sdks/component-library/components/Swatch)
+- [Tabs](/apis-and-sdks/component-library/components/Tabs)
+
+## Featured templates
+
+- [CheckoutCart](/apis-and-sdks/component-library/components/CheckoutCart)
+- [CheckoutConfirmation](/apis-and-sdks/component-library/components/CheckoutConfirmation)
+- [CheckoutPayment](/apis-and-sdks/component-library/components/CheckoutPayment)
+- [CheckoutShipping](/apis-and-sdks/component-library/components/CheckoutShipping)
+- [Filtering](/apis-and-sdks/component-library/components/Filtering)
+- [Homepage](/apis-and-sdks/component-library/components/Homepage)
+- [PDP](/apis-and-sdks/component-library/components/PDP)
+- [PLP](/apis-and-sdks/component-library/components/PLP)
+- [ProductOptions](/apis-and-sdks/component-library/components/ProductOptions)
+
+
+
+
+<div onClick={(e) => {e.stopPropagation()}}>
+<Tabs activeIndex={0} className="devcenter">
+<TabsPanel title="Code" onClick={(e) => {e.stopPropagation()}}>
+
+## What's in the Code tab?
+
+<div class="component-intro">
+
+On each component page, we've included code examples that you can _live edit_ without leaving your browser. We encourage you to experiment with these components and their props to learn how to customize them!
+
+</div>
+
+## Editable code example
+
+If you edit the source code below, the example component will re-render to reflect your edits.
+
+```jsx react-live=true
+<Accordion>
+    <AccordionItem header="Edit this accordion header!" id="1">
+        <div>Edit this accordion text.</div>
+    </AccordionItem>
+</Accordion>
+```
+
+</TabsPanel>
+<TabsPanel title="Design" onClick={(e) => {e.stopPropagation()}}>
+
+## What's in the Design tab?
+
+<div>
+
+Each component page also includes a list of potential uses, accessibility notes, and design best practices.
+
+</div>
+
+</TabsPanel>
+</Tabs>
+</div>

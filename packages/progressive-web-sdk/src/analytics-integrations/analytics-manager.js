@@ -1,7 +1,13 @@
 /* * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
 /* Copyright (c) 2019 Mobify Research & Development Inc. All rights reserved. */
 /* * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
-/** @module */
+/**
+ * The `analytics-manager` module contains the `AnalyticsManager` class, the
+ * main entry point to Mobify's analytics framework. You can use it to send
+ * analytics data to several analytics connectors at the same time.
+ * @module progressive-web-sdk/dist/analytics-integrations/analytics-manager
+ */
+
 import {DOMTracker} from './dom-tracker'
 import {PerformanceTracker} from './performance-tracker'
 import {
@@ -36,21 +42,18 @@ import {
 const ENV = process.env.NODE_ENV || 'development'
 
 /**
- * The main entry point to Mobify's analytics framework. You can use this class
- * to send analytics data to several analytics connectors at the same time.
- *
- * This class is a composite - when you call track('event', {payload}) on
- * the AnalyticsManager, it will call the track() method on every configured
+ * This is a composite class. When you call `track('event', {payload})` on
+ * the AnalyticsManager, it will call the `track()` method on every configured
  * Connector, in turn.
  *
- * @implements {module:interface.AnalyticsConnector}
+ * @implements {module:progressive-web-sdk/dist/analytics-integrations/interface.AnalyticsConnector}
  */
 export class AnalyticsManager {
     /**
      * @constructor
      *
      * @param {Object} options Analytics Manager options
-     * @param {Array<AnalyticsConnector>} options.connectors
+     * @param {Array<module:progressive-web-sdk/dist/analytics-integrations/interface.AnalyticsConnector>} options.connectors
      *     An array of Connectors to register with the Analytics Manager. These must
      *     implement the AnalyticsConnector interface.
      * @param {Boolean} options.debug debug mode flag. `true` will turn the logger on.
@@ -81,9 +84,8 @@ export class AnalyticsManager {
     }
 
     /**
-     *
      * Validate and transform the analytics event and send it to its analytics connectors.
-     *
+     * @inheritDoc
      */
     track(type, data) {
         if (!type) {
@@ -162,7 +164,7 @@ export class AnalyticsManager {
      * Log an analytics event to console.
      *
      * @param {String} connector The connector for an analytics provider.
-     * @param {String<module:Types>} type Analytics event type.
+     * @param {String<progressive-web-sdk/dist/analytics-integrations/types>} type Analytics event type.
      * @param {Object} data The data sent for tracking for the analytics event.
      *
      * @private

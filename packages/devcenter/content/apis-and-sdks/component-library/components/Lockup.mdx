@@ -1,0 +1,83 @@
+---
+title: Lockup
+metaTitle: Lockup
+metaDescription: Lockup
+---
+
+import Lockup from 'progressive-web-sdk/dist/components/lockup'
+import PropsTable from '../../../../src/components/propstable'
+import Tabs from 'progressive-web-sdk/dist/components/tabs/tabs'
+import TabsPanel from 'progressive-web-sdk/dist/components/tabs/tabs-panel'
+
+<div class="component-intro">
+
+The `Lockup` component is used to stop the user from being able to scroll the page.
+Normally, it should wrap around your main app container.
+To lock the page, set the `locked` prop to true.
+To unlock the page, set `locked` to false.
+
+</div>
+
+<div onClick={(e) => {e.stopPropagation()}}>
+<Tabs activeIndex={0} className="devcenter">
+<TabsPanel title="Code" onClick={(e) => {e.stopPropagation()}}>
+
+### JavaScript import
+
+```jsx
+import Lockup from 'progressive-web-sdk/dist/components/lockup'
+```
+
+### SCSS import
+
+```scss
+@import 'node_modules/progressive-web-sdk/dist/components/lockup/base';
+```
+
+### Props table
+
+<PropsTable propMetaData={props.componentMetadata.childrenComponentProp} />
+
+### Basic example
+
+```jsx react-live=true
+class StatefulExample extends React.Component {
+    constructor() {
+        this.state = {
+            locked: false
+        }
+    }
+
+    render() {
+        return (
+            <Lockup locked={this.state.locked}>
+                <div>Your app here!</div>
+            </Lockup>
+        )
+    }
+}
+```
+
+</TabsPanel>
+<TabsPanel title="Design" class="markdown">
+
+### Related components
+- [Sheet](Sheet)
+
+### Potential uses
+
+-   Apply it to a page behind a modal to prevent the user from scrolling content behind the active window.
+-   Use it on a page when content is loading in order to disable all other page actions.
+
+### Accessibility
+
+-   When setting the style for translucent layers, be aware of how the contrast can impact a user's cognitive load. If the opacity contrast is too fine, the main window may lose its focus.
+
+### Best practices
+
+-   When lockup is applied to a container, use a translucent layer so that the user doesn't expect to be able to tap on any elements.
+-   Using a modal window above a translucent layer can be a good way of displaying content related to the task. With modals, a strong contrast is important to keep their focus on the active window.
+
+</TabsPanel>
+</Tabs>
+</div>

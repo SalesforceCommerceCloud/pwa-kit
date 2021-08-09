@@ -1,7 +1,12 @@
 /* * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
 /* Copyright (c) 2019 Mobify Research & Development Inc. All rights reserved. */
 /* * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
-/** @module */
+/**
+ * The `utils` module contains general utility functions used by Analytics
+ * Integrations.
+ * @module progressive-web-sdk/dist/analytics-integrations/utils
+ */
+
 /**
  * Loads a script asynchronously and resolves a promise when it has loaded.
  * This is only for use in a browser environment.

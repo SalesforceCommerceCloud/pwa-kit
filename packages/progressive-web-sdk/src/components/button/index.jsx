@@ -154,7 +154,7 @@ Button.propTypes = {
     icon: PropTypes.string,
 
     /**
-     * Adds values to the class attribute in <Icon> component.
+     * Adds values to the class attribute in `Icon` component.
      */
     iconClassName: PropTypes.string,
 

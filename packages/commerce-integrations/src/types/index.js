@@ -2,7 +2,8 @@
 /* Copyright (c) 2018 Mobify Research & Development Inc. All rights reserved. */
 /* * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
 /**
- * @module types
+ * @fileOverview Commerce Integrations data types
+ * @module @mobify/commerce-integrations/dist/types
  **/
 export * from './cart'
 export * from './cart-item'

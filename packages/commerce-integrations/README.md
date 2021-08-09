@@ -109,7 +109,7 @@ import PropTypes from 'prop-types'
 
 /**
  * Content type definition
- * @typedef {module:types/Content} Content
+ * @typedef {module:@mobify/commerce-integrations/dist/types.Content} Content
  * @property {String} id The content id.
  * @property {String} name The content name.
  * @property {String} body The html content.
@@ -143,7 +143,7 @@ class CustomSalesforceConnector extends SalesforceConnector {
   * @param {modules:types/Identifier} id
   * @param {Object} opts a plain object used to pass optional parameters from the command to be used in the request.
   *
-  * @returns {Promise<module:types/Content>}
+  * @returns {Promise<module:@mobify/commerce-integrations/dist/types.Content>}
   */
   getContent(id, opts = {}) {
     const api = new ShopApi.ContentApi(this.client)
@@ -156,7 +156,7 @@ class CustomSalesforceConnector extends SalesforceConnector {
   * Takes a OCAPI Content object and parses it into a commerce-integrations Content type.
   * @param {Object} data a OCAPI {@link https://documentation.demandware.com/DOC1/topic/com.demandware.dochelp/OCAPI/18.3/shop/Documents/Content.html?cp=0_12_5_13|Content} document
   *
-  * @returns {Promise<module:types/Content>}
+  * @returns {Promise<module:@mobify/commerce-integrations/dist/types.Content>}
   */
   parseGetContent(data) {
     const d = data

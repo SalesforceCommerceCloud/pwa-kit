@@ -1,0 +1,175 @@
+---
+title: Get Started
+metaTitle: Get Started
+metaDescription: Kickstart your Mobify Platform project with this complete guide. Install required software and dependencies and run your project locally for the first time!
+---
+
+import Tabs from 'progressive-web-sdk/dist/components/tabs/tabs'
+import TabsPanel from 'progressive-web-sdk/dist/components/tabs/tabs-panel'
+
+Kickstart your Mobify Platform project with this complete guide. Install required software and dependencies and run your project locally for the first time!
+
+<Callout type="warning">
+
+**Important:** Our installation instructions have been updated to reflect many new technologies released starting in November 2018.
+If you need to install a project that was generated _before_ November 2018, you can still access the [old Quick Start](resources/quick-start) guide.
+
+</Callout>
+
+## Installation
+
+### Supported operating systems
+
+The Mobify Platform supports the following operating systems:
+
+-   macOS 10.13 or greater
+-   Windows 7 or greater
+-   Ubuntu Linux 18.x or greater
+
+### Recommended hardware
+
+We recommend the following for your hardware setup, at a minimum:
+
+-   16 GB RAM
+-   Solid-state drive (SSD)
+-   2 or more CPU cores
+
+### Installing required software
+
+Before you start development, you’ll need to install the following software on
+any computers you plan to use for development:
+
+<div onClick={(e) => {e.stopPropagation()}}>
+<Tabs activeIndex={0} class="devcenter">
+<TabsPanel title="Windows">
+
+Start by downloading and installing **Node 12.0.0**:
+
+-   [Download the installer for 64-bit machines](https://nodejs.org/download/release/v12.0.0/node-v12.0.0-x64.msi)
+-   [Download the installer for 32-bit machines](https://nodejs.org/download/release/v12.0.0/node-v12.0.0-x86.msi)
+-   Run the installer and complete the setup instructions
+-   When prompted by the installer, accept the default option to also install the Node.js runtime, install Node Package Manager, and add the Node.js runtime to your path
+
+Install **Node Package Manager 6.11.3**:
+
+-   Open the Windows Command Prompt and run `npm install -g npm@6.11.3`
+
+Verify that the correct version of Node and Node Package Manager have been installed:
+
+-   Open the Windows Command Prompt and run `node -v`
+-   It should return `v12.0.0`
+-   Run `npm -v`
+-   It should return `6.11.3`
+
+<p>
+    <small>
+        Our platform currently supports versions ^10.17.0 and ^12.0.0, whenever possible we recommend
+        using the more recent version of the two. Other versions of Node are not supported and may result
+        in unexpected errors once your project is deployed.
+    </small>
+</p>
+
+<p>
+    <small>For best results, we do _not_ recommend using Corey Butler's Node Version Manager (nvm) for Windows. In our testing, installations are more often successful by installing Node directly.</small>
+</p>
+
+</TabsPanel>
+<TabsPanel title="Mac" class="markdown">
+
+Start by downloading and installing **Node 12.0.0**:
+
+-   [Download the installer](https://nodejs.org/download/release/v12.0.0/node-v12.0.0.pkg)
+-   Run the installer and complete the setup instructions
+
+Verify that the correct version of Node and Node Package Manager have been installed:
+
+-   Open your terminal app and run `node -v`
+-   It should return `v12.0.0`
+-   Run `npm -v`
+-   It should return `6.11.3`
+
+<p>
+    <small>
+        Our platform currently supports versions ^10.17.0 and ^12.0.0, whenever possible we recommend
+        using the more recent version of the two. Other versions of Node are not supported and may result
+        in unexpected errors once your project is deployed.
+    </small>
+</p>
+
+</TabsPanel>
+<TabsPanel title="Linux" class="markdown">
+
+Start by downloading and installing **Node 12.0.0**:
+
+-   Go to the [main download page](https://nodejs.org/download/release/v12.0.0/)
+-   Download the right binary for your machine. (For example, if you have a 64-bit Intel machine, you would choose the x64 file.)
+-   Extract the binaries and complete the setup instructions after downloading
+
+Verify that the correct version of Node and Node Package Manager have been installed:
+
+-   Open your terminal and run `node -v`
+-   It should return `v12.0.0`
+-   Run `npm -v`
+-   It should return `6.11.3`
+
+<p>
+    <small>
+        Our platform currently supports versions ^10.17.0 and ^12.0.0, whenever possible we recommend
+        using the more recent version of the two. Other versions of Node are not supported and may result
+        in unexpected errors once your project is deployed.
+    </small>
+</p>
+
+<p>
+    <small>
+        If you're using Node Version Manager to install Node, then Node Package Manager 6.11.3 will
+        automatically be installed for you.
+    </small>
+</p>
+
+</TabsPanel>
+</Tabs>
+</div>
+
+## Finding your project files
+
+To access your project files, reach out to your team lead. If you're a team lead looking to generate a new project, reach out to your Mobify contact.
+
+Now, let’s take a short tour of what’s inside your project folder. This is where you’ll spend most of your time in development. It contains all the code you’ll need to build a PWA.
+
+In our documentation, we'll often use `<PROJECT_DIR>` to stand in for the actual project directory name.
+
+## Installing dependencies
+
+Now we need to download and install package dependencies using Node Package
+Manager (npm) by running the following command from your project directory:
+
+```bash
+cd <PROJECT_DIR>
+npm install --quiet
+```
+
+<Callout type="info">
+
+**Note:** It might take a few minutes before you see any activity in the terminal, so don’t cancel the process until it finishes. Thanks for your patience!
+
+</Callout>
+
+## Start your dev server
+
+To start your local web server for local development, run the following command from your project directory:
+
+```bash
+npm run ssr
+```
+
+Now that the development server is running, you can open the PWA in a browser:
+- Go to [http://localhost:3000/](http://localhost:3000/)
+
+**Success!** You should now see the home page for the project scaffold application in your browser. You can stop the development server at any time by using the keyboard shortcut `Control-C`.
+
+<Callout type="info">
+
+**Note:** To preview a server-side rendered page, append the `?mobify_server_only` query string to the URL you'd like to preview. For example, you can test the server-side rendered version of `www.example.com` by visiting the URL `www.example.com?mobify_server_only`.
+
+</Callout>

@@ -5,8 +5,9 @@
 import IsoCountries from 'i18n-iso-countries'
 import {makeValidator} from './validators'
 
+export const CountryCode = makeValidator(IsoCountries.isValid, 'Not a valid Country Code.')
+
 /**
- * @memberOf module:types
+ * @memberOf module:@mobify/commerce-integrations/dist/types
  * @typedef {String} CountryCode
  */
-export const CountryCode = makeValidator(IsoCountries.isValid, 'Not a valid Country Code.')

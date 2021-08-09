@@ -12,11 +12,11 @@ import {noop} from '../../utils/utils'
 
 /**
  * <strong style="color:red; font-size:20px;">Deprecated.</strong>
- * This component is deprecated in favour of a native `<select>`
+ * This component is deprecated in favour of a native `select`
  * element in a Form component.
  *
  * Select is a dropdown component that simulates the behavior of a standard HTML
- * `<select>` tag, but with some unique features: easier to customize its visual
+ * `select` tag, but with some unique features: easier to customize its visual
  * appearance, and the ability to accept options as a Javascript Array.
  */
 const Select = ({
@@ -112,31 +112,31 @@ Select.propTypes = {
      */
     iconProps: PropTypes.object,
     /**
-     * The value for the ID attribute on the <select> element
+     * The value for the ID attribute on the `select` element
      */
     id: PropTypes.string,
     /**
-     * pass in boolean, determines whether <select> will have disabled property
+     * pass in boolean, determines whether `select` will have disabled property
      */
     isDisabled: PropTypes.bool,
     /**
-     * pass in boolean, determines whether <select> will have required property
+     * pass in boolean, determines whether `select` will have required property
      */
     isRequired: PropTypes.bool,
     /**
-     * if label string exists a <label> will be rendered with the passed in string as its text
+     * if label string exists a `label` will be rendered with the passed in string as its text
      */
     label: PropTypes.string,
     /**
-     * The value for the multiple attribute on the <select> element (https://developer.mozilla.org/en/docs/Web/HTML/Element/select#Attributes)
+     * The value for the multiple attribute on the `select` element (https://developer.mozilla.org/en/docs/Web/HTML/Element/select#Attributes)
      */
     multiple: PropTypes.bool,
     /**
-     * The value for the name attribute on the <select> element
+     * The value for the name attribute on the `select` element
      */
     name: PropTypes.string,
     /**
-     * pass in a number to initialize the select with the option at that index
+     * pass in a number to initialize the `select` with the option at that index
      */
     selectedIndex: PropTypes.number,
     /**

@@ -1,7 +1,13 @@
 /* * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
 /* Copyright (c) 2018 Mobify Research & Development Inc. All rights reserved. */
 /* * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
-/** @module */
+
+/**
+ * The `sfcc` module contains the `SalesforceConnector` class, an implementation
+ * of the `CommerceConnector` interface using the Open Commerce API (OCAPI) for
+ * connecting to Salesforce B2C Commerce.
+ * @module @mobify/commerce-integrations/dist/connectors/sfcc
+ */
 
 import ShopApi from 'commercecloud-ocapi-client'
 import btoa from 'btoa'
@@ -54,7 +60,7 @@ const formatFault = (message = '', fault = {}) => {
  *
  * @param {Object} data a OCAPI {@link https://documentation.demandware.com/DOC1/topic/com.demandware.dochelp/OCAPI/18.3/shop/Documents/Image.html|Image} document
  *
- * @return {module:types.Image}.
+ * @return {module:@mobify/commerce-integrations/dist/types.Image}
  */
 /* eslint-disable camelcase */
 const parseImage = ({alt, dis_base_link, link, title}) => ({
@@ -70,7 +76,7 @@ const parseImage = ({alt, dis_base_link, link, title}) => ({
  * ProductSearchResult type.
  *
  * @param {Object} data a OCAPI {@link https://documentation.demandware.com/DOC1/topic/com.demandware.dochelp/OCAPI/18.3/shop/Documents/VariationAttributeValue.html|VariationAttributeValue} document
- * @return {module:types.VariationPropertyValue}
+ * @return {module:@mobify/commerce-integrations/dist/types.VariationPropertyValue}
  * @private
  */
 /* eslint-disable camelcase */
@@ -87,7 +93,7 @@ const parseVariationPropertyValue = ({image, image_swatch, name, value}) => ({
  * VariationProperty type.
  *
  * @param {Object} data a OCAPI {@link https://documentation.demandware.com/DOC1/topic/com.demandware.dochelp/OCAPI/18.3/shop/Documents/VariationAttribute.html|VariationAttribute} document
- * @return {module:types.VariationProperty}
+ * @return {module:@mobify/commerce-integrations/dist/types.VariationProperty}
  * @private
  */
 const parseVariationProperty = ({id, name, values = []}) => ({
@@ -102,7 +108,7 @@ const parseVariationProperty = ({id, name, values = []}) => ({
  *
  * @param {Object} data a OCAPI {@link https://documentation.demandware.com/DOC1/topic/com.demandware.dochelp/OCAPI/18.3/shop/Documents/ProductSearchHit.html|ProductSearchHit} document
  *
- * @returns {module:types.ProductSearchResult}.
+ * @returns {module:@mobify/commerce-integrations/dist/types.ProductSearchResult}
  */
 /* eslint-disable camelcase */
 const parseProductSearchResult = ({
@@ -131,7 +137,7 @@ const parseProductSearchResult = ({
  * @param {Object} data a OCAPI
  * {@link https://documentation.demandware.com/DOC1/topic/com.demandware.dochelp/OCAPI/18.3/shop/Documents/ProductSearchRefinementValue.html|ProductSearchRefinementValue} document
  *
- * @returns {module:types.FilterValue}.
+ * @returns {module:@mobify/commerce-integrations/dist/types.FilterValue}
  */
 /* eslint-disable camelcase */
 const parseFilterValue = ({hit_count, label, value}) => ({
@@ -148,7 +154,7 @@ const parseFilterValue = ({hit_count, label, value}) => ({
  * @param {Object} data a OCAPI
  * {@link https://documentation.demandware.com/DOC1/topic/com.demandware.dochelp/OCAPI/18.3/shop/Documents/ProductSearchRefinement.html|ProductSearchRefinement} document // eslint-disable-line
  *
- * @returns {module:types.Filter}.
+ * @returns {module:@mobify/commerce-integrations/dist/types.Filter}
  */
 /* eslint-disable camelcase */
 const parseFilters = ({label, attribute_id, values}) => ({
@@ -165,7 +171,7 @@ const parseFilters = ({label, attribute_id, values}) => ({
  * @param {Object} data a OCAPI
  * {@link https://documentation.demandware.com/DOC1/topic/com.demandware.dochelp/OCAPI/18.3/shop/Documents/ProductSearchResult.html?cp=0_12_5_96|ProductSearchResult} document // eslint-disable-line
  *
- * @returns {module:types.ProductSearch}
+ * @returns {module:@mobify/commerce-integrations/dist/types.ProductSearch}
  */
 /* eslint-disable camelcase */
 const parseProductSearch = ({
@@ -195,7 +201,7 @@ const parseProductSearch = ({
  * Takes a OCAPI Variant object and parses it into a commerce-integrations Variation type.
  * @param {Object} data a OCAPI {@link https://documentation.demandware.com/DOC1/topic/com.demandware.dochelp/OCAPI/18.3/shop/Documents/Variant.html|Variant} document
  *
- * @returns {Promise<module:types.Variation>}
+ * @returns {Promise<module:@mobify/commerce-integrations/dist/types.Variation>}
  */
 /* eslint-disable camelcase */
 const parseVariation = ({product_id, price, orderable, variation_values}) => ({
@@ -210,7 +216,7 @@ const parseVariation = ({product_id, price, orderable, variation_values}) => ({
  * Takes a OCAPI ImageGroup object and parses it into a commerce-integrations ImageSet type.
  * @param {Object} data a OCAPI {@link https://documentation.demandware.com/DOC1/topic/com.demandware.dochelp/OCAPI/18.3/shop/Documents/ImageGroup.html|ImageGroup} document
  *
- * @returns {Promise<module:types.ImageSet>}
+ * @returns {Promise<module:@mobify/commerce-integrations/dist/types.ImageSet>}
  */
 /* eslint-disable camelcase */
 const parseImageSet = ({images, view_type, variation_attributes}) => ({
@@ -224,7 +230,7 @@ const parseImageSet = ({images, view_type, variation_attributes}) => ({
  * Takes a OCAPI Product object and parses it into a commerce-integrations Product type.
  * @param {Object} data a OCAPI {@link https://documentation.demandware.com/DOC1/topic/com.demandware.dochelp/OCAPI/18.3/shop/Documents/Product.html|Product} document
  *
- * @returns {Promise<module:types.Product>}
+ * @returns {Promise<module:@mobify/commerce-integrations/dist/types.Product>}
  */
 /* eslint-disable camelcase */
 const parseProduct = ({
@@ -340,10 +346,10 @@ const transformCart = (cart) => {
 }
 
 /**
- * A connector for the Salesforce Commerce Cloud API.
+ * A Commerce Integrations connector for Salesforce B2C Commerce backends.
  *
- * @implements {module:connectors/interfaces.CommerceConnector}
- * @implements {module:connectors/interfaces.ParserHooks}
+ * @implements {module:@mobify/commerce-integrations/dist/connectors/interfaces.CommerceConnector}
+ * @implements {module:@mobify/commerce-integrations/dist/connectors/interfaces.ParserHooks}
  */
 export class SalesforceConnector {
     /**
@@ -358,7 +364,7 @@ export class SalesforceConnector {
      * a new SalesforceConnector instance.
      *
      * @param {Object} config {@link https://github.com/mobify/commercecloud-ocapi-client/blob/develop/src/ApiClient.js#L44}
-     * @returns {module:sfcc.SalesforceConnector} The new SalesforceConnector instance.
+     * @returns {module:@mobify/commerce-integrations/dist/connectors/sfcc.SalesforceConnector} The new SalesforceConnector instance.
      */
     static fromConfig(config) {
         return new this.prototype.constructor(new ShopApi.ApiClient(config))
@@ -572,8 +578,8 @@ export class SalesforceConnector {
     /**
      * Register a new customer account and login.
      *
-     * @param {module:types/CustomerRegistration} data
-     * @return {Promise<module:types/Customer>}
+     * @param {module:@mobify/commerce-integrations/dist/types.CustomerRegistration} data
+     * @return {Promise<module:@mobify/commerce-integrations/dist/types.Customer>}
      */
     registerCustomer(data) {
         const body = {
@@ -938,7 +944,7 @@ export class SalesforceConnector {
      * Takes a OCAPI Customer object and parses it into a commerce-integrations Customer type.
      * @param {Object} data a OCAPI {@link https://documentation.demandware.com/DOC1/topic/com.demandware.dochelp/OCAPI/18.3/shop/Documents/Customer.html|Customer} document
      *
-     * @returns {Promise<module:types.Customer>}
+     * @returns {Promise<module:@mobify/commerce-integrations/dist/types.Customer>}
      */
     parseCustomer(data) {
         return parseCustomer(data)
@@ -995,7 +1001,7 @@ export class SalesforceConnector {
      * Takes a OCAPI Product object and parses it into a commerce-integrations Product type.
      * @param {Object} data a OCAPI {@link https://documentation.demandware.com/DOC1/topic/com.demandware.dochelp/OCAPI/18.3/shop/Documents/Product.html|Product} document
      *
-     * @returns {Promise<module:types.Product>}
+     * @returns {Promise<module:@mobify/commerce-integrations/dist/types.Product>}
      */
     parseProduct(data) {
         return parseProduct(data)
@@ -1032,7 +1038,7 @@ export class SalesforceConnector {
      * @param {Object} data a OCAPI
      * {@link https://documentation.demandware.com/DOC1/topic/com.demandware.dochelp/OCAPI/18.3/shop/Documents/ProductSearchResult.html?cp=0_12_5_96|ProductSearchResult} document
      *
-     * @returns {Promise<module:types.ProductSearch>}
+     * @returns {Promise<module:@mobify/commerce-integrations/dist/types.ProductSearch>}
      */
     parseSearchProducts(data, searchParams) {
         return parseProductSearch(data, searchParams)
@@ -1051,7 +1057,7 @@ export class SalesforceConnector {
      * Takes a OCAPI Store object and parses it into a commerce-integrations Store type.
      * @param {Object} data a OCAPI {@link https://documentation.demandware.com/DOC1/topic/com.demandware.dochelp/OCAPI/18.3/shop/Documents/Store.html|Store} document
      *
-     * @returns {Promise<module:types.Store>}
+     * @returns {Promise<module:@mobify/commerce-integrations/dist/types.Store>}
      */
     parseGetStore(data) {
         const d = data
@@ -1139,7 +1145,7 @@ export class SalesforceConnector {
      * commerce-integrations Category type.
      * @param {Object[]} categories an array of OCAPI {@link https://mobify.github.io/commercecloud-ocapi-client/module-models_Category.html|Category} document
      *
-     * @returns {Array<module:types.Category>}
+     * @returns {Array<module:@mobify/commerce-integrations/dist/types.Category>}
      */
     parseCategories(categories) {
         return categories.map((c) => this.parseCategory(c))
@@ -1150,7 +1156,7 @@ export class SalesforceConnector {
      * commerce-integrations Category type.
      * @param {Object[]} categories an OCAPI {@link https://mobify.github.io/commercecloud-ocapi-client/module-models_Category.html|Category} document
      *
-     * @returns {module:types.Category}
+     * @returns {module:@mobify/commerce-integrations/dist/types.Category}
      */
     /* eslint-disable camelcase */
     parseCategory({
@@ -1188,7 +1194,7 @@ export class SalesforceConnector {
      * @param {string} imageUrl
      * @param {Object} attributes additional attributes of an image
      *
-     * @returns {Promise<module:types.Image>}
+     * @returns {Promise<module:@mobify/commerce-integrations/dist/types.Image>}
      */
     parseImage(imageUrl, attributes) {
         return {
@@ -1216,9 +1222,9 @@ export class SalesforceConnector {
      * OCAPI order authorization hooks. If orders placed through this command aren't progressing
      * from the `created` status, it's possible that your API hooks haven't been set up. Please
      * consult your Saleforce professional.
-     * @param {module:types.Cart} cart The customer's cart.
+     * @param {module:@mobify/commerce-integrations/dist/types.Cart} cart The customer's cart.
      * @param {Object} opts
-     * @return {Promise<module:types.Order>}.
+     * @return {Promise<module:@mobify/commerce-integrations/dist/types.Order>}
      */
     // eslint-disable-next-line no-unused-vars
     createOrder(cart, opts = {}) {
