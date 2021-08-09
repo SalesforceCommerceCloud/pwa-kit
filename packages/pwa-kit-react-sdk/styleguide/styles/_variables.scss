@@ -1,0 +1,231 @@
+// Project-Wide Variables
+// ===
+//
+// Edit these as needed. Some guidelines:
+//
+// - Names should be lowercase and dash-separated;
+// - Qualifiers should be added to the beginning of related variables: use
+//   `$small-font-size`, not `$font-size-small`;
+// - Numeric scales should use increments of 10; these numbers are arbitrary and
+//   should not map to actual values. If really necessary, additional values can
+//   be added in between, e.g. $neutral-15 between 10 and 20.
+
+
+// Environment Variable
+// ---
+
+$isStyleguidist: true;
+
+
+// Layout
+// ---
+
+// Basic unit for spacing and alignment; 6 to 12px recommended. Apply in whole
+// or half multiples.
+$sub-unit: 4px;
+$unit: 8px;
+
+// Standard tap-target size
+$tap-size: 44px;
+
+// Max component width for UPWA builds to ensure components don't get too wide
+// on larger viewports
+$max-width: 1280px;
+
+// Responsive Layout
+// Note: $small-breakpoint isn't needed, since it is 0px
+
+$medium-breakpoint: 600px;
+$large-breakpoint: 960px;
+$xlarge-breakpoint: $max-width;
+
+$susy: (
+  'columns': susy-repeat(4),
+  'gutters': 12px,
+  'container-spread': wide,
+  'spread': wide
+);
+
+
+// Typography
+// ---
+
+$font-family: 'Roboto', 'Helvetica Neue', sans-serif;
+$header-font-family: $font-family;
+
+// Line height
+$huge-line-height: 32px;
+$bigger-line-height: 28px;
+$big-line-height: 24px;
+$line-height: 20px;
+$small-line-height: 16px;
+$smaller-line-height: 12px;
+$tiny-line-height: 8px;
+
+// Font sizes
+$huge-font-size: 28px;
+$bigger-font-size: 24px;
+$big-font-size: 20px;
+$font-size: 16px;
+$small-font-size: 14px;
+$smaller-font-size: 12px;
+$tiny-font-size: 8px;
+
+$thin-font-weight: 100;
+$extra-light-font-weight: 200;
+$light-font-weight: 300;
+$regular-font-weight: 400;
+$medium-font-weight: 500;
+$semi-bold-font-weight: 600;
+$bold-font-weight: 700;
+
+// Color palette
+// ---
+
+// Neutrals
+$neutral-00: #fff;
+$neutral-10: #f2f2f2;
+$neutral-20: #ddd;
+$neutral-30: #bbb;
+$neutral-40: #888;
+$neutral-50: #666;
+$neutral-60: #404040;
+$neutral-70: #000;
+
+// Brand colors
+$brand-color: #005569; // blue
+$secondary-brand-color: #0288a7;
+$tertiary-brand-color: #83bdcb;
+$quaternary-brand-color: #bfdfe6;
+
+// Accent colors
+$accent-color: #ff852c; // orange
+$light-accent-color: lighten($accent-color, 15%);
+$dark-accent-color: darken($accent-color, 15%);
+
+// Primary Action
+$primary-action-color: #dc0a3c; // red
+$light-primary-action-color: lighten($primary-action-color, 15%);
+$dark-primary-action-color: darken($primary-action-color, 15%);
+
+// Secondary Action
+$secondary-action-color: #ff852c; // orange
+$light-secondary-action-color: lighten($secondary-action-color, 15%);
+$dark-secondary-action-color: darken($secondary-action-color, 15%);
+
+// Success colors
+$success-color: #037b30; // green
+$light-success-color: #e3f3e9;
+$dark-success-color: darken($success-color, 15%);
+
+// Error colors
+$error-color: #c70936; // red
+$light-error-color: #f8e7eb;
+$dark-error-color: darken($error-color, 15%);
+
+// Sale color
+$sale-color: $error-color;
+
+// Social colors
+$facebook-color: #3a5a93;
+$twitter-color: #55aace;
+$instagram-color: #405de6;
+$pinterest-color: #bd081c;
+$youtube-color: #e52d27;
+$google-plus-color: #dd4b39;
+$yelp-color: #af0606;
+
+
+// Appearance
+// ---
+
+$font-color: $neutral-60;
+
+$link-color: $secondary-brand-color;
+$active-link-color: $tertiary-brand-color;
+
+$focus-color: $secondary-brand-color;
+
+$border-color: $secondary-brand-color;
+$light-border-color: #b6d3da;
+$border-radius: 0;
+
+$input-background-color: $neutral-00;
+$input-border-color: $neutral-30;
+$focused-input-border-color: $secondary-brand-color;
+$horizontal-input-padding: $unit*1.5;
+$vertical-input-padding: $unit*1.5;
+
+$disabled-border-color: $quaternary-brand-color;
+$disabled-button-background-color: $neutral-20;
+$disabled-input-background-color: $neutral-10;
+$disabled-input-color: $neutral-30;
+
+$box-shadow: 0 0 2px 0 rgba(0, 0, 0, 0.3);
+
+
+// Layer (z-index)
+// ---
+
+// Organizes z-index usage by name. Values can be incremented/decremented
+// slightly as necessary. eg. $z2-depth + 1;
+
+$z1-depth: 1;    // background
+$z2-depth: 10;   // icon or other ui element
+$z3-depth: 100;  // modal shade or similar
+$z4-depth: 1000; // modal dialog or similar
+
+
+// Shorthand
+// ---
+//
+// Quick ways to write properties that you re-use often.
+
+$border: 1px solid $border-color;
+$input-padding: $vertical-input-padding $horizontal-input-padding;
+
+
+// 🚨 Deprecated Variables 🚨
+// ---
+//
+// Note: The variables below have been deprecated and will be deleted in a
+// future release. If your project uses an SDK component that depends on these
+// variables, check the component jsx file or styleguide docs for more information.
+
+// Breakpoints
+$mobile-breakpoint: (
+    min-width: 0,
+    max-width: 419px // Avoid colliding with 420px breakpoint
+);
+$tablet-breakpoint: (
+    min-width: 420px,
+    max-width: 1023px // Avoid colliding with 1024px breakpoint
+);
+$desktop-breakpoint: (
+    min-width: 1024px
+);
+
+// Grid Config
+$mobile-column-count: 4;
+$mobile-gutters: $unit * 1.5; // 12px
+
+$tablet-column-count: 8;
+$tablet-gutters: $unit * 3; // 24px
+
+$desktop-column-count: 12;
+$desktop-gutters: $unit * 3; // 24px
+
+
+// Layout Contexts
+$mobile-layout: (
+    columns: susy-repeat($mobile-column-count),
+    gutters: $mobile-gutters
+);
+$tablet-layout: (
+    columns: susy-repeat($tablet-column-count),
+    gutters: $tablet-gutters
+);
+$desktop-layout: (
+    columns: susy-repeat($desktop-column-count),
+    gutters: $desktop-gutters
+);

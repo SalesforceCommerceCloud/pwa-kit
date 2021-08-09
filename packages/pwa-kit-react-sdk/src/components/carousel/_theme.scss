@@ -1,0 +1,72 @@
+// Carousel Theme
+// ===
+
+// Root
+// ---
+//
+// 1. Position context for child previous/next buttons
+
+.pw-carousel {
+    position: relative;
+}
+
+
+// Previous & Next
+// ---
+//
+// 1. Absolutely position relative to the parent carousel container
+
+.pw-carousel__previous,
+.pw-carousel__next {
+    position: absolute; // 1
+    top: 50%;
+
+    transform: translateY(-50%);
+}
+
+.pw-carousel__previous {
+    left: 0;
+}
+
+.pw-carousel__next {
+    right: 0;
+}
+
+
+// Pips
+// ---
+
+.pw-carousel__pips {
+    padding: $sub-unit 0;
+}
+
+.pw-carousel__pip {
+    width: $sub-unit*3;
+    height: $sub-unit*3;
+
+    background-color: transparent;
+
+    &::after {
+        content: '';
+
+        display: block;
+        flex: 0 0 auto;
+        width: $unit;
+        height: $unit;
+
+        border-radius: 50%;
+        background-color: $neutral-20;
+    }
+
+    &.pw--active {
+        background-color: transparent;
+
+        &::after {
+            background-color: $border-color;
+        }
+    }
+
+    &:not(:last-of-type) {
+        margin-right: $sub-unit;
+    }
+}

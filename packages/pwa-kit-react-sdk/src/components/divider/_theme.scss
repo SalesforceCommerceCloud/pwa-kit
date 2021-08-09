@@ -1,0 +1,17 @@
+// Divider Theme
+// ===
+
+.pw-divider {
+    color: $neutral-60;
+}
+
+
+// Text
+// ---
+
+.pw-divider__text {
+    max-width: 80%;
+    padding: 0 $unit;
+
+    font-size: $smaller-font-size;
+}

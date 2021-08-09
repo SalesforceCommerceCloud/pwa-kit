@@ -1,0 +1,15 @@
+// Visibility Utils
+// ===
+//
+// Remove from flow but leave available to screen readers.
+
+@mixin visually-hidden() {
+    position: absolute;
+
+    overflow: hidden;
+    clip: rect(1px, 1px, 1px, 1px);
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    border: 0;
+}

@@ -1,0 +1,12 @@
+// Scroller Theme
+// ===
+
+
+// Scroller Item Container
+// ---
+
+.pw-scroller__item {
+    + .pw-scroller__item {
+        margin-left: $unit;
+    }
+}

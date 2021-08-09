@@ -1,0 +1,310 @@
+{
+  "02295": {
+    "defaultMessage": "Add New Address"
+  },
+  "1063e": {
+    "defaultMessage": "Remove"
+  },
+  "11ffa": {
+    "defaultMessage": "Save & Continue"
+  },
+  "126b4": {
+    "defaultMessage": "Continue to Payment"
+  },
+  "16e04": {
+    "defaultMessage": "{itemCount, plural, =0 {0 items} one {# item} other {# items}} in cart",
+    "description": "# item(s) in cart"
+  },
+  "1c5d5": {
+    "defaultMessage": "Are you sure you want to sign out? You will need to sign back in to proceed with your current order."
+  },
+  "2194a": {
+    "defaultMessage": "Subtotal"
+  },
+  "25f75": {
+    "defaultMessage": "Postal Code"
+  },
+  "28a59": {
+    "defaultMessage": "Billing Address"
+  },
+  "2d0f6": {
+    "defaultMessage": "Add to cart"
+  },
+  "31d26": {
+    "defaultMessage": "New Arrivals"
+  },
+  "357e8": {
+    "defaultMessage": "Checkout as guest"
+  },
+  "375e0": {
+    "defaultMessage": "Sign Out"
+  },
+  "3e5ff": {
+    "defaultMessage": "Edit cart"
+  },
+  "424ea": {
+    "defaultMessage": "We will send an email to {email} with your confirmation number and receipt shortly."
+  },
+  "46a2a": {
+    "defaultMessage": "State"
+  },
+  "476e2": {
+    "defaultMessage": "Please enter a valid card number"
+  },
+  "48974": {
+    "defaultMessage": "Shipping Address"
+  },
+  "49ffd": {
+    "defaultMessage": "Shipping Method"
+  },
+  "4b78a": {
+    "defaultMessage": "Tax"
+  },
+  "4e37e": {
+    "defaultMessage": "Back to cart"
+  },
+  "53069": {
+    "defaultMessage": "Please enter a valid date"
+  },
+  "57d05": {
+    "defaultMessage": "City"
+  },
+  "59716": {
+    "defaultMessage": "Country"
+  },
+  "5e178": {
+    "defaultMessage": "Zip Code"
+  },
+  "66703": {
+    "defaultMessage": "Do you have a gift card or promo code?"
+  },
+  "694e8": {
+    "defaultMessage": "Quantity"
+  },
+  "70d54": {
+    "defaultMessage": "Please enter 2-letter state/province"
+  },
+  "7207d": {
+    "defaultMessage": "Delivery Details"
+  },
+  "72707": {
+    "defaultMessage": "Do you want to send this as a gift?"
+  },
+  "73a61": {
+    "defaultMessage": "Credit Card"
+  },
+  "77587": {
+    "defaultMessage": "Last Name"
+  },
+  "7a3a1": {
+    "defaultMessage": "Lighter layers for lighter days."
+  },
+  "7b6e5": {
+    "defaultMessage": "Please enter a valid security code"
+  },
+  "7c35f": {
+    "defaultMessage": "Please select a payment method."
+  },
+  "7dce1": {
+    "defaultMessage": "Edit"
+  },
+  "8458b": {
+    "defaultMessage": "Forgot password?"
+  },
+  "89d7b": {
+    "defaultMessage": "Shop New Arrivals"
+  },
+  "8a9f1": {
+    "defaultMessage": "Order Number"
+  },
+  "a128f": {
+    "defaultMessage": "Place Order"
+  },
+  "accea": {
+    "defaultMessage": "Payment Details"
+  },
+  "ad075": {
+    "defaultMessage": "New In"
+  },
+  "b5221": {
+    "defaultMessage": "Already have an account? Log in"
+  },
+  "b651e": {
+    "defaultMessage": "Required"
+  },
+  "b7bec": {
+    "defaultMessage": "{itemCount, plural, =0 {0 items} one {# item} other {# items}}",
+    "description": "# item(s) in order"
+  },
+  "bc910": {
+    "defaultMessage": "First Name"
+  },
+  "bcc25": {
+    "defaultMessage": "Phone"
+  },
+  "c1728": {
+    "defaultMessage": "Add New Card"
+  },
+  "c2090": {
+    "defaultMessage": "Continue Shopping"
+  },
+  "c6b5d": {
+    "defaultMessage": "Province"
+  },
+  "d02b5": {
+    "defaultMessage": "Review Order"
+  },
+  "dd7bf": {
+    "defaultMessage": "Address"
+  },
+  "e8078": {
+    "defaultMessage": "Please enter a valid name"
+  },
+  "ea478": {
+    "defaultMessage": "Cancel"
+  },
+  "ea9cf": {
+    "defaultMessage": "Shipping"
+  },
+  "f8f42": {
+    "defaultMessage": "Estimated Total"
+  },
+  "fdb88": {
+    "defaultMessage": "Same as shipping address"
+  },
+  "fe052": {
+    "defaultMessage": "Order Summary"
+  },
+  "fe5d2": {
+    "defaultMessage": "Shop by Category"
+  },
+  "footer.column.account": {
+    "defaultMessage": "Account"
+  },
+  "footer.column.customer_support": {
+    "defaultMessage": "Customer Support"
+  },
+  "footer.column.our_company": {
+    "defaultMessage": "Our Company"
+  },
+  "footer.link.about_us": {
+    "defaultMessage": "About Us"
+  },
+  "footer.link.contact_us": {
+    "defaultMessage": "Contact Us"
+  },
+  "footer.link.order_status": {
+    "defaultMessage": "Order Status"
+  },
+  "footer.link.privacy_policy": {
+    "defaultMessage": "Privacy Policy"
+  },
+  "footer.link.returns_exchanges": {
+    "defaultMessage": "Returns & Exchanges"
+  },
+  "footer.link.shipping": {
+    "defaultMessage": "Shipping"
+  },
+  "footer.link.signin_create_account": {
+    "defaultMessage": "Sign in or Create Account"
+  },
+  "footer.link.site_map": {
+    "defaultMessage": "Site Map"
+  },
+  "footer.link.store_locator": {
+    "defaultMessage": "Store Locator"
+  },
+  "footer.link.terms_conditions": {
+    "defaultMessage": "Terms & Conditions"
+  },
+  "footer.message.copyright": {
+    "defaultMessage": "2021 Salesforce or its affiliates. All rights reserved. This is a demo store only. Orders made WILL NOT be processed."
+  },
+  "footer.subscribe.button.sign_up": {
+    "defaultMessage": "Sign Up"
+  },
+  "footer.subscribe.description.sign_up": {
+    "defaultMessage": "Sign up to stay in the loop about the hottest deals"
+  },
+  "footer.subscribe.heading.first_to_know": {
+    "defaultMessage": "Be the first to know"
+  },
+  "header.button.assistive_msg.logo": {
+    "defaultMessage": "Logo"
+  },
+  "header.button.assistive_msg.menu": {
+    "defaultMessage": "Menu"
+  },
+  "header.button.assistive_msg.my_account": {
+    "defaultMessage": "My account"
+  },
+  "header.button.assistive_msg.my_cart": {
+    "defaultMessage": "My cart"
+  },
+  "header.search.field.value.placeholder": {
+    "defaultMessage": "Search for products..."
+  },
+  "homepage.message.welcome": {
+    "defaultMessage": "Hello World"
+  },
+  "login-redirect.message.welcome": {
+    "defaultMessage": "Login Redirect"
+  },
+  "mobile_navigation.actions.sign_in": {
+    "defaultMessage": "Sign In"
+  },
+  "mobile_navigation.actions.store_locator": {
+    "defaultMessage": "Store Locator"
+  },
+  "mobile_navigation.categories.shop_all": {
+    "defaultMessage": "Shop All"
+  },
+  "mobile_navigation.links.customer_support": {
+    "defaultMessage": "Customer Support"
+  },
+  "mobile_navigation.links.customer_support.contact_us": {
+    "defaultMessage": "Contact Us"
+  },
+  "mobile_navigation.links.customer_support.shipping_and_returns": {
+    "defaultMessage": "Shipping & Returns"
+  },
+  "mobile_navigation.links.out_company": {
+    "defaultMessage": "Our Company"
+  },
+  "mobile_navigation.links.out_company.about_us": {
+    "defaultMessage": "About Us"
+  },
+  "mobile_navigation.links.privacy_and_security": {
+    "defaultMessage": "Privacy & Security"
+  },
+  "mobile_navigation.links.privacy_and_security.privacy_policy": {
+    "defaultMessage": "Privacy Policy"
+  },
+  "mobile_navigation.links.privacy_and_security.stie_map": {
+    "defaultMessage": "Site Map"
+  },
+  "mobile_navigation.links.privacy_and_security.terms_and_conditions": {
+    "defaultMessage": "Terms & Conditions"
+  },
+  "offline_banner.message": {
+    "defaultMessage": "You're currently browsing in offline mode"
+  },
+  "pagination.actions.current_page_verb": {
+    "defaultMessage": "of"
+  },
+  "pagination.actions.next": {
+    "defaultMessage": "Next"
+  },
+  "pagination.actions.prev": {
+    "defaultMessage": "Prev"
+  },
+  "product_list_page.filter_button": {
+    "defaultMessage": "Filter"
+  },
+  "product_list_page.no_results": {
+    "defaultMessage": "We couldn’t find anything for {category}. Try searching for a product or {link}."
+  },
+  "product_list_page.no_results.contact_us": {
+    "defaultMessage": "contact us"
+  }
+}

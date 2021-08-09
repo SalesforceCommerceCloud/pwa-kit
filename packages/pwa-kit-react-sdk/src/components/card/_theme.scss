@@ -1,0 +1,14 @@
+// Card
+// ===
+
+.pw-card {
+    background-color: $neutral-00;
+}
+
+.pw-card.c--shadow {
+    box-shadow: $box-shadow;
+}
+
+.pw-card.c--border {
+    border: $border;
+}

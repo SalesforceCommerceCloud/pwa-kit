@@ -1,0 +1,84 @@
+// Pagination Theme
+// ===
+
+// Pagination
+// ---
+
+.pw-pagination {
+    align-items: center;
+}
+
+
+// Pagination Content
+// ---
+
+.pw-pagination__content {
+    display: flex;
+    align-items: center;
+
+    &:not(:only-child) {
+        margin: 0 $unit*1.5;
+    }
+}
+
+
+// Pagination Ellipsis
+// ---
+
+.pw-pagination__ellipsis {
+    margin: 0 $unit;
+}
+
+
+// Pagination Page Count
+// ---
+
+.pw-pagination__page-count {
+    padding: 0 $unit*2;
+}
+
+// Pagination Page
+// ---
+
+.pw-pagination__page {
+    background: none;
+
+    color: $secondary-brand-color;
+
+    &:active,
+    &:focus {
+        background: $neutral-10;
+    }
+
+    &.pw--active {
+        color: $neutral-70;
+    }
+
+    + .pw-pagination__page {
+        margin-left: $sub-unit;
+    }
+}
+
+
+// Pagination Label
+// ---
+
+.pw-pagination__hidden-label {
+    font-weight: $regular-font-weight;
+}
+
+
+// Modifier: Select
+// ---
+
+.pw-pagination__select {
+    padding-right: $tap-size + $horizontal-input-padding;
+}
+
+.pw-pagination__select-icon {
+    border: 1px solid $focused-input-border-color;
+
+    background: $neutral-00;
+
+    color: $focused-input-border-color;
+}

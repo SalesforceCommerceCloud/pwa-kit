@@ -1,0 +1,184 @@
+// Tile
+// ===
+
+
+// Tile root
+// ---
+
+.pw-tile {
+    display: flex;
+}
+
+
+// Tile Primary
+// ---
+//
+// This is the primary element of tile component that can be either 'a' or 'div'
+
+.pw-tile__primary {
+    flex: 0 0 auto;
+    margin-right: $unit * 1.5;
+}
+
+
+// Tile Options
+// ---
+
+.pw-tile__options {
+    margin-top: $unit * 1.5;
+}
+
+
+// Tile Option
+// ---
+
+.pw-tile__option + .pw-tile__option {
+    margin-top: $sub-unit;
+}
+
+
+// Tile Details
+// ---
+
+.pw-tile__details {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+}
+
+
+// Tile Info
+// ---
+
+.pw-tile__info {
+    height: 100%;
+}
+
+
+// Tile Title
+// ---
+
+.pw-tile__title {
+    margin-bottom: $unit;
+}
+
+
+// Tile Footer
+// ---
+
+.pw-tile__footer {
+    flex: 0 0 auto;
+}
+
+.pw-tile__footer-inner {
+    display: flex;
+    align-items: baseline;
+}
+
+
+// Tile Quantity
+// ---
+
+.pw-tile__quantity {
+    flex: 1 1 auto;
+}
+
+
+// Tile Price
+// ---
+
+.pw-tile__price {
+    flex: 0 0 auto;
+}
+
+
+// Modifier: Column
+// ---
+
+.pw-tile.pw--column {
+    flex-direction: column;
+
+    .pw-tile__image {
+        margin-right: 0;
+        margin-bottom: $unit;
+    }
+
+    .pw-tile__options,
+    .pw-tile__quantity {
+        display: none;
+    }
+
+    .pw-tile__price {
+        margin-top: $unit;
+    }
+
+    .pw-tile__rating-stars {
+        margin-top: $unit;
+    }
+}
+
+
+// Modifier: Full
+// ---
+
+.pw-tile.pw--full {
+    .pw-tile__info {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .pw-tile__info-inner {
+        flex: 1 1 auto;
+    }
+
+    .pw-tile__options,
+    .pw-tile__quantity {
+        display: none;
+    }
+
+
+    .pw-tile__rating-stars {
+        flex: 0 0 auto;
+    }
+
+    .pw-tile__price {
+        margin-top: $unit;
+    }
+}
+
+
+// Modifier: Full and Column
+// ---
+
+.pw-tile.pw--full.pw--column {
+    .pw-tile__info {
+        flex-direction: row;
+        align-items: center;
+    }
+
+    .pw-tile__rating-stars {
+        margin-top: 0;
+    }
+
+    .pw-tile__title {
+        margin-right: $unit;
+    }
+}
+
+
+// Modifier: Search tile
+// ---
+
+.pw-tile.pw--simple {
+    .pw-tile__footer-inner {
+        display: block;
+    }
+
+    .pw-tile__info {
+        height: initial;
+    }
+
+    .pw-tile__header {
+        margin-bottom: $unit;
+    }
+}

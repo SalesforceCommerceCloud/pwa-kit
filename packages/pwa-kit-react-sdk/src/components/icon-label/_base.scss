@@ -1,0 +1,47 @@
+// IconLabel
+// ===
+
+// IconLabel root
+// ---
+
+.pw-icon-label {
+    display: inline-flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: auto;
+}
+
+
+// Sub components
+// ---
+//
+
+.pw-icon-label__label {
+    display: block;
+    margin-top: $sub-unit;
+
+    line-height: 1em;
+
+    @if variable-exists('tiny-font-size') {
+        font-size: $tiny-font-size + 1;
+    } @else if variable-exists('smaller-font-size') {
+        font-size: $smaller-font-size;
+    }
+}
+
+// Icon Label with Button component
+// ---
+
+.pw-icon-label.pw--button,
+.pw-icon-label.pw--button:active,
+.pw-icon-label.pw--button:focus {
+    margin: 0;
+    padding: 0;
+    border: 0;
+
+    background: none;
+    background-color: transparent;
+
+    color: inherit;
+}

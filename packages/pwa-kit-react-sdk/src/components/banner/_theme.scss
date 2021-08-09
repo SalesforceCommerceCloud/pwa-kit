@@ -1,0 +1,53 @@
+// Banner Theme
+// ===
+
+.pw-banner {
+    background-color: $secondary-brand-color;
+
+    color: $neutral-00;
+}
+
+
+// Banner Content
+// ---
+//
+
+.pw-banner__content {
+    font-size: $smaller-font-size;
+    line-height: $small-line-height;
+}
+
+
+// Banner Action
+// ---
+//
+// 1. pw-banner__button and pw-button class are applied on the same element.
+// The base pw-button styles have higher specificity because they are imported after banner styles
+// so we need to nest pw-banner__button class to increase specificity
+
+.pw-banner__action {
+    .pw-banner__button { // 1
+        min-height: $unit*5;
+
+        background-color: transparent;
+
+        &:active,
+        &:focus {
+            background: transparent;
+        }
+    }
+}
+
+
+// Modifier: Alert
+// ---
+
+.pw-banner.pw--alert {
+    background-color: $neutral-20;
+
+    color: $neutral-50;
+
+    .pw-banner__button {
+        color: $secondary-brand-color;
+    }
+}

@@ -1,0 +1,40 @@
+import React from 'react'
+import {render, waitFor} from '@testing-library/react'
+import ScrollToTop from './index'
+import {Router} from 'react-router-dom'
+import {createMemoryHistory} from 'history'
+
+global.scrollTo = jest.fn()
+
+describe('ScrollToTop', () => {
+    let history = createMemoryHistory({initialEntries: ['/']})
+
+    beforeEach(() => {
+        render(
+            <Router history={history}>
+                <ScrollToTop />
+            </Router>
+        )
+    })
+
+    afterEach(() => {
+        jest.clearAllMocks()
+    })
+
+    test('calls window.scrollTo when route changes', async () => {
+        expect(global.scrollTo).toHaveBeenCalledTimes(1)
+        expect(global.scrollTo).toHaveBeenCalledWith(0, 0)
+
+        history.push('/new-url')
+        await waitFor(() => {
+            expect(global.scrollTo).toHaveBeenCalledTimes(2)
+        })
+        expect(global.scrollTo).toHaveBeenCalledWith(0, 0)
+
+        history.push('/new-url2')
+        await waitFor(() => {
+            expect(global.scrollTo).toHaveBeenCalledTimes(3)
+        })
+        expect(global.scrollTo).toHaveBeenCalledWith(0, 0)
+    })
+})

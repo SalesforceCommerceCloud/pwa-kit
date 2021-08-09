@@ -1,0 +1,9 @@
+coverage
+dist
+docs
+generator-assets
+vendor
+temp
+temp_static
+src/static
+src/ssr/server/test_fixtures

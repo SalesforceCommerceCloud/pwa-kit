@@ -1,0 +1,36 @@
+// Header Bar
+// ===
+
+
+// Root
+// ---
+
+.pw-header-bar {
+    display: flex;
+    align-items: center;
+
+    background: $neutral-00;
+}
+
+
+// Header Bar Actions
+// ---
+
+.pw-header-bar__actions {
+    display: flex;
+    align-items: center;
+    flex: 0 0 auto;
+}
+
+
+// Header Bar Title
+// ---
+
+.pw-header-bar__title {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex: 1 1 auto;
+
+    text-align: center;
+}

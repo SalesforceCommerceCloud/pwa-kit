@@ -1,0 +1,87 @@
+// Tabs
+// ===
+
+.pw-tabs {
+    // Root Class. Contains all core styles, typically for the component's
+    // wrapper element.
+}
+
+// Tab strip
+// ---
+//
+// 1. Override default list styles
+
+.pw-tabs__strip {
+    display: flex;
+    margin: 0; // 1
+    padding: 0; // 1
+
+    list-style: none; // 1
+}
+
+
+// Tab
+// ---
+
+.pw-tabs__tab {
+    display: flex;
+    flex: 1 1 auto;
+    width: 100%;
+
+    cursor: pointer;
+
+    &.pw--is-active {
+        box-shadow: inset 0 -2px 0 $neutral-20;
+
+        color: red;
+
+        cursor: default;
+    }
+}
+
+
+// Tab Link
+// ---
+//
+// 1. Add width to ensure block cover 100% of flex parent div
+
+.pw-tabs__link {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex: 1 1 auto; // 1
+    min-height: $tap-size;
+
+    word-break: break-word;
+    text-align: center;
+}
+
+
+// Tab Panel
+// ---
+
+.pw-tabs__panel {
+    display: none;
+
+    &.pw--is-active {
+        display: block;
+    }
+}
+
+
+// Modifier: Overflow tab link scroll
+// ---
+//
+// 1. Prevent tabs from shrinking so they overflow
+
+.pw-tabs__strip-container.pw--is-scrollable {
+    .pw-tabs__strip {
+        overflow-x: auto;
+
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .pw-tabs__tab {
+        flex: 0 0 auto; // 1
+    }
+}

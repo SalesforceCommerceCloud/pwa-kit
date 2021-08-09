@@ -1,0 +1,62 @@
+// Toggle
+// ===
+
+
+// Variables
+// ---
+
+$toggle__easing: cubic-bezier(0.45, 0.1, 0.5, 1);
+
+
+// Toggle Inner
+// ---
+//
+// 1. Relative position for absolute positioned overlay
+
+.pw-toggle__inner {
+    position: relative; // 1
+
+    display: flex;
+    overflow: hidden;
+    flex-direction: column;
+
+    transition: max-height 0.5s $toggle__easing;
+}
+
+
+// Toggle Content
+// ---
+//
+// 1. Do not shrink content so JS can calculate how tall the content is
+
+.pw-toggle__content {
+    flex: 0 0 auto; // 1
+}
+
+// Toggle Button
+// ---
+
+.pw-toggle__toggler {
+    width: 100%;
+}
+
+
+// Toggle overflow
+// ---
+//
+// 1. Absolute positioned to parent `.pw-toggle__inner`
+
+.pw-toggle__inner.pw--overflow::after {
+    content: '';
+
+    position: absolute; // 1
+    right: 0;
+    bottom: 0;
+    left: 0;
+
+    display: block;
+    width: 100%;
+    height: $tap-size/2;
+
+    background: linear-gradient(to top, #fff, rgba(255, 255, 255, 0));
+}

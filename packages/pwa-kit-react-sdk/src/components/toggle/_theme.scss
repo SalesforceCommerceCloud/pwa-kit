@@ -1,0 +1,27 @@
+// Toggle Theme
+// ===
+
+
+// Toggle Content
+// ---
+
+.pw-toggle__content {
+    padding: $unit;
+}
+
+
+// Toggle Button
+// ---
+
+.pw-toggle__toggler {
+    background: transparent;
+
+    color: $secondary-brand-color;
+
+    &:active,
+    &:focus {
+        background: transparent;
+
+        color: $secondary-brand-color;
+    }
+}

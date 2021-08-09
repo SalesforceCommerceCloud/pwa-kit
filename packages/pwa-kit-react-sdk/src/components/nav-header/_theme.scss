@@ -1,0 +1,53 @@
+// Nav Header Theme
+// ===
+
+.pw-nav-header {
+    min-height: $tap-size;
+}
+
+
+// Nav Header Title
+// ---
+
+.pw-nav-header__title {
+    font-weight: $semi-bold-font-weight;
+}
+
+
+// Nav Header Button
+// ---
+
+.pw-nav-header__button {
+    border: 0;
+
+    background: none;
+
+    color: inherit;
+    font-size: inherit;
+
+    &:active,
+    &:focus {
+        background: none;
+
+        color: inherit;
+    }
+}
+
+
+// Modifier: Has Custom Header Animation
+// ---
+//
+// 1. Absolutely positioned relative to `TransitionGroup` which is
+//    responsible for setting up the positioning context, eg:
+//
+//        <TransitionGroup component="div" style={{position: 'relative'}}>
+//            <NavSlider key={key}>
+//                content
+//            </NavSlider>
+//        </TransitionGroup>
+
+.pw-nav-header__slider.pw--has-custom-header-animation {
+    position: absolute;  // 1
+    top: 0;
+    left: 0;
+}

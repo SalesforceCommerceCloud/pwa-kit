@@ -1,0 +1,16 @@
+{{! usage: link to="namepath" html=true/false caption="optional caption"~}}
+{{~#if html~}}
+    <code>
+
+        {{~#link to~}}
+            {{#if url~}}
+                <a href="{{{url}}}">{{#if ../../caption}}{{../../../caption}}{{else}}{{name}}{{/if}}</a>
+                {{~else~}}
+                {{#if ../../caption}}{{../../../caption}}{{else}}{{name}}{{/if~}}
+            {{/if~}}
+        {{/link~}}
+
+    </code>
+    {{~else~}}
+{{~createLink to~}}
+{{/if~}}

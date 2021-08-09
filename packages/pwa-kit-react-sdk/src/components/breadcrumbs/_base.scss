@@ -1,0 +1,70 @@
+// Breadcrumbs
+// ===
+
+$breadcrumb__space: $tap-size;
+
+// Root
+// ---
+//
+// 1. Absolutely position the scroll fade pseudo element relative to parent root container
+
+.pw-breadcrumbs {
+    position: relative; // 1
+
+    &::after {
+        content: '';
+
+        position: absolute; // 1
+        top: 0;
+        right: 0;
+        bottom: 0;
+
+        width: $breadcrumb__space;
+
+        background: linear-gradient(to left, $neutral-00, rgba($neutral-00, 0));
+
+        pointer-events: none;
+    }
+}
+
+
+// List
+// ---
+//
+// 1. Spacer for scroll fade pseudo element so last item in the list
+//    will clear the fade completely.
+
+.pw-breadcrumbs__list {
+    display: flex;
+    overflow-x: auto;
+    margin: 0;
+    padding: 0;
+
+    list-style: none;
+
+    -webkit-overflow-scrolling: touch;
+
+    // 1
+    &::after {
+        content: '';
+
+        display: block;
+        flex: 0 0 auto;
+        width: $breadcrumb__space;
+    }
+}
+
+
+// Item
+// ---
+
+.pw-breadcrumbs__item {
+    display: block;
+    flex: 0 0 auto;
+
+    &:not(:last-of-type)::after {
+        content: '→';
+
+        margin: 0 $unit;
+    }
+}

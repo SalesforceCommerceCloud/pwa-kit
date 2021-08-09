@@ -1,0 +1,27 @@
+// Breadcrumbs theme
+// ===
+
+
+// Item
+// ---
+
+.pw-breadcrumbs__item {
+    font-size: $smaller-font-size;
+
+    &:not(:last-child)::after {
+        content: '/';
+
+        margin: 0 $sub-unit;
+
+        color: $neutral-50;
+    }
+}
+
+
+// Link
+// ---
+
+.pw-breadcrumbs__link,
+.pw-breadcrumbs__non-link {
+    color: $link-color;
+}

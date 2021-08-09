@@ -1,0 +1,119 @@
+// Progress Step Theme
+// ===
+
+// Step Container
+// ---
+
+.pw-progress-steps__step {
+    color: $neutral-40;
+}
+
+// Step badge
+// ---
+//
+// 1. 24px as per design
+// 2. Override base styles to not have border and background fill
+
+.pw-progress-steps__badge {
+    width: $unit*3; // 1
+    height: $unit*3; // 1
+    border: 0; // 2
+
+    background: none; // 2
+}
+
+
+// Step Icon
+// ---
+//
+// 1. Set `pw-icon` size to same as parent (pw-progress-steps__badge), in this case 24px as per design
+
+.pw-progress-steps__icon {
+    width: inherit; // 1
+    height: inherit; // 1
+}
+
+
+// Progress Title
+// ---
+
+.pw-progress-steps__title {
+    font-size: $smaller-font-size;
+}
+
+
+// Progress Number
+// ---
+//
+// 1. Pseudo progress line
+// 2. Override base styles so we can have rounded progress lines
+// 3. 12px margin as per design
+
+.pw-progress-steps__number {
+    // 1
+    &::before,
+    &::after {
+        height: 2px;
+        border: 0; // 2
+
+        border-radius: 1px;
+        background-color: $neutral-40;
+    }
+
+    &::before {
+        margin-right: $unit*1.5; // 3
+
+        border-top-left-radius: 0;
+        border-bottom-left-radius: 0;
+    }
+
+    &::after {
+        margin-left: $unit*1.5; // 3
+
+        border-top-right-radius: 0;
+        border-bottom-right-radius: 0;
+    }
+}
+
+
+// Modifier: Completed Step
+// ---
+//
+// 1. Pseudo progress line
+
+.pw-progress-steps__item.pw--completed {
+    .pw-progress-steps__badge {
+        color: $neutral-60;
+    }
+
+    .pw-progress-steps__number {
+        // 1
+        &::before,
+        &::after {
+            background-color: $neutral-60;
+        }
+    }
+}
+
+
+// Modifier: Current Step
+// ---
+//
+// 1. Pseudo progress line
+
+.pw-progress-steps__item.pw--current {
+    .pw-progress-steps__step {
+        color: $secondary-brand-color;
+    }
+
+    .pw-progress-steps__title {
+        font-weight: $semi-bold-font-weight;
+    }
+
+    .pw-progress-steps__number {
+        // 1
+        &::before {
+            background-color: $neutral-60;
+        }
+    }
+}

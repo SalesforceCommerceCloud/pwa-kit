@@ -1,0 +1,170 @@
+// Flexbox
+// ===
+//
+// Flexbox and align a row of items with a lot of control. Provides a
+// declarative, robust cross-browser way of using flexbox.
+
+
+// Flex (Grow)
+// ---
+//
+// Ensures that the flex child will grow to fill the available space.
+//
+// Note! This utility class should come **BEFORE** the `u-flexbox` class in
+// order to ensure that an element with both classes inherits only the
+// `display: flex` property.
+//
+// 1. Ensure inline elements are treated as block-level.
+// 2. Prevent width collapsing in old implementations.
+
+.u-flex {
+    display: block !important; // 1
+    flex: 1 1 auto !important;
+    width: 100% !important; // 2
+}
+
+
+// Flex (Shrink)
+// ---
+//
+// Shrink Flexbox items to a minimum size.
+//
+// 1. Ensure width collapses in old implementations.
+
+.u-flex-shrink {
+    flex: initial !important;
+    width: auto !important; // 1
+}
+
+
+// Flex (None)
+// ---
+//
+// Neither grow nor shrink!
+
+.u-flex-none {
+    flex: 0 0 auto !important;
+}
+
+
+// Flexbox
+// ---
+//
+// Includes gutters, for grid-like functionality.
+//
+// Note! This should come **AFTER** the `u-flex` utility class in order to
+// ensure an element that has both classes inherits `display: flex`!
+//
+// 1. Remove default styles present on common root elements.
+// 2. Ensure in iOS 5 and 6 that flex-direction isn't inherited from
+//    any flexbox parents that has flex-direction set to direction-row-reverse
+
+.u-flexbox {
+    display: flex !important;
+    flex-direction: row !important; // 2
+    margin: 0 !important; // 1
+    padding: 0 !important; // 1
+
+    list-style: none !important; // 1
+}
+
+.u-flexbox-gutters {
+    margin-right: ($unit * -0.5) !important;
+    margin-left: ($unit * -0.5) !important;
+}
+
+.u-flexbox-gutters > .u-flex,
+.u-flexbox-gutters > .u-flex-shrink {
+    margin: 0 ($unit / 2) !important;
+}
+
+
+// Directions
+// ---
+
+.u-direction-column {
+    flex-direction: column !important;
+}
+
+.u-direction-column-reverse {
+    flex-direction: column-reverse !important;
+}
+
+.u-direction-row {
+    flex-direction: row !important;
+}
+
+.u-direction-row-reverse {
+    flex-direction: row-reverse !important;
+}
+
+
+// Align Items
+// ---
+
+.u-align-top {
+    align-items: flex-start !important;
+}
+
+.u-align-center {
+    align-items: center !important;
+}
+
+.u-align-bottom {
+    align-items: flex-end !important;
+}
+
+
+// Justify Content
+// ---
+
+.u-justify-start {
+    justify-content: flex-start !important;
+}
+
+.u-justify-end {
+    justify-content: flex-end !important;
+}
+
+.u-justify-between {
+    justify-content: space-between !important;
+}
+
+.u-justify-center {
+    justify-content: center !important;
+}
+
+.u-justify-around {
+    justify-content: space-around !important;
+}
+
+
+// Order
+// ---
+//
+// Re-arrange the display order of up to six items. Add additional modifiers in
+// your own stylesheet to re-order more.
+
+.u-order-1 {
+    order: 1 !important;
+}
+
+.u-order-2 {
+    order: 2 !important;
+}
+
+.u-order-3 {
+    order: 3 !important;
+}
+
+.u-order-4 {
+    order: 4 !important;
+}
+
+.u-order-5 {
+    order: 5 !important;
+}
+
+.u-order-6 {
+    order: 6 !important;
+}

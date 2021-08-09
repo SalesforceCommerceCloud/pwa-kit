@@ -1,0 +1,46 @@
+// List Tile
+// ===
+
+
+// Root
+// ---
+
+.pw-list-tile {
+    display: flex;
+    align-items: center;
+}
+
+
+// Primary Section
+// ---
+//
+// 1. Fix flexbox bug where text truncated child elements are breaking layout
+
+.pw-list-tile__primary {
+    display: flex;
+    align-items: center;
+    flex: 1 1 0;
+    width: 100%;
+    min-width: 0; // 1
+    min-height: $tap-size;
+}
+
+
+// Action
+// ---
+
+.pw-list-tile__action {
+    flex: 0 0 auto;
+}
+
+
+// List tile content (on the primary action)
+// ---
+
+.pw-list-tile__content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    flex: 1 1 0;
+    width: 100%;
+}

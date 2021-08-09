@@ -1,0 +1,9 @@
+rules:
+    declaration-no-important: true
+    keyframe-declaration-no-important: true
+    selector-no-type: [ true, { ignoreTypes: '/^((?!^i-amp-).)*$/' } ]
+    selector-class-pattern: '^((?!^-amp-).)*$'
+    property-blacklist: [ 'behavior', '-moz-binding', 'filter' ]
+    declaration-property-value-whitelist:
+        - transition: [ '/opacity/', '/transform/', '-vendorPrefix-transform' ]
+syntax: 'scss'

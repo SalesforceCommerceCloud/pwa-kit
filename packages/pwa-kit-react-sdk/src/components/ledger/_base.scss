@@ -1,0 +1,51 @@
+// Ledger
+// ===
+//
+// A table component used to display order summaries.
+
+
+// Ledger root
+// ---
+
+.pw-ledger {
+    // Root Class base styles
+}
+
+
+// Ledger Row
+// ---
+
+.pw-ledger__row {
+    display: flex;
+    justify-content: space-between;
+
+    &.pw--total {
+        font-weight: $semi-bold-font-weight;
+    }
+}
+
+
+// Ledger Item
+// ---
+
+.pw-ledger__item {
+    flex: 1 1 auto;
+}
+
+
+// Ledger Value
+// ---
+
+.pw-ledger__value {
+    flex: 0 0 auto;
+
+    text-align: right;
+}
+
+
+// Action
+// ---
+
+.pw-ledger__action {
+    display: inline-block;
+}

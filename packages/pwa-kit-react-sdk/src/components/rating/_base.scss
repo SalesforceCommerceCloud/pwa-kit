@@ -1,0 +1,96 @@
+// Rating
+// ===
+
+
+// Rating Variables
+// ---
+
+
+// Root
+// ---
+//
+// 1. Eliminates white-space from `.pw-rating__icon-wrapper` inline-flex
+
+.pw-rating {
+    display: inline-flex;
+
+    line-height: 0; // 1
+    vertical-align: middle;
+}
+
+
+// Rating Label
+// ---
+//
+// 1. Ensure element is removed from flow but available to screen readers.
+
+.pw-rating__label {
+    position: absolute !important; // 1
+
+    overflow: hidden !important; // 1
+    clip: rect(1px, 1px, 1px, 1px) !important; // 1
+    width: 1px !important; // 1
+    height: 1px !important; // 1
+    padding: 0 !important; // 1
+    border: 0 !important; // 1
+}
+
+
+// Rating Icons Wrapper
+// ---
+//
+// Notes:
+//
+// 1. Absolute position filled icons over empty icons
+// 2. Ensure wrapper doesn't shrink in size so inline width percentage
+//    is not skewed
+
+.pw-rating__icon-wrapper {
+    position: relative; // 1
+
+    display: inline-flex;
+    flex: 0 0 auto; // 2
+}
+
+
+// Rating filled count
+// ---
+//
+// Notes:
+//
+// 1. Overlay filled icons over empty icons. Relative positioned
+//    to `.pw-rating__icon-wrapper`
+// 2. z-index is required here to ensure filled icons appears above unfilled icons.
+//    The opaque `.pw-rating__icon` automatically creates a stacking context when
+//    opacity is less than 1.
+
+.pw-rating__filled-icons {
+    position: absolute; // 1
+    top: 0;
+    right: 0;
+    left: 0;
+    z-index: 1; // 2
+
+    display: flex;
+    overflow: hidden;
+    width: 0;
+}
+
+
+// Rating Icon
+// ---
+
+.pw-rating__icon {
+    display: block;
+    flex: 0 0 auto;
+
+    opacity: 0.3;
+
+    color: currentColor;
+
+    fill: currentColor;
+
+    &.pw--filled {
+        opacity: 1;
+    }
+}

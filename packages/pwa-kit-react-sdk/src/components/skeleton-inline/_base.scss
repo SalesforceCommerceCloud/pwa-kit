@@ -1,0 +1,24 @@
+// SkeletonInline
+// ===
+//
+// 1. Strange hack that ensures the pseudo elements behave like text, meaning
+//    they respect and take on a line-height. Without any padding, the pseudo
+//    elements loose their line-height.
+// 2. Offset the gross hack from point 1
+// 3. These values should be overwritten by a project's theme
+
+.pw-skeleton-inline {
+    display: inline-block;
+    padding-left: 1px; // 1
+
+    &::after {
+        content: '';
+
+        display: inline-block;
+        width: 100%;
+        height: 1em;
+        margin-left: -1px; // 2
+
+        background: #f6f7f8; // 3
+    }
+}

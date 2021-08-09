@@ -1,0 +1,42 @@
+// InlineLoader
+// ===
+//
+// 1. Set a limit on how wide this component can go. The children
+//    will shrink and fit into space
+
+.pw-inline-loader {
+    display: inline-flex;
+    max-width: 100%; // 1
+
+    vertical-align: middle;
+}
+
+
+// Loading Dots
+// ---
+//
+// 1. Square ratio to create a circle so it can shrink and resize proportionally
+
+.pw-inline-loader__loading-dot {
+    flex: 0 1 auto;
+    width: $unit*2;
+
+    opacity: 0;
+
+    transform: scale(1);
+
+    animation: inline-loader-pulse 1s ease-in-out infinite;
+
+    &::after {
+        content: '';
+
+        display: block;
+        padding-bottom: 100%; // 1
+
+        background-color: $neutral-30;
+    }
+
+    + .pw-inline-loader__loading-dot {
+        margin-left: $unit;
+    }
+}

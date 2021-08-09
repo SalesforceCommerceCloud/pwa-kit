@@ -1,0 +1,25 @@
+// // CardInput
+// // ===
+// //
+// // 1. Relative position for absolute position credit card icon
+// //    that overlays on top of input
+
+// .pw-card-input {
+//     position: relative; // 1
+// }
+
+// // Card Icon
+// // ---
+// //
+// // 1. Absolute positioned to `pw-card-input`, sits above input field
+// // 2. Eliminates white-space from `.pw-icon` inline-flex
+
+// .pw-card-input__card-icon {
+//     position: absolute; // 1
+//     top: 50%;
+//     right: $unit;
+
+//     line-height: 0; // 2
+
+//     transform: translateY(-50%);
+// }

@@ -1,0 +1,267 @@
+// Forms
+// ===
+
+
+// General Form Elements
+// ---
+//
+// 1. Outline styles will be replaced by styles in :active, :focus states
+
+fieldset {
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+}
+
+input,
+label,
+textarea,
+select {
+    font-family: $font-family;
+    font-size: $font-size;
+}
+
+label {
+    display: inline-block;
+
+    color: $neutral-70;
+    font-weight: $semi-bold-font-weight;
+
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+
+    &:active {
+        color: $active-link-color;
+    }
+}
+
+select,
+textarea,
+[type="text"],
+[type="search"],
+[type="password"],
+[type="tel"],
+[type="url"],
+[type="number"],
+[type="email"] {
+    width: 100%;
+    min-height: $tap-size;
+    padding: $input-padding;
+    border: 1px solid $input-border-color;
+
+    border-radius: $border-radius;
+    background-color: $input-background-color;
+    outline: none; // 1
+
+    color: $font-color;
+    line-height: $line-height;
+
+    -webkit-appearance: none;
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+
+    &::-webkit-input-placeholder {
+        color: $neutral-30;
+        font-style: italic;
+    }
+
+    &:active,
+    &:focus {
+        border-color: $focused-input-border-color;
+
+        box-shadow: 0 0 4px 0 $focused-input-border-color;
+    }
+
+    &[disabled],
+    &[readonly] {
+        border: 0;
+
+        background: $disabled-input-background-color;
+
+        color: $disabled-input-color;
+        font-style: italic;
+
+        pointer-events: none;
+    }
+}
+
+
+// Search input
+// ---
+//
+// These properties must be set with a slightly higher specificity for search
+// inputs because Normalize's defaults are a bit too specific
+
+input[type="search"] {
+    box-sizing: border-box;
+
+    -webkit-appearance: none;
+}
+
+
+// Select
+// ---
+//
+// 1. Restore browser default styling. If you’re taking full control of select
+//    styling, remove both these lines.
+
+select {
+    height: $tap-size; // 1
+
+    -webkit-appearance: menulist-button; // 1
+}
+
+
+// Checkbox and Radios
+// ---
+//
+// 1. Outline styles will be replaced by styles in :active, :focus states
+
+[type="checkbox"],
+[type="radio"] {
+    position: relative;
+
+    display: inline-block;
+    width: 24px;
+    height: 24px;
+    border: 1px solid $input-border-color;
+
+    background: $neutral-00;
+    outline: none; // 1
+
+    vertical-align: middle;
+
+    -webkit-appearance: none;
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+
+    &:active {
+        background: $neutral-10;
+    }
+
+    &:checked {
+        border: 0;
+
+        background: $accent-color;
+
+        color: $neutral-00;
+
+        &::after {
+            content: '';
+
+            position: absolute;
+
+            display: block;
+        }
+    }
+
+    &[disabled],
+    &[readonly] {
+        border: 0;
+
+        background: $disabled-input-background-color;
+
+        color: $disabled-input-color;
+
+        pointer-events: none;
+    }
+}
+
+[type="radio"] {
+    border-radius: 24px;
+
+    &::after {
+        top: 8px;
+        right: 8px;
+        bottom: 8px;
+        left: 8px;
+
+        border-radius: 8px;
+        background: $neutral-00;
+    }
+
+    &[disabled]::after,
+    &[readonly]::after {
+        background: $disabled-input-color;
+    }
+}
+
+[type="checkbox"] {
+    &:checked {
+        &::after {
+            content: '\2714';
+
+            top: 50%;
+            left: 50%;
+
+            font-family: $font-family;
+            font-size: $font-size;
+            line-height: $line-height;
+
+            transform: translate(-50%, -50%);
+        }
+    }
+}
+
+
+// Buttons
+// ---
+//
+// 1. Interactive elements with role="button" may not necessarily want to
+// inherit other button styles.
+
+button,
+[type="submit"] {
+    display: block;
+    min-height: $tap-size;
+    padding: $input-padding;
+    border: 0;
+
+    line-height: $line-height;
+
+    cursor: pointer;
+
+    -webkit-appearance: none;
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+}
+
+[role="button"] {
+    cursor: pointer; // 1
+}
+
+
+// Disabled
+// ---
+//
+// 1. web-kit default disabled style
+// 2. Disabled style for button, checkbox, radio, input and select
+// 3. Checkbox and Radio style
+
+[disabled] {
+    opacity: 1;
+    background: $disabled-input-background-color;
+
+    color: $disabled-input-color;
+
+    cursor: not-allowed;
+
+    -webkit-text-fill-color: $disabled-input-color; // 1
+
+    // 2
+    &:active,
+    &:checked {
+        border-color: $disabled-input-color;
+
+        background: $disabled-input-background-color;
+    }
+
+    // 3
+    &:active,
+    &:checked {
+        &::after {
+            color: $disabled-input-color;
+        }
+    }
+
+    &[type="radio"]::after {
+        background-color: $disabled-input-color;
+    }
+}

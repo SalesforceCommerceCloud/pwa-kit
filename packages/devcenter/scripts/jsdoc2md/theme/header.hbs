@@ -1,0 +1,18 @@
+{{#if (regexp-test kind "interface|class")}}<div class="jsdoc-kind">{{kind}}</div>{{/if}}
+
+{{#if (equal kind 'module')}}
+<div class="jsdoc__module-name">{{name}}</div>
+
+{{{escapeUnsafeSyntax description}}}
+{{/if}}
+
+{{#unless (equal kind "module") }}
+{{#if (regexp-test kind "function|constant|typedef")}}#### {{>sig-name}}{{else if (equal kind 'constructor')}}
+{{#if description}}{{escapeUnsafeSyntax description}}{{/if}}
+```javascript title=Usage
+{{>sig-name}}
+```
+{{else}}
+## {{>sig-name}}
+{{/if}}
+{{/unless}}

@@ -1,0 +1,710 @@
+{
+  "02295": [
+    {
+      "type": 0,
+      "value": "Add New Address"
+    }
+  ],
+  "1063e": [
+    {
+      "type": 0,
+      "value": "Remove"
+    }
+  ],
+  "11ffa": [
+    {
+      "type": 0,
+      "value": "Save & Continue"
+    }
+  ],
+  "126b4": [
+    {
+      "type": 0,
+      "value": "Continue to Payment"
+    }
+  ],
+  "16e04": [
+    {
+      "offset": 0,
+      "options": {
+        "=0": {
+          "value": [
+            {
+              "type": 0,
+              "value": "0 items"
+            }
+          ]
+        },
+        "one": {
+          "value": [
+            {
+              "type": 7
+            },
+            {
+              "type": 0,
+              "value": " item"
+            }
+          ]
+        },
+        "other": {
+          "value": [
+            {
+              "type": 7
+            },
+            {
+              "type": 0,
+              "value": " items"
+            }
+          ]
+        }
+      },
+      "pluralType": "cardinal",
+      "type": 6,
+      "value": "itemCount"
+    },
+    {
+      "type": 0,
+      "value": " in cart"
+    }
+  ],
+  "1c5d5": [
+    {
+      "type": 0,
+      "value": "Are you sure you want to sign out? You will need to sign back in to proceed with your current order."
+    }
+  ],
+  "2194a": [
+    {
+      "type": 0,
+      "value": "Subtotal"
+    }
+  ],
+  "25f75": [
+    {
+      "type": 0,
+      "value": "Postal Code"
+    }
+  ],
+  "28a59": [
+    {
+      "type": 0,
+      "value": "Billing Address"
+    }
+  ],
+  "2d0f6": [
+    {
+      "type": 0,
+      "value": "Add to cart"
+    }
+  ],
+  "31d26": [
+    {
+      "type": 0,
+      "value": "New Arrivals"
+    }
+  ],
+  "357e8": [
+    {
+      "type": 0,
+      "value": "Checkout as guest"
+    }
+  ],
+  "375e0": [
+    {
+      "type": 0,
+      "value": "Sign Out"
+    }
+  ],
+  "3e5ff": [
+    {
+      "type": 0,
+      "value": "Edit cart"
+    }
+  ],
+  "424ea": [
+    {
+      "type": 0,
+      "value": "We will send an email to "
+    },
+    {
+      "type": 1,
+      "value": "email"
+    },
+    {
+      "type": 0,
+      "value": " with your confirmation number and receipt shortly."
+    }
+  ],
+  "46a2a": [
+    {
+      "type": 0,
+      "value": "State"
+    }
+  ],
+  "476e2": [
+    {
+      "type": 0,
+      "value": "Please enter a valid card number"
+    }
+  ],
+  "48974": [
+    {
+      "type": 0,
+      "value": "Shipping Address"
+    }
+  ],
+  "49ffd": [
+    {
+      "type": 0,
+      "value": "Shipping Method"
+    }
+  ],
+  "4b78a": [
+    {
+      "type": 0,
+      "value": "Tax"
+    }
+  ],
+  "4e37e": [
+    {
+      "type": 0,
+      "value": "Back to cart"
+    }
+  ],
+  "53069": [
+    {
+      "type": 0,
+      "value": "Please enter a valid date"
+    }
+  ],
+  "57d05": [
+    {
+      "type": 0,
+      "value": "City"
+    }
+  ],
+  "59716": [
+    {
+      "type": 0,
+      "value": "Country"
+    }
+  ],
+  "5e178": [
+    {
+      "type": 0,
+      "value": "Zip Code"
+    }
+  ],
+  "66703": [
+    {
+      "type": 0,
+      "value": "Do you have a gift card or promo code?"
+    }
+  ],
+  "694e8": [
+    {
+      "type": 0,
+      "value": "Quantity"
+    }
+  ],
+  "70d54": [
+    {
+      "type": 0,
+      "value": "Please enter 2-letter state/province"
+    }
+  ],
+  "7207d": [
+    {
+      "type": 0,
+      "value": "Delivery Details"
+    }
+  ],
+  "72707": [
+    {
+      "type": 0,
+      "value": "Do you want to send this as a gift?"
+    }
+  ],
+  "73a61": [
+    {
+      "type": 0,
+      "value": "Credit Card"
+    }
+  ],
+  "77587": [
+    {
+      "type": 0,
+      "value": "Last Name"
+    }
+  ],
+  "7a3a1": [
+    {
+      "type": 0,
+      "value": "Lighter layers for lighter days."
+    }
+  ],
+  "7b6e5": [
+    {
+      "type": 0,
+      "value": "Please enter a valid security code"
+    }
+  ],
+  "7c35f": [
+    {
+      "type": 0,
+      "value": "Please select a payment method."
+    }
+  ],
+  "7dce1": [
+    {
+      "type": 0,
+      "value": "Edit"
+    }
+  ],
+  "8458b": [
+    {
+      "type": 0,
+      "value": "Forgot password?"
+    }
+  ],
+  "89d7b": [
+    {
+      "type": 0,
+      "value": "Shop New Arrivals"
+    }
+  ],
+  "8a9f1": [
+    {
+      "type": 0,
+      "value": "Order Number"
+    }
+  ],
+  "a128f": [
+    {
+      "type": 0,
+      "value": "Place Order"
+    }
+  ],
+  "accea": [
+    {
+      "type": 0,
+      "value": "Payment Details"
+    }
+  ],
+  "ad075": [
+    {
+      "type": 0,
+      "value": "New In"
+    }
+  ],
+  "b5221": [
+    {
+      "type": 0,
+      "value": "Already have an account? Log in"
+    }
+  ],
+  "b651e": [
+    {
+      "type": 0,
+      "value": "Required"
+    }
+  ],
+  "b7bec": [
+    {
+      "offset": 0,
+      "options": {
+        "=0": {
+          "value": [
+            {
+              "type": 0,
+              "value": "0 items"
+            }
+          ]
+        },
+        "one": {
+          "value": [
+            {
+              "type": 7
+            },
+            {
+              "type": 0,
+              "value": " item"
+            }
+          ]
+        },
+        "other": {
+          "value": [
+            {
+              "type": 7
+            },
+            {
+              "type": 0,
+              "value": " items"
+            }
+          ]
+        }
+      },
+      "pluralType": "cardinal",
+      "type": 6,
+      "value": "itemCount"
+    }
+  ],
+  "bc910": [
+    {
+      "type": 0,
+      "value": "First Name"
+    }
+  ],
+  "bcc25": [
+    {
+      "type": 0,
+      "value": "Phone"
+    }
+  ],
+  "c1728": [
+    {
+      "type": 0,
+      "value": "Add New Card"
+    }
+  ],
+  "c2090": [
+    {
+      "type": 0,
+      "value": "Continue Shopping"
+    }
+  ],
+  "c6b5d": [
+    {
+      "type": 0,
+      "value": "Province"
+    }
+  ],
+  "d02b5": [
+    {
+      "type": 0,
+      "value": "Review Order"
+    }
+  ],
+  "dd7bf": [
+    {
+      "type": 0,
+      "value": "Address"
+    }
+  ],
+  "e8078": [
+    {
+      "type": 0,
+      "value": "Please enter a valid name"
+    }
+  ],
+  "ea478": [
+    {
+      "type": 0,
+      "value": "Cancel"
+    }
+  ],
+  "ea9cf": [
+    {
+      "type": 0,
+      "value": "Shipping"
+    }
+  ],
+  "f8f42": [
+    {
+      "type": 0,
+      "value": "Estimated Total"
+    }
+  ],
+  "fdb88": [
+    {
+      "type": 0,
+      "value": "Same as shipping address"
+    }
+  ],
+  "fe052": [
+    {
+      "type": 0,
+      "value": "Order Summary"
+    }
+  ],
+  "fe5d2": [
+    {
+      "type": 0,
+      "value": "Shop by Category"
+    }
+  ],
+  "footer.column.account": [
+    {
+      "type": 0,
+      "value": "Account"
+    }
+  ],
+  "footer.column.customer_support": [
+    {
+      "type": 0,
+      "value": "Customer Support"
+    }
+  ],
+  "footer.column.our_company": [
+    {
+      "type": 0,
+      "value": "Our Company"
+    }
+  ],
+  "footer.link.about_us": [
+    {
+      "type": 0,
+      "value": "About Us"
+    }
+  ],
+  "footer.link.contact_us": [
+    {
+      "type": 0,
+      "value": "Contact Us"
+    }
+  ],
+  "footer.link.order_status": [
+    {
+      "type": 0,
+      "value": "Order Status"
+    }
+  ],
+  "footer.link.privacy_policy": [
+    {
+      "type": 0,
+      "value": "Privacy Policy"
+    }
+  ],
+  "footer.link.returns_exchanges": [
+    {
+      "type": 0,
+      "value": "Returns & Exchanges"
+    }
+  ],
+  "footer.link.shipping": [
+    {
+      "type": 0,
+      "value": "Shipping"
+    }
+  ],
+  "footer.link.signin_create_account": [
+    {
+      "type": 0,
+      "value": "Sign in or Create Account"
+    }
+  ],
+  "footer.link.site_map": [
+    {
+      "type": 0,
+      "value": "Site Map"
+    }
+  ],
+  "footer.link.store_locator": [
+    {
+      "type": 0,
+      "value": "Store Locator"
+    }
+  ],
+  "footer.link.terms_conditions": [
+    {
+      "type": 0,
+      "value": "Terms & Conditions"
+    }
+  ],
+  "footer.message.copyright": [
+    {
+      "type": 0,
+      "value": "2021 Salesforce or its affiliates. All rights reserved. This is a demo store only. Orders made WILL NOT be processed."
+    }
+  ],
+  "footer.subscribe.button.sign_up": [
+    {
+      "type": 0,
+      "value": "Sign Up"
+    }
+  ],
+  "footer.subscribe.description.sign_up": [
+    {
+      "type": 0,
+      "value": "Sign up to stay in the loop about the hottest deals"
+    }
+  ],
+  "footer.subscribe.heading.first_to_know": [
+    {
+      "type": 0,
+      "value": "Be the first to know"
+    }
+  ],
+  "header.button.assistive_msg.logo": [
+    {
+      "type": 0,
+      "value": "Logo"
+    }
+  ],
+  "header.button.assistive_msg.menu": [
+    {
+      "type": 0,
+      "value": "Menu"
+    }
+  ],
+  "header.button.assistive_msg.my_account": [
+    {
+      "type": 0,
+      "value": "My account"
+    }
+  ],
+  "header.button.assistive_msg.my_cart": [
+    {
+      "type": 0,
+      "value": "My cart"
+    }
+  ],
+  "header.search.field.value.placeholder": [
+    {
+      "type": 0,
+      "value": "Search for products..."
+    }
+  ],
+  "homepage.message.welcome": [
+    {
+      "type": 0,
+      "value": "Hello World"
+    }
+  ],
+  "login-redirect.message.welcome": [
+    {
+      "type": 0,
+      "value": "Login Redirect"
+    }
+  ],
+  "mobile_navigation.actions.sign_in": [
+    {
+      "type": 0,
+      "value": "Sign In"
+    }
+  ],
+  "mobile_navigation.actions.store_locator": [
+    {
+      "type": 0,
+      "value": "Store Locator"
+    }
+  ],
+  "mobile_navigation.categories.shop_all": [
+    {
+      "type": 0,
+      "value": "Shop All"
+    }
+  ],
+  "mobile_navigation.links.customer_support": [
+    {
+      "type": 0,
+      "value": "Customer Support"
+    }
+  ],
+  "mobile_navigation.links.customer_support.contact_us": [
+    {
+      "type": 0,
+      "value": "Contact Us"
+    }
+  ],
+  "mobile_navigation.links.customer_support.shipping_and_returns": [
+    {
+      "type": 0,
+      "value": "Shipping & Returns"
+    }
+  ],
+  "mobile_navigation.links.out_company": [
+    {
+      "type": 0,
+      "value": "Our Company"
+    }
+  ],
+  "mobile_navigation.links.out_company.about_us": [
+    {
+      "type": 0,
+      "value": "About Us"
+    }
+  ],
+  "mobile_navigation.links.privacy_and_security": [
+    {
+      "type": 0,
+      "value": "Privacy & Security"
+    }
+  ],
+  "mobile_navigation.links.privacy_and_security.privacy_policy": [
+    {
+      "type": 0,
+      "value": "Privacy Policy"
+    }
+  ],
+  "mobile_navigation.links.privacy_and_security.stie_map": [
+    {
+      "type": 0,
+      "value": "Site Map"
+    }
+  ],
+  "mobile_navigation.links.privacy_and_security.terms_and_conditions": [
+    {
+      "type": 0,
+      "value": "Terms & Conditions"
+    }
+  ],
+  "offline_banner.message": [
+    {
+      "type": 0,
+      "value": "You're currently browsing in offline mode"
+    }
+  ],
+  "pagination.actions.current_page_verb": [
+    {
+      "type": 0,
+      "value": "of"
+    }
+  ],
+  "pagination.actions.next": [
+    {
+      "type": 0,
+      "value": "Next"
+    }
+  ],
+  "pagination.actions.prev": [
+    {
+      "type": 0,
+      "value": "Prev"
+    }
+  ],
+  "product_list_page.filter_button": [
+    {
+      "type": 0,
+      "value": "Filter"
+    }
+  ],
+  "product_list_page.no_results": [
+    {
+      "type": 0,
+      "value": "We couldn’t find anything for "
+    },
+    {
+      "type": 1,
+      "value": "category"
+    },
+    {
+      "type": 0,
+      "value": ". Try searching for a product or "
+    },
+    {
+      "type": 1,
+      "value": "link"
+    },
+    {
+      "type": 0,
+      "value": "."
+    }
+  ],
+  "product_list_page.no_results.contact_us": [
+    {
+      "type": 0,
+      "value": "contact us"
+    }
+  ]
+}

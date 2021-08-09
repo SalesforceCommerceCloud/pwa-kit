@@ -1,0 +1,34 @@
+// Divider
+// ===
+//
+// A horizontal rule element that can display an optional label as a heading.
+
+
+// Divider root
+// ---
+
+.pw-divider {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    text-align: center;
+
+    &::after,
+    &::before {
+        content: "";
+
+        display: block;
+        flex: 1 1 auto;
+        border-top: 1px solid $border-color;
+    }
+}
+
+
+// Text
+// ---
+
+.pw-divider__text {
+    display: block;
+    flex: 0 1 auto;
+}

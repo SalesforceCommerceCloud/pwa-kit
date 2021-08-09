@@ -1,0 +1,17 @@
+// InlineLoader Theme
+// ===
+
+.pw-inline-loader {
+    // Root Class theme styles
+}
+
+
+// Loading Dot
+// ---
+
+.pw-inline-loader__loading-dot {
+    &::after {
+        border-radius: 100%;
+        background-color: $accent-color;
+    }
+}

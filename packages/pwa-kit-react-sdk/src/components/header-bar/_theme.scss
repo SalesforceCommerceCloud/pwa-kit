@@ -1,0 +1,49 @@
+// Header Bar Theme
+// ===
+
+$header-bar__min-height: $tap-size + $unit; // 52px
+
+.pw-header-bar {
+    min-height: $header-bar__min-height;
+
+    background: $brand-color;
+
+    color: $neutral-00;
+}
+
+
+// Title
+// ---
+//
+// 1. `pw-header-bar__title` can be an <a> element. We'll inherit the same
+//    text color specified in the parent `pw-header-bar`
+
+.pw-header-bar__title {
+    padding: $unit*1.5;
+
+    color: inherit; // 1
+
+    &:first-child {
+        justify-content: flex-start;
+
+        text-align: left;
+    }
+}
+
+
+// Actions
+// ---
+
+.pw-header-bar__actions {
+    margin: $sub-unit;
+}
+
+
+// Modifier: Dialog header bar
+// ---
+
+.pw-header-bar.pw--dialog {
+    background: $neutral-00;
+
+    color: $neutral-70;
+}

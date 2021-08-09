@@ -1,0 +1,51 @@
+// Review Summary
+// ===
+
+.pw-review-summary {
+    display: flex;
+    align-items: flex-start;
+}
+
+
+// Review Summary Image
+// ---
+
+.pw-review-summary__image {
+    flex: 0 0 auto;
+    margin-right: $unit * 1.5;
+}
+
+
+// Review Summary Rating
+// ---
+
+.pw-review-summary__rating {
+    flex: 1 1 auto;
+}
+
+
+// Review Summary Rating Inner
+// ---
+
+.pw-review-summary__rating-inner {
+    display: flex;
+    align-items: center;
+    margin-bottom: $unit;
+}
+
+
+// Review Summary Rating Stars
+// ---
+
+.pw-review-summary__rating-stars {
+    flex: 0 0 auto;
+}
+
+
+// Review Summary Rating Info
+// ---
+
+.pw-review-summary__rating-info {
+    flex: 1 1 auto;
+    margin-left: $unit * 1.5;
+}

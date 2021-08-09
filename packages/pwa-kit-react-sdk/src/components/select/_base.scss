@@ -1,0 +1,105 @@
+// Select
+// ===
+
+// Select root
+// ---
+//
+// 1. Allow positioning of the native select element and caret.
+// 2. Match default user agent styling for inputs.
+
+.c-select {
+    position: relative; // 1
+
+    display: block;
+    width: 100%;
+    min-height: $tap-size;
+
+    font-family: inherit;
+
+    user-select: none;
+
+
+    // Native select element
+    // ---
+    //
+    // 1. Position the native select overtop of the custom element that
+    //    contains it.
+    // 2. Hide everything except the text value.
+
+    select {
+        position: absolute; // 1
+        top: 0; // 1
+        left: 0; // 1
+
+        width: 100%; // 1
+        height: 100%; // 1
+        border: 0; // 2
+
+        background: none; // 2
+
+        -webkit-appearance: none; // 2
+    }
+}
+
+
+// Select with Inner Label
+// ---
+//
+// 1. Vertically align inner label and value.
+// 2. Hide the native select completely while it remains tappable.
+
+.c-select.c--inner-label {
+    display: flex;
+    align-items: center; // 1
+
+    select {
+        opacity: 0; // 2
+    }
+}
+
+
+// Inner label element
+// ---
+
+.c-select__label {
+    display: block;
+}
+
+
+// Select Icon
+// ---
+//
+// 1. Positioned relative to the parent .c-select positioning context
+// 2. This padding shrinks the size of the icon, while preserving the dimensions
+//    of its container.
+// 3. Using min-width and min-height to override the height/width from Icon's
+//    base styles
+
+.c-select__icon {
+    position: absolute; // 1
+    top: 0;
+    right: 0;
+
+    min-width: $tap-size; // 3
+    min-height: $tap-size; // 3
+    padding: $unit * 1.5; // 2
+}
+
+
+// Hide the native select arrow in Firefox by clipping it with overflow: hidden
+// Attribution: https://github.com/filamentgroup/select-css
+
+@-moz-document url-prefix() {
+    .c-select {
+        overflow: hidden;
+
+        select {
+            width: calc(100% + 3em);
+
+            &:-moz-focusring {
+                color: transparent;
+                text-shadow: 0 0 0 #000;
+            }
+        }
+    }
+}

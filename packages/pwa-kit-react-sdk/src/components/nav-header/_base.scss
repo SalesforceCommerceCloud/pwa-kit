@@ -1,0 +1,64 @@
+// Nav Header
+// ===
+
+.pw-nav-header {
+    display: flex;
+    align-items: center;
+}
+
+
+// Nav Header Actions
+// ---
+//
+// 1. flex-basis is set to `0` so flex items will be proportionally distributed with the remaining space.
+//    We want start and end action to be equal width so that the title is always centered.
+
+.pw-nav-header__actions-start,
+.pw-nav-header__actions-end {
+    flex: 1 0 0; // 1
+    align-self: stretch;
+}
+
+
+// Nav Header Start Action
+// ---
+
+.pw-nav-header__actions-start {
+    text-align: left;
+}
+
+
+// Nav Header End Action
+// ---
+
+.pw-nav-header__actions-end {
+    text-align: right;
+}
+
+
+// Nav Header Slider Container
+// ---
+
+.pw-nav-header__slider-container {
+    position: relative;
+
+    overflow: hidden;
+    flex: 4 1 0;
+    align-self: stretch;
+}
+
+
+// Nav Header Title
+// ---
+//
+// 1. Stretch container's height to fill parent `pw-nav-slider` container
+//    so the title can be vertically centered
+
+.pw-nav-header__title {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%; // 1
+
+    text-align: center;
+}

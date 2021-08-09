@@ -1,0 +1,43 @@
+// Swatch
+// ===
+
+
+// Swatch root
+// ---
+
+.pw-swatch {
+    // Root Class. Contains all core styles, typically for the component's
+    // wrapper element.
+}
+
+
+// Swatch Item
+// ---
+
+.pw-swatch__item {
+    display: inline-block;
+    margin-right: $unit;
+    margin-bottom: $unit;
+}
+
+
+// Swatch Button Inner
+// ---
+
+.pw-swatch__button-inner {
+    flex-direction: column;
+}
+
+
+// Swatch Chip Inner
+// ---
+
+.pw-swatch__chip-inner {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-width: $tap-size;
+    min-height: $tap-size;
+
+    text-align: center;
+}
