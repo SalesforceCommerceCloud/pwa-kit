@@ -1,6 +1,6 @@
 {
   "name": "progressive-web-sdk",
-  "version": "2.4.0",
+  "version": "2.4.1",
   "description": "A set of libraries and components which make up the SDK for Progressive Web",
   "main": "dist/index.js",
   "bin": {
@@ -74,7 +74,7 @@
     "inline-style-prefixer": "2.0.5",
     "javascript-stringify": "1.6.0",
     "jsdom": "14.0.0",
-    "lodash": "^4.17.11",
+    "lodash": "^4.17.20",
     "lodash.intersection": "4.4.0",
     "lodash.map": "4.6.0",
     "lodash.mapvalues": "4.6.0",

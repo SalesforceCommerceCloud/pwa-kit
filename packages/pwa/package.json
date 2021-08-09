@@ -1,6 +1,6 @@
 {
   "name": "scaffold-pwa",
-  "version": "2.4.0",
+  "version": "2.4.1",
   "siteName": "NPSP Web",
   "siteUrl": "https://www.example.com/",
   "projectSlug": "scaffold-pwa",
@@ -43,14 +43,14 @@
     }
   },
   "dependencies": {
-    "@mobify/commerce-integrations": "^2.4.0",
+    "@mobify/commerce-integrations": "^2.4.1",
     "bluebird": "^3.5.1",
     "core-js": "2.4.0",
     "es6-object-assign": "^1.1.0",
     "express": "^4.16.4",
     "hoist-non-react-statics": "^3.3.0",
     "json-stable-stringify": "^1.0.1",
-    "lodash": "^4.17.11",
+    "lodash": "^4.17.20",
     "lodash.assign": "4.2.0",
     "lodash.find": "4.6.0",
     "lodash.frompairs": "4.0.1",
@@ -130,7 +130,7 @@
     "nodemon": "1.18.10",
     "postcss-loader": "3.0.0",
     "prettier": "1.18.2",
-    "progressive-web-sdk": "^2.4.0",
+    "progressive-web-sdk": "^2.4.1",
     "raf": "^3.4.0",
     "raw-loader": "0.5.1",
     "react-loadable": "^5.5.0",

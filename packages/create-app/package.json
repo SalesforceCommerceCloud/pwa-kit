@@ -1,6 +1,6 @@
 {
   "name": "@mobify/create-app",
-  "version": "2.4.0",
+  "version": "2.4.1",
   "description": "Mobify's project generator tool",
   "author": "dev@mobify.com",
   "license": "See license in LICENSE",
