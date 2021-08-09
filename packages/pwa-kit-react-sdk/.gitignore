@@ -7,7 +7,6 @@ docs/www
 docs/public/latest/styleguidist
 docs/public/latest/theme/
 docs/public/latest/utility-functions/reference/
-docs/public/latest/analytics/analytics-integrations/api/
 node_modules
 /npm-debug.log
 /tmp

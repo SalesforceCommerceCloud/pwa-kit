@@ -41,7 +41,7 @@ export const ToggleCard = ({
                         >
                             {title}
                         </Heading>
-                        {!editing && !disabled && (
+                        {!editing && !disabled && onEdit && (
                             <Button variant="link" size="sm" onClick={onEdit}>
                                 {editLabel || <FormattedMessage defaultMessage="Edit" />}
                             </Button>
@@ -68,7 +68,7 @@ export const ToggleCardSummary = ({children}) => {
 
 ToggleCard.propTypes = {
     id: PropTypes.string,
-    title: PropTypes.string,
+    title: PropTypes.any,
     editLabel: PropTypes.any,
     editing: PropTypes.bool,
     isLoading: PropTypes.bool,

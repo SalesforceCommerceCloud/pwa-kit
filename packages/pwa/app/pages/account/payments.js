@@ -6,16 +6,19 @@ import React, {useState} from 'react'
 import {FormattedMessage, useIntl} from 'react-intl'
 import {useForm} from 'react-hook-form'
 import {
-    Box,
-    Stack,
-    Heading,
-    Container,
-    SimpleGrid,
     Alert,
     AlertIcon,
+    Button,
+    Box,
+    Container,
+    Heading,
+    SimpleGrid,
+    Skeleton,
+    Stack,
     Text,
-    useToast,
-    Button
+
+    // Hooks
+    useToast
 } from '@chakra-ui/react'
 import {createCreditCardPaymentBodyFromForm, getCreditCardIcon} from '../../utils/cc-utils'
 import useCustomer from '../../commerce-api/hooks/useCustomer'
@@ -26,9 +29,12 @@ import ActionCard from '../../components/action-card'
 import CreditCardFields from '../../components/forms/credit-card-fields'
 import PageActionPlaceHolder from '../../components/page-action-placeholder'
 
+const DEFAULT_SKELETON_COUNT = 3
+
 const AccountPaymentMethods = () => {
     const {formatMessage} = useIntl()
     const {
+        isRegistered,
         paymentInstruments,
         addSavedPaymentInstrument,
         removeSavedPaymentInstrument
@@ -73,6 +79,26 @@ const AccountPaymentMethods = () => {
             <Heading as="h1" fontSize="2xl">
                 <FormattedMessage defaultMessage="Payment Methods" />
             </Heading>
+
+            {/* Show the loading skeleton if the user isn't loaded yet. We determine this be checking to see
+            if the customer is of type `registered`. */}
+            {!isRegistered && (
+                <SimpleGrid columns={[1, 2, 2, 2, 3]} spacing={4}>
+                    {new Array(DEFAULT_SKELETON_COUNT).fill().map((_, index) => {
+                        return (
+                            <ActionCard key={index}>
+                                <Stack spacing={2} marginBottom={3}>
+                                    <Skeleton height="23px" width="120px" />
+
+                                    <Skeleton height="23px" width="84px" />
+
+                                    <Skeleton height="23px" width="104px" />
+                                </Stack>
+                            </ActionCard>
+                        )
+                    })}
+                </SimpleGrid>
+            )}
 
             {isEditing && (
                 <Box
@@ -161,7 +187,7 @@ const AccountPaymentMethods = () => {
                 </SimpleGrid>
             )}
 
-            {!hasSavedPayments && !isEditing && (
+            {!hasSavedPayments && !isEditing && isRegistered && (
                 <PageActionPlaceHolder
                     icon={<PaymentIcon boxSize={8} />}
                     heading={formatMessage({defaultMessage: 'No Saved Payment Methods'})}

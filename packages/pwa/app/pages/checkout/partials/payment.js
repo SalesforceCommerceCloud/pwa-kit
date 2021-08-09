@@ -5,11 +5,11 @@ import {Box, Button, Checkbox, Container, Heading, Stack, Text, Divider} from '@
 import {useCheckout} from '../util/checkout-context'
 import usePaymentForms from '../util/usePaymentForms'
 import {getCreditCardIcon} from '../../../utils/cc-utils'
-import {ChevronDownIcon} from '../../../components/icons'
 import {ToggleCard, ToggleCardEdit, ToggleCardSummary} from '../../../components/toggle-card'
 import PaymentSelection from './payment-selection'
 import ShippingAddressSelection from './shipping-address-selection'
 import AddressDisplay from '../../../components/address-display'
+import {PromoCode, usePromoCode} from '../../../components/promo-code'
 
 const Payment = () => {
     const {
@@ -30,6 +30,8 @@ const Payment = () => {
         reviewOrder
     } = usePaymentForms()
 
+    const {removePromoCode, ...promoCodeProps} = usePromoCode()
+
     useEffect(() => {
         getPaymentMethods()
     }, [])
@@ -47,32 +49,28 @@ const Payment = () => {
             onEdit={() => setCheckoutStep(3)}
         >
             <ToggleCardEdit>
+                <Box mt={-2} mb={4}>
+                    <PromoCode {...promoCodeProps} itemProps={{border: 'none'}} />
+                </Box>
+
                 <Stack spacing={6}>
                     {!selectedPayment?.paymentCard ? (
                         <PaymentSelection form={paymentMethodForm} hideSubmitButton />
                     ) : (
-                        <Stack spacing={6}>
-                            <Box>
-                                <Button variant="link" size="sm" rightIcon={<ChevronDownIcon />}>
-                                    <FormattedMessage defaultMessage="Do you have a gift card or promo code?" />
+                        <Stack spacing={3}>
+                            <Heading as="h3" fontSize="md">
+                                <FormattedMessage defaultMessage="Credit Card" />
+                            </Heading>
+                            <Stack direction="row" spacing={4}>
+                                <PaymentCardSummary payment={selectedPayment} />
+                                <Button
+                                    variant="link"
+                                    size="sm"
+                                    colorScheme="red"
+                                    onClick={removePayment}
+                                >
+                                    <FormattedMessage defaultMessage="Remove" />
                                 </Button>
-                            </Box>
-
-                            <Stack spacing={3}>
-                                <Heading as="h3" fontSize="md">
-                                    <FormattedMessage defaultMessage="Credit Card" />
-                                </Heading>
-                                <Stack direction="row" spacing={4}>
-                                    <PaymentCardSummary payment={selectedPayment} />
-                                    <Button
-                                        variant="link"
-                                        size="sm"
-                                        colorScheme="red"
-                                        onClick={removePayment}
-                                    >
-                                        <FormattedMessage defaultMessage="Remove" />
-                                    </Button>
-                                </Stack>
                             </Stack>
                         </Stack>
                     )}

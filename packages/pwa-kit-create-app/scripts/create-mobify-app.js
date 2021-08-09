@@ -141,7 +141,7 @@ const runGenerator = (answers, {outputDir}) => {
     })
 
     const commerceAPIConfigTemplate = require(`../assets/pwa/commerce-api.config`).template
-    const data = {
+    const commerceData = {
         proxyPath: answers['scaffold-pwa'].mobify.ssrParameters.proxyConfigs[0].path,
         clientId: answers['commerce-api'].clientId,
         organizationId: answers['commerce-api'].organizationId,
@@ -149,8 +149,18 @@ const runGenerator = (answers, {outputDir}) => {
         siteId: answers['commerce-api'].siteId
     }
 
-    new sh.ShellString(commerceAPIConfigTemplate(data)).to(
+    new sh.ShellString(commerceAPIConfigTemplate(commerceData)).to(
         p.resolve(outputDir, 'app', 'commerce-api.config.js')
+    )
+
+    const einsteinAPIConfigTemplate = require(`../assets/pwa/einstein-api.config`).template
+    const einsteinData = {
+        proxyPath: answers['scaffold-pwa'].mobify.ssrParameters.proxyConfigs[3].path,
+        einsteinId: answers['einstein-api'].einsteinId,
+        siteId: answers['commerce-api'].siteId
+    }
+    new sh.ShellString(einsteinAPIConfigTemplate(einsteinData)).to(
+        p.resolve(outputDir, 'app', 'einstein-api.config.js')
     )
 
     console.log('Installing dependencies for the generated project (this can take a while)')
@@ -182,6 +192,8 @@ const prompts = () => {
     // doc --> https://developer.commercecloud.com/s/article/CommerceAPI-ConfigurationValues.
     const defaultCommerceAPIError =
         'Invalid format. Follow this link for configuration documentation https://developer.commercecloud.com/s/article/CommerceAPI-ConfigurationValues'
+    const defaultEinsteinAPIError =
+        'Invalid format. Follow this link for configuration documentation https://developer.commercecloud.com/s/api-details/a003k00000UI4hPAAT/commerce-cloud-developer-centereinsteinrecommendations'
     const validShortCode = (s) => /(^[0-9A-Z]{8}$)/i.test(s) || defaultCommerceAPIError
     const validClientId = (s) =>
         /(^[0-9A-Z]{8}-[0-9A-Z]{4}-[0-9A-Z]{4}-[0-9A-Z]{4}-[0-9A-Z]{12}$)/i.test(s) ||
@@ -189,6 +201,10 @@ const prompts = () => {
         defaultCommerceAPIError
     const validOrganizationId = (s) =>
         /^(f_ecom)_([A-Z]{4})_(prd|stg|dev|[0-9]{3}|s[0-9]{2})$/i.test(s) || defaultCommerceAPIError
+    const validEinsteinId = (s) =>
+        /(^[0-9A-Z]{8}-[0-9A-Z]{4}-[0-9A-Z]{4}-[0-9A-Z]{4}-[0-9A-Z]{12}$)/i.test(s) ||
+        s === '' ||
+        defaultEinsteinAPIError
 
     const questions = [
         {
@@ -221,13 +237,26 @@ const prompts = () => {
             name: 'shortCode',
             message: 'What is your Commerce API short code in Business Manager?',
             validate: validShortCode
+        },
+        {
+            name: 'einsteinId',
+            message: 'What is your API Client ID in the Einstein Configurator? (optional)',
+            validate: validEinsteinId
         }
     ]
 
     return inquirer.prompt(questions).then((answers) => buildAnswers(answers))
 }
 
-const buildAnswers = ({projectId, instanceUrl, clientId, siteId, organizationId, shortCode}) => {
+const buildAnswers = ({
+    projectId,
+    instanceUrl,
+    clientId,
+    siteId,
+    organizationId,
+    shortCode,
+    einsteinId
+}) => {
     return {
         globals: {projectId},
 
@@ -252,13 +281,18 @@ const buildAnswers = ({projectId, instanceUrl, clientId, siteId, organizationId,
                         {
                             path: 'slas',
                             host: 'prd.us.shopper.commercecloud.salesforce.com'
+                        },
+                        {
+                            path: 'einstein',
+                            host: 'api.cquotient.com'
                         }
                     ]
                 }
             }
         },
 
-        'commerce-api': {clientId, siteId, organizationId, shortCode}
+        'commerce-api': {clientId, siteId, organizationId, shortCode},
+        'einstein-api': {einsteinId}
     }
 }
 
@@ -269,7 +303,8 @@ const testProjectAnswers = () => {
         clientId: 'c9c45bfd-0ed3-4aa2-9971-40f88962b836',
         siteId: 'RefArch',
         organizationId: 'f_ecom_zzrf_001',
-        shortCode: 'kv7kzm78'
+        shortCode: 'kv7kzm78',
+        einsteinId: '1ea06c6e-c936-4324-bcf0-fada93f83bb1'
     }
 
     return buildAnswers(config)

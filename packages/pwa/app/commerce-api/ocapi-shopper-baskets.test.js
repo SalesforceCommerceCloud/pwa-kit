@@ -4,7 +4,7 @@ import {
     ocapiBasketResponse,
     ocapiBasketWithItem,
     ocapiBasketWithPaymentInstrumentAndBillingAddress,
-    shippingMethodsResponse
+    mockShippingMethods
 } from './mock-data'
 
 const apiConfig = {...commerceAPIConfig, proxy: undefined}
@@ -269,7 +269,7 @@ describe('test OcapiShopperBaskets class', () => {
             return {
                 status: 200,
                 json: async () => {
-                    return shippingMethodsResponse
+                    return mockShippingMethods
                 }
             }
         })

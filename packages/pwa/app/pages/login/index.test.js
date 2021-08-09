@@ -30,10 +30,10 @@ jest.mock('commerce-sdk-isomorphic', () => {
             }
 
             async getCustomer(args) {
-                if (args.parameters.customerId === 'guestCustomerId') {
+                if (args.parameters.customerId === 'customerid') {
                     return {
                         authType: 'guest',
-                        customerId: 'guestCustomerId'
+                        customerId: 'customerid'
                     }
                 }
                 return mockRegisteredCustomer
@@ -48,7 +48,7 @@ jest.mock('commerce-sdk-isomorphic', () => {
                     },
                     json: async () => ({
                         authType: 'guest',
-                        customerId: 'guestCustomerId'
+                        customerId: 'customerid'
                     })
                 }
             }
@@ -146,7 +146,6 @@ test('Allows customer to sign in to their account', async () => {
     // wait for success state to appear
     expect(await screen.findByText(/Welcome Back/i, {}, {timeout: 30000})).toBeInTheDocument()
     expect(await screen.findByText(/darek@test.com/i, {}, {timeout: 30000})).toBeInTheDocument()
-    expect(await screen.findByText(/Sign out/i, {}, {timeout: 30000})).toBeInTheDocument()
 })
 
 test('Renders error when given incorrect log in credentials', async () => {

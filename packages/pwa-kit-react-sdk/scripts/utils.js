@@ -192,7 +192,7 @@ Utils.readCredentials = (filepath) => {
             /* istanbul ignore next */ () =>
                 Utils.fail(
                     `Credentials file "${filepath}" not found.\n` +
-                        'Visit https://cloud.mobify.com/account for ' +
+                        'Visit https://runtime.commercecloud.com/account/settings for ' +
                         'steps on authorizing your computer to push bundles.'
                 )
         )

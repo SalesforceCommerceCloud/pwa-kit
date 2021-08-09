@@ -232,6 +232,42 @@ class OcapiShopperBaskets {
         const {basketId} = args[0].parameters
         return this.fetch(`baskets/${basketId}`, 'DELETE', args, 'deleteBasket')
     }
+
+    async addCouponToBasket(...args) {
+        const required = ['basketId', 'body']
+        let requiredParametersError = checkRequiredParameters(args[0], required)
+        if (requiredParametersError) {
+            return requiredParametersError
+        }
+        let {
+            parameters: {basketId},
+            body
+        } = args[0]
+        return this.fetch(
+            `baskets/${basketId}/coupons`,
+            'POST',
+            args,
+            'addCouponToBasket',
+            camelCaseKeysToUnderscore(body)
+        )
+    }
+
+    async removeCouponFromBasket(...args) {
+        const required = ['basketId', 'couponItemId']
+        let requiredParametersError = checkRequiredParameters(args[0], required)
+        if (requiredParametersError) {
+            return requiredParametersError
+        }
+        let {
+            parameters: {basketId, couponItemId}
+        } = args[0]
+        return this.fetch(
+            `baskets/${basketId}/coupons/${couponItemId}`,
+            'DELETE',
+            args,
+            'removeCouponFromBasket'
+        )
+    }
 }
 
 export default OcapiShopperBaskets

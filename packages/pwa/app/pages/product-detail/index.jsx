@@ -39,6 +39,7 @@ import useBasket from '../../commerce-api/hooks/useBasket'
 // Others/Utils
 import {HTTPNotFound} from 'pwa-kit-react-sdk/dist/ssr/universal/errors'
 import {rebuildPathWithParams} from '../../utils/url'
+import useEinstein from '../../einstein/hooks/useEinstein'
 
 const MAX_ORDER_QUANTITY = 10
 const OUT_OF_STOCK = 'OUT_OF_STOCK'
@@ -49,6 +50,7 @@ const ProductDetail = ({category, product, isLoading}) => {
     const basket = useBasket()
     const history = useHistory()
     const location = useLocation()
+    const einstein = useEinstein()
 
     const [quantity, setQuantity] = useState(1)
     const [primaryCategory, setPrimaryCategory] = useState(category)
@@ -89,12 +91,13 @@ const ProductDetail = ({category, product, isLoading}) => {
         (unfulfillable && inventoryMessages[UNFULFILLABLE])
 
     const handleAddToCart = async (variant, quantity) => {
-        // The bqasket accepts an array of `ProductItems`, so lets create a single
+        // The basket accepts an array of `ProductItems`, so lets create a single
         // item array to add to the basket.
         const productItems = [
             {
                 productId: variant.productId,
-                quantity
+                quantity,
+                price: variant.price
             }
         ]
 
@@ -123,6 +126,16 @@ const ProductDetail = ({category, product, isLoading}) => {
             setPrimaryCategory(category)
         }
     }, [category])
+
+    useEffect(() => {
+        if (!product) {
+            return
+        }
+        const sendViewProduct = async () => {
+            einstein.sendViewProduct(product)
+        }
+        sendViewProduct()
+    }, [product])
 
     return (
         <Box className="sf-product-detail-page" layerStyle="page">

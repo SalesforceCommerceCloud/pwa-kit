@@ -2,7 +2,7 @@ import React from 'react'
 import {Crypto} from '@peculiar/webcrypto'
 import Checkout from './index'
 import {Route, Switch} from 'react-router-dom'
-import {screen, waitFor, within} from '@testing-library/react'
+import {screen, waitFor, waitForElementToBeRemoved, within} from '@testing-library/react'
 import user from '@testing-library/user-event'
 import {rest} from 'msw'
 import {setupServer} from 'msw/node'
@@ -12,9 +12,10 @@ import {
     ocapiBasketWithItem,
     ocapiOrderResponse,
     exampleTokenReponse,
-    shippingMethodsResponse,
+    mockShippingMethods,
     mockPaymentMethods,
     mockedRegisteredCustomer,
+    mockedRegisteredCustomerWithTwoAddresses,
     productsResponse
 } from '../../commerce-api/mock-data'
 
@@ -100,7 +101,7 @@ const server = setupServer(
 
     // mock available shipping methods
     rest.get('*/shipments/me/shipping_methods', (req, res, ctx) => {
-        return res(ctx.json(shippingMethodsResponse))
+        return res(ctx.json(mockShippingMethods))
     }),
 
     // mock available payment methods
@@ -128,6 +129,7 @@ const server = setupServer(
             ctx.json({
                 authType: 'guest',
                 preferredLocale: 'en_US',
+                ...mockedRegisteredCustomer,
                 // Mocked customer ID should match the mocked basket's customer ID as
                 // it would with real usage, otherwise, the useShopper hook will detect
                 // the mismatch and attempt to refetch a new basket for the customer.
@@ -231,7 +233,7 @@ test('Can proceed through checkout steps as guest', async () => {
         // mock add shipping method
         rest.put('*/shipments/me/shipping_method', (req, res, ctx) => {
             currentBasket.shipments[0].shipping_method =
-                shippingMethodsResponse.applicable_shipping_methods[0]
+                mockShippingMethods.applicable_shipping_methods[0]
             return res(ctx.json(currentBasket))
         }),
 
@@ -403,15 +405,7 @@ test('Can proceed through checkout as registered customer', async () => {
         }),
 
         rest.get('*/customers/:customerId', (req, res, ctx) => {
-            return res(
-                ctx.json({
-                    ...mockedRegisteredCustomer,
-                    // Mocked customer ID should match the mocked basket's customer ID as
-                    // it would with real usage, otherwise, the useShopper hook will detect
-                    // the mismatch and attempt to refetch a new basket for the customer.
-                    customerId: ocapiBasketWithItem.customer_info.customer_id
-                })
-            )
+            return res(ctx.json(mockedRegisteredCustomer))
         }),
 
         // mock adding guest email to basket
@@ -463,7 +457,7 @@ test('Can proceed through checkout as registered customer', async () => {
         // mock add shipping method
         rest.put('*/shipments/me/shipping_method', (req, res, ctx) => {
             currentBasket.shipments[0].shipping_method =
-                shippingMethodsResponse.applicable_shipping_methods[0]
+                mockShippingMethods.applicable_shipping_methods[0]
             return res(ctx.json(currentBasket))
         }),
 
@@ -489,6 +483,11 @@ test('Can proceed through checkout as registered customer', async () => {
                 }
             ]
             return res(ctx.json(currentBasket))
+        }),
+
+        // mock update address
+        rest.patch('*/addresses/savedaddress1', (req, res, ctx) => {
+            return res(ctx.json(mockedRegisteredCustomer.addresses[0]))
         }),
 
         // mock place order
@@ -583,4 +582,230 @@ test('Can proceed through checkout as registered customer', async () => {
     await waitFor(() => {
         expect(window.location.pathname).toEqual('/en/checkout/confirmation')
     })
+})
+
+test('Can edit address during checkout as a registered customer', async () => {
+    // Keep a *deep* of the initial mocked basket. Our mocked fetch responses will continuously
+    // update this object, which essentially mimics a saved basket on the backend.
+    let currentBasket = JSON.parse(JSON.stringify(ocapiBasketWithItem))
+
+    // Set up additional requests for intercepting/mocking for just this test.
+    server.use(
+        // Mock oauth login callback request
+        rest.post('*/oauth2/login', (req, res, ctx) => {
+            return res(ctx.status(303), ctx.set('location', `/callback`))
+        }),
+
+        rest.get('*/callback', (req, res, ctx) => {
+            return res(ctx.status(200))
+        }),
+
+        rest.post('*/oauth2/token', (req, res, ctx) => {
+            return res(
+                ctx.json({
+                    customer_id: 'test',
+                    access_token: 'testtoken',
+                    refresh_token: 'testrefeshtoken',
+                    usid: 'testusid'
+                })
+            )
+        }),
+
+        rest.get('*/customers/:customerId', (req, res, ctx) => {
+            return res(ctx.json(mockedRegisteredCustomer))
+        }),
+
+        // mock adding guest email to basket
+        rest.put('*/baskets/:basketId/customer', (req, res, ctx) => {
+            currentBasket.customer_info.email = 'customer@test.com'
+            return res(ctx.json(currentBasket))
+        }),
+
+        // mock add shipping and billing address to basket
+        rest.put('*/shipping_address', (req, res, ctx) => {
+            const shippingBillingAddress = {
+                address1: req.body.address1,
+                city: 'Tampa',
+                country_code: 'US',
+                first_name: 'Test',
+                full_name: 'Test McTester',
+                id: '047b18d4aaaf4138f693a4b931',
+                last_name: 'McTester',
+                phone: '(727) 555-1234',
+                postal_code: '33712',
+                state_code: 'FL',
+                _type: 'order_address'
+            }
+            currentBasket.shipments[0].shipping_address = shippingBillingAddress
+            currentBasket.billing_address = shippingBillingAddress
+            return res(ctx.json(currentBasket))
+        }),
+
+        // mock update address
+        rest.patch('*/addresses/savedaddress1', (req, res, ctx) => {
+            return res(ctx.json(mockedRegisteredCustomer.addresses[0]))
+        })
+    )
+
+    // Set the initial browser router path and render our component tree.
+    window.history.pushState({}, 'Checkout', '/en/checkout')
+    renderWithProviders(<WrappedCheckout history={history} />)
+
+    // Wait for checkout to load and display first step
+    const loginBtn = await screen.findByText(/log in/i)
+
+    // Provide customer email and submit
+    const emailInput = screen.getByLabelText('Email')
+    const pwInput = screen.getByLabelText('Password')
+    user.type(emailInput, 'customer@test.com')
+    user.type(pwInput, 'Password!1')
+    user.click(loginBtn)
+
+    // Wait for next step to render
+    await waitFor(() =>
+        expect(screen.getByTestId('sf-toggle-card-step-1-content')).not.toBeEmptyDOMElement()
+    )
+
+    const firstAddress = screen.getByTestId('sf-checkout-shipping-address-0')
+    user.click(within(firstAddress).getByRole('button', {name: /edit/i}))
+
+    // Wait for the edit address form to render
+    await waitFor(() =>
+        expect(screen.getByTestId('sf-shipping-address-edit-form')).not.toBeEmptyDOMElement()
+    )
+
+    expect(screen.getByRole('textbox', {name: /first name/i})).toBeInTheDocument()
+
+    // Edit and save the address
+    user.clear(screen.getByLabelText('Address'))
+    user.type(screen.getByLabelText('Address'), '369 Main Street')
+    user.click(screen.getByText(/save & continue to shipping method/i))
+
+    // Wait for next step to render
+    await waitFor(() => {
+        expect(screen.getByTestId('sf-toggle-card-step-2-content')).not.toBeEmptyDOMElement()
+    })
+
+    expect(screen.getByText('369 Main Street')).toBeInTheDocument()
+})
+
+test('Can add address during checkout as a registered customer', async () => {
+    // Keep a *deep* of the initial mocked basket. Our mocked fetch responses will continuously
+    // update this object, which essentially mimics a saved basket on the backend.
+    let currentBasket = JSON.parse(JSON.stringify(ocapiBasketWithItem))
+
+    // Set up additional requests for intercepting/mocking for just this test.
+    server.use(
+        // Mock oauth login callback request
+        rest.post('*/oauth2/login', (req, res, ctx) => {
+            return res(ctx.status(303), ctx.set('location', `/callback`))
+        }),
+
+        rest.get('*/callback', (req, res, ctx) => {
+            return res(ctx.status(200))
+        }),
+
+        rest.post('*/oauth2/token', (req, res, ctx) => {
+            return res(
+                ctx.json({
+                    customer_id: 'test',
+                    access_token: 'testtoken',
+                    refresh_token: 'testrefeshtoken',
+                    usid: 'testusid'
+                })
+            )
+        }),
+
+        rest.get('*/customers/:customerId', (req, res, ctx) => {
+            return res.once(ctx.json(mockedRegisteredCustomerWithTwoAddresses))
+        }),
+
+        // mock adding guest email to basket
+        rest.put('*/baskets/:basketId/customer', (req, res, ctx) => {
+            currentBasket.customer_info.email = 'customer@test.com'
+            return res(ctx.json(currentBasket))
+        }),
+
+        // mock add shipping and billing address to basket
+        rest.put('*/shipping_address', (req, res, ctx) => {
+            const shippingBillingAddress = {
+                address1: req.body.address1,
+                city: req.body.city,
+                country_code: req.body.country_code,
+                first_name: req.body.first_name,
+                full_name: `${req.body.first_name} ${req.body.last_name}`,
+                id: req.id,
+                last_name: req.body.last_name,
+                phone: req.body.phone,
+                postal_code: req.body.postal_code,
+                state_code: req.body.state_code,
+                _type: 'order_address'
+            }
+            currentBasket.shipments[0].shipping_address = shippingBillingAddress
+            currentBasket.billing_address = shippingBillingAddress
+            return res(ctx.json(currentBasket))
+        }),
+
+        rest.post('*/customers/:customerId/addresses', (req, res, ctx) => {
+            return res(
+                ctx.json({
+                    address1: 'Tropicana Field',
+                    addressId: 'savedaddress1',
+                    city: 'Tampa',
+                    countryCode: 'US',
+                    firstName: 'Test2',
+                    fullName: 'Test2 McTester',
+                    lastName: 'McTester',
+                    phone: '(727) 555-1234',
+                    postalCode: '33712',
+                    preferred: false,
+                    stateCode: 'FL'
+                })
+            )
+        })
+    )
+
+    // Set the initial browser router path and render our component tree.
+    window.history.pushState({}, 'Checkout', '/en/checkout')
+    renderWithProviders(<WrappedCheckout history={history} />)
+
+    // Wait for checkout to load and display first step
+    const loginBtn = await screen.findByText(/log in/i)
+
+    // Provide customer email and submit
+    const emailInput = screen.getByLabelText('Email')
+    const pwInput = screen.getByLabelText('Password')
+    user.type(emailInput, 'customer@test.com')
+    user.type(pwInput, 'Password!1')
+    user.click(loginBtn)
+
+    // Wait for next step to render
+    await waitFor(() =>
+        expect(screen.getByTestId('sf-toggle-card-step-1-content')).not.toBeEmptyDOMElement()
+    )
+
+    // Add address
+    user.click(screen.getByRole('button', {name: /add new address/i}))
+    user.type(screen.getByRole('textbox', {name: /first name/i}), 'Test2')
+    user.type(screen.getByRole('textbox', {name: /last name/i}), 'McTester')
+    user.type(screen.getByRole('textbox', {name: /phone/i}), '7275551234')
+    user.selectOptions(screen.getByRole('combobox', {name: /country/i}), ['US'])
+    user.type(screen.getByRole('textbox', {name: /address/i}), 'Tropicana Field')
+    user.type(screen.getByRole('textbox', {name: /city/i}), 'Tampa')
+    user.selectOptions(screen.getByRole('combobox', {name: /state/i}), ['FL'])
+    user.type(screen.getByRole('textbox', {name: /zip code/i}), '33712')
+
+    user.click(screen.getByRole('button', {name: /save & continue to shipping method/i}))
+
+    // Wait for spinner to render and be removed
+    await waitFor(() => {
+        expect(screen.getByTestId(/loading/i)).not.toBeEmptyDOMElement()
+        waitForElementToBeRemoved(() => screen.getAllByTestId(/loading/i))
+    })
+
+    // Wait for next step to render
+    await waitFor(() => {
+        expect(screen.getByTestId('sf-toggle-card-step-2-content')).not.toBeEmptyDOMElement()
+    })
+    expect(await screen.findByText(/test2 mctester/i)).toBeInTheDocument()
 })

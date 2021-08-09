@@ -9,7 +9,7 @@ export const exampleTokenReponse = {
     expires_in: 1800,
     token_type: 'BEARER',
     usid: 'f51fd491-eba1-4582-81f9-4a014a472a20',
-    customer_id: 'ablCFpOOxbEjVN5itxrhzIMOaJ',
+    customer_id: 'customerid',
     enc_user_id: 'ce5f0dd2fc1fdb7f06e8e97011200943'
 }
 
@@ -22,7 +22,7 @@ export const exampleTokenReponseForRefresh = {
     expires_in: 1800,
     token_type: 'BEARER',
     usid: 'f51fd491-eba1-4582-81f9-4a014a472a20',
-    customer_id: 'ablCFpOOxbEjVN5itxrhzIMOaJ',
+    customer_id: 'customerid',
     enc_user_id: 'ce5f0dd2fc1fdb7f06e8e97011200943'
 }
 export const exampleRedirectUrl =
@@ -122,7 +122,7 @@ export const ocapiBasketWithItem = {
     channel_type: 'storefront',
     creation_date: '2021-04-08T19:54:00.772Z',
     currency: 'USD',
-    customer_info: {_type: 'customer_info', customer_id: 'ablCFpOOxbEjVN5itxrhzIMOaJ', email: ''},
+    customer_info: {_type: 'customer_info', customer_id: 'customerid', email: ''},
     last_modified: '2021-04-08T19:54:02.996Z',
     merchandize_total_tax: 0.75,
     notes: {
@@ -256,7 +256,7 @@ export const ocapiBasketWithPaymentInstrumentAndBillingAddress = {
     channel_type: 'storefront',
     creation_date: '2021-04-08T19:54:00.772Z',
     currency: 'USD',
-    customer_info: {_type: 'customer_info', customer_id: 'ceYG89c07x66eryK5BbAawty4a', email: ''},
+    customer_info: {_type: 'customer_info', customer_id: 'customerid', email: ''},
     last_modified: '2021-04-08T19:54:02.996Z',
     merchandize_total_tax: 0.75,
     notes: {
@@ -379,7 +379,7 @@ export const ocapiBasketWithPaymentInstrumentAndBillingAddress = {
     tax_total: null
 }
 
-export const shippingMethodsResponse = {
+export const mockShippingMethods = {
     _v: '21.3',
     _type: 'shipping_method_result',
     applicable_shipping_methods: [
@@ -428,7 +428,7 @@ export const ocapiOrderResponse = {
     creation_date: '2014-11-06T13:36Z',
     currency: 'USD',
     customer_info: {
-        customer_id: 'guestCustomerId',
+        customer_id: 'customerid',
         customer_no: 'jlebowski',
         email: 'jeff@lebowski.com'
     },
@@ -584,6 +584,76 @@ export const mockPaymentMethods = {
     ]
 }
 
+export const mockedRegisteredCustomerWithTwoAddresses = {
+    addresses: [
+        {
+            address1: '123 Main St',
+            addressId: 'savedaddress1',
+            city: 'Tampa',
+            countryCode: 'US',
+            creationDate: '2021-04-07T12:08:03.000Z',
+            firstName: 'Test',
+            fullName: 'Test McTester',
+            lastModified: '2021-04-07T12:08:03.000Z',
+            lastName: 'McTester',
+            phone: '(727) 555-1234',
+            postalCode: '33712',
+            preferred: true,
+            stateCode: 'FL'
+        },
+        {
+            address1: '123 Main St',
+            addressId: 'savedaddress2',
+            city: 'Tampa',
+            countryCode: 'US',
+            creationDate: '2021-04-07T12:08:03.000Z',
+            firstName: 'Test2',
+            fullName: 'Test2 McTester',
+            lastModified: '2021-04-07T12:08:03.000Z',
+            lastName: 'McTester',
+            phone: '(727) 555-1234',
+            postalCode: '33712',
+            preferred: true,
+            stateCode: 'FL'
+        }
+    ],
+    authType: 'registered',
+    creationDate: '2021-03-31T13:32:42.000Z',
+    customerId: 'customerid',
+    customerNo: '00149004',
+    email: 'customer@test.com',
+    enabled: true,
+    lastLoginTime: '2021-04-14T13:38:29.778Z',
+    lastModified: '2021-04-14T13:38:29.778Z',
+    firstName: 'Testing',
+    lastName: 'Tester',
+    phoneHome: '(727) 555-1234',
+    lastVisitTime: '2021-04-14T13:38:29.778Z',
+    login: 'customer@test.com',
+    paymentInstruments: [
+        {
+            creationDate: '2021-04-01T14:34:56.000Z',
+            lastModified: '2021-04-01T14:34:56.000Z',
+            paymentBankAccount: {},
+            paymentCard: {
+                cardType: 'Master Card',
+                creditCardExpired: false,
+                expirationMonth: 1,
+                expirationYear: 2022,
+                holder: 'Test McTester',
+                maskedNumber: '************5454',
+                numberLastDigits: '5454',
+                validFromMonth: 1,
+                validFromYear: 2020
+            },
+            paymentInstrumentId: 'testcard1',
+            paymentMethodId: 'CREDIT_CARD'
+        }
+    ],
+    previousLoginTime: '2021-04-14T13:38:29.778Z',
+    previousVisitTime: '2021-04-14T13:38:29.778Z'
+}
+
 export const mockedRegisteredCustomer = {
     addresses: [
         {
@@ -604,7 +674,7 @@ export const mockedRegisteredCustomer = {
     ],
     authType: 'registered',
     creationDate: '2021-03-31T13:32:42.000Z',
-    customerId: 'bcDQ0m19uOL6BtoKVzEbN4DaKx',
+    customerId: 'customerid',
     customerNo: '00149004',
     email: 'customer@test.com',
     enabled: true,
@@ -641,8 +711,8 @@ export const mockedRegisteredCustomer = {
 
 export const mockedGuestCustomer = {
     authType: 'guest',
-    customerId: 'ceL4byx7CScuk6nIqhBa0HgQGC',
-    preferredLocale: 'en_US'
+    customerId: 'customerid',
+    email: ''
 }
 
 export const productsResponse = {
@@ -1234,7 +1304,7 @@ export const mockOrderHistory = {
             creationDate: '2021-04-06T20:15:40.000Z',
             currency: 'USD',
             customerInfo: {
-                customerId: 'bcDQ0m19uOL6BtoKVzEbN4DaKx',
+                customerId: 'customerid',
                 customerName: ' testing',
                 customerNo: '00149004',
                 email: 'tester@test.com'
@@ -1386,7 +1456,7 @@ export const mockOrderHistory = {
             creationDate: '2021-04-06T19:16:15.000Z',
             currency: 'USD',
             customerInfo: {
-                customerId: 'bcDQ0m19uOL6BtoKVzEbN4DaKx',
+                customerId: 'customerid',
                 customerName: ' testing',
                 customerNo: '00149004',
                 email: 'tester@test.com'
@@ -1538,7 +1608,7 @@ export const mockOrderHistory = {
             creationDate: '2021-04-06T19:14:32.000Z',
             currency: 'USD',
             customerInfo: {
-                customerId: 'bcDQ0m19uOL6BtoKVzEbN4DaKx',
+                customerId: 'customerid',
                 customerName: ' testing',
                 customerNo: '00149004',
                 email: 'tester@test.com'

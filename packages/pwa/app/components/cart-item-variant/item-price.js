@@ -15,9 +15,9 @@ const ItemPrice = (props) => {
     const variant = useCartItemVariant()
     const basket = useBasket()
 
-    const {price, basePrice, priceAfterItemDiscount, priceAfterOrderDiscount} = variant
+    const {price, basePrice, priceAfterItemDiscount} = variant
 
-    const displayPrice = Math.min(price, priceAfterItemDiscount, priceAfterOrderDiscount)
+    const displayPrice = Math.min(price, priceAfterItemDiscount)
 
     return (
         <Box textAlign="right" {...props}>

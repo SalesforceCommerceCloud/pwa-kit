@@ -1,11 +1,47 @@
-import React, {useRef} from 'react'
+import React, {useRef, useState} from 'react'
 import PropTypes from 'prop-types'
 import {useIntl} from 'react-intl'
-import {useMultiStyleConfig, Box, Flex, IconButton, Badge} from '@chakra-ui/react'
+import {
+    useMultiStyleConfig,
+    Box,
+    Flex,
+    IconButton,
+    Badge,
+    Button,
+    Popover,
+    PopoverHeader,
+    PopoverTrigger,
+    PopoverContent,
+    PopoverBody,
+    PopoverFooter,
+    PopoverArrow,
+    Stack,
+    Text,
+    Divider,
+    useDisclosure,
+    useMediaQuery
+} from '@chakra-ui/react'
+
 import useBasket from '../../commerce-api/hooks/useBasket'
+import useCustomer from '../../commerce-api/hooks/useCustomer'
+
+import Link from '../link'
 import SearchInput from '../search-input'
-import {AccountIcon, BrandLogo, BasketIcon, HamburgerIcon} from '../icons'
+import {
+    AccountIcon,
+    BrandLogo,
+    BasketIcon,
+    HamburgerIcon,
+    ChevronDownIcon,
+    SignoutIcon
+} from '../icons'
+
 import {noop} from '../../utils/utils'
+import {navLinks, messages} from '../../pages/account/constant'
+import useNavigation from '../../hooks/use-navigation'
+import LoadingSpinner from '../loading-spinner'
+
+const ENTER_KEY = 'Enter'
 
 /**
  * The header is the main source for accessing
@@ -39,14 +75,44 @@ const Header = ({
 }) => {
     const intl = useIntl()
     const basket = useBasket()
-    const styles = useMultiStyleConfig('Header')
+    const customer = useCustomer()
+    const navigate = useNavigation()
 
+    const {isOpen, onClose, onOpen} = useDisclosure()
+    const [isDesktop] = useMediaQuery('(min-width: 992px)')
+
+    const [showLoading, setShowLoading] = useState(false)
+    // tracking if users enter the popover Content,
+    // so we can decide whether to close the menu when users leave account icons
+    const hasEnterPopoverContent = useRef()
+
+    const styles = useMultiStyleConfig('Header')
     searchInputRef = searchInputRef || useRef()
+
+    const onSignoutClick = async () => {
+        setShowLoading(true)
+        await customer.logout()
+        navigate('/login')
+        setShowLoading(false)
+    }
+
+    const keyMap = {
+        Escape: () => onClose(),
+        Enter: () => onOpen()
+    }
+
+    const handleIconsMouseLeave = () => {
+        // don't close the menu if users enter the popover content
+        setTimeout(() => {
+            if (!hasEnterPopoverContent.current) onClose()
+        }, 100)
+    }
 
     return (
         <Box {...styles.container} {...props}>
             <Box {...styles.content}>
-                <Flex wrap="wrap" alignItems="start">
+                {showLoading && <LoadingSpinner wrapperStyles={{height: '100vh'}} />}
+                <Flex wrap="wrap" alignItems={['baseline', 'baseline', 'baseline', 'center']}>
                     <IconButton
                         aria-label={intl.formatMessage({
                             id: 'header.button.assistive_msg.menu',
@@ -82,16 +148,93 @@ const Header = ({
                             />
                         </form>
                     </Box>
-                    <IconButton
+                    <AccountIcon
+                        {...styles.accountIcon}
+                        tabIndex={0}
+                        onMouseOver={isDesktop ? onOpen : noop}
+                        onKeyDown={(e) => {
+                            e.key === ENTER_KEY ? onMyAccountClick() : noop
+                        }}
+                        onClick={onMyAccountClick}
                         aria-label={intl.formatMessage({
                             id: 'header.button.assistive_msg.my_account',
                             defaultMessage: 'My account'
                         })}
-                        icon={<AccountIcon />}
-                        variant="unstyled"
-                        {...styles.icons}
-                        onClick={onMyAccountClick}
                     />
+
+                    {customer?.authType === 'registered' && (
+                        <Popover
+                            arrowSize={15}
+                            isOpen={isOpen}
+                            placement="bottom-end"
+                            onClose={onClose}
+                            onOpen={onOpen}
+                        >
+                            <PopoverTrigger>
+                                <ChevronDownIcon
+                                    onMouseLeave={handleIconsMouseLeave}
+                                    onKeyDown={(e) => {
+                                        keyMap[e.key]?.(e)
+                                    }}
+                                    {...styles.arrowDown}
+                                    onMouseOver={onOpen}
+                                    tabIndex={0}
+                                />
+                            </PopoverTrigger>
+
+                            <PopoverContent
+                                {...styles.popoverContent}
+                                onMouseLeave={() => {
+                                    hasEnterPopoverContent.current = false
+                                    onClose()
+                                }}
+                                onMouseOver={() => {
+                                    hasEnterPopoverContent.current = true
+                                }}
+                            >
+                                <PopoverArrow />
+                                <PopoverHeader>
+                                    <Text>
+                                        {intl.formatMessage({
+                                            defaultMessage: 'My Account'
+                                        })}
+                                    </Text>
+                                </PopoverHeader>
+                                <PopoverBody>
+                                    <Stack spacing={0} as="nav" data-testid="account-detail-nav">
+                                        {navLinks.map((link) => {
+                                            const LinkIcon = link.icon
+                                            return (
+                                                <Button
+                                                    key={link.name}
+                                                    as={Link}
+                                                    to={`/account${link.path}`}
+                                                    useNavLink={true}
+                                                    variant="menu-link"
+                                                    leftIcon={<LinkIcon boxSize={5} />}
+                                                >
+                                                    {intl.formatMessage(messages[link.name])}
+                                                </Button>
+                                            )
+                                        })}
+                                    </Stack>
+                                </PopoverBody>
+                                <PopoverFooter onClick={onSignoutClick} cursor="pointer">
+                                    <Divider colorScheme="gray" />
+                                    <Button variant="unstyled" {...styles.signout}>
+                                        <Flex>
+                                            <SignoutIcon boxSize={5} {...styles.signoutIcon} />
+                                            <Text as="span" {...styles.signoutText}>
+                                                {intl.formatMessage({
+                                                    defaultMessage: 'Log out'
+                                                })}
+                                            </Text>
+                                        </Flex>
+                                    </Button>
+                                </PopoverFooter>
+                            </PopoverContent>
+                        </Popover>
+                    )}
                     <IconButton
                         aria-label={intl.formatMessage({
                             id: 'header.button.assistive_msg.my_cart',

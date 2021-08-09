@@ -31,6 +31,7 @@ import '../../assets/svg/payment.svg'
 import '../../assets/svg/plus.svg'
 import '../../assets/svg/receipt.svg'
 import '../../assets/svg/search.svg'
+import '../../assets/svg/signout.svg'
 import '../../assets/svg/user.svg'
 import '../../assets/svg/visibility.svg'
 import '../../assets/svg/visibility-off.svg'
@@ -118,6 +119,7 @@ export const SocialPinterestIcon = icon('social-pinterest', {
 })
 export const SocialTwitterIcon = icon('social-twitter')
 export const SocialYoutubeIcon = icon('social-youtube')
+export const SignoutIcon = icon('signout')
 export const UserIcon = icon('user')
 export const VisaIcon = icon('cc-visa', {viewBox: VisaSymbol.viewBox})
 export const VisibilityIcon = icon('visibility')

@@ -32,6 +32,7 @@ const ShippingAddressEditForm = ({
                 border: '1px solid',
                 borderColor: 'blue.600'
             })}
+            data-testid="sf-shipping-address-edit-form"
         >
             <Stack spacing={6}>
                 {hasSavedAddresses && (
@@ -135,7 +136,7 @@ const ShippingAddressSelection = ({
             })
         }
 
-        if (!matchedAddress && selectedAddress) {
+        if (!matchedAddress && selectedAddressId) {
             setIsEditingAddress(true)
         }
     }, [matchedAddress])
@@ -166,6 +167,12 @@ const ShippingAddressSelection = ({
     }
 
     const removeSavedAddress = async (addressId) => {
+        if (addressId === selectedAddressId) {
+            setSelectedAddressId(undefined)
+            setIsEditingAddress(false)
+            form.reset({addressId: ''})
+        }
+
         await customer.removeSavedAddress(addressId)
     }
 
@@ -201,7 +208,7 @@ const ShippingAddressSelection = ({
                                     spacing={4}
                                     gridAutoFlow="row dense"
                                 >
-                                    {customer.addresses?.map((address) => (
+                                    {customer.addresses?.map((address, index) => (
                                         <React.Fragment key={address.addressId}>
                                             <RadioCard value={address.addressId}>
                                                 <ActionCard
@@ -211,6 +218,7 @@ const ShippingAddressSelection = ({
                                                         removeSavedAddress(address.addressId)
                                                     }
                                                     onEdit={() => toggleAddressEdit(address)}
+                                                    data-testid={`sf-checkout-shipping-address-${index}`}
                                                 >
                                                     <AddressDisplay address={address} />
                                                 </ActionCard>
@@ -247,21 +255,34 @@ const ShippingAddressSelection = ({
                                         </React.Fragment>
                                     ))}
 
-                                    {!isEditingAddress && (
-                                        <Button
-                                            variant="outline"
-                                            border="1px dashed"
-                                            borderColor="gray.200"
-                                            color="blue.600"
-                                            height={['44px', '44px', '167px']}
-                                            rounded="base"
-                                            fontWeight="medium"
-                                            leftIcon={<PlusIcon boxSize={'15px'} />}
-                                            onClick={toggleAddressEdit}
-                                        >
-                                            <FormattedMessage defaultMessage="Add New Address" />
-                                        </Button>
-                                    )}
+                                    <Button
+                                        variant="outline"
+                                        border="1px dashed"
+                                        borderColor="gray.200"
+                                        color="blue.600"
+                                        height={['44px', '44px', '167px']}
+                                        rounded="base"
+                                        fontWeight="medium"
+                                        leftIcon={<PlusIcon boxSize={'15px'} />}
+                                        onClick={toggleAddressEdit}
+                                    >
+                                        <FormattedMessage defaultMessage="Add New Address" />
+                                        {/*Arrow up icon pointing to the new address that is being added*/}
+                                        {isEditingAddress && !selectedAddressId && (
+                                            <Box
+                                                width={3}
+                                                height={3}
+                                                borderLeft="1px solid"
+                                                borderTop="1px solid"
+                                                borderColor="blue.600"
+                                                position="absolute"
+                                                left="50%"
+                                                bottom="-23px"
+                                                background="white"
+                                                transform="rotate(45deg)"
+                                            />
+                                        )}
+                                    </Button>
                                 </SimpleGrid>
                             </RadioCardGroup>
                         )}

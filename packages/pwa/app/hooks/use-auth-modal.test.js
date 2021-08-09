@@ -55,10 +55,10 @@ jest.mock('commerce-sdk-isomorphic', () => {
                 return mockRegisteredCustomer
             }
             async getCustomer(args) {
-                if (args.parameters.customerId === 'guestCustomerId') {
+                if (args.parameters.customerId === 'customerid') {
                     return {
                         authType: 'guest',
-                        customerId: 'guestCustomerId'
+                        customerId: 'customerid'
                     }
                 }
                 return mockRegisteredCustomer
@@ -72,7 +72,7 @@ jest.mock('commerce-sdk-isomorphic', () => {
                     },
                     json: async () => ({
                         authType: 'guest',
-                        customerId: 'guestCustomerId'
+                        customerId: 'customerid'
                     })
                 }
             }
@@ -240,5 +240,5 @@ test('Allows customer to create an account', async () => {
 
     // wait for redirecting to account page
     expect(await screen.findByText(/customer@test.com/i, {}, {timeout: 30000})).toBeInTheDocument()
-    expect(await screen.findByText(/Sign out/i, {}, {timeout: 30000})).toBeInTheDocument()
+    expect(await screen.queryAllByText(/Log out/i, {}, {timeout: 30000}).length).toEqual(2)
 })

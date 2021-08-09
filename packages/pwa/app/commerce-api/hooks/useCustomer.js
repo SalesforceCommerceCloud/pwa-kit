@@ -2,6 +2,8 @@ import {useContext, useMemo} from 'react'
 import {nanoid} from 'nanoid'
 import {useCommerceAPI, CustomerContext} from '../utils'
 
+const AuthTypes = Object.freeze({GUEST: 'guest', REGISTERED: 'registered'})
+
 export default function useCustomer() {
     const api = useCommerceAPI()
     const {customer, setCustomer} = useContext(CustomerContext)
@@ -9,6 +11,13 @@ export default function useCustomer() {
     const self = useMemo(() => {
         return {
             ...customer,
+
+            /**
+             * Returns boolean value whether the customer is of type `registered` or not.
+             */
+            get isRegistered() {
+                return customer?.authType === AuthTypes.REGISTERED
+            },
 
             /** Returns the customer's saved addresses with the 'preferred' address in the first index */
             get addresses() {

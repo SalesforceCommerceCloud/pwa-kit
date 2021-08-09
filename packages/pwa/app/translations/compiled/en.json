@@ -245,6 +245,12 @@
       "value": "This email already has an account."
     }
   ],
+  "CyOkb5": [
+    {
+      "type": 0,
+      "value": "Promo Code"
+    }
+  ],
   "D+bY29": [
     {
       "type": 0,
@@ -289,6 +295,12 @@
       "value": " Left!"
     }
   ],
+  "EWw/tK": [
+    {
+      "type": 0,
+      "value": "Apply"
+    }
+  ],
   "Ev6SEF": [
     {
       "type": 0,
@@ -305,6 +317,12 @@
     {
       "type": 0,
       "value": "Remove"
+    }
+  ],
+  "GH9wCg": [
+    {
+      "type": 0,
+      "value": "Please provide a valid promo code"
     }
   ],
   "GretYf": [
@@ -357,6 +375,12 @@
     {
       "type": 0,
       "value": "Order Number"
+    }
+  ],
+  "JQ1EGX": [
+    {
+      "type": 0,
+      "value": "Promotions applied"
     }
   ],
   "JWbGSW": [
@@ -415,6 +439,12 @@
     {
       "type": 1,
       "value": "submitButtonLabel"
+    }
+  ],
+  "O8DHNx": [
+    {
+      "type": 0,
+      "value": "Check the code and try again, it may already be applied or the promo has expired"
     }
   ],
   "O95R3Z": [
@@ -519,6 +549,12 @@
     {
       "type": 0,
       "value": "Shipping"
+    }
+  ],
+  "PlBReU": [
+    {
+      "type": 0,
+      "value": "Log out"
     }
   ],
   "Pwi/Wk": [
@@ -723,16 +759,16 @@
       "value": "Sign me up for Salesforce emails (you can unsubscribe at any time)"
     }
   ],
+  "ZMphaV": [
+    {
+      "type": 0,
+      "value": "Promotion applied"
+    }
+  ],
   "Zhsl4Z": [
     {
       "type": 0,
       "value": "Back to Order History"
-    }
-  ],
-  "aHuP93": [
-    {
-      "type": 0,
-      "value": "Do you have a gift card or promo code?"
     }
   ],
   "aheQdn": [
@@ -1271,6 +1307,12 @@
       "value": "You're currently browsing in offline mode"
     }
   ],
+  "p2EAP0": [
+    {
+      "type": 0,
+      "value": "Promotion removed"
+    }
+  ],
   "pQ2F3h": [
     {
       "type": 0,
@@ -1491,16 +1533,20 @@
       "value": "Addresses"
     }
   ],
+  "xD3Bn3": [
+    {
+      "type": 0,
+      "value": "Quantity: "
+    },
+    {
+      "type": 1,
+      "value": "quantity"
+    }
+  ],
   "xHP4/6": [
     {
       "type": 0,
       "value": "Password Reset"
-    }
-  ],
-  "xXbJso": [
-    {
-      "type": 0,
-      "value": "Sign out"
     }
   ],
   "xYH2SF": [

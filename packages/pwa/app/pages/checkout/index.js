@@ -1,9 +1,8 @@
 import React, {useEffect, useState} from 'react'
 import {FormattedMessage} from 'react-intl'
-import {useHistory} from 'react-router'
 import {Alert, AlertIcon, Box, Button, Container, Grid, GridItem, Stack} from '@chakra-ui/react'
+import useNavigation from '../../hooks/use-navigation'
 import {CheckoutProvider, useCheckout} from './util/checkout-context'
-import OrderSummary from './partials/order-summary'
 import ContactInfo from './partials/contact-info'
 import ShippingAddress from './partials/shipping-address'
 import ShippingOptions from './partials/shipping-options'
@@ -11,9 +10,10 @@ import useCustomer from '../../commerce-api/hooks/useCustomer'
 import useBasket from '../../commerce-api/hooks/useBasket'
 import Payment from './partials/payment'
 import CheckoutSkeleton from './partials/checkout-skeleton'
+import OrderSummary from '../../components/order-summary'
 
 const Checkout = () => {
-    const history = useHistory()
+    const navigate = useNavigation()
     const {globalError, step, placeOrder} = useCheckout()
     const [isLoading, setIsLoading] = useState(false)
 
@@ -28,14 +28,14 @@ const Checkout = () => {
         setIsLoading(true)
         try {
             await placeOrder()
-            history.push(`${history.location.pathname}/confirmation`)
+            navigate('/checkout/confirmation')
         } catch (error) {
             setIsLoading(false)
         }
     }
 
     return (
-        <Box background="gray.50">
+        <Box background="gray.50" flex="1">
             <Container
                 data-testid="sf-checkout-container"
                 maxWidth="container.xl"
@@ -75,7 +75,19 @@ const Checkout = () => {
                     </GridItem>
 
                     <GridItem py={6} px={[4, 4, 4, 0]}>
-                        <OrderSummary onPlaceOrderClick={submitOrder} isLoading={isLoading} />
+                        <OrderSummary
+                            showPromoCodeForm={false}
+                            showTaxEstimationForm={false}
+                            showCartItems={true}
+                        />
+
+                        {step === 4 && (
+                            <Box display={{base: 'none', lg: 'block'}} pt={2}>
+                                <Button w="full" onClick={submitOrder} isLoading={isLoading}>
+                                    <FormattedMessage defaultMessage="Place Order" />
+                                </Button>
+                            </Box>
+                        )}
                     </GridItem>
                 </Grid>
             </Container>

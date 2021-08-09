@@ -5,9 +5,6 @@
 import React, {useState, useEffect} from 'react'
 import PropTypes from 'prop-types'
 import {useHistory, useLocation} from 'react-router-dom'
-
-import {pages, PAGEEVENTS} from 'pwa-kit-react-sdk/dist/ssr/universal/events'
-import {PAGEVIEW, ERROR, OFFLINE} from 'pwa-kit-react-sdk/dist/analytics-integrations/types'
 import {getAssetUrl} from 'pwa-kit-react-sdk/dist/ssr/universal/utils'
 
 // Chakra
@@ -37,11 +34,8 @@ import {AuthModal, useAuthModal} from '../../hooks/use-auth-modal'
 // Others
 import {watchOnlineStatus, flatten} from '../../utils/utils'
 import {IntlProvider, getLocaleConfig} from '../../locale'
-import {getAnalyticsManager} from '../../analytics'
 
 import Seo from '../seo'
-
-const analyticsManager = getAnalyticsManager()
 
 const DEFAULT_NAV_DEPTH = 3
 const DEFAULT_ROOT_CATEGORY = 'root'
@@ -67,22 +61,9 @@ const App = (props) => {
     useShopper()
 
     useEffect(() => {
-        // Listen for events from the SDK to send analytics for.
-        pages.on(PAGEEVENTS.PAGELOAD, (evt) => {
-            analyticsManager.track(PAGEVIEW, evt)
-            analyticsManager.trackPageLoad(evt)
-        })
-        pages.on(PAGEEVENTS.ERROR, (evt) => {
-            analyticsManager.track(ERROR, evt)
-        })
-
-        // Listen for online status changes to update state and send analytics for.
+        // Listen for online status changes.
         watchOnlineStatus((isOnline) => {
             setIsOnline(isOnline)
-
-            analyticsManager.track(OFFLINE, {
-                startTime: !isOnline ? new Date().getTime() : null
-            })
         })
     }, [])
 
@@ -113,6 +94,8 @@ const App = (props) => {
         if (customer?.authType === 'registered') {
             history.push(`/${targetLocale}/account`)
         } else {
+            // if they already are at the login page, do not show login modal
+            if (new RegExp(`^/${targetLocale}/login$`).test(location.pathname)) return
             authModal.onOpen()
         }
     }

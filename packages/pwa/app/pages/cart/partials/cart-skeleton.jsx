@@ -35,7 +35,7 @@ const CartItemSkeleton = () => {
 
 const CartSkeleton = () => {
     return (
-        <Box background="gray.50" paddingBottom={{base: 20, lg: 55}}>
+        <Box background="gray.50" flex="1" paddingBottom={{base: 20, lg: 55}}>
             <Container
                 background="gray.50"
                 data-testid="sf-cart-skeleton"

@@ -1,10 +1,12 @@
 import {useContext, useMemo} from 'react'
+import useEinstein from '../../einstein/hooks/useEinstein'
 import {useCommerceAPI, BasketContext} from '../utils'
 import useCustomer from './useCustomer'
 
 export default function useBasket() {
     const api = useCommerceAPI()
     const customer = useCustomer()
+    const einstein = useEinstein()
     const {basket, setBasket: _setBasket} = useContext(BasketContext)
 
     const setBasket = (basketData) => {
@@ -25,9 +27,18 @@ export default function useBasket() {
                 return basket?.productItems?.length || 0
             },
 
-            // Items taking into account quantity of each
+            /** Items taking into account quantity of each */
             get itemAccumulatedCount() {
                 return basket?.productItems?.reduce((prev, next) => prev + next.quantity, 0) || 0
+            },
+
+            /** Sum of all order-level discounts */
+            get totalOrderDiscount() {
+                return (
+                    basket?.orderPriceAdjustments?.reduce((sum, item) => {
+                        return sum + item.price
+                    }, 0) || 0
+                )
             },
 
             /**
@@ -54,7 +65,7 @@ export default function useBasket() {
             /**
              * Add an item to the basket.
              *
-             * @param {object} item
+             * @param {array} item
              * @param {string} item.productId - The id of the product.
              * @param {number} item.quantity - The quantity of the item.
              */
@@ -67,6 +78,13 @@ export default function useBasket() {
                     throw new Error(response)
                 } else {
                     setBasket(response)
+                    const einsteinProduct = {
+                        id: item[0].productId,
+                        sku: '',
+                        price: item[0].price,
+                        quantity: item[0].quantity
+                    }
+                    einstein.sendAddToCart(einsteinProduct)
                 }
             },
 
@@ -79,7 +97,6 @@ export default function useBasket() {
                 const response = await api.shopperBaskets.removeItemFromBasket({
                     parameters: {basketId: basket.basketId, itemId: itemId}
                 })
-
                 if (response.fault) {
                     throw new Error(response)
                 } else {
@@ -163,6 +180,7 @@ export default function useBasket() {
                     body: {id},
                     parameters: {basketId: basket.basketId, shipmentId: 'me'}
                 })
+
                 setBasket(response)
             },
 
@@ -172,7 +190,6 @@ export default function useBasket() {
              * @see https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/modules/shopperbaskets.html#orderaddress
              */
             async setBillingAddress(address) {
-                address
                 const response = await api.shopperBaskets.updateBillingAddressForBasket({
                     body: address,
                     parameters: {basketId: basket.basketId, shipmentId: 'me'}
@@ -258,6 +275,39 @@ export default function useBasket() {
             },
 
             /**
+             * Apply a coupon/promo code to the current basket
+             * @param {string} code - The promo code to be applied
+             */
+            async applyPromoCode(code) {
+                const response = await api.shopperBaskets.addCouponToBasket({
+                    body: {code},
+                    parameters: {basketId: basket.basketId}
+                })
+
+                if (response.fault) {
+                    throw new Error(response)
+                }
+
+                setBasket(response)
+            },
+
+            /**
+             * Remove a coupon/promo code from the current basket
+             * @param {string} couponIemId - The item id of the appied code
+             */
+            async removePromoCode(couponItemId) {
+                const response = await api.shopperBaskets.removeCouponFromBasket({
+                    parameters: {basketId: basket.basketId, couponItemId}
+                })
+
+                if (response.fault) {
+                    throw new Error(response)
+                }
+
+                setBasket(response)
+            },
+
+            /**
              * Fetches and returns promo details for the given IDs
              * @param {Array<string>} ids - The promo ids to fetch
              * @returns {Object} - API response containing data
@@ -266,6 +316,7 @@ export default function useBasket() {
                 const response = await api.shopperPromotions.getPromotions({
                     parameters: {ids: ids.join(',')}
                 })
+
                 return response
             },
 

@@ -52,7 +52,7 @@ jest.mock('commerce-sdk-isomorphic', () => {
             async getCustomer() {
                 return {
                     authType: 'guest',
-                    customerId: 'guestCustomerId'
+                    customerId: 'customerid'
                 }
             }
 
@@ -65,7 +65,7 @@ jest.mock('commerce-sdk-isomorphic', () => {
                     },
                     json: async () => ({
                         authType: 'guest',
-                        customerId: 'guestCustomerId'
+                        customerId: 'customerid'
                     })
                 }
             }
@@ -224,7 +224,7 @@ const server = setupServer(
         res(
             ctx.delay(0),
             ctx.json({
-                customer_id: 'guestCustomerId',
+                customer_id: 'customerid',
                 access_token: 'testtoken',
                 refresh_token: 'testrefeshtoken',
                 usid: 'testusid'

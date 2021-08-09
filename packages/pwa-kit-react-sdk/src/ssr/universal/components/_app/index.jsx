@@ -13,9 +13,8 @@ import PropTypes from 'prop-types'
  * main purpose is to provide the layout for your application as well as set up any
  * global actions and data fetching via the `getProps` method. Typically this is
  * where you will set up components like your application header, footer and
- * navigation as well as analytics. The contents of this component are project
- * specific, but the rule of thumb is that anything outside of your pages will be
- * added here.
+ * navigation. The contents of this component are project specific, but the rule
+ * of thumb is that anything outside of your pages will be added here.
  */
 const App = (props) => <div id="app">{props.children}</div>
 

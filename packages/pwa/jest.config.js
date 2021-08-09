@@ -15,9 +15,9 @@ module.exports = {
         'non-pwa/**/*.{js,jsx}',
         'worker/**/*.{js,jsx}',
         'scripts/generator/*.{js,jsx}',
-        '!app/analytics/**/*.{js,jsx}',
         '!app/pages/test-container/**/*.{js,jsx}',
         '!app/utils/test-utils.js',
+        '!app/commerce-api/mocks/*js',
         '!app/main.jsx',
         '!app/loader.js',
         '!app/ssr.js',
@@ -27,10 +27,10 @@ module.exports = {
     ],
     coverageThreshold: {
         global: {
-            statements: 70,
-            branches: 50,
-            functions: 60,
-            lines: 60
+            statements: 80,
+            branches: 72,
+            functions: 79,
+            lines: 85
         }
     },
     setupFilesAfterEnv: ['./jest-setup.js'],

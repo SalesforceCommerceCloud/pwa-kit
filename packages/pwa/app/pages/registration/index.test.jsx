@@ -1,5 +1,5 @@
 import React from 'react'
-import {screen, within} from '@testing-library/react'
+import {screen, within, waitFor} from '@testing-library/react'
 import user from '@testing-library/user-event'
 import {renderWithProviders} from '../../utils/test-utils'
 import Registration from '.'
@@ -54,10 +54,10 @@ jest.mock('commerce-sdk-isomorphic', () => {
                 return mockRegisteredCustomer
             }
             async getCustomer(args) {
-                if (args.parameters.customerId === 'guestCustomerId') {
+                if (args.parameters.customerId === 'customerid') {
                     return {
                         authType: 'guest',
-                        customerId: 'guestCustomerId'
+                        customerId: 'customerid'
                     }
                 }
                 return mockRegisteredCustomer
@@ -71,7 +71,7 @@ jest.mock('commerce-sdk-isomorphic', () => {
                     },
                     json: async () => ({
                         authType: 'guest',
-                        customerId: 'guestCustomerId'
+                        customerId: 'customerid'
                     })
                 }
             }
@@ -153,5 +153,7 @@ test('Allows customer to create an account', async () => {
     user.click(withinForm.getByText(/create account/i))
 
     // wait for success state to appear
-    expect(await screen.findByText(/Sign out/i, {}, {timeout: 30000})).toBeInTheDocument()
+    await waitFor(() => {
+        expect(screen.getAllByText(/My Account/).length).toEqual(2)
+    })
 })

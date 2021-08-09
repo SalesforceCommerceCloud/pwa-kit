@@ -30,6 +30,21 @@ export default {
         localeSelector: {
             paddingTop: 1,
             paddingBottom: 1
+        },
+        signout: {
+            width: '100%',
+            paddingLeft: 8,
+            paddingTop: 2,
+            paddingBottom: 2,
+            _focus: {
+                borderRadius: 0,
+                boxShadow: 'outline'
+            }
+        },
+        signoutText: {
+            marginLeft: 2,
+            fontSize: 14,
+            fontWeight: 'normal'
         }
     },
     parts: [
@@ -39,6 +54,7 @@ export default {
         'icon',
         'localeSelector',
         'socials',
-        'socialsItem'
+        'socialsItem',
+        'signout'
     ]
 }

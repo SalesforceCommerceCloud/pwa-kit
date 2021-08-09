@@ -29,10 +29,10 @@ jest.mock('commerce-sdk-isomorphic', () => {
             }
 
             async getCustomer(args) {
-                if (args.parameters.customerId === 'guestCustomerId') {
+                if (args.parameters.customerId === 'customerid') {
                     return {
                         authType: 'guest',
-                        customerId: 'guestCustomerId'
+                        customerId: 'customerid'
                     }
                 }
                 return mockRegisteredCustomer
@@ -47,7 +47,7 @@ jest.mock('commerce-sdk-isomorphic', () => {
                     },
                     json: async () => ({
                         authType: 'guest',
-                        customerId: 'guestCustomerId'
+                        customerId: 'customerid'
                     })
                 }
             }

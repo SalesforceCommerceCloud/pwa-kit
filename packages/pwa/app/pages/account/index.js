@@ -4,7 +4,7 @@
 
 import React, {useState} from 'react'
 import PropTypes from 'prop-types'
-import {FormattedMessage, defineMessages, useIntl} from 'react-intl'
+import {FormattedMessage, useIntl} from 'react-intl'
 import {Route, Switch, useRouteMatch, Redirect} from 'react-router'
 import {
     Accordion,
@@ -17,55 +17,22 @@ import {
     Grid,
     Heading,
     Stack,
-    Text
+    Text,
+    Divider
 } from '@chakra-ui/react'
 import useCustomer from '../../commerce-api/hooks/useCustomer'
 import Seo from '../../components/seo'
 import Link from '../../components/link'
-import {
-    AccountIcon,
-    ChevronDownIcon,
-    ChevronUpIcon,
-    LocationIcon,
-    PaymentIcon,
-    ReceiptIcon
-} from '../../components/icons'
+import {ChevronDownIcon, ChevronUpIcon, SignoutIcon} from '../../components/icons'
 import AccountDetail from './profile'
 import AccountAddresses from './addresses'
 import AccountOrders from './orders'
 import AccountPaymentMethods from './payments'
 import {useLocale} from '../../locale'
 import {useLocation} from 'react-router-dom'
-
-const messages = defineMessages({
-    profile: {defaultMessage: 'Account Details'},
-    addresses: {defaultMessage: 'Addresses'},
-    orders: {defaultMessage: 'Order History'},
-    payments: {defaultMessage: 'Payment Methods'}
-})
-
-const navLinks = [
-    {
-        name: 'profile',
-        path: '',
-        icon: AccountIcon
-    },
-    {
-        name: 'addresses',
-        path: '/addresses',
-        icon: LocationIcon
-    },
-    {
-        name: 'orders',
-        path: '/orders',
-        icon: ReceiptIcon
-    },
-    {
-        name: 'payments',
-        path: '/payments',
-        icon: PaymentIcon
-    }
-]
+import {messages, navLinks} from './constant'
+import useNavigation from '../../hooks/use-navigation'
+import LoadingSpinner from '../../components/loading-spinner'
 
 const Account = () => {
     const {path, url} = useRouteMatch()
@@ -73,7 +40,44 @@ const Account = () => {
     const customer = useCustomer()
     const [locale] = useLocale()
     const location = useLocation()
+    const navigate = useNavigation()
+
     const [mobileNavIndex, setMobileNavIndex] = useState(-1)
+    const [showLoading, setShowLoading] = useState(false)
+
+    const onSignoutClick = async () => {
+        setShowLoading(true)
+        await customer.logout()
+        navigate('/login')
+        setShowLoading(false)
+    }
+
+    const LogoutButton = () => (
+        <>
+            <Divider colorScheme={'gray'} marginTop={3} />
+            <Button
+                fontWeight="500"
+                onClick={onSignoutClick}
+                padding={4}
+                py={0}
+                variant="unstyled"
+                _hover={{background: 'gray.50'}}
+                marginTop={1}
+                borderRadius="4px"
+                cursor={'pointer'}
+                height={11}
+            >
+                <Flex justify={{base: 'center', lg: 'flex-start'}}>
+                    <SignoutIcon boxSize={5} mr={2} />
+                    <Text as="span" fontSize={['md', 'md', 'md', 'sm']} fontWeight="normal">
+                        {formatMessage({
+                            defaultMessage: 'Log out'
+                        })}
+                    </Text>
+                </Flex>
+            </Button>
+        </>
+    )
 
     // If we have customer data and they are not registered, push to login page
     // Using Redirect allows us to store the directed page to location
@@ -87,105 +91,108 @@ const Account = () => {
     }
 
     return (
-        <Box data-testid="account-page" layerStyle="page" paddingTop={[4, 4, 12, 12, 16]}>
+        <Box
+            data-testid={customer.isRegistered ? 'account-page' : 'account-page-skeleton'}
+            layerStyle="page"
+            paddingTop={[4, 4, 12, 12, 16]}
+        >
             <Seo title="My Account" description="Customer Account Page" />
+            <Grid templateColumns={{base: '1fr', lg: '320px 1fr'}} gap={{base: 10, lg: 24}}>
+                {/* small screen nav accordion */}
+                <Accordion
+                    display={{base: 'block', lg: 'none'}}
+                    allowToggle={true}
+                    reduceMotion={true}
+                    index={mobileNavIndex}
+                    onChange={setMobileNavIndex}
+                >
+                    <AccordionItem border="none" background="gray.50" borderRadius="base">
+                        {({isExpanded}) => (
+                            <>
+                                <AccordionButton
+                                    as={Button}
+                                    height={16}
+                                    variant="ghost"
+                                    color="black"
+                                    _active={{background: 'gray.100'}}
+                                    _expanded={{background: 'transparent'}}
+                                >
+                                    <Flex align="center" justify="center">
+                                        <Text as="span" mr={2}>
+                                            <FormattedMessage defaultMessage="My Account" />
+                                        </Text>
+                                        {isExpanded ? <ChevronUpIcon /> : <ChevronDownIcon />}
+                                    </Flex>
+                                </AccordionButton>
+                                <AccordionPanel px={4} paddingBottom={4}>
+                                    <Flex as="nav" spacing={0} direction="column">
+                                        {navLinks.map((link) => (
+                                            <Button
+                                                key={link.name}
+                                                as={Link}
+                                                to={`${url}${link.path}`}
+                                                useNavLink={true}
+                                                variant="menu-link-mobile"
+                                                justifyContent="center"
+                                                fontSize="md"
+                                                fontWeight="normal"
+                                                onClick={() => setMobileNavIndex(-1)}
+                                            >
+                                                {formatMessage(messages[link.name])}
+                                            </Button>
+                                        ))}
 
-            {/* TODO: Render loading skeleton while waiting for customer data */}
-            {!customer?.authType && <Text>Loading...</Text>}
+                                        <LogoutButton justify="center" />
+                                    </Flex>
+                                </AccordionPanel>
+                            </>
+                        )}
+                    </AccordionItem>
+                </Accordion>
 
-            {customer.authType === 'registered' && (
-                <Grid templateColumns={{base: '1fr', lg: '320px 1fr'}} gap={{base: 10, lg: 24}}>
-                    {/* small screen nav accordion */}
-                    <Accordion
-                        display={{base: 'block', lg: 'none'}}
-                        allowToggle={true}
-                        reduceMotion={true}
-                        index={mobileNavIndex}
-                        onChange={setMobileNavIndex}
-                    >
-                        <AccordionItem border="none" background="gray.50" borderRadius="base">
-                            {({isExpanded}) => (
-                                <>
-                                    <AccordionButton
-                                        as={Button}
-                                        height={16}
-                                        variant="ghost"
-                                        color="black"
-                                        _active={{background: 'gray.100'}}
-                                        _expanded={{background: 'transparent'}}
-                                    >
-                                        <Flex align="center" justify="center">
-                                            <Text as="span" mr={2}>
-                                                <FormattedMessage defaultMessage="My Account" />
-                                            </Text>
-                                            {isExpanded ? <ChevronUpIcon /> : <ChevronDownIcon />}
-                                        </Flex>
-                                    </AccordionButton>
-                                    <AccordionPanel px={4} paddingBottom={4}>
-                                        <Stack as="nav" spacing={0}>
-                                            {navLinks.map((link) => (
-                                                <Button
-                                                    key={link.name}
-                                                    as={Link}
-                                                    to={`${url}${link.path}`}
-                                                    useNavLink={true}
-                                                    variant="menu-link-mobile"
-                                                    justifyContent="center"
-                                                    fontSize="md"
-                                                    fontWeight="normal"
-                                                    onClick={() => setMobileNavIndex(-1)}
-                                                >
-                                                    {formatMessage(messages[link.name])}
-                                                </Button>
-                                            ))}
-                                        </Stack>
-                                    </AccordionPanel>
-                                </>
-                            )}
-                        </AccordionItem>
-                    </Accordion>
+                {/* large screen nav sidebar */}
+                <Stack display={{base: 'none', lg: 'flex'}} spacing={4}>
+                    {showLoading && <LoadingSpinner wrapperStyles={{height: '100vh'}} />}
 
-                    {/* large screen nav sidebar */}
-                    <Stack display={{base: 'none', lg: 'flex'}} spacing={4}>
-                        <Heading as="h6" fontSize="18px">
-                            <FormattedMessage defaultMessage="My Account" />
-                        </Heading>
+                    <Heading as="h6" fontSize="18px">
+                        <FormattedMessage defaultMessage="My Account" />
+                    </Heading>
 
-                        <Stack spacing={0} as="nav" data-testid="account-detail-nav">
-                            {navLinks.map((link) => {
-                                const LinkIcon = link.icon
-                                return (
-                                    <Button
-                                        key={link.name}
-                                        as={Link}
-                                        to={`${url}${link.path}`}
-                                        useNavLink={true}
-                                        variant="menu-link"
-                                        leftIcon={<LinkIcon boxSize={5} />}
-                                    >
-                                        {formatMessage(messages[link.name])}
-                                    </Button>
-                                )
-                            })}
-                        </Stack>
-                    </Stack>
+                    <Flex spacing={0} as="nav" data-testid="account-detail-nav" direction="column">
+                        {navLinks.map((link) => {
+                            const LinkIcon = link.icon
+                            return (
+                                <Button
+                                    key={link.name}
+                                    as={Link}
+                                    to={`${url}${link.path}`}
+                                    useNavLink={true}
+                                    variant="menu-link"
+                                    leftIcon={<LinkIcon boxSize={5} />}
+                                >
+                                    {formatMessage(messages[link.name])}
+                                </Button>
+                            )
+                        })}
+                        <LogoutButton />
+                    </Flex>
+                </Stack>
 
-                    <Switch>
-                        <Route exact path={path}>
-                            <AccountDetail />
-                        </Route>
-                        <Route exact path={`${path}/addresses`}>
-                            <AccountAddresses />
-                        </Route>
-                        <Route path={`${path}/orders`}>
-                            <AccountOrders />
-                        </Route>
-                        <Route exact path={`${path}/payments`}>
-                            <AccountPaymentMethods />
-                        </Route>
-                    </Switch>
-                </Grid>
-            )}
+                <Switch>
+                    <Route exact path={path}>
+                        <AccountDetail />
+                    </Route>
+                    <Route exact path={`${path}/addresses`}>
+                        <AccountAddresses />
+                    </Route>
+                    <Route path={`${path}/orders`}>
+                        <AccountOrders />
+                    </Route>
+                    <Route exact path={`${path}/payments`}>
+                        <AccountPaymentMethods />
+                    </Route>
+                </Switch>
+            </Grid>
         </Box>
     )
 }

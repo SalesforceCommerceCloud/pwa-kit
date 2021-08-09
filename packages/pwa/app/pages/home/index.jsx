@@ -30,9 +30,10 @@ const Home = (props) => {
     const intl = useIntl()
     const {productSearchResult} = props
     const basket = useBasket()
-    const handleAddToCart = async (itemId) => {
+    const handleAddToCart = async (itemId, price) => {
         const item = {
             productId: itemId,
+            price: price,
             quantity: 1
         }
         if (basket.basketId) {
@@ -125,7 +126,9 @@ const Home = (props) => {
                                             if (product?.productType?.master) {
                                                 productId = product.representedProduct.id
                                             }
-                                            handleAddToCart(productId)
+                                            const price = product.price
+
+                                            handleAddToCart(productId, price)
                                         }}
                                     >
                                         <FormattedMessage defaultMessage="Add to cart" />

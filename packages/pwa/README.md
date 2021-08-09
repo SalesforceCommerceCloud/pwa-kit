@@ -162,7 +162,6 @@ __mocks__/                                  Mocking objects for unit testing wit
     │   ├── foundations/                    Frequently used theme values like colors, spacing, etc.
     │   └── index.js
     ├── translations/                       Localization
-    ├── analytics.js                        Analytics integrations for services like Google Analytics.
     ├── commerce-api.config.js              Authentication and proxying settings for Commerce API
     ├── locale.js                           Locale settings for internationalization with react-intl
     ├── main.jsx                            Client-side rendering entry point

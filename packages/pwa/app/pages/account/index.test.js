@@ -47,26 +47,21 @@ const server = setupServer(
         res(ctx.delay(0), ctx.json(mockOrderHistory))
     ),
     rest.get('*/products', (req, res, ctx) => res(ctx.delay(0), ctx.json(mockOrderProducts))),
-
     rest.post('*/oauth2/authorize', (req, res, ctx) =>
         res(ctx.delay(0), ctx.status(303), ctx.set('location', `/testcallback`))
     ),
-
     rest.get('*/oauth2/authorize', (req, res, ctx) =>
         res(ctx.delay(0), ctx.status(303), ctx.set('location', `/testcallback`))
     ),
-
     rest.get('*/testcallback', (req, res, ctx) => {
         return res(ctx.delay(0), ctx.status(200))
     }),
-
     rest.post('*/oauth2/login', (req, res, ctx) =>
         res(ctx.delay(0), ctx.status(200), ctx.json(mockedRegisteredCustomer))
     ),
-    rest.get('*/customers/:customerId', (req, res, ctx) => {
-        return res(ctx.delay(0), ctx.status(200), ctx.json(mockedRegisteredCustomer))
-    }),
-
+    rest.get('*/customers/:customerId', (req, res, ctx) =>
+        res(ctx.delay(0), ctx.status(200), ctx.json(mockedRegisteredCustomer))
+    ),
     rest.post('*/oauth2/token', (req, res, ctx) =>
         res(
             ctx.delay(0),
@@ -115,7 +110,7 @@ test('Redirects to login page if the customer is not logged in', async () => {
 
 test('Provides navigation for subpages', async () => {
     renderWithProviders(<MockedComponent />)
-    expect(await screen.findByTestId('account-detail-page')).toBeInTheDocument()
+    expect(await screen.findByTestId('account-page')).toBeInTheDocument()
 
     const nav = within(screen.getByTestId('account-detail-nav'))
     user.click(nav.getByText('Addresses'))
@@ -128,6 +123,7 @@ test('Provides navigation for subpages', async () => {
 
 test('Renders account detail page by default for logged-in customer', async () => {
     renderWithProviders(<MockedComponent />)
+    expect(await screen.findByTestId('account-page')).toBeInTheDocument()
     expect(await screen.findByTestId('account-detail-page')).toBeInTheDocument()
     expect(screen.getByText('Testing Tester')).toBeInTheDocument()
     expect(screen.getByText('customer@test.com')).toBeInTheDocument()
@@ -155,6 +151,7 @@ test('Allows customer to edit profile details', async () => {
     )
 
     renderWithProviders(<MockedComponent />)
+    expect(await screen.findByTestId('account-page')).toBeInTheDocument()
     expect(await screen.findByTestId('account-detail-page')).toBeInTheDocument()
 
     const el = within(screen.getByTestId('sf-toggle-card-my-profile'))
@@ -168,6 +165,7 @@ test('Allows customer to update password', async () => {
     server.use(rest.put('*/password', (req, res, ctx) => res(ctx.json())))
 
     renderWithProviders(<MockedComponent />)
+    expect(await screen.findByTestId('account-page')).toBeInTheDocument()
     expect(await screen.findByTestId('account-detail-page')).toBeInTheDocument()
 
     const el = within(screen.getByTestId('sf-toggle-card-password'))

@@ -6,7 +6,7 @@ import Link from '../../../components/link'
 
 const EmptyCart = () => {
     return (
-        <Box data-testid="sf-cart-empty" minWidth="100%" width="full" background="gray.50">
+        <Box data-testid="sf-cart-empty" flex="1" minWidth="100%" width="full" background="gray.50">
             <Center>
                 <Stack spacing={6} width={['343px', '444px']} marginTop="20%" marginBottom="20%">
                     <Box align="center">

@@ -162,12 +162,8 @@ ListMenuContent.propTypes = {
 }
 
 const ListMenuPopover = ({items, item, name, itemsKey, maxColumns}) => {
-    const theme = useTheme()
-    const {baseStyle} = theme.components.ListMenu
-
     const initialFocusRef = useRef()
     const {isOpen, onClose, onOpen} = useDisclosure()
-
     return (
         <Box onMouseLeave={onClose}>
             <Popover
@@ -176,7 +172,7 @@ const ListMenuPopover = ({items, item, name, itemsKey, maxColumns}) => {
                 onOpen={onOpen}
                 onClose={onClose}
                 isOpen={isOpen}
-                {...baseStyle.popover}
+                variant="fullWidth"
             >
                 <Fragment>
                     <ListMenuTrigger

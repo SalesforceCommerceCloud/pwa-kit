@@ -5,17 +5,20 @@
 import React, {useState} from 'react'
 import {FormattedMessage, useIntl} from 'react-intl'
 import {
-    Box,
-    Stack,
-    Heading,
-    Container,
-    SimpleGrid,
     Alert,
     AlertIcon,
     Badge,
+    Box,
+    Button,
+    Container,
+    Heading,
+    SimpleGrid,
+    Skeleton,
+    Stack,
     Text,
-    useToast,
-    Button
+
+    // Hooks
+    useToast
 } from '@chakra-ui/react'
 import useCustomer from '../../commerce-api/hooks/useCustomer'
 import FormActionButtons from '../../components/forms/form-action-buttons'
@@ -27,9 +30,17 @@ import AddressFields from '../../components/forms/address-fields'
 import AddressDisplay from '../../components/address-display'
 import PageActionPlaceHolder from '../../components/page-action-placeholder'
 
+const DEFAULT_SKELETON_COUNT = 3
+
 const AccountAddresses = () => {
     const {formatMessage} = useIntl()
-    const {addresses, addSavedAddress, updateSavedAddress, removeSavedAddress} = useCustomer()
+    const {
+        isRegistered,
+        addresses,
+        addSavedAddress,
+        updateSavedAddress,
+        removeSavedAddress
+    } = useCustomer()
     const [isEditing, setIsEditing] = useState(false)
     const [selectedAddressId, setSelectedAddressId] = useState(false)
     const toast = useToast()
@@ -83,6 +94,24 @@ const AccountAddresses = () => {
             <Heading as="h1" fontSize="2xl">
                 <FormattedMessage defaultMessage="Addresses" />
             </Heading>
+
+            {!isRegistered && (
+                <SimpleGrid columns={[1, 2, 2, 2, 3]} spacing={4}>
+                    {new Array(DEFAULT_SKELETON_COUNT).fill().map((_, index) => {
+                        return (
+                            <ActionCard key={index}>
+                                <Stack spacing={2} marginBottom={7}>
+                                    <Skeleton height="23px" width="120px" />
+
+                                    <Skeleton height="23px" width="84px" />
+
+                                    <Skeleton height="23px" width="104px" />
+                                </Stack>
+                            </ActionCard>
+                        )
+                    })}
+                </SimpleGrid>
+            )}
 
             {isEditing && (
                 <Box
@@ -165,7 +194,7 @@ const AccountAddresses = () => {
                 </SimpleGrid>
             )}
 
-            {!hasAddresses && !isEditing && (
+            {!hasAddresses && !isEditing && isRegistered && (
                 <PageActionPlaceHolder
                     icon={<LocationIcon boxSize={8} />}
                     heading={formatMessage({defaultMessage: 'No Saved Addresses'})}

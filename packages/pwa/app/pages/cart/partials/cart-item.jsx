@@ -23,7 +23,7 @@ import CartItemVariantName from '../../../components/cart-item-variant/item-name
 import CartItemVariantAttributes from '../../../components/cart-item-variant/item-attributes'
 import CartItemVariantPrice from '../../../components/cart-item-variant/item-price'
 
-const CartItem = ({product}) => {
+const CartItem = ({product, index}) => {
     const basket = useBasket()
     const [showError, setShowError] = useState(false)
     const [showLoading, setShowLoading] = useState(false)
@@ -63,7 +63,7 @@ const CartItem = ({product}) => {
     }
 
     return (
-        <Box data-testid="sf-cart-item" position="relative">
+        <Box position="relative" data-testid={`sf-cart-item-${index}`}>
             <CartItemVariant variant={product}>
                 {showLoading && (
                     <Box
@@ -115,33 +115,36 @@ const CartItem = ({product}) => {
                     <Flex width="full" alignItems="flex-start" backgroundColor="white">
                         <CartItemVariantImage width={['88px', '136px']} mr={4} />
 
-                        <Stack spacing={2} flex={1}>
+                        <Stack spacing={3} flex={1}>
                             <Stack spacing={1}>
                                 <CartItemVariantName />
                                 <CartItemVariantAttributes />
                             </Stack>
 
-                            <Text lineHeight={1} color="gray.700" fontSize="sm" paddingTop={2}>
-                                <FormattedMessage defaultMessage="Quantity:" />
-                            </Text>
-
                             <Flex align="flex-end" justify="space-between">
-                                <Select
-                                    onChange={(e) => changeItemQuantity(e.target.value, product)}
-                                    value={product.quantity}
-                                    width={['90px']}
-                                >
-                                    <option value="0">0 / Remove</option>
-                                    <option value="1">1</option>
-                                    <option value="2">2</option>
-                                    <option value="3">3</option>
-                                    <option value="4">4</option>
-                                    <option value="5">5</option>
-                                    <option value="6">6</option>
-                                    <option value="7">7</option>
-                                    <option value="8">8</option>
-                                    <option value="9">9</option>
-                                </Select>
+                                <Stack spacing={1}>
+                                    <Text fontSize="sm" color="gray.700">
+                                        <FormattedMessage defaultMessage="Quantity:" />
+                                    </Text>
+                                    <Select
+                                        onChange={(e) =>
+                                            changeItemQuantity(e.target.value, product)
+                                        }
+                                        value={product.quantity}
+                                        width="75px"
+                                    >
+                                        <option value="0">0 / Remove</option>
+                                        <option value="1">1</option>
+                                        <option value="2">2</option>
+                                        <option value="3">3</option>
+                                        <option value="4">4</option>
+                                        <option value="5">5</option>
+                                        <option value="6">6</option>
+                                        <option value="7">7</option>
+                                        <option value="8">8</option>
+                                        <option value="9">9</option>
+                                    </Select>
+                                </Stack>
 
                                 <CartItemVariantPrice />
                             </Flex>
@@ -181,7 +184,8 @@ const CartItem = ({product}) => {
 }
 
 CartItem.propTypes = {
-    product: PropTypes.object
+    product: PropTypes.object,
+    index: PropTypes.number
 }
 
 export default CartItem

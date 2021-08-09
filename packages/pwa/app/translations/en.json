@@ -113,6 +113,9 @@
   "BlJFo9": {
     "defaultMessage": "This email already has an account."
   },
+  "CyOkb5": {
+    "defaultMessage": "Promo Code"
+  },
   "D+bY29": {
     "defaultMessage": "Shipping Method"
   },
@@ -132,6 +135,9 @@
   "EOUB63": {
     "defaultMessage": "Only {stockLevel} Left!"
   },
+  "EWw/tK": {
+    "defaultMessage": "Apply"
+  },
   "Ev6SEF": {
     "defaultMessage": "New Password"
   },
@@ -140,6 +146,9 @@
   },
   "G/yZLu": {
     "defaultMessage": "Remove"
+  },
+  "GH9wCg": {
+    "defaultMessage": "Please provide a valid promo code"
   },
   "GretYf": {
     "defaultMessage": "Current Password"
@@ -165,6 +174,9 @@
   },
   "JAcwxt": {
     "defaultMessage": "Order Number"
+  },
+  "JQ1EGX": {
+    "defaultMessage": "Promotions applied"
   },
   "JWbGSW": {
     "defaultMessage": "Shipped to: {name}"
@@ -192,6 +204,9 @@
   },
   "O3zHDW": {
     "defaultMessage": "{submitButtonLabel}"
+  },
+  "O8DHNx": {
+    "defaultMessage": "Check the code and try again, it may already be applied or the promo has expired"
   },
   "O95R3Z": {
     "defaultMessage": "Phone"
@@ -229,6 +244,9 @@
   },
   "PRlD0A": {
     "defaultMessage": "Shipping"
+  },
+  "PlBReU": {
+    "defaultMessage": "Log out"
   },
   "Pwi/Wk": {
     "defaultMessage": "New In"
@@ -326,11 +344,11 @@
   "ZJkXve": {
     "defaultMessage": "Sign me up for Salesforce emails (you can unsubscribe at any time)"
   },
+  "ZMphaV": {
+    "defaultMessage": "Promotion applied"
+  },
   "Zhsl4Z": {
     "defaultMessage": "Back to Order History"
-  },
-  "aHuP93": {
-    "defaultMessage": "Do you have a gift card or promo code?"
   },
   "aheQdn": {
     "defaultMessage": "Last Name"
@@ -575,6 +593,9 @@
   "offline_banner.message": {
     "defaultMessage": "You're currently browsing in offline mode"
   },
+  "p2EAP0": {
+    "defaultMessage": "Promotion removed"
+  },
   "pQ2F3h": {
     "defaultMessage": "Edit Shipping Address"
   },
@@ -657,11 +678,11 @@
   "xBrtnx": {
     "defaultMessage": "Addresses"
   },
+  "xD3Bn3": {
+    "defaultMessage": "Quantity: {quantity}"
+  },
   "xHP4/6": {
     "defaultMessage": "Password Reset"
-  },
-  "xXbJso": {
-    "defaultMessage": "Sign out"
   },
   "xYH2SF": {
     "defaultMessage": "No Saved Addresses"

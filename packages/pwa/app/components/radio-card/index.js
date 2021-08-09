@@ -11,12 +11,12 @@ export const RadioCard = (props) => {
 
     const input = getInputProps()
     const checkbox = getCheckboxProps()
-
     return (
         <Box as="label">
             <input {...input} />
             <Box
                 {...checkbox}
+                aria-hidden={false}
                 position="relative"
                 cursor="pointer"
                 border="1px solid"

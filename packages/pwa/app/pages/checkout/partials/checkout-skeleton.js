@@ -3,7 +3,7 @@ import {Box, Container, Grid, GridItem, Skeleton, Stack} from '@chakra-ui/react'
 
 const CheckoutSkeleton = () => {
     return (
-        <Box background="gray.50">
+        <Box background="gray.50" flex="1">
             <Container
                 data-testid="sf-checkout-skeleton"
                 maxWidth="container.xl"

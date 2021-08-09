@@ -5,7 +5,6 @@
 import React, {useState} from 'react'
 import PropTypes from 'prop-types'
 import {useIntl} from 'react-intl'
-import {Link as RouteLink} from 'react-router-dom'
 
 // Project Components
 import LocaleSelector from '../locale-selector'
@@ -17,6 +16,7 @@ import {
     Box,
     AccordionButton,
     AccordionItem,
+    Button,
     Center,
     Divider,
     Drawer,
@@ -29,7 +29,7 @@ import {
     Fade,
     HStack,
     IconButton,
-    Link,
+    Flex,
     Spinner,
     Text,
     VStack,
@@ -38,13 +38,17 @@ import {
     useBreakpointValue,
     useMultiStyleConfig
 } from '@chakra-ui/react'
-
+import Link from '../../components/link'
 // Icons
-import {BrandLogo, LocationIcon, UserIcon} from '../../components/icons'
+import {BrandLogo, LocationIcon, SignoutIcon, UserIcon} from '../icons'
 
 // Others
 import {noop} from '../../utils/utils'
 import {categoryUrlBuilder} from '../../utils/url'
+import useCustomer from '../../commerce-api/hooks/useCustomer'
+import LoadingSpinner from '../loading-spinner'
+
+import useNavigation from '../../hooks/use-navigation'
 
 // The FONT_SIZES and FONT_WEIGHTS constants are used to control the styling for
 // the accordion buttons as their current depth. In the below definition we assign
@@ -54,7 +58,7 @@ const FONT_WEIGHTS = ['semibold', 'semibold', 'regular']
 const PHONE_DRAWER_SIZE = 'xs'
 const TABLET_DRAWER_SIZE = 'lg'
 
-const DrawerSeperator = () => (
+const DrawerSeparator = () => (
     <Box paddingTop="6" paddingBottom="6">
         <Divider />
     </Box>
@@ -85,11 +89,19 @@ const SUPPORTED_LOCALES = [
  */
 const DrawerMenu = ({isOpen, onClose = noop, onLogoClick = noop, root}) => {
     const intl = useIntl()
+    const customer = useCustomer()
+    const navigate = useNavigation()
     const styles = useMultiStyleConfig('DrawerMenu')
     const drawerSize = useBreakpointValue({sm: PHONE_DRAWER_SIZE, md: TABLET_DRAWER_SIZE})
     const socialIconVariant = useBreakpointValue({base: 'flex', md: 'flex-start'})
     const [selectedLocale, setSelectedLocale] = useState('en-US')
-
+    const [showLoading, setShowLoading] = useState(false)
+    const onSignoutClick = async () => {
+        setShowLoading(true)
+        await customer.logout()
+        navigate('/login')
+        setShowLoading(false)
+    }
     return (
         <Drawer isOpen={isOpen} onClose={onClose} placement="left" size={drawerSize}>
             <DrawerOverlay>
@@ -107,6 +119,8 @@ const DrawerMenu = ({isOpen, onClose = noop, onLogoClick = noop, root}) => {
 
                     {/* Main Content */}
                     <DrawerBody>
+                        {showLoading && <LoadingSpinner />}
+
                         {/* Category Navigation */}
                         {root ? (
                             <Fade in={true}>
@@ -123,7 +137,7 @@ const DrawerMenu = ({isOpen, onClose = noop, onLogoClick = noop, root}) => {
                                                 <AccordionItem border="none" key="show-all">
                                                     <AccordionButton
                                                         paddingLeft={8}
-                                                        as={RouteLink}
+                                                        as={Link}
                                                         to={categoryUrlBuilder(item)}
                                                         fontSize={FONT_SIZES[depth]}
                                                         fontWeight={FONT_WEIGHTS[depth]}
@@ -150,25 +164,92 @@ const DrawerMenu = ({isOpen, onClose = noop, onLogoClick = noop, root}) => {
                             </Center>
                         )}
 
-                        <DrawerSeperator />
+                        <DrawerSeparator />
 
                         {/* Application Actions */}
-                        <VStack align="stretch" spacing={0} {...styles.actions}>
+                        <VStack align="stretch" spacing={0} {...styles.actions} px={0}>
                             <Box {...styles.actionsItem}>
-                                <Link as={RouteLink} to={SIGN_IN_HREF}>
-                                    <HStack>
-                                        <UserIcon {...styles.icon} />{' '}
-                                        <Text>
-                                            {intl.formatMessage({
-                                                id: 'mobile_navigation.actions.sign_in',
-                                                defaultMessage: 'Sign In'
-                                            })}
-                                        </Text>
-                                    </HStack>
-                                </Link>
+                                {customer?.authType === 'registered' ? (
+                                    <NestedAccordion
+                                        urlBuilder={(item, locale) =>
+                                            `/${locale}/account${item.path}`
+                                        }
+                                        itemsAfter={({depth}) =>
+                                            depth === 1 && (
+                                                <Button
+                                                    {...styles.signout}
+                                                    variant="unstyled"
+                                                    onClick={onSignoutClick}
+                                                >
+                                                    <Flex align={'center'}>
+                                                        <SignoutIcon boxSize={5} />
+                                                        <Text {...styles.signoutText} as="span">
+                                                            {intl.formatMessage({
+                                                                defaultMessage: 'Log out'
+                                                            })}
+                                                        </Text>
+                                                    </Flex>
+                                                </Button>
+                                            )
+                                        }
+                                        item={{
+                                            id: 'root',
+                                            items: [
+                                                {
+                                                    id: 'my-account',
+                                                    name: intl.formatMessage({
+                                                        defaultMessage: 'My Account'
+                                                    }),
+                                                    items: [
+                                                        {
+                                                            id: 'profile',
+                                                            path: '',
+                                                            name: intl.formatMessage({
+                                                                defaultMessage: 'Account Details'
+                                                            })
+                                                        },
+                                                        {
+                                                            id: 'orders',
+                                                            path: '/orders',
+                                                            name: intl.formatMessage({
+                                                                defaultMessage: 'Order History'
+                                                            })
+                                                        },
+                                                        {
+                                                            id: 'addresses',
+                                                            path: '/addresses',
+                                                            name: intl.formatMessage({
+                                                                defaultMessage: 'Addresses'
+                                                            })
+                                                        },
+                                                        {
+                                                            id: 'payments',
+                                                            path: '/payments',
+                                                            name: intl.formatMessage({
+                                                                defaultMessage: 'Payment Methods'
+                                                            })
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }}
+                                    />
+                                ) : (
+                                    <Link to={SIGN_IN_HREF}>
+                                        <HStack>
+                                            <UserIcon {...styles.icon} />{' '}
+                                            <Text>
+                                                {intl.formatMessage({
+                                                    id: 'mobile_navigation.actions.sign_in',
+                                                    defaultMessage: 'Sign In'
+                                                })}
+                                            </Text>
+                                        </HStack>
+                                    </Link>
+                                )}
                             </Box>
                             <Box {...styles.actionsItem}>
-                                <Link as={RouteLink} to={STORE_LOCATOR_HREF}>
+                                <Link to={STORE_LOCATOR_HREF}>
                                     <HStack>
                                         <LocationIcon {...styles.icon} />{' '}
                                         <Text>
@@ -187,14 +268,14 @@ const DrawerMenu = ({isOpen, onClose = noop, onLogoClick = noop, root}) => {
                                     locales={SUPPORTED_LOCALES}
                                     onSelect={(locale) => {
                                         /* istanbul ignore next */
-                                        // NOTE: This implementation is jsut mocked infor this version.
+                                        // NOTE: This implementation is just mocked info this version.
                                         setSelectedLocale(locale)
                                     }}
                                 />
                             </Box>
                         </VStack>
 
-                        <DrawerSeperator />
+                        <DrawerSeparator />
 
                         {/* Support Links */}
                         <NestedAccordion
@@ -283,7 +364,7 @@ const DrawerMenu = ({isOpen, onClose = noop, onLogoClick = noop, root}) => {
                             }}
                         />
 
-                        <DrawerSeperator />
+                        <DrawerSeparator />
                     </DrawerBody>
 
                     <DrawerFooter>
