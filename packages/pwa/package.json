@@ -1,6 +1,6 @@
 {
     "name": "scaffold-pwa",
-    "version": "0.8.0",
+    "version": "0.8.1",
     "siteName": "NPSP Web",
     "projectSlug": "scaffold-pwa",
     "aJSSlug": "scaffold-pwa",
@@ -129,7 +129,7 @@
         "nock": "^13.1.1",
         "nodemon": "^2.0.12",
         "prettier": "1.18.2",
-        "pwa-kit-react-sdk": "^0.8.0",
+        "pwa-kit-react-sdk": "^0.8.1",
         "raf": "^3.4.0",
         "raw-loader": "0.5.1",
         "react-loadable": "^5.5.0",
