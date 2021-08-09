@@ -1,3 +1,7 @@
+/* * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * *
+ * Copyright (c) 2021 Mobify Research & Development Inc. All rights reserved. *
+ * * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
+
 /* eslint-disable no-unused-vars */
 import * as sdk from 'commerce-sdk-isomorphic'
 import {getAppOrigin} from 'pwa-kit-react-sdk/dist/utils/url'

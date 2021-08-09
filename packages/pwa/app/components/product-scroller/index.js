@@ -1,3 +1,6 @@
+/* * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * *
+ * Copyright (c) 2021 Mobify Research & Development Inc. All rights reserved. *
+ * * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
 import React, {forwardRef, useRef} from 'react'
 import PropTypes from 'prop-types'
 import {AspectRatio, Box, Heading, IconButton, Skeleton, Stack} from '@chakra-ui/react'

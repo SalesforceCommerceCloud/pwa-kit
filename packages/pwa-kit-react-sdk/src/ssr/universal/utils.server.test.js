@@ -1,10 +1,10 @@
 /**
  * @jest-environment node
  */
-
 /* * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * *
  * Copyright (c) 2021 Mobify Research & Development Inc. All rights reserved. *
  * * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
+
 import * as utils from './utils'
 import {proxyConfigs} from '../../utils/ssr-shared'
 

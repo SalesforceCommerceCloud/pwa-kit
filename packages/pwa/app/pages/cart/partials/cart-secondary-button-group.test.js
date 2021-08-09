@@ -1,4 +1,8 @@
-import React from 'react'
+/* * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * *
+ * Copyright (c) 2021 Mobify Research & Development Inc. All rights reserved. *
+ * * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
+import React, {useEffect} from 'react'
+import PropTypes from 'prop-types'
 import {
     mockedCustomerProductLists,
     mockedCustomerProductListsDetails
@@ -8,14 +12,37 @@ import {renderWithProviders} from '../../../utils/test-utils'
 import CartSecondaryButtonGroup from './cart-secondary-button-group'
 import {screen, waitFor} from '@testing-library/react'
 import user from '@testing-library/user-event'
+import {noop} from '../../../utils/utils'
+import useCustomer from '../../../commerce-api/hooks/useCustomer'
 
-const MockedComponent = () => {
+const MockedComponent = ({
+    onAddToWishlistClick = noop,
+    onEditClick = noop,
+    onRemoveItemClick = noop
+}) => {
+    const customer = useCustomer()
+
+    useEffect(() => {
+        if (customer?.authType !== 'registered') {
+            customer.login('customer@test.com', 'password1')
+        }
+    }, [])
     const product = mockedCustomerProductListsDetails.data[0]
     return (
         <CartItemVariant variant={{...product, productName: product.name}}>
-            <CartSecondaryButtonGroup />
+            <CartSecondaryButtonGroup
+                onAddToWishlistClick={onAddToWishlistClick}
+                onEditClick={onEditClick}
+                onRemoveItemClick={onRemoveItemClick}
+            />
         </CartItemVariant>
     )
+}
+
+MockedComponent.propTypes = {
+    onAddToWishlistClick: PropTypes.func,
+    onEditClick: PropTypes.func,
+    onRemoveItemClick: PropTypes.func
 }
 
 jest.mock('../../../commerce-api/utils', () => {
@@ -93,24 +120,50 @@ test('renders secondary action component', async () => {
         // We need to assert the actual text within the alert
         expect(confirmButton).toBeInTheDocument()
     })
+})
 
-    user.click(confirmButton)
+test('renders secondary with event handlers', async () => {
+    const onRemoveItemClick = jest.fn()
+    const onEditClick = jest.fn()
+    const onAddToWishlistClick = jest.fn()
 
-    await waitFor(() => {
-        // Chakra UI renders multiple elements with toast title in DOM for accessibility.
-        // We need to assert the actual text within the alert
-        expect(screen.getByRole('alert')).toHaveTextContent(/item removed from cart/i)
+    renderWithProviders(
+        <MockedComponent
+            onAddToWishlistClick={onAddToWishlistClick}
+            onEditClick={onEditClick}
+            onRemoveItemClick={onRemoveItemClick}
+        />
+    )
+
+    const editButton = screen.getByRole('button', {
+        name: /Edit/i
     })
+
+    expect(editButton).toBeInTheDocument()
+    user.click(editButton)
+    expect(onEditClick).toHaveBeenCalledTimes(1)
 
     const addToWishlistButton = screen.getByRole('button', {
-        name: /add to wishlist/i
+        name: /Add to wishlist/i
+    })
+    user.click(addToWishlistButton)
+    expect(onAddToWishlistClick).toHaveBeenCalledTimes(1)
+
+    const removeButton = screen.getByRole('button', {
+        name: /remove/i
     })
 
-    user.click(addToWishlistButton)
+    expect(removeButton).toBeInTheDocument()
 
+    user.click(removeButton)
+
+    const confirmButton = screen.getByRole('button', {name: /yes, remove item/i})
     await waitFor(() => {
         // Chakra UI renders multiple elements with toast title in DOM for accessibility.
         // We need to assert the actual text within the alert
-        expect(screen.getAllByText(/1 item added to wishlist/i)).not.toHaveLength(0)
+        expect(confirmButton).toBeInTheDocument()
     })
+    user.click(confirmButton)
+
+    expect(onRemoveItemClick).toHaveBeenCalledTimes(1)
 })

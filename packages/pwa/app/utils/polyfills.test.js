@@ -1,3 +1,6 @@
+/* * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * *
+ * Copyright (c) 2021 Mobify Research & Development Inc. All rights reserved. *
+ * * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
 import * as polyfills from './polyfills'
 
 test('getNeededPolyfills should return a filtered array of required polyfills', () => {

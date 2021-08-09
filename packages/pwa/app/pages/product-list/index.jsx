@@ -2,35 +2,21 @@
  * Copyright (c) 2021 Mobify Research & Development Inc. All rights reserved. *
  * * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
 
-import React, {useContext, useEffect, Fragment} from 'react'
+import React, {useContext, useEffect} from 'react'
 import PropTypes from 'prop-types'
-import {Link as RouteLink, useHistory, useParams} from 'react-router-dom'
+import {useHistory, useParams} from 'react-router-dom'
 import {useIntl} from 'react-intl'
 import {Helmet} from 'react-helmet'
 
 // Components
-import {
-    Box,
-    Heading,
-    Flex,
-    Link,
-    SimpleGrid,
-    Select,
-    Text,
-    FormLabel,
-    FormControl,
-    Fade,
-    Stack
-} from '@chakra-ui/react'
+import {Box, Flex, SimpleGrid, Select, FormLabel, FormControl, Stack} from '@chakra-ui/react'
 
 // Project Components
-import Breadcrumb from '../../components/breadcrumb'
 import Pagination from '../../components/pagination'
 import ProductTile, {Skeleton as ProductTileSkeleton} from '../../components/product-tile'
 import {HideOnMobile, HideOnDesktop} from '../../components/responsive'
-
-// Icons
-import {SearchIcon} from '../../components/icons'
+import EmptySearchResults from './partials/empty-results'
+import PageHeader from './partials/page-header'
 
 // Hooks
 import {useLimitUrls, usePageUrls, useSortUrls, useSearchParams} from '../../hooks'
@@ -38,7 +24,6 @@ import {useLimitUrls, usePageUrls, useSortUrls, useSearchParams} from '../../hoo
 // Others
 import {CategoriesContext} from '../../contexts'
 import {HTTPNotFound} from 'pwa-kit-react-sdk/dist/ssr/universal/errors'
-import {isServer} from '../../utils/utils'
 
 // Constants
 import {DEFAULT_SEARCH_PARAMS, DEFAULT_LIMIT_VALUES} from '../../constants'
@@ -49,13 +34,13 @@ import {DEFAULT_SEARCH_PARAMS, DEFAULT_LIMIT_VALUES} from '../../constants'
  * allowable filters and sort refinements.
  */
 const ProductList = (props) => {
-    const intl = useIntl()
     const history = useHistory()
     const params = useParams()
     const searchParams = useSearchParams()
     const {categories} = useContext(CategoriesContext)
 
     const {
+        searchQuery,
         productSearchResult,
         // eslint-disable-next-line react/prop-types
         staticContext,
@@ -67,7 +52,11 @@ const ProductList = (props) => {
     const {total, sortingOptions} = productSearchResult || {}
 
     // Get the current category from global state.
-    const category = categories[params.categoryId]
+    let category = ''
+    if (!searchQuery) {
+        category = categories[params.categoryId]
+    }
+
     const basePath = `${location.pathname}${location.search}`
 
     // Reset scroll position when `isLoaded` becomes `true`.
@@ -98,35 +87,7 @@ const ProductList = (props) => {
             </Helmet>
 
             {showNoResults ? (
-                <Flex
-                    direction="column"
-                    alignItems="center"
-                    textAlign="center"
-                    paddingTop={28}
-                    paddingBottom={28}
-                >
-                    <SearchIcon boxSize={[6, 6, 12, 12]} marginBottom={5} />
-                    <Text fontSize={['l', 'l', 'xl', '2xl']} fontWeight="700" marginBottom={2}>
-                        {intl.formatMessage(
-                            {
-                                id: 'product_list_page.no_results',
-                                defaultMessage:
-                                    'We couldn’t find anything for {category}. Try searching for a product or {link}.'
-                            },
-                            {
-                                category: category.name,
-                                link: (
-                                    <Link as={RouteLink} to={'/'}>
-                                        {intl.formatMessage({
-                                            id: 'product_list_page.no_results.contact_us',
-                                            defaultMessage: 'contact us'
-                                        })}
-                                    </Link>
-                                )
-                            }
-                        )}
-                    </Text>
-                </Flex>
+                <EmptySearchResults searchQuery={searchQuery} category={category} />
             ) : (
                 <>
                     {/* Header */}
@@ -136,7 +97,8 @@ const ProductList = (props) => {
                             alignItems="flex-end"
                             marginBottom={{base: 4, lg: 6}}
                         >
-                            <BreadcrumbAndTitle
+                            <PageHeader
+                                searchQuery={searchQuery}
                                 category={category}
                                 productSearchResult={productSearchResult}
                                 isLoading={isLoading}
@@ -150,7 +112,8 @@ const ProductList = (props) => {
                     </HideOnMobile>
                     <HideOnDesktop>
                         <Stack spacing={6} marginBottom={4}>
-                            <BreadcrumbAndTitle
+                            <PageHeader
+                                searchQuery={searchQuery}
                                 category={category}
                                 productSearchResult={productSearchResult}
                                 isLoading={isLoading}
@@ -171,6 +134,7 @@ const ProductList = (props) => {
                                   .map((value, index) => <ProductTileSkeleton key={index} />)
                             : productSearchResult.hits.map((productSearchItem) => (
                                   <ProductTile
+                                      data-testid={`sf-product-tile-${productSearchItem.productId}`}
                                       key={productSearchItem.productId}
                                       productSearchItem={productSearchItem}
                                   />
@@ -215,23 +179,40 @@ ProductList.shouldGetProps = ({previousLocation, location}) =>
 ProductList.getProps = async ({res, params, location, api}) => {
     const {categoryId} = params
     const urlParams = new URLSearchParams(location.search)
+    let searchQuery = urlParams.get('q')
+    let isSearch = false
+
+    if (searchQuery) {
+        isSearch = true
+    }
+    // In case somebody navigates to /search without a param
+    if (!categoryId && !isSearch) {
+        // We will simulate search for empty string
+        return {searchQuery: ' ', productSearchResult: {}}
+    }
 
     // Set the `cache-control` header values to align with the Commerce API settings.
     if (res) {
         res.set('Cache-Control', 'public, must-revalidate, max-age=900')
     }
 
+    const refinements = [`cgid=${categoryId}`, 'htype=master']
+
     const [category, productSearchResult] = await Promise.all([
-        api.shopperProducts.getCategory({
-            parameters: {id: categoryId, levels: 0}
-        }),
+        isSearch
+            ? Promise.resolve()
+            : api.shopperProducts.getCategory({
+                  parameters: {id: categoryId, levels: 0}
+              }),
         api.shopperSearch.productSearch({
             parameters: {
                 // Our product detail page currently only supports `master` products. For this reason we
                 // are only going to fetch master products on the product list page.
                 // BUG: Using this `array` method of adding refinements doesn't work when deployed. Figure out
                 // how to fix it.
-                refine: [`cgid=${categoryId}`, 'htype=master'],
+                // eslint-disable-next-line
+                ...(isSearch && {q: searchQuery}),
+                ...(!isSearch && {refine: refinements}),
                 limit: urlParams.get('limit') || DEFAULT_SEARCH_PARAMS.limit,
                 offset: urlParams.get('offset') || DEFAULT_SEARCH_PARAMS.offset,
                 sort: urlParams.get('sort') || DEFAULT_SEARCH_PARAMS.sort
@@ -245,7 +226,7 @@ ProductList.getProps = async ({res, params, location, api}) => {
         throw new HTTPNotFound(category.detail)
     }
 
-    return {productSearchResult}
+    return {searchQuery: searchQuery, productSearchResult}
 }
 
 ProductList.propTypes = {
@@ -266,46 +247,19 @@ ProductList.propTypes = {
      *
      * Notes: This prop is internally provided.
      */
-    location: PropTypes.object
+    location: PropTypes.object,
+
+    searchQuery: PropTypes.string
 }
 
 export default ProductList
-
-const BreadcrumbAndTitle = ({category, productSearchResult, isLoading, ...otherProps}) => {
-    return (
-        <Box {...otherProps}>
-            {/* Breadcrumb */}
-            {category && <Breadcrumb categories={category.parentCategoryTree} />}
-
-            {/* Category Title */}
-            <Flex>
-                <Heading as="h2" size="lg" marginRight={2}>
-                    {`${category?.name}`}
-                </Heading>
-                <Heading as="h2" size="lg" marginRight={2}>
-                    {isServer ? (
-                        <Fragment>({productSearchResult?.total})</Fragment>
-                    ) : (
-                        // Fade in the total when available. When it's changed or not available yet, do not render it
-                        !isLoading && <Fade in={true}>({productSearchResult?.total})</Fade>
-                    )}
-                </Heading>
-            </Flex>
-        </Box>
-    )
-}
-BreadcrumbAndTitle.propTypes = {
-    category: PropTypes.object,
-    productSearchResult: PropTypes.object,
-    isLoading: PropTypes.bool
-}
 
 const Sort = ({sortUrls, productSearchResult, basePath, ...otherProps}) => {
     const intl = useIntl()
     const history = useHistory()
 
     return (
-        <FormControl id="page_sort" width="auto" {...otherProps}>
+        <FormControl data-testid="sf-product-list-sort" id="page_sort" width="auto" {...otherProps}>
             <FormLabel>{intl.formatMessage({defaultMessage: 'Sort by'})}</FormLabel>
             <Select
                 value={basePath.replace(/(offset)=(\d+)/i, '$1=0')}

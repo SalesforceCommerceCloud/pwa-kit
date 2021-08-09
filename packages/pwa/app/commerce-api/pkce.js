@@ -1,3 +1,6 @@
+/* * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * *
+ * Copyright (c) 2021 Mobify Research & Development Inc. All rights reserved. *
+ * * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
 import {nanoid} from 'nanoid'
 import {encode as base64encode} from 'base64-arraybuffer'
 

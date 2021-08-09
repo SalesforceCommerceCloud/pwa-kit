@@ -1,3 +1,6 @@
+/* * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * *
+ * Copyright (c) 2021 Mobify Research & Development Inc. All rights reserved. *
+ * * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
 import React, {Fragment} from 'react'
 import {FormattedMessage} from 'react-intl'
 import {Flex, Button} from '@chakra-ui/react'

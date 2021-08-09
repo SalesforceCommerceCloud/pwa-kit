@@ -14,73 +14,54 @@ import {
     Flex,
 
     // Hooks
-    useStyleConfig,
     Skeleton as ChakraSkeleton,
     ListItem,
-    List
+    List,
+    useMultiStyleConfig
 } from '@chakra-ui/react'
+import {filterImageGroups} from '../../utils/image-groups-utils'
 
 const EnterKeyNumber = 13
 
 const LARGE = 'large'
 const SMALL = 'small'
-const HeroImageMaxWidth = '680px'
-
-/**
- * Filter out an image group from image groups based on size and selected variation attribute
- *
- * @param imageGroups - image groups to be filtered
- * @param options - contains size and selected variation attributes as filter criteria
- * @returns object
- */
-const filterImageGroups = (imageGroups, options) => {
-    const {size, selectedVariationAttributes = {}} = options
-    const imageGroup = imageGroups
-        .filter(({viewType}) => viewType === size)
-        .find(({variationAttributes}) => {
-            // if there is no variationAttributes in the imageGroups, no need to execute any further filter logic on it
-            if (!variationAttributes && Object.keys(selectedVariationAttributes).length === 0) {
-                return true
-            }
-            return (
-                variationAttributes &&
-                variationAttributes.every(({id, values}) => {
-                    const valueValues = values.map(({value}) => value)
-                    return valueValues.includes(selectedVariationAttributes[id])
-                })
-            )
-        })
-    return imageGroup
-}
 
 /**
  * The skeleton representation of the image gallery component. Use this component while
  * you are waiting for product data to be returnd from the server.
  */
-export const Skeleton = () => (
-    <Box data-testid="sf-image-gallery-skeleton">
-        <Flex flexDirection="column">
-            <AspectRatio ratio={1} marginBottom={2} maxWidth={HeroImageMaxWidth}>
-                <ChakraSkeleton />
-            </AspectRatio>
-            <Flex>
-                {new Array(4).fill(0).map((_, index) => (
-                    <AspectRatio ratio={1} width={[20, 20, 24, 24]} marginRight={2} key={index}>
-                        <ChakraSkeleton />
-                    </AspectRatio>
-                ))}
+export const Skeleton = ({size}) => {
+    const styles = useMultiStyleConfig('ImageGallery', {size})
+
+    return (
+        <Box data-testid="sf-image-gallery-skeleton">
+            <Flex flexDirection="column">
+                <AspectRatio ratio={1} {...styles.heroImageSkeleton}>
+                    <ChakraSkeleton />
+                </AspectRatio>
+                <Flex>
+                    {new Array(4).fill(0).map((_, index) => (
+                        <AspectRatio ratio={1} {...styles.thumbnailImageSkeleton} key={index}>
+                            <ChakraSkeleton />
+                        </AspectRatio>
+                    ))}
+                </Flex>
             </Flex>
-        </Flex>
-    </Box>
-)
+        </Box>
+    )
+}
+
+Skeleton.propTypes = {
+    size: PropTypes.bool
+}
 
 /**
  * The image gallery displays a hero image and thumbnails below it. You can control which
- * image groups that are use by passing in the currnet selected variation values.
+ * image groups that are use by passing in the current selected variation values.
  */
-const ImageGallery = ({imageGroups = [], selectedVariationAttributes = {}}) => {
+const ImageGallery = ({imageGroups = [], selectedVariationAttributes = {}, size}) => {
     const [selectedIndex, setSelectedIndex] = useState(0)
-    const styles = useStyleConfig('ImageGallery')
+    const styles = useMultiStyleConfig('ImageGallery', {size})
     const location = useLocation()
 
     // Get the 'hero' image for the current variation.
@@ -112,16 +93,11 @@ const ImageGallery = ({imageGroups = [], selectedVariationAttributes = {}}) => {
 
     const heroImage = heroImageGroup?.images?.[selectedIndex]
     const thumbnailImages = thumbnailImageGroup?.images || []
-
     return (
         <Flex direction="column">
             {heroImage && (
                 <Box {...styles.heroImageGroup}>
-                    <AspectRatio
-                        {...styles.heroImage}
-                        ratio={1}
-                        maxWidth={['none', 'none', HeroImageMaxWidth]}
-                    >
+                    <AspectRatio {...styles.heroImage} ratio={1}>
                         <Img alt={heroImage.alt} src={heroImage.disBaseLink} />
                     </AspectRatio>
                 </Box>
@@ -135,6 +111,7 @@ const ImageGallery = ({imageGroups = [], selectedVariationAttributes = {}}) => {
                             {...styles.thumbnailImageItem}
                             tabIndex={0}
                             key={index}
+                            data-testid="image-gallery-thumbnails"
                             onKeyDown={(e) => {
                                 if (e.keyCode === EnterKeyNumber) {
                                     return setSelectedIndex(index)
@@ -163,7 +140,11 @@ ImageGallery.propTypes = {
     /**
      * The current selected variation values
      */
-    selectedVariationAttributes: PropTypes.object
+    selectedVariationAttributes: PropTypes.object,
+    /**
+     * Size of the Image gallery, this will be used to determined the max width from styles
+     */
+    size: PropTypes.string
 }
 
 export default ImageGallery

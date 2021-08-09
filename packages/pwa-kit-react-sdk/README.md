@@ -10,7 +10,7 @@
                |___/
 ```
 
-[![NPM](https://nodei.co/npm/progressive-web-sdk.png?downloads=true&stars=true)](https://nodei.co/npm/progressive-web-sdk/) [![CircleCI](https://circleci.com/gh/mobify/progressive-web-sdk.svg?style=svg&circle-token=c41dc67ed5bb7c6a485789d6e7c1323e7f1649fb)](https://circleci.com/gh/mobify/progressive-web-sdk)
+[![NPM](https://nodei.co/npm/pwa-kit-react-sdk.png?downloads=true&stars=true)](https://nodei.co/npm/pwa-kit-react-sdk/) [![CircleCI](https://circleci.com/gh/mobify/mobify-platform-sdks.svg?style=svg&circle-token=2fa991127044320858c98be882401b68423f0adb)](https://circleci.com/gh/mobify/mobify-platform-sdks)
 
 A library that supports the isomorphic React rendering pipeline for Commerce Cloud Managed Runtime apps.
 
@@ -19,9 +19,9 @@ A library that supports the isomorphic React rendering pipeline for Commerce Clo
 -   [Git](https://git-scm.com/)
 -   We recommend you use [nvm](https://github.com/creationix/nvm#installation) to
     manage node and npm versions.
--   Node ^10.17.0 || ^12.0.0 [LTS](https://github.com/nodejs/LTS#lts-schedule). We recommend
+-   Node ^12.0.0 || ^14.17.0 [LTS](https://github.com/nodejs/LTS#lts-schedule). We recommend
     using the latest version of Node supported whenever possible.
--   npm ^5.x
+-   npm ^6.x
 
 ## Install Dependencies
 

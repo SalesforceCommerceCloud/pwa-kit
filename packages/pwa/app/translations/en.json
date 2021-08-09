@@ -20,6 +20,9 @@
   "0yGJXJ": {
     "defaultMessage": "Password must contain at least one lowercase letter"
   },
+  "1LE+iY": {
+    "defaultMessage": "See full details"
+  },
   "1TQMt0": {
     "defaultMessage": "{quantity} {itemLabel} added to cart."
   },
@@ -143,6 +146,9 @@
   "DPrDhw": {
     "defaultMessage": "Add New Payment Method"
   },
+  "DwzDiL": {
+    "defaultMessage": "Clear recent searches"
+  },
   "EKKW2e": {
     "defaultMessage": "1 uppercase letter",
     "description": "Password requirement"
@@ -204,6 +210,9 @@
   },
   "L8seEc": {
     "defaultMessage": "Subtotal"
+  },
+  "LiHQih": {
+    "defaultMessage": "Coming Soon"
   },
   "MPcjO/": {
     "defaultMessage": "Are you sure you want to sign out? You will need to sign back in to proceed with your current order."
@@ -284,9 +293,6 @@
   "Qpxx+l": {
     "defaultMessage": "New Arrivals"
   },
-  "Ri//8C": {
-    "defaultMessage": "Add to Cart"
-  },
   "SQJto2": {
     "defaultMessage": "Sign in"
   },
@@ -332,6 +338,9 @@
     "defaultMessage": "1 number",
     "description": "Password requirement"
   },
+  "UE9zNR": {
+    "defaultMessage": "Recent Searches"
+  },
   "Ub+AGc": {
     "defaultMessage": "Sign In"
   },
@@ -346,9 +355,6 @@
   },
   "V/JHlm": {
     "defaultMessage": "Forgot password?"
-  },
-  "V2AxNc": {
-    "defaultMessage": "Add to Wishlist"
   },
   "VSlYv6": {
     "defaultMessage": "Quantity:"
@@ -677,6 +683,12 @@
   "product_list_page.no_results.contact_us": {
     "defaultMessage": "contact us"
   },
+  "product_list_page.no_results_double_check": {
+    "defaultMessage": "Double-check your spelling and try again or {link}"
+  },
+  "product_list_page.no_results_search_query": {
+    "defaultMessage": "We couldn’t find anything for \"{searchQuery}\""
+  },
   "py3qts": {
     "defaultMessage": "New Address Saved"
   },
@@ -789,5 +801,8 @@
   },
   "zXbRZR": {
     "defaultMessage": "Order Number: {orderNumber}"
+  },
+  "zb24ln": {
+    "defaultMessage": "{content}"
   }
 }

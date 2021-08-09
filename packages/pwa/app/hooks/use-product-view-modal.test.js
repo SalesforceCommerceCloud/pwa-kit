@@ -1,0 +1,122 @@
+/* * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * *
+ * Copyright (c) 2021 Mobify Research & Development Inc. All rights reserved. *
+ * * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
+
+import React from 'react'
+import {Router, Route} from 'react-router-dom'
+import PropTypes from 'prop-types'
+import {screen, render, fireEvent, waitFor} from '@testing-library/react'
+import {createMemoryHistory} from 'history'
+import {IntlProvider} from 'react-intl'
+
+import mockProductDetail from '../commerce-api/mocks/variant-750518699578M'
+import {useProductViewModal} from './use-product-view-modal'
+import {DEFAULT_LOCALE} from '../locale'
+
+const MockComponent = ({product}) => {
+    const productViewModalData = useProductViewModal(product)
+    const [isShown, setIsShown] = React.useState(false)
+
+    return (
+        <div>
+            <button onClick={() => setIsShown(!isShown)}>Toggle the content</button>
+            {isShown && (
+                <>
+                    <div>{productViewModalData.product.id}</div>
+                    <div data-testid="variant">{JSON.stringify(productViewModalData.variant)}</div>
+                    <div>{`isFetching: ${productViewModalData.isFetching}`}</div>
+                </>
+            )}
+        </div>
+    )
+}
+
+MockComponent.propTypes = {
+    product: PropTypes.object
+}
+
+describe('useProductViewModal hook', () => {
+    test('return proper data', () => {
+        const history = createMemoryHistory()
+        history.push('/test/path')
+
+        render(
+            <Router history={history}>
+                <IntlProvider locale={DEFAULT_LOCALE} defaultLocale={DEFAULT_LOCALE}>
+                    <MockComponent product={mockProductDetail} />
+                </IntlProvider>
+            </Router>
+        )
+
+        const toggleButton = screen.getByText(/Toggle the content/)
+        fireEvent.click(toggleButton)
+
+        expect(screen.getByText('750518699578M')).toBeInTheDocument()
+        expect(screen.getByText(/isFetching: false/i)).toBeInTheDocument()
+        expect(screen.getByTestId('variant')).toHaveTextContent(
+            '{"orderable":true,"price":299.99,"productId":"750518699578M","variationValues":{"color":"BLACKFB","size":"038","width":"V"}}'
+        )
+    })
+
+    test("update product's related url param when the product content is shown", () => {
+        const history = createMemoryHistory()
+        history.push('/test/path?color=BLACKFB')
+
+        let testLocation
+        render(
+            <Router history={history}>
+                <IntlProvider locale={DEFAULT_LOCALE} defaultLocale={DEFAULT_LOCALE}>
+                    <MockComponent product={mockProductDetail} />
+                    <Route
+                        path="*"
+                        render={({location}) => {
+                            testLocation = location
+                            return null
+                        }}
+                    />
+                </IntlProvider>
+            </Router>
+        )
+        const toggleButton = screen.getByText(/Toggle the content/)
+        fireEvent.click(toggleButton)
+        expect(testLocation.pathname).toBe('/test/path')
+        const searchParams = new URLSearchParams(testLocation.search)
+        expect(searchParams.get('color')).toEqual('BLACKFB')
+        expect(searchParams.get('width')).toEqual('V')
+        expect(searchParams.get('pid')).toEqual('750518699578M')
+    })
+
+    test("clean up product's related url param when unmounting product content", () => {
+        const history = createMemoryHistory()
+        history.push('/test/path')
+
+        let testLocation
+        render(
+            <Router history={history}>
+                <IntlProvider locale={DEFAULT_LOCALE} defaultLocale={DEFAULT_LOCALE}>
+                    <MockComponent product={mockProductDetail} />
+                    <Route
+                        path="*"
+                        render={({location}) => {
+                            testLocation = location
+                            return null
+                        }}
+                    />
+                </IntlProvider>
+            </Router>
+        )
+        const toggleButton = screen.getByText(/Toggle the content/)
+        // show the content
+        fireEvent.click(toggleButton)
+        expect(testLocation.pathname).toBe('/test/path')
+
+        // hide the content
+        fireEvent.click(toggleButton)
+        const searchParams = new URLSearchParams(testLocation.search.toString())
+        waitFor(() => {
+            expect(searchParams.get('color')).toEqual(undefined)
+            expect(searchParams.get('width')).toEqual(undefined)
+            expect(searchParams.get('pid')).toEqual(undefined)
+        })
+    })
+})

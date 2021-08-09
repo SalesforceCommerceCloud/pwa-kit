@@ -1,3 +1,6 @@
+/* * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * *
+ * Copyright (c) 2021 Mobify Research & Development Inc. All rights reserved. *
+ * * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
 import React, {useEffect} from 'react'
 import {FormattedMessage, FormattedNumber} from 'react-intl'
 import {Box, Button, Container, Flex, Radio, RadioGroup, Stack, Text} from '@chakra-ui/react'

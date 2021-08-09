@@ -88,3 +88,45 @@ export const categoryUrlBuilder = (category, local = 'en') =>
  */
 export const productUrlBuilder = (product, local = 'en') =>
     encodeURI(`/${local}/product/${product.id}`)
+
+/**
+ * Given a search term, contructs a search url.
+ *
+ * @param {string} searchTerm
+ * @returns {string}
+ */
+export const searchUrlBuilder = (searchTerm) => `/search?q=${searchTerm}`
+
+/*
+ * Remove query params from a give url path based on a given list of keys
+ *
+ * @param {string} path - The part of url to have params removed from.
+ * @param {array} keys - list of params to be removed
+ * @returns {string} - the url after param has been removed
+ * @example
+ * import {removeQueryParamsFromPath} from /path/to/util/url
+ *
+ * removeQueryParamsFromPath(
+ *   /en/cart?pid=1234&color=black&size=s&abc=12,
+ *   ['pid', 'color', 'size']
+ * )
+ * // returns
+ * // '/en/cart?abc=12'
+ */
+export const removeQueryParamsFromPath = (path, keys) => {
+    const [pathname, search] = path.split('?')
+    const params = new URLSearchParams(search)
+    keys.forEach((key) => {
+        if (params.has(key)) {
+            params.delete(key)
+        }
+    })
+
+    // Clean up any trailing `=` for params without values.
+    const paramStr = params
+        .toString()
+        .replace(/=&/g, '&')
+        .replace(/=$/, '')
+
+    return `${pathname}${paramStr && '?'}${paramStr}`
+}

@@ -1,3 +1,6 @@
+/* * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * *
+ * Copyright (c) 2021 Mobify Research & Development Inc. All rights reserved. *
+ * * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
 export const examplePKCEVerifier =
     'sWSk9W.BiH7Ssv-_mwe6EsYk3OeH9OZ3qE9210l9L9mYDtZL9zETSHzOJPj4Oymp5VGkCn_1r7IOW7-IpGDVzPfTzUdY25TQuBkM1BKTG_41iOB3AI9JOd3f.~Q.DvvY'
 export const exampleTokenReponse = {
@@ -3004,4 +3007,614 @@ export const mockedCustomerProductListsDetails = {
         }
     ],
     total: 1
+}
+
+export const mockCategories = {
+    'mens-clothing-jackets': {
+        id: 'mens-clothing-suits',
+        image:
+            'https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-storefront-catalog-m-en/default/dw56b28e03/images/slot/sub_banners/cat-banner-mens-suits.jpg',
+        name: 'Suits',
+        pageDescription:
+            "Shop Men's suits for business or pleasure. Enjoy from a variety of different styles and cuts at Commerce Cloud.",
+        pageTitle: 'Mens Suits for Business and Casual',
+        parentCategoryId: 'mens-clothing',
+        parentCategoryTree: [
+            {
+                id: 'mens',
+                name: 'Mens'
+            },
+            {
+                id: 'mens-clothing',
+                name: 'Clothing'
+            },
+            {
+                id: 'mens-clothing-suits',
+                name: 'Suits'
+            }
+        ],
+        c_enableCompare: false,
+        c_showInMenu: true,
+        c_slotBannerImage:
+            'https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-storefront-catalog-m-en/default/dw2ec92167/images/slot/landing/cat-landing-slotbottom-mens-suits.jpg'
+    }
+}
+
+export const mockProductSearch = {
+    limit: 3,
+    hits: [
+        {
+            currency: 'USD',
+            hitType: 'master',
+            image: {
+                alt: 'Navy Single Pleat Wool Suit, , large',
+                disBaseLink:
+                    'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwe052b45b/images/large/PG.52002RUBN4Q.NAVYWL.PZ.jpg',
+                link:
+                    'https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwe052b45b/images/large/PG.52002RUBN4Q.NAVYWL.PZ.jpg',
+                title: 'Navy Single Pleat Wool Suit, '
+            },
+            orderable: true,
+            price: 299.99,
+            productId: '25686514M',
+            productName: 'Navy Single Pleat Wool Suit',
+            productType: {
+                master: true
+            },
+            representedProduct: {
+                id: '750518548272M'
+            },
+            representedProducts: [
+                {
+                    id: '750518548272M'
+                },
+                {
+                    id: '750518548180M'
+                },
+                {
+                    id: '750518548258M'
+                },
+                {
+                    id: '750518548265M'
+                },
+                {
+                    id: '750518548227M'
+                },
+                {
+                    id: '750518548197M'
+                },
+                {
+                    id: '750518548234M'
+                },
+                {
+                    id: '750518548203M'
+                },
+                {
+                    id: '750518548241M'
+                },
+                {
+                    id: '750518548432M'
+                },
+                {
+                    id: '750518548487M'
+                },
+                {
+                    id: '750518548456M'
+                },
+                {
+                    id: '750518548319M'
+                },
+                {
+                    id: '750518548357M'
+                },
+                {
+                    id: '750518548371M'
+                },
+                {
+                    id: '750518548296M'
+                }
+            ],
+            variationAttributes: [
+                {
+                    id: 'color',
+                    name: 'Color',
+                    values: [
+                        {
+                            name: 'Navy',
+                            orderable: true,
+                            value: 'NAVYWL'
+                        }
+                    ]
+                },
+                {
+                    id: 'size',
+                    name: 'Size',
+                    values: [
+                        {
+                            name: '36',
+                            orderable: true,
+                            value: '036'
+                        },
+                        {
+                            name: '38',
+                            orderable: true,
+                            value: '038'
+                        },
+                        {
+                            name: '39',
+                            orderable: true,
+                            value: '039'
+                        },
+                        {
+                            name: '40',
+                            orderable: true,
+                            value: '040'
+                        },
+                        {
+                            name: '42',
+                            orderable: true,
+                            value: '042'
+                        },
+                        {
+                            name: '43',
+                            orderable: true,
+                            value: '043'
+                        },
+                        {
+                            name: '44',
+                            orderable: true,
+                            value: '044'
+                        },
+                        {
+                            name: '46',
+                            orderable: true,
+                            value: '046'
+                        },
+                        {
+                            name: '48',
+                            orderable: true,
+                            value: '048'
+                        },
+                        {
+                            name: '50',
+                            orderable: true,
+                            value: '050'
+                        }
+                    ]
+                },
+                {
+                    id: 'width',
+                    name: 'Width',
+                    values: [
+                        {
+                            name: 'Short',
+                            orderable: true,
+                            value: 'S'
+                        },
+                        {
+                            name: 'Regular',
+                            orderable: true,
+                            value: 'V'
+                        },
+                        {
+                            name: 'Long',
+                            orderable: true,
+                            value: 'L'
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            currency: 'USD',
+            hitType: 'master',
+            image: {
+                alt: 'Charcoal Single Pleat Wool Suit, , large',
+                disBaseLink:
+                    'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw4de8166b/images/large/PG.33698RUBN4Q.CHARCWL.PZ.jpg',
+                link:
+                    'https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw4de8166b/images/large/PG.33698RUBN4Q.CHARCWL.PZ.jpg',
+                title: 'Charcoal Single Pleat Wool Suit, '
+            },
+            orderable: true,
+            price: 299.99,
+            productId: '25686571M',
+            productName: 'Charcoal Single Pleat Wool Suit',
+            productType: {
+                master: true
+            },
+            representedProduct: {
+                id: '750518894461M'
+            },
+            representedProducts: [
+                {
+                    id: '750518894461M'
+                },
+                {
+                    id: '750518894515M'
+                },
+                {
+                    id: '750518894522M'
+                },
+                {
+                    id: '750518894539M'
+                },
+                {
+                    id: '750518894508M'
+                },
+                {
+                    id: '750518894447M'
+                },
+                {
+                    id: '750518894478M'
+                },
+                {
+                    id: '750518894485M'
+                },
+                {
+                    id: '750518894713M'
+                },
+                {
+                    id: '750518894690M'
+                },
+                {
+                    id: '750518894744M'
+                },
+                {
+                    id: '750518894737M'
+                },
+                {
+                    id: '750518894751M'
+                },
+                {
+                    id: '750518894577M'
+                },
+                {
+                    id: '750518894591M'
+                },
+                {
+                    id: '750518894553M'
+                },
+                {
+                    id: '750518894638M'
+                },
+                {
+                    id: '750518894614M'
+                }
+            ],
+            variationAttributes: [
+                {
+                    id: 'color',
+                    name: 'Color',
+                    values: [
+                        {
+                            name: 'Charcoal',
+                            orderable: true,
+                            value: 'CHARCWL'
+                        }
+                    ]
+                },
+                {
+                    id: 'size',
+                    name: 'Size',
+                    values: [
+                        {
+                            name: '36',
+                            orderable: true,
+                            value: '036'
+                        },
+                        {
+                            name: '38',
+                            orderable: true,
+                            value: '038'
+                        },
+                        {
+                            name: '40',
+                            orderable: true,
+                            value: '040'
+                        },
+                        {
+                            name: '41',
+                            orderable: true,
+                            value: '041'
+                        },
+                        {
+                            name: '42',
+                            orderable: true,
+                            value: '042'
+                        },
+                        {
+                            name: '44',
+                            orderable: true,
+                            value: '044'
+                        },
+                        {
+                            name: '46',
+                            orderable: true,
+                            value: '046'
+                        },
+                        {
+                            name: '48',
+                            orderable: true,
+                            value: '048'
+                        },
+                        {
+                            name: '50',
+                            orderable: true,
+                            value: '050'
+                        }
+                    ]
+                },
+                {
+                    id: 'width',
+                    name: 'Width',
+                    values: [
+                        {
+                            name: 'Short',
+                            orderable: true,
+                            value: 'S'
+                        },
+                        {
+                            name: 'Regular',
+                            orderable: true,
+                            value: 'V'
+                        },
+                        {
+                            name: 'Long',
+                            orderable: true,
+                            value: 'L'
+                        }
+                    ]
+                }
+            ]
+        }
+    ],
+    query: '',
+    refinements: [
+        {
+            attributeId: 'cgid',
+            label: 'Category',
+            values: [
+                {
+                    hitCount: 6,
+                    label: 'New Arrivals',
+                    value: 'newarrivals'
+                },
+                {
+                    hitCount: 6,
+                    label: 'Mens',
+                    value: 'mens',
+                    values: [
+                        {
+                            hitCount: 6,
+                            label: 'Clothing',
+                            value: 'mens-clothing',
+                            values: [
+                                {
+                                    hitCount: 6,
+                                    label: 'Suits',
+                                    value: 'mens-clothing-suits'
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            attributeId: 'c_refinementColor',
+            label: 'Color',
+            values: [
+                {
+                    hitCount: 0,
+                    label: 'Beige',
+                    presentationId: 'beige',
+                    value: 'Beige'
+                },
+                {
+                    hitCount: 5,
+                    label: 'Black',
+                    presentationId: 'black',
+                    value: 'Black'
+                },
+                {
+                    hitCount: 1,
+                    label: 'Blue',
+                    presentationId: 'blue',
+                    value: 'Blue'
+                },
+                {
+                    hitCount: 0,
+                    label: 'Navy',
+                    presentationId: 'navy',
+                    value: 'Navy'
+                },
+                {
+                    hitCount: 0,
+                    label: 'Brown',
+                    presentationId: 'brown',
+                    value: 'Brown'
+                },
+                {
+                    hitCount: 0,
+                    label: 'Green',
+                    presentationId: 'green',
+                    value: 'Green'
+                },
+                {
+                    hitCount: 0,
+                    label: 'Grey',
+                    presentationId: 'grey',
+                    value: 'Grey'
+                },
+                {
+                    hitCount: 0,
+                    label: 'Orange',
+                    presentationId: 'orange',
+                    value: 'Orange'
+                },
+                {
+                    hitCount: 0,
+                    label: 'Pink',
+                    presentationId: 'pink',
+                    value: 'Pink'
+                },
+                {
+                    hitCount: 0,
+                    label: 'Purple',
+                    presentationId: 'purple',
+                    value: 'Purple'
+                },
+                {
+                    hitCount: 0,
+                    label: 'Red',
+                    presentationId: 'red',
+                    value: 'Red'
+                },
+                {
+                    hitCount: 0,
+                    label: 'White',
+                    presentationId: 'white',
+                    value: 'White'
+                },
+                {
+                    hitCount: 0,
+                    label: 'Yellow',
+                    presentationId: 'yellow',
+                    value: 'Yellow'
+                },
+                {
+                    hitCount: 0,
+                    label: 'Miscellaneous',
+                    presentationId: 'miscellaneous',
+                    value: 'Miscellaneous'
+                }
+            ]
+        },
+        {
+            attributeId: 'c_isNew',
+            label: 'New Arrival',
+            values: [
+                {
+                    hitCount: 4,
+                    label: 'true',
+                    value: 'true'
+                }
+            ]
+        },
+        {
+            attributeId: 'price',
+            label: 'Price',
+            values: [
+                {
+                    hitCount: 6,
+                    label: '$250 - $299.99',
+                    value: '(250..300)'
+                }
+            ]
+        },
+        {
+            attributeId: 'c_size',
+            label: 'Size',
+            values: [
+                {
+                    hitCount: 5,
+                    label: '36',
+                    value: '36'
+                },
+                {
+                    hitCount: 6,
+                    label: '38',
+                    value: '38'
+                },
+                {
+                    hitCount: 3,
+                    label: '39',
+                    value: '39'
+                },
+                {
+                    hitCount: 6,
+                    label: '40',
+                    value: '40'
+                },
+                {
+                    hitCount: 3,
+                    label: '41',
+                    value: '41'
+                },
+                {
+                    hitCount: 5,
+                    label: '42',
+                    value: '42'
+                },
+                {
+                    hitCount: 4,
+                    label: '43',
+                    value: '43'
+                },
+                {
+                    hitCount: 6,
+                    label: '44',
+                    value: '44'
+                },
+                {
+                    hitCount: 6,
+                    label: '46',
+                    value: '46'
+                },
+                {
+                    hitCount: 6,
+                    label: '48',
+                    value: '48'
+                },
+                {
+                    hitCount: 6,
+                    label: '50',
+                    value: '50'
+                }
+            ]
+        }
+    ],
+    searchPhraseSuggestions: {},
+    selectedRefinements: {
+        cgid: 'mens-clothing-suits',
+        htype: 'master'
+    },
+    selectedSortingOption: 'price-low-to-high',
+    sortingOptions: [
+        {
+            id: 'best-matches',
+            label: 'Best Matches'
+        },
+        {
+            id: 'price-low-to-high',
+            label: 'Price Low To High'
+        },
+        {
+            id: 'price-high-to-low',
+            label: 'Price High to Low'
+        },
+        {
+            id: 'product-name-ascending',
+            label: 'Product Name A - Z'
+        },
+        {
+            id: 'product-name-descending',
+            label: 'Product Name Z - A'
+        },
+        {
+            id: 'brand',
+            label: 'Brand'
+        },
+        {
+            id: 'most-popular',
+            label: 'Most Popular'
+        },
+        {
+            id: 'top-sellers',
+            label: 'Top Sellers'
+        }
+    ],
+    offset: 0,
+    total: 3
 }

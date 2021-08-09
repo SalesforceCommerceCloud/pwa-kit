@@ -74,9 +74,6 @@ const defines = {
     // This is for internal Mobify test use
     MOBIFY_CONNECTOR_NAME: `'${process.env.MOBIFY_CONNECTOR_NAME}'`,
     // These are defined as string constants
-    PROJECT_SLUG: `'${pkg.projectSlug}'`,
-    AJS_SLUG: `'${pkg.aJSSlug}'`,
-    SITE_NAME: `"${pkg.siteName}"`,
     WEBPACK_PACKAGE_JSON_MOBIFY: `${JSON.stringify(pkg.mobify || {})}`,
     WEBPACK_SSR_ENABLED: pkg.mobify ? `${pkg.mobify.ssrEnabled}` : 'false',
     DEBUG,

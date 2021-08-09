@@ -1,3 +1,6 @@
+/* * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * *
+ * Copyright (c) 2021 Mobify Research & Development Inc. All rights reserved. *
+ * * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
 import {commerceAPIConfig} from '../commerce-api.config'
 import OcapiShopperOrders from './ocapi-shopper-orders'
 import {ocapiOrderResponse} from './mock-data'

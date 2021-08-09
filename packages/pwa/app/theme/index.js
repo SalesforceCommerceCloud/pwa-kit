@@ -1,3 +1,6 @@
+/* * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * *
+ * Copyright (c) 2021 Mobify Research & Development Inc. All rights reserved. *
+ * * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
 import {extendTheme} from '@chakra-ui/react'
 
 // Foundational style overrides
@@ -41,7 +44,6 @@ import OfflineBanner from './components/project/offline-banner'
 import Pagination from './components/project/pagination'
 import ProductTile from './components/project/product-tile'
 import SocialIcons from './components/project/social-icons'
-import PhotoGallery from './components/project/photo-gallery'
 import SwatchGroup from './components/project/swatch-group'
 import ImageGallery from './components/project/image-gallery'
 
@@ -88,7 +90,6 @@ const overrides = {
         OfflineBanner,
         SocialIcons,
         Pagination,
-        PhotoGallery,
         ProductTile,
         SwatchGroup,
         ImageGallery

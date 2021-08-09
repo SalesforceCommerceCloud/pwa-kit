@@ -31,7 +31,7 @@ module.exports = {
             statements: 80,
             branches: 72,
             functions: 78,
-            lines: 85
+            lines: 84
         }
     },
     setupFilesAfterEnv: ['./jest-setup.js'],

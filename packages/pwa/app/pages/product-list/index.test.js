@@ -1,14 +1,25 @@
+/* * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * *
+ * Copyright (c) 2021 Mobify Research & Development Inc. All rights reserved. *
+ * * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
 import React from 'react'
+import PropTypes from 'prop-types'
+
 import {rest} from 'msw'
 import {setupServer} from 'msw/node'
-import {mockedRegisteredCustomer, productsResponse} from '../../commerce-api/mock-data'
+import {
+    mockedRegisteredCustomer,
+    mockProductSearch,
+    mockCategories
+} from '../../commerce-api/mock-data'
 import {screen} from '@testing-library/react'
 import {Route, Switch} from 'react-router-dom'
 import {renderWithProviders} from '../../utils/test-utils'
 import ProductList from '.'
+import EmptySearchResults from './partials/empty-results'
 
 jest.setTimeout(60000)
-
+let mockCategoriesResponse = mockCategories
+let mockProductListSearchResponse = mockProductSearch
 jest.useFakeTimers()
 
 jest.mock('../../commerce-api/utils', () => {
@@ -19,15 +30,45 @@ jest.mock('../../commerce-api/utils', () => {
     }
 })
 
-const MockedComponent = () => {
+jest.mock('commerce-sdk-isomorphic', () => {
+    const sdk = jest.requireActual('commerce-sdk-isomorphic')
+    return {
+        ...sdk,
+        ShopperProducts: class ShopperProductsMock extends sdk.ShopperProducts {
+            async productSearch() {
+                return {data: [mockProductListSearchResponse]}
+            }
+            async getCategory() {
+                return mockCategoriesResponse
+            }
+        }
+    }
+})
+
+const MockedComponent = ({isLoading}) => {
     return (
         <Switch>
             <Route
                 path="/:locale/category/:categoryId"
-                render={(props) => <ProductList {...props} />}
+                render={(props) => (
+                    <ProductList
+                        {...props}
+                        isLoading={isLoading}
+                        searchQuery="dresses"
+                        productSearchResult={mockProductListSearchResponse}
+                    />
+                )}
             />
         </Switch>
     )
+}
+
+MockedComponent.propTypes = {
+    isLoading: PropTypes.bool
+}
+
+const MockedEmptyPage = () => {
+    return <EmptySearchResults searchQuery={'test'} category={undefined} />
 }
 
 // Set up the msw server to intercept fetch requests and returned mocked results. Additional
@@ -49,7 +90,13 @@ const server = setupServer(
         res(ctx.delay(0), ctx.status(200), ctx.json(mockedRegisteredCustomer))
     ),
     rest.get('*/product-search', (req, res, ctx) =>
-        res(ctx.delay(0), ctx.status(200), ctx.json(productsResponse))
+        res(ctx.delay(0), ctx.status(200), ctx.json(mockProductListSearchResponse))
+    ),
+    // rest.get('*/product-search', (req, res, ctx) =>
+    //     res(ctx.delay(0), ctx.status(200), ctx.json(mockedProductSearchList))
+    // ),
+    rest.post('*/einstein/v3/personalization/*', (req, res, ctx) =>
+        res(ctx.delay(0), ctx.status(200), ctx.json(mockProductListSearchResponse))
     ),
     rest.post('*/oauth2/token', (req, res, ctx) =>
         res(
@@ -90,4 +137,36 @@ afterAll(() => server.close())
 test('should render product list page', async () => {
     renderWithProviders(<MockedComponent />)
     expect(await screen.findByTestId('sf-product-list-page')).toBeInTheDocument()
+})
+
+test('should render sort option list page', async () => {
+    renderWithProviders(<MockedComponent />)
+    const countOfSortComponents = await screen.findAllByText('Sort by')
+    expect(countOfSortComponents.length).toEqual(2)
+})
+
+test('should render skeleton', async () => {
+    renderWithProviders(<MockedComponent isLoading />)
+    expect(screen.getAllByTestId('sf-product-tile-skeleton').length).toEqual(25)
+})
+
+test('should render empty list page', async () => {
+    renderWithProviders(<MockedEmptyPage />)
+    expect(await screen.findByTestId('sf-product-empty-list-page')).toBeInTheDocument()
+})
+
+test('should display Search Results for when searching ', async () => {
+    renderWithProviders(<MockedComponent />)
+    window.history.pushState({}, 'ProductList', 'en/search?q=test')
+    expect(await screen.findByTestId('sf-product-list-page')).toBeInTheDocument()
+})
+
+// test('product tile is rendered', async () => {
+//     renderWithProviders(<MockedComponent />)
+//     expect(await screen.findByTestId('sf-product-tile-25565616M')).toBeInTheDocument()
+// })
+
+test('pagination is rendered', async () => {
+    renderWithProviders(<MockedComponent />)
+    expect(await screen.findByTestId('sf-pagination')).toBeInTheDocument()
 })

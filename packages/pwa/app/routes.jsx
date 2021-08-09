@@ -1,5 +1,8 @@
-/* istanbul ignore file */
+/* * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * *
+ * Copyright (c) 2021 Mobify Research & Development Inc. All rights reserved. *
+ * * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
 
+/* istanbul ignore file */
 // NOTE!
 // This file is being ignored in the test coverage report for now. It reports `0%` functions
 // tested, which brings down the overall coverage and blocks CI. There are tests still, but
@@ -76,6 +79,10 @@ const routes = [
     {
         path: '/:locale/product/:productId',
         component: ProductDetail
+    },
+    {
+        path: '/:locale/search',
+        component: ProductList
     },
     {
         path: '/:locale/category/:categoryId',

@@ -1,3 +1,6 @@
+/* * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * *
+ * Copyright (c) 2021 Mobify Research & Development Inc. All rights reserved. *
+ * * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
 import React from 'react'
 import {rest} from 'msw'
 import {setupServer} from 'msw/node'
@@ -103,9 +106,8 @@ afterAll(() => server.close())
 test('should render product details page', async () => {
     renderWithProviders(<MockedComponent />)
     expect(await screen.findByTestId('product-details-page')).toBeInTheDocument()
-    expect(screen.getByText(/Long Sleeve Crew Neck/)).toBeInTheDocument()
-    expect(screen.getByText(/14.99/)).toBeInTheDocument()
-
-    expect(screen.getByRole('button', {name: /add to cart/i})).toBeInTheDocument()
-    expect(screen.getByRole('button', {name: /add to wishlist/i})).toBeInTheDocument()
+    expect(screen.getAllByText(/Long Sleeve Crew Neck/).length).toEqual(2)
+    expect(screen.getAllByText(/14.99/).length).toEqual(2)
+    expect(screen.getAllByText(/Add to cart/).length).toEqual(2)
+    expect(screen.getAllByText(/Add to wishlist/).length).toEqual(2)
 })

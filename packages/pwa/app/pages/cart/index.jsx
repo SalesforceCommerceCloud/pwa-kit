@@ -1,6 +1,11 @@
+/* * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * *
+ * Copyright (c) 2021 Mobify Research & Development Inc. All rights reserved. *
+ * * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
+
 import React, {useEffect, useState} from 'react'
-import {Box, Stack, Grid, GridItem, Container} from '@chakra-ui/react'
+import {Box, Stack, Grid, GridItem, Container, useDisclosure, Button} from '@chakra-ui/react'
 import {FormattedMessage, useIntl} from 'react-intl'
+
 import EmptyCart from './partials/empty-cart'
 import ProductItem from '../../components/product-item/index'
 import CartTitle from './partials/cart-title'
@@ -10,18 +15,28 @@ import useBasket from '../../commerce-api/hooks/useBasket'
 import OrderSummary from '../../components/order-summary'
 import RecommendedProducts from '../../components/recommended-products'
 import CartSecondaryButtonGroup from './partials/cart-secondary-button-group'
+import ProductViewModal from '../../components/product-view-modal'
+
 import {useToast} from '../../hooks/use-toast'
 import {API_ERROR_MESSAGE} from '../account/constant'
+import useCustomerProductLists, {
+    eventActions
+} from '../../commerce-api/hooks/useCustomerProductLists'
+import {customerProductListTypes} from '../../constants'
+import useNavigation from '../../hooks/use-navigation'
 
 const Cart = () => {
     const basket = useBasket()
+    const intl = useIntl()
     const [selectedItem, setSelectedItem] = useState(undefined)
     const {formatMessage} = useIntl()
     const showToast = useToast()
+    const navigate = useNavigation()
 
-    const handleItemClicked = (itemId) => {
-        setSelectedItem(itemId)
-    }
+    const customerProductLists = useCustomerProductLists()
+
+    const [isCartItemLoading, setCartItemLoading] = useState(false)
+    const {isOpen, onOpen, onClose} = useDisclosure()
 
     useEffect(() => {
         // Set the default shipping method if none is already selected
@@ -41,28 +56,157 @@ const Cart = () => {
         return <EmptyCart />
     }
 
-    const handleChangeItemQuantity = async (quantity, product) => {
-        setSelectedItem(product.itemId)
-        if (quantity === 0) {
+    const handleUpdateCart = async (variant, quantity) => {
+        // close the modal before handle the change
+        onClose()
+        try {
+            setCartItemLoading(true)
+            const productIds = basket.productItems.map(({productId}) => productId)
+            // The user is selecting different variant, and it has not existed in basket
+            if (selectedItem.id !== variant.productId && !productIds.includes(variant.productId)) {
+                const item = {
+                    productId: variant.productId,
+                    quantity,
+                    price: variant.price
+                }
+                return await basket.updateItemInBasket(item, selectedItem.itemId)
+            }
+            // The user is selecting different variant, and it has existed in basket
+            // remove this item in the basket, change the quantity for the new selected variant in the basket
+            if (selectedItem.id !== variant.productId && productIds.includes(variant.productId)) {
+                await basket.removeItemFromBasket(selectedItem.itemId)
+                const basketItem = basket.productItems.find(
+                    ({productId}) => productId === variant.productId
+                )
+                const newQuantity = quantity + basketItem.quantity
+                return await changeItemQuantity(newQuantity, basketItem)
+            }
+            // the user only changes quantity of the same variant
+            if (selectedItem.quantity !== quantity) {
+                return await changeItemQuantity(quantity, selectedItem)
+            }
+        } catch (err) {
+            showToast({
+                title: formatMessage(
+                    {defaultMessage: '{errorMessage}'},
+                    {errorMessage: API_ERROR_MESSAGE}
+                ),
+                status: 'error'
+            })
+        } finally {
+            setCartItemLoading(false)
+            setSelectedItem(undefined)
+        }
+    }
+
+    const changeItemQuantity = async (quantity, product) => {
+        setCartItemLoading(true)
+        setSelectedItem(product)
+        try {
+            if (quantity === 0) {
+                await basket.removeItemFromBasket(product.itemId)
+            } else {
+                const item = {
+                    productId: product.id,
+                    quantity: parseInt(quantity)
+                }
+                await basket.updateItemInBasket(item, product.itemId)
+            }
+        } catch (err) {
+            showToast({
+                title: formatMessage(
+                    {defaultMessage: '{errorMessage}'},
+                    {errorMessage: API_ERROR_MESSAGE}
+                ),
+                status: 'error'
+            })
+        } finally {
+            // reset the state
+            setCartItemLoading(false)
+            setSelectedItem(undefined)
+        }
+    }
+
+    const handleAddToWishlist = async (product) => {
+        setCartItemLoading(true)
+        setSelectedItem(product)
+        try {
+            // If product-lists have not loaded we push "Add to wishlist" event to eventQueue to be
+            // processed once the product-lists have loaded.
+            if (!customerProductLists?.loaded) {
+                const event = {
+                    item: product,
+                    action: eventActions.ADD,
+                    listType: customerProductListTypes.WISHLIST
+                }
+
+                customerProductLists.addActionToEventQueue(event)
+            } else {
+                const wishlist = customerProductLists.data.find(
+                    (list) => list.type === customerProductListTypes.WISHLIST
+                )
+                const requestBody = {
+                    productId: product.productId,
+                    priority: 1,
+                    quantity: product.quantity,
+                    public: false,
+                    type: 'product'
+                }
+
+                const wishlistItem = await customerProductLists.createCustomerProductListItem(
+                    requestBody,
+                    wishlist.id
+                )
+
+                if (wishlistItem?.id) {
+                    const toastAction = (
+                        <Button variant="link" onClick={() => navigate('/account/wishlist')}>
+                            View
+                        </Button>
+                    )
+                    showToast({
+                        title: intl.formatMessage({defaultMessage: '1 item added to wishlist'}),
+                        status: 'success',
+                        action: toastAction
+                    })
+                }
+            }
+        } catch (error) {
+            showToast({
+                title: intl.formatMessage(
+                    {defaultMessage: '{errorMessage}'},
+                    {errorMessage: API_ERROR_MESSAGE}
+                ),
+                status: 'error'
+            })
+        } finally {
+            // close the modal
+            setCartItemLoading(false)
+            setSelectedItem(undefined)
+        }
+    }
+
+    const handleRemoveItem = async (product) => {
+        setSelectedItem(product)
+        setCartItemLoading(true)
+        try {
             await basket.removeItemFromBasket(product.itemId)
-        } else {
-            const productItem = {
-                productId: product.id,
-                quantity: parseInt(quantity)
-            }
-            try {
-                await basket.updateItemInBasket(productItem, product.itemId)
-                setSelectedItem(undefined)
-            } catch (err) {
-                setSelectedItem(undefined)
-                showToast({
-                    title: formatMessage(
-                        {defaultMessage: '{errorMessage}'},
-                        {errorMessage: API_ERROR_MESSAGE}
-                    ),
-                    status: 'error'
-                })
-            }
+            showToast({
+                title: intl.formatMessage({defaultMessage: 'Item removed from cart'}),
+                status: 'success'
+            })
+        } catch (err) {
+            showToast({
+                title: intl.formatMessage(
+                    {defaultMessage: '{errorMessage}'},
+                    {errorMessage: API_ERROR_MESSAGE}
+                ),
+                status: 'error'
+            })
+        } finally {
+            // reset the state
+            setCartItemLoading(false)
+            setSelectedItem(undefined)
         }
     }
 
@@ -90,7 +234,12 @@ const Cart = () => {
                                             index={idx}
                                             secondaryActions={
                                                 <CartSecondaryButtonGroup
-                                                    onClick={handleItemClicked}
+                                                    onAddToWishlistClick={handleAddToWishlist}
+                                                    onEditClick={(product) => {
+                                                        setSelectedItem(product)
+                                                        onOpen()
+                                                    }}
+                                                    onRemoveItemClick={handleRemoveItem}
                                                 />
                                             }
                                             product={{
@@ -100,12 +249,28 @@ const Cart = () => {
                                                 price: product.price
                                             }}
                                             onItemQuantityChange={(value) =>
-                                                handleChangeItemQuantity(value, product)
+                                                changeItemQuantity(value, product)
                                             }
-                                            showLoading={selectedItem === product.itemId}
+                                            showLoading={
+                                                isCartItemLoading &&
+                                                selectedItem?.itemId === product.itemId
+                                            }
                                         />
                                     ))}
                                 </Stack>
+                                <Box>
+                                    {isOpen && (
+                                        <ProductViewModal
+                                            isOpen={isOpen}
+                                            onOpen={onOpen}
+                                            onClose={onClose}
+                                            product={selectedItem}
+                                            updateCart={(variant, quantity) =>
+                                                handleUpdateCart(variant, quantity)
+                                            }
+                                        />
+                                    )}
+                                </Box>
                             </GridItem>
                             <GridItem>
                                 <Stack spacing={4}>

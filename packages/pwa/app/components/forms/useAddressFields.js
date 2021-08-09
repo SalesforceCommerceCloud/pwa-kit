@@ -1,3 +1,6 @@
+/* * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * *
+ * Copyright (c) 2021 Mobify Research & Development Inc. All rights reserved. *
+ * * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
 import {useIntl, defineMessages} from 'react-intl'
 import {formatPhoneNumber} from '../../utils/phone-utils'
 import {stateOptions, provinceOptions} from './state-province-options'

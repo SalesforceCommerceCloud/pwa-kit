@@ -1,6 +1,6 @@
 {
   "name": "pwa-kit-create-app",
-  "version": "0.8.0",
+  "version": "0.9.0-dev",
   "description": "Salesforce's project generator tool",
   "author": "dev@mobify.com",
   "license": "See license in LICENSE",
@@ -16,7 +16,8 @@
   "scripts": {
     "prepare": "node scripts/build.js",
     "format": "prettier --write \"**/*.{js,jsx}\"",
-    "lint": "eslint \"**/*.{js,jsx}\""
+    "lint": "eslint \"**/*.{js,jsx}\"",
+    "lint:fix": "npm run lint -- --fix"
   },
   "dependencies": {
     "commander": "^2.20.0",
@@ -52,6 +53,7 @@
     "eslint": "7.31.0",
     "eslint-config-prettier": "4.0.0",
     "eslint-import-resolver-webpack": "0.10.0",
+    "eslint-plugin-header": "^3.1.1",
     "eslint-plugin-import": "2.23.4",
     "eslint-plugin-jsx-a11y": "6.4.1",
     "eslint-plugin-prettier": "3.0.1",

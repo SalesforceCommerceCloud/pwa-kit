@@ -1,3 +1,6 @@
+/* * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * *
+ * Copyright (c) 2021 Mobify Research & Development Inc. All rights reserved. *
+ * * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
 import {useEffect} from 'react'
 import useBasket from './useBasket'
 import useCustomer from './useCustomer'
@@ -56,12 +59,13 @@ const useShopper = () => {
         // Fetch product details for all items in cart
         if (customer.customerId && basket?.basketId) {
             if (basket.itemCount > 0) {
+                const allImages = true
                 let ids = basket.productItems?.map((item) => item.productId)
                 if (basket?._productItemsDetail) {
                     ids = ids.filter((id) => !basket?._productItemsDetail[id])
                 }
 
-                basket.getProductsInBasket(ids.toString())
+                basket.getProductsInBasket(ids.toString(), {allImages})
             }
         }
     }, [customer, basket])

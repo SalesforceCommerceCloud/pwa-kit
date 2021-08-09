@@ -76,7 +76,7 @@ Run integration tests against live APIs for all packages with:
 
 ## Releasing
 
-CircleCI will automatically publish to NPM from `master` or any branch name starting
+CircleCI will automatically publish to NPM from any branch name starting
 with the `release-`. You need a basic understanding of https://semver.org/ to
 release the packages in the monorepo.
 
@@ -84,7 +84,6 @@ Bear these branch naming conventions in mind:
 
 -   We use the `develop` branch for normal feature development.
 -   We use `release-` branches to review and release release-candidates.
--   We use `master` to release production-quality versions of the SDK.
 
 When we release, we always make a "normal" or a "hotfix" release. Hotfixes are
 something we _only_ do when we have found a bug in a released package and that we
@@ -95,30 +94,25 @@ channel and get a +1 from the engineering team.
 
 ## Normal Releases
 
-Normal releases for V1 are made from the `develop` branch, and normal releases for V2 are made
-from the `v2-develop` branch. Packages on the develop branches should always have version numbers
-of the form `x.y.z-dev`, which tells you "we are working towards a release of version x.y.z".
+Normal releases are made from the `develop` branch and the packages should therefore always have version numbers
+in the form of `x.y.z-dev`, which tells you "we are working towards a release of version x.y.z".
 If you checkout develop and see packages with a version number that doesn't end in `-dev`
 something is wrong –ask someone for help.
 
-We use specific branches to release V1 and V2:
-
--   The **V1** release works with the `develop` and `master` branches.
--   The **V2** release works with the `v2-develop` and `v2-master` branches.
-
 It's easier to describe the release process using an example version number, so for
-this example we'll pretend that we're going to release **V1** and the version number on the branch `develop`
-is `1.1.0-dev`. That would mean that we'd be releasing version `1.1.0` to NPM. The version you find on
+this example we'll pretend that we're going to release and the version number on the branch `develop`
+is `1.1.0-dev`. This means that we'd be releasing version `1.1.0` to NPM. The version you find on
 develop will be different, but the principles are the same.
 
 The steps are as follows:
 
 ```
-git checkout develop # Reminder for V2 we use the `v2-develop` branch.
+git checkout develop
 git pull
 
-# We want a branch to collect and review changes before releasing.
-git checkout -b release-1.1.0
+# We want a long-lived branch to collect and review changes before releasing. 
+# We'll also use this branch for making hotfix releases in the future.
+git checkout -b release-1.1.x
 
 # We'll bump the version numbers in the package.json files to show that this is a release candidate
 npm run bump-version -- 1.1.0-alpha.0
@@ -142,10 +136,15 @@ npm run bump-version -- 1.1.0-alpha.1
 
 npm run bump-version -- 1.1.0  # Remove the -alpha.x suffix!
 git commit -am "Version 1.1.0"
-git checkout master  # Reminder for V2 we use the `v2-master` branch.
-git merge release-1.1.0
 git tag v1.1.0
-git push --tags && git push  # Circle will publish to NPM
+git push --tags && git push
+
+# Now that the newly minted release branch is finalized, there are two administration 
+# tasks that you'll want to complete. Firstly, you'll want to ensure that the new 
+# branch is protected. Ask your Github admin to do this and ensure that they check
+# the "Require status checks to pass before merging" flag. Secondly, update the 
+# weekly builds in CircleCi adding this branch and removing any that fall out of our
+# SLA (we currently support the last 3 minor versions).
 
 # Once done, we need to merge our changes back into develop and prepare for
 # development of the next release. Our releases are always planned to be
@@ -153,8 +152,8 @@ git push --tags && git push  # Circle will publish to NPM
 # no breaking changes. The next minor version bump up from 1.1.0 is 1.2.0,
 # so we want to begin work on 1.2.0-dev. Run this:
 
-git checkout develop  # Reminder for V2 we use the `v2-develop` branch.
-git merge master  # Reminder for V2 we use the `v2-master` branch.
+git checkout develop
+git merge release-1.1.x  # Ensure any fixes during the release process make it back into develop.
 npm run bump-version -- 1.2.0-dev
 git commit -am "Begin development on 1.2.0"
 git push
@@ -171,59 +170,9 @@ to a package that we already released to NPM. It's not possible to replace packa
 on NPM that we've already released though – we can only publish new versions to fix
 the bugs and get people to upgrade. These new versions are hotfixes.
 
-You start a hotfix by finding the commit for the release you want to fix, branching
-from it, fixing the bug and re-releasing with a patch-level version bump.
-The most common case is to hotfix the most recent release, which is easy to find –
-it's usually the latest commit on master. If you want to hotfix an older release,
-you can look it up by its git tag and you'll have to make decisions about exactly
-which versions you want to hotfix (if you're patching 1.0.0 and the current release
-is 1.4.0 you could choose to also hotfix 1.1.0, 1.2.0 and 1.3.0).
-
-For this example we're going to talk about the most common case – patching a bug on
-the most recent release and branching from master. We'll pretend `master` is on
-`1.1.0` so our hotfix must be released under version 1.1.1, which is one patch-level
-version bump upwards.
-
-The steps are a little different from the normal release process. Again, if you
-checkout master and you see package versions that are not production-quality (eg.
-you see `1.1.0-dev` instead of `1.1.0`) then something is wrong – ask for help.
-
-The steps:
-
-```
-
-git checkout master
-git checkout -b release-1.1.1
-npm run bump-version -- 1.1.1-alpha.0
-
-git commit -am "Starting release process for 1.1.1"
-git push  # Circle will release 1.1.1-alpha.0 to NPM which you can review.
-
-# Keep making changes and releasing alpha versions until you are happy. Then:
-
-npm run bump-version -- 1.1.1
-git commit -am "Version 1.1.1"
-git checkout master
-git merge release-1.1.1
-git tag v1.1.1
-git push --tags  # Circle will publish to NPM
-
-
-# You now want to merge your fixes back into develop. When you do this, you
-# will see a merge conflict because the version numbers changed both on your
-# hotfix branch and on develop. You want it to appear as though the hotfix
-# came "before" the changes to develop though, so when resolving these conflicts
-# you want to pick the version numbers from develop, not the ones from master.
-
-git checkout develop
-git merge master  # Conflict! Keep the version numbers from develop, not master!
-
-# Resolve conflicts
-git commit "Merged hotfix into develop"
-git push
-
-
-```
+Executing hotfixes is simple, start by identifying which of the supported versions exhibits 
+the bug and create a PR for each branch, addresses the bug and bumping the branches patch 
+version. (NOTE: If the bug exists in `develop` you do not have to bump the version number.)
 
 When you're finished, drop and update in #product-release and #changelog to let them know what's new.
 

@@ -1,3 +1,6 @@
+/* * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * *
+ * Copyright (c) 2021 Mobify Research & Development Inc. All rights reserved. *
+ * * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
 import React, {useCallback, useEffect, useRef, useState} from 'react'
 import {render} from '@testing-library/react'
 import {BrowserRouter as Router} from 'react-router-dom'
@@ -16,6 +19,7 @@ import {commerceAPIConfig} from '../commerce-api.config'
 import {IntlProvider, DEFAULT_LOCALE} from '../locale'
 import {CategoriesContext} from '../contexts'
 import {einsteinAPIConfig} from '../einstein-api.config'
+import {mockCategories as initialMockCategories} from '../commerce-api/mock-data'
 
 export const renderWithReactIntl = (node, locale = DEFAULT_LOCALE) => {
     return render(
@@ -49,11 +53,10 @@ export const TestProviders = ({
     children,
     initialBasket = null,
     initialCustomer = null,
-    initialCategories = [],
+    initialCategories = initialMockCategories,
     initialProductLists = {}
 }) => {
     const mounted = useRef()
-
     // We use this to track mounted state.
     useEffect(() => {
         mounted.current = true

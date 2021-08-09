@@ -1,9 +1,13 @@
+/* * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * *
+ * Copyright (c) 2021 Mobify Research & Development Inc. All rights reserved. *
+ * * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
 import React from 'react'
 import PropTypes from 'prop-types'
 import {FormattedMessage, FormattedNumber} from 'react-intl'
 import {Stack, Text} from '@chakra-ui/react'
 import useBasket from '../../commerce-api/hooks/useBasket'
 import {useCartItemVariant} from '.'
+import {DEFAULT_CURRENCY} from '../../constants'
 
 /**
  * In the context of a cart product item variant, this component renders the item's
@@ -32,7 +36,7 @@ const ItemPrice = ({currency, ...props}) => {
             <Text fontWeight="bold">
                 <FormattedNumber
                     style="currency"
-                    currency={currency || basket.currency}
+                    currency={currency || basket.currency || DEFAULT_CURRENCY}
                     value={displayPrice}
                 />
                 {hasDiscount && (
@@ -46,7 +50,7 @@ const ItemPrice = ({currency, ...props}) => {
                     >
                         <FormattedNumber
                             style="currency"
-                            currency={currency || basket.currency}
+                            currency={currency || basket.currency || DEFAULT_CURRENCY}
                             value={price}
                         />
                     </Text>
@@ -57,7 +61,7 @@ const ItemPrice = ({currency, ...props}) => {
                 <Text fontSize="14px">
                     <FormattedNumber
                         style="currency"
-                        currency={currency || basket.currency}
+                        currency={currency || basket.currency || DEFAULT_CURRENCY}
                         value={basePrice}
                     />
                     <FormattedMessage

@@ -1,6 +1,6 @@
 {
   "name": "pwa-kit-react-sdk",
-  "version": "0.8.0",
+  "version": "0.9.0-dev",
   "description": "A library that supports the isomorphic React rendering pipeline for Commerce Cloud Managed Runtime apps",
   "main": "dist/index.js",
   "bin": {
@@ -22,13 +22,11 @@
     "vendor"
   ],
   "scripts": {
-    "copyright:lint": "copyright \"src/*.js?(x)\" \"src/!(static)/**/*.js?(x)\" \"bin/**/*.js?(x)\" \"tests/**/*.js?(x)\" \"scripts/**/*.js?(x)\"",
-    "copyright:fix": "npm run copyright:lint -- --fix --update ",
     "prepare": "npm run prod:build",
     "prod:build": "cross-env NODE_ENV=production scripts/build.js",
     "dev:watch": "watch 'npm run dev:build' src/",
-    "lint": "npm run lint:js && npm run copyright:lint",
-    "lint:fix": "npm run lint:js -- --fix && npm run copyright:fix",
+    "lint": "npm run lint:js",
+    "lint:fix": "npm run lint:js -- --fix",
     "lint:js": "eslint \"**/*.{js,jsx}\"",
     "test": "cross-env NODE_ENV=test jest --maxWorkers=2",
     "test:integration": "cross-env TEST_TYPE=integration npm run test",
@@ -110,6 +108,7 @@
     "eslint": "7.31.0",
     "eslint-config-prettier": "4.0.0",
     "eslint-import-resolver-webpack": "0.10.0",
+    "eslint-plugin-header": "^3.1.1",
     "eslint-plugin-import": "2.23.4",
     "eslint-plugin-jsx-a11y": "6.4.1",
     "eslint-plugin-prettier": "3.0.1",
@@ -122,7 +121,6 @@
     "jest-environment-jsdom-global": "^2.0.4",
     "jest-expect-message": "1.0.0",
     "jest-fetch-mock": "^2.1.2",
-    "mobify-code-style": "^2.8.5",
     "nock": "^13.1.1",
     "node-fetch": "2.6.1",
     "node-html-parser": "^3.3.4",

@@ -62,6 +62,7 @@ const ProductTile = (props) => {
 
     return (
         <Link
+            data-testid="product-tile"
             {...styles.container}
             to={productUrlBuilder({id: productSearchItem?.productId}, intl.local)}
             {...rest}

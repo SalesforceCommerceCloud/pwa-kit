@@ -2,7 +2,7 @@
  * Copyright (c) 2021 Mobify Research & Development Inc. All rights reserved. *
  * * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
 
-import {buildUrlSet} from './url'
+import {buildUrlSet, categoryUrlBuilder, productUrlBuilder, searchUrlBuilder} from './url'
 
 describe('buildUrlSet returns the expected set of urls', () => {
     test('when no values are passed in', () => {
@@ -55,5 +55,24 @@ describe('buildUrlSet returns the expected set of urls', () => {
             '/mens/clothing?server_only&offset=5',
             '/mens/clothing?server_only&offset=10'
         ])
+    })
+})
+
+describe('url builder test', () => {
+    test('searchUrlBuilder returns expect', () => {
+        const url = searchUrlBuilder('term')
+
+        expect(url).toEqual('/search?q=term')
+    })
+
+    test('productUrlBuilder returns expect', () => {
+        const url = productUrlBuilder({id: 'productId'})
+
+        expect(url).toEqual('/en/product/productId')
+    })
+
+    test('categoryUrlBuilder returns expect', () => {
+        const url = categoryUrlBuilder({id: 'men'})
+        expect(url).toEqual(`/en/category/men`)
     })
 })

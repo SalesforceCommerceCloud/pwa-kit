@@ -112,7 +112,7 @@ describe('The useVariationAttributes', () => {
             </Router>
         )
         expect(wrapper.getByTestId('variationAttributes').text).toEqual(
-            '[{"id":"color","name":"Color","values":[{"name":"Black","orderable":false,"value":"001","image":{"alt":"Basic Leg Trousers, Black, swatch","disBaseLink":"https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw6cc11129/images/swatch/90011212_001_sw.jpg","link":"https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw6cc11129/images/swatch/90011212_001_sw.jpg","title":"Basic Leg Trousers, Black"},"href":"/en/product/73910532M?color=001&size=2"}],"selectedValue":{"value":"blue"}},{"id":"size","name":"Size","values":[{"name":"28","orderable":false,"value":"28","href":"/en/product/73910532M?color=blue&size=28"}],"selectedValue":{"value":"2"}}]'
+            '[{"id":"color","name":"Color","values":[{"name":"Black","orderable":false,"value":"001","image":{"alt":"Basic Leg Trousers, Black, swatch","disBaseLink":"https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw6cc11129/images/swatch/90011212_001_sw.jpg","link":"https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw6cc11129/images/swatch/90011212_001_sw.jpg","title":"Basic Leg Trousers, Black"},"href":"/test/path?color=001&size=2"}],"selectedValue":{"value":"blue"}},{"id":"size","name":"Size","values":[{"name":"28","orderable":false,"value":"28","href":"/test/path?color=blue&size=28"}],"selectedValue":{"value":"2"}}]'
         )
     })
 })

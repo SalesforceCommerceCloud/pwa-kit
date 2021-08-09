@@ -1,3 +1,6 @@
+/* * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * *
+ * Copyright (c) 2021 Mobify Research & Development Inc. All rights reserved. *
+ * * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
 import {useContext, useMemo} from 'react'
 import useEinstein from './useEinstein'
 import {useCommerceAPI, BasketContext} from '../utils'
@@ -128,14 +131,15 @@ export default function useBasket() {
              * Get the product information for all items in the basket.
              *
              * @param {string} ids - The id(s) of the product, separated by ",".
+             * @param {boolean} options - options to pass as params to the api request
              */
-            async getProductsInBasket(ids) {
+            async getProductsInBasket(ids, options) {
                 if (!ids) {
                     return
                 }
 
                 const response = await api.shopperProducts.getProducts({
-                    parameters: {ids: ids}
+                    parameters: {ids: ids, ...options}
                 })
 
                 const itemDetail = response.data.reduce((result, item) => {

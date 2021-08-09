@@ -1,3 +1,6 @@
+/* * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * *
+ * Copyright (c) 2021 Mobify Research & Development Inc. All rights reserved. *
+ * * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
 import React, {useState} from 'react'
 import {Button} from '@chakra-ui/react'
 import useBasket from '../../../../commerce-api/hooks/useBasket'
@@ -56,7 +59,9 @@ const WishlistPrimaryAction = () => {
     return (
         <>
             {isMasterProduct ? (
-                <Button variant={'solid'}>Select Options</Button>
+                <Button w={'full'} variant={'solid'}>
+                    Select Options
+                </Button>
             ) : (
                 <Button
                     variant={'solid'}

@@ -1,14 +1,22 @@
+/* * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * *
+ * Copyright (c) 2021 Mobify Research & Development Inc. All rights reserved. *
+ * * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
 import React, {useEffect} from 'react'
+import PropTypes from 'prop-types'
+
 import {fireEvent, screen, waitFor} from '@testing-library/react'
 import Header from './index'
 import {renderWithProviders} from '../../utils/test-utils'
 import useCustomer from '../../commerce-api/hooks/useCustomer'
 import {setupServer} from 'msw/node'
 import {rest} from 'msw'
-import {mockedCustomerProductLists, mockedRegisteredCustomer} from '../../commerce-api/mock-data'
+import {
+    exampleTokenReponse,
+    mockedCustomerProductLists,
+    mockedRegisteredCustomer
+} from '../../commerce-api/mock-data'
 import {Route, Switch} from 'react-router-dom'
-import Account from '../../pages/account'
-
+import {createMemoryHistory} from 'history'
 jest.mock('../../commerce-api/utils', () => {
     const originalModule = jest.requireActual('../../commerce-api/utils')
     return {
@@ -17,21 +25,36 @@ jest.mock('../../commerce-api/utils', () => {
     }
 })
 
-const MockedComponent = () => {
+const MockedComponent = ({history}) => {
     const customer = useCustomer()
-
     useEffect(() => {
         if (customer?.authType !== 'registered') {
             customer.login('customer@test.com', 'password1')
         }
     }, [])
+    const onAccountClick = () => {
+        // Link to account page for registered customer, open auth modal otherwise
+        if (customer?.authType === 'registered') {
+            history.push('/en/account')
+        }
+    }
+    const onWishlistClick = () => {
+        history.push('/en/account/wishlist')
+    }
 
     return (
         <Switch>
-            <Header />
-            <Route path="/en/account" render={(props) => <Account {...props} />} />
+            <Route path={'/'}>
+                <div>
+                    <Header onMyAccountClick={onAccountClick} onWishlistClick={onWishlistClick} />
+                    <div>home page</div>
+                </div>
+            </Route>
         </Switch>
     )
+}
+MockedComponent.propTypes = {
+    history: PropTypes.object
 }
 
 const server = setupServer(
@@ -64,6 +87,9 @@ const server = setupServer(
                 enc_user_id: 'testEncUserId'
             })
         )
+    ),
+    rest.get('*/oauth2/logout', (req, res, ctx) =>
+        res(ctx.delay(0), ctx.status(200), ctx.json(exampleTokenReponse))
     )
 )
 
@@ -108,24 +134,18 @@ test('renders Header with event handlers', () => {
     const onLogoClick = jest.fn()
     const onMyAccountClick = jest.fn()
     const onMyCartClick = jest.fn()
-    const onSearchChange = jest.fn()
-    const onSearchSubmit = jest.fn()
     renderWithProviders(
         <Header
             onMenuClick={onMenuClick}
             onLogoClick={onLogoClick}
             onMyAccountClick={onMyAccountClick}
             onMyCartClick={onMyCartClick}
-            onSearchChange={onSearchChange}
-            onSearchSubmit={onSearchSubmit}
         />
     )
     const menu = document.querySelector('button[aria-label="Menu"]')
     const logo = document.querySelector('button[aria-label="Logo"]')
     const account = document.querySelector('svg[aria-label="My account"]')
     const cart = document.querySelector('button[aria-label="My cart"]')
-    const searchInput = document.querySelector('input[type="search"]')
-    const form = document.querySelector('form')
 
     fireEvent.click(menu)
     expect(onMenuClick).toHaveBeenCalledTimes(1)
@@ -135,12 +155,6 @@ test('renders Header with event handlers', () => {
     expect(onMyAccountClick).toHaveBeenCalledTimes(1)
     fireEvent.click(cart)
     expect(onMyCartClick).toHaveBeenCalledTimes(1)
-    fireEvent.change(searchInput, {target: {value: '123'}})
-    expect(searchInput.value).toBe('123')
-    expect(onSearchChange).toHaveBeenCalledTimes(1)
-    fireEvent.submit(form)
-    expect(onSearchSubmit).toHaveBeenCalledTimes(1)
-    expect(onSearchSubmit).toHaveBeenCalledWith(expect.anything(), '123')
 })
 
 /**
@@ -169,7 +183,7 @@ test('renders cart badge when basket is loaded', () => {
     expect(badge).toBeInTheDocument()
 })
 
-test('direct users to account page when an authenticated users click on account icon', async () => {
+test('route to account page when an authenticated users click on account icon', async () => {
     server.use(
         rest.post('*/oauth2/login', (req, res, ctx) =>
             res(ctx.delay(0), ctx.status(303), ctx.set('location', `/testcallback`))
@@ -193,20 +207,76 @@ test('direct users to account page when an authenticated users click on account 
         rest.get('*/customers/:customerId', (req, res, ctx) =>
             res(
                 ctx.json({
-                    ...mockedRegisteredCustomer,
-                    firstName: 'Geordi'
+                    ...mockedRegisteredCustomer
                 })
             )
         )
     )
-    renderWithProviders(<MockedComponent />)
-    // Look for account icon
-    const account = document.querySelector('svg[aria-label="My account"]')
-
-    fireEvent.click(account)
+    const history = createMemoryHistory()
+    // mock push function
+    history.push = jest.fn()
+    renderWithProviders(<MockedComponent history={history} />)
 
     await waitFor(() => {
-        expect(screen.getByText('My Account')).toBeInTheDocument()
+        // Look for account icon
+        const accountTrigger = document.querySelector('svg[aria-label="My account trigger"]')
+        expect(accountTrigger).toBeInTheDocument()
+    })
+    const accountIcon = document.querySelector('svg[aria-label="My account"]')
+    fireEvent.click(accountIcon)
+    await waitFor(() => {
+        expect(history.push).toHaveBeenCalledWith('/en/account')
+    })
+
+    fireEvent.keyDown(accountIcon, {key: 'Enter', code: 'Enter'})
+    await waitFor(() => {
+        expect(history.push).toHaveBeenCalledWith('/en/account')
+    })
+})
+
+test('route to wishlist page when an authenticated users click on wishlist icon', async () => {
+    server.use(
+        rest.post('*/oauth2/login', (req, res, ctx) =>
+            res(ctx.delay(0), ctx.status(303), ctx.set('location', `/testcallback`))
+        ),
+        rest.get('*/testcallback', (req, res, ctx) => {
+            return res(ctx.delay(0), ctx.status(200))
+        }),
+
+        rest.post('*/oauth2/token', (req, res, ctx) =>
+            res(
+                ctx.delay(0),
+                ctx.json({
+                    customer_id: 'test',
+                    access_token: 'testtoken',
+                    refresh_token: 'testrefeshtoken',
+                    usid: 'testusid',
+                    enc_user_id: 'testEncUserId'
+                })
+            )
+        ),
+        rest.get('*/customers/:customerId', (req, res, ctx) =>
+            res(
+                ctx.json({
+                    ...mockedRegisteredCustomer
+                })
+            )
+        )
+    )
+    const history = createMemoryHistory()
+    // mock push function
+    history.push = jest.fn()
+    renderWithProviders(<MockedComponent history={history} />)
+
+    await waitFor(() => {
+        // Look for account icon
+        const accountTrigger = document.querySelector('svg[aria-label="My account trigger"]')
+        expect(accountTrigger).toBeInTheDocument()
+    })
+    const wishlistIcon = document.querySelector('button[aria-label="Wishlist"]')
+    fireEvent.click(wishlistIcon)
+    await waitFor(() => {
+        expect(history.push).toHaveBeenCalledWith('/en/account/wishlist')
     })
 })
 
@@ -234,8 +304,7 @@ test('shows dropdown menu when an authenticated users hover on the account icon'
         rest.get('*/customers/:customerId', (req, res, ctx) =>
             res(
                 ctx.json({
-                    ...mockedRegisteredCustomer,
-                    firstName: 'Geordi'
+                    ...mockedRegisteredCustomer
                 })
             )
         ),
@@ -251,6 +320,9 @@ test('shows dropdown menu when an authenticated users hover on the account icon'
     fireEvent.mouseOver(account)
 
     await waitFor(() => {
+        // Look for account icon
+        const accountTrigger = document.querySelector('svg[aria-label="My account trigger"]')
+        expect(accountTrigger).toBeInTheDocument
         expect(screen.getByText('My Account')).toBeInTheDocument()
     })
 })

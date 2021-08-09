@@ -1,8 +1,12 @@
+/* * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * *
+ * Copyright (c) 2021 Mobify Research & Development Inc. All rights reserved. *
+ * * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
 import React from 'react'
 import PropTypes from 'prop-types'
 import {AspectRatio, Box, Badge, Image} from '@chakra-ui/react'
 import {useCartItemVariant} from '.'
 import {FormattedMessage} from 'react-intl'
+import {filterImageGroups} from '../../utils/image-groups-utils'
 
 /**
  * In the context of a cart product item variant, this component renders the item's
@@ -15,8 +19,11 @@ import {FormattedMessage} from 'react-intl'
 const ItemImage = ({imageProps, ratio = 1, ...props}) => {
     const variant = useCartItemVariant()
 
-    // We fine the 'small' images in the variant's image groups and pick the first one.
-    const image = variant.imageGroups?.find((group) => group.viewType === 'small').images[0]
+    // We find the 'small' images in the variant's image groups based on variationValues and pick the first one
+    const image = filterImageGroups(variant?.imageGroups, {
+        size: 'small',
+        selectedVariationAttributes: variant?.variationValues
+    }).images?.[0]
 
     return (
         <Box width="84px" backgroundColor="gray.100" {...props}>

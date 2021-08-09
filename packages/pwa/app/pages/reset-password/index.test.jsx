@@ -1,3 +1,6 @@
+/* * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * *
+ * Copyright (c) 2021 Mobify Research & Development Inc. All rights reserved. *
+ * * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
 import React from 'react'
 import {screen, waitFor, within} from '@testing-library/react'
 import user from '@testing-library/user-event'
@@ -172,6 +175,4 @@ test('Renders error message from server', async () => {
     user.click(within(screen.getByTestId('sf-auth-modal-form')).getByText(/reset password/i))
 
     expect(await screen.findByText('Something went wrong')).toBeInTheDocument()
-
-    screen.debug()
 })

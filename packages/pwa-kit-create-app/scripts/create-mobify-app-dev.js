@@ -1,4 +1,7 @@
 #!/usr/bin/env node
+/* * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * *
+ * Copyright (c) 2021 Mobify Research & Development Inc. All rights reserved. *
+ * * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
 
 /**
  * This is a small wrapper around the generator script that we intend to use during
@@ -34,6 +37,7 @@
  * accidentally add a devDependency to a package and then forget that the
  * devDependency won't actually be installed for the end-user!
  */
+
 const p = require('path')
 const sh = require('shelljs')
 const fs = require('fs')

@@ -1,3 +1,7 @@
+/* * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * *
+ * Copyright (c) 2021 Mobify Research & Development Inc. All rights reserved. *
+ * * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
+
 /**
  * Call requestIdleCallback in supported browsers.
  *
@@ -91,3 +95,59 @@ export const flatten = (node, key = 'children') => {
  * @returns Boolean
  */
 export const isServer = typeof window === 'undefined'
+
+/**
+ * retrieves an item from session storage
+ * @param {string} key
+ * @returns JSON | undefined
+ */
+export const getSessionJSONItem = (key) => {
+    if (isServer) {
+        return undefined
+    }
+    const item = window.sessionStorage.getItem(key)
+    if (item) {
+        return JSON.parse(item)
+    } else {
+        return undefined
+    }
+}
+/**
+ * sets an item in session storage
+ * @param {string} key
+ * @param {string} value
+ */
+export const setSessionJSONItem = (key, value) => {
+    window.sessionStorage.setItem(key, JSON.stringify(value))
+}
+
+/**
+ * clears an item in session storage
+ * @param {string} key
+ */
+export const clearSessionJSONItem = (key) => {
+    window.sessionStorage.removeItem(key)
+}
+
+/**
+ * bolds a substring of a string by adding <b> tags
+ * @param {string} str
+ * @param {string} substr
+ * @returns stringified HTML Node
+ */
+export const boldString = (str, substr) => {
+    return str.replace(RegExp(substr, 'g'), `<b>${substr}</b>`)
+}
+
+/**
+ * Capitalizes the words in a string
+ * @param {string} text
+ * @returns capitalized text
+ */
+export const capitalize = (text) => {
+    return text
+        .toLowerCase()
+        .split(' ')
+        .map((s) => s.charAt(0).toUpperCase() + s.substring(1))
+        .join(' ')
+}

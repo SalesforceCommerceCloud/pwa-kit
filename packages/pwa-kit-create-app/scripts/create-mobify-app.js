@@ -1,4 +1,7 @@
 #!/usr/bin/env node
+/* * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * *
+ * Copyright (c) 2021 Mobify Research & Development Inc. All rights reserved. *
+ * * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
 
 /**
  * This is a generator for projects that run on the Mobify platform.
@@ -26,6 +29,7 @@
  *   1. "test-project" - A test project using the demo connector.
  *   2. "test-project-sffc" - A test project using the SFCC connector.
  */
+
 const p = require('path')
 const program = require('commander')
 const inquirer = require('inquirer')
@@ -257,14 +261,9 @@ const buildAnswers = ({
 }) => {
     return {
         globals: {projectId},
-
         'scaffold-pwa': {
             name: projectId,
             version: GENERATED_PROJECT_VERSION,
-            aJSSlug: projectId,
-            projectSlug: projectId,
-            siteName: projectId,
-
             mobify: {
                 ssrParameters: {
                     proxyConfigs: [

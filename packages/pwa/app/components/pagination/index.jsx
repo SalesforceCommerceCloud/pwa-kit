@@ -45,7 +45,7 @@ const Pagination = (props) => {
 
     // Determine the current page index.
     return (
-        <Flex className="sf-pagination" {...styles.container} {...rest}>
+        <Flex data-testid="sf-pagination" className="sf-pagination" {...styles.container} {...rest}>
             {/* Previous Button */}
             <Button
                 {...styles.button}

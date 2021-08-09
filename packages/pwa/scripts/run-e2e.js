@@ -1,5 +1,7 @@
 #!/usr/bin/env node
-
+/* * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * *
+ * Copyright (c) 2021 Mobify Research & Development Inc. All rights reserved. *
+ * * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
 const utils = require('./utils')
 const spawnSync = require('cross-spawn').sync
 

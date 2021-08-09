@@ -6,7 +6,7 @@
 import {useVariationParams} from './use-variation-params'
 
 /**
- * For use on the Product Detail page, this hook returns the currently selected
+ * This hook returns the currently selected
  * variant or undefined. NOTE: All attributes must be selected before a variant
  * will be returned.
  *

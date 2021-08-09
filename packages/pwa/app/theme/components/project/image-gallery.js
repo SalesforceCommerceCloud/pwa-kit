@@ -1,8 +1,14 @@
+/* * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * *
+ * Copyright (c) 2021 Mobify Research & Development Inc. All rights reserved. *
+ * * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
 export default {
     baseStyle: {
         container: {},
         heroImage: {},
         heroImageGroup: {
+            marginBottom: 2
+        },
+        heroImageSkeleton: {
             marginBottom: 2
         },
         thumbnailImageGroup: {},
@@ -19,7 +25,32 @@ export default {
             _focusVisible: {
                 outline: 0
             }
+        },
+        thumbnailImageSkeleton: {
+            marginRight: 2,
+            width: [20, 20, 24, 24]
         }
     },
-    parts: ['container', 'heroImageGroup', 'thumbnailImageGroup']
+    sizes: {
+        sm: {
+            heroImageSkeleton: {
+                maxWidth: ['none', 'none', '500px']
+            },
+            heroImage: {
+                maxWidth: ['none', 'none', '500px']
+            }
+        },
+        md: {
+            heroImageSkeleton: {
+                maxWidth: ['none', 'none', '680px']
+            },
+            heroImage: {
+                maxWidth: ['none', 'none', '680px']
+            }
+        }
+    },
+    defaultProps: {
+        size: 'md'
+    },
+    parts: ['container', 'heroImageGroup', 'heroImage', 'heroImageSkeleton', 'thumbnailImageGroup']
 }

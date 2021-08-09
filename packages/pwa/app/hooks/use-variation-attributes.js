@@ -9,7 +9,7 @@ import {useLocation} from 'react-router-dom'
 import {useVariationParams} from './use-variation-params'
 
 // Utils
-import {productUrlBuilder, rebuildPathWithParams} from '../utils/url'
+import {rebuildPathWithParams} from '../utils/url'
 
 /**
  * Return the first image in the `swatch` type image group for a given
@@ -45,10 +45,7 @@ const getVariantValueSwatch = (product, variationValue) => {
  * @returns {String} a product url for the current variation value.
  */
 const buildVariantValueHref = (product, params, location) => {
-    return rebuildPathWithParams(
-        `${productUrlBuilder({id: product.master.masterId})}${location.search}`,
-        params
-    )
+    return rebuildPathWithParams(`${location.pathname}${location.search}`, params)
 }
 
 /**

@@ -1,3 +1,6 @@
+/* * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * *
+ * Copyright (c) 2021 Mobify Research & Development Inc. All rights reserved. *
+ * * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
 import React from 'react'
 import {screen} from '@testing-library/react'
 import user from '@testing-library/user-event'
@@ -7,6 +10,8 @@ import {renderWithProviders} from '../../utils/test-utils'
 import Login from '.'
 import {BrowserRouter as Router, Route} from 'react-router-dom'
 import Account from '../account'
+import Registration from '../registration'
+import ResetPassword from '../reset-password'
 
 jest.setTimeout(60000)
 
@@ -85,6 +90,12 @@ const MockedComponent = () => {
     return (
         <Router>
             <Login />
+            <Route path="/en/registration">
+                <Registration />
+            </Route>
+            <Route path="/en/reset-password">
+                <ResetPassword />
+            </Route>
             <Route path="/en/account">
                 <Account match={match} />
             </Route>
@@ -169,6 +180,30 @@ test('Renders error when given incorrect log in credentials', async () => {
     expect(
         await screen.findByText(
             /Incorrect username or password, please try again./i,
+            {},
+            {timeout: 12000}
+        )
+    ).toBeInTheDocument()
+})
+
+test('should navigate to sign in page when the user clicks Create Account', async () => {
+    // render our test component
+    renderWithProviders(<MockedComponent />)
+    user.click(screen.getByText(/Create Account/i))
+
+    // wait for sign up page to appear
+    expect(await screen.findByText(/Let's get started/i, {}, {timeout: 12000})).toBeInTheDocument()
+})
+
+test('should navigate to reset password page when the user clicks Forgot Password', async () => {
+    // render our test component
+    renderWithProviders(<MockedComponent />)
+    user.click(screen.getByText(/forgot password/i))
+
+    // wait for sign up page to appear
+    expect(
+        await screen.findByText(
+            /Enter your email to receive instructions on how to reset your password/i,
             {},
             {timeout: 12000}
         )

@@ -40,7 +40,6 @@ const MockProduct = {
 
 const MockComponent = () => {
     const variant = useVariant(MockProduct)
-    console.log('variant: ', variant)
     return (
         <script data-testid="variant" type="application/json">
             {JSON.stringify(variant)}

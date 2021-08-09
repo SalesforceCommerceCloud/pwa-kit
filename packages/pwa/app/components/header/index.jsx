@@ -1,3 +1,6 @@
+/* * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * *
+ * Copyright (c) 2021 Mobify Research & Development Inc. All rights reserved. *
+ * * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
 import React, {useRef, useState} from 'react'
 import PropTypes from 'prop-types'
 import {useIntl} from 'react-intl'
@@ -26,7 +29,7 @@ import useBasket from '../../commerce-api/hooks/useBasket'
 import useCustomer from '../../commerce-api/hooks/useCustomer'
 
 import Link from '../link'
-import SearchInput from '../search-input'
+import Search from '../search'
 import withRegistration from '../../hoc/with-registration'
 import {
     AccountIcon,
@@ -59,18 +62,13 @@ const IconButtonWithRegistration = withRegistration(IconButton)
  * @param   {func} props.onMenuClick click event handler for menu button
  * @param   {func} props.onLogoClick click event handler for menu button
  * @param   {object} props.searchInputRef reference of the search input
- * @param   {func} props.onSearchSubmit submit event handler for search input
- * @param   {func} props.onSearchChange input change event handler for search input
  * @param   {func} props.onMyAccountClick click event handler for my account button
  * @param   {func} props.onMyCartClick click event handler for my cart button
  * @return  {React.ReactElement} - Header component
  */
 const Header = ({
     children,
-    searchInputRef,
     onMenuClick = noop,
-    onSearchSubmit = noop,
-    onSearchChange = noop,
     onMyAccountClick = noop,
     onLogoClick = noop,
     onMyCartClick = noop,
@@ -91,7 +89,6 @@ const Header = ({
     const hasEnterPopoverContent = useRef()
 
     const styles = useMultiStyleConfig('Header')
-    searchInputRef = searchInputRef || useRef()
 
     const onSignoutClick = async () => {
         setShowLoading(true)
@@ -140,17 +137,13 @@ const Header = ({
                     />
                     <Box {...styles.bodyContainer}>{children}</Box>
                     <Box {...styles.searchContainer}>
-                        <form onSubmit={(e) => onSearchSubmit(e, searchInputRef.current.value)}>
-                            <SearchInput
-                                placeholder={intl.formatMessage({
-                                    id: 'header.search.field.value.placeholder',
-                                    defaultMessage: 'Search for products...'
-                                })}
-                                ref={searchInputRef}
-                                {...styles.search}
-                                onChange={onSearchChange}
-                            />
-                        </form>
+                        <Search
+                            placeholder={intl.formatMessage({
+                                id: 'header.search.field.value.placeholder',
+                                defaultMessage: 'Search for products...'
+                            })}
+                            {...styles.search}
+                        />
                     </Box>
                     <AccountIcon
                         {...styles.accountIcon}
@@ -176,6 +169,7 @@ const Header = ({
                         >
                             <PopoverTrigger>
                                 <ChevronDownIcon
+                                    aria-label="My account trigger"
                                     onMouseLeave={handleIconsMouseLeave}
                                     onKeyDown={(e) => {
                                         keyMap[e.key]?.(e)
@@ -277,8 +271,6 @@ Header.propTypes = {
     children: PropTypes.node,
     onMenuClick: PropTypes.func,
     onLogoClick: PropTypes.func,
-    onSearchSubmit: PropTypes.func,
-    onSearchChange: PropTypes.func,
     onMyAccountClick: PropTypes.func,
     onWishlistClick: PropTypes.func,
     onMyCartClick: PropTypes.func,

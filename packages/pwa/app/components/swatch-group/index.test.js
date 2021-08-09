@@ -1,6 +1,9 @@
+/* * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * *
+ * Copyright (c) 2021 Mobify Research & Development Inc. All rights reserved. *
+ * * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
 import React from 'react'
-import {screen, render} from '@testing-library/react'
-import {Router, useLocation} from 'react-router-dom'
+import {screen, render, fireEvent, waitFor} from '@testing-library/react'
+import {Router, useHistory, useLocation} from 'react-router-dom'
 import SwatchGroup from './index'
 import {Box} from '@chakra-ui/react'
 import Swatch from './swatch'
@@ -57,6 +60,7 @@ const data = {
 
 const Page = () => {
     const location = useLocation()
+    const history = useHistory()
     const params = new URLSearchParams(location.search)
     const selectedColor = data.values.find(({value}) => {
         return value === params.get('color')
@@ -67,8 +71,13 @@ const Page = () => {
             variant="circle"
             key={data.id}
             value={params.get('color')}
-            label={selectedColor && selectedColor.name}
+            displayName={(selectedColor && selectedColor.name) || ''}
+            label={data.name}
             name={data.name}
+            onChange={(_, href) => {
+                if (!href) return
+                history.replace(href)
+            }}
         >
             {data.values.map(({value, name, image, orderable, href}) => {
                 return (
@@ -86,6 +95,7 @@ const Page = () => {
                             minW="32px"
                             bgImage={image ? `url(${image.disBaseLink})` : ''}
                         />
+                        <div>{value}</div>
                     </Swatch>
                 )
             })}
@@ -104,5 +114,23 @@ describe('Swatch Component', () => {
             </Router>
         )
         expect(screen.getAllByRole('link').length).toEqual(data.values.length)
+    })
+
+    test('swatch can be selected', () => {
+        const history = createMemoryHistory()
+        history.push('/en/swatch-example')
+
+        render(
+            <Router history={history}>
+                <Page />
+            </Router>
+        )
+
+        expect(screen.getAllByRole('link').length).toEqual(data.values.length)
+        const firstSwatch = screen.getAllByRole('link')[0]
+        fireEvent.click(firstSwatch)
+        waitFor(() => {
+            expect(history.search).toEqual('?color=BLACKFB')
+        })
     })
 })

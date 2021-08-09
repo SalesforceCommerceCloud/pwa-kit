@@ -1,3 +1,6 @@
+/* * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * *
+ * Copyright (c) 2021 Mobify Research & Development Inc. All rights reserved. *
+ * * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
 export default {
     baseStyle: {
         borderRadius: 'base'
@@ -48,6 +51,12 @@ export default {
                 bg: 'gray.100',
                 textDecoration: 'none'
             }
+        },
+        'search-link': {
+            color: 'black',
+            justifyContent: 'flex-start',
+            fontSize: 'sm',
+            _hover: {textDecoration: 'none'}
         }
     },
     sizes: {

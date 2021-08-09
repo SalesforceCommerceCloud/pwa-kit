@@ -41,6 +41,12 @@
       "value": "Password must contain at least one lowercase letter"
     }
   ],
+  "1LE+iY": [
+    {
+      "type": 0,
+      "value": "See full details"
+    }
+  ],
   "1TQMt0": [
     {
       "type": 1,
@@ -317,6 +323,12 @@
       "value": "Add New Payment Method"
     }
   ],
+  "DwzDiL": [
+    {
+      "type": 0,
+      "value": "Clear recent searches"
+    }
+  ],
   "EKKW2e": [
     {
       "type": 0,
@@ -451,6 +463,12 @@
     {
       "type": 0,
       "value": "Subtotal"
+    }
+  ],
+  "LiHQih": [
+    {
+      "type": 0,
+      "value": "Coming Soon"
     }
   ],
   "MPcjO/": [
@@ -641,12 +659,6 @@
       "value": "New Arrivals"
     }
   ],
-  "Ri//8C": [
-    {
-      "type": 0,
-      "value": "Add to Cart"
-    }
-  ],
   "SQJto2": [
     {
       "type": 0,
@@ -747,6 +759,12 @@
       "value": "1 number"
     }
   ],
+  "UE9zNR": [
+    {
+      "type": 0,
+      "value": "Recent Searches"
+    }
+  ],
   "Ub+AGc": [
     {
       "type": 0,
@@ -775,12 +793,6 @@
     {
       "type": 0,
       "value": "Forgot password?"
-    }
-  ],
-  "V2AxNc": [
-    {
-      "type": 0,
-      "value": "Add to Wishlist"
     }
   ],
   "VSlYv6": [
@@ -1503,6 +1515,30 @@
       "value": "contact us"
     }
   ],
+  "product_list_page.no_results_double_check": [
+    {
+      "type": 0,
+      "value": "Double-check your spelling and try again or "
+    },
+    {
+      "type": 1,
+      "value": "link"
+    }
+  ],
+  "product_list_page.no_results_search_query": [
+    {
+      "type": 0,
+      "value": "We couldn’t find anything for \""
+    },
+    {
+      "type": 1,
+      "value": "searchQuery"
+    },
+    {
+      "type": 0,
+      "value": "\""
+    }
+  ],
   "py3qts": [
     {
       "type": 0,
@@ -1773,6 +1809,12 @@
     {
       "type": 1,
       "value": "orderNumber"
+    }
+  ],
+  "zb24ln": [
+    {
+      "type": 1,
+      "value": "content"
     }
   ]
 }

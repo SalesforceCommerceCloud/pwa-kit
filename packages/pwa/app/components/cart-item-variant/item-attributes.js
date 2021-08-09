@@ -1,3 +1,7 @@
+/* * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * *
+ * Copyright (c) 2021 Mobify Research & Development Inc. All rights reserved. *
+ * * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
+
 /* eslint-disable no-unused-vars */
 import React, {useEffect, useState} from 'react'
 import PropTypes from 'prop-types'
@@ -6,6 +10,7 @@ import useBasket from '../../commerce-api/hooks/useBasket'
 import {Flex, Stack, Text} from '@chakra-ui/react'
 import {useCartItemVariant} from './'
 import PromoPopover from '../promo-popover'
+import {DEFAULT_CURRENCY} from '../../constants'
 
 /**
  * In the context of a cart product item variant, this component renders a styled
@@ -74,7 +79,7 @@ const ItemAttributes = ({includeQuantity, currency, ...props}) => {
                         <Text as="span" color="green.500">
                             <FormattedNumber
                                 style="currency"
-                                currency={currency || basket.currency}
+                                currency={currency || basket.currency || DEFAULT_CURRENCY}
                                 value={variant.priceAdjustments[0].price}
                             />
                         </Text>

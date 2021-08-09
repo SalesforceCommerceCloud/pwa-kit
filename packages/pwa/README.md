@@ -45,7 +45,7 @@ The React Retail App is built with [Commerce API](https://developer.commerceclou
 
 | name                                          | Description                                                                             |
 | --------------------------------------------- | --------------------------------------------------------------------------------------- |
-| `projectSlug`                                 | Matches your project ID in the [Runtime Admin](https://runtime.commercecloud.com/) tool |
+| `name`                                        | Matches your project ID in the [Runtime Admin](https://runtime.commercecloud.com/) tool |
 | `mobify.ssrParameters.ssrFunctionNodeVersion` | Matches your project's Node version (`12.x`, `14.x`)                                    |
 | `mobify.ssrParameters.proxyConfigs`           | Proxy configuration for Commerce API and OCAPI.                                         |
 

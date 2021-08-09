@@ -1,3 +1,6 @@
+/* * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * *
+ * Copyright (c) 2021 Mobify Research & Development Inc. All rights reserved. *
+ * * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
 import 'raf/polyfill' // fix requestAnimationFrame issue with polyfill
 import '@testing-library/jest-dom/extend-expect'
 import {Crypto} from '@peculiar/webcrypto'
