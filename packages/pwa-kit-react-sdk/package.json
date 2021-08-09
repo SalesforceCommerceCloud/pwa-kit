@@ -14,13 +14,15 @@
   },
   "files": [
     "bin",
-    "generator-assets",
-    "dist",
     "LICENSE",
-    "src",
     "scripts",
-    "vendor"
+    "ssr",
+    "utils",
+    "webpack"
   ],
+  "publishConfig": {
+    "directory": "dist"
+  },
   "scripts": {
     "prepare": "npm run prod:build",
     "prod:build": "cross-env NODE_ENV=production scripts/build.js",
@@ -33,7 +35,8 @@
     "test:watch": "npm test -- --watch",
     "test:inspect": "node --inspect-brk jest --runInBand",
     "version": "node ./scripts/version.js",
-    "format": "prettier --write \"**/*.{js,jsx}\""
+    "format": "prettier --write \"**/*.{js,jsx}\"",
+    "prepublishOnly": "node scripts/prepare-dist.js"
   },
   "repository": {
     "type": "git",
@@ -129,6 +132,7 @@
     "react-dom": "16.14.0",
     "react-helmet": "5.2.0",
     "react-router-dom": "^5.1.2",
+    "replace-in-file": "^6.2.0",
     "s3rver": "^3.1.0",
     "semver": "^7.3.2",
     "shelljs": "^0.8.4",
