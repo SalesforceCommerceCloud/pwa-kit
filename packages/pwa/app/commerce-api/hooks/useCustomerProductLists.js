@@ -286,7 +286,7 @@ export default function useCustomerProductLists() {
             },
 
             /**
-             * Remove an item from a customerProcuctList
+             * Remove an item from a customerProductList
              * @param {string} itemId id of item (in product-list not productId) to be removed
              * @param {string} listId id of list to remove item from
              */
@@ -318,6 +318,52 @@ export default function useCustomerProductLists() {
                                 ...list,
                                 customerProductListItems: list.customerProductListItems.filter(
                                     (x) => x.id !== item.id
+                                )
+                            }
+                        }
+                        return list
+                    })
+                }
+
+                setCustomerProductLists(updatedProductLists)
+            },
+
+            /**
+             * Update an item from a customerProductList
+             *
+             * @param {object} item
+             * @param {string} item.id the id of the item in the product list
+             * @param {number} item.quantity the quantity of the item
+             * @param {string} listId id of the list to update the item in
+             */
+            async updateCustomerProductListItem(item, listId) {
+                if (item.quantity === 0) {
+                    return this.deleteCustomerProductListItem(item, listId)
+                }
+
+                const response = await api.shopperCustomers.updateCustomerProductListItem({
+                    body: item,
+                    parameters: {
+                        customerId: customer.customerId,
+                        listId,
+                        itemId: item.id
+                    }
+                })
+
+                if (isError(response)) {
+                    throw new Error(response)
+                }
+
+                // The response is the single updated item so we'll find that
+                // item by its id and update it
+                const updatedProductLists = {
+                    ...customerProductLists,
+                    data: customerProductLists.data.map((list) => {
+                        if (list.id === listId) {
+                            return {
+                                ...list,
+                                customerProductListItems: list.customerProductListItems.map(
+                                    (item) => (item.id === response.id ? response : item)
                                 )
                             }
                         }

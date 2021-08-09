@@ -11,8 +11,10 @@ import useCustomerProductLists from '../../../commerce-api/hooks/useCustomerProd
 import {Box, Flex, Skeleton} from '@chakra-ui/react'
 import {customerProductListTypes} from '../../../constants'
 import ProductItem from '../../../components/product-item/index'
+import {useToast} from '../../../hooks/use-toast'
 import WishlistPrimaryAction from './partials/wishlist-primary-action'
 import WishlistSecondaryButtonGroup from './partials/wishlist-secondary-button-group'
+import {API_ERROR_MESSAGE} from '../constant'
 
 const numberOfSkeletonItems = 3
 
@@ -22,26 +24,28 @@ const AccountWishlist = () => {
     const customerProductLists = useCustomerProductLists()
     const [wishlist, setWishlist] = useState()
     const [selectedItem, setSelectedItem] = useState(undefined)
+    const showToast = useToast()
 
     const handleActionClicked = (itemId) => {
         setSelectedItem(itemId)
     }
 
-    const handleItemQuantityChanged = (quantity, item) => {
-        const updatedProductList = {
-            ...wishlist,
-            customerProductListItems: wishlist.customerProductListItems.map((product) => {
-                if (product.id === item.id) {
-                    return {
-                        ...product,
-                        quantity: parseInt(quantity)
-                    }
-                }
-                return product
+    const handleItemQuantityChanged = async (quantity, item) => {
+        try {
+            await customerProductLists.updateCustomerProductListItem(
+                {...item, quantity: parseInt(quantity)},
+                wishlist.id
+            )
+        } catch (err) {
+            console.error(err)
+            showToast({
+                title: formatMessage(
+                    {defaultMessage: '{errorMessage}'},
+                    {errorMessage: API_ERROR_MESSAGE}
+                ),
+                status: 'error'
             })
         }
-        // TODO: Call product-list API to update item quantity in wishlist.
-        setWishlist(updatedProductList)
     }
 
     useEffect(() => {
