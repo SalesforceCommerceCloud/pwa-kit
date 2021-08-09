@@ -82,21 +82,25 @@ channel and get a +1 from the engineering team.
 
 ## Normal Releases
 
-Normal releases are made from the `develop` branch. Packages on the develop branch
-should always have version numbers of the form `x.y.z-dev`, which tells you "we are
-working towards a release of version x.y.z". If you checkout develop and see
-packages with a version number that doesn't end in `-dev` something is wrong –
-ask someone for help.
+Normal releases for V1 are made from the `develop` branch, and normal releases for V2 are made
+from the `v2-develop` branch. Packages on the develop branches should always have version numbers 
+of the form `x.y.z-dev`, which tells you "we are working towards a release of version x.y.z". 
+If you checkout develop and see packages with a version number that doesn't end in `-dev` 
+something is wrong –ask someone for help.
+
+We use specific branches to release V1 and V2: 
+- The **V1** release works with the `develop` and `master` branches.
+- The **V2** release works with the `v2-develop` and `v2-master` branches.
 
 It's easier to describe the release process using an example version number, so for
-this example we'll pretend that the version number on develop is `1.1.0-dev`. That
-would mean that we'd be releasing version `1.1.0` to NPM. The version you find on
+this example we'll pretend that we're going to release **V1** and the version number on the branch `develop` 
+is `1.1.0-dev`. That would mean that we'd be releasing version `1.1.0` to NPM. The version you find on
 develop will be different, but the principles are the same.
 
 The steps are as follows:
 
 ```
-git checkout develop
+git checkout develop # Reminder for V2 we use the `v2-develop` branch.
 git pull
 
 # We want a branch to collect and review changes before releasing.
@@ -113,7 +117,6 @@ git push
 # Now, review and make changes to the release candidate. At very least, you want to
 #
 #  - Review/update CHANGELOG.md files for each of the packages.
-#  - Update the `docs/public/versions.json` and `docs/public/release-dates.json` and append the new version number.
 
 
 # If you've made changes and want to publish another release candidate to NPM you can
@@ -125,10 +128,10 @@ npm run bump-version -- 1.1.0-alpha.1
 
 npm run bump-version -- 1.1.0  # Remove the -alpha.x suffix!
 git commit -am "Version 1.1.0"
-git checkout master
+git checkout master  # Reminder for V2 we use the `v2-master` branch.
 git merge release-1.1.0
 git tag v1.1.0
-git push --tags  # Circle will publish to NPM
+git push --tags && git push  # Circle will publish to NPM
 
 # Once done, we need to merge our changes back into develop and prepare for
 # development of the next release. Our releases are always planned to be
@@ -136,10 +139,11 @@ git push --tags  # Circle will publish to NPM
 # no breaking changes. The next minor version bump up from 1.1.0 is 1.2.0,
 # so we want to begin work on 1.2.0-dev. Run this:
 
-git checkout develop
-git merge master
+git checkout develop  # Reminder for V2 we use the `v2-develop` branch.
+git merge master  # Reminder for V2 we use the `v2-master` branch.
 npm run bump-version -- 1.2.0-dev
-git com -am "Begin development on 1.2.0"
+git commit -am "Begin development on 1.2.0"
+git push 
 
 ```
 

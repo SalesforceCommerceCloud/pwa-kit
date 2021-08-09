@@ -1,3 +1,7 @@
+## v2.4.0 (Nov 26, 2020)
+## v2.4.0-alpha.0 (Nov 26, 2020)
+- Update vulnerable third party dependencies [#1410](https://github.com/mobify/mobify-platform-sdks/pull/1410)
+## v2.4.0-dev (Oct 01, 2020)
 ## v2.3.0 (Oct 01, 2020)
 ## v2.3.0-alpha.0 (Oct 01, 2020)
 - Fix MegaMenu double clicking issue. [#1393](https://github.com/mobify/mobify-platform-sdks/pull/1393)

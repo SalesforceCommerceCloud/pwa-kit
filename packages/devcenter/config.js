@@ -200,6 +200,7 @@ const config = {
 
                 // forced order for level 3
                 `/${mainNav.RELEASE_NOTES}/archive/version-history`,
+                `/${mainNav.RELEASE_NOTES}/archive/2020-11`,
                 `/${mainNav.RELEASE_NOTES}/archive/2020-10`,
                 `/${mainNav.RELEASE_NOTES}/archive/2020-08`,
                 `/${mainNav.RELEASE_NOTES}/archive/2020-05`,
