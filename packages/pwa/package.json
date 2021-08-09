@@ -1,6 +1,6 @@
 {
   "name": "scaffold-pwa",
-  "version": "2.4.6",
+  "version": "2.4.7",
   "siteName": "NPSP Web",
   "siteUrl": "https://www.example.com/",
   "projectSlug": "scaffold-pwa",
@@ -43,13 +43,12 @@
     }
   },
   "dependencies": {
-    "@mobify/commerce-integrations": "^2.4.6",
+    "@mobify/commerce-integrations": "^2.4.7",
     "bluebird": "^3.5.1",
     "core-js": "2.4.0",
     "es6-object-assign": "^1.1.0",
     "express": "^4.16.4",
     "hoist-non-react-statics": "^3.3.0",
-    "json-stable-stringify": "^1.0.1",
     "lodash": "^4.17.20",
     "lodash.assign": "4.2.0",
     "lodash.find": "4.6.0",
@@ -100,7 +99,7 @@
     "css-loader": "1.0.0",
     "enzyme": "3.8.0",
     "enzyme-adapter-react-16": "1.15.2",
-    "eslint": "4.19.1",
+    "eslint": "^5.0.0",
     "eslint-config-prettier": "4.0.0",
     "eslint-import-resolver-webpack": "0.10.0",
     "eslint-plugin-import": "2.12.0",
@@ -130,7 +129,7 @@
     "nodemon": "1.18.10",
     "postcss-loader": "3.0.0",
     "prettier": "1.18.2",
-    "progressive-web-sdk": "^2.4.6",
+    "progressive-web-sdk": "^2.4.7",
     "raf": "^3.4.0",
     "raw-loader": "0.5.1",
     "react-loadable": "^5.5.0",
@@ -148,19 +147,13 @@
     "webpack": "4.39.1",
     "webpack-cli": "^3.3.11"
   },
-  "optionalDependencies": {
-    "fsevents": "1.2.9"
-  },
-  "comments": {
-    "fsevents": "fsevents@1.2.9 is locked in to prevent broken builds on windows for v1.2.11"
-  },
   "scripts": {
     "analyze-build": "cross-env MOBIFY_ANALYZE=true npm run prod:build",
     "build-sprites": "npm run clean:svgs && svg-sprite --symbol --symbol-dest='.' --symbol-sprite='sprite.svg' --shape-id-generator='pw-%s' --shape-id-separator=''  --dest=./app/static/svg/sprite-dist ./app/static/svg/sprite-source/*.svg",
     "clean:svgs": "svgo --enable='removeUselessStrokeAndFill' --disable='removeViewBox' -f ./app/static/svg/sprite-source",
     "lint": "npm run lint:js && npm run lint:sass",
     "lint:fix": "npm run lint:js -- --fix",
-    "lint:js": "eslint '**/*.{js,jsx}'",
+    "lint:js": "eslint \"**/*.{js,jsx}\"",
     "lint:sass": "sass-lint -c .sass-lint.yml 'app/**/*.scss' -v",
     "push": "cross-env NODE_ENV=production npm run prod:build && sdk-upload",
     "save-credentials": "sdk-save-credentials",

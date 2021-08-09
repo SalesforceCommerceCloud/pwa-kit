@@ -30,5 +30,5 @@ test('bazaarvoiceWrapper higher order component should render null on server sid
     const WrapperComponent = bazaarvoiceWrapper(mockComponent)
     const wrapper = render(<WrapperComponent />)
     // Component will render nothing as no script is loaded on sever side
-    expect(wrapper.html()).toEqual(null)
+    expect(wrapper.html()).toBeFalsy()
 })

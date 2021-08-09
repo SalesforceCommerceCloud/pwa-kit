@@ -18,7 +18,7 @@ describe('Split on SSR', () => {
             </Split>
         )
 
-        expect(wrapper.html()).toBeNull()
+        expect(wrapper.html()).toBeFalsy()
     })
 
     test('Renders children when showOnVariant is null', () => {

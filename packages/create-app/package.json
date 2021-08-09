@@ -1,6 +1,6 @@
 {
   "name": "@mobify/create-app",
-  "version": "2.4.6",
+  "version": "2.4.7",
   "description": "Mobify's project generator tool",
   "author": "dev@mobify.com",
   "license": "See license in LICENSE",
@@ -16,7 +16,7 @@
   "scripts": {
     "prepare": "node scripts/build.js",
     "format": "prettier --write \"**/*.{js,jsx}\"",
-    "lint": "eslint '**/*.{js,jsx}'"
+    "lint": "eslint \"**/*.{js,jsx}\""
   },
   "dependencies": {
     "commander": "^2.20.0",
@@ -48,7 +48,7 @@
     "bluebird": "^3.5.1",
     "cross-env": "^5.2.0",
     "cross-spawn": "^6.0.5",
-    "eslint": "4.19.1",
+    "eslint": "^5.0.0",
     "eslint-config-prettier": "4.0.0",
     "eslint-import-resolver-webpack": "0.10.0",
     "eslint-plugin-import": "2.12.0",

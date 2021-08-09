@@ -19,7 +19,6 @@ import CopyPlugin from 'copy-webpack-plugin'
 import TimeFixPlugin from 'time-fix-plugin'
 import {BundleAnalyzerPlugin} from 'webpack-bundle-analyzer'
 import LoadablePlugin from '@loadable/webpack-plugin'
-import OptimizeCssAssetsPlugin from 'optimize-css-assets-webpack-plugin'
 import {createModuleReplacementPlugin, BuildMarkerPlugin} from './plugins'
 
 const root = process.cwd()
@@ -134,8 +133,7 @@ const minimizer = (mode) => {
                     cache: true,
                     parallel: true,
                     sourceMap: true
-                }),
-                new OptimizeCssAssetsPlugin()
+                })
             ]
         case development:
             return [

@@ -81,7 +81,7 @@ const commonDevDeps = {
     'babel-plugin-dynamic-import-node-babel-7': '^2.0.7',
     commander: '^2.20.0',
     'cross-env': '^5.2.0',
-    eslint: '4.19.1',
+    eslint: '^5.0.0',
     'eslint-config-prettier': '4.0.0',
     'eslint-import-resolver-webpack': '0.10.0',
     'eslint-plugin-import': '2.12.0',

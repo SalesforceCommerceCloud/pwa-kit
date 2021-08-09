@@ -2,6 +2,7 @@
 /* Copyright (c) 2020 Mobify Research & Development Inc. All rights reserved. */
 /* * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
 
+// eslint-disable-next-line no-unused-vars
 /* global jest */
 
 import 'raf/polyfill' // fix requestAnimationFrame issue with polyfill
