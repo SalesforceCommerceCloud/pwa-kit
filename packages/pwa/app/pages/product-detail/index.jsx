@@ -31,7 +31,6 @@ import useEinstein from '../../commerce-api/hooks/useEinstein'
 // Project Components
 import RecommendedProducts from '../../components/recommended-products'
 import ProductView from '../../partials/product-view'
-import AddToCartModal from '../../components/add-to-cart-modal'
 
 // Others/Utils
 import {HTTPNotFound} from 'pwa-kit-react-sdk/dist/ssr/universal/errors'
@@ -55,7 +54,6 @@ const ProductDetail = ({category, product, isLoading}) => {
     const customerProductLists = useCustomerProductLists()
     const navigate = useNavigation()
     const showToast = useToast()
-
     const handleAddToCart = async (variant, quantity) => {
         try {
             if (!variant?.orderable || !quantity) return
