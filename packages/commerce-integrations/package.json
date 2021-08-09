@@ -6,7 +6,7 @@
     "access": "public"
   },
   "scripts": {
-    "build": "rimraf dist && babel src --bail --ignore '*.test.js','test.js','tapes/*' --out-dir dist --quiet",
+    "build": "rimraf dist && babel src --ignore '*.test.js','test.js','tapes/*' --out-dir dist --quiet",
     "prepare": "npm run build",
     "version": "node ./scripts/version.js",
     "lint": "npm run lint:js",
