@@ -9,7 +9,7 @@
 import * as errors from '../errors'
 
 // Third party modules
-import stringify from 'json-stable-stringify'
+import stringify from 'fast-json-stable-stringify'
 
 /**
  * Create a promise that will resolve in a given number of milliseconds.

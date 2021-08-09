@@ -1,7 +1,7 @@
 /* eslint-disable */
 
 /* * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
-/* Copyright (c) 2019 Mobify Research & Development Inc. All rights reserved. */
+/* Copyright (c) 2021 Mobify Research & Development Inc. All rights reserved. */
 /* * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
 /**
  * The `engagement-engine` module contains the `EngagementEngineConnector` class,

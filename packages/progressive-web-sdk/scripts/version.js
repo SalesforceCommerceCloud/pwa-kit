@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /* * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
-/* Copyright (c) 2019 Mobify Research & Development Inc. All rights reserved. */
+/* Copyright (c) 2021 Mobify Research & Development Inc. All rights reserved. */
 /* * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
 // Update Change Log heading
 const pkg = require('../package.json')

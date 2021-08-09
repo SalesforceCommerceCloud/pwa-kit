@@ -364,10 +364,7 @@ const mapDispatchToProps = {
 }
 
 export {ProductDetails as UnconnectedProductDetails}
-export default connect(
-    mapStateToProps,
-    mapDispatchToProps
-)(ProductDetails)
+export default connect(mapStateToProps, mapDispatchToProps)(ProductDetails)
 
 // eslint-disable-next-line
 const VariationPropertySwatchGroup = ({

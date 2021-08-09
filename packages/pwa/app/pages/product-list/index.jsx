@@ -5,7 +5,7 @@ import {connect} from 'react-redux'
 import {createPropsSelector} from 'reselect-immutable-helpers'
 import MediaQuery from 'react-responsive'
 import PropTypes from 'prop-types'
-import stringify from 'json-stable-stringify'
+import stringify from 'fast-json-stable-stringify'
 import Helmet from 'react-helmet'
 
 import * as actions from './actions'
@@ -213,7 +213,4 @@ const mapDispatchToProps = {
 }
 
 export {ProductList as UnconnectedProductList}
-export default connect(
-    mapStateToProps,
-    mapDispatchToProps
-)(ProductList)
+export default connect(mapStateToProps, mapDispatchToProps)(ProductList)

@@ -1,6 +1,6 @@
 {
     "name": "@mobify/commerce-integrations",
-    "version": "1.20.3",
+    "version": "1.20.4",
     "description": "A customizable API abstraction layer for ecommerce backends.",
     "publishConfig": {
         "access": "public"
@@ -14,7 +14,7 @@
         "version": "node ./scripts/version.js",
         "lint": "npm run lint:js",
         "lint:fix": "npm run lint:js -- --fix",
-        "lint:js": "eslint '**/*.{js,jsx}'",
+        "lint:js": "eslint \"**/*.{js,jsx}\"",
         "test": "jest"
     },
     "repository": {
@@ -30,6 +30,7 @@
     "dependencies": {
         "btoa": "^1.2.1",
         "commercecloud-ocapi-client": "^0.1.12",
+        "fast-json-stable-stringify": "^2.1.0",
         "fs-extra": "^7.0.1",
         "hybris-occ-client": "^0.1.5",
         "i18n-iso-countries": "^3.6.3",
@@ -43,17 +44,16 @@
         "@babel/core": "^7.4.5",
         "@babel/preset-env": "^7.4.5",
         "@babel/preset-react": "^7.0.0",
-        "@mobify/documentation-theme": "^1.20.3",
+        "@mobify/documentation-theme": "^1.20.4",
         "babel-jest": "^24.8.0",
         "cpr": "^3.0.1",
         "cross-spawn": "^6.0.5",
-        "eslint": "4.19.1",
+        "eslint": "^5.0.0",
         "fs-extra": "^7.0.1",
         "immutable": "^3.8.2",
         "jest-cli": "^24.9.0",
         "jsdoc": "^3.6.3",
         "jsdom": "^11.6.2",
-        "json-stable-stringify": "^1.0.1",
         "prop-types": "^15.6.1",
         "react": "^16.8.6",
         "redux": "^3.7.2",

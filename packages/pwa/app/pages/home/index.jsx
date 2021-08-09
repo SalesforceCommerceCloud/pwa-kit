@@ -94,7 +94,4 @@ const mapDispatchToProps = {
     initializeHome: actions.initializeHome
 }
 
-export default connect(
-    mapStateToProps,
-    mapDispatchToProps
-)(Home)
+export default connect(mapStateToProps, mapDispatchToProps)(Home)

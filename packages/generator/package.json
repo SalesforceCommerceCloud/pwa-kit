@@ -1,6 +1,6 @@
 {
   "name": "@mobify/generator",
-  "version": "1.20.3",
+  "version": "1.20.4",
   "description": "Mobify's project generator tool",
   "private": true,
   "main": "scripts/mobify-generator.js",
@@ -22,7 +22,7 @@
   "devDependencies": {
     "@babel/cli": "^7.4.4",
     "cross-spawn": "^6.0.5",
-    "eslint": "4.19.1",
+    "eslint": "^5.0.0",
     "jest-cli": "^24.9.0",
     "jsdoc": "^3.6.3",
     "shelljs": "^0.8.3"

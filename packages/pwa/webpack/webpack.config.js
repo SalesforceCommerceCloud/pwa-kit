@@ -149,12 +149,14 @@ const cssLoader = [
     {
         loader: 'postcss-loader',
         options: {
-            plugins: [
-                autoprefixer({
-                    // Don't remove outdated prefixes. Speeds up build time.
-                    remove: false
-                })
-            ]
+            postcssOptions: {
+                plugins: [
+                    autoprefixer({
+                        // Don't remove outdated prefixes. Speeds up build time.
+                        remove: false
+                    })
+                ]
+            }
         }
     }
 ]

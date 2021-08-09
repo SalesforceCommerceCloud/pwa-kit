@@ -95,7 +95,10 @@ test('Variation properties of product returned', () => {
                         {
                             id: 'color',
                             label: 'Color',
-                            values: [{name: 'black', value: 'Black'}, {name: 'grey', value: 'Grey'}]
+                            values: [
+                                {name: 'black', value: 'Black'},
+                                {name: 'grey', value: 'Grey'}
+                            ]
                         },
                         {
                             id: 'size',
@@ -160,7 +163,10 @@ test('Image sets', () => {
                         {
                             id: 'color',
                             label: 'Color',
-                            values: [{name: 'black', value: 'Black'}, {name: 'grey', value: 'Grey'}]
+                            values: [
+                                {name: 'black', value: 'Black'},
+                                {name: 'grey', value: 'Grey'}
+                            ]
                         },
                         {
                             id: 'size',

@@ -1,6 +1,6 @@
 {
   "name": "@mobify/test-framework",
-  "version": "1.20.3",
+  "version": "1.20.4",
   "description": "Mobify Platform Test Framwork",
   "main": "index.js",
   "bin": {
@@ -13,17 +13,17 @@
   "author": "Mobify",
   "scripts": {
     "lint": "npm run lint:js",
-    "lint:js": "eslint '**/*.{js,jsx}'",
+    "lint:js": "eslint \"**/*.{js,jsx}\"",
     "lint:fix": "npm run lint:js -- --fix",
     "docs": "mobify-docs compile docs/public/latest",
     "docs:preview": "mobify-docs preview docs/public/latest",
     "deployDocs": "node ./scripts/deployDocs.js"
   },
   "dependencies": {
-    "@mobify/documentation-theme": "^1.20.3",
+    "@mobify/documentation-theme": "^1.20.4",
     "chromedriver": "latest",
     "commander": "2.9.0",
-    "lighthouse": "4.2.0",
+    "lighthouse": "^6.0.0",
     "nightwatch": "^1.2.4",
     "rimraf": "2.6.2"
   },
@@ -37,7 +37,7 @@
   "devDependencies": {
     "@babel/core": "^7.4.5",
     "@babel/register": "^7.4.4",
-    "eslint": "4.19.1",
+    "eslint": "^5.0.0",
     "jsdoc": "^3.6.3"
   }
 }

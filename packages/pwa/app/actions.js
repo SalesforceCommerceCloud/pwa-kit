@@ -1,4 +1,4 @@
-import stringify from 'json-stable-stringify'
+import stringify from 'fast-json-stable-stringify'
 import {getRootCategoryId} from './connector'
 
 const ROOT_CATEGORY_ID = getRootCategoryId()

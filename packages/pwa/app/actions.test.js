@@ -2,7 +2,7 @@ import * as actions from './actions'
 import reducer from './reducer'
 import thunk from 'redux-thunk'
 import configureStore from 'redux-mock-store'
-import stringify from 'json-stable-stringify'
+import stringify from 'fast-json-stable-stringify'
 
 test('onOnlineStatusChange updates the online status in the redux store', () => {
     const now = 1234

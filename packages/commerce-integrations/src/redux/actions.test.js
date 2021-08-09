@@ -4,7 +4,7 @@
  * Note that these are *not* integration tests - the API
  * layer is fully-mocked and injected into the thunk-actions.
  */
-import stringify from 'json-stable-stringify'
+import stringify from 'fast-json-stable-stringify'
 import thunk from 'redux-thunk'
 import sinon from 'sinon'
 import * as actions from './actions'

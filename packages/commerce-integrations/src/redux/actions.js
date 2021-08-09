@@ -1,4 +1,4 @@
-import stringify from 'json-stable-stringify'
+import stringify from 'fast-json-stable-stringify'
 import {createAction} from 'redux-actions'
 
 export const receiveCartData = createAction('Receive Cart Data', (payload) => payload)

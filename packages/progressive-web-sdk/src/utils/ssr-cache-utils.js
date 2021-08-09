@@ -1,5 +1,5 @@
 /* * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
-/* Copyright (c) 2019 Mobify Research & Development Inc. All rights reserved. */
+/* Copyright (c) 2021 Mobify Research & Development Inc. All rights reserved. */
 /* * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
 /**
  * @module progressive-web-sdk/dist/utils/ssr-cache-utils
@@ -288,7 +288,7 @@ export class PersistentCache {
 
         workingNamespace.push(...keyElements)
 
-        const cleanupRE = /[\s\/*\\]/gi
+        const cleanupRE = /[\s/*\\]/gi
         // Build safeNamespace as a path, ending in a path separator, so that
         // it will work as both a local and S3 directory path. Any falsy
         // elements in the namespace Array are ignored..
