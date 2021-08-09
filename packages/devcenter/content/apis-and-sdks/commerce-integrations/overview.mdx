@@ -75,12 +75,10 @@ An interface defines the signature of a class including its method names, expect
 
 To reduce bugs later, write your connector methods so that they perform data-centric fetches, not page-centric fetches. For example, rather than storing page-centric content in your state management system, store raw data, such as products and categories so that you can reuse the data on any page and avoid any duplication of the data.
 
-<Callout type="warning">
-
-**Important:** A common mistake is to add new methods to the connector rather than
+:::important
+A common mistake is to add new methods to the connector rather than
 implementing the methods of the [CommerceConnector](/apis-and-sdks/commerce-integrations/connectors/interfaces) interface. This limits your ability to switch between ecommerce backends in the future.
-
-</Callout>
+:::
 
 ### Writing isomorphic JavaScript
 

@@ -142,11 +142,9 @@ If you want to collect pageview metrics using the Google Analytics tag in a Goog
 
 </figure>
 
-<Callout type="info">
-
-**Note:** Do not use the history change trigger type. This trigger type listens for a browser’s history change in order to send a pageview event. This leaves no time for other page-related metrics, such as page title, to be set before sending a pageview event.
-
-</Callout>
+:::note
+Do not use the history change trigger type. This trigger type listens for a browser’s history change in order to send a pageview event. This leaves no time for other page-related metrics, such as page title, to be set before sending a pageview event.
+:::
 
 2. Use your custom-created trigger to trigger your `Pageview` tag, within **Tag Configuration**:
 

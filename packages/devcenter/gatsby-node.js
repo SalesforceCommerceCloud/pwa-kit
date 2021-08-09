@@ -1,7 +1,5 @@
 const path = require('path')
 const startCase = require('lodash.startcase')
-const openApiProcessor = require('./src/utils/processor')
-const fetch = require('node-fetch')
 
 exports.createPages = async ({graphql, actions}) =>
     await graphql(`
@@ -18,43 +16,6 @@ exports.createPages = async ({graphql, actions}) =>
                             title
                             metaTitle
                             metaDescription
-                        }
-                    }
-                }
-            }
-            allOpenApiSpec {
-                edges {
-                    node {
-                        description
-                        paths: childrenOpenApiSpecPath {
-                            fullPath
-                            verb
-                            description
-                            operationId
-                            parameters {
-                                description
-                                in
-                                name
-                                required
-                                schema {
-                                    type
-                                }
-                            }
-                            requestBody: childrenOpenApiSpecRequestBodySchemas {
-                                required
-                                properties {
-                                    description
-                                    enum
-                                    name
-                                    type
-                                }
-                                example
-                            }
-                            response: childOpenApiSpecResponse {
-                                statusCode
-                                description
-                                example
-                            }
                         }
                     }
                 }
@@ -78,10 +39,6 @@ exports.createPages = async ({graphql, actions}) =>
                 component = path.resolve('./src/templates/components.js')
                 context['id'] = node.fields.id
                 context['componentName'] = node.frontmatter.metaTitle
-            } else if (node.fields.slug.match(/apis-and-sdks\/mobify-cloud/g)) {
-                component = path.resolve('./src/templates/cloud-api.js')
-                context['id'] = node.fields.id
-                context['allOpenApiSpec'] = data.allOpenApiSpec
             } else {
                 component = path.resolve('./src/templates/docs.js')
                 context['id'] = node.fields.id
@@ -108,60 +65,6 @@ exports.onCreateWebpackConfig = ({actions}) => {
             }
         }
     })
-}
-
-const toNode = (data, type, createContentDigest) => {
-    const openApiPrefix = 'openapi.'
-
-    if (!data) {
-        throw new Error('No data object specified')
-    }
-
-    if (!type) {
-        throw new Error('No type specified')
-    }
-
-    if (!data.hasOwnProperty('id')) {
-        throw new Error('Data object has no id property')
-    }
-
-    if (!data.hasOwnProperty('parent')) {
-        throw new Error('Data object has no parent property')
-    }
-
-    if (!data.hasOwnProperty('children') || !Array.isArray(data.children)) {
-        throw new Error('Data object has no children array property')
-    }
-
-    if (data.hasOwnProperty('fields') && data.hasOwnProperty('meta')) {
-        throw new Error('Data object defines both a fields and a meta property')
-    }
-
-    if (!data.hasOwnProperty('fields') && !data.hasOwnProperty('meta')) {
-        throw new Error('Data object does not define a fields or meta property')
-    }
-
-    const node = Object.assign(
-        {
-            id: `${openApiPrefix}${data.id}`,
-            parent: data.parent ? `${openApiPrefix}${data.parent}` : null,
-            children: data.children.map((c) => `${openApiPrefix}${c}`),
-            internal: {
-                type
-            }
-        },
-        data.fields
-    )
-
-    if (data.meta) {
-        node.internal.contentDigest = createContentDigest(data.meta.content)
-        node.internal.mediaType = data.meta.mediaType
-        node.internal.content = data.meta.content
-        return node
-    }
-
-    node.internal.contentDigest = createContentDigest(JSON.stringify(data.fields))
-    return node
 }
 
 exports.onCreateNode = async ({node, getNode, actions, loadNodeContent, createContentDigest}) => {
@@ -213,45 +116,5 @@ exports.onCreateNode = async ({node, getNode, actions, loadNodeContent, createCo
             node,
             value: node.frontmatter.title || startCase(parent.name)
         })
-    }
-}
-
-const SUCCESS_REMOTE_FILE_DOWNLOADED = 'Remote file {0} was downloaded'
-const FAILED_REMOTE_FILE_DOWNLOADED = "Can't download the remote file from {0}"
-// download json file provided by ADN team for Cloud API
-exports.sourceNodes = async ({actions, createContentDigest, reporter}) => {
-    const url = 'https://docs.mobify.com/openapi/cloud/openapi-schema.json'
-
-    try {
-        const {createNode} = actions
-        const response = await fetch(url)
-        const resultData = await response.json()
-        if (resultData) {
-            reporter.success(SUCCESS_REMOTE_FILE_DOWNLOADED.replace('{0}', url))
-        }
-
-        const baseUrl = 'https://cloud.mobify.com'
-        const result = openApiProcessor('cloud-api', resultData, baseUrl)
-
-        const nodes = []
-        nodes.push(toNode(result.information, 'OpenApiSpec', createContentDigest))
-        result.paths.forEach((p) => {
-            nodes.push(toNode(p, 'OpenApiSpecPath', createContentDigest))
-        })
-        result.responses.forEach((r) => {
-            nodes.push(toNode(r, 'OpenApiSpecResponse', createContentDigest))
-        })
-        result.requestBodySchemas.forEach((d) => {
-            nodes.push(toNode(d, 'OpenApiSpecRequestBodySchemas', createContentDigest))
-        })
-
-        nodes.forEach((n) => {
-            createNode(n)
-        })
-
-        return
-    } catch (e) {
-        console.log('e', e)
-        reporter.error(FAILED_REMOTE_FILE_DOWNLOADED.replace('{0}', url))
     }
 }

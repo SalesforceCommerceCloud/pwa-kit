@@ -63,11 +63,9 @@ You can change this behavior using the `key` argument. Additionally, you can par
 
 If no matching response was found, `cacheResponseWhenDone()` stores the outgoing response for next time. Responses are stored in the cache for as long as the `s-maxage` and `max-age` properties of the `Cache-Control` header indicate. You can override this behaviour with the `expiry` argument.
 
-<Callout type="info">
-
-**Best practice:** The App Cache should be queried immediately after the [App Server](/get-started/architecture/app-server-overview) receives a request. This way, if a response is found in the cache, it will be returned as quickly as possible.
-
-</Callout>
+:::note
+The App Cache should be queried immediately after the [App Server](/get-started/architecture/app-server-overview) receives a request. This way, if a response is found in the cache, it will be returned as quickly as possible.
+:::
 
 ## Testing the App Cache
 

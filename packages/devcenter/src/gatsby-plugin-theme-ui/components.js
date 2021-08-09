@@ -5,7 +5,6 @@ import JSDocWrapper from './JSDocWrapper'
 import Helmet from 'react-helmet'
 import TableWrapper from '../components/TableWrapper'
 import SchemaTable from '../components/SchemaTable'
-import CloudApiWrapper from './CloudApiWrapper'
 
 export default {
     code: CodeBlock,
@@ -14,6 +13,5 @@ export default {
     TableWrapper,
     Helmet,
     MobifyComponentWrapper,
-    CloudApiWrapper,
     JSDocWrapper
 }

@@ -101,21 +101,6 @@ commands:
           command: |
             # Basic smoke-tests for uncommonly run scripts in a project
             node /home/circleci/project/scripts/smoke-test-npm-scripts.js --dir << parameters.dir >>
-  runaudits:
-    description: 'Run NPM Audits on the Monorepo'
-    steps:
-      - run:
-          name: Run NPM Audits on the Monorepo
-          command: |
-              set +e
-              results=$(node ./scripts/audit.js --max-critical 0 --max-high 18)
-              exitCode=$?
-              set -e
-
-              echo "$results"
-              echo "$results" | awk '{ print "mobify_platform_sdks.vulnerabilities_"$1 " "$2 }' | xargs -n2 bash -c 'dog metric post "$1" $2' bash
-
-              exit $exitCode
   checkclean:
     description: 'Check Repository Clean'
     steps:
@@ -135,7 +120,6 @@ jobs:
     steps:
       - checkout
       - setup
-      - runaudits
       - runtests:
           enableIntegrationTests: false
       - smoketestscripts
@@ -156,7 +140,6 @@ jobs:
     steps:
       - checkout
       - setup
-      - runaudits
       - runtests
       - smoketestscripts
       - run:
@@ -215,22 +198,6 @@ jobs:
 
             cd /tmp/project
             npm run prod:build
-      - run:
-          name: Audit Generated Project
-          environment:
-          command: |
-            # This is the *most* important audit step, much more than the
-            # "whole monorepo" one above - bear in mind that SDK users probably
-            # don't care if eg. our docs site uses a vulnerable dependency.
-            #
-            # Treat failures here seriously and try to fix them before just bumping
-            # thresholds. These vulnerabilities create a really bad impression with our
-            # users during sales or in the early stages of a project.
-            #
-            # REMINDER: Have you bumped up our alpha versions? If you recently fixed some
-            # vulnerabilities, you will need to increment the alpha versions (so that
-            # publishing them to the local npm repo would be successful).
-            ./scripts/audit-single-package.js /tmp/project --max-critical 0 --max-high 2
       - run:
           name: Count Generated Project Dependencies
           environment:

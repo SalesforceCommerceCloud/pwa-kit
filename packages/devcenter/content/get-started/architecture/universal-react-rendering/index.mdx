@@ -12,7 +12,7 @@ In [universal](https://cdb.reacttraining.com/universal-javascript-4761051b7ae9) 
 
 Mobify’s Universal React Rendering framework allows you to write and maintain one code base that can render on both the client and the server.
 
-In this article, we’ll outline the key concepts you’ll need to use this framework.
+In this article, we’ll outline the key concepts for using this framework, including the `getProps` static method and special components.
 
 ## Mobify’s React Server-Side Rendering Framework
 
@@ -101,11 +101,15 @@ ProductList.getProps = async ({params}) => {
 `getProps` is passed a single argument with properties:
 
 -   `params`: the [parameters](https://expressjs.com/en/4x/api.html#req.params) Express object object
--   `req`: the [request](http://expressjs.com/en/4x/api.html#req) Express object, available server-side only
--   `res`: the [response](http://expressjs.com/en/4x/api.html#res) Express object, available server-side only
+-   `req`: the [request](https://expressjs.com/en/4x/api.html#req) Express object, available server-side only
+-   `res`: the [response](https://expressjs.com/en/4x/api.html#res) Express object, available server-side only
 -   `location`: the URL of the request
 
 A component's implementation of `getProps` must run both server and client side, and must return a promise which resolves to an object. The object is passed as props to your component’s [`render`](https://reactjs.org/docs/react-component.html#render) method.
+
+On the _server side_, this returned object is actually going to be serialized in the output html (look for `__PRELOADED_STATE__`). So to keep the html lean, it's best for you to be selective in what data to return in `getProps`. Avoid returning the whole response from the backend if you don't need to.
+
+On the _client side_, when you navigate to subsequent pages, please note that the page would get rendered immediately, while `getProps` is still fetching the data. So you'll need to check for undefined props in your page component. Remember to also render [placeholder skeletons](/how-to-guides/categories/design/placeholder-design) when some data is not available yet.
 
 #### Extending getProps with \_app-config
 
@@ -135,7 +139,7 @@ import fetch from 'isomorphic-fetch'
 const ProductDetails = ({name}) => <h1>{name}</h1>
 
 ProductDetails.getProps = async () => {
-    const response = await fetch(`http://httpbin.org/status/500`)
+    const response = await fetch(`https://httpbin.org/status/500`)
     if (!response.ok) {
         throw new HTTPError(response.status, response.statusText)
     }
@@ -159,7 +163,7 @@ const ProductDetails = ({name, errorProductNotFound}) => (
 )
 
 ProductDetails.getProps = async ({res}) => {
-    const response = await fetch(`http://httpbin.org/status/404`)
+    const response = await fetch(`https://httpbin.org/status/404`)
     if (!response.ok) {
         if (response.status !== 404) {
             throw new HTTPError(response.status, response.statusText)

@@ -8,14 +8,12 @@ maxVersion: 2.0.0
 featured: false
 ---
 
-<Callout type="info">
-
-**Note:** This Guide is only applicable to projects that choose to use Redux for their state management system.
-
-</Callout>
+:::note
+This Guide is only applicable to projects that choose to use Redux for their state management system.
+:::
 
 A selector is a [pure
-function](http://www.nicoespeon.com/en/2015/01/pure-functions-javascript/) that
+function](https://www.nicoespeon.com/en/2015/01/pure-functions-javascript/) that
 takes a state object from the Redux store and returns some information extracted
 from that state object. Selectors are most commonly used in `mapStateToProps`
 functions to provide data to your React components.
@@ -106,10 +104,12 @@ export const getCurrentProduct = createSelector(
 );
 ```
 
-**Important:** When using Reselect's `createSelector` function with more than
+:::important 
+When using Reselect's `createSelector` function with more than
 one basic selector, the resulting compound selector is still memoized. But for
 it to return the memoized result, each of the basic selectors must return the
 same result as the last time the compound selector was called.
+:::
 
 ## Immutable data structures
 

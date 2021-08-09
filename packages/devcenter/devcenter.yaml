@@ -1,13 +1,11 @@
 # DevCenter is hosted on an S3 bucket. CloudFront uses it as an origin,
 # adding HTTP caching heads using Lambda @ Edge Origin Response.
 #
-# Inspired by these implementations:
-# https://gist.github.com/jed/56b1f58297d374572bc51c59394c7e7f
-# https://github.com/jkrnak/serverless-lambda-at-edge
 #
 # This stack must be deployed in `us-east-1` as it contains global resources.
 ---
 AWSTemplateFormatVersion: 2010-09-09
+Transform: AWS::Serverless-2016-10-31
 Description: mobify-devcenter
 
 Parameters:
@@ -16,12 +14,6 @@ Parameters:
         Default: staging
         AllowedPattern: '[a-z][-a-z0-9]+'
 
-    # *.mobify.com
-    CloudFrontCertificateARN:
-        Type: String
-        Default: arn:aws:acm:us-east-1:787649934531:certificate/718b7a81-9767-40c5-9f9c-d7b7baa6cdce
-        AllowedPattern: 'arn:aws:acm:us-east-1:[0-9]+:certificate/[-a-z0-9]+'
-
 Conditions:
     IsProduction: !Equals [!Ref Environment, production]
 
@@ -29,11 +21,15 @@ Resources:
     S3Bucket:
         Type: AWS::S3::Bucket
         Properties:
-            BucketName: !Sub mobify-devcenter-${Environment}
-            AccessControl: PublicRead
+            BucketName: !Sub mobify-devcenter-${AWS::AccountId}
+            AccessControl: Private
             WebsiteConfiguration:
                 IndexDocument: index.html
                 ErrorDocument: 404.html
+            Tags:
+                # Required to handle P0 policy violation: "AWS S3 Bucket Public 'READ' Access"
+                - Key: p_confidentiality
+                  Value: Public
 
     S3BucketWriteIAMPolicy:
         Type: AWS::IAM::ManagedPolicy
@@ -60,10 +56,8 @@ Resources:
         Properties:
             DistributionConfig:
                 Aliases:
-                    - !If
-                      - IsProduction
-                      - dev.mobify.com
-                      - !Sub dev-${Environment}.mobify.com
+                    - !If [IsProduction, dev.mobify.com, dev.mobify-staging.com]
+                    - !If [IsProduction, docs.mobify.com, docs.mobify-staging.com]
                 Origins:
                     - Id: devcenter
                       DomainName: !Sub ${S3Bucket}.s3-website-us-east-1.amazonaws.com
@@ -80,100 +74,119 @@ Resources:
                     Compress: true
                     LambdaFunctionAssociations:
                         - EventType: origin-response
-                          LambdaFunctionARN: !GetAtt VersionedOriginResponseLambda.FunctionArn
+                          LambdaFunctionARN: !Ref OriginResponseLambda.Version
+                        - EventType: viewer-request
+                          LambdaFunctionARN: !Ref ViewerRequestLambda.Version
                 PriceClass: PriceClass_100
                 Enabled: true
                 HttpVersion: http2
                 ViewerCertificate:
-                    AcmCertificateArn: !Ref CloudFrontCertificateARN
+                    AcmCertificateArn:
+                        !If [
+                            IsProduction,
+                            arn:aws:acm:us-east-1:120963225130:certificate/37ca3ba8-c6aa-4946-b00e-71b817d446f1,
+                            arn:aws:acm:us-east-1:766791126171:certificate/57007ad9-af3d-4f67-a199-4f2ba224a344,
+                        ]
                     SslSupportMethod: sni-only
 
-    # L@E can only reference a specific version of a Lambda:
-    # https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/lambda-requirements-limits.html#lambda-requirements-cloudfront-triggers
-    PublishLambdaVersionLambda:
-        Type: AWS::Lambda::Function
+    CdnDns:
+        Type: AWS::Route53::RecordSet
         Properties:
-            Handler: index.handler
-            Runtime: nodejs10.x
-            Role: !GetAtt PublishLambdaVersionLambdaRole.Arn
-            Code:
-                ZipFile: |
-                    const {Lambda} = require('aws-sdk')
-                    const {send, SUCCESS, FAILED} = require('cfn-response')
-                    const lambda = new Lambda()
-                    exports.handler = (event, context) => {
-                        const {RequestType, ResourceProperties: {FunctionName}} = event
-                        if (RequestType == 'Delete') return send(event, context, SUCCESS)
-                        lambda.publishVersion({FunctionName}, (err, {FunctionArn}) => {
-                        err
-                            ? send(event, context, FAILED, err)
-                            : send(event, context, SUCCESS, {FunctionArn})
-                        })
-                    }
+            Name: !If [IsProduction, dev.mobify.com, dev.mobify-staging.com]
+            Type: CNAME
+            HostedZoneId: !If [IsProduction, Z049604136MJ1KWZMAYXF, Z00429581ZFAEVBCIAQZ8]
+            ResourceRecords:
+                - !GetAtt CloudFrontDistribution.DomainName
+            TTL: 300
 
-    PublishLambdaVersionLambdaRole:
+    DocsDns:
+        Type: AWS::Route53::RecordSet
+        Properties:
+            Name: !If [IsProduction, docs.mobify.com, docs.mobify-staging.com]
+            Type: CNAME
+            HostedZoneId: !If [IsProduction, Z049604136MJ1KWZMAYXF, Z00429581ZFAEVBCIAQZ8]
+            ResourceRecords:
+                - !GetAtt CloudFrontDistribution.DomainName
+            TTL: 300
+
+    LambdasExecutionRole:
         Type: AWS::IAM::Role
         Properties:
             AssumeRolePolicyDocument:
-                Version: 2012-10-17
+                Version: '2012-10-17'
                 Statement:
-                    Effect: Allow
-                    Principal:
-                        Service: lambda.amazonaws.com
-                    Action: sts:AssumeRole
+                    - Effect: Allow
+                      Principal:
+                          Service:
+                              - lambda.amazonaws.com
+                              - edgelambda.amazonaws.com
+                      Action:
+                          - sts:AssumeRole
+            Path: '/'
             ManagedPolicyArns:
                 - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
-            Policies:
-                - PolicyName: PublishVersion
-                  PolicyDocument:
-                      Version: 2012-10-17
-                      Statement:
-                          - Effect: Allow
-                            Action: lambda:PublishVersion
-                            Resource: '*'
+            PermissionsBoundary: !Sub 'arn:aws:iam::${AWS::AccountId}:policy/PCSKPermissionsBoundary'
 
     OriginResponseLambda:
-        Type: AWS::Lambda::Function
+        Type: AWS::Serverless::Function
         Properties:
-            Role: !GetAtt OriginResponseLambdaRole.Arn
-            Runtime: nodejs10.x
+            Role: !GetAtt LambdasExecutionRole.Arn
+            Runtime: 'nodejs12.x'
             Handler: index.handler
-            Code:
-                ZipFile: |
-                    exports.handler = (event, context, callback) => {
-                        const {response} = event.Records[0].cf
-                        const {headers} = response
-                        if (response.status === '200' && !headers['cache-control']) {
-                            headers['cache-control'] = [
-                                {
-                                    key: 'cache-control',
-                                    value: `public, max-age=${60 * 5}`
-                                }
-                            ]
-                        }
-                        return callback(null, response)
+            Timeout: 3
+            PackageType: Zip
+            InlineCode: |
+                exports.handler = (event, context, callback) => {
+                    const {response} = event.Records[0].cf;
+                    const {headers} = response;
+                    if (response.status === '200' && !headers['cache-control']) {
+                        headers['cache-control'] = [
+                            {
+                                key: 'cache-control',
+                                value: `public, max-age=${60 * 5}`
+                            }
+                        ];
                     }
 
-    OriginResponseLambdaRole:
-        Type: AWS::IAM::Role
-        Properties:
-            AssumeRolePolicyDocument:
-                Version: 2012-10-17
-                Statement:
-                    Effect: Allow
-                    Principal:
-                        Service:
-                            - lambda.amazonaws.com
-                            - edgelambda.amazonaws.com
-                    Action: sts:AssumeRole
-            ManagedPolicyArns:
-                - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+                    return callback(null, response);
+                };
+            AutoPublishAlias: live
 
-    VersionedOriginResponseLambda:
-        Type: Custom::LatestLambdaVersion
+    ViewerRequestLambda:
+        Type: AWS::Serverless::Function
         Properties:
-            ServiceToken: !GetAtt PublishLambdaVersionLambda.Arn
-            FunctionName: !Ref OriginResponseLambda
+            Handler: index.handler
+            Role: !GetAtt LambdasExecutionRole.Arn
+            Runtime: 'nodejs12.x'
+            Timeout: 3
+            PackageType: Zip
+            InlineCode: |
+                exports.handler = (event, context, callback) => {
+                    const request = event.Records[0].cf.request;
+                    const host = request.headers['host'][0].value;
+                    const hostDomainArray = host.split('.');
+                    const hostSubDomain = hostDomainArray[0];
+                    const hostDomain = hostDomainArray[1] + '.' + hostDomainArray[2];
+
+                    if (hostSubDomain !== 'docs') {
+                        callback(null, request);
+                        return;
+                    }
+
+                    const redirectResponse = {
+                        status: '302',
+                        statusDescription: 'Found',
+                        headers: {
+                            location: [{
+                                key: 'Location',
+                                value: `https://dev.${hostDomain}/v1.x/`,
+                            }],
+                        },
+                    };
+
+                    callback(null, redirectResponse);
+                };
+            AutoPublishAlias: live
 
 Outputs:
     CloudFrontDistributionId:

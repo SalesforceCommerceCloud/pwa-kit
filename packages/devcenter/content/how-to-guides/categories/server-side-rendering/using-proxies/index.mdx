@@ -8,11 +8,9 @@ maxVersion: 2.0.0
 featured: true
 ---
 
-<Callout type="info">
-
-**Note:** Before you follow this guide, we recommend reading our [overview of proxies](/get-started/architecture/deployment-infrastructure/#proxies).
-
-</Callout>
+:::note
+Before you follow this guide, we recommend reading our [overview of proxies](/get-started/architecture/deployment-infrastructure/#proxies).
+:::
 
 ## Introduction
 
@@ -106,11 +104,9 @@ Instead, we can configure a target to override a bundle's `proxyConfigs` using t
 
 For example, in this scenario, we should use the API to set `production`'s `proxyConfig` to always reference `api.example.com` (ignoring the values set in `package.json`).
 
-<Callout type="warning">
-
-**Important:** Once set, never change the existing proxy settings for a target that is serving production traffic. Contact the [Mobify Support Team](https://support.mobify.com/support/tickets/new) if you would like to change proxy configuration for a production target.
-
-</Callout>
+:::important
+Once set, never change the existing proxy settings for a target that is serving production traffic. Contact the [Mobify Support Team](https://support.mobify.com/support/tickets/new) if you would like to change proxy configuration for a production target.
+:::
 
 Ideally, you'll only need to have 1 bundle for all cloud targets. You don't need to create a new bundle for each target just to modify the proxy settings. With the [Mobify Cloud API](/apis-and-sdks/mobify-cloud), set your proxy settings in the Cloud.
 

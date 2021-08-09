@@ -16,11 +16,9 @@ For example, you may set a cache header to 1 hour for the home page, and 4 hours
 
 Continue to track cache hit ratios and update them as your site’s content and traffic changes. (Do this weekly, or even daily.) To learn more about setting cache headers, read our how-to article on [using the CDN](/how-to-guides/categories/performance/using-the-cdn-cache-to-maximize-performance).
 
-<Callout type="info">
-
-**Note:** Talk to your Mobify contact to access a dashboard tool for cache hit ratios.
-
-</Callout>
+:::note
+Talk to your Mobify contact to access a dashboard tool for cache hit ratios.
+:::
 
 **Response time**: this is a key indicator of your site’s performance. Keep tabs on the response time for any requests that go through the [proxy](/how-to-guides/categories/server-side-rendering/using-proxies). (That could be your backend, CMS system, and the PWA’s total server-side rendered response time.) It’s best to look at response times from several different angles to understand the full picture. 
 
@@ -30,11 +28,9 @@ Backend performance will vary over time, so it’s important to continue monitor
 
 **HTTP status codes**: this will allow you to find and fix common errors, like HTTP 400 and 500 errors. This is ideal both immediately after launch and in ongoing monitoring.
 
-<Callout type="info">
-
-**Note:** 404 errors don’t always mean something went wrong. For example, a 404 error is the correct response when a user visits a URL for a page that doesn’t exist.
-
-</Callout>
+:::note
+404 errors don’t always mean something went wrong. For example, a 404 error is the correct response when a user visits a URL for a page that doesn’t exist.
+:::
 
 **Backend error rates**: this will allow you to plan safe outage states for system failure. For example, some ecommerce backends go down every 28 days for routine maintenance. Knowing your application’s backend behavior will help you [handle backend outages](/how-to-guides/categories/performance/handling-backend-outages).
 

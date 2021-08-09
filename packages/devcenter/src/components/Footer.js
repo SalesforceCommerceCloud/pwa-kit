@@ -32,7 +32,9 @@ const Footer = ({isWhiteFooter}) => (
                             <Anchor href="https://www.mobify.com/customers/">Case Studies</Anchor>
                         </div>
                         <div>
-                            <Anchor href="https://www.mobify.com/terms-of-use/">Term of Use</Anchor>
+                            <Anchor href="https://www.mobify.com/terms-of-use/">
+                                Terms of Use
+                            </Anchor>
                         </div>
                         <div>
                             <Anchor href="https://www.mobify.com/privacy/">Privacy Policy</Anchor>
@@ -50,7 +52,9 @@ const Footer = ({isWhiteFooter}) => (
                             <StyledLink to="/apis-and-sdks">APIs &amp; SDKs</StyledLink>
                         </div>
                         <div>
-                            <StyledLink to="https://dev.mobify.com/v1.x/">V1 Documentation</StyledLink>
+                            <StyledLink to="https://dev.mobify.com/v1.x/">
+                                V1 Documentation
+                            </StyledLink>
                         </div>
                         <div>
                             <StyledLink to="/resources/feedback">Feedback</StyledLink>
@@ -97,7 +101,7 @@ const Footer = ({isWhiteFooter}) => (
                     <img src={Logo} alt="Mobify logo" height="20" />
                     <Menu isMobile={true}>
                         <Anchor href="https://www.mobify.com/contact/">Contact</Anchor>
-                        <Anchor href="https://www.mobify.com/terms-of-use/">Term of Use</Anchor>
+                        <Anchor href="https://www.mobify.com/terms-of-use/">Terms of Use</Anchor>
                         <Anchor href="https://www.mobify.com/privacy/">Privacy Policy</Anchor>
                     </Menu>
                     <StyledCopyright>

@@ -8,11 +8,9 @@ maxVersion: 2.0.0
 featured: false
 ---
 
-<Callout type="warning">
-
-**Important:** Some of the advice in this article is only applicable to projects that choose to use Redux for state management.
-
-</Callout>
+:::important
+Some of the advice in this article is only applicable to projects that choose to use Redux for state management.
+:::
 
 Progressive Web Apps often need to support the needs of different languages, currencies, or other unique formats that are unique to various regions, cultures and customs. In computing, the practice of supporting these various locales is called [internationalization and localization](https://en.wikipedia.org/wiki/Internationalization_and_localization#Naming). These terms are abbreviated to i18n and l10n, respectively. For the rest of this document, we will use the term i18n.
 
@@ -33,7 +31,7 @@ All of the instructions provided in this guide assume you are using the react-in
 
 In this guide we walk you through how to add the react-intl library and supporting Node.js functionality for the library.
 
-Node.js uses an underlying library called [ICU](http://site.icu-project.org/) to implement the internatlization functionality provided by react-intl. ICU is a library which allow you add internationalization to your site for any country in the world. full-icu needs to be installed as a dev dependency because AWS Lambdas running NodeJS already has full-icu installed.
+Node.js uses an underlying library called [ICU](https://site.icu-project.org/) to implement the internatlization functionality provided by react-intl. ICU is a library which allow you add internationalization to your site for any country in the world. full-icu needs to be installed as a dev dependency because AWS Lambdas running NodeJS already has full-icu installed.
 
 Browsers obtain the underlying internationalization functionality from the [Intl API](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl).
 

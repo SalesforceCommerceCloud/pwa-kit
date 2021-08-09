@@ -12,30 +12,30 @@ const pageQuery = `{
         frontmatter {
           metaTitle
         }
-        excerpt(pruneLength: 500)
+        excerpt(pruneLength: 1000)
       }
     }
   }
 }`
 
 const flatten = (arr) =>
-  arr.map(({node: {frontmatter, fields, ...rest}}) => ({
-    ...frontmatter,
-    ...fields,
-    ...rest
-  }))
+    arr.map(({node: {frontmatter, fields, ...rest}}) => ({
+        ...frontmatter,
+        ...fields,
+        ...rest
+    }))
 
 const settings = {attributesToSnippet: [`excerpt:25`]}
 
 const indexName = config.header.search ? config.header.search.indexName : ''
 
 const queries = [
-  {
-    query: pageQuery,
-    transformer: ({data}) => flatten(data.pages.edges),
-    indexName: `${indexName}`,
-    settings
-  }
+    {
+        query: pageQuery,
+        transformer: ({data}) => flatten(data.pages.edges),
+        indexName: `${indexName}`,
+        settings
+    }
 ]
 
 module.exports = queries

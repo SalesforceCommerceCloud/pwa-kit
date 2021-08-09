@@ -8,11 +8,9 @@ maxVersion: 2.0.0
 featured: false
 ---
 
-<Callout type="info">
-
-**Note:** All new Salesforce Commerce projects should use the [`SalesforceConnector`](/apis-and-sdks/commerce-integrations/connectors/sfcc).
-
-</Callout>
+:::note
+All new Salesforce Commerce projects should use the [`SalesforceConnector`](/apis-and-sdks/commerce-integrations/connectors/sfcc).
+:::
 
 ## Before you begin
 
@@ -32,11 +30,9 @@ The OCAPI client allows your Connector to communicate with Salesforce Commerce, 
 
 2. Update your OCAPI settings in the OCAPI configuration file. (OCAPI settings control which resources are accessible to an authorized user.) To do this, add a client to your OCAPI settings. This client should have access to the resources listed in this file. Here’s an example of a [settings file](./mobify-ocapi-settings.json) with the resources required for our Commerce Integrations.
 
-<Callout type="info">
-
-**Important:** When you set up your OCAPI client, never embed any secret values related to it (like its password) in the bundle.
-
-</Callout>
+:::note
+When you set up your OCAPI client, never embed any secret values related to it (like its password) in the bundle.
+:::
 
 ## Configuring your Salesforce connector instance
 

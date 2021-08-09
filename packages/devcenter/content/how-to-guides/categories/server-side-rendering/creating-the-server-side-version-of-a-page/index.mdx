@@ -20,11 +20,9 @@ To determine if we are server side or client side, we check if the `typeof windo
 
 Let’s consider a product detail page, as an example. Typically, cacheable content on this page would include the product name, images, and description. We would not cache personalized content such as the shopping cart, or saved items. We would also avoid caching frequently-changing information such as the price of remaining inventory.
 
-<Callout type="info">
-
-**Note:** To preview a server-side rendered page, append the `?mobify_server_only` query string to the URL you'd like to preview. For example, you can test the server-side rendered version of `www.example.com` by visiting the URL `www.example.com?mobify_server_only`.
-
-</Callout>
+:::note
+To preview a server-side rendered page, append the `?mobify_server_only` query string to the URL you'd like to preview. For example, you can test the server-side rendered version of `www.example.com` by visiting the URL `www.example.com?mobify_server_only`.
+:::
 
 ### Example: cacheable product description component
 

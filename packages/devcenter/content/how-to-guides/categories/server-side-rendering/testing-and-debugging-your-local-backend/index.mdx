@@ -8,11 +8,9 @@ maxVersion: 2.0.0
 featured: false
 ---
 
-<Callout type="info">
-
-**Note:** The Server-Side Rendering Performance series is designed to dive into the most important topics you'll encounter while building, testing and deploying a server-side rendered Progressive Web App (PWA).
-
-</Callout>
+:::note
+The Server-Side Rendering Performance series is designed to dive into the most important topics you'll encounter while building, testing and deploying a server-side rendered Progressive Web App (PWA).
+:::
 
 There are a few key tools you can access to debug your server-side rendered PWA’s local backend. Here, we’ll discuss the steps to access Chrome DevTools’ breakpoints and profiler.
 
@@ -22,7 +20,7 @@ With a simple command, you can use Chrome DevTools to debug the local backend of
 
 1. Open your favorite command line interface
 2. Go to your project directory
-3. Run `npm run start:ssr:inspect`. Running this command allows you to use DevTools to inspect the processes that are running in the background.
+3. Run `npm run start:inspect`. Running this command allows you to use DevTools to inspect the processes that are running in the background.
 4. Open Chrome and enter the URL [chrome://inspect](chrome://inspect)
 5. Click the link for running the Express app that appears on the page
 6. DevTools will open up in a new window, connected to the Express app

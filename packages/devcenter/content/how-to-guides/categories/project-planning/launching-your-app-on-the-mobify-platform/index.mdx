@@ -78,10 +78,10 @@ curl 'https://cloud.mobify.com/api/projects/example/target/staging/' \
   --data '{"ssr_external_domain": "example.com", "ssr_external_hostname": "staging.example.com", }'
 ```
 
-<Callout type="warning">
-    **Important:** After this step, the target will no longer be accessible at it's
-    `mobify-storefront.com` domain.
-</Callout>
+:::important
+After this step, the target will no longer be accessible at its
+`mobify-storefront.com` domain.
+:::
 
 Verify the configuration using [`cURL`](https://daniel.haxx.se/blog/2018/04/05/curl-another-host/) to make a request with DNS spoofing:
 

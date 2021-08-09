@@ -60,6 +60,35 @@ const plugins = [
                     }
                 }
             ],
+            remarkPlugins: [
+                // To pass options, use a 2-element array with the
+                // configuration in an object in the second element
+                [require('remark-containers'), {
+                    default: true,
+                    custom: [{
+                      type: 'note',
+                      element: 'Callout',
+                      transform: function (node, config) {
+                        node.data.hProperties = {
+                          className: `${config}`,
+                          type: 'note',
+                          label: 'Note'
+                        }
+                      }
+                    },
+                    {
+                        type: 'important',
+                        element: 'Callout',
+                        transform: function (node, config) {
+                          node.data.hProperties = {
+                            className: `${config}`,
+                            type: 'important',
+                            label:'Important'
+                          }
+                        }
+                    },]
+                }]
+            ],
             // Repeat config for gatsby-remark-images here to work around bug in gatsby-plugin-mdx
             plugins: [
                 'gatsby-plugin-catch-links',
@@ -99,7 +128,6 @@ const plugins = [
             icon: 'src/images/mobify-site-icon.png'
         }
     },
-
     'gatsby-transformer-react-docgen',
     {
         resolve: `gatsby-source-filesystem`,
@@ -107,18 +135,6 @@ const plugins = [
             name: 'components',
             path: `../progressive-web-sdk/src/components/`,
             ignore: [`**/*.md`, `**/*.scss`, `**/*test.js`]
-        }
-    },
-    {
-        resolve: `gatsby-plugin-gdpr-cookies`,
-        options: {
-            googleTagManager: {
-                trackingId: config.gatsby.gtmTrackingId,
-                cookieName: 'gatsby-gdpr-google-tagmanager', // default
-                dataLayerName: 'dataLayer' // default
-            },
-            // defines the environments where the tracking should be available
-            environments: ['production']
         }
     },
     {

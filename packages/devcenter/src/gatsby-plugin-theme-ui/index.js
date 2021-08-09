@@ -67,31 +67,31 @@ const headings = {
     h2: {
         ...headingBase,
         fontSize: ['lg', 'xxl'], // 20px 32px
-        pt: 'xxl', // 32px
+        pt: 'md', // 16px
         mb: 'xl' // 24px
     },
     h3: {
         ...headingBase,
         fontSize: ['lg', 'xl'], // 20px 24px
-        pt: 'xl', // 24px
+        pt: 'sm', // 8px
         mb: 'md' // 16px
     },
     h4: {
         ...headingBase,
         fontSize: ['md', 'lg'], // 16px 20px
-        pt: 'md', // 16px
+        pt: 'sm', // 8px
         mb: 'sm' //  8px
     },
     h5: {
         ...headingBase,
         fontSize: ['sm', 'md'], // 14px 16px
-        pt: 'md', // 16px
+        pt: 'sm', // 8px
         mb: 'sm' //  8px
     },
     h6: {
         ...headingBase,
         fontSize: [0, 'sm'], // 12px 14px
-        pt: 'md', // 16px
+        pt: 'sm', // 8px
         mb: 'sm' //  8px
     }
 }

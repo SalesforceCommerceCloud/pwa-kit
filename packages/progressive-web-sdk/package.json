@@ -1,6 +1,6 @@
 {
   "name": "progressive-web-sdk",
-  "version": "2.4.5",
+  "version": "2.4.6",
   "description": "A set of libraries and components which make up the SDK for Progressive Web",
   "main": "dist/index.js",
   "bin": {
@@ -28,7 +28,6 @@
     "copyright:fix": "npm run copyright:lint -- --fix --update ",
     "prepare": "npm run prod:build",
     "prod:build": "cross-env NODE_ENV=production scripts/build.js",
-    "dev:build": "echo \"This command is deprecated. Please use 'npm run prod:build'.\"; sleep 5; npm run prod:build",
     "dev:watch": "watch 'npm run dev:build' src/",
     "lint": "npm run lint:js && npm run lint:sass && npm run copyright:lint",
     "lint:fix": "npm run lint:js -- --fix && npm run copyright:fix",
@@ -102,10 +101,10 @@
     "set-cookie-parser": "^2.2.1",
     "source-map-support": "0.5.9",
     "sw-toolbox": "3.6.0",
+    "terser-webpack-plugin": "^4.2.3",
     "time-fix-plugin": "2.0.5",
     "tti-polyfill": "0.2.2",
     "ua-parser-js": "^0.7.23",
-    "uglifyjs-webpack-plugin": "1.3.0",
     "url-parse": "^1.4.7",
     "utf-8-validate": "5.0.1",
     "validator": "10.11.0",

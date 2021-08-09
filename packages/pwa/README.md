@@ -32,4 +32,4 @@ to begin.
 
 For more context take a look at our documentation at [dev.mobify.com][mobify-docs].
 
-[mobify-docs]: http://dev.mobify.com
+[mobify-docs]: https://dev.mobify.com

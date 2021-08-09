@@ -21,9 +21,8 @@ You can find the latest version of the SDK Docs on [DevCenter](https://dev.mobif
 -   [Git](https://git-scm.com/)
 -   We recommend you use [nvm](https://github.com/creationix/nvm#installation) to
     manage node and npm versions.
--   Node ^10.17.0 || ^12.0.0 [LTS](https://github.com/nodejs/LTS#lts-schedule). We recommend
-    using the latest version of Node supported whenever possible.
--   npm ^5.x
+-   Node ^10.17.0 or ^12.x
+-   npm ^5.7.1 or ^6.11.3
 
 ## Install Dependencies
 

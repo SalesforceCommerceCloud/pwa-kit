@@ -14,11 +14,9 @@ A URL redirect allows you to forward a request from a user or web crawler to a d
 
 In this article, we’ll walk you through the steps to create and manage URL redirects for your Mobify storefront from the [Mobify Cloud](https://cloud.mobify.com/) user interface. This method provides a convenient way for ecommerce teams and other business users to manage redirects quickly and easily, without the need for code changes.
 
-<Callout type="info">
-
-**Note:** You can also manage redirects by using the [Mobify Cloud API](/apis-and-sdks/mobify-cloud) or by extending your project’s [App Server](/get-started/architecture/app-server-overview) code.
-
-</Callout>
+:::note
+You can also manage redirects by using the [Mobify Cloud API](/apis-and-sdks/mobify-cloud) or by extending your project’s [App Server](/get-started/architecture/app-server-overview) code.
+:::
 
 ## Prerequisites
 
@@ -34,11 +32,9 @@ To manage redirects using Mobify Cloud, you'll need:
 
 You may want to grant team members the ability to manage redirects while restricting their access to other functions in Mobify Cloud, such as deploying bundles. To achieve this, Admin users can assign a user to the Redirector role. This role has full access to the URL redirects functions of Mobify Cloud, but it's restricted from managing bundles.
 
-<Callout type="info">
-
-**Note:** The Admin, Developer, and Deployer role types can also manage redirects in Mobify Cloud. The Read Only and Designer role types can only view redirects.
-
-</Callout>
+:::note
+The Admin, Developer, and Deployer role types can also manage redirects in Mobify Cloud. The Read Only and Designer role types can only view redirects.
+:::
 
 For users with an Admin role type, follow these steps to create a new Redirector team member:
 
@@ -88,11 +84,9 @@ Sometimes, your path may contain a query string parameter. For example, the rela
 
 When creating redirects, you can select the option to **Forward query string parameters**. Selecting this option will append any existing query parameters to the **To** URL. If this option is _not_ selected, query string parameters will be stripped from the path.
 
-<Callout type="info">
-
+:::note
 What happens when your **To** path has a query string that you choose to forward, but the incoming request also has a query string? In this case, the resulting URL will be a combination of the two query strings. The query string from the **To** path is appended to the query string in the request. For example, if your application receives a request for the relative path `/spring?year=2019` and you've chosen to redirect `/spring` to the path `/summer?year=2020` with **Forward query string parameters** enabled, the resulting URL will be `/summer?year=2019&year=2020`.
-
-</Callout>
+:::
 
 ### Testing on staging
 
@@ -120,11 +114,9 @@ After you've completed testing on staging, you can clone all your redirects from
 6. Choose your production target in **To Target**
 7. Select the **Clone Redirects** button
 
-<Callout type="warning">
-
-**Important:** When you clone redirects, you’re replacing _all_ the redirects in the production target with _all_ the redirects in the staging target.
-
-</Callout>
+:::important
+When you clone redirects, you’re replacing _all_ the redirects in the production target with _all_ the redirects in the staging target.
+:::
 
 ## Best practices
 

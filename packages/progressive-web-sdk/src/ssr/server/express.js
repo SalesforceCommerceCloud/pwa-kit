@@ -1,6 +1,9 @@
 /* * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
 /* Copyright (c) 2020 Mobify Research & Development Inc. All rights reserved. */
 /* * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
+/**
+ * @module progressive-web-sdk/dist/ssr/server/express
+ */
 
 /* eslint import/no-commonjs:0 */
 import assert from 'assert'
@@ -396,6 +399,8 @@ const validateConfiguration = (options) => {
 
 /**
  * Tracks in-flight requests.
+ *
+ * @private
  */
 class RequestMonitor {
     constructor() {

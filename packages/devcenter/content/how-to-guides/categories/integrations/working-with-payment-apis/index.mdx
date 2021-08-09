@@ -107,27 +107,11 @@ If it rerenders, the events added to the element by the script will be removed.
 To avoid this, make sure that your component which renders the `<isapplepay />`
 element returns false in its `shouldComponentUpdate` method.
 
-<div class="c-callout">
-    <p>
-        <strong>Note:</strong> If you can't see the Apple Pay button injected, perhaps these
-        criteria that <code>applepay.js</code> is looking for have not been met. Please make sure
-        that:
-        <ul>
-            <li>Your cart is not empty</li>
-            <li>And the total cart amount is greater than 0</li>
-        </ul>
-    </p>
-</div>
+If you can't see the Apple Pay button injected, perhaps these criteria that `applepay.js` is looking for have not been met. Please make sure that:
+- Your cart is not empty
+- And the total cart amount is greater than 0
 
-<div class="c-callout">
-    <p>
-        <strong>Note:</strong> It is possible to use Apple Pay to speed up the purchase of a single
-        item, by having the Apple Pay button on the Product Detail page. However, in this case, it
-        is most likely that the cart would be empty. To make sure that the button is injected
-        properly, you'll need to add an attribute to identify the current item's SKU number:{' '}
-        <code>&lt;isapplepay sku="12345" /&gt;</code>
-    </p>
-</div>
+It is possible to use Apple Pay to speed up the purchase of a single item, by having the Apple Pay button on the Product Detail page. However, in this case, it is most likely that the cart would be empty. To make sure that the button is injected properly, you'll need to add an attribute to identify the current item's SKU number: `<isapplepay sku="12345" />`
 
 The styles used for Apple Pay buttons are built into Safari. To create an Apple
 Pay button that matches the dimensions of standard buttons in your PWA, you can

@@ -26,16 +26,12 @@ To use the App Server, it’s important to know a few details:
 
 - Location matters: while targets are global, the App Server runs in a specific region. To get the best performance, it’s important to keep your App Server as close as possible to your primary backend. (Your primary backend is the one where you make the most requests. It could be your ecommerce backend, or your content management system.) Set the region of your target using the [Mobify Cloud API](/apis-and-sdks/mobify-cloud) and its `ssr_region` field.
 
-<Callout type="info">
-
-**Note:** setting the App Server’s region is one of the most important decisions you’ll make for performance. Reach out to your [Mobify Support](https://support.mobify.com/support/home) contact for help in selecting the best region.
-
-</Callout>
+:::note
+Setting the App Server’s region is one of the most important decisions you’ll make for performance. Reach out to your [Mobify Support](https://support.mobify.com/support/home) contact for help in selecting the best region.
+:::
 
 -   The App Server is responsible for dynamic rendering. To improve performance, always check the App Server's response time and optimize cache headers for the response. Make sure that requests to the App Server resolve in under 3 seconds, and under 1 second is even better. Ensure that responses from the App Server get cached by the CDN by [setting appropriate cache headers](/how-to-guides/categories/performance/using-the-cdn-cache-to-maximize-performance) in all your pages.
 
-<Callout type="info">
-
-**Note:** to improve the App Server's cache hit rate, we remove any HTTP cookie headers set by the App Server. Because of this, the server cannot set cookies.
-
-</Callout>
+:::note
+To improve the App Server's cache hit rate, we remove any HTTP cookie headers set by the App Server. Because of this, the server cannot set cookies.
+:::

@@ -1,7 +1,7 @@
 ---
 title: Creating Responsive Layout Grids with Susy
 metaTitle: Creating Responsive Layout Grids with Susy
-metaDescription: "Create a readable and robust responsive grid system with the Susy SASS library."
+metaDescription: 'Create a readable and robust responsive grid system with the Susy SASS library.'
 category: Design
 minVersion: 2.0.0
 maxVersion: 2.0.0
@@ -10,7 +10,7 @@ featured: false
 
 ## Introduction
 
-This guide will introduce you to [Susy 3](http://oddbird.net/susy/docs/), the responsive grid library that Mobify includes in the [Progressive Web SDK](/apis-and-sdks/progressive-web-sdk). We'll discuss best practices for using the library and share sample code that you can use in your projects.
+This guide will introduce you to [Susy 3](https://oddbird.net/susy/docs/), the responsive grid library that Mobify includes in the [Progressive Web SDK](/apis-and-sdks/progressive-web-sdk). We'll discuss best practices for using the library and share sample code that you can use in your projects.
 
 ## Responsive Best Practices
 
@@ -20,20 +20,20 @@ The SDK has some default breakpoints in place for you in `_variables.scss`: `$me
 
 ## Why Susy?
 
-[Susy](http://oddbird.net/susy/) is a SASS library that helps you build readable and robust responsive grid systems. The library has been developed and maintained for over 8 years by [Miriam Suzanne](http://www.miriamsuzanne.com/), a prominent contributor in the web development community.
+[Susy](https://oddbird.net/susy/) is a SASS library that helps you build readable and robust responsive grid systems. The library has been developed and maintained for over 8 years by [Miriam Suzanne](https://www.miriamsuzanne.com/), a prominent contributor in the web development community.
 
 We've chosen Susy for a number of reasons:
 
-- It follows familiar Sass conventions
-- It's actively maintained, with a large support community
-- It can be set up to mimic the implementation of [CSS Grid](https://www.w3.org/TR/css-grid-1/)
-- It supports `float` and `flex` layouts
+-   It follows familiar Sass conventions
+-   It's actively maintained, with a large support community
+-   It can be set up to mimic the implementation of [CSS Grid](https://www.w3.org/TR/css-grid-1/)
+-   It supports `float` and `flex` layouts
 
 ## Getting Started
 
 ### Susy Setup
 
-Susy is already installed for you as a Node package. In your project's `_variables.scss` file, you'll find a `$susy` Sass map that sets a couple defaults. [Read more about these options and others you can set](http://oddbird.net/susy/docs/config.html#variable--susy).
+Susy is already installed for you as a Node package. In your project's `_variables.scss` file, you'll find a `$susy` Sass map that sets a couple defaults. [Read more about these options and others you can set](https://oddbird.net/susy/docs/config.html#variable--susy).
 
 ```scss
 // Responsive Grid Configuration
@@ -54,14 +54,16 @@ This is all you need to set up to start [using Susy](#grid-usage)! For projects 
 The basic setup is now complete! For projects that use different grids depending on device width, read on below for a bit more setup. Otherwise, jump ahead to start [using Susy](#grid-usage).
 
 **1. Set up a configuration for each non-default grid layout**
+
 <a name="layout-config" href="#layout-config"></a>
+
 If you want to switch to a _12 column_ grid with _24px gutters_ at your _large breakpoint_, you might add the following code to `_variables.scss`:
 
 ```scss
 $large-config: (
     columns: susy-repeat(12),
     gutters: 24px
-)
+);
 ```
 
 _Note: Your "default" grid configuration is what you have declared in your `$susy` map._
@@ -90,7 +92,7 @@ It will output an `@media` block that has a [config's](#layout-config) values sc
 
 **3. Bonus step**
 
-If you'd like, you can use Sass's [variable arguments](http://sass-lang.com/documentation/file.SASS_REFERENCE.html#variable_arguments) to group your breakpoint and config variables together. For example, we could group the `$large-breakpoint` together with the `$large-config`:
+If you'd like, you can use Sass's [variable arguments](https://sass-lang.com/documentation/file.SASS_REFERENCE.html#variable_arguments) to group your breakpoint and config variables together. For example, we could group the `$large-breakpoint` together with the `$large-config`:
 
 ```scss
 // _variables.scss
@@ -127,7 +129,7 @@ Now that we're all set up, it's time to use Susy!
 
 ### Span
 
-Use the [`@span`](http://oddbird.net/susy/docs/api.html#function--susy-span) function to set an element to span a number of columns. You can use it with `width`, `flex-basis`, `margin`, or any other CSS rule that accepts a number. If you pass a parameter larger than `1`, Susy will add in intermediate gutter spacing.
+Use the [`@span`](https://oddbird.net/susy/docs/api.html#function--susy-span) function to set an element to span a number of columns. You can use it with `width`, `flex-basis`, `margin`, or any other CSS rule that accepts a number. If you pass a parameter larger than `1`, Susy will add in intermediate gutter spacing.
 
 ```scss
 .c-cool-component {
@@ -138,15 +140,15 @@ Use the [`@span`](http://oddbird.net/susy/docs/api.html#function--susy-span) fun
 }
 ```
 
-The Susy docs explain how to [add more parameters for context, nesting and other use cases](http://oddbird.net/susy/docs/api.html#function--susy-span).
+The Susy docs explain how to [add more parameters for context, nesting and other use cases](https://oddbird.net/susy/docs/api.html#function--susy-span).
 
 In the above code sample, one **important caveat** to be aware of is that `width: span(4)` is actually relative to the width of the _parent container_. When you inspect the resulting CSS (e.g. `width: calc(96px + ((100% - 264px) / 8 * 4))`), you will see that it uses `100%` in its calculation. So whenever you use `span`, please be aware of where that gets used and the styling of its parent container.
 
-_Note: Susy2 included a [`container` mixin](http://susy.readthedocs.io/toolkit/#container) that helped clearfix for your floats, but this was removed in Susy3. If you're using Susy with `float`, we've built our own `@include container` mixin into the SDK that provides similar functionality. It gets imported into your project in `app/stylesheet.scss` along with the other Susy mixins._
+_Note: Susy2 included a [`container` mixin](https://susy.readthedocs.io/toolkit/#container) that helped clearfix for your floats, but this was removed in Susy3. If you're using Susy with `float`, we've built our own `@include container` mixin into the SDK that provides similar functionality. It gets imported into your project in `app/stylesheet.scss` along with the other Susy mixins._
 
 ### Gutter
 
-Use the [`@gutter`](http://oddbird.net/susy/docs/api.html#function--susy-gutter) function to add gutter math to a CSS rule. For example, adding `margin-right: gutter()` to a component will set the `margin-right` of that element to be the width of a gutter. We started setting up our layout in the example above, but we did not yet add gutter spacing between each instance of _cool-component_. We can use `gutter` to do that:
+Use the [`@gutter`](https://oddbird.net/susy/docs/api.html#function--susy-gutter) function to add gutter math to a CSS rule. For example, adding `margin-right: gutter()` to a component will set the `margin-right` of that element to be the width of a gutter. We started setting up our layout in the example above, but we did not yet add gutter spacing between each instance of _cool-component_. We can use `gutter` to do that:
 
 ```scss
 .c-cool-component {
@@ -160,7 +162,7 @@ Use the [`@gutter`](http://oddbird.net/susy/docs/api.html#function--susy-gutter)
 }
 ```
 
-[Read more about the `gutter` function on the Susy docs.](http://oddbird.net/susy/docs/api.html#function--susy-gutter)
+[Read more about the `gutter` function on the Susy docs.](https://oddbird.net/susy/docs/api.html#function--susy-gutter)
 
 ## Examples
 
@@ -180,7 +182,7 @@ Easily make your components responsive:
     margin-right: gutter();
 
     &:nth-child(2n) {
-        margin-right: 0
+        margin-right: 0;
     }
 }
 

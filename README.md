@@ -12,8 +12,8 @@ up the front-end of the Mobify platform. These include:
 ## Requirements
 
 ```
-  Node ^10.17.0 || ^12.0.0
-  npm ^5.7.1
+Node ^10.17.0 or ^12.x
+npm ^5.7.1 or ^6.11.3
 ```
 
 ## Setup
@@ -114,6 +114,8 @@ git commit -am "Starting release process for 1.1.0"
 # Pushing will cause Circle to release 1.1.0-alpha.0 to NPM which we can review.
 git push
 
+# Open a PR to merge release branch to master
+
 # Now, review and make changes to the release candidate. At very least, you want to
 #
 #  - Review/update CHANGELOG.md files for each of the packages.
@@ -126,12 +128,19 @@ npm run bump-version -- 1.1.0-alpha.1
 # Do that as often as necessary, until you are happy with the changes on
 # the release branch. Once you're ready to release do this:
 
+# Start QA work with the team, get your PR approved by another engineer before releasing the final version to NPM.
 npm run bump-version -- 1.1.0  # Remove the -alpha.x suffix!
 git commit -am "Version 1.1.0"
+git push # # Circle will release 1.1.0 to NPM
+
+# Merge your PR
+
 git checkout master  # Reminder for V2 we use the `v2-master` branch.
-git merge release-1.1.0
+git pull
 git tag v1.1.0
-git push --tags && git push  # Circle will publish to NPM
+# Circle is configured to not publish to NPM if the version is already published
+# This command will just push the tag
+git push origin v1.1.0  
 
 # Once done, we need to merge our changes back into develop and prepare for
 # development of the next release. Our releases are always planned to be
@@ -140,10 +149,18 @@ git push --tags && git push  # Circle will publish to NPM
 # so we want to begin work on 1.2.0-dev. Run this:
 
 git checkout develop  # Reminder for V2 we use the `v2-develop` branch.
+
+# `develop/v2-develop` branch is protected, you cannot push directly anymore
+git checkout -b update-from-master
+
+# Conflict! Keep the version numbers from develop, not master!
 git merge master  # Reminder for V2 we use the `v2-master` branch.
-npm run bump-version -- 1.2.0-dev
-git commit -am "Begin development on 1.2.0"
-git push 
+
+# Resolve conflicts
+git commit -am "Merged hotfix into develop"
+git push
+
+# Create and merge a PR to merge `update-from-master` to `develop`
 
 ```
 
@@ -185,15 +202,22 @@ npm run bump-version -- 1.1.1-alpha.0
 git commit -am "Starting release process for 1.1.1"
 git push  # Circle will release 1.1.1-alpha.0 to NPM which you can review.
 
-# Keep making changes and releasing alpha versions until you are happy. Then:
+# Open a PR to merge release branch to master
 
+# Keep making changes and releasing alpha versions until you are happy. Then:
+# Start QA work with the team, get your PR approved by another engineer before releasing the final version to NPM.
 npm run bump-version -- 1.1.1
 git commit -am "Version 1.1.1"
-git checkout master
-git merge release-1.1.1
-git tag v1.1.1
-git push --tags  # Circle will publish to NPM
+git push # Circle will release 1.1.1 to NPM.
 
+# Merge your PR
+    
+git checkout `master`  # Reminder for V2 we use the `v2-master` branch.
+git pull
+git tag v1.1.1
+# Circle is configured to not publish to NPM if the version is already published
+# This command will just push the tag
+git push origin v1.1.1 
 
 # You now want to merge your fixes back into develop. When you do this, you
 # will see a merge conflict because the version numbers changed both on your
@@ -202,13 +226,16 @@ git push --tags  # Circle will publish to NPM
 # you want to pick the version numbers from develop, not the ones from master.
 
 git checkout develop
+
+# `develop/v2-develop` branch is protected, you cannot push directly anymore
+git checkout -b update-from-master
 git merge master  # Conflict! Keep the version numbers from develop, not master!
 
 # Resolve conflicts
-git commit "Merged hotfix into develop"
+git commit -am "Merged hotfix into develop"
 git push
 
-
+# Create a PR to merge `update-from-master` to `develop`
 ```
 
 When you're finished, drop and update in #product-release and #changelog to let
@@ -216,14 +243,63 @@ them know what's new.
 
 [lerna]: https://github.com/lerna/lerna
 
-## Fixing NPM vulnerabilities
+## NPM vulnerabilities
 
-When these are discovered they can prevent us from releasing – our Circle builds are
-set up to fail once a certain number of vulnerabilities is found across our packages.
+When these are discovered they can prevent us from releasing – our repository is set up to use
+the [Snyk GitHub integration](https://support.snyk.io/hc/en-us/articles/360015951318-GitHub-Enterprise-Integration).
+Snyk test any newly created pull request in our repositories for security vulnerabilities, two Snyk status checks are
+displayed — one for security tests and the other for license checks.
 
-In simple cases these vulnerabilities can be fixed automatically. To work around
-various issues with local-only monorepo packages, run this to fix them:
+### Skip failed Snyk checks
+
+The GitHub Snyk checks are configured to fail when new high vulnerabilities are introduced. After evaluating the risks
+of merging the PR with the vulnerability, users with the Snyk Administrator role can unblock the PR
+by [marking a failed test as successful](https://support.snyk.io/hc/en-us/articles/360007301698-Skipping-Snyk-Pull-Request-Checks)
+.
+
+### Ignore vulnerabilities
+
+We ignore vulnerabilities using the Snyk UI. Navigate to the [projects page](https://app.snyk.io/org/mobify/projects),
+find the manifest file with the vulnerability you want to ignore, and clicking the Ignore button.
+
+### Fix vulnerabilities
+
+In simple cases these vulnerabilities can be fixed by upgrading a package. We've two approaches
+to [remediate vulnerabilities](https://support.snyk.io/hc/en-us/articles/360006113798-Remediate-your-vulnerabilities):
+
+#### Using the Snyk UI
+
+We can [manually generate a PR fom the UI](https://support.snyk.io/hc/en-us/articles/360011484018-Fixing-vulnerabilities)
+fixing individual or multiple vulnerabilities.
+
+#### Using the Snyk CLI
+
+**Install and Authenticate Snyk CLI:**
+
+1. Install Snyk CLI via npm.
+    ```bash
+    npm install -g snyk
+    ```
+2. Run the `auth` command to open a browser tab.
+    ```bash
+    snyk auth
+    ```
+3. Click the Authenticate button.
+
+**Running `snyk wizard`:**
+
+To work around various issues with local-only monorepo packages, run the Snyk `wizard` at the root of each package of
+the monorepo to fix vulnerabilities.
+
+1. Remove any local-only dependencies from `package.json`.
+2. Run `snyk wizard`
+3. Add back the local-only dependencies to the `package.json`.
+
+**Test for vulnerabilities with `snyk test`:**
+
+Run the `test` command from the root of the monorepo.
 
 ```bash
-  node scripts/audit.js --fix
+snyk test --strict-out-of-sync=false --all-projects
 ```
+

@@ -1,0 +1,37 @@
+---
+title: Account Manager migration
+metaTitle: Account Manager migration
+metaDescription: 'Account Manager migration details and FAQ'
+category: Upgrades and Migrations
+minVersion: 2.0.0
+maxVersion: 2.0.0
+featured: false
+---
+:::note
+We’re updating Mobify with additional security measures. After **April 12, 2021**, you will only be able to log in through a Salesforce Commerce Cloud account. 
+:::
+
+To prepare for this transition, here’s what your team can expect prior to the transition:
+
+* Users that do not have a Salesforce Commerce Cloud account will receive an invite to create a new account. We recommend setting up multi-factor authentication for additional security.
+* Users that already have a Salesforce Commerce Cloud account will be granted additional organizational roles to continue accessing Mobify.
+* Customers who do not have a Salesforce Commerce Cloud organization in [Account Manager](https://account.demandware.com/) will have one created, along with an Account Administrator assigned to manage future account changes.
+
+For any critical issues, please log an "Urgent" severity ticket through [support.mobify.com](http://support.mobify.com/)  or contact us at [support@mobify.com](mailto:support@mobify.com), and our team will assist.
+
+## Frequently Asked Questions
+
+### Can I continue to use my existing email/password login?
+Your email/password login will continue to work, up until your first login with your Commerce Cloud credentials.
+
+### Will my ability to deploy and publish bundles be affected?
+Your individual API keys will be unaffected by this change, and will continue to work for deploying and publishing bundles from command line interface and build scripts.
+
+### How will I be able to change my password in the future?
+All profile and password management will be done in [Account Manager](https://account.demandware.com/).
+
+### How will I give access to my Mobify projects to new team members in the future?
+Organization Account Administrators in [Account Manager](https://account.demandware.com/) will be able to invite additional users and grant them the required *Commerce Runtime Manager User* role to access Mobify. Project access and permissions will continue to be managed directly in Mobify.
+
+### Where can I learn more about managing my Salesforce Commerce Cloud account?
+You can read more about how to manage your Salesforce Commerce Cloud account and organization on the [Commerce Cloud docs](https://documentation.b2c.commercecloud.salesforce.com/DOC2/topic/com.demandware.dochelp/content/b2c_commerce/topics/account_manager/b2c_account_manager_overview.html?resultof=%22%61%63%63%6f%75%6e%74%22%20%22%6d%61%6e%61%67%65%72%22%20%22%6d%61%6e%61%67%22%20).

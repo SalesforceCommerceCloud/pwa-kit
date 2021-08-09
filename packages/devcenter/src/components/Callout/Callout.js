@@ -6,12 +6,12 @@ import WarningIcon from '../icons/Warning.svg'
 
 const calloutType = (props) => {
     return {
-        info: {
+        note: {
             background: props.theme.colors.lightBlue,
             boxShadowColor: props.theme.colors.blue,
             icon: InfoIcon
         },
-        warning: {
+        important: {
             background: props.theme.colors.lightRed,
             boxShadowColor: props.theme.colors.alert,
             icon: WarningIcon
@@ -19,9 +19,11 @@ const calloutType = (props) => {
         // add more callout styling here
     }
 }
+
 const Callout = ({children, className, ...props}) => (
     <StyledCalloutWrapper className={className} {...props}>
-        {children}
+        <p><strong>{props.label}</strong></p>
+        <div>{children}</div>
     </StyledCalloutWrapper>
 )
 
