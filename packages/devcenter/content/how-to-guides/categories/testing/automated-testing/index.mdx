@@ -1,25 +1,20 @@
 ---
 title: Automated Testing
 metaTitle: Automated Testing
-metaDescription: The Mobify Platform is a Front-end as a Service for ecommerce.
+metaDescription: Learn how to test your PWA using Mobify's integrated test framework
 category: Testing
 ---
 
-<Callout type="warning">
-<strong>Important:</strong> Projects generated after January 2019 use the <a href="./mobify-test-framework">Test Framework</a>. For anyone working on projects that were generated before January 2019, we've left the automated testing documentation here in case you still need to refer to it.
-</Callout>
-
-
 Every project using the Progressive Mobile Web SDK includes an integrated test framework based on testing the PWA. There are 4 types of tests:
 * Linting: Flags typos, syntax errors and enforces consistent code style.
-* Unit testing: Checks components and low level features work as intended. 
+* Unit testing: Checks components and low level features work as intended.
 * End-to-end testing: Verifies that user workflows, such as adding a product to the cart, can be performed in a browser.
 * Performance testing: Measures the size and speed of your PWA.
 
 Tests can be run locally or in a [continuous integration](#ci) environment.
 
 ## Linting
-The Mobify PWA scaffold uses [`eslint`](http://eslint.org/) for verifying code quality. The test will fail if it catches any style or syntax errors. 
+The Mobify PWA scaffold uses [`eslint`](http://eslint.org/) for verifying code quality. The test will fail if it catches any style or syntax errors.
 
 ```bash
 # Run the linter:
@@ -29,12 +24,13 @@ npm run lint
 npm run lint:fix
 ```
 
-By default, it uses the [mobify-code-stye](https://www.github.com/mobify/mobify-code-style). 
+By default, it uses the [mobify-code-stye](https://www.github.com/mobify/mobify-code-style).
 
 You can add rules to the `.eslintrc.yml` file in the `web` directory inside your project directory.
 
 ## Unit Tests
-We use [`jest`](https://facebook.github.io/jest/) as our unit testing framework. 
+
+We use [`jest`](https://facebook.github.io/jest/) as our unit testing framework.
 
 ```bash
 # To only run tests related to files you modify during development:
@@ -118,6 +114,7 @@ Tests will use the `default` environment, which is a Chrome instance that emulat
 Then use `npm run test:e2e -- -e custom` to run the E2E tests using the custom environment
 
 ### Additional Resources
+
 * [Overview of Nighwatch](https://docs.google.com/presentation/d/1y5dEz_b82xDlJ0yVcMPMmt19Li6pYqkE7ohzHwq8AyI/pub?start=false&loop=false&delayms=3000)
 * [Writing tests](http://nightwatchjs.org/guide)
 * [Configuration](http://nightwatchjs.org/gettingstarted#settings-file)
@@ -131,10 +128,10 @@ We use [Lighthouse](https://github.com/GoogleChrome/lighthouse) to assess an app
 
 We focus on two metrics: the Progressive Web App score and Time to First Interactive. The Progressive Web App score is a threshold that is configurable in the `web/package.json` file by adjusting the `min_lighthouse_score` variable. Lighthouse gives the score as a percentage of passed PWA audits. For projects using Lighthouse 2.x, aim for a score of 90 or better.
 
-Time to First Interactive measures the first point in which necessary scripts have loaded and the CPU is idle enough to handle most user input. This threshold, given in milliseconds (ms), is configurable in the `web/package.json` file by adjusting the `max_first_interactive` variable. Aim for 10,000 ms or less. 
+Time to First Interactive measures the first point in which necessary scripts have loaded and the CPU is idle enough to handle most user input. This threshold, given in milliseconds (ms), is configurable in the `web/package.json` file by adjusting the `max_first_interactive` variable. Aim for 10,000 ms or less.
 
 Lighthouse will run against the configurable `siteUrl` in the `web/package.json` file.
-It's important to note that we should be testing performance via bundles on cloud.mobify.com for the closest result to what we see when we go live. 
+It's important to note that we should be testing performance via bundles on cloud.mobify.com for the closest result to what we see when we go live.
 
 ```bash
 # Run against local files with Mobify Preview, for when the PWA is not live:
@@ -148,7 +145,7 @@ npm run test:pwa-prod
 npm run test:pwa-prod https://hybris.merlinspotions.com
 ```
 
-When the test completes, you can find the full HTML report under `web/tests/performance/lighthouse/reports`. 
+When the test completes, you can find the full HTML report under `web/tests/performance/lighthouse/reports`.
 
 ---
 
@@ -183,6 +180,7 @@ npm run test:lighthouse
 
 
 ### Additional Resources
+
 * [Lighthouse Information](https://developers.google.com/web/tools/lighthouse/)
 * [Google's PWA Checklist](https://developers.google.com/web/progressive-web-apps/checklist)
 
@@ -228,9 +226,9 @@ Mobify uses [CircleCI 2.0 Workflows](https://circleci.com/docs/2.0/workflows/) f
  1. Unit
  1. End-to-end
  1. Performance
-1. CircleCI uploads a bundle if the tests pass 
+1. CircleCI uploads a bundle if the tests pass
 
-The workflow jobs are defined and orchestrated in the `.circleci/config.yml` file. 
+The workflow jobs are defined and orchestrated in the `.circleci/config.yml` file.
 
 ### Setting up
 
@@ -239,9 +237,9 @@ The workflow jobs are defined and orchestrated in the `.circleci/config.yml` fil
 1. Click on **Set Up Project** for the project that you want CircleCI to build
 1. Click on **Start building**
 1. CircleCI will detect the `.circleci/config.yml` configuration file that is automatically generated with your project and start building the project
-1. CircleCI will automatically trigger a new build whenever code is pushed to Github. 
+1. CircleCI will automatically trigger a new build whenever code is pushed to Github.
 
-The CircleCI environment is based upon [a Docker image of a typical Mobify development environment](https://hub.docker.com/r/mobify/cci-docker-primary/). The `config.yml` file contains a number of [jobs](https://circleci.com/docs/2.0/jobs-steps/) that are a collection of commands, and [workflows](https://circleci.com/docs/2.0/workflows/) that define the execution order of jobs. 
+The CircleCI environment is based upon [a Docker image of a typical Mobify development environment](https://hub.docker.com/r/mobify/cci-docker-primary/). The `config.yml` file contains a number of [jobs](https://circleci.com/docs/2.0/jobs-steps/) that are a collection of commands, and [workflows](https://circleci.com/docs/2.0/workflows/) that define the execution order of jobs.
 
 Edit the `config.yml` file to customize the build for your project.
 

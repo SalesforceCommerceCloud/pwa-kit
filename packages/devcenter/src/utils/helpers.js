@@ -80,13 +80,11 @@ export const calculateTreeData = (edges, forcedNavOrder = []) => {
                         label: part,
                         children: [],
                         path: slug,
-                        // group,
                         title: part,
                         is_parent: true
                     }
                     prevItems.push(tmp)
                 }
-
                 prevItems = tmp.children
             }
 
@@ -110,10 +108,25 @@ export const calculateTreeData = (edges, forcedNavOrder = []) => {
                     group
                 })
             }
+            prevItems.sort((a, b) => {
+                if (a.desktopTitle > b.desktopTitle) return 1
+                if (a.desktopTitle < b.desktopTitle) return -1
+                return 0
+            })
+
             return accu
         },
         {children: []}
     )
+
+    // sorting the second level
+    tree.children.map((item) => {
+        item.children = item.children.sort(function(a, b) {
+            if (a.label.toLowerCase() < b.label.toLowerCase()) return -1
+            if (a.label.toLowerCase() > b.label.toLowerCase()) return 1
+            return 0
+        })
+    })
 
     const tmp = [...forcedNavOrder]
     tmp.reverse()

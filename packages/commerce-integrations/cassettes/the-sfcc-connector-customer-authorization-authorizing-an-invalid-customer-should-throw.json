@@ -1,14 +1,14 @@
 [
     {
-        "scope": "https://mobify-tech-prtnr-na03-dw.demandware.net:443",
+        "scope": "https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com:443",
         "method": "POST",
-        "path": "/s/2017refresh/dw/shop/v17_8/customers/auth",
+        "path": "/s/RefArch/dw/shop/v20_4/customers/auth",
         "body": {
             "type": "credentials"
         },
         "status": 401,
         "response": {
-            "_v": "17.8",
+            "_v": "20.4",
             "fault": {
                 "arguments": {
                     "credentialType": "Authorization:Basic header"
@@ -18,26 +18,32 @@
             }
         },
         "rawHeaders": [
-            "Accept-Ranges",
+            "accept-ranges",
             "bytes",
             "x-dw-request-base-id",
-            "sTQ2nRUqQ11kAAAK",
-            "Cache-Control",
+            "QQEsLyu8c1_OxTMK",
+            "x-content-type-options",
+            "nosniff",
+            "cache-control",
             "no-cache, no-store, must-revalidate",
-            "Pragma",
+            "pragma",
             "no-cache",
-            "Expires",
+            "expires",
             "Thu, 01 Dec 1994 16:00:00 GMT",
-            "Content-Type",
+            "jweb",
+            "y",
+            "content-type",
             "application/json;charset=UTF-8",
-            "Content-Length",
+            "content-length",
             "202",
-            "Date",
-            "Thu, 01 Aug 2019 18:06:13 GMT+00:00",
-            "Connection",
-            "close",
-            "Server",
-            "Apache"
+            "date",
+            "Tue, 29 Sep 2020 22:58:51 UTC",
+            "server",
+            "istio-envoy",
+            "x-envoy-upstream-service-time",
+            "265",
+            "connection",
+            "close"
         ]
     }
 ]

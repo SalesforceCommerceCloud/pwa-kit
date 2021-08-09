@@ -169,7 +169,7 @@ class ProductList extends React.Component {
                             <Link
                                 className="pw--underline"
                                 openInNewTab
-                                href="https://docs.mobify.com/commerce-integrations/latest/"
+                                href="https://dev.mobify.com/v1.x/apis-and-sdks/commerce-integrations/overview"
                             >
                                 Read the guide
                             </Link>
@@ -180,9 +180,9 @@ class ProductList extends React.Component {
                         <Link
                             className="pw--underline"
                             openInNewTab
-                            href="https://docs.mobify.com/progressive-web/latest/"
+                            href="https://dev.mobify.com/v1.x/how-to-guides"
                         >
-                            docs.mobify.com
+                            dev.mobify.com
                         </Link>
                     </div>
                 </div>

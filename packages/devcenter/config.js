@@ -89,13 +89,7 @@ const config = {
             [
                 // this is the key name (direct sub folder in content)
                 mainNav.HOW_TO_GUIDES,
-                `/${mainNav.HOW_TO_GUIDES}/index`,
-
-                // forced order for level 2
-                `/${mainNav.HOW_TO_GUIDES}/categories/design`,
-                `/${mainNav.HOW_TO_GUIDES}/categories/guides`,
-                `/${mainNav.HOW_TO_GUIDES}/categories/testing`,
-                `/${mainNav.HOW_TO_GUIDES}/categories/upgrades`
+                `/${mainNav.HOW_TO_GUIDES}/index`
             ],
             [
                 // this is the key name (direct sub folder in content)

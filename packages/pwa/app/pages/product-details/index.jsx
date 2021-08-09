@@ -275,7 +275,7 @@ class ProductDetails extends React.Component {
                         <Link
                             className="pw--underline"
                             openInNewTab
-                            href="https://docs.mobify.com/commerce-integrations/latest/"
+                            href="https://dev.mobify.com/v1.x/apis-and-sdks/commerce-integrations/overview"
                         >
                             Read the guide
                         </Link>
@@ -306,8 +306,12 @@ class ProductDetails extends React.Component {
 
                 <div className="u-padding-bottom-lg">
                     View more guides on&nbsp;
-                    <Link className="pw--underline" openInNewTab href="https://docs.mobify.com">
-                        docs.mobify.com
+                    <Link
+                        className="pw--underline"
+                        openInNewTab
+                        href="https://dev.mobify.com/v1.x/"
+                    >
+                        dev.mobify.com
                     </Link>
                 </div>
 

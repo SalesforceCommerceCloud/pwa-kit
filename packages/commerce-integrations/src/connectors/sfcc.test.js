@@ -26,28 +26,28 @@ if (isIntegrationTest) {
 const userFixture = (key) => {
     const time = isIntegrationTest ? new Date().getTime() : ''
     return {
-        firstName: `test-${key}${time}-firstName`,
-        lastName: `test-${key}${time}-lastName`,
-        email: `test-${key}${time}@example-foo.com`,
-        password: `test-${key}${time}-password`
+        firstName: `test-v1-${key}${time}-firstName`,
+        lastName: `test-v1-${key}${time}-lastName`,
+        email: `test-v1-${key}${time}@example-foo.com`,
+        password: `test-v1-${key}${time}-P4$$word`
     }
 }
 
 const validCredentials = {
-    username: 'mobifyeng@gmail.com',
-    password: 'P4sswordP4'
+    username: 'testuser1@demandware.com',
+    password: 'P4$$wordP4'
 }
 
 const invalidCredentials = {
-    username: 'invaliduser@gmail.com',
-    password: 'P4sswordP4'
+    username: 'testuser0@demandware.com',
+    password: 'P4$$wordP4'
 }
 const customerInformation = {
     email: 'engineer@mobify.com'
 }
 const orderAddress = {
-    firstName: 'Donald',
-    lastName: 'Trump',
+    firstName: 'Test',
+    lastName: 'User',
     phone: '5555555555',
     addressLine1: '1600 Pennsylvania Ave NW',
     countryCode: 'US',
@@ -56,7 +56,7 @@ const orderAddress = {
     postalCode: '20500'
 }
 const cartItem = {
-    productId: '061492215594',
+    productId: '008884303989M',
     quantity: 1
 }
 const payment = {
@@ -65,7 +65,7 @@ const payment = {
     details: {
         ccv: '123',
         type: 'Visa',
-        holderName: 'Donald Trump',
+        holderName: 'Test User',
         number: '411111111111112',
         expiryMonth: 1,
         expiryYear: 2028
@@ -75,9 +75,9 @@ const payment = {
 describe(`The SFCC Connector`, () => {
     const makeConnector = () =>
         SalesforceConnector.fromConfig({
-            basePath: `https://mobify-tech-prtnr-na03-dw.demandware.net/s/2017refresh/dw/shop/v17_8`,
+            basePath: `https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com/s/RefArch/dw/shop/v20_4`,
             defaultHeaders: {
-                'x-dw-client-id': '5640cc6b-f5e9-466e-9134-9853e9f9db93'
+                'x-dw-client-id': 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
             }
         })
 
@@ -215,10 +215,12 @@ describe(`The SFCC Connector`, () => {
                             expect(orders.count).toEqual(1)
                             expect(orders.total).toEqual(1)
                             expect(orders.data[0].id).toEqual(order.id)
+
+                            // Delete the cart as placing the order successfully has deleted it.
+                            cart = undefined
+
                             return null
                         })
-                        // 15. Finally Delete the cart (also delete cart on error)
-                        .then(() => connector.deleteCart(cart.id))
                         .catch((e) => {
                             // Ensure we delete the cart so our tests don't fail on cart creation next time.
                             if (cart) {
@@ -307,7 +309,7 @@ describe(`The SFCC Connector`, () => {
         const spec5 = test('with a valid id should resolve with a Product instance', () => {
             return record(spec5, () => {
                 const connector = makeConnector()
-                return connector.getProduct('25564777').then((data) => {
+                return connector.getProduct('008884303989M').then((data) => {
                     expect(propTypeErrors(Product, data)).toBeFalsy()
                 })
             })
@@ -325,7 +327,7 @@ describe(`The SFCC Connector`, () => {
         const spec7 = test('with valid ids should resolve with a ProductList instance with populated data', () => {
             return record(spec7, () => {
                 const connector = makeConnector()
-                const validIds = ['25564777', '25518724']
+                const validIds = ['008884303989M', '008884303996M']
                 return connector.getProducts(validIds).then((result) => {
                     expect(propTypeErrors(ProductList, result)).toBeFalsy()
                     expect(result.data.length).toEqual(validIds.length)
@@ -347,7 +349,7 @@ describe(`The SFCC Connector`, () => {
         const spec9 = test('with a mix of valid and invalid ids should resolve with a ProductList instance with partial data', () => {
             return record(spec9, () => {
                 const connector = makeConnector()
-                const validIds = ['25564777', '25518724']
+                const validIds = ['008884303989M', '008884303996M']
                 const invalidIds = ['1', '2']
 
                 return connector.getProducts([...validIds, ...invalidIds]).then((result) => {
@@ -363,7 +365,7 @@ describe(`The SFCC Connector`, () => {
     const spec10 = test('Getting a Store', () => {
         return record(spec10, () => {
             const connector = makeConnector()
-            return connector.getStore('the_academy_of_magical_arts').then((data) => {
+            return connector.getStore('store1').then((data) => {
                 expect(propTypeErrors(Store, data)).toBeFalsy()
             })
         })
@@ -569,11 +571,11 @@ describe(`The SFCC Connector`, () => {
             connector
                 .createCart()
                 .then((cart) => connector.addCartItem(cart, cartItem))
-                .then((cart) => connector.addCouponEntry(cart, 'MAGIC'))
+                .then((cart) => connector.addCouponEntry(cart, 'orderLevel'))
                 .then((cart) => {
                     expect(propTypeErrors(Cart, cart)).toBeFalsy()
                     expect(cart.items.length).toEqual(1)
-                    expect(cart.couponEntries[0].code).toEqual('MAGIC')
+                    expect(cart.couponEntries[0].code).toEqual('orderLevel')
                     expect(cart.couponEntries[0].id).toBeDefined()
                     expect(cart.discounts).toBeLessThan(0)
                     return cart

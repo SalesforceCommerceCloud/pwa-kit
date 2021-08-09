@@ -49,10 +49,10 @@ export const getConnector = () => {
             return import('@mobify/commerce-integrations/dist/connectors/sfcc').then((module) => {
                 return module.SalesforceConnector.fromConfig({
                     basePath: isUniversal
-                        ? `/mobify/proxy/base2/s/2017refresh/dw/shop/v17_8`
-                        : `https://mobify-tech-prtnr-na03-dw.demandware.net/s/2017refresh/dw/shop/v17_8`,
+                        ? `/mobify/proxy/base2/s/RefArch/dw/shop/v20_4`
+                        : `https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com/s/RefArch/dw/shop/v20_4`,
                     defaultHeaders: {
-                        'x-dw-client-id': '5640cc6b-f5e9-466e-9134-9853e9f9db93'
+                        'x-dw-client-id': 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
                     }
                 })
             })

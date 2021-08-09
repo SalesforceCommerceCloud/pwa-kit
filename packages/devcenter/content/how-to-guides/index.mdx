@@ -6,7 +6,7 @@ column: 2
 ---
 
 import {Grid} from '@theme-ui/components'
-import {Card as DevCenterCard} from '../../src/components/CardComponent'
+import {Card as DevCenterCard} from '../../src/components/CardComponent' 
 
 These guides will walk you through specific tasks using the Mobify Platform.
 
@@ -34,23 +34,58 @@ Browse by category to see all the guides we've published. (Or use the search bar
 
 <Grid gap={'xl'} columns={[1, null, 2]} paddingBottom={2}>
 <DevCenterCard
+title={props.categoryMap['Analytics'].title}
+description="Help improve your project’s analytics implementation."
+linkGroups={props.categoryMap['Analytics'].linkMap}
+/>
+<DevCenterCard
+title={props.categoryMap['Deployment'].title}
+description="Deploy your project on the Mobify Platform."
+linkGroups={props.categoryMap['Deployment'].linkMap}
+/>
+<DevCenterCard
 title={props.categoryMap['Design'].title}
 description="Best practices to help optimize the user experience."
 linkGroups={props.categoryMap['Design'].linkMap}
 />
 <DevCenterCard
-title={props.categoryMap['Guides'].title}
-description="Get in-depth help on a variety of topics related to building an ecommerce PWA with the Mobify Platform."
-linkGroups={props.categoryMap['Guides'].linkMap}
+title={props.categoryMap['Integrations'].title}
+description="Integrate Salesforce Commerce, SAP Hybris, or other backends into your project."
+linkGroups={props.categoryMap['Integrations'].linkMap}
 />
 <DevCenterCard
-title={props.categoryMap['Upgrades'].title}
+title={props.categoryMap['Performance'].title}
 description="Step-by-step instructions for upgrading key project dependencies."
-linkGroups={props.categoryMap['Upgrades'].linkMap}
+linkGroups={props.categoryMap['Performance'].linkMap}
+/>
+<DevCenterCard
+title={props.categoryMap['Project Planning'].title}
+description="Step-by-step instructions for upgrading key project dependencies."
+linkGroups={props.categoryMap['Project Planning'].linkMap}
+/>
+<DevCenterCard
+title={props.categoryMap['Server-side rendering'].title}
+description="Step-by-step instructions for upgrading key project dependencies."
+linkGroups={props.categoryMap['Server-side rendering'].linkMap}
+/>
+<DevCenterCard
+title={props.categoryMap['Internationalization'].title}
+description="Integrate Salesforce Commerce, SAP Hybris, or other backends into your project."
+linkGroups={props.categoryMap['Internationalization'].linkMap}
+/>
+<DevCenterCard
+title={props.categoryMap['State Management'].title}
+description="Step-by-step instructions for upgrading key project dependencies."
+linkGroups={props.categoryMap['State Management'].linkMap}
 />
 <DevCenterCard
 title={props.categoryMap['Testing'].title}
 description="Best practices for testing single-page apps, including automated and manual methods."
 linkGroups={props.categoryMap['Testing'].linkMap}
+/>
+<DevCenterCard
+title={props.categoryMap['Upgrades'].title}
+description="Step-by-step instructions for upgrading key project dependencies."
+linkGroups={props.categoryMap['Upgrades'].linkMap}
 />
 </Grid>

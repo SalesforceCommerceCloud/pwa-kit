@@ -165,21 +165,27 @@ class Header extends React.Component {
     }
 
     openNavigation() {
-        this.setState({navigationIsOpen: true})
-        this.setState({path: '/'})
+        this.setState({
+            navigationIsOpen: true,
+            path: '/'
+        })
     }
 
     closeNavigation() {
-        this.setState({navigationIsOpen: false})
-        this.setState({path: '/'})
+        this.setState({
+            navigationIsOpen: false,
+            path: '/'
+        })
     }
 
     onPathChange(path, isLeaf, trigger, originalPath) {
-        const {router} = this.props
         this.setState({path: originalPath})
         if (trigger === 'click' && isLeaf) {
+            const {router} = this.props
             router.push(originalPath)
-            this.setState({navigationIsOpen: false}, () => this.setState({path: '/'}))
+            this.setState({navigationIsOpen: false, path: '/'})
+        } else {
+            this.setState({path: originalPath})
         }
     }
 

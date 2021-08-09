@@ -1,42 +1,48 @@
 [
     {
-        "scope": "https://mobify-tech-prtnr-na03-dw.demandware.net:443",
+        "scope": "https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com:443",
         "method": "GET",
-        "path": "/s/2017refresh/dw/shop/v17_8/products/1?expand=availability%2Cprices%2Cvariations%2Cimages&all_images=true",
+        "path": "/s/RefArch/dw/shop/v20_4/products/1?expand=availability%2Cprices%2Cvariations%2Cimages&all_images=true",
         "body": "",
         "status": 404,
         "response": {
-            "_v": "17.8",
+            "_v": "20.4",
             "fault": {
                 "arguments": {
                     "productId": "1",
-                    "siteId": "2017refresh"
+                    "siteId": "RefArch"
                 },
                 "type": "ProductNotFoundException",
-                "message": "No product with ID '1' for site '2017refresh' could be found."
+                "message": "No product with ID '1' for site 'RefArch' could be found."
             }
         },
         "rawHeaders": [
-            "Accept-Ranges",
+            "accept-ranges",
             "bytes",
             "x-dw-request-base-id",
-            "sTQ0nRQqQ11kAAAK",
-            "Cache-Control",
+            "QQEiLyi8c1_OxTMK",
+            "x-content-type-options",
+            "nosniff",
+            "cache-control",
             "no-cache, no-store, must-revalidate",
-            "Pragma",
+            "pragma",
             "no-cache",
-            "Expires",
+            "expires",
             "Thu, 01 Dec 1994 16:00:00 GMT",
-            "Content-Type",
+            "jweb",
+            "y",
+            "content-type",
             "application/json;charset=UTF-8",
-            "Content-Length",
-            "184",
-            "Date",
-            "Thu, 01 Aug 2019 18:06:12 GMT+00:00",
-            "Connection",
-            "close",
-            "Server",
-            "Apache"
+            "content-length",
+            "176",
+            "date",
+            "Tue, 29 Sep 2020 22:58:48 UTC",
+            "server",
+            "istio-envoy",
+            "x-envoy-upstream-service-time",
+            "14",
+            "connection",
+            "close"
         ]
     }
 ]

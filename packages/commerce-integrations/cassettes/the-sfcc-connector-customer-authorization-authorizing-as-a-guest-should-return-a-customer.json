@@ -1,46 +1,52 @@
 [
-  {
-    "scope": "https://mobify-tech-prtnr-na03-dw.demandware.net:443",
-    "method": "POST",
-    "path": "/s/2017refresh/dw/shop/v17_8/customers/auth",
-    "body": {
-      "type": "guest"
-    },
-    "status": 200,
-    "response": {
-      "_v": "17.8",
-      "_type": "customer",
-      "auth_type": "guest",
-      "customer_id": "ab7lR9eLoOFRm9lVCxMTPfObuF",
-      "preferred_locale": "default"
-    },
-    "rawHeaders": [
-      "Accept-Ranges",
-      "bytes",
-      "x-dw-request-base-id",
-      "7XbJ8KypgFt5AAAK",
-      "Allow",
-      "DELETE,OPTIONS,POST",
-      "x-dw-version-status",
-      "deprecated",
-      "Authorization",
-      "Bearer eyJfdiI6IjEiLCJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfdiI6IjEiLCJleHAiOjE1MzUxNjA1MDAsImlhdCI6MTUzNTE1ODcwMCwiaXNzIjoiNTY0MGNjNmItZjVlOS00NjZlLTkxMzQtOTg1M2U5ZjlkYjkzIiwic3ViIjoie1wiX3ZcIjpcIjFcIixcImN1c3RvbWVyX2luZm9cIjp7XCJjdXN0b21lcl9pZFwiOlwiYWI3bFI5ZUxvT0ZSbTlsVkN4TVRQZk9idUZcIixcImd1ZXN0XCI6dHJ1ZX19In0.dl8XgldAVo8SGRDrrSAdnbD_tnRnfYwIrohjhsPW78JgTif2kukQqnB74RgKHRx6U5CTBee8ktTVwqnmtguRT22BNYjnjcIKX4HE1grvG0MVs2f9HJSfap9SYzUk0ZqixJz5v-AP-qV2Xu3f4UstNTTbhRBBhy3rFH-wGno7e0Dh1KbLcx49rwBFH_lFjJEHvA0k9r70IXz4l9y4I8oqOr6uPPn5o-AKCf2xd90DkM16Y2NpG_mOX_gOmYm_m7hJzKuY4zU90SGc-GYkbBKfRPK3GthTr0LNXVsknydirpsZDI1hlBjrCxNz689-ogulCp37V20T0JJ_urMprMgv1PFSpgUtpnavy4CcGXjlW7BrGfrg4sOBVnFp4r1lRtSg3-RoGsk4N6kLozoGuuA2m0RSV1L2GIInWAkS_oKUAOp5V1YZ0-x9JG8e60DuGu1IXl2eTQodlj39zBlZQPo7MK9HHIZ2s_LM-10LzF6AXZ8",
-      "Cache-Control",
-      "no-cache, no-store, must-revalidate",
-      "Pragma",
-      "no-cache",
-      "Expires",
-      "Thu, 01 Dec 1994 16:00:00 GMT",
-      "Content-Type",
-      "application/json;charset=UTF-8",
-      "Content-Length",
-      "124",
-      "Date",
-      "Sat, 25 Aug 2018 00:58:20 GMT+00:00",
-      "Connection",
-      "close",
-      "Server",
-      "Apache"
-    ]
-  }
+    {
+        "scope": "https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com:443",
+        "method": "POST",
+        "path": "/s/RefArch/dw/shop/v20_4/customers/auth",
+        "body": {
+            "type": "guest"
+        },
+        "status": 200,
+        "response": {
+            "_v": "20.4",
+            "_type": "customer",
+            "auth_type": "guest",
+            "customer_id": "abpR81DGieypAKNNO61RATVruz",
+            "preferred_locale": "en_US"
+        },
+        "rawHeaders": [
+            "accept-ranges",
+            "bytes",
+            "x-dw-request-base-id",
+            "QQEtLyy8c1_OxTMK",
+            "authorization",
+            "Bearer eyJfdiI6IjEiLCJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfdiI6IjEiLCJleHAiOjE2MDE0MjIxMzIsImlhdCI6MTYwMTQyMDMzMiwiaXNzIjoiYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhIiwic3ViIjoie1wiX3ZcIjpcIjFcIixcImN1c3RvbWVyX2luZm9cIjp7XCJjdXN0b21lcl9pZFwiOlwiYWJwUjgxREdpZXlwQUtOTk82MVJBVFZydXpcIixcImd1ZXN0XCI6dHJ1ZSxcInZpc2l0X2lkXCI6XCJlYzRhNDMyMDg5OTU0NjU3N2UwMjE5NmQ2NFwifX0ifQ.dl8XgldAVo8SGRDrrSAdnbD_tnRnfYwIrohjhsPW78JgTif2kukQqnB74RgKHRx6U5CTBee8ktTVwqnmtguRT3fzLYlOHDF1bMqto6ZCOpSmVHPyvxtzI7y1KHAKSLNUOeSfdkPCh7scjKmbiuzeHOQI38pvTfH4j3oaucbjiNjwkUGCPs_LS_JYaTNhkdqjlRDBcyYo3h8ArKx_5YJK18aynZ00coTdezBKLTzMb7ByQTjiYk7tOi-7SSgrri89gY8EIYV9uqACQCuRVCbuc1GYu0OFr_RipfeglkIeO9tSFneyECtAPQ_Ly1PDNzHvg2RmGyL-zAHEVFgt1gk50zYSk-sX8QSCVHpTPZZBfdS9okARuuH2_pOzYA0DKp4RVXTBLid62ZBeg0io22QEK59q2kxaOJDtqzPWmOf5tZGXw41lX-QyrQpA82VzdUma00bp8JuUk7-LmBjmQOThZxuinWlwfit_OjoF2XwX8dokxgj37tHyx3OqAnigzUB_lAz8GzHejnaWe8uCVnYlPINK9q_4MD4DKYFp8Ffihd41Ho1z7gGBq3SedCZ4MHcl",
+            "allow",
+            "DELETE,OPTIONS,POST",
+            "x-content-type-options",
+            "nosniff",
+            "x-dw-version-status",
+            "deprecated",
+            "cache-control",
+            "no-cache, no-store, must-revalidate",
+            "pragma",
+            "no-cache",
+            "expires",
+            "Thu, 01 Dec 1994 16:00:00 GMT",
+            "jweb",
+            "y",
+            "content-type",
+            "application/json;charset=UTF-8",
+            "content-length",
+            "122",
+            "date",
+            "Tue, 29 Sep 2020 22:58:51 UTC",
+            "server",
+            "istio-envoy",
+            "x-envoy-upstream-service-time",
+            "21",
+            "connection",
+            "close"
+        ]
+    }
 ]

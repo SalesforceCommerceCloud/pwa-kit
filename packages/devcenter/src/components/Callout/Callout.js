@@ -68,7 +68,7 @@ const StyledCalloutWrapper = styled.div({}, (props) => {
 })
 
 Callout.propTypes = {
-    children: PropTypes.element.isRequired,
+    children: PropTypes.oneOfType([PropTypes.array, PropTypes.element]),
     className: PropTypes.string.isRequired
 }
 

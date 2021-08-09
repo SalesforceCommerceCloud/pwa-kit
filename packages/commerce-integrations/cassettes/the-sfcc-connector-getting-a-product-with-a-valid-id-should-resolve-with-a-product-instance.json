@@ -1,42 +1,45 @@
 [
-  {
-    "scope": "https://mobify-tech-prtnr-na03-dw.demandware.net:443",
-    "method": "GET",
-    "path": "/s/2017refresh/dw/shop/v17_8/products/25564777?expand=availability%2Cprices%2Cvariations%2Cimages&all_images=true",
-    "body": "",
-    "status": 200,
-    "response": [
-      "1f8b0800000000000000",
-      "e4596d8fe23610fe2b693e27e48584c04a55a5bb534f77da955645d5ad5a55919338e05bc74e6d074a57fcf74e5e60390eb14bca92b47cc3663c7e9e7966c623e5490f17fa8dee0483b16ee8a15ae51896b9e049112bd8890b21308b57b0f9ebf4036c90047ebabe3ff2822028d7199ae1702678914bfde6f7a7ad8f9d3f3666070ce02f4415aca614e305a6584aed97224d29d67e169c29ed1de585c48666681489ca3e21328c90c42125ec114ece95cae58d6549a2a499f364e80e129c21962c91c0038695952cadea326be15a08d1afa1b4271667d68e99544891d832ad2951589a28cf61979a315288f21958a6a8a0a527df735080705c7b945685cabaff38706cd7f56cdf1f7cfefcc9f11f1e06f7bf0dbee63300bc8733e3114957a6c2f1dccc8562c264c81e9ac9721ff6e5102aa2287e8508fadaf8afeb1779a3c9789c442f47e75d47fab540f87afdfe30f405c1cb8d86b526dfa97abeb2fd3207b67dd1feaa6bb752e25f1470af94bcea2a6e942c4b19090278380b9152824485da2bd603069b373ce6940bbdf4418b974f8595d9c61c6c1af400e3e23dc5d0329c9022eb3c0b913df15c341c6d34ae61f5aaa1b481789169a02712fa23ec8f53cf7f457cbaea246d20b61e081a59de7e22e889fe575ec2671a0a7a22e6951773cfe782b76f2d8626334469e779886ccf89d0702b7285aa673de5648417990afaa1",
-      "5f309ef8899d042f47a7ab36d20261eb91a0d6e4ed27827e687fd5b57ba671a01f4a5e7515f77c16b8584f592215cf3b4f45dff6e320b593add015ac834abfbfef68306d01f1ff928c759294db842d30535cacf49b9dccdb6e42f629b8793231f408c58f5c2458a0a88c418a2830ad81eedaef98285180452ef0f7c7a4e2f16348cb2096ded7a03e67b330c13216242f8981db2f5803ed341e4908344eb42551734dcd89d414fe4b1502b6441dfdb48abe7c5625aa8418689f94d4722c521cabd228d3e08647537133218c61f10300ce905458ecd26f76da67a4b45cdb09044e0596f3b2aee49ce7d6c209c2b1d57c690493e693e24fd018c23a077f2c23b68514ee7f793c105a12c3c29f0c6c1b429811165636e19f056290ab20aa63e80c652fe72cb8cfcb7ed48502d5c5af2b2dfd5bd2d52a436215427de31964601db425cf3093664c39806533b82e9770146410aa138aa067fead2a75ae3ded7f81ae97cf59590abd6eda0853079a00536f9da881ed8cbca1e73ae3a17320598f66a5b1e555e9b2eb4adf6d8e9b16f7d434bde7ee05b1237f976c27b71ff5f5ee037a71fa23f76cf447eec9f41f6e3ba6ef8dcf46df1b9f4cffee43c7f47dff6cf47dff64fad33ba07fa679a27910deb71b2f9ad3f58873200207c68f7dd90ec3aba83e3f57f5aa1db8e93160552c8f43daf77777d45f999aa7f9bb3deaaf6c74a7f97b",
-      "38eeb06c1d3004aeff010000ffff",
-      "03009ed95e4cfc240000"
-    ],
-    "rawHeaders": [
-      "Accept-Ranges",
-      "bytes",
-      "x-dw-request-base-id",
-      "7Xa98KepgFt5AAAK",
-      "Allow",
-      "GET,HEAD,OPTIONS",
-      "x-dw-version-status",
-      "deprecated",
-      "Cache-Control",
-      "max-age=60,must-revalidate",
-      "Content-Type",
-      "application/json;charset=UTF-8",
-      "Transfer-Encoding",
-      "chunked",
-      "Content-Encoding",
-      "gzip",
-      "Vary",
-      "Accept-Encoding",
-      "Date",
-      "Sat, 25 Aug 2018 00:58:15 GMT+00:00",
-      "Connection",
-      "close",
-      "Server",
-      "Apache"
-    ]
-  }
+    {
+        "scope": "https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com:443",
+        "method": "GET",
+        "path": "/s/RefArch/dw/shop/v20_4/products/008884303989M?expand=availability%2Cprices%2Cvariations%2Cimages&all_images=true",
+        "body": "",
+        "status": 200,
+        "response": [
+            "1f8b0800000000000000ec5a6d6fdb3610fe2b9c3e3b7ab36c4b018662cdd601c50a044db715190a81a2689b8bde4652769c20ff7d4749761cc7532ac173d9c0f197903c9e8ecf3df7e808e8de0817c6b9e1daa6670c8c50ae0a0ac382e7714924cc9092739a91154cfe7ef5334cb018feb56ddff7bda13d0cfce0839a4cf18c86339e978530ceffbadf38da5a589bed3180259c48185d2658b2ac4cd1dba4a4e84a725650817ec162852e30a7e81d9392c6e86aceb84403f8259857db6326c2080b1a262cbb014773290b716e59349e511316859c99244f53ca0925495ec6a6c00915d31cc66ac18a9756158ab570adebeb8fef42db76ac3cb3629ae22c5ec2c34d212138629d59574c5271868b026693b3f48c6089937c06b6535c26127c0d470189fce1b4f629ac2a4cebf257d3b11d77e83a23f3fdfb3fc6cee7cfe6e5b5f977318313ec047e77c7a7671003c499c5517e6b960206f16dfb298e19b06432a1dd73663c0c5e7bf61d6f32245e805f06f3ad1ed9ef1170efec7f19180b46976b06d4297cc689ff4d32fe9c031ada32e7a41bed893b9c78e8cd839382bcc40325239833d89a672196b02b2ae58e50ec31583730244f726e281ff0d017778595d9da1c6c9ac34018df5acf0628a5312b53fd381cb80eb51d275853a28e536731eb13b1065d90ae0470bcc81f03685f01a7362ad63de24335424d168fde09e9ca9e937c1cbd19d2950a2721f97efba1a3cbda00891427897e2c8eecc0a16397ac395185a9b39ef50858836e48d3ec4fe2a13f89fcd1cb606a22613d023e542b54a7f0e89d90a6cc39e9c691db204d79705290efb507fa567ab6c492ccf5237234f526aefd784faae3dc4b8c8b4b2d98dc27e2574ae59a536a9a650b9ac99caf8cf32dde6e2681bb129e1c547f0323c2e426e731e53852b04c71226813ec664fa8ee9e5b469297605370fa7ca39039b90913baa0c9fa190fc0923c9b8531150440564704e7bfe50b8af29223aa10270a7191272c464201ceb2d91bf4694e3334638d9d68328491e4ab1f60910924ca0892892295c17a1d31659131029baa472199a339061f2c432be5071828a844c03eb4ccf94d9160b05d52cc111010318920f60cb6283f110cf3a9724d01dd6a0fbd951c23602d0ca409b8a45848cab7b16e660e541cc2fa48a73f71a03554bb98e70514bb1d7a56f32980b0dc913db227c3f18737a066615d093faa146d820bab746eecf627132033ce2723d3b6216129cbc2ca26fca7c419940c90c91918194e3b970e3cad50a2fa4ad35f9dad97a6184f5187da9983cfd78a13f0b0784aa6ba5aee77bf6da9878dcc66b2262850b22cc8ce072e8f467b943493472bc0c79882bd45d85a6c83cdb9773ee009aa427d7c2bac5f19f7cd4be4f16d00e0b23b757078e7190fdbedccb742c2b387f6a190a87c7546c21eeb828437391c12e0ab3b12be2e48d841172482c054fdc97f2061073daac3d30389eae3bc83e984df07095b0f243cdb39986256beba23a18d4eb8c3c32101bebaeb84aa8e035d6f9a3ef1a2df6da7d95ddfb8f640b0e736b49bc1fde15547ddf8bfaa47fd82f3da02abb06c0f69d7dfb8dddfb8ab3fbfdd9fdfd51f28469b4325281d1dbaed0eddce0edb53e2744e89d39e13a51c5f9e16ccd74aefc020e1730b12723a65194de1d27dd1ac2e9b1a20e1d67e355cb258ce617c6d3cfc0b0000ffff",
+            "0300e3c18bdb2a2e0000"
+        ],
+        "rawHeaders": [
+            "accept-ranges",
+            "bytes",
+            "x-dw-request-base-id",
+            "QQEhLyi8c1_OxTMK",
+            "allow",
+            "GET,HEAD,OPTIONS",
+            "x-dw-version-status",
+            "deprecated",
+            "x-content-type-options",
+            "nosniff",
+            "cache-control",
+            "max-age=0,no-cache,no-store,must-revalidate",
+            "jweb",
+            "y",
+            "vary",
+            "accept-encoding",
+            "content-encoding",
+            "gzip",
+            "content-type",
+            "application/json;charset=UTF-8",
+            "date",
+            "Tue, 29 Sep 2020 22:58:48 UTC",
+            "server",
+            "istio-envoy",
+            "x-envoy-upstream-service-time",
+            "32",
+            "connection",
+            "close",
+            "transfer-encoding",
+            "chunked"
+        ]
+    }
 ]

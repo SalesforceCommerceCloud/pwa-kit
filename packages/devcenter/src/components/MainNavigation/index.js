@@ -33,7 +33,7 @@ const MainNavigation = ({navOpen, location, setNavOpen, showLeftSidebar}) => {
             }
             allMdx(
                 filter: {fileAbsolutePath: {regex: "/content/"}}
-                sort: {fields: fields___slug}
+                sort: {fields: fields___slug, order: ASC}
             ) {
                 edges {
                     node {

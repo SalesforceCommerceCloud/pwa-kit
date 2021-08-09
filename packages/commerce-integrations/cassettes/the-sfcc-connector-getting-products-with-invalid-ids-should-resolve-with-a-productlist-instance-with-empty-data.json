@@ -1,37 +1,43 @@
 [
-  {
-    "scope": "https://mobify-tech-prtnr-na03-dw.demandware.net:443",
-    "method": "GET",
-    "path": "/s/2017refresh/dw/shop/v17_8/products/(1,2)?expand=availability%2Cprices%2Cvariations%2Cimages&all_images=true",
-    "body": "",
-    "status": 200,
-    "response": {
-      "_v": "17.8",
-      "_type": "product_result",
-      "count": 0,
-      "total": 0
-    },
-    "rawHeaders": [
-      "Accept-Ranges",
-      "bytes",
-      "x-dw-request-base-id",
-      "7XbA8KipgFt5AAAK",
-      "Allow",
-      "GET,HEAD,OPTIONS",
-      "x-dw-version-status",
-      "deprecated",
-      "Cache-Control",
-      "max-age=86400,must-revalidate",
-      "Content-Type",
-      "application/json;charset=UTF-8",
-      "Content-Length",
-      "58",
-      "Date",
-      "Sat, 25 Aug 2018 00:58:15 GMT+00:00",
-      "Connection",
-      "close",
-      "Server",
-      "Apache"
-    ]
-  }
+    {
+        "scope": "https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com:443",
+        "method": "GET",
+        "path": "/s/RefArch/dw/shop/v20_4/products/(1,2)?expand=availability%2Cprices%2Cvariations%2Cimages&all_images=true",
+        "body": "",
+        "status": 200,
+        "response": {
+            "_v": "20.4",
+            "_type": "product_result",
+            "count": 0,
+            "total": 0
+        },
+        "rawHeaders": [
+            "accept-ranges",
+            "bytes",
+            "x-dw-request-base-id",
+            "QQEkLym8c1_OxTMK",
+            "allow",
+            "GET,HEAD,OPTIONS",
+            "x-dw-version-status",
+            "deprecated",
+            "x-content-type-options",
+            "nosniff",
+            "cache-control",
+            "max-age=60,must-revalidate",
+            "jweb",
+            "y",
+            "content-type",
+            "application/json;charset=UTF-8",
+            "content-length",
+            "58",
+            "date",
+            "Tue, 29 Sep 2020 22:58:48 UTC",
+            "server",
+            "istio-envoy",
+            "x-envoy-upstream-service-time",
+            "14",
+            "connection",
+            "close"
+        ]
+    }
 ]

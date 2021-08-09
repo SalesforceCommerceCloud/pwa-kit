@@ -6,7 +6,7 @@ import {navigate} from 'gatsby'
 import styled from '@emotion/styled'
 import file from '../../images/file.svg'
 import externalLink from '../../images/external-link.svg'
-import {GlobalDispatchContext, GlobalStateContext} from '../../context/GlobalContextProvider'
+import {GlobalDispatchContext} from '../../context/GlobalContextProvider'
 import {Styled} from 'theme-ui'
 
 const CardContent = styled.div`
@@ -150,6 +150,14 @@ export const Card = ({
     linkGroups
 }) => {
     const dispatch = useContext(GlobalDispatchContext)
+    if (linkGroups) {
+        // sort the link alphabetically
+        linkGroups.sort((a, b) => {
+            if (a.title < b.title) return -1
+            if (a.title > b.title) return 1
+            return 0
+        })
+    }
     return (
         <StyledCardWrapper
             tabIndex="0"
@@ -188,25 +196,13 @@ export const Card = ({
                     {description && <p className="card_description">{description}</p>}
                     {linkGroups && (
                         <ul className="links">
-                            {Object.entries(linkGroups).map(([name, links]) => {
+                            {linkGroups.map(({title, slug}) => {
                                 return (
-                                    <div key={name}>
-                                        {name !== 'null' && (
-                                            <span className="link_group">{name.toUpperCase()}</span>
-                                        )}
-                                        {links &&
-                                            links.map((link) => {
-                                                return (
-                                                    <li key={link.title}>
-                                                        <img
-                                                            className="card_icon"
-                                                            src={file}
-                                                            alt="file"
-                                                        />
-                                                        <Link to={link.slug}>{link.title}</Link>
-                                                    </li>
-                                                )
-                                            })}
+                                    <div key={slug}>
+                                        <li key={title}>
+                                            <img className="card_icon" src={file} alt="file" />
+                                            <Link to={slug}>{title}</Link>
+                                        </li>
                                     </div>
                                 )
                             })}
@@ -248,7 +244,7 @@ Card.propTypes = {
     /**
      * Links to other pages to list on the card.
      */
-    linkGroups: PropTypes.object,
+    linkGroups: PropTypes.array,
 
     /**
      * The link for a clickable card to navigate to.

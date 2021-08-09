@@ -1,43 +1,47 @@
 [
-  {
-    "scope": "https://mobify-tech-prtnr-na03-dw.demandware.net:443",
-    "method": "GET",
-    "path": "/s/2017refresh/dw/shop/v17_8/stores?latitude=0&longitude=0&distance_unit=km&start=0&count=20",
-    "body": "",
-    "status": 200,
-    "response": [
-      "1f8b0800000000000000",
-      "9c544d6f9c3010fd2b16a7565ac0c07ec02a8abad9aaea25a76d72492a348bcd62c58c916db24251fe7b07f29daa51d49be7cde38de7f989bba0bc0dd641b28af26016947ee82495ce1b2b4b2b5daf3dc195e9d107eb741608f010acafeede3289024210dd2504a569c22e501964bbe963e507422f0149e656da273d3b949511a3c676439850ce1385ea24cdd23c4a172f58d9a3a2f9c14d4b4425e8b497e8cac6f46e9cadf05622dd6328a7deb9d9ab7a205c8357be1f47cc8b285de5bc280834787844439a14f122cff97c1620b4d35dc001fb2ed9994452e88c2b25c25e4b12ae413b39611ef4d3dd2f971b7e36272a815e3ea1675679e51ab635ba6ff70aa6fe68a93615d0e145d4db9e34abf2d1922d7d7f09ba7fb4e57ef6a1d32bce13f6c302de68856c432ef4f2c5f19f46ebe1688cf8dbf18bdd3bc717ab2c2a96ff705cb6a0341507557bd798ee5b0b075555e0bc9651659e1fc537b2840a846c87d2d4e5c422a7c07a3752a81e6737de776e1dc7edf44ca197551376d6a30d1178168a63440280e2085646287d6c307e858c3eab2a0ee39df2d251a7060a692c8ee94ac8055fac626821d4e660a20e0f9f4a47368f78325f26d9bb742494c274b1e4cbe774fc6a24db3c6cc84ccdce1f36649b870dbbc6e0c8fa92a5d9d7305f24619625d9a76254709ee6ef53b405ad6a63f1557e28f2d651eba43b3d37286060",
-      "2105408d877ccd39b454279c4e5d7b1277a7d7788d44dd81ef2d711c2b3e20f5f89692bf62fc57802965f7bfa79d2c6589cf026f6865fa8fdcff010000ffff",
-      "0300242c5ce376040000"
-    ],
-    "rawHeaders": [
-      "Accept-Ranges",
-      "bytes",
-      "x-dw-request-base-id",
-      "7XZ2_shnhFt5AAAK",
-      "Allow",
-      "GET,HEAD,OPTIONS",
-      "x-dw-version-status",
-      "deprecated",
-      "Content-Language",
-      "en-US",
-      "Cache-Control",
-      "max-age=60,must-revalidate",
-      "Content-Type",
-      "application/json;charset=UTF-8",
-      "Transfer-Encoding",
-      "chunked",
-      "Content-Encoding",
-      "gzip",
-      "Vary",
-      "Accept-Encoding",
-      "Date",
-      "Mon, 27 Aug 2018 21:06:16 GMT+00:00",
-      "Connection",
-      "close",
-      "Server",
-      "Apache"
-    ]
-  }
+    {
+        "scope": "https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com:443",
+        "method": "GET",
+        "path": "/s/RefArch/dw/shop/v20_4/stores?latitude=0&longitude=0&distance_unit=km&start=0&count=20",
+        "body": "",
+        "status": 200,
+        "response": [
+            "1f8b0800000000000000dc985b6fdb3614c7bf0a6714d8c3228d57910a86a16d5aac97a4c8e6ac79580783969858a8241a1495ce2bfadd77e49b222b89b43ea4d80cc8968ee823f2fc78fe3cd4e7c9ec66723ca138e493a3c9ccaf96062e2b6f9d993953d5b9077362ebd24f8e093d9aa4daebc9f11f9fbb4da18d4e53685f11309d9ada3b7dedf4dc9488068de324f32bb8f3c6947ae7cfad66894d1b172f5e822dcd2aafcb04ae858c6418c9d634abcb0c1e3ff95840bb2c85b36be30a5dce76cfceb5cf7cddf812388ca9529883d196d75b2b21a1508c4a7c342975d13cf2adaeafa0739b1ff0b0b4d50cfa36cf0db8bfd27965d636aff35d27b1949c41cb4d6816b67615584f725b99144deb32d5ab2adcdfcf6da2e1a4f5e95d0d2e93d976e827e0f4bdceebfdf0935956de9812feb33a8561bf6e46b9b7cc8acd50679d717f397a90024527bad4393acfff6e019c5be7735da67d08bf4f3b1014673ce40f42583f5376c2cf5918894809da097f20714805d8dbf8bfcc4de29d4517b59bdb26fe0b5b36f61f4840b10c441c078247721c194e3059475e7bb3339ebdfc2a16eb288c63b11dfe00051631f40ae267938f68ea5b10ef00c402fd5a6765b21a0143c461337bef84610a9de5bba7b3a7892d96ba5c85f0db21c5baa468482517e4901409318d624af6a42e336782e6ab4b2922326044055445781c254a649fd2b347a1c4062931862e75b5c8ca6b6fcb0ea8e7300a5b8e4014f190b10144892dbd4efcd3d47e826ec271532decb2878ae043564c44b1207d5622065c7b562fb66ed1c57b3405c77d64e025202212639161f500b29d089e41c80234d5fe1811ac0b388f97c54f73877efcf983fb50a25b1f104a6844974da368593c0a7d88e6007ea1383ab1795dcceb0a3dbb315f435f84920faaa5e871e59891b8cf5511a95aaec0d279b4d5cc3e54a55420a98cc64225ff03a8628829c198c00a58cc5d965e9b4e4aefad63b8ca90c7638497df2bbcbc075dd258de013d663c6a85f764a1c15f765deec09759724f564bc2031af1d142ccbf9510f3616ae81cceb314fe9d41f172a9572db74b3bafdd9864943c546a0cb4a7ebab2db12bfd17d815c6c1f6c05d513ec428a8648de21f60244c42b1d962b445615c6210948a753a8e10517714342d21d3c4769da3a6fcbe422f4c9915e88dd165859e508cecd5d5776da23ecb73b4697711c002e77c85b43388a22bebd0138eb74dff6dfe7f13211f9c3d02a3cbacf40b67975d1d3fd59f9c6966c788c913876a58c9a3c3d910a95808d19f0d5cc95bb3e1ed42e78d183963fcadbcaeba391d4b15088503d8b1f0b13366bb3979fc9c8e06a940524f8b0ccadddb227ceeec4d93e6a398281ce251e52fbd578569171809152312ab1e304e781cb7c0a6f5d2b8fb49714ca00ca64144d5485234c63d52bfbd7e14527470cbc862f4bcbf5e9e41cc17a6f2c60da312b0d78eee43d5d25087e91337d923fb34045d67d596c62fdac194d1e84c3b7fb00c6206ed05a48e64e34030b24eae0e8877affe6b75901acc3e1020f45caf3a44a74b075b9dabcce423de0408f9400dd4228d0f911286a93adcb3c0b2c9b8684ae55d82b55d81752acd3474d41eee363961eb238ac9c82a1744271eb384be32b018360b62650bf86a6ea2cdcdb03715f66dfd62d77473eb3140c743a025ac7dd6a607fb9775362fadf3c39c23824331aad625f7aa2c39a892600194500e1d16bb2ca4988a467dbbef831a81451bc9bd631650c8f1381281c464a4d846111687b3e0e4e2718a15a856fe5c3f1a627f0c8ae82df4ac7989fae51f000000ffff",
+            "030031cca5fe74150000"
+        ],
+        "rawHeaders": [
+            "accept-ranges",
+            "bytes",
+            "x-dw-request-base-id",
+            "QQEoLyq8c1_OxTMK",
+            "content-language",
+            "en-US",
+            "allow",
+            "GET,HEAD,OPTIONS",
+            "x-content-type-options",
+            "nosniff",
+            "x-dw-version-status",
+            "deprecated",
+            "cache-control",
+            "max-age=0,no-cache,no-store,must-revalidate",
+            "jweb",
+            "y",
+            "vary",
+            "accept-encoding",
+            "content-encoding",
+            "gzip",
+            "content-type",
+            "application/json;charset=UTF-8",
+            "date",
+            "Tue, 29 Sep 2020 22:58:49 UTC",
+            "server",
+            "istio-envoy",
+            "x-envoy-upstream-service-time",
+            "13",
+            "connection",
+            "close",
+            "transfer-encoding",
+            "chunked"
+        ]
+    }
 ]

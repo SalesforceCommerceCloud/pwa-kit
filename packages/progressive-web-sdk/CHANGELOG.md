@@ -1,5 +1,8 @@
+## v1.20.0 (Oct 02, 2020)
+## v1.20.0-alpha.0 (Oct 01, 2020)
+- Fix MegaMenu double clicking issue. [#1395](https://github.com/mobify/mobify-platform-sdks/pull/1395)
+## v1.20.0-dev (Aug 07, 2020)
 ## v1.19.0 (Aug 07, 2020)
-## v1.19.0-dev (May 29, 2020)
 ## v1.18.0 (May 29, 2020)
 - Update engines support for Node 12.x. [#1235](https://github.com/mobify/mobify-platform-sdks/pull/1235)
 

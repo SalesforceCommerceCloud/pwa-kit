@@ -9,6 +9,7 @@ The Mobify Test Framework is a package of testing tools used for performance
 and end-to-end (E2E) testing of your PWAs.
 
 ## Usage
+
 ```bash
 mobify-test-framework [command]
 Commands:
@@ -17,6 +18,7 @@ Commands:
 ```
 
 ## Performance Testing with Lighthouse
+
 [Lighthouse](https://github.com/GoogleChrome/lighthouse) is a tool we use to
 assess an app against [Google's PWA
 Checklist](https://developers.google.com/web/progressive-web-apps/checklist).
@@ -31,14 +33,14 @@ See the list of configurable thresholds and recommended values below:
 mobify-test-framework lighthouse https://www.merlinspotions.com
 
 # Basic Settings:
---maxTTI - Maximum time to interactive before reporting a failure (default: 10000 ms)
---minPWAScore - Minimum PWA score before reporting a failure (default: 90)
---minSEOScore - Minimum SEO score before reporting a failure (default: 100)
---minAccessibilityScore - Minimum accessibility score before reporting a failure (default: 100)
---checkConsoleErrors - Assert that browser errors are not logged to the console (default: false)
---mobifyPreview - set Mobify Preview parameters to the url (default: false)
---device - Form factor for tests (choices: 'mobile', 'desktop') (default: 'mobile')
---outputDir - set the Output directory for reports (default: 'tests/lighthouse-reports')
+ --maxTTI - Maximum time to interactive before reporting a failure (default: 10000 ms)
+ --minPWAScore - Minimum PWA score before reporting a failure (default: 90)
+ --minSEOScore - Minimum SEO score before reporting a failure (default: 100)
+ --minAccessibilityScore - Minimum accessibility score before reporting a failure (default: 100)
+ --checkConsoleErrors - Assert that browser errors are not logged to the console (default: false)
+ --mobifyPreview - set Mobify Preview parameters to the url (default: false)
+ --device - Form factor for tests (choices: 'mobile', 'desktop') (default: 'mobile')
+ --outputDir - set the Output directory for reports (default: 'tests/lighthouse-reports')
 
 # We can also run Lighthouse against multiple URLs:
 mobify-test-framework lighthouse https://www.merlinspotions.com https://www.merlinspotions.com/potions
@@ -49,6 +51,7 @@ mobify-test-framework lighthouse https://www.merlinspotions.com --mobifyPreview
 ```
 
 ## End to End Testing with Nightwatch
+
 [`Nightwatch.js`](http://nightwatchjs.org/) is a tool that automates user
 interaction for browser end-to-end tests. The Mobify Test Framework manages the
 installation of Chromedriver and the latest version is

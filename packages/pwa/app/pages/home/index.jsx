@@ -42,7 +42,7 @@ class Home extends React.Component {
                         <Link
                             className="pw--underline"
                             openInNewTab
-                            href="https://docs.mobify.com/commerce-integrations/latest/"
+                            href="https://dev.mobify.com/v1.x/apis-and-sdks/commerce-integrations/overview/"
                         >
                             Read the guide
                         </Link>
@@ -55,7 +55,7 @@ class Home extends React.Component {
                         <Link
                             className="pw--underline"
                             openInNewTab
-                            href="https://docs.mobify.com/progressive-web/latest/guides/responsive-grid/"
+                            href="https://dev.mobify.com/v1.x/how-to-guides/categories/guides/responsive-grid"
                         >
                             Read the guide
                         </Link>
@@ -64,8 +64,12 @@ class Home extends React.Component {
 
                 <div className="u-padding-bottom-lg">
                     View more guides on&nbsp;
-                    <Link className="pw--underline" openInNewTab href="https://docs.mobify.com">
-                        docs.mobify.com
+                    <Link
+                        className="pw--underline"
+                        openInNewTab
+                        href="https://dev.mobify.com/v1.x/"
+                    >
+                        dev.mobify.com
                     </Link>
                 </div>
             </div>

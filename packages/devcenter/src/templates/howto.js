@@ -1,9 +1,9 @@
 /** @jsx jsx */
+import React from 'react'
 import {jsx} from 'theme-ui'
 import {graphql} from 'gatsby'
 import {MDXRenderer} from 'gatsby-plugin-mdx'
 import PropTypes from 'prop-types'
-import React from 'react'
 import Layout from '../components/Layout'
 import SEO from '../components/SEO'
 import {Styled} from 'theme-ui'
@@ -13,11 +13,11 @@ const HowToTemplate = ({data, location}) => {
 
     let categoryMap = {}
     let featuredCategories = []
-    all.group.forEach((category) => {
-        let linkMap = {}
+    all.group.forEach(({edges, fieldValue}) => {
+        let linkMap = []
         let categoryName
-        category.edges.forEach((section) => {
-            const {subcategory, title, featured} = section.node.frontmatter
+        edges.forEach((section) => {
+            const {title, featured} = section.node.frontmatter
             const {slug} = section.node.fields
 
             if (featured) {
@@ -27,25 +27,18 @@ const HowToTemplate = ({data, location}) => {
             if (!categoryName) {
                 categoryName = section.node.frontmatter.category
             }
-
-            const linkEntry = {
+            linkMap.push({
                 title,
                 slug
-            }
-
-            if (!linkMap[subcategory]) {
-                linkMap[subcategory] = []
-            }
-            let tempLinkEntries = linkMap[subcategory]
-            tempLinkEntries.push(linkEntry)
-            linkMap[subcategory] = tempLinkEntries
+            })
         })
 
-        categoryMap[category.fieldValue] = {
+        categoryMap[fieldValue] = {
             title: categoryName,
             linkMap
         }
     })
+
     return (
         <Layout location={location} column={mdx.frontmatter.column}>
             <SEO title={mdx.frontmatter.metaTitle} description={mdx.frontmatter.metaDescription} />
