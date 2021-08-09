@@ -1,6 +1,6 @@
 {
   "name": "@mobify/commerce-integrations",
-  "version": "2.4.3",
+  "version": "2.4.4",
   "description": "A customizable API abstraction layer for ecommerce backends.",
   "publishConfig": {
     "access": "public"
