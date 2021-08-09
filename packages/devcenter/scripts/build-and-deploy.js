@@ -21,11 +21,11 @@ const isMaster = (() => {
 })()
 
 const getBucketName = () => {
-    return isMaster() ? 'mobify-devcenter-production' : 'mobify-devcenter-staging'
+    return isMaster() ? 'mobify-devcenter-120963225130' : 'mobify-devcenter-766791126171'
 }
 
 const getSiteURL = () => {
-    return isMaster() ? 'https://dev.mobify.com/' : 'https://dev-staging.mobify.com/'
+    return isMaster() ? 'https://dev.mobify.com/' : 'https://dev.mobify-staging.com/'
 }
 
 const checkDependencies = () => {
@@ -56,11 +56,12 @@ const main = (args) => {
     sh.env['GATSBY_PATH_PREFIX'] = `/${prefix}/`
     sh.env['GATSBY_SITE_URL'] = siteURL
     sh.env['GATSBY_ACTIVE_ENV'] =
-        bucket === 'mobify-devcenter-production' || isMaster() ? 'production' : 'staging'
+        bucket === 'mobify-devcenter-120963225130' || isMaster() ? 'production' : 'staging'
 
     if (shouldBuild) {
         sh.exec(`npm run build`, {fatal: true})
     }
+
     sh.exec(`aws s3 sync --acl public-read --delete ${dir} s3://${bucket}/${prefix}/`, {
         fatal: true
     })

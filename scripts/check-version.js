@@ -66,7 +66,7 @@ if (warnings.length) {
     console.log('')
 
     console.log(
-        'To fix this warning, see: https://docs.mobify.com/progressive-web/latest/getting-started/#installing-required-software'
+        'To fix this warning, see: https://dev.mobify.com/v1.x/get-started#installing-required-software'
     )
     rl.question(
         blue(

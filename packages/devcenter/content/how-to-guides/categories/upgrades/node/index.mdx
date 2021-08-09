@@ -25,7 +25,7 @@ Please follow these instructions to deploy a Node.js 10.x bundle to your `produc
 1. In your project’s `package.json` file, update `progressive-web-sdk` to a version which supports Node.js 10. We recommend updating to version [`1.11.3`](../../../release-notes/archive/2019-09), or patch version `1.13.2`.
 2. In the `ssrParameters` section of your project’s `package.json` file, add the following field as a new line, copying the syntax exactly:
 `"ssrFunctionNodeVersion": "10.x"`
-This parameter specifies the version of Node.js used to run the [SSR server](https://docs.mobify.com/progressive-web/latest/utility-functions/reference/SSRServer.html) and [request processor](../../../how-to-guides/categories/guides/request-processor).
+This parameter specifies the version of Node.js used to run the SSR server and [request processor](../../../how-to-guides/categories/performance/request-processor).
 3. Update your local development environment, your continuous integration, and anywhere else you're building bundles to use Node.js `v10.17.0` (npm `v6.11.3`) .
     1. Ensure all promises are correctly handled in your application. Unhandled rejection will now cause your application process to crash in Node.js 10.x.
 4. Remove your existing `node_modules`. Run `npm install` (or if it's available based on your version of NPM, run `npm ci`).
@@ -37,4 +37,3 @@ This parameter specifies the version of Node.js used to run the [SSR server](htt
 8. Publish your new bundle to `production`. Perform your standard testing after publishing to `production`.
 
 After following these steps, you can rest assured that your `production` target will now be running on Node.js 10. If you’re experiencing any difficulties with your upgrade, be sure to contact [Mobify Support](https://support.mobify.com/support/home).
-

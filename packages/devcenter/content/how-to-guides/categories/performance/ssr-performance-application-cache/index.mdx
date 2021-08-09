@@ -50,7 +50,7 @@ class AppCacheSSRServer extends SSRServer {
 }
 ```
 
-[`SSRServer`](https://docs.mobify.com/progressive-web/latest/utility-functions/reference/SSRServer.html) provides three methods, `SSRServer.getResponseFromCache()`, `SSRServer.sendCachedResponse()` and `SSRServer.cacheResponseWhenDone()` to interact with the App Cache.
+`SSRServer` provides three methods, `SSRServer.getResponseFromCache()`, `SSRServer.sendCachedResponse()` and `SSRServer.cacheResponseWhenDone()` to interact with the App Cache.
 
 The example overrides `SSRServer.requestHook` to check if a response for `request` exists within the App Cache using `SSRServer.getResponseFromCache()`. If it does, it is returned using `SSRServer.sendCachedResponse()`. If not, `SSRServer.cacheResponseWhenDone()` stores the response in the cache for use with the next request.
 

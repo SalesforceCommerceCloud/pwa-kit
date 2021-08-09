@@ -1,7 +1,0 @@
-.DS_Store
-node_modules
-npm-debug.log
-www
-.idea/
-.vscode/
-public/theme

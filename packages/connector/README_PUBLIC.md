@@ -22,4 +22,4 @@ own, real Connector.
 Take a look at the [Commerce Integrations documentation][ci-docs] to learn
 how to get started with your custom connector.
 
-[ci-docs]: https://docs.mobify.com/commerce-integrations
+[ci-docs]: https://dev.mobify.com/v1.x/apis-and-sdks/commerce-integrations/overview

@@ -8,7 +8,6 @@ rendering. You can develop both locally using the same codebase.
 If you haven't already, follow the setup steps in the README at the root of this
 repository.
 
-
 ## Running Your PWA
 
 You can run your PWA in either server-side or client-side rendering modes. The
@@ -29,7 +28,6 @@ npm run start:preview
 
 Both commands print the URL you need to visit to see your running PWA in the terminal.
 
-
 ## Building Your PWA
 
 Your project comes with a sample Commerce Integrations connector as well as examples
@@ -41,6 +39,4 @@ We recommend you run your PWA and explore the sample pages to get a feel for whe
 to begin.
 
 For more context take a look at the other READMEs in this project as well as our
-comprehensive documentation at [docs.mobify.com][mobify-docs].
-
-[mobify-docs]: http://docs.mobify.com
+comprehensive documentation on the [Mobify DevCenter](https://dev.mobify.com/v1.x/).

@@ -75,7 +75,7 @@ A proxy's `host`:
 
 > If you configured your proxy settings incorrectly, expect to see an error message with the `ProxyConfigs` keyword.
 
-> Proxies work both in local development and when deployed to a target. In local development, `proxyConfigs` is used to set up the [`SSRServer`](https://docs.mobify.com/progressive-web/latest/utility-functions/reference/SSRServer.html). This is managed by default in the scaffold. `proxyConfigs` is stored as part of a bundle.
+> Proxies work both in local development and when deployed to a target. In local development, `proxyConfigs` is used to set up the `SSRServer`. This is managed by default in the scaffold. `proxyConfigs` is stored as part of a bundle.
 
 Now, we can use our proxy by requesting data from it:
 
@@ -127,7 +127,7 @@ Ideally, you'll only need to have 1 bundle for all cloud targets. You don't need
 
 ## Retrieving current proxy settings
 
-Once the the proxy settings are set, later you can find out what they are by using the utility function [`getProxyConfigs()`](https://docs.mobify.com/progressive-web/latest/utility-functions/reference/global.html#getProxyConfigs). For example, you might want to use different SFCC's OCAPI client IDs depending on which environment you're in.
+Once the the proxy settings are set, later you can find out what they are by using the utility function [`getProxyConfigs()`](../../../apis-and-sdks/progressive-web-sdk/utils/universal-utils#module-colon-progressive-web-sdk-slash-dist-slash-utils-slash-universal-utils-dot-getProxyConfigs). For example, you might want to use different SFCC's OCAPI client IDs depending on which environment you're in.
 
 ```javascript
 import { getProxyConfigs } from "progressive-web-sdk/dist/utils/universal-utils"

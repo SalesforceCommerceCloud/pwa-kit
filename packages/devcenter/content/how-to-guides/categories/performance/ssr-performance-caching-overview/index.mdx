@@ -151,7 +151,7 @@ For search engine optimization (SEO) as well as performance, it’s important to
 
 We also recommend customizing cache lifetimes for different status codes. For example, you may consider setting a shorter cache lifetime in the case of a transient error, when there is a problem connecting to the ecommerce API. This would ensure that you can serve your users the correct version of the content more rapidly when the error is resolved. Meanwhile, successful responses should have a longer cache lifetime to maximize cache hits.
 
-You can set the status code for responses in the parameters to `ssrRenderingComplete`(within `progressive-web-sdk/dist/utils/universal-utils`) or in the [`responseHook`](https://docs.mobify.com/progressive-web/latest/utility-functions/reference/SSRServer.html), which is located within `pwa/app/ssr.js`.
+You can set the status code for responses in the parameters to `ssrRenderingComplete`(within `progressive-web-sdk/dist/utils/universal-utils`) or in the `responseHook`, which is located within `pwa/app/ssr.js`.
 
 ## Maximizing performance by making sure uncached pages are fast
 

@@ -1,9 +1,9 @@
 {
   "name": "scaffold-connector",
-  "version": "1.20.2",
+  "version": "1.20.3",
   "description": "",
   "dependencies": {
-    "@mobify/commerce-integrations": "^1.20.2"
+    "@mobify/commerce-integrations": "^1.20.3"
   },
   "devDependencies": {
     "@babel/cli": "^7.4.4",
@@ -16,8 +16,8 @@
   },
   "main": "index.js",
   "scripts": {
-    "build": "babel src --bail --ignore '*.test.js','test.js' --out-dir dist --copy-files --quiet",
-    "start": "babel src --bail --ignore '*.test.js','test.js' --out-dir dist --copy-files --watch",
+    "build": "babel src --ignore '*.test.js','test.js' --out-dir dist --copy-files --quiet",
+    "start": "babel src --ignore '*.test.js','test.js' --out-dir dist --copy-files --watch",
     "prepare": "npm run build",
     "test": "jest",
     "lint": "npm run lint:js",

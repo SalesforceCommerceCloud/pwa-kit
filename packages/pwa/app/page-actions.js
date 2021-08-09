@@ -30,7 +30,7 @@ import {getAnalyticsManager} from './analytics'
  *     }))
  *
  * The available response options are described here
- * https://docs.mobify.com/progressive-web/latest/utility-functions/reference/global.html#ssrRenderingComplete
+ * https://dev.mobify.com/v1.x/apis-and-sdks/progressive-web-sdk/utils/universal-utils#module-colon-progressive-web-sdk-slash-dist-slash-utils-slash-universal-utils-dot-ssrRenderingComplete
  *
  * @param promise {Promise} your Page's data loading promise.
  * @param pageType {String} the page type, for Analytics tracking, eg. 'product-list-page'.

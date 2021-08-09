@@ -3,8 +3,7 @@ const mainNav = require('./mainNavConst')
 const config = {
     gatsby: {
         pathPrefix: process.env.GATSBY_PATH_PREFIX,
-        siteUrl: process.env.GATSBY_SITE_URL || 'http://localhost:8000/',
-        gtmTrackingId: 'GTM-TJKQ92R'
+        siteUrl: process.env.GATSBY_SITE_URL || 'http://localhost:8000/'
     },
     header: {
         logo: '',

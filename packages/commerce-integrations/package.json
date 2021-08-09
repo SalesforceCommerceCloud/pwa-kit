@@ -1,12 +1,12 @@
 {
     "name": "@mobify/commerce-integrations",
-    "version": "1.20.2",
+    "version": "1.20.3",
     "description": "A customizable API abstraction layer for ecommerce backends.",
     "publishConfig": {
         "access": "public"
     },
     "scripts": {
-        "build": "rimraf dist && babel src --bail --ignore '*.test.js','test.js','tapes/*' --out-dir dist --quiet",
+        "build": "rimraf dist && babel src --ignore '*.test.js','test.js','tapes/*' --out-dir dist --quiet",
         "jsdoc": "node ./scripts/jsdoc.js",
         "docs": "rimraf docs && npm run jsdoc",
         "deployDocs": "node ./scripts/deployDocs.js",
@@ -43,7 +43,7 @@
         "@babel/core": "^7.4.5",
         "@babel/preset-env": "^7.4.5",
         "@babel/preset-react": "^7.0.0",
-        "@mobify/documentation-theme": "^1.20.2",
+        "@mobify/documentation-theme": "^1.20.3",
         "babel-jest": "^24.8.0",
         "cpr": "^3.0.1",
         "cross-spawn": "^6.0.5",

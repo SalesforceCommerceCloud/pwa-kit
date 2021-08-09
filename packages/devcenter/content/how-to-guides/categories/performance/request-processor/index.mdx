@@ -46,7 +46,7 @@ Mobify's CDN looks up objects in its cache using the full URL including the quer
 
 We can use the request processor to filter querystrings that are only used on the client side, so that the CDN is more likely to respond with a cached response.
 
-This example uses `processRequest` to filter querystring parameters `gclid` and `utm_campaign`, which are commonly associated with Google marketing campaigns. It uses the [`QueryParameters`](https://docs.mobify.com/progressive-web/latest/utility-functions/reference/QueryParameters.html) library function to simpify working with querystrings:
+This example uses `processRequest` to filter querystring parameters `gclid` and `utm_campaign`, which are commonly associated with Google marketing campaigns. It uses the [`QueryParameters`](../../../apis-and-sdks/progressive-web-sdk/utils/ssr-request-processing-utils#module-colon-progressive-web-sdk-slash-dist-slash-utils-slash-ssr-request-processing-utils-dot-QueryParameters) library function to simpify working with querystrings:
 
 ```javascript
 import { QueryParameters } from "progressive-web-sdk/dist/utils/ssr-request-processing-utils"
@@ -119,7 +119,7 @@ export const processRequest = ({
 
 Now in `pwa/app/ssr.js`, we modify `ExtendedSSRServer` to:
 
-- Get the group from the request class using the `options` argument passed to [`requestHook`](https://docs.mobify.com/progressive-web/latest/utility-functions/reference/SSRServer.html)
+- Get the group from the request class using the `options` argument passed to `requestHook`
 - Set the `ab` cookie so its value persists using [`res.cookie`](https://expressjs.com/en/4x/api.html#res.cookie)
 - Respond based on the group
 

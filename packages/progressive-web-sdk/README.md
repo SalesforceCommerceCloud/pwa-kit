@@ -14,7 +14,7 @@
 
 A set of components and utilities which make up the SDK for Progressive Web
 
-You can find the live version of the SDK Docs [here](https://docs.mobify.com/progressive-web/)
+You can find the live version of the SDK Docs [here](https://dev.mobify.com/v1.x/)
 
 ## Requirements
 
@@ -29,19 +29,6 @@ You can find the live version of the SDK Docs [here](https://docs.mobify.com/pro
 ```bash
 npm i
 ```
-
-## Usage
-
-The Progressive Web SDK has a number of components that can be used in progressive web builds.
-Component documentation and examples can be seen by running our styleguide:
-
-```bash
-npm run docs:dev
-```
-
-You can now view the styleguide at [http://localhost:9000.](http://localhost:9000)
-
-Our docs are built on [styleguidist.](https://github.com/sapegin/react-styleguidist)
 
 ## Use the SDK in a project
 
@@ -106,7 +93,3 @@ someFunctionToBeDeprecated() => {
 
 This is the warning that will print in your browser:
 `[MOBIFY API WARNING]: You are currently using an deprecated function: [someFunctionToBeDeprecated]. It will be removed in version 1.2.3. Please use [newFunction] instead.`
-
-## Documentation
-
-Please see the [Documentation README](https://github.com/mobify/progressive-web-sdk/blob/develop/docs/README.md).

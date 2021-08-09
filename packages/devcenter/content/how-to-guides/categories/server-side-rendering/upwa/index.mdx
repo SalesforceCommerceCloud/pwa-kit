@@ -32,7 +32,7 @@ Server-side rendering (SSR) uses the PWA code to generate the HTML, which is ret
 
 Currently, WidgetCorp runs a webserver, and the hostname `www.widgetcorp.com` points to that webserver. When a device requests a URL from the webserver, the webserver fetches data from the backend server, uses it to render an HTML page for that URL and returns the page to the device.
 
-When the SSR PWA is launched, `www.widgetcorp.com` will point instead to an **[SSR server](https://docs.mobify.com/progressive-web/latest/utility-functions/reference/SSRServer.html)** (code that runs on the Mobify Platform). When a device
+When the SSR PWA is launched, `www.widgetcorp.com` will point instead to an **SSR server** (code that runs on the Mobify Platform). When a device
 requests a URL from the SSR Server, it will do the following:
 1. Run the SSR PWA code, setting the route to match the URL
 2. Allow the SSR PWA to render HTML, using React, with state kept in the

@@ -107,3 +107,65 @@ and any experimental functions that should not have the experimental warning any
     * Create a PR to merge into `develop`.
 
 [lerna]: https://github.com/lerna/lerna
+
+## NPM vulnerabilities
+
+When these are discovered they can prevent us from releasing – our repository is set up to use
+the [Snyk GitHub integration](https://support.snyk.io/hc/en-us/articles/360015951318-GitHub-Enterprise-Integration).
+Snyk test any newly created pull request in our repositories for security vulnerabilities, two Snyk status checks are
+displayed — one for security tests and the other for license checks.
+
+### Skip failed Snyk checks
+
+The GitHub Snyk checks are configured to fail when new high vulnerabilities are introduced. After evaluating the risks
+of merging the PR with the vulnerability, users with the Snyk Administrator role can unblock the PR
+by [marking a failed test as successful](https://support.snyk.io/hc/en-us/articles/360007301698-Skipping-Snyk-Pull-Request-Checks)
+.
+
+### Ignore vulnerabilities
+
+We ignore vulnerabilities using the Snyk UI. Navigate to the [projects page](https://app.snyk.io/org/mobify/projects),
+find the manifest file with the vulnerability you want to ignore, and clicking the Ignore button.
+
+### Fix vulnerabilities
+
+In simple cases these vulnerabilities can be fixed by upgrading a package. We've two approaches
+to [remediate vulnerabilities](https://support.snyk.io/hc/en-us/articles/360006113798-Remediate-your-vulnerabilities):
+
+#### Using the Snyk UI
+
+We
+can [manually generate a PR fom the UI](https://support.snyk.io/hc/en-us/articles/360011484018-Fixing-vulnerabilities)
+fixing individual or multiple vulnerabilities.
+
+#### Using the Snyk CLI
+
+**Install and Authenticate Snyk CLI:**
+
+1. Install Snyk CLI via npm.
+    ```bash
+    npm install -g snyk
+    ```
+2. Run the `auth` command to open a browser tab.
+    ```bash
+    snyk auth
+    ```
+3. Click the Authenticate button.
+
+**Running `snyk wizard`:**
+
+To work around various issues with local-only monorepo packages, run the Snyk `wizard` at the root of each package of
+the monorepo to fix vulnerabilities.
+
+1. Remove any local-only dependencies from `package.json`.
+2. Run `snyk wizard`
+3. Add back the local-only dependencies to the `package.json`.
+
+**Test for vulnerabilities with `snyk test`:**
+
+Run the `test` command from the root of the monorepo.
+
+```bash
+snyk test --strict-out-of-sync=false --all-projects
+```
+

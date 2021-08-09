@@ -111,18 +111,6 @@ const plugins = [
         }
     },
     {
-        resolve: `gatsby-plugin-gdpr-cookies`,
-        options: {
-            googleTagManager: {
-                trackingId: config.gatsby.gtmTrackingId,
-                cookieName: 'gatsby-gdpr-google-tagmanager', // default
-                dataLayerName: 'dataLayer' // default
-            },
-            // defines the environments where the tracking should be available
-            environments: ['production']
-        }
-    },
-    {
         resolve: `gatsby-source-filesystem`,
         options: {
             name: `apis-and-sdks`,
