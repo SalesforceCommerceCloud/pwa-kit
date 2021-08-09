@@ -1302,9 +1302,7 @@ describe('SSRServer operation', () => {
                 expect('cookie' in headers).toBe(false)
 
                 expect(headers['accept-language']).toEqual('en')
-
-                // The accept-encoding headers gets special treatment
-                expect(headers['accept-encoding']).toEqual('gzip, deflate')
+                expect(headers['accept-encoding']).toEqual('gzip')
 
                 // This value is fixed
                 expect(headers['user-agent']).toEqual('Amazon CloudFront')

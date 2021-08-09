@@ -115,7 +115,7 @@ commands:
           name: Run NPM Audits
           command: |
               set +e
-              results=$(node ./scripts/audit.js --max-critical 0 --max-high=7)
+              results=$(node ./scripts/audit.js --max-critical 0 --max-high=23)
               exitCode=$?
               set -e
 
@@ -165,20 +165,6 @@ jobs:
       - countdependencies
       - runaudits
       - runtests
-      - run:
-          name: Publish Docs
-          command: |
-              if [[ $DEVELOP || $RELEASE ]]; then
-                target=staging
-              elif [[ $MASTER ]]; then
-                target=production
-              else
-                target=""
-              fi
-
-              if [[ $target ]]; then
-                npm run lerna -- run deployDocs -- $target
-              fi
       - run:
           name: Push Bundle
           command: |
