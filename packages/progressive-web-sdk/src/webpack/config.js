@@ -289,7 +289,7 @@ const common = {
             filename: '[name].css'
         }),
 
-        new CopyPlugin([{from: 'app/static/', to: 'static/'}]),
+        new CopyPlugin({patterns: [{from: 'app/static/', to: 'static/'}]}),
 
         analyzeBundle &&
             new BundleAnalyzerPlugin({

@@ -1,6 +1,7 @@
 import React, {Fragment} from 'react'
 import PropTypes from 'prop-types'
 import {withRouter} from 'react-router-dom'
+import {getAssetUrl} from 'progressive-web-sdk/dist/ssr/universal/utils'
 
 import {Desktop, TabletOrSmaller, Mobile} from '../../components/media-queries'
 
@@ -100,7 +101,7 @@ export const MobileHeader = (props) => {
             <HeaderBarTitle className="c-header__title">
                 <a href="/">
                     <img
-                        src="https://www.mobify.com/wp-content/uploads/logo-mobify-white.png"
+                        src={getAssetUrl('static/img/global/logo-mobify-white.png')}
                         alt="Mobify Logo"
                         height="35"
                     />
@@ -130,7 +131,7 @@ export const DesktopHeader = (props) => {
                     <HeaderBarTitle className="u-flexbox" href="/">
                         <img
                             className="c-header__logo"
-                            src="https://www.mobify.com/wp-content/uploads/logo-mobify-white.png"
+                            src={getAssetUrl('static/img/global/logo-mobify-white.png')}
                             alt="Mobify Logo"
                             height="50"
                         />

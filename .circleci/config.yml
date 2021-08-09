@@ -108,7 +108,7 @@ commands:
           name: Run NPM Audits on the Monorepo
           command: |
               set +e
-              results=$(node ./scripts/audit.js --max-critical 0 --max-high 6)
+              results=$(node ./scripts/audit.js --max-critical 0 --max-high 18)
               exitCode=$?
               set -e
 
@@ -163,9 +163,9 @@ jobs:
           name: Push Bundle
           command: |
               if [[ $DEVELOP || $RELEASE ]]; then
-                target=staging
+                target=v2-staging
               elif [[ $MASTER ]]; then
-                target=production
+                target=v2-production
               else
                 target=""
               fi

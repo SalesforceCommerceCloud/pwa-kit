@@ -124,8 +124,11 @@ const audit = ({opts, npm, packageInfos}) => {
     return Promise.resolve().then(() => {
         return Promise.all(
             packageInfos.map(({location, name}) => {
-                return spawnPromise(npm, ['--prefix', location, 'audit', '--json']).then(
+                return spawnPromise(npm, ['--prefix', location, 'audit', '--json', '--production']).then(
                     ([process, stdout]) => {
+                        // DEBUG
+                        // console.log('--- audit for', location, stdout)
+
                         return {
                             name,
                             location,

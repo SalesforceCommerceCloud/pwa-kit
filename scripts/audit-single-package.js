@@ -25,7 +25,7 @@ const main = (opts) => {
     const cwd = path.resolve(args[0])
     // See https://nodejs.org/api/child_process.html#child_process_child_process_exec_command_options_callback
     const maxBufferDefault = 1024 * 1024
-    const result = JSON.parse(sh.exec('npm audit --json', {cwd, maxBuffer: maxBufferDefault * 100, silent: true}))
+    const result = JSON.parse(sh.exec('npm audit --json --production', {cwd, maxBuffer: maxBufferDefault * 100, silent: true}))
 
     const totals = result.metadata.vulnerabilities
     console.log(JSON.stringify(totals, null, 4))
