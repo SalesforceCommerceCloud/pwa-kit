@@ -5,6 +5,9 @@
   "+dLAnb": {
     "defaultMessage": "Estimated Total"
   },
+  "+y/wae": {
+    "defaultMessage": "{errorMessage}"
+  },
   "/kLqfV": {
     "defaultMessage": "This is a gift."
   },
@@ -16,6 +19,9 @@
   },
   "0yGJXJ": {
     "defaultMessage": "Password must contain at least one lowercase letter"
+  },
+  "1TQMt0": {
+    "defaultMessage": "{quantity} {itemLabel} added to cart."
   },
   "1b9Q93": {
     "defaultMessage": "You will receive an email at <b>{email}</b> with a link to reset your password shortly."
@@ -47,9 +53,6 @@
   "3gXwAV": {
     "defaultMessage": "Sign in to retrieve your saved items or continue shopping"
   },
-  "3kJE8G": {
-    "defaultMessage": "Something went wrong. Try again."
-  },
   "3rGMFt": {
     "defaultMessage": "Sale"
   },
@@ -58,6 +61,9 @@
   },
   "4JYnp2": {
     "defaultMessage": "Ordered: {date}"
+  },
+  "4UPOXx": {
+    "defaultMessage": "Confirm Remove Item"
   },
   "5JcXdV": {
     "defaultMessage": "Create Account"
@@ -86,6 +92,9 @@
   "8pvKg1": {
     "defaultMessage": "Payment Details"
   },
+  "92jEbC": {
+    "defaultMessage": "Are you sure you want to remove this item from your wishlist?"
+  },
   "9Npj92": {
     "defaultMessage": "Enter your email to receive instructions on how to reset your password"
   },
@@ -112,6 +121,9 @@
   },
   "BlJFo9": {
     "defaultMessage": "This email already has an account."
+  },
+  "Cl4TrE": {
+    "defaultMessage": "Add to wishlist"
   },
   "Cm91xY": {
     "defaultMessage": "Complete The Set"
@@ -220,6 +232,9 @@
   "O9nLUc": {
     "defaultMessage": "Please select your {stateOrProvince}"
   },
+  "OKPeJz": {
+    "defaultMessage": "Item removed from cart"
+  },
   "ONNUqG": {
     "defaultMessage": "By creating an account, you agree to Salesforce’s <policy>Privacy Policy</policy> and <terms>Terms & Conditions</terms>"
   },
@@ -260,11 +275,11 @@
   "Q6wcZ5": {
     "defaultMessage": "First Name"
   },
-  "QRowXV": {
-    "defaultMessage": "Something went wrong. Try again!"
-  },
   "QclMUn": {
     "defaultMessage": "Please select your country"
+  },
+  "Qm3TN9": {
+    "defaultMessage": "Are you sure you want to continue ?"
   },
   "Qpxx+l": {
     "defaultMessage": "New Arrivals"
@@ -274,6 +289,9 @@
   },
   "SQJto2": {
     "defaultMessage": "Sign in"
+  },
+  "SRkOX8": {
+    "defaultMessage": "No, keep item"
   },
   "SeGQoh": {
     "defaultMessage": "Address Updated"
@@ -335,9 +353,6 @@
   "VSlYv6": {
     "defaultMessage": "Quantity:"
   },
-  "W/5hwr": {
-    "defaultMessage": "Something went wrong. Please try again."
-  },
   "WHgdsk": {
     "defaultMessage": "Out of stock"
   },
@@ -365,6 +380,9 @@
   "Zhsl4Z": {
     "defaultMessage": "Back to Order History"
   },
+  "a5msuh": {
+    "defaultMessage": "Yes"
+  },
   "aheQdn": {
     "defaultMessage": "Last Name"
   },
@@ -380,6 +398,12 @@
   },
   "bhUBy4": {
     "defaultMessage": "Save & Continue to Shipping Method"
+  },
+  "bk7ZVA": {
+    "defaultMessage": "Are you sure you want to remove this item ?"
+  },
+  "c+bH65": {
+    "defaultMessage": "Confirm Action"
   },
   "c1zaMK": {
     "defaultMessage": "Please enter your address"
@@ -397,6 +421,9 @@
   "dUxyza": {
     "defaultMessage": "Reviews"
   },
+  "dfEp3Z": {
+    "defaultMessage": "Yes, remove item"
+  },
   "e6Ph5+": {
     "defaultMessage": "Address"
   },
@@ -411,6 +438,9 @@
   },
   "fE3ujL": {
     "defaultMessage": "Order Details"
+  },
+  "fG2sM9": {
+    "defaultMessage": "Please sign in to continue!"
   },
   "fIHFDI": {
     "defaultMessage": "Add New Address"
@@ -520,6 +550,9 @@
   "ivNR8s": {
     "defaultMessage": "Order Summary"
   },
+  "jAOn1A": {
+    "defaultMessage": "Are you sure you want to remove this item from your cart?"
+  },
   "jvo0vs": {
     "defaultMessage": "Save"
   },
@@ -607,6 +640,9 @@
   },
   "oLpv29": {
     "defaultMessage": "Please enter a valid email address"
+  },
+  "oUWADl": {
+    "defaultMessage": "No"
   },
   "odTkf5": {
     "defaultMessage": "Back to sign in"
@@ -704,6 +740,9 @@
   },
   "wEQDC6": {
     "defaultMessage": "Edit"
+  },
+  "x3r6nd": {
+    "defaultMessage": "1 item removed from wishlist"
   },
   "x6hxSH": {
     "defaultMessage": "Something's not right with your email or password. Try again."

@@ -1,6 +1,5 @@
 #!/usr/bin/env node
 
-/* eslint import/no-commonjs:0 */
 /* eslint-env node */
 const Promise = require('bluebird')
 const _fs = require('fs')

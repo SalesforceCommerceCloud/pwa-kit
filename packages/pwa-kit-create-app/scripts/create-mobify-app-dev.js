@@ -1,7 +1,5 @@
 #!/usr/bin/env node
 
-/* eslint import/no-commonjs:0 no-useless-escape:0*/
-
 /**
  * This is a small wrapper around the generator script that we intend to use during
  * development and testing only. This script behaves identically to the wrapped

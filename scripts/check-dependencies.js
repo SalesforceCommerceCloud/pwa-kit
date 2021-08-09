@@ -77,13 +77,13 @@ const commonDevDeps = {
     'babel-plugin-dynamic-import-node-babel-7': '^2.0.7',
     commander: '^2.20.0',
     'cross-env': '^5.2.0',
-    eslint: '4.19.1',
+    eslint: '7.31.0',
     'eslint-config-prettier': '4.0.0',
     'eslint-import-resolver-webpack': '0.10.0',
-    'eslint-plugin-import': '2.12.0',
-    'eslint-plugin-jsx-a11y': '2.2.3',
+    'eslint-plugin-import': '2.23.4',
+    'eslint-plugin-jsx-a11y': '6.4.1',
     'eslint-plugin-prettier': '3.0.1',
-    'eslint-plugin-react': '7.12.4',
+    'eslint-plugin-react': '7.24.0',
     jest: '^26.6.3',
     'jest-cli': '^26.6.3',
     'jest-each': '^24.8.0',
@@ -158,7 +158,7 @@ const check = () => {
             if(name !== 'lerna' && commonDevDeps[name] !== version) {
                 errors.push(
                     `The root package.json has "${name}@${version}" as a devDependency ` +
-                    `which is not a whitelisted development package. See the check-dependencies script.`
+                    `that is not an explictly allowed development package. See the check-dependencies script.`
                 )
             }
         })

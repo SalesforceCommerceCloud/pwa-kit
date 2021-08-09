@@ -18,6 +18,7 @@ import {createGetTokenBody} from './utils'
  */
 
 const usidStorageKey = 'usid'
+const encUserIdStorageKey = 'enc-user-id'
 const tokenStorageKey = 'token'
 const refreshTokenStorageKey = 'refresh-token'
 
@@ -37,7 +38,9 @@ class Auth {
             ? window.localStorage.getItem(refreshTokenStorageKey)
             : undefined
         this._usid = this._onClient ? window.localStorage.getItem(usidStorageKey) : undefined
-
+        this._encUserId = this._onClient
+            ? window.localStorage.getItem(encUserIdStorageKey)
+            : undefined
         this.login = this.login.bind(this)
         this.logout = this.logout.bind(this)
     }
@@ -60,6 +63,10 @@ class Auth {
 
     get usid() {
         return this._usid
+    }
+
+    get encUserId() {
+        return this._encUserId
     }
 
     /**
@@ -141,7 +148,15 @@ class Auth {
      * @returns {(Promise<Customer>|undefined)}
      */
     async logout(shouldLoginAsGuest = true) {
-        this._clearAuth()
+        const options = {
+            parameters: {
+                refresh_token: this.refreshToken,
+                client_id: this._config.parameters.clientId,
+                channel_id: this._config.parameters.siteId
+            }
+        }
+        await this._api.shopperLogin.logoutCustomer(options, true)
+        await this._clearAuth()
         if (shouldLoginAsGuest) {
             return this.login()
         }
@@ -153,11 +168,15 @@ class Auth {
      * @param {object} tokenResponse - access_token,id_token,refresh_token, expires_in,token_type, usid, customer_id, enc_user_id, idp_access_token
      */
     _handleShopperLoginTokenResponse(tokenResponse) {
-        const {access_token, refresh_token, customer_id, usid} = tokenResponse
+        const {access_token, refresh_token, customer_id, usid, enc_user_id} = tokenResponse
         this._customerId = customer_id
         this._saveAccessToken(`Bearer ${access_token}`)
         this._saveRefreshToken(refresh_token)
         this._saveUsid(usid)
+        // Non registered users recieve an empty string for the encoded user id value
+        if (enc_user_id.length > 0) {
+            this._saveEncUserId(enc_user_id)
+        }
 
         sessionStorage.removeItem('codeVerifier')
     }
@@ -345,7 +364,7 @@ class Auth {
     }
 
     /**
-     * Stores the given auth token.
+     * Stores the given usid token.
      * @private
      * @param {string} usid - Unique shopper Id.
      */
@@ -353,6 +372,18 @@ class Auth {
         this._usid = usid
         if (this._onClient) {
             window.localStorage.setItem(usidStorageKey, usid)
+        }
+    }
+
+    /**
+     * Stores the given enc_user_id token. enc = encoded
+     * @private
+     * @param {string} encUserId - Logged in Shopper reference for Einstein API.
+     */
+    _saveEncUserId(encUserId) {
+        this._encUserId = encUserId
+        if (this._onClient) {
+            window.localStorage.setItem(encUserIdStorageKey, encUserId)
         }
     }
 
@@ -365,10 +396,12 @@ class Auth {
         this._authToken = undefined
         this._refreshToken = undefined
         this._usid = undefined
+        this._encUserId = undefined
         if (this._onClient) {
             window.localStorage.removeItem(tokenStorageKey)
             window.localStorage.removeItem(refreshTokenStorageKey)
             window.localStorage.removeItem(usidStorageKey)
+            window.localStorage.removeItem(encUserIdStorageKey)
         }
     }
 

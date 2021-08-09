@@ -14,6 +14,7 @@ import {useForm} from 'react-hook-form'
 import {ChevronDownIcon, ChevronUpIcon} from '../../components/icons'
 import useBasket from '../../commerce-api/hooks/useBasket'
 import PromoCodeFields from '../../components/forms/promo-code-fields'
+import {API_ERROR_MESSAGE} from '../../pages/account/constant'
 
 export const usePromoCode = () => {
     const {formatMessage} = useIntl()
@@ -53,7 +54,10 @@ export const usePromoCode = () => {
             })
         } catch (err) {
             toast({
-                title: formatMessage({defaultMessage: 'Something went wrong. Please try again.'}),
+                title: formatMessage(
+                    {defaultMessage: '{errorMessage}'},
+                    {errorMessage: API_ERROR_MESSAGE}
+                ),
                 status: 'error',
                 position: 'top-right',
                 isClosable: true

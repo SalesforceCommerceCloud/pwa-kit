@@ -15,7 +15,7 @@ const ItemPrice = ({currency, ...props}) => {
 
     const {price, basePrice, priceAfterItemDiscount} = variant
 
-    const displayPrice = Math.min(price, priceAfterItemDiscount)
+    const displayPrice = priceAfterItemDiscount ? Math.min(price, priceAfterItemDiscount) : price
 
     const hasDiscount = displayPrice !== price
 
@@ -53,7 +53,7 @@ const ItemPrice = ({currency, ...props}) => {
                 )}
             </Text>
 
-            {price !== basePrice && (
+            {basePrice && price !== basePrice && (
                 <Text fontSize="14px">
                     <FormattedNumber
                         style="currency"

@@ -1,4 +1,3 @@
-/* eslint import/no-commonjs:0 */
 const Promise = require('bluebird')
 const fetch = require('node-fetch')
 const kill = require('tree-kill')

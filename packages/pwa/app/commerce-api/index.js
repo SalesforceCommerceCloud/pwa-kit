@@ -34,25 +34,6 @@ import EinsteinAPI from './einstein'
  */
 
 /**
- * Extention of the shopperlogin class until SLAS enables CDN
- */
-class SlasShopperLogin extends sdk.ShopperLogin {
-    constructor(config = {}) {
-        const tenantId = getTenantId(config.parameters.organizationId)
-        const slasConfig = {
-            ...config,
-            proxy: config.proxy == null ? undefined : `${getAppOrigin()}/mobify/proxy/slas`,
-            baseUri: `https://prd.us.shopper.commercecloud.salesforce.com/api/v1`,
-            parameters: {
-                ...config.parameters,
-                organizationId: tenantId
-            }
-        }
-        super(slasConfig)
-    }
-}
-
-/**
  * A wrapper class that proxies calls to the underlying commerce-sdk-isomorphic.
  * The sdk class instances are created automatically with the given config.
  */
@@ -81,7 +62,7 @@ class CommerceAPI {
             shopperCustomers: sdk.ShopperCustomers,
             shopperBaskets: OcapiShopperBaskets,
             shopperGiftCertificates: sdk.ShopperGiftCertificates,
-            shopperLogin: SlasShopperLogin,
+            shopperLogin: sdk.ShopperLogin,
             shopperOrders: OcapiShopperOrders,
             shopperProducts: sdk.ShopperProducts,
             shopperPromotions: sdk.ShopperPromotions,

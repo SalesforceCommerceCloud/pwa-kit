@@ -134,7 +134,7 @@ export const camelCaseKeysToUnderscore = (_obj) => {
         // Only process if names are different
         if (newName != oldName) {
             // Check for the old property name to avoid a ReferenceError in strict mode.
-            if (obj.hasOwnProperty(oldName)) {
+            if (Object.prototype.hasOwnProperty.call(obj, oldName)) {
                 obj[newName] = obj[oldName]
                 delete obj[oldName]
             }

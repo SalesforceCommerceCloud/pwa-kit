@@ -56,6 +56,15 @@ jest.mock('commerce-sdk-isomorphic', () => {
                     url: mockExampleRedirectUrl
                 }
             }
+            async logoutCustomer() {
+                return {
+                    status: 200,
+                    headers: {
+                        get: () => null
+                    },
+                    url: mockExampleTokenResponse
+                }
+            }
         },
         ShopperCustomers: class ShopperCustomersMock extends sdk.ShopperCustomers {
             async getAccessToken() {
@@ -171,6 +180,7 @@ describe('CommerceAPI', () => {
         const customer = await api.auth.login({email, password})
         expect(customer).toBeDefined()
         expect(customer.authType).toEqual('registered')
+        expect(api.auth.encUserId.length).toBeGreaterThan(0)
     })
     test('refreshes existing logged in token', async () => {
         const _CommerceAPI = require('./index').default
@@ -180,6 +190,7 @@ describe('CommerceAPI', () => {
         const customer = await api.auth.login()
         expect(customer).toBeDefined()
         expect(customer.authType).toEqual('registered')
+        expect(api.auth.encUserId.length).toBeGreaterThan(0)
     })
     test('refreshes existing token', async () => {
         const _CommerceAPI = require('./index').default
@@ -338,6 +349,16 @@ describe('CommerceAPI', () => {
         const api = getAPI()
         api.auth._saveRefreshToken(mockExampleTokenResponse.refresh_token)
         expect(api.auth.refreshToken).toEqual(mockExampleTokenResponse.refresh_token)
+    })
+    test('saves encUserId in local storage if window exists', async () => {
+        const api = getAPI()
+        api.auth._saveEncUserId(mockExampleTokenResponse.enc_user_id)
+        expect(api.auth.encUserId).toEqual(mockExampleTokenResponse.enc_user_id)
+    })
+    test('saves usid in local storage if window exists', async () => {
+        const api = getAPI()
+        api.auth._saveUsid(mockExampleTokenResponse.usid)
+        expect(api.auth.usid).toEqual(mockExampleTokenResponse.usid)
     })
     test('test onClient is true if window exists', async () => {
         const api = getAPI()

@@ -22,7 +22,7 @@ const useShopper = () => {
     // Handle basket init/updates in response to customer/basket changes.
     useEffect(() => {
         const hasCustomer = customer?.customerId
-        const hasBasket = basket?.loaded()
+        const hasBasket = basket?.loaded
 
         // We have a customer but no basket, so we fetch a new or existing basket
         if (hasCustomer && !hasBasket) {
@@ -50,7 +50,10 @@ const useShopper = () => {
             basket.updateCustomerInfo({email: customer.email})
             return
         }
+    }, [customer, basket.loaded])
 
+    useEffect(() => {
+        // Fetch product details for all items in cart
         if (customer.customerId && basket?.basketId) {
             if (basket.itemCount > 0) {
                 let ids = basket.productItems?.map((item) => item.productId)
@@ -66,7 +69,7 @@ const useShopper = () => {
     // Load wishlists in context for logged-in users
     useEffect(() => {
         const hasCustomer = customer?.customerId
-        const hasCustomerProductLists = customerProductLists?.loaded()
+        const hasCustomerProductLists = customerProductLists?.loaded
         if (hasCustomer && customer?.authType === 'registered' && !hasCustomerProductLists) {
             // we are only interested in wishlist
             customerProductLists.fetchOrCreateProductLists(customerProductListTypes.WISHLIST)
@@ -74,7 +77,22 @@ const useShopper = () => {
             // customerProductLists need to be reset when the user logs out
             customerProductLists.clearProductLists()
         }
-    }, [customerProductLists, customer])
+    }, [customerProductLists.loaded, customer.authType])
+
+    useEffect(() => {
+        // Fetch product details for new items in product-lists
+        const hasCustomerProductLists = customerProductLists?.loaded
+        if (hasCustomerProductLists) {
+            customerProductLists.data.forEach((list) => {
+                let ids = list.customerProductListItems?.map((item) => item.productId)
+                if (list?._productItemsDetail) {
+                    ids = ids.filter((id) => !list?._productItemsDetail[id])
+                }
+
+                customerProductLists.getProductsInList(ids?.toString(), list.id)
+            })
+        }
+    }, [customerProductLists])
 
     return {customer, basket}
 }

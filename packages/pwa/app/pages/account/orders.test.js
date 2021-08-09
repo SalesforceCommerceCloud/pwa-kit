@@ -80,7 +80,8 @@ const server = setupServer(
                 customer_id: 'test',
                 access_token: 'testtoken',
                 refresh_token: 'testrefeshtoken',
-                usid: 'testusid'
+                usid: 'testusid',
+                enc_user_id: 'testEncUserId'
             })
         )
     )

@@ -152,15 +152,6 @@ const Header = ({
                             />
                         </form>
                     </Box>
-                    <IconButtonWithRegistration
-                        aria-label={intl.formatMessage({
-                            defaultMessage: 'Wishlist'
-                        })}
-                        icon={<WishlistIcon />}
-                        variant="unstyled"
-                        {...styles.icons}
-                        onClick={onWishlistClick}
-                    />
                     <AccountIcon
                         {...styles.accountIcon}
                         tabIndex={0}
@@ -248,6 +239,15 @@ const Header = ({
                             </PopoverContent>
                         </Popover>
                     )}
+                    <IconButtonWithRegistration
+                        aria-label={intl.formatMessage({
+                            defaultMessage: 'Wishlist'
+                        })}
+                        icon={<WishlistIcon />}
+                        variant="unstyled"
+                        {...styles.icons}
+                        onClick={onWishlistClick}
+                    />
                     <IconButton
                         aria-label={intl.formatMessage({
                             id: 'header.button.assistive_msg.my_cart',
@@ -256,7 +256,7 @@ const Header = ({
                         icon={
                             <>
                                 <BasketIcon />
-                                {basket?.loaded() && (
+                                {basket?.loaded && (
                                     <Badge variant="notification">
                                         {basket.itemAccumulatedCount}
                                     </Badge>

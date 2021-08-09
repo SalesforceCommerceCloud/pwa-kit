@@ -321,7 +321,7 @@ export default function useCustomer() {
                 })
 
                 const productMap = response.data.reduce((result, item) => {
-                    var key = item.id
+                    const key = item.id
                     result[key] = item
                     return result
                 }, {})

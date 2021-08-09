@@ -1,6 +1,6 @@
-/* * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
-/* Copyright (c) 2021 Mobify Research & Development Inc. All rights reserved. */
-/* * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
+/* * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * *
+ * Copyright (c) 2021 Mobify Research & Development Inc. All rights reserved. *
+ * * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
 /**
  * @module progressive-web-sdk/dist/utils/ssr-proxying
  */
@@ -699,7 +699,7 @@ export const X_HEADERS_TO_ADD = {
 
 /**
  * List of headers that are allowed for a caching proxy request.
- * This must match the whitelist that CloudFront uses for a
+ * This must match the allowlist that CloudFront uses for a
  * CacheBehavior that does not pass cookies and is not configured
  * to cache based on headers.
  *
@@ -716,8 +716,8 @@ export const X_HEADERS_TO_ADD = {
  *
  * @private
  */
-export const WHITELISTED_CACHING_PROXY_REQUEST_HEADERS = {
-    // This is the set of headers whitelisted for CloudFront
+export const ALLOWED_CACHING_PROXY_REQUEST_HEADERS = {
+    // This is the set of headers allowed for CloudFront
     accept: true,
     'accept-charset': true,
     'accept-encoding': true,
@@ -779,9 +779,9 @@ export const rewriteProxyRequestHeaders = ({
 
     // For a caching proxy, apply special header processing
     if (caching) {
-        // Remove any non-whitelisted headers
+        // Remove any headers that are not on the allowlist
         workingHeaders.keys().forEach((key) => {
-            if (!WHITELISTED_CACHING_PROXY_REQUEST_HEADERS[key]) {
+            if (!ALLOWED_CACHING_PROXY_REQUEST_HEADERS[key]) {
                 workingHeaders.deleteHeader(key)
             }
         })

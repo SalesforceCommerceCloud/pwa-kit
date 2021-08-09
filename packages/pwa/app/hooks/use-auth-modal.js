@@ -22,6 +22,7 @@ import RegisterForm from '../components/register'
 import {useHistory} from 'react-router-dom'
 import {useLocale} from '../locale'
 import {noop} from '../utils/utils'
+import {API_ERROR_MESSAGE} from '../pages/account/constant'
 
 const LOGIN_VIEW = 'login'
 const REGISTER_VIEW = 'register'
@@ -62,9 +63,10 @@ export const AuthModal = ({
                       defaultMessage:
                           "Something's not right with your email or password. Try again."
                   })
-                : formatMessage({
-                      defaultMessage: 'Something went wrong. Please try again.'
-                  })
+                : formatMessage(
+                      {defaultMessage: '{errorMessage}'},
+                      {errorMessage: API_ERROR_MESSAGE}
+                  )
             form.setError('global', {type: 'manual', message})
         }
     }

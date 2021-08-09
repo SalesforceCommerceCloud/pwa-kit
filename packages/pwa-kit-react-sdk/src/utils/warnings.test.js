@@ -1,6 +1,6 @@
-/* * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
-/* Copyright (c) 2021 Mobify Research & Development Inc. All rights reserved. */
-/* * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
+/* * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * *
+ * Copyright (c) 2021 Mobify Research & Development Inc. All rights reserved. *
+ * * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
 import {deprecated, experimental} from './warnings'
 
 describe('warnings', () => {
@@ -19,7 +19,7 @@ describe('warnings', () => {
         }
         testFunction1()
         expect(console.warn.mock.calls[0][0]).toEqual(
-            `[MOBIFY API WARNING]: You are currently using an deprecated function: [testFunction1]. msg`
+            `[PWA Kit API WARNING]: You are currently using an deprecated function: [testFunction1]. msg`
         )
 
         testFunction1()
@@ -30,7 +30,7 @@ describe('warnings', () => {
         }
         testFunction2()
         expect(console.warn.mock.calls[1][0]).toEqual(
-            `[MOBIFY API WARNING]: You are currently using an deprecated function: [testFunction2]. `
+            `[PWA Kit API WARNING]: You are currently using an deprecated function: [testFunction2]. `
         )
     })
 
@@ -40,7 +40,7 @@ describe('warnings', () => {
         }
         testFunction3()
         expect(console.warn.mock.calls[0][0]).toEqual(
-            `[MOBIFY API WARNING]: You are currently using an experimental function: [testFunction3] This function may change at any time. msg`
+            `[PWA Kit API WARNING]: You are currently using an experimental function: [testFunction3] This function may change at any time. msg`
         )
 
         testFunction3()
@@ -51,7 +51,7 @@ describe('warnings', () => {
         }
         testFunction4()
         expect(console.warn.mock.calls[1][0]).toEqual(
-            `[MOBIFY API WARNING]: You are currently using an experimental function: [testFunction4] This function may change at any time. `
+            `[PWA Kit API WARNING]: You are currently using an experimental function: [testFunction4] This function may change at any time. `
         )
     })
 })

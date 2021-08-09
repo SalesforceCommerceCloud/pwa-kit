@@ -1,12 +1,13 @@
-/* * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
-/* Copyright (c) 2021 Mobify Research & Development Inc. All rights reserved. */
-/* * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
+/* * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * *
+ * Copyright (c) 2021 Mobify Research & Development Inc. All rights reserved. *
+ * * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
 
 import React, {useEffect, useState} from 'react'
 import {useLocation, useHistory} from 'react-router-dom'
 import PropTypes from 'prop-types'
 import {Helmet} from 'react-helmet'
 import {FormattedMessage, useIntl} from 'react-intl'
+import useNavigation from '../../hooks/use-navigation'
 
 // Components
 import {
@@ -22,8 +23,7 @@ import {
     Select,
     Stack,
     Skeleton,
-    Text,
-    useToast
+    Text
 } from '@chakra-ui/react'
 
 // Project Components
@@ -46,6 +46,8 @@ import useCustomerProductLists, {
     eventActions
 } from '../../commerce-api/hooks/useCustomerProductLists'
 import {customerProductListTypes} from '../../constants'
+import {useToast} from '../../hooks/use-toast'
+import {API_ERROR_MESSAGE} from '../account/constant'
 
 const MAX_ORDER_QUANTITY = 10
 const OUT_OF_STOCK = 'OUT_OF_STOCK'
@@ -56,8 +58,10 @@ const ProductDetail = ({category, product, isLoading}) => {
     const intl = useIntl()
     const basket = useBasket()
     const history = useHistory()
+    const navigate = useNavigation()
     const location = useLocation()
     const customerProductLists = useCustomerProductLists()
+    const showToast = useToast()
 
     const einstein = useEinstein()
 
@@ -73,8 +77,7 @@ const ProductDetail = ({category, product, isLoading}) => {
     const canOrder = !isLoading && variant?.orderable && quantity <= stockLevel
     const showLoading = !product
 
-    const canAddToWishlist = !isLoading && variant
-    const toast = useToast()
+    const canAddToWishlist = !isLoading
 
     // A product is considered out of stock if the stock level is 0 or if we have all our
     // variation attributes selected, but don't have a variant. We do this because the API
@@ -116,26 +119,15 @@ const ProductDetail = ({category, product, isLoading}) => {
         basket.addItemToBasket(productItems)
     }
 
-    const showToast = (title, status) => {
-        const toastId = `${title}-${status}`
-        if (!toast.isActive(toastId)) {
-            // Prevent duplicate toasts
-            toast({
-                id: toastId,
-                title,
-                status,
-                isClosable: true,
-                position: 'top-right',
-                variant: 'subtle'
-            })
-        }
+    const onViewWishlistClick = () => {
+        navigate('/account/wishlist')
     }
 
     const addItemToWishlist = async () => {
         try {
             // If product-lists have not loaded we push "Add to wishlist" event to eventQueue to be
             // processed once the product-lists have loaded.
-            if (!customerProductLists?.loaded()) {
+            if (!customerProductLists?.loaded) {
                 const event = {
                     item: {...product, quantity},
                     action: eventActions.ADD,
@@ -161,18 +153,27 @@ const ProductDetail = ({category, product, isLoading}) => {
                 )
 
                 if (wishlistItem?.id) {
-                    showToast(
-                        intl.formatMessage({defaultMessage: '1 item added to wishlist'}),
-                        'success'
+                    const toastAction = (
+                        <Button variant="link" onClick={onViewWishlistClick}>
+                            View
+                        </Button>
                     )
+                    showToast({
+                        title: intl.formatMessage({defaultMessage: '1 item added to wishlist'}),
+                        status: 'success',
+                        action: toastAction
+                    })
                 }
             }
         } catch (error) {
             console.error(error)
-            showToast(
-                intl.formatMessage({defaultMessage: 'Something went wrong. Try again!'}),
-                'error'
-            )
+            showToast({
+                title: intl.formatMessage(
+                    {defaultMessage: '{errorMessage}'},
+                    {errorMessage: API_ERROR_MESSAGE}
+                ),
+                status: 'error'
+            })
         }
     }
 
@@ -393,7 +394,7 @@ const ProductDetail = ({category, product, isLoading}) => {
                                         </Fade>
                                     )}
 
-                                    <Stack spacing={4}>
+                                    <Stack spacing={4} display={{base: 'none', lg: 'block'}}>
                                         <Button
                                             disabled={!canOrder}
                                             onClick={handleAddToCart}

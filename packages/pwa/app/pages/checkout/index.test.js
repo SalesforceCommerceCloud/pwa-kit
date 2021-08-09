@@ -48,6 +48,19 @@ jest.mock('../../commerce-api/pkce', () => {
     }
 })
 
+jest.mock('../../commerce-api/hooks/useCustomerProductLists', () => {
+    const originalModule = jest.requireActual('../../commerce-api/hooks/useCustomerProductLists')
+    const useCustomerProductLists = originalModule.default
+
+    return () => {
+        const customerProductLists = useCustomerProductLists()
+
+        customerProductLists.getProductsInList = jest.fn()
+
+        return customerProductLists
+    }
+})
+
 const {keysToCamel} = jest.requireActual('../../commerce-api/utils')
 
 // This is our wrapped component for testing. It handles initialization of the customer
@@ -145,7 +158,8 @@ const server = setupServer(
                 customer_id: ocapiBasketWithItem.customer_info.customer_id,
                 access_token: 'testtoken',
                 refresh_token: 'testrefeshtoken',
-                usid: 'testusid'
+                usid: 'testusid',
+                enc_user_id: 'testEncUserId'
             })
         )
     })
@@ -396,7 +410,8 @@ test('Can proceed through checkout as registered customer', async () => {
                     customer_id: 'test',
                     access_token: 'testtoken',
                     refresh_token: 'testrefeshtoken',
-                    usid: 'testusid'
+                    usid: 'testusid',
+                    enc_user_id: 'testEncUserId'
                 })
             )
         }),
@@ -608,7 +623,8 @@ test('Can edit address during checkout as a registered customer', async () => {
                     customer_id: 'test',
                     access_token: 'testtoken',
                     refresh_token: 'testrefeshtoken',
-                    usid: 'testusid'
+                    usid: 'testusid',
+                    enc_user_id: 'testEncUserId'
                 })
             )
         }),
@@ -700,7 +716,6 @@ test('Can add address during checkout as a registered customer', async () => {
     // Keep a *deep* of the initial mocked basket. Our mocked fetch responses will continuously
     // update this object, which essentially mimics a saved basket on the backend.
     let currentBasket = JSON.parse(JSON.stringify(ocapiBasketWithItem))
-
     // Set up additional requests for intercepting/mocking for just this test.
     server.use(
         // Mock oauth login callback request
@@ -718,7 +733,8 @@ test('Can add address during checkout as a registered customer', async () => {
                     customer_id: 'test',
                     access_token: 'testtoken',
                     refresh_token: 'testrefeshtoken',
-                    usid: 'testusid'
+                    usid: 'testusid',
+                    enc_user_id: 'testEncUserId'
                 })
             )
         }),

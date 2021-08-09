@@ -1,3 +1,7 @@
+## v0.8.0 (Jul 28, 2021)
+## v0.8.0-alpha.1 (Jul 28, 2021)
+## v0.8.0-alpha.0 (Jul 28, 2021)
+## v0.8.0-dev (Jul 14, 2021)
 ## v0.7.0 (Jul 14, 2021)
 ## v0.7.0-alpha.0 (Jul 14, 2021)
 ## v0.7.0-dev (Jun 30, 2021)
@@ -384,7 +388,7 @@
         - Added `normalizePhone` to `normalize-utils.js` file
     - Remove image placeholder in IE11 [#1138](https://github.com/mobify/progressive-web-sdk/pull/1138)
     - Add onImageError handler to Image component [#1124](https://github.com/mobify/progressive-web-sdk/pull/1124)
-    - Store the React route blacklist globally, so it can be used within loader.js [#1139](https://github.com/mobify/progressive-web-sdk/pull/1139#pullrequestreview-124643984)
+    - Store the React route blocklist globally, so it can be used within loader.js [#1139](https://github.com/mobify/progressive-web-sdk/pull/1139#pullrequestreview-124643984)
 
 ## v1.2.0 (May 17, 2018)
 - **OTHER CHANGES**
@@ -1070,7 +1074,7 @@
 - Use React.Children.count to get accordion item length [#398](https://github.com/mobify/progressive-web-sdk/pull/398)
 - Remove AccordionItem orientationChange listener on unmount [#399](https://github.com/mobify/progressive-web-sdk/pull/399)
 - Fix bug where Carousel doesn't update its internal state when its children change [#400](https://github.com/mobify/progressive-web-sdk/pull/400)
-- Allow the setting of blacklisted routes on the Router [#402](https://github.com/mobify/progressive-web-sdk/pull/402)
+- Allow the setting of blocked routes on the Router [#402](https://github.com/mobify/progressive-web-sdk/pull/402)
 
 ## v0.10.6 (November 25, 2016)
 - Add `openItem` and `closeItem` functions to the Accordion component [#392](https://github.com/mobify/progressive-web-sdk/pull/392)

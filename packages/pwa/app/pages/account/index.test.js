@@ -9,7 +9,8 @@ import {
     mockedGuestCustomer,
     mockedRegisteredCustomer,
     mockOrderHistory,
-    mockOrderProducts
+    mockOrderProducts,
+    exampleTokenReponse
 } from '../../commerce-api/mock-data'
 import useCustomer from '../../commerce-api/hooks/useCustomer'
 import Account from './index'
@@ -61,6 +62,9 @@ const server = setupServer(
     rest.get('*/customers/:customerId', (req, res, ctx) =>
         res(ctx.delay(0), ctx.status(200), ctx.json(mockedRegisteredCustomer))
     ),
+    rest.get('*/oauth2/logout', (req, res, ctx) =>
+        res(ctx.delay(0), ctx.status(200), ctx.json(exampleTokenReponse))
+    ),
     rest.post('*/oauth2/token', (req, res, ctx) =>
         res(
             ctx.delay(0),
@@ -68,7 +72,8 @@ const server = setupServer(
                 customer_id: 'test',
                 access_token: 'testtoken',
                 refresh_token: 'testrefeshtoken',
-                usid: 'testusid'
+                usid: 'testusid',
+                enc_user_id: 'testEncUserId'
             })
         )
     )

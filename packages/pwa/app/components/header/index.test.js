@@ -60,7 +60,8 @@ const server = setupServer(
                 customer_id: 'test',
                 access_token: 'testtoken',
                 refresh_token: 'testrefeshtoken',
-                usid: 'testusid'
+                usid: 'testusid',
+                enc_user_id: 'testEncUserId'
             })
         )
     )
@@ -184,7 +185,8 @@ test('direct users to account page when an authenticated users click on account 
                     customer_id: 'test',
                     access_token: 'testtoken',
                     refresh_token: 'testrefeshtoken',
-                    usid: 'testusid'
+                    usid: 'testusid',
+                    enc_user_id: 'testEncUserId'
                 })
             )
         ),
@@ -224,7 +226,8 @@ test('shows dropdown menu when an authenticated users hover on the account icon'
                     customer_id: 'test',
                     access_token: 'testtoken',
                     refresh_token: 'testrefeshtoken',
-                    usid: 'testusid'
+                    usid: 'testusid',
+                    enc_user_id: 'testEncUserId'
                 })
             )
         ),

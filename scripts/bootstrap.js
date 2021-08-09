@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-/* eslint import/no-commonjs:0 */
 
 /**
  * Bootstrap all packages, intended to be used as a post-install hook.

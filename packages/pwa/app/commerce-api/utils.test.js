@@ -1,5 +1,5 @@
 import jwt from 'njwt'
-import {camelCaseKeysToUnderscore, isTokenValid} from './utils'
+import {camelCaseKeysToUnderscore, isTokenValid, convertSnakeCaseToSentenceCase} from './utils'
 
 const createJwt = (secondsToExp) => {
     const token = jwt.create({}, 'test')
@@ -43,5 +43,14 @@ describe('isTokenValid', () => {
         expect(underScoreKeys.test_key).toBeDefined()
         expect(underScoreKeys.test_key.nested_test_key).toBeDefined()
         expect(underScoreKeys.test_key.nested_test_key.deep_down_key).toBeDefined()
+    })
+
+    test('convertSnakeCaseToSentenceCase returns correct formatted string', () => {
+        const snakeCaseString = 'test_snake_case_string'
+        const expectedSentenceCaseString = 'test snake case string'
+
+        expect(convertSnakeCaseToSentenceCase(snakeCaseString) === expectedSentenceCaseString).toBe(
+            true
+        )
     })
 })

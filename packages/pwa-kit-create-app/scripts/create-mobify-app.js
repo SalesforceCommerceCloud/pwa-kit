@@ -1,7 +1,5 @@
 #!/usr/bin/env node
 
-/* eslint import/no-commonjs:0 no-useless-escape:0*/
-
 /**
  * This is a generator for projects that run on the Mobify platform.
  *
@@ -155,7 +153,7 @@ const runGenerator = (answers, {outputDir}) => {
 
     const einsteinAPIConfigTemplate = require(`../assets/pwa/einstein-api.config`).template
     const einsteinData = {
-        proxyPath: answers['scaffold-pwa'].mobify.ssrParameters.proxyConfigs[3].path,
+        proxyPath: answers['scaffold-pwa'].mobify.ssrParameters.proxyConfigs[2].path,
         einsteinId: answers['einstein-api'].einsteinId,
         siteId: answers['commerce-api'].siteId
     }
@@ -277,10 +275,6 @@ const buildAnswers = ({
                         {
                             path: 'ocapi',
                             host: new URL(instanceUrl).hostname
-                        },
-                        {
-                            path: 'slas',
-                            host: 'prd.us.shopper.commercecloud.salesforce.com'
                         },
                         {
                             path: 'einstein',

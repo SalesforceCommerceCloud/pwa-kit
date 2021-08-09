@@ -7,18 +7,19 @@ The Retail React App is an isomorphic JavaScript storefront [Progressive Web App
 Developers enjoy a streamlined experience without having to worry about the underlying infrastructure, whether they're developing their app locally, deploying it to a [Managed Runtime](https://developer.commercecloud.com/s/article/PWA-Kit) environment, or testing the app live.
 
 ## 📖 Table of Contents
-  * [**Prerequisites**](#-prerequisites)
-  * [**Getting Started**](#-getting-started)
-  * [**Configurations**](#-configurations)
-  * [**NPM Scripts**](#-npm-scripts)
-  * [**Directory Structure**](#-directory-structure)
-  * [**Commerce API Integration**](#commerce-api-integration)
-  * [**Localization**](#localization)
-  * [**Theming**](#-theming)
-  * [**Testing**](#-testing)
-  * [**Deploying**](#deploying)
-  * [**SVG icons**](#svg-icons)
-  * [**Useful External Links**](#useful-external-links)
+
+-   [**Prerequisites**](#-prerequisites)
+-   [**Getting Started**](#-getting-started)
+-   [**Configurations**](#-configurations)
+-   [**NPM Scripts**](#-npm-scripts)
+-   [**Directory Structure**](#-directory-structure)
+-   [**Commerce API Integration**](#commerce-api-integration)
+-   [**Localization**](#localization)
+-   [**Theming**](#-theming)
+-   [**Testing**](#-testing)
+-   [**Deploying**](#deploying)
+-   [**SVG icons**](#svg-icons)
+-   [**Useful External Links**](#useful-external-links)
 
 ## 🔌 Prerequisites
 
@@ -46,7 +47,7 @@ The React Retail App is built with [Commerce API](https://developer.commerceclou
 | --------------------------------------------- | --------------------------------------------------------------------------------------- |
 | `projectSlug`                                 | Matches your project ID in the [Runtime Admin](https://runtime.commercecloud.com/) tool |
 | `mobify.ssrParameters.ssrFunctionNodeVersion` | Matches your project's Node version (`12.x`, `14.x`)                                    |
-| `mobify.ssrParameters.proxyConfigs`           | Proxy configuration for Commerce API, OCAPI and SLAS                                    |
+| `mobify.ssrParameters.proxyConfigs`           | Proxy configuration for Commerce API and OCAPI.                                         |
 
 Sample Proxy Configs:
 
@@ -60,10 +61,6 @@ Sample Proxy Configs:
         {
             "host": "xxxx-000.sandbox.us01.dx.commercecloud.salesforce.com",
             "path": "ocapi"
-        },
-        {
-            "host": "prd.us.shopper.commercecloud.salesforce.com",
-            "path": "slas"
         }
     ]
 }
@@ -87,49 +84,38 @@ export const commerceAPIConfig = {
 
 ### Shopper Login and API Access Service
 
-To authorize certain API requests on behalf of shoppers, we rely on a Commerce API called the [Shopper Login and API Access Service](https://developer.commercecloud.com/s/api-details/a003k00000VWfNDAA1/commerce-cloud-developer-centershopperloginandapiaccessservice).
-(SLAS). By default, requests to SLAS are made through a proxy. For this proxy configuration to work,
-**you must use the SLAS Admin API to configure a public client for your storefront**. See the
+To authorize shoppers to make API requests, we use the [Shopper Login and API Access Service](https://developer.commercecloud.com/s/api-details/a003k00000VWfNDAA1/commerce-cloud-developer-centershopperloginandapiaccessservice) or SLAS.
+**You must use the SLAS Admin API to setup a public client for your storefront**. See the
 [SLAS Admin API guide](https://developer.commercecloud.com/s/api-details/a003k00000VzoEyAAJ/commerce-cloud-developer-centershopperloginandapiaccessadmin)
-for instructions on how to configure a public client.
+for instructions.
 
-**Important**: Before you can configure a public client, you must complete a number of other
-steps, all of which are described in the SLAS Admin API guide. These steps include setting up an
-API client for administrator use, downloading and installing the `sfcc-ci` tool, requesting an
-access token, and using the access token to configure the API client via the SLAS Admin API.
-
-When you configure the public client for your storefront, you must include the callback URIs for
-all of your Managed Runtime environments in the
-`redirectUri` parameter that you pass to the SLAS Admin API. For example, if you have
-an environment called `test` and its `hostname` is
-`my-project-test.mobify-storefront.com`, then you must include
-`https://my-project-test.mobify-storefront.com/callback` in the
-`redirectUri` parameter. You must also include the callback URIs for all your other
-environments.
+When creating a public client, be sure to include callback URIs for your Managed Runtime environments
+in the `redirectUri` parameter. For example, if you have an environment `my-project-test.mobify-storefront.com`,
+include `https://my-project-test.mobify-storefront.com/callback`.
 
 ## 📜 NPM Scripts
 
 You can run `npm run <SCRIPT_NAME>` to run the following available scripts:
 
-| name                      | Description                                                                                                                                                                                                                          |
-| ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `analyze-build`           | Build the project in production mode and create two [webpack-bundle-analyzer](https://github.com/webpack-contrib/webpack-bundle-analyzer) reports. These are used for performance optimization to ensure the bundle size is kept small. |
-| `compile-messages`        | Compile all localized messages into AST format                                                                                                                                                                                                          |
-| `extract-messages`        | Automatically extract the default locale's messages from the React components                                                                                                                                                                |
-| `format`                  | Format the code using [Prettier](https://prettier.io/)                                                                                                                                                                               |
-| `lint`                    | Find inconsistent code styling using [ESlint](https://eslint.org/)                                                                                                                                                                   |
-| `lint:fix`                | Automatically fix ESlint errors                                                                                                                                                                                                      |
-| `prod:build`              | Build the project in production mode                                                                                                                                                                                                |
-| `push`                    | Push the bundle (production build code artifacts) to your [Runtime Admin](https://runtime.commercecloud.com/) project                                                                                                                |
-| `save-credentials`        | Save Runtime Admin credentials locally (for `push` command)                                                                                                                                                                          |
-| `start`                   | Start the SSR server                                                                                                                                                                                                                 |
-| `start:inspect`           | Start the SSR server using Node.js inspector                                                                                                                                                                                         |
-| `start:pseudolocale`      | Start the SSR server with pseudo locale                                                                                                                                                                                                                                  |
-| `test`                    | Run unit tests using [Jest](https://jestjs.io/)                                                                                                                                                                                      |
-| `test:e2e`                | Run end-to-end tests using [Cypress](https://www.cypress.io/)                                                                                                                                                                        |
-| `test:e2e-ci`             | Run end-to-end tests in CI mode                                                                                                                                                                                                      |
-| `test:lighthouse`         | Run [Lighthouse](https://developers.google.com/web/tools/lighthouse) test                                                                                                                                                            |
-| `test:max-file-size`      | Run [bundlesize](https://github.com/siddharthkp/bundlesize) test                                                                                                                                                                     |
+| name                 | Description                                                                                                                                                                                                                             |
+| -------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `analyze-build`      | Build the project in production mode and create two [webpack-bundle-analyzer](https://github.com/webpack-contrib/webpack-bundle-analyzer) reports. These are used for performance optimization to ensure the bundle size is kept small. |
+| `compile-messages`   | Compile all localized messages into AST format                                                                                                                                                                                          |
+| `extract-messages`   | Automatically extract the default locale's messages from the React components                                                                                                                                                           |
+| `format`             | Format the code using [Prettier](https://prettier.io/)                                                                                                                                                                                  |
+| `lint`               | Find inconsistent code styling using [ESlint](https://eslint.org/)                                                                                                                                                                      |
+| `lint:fix`           | Automatically fix ESlint errors                                                                                                                                                                                                         |
+| `prod:build`         | Build the project in production mode                                                                                                                                                                                                    |
+| `push`               | Push the bundle (production build code artifacts) to your [Runtime Admin](https://runtime.commercecloud.com/) project                                                                                                                   |
+| `save-credentials`   | Save Runtime Admin credentials locally (for `push` command)                                                                                                                                                                             |
+| `start`              | Start the SSR server                                                                                                                                                                                                                    |
+| `start:inspect`      | Start the SSR server using Node.js inspector                                                                                                                                                                                            |
+| `start:pseudolocale` | Start the SSR server with pseudo locale                                                                                                                                                                                                 |
+| `test`               | Run unit tests using [Jest](https://jestjs.io/)                                                                                                                                                                                         |
+| `test:e2e`           | Run end-to-end tests using [Cypress](https://www.cypress.io/)                                                                                                                                                                           |
+| `test:e2e-ci`        | Run end-to-end tests in CI mode                                                                                                                                                                                                         |
+| `test:lighthouse`    | Run [Lighthouse](https://developers.google.com/web/tools/lighthouse) test                                                                                                                                                               |
+| `test:max-file-size` | Run [bundlesize](https://github.com/siddharthkp/bundlesize) test                                                                                                                                                                        |
 
 ## 🔖 Directory Structure
 
@@ -150,6 +136,8 @@ __mocks__/                                  Mocking objects for unit testing wit
     │   └── _error                          Generic error component
     │   └── ...
     ├── contexts/                           React contexts
+    ├── hoc                                 Higher order components (HOCs)
+    │   └── with-registration               HOC for adding login flow onClick of wrapped component
     ├── hooks/                              React hooks
     ├── pages/                              Ecommerce pages like home, PLP, PDP, etc.
     ├── static/                             Static assets
@@ -211,6 +199,7 @@ The `CommerceAPI` wrapper currently uses OCAPI for baskets and orders and uses t
 ## Localization
 
 See [Localization README.md](./app/translations/README.md)
+
 ## ✨ Theming
 
 The React Retail App follows the [Chakra Theming](https://chakra-ui.com/) rules and the default theme is based on the [System UI Theme Specification](https://system-ui.com/theme/).
@@ -270,7 +259,7 @@ The imported SVG icons are packaged into an SVG sprite at build time, and the sp
 
 ## Useful external links:
 
-* [PWA Kit Documentation](https://developer.commercecloud.com/s/article/PWA-Kit)
-* [Commerce API](https://developer.commercecloud.com/s/commerce-api)
-* [Runtime Admin](https://runtime.commercecloud.com/)
-* [Trailhead](https://trailhead.salesforce.com/en/content/learn/modules/commerce-pwa-kit-and-managed-runtime)
+-   [PWA Kit Documentation](https://developer.commercecloud.com/s/article/PWA-Kit)
+-   [Commerce API](https://developer.commercecloud.com/s/commerce-api)
+-   [Runtime Admin](https://runtime.commercecloud.com/)
+-   [Trailhead](https://trailhead.salesforce.com/en/content/learn/modules/commerce-pwa-kit-and-managed-runtime)

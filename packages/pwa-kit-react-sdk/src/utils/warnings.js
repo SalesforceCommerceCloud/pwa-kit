@@ -1,6 +1,6 @@
-/* * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
-/* Copyright (c) 2021 Mobify Research & Development Inc. All rights reserved. */
-/* * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
+/* * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * *
+ * Copyright (c) 2021 Mobify Research & Development Inc. All rights reserved. *
+ * * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
 /**
  * @module progressive-web-sdk/dist/utils/warnings
  * @private
@@ -68,5 +68,5 @@ const warn = (type, message) => {
     }
 
     if (!shouldDisplay(functionName)) return
-    console.warn(`[MOBIFY API WARNING]: ${messages[type]} ${message ? message : ''}`)
+    console.warn(`[PWA Kit API WARNING]: ${messages[type]} ${message ? message : ''}`)
 }

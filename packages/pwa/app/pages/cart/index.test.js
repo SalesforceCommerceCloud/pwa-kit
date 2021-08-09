@@ -131,10 +131,18 @@ test('Can update item in the cart', async () => {
 
     mockedBasketResponse = {
         ...mockedBasketResponse,
-        productItems: [{...mockedBasketResponse.productItems[0], quantity: 3}]
+        productItems: [
+            {
+                ...mockedBasketResponse.productItems[0],
+                quantity: 3,
+                id: mockedBasketResponse.productItems[0].item_id
+            }
+        ]
     }
 
-    const cartItem = await screen.findByTestId('sf-cart-item-0')
+    const cartItem = await screen.findByTestId(
+        `sf-cart-item-${mockedBasketResponse.productItems[0].productId}`
+    )
     expect(within(cartItem).getByRole('combobox')).toHaveValue('2')
 
     // update item quantity
@@ -151,8 +159,9 @@ test('Can remove item from the cart', async () => {
 
     // remove item
     mockedBasketResponse = keysToCamel(mockEmptyBasket)
-    const cartItem = await screen.findByTestId('sf-cart-item-0')
+    const cartItem = await screen.findByTestId('sf-cart-item-750518699578M')
     userEvent.click(within(cartItem).getByRole('button', {name: /remove/i}))
+    userEvent.click(screen.getByRole('button', {name: /yes, remove item/i}))
 
     expect(await screen.findByTestId('sf-cart-empty')).toBeInTheDocument()
 })
@@ -224,7 +233,7 @@ test('Can apply and remove product-level coupon code with promotion', async () =
     userEvent.click(screen.getByText('Apply'))
     expect(await screen.findByText(/MENSSUITS/i)).toBeInTheDocument()
 
-    const cartItem = await screen.findByTestId('sf-cart-item-0')
+    const cartItem = await screen.findByTestId('sf-cart-item-750518699578M')
     expect(await within(cartItem).findByText('-$30.00')).toBeInTheDocument()
 
     // remove coupon

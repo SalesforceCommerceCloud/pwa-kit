@@ -1,7 +1,8 @@
-import React, {useEffect, useState} from 'react'
+import React, {useEffect, useRef, useState} from 'react'
 import PropTypes from 'prop-types'
 import ProductScroller from '../../components/product-scroller'
 import useEinstein from '../../commerce-api/hooks/useEinstein'
+import useIntersectionObserver from '../../hooks/useIntersectionObserver'
 
 /**
  * A component for fetching and rendering product recommendations from the Einstein API
@@ -14,8 +15,12 @@ const RecommendedProducts = ({zone, recommender, products, title, shouldFetch, .
         recommendations,
         getZoneRecommendations,
         getRecommendations,
-        sendClickReco
+        sendClickReco,
+        sendViewReco
     } = useEinstein()
+
+    const ref = useRef()
+    const isOnScreen = useIntersectionObserver(ref, {useOnce: true})
     const [_products, setProducts] = useState(products)
 
     useEffect(() => {
@@ -64,6 +69,18 @@ const RecommendedProducts = ({zone, recommender, products, title, shouldFetch, .
         }
     }, [products])
 
+    useEffect(() => {
+        if (isOnScreen && recommendations?.recs) {
+            sendViewReco(
+                {
+                    recommenderName: recommendations.recommenderName,
+                    __recoUUID: recommendations.recoUUID
+                },
+                recommendations.recs.map((rec) => ({id: rec.id}))
+            )
+        }
+    }, [isOnScreen, recommendations])
+
     // Check if we have an Einstein API instance before attempting to render anything
     if (!api) {
         return null
@@ -77,6 +94,7 @@ const RecommendedProducts = ({zone, recommender, products, title, shouldFetch, .
 
     return (
         <ProductScroller
+            ref={ref}
             title={title || recommendations?.displayMessage}
             products={recommendations.recs}
             onProductClick={(product) =>

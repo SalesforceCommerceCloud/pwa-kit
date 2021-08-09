@@ -226,7 +226,8 @@ const server = setupServer(
                 customer_id: 'customerid',
                 access_token: 'testtoken',
                 refresh_token: 'testrefeshtoken',
-                usid: 'testusid'
+                usid: 'testusid',
+                enc_user_id: 'testEncUserId'
             })
         )
     )

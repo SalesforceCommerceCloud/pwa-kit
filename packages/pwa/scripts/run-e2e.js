@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-/* eslint import/no-commonjs:0 */
+
 const utils = require('./utils')
 const spawnSync = require('cross-spawn').sync
 

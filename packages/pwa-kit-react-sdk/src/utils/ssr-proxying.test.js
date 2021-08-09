@@ -1,10 +1,8 @@
-/* * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
-/* Copyright (c) 2021 Mobify Research & Development Inc. All rights reserved. */
-/* * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
+/* * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * *
+ * Copyright (c) 2021 Mobify Research & Development Inc. All rights reserved. *
+ * * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
 
-/* global jest expect */
 /* eslint-env jest */
-/* eslint import/no-commonjs:0 */
 /* eslint max-nested-callbacks:0 */
 
 import {
@@ -15,7 +13,7 @@ import {
     rewriteProxyResponseHeaders,
     rfc1123,
     MAX_URL_LENGTH_BYTES,
-    WHITELISTED_CACHING_PROXY_REQUEST_HEADERS
+    ALLOWED_CACHING_PROXY_REQUEST_HEADERS
 } from './ssr-proxying'
 
 describe('rfc1123 tests', () => {
@@ -605,7 +603,7 @@ describe('rewriteProxyRequestHeaders tests', () => {
             name: 'caching-proxy processing GET 1',
             caching: true,
             targetHost: 'www.customer.com',
-            testWhitelist: true,
+            testAllowlist: true,
             method: 'GET',
             input: {
                 'accept-encoding': 'deflate, gzip',
@@ -663,10 +661,10 @@ describe('rewriteProxyRequestHeaders tests', () => {
         test(testCase.name || `test ${testCaseIndex}`, () => {
             const headers = Object.assign({}, testCase.input || {})
 
-            // If we're doing whitelist testing, add a value for
-            // every whitelisted header.
-            if (testCase.testWhitelist) {
-                Object.keys(WHITELISTED_CACHING_PROXY_REQUEST_HEADERS).forEach((key) => {
+            // If we're testing the allowlist, add a value for
+            // every allowed header.
+            if (testCase.testAllowlist) {
+                Object.keys(ALLOWED_CACHING_PROXY_REQUEST_HEADERS).forEach((key) => {
                     if (!(key in headers)) {
                         headers[key] = key
                     }
@@ -693,11 +691,11 @@ describe('rewriteProxyRequestHeaders tests', () => {
                 ).toEqual(value)
             })
 
-            // If we're doing whitelist testing, verify that each
-            // whitelisted header that has a corresponding values
+            // If we're testing the allowlist, verify that each
+            // allowed header that has a corresponding value
             // in testCase.expected matches that expected value.
-            if (testCase.testWhitelist) {
-                Object.keys(WHITELISTED_CACHING_PROXY_REQUEST_HEADERS).forEach((key) => {
+            if (testCase.testAllowlist) {
+                Object.keys(ALLOWED_CACHING_PROXY_REQUEST_HEADERS).forEach((key) => {
                     if (expectedKeys.indexOf(key) < 0) {
                         expect(updatedHeaders[key]).toEqual(headers[key])
                     }

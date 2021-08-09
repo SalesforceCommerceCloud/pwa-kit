@@ -1,7 +1,11 @@
 import React from 'react'
 import {rest} from 'msw'
 import {setupServer} from 'msw/node'
-import {mockedRegisteredCustomer} from '../../commerce-api/mock-data'
+import {
+    mockedCustomerProductLists,
+    mockedRegisteredCustomer,
+    productsResponse
+} from '../../commerce-api/mock-data'
 import {screen} from '@testing-library/react'
 import {Route, Switch} from 'react-router-dom'
 import ProductDetail from '.'
@@ -22,9 +26,14 @@ jest.mock('../../commerce-api/utils', () => {
 })
 
 const MockedComponent = () => {
+    const product = productsResponse.data[0]
+
     return (
         <Switch>
-            <Route path="/en/product/:productId" render={(props) => <ProductDetail {...props} />} />
+            <Route
+                path="/en/product/:productId"
+                render={(props) => <ProductDetail {...props} product={product} />}
+            />
         </Switch>
     )
 }
@@ -54,10 +63,19 @@ const server = setupServer(
                 customer_id: 'test',
                 access_token: 'testtoken',
                 refresh_token: 'testrefeshtoken',
-                usid: 'testusid'
+                usid: 'testusid',
+                enc_user_id: 'testEncUserId'
             })
         )
-    )
+    ),
+    // mock fetch product lists
+    rest.get('*/customers/:customerId/product-lists', (req, res, ctx) => {
+        return res(ctx.json(mockedCustomerProductLists))
+    }),
+    // mock add item to product lists
+    rest.post('*/customers/:customerId/product-lists/:listId/items', (req, res, ctx) => {
+        return res(ctx.delay(0), ctx.status(200))
+    })
 )
 
 // Set up and clean up
@@ -69,7 +87,7 @@ beforeAll(() => {
 
     // Since we're testing some navigation logic, we are using a simple Router
     // around our component. We need to initialize the default route/path here.
-    window.history.pushState({}, 'ProductDetail', '/en/product/25686364M')
+    window.history.pushState({}, 'ProductDetail', '/en/product/test-product')
 })
 
 beforeEach(() => {
@@ -85,4 +103,9 @@ afterAll(() => server.close())
 test('should render product details page', async () => {
     renderWithProviders(<MockedComponent />)
     expect(await screen.findByTestId('product-details-page')).toBeInTheDocument()
+    expect(screen.getByText(/Long Sleeve Crew Neck/)).toBeInTheDocument()
+    expect(screen.getByText(/14.99/)).toBeInTheDocument()
+
+    expect(screen.getByRole('button', {name: /add to cart/i})).toBeInTheDocument()
+    expect(screen.getByRole('button', {name: /add to wishlist/i})).toBeInTheDocument()
 })

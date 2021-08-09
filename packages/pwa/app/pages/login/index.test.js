@@ -125,7 +125,8 @@ test('Allows customer to sign in to their account', async () => {
                     customer_id: 'test',
                     access_token: 'testtoken',
                     refresh_token: 'testrefeshtoken',
-                    usid: 'testusid'
+                    usid: 'testusid',
+                    enc_user_id: 'testEncUserId'
                 })
             )
         ),

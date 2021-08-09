@@ -19,7 +19,7 @@ export default function useBasket() {
             ...basket,
 
             // Check if a this represents a valid basket
-            loaded() {
+            get loaded() {
                 return basket && basket.basketId
             },
 
@@ -139,7 +139,7 @@ export default function useBasket() {
                 })
 
                 const itemDetail = response.data.reduce((result, item) => {
-                    var key = item.id
+                    const key = item.id
                     result[key] = item
                     return result
                 }, {})

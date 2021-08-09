@@ -1,6 +1,6 @@
-/* * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
-/* Copyright (c) 2021 Mobify Research & Development Inc. All rights reserved. */
-/* * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
+/* * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * *
+ * Copyright (c) 2021 Mobify Research & Development Inc. All rights reserved. *
+ * * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
 
 import React, {Fragment} from 'react'
 import PropTypes from 'prop-types'
@@ -19,7 +19,11 @@ const LoginForm = ({submitForm, clickForgotPassword = noop, clickCreateAccount =
                     <FormattedMessage defaultMessage="Welcome Back" />
                 </Text>
             </Stack>
-            <form onSubmit={form.handleSubmit(submitForm)} data-testid="sf-auth-modal-form">
+            <form
+                id="login-form"
+                onSubmit={form.handleSubmit(submitForm)}
+                data-testid="sf-auth-modal-form"
+            >
                 <Stack spacing={8} paddingLeft={4} paddingRight={4}>
                     {form.errors?.global && (
                         <Alert status="error">

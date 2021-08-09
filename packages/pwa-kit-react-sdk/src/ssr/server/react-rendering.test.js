@@ -1,9 +1,9 @@
 /**
  * @jest-environment node
  */
-/* * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
-/* Copyright (c) 2021 Mobify Research & Development Inc. All rights reserved. */
-/* * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
+/* * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * *
+ * Copyright (c) 2021 Mobify Research & Development Inc. All rights reserved. *
+ * * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
 import {render, ALLOWLISTED_INLINE_SCRIPTS} from './react-rendering'
 import {createApp} from './express'
 import request from 'supertest'
@@ -134,6 +134,7 @@ jest.mock('../universal/routes', () => {
         static getProps() {
             return Promise.resolve()
         }
+        // eslint-disable-next-line react/require-render-return
         render() {
             throw new Error('This is an error rendering')
         }

@@ -1,6 +1,6 @@
-/* * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
-/* Copyright (c) 2021 Mobify Research & Development Inc. All rights reserved. */
-/* * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
+/* * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * *
+ * Copyright (c) 2021 Mobify Research & Development Inc. All rights reserved. *
+ * * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
 /**
  * @module progressive-web-sdk/dist/utils/ssr-server
  */
@@ -31,7 +31,8 @@ export const TABLET = 'TABLET'
 let bundleBaseURL
 const bundleID = process.env.BUNDLE_ID
 
-export const isRemote = () => process.env.hasOwnProperty('AWS_LAMBDA_FUNCTION_NAME')
+export const isRemote = () =>
+    Object.prototype.hasOwnProperty.call(process.env, 'AWS_LAMBDA_FUNCTION_NAME')
 
 export const getBundleBaseUrl = () => {
     return `/mobify/bundle/${isRemote() ? bundleID : 'development'}/`
@@ -461,7 +462,7 @@ export const processLambdaResponse = (response) => {
 /**
  * @private
  */
-export const WHITELISTED_CACHING_PROXY_REQUEST_METHODS = ['HEAD', 'GET', 'OPTIONS']
+export const ALLOWED_CACHING_PROXY_REQUEST_METHODS = ['HEAD', 'GET', 'OPTIONS']
 
 /**
  * This path matching RE matches on /mobify/proxy and then skips one path
@@ -655,7 +656,7 @@ export const configureProxy = ({
     return (req, res, next) => {
         // This function will only be called for requests for the
         // current proxy config.
-        if (!WHITELISTED_CACHING_PROXY_REQUEST_METHODS.includes(req.method)) {
+        if (!ALLOWED_CACHING_PROXY_REQUEST_METHODS.includes(req.method)) {
             return res
                 .status(405)
                 .send(`Method ${req.method} not supported for caching proxy`)

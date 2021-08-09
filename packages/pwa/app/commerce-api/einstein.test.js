@@ -48,7 +48,8 @@ describe('EinsteinAPI', () => {
                     'Content-Type': 'application/json',
                     'x-cq-client-id': 'test-id'
                 },
-                body: '{"product":{"id":"56736828M","sku":"","altId":"","altIdType":""}}'
+                body:
+                    '{"product":{"id":"56736828M","sku":"","altId":"","altIdType":""},"userId":"test-usid","cookieId":""}'
             }
         )
     })
@@ -64,7 +65,7 @@ describe('EinsteinAPI', () => {
                     'x-cq-client-id': 'test-id'
                 },
                 body:
-                    '{"products":[{"id":"883360544021M","sku":"","price":155,"quantity":1}],"userId":"test-usid"}'
+                    '{"products":[{"id":"883360544021M","sku":"","price":155,"quantity":1}],"userId":"test-usid","cookieId":""}'
             }
         )
     })
@@ -80,7 +81,7 @@ describe('EinsteinAPI', () => {
                     'x-cq-client-id': 'test-id'
                 },
                 body:
-                    '{"recommenderName":"testRecommender","__recoUUID":"883360544021M","product":{"id":"56736828M","sku":"","altId":"","altIdType":""},"userId":"test-usid"}'
+                    '{"recommenderName":"testRecommender","__recoUUID":"883360544021M","product":{"id":"56736828M","sku":"","altId":"","altIdType":""},"userId":"test-usid","cookieId":""}'
             }
         )
     })
@@ -96,7 +97,7 @@ describe('EinsteinAPI', () => {
                     'x-cq-client-id': 'test-id'
                 },
                 body:
-                    '{"recommenderName":"testRecommender","__recoUUID":"883360544021M","products":{"id":"test-reco"},"userId":"test-usid"}'
+                    '{"recommenderName":"testRecommender","__recoUUID":"883360544021M","products":{"id":"test-reco"},"userId":"test-usid","cookieId":""}'
             }
         )
     })
@@ -129,7 +130,7 @@ describe('EinsteinAPI', () => {
                     'Content-Type': 'application/json',
                     'x-cq-client-id': 'test-id'
                 },
-                body: '{"userId":"test-usid"}'
+                body: '{"userId":"test-usid","cookieId":""}'
             }
         )
 
@@ -182,7 +183,7 @@ describe('EinsteinAPI', () => {
                     'Content-Type': 'application/json',
                     'x-cq-client-id': 'test-id'
                 },
-                body: '{"userId":"test-usid"}'
+                body: '{"userId":"test-usid","cookieId":""}'
             }
         )
 

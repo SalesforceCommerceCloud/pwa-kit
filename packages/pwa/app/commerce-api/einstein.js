@@ -47,6 +47,10 @@ class EinsteinAPI {
                 altId,
                 altIdType
             },
+            userId: this.commerceAPI.auth.encUserId
+                ? this.commerceAPI.auth.encUserId
+                : this.commerceAPI.auth.usid,
+            cookieId: this.commerceAPI.auth.encUserId ? this.commerceAPI.auth.usid : '',
             ...args
         }
 
@@ -65,7 +69,10 @@ class EinsteinAPI {
             recommenderName,
             __recoUUID,
             products: products,
-            userId: this.commerceAPI.auth.usid,
+            userId: this.commerceAPI.auth.encUserId
+                ? this.commerceAPI.auth.encUserId
+                : this.commerceAPI.auth.usid,
+            cookieId: this.commerceAPI.auth.encUserId ? this.commerceAPI.auth.usid : '',
             ...args
         }
 
@@ -90,7 +97,10 @@ class EinsteinAPI {
                 altId,
                 altIdType
             },
-            userId: this.commerceAPI.auth.usid,
+            userId: this.commerceAPI.auth.encUserId
+                ? this.commerceAPI.auth.encUserId
+                : this.commerceAPI.auth.usid,
+            cookieId: this.commerceAPI.auth.encUserId ? this.commerceAPI.auth.usid : '',
             ...args
         }
 
@@ -106,7 +116,10 @@ class EinsteinAPI {
         const method = 'POST'
         const body = {
             products: [product],
-            userId: this.commerceAPI.auth.usid,
+            userId: this.commerceAPI.auth.encUserId
+                ? this.commerceAPI.auth.encUserId
+                : this.commerceAPI.auth.usid,
+            cookieId: this.commerceAPI.auth.encUserId ? this.commerceAPI.auth.usid : '',
             ...args
         }
 
@@ -133,7 +146,10 @@ class EinsteinAPI {
         const endpoint = `/personalization/recs/${this.config.siteId}/${recommenderName}`
         const method = 'POST'
         const body = {
-            userId: this.commerceAPI.auth.usid,
+            userId: this.commerceAPI.auth.encUserId
+                ? this.commerceAPI.auth.encUserId
+                : this.commerceAPI.auth.usid,
+            cookieId: this.commerceAPI.auth.encUserId ? this.commerceAPI.auth.usid : '',
             ...args
         }
 
@@ -153,7 +169,10 @@ class EinsteinAPI {
         const endpoint = `/personalization/${this.config.siteId}/zones/${zoneName}/recs`
         const method = 'POST'
         const body = {
-            userId: this.commerceAPI.auth.usid,
+            userId: this.commerceAPI.auth.encUserId
+                ? this.commerceAPI.auth.encUserId
+                : this.commerceAPI.auth.usid,
+            cookieId: this.commerceAPI.auth.encUserId ? this.commerceAPI.auth.usid : '',
             ...args
         }
 

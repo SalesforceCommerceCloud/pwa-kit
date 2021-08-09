@@ -47,7 +47,7 @@ someExperimentalFunction() => {
 ```
 
 This is the warning that will print in your browser:
-`[MOBIFY API WARNING]: You are currently using an experimental function: [someExperimentalFunction] This function may change at any time.`
+`[PWA Kit API WARNING]: You are currently using an experimental function: [someExperimentalFunction] This function may change at any time.`
 
 ```javascript
 import {deprecate} from './utils/warnings'
@@ -61,7 +61,7 @@ someFunctionToBeDeprecated() => {
 ```
 
 This is the warning that will print in your browser:
-`[MOBIFY API WARNING]: You are currently using an deprecated function: [someFunctionToBeDeprecated]. It will be removed in version 1.2.3. Please use [newFunction] instead.`
+`[PWA Kit API WARNING]: You are currently using an deprecated function: [someFunctionToBeDeprecated]. It will be removed in version 1.2.3. Please use [newFunction] instead.`
 
 ## Documentation
 

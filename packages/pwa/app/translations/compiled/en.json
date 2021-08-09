@@ -11,6 +11,12 @@
       "value": "Estimated Total"
     }
   ],
+  "+y/wae": [
+    {
+      "type": 1,
+      "value": "errorMessage"
+    }
+  ],
   "/kLqfV": [
     {
       "type": 0,
@@ -33,6 +39,24 @@
     {
       "type": 0,
       "value": "Password must contain at least one lowercase letter"
+    }
+  ],
+  "1TQMt0": [
+    {
+      "type": 1,
+      "value": "quantity"
+    },
+    {
+      "type": 0,
+      "value": " "
+    },
+    {
+      "type": 1,
+      "value": "itemLabel"
+    },
+    {
+      "type": 0,
+      "value": " added to cart."
     }
   ],
   "1b9Q93": [
@@ -109,12 +133,6 @@
       "value": "Sign in to retrieve your saved items or continue shopping"
     }
   ],
-  "3kJE8G": [
-    {
-      "type": 0,
-      "value": "Something went wrong. Try again."
-    }
-  ],
   "3rGMFt": [
     {
       "type": 0,
@@ -135,6 +153,12 @@
     {
       "type": 1,
       "value": "date"
+    }
+  ],
+  "4UPOXx": [
+    {
+      "type": 0,
+      "value": "Confirm Remove Item"
     }
   ],
   "5JcXdV": [
@@ -191,6 +215,12 @@
       "value": "Payment Details"
     }
   ],
+  "92jEbC": [
+    {
+      "type": 0,
+      "value": "Are you sure you want to remove this item from your wishlist?"
+    }
+  ],
   "9Npj92": [
     {
       "type": 0,
@@ -243,6 +273,12 @@
     {
       "type": 0,
       "value": "This email already has an account."
+    }
+  ],
+  "Cl4TrE": [
+    {
+      "type": 0,
+      "value": "Add to wishlist"
     }
   ],
   "Cm91xY": [
@@ -475,6 +511,12 @@
       "value": "stateOrProvince"
     }
   ],
+  "OKPeJz": [
+    {
+      "type": 0,
+      "value": "Item removed from cart"
+    }
+  ],
   "ONNUqG": [
     {
       "type": 0,
@@ -581,16 +623,16 @@
       "value": "First Name"
     }
   ],
-  "QRowXV": [
-    {
-      "type": 0,
-      "value": "Something went wrong. Try again!"
-    }
-  ],
   "QclMUn": [
     {
       "type": 0,
       "value": "Please select your country"
+    }
+  ],
+  "Qm3TN9": [
+    {
+      "type": 0,
+      "value": "Are you sure you want to continue ?"
     }
   ],
   "Qpxx+l": [
@@ -609,6 +651,12 @@
     {
       "type": 0,
       "value": "Sign in"
+    }
+  ],
+  "SRkOX8": [
+    {
+      "type": 0,
+      "value": "No, keep item"
     }
   ],
   "SeGQoh": [
@@ -741,12 +789,6 @@
       "value": "Quantity:"
     }
   ],
-  "W/5hwr": [
-    {
-      "type": 0,
-      "value": "Something went wrong. Please try again."
-    }
-  ],
   "WHgdsk": [
     {
       "type": 0,
@@ -799,6 +841,12 @@
     {
       "type": 0,
       "value": "Back to Order History"
+    }
+  ],
+  "a5msuh": [
+    {
+      "type": 0,
+      "value": "Yes"
     }
   ],
   "aheQdn": [
@@ -865,6 +913,18 @@
       "value": "Save & Continue to Shipping Method"
     }
   ],
+  "bk7ZVA": [
+    {
+      "type": 0,
+      "value": "Are you sure you want to remove this item ?"
+    }
+  ],
+  "c+bH65": [
+    {
+      "type": 0,
+      "value": "Confirm Action"
+    }
+  ],
   "c1zaMK": [
     {
       "type": 0,
@@ -893,6 +953,12 @@
     {
       "type": 0,
       "value": "Reviews"
+    }
+  ],
+  "dfEp3Z": [
+    {
+      "type": 0,
+      "value": "Yes, remove item"
     }
   ],
   "e6Ph5+": [
@@ -937,6 +1003,12 @@
     {
       "type": 0,
       "value": "Order Details"
+    }
+  ],
+  "fG2sM9": [
+    {
+      "type": 0,
+      "value": "Please sign in to continue!"
     }
   ],
   "fIHFDI": [
@@ -1155,6 +1227,12 @@
       "value": "Order Summary"
     }
   ],
+  "jAOn1A": [
+    {
+      "type": 0,
+      "value": "Are you sure you want to remove this item from your cart?"
+    }
+  ],
   "jvo0vs": [
     {
       "type": 0,
@@ -1335,6 +1413,12 @@
     {
       "type": 0,
       "value": "Please enter a valid email address"
+    }
+  ],
+  "oUWADl": [
+    {
+      "type": 0,
+      "value": "No"
     }
   ],
   "odTkf5": [
@@ -1585,6 +1669,12 @@
     {
       "type": 0,
       "value": "Edit"
+    }
+  ],
+  "x3r6nd": [
+    {
+      "type": 0,
+      "value": "1 item removed from wishlist"
     }
   ],
   "x6hxSH": [
