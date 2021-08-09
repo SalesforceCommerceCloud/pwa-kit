@@ -1,6 +1,6 @@
 import React, {useState, useEffect} from 'react'
 import PropTypes from 'prop-types'
-import {FormattedMessage} from 'react-intl'
+import {FormattedMessage, useIntl} from 'react-intl'
 import {Box, Button, Container, Heading, SimpleGrid, Stack} from '@chakra-ui/react'
 import {useForm, Controller} from 'react-hook-form'
 import {shallowEquals} from '../../../utils/utils'
@@ -10,6 +10,82 @@ import ActionCard from '../../../components/action-card'
 import {PlusIcon} from '../../../components/icons'
 import AddressDisplay from '../../../components/address-display'
 import AddressFields from '../../../components/forms/address-fields'
+import FormActionButtons from '../../../components/forms/form-action-buttons'
+
+const ShippingAddressEditForm = ({
+    title,
+    hasSavedAddresses,
+    toggleAddressEdit,
+    hideSubmitButton,
+    form,
+    submitButtonLabel
+}) => {
+    const {formatMessage} = useIntl()
+
+    return (
+        <Box
+            {...(hasSavedAddresses && {
+                gridColumn: [1, 1, 'span 2'],
+                paddingX: [4, 4, 6],
+                paddingY: 6,
+                rounded: 'base',
+                border: '1px solid',
+                borderColor: 'blue.600'
+            })}
+        >
+            <Stack spacing={6}>
+                {hasSavedAddresses && (
+                    <Heading as="h3" size="sm">
+                        {title}
+                    </Heading>
+                )}
+
+                <Stack spacing={6}>
+                    <AddressFields form={form} />
+
+                    {hasSavedAddresses ? (
+                        <FormActionButtons
+                            saveButtonLabel={formatMessage({
+                                defaultMessage: 'Save & Continue to Shipping Method'
+                            })}
+                            onCancel={toggleAddressEdit}
+                        />
+                    ) : (
+                        !hideSubmitButton && (
+                            <Box>
+                                <Container variant="form">
+                                    <Button
+                                        type="submit"
+                                        width="full"
+                                        disabled={form.formState.isSubmitting}
+                                    >
+                                        {formatMessage(
+                                            {
+                                                defaultMessage: '{submitButtonLabel}'
+                                            },
+                                            {
+                                                submitButtonLabel
+                                            }
+                                        )}
+                                    </Button>
+                                </Container>
+                            </Box>
+                        )
+                    )}
+                </Stack>
+            </Stack>
+        </Box>
+    )
+}
+
+ShippingAddressEditForm.propTypes = {
+    title: PropTypes.string,
+    hasSavedAddresses: PropTypes.bool,
+    toggleAddressEdit: PropTypes.func,
+    hideSubmitButton: PropTypes.bool,
+    form: PropTypes.object,
+    submitButtonLabel: PropTypes.string
+}
 
 const ShippingAddressSelection = ({
     form,
@@ -18,9 +94,11 @@ const ShippingAddressSelection = ({
     hideSubmitButton = false,
     onSubmit = async () => null
 }) => {
+    const {formatMessage} = useIntl()
     const {customer} = useCheckout()
     const hasSavedAddresses = customer.addresses && customer.addresses.length > 0
     const [isEditingAddress, setIsEditingAddress] = useState(!hasSavedAddresses)
+    const [selectedAddressId, setSelectedAddressId] = useState(false)
 
     form =
         form ||
@@ -36,9 +114,7 @@ const ShippingAddressSelection = ({
         hasSavedAddresses &&
         selectedAddress &&
         customer.addresses.find((savedAddress) => {
-            // eslint-disable-next-line no-unused-vars
             const {addressId, creationDate, lastModified, preferred, ...address} = savedAddress
-            // eslint-disable-next-line no-unused-vars
             const {id, _type, ...selectedAddr} = selectedAddress
             return shallowEquals(address, selectedAddr)
         })
@@ -64,7 +140,16 @@ const ShippingAddressSelection = ({
         }
     }, [matchedAddress])
 
+    // Updates the selected customer address if we've an address selected
+    // else saves a new customer address
     const submitForm = async (address) => {
+        if (selectedAddressId) {
+            address = {...address, addressId: selectedAddressId}
+        }
+
+        setIsEditingAddress(false)
+        form.reset({addressId: ''})
+
         await onSubmit(address)
     }
 
@@ -86,11 +171,17 @@ const ShippingAddressSelection = ({
 
     // Opens/closes the 'add address' form. Notice that when toggling either state,
     // we reset the form so as to remove any address selection.
-    const toggleAddressEdit = () => {
-        if (!isEditingAddress) {
+    const toggleAddressEdit = (address = undefined) => {
+        if (address?.addressId) {
+            setSelectedAddressId(address.addressId)
+            form.reset({...address})
+            setIsEditingAddress(true)
+        } else {
+            setSelectedAddressId(undefined)
             form.reset({addressId: ''})
+            setIsEditingAddress(!isEditingAddress)
         }
-        setIsEditingAddress(!isEditingAddress)
+
         form.trigger()
     }
 
@@ -105,22 +196,55 @@ const ShippingAddressSelection = ({
                         rules={{required: !isEditingAddress}}
                         render={({value}) => (
                             <RadioCardGroup value={value} onChange={handleAddressIdSelection}>
-                                <SimpleGrid columns={[1, 1, 2]} spacing={4}>
+                                <SimpleGrid
+                                    columns={[1, 1, 2]}
+                                    spacing={4}
+                                    gridAutoFlow="row dense"
+                                >
                                     {customer.addresses?.map((address) => (
-                                        <RadioCard
-                                            key={address.addressId}
-                                            value={address.addressId}
-                                        >
-                                            <ActionCard
-                                                p={0}
-                                                border="none"
-                                                onRemove={() =>
-                                                    removeSavedAddress(address.addressId)
-                                                }
-                                            >
-                                                <AddressDisplay address={address} />
-                                            </ActionCard>
-                                        </RadioCard>
+                                        <React.Fragment key={address.addressId}>
+                                            <RadioCard value={address.addressId}>
+                                                <ActionCard
+                                                    padding={0}
+                                                    border="none"
+                                                    onRemove={() =>
+                                                        removeSavedAddress(address.addressId)
+                                                    }
+                                                    onEdit={() => toggleAddressEdit(address)}
+                                                >
+                                                    <AddressDisplay address={address} />
+                                                </ActionCard>
+                                                {/*Arrow up icon pointing to the address that is being edited*/}
+                                                {isEditingAddress &&
+                                                    address.addressId === selectedAddressId && (
+                                                        <Box
+                                                            width={3}
+                                                            height={3}
+                                                            borderLeft="1px solid"
+                                                            borderTop="1px solid"
+                                                            borderColor="blue.600"
+                                                            position="absolute"
+                                                            left="50%"
+                                                            bottom="-23px"
+                                                            background="white"
+                                                            transform="rotate(45deg)"
+                                                        />
+                                                    )}
+                                            </RadioCard>
+                                            {isEditingAddress &&
+                                                address.addressId === selectedAddressId && (
+                                                    <ShippingAddressEditForm
+                                                        title={formatMessage({
+                                                            defaultMessage: 'Edit Shipping Address'
+                                                        })}
+                                                        hasSavedAddresses={hasSavedAddresses}
+                                                        toggleAddressEdit={toggleAddressEdit}
+                                                        hideSubmitButton={hideSubmitButton}
+                                                        form={form}
+                                                        submitButtonLabel={submitButtonLabel}
+                                                    />
+                                                )}
+                                        </React.Fragment>
                                     ))}
 
                                     {!isEditingAddress && (
@@ -129,7 +253,7 @@ const ShippingAddressSelection = ({
                                             border="1px dashed"
                                             borderColor="gray.200"
                                             color="blue.600"
-                                            h={['44px', '44px', '167px']}
+                                            height={['44px', '44px', '167px']}
                                             rounded="base"
                                             fontWeight="medium"
                                             leftIcon={<PlusIcon boxSize={'15px'} />}
@@ -144,42 +268,17 @@ const ShippingAddressSelection = ({
                     />
                 )}
 
-                {isEditingAddress && (
-                    <Box
-                        {...(hasSavedAddresses && {
-                            px: [4, 4, 6],
-                            py: 6,
-                            rounded: 'base',
-                            border: '1px solid',
-                            borderColor: 'blue.600'
+                {isEditingAddress && !selectedAddressId && (
+                    <ShippingAddressEditForm
+                        title={formatMessage({
+                            defaultMessage: 'Add New Address'
                         })}
-                    >
-                        <Stack spacing={6}>
-                            {hasSavedAddresses && (
-                                <Heading as="h3" size="sm">
-                                    <FormattedMessage defaultMessage="Add New Address" />
-                                </Heading>
-                            )}
-
-                            <Stack spacing={6}>
-                                <AddressFields form={form} />
-
-                                {!hideSubmitButton && (
-                                    <Box>
-                                        <Container variant="form">
-                                            <Button
-                                                type="submit"
-                                                w="full"
-                                                disabled={form.formState.isSubmitting}
-                                            >
-                                                {submitButtonLabel}
-                                            </Button>
-                                        </Container>
-                                    </Box>
-                                )}
-                            </Stack>
-                        </Stack>
-                    </Box>
+                        hasSavedAddresses={hasSavedAddresses}
+                        toggleAddressEdit={toggleAddressEdit}
+                        hideSubmitButton={hideSubmitButton}
+                        form={form}
+                        submitButtonLabel={submitButtonLabel}
+                    />
                 )}
 
                 {!isEditingAddress && !hideSubmitButton && (
@@ -187,10 +286,15 @@ const ShippingAddressSelection = ({
                         <Container variant="form">
                             <Button
                                 type="submit"
-                                w="full"
+                                width="full"
                                 disabled={!form.formState.isValid || form.formState.isSubmitting}
                             >
-                                {submitButtonLabel}
+                                {formatMessage(
+                                    {
+                                        defaultMessage: '{submitButtonLabel}'
+                                    },
+                                    {submitButtonLabel}
+                                )}
                             </Button>
                         </Container>
                     </Box>

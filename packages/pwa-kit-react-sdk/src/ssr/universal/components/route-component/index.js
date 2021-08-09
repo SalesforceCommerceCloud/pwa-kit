@@ -124,6 +124,11 @@ export const routeComponent = (Wrapped, isPage, locals) => {
          * If not implemented `getProps()` does nothing and the component will not
          * fetch any data.
          *
+         * Before the promise is returned, a reference is stored for later
+         * comparision with a call to isLatestPropsPromise. This is used to
+         * resolve race conditions when there are multiple getProps calls
+         * active.
+         *
          * @param {Object} args
          *
          * @param {Request} args.req - an Express HTTP Request object on the server,
@@ -144,11 +149,11 @@ export const routeComponent = (Wrapped, isPage, locals) => {
          * @return {Promise<Object>}
          */
         // eslint-disable-next-line
-        static async getProps(args) {
-            const component = await RouteComponent.getComponent()
-            return component.getProps
-                ? component.getProps({...args, ...extraArgs})
-                : Promise.resolve()
+        static getProps(args) {
+            RouteComponent._latestPropsPromise = RouteComponent.getComponent().then((component) =>
+                component.getProps ? component.getProps({...args, ...extraArgs}) : Promise.resolve()
+            )
+            return RouteComponent._latestPropsPromise
         }
 
         /**
@@ -176,6 +181,17 @@ export const routeComponent = (Wrapped, isPage, locals) => {
             return RouteComponent.getComponent().then((c) =>
                 c.getTemplateName ? c.getTemplateName() : Promise.resolve(wrappedComponentName)
             )
+        }
+
+        /**
+         * Check if a promise is still the latest call to getProps. This is used
+         * to check if the results are outdated before using them.
+         *
+         * @param {Promise} propsPromise - The promise from the call to getProps to check
+         * @returns true or false
+         */
+        static isLatestPropsPromise(propsPromise) {
+            return propsPromise === RouteComponent._latestPropsPromise
         }
 
         componentDidMount() {
@@ -293,25 +309,34 @@ export const routeComponent = (Wrapped, isPage, locals) => {
                     }
                 })
 
+                /**
+                 * When a user triggers two getProps for the same component,
+                 * we'd like to always use the one for the later user action
+                 * instead of the one that resolves last. getProps
+                 * stores a reference to the promise that we check before we use
+                 * the results from it.
+                 */
                 console.log(`Calling getProps for '${templateName}'`)
                 const req = undefined
                 const res = undefined
-                const childProps =
-                    (await RouteComponent.getProps({
-                        req,
-                        res,
-                        params,
-                        location
-                    })) || {}
+                const propsPromise = RouteComponent.getProps({
+                    req,
+                    res,
+                    params,
+                    location
+                })
+                const childProps = await propsPromise
 
                 this._suppressUpdate = false
 
-                await setStateAsync({
-                    childProps: {
-                        ...childProps,
-                        isLoading: false
-                    }
-                })
+                if (RouteComponent.isLatestPropsPromise(propsPromise)) {
+                    await setStateAsync({
+                        childProps: {
+                            ...childProps,
+                            isLoading: false
+                        }
+                    })
+                }
 
                 onGetPropsComplete()
                 emitPageLoadEvent(templateName, now())

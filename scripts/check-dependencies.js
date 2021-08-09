@@ -43,11 +43,7 @@ const rootDir = path.join(__dirname, '..')
 const packagesDir = path.join(rootDir, 'packages')
 const assetsDir = path.join(__dirname, 'assets')
 
-// The devcenter is excluded from all this, because Gatsby comes with its own
-// opinionated build pipeline – it configures its own build tools.
-const excludedPackages = [
-    'devcenter'
-]
+const excludedPackages = []
 
 // We are going to copy these files into each package from this script, in order to
 // standardize them.

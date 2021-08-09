@@ -1,7 +1,6 @@
 import {useContext, useMemo} from 'react'
-import {getAppOrigin} from 'pwa-kit-react-sdk/dist/utils/url'
 import {nanoid} from 'nanoid'
-import {useCommerceAPI, CustomerContext, createGetTokenBody} from '../utils'
+import {useCommerceAPI, CustomerContext} from '../utils'
 
 export default function useCustomer() {
     const api = useCommerceAPI()
@@ -34,38 +33,23 @@ export default function useCustomer() {
              * @param {string} credentials.password
              */
             async login(credentials) {
-                const res = await api.auth.login(credentials)
-
-                if (credentials) {
-                    const tokenBody = createGetTokenBody(
-                        res,
-                        `${getAppOrigin()}/callback`,
-                        window.sessionStorage.getItem('codeVerifier')
-                    )
-                    const {customer_id} = await api.auth.getLoggedInToken(tokenBody)
-
-                    const customer = await api.shopperCustomers.getCustomer({
-                        parameters: {customerId: customer_id}
-                    })
-
-                    setCustomer(customer)
+                const skeletonCustomer = await api.auth.login(credentials)
+                if (skeletonCustomer.authType === 'guest') {
+                    setCustomer(skeletonCustomer)
                 } else {
-                    let customer = res.customer
-
-                    if (res.access_token) {
-                        customer = await api.shopperCustomers.getCustomer({
-                            parameters: {customerId: res.customer_id}
-                        })
-                    }
+                    const customer = await api.shopperCustomers.getCustomer({
+                        parameters: {customerId: skeletonCustomer.customerId}
+                    })
                     setCustomer(customer)
                 }
             },
 
             /**
              * Log out current customer.
+             * and retrive a guest access token
              */
             async logout() {
-                const {customer} = await api.auth.logout()
+                const customer = await api.auth.logout()
                 setCustomer(customer)
             },
 

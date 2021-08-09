@@ -9,6 +9,7 @@ import space from './foundations/space'
 import layerStyles from './foundations/layerStyles'
 
 // Base component style overrides
+import Alert from './components/base/alert'
 import Accordion from './components/base/accordion'
 import Badge from './components/base/badge'
 import Button from './components/base/button'
@@ -57,6 +58,7 @@ const overrides = {
     components: {
         // base components
         Accordion,
+        Alert,
         Badge,
         Button,
         Checkbox,

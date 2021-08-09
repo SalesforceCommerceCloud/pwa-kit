@@ -163,7 +163,6 @@ export const CheckoutProvider = ({children}) => {
              * @param {Object} addressData
              */
             async setShippingAddress(addressData) {
-                /* eslint-disable no-unused-vars */
                 const {
                     id,
                     preferred,
@@ -173,13 +172,14 @@ export const CheckoutProvider = ({children}) => {
                     addressName,
                     ...address
                 } = addressData
-                /* eslint-enable no-unused-vars */
 
                 await basket.setShippingAddress(address)
 
-                // Save the address to the customer's account if they are registered.
-                if (!state.isGuestCheckout && !addressId) {
-                    customer.addSavedAddress(address)
+                // Add/Update the address to the customer's account if they are registered.
+                if (!state.isGuestCheckout) {
+                    !addressId
+                        ? customer.addSavedAddress(address)
+                        : customer.updateSavedAddress({...address, addressId: addressId})
                 }
             },
 
@@ -225,7 +225,6 @@ export const CheckoutProvider = ({children}) => {
              * @param {Object} payment
              */
             async setPayment(payment) {
-                // eslint-disable-next-line no-unused-vars
                 const {expiry, paymentInstrumentId, ...selectedPayment} = payment
 
                 if (paymentInstrumentId) {
@@ -281,7 +280,6 @@ export const CheckoutProvider = ({children}) => {
              * @param {Object} addressData
              */
             async setBillingAddress(addressData) {
-                /* eslint-disable no-unused-vars */
                 const {
                     id,
                     preferred,
@@ -291,7 +289,6 @@ export const CheckoutProvider = ({children}) => {
                     addressName,
                     ...address
                 } = addressData
-                /* eslint-enable no-unused-vars */
 
                 await basket.setBillingAddress(address)
 

@@ -2,10 +2,10 @@
 /* Copyright (c) 2021 Mobify Research & Development Inc. All rights reserved. */
 /* * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
 
-import React, {useEffect, useState} from 'react'
+import React, {useState} from 'react'
 import PropTypes from 'prop-types'
 import {FormattedMessage, defineMessages, useIntl} from 'react-intl'
-import {Route, Switch, useRouteMatch} from 'react-router'
+import {Route, Switch, useRouteMatch, Redirect} from 'react-router'
 import {
     Accordion,
     AccordionButton,
@@ -20,7 +20,6 @@ import {
     Text
 } from '@chakra-ui/react'
 import useCustomer from '../../commerce-api/hooks/useCustomer'
-import useNavigation from '../../hooks/use-navigation'
 import Seo from '../../components/seo'
 import Link from '../../components/link'
 import {
@@ -35,6 +34,8 @@ import AccountDetail from './profile'
 import AccountAddresses from './addresses'
 import AccountOrders from './orders'
 import AccountPaymentMethods from './payments'
+import {useLocale} from '../../locale'
+import {useLocation} from 'react-router-dom'
 
 const messages = defineMessages({
     profile: {defaultMessage: 'Account Details'},
@@ -69,16 +70,21 @@ const navLinks = [
 const Account = () => {
     const {path, url} = useRouteMatch()
     const {formatMessage} = useIntl()
-    const navigate = useNavigation()
     const customer = useCustomer()
+    const [locale] = useLocale()
+    const location = useLocation()
     const [mobileNavIndex, setMobileNavIndex] = useState(-1)
 
     // If we have customer data and they are not registered, push to login page
-    useEffect(() => {
-        if (customer.authType != null && customer.authType !== 'registered') {
-            navigate('/login')
-        }
-    }, [customer])
+    // Using Redirect allows us to store the directed page to location
+    // so we can direct users back after they are successfully log in
+    if (customer.authType != null && customer.authType !== 'registered') {
+        return (
+            <Redirect
+                to={{pathname: `/${locale}/login`, state: {directedFrom: location.pathname}}}
+            />
+        )
+    }
 
     return (
         <Box data-testid="account-page" layerStyle="page" paddingTop={[4, 4, 12, 12, 16]}>

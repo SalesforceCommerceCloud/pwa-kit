@@ -34,7 +34,6 @@ const CheckoutConfirmation = () => {
     // page. We capture it in local state to use for our UI. A new basket will be automatically
     // created so we should only reference our captured order data here.
     const [order] = useState(basket)
-
     // If we don't have an order object on first render we need to transition back to a
     // different page. Fow now, we push to the homepage.
     useEffect(() => {

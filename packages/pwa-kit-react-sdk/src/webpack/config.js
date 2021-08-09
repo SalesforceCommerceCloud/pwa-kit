@@ -282,7 +282,7 @@ const ssrServerConfig = Object.assign(
     {
         name: 'ssr-server',
         mode,
-        devtool: 'cheap-source-map', // Always use source map, makes debugging the server much easier.
+        devtool: 'source-map', // Always use source map, makes debugging the server much easier.
         entry: './app/ssr.js',
         target: 'node',
         output: {

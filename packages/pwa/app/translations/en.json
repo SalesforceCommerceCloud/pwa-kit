@@ -1,4 +1,7 @@
 {
+  "+O5yEM": {
+    "defaultMessage": "Promotions Applied"
+  },
   "+dLAnb": {
     "defaultMessage": "Estimated Total"
   },
@@ -19,6 +22,9 @@
   },
   "25WwxF": {
     "defaultMessage": "Don't have an account?"
+  },
+  "2BHb6K": {
+    "defaultMessage": "Applied promotions info"
   },
   "2SvpuI": {
     "defaultMessage": "Log in here"
@@ -94,6 +100,9 @@
   },
   "AwzkSM": {
     "defaultMessage": "Tax"
+  },
+  "B/orA3": {
+    "defaultMessage": "Promotions"
   },
   "B5/YE0": {
     "defaultMessage": "Profile updated"
@@ -181,6 +190,9 @@
   "NymXNv": {
     "defaultMessage": "New Payment Method Saved"
   },
+  "O3zHDW": {
+    "defaultMessage": "{submitButtonLabel}"
+  },
   "O95R3Z": {
     "defaultMessage": "Phone"
   },
@@ -196,6 +208,9 @@
   },
   "OVAmhz": {
     "defaultMessage": "Back to cart"
+  },
+  "OVvfLK": {
+    "defaultMessage": "You're now signed in"
   },
   "Olgsm/": {
     "defaultMessage": "Create an account for faster checkout"
@@ -287,6 +302,9 @@
   "VSlYv6": {
     "defaultMessage": "Quantity:"
   },
+  "W/5hwr": {
+    "defaultMessage": "Something went wrong. Please try again."
+  },
   "WHgdsk": {
     "defaultMessage": "Out of stock"
   },
@@ -302,9 +320,6 @@
   "Yy/yDL": {
     "defaultMessage": "Reset password"
   },
-  "Yywm0p": {
-    "defaultMessage": "Continue shopping"
-  },
   "YzZa8+": {
     "defaultMessage": "My Profile"
   },
@@ -316,9 +331,6 @@
   },
   "aHuP93": {
     "defaultMessage": "Do you have a gift card or promo code?"
-  },
-  "agOXPD": {
-    "defaultMessage": "Size"
   },
   "aheQdn": {
     "defaultMessage": "Last Name"
@@ -332,6 +344,9 @@
   },
   "bXv4wB": {
     "defaultMessage": "Shop New Arrivals"
+  },
+  "bhUBy4": {
+    "defaultMessage": "Save & Continue to Shipping Method"
   },
   "c1zaMK": {
     "defaultMessage": "Please enter your address"
@@ -436,9 +451,6 @@
   "hDI+JM": {
     "defaultMessage": "Sort by"
   },
-  "hcdFiU": {
-    "defaultMessage": "each"
-  },
   "header.button.assistive_msg.logo": {
     "defaultMessage": "Logo"
   },
@@ -483,6 +495,9 @@
   },
   "lKv8ex": {
     "defaultMessage": "Default"
+  },
+  "llHgJz": {
+    "defaultMessage": "Welcome {name},"
   },
   "login-redirect.message.welcome": {
     "defaultMessage": "Login Redirect"
@@ -560,6 +575,9 @@
   "offline_banner.message": {
     "defaultMessage": "You're currently browsing in offline mode"
   },
+  "pQ2F3h": {
+    "defaultMessage": "Edit Shipping Address"
+  },
   "pS9/Sw": {
     "defaultMessage": "Please enter your card number"
   },
@@ -597,9 +615,6 @@
   "s7dATg": {
     "defaultMessage": "Edit cart"
   },
-  "saIij4": {
-    "defaultMessage": "Where would you like to go next?"
-  },
   "sy+pv5": {
     "defaultMessage": "Email"
   },
@@ -614,9 +629,6 @@
   },
   "uE6ELS": {
     "defaultMessage": "Not provided"
-  },
-  "uMhpKe": {
-    "defaultMessage": "Color"
   },
   "uSpe21": {
     "defaultMessage": "Edit Address"
@@ -663,9 +675,6 @@
   "xuTqgN": {
     "defaultMessage": "Payment Methods"
   },
-  "yHfqLT": {
-    "defaultMessage": "View account"
-  },
   "z+Zrln": {
     "defaultMessage": "Set as default"
   },
@@ -677,6 +686,10 @@
   },
   "zHi6BD": {
     "defaultMessage": "Please enter 2-letter state/province"
+  },
+  "zODu/+": {
+    "defaultMessage": "ea",
+    "description": "Abbreviated 'each', follows price per item, like $10/ea"
   },
   "zXbRZR": {
     "defaultMessage": "Order Number: {orderNumber}"

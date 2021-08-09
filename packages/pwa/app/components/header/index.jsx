@@ -100,7 +100,11 @@ const Header = ({
                         icon={
                             <>
                                 <BasketIcon />
-                                <Badge variant="notification">{basket.itemAccumulatedCount}</Badge>
+                                {basket?.loaded() && (
+                                    <Badge variant="notification">
+                                        {basket.itemAccumulatedCount}
+                                    </Badge>
+                                )}
                             </>
                         }
                         variant="unstyled"

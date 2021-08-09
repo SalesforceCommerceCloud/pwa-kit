@@ -197,7 +197,26 @@ jobs:
       - slack/status:
           fail_only: true
           only_for_branches: salesforce-master,salesforce-develop
-
+  testNode14:
+    docker:
+      - image: circleci/node:14-stretch-browsers
+    steps:
+      - checkout
+      - setup
+      - runaudits
+      - runtests:
+          enableIntegrationTests: false
+      - smoketestscripts
+      - checkclean
+      - store_test_results:
+          path: packages/pwa/tests/reports
+          when: always
+      - store_artifacts:
+          path: packages/pwa/tests/screenshots
+          when: always
+      - slack/status:
+          fail_only: true
+          only_for_branches: salesforce-master,salesforce-develop
   generatedSFCCProjectTest:
     docker:
       - image: circleci/node:12-stretch-browsers
@@ -272,6 +291,7 @@ workflows:
   test:
     jobs:
       - testNode12
+      - testNode14
       - generatedSFCCProjectTest
   nightly-build:
     triggers:
@@ -283,6 +303,8 @@ workflows:
                 - salesforce-develop
     jobs:
       - testNode12:
+          context: nightly-build
+      - testNode14:
           context: nightly-build
       - generatedSFCCProjectTest:
           context: nightly-build

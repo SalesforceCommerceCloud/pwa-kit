@@ -124,7 +124,8 @@ test('Allows customer to sign in to their account', async () => {
                 ctx.json({
                     customer_id: 'test',
                     access_token: 'testtoken',
-                    refresh_token: 'testrefeshtoken'
+                    refresh_token: 'testrefeshtoken',
+                    usid: 'testusid'
                 })
             )
         ),

@@ -1,4 +1,5 @@
 import React from 'react'
+import {Crypto} from '@peculiar/webcrypto'
 import Checkout from './index'
 import {Route, Switch} from 'react-router-dom'
 import {screen, waitFor, within} from '@testing-library/react'
@@ -110,6 +111,41 @@ const server = setupServer(
     // mock product details
     rest.get('*/products', (req, res, ctx) => {
         return res(ctx.json({data: [{id: '701642811398M'}]}))
+    }),
+
+    rest.get('*/oauth2/authorize', (req, res, ctx) =>
+        res(ctx.delay(0), ctx.status(303), ctx.set('location', `/testcallback`))
+    ),
+
+    rest.get('*/testcallback', (req, res, ctx) => {
+        return res(ctx.delay(0), ctx.status(200))
+    }),
+
+    rest.get('*/customers/:customerId', (req, res, ctx) => {
+        return res(
+            ctx.delay(0),
+            ctx.status(200),
+            ctx.json({
+                authType: 'guest',
+                preferredLocale: 'en_US',
+                // Mocked customer ID should match the mocked basket's customer ID as
+                // it would with real usage, otherwise, the useShopper hook will detect
+                // the mismatch and attempt to refetch a new basket for the customer.
+                customerId: ocapiBasketWithItem.customer_info.customer_id
+            })
+        )
+    }),
+
+    rest.post('*/oauth2/token', (req, res, ctx) => {
+        return res(
+            ctx.delay(0),
+            ctx.json({
+                customer_id: ocapiBasketWithItem.customer_info.customer_id,
+                access_token: 'testtoken',
+                refresh_token: 'testrefeshtoken',
+                usid: 'testusid'
+            })
+        )
     })
 )
 
@@ -117,6 +153,14 @@ const server = setupServer(
 beforeAll(() => {
     jest.resetModules()
     server.listen({onUnhandledRequest: 'error'})
+
+    // Need to mock TextEncoder for tests
+    if (typeof TextEncoder === 'undefined') {
+        global.TextEncoder = require('util').TextEncoder
+    }
+
+    // Need to mock window.crypto for tests
+    window.crypto = new Crypto()
 })
 afterEach(() => {
     localStorage.clear()
@@ -262,7 +306,7 @@ test('Can proceed through checkout steps as guest', async () => {
     user.type(screen.getByLabelText(/city/i), 'Tampa')
     user.selectOptions(screen.getByLabelText(/state/i), ['FL'])
     user.type(screen.getByLabelText(/zip code/i), '33610')
-    user.click(screen.getByText(/continue to shipping options/i))
+    user.click(screen.getByText(/continue to shipping method/i))
 
     // Wait for next step to render
     await waitFor(() => {
@@ -352,7 +396,8 @@ test('Can proceed through checkout as registered customer', async () => {
                 ctx.json({
                     customer_id: 'test',
                     access_token: 'testtoken',
-                    refresh_token: 'testrefeshtoken'
+                    refresh_token: 'testrefeshtoken',
+                    usid: 'testusid'
                 })
             )
         }),
@@ -480,7 +525,7 @@ test('Can proceed through checkout as registered customer', async () => {
 
     // Select a saved address and continue
     user.click(screen.getByDisplayValue('savedaddress1'))
-    user.click(screen.getByText(/continue to shipping options/i))
+    user.click(screen.getByText(/continue to shipping method/i))
 
     // Wait for next step to render
     await waitFor(() => {

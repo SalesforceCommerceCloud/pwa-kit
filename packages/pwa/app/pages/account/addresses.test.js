@@ -3,9 +3,11 @@ import {screen, waitFor} from '@testing-library/react'
 import user from '@testing-library/user-event'
 import {rest} from 'msw'
 import {setupServer} from 'msw/node'
+import {Crypto} from '@peculiar/webcrypto'
 import {renderWithProviders} from '../../utils/test-utils'
 import AccountAddresses from './addresses'
 import useCustomer from '../../commerce-api/hooks/useCustomer'
+import {mockedRegisteredCustomer} from '../../commerce-api/mock-data'
 
 let mockCustomer = {}
 
@@ -52,7 +54,7 @@ jest.mock('@chakra-ui/toast', () => {
 const MockedComponent = () => {
     const customer = useCustomer()
     useEffect(() => {
-        customer.login()
+        customer.login('test@test.com', 'password')
     }, [])
     return (
         <div>
@@ -68,6 +70,33 @@ const server = setupServer(
     ),
     rest.get('*/customers/:customerId', (req, res, ctx) =>
         res(ctx.delay(0), ctx.json(mockCustomer))
+    ),
+    rest.post('*/oauth2/authorize', (req, res, ctx) =>
+        res(ctx.delay(0), ctx.status(303), ctx.set('location', `/testcallback`))
+    ),
+
+    rest.get('*/oauth2/authorize', (req, res, ctx) =>
+        res(ctx.delay(0), ctx.status(303), ctx.set('location', `/testcallback`))
+    ),
+
+    rest.post('*/oauth2/login', (req, res, ctx) =>
+        res(ctx.delay(0), ctx.status(200), ctx.json(mockedRegisteredCustomer))
+    ),
+
+    rest.get('*/testcallback', (req, res, ctx) => {
+        return res(ctx.delay(0), ctx.status(200))
+    }),
+
+    rest.post('*/oauth2/token', (req, res, ctx) =>
+        res(
+            ctx.delay(0),
+            ctx.json({
+                customer_id: 'test',
+                access_token: 'testtoken',
+                refresh_token: 'testrefeshtoken',
+                usid: 'testusid'
+            })
+        )
     )
 )
 
@@ -84,6 +113,14 @@ beforeEach(() => {
         lastName: 'Keane',
         login: 'jkeane@64labs.com'
     }
+
+    // Need to mock TextEncoder for tests
+    if (typeof TextEncoder === 'undefined') {
+        global.TextEncoder = require('util').TextEncoder
+    }
+
+    // Need to mock window.crypto for tests
+    window.crypto = new Crypto()
 })
 afterEach(() => {
     localStorage.clear()

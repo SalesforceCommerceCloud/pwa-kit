@@ -4,6 +4,7 @@ import {screen} from '@testing-library/react'
 import user from '@testing-library/user-event'
 import {rest} from 'msw'
 import {setupServer} from 'msw/node'
+import {Crypto} from '@peculiar/webcrypto'
 import {renderWithProviders} from '../../utils/test-utils'
 import {
     mockedRegisteredCustomer,
@@ -26,7 +27,7 @@ const MockedComponent = () => {
 
     useEffect(() => {
         if (customer?.authType !== 'registered') {
-            customer.login()
+            customer.login('est@test.com', 'password')
         }
     }, [])
 
@@ -54,13 +55,50 @@ const server = setupServer(
     rest.get('*/customers/:customerId/orders', (req, res, ctx) =>
         res(ctx.delay(0), ctx.json(mockOrderHistory))
     ),
-    rest.get('*/products', (req, res, ctx) => res(ctx.delay(0), ctx.json(mockOrderProducts)))
+    rest.get('*/products', (req, res, ctx) => res(ctx.delay(0), ctx.json(mockOrderProducts))),
+    rest.get('*/customers/:customerId', (req, res, ctx) =>
+        res(ctx.delay(0), ctx.json(mockedRegisteredCustomer))
+    ),
+    rest.post('*/oauth2/authorize', (req, res, ctx) =>
+        res(ctx.delay(0), ctx.status(303), ctx.set('location', `/testcallback`))
+    ),
+    rest.post('*/oauth2/login', (req, res, ctx) =>
+        res(ctx.delay(0), ctx.status(200), ctx.json(mockedRegisteredCustomer))
+    ),
+
+    rest.get('*/oauth2/authorize', (req, res, ctx) =>
+        res(ctx.delay(0), ctx.status(303), ctx.set('location', `/testcallback`))
+    ),
+
+    rest.get('*/testcallback', (req, res, ctx) => {
+        return res(ctx.delay(0), ctx.status(200))
+    }),
+
+    rest.post('*/oauth2/token', (req, res, ctx) =>
+        res(
+            ctx.delay(0),
+            ctx.json({
+                customer_id: 'test',
+                access_token: 'testtoken',
+                refresh_token: 'testrefeshtoken',
+                usid: 'testusid'
+            })
+        )
+    )
 )
 
 // Set up and clean up
 beforeEach(() => {
     jest.resetModules()
     server.listen({onUnhandledRequest: 'error'})
+
+    // Need to mock TextEncoder for tests
+    if (typeof TextEncoder === 'undefined') {
+        global.TextEncoder = require('util').TextEncoder
+    }
+
+    // Need to mock window.crypto for tests
+    window.crypto = new Crypto()
     window.history.pushState({}, 'Account', '/en/orders')
 })
 afterEach(() => {

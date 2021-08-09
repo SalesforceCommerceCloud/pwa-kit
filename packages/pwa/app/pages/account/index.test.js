@@ -1,11 +1,13 @@
 import React, {useEffect} from 'react'
 import {Route, Switch} from 'react-router-dom'
+import {Crypto} from '@peculiar/webcrypto'
 import {screen, waitFor, within} from '@testing-library/react'
 import user from '@testing-library/user-event'
 import {rest} from 'msw'
 import {setupServer} from 'msw/node'
 import {renderWithProviders} from '../../utils/test-utils'
 import {
+    mockedGuestCustomer,
     mockedRegisteredCustomer,
     mockOrderHistory,
     mockOrderProducts
@@ -26,7 +28,7 @@ const MockedComponent = () => {
 
     useEffect(() => {
         if (customer?.authType !== 'registered') {
-            customer.login()
+            customer.login('test@test.com', 'password1')
         }
     }, [])
 
@@ -44,13 +46,52 @@ const server = setupServer(
     rest.get('*/customers/:customerId/orders', (req, res, ctx) =>
         res(ctx.delay(0), ctx.json(mockOrderHistory))
     ),
-    rest.get('*/products', (req, res, ctx) => res(ctx.delay(0), ctx.json(mockOrderProducts)))
+    rest.get('*/products', (req, res, ctx) => res(ctx.delay(0), ctx.json(mockOrderProducts))),
+
+    rest.post('*/oauth2/authorize', (req, res, ctx) =>
+        res(ctx.delay(0), ctx.status(303), ctx.set('location', `/testcallback`))
+    ),
+
+    rest.get('*/oauth2/authorize', (req, res, ctx) =>
+        res(ctx.delay(0), ctx.status(303), ctx.set('location', `/testcallback`))
+    ),
+
+    rest.get('*/testcallback', (req, res, ctx) => {
+        return res(ctx.delay(0), ctx.status(200))
+    }),
+
+    rest.post('*/oauth2/login', (req, res, ctx) =>
+        res(ctx.delay(0), ctx.status(200), ctx.json(mockedRegisteredCustomer))
+    ),
+    rest.get('*/customers/:customerId', (req, res, ctx) => {
+        return res(ctx.delay(0), ctx.status(200), ctx.json(mockedRegisteredCustomer))
+    }),
+
+    rest.post('*/oauth2/token', (req, res, ctx) =>
+        res(
+            ctx.delay(0),
+            ctx.json({
+                customer_id: 'test',
+                access_token: 'testtoken',
+                refresh_token: 'testrefeshtoken',
+                usid: 'testusid'
+            })
+        )
+    )
 )
 
 // Set up and clean up
 beforeEach(() => {
     jest.resetModules()
     server.listen({onUnhandledRequest: 'error'})
+
+    // Need to mock TextEncoder for tests
+    if (typeof TextEncoder === 'undefined') {
+        global.TextEncoder = require('util').TextEncoder
+    }
+
+    // Need to mock window.crypto for tests
+    window.crypto = new Crypto()
 
     // Since we're testing some navigation logic, we are using a simple Router
     // around our component. We need to initialize the default route/path here.
@@ -64,9 +105,9 @@ afterAll(() => server.close())
 
 test('Redirects to login page if the customer is not logged in', async () => {
     server.use(
-        rest.post('*/customers/actions/login', (req, res, ctx) =>
-            res(ctx.set('authorization', `Bearer guesttoken`), ctx.json({authType: 'guest'}))
-        )
+        rest.get('*/customers/:customerId', (req, res, ctx) => {
+            return res(ctx.delay(0), ctx.status(200), ctx.json(mockedGuestCustomer))
+        })
     )
     renderWithProviders(<MockedComponent />)
     await waitFor(() => expect(window.location.pathname).toEqual('/en/login'))

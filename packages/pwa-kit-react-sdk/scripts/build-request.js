@@ -10,9 +10,6 @@ const Utils = require('./utils')
 const URL = require('url').URL
 
 const buildRequest = (options, dataBuffer) => {
-    // Avoids DEPTH_ZERO_SELF_SIGNED_CERT error for self-signed certs
-    process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
-
     // e.g. https://cloud.mobify.com/api/projects/progressive-web/builds/
     /* eslint-disable prefer-template */
     const pathname = path.posix.join(

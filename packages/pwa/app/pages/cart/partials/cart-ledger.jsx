@@ -7,6 +7,11 @@ import CartCta from './cart-cta'
 
 const CartLedger = () => {
     const basket = useBasket()
+
+    const discountTotal = basket?.orderPriceAdjustments?.reduce((sum, item) => {
+        return sum + item.price
+    }, 0)
+
     return (
         <Stack paddingTop={{base: 0, lg: 8}} spacing={5}>
             <Heading fontSize="lg" pt={1}>
@@ -26,6 +31,20 @@ const CartLedger = () => {
                             />
                         </Text>
                     </Flex>
+                    {discountTotal && discountTotal !== 0 && (
+                        <Flex justify="space-between">
+                            <Text color="gray.700">
+                                <FormattedMessage defaultMessage="Promotions" />
+                            </Text>
+                            <Text color="green.500">
+                                <FormattedNumber
+                                    style="currency"
+                                    currency={basket?.currency}
+                                    value={discountTotal}
+                                />
+                            </Text>
+                        </Flex>
+                    )}
                     <Box>
                         <Accordion allowToggle color="blue.500">
                             <AccordionItem borderTop="none" borderBottom="none">
@@ -62,16 +81,16 @@ const CartLedger = () => {
                     <Box>
                         <Accordion allowToggle color="blue.500">
                             <AccordionItem>
-                                <h2>
-                                    <Button
-                                        py={2}
-                                        px={2}
-                                        variant="link"
-                                        rightIcon={<ChevronDownIcon />}
-                                    >
-                                        <FormattedMessage defaultMessage="Do you have a promo code?" />
-                                    </Button>
-                                </h2>
+                                <Button
+                                    py={2}
+                                    px={2}
+                                    fontSize="sm"
+                                    variant="link"
+                                    rightIcon={<ChevronDownIcon />}
+                                >
+                                    <FormattedMessage defaultMessage="Do you have a promo code?" />
+                                </Button>
+
                                 {/* <AccordionPanel pb={4}>
                                     <Input
                                         marginTop={2}
@@ -91,7 +110,7 @@ const CartLedger = () => {
                         <FormattedNumber
                             style="currency"
                             currency={basket?.currency}
-                            value={basket?.productSubTotal}
+                            value={basket?.productTotal}
                         />
                     </Text>
                 </Flex>

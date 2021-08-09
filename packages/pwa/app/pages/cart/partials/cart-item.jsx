@@ -1,4 +1,5 @@
 import React, {useState} from 'react'
+import PropTypes from 'prop-types'
 import {FormattedMessage} from 'react-intl'
 import {
     Box,
@@ -8,26 +9,24 @@ import {
     Text,
     Select,
     Checkbox,
-    Badge,
-    Image,
     Alert,
     AlertIcon,
     AlertDescription,
-    AspectRatio,
     Spinner,
-    CloseButton
+    CloseButton,
+    Divider
 } from '@chakra-ui/react'
-import CartItemPrice from './cart-item-price'
 import useBasket from '../../../commerce-api/hooks/useBasket'
-import PropTypes from 'prop-types'
+import CartItemVariant from '../../../components/cart-item-variant/index.js'
+import CartItemVariantImage from '../../../components/cart-item-variant/item-image'
+import CartItemVariantName from '../../../components/cart-item-variant/item-name'
+import CartItemVariantAttributes from '../../../components/cart-item-variant/item-attributes'
+import CartItemVariantPrice from '../../../components/cart-item-variant/item-price'
 
 const CartItem = ({product}) => {
     const basket = useBasket()
     const [showError, setShowError] = useState(false)
     const [showLoading, setShowLoading] = useState(false)
-    const productImage = product.imageGroups?.find((group) => group.viewType === 'large').images[0]
-
-    // const promotionalCallouts = product.productPromotions?.map((promo) => promo.calloutMsg)
 
     const closeAlert = () => {
         setShowError(false)
@@ -62,207 +61,121 @@ const CartItem = ({product}) => {
             setShowLoading(false)
         }
     }
+
     return (
-        <Box data-testid="sf-cart-item" position="relative" display="block">
-            {showLoading && (
-                <Box
-                    position="absolute"
-                    bg="white"
-                    top={0}
-                    left={0}
-                    width="100%"
-                    height="100%"
-                    zIndex="9999"
-                >
-                    <Spinner
-                        position="absolute"
-                        top="50%"
-                        left="50%"
-                        opacity={0.85}
-                        color="blue.600"
-                        zIndex="9999"
-                        margin="-25px 0 0 -25px"
-                    />
-                </Box>
-            )}
-            <Stack
-                borderRadius={1}
-                borderColor="gray.100"
-                borderWidth="1px"
-                align="flex-start"
-                backgroundColor="white"
-                padding={[4, 6]}
-                pb={[4, 4]}
-            >
-                {showError && (
-                    <Alert
-                        status="error"
-                        marginBottom={6}
-                        backGroundColor="red.50"
-                        border="1px solid"
-                        borderColor="red.600"
-                        borderRadius={1}
-                    >
-                        <AlertIcon />
-                        <Box flex="1">
-                            <AlertDescription fontSize="14px">
-                                <FormattedMessage defaultMessage="Something went wrong. Try again." />
-                                <CloseButton
-                                    onClick={() => closeAlert()}
-                                    size="sm"
-                                    position="absolute"
-                                    right="6px"
-                                    top="6px"
-                                />
-                            </AlertDescription>
-                        </Box>
-                    </Alert>
-                )}
-
-                <Flex width="full" backgroundColor="white">
+        <Box data-testid="sf-cart-item" position="relative">
+            <CartItemVariant variant={product}>
+                {showLoading && (
                     <Box
-                        width={['88px', '136px']}
-                        height={['88px', '136px']}
-                        backgroundColor="gray.100"
-                        marginRight={4}
+                        position="absolute"
+                        bg="white"
+                        top={0}
+                        left={0}
+                        width="100%"
+                        height="100%"
+                        zIndex="9999"
                     >
-                        {product.c_isSale && (
-                            <Badge
-                                position="absolute"
-                                fontSize="10px"
-                                ml={3}
-                                marginTop={2}
-                                variant="solid"
-                                colorScheme="blue"
-                            >
-                                <FormattedMessage defaultMessage="Sale" />
-                            </Badge>
-                        )}
-
-                        {/* Client Image */}
-                        <AspectRatio ratio={1}>
-                            <Image
-                                alt={productImage?.alt}
-                                src={productImage?.disBaseLink}
-                                ignoreFallback={true}
-                            />
-                        </AspectRatio>
+                        <Spinner
+                            position="absolute"
+                            top="50%"
+                            left="50%"
+                            opacity={0.85}
+                            color="blue.600"
+                            zIndex="9999"
+                            margin="-25px 0 0 -25px"
+                        />
                     </Box>
-                    <Stack spacing={2} flex={1}>
-                        <Text lineHeight={1} fontWeight="bold">
-                            {product.name}
-                        </Text>
-                        <Text lineHeight={1} color="gray.700" fontSize="sm">
-                            <FormattedMessage defaultMessage="Color" />
-                            {': '} {product.c_refinementColor}
-                        </Text>
-                        <Text lineHeight={1} color="gray.700" fontSize="sm">
-                            <FormattedMessage defaultMessage="Size" />
-                            {': '} {product.c_size}
-                        </Text>
-                        <Text lineHeight={1} color="gray.700" fontSize="sm" paddingTop={2}>
-                            <FormattedMessage defaultMessage="Quantity:" />
-                        </Text>
-
-                        <Flex align="flex-end" justify="space-between">
-                            <Select
-                                onChange={(e) => changeItemQuantity(e.target.value, product)}
-                                value={product.quantity}
-                                width={['90px']}
-                            >
-                                <option value="0">0 / Remove</option>
-                                <option value="1">1</option>
-                                <option value="2">2</option>
-                                <option value="3">3</option>
-                                <option value="4">4</option>
-                                <option value="5">5</option>
-                                <option value="6">6</option>
-                                <option value="7">7</option>
-                                <option value="8">8</option>
-                                <option value="9">9</option>
-                            </Select>
-                            {/* <Text fontSize="12">Out of stock</Text> */}
-                            {/* {promotionalCallouts &&
-                                promotionalCallouts.map((msg, index) => (
-                                    <Text key={index} color="gray.700" fontSize="12">
-                                        {msg}
-                                    </Text>
-                                ))} */}
-
-                            <CartItemPrice
-                                currency={basket.currency}
-                                totalPrice={product.price}
-                                basePrice={product.basePrice}
-                            />
-                        </Flex>
-                        <Flex
-                            justify={['left', 'left', 'space-between', 'space-between']}
-                            borderBottom={['1px', '1px', '0px']}
-                            borderBottomColor={['gray.100', 'gray.100']}
+                )}
+                <Stack layerStyle="card" align="flex-start">
+                    {showError && (
+                        <Alert
+                            status="error"
+                            marginBottom={6}
+                            backGroundColor="red.50"
+                            border="1px solid"
+                            borderColor="red.600"
+                            borderRadius={1}
                         >
-                            <Box marginTop={[0, 0, 1, 1]}>
-                                <Button
-                                    height={11}
-                                    onClick={() => removeItem(product)}
-                                    variant="link"
-                                    size="sm"
-                                >
-                                    <FormattedMessage defaultMessage="Remove" />
-                                </Button>
-                                {/* <Button marginLeft={4} variant="link" size="xs">
-                                Save for later
-                            </Button>
-                            <Button marginLeft={4} variant="link" size="xs">
-                                Edit
-                            </Button> */}
+                            <AlertIcon />
+                            <Box flex="1">
+                                <AlertDescription fontSize="14px">
+                                    <FormattedMessage defaultMessage="Something went wrong. Try again." />
+                                    <CloseButton
+                                        onClick={() => closeAlert()}
+                                        size="sm"
+                                        position="absolute"
+                                        right="6px"
+                                        top="6px"
+                                    />
+                                </AlertDescription>
                             </Box>
-                            <Flex>
-                                <Checkbox
-                                    isReadOnly={true}
-                                    display={['none', 'none', 'flex', 'flex']}
-                                    marginTop={1}
-                                >
-                                    <Box fontSize="sm" display="inline-block">
-                                        <FormattedMessage defaultMessage="This is a gift." />
-                                    </Box>
-                                </Checkbox>
+                        </Alert>
+                    )}
 
-                                <Button
-                                    marginLeft={1}
-                                    variant="link"
-                                    size="sm"
-                                    marginTop={1}
-                                    spacing="1rem"
-                                    display={['none', 'none', 'flex', 'flex']}
+                    <Flex width="full" alignItems="flex-start" backgroundColor="white">
+                        <CartItemVariantImage width={['88px', '136px']} mr={4} />
+
+                        <Stack spacing={2} flex={1}>
+                            <Stack spacing={1}>
+                                <CartItemVariantName />
+                                <CartItemVariantAttributes />
+                            </Stack>
+
+                            <Text lineHeight={1} color="gray.700" fontSize="sm" paddingTop={2}>
+                                <FormattedMessage defaultMessage="Quantity:" />
+                            </Text>
+
+                            <Flex align="flex-end" justify="space-between">
+                                <Select
+                                    onChange={(e) => changeItemQuantity(e.target.value, product)}
+                                    value={product.quantity}
+                                    width={['90px']}
                                 >
-                                    <FormattedMessage defaultMessage="Learn more" />
-                                </Button>
+                                    <option value="0">0 / Remove</option>
+                                    <option value="1">1</option>
+                                    <option value="2">2</option>
+                                    <option value="3">3</option>
+                                    <option value="4">4</option>
+                                    <option value="5">5</option>
+                                    <option value="6">6</option>
+                                    <option value="7">7</option>
+                                    <option value="8">8</option>
+                                    <option value="9">9</option>
+                                </Select>
+
+                                <CartItemVariantPrice />
                             </Flex>
-                        </Flex>
-                        <Flex>
-                            <Checkbox
-                                isReadOnly={true}
-                                display={['flex', 'flex', 'none', 'none']}
-                                size="md"
-                                height={11}
+
+                            <Stack
+                                direction={{base: 'column', lg: 'row'}}
+                                alignItems={{base: 'flex-start', lg: 'center'}}
+                                justifyContent={{base: 'flex-start', lg: 'space-between'}}
+                                divider={<Divider display={{base: 'block', lg: 'none'}} />}
                             >
-                                <Box fontSize="sm" display="inline-block">
-                                    <FormattedMessage defaultMessage="This is a gift." />
+                                <Box>
+                                    <Button
+                                        variant="link"
+                                        size="sm"
+                                        onClick={() => removeItem(product)}
+                                    >
+                                        <FormattedMessage defaultMessage="Remove" />
+                                    </Button>
                                 </Box>
-                            </Checkbox>
-                            <Button
-                                marginLeft={1}
-                                variant="link"
-                                size="sm"
-                                spacing="1rem"
-                                display={['flex', 'flex', 'none', 'none']}
-                            >
-                                <FormattedMessage defaultMessage="Learn more" />
-                            </Button>
-                        </Flex>
-                    </Stack>
-                </Flex>
-            </Stack>
+                                <Flex alignItems="center">
+                                    <Checkbox spacing={2} isReadOnly={true}>
+                                        <FormattedMessage defaultMessage="This is a gift." />
+                                    </Checkbox>
+                                    <Box marginLeft={1}>
+                                        <Button marginLeft={1} variant="link" size="sm">
+                                            <FormattedMessage defaultMessage="Learn more" />
+                                        </Button>
+                                    </Box>
+                                </Flex>
+                            </Stack>
+                        </Stack>
+                    </Flex>
+                </Stack>
+            </CartItemVariant>
         </Box>
     )
 }

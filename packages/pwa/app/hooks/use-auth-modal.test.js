@@ -1,8 +1,10 @@
 import React from 'react'
-import {screen, within} from '@testing-library/react'
+import {screen, within, waitFor} from '@testing-library/react'
 import user from '@testing-library/user-event'
 import {renderWithProviders} from '../utils/test-utils'
 import {AuthModal, useAuthModal} from './use-auth-modal'
+import {BrowserRouter as Router, Route} from 'react-router-dom'
+import Account from '../pages/account'
 
 jest.setTimeout(60000)
 
@@ -17,6 +19,7 @@ const mockRegisteredCustomer = {
 }
 
 const mockLogin = jest.fn()
+jest.useFakeTimers()
 
 jest.mock('../commerce-api/auth', () => {
     return jest.fn().mockImplementation(() => {
@@ -109,12 +112,17 @@ jest.mock('../commerce-api/pkce', () => {
 
 const MockedComponent = () => {
     const authModal = useAuthModal()
-
+    const match = {
+        params: {pageName: 'profile'}
+    }
     return (
-        <div>
+        <Router>
             <button onClick={authModal.onOpen}>Open Modal</button>
             <AuthModal {...authModal} />
-        </div>
+            <Route path="/en/account">
+                <Account match={match} />
+            </Route>
+        </Router>
     )
 }
 
@@ -159,13 +167,11 @@ test('Allows customer to sign in to their account', async () => {
     user.type(screen.getByLabelText('Email'), 'customer@test.com')
     user.type(screen.getByLabelText('Password'), 'Password!1')
     user.click(screen.getByText(/sign in/i))
-
-    // wait for success state to appear
-    expect(await screen.findByText(/where would you like to go next/i)).toBeInTheDocument()
-
-    // close the modal
-    user.click(screen.getByText(/continue shopping/i))
-    expect(screen.queryByText(/where would you like to go next/)).not.toBeInTheDocument()
+    // wait for successful toast to appear
+    await waitFor(() => {
+        expect(screen.getByText(/Welcome Tester/i)).toBeInTheDocument()
+        expect(screen.getByText(/you're now signed in/i)).toBeInTheDocument()
+    })
 })
 
 test('Renders error when given incorrect log in credentials', async () => {
@@ -232,5 +238,7 @@ test('Allows customer to create an account', async () => {
     user.paste(withinForm.getAllByLabelText(/password/i)[0], 'Password!1')
     user.click(withinForm.getByText(/create account/i))
 
-    expect(await screen.findByText(/Where would you like to go next/i)).toBeInTheDocument()
+    // wait for redirecting to account page
+    expect(await screen.findByText(/customer@test.com/i, {}, {timeout: 30000})).toBeInTheDocument()
+    expect(await screen.findByText(/Sign out/i, {}, {timeout: 30000})).toBeInTheDocument()
 })

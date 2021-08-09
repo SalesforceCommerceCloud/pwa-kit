@@ -25,7 +25,7 @@ Public-facing documentation lives on the [Commerce Cloud Developer Center](https
 ## Requirements
 
 ```
-  Node ^12.x
+  Node ^12.x || ^14.x
   npm ^6.14.4
 ```
 

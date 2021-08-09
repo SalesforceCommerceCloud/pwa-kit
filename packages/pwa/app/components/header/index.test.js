@@ -56,3 +56,29 @@ test('renders Header with event handlers', () => {
     expect(onSearchSubmit).toHaveBeenCalledTimes(1)
     expect(onSearchSubmit).toHaveBeenCalledWith(expect.anything(), '123')
 })
+
+/**
+ * The badge component on the cart that shows the number of items in the cart
+ * should only be displayed when there is a valid cart loaded.
+ */
+const testBaskets = [null, undefined, {basketId: null}, {basketId: undefined}]
+
+test.each(testBaskets)('does not render cart badge when basket not loaded', (initialBasket) => {
+    renderWithProviders(<Header />, {wrapperProps: {initialBasket}})
+
+    // Look for badge.
+    const badge = document.querySelector('button[aria-label="My cart"] .chakra-badge')
+
+    expect(badge).toBeNull()
+})
+
+test('renders cart badge when basket is loaded', () => {
+    const initialBasket = {basketId: 'valid_id'}
+
+    renderWithProviders(<Header />, {wrapperProps: {initialBasket}})
+
+    // Look for badge.
+    const badge = document.querySelector('button[aria-label="My cart"] .chakra-badge')
+
+    expect(badge).toBeInTheDocument()
+})

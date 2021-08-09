@@ -36,7 +36,7 @@ npm start
 
 ## 🛠 Configurations
 
-The React Retail App is built with [Commerce API](https://developer.commercecloud.com/s/article/CommerceAPI-ConfigurationValues), [OCAPI](https://documentation.b2c.commercecloud.salesforce.com/DOC2/topic/com.demandware.dochelp/OCAPI/current/usage/OpenCommerceAPI.html), and [SLAS](https://developer.commercecloud.com/s/api-details/a003k00000VzoEyAAJ/commerce-cloud-developer-centershopperloginandapiaccessadmin) integrations. When generating a project, you will be prompted to configure these integrations. If you want to update these configuration values later, here's how to do it:
+The React Retail App is built with [Commerce API](https://developer.commercecloud.com/s/article/CommerceAPI-ConfigurationValues), [OCAPI](https://documentation.b2c.commercecloud.salesforce.com/DOC2/topic/com.demandware.dochelp/OCAPI/current/usage/OpenCommerceAPI.html), and [SLAS](https://developer.commercecloud.com/s/api-details/a003k00000VWfNDAA1/commerce-cloud-developer-centershopperloginandapiaccessservice) integrations. When generating a project, you will be prompted to configure these integrations. If you want to update these configuration values later, here's how to do it:
 
 ### Update Configurations
 
@@ -45,7 +45,7 @@ The React Retail App is built with [Commerce API](https://developer.commerceclou
 | name                                          | Description                                                                             |
 | --------------------------------------------- | --------------------------------------------------------------------------------------- |
 | `projectSlug`                                 | Matches your project ID in the [Runtime Admin](https://runtime.commercecloud.com/) tool |
-| `mobify.ssrParameters.ssrFunctionNodeVersion` | Matches your project's Node version (`12.x`)                                    |
+| `mobify.ssrParameters.ssrFunctionNodeVersion` | Matches your project's Node version (`12.x`, `14.x`)                                    |
 | `mobify.ssrParameters.proxyConfigs`           | Proxy configuration for Commerce API, OCAPI and SLAS                                    |
 
 Sample Proxy Configs:
@@ -84,6 +84,28 @@ export const commerceAPIConfig = {
     }
 }
 ```
+
+### Shopper Login and API Access Service
+
+To authorize certain API requests on behalf of shoppers, we rely on a Commerce API called the [Shopper Login and API Access Service](https://developer.commercecloud.com/s/api-details/a003k00000VWfNDAA1/commerce-cloud-developer-centershopperloginandapiaccessservice).
+(SLAS). By default, requests to SLAS are made through a proxy. For this proxy configuration to work,
+**you must use the SLAS Admin API to configure a public client for your storefront**. See the
+[SLAS Admin API guide](https://developer.commercecloud.com/s/api-details/a003k00000VzoEyAAJ/commerce-cloud-developer-centershopperloginandapiaccessadmin)
+for instructions on how to configure a public client.
+
+**Important**: Before you can configure a public client, you must complete a number of other
+steps, all of which are described in the SLAS Admin API guide. These steps include setting up an
+API client for administrator use, downloading and installing the `sfcc-ci` tool, requesting an
+access token, and using the access token to configure the API client via the SLAS Admin API.
+
+When you configure the public client for your storefront, you must include the callback URIs for
+all of your Managed Runtime environments in the
+`redirectUri` parameter that you pass to the SLAS Admin API. For example, if you have
+an environment called `test` and its `hostname` is
+`my-project-test.mobify-storefront.com`, then you must include
+`https://my-project-test.mobify-storefront.com/callback` in the
+`redirectUri` parameter. You must also include the callback URIs for all your other
+environments.
 
 ## 📜 NPM Scripts
 

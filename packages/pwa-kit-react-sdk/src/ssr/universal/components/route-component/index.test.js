@@ -19,6 +19,12 @@ const trueOnceThenFalse = () =>
         .mockReturnValue(false)
         .mockReturnValueOnce(true)
 
+const falseOnceThenTrue = () =>
+    jest
+        .fn()
+        .mockReturnValue(true)
+        .mockReturnValueOnce(false)
+
 jest.mock('../_app-config', () => {
     const React = require('react')
     const PropTypes = require('prop-types')
@@ -276,6 +282,61 @@ describe('getRoutes', () => {
 
         const expected404Name = 'WithErrorHandling(withRouter(routeComponent(Throw404)))'
         expect(second.component.displayName).toBe(expected404Name)
+    })
+})
+
+/**
+ * A race condition is created when a user clicks two links for the same
+ * component. If the getProps call for the second link resolves before the
+ * first, we want to make sure the results of the first are ignored. In this
+ * test we setProps twice to trigger getProps calls and make sure only the
+ * second one updates the component.
+ */
+describe('Handles race conditions for getProps', () => {
+    test(`unresolved calls to 'getProps' are squashed by new new calls`, async () => {
+        const render = jest.fn()
+
+        // We can't inspect the render directly, so include this mock function
+        // in the render and inspect that
+        // eslint-disable-next-line react/prop-types
+        const MockComponent = ({callId}) => <p>{render(callId)}</p>
+        // Skip getProps on mount by returning false the first time
+        MockComponent.shouldGetProps = falseOnceThenTrue()
+        MockComponent.getProps = jest
+            .fn()
+            .mockImplementationOnce(() => Promise.resolve({callId: 1}))
+            .mockImplementationOnce(() => Promise.resolve({callId: 2}))
+
+        const Component = routeComponent(MockComponent, {}, true)
+
+        let resolver = []
+        let wrapper
+        const onUpdateComplete = () => {
+            const r = resolver.pop()
+            if (r) {
+                r(wrapper)
+            }
+        }
+        await new Promise((resolve) => {
+            resolver.push(resolve)
+            wrapper = mount(<Component onUpdateComplete={onUpdateComplete} />)
+        })
+
+        // Update the wrappers props 2 times in succession, this will cause `getProps` to be called
+        // twice, but only the later should call `setStateAsync` causing a re-render.
+        const p1 = new Promise((resolve) => {
+            resolver.push(resolve)
+            wrapper.setProps({tick: 1})
+        })
+        const p2 = new Promise((resolve) => {
+            resolver.push(resolve)
+            wrapper.setProps({tick: 2})
+        })
+        await Promise.all([p1, p2])
+
+        expect(MockComponent.getProps.mock.calls.length).toBe(2)
+        expect(render).not.toHaveBeenCalledWith(1)
+        expect(render).toHaveBeenCalledWith(2)
     })
 })
 

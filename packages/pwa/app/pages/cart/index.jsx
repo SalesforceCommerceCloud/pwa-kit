@@ -19,12 +19,13 @@ const Cart = () => {
     }
 
     return (
-        <Box background="gray.50">
+        <Box background="gray.50" flex="1">
             <Container
                 data-testid="sf-cart-container"
                 maxWidth="container.xl"
                 p={[4, 6, 6, 4]}
                 paddingTop={[null, null, null, 6]}
+                paddingBottom={[null, null, null, 14]}
             >
                 <Grid templateColumns={{base: '1fr', lg: '66% 1fr'}} gap={{base: 10, xl: 20}}>
                     <GridItem>
@@ -43,7 +44,7 @@ const Cart = () => {
                             ))}
                         </Stack>
                     </GridItem>
-                    <GridItem py={8} px={[6, 6, 6, 0]}>
+                    <GridItem py={[6, 6, 6, 8]} px={0}>
                         <CartLedger />
                     </GridItem>
                 </Grid>

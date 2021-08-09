@@ -139,7 +139,7 @@ const App = (props) => {
                     <Box id="app" display="flex" flexDirection="column" flex={1}>
                         <SkipNavLink zIndex="skipLink">Skip to Content</SkipNavLink>
 
-                        <Box>
+                        <Box {...styles.headerWrapper}>
                             {!isCheckout ? (
                                 <Header
                                     onMenuClick={onOpen}
@@ -167,8 +167,17 @@ const App = (props) => {
 
                         {!isOnline && <OfflineBanner />}
 
-                        <SkipNavContent style={{flex: 1, outline: 0}}>
-                            <Box as="main" id="app-main" role="main" flex="1">
+                        <SkipNavContent
+                            style={{display: 'flex', flexDirection: 'column', flex: 1, outline: 0}}
+                        >
+                            <Box
+                                as="main"
+                                id="app-main"
+                                role="main"
+                                display="flex"
+                                flexDirection="column"
+                                flex="1"
+                            >
                                 <OfflineBoundary isOnline={false}>{children}</OfflineBoundary>
                             </Box>
                         </SkipNavContent>

@@ -5,7 +5,7 @@ export default {
             width: 'full'
         },
         control: {
-            marginTop: '3px',
+            marginTop: '2px',
             _checked: {
                 backgroundColor: 'blue.600',
                 borderColor: 'blue.600',
@@ -18,7 +18,7 @@ export default {
     },
     sizes: {
         md: {
-            label: {marginLeft: 3, fontSize: 'sm'}
+            label: {fontSize: 'sm'}
         }
     }
 }

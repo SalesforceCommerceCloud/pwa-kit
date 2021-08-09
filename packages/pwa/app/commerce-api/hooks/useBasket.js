@@ -16,6 +16,11 @@ export default function useBasket() {
         return {
             ...basket,
 
+            // Check if a this represents a valid basket
+            loaded() {
+                return basket && basket.basketId
+            },
+
             get itemCount() {
                 return basket?.productItems?.length || 0
             },
@@ -250,6 +255,18 @@ export default function useBasket() {
                 })
 
                 setBasket(response)
+            },
+
+            /**
+             * Fetches and returns promo details for the given IDs
+             * @param {Array<string>} ids - The promo ids to fetch
+             * @returns {Object} - API response containing data
+             */
+            async getPromotions(ids) {
+                const response = await api.shopperPromotions.getPromotions({
+                    parameters: {ids: ids.join(',')}
+                })
+                return response
             },
 
             /**

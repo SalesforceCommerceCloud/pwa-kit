@@ -52,10 +52,7 @@ const runSSR = ({inspect}) => {
                     command: webpack,
                     args: ['--mode', nodeEnv, '--watch'],
                     opts: {
-                        env: Object.assign({}, process.env, {
-                            TOUCH_BUILD_MARKER: 1,
-                            DEVTOOL: nodeEnv === development ? 'source-map' : 'cheap-source-map'
-                        })
+                        env: process.env
                     },
                     name: 'webpack'
                 },

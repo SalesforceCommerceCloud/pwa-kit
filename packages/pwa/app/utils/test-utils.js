@@ -35,7 +35,12 @@ export const renderWithRouterAndCommerceAPI = (node) => {
  * for testing purposes.
  * @param {object} props
  */
-export const TestProviders = ({children}) => {
+export const TestProviders = ({
+    children,
+    initialBasket = null,
+    initialCustomer = null,
+    initialCategories = []
+}) => {
     const mounted = useRef()
 
     // We use this to track mounted state.
@@ -57,9 +62,9 @@ export const TestProviders = ({children}) => {
         proxy,
         ocapiHost
     })
-    const [basket, _setBasket] = useState(null)
-    const [customer, setCustomer] = useState(null)
-    const [categories, setCategories] = useState([])
+    const [basket, _setBasket] = useState(initialBasket)
+    const [customer, setCustomer] = useState(initialCustomer)
+    const [categories, setCategories] = useState(initialCategories)
 
     const setBasket = useCallback((data) => {
         if (!mounted.current) {
@@ -86,7 +91,10 @@ export const TestProviders = ({children}) => {
 }
 
 TestProviders.propTypes = {
-    children: PropTypes.element
+    children: PropTypes.element,
+    initialBasket: PropTypes.object,
+    initialCustomer: PropTypes.object,
+    initialCategories: PropTypes.element
 }
 
 /**
@@ -98,4 +106,8 @@ TestProviders.propTypes = {
  * @param {object} options
  */
 export const renderWithProviders = (children, options) =>
-    render(children, {wrapper: TestProviders, ...options})
+    render(children, {
+        // eslint-disable-next-line react/display-name
+        wrapper: () => <TestProviders {...options?.wrapperProps}>{children}</TestProviders>,
+        ...options
+    })

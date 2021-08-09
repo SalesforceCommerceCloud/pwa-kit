@@ -1,3 +1,5 @@
+import theme from '@chakra-ui/theme'
+
 export default {
     baseStyle: {
         container: {
@@ -6,6 +8,11 @@ export default {
             flexDirection: 'column',
             backgroundColor: 'white',
             minWidth: '375px'
+        },
+        headerWrapper: {
+            position: 'sticky',
+            top: 0,
+            zIndex: theme.zIndices.sticky
         }
     },
     parts: ['container']

@@ -1,6 +1,6 @@
 {
   "name": "pwa-kit-react-sdk",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "A library that supports the isomorphic React rendering pipeline for Commerce Cloud Managed Runtime apps",
   "main": "dist/index.js",
   "bin": {
@@ -10,7 +10,7 @@
     "sdk-create-hash-manifest": "bin/create-hash-manifest.js"
   },
   "engines": {
-    "node": "^12.0.0"
+    "node": "^12.0.0 || ^14.0.0"
   },
   "files": [
     "bin",
@@ -53,12 +53,11 @@
     "compression": "1.7.4",
     "copy-webpack-plugin": "^6.0.0",
     "event-emitter": "^0.3.5",
-    "git-rev-sync": "1.8.0",
+    "git-rev-sync": "^3.0.1",
     "glob": "7.1.1",
     "header-case": "1.0.1",
     "hoist-non-react-statics": "^3.3.1",
     "http-proxy-middleware": "0.19.0",
-    "jsdom": "14.0.0",
     "lodash": "^4.17.20",
     "merge-descriptors": "^1.0.1",
     "mime-types": "2.1.20",
@@ -130,6 +129,7 @@
     "mobify-code-style": "^2.8.5",
     "nock": "^10.0.0",
     "node-fetch": "2.6.1",
+    "node-html-parser": "^3.3.4",
     "prettier": "1.18.2",
     "react": "16.14.0",
     "react-dom": "16.14.0",

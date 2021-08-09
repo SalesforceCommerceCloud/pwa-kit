@@ -51,7 +51,7 @@ const TTI_POLYFILL_SCRIPT = [
     `g.o.observe({entryTypes:['longtask']})}}();`
 ].join('')
 
-export const WHITELISTED_INLINE_SCRIPTS = [TTI_POLYFILL_SCRIPT]
+export const ALLOWLISTED_INLINE_SCRIPTS = [TTI_POLYFILL_SCRIPT]
 
 /**
  * Convert from thrown Error or String to {message, status} that we need for

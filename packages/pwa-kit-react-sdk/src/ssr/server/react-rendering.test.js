@@ -4,10 +4,10 @@
 /* * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
 /* Copyright (c) 2021 Mobify Research & Development Inc. All rights reserved. */
 /* * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
-import {render, WHITELISTED_INLINE_SCRIPTS} from './react-rendering'
+import {render, ALLOWLISTED_INLINE_SCRIPTS} from './react-rendering'
 import {createApp} from './express'
 import request from 'supertest'
-import jsdom from 'jsdom'
+import {parse} from 'node-html-parser'
 import path from 'path'
 
 const opts = (overrides = {}) => {
@@ -267,30 +267,8 @@ jest.mock('../universal/routes', () => {
 })
 
 describe('The Node SSR Environment', () => {
-    let window
-
-    beforeAll(() => {
-        const dom = new jsdom.JSDOM(``)
-        window = dom.window
-    })
-
-    afterAll(() => {
-        window = undefined
-    })
-
     /**
-     * Build a JSDom document fragment in order to make sane assertions about
-     * returned HTML. We *still* don't want to run these tests "in the browser"
-     * though - these tests are for a server.
-     */
-    const buildDoc = (html) => {
-        const doc = window.document.implementation.createHTMLDocument()
-        doc.documentElement.innerHTML = html
-        return doc
-    }
-
-    /**
-     * Scripts are "safe" if they are external, not executable or on our whitelist of
+     * Scripts are "safe" if they are external, not executable or on our allow list of
      * static, inline scripts.
      */
     const scriptsAreSafe = (doc) => {
@@ -301,8 +279,8 @@ describe('The Node SSR Environment', () => {
             const executable =
                 !script.hasAttribute('type') ||
                 script.getAttribute('type') === 'application/javascript'
-            const whitelisted = WHITELISTED_INLINE_SCRIPTS.indexOf(script.innerHTML) >= 0
-            return external || !executable || whitelisted
+            const allowlisted = ALLOWLISTED_INLINE_SCRIPTS.indexOf(script.innerHTML) >= 0
+            return external || !executable || allowlisted
         })
     }
 
@@ -316,7 +294,7 @@ describe('The Node SSR Environment', () => {
                 expect(res.statusCode).toBe(200)
                 const html = res.text
                 console.error(html)
-                const doc = buildDoc(html)
+                const doc = parse(html)
                 const include = ['<div>This is a PWA</div>']
                 const data = dataFromHTML(doc)
                 expect(data.__DEVICE_TYPE__).toEqual('DESKTOP')
@@ -335,7 +313,7 @@ describe('The Node SSR Environment', () => {
             assertions: (res) => {
                 expect(res.statusCode).toBe(200)
                 const html = res.text
-                const doc = buildDoc(html)
+                const doc = parse(html)
                 const data = dataFromHTML(doc)
                 expect(data.__DEVICE_TYPE__).toEqual('TABLET')
                 const include = ['<div>This is a PWA</div>']
@@ -354,7 +332,7 @@ describe('The Node SSR Environment', () => {
             assertions: (res) => {
                 expect(res.statusCode).toBe(200)
                 const html = res.text
-                const doc = buildDoc(html)
+                const doc = parse(html)
                 const data = dataFromHTML(doc)
                 expect(data.__DEVICE_TYPE__).toEqual('PHONE')
                 const include = ['<div>This is a PWA</div>']
@@ -367,7 +345,7 @@ describe('The Node SSR Environment', () => {
             req: {url: '/pwa/', query: {mobify_server_only: '1'}},
             assertions: (res) => {
                 const html = res.text
-                const doc = buildDoc(html)
+                const doc = parse(html)
                 const include = ['<div>This is a PWA</div>']
                 include.forEach((s) => expect(html).toEqual(expect.stringContaining(s)))
                 doc.querySelectorAll('script').forEach((script) => {
@@ -440,7 +418,7 @@ describe('The Node SSR Environment', () => {
             req: {url: '/get-props-rejects-with-empty-string/'},
             assertions: (res) => {
                 const html = res.text
-                const doc = buildDoc(html)
+                const doc = parse(html)
                 const data = dataFromHTML(doc)
 
                 expect(data.__ERROR__.message).toEqual('Internal Server Error')
@@ -453,7 +431,7 @@ describe('The Node SSR Environment', () => {
             req: {url: '/render-throws-error/'},
             assertions: (res) => {
                 const html = res.text
-                const doc = buildDoc(html)
+                const doc = parse(html)
                 const data = dataFromHTML(doc)
 
                 expect(data.__ERROR__.message).toEqual('Internal Server Error')
@@ -468,12 +446,14 @@ describe('The Node SSR Environment', () => {
             assertions: (res) => {
                 expect(res.statusCode).toBe(200)
                 const html = res.text
-                const doc = buildDoc(html)
+                const doc = parse(html)
                 const head = doc.querySelector('head')
                 expect(html.includes('lang="helmet-html-attribute"')).toBe(true)
-                expect(doc.querySelector('body').className).toEqual('helmet-body-attribute')
+                expect(doc.querySelector('body').getAttribute('class')).toEqual(
+                    'helmet-body-attribute'
+                )
                 expect(head.querySelector(`title`).innerHTML).toEqual('Helmet title')
-                expect(head.querySelector('base').target).toEqual('_blank')
+                expect(head.querySelector('base').getAttribute('target')).toEqual('_blank')
                 expect(
                     doc.querySelector('style').innerHTML.includes('background-color: blue;')
                 ).toBe(true)

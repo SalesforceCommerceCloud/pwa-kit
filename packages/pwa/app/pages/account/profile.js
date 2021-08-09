@@ -17,7 +17,6 @@ import {
 } from '@chakra-ui/react'
 import {useForm} from 'react-hook-form'
 import useCustomer from '../../commerce-api/hooks/useCustomer'
-import link from '../../components/link'
 import {AlertIcon} from '../../components/icons'
 import {ToggleCard, ToggleCardEdit, ToggleCardSummary} from '../../components/toggle-card'
 import ProfileFields from '../../components/forms/profile-fields'
@@ -201,7 +200,7 @@ const AccountDetail = () => {
             </Stack>
 
             <Box>
-                <Button as={link} to="/" variant="link" onClick={() => customer.logout()}>
+                <Button variant="link" onClick={() => customer.logout()}>
                     <FormattedMessage defaultMessage="Sign out" />
                 </Button>
             </Box>

@@ -3,6 +3,7 @@ import {screen, within} from '@testing-library/react'
 import user from '@testing-library/user-event'
 import {rest} from 'msw'
 import {setupServer} from 'msw/node'
+import {Crypto} from '@peculiar/webcrypto'
 import {renderWithProviders} from '../../utils/test-utils'
 import ResetPassword from '.'
 
@@ -62,7 +63,31 @@ const MockedComponent = () => {
     )
 }
 
-const server = setupServer()
+const server = setupServer(
+    rest.post('*/oauth2/authorize', (req, res, ctx) =>
+        res(ctx.delay(0), ctx.status(303), ctx.set('location', `/testcallback`))
+    ),
+
+    rest.get('*/oauth2/authorize', (req, res, ctx) =>
+        res(ctx.delay(0), ctx.status(303), ctx.set('location', `/testcallback`))
+    ),
+
+    rest.get('*/testcallback', (req, res, ctx) => {
+        return res(ctx.delay(0), ctx.status(200))
+    }),
+
+    rest.post('*/oauth2/token', (req, res, ctx) =>
+        res(
+            ctx.delay(0),
+            ctx.json({
+                customer_id: 'test',
+                access_token: 'testtoken',
+                refresh_token: 'testrefeshtoken',
+                usid: 'testusid'
+            })
+        )
+    )
+)
 
 // Set up and clean up
 beforeEach(() => {
@@ -70,6 +95,13 @@ beforeEach(() => {
     server.listen({
         onUnhandledRequest: 'error'
     })
+    // Need to mock TextEncoder for tests
+    if (typeof TextEncoder === 'undefined') {
+        global.TextEncoder = require('util').TextEncoder
+    }
+
+    // Need to mock window.crypto for tests
+    window.crypto = new Crypto()
 })
 afterEach(() => {
     localStorage.clear()

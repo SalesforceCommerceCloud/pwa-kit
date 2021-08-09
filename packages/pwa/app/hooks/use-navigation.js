@@ -4,7 +4,7 @@ import {useLocale} from '../locale'
 
 /**
  * A convenience hook for programmatic navigation uses history's `push` or `replace`. The proper locale
- * is automatically prepended to the provded path. Additional args are passed through to `history`.
+ * is automatically prepended to the provided path. Additional args are passed through to `history`.
  * @returns {function} - Returns a navigate function that passes args to history methods.
  */
 const useNavigation = () => {
@@ -21,7 +21,7 @@ const useNavigation = () => {
         (path, action = 'push', ...args) => {
             const localePath = `/${locale}`
             const localizedHref = path && path.includes(localePath) ? path : `${localePath}${path}`
-            history[action](localizedHref, ...args)
+            history[action](path === '/' ? '/' : localizedHref, ...args)
         },
         [locale]
     )

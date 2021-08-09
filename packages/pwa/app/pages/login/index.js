@@ -10,14 +10,17 @@ import useCustomer from '../../commerce-api/hooks/useCustomer'
 import useNavigation from '../../hooks/use-navigation'
 import Seo from '../../components/seo'
 import {useForm} from 'react-hook-form'
+import {useLocation} from 'react-router-dom'
 
 import LoginForm from '../../components/login'
 
 const Login = () => {
     const {formatMessage} = useIntl()
+
     const navigate = useNavigation()
     const customer = useCustomer()
     const form = useForm()
+    const location = useLocation()
 
     const submitForm = async (data) => {
         try {
@@ -35,7 +38,11 @@ const Login = () => {
     // If customer is registered push to account page
     useEffect(() => {
         if (customer.authType != null && customer.authType === 'registered') {
-            navigate('/account')
+            if (location?.state?.directedFrom) {
+                navigate(location.state.directedFrom)
+            } else {
+                navigate('/account')
+            }
         }
     }, [customer])
 

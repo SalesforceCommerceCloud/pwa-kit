@@ -1,6 +1,7 @@
 import {createContext, useContext} from 'react'
 import jwtDecode from 'jwt-decode'
 import {getAppOrigin} from 'pwa-kit-react-sdk/dist/utils/url'
+import {HTTPError} from 'pwa-kit-react-sdk/dist/ssr/universal/errors'
 
 /**
  * Compares the token age against the issued and expiry times. If the token's age is
@@ -234,6 +235,7 @@ export const createOcapiFetch = (commerceAPIConfig) => async (
             body: JSON.stringify(body)
         })
     })
+    const httpStatus = response.status
 
     if (!args[1] && response.json) {
         response = await response.json()
@@ -241,7 +243,8 @@ export const createOcapiFetch = (commerceAPIConfig) => async (
 
     const convertedResponse = keysToCamel(response)
     if (convertedResponse.fault) {
-        return convertOcapiFaultToCapiError(convertedResponse.fault)
+        const error = convertOcapiFaultToCapiError(convertedResponse.fault)
+        throw new HTTPError(httpStatus, error.detail)
     } else {
         return convertedResponse
     }

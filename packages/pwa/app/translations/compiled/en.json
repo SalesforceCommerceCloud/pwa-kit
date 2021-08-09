@@ -1,4 +1,10 @@
 {
+  "+O5yEM": [
+    {
+      "type": 0,
+      "value": "Promotions Applied"
+    }
+  ],
   "+dLAnb": [
     {
       "type": 0,
@@ -53,6 +59,12 @@
     {
       "type": 0,
       "value": "Don't have an account?"
+    }
+  ],
+  "2BHb6K": [
+    {
+      "type": 0,
+      "value": "Applied promotions info"
     }
   ],
   "2SvpuI": [
@@ -207,6 +219,12 @@
     {
       "type": 0,
       "value": "Tax"
+    }
+  ],
+  "B/orA3": [
+    {
+      "type": 0,
+      "value": "Promotions"
     }
   ],
   "B5/YE0": [
@@ -393,6 +411,12 @@
       "value": "New Payment Method Saved"
     }
   ],
+  "O3zHDW": [
+    {
+      "type": 1,
+      "value": "submitButtonLabel"
+    }
+  ],
   "O95R3Z": [
     {
       "type": 0,
@@ -453,6 +477,12 @@
     {
       "type": 0,
       "value": "Back to cart"
+    }
+  ],
+  "OVvfLK": [
+    {
+      "type": 0,
+      "value": "You're now signed in"
     }
   ],
   "Olgsm/": [
@@ -645,6 +675,12 @@
       "value": "Quantity:"
     }
   ],
+  "W/5hwr": [
+    {
+      "type": 0,
+      "value": "Something went wrong. Please try again."
+    }
+  ],
   "WHgdsk": [
     {
       "type": 0,
@@ -675,12 +711,6 @@
       "value": "Reset password"
     }
   ],
-  "Yywm0p": [
-    {
-      "type": 0,
-      "value": "Continue shopping"
-    }
-  ],
   "YzZa8+": [
     {
       "type": 0,
@@ -703,12 +733,6 @@
     {
       "type": 0,
       "value": "Do you have a gift card or promo code?"
-    }
-  ],
-  "agOXPD": [
-    {
-      "type": 0,
-      "value": "Size"
     }
   ],
   "aheQdn": [
@@ -767,6 +791,12 @@
     {
       "type": 0,
       "value": "Shop New Arrivals"
+    }
+  ],
+  "bhUBy4": [
+    {
+      "type": 0,
+      "value": "Save & Continue to Shipping Method"
     }
   ],
   "c1zaMK": [
@@ -987,12 +1017,6 @@
       "value": "Sort by"
     }
   ],
-  "hcdFiU": [
-    {
-      "type": 0,
-      "value": "each"
-    }
-  ],
   "header.button.assistive_msg.logo": [
     {
       "type": 0,
@@ -1081,6 +1105,20 @@
     {
       "type": 0,
       "value": "Default"
+    }
+  ],
+  "llHgJz": [
+    {
+      "type": 0,
+      "value": "Welcome "
+    },
+    {
+      "type": 1,
+      "value": "name"
+    },
+    {
+      "type": 0,
+      "value": ","
     }
   ],
   "login-redirect.message.welcome": [
@@ -1233,6 +1271,12 @@
       "value": "You're currently browsing in offline mode"
     }
   ],
+  "pQ2F3h": [
+    {
+      "type": 0,
+      "value": "Edit Shipping Address"
+    }
+  ],
   "pS9/Sw": [
     {
       "type": 0,
@@ -1359,12 +1403,6 @@
       "value": "Edit cart"
     }
   ],
-  "saIij4": [
-    {
-      "type": 0,
-      "value": "Where would you like to go next?"
-    }
-  ],
   "sy+pv5": [
     {
       "type": 0,
@@ -1393,12 +1431,6 @@
     {
       "type": 0,
       "value": "Not provided"
-    }
-  ],
-  "uMhpKe": [
-    {
-      "type": 0,
-      "value": "Color"
     }
   ],
   "uSpe21": [
@@ -1495,12 +1527,6 @@
       "value": "Payment Methods"
     }
   ],
-  "yHfqLT": [
-    {
-      "type": 0,
-      "value": "View account"
-    }
-  ],
   "z+Zrln": [
     {
       "type": 0,
@@ -1523,6 +1549,12 @@
     {
       "type": 0,
       "value": "Please enter 2-letter state/province"
+    }
+  ],
+  "zODu/+": [
+    {
+      "type": 0,
+      "value": "ea"
     }
   ],
   "zXbRZR": [

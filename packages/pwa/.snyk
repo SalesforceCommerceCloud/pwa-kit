@@ -60,13 +60,19 @@ ignore:
         expires: '2021-05-26T15:49:45.729Z'
   SNYK-JS-INI-1048974:
     - fsevents > node-pre-gyp > rc > ini:
-        reason: no fix available
-        expires: '2021-05-26T16:30:50.778Z'
+        reason: W-9331120 no fix available
+        expires: '2021-06-26T17:44:36.650Z'
   SNYK-JS-MINIMIST-559764:
     - fsevents > node-pre-gyp > mkdirp > minimist:
-        reason: no fix available
-        expires: '2021-05-26T16:30:50.778Z'
+        reason: W-9331120 no fix available
+        expires: '2021-06-26T17:44:36.650Z'
     - fsevents > node-pre-gyp > rc > minimist:
         reason: no fix available
         expires: '2021-05-26T16:30:50.778Z'
+      fsevents > node-pre-gyp > tar > mkdirp > minimist:
+        reason: W-9331120 no fix available
+        expires: '2021-06-26T17:44:36.650Z'
+    - fsevents > node-pre-gyp > rc > minimist:
+        reason: W-9331120 no fix available
+        expires: '2021-06-26T17:44:36.650Z'
 patch: {}

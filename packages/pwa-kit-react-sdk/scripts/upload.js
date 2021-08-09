@@ -27,7 +27,7 @@ const isEmptyOptions = (options) => {
 const upload = (options) => {
     const dataBufferPromise = Utils.buildObject(ARCHIVE, options).then((buildObj) => {
         const buildJSON = JSON.stringify(buildObj, null, 4)
-        return new Buffer(buildJSON)
+        return Buffer.from(buildJSON)
     })
 
     const credentialsPromise = Utils.readCredentials(options.settingsFile)

@@ -11,14 +11,16 @@ import {
     ModalOverlay,
     Stack,
     Text,
-    useDisclosure
+    useDisclosure,
+    useToast
 } from '@chakra-ui/react'
 import useCustomer from '../commerce-api/hooks/useCustomer'
 import {BrandLogo} from '../components/icons'
-import Link from '../components/link'
 import LoginForm from '../components/login'
 import ResetPasswordForm from '../components/reset-password'
 import RegisterForm from '../components/register'
+import {useHistory} from 'react-router-dom'
+import {useLocale} from '../locale'
 
 const LOGIN_VIEW = 'login'
 const REGISTER_VIEW = 'register'
@@ -30,9 +32,12 @@ export const AuthModal = ({initialView = LOGIN_VIEW, ...props}) => {
     const [currentView, setCurrentView] = useState(initialView)
     const form = useForm()
     const submittedEmail = useRef()
-
+    const history = useHistory()
+    const toast = useToast()
+    const [locale] = useLocale()
     const submitForm = async (data) => {
         form.clearErrors()
+
         return {
             login: handleLogin,
             register: handleRegister,
@@ -49,7 +54,9 @@ export const AuthModal = ({initialView = LOGIN_VIEW, ...props}) => {
                       defaultMessage:
                           "Something's not right with your email or password. Try again."
                   })
-                : error.message
+                : formatMessage({
+                      defaultMessage: 'Something went wrong. Please try again.'
+                  })
             form.setError('global', {type: 'manual', message})
         }
     }
@@ -57,6 +64,7 @@ export const AuthModal = ({initialView = LOGIN_VIEW, ...props}) => {
     const handleRegister = async (data) => {
         try {
             await customer.registerCustomer(data)
+            history.push(`/${locale}/account`)
         } catch (error) {
             form.setError('global', {type: 'manual', message: error.message})
         }
@@ -96,24 +104,43 @@ export const AuthModal = ({initialView = LOGIN_VIEW, ...props}) => {
         form.reset()
     }, [currentView])
 
-    const LoginRegisterSuccess = () => (
-        <Stack justify="center" align="center" spacing={6}>
-            <BrandLogo width="60px" height="auto" />
-            <Stack>
-                <Text align="center" fontSize="md">
-                    <FormattedMessage defaultMessage={'Where would you like to go next?'} />
-                </Text>
-                <Stack spacing={4} pt={4}>
-                    <Button as={Link} to="/account" variant="outline" onClick={props.onClose}>
-                        <FormattedMessage defaultMessage="View account" />
-                    </Button>
-                    <Button onClick={props.onClose}>
-                        <FormattedMessage defaultMessage="Continue shopping" />
-                    </Button>
-                </Stack>
-            </Stack>
-        </Stack>
-    )
+    useEffect(() => {
+        // Lets determine if the user has either logged in, or registed.
+        const loggingIn = currentView === LOGIN_VIEW
+        const registering = currentView === REGISTER_VIEW
+        const {isOpen} = props
+        const isNowRegistered =
+            isOpen && customer?.authType === 'registered' && (loggingIn || registering)
+
+        // If the customer changed, but it's not because they logged in or registered. Do nothing.
+        if (!isNowRegistered) {
+            return
+        }
+
+        // We are done with the modal.
+        props.onClose()
+
+        // Show a toast only for those registed users returning to the site.
+        if (loggingIn) {
+            toast({
+                variant: 'subtle',
+                title: `${formatMessage(
+                    {
+                        defaultMessage: 'Welcome {name},'
+                    },
+                    {
+                        name: customer?.firstName
+                    }
+                )}`,
+                description: `${formatMessage({
+                    defaultMessage: "You're now signed in"
+                })}`,
+                status: 'success',
+                position: 'top-right',
+                isClosable: true
+            })
+        }
+    }, [customer])
 
     const PasswordResetSuccess = () => (
         <Stack justify="center" align="center" spacing={6}>
@@ -161,10 +188,6 @@ export const AuthModal = ({initialView = LOGIN_VIEW, ...props}) => {
                             clickSignIn={() => setCurrentView(LOGIN_VIEW)}
                         />
                     )}
-                    {form.formState.isSubmitSuccessful &&
-                        (currentView === LOGIN_VIEW || currentView === REGISTER_VIEW) && (
-                            <LoginRegisterSuccess />
-                        )}
                     {!form.formState.isSubmitSuccessful && currentView === PASSWORD_VIEW && (
                         <ResetPasswordForm
                             form={form}

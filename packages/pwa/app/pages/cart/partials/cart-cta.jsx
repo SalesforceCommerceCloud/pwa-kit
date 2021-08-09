@@ -11,7 +11,7 @@ const CartCta = () => {
                 as={Link}
                 to="/checkout"
                 width={['95%', '95%', '95%', '100%']}
-                marginTop={6}
+                marginTop={[6, 6, 2, 2]}
                 mb={4}
                 rightIcon={<LockIcon />}
                 variant="solid"
