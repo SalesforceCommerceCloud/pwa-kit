@@ -26,8 +26,29 @@ export default {
         link: (props) => ({
             color: props.colorScheme === 'red' ? 'red.500' : 'blue.600',
             fontWeight: 'normal',
-            minWidth: '1em'
-        })
+            minWidth: '1em',
+            lineHeight: 4
+        }),
+        'menu-link': {
+            color: 'black',
+            justifyContent: 'flex-start',
+            fontSize: 'sm',
+            _hover: {bg: 'gray.50', textDecoration: 'none'},
+            _activeLink: {
+                bg: 'gray.50',
+                textDecoration: 'none'
+            }
+        },
+        'menu-link-mobile': {
+            color: 'black',
+            justifyContent: 'flex-start',
+            fontSize: 'sm',
+            _hover: {bg: 'gray.50', textDecoration: 'none'},
+            _activeLink: {
+                bg: 'gray.100',
+                textDecoration: 'none'
+            }
+        }
     },
     sizes: {
         md: {

@@ -14,6 +14,8 @@ import {pages as pageEvents} from '../../events'
 const noop = () => undefined
 
 const isServerSide = typeof window === 'undefined'
+const isHydrating = () => !isServerSide && window.__HYDRATING__
+
 const hasPerformanceAPI = !isServerSide && window.performance && window.performance.timing
 
 /* istanbul ignore next */
@@ -59,6 +61,9 @@ export const routeComponent = (Wrapped, isPage, locals) => {
             super(props, context)
             this.state = {
                 childProps: {
+                    // When serverside or hydrating, forward props from the frozen app state
+                    // to the wrapped component.
+                    ...(isServerSide || isHydrating() ? this.props.preloadedProps : undefined),
                     isLoading: false
                 }
             }
@@ -177,7 +182,7 @@ export const routeComponent = (Wrapped, isPage, locals) => {
             this.componentDidUpdate({})
         }
 
-        componentDidUpdate(previousProps) {
+        async componentDidUpdate(previousProps) {
             // Because we are setting the component state from within this function we need a
             // guard prevent various events (update, error, complete, and load) from being
             // called multiple times.
@@ -198,25 +203,32 @@ export const routeComponent = (Wrapped, isPage, locals) => {
             const {params} = match || {}
             const {params: previousParams} = previousMatch || {}
 
-            // The isHydrating MUST only be used to decide whether or not to call
-            // static lifecycle methods. Do not use it in component rendering - you
-            // will not be able to trigger updates, because this is intentionally
-            // outside of a component's state/props.
-            const isHydrating = !isServerSide && window.__HYDRATING__
+            // The wasHydratingOnUpdate flag MUST only be used to decide whether
+            // or not to call static lifecycle methods.  Do not use it in
+            // component rendering - you will not be able to trigger updates,
+            // because this is intentionally outside of a component's
+            // state/props.
+            const wasHydratingOnUpdate = isHydrating()
 
             /* istanbul ignore next */
             // Don't getProps() when hydrating - the server has already done
             // getProps() frozen the state in the page.
-            const shouldGetPropsNow = () => {
+            const shouldGetPropsNow = async () => {
                 return (
-                    !isHydrating &&
-                    RouteComponent.shouldGetProps({
+                    !wasHydratingOnUpdate &&
+                    (await RouteComponent.shouldGetProps({
                         previousLocation,
                         location,
                         previousParams,
                         params
-                    })
+                    }))
                 )
+            }
+
+            const setStateAsync = (newState) => {
+                return new Promise((resolve) => {
+                    this.setState(newState, resolve)
+                })
             }
 
             // Note: We've built a reasonable notion of a "page load time" here:
@@ -231,102 +243,84 @@ export const routeComponent = (Wrapped, isPage, locals) => {
             // Since the time is overwhelmingly spent fetching data on soft-navs,
             // we think this is a good approximation in both cases.
 
-            return Promise.resolve()
-                .then(() => RouteComponent.getTemplateName())
-                .then((templateName) => {
-                    const start = now()
-                    const emitPageLoadEvent = (templateName, end) =>
-                        isPage && pageEvents.pageLoad(templateName, start, end)
+            const templateName = await RouteComponent.getTemplateName()
 
-                    const emitPageErrorEvent = (name, content) =>
-                        isPage && pageEvents.error(name, content)
+            const start = now()
 
-                    // If hydrating, we know that the server just fetched and
-                    // rendered for us, embedding the app-state in the page HTML.
-                    // For that reason, we don't ever do getProps while Hydrating.
-                    // However, we still want to report a page load time for this
-                    // initial render. Rather than fetching again, trigger the event
-                    // right away and do nothing.
+            const emitPageLoadEvent = (templateName, end) =>
+                isPage && pageEvents.pageLoad(templateName, start, end)
 
-                    if (isHydrating) {
-                        emitPageLoadEvent(templateName, now())
+            const emitPageErrorEvent = (name, content) => isPage && pageEvents.error(name, content)
+
+            // If hydrating, we know that the server just fetched and
+            // rendered for us, embedding the app-state in the page HTML.
+            // For that reason, we don't ever do getProps while Hydrating.
+            // However, we still want to report a page load time for this
+            // initial render. Rather than fetching again, trigger the event
+            // right away and do nothing.
+
+            if (wasHydratingOnUpdate) {
+                emitPageLoadEvent(templateName, now())
+            }
+
+            const willGetProps = await shouldGetPropsNow()
+
+            // Because `shouldGetPropsNow` is async the app is often
+            // no longer hydrating when you hit this line. That doesn't
+            // matter for initialization. For logging make it clear
+            // that we mean "the app was hydrating on this call to
+            // componentDidUpdate".
+            console.log(
+                JSON.stringify({
+                    templateName,
+                    wasHydratingOnUpdate,
+                    willGetProps
+                })
+            )
+
+            if (!willGetProps) {
+                onUpdateComplete()
+                return
+            }
+
+            try {
+                this._suppressUpdate = true
+
+                await setStateAsync({
+                    childProps: {
+                        ...this.state.childProps,
+                        isLoading: true
                     }
-
-                    return Promise.resolve()
-                        .then(shouldGetPropsNow)
-                        .then((should) => {
-                            // Because `shouldGetPropsNow` is async the app is often
-                            // no longer hydrating when you hit this line. That doesn't
-                            // matter for initialization. For logging make it clear
-                            // that we mean "the app was hydrating on this call to
-                            // componentDidUpdate".
-                            console.log(
-                                JSON.stringify({
-                                    templateName,
-                                    wasHydratingOnUpdate: isHydrating,
-                                    shouldInit: should
-                                })
-                            )
-
-                            if (should) {
-                                return Promise.resolve()
-                                    .then(() => {
-                                        this._suppressUpdate = true
-
-                                        return new Promise((resolve) => {
-                                            this.setState(
-                                                {
-                                                    childProps: {
-                                                        ...this.state.childProps,
-                                                        isLoading: true
-                                                    }
-                                                },
-                                                resolve
-                                            )
-                                        })
-                                    })
-                                    .then(() => {
-                                        console.log(`Calling getProps for '${templateName}'`)
-                                        const req = undefined
-                                        const res = undefined
-                                        return RouteComponent.getProps({
-                                            req,
-                                            res,
-                                            params,
-                                            location
-                                        })
-                                    })
-                                    .then((childProps = {}) => {
-                                        this._suppressUpdate = false
-
-                                        return new Promise((resolve) => {
-                                            this.setState(
-                                                {
-                                                    childProps: {
-                                                        ...childProps,
-                                                        isLoading: false
-                                                    }
-                                                },
-                                                resolve
-                                            )
-                                        })
-                                    })
-                                    .then(() => {
-                                        onGetPropsComplete()
-                                        emitPageLoadEvent(templateName, now())
-                                    })
-                                    .catch((err) => {
-                                        onGetPropsError(err)
-                                        emitPageErrorEvent(templateName, err)
-                                    })
-                            }
-                        })
                 })
-                .then((result) => {
-                    onUpdateComplete()
 
-                    return result
+                console.log(`Calling getProps for '${templateName}'`)
+                const req = undefined
+                const res = undefined
+                const childProps =
+                    (await RouteComponent.getProps({
+                        req,
+                        res,
+                        params,
+                        location
+                    })) || {}
+
+                this._suppressUpdate = false
+
+                await setStateAsync({
+                    childProps: {
+                        ...childProps,
+                        isLoading: false
+                    }
                 })
+
+                onGetPropsComplete()
+                emitPageLoadEvent(templateName, now())
+            } catch (err) {
+                onGetPropsError(err)
+                emitPageErrorEvent(templateName, err)
+            }
+
+            onUpdateComplete()
         }
 
         /**
@@ -334,7 +328,12 @@ export const routeComponent = (Wrapped, isPage, locals) => {
          * private or test-only props for this HOC.
          */
         getChildProps() {
-            const excludes = ['onGetPropsComplete', 'onGetPropsError', 'onUpdateComplete']
+            const excludes = [
+                'onGetPropsComplete',
+                'onGetPropsError',
+                'onUpdateComplete',
+                'preloadedProps'
+            ]
             return Object.assign(
                 {},
                 ...Object.entries(this.props)
@@ -361,7 +360,8 @@ export const routeComponent = (Wrapped, isPage, locals) => {
         match: PropTypes.object,
         onGetPropsComplete: PropTypes.func,
         onGetPropsError: PropTypes.func,
-        onUpdateComplete: PropTypes.func
+        onUpdateComplete: PropTypes.func,
+        preloadedProps: PropTypes.object
     }
 
     const excludes = {

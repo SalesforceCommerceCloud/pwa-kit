@@ -17,6 +17,8 @@ import {
     productsResponse
 } from '../../commerce-api/mock-data'
 
+jest.setTimeout(60000)
+
 // Make sure fetch is defined in test env
 Object.defineProperty(window, 'fetch', {
     value: require('node-fetch')
@@ -112,7 +114,10 @@ const server = setupServer(
 )
 
 // Set up and clean up
-beforeAll(() => server.listen())
+beforeAll(() => {
+    jest.resetModules()
+    server.listen({onUnhandledRequest: 'error'})
+})
 afterEach(() => {
     localStorage.clear()
     server.resetHandlers()
@@ -243,7 +248,7 @@ test('Can proceed through checkout steps as guest', async () => {
 
     // Wait for next step to render
     await waitFor(() =>
-        expect(screen.getByTestId('sf-checkout-section-step-1-content')).not.toBeEmptyDOMElement()
+        expect(screen.getByTestId('sf-toggle-card-step-1-content')).not.toBeEmptyDOMElement()
     )
 
     // Email should be displayed in previous step summary
@@ -261,7 +266,7 @@ test('Can proceed through checkout steps as guest', async () => {
 
     // Wait for next step to render
     await waitFor(() => {
-        expect(screen.getByTestId('sf-checkout-section-step-2-content')).not.toBeEmptyDOMElement()
+        expect(screen.getByTestId('sf-toggle-card-step-2-content')).not.toBeEmptyDOMElement()
     })
 
     // Shipping address displayed in previous step summary
@@ -283,7 +288,7 @@ test('Can proceed through checkout steps as guest', async () => {
 
     // Wait for next step to render
     await waitFor(() => {
-        expect(screen.getByTestId('sf-checkout-section-step-3-content')).not.toBeEmptyDOMElement()
+        expect(screen.getByTestId('sf-toggle-card-step-3-content')).not.toBeEmptyDOMElement()
     })
 
     // Applied shipping method should be displayed in previous step summary
@@ -299,7 +304,7 @@ test('Can proceed through checkout steps as guest', async () => {
     expect(screen.getByLabelText(/same as shipping address/i)).toBeChecked()
 
     // Should display billing address that matches shipping address
-    const step3Content = within(screen.getByTestId('sf-checkout-section-step-3-content'))
+    const step3Content = within(screen.getByTestId('sf-toggle-card-step-3-content'))
     expect(step3Content.getByText('Tester McTesting')).toBeInTheDocument()
     expect(step3Content.getByText('123 Main St')).toBeInTheDocument()
     expect(step3Content.getByText('Tampa, FL 33610')).toBeInTheDocument()
@@ -366,7 +371,7 @@ test('Can proceed through checkout as registered customer', async () => {
 
         // mock adding guest email to basket
         rest.put('*/baskets/:basketId/customer', (req, res, ctx) => {
-            currentBasket.customer_info.email = 'darek@test.com'
+            currentBasket.customer_info.email = 'customer@test.com'
             return res(ctx.json(currentBasket))
         }),
 
@@ -445,7 +450,7 @@ test('Can proceed through checkout as registered customer', async () => {
         rest.post('*/orders', (req, res, ctx) => {
             currentBasket = {
                 ...ocapiOrderResponse,
-                customer_info: {...ocapiOrderResponse.customer_info, email: 'darek@test.com'}
+                customer_info: {...ocapiOrderResponse.customer_info, email: 'customer@test.com'}
             }
             return res(ctx.json(currentBasket))
         })
@@ -461,17 +466,17 @@ test('Can proceed through checkout as registered customer', async () => {
     // Provide customer email and submit
     const emailInput = screen.getByLabelText('Email')
     const pwInput = screen.getByLabelText('Password')
-    user.type(emailInput, 'darek@test.com')
+    user.type(emailInput, 'customer@test.com')
     user.type(pwInput, 'Password!1')
     user.click(loginBtn)
 
     // Wait for next step to render
     await waitFor(() =>
-        expect(screen.getByTestId('sf-checkout-section-step-1-content')).not.toBeEmptyDOMElement()
+        expect(screen.getByTestId('sf-toggle-card-step-1-content')).not.toBeEmptyDOMElement()
     )
 
     // Email should be displayed in previous step summary
-    expect(screen.getByText('darek@test.com')).toBeInTheDocument()
+    expect(screen.getByText('customer@test.com')).toBeInTheDocument()
 
     // Select a saved address and continue
     user.click(screen.getByDisplayValue('savedaddress1'))
@@ -479,7 +484,7 @@ test('Can proceed through checkout as registered customer', async () => {
 
     // Wait for next step to render
     await waitFor(() => {
-        expect(screen.getByTestId('sf-checkout-section-step-2-content')).not.toBeEmptyDOMElement()
+        expect(screen.getByTestId('sf-toggle-card-step-2-content')).not.toBeEmptyDOMElement()
     })
 
     // Shipping address displayed in previous step summary
@@ -499,7 +504,7 @@ test('Can proceed through checkout as registered customer', async () => {
 
     // Wait for next step to render
     await waitFor(() => {
-        expect(screen.getByTestId('sf-checkout-section-step-3-content')).not.toBeEmptyDOMElement()
+        expect(screen.getByTestId('sf-toggle-card-step-3-content')).not.toBeEmptyDOMElement()
     })
 
     // Applied shipping method should be displayed in previous step summary
@@ -512,7 +517,7 @@ test('Can proceed through checkout as registered customer', async () => {
     expect(screen.getByLabelText(/same as shipping address/i)).toBeChecked()
 
     // Should display billing address that matches shipping address
-    const step3Content = within(screen.getByTestId('sf-checkout-section-step-3-content'))
+    const step3Content = within(screen.getByTestId('sf-toggle-card-step-3-content'))
     expect(step3Content.getByText('123 Main St')).toBeInTheDocument()
 
     // Move to final review step

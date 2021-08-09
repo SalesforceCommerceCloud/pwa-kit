@@ -15,17 +15,18 @@ import {useSearchParams} from './use-search-params'
  * Generate a memoized list of page size urls. Chaning the page size will reset
  * the offset to zero to simplify things.
  */
-export const usePageUrls = ({total = 0}) => {
+export const usePageUrls = ({total = 0, limit}) => {
     const location = useLocation()
-    const {limit} = useSearchParams()
+    const searchParams = useSearchParams()
+    const _limit = limit || searchParams.limit
 
     return useMemo(() => {
-        const pageCount = Math.ceil(total / limit)
+        const pageCount = Math.ceil(total / _limit)
 
         return buildUrlSet(
             `${location.pathname}${location.search}`,
             'offset',
-            new Array(pageCount).fill(0).map((_, index) => index * limit)
+            new Array(pageCount).fill(0).map((_, index) => index * _limit)
         )
-    }, [location.pathname, location.search, limit, total])
+    }, [location.pathname, location.search, _limit, total])
 }

@@ -1,22 +1,18 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {FormattedMessage, FormattedNumber} from 'react-intl'
-import useBasket from '../../../commerce-api/hooks/useBasket'
 import {AspectRatio, Flex, Image, Stack, Text} from '@chakra-ui/react'
 
-const CartProductVariant = ({item}) => {
-    const basket = useBasket()
-
-    if (!basket._productItemsDetail) {
+const CartProductVariant = ({item, variant}) => {
+    if (!variant) {
         return null
     }
 
-    const product = basket._productItemsDetail[item.productId]
-    const image = product.imageGroups?.find((group) => group.viewType === 'small').images[0]
+    const image = variant.imageGroups?.find((group) => group.viewType === 'small').images[0]
 
-    const variationValues = Object.keys(product.variationValues).map((key) => {
-        const value = product.variationValues[key]
-        const attr = product.variationAttributes?.find((attr) => attr.id === key)
+    const variationValues = Object.keys(variant.variationValues).map((key) => {
+        const value = variant.variationValues[key]
+        const attr = variant.variationAttributes?.find((attr) => attr.id === key)
         return {
             id: key,
             name: attr?.name || key,
@@ -32,7 +28,7 @@ const CartProductVariant = ({item}) => {
                 </AspectRatio>
             )}
             <Stack spacing={0} flex={1}>
-                <Text fontWeight="bold">{product.name}</Text>
+                <Text fontWeight="bold">{variant.name}</Text>
                 {variationValues.map((variationValue) => (
                     <Text fontSize="sm" key={variationValue.id}>
                         {variationValue.value}
@@ -46,7 +42,7 @@ const CartProductVariant = ({item}) => {
                 <FormattedNumber
                     value={item.price * item.quantity}
                     style="currency"
-                    currency={basket.currency}
+                    currency={variant.currency}
                 />
             </Text>
         </Flex>
@@ -54,7 +50,8 @@ const CartProductVariant = ({item}) => {
 }
 
 CartProductVariant.propTypes = {
-    item: PropTypes.object.isRequired
+    item: PropTypes.object.isRequired,
+    variant: PropTypes.object
 }
 
 export default CartProductVariant

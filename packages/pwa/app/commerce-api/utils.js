@@ -254,3 +254,21 @@ export const getTenantId = (orgId) => {
     const tenantId = orgId.substring(indexToStartOfTenantId + 1)
     return tenantId
 }
+
+/**
+ * Indicates if an JSON response from the SDK should be considered an error
+ * @param {object} jsonResponse - The response object returned from SDK calls
+ * @returns {boolean}
+ */
+export const isError = (jsonResponse) => {
+    if (!jsonResponse) {
+        return false
+    }
+
+    const {detail, title, type} = jsonResponse
+    if (detail && title && type) {
+        return true
+    }
+
+    return false
+}

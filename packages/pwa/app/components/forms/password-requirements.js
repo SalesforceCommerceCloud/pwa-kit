@@ -5,6 +5,9 @@ import {Flex, Text, Stack} from '@chakra-ui/react'
 import {CheckCircleIcon} from '../icons'
 import {validatePassword} from '../../utils/password-utils'
 
+/**
+ * UI component for styling password requirement line
+ */
 const PasswordRequirement = ({isValid, children}) => {
     const iconStyles = {
         display: 'block',
@@ -27,10 +30,17 @@ const PasswordRequirement = ({isValid, children}) => {
 }
 
 PasswordRequirement.propTypes = {
+    /** Should it render in valid state */
     isValid: PropTypes.bool,
+
+    /** The requirement text */
     children: PropTypes.any
 }
 
+/**
+ * Renders a list of password requirments. Each requirement line toggles to its `isValid`
+ * state when the given password value meets the associated critieria.
+ */
 const PasswordRequirements = ({value}) => {
     const pwValidations = validatePassword(value)
 
@@ -68,6 +78,7 @@ const PasswordRequirements = ({value}) => {
 }
 
 PasswordRequirements.propTypes = {
+    /** The password to check against */
     value: PropTypes.string
 }
 

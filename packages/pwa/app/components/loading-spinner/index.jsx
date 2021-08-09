@@ -1,8 +1,7 @@
-import {Box} from '@chakra-ui/layout'
-import {Spinner} from '@chakra-ui/spinner'
 import React from 'react'
+import {Box, Spinner} from '@chakra-ui/react'
 
-const LoadingScrim = () => {
+const LoadingSpinner = () => {
     return (
         <Box
             zIndex="10"
@@ -29,4 +28,4 @@ const LoadingScrim = () => {
     )
 }
 
-export default LoadingScrim
+export default LoadingSpinner

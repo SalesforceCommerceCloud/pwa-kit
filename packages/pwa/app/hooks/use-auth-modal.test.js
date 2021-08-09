@@ -1,8 +1,6 @@
 import React from 'react'
 import {screen, within} from '@testing-library/react'
 import user from '@testing-library/user-event'
-import {rest} from 'msw'
-import {setupServer} from 'msw/node'
 import {renderWithProviders} from '../utils/test-utils'
 import {AuthModal, useAuthModal} from './use-auth-modal'
 
@@ -12,21 +10,47 @@ const mockRegisteredCustomer = {
     authType: 'registered',
     customerId: 'registeredCustomerId',
     customerNo: 'testno',
-    email: 'darek@test.com',
+    email: 'customer@test.com',
     firstName: 'Tester',
     lastName: 'Testing',
-    login: 'darek@test.com'
+    login: 'customer@test.com'
 }
+
+const mockLogin = jest.fn()
+
+jest.mock('../commerce-api/auth', () => {
+    return jest.fn().mockImplementation(() => {
+        return {
+            login: mockLogin.mockImplementation(async () => {
+                throw new Error('invalid credentials')
+            }),
+            getLoggedInToken: jest.fn().mockImplementation(async () => {
+                return {customer_id: 'mockcustomerid'}
+            })
+        }
+    })
+})
 
 jest.mock('commerce-sdk-isomorphic', () => {
     const sdk = jest.requireActual('commerce-sdk-isomorphic')
     return {
         ...sdk,
+        ShopperLogin: class ShopperLoginMock extends sdk.ShopperLogin {
+            async getAccessToken() {
+                return {
+                    access_token: 'accesstoken',
+                    refresh_token: 'refreshtoken',
+                    customer_id: 'customerId'
+                }
+            }
+            authenticateCustomer() {
+                return {url: '/callback'}
+            }
+        },
         ShopperCustomers: class ShopperCustomersMock extends sdk.ShopperCustomers {
             async registerCustomer() {
                 return mockRegisteredCustomer
             }
-
             async getCustomer(args) {
                 if (args.parameters.customerId === 'guestCustomerId') {
                     return {
@@ -36,7 +60,6 @@ jest.mock('commerce-sdk-isomorphic', () => {
                 }
                 return mockRegisteredCustomer
             }
-
             async authorizeCustomer() {
                 return {
                     headers: {
@@ -48,6 +71,14 @@ jest.mock('commerce-sdk-isomorphic', () => {
                         authType: 'guest',
                         customerId: 'guestCustomerId'
                     })
+                }
+            }
+            async getResetPasswordToken() {
+                return {
+                    email: 'foo@test.com',
+                    expiresInMinutes: 10,
+                    login: 'foo@test.com',
+                    resetToken: 'testresettoken'
                 }
             }
         }
@@ -87,20 +118,16 @@ const MockedComponent = () => {
     )
 }
 
-const server = setupServer()
-
 // Set up and clean up
 beforeEach(() => {
-    jest.resetModules()
-    server.listen({
-        onUnhandledRequest: 'error'
-    })
+    jest.useFakeTimers()
 })
 afterEach(() => {
     localStorage.clear()
-    server.resetHandlers()
+    jest.resetModules()
+    jest.runOnlyPendingTimers()
+    jest.useRealTimers()
 })
-afterAll(() => server.close())
 
 test('Renders login modal by default', async () => {
     renderWithProviders(<MockedComponent />)
@@ -117,31 +144,9 @@ test('Renders login modal by default', async () => {
 })
 
 test('Allows customer to sign in to their account', async () => {
-    // mock auth flow requests
-    server.use(
-        rest.post('*/oauth2/login', (req, res, ctx) =>
-            res(ctx.delay(0), ctx.status(303), ctx.set('location', `/testcallback`))
-        ),
-
-        rest.get('*/testcallback', (req, res, ctx) => {
-            return res(ctx.delay(0), ctx.status(200))
-        }),
-
-        rest.post('*/oauth2/token', (req, res, ctx) =>
-            res(
-                ctx.delay(0),
-                ctx.json({
-                    customer_id: 'test',
-                    access_token: 'testtoken',
-                    refresh_token: 'testrefeshtoken'
-                })
-            )
-        ),
-
-        rest.get('*/customers/:customerId', (req, res, ctx) =>
-            res(ctx.delay(0), ctx.json({authType: 'registered', email: 'darek@test.com'}))
-        )
-    )
+    mockLogin.mockImplementationOnce(async () => {
+        return {url: '/callback'}
+    })
 
     // render our test component
     renderWithProviders(<MockedComponent />)
@@ -151,14 +156,12 @@ test('Allows customer to sign in to their account', async () => {
     user.click(trigger)
 
     // enter credentials and submit
-    user.type(screen.getByLabelText('Email'), 'darek@test.com')
+    user.type(screen.getByLabelText('Email'), 'customer@test.com')
     user.type(screen.getByLabelText('Password'), 'Password!1')
     user.click(screen.getByText(/sign in/i))
 
     // wait for success state to appear
-    expect(
-        await screen.findByText(/where would you like to go next/i, {}, {timeout: 12000})
-    ).toBeInTheDocument()
+    expect(await screen.findByText(/where would you like to go next/i)).toBeInTheDocument()
 
     // close the modal
     user.click(screen.getByText(/continue shopping/i))
@@ -166,13 +169,6 @@ test('Allows customer to sign in to their account', async () => {
 })
 
 test('Renders error when given incorrect log in credentials', async () => {
-    // mock failed auth request
-    server.use(
-        rest.post('*/oauth2/login', (req, res, ctx) =>
-            res(ctx.delay(0), ctx.status(401), ctx.json({message: 'Invalid Credentials.'}))
-        )
-    )
-
     // render our test component
     renderWithProviders(<MockedComponent />)
 
@@ -181,36 +177,17 @@ test('Renders error when given incorrect log in credentials', async () => {
     user.click(trigger)
 
     // enter credentials and submit
-    user.type(screen.getByLabelText('Email'), 'foo@test.com')
+    user.type(screen.getByLabelText('Email'), 'bad@test.com')
     user.type(screen.getByLabelText('Password'), 'SomeFakePassword1!')
     user.click(screen.getByText(/sign in/i))
 
     // wait for login error alert to appear
     expect(
-        await screen.findByText(
-            /something's not right with your email or password\. try again\./i,
-            {},
-            {timeout: 12000}
-        )
+        await screen.findByText(/something's not right with your email or password\. try again\./i)
     ).toBeInTheDocument()
 })
 
 test('Allows customer to generate password token', async () => {
-    // mock reset password request
-    server.use(
-        rest.post('*/create-reset-token', (req, res, ctx) =>
-            res(
-                ctx.delay(0),
-                ctx.json({
-                    email: 'foo@test.com',
-                    expiresInMinutes: 10,
-                    login: 'foo@test.com',
-                    resetToken: 'testresettoken'
-                })
-            )
-        )
-    )
-
     // render our test component
     renderWithProviders(<MockedComponent />)
 
@@ -226,41 +203,21 @@ test('Allows customer to generate password token', async () => {
     user.click(within(screen.getByTestId('sf-auth-modal-form')).getByText(/reset password/i))
 
     // wait for success state
-    expect(await screen.findByText(/password reset/i, {}, {timeout: 12000})).toBeInTheDocument()
+    expect(await screen.findByText(/password reset/i)).toBeInTheDocument()
     expect(screen.getByText(/foo@test.com/i)).toBeInTheDocument()
 })
 
 test('Allows customer to create an account', async () => {
-    server.use(
-        rest.post('*/oauth2/login', (req, res, ctx) => {
-            return res(ctx.delay(0), ctx.status(303), ctx.set('location', `/testcallback`))
-        }),
-
-        rest.get('*/testcallback', (req, res, ctx) => {
-            return res(ctx.delay(0), ctx.status(200))
-        }),
-
-        rest.post('*/oauth2/token', (req, res, ctx) => {
-            return res(
-                ctx.delay(0),
-                ctx.json({
-                    customer_id: 'test',
-                    access_token: 'testtoken',
-                    refresh_token: 'testrefeshtoken'
-                })
-            )
-        }),
-
-        rest.get('*/customers/:customerId', (req, res, ctx) => {
-            return res(ctx.delay(0), ctx.json(mockRegisteredCustomer))
-        })
-    )
+    mockLogin.mockImplementationOnce(async () => {
+        return {url: '/callback'}
+    })
 
     // render our test component
     renderWithProviders(<MockedComponent />)
 
     // open the modal
-    const trigger = screen.getByText(/open modal/i)
+    const trigger = screen.getByText('Open Modal')
+
     user.click(trigger)
 
     // switch to 'create account' view
@@ -268,13 +225,12 @@ test('Allows customer to create an account', async () => {
 
     // fill out form and submit
     const withinForm = within(screen.getByTestId('sf-auth-modal-form'))
-    user.type(withinForm.getByLabelText(/first name/i), 'Tester')
-    user.type(withinForm.getByLabelText(/last name/i), 'Testing')
-    user.type(withinForm.getByPlaceholderText(/you@email.com/i), 'darek@test.com')
-    user.type(withinForm.getAllByLabelText(/password/i)[0], 'Password!1')
+
+    user.paste(withinForm.getByLabelText('First Name'), 'Tester')
+    user.paste(withinForm.getByLabelText('Last Name'), 'Tester')
+    user.paste(withinForm.getByPlaceholderText(/you@email.com/i), 'customer@test.com')
+    user.paste(withinForm.getAllByLabelText(/password/i)[0], 'Password!1')
     user.click(withinForm.getByText(/create account/i))
 
-    expect(
-        await screen.findByText(/Where would you like to go next/i, {}, {timeout: 30000})
-    ).toBeInTheDocument()
+    expect(await screen.findByText(/Where would you like to go next/i)).toBeInTheDocument()
 })

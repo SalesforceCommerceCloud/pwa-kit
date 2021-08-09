@@ -103,6 +103,16 @@
       "value": "Cancel"
     }
   ],
+  "4JYnp2": [
+    {
+      "type": 0,
+      "value": "Ordered: "
+    },
+    {
+      "type": 1,
+      "value": "date"
+    }
+  ],
   "5JcXdV": [
     {
       "type": 0,
@@ -127,12 +137,6 @@
       "value": "Please enter a valid date"
     }
   ],
-  "6cYvfa": [
-    {
-      "type": 0,
-      "value": "Enter your email to recieve instructions on how to reset your password"
-    }
-  ],
   "7gXPhB": [
     {
       "type": 0,
@@ -145,16 +149,16 @@
       "value": "Delivery Details"
     }
   ],
-  "8HJxXG": [
-    {
-      "type": 0,
-      "value": "Sign up"
-    }
-  ],
   "8iXlvA": [
     {
       "type": 0,
       "value": "Save & Continue"
+    }
+  ],
+  "8j72eG": [
+    {
+      "type": 0,
+      "value": "Please provide a new password"
     }
   ],
   "8pvKg1": [
@@ -167,6 +171,12 @@
     {
       "type": 0,
       "value": "Want shipping & tax estimates?"
+    }
+  ],
+  "9Npj92": [
+    {
+      "type": 0,
+      "value": "Enter your email to receive instructions on how to reset your password"
     }
   ],
   "A8Tnga": [
@@ -199,6 +209,12 @@
       "value": "Tax"
     }
   ],
+  "B5/YE0": [
+    {
+      "type": 0,
+      "value": "Profile updated"
+    }
+  ],
   "BAoId6": [
     {
       "type": 0,
@@ -229,6 +245,12 @@
       "value": "Shipping Address"
     }
   ],
+  "DPrDhw": [
+    {
+      "type": 0,
+      "value": "Add New Payment Method"
+    }
+  ],
   "EKKW2e": [
     {
       "type": 0,
@@ -249,6 +271,12 @@
       "value": " Left!"
     }
   ],
+  "Ev6SEF": [
+    {
+      "type": 0,
+      "value": "New Password"
+    }
+  ],
   "F62y+K": [
     {
       "type": 0,
@@ -259,6 +287,12 @@
     {
       "type": 0,
       "value": "Remove"
+    }
+  ],
+  "GretYf": [
+    {
+      "type": 0,
+      "value": "Current Password"
     }
   ],
   "Gu0oq5": [
@@ -285,6 +319,16 @@
       "value": "Let's get started"
     }
   ],
+  "ItDqLZ": [
+    {
+      "type": 1,
+      "value": "count"
+    },
+    {
+      "type": 0,
+      "value": " items"
+    }
+  ],
   "IyXU3R": [
     {
       "type": 0,
@@ -297,10 +341,26 @@
       "value": "Order Number"
     }
   ],
+  "JWbGSW": [
+    {
+      "type": 0,
+      "value": "Shipped to: "
+    },
+    {
+      "type": 1,
+      "value": "name"
+    }
+  ],
   "KV/9Hv": [
     {
       "type": 0,
       "value": "Questions"
+    }
+  ],
+  "Kz7I2o": [
+    {
+      "type": 0,
+      "value": "Password updated"
     }
   ],
   "L8seEc": [
@@ -315,10 +375,22 @@
       "value": "Are you sure you want to sign out? You will need to sign back in to proceed with your current order."
     }
   ],
+  "MnpUD7": [
+    {
+      "type": 0,
+      "value": "View details"
+    }
+  ],
   "NTgwLi": [
     {
       "type": 0,
       "value": "Place Order"
+    }
+  ],
+  "NymXNv": [
+    {
+      "type": 0,
+      "value": "New Payment Method Saved"
     }
   ],
   "O95R3Z": [
@@ -367,6 +439,16 @@
       "value": "terms"
     }
   ],
+  "OUPaUZ": [
+    {
+      "type": 1,
+      "value": "count"
+    },
+    {
+      "type": 0,
+      "value": " items"
+    }
+  ],
   "OVAmhz": [
     {
       "type": 0,
@@ -409,12 +491,6 @@
       "value": "Shipping"
     }
   ],
-  "PwaN2o": [
-    {
-      "type": 0,
-      "value": "Welcome"
-    }
-  ],
   "Pwi/Wk": [
     {
       "type": 0,
@@ -451,10 +527,22 @@
       "value": "Sign in"
     }
   ],
+  "SeGQoh": [
+    {
+      "type": 0,
+      "value": "Address Updated"
+    }
+  ],
   "Seanpx": [
     {
       "type": 0,
       "value": "Required"
+    }
+  ],
+  "SmKUxZ": [
+    {
+      "type": 0,
+      "value": "Add a new address method for faster checkout"
     }
   ],
   "Solm6E": [
@@ -497,22 +585,28 @@
       "value": "Or return to"
     }
   ],
+  "TSYROF": [
+    {
+      "type": 0,
+      "value": "You haven't placed an order yet"
+    }
+  ],
   "TdTXXf": [
     {
       "type": 0,
       "value": "Learn more"
     }
   ],
+  "TemVby": [
+    {
+      "type": 0,
+      "value": "Full Name"
+    }
+  ],
   "Ty4jOO": [
     {
       "type": 0,
       "value": "1 number"
-    }
-  ],
-  "UDdlpO": [
-    {
-      "type": 0,
-      "value": "Hi,"
     }
   ],
   "Ub+AGc": [
@@ -533,6 +627,12 @@
       "value": "Size & Fit"
     }
   ],
+  "V+R4NC": [
+    {
+      "type": 0,
+      "value": "Add Payment Method"
+    }
+  ],
   "V/JHlm": [
     {
       "type": 0,
@@ -551,6 +651,24 @@
       "value": "Out of stock"
     }
   ],
+  "XBfvKN": [
+    {
+      "type": 0,
+      "value": "Order History"
+    }
+  ],
+  "XQPWe6": [
+    {
+      "type": 0,
+      "value": "Once you place an order the details will show up here"
+    }
+  ],
+  "YDGR5k": [
+    {
+      "type": 0,
+      "value": "No Saved Payment Methods"
+    }
+  ],
   "Yy/yDL": [
     {
       "type": 0,
@@ -563,10 +681,22 @@
       "value": "Continue shopping"
     }
   ],
+  "YzZa8+": [
+    {
+      "type": 0,
+      "value": "My Profile"
+    }
+  ],
   "ZJkXve": [
     {
       "type": 0,
       "value": "Sign me up for Salesforce emails (you can unsubscribe at any time)"
+    }
+  ],
+  "Zhsl4Z": [
+    {
+      "type": 0,
+      "value": "Back to Order History"
     }
   ],
   "aHuP93": [
@@ -675,6 +805,12 @@
       "value": "Address"
     }
   ],
+  "eKEL/g": [
+    {
+      "type": 0,
+      "value": "Pending"
+    }
+  ],
   "f9teca": [
     {
       "type": 0,
@@ -699,6 +835,12 @@
     {
       "type": 0,
       "value": " with your confirmation number and receipt shortly."
+    }
+  ],
+  "fE3ujL": [
+    {
+      "type": 0,
+      "value": "Order Details"
     }
   ],
   "fIHFDI": [
@@ -917,6 +1059,12 @@
       "value": "Order Summary"
     }
   ],
+  "jvo0vs": [
+    {
+      "type": 0,
+      "value": "Save"
+    }
+  ],
   "kVzyDt": [
     {
       "type": 0,
@@ -929,10 +1077,34 @@
       "value": "State"
     }
   ],
+  "lKv8ex": [
+    {
+      "type": 0,
+      "value": "Default"
+    }
+  ],
   "login-redirect.message.welcome": [
     {
       "type": 0,
       "value": "Login Redirect"
+    }
+  ],
+  "m/CSCf": [
+    {
+      "type": 0,
+      "value": "Add a new payment method for faster checkout"
+    }
+  ],
+  "mXiD5u": [
+    {
+      "type": 0,
+      "value": "Phone Number"
+    }
+  ],
+  "mYx8sv": [
+    {
+      "type": 0,
+      "value": "Account Details"
     }
   ],
   "mobile_navigation.actions.sign_in": [
@@ -1013,10 +1185,22 @@
       "value": "1 lowercase letter"
     }
   ],
+  "nFQbxh": [
+    {
+      "type": 0,
+      "value": "Payment Method"
+    }
+  ],
   "nYi7Xz": [
     {
       "type": 0,
       "value": "Your Cart is Empty"
+    }
+  ],
+  "o1QPc9": [
+    {
+      "type": 0,
+      "value": "Tracking Number"
     }
   ],
   "o40Ymt": [
@@ -1099,6 +1283,12 @@
     {
       "type": 0,
       "value": "contact us"
+    }
+  ],
+  "py3qts": [
+    {
+      "type": 0,
+      "value": "New Address Saved"
     }
   ],
   "qGl7SR": [
@@ -1199,10 +1389,22 @@
       "value": "Already have an account?"
     }
   ],
+  "uE6ELS": [
+    {
+      "type": 0,
+      "value": "Not provided"
+    }
+  ],
   "uMhpKe": [
     {
       "type": 0,
       "value": "Color"
+    }
+  ],
+  "uSpe21": [
+    {
+      "type": 0,
+      "value": "Edit Address"
     }
   ],
   "uV4+68": [
@@ -1251,6 +1453,12 @@
       "value": "Something's not right with your email or password. Try again."
     }
   ],
+  "xBrtnx": [
+    {
+      "type": 0,
+      "value": "Addresses"
+    }
+  ],
   "xHP4/6": [
     {
       "type": 0,
@@ -1263,16 +1471,40 @@
       "value": "Sign out"
     }
   ],
+  "xYH2SF": [
+    {
+      "type": 0,
+      "value": "No Saved Addresses"
+    }
+  ],
+  "xg14pg": [
+    {
+      "type": 0,
+      "value": "Add Address"
+    }
+  ],
   "xl27nc": [
     {
       "type": 0,
       "value": "Reset Password"
     }
   ],
+  "xuTqgN": [
+    {
+      "type": 0,
+      "value": "Payment Methods"
+    }
+  ],
   "yHfqLT": [
     {
       "type": 0,
       "value": "View account"
+    }
+  ],
+  "z+Zrln": [
+    {
+      "type": 0,
+      "value": "Set as default"
     }
   ],
   "z34C7B": [
@@ -1291,6 +1523,16 @@
     {
       "type": 0,
       "value": "Please enter 2-letter state/province"
+    }
+  ],
+  "zXbRZR": [
+    {
+      "type": 0,
+      "value": "Order Number: "
+    },
+    {
+      "type": 1,
+      "value": "orderNumber"
     }
   ]
 }

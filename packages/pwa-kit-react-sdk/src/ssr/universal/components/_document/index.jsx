@@ -49,11 +49,6 @@ const Document = (props) => {
                 <meta name="format-detection" content="telephone=no" />
                 <link
                     rel="preconnect"
-                    href="https://engagement-collector.mobify.net"
-                    crossOrigin="use credentials"
-                />
-                <link
-                    rel="preconnect"
                     href="https://www.google-analytics.com"
                     crossOrigin="use credentials"
                 />

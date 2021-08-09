@@ -20,7 +20,7 @@ import {useForm} from 'react-hook-form'
 import {FormattedMessage, useIntl} from 'react-intl'
 import {useCheckout} from '../util/checkout-context'
 import useLoginFields from '../../../components/forms/useLoginFields'
-import {Section, SectionEdit, SectionSummary} from './section'
+import {ToggleCard, ToggleCardEdit, ToggleCardSummary} from '../../../components/toggle-card'
 import Field from '../../../components/field'
 
 const ContactInfo = () => {
@@ -74,7 +74,7 @@ const ContactInfo = () => {
         setIsGuestCheckout(!isGuestCheckout)
     }
     return (
-        <Section
+        <ToggleCard
             id="step-0"
             title="Contact Info"
             editing={step === 0}
@@ -90,7 +90,7 @@ const ContactInfo = () => {
                 !isGuestCheckout ? <FormattedMessage defaultMessage="Sign Out" /> : undefined
             }
         >
-            <SectionEdit>
+            <ToggleCardEdit>
                 <Container variant="form">
                     <form onSubmit={form.handleSubmit(submitForm)}>
                         <Stack spacing={6}>
@@ -134,8 +134,8 @@ const ContactInfo = () => {
                         </Stack>
                     </form>
                 </Container>
-            </SectionEdit>
-            <SectionSummary>
+            </ToggleCardEdit>
+            <ToggleCardSummary>
                 <Text>{basket?.customerInfo?.email || customer?.email}</Text>
 
                 <SignOutConfirmationDialog
@@ -148,8 +148,8 @@ const ContactInfo = () => {
                         setSignOutConfirmDialogIsOpen(false)
                     }}
                 />
-            </SectionSummary>
-        </Section>
+            </ToggleCardSummary>
+        </ToggleCard>
     )
 }
 

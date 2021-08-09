@@ -4,7 +4,7 @@ import {Box, Button, Container, Flex, Radio, RadioGroup, Stack, Text} from '@cha
 import {useForm, Controller} from 'react-hook-form'
 import {useCheckout} from '../util/checkout-context'
 import {ChevronDownIcon} from '../../../components/icons'
-import {Section, SectionEdit, SectionSummary} from './section'
+import {ToggleCard, ToggleCardEdit, ToggleCardSummary} from '../../../components/toggle-card'
 
 export default function ShippingOptions() {
     const {
@@ -48,7 +48,7 @@ export default function ShippingOptions() {
     }
 
     return (
-        <Section
+        <ToggleCard
             id="step-2"
             title="Shipping & Gift Options"
             editing={step === 2}
@@ -56,7 +56,7 @@ export default function ShippingOptions() {
             disabled={selectedShippingMethod == null}
             onEdit={() => setCheckoutStep(2)}
         >
-            <SectionEdit>
+            <ToggleCardEdit>
                 <form
                     onSubmit={form.handleSubmit(submitForm)}
                     data-testid="sf-checkout-shipping-options-form"
@@ -113,10 +113,10 @@ export default function ShippingOptions() {
                         </Box>
                     </Stack>
                 </form>
-            </SectionEdit>
+            </ToggleCardEdit>
 
             {selectedShippingMethod && (
-                <SectionSummary>
+                <ToggleCardSummary>
                     <Flex justify="space-between" w="full">
                         <Text>{selectedShippingMethod.name}</Text>
                         <Text fontWeight="bold">
@@ -130,8 +130,8 @@ export default function ShippingOptions() {
                     <Text fontSize="sm" color="gray.700">
                         {selectedShippingMethod.description}
                     </Text>
-                </SectionSummary>
+                </ToggleCardSummary>
             )}
-        </Section>
+        </ToggleCard>
     )
 }

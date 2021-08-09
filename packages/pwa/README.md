@@ -22,7 +22,7 @@ Developers enjoy a streamlined experience without having to worry about the unde
 
 ## 🔌 Prerequisites
 
--   Node.js 10.x or 12.x (14.x support coming soon)
+-   Node.js 12.x (14.x support coming soon)
 
 ## 🚀 Getting Started
 
@@ -45,7 +45,7 @@ The React Retail App is built with [Commerce API](https://developer.commerceclou
 | name                                          | Description                                                                             |
 | --------------------------------------------- | --------------------------------------------------------------------------------------- |
 | `projectSlug`                                 | Matches your project ID in the [Runtime Admin](https://runtime.commercecloud.com/) tool |
-| `mobify.ssrParameters.ssrFunctionNodeVersion` | Matches your project's Node version (`10.x`, `12.x`)                                    |
+| `mobify.ssrParameters.ssrFunctionNodeVersion` | Matches your project's Node version (`12.x`)                                    |
 | `mobify.ssrParameters.proxyConfigs`           | Proxy configuration for Commerce API, OCAPI and SLAS                                    |
 
 Sample Proxy Configs:
@@ -112,34 +112,56 @@ You can run `npm run <SCRIPT_NAME>` to run the following available scripts:
 ## 🔖 Directory Structure
 
 ```
-app/                                    The actual application code lives in here
-├── assets/svg/                         SVG icons
-├── commerce-api/                       Commerce API client and hooks
-├── components/                         React components
-│   ├── _app                            Root component
-│   ├── _app-config                     Inject context providers, state management, etc.
-│   └── _error                          Generic error component
-│   └── ...
-├── contexts/                           React contexts
-├── hooks/                              React hooks
-├── pages/                              Pages like homepage, PLP, PDP, etc.
-├── static/                             Static assets
-│   └── manifest.json                   PWA manifest
-│   └── ...
-├── theme/                              Chakra UI theme
-│   ├── components/
-│   │   ├── base/                       Theme files for Chakra components
-│   │   └── project/                    Theme files for custom components
-│   ├── foundations/                    Chakra UI theme foundations like spacing, etc.
-│   └── index.js
-├── translations/                       Localization
-├── analytics.js                        Analytics integrations, like Google Analytics.
-├── commerce-api.config.js              Commerce api configuration
-├── locale.js                           Localization
-├── main.jsx                            Client side starting point
-├── request-processor.js                Request processing at CDN edge
-├── routes.jsx                          React app routes
-└── ssr.js                              Server side rendering starting point
+.eslintrc.js                                Code style rules for ESLint
+.npmignore                                  Exclusion rules for npm
+.prettierignore                             Exclusion rules for Prettier code formatting
+.prettierrc.yaml                            Code formatting rules for Prettier
+LICENSE                                     Software licensing agreement
+README.md                                   The documentation that you're reading right now!
+__mocks__/                                  Mocking objects for unit testing with Jest
+├── app/                                    Application code lives here
+    ├── assets/svg/                         SVG icon assets
+    ├── commerce-api/                       Commerce API client and hooks
+    ├── components/                         React components
+    │   ├── _app                            Root component
+    │   ├── _app-config                     Wrapper component for injecting context providers, state management, etc.
+    │   └── _error                          Generic error component
+    │   └── ...
+    ├── contexts/                           React contexts
+    ├── hooks/                              React hooks
+    ├── pages/                              Ecommerce pages like home, PLP, PDP, etc.
+    ├── static/                             Static assets
+    │   └── manifest.json                   PWA manifest
+    │   └── ...
+    ├── theme/                              Theme files for components
+    │   ├── components/
+    │   │   ├── base/                       Theme files for Chakra components
+    │   │   └── project/                    Theme files for custom components
+    │   ├── foundations/                    Frequently used theme values like colors, spacing, etc.
+    │   └── index.js
+    ├── translations/                       Localization
+    ├── analytics.js                        Analytics integrations for services like Google Analytics.
+    ├── commerce-api.config.js              Authentication and proxying settings for Commerce API
+    ├── locale.js                           Locale settings for internationalization with react-intl
+    ├── main.jsx                            Client-side rendering entry point
+    ├── request-processor.js                Request processing functions (run at CDN edge, not locally)
+    ├── routes.jsx                          Maps request paths to route components
+    └── ssr.js                              Server-side rendering entry point
+babel.config.js                             Transpilation rules for Babel
+cache-hash-config.json                      Cache breaking hash used by the CDN
+cypress/                                    Support files for Cypress
+cypress.json                                End-to-end testing configuration for Cypress
+jest-babel-transform.js                     Babel configuration file for Jest
+jest-setup.js                               Unit testing setup for Jest
+jest.config.js                              Unit testing configuration for Jest
+node_modules/                               Package dependencies
+package-lock.json
+package.json                                General project configuration
+react-retail-app.png                        Screenshot for README.md
+scripts/                                    Automation tools
+tests/                                      Unit tests
+webpack.config.js                           Code bundling rules for Webpack
+worker/                                     Service worker
 ```
 
 ## Commerce API Integration

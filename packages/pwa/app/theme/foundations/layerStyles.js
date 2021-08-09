@@ -6,8 +6,17 @@ const card = {
     boxShadow: 'base'
 }
 
+const cardBordered = {
+    ...card,
+    px: [4, 4, 5, 6],
+    border: '1px solid',
+    borderColor: 'gray.50'
+}
+
 export default {
     card,
+
+    cardBordered,
 
     ccIcon: {
         width: '34px',

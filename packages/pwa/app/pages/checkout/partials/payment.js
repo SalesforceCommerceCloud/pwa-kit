@@ -1,14 +1,15 @@
 import React, {useEffect} from 'react'
 import PropTypes from 'prop-types'
+import {FormattedMessage} from 'react-intl'
 import {Box, Button, Checkbox, Container, Heading, Stack, Text, Divider} from '@chakra-ui/react'
 import {useCheckout} from '../util/checkout-context'
 import usePaymentForms from '../util/usePaymentForms'
 import {getCreditCardIcon} from '../../../utils/cc-utils'
 import {ChevronDownIcon} from '../../../components/icons'
-import {Section, SectionEdit, SectionSummary} from './section'
+import {ToggleCard, ToggleCardEdit, ToggleCardSummary} from '../../../components/toggle-card'
 import PaymentSelection from './payment-selection'
 import ShippingAddressSelection from './shipping-address-selection'
-import {FormattedMessage} from 'react-intl'
+import AddressDisplay from '../../../components/address-display'
 
 const Payment = () => {
     const {
@@ -34,7 +35,7 @@ const Payment = () => {
     }, [])
 
     return (
-        <Section
+        <ToggleCard
             id="step-3"
             title="Payment"
             editing={step === 3}
@@ -45,7 +46,7 @@ const Payment = () => {
             disabled={selectedPayment == null}
             onEdit={() => setCheckoutStep(3)}
         >
-            <SectionEdit>
+            <ToggleCardEdit>
                 <Stack spacing={6}>
                     {!selectedPayment?.paymentCard ? (
                         <PaymentSelection form={paymentMethodForm} hideSubmitButton />
@@ -95,7 +96,7 @@ const Payment = () => {
 
                         {billingSameAsShipping && selectedShippingAddress && (
                             <Box pl={7}>
-                                <AddressSummary address={selectedShippingAddress} />
+                                <AddressDisplay address={selectedShippingAddress} />
                             </Box>
                         )}
                     </Stack>
@@ -116,9 +117,9 @@ const Payment = () => {
                         </Container>
                     </Box>
                 </Stack>
-            </SectionEdit>
+            </ToggleCardEdit>
 
-            <SectionSummary>
+            <ToggleCardSummary>
                 <Stack spacing={6}>
                     {selectedPayment && (
                         <Stack spacing={3}>
@@ -136,12 +137,12 @@ const Payment = () => {
                             <Heading as="h3" fontSize="md">
                                 <FormattedMessage defaultMessage="Billing Address" />
                             </Heading>
-                            <AddressSummary address={selectedBillingAddress} />
+                            <AddressDisplay address={selectedBillingAddress} />
                         </Stack>
                     )}
                 </Stack>
-            </SectionSummary>
-        </Section>
+            </ToggleCardSummary>
+        </ToggleCard>
     )
 }
 
@@ -163,20 +164,5 @@ const PaymentCardSummary = ({payment}) => {
 }
 
 PaymentCardSummary.propTypes = {payment: PropTypes.object}
-
-const AddressSummary = ({address}) => (
-    <Box>
-        <Text>
-            {address.firstName} {address.lastName}
-        </Text>
-        <Text>{address.address1}</Text>
-        <Text>
-            {address.city}, {address.stateCode} {address.postalCode}
-        </Text>
-        <Text>{address.countryCode}</Text>
-    </Box>
-)
-
-AddressSummary.propTypes = {address: PropTypes.object}
 
 export default Payment

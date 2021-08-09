@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars */
-import React, {useEffect} from 'react'
+import React from 'react'
 import {screen, waitFor} from '@testing-library/react'
 import user from '@testing-library/user-event'
 import {rest} from 'msw'
@@ -8,7 +8,8 @@ import {renderWithProviders} from '../../utils/test-utils'
 import Confirmation from './confirmation'
 import {keysToCamel} from '../../commerce-api/utils'
 import useBasket from '../../commerce-api/hooks/useBasket'
-import useCustomer from '../../commerce-api/hooks/useCustomer'
+import useShopper from '../../commerce-api/hooks/useShopper'
+import {ocapiOrderResponse} from '../../commerce-api/mock-data'
 import {mockedGuestCustomer, expiredAuthToken} from '../../commerce-api/mock-data'
 
 jest.mock('../../commerce-api/hooks/useCustomer', () => {
@@ -29,122 +30,144 @@ jest.mock('../../commerce-api/hooks/useCustomer', () => {
     }
 })
 
-const mockOrder = {
-    _type: 'order',
-    adjusted_merchandize_total_tax: 0.05,
-    adjusted_shipping_total_tax: 0.0,
-    billing_address: {
-        city: 'Boston',
-        country_code: 'US',
-        first_name: 'Jeff',
-        full_name: 'Jeff Lebowski',
-        last_name: 'Lebowski'
-    },
-    currency: 'USD',
-    customer_info: {
-        customer_no: 'jlebowski',
-        email: 'jeff@lebowski.com'
-    },
-    merchandize_total_tax: 5.0,
-    order_no: '00000101',
-    order_total: 1.06,
-    payment_instruments: [
-        {
-            amount: 1.0,
-            payment_card: {
-                card_type: 'testVisa',
-                credit_card_expired: false,
-                expiration_month: 4,
-                expiration_year: 21.2,
-                holder: 'TestPerson',
-                number_last_digits: 'mber',
-                number_masked: '**********mber'
-            },
-            payment_method_id: 'CREDIT_CARD'
-        }
-    ],
-    product_items: [
-        {
-            adjusted_tax: 5.0,
-            base_price: 16.49,
-            bonus_product_line_item: false,
-            item_text: 'Simple Product',
-            price: 16.49,
-            price_after_item_discount: 16.49,
-            price_after_order_discount: 1.0,
-            product_id: 'SimpleProduct',
-            product_name: 'Simple Product',
-            quantity: 1.0,
-            tax: 5.0,
-            tax_basis: 16.49,
-            tax_class_id: null,
-            tax_rate: 0.05,
-            item_id: 'cdHBEiWbNV9ZcaaadhrCk35gtp',
-            c_strValue: 'Test'
-        }
-    ],
-    product_sub_total: 16.49,
-    product_total: 1.0,
-    shipments: [
-        {
-            id: 'me',
-            shipping_address: {
-                city: 'Boston',
-                country_code: 'US',
-                first_name: 'Jeff',
-                full_name: 'Jeff Lebowski',
-                last_name: 'Lebowski',
-                c_strValue: 'cTest'
-            },
-            shipping_method: {
-                description: 'The base shipping method.',
-                id: 'BaseShippingMethod',
-                name: 'Base Shipping Method',
-                price: 0.01,
-                c_somestring: 'ShippingMethod String Value'
-            }
-        }
-    ],
-    shipping_items: [
-        {
-            adjusted_tax: 0.0,
-            base_price: 0.01,
-            item_text: 'Shipping',
-            price: 0.01,
-            price_after_item_discount: 0.01,
-            shipment_id: 'me',
-            tax: 0.0,
-            tax_basis: 0.01,
-            tax_class_id: 'DefaultTaxClass',
-            tax_rate: 0.05,
-            item_id: 'devgoiWbNVc92aaadhrSk35gtp'
-        }
-    ],
-    shipping_total: 0.01,
-    shipping_total_tax: 0.0,
-    status: 'created',
-    tax_total: 0.05
-}
+const mockOrder = keysToCamel({
+    basket_id: 'testorderbasket',
+    ...ocapiOrderResponse
+})
 
 const mockBasketOrder = {
     baskets: [mockOrder]
 }
 
-const WrappedConfirmation = () => {
-    const basket = useBasket()
-    const customer = useCustomer()
+jest.mock('commerce-sdk-isomorphic', () => {
+    const sdk = jest.requireActual('commerce-sdk-isomorphic')
+    return {
+        ...sdk,
+        ShopperCustomers: class ShopperCustomersMock extends sdk.ShopperCustomers {
+            async getCustomer() {
+                return {
+                    authType: 'guest',
+                    customerId: 'guestCustomerId'
+                }
+            }
 
-    useEffect(() => {
-        basket.getOrCreateBasket()
-        customer.login()
-    }, [])
+            async authorizeCustomer() {
+                return {
+                    headers: {
+                        get(key) {
+                            return {authorization: 'guestToken'}[key]
+                        }
+                    },
+                    json: async () => ({
+                        authType: 'guest',
+                        customerId: 'guestCustomerId'
+                    })
+                }
+            }
 
-    return basket._type === 'order' ? <Confirmation /> : null
-}
+            async getCustomerBaskets() {
+                return mockBasketOrder
+            }
+        },
+        ShopperProducts: class ShopperProductsMock extends sdk.ShopperProducts {
+            async getProducts() {
+                return {
+                    data: [
+                        {
+                            id: 'SimpleProduct',
+                            currency: 'USD',
 
-Object.defineProperty(window, 'fetch', {
-    value: require('node-fetch')
+                            imageGroups: [
+                                {
+                                    images: [
+                                        {
+                                            alt: 'alttext',
+                                            disBaseLink: '/image',
+                                            link: '/image',
+                                            title: 'simpleproduct'
+                                        }
+                                    ],
+                                    viewType: 'small'
+                                }
+                            ],
+                            name: 'Simple Product',
+
+                            price: 46.99,
+
+                            variationAttributes: [
+                                {
+                                    id: 'color',
+                                    name: 'Color',
+                                    values: [
+                                        {
+                                            name: 'Grey Heather Multi',
+                                            orderable: true,
+                                            value: 'JJ1MCE6'
+                                        },
+                                        {
+                                            name: 'Begonia Multi',
+                                            orderable: true,
+                                            value: 'JJHL3XX'
+                                        }
+                                    ]
+                                },
+                                {
+                                    id: 'size',
+                                    name: 'Size',
+                                    values: [
+                                        {
+                                            name: 'S',
+                                            orderable: true,
+                                            value: '9SM'
+                                        },
+                                        {
+                                            name: 'M',
+                                            orderable: true,
+                                            value: '9MD'
+                                        },
+                                        {
+                                            name: 'L',
+                                            orderable: true,
+                                            value: '9LG'
+                                        },
+                                        {
+                                            name: 'XL',
+                                            orderable: true,
+                                            value: '9XL'
+                                        }
+                                    ]
+                                }
+                            ],
+                            variationValues: {
+                                color: 'JJ1MCE6',
+                                size: '9MD'
+                            }
+                        }
+                    ]
+                }
+            }
+        }
+    }
 })
+
+jest.mock('../../commerce-api/utils', () => {
+    const originalModule = jest.requireActual('../../commerce-api/utils')
+    return {
+        ...originalModule,
+        isTokenValid: jest.fn().mockReturnValue(true)
+    }
+})
+
+const WrappedConfirmation = () => {
+    useShopper()
+
+    const basket = useBasket()
+    if (basket?._type !== 'order') {
+        return null
+    }
+
+    return <Confirmation />
+}
 
 const server = setupServer(
     rest.get('*/baskets*', (_, res, ctx) => {
@@ -172,14 +195,16 @@ const server = setupServer(
     })
 )
 
-beforeAll(() => server.listen())
-afterEach(() => server.resetHandlers())
-afterAll(() => server.close())
-
-test('Renders null when no order data is loaded', async () => {
-    renderWithProviders(<Confirmation />)
-    expect(screen.queryByTestId('sf-checkout-confirmation-container')).not.toBeInTheDocument()
+// Set up and clean up
+beforeAll(() => {
+    jest.resetModules()
+    server.listen({onUnhandledRequest: 'error'})
 })
+afterEach(() => {
+    localStorage.clear()
+    server.resetHandlers()
+})
+afterAll(() => server.close())
 
 test('Renders the order detail when present', async () => {
     renderWithProviders(<WrappedConfirmation />)

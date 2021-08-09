@@ -1,8 +1,8 @@
 import React, {useState} from 'react'
-import {Box, Text} from '@chakra-ui/react'
 import {useCheckout} from '../util/checkout-context'
-import {Section, SectionEdit, SectionSummary} from './section'
+import {ToggleCard, ToggleCardEdit, ToggleCardSummary} from '../../../components/toggle-card'
 import ShippingAddressSelection from './shipping-address-selection'
+import AddressDisplay from '../../../components/address-display'
 
 export default function ShippingAddress() {
     const {
@@ -22,7 +22,7 @@ export default function ShippingAddress() {
     }
 
     return (
-        <Section
+        <ToggleCard
             id="step-1"
             title="Shipping Address"
             editing={step === 1}
@@ -30,26 +30,18 @@ export default function ShippingAddress() {
             disabled={selectedShippingAddress == null}
             onEdit={() => setCheckoutStep(1)}
         >
-            <SectionEdit>
+            <ToggleCardEdit>
                 <ShippingAddressSelection
                     selectedAddress={selectedShippingAddress}
                     submitButtonLabel="Continue to Shipping Options"
                     onSubmit={submitAndContinue}
                 />
-            </SectionEdit>
+            </ToggleCardEdit>
             {selectedShippingAddress && (
-                <SectionSummary>
-                    <Box>
-                        <Text>{selectedShippingAddress.fullName}</Text>
-                        <Text>{selectedShippingAddress.address1}</Text>
-                        <Text>
-                            {selectedShippingAddress.city}, {selectedShippingAddress.stateCode}{' '}
-                            {selectedShippingAddress.postalCode}
-                        </Text>
-                        <Text>{selectedShippingAddress.countryCode}</Text>
-                    </Box>
-                </SectionSummary>
+                <ToggleCardSummary>
+                    <AddressDisplay address={selectedShippingAddress} />
+                </ToggleCardSummary>
             )}
-        </Section>
+        </ToggleCard>
     )
 }

@@ -148,27 +148,6 @@ commands:
               git diff --exit-code
 
 jobs:
-  testNode10:
-    docker:
-      - image: circleci/node:10-stretch-browsers
-    steps:
-      - checkout
-      - setup
-      - runaudits
-      - runtests:
-          enableIntegrationTests: false
-      - smoketestscripts
-      - checkclean
-      - store_test_results:
-          path: packages/pwa/tests/reports
-          when: always
-      - store_artifacts:
-          path: packages/pwa/tests/screenshots
-          when: always
-      - slack/status:
-          fail_only: true
-          only_for_branches: salesforce-master,salesforce-develop
-
   testNode12:
     docker:
       - image: circleci/node:12-stretch-browsers
@@ -292,7 +271,6 @@ workflows:
   version: 2
   test:
     jobs:
-      - testNode10
       - testNode12
       - generatedSFCCProjectTest
   nightly-build:
@@ -304,8 +282,6 @@ workflows:
               only:
                 - salesforce-develop
     jobs:
-      - testNode10:
-          context: nightly-build
       - testNode12:
           context: nightly-build
       - generatedSFCCProjectTest:

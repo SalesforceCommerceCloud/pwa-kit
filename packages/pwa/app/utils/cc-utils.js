@@ -71,3 +71,30 @@ export const getPaymentInstrumentCardType = (type) => {
         discover: 'Discover'
     }[type]
 }
+
+export const createCreditCardPaymentBodyFromForm = (paymentFormData) => {
+    // eslint-disable-next-line no-unused-vars
+    const {expiry, paymentInstrumentId, ...selectedPayment} = paymentFormData
+
+    // The form gives us the expiration date as `MM/YY` - so we need to split it into
+    // month and year to submit them as individual fields.
+    const [expirationMonth, expirationYear] = expiry.split('/')
+
+    return {
+        paymentMethodId: 'CREDIT_CARD',
+        paymentCard: {
+            ...selectedPayment,
+            number: selectedPayment.number.replace(/ /g, ''),
+            cardType: getPaymentInstrumentCardType(selectedPayment.cardType),
+            expirationMonth: parseInt(expirationMonth),
+            expirationYear: parseInt(`20${expirationYear}`),
+
+            // TODO: These fields are required for saving the card to the customer's
+            // account. Im not sure what they are for or how to get them, so for now
+            // we're just passing some values to make it work. Need to investigate.
+            issueNumber: '',
+            validFromMonth: 1,
+            validFromYear: 2020
+        }
+    }
+}

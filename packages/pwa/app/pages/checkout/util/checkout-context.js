@@ -236,7 +236,7 @@ export const CheckoutProvider = ({children}) => {
                     return
                 }
 
-                // The form gices us the expiration date as `MM/YY` - so we need to split it into
+                // The form gives us the expiration date as `MM/YY` - so we need to split it into
                 // month and year to submit them as individual fields.
                 const [expirationMonth, expirationYear] = expiry.split('/')
 
@@ -295,9 +295,8 @@ export const CheckoutProvider = ({children}) => {
 
                 await basket.setBillingAddress(address)
 
-                // Save the address to the customer's account if they are registered and they
-                // provided a name for it.
-                if (!state.isGuestCheckout) {
+                // Save the address to the customer's account if they are registered and its a new address
+                if (!state.isGuestCheckout && !id && !addressId) {
                     customer.addSavedAddress(address)
                 }
             },

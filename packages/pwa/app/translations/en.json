@@ -44,6 +44,9 @@
   "47FYwb": {
     "defaultMessage": "Cancel"
   },
+  "4JYnp2": {
+    "defaultMessage": "Ordered: {date}"
+  },
   "5JcXdV": {
     "defaultMessage": "Create Account"
   },
@@ -56,26 +59,26 @@
   "6DCLcI": {
     "defaultMessage": "Please enter a valid date"
   },
-  "6cYvfa": {
-    "defaultMessage": "Enter your email to recieve instructions on how to reset your password"
-  },
   "7gXPhB": {
     "defaultMessage": "Qty"
   },
   "7xscgD": {
     "defaultMessage": "Delivery Details"
   },
-  "8HJxXG": {
-    "defaultMessage": "Sign up"
-  },
   "8iXlvA": {
     "defaultMessage": "Save & Continue"
+  },
+  "8j72eG": {
+    "defaultMessage": "Please provide a new password"
   },
   "8pvKg1": {
     "defaultMessage": "Payment Details"
   },
   "9HRQUG": {
     "defaultMessage": "Want shipping & tax estimates?"
+  },
+  "9Npj92": {
+    "defaultMessage": "Enter your email to receive instructions on how to reset your password"
   },
   "A8Tnga": {
     "defaultMessage": "Credit Card"
@@ -92,6 +95,9 @@
   "AwzkSM": {
     "defaultMessage": "Tax"
   },
+  "B5/YE0": {
+    "defaultMessage": "Profile updated"
+  },
   "BAoId6": {
     "defaultMessage": "Please enter your phone number"
   },
@@ -107,6 +113,9 @@
   "DP5VOH": {
     "defaultMessage": "Shipping Address"
   },
+  "DPrDhw": {
+    "defaultMessage": "Add New Payment Method"
+  },
   "EKKW2e": {
     "defaultMessage": "1 uppercase letter",
     "description": "Password requirement"
@@ -114,11 +123,17 @@
   "EOUB63": {
     "defaultMessage": "Only {stockLevel} Left!"
   },
+  "Ev6SEF": {
+    "defaultMessage": "New Password"
+  },
   "F62y+K": {
     "defaultMessage": "Sign Out"
   },
   "G/yZLu": {
     "defaultMessage": "Remove"
+  },
+  "GretYf": {
+    "defaultMessage": "Current Password"
   },
   "Gu0oq5": {
     "defaultMessage": "1 special character (example: , S ! % #)",
@@ -133,14 +148,23 @@
   "Ihg+6O": {
     "defaultMessage": "Let's get started"
   },
+  "ItDqLZ": {
+    "defaultMessage": "{count} items"
+  },
   "IyXU3R": {
     "defaultMessage": "Please enter a valid card number"
   },
   "JAcwxt": {
     "defaultMessage": "Order Number"
   },
+  "JWbGSW": {
+    "defaultMessage": "Shipped to: {name}"
+  },
   "KV/9Hv": {
     "defaultMessage": "Questions"
+  },
+  "Kz7I2o": {
+    "defaultMessage": "Password updated"
   },
   "L8seEc": {
     "defaultMessage": "Subtotal"
@@ -148,8 +172,14 @@
   "MPcjO/": {
     "defaultMessage": "Are you sure you want to sign out? You will need to sign back in to proceed with your current order."
   },
+  "MnpUD7": {
+    "defaultMessage": "View details"
+  },
   "NTgwLi": {
     "defaultMessage": "Place Order"
+  },
+  "NymXNv": {
+    "defaultMessage": "New Payment Method Saved"
   },
   "O95R3Z": {
     "defaultMessage": "Phone"
@@ -159,6 +189,10 @@
   },
   "ONNUqG": {
     "defaultMessage": "By creating an account, you agree to Salesforce’s <policy>Privacy Policy</policy> and <terms>Terms & Conditions</terms>"
+  },
+  "OUPaUZ": {
+    "defaultMessage": "{count} items",
+    "description": "Number of items in order"
   },
   "OVAmhz": {
     "defaultMessage": "Back to cart"
@@ -181,9 +215,6 @@
   "PRlD0A": {
     "defaultMessage": "Shipping"
   },
-  "PwaN2o": {
-    "defaultMessage": "Welcome"
-  },
   "Pwi/Wk": {
     "defaultMessage": "New In"
   },
@@ -202,8 +233,14 @@
   "SQJto2": {
     "defaultMessage": "Sign in"
   },
+  "SeGQoh": {
+    "defaultMessage": "Address Updated"
+  },
   "Seanpx": {
     "defaultMessage": "Required"
+  },
+  "SmKUxZ": {
+    "defaultMessage": "Add a new address method for faster checkout"
   },
   "Solm6E": {
     "defaultMessage": "Zip Code"
@@ -219,15 +256,18 @@
     "defaultMessage": "Or return to",
     "description": "Precedes link to return to sign in"
   },
+  "TSYROF": {
+    "defaultMessage": "You haven't placed an order yet"
+  },
   "TdTXXf": {
     "defaultMessage": "Learn more"
+  },
+  "TemVby": {
+    "defaultMessage": "Full Name"
   },
   "Ty4jOO": {
     "defaultMessage": "1 number",
     "description": "Password requirement"
-  },
-  "UDdlpO": {
-    "defaultMessage": "Hi,"
   },
   "Ub+AGc": {
     "defaultMessage": "Sign In"
@@ -238,6 +278,9 @@
   "V+9Zzz": {
     "defaultMessage": "Size & Fit"
   },
+  "V+R4NC": {
+    "defaultMessage": "Add Payment Method"
+  },
   "V/JHlm": {
     "defaultMessage": "Forgot password?"
   },
@@ -247,14 +290,29 @@
   "WHgdsk": {
     "defaultMessage": "Out of stock"
   },
+  "XBfvKN": {
+    "defaultMessage": "Order History"
+  },
+  "XQPWe6": {
+    "defaultMessage": "Once you place an order the details will show up here"
+  },
+  "YDGR5k": {
+    "defaultMessage": "No Saved Payment Methods"
+  },
   "Yy/yDL": {
     "defaultMessage": "Reset password"
   },
   "Yywm0p": {
     "defaultMessage": "Continue shopping"
   },
+  "YzZa8+": {
+    "defaultMessage": "My Profile"
+  },
   "ZJkXve": {
     "defaultMessage": "Sign me up for Salesforce emails (you can unsubscribe at any time)"
+  },
+  "Zhsl4Z": {
+    "defaultMessage": "Back to Order History"
   },
   "aHuP93": {
     "defaultMessage": "Do you have a gift card or promo code?"
@@ -294,11 +352,17 @@
   "e6Ph5+": {
     "defaultMessage": "Address"
   },
+  "eKEL/g": {
+    "defaultMessage": "Pending"
+  },
   "f9teca": {
     "defaultMessage": "Province"
   },
   "fCRlK5": {
     "defaultMessage": "We will send an email to <b>{email}</b> with your confirmation number and receipt shortly."
+  },
+  "fE3ujL": {
+    "defaultMessage": "Order Details"
   },
   "fIHFDI": {
     "defaultMessage": "Add New Address"
@@ -408,14 +472,29 @@
   "ivNR8s": {
     "defaultMessage": "Order Summary"
   },
+  "jvo0vs": {
+    "defaultMessage": "Save"
+  },
   "kVzyDt": {
     "defaultMessage": "Thank you for your order!"
   },
   "ku+mDU": {
     "defaultMessage": "State"
   },
+  "lKv8ex": {
+    "defaultMessage": "Default"
+  },
   "login-redirect.message.welcome": {
     "defaultMessage": "Login Redirect"
+  },
+  "m/CSCf": {
+    "defaultMessage": "Add a new payment method for faster checkout"
+  },
+  "mXiD5u": {
+    "defaultMessage": "Phone Number"
+  },
+  "mYx8sv": {
+    "defaultMessage": "Account Details"
   },
   "mobile_navigation.actions.sign_in": {
     "defaultMessage": "Sign In"
@@ -457,8 +536,14 @@
     "defaultMessage": "1 lowercase letter",
     "description": "Password requirement"
   },
+  "nFQbxh": {
+    "defaultMessage": "Payment Method"
+  },
   "nYi7Xz": {
     "defaultMessage": "Your Cart is Empty"
+  },
+  "o1QPc9": {
+    "defaultMessage": "Tracking Number"
   },
   "o40Ymt": {
     "defaultMessage": "Please enter a valid security code"
@@ -493,6 +578,9 @@
   "product_list_page.no_results.contact_us": {
     "defaultMessage": "contact us"
   },
+  "py3qts": {
+    "defaultMessage": "New Address Saved"
+  },
   "qGl7SR": {
     "defaultMessage": "Please create a password"
   },
@@ -524,8 +612,14 @@
   "uCk8r+": {
     "defaultMessage": "Already have an account?"
   },
+  "uE6ELS": {
+    "defaultMessage": "Not provided"
+  },
   "uMhpKe": {
     "defaultMessage": "Color"
+  },
+  "uSpe21": {
+    "defaultMessage": "Edit Address"
   },
   "uV4+68": {
     "defaultMessage": "Please enter your {postalOrZip}"
@@ -548,17 +642,32 @@
   "x6hxSH": {
     "defaultMessage": "Something's not right with your email or password. Try again."
   },
+  "xBrtnx": {
+    "defaultMessage": "Addresses"
+  },
   "xHP4/6": {
     "defaultMessage": "Password Reset"
   },
   "xXbJso": {
     "defaultMessage": "Sign out"
   },
+  "xYH2SF": {
+    "defaultMessage": "No Saved Addresses"
+  },
+  "xg14pg": {
+    "defaultMessage": "Add Address"
+  },
   "xl27nc": {
     "defaultMessage": "Reset Password"
   },
+  "xuTqgN": {
+    "defaultMessage": "Payment Methods"
+  },
   "yHfqLT": {
     "defaultMessage": "View account"
+  },
+  "z+Zrln": {
+    "defaultMessage": "Set as default"
   },
   "z34C7B": {
     "defaultMessage": "Password must contain at least one special character"
@@ -568,5 +677,8 @@
   },
   "zHi6BD": {
     "defaultMessage": "Please enter 2-letter state/province"
+  },
+  "zXbRZR": {
+    "defaultMessage": "Order Number: {orderNumber}"
   }
 }

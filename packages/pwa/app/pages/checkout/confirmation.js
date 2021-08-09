@@ -21,6 +21,7 @@ import useCustomer from '../../commerce-api/hooks/useCustomer'
 import {useLocale} from '../../locale'
 import Link from '../../components/link'
 import CartProductVariant from './partials/cart-product-variant'
+import AddressDisplay from '../../components/address-display'
 import PostCheckoutRegistrationFields from '../../components/forms/post-checkout-registration-fields'
 
 const CheckoutConfirmation = () => {
@@ -57,6 +58,7 @@ const CheckoutConfirmation = () => {
             lastName: customer.lastName || order.billingAddress?.lastName
         }
     })
+
     const submitForm = async (data) => {
         try {
             await customer.registerCustomer(data)
@@ -180,22 +182,9 @@ const CheckoutConfirmation = () => {
                                         <Heading as="h3" fontSize="sm">
                                             <FormattedMessage defaultMessage="Shipping Address" />
                                         </Heading>
-                                        <Box>
-                                            <Text>
-                                                {order.shipments[0].shippingAddress.fullName}
-                                            </Text>
-                                            <Text>
-                                                {order.shipments[0].shippingAddress.address1}
-                                            </Text>
-                                            <Text>
-                                                {order.shipments[0].shippingAddress.city},{' '}
-                                                {order.shipments[0].shippingAddress.stateCode}{' '}
-                                                {order.shipments[0].shippingAddress.postalCode}
-                                            </Text>
-                                            <Text>
-                                                {order.shipments[0].shippingAddress.countryCode}
-                                            </Text>
-                                        </Box>
+                                        <AddressDisplay
+                                            address={order.shipments[0].shippingAddress}
+                                        />
                                     </Stack>
 
                                     <Stack spacing={1}>
@@ -237,7 +226,14 @@ const CheckoutConfirmation = () => {
 
                                     <Stack spacing={5} align="flex-start">
                                         {order.productItems?.map((item) => (
-                                            <CartProductVariant item={item} key={item.itemId} />
+                                            <CartProductVariant
+                                                item={item}
+                                                variant={
+                                                    basket._productItemsDetail &&
+                                                    basket._productItemsDetail[item.productId]
+                                                }
+                                                key={item.itemId}
+                                            />
                                         ))}
 
                                         <Stack w="full" py={4} borderY="1px" borderColor="gray.200">
@@ -303,16 +299,7 @@ const CheckoutConfirmation = () => {
                                         <Heading as="h3" fontSize="sm">
                                             <FormattedMessage defaultMessage="Billing Address" />
                                         </Heading>
-                                        <Box>
-                                            <Text>{order.billingAddress.fullName}</Text>
-                                            <Text>{order.billingAddress.address1}</Text>
-                                            <Text>
-                                                {order.billingAddress.city},{' '}
-                                                {order.billingAddress.stateCode}{' '}
-                                                {order.billingAddress.postalCode}
-                                            </Text>
-                                            <Text>{order.billingAddress.countryCode}</Text>
-                                        </Box>
+                                        <AddressDisplay address={order.billingAddress} />
                                     </Stack>
 
                                     <Stack spacing={1}>

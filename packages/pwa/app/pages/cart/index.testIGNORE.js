@@ -47,6 +47,14 @@ const WrappedCart = () => {
     return <Cart />
 }
 
+// Set up and clean up
+beforeAll(() => {
+    jest.resetModules()
+})
+afterEach(() => {
+    localStorage.clear()
+})
+
 describe('test Cart with Items', () => {
     beforeAll(() => serverToReturnCartItems.listen())
     afterEach(() => serverToReturnCartItems.resetHandlers())

@@ -27,7 +27,9 @@ import '../../assets/svg/social-instagram.svg'
 import '../../assets/svg/social-twitter.svg'
 import '../../assets/svg/social-youtube.svg'
 import '../../assets/svg/lock.svg'
+import '../../assets/svg/payment.svg'
 import '../../assets/svg/plus.svg'
+import '../../assets/svg/receipt.svg'
 import '../../assets/svg/search.svg'
 import '../../assets/svg/user.svg'
 import '../../assets/svg/visibility.svg'
@@ -102,10 +104,12 @@ export const FlagUsaIcon = icon('flag-usa')
 export const HamburgerIcon = icon('hamburger')
 export const InfoIcon = icon('info')
 export const LockIcon = icon('lock')
-export const LocationIcon = icon('location', {viewBox: LocationSymbol.viewBox})
+export const LocationIcon = icon('location')
+export const PaymentIcon = icon('payment')
 export const PaypalIcon = icon('paypal', {viewBox: PaypalSymbol.viewBox})
 export const PlusIcon = icon('plus')
 export const MastercardIcon = icon('cc-mastercard', {viewBox: MastercardSymbol.viewBox})
+export const ReceiptIcon = icon('receipt')
 export const SearchIcon = icon('search')
 export const SocialFacebookIcon = icon('social-facebook')
 export const SocialInstagramIcon = icon('social-instagram')

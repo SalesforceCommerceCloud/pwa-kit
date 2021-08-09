@@ -1,12 +1,14 @@
 import React, {useState, useEffect} from 'react'
 import PropTypes from 'prop-types'
 import {FormattedMessage} from 'react-intl'
-import {Box, Button, Container, Heading, SimpleGrid, Stack, Text} from '@chakra-ui/react'
+import {Box, Button, Container, Heading, SimpleGrid, Stack} from '@chakra-ui/react'
 import {useForm, Controller} from 'react-hook-form'
 import {shallowEquals} from '../../../utils/utils'
 import {useCheckout} from '../util/checkout-context'
 import {RadioCard, RadioCardGroup} from '../../../components/radio-card'
+import ActionCard from '../../../components/action-card'
 import {PlusIcon} from '../../../components/icons'
+import AddressDisplay from '../../../components/address-display'
 import AddressFields from '../../../components/forms/address-fields'
 
 const ShippingAddressSelection = ({
@@ -16,10 +18,8 @@ const ShippingAddressSelection = ({
     hideSubmitButton = false,
     onSubmit = async () => null
 }) => {
-    const {customer, removeSavedAddress} = useCheckout()
-
+    const {customer} = useCheckout()
     const hasSavedAddresses = customer.addresses && customer.addresses.length > 0
-
     const [isEditingAddress, setIsEditingAddress] = useState(!hasSavedAddresses)
 
     form =
@@ -80,6 +80,10 @@ const ShippingAddressSelection = ({
         form.reset({...address})
     }
 
+    const removeSavedAddress = async (addressId) => {
+        await customer.removeSavedAddress(addressId)
+    }
+
     // Opens/closes the 'add address' form. Notice that when toggling either state,
     // we reset the form so as to remove any address selection.
     const toggleAddressEdit = () => {
@@ -107,34 +111,15 @@ const ShippingAddressSelection = ({
                                             key={address.addressId}
                                             value={address.addressId}
                                         >
-                                            <Stack spacing={4}>
-                                                <Box>
-                                                    <Text fontWeight="bold" mb={1}>
-                                                        {address.fullName}
-                                                    </Text>
-                                                    <Text>{address.address1}</Text>
-                                                    <Text>
-                                                        {address.city}, {address.territory}{' '}
-                                                        {address.postalCode}
-                                                    </Text>
-                                                    <Text>{address.countryCode}</Text>
-                                                </Box>
-                                                <Stack direction="row" spacing={4}>
-                                                    <Button variant="link" size="sm">
-                                                        <FormattedMessage defaultMessage="Edit" />
-                                                    </Button>
-                                                    <Button
-                                                        variant="link"
-                                                        size="sm"
-                                                        colorScheme="red"
-                                                        onClick={() =>
-                                                            removeSavedAddress(address.addressId)
-                                                        }
-                                                    >
-                                                        <FormattedMessage defaultMessage="Remove" />
-                                                    </Button>
-                                                </Stack>
-                                            </Stack>
+                                            <ActionCard
+                                                p={0}
+                                                border="none"
+                                                onRemove={() =>
+                                                    removeSavedAddress(address.addressId)
+                                                }
+                                            >
+                                                <AddressDisplay address={address} />
+                                            </ActionCard>
                                         </RadioCard>
                                     ))}
 
@@ -177,10 +162,7 @@ const ShippingAddressSelection = ({
                             )}
 
                             <Stack spacing={6}>
-                                <AddressFields
-                                    form={form}
-                                    isGuest={customer.authType === 'guest'}
-                                />
+                                <AddressFields form={form} />
 
                                 {!hideSubmitButton && (
                                     <Box>
@@ -199,6 +181,7 @@ const ShippingAddressSelection = ({
                         </Stack>
                     </Box>
                 )}
+
                 {!isEditingAddress && !hideSubmitButton && (
                     <Box pt={2}>
                         <Container variant="form">

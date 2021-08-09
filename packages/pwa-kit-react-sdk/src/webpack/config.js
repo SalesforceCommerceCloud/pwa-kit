@@ -11,7 +11,7 @@ import path from 'path'
 
 import webpack from 'webpack'
 import WebpackNotifierPlugin from 'webpack-notifier'
-import UglifyJsPlugin from 'uglifyjs-webpack-plugin'
+import TerserPlugin from 'terser-webpack-plugin'
 import CopyPlugin from 'copy-webpack-plugin'
 import TimeFixPlugin from 'time-fix-plugin'
 import {BundleAnalyzerPlugin} from 'webpack-bundle-analyzer'
@@ -88,11 +88,11 @@ const defines = {
     ['global.GENTLY']: false
 }
 
-const uglifiyer = (mode) => {
+const minimizer = (mode) => {
     switch (mode) {
         case production:
             return [
-                new UglifyJsPlugin({
+                new TerserPlugin({
                     cache: true,
                     parallel: true,
                     sourceMap: true
@@ -100,34 +100,15 @@ const uglifiyer = (mode) => {
             ]
         case development:
             return [
-                new UglifyJsPlugin({
+                new TerserPlugin({
                     cache: true,
                     parallel: true,
                     sourceMap: true,
-                    uglifyOptions: {
+                    terserOptions: {
                         ie8: false,
                         mangle: false,
                         warnings: false,
-                        compress: {
-                            // Dead-code removal
-                            dead_code: true,
-                            unused: true,
-
-                            // Uglify options
-                            booleans: false,
-                            collapse_vars: false,
-                            comparisons: false,
-                            conditionals: false,
-                            drop_debugger: false,
-                            evaluate: false,
-                            if_return: false,
-                            join_vars: true,
-                            keep_fnames: true,
-                            loops: false,
-                            properties: true,
-                            reduce_vars: false,
-                            sequences: false
-                        }
+                        compress: false
                     }
                 })
             ]
@@ -271,7 +252,7 @@ const main = Object.assign({}, common, {
                 }
             }
         },
-        minimizer: uglifiyer(mode)
+        minimizer: minimizer(mode)
     },
     performance: {
         maxEntrypointSize: 905000,
@@ -289,7 +270,7 @@ const others = Object.assign({}, common, {
         'fetch-polyfill': 'whatwg-fetch'
     },
     optimization: {
-        minimizer: uglifiyer(mode)
+        minimizer: minimizer(mode)
     }
 })
 
@@ -340,8 +321,8 @@ const ssrServerConfig = Object.assign(
         ? {
               optimization: {
                   minimizer: [
-                      new UglifyJsPlugin({
-                          uglifyOptions: {
+                      new TerserPlugin({
+                          terserOptions: {
                               compress: false,
                               mangle: false,
                               ecma: 6

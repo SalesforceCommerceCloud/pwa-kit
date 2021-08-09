@@ -3,7 +3,7 @@ import * as sdk from 'commerce-sdk-isomorphic'
 import {getAppOrigin} from 'pwa-kit-react-sdk/dist/utils/url'
 import OcapiShopperBaskets from './ocapi-shopper-baskets'
 import OcapiShopperOrders from './ocapi-shopper-orders'
-import {getTenantId, isTokenValid} from './utils'
+import {getTenantId, isError, isTokenValid} from './utils'
 import Auth from './auth'
 
 /**
@@ -176,6 +176,10 @@ class CommerceAPI {
      * @returns {*} - The response to be passed back to original caller.
      */
     didReceiveResponse(response, args) {
+        if (isError(response)) {
+            return {...response, isError: true, message: response.detail}
+        }
+
         return response
     }
 }

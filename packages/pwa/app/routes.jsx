@@ -42,8 +42,7 @@ const routes = [
     },
     {
         path: '/:locale/account',
-        component: Account,
-        exact: true
+        component: Account
     },
     {
         path: '/:locale/checkout',

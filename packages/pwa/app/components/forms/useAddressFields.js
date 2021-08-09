@@ -14,7 +14,8 @@ const messages = defineMessages({
     province: {defaultMessage: 'Province'},
     zipCode: {defaultMessage: 'Zip Code'},
     postalCode: {defaultMessage: 'Postal Code'},
-    stateCodeInvalid: {defaultMessage: 'Please enter 2-letter state/province'}
+    stateCodeInvalid: {defaultMessage: 'Please enter 2-letter state/province'},
+    preferred: {defaultMessage: 'Set as default'}
 })
 
 /**
@@ -124,6 +125,14 @@ export default function useAddressFields({form: {watch, control, errors}, prefix
                 )
             },
             error: errors[`${prefix}postalCode`],
+            control
+        },
+        preferred: {
+            name: `${prefix}preferred`,
+            label: formatMessage(messages.preferred),
+            defaultValue: false,
+            type: 'checkbox',
+            rules: {},
             control
         }
     }

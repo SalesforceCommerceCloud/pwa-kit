@@ -95,6 +95,10 @@ const getMockComponent = () => {
     return MockComponent
 }
 
+beforeEach(() => {
+    delete global.__HYDRATING__
+})
+
 describe('The routeComponent component', () => {
     test('Is a higher-order component', () => {
         const Mock = getMockComponent()
@@ -272,5 +276,51 @@ describe('getRoutes', () => {
 
         const expected404Name = 'WithErrorHandling(withRouter(routeComponent(Throw404)))'
         expect(second.component.displayName).toBe(expected404Name)
+    })
+})
+
+describe('Uses preloaded props on initial clientside page load', () => {
+    test('Uses preloadedProps when hydrating', async () => {
+        global.__HYDRATING__ = true
+        const preloadedProps = {foo: 'bar'}
+        const expectedPreloadedChildProps = {foo: 'bar', isLoading: false}
+
+        const Mock = (props) => <div>Mock {JSON.stringify(props)}</div>
+        Mock.displayName = 'MockComponent'
+
+        const Component = routeComponent(Mock, true, {})
+
+        const wrapped = await new Promise((resolve) => {
+            const wrapper = mount(
+                <Component
+                    preloadedProps={preloadedProps}
+                    onUpdateComplete={() => resolve(wrapper)}
+                />
+            )
+        })
+
+        expect(wrapped.find('MockComponent').props()).toMatchObject(expectedPreloadedChildProps)
+    })
+
+    test('Does not use preloadedProps when not hydrating', async () => {
+        global.__HYDRATING__ = false
+        const preloadedProps = {foo: 'bar'}
+        const expectedNotPreloadedChildProps = {isLoading: false}
+
+        const Mock = (props) => <div>Mock {JSON.stringify(props)}</div>
+        Mock.displayName = 'MockComponent'
+
+        const Component = routeComponent(Mock, true, {})
+
+        const wrapped = await new Promise((resolve) => {
+            const wrapper = mount(
+                <Component
+                    preloadedProps={preloadedProps}
+                    onUpdateComplete={() => resolve(wrapper)}
+                />
+            )
+        })
+
+        expect(wrapped.find('MockComponent').props()).toMatchObject(expectedNotPreloadedChildProps)
     })
 })

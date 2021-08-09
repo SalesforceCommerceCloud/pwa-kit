@@ -1,28 +1,24 @@
-import React, {Fragment, useEffect, useRef, useState} from 'react'
+import React, {useEffect, useRef, useState} from 'react'
 import PropTypes from 'prop-types'
 import {FormattedMessage, useIntl} from 'react-intl'
 import {useForm} from 'react-hook-form'
 import {
     Button,
-    Box,
     Modal,
     ModalBody,
     ModalCloseButton,
     ModalContent,
-    ModalHeader,
     ModalOverlay,
     Stack,
     Text,
-    useDisclosure,
-    Alert,
-    Link as ChakraLink
+    useDisclosure
 } from '@chakra-ui/react'
 import useCustomer from '../commerce-api/hooks/useCustomer'
-import {AlertIcon, BrandLogo} from '../components/icons'
+import {BrandLogo} from '../components/icons'
 import Link from '../components/link'
-import LoginFields from '../components/forms/login-fields'
-import RegistrationFields from '../components/forms/registration-fields'
-import ResetPasswordFields from '../components/forms/reset-password-fields'
+import LoginForm from '../components/login'
+import ResetPasswordForm from '../components/reset-password'
+import RegisterForm from '../components/register'
 
 const LOGIN_VIEW = 'login'
 const REGISTER_VIEW = 'register'
@@ -100,255 +96,84 @@ export const AuthModal = ({initialView = LOGIN_VIEW, ...props}) => {
         form.reset()
     }, [currentView])
 
+    const LoginRegisterSuccess = () => (
+        <Stack justify="center" align="center" spacing={6}>
+            <BrandLogo width="60px" height="auto" />
+            <Stack>
+                <Text align="center" fontSize="md">
+                    <FormattedMessage defaultMessage={'Where would you like to go next?'} />
+                </Text>
+                <Stack spacing={4} pt={4}>
+                    <Button as={Link} to="/account" variant="outline" onClick={props.onClose}>
+                        <FormattedMessage defaultMessage="View account" />
+                    </Button>
+                    <Button onClick={props.onClose}>
+                        <FormattedMessage defaultMessage="Continue shopping" />
+                    </Button>
+                </Stack>
+            </Stack>
+        </Stack>
+    )
+
+    const PasswordResetSuccess = () => (
+        <Stack justify="center" align="center" spacing={6}>
+            <BrandLogo width="60px" height="auto" />
+            <Text align="center" fontSize="md">
+                <FormattedMessage defaultMessage={'Password Reset'} />
+            </Text>
+            <Stack spacing={6} pt={4}>
+                <Text align="center" fontSize="sm">
+                    <FormattedMessage
+                        defaultMessage="You will receive an email at <b>{email}</b> with a link to reset your password shortly."
+                        values={{
+                            email: submittedEmail.current,
+                            // eslint-disable-next-line react/display-name
+                            b: (chunks) => <b>{chunks}</b>
+                        }}
+                    />
+                </Text>
+
+                <Button onClick={() => setCurrentView(LOGIN_VIEW)}>
+                    <FormattedMessage defaultMessage="Back to sign in" />
+                </Button>
+            </Stack>
+        </Stack>
+    )
+
     return (
         <Modal size="sm" closeOnOverlayClick={false} data-testid="sf-auth-modal" {...props}>
             <ModalOverlay />
-
             <ModalContent>
-                <ModalHeader pt={12} pb={0}>
-                    <Stack justify="center" align="center" spacing={6}>
-                        <BrandLogo width="60px" height="auto" />
-
-                        {!form.formState.isSubmitSuccessful && (
-                            <Text align="center">
-                                {currentView === LOGIN_VIEW && (
-                                    <FormattedMessage defaultMessage="Welcome Back" />
-                                )}
-                                {currentView === REGISTER_VIEW && (
-                                    <FormattedMessage defaultMessage="Let's get started" />
-                                )}
-                                {currentView === PASSWORD_VIEW && (
-                                    <FormattedMessage defaultMessage="Reset Password" />
-                                )}
-                            </Text>
-                        )}
-
-                        {form.formState.isSubmitSuccessful && (
-                            <Stack>
-                                {[LOGIN_VIEW, REGISTER_VIEW].includes(currentView) && (
-                                    <Fragment>
-                                        <Text align="center">
-                                            <FormattedMessage defaultMessage="Hi, " />{' '}
-                                            {customer.firstName || (
-                                                <FormattedMessage defaultMessage="Welcome" />
-                                            )}
-                                        </Text>
-                                        <Text align="center" fontSize="md">
-                                            <FormattedMessage defaultMessage="Where would you like to go next?" />
-                                        </Text>
-                                    </Fragment>
-                                )}
-                                {currentView === PASSWORD_VIEW && (
-                                    <FormattedMessage defaultMessage="Password Reset" />
-                                )}
-                            </Stack>
-                        )}
-                    </Stack>
-                </ModalHeader>
-
                 <ModalCloseButton />
-
-                <ModalBody pb={8}>
-                    {!form.formState.isSubmitSuccessful && (
-                        <Stack spacing={6}>
-                            <Text fontSize="sm" align="center" color="gray.700">
-                                {currentView === REGISTER_VIEW && (
-                                    <FormattedMessage defaultMessage="Create an account and get first access to the very best products, inspiration and community." />
-                                )}
-                                {currentView === PASSWORD_VIEW && (
-                                    <FormattedMessage defaultMessage="Enter your email to recieve instructions on how to reset your password" />
-                                )}
-                            </Text>
-
-                            <form
-                                onSubmit={form.handleSubmit(submitForm)}
-                                data-testid="sf-auth-modal-form"
-                            >
-                                <Stack spacing={8}>
-                                    {form.errors?.global && (
-                                        <Alert status="error">
-                                            <AlertIcon color="red.500" boxSize={4} />
-                                            <Text fontSize="sm" ml={3}>
-                                                {form.errors.global.message}
-                                            </Text>
-                                        </Alert>
-                                    )}
-
-                                    {currentView === LOGIN_VIEW && (
-                                        <>
-                                            <Stack>
-                                                <LoginFields form={form} />
-
-                                                <Box>
-                                                    <Button
-                                                        variant="link"
-                                                        size="sm"
-                                                        onClick={() =>
-                                                            setCurrentView(PASSWORD_VIEW)
-                                                        }
-                                                    >
-                                                        <FormattedMessage defaultMessage="Forgot password?" />
-                                                    </Button>
-                                                </Box>
-                                            </Stack>
-
-                                            <Stack spacing={6}>
-                                                <Button
-                                                    type="submit"
-                                                    onClick={() => form.clearErrors('global')}
-                                                    isLoading={form.formState.isSubmitting}
-                                                >
-                                                    <FormattedMessage defaultMessage="Sign in" />
-                                                </Button>
-
-                                                <Stack direction="row" spacing={1} justify="center">
-                                                    <Text fontSize="sm">
-                                                        <FormattedMessage defaultMessage="Don't have an account?" />
-                                                    </Text>
-                                                    <Button
-                                                        variant="link"
-                                                        size="sm"
-                                                        onClick={() =>
-                                                            setCurrentView(REGISTER_VIEW)
-                                                        }
-                                                    >
-                                                        <FormattedMessage defaultMessage="Create account" />
-                                                    </Button>
-                                                </Stack>
-                                            </Stack>
-                                        </>
-                                    )}
-
-                                    {currentView === REGISTER_VIEW && (
-                                        <>
-                                            <RegistrationFields form={form} />
-
-                                            <Stack spacing={6}>
-                                                <Button
-                                                    type="submit"
-                                                    onClick={() => form.clearErrors('global')}
-                                                    isLoading={form.formState.isSubmitting}
-                                                >
-                                                    <FormattedMessage defaultMessage="Create account" />
-                                                </Button>
-
-                                                <Stack direction="row" spacing={1} justify="center">
-                                                    <Text fontSize="sm">
-                                                        <FormattedMessage defaultMessage="Already have an account?" />
-                                                    </Text>
-                                                    <Button
-                                                        variant="link"
-                                                        size="sm"
-                                                        onClick={() => setCurrentView(LOGIN_VIEW)}
-                                                    >
-                                                        <FormattedMessage defaultMessage="Sign in" />
-                                                    </Button>
-                                                </Stack>
-
-                                                <Text fontSize="sm" align="center">
-                                                    <FormattedMessage
-                                                        defaultMessage="By creating an account, you agree to Salesforce’s <policy>Privacy Policy</policy> and <terms>Terms & Conditions</terms>"
-                                                        values={{
-                                                            // eslint-disable-next-line react/display-name
-                                                            policy: (chunks) => (
-                                                                <ChakraLink
-                                                                    as={Link}
-                                                                    to="/privacy-policy"
-                                                                    color="blue.600"
-                                                                >
-                                                                    {chunks}
-                                                                </ChakraLink>
-                                                            ),
-                                                            // eslint-disable-next-line react/display-name
-                                                            terms: (chunks) => (
-                                                                <ChakraLink
-                                                                    as={Link}
-                                                                    to="/terms-conditions"
-                                                                    color="blue.600"
-                                                                >
-                                                                    {chunks}
-                                                                </ChakraLink>
-                                                            )
-                                                        }}
-                                                    />
-                                                </Text>
-                                            </Stack>
-                                        </>
-                                    )}
-
-                                    {currentView === PASSWORD_VIEW && (
-                                        <>
-                                            <ResetPasswordFields form={form} />
-
-                                            <Stack spacing={6}>
-                                                <Button
-                                                    type="submit"
-                                                    onClick={() => form.clearErrors('global')}
-                                                    isLoading={form.formState.isSubmitting}
-                                                >
-                                                    <FormattedMessage defaultMessage="Reset password" />
-                                                </Button>
-
-                                                <Stack direction="row" spacing={1} justify="center">
-                                                    <Text fontSize="sm">
-                                                        <FormattedMessage
-                                                            defaultMessage="Or return to"
-                                                            description="Precedes link to return to sign in"
-                                                        />
-                                                    </Text>
-                                                    <Button
-                                                        variant="link"
-                                                        size="sm"
-                                                        onClick={() => setCurrentView(LOGIN_VIEW)}
-                                                    >
-                                                        <FormattedMessage defaultMessage="Sign in" />
-                                                    </Button>
-                                                </Stack>
-                                            </Stack>
-                                        </>
-                                    )}
-                                </Stack>
-                            </form>
-                        </Stack>
+                <ModalBody pb={8} bg="white" paddingBottom={14} marginTop={14}>
+                    {!form.formState.isSubmitSuccessful && currentView === LOGIN_VIEW && (
+                        <LoginForm
+                            form={form}
+                            submitForm={submitForm}
+                            clickCreateAccount={() => setCurrentView(REGISTER_VIEW)}
+                            clickForgotPassword={() => setCurrentView(PASSWORD_VIEW)}
+                        />
                     )}
-
-                    {form.formState.isSubmitSuccessful && (
-                        <Box>
-                            {[LOGIN_VIEW, REGISTER_VIEW].includes(currentView) && (
-                                <Stack spacing={4} pt={4}>
-                                    <Button
-                                        as={Link}
-                                        to="/account"
-                                        variant="outline"
-                                        onClick={props.onClose}
-                                    >
-                                        <FormattedMessage defaultMessage="View account" />
-                                    </Button>
-                                    <Button onClick={props.onClose}>
-                                        <FormattedMessage defaultMessage="Continue shopping" />
-                                    </Button>
-                                </Stack>
-                            )}
-
-                            {currentView === PASSWORD_VIEW && (
-                                <Stack spacing={6} pt={4}>
-                                    <Text align="center" fontSize="sm">
-                                        <FormattedMessage
-                                            defaultMessage="You will receive an email at <b>{email}</b> with a link to reset your password shortly."
-                                            values={{
-                                                email: submittedEmail.current,
-                                                // eslint-disable-next-line react/display-name
-                                                b: (chunks) => <b>{chunks}</b>
-                                            }}
-                                        />
-                                    </Text>
-
-                                    <Button onClick={() => setCurrentView(LOGIN_VIEW)}>
-                                        <FormattedMessage defaultMessage="Back to sign in" />
-                                    </Button>
-                                </Stack>
-                            )}
-                        </Box>
+                    {!form.formState.isSubmitSuccessful && currentView === REGISTER_VIEW && (
+                        <RegisterForm
+                            form={form}
+                            submitForm={submitForm}
+                            clickSignIn={() => setCurrentView(LOGIN_VIEW)}
+                        />
+                    )}
+                    {form.formState.isSubmitSuccessful &&
+                        (currentView === LOGIN_VIEW || currentView === REGISTER_VIEW) && (
+                            <LoginRegisterSuccess />
+                        )}
+                    {!form.formState.isSubmitSuccessful && currentView === PASSWORD_VIEW && (
+                        <ResetPasswordForm
+                            form={form}
+                            submitForm={submitForm}
+                            clickSignIn={() => setCurrentView(LOGIN_VIEW)}
+                        />
+                    )}
+                    {form.formState.isSubmitSuccessful && currentView === PASSWORD_VIEW && (
+                        <PasswordResetSuccess />
                     )}
                 </ModalBody>
             </ModalContent>

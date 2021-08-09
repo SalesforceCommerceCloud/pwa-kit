@@ -2,19 +2,35 @@ import React, {useContext, createContext} from 'react'
 import PropTypes from 'prop-types'
 import {FormattedMessage} from 'react-intl'
 import {Box, Button, Flex, Heading, Stack} from '@chakra-ui/react'
-import LoadingScrim from './loading-scrim'
+import LoadingSpinner from '../../components/loading-spinner'
 
-const SectionContext = createContext()
+const ToggleCardContext = createContext()
 
-export const Section = ({id, title, editing, disabled, onEdit, editLabel, isLoading, children}) => {
+/**
+ * A card-like box that renders one of two states: 'edit' and 'summary'. It takes a single
+ * `ToggleCardSummary` and `ToggleCardEdit` component as children and renders one or the
+ * other depending on the `editing` prop. See `app/pages/checkout` for example.
+ */
+export const ToggleCard = ({
+    id,
+    title,
+    editing,
+    disabled,
+    onEdit,
+    editLabel,
+    isLoading,
+    children,
+    ...props
+}) => {
     return (
-        <SectionContext.Provider value={{editing, disabled}}>
+        <ToggleCardContext.Provider value={{editing, disabled}}>
             <Box
                 layerStyle="card"
                 rounded={[0, 0, 'base']}
                 px={[4, 4, 6]}
-                data-testid={`sf-checkout-section-${id}`}
+                data-testid={`sf-toggle-card-${id}`}
                 position="relative"
+                {...props}
             >
                 <Stack spacing={editing || (!editing && !disabled) ? 4 : 0}>
                     <Flex justify="space-between">
@@ -31,26 +47,26 @@ export const Section = ({id, title, editing, disabled, onEdit, editLabel, isLoad
                             </Button>
                         )}
                     </Flex>
-                    <Box data-testid={`sf-checkout-section-${id}-content`}>{children}</Box>
+                    <Box data-testid={`sf-toggle-card-${id}-content`}>{children}</Box>
                 </Stack>
 
-                {isLoading && editing && <LoadingScrim />}
+                {isLoading && editing && <LoadingSpinner />}
             </Box>
-        </SectionContext.Provider>
+        </ToggleCardContext.Provider>
     )
 }
 
-export const SectionEdit = ({children}) => {
-    const {editing} = useContext(SectionContext)
+export const ToggleCardEdit = ({children}) => {
+    const {editing} = useContext(ToggleCardContext)
     return editing ? children : null
 }
 
-export const SectionSummary = ({children}) => {
-    const {editing, disabled} = useContext(SectionContext)
+export const ToggleCardSummary = ({children}) => {
+    const {editing, disabled} = useContext(ToggleCardContext)
     return !editing && !disabled ? children : null
 }
 
-Section.propTypes = {
+ToggleCard.propTypes = {
     id: PropTypes.string,
     title: PropTypes.string,
     editLabel: PropTypes.any,
@@ -61,10 +77,10 @@ Section.propTypes = {
     children: PropTypes.any
 }
 
-SectionEdit.propTypes = {
+ToggleCardEdit.propTypes = {
     children: PropTypes.any
 }
 
-SectionSummary.propTypes = {
+ToggleCardSummary.propTypes = {
     children: PropTypes.any
 }

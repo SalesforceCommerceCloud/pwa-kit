@@ -55,25 +55,10 @@ const usePaymentForms = () => {
     }
 
     const submitBillingAddressForm = async (address) => {
-        // When the `Same as shipping address` checkbox is unchecked, we submit the form
-        // values to be applied to the basket billing address. Note that we first remove
-        // the field `addressId` if it was there before setting. This handles the case
-        // where a registered user has selected one of their saved addresses to use as
-        // the billing address, which will have an `addressId`. This needs to be omitted
-        // from the API request as it is not part of the expected data.
-
-        // When the checkbox is checked, we instead apply the current shipping address
-        // to the billing address. Similar to the previous condition, we need to omit
-        // the `id` field from the shipping address before sending the request.
-
         if (!billingSameAsShipping) {
-            // eslint-disable-next-line no-unused-vars
-            const {addressId, ...billingAddress} = address
-            await setBillingAddress(billingAddress)
+            await setBillingAddress(address)
         } else {
-            // eslint-disable-next-line no-unused-vars
-            const {id, ...shippingAddress} = selectedShippingAddress
-            await setBillingAddress(shippingAddress)
+            await setBillingAddress(selectedShippingAddress)
         }
 
         // Once the billing address is applied to the basket, we can move to the final

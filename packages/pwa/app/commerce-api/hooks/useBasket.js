@@ -25,10 +25,14 @@ export default function useBasket() {
                 return basket?.productItems?.reduce((prev, next) => prev + next.quantity, 0) || 0
             },
 
+            /**
+             * Get an existing basket, if basket doesn't exist, create a new one.
+             *
+             * NOTE: This request is the only time we are using the ShopperCustomers API
+             * to interact with a customer basket. All other calls are done through the
+             * ShopperBaskets API, which in our case, uses OCAPI rather than commerce sdk.
+             */
             async getOrCreateBasket() {
-                // NOTE: This request is the only time we are using the ShopperCustomers API
-                // to interact with a customer basket. All other calls are done through the
-                // ShopperBaskets API, which in our case, uses OCAPI rather than commerce sdk.
                 const customerBaskets = await api.shopperCustomers.getCustomerBaskets({
                     parameters: {customerId: customer?.customerId}
                 })
@@ -42,6 +46,13 @@ export default function useBasket() {
                 setBasket(newBasket)
             },
 
+            /**
+             * Add an item to the basket.
+             *
+             * @param {object} item
+             * @param {string} item.productId - The id of the product.
+             * @param {number} item.quantity - The quantity of the item.
+             */
             async addItemToBasket(item) {
                 const response = await api.shopperBaskets.addItemToBasket({
                     body: item,
@@ -54,6 +65,11 @@ export default function useBasket() {
                 }
             },
 
+            /**
+             * Remove an item from the basket.
+             *
+             * @param {string} itemId - The id of the basket item.
+             */
             async removeItemFromBasket(itemId) {
                 const response = await api.shopperBaskets.removeItemFromBasket({
                     parameters: {basketId: basket.basketId, itemId: itemId}
@@ -66,6 +82,14 @@ export default function useBasket() {
                 }
             },
 
+            /**
+             * Update an item in the basket.
+             *
+             * @param {object} item
+             * @param {string} item.productId - The id of the product.
+             * @param {number} item.quantity - The quantity of the item.
+             * @param {string} basketItemId - The id of the item.
+             */
             async updateItemInBasket(item, basketItemId) {
                 const response = await api.shopperBaskets.updateItemInBasket({
                     body: item,
@@ -78,6 +102,11 @@ export default function useBasket() {
                 }
             },
 
+            /**
+             * Get the product information for all items in the basket.
+             *
+             * @param {string} ids - The id(s) of the product, separated by ",".
+             */
             async getProductsInBasket(ids) {
                 if (!ids) {
                     return
@@ -101,6 +130,11 @@ export default function useBasket() {
                 setBasket(updatedBasket)
             },
 
+            /**
+             * Set the shipping address for the current basket.
+             * @external Address
+             * @see https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/modules/shopperbaskets.html#orderaddress
+             */
             async setShippingAddress(address) {
                 const response = await api.shopperBaskets.updateShippingAddressForShipment({
                     body: address,
@@ -114,6 +148,11 @@ export default function useBasket() {
                 setBasket(response)
             },
 
+            /**
+             * Set the shipping method for the current basket.
+             *
+             * @param {string} id - The id of the shipping method.
+             */
             async setShippingMethod(id) {
                 const response = await api.shopperBaskets.updateShippingMethodForShipment({
                     body: {id},
@@ -122,7 +161,13 @@ export default function useBasket() {
                 setBasket(response)
             },
 
+            /**
+             * Set the billing address for the current basket.
+             * @external Address
+             * @see https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/modules/shopperbaskets.html#orderaddress
+             */
             async setBillingAddress(address) {
+                address
                 const response = await api.shopperBaskets.updateBillingAddressForBasket({
                     body: address,
                     parameters: {basketId: basket.basketId, shipmentId: 'me'}
@@ -131,14 +176,20 @@ export default function useBasket() {
                 setBasket(response)
             },
 
+            /**
+             * Set the payment instrument for the current basket
+             *
+             * NOTE: API does allow adding multiple payment instruments to split payment. However,
+             * we are currently only handling a single payment instrument.
+             * Commerce API does not have an endpoint to edit a payment instrument, but OCAPI does.
+             * We want to emulate Commerce API behavior (when using OCAPI) so we'll just remove the
+             * existing payment and add the new one to simulate editing. We're making an assumption
+             * that our basket will never have more than one payment instrument applied at any time.
+             *
+             * @external PaymentInstrument
+             * @see https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/modules/shopperbaskets.html#basketpaymentinstrumentrequest
+             */
             async setPaymentInstrument(paymentInstrument) {
-                // NOTE: API does allow adding multiple payment instruments to split payment. However,
-                // we are currently only handling a single payment instrument.
-                // Commerce API does not have an endpoint to edit a payment instrument, but OCAPI does.
-                // We want to emulate Commerce API behavior (when using OCAPI) so we'll just remove the
-                // existing payment and add the new one to simulate editing. We're making an assumption
-                // that our basket will never have more than one payment instrument applied at any time.
-
                 // Keep reference to existing payment instrument id
                 let existingPaymentInstrumentId =
                     basket.paymentInstruments && basket.paymentInstruments[0]?.paymentInstrumentId
@@ -165,6 +216,9 @@ export default function useBasket() {
                 setBasket(response)
             },
 
+            /**
+             * Remove the payment instrument for the current basket
+             */
             async removePaymentInstrument() {
                 let paymentInstrumentId =
                     basket.paymentInstruments && basket.paymentInstruments[0]?.paymentInstrumentId
@@ -183,6 +237,12 @@ export default function useBasket() {
                 setBasket(response)
             },
 
+            /**
+             * Update the customer information for the current basket.
+             *
+             * @param {object} info
+             * @param {string} info.email - The email of the customer.
+             */
             async updateCustomerInfo(info) {
                 const response = await api.shopperBaskets.updateCustomerForBasket({
                     body: info,
@@ -192,6 +252,9 @@ export default function useBasket() {
                 setBasket(response)
             },
 
+            /**
+             * Creates an order using the current basket.
+             */
             async createOrder() {
                 const response = await api.shopperOrders.createOrder({
                     body: {basketId: basket.basketId}

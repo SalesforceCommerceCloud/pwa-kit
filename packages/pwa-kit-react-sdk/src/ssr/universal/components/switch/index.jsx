@@ -22,14 +22,14 @@ const Switch = (props) => {
         <UIDReset>
             <AppErrorBoundary error={error}>
                 {!error && (
-                    <App {...appState.appProps}>
+                    <App preloadedProps={appState.appProps}>
                         <RouterSwitch>
                             {routes.map((route, i) => {
                                 const {component: Component, ...routeProps} = route
                                 return (
                                     <Route key={i} {...routeProps}>
                                         <UIDFork>
-                                            <Component {...appState.pageProps} />
+                                            <Component preloadedProps={appState.pageProps} />
                                         </UIDFork>
                                     </Route>
                                 )
@@ -46,7 +46,8 @@ Switch.propTypes = {
     error: PropTypes.object,
     appState: PropTypes.object,
     routes: PropTypes.array,
-    App: PropTypes.func
+    App: PropTypes.func,
+    preloadedProps: PropTypes.object
 }
 
 export default Switch

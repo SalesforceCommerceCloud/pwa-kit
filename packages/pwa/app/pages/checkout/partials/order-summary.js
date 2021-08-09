@@ -17,13 +17,6 @@ const OrderSummary = ({isLoading, onPlaceOrderClick = () => null}) => {
                 <FormattedMessage defaultMessage="Order Summary" />
             </Heading>
 
-            {/* This is just for testing/dev purposes. Will remove later. */}
-            {/* <Button
-                onClick={() => basket.addItemToBasket([{productId: '701642811398M', quantity: 2}])}
-            >
-                Add item
-            </Button> */}
-
             <Stack spacing={5} align="flex-start">
                 <Stack spacing={5} width="full">
                     <Box>
@@ -44,7 +37,14 @@ const OrderSummary = ({isLoading, onPlaceOrderClick = () => null}) => {
                     {cartItemsExpanded && (
                         <Stack spacing={5} align="flex-start">
                             {basket.productItems?.map((item) => (
-                                <CartProductVariant key={item.itemId} item={item} />
+                                <CartProductVariant
+                                    key={item.itemId}
+                                    variant={
+                                        basket._productItemsDetail &&
+                                        basket._productItemsDetail[item.productId]
+                                    }
+                                    item={item}
+                                />
                             ))}
 
                             <Button as={link} to="/cart" variant="link" width="full">
