@@ -6,7 +6,7 @@ export default {
         container: {
             position: 'relative'
         },
-        wishlistIcon: {
+        iconButton: {
             position: 'absolute',
             top: 2,
             right: 2

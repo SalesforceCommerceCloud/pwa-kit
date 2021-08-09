@@ -4,6 +4,7 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
+import {WishlistIcon, WishlistSolidIcon} from '../icons'
 
 // Components
 import {
@@ -14,7 +15,8 @@ import {
     Skeleton as ChakraSkeleton,
     Text,
     Stack,
-    useMultiStyleConfig
+    useMultiStyleConfig,
+    IconButton
 } from '@chakra-ui/react'
 
 // Hooks
@@ -22,8 +24,12 @@ import {useIntl} from 'react-intl'
 
 // Other
 import {productUrlBuilder} from '../../utils/url'
-import {isServer} from '../../utils/utils'
+import {isServer, noop} from '../../utils/utils'
 import Link from '../link'
+import withRegistration from '../../hoc/with-registration'
+import {customerProductListTypes} from '../../constants'
+
+const IconButtonWithRegistration = withRegistration(IconButton)
 
 // Component Skeleton
 export const Skeleton = () => {
@@ -56,9 +62,14 @@ const ProductTile = (props) => {
         productSearchItem,
         // eslint-disable-next-line react/prop-types
         staticContext,
+        onWishlistItemToggled = noop,
+        existsInListTypes = {},
         ...rest
     } = props
-    const {currency, image, price, productName} = productSearchItem
+    const {currency, image, price, productName, productId} = productSearchItem
+    const isProductInWishlist = existsInListTypes[customerProductListTypes.WISHLIST]?.includes(
+        productId
+    )
 
     return (
         <Link
@@ -76,6 +87,30 @@ const ProductTile = (props) => {
                 <AspectRatio {...styles.image} ratio={1} display={isServer ? 'none' : 'block'}>
                     <Image alt={image.alt} src={image.disBaseLink} ignoreFallback={true} />
                 </AspectRatio>
+                {isProductInWishlist ? (
+                    <IconButton
+                        aria-label={intl.formatMessage({
+                            defaultMessage: 'Wishlist'
+                        })}
+                        icon={<WishlistSolidIcon />}
+                        variant="unstyled"
+                        {...styles.iconButton}
+                        onClick={(e) => {
+                            e.preventDefault()
+                            onWishlistItemToggled()
+                        }}
+                    />
+                ) : (
+                    <IconButtonWithRegistration
+                        aria-label={intl.formatMessage({
+                            defaultMessage: 'Wishlist'
+                        })}
+                        icon={<WishlistIcon />}
+                        variant="unstyled"
+                        {...styles.iconButton}
+                        onClick={onWishlistItemToggled}
+                    />
+                )}
             </Box>
 
             {/* Title */}
@@ -98,7 +133,15 @@ ProductTile.propTypes = {
      * The product search hit that will be represented in this
      * component.
      */
-    productSearchItem: PropTypes.object.isRequired
+    productSearchItem: PropTypes.object.isRequired,
+    /**
+     * Types of lists the product/variant is added to. (eg: wishlist)
+     */
+    existsInListTypes: PropTypes.object,
+    /**
+     * Callback function to be invoked when user toggles item from wishlist
+     */
+    onWishlistItemToggled: PropTypes.func
 }
 
 export default ProductTile

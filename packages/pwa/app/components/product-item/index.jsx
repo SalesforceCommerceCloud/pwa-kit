@@ -13,6 +13,15 @@ import CartItemVariantPrice from '../cart-item-variant/item-price'
 import LoadingSpinner from '../loading-spinner/index.jsx'
 import {noop} from '../../utils/utils'
 
+/**
+ * Component representing a product item usually in a list with details about the product - name, variant, pricing, etc.
+ * @param {Object} product Product to be represented in the list item.
+ * @param {node} primaryAction Child component representing the most prominent action to be performed by the user.
+ * @param {node} secondaryActions Child component representing the other actions relevant to the product to be performed by the user.
+ * @param {func} onItemQuantityChange callback function to be invoked whenever item quantity changes.
+ * @param {boolean} showLoading Renders a loading spinner with overlay if set to true.
+ * @returns A JSX element representing product item in a list (eg: wishlist, cart, etc).
+ */
 const ProductItem = ({
     product,
     primaryAction,

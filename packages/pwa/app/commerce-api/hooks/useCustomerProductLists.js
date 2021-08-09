@@ -106,7 +106,7 @@ export default function useCustomerProductLists() {
             },
 
             get loaded() {
-                return customerProductLists?.data?.length
+                return !!customerProductLists?.data?.length
             },
 
             getProductListPerType(type) {

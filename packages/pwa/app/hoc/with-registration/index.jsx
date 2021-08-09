@@ -21,7 +21,8 @@ const withRegistration = (Component) => {
         const {formatMessage} = useIntl()
         const showToast = useToast()
 
-        const handleClick = () => {
+        const handleClick = (e) => {
+            e.preventDefault()
             if (customer?.authType !== 'registered') {
                 // Do not show auth modal if users is already on the login page
                 if (isLoginPage) {
