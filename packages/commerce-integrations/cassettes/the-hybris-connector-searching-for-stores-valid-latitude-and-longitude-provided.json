@@ -1,0 +1,2545 @@
+[
+  {
+    "scope": "https://hybris.merlinspotions.com:443",
+    "method": "GET",
+    "path": "/rest/v2/apparel-uk/stores?latitude=52.514151&pageSize=20&sort=relevance&currentPage=0&fields=FULL&longitude=-0.116745",
+    "body": "",
+    "status": 200,
+    "response": {
+      "boundEastLongitude": 1.2437849999999997,
+      "boundNorthLatitude": 53.41304,
+      "boundSouthLatitude": 51.615261999999994,
+      "boundWestLongitude": -1.477275,
+      "pagination": {
+        "currentPage": 0,
+        "pageSize": 20,
+        "totalPages": 1,
+        "totalResults": 17
+      },
+      "sourceLatitude": 52.514151,
+      "sourceLongitude": -0.116745,
+      "stores": [
+        {
+          "address": {
+            "country": {
+              "isocode": "GB",
+              "name": "United Kingdom"
+            },
+            "defaultAddress": false,
+            "formattedAddress": "West Road, Cambridge, CB3 9DR, United Kingdom",
+            "id": "8796093284375",
+            "line1": "West Road",
+            "phone": "+44 29 7804 6812",
+            "postalCode": "CB3 9DR",
+            "shippingAddress": false,
+            "town": "Cambridge",
+            "visibleInAddressBook": true
+          },
+          "displayName": "Cambridge University",
+          "features": {
+            "entry": [
+              {
+                "key": "buyOnlinePickupInStore",
+                "value": "Buy Online Pick Up In Store"
+              },
+              {
+                "key": "sundayWorkshops",
+                "value": "Sunday Workshops"
+              },
+              {
+                "key": "creche",
+                "value": "Creche"
+              }
+            ]
+          },
+          "formattedDistance": "23.6 Miles",
+          "geoPoint": {
+            "latitude": 52.202784,
+            "longitude": 0.108853
+          },
+          "name": "Cambridge University",
+          "openingHours": {
+            "code": "apparel-uk-standard-hours",
+            "specialDayOpeningList": [],
+            "weekDayOpeningList": [
+              {
+                "closingTime": {
+                  "formattedHour": "20:00",
+                  "hour": 8,
+                  "minute": 0
+                },
+                "openingTime": {
+                  "formattedHour": "09:00",
+                  "hour": 9,
+                  "minute": 0
+                },
+                "closed": false,
+                "weekDay": "Mon"
+              },
+              {
+                "closingTime": {
+                  "formattedHour": "20:00",
+                  "hour": 8,
+                  "minute": 0
+                },
+                "openingTime": {
+                  "formattedHour": "09:00",
+                  "hour": 9,
+                  "minute": 0
+                },
+                "closed": false,
+                "weekDay": "Tue"
+              },
+              {
+                "closingTime": {
+                  "formattedHour": "20:00",
+                  "hour": 8,
+                  "minute": 0
+                },
+                "openingTime": {
+                  "formattedHour": "09:00",
+                  "hour": 9,
+                  "minute": 0
+                },
+                "closed": false,
+                "weekDay": "Wed"
+              },
+              {
+                "closingTime": {
+                  "formattedHour": "20:00",
+                  "hour": 8,
+                  "minute": 0
+                },
+                "openingTime": {
+                  "formattedHour": "09:00",
+                  "hour": 9,
+                  "minute": 0
+                },
+                "closed": false,
+                "weekDay": "Thu"
+              },
+              {
+                "closingTime": {
+                  "formattedHour": "20:00",
+                  "hour": 8,
+                  "minute": 0
+                },
+                "openingTime": {
+                  "formattedHour": "09:00",
+                  "hour": 9,
+                  "minute": 0
+                },
+                "closed": false,
+                "weekDay": "Fri"
+              },
+              {
+                "closingTime": {
+                  "formattedHour": "20:00",
+                  "hour": 8,
+                  "minute": 0
+                },
+                "openingTime": {
+                  "formattedHour": "10:00",
+                  "hour": 10,
+                  "minute": 0
+                },
+                "closed": false,
+                "weekDay": "Sat"
+              },
+              {
+                "closed": true,
+                "weekDay": "Sun"
+              }
+            ]
+          },
+          "storeImages": [
+            {
+              "format": "store",
+              "url": "/rest/v2/medias/?context=bWFzdGVyfGltYWdlc3wxMTQ1Mjd8aW1hZ2UvanBlZ3xpbWFnZXMvaGM4L2g0Zi84Nzk2Nzg4OTQ5MDIyLmpwZ3wwODNmODRmYWY5YTE4OGEzZjM0N2U1YmQxODc2MDljODRjMTlkZjQxYjQ5YjQ0YzY2NjA3ZTM4MTFkMjUxMmIw"
+            },
+            {
+              "format": "cartIcon",
+              "url": "/rest/v2/medias/?context=bWFzdGVyfGltYWdlc3wyMjAyNnxpbWFnZS9qcGVnfGltYWdlcy9oMmQvaDQ3Lzg3OTY3ODkwODAwOTQuanBnfDBlM2FmMTJiNzQzMjFmYjcyZjY5ZmM0NzE0NDc5NzYwODhhZmI2ZTQzMTI4OTNjMTI2OTllNzRkMDEyMTg0OTM"
+            }
+          ],
+          "url": "/store/Cambridge University?lat=52.514151&long=-0.116745"
+        },
+        {
+          "address": {
+            "country": {
+              "isocode": "GB",
+              "name": "United Kingdom"
+            },
+            "defaultAddress": false,
+            "formattedAddress": "Trumpington Street, Cambridge, CB2 1RB, United Kingdom",
+            "id": "8796093218839",
+            "line1": "Trumpington Street",
+            "phone": "+44 20 3286 5703",
+            "postalCode": "CB2 1RB",
+            "shippingAddress": false,
+            "town": "Cambridge",
+            "visibleInAddressBook": true
+          },
+          "displayName": "Cambridge Museum",
+          "features": {
+            "entry": [
+              {
+                "key": "wheelchair",
+                "value": "Wheelchair Access"
+              },
+              {
+                "key": "buyOnlinePickupInStore",
+                "value": "Buy Online Pick Up In Store"
+              }
+            ]
+          },
+          "formattedDistance": "23.9 Miles",
+          "geoPoint": {
+            "latitude": 52.200782,
+            "longitude": 0.119287
+          },
+          "name": "Cambridge Museum",
+          "openingHours": {
+            "code": "apparel-uk-weekend-hours",
+            "specialDayOpeningList": [],
+            "weekDayOpeningList": [
+              {
+                "closingTime": {
+                  "formattedHour": "20:00",
+                  "hour": 8,
+                  "minute": 0
+                },
+                "openingTime": {
+                  "formattedHour": "09:00",
+                  "hour": 9,
+                  "minute": 0
+                },
+                "closed": false,
+                "weekDay": "Mon"
+              },
+              {
+                "closingTime": {
+                  "formattedHour": "20:00",
+                  "hour": 8,
+                  "minute": 0
+                },
+                "openingTime": {
+                  "formattedHour": "09:00",
+                  "hour": 9,
+                  "minute": 0
+                },
+                "closed": false,
+                "weekDay": "Tue"
+              },
+              {
+                "closingTime": {
+                  "formattedHour": "20:00",
+                  "hour": 8,
+                  "minute": 0
+                },
+                "openingTime": {
+                  "formattedHour": "09:00",
+                  "hour": 9,
+                  "minute": 0
+                },
+                "closed": false,
+                "weekDay": "Wed"
+              },
+              {
+                "closingTime": {
+                  "formattedHour": "20:00",
+                  "hour": 8,
+                  "minute": 0
+                },
+                "openingTime": {
+                  "formattedHour": "09:00",
+                  "hour": 9,
+                  "minute": 0
+                },
+                "closed": false,
+                "weekDay": "Thu"
+              },
+              {
+                "closingTime": {
+                  "formattedHour": "20:00",
+                  "hour": 8,
+                  "minute": 0
+                },
+                "openingTime": {
+                  "formattedHour": "09:00",
+                  "hour": 9,
+                  "minute": 0
+                },
+                "closed": false,
+                "weekDay": "Fri"
+              },
+              {
+                "closingTime": {
+                  "formattedHour": "20:00",
+                  "hour": 8,
+                  "minute": 0
+                },
+                "openingTime": {
+                  "formattedHour": "10:00",
+                  "hour": 10,
+                  "minute": 0
+                },
+                "closed": false,
+                "weekDay": "Sat"
+              },
+              {
+                "closingTime": {
+                  "formattedHour": "16:00",
+                  "hour": 4,
+                  "minute": 0
+                },
+                "openingTime": {
+                  "formattedHour": "10:00",
+                  "hour": 10,
+                  "minute": 0
+                },
+                "closed": false,
+                "weekDay": "Sun"
+              }
+            ]
+          },
+          "storeImages": [
+            {
+              "format": "store",
+              "url": "/rest/v2/medias/?context=bWFzdGVyfGltYWdlc3w3NjkxMXxpbWFnZS9qcGVnfGltYWdlcy9oMGEvaGJiLzg3OTY3ODg5MTYyNTQuanBnfDVlMzY3Y2FmMGI3OGZhNjQ5ZGQ3NzE0NzE3NzgxMWE4MWQ0YTljNThlNjJhMWRkN2JmZjQ1NjA1ZjM4MGFmYmM"
+            },
+            {
+              "format": "cartIcon",
+              "url": "/rest/v2/medias/?context=bWFzdGVyfGltYWdlc3wxNDE3NXxpbWFnZS9qcGVnfGltYWdlcy9oNDYvaDE1Lzg3OTY3ODkwNDczMjYuanBnfDgzNTAyYzdjNjNmMjFhM2NhNTRmMTUyZTQxODcwNGQ2N2ZmZDZiMDhhNzVlMmZkYjQ3MWY3N2I3ZTRlMTRmZmU"
+            }
+          ],
+          "url": "/store/Cambridge Museum?lat=52.514151&long=-0.116745"
+        },
+        {
+          "address": {
+            "country": {
+              "isocode": "GB",
+              "name": "United Kingdom"
+            },
+            "defaultAddress": false,
+            "formattedAddress": "Whitehill Road, Cambridge, CB5 8LN, United Kingdom",
+            "id": "8796093317143",
+            "line1": "Whitehill Road",
+            "phone": "+44 20 5228 1840",
+            "postalCode": "CB5 8LN",
+            "shippingAddress": false,
+            "town": "Cambridge",
+            "visibleInAddressBook": true
+          },
+          "displayName": "Cambridge Coldham's",
+          "features": {
+            "entry": [
+              {
+                "key": "wheelchair",
+                "value": "Wheelchair Access"
+              },
+              {
+                "key": "buyOnlinePickupInStore",
+                "value": "Buy Online Pick Up In Store"
+              }
+            ]
+          },
+          "formattedDistance": "24 Miles",
+          "geoPoint": {
+            "latitude": 52.210533,
+            "longitude": 0.156842
+          },
+          "name": "Cambridge Coldham's",
+          "openingHours": {
+            "code": "apparel-uk-weekend-hours",
+            "specialDayOpeningList": [],
+            "weekDayOpeningList": [
+              {
+                "closingTime": {
+                  "formattedHour": "20:00",
+                  "hour": 8,
+                  "minute": 0
+                },
+                "openingTime": {
+                  "formattedHour": "09:00",
+                  "hour": 9,
+                  "minute": 0
+                },
+                "closed": false,
+                "weekDay": "Mon"
+              },
+              {
+                "closingTime": {
+                  "formattedHour": "20:00",
+                  "hour": 8,
+                  "minute": 0
+                },
+                "openingTime": {
+                  "formattedHour": "09:00",
+                  "hour": 9,
+                  "minute": 0
+                },
+                "closed": false,
+                "weekDay": "Tue"
+              },
+              {
+                "closingTime": {
+                  "formattedHour": "20:00",
+                  "hour": 8,
+                  "minute": 0
+                },
+                "openingTime": {
+                  "formattedHour": "09:00",
+                  "hour": 9,
+                  "minute": 0
+                },
+                "closed": false,
+                "weekDay": "Wed"
+              },
+              {
+                "closingTime": {
+                  "formattedHour": "20:00",
+                  "hour": 8,
+                  "minute": 0
+                },
+                "openingTime": {
+                  "formattedHour": "09:00",
+                  "hour": 9,
+                  "minute": 0
+                },
+                "closed": false,
+                "weekDay": "Thu"
+              },
+              {
+                "closingTime": {
+                  "formattedHour": "20:00",
+                  "hour": 8,
+                  "minute": 0
+                },
+                "openingTime": {
+                  "formattedHour": "09:00",
+                  "hour": 9,
+                  "minute": 0
+                },
+                "closed": false,
+                "weekDay": "Fri"
+              },
+              {
+                "closingTime": {
+                  "formattedHour": "20:00",
+                  "hour": 8,
+                  "minute": 0
+                },
+                "openingTime": {
+                  "formattedHour": "10:00",
+                  "hour": 10,
+                  "minute": 0
+                },
+                "closed": false,
+                "weekDay": "Sat"
+              },
+              {
+                "closingTime": {
+                  "formattedHour": "16:00",
+                  "hour": 4,
+                  "minute": 0
+                },
+                "openingTime": {
+                  "formattedHour": "10:00",
+                  "hour": 10,
+                  "minute": 0
+                },
+                "closed": false,
+                "weekDay": "Sun"
+              }
+            ]
+          },
+          "storeImages": [],
+          "url": "/store/Cambridge Coldham's?lat=52.514151&long=-0.116745"
+        },
+        {
+          "address": {
+            "country": {
+              "isocode": "GB",
+              "name": "United Kingdom"
+            },
+            "defaultAddress": false,
+            "formattedAddress": "Mill Road, Cambridge, CB1 3DF, United Kingdom",
+            "id": "8796093349911",
+            "line1": "Mill Road",
+            "phone": "+44 20 2916 0904",
+            "postalCode": "CB1 3DF",
+            "shippingAddress": false,
+            "town": "Cambridge",
+            "visibleInAddressBook": true
+          },
+          "displayName": "Cambridge Hospital",
+          "features": {
+            "entry": [
+              {
+                "key": "buyOnlinePickupInStore",
+                "value": "Buy Online Pick Up In Store"
+              },
+              {
+                "key": "sundayWorkshops",
+                "value": "Sunday Workshops"
+              },
+              {
+                "key": "creche",
+                "value": "Creche"
+              }
+            ]
+          },
+          "formattedDistance": "24.4 Miles",
+          "geoPoint": {
+            "latitude": 52.198358,
+            "longitude": 0.142014
+          },
+          "name": "Cambridge Hospital",
+          "openingHours": {
+            "code": "apparel-uk-standard-hours",
+            "specialDayOpeningList": [],
+            "weekDayOpeningList": [
+              {
+                "closingTime": {
+                  "formattedHour": "20:00",
+                  "hour": 8,
+                  "minute": 0
+                },
+                "openingTime": {
+                  "formattedHour": "09:00",
+                  "hour": 9,
+                  "minute": 0
+                },
+                "closed": false,
+                "weekDay": "Mon"
+              },
+              {
+                "closingTime": {
+                  "formattedHour": "20:00",
+                  "hour": 8,
+                  "minute": 0
+                },
+                "openingTime": {
+                  "formattedHour": "09:00",
+                  "hour": 9,
+                  "minute": 0
+                },
+                "closed": false,
+                "weekDay": "Tue"
+              },
+              {
+                "closingTime": {
+                  "formattedHour": "20:00",
+                  "hour": 8,
+                  "minute": 0
+                },
+                "openingTime": {
+                  "formattedHour": "09:00",
+                  "hour": 9,
+                  "minute": 0
+                },
+                "closed": false,
+                "weekDay": "Wed"
+              },
+              {
+                "closingTime": {
+                  "formattedHour": "20:00",
+                  "hour": 8,
+                  "minute": 0
+                },
+                "openingTime": {
+                  "formattedHour": "09:00",
+                  "hour": 9,
+                  "minute": 0
+                },
+                "closed": false,
+                "weekDay": "Thu"
+              },
+              {
+                "closingTime": {
+                  "formattedHour": "20:00",
+                  "hour": 8,
+                  "minute": 0
+                },
+                "openingTime": {
+                  "formattedHour": "09:00",
+                  "hour": 9,
+                  "minute": 0
+                },
+                "closed": false,
+                "weekDay": "Fri"
+              },
+              {
+                "closingTime": {
+                  "formattedHour": "20:00",
+                  "hour": 8,
+                  "minute": 0
+                },
+                "openingTime": {
+                  "formattedHour": "10:00",
+                  "hour": 10,
+                  "minute": 0
+                },
+                "closed": false,
+                "weekDay": "Sat"
+              },
+              {
+                "closed": true,
+                "weekDay": "Sun"
+              }
+            ]
+          },
+          "storeImages": [
+            {
+              "format": "store",
+              "url": "/rest/v2/medias/?context=bWFzdGVyfGltYWdlc3w5NTE2NXxpbWFnZS9qcGVnfGltYWdlcy9oMTgvaDE5Lzg3OTY3ODg4ODM0ODYuanBnfDYyN2Q1MmIxOTRkN2ZhNjk4Y2JlYzA5YmFmZWIxOWY1OTc4ZTA1YTg5ZWFlMzk1NTBjODM3ZTkyYTI0YTNmY2U"
+            },
+            {
+              "format": "cartIcon",
+              "url": "/rest/v2/medias/?context=bWFzdGVyfGltYWdlc3wxNjU3OHxpbWFnZS9qcGVnfGltYWdlcy9oM2YvaGRjLzg3OTY3ODg4NTA3MTguanBnfDQ2YjQzYWZmMmFhOWViOTcyOTgzMzFhMzllYTM0MzRlMjNmOTllODIxNjdiODBjNjcwYzUzNGI4Y2NhOTliMWI"
+            }
+          ],
+          "url": "/store/Cambridge Hospital?lat=52.514151&long=-0.116745"
+        },
+        {
+          "address": {
+            "country": {
+              "isocode": "GB",
+              "name": "United Kingdom"
+            },
+            "defaultAddress": false,
+            "formattedAddress": "21 Trumpington Road, Cambridge, CB2 8AJ, United Kingdom",
+            "id": "8796093251607",
+            "line1": "21 Trumpington Road",
+            "phone": "+44 116 739 4689",
+            "postalCode": "CB2 8AJ",
+            "shippingAddress": false,
+            "town": "Cambridge",
+            "visibleInAddressBook": true
+          },
+          "displayName": "Cambridge Lakes Golf Course",
+          "features": {
+            "entry": [
+              {
+                "key": "buyOnlinePickupInStore",
+                "value": "Buy Online Pick Up In Store"
+              },
+              {
+                "key": "sundayWorkshops",
+                "value": "Sunday Workshops"
+              },
+              {
+                "key": "creche",
+                "value": "Creche"
+              }
+            ]
+          },
+          "formattedDistance": "24.8 Miles",
+          "geoPoint": {
+            "latitude": 52.1866526,
+            "longitude": 0.1206501
+          },
+          "name": "Cambridge Lakes Golf Course",
+          "openingHours": {
+            "code": "apparel-uk-standard-hours",
+            "specialDayOpeningList": [],
+            "weekDayOpeningList": [
+              {
+                "closingTime": {
+                  "formattedHour": "20:00",
+                  "hour": 8,
+                  "minute": 0
+                },
+                "openingTime": {
+                  "formattedHour": "09:00",
+                  "hour": 9,
+                  "minute": 0
+                },
+                "closed": false,
+                "weekDay": "Mon"
+              },
+              {
+                "closingTime": {
+                  "formattedHour": "20:00",
+                  "hour": 8,
+                  "minute": 0
+                },
+                "openingTime": {
+                  "formattedHour": "09:00",
+                  "hour": 9,
+                  "minute": 0
+                },
+                "closed": false,
+                "weekDay": "Tue"
+              },
+              {
+                "closingTime": {
+                  "formattedHour": "20:00",
+                  "hour": 8,
+                  "minute": 0
+                },
+                "openingTime": {
+                  "formattedHour": "09:00",
+                  "hour": 9,
+                  "minute": 0
+                },
+                "closed": false,
+                "weekDay": "Wed"
+              },
+              {
+                "closingTime": {
+                  "formattedHour": "20:00",
+                  "hour": 8,
+                  "minute": 0
+                },
+                "openingTime": {
+                  "formattedHour": "09:00",
+                  "hour": 9,
+                  "minute": 0
+                },
+                "closed": false,
+                "weekDay": "Thu"
+              },
+              {
+                "closingTime": {
+                  "formattedHour": "20:00",
+                  "hour": 8,
+                  "minute": 0
+                },
+                "openingTime": {
+                  "formattedHour": "09:00",
+                  "hour": 9,
+                  "minute": 0
+                },
+                "closed": false,
+                "weekDay": "Fri"
+              },
+              {
+                "closingTime": {
+                  "formattedHour": "20:00",
+                  "hour": 8,
+                  "minute": 0
+                },
+                "openingTime": {
+                  "formattedHour": "10:00",
+                  "hour": 10,
+                  "minute": 0
+                },
+                "closed": false,
+                "weekDay": "Sat"
+              },
+              {
+                "closed": true,
+                "weekDay": "Sun"
+              }
+            ]
+          },
+          "storeImages": [
+            {
+              "format": "store",
+              "url": "/rest/v2/medias/?context=bWFzdGVyfGltYWdlc3w5NTE2NXxpbWFnZS9qcGVnfGltYWdlcy9oMTgvaDE5Lzg3OTY3ODg4ODM0ODYuanBnfDYyN2Q1MmIxOTRkN2ZhNjk4Y2JlYzA5YmFmZWIxOWY1OTc4ZTA1YTg5ZWFlMzk1NTBjODM3ZTkyYTI0YTNmY2U"
+            },
+            {
+              "format": "cartIcon",
+              "url": "/rest/v2/medias/?context=bWFzdGVyfGltYWdlc3wxNjU3OHxpbWFnZS9qcGVnfGltYWdlcy9oM2YvaGRjLzg3OTY3ODg4NTA3MTguanBnfDQ2YjQzYWZmMmFhOWViOTcyOTgzMzFhMzllYTM0MzRlMjNmOTllODIxNjdiODBjNjcwYzUzNGI4Y2NhOTliMWI"
+            }
+          ],
+          "url": "/store/Cambridge Lakes Golf Course?lat=52.514151&long=-0.116745"
+        },
+        {
+          "address": {
+            "country": {
+              "isocode": "GB",
+              "name": "United Kingdom"
+            },
+            "defaultAddress": false,
+            "formattedAddress": "2A Greyfriars, Bedford, MK40 1HP, United Kingdom",
+            "id": "8796093087767",
+            "line1": "2A Greyfriars",
+            "phone": "+44 20 8653 3471",
+            "postalCode": "MK40 1HP",
+            "shippingAddress": false,
+            "town": "Bedford",
+            "visibleInAddressBook": true
+          },
+          "displayName": "Bedford",
+          "features": {
+            "entry": [
+              {
+                "key": "wheelchair",
+                "value": "Wheelchair Access"
+              },
+              {
+                "key": "buyOnlinePickupInStore",
+                "value": "Buy Online Pick Up In Store"
+              },
+              {
+                "key": "creche",
+                "value": "Creche"
+              }
+            ]
+          },
+          "formattedDistance": "30.1 Miles",
+          "geoPoint": {
+            "latitude": 52.13651,
+            "longitude": -0.47238
+          },
+          "name": "Bedford",
+          "openingHours": {
+            "code": "apparel-uk-standard-hours",
+            "specialDayOpeningList": [],
+            "weekDayOpeningList": [
+              {
+                "closingTime": {
+                  "formattedHour": "20:00",
+                  "hour": 8,
+                  "minute": 0
+                },
+                "openingTime": {
+                  "formattedHour": "09:00",
+                  "hour": 9,
+                  "minute": 0
+                },
+                "closed": false,
+                "weekDay": "Mon"
+              },
+              {
+                "closingTime": {
+                  "formattedHour": "20:00",
+                  "hour": 8,
+                  "minute": 0
+                },
+                "openingTime": {
+                  "formattedHour": "09:00",
+                  "hour": 9,
+                  "minute": 0
+                },
+                "closed": false,
+                "weekDay": "Tue"
+              },
+              {
+                "closingTime": {
+                  "formattedHour": "20:00",
+                  "hour": 8,
+                  "minute": 0
+                },
+                "openingTime": {
+                  "formattedHour": "09:00",
+                  "hour": 9,
+                  "minute": 0
+                },
+                "closed": false,
+                "weekDay": "Wed"
+              },
+              {
+                "closingTime": {
+                  "formattedHour": "20:00",
+                  "hour": 8,
+                  "minute": 0
+                },
+                "openingTime": {
+                  "formattedHour": "09:00",
+                  "hour": 9,
+                  "minute": 0
+                },
+                "closed": false,
+                "weekDay": "Thu"
+              },
+              {
+                "closingTime": {
+                  "formattedHour": "20:00",
+                  "hour": 8,
+                  "minute": 0
+                },
+                "openingTime": {
+                  "formattedHour": "09:00",
+                  "hour": 9,
+                  "minute": 0
+                },
+                "closed": false,
+                "weekDay": "Fri"
+              },
+              {
+                "closingTime": {
+                  "formattedHour": "20:00",
+                  "hour": 8,
+                  "minute": 0
+                },
+                "openingTime": {
+                  "formattedHour": "10:00",
+                  "hour": 10,
+                  "minute": 0
+                },
+                "closed": false,
+                "weekDay": "Sat"
+              },
+              {
+                "closed": true,
+                "weekDay": "Sun"
+              }
+            ]
+          },
+          "storeImages": [
+            {
+              "format": "store",
+              "url": "/rest/v2/medias/?context=bWFzdGVyfGltYWdlc3w5NTE2NXxpbWFnZS9qcGVnfGltYWdlcy9oMTgvaDE5Lzg3OTY3ODg4ODM0ODYuanBnfDYyN2Q1MmIxOTRkN2ZhNjk4Y2JlYzA5YmFmZWIxOWY1OTc4ZTA1YTg5ZWFlMzk1NTBjODM3ZTkyYTI0YTNmY2U"
+            },
+            {
+              "format": "cartIcon",
+              "url": "/rest/v2/medias/?context=bWFzdGVyfGltYWdlc3wxNjU3OHxpbWFnZS9qcGVnfGltYWdlcy9oM2YvaGRjLzg3OTY3ODg4NTA3MTguanBnfDQ2YjQzYWZmMmFhOWViOTcyOTgzMzFhMzllYTM0MzRlMjNmOTllODIxNjdiODBjNjcwYzUzNGI4Y2NhOTliMWI"
+            }
+          ],
+          "url": "/store/Bedford?lat=52.514151&long=-0.116745"
+        },
+        {
+          "address": {
+            "country": {
+              "isocode": "GB",
+              "name": "United Kingdom"
+            },
+            "defaultAddress": false,
+            "formattedAddress": "Carlton Rd, Bedford, MK43 7JL, United Kingdom",
+            "id": "8796093054999",
+            "line1": "Carlton Rd",
+            "phone": "+44 20 50017070",
+            "postalCode": "MK43 7JL",
+            "shippingAddress": false,
+            "town": "Bedford",
+            "visibleInAddressBook": true
+          },
+          "displayName": "Carlton",
+          "features": {
+            "entry": [
+              {
+                "key": "wheelchair",
+                "value": "Wheelchair Access"
+              },
+              {
+                "key": "buyOnlinePickupInStore",
+                "value": "Buy Online Pick Up In Store"
+              }
+            ]
+          },
+          "formattedDistance": "30.6 Miles",
+          "geoPoint": {
+            "latitude": 52.18751,
+            "longitude": -0.60308
+          },
+          "name": "Carlton",
+          "openingHours": {
+            "code": "apparel-uk-standard-hours",
+            "specialDayOpeningList": [],
+            "weekDayOpeningList": [
+              {
+                "closingTime": {
+                  "formattedHour": "20:00",
+                  "hour": 8,
+                  "minute": 0
+                },
+                "openingTime": {
+                  "formattedHour": "09:00",
+                  "hour": 9,
+                  "minute": 0
+                },
+                "closed": false,
+                "weekDay": "Mon"
+              },
+              {
+                "closingTime": {
+                  "formattedHour": "20:00",
+                  "hour": 8,
+                  "minute": 0
+                },
+                "openingTime": {
+                  "formattedHour": "09:00",
+                  "hour": 9,
+                  "minute": 0
+                },
+                "closed": false,
+                "weekDay": "Tue"
+              },
+              {
+                "closingTime": {
+                  "formattedHour": "20:00",
+                  "hour": 8,
+                  "minute": 0
+                },
+                "openingTime": {
+                  "formattedHour": "09:00",
+                  "hour": 9,
+                  "minute": 0
+                },
+                "closed": false,
+                "weekDay": "Wed"
+              },
+              {
+                "closingTime": {
+                  "formattedHour": "20:00",
+                  "hour": 8,
+                  "minute": 0
+                },
+                "openingTime": {
+                  "formattedHour": "09:00",
+                  "hour": 9,
+                  "minute": 0
+                },
+                "closed": false,
+                "weekDay": "Thu"
+              },
+              {
+                "closingTime": {
+                  "formattedHour": "20:00",
+                  "hour": 8,
+                  "minute": 0
+                },
+                "openingTime": {
+                  "formattedHour": "09:00",
+                  "hour": 9,
+                  "minute": 0
+                },
+                "closed": false,
+                "weekDay": "Fri"
+              },
+              {
+                "closingTime": {
+                  "formattedHour": "20:00",
+                  "hour": 8,
+                  "minute": 0
+                },
+                "openingTime": {
+                  "formattedHour": "10:00",
+                  "hour": 10,
+                  "minute": 0
+                },
+                "closed": false,
+                "weekDay": "Sat"
+              },
+              {
+                "closed": true,
+                "weekDay": "Sun"
+              }
+            ]
+          },
+          "storeImages": [
+            {
+              "format": "store",
+              "url": "/rest/v2/medias/?context=bWFzdGVyfGltYWdlc3wxMTQ1Mjd8aW1hZ2UvanBlZ3xpbWFnZXMvaGM4L2g0Zi84Nzk2Nzg4OTQ5MDIyLmpwZ3wwODNmODRmYWY5YTE4OGEzZjM0N2U1YmQxODc2MDljODRjMTlkZjQxYjQ5YjQ0YzY2NjA3ZTM4MTFkMjUxMmIw"
+            },
+            {
+              "format": "cartIcon",
+              "url": "/rest/v2/medias/?context=bWFzdGVyfGltYWdlc3wyMjAyNnxpbWFnZS9qcGVnfGltYWdlcy9oMmQvaDQ3Lzg3OTY3ODkwODAwOTQuanBnfDBlM2FmMTJiNzQzMjFmYjcyZjY5ZmM0NzE0NDc5NzYwODhhZmI2ZTQzMTI4OTNjMTI2OTllNzRkMDEyMTg0OTM"
+            }
+          ],
+          "url": "/store/Carlton?lat=52.514151&long=-0.116745"
+        },
+        {
+          "address": {
+            "country": {
+              "isocode": "GB",
+              "name": "United Kingdom"
+            },
+            "defaultAddress": false,
+            "formattedAddress": "Bolero Square, Nottingham, NG1 1LA, United Kingdom",
+            "id": "8796094595095",
+            "line1": "Bolero Square",
+            "phone": "+44 116 723 5234",
+            "postalCode": "NG1 1LA",
+            "shippingAddress": false,
+            "town": "Nottingham",
+            "visibleInAddressBook": true
+          },
+          "displayName": "Nottingham Ice Center",
+          "features": {
+            "entry": [
+              {
+                "key": "wheelchair",
+                "value": "Wheelchair Access"
+              },
+              {
+                "key": "buyOnlinePickupInStore",
+                "value": "Buy Online Pick Up In Store"
+              },
+              {
+                "key": "sundayWorkshops",
+                "value": "Sunday Workshops"
+              },
+              {
+                "key": "creche",
+                "value": "Creche"
+              }
+            ]
+          },
+          "formattedDistance": "52.5 Miles",
+          "geoPoint": {
+            "latitude": 52.95264,
+            "longitude": -1.139276
+          },
+          "name": "Nottingham Ice Center",
+          "openingHours": {
+            "code": "apparel-uk-weekend-hours",
+            "specialDayOpeningList": [],
+            "weekDayOpeningList": [
+              {
+                "closingTime": {
+                  "formattedHour": "20:00",
+                  "hour": 8,
+                  "minute": 0
+                },
+                "openingTime": {
+                  "formattedHour": "09:00",
+                  "hour": 9,
+                  "minute": 0
+                },
+                "closed": false,
+                "weekDay": "Mon"
+              },
+              {
+                "closingTime": {
+                  "formattedHour": "20:00",
+                  "hour": 8,
+                  "minute": 0
+                },
+                "openingTime": {
+                  "formattedHour": "09:00",
+                  "hour": 9,
+                  "minute": 0
+                },
+                "closed": false,
+                "weekDay": "Tue"
+              },
+              {
+                "closingTime": {
+                  "formattedHour": "20:00",
+                  "hour": 8,
+                  "minute": 0
+                },
+                "openingTime": {
+                  "formattedHour": "09:00",
+                  "hour": 9,
+                  "minute": 0
+                },
+                "closed": false,
+                "weekDay": "Wed"
+              },
+              {
+                "closingTime": {
+                  "formattedHour": "20:00",
+                  "hour": 8,
+                  "minute": 0
+                },
+                "openingTime": {
+                  "formattedHour": "09:00",
+                  "hour": 9,
+                  "minute": 0
+                },
+                "closed": false,
+                "weekDay": "Thu"
+              },
+              {
+                "closingTime": {
+                  "formattedHour": "20:00",
+                  "hour": 8,
+                  "minute": 0
+                },
+                "openingTime": {
+                  "formattedHour": "09:00",
+                  "hour": 9,
+                  "minute": 0
+                },
+                "closed": false,
+                "weekDay": "Fri"
+              },
+              {
+                "closingTime": {
+                  "formattedHour": "20:00",
+                  "hour": 8,
+                  "minute": 0
+                },
+                "openingTime": {
+                  "formattedHour": "10:00",
+                  "hour": 10,
+                  "minute": 0
+                },
+                "closed": false,
+                "weekDay": "Sat"
+              },
+              {
+                "closingTime": {
+                  "formattedHour": "16:00",
+                  "hour": 4,
+                  "minute": 0
+                },
+                "openingTime": {
+                  "formattedHour": "10:00",
+                  "hour": 10,
+                  "minute": 0
+                },
+                "closed": false,
+                "weekDay": "Sun"
+              }
+            ]
+          },
+          "storeImages": [
+            {
+              "format": "store",
+              "url": "/rest/v2/medias/?context=bWFzdGVyfGltYWdlc3w5NTE2NXxpbWFnZS9qcGVnfGltYWdlcy9oMTgvaDE5Lzg3OTY3ODg4ODM0ODYuanBnfDYyN2Q1MmIxOTRkN2ZhNjk4Y2JlYzA5YmFmZWIxOWY1OTc4ZTA1YTg5ZWFlMzk1NTBjODM3ZTkyYTI0YTNmY2U"
+            },
+            {
+              "format": "cartIcon",
+              "url": "/rest/v2/medias/?context=bWFzdGVyfGltYWdlc3wxNjU3OHxpbWFnZS9qcGVnfGltYWdlcy9oM2YvaGRjLzg3OTY3ODg4NTA3MTguanBnfDQ2YjQzYWZmMmFhOWViOTcyOTgzMzFhMzllYTM0MzRlMjNmOTllODIxNjdiODBjNjcwYzUzNGI4Y2NhOTliMWI"
+            }
+          ],
+          "url": "/store/Nottingham Ice Center?lat=52.514151&long=-0.116745"
+        },
+        {
+          "address": {
+            "country": {
+              "isocode": "GB",
+              "name": "United Kingdom"
+            },
+            "defaultAddress": false,
+            "formattedAddress": "1 Brewhouse Yard, Nottingham, NG1 6AD, United Kingdom",
+            "id": "8796094660631",
+            "line1": "1 Brewhouse Yard",
+            "phone": "+44 20 1836 7419",
+            "postalCode": "NG1 6AD",
+            "shippingAddress": false,
+            "town": "Nottingham",
+            "visibleInAddressBook": true
+          },
+          "displayName": "Nottingham",
+          "features": {
+            "entry": [
+              {
+                "key": "wheelchair",
+                "value": "Wheelchair Access"
+              },
+              {
+                "key": "buyOnlinePickupInStore",
+                "value": "Buy Online Pick Up In Store"
+              }
+            ]
+          },
+          "formattedDistance": "52.8 Miles",
+          "geoPoint": {
+            "latitude": 52.948661,
+            "longitude": -1.151981
+          },
+          "name": "Nottingham",
+          "openingHours": {
+            "code": "apparel-uk-weekend-hours",
+            "specialDayOpeningList": [],
+            "weekDayOpeningList": [
+              {
+                "closingTime": {
+                  "formattedHour": "20:00",
+                  "hour": 8,
+                  "minute": 0
+                },
+                "openingTime": {
+                  "formattedHour": "09:00",
+                  "hour": 9,
+                  "minute": 0
+                },
+                "closed": false,
+                "weekDay": "Mon"
+              },
+              {
+                "closingTime": {
+                  "formattedHour": "20:00",
+                  "hour": 8,
+                  "minute": 0
+                },
+                "openingTime": {
+                  "formattedHour": "09:00",
+                  "hour": 9,
+                  "minute": 0
+                },
+                "closed": false,
+                "weekDay": "Tue"
+              },
+              {
+                "closingTime": {
+                  "formattedHour": "20:00",
+                  "hour": 8,
+                  "minute": 0
+                },
+                "openingTime": {
+                  "formattedHour": "09:00",
+                  "hour": 9,
+                  "minute": 0
+                },
+                "closed": false,
+                "weekDay": "Wed"
+              },
+              {
+                "closingTime": {
+                  "formattedHour": "20:00",
+                  "hour": 8,
+                  "minute": 0
+                },
+                "openingTime": {
+                  "formattedHour": "09:00",
+                  "hour": 9,
+                  "minute": 0
+                },
+                "closed": false,
+                "weekDay": "Thu"
+              },
+              {
+                "closingTime": {
+                  "formattedHour": "20:00",
+                  "hour": 8,
+                  "minute": 0
+                },
+                "openingTime": {
+                  "formattedHour": "09:00",
+                  "hour": 9,
+                  "minute": 0
+                },
+                "closed": false,
+                "weekDay": "Fri"
+              },
+              {
+                "closingTime": {
+                  "formattedHour": "20:00",
+                  "hour": 8,
+                  "minute": 0
+                },
+                "openingTime": {
+                  "formattedHour": "10:00",
+                  "hour": 10,
+                  "minute": 0
+                },
+                "closed": false,
+                "weekDay": "Sat"
+              },
+              {
+                "closingTime": {
+                  "formattedHour": "16:00",
+                  "hour": 4,
+                  "minute": 0
+                },
+                "openingTime": {
+                  "formattedHour": "10:00",
+                  "hour": 10,
+                  "minute": 0
+                },
+                "closed": false,
+                "weekDay": "Sun"
+              }
+            ]
+          },
+          "storeImages": [
+            {
+              "format": "store",
+              "url": "/rest/v2/medias/?context=bWFzdGVyfGltYWdlc3w3NjkxMXxpbWFnZS9qcGVnfGltYWdlcy9oMGEvaGJiLzg3OTY3ODg5MTYyNTQuanBnfDVlMzY3Y2FmMGI3OGZhNjQ5ZGQ3NzE0NzE3NzgxMWE4MWQ0YTljNThlNjJhMWRkN2JmZjQ1NjA1ZjM4MGFmYmM"
+            },
+            {
+              "format": "cartIcon",
+              "url": "/rest/v2/medias/?context=bWFzdGVyfGltYWdlc3wxNDE3NXxpbWFnZS9qcGVnfGltYWdlcy9oNDYvaDE1Lzg3OTY3ODkwNDczMjYuanBnfDgzNTAyYzdjNjNmMjFhM2NhNTRmMTUyZTQxODcwNGQ2N2ZmZDZiMDhhNzVlMmZkYjQ3MWY3N2I3ZTRlMTRmZmU"
+            }
+          ],
+          "url": "/store/Nottingham?lat=52.514151&long=-0.116745"
+        },
+        {
+          "address": {
+            "country": {
+              "isocode": "GB",
+              "name": "United Kingdom"
+            },
+            "defaultAddress": false,
+            "formattedAddress": "Theatre Square, Nottingham, NG1 5ND, United Kingdom",
+            "id": "8796094529559",
+            "line1": "Theatre Square",
+            "phone": "+44 20 6124 4113",
+            "postalCode": "NG1 5ND",
+            "shippingAddress": false,
+            "town": "Nottingham",
+            "visibleInAddressBook": true
+          },
+          "displayName": "Nottingham Concert Hall",
+          "features": {
+            "entry": [
+              {
+                "key": "wheelchair",
+                "value": "Wheelchair Access"
+              },
+              {
+                "key": "buyOnlinePickupInStore",
+                "value": "Buy Online Pick Up In Store"
+              }
+            ]
+          },
+          "formattedDistance": "53.1 Miles",
+          "geoPoint": {
+            "latitude": 52.955849,
+            "longitude": -1.151702
+          },
+          "name": "Nottingham Concert Hall",
+          "openingHours": {
+            "code": "apparel-uk-standard-hours",
+            "specialDayOpeningList": [],
+            "weekDayOpeningList": [
+              {
+                "closingTime": {
+                  "formattedHour": "20:00",
+                  "hour": 8,
+                  "minute": 0
+                },
+                "openingTime": {
+                  "formattedHour": "09:00",
+                  "hour": 9,
+                  "minute": 0
+                },
+                "closed": false,
+                "weekDay": "Mon"
+              },
+              {
+                "closingTime": {
+                  "formattedHour": "20:00",
+                  "hour": 8,
+                  "minute": 0
+                },
+                "openingTime": {
+                  "formattedHour": "09:00",
+                  "hour": 9,
+                  "minute": 0
+                },
+                "closed": false,
+                "weekDay": "Tue"
+              },
+              {
+                "closingTime": {
+                  "formattedHour": "20:00",
+                  "hour": 8,
+                  "minute": 0
+                },
+                "openingTime": {
+                  "formattedHour": "09:00",
+                  "hour": 9,
+                  "minute": 0
+                },
+                "closed": false,
+                "weekDay": "Wed"
+              },
+              {
+                "closingTime": {
+                  "formattedHour": "20:00",
+                  "hour": 8,
+                  "minute": 0
+                },
+                "openingTime": {
+                  "formattedHour": "09:00",
+                  "hour": 9,
+                  "minute": 0
+                },
+                "closed": false,
+                "weekDay": "Thu"
+              },
+              {
+                "closingTime": {
+                  "formattedHour": "20:00",
+                  "hour": 8,
+                  "minute": 0
+                },
+                "openingTime": {
+                  "formattedHour": "09:00",
+                  "hour": 9,
+                  "minute": 0
+                },
+                "closed": false,
+                "weekDay": "Fri"
+              },
+              {
+                "closingTime": {
+                  "formattedHour": "20:00",
+                  "hour": 8,
+                  "minute": 0
+                },
+                "openingTime": {
+                  "formattedHour": "10:00",
+                  "hour": 10,
+                  "minute": 0
+                },
+                "closed": false,
+                "weekDay": "Sat"
+              },
+              {
+                "closed": true,
+                "weekDay": "Sun"
+              }
+            ]
+          },
+          "storeImages": [
+            {
+              "format": "store",
+              "url": "/rest/v2/medias/?context=bWFzdGVyfGltYWdlc3wxMTQ1Mjd8aW1hZ2UvanBlZ3xpbWFnZXMvaGM4L2g0Zi84Nzk2Nzg4OTQ5MDIyLmpwZ3wwODNmODRmYWY5YTE4OGEzZjM0N2U1YmQxODc2MDljODRjMTlkZjQxYjQ5YjQ0YzY2NjA3ZTM4MTFkMjUxMmIw"
+            },
+            {
+              "format": "cartIcon",
+              "url": "/rest/v2/medias/?context=bWFzdGVyfGltYWdlc3wyMjAyNnxpbWFnZS9qcGVnfGltYWdlcy9oMmQvaDQ3Lzg3OTY3ODkwODAwOTQuanBnfDBlM2FmMTJiNzQzMjFmYjcyZjY5ZmM0NzE0NDc5NzYwODhhZmI2ZTQzMTI4OTNjMTI2OTllNzRkMDEyMTg0OTM"
+            }
+          ],
+          "url": "/store/Nottingham Concert Hall?lat=52.514151&long=-0.116745"
+        },
+        {
+          "address": {
+            "country": {
+              "isocode": "GB",
+              "name": "United Kingdom"
+            },
+            "defaultAddress": false,
+            "formattedAddress": "14 Shakespeare St, Nottingham, NG1 4FQ, United Kingdom",
+            "id": "8796094627863",
+            "line1": "14 Shakespeare St",
+            "phone": "+44 29 8803 7515",
+            "postalCode": "NG1 4FQ",
+            "shippingAddress": false,
+            "town": "Nottingham",
+            "visibleInAddressBook": true
+          },
+          "displayName": "Nottingham University",
+          "features": {
+            "entry": [
+              {
+                "key": "wheelchair",
+                "value": "Wheelchair Access"
+              },
+              {
+                "key": "buyOnlinePickupInStore",
+                "value": "Buy Online Pick Up In Store"
+              }
+            ]
+          },
+          "formattedDistance": "53.1 Miles",
+          "geoPoint": {
+            "latitude": 52.957506,
+            "longitude": -1.15
+          },
+          "name": "Nottingham University",
+          "openingHours": {
+            "code": "apparel-uk-weekend-hours",
+            "specialDayOpeningList": [],
+            "weekDayOpeningList": [
+              {
+                "closingTime": {
+                  "formattedHour": "20:00",
+                  "hour": 8,
+                  "minute": 0
+                },
+                "openingTime": {
+                  "formattedHour": "09:00",
+                  "hour": 9,
+                  "minute": 0
+                },
+                "closed": false,
+                "weekDay": "Mon"
+              },
+              {
+                "closingTime": {
+                  "formattedHour": "20:00",
+                  "hour": 8,
+                  "minute": 0
+                },
+                "openingTime": {
+                  "formattedHour": "09:00",
+                  "hour": 9,
+                  "minute": 0
+                },
+                "closed": false,
+                "weekDay": "Tue"
+              },
+              {
+                "closingTime": {
+                  "formattedHour": "20:00",
+                  "hour": 8,
+                  "minute": 0
+                },
+                "openingTime": {
+                  "formattedHour": "09:00",
+                  "hour": 9,
+                  "minute": 0
+                },
+                "closed": false,
+                "weekDay": "Wed"
+              },
+              {
+                "closingTime": {
+                  "formattedHour": "20:00",
+                  "hour": 8,
+                  "minute": 0
+                },
+                "openingTime": {
+                  "formattedHour": "09:00",
+                  "hour": 9,
+                  "minute": 0
+                },
+                "closed": false,
+                "weekDay": "Thu"
+              },
+              {
+                "closingTime": {
+                  "formattedHour": "20:00",
+                  "hour": 8,
+                  "minute": 0
+                },
+                "openingTime": {
+                  "formattedHour": "09:00",
+                  "hour": 9,
+                  "minute": 0
+                },
+                "closed": false,
+                "weekDay": "Fri"
+              },
+              {
+                "closingTime": {
+                  "formattedHour": "20:00",
+                  "hour": 8,
+                  "minute": 0
+                },
+                "openingTime": {
+                  "formattedHour": "10:00",
+                  "hour": 10,
+                  "minute": 0
+                },
+                "closed": false,
+                "weekDay": "Sat"
+              },
+              {
+                "closingTime": {
+                  "formattedHour": "16:00",
+                  "hour": 4,
+                  "minute": 0
+                },
+                "openingTime": {
+                  "formattedHour": "10:00",
+                  "hour": 10,
+                  "minute": 0
+                },
+                "closed": false,
+                "weekDay": "Sun"
+              }
+            ]
+          },
+          "storeImages": [
+            {
+              "format": "store",
+              "url": "/rest/v2/medias/?context=bWFzdGVyfGltYWdlc3wxMTQ1Mjd8aW1hZ2UvanBlZ3xpbWFnZXMvaGM4L2g0Zi84Nzk2Nzg4OTQ5MDIyLmpwZ3wwODNmODRmYWY5YTE4OGEzZjM0N2U1YmQxODc2MDljODRjMTlkZjQxYjQ5YjQ0YzY2NjA3ZTM4MTFkMjUxMmIw"
+            },
+            {
+              "format": "cartIcon",
+              "url": "/rest/v2/medias/?context=bWFzdGVyfGltYWdlc3wyMjAyNnxpbWFnZS9qcGVnfGltYWdlcy9oMmQvaDQ3Lzg3OTY3ODkwODAwOTQuanBnfDBlM2FmMTJiNzQzMjFmYjcyZjY5ZmM0NzE0NDc5NzYwODhhZmI2ZTQzMTI4OTNjMTI2OTllNzRkMDEyMTg0OTM"
+            }
+          ],
+          "url": "/store/Nottingham University?lat=52.514151&long=-0.116745"
+        },
+        {
+          "address": {
+            "country": {
+              "isocode": "GB",
+              "name": "United Kingdom"
+            },
+            "defaultAddress": false,
+            "formattedAddress": "Derby Road, Nottingham, NG7 2UH, United Kingdom",
+            "id": "8796094562327",
+            "line1": "Derby Road",
+            "phone": "+44 20 3097 1369",
+            "postalCode": "NG7 2UH",
+            "shippingAddress": false,
+            "town": "Nottingham",
+            "visibleInAddressBook": true
+          },
+          "displayName": "Nottingham Hospital",
+          "features": {
+            "entry": [
+              {
+                "key": "buyOnlinePickupInStore",
+                "value": "Buy Online Pick Up In Store"
+              },
+              {
+                "key": "sundayWorkshops",
+                "value": "Sunday Workshops"
+              },
+              {
+                "key": "creche",
+                "value": "Creche"
+              }
+            ]
+          },
+          "formattedDistance": "54.3 Miles",
+          "geoPoint": {
+            "latitude": 52.943338,
+            "longitude": -1.200632
+          },
+          "name": "Nottingham Hospital",
+          "openingHours": {
+            "code": "apparel-uk-standard-hours",
+            "specialDayOpeningList": [],
+            "weekDayOpeningList": [
+              {
+                "closingTime": {
+                  "formattedHour": "20:00",
+                  "hour": 8,
+                  "minute": 0
+                },
+                "openingTime": {
+                  "formattedHour": "09:00",
+                  "hour": 9,
+                  "minute": 0
+                },
+                "closed": false,
+                "weekDay": "Mon"
+              },
+              {
+                "closingTime": {
+                  "formattedHour": "20:00",
+                  "hour": 8,
+                  "minute": 0
+                },
+                "openingTime": {
+                  "formattedHour": "09:00",
+                  "hour": 9,
+                  "minute": 0
+                },
+                "closed": false,
+                "weekDay": "Tue"
+              },
+              {
+                "closingTime": {
+                  "formattedHour": "20:00",
+                  "hour": 8,
+                  "minute": 0
+                },
+                "openingTime": {
+                  "formattedHour": "09:00",
+                  "hour": 9,
+                  "minute": 0
+                },
+                "closed": false,
+                "weekDay": "Wed"
+              },
+              {
+                "closingTime": {
+                  "formattedHour": "20:00",
+                  "hour": 8,
+                  "minute": 0
+                },
+                "openingTime": {
+                  "formattedHour": "09:00",
+                  "hour": 9,
+                  "minute": 0
+                },
+                "closed": false,
+                "weekDay": "Thu"
+              },
+              {
+                "closingTime": {
+                  "formattedHour": "20:00",
+                  "hour": 8,
+                  "minute": 0
+                },
+                "openingTime": {
+                  "formattedHour": "09:00",
+                  "hour": 9,
+                  "minute": 0
+                },
+                "closed": false,
+                "weekDay": "Fri"
+              },
+              {
+                "closingTime": {
+                  "formattedHour": "20:00",
+                  "hour": 8,
+                  "minute": 0
+                },
+                "openingTime": {
+                  "formattedHour": "10:00",
+                  "hour": 10,
+                  "minute": 0
+                },
+                "closed": false,
+                "weekDay": "Sat"
+              },
+              {
+                "closed": true,
+                "weekDay": "Sun"
+              }
+            ]
+          },
+          "storeImages": [],
+          "url": "/store/Nottingham Hospital?lat=52.514151&long=-0.116745"
+        },
+        {
+          "address": {
+            "country": {
+              "isocode": "GB",
+              "name": "United Kingdom"
+            },
+            "defaultAddress": false,
+            "formattedAddress": "Bramall Lane, Sheffield, S2 4RF, United Kingdom",
+            "id": "8796094267415",
+            "line1": "Bramall Lane",
+            "phone": "+44 20 1385 5693",
+            "postalCode": "S2 4RF",
+            "shippingAddress": false,
+            "town": "Sheffield",
+            "visibleInAddressBook": true
+          },
+          "displayName": "Sheffield United FC",
+          "features": {
+            "entry": [
+              {
+                "key": "wheelchair",
+                "value": "Wheelchair Access"
+              },
+              {
+                "key": "buyOnlinePickupInStore",
+                "value": "Buy Online Pick Up In Store"
+              }
+            ]
+          },
+          "formattedDistance": "81.9 Miles",
+          "geoPoint": {
+            "latitude": 53.369325,
+            "longitude": -1.471845
+          },
+          "name": "Sheffield United FC",
+          "openingHours": {
+            "code": "apparel-uk-weekend-hours",
+            "specialDayOpeningList": [],
+            "weekDayOpeningList": [
+              {
+                "closingTime": {
+                  "formattedHour": "20:00",
+                  "hour": 8,
+                  "minute": 0
+                },
+                "openingTime": {
+                  "formattedHour": "09:00",
+                  "hour": 9,
+                  "minute": 0
+                },
+                "closed": false,
+                "weekDay": "Mon"
+              },
+              {
+                "closingTime": {
+                  "formattedHour": "20:00",
+                  "hour": 8,
+                  "minute": 0
+                },
+                "openingTime": {
+                  "formattedHour": "09:00",
+                  "hour": 9,
+                  "minute": 0
+                },
+                "closed": false,
+                "weekDay": "Tue"
+              },
+              {
+                "closingTime": {
+                  "formattedHour": "20:00",
+                  "hour": 8,
+                  "minute": 0
+                },
+                "openingTime": {
+                  "formattedHour": "09:00",
+                  "hour": 9,
+                  "minute": 0
+                },
+                "closed": false,
+                "weekDay": "Wed"
+              },
+              {
+                "closingTime": {
+                  "formattedHour": "20:00",
+                  "hour": 8,
+                  "minute": 0
+                },
+                "openingTime": {
+                  "formattedHour": "09:00",
+                  "hour": 9,
+                  "minute": 0
+                },
+                "closed": false,
+                "weekDay": "Thu"
+              },
+              {
+                "closingTime": {
+                  "formattedHour": "20:00",
+                  "hour": 8,
+                  "minute": 0
+                },
+                "openingTime": {
+                  "formattedHour": "09:00",
+                  "hour": 9,
+                  "minute": 0
+                },
+                "closed": false,
+                "weekDay": "Fri"
+              },
+              {
+                "closingTime": {
+                  "formattedHour": "20:00",
+                  "hour": 8,
+                  "minute": 0
+                },
+                "openingTime": {
+                  "formattedHour": "10:00",
+                  "hour": 10,
+                  "minute": 0
+                },
+                "closed": false,
+                "weekDay": "Sat"
+              },
+              {
+                "closingTime": {
+                  "formattedHour": "16:00",
+                  "hour": 4,
+                  "minute": 0
+                },
+                "openingTime": {
+                  "formattedHour": "10:00",
+                  "hour": 10,
+                  "minute": 0
+                },
+                "closed": false,
+                "weekDay": "Sun"
+              }
+            ]
+          },
+          "storeImages": [
+            {
+              "format": "store",
+              "url": "/rest/v2/medias/?context=bWFzdGVyfGltYWdlc3wxMTQ1Mjd8aW1hZ2UvanBlZ3xpbWFnZXMvaGM4L2g0Zi84Nzk2Nzg4OTQ5MDIyLmpwZ3wwODNmODRmYWY5YTE4OGEzZjM0N2U1YmQxODc2MDljODRjMTlkZjQxYjQ5YjQ0YzY2NjA3ZTM4MTFkMjUxMmIw"
+            },
+            {
+              "format": "cartIcon",
+              "url": "/rest/v2/medias/?context=bWFzdGVyfGltYWdlc3wyMjAyNnxpbWFnZS9qcGVnfGltYWdlcy9oMmQvaDQ3Lzg3OTY3ODkwODAwOTQuanBnfDBlM2FmMTJiNzQzMjFmYjcyZjY5ZmM0NzE0NDc5NzYwODhhZmI2ZTQzMTI4OTNjMTI2OTllNzRkMDEyMTg0OTM"
+            }
+          ],
+          "url": "/store/Sheffield United FC?lat=52.514151&long=-0.116745"
+        },
+        {
+          "address": {
+            "country": {
+              "isocode": "GB",
+              "name": "United Kingdom"
+            },
+            "defaultAddress": false,
+            "formattedAddress": "Broughton Ln, Sheffield, S9 2DF, United Kingdom",
+            "id": "8796094234647",
+            "line1": "Broughton Ln",
+            "phone": "+44 116 153 4179",
+            "postalCode": "S9 2DF",
+            "shippingAddress": false,
+            "town": "Sheffield",
+            "visibleInAddressBook": true
+          },
+          "displayName": "Sheffield Arena",
+          "features": {
+            "entry": [
+              {
+                "key": "wheelchair",
+                "value": "Wheelchair Access"
+              },
+              {
+                "key": "buyOnlinePickupInStore",
+                "value": "Buy Online Pick Up In Store"
+              },
+              {
+                "key": "sundayWorkshops",
+                "value": "Sunday Workshops"
+              },
+              {
+                "key": "creche",
+                "value": "Creche"
+              }
+            ]
+          },
+          "formattedDistance": "81.9 Miles",
+          "geoPoint": {
+            "latitude": 53.399777,
+            "longitude": -1.41881
+          },
+          "name": "Sheffield Arena",
+          "openingHours": {
+            "code": "apparel-uk-weekend-hours",
+            "specialDayOpeningList": [],
+            "weekDayOpeningList": [
+              {
+                "closingTime": {
+                  "formattedHour": "20:00",
+                  "hour": 8,
+                  "minute": 0
+                },
+                "openingTime": {
+                  "formattedHour": "09:00",
+                  "hour": 9,
+                  "minute": 0
+                },
+                "closed": false,
+                "weekDay": "Mon"
+              },
+              {
+                "closingTime": {
+                  "formattedHour": "20:00",
+                  "hour": 8,
+                  "minute": 0
+                },
+                "openingTime": {
+                  "formattedHour": "09:00",
+                  "hour": 9,
+                  "minute": 0
+                },
+                "closed": false,
+                "weekDay": "Tue"
+              },
+              {
+                "closingTime": {
+                  "formattedHour": "20:00",
+                  "hour": 8,
+                  "minute": 0
+                },
+                "openingTime": {
+                  "formattedHour": "09:00",
+                  "hour": 9,
+                  "minute": 0
+                },
+                "closed": false,
+                "weekDay": "Wed"
+              },
+              {
+                "closingTime": {
+                  "formattedHour": "20:00",
+                  "hour": 8,
+                  "minute": 0
+                },
+                "openingTime": {
+                  "formattedHour": "09:00",
+                  "hour": 9,
+                  "minute": 0
+                },
+                "closed": false,
+                "weekDay": "Thu"
+              },
+              {
+                "closingTime": {
+                  "formattedHour": "20:00",
+                  "hour": 8,
+                  "minute": 0
+                },
+                "openingTime": {
+                  "formattedHour": "09:00",
+                  "hour": 9,
+                  "minute": 0
+                },
+                "closed": false,
+                "weekDay": "Fri"
+              },
+              {
+                "closingTime": {
+                  "formattedHour": "20:00",
+                  "hour": 8,
+                  "minute": 0
+                },
+                "openingTime": {
+                  "formattedHour": "10:00",
+                  "hour": 10,
+                  "minute": 0
+                },
+                "closed": false,
+                "weekDay": "Sat"
+              },
+              {
+                "closingTime": {
+                  "formattedHour": "16:00",
+                  "hour": 4,
+                  "minute": 0
+                },
+                "openingTime": {
+                  "formattedHour": "10:00",
+                  "hour": 10,
+                  "minute": 0
+                },
+                "closed": false,
+                "weekDay": "Sun"
+              }
+            ]
+          },
+          "storeImages": [
+            {
+              "format": "store",
+              "url": "/rest/v2/medias/?context=bWFzdGVyfGltYWdlc3w5NTE2NXxpbWFnZS9qcGVnfGltYWdlcy9oMTgvaDE5Lzg3OTY3ODg4ODM0ODYuanBnfDYyN2Q1MmIxOTRkN2ZhNjk4Y2JlYzA5YmFmZWIxOWY1OTc4ZTA1YTg5ZWFlMzk1NTBjODM3ZTkyYTI0YTNmY2U"
+            },
+            {
+              "format": "cartIcon",
+              "url": "/rest/v2/medias/?context=bWFzdGVyfGltYWdlc3wxNjU3OHxpbWFnZS9qcGVnfGltYWdlcy9oM2YvaGRjLzg3OTY3ODg4NTA3MTguanBnfDQ2YjQzYWZmMmFhOWViOTcyOTgzMzFhMzllYTM0MzRlMjNmOTllODIxNjdiODBjNjcwYzUzNGI4Y2NhOTliMWI"
+            }
+          ],
+          "url": "/store/Sheffield Arena?lat=52.514151&long=-0.116745"
+        },
+        {
+          "address": {
+            "country": {
+              "isocode": "GB",
+              "name": "United Kingdom"
+            },
+            "defaultAddress": false,
+            "formattedAddress": "The Oasis, Sheffield, S9 1EP, United Kingdom",
+            "id": "8796094332951",
+            "line1": "The Oasis",
+            "phone": "+44 116 987 5657",
+            "postalCode": "S9 1EP",
+            "shippingAddress": false,
+            "town": "Sheffield",
+            "visibleInAddressBook": true
+          },
+          "displayName": "Sheffield",
+          "features": {
+            "entry": [
+              {
+                "key": "buyOnlinePickupInStore",
+                "value": "Buy Online Pick Up In Store"
+              },
+              {
+                "key": "sundayWorkshops",
+                "value": "Sunday Workshops"
+              },
+              {
+                "key": "creche",
+                "value": "Creche"
+              }
+            ]
+          },
+          "formattedDistance": "82.4 Miles",
+          "geoPoint": {
+            "latitude": 53.41304,
+            "longitude": -1.412461
+          },
+          "name": "Sheffield",
+          "openingHours": {
+            "code": "apparel-uk-standard-hours",
+            "specialDayOpeningList": [],
+            "weekDayOpeningList": [
+              {
+                "closingTime": {
+                  "formattedHour": "20:00",
+                  "hour": 8,
+                  "minute": 0
+                },
+                "openingTime": {
+                  "formattedHour": "09:00",
+                  "hour": 9,
+                  "minute": 0
+                },
+                "closed": false,
+                "weekDay": "Mon"
+              },
+              {
+                "closingTime": {
+                  "formattedHour": "20:00",
+                  "hour": 8,
+                  "minute": 0
+                },
+                "openingTime": {
+                  "formattedHour": "09:00",
+                  "hour": 9,
+                  "minute": 0
+                },
+                "closed": false,
+                "weekDay": "Tue"
+              },
+              {
+                "closingTime": {
+                  "formattedHour": "20:00",
+                  "hour": 8,
+                  "minute": 0
+                },
+                "openingTime": {
+                  "formattedHour": "09:00",
+                  "hour": 9,
+                  "minute": 0
+                },
+                "closed": false,
+                "weekDay": "Wed"
+              },
+              {
+                "closingTime": {
+                  "formattedHour": "20:00",
+                  "hour": 8,
+                  "minute": 0
+                },
+                "openingTime": {
+                  "formattedHour": "09:00",
+                  "hour": 9,
+                  "minute": 0
+                },
+                "closed": false,
+                "weekDay": "Thu"
+              },
+              {
+                "closingTime": {
+                  "formattedHour": "20:00",
+                  "hour": 8,
+                  "minute": 0
+                },
+                "openingTime": {
+                  "formattedHour": "09:00",
+                  "hour": 9,
+                  "minute": 0
+                },
+                "closed": false,
+                "weekDay": "Fri"
+              },
+              {
+                "closingTime": {
+                  "formattedHour": "20:00",
+                  "hour": 8,
+                  "minute": 0
+                },
+                "openingTime": {
+                  "formattedHour": "10:00",
+                  "hour": 10,
+                  "minute": 0
+                },
+                "closed": false,
+                "weekDay": "Sat"
+              },
+              {
+                "closed": true,
+                "weekDay": "Sun"
+              }
+            ]
+          },
+          "storeImages": [
+            {
+              "format": "store",
+              "url": "/rest/v2/medias/?context=bWFzdGVyfGltYWdlc3w5NTE2NXxpbWFnZS9qcGVnfGltYWdlcy9oMTgvaDE5Lzg3OTY3ODg4ODM0ODYuanBnfDYyN2Q1MmIxOTRkN2ZhNjk4Y2JlYzA5YmFmZWIxOWY1OTc4ZTA1YTg5ZWFlMzk1NTBjODM3ZTkyYTI0YTNmY2U"
+            },
+            {
+              "format": "cartIcon",
+              "url": "/rest/v2/medias/?context=bWFzdGVyfGltYWdlc3wxNjU3OHxpbWFnZS9qcGVnfGltYWdlcy9oM2YvaGRjLzg3OTY3ODg4NTA3MTguanBnfDQ2YjQzYWZmMmFhOWViOTcyOTgzMzFhMzllYTM0MzRlMjNmOTllODIxNjdiODBjNjcwYzUzNGI4Y2NhOTliMWI"
+            }
+          ],
+          "url": "/store/Sheffield?lat=52.514151&long=-0.116745"
+        },
+        {
+          "address": {
+            "country": {
+              "isocode": "GB",
+              "name": "United Kingdom"
+            },
+            "defaultAddress": false,
+            "formattedAddress": "Church Street, Sheffield, S1 1HA, United Kingdom",
+            "id": "8796094201879",
+            "line1": "Church Street",
+            "phone": "+44 116 764 0910",
+            "postalCode": "S1 1HA",
+            "shippingAddress": false,
+            "town": "Sheffield",
+            "visibleInAddressBook": true
+          },
+          "displayName": "Sheffield Kathedrale",
+          "features": {
+            "entry": [
+              {
+                "key": "buyOnlinePickupInStore",
+                "value": "Buy Online Pick Up In Store"
+              },
+              {
+                "key": "sundayWorkshops",
+                "value": "Sunday Workshops"
+              },
+              {
+                "key": "creche",
+                "value": "Creche"
+              }
+            ]
+          },
+          "formattedDistance": "82.5 Miles",
+          "geoPoint": {
+            "latitude": 53.382497,
+            "longitude": -1.469882
+          },
+          "name": "Sheffield Kathedrale",
+          "openingHours": {
+            "code": "apparel-uk-standard-hours",
+            "specialDayOpeningList": [],
+            "weekDayOpeningList": [
+              {
+                "closingTime": {
+                  "formattedHour": "20:00",
+                  "hour": 8,
+                  "minute": 0
+                },
+                "openingTime": {
+                  "formattedHour": "09:00",
+                  "hour": 9,
+                  "minute": 0
+                },
+                "closed": false,
+                "weekDay": "Mon"
+              },
+              {
+                "closingTime": {
+                  "formattedHour": "20:00",
+                  "hour": 8,
+                  "minute": 0
+                },
+                "openingTime": {
+                  "formattedHour": "09:00",
+                  "hour": 9,
+                  "minute": 0
+                },
+                "closed": false,
+                "weekDay": "Tue"
+              },
+              {
+                "closingTime": {
+                  "formattedHour": "20:00",
+                  "hour": 8,
+                  "minute": 0
+                },
+                "openingTime": {
+                  "formattedHour": "09:00",
+                  "hour": 9,
+                  "minute": 0
+                },
+                "closed": false,
+                "weekDay": "Wed"
+              },
+              {
+                "closingTime": {
+                  "formattedHour": "20:00",
+                  "hour": 8,
+                  "minute": 0
+                },
+                "openingTime": {
+                  "formattedHour": "09:00",
+                  "hour": 9,
+                  "minute": 0
+                },
+                "closed": false,
+                "weekDay": "Thu"
+              },
+              {
+                "closingTime": {
+                  "formattedHour": "20:00",
+                  "hour": 8,
+                  "minute": 0
+                },
+                "openingTime": {
+                  "formattedHour": "09:00",
+                  "hour": 9,
+                  "minute": 0
+                },
+                "closed": false,
+                "weekDay": "Fri"
+              },
+              {
+                "closingTime": {
+                  "formattedHour": "20:00",
+                  "hour": 8,
+                  "minute": 0
+                },
+                "openingTime": {
+                  "formattedHour": "10:00",
+                  "hour": 10,
+                  "minute": 0
+                },
+                "closed": false,
+                "weekDay": "Sat"
+              },
+              {
+                "closed": true,
+                "weekDay": "Sun"
+              }
+            ]
+          },
+          "storeImages": [],
+          "url": "/store/Sheffield Kathedrale?lat=52.514151&long=-0.116745"
+        },
+        {
+          "address": {
+            "country": {
+              "isocode": "GB",
+              "name": "United Kingdom"
+            },
+            "defaultAddress": false,
+            "formattedAddress": "Herries Road, Sheffield, S5 7AU, United Kingdom",
+            "id": "8796094300183",
+            "line1": "Herries Road",
+            "phone": "+44 20 9323 2242",
+            "postalCode": "S5 7AU",
+            "shippingAddress": false,
+            "town": "Sheffield",
+            "visibleInAddressBook": true
+          },
+          "displayName": "Sheffield Hospital",
+          "features": {
+            "entry": [
+              {
+                "key": "wheelchair",
+                "value": "Wheelchair Access"
+              },
+              {
+                "key": "buyOnlinePickupInStore",
+                "value": "Buy Online Pick Up In Store"
+              }
+            ]
+          },
+          "formattedDistance": "84.1 Miles",
+          "geoPoint": {
+            "latitude": 53.411526,
+            "longitude": -1.477275
+          },
+          "name": "Sheffield Hospital",
+          "openingHours": {
+            "code": "apparel-uk-weekend-hours",
+            "specialDayOpeningList": [],
+            "weekDayOpeningList": [
+              {
+                "closingTime": {
+                  "formattedHour": "20:00",
+                  "hour": 8,
+                  "minute": 0
+                },
+                "openingTime": {
+                  "formattedHour": "09:00",
+                  "hour": 9,
+                  "minute": 0
+                },
+                "closed": false,
+                "weekDay": "Mon"
+              },
+              {
+                "closingTime": {
+                  "formattedHour": "20:00",
+                  "hour": 8,
+                  "minute": 0
+                },
+                "openingTime": {
+                  "formattedHour": "09:00",
+                  "hour": 9,
+                  "minute": 0
+                },
+                "closed": false,
+                "weekDay": "Tue"
+              },
+              {
+                "closingTime": {
+                  "formattedHour": "20:00",
+                  "hour": 8,
+                  "minute": 0
+                },
+                "openingTime": {
+                  "formattedHour": "09:00",
+                  "hour": 9,
+                  "minute": 0
+                },
+                "closed": false,
+                "weekDay": "Wed"
+              },
+              {
+                "closingTime": {
+                  "formattedHour": "20:00",
+                  "hour": 8,
+                  "minute": 0
+                },
+                "openingTime": {
+                  "formattedHour": "09:00",
+                  "hour": 9,
+                  "minute": 0
+                },
+                "closed": false,
+                "weekDay": "Thu"
+              },
+              {
+                "closingTime": {
+                  "formattedHour": "20:00",
+                  "hour": 8,
+                  "minute": 0
+                },
+                "openingTime": {
+                  "formattedHour": "09:00",
+                  "hour": 9,
+                  "minute": 0
+                },
+                "closed": false,
+                "weekDay": "Fri"
+              },
+              {
+                "closingTime": {
+                  "formattedHour": "20:00",
+                  "hour": 8,
+                  "minute": 0
+                },
+                "openingTime": {
+                  "formattedHour": "10:00",
+                  "hour": 10,
+                  "minute": 0
+                },
+                "closed": false,
+                "weekDay": "Sat"
+              },
+              {
+                "closingTime": {
+                  "formattedHour": "16:00",
+                  "hour": 4,
+                  "minute": 0
+                },
+                "openingTime": {
+                  "formattedHour": "10:00",
+                  "hour": 10,
+                  "minute": 0
+                },
+                "closed": false,
+                "weekDay": "Sun"
+              }
+            ]
+          },
+          "storeImages": [
+            {
+              "format": "store",
+              "url": "/rest/v2/medias/?context=bWFzdGVyfGltYWdlc3w3NjkxMXxpbWFnZS9qcGVnfGltYWdlcy9oMGEvaGJiLzg3OTY3ODg5MTYyNTQuanBnfDVlMzY3Y2FmMGI3OGZhNjQ5ZGQ3NzE0NzE3NzgxMWE4MWQ0YTljNThlNjJhMWRkN2JmZjQ1NjA1ZjM4MGFmYmM"
+            },
+            {
+              "format": "cartIcon",
+              "url": "/rest/v2/medias/?context=bWFzdGVyfGltYWdlc3wxNDE3NXxpbWFnZS9qcGVnfGltYWdlcy9oNDYvaDE1Lzg3OTY3ODkwNDczMjYuanBnfDgzNTAyYzdjNjNmMjFhM2NhNTRmMTUyZTQxODcwNGQ2N2ZmZDZiMDhhNzVlMmZkYjQ3MWY3N2I3ZTRlMTRmZmU"
+            }
+          ],
+          "url": "/store/Sheffield Hospital?lat=52.514151&long=-0.116745"
+        }
+      ]
+    },
+    "rawHeaders": [
+      "Cache-Control",
+      "public, max-age=1800",
+      "Content-Type",
+      "application/json",
+      "Date",
+      "Sat, 25 Aug 2018 00:58:08 GMT",
+      "ETag",
+      "\"0eda23548fde5f93f6f2a145bfeb9fd22\"",
+      "Server",
+      "Apache-Coyote/1.1",
+      "Strict-Transport-Security",
+      "max-age=16070400 ; includeSubDomains",
+      "X-Content-Type-Options",
+      "nosniff",
+      "X-Frame-Options",
+      "SAMEORIGIN",
+      "X-Total-Count",
+      "17",
+      "X-XSS-Protection",
+      "1; mode=block",
+      "Content-Length",
+      "69422",
+      "Connection",
+      "Close"
+    ]
+  }
+]

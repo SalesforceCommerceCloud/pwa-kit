@@ -1,0 +1,789 @@
+[
+  {
+    "scope": "https://hybris.merlinspotions.com:443",
+    "method": "GET",
+    "path": "/rest/v2/apparel-uk/products/300659388?fields=FULL",
+    "body": "",
+    "status": 200,
+    "response": {
+      "availableForPickup": true,
+      "baseOptions": [
+        {
+          "options": [
+            {
+              "code": "300659388",
+              "priceData": {
+                "currencyIso": "GBP",
+                "formattedValue": "£283.46",
+                "priceType": "BUY",
+                "value": 283.46
+              },
+              "stock": {
+                "stockLevel": 21,
+                "stockLevelStatus": "inStock"
+              },
+              "url": "/Categories/Accessories/Videocamera/HD-Hero2-Outdoor-Edition/p/300659388",
+              "variantOptionQualifiers": [
+                {
+                  "name": "Style",
+                  "qualifier": "style",
+                  "value": "uni"
+                },
+                {
+                  "name": "Size",
+                  "qualifier": "size",
+                  "value": "Uni"
+                }
+              ]
+            }
+          ],
+          "selected": {
+            "code": "300659388",
+            "priceData": {
+              "currencyIso": "GBP",
+              "formattedValue": "£283.46",
+              "priceType": "BUY",
+              "value": 283.46
+            },
+            "stock": {
+              "stockLevel": 21,
+              "stockLevelStatus": "inStock"
+            },
+            "url": "/Categories/Accessories/Videocamera/HD-Hero2-Outdoor-Edition/p/300659388",
+            "variantOptionQualifiers": [
+              {
+                "name": "Style",
+                "qualifier": "style",
+                "value": "uni"
+              },
+              {
+                "name": "Size",
+                "qualifier": "size",
+                "value": "Uni"
+              }
+            ]
+          },
+          "variantType": "ApparelSizeVariantProduct"
+        },
+        {
+          "options": [
+            {
+              "code": "130663_uni",
+              "priceData": {
+                "currencyIso": "GBP",
+                "formattedValue": "£283.46",
+                "priceType": "FROM",
+                "value": 283.46
+              },
+              "stock": {
+                "stockLevel": 0,
+                "stockLevelStatus": "outOfStock"
+              },
+              "url": "/Categories/Accessories/Videocamera/HD-Hero2-Outdoor-Edition/p/130663_uni",
+              "variantOptionQualifiers": [
+                {
+                  "image": {
+                    "format": "30Wx30H",
+                    "url": "/rest/v2/medias/?context=bWFzdGVyfGltYWdlc3wxNDE4fGltYWdlL2pwZWd8aW1hZ2VzL2gwNy9oOWQvODc5NjI2ODkyMDg2Mi5qcGd8NjJmYjAzMjdiYmM3ZTc1YTE0Yzg3NWE3YTRiMmRlNTlmMmJkMDdkMDdhZTc2OWI5OTdiNzRjMzM4NWYyYWY1YQ"
+                  },
+                  "name": "Style",
+                  "qualifier": "style",
+                  "value": "uni"
+                }
+              ]
+            }
+          ],
+          "selected": {
+            "code": "130663_uni",
+            "priceData": {
+              "currencyIso": "GBP",
+              "formattedValue": "£283.46",
+              "priceType": "FROM",
+              "value": 283.46
+            },
+            "stock": {
+              "stockLevel": 0,
+              "stockLevelStatus": "outOfStock"
+            },
+            "url": "/Categories/Accessories/Videocamera/HD-Hero2-Outdoor-Edition/p/130663_uni",
+            "variantOptionQualifiers": [
+              {
+                "image": {
+                  "format": "30Wx30H",
+                  "url": "/rest/v2/medias/?context=bWFzdGVyfGltYWdlc3wxNDE4fGltYWdlL2pwZWd8aW1hZ2VzL2gwNy9oOWQvODc5NjI2ODkyMDg2Mi5qcGd8NjJmYjAzMjdiYmM3ZTc1YTE0Yzg3NWE3YTRiMmRlNTlmMmJkMDdkMDdhZTc2OWI5OTdiNzRjMzM4NWYyYWY1YQ"
+                },
+                "name": "Style",
+                "qualifier": "style",
+                "value": "uni"
+              }
+            ]
+          },
+          "variantType": "ApparelStyleVariantProduct"
+        }
+      ],
+      "baseProduct": "130663_uni",
+      "categories": [
+        {
+          "code": "222000",
+          "url": "/Categories/Accessories/Videocamera/c/222000"
+        },
+        {
+          "code": "GoPro Cam",
+          "image": {
+            "format": "96Wx96H",
+            "url": "/rest/v2/medias/?context=bWFzdGVyfGltYWdlc3w1ODI1fGltYWdlL2pwZWd8aW1hZ2VzL2gwNi9oYjkvODc5NjE3MjY0ODQ3OC5qcGd8ZDE3YTEwNjBhMGZhNzRmZjUwMTUzNTBiN2I4MmM5MDczMGIwNjNlZWE4Y2EwYmUyY2EyMWRiZWM0NmY5ODY3OA"
+          },
+          "url": "/Brands/GoPro-Cam/c/GoPro%20Cam"
+        }
+      ],
+      "code": "300659388",
+      "description": "The HD HERO2: Outdoor Edition is the most advanced GoPro camera yet. Wearable and gear mountable, waterproof to 197? (60m), capable of capturing professional full 170º wide angle 1080p video and 11 megapixel photos at a rate of 10 photos per second, the HD HERO2 is the world’s most versatile camera. Whether your goal is to capture a great day out with friends or you’re gunning for the cover of a magazine, the HD HERO2: Outdoor Edition can help you nail it and look like a HERO.<br /><br />Included are mounting accessories you’re most likely to use during outdoor sports like biking, skiing, skating, kayaking and so on.<br /><br />The HD HERO2: Outdoor Edition is compatible with all GoPro expansion accessories and BacPacs™, including the Wi-Fi BacPac and Wi-Fi Remote (coming soon).<br /><br />Features:<br /><br />+ 11MP HD HERO2 Camera<br />+ Waterproof Housing (197? / 60m)<br />+ HD Skeleton Backdoor<br />+ Rechargeable Li-ion Battery<br />+ USB Cable<br />+ Vented Helmet Strap<br />+ Head Strap<br />+ 2 Curved Surface Adhesive Mounts<br />+ 2 Flat Surface Adhesive Mounts<br />+ 1 Three-Way Pivot Arm<br />+ Assorted Mounting Hardware<br />+ Note: SD card not included<br /><br />Camera Optics:<br /><br />+ 2X Sharper Professional Glass Lens<br />+ f/2.8 Fixed Focus<br />+ 170º Wide FOV (Including 1080p)<br />+ 127º Medium FOV (In 1080p)<br />+ 90º Narrow FOV<br /><br />Video:<br /><br />+ HD RESOLUTIONS:<br />+ 1080p: 1920×1080, 30FPS<br />+ 960p: 1280×960, 48FPS + 30FPS<br />+ 720p: 1280×720, 60FPS + 30FPS<br />+ STANDARD DEFINITION RESOLUTIONS<br />+ WVGA: 848×480, 120FPS + 60FPS<br />+ High Performance,1 /2.3” CMOS Image Sensor<br />+ Light Sensitivity: .84 V/lux-sec<br />+ Video Format: H.264 codec, .mp4 File Format<br />+ Exposure Control: Spot, Center Weighted<br />+ White Balance: Auto<br /><br />Photo:<br /><br />+ RESOLUTIONS: 11MP, 8MP, 5 MP<br />+ FOV: Wide 170º FOV, Medium 127º FOV<br />+ CAPTURE MODES: Single, 10 Photo Burst, Time-Lapse*, Self-Timer<br />+ * Now supports time-lapse photo every 0.5 seconds. Requires Class 10 speed SD Card.<br /><br />Audio:<br /><br />+ Mono, 48 kHz, AAC Compression, Auto Gain Control<br />+ Stereo External Microphone Input (3.5mm)<br /><br />Storage:<br /><br />+ MEMORY:<br />+ SDHC: Up to 32GB (Class 4 or Higher)<br />+ AVERAGE RECORDING TIME WITH 32GB SD CARD:<br />+ 1080p30: 4 hours<br />+ 960p30: 6 hours<br />+ 720p60: 4 hours<br />+ 720p30: 6 hours<br />+ WVGA 120: 4.5 hours<br /><br />Included Cables:<br /><br />+ USB Cable For Charging and Data Transfer<br /><br />Battery & Charging:<br /><br />+ 1100mah Rechargeable Lithium-Ion<br />+ Charge via USB<br /><br />Operating System:<br /><br />+ Microsoft Windows® Vista, 7 and Later<br />+ Mac OS® x 10.5 and Later<br /><br />Compatible with all GoPro BacPacs:<br /><br />+ Wi-Fi BacPac™ and Wi-Fi Remote™ (Coming Soon)<br />+ LCD BacPac™<br />+ Battery BacPac™<br />+ 3D HERO® System*<br /><br />*Compatible with future firmware release </p>",
+      "images": [
+        {
+          "altText": "HD Hero2 Outdoor Edition uni Uni",
+          "format": "zoom",
+          "imageType": "PRIMARY",
+          "url": "/rest/v2/medias/?context=bWFzdGVyfGltYWdlc3w2OTY3MHxpbWFnZS9qcGVnfGltYWdlcy9oZTEvaDJlLzg3OTYyNjg2OTE0ODYuanBnfDkyZTlkMmU3NDM5YzQ4ZjQ5ZDgxZGI4MzlkM2RiY2VlN2I5ZWU2NzlmMTFiZGE0ODY1NmY4M2E5NzUxODkwYjg"
+        },
+        {
+          "altText": "HD Hero2 Outdoor Edition uni Uni",
+          "format": "product",
+          "imageType": "PRIMARY",
+          "url": "/rest/v2/medias/?context=bWFzdGVyfGltYWdlc3wyNzAzOHxpbWFnZS9qcGVnfGltYWdlcy9oMjQvaGFkLzg3OTYyNjg3ODk3OTAuanBnfDA0MjUyYjRmMDYyNWJkOGFmMWQ2MzBiYWRjYmM3MTQ0OTMwNGFjMDdiMmUzY2RmYTgwY2Y1OWRkYTQxNTcyMTY"
+        },
+        {
+          "altText": "HD Hero2 Outdoor Edition uni Uni",
+          "format": "thumbnail",
+          "imageType": "PRIMARY",
+          "url": "/rest/v2/medias/?context=bWFzdGVyfGltYWdlc3w1NDA2fGltYWdlL2pwZWd8aW1hZ2VzL2hjMi9oOTcvODc5NjI2ODc1NzAyMi5qcGd8NGJkZjY2NmY1ODE2OGI3YTkzMzVmMzViYWE3ZTY5MTc4MDkxMzZiOTY3NWZhOWQ3M2FkNjZjMmQ1OTJjYmJlYw"
+        },
+        {
+          "altText": "HD Hero2 Outdoor Edition uni Uni",
+          "format": "cartIcon",
+          "imageType": "PRIMARY",
+          "url": "/rest/v2/medias/?context=bWFzdGVyfGltYWdlc3wzMTgzfGltYWdlL2pwZWd8aW1hZ2VzL2hiMi9oNjgvODc5NjI2ODk4NjM5OC5qcGd8NTRjZWQwMGZmMTFlNzdmZjEwMTkxMWIxMWJhNTllMjNjYTI1YmM0Y2MxZGFmNzYxNzQ3ODM3NGI4MGNkN2VhYg"
+        },
+        {
+          "altText": "HD Hero2 Outdoor Edition uni Uni",
+          "format": "zoom",
+          "galleryIndex": 0,
+          "imageType": "GALLERY",
+          "url": "/rest/v2/medias/?context=bWFzdGVyfGltYWdlc3w2OTY3MHxpbWFnZS9qcGVnfGltYWdlcy9oZTEvaDJlLzg3OTYyNjg2OTE0ODYuanBnfDkyZTlkMmU3NDM5YzQ4ZjQ5ZDgxZGI4MzlkM2RiY2VlN2I5ZWU2NzlmMTFiZGE0ODY1NmY4M2E5NzUxODkwYjg"
+        },
+        {
+          "altText": "HD Hero2 Outdoor Edition uni Uni",
+          "format": "product",
+          "galleryIndex": 0,
+          "imageType": "GALLERY",
+          "url": "/rest/v2/medias/?context=bWFzdGVyfGltYWdlc3wyNzAzOHxpbWFnZS9qcGVnfGltYWdlcy9oMjQvaGFkLzg3OTYyNjg3ODk3OTAuanBnfDA0MjUyYjRmMDYyNWJkOGFmMWQ2MzBiYWRjYmM3MTQ0OTMwNGFjMDdiMmUzY2RmYTgwY2Y1OWRkYTQxNTcyMTY"
+        },
+        {
+          "altText": "HD Hero2 Outdoor Edition uni Uni",
+          "format": "thumbnail",
+          "galleryIndex": 0,
+          "imageType": "GALLERY",
+          "url": "/rest/v2/medias/?context=bWFzdGVyfGltYWdlc3w1NDA2fGltYWdlL2pwZWd8aW1hZ2VzL2hjMi9oOTcvODc5NjI2ODc1NzAyMi5qcGd8NGJkZjY2NmY1ODE2OGI3YTkzMzVmMzViYWE3ZTY5MTc4MDkxMzZiOTY3NWZhOWQ3M2FkNjZjMmQ1OTJjYmJlYw"
+        },
+        {
+          "altText": "HD Hero2 Outdoor Edition uni Uni",
+          "format": "zoom",
+          "galleryIndex": 1,
+          "imageType": "GALLERY",
+          "url": "/rest/v2/medias/?context=bWFzdGVyfGltYWdlc3w1MTY4MHxpbWFnZS9qcGVnfGltYWdlcy9oMjUvaDU4Lzg3OTYyNjg5NTM2MzAuanBnfGVmNDRjYTgwZTViNmI5MWM2ZDg3MWRmMWY2ZjNmNTBlZmFhN2VlMzhhZDAwY2ExMzY1ZDdmYWM4MmU2NWE4Mzc"
+        },
+        {
+          "altText": "HD Hero2 Outdoor Edition uni Uni",
+          "format": "product",
+          "galleryIndex": 1,
+          "imageType": "GALLERY",
+          "url": "/rest/v2/medias/?context=bWFzdGVyfGltYWdlc3wyMTMxM3xpbWFnZS9qcGVnfGltYWdlcy9oMzQvaGJkLzg3OTYyNjkwNTE5MzQuanBnfDI3ZDg4NGYyODI5OTRjY2YyM2I5ZTQ0NGEwNjdmZDdlNDI0MWI5MzQ2OGU0YjQwNjRjNDYwNDUyOTFhZTMyZDM"
+        },
+        {
+          "altText": "HD Hero2 Outdoor Edition uni Uni",
+          "format": "thumbnail",
+          "galleryIndex": 1,
+          "imageType": "GALLERY",
+          "url": "/rest/v2/medias/?context=bWFzdGVyfGltYWdlc3w0NzAwfGltYWdlL2pwZWd8aW1hZ2VzL2hmZi9oOWIvODc5NjI2OTExNzQ3MC5qcGd8ZmNmMjA2ZTRmOWVlNGRkMjg2MjRhZWQzZWYzZTQ0MWY0Yzg0YjEzZGNhMDg3NTE3MzZiYTI4YTQyZGMwZTZhNQ"
+        },
+        {
+          "altText": "HD Hero2 Outdoor Edition uni Uni",
+          "format": "zoom",
+          "galleryIndex": 2,
+          "imageType": "GALLERY",
+          "url": "/rest/v2/medias/?context=bWFzdGVyfGltYWdlc3w0NTQxNXxpbWFnZS9qcGVnfGltYWdlcy9oNjMvaDgzLzg3OTYyNjkzNDY4NDYuanBnfGE3YzM1NjkwZjJjNDIwODI0ZGE5MzZkODRiNTQ4Y2IwOGQ5YWU1NjE2ZDA2NzZlOTM1MDRlZTVkNjE1MmIzNjc"
+        },
+        {
+          "altText": "HD Hero2 Outdoor Edition uni Uni",
+          "format": "product",
+          "galleryIndex": 2,
+          "imageType": "GALLERY",
+          "url": "/rest/v2/medias/?context=bWFzdGVyfGltYWdlc3wxNzM1MXxpbWFnZS9qcGVnfGltYWdlcy9oNzAvaDg3Lzg3OTYyNjkzNzk2MTQuanBnfDE1YzgyYWUwODg3YzI1ODM1ZGU5MGE5NjE3NTBhMDJiNGFhMjE1ZDc4MjI5NDliYjhmYjA0NDgwMGNkYjRkZGM"
+        },
+        {
+          "altText": "HD Hero2 Outdoor Edition uni Uni",
+          "format": "thumbnail",
+          "galleryIndex": 2,
+          "imageType": "GALLERY",
+          "url": "/rest/v2/medias/?context=bWFzdGVyfGltYWdlc3w0MDU2fGltYWdlL2pwZWd8aW1hZ2VzL2g2OS9oNGMvODc5NjI2OTQ0NTE1MC5qcGd8MTI2MTdkM2ZmMTBmM2JmNjFlOTg0NjNkZDRiZGYzMWY3ZTBjYjVmYjA2ZDFlNjZkNzRjMTgxZjdmNWQwNmM0MA"
+        },
+        {
+          "altText": "HD Hero2 Outdoor Edition uni Uni",
+          "format": "zoom",
+          "galleryIndex": 3,
+          "imageType": "GALLERY",
+          "url": "/rest/v2/medias/?context=bWFzdGVyfGltYWdlc3w0NTU4OXxpbWFnZS9qcGVnfGltYWdlcy9oZWEvaGFkLzg3OTYyNjk2MDg5OTAuanBnfGExN2NkMjQ1OTEwNWViYzkxYzVlNzQxYzM2YzM0MTNjOGU1M2Y1ODI4MmM2MTA1ZmRmM2MwN2ZlZDcyNGQ3Y2Q"
+        },
+        {
+          "altText": "HD Hero2 Outdoor Edition uni Uni",
+          "format": "product",
+          "galleryIndex": 3,
+          "imageType": "GALLERY",
+          "url": "/rest/v2/medias/?context=bWFzdGVyfGltYWdlc3wxNzA0MHxpbWFnZS9qcGVnfGltYWdlcy9oNzgvaDY5Lzg3OTYyNjk4MDU1OTguanBnfDczYTk2NGQ3MjYwOTRiZTcyYTg2MmQ5NmQ0MzJiZjg1MWYwMTI1Yzk5NDBhNzVmZmY5YTBjYzE3YjFhOGI4ZjU"
+        },
+        {
+          "altText": "HD Hero2 Outdoor Edition uni Uni",
+          "format": "thumbnail",
+          "galleryIndex": 3,
+          "imageType": "GALLERY",
+          "url": "/rest/v2/medias/?context=bWFzdGVyfGltYWdlc3wzNTYzfGltYWdlL2pwZWd8aW1hZ2VzL2g5OS9oYWEvODc5NjI2OTc3MjgzMC5qcGd8Yzk4NjJmMmYzNjZlN2RkMmQwMmY1MDEyODIwZGExZmNjZGNhOWMwNjE2NGJkZDI3NTQyNDMyMGFhZWNmZjdjOQ"
+        }
+      ],
+      "name": "HD Hero2 Outdoor Edition uni Uni",
+      "numberOfReviews": 0,
+      "potentialPromotions": [],
+      "price": {
+        "currencyIso": "GBP",
+        "formattedValue": "£283.46",
+        "priceType": "BUY",
+        "value": 283.46
+      },
+      "priceRange": {
+        "maxPrice": {
+          "currencyIso": "GBP",
+          "value": 283.46
+        },
+        "minPrice": {
+          "currencyIso": "GBP",
+          "value": 283.46
+        }
+      },
+      "productReferences": [],
+      "purchasable": true,
+      "reviews": [],
+      "stock": {
+        "stockLevel": 21,
+        "stockLevelStatus": "inStock"
+      },
+      "summary": "<p> GoPro cameras are used by more professional athletes, sports filmmakers and core enthusiasts than any other camera in the world.",
+      "url": "/apparel-uk/products/300659388"
+    },
+    "rawHeaders": [
+      "Cache-Control",
+      "private, max-age=120",
+      "Content-Type",
+      "application/json",
+      "Date",
+      "Sat, 25 Aug 2018 00:58:05 GMT",
+      "ETag",
+      "\"0ea7eb780a2f613a05c991509d587a3ff\"",
+      "Server",
+      "Apache-Coyote/1.1",
+      "Strict-Transport-Security",
+      "max-age=16070400 ; includeSubDomains",
+      "X-Content-Type-Options",
+      "nosniff",
+      "X-Frame-Options",
+      "SAMEORIGIN",
+      "X-XSS-Protection",
+      "1; mode=block",
+      "Content-Length",
+      "13368",
+      "Connection",
+      "Close"
+    ]
+  },
+  {
+    "scope": "https://hybris.merlinspotions.com:443",
+    "method": "GET",
+    "path": "/rest/v2/apparel-uk/products/130663_uni?fields=FULL",
+    "body": "",
+    "status": 200,
+    "response": {
+      "availableForPickup": false,
+      "baseOptions": [
+        {
+          "options": [
+            {
+              "code": "130663_uni",
+              "priceData": {
+                "currencyIso": "GBP",
+                "formattedValue": "£283.46",
+                "priceType": "FROM",
+                "value": 283.46
+              },
+              "stock": {
+                "stockLevel": 0,
+                "stockLevelStatus": "outOfStock"
+              },
+              "url": "/Categories/Accessories/Videocamera/HD-Hero2-Outdoor-Edition/p/130663_uni",
+              "variantOptionQualifiers": [
+                {
+                  "image": {
+                    "format": "30Wx30H",
+                    "url": "/rest/v2/medias/?context=bWFzdGVyfGltYWdlc3wxNDE4fGltYWdlL2pwZWd8aW1hZ2VzL2gwNy9oOWQvODc5NjI2ODkyMDg2Mi5qcGd8NjJmYjAzMjdiYmM3ZTc1YTE0Yzg3NWE3YTRiMmRlNTlmMmJkMDdkMDdhZTc2OWI5OTdiNzRjMzM4NWYyYWY1YQ"
+                  },
+                  "name": "Style",
+                  "qualifier": "style",
+                  "value": "uni"
+                }
+              ]
+            }
+          ],
+          "selected": {
+            "code": "130663_uni",
+            "priceData": {
+              "currencyIso": "GBP",
+              "formattedValue": "£283.46",
+              "priceType": "FROM",
+              "value": 283.46
+            },
+            "stock": {
+              "stockLevel": 0,
+              "stockLevelStatus": "outOfStock"
+            },
+            "url": "/Categories/Accessories/Videocamera/HD-Hero2-Outdoor-Edition/p/130663_uni",
+            "variantOptionQualifiers": [
+              {
+                "image": {
+                  "format": "30Wx30H",
+                  "url": "/rest/v2/medias/?context=bWFzdGVyfGltYWdlc3wxNDE4fGltYWdlL2pwZWd8aW1hZ2VzL2gwNy9oOWQvODc5NjI2ODkyMDg2Mi5qcGd8NjJmYjAzMjdiYmM3ZTc1YTE0Yzg3NWE3YTRiMmRlNTlmMmJkMDdkMDdhZTc2OWI5OTdiNzRjMzM4NWYyYWY1YQ"
+                },
+                "name": "Style",
+                "qualifier": "style",
+                "value": "uni"
+              }
+            ]
+          },
+          "variantType": "ApparelStyleVariantProduct"
+        }
+      ],
+      "baseProduct": "130663",
+      "categories": [
+        {
+          "code": "222000",
+          "url": "/Categories/Accessories/Videocamera/c/222000"
+        },
+        {
+          "code": "GoPro Cam",
+          "image": {
+            "format": "96Wx96H",
+            "url": "/rest/v2/medias/?context=bWFzdGVyfGltYWdlc3w1ODI1fGltYWdlL2pwZWd8aW1hZ2VzL2gwNi9oYjkvODc5NjE3MjY0ODQ3OC5qcGd8ZDE3YTEwNjBhMGZhNzRmZjUwMTUzNTBiN2I4MmM5MDczMGIwNjNlZWE4Y2EwYmUyY2EyMWRiZWM0NmY5ODY3OA"
+          },
+          "url": "/Brands/GoPro-Cam/c/GoPro%20Cam"
+        }
+      ],
+      "code": "130663_uni",
+      "description": "The HD HERO2: Outdoor Edition is the most advanced GoPro camera yet. Wearable and gear mountable, waterproof to 197? (60m), capable of capturing professional full 170º wide angle 1080p video and 11 megapixel photos at a rate of 10 photos per second, the HD HERO2 is the world’s most versatile camera. Whether your goal is to capture a great day out with friends or you’re gunning for the cover of a magazine, the HD HERO2: Outdoor Edition can help you nail it and look like a HERO.<br /><br />Included are mounting accessories you’re most likely to use during outdoor sports like biking, skiing, skating, kayaking and so on.<br /><br />The HD HERO2: Outdoor Edition is compatible with all GoPro expansion accessories and BacPacs™, including the Wi-Fi BacPac and Wi-Fi Remote (coming soon).<br /><br />Features:<br /><br />+ 11MP HD HERO2 Camera<br />+ Waterproof Housing (197? / 60m)<br />+ HD Skeleton Backdoor<br />+ Rechargeable Li-ion Battery<br />+ USB Cable<br />+ Vented Helmet Strap<br />+ Head Strap<br />+ 2 Curved Surface Adhesive Mounts<br />+ 2 Flat Surface Adhesive Mounts<br />+ 1 Three-Way Pivot Arm<br />+ Assorted Mounting Hardware<br />+ Note: SD card not included<br /><br />Camera Optics:<br /><br />+ 2X Sharper Professional Glass Lens<br />+ f/2.8 Fixed Focus<br />+ 170º Wide FOV (Including 1080p)<br />+ 127º Medium FOV (In 1080p)<br />+ 90º Narrow FOV<br /><br />Video:<br /><br />+ HD RESOLUTIONS:<br />+ 1080p: 1920×1080, 30FPS<br />+ 960p: 1280×960, 48FPS + 30FPS<br />+ 720p: 1280×720, 60FPS + 30FPS<br />+ STANDARD DEFINITION RESOLUTIONS<br />+ WVGA: 848×480, 120FPS + 60FPS<br />+ High Performance,1 /2.3” CMOS Image Sensor<br />+ Light Sensitivity: .84 V/lux-sec<br />+ Video Format: H.264 codec, .mp4 File Format<br />+ Exposure Control: Spot, Center Weighted<br />+ White Balance: Auto<br /><br />Photo:<br /><br />+ RESOLUTIONS: 11MP, 8MP, 5 MP<br />+ FOV: Wide 170º FOV, Medium 127º FOV<br />+ CAPTURE MODES: Single, 10 Photo Burst, Time-Lapse*, Self-Timer<br />+ * Now supports time-lapse photo every 0.5 seconds. Requires Class 10 speed SD Card.<br /><br />Audio:<br /><br />+ Mono, 48 kHz, AAC Compression, Auto Gain Control<br />+ Stereo External Microphone Input (3.5mm)<br /><br />Storage:<br /><br />+ MEMORY:<br />+ SDHC: Up to 32GB (Class 4 or Higher)<br />+ AVERAGE RECORDING TIME WITH 32GB SD CARD:<br />+ 1080p30: 4 hours<br />+ 960p30: 6 hours<br />+ 720p60: 4 hours<br />+ 720p30: 6 hours<br />+ WVGA 120: 4.5 hours<br /><br />Included Cables:<br /><br />+ USB Cable For Charging and Data Transfer<br /><br />Battery & Charging:<br /><br />+ 1100mah Rechargeable Lithium-Ion<br />+ Charge via USB<br /><br />Operating System:<br /><br />+ Microsoft Windows® Vista, 7 and Later<br />+ Mac OS® x 10.5 and Later<br /><br />Compatible with all GoPro BacPacs:<br /><br />+ Wi-Fi BacPac™ and Wi-Fi Remote™ (Coming Soon)<br />+ LCD BacPac™<br />+ Battery BacPac™<br />+ 3D HERO® System*<br /><br />*Compatible with future firmware release </p>",
+      "images": [
+        {
+          "altText": "HD Hero2 Outdoor Edition uni",
+          "format": "zoom",
+          "imageType": "PRIMARY",
+          "url": "/rest/v2/medias/?context=bWFzdGVyfGltYWdlc3w2OTY3MHxpbWFnZS9qcGVnfGltYWdlcy9oZTEvaDJlLzg3OTYyNjg2OTE0ODYuanBnfDkyZTlkMmU3NDM5YzQ4ZjQ5ZDgxZGI4MzlkM2RiY2VlN2I5ZWU2NzlmMTFiZGE0ODY1NmY4M2E5NzUxODkwYjg"
+        },
+        {
+          "altText": "HD Hero2 Outdoor Edition uni",
+          "format": "product",
+          "imageType": "PRIMARY",
+          "url": "/rest/v2/medias/?context=bWFzdGVyfGltYWdlc3wyNzAzOHxpbWFnZS9qcGVnfGltYWdlcy9oMjQvaGFkLzg3OTYyNjg3ODk3OTAuanBnfDA0MjUyYjRmMDYyNWJkOGFmMWQ2MzBiYWRjYmM3MTQ0OTMwNGFjMDdiMmUzY2RmYTgwY2Y1OWRkYTQxNTcyMTY"
+        },
+        {
+          "altText": "HD Hero2 Outdoor Edition uni",
+          "format": "thumbnail",
+          "imageType": "PRIMARY",
+          "url": "/rest/v2/medias/?context=bWFzdGVyfGltYWdlc3w1NDA2fGltYWdlL2pwZWd8aW1hZ2VzL2hjMi9oOTcvODc5NjI2ODc1NzAyMi5qcGd8NGJkZjY2NmY1ODE2OGI3YTkzMzVmMzViYWE3ZTY5MTc4MDkxMzZiOTY3NWZhOWQ3M2FkNjZjMmQ1OTJjYmJlYw"
+        },
+        {
+          "altText": "HD Hero2 Outdoor Edition uni",
+          "format": "cartIcon",
+          "imageType": "PRIMARY",
+          "url": "/rest/v2/medias/?context=bWFzdGVyfGltYWdlc3wzMTgzfGltYWdlL2pwZWd8aW1hZ2VzL2hiMi9oNjgvODc5NjI2ODk4NjM5OC5qcGd8NTRjZWQwMGZmMTFlNzdmZjEwMTkxMWIxMWJhNTllMjNjYTI1YmM0Y2MxZGFmNzYxNzQ3ODM3NGI4MGNkN2VhYg"
+        },
+        {
+          "altText": "HD Hero2 Outdoor Edition uni",
+          "format": "zoom",
+          "galleryIndex": 0,
+          "imageType": "GALLERY",
+          "url": "/rest/v2/medias/?context=bWFzdGVyfGltYWdlc3w2OTY3MHxpbWFnZS9qcGVnfGltYWdlcy9oZTEvaDJlLzg3OTYyNjg2OTE0ODYuanBnfDkyZTlkMmU3NDM5YzQ4ZjQ5ZDgxZGI4MzlkM2RiY2VlN2I5ZWU2NzlmMTFiZGE0ODY1NmY4M2E5NzUxODkwYjg"
+        },
+        {
+          "altText": "HD Hero2 Outdoor Edition uni",
+          "format": "product",
+          "galleryIndex": 0,
+          "imageType": "GALLERY",
+          "url": "/rest/v2/medias/?context=bWFzdGVyfGltYWdlc3wyNzAzOHxpbWFnZS9qcGVnfGltYWdlcy9oMjQvaGFkLzg3OTYyNjg3ODk3OTAuanBnfDA0MjUyYjRmMDYyNWJkOGFmMWQ2MzBiYWRjYmM3MTQ0OTMwNGFjMDdiMmUzY2RmYTgwY2Y1OWRkYTQxNTcyMTY"
+        },
+        {
+          "altText": "HD Hero2 Outdoor Edition uni",
+          "format": "thumbnail",
+          "galleryIndex": 0,
+          "imageType": "GALLERY",
+          "url": "/rest/v2/medias/?context=bWFzdGVyfGltYWdlc3w1NDA2fGltYWdlL2pwZWd8aW1hZ2VzL2hjMi9oOTcvODc5NjI2ODc1NzAyMi5qcGd8NGJkZjY2NmY1ODE2OGI3YTkzMzVmMzViYWE3ZTY5MTc4MDkxMzZiOTY3NWZhOWQ3M2FkNjZjMmQ1OTJjYmJlYw"
+        },
+        {
+          "altText": "HD Hero2 Outdoor Edition uni",
+          "format": "zoom",
+          "galleryIndex": 1,
+          "imageType": "GALLERY",
+          "url": "/rest/v2/medias/?context=bWFzdGVyfGltYWdlc3w1MTY4MHxpbWFnZS9qcGVnfGltYWdlcy9oMjUvaDU4Lzg3OTYyNjg5NTM2MzAuanBnfGVmNDRjYTgwZTViNmI5MWM2ZDg3MWRmMWY2ZjNmNTBlZmFhN2VlMzhhZDAwY2ExMzY1ZDdmYWM4MmU2NWE4Mzc"
+        },
+        {
+          "altText": "HD Hero2 Outdoor Edition uni",
+          "format": "product",
+          "galleryIndex": 1,
+          "imageType": "GALLERY",
+          "url": "/rest/v2/medias/?context=bWFzdGVyfGltYWdlc3wyMTMxM3xpbWFnZS9qcGVnfGltYWdlcy9oMzQvaGJkLzg3OTYyNjkwNTE5MzQuanBnfDI3ZDg4NGYyODI5OTRjY2YyM2I5ZTQ0NGEwNjdmZDdlNDI0MWI5MzQ2OGU0YjQwNjRjNDYwNDUyOTFhZTMyZDM"
+        },
+        {
+          "altText": "HD Hero2 Outdoor Edition uni",
+          "format": "thumbnail",
+          "galleryIndex": 1,
+          "imageType": "GALLERY",
+          "url": "/rest/v2/medias/?context=bWFzdGVyfGltYWdlc3w0NzAwfGltYWdlL2pwZWd8aW1hZ2VzL2hmZi9oOWIvODc5NjI2OTExNzQ3MC5qcGd8ZmNmMjA2ZTRmOWVlNGRkMjg2MjRhZWQzZWYzZTQ0MWY0Yzg0YjEzZGNhMDg3NTE3MzZiYTI4YTQyZGMwZTZhNQ"
+        },
+        {
+          "altText": "HD Hero2 Outdoor Edition uni",
+          "format": "zoom",
+          "galleryIndex": 2,
+          "imageType": "GALLERY",
+          "url": "/rest/v2/medias/?context=bWFzdGVyfGltYWdlc3w0NTQxNXxpbWFnZS9qcGVnfGltYWdlcy9oNjMvaDgzLzg3OTYyNjkzNDY4NDYuanBnfGE3YzM1NjkwZjJjNDIwODI0ZGE5MzZkODRiNTQ4Y2IwOGQ5YWU1NjE2ZDA2NzZlOTM1MDRlZTVkNjE1MmIzNjc"
+        },
+        {
+          "altText": "HD Hero2 Outdoor Edition uni",
+          "format": "product",
+          "galleryIndex": 2,
+          "imageType": "GALLERY",
+          "url": "/rest/v2/medias/?context=bWFzdGVyfGltYWdlc3wxNzM1MXxpbWFnZS9qcGVnfGltYWdlcy9oNzAvaDg3Lzg3OTYyNjkzNzk2MTQuanBnfDE1YzgyYWUwODg3YzI1ODM1ZGU5MGE5NjE3NTBhMDJiNGFhMjE1ZDc4MjI5NDliYjhmYjA0NDgwMGNkYjRkZGM"
+        },
+        {
+          "altText": "HD Hero2 Outdoor Edition uni",
+          "format": "thumbnail",
+          "galleryIndex": 2,
+          "imageType": "GALLERY",
+          "url": "/rest/v2/medias/?context=bWFzdGVyfGltYWdlc3w0MDU2fGltYWdlL2pwZWd8aW1hZ2VzL2g2OS9oNGMvODc5NjI2OTQ0NTE1MC5qcGd8MTI2MTdkM2ZmMTBmM2JmNjFlOTg0NjNkZDRiZGYzMWY3ZTBjYjVmYjA2ZDFlNjZkNzRjMTgxZjdmNWQwNmM0MA"
+        },
+        {
+          "altText": "HD Hero2 Outdoor Edition uni",
+          "format": "zoom",
+          "galleryIndex": 3,
+          "imageType": "GALLERY",
+          "url": "/rest/v2/medias/?context=bWFzdGVyfGltYWdlc3w0NTU4OXxpbWFnZS9qcGVnfGltYWdlcy9oZWEvaGFkLzg3OTYyNjk2MDg5OTAuanBnfGExN2NkMjQ1OTEwNWViYzkxYzVlNzQxYzM2YzM0MTNjOGU1M2Y1ODI4MmM2MTA1ZmRmM2MwN2ZlZDcyNGQ3Y2Q"
+        },
+        {
+          "altText": "HD Hero2 Outdoor Edition uni",
+          "format": "product",
+          "galleryIndex": 3,
+          "imageType": "GALLERY",
+          "url": "/rest/v2/medias/?context=bWFzdGVyfGltYWdlc3wxNzA0MHxpbWFnZS9qcGVnfGltYWdlcy9oNzgvaDY5Lzg3OTYyNjk4MDU1OTguanBnfDczYTk2NGQ3MjYwOTRiZTcyYTg2MmQ5NmQ0MzJiZjg1MWYwMTI1Yzk5NDBhNzVmZmY5YTBjYzE3YjFhOGI4ZjU"
+        },
+        {
+          "altText": "HD Hero2 Outdoor Edition uni",
+          "format": "thumbnail",
+          "galleryIndex": 3,
+          "imageType": "GALLERY",
+          "url": "/rest/v2/medias/?context=bWFzdGVyfGltYWdlc3wzNTYzfGltYWdlL2pwZWd8aW1hZ2VzL2g5OS9oYWEvODc5NjI2OTc3MjgzMC5qcGd8Yzk4NjJmMmYzNjZlN2RkMmQwMmY1MDEyODIwZGExZmNjZGNhOWMwNjE2NGJkZDI3NTQyNDMyMGFhZWNmZjdjOQ"
+        }
+      ],
+      "name": "HD Hero2 Outdoor Edition uni",
+      "numberOfReviews": 0,
+      "potentialPromotions": [],
+      "price": {
+        "currencyIso": "GBP",
+        "formattedValue": "£283.46",
+        "priceType": "FROM",
+        "value": 283.46
+      },
+      "priceRange": {},
+      "productReferences": [
+        {
+          "referenceType": "CROSSELLING",
+          "target": {
+            "code": "102277",
+            "name": "Trace Helm",
+            "url": "/Brands/Red/Trace-Helm/p/102277"
+          },
+          "preselected": false
+        }
+      ],
+      "purchasable": false,
+      "reviews": [],
+      "stock": {
+        "stockLevel": 0,
+        "stockLevelStatus": "outOfStock"
+      },
+      "summary": "<p> GoPro cameras are used by more professional athletes, sports filmmakers and core enthusiasts than any other camera in the world.",
+      "url": "/apparel-uk/products/130663_uni",
+      "variantOptions": [
+        {
+          "code": "300659388",
+          "priceData": {
+            "currencyIso": "GBP",
+            "formattedValue": "£283.46",
+            "priceType": "BUY",
+            "value": 283.46
+          },
+          "stock": {
+            "stockLevel": 21,
+            "stockLevelStatus": "inStock"
+          },
+          "url": "/Categories/Accessories/Videocamera/HD-Hero2-Outdoor-Edition/p/300659388",
+          "variantOptionQualifiers": [
+            {
+              "name": "Style",
+              "qualifier": "style",
+              "value": "uni"
+            },
+            {
+              "name": "Size",
+              "qualifier": "size",
+              "value": "Uni"
+            }
+          ]
+        }
+      ],
+      "variantType": "ApparelSizeVariantProduct"
+    },
+    "rawHeaders": [
+      "Cache-Control",
+      "private, max-age=120",
+      "Content-Type",
+      "application/json",
+      "Date",
+      "Sat, 25 Aug 2018 00:58:05 GMT",
+      "ETag",
+      "\"05b001ea0b83ef20389510bc1d8f0ee2a\"",
+      "Server",
+      "Apache-Coyote/1.1",
+      "Strict-Transport-Security",
+      "max-age=16070400 ; includeSubDomains",
+      "X-Content-Type-Options",
+      "nosniff",
+      "X-Frame-Options",
+      "SAMEORIGIN",
+      "X-XSS-Protection",
+      "1; mode=block",
+      "Content-Length",
+      "12579",
+      "Connection",
+      "Close"
+    ]
+  },
+  {
+    "scope": "https://hybris.merlinspotions.com:443",
+    "method": "GET",
+    "path": "/rest/v2/apparel-uk/products/130663?fields=FULL",
+    "body": "",
+    "status": 200,
+    "response": {
+      "availableForPickup": false,
+      "baseOptions": [],
+      "categories": [
+        {
+          "code": "222000",
+          "url": "/Categories/Accessories/Videocamera/c/222000"
+        },
+        {
+          "code": "GoPro Cam",
+          "image": {
+            "format": "96Wx96H",
+            "url": "/rest/v2/medias/?context=bWFzdGVyfGltYWdlc3w1ODI1fGltYWdlL2pwZWd8aW1hZ2VzL2gwNi9oYjkvODc5NjE3MjY0ODQ3OC5qcGd8ZDE3YTEwNjBhMGZhNzRmZjUwMTUzNTBiN2I4MmM5MDczMGIwNjNlZWE4Y2EwYmUyY2EyMWRiZWM0NmY5ODY3OA"
+          },
+          "url": "/Brands/GoPro-Cam/c/GoPro%20Cam"
+        }
+      ],
+      "code": "130663",
+      "description": "The HD HERO2: Outdoor Edition is the most advanced GoPro camera yet. Wearable and gear mountable, waterproof to 197? (60m), capable of capturing professional full 170º wide angle 1080p video and 11 megapixel photos at a rate of 10 photos per second, the HD HERO2 is the world’s most versatile camera. Whether your goal is to capture a great day out with friends or you’re gunning for the cover of a magazine, the HD HERO2: Outdoor Edition can help you nail it and look like a HERO.<br /><br />Included are mounting accessories you’re most likely to use during outdoor sports like biking, skiing, skating, kayaking and so on.<br /><br />The HD HERO2: Outdoor Edition is compatible with all GoPro expansion accessories and BacPacs™, including the Wi-Fi BacPac and Wi-Fi Remote (coming soon).<br /><br />Features:<br /><br />+ 11MP HD HERO2 Camera<br />+ Waterproof Housing (197? / 60m)<br />+ HD Skeleton Backdoor<br />+ Rechargeable Li-ion Battery<br />+ USB Cable<br />+ Vented Helmet Strap<br />+ Head Strap<br />+ 2 Curved Surface Adhesive Mounts<br />+ 2 Flat Surface Adhesive Mounts<br />+ 1 Three-Way Pivot Arm<br />+ Assorted Mounting Hardware<br />+ Note: SD card not included<br /><br />Camera Optics:<br /><br />+ 2X Sharper Professional Glass Lens<br />+ f/2.8 Fixed Focus<br />+ 170º Wide FOV (Including 1080p)<br />+ 127º Medium FOV (In 1080p)<br />+ 90º Narrow FOV<br /><br />Video:<br /><br />+ HD RESOLUTIONS:<br />+ 1080p: 1920×1080, 30FPS<br />+ 960p: 1280×960, 48FPS + 30FPS<br />+ 720p: 1280×720, 60FPS + 30FPS<br />+ STANDARD DEFINITION RESOLUTIONS<br />+ WVGA: 848×480, 120FPS + 60FPS<br />+ High Performance,1 /2.3” CMOS Image Sensor<br />+ Light Sensitivity: .84 V/lux-sec<br />+ Video Format: H.264 codec, .mp4 File Format<br />+ Exposure Control: Spot, Center Weighted<br />+ White Balance: Auto<br /><br />Photo:<br /><br />+ RESOLUTIONS: 11MP, 8MP, 5 MP<br />+ FOV: Wide 170º FOV, Medium 127º FOV<br />+ CAPTURE MODES: Single, 10 Photo Burst, Time-Lapse*, Self-Timer<br />+ * Now supports time-lapse photo every 0.5 seconds. Requires Class 10 speed SD Card.<br /><br />Audio:<br /><br />+ Mono, 48 kHz, AAC Compression, Auto Gain Control<br />+ Stereo External Microphone Input (3.5mm)<br /><br />Storage:<br /><br />+ MEMORY:<br />+ SDHC: Up to 32GB (Class 4 or Higher)<br />+ AVERAGE RECORDING TIME WITH 32GB SD CARD:<br />+ 1080p30: 4 hours<br />+ 960p30: 6 hours<br />+ 720p60: 4 hours<br />+ 720p30: 6 hours<br />+ WVGA 120: 4.5 hours<br /><br />Included Cables:<br /><br />+ USB Cable For Charging and Data Transfer<br /><br />Battery & Charging:<br /><br />+ 1100mah Rechargeable Lithium-Ion<br />+ Charge via USB<br /><br />Operating System:<br /><br />+ Microsoft Windows® Vista, 7 and Later<br />+ Mac OS® x 10.5 and Later<br /><br />Compatible with all GoPro BacPacs:<br /><br />+ Wi-Fi BacPac™ and Wi-Fi Remote™ (Coming Soon)<br />+ LCD BacPac™<br />+ Battery BacPac™<br />+ 3D HERO® System*<br /><br />*Compatible with future firmware release </p>",
+      "images": [
+        {
+          "altText": "HD Hero2 Outdoor Edition",
+          "format": "zoom",
+          "imageType": "PRIMARY",
+          "url": "/rest/v2/medias/?context=bWFzdGVyfGltYWdlc3w2OTY3MHxpbWFnZS9qcGVnfGltYWdlcy9oZTEvaDJlLzg3OTYyNjg2OTE0ODYuanBnfDkyZTlkMmU3NDM5YzQ4ZjQ5ZDgxZGI4MzlkM2RiY2VlN2I5ZWU2NzlmMTFiZGE0ODY1NmY4M2E5NzUxODkwYjg"
+        },
+        {
+          "altText": "HD Hero2 Outdoor Edition",
+          "format": "product",
+          "imageType": "PRIMARY",
+          "url": "/rest/v2/medias/?context=bWFzdGVyfGltYWdlc3wyNzAzOHxpbWFnZS9qcGVnfGltYWdlcy9oMjQvaGFkLzg3OTYyNjg3ODk3OTAuanBnfDA0MjUyYjRmMDYyNWJkOGFmMWQ2MzBiYWRjYmM3MTQ0OTMwNGFjMDdiMmUzY2RmYTgwY2Y1OWRkYTQxNTcyMTY"
+        },
+        {
+          "altText": "HD Hero2 Outdoor Edition",
+          "format": "thumbnail",
+          "imageType": "PRIMARY",
+          "url": "/rest/v2/medias/?context=bWFzdGVyfGltYWdlc3w1NDA2fGltYWdlL2pwZWd8aW1hZ2VzL2hjMi9oOTcvODc5NjI2ODc1NzAyMi5qcGd8NGJkZjY2NmY1ODE2OGI3YTkzMzVmMzViYWE3ZTY5MTc4MDkxMzZiOTY3NWZhOWQ3M2FkNjZjMmQ1OTJjYmJlYw"
+        },
+        {
+          "altText": "HD Hero2 Outdoor Edition",
+          "format": "cartIcon",
+          "imageType": "PRIMARY",
+          "url": "/rest/v2/medias/?context=bWFzdGVyfGltYWdlc3wzMTgzfGltYWdlL2pwZWd8aW1hZ2VzL2hiMi9oNjgvODc5NjI2ODk4NjM5OC5qcGd8NTRjZWQwMGZmMTFlNzdmZjEwMTkxMWIxMWJhNTllMjNjYTI1YmM0Y2MxZGFmNzYxNzQ3ODM3NGI4MGNkN2VhYg"
+        },
+        {
+          "altText": "HD Hero2 Outdoor Edition",
+          "format": "zoom",
+          "galleryIndex": 0,
+          "imageType": "GALLERY",
+          "url": "/rest/v2/medias/?context=bWFzdGVyfGltYWdlc3w2OTY3MHxpbWFnZS9qcGVnfGltYWdlcy9oZTEvaDJlLzg3OTYyNjg2OTE0ODYuanBnfDkyZTlkMmU3NDM5YzQ4ZjQ5ZDgxZGI4MzlkM2RiY2VlN2I5ZWU2NzlmMTFiZGE0ODY1NmY4M2E5NzUxODkwYjg"
+        },
+        {
+          "altText": "HD Hero2 Outdoor Edition",
+          "format": "product",
+          "galleryIndex": 0,
+          "imageType": "GALLERY",
+          "url": "/rest/v2/medias/?context=bWFzdGVyfGltYWdlc3wyNzAzOHxpbWFnZS9qcGVnfGltYWdlcy9oMjQvaGFkLzg3OTYyNjg3ODk3OTAuanBnfDA0MjUyYjRmMDYyNWJkOGFmMWQ2MzBiYWRjYmM3MTQ0OTMwNGFjMDdiMmUzY2RmYTgwY2Y1OWRkYTQxNTcyMTY"
+        },
+        {
+          "altText": "HD Hero2 Outdoor Edition",
+          "format": "thumbnail",
+          "galleryIndex": 0,
+          "imageType": "GALLERY",
+          "url": "/rest/v2/medias/?context=bWFzdGVyfGltYWdlc3w1NDA2fGltYWdlL2pwZWd8aW1hZ2VzL2hjMi9oOTcvODc5NjI2ODc1NzAyMi5qcGd8NGJkZjY2NmY1ODE2OGI3YTkzMzVmMzViYWE3ZTY5MTc4MDkxMzZiOTY3NWZhOWQ3M2FkNjZjMmQ1OTJjYmJlYw"
+        },
+        {
+          "altText": "HD Hero2 Outdoor Edition",
+          "format": "zoom",
+          "galleryIndex": 1,
+          "imageType": "GALLERY",
+          "url": "/rest/v2/medias/?context=bWFzdGVyfGltYWdlc3w1MTY4MHxpbWFnZS9qcGVnfGltYWdlcy9oMjUvaDU4Lzg3OTYyNjg5NTM2MzAuanBnfGVmNDRjYTgwZTViNmI5MWM2ZDg3MWRmMWY2ZjNmNTBlZmFhN2VlMzhhZDAwY2ExMzY1ZDdmYWM4MmU2NWE4Mzc"
+        },
+        {
+          "altText": "HD Hero2 Outdoor Edition",
+          "format": "product",
+          "galleryIndex": 1,
+          "imageType": "GALLERY",
+          "url": "/rest/v2/medias/?context=bWFzdGVyfGltYWdlc3wyMTMxM3xpbWFnZS9qcGVnfGltYWdlcy9oMzQvaGJkLzg3OTYyNjkwNTE5MzQuanBnfDI3ZDg4NGYyODI5OTRjY2YyM2I5ZTQ0NGEwNjdmZDdlNDI0MWI5MzQ2OGU0YjQwNjRjNDYwNDUyOTFhZTMyZDM"
+        },
+        {
+          "altText": "HD Hero2 Outdoor Edition",
+          "format": "thumbnail",
+          "galleryIndex": 1,
+          "imageType": "GALLERY",
+          "url": "/rest/v2/medias/?context=bWFzdGVyfGltYWdlc3w0NzAwfGltYWdlL2pwZWd8aW1hZ2VzL2hmZi9oOWIvODc5NjI2OTExNzQ3MC5qcGd8ZmNmMjA2ZTRmOWVlNGRkMjg2MjRhZWQzZWYzZTQ0MWY0Yzg0YjEzZGNhMDg3NTE3MzZiYTI4YTQyZGMwZTZhNQ"
+        },
+        {
+          "altText": "HD Hero2 Outdoor Edition",
+          "format": "zoom",
+          "galleryIndex": 2,
+          "imageType": "GALLERY",
+          "url": "/rest/v2/medias/?context=bWFzdGVyfGltYWdlc3w0NTQxNXxpbWFnZS9qcGVnfGltYWdlcy9oNjMvaDgzLzg3OTYyNjkzNDY4NDYuanBnfGE3YzM1NjkwZjJjNDIwODI0ZGE5MzZkODRiNTQ4Y2IwOGQ5YWU1NjE2ZDA2NzZlOTM1MDRlZTVkNjE1MmIzNjc"
+        },
+        {
+          "altText": "HD Hero2 Outdoor Edition",
+          "format": "product",
+          "galleryIndex": 2,
+          "imageType": "GALLERY",
+          "url": "/rest/v2/medias/?context=bWFzdGVyfGltYWdlc3wxNzM1MXxpbWFnZS9qcGVnfGltYWdlcy9oNzAvaDg3Lzg3OTYyNjkzNzk2MTQuanBnfDE1YzgyYWUwODg3YzI1ODM1ZGU5MGE5NjE3NTBhMDJiNGFhMjE1ZDc4MjI5NDliYjhmYjA0NDgwMGNkYjRkZGM"
+        },
+        {
+          "altText": "HD Hero2 Outdoor Edition",
+          "format": "thumbnail",
+          "galleryIndex": 2,
+          "imageType": "GALLERY",
+          "url": "/rest/v2/medias/?context=bWFzdGVyfGltYWdlc3w0MDU2fGltYWdlL2pwZWd8aW1hZ2VzL2g2OS9oNGMvODc5NjI2OTQ0NTE1MC5qcGd8MTI2MTdkM2ZmMTBmM2JmNjFlOTg0NjNkZDRiZGYzMWY3ZTBjYjVmYjA2ZDFlNjZkNzRjMTgxZjdmNWQwNmM0MA"
+        },
+        {
+          "altText": "HD Hero2 Outdoor Edition",
+          "format": "zoom",
+          "galleryIndex": 3,
+          "imageType": "GALLERY",
+          "url": "/rest/v2/medias/?context=bWFzdGVyfGltYWdlc3w0NTU4OXxpbWFnZS9qcGVnfGltYWdlcy9oZWEvaGFkLzg3OTYyNjk2MDg5OTAuanBnfGExN2NkMjQ1OTEwNWViYzkxYzVlNzQxYzM2YzM0MTNjOGU1M2Y1ODI4MmM2MTA1ZmRmM2MwN2ZlZDcyNGQ3Y2Q"
+        },
+        {
+          "altText": "HD Hero2 Outdoor Edition",
+          "format": "product",
+          "galleryIndex": 3,
+          "imageType": "GALLERY",
+          "url": "/rest/v2/medias/?context=bWFzdGVyfGltYWdlc3wxNzA0MHxpbWFnZS9qcGVnfGltYWdlcy9oNzgvaDY5Lzg3OTYyNjk4MDU1OTguanBnfDczYTk2NGQ3MjYwOTRiZTcyYTg2MmQ5NmQ0MzJiZjg1MWYwMTI1Yzk5NDBhNzVmZmY5YTBjYzE3YjFhOGI4ZjU"
+        },
+        {
+          "altText": "HD Hero2 Outdoor Edition",
+          "format": "thumbnail",
+          "galleryIndex": 3,
+          "imageType": "GALLERY",
+          "url": "/rest/v2/medias/?context=bWFzdGVyfGltYWdlc3wzNTYzfGltYWdlL2pwZWd8aW1hZ2VzL2g5OS9oYWEvODc5NjI2OTc3MjgzMC5qcGd8Yzk4NjJmMmYzNjZlN2RkMmQwMmY1MDEyODIwZGExZmNjZGNhOWMwNjE2NGJkZDI3NTQyNDMyMGFhZWNmZjdjOQ"
+        }
+      ],
+      "name": "HD Hero2 Outdoor Edition",
+      "numberOfReviews": 0,
+      "potentialPromotions": [],
+      "price": {
+        "currencyIso": "GBP",
+        "formattedValue": "£283.46",
+        "priceType": "FROM",
+        "value": 283.46
+      },
+      "priceRange": {},
+      "productReferences": [],
+      "purchasable": false,
+      "reviews": [],
+      "stock": {
+        "stockLevel": 0,
+        "stockLevelStatus": "outOfStock"
+      },
+      "summary": "<p> GoPro cameras are used by more professional athletes, sports filmmakers and core enthusiasts than any other camera in the world.",
+      "url": "/apparel-uk/products/130663",
+      "variantOptions": [
+        {
+          "code": "130663_uni",
+          "priceData": {
+            "currencyIso": "GBP",
+            "formattedValue": "£283.46",
+            "priceType": "FROM",
+            "value": 283.46
+          },
+          "stock": {
+            "stockLevel": 0,
+            "stockLevelStatus": "outOfStock"
+          },
+          "url": "/Categories/Accessories/Videocamera/HD-Hero2-Outdoor-Edition/p/130663_uni",
+          "variantOptionQualifiers": [
+            {
+              "image": {
+                "format": "30Wx30H",
+                "url": "/rest/v2/medias/?context=bWFzdGVyfGltYWdlc3wxNDE4fGltYWdlL2pwZWd8aW1hZ2VzL2gwNy9oOWQvODc5NjI2ODkyMDg2Mi5qcGd8NjJmYjAzMjdiYmM3ZTc1YTE0Yzg3NWE3YTRiMmRlNTlmMmJkMDdkMDdhZTc2OWI5OTdiNzRjMzM4NWYyYWY1YQ"
+              },
+              "name": "Style",
+              "qualifier": "style",
+              "value": "uni"
+            }
+          ]
+        }
+      ],
+      "variantType": "ApparelStyleVariantProduct"
+    },
+    "rawHeaders": [
+      "Cache-Control",
+      "private, max-age=120",
+      "Content-Type",
+      "application/json",
+      "Date",
+      "Sat, 25 Aug 2018 00:58:05 GMT",
+      "ETag",
+      "\"0ec81ca76b157212f05e7de56018c1daf\"",
+      "Server",
+      "Apache-Coyote/1.1",
+      "Strict-Transport-Security",
+      "max-age=16070400 ; includeSubDomains",
+      "X-Content-Type-Options",
+      "nosniff",
+      "X-Frame-Options",
+      "SAMEORIGIN",
+      "X-XSS-Protection",
+      "1; mode=block",
+      "Content-Length",
+      "10624",
+      "Connection",
+      "Close"
+    ]
+  }
+]

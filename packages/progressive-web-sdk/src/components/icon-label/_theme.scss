@@ -1,0 +1,15 @@
+// Icon Label Theme
+// ===
+
+
+// Icon Label's Label
+// ---
+
+.pw-icon-label__label {
+    margin-top: $sub-unit;
+
+    @if variable-exists('tiny-font-size') {
+        font-size: $tiny-font-size + 1;
+        line-height: $tiny-line-height;
+    }
+}

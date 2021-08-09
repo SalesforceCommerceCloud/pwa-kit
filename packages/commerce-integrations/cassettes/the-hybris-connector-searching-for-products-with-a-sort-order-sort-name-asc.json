@@ -1,0 +1,1936 @@
+[
+  {
+    "scope": "https://hybris.merlinspotions.com:443",
+    "method": "GET",
+    "path": "/rest/v2/apparel-uk/products/search?query=%3Aname-asc%3AallCategories%3A220000&pageSize=20&sort=name-asc&currentPage=0&fields=FULL",
+    "body": "",
+    "status": 200,
+    "response": {
+      "type": "productCategorySearchPageWsDTO",
+      "breadcrumbs": [
+        {
+          "facetCode": "allCategories",
+          "facetName": "allCategories",
+          "facetValueCode": "220000",
+          "facetValueName": "220000",
+          "removeQuery": {
+            "query": {
+              "value": ":name-asc"
+            },
+            "url": "/search?q=%3Aname-asc"
+          }
+        }
+      ],
+      "currentQuery": {
+        "query": {
+          "value": ":name-asc:allCategories:220000"
+        },
+        "url": "/search?q=%3Aname-asc%3AallCategories%3A220000"
+      },
+      "facets": [
+        {
+          "category": false,
+          "multiSelect": true,
+          "name": "Stores",
+          "priority": 10000,
+          "values": [
+            {
+              "count": 130,
+              "name": "Birmingham Hospital",
+              "query": {
+                "query": {
+                  "value": ":name-asc:allCategories:220000:availableInStores:Birmingham+Hospital"
+                },
+                "url": "/search?q=%3Aname-asc%3AallCategories%3A220000%3AavailableInStores%3ABirmingham%2BHospital"
+              },
+              "selected": false
+            },
+            {
+              "count": 88,
+              "name": "Birmingham Kathedrale",
+              "query": {
+                "query": {
+                  "value": ":name-asc:allCategories:220000:availableInStores:Birmingham+Kathedrale"
+                },
+                "url": "/search?q=%3Aname-asc%3AallCategories%3A220000%3AavailableInStores%3ABirmingham%2BKathedrale"
+              },
+              "selected": false
+            },
+            {
+              "count": 87,
+              "name": "Birmingham Park",
+              "query": {
+                "query": {
+                  "value": ":name-asc:allCategories:220000:availableInStores:Birmingham+Park"
+                },
+                "url": "/search?q=%3Aname-asc%3AallCategories%3A220000%3AavailableInStores%3ABirmingham%2BPark"
+              },
+              "selected": false
+            },
+            {
+              "count": 85,
+              "name": "Birmingham Symphony Hall",
+              "query": {
+                "query": {
+                  "value": ":name-asc:allCategories:220000:availableInStores:Birmingham+Symphony+Hall"
+                },
+                "url": "/search?q=%3Aname-asc%3AallCategories%3A220000%3AavailableInStores%3ABirmingham%2BSymphony%2BHall"
+              },
+              "selected": false
+            },
+            {
+              "count": 107,
+              "name": "Cambridge Coldham's",
+              "query": {
+                "query": {
+                  "value": ":name-asc:allCategories:220000:availableInStores:Cambridge+Coldham%27s"
+                },
+                "url": "/search?q=%3Aname-asc%3AallCategories%3A220000%3AavailableInStores%3ACambridge%2BColdham%2527s"
+              },
+              "selected": false
+            },
+            {
+              "count": 106,
+              "name": "Cambridge Hospital",
+              "query": {
+                "query": {
+                  "value": ":name-asc:allCategories:220000:availableInStores:Cambridge+Hospital"
+                },
+                "url": "/search?q=%3Aname-asc%3AallCategories%3A220000%3AavailableInStores%3ACambridge%2BHospital"
+              },
+              "selected": false
+            },
+            {
+              "count": 104,
+              "name": "Cambridge Lakes Golf Course",
+              "query": {
+                "query": {
+                  "value": ":name-asc:allCategories:220000:availableInStores:Cambridge+Lakes+Golf+Course"
+                },
+                "url": "/search?q=%3Aname-asc%3AallCategories%3A220000%3AavailableInStores%3ACambridge%2BLakes%2BGolf%2BCourse"
+              },
+              "selected": false
+            },
+            {
+              "count": 101,
+              "name": "Cambridge Museum",
+              "query": {
+                "query": {
+                  "value": ":name-asc:allCategories:220000:availableInStores:Cambridge+Museum"
+                },
+                "url": "/search?q=%3Aname-asc%3AallCategories%3A220000%3AavailableInStores%3ACambridge%2BMuseum"
+              },
+              "selected": false
+            },
+            {
+              "count": 113,
+              "name": "Cambridge University",
+              "query": {
+                "query": {
+                  "value": ":name-asc:allCategories:220000:availableInStores:Cambridge+University"
+                },
+                "url": "/search?q=%3Aname-asc%3AallCategories%3A220000%3AavailableInStores%3ACambridge%2BUniversity"
+              },
+              "selected": false
+            },
+            {
+              "count": 85,
+              "name": "Cardiff Castle",
+              "query": {
+                "query": {
+                  "value": ":name-asc:allCategories:220000:availableInStores:Cardiff+Castle"
+                },
+                "url": "/search?q=%3Aname-asc%3AallCategories%3A220000%3AavailableInStores%3ACardiff%2BCastle"
+              },
+              "selected": false
+            },
+            {
+              "count": 81,
+              "name": "Cardiff City Stadium",
+              "query": {
+                "query": {
+                  "value": ":name-asc:allCategories:220000:availableInStores:Cardiff+City+Stadium"
+                },
+                "url": "/search?q=%3Aname-asc%3AallCategories%3A220000%3AavailableInStores%3ACardiff%2BCity%2BStadium"
+              },
+              "selected": false
+            },
+            {
+              "count": 86,
+              "name": "Cardiff Museum",
+              "query": {
+                "query": {
+                  "value": ":name-asc:allCategories:220000:availableInStores:Cardiff+Museum"
+                },
+                "url": "/search?q=%3Aname-asc%3AallCategories%3A220000%3AavailableInStores%3ACardiff%2BMuseum"
+              },
+              "selected": false
+            },
+            {
+              "count": 84,
+              "name": "Cardiff Park",
+              "query": {
+                "query": {
+                  "value": ":name-asc:allCategories:220000:availableInStores:Cardiff+Park"
+                },
+                "url": "/search?q=%3Aname-asc%3AallCategories%3A220000%3AavailableInStores%3ACardiff%2BPark"
+              },
+              "selected": false
+            },
+            {
+              "count": 124,
+              "name": "Edinburgh Castle",
+              "query": {
+                "query": {
+                  "value": ":name-asc:allCategories:220000:availableInStores:Edinburgh+Castle"
+                },
+                "url": "/search?q=%3Aname-asc%3AallCategories%3A220000%3AavailableInStores%3AEdinburgh%2BCastle"
+              },
+              "selected": false
+            },
+            {
+              "count": 97,
+              "name": "Edinburgh Dynamic Earth",
+              "query": {
+                "query": {
+                  "value": ":name-asc:allCategories:220000:availableInStores:Edinburgh+Dynamic+Earth"
+                },
+                "url": "/search?q=%3Aname-asc%3AallCategories%3A220000%3AavailableInStores%3AEdinburgh%2BDynamic%2BEarth"
+              },
+              "selected": false
+            },
+            {
+              "count": 104,
+              "name": "Edinburgh Hospital",
+              "query": {
+                "query": {
+                  "value": ":name-asc:allCategories:220000:availableInStores:Edinburgh+Hospital"
+                },
+                "url": "/search?q=%3Aname-asc%3AallCategories%3A220000%3AavailableInStores%3AEdinburgh%2BHospital"
+              },
+              "selected": false
+            },
+            {
+              "count": 102,
+              "name": "Edinburgh Park",
+              "query": {
+                "query": {
+                  "value": ":name-asc:allCategories:220000:availableInStores:Edinburgh+Park"
+                },
+                "url": "/search?q=%3Aname-asc%3AallCategories%3A220000%3AavailableInStores%3AEdinburgh%2BPark"
+              },
+              "selected": false
+            },
+            {
+              "count": 110,
+              "name": "Edinburgh University",
+              "query": {
+                "query": {
+                  "value": ":name-asc:allCategories:220000:availableInStores:Edinburgh+University"
+                },
+                "url": "/search?q=%3Aname-asc%3AallCategories%3A220000%3AavailableInStores%3AEdinburgh%2BUniversity"
+              },
+              "selected": false
+            },
+            {
+              "count": 84,
+              "name": "Glasgow",
+              "query": {
+                "query": {
+                  "value": ":name-asc:allCategories:220000:availableInStores:Glasgow"
+                },
+                "url": "/search?q=%3Aname-asc%3AallCategories%3A220000%3AavailableInStores%3AGlasgow"
+              },
+              "selected": false
+            },
+            {
+              "count": 114,
+              "name": "Glasgow Hospital",
+              "query": {
+                "query": {
+                  "value": ":name-asc:allCategories:220000:availableInStores:Glasgow+Hospital"
+                },
+                "url": "/search?q=%3Aname-asc%3AallCategories%3A220000%3AavailableInStores%3AGlasgow%2BHospital"
+              },
+              "selected": false
+            },
+            {
+              "count": 84,
+              "name": "Glasgow Ibrox Park",
+              "query": {
+                "query": {
+                  "value": ":name-asc:allCategories:220000:availableInStores:Glasgow+Ibrox+Park"
+                },
+                "url": "/search?q=%3Aname-asc%3AallCategories%3A220000%3AavailableInStores%3AGlasgow%2BIbrox%2BPark"
+              },
+              "selected": false
+            },
+            {
+              "count": 87,
+              "name": "Glasgow University",
+              "query": {
+                "query": {
+                  "value": ":name-asc:allCategories:220000:availableInStores:Glasgow+University"
+                },
+                "url": "/search?q=%3Aname-asc%3AallCategories%3A220000%3AavailableInStores%3AGlasgow%2BUniversity"
+              },
+              "selected": false
+            },
+            {
+              "count": 105,
+              "name": "Leeds",
+              "query": {
+                "query": {
+                  "value": ":name-asc:allCategories:220000:availableInStores:Leeds"
+                },
+                "url": "/search?q=%3Aname-asc%3AallCategories%3A220000%3AavailableInStores%3ALeeds"
+              },
+              "selected": false
+            },
+            {
+              "count": 106,
+              "name": "Leeds Cockpit",
+              "query": {
+                "query": {
+                  "value": ":name-asc:allCategories:220000:availableInStores:Leeds+Cockpit"
+                },
+                "url": "/search?q=%3Aname-asc%3AallCategories%3A220000%3AavailableInStores%3ALeeds%2BCockpit"
+              },
+              "selected": false
+            },
+            {
+              "count": 104,
+              "name": "Leeds Moor",
+              "query": {
+                "query": {
+                  "value": ":name-asc:allCategories:220000:availableInStores:Leeds+Moor"
+                },
+                "url": "/search?q=%3Aname-asc%3AallCategories%3A220000%3AavailableInStores%3ALeeds%2BMoor"
+              },
+              "selected": false
+            },
+            {
+              "count": 114,
+              "name": "Leeds Stadium",
+              "query": {
+                "query": {
+                  "value": ":name-asc:allCategories:220000:availableInStores:Leeds+Stadium"
+                },
+                "url": "/search?q=%3Aname-asc%3AallCategories%3A220000%3AavailableInStores%3ALeeds%2BStadium"
+              },
+              "selected": false
+            },
+            {
+              "count": 112,
+              "name": "Leeds Victoria Quarter",
+              "query": {
+                "query": {
+                  "value": ":name-asc:allCategories:220000:availableInStores:Leeds+Victoria+Quarter"
+                },
+                "url": "/search?q=%3Aname-asc%3AallCategories%3A220000%3AavailableInStores%3ALeeds%2BVictoria%2BQuarter"
+              },
+              "selected": false
+            },
+            {
+              "count": 107,
+              "name": "London Greenwich Park",
+              "query": {
+                "query": {
+                  "value": ":name-asc:allCategories:220000:availableInStores:London+Greenwich+Park"
+                },
+                "url": "/search?q=%3Aname-asc%3AallCategories%3A220000%3AavailableInStores%3ALondon%2BGreenwich%2BPark"
+              },
+              "selected": false
+            },
+            {
+              "count": 127,
+              "name": "London Hospital",
+              "query": {
+                "query": {
+                  "value": ":name-asc:allCategories:220000:availableInStores:London+Hospital"
+                },
+                "url": "/search?q=%3Aname-asc%3AallCategories%3A220000%3AavailableInStores%3ALondon%2BHospital"
+              },
+              "selected": false
+            },
+            {
+              "count": 102,
+              "name": "London Hyde Park",
+              "query": {
+                "query": {
+                  "value": ":name-asc:allCategories:220000:availableInStores:London+Hyde+Park"
+                },
+                "url": "/search?q=%3Aname-asc%3AallCategories%3A220000%3AavailableInStores%3ALondon%2BHyde%2BPark"
+              },
+              "selected": false
+            },
+            {
+              "count": 109,
+              "name": "London School",
+              "query": {
+                "query": {
+                  "value": ":name-asc:allCategories:220000:availableInStores:London+School"
+                },
+                "url": "/search?q=%3Aname-asc%3AallCategories%3A220000%3AavailableInStores%3ALondon%2BSchool"
+              },
+              "selected": false
+            },
+            {
+              "count": 108,
+              "name": "London Theater",
+              "query": {
+                "query": {
+                  "value": ":name-asc:allCategories:220000:availableInStores:London+Theater"
+                },
+                "url": "/search?q=%3Aname-asc%3AallCategories%3A220000%3AavailableInStores%3ALondon%2BTheater"
+              },
+              "selected": false
+            },
+            {
+              "count": 101,
+              "name": "Manchester",
+              "query": {
+                "query": {
+                  "value": ":name-asc:allCategories:220000:availableInStores:Manchester"
+                },
+                "url": "/search?q=%3Aname-asc%3AallCategories%3A220000%3AavailableInStores%3AManchester"
+              },
+              "selected": false
+            },
+            {
+              "count": 94,
+              "name": "Manchester dental Hospital",
+              "query": {
+                "query": {
+                  "value": ":name-asc:allCategories:220000:availableInStores:Manchester+dental+Hospital"
+                },
+                "url": "/search?q=%3Aname-asc%3AallCategories%3A220000%3AavailableInStores%3AManchester%2Bdental%2BHospital"
+              },
+              "selected": false
+            },
+            {
+              "count": 83,
+              "name": "Manchester Holiday Inn",
+              "query": {
+                "query": {
+                  "value": ":name-asc:allCategories:220000:availableInStores:Manchester+Holiday+Inn"
+                },
+                "url": "/search?q=%3Aname-asc%3AallCategories%3A220000%3AavailableInStores%3AManchester%2BHoliday%2BInn"
+              },
+              "selected": false
+            },
+            {
+              "count": 108,
+              "name": "Manchester Hospital",
+              "query": {
+                "query": {
+                  "value": ":name-asc:allCategories:220000:availableInStores:Manchester+Hospital"
+                },
+                "url": "/search?q=%3Aname-asc%3AallCategories%3A220000%3AavailableInStores%3AManchester%2BHospital"
+              },
+              "selected": false
+            },
+            {
+              "count": 113,
+              "name": "Manchester United FC",
+              "query": {
+                "query": {
+                  "value": ":name-asc:allCategories:220000:availableInStores:Manchester+United+FC"
+                },
+                "url": "/search?q=%3Aname-asc%3AallCategories%3A220000%3AavailableInStores%3AManchester%2BUnited%2BFC"
+              },
+              "selected": false
+            },
+            {
+              "count": 87,
+              "name": "Newcastle upon Tyne Gallery",
+              "query": {
+                "query": {
+                  "value": ":name-asc:allCategories:220000:availableInStores:Newcastle+upon+Tyne+Gallery"
+                },
+                "url": "/search?q=%3Aname-asc%3AallCategories%3A220000%3AavailableInStores%3ANewcastle%2Bupon%2BTyne%2BGallery"
+              },
+              "selected": false
+            },
+            {
+              "count": 105,
+              "name": "Newcastle upon Tyne Hospital",
+              "query": {
+                "query": {
+                  "value": ":name-asc:allCategories:220000:availableInStores:Newcastle+upon+Tyne+Hospital"
+                },
+                "url": "/search?q=%3Aname-asc%3AallCategories%3A220000%3AavailableInStores%3ANewcastle%2Bupon%2BTyne%2BHospital"
+              },
+              "selected": false
+            },
+            {
+              "count": 98,
+              "name": "Newcastle upon Tyne Kathedrale",
+              "query": {
+                "query": {
+                  "value": ":name-asc:allCategories:220000:availableInStores:Newcastle+upon+Tyne+Kathedrale"
+                },
+                "url": "/search?q=%3Aname-asc%3AallCategories%3A220000%3AavailableInStores%3ANewcastle%2Bupon%2BTyne%2BKathedrale"
+              },
+              "selected": false
+            },
+            {
+              "count": 93,
+              "name": "Newcastle upon Tyne University",
+              "query": {
+                "query": {
+                  "value": ":name-asc:allCategories:220000:availableInStores:Newcastle+upon+Tyne+University"
+                },
+                "url": "/search?q=%3Aname-asc%3AallCategories%3A220000%3AavailableInStores%3ANewcastle%2Bupon%2BTyne%2BUniversity"
+              },
+              "selected": false
+            },
+            {
+              "count": 83,
+              "name": "Nottingham",
+              "query": {
+                "query": {
+                  "value": ":name-asc:allCategories:220000:availableInStores:Nottingham"
+                },
+                "url": "/search?q=%3Aname-asc%3AallCategories%3A220000%3AavailableInStores%3ANottingham"
+              },
+              "selected": false
+            },
+            {
+              "count": 87,
+              "name": "Nottingham Hospital",
+              "query": {
+                "query": {
+                  "value": ":name-asc:allCategories:220000:availableInStores:Nottingham+Hospital"
+                },
+                "url": "/search?q=%3Aname-asc%3AallCategories%3A220000%3AavailableInStores%3ANottingham%2BHospital"
+              },
+              "selected": false
+            },
+            {
+              "count": 81,
+              "name": "Nottingham Ice Center",
+              "query": {
+                "query": {
+                  "value": ":name-asc:allCategories:220000:availableInStores:Nottingham+Ice+Center"
+                },
+                "url": "/search?q=%3Aname-asc%3AallCategories%3A220000%3AavailableInStores%3ANottingham%2BIce%2BCenter"
+              },
+              "selected": false
+            },
+            {
+              "count": 107,
+              "name": "Nottingham University",
+              "query": {
+                "query": {
+                  "value": ":name-asc:allCategories:220000:availableInStores:Nottingham+University"
+                },
+                "url": "/search?q=%3Aname-asc%3AallCategories%3A220000%3AavailableInStores%3ANottingham%2BUniversity"
+              },
+              "selected": false
+            },
+            {
+              "count": 122,
+              "name": "Sheffield",
+              "query": {
+                "query": {
+                  "value": ":name-asc:allCategories:220000:availableInStores:Sheffield"
+                },
+                "url": "/search?q=%3Aname-asc%3AallCategories%3A220000%3AavailableInStores%3ASheffield"
+              },
+              "selected": false
+            },
+            {
+              "count": 105,
+              "name": "Sheffield Arena",
+              "query": {
+                "query": {
+                  "value": ":name-asc:allCategories:220000:availableInStores:Sheffield+Arena"
+                },
+                "url": "/search?q=%3Aname-asc%3AallCategories%3A220000%3AavailableInStores%3ASheffield%2BArena"
+              },
+              "selected": false
+            },
+            {
+              "count": 103,
+              "name": "Sheffield Hospital",
+              "query": {
+                "query": {
+                  "value": ":name-asc:allCategories:220000:availableInStores:Sheffield+Hospital"
+                },
+                "url": "/search?q=%3Aname-asc%3AallCategories%3A220000%3AavailableInStores%3ASheffield%2BHospital"
+              },
+              "selected": false
+            },
+            {
+              "count": 105,
+              "name": "Sheffield Kathedrale",
+              "query": {
+                "query": {
+                  "value": ":name-asc:allCategories:220000:availableInStores:Sheffield+Kathedrale"
+                },
+                "url": "/search?q=%3Aname-asc%3AallCategories%3A220000%3AavailableInStores%3ASheffield%2BKathedrale"
+              },
+              "selected": false
+            },
+            {
+              "count": 83,
+              "name": "Sheffield United FC",
+              "query": {
+                "query": {
+                  "value": ":name-asc:allCategories:220000:availableInStores:Sheffield+United+FC"
+                },
+                "url": "/search?q=%3Aname-asc%3AallCategories%3A220000%3AavailableInStores%3ASheffield%2BUnited%2BFC"
+              },
+              "selected": false
+            }
+          ],
+          "visible": true
+        },
+        {
+          "category": false,
+          "multiSelect": true,
+          "name": "Price",
+          "priority": 4000,
+          "values": [
+            {
+              "count": 33,
+              "name": "£0-£19.99",
+              "query": {
+                "query": {
+                  "value": ":name-asc:allCategories:220000:price:%C2%A30-%C2%A319.99"
+                },
+                "url": "/search?q=%3Aname-asc%3AallCategories%3A220000%3Aprice%3A%25C2%25A30-%25C2%25A319.99"
+              },
+              "selected": false
+            },
+            {
+              "count": 104,
+              "name": "£20-£49.99",
+              "query": {
+                "query": {
+                  "value": ":name-asc:allCategories:220000:price:%C2%A320-%C2%A349.99"
+                },
+                "url": "/search?q=%3Aname-asc%3AallCategories%3A220000%3Aprice%3A%25C2%25A320-%25C2%25A349.99"
+              },
+              "selected": false
+            },
+            {
+              "count": 1,
+              "name": "£50-£99.99",
+              "query": {
+                "query": {
+                  "value": ":name-asc:allCategories:220000:price:%C2%A350-%C2%A399.99"
+                },
+                "url": "/search?q=%3Aname-asc%3AallCategories%3A220000%3Aprice%3A%25C2%25A350-%25C2%25A399.99"
+              },
+              "selected": false
+            },
+            {
+              "count": 4,
+              "name": "£100-£199.99",
+              "query": {
+                "query": {
+                  "value": ":name-asc:allCategories:220000:price:%C2%A3100-%C2%A3199.99"
+                },
+                "url": "/search?q=%3Aname-asc%3AallCategories%3A220000%3Aprice%3A%25C2%25A3100-%25C2%25A3199.99"
+              },
+              "selected": false
+            },
+            {
+              "count": 4,
+              "name": "£200-£299.99",
+              "query": {
+                "query": {
+                  "value": ":name-asc:allCategories:220000:price:%C2%A3200-%C2%A3299.99"
+                },
+                "url": "/search?q=%3Aname-asc%3AallCategories%3A220000%3Aprice%3A%25C2%25A3200-%25C2%25A3299.99"
+              },
+              "selected": false
+            },
+            {
+              "count": 1,
+              "name": "£400-£499.99",
+              "query": {
+                "query": {
+                  "value": ":name-asc:allCategories:220000:price:%C2%A3400-%C2%A3499.99"
+                },
+                "url": "/search?q=%3Aname-asc%3AallCategories%3A220000%3Aprice%3A%25C2%25A3400-%25C2%25A3499.99"
+              },
+              "selected": false
+            }
+          ],
+          "visible": true
+        },
+        {
+          "category": false,
+          "multiSelect": true,
+          "name": "Colour",
+          "priority": 2500,
+          "values": [
+            {
+              "count": 43,
+              "name": "Black",
+              "query": {
+                "query": {
+                  "value": ":name-asc:allCategories:220000:swatchColors:BLACK"
+                },
+                "url": "/search?q=%3Aname-asc%3AallCategories%3A220000%3AswatchColors%3ABLACK"
+              },
+              "selected": false
+            },
+            {
+              "count": 26,
+              "name": "Blue",
+              "query": {
+                "query": {
+                  "value": ":name-asc:allCategories:220000:swatchColors:BLUE"
+                },
+                "url": "/search?q=%3Aname-asc%3AallCategories%3A220000%3AswatchColors%3ABLUE"
+              },
+              "selected": false
+            },
+            {
+              "count": 5,
+              "name": "Brown",
+              "query": {
+                "query": {
+                  "value": ":name-asc:allCategories:220000:swatchColors:BROWN"
+                },
+                "url": "/search?q=%3Aname-asc%3AallCategories%3A220000%3AswatchColors%3ABROWN"
+              },
+              "selected": false
+            },
+            {
+              "count": 14,
+              "name": "Green",
+              "query": {
+                "query": {
+                  "value": ":name-asc:allCategories:220000:swatchColors:GREEN"
+                },
+                "url": "/search?q=%3Aname-asc%3AallCategories%3A220000%3AswatchColors%3AGREEN"
+              },
+              "selected": false
+            },
+            {
+              "count": 7,
+              "name": "Grey",
+              "query": {
+                "query": {
+                  "value": ":name-asc:allCategories:220000:swatchColors:GREY"
+                },
+                "url": "/search?q=%3Aname-asc%3AallCategories%3A220000%3AswatchColors%3AGREY"
+              },
+              "selected": false
+            },
+            {
+              "count": 4,
+              "name": "Orange",
+              "query": {
+                "query": {
+                  "value": ":name-asc:allCategories:220000:swatchColors:ORANGE"
+                },
+                "url": "/search?q=%3Aname-asc%3AallCategories%3A220000%3AswatchColors%3AORANGE"
+              },
+              "selected": false
+            },
+            {
+              "count": 1,
+              "name": "Pink",
+              "query": {
+                "query": {
+                  "value": ":name-asc:allCategories:220000:swatchColors:PINK"
+                },
+                "url": "/search?q=%3Aname-asc%3AallCategories%3A220000%3AswatchColors%3APINK"
+              },
+              "selected": false
+            },
+            {
+              "count": 7,
+              "name": "Purple",
+              "query": {
+                "query": {
+                  "value": ":name-asc:allCategories:220000:swatchColors:PURPLE"
+                },
+                "url": "/search?q=%3Aname-asc%3AallCategories%3A220000%3AswatchColors%3APURPLE"
+              },
+              "selected": false
+            },
+            {
+              "count": 17,
+              "name": "Red",
+              "query": {
+                "query": {
+                  "value": ":name-asc:allCategories:220000:swatchColors:RED"
+                },
+                "url": "/search?q=%3Aname-asc%3AallCategories%3A220000%3AswatchColors%3ARED"
+              },
+              "selected": false
+            },
+            {
+              "count": 34,
+              "name": "White",
+              "query": {
+                "query": {
+                  "value": ":name-asc:allCategories:220000:swatchColors:WHITE"
+                },
+                "url": "/search?q=%3Aname-asc%3AallCategories%3A220000%3AswatchColors%3AWHITE"
+              },
+              "selected": false
+            },
+            {
+              "count": 9,
+              "name": "Yellow",
+              "query": {
+                "query": {
+                  "value": ":name-asc:allCategories:220000:swatchColors:YELLOW"
+                },
+                "url": "/search?q=%3Aname-asc%3AallCategories%3A220000%3AswatchColors%3AYELLOW"
+              },
+              "selected": false
+            }
+          ],
+          "visible": true
+        },
+        {
+          "category": false,
+          "multiSelect": true,
+          "name": "Size",
+          "priority": 2000,
+          "values": [
+            {
+              "count": 1,
+              "name": "7 1/4",
+              "query": {
+                "query": {
+                  "value": ":name-asc:allCategories:220000:size:7+1%2F4"
+                },
+                "url": "/search?q=%3Aname-asc%3AallCategories%3A220000%3Asize%3A7%2B1%252F4"
+              },
+              "selected": false
+            },
+            {
+              "count": 1,
+              "name": "7 3/4",
+              "query": {
+                "query": {
+                  "value": ":name-asc:allCategories:220000:size:7+3%2F4"
+                },
+                "url": "/search?q=%3Aname-asc%3AallCategories%3A220000%3Asize%3A7%2B3%252F4"
+              },
+              "selected": false
+            },
+            {
+              "count": 2,
+              "name": "XS",
+              "query": {
+                "query": {
+                  "value": ":name-asc:allCategories:220000:size:XS"
+                },
+                "url": "/search?q=%3Aname-asc%3AallCategories%3A220000%3Asize%3AXS"
+              },
+              "selected": false
+            },
+            {
+              "count": 10,
+              "name": "S",
+              "query": {
+                "query": {
+                  "value": ":name-asc:allCategories:220000:size:S"
+                },
+                "url": "/search?q=%3Aname-asc%3AallCategories%3A220000%3Asize%3AS"
+              },
+              "selected": false
+            },
+            {
+              "count": 11,
+              "name": "M",
+              "query": {
+                "query": {
+                  "value": ":name-asc:allCategories:220000:size:M"
+                },
+                "url": "/search?q=%3Aname-asc%3AallCategories%3A220000%3Asize%3AM"
+              },
+              "selected": false
+            },
+            {
+              "count": 15,
+              "name": "L",
+              "query": {
+                "query": {
+                  "value": ":name-asc:allCategories:220000:size:L"
+                },
+                "url": "/search?q=%3Aname-asc%3AallCategories%3A220000%3Asize%3AL"
+              },
+              "selected": false
+            },
+            {
+              "count": 16,
+              "name": "LXL",
+              "query": {
+                "query": {
+                  "value": ":name-asc:allCategories:220000:size:LXL"
+                },
+                "url": "/search?q=%3Aname-asc%3AallCategories%3A220000%3Asize%3ALXL"
+              },
+              "selected": false
+            },
+            {
+              "count": 11,
+              "name": "XL",
+              "query": {
+                "query": {
+                  "value": ":name-asc:allCategories:220000:size:XL"
+                },
+                "url": "/search?q=%3Aname-asc%3AallCategories%3A220000%3Asize%3AXL"
+              },
+              "selected": false
+            },
+            {
+              "count": 61,
+              "name": "Uni",
+              "query": {
+                "query": {
+                  "value": ":name-asc:allCategories:220000:size:Uni"
+                },
+                "url": "/search?q=%3Aname-asc%3AallCategories%3A220000%3Asize%3AUni"
+              },
+              "selected": false
+            },
+            {
+              "count": 16,
+              "name": "SM",
+              "query": {
+                "query": {
+                  "value": ":name-asc:allCategories:220000:size:SM"
+                },
+                "url": "/search?q=%3Aname-asc%3AallCategories%3A220000%3Asize%3ASM"
+              },
+              "selected": false
+            }
+          ],
+          "visible": true
+        },
+        {
+          "category": true,
+          "multiSelect": false,
+          "name": "Collection",
+          "priority": 100,
+          "values": [
+            {
+              "count": 27,
+              "name": "Collections",
+              "query": {
+                "query": {
+                  "value": ":name-asc:allCategories:220000:collection:collections"
+                },
+                "url": "/search?q=%3Aname-asc%3AallCategories%3A220000%3Acollection%3Acollections"
+              },
+              "selected": false
+            },
+            {
+              "count": 27,
+              "name": "Streetwear",
+              "query": {
+                "query": {
+                  "value": ":name-asc:allCategories:220000:collection:streetwear"
+                },
+                "url": "/search?q=%3Aname-asc%3AallCategories%3A220000%3Acollection%3Astreetwear"
+              },
+              "selected": false
+            }
+          ],
+          "visible": true
+        },
+        {
+          "category": true,
+          "multiSelect": false,
+          "name": "Category",
+          "priority": 100,
+          "values": [
+            {
+              "count": 5,
+              "name": "Bandanas",
+              "query": {
+                "query": {
+                  "value": ":name-asc:allCategories:220000:category:221600"
+                },
+                "url": "/search?q=%3Aname-asc%3AallCategories%3A220000%3Acategory%3A221600"
+              },
+              "selected": false
+            },
+            {
+              "count": 46,
+              "name": "Beanies",
+              "query": {
+                "query": {
+                  "value": ":name-asc:allCategories:220000:category:220500"
+                },
+                "url": "/search?q=%3Aname-asc%3AallCategories%3A220000%3Acategory%3A220500"
+              },
+              "selected": false
+            },
+            {
+              "count": 27,
+              "name": "Belts",
+              "query": {
+                "query": {
+                  "value": ":name-asc:allCategories:220000:category:251100"
+                },
+                "url": "/search?q=%3Aname-asc%3AallCategories%3A220000%3Acategory%3A251100"
+              },
+              "selected": false
+            },
+            {
+              "count": 23,
+              "name": "Caps",
+              "query": {
+                "query": {
+                  "value": ":name-asc:allCategories:220000:category:220600"
+                },
+                "url": "/search?q=%3Aname-asc%3AallCategories%3A220000%3Acategory%3A220600"
+              },
+              "selected": false
+            },
+            {
+              "count": 26,
+              "name": "Gloves",
+              "query": {
+                "query": {
+                  "value": ":name-asc:allCategories:220000:category:190700"
+                },
+                "url": "/search?q=%3Aname-asc%3AallCategories%3A220000%3Acategory%3A190700"
+              },
+              "selected": false
+            },
+            {
+              "count": 26,
+              "name": "Snowwear men",
+              "query": {
+                "query": {
+                  "value": ":name-asc:allCategories:220000:category:190000"
+                },
+                "url": "/search?q=%3Aname-asc%3AallCategories%3A220000%3Acategory%3A190000"
+              },
+              "selected": false
+            },
+            {
+              "count": 10,
+              "name": "Socks",
+              "query": {
+                "query": {
+                  "value": ":name-asc:allCategories:220000:category:221100"
+                },
+                "url": "/search?q=%3Aname-asc%3AallCategories%3A220000%3Acategory%3A221100"
+              },
+              "selected": false
+            },
+            {
+              "count": 27,
+              "name": "Streetwear men",
+              "query": {
+                "query": {
+                  "value": ":name-asc:allCategories:220000:category:250000"
+                },
+                "url": "/search?q=%3Aname-asc%3AallCategories%3A220000%3Acategory%3A250000"
+              },
+              "selected": false
+            },
+            {
+              "count": 1,
+              "name": "Videocamera",
+              "query": {
+                "query": {
+                  "value": ":name-asc:allCategories:220000:category:222000"
+                },
+                "url": "/search?q=%3Aname-asc%3AallCategories%3A220000%3Acategory%3A222000"
+              },
+              "selected": false
+            },
+            {
+              "count": 9,
+              "name": "Watches",
+              "query": {
+                "query": {
+                  "value": ":name-asc:allCategories:220000:category:340000"
+                },
+                "url": "/search?q=%3Aname-asc%3AallCategories%3A220000%3Acategory%3A340000"
+              },
+              "selected": false
+            }
+          ],
+          "visible": true
+        },
+        {
+          "category": true,
+          "multiSelect": false,
+          "name": "Brand",
+          "priority": 100,
+          "values": [
+            {
+              "count": 1,
+              "name": "Billabong",
+              "query": {
+                "query": {
+                  "value": ":name-asc:allCategories:220000:brand:Billabong"
+                },
+                "url": "/search?q=%3Aname-asc%3AallCategories%3A220000%3Abrand%3ABillabong"
+              },
+              "selected": false
+            },
+            {
+              "count": 7,
+              "name": "Blue Tomato",
+              "query": {
+                "query": {
+                  "value": ":name-asc:allCategories:220000:brand:Blue+Tomato"
+                },
+                "url": "/search?q=%3Aname-asc%3AallCategories%3A220000%3Abrand%3ABlue%2BTomato"
+              },
+              "selected": false
+            },
+            {
+              "count": 43,
+              "name": "Burton",
+              "query": {
+                "query": {
+                  "value": ":name-asc:allCategories:220000:brand:Burton"
+                },
+                "url": "/search?q=%3Aname-asc%3AallCategories%3A220000%3Abrand%3ABurton"
+              },
+              "selected": false
+            },
+            {
+              "count": 2,
+              "name": "DC",
+              "query": {
+                "query": {
+                  "value": ":name-asc:allCategories:220000:brand:DC"
+                },
+                "url": "/search?q=%3Aname-asc%3AallCategories%3A220000%3Abrand%3ADC"
+              },
+              "selected": false
+            },
+            {
+              "count": 7,
+              "name": "Element",
+              "query": {
+                "query": {
+                  "value": ":name-asc:allCategories:220000:brand:Element"
+                },
+                "url": "/search?q=%3Aname-asc%3AallCategories%3A220000%3Abrand%3AElement"
+              },
+              "selected": false
+            },
+            {
+              "count": 9,
+              "name": "Elm",
+              "query": {
+                "query": {
+                  "value": ":name-asc:allCategories:220000:brand:Elm"
+                },
+                "url": "/search?q=%3Aname-asc%3AallCategories%3A220000%3Abrand%3AElm"
+              },
+              "selected": false
+            },
+            {
+              "count": 2,
+              "name": "Foursquare",
+              "query": {
+                "query": {
+                  "value": ":name-asc:allCategories:220000:brand:Foursquare"
+                },
+                "url": "/search?q=%3Aname-asc%3AallCategories%3A220000%3Abrand%3AFoursquare"
+              },
+              "selected": false
+            },
+            {
+              "count": 4,
+              "name": "Fox",
+              "query": {
+                "query": {
+                  "value": ":name-asc:allCategories:220000:brand:Fox"
+                },
+                "url": "/search?q=%3Aname-asc%3AallCategories%3A220000%3Abrand%3AFox"
+              },
+              "selected": false
+            },
+            {
+              "count": 1,
+              "name": "GoPro Cam",
+              "query": {
+                "query": {
+                  "value": ":name-asc:allCategories:220000:brand:GoPro+Cam"
+                },
+                "url": "/search?q=%3Aname-asc%3AallCategories%3A220000%3Abrand%3AGoPro%2BCam"
+              },
+              "selected": false
+            },
+            {
+              "count": 10,
+              "name": "Landing",
+              "query": {
+                "query": {
+                  "value": ":name-asc:allCategories:220000:brand:Landing"
+                },
+                "url": "/search?q=%3Aname-asc%3AallCategories%3A220000%3Abrand%3ALanding"
+              },
+              "selected": false
+            },
+            {
+              "count": 10,
+              "name": "Nixon",
+              "query": {
+                "query": {
+                  "value": ":name-asc:allCategories:220000:brand:Nixon"
+                },
+                "url": "/search?q=%3Aname-asc%3AallCategories%3A220000%3Abrand%3ANixon"
+              },
+              "selected": false
+            },
+            {
+              "count": 12,
+              "name": "Oakley",
+              "query": {
+                "query": {
+                  "value": ":name-asc:allCategories:220000:brand:Oakley"
+                },
+                "url": "/search?q=%3Aname-asc%3AallCategories%3A220000%3Abrand%3AOakley"
+              },
+              "selected": false
+            },
+            {
+              "count": 15,
+              "name": "Quiksilver",
+              "query": {
+                "query": {
+                  "value": ":name-asc:allCategories:220000:brand:Quiksilver"
+                },
+                "url": "/search?q=%3Aname-asc%3AallCategories%3A220000%3Abrand%3AQuiksilver"
+              },
+              "selected": false
+            },
+            {
+              "count": 4,
+              "name": "VIVO",
+              "query": {
+                "query": {
+                  "value": ":name-asc:allCategories:220000:brand:VIVO"
+                },
+                "url": "/search?q=%3Aname-asc%3AallCategories%3A220000%3Abrand%3AVIVO"
+              },
+              "selected": false
+            },
+            {
+              "count": 13,
+              "name": "Volcom",
+              "query": {
+                "query": {
+                  "value": ":name-asc:allCategories:220000:brand:Volcom"
+                },
+                "url": "/search?q=%3Aname-asc%3AallCategories%3A220000%3Abrand%3AVolcom"
+              },
+              "selected": false
+            },
+            {
+              "count": 1,
+              "name": "Von Zipper",
+              "query": {
+                "query": {
+                  "value": ":name-asc:allCategories:220000:brand:Von+Zipper"
+                },
+                "url": "/search?q=%3Aname-asc%3AallCategories%3A220000%3Abrand%3AVon%2BZipper"
+              },
+              "selected": false
+            },
+            {
+              "count": 6,
+              "name": "droid.",
+              "query": {
+                "query": {
+                  "value": ":name-asc:allCategories:220000:brand:droid"
+                },
+                "url": "/search?q=%3Aname-asc%3AallCategories%3A220000%3Abrand%3Adroid"
+              },
+              "selected": false
+            }
+          ],
+          "visible": true
+        }
+      ],
+      "freeTextSearch": "",
+      "pagination": {
+        "currentPage": 0,
+        "pageSize": 20,
+        "sort": "name-asc",
+        "totalPages": 8,
+        "totalResults": 147
+      },
+      "products": [
+        {
+          "availableForPickup": true,
+          "baseProduct": "94415",
+          "code": "300398794",
+          "images": [
+            {
+              "format": "thumbnail",
+              "imageType": "PRIMARY",
+              "url": "/rest/v2/medias/?context=bWFzdGVyfGltYWdlc3w1MDY5fGltYWdlL2pwZWd8aW1hZ2VzL2g1OC9oYTgvODc5NjUxMjQ4NTQwNi5qcGd8MTRkOGNhYmQ1OGJjMDJjOGE5NmU2ZDg1ODE0NDNlMjM0ZDE5NmRkOTg0Mjg3OTQzNTY4Zjk3ZTU4NjRkYTM5Mw"
+            },
+            {
+              "format": "product",
+              "imageType": "PRIMARY",
+              "url": "/rest/v2/medias/?context=bWFzdGVyfGltYWdlc3wzMTUyNHxpbWFnZS9qcGVnfGltYWdlcy9oZjAvaDc1Lzg3OTY1MTI0MTk4NzAuanBnfDQ3OWRiODk4Nzc2MjNhMWUzMzhkMjFkYjVkMjAxN2VmODk4YWU0YWFmMjExZDM5Mjk0YTA1MmY2NDgxNWJlOTU"
+            }
+          ],
+          "name": "Adapt New Era blacktop 7 1/4",
+          "price": {
+            "currencyIso": "GBP",
+            "formattedValue": "£32.36",
+            "priceType": "BUY",
+            "value": 32.36
+          },
+          "priceRange": {},
+          "stock": {
+            "stockLevelStatus": "inStock"
+          },
+          "url": "/Categories/Accessories/Caps/Adapt-New-Era/p/300398794",
+          "volumePricesFlag": false
+        },
+        {
+          "availableForPickup": false,
+          "baseProduct": "94415",
+          "code": "300398801",
+          "images": [
+            {
+              "format": "thumbnail",
+              "imageType": "PRIMARY",
+              "url": "/rest/v2/medias/?context=bWFzdGVyfGltYWdlc3w1MzU3fGltYWdlL2pwZWd8aW1hZ2VzL2hkMi9oY2UvODc5NjUxMjcxNDc4Mi5qcGd8N2RjOWUwNWUzZTk0ZTEzNjFiMjZiNWQxNGFlYjljZmYzNzE3MmEzN2ExYTcwYjU1NTFhZTJkZDYxMDA3ODJlZQ"
+            },
+            {
+              "format": "product",
+              "imageType": "PRIMARY",
+              "url": "/rest/v2/medias/?context=bWFzdGVyfGltYWdlc3wzMzAzNHxpbWFnZS9qcGVnfGltYWdlcy9oZTUvaDEyLzg3OTY1MTI3ODAzMTguanBnfGJmYjgyNGI1YTkxMjYyMGZlZmJkNjhkYzhlN2RhNTAyNDA0NDllYzJiYzBmNjQyMGVlMzgyNTE0NzUwYmNjNmE"
+            }
+          ],
+          "name": "Adapt New Era blue print 7 3/4",
+          "price": {
+            "currencyIso": "GBP",
+            "formattedValue": "£32.36",
+            "priceType": "BUY",
+            "value": 32.36
+          },
+          "priceRange": {},
+          "stock": {
+            "stockLevel": 0,
+            "stockLevelStatus": "outOfStock"
+          },
+          "url": "/Categories/Accessories/Caps/Adapt-New-Era/p/300398801",
+          "volumePricesFlag": false
+        },
+        {
+          "availableForPickup": true,
+          "baseProduct": "118859",
+          "code": "300608207",
+          "images": [
+            {
+              "format": "thumbnail",
+              "imageType": "PRIMARY",
+              "url": "/rest/v2/medias/?context=bWFzdGVyfGltYWdlc3wzNTg4fGltYWdlL2pwZWd8aW1hZ2VzL2gwYi9oYzQvODc5NjQ2OTgyMTQ3MC5qcGd8ZGM5MThjYjI1Mjg4OWMxYTM4NWU2NjJkYzQ3MzI1NTM4M2FlODZhOGFmNzFkMmU5YjJjMTVhMDQ3YmE1YWFiOQ"
+            },
+            {
+              "format": "product",
+              "imageType": "PRIMARY",
+              "url": "/rest/v2/medias/?context=bWFzdGVyfGltYWdlc3wxNjQ3NXxpbWFnZS9qcGVnfGltYWdlcy9oYjgvaGEyLzg3OTY0Njk3ODg3MDIuanBnfDYxYjA2OWEzMDY4NDZmZDAxYjMwZDhmMTZkNzI2NzdkZmQyMWU2MjViMzhmZGUwYTMyMmFlYzhkYTgzNzFlMzg"
+            }
+          ],
+          "name": "Assortment Web Belt blue black Uni",
+          "price": {
+            "currencyIso": "GBP",
+            "formattedValue": "£20.21",
+            "priceType": "BUY",
+            "value": 20.21
+          },
+          "priceRange": {},
+          "stock": {
+            "stockLevelStatus": "inStock"
+          },
+          "url": "/Categories/Accessories/Belts/Assortment-Web-Belt/p/300608207",
+          "volumePricesFlag": false
+        },
+        {
+          "availableForPickup": true,
+          "baseProduct": "118859",
+          "code": "300785802",
+          "images": [
+            {
+              "format": "thumbnail",
+              "imageType": "PRIMARY",
+              "url": "/rest/v2/medias/?context=bWFzdGVyfGltYWdlc3w1Nzg2fGltYWdlL2pwZWd8aW1hZ2VzL2g0Mi9oOGEvODc5NjQ3MDE0OTE1MC5qcGd8YThhMzlkNTU2ODBkZWE4Y2ZhMTlhYjRhMDQ2OGIxNDNkMjBmNzM1NTZmOWVjYzYwYjQ3NTMyYTE2MGQxOGFlYg"
+            },
+            {
+              "format": "product",
+              "imageType": "PRIMARY",
+              "url": "/rest/v2/medias/?context=bWFzdGVyfGltYWdlc3wzNTE2NnxpbWFnZS9qcGVnfGltYWdlcy9oOTEvaDgwLzg3OTY0NzAxMTYzODIuanBnfGQ5NjJkYTM1ODkyNWI3ODY3MzE5YTYzYjg3OWRkYmRmZjAxZjBjN2RkNWI5Y2RmZjgwY2E0M2MyNzdjZjg0M2E"
+            }
+          ],
+          "name": "Assortment Web Belt blue combo Uni",
+          "price": {
+            "currencyIso": "GBP",
+            "formattedValue": "£20.21",
+            "priceType": "BUY",
+            "value": 20.21
+          },
+          "priceRange": {},
+          "stock": {
+            "stockLevelStatus": "inStock"
+          },
+          "url": "/Categories/Accessories/Belts/Assortment-Web-Belt/p/300785802",
+          "volumePricesFlag": false
+        },
+        {
+          "availableForPickup": true,
+          "baseProduct": "118859",
+          "code": "300608209",
+          "images": [
+            {
+              "format": "thumbnail",
+              "imageType": "PRIMARY",
+              "url": "/rest/v2/medias/?context=bWFzdGVyfGltYWdlc3w0MzI5fGltYWdlL2pwZWd8aW1hZ2VzL2gwNi9oODMvODc5NjQ2OTUyNjU1OC5qcGd8NWYxYTgwMDc4ODMwZGRmYjBhNzJlZjI3NWRmZTBiMmI1MTBiN2ZhODZkYjUxY2Q5OTE2OTFlZjVmMWMyODI1Nw"
+            },
+            {
+              "format": "product",
+              "imageType": "PRIMARY",
+              "url": "/rest/v2/medias/?context=bWFzdGVyfGltYWdlc3wxOTY3M3xpbWFnZS9qcGVnfGltYWdlcy9oZWEvaDA5Lzg3OTY0Njk0MjgyNTQuanBnfGNkY2UzZGQyZTBjMDYzMTBmOGJjN2JlMGZiOTBjNDdiMDY4ZWYyYTYyZWFhNWI0NGE5MzgwNTQ3MDNlY2FhZmE"
+            }
+          ],
+          "name": "Assortment Web Belt drip red Uni",
+          "price": {
+            "currencyIso": "GBP",
+            "formattedValue": "£20.21",
+            "priceType": "BUY",
+            "value": 20.21
+          },
+          "priceRange": {},
+          "stock": {
+            "stockLevelStatus": "inStock"
+          },
+          "url": "/Categories/Accessories/Belts/Assortment-Web-Belt/p/300608209",
+          "volumePricesFlag": false
+        },
+        {
+          "availableForPickup": true,
+          "baseProduct": "118859",
+          "code": "300608208",
+          "images": [
+            {
+              "format": "thumbnail",
+              "imageType": "PRIMARY",
+              "url": "/rest/v2/medias/?context=bWFzdGVyfGltYWdlc3w1MTMyfGltYWdlL2pwZWd8aW1hZ2VzL2hiYi9oNDMvODc5NjQ2OTEzMzM0Mi5qcGd8OTg1MDFkYzJhYWY0OWE4ZWUxNDQwNDA3MWNhMmNiYTZmN2ViZGUyNGEyZmJlMzk1OTVjMDRkYWQ4NWM5Mjc5YQ"
+            },
+            {
+              "format": "product",
+              "imageType": "PRIMARY",
+              "url": "/rest/v2/medias/?context=bWFzdGVyfGltYWdlc3wyNTU2OXxpbWFnZS9qcGVnfGltYWdlcy9oZDcvaGJjLzg3OTY0NjkyMzE2NDYuanBnfDEwOTM2NmEwMzY0YTFmN2Q1YzkxMTQ4NjVlMWQwYjU3MjRlMzc5ZTBkMjU0MmMzMTU5NDNhNTdhM2JiOGEzNTU"
+            }
+          ],
+          "name": "Assortment Web Belt mix Uni",
+          "price": {
+            "currencyIso": "GBP",
+            "formattedValue": "£20.21",
+            "priceType": "BUY",
+            "value": 20.21
+          },
+          "priceRange": {},
+          "stock": {
+            "stockLevelStatus": "inStock"
+          },
+          "url": "/Categories/Accessories/Belts/Assortment-Web-Belt/p/300608208",
+          "volumePricesFlag": false
+        },
+        {
+          "availableForPickup": true,
+          "baseProduct": "111160",
+          "code": "300515779",
+          "images": [
+            {
+              "format": "thumbnail",
+              "imageType": "PRIMARY",
+              "url": "/rest/v2/medias/?context=bWFzdGVyfGltYWdlc3w0Nzg2fGltYWdlL2pwZWd8aW1hZ2VzL2g1Yi9oMGUvODc5NjI2ODEzNDQzMC5qcGd8MGE0NTNjNmZlMGQ4MjIyOGM1M2UxOTg2MjEzMzY4YmMyN2RmZDY5MDkyNmU3NzdkNjY3ZDg0OTI3OWUzNDA3Yw"
+            },
+            {
+              "format": "product",
+              "imageType": "PRIMARY",
+              "url": "/rest/v2/medias/?context=bWFzdGVyfGltYWdlc3wyMzgyMHxpbWFnZS9qcGVnfGltYWdlcy9oNzcvaGZjLzg3OTYyNjgxMDE2NjIuanBnfDgwODY4NzJhYWJlMzgzMDQwNGFmYTE5MGJiN2VmYjQ1NjQzYWE3ZTI4N2Y0OGJmMmU2ZTdjZDRjMzc5Zjk1N2I"
+            }
+          ],
+          "name": "BT Airhole Helgasons Facemask tiedie LXL",
+          "price": {
+            "currencyIso": "GBP",
+            "formattedValue": "£20.21",
+            "priceType": "BUY",
+            "value": 20.21
+          },
+          "priceRange": {},
+          "stock": {
+            "stockLevelStatus": "inStock"
+          },
+          "url": "/Categories/Accessories/Bandanas/BT-Airhole-Helgasons-Facemask/p/300515779",
+          "volumePricesFlag": false
+        },
+        {
+          "availableForPickup": false,
+          "baseProduct": "111160",
+          "code": "300515780",
+          "images": [
+            {
+              "format": "thumbnail",
+              "imageType": "PRIMARY",
+              "url": "/rest/v2/medias/?context=bWFzdGVyfGltYWdlc3w0Nzg2fGltYWdlL2pwZWd8aW1hZ2VzL2g1Yi9oMGUvODc5NjI2ODEzNDQzMC5qcGd8MGE0NTNjNmZlMGQ4MjIyOGM1M2UxOTg2MjEzMzY4YmMyN2RmZDY5MDkyNmU3NzdkNjY3ZDg0OTI3OWUzNDA3Yw"
+            },
+            {
+              "format": "product",
+              "imageType": "PRIMARY",
+              "url": "/rest/v2/medias/?context=bWFzdGVyfGltYWdlc3wyMzgyMHxpbWFnZS9qcGVnfGltYWdlcy9oNzcvaGZjLzg3OTYyNjgxMDE2NjIuanBnfDgwODY4NzJhYWJlMzgzMDQwNGFmYTE5MGJiN2VmYjQ1NjQzYWE3ZTI4N2Y0OGJmMmU2ZTdjZDRjMzc5Zjk1N2I"
+            }
+          ],
+          "name": "BT Airhole Helgasons Facemask tiedie SM",
+          "price": {
+            "currencyIso": "GBP",
+            "formattedValue": "£20.21",
+            "priceType": "BUY",
+            "value": 20.21
+          },
+          "priceRange": {},
+          "stock": {
+            "stockLevel": 0,
+            "stockLevelStatus": "outOfStock"
+          },
+          "url": "/Categories/Accessories/Bandanas/BT-Airhole-Helgasons-Facemask/p/300515780",
+          "volumePricesFlag": false
+        },
+        {
+          "availableForPickup": true,
+          "baseProduct": "111159",
+          "code": "300689173",
+          "images": [
+            {
+              "format": "thumbnail",
+              "imageType": "PRIMARY",
+              "url": "/rest/v2/medias/?context=bWFzdGVyfGltYWdlc3w0NDc2fGltYWdlL2pwZWd8aW1hZ2VzL2hjMy9oNDkvODc5NjI4NjA5MTI5NC5qcGd8MjQ4MTNjYTIyMzY5NTZjNmE3OWQwODgxNzFjY2I5YTkxODJmOWU0NTFlMDNjMjhiYzk0MGZjZDUxNTRiZmM5Ng"
+            },
+            {
+              "format": "product",
+              "imageType": "PRIMARY",
+              "url": "/rest/v2/medias/?context=bWFzdGVyfGltYWdlc3wyMTY5M3xpbWFnZS9qcGVnfGltYWdlcy9oYjYvaGViLzg3OTYyODYxMjQwNjIuanBnfGQyMzMzNGZjNTEwOWRjZDI2ZDMwYzM4N2Y5MzdjM2MwYTRjOTE5ZDU5YjBiYzY4OWNiODNmMmIxMTY5NGNhNmQ"
+            }
+          ],
+          "name": "BT Airhole Splatter Facemask black LXL",
+          "price": {
+            "currencyIso": "GBP",
+            "formattedValue": "£24.26",
+            "priceType": "BUY",
+            "value": 24.26
+          },
+          "priceRange": {},
+          "stock": {
+            "stockLevelStatus": "inStock"
+          },
+          "url": "/Categories/Accessories/Bandanas/BT-Airhole-Splatter-Facemask/p/300689173",
+          "volumePricesFlag": false
+        },
+        {
+          "availableForPickup": true,
+          "baseProduct": "111159",
+          "code": "300689175",
+          "images": [
+            {
+              "format": "thumbnail",
+              "imageType": "PRIMARY",
+              "url": "/rest/v2/medias/?context=bWFzdGVyfGltYWdlc3w0Mzg2fGltYWdlL2pwZWd8aW1hZ2VzL2g3Mi9oZjcvODc5NjI4NTYzMjU0Mi5qcGd8NjFlMzg5NzcwYjgxOTJmYTQ1M2UwYmQ1OTZiMTcxOWU5NmMxNDM2MWVhMDAzZGY3YWY3NjU4ZjcyNDNkYmI0MQ"
+            },
+            {
+              "format": "product",
+              "imageType": "PRIMARY",
+              "url": "/rest/v2/medias/?context=bWFzdGVyfGltYWdlc3wyMjQyNHxpbWFnZS9qcGVnfGltYWdlcy9oYTYvaDgwLzg3OTYyODU1MzQyMzguanBnfGEwYjc5MjhkNWMwY2YwMGQ4NTU4MjMyYzhjM2ZhODM1MDQ0YTFkNmYyOTcwNGI5MmNhYWQ2ZDQyZDM1ODQ0YmE"
+            }
+          ],
+          "name": "BT Airhole Splatter Facemask white LXL",
+          "price": {
+            "currencyIso": "GBP",
+            "formattedValue": "£24.26",
+            "priceType": "BUY",
+            "value": 24.26
+          },
+          "priceRange": {},
+          "stock": {
+            "stockLevelStatus": "inStock"
+          },
+          "url": "/Categories/Accessories/Bandanas/BT-Airhole-Splatter-Facemask/p/300689175",
+          "volumePricesFlag": false
+        },
+        {
+          "availableForPickup": true,
+          "baseProduct": "111159",
+          "code": "300689176",
+          "images": [
+            {
+              "format": "thumbnail",
+              "imageType": "PRIMARY",
+              "url": "/rest/v2/medias/?context=bWFzdGVyfGltYWdlc3w0Mzg2fGltYWdlL2pwZWd8aW1hZ2VzL2g3Mi9oZjcvODc5NjI4NTYzMjU0Mi5qcGd8NjFlMzg5NzcwYjgxOTJmYTQ1M2UwYmQ1OTZiMTcxOWU5NmMxNDM2MWVhMDAzZGY3YWY3NjU4ZjcyNDNkYmI0MQ"
+            },
+            {
+              "format": "product",
+              "imageType": "PRIMARY",
+              "url": "/rest/v2/medias/?context=bWFzdGVyfGltYWdlc3wyMjQyNHxpbWFnZS9qcGVnfGltYWdlcy9oYTYvaDgwLzg3OTYyODU1MzQyMzguanBnfGEwYjc5MjhkNWMwY2YwMGQ4NTU4MjMyYzhjM2ZhODM1MDQ0YTFkNmYyOTcwNGI5MmNhYWQ2ZDQyZDM1ODQ0YmE"
+            }
+          ],
+          "name": "BT Airhole Splatter Facemask white SM",
+          "price": {
+            "currencyIso": "GBP",
+            "formattedValue": "£24.26",
+            "priceType": "BUY",
+            "value": 24.26
+          },
+          "priceRange": {},
+          "stock": {
+            "stockLevelStatus": "inStock"
+          },
+          "url": "/Categories/Accessories/Bandanas/BT-Airhole-Splatter-Facemask/p/300689176",
+          "volumePricesFlag": false
+        },
+        {
+          "availableForPickup": true,
+          "baseProduct": "117204",
+          "code": "300650114",
+          "images": [
+            {
+              "format": "thumbnail",
+              "imageType": "PRIMARY",
+              "url": "/rest/v2/medias/?context=bWFzdGVyfGltYWdlc3wzNjQwfGltYWdlL2pwZWd8aW1hZ2VzL2gxMS9oODUvODc5NjUwNTg2NjI3MC5qcGd8ODI3MGRmMTVkYjk4OTdhZjlhNmExNjI2NjVmZTU5MTMzNzU3YjZlMjBhYTU3ZGVlMjk5NTU4NmYxYzNhMzc5ZA"
+            },
+            {
+              "format": "product",
+              "imageType": "PRIMARY",
+              "url": "/rest/v2/medias/?context=bWFzdGVyfGltYWdlc3wxNTc1N3xpbWFnZS9qcGVnfGltYWdlcy9oMGMvaDUzLzg3OTY1MDU4MDA3MzQuanBnfGI1OGEyNjA0MWFmYjUyOWMzNzMzOWM0NTQ5MGM0M2Q3YzE4NWM2MWM1MTlmNzE4MzljNjE4ZWUxZmU0Mjg5YTM"
+            }
+          ],
+          "name": "BT Contrast Cap black Uni",
+          "price": {
+            "currencyIso": "GBP",
+            "formattedValue": "£11.30",
+            "priceType": "BUY",
+            "value": 11.3
+          },
+          "priceRange": {},
+          "stock": {
+            "stockLevelStatus": "inStock"
+          },
+          "url": "/Brands/Blue-Tomato/BT-Contrast-Cap/p/300650114",
+          "volumePricesFlag": false
+        },
+        {
+          "availableForPickup": true,
+          "baseProduct": "117205",
+          "code": "300564385",
+          "images": [
+            {
+              "format": "thumbnail",
+              "imageType": "PRIMARY",
+              "url": "/rest/v2/medias/?context=bWFzdGVyfGltYWdlc3wzNDI2fGltYWdlL2pwZWd8aW1hZ2VzL2hkZi9oMTIvODc5NjUwNzQ3MTkwMi5qcGd8YTIzOGMzODEwNjUwNGQ2ZmQ4OWMyMDQwMjg2MzcyNTNjNWEzZDMxNjFhOGU1MmU2MDhhN2RkNzJkZDFhYWI0ZA"
+            },
+            {
+              "format": "product",
+              "imageType": "PRIMARY",
+              "url": "/rest/v2/medias/?context=bWFzdGVyfGltYWdlc3wxODM5M3xpbWFnZS9qcGVnfGltYWdlcy9oYzQvaDMxLzg3OTY1MDc1Mzc0MzguanBnfGU0NDExOGYxNTBmYTdkZDJhYjIxNDdkNTY1ZTVjMTU0NjM5ZWQ2YTUxYjRmOTYzZWQwYzEzZTQwZTIxNDUzNDE"
+            }
+          ],
+          "name": "BT Full Splatter Cap white Uni",
+          "price": {
+            "currencyIso": "GBP",
+            "formattedValue": "£11.30",
+            "priceType": "BUY",
+            "value": 11.3
+          },
+          "priceRange": {},
+          "stock": {
+            "stockLevelStatus": "inStock"
+          },
+          "url": "/Brands/Blue-Tomato/BT-Full-Splatter-Cap/p/300564385",
+          "volumePricesFlag": false
+        },
+        {
+          "availableForPickup": true,
+          "baseProduct": "95288",
+          "code": "300409041",
+          "images": [
+            {
+              "format": "thumbnail",
+              "imageType": "PRIMARY",
+              "url": "/rest/v2/medias/?context=bWFzdGVyfGltYWdlc3wzMjg4fGltYWdlL2pwZWd8aW1hZ2VzL2hhNS9oZDcvODc5NjI5MDQxNjY3MC5qcGd8ZGQ3NWNlMzU3NmI0MzlkYjYzOTY1MjQwYmE1YjhhZmFmM2U5N2RlOTdjNWM5YmVmOTUyMjVkYmVmMWE3ZDlhMw"
+            },
+            {
+              "format": "product",
+              "imageType": "PRIMARY",
+              "url": "/rest/v2/medias/?context=bWFzdGVyfGltYWdlc3wxNDkwNnxpbWFnZS9qcGVnfGltYWdlcy9oOGUvaGIxLzg3OTYyOTAzMTgzNjYuanBnfGVmOGI1MTU2ODRkZmFhNDNjZDFkNDJlNDNmMTc0ODdhOGVkZjQ4Mjc2NWMyNmUzNTQ3N2Y2NmQyNDZmODU2YWY"
+            }
+          ],
+          "name": "Buffer II Sock cardinal L",
+          "price": {
+            "currencyIso": "GBP",
+            "formattedValue": "£20.21",
+            "priceType": "BUY",
+            "value": 20.21
+          },
+          "priceRange": {},
+          "stock": {
+            "stockLevelStatus": "inStock"
+          },
+          "url": "/Categories/Accessories/Socks/Buffer-II-Sock/p/300409041",
+          "volumePricesFlag": false
+        },
+        {
+          "availableForPickup": true,
+          "baseProduct": "95288",
+          "code": "300409038",
+          "images": [
+            {
+              "format": "thumbnail",
+              "imageType": "PRIMARY",
+              "url": "/rest/v2/medias/?context=bWFzdGVyfGltYWdlc3wyOTQ4fGltYWdlL2pwZWd8aW1hZ2VzL2g4NC9oOWIvODc5NjI5MDEyMTc1OC5qcGd8MDcyYmFmNDk3NDM1YzU0YzljN2E0YmY1ZmZlNjQxZmMwY2E4YzZmMzgwMzhkYzBlM2IyZjhlMTJlZTE5ZmNjYQ"
+            },
+            {
+              "format": "product",
+              "imageType": "PRIMARY",
+              "url": "/rest/v2/medias/?context=bWFzdGVyfGltYWdlc3wxMjkzNHxpbWFnZS9qcGVnfGltYWdlcy9oZmYvaGNhLzg3OTYyODk5OTA2ODYuanBnfDUyMTNmMjBjNDk4NGU0YTEzMmM3ZWQwYThiOTgwOWQxNDMzYTFiZThkOGE0MWJkODk2YThlYmVlOGU1NzgzMjY"
+            }
+          ],
+          "name": "Buffer II Sock true black L",
+          "price": {
+            "currencyIso": "GBP",
+            "formattedValue": "£20.21",
+            "priceType": "BUY",
+            "value": 20.21
+          },
+          "priceRange": {},
+          "stock": {
+            "stockLevelStatus": "inStock"
+          },
+          "url": "/Categories/Accessories/Socks/Buffer-II-Sock/p/300409038",
+          "volumePricesFlag": false
+        },
+        {
+          "availableForPickup": true,
+          "baseProduct": "95288",
+          "code": "300409039",
+          "images": [
+            {
+              "format": "thumbnail",
+              "imageType": "PRIMARY",
+              "url": "/rest/v2/medias/?context=bWFzdGVyfGltYWdlc3wyOTQ4fGltYWdlL2pwZWd8aW1hZ2VzL2g4NC9oOWIvODc5NjI5MDEyMTc1OC5qcGd8MDcyYmFmNDk3NDM1YzU0YzljN2E0YmY1ZmZlNjQxZmMwY2E4YzZmMzgwMzhkYzBlM2IyZjhlMTJlZTE5ZmNjYQ"
+            },
+            {
+              "format": "product",
+              "imageType": "PRIMARY",
+              "url": "/rest/v2/medias/?context=bWFzdGVyfGltYWdlc3wxMjkzNHxpbWFnZS9qcGVnfGltYWdlcy9oZmYvaGNhLzg3OTYyODk5OTA2ODYuanBnfDUyMTNmMjBjNDk4NGU0YTEzMmM3ZWQwYThiOTgwOWQxNDMzYTFiZThkOGE0MWJkODk2YThlYmVlOGU1NzgzMjY"
+            }
+          ],
+          "name": "Buffer II Sock true black M",
+          "price": {
+            "currencyIso": "GBP",
+            "formattedValue": "£20.21",
+            "priceType": "BUY",
+            "value": 20.21
+          },
+          "priceRange": {},
+          "stock": {
+            "stockLevelStatus": "inStock"
+          },
+          "url": "/Categories/Accessories/Socks/Buffer-II-Sock/p/300409039",
+          "volumePricesFlag": false
+        },
+        {
+          "availableForPickup": true,
+          "baseProduct": "95288",
+          "code": "300409040",
+          "images": [
+            {
+              "format": "thumbnail",
+              "imageType": "PRIMARY",
+              "url": "/rest/v2/medias/?context=bWFzdGVyfGltYWdlc3wyOTQ4fGltYWdlL2pwZWd8aW1hZ2VzL2g4NC9oOWIvODc5NjI5MDEyMTc1OC5qcGd8MDcyYmFmNDk3NDM1YzU0YzljN2E0YmY1ZmZlNjQxZmMwY2E4YzZmMzgwMzhkYzBlM2IyZjhlMTJlZTE5ZmNjYQ"
+            },
+            {
+              "format": "product",
+              "imageType": "PRIMARY",
+              "url": "/rest/v2/medias/?context=bWFzdGVyfGltYWdlc3wxMjkzNHxpbWFnZS9qcGVnfGltYWdlcy9oZmYvaGNhLzg3OTYyODk5OTA2ODYuanBnfDUyMTNmMjBjNDk4NGU0YTEzMmM3ZWQwYThiOTgwOWQxNDMzYTFiZThkOGE0MWJkODk2YThlYmVlOGU1NzgzMjY"
+            }
+          ],
+          "name": "Buffer II Sock true black S",
+          "price": {
+            "currencyIso": "GBP",
+            "formattedValue": "£20.21",
+            "priceType": "BUY",
+            "value": 20.21
+          },
+          "priceRange": {},
+          "stock": {
+            "stockLevel": 4,
+            "stockLevelStatus": "lowStock"
+          },
+          "url": "/Categories/Accessories/Socks/Buffer-II-Sock/p/300409040",
+          "volumePricesFlag": false
+        },
+        {
+          "availableForPickup": false,
+          "baseProduct": "94172",
+          "code": "300396667",
+          "images": [
+            {
+              "format": "thumbnail",
+              "imageType": "PRIMARY",
+              "url": "/rest/v2/medias/?context=bWFzdGVyfGltYWdlc3w0MTk5fGltYWdlL2pwZWd8aW1hZ2VzL2g0Ni9oOWQvODc5NjI4NDI1NjI4Ni5qcGd8NDk0OGM2M2IzNDdiNTY2MjdhODIyYWFkMGNiMjQ2NjkwNzFmZmIwNjNjZTJmNzFjYTQ2ZTc1Y2NmMWM0NmNlYg"
+            },
+            {
+              "format": "product",
+              "imageType": "PRIMARY",
+              "url": "/rest/v2/medias/?context=bWFzdGVyfGltYWdlc3wyMTg5M3xpbWFnZS9qcGVnfGltYWdlcy9oOWMvaDY4Lzg3OTYyODQxNTc5ODIuanBnfDcyZDMxNWQ3N2NkMzUzZTA4Mzc1ODkyODIyODA4MWY3NzE1YTEwY2UwYjg5MWQwYzcwMzZlMDE5OTMxYjUzNjQ"
+            }
+          ],
+          "name": "Camper Beanie black Uni",
+          "price": {
+            "currencyIso": "GBP",
+            "formattedValue": "£16.16",
+            "priceType": "BUY",
+            "value": 16.16
+          },
+          "priceRange": {},
+          "stock": {
+            "stockLevel": 0,
+            "stockLevelStatus": "outOfStock"
+          },
+          "url": "/Categories/Accessories/Beanies/Camper-Beanie/p/300396667",
+          "volumePricesFlag": false
+        },
+        {
+          "availableForPickup": true,
+          "baseProduct": "100988",
+          "code": "300649655",
+          "images": [
+            {
+              "format": "thumbnail",
+              "imageType": "PRIMARY",
+              "url": "/rest/v2/medias/?context=bWFzdGVyfGltYWdlc3w0MDM4fGltYWdlL2pwZWd8aW1hZ2VzL2hlZS9oNzgvODc5NjI4MzUzNTM5MC5qcGd8YWI4NWQ3NjRmOGZlZmM3OTQ0NmUyODYzNzA1OWI2MzVmYTFkOTFmNWE1OTc2NmNhNzlmYTdhYzE5ZGI4ODkyNA"
+            },
+            {
+              "format": "product",
+              "imageType": "PRIMARY",
+              "url": "/rest/v2/medias/?context=bWFzdGVyfGltYWdlc3wxOTc4NHxpbWFnZS9qcGVnfGltYWdlcy9oOGUvaDdlLzg3OTYyODM1NjgxNTguanBnfDQ3Y2U5NDk5ZWVjN2Y4NDYwZjgxMTBmMTc5Y2IzZDM3YTY4YTk5YTIwMjY5Y2QyNzYzYWZmMGNjZWU2NWRiMTM"
+            }
+          ],
+          "name": "Cascata Beanie black/red Uni",
+          "price": {
+            "currencyIso": "GBP",
+            "formattedValue": "£28.31",
+            "priceType": "BUY",
+            "value": 28.31
+          },
+          "priceRange": {},
+          "stock": {
+            "stockLevelStatus": "inStock"
+          },
+          "url": "/Categories/Accessories/Beanies/Cascata-Beanie/p/300649655",
+          "volumePricesFlag": false
+        },
+        {
+          "availableForPickup": false,
+          "baseProduct": "100988",
+          "code": "300444080",
+          "images": [
+            {
+              "format": "thumbnail",
+              "imageType": "PRIMARY",
+              "url": "/rest/v2/medias/?context=bWFzdGVyfGltYWdlc3w0ODAwfGltYWdlL2pwZWd8aW1hZ2VzL2hhMi9oNjMvODc5NjI4Mzc5NzUzNC5qcGd8NjIzYThkMTUyMDM3OTNjNjk2YWNhYjE1ZGM0ZTY3ODFkZjczNzMzZjc4MjgxOGVmNjljNTFmNzVmZWFkMTY4YQ"
+            },
+            {
+              "format": "product",
+              "imageType": "PRIMARY",
+              "url": "/rest/v2/medias/?context=bWFzdGVyfGltYWdlc3wyNTM2OHxpbWFnZS9qcGVnfGltYWdlcy9oNWMvaDA1Lzg3OTYyODM4MzAzMDIuanBnfDBmMzk4OGIwOWQyYWM1YzMxN2E2ZjU1OWIyMWI3YzlkNTQ5ODY3ZjZmM2RiYmM3NDA1YTM0ZWFiMWZmNzc4MDQ"
+            }
+          ],
+          "name": "Cascata Beanie olympian blue Uni",
+          "price": {
+            "currencyIso": "GBP",
+            "formattedValue": "£28.31",
+            "priceType": "BUY",
+            "value": 28.31
+          },
+          "priceRange": {},
+          "stock": {
+            "stockLevel": 0,
+            "stockLevelStatus": "outOfStock"
+          },
+          "url": "/Categories/Accessories/Beanies/Cascata-Beanie/p/300444080",
+          "volumePricesFlag": false
+        }
+      ],
+      "sorts": [
+        {
+          "code": "relevance",
+          "name": "Relevance",
+          "selected": false
+        },
+        {
+          "code": "topRated",
+          "name": "Top Rated",
+          "selected": false
+        },
+        {
+          "code": "name-asc",
+          "name": "Name (ascending)",
+          "selected": true
+        },
+        {
+          "code": "name-desc",
+          "name": "Name (descending)",
+          "selected": false
+        },
+        {
+          "code": "price-asc",
+          "name": "Price (lowest first)",
+          "selected": false
+        },
+        {
+          "code": "price-desc",
+          "name": "Price (highest first)",
+          "selected": false
+        }
+      ]
+    },
+    "rawHeaders": [
+      "Cache-Control",
+      "public, max-age=300",
+      "Content-Type",
+      "application/json",
+      "Date",
+      "Sat, 25 Aug 2018 00:58:02 GMT",
+      "ETag",
+      "\"06fba4a6d72e7bca86c1cd179e98372a0\"",
+      "Server",
+      "Apache-Coyote/1.1",
+      "Strict-Transport-Security",
+      "max-age=16070400 ; includeSubDomains",
+      "X-Content-Type-Options",
+      "nosniff",
+      "X-Frame-Options",
+      "SAMEORIGIN",
+      "X-Total-Count",
+      "147",
+      "X-XSS-Protection",
+      "1; mode=block",
+      "Content-Length",
+      "62409",
+      "Connection",
+      "Close"
+    ]
+  }
+]

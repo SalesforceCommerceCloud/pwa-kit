@@ -1,0 +1,105 @@
+---
+title: Implementing a Custom Scraping Connector
+metaTitle: Implementing a Custom Scraping Connector
+metaDescription: 'Best practices for projects that require a web scraping approach to access ecommerce data.'
+category: Integrations
+minVersion: 2.0.0
+maxVersion: 2.0.0
+featured: false
+---
+
+## Introduction
+
+Some projects may not have access to a readily-available API on their ecommerce backend. In this situation, we recommend implementing a connector by scraping your existing desktop site.
+
+A web scraping approach requires significant setup, because you’ll need to build a custom connector from scratch. You will also need to take care to avoid global browser dependencies in case you want to use your connector outside of a PWA.
+
+Fortunately, we have a lot of experience building web scrapers, and we’ve packaged our utilities into a base connector that you can use as a starting point.
+
+## Best practices
+
+**Implementing your interface**
+
+Your connector is an interface, which means that you will need to write implementations for all of the methods that the connector interface defines.
+
+To reduce bugs later, write your connector methods so that they perform data-centric fetches, not page-centric fetches. For example, rather than storing page-centric content in your state management system, we encourage you to store raw data, such as products and categories. This will allow you to re-use the data on any page, and will avoid any duplication of the data. You will also see far fewer bugs with a data-centric architecture.
+
+**Writing isomorphic JavaScript**
+
+When you write your connector, you’ll need to write _isomorphic_ JavaScript. Isomorphic means that your JavaScript must be able to run on both the client side and the server side. Follow these rules to ensure that your connector runs in both contexts:
+
+1. You must inject the `window` object into the connector’s constructor
+2. You must access any browser globals on `this.window` within the connector
+3. Avoid using any browser-specific API, such as the `window` object
+
+By following these rules, you can swap `window` for a JSDOM instance, essentially giving you an API that you can use to build applications outside of the browser.
+
+**Example**
+
+Consider the following example, for a fictional store at example.com:
+
+```javascript
+import {ScrapingConnector} from '@mobify/commerce-integrations/dist/connectors/scraping-connector'
+
+/**
+ * A web scraping Connector for www.example.com.
+ */
+export class CustomWebScrapingConnector extends ScrapingConnector {
+    constructor({window}) {
+        super({window})
+        this.basePath = 'https://www.example.com'
+    }
+
+    /**
+     * A searchProducts implementation that uses this.agent and this.buildDocument
+     * to fetch a HTML response, build a document and then parse search results
+     * out of the page content.
+     */
+    searchProducts(params) {
+        const url = `${this.basePath}/search/${params.filters.category}?count=${params.count}`
+        return this.agent
+            .get(url)
+            .then((res) => this.buildDocument(res))
+            .then((htmlDoc) => this.parseSearchProducts(htmlDoc))
+    }
+
+    /**
+     * Typically we write parsers a separate methods that use DOM APIs
+     * to parse content out of an HTML response.
+     */
+    parseSearchProducts(htmlDoc) {
+        return {
+            results: htmlDoc.querySelectorAll('.product').map((prod) => ({
+                productName: prod.querySelector('.title').textContent.trim(),
+                price: parseInt(prod.querySelector('.price').textContent.trim())
+            }))
+        }
+    }
+}
+```
+
+Now, we can use the Connector in a browser:
+
+```javascript
+const connector = new CustomWebScrapingConnector({window: window})
+const searchRequest = {filters: {categoryId: 'menswear'}}
+connector.searchProducts(searchRequest).then((result) => {
+    console.log(result)
+})
+```
+
+Or on the server:
+
+```javascript
+import jsdom from 'jsdom'
+
+jsdom.JSDOM.fromURL('https://www.example.com')
+    .then((dom) => new CustomWebScrapingConnector({window: dom.window})
+    .then((connector) => {
+        const searchRequest = {filters: {categoryId: 'menswear'}}
+        return connector.searchProducts(searchRequest)
+    })
+    .then((result) => {console.log(result)})
+```
+
+To continue learning about building a custom web scraping connector, you can find more hands-on code examples in our [Web Scraping guide](/how-to-guides/categories/integrations/writing-a-web-scraping-connector).

@@ -1,0 +1,67 @@
+// MegaMenuItem
+// ===
+
+
+// Root
+// ---
+//
+// 1. This is to turn off a style that comes from the doc theme's styles...
+
+.pw-mega-menu-item {
+    display: block;
+    overflow-x: hidden;
+    margin-bottom: 0; // 1
+
+    &.pw--depth-1,
+    &.pw--depth-2 {
+        flex: 1 1 auto;
+    }
+}
+
+
+// Content
+// ---
+//
+// 1. Only the root level item's content should be hidden by default
+
+.pw-mega-menu-item__content {
+    &.pw--depth-0 {
+        @include visually-hidden; // 1
+    }
+}
+
+
+// Children
+// ---
+//
+// 1. The root level flexes its children into a horizontal layout
+// 2. 1st level items' children (the 2nd level) are hidden by default
+// 3. All items below depth 1 are _visually_ hidden by default. If a 1st depth
+//    item is interacted with, it's children will become revealed
+// 4. Position absolutely relative to the parent MegaMenu component container
+
+.pw-mega-menu-item__children {
+    overflow-x: auto;
+    overflow-y: visible;
+
+    background: $neutral-00;
+
+    &.pw--depth-0 {
+        display: flex; // 1
+    }
+
+    &.pw--depth-1 {
+        position: absolute; // 4
+        right: 0;
+        left: 0;
+        z-index: $z4-depth;
+    }
+
+    &.pw--depth-1.pw--active {
+        display: flex;
+    }
+
+    &.pw--depth-1:not(.pw--active) {
+        @include visually-hidden; // 2, 3
+    }
+}

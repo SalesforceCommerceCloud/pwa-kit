@@ -1,0 +1,32 @@
+// Lockup
+// ===
+//
+// Component description here
+
+
+// Variables
+// ---
+
+
+// Lockup root
+// ---
+
+.pw-lockup {
+    // Root Class. Contains all core styles, typically for the component's
+    // wrapper element.
+}
+
+
+// Modifiers
+// ---
+//
+// 1. Avoid stretching of contents on some devices
+.pw-lockup.pw--is-locked {
+    right: 0; // 1
+    bottom: 0; // 1
+    left: 0; // 1
+
+    overflow: hidden;
+
+    -webkit-overflow-scrolling: auto;
+}

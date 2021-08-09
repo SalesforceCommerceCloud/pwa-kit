@@ -1,0 +1,140 @@
+// Swatch Theme
+// ===
+
+$swatch__border-width: 2px;
+
+// Swatch Item
+// ---
+
+.pw-swatch__item {
+    @if variable-exists('tiny-font-size') {
+        font-size: $tiny-font-size + 1;
+    }
+}
+
+// Swatch Button
+// ---
+//
+// 1. Override default button styles
+
+.pw-swatch__button {
+    padding: 0;
+
+    background: none;
+
+    color: $neutral-40;
+
+    &:active,
+    &:focus {
+        background: none; // 1
+
+        color: $neutral-40; // 1
+    }
+}
+
+
+// Swatch Chip
+// ---
+
+.pw-swatch__chip {
+    border: $swatch__border-width solid $neutral-30;
+
+    background-color: $neutral-00;
+
+    font-weight: $regular-font-weight;
+    font-size: $smaller-font-size;
+
+    transition: 0.2s ease-out border-color;
+}
+
+
+// Swatch Chip Inner
+// ---
+
+.pw-swatch__chip-inner {
+    border: $swatch__border-width solid $neutral-00;
+}
+
+
+// Swatch Item Outer Label
+// ---
+
+.pw-swatch__outer-label {
+    margin-top: $sub-unit;
+
+    line-height: $tiny-line-height;
+    letter-spacing: 0.5px;
+}
+
+
+// State: Active Swatch Button
+// ---
+
+.pw-swatch__button.pw--active {
+    .pw-swatch__chip {
+        border: $swatch__border-width solid $secondary-brand-color;
+    }
+}
+
+
+// State: Disabled Swatch Button
+// ---
+//
+// 1. Override default button [disabled] styles
+
+.pw-swatch__button[disabled] {
+    background: none;
+
+    color: $neutral-30;
+
+    -webkit-text-fill-color: initial; // 1
+}
+
+
+// State: Disabled Chip
+// ---
+//
+// 1. Relative position for absolute positioned 'X' overlay
+// 2. Absolute position 'X' overlay to cover `.pw-swatch__chip` entirely
+// 3. Ensure 'X' overlay sits above swatch chip contents as the 0.8 opacity
+//    puts `pw-swatch__chip-inner` into its own rendering layer
+
+.pw-swatch__chip.pw--disabled {
+    position: relative; // 1
+
+    border-color: $neutral-30;
+
+    color: $neutral-40;
+
+    // Pseudo elements to create the 'X' overlay above the chip
+    &::before,
+    &::after {
+        content: '';
+
+        position: absolute; // 2
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        z-index: $z1-depth; // 3
+
+        display: block;
+    }
+
+    &::before {
+        background: linear-gradient(to top left, transparent 48.5%, $neutral-30, transparent 52.5%);
+    }
+
+    &::after {
+        background: linear-gradient(
+            to top right,
+            transparent 48.5%,
+            $neutral-30,
+            transparent 52.5%
+        );
+    }
+
+    .pw-swatch__chip-inner {
+        opacity: 0.8;
+    }
+}

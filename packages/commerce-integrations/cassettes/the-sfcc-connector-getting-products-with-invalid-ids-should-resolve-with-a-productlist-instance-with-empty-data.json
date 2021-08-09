@@ -1,0 +1,41 @@
+[
+    {
+        "scope": "https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com:443",
+        "method": "GET",
+        "path": "/s/RefArch/dw/shop/v20_4/products/(1,2)?expand=availability%2Cprices%2Cvariations%2Cimages&all_images=true",
+        "body": "",
+        "status": 200,
+        "response": {
+            "_v": "20.4",
+            "_type": "product_result",
+            "count": 0,
+            "total": 0
+        },
+        "rawHeaders": [
+            "accept-ranges",
+            "bytes",
+            "x-dw-request-base-id",
+            "OgHGv3F_GF9QXzMK",
+            "allow",
+            "GET,HEAD,OPTIONS",
+            "x-content-type-options",
+            "nosniff",
+            "cache-control",
+            "max-age=60,must-revalidate",
+            "jweb",
+            "y",
+            "content-type",
+            "application/json;charset=UTF-8",
+            "content-length",
+            "58",
+            "date",
+            "Wed, 22 Jul 2020 18:03:29 GMT",
+            "server",
+            "istio-envoy",
+            "x-envoy-upstream-service-time",
+            "13",
+            "connection",
+            "close"
+        ]
+    }
+]

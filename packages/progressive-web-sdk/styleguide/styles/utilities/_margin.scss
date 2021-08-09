@@ -1,0 +1,152 @@
+// Margin
+// ===
+
+// Miscellanous
+// ---
+
+.u-margin-0 {
+    margin: 0 !important;
+}
+
+.u-margin-center {
+    margin: 0 auto !important;
+}
+
+
+// Vertical Margins
+// ---
+//
+// Granular control over vertical spacing independent of a component. Includes
+// values based on global spacing.
+//
+// Suffixes:
+// 0:  none
+// sm: small
+// md: medium
+// lg: large
+
+.u-margin-top-0 {
+    margin-top: 0 !important;
+}
+
+.u-margin-top {
+    margin-top: $unit !important;
+}
+
+.u-margin-top-sm {
+    margin-top: ($unit / 2) !important;
+}
+
+.u-margin-top-md {
+    margin-top: $unit * 1.5 !important;
+}
+
+.u-margin-top-lg {
+    margin-top: $unit * 2 !important;
+}
+
+.u-margin-bottom-0 {
+    margin-bottom: 0 !important;
+}
+
+.u-margin-bottom {
+    margin-bottom: $unit !important;
+}
+
+.u-margin-bottom-sm {
+    margin-bottom: ($unit / 2) !important;
+}
+
+.u-margin-bottom-md {
+    margin-bottom: $unit * 1.5 !important;
+}
+
+.u-margin-bottom-lg {
+    margin-bottom: $unit * 2 !important;
+}
+
+
+// Horizontal Margins
+// ---
+//
+// Granular control over horizontal spacing independent of a component. Includes
+// values based on global spacing, and adds values based on relative typographic
+// sizes.
+//
+// `start` and `end` are writing-direction independent forms for `left` and
+// `right`. For right-to-left localizations, create an alternate version of this
+// stylesheet with the property directions reversed.
+//
+// Suffixes:
+//
+// 0:  none
+// th: thick space (about 1.5× a “normal” word space)
+// en: en space (half an em)
+// em: em space
+// sm: small
+// md: medium
+// lg: large
+
+.u-margin-start-0 {
+    margin-left: 0 !important;
+}
+
+.u-margin-start {
+    margin-left: $unit !important;
+}
+
+.u-margin-start-th {
+    margin-left: 0.333em !important;
+}
+
+.u-margin-start-en {
+    margin-left: 0.5em !important;
+}
+
+.u-margin-start-em {
+    margin-left: 1em !important;
+}
+
+.u-margin-start-sm {
+    margin-left: ($unit / 2) !important;
+}
+
+.u-margin-start-md {
+    margin-left: $unit * 1.5 !important;
+}
+
+.u-margin-start-lg {
+    margin-left: $unit * 2 !important;
+}
+
+.u-margin-end-0 {
+    margin-right: 0 !important;
+}
+
+.u-margin-end {
+    margin-right: $unit !important;
+}
+
+.u-margin-end-th {
+    margin-right: 0.333em !important;
+}
+
+.u-margin-end-en {
+    margin-right: 0.5em !important;
+}
+
+.u-margin-end-em {
+    margin-right: 1em !important;
+}
+
+.u-margin-end-sm {
+    margin-right: ($unit / 2) !important;
+}
+
+.u-margin-end-md {
+    margin-right: $unit * 1.5 !important;
+}
+
+.u-margin-end-lg {
+    margin-right: $unit * 2 !important;
+}

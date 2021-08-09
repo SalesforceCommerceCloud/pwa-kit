@@ -1,0 +1,62 @@
+---
+title: SkeletonText
+metaTitle: SkeletonText
+metaDescription: SkeletonText
+---
+
+import SkeletonText from 'progressive-web-sdk/dist/components/skeleton-text'
+import PropsTable from '../../../../src/components/propstable'
+import Tabs from 'progressive-web-sdk/dist/components/tabs/tabs'
+import TabsPanel from 'progressive-web-sdk/dist/components/tabs/tabs-panel'
+
+<div class="component-intro">
+
+A skeleton component which mimics lines of text on a page. Internally, it uses [SkeletonInline](SkeletonInline).
+
+This type of skeleton component is most useful when you need to mimic multiple lines of text, such as paragraphs or blocks of information.
+
+Related components: [SkeletonBlock](SkeletonBlock) and [SkeletonInline](SkeletonInline).
+
+</div>
+
+<div onClick={(e) => {e.stopPropagation()}}>
+<Tabs activeIndex={0} className="devcenter">
+<TabsPanel title="Code" onClick={(e) => {e.stopPropagation()}}>
+
+### JavaScript import
+
+```jsx
+import SkeletonText from 'progressive-web-sdk/dist/components/skeleton-text'
+```
+
+### SCSS import
+
+```scss
+@import 'node_modules/progressive-web-sdk/dist/components/skeleton-text/base';
+```
+
+### Props table
+
+<PropsTable propMetaData={props.componentMetadata.childrenComponentProp} />
+
+### Basic example
+
+```jsx react-live=true
+<SkeletonText />
+```
+
+### With five lines of heading text
+
+```jsx react-live=true
+<SkeletonText type="h2" lines={5} width="50%" />
+```
+
+### With 3 Lines of text with custom line height
+
+```jsx react-live=true
+<SkeletonText lines={3} width="50%" style={{lineHeight: '2em'}} />
+```
+
+</TabsPanel>
+</Tabs>
+</div>

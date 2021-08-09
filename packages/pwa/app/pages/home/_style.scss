@@ -1,0 +1,17 @@
+// Home
+// ===
+//
+// 1. Generates svg-background for visualizing and debugging Susy grids
+// 2. Update grid set up for larger breakpoints
+
+.t-home {
+    min-height: 100%;
+
+    background: susy-svg-grid() no-repeat scroll; // 1
+}
+
+@include susy-breakpoint($medium-breakpoint, $medium-layout) {
+    .t-home {
+        background: susy-svg-grid(); // 2
+    }
+}

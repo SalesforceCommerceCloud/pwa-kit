@@ -1,0 +1,11 @@
+{{#if exceptions~}}
+<div className="jsdoc-throws">
+
+**Throws**:
+
+{{#each exceptions~}}
+{{#if type.names}}{{>linked-type-list types=type.names}} {{/if}}{{{escapeUnsafeSyntax description}}}
+
+{{/each}}
+</div>
+{{/if}}

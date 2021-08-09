@@ -1,0 +1,111 @@
+// Progress Steps
+// ===
+
+// Root
+// ---
+//
+// 1. Reset list style
+
+.pw-progress-steps {
+    display: flex;
+    max-width: $max-width;
+    margin: 0; // 1
+    padding: 0; // 1
+
+    list-style: none; // 1
+}
+
+
+// Progress Step Item
+// ---
+//
+// 1. Ensure items are equal width
+// 2. Visually hiding the pseudo line so progress badge
+//    stays centered.
+// 3. Ensure that inaccessible steps don't have a pointer cursor
+
+.pw-progress-steps__item {
+    flex: 1 1 auto;
+    width: 100%; // 1
+
+    text-align: center;
+
+    &:first-child {
+        .pw-progress-steps__number::before {
+            opacity: 0; // 2
+        }
+    }
+
+    &:last-child {
+        .pw-progress-steps__number::after {
+            opacity: 0; // 2
+        }
+    }
+
+    &:not(.pw--completed):not(.pw--current) {
+        .pw-progress-steps__step {
+            cursor: default; // 3
+        }
+    }
+}
+
+
+// Progress Step
+// ---
+//
+// 1. Element could be `<a>` tag. Display block for flexbox
+//    compatibility
+
+.pw-progress-steps__step {
+    display: block; // 1
+}
+
+
+// Progress Number
+// ---
+//
+// 1. Pseudo progress line
+
+.pw-progress-steps__number {
+    position: relative;
+
+    display: flex;
+    align-items: center;
+
+    &::before,
+    &::after {
+        // 1
+        content: '';
+
+        display: block;
+        flex: 1 1 auto;
+        border-top: 1px solid #ddd;
+    }
+}
+
+
+// Progress Badge
+// ---
+
+.pw-progress-steps__badge {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 48px;
+    height: 48px;
+    border: 1px solid #ddd;
+
+    border-radius: 100%;
+    background: white;
+}
+
+
+// Progress Step Title
+// ---
+
+.pw-progress-steps__title {
+    margin-top: 8px;
+    padding: 0 16px;
+
+    word-break: break-word;
+}

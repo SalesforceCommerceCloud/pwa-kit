@@ -1,0 +1,85 @@
+[
+  {
+    "scope": "https://hybris.merlinspotions.com:443",
+    "method": "POST",
+    "path": "/authorizationserver/oauth/token",
+    "body": "client_id=mobile_android&client_secret=secret&grant_type=client_credentials",
+    "status": 200,
+    "response": {
+      "access_token": "bd005ccf-f46d-48be-b717-5cb112961c23",
+      "token_type": "bearer",
+      "expires_in": 12182,
+      "scope": "merlinspotions"
+    },
+    "rawHeaders": [
+      "Cache-Control",
+      "no-store",
+      "Content-Type",
+      "application/json;charset=UTF-8",
+      "Date",
+      "Sat, 25 Aug 2018 00:58:14 GMT",
+      "Pragma",
+      "no-cache",
+      "Server",
+      "Apache-Coyote/1.1",
+      "Set-Cookie",
+      "JSESSIONID=124F0BCEDEF895F3DF40E0000E88E457; Path=/authorizationserver; Secure; HttpOnly",
+      "Strict-Transport-Security",
+      "max-age=31536000 ; includeSubDomains",
+      "X-Content-Type-Options",
+      "nosniff",
+      "X-Frame-Options",
+      "SAMEORIGIN",
+      "X-XSS-Protection",
+      "1; mode=block",
+      "Content-Length",
+      "121",
+      "Connection",
+      "Close"
+    ]
+  },
+  {
+    "scope": "https://hybris.merlinspotions.com:443",
+    "method": "GET",
+    "path": "/rest/v2/apparel-uk/users/anonymous?fields=FULL",
+    "body": "",
+    "status": 200,
+    "response": {
+      "type": "userWsDTO",
+      "name": "Anonymous",
+      "uid": "anonymous",
+      "currency": {
+        "active": true,
+        "isocode": "JPY",
+        "name": "Japanese Yen",
+        "symbol": "¥"
+      },
+      "firstName": "Anonymous",
+      "lastName": ""
+    },
+    "rawHeaders": [
+      "Cache-Control",
+      "private",
+      "Content-Type",
+      "application/json",
+      "Date",
+      "Sat, 25 Aug 2018 00:58:14 GMT",
+      "ETag",
+      "\"012a88e11593fc79d07272fafd2825ce0\"",
+      "Server",
+      "Apache-Coyote/1.1",
+      "Strict-Transport-Security",
+      "max-age=16070400 ; includeSubDomains",
+      "X-Content-Type-Options",
+      "nosniff",
+      "X-Frame-Options",
+      "SAMEORIGIN",
+      "X-XSS-Protection",
+      "1; mode=block",
+      "Content-Length",
+      "251",
+      "Connection",
+      "Close"
+    ]
+  }
+]

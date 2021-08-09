@@ -1,0 +1,42 @@
+---
+title: TabsPanel
+metaTitle: TabsPanel
+metaDescription: TabsPanel
+---
+
+import Tabs from 'progressive-web-sdk/dist/components/tabs/tabs'
+import TabsPanel from 'progressive-web-sdk/dist/components/tabs/tabs-panel'
+import PropsTable from '../../../../src/components/propstable'
+
+<div class="component-intro">
+
+This component is used inside the [Tabs](Tabs) component as its children.
+
+Related component: [Tabs](Tabs).
+
+</div>
+
+<div onClick={(e) => {e.stopPropagation()}}>
+<Tabs activeIndex={0} className="devcenter">
+<TabsPanel title="Code" onClick={(e) => {e.stopPropagation()}}>
+
+### JavaScript import
+
+```jsx
+import {Tabs, TabsPanel} from 'progressive-web-sdk/dist/components/tabs'
+```
+
+### SCSS import
+
+```scss
+@import 'node_modules/progressive-web-sdk/dist/components/tabs/base';
+```
+
+### Props table
+
+<PropsTable propMetaData={props.componentMetadata.childrenComponentProp} />
+
+</TabsPanel>
+</Tabs>
+</div>
+

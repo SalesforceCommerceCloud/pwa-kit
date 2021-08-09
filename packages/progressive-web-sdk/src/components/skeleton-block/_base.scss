@@ -1,0 +1,15 @@
+// SkeletonBlock
+// ===
+//
+// A skeleton component that can be used to mimic block-level elements, such as images or DIVs.
+
+// SkeletonBlock root
+// ---
+//
+// 1. These values should be overwritten by a project's theme
+
+.pw-skeleton-block {
+    max-width: 100%;
+
+    background: #f6f7f8; // 1
+}

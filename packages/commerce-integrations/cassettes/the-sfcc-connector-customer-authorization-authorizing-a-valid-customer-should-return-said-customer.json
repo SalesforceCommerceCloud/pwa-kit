@@ -1,0 +1,63 @@
+[
+    {
+        "scope": "https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com:443",
+        "method": "POST",
+        "path": "/s/RefArch/dw/shop/v20_4/customers/auth",
+        "body": {
+            "type": "credentials"
+        },
+        "status": 200,
+        "response": {
+            "_v": "20.4",
+            "_type": "customer",
+            "auth_type": "registered",
+            "birthday": "1988-10-21",
+            "creation_date": "2015-05-18T19:19:51.000Z",
+            "customer_id": "abB3TGQ9d1CrrJNs9paoGwWb2M",
+            "customer_no": "D00000001",
+            "email": "testuser1@demandware.com",
+            "enabled": true,
+            "first_name": "Test1",
+            "gender": 2,
+            "last_login_time": "2020-07-22T18:03:31.131Z",
+            "last_modified": "2020-07-22T18:03:31.131Z",
+            "last_name": "User1",
+            "last_visit_time": "2020-07-22T18:03:31.131Z",
+            "login": "testuser1@demandware.com",
+            "previous_login_time": "2020-07-22T18:03:22.176Z",
+            "previous_visit_time": "2020-07-22T18:03:22.176Z"
+        },
+        "rawHeaders": [
+            "accept-ranges",
+            "bytes",
+            "x-dw-request-base-id",
+            "OgHNv3N_GF9QXzMK",
+            "allow",
+            "DELETE,OPTIONS,POST",
+            "x-content-type-options",
+            "nosniff",
+            "authorization",
+            "Bearer eyJfdiI6IjEiLCJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfdiI6IjEiLCJleHAiOjE1OTU0NDI4MTEsImlhdCI6MTU5NTQ0MTAxMSwiaXNzIjoiYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhIiwic3ViIjoie1wiX3ZcIjpcIjFcIixcImN1c3RvbWVyX2luZm9cIjp7XCJjdXN0b21lcl9pZFwiOlwiYWJCM1RHUTlkMUNyckpOczlwYW9Hd1diMk1cIixcImd1ZXN0XCI6ZmFsc2V9fSJ9.dl8XgldAVo8SGRDrrSAdnbD_tnRnfYwIrohjhsPW78JgTif2kukQqnB74RgKHRx6U5CTBee8ktTVwqnmtguRT1Izs8ks36bbFcDsAsDTtvg6rmvyWGVrkDKWMo-LrU2fdMGnqkus5ghjBh24hTR3veQI38pvTfH4j3oaucbjiNjwkUGCPs_LS_JYaTNhkdqjlRDBcyYo3h8ArKx_5YJK18aynZ00coTdezBKLTzMb7ByQTjiYk7tOi-7SSgrri89gY8EIYV9uqACQCuRVCbuc1GYu0OFr_RipfeglkIeO9tSFneyECtAPQ_Ly1PDNzHvtp359miVwM_kT5t5WVrsd6W67x0pq1-jyVPIrZhjQTm9okARuuH2_pOzYA0DKp4RRxgQTTWGUZhOfNSS6EZ_9aZdoFrPb1wXcfW9WoJ0HZyJTCd-8-Pv9Fr1gdRZa8S-tD37j0S2vPZ-z5AhNxsoTXkrTLboDu4mdVlyZPBbnoI",
+            "cache-control",
+            "no-cache, no-store, must-revalidate",
+            "pragma",
+            "no-cache",
+            "expires",
+            "Thu, 01 Dec 1994 16:00:00 GMT",
+            "jweb",
+            "y",
+            "content-type",
+            "application/json;charset=UTF-8",
+            "content-length",
+            "561",
+            "date",
+            "Wed, 22 Jul 2020 18:03:31 GMT",
+            "server",
+            "istio-envoy",
+            "x-envoy-upstream-service-time",
+            "22",
+            "connection",
+            "close"
+        ]
+    }
+]

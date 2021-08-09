@@ -1,0 +1,124 @@
+// Accordion theme
+// ===
+
+$accordion__border: 1px solid $light-border-color;
+$accordion__padding: $unit*1.5;
+
+
+// Item
+// ---
+
+.pw-accordion__item {
+    border-bottom: $accordion__border;
+
+    &:first-child {
+        border-top: $accordion__border;
+    }
+}
+
+
+// Header
+// ---
+
+.pw-accordion__header {
+    font-weight: $semi-bold-font-weight;
+}
+
+
+// Inner Header
+// ---
+//
+// 1. Relative position for absolute positioned separator
+// 2. Separator between accordion header and content
+
+.pw-accordion__inner-header {
+    position: relative; // 1
+
+    overflow: hidden;
+    min-height: $tap-size;
+
+    // 2
+    &::after {
+        content: '';
+
+        position: absolute; // 1
+        right: 0;
+        bottom: 0;
+        left: $accordion__padding;
+
+        display: block;
+        border-top: 1px solid $neutral-10;
+    }
+}
+
+
+// Icon
+// ---
+
+.pw-accordion__icon {
+    flex: 0 0 auto;
+    width: $tap-size;
+    height: $tap-size;
+}
+
+
+// Open and Close Icon
+// ---
+
+.pw-accordion__open-icon,
+.pw-accordion__close-icon {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: $tap-size;
+    height: $tap-size;
+}
+
+
+// Glyph
+// ---
+
+.pw-accordion__glyph {
+    flex: 0 0 auto;
+
+    color: $secondary-brand-color;
+}
+
+
+// Title
+// ---
+
+.pw-accordion__title {
+    display: flex;
+    align-items: center;
+    padding: $accordion__padding $accordion__padding $accordion__padding 0;
+}
+
+
+// Content
+// ---
+
+.pw-accordion__content {
+    padding: $accordion__padding;
+}
+
+
+// States: Closed
+// ---
+//
+// 1. Don't show header and content separator when accordion is closed
+
+.pw-accordion__item:not(.pw-accordion--is-open) .pw-accordion__inner-header::after {
+    opacity: 0; // 1
+}
+
+
+// Modifier: Set icon to end
+// ---
+
+.pw-accordion__inner-header.pw--icon-end {
+    .pw-accordion__title {
+        padding-right: 0;
+        padding-left: $accordion__padding;
+    }
+}

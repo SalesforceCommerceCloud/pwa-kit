@@ -1,0 +1,7 @@
+cassettes
+coverage
+dist
+docs
+node_modules
+scripts
+jest.config.js

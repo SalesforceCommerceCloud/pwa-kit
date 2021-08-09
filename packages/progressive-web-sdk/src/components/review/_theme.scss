@@ -1,0 +1,45 @@
+// Review Theme
+// ===
+
+
+// Review Heading
+// ---
+
+.pw-review__heading {
+    color: $neutral-60;
+    font-weight: $semi-bold-font-weight;
+    font-size: $font-size;
+    line-height: $line-height;
+}
+
+
+// Review Author
+// ---
+
+.pw-review__author {
+    margin: $sub-unit 0;
+}
+
+
+// Review Author Info
+// ---
+
+.pw-review__author-info {
+    margin: 0;
+
+    color: $neutral-50;
+    font-size: $smaller-font-size;
+    line-height: $small-line-height;
+}
+
+
+// Review Content
+// ---
+
+.pw-review__content {
+    margin: $unit 0 0;
+
+    color: $neutral-60;
+    font-size: $font-size;
+    line-height: $line-height;
+}

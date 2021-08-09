@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="113px" height="68px" viewBox="0 0 113 68" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 48.2 (47327) - http://www.bohemiancoding.com/sketch -->
+    <title>arrow</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Components-emptystate" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" transform="translate(-615.000000, -385.000000)">
+        <g id="arrow" transform="translate(616.000000, 385.000000)" stroke="#005C83">
+            <polyline id="Path-3" points="10.6328125 44 0 56.0273438 10.6328125 67.1484375"></polyline>
+            <path d="M110.652344,0 C100.406901,42.3929903 36.7311996,56 0,56" id="Path-2"></path>
+        </g>
+    </g>
+</svg>

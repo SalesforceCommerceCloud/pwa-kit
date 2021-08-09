@@ -1,0 +1,30 @@
+// Heading
+// ===
+
+.u-heading-family {
+    font-family: $header-font-family;
+}
+
+.u-h1 {
+    @extend %h1; // 28px/32px
+}
+
+.u-h2 {
+    @extend %h2; // 24px/28px
+}
+
+.u-h3 {
+    @extend %h3; // 20px/24px
+}
+
+.u-h4 {
+    @extend %h4; // 20px/24px
+}
+
+.u-h5 {
+    @extend %h5; // 16px/20px
+}
+
+.u-h6 {
+    @extend %h6; // 14px/20px
+}

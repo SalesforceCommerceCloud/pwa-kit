@@ -1,0 +1,26 @@
+// Tables
+// ===
+
+table {
+    border-spacing: 0;
+    border-collapse: collapse;
+    width: 100%;
+    margin: $unit 0;
+}
+
+th {
+    padding: $unit 0;
+
+    font-weight: $semi-bold-font-weight;
+    text-align: left;
+}
+
+td {
+    padding: $unit 0;
+}
+
+tr,
+td,
+th {
+    vertical-align: middle;
+}

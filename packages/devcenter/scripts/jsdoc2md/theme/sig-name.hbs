@@ -1,0 +1,16 @@
+{{#if virtual}}*{{/if}}{{#with (parentObject)}}{{#if virtual}}*{{/if~}}{{/with~}}
+{{#if name}}{{#sig~}}
+{{{@depOpen}~}}
+{{{@codeOpen}~}}
+{{#if @prefix}}{{@prefix}} {{/if~}}
+{{#if (isEvent)}}"{{{formatName this }}}"{{else}}{{formatName this}}{{/if~}}
+{{#if @methodSign}}{{#if (isEvent)}} {{@methodSign}}{{else}}{{@methodSign}}{{/if}}{{/if~}}
+{{{@codeClose}}}{{#unless (regexp-test kind 'module|constructor')}}{{ markdownHeadingIdentifier id }}{{/unless}}
+{{#unless (equal kind 'constructor')}}
+{{#if description}}{{{escapeUnsafeSyntax description}}}{{/if}}
+{{/unless}}
+{{{getImportStatement this @root}}}
+{{#if @suffix}} {{@suffix}}{{/if~}}
+{{{@depClose}~}}
+{{~/sig}}{{/if~}}
+{{#if virtual}}*{{/if}}{{#with (parentObject)}}{{#if virtual}}*{{/if~}}{{/with~}}

@@ -1,0 +1,30 @@
+// Share Theme
+// ===
+
+// Sub components
+// ---
+
+.pw-share__sheet-header {
+    padding: $unit * 3;
+
+    color: $neutral-70;
+    font-weight: $medium-font-weight;
+    font-size: $big-font-size;
+}
+
+.pw-share__sheet-content {
+    padding: $unit * 2.5;
+}
+
+.pw-share__option {
+    background-color: transparent;
+}
+
+.pw-share__option-icon {
+    .pw-icon.pw--x-large {
+        width: $unit * 6;
+        height: $unit * 6;
+
+        background-color: transparent;
+    }
+}

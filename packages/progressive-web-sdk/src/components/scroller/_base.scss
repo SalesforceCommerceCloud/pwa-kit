@@ -1,0 +1,24 @@
+// Scroller
+// ===
+
+
+// Scroller Content
+// ---
+//
+// 1. Stop vertical scroll bar that appears by default when scrolling
+
+.pw-scroller__content {
+    position: relative;
+
+    display: flex;
+    overflow-x: scroll;
+    overflow-y: hidden; // 1
+}
+
+
+// Scroller Item Container
+// ---
+
+.pw-scroller__item {
+    flex: 0 0 auto;
+}

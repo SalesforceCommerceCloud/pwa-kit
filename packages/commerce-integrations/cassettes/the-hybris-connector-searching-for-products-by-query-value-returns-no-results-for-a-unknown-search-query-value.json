@@ -1,0 +1,87 @@
+[
+    {
+        "scope": "https://hybris.merlinspotions.com:443",
+        "method": "GET",
+        "path": "/rest/v2/apparel-uk/products/search?query=xxxyyyaaabbb%3A%3A%3Arelevance&pageSize=20&sort=relevance&currentPage=0&fields=FULL",
+        "body": "",
+        "status": 200,
+        "response": {
+            "type": "productCategorySearchPageWsDTO",
+            "breadcrumbs": [],
+            "currentQuery": {
+                "query": {
+                    "value": "xxxyyyaaabbb:relevance"
+                },
+                "url": "/search?q=xxxyyyaaabbb%3Arelevance"
+            },
+            "facets": [],
+            "freeTextSearch": "xxxyyyaaabbb",
+            "pagination": {
+                "currentPage": 0,
+                "pageSize": 20,
+                "sort": "relevance",
+                "totalPages": 0,
+                "totalResults": 0
+            },
+            "products": [],
+            "sorts": [
+                {
+                    "code": "relevance",
+                    "name": "Relevance",
+                    "selected": true
+                },
+                {
+                    "code": "topRated",
+                    "name": "Top Rated",
+                    "selected": false
+                },
+                {
+                    "code": "name-asc",
+                    "name": "Name (ascending)",
+                    "selected": false
+                },
+                {
+                    "code": "name-desc",
+                    "name": "Name (descending)",
+                    "selected": false
+                },
+                {
+                    "code": "price-asc",
+                    "name": "Price (lowest first)",
+                    "selected": false
+                },
+                {
+                    "code": "price-desc",
+                    "name": "Price (highest first)",
+                    "selected": false
+                }
+            ]
+        },
+        "rawHeaders": [
+            "Cache-Control",
+            "public, max-age=300",
+            "Content-Type",
+            "application/json",
+            "Date",
+            "Fri, 28 Sep 2018 18:16:29 GMT",
+            "ETag",
+            "\"0d3ece0df0c131982713ea0c12dd9993c\"",
+            "Server",
+            "Apache-Coyote/1.1",
+            "Strict-Transport-Security",
+            "max-age=16070400 ; includeSubDomains",
+            "X-Content-Type-Options",
+            "nosniff",
+            "X-Frame-Options",
+            "SAMEORIGIN",
+            "X-Total-Count",
+            "0",
+            "X-XSS-Protection",
+            "1; mode=block",
+            "Content-Length",
+            "1038",
+            "Connection",
+            "Close"
+        ]
+    }
+]

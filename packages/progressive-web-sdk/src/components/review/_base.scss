@@ -1,0 +1,32 @@
+// Review
+// ===
+
+.pw-review {
+    padding: $unit*2 $unit*1.5;
+}
+
+
+// Review Header
+// ---
+
+.pw-review__header {
+    display: flex;
+    align-items: center;
+}
+
+
+// Review Heading
+// ---
+
+.pw-review__heading {
+    flex: 1 1 auto;
+    margin-right: $unit*1.5;
+}
+
+
+// Review Rating
+// ---
+
+.pw-review__rating {
+    flex: 0 0 auto;
+}

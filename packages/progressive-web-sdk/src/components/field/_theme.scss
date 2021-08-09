@@ -1,0 +1,99 @@
+// // Field theme
+// // ===
+
+// // Label Wrap
+// // ---
+
+// .pw-field__label-wrap {
+//     display: flex;
+//     align-items: baseline;
+
+//     &:not(.pw--end) {
+//         margin-bottom: $unit;
+//     }
+
+//     &.pw--end {
+//         margin-top: $sub-unit;
+//         margin-left: $unit*1.5;
+//     }
+// }
+
+// // Label
+// // ---
+
+// .pw-field__label {
+//     flex: 0 1 auto;
+// }
+
+// // Hint
+// // ---
+
+// .pw-field__hint {
+//     flex: 1 0 auto;
+//     margin-left: $unit;
+
+//     color: $neutral-50;
+//     font-size: $smaller-font-size;
+//     line-height: $small-line-height;
+//     text-align: right;
+// }
+
+// // Caption
+// // ---
+
+// .pw-field__caption {
+//     margin-top: $sub-unit;
+
+//     color: $neutral-50;
+//     font-size: $smaller-font-size;
+//     line-height: $small-line-height;
+// }
+
+// // Errors
+// // ---
+
+// .pw-field__error {
+//     margin-top: $sub-unit;
+
+//     color: $error-color;
+//     font-size: $smaller-font-size;
+//     line-height: $small-line-height;
+// }
+
+// // Modifier: Error field
+// // ---
+
+// .pw-field.pw--error {
+//     .pw-field__label {
+//         color: $error-color;
+//     }
+
+//     input,
+//     select,
+//     .pw-field__input > * {
+//         border-color: $error-color;
+
+//         &:focus,
+//         &:active {
+//             border-color: $error-color;
+
+//             box-shadow: 0 0 4px 0 $error-color;
+//         }
+//     }
+// }
+
+// // Modifier: Check/Radio field
+// // ---
+// //
+// // 1. Align the caption/error message with label
+
+// .pw-field.pw--is-check-radio {
+//     .pw-field__label {
+//         font-weight: $regular-font-weight;
+//     }
+
+//     .pw-field__error,
+//     .pw-field__caption {
+//         margin-left: $unit*4.5; // 1
+//     }
+// }

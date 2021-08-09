@@ -1,0 +1,48 @@
+[
+    {
+        "scope": "https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com:443",
+        "method": "GET",
+        "path": "/s/RefArch/dw/shop/v20_4/products/1?expand=availability%2Cprices%2Cvariations%2Cimages&all_images=true",
+        "body": "",
+        "status": 404,
+        "response": {
+            "_v": "20.4",
+            "fault": {
+                "arguments": {
+                    "productId": "1",
+                    "siteId": "RefArch"
+                },
+                "type": "ProductNotFoundException",
+                "message": "No product with ID '1' for site 'RefArch' could be found."
+            }
+        },
+        "rawHeaders": [
+            "accept-ranges",
+            "bytes",
+            "x-dw-request-base-id",
+            "OgHEv3B_GF9QXzMK",
+            "x-content-type-options",
+            "nosniff",
+            "cache-control",
+            "no-cache, no-store, must-revalidate",
+            "pragma",
+            "no-cache",
+            "expires",
+            "Thu, 01 Dec 1994 16:00:00 GMT",
+            "jweb",
+            "y",
+            "content-type",
+            "application/json;charset=UTF-8",
+            "content-length",
+            "176",
+            "date",
+            "Wed, 22 Jul 2020 18:03:28 GMT",
+            "server",
+            "istio-envoy",
+            "x-envoy-upstream-service-time",
+            "13",
+            "connection",
+            "close"
+        ]
+    }
+]

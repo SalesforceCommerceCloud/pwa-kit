@@ -1,0 +1,89 @@
+---
+title: IconLabel
+metaTitle: IconLabel
+metaDescription: IconLabel
+---
+
+import IconLabel from 'progressive-web-sdk/dist/components/icon-label'
+import PropsTable from '../../../../src/components/propstable'
+import Tabs from 'progressive-web-sdk/dist/components/tabs/tabs'
+import TabsPanel from 'progressive-web-sdk/dist/components/tabs/tabs-panel'
+
+<div class="component-intro">
+
+An icon and label combination. If no `iconSize` is passed in, the default is medium.
+
+Related components: [Icon](Icon) and [HeaderBar](HeaderBar).
+
+</div>
+
+<div onClick={(e) => {e.stopPropagation()}}>
+<Tabs activeIndex={0} className="devcenter">
+<TabsPanel title="Code" onClick={(e) => {e.stopPropagation()}}>
+
+### JavaScript import
+
+```jsx
+import IconLabel from 'progressive-web-sdk/dist/components/icon-label'
+```
+
+### SCSS import
+
+```scss
+@import 'node_modules/progressive-web-sdk/dist/components/icon-label/base';
+```
+
+### Props table
+
+<PropsTable propMetaData={props.componentMetadata.childrenComponentProp} />
+
+### Basic example
+
+```jsx react-live=true
+<IconLabel label="Close" iconName="close" />
+```
+
+### With render button element
+
+```jsx react-live=true
+<IconLabel
+    label="Add To Cart"
+    iconName="cart"
+    button={{
+        analyticsName: 'analytics-name',
+        onClick: () => alert('Clicked'),
+        buttonInnerClassName: 'inner-class-name',
+        buttonProps: {
+            openInNewTab: true
+        }
+    }}
+/>
+```
+
+</TabsPanel>
+<TabsPanel title="Design" class="markdown">
+
+### Screenshot
+
+![](./images/components/icon-label/iconlabel-uikit.png)
+
+### Potential uses
+
+-   In the header bar, to allow multiple actions to fit within a small space.
+-   Anywhere an icon is used instead of text, and when users may struggle to comprehend the meaning of the icon.
+
+### Accessibility
+
+-   Ensure the label size is small yet legible. Ensure the text size is at least 8px.
+-   Because of the small text size, be extra careful with the color contrast between the label and the background color. [Use this handy tool](http://www.contrastchecker.com) to test contrast.
+
+### Best practices
+
+-   Research has shown that using labels with icons can improve comprehension and interactivity.
+-   Keep labels short. Icons are designed to occupy a small space and a long label will negate this benefit.
+-   Users learn the meaning of an icon through repeat exposure. Consider removing labels once the icon has been seen several times. A good example is the fixed header bar, where labels are removed from the icons after the user starts scrolling.
+-   Don't use labels when multiple instances of the icon exist in the same place. For example, no label is required for the + icons in an accordion.
+
+</TabsPanel>
+</Tabs>
+</div>

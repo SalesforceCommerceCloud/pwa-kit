@@ -1,0 +1,43 @@
+[
+    {
+        "scope": "https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com:443",
+        "method": "GET",
+        "path": "/s/RefArch/dw/shop/v20_4/products/(008884303989M,008884303996M)?expand=availability%2Cprices%2Cvariations%2Cimages&all_images=true",
+        "body": "",
+        "status": 200,
+        "response": [
+            "1f8b0800000000000000ec5b6b6fdb3614fd2b9c3e3b7a59b1250343b166eb80620582a6db8a0c854049b4cd45af91941d27c87fdfa524e7e1784ee4b90e6d10fd524997d797e71e1e5d0127b746383346866b9b9ed13342b128095c96ac48aa58848cf02a15f0202eaa5c1823b76724586063f4d7ed6aac0caa182379bc809bbf5ffc0c376802ffb56ddff7bdbedd0ffce093bc99e1090927aca84afe24d1a307cbb03501f008434923e33cc582e65586dea715411782d19270f40be60b748619411fa81024411753ca04eac1bf14b37a79427918614ec294e65790682a44c9479645920931e1211713332eb28cb098c469512526c729e1e302aee5032b995b7529d6ccb52e2f3f7f086ddbb18adc4a4886f3640e3f6e7201c5c5d689754105e127b82ce16e7a929dc4005f5a4c20768c015ac8d53f0de2c8ef8f9b9cdcaacbb4ce7f351ddb71fbae736a7efcf8c7c0f9fad53cbf34ff2e27b08395c26f6ed8f8046a803af3242aaecd8ac34572bd7917fb2c58509192ee3d33ee7ac7de7dc71bf6632fc02f83f95e8dee6f51f0d6ddffd6336694cc970c685af88c13df4d32fe9c021aca3247ebc6e6c6ed4e3cd4e68156909778206504330a4b8b3cc40256459558118a3501cb01262ed282193207fce88babc23a6c190e31ed66a08cb7d6b31eca4842ab4c3d0e07ae436cc709969468ea5459ccb6a9588129485502385ee40f00b457c0a98c8a75af78578350dbc5bd4f42aab247cbc7de872155a9a085e470e7a1bdcb5a0ff10ca7a97a2c8eecc02103375e72a22e53653ddba26005a62145bb3f4cfafe30f24f5f06531109dba2e05d8d424d0bf73e0929ca1cad1b7b1e8314e5815690439d81de4acfe658c453f5881c8dbda16b3f7c273575ae25c6d9b9124cdea6e223a572c329799be633928b822d8cd123dededf04ee0af865d7ef19118eaf0a9610862309c918a79cb485dec787f2bbf351906015c4948c3c5fc845115f8529999154e6bf037614f9244c088f015cb93548fc5b3123a8a8182212e95822cd8b9426884ba0693e7987be4c498e26b48de36d6730126cf1033ca41cf12a8226a24876ae798ea88cc8690c8bea9f42a240530c39688e16320f308f13818075685eb0ab32c5103b279821201ea20241dd392c917922b82cc632350154eb35e45a308c80ad70214cc024c35c10f618e3f6ce8e0e05b73e93f14f0ce80ca79c4f8b120eb91d7a566b01e0967b6a9fdac3fee0d33b50b1b039013fcaf6dc1717d6adbc8f5bdf4880cc180d4f4ddb868665340feb98f09f0ae7705480444ecfc871d6f9c8c0af95524c8fb4fdf5deb6d212e329ea706ea690f35871021e964fc9d49c96679e96e6b29557e97f9104054a5665bc626c79085aa3a0b9d8db017ca829587b08371eb6defdbe578c3b417d501fde06cb57c56dfbf278780b00b8f4466e1cde75c6dde331e6ad90f0ecbebd2b24ea5c9d91b007aa20e10d778704e4ea8e84af0a1276d00589203083e03f91b0832d4e87a70612b5296f673ae16f8384ad06129eedec4c31eb5cdd91504627dcfeee90805cdd75429e8e1d7dd6b473e2d9765f39edeae64b6b0d046bbe82563bb8bebc7aabf7f92f9aabed8af336155663b9b9a4d57c83cdf9065df3f99bf3f95df381626c4a2805a56342777342b773c2cd2d713ab7c4d9dc13a91cdf9e1e98d74a6fcf88c3e71171c8c898e624830feeb3f6e9bc3d0371f868bdbc9cd3444ce1faf2c9ae5e6f0b6fa64b6d0bd7f64e6d0bd7a64e6d0bd7baa16de15a41b42d5cdbc2b5af53dbc2b59b53dbc2b57c1cca30a42a15b4901cee3ca46de1dadea96de1dad4a96de15a370e640c5294075a410e7506d2b6706d0b3f162a77b5853bd25df23d7de14eed33d6c6706d0c3fd2f66b63f81b19c383c1439036866b63b836866b63b836866b63b836866b63b836866b63b8aac670f77f1ac35d63c5180e25884260f947d877ff020000ffff",
+            "0300d65cdaa2735c0000"
+        ],
+        "rawHeaders": [
+            "accept-ranges",
+            "bytes",
+            "x-dw-request-base-id",
+            "OgHFv3F_GF9QXzMK",
+            "allow",
+            "GET,HEAD,OPTIONS",
+            "x-content-type-options",
+            "nosniff",
+            "cache-control",
+            "max-age=0,no-cache,no-store,must-revalidate",
+            "jweb",
+            "y",
+            "vary",
+            "accept-encoding",
+            "content-encoding",
+            "gzip",
+            "content-type",
+            "application/json;charset=UTF-8",
+            "date",
+            "Wed, 22 Jul 2020 18:03:28 GMT",
+            "server",
+            "istio-envoy",
+            "x-envoy-upstream-service-time",
+            "38",
+            "connection",
+            "close",
+            "transfer-encoding",
+            "chunked"
+        ]
+    }
+]

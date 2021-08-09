@@ -1,0 +1,146 @@
+// Error page
+// ===
+
+.t-error {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: 100vh;
+
+    main {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex: 1 1 auto;
+        padding: 0 gutter();
+    }
+}
+
+// Container
+// ---
+//
+// 1. Max width for error container
+
+.t-error__container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    width: 100%;
+    max-width: $max-width;
+    height: 100%;
+    margin: 0 auto;
+}
+
+@include susy-breakpoint($medium-breakpoint, $medium-layout) {
+    .t-error__container {
+        flex: 0 0 auto;
+    }
+}
+
+// Container flexbox
+// ---
+
+.t-error__container-flexbox {
+    display: block;
+    text-align: center;
+}
+
+@include susy-breakpoint($medium-breakpoint, $medium-layout) {
+    .t-error__container-flexbox {
+        display: flex;
+    }
+}
+
+// Container stack
+// ---
+
+.t-error__container-stack {
+    overflow-x: auto;
+    flex: 1;
+    margin: 0;
+    padding: $unit;
+    background: $neutral-10;
+    color: $primary-action-color;
+    font-family: monospace;
+}
+
+@include susy-breakpoint($medium-breakpoint, $medium-layout) {
+    .t-error__container-stack {
+        padding: $unit * 2;
+    }
+}
+
+// Error Header
+// ---
+
+.t-error__header {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: $header-height;
+
+    background: $neutral-00;
+    background-color: $ui-brand-color;
+
+    color: $neutral-00;
+    line-height: 0;
+}
+
+// Container Icon
+// ---
+
+.t-error__container-cloud {
+    flex: initial;
+    padding: 0;
+}
+
+@include susy-breakpoint($medium-breakpoint, $medium-layout) {
+    .t-error__container-cloud {
+        flex: 1 1 50%;
+        padding: 0 $unit;
+    }
+}
+
+// Container Content
+// ---
+
+.t-error__container-content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    flex: initial;
+    padding: 0;
+}
+
+@include susy-breakpoint($medium-breakpoint, $medium-layout) {
+    .t-error__container-content {
+        flex: 1 1 50%;
+        min-width: 297px;
+        padding: 0 $unit;
+    }
+}
+
+// Cloud icon
+// ---
+//
+// 1. Icon size
+
+.t-error__cloud-icon {
+    display: inline-flex;
+    width: 400px; // 1
+    max-width: 100%;
+    height: auto;
+    max-height: 100%;
+
+    color: $neutral-20;
+
+    pointer-events: none;
+
+    fill: $neutral-20;
+}
+
+@include susy-breakpoint($medium-breakpoint, $medium-layout) {
+    .t-error__cloud-icon {
+        height: 240px; // 1
+    }
+}

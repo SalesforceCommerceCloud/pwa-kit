@@ -1,0 +1,35 @@
+---
+title: Achieving the Perception of Instant Page Transitions with Optimistic UI
+metaTitle: Achieving the Perception of Instant Page Transitions with Optimistic UI
+metaDescription: "Learn how to create the perception of instant page transitions in your Mobify PWA with optimistic UI techniques."
+category: Design
+minVersion: 2.0.0
+maxVersion: 2.0.0
+featured: false
+---
+
+Optimistic UI is a technique you can use to help improve the perceived performance of your app. The technique involves populating the UI with "optimistic data"-- any relevant data that’s already available-- before receiving the real response from the server. Once the response is received, the optimistic data can then be updated. 
+
+One way you can implement optimistic UI is by using your [global state management system](/how-to-guides/categories/state-management/managing-global-state) to store your optimistic data.  Alternatively, you can also implement optimistic UI through a stale-while-revalidate cache like [SWR](https://swr.now.sh/), which is a React Hooks library.
+
+In this article, we’ll show you how to implement optimistic UI for your product details page (PDP) by using the data fetched from when the shopper first visits your product listing page (PLP). 
+
+In this approach, the PLP will retrieve its data as usual but as soon as the response is received, you can parse it and add each product data to the cache indexed by a unique product identifier. 
+
+Notice that the SWR method `mutate()` is used to update the cache with local data at a given cache key. You can use it like this:
+
+```javascript
+import {mutate} from 'swr'
+
+mutate(cache-key, productData)
+```
+
+In your PDP, you can wrap the fetch with the SWR method called `useSWR()`. This will first check the cache at the given unique product identifier for cached data. If any data for that product identifier was cached, then that data will be returned to render the page while the real fetch for the PDP is still occurring in the background. When fresh PDP data is returned, the page will update with the real response.
+
+Notice that the SWR method `useSWR()` is used to fetch your data so that it can be cached at a given cache key. It supports server-side rendering by providing an `initialData` option to populate the data if it’s fetched server-side. You can use it like this:
+
+```javascript
+import useSWR from 'swr'
+
+const { data, error } = useSWR(cache-key, connector.getProductDetails(), { initialData })
+```

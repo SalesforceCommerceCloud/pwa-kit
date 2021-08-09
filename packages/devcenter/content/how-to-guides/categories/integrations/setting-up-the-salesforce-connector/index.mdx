@@ -1,0 +1,59 @@
+---
+title: Setting Up the Salesforce Connector
+metaTitle: Setting Up the Salesforce Connector
+metaDescription: "A step by step guide to set up the Salesforce Connector for projects with a Salesforce Commerce backend."
+category: Integrations
+minVersion: 2.0.0
+maxVersion: 2.0.0
+featured: false
+---
+
+<Callout type="info">
+
+**Note:** All new Salesforce Commerce projects should use the [`SalesforceConnector`](/apis-and-sdks/commerce-integrations/connectors/sfcc).
+
+</Callout>
+
+## Before you begin
+
+Complete the following steps to ensure your setup goes smoothly:
+
+- Complete our [installation instructions](/get-started/#installation)
+- Ensure you have Administrator-level access to your Salesforce Commerce site
+- Brush up on your knowledge about the Salesforce API, OCAPI. Learning the underlying API is an important prerequisite to setting up your Connector. To review, access the [Salesforce documentation](https://documentation.b2c.commercecloud.salesforce.com/DOC1/index.jsp).
+
+## Making your API accessible
+
+You’ll need to setup your backend API to ensure that all your endpoints are accessible.
+
+The OCAPI client allows your Connector to communicate with Salesforce Commerce, supporting up to version 17.8. Here’s how to setup the OCAPI client:
+
+1. Create a new OCAPI client ID, which is described in the [Salesforce documentation](https://documentation.b2c.commercecloud.salesforce.com/DOC1/index.jsp?topic=%2Fcom.demandware.dochelp%2FAccountManager%2FAccountManagerAddAPIClientID.html). Be sure to record the client ID that gets created, as you will need it to configure OCAPI settings and the connector.
+
+2. Update your OCAPI settings in the OCAPI configuration file. (OCAPI settings control which resources are accessible to an authorized user.) To do this, add a client to your OCAPI settings. This client should have access to the resources listed in this file. Here’s an example of a [settings file](./mobify-ocapi-settings.json) with the resources required for our Commerce Integrations.
+
+<Callout type="info">
+
+**Important:** When you set up your OCAPI client, never embed any secret values related to it (like its password) in the bundle.
+
+</Callout>
+
+## Configuring your Salesforce connector instance
+
+When your project gets generated, you get a starting point Connector, which you will be replacing.
+
+To configure and instantiate your instance of the `Salesforce Connector`:
+
+1. Go to `<PROJECT_DIR>/app/connector.js` and import the `SalesforceConnector`.
+2. Extend the connector class and make any customizations you’d like.
+3. Modify the `getConnector` method to return a new instance of your extended connector.
+
+## Common challenges working with Salesforce connector
+
+In the spirit of acknowledging the challenging aspects up front, the most challenging parts of building Mobify Platform projects with a Salesforce backend include cases when:
+
+- Something you want to access is not available in the Shop API
+- The Shop API behavior diverges from the storefront behavior
+- Your project requires using session bridging to sync OCAPI and storefront sessions
+
+For more information check out our [Salesforce Commerce Concepts series](/how-to-guides/categories/integrations/salesforce-commerce-concepts-session-bridging), which is designed to help you tackle the most challenging topics you may encounter while working on a Mobify/Salesforce project.

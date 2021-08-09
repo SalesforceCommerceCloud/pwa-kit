@@ -1,0 +1,20 @@
+// Carousel Theme
+// ===
+//
+// 1. Position context for the child `.pw--side-controls .pw-carousel__previous`
+//    and `.pw--side-controls .pw-carousel__next` elements
+
+.pw-carousel {
+    position: relative; // 1
+}
+
+
+// Carousel Controls
+// ---
+//
+// 1. Hide the carousel slide numbers from being displayed
+
+.pw-carousel__controls {
+    padding-top: $unit * 1.5;
+    padding-bottom: $unit * 1.5;
+}

@@ -1,0 +1,67 @@
+// Example Email Subscribe Form
+// ===
+//
+// 1. Ensure that button align with input field
+// 2. Override flex style
+
+.c-email-subscribe__form-field-input {
+    display: block; // 2
+}
+
+.c-email-subscribe__form-field-inner {
+    display: inline-block;
+    width: 100%;
+}
+
+.c-email-subscribe__form-field-label-wrap {
+    display: flex;
+    flex: 1 1 auto;
+}
+
+.c-email-subscribe__form-field-label {
+    flex: 1 1 auto;
+    margin-bottom: $unit;
+
+    font-weight: $semi-bold-font-weight;
+    font-size: $font-size;
+    line-height: 1em;
+}
+
+.c-email-subscribe__form-field-error-text {
+    margin-top: $sub-unit;
+
+    color: $error-color;
+    font-size: $small-font-size;
+    line-height: $small-line-height;
+}
+
+.c-email-subscribe__form-field-row {
+    max-width: 25em;
+}
+
+.c-email-subscribe__form-field-error {
+    .c-email-subscribe__form-field-label {
+        color: $error-color;
+    }
+
+    input,
+    select,
+    .c-email-subscribe__form-field-input > * {
+        border-color: $error-color;
+
+        &:focus,
+        &:active {
+            border-color: $error-color;
+
+            box-shadow: 0 0 4px 0 $error-color;
+        }
+    }
+}
+
+.c-email-subscribe__button {
+    .c-email-subscribe__form-field-label {
+        width: 1px; // 1
+        visibility: hidden; // 1
+        white-space: nowrap; // 1
+    }
+}

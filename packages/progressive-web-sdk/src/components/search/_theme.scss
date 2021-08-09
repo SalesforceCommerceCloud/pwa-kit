@@ -1,0 +1,93 @@
+// Search Theme
+// ===
+
+
+// Search Form
+// ---
+
+.pw-search__form {
+    border: 1px solid $neutral-30;
+}
+
+
+// Search Input
+// ---
+
+.pw-search__input {
+    border: 0;
+
+    &:focus {
+        box-shadow: none;
+    }
+}
+
+
+// Search Icon
+// ---
+
+.pw-search__icon {
+    color: $secondary-brand-color;
+
+    .pw-search__icon-content {
+        vertical-align: middle;
+    }
+}
+
+
+// Search Suggestion Heading
+// ---
+
+.pw-search__suggestion-heading {
+    padding: $unit $unit*1.5;
+    border-bottom: 1px solid $neutral-20;
+
+    background-color: $neutral-10;
+    font-family: $header-font-family;
+    font-size: $huge-font-size;
+    line-height: $huge-line-height;
+}
+
+
+// Search Suggestion
+// ---
+
+.pw-search__suggestion + .pw-search__suggestion {
+    border-top: 1px solid $neutral-20;
+}
+
+
+// Search Term Suggestion
+// ---
+
+.pw-search__term-suggestions + .pw-search__product-suggestions {
+    border-top: 1px solid $neutral-20;
+}
+
+
+// Search Product Suggestion
+// ---
+
+.pw-search__product-suggestions {
+    .pw-search__suggestion {
+        padding: $unit*1.5;
+    }
+}
+
+
+// Modifier: isOverlay
+// ---
+//
+// Remove button but leave available to screen readers.
+
+.pw-search.pw--is-overlay {
+    .pw-search__button-submit {
+        position: absolute !important;
+
+        overflow: hidden !important;
+        clip: rect(1px, 1px, 1px, 1px) !important;
+        width: 1px !important;
+        height: 1px !important;
+        padding: 0 !important;
+        border: 0 !important;
+    }
+}

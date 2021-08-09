@@ -1,0 +1,221 @@
+// Project-Wide Variables
+// ===
+//
+// Edit these as needed. Some guidelines:
+//
+// - Names should be lowercase and dash-separated;
+// - Qualifiers should be added to the beginning of related variables: use
+//   `$small-font-size`, not `$font-size-small`;
+// - Numeric scales should use increments of 10; these numbers are arbitrary and
+//   should not map to actual values. If really necessary, additional values can
+//   be added in between, e.g. $neutral-15 between 10 and 20.
+//
+//
+// Table of Contents
+// ---
+//
+//     [AAA] Basic Layout
+//     [BBB] Responsive Layout
+//     [CCC] Typography
+//     [DDD] Color Palette
+//     [EEE] Appearance
+//     [FFF] Z-Index
+//     [GGG] Shorthands
+
+
+// [AAA] Basic Layout
+// ---
+
+// Basic unit for spacing and alignment; 6 to 12px recommended. Apply in whole
+// or half multiples.
+$sub-unit: 4px;
+$unit: 8px;
+
+// Standard tap-target size
+$tap-size: 44px;
+
+// Container widths
+$narrow-width: 320px;
+$max-width: 1280px;
+
+// Content Height Calculations
+$header-height: 64px;
+$footer-height: 173px;
+$content-height: calc(100vh - #{$header-height} - #{$footer-height});
+
+// [BBB] Responsive Layout
+// ---
+//
+// Media query breakpoints and grid setup. Please see Mobify's Responsive Best
+// Practices doc here: https://bit.ly/2tmRnEi, and our Responsive Grid
+// documentation here: https://dev.mobify.com/v2.x/how-to-guides/categories/design/creating-responsive-layout-grids-with-susy
+//
+// Note: $small-breakpoint isn't needed, since it is 0px
+
+$medium-breakpoint: 600px;
+$large-breakpoint: 960px;
+$xlarge-breakpoint: $max-width;
+
+$susy: (
+    // Add color to show the columns and gutters
+    'svg-grid-colors': hsl(0, 0%, 95%),
+    'columns': susy-repeat(4),
+    'gutters': 12px
+);
+
+$medium-layout: (
+    'svg-grid-colors': hsl(0, 0%, 95%),
+    'columns': susy-repeat(12),
+    'gutters': 12px
+);
+
+$large-layout: (
+    'svg-grid-colors': hsl(0, 0%, 95%),
+    'columns': susy-repeat(12),
+    'gutters': 24px
+);
+
+
+// [CCC] Typography
+// ---
+$font-family: 'San Francisco', 'Roboto', 'Fira Sans', 'Segoe UI', sans-serif;
+$header-font-family: $font-family;
+
+// Line height
+$huge-line-height: 32px;
+$bigger-line-height: 28px;
+$big-line-height: 24px;
+$line-height: 20px;
+$small-line-height: 16px;
+$smaller-line-height: 12px;
+$tiny-line-height: 8px;
+
+// Font sizes
+$huge-font-size: 28px;
+$bigger-font-size: 24px;
+$big-font-size: 20px;
+$font-size: 16px;
+$small-font-size: 14px;
+$smaller-font-size: 12px;
+$tiny-font-size: 8px;
+
+// Font weight
+$thin-font-weight: 100;
+$extra-light-font-weight: 200;
+$light-font-weight: 300;
+$regular-font-weight: 400;
+$medium-font-weight: 500;
+$semi-bold-font-weight: 600;
+$bold-font-weight: 700;
+
+// [DDD] Color Palette
+// ---
+
+// Neutrals
+$neutral-00: #fff;
+$neutral-10: #f7f7f7;
+$neutral-15: #eee;
+$neutral-20: #d5d5d5;
+$neutral-30: #bfbfbf;
+$neutral-40: #999;
+$neutral-50: #696969;
+$neutral-60: #333;
+$neutral-70: #000;
+
+// Brand colors
+$brand-color: #017e9b; // blue
+$secondary-brand-color: #005569;
+$tertiary-brand-color: #83bdcb;
+$quaternary-brand-color: #bfdfe6;
+
+// UI Kit colors
+$ui-brand-color: #005c83; // dark blue
+
+// Accent colors
+$accent-color: #ff852c; // orange
+$light-accent-color: lighten($accent-color, 15%);
+$dark-accent-color: darken($accent-color, 15%);
+
+// Primary Action
+$primary-action-color: #dc0a3c;
+$light-primary-action-color: lighten($primary-action-color, 15%);
+$dark-primary-action-color: darken($primary-action-color, 15%);
+
+// Secondary Action
+$secondary-action-color: #ff852c;
+$light-secondary-action-color: lighten($secondary-action-color, 15%);
+$dark-secondary-action-color: darken($secondary-action-color, 15%);
+
+// Success colors
+$success-color: #037b30;
+$light-success-color: lighten($success-color, 15%);
+$dark-success-color: darken($success-color, 15%);
+
+// Error colors
+$error-color: #c70936;
+$light-error-color: lighten($error-color, 15%);
+$feedback-error-color: #f8e7eb;
+$dark-error-color: darken($error-color, 15%);
+
+// Sale color
+$sale-color: $error-color;
+
+// Social colors
+$facebook-color: #3a5a93;
+$twitter-color: #55aace;
+$instagram-color: #405de6;
+$pinterest-color: #bd081c;
+$youtube-color: #e52d27;
+$google-plus-color: #dd4b39;
+$yelp-color: #af0606;
+
+
+// [EEE] Appearance
+// ---
+
+$font-color: $neutral-60;
+
+$link-color: $ui-brand-color;
+$active-link-color: $dark-accent-color;
+
+$focus-color: $brand-color;
+
+$border-color: $neutral-20;
+$border-radius: 4px;
+
+$input-background-color: $neutral-00;
+$input-border-color: $border-color;
+$focused-input-border-color: $secondary-brand-color;
+$disabled-input-color: $neutral-40;
+$disabled-input-background-color: $neutral-15;
+$disabled-button-background-color: $neutral-15;
+$horizontal-input-padding: $unit;
+$vertical-input-padding: $unit;
+
+$background-color: $neutral-10;
+$overlay-color: rgba($neutral-00, 0.85);
+
+
+// [FFF] Z-Index
+// ---
+
+// Organizes z-index usage by name. Values can be incremented/decremented
+// slightly as necessary. eg. $z1-layer + 1;
+
+$z1-depth: 1;    // background
+$z2-depth: 10;   // icon or other ui element
+$z3-depth: 100;  // modal shade or similar
+$z4-depth: 1000; // modal dialog or similar
+
+
+// [GGG] Shorthands
+// ---
+
+$border: 1px solid $border-color;
+$light-border: 1px solid $neutral-15;
+$input-padding: $vertical-input-padding $horizontal-input-padding;
+
+$box-shadow: 0 0 2px 0 rgba(0, 0, 0, 0.3);
+$large-box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.3);
+$inset-box-shadow: inset 0 2px 2px -2px rgba(0, 0, 0, 0.3), inset 0 -2px 2px -2px rgba(0, 0, 0, 0.3);
+$input-box-shadow: inset 0 0 5px 0 rgba(0, 0, 0, 0.3);

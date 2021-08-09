@@ -1,0 +1,190 @@
+[
+  {
+    "scope": "https://hybris.merlinspotions.com:443",
+    "method": "GET",
+    "path": "/rest/v2/apparel-uk/stores/London%20Hospital?fields=FULL",
+    "body": "",
+    "status": 200,
+    "response": {
+      "address": {
+        "country": {
+          "isocode": "GB",
+          "name": "United Kingdom"
+        },
+        "defaultAddress": false,
+        "formattedAddress": "Stadium Road, London, SE18 4QH, United Kingdom",
+        "id": "8796093513751",
+        "line1": "Stadium Road",
+        "phone": "+44 20 2199 7080",
+        "postalCode": "SE18 4QH",
+        "shippingAddress": false,
+        "town": "London",
+        "visibleInAddressBook": true
+      },
+      "displayName": "London Hospital",
+      "features": {
+        "entry": [
+          {
+            "key": "wheelchair",
+            "value": "Wheelchair Access"
+          },
+          {
+            "key": "buyOnlinePickupInStore",
+            "value": "Buy Online Pick Up In Store"
+          },
+          {
+            "key": "sundayWorkshops",
+            "value": "Sunday Workshops"
+          },
+          {
+            "key": "creche",
+            "value": "Creche"
+          }
+        ]
+      },
+      "geoPoint": {
+        "latitude": 51.477259,
+        "longitude": 0.051145
+      },
+      "name": "London Hospital",
+      "openingHours": {
+        "code": "apparel-uk-weekend-hours",
+        "specialDayOpeningList": [],
+        "weekDayOpeningList": [
+          {
+            "closingTime": {
+              "formattedHour": "20:00",
+              "hour": 8,
+              "minute": 0
+            },
+            "openingTime": {
+              "formattedHour": "09:00",
+              "hour": 9,
+              "minute": 0
+            },
+            "closed": false,
+            "weekDay": "Mon"
+          },
+          {
+            "closingTime": {
+              "formattedHour": "20:00",
+              "hour": 8,
+              "minute": 0
+            },
+            "openingTime": {
+              "formattedHour": "09:00",
+              "hour": 9,
+              "minute": 0
+            },
+            "closed": false,
+            "weekDay": "Tue"
+          },
+          {
+            "closingTime": {
+              "formattedHour": "20:00",
+              "hour": 8,
+              "minute": 0
+            },
+            "openingTime": {
+              "formattedHour": "09:00",
+              "hour": 9,
+              "minute": 0
+            },
+            "closed": false,
+            "weekDay": "Wed"
+          },
+          {
+            "closingTime": {
+              "formattedHour": "20:00",
+              "hour": 8,
+              "minute": 0
+            },
+            "openingTime": {
+              "formattedHour": "09:00",
+              "hour": 9,
+              "minute": 0
+            },
+            "closed": false,
+            "weekDay": "Thu"
+          },
+          {
+            "closingTime": {
+              "formattedHour": "20:00",
+              "hour": 8,
+              "minute": 0
+            },
+            "openingTime": {
+              "formattedHour": "09:00",
+              "hour": 9,
+              "minute": 0
+            },
+            "closed": false,
+            "weekDay": "Fri"
+          },
+          {
+            "closingTime": {
+              "formattedHour": "20:00",
+              "hour": 8,
+              "minute": 0
+            },
+            "openingTime": {
+              "formattedHour": "10:00",
+              "hour": 10,
+              "minute": 0
+            },
+            "closed": false,
+            "weekDay": "Sat"
+          },
+          {
+            "closingTime": {
+              "formattedHour": "16:00",
+              "hour": 4,
+              "minute": 0
+            },
+            "openingTime": {
+              "formattedHour": "10:00",
+              "hour": 10,
+              "minute": 0
+            },
+            "closed": false,
+            "weekDay": "Sun"
+          }
+        ]
+      },
+      "storeImages": [
+        {
+          "format": "store",
+          "url": "/rest/v2/medias/?context=bWFzdGVyfGltYWdlc3w5NTE2NXxpbWFnZS9qcGVnfGltYWdlcy9oMTgvaDE5Lzg3OTY3ODg4ODM0ODYuanBnfDYyN2Q1MmIxOTRkN2ZhNjk4Y2JlYzA5YmFmZWIxOWY1OTc4ZTA1YTg5ZWFlMzk1NTBjODM3ZTkyYTI0YTNmY2U"
+        },
+        {
+          "format": "cartIcon",
+          "url": "/rest/v2/medias/?context=bWFzdGVyfGltYWdlc3wxNjU3OHxpbWFnZS9qcGVnfGltYWdlcy9oM2YvaGRjLzg3OTY3ODg4NTA3MTguanBnfDQ2YjQzYWZmMmFhOWViOTcyOTgzMzFhMzllYTM0MzRlMjNmOTllODIxNjdiODBjNjcwYzUzNGI4Y2NhOTliMWI"
+        }
+      ]
+    },
+    "rawHeaders": [
+      "Cache-Control",
+      "public, max-age=1800",
+      "Content-Type",
+      "application/json",
+      "Date",
+      "Sat, 25 Aug 2018 00:58:08 GMT",
+      "ETag",
+      "\"00bd7edcdcfcf608e5467b58c93b4645c\"",
+      "Server",
+      "Apache-Coyote/1.1",
+      "Strict-Transport-Security",
+      "max-age=16070400 ; includeSubDomains",
+      "X-Content-Type-Options",
+      "nosniff",
+      "X-Frame-Options",
+      "SAMEORIGIN",
+      "X-XSS-Protection",
+      "1; mode=block",
+      "Content-Length",
+      "3875",
+      "Connection",
+      "Close"
+    ]
+  }
+]

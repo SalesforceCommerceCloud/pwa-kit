@@ -1,0 +1,49 @@
+[
+    {
+        "scope": "https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com:443",
+        "method": "POST",
+        "path": "/s/RefArch/dw/shop/v20_4/customers/auth",
+        "body": {
+            "type": "credentials"
+        },
+        "status": 401,
+        "response": {
+            "_v": "20.4",
+            "fault": {
+                "arguments": {
+                    "credentialType": "Authorization:Basic header"
+                },
+                "type": "AuthenticationFailedException",
+                "message": "Customer authentication based on Authorization:Basic header failed."
+            }
+        },
+        "rawHeaders": [
+            "accept-ranges",
+            "bytes",
+            "x-dw-request-base-id",
+            "OgHOv3N_GF9QXzMK",
+            "x-content-type-options",
+            "nosniff",
+            "cache-control",
+            "no-cache, no-store, must-revalidate",
+            "pragma",
+            "no-cache",
+            "expires",
+            "Thu, 01 Dec 1994 16:00:00 GMT",
+            "jweb",
+            "y",
+            "content-type",
+            "application/json;charset=UTF-8",
+            "content-length",
+            "202",
+            "date",
+            "Wed, 22 Jul 2020 18:03:31 GMT",
+            "server",
+            "istio-envoy",
+            "x-envoy-upstream-service-time",
+            "262",
+            "connection",
+            "close"
+        ]
+    }
+]

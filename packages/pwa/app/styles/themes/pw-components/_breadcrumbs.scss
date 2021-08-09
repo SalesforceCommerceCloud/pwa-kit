@@ -1,0 +1,13 @@
+// Breadcrumbs Theme
+// ===
+
+.pw-breadcumbs__item {
+
+    &:not(:last-of-type)::after {
+        content: '>';
+
+        margin: 0 $unit;
+
+        color: $brand-color;
+    }
+}

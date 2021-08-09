@@ -1,0 +1,48 @@
+{{>deprecated~}}
+{{>summary~}}
+{{>augments~}}
+{{>implements~}}
+{{>mixes~}}
+{{>default~}}
+{{>chainable~}}
+{{>overrides~}}
+{{>returns~}}
+{{>category~}}
+{{>throws~}}
+{{>fires~}}
+{{>this~}}
+{{>access~}}
+{{>readOnly~}}
+{{>requires~}}
+{{>customTags~}}
+{{>see~}}
+{{>since~}}
+{{>version~}}
+{{>authors~}}
+{{>license~}}
+{{>copyright~}}
+{{>todo~}}
+{{>params~}}
+{{>properties~}}
+{{>examples~}}
+{{#unless (regexp-test kind "module|class|interface")}}
+
+---
+{{/unless}}
+{{#if (equal kind "class")}}
+{{#if (hasConstructor @root this)}}
+
+### Constructor
+{{else}}
+
+{{#if (hasMethod @root this)}}
+
+### Methods
+{{/if}}
+{{/if}}{{/if}}
+{{#if (equal kind 'constructor')}}
+{{#with (parentObject)}}{{#if (hasMethod @root this)}}
+### Methods{{/if}}
+{{/with~}}
+{{/if}}
+

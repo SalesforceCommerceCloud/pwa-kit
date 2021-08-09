@@ -1,0 +1,20 @@
+// Header Bar Theme
+// ===
+
+.pw-header-bar {
+    min-height: $header-height;
+
+    background-color: $ui-brand-color;
+
+    color: $neutral-00;
+}
+
+// Title
+// ---
+
+.pw-header-bar__title {
+    justify-content: flex-start;
+    flex: initial;
+
+    line-height: 0;
+}

@@ -1,0 +1,50 @@
+[
+    {
+        "scope": "https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com:443",
+        "method": "POST",
+        "path": "/s/RefArch/dw/shop/v20_4/customers/auth",
+        "body": {
+            "type": "guest"
+        },
+        "status": 200,
+        "response": {
+            "_v": "20.4",
+            "_type": "customer",
+            "auth_type": "guest",
+            "customer_id": "abGqy4naFJSLSHv3a9wnSl5Wdg",
+            "preferred_locale": "en_US"
+        },
+        "rawHeaders": [
+            "accept-ranges",
+            "bytes",
+            "x-dw-request-base-id",
+            "OgHQv3N_GF9QXzMK",
+            "allow",
+            "DELETE,OPTIONS,POST",
+            "x-content-type-options",
+            "nosniff",
+            "authorization",
+            "Bearer eyJfdiI6IjEiLCJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfdiI6IjEiLCJleHAiOjE1OTU0NDI4MTEsImlhdCI6MTU5NTQ0MTAxMSwiaXNzIjoiYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhIiwic3ViIjoie1wiX3ZcIjpcIjFcIixcImN1c3RvbWVyX2luZm9cIjp7XCJjdXN0b21lcl9pZFwiOlwiYWJHcXk0bmFGSlNMU0h2M2E5d25TbDVXZGdcIixcImd1ZXN0XCI6dHJ1ZX19In0.dl8XgldAVo8SGRDrrSAdnbD_tnRnfYwIrohjhsPW78JgTif2kukQqnB74RgKHRx6U5CTBee8ktTVwqnmtguRT1Izs8ks36bbFcDsAsDTtvg6rmvyWGVrkDKWMo-LrU2fdMGnqkus5ghjBh24hTR3veQI38pvTfH4j3oaucbjiNjwkUGCPs_LS_JYaTNhkdqjlRDBcyYo3h8ArKx_5YJK18aynZ00coTdezBKLTzMb7ByQTjiYk7tOi-7SSgrri89gY8EIYV9uqACQCuRVCbuc1GYu0OFr_RipfeglkIeO9tSFneyECtAPQ_Ly1PDNzHv8nqx1v1COjwVLPY0J8XKQ6RtxMXBRzNvVbqu4WjieoC9okARuuH2_pOzYA0DKp4RAO_CQVGo3Pema1z6e88la8g0OGBH_GOpqnPFygVPehVHGPQ2bV2Iz44L6PWZjSFvMnxXdummSG2gRGyofVmzOBlfBEf1gbboPmJfOPhF2aE",
+            "cache-control",
+            "no-cache, no-store, must-revalidate",
+            "pragma",
+            "no-cache",
+            "expires",
+            "Thu, 01 Dec 1994 16:00:00 GMT",
+            "jweb",
+            "y",
+            "content-type",
+            "application/json;charset=UTF-8",
+            "content-length",
+            "122",
+            "date",
+            "Wed, 22 Jul 2020 18:03:31 GMT",
+            "server",
+            "istio-envoy",
+            "x-envoy-upstream-service-time",
+            "13",
+            "connection",
+            "close"
+        ]
+    }
+]

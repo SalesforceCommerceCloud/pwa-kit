@@ -1,0 +1,42 @@
+---
+title: CarouselItem
+metaTitle: CarouselItem
+metaDescription: CarouselItem
+---
+
+import PropsTable from '../../../../src/components/propstable'
+import Tabs from 'progressive-web-sdk/dist/components/tabs/tabs'
+import TabsPanel from 'progressive-web-sdk/dist/components/tabs/tabs-panel'
+
+<div class="component-intro">
+
+A single item within the `Carousel` component.
+
+Related component: [Carousel](Carousel).
+
+</div>
+
+<div onClick={(e) => {e.stopPropagation()}}>
+<Tabs activeIndex={0} className="devcenter">
+<TabsPanel title="Code" onClick={(e) => {e.stopPropagation()}}>
+
+### JavaScript imports
+
+```jsx
+import Carousel from 'progressive-web-sdk/dist/components/carousel'
+import CarouselItem from 'progressive-web-sdk/dist/components/carousel/carousel-item'
+```
+
+### SCSS import
+
+```scss
+@import 'node_modules/progressive-web-sdk/dist/components/carousel/base';
+```
+
+### Props table
+
+<PropsTable propMetaData={props.componentMetadata.childrenComponentProp} />
+
+</TabsPanel>
+</Tabs>
+</div>

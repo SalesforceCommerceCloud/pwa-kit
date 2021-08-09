@@ -1,0 +1,24 @@
+// // CardVerification
+// // ===
+
+// // CardVerification root
+// // ---
+// //
+// // 1. Relative position for absolute position cvv icon
+
+// .pw-card-verification {
+//     position: relative; // 1
+// }
+
+// // Card Icon
+// // ---
+// //
+// // 1. Absolute positioned to `pw-card-verification`, sits above input field
+
+// .pw-card-verification__icon {
+//     position: absolute; // 1
+//     top: 50%;
+//     right: $unit;
+
+//     transform: translateY(-50%);
+// }

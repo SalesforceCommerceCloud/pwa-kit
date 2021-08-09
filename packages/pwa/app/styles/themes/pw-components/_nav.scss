@@ -1,0 +1,17 @@
+// Nav Theme
+// ===
+//
+// 1) Fix navigation height on Microsoft Edge when in desktop width.
+
+.c-header__nav-modal {
+    border-top: 1px solid $neutral-20;
+    border-bottom: 1px solid $neutral-20;
+    background-color: $neutral-00;
+    color: $neutral-60;
+}
+
+@supports (-ms-ime-align: auto) {
+    .pw-nav {
+        height: initial; //1
+    }
+}

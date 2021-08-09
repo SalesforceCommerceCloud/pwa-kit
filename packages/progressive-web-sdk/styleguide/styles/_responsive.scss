@@ -1,0 +1,58 @@
+// Susy Mixins
+// ===
+//
+// `susy-breakpoint` is an alternative to an @media query. It allows you to
+//  set a layout context that will only affect the code inside the block.
+//  See https://dev.mobify.com/v2.x/how-to-guides/categories/design/creating-responsive-layout-grids-with-susy for more information.
+
+@mixin susy-breakpoint($breakpoint, $config) {
+    //  Normalize any shorthand arguments
+    $config: susy-compile($config);
+    $query: null;
+
+    // Build the query
+    @if type-of($breakpoint) == map {
+        $min: map-get($breakpoint, 'min-width');
+        $max: map-get($breakpoint, 'max-width');
+
+        $min: if($min, '(min-width: #{$min})', null);
+        $max: if($max, '(max-width: #{$max})', null);
+
+        // Combine them if we need both
+        $and: if($min and $max, '#{$min} and #{$max}', null);
+        $query: $and or $min or $max;
+    } @else {
+        // Or fall back to the min value
+        $query: '(min-width: #{$breakpoint})';
+    }
+
+    // apply the results...
+    @media #{$query} {
+
+        // record the global settings -
+        // and update the global variable with our new settings
+        $global: $susy;
+        $susy: map-merge($susy, $config) !global;
+
+        @content;
+
+        // return the global variable to its initial value
+        $susy: $global !global;
+    }
+}
+
+
+// Mimic behaviour of @container mixin from Susy2. Use this to help clear and
+// contain your grids if you are using floats.
+// http://susy.readthedocs.io/toolkit/#container
+
+@mixin container($width: 100%) {
+    &::after {
+        clear: both;
+        content: ' ';
+        display: table;
+    }
+
+    margin: 0 auto;
+    max-width: $width;
+}

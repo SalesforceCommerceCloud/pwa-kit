@@ -1,0 +1,159 @@
+// Margin
+// ===
+
+// Miscellanous
+// ---
+
+.u-margin-0 {
+    margin: 0;
+}
+
+.u-margin-center {
+    margin: 0 auto;
+}
+
+.u-margin-all {
+    margin-top: $unit;
+    margin-right: $unit;
+    margin-bottom: $unit;
+    margin-left: $unit;
+}
+
+
+// Vertical Margins
+// ---
+//
+// Granular control over vertical spacing independent of a component. Includes
+// values based on global spacing.
+//
+// Suffixes:
+// 0:  none
+// sm: small
+// md: medium
+// lg: large
+
+.u-margin-top-0 {
+    margin-top: 0;
+}
+
+.u-margin-top {
+    margin-top: $unit;
+}
+
+.u-margin-top-sm {
+    margin-top: ($unit / 2);
+}
+
+.u-margin-top-md {
+    margin-top: $unit * 1.5;
+}
+
+.u-margin-top-lg {
+    margin-top: $unit * 2;
+}
+
+.u-margin-bottom-0 {
+    margin-bottom: 0;
+}
+
+.u-margin-bottom {
+    margin-bottom: $unit;
+}
+
+.u-margin-bottom-sm {
+    margin-bottom: ($unit / 2);
+}
+
+.u-margin-bottom-md {
+    margin-bottom: $unit * 1.5;
+}
+
+.u-margin-bottom-lg {
+    margin-bottom: $unit * 2;
+}
+
+
+// Horizontal Margins
+// ---
+//
+// Granular control over horizontal spacing independent of a component. Includes
+// values based on global spacing, and adds values based on relative typographic
+// sizes.
+//
+// `start` and `end` are writing-direction independent forms for `left` and
+// `right`. For right-to-left localizations, create an alternate version of this
+// stylesheet with the property directions reversed.
+//
+// Suffixes:
+//
+// 0:  none
+// th: thick space (about 1.5× a “normal” word space)
+// en: en space (half an em)
+// em: em space
+// sm: small
+// md: medium
+// lg: large
+
+.u-margin-start-0 {
+    margin-left: 0;
+}
+
+.u-margin-start {
+    margin-left: $unit;
+}
+
+.u-margin-start-th {
+    margin-left: 0.333em;
+}
+
+.u-margin-start-en {
+    margin-left: 0.5em;
+}
+
+.u-margin-start-em {
+    margin-left: 1em;
+}
+
+.u-margin-start-sm {
+    margin-left: ($unit / 2);
+}
+
+.u-margin-start-md {
+    margin-left: $unit * 1.5;
+}
+
+.u-margin-start-lg {
+    margin-left: $unit * 2;
+}
+
+.u-margin-end-0 {
+    margin-right: 0;
+}
+
+.u-margin-end {
+    margin-right: $unit;
+}
+
+.u-margin-end-th {
+    margin-right: 0.333em;
+}
+
+.u-margin-end-en {
+    margin-right: 0.5em;
+}
+
+.u-margin-end-em {
+    margin-right: 1em;
+}
+
+.u-margin-end-sm {
+    margin-right: ($unit / 2);
+}
+
+.u-margin-end-md {
+    margin-right: $unit * 1.5;
+}
+
+.u-margin-end-lg {
+    margin-right: $unit * 2;
+}

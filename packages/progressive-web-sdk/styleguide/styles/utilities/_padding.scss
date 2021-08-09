@@ -1,0 +1,164 @@
+// Padding
+// ===
+
+// Miscellanous
+// ---
+
+.u-padding-0 {
+    padding: 0 !important;
+}
+
+.u-padding {
+    padding: $unit !important;
+}
+
+.u-padding-sm {
+    padding: ($unit / 2) !important;
+}
+
+.u-padding-md {
+    padding: $unit * 1.5 !important;
+}
+
+.u-padding-lg {
+    padding: $unit * 2 !important;
+}
+
+
+// Vertical Padding
+// ---
+//
+// Granular control over vertical spacing independent of a component. Includes
+// values based on global spacing.
+//
+// Suffixes:
+// 0:  none
+// sm: small
+// md: medium
+// lg: large
+
+.u-padding-top-0 {
+    padding-top: 0 !important;
+}
+
+.u-padding-top {
+    padding-top: $unit !important;
+}
+
+.u-padding-top-sm {
+    padding-top: ($unit / 2) !important;
+}
+
+.u-padding-top-md {
+    padding-top: $unit * 1.5 !important;
+}
+
+.u-padding-top-lg {
+    padding-top: $unit * 2 !important;
+}
+
+.u-padding-bottom-0 {
+    padding-bottom: 0 !important;
+}
+
+.u-padding-bottom {
+    padding-bottom: $unit !important;
+}
+
+.u-padding-bottom-sm {
+    padding-bottom: ($unit / 2) !important;
+}
+
+.u-padding-bottom-md {
+    padding-bottom: $unit * 1.5 !important;
+}
+
+.u-padding-bottom-lg {
+    padding-bottom: $unit * 2 !important;
+}
+
+
+// Horizontal Padding
+// ---
+//
+// Granular control over horizontal spacing independent of a component. Includes
+// values based on global spacing, and adds values based on relative typographic
+// sizes.
+//
+// `start` and `end` are writing-direction independent forms for `left` and
+// `right`. For right-to-left localizations, create an alternate version of this
+// stylesheet with the property directions reversed.
+//
+// Suffixes:
+//
+// 0:  none
+// th: thick space (about 1.5× a “normal” word space)
+// en: en space (half an em)
+// em: em space
+// sm: small
+// md: medium
+// lg: large
+
+.u-padding-start-0 {
+    padding-left: 0 !important;
+}
+
+.u-padding-start {
+    padding-left: $unit !important;
+}
+
+.u-padding-start-th {
+    padding-left: 0.333em !important;
+}
+
+.u-padding-start-en {
+    padding-left: 0.5em !important;
+}
+
+.u-padding-start-em {
+    padding-left: 1em !important;
+}
+
+.u-padding-start-sm {
+    padding-left: ($unit / 2) !important;
+}
+
+.u-padding-start-md {
+    padding-left: $unit * 1.5 !important;
+}
+
+.u-padding-start-lg {
+    padding-left: $unit * 2 !important;
+}
+
+.u-padding-end-0 {
+    padding-right: 0 !important;
+}
+
+.u-padding-end {
+    padding-right: $unit !important;
+}
+
+.u-padding-end-th {
+    padding-right: 0.333em !important;
+}
+
+.u-padding-end-en {
+    padding-right: 0.5em !important;
+}
+
+.u-padding-end-em {
+    padding-right: 1em !important;
+}
+
+.u-padding-end-sm {
+    padding-right: ($unit / 2) !important;
+}
+
+.u-padding-end-md {
+    padding-right: $unit * 1.5 !important;
+}
+
+.u-padding-end-lg {
+    padding-right: $unit * 2 !important;
+}

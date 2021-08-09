@@ -1,0 +1,216 @@
+[
+  {
+    "scope": "https://hybris.merlinspotions.com:443",
+    "method": "GET",
+    "path": "/rest/v2/apparel-uk/catalogs/apparelProductCatalog/Online/categories/320000",
+    "body": "",
+    "status": 200,
+    "response": {
+      "type": "categoryHierarchyWsDTO",
+      "id": "320000",
+      "name": "Bikewear",
+      "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/320000",
+      "subcategories": [
+        {
+          "id": "320500",
+          "name": "MTB Jackets",
+          "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/320500",
+          "subcategories": []
+        },
+        {
+          "id": "321000",
+          "name": "MTB Gloves wmn",
+          "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/321000",
+          "subcategories": []
+        },
+        {
+          "id": "320700",
+          "name": "MTB Shirt wmn",
+          "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/320700",
+          "subcategories": []
+        },
+        {
+          "id": "321100",
+          "name": "MTB Jackets wmn",
+          "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/321100",
+          "subcategories": []
+        },
+        {
+          "id": "320100",
+          "name": "MTB Shirts",
+          "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/320100",
+          "subcategories": []
+        },
+        {
+          "id": "320800",
+          "name": "MTB Shorts wmn",
+          "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/320800",
+          "subcategories": []
+        }
+      ]
+    },
+    "rawHeaders": [
+      "Cache-Control",
+      "no-cache, no-store, max-age=0, must-revalidate",
+      "Content-Type",
+      "application/json",
+      "Date",
+      "Sat, 25 Aug 2018 00:58:09 GMT",
+      "Expires",
+      "0",
+      "Pragma",
+      "no-cache",
+      "Server",
+      "Apache-Coyote/1.1",
+      "Strict-Transport-Security",
+      "max-age=16070400 ; includeSubDomains",
+      "X-Content-Type-Options",
+      "nosniff",
+      "X-Frame-Options",
+      "SAMEORIGIN",
+      "X-XSS-Protection",
+      "1; mode=block",
+      "Content-Length",
+      "1246",
+      "Connection",
+      "Close"
+    ]
+  },
+  {
+    "scope": "https://hybris.merlinspotions.com:443",
+    "method": "GET",
+    "path": "/rest/v2/apparel-uk/catalogs/apparelProductCatalog/Online/categories/220000",
+    "body": "",
+    "status": 200,
+    "response": {
+      "type": "categoryHierarchyWsDTO",
+      "id": "220000",
+      "name": "Accessories",
+      "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/220000",
+      "subcategories": [
+        {
+          "id": "221600",
+          "name": "Bandanas",
+          "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/221600",
+          "subcategories": []
+        },
+        {
+          "id": "221200",
+          "name": "Beach Towels",
+          "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/221200",
+          "subcategories": []
+        },
+        {
+          "id": "220500",
+          "name": "Beanies",
+          "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/220500",
+          "subcategories": []
+        },
+        {
+          "id": "221800",
+          "name": "Electronic Accessories",
+          "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/221800",
+          "subcategories": []
+        },
+        {
+          "id": "251100",
+          "name": "Belts",
+          "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/251100",
+          "subcategories": []
+        },
+        {
+          "id": "220600",
+          "name": "Caps",
+          "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/220600",
+          "subcategories": []
+        },
+        {
+          "id": "221900",
+          "name": "Cameras",
+          "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/221900",
+          "subcategories": []
+        },
+        {
+          "id": "221500",
+          "name": "Jewellery",
+          "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/221500",
+          "subcategories": []
+        },
+        {
+          "id": "190700",
+          "name": "Gloves",
+          "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/190700",
+          "subcategories": []
+        },
+        {
+          "id": "221300",
+          "name": "Headphones",
+          "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/221300",
+          "subcategories": []
+        },
+        {
+          "id": "221000",
+          "name": "Others",
+          "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/221000",
+          "subcategories": []
+        },
+        {
+          "id": "221100",
+          "name": "Socks",
+          "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/221100",
+          "subcategories": []
+        },
+        {
+          "id": "220700",
+          "name": "Wallets",
+          "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/220700",
+          "subcategories": []
+        },
+        {
+          "id": "222000",
+          "name": "Videocamera",
+          "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/222000",
+          "subcategories": []
+        },
+        {
+          "id": "221400",
+          "name": "Sticker",
+          "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/221400",
+          "subcategories": []
+        },
+        {
+          "id": "340000",
+          "name": "Watches",
+          "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/340000",
+          "subcategories": []
+        }
+      ]
+    },
+    "rawHeaders": [
+      "Cache-Control",
+      "no-cache, no-store, max-age=0, must-revalidate",
+      "Content-Type",
+      "application/json",
+      "Date",
+      "Sat, 25 Aug 2018 00:58:09 GMT",
+      "Expires",
+      "0",
+      "Pragma",
+      "no-cache",
+      "Server",
+      "Apache-Coyote/1.1",
+      "Strict-Transport-Security",
+      "max-age=16070400 ; includeSubDomains",
+      "X-Content-Type-Options",
+      "nosniff",
+      "X-Frame-Options",
+      "SAMEORIGIN",
+      "X-XSS-Protection",
+      "1; mode=block",
+      "Content-Length",
+      "2935",
+      "Connection",
+      "Close"
+    ]
+  }
+]

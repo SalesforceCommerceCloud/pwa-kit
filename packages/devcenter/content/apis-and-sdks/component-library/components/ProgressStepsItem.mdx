@@ -1,0 +1,43 @@
+---
+title: ProgressStepsItem
+metaTitle: ProgressStepsItem
+metaDescription: ProgressStepsItem
+---
+
+import ProgressSteps from 'progressive-web-sdk/dist/components/progress-steps/progress-steps'
+import ProgressStepsItem from 'progressive-web-sdk/dist/components/progress-steps/progress-steps-item'
+import PropsTable from '../../../../src/components/propstable'
+import Tabs from 'progressive-web-sdk/dist/components/tabs/tabs'
+import TabsPanel from 'progressive-web-sdk/dist/components/tabs/tabs-panel'
+
+<div class="component-intro">
+
+The `ProgressStepsItem` component is used inside the `ProgressSteps` component to display each step.
+
+Related component: [ProgressSteps](ProgressSteps).
+
+</div>
+
+<div onClick={(e) => {e.stopPropagation()}}>
+<Tabs activeIndex={0} className="devcenter">
+<TabsPanel title="Code" onClick={(e) => {e.stopPropagation()}}>
+
+### JavaScript import
+
+```jsx
+import {ProgressSteps, ProgressStepsItem} from 'progressive-web-sdk/src/components/progress-steps'
+```
+
+### SCSS import
+
+```scss
+@import 'node_modules/progressive-web-sdk/src/components/progress-steps/base';
+```
+
+### Props table
+
+<PropsTable propMetaData={props.componentMetadata.childrenComponentProp} />
+
+</TabsPanel>
+</Tabs>
+</div>

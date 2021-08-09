@@ -1,0 +1,72 @@
+// Dimension utils
+// ===
+//
+// Apply fluid widths to components or sub-components.
+//
+//
+// 1. Force elements to keep their explicit width when inside a flexbox to
+//    prevent them from growing or shrinking.
+
+
+// Fractional Widths
+// ---
+
+.u-width-1of6 {
+    flex: initial; // 1
+    width: (100%/6); // 16.667%
+}
+
+.u-width-1of4 {
+    flex: initial; // 1
+    width: 25%;
+}
+
+.u-width-1of3,
+.u-width-2of6 {
+    flex: initial; // 1
+    width: (100%/3); // 33.333%
+}
+
+.u-width-1of2,
+.u-width-2of4,
+.u-width-3of6 {
+    flex: initial; // 1
+    width: 50%;
+}
+
+.u-width-2of3,
+.u-width-4of6 {
+    flex: initial; // 1
+    width: 2 * (100%/3); // 66.666%
+}
+
+.u-width-3of4 {
+    flex: initial; // 1
+    width: 75%;
+}
+
+.u-width-5of6 {
+    flex: initial; // 1
+    width: 5 * (100%/6); // 83.333%
+}
+
+
+// Full Width
+// ---
+
+.u-width-full {
+    flex: initial; // 1
+    width: 100%;
+}
+
+
+// Full Block
+// ---
+//
+// Set width to 100% with display block.
+
+.u-width-block-full {
+    display: block;
+    flex: initial; // 1
+    width: 100%;
+}

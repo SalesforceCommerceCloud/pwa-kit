@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="66px" height="66px" viewBox="0 0 66 66" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 64 (93537) - https://sketch.com -->
+    <title>icon/guides</title>
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <filter x="-41.7%" y="-41.7%" width="183.3%" height="183.3%" filterUnits="objectBoundingBox" id="filter-1">
+            <feOffset dx="0" dy="1" in="SourceAlpha" result="shadowOffsetOuter1"></feOffset>
+            <feGaussianBlur stdDeviation="4.5" in="shadowOffsetOuter1" result="shadowBlurOuter1"></feGaussianBlur>
+            <feColorMatrix values="0 0 0 0 0.0549019608   0 0 0 0 0.0431372549   0 0 0 0 0.290196078  0 0 0 0.4 0" type="matrix" in="shadowBlurOuter1" result="shadowMatrixOuter1"></feColorMatrix>
+            <feMerge>
+                <feMergeNode in="shadowMatrixOuter1"></feMergeNode>
+                <feMergeNode in="SourceGraphic"></feMergeNode>
+            </feMerge>
+        </filter>
+        <linearGradient x1="0%" y1="0%" x2="100%" y2="100%" id="linearGradient-2">
+            <stop stop-color="#DC0A3C" offset="0%"></stop>
+            <stop stop-color="#4E439B" offset="100%"></stop>
+        </linearGradient>
+        <path d="M5.55555556,17.8905632 L5.55555556,6.69610342 C5.55555556,4.84285015 7.05285072,3.33333333 8.88377508,3.33333333 L17.7828916,3.33333333 C19.6243199,3.33333333 21.1111111,4.84988808 21.1111111,6.69610342 L21.1111111,17.8905632 C21.1111111,19.7438165 19.6138159,21.2533333 17.7828916,21.2533333 L11.1105556,21.2523333 L11.1111111,23.3333333 L9.44444444,22.3733333 L7.77777778,23.3333333 L7.77795546,21.0625716 C6.48197333,20.5998316 5.55555556,19.347903 5.55555556,17.8905632 Z M16.0274386,14.5333333 L10.639228,14.5333333 C10.2864583,14.5333333 10,14.8234084 10,15.1812341 L10,15.1812341 L10,16.1254325 C10,16.4804925 10.2861921,16.7733333 10.639228,16.7733333 L10.639228,16.7733333 L16.0274386,16.7733333 C16.3802083,16.7733333 16.6666667,16.4832583 16.6666667,16.1254325 L16.6666667,16.1254325 L16.6666667,15.1812341 C16.6666667,14.8261742 16.3804745,14.5333333 16.0274386,14.5333333 L16.0274386,14.5333333 Z M16.0274386,7.81333333 L10.639228,7.81333333 C10.2864583,7.81333333 10,8.10071046 10,8.4552081 L10,8.4552081 L10,11.6514586 C10,11.999388 10.2861921,12.2933333 10.639228,12.2933333 L10.639228,12.2933333 L16.0274386,12.2933333 C16.3802083,12.2933333 16.6666667,12.0059562 16.6666667,11.6514586 L16.6666667,11.6514586 L16.6666667,8.4552081 C16.6666667,8.10727865 16.3804745,7.81333333 16.0274386,7.81333333 L16.0274386,7.81333333 Z" id="path-3"></path>
+    </defs>
+    <g id="R3-Updates" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="card/medium/icon" transform="translate(-23.000000, -24.000000)">
+            <g id="icon/background/shadow" transform="translate(32.000000, 32.000000)">
+                <g id="bg" filter="url(#filter-1)" stroke-width="1" fill-rule="evenodd" fill="url(#linearGradient-2)">
+                    <circle id="Oval-2" cx="24" cy="24" r="24"></circle>
+                </g>
+                <g id="icon/guide" transform="translate(10.666667, 10.666667)">
+                    <mask id="mask-4" fill="white">
+                        <use xlink:href="#path-3"></use>
+                    </mask>
+                    <use fill="#FFFFFF" fill-rule="evenodd" xlink:href="#path-3"></use>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

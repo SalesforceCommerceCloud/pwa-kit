@@ -1,0 +1,113 @@
+// Carousel
+// ===
+
+
+// Root
+// ---
+//
+// 1. This addresses a rendering issue on iOS 12 (WEB-2253). It's not clear to
+//    me why, but after adding margins to the `pw-carousel__item` elements (to
+//    resolve DESKTOP-313), iOS 12 Safari started having problems after the
+//    carousel finished animation. Apparently unsetting margins on empty
+//    elements that are direct children to `.pw-carousel` fixes the issue, I'm
+//    just not actually sure why.
+
+.pw-carousel {
+    overflow: hidden;
+
+    & > *:empty {
+        margin: initial; // 1
+    }
+}
+
+
+// Carousel Inner Wrapper
+// ---
+
+.pw-carousel__inner {
+    display: flex;
+    justify-content: center;
+    flex: 0 0 auto;
+}
+
+
+// Carousel Item
+// ---
+//
+// 1. Prevent there from being unwanted white space beneath images
+
+.pw-carousel__item {
+    display: block;
+    flex: 0 0 auto;
+    width: 100%;
+
+    line-height: 0;
+    text-align: center; // 1
+
+    &:first-of-type {
+        margin-left: -100%;
+    }
+
+    &:last-of-type {
+        margin-right: -100%;
+    }
+}
+
+
+// Carousel Controls
+// ---
+
+.pw-carousel__controls {
+    display: flex;
+    align-items: center;
+}
+
+
+// Carousel Previous
+// ---
+
+.pw-carousel__previous {
+    flex: 0 0 auto;
+}
+
+
+// Carousel Next
+// ---
+
+.pw-carousel__next {
+    flex: 0 0 auto;
+}
+
+
+// Carousel Pips Container
+// ---
+
+.pw-carousel__pips {
+    flex: 1 1 auto;
+
+    text-align: center;
+
+    &:last-of-type {
+        margin-right: 0;
+    }
+}
+
+
+// Carousel Pip
+// ---
+
+.pw-carousel__pip {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    width: 0.5em;
+    height: 0.5em;
+    margin-right: 0.5em;
+
+    border-radius: 50%;
+    background-color: $neutral-20;
+
+    &.pw--active {
+        background-color: $neutral-50;
+    }
+}

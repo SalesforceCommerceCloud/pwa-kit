@@ -1,0 +1,109 @@
+// Popover
+// ===
+
+// Root
+// ---
+//
+// 1. The outmost popover element exists solely to position
+
+.pw-popover {
+    position: relative; // 1
+
+    display: inline-block;
+}
+
+
+// Inner
+// ---
+//
+// 1. We need this inner div to make sure the caret can have a shadow that sits
+// behind the content, so we need to do some z-index magic
+// 2. The popover should sit on top of other content
+
+.pw-popover__inner {
+    position: absolute; // 2
+    z-index: $z4-depth; // 1
+
+    border-radius: $border-radius;
+    box-shadow: $box-shadow;
+}
+
+
+// Popover Caret
+// ---
+//
+// 1. Styles for the solid portion of the caret
+// 2. Position the caret and shadow at the top of the popover
+// 3. Position the caret and shadow at the left, center and right side of the
+// popover, depending on prop values
+// 4. Re-declare our transform so it doesn't get overruled
+// 5. Shadow portion of the caret
+
+
+.pw-popover__caret {
+    position: absolute;
+    top: -($unit); // 2
+    z-index: $z4-depth - 1;
+
+    width: 0;
+    height: 0;
+    border-right: $unit solid transparent; // 1
+    border-bottom: $unit solid $neutral-00; // 1
+    border-left: $unit solid transparent; // 1
+
+    &::after { // 5
+        content: '';
+
+        position: absolute;
+        top: $sub-unit/2; // 2
+        z-index: $z4-depth - 1;
+
+        width: $unit + 4px;
+        height: $unit + 4px;
+
+        box-shadow: $box-shadow;
+
+        transform: rotate(45deg);
+    }
+
+    &.pw--left {
+        left: $unit; // 3
+
+        &::after {
+            left: -($unit - 2); // 3
+        }
+    }
+
+    &.pw--center {
+        left: 50%; // 3
+
+        transform: translateX(-50%);
+
+        &::after {
+            left: 50%; // 3
+
+            transform: translateX(-50%) rotate(45deg); // 4
+        }
+    }
+
+    &.pw--right {
+        right: $unit; // 3
+
+        &::after {
+            right: -($unit - 2); // 3
+        }
+    }
+}
+
+
+// Popover Content
+// ---
+//
+// 1. Make sure the content sits on top of the caret shadow
+
+.pw-popover__content {
+    position: relative;
+    z-index: $z4-depth + 1; // 1
+
+    background: $neutral-00;
+}

@@ -1,0 +1,45 @@
+[
+    {
+        "scope": "https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com:443",
+        "method": "GET",
+        "path": "/s/RefArch/dw/shop/v20_4/stores?latitude=34.014613&longitude=-118.225606&distance_unit=km&start=0&count=20",
+        "body": "",
+        "status": 200,
+        "response": [
+            "1f8b0800000000000000dc986d6fdb3610c7bf0a6714d88b451a1f45321886b669b1b64b8a6ece9a17eb60d0126d0b95448392d27945bffb4e8e6dd9721da92f9a623320db3a9e28f27eba3f8ffa389adc8ece4714877c74369a54aba585d3b272de4ebc2debac0273eceaa21a9d137a364a4c6546e77f7e3c74051f9324e05f1230498c6e9c4bd093dba6214eab15189ffa3499dba5f3bb0efd6a12bba4e9e38f31d892b4ac4c11c339c7188784b4a6495da470ffd1fb1cfc6c6ed26c7b63f23876f9d214ab107ea1314d762d044e3353a555dddc83939048299406a32be61b6b2059483115589d8d0a933763799ed9b8f2ae48e3128deba5f568bc99e172e18ac6e3071250cc021d894062d2846de9ca892dcc34b370fb99c94abbb65526dbce10471116e009b6ca6e8d17d76b4b13eaccc506feb4bd54be864ee2c926521770c55b93d5bb68c593b4b8b5055cb3ba8428bd6ce6bdb34cf2c95db7db487c3abb1718e14aa2a76605536d818d973e2de6b3d466c900625c875a9d20d642d1874c684818a68a7498d050302e24df31d91b0abab2496a3ec78413b63e224da2614c08c1bacbe4eac98e896da25982ed85f51619384a97c357d388ee1ac39df3c2d5fec0b75a6c5def9a1e82b4ee034d994677897880fa0a902d6c5959df4f9a301e46bc97b4ea92d65a08213ba449c80505fb8ef42fc62710197465d63ab1873782949344045a4a360c2f239877f1be7e7144ecca15284063539d23824d0efff532ff69ead18f3fbff3ef0ab4f719d70538d165e3142df30761aa7a93976034ced36a7180f48d77b7298432b60390721e123d446ee949b9a55db5558cc84656bbbc09d79ab599bd56d83dcdede4342601233488a81aa8b35463d685fefbcb0721457b49095818d3a25a78b73c5c1c2fcd073f90558443857bd32feaa65fa4f43acf3a381ae5572d8e5f17266ba4c15b5b9da6a2a50a84c20195782015a2f811953da5fd9a54a25e2a18bd81ff4db254a9c9d08d59b5606edcb4f6c5102cb0680d4aa1c7ebb34dfeccccdf605718079b031fd6305d8a824ac6d8314506954d4bf1c2e5b9f5b1451799ab93a1843019b2165ed9e2fb123db3459aa357d614257a443172b3d977ad643ec93274e7771d948bd457e57a45a468e63c7ac4f1c6f54b95f85ba86f7fe984314117269f1eafaa3beb90c7470e2c78f94905e6dd878549aa65b7de2521d68c47a47d581606fa4be7c55ebea3f1c22d3bcb2f9170310f68c4f1402526fcbe27ea6b52e37dd484e2e8c265753eadcbce360526e10625bc0aa9ecd561710485435df219288a4815b5cbe202f6495b20c72094525025cb81652e2544dd03e23f5207893ea6208ca0dda037c51c081e64e260a81287f8546dbb4dc3d8159589abc789fb00c384e3b6846c39de7fe223f422d2a2bbd701f44263daa27fb6e9165dbf3d9186d04b40442486d2c7ff03fa10cd3efc11432f009a8bdf1fb07f0d99b440bfd56911af863c016c6029cc4e0a31eb82a7928be6dd49173c8d346d85f826f53668be8e8933a202aaa2c1c22bbf95f0b2de0d28ac950514596fb27ff6f62a802833c580d70c94aa50f6abae3c24c0c248444a7409e010b69e51534c1fbefa41d7b59f765497621908ad03c123398c02279f29a89e3f0805d947e1d2d69537736fa6b64034e02d8a57309e630ccf9e1f60d00c6227d87d18e6d6e7a6986cefddc21038d454a94665f760101242010bfb89762762ea190ceeee6758c4a5dc6c32f6750d4ae0d2268d662566b5f7bee64be2bf9efeb0f81fccfbd35f6bfe1e420313ab1c0cb67989fae95f000000ffff",
+            "0300548ce19b74150000"
+        ],
+        "rawHeaders": [
+            "accept-ranges",
+            "bytes",
+            "x-dw-request-base-id",
+            "OgHJv3J_GF9QXzMK",
+            "allow",
+            "GET,HEAD,OPTIONS",
+            "x-content-type-options",
+            "nosniff",
+            "content-language",
+            "en-US",
+            "cache-control",
+            "max-age=0,no-cache,no-store,must-revalidate",
+            "jweb",
+            "y",
+            "vary",
+            "accept-encoding",
+            "content-encoding",
+            "gzip",
+            "content-type",
+            "application/json;charset=UTF-8",
+            "date",
+            "Wed, 22 Jul 2020 18:03:29 GMT",
+            "server",
+            "istio-envoy",
+            "x-envoy-upstream-service-time",
+            "17",
+            "connection",
+            "close",
+            "transfer-encoding",
+            "chunked"
+        ]
+    }
+]

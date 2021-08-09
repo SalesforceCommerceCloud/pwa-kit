@@ -1,0 +1,51 @@
+---
+title: 'Salesforce Commerce Concepts: General Troubleshooting'
+metaTitle: 'Salesforce Commerce Concepts: General Troubleshooting'
+metaDescription: "Part of an advanced series to help you tackle the most challenging topics when integrating Salesforce Commerce with your Mobify app. This lesson covers common issues that can arise while building a Mobify app with a Salesforce Commerce backend."
+category: Integrations
+minVersion: 2.0.0
+maxVersion: 2.0.0
+featured: false
+---
+
+## Introduction  
+
+<Callout type="info">
+
+**Note:** The Salesforce Commerce Concepts series is designed to dive into some of the more challenging topics you may encounter when working with Salesforce B2C Commerce. 
+
+</Callout>
+
+This lesson focuses on troubleshooting common issues that can arise while working with Salesforce B2C Commerce backend.
+
+## Essential prerequisites  
+
+To get the most out of this guide, make sure you:  
+
+- If you’re *not* a backend developer yourself, you’ll need to make friends with one, as a lot of the tactics discussed in this guide require backend development expertise. Often, projects require changes to expose more data using requests to the Salesforce Commerce Cloud Open Commerce API, (OCAPI). The best case scenario is being able to work with a backend developer who understands the site’s OCAPI implementation. This will allow you to make changes to the site that will save you from having to scrape the data from desktop, or send multiple requests to get the same data.
+- Complete our initial [Salesforce Connector setup steps](/how-to-guides/categories/integrations/setting-up-the-salesforce-connector).
+- Have Salesforce B2C Business Manager access for the development environment (not the production environment). This is very useful for debugging and testing certain kinds of issues, such as when the availability of a product changes.
+- Be able to access the [Salesforce Documentation](https://documentation.b2c.commercecloud.salesforce.com/DOC1/index.jsp), so you can pause and review the underlying API when necessary.
+
+## Troubleshooting
+
+In this section, we'll go through the most common issues you may need to troubleshoot during a Mobify project with a Salesforce backend.
+
+
+### iOS and basic auth
+
+Salesforce Commerce development environments are often protected using [Basic HTTP authentication](https://developer.mozilla.org/en-US/docs/Web/HTTP/Authentication) which uses the Authorization HTTP header. Unfortunately, OCAPI authentication using JWT also uses the Authorization HTTP header. The Safari browser cannot provide both Basic HTTP authentication and JWT authentication. The JWT authentication header is not correctly sent and OCAPI requests fail.
+
+To test the PWA on Safari, disable basic authentication on your Salesforce Commerce environment. If the environment must be protected, use another method of access control like IP whitelisting instead.
+
+
+### PUT methods
+
+OCAPI requests using the PUT method no longer work on staging or production environments. Instead, a POST method must be used with the `x-dw-http-method-override` header. Read more in the [Salesforce Documentation](https://documentation.b2c.commercecloud.salesforce.com/DOC1/index.jsp), and in the [Salesforce developer community](https://xchange.demandware.com/message/82112).
+
+## Wrap up
+
+After reading this guide, we hope you can troubleshoot some of the common issues we've seen during Mobify builds with Salesforce B2C Commerce. 
+
+After completing this guide, you may want to review some of the concepts, such as [session bridging](/how-to-guides/categories/integrations/salesforce-commerce-concepts-session-bridging), or [checkout](/how-to-guides/categories/integrations/salesforce-commerce-concepts-checkout) that were introduced in the other guides in this series.
+

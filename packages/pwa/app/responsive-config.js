@@ -1,0 +1,12 @@
+export const BREAKPOINTS = {
+    SMALL: 0,
+    MEDIUM: 600,
+    LARGE: 960,
+    XLARGE: 1280
+}
+
+export const DEVICE_SIZES = {
+    PHONE: BREAKPOINTS.MEDIUM - 1,
+    TABLET: BREAKPOINTS.LARGE - 1,
+    DESKTOP: BREAKPOINTS.XLARGE - 1
+}

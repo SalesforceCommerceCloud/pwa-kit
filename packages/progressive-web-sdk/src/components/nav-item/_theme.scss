@@ -1,0 +1,23 @@
+// Nav Item Theme
+// ===
+
+.pw-nav-item {
+    &:hover,
+    &:active,
+    &:visited,
+    &:focus {
+        color: $brand-color;
+    }
+
+    &:hover {
+        background-color: $neutral-10;
+    }
+}
+
+
+// Selected
+// ---
+
+.pw-nav-item.pw--selected {
+    background-color: $neutral-10;
+}

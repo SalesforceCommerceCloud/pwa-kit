@@ -1,0 +1,34 @@
+# This is a config for verdaccio, a private NPM repository you can run yourself.
+# The repository is unsecured and only intended to be run locally - don't expose
+# it on the internet.
+
+storage: ./storage
+
+auth:
+  htpasswd:
+    file: ./htpasswd
+
+uplinks:
+  npmjs:
+    url: https://registry.npmjs.org/
+    cache: false
+
+# Allow anybody to publish any package, with no auth.
+packages:
+  '@*/*':
+    access: $all
+    publish: $all
+    proxy: npmjs
+  '**':
+    access: $all
+    publish: $all
+    proxy: npmjs
+
+publish:
+  allow_offline: true
+
+logs:
+  - {type: stdout, format: pretty, level: http}
+
+server:
+  keepAliveTimeout: 0

@@ -1,0 +1,30 @@
+// NavMenu Theme
+// ===
+
+.pw-nav-menu {
+    // Root Class theme styles
+}
+
+
+.pw-nav-menu__panel {
+    background-color: white;
+}
+
+
+// Modifier: Has Custom Menu Animation
+// ---
+//
+// 1. Absolutely positioned relative to `TransitionGroup` which is
+//    responsible for setting up the positioning context, eg:
+//
+//        <TransitionGroup component="div" style={{position: 'relative'}}>
+//            <NavSlider key={key}>
+//                content
+//            </NavSlider>
+//        </TransitionGroup>
+
+.pw-nav-menu__slider.pw--has-custom-menu-animation {
+    position: absolute;  // 1
+    top: 0;
+    left: 0;
+}

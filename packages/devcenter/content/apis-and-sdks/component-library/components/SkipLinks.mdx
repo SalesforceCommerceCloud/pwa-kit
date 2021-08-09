@@ -1,0 +1,96 @@
+---
+title: SkipLinks
+metaTitle: SkipLinks
+metaDescription: SkipLinks
+---
+
+import SkipLinks from 'progressive-web-sdk/dist/components/skip-links'
+import PropsTable from '../../../../src/components/propstable'
+import Tabs from 'progressive-web-sdk/dist/components/tabs/tabs'
+import TabsPanel from 'progressive-web-sdk/dist/components/tabs/tabs-panel'
+
+<div class="component-intro">
+
+The `SkipLinks` component allows you to provide faster navigation for users who interact with websites using keyboards, screen readers, or other technologies that don't rely on a mouse pointer.
+
+The links specified within a `SkipLinks` component remain hidden until the user focuses on them using an interaction such as tabbing. At that point, they become visible.
+
+[More information from Webaim.org](http://webaim.org/techniques/skipnav/)
+
+</div>
+
+<div onClick={(e) => {e.stopPropagation()}}>
+<Tabs activeIndex={0} className="devcenter">
+<TabsPanel title="Code" onClick={(e) => {e.stopPropagation()}}>
+
+### JavaScript import
+
+```jsx
+import SkipLinks from 'progressive-web-sdk/dist/components/skip-links'
+```
+
+### SCSS import
+
+```scss
+@import 'node_modules/progressive-web-sdk/dist/components/skip-links/base';
+```
+
+### Props table
+
+<PropsTable propMetaData={props.componentMetadata.childrenComponentProp} />
+
+### The target prop
+
+The `target` prop is an ID in the form of a string which refers to a DOM element on the current page. It's used in an anchor tag's `href` to "jump" to the DOM element. For example, refer to `#app-navigation` or `#app-footer` in the next example below.
+
+The `target` should point to an element that exists on the page. If there is no element on the page, it could result in an unexpected and confusing user experience for non-visual users, such as screen reader users.
+
+### The label prop
+
+The `label` prop is a text string that will display inside each individual anchor in the `SkipLinks`. This text should be human-readable so that any user agents can easily use it for simple navigation.
+
+### Basic example
+
+```jsx react-live=true
+<div>
+    <p>Press "Tab" until you see a link appear below this text!</p>
+    <SkipLinks
+        items={[
+            {
+                target: '#app-main',
+                label: 'Skip to content'
+            },
+            {
+                target: '#header-navigation',
+                label: 'Skip to main navigation'
+            },
+            {
+                target: '#app-footer',
+                label: 'Skip to footer'
+            }
+        ]}
+    />
+</div>
+```
+
+</TabsPanel>
+<TabsPanel title="Design" class="markdown">
+
+### Potential uses
+
+-   As a "skip to content" action on all pages.
+
+### Accessibility
+
+-   This component is essential in order to conform with AA and AAA accessibility guidelines. Use it on every page for users to skip the global navigation.
+-   Always consider non-touch users and the browsing experience for users who rely on the keyboard.
+
+### Best practices
+
+-   Typically the `SkipLinks` component is added to skip past the global navigational elements of a page.
+-   `SkipLinks` is also used in forms, to skip past irrelevant content and tab to the next step in the flow.
+-   This component can be used in any section where non-touch users have the need to skip over non-contextual content to continue with their flow.
+
+</TabsPanel>
+</Tabs>
+</div>

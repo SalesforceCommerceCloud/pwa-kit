@@ -1,0 +1,8 @@
+build
+coverage
+docs
+app/static
+tests/e2e
+jest.config.js
+webpack
+scripts/generator/assets

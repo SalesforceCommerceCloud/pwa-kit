@@ -1,0 +1,10 @@
+// SkeletonInline Theme
+// ===
+
+.pw-skeleton-inline {
+    background: $neutral-10;
+    background-image: linear-gradient(to right, $neutral-10 0%, scale-color($neutral-20, $lightness: 10%) 50%, $neutral-10 100%);
+    background-repeat: no-repeat;
+    background-size: 100vw 100vh;
+    animation: 1.5s linear infinite background-shimmer;
+}

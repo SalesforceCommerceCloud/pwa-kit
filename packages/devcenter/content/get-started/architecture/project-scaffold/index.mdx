@@ -1,0 +1,53 @@
+---
+title: Project Scaffold
+metaTitle: The Project Scaffold
+metaDescription: Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium.
+---
+
+## What is the scaffold?
+
+The scaffold is your Mobify project starting point. It’s a server-side rendered React app that’s optimized for ecommerce web applications, with the following features:
+
+-   Contains all the dependencies you need to create a Node.js project.
+-   Integrates Mobify’s [Commerce Integrations](/apis-and-sdks/commerce-integrations/overview) and [Analytics Integrations](/apis-and-sdks/progressive-web-sdk/analytics-integrations/overview), which you can then customize to suit your backend and any analytics providers.
+-   Comes with common ecommerce pages already implemented: the home page, product details page (PDP), product listing page (PLP), and an error page.
+-   Contains user interface components from Mobify’s [Component Library](/apis-and-sdks/component-library).
+-   Comes with excellent [Lighthouse performance scores](https://developers.google.com/web/tools/lighthouse) right off the bat.
+
+### Libraries used in the scaffold
+
+Over 100 different libraries are imported into the scaffold files from `node_modules` to provide a performant project starting point. Of these, Mobify’s Progressive Web SDK is one of the core libraries that’s included.
+
+To see a list of all the major libraries included in the project scaffold, read about our [core technologies](/get-started/architecture/core-technologies).
+
+## What does the scaffold include?
+
+### Scaffold files
+
+The scaffold includes the following files and directories:
+
+-   `routes`, `pages`, and components: everything you’d expect for a React app.
+-   `pages` directory: contains the home page, PDP, PLP, and error page.
+-   `main.jsx`: the project entry point. It starts the Express app and the `AnalyticsManager`.
+-   `<PROJECT_DIR>/app/connector.js`: a starting point [Commerce Integrations](/apis-and-sdks/commerce-integrations/overview) `Connector` that you can configure for your ecommerce backend.
+-   `<PROJECT_DIR>/app/analytics.js`: a starting point [Analytics Integrations](/apis-and-sdks/progressive-web-sdk/analytics-integrations/overview) implementation. It contains `getAnalyticsManager`, which returns a singleton instance of `AnalyticsManager`.
+-   `ssr.js`: this is where you can configure your Express app.
+-   `eslint`: a linter that helps highlight code syntax and style issues without having to execute it.
+-   `jest`: a testing framework for JavaScript.
+-   `webpack` directory: a module bundler. It consolidates Mobify's application modules into one or more bundles for the end user to download.
+-   `babel`: a transpiler that converts your Javascript code into a backwards-compatible version so that it can be run in a wide range of browsers. Specifically, it converts JSX syntax to Javascript syntax and ES6 syntax to ES5 syntax.
+-   `app/worker/main.js`: service workers.
+
+### NPM scripts
+
+The scaffold also includes these NPM scripts:
+
+-   `npm run start` or `npm start`: starts your local development server.
+-   `DEBUG=true npm run start`: starts your local development server with the debug environmental variable enabled. This option prints logs in the Chrome DevTools console, which is especially handy for debugging analytics implementations.
+-   `npm run test`: runs the Jest test framework.
+-   `npm run lint`: runs the ESLint linter.
+-   `npm run prod:build`: builds your project.
+
+## Project scaffold history
+
+Mobify's original scaffold was a site called Merlin’s Potions. Thanks to partner feedback, it was replaced in January 2019 with a new lightweight scaffold that’s intended to be much more simple to use. The new scaffold is available in Mobify Platform versions 1.0.4-alpha.0 and later.

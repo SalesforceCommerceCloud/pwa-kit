@@ -1,0 +1,172 @@
+---
+title: Icon
+metaTitle: Icon
+metaDescription: Icon
+---
+
+import Icon from 'progressive-web-sdk/dist/components/icon'
+import PropsTable from '../../../../src/components/propstable'
+import Tabs from 'progressive-web-sdk/dist/components/tabs/tabs'
+import TabsPanel from 'progressive-web-sdk/dist/components/tabs/tabs-panel'
+
+<div class="component-intro">
+
+Icons communicate actions and give context to messaging through very simple imagery.
+
+The `Icon` component renders an SVG that uses the chosen symbol from the SVG sprite present on the page.
+
+Related component: [IconLabel](IconLabel).
+
+</div>
+
+<div onClick={(e) => {e.stopPropagation()}}>
+<Tabs activeIndex={0} className="devcenter">
+<TabsPanel title="Code" onClick={(e) => {e.stopPropagation()}}>
+
+### JavaScript import
+
+```jsx
+import Icon from 'progressive-web-sdk/dist/components/icon'
+```
+
+### SCSS import
+
+```scss
+@import 'node_modules/progressive-web-sdk/dist/components/icon/base';
+```
+
+### Props table
+
+<PropsTable propMetaData={props.componentMetadata.childrenComponentProp} />
+
+### Prerequisite: SVG icon sprite
+
+In order for the `Icon` component to work, an SVG icon sprite must be loaded into the page where the `Icon` component is used. The icon sprite technique used is the same as [the one described by CSS Tricks](https://css-tricks.com/svg-sprites-use-better-icon-fonts/),
+combined with an [external SVG reference file](https://css-tricks.com/svg-use-with-external-reference-take-2/)
+for caching. It's even possible to have multiple icon sprites (see the section below called "Example extra icon sprite").
+
+```jsx
+// It's recommended that the sprite value come from your state management 
+// system, which will be updated after a successful Ajax request.
+const externallyLoadedSpriteXml = this.props.sprite
+
+// Add this to the app once in a high level place. This way the sprite will
+// only be loaded once, and will be available across all pages and components.
+<DangerousHTML html={externallyLoadedSpriteXml}>
+    {(spriteString) => <div hidden dangerouslySetInnerHTML={spriteString} />}
+</DangerousHTML>
+
+// Once the above DangerousHTML is populated the sprite prop, Icon can be used
+<Icon name="cart" />
+```
+
+### Available icons
+
+All available icons are stored inside `<PROJECT_DIR>/app/static/svg/sprite-source/`. To use an icon from that directory, set the `name` prop of the icon to the filename without the `.svg` extension. For example, to use the icon called `zoom.svg`, you could use the following:
+
+```jsx react-live=true
+<Icon name="zoom" />
+```
+
+### Adding new icons
+
+To add new icons to your project, place the SVGs inside the `<PROJECT_DIR>/app/static/svg/sprite-source/` directory. Then, run the command `npm run build-sprites`. This will optimize your SVGs and add them to the SVG icon sprite.
+
+### Basic example
+
+```jsx react-live=true
+<Icon name="cart" title="Screen Readers read me, but not the next icon" />
+```
+
+**Icons** should be treated like images, with accessible titles for screen readers. That means the `title` attribute must be filled with useful text.
+
+If no `title` is provided, the icon will be hidden from screen readers. In other words, it will be `aria-hidden: true`.
+
+### Different sizes
+
+Icons can take in a `size` prop. Common values include `small`, `medium` and
+`large`.
+
+```jsx react-live=true
+<div>
+    <Icon name="cart" size="small" />
+    <Icon name="cart" size="medium" />
+    <Icon name="cart" size="large" />
+</div>
+```
+
+You can provide any string value into `size` and use its corresponding class to customize the appearance in any project. For example:
+
+```jsx react-live=true
+<div>
+    <Icon name="cart" size="microscopic" />
+    <Icon name="cart" size="gargantuan" />
+    <Icon name="cart" size="colossal" />
+</div>
+```
+
+### Extra icon sprite
+
+It's possible to have multiple icon sprites at once by adding the additional icon sprites to your page. An SVG sprite's symbols should have unique prefixed IDs, such as `id="custom-blob"`. You can then use the Icon component's `prefix` and `name` props to reference your new icon sprite symbols.
+
+```jsx react-live=true
+<div>
+    <div style={{display: 'none'}}>
+        {/*
+            Here we add the icon sprite via a JSX SVG component. We hide it in
+            order to prevent it from visually rendering itself.
+        */}
+        <svg>
+            {/*
+                Notice that our id is `#custom-oval`, which we will reference
+                using both the Icon component's `prefix` and `name` props.
+            */}
+            <symbol id="custom-oval">
+                <g fill="#FF0000">
+                    <circle id="Oval" cx="8" cy="8" r="8" />
+                </g>
+            </symbol>
+        </svg>
+    </div>
+
+    {/*
+        The prefix and name will combine to `#custom-oval`. Beware, if you don't
+        declare a custom prefix, the Icon component assumes the prefix is `pw`,
+        which is the default value
+    */}
+    <Icon prefix="custom" name="oval" />
+</div>
+```
+
+</TabsPanel>
+<TabsPanel title="Design" class="markdown">
+
+### Screenshot
+
+![](./images/components/icon/icon-uikit.png)
+
+### Potential uses
+
+-   To symbolize actions when there is no space for words.
+-   When there are many instances of the same action together, and repeating words would clutter the UI.
+-   To reinforce a message. For example, using an error icon next to an error message.
+-   Icons without labels are best suited to accompany simple actions or messages that are universally recognizable. These include arrows, tick/cross symbols, warnings, and plus/minus symbols.
+
+### Accessibility
+
+-   Don't assume that just because you understand an icon, everyone will. Use a label or support icon up with text if the message is not 100% clear.
+-   Icons should not be smaller than 16px width or height to ensure they're legible.
+
+### Best practices
+
+-   Variable depending on the actions.
+-   Only use icons without a label when the action is very clear.
+-   Don't use icons when words will serve the purpose without cluttering the UI.
+-   Keep your icons simple to ensure they're legible on small screens.
+-   Use the SVG file format to keep the icons legible in all sizes.
+-   Keep the vectors as simple as possible with minimal anchor points in order to reduce the file size.
+-   Icons should be a single color so that the color can be easily defined in the CSS.
+
+</TabsPanel>
+</Tabs>
+</div>

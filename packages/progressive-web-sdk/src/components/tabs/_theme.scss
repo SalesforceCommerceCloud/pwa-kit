@@ -1,0 +1,123 @@
+// Tabs
+// ===
+
+
+// Tab strip
+// ---
+
+.pw-tabs__strip {
+    margin-bottom: $unit*2;
+}
+
+
+// Tab Link
+// ---
+//
+// 1. Absolute position active state border to bottom of
+//    `pw-tabs__link`
+// 2. Pseudo line for active state style
+
+.pw-tabs__link {
+    position: relative; // 1
+
+    padding: $unit*2;
+
+    background: $neutral-00;
+
+    color: $neutral-70;
+    line-height: $small-line-height;
+
+    &:focus {
+        color: $neutral-70;
+    }
+
+
+    &::after {
+        content: '';
+
+        position: absolute; // 1
+        right: 0;
+        bottom: 0;
+        left: 0;
+
+        display: block;
+        height: $sub-unit/2;
+    }
+}
+
+
+// State: Active tab
+// ---
+
+.pw-tabs__tab.pw--is-active {
+    color: $secondary-brand-color;
+
+    .pw-tabs__link {
+        box-shadow: none;
+
+        &::after {
+            background: $secondary-brand-color;
+        }
+    }
+}
+
+
+// Modifier: Overflow tab link scroll
+// ---
+//
+// 1. Relative position for absolute positioned scroll fade overlay
+// 2. Absolute position scroll fade to left and right of scroll pane
+// 3. Overflow scroll fade overlay
+// 4. Tabs will not shrink below natural width but will grow to fill in space
+// 5. This number is calculated from UI Kit's spec to reveal roughly half
+//    of the last item. (120/320 = 0.375)
+
+.pw-tabs__strip-container.pw--is-scrollable {
+    position: relative; // 1
+
+    &::before,
+    &::after {
+        content: '';
+
+        position: absolute; // 2
+        top: 0;
+        bottom: 0;
+        z-index: $z1-depth;
+
+        width: $tap-size;
+
+        opacity: 0;
+
+        transition: opacity 0.2s ease-in-out;
+
+        pointer-events: none;
+    }
+
+    // 3
+    &::before {
+        left: 0;
+
+        background: linear-gradient(to right, $neutral-00, rgba($neutral-00, 0));
+    }
+
+    // 3
+    &::after {
+        right: 0;
+
+        background: linear-gradient(to left, $neutral-00, rgba($neutral-00, 0));
+    }
+
+    .pw-tabs__tab {
+        flex: 1 0 auto; // 4
+        width: 37.5%; // 5
+    }
+}
+
+
+// State: Show overflow fade on tab strip
+// ---
+
+.pw-tabs__strip-container.pw--overflow-left::before,
+.pw-tabs__strip-container.pw--overflow-right::after {
+    opacity: 1;
+}

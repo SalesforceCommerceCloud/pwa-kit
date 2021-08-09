@@ -1,0 +1,201 @@
+---
+title: Managing Global State in a React App
+metaTitle: Managing Global State in a React App
+metaDescription: "Learn how to manage global state in your Mobify project, with examples using the React Context API, or with Redux."
+category: State Management
+minVersion: 2.0.0
+maxVersion: 2.0.0
+featured: true
+---
+
+## Introduction
+
+While building your PWA, you may find the need to manage global state. There are many state management libraries out there that help you do just that, such as [Redux](https://redux.js.org/) and [MobX](https://mobx.js.org/README.html). Mobify does not recommend any particular state-management library—and you can build a Mobify app without using one at all. You can always provide state information to your components via props, but if you want to use React's more advanced features for managing state, this article will show you how.
+
+## Using props
+
+The simplest technique for sharing state among components is to provide that state information via props to a component that is a parent to all the components that need to access that state data. The React docs describe this technique in detail and call it [lifting state up](https://reactjs.org/docs/lifting-state-up.html). To complement this technique, we recommend you also consider the technique that blogger Kent C. Dodds calls [prop drilling](https://kentcdodds.com/blog/prop-drilling).
+
+## The React Context API
+
+React's [Context API](https://reactjs.org/docs/context.html) simplifies the process of making data available to a large number of components, without having to manually pass that data through props at each level of your app's component tree.
+
+Kent C. Dodds has written some helpful blog posts on this approach to state management. We recommend reading [How to use React Context effectively](https://kentcdodds.com/blog/how-to-use-react-context-effectively) and [Application State Management with React
+](https://kentcdodds.com/blog/application-state-management-with-react) for more information.
+
+## Example: React Context
+
+Here's an example of how you might use the React Context API with a component that acts as a wrapper around all of your components to provide shared state data to them.
+
+Start by creating a component called `GlobalState` that has two Context objects:
+
+1. `GlobalStateContext`: where you can store your global state.
+2. `GlobalDispatchContext`: where you store your dispatch function, which is used to modify your global state through a reducer.
+
+Each Context object comes with a Provider component which allows consuming components to subscribe to Context changes. Here, the Context objects are initialized with the given props, `initialState` and `dispatch`. You get these props when you connect your state with your `reducer`, using the `useReducer` Hook. For more information on React Hooks, including how to use them with the Context API, see the official [React Hooks reference documentation](https://reactjs.org/docs/hooks-reference.html).
+
+
+This occurs when you’re ready to initialize an instance of this component to wrap around your app.
+
+For example, here’s how you would do this in your PWA:
+
+```javascript
+// pwa/app/components/global-state/index.js
+
+import React from "react";
+import PropTypes from "prop-types";
+
+// Set up global contexts
+export const GlobalStateContext = React.createContext();
+export const GlobalDispatchContext = React.createContext();
+
+// Actions
+export const SET_CART_ITEMS = "SET_CART_ITEMS";
+
+// Reducer
+export const reducer = (state, action) => {
+  const { type, payload } = action;
+
+  switch (type) {
+    case SET_CART_ITEMS: {
+      return {
+        ...state,
+        cart: payload
+      };
+    }
+    // Add more here!
+    default:
+      return state;
+  }
+};
+
+function GlobalState(props) {
+  const { initialState, dispatch } = props;
+  return (
+    <GlobalStateContext.Provider value={initialState}>
+      <GlobalDispatchContext.Provider value={dispatch}>
+        {props.children}
+      </GlobalDispatchContext.Provider>
+    </GlobalStateContext.Provider>
+  );
+}
+
+GlobalState.propTypes = {
+  // The state returned from setting up the reducer using the React Hook `useReducer`.
+  initialState: PropTypes.object.isRequired,
+
+  // The dispatch function returned from setting up the reducer using the React Hook `useReducer`.
+  dispatch: PropTypes.func.isRequired,
+
+  children: PropTypes.node
+};
+
+export default GlobalState;
+```
+
+In your PWA, the AppConfig special component located at `pwa/app/components/_app-config/index.jsx` is where you can initialize your state management system. Here, `props.children` contains all the components of your PWA, so it’s where you want to add your GlobalState component.
+
+1. To get the props you need to initialize it. To do this, use the React Hook `useReducer` to create a connected state to your reducer. `useReducer` takes in an `initialState` object and the `reducer` imported from the GlobalState component.
+2. Next, pass in the connected state and a `dispatch` function to modify that state.
+
+For example:
+
+```javascript
+// pwa/app/components/_app-config/index.jsx
+
+import React, { useReducer } from "react";
+import GlobalState, { reducer } from "../global-state";
+
+const initialState = {
+  cart: null
+};
+
+function AppConfig(props) {
+  const [state, dispatch] = useReducer(reducer, initialState);
+
+  return (
+    <GlobalState initialState={state} dispatch={dispatch}>
+      {props.children}
+    </GlobalState>
+  );
+}
+```
+
+Now you can give any component access to your global context data, including the ability to update it. Just import `GlobalStateContext` and `GlobalDispatchContext` from your GlobalState component and provide those context objects to React's `useContext()` method. 
+
+For example:
+
+```javascript
+import React, {useContext} from 'react'
+import {GlobalStateContext, GlobalDispatchContext, SET_CART_ITEMS} from 'pwa/app/components/global-state'
+
+function ExamplePage() {
+    const globalState = useContext(GlobalStateContext)
+    const dispatch = useContext(GlobalDispatchContext)
+
+    // Use this where you want to update the cart data in your global state
+    dispatch({type: SET_CART_ITEMS, payload: cartItems})
+
+    return ( /* render something */ )
+}
+```
+
+## Manage global state with a state management library
+
+Some projects may choose to manage state through a library such as Redux or MobX. You can customize your application to use a state management library by overriding the default AppConfig [special component](/documentation/architecture/universal-react-rendering#special-components). It's located in the Project Scaffold, within `app/components/_app-config/index.jsx`.
+
+### Example: managing global state with Redux
+
+You can set up Redux for your PWA by overriding the Project Scaffold's default AppConfig component. The component has four methods you can use to set up Redux:
+
+- The `restore` method is where you create your Redux store with a reducer, initial state, and any middleware.
+- The `freeze` method allows you to freeze your state management backend for embedding into the page HTML.
+- The `extraGetPropsArgs` method is where you can return any extra arguments that you'd like to inject into `getProps` methods across the entire app. In this case, we can return the Redux store as an extra argument.
+- The `render` method allows you to set up context providers for state management libraries such as Redux. For example, you can use it to wrap the app in a Redux provider.
+
+Below is an example of how you might override the default AppConfig component to set up Redux for your PWA. In addition to the steps we show here, you'll also need to create your store with a reducer, initial state, and any middleware to finish your implementation.
+
+```javascript
+// pwa/app/components/_app-config/index.jsx
+
+import React from "react";
+import PropTypes from "prop-types";
+import { createStore } from "redux";
+import { Provider } from "react-redux";
+
+/**
+ * Configure this app to use Redux by injecting 'store' and 'dispatch' into
+ * all getProps() functions.
+ */
+
+class AppConfig extends React.Component {
+  static restore(locals, frozen = {}) {
+    // create your store with a reducer, initial state, and any middleware.
+    const initialState = isServerSide ? {} : frozen;
+    locals.store = createStore(reducer, initialState, middlewares);
+  }
+  static freeze(locals) {
+    return locals.store.getState();
+  }
+  static extraGetPropsArgs(locals) {
+    return {
+      store: locals.store,
+      dispatch: locals.store.dispatch
+    };
+  }
+  /**
+   * The render function will wrap the app in a Redux provider.
+   */
+  render() {
+    const { children, locals } = this.props;
+    return <Provider store={locals.store}>{children}</Provider>;
+  }
+}
+
+AppConfig.propTypes = {
+  children: PropTypes.node,
+  locals: PropTypes.object
+};
+
+export default AppConfig;
+```

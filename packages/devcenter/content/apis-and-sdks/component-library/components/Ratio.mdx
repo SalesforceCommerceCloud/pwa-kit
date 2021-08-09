@@ -1,0 +1,63 @@
+---
+title: Ratio
+metaTitle: Ratio
+metaDescription: Ratio
+---
+
+import Ratio from 'progressive-web-sdk/dist/components/ratio'
+import PropsTable from '../../../../src/components/propstable'
+import Tabs from 'progressive-web-sdk/dist/components/tabs/tabs'
+import TabsPanel from 'progressive-web-sdk/dist/components/tabs/tabs-panel'
+
+<div class="component-intro">
+
+Fluid-width element with an intrinsic width/height ratio. It is best used with media elements like `img` or `video`.
+
+Related components: [Rating](Rating) and [ReviewSummary](ReviewSummary).
+
+</div>
+
+<div onClick={(e) => {e.stopPropagation()}}>
+<Tabs activeIndex={0} className="devcenter">
+<TabsPanel title="Code" onClick={(e) => {e.stopPropagation()}}>
+
+### JavaScript import
+
+```jsx
+import Ratio from 'progressive-web-sdk/dist/components/ratio'
+```
+
+### SCSS import
+
+```scss
+@import 'node_modules/progressive-web-sdk/dist/components/ratio/base';
+```
+
+### Props table
+
+<PropsTable propMetaData={props.componentMetadata.childrenComponentProp} />
+
+### Basic example
+
+```jsx react-live=true
+<Ratio width="4" height="3">
+    <img src="https://unsplash.it/400/300" alt="" />
+</Ratio>
+```
+
+### With aspect
+
+Instead of using the `height` and `width` props, `aspect` can be used.
+
+The value passed to `aspect` should be a string of two positive integers with a
+colon ":" in between. For example `aspect="4:3"`.
+
+```jsx react-live=true
+<Ratio aspect="4:3">
+    <img src="https://unsplash.it/400/300" alt="" />
+</Ratio>
+```
+
+</TabsPanel>
+</Tabs>
+</div>

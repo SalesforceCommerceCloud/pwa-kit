@@ -1,0 +1,20 @@
+// Offline Boundary
+// ===
+//
+// 1. SVG measurements for Offline Icon
+
+.c-offline-boundary {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    max-width: $narrow-width;
+    height: 100%;
+    margin: 0 auto;
+
+    .c-offline-boundary__icon {
+        width: 132px; // 1
+        height: 105px; // 1
+        padding: 0;
+    }
+}

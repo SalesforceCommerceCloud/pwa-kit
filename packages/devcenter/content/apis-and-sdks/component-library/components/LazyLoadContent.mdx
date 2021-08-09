@@ -1,0 +1,68 @@
+---
+title: LazyLoadContent
+metaTitle: LazyLoadContent
+metaDescription: LazyLoadContent
+---
+
+import LazyLoadContent from 'progressive-web-sdk/dist/components/lazy-load-content'
+import PropsTable from '../../../../src/components/propstable'
+import Tabs from 'progressive-web-sdk/dist/components/tabs/tabs'
+import TabsPanel from 'progressive-web-sdk/dist/components/tabs/tabs-panel'
+
+<div class="component-intro">
+
+Content wrapped in this component will render immediately if it's in view, or it will be loaded when the user scrolls it into view.
+
+</div>
+
+<div onClick={(e) => {e.stopPropagation()}}>
+<Tabs activeIndex={0} className="devcenter">
+<TabsPanel title="Code" onClick={(e) => {e.stopPropagation()}}>
+
+### JavaScript import
+
+```jsx
+import LazyLoadContent from 'progressive-web-sdk/dist/components/lazy-load-content'
+```
+
+### Props table
+
+<PropsTable propMetaData={props.componentMetadata.childrenComponentProp} />
+
+### Basic example
+
+```jsx react-live=true
+<LazyLoadContent placeholder={<SkeletonBlock height="250px" width="250px" />}>
+    <Image
+        src="https://i.pinimg.com/564x/af/f7/43/aff743479fc29789d2231329453b1abc.jpg"
+        alt="Alt text"
+        height="250px"
+        width="250px"
+    />
+</LazyLoadContent>
+```
+
+### Threshold and scrollCheckInterval props
+
+These props allow you to delay the loading of an image until it scrolls within a certain range of the viewport.
+
+```jsx react-live=true
+<div style={{paddingTop: '333px'}}>
+    <LazyLoadContent
+        placeholder={<SkeletonBlock height="250px" width="250px" />}
+        threshold={200}
+        scrollCheckInterval={400}
+    >
+        <Image
+            src="https://i.pinimg.com/564x/af/f7/43/aff743479fc29789d2231329453b1abc.jpg"
+            alt="Alt text"
+            height="250px"
+            width="250px"
+        />
+    </LazyLoadContent>
+</div>
+```
+
+</TabsPanel>
+</Tabs>
+</div>

@@ -1,0 +1,333 @@
+// Forms
+// ===
+
+$base__radio-checkmark: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#ffffff"><path d="M18.8 6l-9.1 9.2-4.3-4.3L4 12.3 9.7 18 20.2 7.4z"/></svg>';
+
+
+// General Form Elements
+// ---
+//
+// 1. Address Firefox 4+ setting `line-height` on `input` using `!important` in
+// the UA stylesheet.
+// 2. Remove padding so people aren’t caught out if they zero out fieldsets.
+// 3. Remove inner padding and border in Firefox 4+.
+// 4. Correct color not being inherited. Known issue: affects color of disabled
+//    elements.
+// 5. Correct font properties not being inherited.
+// 6. Address margins set differently in Firefox 4+, Safari, and Chrome.
+// 7. Set font-size to 16px to avoid zooming in on iOS (https://stackoverflow.com/questions/11064237/prevent-iphone-from-zooming-form)
+
+fieldset {
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+}
+
+input {
+    margin: 0; // 6
+
+    color: inherit; // 4
+    font: inherit; // 5
+    font-family: $font-family;
+    font-size: $font-size + 2; // 7
+    line-height: normal; // 1
+
+    &::-moz-focus-inner {
+        padding: 0; // 3
+        border: 0; // 3
+    }
+}
+
+textarea {
+    margin: 0; // 6
+
+    color: inherit; // 4
+    font: inherit; // 5
+}
+
+label,
+textarea {
+    font-family: $font-family;
+    font-size: $font-size;
+}
+
+label {
+    display: inline-block;
+    margin-bottom: $unit / 2;
+
+    font-weight: $semi-bold-font-weight;
+
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+
+    &:active {
+        color: $active-link-color;
+    }
+}
+
+select,
+textarea,
+[type="text"],
+[type="search"],
+[type="password"],
+[type="tel"],
+[type="url"],
+[type="number"],
+[type="email"] {
+    width: 100%;
+    min-height: $tap-size;
+    padding: $input-padding;
+    border: $border;
+
+    border-radius: 0;
+    background-color: $input-background-color;
+
+    line-height: $line-height;
+
+    -webkit-appearance: none;
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+
+    &::-webkit-input-placeholder {
+        color: $neutral-50;
+    }
+
+    &:active,
+    &:focus {
+        border-color: $focus-color;
+
+        box-shadow: $input-box-shadow;
+    }
+}
+
+legend {
+    padding: 0; // 2
+}
+
+
+// Search input
+// ---
+//
+// These properties must be set with a slightly higher specificity for search
+// inputs because Normalize's defaults are a bit too specific
+//
+// 1. Address `appearance` set to `searchfield` in Safari and Chrome.
+// 2. Remove inner padding and search cancel button in Safari and Chrome on OS X.
+//    Safari (but not Chrome) clips the cancel button when the search input has
+//    padding (and `textfield` appearance).
+
+input[type="search"] {
+    box-sizing: border-box;
+
+    -webkit-appearance: none; // 1
+
+    &::-webkit-search-cancel-button,
+    &::-webkit-search-decoration {
+        -webkit-appearance: none; // 2
+    }
+}
+
+// Select
+// ---
+//
+// 1. Restore browser default styling. If you’re taking full control of select
+//    styling, remove both these lines.
+// 2. Simulate the position of the down-arrow as if it were a Icon component in
+//    a button.
+// 3. Address inconsistent `text-transform` inheritance for `button` and `select`.
+//    All other form control elements do not inherit `text-transform` values.
+//    Correct `button` style inheritance in Firefox and Opera. Correct `select`
+//    style inheritance in Firefox.
+// 4. Correct color not being inherited. Known issue: affects color of disabled
+//    elements.
+// 5. Set font-size to 16px to avoid zooming in on iOS (https://stackoverflow.com/questions/11064237/prevent-iphone-from-zooming-form)
+// 6. Address margins set differently in Firefox 4+, Safari, and Chrome.
+
+select {
+    height: $tap-size; // 1
+    margin: 0; // 6
+
+    border-radius: 0;
+
+    color: $brand-color;
+    font-family: $font-family;
+    font-size: $font-size + 2; // 5
+    text-transform: none; // 3
+
+    &,
+    &[disabled] {
+        background-repeat: no-repeat;
+        background-position: calc(100% - 14px) center; // 2
+        background-size: 12px 6px;
+    }
+}
+
+optgroup {
+    margin: 0; // 6
+
+    color: inherit; // 4
+    font: inherit; // 5
+}
+
+
+// Checkbox and Radios
+// ---
+
+[type="checkbox"],
+[type="radio"] {
+    position: relative;
+
+    display: inline-block;
+    width: $unit*3;
+    height: $unit*3;
+    margin-right: $unit;
+    border: $border;
+
+    background: $neutral-00;
+
+    vertical-align: middle;
+
+    -webkit-appearance: none;
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+
+    &:active {
+        background: $neutral-30;
+    }
+
+    &:checked {
+        border: 0;
+
+        background: $brand-color;
+
+        &::after {
+            content: '';
+
+            position: absolute;
+
+            display: block;
+        }
+    }
+
+    &:disabled {
+        border: 0;
+
+        background: rgba($neutral-20, 0.5);
+    }
+}
+
+[type="radio"] {
+    border-radius: 50%;
+
+    &:after {
+        top: $unit;
+        right: $unit;
+        bottom: $unit;
+        left: $unit;
+
+        border-radius: 50%;
+        background: $neutral-00;
+    }
+}
+
+[type="checkbox"] {
+    &:checked {
+        &:after {
+            content: '';
+
+            top: 0;
+
+            display: block;
+            width: $unit*3;
+            height: $unit*3;
+
+            background: url($base__radio-checkmark);
+
+            color: $neutral-00;
+            line-height: 0;
+
+            pointer-events: none;
+        }
+    }
+}
+
+
+// Buttons
+// ---
+//
+// 1. Address margins set differently in Firefox 4+, Safari, and Chrome.
+// 2. Correct color not being inherited. Known issue: affects color of disabled
+//    elements.
+// 3. Correct font properties not being inherited.
+// 4. Address inconsistent `text-transform` inheritance for `button` and `select`.
+//    All other form control elements do not inherit `text-transform` values.
+//    Correct `button` style inheritance in Firefox and Opera. Correct `select`
+//    style inheritance in Firefox.
+// 5. Remove inner padding and border in Firefox 4+.
+// 6. Avoid the WebKit bug in Android 4.0.* where (2) destroys native `audio`
+//    and `video` controls.
+// 7. Correct inability to style clickable `input` types in iOS.
+
+button,
+[type="submit"] {
+    display: block;
+    margin: 0; // 1
+    padding: 0;
+    border: 0;
+
+    background: $neutral-15;
+
+    color: inherit; // 2
+    font: inherit; // 3
+    line-height: $line-height;
+    text-transform: none; // 4
+
+    -webkit-appearance: none;
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+
+    &::-moz-focus-inner {
+        padding: 0; // 5
+        border: 0; // 5
+    }
+
+    &:active {
+        background: $neutral-30;
+    }
+}
+
+html input[type="button"],
+// 6
+input[type="reset"] {
+    -webkit-appearance: button; // 7
+}
+
+
+// Disabled
+// ---
+//
+// 1. web-kit default disabled style
+// 2. Disabled style for button, checkbox, radio, input and select
+// 3. Checkbox and Radio style
+
+[disabled] {
+    opacity: 1;
+    background: $disabled-input-background-color;
+
+    color: $disabled-input-color;
+
+    -webkit-text-fill-color: $disabled-input-color; // 1
+
+    // 2
+    &:active,
+    &:checked {
+        border-color: $disabled-input-color;
+
+        background: $disabled-input-background-color;
+
+        &::after {
+            color: $disabled-input-color; // 3
+        }
+    }
+
+    &[type="radio"]:after {
+        background-color: $disabled-input-color;
+    }
+}

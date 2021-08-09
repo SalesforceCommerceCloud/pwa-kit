@@ -1,0 +1,899 @@
+[
+    {
+        "scope": "https://hybris.merlinspotions.com:443",
+        "method": "GET",
+        "path": "/rest/v2/apparel-uk/products/search?query=mouse%3A%3A%3Arelevance&pageSize=20&sort=relevance&currentPage=0&fields=FULL",
+        "body": "",
+        "status": 200,
+        "response": {
+            "type": "productCategorySearchPageWsDTO",
+            "breadcrumbs": [],
+            "currentQuery": {
+                "query": {
+                    "value": "mouse:relevance"
+                },
+                "url": "/search?q=mouse%3Arelevance"
+            },
+            "facets": [
+                {
+                    "category": false,
+                    "multiSelect": true,
+                    "name": "Stores",
+                    "priority": 10000,
+                    "values": [
+                        {
+                            "count": 2,
+                            "name": "Birmingham Hospital",
+                            "query": {
+                                "query": {
+                                    "value": "mouse:relevance:availableInStores:Birmingham+Hospital"
+                                },
+                                "url": "/search?q=mouse%3Arelevance%3AavailableInStores%3ABirmingham%2BHospital"
+                            },
+                            "selected": false
+                        },
+                        {
+                            "count": 1,
+                            "name": "Birmingham Park",
+                            "query": {
+                                "query": {
+                                    "value": "mouse:relevance:availableInStores:Birmingham+Park"
+                                },
+                                "url": "/search?q=mouse%3Arelevance%3AavailableInStores%3ABirmingham%2BPark"
+                            },
+                            "selected": false
+                        },
+                        {
+                            "count": 1,
+                            "name": "Birmingham Symphony Hall",
+                            "query": {
+                                "query": {
+                                    "value": "mouse:relevance:availableInStores:Birmingham+Symphony+Hall"
+                                },
+                                "url": "/search?q=mouse%3Arelevance%3AavailableInStores%3ABirmingham%2BSymphony%2BHall"
+                            },
+                            "selected": false
+                        },
+                        {
+                            "count": 2,
+                            "name": "Birmingham Villa Park",
+                            "query": {
+                                "query": {
+                                    "value": "mouse:relevance:availableInStores:Birmingham+Villa+Park"
+                                },
+                                "url": "/search?q=mouse%3Arelevance%3AavailableInStores%3ABirmingham%2BVilla%2BPark"
+                            },
+                            "selected": false
+                        },
+                        {
+                            "count": 2,
+                            "name": "Cambridge Coldham's",
+                            "query": {
+                                "query": {
+                                    "value": "mouse:relevance:availableInStores:Cambridge+Coldham%27s"
+                                },
+                                "url": "/search?q=mouse%3Arelevance%3AavailableInStores%3ACambridge%2BColdham%2527s"
+                            },
+                            "selected": false
+                        },
+                        {
+                            "count": 2,
+                            "name": "Cambridge Hospital",
+                            "query": {
+                                "query": {
+                                    "value": "mouse:relevance:availableInStores:Cambridge+Hospital"
+                                },
+                                "url": "/search?q=mouse%3Arelevance%3AavailableInStores%3ACambridge%2BHospital"
+                            },
+                            "selected": false
+                        },
+                        {
+                            "count": 2,
+                            "name": "Cambridge Lakes Golf Course",
+                            "query": {
+                                "query": {
+                                    "value": "mouse:relevance:availableInStores:Cambridge+Lakes+Golf+Course"
+                                },
+                                "url": "/search?q=mouse%3Arelevance%3AavailableInStores%3ACambridge%2BLakes%2BGolf%2BCourse"
+                            },
+                            "selected": false
+                        },
+                        {
+                            "count": 1,
+                            "name": "Cambridge Museum",
+                            "query": {
+                                "query": {
+                                    "value": "mouse:relevance:availableInStores:Cambridge+Museum"
+                                },
+                                "url": "/search?q=mouse%3Arelevance%3AavailableInStores%3ACambridge%2BMuseum"
+                            },
+                            "selected": false
+                        },
+                        {
+                            "count": 1,
+                            "name": "Cambridge University",
+                            "query": {
+                                "query": {
+                                    "value": "mouse:relevance:availableInStores:Cambridge+University"
+                                },
+                                "url": "/search?q=mouse%3Arelevance%3AavailableInStores%3ACambridge%2BUniversity"
+                            },
+                            "selected": false
+                        },
+                        {
+                            "count": 1,
+                            "name": "Cardiff City Stadium",
+                            "query": {
+                                "query": {
+                                    "value": "mouse:relevance:availableInStores:Cardiff+City+Stadium"
+                                },
+                                "url": "/search?q=mouse%3Arelevance%3AavailableInStores%3ACardiff%2BCity%2BStadium"
+                            },
+                            "selected": false
+                        },
+                        {
+                            "count": 2,
+                            "name": "Cardiff Museum",
+                            "query": {
+                                "query": {
+                                    "value": "mouse:relevance:availableInStores:Cardiff+Museum"
+                                },
+                                "url": "/search?q=mouse%3Arelevance%3AavailableInStores%3ACardiff%2BMuseum"
+                            },
+                            "selected": false
+                        },
+                        {
+                            "count": 2,
+                            "name": "Cardiff Park",
+                            "query": {
+                                "query": {
+                                    "value": "mouse:relevance:availableInStores:Cardiff+Park"
+                                },
+                                "url": "/search?q=mouse%3Arelevance%3AavailableInStores%3ACardiff%2BPark"
+                            },
+                            "selected": false
+                        },
+                        {
+                            "count": 1,
+                            "name": "Cardiff University",
+                            "query": {
+                                "query": {
+                                    "value": "mouse:relevance:availableInStores:Cardiff+University"
+                                },
+                                "url": "/search?q=mouse%3Arelevance%3AavailableInStores%3ACardiff%2BUniversity"
+                            },
+                            "selected": false
+                        },
+                        {
+                            "count": 1,
+                            "name": "Carlton",
+                            "query": {
+                                "query": {
+                                    "value": "mouse:relevance:availableInStores:Carlton"
+                                },
+                                "url": "/search?q=mouse%3Arelevance%3AavailableInStores%3ACarlton"
+                            },
+                            "selected": false
+                        },
+                        {
+                            "count": 2,
+                            "name": "Edinburgh Castle",
+                            "query": {
+                                "query": {
+                                    "value": "mouse:relevance:availableInStores:Edinburgh+Castle"
+                                },
+                                "url": "/search?q=mouse%3Arelevance%3AavailableInStores%3AEdinburgh%2BCastle"
+                            },
+                            "selected": false
+                        },
+                        {
+                            "count": 2,
+                            "name": "Edinburgh Dynamic Earth",
+                            "query": {
+                                "query": {
+                                    "value": "mouse:relevance:availableInStores:Edinburgh+Dynamic+Earth"
+                                },
+                                "url": "/search?q=mouse%3Arelevance%3AavailableInStores%3AEdinburgh%2BDynamic%2BEarth"
+                            },
+                            "selected": false
+                        },
+                        {
+                            "count": 2,
+                            "name": "Edinburgh Hospital",
+                            "query": {
+                                "query": {
+                                    "value": "mouse:relevance:availableInStores:Edinburgh+Hospital"
+                                },
+                                "url": "/search?q=mouse%3Arelevance%3AavailableInStores%3AEdinburgh%2BHospital"
+                            },
+                            "selected": false
+                        },
+                        {
+                            "count": 1,
+                            "name": "Edinburgh Park",
+                            "query": {
+                                "query": {
+                                    "value": "mouse:relevance:availableInStores:Edinburgh+Park"
+                                },
+                                "url": "/search?q=mouse%3Arelevance%3AavailableInStores%3AEdinburgh%2BPark"
+                            },
+                            "selected": false
+                        },
+                        {
+                            "count": 2,
+                            "name": "Edinburgh University",
+                            "query": {
+                                "query": {
+                                    "value": "mouse:relevance:availableInStores:Edinburgh+University"
+                                },
+                                "url": "/search?q=mouse%3Arelevance%3AavailableInStores%3AEdinburgh%2BUniversity"
+                            },
+                            "selected": false
+                        },
+                        {
+                            "count": 1,
+                            "name": "Glasgow",
+                            "query": {
+                                "query": {
+                                    "value": "mouse:relevance:availableInStores:Glasgow"
+                                },
+                                "url": "/search?q=mouse%3Arelevance%3AavailableInStores%3AGlasgow"
+                            },
+                            "selected": false
+                        },
+                        {
+                            "count": 1,
+                            "name": "Glasgow Hospital",
+                            "query": {
+                                "query": {
+                                    "value": "mouse:relevance:availableInStores:Glasgow+Hospital"
+                                },
+                                "url": "/search?q=mouse%3Arelevance%3AavailableInStores%3AGlasgow%2BHospital"
+                            },
+                            "selected": false
+                        },
+                        {
+                            "count": 1,
+                            "name": "Glasgow Ibrox Park",
+                            "query": {
+                                "query": {
+                                    "value": "mouse:relevance:availableInStores:Glasgow+Ibrox+Park"
+                                },
+                                "url": "/search?q=mouse%3Arelevance%3AavailableInStores%3AGlasgow%2BIbrox%2BPark"
+                            },
+                            "selected": false
+                        },
+                        {
+                            "count": 1,
+                            "name": "Glasgow Kathedrale",
+                            "query": {
+                                "query": {
+                                    "value": "mouse:relevance:availableInStores:Glasgow+Kathedrale"
+                                },
+                                "url": "/search?q=mouse%3Arelevance%3AavailableInStores%3AGlasgow%2BKathedrale"
+                            },
+                            "selected": false
+                        },
+                        {
+                            "count": 2,
+                            "name": "Glasgow University",
+                            "query": {
+                                "query": {
+                                    "value": "mouse:relevance:availableInStores:Glasgow+University"
+                                },
+                                "url": "/search?q=mouse%3Arelevance%3AavailableInStores%3AGlasgow%2BUniversity"
+                            },
+                            "selected": false
+                        },
+                        {
+                            "count": 1,
+                            "name": "Jersey",
+                            "query": {
+                                "query": {
+                                    "value": "mouse:relevance:availableInStores:Jersey"
+                                },
+                                "url": "/search?q=mouse%3Arelevance%3AavailableInStores%3AJersey"
+                            },
+                            "selected": false
+                        },
+                        {
+                            "count": 1,
+                            "name": "Leeds",
+                            "query": {
+                                "query": {
+                                    "value": "mouse:relevance:availableInStores:Leeds"
+                                },
+                                "url": "/search?q=mouse%3Arelevance%3AavailableInStores%3ALeeds"
+                            },
+                            "selected": false
+                        },
+                        {
+                            "count": 2,
+                            "name": "Leeds Cockpit",
+                            "query": {
+                                "query": {
+                                    "value": "mouse:relevance:availableInStores:Leeds+Cockpit"
+                                },
+                                "url": "/search?q=mouse%3Arelevance%3AavailableInStores%3ALeeds%2BCockpit"
+                            },
+                            "selected": false
+                        },
+                        {
+                            "count": 2,
+                            "name": "Leeds Moor",
+                            "query": {
+                                "query": {
+                                    "value": "mouse:relevance:availableInStores:Leeds+Moor"
+                                },
+                                "url": "/search?q=mouse%3Arelevance%3AavailableInStores%3ALeeds%2BMoor"
+                            },
+                            "selected": false
+                        },
+                        {
+                            "count": 2,
+                            "name": "Leeds Stadium",
+                            "query": {
+                                "query": {
+                                    "value": "mouse:relevance:availableInStores:Leeds+Stadium"
+                                },
+                                "url": "/search?q=mouse%3Arelevance%3AavailableInStores%3ALeeds%2BStadium"
+                            },
+                            "selected": false
+                        },
+                        {
+                            "count": 1,
+                            "name": "Leeds Victoria Quarter",
+                            "query": {
+                                "query": {
+                                    "value": "mouse:relevance:availableInStores:Leeds+Victoria+Quarter"
+                                },
+                                "url": "/search?q=mouse%3Arelevance%3AavailableInStores%3ALeeds%2BVictoria%2BQuarter"
+                            },
+                            "selected": false
+                        },
+                        {
+                            "count": 2,
+                            "name": "London Greenwich Park",
+                            "query": {
+                                "query": {
+                                    "value": "mouse:relevance:availableInStores:London+Greenwich+Park"
+                                },
+                                "url": "/search?q=mouse%3Arelevance%3AavailableInStores%3ALondon%2BGreenwich%2BPark"
+                            },
+                            "selected": false
+                        },
+                        {
+                            "count": 2,
+                            "name": "London Hospital",
+                            "query": {
+                                "query": {
+                                    "value": "mouse:relevance:availableInStores:London+Hospital"
+                                },
+                                "url": "/search?q=mouse%3Arelevance%3AavailableInStores%3ALondon%2BHospital"
+                            },
+                            "selected": false
+                        },
+                        {
+                            "count": 1,
+                            "name": "London School",
+                            "query": {
+                                "query": {
+                                    "value": "mouse:relevance:availableInStores:London+School"
+                                },
+                                "url": "/search?q=mouse%3Arelevance%3AavailableInStores%3ALondon%2BSchool"
+                            },
+                            "selected": false
+                        },
+                        {
+                            "count": 1,
+                            "name": "London Theater",
+                            "query": {
+                                "query": {
+                                    "value": "mouse:relevance:availableInStores:London+Theater"
+                                },
+                                "url": "/search?q=mouse%3Arelevance%3AavailableInStores%3ALondon%2BTheater"
+                            },
+                            "selected": false
+                        },
+                        {
+                            "count": 2,
+                            "name": "Manchester",
+                            "query": {
+                                "query": {
+                                    "value": "mouse:relevance:availableInStores:Manchester"
+                                },
+                                "url": "/search?q=mouse%3Arelevance%3AavailableInStores%3AManchester"
+                            },
+                            "selected": false
+                        },
+                        {
+                            "count": 1,
+                            "name": "Manchester dental Hospital",
+                            "query": {
+                                "query": {
+                                    "value": "mouse:relevance:availableInStores:Manchester+dental+Hospital"
+                                },
+                                "url": "/search?q=mouse%3Arelevance%3AavailableInStores%3AManchester%2Bdental%2BHospital"
+                            },
+                            "selected": false
+                        },
+                        {
+                            "count": 1,
+                            "name": "Manchester Holiday Inn",
+                            "query": {
+                                "query": {
+                                    "value": "mouse:relevance:availableInStores:Manchester+Holiday+Inn"
+                                },
+                                "url": "/search?q=mouse%3Arelevance%3AavailableInStores%3AManchester%2BHoliday%2BInn"
+                            },
+                            "selected": false
+                        },
+                        {
+                            "count": 2,
+                            "name": "Manchester Hospital",
+                            "query": {
+                                "query": {
+                                    "value": "mouse:relevance:availableInStores:Manchester+Hospital"
+                                },
+                                "url": "/search?q=mouse%3Arelevance%3AavailableInStores%3AManchester%2BHospital"
+                            },
+                            "selected": false
+                        },
+                        {
+                            "count": 2,
+                            "name": "Manchester United FC",
+                            "query": {
+                                "query": {
+                                    "value": "mouse:relevance:availableInStores:Manchester+United+FC"
+                                },
+                                "url": "/search?q=mouse%3Arelevance%3AavailableInStores%3AManchester%2BUnited%2BFC"
+                            },
+                            "selected": false
+                        },
+                        {
+                            "count": 1,
+                            "name": "Newcastle upon Tyne College",
+                            "query": {
+                                "query": {
+                                    "value": "mouse:relevance:availableInStores:Newcastle+upon+Tyne+College"
+                                },
+                                "url": "/search?q=mouse%3Arelevance%3AavailableInStores%3ANewcastle%2Bupon%2BTyne%2BCollege"
+                            },
+                            "selected": false
+                        },
+                        {
+                            "count": 2,
+                            "name": "Newcastle upon Tyne Gallery",
+                            "query": {
+                                "query": {
+                                    "value": "mouse:relevance:availableInStores:Newcastle+upon+Tyne+Gallery"
+                                },
+                                "url": "/search?q=mouse%3Arelevance%3AavailableInStores%3ANewcastle%2Bupon%2BTyne%2BGallery"
+                            },
+                            "selected": false
+                        },
+                        {
+                            "count": 2,
+                            "name": "Newcastle upon Tyne Hospital",
+                            "query": {
+                                "query": {
+                                    "value": "mouse:relevance:availableInStores:Newcastle+upon+Tyne+Hospital"
+                                },
+                                "url": "/search?q=mouse%3Arelevance%3AavailableInStores%3ANewcastle%2Bupon%2BTyne%2BHospital"
+                            },
+                            "selected": false
+                        },
+                        {
+                            "count": 2,
+                            "name": "Newcastle upon Tyne University",
+                            "query": {
+                                "query": {
+                                    "value": "mouse:relevance:availableInStores:Newcastle+upon+Tyne+University"
+                                },
+                                "url": "/search?q=mouse%3Arelevance%3AavailableInStores%3ANewcastle%2Bupon%2BTyne%2BUniversity"
+                            },
+                            "selected": false
+                        },
+                        {
+                            "count": 1,
+                            "name": "Nottingham",
+                            "query": {
+                                "query": {
+                                    "value": "mouse:relevance:availableInStores:Nottingham"
+                                },
+                                "url": "/search?q=mouse%3Arelevance%3AavailableInStores%3ANottingham"
+                            },
+                            "selected": false
+                        },
+                        {
+                            "count": 1,
+                            "name": "Nottingham Concert Hall",
+                            "query": {
+                                "query": {
+                                    "value": "mouse:relevance:availableInStores:Nottingham+Concert+Hall"
+                                },
+                                "url": "/search?q=mouse%3Arelevance%3AavailableInStores%3ANottingham%2BConcert%2BHall"
+                            },
+                            "selected": false
+                        },
+                        {
+                            "count": 1,
+                            "name": "Nottingham Hospital",
+                            "query": {
+                                "query": {
+                                    "value": "mouse:relevance:availableInStores:Nottingham+Hospital"
+                                },
+                                "url": "/search?q=mouse%3Arelevance%3AavailableInStores%3ANottingham%2BHospital"
+                            },
+                            "selected": false
+                        },
+                        {
+                            "count": 2,
+                            "name": "Nottingham Ice Center",
+                            "query": {
+                                "query": {
+                                    "value": "mouse:relevance:availableInStores:Nottingham+Ice+Center"
+                                },
+                                "url": "/search?q=mouse%3Arelevance%3AavailableInStores%3ANottingham%2BIce%2BCenter"
+                            },
+                            "selected": false
+                        },
+                        {
+                            "count": 2,
+                            "name": "Nottingham University",
+                            "query": {
+                                "query": {
+                                    "value": "mouse:relevance:availableInStores:Nottingham+University"
+                                },
+                                "url": "/search?q=mouse%3Arelevance%3AavailableInStores%3ANottingham%2BUniversity"
+                            },
+                            "selected": false
+                        },
+                        {
+                            "count": 1,
+                            "name": "Sheffield",
+                            "query": {
+                                "query": {
+                                    "value": "mouse:relevance:availableInStores:Sheffield"
+                                },
+                                "url": "/search?q=mouse%3Arelevance%3AavailableInStores%3ASheffield"
+                            },
+                            "selected": false
+                        },
+                        {
+                            "count": 2,
+                            "name": "Sheffield Kathedrale",
+                            "query": {
+                                "query": {
+                                    "value": "mouse:relevance:availableInStores:Sheffield+Kathedrale"
+                                },
+                                "url": "/search?q=mouse%3Arelevance%3AavailableInStores%3ASheffield%2BKathedrale"
+                            },
+                            "selected": false
+                        }
+                    ],
+                    "visible": true
+                },
+                {
+                    "category": false,
+                    "multiSelect": true,
+                    "name": "Price",
+                    "priority": 4000,
+                    "values": [
+                        {
+                            "count": 1,
+                            "name": "£50-£99.99",
+                            "query": {
+                                "query": {
+                                    "value": "mouse:relevance:price:%C2%A350-%C2%A399.99"
+                                },
+                                "url": "/search?q=mouse%3Arelevance%3Aprice%3A%25C2%25A350-%25C2%25A399.99"
+                            },
+                            "selected": false
+                        },
+                        {
+                            "count": 1,
+                            "name": "£100-£199.99",
+                            "query": {
+                                "query": {
+                                    "value": "mouse:relevance:price:%C2%A3100-%C2%A3199.99"
+                                },
+                                "url": "/search?q=mouse%3Arelevance%3Aprice%3A%25C2%25A3100-%25C2%25A3199.99"
+                            },
+                            "selected": false
+                        }
+                    ],
+                    "visible": true
+                },
+                {
+                    "category": false,
+                    "multiSelect": true,
+                    "name": "Colour",
+                    "priority": 2500,
+                    "values": [
+                        {
+                            "count": 1,
+                            "name": "Grey",
+                            "query": {
+                                "query": {
+                                    "value": "mouse:relevance:swatchColors:GREY"
+                                },
+                                "url": "/search?q=mouse%3Arelevance%3AswatchColors%3AGREY"
+                            },
+                            "selected": false
+                        }
+                    ],
+                    "visible": true
+                },
+                {
+                    "category": false,
+                    "multiSelect": true,
+                    "name": "Size",
+                    "priority": 2000,
+                    "values": [
+                        {
+                            "count": 1,
+                            "name": "XXS",
+                            "query": {
+                                "query": {
+                                    "value": "mouse:relevance:size:XXS"
+                                },
+                                "url": "/search?q=mouse%3Arelevance%3Asize%3AXXS"
+                            },
+                            "selected": false
+                        }
+                    ],
+                    "visible": true
+                },
+                {
+                    "category": true,
+                    "multiSelect": false,
+                    "name": "Collection",
+                    "priority": 100,
+                    "values": [
+                        {
+                            "count": 1,
+                            "name": "Snow",
+                            "query": {
+                                "query": {
+                                    "value": "mouse:relevance:collection:snow"
+                                },
+                                "url": "/search?q=mouse%3Arelevance%3Acollection%3Asnow"
+                            },
+                            "selected": false
+                        },
+                        {
+                            "count": 1,
+                            "name": "Sunglasses",
+                            "query": {
+                                "query": {
+                                    "value": "mouse:relevance:collection:sunglasses"
+                                },
+                                "url": "/search?q=mouse%3Arelevance%3Acollection%3Asunglasses"
+                            },
+                            "selected": false
+                        }
+                    ],
+                    "visible": true
+                },
+                {
+                    "category": true,
+                    "multiSelect": false,
+                    "name": "Category",
+                    "priority": 100,
+                    "values": [
+                        {
+                            "count": 1,
+                            "name": "Clothes",
+                            "query": {
+                                "query": {
+                                    "value": "mouse:relevance:category:clothes"
+                                },
+                                "url": "/search?q=mouse%3Arelevance%3Acategory%3Aclothes"
+                            },
+                            "selected": false
+                        },
+                        {
+                            "count": 1,
+                            "name": "Snow Pants women",
+                            "query": {
+                                "query": {
+                                    "value": "mouse:relevance:category:200300"
+                                },
+                                "url": "/search?q=mouse%3Arelevance%3Acategory%3A200300"
+                            },
+                            "selected": false
+                        },
+                        {
+                            "count": 1,
+                            "name": "Snowwear women",
+                            "query": {
+                                "query": {
+                                    "value": "mouse:relevance:category:200000"
+                                },
+                                "url": "/search?q=mouse%3Arelevance%3Acategory%3A200000"
+                            },
+                            "selected": false
+                        },
+                        {
+                            "count": 1,
+                            "name": "Sunglasses",
+                            "query": {
+                                "query": {
+                                    "value": "mouse:relevance:category:sunglasses"
+                                },
+                                "url": "/search?q=mouse%3Arelevance%3Acategory%3Asunglasses"
+                            },
+                            "selected": false
+                        }
+                    ],
+                    "visible": true
+                },
+                {
+                    "category": true,
+                    "multiSelect": false,
+                    "name": "Brand",
+                    "priority": 100,
+                    "values": [
+                        {
+                            "count": 1,
+                            "name": "Burton",
+                            "query": {
+                                "query": {
+                                    "value": "mouse:relevance:brand:Burton"
+                                },
+                                "url": "/search?q=mouse%3Arelevance%3Abrand%3ABurton"
+                            },
+                            "selected": false
+                        },
+                        {
+                            "count": 1,
+                            "name": "Von Zipper",
+                            "query": {
+                                "query": {
+                                    "value": "mouse:relevance:brand:Von+Zipper"
+                                },
+                                "url": "/search?q=mouse%3Arelevance%3Abrand%3AVon%2BZipper"
+                            },
+                            "selected": false
+                        }
+                    ],
+                    "visible": true
+                }
+            ],
+            "freeTextSearch": "mouse",
+            "pagination": {
+                "currentPage": 0,
+                "pageSize": 20,
+                "sort": "relevance",
+                "totalPages": 1,
+                "totalResults": 2
+            },
+            "products": [
+                {
+                    "availableForPickup": true,
+                    "baseProduct": "95490",
+                    "code": "300414022",
+                    "images": [
+                        {
+                            "format": "thumbnail",
+                            "imageType": "PRIMARY",
+                            "url": "/rest/v2/medias/?context=bWFzdGVyfGltYWdlc3wzMzEwfGltYWdlL2pwZWd8aW1hZ2VzL2g0Ny9oMzAvODc5NjM3OTE1MjQxNC5qcGd8Y2I5NDRlNjNmNmQ2NDJkYzJhMGUxNjlhZDI5MjdhZGIzMDRmYTFkMThlYjg4MWJkYmVhNzgyNWI5NjM2YzgzYQ"
+                        },
+                        {
+                            "format": "product",
+                            "imageType": "PRIMARY",
+                            "url": "/rest/v2/medias/?context=bWFzdGVyfGltYWdlc3wxMzkzNnxpbWFnZS9qcGVnfGltYWdlcy9oYzQvaDE5Lzg3OTYzNzkyODM0ODYuanBnfDZhMDRlN2U4NDM5ZmUzNjY2YThkNWIwNTg2OTUwZWQyNzgzNmQ2ZjBlMWRkZDY2YWMxY2U0Njc1ZDU3M2YxNjY"
+                        }
+                    ],
+                    "name": "Lucky Pant Women moss XXS",
+                    "price": {
+                        "currencyIso": "GBP",
+                        "formattedValue": "£105.26",
+                        "priceType": "BUY",
+                        "value": 105.26
+                    },
+                    "priceRange": {},
+                    "stock": {
+                        "stockLevelStatus": "inStock"
+                    },
+                    "url": "/Collections/Snow/Lucky-Pant-Women/p/300414022",
+                    "volumePricesFlag": false
+                },
+                {
+                    "availableForPickup": true,
+                    "baseProduct": "300015407",
+                    "code": "300015407",
+                    "images": [
+                        {
+                            "format": "thumbnail",
+                            "imageType": "PRIMARY",
+                            "url": "/rest/v2/medias/?context=bWFzdGVyfGltYWdlc3wxNjgzfGltYWdlL2pwZWd8aW1hZ2VzL2hiYy9oZWEvODc5NjE5Nzg3OTgzOC5qcGd8ZGFjZTgzZmI4M2I2ODA2N2RmZjIxMDc0NjM0M2MyMDNmNzkzZTMxZDliMDJhZTEyMDA3MWZjZDVkYTgzNDdhNg"
+                        },
+                        {
+                            "format": "product",
+                            "imageType": "PRIMARY",
+                            "url": "/rest/v2/medias/?context=bWFzdGVyfGltYWdlc3w1MTc5fGltYWdlL2pwZWd8aW1hZ2VzL2gxOC9oZTQvODc5NjE5MDA4MTA1NC5qcGd8OGUyODEwMzBiMzBmY2ZkY2E0Nzc0Mjc3ZGJhMTcyMjMyYjY5YWQyNDNiMWEwNGRjZDU1MjUyZjM1ZjFkYWI5Yw"
+                        }
+                    ],
+                    "name": "Shades Von Zipper Fernstein gold moss gradient",
+                    "price": {
+                        "currencyIso": "GBP",
+                        "formattedValue": "£76.46",
+                        "priceType": "BUY",
+                        "value": 76.46
+                    },
+                    "priceRange": {},
+                    "stock": {
+                        "stockLevelStatus": "inStock"
+                    },
+                    "summary": "The signature Von Zipper eyepiece is the living example that it is your god given right to stand up and scream your individuality at the top of your lungs.",
+                    "url": "/Brands/Von-Zipper/Shades-Von-Zipper-Fernstein-gold-moss-gradient/p/300015407",
+                    "volumePricesFlag": false
+                }
+            ],
+            "sorts": [
+                {
+                    "code": "relevance",
+                    "name": "Relevance",
+                    "selected": true
+                },
+                {
+                    "code": "topRated",
+                    "name": "Top Rated",
+                    "selected": false
+                },
+                {
+                    "code": "name-asc",
+                    "name": "Name (ascending)",
+                    "selected": false
+                },
+                {
+                    "code": "name-desc",
+                    "name": "Name (descending)",
+                    "selected": false
+                },
+                {
+                    "code": "price-asc",
+                    "name": "Price (lowest first)",
+                    "selected": false
+                },
+                {
+                    "code": "price-desc",
+                    "name": "Price (highest first)",
+                    "selected": false
+                }
+            ],
+            "spellingSuggestion": {
+                "query": "moss:relevance",
+                "suggestion": "moss"
+            }
+        },
+        "rawHeaders": [
+            "Cache-Control",
+            "public, max-age=300",
+            "Content-Type",
+            "application/json",
+            "Date",
+            "Tue, 02 Oct 2018 16:47:02 GMT",
+            "ETag",
+            "\"0b561a2dab15975df08632c625cc869e8\"",
+            "Server",
+            "Apache-Coyote/1.1",
+            "Strict-Transport-Security",
+            "max-age=16070400 ; includeSubDomains",
+            "X-Content-Type-Options",
+            "nosniff",
+            "X-Frame-Options",
+            "SAMEORIGIN",
+            "X-Total-Count",
+            "2",
+            "X-XSS-Protection",
+            "1; mode=block",
+            "Content-Length",
+            "25513",
+            "Connection",
+            "Close"
+        ]
+    }
+]

@@ -1,0 +1,44 @@
+---
+title: HeaderBarTitle
+metaTitle: HeaderBarTitle
+metaDescription: HeaderBarTitle
+---
+
+import PropsTable from '../../../../src/components/propstable'
+import Tabs from 'progressive-web-sdk/dist/components/tabs/tabs'
+import TabsPanel from 'progressive-web-sdk/dist/components/tabs/tabs-panel'
+
+<div class="component-intro">
+
+This contains the title in `HeaderBar`. It can render as plain text, or as a link. It gives developers the flexibility of adding other components as its content.
+
+Related components: [HeaderBarActions](HeaderBarActions) and [HeaderBar](HeaderBar).
+
+</div>
+
+<div onClick={(e) => {e.stopPropagation()}}>
+<Tabs activeIndex={0} className="devcenter">
+<TabsPanel title="Code" onClick={(e) => {e.stopPropagation()}}>
+
+### JavaScript imports
+
+```jsx
+import {HeaderBar, 
+        HeaderBarActions, 
+        HeaderBarTitle
+       } from 'progressive-web-sdk/dist/components/header-bar'
+```
+
+### SCSS import
+
+```scss
+@import 'node_modules/progressive-web-sdk/dist/components/header-bar/base';
+```
+
+### Props table
+
+<PropsTable propMetaData={props.componentMetadata.childrenComponentProp} />
+
+</TabsPanel>
+</Tabs>
+</div>

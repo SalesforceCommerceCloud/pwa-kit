@@ -1,0 +1,33 @@
+// App
+// ===
+// 1. Force a vertical scroll bar to avoid centering jumps.
+
+.c-pwa-app {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh; // 1
+}
+
+.c-pwa-app__main {
+    display: flex;
+    flex: 1 1 auto;
+    align-self: center;
+    width: 100%;
+    max-width: $max-width;
+    min-height: 100%;
+    padding-right: gutter();
+    padding-left: gutter();
+}
+
+.c-pwa-app__content {
+    flex: 1 1 auto;
+    min-height: 100vh; // 1
+}
+
+.c-pwa-app__offline-banner {
+    padding: $unit*2;
+
+    background-color: $neutral-60;
+
+    color: $neutral-10;
+}

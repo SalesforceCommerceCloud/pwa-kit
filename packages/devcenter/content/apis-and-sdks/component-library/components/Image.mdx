@@ -1,0 +1,162 @@
+---
+title: Image
+metaTitle: Image
+metaDescription: Image
+---
+
+import Image from 'progressive-web-sdk/dist/components/image'
+import PropsTable from '../../../../src/components/propstable'
+import logo from './logo-mobify-white.png'
+import loading from './loading.gif'
+import Tabs from 'progressive-web-sdk/dist/components/tabs/tabs'
+import TabsPanel from 'progressive-web-sdk/dist/components/tabs/tabs-panel'
+
+<div class="component-intro">
+
+An image component with placeholder functionality using the [SkeletonBlock](SkeletonBlock) component.
+
+**Note**: Placeholder functionality is not supported in Internet Explorer (IE) 11. This is due to a bug in how IE11 handles the `onload` event for images. For all other browsers, the `Image` component must have an explicit height for the placeholder to appear.
+
+</div>
+
+<div onClick={(e) => {e.stopPropagation()}}>
+<Tabs activeIndex={0} className="devcenter">
+<TabsPanel title="Code" onClick={(e) => {e.stopPropagation()}}>
+
+### JavaScript import
+
+```jsx
+import Image from 'progressive-web-sdk/dist/components/image'
+```
+
+### SCSS import
+
+```scss
+@import 'node_modules/progressive-web-sdk/dist/components/image/base';
+```
+
+### Props table
+
+<PropsTable propMetaData={props.componentMetadata.childrenComponentProp} />
+
+### Basic example
+
+```jsx react-live=true
+<Image src={logo} width="300px" height="93px" alt="Mobify Logo" />
+```
+
+### With the srcSet prop
+
+```jsx react-live=true
+class Example extends React.Component {
+    constructor() {
+        this.cat1 =
+            'https://s-media-cache-ak0.pinimg.com/564x/72/4b/6d/724b6d' +
+            'bf91c378a53d6890bb525c1aa9.jpg'
+        this.cat2 =
+            'https://s-media-cache-ak0.pinimg.com/564x/af/f7/43/aff743' +
+            '479fc29789d2231329453b1abc.jpg'
+        this.cat3 = 
+            'http://media2.popsugar-assets.com/files/thumbor/' +
+            'DBA3mv_owF0E2BoCrH_oaseQick/fit-in/500x500/filters:format_auto-!!-' +
+            ':strip_icc-!!-/2015/07/13/281/n/1922243/953ff51d_edit_img_image_16' +
+            '594958_1436816964_11378154_1591447017795211_1999564903_n/i/Homemad' +
+            'e-Salmon-Popsicle-Cat-Treat.jpg'
+    }
+
+    render() {
+        return (
+            <Image
+                srcSet={[`${this.cat2} 2100w`, `${this.cat1} 700w`]}
+                src={this.cat1}
+                alt="Cats!"
+            />
+        )
+    }
+}
+```
+
+### With useLoaderDuringTransitions
+
+```jsx react-live=true
+class StatefulExample extends React.Component {
+    constructor() {
+        this.state = {
+            src: 'https://unsplash.it/400/300',
+            useLoaderDuringTransitions: true
+        }
+    }
+
+    transitionImage() {
+        if (/300/.test(this.state.src)) {
+            this.setState({src: 'https://unsplash.it/400/200'})
+        } else {
+            this.setState({src: 'https://unsplash.it/400/300'})
+        }
+    }
+
+    changeUseLoaderDuringTransitions() {
+        this.setState({useLoaderDuringTransitions: !this.state.useLoaderDuringTransitions})
+    }
+
+    render() {
+        return (
+            <span>
+                <Image
+                    src={this.state.src}
+                    useLoaderDuringTransitions={this.state.useLoaderDuringTransitions}
+                    artificialLoadingDelay={1000}
+                    loadingIndicator={<img src={loading} />}
+                />
+                <button onClick={this.changeUseLoaderDuringTransitions.bind(this)}>
+                    {' '}
+                    {'useLoaderDuringTransitions=' + this.state.useLoaderDuringTransitions}
+                </button>
+                <button onClick={this.transitionImage.bind(this)}>
+                    Change image src (simulates image load delay of 1000ms)
+                </button>
+            </span>
+        )
+    }
+}
+```
+
+### With inline styles
+
+Please note that the `width` property is overridden by the `imageStyle.width`.
+
+```jsx react-live=true
+class Example extends React.Component {
+    constructor() {
+        this.wrapperStyle = {
+            position: 'relative',
+            left: '160px'
+        }
+
+        this.imageStyle = {
+            borderRadius: '10px',
+            height: '80px',
+            width: '80px'
+        }
+
+        this.cat =
+            'https://s-media-cache-ak0.pinimg.com/564x/72/4b/6d/724b6d' +
+            'bf91c378a53d6890bb525c1aa9.jpg'
+    }
+
+    render() {
+        return (
+            <Image
+                src={this.cat}
+                wrapperStyle={this.wrapperStyle}
+                imageStyle={this.imageStyle}
+                width="400px"
+            />
+        )
+    }
+}
+```
+
+</TabsPanel>
+</Tabs>
+</div>

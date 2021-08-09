@@ -1,0 +1,128 @@
+// General
+// ===
+
+// Document
+// ---
+//
+// 1. Applying styles to *::before or *::after is a performance issue on some
+//    legacy Android devices (4.1.x). As such, these are disabled by default.
+// 2. Prevent iOS text size adjust after orientation change, without disabling
+//    user zoom.
+// 3. Remove default margin in all browsers.
+
+
+// *::before, // 1
+// *::after, // 1
+* {
+    box-sizing: border-box;
+
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+}
+
+html {
+    color: $font-color;
+    font-family: $font-family;
+    font-size: $font-size;
+    line-height: $line-height;
+
+    -ms-text-size-adjust: 100%; // 2
+    -webkit-text-size-adjust: 100%; // 2
+}
+
+body {
+    margin: 0; // 3
+}
+
+
+// Grouping content
+// ---
+//
+// 1. Address margin not present in Safari.
+// 2. Contain overflow in all browsers.
+// 3. Address odd `em`-unit font size rendering in all browsers.The duplication
+//    of `monospace` is intentional
+//    ([Source](http://en.wikipedia.org/wiki/User:Davidgothberg/Test59)).
+
+figure {
+    margin: 1em 40px; // 1
+}
+
+pre {
+    overflow: auto; // 2
+}
+
+code,
+kbd,
+pre,
+samp {
+    font-family: monospace, monospace; // 3
+    font-size: 1em; // 3
+}
+
+
+// New HTML5 elements
+// ---
+
+// Correct `block` display not defined for `main` in mobile Safari 6 and
+// Android 4.3.
+//
+// Correct `block` display not defined for `menu`.
+
+main,
+menu {
+    display: block;
+}
+
+// Normalize vertical alignment of `progress` in Chrome and Firefox.
+
+audio,
+canvas,
+progress,
+video {
+    vertical-align: baseline;
+}
+
+// Prevent modern browsers from displaying `audio` without controls.
+// Remove excess height in iOS 5 devices.
+
+audio:not([controls]) {
+    display: none;
+    height: 0;
+}
+
+// Hide the `template` element in mobile Safari.
+
+template {
+    display: none;
+}
+
+// Prevent `sub` and `sup` affecting `line-height` in all browsers.
+
+sub,
+sup {
+    position: relative;
+
+    font-size: 75%;
+    line-height: 0;
+    vertical-align: baseline;
+}
+
+sup {
+    top: -0.5em;
+}
+
+sub {
+    bottom: -0.25em;
+}
+
+
+// Hidden
+// ---
+//
+// Hide visually and from screen readers. `u-visually-hidden` class is preferred
+// to ensure that it's working in all conditions.
+
+[hidden] {
+    display: none;
+}

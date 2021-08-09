@@ -1,0 +1,14 @@
+// MegaMenu
+// ===
+//
+// 1. Set a position context so that child MegaMenuItem components can be
+//    absolutely positioned relative to this outer-most container.
+
+.pw-mega-menu {
+    position: relative; // 1
+
+    margin: 0;
+    padding: 0;
+
+    list-style-type: none;
+}

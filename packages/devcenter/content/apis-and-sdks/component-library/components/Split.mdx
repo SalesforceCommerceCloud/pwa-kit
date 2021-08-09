@@ -1,0 +1,88 @@
+---
+title: Split
+metaTitle: Split
+metaDescription: Split
+---
+
+import Split from 'progressive-web-sdk/dist/components/split'
+import PropsTable from '../../../../src/components/propstable'
+import Tabs from 'progressive-web-sdk/dist/components/tabs/tabs'
+import TabsPanel from 'progressive-web-sdk/dist/components/tabs/tabs-panel'
+
+<div class="component-intro">
+
+The `Split` component is used to store a split test variant value in a cookie. It displays children if the cookie value requirement is met or adds `splitValue` props to your component.
+
+The `Split` component helps surface cookie values into props of other React components. This component is subscribed to by the Cookie Manager: When there's an update to the value of the cookie, it will propagate the value of the cookie to the children of this component.
+
+</div>
+
+<div onClick={(e) => {e.stopPropagation()}}>
+<Tabs activeIndex={0} className="devcenter">
+<TabsPanel title="Code" onClick={(e) => {e.stopPropagation()}}>
+
+### JavaScript import
+
+```jsx
+import Split from 'progressive-web-sdk/dist/components/split/'
+```
+
+### Props table
+
+<PropsTable propMetaData={props.componentMetadata.childrenComponentProp} />
+
+### Basic example
+
+```jsx
+<Split splitCookieName="split-cookie-name" defaultSplitValue="A">
+    <ComponentA />
+    <ComponentB />
+</Split>
+```
+
+The example above gives both `ComponentA` and `ComponentB` a new `splitValue` props, which will contain the cookie value of `split-cookie-name`.
+
+If the `defaultSplitValue` attribute is defined, `splitValue` will be equal to `defaultSplitValue`when the specified cookie is not defined.
+
+If the `defaultSplitValue` attribute is not defined,
+`splitValue` will be equal to `null`.
+
+### Show children based on cookie value
+
+```jsx react-live=true
+<Split splitCookieName="split-cookie-name" showOnVariant="A">
+    <div>Test A</div>
+</Split>
+```
+
+The example above will only render the children if the cookie value of
+`split-cookie-name` is exactly `A`.
+
+### Show children if the cookie is not defined
+
+```jsx react-live=true
+<Split splitCookieName="split-cookie-name" showOnVariant="null">
+    <div>Test null</div>
+</Split>
+```
+
+The example above will only render the children if `split-cookie-name` cookie is **not defined**. This is useful for defining a skeleton state when there is an anticipated delay of when the cookie will be set.
+
+To obtain the cookie value, add the following to your template container file:
+
+```jsx static
+...
+ProductList.propTypes = {
+    ...
+    splitValue: PropTypes.string
+}
+
+export default template(ProductList, {
+    splitCookieName: 'split-cookie-name',
+    defaultSplitValue: 'A'  // Optional
+})
+```
+
+</TabsPanel>
+</Tabs>
+</div>

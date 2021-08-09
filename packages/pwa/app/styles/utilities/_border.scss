@@ -1,0 +1,61 @@
+// Border
+// ===
+
+// Border (Width and Color)
+// ---
+
+.u-border {
+    border: $border;
+}
+
+.u-border-0 {
+    border: 0;
+}
+
+.u-border-top {
+    border-top: $border;
+}
+
+.u-border-end {
+    border-right: $border;
+}
+
+.u-border-bottom {
+    border-bottom: $border;
+}
+
+.u-border-start {
+    border-left: $border;
+}
+
+
+// Light Border (Width and Color)
+// ---
+
+.u-border-light {
+    border: $light-border;
+}
+
+.u-border-light-top {
+    border-top: $light-border;
+}
+
+.u-border-light-end {
+    border-right: $light-border;
+}
+
+.u-border-light-bottom {
+    border-bottom: $light-border;
+}
+
+.u-border-light-start {
+    border-left: $light-border;
+}
+
+
+// Border (Other)
+// ---
+
+.u-border-radius {
+    border-radius: $border-radius;
+}

@@ -1,0 +1,29 @@
+// PasswordInput
+// ===
+//
+// An input field to capture passwords.
+// Allows the user to toggle if their password should be visible or masked.
+
+
+// Password Input root
+// ---
+//
+// 1. The visibility toggle will be positioned relative to this element
+
+.pw-password-input {
+    position: relative; // 1
+}
+
+
+// Password Input visibility toggle
+// ---
+//
+// 1. Positioned absolute relative to .pw-password-input
+// 2. Override the default button styles
+
+.pw-password-input__toggle {
+    position: absolute; // 1
+    right: 0;
+
+    padding: 0 $unit*1.5 !important; // 2
+}

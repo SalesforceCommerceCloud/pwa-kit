@@ -1,0 +1,86 @@
+[
+    {
+        "scope": "https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com:443",
+        "method": "GET",
+        "path": "/s/RefArch/dw/shop/v20_4/orders/1",
+        "body": "",
+        "status": 401,
+        "response": {
+            "_v": "20.4",
+            "fault": {
+                "type": "AuthorizationHeaderMissingException",
+                "message": "Unauthorized request: The 'Authorization' header is missing."
+            }
+        },
+        "rawHeaders": [
+            "accept-ranges",
+            "bytes",
+            "x-dw-request-base-id",
+            "OgHCv3B_GF9QXzMK",
+            "x-content-type-options",
+            "nosniff",
+            "cache-control",
+            "no-cache, no-store, must-revalidate",
+            "pragma",
+            "no-cache",
+            "expires",
+            "Thu, 01 Dec 1994 16:00:00 GMT",
+            "jweb",
+            "y",
+            "content-type",
+            "application/json;charset=UTF-8",
+            "content-length",
+            "141",
+            "date",
+            "Wed, 22 Jul 2020 18:03:28 GMT",
+            "server",
+            "istio-envoy",
+            "x-envoy-upstream-service-time",
+            "11",
+            "connection",
+            "close"
+        ]
+    },
+    {
+        "scope": "https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com:443",
+        "method": "GET",
+        "path": "/s/RefArch/dw/shop/v20_4/orders/2",
+        "body": "",
+        "status": 401,
+        "response": {
+            "_v": "20.4",
+            "fault": {
+                "type": "AuthorizationHeaderMissingException",
+                "message": "Unauthorized request: The 'Authorization' header is missing."
+            }
+        },
+        "rawHeaders": [
+            "accept-ranges",
+            "bytes",
+            "x-dw-request-base-id",
+            "OgHBv3B_GF9QXzMK",
+            "x-content-type-options",
+            "nosniff",
+            "cache-control",
+            "no-cache, no-store, must-revalidate",
+            "pragma",
+            "no-cache",
+            "expires",
+            "Thu, 01 Dec 1994 16:00:00 GMT",
+            "jweb",
+            "y",
+            "content-type",
+            "application/json;charset=UTF-8",
+            "content-length",
+            "141",
+            "date",
+            "Wed, 22 Jul 2020 18:03:28 GMT",
+            "server",
+            "istio-envoy",
+            "x-envoy-upstream-service-time",
+            "12",
+            "connection",
+            "close"
+        ]
+    }
+]

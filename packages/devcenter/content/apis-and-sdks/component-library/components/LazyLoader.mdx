@@ -1,0 +1,632 @@
+---
+title: LazyLoader
+metaTitle: LazyLoader
+metaDescription: LazyLoader
+---
+
+import LazyLoader from 'progressive-web-sdk/dist/components/lazy-loader'
+import PropsTable from '../../../../src/components/propstable'
+import Tabs from 'progressive-web-sdk/dist/components/tabs/tabs'
+import TabsPanel from 'progressive-web-sdk/dist/components/tabs/tabs-panel'
+
+<div class="component-intro">
+
+The `LazyLoader` component makes it possible to delay rendering of content until the
+user has actually scrolled a certain distance through a page.
+
+When the `LazyLoader` scrolls into view, it triggers a function callback to `fetchItems` (a Promise) to achieve the various lazy loading effects.
+
+The `LazyLoader` is not responsible for managing its children. The component's children must be managed outside of the `LazyLoader` component (for example, in the `LazyLoader` component's parent).
+
+Related component: [Pagination](Pagination).
+
+</div>
+
+<div onClick={(e) => {e.stopPropagation()}}>
+<Tabs activeIndex={0} className="devcenter">
+<TabsPanel title="Code" onClick={(e) => {e.stopPropagation()}}>
+
+### JavaScript import
+
+```jsx
+import LazyLoader from 'progressive-web-sdk/dist/components/lazy-loader'
+```
+
+### SCSS import
+
+```scss
+@import 'node_modules/progressive-web-sdk/dist/components/lazy-loader/base';
+```
+
+### Props table
+
+<PropsTable propMetaData={props.componentMetadata.childrenComponentProp} />
+
+### Basic example
+
+```jsx react-live=true
+class StatefulExample extends React.Component {
+    constructor() {
+        // First thing we do is track in the state that has
+        // loaded so far. The loaded count will start at 0,
+        // growing to 1 only after the content has loaded.
+
+        this.state = {
+            totalLoaded: 0,
+            content: 'Lazily waiting around...'
+        }
+    }
+
+    // Next, we define a callback function which
+    // updates the state with the newly "fetched" content:
+
+    fetchLazyContent() {
+        return new Promise((resolve) => {
+            // Simulate a little latency
+            setTimeout(() => {
+                this.setState(
+                    {
+                        totalLoaded: 1,
+                        content: 'Content has lazily loaded!'
+                    },
+                    resolve
+                )
+            }, 2000)
+        })
+    }
+
+    render() {
+        // Finally, we render the LazyLoader component and its
+        // current state. Only after the user scrolls the
+        // component into view will it trigger the
+        // `fetchLazyContent` callback.
+
+        return (
+            <LazyLoader
+                fetchItems={this.fetchLazyContent.bind(this)}
+                currentItemCount={this.state.totalLoaded}
+            >
+                {this.state.content}
+            </LazyLoader>
+        )
+    }
+}
+```
+
+You may notice that the example above will always attempt to load something every time the user scrolls. That's because we've provided the component with a way of knowing when it has finished lazy loading "all" of its content. If your implementation is gradually loading small chunks from a list of hundreds of items, you should stop lazy loading once you hit the total item count.
+
+Continuing from the example above, you can provide the `LazyLoad` component with the information it needs to stop like this:
+
+```jsx react-live=true
+class StatefulExample extends React.Component {
+    constructor() {
+        // First thing we do is track in the state that has
+        // loaded so far. The loaded count will start at 0,
+        // growing to 1 only after the content has loaded.
+
+        this.state = {
+            totalLoaded: 0,
+            content: 'Lazily waiting around...'
+        }
+    }
+
+    // Next, we define a callback function which
+    // updates the state with the newly "fetched" content:
+
+    fetchLazyContent() {
+        return new Promise((resolve) => {
+            // Simulate a little latency
+            setTimeout(() => {
+                this.setState(
+                    {
+                        totalLoaded: 1,
+                        content: 'Content has lazily loaded!'
+                    },
+                    resolve
+                )
+            }, 2000)
+        })
+    }
+
+    render() {
+        // Everything so far is the same. The only thing we're
+        // changing is adding the `itemTotal` prop below,
+        // which tells the component to stop trying to lazy
+        // load once the `currentItemCount` hits that number.
+
+        return (
+            <LazyLoader
+                fetchItems={this.fetchLazyContent.bind(this)}
+                currentItemCount={this.state.totalLoaded}
+                itemTotal={1}
+            >
+                {this.state.content}
+            </LazyLoader>
+        )
+    }
+}
+```
+
+### Lazy loading ecommerce content (with fetch)
+
+A common ecommerce example is to lazy load product items. Typically we don't have all of the items on first render, so we must request for more as the user scrolls through the page.
+
+Notice how the "loading" state of the `LazyLoader` will not trigger until the end of the component has scrolled into view:
+
+```jsx react-live=true
+class StatefulExample extends React.Component {
+    constructor() {
+        // We start off with having only a few items already
+        // in the state.
+
+        this.state = {
+            items: [
+                {
+                    name: 'Tegano Dress Engineered Tee',
+                    price: '$245'
+                },
+                {
+                    name: 'Adraya Dress in Barnet Check',
+                    price: '$295'
+                }
+            ]
+        }
+    }
+
+    // We define a function that will fetch content
+    // from "the server" and update the state.
+
+    fetchLazyContent() {
+        return new Promise((resolve) => {
+            // Simulate fetching new items from the server
+            const newItems = [
+                ...this.state.items,
+                {
+                    name: 'Split Neck Silk Tunic',
+                    price: '$89'
+                },
+                {
+                    name: 'Petite Signature Slim Pants',
+                    price: '$89'
+                }
+            ]
+
+            // Simulate a little latency
+            setTimeout(() => {
+                this.setState(
+                    {
+                        items: newItems
+                    },
+                    resolve
+                )
+            }, 2000)
+        })
+    }
+
+    render() {
+        return (
+            <LazyLoader
+                fetchItems={this.fetchLazyContent.bind(this)}
+                currentItemCount={this.state.items.length}
+                itemTotal={4}
+            >
+                {this.state.items.map(({name, price}) => (
+                    <div key={name} className="u-flexbox u-margin-bottom">
+                        <Image
+                            src="http://www.url.com/does-not-exist.jpg"
+                            width="50px"
+                            height="50px"
+                            alt={name}
+                        />
+
+                        <div className="u-flex u-padding-start">
+                            <div>{price}</div>
+                            <div>{name}</div>
+                        </div>
+                    </div>
+                ))}
+            </LazyLoader>
+        )
+    }
+}
+```
+
+### Lazy loading ecommerce content (without fetch)
+
+In this example, we already have all the items we need, but we want to delay the rendering of some items until the user scrolls down far enough. This might happen if those items contain items which are slow to load, such as images.
+
+```jsx react-live=true
+class StatefulExample extends React.Component {
+    constructor() {
+        // In our state we track how many items we want
+        // to show at a time. This number will grow to show
+        // more as the LazyLoader is scrolled through.
+
+        this.state = {
+            itemsToDisplay: 2
+        }
+
+        // Here's our complete list of items.
+        // We will not be fetching for any more in this example.
+
+        this.items = [
+            {
+                name: 'Tegano Dress Engineered Tee',
+                price: '$245'
+            },
+            {
+                name: 'Adraya Dress in Barnet Check',
+                price: '$295'
+            },
+            {
+                name: 'Davah Dress in Light Poplin',
+                price: '$295'
+            },
+            {
+                name: 'Stenna Dress in Seasons',
+                price: '$395'
+            },
+            {
+                name: 'Petite Signature Velvet Slim Pants',
+                price: '$89'
+            },
+            {
+                name: 'Cascade Ruffle Front Top',
+                price: '$59'
+            }
+        ]
+
+        // Here we pick out only those items from the `items`
+        // array that we want to show based on the value of
+        // `itemsToDisplay`.
+
+        this.itemsToRender =
+            this.items.length >= this.state.itemsToDisplay
+                ? this.items.slice(0, this.state.itemsToDisplay)
+                : this.items
+    }
+
+    // Since we are not "fetching" anything, instead of
+    // simulating a network call we'll just update the
+    // state to gradually increase the value of
+    // `itemsToDisplay`.
+
+    loadMore({lastPosition}) {
+        return new Promise((resolve) => {
+            // Simulate a little latency
+            setTimeout(() => {
+                this.setState(
+                    {
+                        itemsToDisplay: lastPosition
+                    },
+                    resolve
+                )
+            }, 2000)
+        })
+    }
+
+    render() {
+        return (
+            // Notice that we've added the `itemsPerPage` prop.
+            // This is necessary to make sure that the `loadMore`
+            // function above receives the correct value for its
+            // `lastPosition` argument.
+
+            <LazyLoader
+                fetchItems={this.loadMore.bind(this)}
+                currentItemCount={this.itemsToRender.length}
+                itemTotal={this.items.length}
+                itemsPerPage={2}
+            >
+                {this.itemsToRender.map(({name, price}) => (
+                    <div key={name} className="u-flexbox u-margin-bottom">
+                        <Image
+                            src="http://www.url.com/does-not-exist.jpg"
+                            width="50px"
+                            height="50px"
+                            alt={name}
+                        />
+
+                        <div className="u-flex u-padding-start">
+                            <div>{price}</div>
+                            <div>{name}</div>
+                        </div>
+                    </div>
+                ))}
+            </LazyLoader>
+        )
+    }
+}
+```
+
+### Load more button
+
+Instead of waiting for the user to scroll to the `LazyLoader` component, the user can decide for themselves to load more by clicking on a "Load More" button. To provide this button, set `useLoadMoreButton` to `true`. For example:
+
+```jsx react-live=true
+class StatefulExample extends React.Component {
+    constructor() {
+        this.state = {
+            totalLoaded: 0,
+            content: 'Lazily waiting around...'
+        }
+    }
+
+    // Next, we define a callback function which
+    // updates the state with the newly "fetched" content:
+
+    fetchLazyContent() {
+        return new Promise((resolve) => {
+            // Simulate a little latency
+            setTimeout(() => {
+                this.setState(
+                    {
+                        totalLoaded: 1,
+                        content: 'Content has lazily loaded!'
+                    },
+                    resolve
+                )
+            }, 2000)
+        })
+    }
+
+    render() {
+        // We set `useLoadMoreButton` to true to show the
+        // button.
+
+        return (
+            <LazyLoader
+                fetchItems={this.fetchLazyContent.bind(this)}
+                currentItemCount={this.state.totalLoaded}
+                useLoadMoreButton={true}
+            >
+                {this.state.content}
+            </LazyLoader>
+        )
+    }
+}
+```
+
+The Load More button can be customized using the `loadMoreButtonClassName` and `loadMoreItemsMessage` props.
+
+```jsx react-live=true
+class StatefulExample extends React.Component {
+    constructor() {
+        this.state = {
+            totalLoaded: 0,
+            content: 'Lazily waiting around...'
+        }
+    }
+
+    // Next, we define a callback function which
+    // updates the state with the newly "fetched" content:
+
+    fetchLazyContent() {
+        return new Promise((resolve) => {
+            // Simulate a little latency
+            setTimeout(() => {
+                this.setState(
+                    {
+                        totalLoaded: 1,
+                        content: 'Content has lazily loaded!'
+                    },
+                    resolve
+                )
+            }, 2000)
+        })
+    }
+
+    render() {
+        // Here we customize the Load More button by giving
+        // it a modifier class, and also altering its
+        // message:
+
+        return (
+            <LazyLoader
+                fetchItems={this.fetchLazyContent.bind(this)}
+                currentItemCount={this.state.totalLoaded}
+                useLoadMoreButton={true}
+                loadMoreButtonClassName={'pw--secondary u-width-full'}
+                loadMoreItemsMessage={'Load more items while you can!'}
+            >
+                {this.state.content}
+            </LazyLoader>
+        )
+    }
+}
+```
+
+The last thing to know about the Load More button is that you can customize the text that gets displayed when all the items have loaded. To do so, you need to provide the message to the `allItemsLoadedMessage` prop, and you must also provide an `itemTotal` count, otherwise the LazyLoader will not know when to change the message it displays in the Load More button.
+
+```jsx react-live=true
+class StatefulExample extends React.Component {
+    constructor() {
+        this.state = {
+            totalLoaded: 0,
+            content: 'Lazily waiting around...'
+        }
+    }
+
+    // Next, we define a callback function which
+    // updates the state with the newly "fetched" content:
+
+    fetchLazyContent() {
+        return new Promise((resolve) => {
+            // Simulate a little latency
+            setTimeout(() => {
+                this.setState(
+                    {
+                        totalLoaded: 1,
+                        content: 'Content has lazily loaded!'
+                    },
+                    resolve
+                )
+            }, 2000)
+        })
+    }
+
+    render() {
+        // Here we provide a custom message that only displays
+        // once `currentItemCount` and `itemTotal` meet.
+
+        // Notice below that we also add `itemTotal` so the
+        // component knows when it has reached
+        // the end.
+
+        return (
+            <LazyLoader
+                fetchItems={this.fetchLazyContent.bind(this)}
+                currentItemCount={this.state.totalLoaded}
+                useLoadMoreButton={true}
+                loadMoreButtonClassName={'pw--tertiary u-width-full'}
+                loadMoreItemsMessage={'Load more items while you can!'}
+                itemTotal={1}
+                allItemsLoadedMessage={'Sorry, no more items left!'}
+            >
+                {this.state.content}
+            </LazyLoader>
+        )
+    }
+}
+```
+
+### The loadingIndicator prop
+
+```jsx react-live=true
+class StatefulExample extends React.Component {
+    constructor() {
+        this.state = {
+            totalLoaded: 0,
+            content: 'Lazily waiting around...'
+        }
+
+        // Create a custom React node to pass to the
+        // `LazyLoader`'s `loadingIndicator` prop
+        this.loadingIcon = (
+            <div>
+                <Icon name="caution" />
+                <span>Caution! Loading something!</span>
+            </div>
+        )
+    }
+
+    // Next, we define a callback function which
+    // updates the state with the newly "fetched" content:
+
+    fetchLazyContent() {
+        return new Promise((resolve) => {
+            // Simulate a little latency
+            setTimeout(() => {
+                this.setState(
+                    {
+                        totalLoaded: 1,
+                        content: 'Content has lazily loaded!'
+                    },
+                    resolve
+                )
+            }, 2000)
+        })
+    }
+
+    render() {
+        return (
+            <LazyLoader
+                fetchItems={this.fetchLazyContent.bind(this)}
+                currentItemCount={this.state.totalLoaded}
+                loadingIndicator={this.loadingIcon}
+            >
+                {this.state.content}
+            </LazyLoader>
+        )
+    }
+}
+```
+
+### Accessible screen reader support
+
+For users that require screen reader support, we've included the `notificationAddedMessage` prop to allow developers to customize the message those users will receive when the LazyLoader finishes updating.
+
+In the example below, the `notificationAddedMessage` prop gets updated to a new value, but you won't be able to hear it unless you're using a screen reader.
+
+Note that whether you set a notification message or not, the user will be notified either way. There is a default message, and the `notificationAddedMessage` overrides that default message.
+
+```jsx react-live=true
+class StatefulExample extends React.Component {
+    constructor() {
+        this.state = {
+            totalLoaded: 0,
+            content: 'Screen reader waiting to hear update...'
+        }
+
+        // Create a custom React node to pass to the
+        // `LazyLoader`'s `loadingIndicator` prop
+        this.loadingIcon = (
+            <div>
+                <Icon name="caution" />
+                <span>Caution! Loading something!</span>
+            </div>
+        )
+    }
+
+    // Next, we define a callback function which
+    // updates the state with the newly "fetched" content:
+
+    fetchLazyContent() {
+        return new Promise((resolve) => {
+            // Simulate a little latency
+            setTimeout(() => {
+                this.setState(
+                    {
+                        totalLoaded: 1,
+                        content: 'Screen reader users notified!'
+                    },
+                    resolve
+                )
+            }, 2000)
+        })
+    }
+
+    render() {
+        return (
+            // Here we create a new message for screen
+            // reader users:
+
+            <LazyLoader
+                fetchItems={this.fetchLazyContent.bind(this)}
+                currentItemCount={this.state.totalLoaded}
+                notificationAddedMessage={'We have downloaded and updated your content.'}
+            >
+                {this.state.content}
+            </LazyLoader>
+        )
+    }
+}
+```
+
+</TabsPanel>
+<TabsPanel title="Design" class="markdown">
+
+### Potential uses
+
+-   Can be applied to any component outside of initial view to ensure that the assets within the user's view will load first.
+-   Can be applied to any code-heavy assets to speed up initial page load, such as images or SVG files.
+-   Useful on long scrolling pages with many instances of similar items, such as search results pages or product listing pages.
+-   Can be used as an alternative to [pagination](Pagination) for loading the next set of products.
+
+### Accessibility
+
+-   Be sure to check the contrast of text on background color to ensure it passes a11y guidelines. [Use this handy tool to guide you](http://www.contrastchecker.com).
+
+### Best practices
+
+-   The component reacts to a scroll action performed by the user. When items are scrolled into view, LazyLoading is triggered.
+-   When more content is loaded, this often extends the height of the page which can then be scrolled further.
+-   The component can be triggered automatically, or after the user taps a "Load More" button.
+-   Apply `LazyLoading` to all code-heavy assets that are outside of the initial view.
+-   Show that content is loading after a user has triggered the load using either the[InlineLoader](InlineLoader) or [SkeletonBlock](SkeletonBlock) components.
+-   Consider any content that may exist below the content being loaded. If lazy loading results in an increase in page height, then a user may be unable to access content below the loaded results. In this case, you can use a Load More button in place of automatic triggering.
+-   Consider a user who would like to share or bookmark certain pages. If lazy loading is chosen instead of pagination, a user will not be able to share anything outside the first set of items on page 1.
+
+</TabsPanel>
+</Tabs>
+</div>

@@ -1,0 +1,142 @@
+---
+title: Handling Backend Outages
+metaTitle: Handling Backend Outages
+metaDescription: 'Best practices to help you design a response to system outages'
+category: Performance
+minVersion: 2.0.0
+maxVersion: 2.0.0
+featured: false
+---
+
+## Introduction
+
+In the past, a backend outage likely meant that your entire application went down. Not with Mobify: applications running on the Mobify Platform have front-ends which are decoupled from their backends. Because your front-end can still operate when the backend fails, your application can continue to serve users to some degree, even when the backend ecommerce platform or content management system (CMS) is down.
+
+In this article, we’ll show you a suggested approach you can use to respond to an ecommerce backend outage, creating an informative banner at the top of the Progressive Web App (PWA) screen which informs users about the outage. We’ll show you how to create a custom error class within your [Connector](/apis-and-sdks/commerce-integrations/connectors/interfaces), how to update your state management, and how to add the custom error message to a `Banner` component.
+
+## Example: creating a custom Banner message
+
+By following the steps below, your PWA will respond to an ecommerce backend outage with an informative `Banner`, like this:
+
+<figure class="u-text-align-center">
+
+![PWA With Custom Banner](./images/PWA_Custom_Banner.png)
+
+</figure>
+
+First, we will create a custom `Error` for the Connector called `ConnectorError`, which extends the regular `Error` class. The role of `ConnectorError` is to check the type of error and provide a custom message in response. For example, you may have an error loading categories, or you may have an error loading products. You can then respond specifically for different types of errors, like this:
+
+```javascript
+// <PROJECT_DIR>/app/connector.js
+
+/**
+ * Create a custom Error class by extending the Error class.
+ * Add a custom message, and pass in a status:
+ */
+class ConnectorError extends Error {
+    constructor(status, message, ...params) {
+        super(...params)
+        this.status = status
+        this.message = message
+    }
+}
+
+/**
+ * Customize the Connector based on the custom Error class
+ * we created above. In this example, we assume the backend
+ * is Salesforce, so we use the `SalesforceConnector`:
+ */
+export default class Connector extends SalesforceConnector {
+    getProductsFromBackend() {
+        return fetch('/mobify/proxy/base/status/500').then((response) => {
+            if (response.status == 500 || !response.ok) {
+                throw new ConnectorError(
+                    response.status,
+                    'A network error occurred while loading products from the backend!'
+                )
+            }
+        })
+    }
+}
+```
+
+Next, update your state management implementation to send data from the Connector to the PWA. We demonstrate the Redux implementation below, for projects that choose to use Redux as their state management system.
+
+Note the function `getProductsFromBackend` in the example below, which allows the backend error to be caught earlier due to the `catch` block:
+
+```javascript
+// <PROJECT_DIR>/app/actions.js
+
+// Action Type
+export const BACKEND_ERROR_RECEIVED = 'BACKEND_ERROR_RECEIVED'
+
+// Data Actions
+export const backendErrorReceived = (payload) => ({
+    type: BACKEND_ERROR_RECEIVED,
+    payload
+})
+
+// In this Thunk Actions implementation, if there’s an error, it will get caught earlier and dispatched to the Redux store.
+export const getProductsFromBackend = () => (dispatch, _, {connector}) =>
+    connector
+        .getProductsFromBackend()
+        .then(() => {})
+        .catch((error) => {
+            dispatch(backendErrorReceived(error))
+        })
+```
+
+The rest of the Redux implementation will look like this:
+
+```javascript
+// <PROJECT_DIR>/app/selectors.js
+export const getConnectorError = ({errors}) => errors
+export const getConnectorErrorStatus = createSelector(
+    getConnectorError,
+    'status'
+)
+
+// <PROJECT_DIR>/app/reducer.js
+import {BACKEND_ERROR_RECEIVED} from './actions'
+
+export const errors = (state = Immutable.Map(), action) => {
+    switch (action.type) {
+        case BACKEND_ERROR_RECEIVED:
+            return state.mergeDeep(action.payload)
+        default:
+            return state
+    }
+}
+```
+
+To display the custom connector’s error message in a banner, map your error selector to your `Banner` component props, like this:
+
+```javascript
+class ProductList extends React.Component {
+
+    ...
+
+    render() {
+        const {connectorError} = this.props
+        return (
+            <div className="t-product-list">
+                {connectorError && (
+                    <Banner isAlert title="info" icon="info" className="u-margin-top-md">
+                        {connectorError.message}
+                    </Banner>
+                )}
+            </div>
+        )
+    }
+}
+```
+
+## Other suggested approaches
+
+In addition to the approach we demonstrated above, you can also try these ideas for handling backend outages:
+
+-   Render as much content as you can on the screen. If you can’t render much content due to the backend outage, consider returning an error page with the HTTP 500 status code.
+
+-   Adjust your approach depending on the type of backend outage. Your response may differ for an ecommerce backend outage, versus a CMS outage. For example, imagine that your ecommerce backend stores most of your products’ data, and that your CMS stores the product images. If your ecommerce backend went down, your site would have very little functionality. In that case, it may be best to render an HTTP 500 status code. However, an outage in your CMS may leave the site with a decent amount of functionality, enough for users to continue using the site. They could perhaps still add items to their cart and make purchases from product detail pages, even if the CMS content is unavailable. In that case, you can provide an informative banner message to tell the user about the missing content, and that they can still shop the site.
+
+-   It’s best to simulate the backend outage to confirm that you can detect these types of outages, and to test the user experience under that scenario. To simulate, change the backend proxy to point to a different environment that will give you unexpected data. You can also create a Connector test that mocks out different responses and gives you different data than what you’d expect.

@@ -1,0 +1,43 @@
+[
+    {
+        "scope": "https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com:443",
+        "method": "GET",
+        "path": "/s/RefArch/dw/shop/v20_4/products/008884303989M?expand=availability%2Cprices%2Cvariations%2Cimages&all_images=true",
+        "body": "",
+        "status": 200,
+        "response": [
+            "1f8b0800000000000000ec5a6d6fdb3610fe2b9c3e3b7ab36c4b018662cdd601c50a044db715190a8192689b8b246a2465c709f2df779464c7713ca5123c970d0c7f31c9e3e9f8dc738f8e80ee8d70619c1bae6d7ac6c008e5aa20302c384bca58c24c5c724ef2780593bf5ffd0c133481bfb6edfbbe37b487811f7c5093199e9170c6595908e3fcaffb8da3ad85b5d91e0358c2a984d1658a25cdcb0cbd4d4b82ae24a70511e8172c56e8027382de51294982aee6944b34805f8a79b53da1228cb020614af31b703497b210e796459219316151c89919b32c233c2671cacac414382562ca60ac16ac646955a1580bd7babefef82eb46dc762b995900ce7c9121e6e0a09c1c5d6997545251167b82860363dcbce622c71ca66603bc5652ac1d77014c4913f9cd63e855585695dfe6a3ab6e30e5d6764be7fffc7d8f9fcd9bcbc36ff2e6670829dc0efeef8f40c628038f32462b766296090dcb69fe298014b2a53d23d67c6c3e0b567dff126c3d80bf0cb60bed523fb3d02ee9dfd2f036341c972cd803a85cf38f1bf49c69f7340435be69c74a33d7187130fbd797052909778a06404730a5b591e6209bba252ee08c51e83750313b3947143f98087beb82bacccd6e660d31c06c2f8d67a364019496899e9c7e1c07588ed38c19a12759c3a8b599f8835e882742580e345fe1840fb0a38b551b1ee111faa116ab278f44e4857f69ce4e3e8cd90ae543809c9f7db0f1d5dd6064864384df5637164070e19bbf19a1355983aeb598f8035e88634cdfe2419fa93c81fbd0ca62612d623e043b542750a8fde0969ca9c936e1cb90dd294072705f95e7ba06fa5674b2ce3b97e448ea6dec4b51fef49759c7b897171a90593fb44fc4aa95c734a4dd37c4172c9f8ca38dfe2ed6612b82be1c9ae3f30221cdf309e108e2305c914a78234816eec4375efdc3292bc049b8293e71b8564f14d9892054995ff076007cb676142440ce0aaa381e3dfd8822056724414d2b1425ab094264828a0693e7b833ecd498e66b4b1134d6630927cf5032c52814419411251a43257af23aa2c721ac3a6ea51483234c7e083e668a5fc00f30491085887968cdf142906db25c11c01f1109508e2ce618bf213c1904d956b02a8567bc8ade418015b61204dc024c34212be8d713373a0a210d64732fd89039da1cac59c1550e476e859cd2700c27247f6c89e0cc71fde808a857505fca8d2b3092eac52b9b1db9f4880cc389f8c4cdb868465340f2b9bf09f12e7502a40226760e438eb5c32f0b44289e92b4d7f75b65e5a623c451dea660e3e5f2b4ec0c3e22999ea6ab9dffda6a51e36f29acb9aa040c9b288773e6c7934daa3a0b93c5a013ec614ec2dc2d6621b6ccebdf3e14e5015eae3db60fdaab86f5e1e8f6f010097dea983c3bbce78d86e63be15129e3db40f8544e5ab3312f6581724bcc9e190005fdd91f07541c20eba2011046610fc271276d0a33a3c3d90a83eca3b984ef87d90b0f540c2b39d832966e5ab3b12dae8843b3c1c12e0abbb4ea8ea38d0b5a6e9132ffadd729addf54d6b0f047b6e41bb19dc1f5e75d48dffab7ad42f38af2db00acbf69076fd8ddbfd8dbbfaf3dbfdf95dfd8162b4395482d2d1a1dbeed0edecb03d254ee79438ed3951caf1e569c17cadf40e8c387c6e11879c4c694e32b8705f34abcba606e2706bbf1a2e6922e730be361efe050000ffff",
+            "0300bd2a590c222e0000"
+        ],
+        "rawHeaders": [
+            "accept-ranges",
+            "bytes",
+            "x-dw-request-base-id",
+            "OgHDv3B_GF9QXzMK",
+            "allow",
+            "GET,HEAD,OPTIONS",
+            "x-content-type-options",
+            "nosniff",
+            "cache-control",
+            "max-age=0,no-cache,no-store,must-revalidate",
+            "jweb",
+            "y",
+            "vary",
+            "accept-encoding",
+            "content-encoding",
+            "gzip",
+            "content-type",
+            "application/json;charset=UTF-8",
+            "date",
+            "Wed, 22 Jul 2020 18:03:28 GMT",
+            "server",
+            "istio-envoy",
+            "x-envoy-upstream-service-time",
+            "40",
+            "connection",
+            "close",
+            "transfer-encoding",
+            "chunked"
+        ]
+    }
+]
