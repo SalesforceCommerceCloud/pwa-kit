@@ -8,7 +8,11 @@ export default {
             display: 'flex',
             boxSize: 4,
             color: 'grey'
+        },
+        link: {
+            paddingTop: 3,
+            paddingBottom: 3
         }
     },
-    parts: ['container', 'icon']
+    parts: ['container', 'icon', 'link']
 }

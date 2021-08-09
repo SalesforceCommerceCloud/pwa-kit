@@ -8,7 +8,6 @@
 'use strict'
 
 const Promise = require('bluebird')
-const copy = Promise.promisify(require('copy'))
 const fs = require('fs')
 const mkdir = Promise.promisify(fs.mkdir)
 const exec = require('child_process').exec
@@ -51,32 +50,8 @@ const transpileSrc = () => {
     }).catch(catcher('exec error'))
 }
 
-const copyComponentScss = () => {
-    console.log('Copying component scss files to dist/')
-
-    return copy('src/components/**/*.scss', 'dist/components/').catch(catcher(`Error copying scss`))
-}
-
-const copyResponsiveScss = () => {
-    console.log('Copying responsive scss files to dist/')
-
-    return copy('styleguide/styles/_responsive.scss', 'dist/styles/', {flatten: true}).catch(
-        catcher(`Error copying scss`)
-    )
-}
-
-const copySvg = () => {
-    console.log('Copying svg files to dist/')
-
-    return copy('src/components/**/*.svg', 'dist/components/').catch(catcher(`Error copying scss`))
-}
-
 cleanDist()
     // Transpile & copy everything under 'src' into 'dist'
     .then(transpileSrc)
-    // Copy other files to dist
-    .then(copyComponentScss)
-    .then(copyResponsiveScss)
-    .then(copySvg)
     .then(() => console.log('Successfully built!'))
     .catch(catcher('Error in build'))

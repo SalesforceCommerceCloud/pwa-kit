@@ -12,9 +12,7 @@
 
 [![NPM](https://nodei.co/npm/progressive-web-sdk.png?downloads=true&stars=true)](https://nodei.co/npm/progressive-web-sdk/) [![CircleCI](https://circleci.com/gh/mobify/progressive-web-sdk.svg?style=svg&circle-token=c41dc67ed5bb7c6a485789d6e7c1323e7f1649fb)](https://circleci.com/gh/mobify/progressive-web-sdk)
 
-A set of components and utilities which make up the SDK for Progressive Web
-
-You can find the latest version of the SDK Docs on [DevCenter](https://dev.mobify.com/)
+A library that supports the isomorphic React rendering pipeline for Commerce Cloud Managed Runtime apps.
 
 ## Requirements
 
@@ -29,39 +27,6 @@ You can find the latest version of the SDK Docs on [DevCenter](https://dev.mobif
 
 ```bash
 npm i
-```
-
-## Usage
-
-The Progressive Web SDK has a number of components that can be used in progressive web builds.
-Component documentation and examples can be seen by running our styleguide:
-
-```bash
-npm run docs:dev
-```
-
-You can now view the styleguide at [http://localhost:9000.](http://localhost:9000)
-
-Our docs are built on [styleguidist.](https://github.com/sapegin/react-styleguidist)
-
-## Use the SDK in a project
-
-To use the progressive-web-sdk in a project, add it as a dev-dependency to your package.json.
-Once you have done that, run `npm install`.
-
-Components can now be imported into your project by loading the build files from `dist`:
-
-```javascript
-import Button from 'pwa-kit-react-sdk/dist/components/button'
-
-const myButton = <Button text="Take My Money!" />
-```
-
-If you are actively developing a new library or component in the SDK, run the following
-command in order for the files to be built into `dist` when making changes in `src`:
-
-```javascript
-npm run dev:watch
 ```
 
 ## Marking public API functions as experimental or deprecated

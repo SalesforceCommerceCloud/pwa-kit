@@ -18,6 +18,7 @@ branches:
     - v2-master
     - v2-develop
     - salesforce-master
+    - salesforce-develop
 
 # Install Scripts
 install:

@@ -1,9 +1,11 @@
 export default {
     baseStyle: {
+        container: {style: {alignItems: 'baseline'}},
         label: {
             width: 'full'
         },
         control: {
+            marginTop: '3px',
             _checked: {
                 backgroundColor: 'blue.600',
                 borderColor: 'blue.600',
@@ -16,7 +18,7 @@ export default {
     },
     sizes: {
         md: {
-            label: {marginLeft: 3}
+            label: {marginLeft: 3, fontSize: 'sm'}
         }
     }
 }

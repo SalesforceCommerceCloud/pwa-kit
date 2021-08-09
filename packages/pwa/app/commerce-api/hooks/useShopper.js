@@ -33,7 +33,6 @@ const useShopper = () => {
             basket.getOrCreateBasket()
             return
         }
-
         // We have a registered customer (customer with email), and we have their basket,
         // but the email applied to the basket is missing or doesn't match the customer
         // email. In this case, we update the basket with their email.

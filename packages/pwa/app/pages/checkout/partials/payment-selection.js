@@ -10,7 +10,8 @@ import {
     Radio,
     RadioGroup,
     Stack,
-    Text
+    Text,
+    Tooltip
 } from '@chakra-ui/react'
 import {useForm, Controller} from 'react-hook-form'
 import {ChevronDownIcon, LockIcon, PaypalIcon} from '../../../components/icons'
@@ -80,7 +81,16 @@ const PaymentSelection = ({form, hideSubmitButton, onSubmit = () => null}) => {
                                                 <Text fontWeight="bold">
                                                     <FormattedMessage defaultMessage="Credit Card" />
                                                 </Text>
-                                                <LockIcon color="gray.700" boxSize={5} />
+                                                <Tooltip
+                                                    hasArrow
+                                                    placement="top"
+                                                    label={formatMessage({
+                                                        defaultMessage:
+                                                            'This is a secure SSL encrypted payment.'
+                                                    })}
+                                                >
+                                                    <LockIcon color="gray.700" boxSize={5} />
+                                                </Tooltip>
                                             </Stack>
                                             <Text fontWeight="bold">
                                                 <FormattedNumber
@@ -98,6 +108,7 @@ const PaymentSelection = ({form, hideSubmitButton, onSubmit = () => null}) => {
                                         {hasSavedCards && (
                                             <Controller
                                                 name="paymentInstrumentId"
+                                                defaultValue=""
                                                 control={form.control}
                                                 rules={{
                                                     required: !isEditingPayment

@@ -1,8 +1,7 @@
 {
   "name": "scaffold-pwa",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "siteName": "NPSP Web",
-  "siteUrl": "https://www.example.com/",
   "projectSlug": "scaffold-pwa",
   "aJSSlug": "scaffold-pwa",
   "license": "See license in LICENSE",
@@ -57,6 +56,7 @@
     "core-js": "2.4.0",
     "es6-object-assign": "^1.1.0",
     "express": "^4.16.4",
+    "focus-visible": "^5.2.0",
     "framer-motion": "^3.7.0",
     "hoist-non-react-statics": "^3.3.0",
     "json-stable-stringify": "^1.0.1",
@@ -144,7 +144,7 @@
     "nodemon": "1.18.10",
     "postcss-loader": "3.0.0",
     "prettier": "1.18.2",
-    "pwa-kit-react-sdk": "^0.1.0",
+    "pwa-kit-react-sdk": "^0.2.0",
     "raf": "^3.4.0",
     "raw-loader": "0.5.1",
     "react-loadable": "^5.5.0",
@@ -167,30 +167,29 @@
   },
   "scripts": {
     "analyze-build": "cross-env MOBIFY_ANALYZE=true npm run prod:build",
-    "lint": "npm run lint:js",
-    "lint:fix": "npm run lint:js -- --fix",
-    "lint:js": "eslint '**/*.{js,jsx}'",
+    "compile-messages": "formatjs compile-folder --ast app/translations app/translations/compiled",
+    "compile-messages:pseudo": "formatjs compile --ast app/translations/$npm_package_l10n_defaultLocale.json --out-file app/translations/compiled/pseudo.json --pseudo-locale xx-LS",
+    "extract-messages": "formatjs extract 'app/**/*.{js,jsx}' --out-file app/translations/$npm_package_l10n_defaultLocale.json --id-interpolation-pattern [sha512:contenthash:base64:6]",
+    "format": "prettier --write \"**/*.{js,jsx}\"",
+    "lint": "eslint '**/*.{js,jsx}'",
+    "lint:fix": "npm run lint -- --fix",
+    "prod:build": "npm run extract-messages && npm run compile-messages && cross-env NODE_ENV=production sdk-pwa-build",
     "push": "cross-env NODE_ENV=production npm run prod:build && sdk-upload",
     "save-credentials": "sdk-save-credentials",
     "start": "cross-env NODE_ICU_DATA=node_modules/full-icu node ./scripts/start ssr",
     "start:inspect": "npm run start -- --inspect",
-    "start:pseudolocale": "npm run compile-messages:pseudo && cross-env TARGET_LOCALE=pseudo npm run start",
-    "prod:build": "npm run compile-messages && cross-env NODE_ENV=production sdk-pwa-build",
+    "start:pseudolocale": "npm run extract-messages && npm run compile-messages:pseudo && cross-env TARGET_LOCALE=pseudo npm run start",
     "test": "cross-env NODE_ICU_DATA=node_modules/full-icu jest --maxWorkers=2 --env=jest-environment-jsdom-sixteen",
     "test:e2e": "cypress run",
     "test:e2e-ci": "node ./scripts/run-e2e.js",
     "test:integration": "cross-env TEST_TYPE=integration npm run test",
     "test:lighthouse": "lhci autorun --config=tests/lighthouserc.js",
-    "test:max-file-size": "bundlesize",
-    "format": "prettier --write \"**/*.{js,jsx}\"",
-    "extract-messages": "formatjs extract 'app/**/*.{js,jsx}' --out-file app/translations/$npm_package_l10n_defaultLocale.json",
-    "compile-messages": "formatjs compile-folder --ast app/translations app/translations/compiled",
-    "compile-messages:pseudo": "formatjs compile --ast app/translations/$npm_package_l10n_defaultLocale.json --out-file app/translations/compiled/pseudo.json --pseudo-locale xx-LS"
+    "test:max-file-size": "bundlesize"
   },
   "bundlesize": [
     {
       "path": "build/main.js",
-      "maxSize": "22 kB"
+      "maxSize": "30 kB"
     },
     {
       "path": "build/vendor.js",

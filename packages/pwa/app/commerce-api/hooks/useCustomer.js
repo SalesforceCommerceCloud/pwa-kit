@@ -22,6 +22,7 @@ export default function useCustomer() {
                         window.sessionStorage.getItem('codeVerifier')
                     )
                     const {customer_id} = await api.auth.getLoggedInToken(tokenBody)
+
                     const customer = await api.shopperCustomers.getCustomer({
                         parameters: {customerId: customer_id}
                     })
@@ -29,19 +30,19 @@ export default function useCustomer() {
                     setCustomer(customer)
                 } else {
                     let customer = res.customer
+
                     if (res.access_token) {
                         customer = await api.shopperCustomers.getCustomer({
                             parameters: {customerId: res.customer_id}
                         })
                     }
-
                     setCustomer(customer)
                 }
             },
 
             async logout() {
-                const guestCustomer = await api.auth.logout()
-                setCustomer(guestCustomer)
+                const {customer} = await api.auth.logout()
+                setCustomer(customer)
             },
 
             async getCustomer() {
@@ -52,8 +53,46 @@ export default function useCustomer() {
                 )
             },
 
+            async registerCustomer(data) {
+                // TODO: investigate how to submit/include the checkbox input
+                // for receiving email communication.
+
+                const body = {
+                    customer: {
+                        firstName: data.firstName,
+                        lastName: data.lastName,
+                        email: data.email,
+                        login: data.email
+                    },
+                    password: data.password
+                }
+
+                const response = await api.shopperCustomers.registerCustomer({body})
+
+                // Check for error json response
+                if (response.detail && response.title && response.type) {
+                    throw new Error(response.detail)
+                }
+
+                // Send a new login request with the given credentials to ensure tokens are updated.
+                await self.login({email: data.email, password: data.password})
+            },
+
+            /**
+             * @todo - Backend set up required
+             * @param {string} - customer email address
+             */
+            async getResetPasswordToken(login) {
+                const response = await api.shopperCustomers.getResetPasswordToken({body: {login}})
+
+                // Check for error json response
+                if (response.detail && response.title && response.type) {
+                    throw new Error(response.detail)
+                }
+            },
+
             async addSavedAddress(address) {
-                // The `addressNId` field is required to save the customer's address to their account.
+                // The `addressId` field is required to save the customer's address to their account.
                 // Rather than make the customer provide a name/id, we can generate a unique id behind
                 // the scenes instead. This is only useful if you are not displaying the addr name/id
                 // in the UI, which we aren't.

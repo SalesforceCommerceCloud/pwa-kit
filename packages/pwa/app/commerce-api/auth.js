@@ -77,6 +77,7 @@ class Auth {
         }
 
         const response = await this._api.shopperLogin.getAccessToken(options)
+
         await this._handleShopperLoginTokenResponse(response)
         return response
     }
@@ -102,6 +103,7 @@ class Auth {
             } else if (this._authToken && this._refreshToken) {
                 authorizationMethod = '_refreshLoggedInToken'
             }
+
             return this[authorizationMethod](credentials).catch((error) => {
                 if (retries === 0 && error.message === 'EXPIRED_TOKEN') {
                     retries = 1 // we only retry once
@@ -183,8 +185,11 @@ class Auth {
      */
     async _loginWithCredentials(credentials) {
         const codeVerifier = createCodeVerifier()
+
         const codeChallenge = await generateCodeChallenge(codeVerifier)
+
         sessionStorage.setItem('codeVerifier', codeVerifier)
+
         const authorization = `Basic ${btoa(`${credentials.email}:${credentials.password}`)}`
         const options = {
             headers: {
@@ -200,7 +205,6 @@ class Auth {
         }
 
         const response = await this._api.shopperLogin.authenticateCustomer(options, true)
-
         if (response.status > 400) {
             const json = await response.json()
             throw new Error(json.message)

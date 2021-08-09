@@ -133,6 +133,7 @@ Field.propTypes = {
     formLabel: PropTypes.any,
     type: PropTypes.oneOf([
         'text',
+        'number',
         'password',
         'email',
         'phone',

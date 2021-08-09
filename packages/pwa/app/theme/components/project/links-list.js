@@ -7,9 +7,13 @@ export default {
         list: {
             fontSize: 'sm'
         },
+        headingLink: {
+            display: 'inline-flex'
+        },
         heading: {
             fontSize: 'md',
-            marginBottom: 4
+            paddingTop: 3,
+            paddingBottom: 3
         }
     },
     variants: {

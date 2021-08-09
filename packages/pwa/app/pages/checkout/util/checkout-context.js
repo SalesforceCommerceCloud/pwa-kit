@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react'
+import React, {useCallback, useEffect, useRef, useState} from 'react'
 import PropTypes from 'prop-types'
 import useBasket from '../../../commerce-api/hooks/useBasket'
 import useCustomer from '../../../commerce-api/hooks/useCustomer'
@@ -9,6 +9,7 @@ import {isMatchingAddress} from '../../../utils/utils'
 const CheckoutContext = React.createContext()
 
 export const CheckoutProvider = ({children}) => {
+    const mounted = useRef()
     const api = useCommerceAPI()
     const customer = useCustomer()
     const basket = useBasket()
@@ -16,7 +17,6 @@ export const CheckoutProvider = ({children}) => {
     const [state, setState] = useState({
         // @TODO: use contants to represent checkout steps like const CHECKOUT_STEP_2_SHIPPING = 2
         step: undefined,
-
         isGuestCheckout: false,
         shippingMethods: undefined,
         paymentMethods: undefined,
@@ -24,12 +24,25 @@ export const CheckoutProvider = ({children}) => {
         sectionError: undefined
     })
 
-    const mergeState = (data) => {
+    const mergeState = useCallback((data) => {
+        // If we become unmounted during an async call that results in updating state, we
+        // skip the update to avoid React errors about setting state in unmounted components.
+        if (!mounted.current) {
+            return
+        }
         setState((_state) => ({
             ..._state,
             ...data
         }))
-    }
+    })
+
+    // We use this to track mounted state.
+    useEffect(() => {
+        mounted.current = true
+        return () => {
+            mounted.current = false
+        }
+    }, [])
 
     useEffect(() => {
         if (customer.authType === 'registered' && state.isGuestCheckout) {
@@ -164,9 +177,8 @@ export const CheckoutProvider = ({children}) => {
 
                 await basket.setShippingAddress(address)
 
-                // Save the address to the customer's account if they are registered and they
-                // provided a name for it.
-                if (!state.isGuestCheckout) {
+                // Save the address to the customer's account if they are registered.
+                if (!state.isGuestCheckout && !addressId) {
                     customer.addSavedAddress(address)
                 }
             },

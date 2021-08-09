@@ -1,19 +1,21 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import ccValidator from 'card-validator'
-import {Box, Flex, FormLabel, InputRightElement, SimpleGrid, Stack} from '@chakra-ui/react'
+import {useIntl} from 'react-intl'
+import {Box, Flex, FormLabel, InputRightElement, SimpleGrid, Stack, Tooltip} from '@chakra-ui/react'
 import {formatCreditCardNumber, getCreditCardIcon} from '../../utils/cc-utils'
 import useCreditCardFields from './useCreditCardFields'
 import Field from '../field'
-import {AmexIcon, CVVIcon, DiscoverIcon, MastercardIcon, VisaIcon} from '../icons'
+import {AmexIcon, DiscoverIcon, MastercardIcon, VisaIcon, InfoIcon} from '../icons'
 
 const CreditCardFields = ({form, prefix = ''}) => {
+    const {formatMessage} = useIntl()
     const fields = useCreditCardFields({form, prefix})
 
     // Rerender the fields when we `cardType` changes so the detected
     // card icon appears while typing the card number.
     // https://react-hook-form.com/api#watch
-    form.watch('cardType')
+    const cardType = form.watch('cardType')
 
     const CardIcon = getCreditCardIcon(form.getValues().cardType)
 
@@ -35,7 +37,7 @@ const CreditCardFields = ({form, prefix = ''}) => {
                     }
                     inputProps={({onChange}) => ({
                         onChange(evt) {
-                            const number = evt.target.value
+                            const number = evt.target.value.replace(/[^0-9 ]+/, '')
                             const {card} = ccValidator.number(number)
                             const formattedNumber = card
                                 ? formatCreditCardNumber(number, card)
@@ -71,21 +73,46 @@ const CreditCardFields = ({form, prefix = ''}) => {
                                 if (value.length > 4) {
                                     return
                                 }
-
                                 if (value.length >= 2) {
                                     value = `${value.substr(0, 2)}/${value.substr(2)}`
                                 }
 
                                 return onChange(value)
+                            },
+                            onKeyDown(evt) {
+                                if (evt.keyCode === 8 || evt.keyCode === 46) {
+                                    evt.preventDefault()
+                                    return onChange(evt.target.value.slice(0, -1))
+                                }
                             }
                         })}
                     />
 
-                    <Field {...fields.securityCode}>
-                        <InputRightElement width="60px">
-                            <CVVIcon width={8} height="auto" />
-                        </InputRightElement>
-                    </Field>
+                    <Field
+                        {...fields.securityCode}
+                        formLabel={
+                            <FormLabel>
+                                {fields.securityCode.label}{' '}
+                                <Tooltip
+                                    hasArrow
+                                    placement="top"
+                                    label={formatMessage(
+                                        {
+                                            defaultMessage:
+                                                'This {length}-digit code can be found on the {side} of your card.',
+                                            description: 'Credit card security code help text'
+                                        },
+                                        {
+                                            length: cardType === 'american-express' ? 4 : 3,
+                                            side: cardType === 'american-express' ? 'front' : 'back'
+                                        }
+                                    )}
+                                >
+                                    <InfoIcon boxSize={5} color="gray.700" ml={1} />
+                                </Tooltip>
+                            </FormLabel>
+                        }
+                    />
                 </SimpleGrid>
             </Stack>
             <Field {...fields.cardType} />

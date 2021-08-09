@@ -113,15 +113,6 @@ const Pagination = (props) => {
                 </Text>
                 <ChevronRightIcon />
             </Button>
-
-            {/* Handle navigation in non-react context */}
-            {isServer && (
-                <div
-                    dangerouslySetInnerHTML={{
-                        __html: `<script>document.getElementById('${SELECT_ID}').addEventListener('change', ({target}) => { window.location = target.value})</script>`
-                    }}
-                />
-            )}
         </Flex>
     )
 }

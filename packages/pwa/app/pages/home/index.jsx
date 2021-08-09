@@ -149,8 +149,6 @@ Home.propTypes = {
 }
 
 Home.getProps = async ({api}) => {
-    // Login as `guest` to get session.
-    await api.auth.login()
     const recommededCategoryId = 'womens-clothing-tops'
 
     const [productSearchResult] = await Promise.all([

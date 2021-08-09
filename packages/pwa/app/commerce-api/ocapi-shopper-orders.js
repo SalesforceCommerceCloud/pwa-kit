@@ -20,6 +20,7 @@ class OcapiShopperOrders {
         if (requiredParametersError) {
             return requiredParametersError
         }
+
         const {body} = args[0]
         return await this.fetch(
             'orders',

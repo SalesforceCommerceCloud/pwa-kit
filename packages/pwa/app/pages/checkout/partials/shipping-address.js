@@ -1,4 +1,4 @@
-import React from 'react'
+import React, {useState} from 'react'
 import {Box, Text} from '@chakra-ui/react'
 import {useCheckout} from '../util/checkout-context'
 import {Section, SectionEdit, SectionSummary} from './section'
@@ -12,10 +12,13 @@ export default function ShippingAddress() {
         setCheckoutStep,
         goToNextStep
     } = useCheckout()
+    const [isLoading, setIsLoading] = useState()
 
     const submitAndContinue = async (address) => {
+        setIsLoading(true)
         await setShippingAddress(address)
         goToNextStep()
+        setIsLoading(false)
     }
 
     return (
@@ -23,6 +26,7 @@ export default function ShippingAddress() {
             id="step-1"
             title="Shipping Address"
             editing={step === 1}
+            isLoading={isLoading}
             disabled={selectedShippingAddress == null}
             onEdit={() => setCheckoutStep(1)}
         >

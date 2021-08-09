@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react'
+import React, {useEffect, useState, Fragment} from 'react'
 import {FormattedMessage, FormattedNumber} from 'react-intl'
 import {useHistory} from 'react-router-dom'
 import {
@@ -10,14 +10,24 @@ import {
     SimpleGrid,
     Spacer,
     Stack,
-    Text
+    Text,
+    Alert,
+    AlertIcon
 } from '@chakra-ui/react'
+import {useForm} from 'react-hook-form'
 import {getCreditCardIcon} from '../../utils/cc-utils'
 import useBasket from '../../commerce-api/hooks/useBasket'
+import useCustomer from '../../commerce-api/hooks/useCustomer'
+import {useLocale} from '../../locale'
+import Link from '../../components/link'
+import CartProductVariant from './partials/cart-product-variant'
+import PostCheckoutRegistrationFields from '../../components/forms/post-checkout-registration-fields'
 
 const CheckoutConfirmation = () => {
     const history = useHistory()
     const basket = useBasket()
+    const customer = useCustomer()
+    const [locale] = useLocale()
 
     // The order data will initially be stored as our basket when first coming to this
     // page. We capture it in local state to use for our UI. A new basket will be automatically
@@ -28,6 +38,7 @@ const CheckoutConfirmation = () => {
     // different page. Fow now, we push to the homepage.
     useEffect(() => {
         if (!order || order._type !== 'order') {
+            // TODO: call `useNavigation` hook once it's merged
             history.push('/')
         }
     }, [order])
@@ -38,14 +49,55 @@ const CheckoutConfirmation = () => {
 
     const CardIcon = getCreditCardIcon(order.paymentInstruments[0].paymentCard?.cardType)
 
+    const form = useForm({
+        defaultValues: {
+            email: customer?.email || order.customerInfo?.email || '',
+            password: '',
+            firstName: customer.firstName || order.billingAddress?.firstName,
+            lastName: customer.lastName || order.billingAddress?.lastName
+        }
+    })
+    const submitForm = async (data) => {
+        try {
+            await customer.registerCustomer(data)
+        } catch (error) {
+            const existingAccountMessage = (
+                <Fragment>
+                    <FormattedMessage defaultMessage="This email already has an account." />
+                    &nbsp;
+                    <Link to={`/${locale}/login`} color="blue.600">
+                        <FormattedMessage defaultMessage="Log in here" />
+                    </Link>
+                </Fragment>
+            )
+
+            const message = /the login is already in use/i.test(error.message)
+                ? existingAccountMessage
+                : error.message
+
+            form.setError('global', {type: 'manual', message})
+            return
+        }
+
+        // Customer is successfully registered with a new account,
+        // and the recent order would be associated with this account too.
+        // Now redirect to the Account page.
+        history.push(`/${locale}/account`)
+    }
+
     return (
         <Box background="gray.50">
-            <Container maxWidth="container.md" py={{base: 7, md: 16}} px={{base: 0, md: 4}}>
+            <Container
+                maxWidth="container.md"
+                py={{base: 7, md: 16}}
+                px={{base: 0, md: 4}}
+                data-testid="sf-checkout-confirmation-container"
+            >
                 <Stack spacing={4}>
                     <Box layerStyle="card" rounded={[0, 0, 'base']} px={[4, 4, 6]} py={[6, 6, 8]}>
                         <Stack spacing={6}>
                             <Heading align="center" fontSize={['2xl']}>
-                                Thank you for your order!
+                                <FormattedMessage defaultMessage="Thank you for your order!" />
                             </Heading>
 
                             <Box>
@@ -59,14 +111,18 @@ const CheckoutConfirmation = () => {
                                         </Text>
                                         <Text align="center">
                                             <FormattedMessage
-                                                defaultMessage="We will send an email to {email} with your confirmation number and receipt shortly."
-                                                values={{email: order.customerInfo.email}}
+                                                defaultMessage="We will send an email to <b>{email}</b> with your confirmation number and receipt shortly."
+                                                values={{
+                                                    // eslint-disable-next-line react/display-name
+                                                    b: (chunks) => <b>{chunks}</b>,
+                                                    email: order.customerInfo.email
+                                                }}
                                             />
                                         </Text>
 
                                         <Spacer />
 
-                                        <Button variant="outline">
+                                        <Button as={Link} href="/" variant="outline">
                                             <FormattedMessage defaultMessage="Continue Shopping" />
                                         </Button>
                                     </Stack>
@@ -74,6 +130,43 @@ const CheckoutConfirmation = () => {
                             </Box>
                         </Stack>
                     </Box>
+
+                    {customer.authType === 'guest' && (
+                        <Box
+                            layerStyle="card"
+                            rounded={[0, 0, 'base']}
+                            px={[4, 4, 6]}
+                            py={[6, 6, 8]}
+                        >
+                            <Container variant="form">
+                                <Heading fontSize="lg" marginBottom={6}>
+                                    <FormattedMessage defaultMessage="Create an account for faster checkout" />
+                                </Heading>
+
+                                <form onSubmit={form.handleSubmit(submitForm)}>
+                                    <Stack spacing={4}>
+                                        {form.errors?.global && (
+                                            <Alert status="error">
+                                                <AlertIcon />
+                                                {form.errors.global.message}
+                                            </Alert>
+                                        )}
+
+                                        <PostCheckoutRegistrationFields form={form} />
+
+                                        <Button
+                                            type="submit"
+                                            width="full"
+                                            onClick={() => form.clearErrors('global')}
+                                            isLoading={form.formState.isSubmitting}
+                                        >
+                                            <FormattedMessage defaultMessage="Create Account" />
+                                        </Button>
+                                    </Stack>
+                                </form>
+                            </Container>
+                        </Box>
+                    )}
 
                     <Box layerStyle="card" rounded={[0, 0, 'base']} px={[4, 4, 6]} py={[6, 6, 8]}>
                         <Container variant="form">
@@ -144,31 +237,7 @@ const CheckoutConfirmation = () => {
 
                                     <Stack spacing={5} align="flex-start">
                                         {order.productItems?.map((item) => (
-                                            <Flex width="full" key={item.itemId}>
-                                                <Box
-                                                    width="84px"
-                                                    height="84px"
-                                                    bg="gray.100"
-                                                    mr={4}
-                                                ></Box>
-                                                <Stack spacing={0} flex={1}>
-                                                    <Text fontWeight="bold">
-                                                        {item.productName}
-                                                    </Text>
-                                                    <Text fontSize="sm">Size: XXL</Text>
-                                                    <Text fontSize="sm">
-                                                        <FormattedMessage defaultMessage="Quantity" />
-                                                        : {item.quantity}
-                                                    </Text>
-                                                </Stack>
-                                                <Text fontWeight="bold">
-                                                    <FormattedNumber
-                                                        value={item.price * item.quantity}
-                                                        style="currency"
-                                                        currency={order.currency}
-                                                    />
-                                                </Text>
-                                            </Flex>
+                                            <CartProductVariant item={item} key={item.itemId} />
                                         ))}
 
                                         <Stack w="full" py={4} borderY="1px" borderColor="gray.200">

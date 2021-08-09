@@ -1,18 +1,28 @@
 import React, {useState} from 'react'
+import PropTypes from 'prop-types'
 import {FormattedMessage, FormattedNumber} from 'react-intl'
+import {useCheckout} from '../util/checkout-context'
 import {Box, Button, Flex, Heading, Stack, Text} from '@chakra-ui/react'
-import useBasket from '../../../commerce-api/hooks/useBasket'
 import {BasketIcon, ChevronDownIcon, ChevronUpIcon} from '../../../components/icons'
+import CartProductVariant from './cart-product-variant'
+import link from '../../../components/link'
 
-const OrderSummary = () => {
-    const basket = useBasket()
+const OrderSummary = ({isLoading, onPlaceOrderClick = () => null}) => {
+    const {basket, step} = useCheckout()
     const [cartItemsExpanded, setCartItemsExpanded] = useState(false)
 
     return (
         <Stack spacing={5}>
-            <Heading fontSize="lg" lineHeight="30px">
+            <Heading fontSize="lg">
                 <FormattedMessage defaultMessage="Order Summary" />
             </Heading>
+
+            {/* This is just for testing/dev purposes. Will remove later. */}
+            {/* <Button
+                onClick={() => basket.addItemToBasket([{productId: '701642811398M', quantity: 2}])}
+            >
+                Add item
+            </Button> */}
 
             <Stack spacing={5} align="flex-start">
                 <Stack spacing={5} width="full">
@@ -34,27 +44,10 @@ const OrderSummary = () => {
                     {cartItemsExpanded && (
                         <Stack spacing={5} align="flex-start">
                             {basket.productItems?.map((item) => (
-                                <Flex width="full" key={item.itemId}>
-                                    <Box width="84px" height="84px" bg="gray.100" mr={4}></Box>
-                                    <Stack spacing={0} flex={1}>
-                                        <Text fontWeight="bold">{item.productName}</Text>
-                                        <Text fontSize="sm">Size: XXL</Text>
-                                        <Text fontSize="sm">
-                                            <FormattedMessage defaultMessage="Quantity" />:{' '}
-                                            {item.quantity}
-                                        </Text>
-                                    </Stack>
-                                    <Text fontWeight="bold">
-                                        <FormattedNumber
-                                            value={item.price * item.quantity}
-                                            style="currency"
-                                            currency={basket.currency}
-                                        />
-                                    </Text>
-                                </Flex>
+                                <CartProductVariant key={item.itemId} item={item} />
                             ))}
 
-                            <Button variant="link" width="full">
+                            <Button as={link} to="/cart" variant="link" width="full">
                                 <FormattedMessage defaultMessage="Edit cart" />
                             </Button>
                         </Stack>
@@ -117,8 +110,21 @@ const OrderSummary = () => {
                     </Text>
                 </Flex>
             </Stack>
+
+            {step === 4 && (
+                <Box display={{base: 'none', lg: 'block'}} pt={2}>
+                    <Button w="full" onClick={onPlaceOrderClick} isLoading={isLoading}>
+                        <FormattedMessage defaultMessage="Place Order" />
+                    </Button>
+                </Box>
+            )}
         </Stack>
     )
+}
+
+OrderSummary.propTypes = {
+    isLoading: PropTypes.bool,
+    onPlaceOrderClick: PropTypes.func
 }
 
 export default OrderSummary

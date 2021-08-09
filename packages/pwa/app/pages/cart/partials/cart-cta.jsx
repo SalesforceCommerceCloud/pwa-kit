@@ -10,7 +10,7 @@ const CartCta = () => {
             <Button
                 as={Link}
                 to="/checkout"
-                width="95%"
+                width={['95%', '95%', '95%', '100%']}
                 marginTop={6}
                 mb={4}
                 rightIcon={<LockIcon />}
@@ -18,11 +18,11 @@ const CartCta = () => {
             >
                 <FormattedMessage defaultMessage="Proceed to Checkout" />
             </Button>
-            <Flex margin="auto" width="140px" justify="space-between" paddingBottom={11}>
-                <VisaIcon />
-                <MastercardIcon />
-                <AmexIcon />
-                <DiscoverIcon />
+            <Flex justify={'center'}>
+                <VisaIcon height={8} width={10} mr={2} />
+                <MastercardIcon height={8} width={10} mr={2} />
+                <AmexIcon height={8} width={10} mr={2} />
+                <DiscoverIcon height={8} width={10} mr={2} />
             </Flex>
         </Fragment>
     )

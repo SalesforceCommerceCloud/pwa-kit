@@ -17,6 +17,7 @@ module.exports = {
         'scripts/generator/*.{js,jsx}',
         '!app/analytics/**/*.{js,jsx}',
         '!app/pages/test-container/**/*.{js,jsx}',
+        '!app/utils/test-utils.js',
         '!app/main.jsx',
         '!app/loader.js',
         '!app/ssr.js',

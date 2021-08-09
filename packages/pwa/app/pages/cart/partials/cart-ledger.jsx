@@ -1,51 +1,42 @@
 import React from 'react'
 import {FormattedMessage, FormattedNumber} from 'react-intl'
-import {
-    Box,
-    Flex,
-    Button,
-    Stack,
-    Text,
-    Heading,
-    Accordion,
-    AccordionItem,
-    AccordionButton,
-    AccordionIcon
-} from '@chakra-ui/react'
-import {AmexIcon, DiscoverIcon, LockIcon, MastercardIcon, VisaIcon} from '../../../components/icons'
+import {Box, Flex, Button, Stack, Text, Heading, Accordion, AccordionItem} from '@chakra-ui/react'
+import {ChevronDownIcon} from '../../../components/icons'
 import useBasket from '../../../commerce-api/hooks/useBasket'
-import Link from '../../../components/link'
+import CartCta from './cart-cta'
 
 const CartLedger = () => {
     const basket = useBasket()
     return (
-        <Stack spacing={5}>
-            <Heading fontSize="lg" lineHeight="30px">
+        <Stack paddingTop={{base: 0, lg: 8}} spacing={5}>
+            <Heading fontSize="lg" pt={1}>
                 <FormattedMessage defaultMessage="Order Summary" />
             </Heading>
-            <Stack spacing={5} align="flex-start">
-                <Stack width="full" py={4} borderY="1px" borderColor="gray.200" borderBottom="none">
+            <Stack spacing={4} align="flex-start">
+                <Stack width="full">
                     <Flex justify="space-between">
                         <Text fontWeight="bold">
                             <FormattedMessage defaultMessage="Subtotal" />
                         </Text>
-                        <FormattedNumber
-                            style="currency"
-                            currency={basket?.currency}
-                            value={basket?.productSubTotal}
-                        />
+                        <Text fontWeight="bold">
+                            <FormattedNumber
+                                style="currency"
+                                currency={basket?.currency}
+                                value={basket?.productSubTotal}
+                            />
+                        </Text>
                     </Flex>
                     <Box>
                         <Accordion allowToggle color="blue.500">
                             <AccordionItem borderTop="none" borderBottom="none">
-                                <h2>
-                                    <AccordionButton variant="link">
-                                        <Box flex="1" textAlign="left" fontSize="14px">
-                                            <FormattedMessage defaultMessage="Want shipping & tax estimates?" />
-                                        </Box>
-                                        <AccordionIcon />
-                                    </AccordionButton>
-                                </h2>
+                                <Button
+                                    fontSize="sm"
+                                    variant="link"
+                                    rightIcon={<ChevronDownIcon />}
+                                >
+                                    <FormattedMessage defaultMessage="Want shipping & tax estimates?" />
+                                </Button>
+
                                 {/* <AccordionPanel pb={4}>
                                     <Input
                                         marginTop={2}
@@ -57,25 +48,29 @@ const CartLedger = () => {
                         </Accordion>
                     </Box>
                     <Flex justify="space-between">
-                        <Text>
+                        <Text color="gray.700">
                             <FormattedMessage defaultMessage="Shipping" />
                         </Text>
-                        <Text>TBD</Text>
+                        <Text color="gray.700">TBD</Text>
                     </Flex>
                     <Flex justify="space-between">
-                        <FormattedMessage defaultMessage="Tax" />
-                        <Text>TBD</Text>
+                        <Text color="gray.700">
+                            <FormattedMessage defaultMessage="Tax" />
+                        </Text>
+                        <Text color="gray.700">TBD</Text>
                     </Flex>
                     <Box>
                         <Accordion allowToggle color="blue.500">
                             <AccordionItem>
                                 <h2>
-                                    <AccordionButton variant="link">
-                                        <Box flex="1" textAlign="left">
-                                            <FormattedMessage defaultMessage="Do you have a promo code?" />
-                                        </Box>
-                                        <AccordionIcon />
-                                    </AccordionButton>
+                                    <Button
+                                        py={2}
+                                        px={2}
+                                        variant="link"
+                                        rightIcon={<ChevronDownIcon />}
+                                    >
+                                        <FormattedMessage defaultMessage="Do you have a promo code?" />
+                                    </Button>
                                 </h2>
                                 {/* <AccordionPanel pb={4}>
                                     <Input
@@ -92,29 +87,16 @@ const CartLedger = () => {
                     <Text fontWeight="bold">
                         <FormattedMessage defaultMessage="Estimated Total" />
                     </Text>
-                    <FormattedNumber
-                        style="currency"
-                        currency={basket?.currency}
-                        value={basket?.productSubTotal}
-                    />
+                    <Text fontWeight="bold">
+                        <FormattedNumber
+                            style="currency"
+                            currency={basket?.currency}
+                            value={basket?.productSubTotal}
+                        />
+                    </Text>
                 </Flex>
                 <Box w="100%" display={['none', 'none', 'none', 'block']} align="center">
-                    <Button
-                        as={Link}
-                        to={'/checkout'}
-                        w="100%"
-                        mb={4}
-                        rightIcon={<LockIcon />}
-                        variant="solid"
-                    >
-                        <FormattedMessage defaultMessage="Proceed to Checkout" />
-                    </Button>
-                    <Flex m="auto" w="140px" justify="space-between">
-                        <VisaIcon />
-                        <MastercardIcon />
-                        <AmexIcon />
-                        <DiscoverIcon />
-                    </Flex>
+                    <CartCta />
                 </Box>
             </Stack>
         </Stack>

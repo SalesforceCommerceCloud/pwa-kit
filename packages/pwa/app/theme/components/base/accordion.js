@@ -2,7 +2,10 @@ export default {
     baseStyle: {
         button: {
             paddingLeft: 0,
-            paddingRight: 0
+
+            _hover: {
+                background: 'none'
+            }
         },
         panel: {
             paddingTop: 0,

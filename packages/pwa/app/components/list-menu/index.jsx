@@ -2,7 +2,7 @@
 /* Copyright (c) 2021 Mobify Research & Development Inc. All rights reserved. */
 /* * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
 
-import React, {Fragment} from 'react'
+import React, {Fragment, useRef, forwardRef} from 'react'
 import PropTypes from 'prop-types'
 import {Link as RouteLink} from 'react-router-dom'
 
@@ -25,45 +25,81 @@ import {
     Spinner,
 
     // Hooks
-    useTheme
+    useTheme,
+    useDisclosure
 } from '@chakra-ui/react'
 
 // Others
 import {categoryUrlBuilder} from '../../utils/url'
+import {ChevronDownIcon} from '../icons'
 
-const ListMenuTrigger = ({item, name, isOpen, onClose}) => {
+const MAXIMUM_NUMBER_COLUMNS = 5
+
+const ChevronIconTrigger = forwardRef(function ChevronIconTrigger(props, ref) {
+    return (
+        <Box {...props} ref={ref}>
+            <ChevronDownIcon />
+        </Box>
+    )
+})
+
+const ListMenuTrigger = ({item, name, isOpen, onOpen, onClose, hasItems}) => {
     const theme = useTheme()
     const {baseStyle} = theme.components.ListMenu
 
+    const keyMap = {
+        Escape: () => onClose(),
+        Enter: () => onOpen()
+    }
+
     return (
-        <PopoverTrigger>
+        <Box {...baseStyle.listMenuTriggerContainer}>
             <Link
                 as={RouteLink}
-                name={name}
                 to={categoryUrlBuilder(item)}
-                onClick={onClose}
-                {...baseStyle.listMenuTrigger}
-                {...(isOpen ? baseStyle.listMenuTriggerActive : {})}
+                onMouseOver={onOpen}
+                {...baseStyle.listMenuTriggerLink}
+                {...(hasItems ? {name: name + ' __'} : {name: name})}
+                {...(!hasItems ? baseStyle.listMenuTriggerLinkWithIcon : {})}
+                {...(isOpen ? baseStyle.listMenuTriggerLinkActive : {})}
             >
                 {name}
             </Link>
-        </PopoverTrigger>
+
+            {hasItems && (
+                <Link
+                    as={RouteLink}
+                    to={'#'}
+                    onMouseOver={onOpen}
+                    onKeyDown={(e) => {
+                        keyMap[e.key]?.(e)
+                    }}
+                    {...baseStyle.listMenuTriggerLinkIcon}
+                >
+                    <PopoverTrigger>
+                        <ChevronIconTrigger {...baseStyle.selectedButtonIcon} />
+                    </PopoverTrigger>
+                </Link>
+            )}
+        </Box>
     )
 }
 ListMenuTrigger.propTypes = {
     item: PropTypes.object,
     name: PropTypes.string,
     isOpen: PropTypes.bool,
-    onClose: PropTypes.func
+    onOpen: PropTypes.func,
+    onClose: PropTypes.func,
+    hasItems: PropTypes.bool
 }
 
-const ListMenuContent = ({maxColumns, items, itemsKey, onClose}) => {
+const ListMenuContent = ({maxColumns, items, itemsKey, onClose, initialFocusRef}) => {
     const theme = useTheme()
     const {baseStyle} = theme.components.ListMenu
 
     return (
         <PopoverContent data-testid="popover-menu" {...baseStyle.popoverContent}>
-            <PopoverBody {...baseStyle.popoverBody}>
+            <PopoverBody>
                 <Container as={Stack} {...baseStyle.popoverContainer}>
                     <SimpleGrid
                         spacing={8}
@@ -73,7 +109,7 @@ const ListMenuContent = ({maxColumns, items, itemsKey, onClose}) => {
                         }, minmax(0, 21%))`}
                         marginInlineStart={{lg: '68px', xl: '96px'}}
                     >
-                        {items.map((item) => {
+                        {items.map((item, index) => {
                             const {id, name} = item
                             const items = item[itemsKey]
 
@@ -82,7 +118,7 @@ const ListMenuContent = ({maxColumns, items, itemsKey, onClose}) => {
                                 text: name,
                                 styles: {
                                     fontSize: 'md',
-                                    marginBottom: 5
+                                    marginBottom: 2
                                 }
                             }
 
@@ -93,7 +129,9 @@ const ListMenuContent = ({maxColumns, items, itemsKey, onClose}) => {
                                           href: categoryUrlBuilder(item),
                                           text: name,
                                           styles: {
-                                              fontSize: 'md'
+                                              fontSize: 'md',
+                                              paddingTop: 3,
+                                              paddingBottom: 3
                                           }
                                       }
                                   })
@@ -105,6 +143,7 @@ const ListMenuContent = ({maxColumns, items, itemsKey, onClose}) => {
                                     links={links}
                                     color={'gray.900'}
                                     onLinkClick={onClose}
+                                    {...(index === 0 ? {headingLinkRef: initialFocusRef} : {})}
                                 />
                             )
                         })}
@@ -118,15 +157,64 @@ ListMenuContent.propTypes = {
     items: PropTypes.array,
     maxColumns: PropTypes.number,
     itemsKey: PropTypes.string,
-    onClose: PropTypes.func
+    onClose: PropTypes.func,
+    initialFocusRef: PropTypes.object
 }
 
-const MAXIMUM_NUMBER_COLUMNS = 5
+const ListMenuPopover = ({items, item, name, itemsKey, maxColumns}) => {
+    const theme = useTheme()
+    const {baseStyle} = theme.components.ListMenu
+
+    const initialFocusRef = useRef()
+    const {isOpen, onClose, onOpen} = useDisclosure()
+
+    return (
+        <Box onMouseLeave={onClose}>
+            <Popover
+                placement={'bottom-start'}
+                initialFocusRef={initialFocusRef}
+                onOpen={onOpen}
+                onClose={onClose}
+                isOpen={isOpen}
+                {...baseStyle.popover}
+            >
+                <Fragment>
+                    <ListMenuTrigger
+                        item={item}
+                        name={name}
+                        isOpen={isOpen}
+                        onOpen={onOpen}
+                        onClose={onClose}
+                        hasItems={!!items}
+                    />
+                    {items && (
+                        <ListMenuContent
+                            items={items}
+                            itemsKey={itemsKey}
+                            initialFocusRef={initialFocusRef}
+                            onClose={onClose}
+                            maxColumns={maxColumns}
+                        />
+                    )}
+                </Fragment>
+            </Popover>
+        </Box>
+    )
+}
+
+ListMenuPopover.propTypes = {
+    items: PropTypes.array,
+    item: PropTypes.object,
+    name: PropTypes.string,
+    maxColumns: PropTypes.number,
+    itemsKey: PropTypes.string
+}
 
 /**
  * This is the navigation component used for desktop devices. Holds the site navigation,
  * providing users with a way to access all product categories and other important pages.
- * The submenus are open when the user hovers over the ListMenu items.
+ * The submenus are open when the user moves the mouse over the trigger and for A11y when
+ * users use the keyboard Tab key to focus over the chevron icon and press Enter.
  *
  * @param root The root category in your commerce cloud back-end.
  * @param maxColumns The maximum number of columns that we want to use per row inside the ListMenu.
@@ -146,37 +234,16 @@ const ListMenu = ({root, maxColumns = MAXIMUM_NUMBER_COLUMNS}) => {
                         {items.map((item) => {
                             const {id, name} = item
                             const items = item[itemsKey]
-                            const initialFocusRef = React.useRef()
 
                             return (
-                                <Box key={id} {...baseStyle.stackElement}>
-                                    <Popover
-                                        trigger={'hover'}
-                                        placement={'bottom-start'}
-                                        gutter={17}
-                                        initialFocusRef={initialFocusRef}
-                                        {...baseStyle.popover}
-                                    >
-                                        {({isOpen, onClose}) => (
-                                            <Fragment>
-                                                <ListMenuTrigger
-                                                    item={item}
-                                                    name={name}
-                                                    isOpen={isOpen}
-                                                    onClose={onClose}
-                                                />
-                                                {items && (
-                                                    <ListMenuContent
-                                                        maxColumns={maxColumns}
-                                                        items={items}
-                                                        itemsKey={itemsKey}
-                                                        onClose={onClose}
-                                                    />
-                                                )}
-                                            </Fragment>
-                                        )}
-                                    </Popover>
-                                </Box>
+                                <ListMenuPopover
+                                    key={id}
+                                    maxColumns={maxColumns}
+                                    item={item}
+                                    name={name}
+                                    items={items}
+                                    itemsKey={itemsKey}
+                                />
                             )
                         })}
                     </Stack>

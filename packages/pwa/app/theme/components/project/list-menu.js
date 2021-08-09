@@ -27,11 +27,32 @@ export default {
             position: 'absolute'
         },
         popoverContainer: {
-            paddingTop: 4,
+            paddingTop: 0,
             paddingBottom: 8,
             maxWidth: 'container.xxxl'
         },
-        listMenuTriggerActive: {
+        listMenuTriggerContainer: {
+            display: 'flex',
+            alignItems: 'center'
+        },
+        listMenuTriggerLink: {
+            display: 'block',
+            whiteSpace: 'nowrap',
+            position: 'relative',
+            paddingTop: 3,
+            paddingRight: 1,
+            paddingBottom: 2,
+            paddingLeft: 1,
+            marginLeft: 3,
+            fontSize: 'md',
+            fontWeight: 700,
+            color: 'gray.900',
+            _hover: {
+                textDecoration: 'none'
+            }
+        },
+        listMenuTriggerLinkWithIcon: {marginRight: 3},
+        listMenuTriggerLinkActive: {
             textDecoration: 'none',
             _before: {
                 position: 'absolute',
@@ -42,17 +63,11 @@ export default {
                 bottom: '0px'
             }
         },
-        listMenuTrigger: {
-            display: 'block',
-            whiteSpace: 'nowrap',
-            position: 'relative',
-            paddingTop: 3,
-            paddingRight: 5,
-            paddingBottom: 2,
-            paddingLeft: 4,
-            fontSize: 'md',
-            fontWeight: 700,
-            color: 'gray.900',
+        listMenuTriggerLinkIcon: {
+            marginTop: 3,
+            marginRight: 3,
+            marginBottom: 2,
+            marginLeft: 0,
             _hover: {
                 textDecoration: 'none'
             }
@@ -60,11 +75,12 @@ export default {
     },
     parts: [
         'container',
-        'listMenuLink',
-        'listMenuLinkActive',
-        'navLinkTitle',
-        'navLinkItem',
+        'stackContainer',
         'popoverContent',
-        'popoverContainer'
+        'popoverContainer',
+        'listMenuTriggerContainer',
+        'listMenuTriggerLink',
+        'listMenuTriggerLinkActive',
+        'listMenuTriggerIcon'
     ]
 }

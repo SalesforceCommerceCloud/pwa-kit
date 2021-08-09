@@ -1,3 +1,5 @@
+import theme from '@chakra-ui/theme'
+
 export default {
     baseStyle: {
         container: {
@@ -6,7 +8,9 @@ export default {
             width: 'full',
             boxShadow: 'base',
             backgroundColor: 'white',
-            position: 'relative'
+            position: 'sticky',
+            top: 0,
+            zIndex: theme.zIndices.sticky
         },
         content: {
             maxWidth: 'container.xxxl',

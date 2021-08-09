@@ -19,6 +19,7 @@ export function isTokenValid(token) {
     if (validTimeSeconds > tokenAgeSeconds) {
         return true
     }
+
     return false
 }
 

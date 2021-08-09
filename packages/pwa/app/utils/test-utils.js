@@ -1,4 +1,4 @@
-import React, {useState} from 'react'
+import React, {useCallback, useEffect, useRef, useState} from 'react'
 import {render} from '@testing-library/react'
 import {BrowserRouter as Router} from 'react-router-dom'
 import {ChakraProvider} from '@chakra-ui/react'
@@ -36,6 +36,16 @@ export const renderWithRouterAndCommerceAPI = (node) => {
  * @param {object} props
  */
 export const TestProviders = ({children}) => {
+    const mounted = useRef()
+
+    // We use this to track mounted state.
+    useEffect(() => {
+        mounted.current = true
+        return () => {
+            mounted.current = false
+        }
+    }, [])
+
     // API config overrides for disabling localhost proxy.
     const proxy = undefined
 
@@ -47,9 +57,16 @@ export const TestProviders = ({children}) => {
         proxy,
         ocapiHost
     })
-    const [basket, setBasket] = useState(null)
+    const [basket, _setBasket] = useState(null)
     const [customer, setCustomer] = useState(null)
     const [categories, setCategories] = useState([])
+
+    const setBasket = useCallback((data) => {
+        if (!mounted.current) {
+            return
+        }
+        _setBasket(data)
+    })
 
     return (
         <IntlProvider locale={DEFAULT_LOCALE} defaultLocale={DEFAULT_LOCALE}>

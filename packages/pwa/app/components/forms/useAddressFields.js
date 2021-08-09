@@ -1,4 +1,6 @@
 import {useIntl, defineMessages} from 'react-intl'
+import {formatPhoneNumber} from '../../utils/phone-utils'
+import {stateOptions, provinceOptions} from './state-province-options'
 
 const messages = defineMessages({
     required: {defaultMessage: 'Required'},
@@ -33,7 +35,7 @@ export default function useAddressFields({form: {watch, control, errors}, prefix
             label: formatMessage(messages.firstName),
             defaultValue: '',
             type: 'text',
-            rules: {required: formatMessage(messages.required)},
+            rules: {required: formatMessage({defaultMessage: 'Please enter your first name'})},
             error: errors[`${prefix}firstName`],
             control
         },
@@ -42,7 +44,7 @@ export default function useAddressFields({form: {watch, control, errors}, prefix
             label: formatMessage(messages.lastName),
             defaultValue: '',
             type: 'text',
-            rules: {required: formatMessage(messages.required)},
+            rules: {required: formatMessage({defaultMessage: 'Please enter your last name'})},
             error: errors[`${prefix}lastName`],
             control
         },
@@ -51,8 +53,13 @@ export default function useAddressFields({form: {watch, control, errors}, prefix
             label: formatMessage(messages.phone),
             defaultValue: '',
             type: 'text',
-            rules: {required: formatMessage(messages.required)},
+            rules: {required: formatMessage({defaultMessage: 'Please enter your phone number'})},
             error: errors[`${prefix}phone`],
+            inputProps: ({onChange}) => ({
+                onChange(evt) {
+                    onChange(formatPhoneNumber(evt.target.value))
+                }
+            }),
             control
         },
         countryCode: {
@@ -61,7 +68,7 @@ export default function useAddressFields({form: {watch, control, errors}, prefix
             defaultValue: 'US',
             type: 'select',
             options: [{value: 'CA', label: 'Canada'}, {value: 'US', label: 'United States'}],
-            rules: {required: formatMessage(messages.required)},
+            rules: {required: formatMessage({defaultMessage: 'Please select your country'})},
             error: errors[`${prefix}countryCode`],
             control
         },
@@ -70,7 +77,7 @@ export default function useAddressFields({form: {watch, control, errors}, prefix
             label: formatMessage(messages.address),
             defaultValue: '',
             type: 'text',
-            rules: {required: formatMessage(messages.required)},
+            rules: {required: formatMessage({defaultMessage: 'Please enter your address'})},
             error: errors[`${prefix}address1`],
             control
         },
@@ -79,7 +86,7 @@ export default function useAddressFields({form: {watch, control, errors}, prefix
             label: formatMessage(messages.city),
             defaultValue: '',
             type: 'text',
-            rules: {required: formatMessage(messages.required)},
+            rules: {required: formatMessage({defaultMessage: 'Please enter your city'})},
             error: errors[`${prefix}city`],
             control
         },
@@ -87,22 +94,20 @@ export default function useAddressFields({form: {watch, control, errors}, prefix
             name: `${prefix}stateCode`,
             label: formatMessage(countryCode === 'CA' ? messages.province : messages.state),
             defaultValue: '',
-            type: 'text',
+            type: 'select',
+            options: [
+                {value: '', label: ''},
+                ...(countryCode === 'CA' ? provinceOptions : stateOptions)
+            ],
             rules: {
-                required: formatMessage(messages.required),
-                validate: (value) =>
-                    /[a-zA-Z]{2}/.test(value) || formatMessage(messages.stateCodeInvalid)
+                required: formatMessage(
+                    {
+                        defaultMessage: 'Please select your {stateOrProvince}'
+                    },
+                    {stateOrProvince: countryCode === 'CA' ? 'province' : 'state'}
+                )
             },
             error: errors[`${prefix}stateCode`],
-            inputProps: ({onChange}) => ({
-                maxLength: 2,
-                onChange(evt) {
-                    if (/[^a-zA-Z]/g.test(evt.target.value)) {
-                        return
-                    }
-                    onChange(evt.target.value)
-                }
-            }),
             control
         },
         postalCode: {
@@ -110,7 +115,14 @@ export default function useAddressFields({form: {watch, control, errors}, prefix
             label: formatMessage(countryCode === 'CA' ? messages.postalCode : messages.zipCode),
             defaultValue: '',
             type: 'text',
-            rules: {required: formatMessage(messages.required)},
+            rules: {
+                required: formatMessage(
+                    {
+                        defaultMessage: 'Please enter your {postalOrZip}'
+                    },
+                    {postalOrZip: countryCode === 'CA' ? 'postal code' : 'zip code'}
+                )
+            },
             error: errors[`${prefix}postalCode`],
             control
         }

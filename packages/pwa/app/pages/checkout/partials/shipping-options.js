@@ -52,39 +52,52 @@ export default function ShippingOptions() {
             id="step-2"
             title="Shipping & Gift Options"
             editing={step === 2}
+            isLoading={form.formState.isSubmitting}
             disabled={selectedShippingMethod == null}
             onEdit={() => setCheckoutStep(2)}
         >
             <SectionEdit>
-                <form onSubmit={form.handleSubmit(submitForm)}>
+                <form
+                    onSubmit={form.handleSubmit(submitForm)}
+                    data-testid="sf-checkout-shipping-options-form"
+                >
                     <Stack spacing={6}>
-                        <Controller
-                            name="shippingMethodId"
-                            control={form.control}
-                            render={({value, onChange}) => (
-                                <RadioGroup value={value} onChange={onChange}>
-                                    <Stack spacing={5}>
-                                        {shippingMethods?.applicableShippingMethods?.map((opt) => (
-                                            <Radio value={opt.id} key={opt.id}>
-                                                <Flex justify="space-between" w="full">
-                                                    <Text>{opt.name}</Text>
-                                                    <Text fontWeight="bold">
-                                                        <FormattedNumber
-                                                            value={opt.price}
-                                                            style="currency"
-                                                            currency={basket.currency}
-                                                        />
-                                                    </Text>
-                                                </Flex>
-                                                <Text fontSize="sm" color="gray.600">
-                                                    {opt.c_estimatedArrivalTime}
-                                                </Text>
-                                            </Radio>
-                                        ))}
-                                    </Stack>
-                                </RadioGroup>
-                            )}
-                        />
+                        {shippingMethods?.applicableShippingMethods && (
+                            <Controller
+                                name="shippingMethodId"
+                                control={form.control}
+                                defaultValue=""
+                                render={({value, onChange}) => (
+                                    <RadioGroup
+                                        name="shipping-options-radiogroup"
+                                        value={value}
+                                        onChange={onChange}
+                                    >
+                                        <Stack spacing={5}>
+                                            {shippingMethods.applicableShippingMethods.map(
+                                                (opt) => (
+                                                    <Radio value={opt.id} key={opt.id}>
+                                                        <Flex justify="space-between" w="full">
+                                                            <Text>{opt.name}</Text>
+                                                            <Text fontWeight="bold">
+                                                                <FormattedNumber
+                                                                    value={opt.price}
+                                                                    style="currency"
+                                                                    currency={basket.currency}
+                                                                />
+                                                            </Text>
+                                                        </Flex>
+                                                        <Text fontSize="sm" color="gray.600">
+                                                            {opt.description}
+                                                        </Text>
+                                                    </Radio>
+                                                )
+                                            )}
+                                        </Stack>
+                                    </RadioGroup>
+                                )}
+                            />
+                        )}
 
                         <Box>
                             <Button variant="link" size="sm" rightIcon={<ChevronDownIcon />}>
@@ -93,11 +106,7 @@ export default function ShippingOptions() {
                         </Box>
                         <Box>
                             <Container variant="form">
-                                <Button
-                                    w="full"
-                                    type="submit"
-                                    isLoading={form.formState.isSubmitting}
-                                >
+                                <Button w="full" type="submit">
                                     <FormattedMessage defaultMessage="Continue to Payment" />
                                 </Button>
                             </Container>
@@ -119,7 +128,7 @@ export default function ShippingOptions() {
                         </Text>
                     </Flex>
                     <Text fontSize="sm" color="gray.700">
-                        {selectedShippingMethod.c_estimatedArrivalTime}
+                        {selectedShippingMethod.description}
                     </Text>
                 </SectionSummary>
             )}

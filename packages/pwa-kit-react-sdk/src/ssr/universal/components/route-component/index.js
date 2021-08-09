@@ -182,6 +182,7 @@ export const routeComponent = (Wrapped, isPage, locals) => {
             // guard prevent various events (update, error, complete, and load) from being
             // called multiple times.
             if (this._suppressUpdate) {
+                this._suppressUpdate = false
                 return
             }
 

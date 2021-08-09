@@ -26,7 +26,7 @@ export default function useCreditCardFields({form: {control, errors}, prefix = '
             defaultValue: '',
             type: 'text',
             rules: {
-                required: formatMessage(messages.required),
+                required: formatMessage({defaultMessage: 'Please enter your card number'}),
                 validate: (value) =>
                     cardValidator.number(value).isValid || formatMessage(messages.cardNumberInvalid)
             },
@@ -47,7 +47,9 @@ export default function useCreditCardFields({form: {control, errors}, prefix = '
             defaultValue: '',
             type: 'text',
             rules: {
-                required: formatMessage(messages.required),
+                required: formatMessage({
+                    defaultMessage: 'Please enter your name as shown on your card'
+                }),
                 validate: (value) =>
                     cardValidator.cardholderName(value).isValid ||
                     formatMessage(messages.nameInvalid)
@@ -62,7 +64,9 @@ export default function useCreditCardFields({form: {control, errors}, prefix = '
             type: 'text',
             placeholder: 'MM/YY',
             rules: {
-                required: formatMessage(messages.required),
+                required: formatMessage({
+                    defaultMessage: 'Please enter your expiry date'
+                }),
                 validate: (value) =>
                     cardValidator.expirationDate(value).isValid ||
                     formatMessage(messages.dateInvalid)
@@ -74,19 +78,19 @@ export default function useCreditCardFields({form: {control, errors}, prefix = '
             name: `${prefix}securityCode`,
             label: 'Security Code',
             defaultValue: '',
-            type: 'number',
+            type: 'text',
             rules: {
-                required: formatMessage(messages.required),
+                required: formatMessage({
+                    defaultMessage: 'Please enter your security code'
+                }),
                 validate: (value) =>
                     cardValidator.cvv(value).isValid || formatMessage(messages.codeInvalid)
             },
             error: errors[`${prefix}securityCode`],
             inputProps: ({onChange}) => ({
+                maxLength: 4,
                 onChange(evt) {
-                    if (/[^\d]/g.test(evt.target.value)) {
-                        return
-                    }
-                    onChange(evt.target.value)
+                    onChange(evt.target.value.replace(/[^0-9 ]+/, ''))
                 }
             }),
             control

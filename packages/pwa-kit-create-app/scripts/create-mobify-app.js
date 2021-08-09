@@ -31,7 +31,7 @@
 const p = require('path')
 const program = require('commander')
 const inquirer = require('inquirer')
-const url = require('url')
+const {URL} = require('url')
 const deepmerge = require('deepmerge')
 const sh = require('shelljs')
 const generatorPkg = require('../package.json')
@@ -54,38 +54,6 @@ const SDK_VERSION = generatorPkg.version
 const readJson = (path) => JSON.parse(sh.cat(path))
 
 const writeJson = (path, data) => new sh.ShellString(JSON.stringify(data, null, 2)).to(path)
-
-const testProjectAnswers = () => {
-    const siteName = `scaffold-pwa`
-
-    return {
-        'scaffold-pwa': {
-            siteName,
-            siteUrl: 'https://www.example.com/',
-            projectSlug: siteName,
-            aJSSlug: siteName,
-            name: siteName,
-            version: '0.0.1',
-            mobify: {
-                ssrParameters: {
-                    proxyConfigs: [
-                        {
-                            protocol: 'https',
-                            host: 'kv7kzm78.api.commercecloud.salesforce.com',
-                            path: 'api'
-                        }
-                    ]
-                }
-            }
-        },
-        ['commerce-api']: {
-            clientId: 'c9c45bfd-0ed3-4aa2-9971-40f88962b836',
-            organizationId: 'f_ecom_zzrf_001',
-            shortCode: 'kv7kzm78',
-            siteId: 'RefArch'
-        }
-    }
-}
 
 const replaceJSON = (path, replacements) =>
     writeJson(path, Object.assign(readJson(path), replacements))
@@ -194,10 +162,23 @@ const runGenerator = (answers, {outputDir}) => {
 }
 
 const prompts = () => {
-    const slug = (x) => Boolean(/^[a-z0-9_-]+$/.exec(x)) || 'Value must be a slug'
-    const validUrl = (s) => Boolean(url.parse(s).protocol) || 'Value must be a URL'
+    const validProjectId = (s) =>
+        /^[a-z0-9-]{1,20}$/.test(s) ||
+        'Value can only contain lowercase letters, numbers, and hyphens.'
 
-    // To see definitions for Commmerce API configuration values, refer to these
+    const validUrl = (s) => {
+        try {
+            new URL(s)
+            return true
+        } catch (err) {
+            return 'Value must be an absolute URL'
+        }
+    }
+
+    const validSiteId = (s) =>
+        /^[a-z0-9_-]+$/i.test(s) || 'Valid characters are alphanumeric, hyphen, or underscore'
+
+    // To see definitions for Commerce API configuration values, refer to these
     // doc --> https://developer.commercecloud.com/s/article/CommerceAPI-ConfigurationValues.
     const defaultCommerceAPIError =
         'Invalid format. Follow this link for configuration documentation https://developer.commercecloud.com/s/article/CommerceAPI-ConfigurationValues'
@@ -207,100 +188,91 @@ const prompts = () => {
         s === 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa' ||
         defaultCommerceAPIError
     const validOrganizationId = (s) =>
-        /(^f_ecom)_([A-Z]{4})_([A-Z]{3}|[0-9]{3}|s[0-9]{2}$)/i.test(s) || defaultCommerceAPIError
+        /^(f_ecom)_([A-Z]{4})_(prd|stg|dev|[0-9]{3}|s[0-9]{2})$/i.test(s) || defaultCommerceAPIError
 
     const questions = [
         {
-            name: 'globals.projectName',
-            validate: slug,
-            message: 'What is the name of your project (it must be a slug, eg. "my-project")?'
+            name: 'projectId',
+            validate: validProjectId,
+            message: 'What is your project ID (example-project) in Managed Runtime Admin?'
         },
         {
-            name: 'scaffold-pwa.siteUrl',
-            default: 'https://www.example.com/',
-            message: 'Where do you plan to host your project (eg. "https://www.example.com/")?',
+            name: 'instanceUrl',
+            message:
+                'What is the URL (https://example_instance_id.sandbox.us01.dx.commercecloud.salesforce.com) for your Commerce Cloud instance?',
             validate: validUrl
         },
         {
-            name: 'scaffold-pwa.mobify.ssrParameters.proxyConfigs[0].protocol',
-            message: 'What is the protocol for your ecommerce backend (eg. http/https)?',
-            default: () => {
-                const defaults = testProjectAnswers()
-                return defaults['scaffold-pwa'].mobify.ssrParameters.proxyConfigs[0].protocol
-            }
+            name: 'clientId',
+            message: 'What is your Commerce API client ID in Account Manager?',
+            validate: validClientId
         },
         {
-            name: 'scaffold-pwa.mobify.ssrParameters.proxyConfigs[0].host',
-            message: 'What is the host for your ecommerce backend (eg. www.example.com)',
-            default: () => {
-                const defaults = testProjectAnswers()
-                return defaults['scaffold-pwa'].mobify.ssrParameters.proxyConfigs[0].host
-            }
+            name: 'siteId',
+            message: "What is your site's ID (examples: RefArch, SiteGenesis) in Business Manager?",
+            validate: validSiteId
         },
         {
-            name: 'scaffold-pwa.mobify.ssrParameters.proxyConfigs[0].path',
-            message:
-                'We\'re going to set up a proxy for your ecommerce backend at "/mobify/proxy/api". Do you want to use a different path for it, or keep "api"? (Most people keep it)',
-            default: () => {
-                const defaults = testProjectAnswers()
-                return defaults['scaffold-pwa'].mobify.ssrParameters.proxyConfigs[0].path
-            }
+            name: 'organizationId',
+            message: 'What is your Commerce API organization ID in Business Manager?',
+            validate: validOrganizationId
         },
         {
-            name: 'commerce-api.siteId',
-            message:
-                'What is your Salesforce B2C Commerce platform siteId (eg. RefArch or SiteGenesis)?',
-            default: () => {
-                const defaults = testProjectAnswers()
-                return defaults[['commerce-api']].siteId
-            }
-        },
-        {
-            name: 'commerce-api.clientId',
-            message:
-                'What is the clientId for your Salesforce Commerce? (you can find this in Business Manager)',
-            validate: validClientId,
-            default: () => {
-                const defaults = testProjectAnswers()
-                return defaults[['commerce-api']].clientId
-            }
-        },
-        {
-            name: 'commerce-api.organizationId',
-            message:
-                'What is the organizationId for your Salesforce identity? (you can find this in Business Manager)',
-            validate: validOrganizationId,
-            default: () => {
-                const defaults = testProjectAnswers()
-                return defaults[['commerce-api']].organizationId
-            }
-        },
-        {
-            name: 'commerce-api.shortCode',
-            message:
-                'What is the shortCode for your Salesforce Commerce? (you can find this in Business Manager)',
-            validate: validShortCode,
-            default: () => {
-                const defaults = testProjectAnswers()
-                return defaults[['commerce-api']].shortCode
-            }
+            name: 'shortCode',
+            message: 'What is your Commerce API short code in Business Manager?',
+            validate: validShortCode
         }
     ]
-    return inquirer.prompt(questions).then((answers) => {
-        const derived = {
-            'scaffold-pwa': {
-                name: answers.globals.projectName,
-                version: GENERATED_PROJECT_VERSION,
-                aJSSlug: answers.globals.projectName,
-                projectSlug: answers.globals.projectName,
-                siteName: answers.globals.projectName
+
+    return inquirer.prompt(questions).then((answers) => buildAnswers(answers))
+}
+
+const buildAnswers = ({projectId, instanceUrl, clientId, siteId, organizationId, shortCode}) => {
+    return {
+        globals: {projectId},
+
+        'scaffold-pwa': {
+            name: projectId,
+            version: GENERATED_PROJECT_VERSION,
+            aJSSlug: projectId,
+            projectSlug: projectId,
+            siteName: projectId,
+
+            mobify: {
+                ssrParameters: {
+                    proxyConfigs: [
+                        {
+                            path: 'api',
+                            host: `${shortCode}.api.commercecloud.salesforce.com`
+                        },
+                        {
+                            path: 'ocapi',
+                            host: new URL(instanceUrl).hostname
+                        },
+                        {
+                            path: 'slas',
+                            host: 'prd.us.shopper.commercecloud.salesforce.com'
+                        }
+                    ]
+                }
             }
-        }
-        let finalAnswers = {}
-        finalAnswers = merge(finalAnswers, answers)
-        finalAnswers = merge(finalAnswers, derived)
-        return finalAnswers
-    })
+        },
+
+        'commerce-api': {clientId, siteId, organizationId, shortCode}
+    }
+}
+
+const testProjectAnswers = () => {
+    const config = {
+        projectId: 'scaffold-pwa',
+        instanceUrl: 'https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com',
+        clientId: 'c9c45bfd-0ed3-4aa2-9971-40f88962b836',
+        siteId: 'RefArch',
+        organizationId: 'f_ecom_zzrf_001',
+        shortCode: 'kv7kzm78'
+    }
+
+    return buildAnswers(config)
 }
 
 const main = (opts) => {
@@ -314,8 +286,11 @@ const main = (opts) => {
 
     switch (GENERATOR_PRESET) {
         case TEST_PROJECT:
-            return runGenerator(testProjectAnswers('demo'), opts)
+            return runGenerator(testProjectAnswers(), opts)
         case PROMPT:
+            console.log(
+                'See https://developer.commercecloud.com/s/article/CommerceAPI-ConfigurationValues for details on configuration values\n'
+            )
             return prompts(opts).then((answers) => runGenerator(answers, opts))
         default:
             console.error(

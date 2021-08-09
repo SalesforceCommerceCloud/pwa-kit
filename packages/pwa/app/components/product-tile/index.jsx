@@ -14,8 +14,8 @@ import {
     Image,
     Link,
     Skeleton as ChakraSkeleton,
-    SkeletonText as ChakraSkeletonText,
     Text,
+    Stack,
 
     // Hooks
     useMultiStyleConfig
@@ -29,14 +29,22 @@ import {productUrlBuilder} from '../../utils/url'
 import {isServer} from '../../utils/utils'
 
 // Component Skeleton
-export const Skeleton = () => (
-    <Box data-testid="sf-product-tile-skeleton">
-        <AspectRatio ratio={1}>
-            <ChakraSkeleton />
-        </AspectRatio>
-        <ChakraSkeletonText noOfLines={2} marginTop="4" spacing="4" />
-    </Box>
-)
+export const Skeleton = () => {
+    const styles = useMultiStyleConfig('ProductTile')
+    return (
+        <Box data-testid="sf-product-tile-skeleton">
+            <Stack spacing={2}>
+                <Box {...styles.imageWrapper}>
+                    <AspectRatio ratio={1} {...styles.image}>
+                        <ChakraSkeleton />
+                    </AspectRatio>
+                </Box>
+                <ChakraSkeleton width="80px" height="20px" />
+                <ChakraSkeleton width={{base: '120px', md: '220px'}} height="12px" />
+            </Stack>
+        </Box>
+    )
+}
 
 /**
  * The ProductTile is a simple visual representation of a product search hit
@@ -57,15 +65,17 @@ const ProductTile = (props) => {
             as={RouteLink}
             to={productUrlBuilder({id: productSearchItem?.productId}, intl.local)}
         >
-            {/* Server Image */}
-            <AspectRatio {...styles.image} ratio={1} display={isServer ? 'block' : 'none'}>
-                <Img alt={image.alt} src={image.disBaseLink} />
-            </AspectRatio>
+            <Box {...styles.imageWrapper}>
+                {/* Server Image */}
+                <AspectRatio {...styles.image} ratio={1} display={isServer ? 'block' : 'none'}>
+                    <Img alt={image.alt} src={image.disBaseLink} />
+                </AspectRatio>
 
-            {/* Client Image */}
-            <AspectRatio {...styles.image} ratio={1} display={isServer ? 'none' : 'block'}>
-                <Image alt={image.alt} src={image.disBaseLink} ignoreFallback={true} />
-            </AspectRatio>
+                {/* Client Image */}
+                <AspectRatio {...styles.image} ratio={1} display={isServer ? 'none' : 'block'}>
+                    <Image alt={image.alt} src={image.disBaseLink} ignoreFallback={true} />
+                </AspectRatio>
+            </Box>
 
             {/* Title */}
             <Text {...styles.title} aria-label="product name">

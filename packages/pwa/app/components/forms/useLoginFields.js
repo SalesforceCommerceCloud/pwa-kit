@@ -1,18 +1,27 @@
-export default function useLoginFields({control, errors, prefix = ''}) {
+import {useIntl} from 'react-intl'
+
+export default function useLoginFields({form: {control, errors}, prefix = ''}) {
+    const {formatMessage} = useIntl()
+
     const fields = {
         email: {
             name: `${prefix}email`,
-            label: 'Email',
+            label: formatMessage({defaultMessage: 'Email'}),
+            placeholder: 'you@email.com',
+            defaultValue: '',
             type: 'email',
-            rules: {required: 'Please enter a valid email address'},
+            rules: {
+                required: formatMessage({defaultMessage: 'Please enter your email address'})
+            },
             error: errors[`${prefix}email`],
             control
         },
         password: {
             name: `${prefix}password`,
-            label: 'Password',
+            label: formatMessage({defaultMessage: 'Password'}),
+            defaultValue: '',
             type: 'password',
-            rules: {required: 'Please enter your password'},
+            rules: {required: formatMessage({defaultMessage: 'Please enter your password'})},
             error: errors[`${prefix}password`],
             control
         }

@@ -14,7 +14,7 @@ import {
     AlertIcon,
     AlertDescription,
     AspectRatio,
-    CircularProgress,
+    Spinner,
     CloseButton
 } from '@chakra-ui/react'
 import CartItemPrice from './cart-item-price'
@@ -63,25 +63,36 @@ const CartItem = ({product}) => {
         }
     }
     return (
-        <Box data-testid="sf-cart-item" position="relative">
+        <Box data-testid="sf-cart-item" position="relative" display="block">
             {showLoading && (
-                <CircularProgress
+                <Box
                     position="absolute"
-                    top="50%"
-                    left="50%"
-                    isIndeterminate
+                    bg="white"
+                    top={0}
+                    left={0}
+                    width="100%"
+                    height="100%"
                     zIndex="9999"
-                    margin="-25px 0 0 -25px"
-                />
+                >
+                    <Spinner
+                        position="absolute"
+                        top="50%"
+                        left="50%"
+                        opacity={0.85}
+                        color="blue.600"
+                        zIndex="9999"
+                        margin="-25px 0 0 -25px"
+                    />
+                </Box>
             )}
             <Stack
-                borderRadius="4px"
+                borderRadius={1}
                 borderColor="gray.100"
                 borderWidth="1px"
-                opacity={showLoading ? '0.2' : '1.0'}
                 align="flex-start"
                 backgroundColor="white"
                 padding={[4, 6]}
+                pb={[4, 4]}
             >
                 {showError && (
                     <Alert
@@ -90,7 +101,7 @@ const CartItem = ({product}) => {
                         backGroundColor="red.50"
                         border="1px solid"
                         borderColor="red.600"
-                        borderRadius="4px"
+                        borderRadius={1}
                     >
                         <AlertIcon />
                         <Box flex="1">
@@ -110,7 +121,6 @@ const CartItem = ({product}) => {
 
                 <Flex width="full" backgroundColor="white">
                     <Box
-                        marginBottom="62px"
                         width={['88px', '136px']}
                         height={['88px', '136px']}
                         backgroundColor="gray.100"
@@ -138,15 +148,17 @@ const CartItem = ({product}) => {
                             />
                         </AspectRatio>
                     </Box>
-                    <Stack marginLeft={[4, 6]} spacing={2} flex={1}>
+                    <Stack spacing={2} flex={1}>
                         <Text lineHeight={1} fontWeight="bold">
                             {product.name}
                         </Text>
                         <Text lineHeight={1} color="gray.700" fontSize="sm">
-                            {product.c_refinementColor}
+                            <FormattedMessage defaultMessage="Color" />
+                            {': '} {product.c_refinementColor}
                         </Text>
                         <Text lineHeight={1} color="gray.700" fontSize="sm">
-                            <FormattedMessage defaultMessage="Size" /> {product.c_size}
+                            <FormattedMessage defaultMessage="Size" />
+                            {': '} {product.c_size}
                         </Text>
                         <Text lineHeight={1} color="gray.700" fontSize="sm" paddingTop={2}>
                             <FormattedMessage defaultMessage="Quantity:" />
@@ -185,15 +197,15 @@ const CartItem = ({product}) => {
                         </Flex>
                         <Flex
                             justify={['left', 'left', 'space-between', 'space-between']}
-                            marginTop={3}
                             borderBottom={['1px', '1px', '0px']}
                             borderBottomColor={['gray.100', 'gray.100']}
                         >
-                            <Box marginTop={[1, 3, 3]}>
+                            <Box marginTop={[0, 0, 1, 1]}>
                                 <Button
+                                    height={11}
                                     onClick={() => removeItem(product)}
                                     variant="link"
-                                    size="xs"
+                                    size="sm"
                                 >
                                     <FormattedMessage defaultMessage="Remove" />
                                 </Button>
@@ -204,23 +216,50 @@ const CartItem = ({product}) => {
                                 Edit
                             </Button> */}
                             </Box>
-                            <Checkbox
-                                display={['none', 'none', 'flex', 'flex']}
-                                size="sm"
-                                marginTop="12px"
-                            >
-                                <FormattedMessage defaultMessage="This is a gift." />
-                                <Button marginLeft={1} variant="link" size="sm">
+                            <Flex>
+                                <Checkbox
+                                    isReadOnly={true}
+                                    display={['none', 'none', 'flex', 'flex']}
+                                    marginTop={1}
+                                >
+                                    <Box fontSize="sm" display="inline-block">
+                                        <FormattedMessage defaultMessage="This is a gift." />
+                                    </Box>
+                                </Checkbox>
+
+                                <Button
+                                    marginLeft={1}
+                                    variant="link"
+                                    size="sm"
+                                    marginTop={1}
+                                    spacing="1rem"
+                                    display={['none', 'none', 'flex', 'flex']}
+                                >
                                     <FormattedMessage defaultMessage="Learn more" />
                                 </Button>
-                            </Checkbox>
+                            </Flex>
                         </Flex>
-                        <Checkbox isDisabled display={['flex', 'flex', 'none', 'none']} size="sm">
-                            <FormattedMessage defaultMessage="This is a gift." />
-                            <Button marginLeft={1} variant="link" size="xs">
+                        <Flex>
+                            <Checkbox
+                                isReadOnly={true}
+                                display={['flex', 'flex', 'none', 'none']}
+                                size="md"
+                                height={11}
+                            >
+                                <Box fontSize="sm" display="inline-block">
+                                    <FormattedMessage defaultMessage="This is a gift." />
+                                </Box>
+                            </Checkbox>
+                            <Button
+                                marginLeft={1}
+                                variant="link"
+                                size="sm"
+                                spacing="1rem"
+                                display={['flex', 'flex', 'none', 'none']}
+                            >
                                 <FormattedMessage defaultMessage="Learn more" />
                             </Button>
-                        </Checkbox>
+                        </Flex>
                     </Stack>
                 </Flex>
             </Stack>

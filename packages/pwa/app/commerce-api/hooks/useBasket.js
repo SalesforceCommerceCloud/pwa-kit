@@ -5,8 +5,8 @@ import useCustomer from './useCustomer'
 export default function useBasket() {
     const api = useCommerceAPI()
     const customer = useCustomer()
-
     const {basket, setBasket: _setBasket} = useContext(BasketContext)
+
     const setBasket = (basketData) => {
         const _productItemsDetail = basket?._productItemsDetail
         _setBasket({_productItemsDetail, ...basketData})
@@ -26,12 +26,18 @@ export default function useBasket() {
             },
 
             async getOrCreateBasket() {
+                // NOTE: This request is the only time we are using the ShopperCustomers API
+                // to interact with a customer basket. All other calls are done through the
+                // ShopperBaskets API, which in our case, uses OCAPI rather than commerce sdk.
                 const customerBaskets = await api.shopperCustomers.getCustomerBaskets({
                     parameters: {customerId: customer?.customerId}
                 })
+
                 if (Array.isArray(customerBaskets?.baskets)) {
                     return setBasket(customerBaskets.baskets[0])
                 }
+
+                // Back to using ShopperBaskets for all basket interaction.
                 const newBasket = await api.shopperBaskets.createBasket({})
                 setBasket(newBasket)
             },
@@ -76,6 +82,7 @@ export default function useBasket() {
                 if (!ids) {
                     return
                 }
+
                 const response = await api.shopperProducts.getProducts({
                     parameters: {ids: ids}
                 })
@@ -90,6 +97,7 @@ export default function useBasket() {
                     ...basket,
                     _productItemsDetail: {...basket._productItemsDetail, ...itemDetail}
                 }
+
                 setBasket(updatedBasket)
             },
 
@@ -111,7 +119,6 @@ export default function useBasket() {
                     body: {id},
                     parameters: {basketId: basket.basketId, shipmentId: 'me'}
                 })
-
                 setBasket(response)
             },
 
@@ -190,7 +197,7 @@ export default function useBasket() {
                     body: {basketId: basket.basketId}
                 })
 
-                if (response.fault && response.title) {
+                if (response.fault || (response.title && response.type && response.detail)) {
                     throw new Error(response.title)
                 }
 

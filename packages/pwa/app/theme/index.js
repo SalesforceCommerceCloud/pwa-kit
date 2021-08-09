@@ -18,9 +18,11 @@ import Drawer from './components/base/drawer'
 import FormLabel from './components/base/formLabel'
 import Icon from './components/base/icon'
 import Input from './components/base/input'
+import Modal from './components/base/modal'
 import Radio from './components/base/radio'
 import Select from './components/base/select'
 import Skeleton from './components/base/skeleton'
+import Tooltip from './components/base/tooltip'
 import Popover from './components/base/popover'
 
 // Project Component style overrides
@@ -38,9 +40,9 @@ import OfflineBanner from './components/project/offline-banner'
 import Pagination from './components/project/pagination'
 import ProductTile from './components/project/product-tile'
 import SocialIcons from './components/project/social-icons'
-
-// Project Pages
-import ProductList from './components/project/product-list-page'
+import PhotoGallery from './components/project/photo-gallery'
+import SwatchGroup from './components/project/swatch-group'
+import ImageGallery from './components/project/image-gallery'
 
 // Please refer to the Chakra-Ui theme customization docs found
 // here https://chakra-ui.com/docs/theming/customize-theme to learn
@@ -63,10 +65,12 @@ const overrides = {
         FormLabel,
         Icon,
         Input,
+        Modal,
         Popover,
         Radio,
         Select,
         Skeleton,
+        Tooltip,
 
         // project components
         App,
@@ -80,12 +84,12 @@ const overrides = {
         NestedAccordion,
         LocaleSelector,
         OfflineBanner,
-        Pagination,
-        ProductTile,
         SocialIcons,
-
-        // pages
-        ProductList
+        Pagination,
+        PhotoGallery,
+        ProductTile,
+        SwatchGroup,
+        ImageGallery
     }
 }
 

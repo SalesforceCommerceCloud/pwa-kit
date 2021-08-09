@@ -2,7 +2,7 @@
 /* Copyright (c) 2019 Mobify Research & Development Inc. All rights reserved. */
 /* * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
 
-import React, {useContext, useEffect} from 'react'
+import React, {useContext, useEffect, Fragment} from 'react'
 import PropTypes from 'prop-types'
 import {Link as RouteLink, useHistory, useParams} from 'react-router-dom'
 import {useIntl} from 'react-intl'
@@ -11,26 +11,26 @@ import {Helmet} from 'react-helmet'
 // Components
 import {
     Box,
-    Button,
     Heading,
     Flex,
     Link,
-    Skeleton,
     SimpleGrid,
     Select,
     Text,
-
-    // Hooks
-    useStyleConfig
+    FormLabel,
+    FormControl,
+    Fade,
+    Stack
 } from '@chakra-ui/react'
 
 // Project Components
 import Breadcrumb from '../../components/breadcrumb'
 import Pagination from '../../components/pagination'
 import ProductTile, {Skeleton as ProductTileSkeleton} from '../../components/product-tile'
+import {HideOnMobile, HideOnDesktop} from '../../components/responsive'
 
 // Icons
-import {FilterIcon, SearchIcon} from '../../components/icons'
+import {SearchIcon} from '../../components/icons'
 
 // Hooks
 import {useLimitUrls, usePageUrls, useSortUrls, useSearchParams} from '../../hooks'
@@ -38,9 +38,7 @@ import {useLimitUrls, usePageUrls, useSortUrls, useSearchParams} from '../../hoo
 // Others
 import {CategoriesContext} from '../../contexts'
 import {HTTPNotFound} from 'pwa-kit-react-sdk/dist/ssr/universal/errors'
-
-// Helpers
-const isServer = typeof window === 'undefined'
+import {isServer} from '../../utils/utils'
 
 // Constants
 import {DEFAULT_SEARCH_PARAMS, DEFAULT_LIMIT_VALUES} from '../../constants'
@@ -56,8 +54,6 @@ const ProductList = (props) => {
     const params = useParams()
     const searchParams = useSearchParams()
     const {categories} = useContext(CategoriesContext)
-
-    const styles = useStyleConfig('ProductList')
 
     const {
         productSearchResult,
@@ -88,7 +84,12 @@ const ProductList = (props) => {
     const showNoResults = !isLoading && productSearchResult && !productSearchResult?.hits
 
     return (
-        <Box className="sf-product-list-page" layerStyle="page" {...styles.container} {...rest}>
+        <Box
+            className="sf-product-list-page"
+            layerStyle="page"
+            paddingTop={{base: 6, lg: 8}}
+            {...rest}
+        >
             <Helmet>
                 <title>{category?.pageTitle}</title>
                 <meta name="description" content={category?.pageDescription} />
@@ -96,9 +97,15 @@ const ProductList = (props) => {
             </Helmet>
 
             {showNoResults ? (
-                <Flex {...styles.noResults}>
-                    <SearchIcon {...styles.noResultsIcon} />
-                    <Text {...styles.noResultsText}>
+                <Flex
+                    direction="column"
+                    alignItems="center"
+                    textAlign="center"
+                    paddingTop={28}
+                    paddingBottom={28}
+                >
+                    <SearchIcon boxSize={[6, 6, 12, 12]} marginBottom={5} />
+                    <Text fontSize={['l', 'l', 'xl', '2xl']} fontWeight="700" marginBottom={2}>
                         {intl.formatMessage(
                             {
                                 id: 'product_list_page.no_results',
@@ -122,63 +129,41 @@ const ProductList = (props) => {
             ) : (
                 <>
                     {/* Header */}
-                    <Box {...styles.header}>
-                        <Box>
-                            {/* Breadcrumb */}
-                            {category && (
-                                <Breadcrumb
-                                    marginBottom={2}
-                                    categories={category.parentCategoryTree}
-                                />
-                            )}
-
-                            {/* Category Title */}
-                            <Flex {...styles.headerTitle}>
-                                <Heading as="h2" size="lg" marginRight={2}>
-                                    {`${category?.name}`}
-                                </Heading>
-                                <Heading as="h2" size="lg" marginRight={2}>
-                                    <Skeleton height={9} width={85} isLoaded={!isLoading}>
-                                        {`(${productSearchResult?.total})`}
-                                    </Skeleton>
-                                </Heading>
-                            </Flex>
-                        </Box>
-
-                        <Flex {...styles.toolbar}>
-                            <Button
-                                aria-label="Search Filters"
-                                variant="outline"
-                                {...styles.filterButton}
-                            >
-                                <FilterIcon boxSize={4} />
-                                <Text marginLeft={3}>
-                                    {intl.formatMessage({
-                                        id: 'product_list_page.filter_button',
-                                        defaultMessage: 'Filter'
-                                    })}
-                                </Text>
-                            </Button>
-
-                            <Select
-                                id="page_sort"
-                                value={basePath.replace(/(offset)=(\d+)/i, '$1=0')}
-                                onChange={({target}) => {
-                                    history.push(target.value)
-                                }}
-                                {...styles.sortSelect}
-                            >
-                                {sortUrls.map((href, index) => (
-                                    <option key={href} value={href}>
-                                        {productSearchResult?.sortingOptions[index].label}
-                                    </option>
-                                ))}
-                            </Select>
+                    <HideOnMobile>
+                        <Flex
+                            justifyContent="space-between"
+                            alignItems="flex-end"
+                            marginBottom={{base: 4, lg: 6}}
+                        >
+                            <BreadcrumbAndTitle
+                                category={category}
+                                productSearchResult={productSearchResult}
+                                isLoading={isLoading}
+                            />
+                            <Sort
+                                sortUrls={sortUrls}
+                                productSearchResult={productSearchResult}
+                                basePath={basePath}
+                            />
                         </Flex>
-                    </Box>
+                    </HideOnMobile>
+                    <HideOnDesktop>
+                        <Stack spacing={6} marginBottom={4}>
+                            <BreadcrumbAndTitle
+                                category={category}
+                                productSearchResult={productSearchResult}
+                                isLoading={isLoading}
+                            />
+                            <Sort
+                                sortUrls={sortUrls}
+                                productSearchResult={productSearchResult}
+                                basePath={basePath}
+                            />
+                        </Stack>
+                    </HideOnDesktop>
 
                     {/* Body */}
-                    <SimpleGrid {...styles.body}>
+                    <SimpleGrid columns={[2, 2, 3, 3]} spacingX={4} spacingY={{base: 12, lg: 16}}>
                         {isLoading || !productSearchResult
                             ? new Array(searchParams.limit)
                                   .fill(0)
@@ -192,12 +177,12 @@ const ProductList = (props) => {
                     </SimpleGrid>
 
                     {/* Footer */}
-                    <Flex {...styles.footer}>
+                    <Flex justifyContent={['center', 'center', 'flex-start']} paddingTop={8}>
                         <Pagination currentURL={basePath} urls={pageUrls} />
 
-                        {/* 
+                        {/*
                             Our design doesn't call for a page size select. Show this element if you want
-                            to add one to your design. 
+                            to add one to your design.
                         */}
                         <Select
                             display="none"
@@ -214,15 +199,6 @@ const ProductList = (props) => {
                         </Select>
                     </Flex>
                 </>
-            )}
-
-            {/* This logic ensures page navigation works if the react app fails to load. */}
-            {isServer && (
-                <div
-                    dangerouslySetInnerHTML={{
-                        __html: `<script>document.getElementById('page_sort').addEventListener('change', ({target}) => { window.location = target.value})</script>`
-                    }}
-                />
             )}
         </Box>
     )
@@ -244,16 +220,17 @@ ProductList.getProps = async ({res, params, location, api}) => {
         res.set('Cache-Control', 'public, must-revalidate, max-age=900')
     }
 
-    // Login as `guest` to get session.
-    await api.auth.login()
-
     const [category, productSearchResult] = await Promise.all([
         api.shopperProducts.getCategory({
             parameters: {id: categoryId, levels: 0}
         }),
         api.shopperSearch.productSearch({
             parameters: {
-                refine: `cgid=${categoryId}`,
+                // Our product detail page currently only supports `master` products. For this reason we
+                // are only going to fetch master products on the product list page.
+                // BUG: Using this `array` method of adding refinements doesn't work when deployed. Figure out
+                // how to fix it.
+                refine: [`cgid=${categoryId}`, 'htype=master'],
                 limit: urlParams.get('limit') || DEFAULT_SEARCH_PARAMS.limit,
                 offset: urlParams.get('offset') || DEFAULT_SEARCH_PARAMS.offset,
                 sort: urlParams.get('sort') || DEFAULT_SEARCH_PARAMS.sort
@@ -267,7 +244,7 @@ ProductList.getProps = async ({res, params, location, api}) => {
         throw new HTTPNotFound(category.detail)
     }
 
-    return {category, productSearchResult}
+    return {productSearchResult}
 }
 
 ProductList.propTypes = {
@@ -292,3 +269,62 @@ ProductList.propTypes = {
 }
 
 export default ProductList
+
+const BreadcrumbAndTitle = ({category, productSearchResult, isLoading, ...otherProps}) => {
+    return (
+        <Box {...otherProps}>
+            {/* Breadcrumb */}
+            {category && <Breadcrumb categories={category.parentCategoryTree} />}
+
+            {/* Category Title */}
+            <Flex>
+                <Heading as="h2" size="lg" marginRight={2}>
+                    {`${category?.name}`}
+                </Heading>
+                <Heading as="h2" size="lg" marginRight={2}>
+                    {isServer ? (
+                        <Fragment>({productSearchResult?.total})</Fragment>
+                    ) : (
+                        // Fade in the total when available. When it's changed or not available yet, do not render it
+                        !isLoading && <Fade in={true}>({productSearchResult?.total})</Fade>
+                    )}
+                </Heading>
+            </Flex>
+        </Box>
+    )
+}
+BreadcrumbAndTitle.propTypes = {
+    category: PropTypes.object,
+    productSearchResult: PropTypes.object,
+    isLoading: PropTypes.bool
+}
+
+const Sort = ({sortUrls, productSearchResult, basePath, ...otherProps}) => {
+    const intl = useIntl()
+    const history = useHistory()
+
+    return (
+        <FormControl id="page_sort" width="auto" {...otherProps}>
+            <FormLabel>{intl.formatMessage({defaultMessage: 'Sort by'})}</FormLabel>
+            <Select
+                value={basePath.replace(/(offset)=(\d+)/i, '$1=0')}
+                onChange={({target}) => {
+                    history.push(target.value)
+                }}
+                height={11}
+                width={200}
+            >
+                {sortUrls.map((href, index) => (
+                    <option key={href} value={href}>
+                        {productSearchResult?.sortingOptions[index].label}
+                    </option>
+                ))}
+            </Select>
+        </FormControl>
+    )
+}
+Sort.propTypes = {
+    sortUrls: PropTypes.array,
+    productSearchResult: PropTypes.object,
+    basePath: PropTypes.string
+}

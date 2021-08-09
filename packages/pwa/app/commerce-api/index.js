@@ -41,10 +41,7 @@ class SlasShopperLogin extends sdk.ShopperLogin {
         const slasConfig = {
             ...config,
             proxy: config.proxy == null ? undefined : `${getAppOrigin()}/mobify/proxy/slas`,
-            baseUri:
-                config.proxy == null
-                    ? undefined
-                    : `https://prd.us.shopper.commercecloud.salesforce.com/api/v1`,
+            baseUri: `https://prd.us.shopper.commercecloud.salesforce.com/api/v1`,
             parameters: {
                 ...config.parameters,
                 organizationId: tenantId
@@ -156,8 +153,8 @@ class CommerceAPI {
         // If the token is invalid (missing, past/nearing expiration), we issue
         //  a login call, which will attempt to refresh the token or get a new
         //  guest token. Once login is complete, we can proceed.
-        const authToken = this.auth.authToken
-        if (!isTokenValid(authToken)) {
+        if (!isTokenValid(this.auth.authToken)) {
+            // NOTE: Login will update `this.auth.authToken` with a fresh token
             await this.auth.login()
         }
 
@@ -165,7 +162,7 @@ class CommerceAPI {
         const [fetchOptions, ...restParams] = params
         const newFetchOptions = {
             ...fetchOptions,
-            headers: {...fetchOptions.headers, Authorization: authToken}
+            headers: {...fetchOptions.headers, Authorization: this.auth.authToken}
         }
         return [newFetchOptions, ...restParams]
     }

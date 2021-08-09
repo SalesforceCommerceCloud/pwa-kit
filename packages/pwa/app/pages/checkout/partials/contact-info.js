@@ -17,13 +17,14 @@ import {
 } from '@chakra-ui/react'
 import {useHistory} from 'react-router-dom'
 import {useForm} from 'react-hook-form'
-import {FormattedMessage} from 'react-intl'
+import {FormattedMessage, useIntl} from 'react-intl'
 import {useCheckout} from '../util/checkout-context'
 import useLoginFields from '../../../components/forms/useLoginFields'
 import {Section, SectionEdit, SectionSummary} from './section'
 import Field from '../../../components/field'
 
 const ContactInfo = () => {
+    const {formatMessage} = useIntl()
     const history = useHistory()
 
     const {
@@ -41,9 +42,10 @@ const ContactInfo = () => {
         defaultValues: {email: customer?.email || basket.customerInfo?.email || '', password: ''}
     })
 
-    const fields = useLoginFields(form)
+    const fields = useLoginFields({form})
 
     const [error, setError] = useState(null)
+    const [showPasswordField, setShowPasswordField] = useState(true)
     const [signOutConfirmDialogIsOpen, setSignOutConfirmDialogIsOpen] = useState(false)
 
     const submitForm = async (data) => {
@@ -52,7 +54,15 @@ const ContactInfo = () => {
             await login(data)
             goToNextStep()
         } catch (error) {
-            setError(error.message)
+            if (/invalid credentials/i.test(error.message)) {
+                setError(
+                    formatMessage({
+                        defaultMessage: 'Incorrect username or password, please try again.'
+                    })
+                )
+            } else {
+                setError(error.message)
+            }
         }
     }
 
@@ -60,14 +70,15 @@ const ContactInfo = () => {
         if (error) {
             setError(null)
         }
+        setShowPasswordField(!showPasswordField)
         setIsGuestCheckout(!isGuestCheckout)
     }
-
     return (
         <Section
             id="step-0"
             title="Contact Info"
             editing={step === 0}
+            isLoading={form.formState.isSubmitting}
             onEdit={() => {
                 if (!isGuestCheckout) {
                     setSignOutConfirmDialogIsOpen(true)
@@ -90,9 +101,9 @@ const ContactInfo = () => {
                                 </Alert>
                             )}
 
-                            <Stack spacing={5}>
+                            <Stack spacing={5} position="relative">
                                 <Field {...fields.email} />
-                                {!isGuestCheckout && (
+                                {showPasswordField && (
                                     <Stack>
                                         <Field {...fields.password} />
                                         <Box>
@@ -105,11 +116,15 @@ const ContactInfo = () => {
                             </Stack>
 
                             <Stack spacing={3}>
-                                <Button type="submit" isLoading={form.formState.isSubmitting}>
-                                    {isGuestCheckout ? 'Checkout as guest' : 'Log in'}
+                                <Button type="submit">
+                                    {!showPasswordField ? (
+                                        <FormattedMessage defaultMessage="Checkout as guest" />
+                                    ) : (
+                                        <FormattedMessage defaultMessage="Log in" />
+                                    )}
                                 </Button>
                                 <Button variant="outline" onClick={toggleGuestCheckout}>
-                                    {isGuestCheckout ? (
+                                    {!showPasswordField ? (
                                         <FormattedMessage defaultMessage="Already have an account? Log in" />
                                     ) : (
                                         <FormattedMessage defaultMessage="Checkout as guest" />

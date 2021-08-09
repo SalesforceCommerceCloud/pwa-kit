@@ -1,182 +1,313 @@
 {
-  "02295": {
-    "defaultMessage": "Add New Address"
+  "+dLAnb": {
+    "defaultMessage": "Estimated Total"
   },
-  "1063e": {
-    "defaultMessage": "Remove"
+  "/kLqfV": {
+    "defaultMessage": "This is a gift."
   },
-  "11ffa": {
-    "defaultMessage": "Save & Continue"
+  "/vJwLB": {
+    "defaultMessage": "Please enter your email address"
   },
-  "126b4": {
+  "0g/1TG": {
     "defaultMessage": "Continue to Payment"
   },
-  "16e04": {
-    "defaultMessage": "{itemCount, plural, =0 {0 items} one {# item} other {# items}} in cart",
-    "description": "# item(s) in cart"
+  "0yGJXJ": {
+    "defaultMessage": "Password must contain at least one lowercase letter"
   },
-  "1c5d5": {
-    "defaultMessage": "Are you sure you want to sign out? You will need to sign back in to proceed with your current order."
+  "1b9Q93": {
+    "defaultMessage": "You will receive an email at <b>{email}</b> with a link to reset your password shortly."
   },
-  "2194a": {
-    "defaultMessage": "Subtotal"
+  "25WwxF": {
+    "defaultMessage": "Don't have an account?"
   },
-  "25f75": {
-    "defaultMessage": "Postal Code"
+  "2SvpuI": {
+    "defaultMessage": "Log in here"
   },
-  "28a59": {
-    "defaultMessage": "Billing Address"
+  "2bGejb": {
+    "defaultMessage": "My Account"
   },
-  "2d0f6": {
-    "defaultMessage": "Add to cart"
+  "2tqQFl": {
+    "defaultMessage": "Cart"
   },
-  "31d26": {
-    "defaultMessage": "New Arrivals"
+  "3NVyN7": {
+    "defaultMessage": "Please enter your first name"
   },
-  "357e8": {
-    "defaultMessage": "Checkout as guest"
+  "3gXwAV": {
+    "defaultMessage": "Sign in to retrieve your saved items or continue shopping"
   },
-  "375e0": {
-    "defaultMessage": "Sign Out"
+  "3kJE8G": {
+    "defaultMessage": "Something went wrong. Try again."
   },
-  "3e5ff": {
-    "defaultMessage": "Edit cart"
+  "3rGMFt": {
+    "defaultMessage": "Sale"
   },
-  "424ea": {
-    "defaultMessage": "We will send an email to {email} with your confirmation number and receipt shortly."
+  "47FYwb": {
+    "defaultMessage": "Cancel"
   },
-  "46a2a": {
-    "defaultMessage": "State"
+  "5JcXdV": {
+    "defaultMessage": "Create Account"
   },
-  "476e2": {
-    "defaultMessage": "Please enter a valid card number"
+  "5S2I6Q": {
+    "defaultMessage": "Incorrect username or password, please try again."
   },
-  "48974": {
-    "defaultMessage": "Shipping Address"
+  "5sg7KC": {
+    "defaultMessage": "Password"
   },
-  "49ffd": {
-    "defaultMessage": "Shipping Method"
-  },
-  "4b78a": {
-    "defaultMessage": "Tax"
-  },
-  "4e37e": {
-    "defaultMessage": "Back to cart"
-  },
-  "53069": {
+  "6DCLcI": {
     "defaultMessage": "Please enter a valid date"
   },
-  "57d05": {
-    "defaultMessage": "City"
+  "6cYvfa": {
+    "defaultMessage": "Enter your email to recieve instructions on how to reset your password"
   },
-  "59716": {
-    "defaultMessage": "Country"
+  "7gXPhB": {
+    "defaultMessage": "Qty"
   },
-  "5e178": {
-    "defaultMessage": "Zip Code"
-  },
-  "66703": {
-    "defaultMessage": "Do you have a gift card or promo code?"
-  },
-  "694e8": {
-    "defaultMessage": "Quantity"
-  },
-  "70d54": {
-    "defaultMessage": "Please enter 2-letter state/province"
-  },
-  "7207d": {
+  "7xscgD": {
     "defaultMessage": "Delivery Details"
   },
-  "72707": {
-    "defaultMessage": "Do you want to send this as a gift?"
+  "8HJxXG": {
+    "defaultMessage": "Sign up"
   },
-  "73a61": {
-    "defaultMessage": "Credit Card"
+  "8iXlvA": {
+    "defaultMessage": "Save & Continue"
   },
-  "77587": {
-    "defaultMessage": "Last Name"
-  },
-  "7a3a1": {
-    "defaultMessage": "Lighter layers for lighter days."
-  },
-  "7b6e5": {
-    "defaultMessage": "Please enter a valid security code"
-  },
-  "7c35f": {
-    "defaultMessage": "Please select a payment method."
-  },
-  "7dce1": {
-    "defaultMessage": "Edit"
-  },
-  "8458b": {
-    "defaultMessage": "Forgot password?"
-  },
-  "89d7b": {
-    "defaultMessage": "Shop New Arrivals"
-  },
-  "8a9f1": {
-    "defaultMessage": "Order Number"
-  },
-  "a128f": {
-    "defaultMessage": "Place Order"
-  },
-  "accea": {
+  "8pvKg1": {
     "defaultMessage": "Payment Details"
   },
-  "ad075": {
-    "defaultMessage": "New In"
+  "9HRQUG": {
+    "defaultMessage": "Want shipping & tax estimates?"
   },
-  "b5221": {
+  "A8Tnga": {
+    "defaultMessage": "Credit Card"
+  },
+  "ADKef8": {
+    "defaultMessage": "Add to cart"
+  },
+  "AYIKp4": {
     "defaultMessage": "Already have an account? Log in"
   },
-  "b651e": {
+  "Au/ysp": {
+    "defaultMessage": "This is a secure SSL encrypted payment."
+  },
+  "AwzkSM": {
+    "defaultMessage": "Tax"
+  },
+  "BAoId6": {
+    "defaultMessage": "Please enter your phone number"
+  },
+  "BlJFo9": {
+    "defaultMessage": "This email already has an account."
+  },
+  "D+bY29": {
+    "defaultMessage": "Shipping Method"
+  },
+  "D8RblK": {
+    "defaultMessage": "Do you have a promo code?"
+  },
+  "DP5VOH": {
+    "defaultMessage": "Shipping Address"
+  },
+  "EKKW2e": {
+    "defaultMessage": "1 uppercase letter",
+    "description": "Password requirement"
+  },
+  "EOUB63": {
+    "defaultMessage": "Only {stockLevel} Left!"
+  },
+  "F62y+K": {
+    "defaultMessage": "Sign Out"
+  },
+  "G/yZLu": {
+    "defaultMessage": "Remove"
+  },
+  "Gu0oq5": {
+    "defaultMessage": "1 special character (example: , S ! % #)",
+    "description": "Password requirement"
+  },
+  "I866h3": {
+    "defaultMessage": "Password must contain at least one number"
+  },
+  "IUXVjJ": {
+    "defaultMessage": "Continue Shopping"
+  },
+  "Ihg+6O": {
+    "defaultMessage": "Let's get started"
+  },
+  "IyXU3R": {
+    "defaultMessage": "Please enter a valid card number"
+  },
+  "JAcwxt": {
+    "defaultMessage": "Order Number"
+  },
+  "KV/9Hv": {
+    "defaultMessage": "Questions"
+  },
+  "L8seEc": {
+    "defaultMessage": "Subtotal"
+  },
+  "MPcjO/": {
+    "defaultMessage": "Are you sure you want to sign out? You will need to sign back in to proceed with your current order."
+  },
+  "NTgwLi": {
+    "defaultMessage": "Place Order"
+  },
+  "O95R3Z": {
+    "defaultMessage": "Phone"
+  },
+  "O9nLUc": {
+    "defaultMessage": "Please select your {stateOrProvince}"
+  },
+  "ONNUqG": {
+    "defaultMessage": "By creating an account, you agree to Salesforce’s <policy>Privacy Policy</policy> and <terms>Terms & Conditions</terms>"
+  },
+  "OVAmhz": {
+    "defaultMessage": "Back to cart"
+  },
+  "Olgsm/": {
+    "defaultMessage": "Create an account for faster checkout"
+  },
+  "OrvEHn": {
+    "defaultMessage": "Product Detail"
+  },
+  "P5ouV8": {
+    "defaultMessage": "Please enter your security code"
+  },
+  "PBSfL4": {
+    "defaultMessage": "Please enter a valid name"
+  },
+  "PNj3WE": {
+    "defaultMessage": "Review Order"
+  },
+  "PRlD0A": {
+    "defaultMessage": "Shipping"
+  },
+  "PwaN2o": {
+    "defaultMessage": "Welcome"
+  },
+  "Pwi/Wk": {
+    "defaultMessage": "New In"
+  },
+  "Q6wcZ5": {
+    "defaultMessage": "First Name"
+  },
+  "QclMUn": {
+    "defaultMessage": "Please select your country"
+  },
+  "Qpxx+l": {
+    "defaultMessage": "New Arrivals"
+  },
+  "Ri//8C": {
+    "defaultMessage": "Add to Cart"
+  },
+  "SQJto2": {
+    "defaultMessage": "Sign in"
+  },
+  "Seanpx": {
     "defaultMessage": "Required"
   },
-  "b7bec": {
+  "Solm6E": {
+    "defaultMessage": "Zip Code"
+  },
+  "TBI5GJ": {
+    "defaultMessage": "This {length}-digit code can be found on the {side} of your card.",
+    "description": "Credit card security code help text"
+  },
+  "TE4fIS": {
+    "defaultMessage": "City"
+  },
+  "TR+DHM": {
+    "defaultMessage": "Or return to",
+    "description": "Precedes link to return to sign in"
+  },
+  "TdTXXf": {
+    "defaultMessage": "Learn more"
+  },
+  "Ty4jOO": {
+    "defaultMessage": "1 number",
+    "description": "Password requirement"
+  },
+  "UDdlpO": {
+    "defaultMessage": "Hi,"
+  },
+  "Ub+AGc": {
+    "defaultMessage": "Sign In"
+  },
+  "UqKMjl": {
+    "defaultMessage": "Postal Code"
+  },
+  "V+9Zzz": {
+    "defaultMessage": "Size & Fit"
+  },
+  "V/JHlm": {
+    "defaultMessage": "Forgot password?"
+  },
+  "VSlYv6": {
+    "defaultMessage": "Quantity:"
+  },
+  "WHgdsk": {
+    "defaultMessage": "Out of stock"
+  },
+  "Yy/yDL": {
+    "defaultMessage": "Reset password"
+  },
+  "Yywm0p": {
+    "defaultMessage": "Continue shopping"
+  },
+  "ZJkXve": {
+    "defaultMessage": "Sign me up for Salesforce emails (you can unsubscribe at any time)"
+  },
+  "aHuP93": {
+    "defaultMessage": "Do you have a gift card or promo code?"
+  },
+  "agOXPD": {
+    "defaultMessage": "Size"
+  },
+  "aheQdn": {
+    "defaultMessage": "Last Name"
+  },
+  "au3Vns": {
     "defaultMessage": "{itemCount, plural, =0 {0 items} one {# item} other {# items}}",
     "description": "# item(s) in order"
   },
-  "bc910": {
-    "defaultMessage": "First Name"
+  "bTjwXj": {
+    "defaultMessage": "Welcome Back"
   },
-  "bcc25": {
-    "defaultMessage": "Phone"
+  "bXv4wB": {
+    "defaultMessage": "Shop New Arrivals"
   },
-  "c1728": {
+  "c1zaMK": {
+    "defaultMessage": "Please enter your address"
+  },
+  "c7/79+": {
+    "defaultMessage": "Billing Address"
+  },
+  "cChish": {
+    "defaultMessage": "8 characters minimum",
+    "description": "Password requirement"
+  },
+  "cUwO+6": {
     "defaultMessage": "Add New Card"
   },
-  "c2090": {
-    "defaultMessage": "Continue Shopping"
+  "dUxyza": {
+    "defaultMessage": "Reviews"
   },
-  "c6b5d": {
-    "defaultMessage": "Province"
-  },
-  "d02b5": {
-    "defaultMessage": "Review Order"
-  },
-  "dd7bf": {
+  "e6Ph5+": {
     "defaultMessage": "Address"
   },
-  "e8078": {
-    "defaultMessage": "Please enter a valid name"
+  "f9teca": {
+    "defaultMessage": "Province"
   },
-  "ea478": {
-    "defaultMessage": "Cancel"
+  "fCRlK5": {
+    "defaultMessage": "We will send an email to <b>{email}</b> with your confirmation number and receipt shortly."
   },
-  "ea9cf": {
-    "defaultMessage": "Shipping"
+  "fIHFDI": {
+    "defaultMessage": "Add New Address"
   },
-  "f8f42": {
-    "defaultMessage": "Estimated Total"
+  "fWz2xP": {
+    "defaultMessage": "Please enter your expiry date"
   },
-  "fdb88": {
-    "defaultMessage": "Same as shipping address"
-  },
-  "fe052": {
-    "defaultMessage": "Order Summary"
-  },
-  "fe5d2": {
-    "defaultMessage": "Shop by Category"
+  "ffE6Xw": {
+    "defaultMessage": "Password must contain at least 8 characters"
   },
   "footer.column.account": {
     "defaultMessage": "Account"
@@ -229,6 +360,21 @@
   "footer.subscribe.heading.first_to_know": {
     "defaultMessage": "Be the first to know"
   },
+  "fuzq0p": {
+    "defaultMessage": "Checkout as guest"
+  },
+  "gg6vZx": {
+    "defaultMessage": "Shop by Category"
+  },
+  "hCj9FS": {
+    "defaultMessage": "Please enter your name as shown on your card"
+  },
+  "hDI+JM": {
+    "defaultMessage": "Sort by"
+  },
+  "hcdFiU": {
+    "defaultMessage": "each"
+  },
   "header.button.assistive_msg.logo": {
     "defaultMessage": "Logo"
   },
@@ -246,6 +392,27 @@
   },
   "homepage.message.welcome": {
     "defaultMessage": "Hello World"
+  },
+  "huqKGl": {
+    "defaultMessage": "Create account"
+  },
+  "iPMbLb": {
+    "defaultMessage": "Please select a payment method."
+  },
+  "iiYrag": {
+    "defaultMessage": "Please enter your password"
+  },
+  "ipwTkh": {
+    "defaultMessage": "Same as shipping address"
+  },
+  "ivNR8s": {
+    "defaultMessage": "Order Summary"
+  },
+  "kVzyDt": {
+    "defaultMessage": "Thank you for your order!"
+  },
+  "ku+mDU": {
+    "defaultMessage": "State"
   },
   "login-redirect.message.welcome": {
     "defaultMessage": "Login Redirect"
@@ -286,8 +453,30 @@
   "mobile_navigation.links.privacy_and_security.terms_and_conditions": {
     "defaultMessage": "Terms & Conditions"
   },
+  "nA8PRt": {
+    "defaultMessage": "1 lowercase letter",
+    "description": "Password requirement"
+  },
+  "nYi7Xz": {
+    "defaultMessage": "Your Cart is Empty"
+  },
+  "o40Ymt": {
+    "defaultMessage": "Please enter a valid security code"
+  },
+  "oLpv29": {
+    "defaultMessage": "Please enter a valid email address"
+  },
+  "odTkf5": {
+    "defaultMessage": "Back to sign in"
+  },
+  "odXlk8": {
+    "defaultMessage": "Log in"
+  },
   "offline_banner.message": {
     "defaultMessage": "You're currently browsing in offline mode"
+  },
+  "pS9/Sw": {
+    "defaultMessage": "Please enter your card number"
   },
   "pagination.actions.current_page_verb": {
     "defaultMessage": "of"
@@ -298,13 +487,86 @@
   "pagination.actions.prev": {
     "defaultMessage": "Prev"
   },
-  "product_list_page.filter_button": {
-    "defaultMessage": "Filter"
-  },
   "product_list_page.no_results": {
     "defaultMessage": "We couldn’t find anything for {category}. Try searching for a product or {link}."
   },
   "product_list_page.no_results.contact_us": {
     "defaultMessage": "contact us"
+  },
+  "qGl7SR": {
+    "defaultMessage": "Please create a password"
+  },
+  "qVGRIE": {
+    "defaultMessage": "Quantity"
+  },
+  "rkxMdY": {
+    "defaultMessage": "{itemCount, plural, =0 {0 items} one {# item} other {# items}} in cart",
+    "description": "# item(s) in cart"
+  },
+  "s/qo4z": {
+    "defaultMessage": "Please enter your last name"
+  },
+  "s7dATg": {
+    "defaultMessage": "Edit cart"
+  },
+  "saIij4": {
+    "defaultMessage": "Where would you like to go next?"
+  },
+  "sy+pv5": {
+    "defaultMessage": "Email"
+  },
+  "tiVXug": {
+    "defaultMessage": "Please enter your city"
+  },
+  "tpMVg1": {
+    "defaultMessage": "Lighter layers for lighter days."
+  },
+  "uCk8r+": {
+    "defaultMessage": "Already have an account?"
+  },
+  "uMhpKe": {
+    "defaultMessage": "Color"
+  },
+  "uV4+68": {
+    "defaultMessage": "Please enter your {postalOrZip}"
+  },
+  "vONi+O": {
+    "defaultMessage": "Country"
+  },
+  "vrBTnC": {
+    "defaultMessage": "Do you want to send this as a gift?"
+  },
+  "vvTcAr": {
+    "defaultMessage": "Create an account and get first access to the very best products, inspiration and community."
+  },
+  "wBVQL7": {
+    "defaultMessage": "Password must contain at least one uppercase letter"
+  },
+  "wEQDC6": {
+    "defaultMessage": "Edit"
+  },
+  "x6hxSH": {
+    "defaultMessage": "Something's not right with your email or password. Try again."
+  },
+  "xHP4/6": {
+    "defaultMessage": "Password Reset"
+  },
+  "xXbJso": {
+    "defaultMessage": "Sign out"
+  },
+  "xl27nc": {
+    "defaultMessage": "Reset Password"
+  },
+  "yHfqLT": {
+    "defaultMessage": "View account"
+  },
+  "z34C7B": {
+    "defaultMessage": "Password must contain at least one special character"
+  },
+  "z3Qj9h": {
+    "defaultMessage": "Proceed to Checkout"
+  },
+  "zHi6BD": {
+    "defaultMessage": "Please enter 2-letter state/province"
   }
 }

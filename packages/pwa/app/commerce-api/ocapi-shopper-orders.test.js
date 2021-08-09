@@ -23,7 +23,7 @@ describe('test OcapiShopperOrders class', () => {
         expect(order).toBeDefined()
         expect(order.orderNo).toBeDefined()
     })
-    test('createOrder returns error object when no params are passed', async () => {
+    test('createOrder returns error object when no body is passed', async () => {
         const ocapiShopperOrders = getOcapiShopperOrders()
         global.fetch = jest.fn().mockImplementation(() => {
             return {

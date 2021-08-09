@@ -4,9 +4,11 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {withRouter} from 'react-router-dom'
+import {Button} from '@chakra-ui/react'
+import {AlertIcon} from '../icons'
 
-import Button from 'pwa-kit-react-sdk/dist/components/button'
-import Icon from 'pwa-kit-react-sdk/dist/components/icon'
+// import Button from 'pwa-kit-react-sdk/dist/components/button'
+// import Icon from 'pwa-kit-react-sdk/dist/components/icon'
 
 /**
  * OfflineBoundary is a React Error boundary that catches errors thrown when
@@ -64,11 +66,7 @@ class OfflineBoundary extends React.Component {
             <React.Fragment>
                 {chunkLoadError ? (
                     <div className="c-offline-boundary u-direction-column u-text-align-center u-padding-top u-padding-bottom">
-                        <Icon
-                            className="c-offline-boundary__icon u-color-neutral-20 u-margin-bottom-md"
-                            name="offline-cloud"
-                            title="Offline Cloud"
-                        />
+                        <AlertIcon />
 
                         <h1 className="u-margin-bottom-md u-text-family">
                             You are currently offline

@@ -25,6 +25,7 @@ const usePaymentForms = () => {
     const paymentMethodForm = useForm()
 
     const billingAddressForm = useForm({
+        mode: 'onChange',
         shouldUnregister: false,
         defaultValues: {...selectedBillingAddress}
     })

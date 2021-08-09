@@ -15,7 +15,9 @@ export default {
     },
 
     page: {
-        padding: [4, 4, 6, 6, 8],
+        px: [4, 4, 6, 6, 8],
+        paddingTop: [4, 4, 6, 6, 8],
+        paddingBottom: 32,
         maxWidth: 'container.xxxl',
         marginLeft: 'auto',
         marginRight: 'auto'

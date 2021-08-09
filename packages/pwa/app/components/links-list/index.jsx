@@ -3,13 +3,27 @@ import PropTypes from 'prop-types'
 import {Box, List, ListItem, Link, Heading, HStack, useMultiStyleConfig} from '@chakra-ui/react'
 import {Link as RouteLink} from 'react-router-dom'
 
-const LinksList = ({links = [], heading = '', variant, color, onLinkClick, ...otherProps}) => {
+const LinksList = ({
+    links = [],
+    heading = '',
+    variant,
+    color,
+    onLinkClick,
+    headingLinkRef,
+    ...otherProps
+}) => {
     const styles = useMultiStyleConfig('LinksList', {variant})
     return (
         <Box {...styles.container} {...(color ? {color: color} : {})} {...otherProps}>
             {heading &&
                 (heading.href ? (
-                    <Link as={RouteLink} to={heading.href} onClick={onLinkClick}>
+                    <Link
+                        as={RouteLink}
+                        to={heading.href}
+                        onClick={onLinkClick}
+                        ref={headingLinkRef}
+                        {...styles.headingLink}
+                    >
                         <Heading {...styles.heading} {...(heading.styles ? heading.styles : {})}>
                             {heading.text}
                         </Heading>
@@ -65,7 +79,8 @@ LinksList.propTypes = {
     heading: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
     variant: PropTypes.oneOf(['vertical', 'horizontal']),
     color: PropTypes.string,
-    onLinkClick: PropTypes.func
+    onLinkClick: PropTypes.func,
+    headingLinkRef: PropTypes.object
 }
 
 export default LinksList

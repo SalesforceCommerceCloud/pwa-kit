@@ -4,8 +4,10 @@ export default {
         popper: {
             width: '100%',
             maxWidth: '100%',
-            top: '100% !important',
-            transform: 'none !important'
+            top: '0',
+            right: 'auto',
+            bottom: 'auto',
+            left: '0'
         }
     })
 }

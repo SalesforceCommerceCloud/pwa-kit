@@ -5,7 +5,6 @@ import useBasket from '../../../commerce-api/hooks/useBasket'
 import Link from '../../../components/link'
 import {BasketIcon, BrandLogo} from '../../../components/icons'
 
-// @TODO: re-use the application header
 const CheckoutHeader = () => {
     const basket = useBasket()
 
@@ -13,7 +12,7 @@ const CheckoutHeader = () => {
         <Box px={[4, 4, 8]} bg="white" borderBottom="1px" borderColor="gray.100">
             <Box maxWidth="container.xxxl" marginLeft="auto" marginRight="auto">
                 <Flex h={{base: '52px', md: '80px'}} align="center" justify="space-between">
-                    <Link href="/">
+                    <Link href="/" title="Back to homepage">
                         <BrandLogo
                             width={{base: '35px', md: '45px'}}
                             height={{base: '24px', md: '32px'}}

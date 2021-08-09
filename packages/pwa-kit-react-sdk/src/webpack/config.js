@@ -11,14 +11,11 @@ import path from 'path'
 
 import webpack from 'webpack'
 import WebpackNotifierPlugin from 'webpack-notifier'
-import autoprefixer from 'autoprefixer'
-import MiniCssExtractPlugin from 'mini-css-extract-plugin'
 import UglifyJsPlugin from 'uglifyjs-webpack-plugin'
 import CopyPlugin from 'copy-webpack-plugin'
 import TimeFixPlugin from 'time-fix-plugin'
 import {BundleAnalyzerPlugin} from 'webpack-bundle-analyzer'
 import LoadablePlugin from '@loadable/webpack-plugin'
-import OptimizeCssAssetsPlugin from 'optimize-css-assets-webpack-plugin'
 import {createModuleReplacementPlugin, BuildMarkerPlugin} from './plugins'
 
 const root = process.cwd()
@@ -85,7 +82,6 @@ const defines = {
     SITE_NAME: `"${pkg.siteName}"`,
     WEBPACK_PACKAGE_JSON_MOBIFY: `${JSON.stringify(pkg.mobify || {})}`,
     WEBPACK_SSR_ENABLED: pkg.mobify ? `${pkg.mobify.ssrEnabled}` : 'false',
-    WEBPACK_SITE_URL: `'${pkg.siteUrl}'`,
     DEBUG,
     WEBPACK_PAGE_NOT_FOUND_URL: `'${(pkg.mobify || {}).pageNotFoundURL || ''}' `,
     NODE_ENV: `'${process.env.NODE_ENV}'`,
@@ -100,8 +96,7 @@ const uglifiyer = (mode) => {
                     cache: true,
                     parallel: true,
                     sourceMap: true
-                }),
-                new OptimizeCssAssetsPlugin()
+                })
             ]
         case development:
             return [
@@ -140,30 +135,6 @@ const uglifiyer = (mode) => {
             throw new Error(`Invalid mode ${mode}`)
     }
 }
-
-const cssLoader = [
-    MiniCssExtractPlugin.loader,
-    {
-        loader: 'css-loader?-autoprefixer',
-        options: {
-            // Don't use automatic URL transforms
-            url: false
-        }
-    },
-    {
-        loader: 'postcss-loader',
-        options: {
-            plugins: [
-                autoprefixer({
-                    // Don't remove outdated prefixes. Speeds up build time.
-                    remove: false
-                })
-            ]
-        }
-    }
-]
-
-const sassLoader = cssLoader.concat(['sass-loader'])
 
 const babelLoader = [
     {
@@ -220,20 +191,6 @@ const common = {
             '@loadable/webpack-plugin': resolve(nodeModules, '@loadable/webpack-plugin'),
             'babel-runtime': resolve(nodeModules, 'babel-runtime'),
             'svg-sprite-loader': resolve(nodeModules, 'svg-sprite-loader'),
-            lodash: resolve(nodeModules, 'lodash'),
-            'lodash-es': resolve(nodeModules, 'lodash'),
-            'lodash._basefor': resolve(nodeModules, 'lodash', '_baseFor'),
-            'lodash.escaperegexp': resolve(nodeModules, 'lodash', 'escapeRegExp'),
-            'lodash.find': resolve(nodeModules, 'lodash', 'find'),
-            'lodash.frompairs': resolve(nodeModules, 'lodash', 'fromPairs'),
-            'lodash.isarray': resolve(nodeModules, 'lodash', 'isArray'),
-            'lodash.isarguments': resolve(nodeModules, 'lodash', 'isArguments'),
-            'lodash.intersection': resolve(nodeModules, 'lodash', 'intersection'),
-            'lodash.isplainobject': resolve(nodeModules, 'lodash', 'isPlainObject'),
-            'lodash.keys': resolve(nodeModules, 'lodash', 'keys'),
-            'lodash.keysin': resolve(nodeModules, 'lodash', 'keysIn'),
-            'lodash.mapvalues': resolve(nodeModules, 'lodash', 'mapValues'),
-            'lodash.throttle': resolve(nodeModules, 'lodash', 'throttle'),
             react: resolve(nodeModules, 'react'),
             'react-router-dom': resolve(nodeModules, 'react-router-dom'),
             'react-dom': resolve(nodeModules, 'react-dom'),
@@ -249,10 +206,6 @@ const common = {
             title: `Mobify Project: ${pkg.name}`,
             excludeWarnings: true,
             skipFirstNotification: true
-        }),
-
-        new MiniCssExtractPlugin({
-            filename: '[name].css'
         }),
 
         new CopyPlugin({
@@ -288,15 +241,6 @@ const common = {
             {
                 test: /\.svg$/,
                 loader: 'ignore-loader'
-            },
-            {
-                test: /\.css?$/,
-                use: cssLoader
-            },
-            {
-                test: /\.scss$/,
-                use: sassLoader,
-                include: [/node_modules\/pwa-kit-react-sdk/, /app/]
             },
             {
                 test: /\.html$/,

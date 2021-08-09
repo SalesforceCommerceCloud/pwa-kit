@@ -18,14 +18,12 @@ const AddressFields = ({form, prefix = '', isGuest}) => {
             <Field {...fields.phone} />
             <Field {...fields.countryCode} />
             <Field {...fields.address1} />
-            <Grid templateColumns="repeat(6, 1fr)" gap={5}>
-                <GridItem colSpan={[6, 6, 3]}>
-                    <Field {...fields.city} />
-                </GridItem>
-                <GridItem colSpan={[2, 2, 1]}>
+            <Field {...fields.city} />
+            <Grid templateColumns="repeat(8, 1fr)" gap={5}>
+                <GridItem colSpan={[4, 4, 4]}>
                     <Field {...fields.stateCode} />
                 </GridItem>
-                <GridItem colSpan={[4, 4, 2]}>
+                <GridItem colSpan={[4, 4, 4]}>
                     <Field {...fields.postalCode} />
                 </GridItem>
             </Grid>

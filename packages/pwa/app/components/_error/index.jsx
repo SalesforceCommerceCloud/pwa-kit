@@ -34,7 +34,7 @@ const Error = (props) => {
                 </a>
             </div>
 
-            <main id="app-main" className="c-app-wrapper__main" role="main">
+            <main id="app-main" role="main">
                 <div className="t-error__container">
                     <div className="t-error__container-flexbox">
                         <div className="t-error__container-cloud u-margin-top-lg u-margin-bottom-lg">

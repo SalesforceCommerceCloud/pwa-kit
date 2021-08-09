@@ -1,7 +1,6 @@
-import React, {useEffect, useState} from 'react'
+import React, {useEffect} from 'react'
 import PropTypes from 'prop-types'
 import {Box, Button, Checkbox, Container, Heading, Stack, Text, Divider} from '@chakra-ui/react'
-import {useHistory} from 'react-router-dom'
 import {useCheckout} from '../util/checkout-context'
 import usePaymentForms from '../util/usePaymentForms'
 import {getCreditCardIcon} from '../../../utils/cc-utils'
@@ -19,13 +18,8 @@ const Payment = () => {
         selectedBillingAddress,
         selectedPayment,
         getPaymentMethods,
-        removePayment,
-        placeOrder
+        removePayment
     } = useCheckout()
-
-    const history = useHistory()
-
-    const [isLoading, setIsLoading] = useState(false)
 
     const {
         paymentMethodForm,
@@ -39,21 +33,15 @@ const Payment = () => {
         getPaymentMethods()
     }, [])
 
-    const submitOrder = async () => {
-        setIsLoading(true)
-        try {
-            await placeOrder()
-            history.push(`${history.location.pathname}/confirmation`)
-        } catch (error) {
-            setIsLoading(false)
-        }
-    }
-
     return (
         <Section
             id="step-3"
             title="Payment"
             editing={step === 3}
+            isLoading={
+                paymentMethodForm.formState.isSubmitting ||
+                billingAddressForm.formState.isSubmitting
+            }
             disabled={selectedPayment == null}
             onEdit={() => setCheckoutStep(3)}
         >
@@ -122,14 +110,7 @@ const Payment = () => {
 
                     <Box pt={3}>
                         <Container variant="form">
-                            <Button
-                                w="full"
-                                onClick={reviewOrder}
-                                isLoading={
-                                    paymentMethodForm.formState.isSubmitting ||
-                                    billingAddressForm.formState.isSubmitting
-                                }
-                            >
+                            <Button w="full" onClick={reviewOrder}>
                                 <FormattedMessage defaultMessage="Review Order" />
                             </Button>
                         </Container>
@@ -157,16 +138,6 @@ const Payment = () => {
                             </Heading>
                             <AddressSummary address={selectedBillingAddress} />
                         </Stack>
-                    )}
-
-                    {selectedPayment && selectedBillingAddress && (
-                        <Box pt={3}>
-                            <Container variant="form">
-                                <Button w="full" onClick={submitOrder} isLoading={isLoading}>
-                                    <FormattedMessage defaultMessage="Place Order" />
-                                </Button>
-                            </Container>
-                        </Box>
                     )}
                 </Stack>
             </SectionSummary>

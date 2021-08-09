@@ -25,6 +25,7 @@ const ShippingAddressSelection = ({
     form =
         form ||
         useForm({
+            mode: 'onChange',
             shouldUnregister: false,
             defaultValues: {
                 ...selectedAddress
@@ -95,6 +96,7 @@ const ShippingAddressSelection = ({
                 {hasSavedAddresses && (
                     <Controller
                         name="addressId"
+                        defaultValue=""
                         control={form.control}
                         rules={{required: !isEditingAddress}}
                         render={({value}) => (
@@ -184,7 +186,6 @@ const ShippingAddressSelection = ({
                                     <Box>
                                         <Container variant="form">
                                             <Button
-                                                isLoading={form.formState.isSubmitting}
                                                 type="submit"
                                                 w="full"
                                                 disabled={form.formState.isSubmitting}
@@ -202,7 +203,6 @@ const ShippingAddressSelection = ({
                     <Box pt={2}>
                         <Container variant="form">
                             <Button
-                                isLoading={form.formState.isSubmitting}
                                 type="submit"
                                 w="full"
                                 disabled={!form.formState.isValid || form.formState.isSubmitting}

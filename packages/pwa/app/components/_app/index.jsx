@@ -11,13 +11,7 @@ import {PAGEVIEW, ERROR, OFFLINE} from 'pwa-kit-react-sdk/dist/analytics-integra
 import {getAssetUrl} from 'pwa-kit-react-sdk/dist/ssr/universal/utils'
 
 // Chakra
-import {
-    Box,
-
-    // Hooks
-    useDisclosure,
-    useStyleConfig
-} from '@chakra-ui/react'
+import {Box, useDisclosure, useStyleConfig} from '@chakra-ui/react'
 import {SkipNavLink, SkipNavContent} from '@chakra-ui/skip-nav'
 
 // Contexts
@@ -37,6 +31,8 @@ import {HideOnDesktop, HideOnMobile} from '../responsive'
 
 // Hooks
 import useShopper from '../../commerce-api/hooks/useShopper'
+import useCustomer from '../../commerce-api/hooks/useCustomer'
+import {AuthModal, useAuthModal} from '../../hooks/use-auth-modal'
 
 // Others
 import {watchOnlineStatus, flatten} from '../../utils/utils'
@@ -56,7 +52,8 @@ const App = (props) => {
 
     const history = useHistory()
     const location = useLocation()
-
+    const authModal = useAuthModal()
+    const customer = useCustomer()
     const [isOnline, setIsOnline] = useState(true)
     const [categories, setCategories] = useState(allCategories)
     const styles = useStyleConfig('App')
@@ -111,6 +108,15 @@ const App = (props) => {
         onClose()
     }
 
+    const onAccountClick = () => {
+        // Link to account page for registered customer, open auth modal otherwise
+        if (customer?.authType === 'registered') {
+            history.push(`/${targetLocale}/account`)
+        } else {
+            authModal.onOpen()
+        }
+    }
+
     return (
         <Box className="sf-app" {...styles.container}>
             <IntlProvider locale={targetLocale} defaultLocale={defaultLocale} messages={messages}>
@@ -130,45 +136,46 @@ const App = (props) => {
 
                     <ScrollToTop />
 
-                    <Box id="app" className="c-app">
+                    <Box id="app" display="flex" flexDirection="column" flex={1}>
                         <SkipNavLink zIndex="skipLink">Skip to Content</SkipNavLink>
 
-                        {!isCheckout ? (
-                            <Header
-                                onMenuClick={onOpen}
-                                onLogoClick={onLogoClick}
-                                onMyCartClick={onCartClick}
-                            >
-                                <HideOnDesktop>
-                                    <DrawerMenu
-                                        isOpen={isOpen}
-                                        onClose={onClose}
-                                        onLogoClick={onLogoClick}
-                                        root={categories[DEFAULT_ROOT_CATEGORY]}
-                                    />
-                                </HideOnDesktop>
+                        <Box>
+                            {!isCheckout ? (
+                                <Header
+                                    onMenuClick={onOpen}
+                                    onLogoClick={onLogoClick}
+                                    onMyCartClick={onCartClick}
+                                    onMyAccountClick={onAccountClick}
+                                >
+                                    <HideOnDesktop>
+                                        <DrawerMenu
+                                            isOpen={isOpen}
+                                            onClose={onClose}
+                                            onLogoClick={onLogoClick}
+                                            root={categories[DEFAULT_ROOT_CATEGORY]}
+                                        />
+                                    </HideOnDesktop>
 
-                                <HideOnMobile>
-                                    <ListMenu root={categories[DEFAULT_ROOT_CATEGORY]} />
-                                </HideOnMobile>
-                            </Header>
-                        ) : (
-                            <CheckoutHeader />
-                        )}
+                                    <HideOnMobile>
+                                        <ListMenu root={categories[DEFAULT_ROOT_CATEGORY]} />
+                                    </HideOnMobile>
+                                </Header>
+                            ) : (
+                                <CheckoutHeader />
+                            )}
+                        </Box>
 
                         {!isOnline && <OfflineBanner />}
 
-                        <SkipNavContent>
+                        <SkipNavContent style={{flex: 1, outline: 0}}>
                             <Box as="main" id="app-main" role="main" flex="1">
-                                <Box className="c-app__content">
-                                    <OfflineBoundary isOnline={isOnline}>
-                                        {children}
-                                    </OfflineBoundary>
-                                </Box>
+                                <OfflineBoundary isOnline={false}>{children}</OfflineBoundary>
                             </Box>
                         </SkipNavContent>
 
                         {!isCheckout ? <Footer /> : <CheckoutFooter />}
+
+                        <AuthModal {...authModal} />
                     </Box>
                 </CategoriesContext.Provider>
             </IntlProvider>

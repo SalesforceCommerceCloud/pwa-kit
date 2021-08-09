@@ -23,12 +23,12 @@ const Cart = () => {
             <Container
                 data-testid="sf-cart-container"
                 maxWidth="container.xl"
-                py={{base: 4, md: 8}}
-                px={{base: 4, md: 8}}
+                p={[4, 6, 6, 4]}
+                paddingTop={[null, null, null, 6]}
             >
                 <Grid templateColumns={{base: '1fr', lg: '66% 1fr'}} gap={{base: 10, xl: 20}}>
                     <GridItem>
-                        <Stack spacing={4}>
+                        <Stack paddingTop={4} spacing={4}>
                             <CartTitle />
                             {basket.productItems.map((product) => (
                                 <CartItem
@@ -43,7 +43,7 @@ const Cart = () => {
                             ))}
                         </Stack>
                     </GridItem>
-                    <GridItem py={6} px={[4, 4, 0]}>
+                    <GridItem py={8} px={[6, 6, 6, 0]}>
                         <CartLedger />
                     </GridItem>
                 </Grid>
@@ -51,7 +51,7 @@ const Cart = () => {
             <Box
                 h="130px"
                 position="sticky"
-                bottom="0px"
+                bottom={0}
                 bg="white"
                 display={['block', 'block', 'block', 'none']}
                 align="center"

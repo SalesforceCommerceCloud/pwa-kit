@@ -13,10 +13,9 @@ commands:
           name: 'Set environment variables'
           command: |
             touch $BASH_ENV
-            if [[ "${CIRCLE_BRANCH}" == "master" || "${CIRCLE_BRANCH}" == "v2-master" ]]; then echo 'export MASTER=true' >> $BASH_ENV; fi
-            if [[ "${CIRCLE_BRANCH}" == "develop" || "${CIRCLE_BRANCH}" == "v2-develop" ]]; then echo 'export DEVELOP=true' >> $BASH_ENV; fi
+            if [[ "${CIRCLE_BRANCH}" == "salesforce-master" ]]; then echo 'export MASTER=true' >> $BASH_ENV; fi
+            if [[ "${CIRCLE_BRANCH}" == "salesforce-develop" ]]; then echo 'export DEVELOP=true' >> $BASH_ENV; fi
             if [[ "${CIRCLE_BRANCH}" =~ ^release- ]]; then echo 'export RELEASE=true' >> $BASH_ENV; fi
-            if [[ "${CIRCLE_BRANCH}" == "salesforce-master" ]]; then echo 'export SALESFORCE_MASTER=true' >> $BASH_ENV; fi
             echo 'export DETECT_CHROMEDRIVER_VERSION=true' >> $BASH_ENV;
             source $BASH_ENV
       - run:
@@ -168,7 +167,7 @@ jobs:
           when: always
       - slack/status:
           fail_only: true
-          only_for_branches: master,v2-master,develop,v2-develop
+          only_for_branches: salesforce-master,salesforce-develop
 
   testNode12:
     docker:
@@ -218,7 +217,7 @@ jobs:
           when: always
       - slack/status:
           fail_only: true
-          only_for_branches: master,v2-master,develop,v2-develop
+          only_for_branches: salesforce-master,salesforce-develop
 
   generatedSFCCProjectTest:
     docker:
@@ -275,11 +274,11 @@ jobs:
           dir: /tmp/project
       - slack/status:
           fail_only: true
-          only_for_branches: master,v2-master,develop,v2-develop
+          only_for_branches: salesforce-master,salesforce-develop
       - run:
           name: Push Bundle
           command: |
-            if [[ $SALESFORCE_MASTER ]]; then
+            if [[ $DEVELOP ]]; then
               target='generated-pwa'
             else
               target=""
@@ -303,8 +302,7 @@ workflows:
           filters:
             branches:
               only:
-                - develop
-                - v2-develop
+                - salesforce-develop
     jobs:
       - testNode10:
           context: nightly-build

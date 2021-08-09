@@ -1,13 +1,13 @@
 {
   "name": "mobify-platform-sdks",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "engines": {
     "node": "^10.17.0 || ^12.0.0",
     "npm": ">=5.7.1"
   },
   "devDependencies": {
     "commander": "^2.20.0",
-    "lerna": "^3.4.3",
+    "lerna": "^3.20.2",
     "semver": "^7.3.2",
     "shelljs": "^0.8.4"
   },
@@ -18,6 +18,7 @@
     "pretest": "npm run lint",
     "test": "lerna run --stream --concurrency=1 test",
     "test:integration": "lerna run --stream --concurrency=1 test:integration",
+    "test:e2e-ci": "lerna run --stream --concurrency=1 test:e2e-ci",
     "test:max-file-size": "lerna run --stream test:max-file-size",
     "lint": "lerna run --parallel --stream lint -- --silent",
     "lint:fix": "lerna run lint:fix",

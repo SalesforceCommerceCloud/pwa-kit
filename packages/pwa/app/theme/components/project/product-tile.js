@@ -1,6 +1,9 @@
 export default {
     baseStyle: {
         container: {},
+        imageWrapper: {
+            marginBottom: 2
+        },
         image: {
             paddingBottom: 2
         },
@@ -11,5 +14,5 @@ export default {
         rating: {},
         variations: {}
     },
-    parts: ['container', 'image', 'price', 'title', 'rating', 'variations']
+    parts: ['container', 'imageWrapper', 'image', 'price', 'title', 'rating', 'variations']
 }

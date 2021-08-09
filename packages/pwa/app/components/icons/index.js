@@ -1,4 +1,4 @@
-import React from 'react'
+import React, {forwardRef} from 'react'
 import {Icon, useTheme} from '@chakra-ui/react'
 
 // Our own SVG imports. These will be extracted to a single sprite sheet by the
@@ -10,6 +10,7 @@ import '../../assets/svg/alert.svg'
 import '../../assets/svg/account.svg'
 import '../../assets/svg/basket.svg'
 import '../../assets/svg/check.svg'
+import '../../assets/svg/check-circle.svg'
 import '../../assets/svg/chevron-up.svg'
 import '../../assets/svg/chevron-down.svg'
 import '../../assets/svg/chevron-right.svg'
@@ -20,6 +21,7 @@ import '../../assets/svg/filter.svg'
 import '../../assets/svg/flag-can.svg'
 import '../../assets/svg/flag-usa.svg'
 import '../../assets/svg/hamburger.svg'
+import '../../assets/svg/info.svg'
 import '../../assets/svg/social-facebook.svg'
 import '../../assets/svg/social-instagram.svg'
 import '../../assets/svg/social-twitter.svg'
@@ -65,15 +67,15 @@ const icon = (name, passProps) => {
         .toLowerCase()
         .replace(/(?:^|[\s-/])\w/g, (match) => match.toUpperCase())
         .replace(/-/g, '')
-    const component = (props) => {
+    const component = forwardRef((props, ref) => {
         const theme = useTheme()
         const {baseStyle} = theme.components.Icon
         return (
-            <Icon {...baseStyle} {...passProps} {...props}>
+            <Icon ref={ref} {...baseStyle} {...passProps} {...props}>
                 <use role="presentation" xlinkHref={`#${name}`} />
             </Icon>
         )
-    }
+    })
     component.displayName = `${displayName}Icon`
     return component
 }
@@ -87,6 +89,7 @@ export const AccountIcon = icon('account')
 export const BrandLogo = icon('brand-logo', {viewBox: BrandLogoSymbol.viewBox})
 export const BasketIcon = icon('basket')
 export const CheckIcon = icon('check')
+export const CheckCircleIcon = icon('check-circle')
 export const ChevronDownIcon = icon('chevron-down')
 export const ChevronLeftIcon = icon('chevron-left')
 export const ChevronRightIcon = icon('chevron-right')
@@ -97,6 +100,7 @@ export const FilterIcon = icon('filter')
 export const FlagCanIcon = icon('flag-can')
 export const FlagUsaIcon = icon('flag-usa')
 export const HamburgerIcon = icon('hamburger')
+export const InfoIcon = icon('info')
 export const LockIcon = icon('lock')
 export const LocationIcon = icon('location', {viewBox: LocationSymbol.viewBox})
 export const PaypalIcon = icon('paypal', {viewBox: PaypalSymbol.viewBox})

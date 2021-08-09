@@ -7,10 +7,10 @@ const CheckoutSkeleton = () => {
             <Container
                 data-testid="sf-checkout-skeleton"
                 maxWidth="container.xl"
-                py={{base: 7, md: 16}}
-                px={{base: 0, md: 4}}
+                py={{base: 7, lg: 16}}
+                px={{base: 0, lg: 4}}
             >
-                <Grid templateColumns={{base: '1fr', md: '66% 1fr'}} gap={{base: 10, lg: 20}}>
+                <Grid templateColumns={{base: '1fr', lg: '66% 1fr'}} gap={{base: 10, lg: 20}}>
                     <GridItem>
                         <Stack spacing={4}>
                             <Skeleton height="78px" />
