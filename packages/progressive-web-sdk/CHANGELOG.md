@@ -1,3 +1,7 @@
+## v1.18.1 (Jun 22, 2020)
+- Hotfix: Fix incorrect handling of capital letters inside querystrings in request processor code [#2760](https://mobify.atlassian.net/browse/WEB-2760)
+
+## v1.18.1-alpha.0 (Jun 17, 2020)
 ## v1.17.0 (Apr 13, 2020)
 - Use `itemId` for AccordionItem component `data-analytics-content` value [#1051](https://github.com/mobify/mobify-platform-sdks/pull/1051)
 

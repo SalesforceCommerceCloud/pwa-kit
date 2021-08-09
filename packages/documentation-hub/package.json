@@ -1,6 +1,6 @@
 {
   "name": "mobify-documentation-hub",
-  "version": "1.17.0",
+  "version": "1.18.1",
   "homepage": "http://docs.mobify.com/",
   "description": "Mobify's Documentation Hub!",
   "author": "Mobify (www.mobify.com)",
@@ -17,7 +17,7 @@
     "remark-preset-lint-recommended": "1.0.0"
   },
   "devDependencies": {
-    "@mobify/documentation-theme": "^1.17.0",
+    "@mobify/documentation-theme": "^1.18.1",
     "mobify-code-style": "^2.8.4"
   }
 }

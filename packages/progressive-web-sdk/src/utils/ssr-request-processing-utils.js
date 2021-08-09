@@ -146,11 +146,10 @@ export class QueryParameters {
      */
     toString() {
         return this._parameters
-            .map((parameter) =>
-                parameter.value === null
-                    ? escape(parameter.key)
-                    : `${escape(parameter.key)}=${escape(parameter.value)}`
-            )
+            .map((parameter) => {
+                const k = escape(unescape(parameter.originalKey))
+                return parameter.value === null ? k : `${k}=${escape(parameter.value)}`
+            })
             .join('&')
     }
 }

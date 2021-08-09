@@ -28,7 +28,7 @@ commands:
             # Install system dependencies
             sudo apt-get update
             sudo apt-get install python-dev python-pip google-chrome-stable time
-            sudo pip install awscli datadog
+            sudo pip install awscli==1.18.85 datadog==0.36.0
             sudo npm install -g npm@6.11.3
 
             # Add a dogrc so we can submit metrics to datadog
@@ -117,7 +117,7 @@ jobs:
           name: Run NPM Audits
           command: |
               set +e
-              results=$(node ./scripts/audit.js --max-critical 0 --max-high=6)
+              results=$(node ./scripts/audit.js --max-critical 0 --max-high=10)
               exitCode=$?
               set -e
 
