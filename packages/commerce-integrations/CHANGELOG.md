@@ -1,3 +1,8 @@
+## v2.4.2 (Jan 11, 2021)
+## v2.4.2-alpha.2 (Jan 10, 2021)
+- Hotfix: upgrade some third-party dependencies to fix security vulnarabilities [#1425](https://github.com/mobify/mobify-platform-sdks/pull/1425)
+## v2.4.2-alpha.1 (Jan 08, 2021)
+## v2.4.2-alpha.0 (Jan 05, 2021)
 ## v2.4.1 (Dec 21, 2020)
 ## v2.4.0 (Nov 26, 2020)
 ## v2.4.0-alpha.0 (Nov 26, 2020)

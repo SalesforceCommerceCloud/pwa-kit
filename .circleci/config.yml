@@ -108,7 +108,7 @@ commands:
           name: Run NPM Audits on the Monorepo
           command: |
               set +e
-              results=$(node ./scripts/audit.js --max-critical 0 --max-high 3)
+              results=$(node ./scripts/audit.js --max-critical 0 --max-high 6)
               exitCode=$?
               set -e
 
@@ -226,6 +226,10 @@ jobs:
             # Treat failures here seriously and try to fix them before just bumping
             # thresholds. These vulnerabilities create a really bad impression with our
             # users during sales or in the early stages of a project.
+            #
+            # REMINDER: Have you bumped up our alpha versions? If you recently fixed some
+            # vulnerabilities, you will need to increment the alpha versions (so that
+            # publishing them to the local npm repo would be successful).
             ./scripts/audit-single-package.js /tmp/project --max-critical 0 --max-high 2
       - run:
           name: Count Generated Project Dependencies
