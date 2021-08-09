@@ -13,8 +13,7 @@ commands:
           name: 'Set environment variables'
           command: |
             touch $BASH_ENV
-            if [[ "${CIRCLE_BRANCH}" == "salesforce-master" ]]; then echo 'export MASTER=true' >> $BASH_ENV; fi
-            if [[ "${CIRCLE_BRANCH}" == "salesforce-develop" ]]; then echo 'export DEVELOP=true' >> $BASH_ENV; fi
+            if [[ "${CIRCLE_BRANCH}" == "develop" ]]; then echo 'export DEVELOP=true' >> $BASH_ENV; fi
             if [[ "${CIRCLE_BRANCH}" =~ ^release- ]]; then echo 'export RELEASE=true' >> $BASH_ENV; fi
             echo 'export DETECT_CHROMEDRIVER_VERSION=true' >> $BASH_ENV;
             source $BASH_ENV
@@ -95,7 +94,7 @@ commands:
             fi
 
             # Only run expensive integration tests on these branches
-            if [[ (<< parameters.enableIntegrationTests >> == "true") && ( $MASTER || $DEVELOP || $RELEASE ) ]]; then
+            if [[ (<< parameters.enableIntegrationTests >> == "true") && ( $DEVELOP || $RELEASE ) ]]; then
               npm run test:integration
             fi
   smoketestscripts:
@@ -149,7 +148,7 @@ jobs:
           when: always
       - slack/status:
           fail_only: true
-          only_for_branches: salesforce-master,salesforce-develop
+          only_for_branches: develop
   testNode14:
     docker:
       - image: circleci/node:14-stretch-browsers
@@ -164,7 +163,7 @@ jobs:
           command: |
               if [[ $DEVELOP || $RELEASE ]]; then
                 target=staging
-              elif [[ $MASTER ]]; then
+              elif [[ $RELEASE ]]; then
                 target=production
               else
                 target=""
@@ -180,7 +179,7 @@ jobs:
               # Add NPM token to allow publishing from Circle
               echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > ~/.npmrc
 
-              if [[ $MASTER || $RELEASE ]]; then
+              if [[ $RELEASE ]]; then
                 # Publish all changed packages. The "from-package" arg means "look
                 # at the version numbers in each package.json file and if that doesn't
                 # exist on NPM, publish"
@@ -197,7 +196,7 @@ jobs:
           when: always
       - slack/status:
           fail_only: true
-          only_for_branches: salesforce-master,salesforce-develop
+          only_for_branches: develop
   generatedSFCCProjectTest:
     docker:
       - image: circleci/node:14-stretch-browsers
@@ -230,7 +229,7 @@ jobs:
             # vulnerabilities, you will need to increment the alpha versions (so that
             # publishing them to the local npm repo would be successful).
 
-            if [[ "${CIRCLE_BRANCH}" == "salesforce-master" ]]; then
+            if [[ "${CIRCLE_BRANCH}" == "develop" ]]; then
               snyk monitor --ignore-policy --remote-repo-url='https://github.com/mobify/mobify-platform-sdks.git' --project-name='generated-scaffold-pwa' --org='mobify'
             fi
       - run:
@@ -252,7 +251,7 @@ jobs:
           dir: /tmp/project
       - slack/status:
           fail_only: true
-          only_for_branches: salesforce-master,salesforce-develop
+          only_for_branches: develop
       - run:
           name: Push Bundle
           command: |
@@ -280,7 +279,7 @@ workflows:
           filters:
             branches:
               only:
-                - salesforce-develop
+                - develop
     jobs:
       - testNode12:
           context: nightly-build
