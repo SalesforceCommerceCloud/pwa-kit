@@ -30,13 +30,8 @@ import {filterImageGroups} from '../../utils/image-groups-utils'
 const AddToCartModal = ({product, variant, quantity, ...props}) => {
     const intl = useIntl()
     const basket = useBasket()
-    const size = useBreakpointValue({ base: "full", lg: "2xl", xl: "4xl" })
-    const {
-        currency,
-        productItems,
-        productSubTotal,
-        itemCount
-    } = basket
+    const size = useBreakpointValue({base: 'full', lg: '2xl', xl: '4xl'})
+    const {currency, productItems, productSubTotal, itemCount} = basket
     const variationAttributes = useVariationAttributes(product)
     const {productId, variationValues} = variant
     const lineItemPrice = productItems?.find((item) => item.productId === productId)?.price
@@ -47,13 +42,13 @@ const AddToCartModal = ({product, variant, quantity, ...props}) => {
     }).images?.[0]
 
     return (
-        <Modal size={size} {...props} >
+        <Modal size={size} {...props}>
             <ModalOverlay />
             <ModalContent
                 margin="0"
-                marginTop={{md: "8", lg: "200px"}}
+                marginTop={{md: '8', lg: '200px'}}
                 overflow="hidden"
-                borderRadius={{base: "none", md: "base"}}
+                borderRadius={{base: 'none', md: 'base'}}
                 bgColor="gray.50"
             >
                 <ModalHeader paddingTop="8" bgColor="white" fontSize="2xl" fontWeight="700">
@@ -64,82 +59,80 @@ const AddToCartModal = ({product, variant, quantity, ...props}) => {
                 <ModalCloseButton />
                 <ModalBody bgColor="white" paddingTop="4" paddingBottom="8" flex="none">
                     <Flex
-                        flexDirection={{base: "column", lg: "row"}}
+                        flexDirection={{base: 'column', lg: 'row'}}
                         justifyContent="space-between"
                     >
                         <Box
                             flex="1"
-                            paddingX={{base: "4", xl: "8"}}
-                            paddingY={{base: "4", lg: "0"}}
-
+                            paddingX={{base: '4', xl: '8'}}
+                            paddingY={{base: '4', lg: '0'}}
                             // divider style
-                            borderRightWidth={{lg: "1px"}}
-                            borderBottomWidth={{base: "1px", lg: "0px"}}
+                            borderRightWidth={{lg: '1px'}}
+                            borderBottomWidth={{base: '1px', lg: '0px'}}
                             borderColor="gray.200"
                             borderStyle="solid"
                         >
                             <Flex justifyContent="space-between">
                                 <Flex gridGap="4">
-                                <Box w="20" flex="none">
-                                    <AspectRatio ratio="1">
-                                        <Image src={image.link} alt={image.alt} />
-                                    </AspectRatio>
-                                </Box>
-                                <Box>
-                                    <Text fontWeight="700">
-                                        {product.name}
-                                    </Text>
-                                    <Box color="gray.600" fontSize="sm" fontWeight="400">
-                                        {
-                                            variationAttributes.map((attr) => {
-                                                return <Text key={attr.id}>
-                                                    {attr.selectedValue.name}
-                                                </Text>
-                                            })
-                                        }
-                                        <Text>
-                                            {intl.formatMessage({
-                                                defaultMessage: 'Qty'
-                                            })}: {quantity}
-                                        </Text>
+                                    <Box w="20" flex="none">
+                                        <AspectRatio ratio="1">
+                                            <Image src={image.link} alt={image.alt} />
+                                        </AspectRatio>
                                     </Box>
-                                </Box>
+                                    <Box>
+                                        <Text fontWeight="700">{product.name}</Text>
+                                        <Box color="gray.600" fontSize="sm" fontWeight="400">
+                                            {variationAttributes.map((attr) => {
+                                                return (
+                                                    <Text key={attr.id}>
+                                                        {attr.selectedValue.name}
+                                                    </Text>
+                                                )
+                                            })}
+                                            <Text>
+                                                {intl.formatMessage({
+                                                    defaultMessage: 'Qty'
+                                                })}
+                                                : {quantity}
+                                            </Text>
+                                        </Box>
+                                    </Box>
                                 </Flex>
                                 <Box flex="none" alignSelf="flex-end" fontWeight="600">
                                     <Text>
-                                        {lineItemPrice && intl.formatNumber(lineItemPrice, {
-                                            style: 'currency',
-                                            currency: currency || DEFAULT_CURRENCY
-                                        })}
-                                </Text>
+                                        {lineItemPrice &&
+                                            intl.formatNumber(lineItemPrice, {
+                                                style: 'currency',
+                                                currency: currency || DEFAULT_CURRENCY
+                                            })}
+                                    </Text>
                                 </Box>
                             </Flex>
                         </Box>
                         <Box
                             flex="1"
-                            paddingX={{base: "4", xl: "8"}}
-                            paddingY={{base: "4", lg: "0"}}
+                            paddingX={{base: '4', xl: '8'}}
+                            paddingY={{base: '4', lg: '0'}}
                         >
                             <Flex justifyContent="space-between" marginBottom="8">
                                 <Text fontWeight="700">
-                                    {intl.formatMessage({
-                                        defaultMessage: 'Cart Subtotal ({itemCount} item)'
-                                    }, {itemCount})}
+                                    {intl.formatMessage(
+                                        {
+                                            defaultMessage: 'Cart Subtotal ({itemCount} item)'
+                                        },
+                                        {itemCount}
+                                    )}
                                 </Text>
                                 <Text alignSelf="flex-end" fontWeight="600">
-                                    {productSubTotal && intl.formatNumber(productSubTotal, {
-                                        style: 'currency',
-                                        currency: currency || DEFAULT_CURRENCY
-                                    })}
+                                    {productSubTotal &&
+                                        intl.formatNumber(productSubTotal, {
+                                            style: 'currency',
+                                            currency: currency || DEFAULT_CURRENCY
+                                        })}
                                 </Text>
                             </Flex>
                             <Stack spacing="4">
-                                <Button
-                                    as={Link}
-                                    to="/cart"
-                                    width="100%"
-                                    variant="solid"
-                                >
+                                <Button as={Link} to="/cart" width="100%" variant="solid">
                                     {intl.formatMessage({
                                         defaultMessage: 'View Cart'
                                     })}
@@ -160,9 +153,7 @@ const AddToCartModal = ({product, variant, quantity, ...props}) => {
                         </Box>
                     </Flex>
                 </ModalBody>
-                <Box padding="8">
-                    {props.children}
-                </Box>
+                <Box padding="8">{props.children}</Box>
             </ModalContent>
         </Modal>
     )
@@ -171,12 +162,14 @@ const AddToCartModal = ({product, variant, quantity, ...props}) => {
 AddToCartModal.propTypes = {
     product: PropTypes.shape({
         name: PropTypes.string,
-        imageGroups: PropTypes.array,
+        imageGroups: PropTypes.array
     }),
     variant: PropTypes.shape({
         productId: PropTypes.string,
-        variationValues: PropTypes.object,
+        variationValues: PropTypes.object
     }),
+    quantity: PropTypes.number,
+    children: PropTypes.any
 }
 
 export default AddToCartModal
