@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="126px" height="14px" viewBox="0 0 126 14" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 44.1 (41455) - http://www.bohemiancoding.com/sketch -->
+    <title>link-img</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Design-system-updates" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" font-weight="normal" font-family=".SFNSText, .SF NS Text" font-size="14" text-decoration="underline">
+        <g id="SDK-Homepage-v2" transform="translate(-1059.000000, -1505.000000)" fill="#4E439B">
+            <g id="Web-Components---multiple-cards" transform="translate(341.000000, 1352.000000)">
+                <g id="1st-row-components" transform="translate(0.000000, 76.000000)">
+                    <g id="link" transform="translate(703.000000, 7.000000)">
+                        <text id="link-img">
+                            <tspan x="15" y="81">Hey, I’m a text Link!</tspan>
+                        </text>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

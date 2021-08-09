@@ -1,0 +1,22 @@
+// Opacity Utilities
+// ===
+
+.u-not-transparent {
+    opacity: 1;
+}
+
+.u-slightly-transparent {
+    opacity: 0.75;
+}
+
+.u-moderately-transparent {
+    opacity: 0.5;
+}
+
+.u-very-transparent {
+    opacity: 0.15;
+}
+
+.u-fully-transparent {
+    opacity: 0;
+}

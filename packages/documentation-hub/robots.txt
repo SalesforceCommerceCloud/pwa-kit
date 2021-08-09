@@ -1,0 +1,22 @@
+User-agent: *
+
+Disallow: /amp-sdk/0.*/
+Disallow: /amp-sdk/1.*/
+Disallow: /amp/0.*/
+Disallow: /amp/1.*/
+Disallow: /amp/dev/
+Disallow: /amp/v*/
+Disallow: /connection-center/0.*/
+Disallow: /connection-center/1.*/
+Disallow: /design/0.*/
+Disallow: /design/1.*/
+Disallow: /engagement-engine/0.*/
+Disallow: /engagement-engine/1.*/
+Disallow: /messaging/
+Disallow: /native-apps/0.*/
+Disallow: /native-apps/1.*/
+Disallow: /progressive-web/0.*/
+Disallow: /progressive-web/1.*/
+Disallow: /progressive-web/dev/
+Disallow: /progressive-web/v*/
+Disallow: /store-drivers/

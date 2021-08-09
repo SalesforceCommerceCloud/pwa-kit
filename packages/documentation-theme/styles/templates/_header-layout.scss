@@ -1,0 +1,73 @@
+// Header layout
+// ===
+//
+// 1. To align picker and search input
+
+.t-header-layout {
+    padding-top: $base-space;
+    z-index: $z2-depth;
+
+    .c-search-box {
+        float: left;
+        position: absolute;
+        top: $very-small-space;
+        right: 0;
+        left: 0;
+        z-index: $z4-depth;
+
+        @include for-phone-only {
+            min-width: initial;
+
+            &.c--search-open {
+                transform: translate(calc(100% - 15%), 0);
+            }
+        }
+        @include for-tablet-only {
+            min-width: initial;
+
+            &.c--search-open {
+                transform: translate(calc(100% - 30%), 0);
+            }
+        }
+    }
+
+    .c-version-picker {
+        margin-right: $medium-space;
+
+        text-align: right;
+    }
+
+    .c-version-picker__list {
+        right: 0;
+
+        transform: translateX($medium-space); // 1
+    }
+
+    @include for-tablet-landscape-up {
+        padding-top: $large-space + 2; // align line to menu
+
+        .c-search-box {
+            position: inherit;
+        }
+    }
+}
+
+
+// Search
+// ---
+
+.t-header-layout__search {
+    @include for-tablet-landscape-up {
+        width: 290px;
+    }
+}
+
+
+// Content
+// ---
+//
+// 1. Set same height as search input so can align text middle
+
+.t-header-layout__content {
+    min-height: 70px // 1
+}

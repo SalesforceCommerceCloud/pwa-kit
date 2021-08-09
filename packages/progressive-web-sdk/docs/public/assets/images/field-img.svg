@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="192px" height="54px" viewBox="0 0 192 54" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 44.1 (41455) - http://www.bohemiancoding.com/sketch -->
+    <title>field-img</title>
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <filter x="-5.1%" y="-4.7%" width="110.2%" height="117.1%" filterUnits="objectBoundingBox" id="filter-1">
+            <feOffset dx="0" dy="4" in="SourceAlpha" result="shadowOffsetOuter1"></feOffset>
+            <feGaussianBlur stdDeviation="2" in="shadowOffsetOuter1" result="shadowBlurOuter1"></feGaussianBlur>
+            <feColorMatrix values="0 0 0 0 0   0 0 0 0 0   0 0 0 0 0  0 0 0 0.0576313406 0" type="matrix" in="shadowBlurOuter1" result="shadowMatrixOuter1"></feColorMatrix>
+            <feMerge>
+                <feMergeNode in="shadowMatrixOuter1"></feMergeNode>
+                <feMergeNode in="SourceGraphic"></feMergeNode>
+            </feMerge>
+        </filter>
+        <rect id="path-2" x="0" y="14" width="184" height="32"></rect>
+    </defs>
+    <g id="Design-system-updates" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="SDK-Homepage-v2" transform="translate(-821.000000, -1482.000000)">
+            <g id="Web-Components---multiple-cards" transform="translate(341.000000, 1352.000000)">
+                <g id="1st-row-components" transform="translate(0.000000, 76.000000)">
+                    <g id="Field" filter="url(#filter-1)" transform="translate(468.000000, 0.000000)">
+                        <g id="field-img" transform="translate(16.000000, 54.000000)">
+                            <g id="Rectangle-14-Copy-3">
+                                <use fill="#FFFFFF" fill-rule="evenodd" xlink:href="#path-2"></use>
+                                <rect stroke="#C4C4C4" stroke-width="1" x="0.5" y="14.5" width="183" height="31"></rect>
+                            </g>
+                            <rect id="Rectangle-14-Copy-4" fill="#C4C4C4" x="0" y="0" width="84.995" height="6"></rect>
+                            <text id="email@mobify.com" font-family="SFUIText-Medium, SF UI Text" font-size="11" font-weight="400" fill="#BBBBBB">
+                                <tspan x="9.55" y="34">email@mobify.com</tspan>
+                            </text>
+                        </g>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

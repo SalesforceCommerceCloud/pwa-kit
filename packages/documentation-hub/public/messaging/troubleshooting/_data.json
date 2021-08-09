@@ -1,0 +1,10 @@
+{
+    "common-issues": {
+        "title": "Common issues",
+        "intro": "A list of recipes when unexpected situations occur."
+    },
+    "apn-troubleshooting": {
+        "title": "APN Troubleshooting",
+        "intro": "A set of helpful steps to take when troubleshooting Safari notifications."
+    }
+}

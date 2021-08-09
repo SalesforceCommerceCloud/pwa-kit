@@ -1,0 +1,55 @@
+// Responsive Generator
+// ===
+//
+// Nest a media query (i.e. @include for-tablet-portrait-up inside a component or
+// utility to create a viewport-specific style.
+//
+// .my-box {
+//     padding: 10px;
+//
+//     @include for-desktop-up {
+//         padding: 20px;
+//     }
+// }
+
+@mixin for-phone-only {
+    @media (max-width: #{$small-content-width}) {
+        @content;
+    }
+}
+
+@mixin for-tablet-only {
+    @media (min-width: #{$small-content-width}) and (max-width: #{$medium-content-width}) {
+        @content;
+    }
+}
+
+@mixin for-tablet-landscape-down {
+    @media (max-width: #{$medium-content-width}) {
+        @content;
+    }
+}
+
+@mixin for-tablet-portrait-up {
+    @media (min-width: #{$small-content-width}) {
+        @content;
+    }
+}
+
+@mixin for-tablet-landscape-up {
+    @media (min-width: #{$medium-content-width}) {
+        @content;
+    }
+}
+
+@mixin for-desktop-up {
+    @media (min-width: #{$large-content-width}) {
+        @content;
+    }
+}
+
+@mixin for-big-desktop-up {
+    @media (min-width: #{$very-large-content-width}) {
+        @content;
+    }
+}

@@ -1,0 +1,20 @@
+ul.c-section-contents {
+    margin-left: 0;
+    padding-left: 0;
+
+    a {
+        text-decoration: none;
+    }
+
+    .c-card__heading {
+        margin-top: $base-space;
+    }
+
+    .c-card {
+        transition: box-shadow 0.15s ease;
+
+        &:hover {
+            box-shadow: 0 0 0.35rem rgba(6,23,39,0.4);
+        }
+    }
+}

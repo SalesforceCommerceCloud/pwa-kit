@@ -1,0 +1,14 @@
+// Shadow Utilities
+// ===
+
+.u-small-shadow {
+    box-shadow: $small-box-shadow;
+}
+
+.u-small-shadow-inset {
+    box-shadow: $small-box-shadow-inset;
+}
+
+.u-large-shadow {
+    box-shadow: $large-box-shadow;
+}

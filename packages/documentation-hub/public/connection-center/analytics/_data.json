@@ -1,0 +1,14 @@
+{
+    "analytics-overview": {
+        "title": "Analytics Overview",
+        "intro": "How to monitor the success of your web push marketing through key metrics."
+    },
+     "campaign-analytics": {
+        "title": "Campaign-level Analytics",
+        "intro": "How to read and compare metrics across yours campaigns to discover which performed best."
+    },
+    "message-analytics": {
+        "title": "Message-level Analytics",
+        "intro": "How to read metrics and compare metrics within a the individual messages in a campaign to discover how each connection performed."
+    }
+}

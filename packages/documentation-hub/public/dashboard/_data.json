@@ -1,0 +1,25 @@
+{
+    "index": {
+        "layout": "../_layouts/homepage",
+        "name": "Dashboard *Beta",
+        "tagline": "Use this guide to help you during the Beta testing phase of the Mobify Dashboard."
+    },
+    "_homepage": {
+        "beta-testing": {
+            "blocks": [
+                {
+                    "title": "How to use the Prototype",
+                    "info": "Guidance on the dashboard's core features and how to interpret the metrics.",
+                    "button": "View guide",
+                    "href": "beta-testing/using-the-prototype/"
+                },
+                {
+                    "title": "Providing feedback",
+                    "info": "Understand how to structure and provide feedback during the research study.",
+                    "button": "View guide",
+                    "href": "beta-testing/providing-feedback/"
+                }
+            ]
+        }
+    }
+}

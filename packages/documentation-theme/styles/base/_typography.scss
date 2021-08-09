@@ -1,0 +1,92 @@
+// Typography
+// ===
+
+
+// Headers
+// ---
+
+%heading {
+    margin: 0;
+    font-family: $brand-font-family;
+    font-weight: $heavy-font-weight;
+    line-height: 1.25;
+    letter-spacing:-.05rem;
+}
+
+h1,
+%h1 {
+    @extend %heading;
+
+    font-size: $large-font-size;
+
+    @include for-tablet-portrait-up {
+        font-size: $larger-font-size;
+    }
+}
+
+h2,
+%h2 {
+    @extend %heading;
+
+    font-size: $medium-font-size;
+    
+    @include for-tablet-portrait-up {
+        font-size: $large-font-size;
+    }
+}
+
+h3,
+%h3 {
+
+    font-size: $base-font-size;
+
+    @include for-tablet-portrait-up {
+        font-size: $medium-font-size;
+    }
+}
+
+h4,
+%h4 {
+
+    font-size: $base-font-size;
+
+    @include for-tablet-portrait-up {
+        font-size: $base-font-size;
+    }
+}
+
+h5,
+h6,
+%h5,
+%h6 {
+
+    font-size: $base-font-size;
+}
+
+
+// Text Elements
+// ---
+
+
+p {
+    margin: 0;
+
+    + p {
+        margin-top: $large-space;
+    }
+
+    &:empty {
+        display: none;
+    }
+}
+
+a {
+    color: $link-color;
+    text-decoration: none;
+
+    &:active,
+    &:hover,
+    &:focus {
+        color: $active-link-color;
+    }
+}

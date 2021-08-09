@@ -1,0 +1,9 @@
+include ../mixins/logo
+
+mixin headerTop
+    div.u-padding-top-sm.u-padding-bottom-sm.u-clearfix.u-flexbox.u-align-center
+        a(href='/').u-neutral-10
+            div.c-logo
+                +logo
+        a(href='https://support.mobify.com/').u-neutral-10.u-margin-start-auto
+            span.u-block.u-padding-top.u-padding-bottom.u-text-bold Support

@@ -1,0 +1,36 @@
+{
+    "index": {
+        "layout": "../_layouts/homepage",
+        "name": "Designer's Guide",
+        "tagline": "A collection of guides for designers creating performant interactions using the Mobify Platform."
+    },
+    "_homepage": {
+        "categories": {
+            "useCategoryList": true
+        }
+    },
+    "instant-page-transitions": {
+        "title": "Instant Page Transitions",
+        "intro": "Learn how to create instant page transitions, where shared content from multiple pages in the PWA are rendered immediately."
+    },
+    "placeholder-design": {
+        "title": "Placeholder Design",
+        "intro": "Make your site feel even faster than it is with Mobify's Skeleton component placeholders."
+    },
+    "performant-product-loading-strategy": {
+        "title": "Performant Product Loading Strategy",
+        "intro": "Use lazy loading and other tactics to build a performant product loading strategy for your PWA."
+    },
+    "offline-mode-experience": {
+        "title": "Offline Mode Experience",
+        "intro": "Design a great Offline Mode experience for users with spotty or slow network connections."
+    },
+    "add-to-home-screen": {
+        "title": "Add to Home Screen",
+        "intro": "The Add to Home Screen feature allows users to add the Progressive Web App (PWA) to their device."
+    },
+    "full-screen-mode": {
+        "title": "Full Screen Mode",
+        "intro": "Design a great Full Screen Mode experience to help users feel fully immersed in your site."
+    }
+}

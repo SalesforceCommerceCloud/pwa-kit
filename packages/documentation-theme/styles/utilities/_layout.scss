@@ -1,0 +1,178 @@
+// Layout Utilities
+// ===
+
+
+// Floats
+// ---
+//
+// Writing-direction independent floats. For RTL stylesheets, redefine these
+// styles with the opposite direction. Templates need not be changed.
+
+.u-float-start {
+    float: left !important;
+}
+
+.u-float-end {
+    float: right !important;
+}
+
+
+// Contain Floats
+// ---
+//
+// Contain all floated children and their margins. Micro-clearfix, as per:
+// css-101.org/articles/clearfix/latest-new-clearfix-so-far.php.
+
+.u-clearfix {
+    &::after {
+        content: '' !important;
+
+        clear: both !important;
+
+        display: table !important;
+    }
+}
+
+
+// Positioning
+// ---
+
+.u-context {
+    position: relative !important;
+}
+
+.u-position {
+    position: absolute !important;
+}
+
+.u-fixed {
+    position: fixed !important;
+}
+
+
+// Position to Coordinates
+// ---
+
+.u-place-top {
+    top: 0 !important;
+}
+
+.u-place-top-halfway {
+    top: 50% !important;
+}
+
+.u-place-end {
+    right: 0 !important;
+}
+
+.u-place-end-halfway {
+    right: 50% !important;
+}
+
+.u-place-bottom {
+    bottom: 0 !important;
+}
+
+.u-place-bottom-halfway {
+    bottom: 50% !important;
+}
+
+.u-place-start {
+    left: 0 !important;
+}
+
+.u-place-start-halfway {
+    left: 50% !important;
+}
+
+
+// Center Align (Translate)
+// ---
+
+.u-realign-center {
+    transform: translate(-50%, -50%) !important;
+}
+
+.u-realign-center-vertically {
+    transform: translateY(-50%) !important;
+}
+
+.u-realign-center-horizontally {
+    transform: translateX(-50%) !important;
+}
+
+
+// Bleed
+// ---
+
+.u-bleed {
+    margin-right: -$base-space !important;
+    margin-left: -$base-space !important;
+}
+
+.u-bleed-start {
+    margin-left: -$base-space !important;
+}
+
+.u-bleed-end {
+    margin-right: -$base-space !important;
+}
+
+.u-bleed-top {
+    margin-top: -$base-space !important;
+}
+
+.u-bleed-bottom {
+    margin-bottom: -$base-space !important;
+}
+
+
+// Z Index Positioning
+// ---
+
+.u-z1 {
+    z-index: $z1-depth !important;
+}
+
+.u-z2 {
+    z-index: $z2-depth !important;
+}
+
+.u-z3 {
+    z-index: $z3-depth !important;
+}
+
+.u-z4 {
+    z-index: $z4-depth !important;
+}
+
+
+// Height
+// ---
+
+.u-height-full-vh {
+    min-height: 100vh;
+}
+
+// Width
+// ---
+//
+
+.u-min-width-auto {
+    min-width: auto !important;
+}
+
+// Device width
+// ---
+//
+// 1. Add width to support retina
+
+.u-ios-iphone-7 {
+    width: 375px; // 1
+    margin: 0 auto;
+}
+
+.u-android-nexus-5 {
+    width: 360px; // 1
+    margin: 0 auto;
+}

@@ -1,0 +1,244 @@
+import React from 'react'
+import PropTypes from 'prop-types'
+
+import {Provider} from 'react-redux'
+import {Router as SDKRouter, Route, IndexRoute} from 'progressive-web-sdk/dist/routing'
+import {ssrRenderingCompleted} from 'progressive-web-sdk/dist/utils/universal-utils'
+import {PERFORMANCE_METRICS} from 'progressive-web-sdk/dist/analytics/data-objects/'
+import {trackPerformance} from 'progressive-web-sdk/dist/analytics/actions'
+import {stringFormat} from 'dolce-gabbana-utils/dist/utils/format-utils'
+import PageLoader from './components/page-loader'
+import Loadable from 'react-loadable'
+import * as generalConfig from './config/sfcc/general-config.js'
+
+import {
+    getQueryStringParams,
+    removeParamFromURL,
+    appendParamToURL,
+    htmlDecode,
+    urlCache
+} from 'dolce-gabbana-utils/dist/utils/url-utils'
+
+// Containers
+import App from '.'
+
+// Use Webpacks' import() with react-loadable to do code-splitting on a
+// per-component basis. We recommend doing this for pages in your app.
+
+export const ProductDetails = Loadable({
+    loader: () => import('./pages/product-details' /* webpackChunkName: "product-details" */),
+    loading: PageLoader
+})
+
+export const ProductList = Loadable({
+    loader: () => import('./pages/search-show' /* webpackChunkName: "search-show" */),
+    loading: PageLoader
+})
+
+export const Home = Loadable({
+    loader: () => import('./pages/home' /* webpackChunkName: "home" */),
+    loading: PageLoader
+})
+
+export const redirectToResponsiveSite = () => {
+    const externalUrl = appendParamToURL(window.location.href, 'noMobify', 'true')
+    window.history.replaceState({}, {}, externalUrl)
+    window.location.reload()
+
+    return null
+}
+
+class Router extends React.Component {
+    constructor(props) {
+        super(props)
+
+        this.routesMap = [
+            {
+                regex: /.*-([a-z]{3}[0-9]{7}[a-z]{3}).html/,
+                path: `${generalConfig.getRootUrl()}Product-Show?pid={1}`
+            }
+        ]
+
+        this.setupHistory = this.setupHistory.bind(this)
+        this.regexToPathRoute = this.regexToPathRoute.bind(this)
+        this.handleReloadOriginalQuery = this.handleReloadOriginalQuery.bind(this)
+    }
+
+    forceTrailingSlash() {
+        const regex = new RegExp(`^((?!${mobSiteId}*.*/).)*$`)
+        const path = window.location.pathname
+        if (regex.test(path)) {
+            history.replaceState({}, {}, `${path}/`)
+            window.location.reload()
+        }
+    }
+
+    handleReloadOriginalQuery() {
+        const originalObj = new URL(decodeURI(htmlDecode(window.originalQuery)))
+
+        const originalUrl = `${originalObj.pathname}${originalObj.hash}${originalObj.search}`
+
+        const location = this.history.getCurrentLocation()
+        const newLocation = this.history.createLocation(originalUrl, 'POP')
+
+        const realUrl = decodeURI(`${location.pathname}${location.hash}${location.search}`)
+
+        urlCache[realUrl] = newLocation
+
+        Promise.resolve(this.history.replace(newLocation)).then(() => {
+            history.replaceState({}, {}, realUrl)
+        })
+    }
+
+    regexToPathRoute(location) {
+        let match
+        const element = this.routesMap.find((item) => (match = location.match(item.regex)) !== null)
+
+        return element && match ? stringFormat(element.path, ...match) : location
+    }
+
+    setupHistory() {
+        this.history = this.props.history || SDKRouter.defaultProps.history
+        this.history.listenBefore((location, action) => {
+            // The URL that will be displayed
+            const fakeURL = removeParamFromURL(
+                decodeURI(htmlDecode(`${location.pathname}${location.search}${location.hash}`)),
+                'originalQuery'
+            )
+
+            // Get the correct pathname checking by comparing it with regexes
+            location.pathname = this.regexToPathRoute(location.pathname)
+
+            // Save this location in previousLocation that will be used later to increment user click if the page is changed
+            window.previousLocation = Object.assign({}, window.location)
+
+            // If the location is already cached restore it else parse and cache it
+            const cachedLocation = urlCache[fakeURL]
+            if (cachedLocation) {
+                location.pathname = cachedLocation.pathname
+                location.search = cachedLocation.search
+                location.hash = cachedLocation.hash
+            } else {
+                // Extract the originalQuery from the location if present
+                const queryParams = getQueryStringParams(location.search)
+                const originalQuery =
+                    ('originalQuery' in location.query
+                        ? location.query.originalQuery
+                        : queryParams.originalQuery) || undefined
+
+                // If the originalQuery is present manipulate the location
+                if (originalQuery) {
+                    const [base, params] = originalQuery.split('?')
+
+                    location.pathname = `${generalConfig.getDemandwareStoreUrl()}/${base}`
+                    location.search = `?${params}`
+
+                    delete location.query.originalQuery
+                }
+                // Else if the pathname is equal to localized SEO Search Show URL change it
+                else if (
+                    decodeURI(location.pathname) === unescape(decodeURI(app.urls.searchShow))
+                ) {
+                    location.pathname = `${generalConfig.getDemandwareStoreUrl}/Search-Show`
+                }
+
+                // Cache the location
+                urlCache[fakeURL] = location
+            }
+
+            // Change the location and display the fakeURL
+            Promise.resolve(action(location)).then(() => {
+                window.history.replaceState({}, {}, fakeURL)
+            })
+        })
+    }
+
+    shouldComponentUpdate() {
+        // If server-side do not re-render after the initial render
+        // is complete.
+        return !ssrRenderingCompleted()
+    }
+
+    componentWillMount() {
+        if (Mobify.target === 'development') {
+            this.forceTrailingSlash()
+        }
+
+        this.setupHistory()
+        this.handleReloadOriginalQuery()
+
+        trackPerformance(PERFORMANCE_METRICS.templateWillMount)
+    }
+
+    render() {
+        const {store} = this.props
+        return (
+            <Provider store={store}>
+                <SDKRouter history={this.history}>
+                    <Route path="/" component={App}>
+                        <IndexRoute component={Home} routeName="home" />
+                        <Route path="*Home-Show*" component={Home} routeName="home" />
+
+                        <Route
+                            path="*Search-Show"
+                            component={ProductList}
+                            routeName="productList"
+                        />
+                        <Route
+                            path="**/Search-Show*"
+                            component={ProductList}
+                            routeName="productList"
+                        />
+
+                        <Route path="*/men/*" component={ProductList} routeName="productList" />
+                        <Route path="*/women/*" component={ProductList} routeName="productList" />
+                        <Route path="*/gifts/*" component={ProductList} routeName="productList" />
+
+                        <Route
+                            path="*/children/*"
+                            component={ProductList}
+                            routeName="productList"
+                        />
+
+                        <Route
+                            path="*/watchesandjewelry/*"
+                            component={ProductList}
+                            routeName="productList"
+                        />
+
+                        <Route
+                            path="*/dgspecials/*"
+                            component={ProductList}
+                            routeName="productList"
+                        />
+
+                        <Route
+                            path="*/Product-Show*"
+                            component={ProductDetails}
+                            routeName="productDetails"
+                        />
+                        <Route
+                            path="*/Product-Variation*"
+                            component={ProductDetails}
+                            routeName="productDetails"
+                        />
+
+                        <Route
+                            path="*"
+                            routeName="withoutMobify"
+                            component={() => null}
+                            onEnter={redirectToResponsiveSite}
+                        />
+                    </Route>
+                </SDKRouter>
+            </Provider>
+        )
+    }
+}
+
+Router.propTypes = {
+    history: PropTypes.object,
+    store: PropTypes.object
+}
+
+export default Router

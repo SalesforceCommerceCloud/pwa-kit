@@ -1,0 +1,10 @@
+// Skeleton Text Theme
+// ===
+//
+// 1. Temporary fix while waiting for an SDK change. @TODO Remove this once the
+//    SkeletonText component's base styles this with `inline-block`
+
+.pw-skeleton-text__line {
+    display: inline-block; // 1
+    height: 1em;
+}

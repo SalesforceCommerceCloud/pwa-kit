@@ -1,0 +1,14 @@
+{
+    "commerce-integrations": {
+        "title": "Commerce Integrations Overview"
+    },
+    "commerce-integrations/api": {
+        "title": "Commerce Integrations API"
+    },
+    "integration-manager": {
+        "title": "The Integration Manager (deprecated)"
+    },
+    "../ecommerce-integrations/api": {
+        "title": "The Integration Manager API (deprecated)"
+    }
+}

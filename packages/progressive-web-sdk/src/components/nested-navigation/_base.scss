@@ -1,0 +1,162 @@
+// Nested Navigation
+// ===
+
+.pw-nested-navigation,
+.c-nested-navigation {
+    display: flex;
+    flex-direction: column;
+
+    background: white;
+}
+
+
+// Navigation Header
+// ---
+
+.pw-nested-navigation__header,
+.c-nested-navigation__header {
+    display: flex;
+    align-items: center;
+    flex: 0 0 auto;
+    min-height: 48px;
+}
+
+
+// Header Actions
+// ---
+
+.pw-nested-navigation__actions,
+.c-nested-navigation__actions {
+    display: flex;
+    align-items: center;
+    flex: 0 0 auto;
+}
+
+
+// Previous Action
+// ---
+
+.pw-nested-navigation__prev-action,
+.c-nested-navigation__prev-action {
+    flex: 0 0 auto;
+
+    &.pw--is-root,
+    &.c--is-root {
+        display: none;
+    }
+}
+
+
+// Action
+// ---
+
+.pw-nested-navigation__action,
+.c-nested-navigation__action {
+    flex: 0 0 auto;
+}
+
+
+// Navigation Title
+// ---
+//
+// 1. Position relative for absolute positioned `.pw-nested-navigation__panel`
+// 2. Contents inside are absolutely positioned so the container would naturally
+//    collapse on itself because it doesn't know how tall it needs to be. Use
+//    `align-self: stretch` to set container to `.pw-nested-navigation__header`
+//    height
+
+.pw-nested-navigation__title,
+.c-nested-navigation__title {
+    position: relative; // 1
+
+    overflow: hidden;
+    flex: 1 1 auto;
+    align-self: stretch; // 2
+}
+
+
+// Animated Title Text
+// ---
+//
+// 1. Absolute positioned to `.pw-nested-navigation__title`
+
+.pw-nested-navigation__title-content,
+.c-nested-navigation__title-content {
+    position: absolute; // 1
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    &.pw--left,
+    &.c--left {
+        transform: translateX(-20%);
+    }
+
+    &.pw--right,
+    &.c--right {
+        transform: translateX(20%);
+    }
+}
+
+
+// Navigation Panel Container
+// ---
+//
+// 1. Position relative for absolute positioned `.pw-nested-navigation__panel`
+
+.pw-nested-navigation__container,
+.c-nested-navigation__container {
+    position: relative; // 1
+
+    overflow: hidden;
+    flex: 1 1 auto;
+    min-height: 200px;
+}
+
+
+// Nested Navigation Panel
+// ---
+//
+// 1. Absolute positioned to `.pw-nested-navigation__container`
+
+.pw-nested-navigation__panel,
+.c-nested-navigation__panel {
+    position: absolute; // 1
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+
+    display: flex;
+    overflow-y: auto;
+    flex-direction: column;
+    flex: 1 1 auto;
+
+    background: white;
+
+    -webkit-overflow-scrolling: touch;
+
+    &.pw--left,
+    &.c--left {
+        z-index: 0;
+
+        transform: translateX(-10%);
+    }
+
+    &.pw--center,
+    &.c--center {
+        z-index: 1;
+    }
+
+    &.pw--right,
+    &.c--right {
+        z-index: 2;
+
+        transform: translateX(100%);
+    }
+}

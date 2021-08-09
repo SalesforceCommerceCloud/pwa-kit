@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="186px" height="87px" viewBox="0 0 186 87" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 44.1 (41455) - http://www.bohemiancoding.com/sketch -->
+    <title>graph + points</title>
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <linearGradient x1="44.1142785%" y1="29.3524852%" x2="94.5660183%" y2="90.8765566%" id="linearGradient-1">
+            <stop stop-color="#0288A7" offset="0%"></stop>
+            <stop stop-color="#4E439B" offset="100%"></stop>
+        </linearGradient>
+    </defs>
+    <g id="Design-system-updates" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="SDK-Homepage-v2" transform="translate(-1054.000000, -1140.000000)">
+            <g id="Guides-2" transform="translate(341.000000, 768.000000)">
+                <g id="guide-4" transform="translate(470.000000, 301.000000)">
+                    <g id="Graph3" transform="translate(99.000000, 54.000000)">
+                        <g id="graph-+-points">
+                            <polygon id="graph" stroke-opacity="0.387369792" stroke="#7D75B4" fill-opacity="0.109999999" fill="url(#linearGradient-1)" points="0 119 48.175 111 101.475 94 130.175 97 147.6 87 172.2 68 216.275 65 228.575 47 249.075 51 276.75 32 302.375 39 353.625 0 353.625 119"></polygon>
+                            <rect id="Rectangle-14-Copy-7" fill="#5F55A4" x="144.525" y="87" width="3.075" height="3"></rect>
+                            <rect id="Rectangle-14-Copy-8" fill="#5F55A4" x="170.15" y="67" width="3.075" height="3"></rect>
+                            <rect id="Rectangle-14-Copy-9" fill="#5F55A4" x="247.025" y="49" width="3.075" height="3"></rect>
+                            <rect id="Rectangle-14-Copy-10" fill="#5F55A4" x="227.55" y="46" width="3.075" height="3"></rect>
+                            <rect id="Rectangle-14-Copy-13" fill="#5F55A4" x="214.225" y="63" width="3.075" height="3"></rect>
+                            <rect id="Rectangle-14-Copy-15" fill="#5F55A4" x="275.725" y="31" width="3.075" height="3"></rect>
+                            <rect id="Rectangle-14-Copy-19" fill="#5F55A4" x="300.325" y="38" width="3.075" height="3"></rect>
+                            <rect id="Rectangle-14-Copy-19" fill="#5F55A4" x="325.95" y="18" width="3.075" height="3"></rect>
+                        </g>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

@@ -1,0 +1,333 @@
+{
+   "./": {
+      "title": "All Functions",
+      "_excludeFromCatalog": true
+   },
+   "reference/global.html#browserSupportsMessaging": {
+      "title": "browserSupportsMessaging"
+   },
+   "reference/global.html#buildQueryString": {
+      "title": "buildQueryString"
+   },
+   "reference/global.html#calculateViewportSize": {
+      "title": "calculateViewportSize"
+   },
+   "reference/global.html#convertStateObjectToStateImmutable": {
+      "title": "convertStateObjectToStateImmutable"
+   },
+   "reference/global.html#createAction": {
+      "title": "createAction"
+   },
+   "reference/global.html#createActionWithAnalytics": {
+      "title": "createActionWithAnalytics"
+   },
+   "reference/global.html#createTypedAction": {
+      "title": "createTypedAction"
+   },
+   "reference/global.html#decreaseVisitCountdowns": {
+      "title": "decreaseVisitCountdowns"
+   },
+   "reference/global.html#defer": {
+      "title": "defer"
+   },
+   "reference/global.html#documentWriteSupported": {
+      "title": "documentWriteSupported"
+   },
+   "reference/global.html#extractPathFromURL": {
+      "title": "extractPathFromURL"
+   },
+   "reference/global.html#formEncode": {
+      "title": "formEncode"
+   },
+   "reference/global.html#getAssetUrl": {
+      "title": "getAssetUrl"
+   },
+   "reference/global.html#getBoundedValue": {
+      "title": "getBoundedValue"
+   },
+   "reference/global.html#getBreakpoints": {
+      "title": "getBreakpoints"
+   },
+   "reference/global.html#getBrowserSize": {
+      "title": "getBrowserSize"
+   },
+   "reference/global.html#getBrowserSizeNames": {
+      "title": "getBrowserSizeNames"
+   },
+   "reference/global.html#getBundleID": {
+      "title": "getBundleID"
+   },
+   "reference/global.html#getChromeVersion": {
+      "title": "getChromeVersion"
+   },
+   "reference/global.html#getCookie": {
+      "title": "getCookie"
+   },
+   "reference/global.html#getCookieValue": {
+      "title": "getCookieValue"
+   },
+   "reference/global.html#getDeployTarget": {
+      "title": "getDeployTarget"
+   },
+   "reference/global.html#getDisplayName": {
+      "title": "getDisplayName"
+   },
+   "reference/global.html#getFirefoxVersion": {
+      "title": "getFirefoxVersion"
+   },
+   "reference/global.html#getPageCount": {
+      "title": "getPageCount"
+   },
+   "reference/global.html#getPath": {
+      "title": "getPath"
+   },
+   "reference/global.html#getProjectIDandTargetFromURL": {
+      "title": "getProjectIDandTargetFromURL"
+   },
+   "reference/global.html#getProxyConfigs": {
+      "title": "getProxyConfigs"
+   },
+   "reference/global.html#getPWAType": {
+      "title": "getPWAType"
+   },
+   "reference/global.html#getTextFrom": {
+      "title": "getTextFrom"
+   },
+   "reference/global.html#getURL": {
+      "title": "getURL"
+   },
+   "reference/global.html#getVisitCountdowns": {
+      "title": "getVisitCountdowns"
+   },
+   "reference/global.html#initStorage": {
+      "title": "initStorage"
+   },
+   "reference/global.html#iOSBrowser": {
+      "title": "iOSBrowser"
+   },
+   "reference/global.html#isChrome68OrHigher": {
+      "title": "isChrome68OrHigher"
+   },
+   "reference/global.html#isCrawler": {
+      "title": "isCrawler"
+   },
+   "reference/global.html#isDataURL": {
+      "title": "isDataURL"
+   },
+   "reference/global.html#isFirefoxBrowser": {
+      "title": "isFirefoxBrowser"
+   },
+   "reference/global.html#isLocalStorageAvailable": {
+      "title": "isLocalStorageAvailable"
+   },
+   "reference/global.html#isMessagingSupported": {
+      "title": "isMessagingSupported"
+   },
+   "reference/global.html#isOrIsNotBusy": {
+      "title": "isOrIsNotBusy"
+   },
+   "reference/global.html#isPreview": {
+      "title": "isPreview"
+   },
+   "reference/global.html#isSamsungBrowser": {
+      "title": "isSamsungBrowser"
+   },
+   "reference/global.html#isSessionStorageAvailable": {
+      "title": "isSessionStorageAvailable"
+   },
+   "reference/global.html#isStandalone": {
+      "title": "isStandalone"
+   },
+   "reference/global.html#isStorageAvailable": {
+      "title": "isStorageAvailable"
+   },
+   "reference/global.html#isSubscribedToChannel": {
+      "title": "isSubscribedToChannel"
+   },
+   "reference/global.html#isUniversal": {
+      "title": "isUniversal"
+   },
+   "reference/global.html#isUsingMobifyPreview": {
+      "title": "isUsingMobifyPreview"
+   },
+   "reference/global.html#isV8Tag": {
+      "title": "isV8Tag"
+   },
+   "reference/global.html#loadPreview": {
+      "title": "loadPreview"
+   },
+   "reference/global.html#loadScript": {
+      "title": "loadScript"
+   },
+   "reference/global.html#loadScriptAsPromise": {
+      "title": "loadScriptAsPromise"
+   },
+   "reference/global.html#loadUPWA": {
+      "title": "loadUPWA"
+   },
+   "reference/global.html#loadWorker": {
+      "title": "loadWorker"
+   },
+   "reference/global.html#Logger": {
+      "title": "Logger"
+   },
+   "reference/global.html#makeFormEncodedRequest": {
+      "title": "makeFormEncodedRequest"
+   },
+   "reference/global.html#makeJsonEncodedRequest": {
+      "title": "makeJsonEncodedRequest"
+   },
+   "reference/global.html#makeRequest": {
+      "title": "makeRequest"
+   },
+   "reference/global.html#mergePayload": {
+      "title": "mergePayload"
+   },
+   "reference/global.html#mergePayloadSkipList": {
+      "title": "mergePayloadSkipList"
+   },
+   "reference/global.html#normalizePhone": {
+      "title": "normalizePhone"
+   },
+   "reference/global.html#parseButton": {
+      "title": "parseButton"
+   },
+   "reference/global.html#parseImage": {
+      "title": "parseImage"
+   },
+   "reference/global.html#parseOption": {
+      "title": "parseOption"
+   },
+   "reference/global.html#parsePageMeta": {
+      "title": "parsePageMeta"
+   },
+   "reference/global.html#parseSelect": {
+      "title": "parseSelect"
+   },
+   "reference/global.html#parseTextLink": {
+      "title": "parseTextLink"
+   },
+   "reference/global.html#prefetchLink": {
+      "title": "prefetchLink"
+   },
+   "reference/global.html#preloadSWAmp": {
+      "title": "preloadSWAmp"
+   },
+   "reference/global.html#preventDesktopSiteFromRendering": {
+      "title": "preventDesktopSiteFromRendering"
+   },
+   "reference/global.html#renderOrHydrate": {
+      "title": "renderOrHydrate"
+   },
+   "reference/global.html#rfc1123": {
+      "title": "rfc1123"
+   },
+   "reference/global.html#runningServerSide": {
+      "title": "runningServerSide"
+   },
+   "reference/global.html#sendPerformanceEvent": {
+      "title": "sendPerformanceEvent"
+   },
+   "reference/global.html#setBaseProxy": {
+      "title": "setBaseProxy"
+   },
+   "reference/global.html#setBreakpoints": {
+      "title": "setBreakpoints"
+   },
+   "reference/global.html#setBrowserSizeNames": {
+      "title": "setBrowserSizeNames"
+   },
+   "reference/global.html#setCustomContent": {
+      "title": "setCustomContent"
+   },
+   "reference/global.html#setPageCount": {
+      "title": "setPageCount"
+   },
+   "reference/global.html#setPerformanceValues": {
+      "title": "setPerformanceValues"
+   },
+   "reference/global.html#setVisitCountdownsInStorage": {
+      "title": "setVisitCountdownsInStorage"
+   },
+   "reference/global.html#SHOULD_PREVIEW_QUERY": {
+      "title": "SHOULD_PREVIEW_QUERY"
+   },
+   "reference/global.html#shouldAsk": {
+      "title": "shouldAsk"
+   },
+   "reference/global.html#shouldLoadResource": {
+      "title": "shouldLoadResource"
+   },
+   "reference/global.html#shouldPreview": {
+      "title": "shouldPreview"
+   },
+   "reference/global.html#skipListsMerger": {
+      "title": "skipListsMerger"
+   },
+   "reference/global.html#splitFullName": {
+      "title": "splitFullName"
+   },
+   "reference/global.html#ssrRenderingComplete": {
+      "title": "ssrRenderingComplete"
+   },
+   "reference/global.html#ssrRenderingCompleted": {
+      "title": "ssrRenderingCompleted"
+   },
+   "reference/global.html#ssrRenderingCompleteThunk": {
+      "title": "ssrRenderingCompleteThunk"
+   },
+   "reference/global.html#ssrRenderingFailed": {
+      "title": "ssrRenderingFailed"
+   },
+   "reference/global.html#ssrRenderingFailedThunk": {
+      "title": "ssrRenderingFailedThunk"
+   },
+   "reference/global.html#startVisitCountdown": {
+      "title": "startVisitCountdown"
+   },
+   "reference/global.html#stripEvent": {
+      "title": "stripEvent"
+   },
+   "reference/global.html#supportedBrowsers": {
+      "title": "supportedBrowsers"
+   },
+   "reference/global.html#textLink": {
+      "title": "textLink"
+   },
+   "reference/global.html#trackFirstPaints": {
+      "title": "trackFirstPaints"
+   },
+   "reference/global.html#triggerSandyAppStartEvent": {
+      "title": "triggerSandyAppStartEvent"
+   },
+   "reference/global.html#typecheck": {
+      "title": "typecheck"
+   },
+   "reference/global.html#updateState": {
+      "title": "updateState"
+   },
+   "reference/global.html#urlToBasicPathKey": {
+      "title": "urlToBasicPathKey"
+   },
+   "reference/global.html#urlToPathKey": {
+      "title": "urlToPathKey"
+   },
+   "reference/global.html#uuid": {
+      "title": "uuid"
+   },
+   "reference/global.html#validateCCExpiry": {
+      "title": "validateCCExpiry"
+   },
+   "reference/global.html#validateCCNumber": {
+      "title": "validateCCNumber"
+   },
+   "reference/global.html#validateFullName": {
+      "title": "validateFullName"
+   },
+   "reference/global.html#validatePageNumber": {
+      "title": "validatePageNumber"
+   },
+   "reference/global.html#validatePostalCode": {
+      "title": "validatePostalCode"
+   }
+}

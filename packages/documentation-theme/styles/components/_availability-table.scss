@@ -1,0 +1,55 @@
+// Availability Table Component
+// ===
+//
+// Allows you to create a table for comparing the availability of many possible
+// attributes without making your table too wide. This component allows you to
+// slant your table headings so they take up less horizontal space. Borders are
+// only used to visually separate the attributes into vertical channels for
+// readability.
+//
+// Example usage: We use this component to show which features of the Mobify
+// Platform are availabile for different devices and browsers.
+// https://docs.mobify.com/platform/1.0/compatibility/
+
+.c-availability-table,
+.c-availability-table__header,
+.c-availability-table__data {
+    border: 0 !important;
+}
+
+.c-availability-table__header--repeated {
+    @include for-tablet-landscape-up {
+        display: none;
+    }
+}
+
+// 1. Magic numbers
+// 2. 45 is really 360-45 
+
+.c-availability-table__slanted-header {
+    width: 42px;
+    margin-bottom: $medium-space;
+    margin-left: -$medium-space;
+    margin-top: $very-large-space;
+
+    transform: translate(25px, 51px) // 1
+    rotate(315deg); // 2
+}
+
+.c-availability-table__data {
+    padding: 0 !important;
+    border-right: 1px solid $border-color !important;
+    border-left: 1px solid $border-color !important;
+
+    font-weight: bold;
+    font-size: 10px;
+    text-align: center !important;
+}
+
+.c-availability-table__data--available {
+    color: $success-color;
+}
+
+.c-availability-table__data--unavailable {
+    color: transparent;
+}

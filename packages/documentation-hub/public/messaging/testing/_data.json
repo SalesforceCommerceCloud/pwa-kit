@@ -1,0 +1,18 @@
+{
+    "what-to-test": {
+        "title": "What to Test",
+        "intro": "Understanding what should be tested for."
+    },
+    "no-test-on-staging": {
+        "title": "What cannot be tested on Staging",
+        "intro": "Understanding what cannot be tested on Staging environment."
+    },
+    "automated-tests": {
+        "title": "Automated Tests",
+        "intro": "A suite of automated tests to ensure everything is running as intended."
+    },
+    "preview": {
+        "title": "Preview messages",
+        "intro": "Send push notifications to registered preview devices without impacting existing subscribers." 
+    }
+}

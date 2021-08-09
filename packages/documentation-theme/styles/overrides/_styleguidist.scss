@@ -1,0 +1,334 @@
+// Styleguidist Overrides
+// ===
+//
+// 1. To override styleguidist styles
+
+$rsgSearchHeaderWidth: 250px;
+
+
+// Global Styleguide Styles
+// ---
+
+.rsg-style-guide {
+    display: flex;
+    flex: 1 1 auto;
+}
+
+@include for-phone-only {
+    .rsg-style-guide--is-top-level {
+        .rsg-components__search-nav {
+            display: block;
+            width: 100%;
+            margin-right: 0;
+
+            a {
+                display: inline-block;
+                padding: $small-space ($very-small-space/2);
+            }
+        }
+
+        .rsg-components__component-section {
+            display: none;
+        }
+
+        [class*="rsg--isChild-"] {
+            display: block;
+            margin: $small-space 0;
+        }
+    }
+
+    // Component view's first header wrapper
+    [id*="-container"] {
+        [class*="rsg--wrapper-"] {
+            display: flex;
+            flex-direction: column-reverse;
+            align-items: flex-start;
+        }
+
+        // "Back to components" link
+        header [class*="rsg--toolbar-"] {
+            margin-bottom: $base-space;
+            margin-left: 0;
+
+            a {
+                display: none;
+
+                color: $link-color;
+                font-weight: bold;
+                text-decoration: none;
+
+                &::before {
+                    content: '\2190 \00A0 Back';
+                }
+
+                svg {
+                    display: none;
+                }
+            }
+        }
+    }
+}
+
+@include for-tablet-only {
+    .rsg-style-guide--is-top-level {
+        [class*="rsg--isChild-"] {
+            display: block;
+            margin: $small-space 0;
+        }
+    }
+}
+
+
+// "Get Started" Arrow
+// ---
+
+.rsg-style-guide__arrow {
+    margin-top: $xlarge-space;
+}
+
+
+// Styleguidist "components" Wrapper
+// ---
+
+.rsg-components {
+    display: flex;
+    flex: 1 1 auto;
+    max-width: 100%;
+}
+
+
+// Styleguidist "Search" and "Navigation"
+// ---
+
+.rsg-components__search-nav {
+    z-index: $z2-depth - 1;
+
+    overflow: scroll;
+    flex: 0 0 auto;
+    width: $rsgSearchHeaderWidth;
+    margin-right: $xlarge-space;
+    padding: $xlarge-space 0;
+
+    background: #fff;
+
+    a {
+        color: $link-color;
+        font-size: $smallish-font-size;
+        text-decoration: none;
+    }
+
+    ul {
+        margin: 0;
+        padding: 0;
+    }
+
+    li {
+        list-style: none;
+    }
+
+    input {
+        width: 100%;
+        padding: $small-space;
+        border: 1px solid $border-color;
+
+        border-radius: $border-radius;
+        background-color: $white;
+        outline: none;
+
+        transition: all .15s ease-in-out;
+
+        &:focus {
+            box-shadow: $small-box-shadow;
+        }
+    }
+
+    .rsg-component-filter {
+        margin-bottom: $base-space;
+    }
+
+    [class*="rsg--list-"] {
+        margin: 0;
+
+        [class*="rsg--list-"] {
+            margin-left: $large-space;
+        }
+    }
+
+    [class*="rsg--list-"] .rsg-component-filter {
+        display: none;
+    }
+}
+
+@include for-phone-only {
+    .rsg-components__search-nav {
+        display: none;
+    }
+}
+
+
+// List of Links (sidebar nav links)
+// ---
+
+.rsg-component-list .rsg-component-list {
+    padding-bottom: $base-space;
+}
+
+
+// Styleguidist Components, Main Content Area
+// ---
+
+.rsg-components__component-section {
+    flex: 1 1 auto;
+    max-width: 100%;
+
+    // The component title. Emulate the appearance of an H1
+    [id][class*="rsg--heading2-"] {
+        font-size: $massive-font-size;
+        color: $neutral-70;
+    }
+
+    [class*="rsg--list-"] {
+        margin-left: 0;
+    }
+
+    [class*="rsg--tabs-"] {
+        margin-top: $xlarge-space;
+    }
+
+    [class*="rsg--tab-"] {
+        .CodeMirror-scroll {
+            margin-right: 0;
+        }
+    }
+
+    // Code blocks
+    [class*="rsg--pre-"] {
+        overflow: scroll;
+        margin-bottom: $massive-space;
+
+        &.language-js {
+            margin-bottom: $very-large-space;
+        }
+    }
+
+    // Rendred examples
+    [class*="rsg--preview-"] {
+        margin-bottom: $smallish-space;
+    }
+
+    [class*="rsg--heading"],
+    [class*="rsg--heading"] a {
+        font-family: $brand-font-family;
+        font-weight: $heavy-font-weight;
+        letter-spacing: -.05rem;
+        text-decoration: none;
+        color: $neutral-70;
+    }
+
+    [class*="rsg--root-"]:not(:last-of-type) {
+        margin-bottom: $massive-space;
+    }
+
+    [class*="rsg--preview"] {
+        position: relative; // temporary fix for issue with Carousel's layout="fill" example
+
+        background: $neutral-10;
+        color: $neutral-70;
+    }
+
+    [class*="rsg--table-"] {
+        background: transparent;
+    }
+
+    [class*="rsg--tableHead-"],
+    [class*="rsg--thead-"],
+    [class*="rsg--tr-"],
+    [class*="rsg--table-"] tr {
+        border-bottom: 1px solid rgba(0,0,0,.03);
+    }
+
+    [class*="rsg--cellHeading-"],
+    [class*="rsg--cell-"],
+    [class*="rsg--th-"],
+    [class*="rsg--td-"] {
+        border: none !important; // 1
+
+        color: $neutral-70;
+        font-size: $small-font-size;
+
+        [class*="rsg--para-"] {
+            color: $neutral-70;
+            font-size: $small-font-size;
+        }
+    }
+
+    [class*="rsg--cellHeading-"] {
+        font-size: $tiny-font-size;
+        text-transform: uppercase;
+    }
+
+    [class*="rsg--cell-"]:last-child {
+        width: initial;
+    }
+
+    [class*="rsg--name-"] {
+        display: inline-block;
+        margin-bottom: $small-space;
+
+        color: $neutral-70;
+    }
+}
+
+// Tab Buttons
+[class*="rsg--tabButtons-"],
+[class*="rsg--controls-"] {
+    [class*="rsg--button-"] {
+        padding-right: $smallish-space;
+        padding-left: $smallish-space;
+
+        color: $link-color;
+        font-family: $base-font-family;
+        font-weight: bold;
+
+        &[class*="rsg--isActive-"] {
+            border-bottom: 3px solid $link-color;
+        }
+    }
+}
+
+// Body text
+[class*="rsg--para-"] {
+    color: $neutral-70;
+}
+
+[class*="rsg--text-"] {
+    color: $neutral-70;
+    font-size: $small-font-size;
+}
+
+// Isolation Buttons
+[class*="rsg--toolbar-"] [class*="rsg--button-"] {
+    display: none;
+}
+
+
+// Code Snippits
+//
+// 1. Fix a render bug where `white-space: pre;` elements overflow, and also
+//    force other parent elements to overflow as well. See example:
+//    @url: https://codepen.io/jeffkamo/pen/MQaxdz
+//    Also see WEB-1861!
+// 2. Related to #1... if word-wrap is set to `break-word` while width is `0`
+//    then the layout breaks in Safari. The content collapses into a single
+//    column, as the content breaks at every letter, since the width is
+//    indeed at `0`. This fix prevents that, preserving the layout.
+.rsg-components__component-section [class*="rsg--tab-"] .CodeMirror-line,
+pre code[class*="rsg--code-"],
+code[class*="language-"],
+pre[class*="rsg--root-"] {
+    display: block;
+    width: 0; // 1
+
+    word-wrap: initial; // 2
+    white-space: pre;
+}

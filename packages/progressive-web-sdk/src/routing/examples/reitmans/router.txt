@@ -1,0 +1,431 @@
+import React from 'react'
+import PropTypes from 'prop-types'
+import {Provider} from 'react-redux'
+import {
+  Router as SDKRouter,
+  Route,
+  IndexRoute,
+} from 'progressive-web-sdk/dist/routing'
+import {Redirect} from 'react-router'
+import {ssrRenderingCompleted} from 'progressive-web-sdk/dist/utils/universal-utils'
+
+import PageLoader from './components/page-loader'
+import Loadable from 'react-loadable'
+
+// Containers
+import App from '.'
+
+// Use Webpacks' import() with react-loadable to do code-splitting on a
+// per-component basis. We recommend doing this for pages in your app.
+export const Cart = Loadable({
+  loader: () => import('./pages/cart' /* webpackChunkName: "cart" */),
+  loading: PageLoader,
+})
+
+export const Checkout = Loadable({
+  loader: () => import('./pages/checkout' /* webpackChunkName: "checkout" */),
+  loading: PageLoader,
+})
+
+export const Confirmation = Loadable({
+  loader: () =>
+    import('./pages/confirmation' /* webpackChunkName: "confirmation" */),
+  loading: PageLoader,
+})
+
+export const ProductDetails = Loadable({
+  loader: () =>
+    import('./pages/product-details' /* webpackChunkName: "product-details" */),
+  loading: PageLoader,
+})
+
+export const ProductList = Loadable({
+  loader: () =>
+    import('./pages/product-list' /* webpackChunkName: "product-list" */),
+  loading: PageLoader,
+})
+
+export const StyleGuide = Loadable({
+  loader: () => import('./pages/style-guide' /* webpackChunkName: "home" */),
+  loading: PageLoader,
+})
+
+export const Home = Loadable({
+  loader: () => import('./pages/home' /* webpackChunkName: "home" */),
+  loading: PageLoader,
+})
+
+export const Dark = Loadable({
+  loader: () => import('./pages/dark' /* webpackChunkName: "dark" */),
+  loading: PageLoader,
+})
+
+export const CmsDemo = Loadable({
+  loader: () => import('./pages/cms-demo' /* webpackChunkName: "cms-demo" */),
+  loading: PageLoader,
+})
+
+export const Story = Loadable({
+  loader: () => import('./pages/story' /* webpackChunkName: "story" */),
+  loading: PageLoader,
+})
+
+export const AccountLogin = Loadable({
+  loader: () =>
+    import('./pages/account-login' /* webpackChunkName: "account-login" */),
+  loading: PageLoader,
+})
+
+export const AccountCreate = Loadable({
+  loader: () =>
+    import('./pages/account-create' /* webpackChunkName: "account-create" */),
+  loading: PageLoader,
+})
+
+export const Sitemap = Loadable({
+  loader: () => import('./pages/sitemap' /* webpackChunkName: "sitemap" */),
+  loading: PageLoader,
+})
+
+export const GarmentCare = Loadable({
+  loader: () =>
+    import('./pages/garment-care' /* webpackChunkName: "garment-care" */),
+  loading: PageLoader,
+})
+
+export const Unsubscribe = Loadable({
+  loader: () =>
+    import('./pages/unsubscribe' /* webpackChunkName: "unsubscribe" */),
+  loading: PageLoader,
+})
+
+export const ExtendedSizes = Loadable({
+  loader: () =>
+    import('./pages/extended-sizes' /* webpackChunkName: "extended-sizes" */),
+  loading: PageLoader,
+})
+
+export const Conciergerie = Loadable({
+  loader: () =>
+    import('./pages/conciergerie' /* webpackChunkName: "conciergerie" */),
+  loading: PageLoader,
+})
+
+export const MyAccount = Loadable({
+  loader: () =>
+    import(
+      './pages/account-dashboard' /* webpackChunkName: "account-dashboard" */
+    ),
+  loading: PageLoader,
+})
+
+export const PasswordReset = Loadable({
+  loader: () =>
+    import('./pages/password-reset' /* webpackChunkName: "password-reset" */),
+  loading: PageLoader,
+})
+
+export const GlobalElements = Loadable({
+  loader: () =>
+    import('./pages/global-content' /* webpackChunkName: "global-content" */),
+  loading: PageLoader,
+})
+
+export const GiftCard = Loadable({
+  loader: () =>
+    import('./pages/gift-card' /* webpackChunkName: "gift-cards" */),
+  loading: PageLoader,
+})
+
+export const GiftCards = Loadable({
+  loader: () =>
+    import('./pages/gift-cards' /* webpackChunkName: "gift-cards" */),
+  loading: PageLoader,
+})
+
+export const Faq = Loadable({
+  loader: () => import('./pages/faq' /* webpackChunkName: "faq" */),
+  loading: PageLoader,
+})
+
+export const StoreLocator = Loadable({
+  loader: () =>
+    import('./pages/store-locator' /* webpackChunkName: "store-locator" */),
+  loading: PageLoader,
+})
+
+export const WriteProductReview = Loadable({
+  loader: () =>
+    import(
+      './pages/product-details/partials/WriteProductReview' /* webpackChunkName: "write-a-review" */
+    ),
+  loading: PageLoader,
+})
+
+export const Reitmans404Page = Loadable({
+  loader: () =>
+    import('./pages/reitmans-404-page' /* webpackChunkName: "faq" */),
+  loading: PageLoader,
+})
+
+export const StoreDetail = Loadable({
+  loader: () =>
+    import('./pages/store-detail' /* webpackChunkName: "write-a-review" */),
+  loading: PageLoader,
+})
+
+export const GenericContent = Loadable({
+  loader: () =>
+    import('./pages/generic-content' /* webpackChunkName: "generic-content" */),
+  loading: PageLoader,
+})
+
+export const ContactUs = Loadable({
+  loader: () =>
+    import('./pages/contact-us' /* webpackChunkName: "contact-us" */),
+  loading: PageLoader,
+})
+
+export const Casl = Loadable({
+  loader: () => import('./pages/casl' /* webpackChunkName: "casl" */),
+  loading: PageLoader,
+})
+
+class Router extends React.Component {
+  shouldComponentUpdate() {
+    // If server-side do not re-render after the initial render
+    // is complete.
+    return !ssrRenderingCompleted()
+  }
+
+  render() {
+    const {store} = this.props
+
+    // Please Name routeName one of the following for analytics purposes based on what category they fall into
+    // "Home", "Category", "Product", "Search", "Store Locator", "Account", "SignInOptions", "Content Page", "Cart", "Checkout", "Purchase","404", “Wishlist”  or "Other"
+    return (
+      <Provider store={store}>
+        <SDKRouter>
+          <Route path="/" component={App}>
+            <IndexRoute component={Home} />
+            <Route component={Dark} path="letmein" routeName="holding-page" />
+            <Route component={Home} path="fr" routeName="Home" />
+            <Route component={Home} path="en" routeName="Home" />
+            <Route component={Home} path="*/email-signup" routeName="Home" />
+            <Route
+              component={Reitmans404Page}
+              path="*page-not-found"
+              routeName="page-not-found"
+              status={404}
+            />
+            <Route component={CmsDemo} path="*cms-demo" routeName="cms-demo" />
+            <Route
+              component={GenericContent}
+              routeName="generic"
+              path="*/content/*"
+            />
+            <Route
+              path="*/checkout*"
+              component={Checkout}
+              routeName="Checkout"
+            />
+            <Redirect from="/en/cartes-cadeaux*" to="/en/gift-cards" />
+            <Redirect from="/fr/gift-cards*" to="/fr/cartes-cadeaux*" />
+            <Redirect
+              from="/en/activation-carte-cadeau"
+              to="/en/gift-card-activation"
+            />
+            <Redirect
+              from="/fr/gift-card-activation"
+              to="/fr/activation-carte-cadeau"
+            />
+            <Route
+              component={GiftCards}
+              routeName="gift-cards"
+              path="*cartes-cadeaux*"
+            />
+            <Route
+              component={GiftCards}
+              routeName="gift-cards"
+              path="*Gift-Cards"
+            />
+            <Route
+              component={GiftCard}
+              routeName="gift-card-activation"
+              path="*gift-card-activation"
+            />
+            <Route
+              component={GiftCard}
+              routeName="gift-card-activation"
+              path="*activation-carte-cadeau"
+            />
+            <Route
+              component={GiftCard}
+              routeName="gift-card-balance"
+              path="*gift-card-balance"
+            />
+            <Route
+              component={GiftCard}
+              routeName="gift-card-physical"
+              path="*GiftCard-ShowPhysical"
+            />
+            <Route
+              component={GiftCard}
+              routeName="e-gift-card"
+              path="*GiftCard-ShowEGift"
+            />
+            <Route path="*cart*" component={Cart} routeName="Cart" />
+            <Route component={Faq} path="*/faq*" routeName="faq" />
+            <Route path="*/cart*" component={Cart} routeName="Cart" />
+            <Route
+              path="*confirmation"
+              component={Confirmation}
+              routeName="Confirmation"
+            />
+            <Route path="style-guide" component={StyleGuide} />
+            <Route component={Story} routeName="story" path="*/story/*" />
+            <Route
+              component={AccountLogin}
+              routeName="account-login"
+              path="*Account-Login"
+            />
+            <Route
+              component={Unsubscribe}
+              routeName="unsubscribe"
+              path="*Unsubscribe-Start"
+            />
+            <Route
+              component={AccountCreate}
+              routeName="account-create"
+              path="*Account-Create"
+            />
+            <Route
+              component={StoreDetail}
+              routeName="StoreDetail"
+              path="*Stores-Detail*"
+            />
+            <Route
+              component={MyAccount}
+              routeName="my-account"
+              path="*Account-Show*"
+            />
+            <Route
+              component={MyAccount}
+              routeName="account-profile"
+              path="*Account-EditProfile*"
+            />
+            <Route
+              component={MyAccount}
+              routeName="account-addresses"
+              path="*Address-List*"
+            />
+            <Route
+              component={MyAccount}
+              routeName="account-payments"
+              path="*PaymentInstruments-List*"
+            />
+            <Route
+              component={MyAccount}
+              routeName="account-order-history"
+              path="*Order-History*"
+            />
+            <Route
+              component={MyAccount}
+              path="*order-status*"
+              routeName="order-status"
+            />
+            <Route
+              component={MyAccount}
+              routeName="account-wishlist"
+              path="*Wishlist-Show*"
+            />
+            <Route
+              component={MyAccount}
+              routeName="account-change-email"
+              path="*Account-ChangeEmail*"
+            />
+            <Route
+              component={MyAccount}
+              routeName="account-change-password"
+              path="*Account-ChangePassword*"
+            />
+            <Route
+              component={MyAccount}
+              routeName="account-preferred-store"
+              path="*Preferred-Store*"
+            />
+            <Route
+              component={PasswordReset}
+              routeName="password-reset"
+              path="*reset-password*"
+            />
+            <Route
+              component={PasswordReset}
+              routeName="new-password"
+              path="*Account-SetNewPassword*"
+            />
+            <Route
+              component={StoreLocator}
+              routeName="store-loctor"
+              path="*store-locator*"
+            />
+            <Route
+              component={GarmentCare}
+              routeName="garment-care"
+              path="*Garment-Care"
+            />
+            <Route
+              component={ExtendedSizes}
+              routeName="extended-sizes"
+              path="*Extended-Sizes"
+            />
+            <Route
+              component={Conciergerie}
+              routeName="conciergerie"
+              path="*Conciergerie"
+            />
+            <Route
+              component={GlobalElements}
+              path="*/global-elements"
+              routeName="GlobalElements"
+            />
+            <Route
+              component={WriteProductReview}
+              routeName="write-a-review"
+              path="*WriteReviewPage"
+            />
+
+            <Route component={Sitemap} routeName="sitemap" path="*Sitemap" />
+
+            <Route
+              component={ContactUs}
+              routeName="contact-us"
+              path="*Contact-Us"
+            />
+
+            <Route component={Casl} routeName="casl" path="*CASL" />
+
+            <Route path="products/:productId" />
+            <Route
+              path="*/:productId.html"
+              component={ProductDetails}
+              routeName="Product"
+            />
+            <Route
+              path=":localePath/*"
+              component={ProductList}
+              routeName="Category"
+            />
+            <Route path="*" component={ProductList} routeName="Category" />
+          </Route>
+        </SDKRouter>
+      </Provider>
+    )
+  }
+}
+
+Router.propTypes = {
+  store: PropTypes.object,
+}
+
+export default Router

@@ -1,0 +1,66 @@
+//- This mixin is typically used on a product homepage, and is concerned with the
+//- _homepage key of _data.json files.
+
+include ./card
+
+//- We care about when the key name is 'components' or 'overview'
+    - In the case of 'components', we want a grid size of 4
+    - In the case of 'overview', we don't want a grid and we'll prefix the title
+      with "Overview: "
+//- We also care about the number of sections - if there's only three, use a grid
+    size of 3
+mixin renderCards(section, sectionName)
+    - var isComponentBlock = sectionName === 'components'
+    - var isOverview = sectionName === 'overview'
+
+    - var gridSize = 2
+    - if (isComponentBlock) {
+        - gridSize = 4
+    - } else if (section.blocks.length === 3) {
+        - gridSize = 3
+    - }
+
+    - var classes = isOverview ? null : ["c-grid", `c--${gridSize}up`]
+
+    div(class=classes)
+        each block in section.blocks
+            - var title = isOverview ? `Overview: ${block.title}` : block.title
+            +card(block.href, title, block.info, block.button, block.image, isComponentBlock)
+        if isOverview
+            hr
+
+mixin blockContents
+    - var version = current.path[0]
+    //- In the case of the homepage of a docs project
+    - if (version === 'index') {
+        - var data = public._data
+    - } else {
+        - var data = public[version]._data
+    - }
+
+    each section, sectionName in data._homepage
+          - var isDeprecatedSection = sectionName === 'deprecated'
+
+          if isDeprecatedSection
+              hr.u-margin-top-massive
+          if section.title
+              h2 #{section.title}
+          if section.intro
+              - var deprecatedClasses = 'u-margin-top-sm u-padding-top-sm u-padding-start-lg u-padding-bottom-sm u-padding-end-lg u-small-shadow u-background-warning'
+              p(class=isDeprecatedSection ? deprecatedClasses : '') #{section.intro}
+          if section.questions
+               for question in section.questions
+                   div.mt2
+                       - var url = './' + question.href
+                       a.no-underline.util-block(href=url) #{question.question}
+          if section.blocks
+              +renderCards(section, sectionName)
+              // There's a use case on Documentation Hub where we display all of the available sections on a product homepage,
+              // so this will just automatically use the metadata available in _data.json for that product.
+          else if sectionName === 'categories' && section.useCategoryList === true
+              - var availableCategories = _.pickBy(data, function(value, key) {
+                  - return !key.startsWith('_') && key !== 'index' && key !== 'styleguidist' && key !== 'overview'
+              - })
+              .c-grid.c--2up
+                  each category, categoryName in availableCategories
+                      mixin card(categoryName, category.title, category.intro, category.title)

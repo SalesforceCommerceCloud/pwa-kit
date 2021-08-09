@@ -1,0 +1,54 @@
+// jQueryUI Overrides
+// ===
+//
+// 1. To override jQueryUI styles
+
+.tabs-line.ui-tabs, .tabs-line.ui-tabs .ui-tabs-nav {
+    padding: 0px;
+}
+
+.tabs-line .ui-state-default {
+    border: 0 !important;
+    padding-bottom: 0px !important;
+    border-bottom-width: $very-small-space !important;
+    border-bottom: $very-small-space solid $tab-color !important;
+    margin: -1px 0.2em 0px -1px !important;
+}
+
+.tabs-line .ui-state-hover {
+    border: 0 !important;
+    padding-bottom: 0px !important;
+    border-bottom-width: $very-small-space !important;
+    border-bottom: $very-small-space solid $tab-highlight-color !important;
+    margin: -1px 0.2em 0px -1px !important;
+}
+
+.tabs-line .ui-state-active {
+    border: 0 !important;
+    padding-bottom: 0px !important;
+    border-bottom-width: $very-small-space !important;
+    border-bottom: $very-small-space solid $light-accent-color !important;
+    margin: -1px 0.2em 0px -1px !important;
+    background-color: $tab-color !important;
+}
+
+.tabs-line .ui-state-active .ui-tabs-anchor {
+    color: $light-accent-color;
+    font-weight: bold;
+}
+
+.tabs-line.tabs-no-border {
+    border: 0px !important;
+}
+
+.tabs-line.tabs-no-border .ui-tabs-nav {
+    border: 0px !important;
+}
+
+.tabs-line.tabs-no-border .ui-tabs-panel {
+    padding: 1em 0px !important;
+}
+
+.ui-accordion-header-icon {
+    margin-right: 0.5em;
+}

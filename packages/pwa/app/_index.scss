@@ -1,0 +1,39 @@
+// App
+// ===
+//
+// 1. Wraps all main content, but not the header and footer!
+
+
+.t-app {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.t-app__main {
+    display: flex;
+    flex: 1 1 auto;
+    align-self: center;
+    width: 100%;
+    max-width: $max-width;
+    min-height: 100%;
+    padding-right: gutter();
+    padding-left: gutter();
+}
+
+.t-app__content {
+    flex: 1 1 auto;
+}
+
+.t-app__offline-banner {
+    position: relative;
+    top: 0;
+    z-index: $z2-depth;
+
+    width: 100%;
+    padding: $unit*2;
+
+    background-color: $neutral-60;
+
+    color: $neutral-10;
+}

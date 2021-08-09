@@ -1,0 +1,40 @@
+// Label
+// ===
+//
+// 1. Intetionally ignoring variables in order to match design
+// 2. Variable is missing. @TODO: make new variable?
+
+.c-label {
+    display: inline-block;
+    padding: 5px 10px; // 1
+
+    border-radius: 5px; // 1
+
+    color: $white;
+    font-family: inherit;
+    font-weight: $heavy-font-weight;
+    font-size: $base-font-size;
+    line-height: $medium-font-size;
+    letter-spacing: -0.18px;
+    text-transform: uppercase;
+}
+
+
+// Themes
+// ---
+
+.c-label.c--features {
+    background: $hover-error-color;
+}
+
+.c-label.c--updates {
+    background: #09f; // 2
+}
+
+.c-label.c--bugs {
+    background: #4e439b; // 2
+}
+
+.c-label.c--known {
+    background: $lighter-accent-color;
+}

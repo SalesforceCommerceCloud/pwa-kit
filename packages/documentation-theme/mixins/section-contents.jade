@@ -1,0 +1,30 @@
+include ./card
+
+mixin sectionContents
+    // This is a bit complex due to the fact that we use directories with `index.md`
+    // in them so that we can have trailing slashes for all of our doc URLs
+    // `/progressive-web-sdk/latest/reference/changelog` -> `reference/changelog/index.md`
+    - var localPath = [].concat(current.path)
+    - if (localPath[localPath.length - 1] === 'index') {
+        - localPath = localPath.slice(0, localPath.length - 1)
+    - }
+
+    - var node = public
+
+    - for (i = 0; i < localPath.length; i++) {
+    -     node = node[localPath[i]];
+    - }
+
+    - var docsRoot = environment === 'production' ? PROD_ROOT : DEV_ROOT
+
+    // Render nothing and don't crash if we call this mixin on a section without children
+    if (node._data)
+        ul.c-section-contents.u-list-style-none
+            each childNode, slug in node._data
+                if (!(slug.startsWith('_') || slug === "styleguidist" || slug === "index"))
+                    - url = docsRoot + localPath.join('/') + '/' + slug
+                    li
+                        a.c-card(href=url)
+                            h2.u-text-size-normal.u-margin-top-sm.u-margin-bottom-sm.c-card__heading.c-heading.c--h2 #{childNode.title}
+                            if childNode.intro
+                                p.c-card__message #{childNode.intro}

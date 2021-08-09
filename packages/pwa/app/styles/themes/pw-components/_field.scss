@@ -1,0 +1,58 @@
+// Field Theme
+// ---
+//
+
+// Inner
+// ---
+
+.pw-field__inner {
+    display: inline-block;
+    width: 100%;
+}
+
+// Label Wrap
+// ---
+
+.pw-field__label-wrap {
+    display: flex;
+    flex: 1 1 auto;
+}
+
+// Label
+// ---
+//
+
+.pw-field__label {
+    flex: 1 1 auto;
+    margin-bottom: $unit;
+
+    font-weight: $semi-bold-font-weight;
+    font-size: $font-size;
+    line-height: 1em;
+}
+
+// Field: Error
+// ---
+
+.pw-field__error {
+    margin-top: $sub-unit;
+
+    color: $error-color;
+    font-size: $small-font-size;
+    line-height: $small-line-height;
+}
+
+// Modifier: Error Field
+// ---
+
+.pw-field.pw--error {
+    .pw-field__label {
+        color: $error-color;
+    }
+
+    input,
+    select,
+    .pw-field__input > * {
+        border-color: $error-color;
+    }
+}

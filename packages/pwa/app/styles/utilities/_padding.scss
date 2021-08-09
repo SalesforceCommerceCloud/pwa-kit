@@ -1,0 +1,164 @@
+// Padding
+// ===
+
+// Miscellanous
+// ---
+
+.u-padding-0 {
+    padding: 0;
+}
+
+.u-padding {
+    padding: $unit;
+}
+
+.u-padding-sm {
+    padding: ($unit / 2);
+}
+
+.u-padding-md {
+    padding: $unit * 1.5;
+}
+
+.u-padding-lg {
+    padding: $unit * 2;
+}
+
+// Vertical Padding
+// ---
+//
+// Granular control over vertical spacing independent of a component. Includes
+// values based on global spacing.
+//
+// Suffixes:
+// 0:  none
+// sm: small
+// md: medium
+// lg: large
+
+.u-padding-top-0 {
+    padding-top: 0;
+}
+
+.u-padding-top {
+    padding-top: $unit;
+}
+
+.u-padding-top-sm {
+    padding-top: ($unit / 2);
+}
+
+.u-padding-top-md {
+    padding-top: $unit * 1.5;
+}
+
+.u-padding-top-lg {
+    padding-top: $unit * 2;
+}
+
+.u-padding-bottom-0 {
+    padding-bottom: 0;
+}
+
+.u-padding-bottom {
+    padding-bottom: $unit;
+}
+
+.u-padding-bottom-sm {
+    padding-bottom: ($unit / 2);
+}
+
+.u-padding-bottom-md {
+    padding-bottom: $unit * 1.5;
+}
+
+.u-padding-bottom-lg {
+    padding-bottom: $unit * 2;
+}
+
+
+// Horizontal Padding
+// ---
+//
+// Granular control over horizontal spacing independent of a component. Includes
+// values based on global spacing, and adds values based on relative typographic
+// sizes.
+//
+// `start` and `end` are writing-direction independent forms for `left` and
+// `right`. For right-to-left localizations, create an alternate version of this
+// stylesheet with the property directions reversed.
+//
+// Suffixes:
+//
+// 0:  none
+// th: thick space (about 1.5× a “normal” word space)
+// en: en space (half an em)
+// em: em space
+// sm: small
+// md: medium
+// lg: large
+
+.u-padding-start-0 {
+    padding-left: 0;
+}
+
+.u-padding-start {
+    padding-left: $unit;
+}
+
+.u-padding-start-th {
+    padding-left: 0.333em;
+}
+
+.u-padding-start-en {
+    padding-left: 0.5em;
+}
+
+.u-padding-start-em {
+    padding-left: 1em;
+}
+
+.u-padding-start-sm {
+    padding-left: ($unit / 2);
+}
+
+.u-padding-start-md {
+    padding-left: $unit * 1.5;
+}
+
+.u-padding-start-lg {
+    padding-left: $unit * 2;
+}
+
+.u-padding-end-0 {
+    padding-right: 0;
+}
+
+.u-padding-end {
+    padding-right: $unit;
+}
+
+.u-padding-end-th {
+    padding-right: 0.333em;
+}
+
+.u-padding-end-en {
+    padding-right: 0.5em;
+}
+
+.u-padding-end-em {
+    padding-right: 1em;
+}
+
+.u-padding-end-sm {
+    padding-right: ($unit / 2);
+}
+
+.u-padding-end-md {
+    padding-right: $unit * 1.5;
+}
+
+.u-padding-end-lg {
+    padding-right: $unit * 2;
+}
+

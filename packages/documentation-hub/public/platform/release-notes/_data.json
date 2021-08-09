@@ -1,0 +1,82 @@
+{
+    "2020-february": {
+        "title": "February 2020",
+        "intro": "Express.js compatible server side rendering architecture and bug fixes"
+    },
+    "2020-january": {
+        "title": "January 2020",
+        "intro": "Node.js 10 upgrade, Application Cache improvements, Component fixes, and more"
+    },
+    "2019-november": {
+        "title": "November 2019",
+        "intro": "Node SSR Environment, Node 10, CSP support, and more"
+    },
+    "2019-september": {
+        "title": "September 2019",
+        "intro": "PWA Scaffold improvements, Application Delivery Network updates, and more"
+    },
+    "2019-august": {
+        "title": "August 2019",
+        "intro": "PWA developer experience enhancements, Analytics Integrations updates, and more"
+    },
+    "2019-july": {
+        "title": "July 2019",
+        "intro": "Analytics Integrations, Scaffold developer experience improvements, and more"
+    },
+    "2019-may": {
+        "title": "May 2019",
+        "intro": "Mobify Testing Framework, Progressive Web Apps, and Scaffold enhancements and bug fixes"
+    },
+    "2019-march": {
+        "title": "March 2019",
+        "intro": "Universal PWA and New Scaffold developer experience improvements"
+    },
+    "2019-february": {
+        "title": "Febuary 2019",
+        "intro": "Various fixes and enhancements across Universal PWAs, PWAs, and native apps"
+    },
+    "2019-january": {
+        "title": "January 2019",
+        "intro": "New scaffold and various Universal PWA developer experience, deployment, and monitoring improvements"
+    },
+    "2018-november": {
+        "title": "November 2018",
+        "intro": "Universal PWA developer experience and deployment improvements, Native App support for notches and iOS12 and various platform fixes"
+    },
+    "2018-september": {
+        "title": "September 2018",
+        "intro": "New Commerce Integrations framework, Performance Optimizations, Responsive PWA components, and Native App Enhancements"
+    },
+    "2018-august": {
+        "title": "August 2018",
+        "intro": "Progressive Web App performance enhancements, Add to Homescreen updates and more"
+    },
+    "2018-june": {
+        "title": "June 2018",
+        "intro": "Native app builds via Bitrise, Responsive Grids and Utility function migrations"
+    },
+    "2018-may": {
+        "title": "May 2018",
+        "intro": "Webpack 4, Adobe Analytics Integration, Native App Enhancements, and GDPR updates"
+    },
+    "2018-march": {
+        "title": "March 2018",
+        "intro": "Payment Request API, Dynamic AMP Pages, Native App Enhancements, and Support for Salesforce Mobile-First Reference Architecture"
+    },
+    "2018-february": {
+        "title": "February 2018",
+        "intro": "Samsung Internet support, Salesforce Commerce Cloud integration for AMP, documentation site enhancements and more"
+    },
+    "2018-january": {
+        "title": "January 2018",
+        "intro": "AMP deployment updates, Monetate and A/B testing integrations, PWA internationalization and more."
+    },
+    "2017-november": {
+        "title": "November 2017",
+        "intro": "Device-based push analytics, ecommerce platform API clients and more."
+    },
+    "2017-september": {
+        "title": "September 2017",
+        "intro": "Accelerated Mobile Pages, PWA feature updates, a new generator and more."
+    }
+}

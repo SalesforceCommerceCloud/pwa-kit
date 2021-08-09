@@ -1,0 +1,66 @@
+// Hiding Utilities
+// ===
+
+
+// Clip Overflow
+// ---
+
+.u-clip {
+    overflow: hidden !important;
+}
+
+
+// Do Not Display
+// ---
+
+.u-hidden {
+    display: none !important;
+
+    @include for-phone-only {
+        &--for-phone-only {
+            display: none !important;
+        }
+    }
+
+    @include for-tablet-only {
+        &--for-tablet-only {
+            display: none !important;
+        }
+    }
+
+    @include for-tablet-portrait-up {
+        &--for-tablet-portrait-up {
+            display: none !important;
+        }
+    }
+
+    @include for-tablet-landscape-up {
+        &--for-tablet-landscape-up {
+            display: none !important;
+        }
+    }
+}
+
+
+// Visually Hidden
+// ---
+//
+// Using absolute positioning, we take the element out of flow so as not to
+// affect the layout of anything around it. With a height of 1px, the element
+// should still be visible for Voice Over to read the content. The clipping
+// removes any visible trace of the element from the page.
+//
+// http://snook.ca/archives/html_and_css/hiding-content-for-accessibility
+//
+// 1. Override any visible styles that may be appear outside an element.
+
+.u-visually-hidden {
+    position: absolute !important;
+
+    overflow: hidden !important;
+    clip: rect(1px, 1px, 1px, 1px) !important;
+    width: 1px !important;
+    height: 1px !important;
+    padding: 0 !important; // 1
+    border: 0 !important; // 1
+}

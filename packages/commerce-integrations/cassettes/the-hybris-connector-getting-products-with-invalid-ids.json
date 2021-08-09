@@ -1,0 +1,76 @@
+[
+  {
+    "scope": "https://hybris.merlinspotions.com:443",
+    "method": "GET",
+    "path": "/rest/v2/apparel-uk/products/1?fields=FULL",
+    "body": "",
+    "status": 400,
+    "response": {
+      "errors": [
+        {
+          "message": "Product with code '1' not found!",
+          "type": "UnknownIdentifierError"
+        }
+      ]
+    },
+    "rawHeaders": [
+      "Cache-Control",
+      "private, max-age=120",
+      "Content-Type",
+      "application/json",
+      "Date",
+      "Mon, 24 Sep 2018 23:16:52 GMT",
+      "Server",
+      "Apache-Coyote/1.1",
+      "Strict-Transport-Security",
+      "max-age=16070400 ; includeSubDomains",
+      "X-Content-Type-Options",
+      "nosniff",
+      "X-Frame-Options",
+      "SAMEORIGIN",
+      "X-XSS-Protection",
+      "1; mode=block",
+      "Content-Length",
+      "122",
+      "Connection",
+      "Close"
+    ]
+  },
+  {
+    "scope": "https://hybris.merlinspotions.com:443",
+    "method": "GET",
+    "path": "/rest/v2/apparel-uk/products/2?fields=FULL",
+    "body": "",
+    "status": 400,
+    "response": {
+      "errors": [
+        {
+          "message": "Product with code '2' not found!",
+          "type": "UnknownIdentifierError"
+        }
+      ]
+    },
+    "rawHeaders": [
+      "Cache-Control",
+      "private, max-age=120",
+      "Content-Type",
+      "application/json",
+      "Date",
+      "Mon, 24 Sep 2018 23:16:52 GMT",
+      "Server",
+      "Apache-Coyote/1.1",
+      "Strict-Transport-Security",
+      "max-age=16070400 ; includeSubDomains",
+      "X-Content-Type-Options",
+      "nosniff",
+      "X-Frame-Options",
+      "SAMEORIGIN",
+      "X-XSS-Protection",
+      "1; mode=block",
+      "Content-Length",
+      "122",
+      "Connection",
+      "Close"
+    ]
+  }
+]

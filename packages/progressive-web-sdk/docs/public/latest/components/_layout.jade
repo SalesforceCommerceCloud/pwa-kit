@@ -1,0 +1,12 @@
+extends ../../../../node_modules/@mobify/documentation-theme/layouts/base
+
+append meta
+    - var styleguidistPath = environment === 'production' ? styleguidistProd : styleguidistDev
+    link(rel="stylesheet" type="text/css" href=`${styleguidistPath}css/styleguide.css`)
+
+append scripts
+    script(type="text/javascript" src=`${styleguidistPath}build/main.bundle.js`)
+
+block content
+    div(id="app" class="c-contain c-text-content u-margin-bottom-xl u-flex")
+        

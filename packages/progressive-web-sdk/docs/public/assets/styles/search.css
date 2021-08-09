@@ -1,0 +1,26 @@
+/*
+Search script
+===
+
+This file is for styling search field on pages with list of utility functions.
+We are using a third party script, List.js (http://listjs.com/), to search in
+list of utility functions, docs/public/assets/scripts/search.js.
+*/
+
+#utilities .search {
+    width: calc(100% - 16px);
+    padding: 8px;
+    border: 1px solid #d2d2d2;
+
+    border-radius: 2px;
+    background-color: #fff;
+    outline: none;
+
+    font-size: 16px;
+
+    transition: all .15s ease-in-out;
+}
+
+#utilities .search:focus {
+    box-shadow: 0 0.1rem 0.25rem rgba(6, 23, 39, 0.1);
+}

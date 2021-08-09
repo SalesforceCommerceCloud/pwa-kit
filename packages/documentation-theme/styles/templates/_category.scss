@@ -1,0 +1,25 @@
+// Category Template
+// ===
+//
+// 1. Change colour so wont hide from sheet background colour
+
+.t-category {
+    @include for-phone-only {
+        table.gsc-search-box {
+            width: 100%;
+        }
+    }
+    @include for-tablet-only {
+        table.gsc-search-box {
+            width: 100%;
+        }
+    }
+
+    .c-search-box {
+        .gsc-input-box-focus {
+            &::after {
+                color: $neutral-50; // 1
+            }
+        }
+    }
+}

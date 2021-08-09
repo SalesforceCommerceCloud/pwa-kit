@@ -1,0 +1,73 @@
+// Spinner
+// ===
+
+// Spinner variable
+// ---
+
+$offset: 187;
+$duration: 1.4s;
+
+
+// Spinner root
+// ---
+
+.c-spinner {
+    display: block;
+    margin: 48px auto;
+
+    animation: rotator $duration linear infinite;
+}
+
+
+// Spinner circle
+// ---
+
+.c-spinner__circle {
+    transform-origin: center;
+
+    animation: dash $duration ease-in-out infinite, colors ($duration*4) ease-in-out infinite;
+
+    stroke-dasharray: $offset;
+    stroke-dashoffset: 0;
+}
+
+
+// Spinner animation
+// ---
+
+@keyframes rotator {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(270deg);
+    }
+}
+
+@keyframes colors {
+    0% {
+        stroke: $accent-color;
+    }
+    50% {
+        stroke: $accent-color;
+    }
+    100% {
+        stroke: $accent-color;
+    }
+}
+
+@keyframes dash {
+    0% {
+        stroke-dashoffset: $offset;
+    }
+    50% {
+        transform: rotate(135deg);
+
+        stroke-dashoffset: $offset/4;
+    }
+    100% {
+        transform: rotate(450deg);
+
+        stroke-dashoffset: $offset;
+    }
+}

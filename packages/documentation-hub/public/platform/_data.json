@@ -1,0 +1,28 @@
+{
+    "index": {
+        "layout": "../_layouts/homepage",
+        "name": "Platform Reference",
+        "tagline": "The Mobify™ Platform"
+    },
+    "release-notes": {
+        "title": "Release Notes",
+        "intro": "Detailed overview of the latest platform enhancements available to customers."
+    },
+    "compatibility": {
+        "title": "Compatibility Matrix",
+        "intro": "Check which devices and browsers are supported across the Mobify Platform."
+    },
+    "support": {
+        "title": "Support Policy",
+        "intro": "Learn about Mobify's Shared responsibility model, and our SDK support policies."
+    },
+    "feedback": {
+        "title": "Product Feedback",
+        "intro": "Send feedback on which enhancements and features you would like to see in the platform."
+    },
+    "_homepage": {
+        "categories": {
+            "useCategoryList": true
+        }
+    }
+}

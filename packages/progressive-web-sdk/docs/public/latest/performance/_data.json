@@ -1,0 +1,14 @@
+{
+    "performance-overview": {
+        "title": "Overview"
+    },
+    "task-splitting": {
+        "title": "Task-splitting"
+    },
+    "download-management": {
+        "title": "Download Management"
+    },
+    "quiet": {
+        "title": "PWA Quiet State"
+    }
+}

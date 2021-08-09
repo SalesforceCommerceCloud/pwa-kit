@@ -1,0 +1,19 @@
+// Icon theme
+// ===
+
+.pw-icon {
+    &.pw--microscopic {
+        width: $sub-unit;
+        height: $sub-unit;
+    }
+
+    &.pw--gargantuan {
+        width: $unit*12;
+        height: $unit*12;
+    }
+
+    &.pw--colossal {
+        width: $unit*24;
+        height: $unit*24;
+    }
+}

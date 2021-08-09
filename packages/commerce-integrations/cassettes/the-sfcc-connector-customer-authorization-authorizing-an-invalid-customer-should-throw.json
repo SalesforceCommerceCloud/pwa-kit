@@ -1,0 +1,43 @@
+[
+    {
+        "scope": "https://mobify-tech-prtnr-na03-dw.demandware.net:443",
+        "method": "POST",
+        "path": "/s/2017refresh/dw/shop/v17_8/customers/auth",
+        "body": {
+            "type": "credentials"
+        },
+        "status": 401,
+        "response": {
+            "_v": "17.8",
+            "fault": {
+                "arguments": {
+                    "credentialType": "Authorization:Basic header"
+                },
+                "type": "AuthenticationFailedException",
+                "message": "Customer authentication based on Authorization:Basic header failed."
+            }
+        },
+        "rawHeaders": [
+            "Accept-Ranges",
+            "bytes",
+            "x-dw-request-base-id",
+            "sTQ2nRUqQ11kAAAK",
+            "Cache-Control",
+            "no-cache, no-store, must-revalidate",
+            "Pragma",
+            "no-cache",
+            "Expires",
+            "Thu, 01 Dec 1994 16:00:00 GMT",
+            "Content-Type",
+            "application/json;charset=UTF-8",
+            "Content-Length",
+            "202",
+            "Date",
+            "Thu, 01 Aug 2019 18:06:13 GMT+00:00",
+            "Connection",
+            "close",
+            "Server",
+            "Apache"
+        ]
+    }
+]

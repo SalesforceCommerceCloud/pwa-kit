@@ -1,0 +1,10 @@
+{
+    "what-is-amp": {
+        "title": "What is AMP?",
+        "intro": "An essential introduction to the AMP project and how it works."
+    },
+    "design-principles": {
+        "title": "Design principles",
+        "intro": "Designing for AMP with Google and Mobify's philosophy in mind."
+    }
+}

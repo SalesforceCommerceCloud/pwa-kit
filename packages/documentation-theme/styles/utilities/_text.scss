@@ -1,0 +1,176 @@
+// Text Utilities
+// ===
+
+
+// Text Transformation
+// ---
+//
+
+.u-text-uppercase {
+    text-transform: uppercase !important;
+}
+
+.u-text-capitalize {
+    text-transform: capitalize !important;
+}
+
+
+// Text Flow Alignment
+// ---
+//
+// Writing-direction independent text alignment. For RTL stylesheets, redefine
+// these styles with the opposite direction. Templates need not be changed.
+
+.u-text-align-start {
+    text-align: left !important;
+}
+
+.u-text-align-center {
+    text-align: center !important;
+}
+
+.u-text-align-end {
+    text-align: right !important;
+}
+
+
+// Text Sizes
+// ---
+
+.u-text-size-tiny {
+    font-size: $tiny-font-size !important;
+}
+
+.u-text-size-small {
+    font-size: $small-font-size !important;
+}
+
+.u-text-size-smaller {
+    font-size: $smaller-font-size !important;
+}
+
+.u-text-size-smallish {
+    font-size: $smallish-font-size !important;
+}
+
+.u-text-size-normal {
+    font-size: $base-font-size !important;
+}
+
+.u-text-size-medium {
+    @include for-tablet-portrait-up {
+        font-size: $large-font-size !important;
+    }
+
+    font-size: $medium-font-size !important;
+}
+
+.u-text-size-large {
+    @include for-tablet-portrait-up {
+        font-size: $very-large-font-size !important;
+    }
+
+    font-size: $large-font-size !important;
+}
+
+.u-text-size-larger {
+    font-size: $larger-font-size !important;
+}
+
+.u-text-size-large-fixed {
+    font-size: $large-font-size !important;
+}
+
+.u-text-size-very-large {
+    @include for-tablet-portrait-up {
+        font-size: $massive-font-size !important;
+    }
+
+    font-size: $very-large-font-size !important;
+}
+
+.u-text-size-massive {
+    @include for-tablet-portrait-up {
+        font-size: $super-massive-font-size !important;
+    }
+
+    font-size: $massive-font-size + 8 !important;
+}
+
+
+// Text Sizes
+// ---
+
+.u-text-regular {
+    font-weight: $base-font-weight !important;
+}
+
+.u-text-medium {
+    font-weight: $medium-font-weight !important;
+}
+
+.u-text-bold {
+    font-weight: $heavy-font-weight !important;
+}
+
+.u-text-italic {
+    font-style: italic !important;
+}
+
+
+// Truncate
+// ---
+
+.u-text-truncate {
+    overflow: hidden !important;
+    max-width: 100% !important;
+
+    white-space: nowrap !important;
+    text-overflow: ellipsis !important;
+}
+
+.u-text-no-wrap {
+    white-space: nowrap !important;
+}
+
+.u-text-no-decoration {
+    text-decoration: none !important;
+}
+
+
+// Leading / Line-Height
+// ---
+//
+// lead [rhyming with `said`]:
+// Originally a strip of soft metal used for vertical spacing between lines of
+// type. Now meaning the vertical distance from the baseline of one line to the
+// baseline of the next.
+
+.u-text-leading-reset {
+    line-height: 1 !important;
+}
+
+.u-text-leading-default {
+    line-height: $base-line-height !important;
+}
+
+// Tabular numbers
+// ---
+//
+// Uses the alternate glyphs for numbers so that their widths line up in a table.
+
+.u-text-tabular-nums {
+    font-variant-numeric: lining-nums tabular-nums !important;
+}
+
+// Pad digits 1 start
+// ---
+//
+// Allows you to pad a number with a zero at the start of the number for
+// alignment purposes. The zero will be invisible.
+
+.u-text-pad-digits-1-start::before {
+    content: "0";
+
+    visibility: hidden;
+}

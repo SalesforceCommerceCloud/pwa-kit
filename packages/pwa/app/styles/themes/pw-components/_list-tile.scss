@@ -1,0 +1,43 @@
+// List Tile Theme
+// ===
+.pw-list-tile {
+    &.pw--instructional-block {
+        margin-bottom: $unit * 2;
+        border: $border;
+
+        .pw-list-tile__primary {
+            background-color: $neutral-00;
+        }
+    }
+}
+
+// Primary
+// ---
+//
+// 1. Slightly larger than standard font size, at 15px
+
+.pw-list-tile__primary {
+    font-size: $font-size + 1; // 1
+}
+
+// Content
+// ---
+
+.pw-list-tile__content {
+    padding: $unit $unit * 2.5;
+}
+
+// Action
+// ---
+
+.pw-list-tile__action {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-width: $tap-size;
+    min-height: $tap-size;
+}
+
+.pw-list-tile__action + .pw-list-tile__content {
+    padding-left: 0;
+}

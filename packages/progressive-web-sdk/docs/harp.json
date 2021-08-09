@@ -1,0 +1,12 @@
+{
+    "globals": {
+        "PROJECT_NAME": "Progressive Web SDK",
+        "SITE_TITLE": "Mobify Progressive Web SDK Docs",
+        "SITE_DESCRIPTION": "Home of the documentation for the Mobify Progressive Web SDK.",
+        "styleguidistProd": "../styleguidist/",
+        "styleguidistDev": "http://localhost:9002/",
+        "PROD_ROOT": "/progressive-web/",
+        "DEV_ROOT": "/",
+        "changelogPath": "latest/changelog/web-sdk/"
+    }
+}

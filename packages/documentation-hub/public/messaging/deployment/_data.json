@@ -1,0 +1,14 @@
+{
+    "requirements": {
+        "title": "Setup Requirements",
+        "intro": "Deployment requirements."
+    },
+    "staging": {
+        "title": "Staging",
+        "intro": "Deploy to Staging"
+    },
+    "production": {
+        "title": "Production",
+        "intro": "Deploy to Staging"
+    }
+}

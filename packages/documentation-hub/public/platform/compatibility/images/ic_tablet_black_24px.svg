@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="22px" height="16px" viewBox="0 0 22 16" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 47 (45396) - http://www.bohemiancoding.com/sketch -->
+    <title>ic_tablet_black_24px</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Campaign-detail" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Detail-Results-Revenue" transform="translate(-316.000000, -570.000000)">
+            <g id="ic_tablet_black_24px" transform="translate(315.000000, 566.000000)">
+                <polygon id="Shape" points="0 0 24 0 24 24 0 24"></polygon>
+                <path d="M21,4 L3,4 C1.9,4 1,4.9 1,6 L1,18 C1,19.1 1.9,20 3,20 L21,20 C22.1,20 22.99,19.1 22.99,18 L23,6 C23,4.9 22.1,4 21,4 Z M19,18 L5,18 L5,6 L19,6 L19,18 Z" id="Shape" fill="#4A4949" fill-rule="nonzero"></path>
+            </g>
+        </g>
+    </g>
+</svg>

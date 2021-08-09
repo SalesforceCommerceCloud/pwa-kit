@@ -1,0 +1,17 @@
+// Components Styles
+// ===
+//
+// *Important note*: This is a generated file, do not modify any manual changes
+// will be lost.
+
+// Base
+// ---
+
+<% print(context.components.map((component) => `@import '${component.basePath}';`).join('\n')) %>
+
+
+// Themes
+// ---
+
+
+<% print(context.components.map((component) => component.themePath ? `@import '${component.themePath}';` : '').join('\n')) %>

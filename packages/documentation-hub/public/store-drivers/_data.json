@@ -1,0 +1,16 @@
+{
+    "index": {
+        "layout": "../_layouts/homepage",
+        "name": "Store Drivers",
+        "tagline": "Learn about the core features of Store Drivers and how to increase foot traffic to your stores."
+    },
+    "_homepage": {
+        "categories": {
+            "useCategoryList": true
+        }
+    },
+    "store-locators": {
+        "title": "Store Locators",
+        "intro": "Help shoppers find the store closest to them."
+    }
+}

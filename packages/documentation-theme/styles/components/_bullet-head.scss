@@ -1,0 +1,39 @@
+// Bullet Head
+// ===
+//
+// This component is intended to both bold a chunk of text (the title, or dt),
+// and add a bullet point symbol before the definition (the dd). The end result
+// is something along the lines of a header leading into a bullet point, all in
+// a single line.
+//
+// In particular this component is intended for use in Release Notes
+// pages, as seen in the `documentation-hub` repository.
+
+/* Expected structure:
+<dl class="c-bullet-head">
+    <dt class="c-bullet-head__dt">This is a bullet-head component</dt>
+    <dd class="c-bullet-head__dd">This is the bullet-head component description. It starts with a dot, and it is where you would provide content.</dd>
+</dl>
+*/
+
+
+// Head
+// ---
+
+.c-bullet-head__dt {
+    display: inline;
+
+    font-weight: bold;
+}
+
+
+// Bullet
+// ---
+
+.c-bullet-head__dd {
+    display: inline;
+
+    &::before {
+        content: '• ';
+    }
+}

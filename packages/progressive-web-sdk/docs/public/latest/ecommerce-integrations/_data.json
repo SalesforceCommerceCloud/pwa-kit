@@ -1,0 +1,20 @@
+{
+    "ecommerce-overview": {
+        "title": "Overview"
+    },
+    "integrating-sfcc": {
+        "title": "Integrating Salesforce Commerce Cloud"
+    },
+    "integrating-hybris": {
+        "title": "Integrating SAP Hybris Commerce"
+    },
+    "building-a-connector": {
+        "title": "Integrating Any Ecommerce Platform"
+    },
+    "extending-a-connector": {
+        "title": "Extending an Ecommerce Connector"
+    },
+    "api": {
+        "title": "API Reference"
+    }
+}

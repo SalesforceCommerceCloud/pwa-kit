@@ -1,0 +1,99 @@
+// Typography
+// ===
+
+
+// Headers
+// ---
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    margin: 0;
+
+    font-family: $header-font-family;
+}
+
+h1,
+%h1 {
+    font-weight: $extra-light-font-weight;
+    font-size: $huge-font-size; // 28px
+    line-height: $huge-line-height; // 32px
+}
+
+h2,
+%h2 {
+    font-size: $bigger-font-size; // 24px
+    line-height: $bigger-line-height; // 28px
+}
+
+h3,
+%h3 {
+    font-weight: $semi-bold-font-weight;
+    font-size: $big-font-size; // 20px
+    line-height: $unit * 3; // 24px
+}
+
+h4,
+%h4 {
+    font-size: $big-font-size; // 20px
+    line-height: $unit * 3; // 24px
+}
+
+h5,
+%h5 {
+    font-weight: $semi-bold-font-weight;
+    font-size: $font-size; // 16px
+    line-height: $line-height; // 20px
+}
+
+h6,
+%h6 {
+    font-size: $font-size; // 16px
+    line-height: $line-height; // 20px
+}
+
+
+// Text Elements
+// ---
+
+p {
+    margin: 0 0 $unit;
+
+    line-height: 1.5em;
+}
+
+a {
+    color: $link-color;
+    text-decoration: none;
+
+    &:active,
+    &:focus {
+        color: $active-link-color;
+    }
+}
+
+
+// Miscellaneous Elements
+// ---
+
+hr {
+    margin: ($unit * 2) 0;
+    border: 1px solid $border-color;
+    border-width: 0 0 1px;
+}
+
+img {
+    max-width: 100%;
+    margin: 0;
+}
+
+blockquote {
+    margin: ($unit * 2) 0;
+    padding-left: $unit;
+    border-left: 2px solid $border-color;
+
+    color: lighten($font-color, 15);
+}

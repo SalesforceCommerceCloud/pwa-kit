@@ -1,0 +1,30 @@
+include ../mixins/logo
+
+mixin top-nav
+    div.c-contain.u-flexbox.u-justify-between.u-margin-bottom-lg.u-align-center.u-hidden--for-tablet-landscape-up
+        div.u-flex-shrink
+            div.u-flexbox.u-flex-column.u-align-center
+                span.u-block.u-flex
+                    button#js-nav-toggle.c-menu.u-background-transparent.u-border-0
+                        span.c-menu__menu-icon.c-icon
+                            include ../theme/icons/icon-menu.svg
+                        span.c-menu__close-icon.c-icon.u-hidden
+                            include ../theme/icons/icon-close.svg
+                span.u-block.u-visually-hidden Menu
+            div#js-menu-sheet.c-overlay.c--transparent-half
+                span.u-visually-hidden Menu Sheet Overlay
+
+        div.u-flex-shrink
+            a(href='/').u-neutral-70
+                div.c-logo.c--full-color
+                    +logo
+
+        div.u-flex-shrink
+            div.u-flexbox.u-flex-column.u-align-center
+                span.u-block.u-flex
+                    button#js-search-toggle.c-search-button.u-background-transparent.u-border-0
+                        span.c-search-button__search-icon.c-icon
+                            include ../theme/icons/search.svg
+                        span.c-search-button__close-icon.c-icon.u-hidden
+                            include ../theme/icons/icon-close.svg
+                span.u-block.u-visually-hidden Search

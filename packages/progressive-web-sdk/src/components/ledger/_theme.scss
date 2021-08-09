@@ -1,0 +1,61 @@
+// Ledger Theme
+// ===
+
+
+.pw-ledger {
+    // Root Class theme styles
+}
+
+
+// Rows
+// ---
+
+.pw-ledger__row {
+    background-color: transparent;
+
+    + .pw-ledger__row {
+        margin-top: $unit;
+    }
+
+    &:not(:last-child) {
+        margin-bottom: $unit * 1.5;
+    }
+}
+
+
+// Item & Value
+// ---
+
+.pw-ledger__item,
+.pw-ledger__value {
+    padding: 0;
+}
+
+.pw-ledger__item {
+    color: $font-color;
+}
+
+.pw-ledger__value {
+    font-weight: $semi-bold-font-weight;
+}
+
+
+// Details
+// ---
+
+.pw-ledger__details {
+    margin-top: $sub-unit;
+
+    color: $neutral-50;
+    font-size: $smaller-font-size;
+    line-height: $small-line-height;
+}
+
+
+// States: Total row
+// ---
+
+.pw-ledger__row.pw--total {
+    font-size: $big-font-size;
+    line-height: $big-line-height;
+}

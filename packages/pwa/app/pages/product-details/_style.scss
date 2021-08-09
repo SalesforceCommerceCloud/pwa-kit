@@ -1,0 +1,128 @@
+// Example Product Details
+// ===
+
+@include susy-breakpoint($medium-breakpoint, $medium-layout) {
+    .t-product-details__overview {
+        display: flex;
+    }
+}
+
+// Carousel
+// ---
+
+.t-product-details__carousel {
+    margin-right: -(gutter());
+    margin-bottom: $unit;
+    margin-left: -(gutter());
+
+    .pw-carousel__controls {
+        position: absolute;
+        top: 50%;
+
+        width: 100%;
+
+        transform: translateY(-50%);
+    }
+
+    .pw-carousel__pip {
+        display: none;
+    }
+}
+
+@include susy-breakpoint($medium-breakpoint, $medium-layout) {
+    .t-product-details__carousel {
+        flex-basis: span(7);
+        margin-right: gutter() * 2;
+    }
+}
+
+@include susy-breakpoint($large-breakpoint, $large-layout) {
+    .t-product-details__carousel {
+        margin-right: gutter();
+        margin-left: 0;
+    }
+}
+
+@include susy-breakpoint($xlarge-breakpoint, $large-layout) {
+    .t-product-details__carousel {
+        flex-basis: span(8);
+    }
+}
+
+// Product Information
+/// ---
+
+@include susy-breakpoint($medium-breakpoint, $medium-layout) {
+    .t-product-details__info {
+        flex-basis: span(5);
+    }
+}
+
+@include susy-breakpoint($xlarge-breakpoint, $large-layout) {
+    .t-product-details__info {
+        flex-basis: span(4);
+    }
+}
+
+// Modal Button
+// ---
+
+.t-product-details__modal-button {
+    max-width: 20em;
+}
+
+// Breadcrumbs
+// ---
+
+.t-product-details__breadcrumbs {
+    margin-top: $unit;
+    margin-bottom: $unit;
+}
+
+// Description
+// ---
+//
+// 1. Provide context for absolutely positioned swatch
+// 2. Make sure the background covers the entire swatch
+// 3.  Make sure swatch fills the entire swatch container
+
+.t-product-details__price {
+    font-family: $header-font-family;
+    font-weight: $semi-bold-font-weight;
+    font-size: $big-font-size;
+    line-height: $huge-line-height;
+}
+
+.t-product-details__swatch {
+    position: relative; // 1
+
+    line-height: 0; // 2
+}
+
+.t-product-details__swatch-background {
+    position: absolute; // 3
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+
+    display: block;
+    width: 100%;
+    height: 100%;
+
+    background-repeat: repeat;
+}
+
+// Shipping and Delivery Information Modal Content
+// ---
+
+.t-product-details__shipping-delivery-modal-content {
+}
+@include susy-breakpoint($medium-breakpoint, $medium-layout) {
+    .t-product-details__shipping-delivery-modal-content {
+        padding-bottom: 120px;
+    }
+
+    padding: $unit * 1.5;
+    padding-bottom: 100px;
+}

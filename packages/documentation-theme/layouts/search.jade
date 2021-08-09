@@ -1,0 +1,39 @@
+//- 🔍Search Page.
+extends ../layouts/base
+include ../mixins/header-top
+include ../mixins/search-box
+
+append config
+    - title = `Search Results`
+    - hasPicker = false
+
+//- Removes the navigation, header, and footer
+block main
+    block content
+        main.t-search.u-context.u-flexbox.u-flex-column.u-height-full-vh
+            header.t-header-small.u-flex-none.u-margin-bottom-lg.u-context.u-clip.u-neutral-10.u-background-accent-gradient.u-large-shadow
+                div.c-contain.u-context.u-z1
+                    +headerTop
+
+            div.c-contain.u-flex.u-margin-bottom-xl
+                h1.u-visually-hidden Search Results
+
+                a(href="javascript:history.go(-1)" id="js-back-path" class="u-text-size-large-fixed") &#171; Back
+
+                div.u-margin-top-lg.u-margin-bottom-lg
+                    +searchBox
+
+                div.c-search-results
+                    div#search-results-spinner
+                        svg(class="c-spinner" width="48px" height="48px" viewBox="0 0 66 66")
+                            circle(class="c-spinner__circle" fill="none" stroke-width="6" stroke-linecap="round" cx="33" cy="33" r="30")
+
+                    div#custom-search-results
+                        gcse:searchresults-only
+
+            script(type="text/javascript").
+                // if history length return to 2 which means user open 404 page on new request 
+                // rather than open 404 page from docs
+                if (history.length === 2) {
+                    document.getElementById('js-back-path').setAttribute('href', '/')
+                }

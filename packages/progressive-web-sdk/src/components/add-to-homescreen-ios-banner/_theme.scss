@@ -1,0 +1,14 @@
+// AddToHomescreenIosBanner Theme
+// ===
+
+.pw-add-to-homescreen-ios-banner {
+    border-radius: 5px;
+    background-color: $banner-background-color;
+
+    color: $neutral-70;
+    font-size: $smaller-font-size;
+}
+
+.pw-add-to-homescreen-ios-banner__close {
+    color: #007aff;
+}

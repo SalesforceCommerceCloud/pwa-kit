@@ -1,0 +1,22 @@
+//- Large Header. Requires `title` and `tagline`.
+include ../../node_modules/@mobify/documentation-theme/mixins/header-top
+include ../../node_modules/@mobify/documentation-theme/mixins/search-box
+include ./hero-image
+
+mixin largeHeader(name, tagline)
+    header.t-header.u-flex-none.u-margin-bottom-massive.u-context.u-clip.u-neutral-10.u-background-accent-gradient.u-large-shadow
+        div.c-contain.u-context.u-z1.u-margin-start-auto.u-margin-end-auto
+            +headerTop
+
+            div.u-margin-top-xl.u-margin-bottom-xl.u-padding-top-xl.u-text-align-center
+                h1.u-margin-bottom.u-text-leading-reset
+                    span.u-text-regular 
+                    = name
+                h2.c-heading.c--h3.u-text-leading-reset.u-text-regular
+                    = tagline
+
+            div.c-contain.u-margin-bottom-xl.u-margin-start-auto.u-margin-end-auto
+                +searchBox
+
+        div(role='presentation').u-position.u-place-top-halfway.u-place-start-halfway.u-realign-center.u-very-transparent
+            +heroImage

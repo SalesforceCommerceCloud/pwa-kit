@@ -1,0 +1,81 @@
+// Swatch Theme
+// ===
+
+
+// Item
+// ---
+
+.pw-swatch__item {
+    border: $border;
+
+    &.pw--selected {
+        border-width: $sub-unit/2;
+        border-color: $brand-color;
+
+        + .pw-swatch__error {
+            display: none;
+        }
+    }
+}
+
+
+// Label
+// ---
+
+.pw-swatch__label {
+    display: inline-block;
+    margin-bottom: 4px;
+
+    font-weight: $semi-bold-font-weight;
+}
+
+
+// Button
+// ---
+
+.pw-swatch__button {
+    color: $neutral-50;
+    text-transform: uppercase;
+}
+
+.pw-swatch__button-inner {
+    padding: 0;
+}
+
+
+// Chip
+// ---
+//
+// 1. This is a diagonal line - pythagoras
+
+.pw-swatch__chip {
+    &.pw--disabled {
+        &::before {
+            content: '';
+
+            position: absolute;
+            top: 0;
+            left: 0;
+
+            display: block;
+            width: 1px;
+            height: 65px; // 1
+
+            background-color: $neutral-20;
+
+            transform: rotate(-45deg);
+            transform-origin: 0 0;
+        }
+
+        .pw-swatch__chip-inner {
+            opacity: 0.5;
+        }
+    }
+}
+
+// Error
+// ---
+
+.pw-swatch__error {
+    color: $error-color;
+}

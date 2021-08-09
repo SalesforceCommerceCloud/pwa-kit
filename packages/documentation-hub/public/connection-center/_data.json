@@ -1,0 +1,48 @@
+{
+    "index": {
+        "layout": "../_layouts/homepage",
+        "name": "Connection Center",
+        "tagline": "Learn about the core features of the Connection Center to create powerful customer engagement."
+    },
+    "_homepage": {
+        "overview": {
+            "blocks": [
+                {
+                    "title": "What is the Connection Center?",
+                    "info": "The Connection Center empowers marketers to target, personalize, deliver, and track mobile engagement from one central location.",
+                    "button": "Learn More",
+                    "href": "overview/introduction/"
+                },
+                {
+                    "title": "Create a Campaign",
+                    "info": "Walk through these steps to begin engaging with your shoppers",
+                    "button": "Learn More",
+                    "href": "overview/create-a-campaign/"
+                }
+            ]
+        },
+        "categories": {
+            "useCategoryList": true
+        }
+    },
+    "overview": {
+        "title": "Overview",
+        "intro": "Introduction to the Marketing console of the Mobify platform"
+    },
+    "analytics": {
+        "title": "Analytics",
+        "intro": "Understand your analytics in Connection Center"
+    },
+    "audience-filters": {
+        "title": "Audience Filters",
+        "intro": "Learn how to use audience filters to target your shoppers."
+    },
+    "push-notifications": {
+        "title": "Push Notifications",
+        "intro": "Learn how push notifications can improve shopper engagement."
+    },
+    "smart-content": {
+        "title": "Smart Content",
+        "intro": "Learn how smart content can be used to display personalized content on your website or app."
+    }
+}

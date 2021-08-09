@@ -1,0 +1,452 @@
+{
+   "all": {
+      "title": "All Components and Templates",
+      "type": "Landing Page",
+      "description": "",
+      "_excludeFromCatalog": true
+   },
+   "./#!/Accordion": {
+      "title": "Accordion",
+      "type": "Component",
+      "description": "The outer wrapper of expandable content"
+   },
+   "./#!/AccordionItem": {
+      "title": "AccordionItem",
+      "type": "Component",
+      "description": "An expandable container for the accordion's content"
+   },
+   "./#!/AccordionItemContent": {
+      "title": "AccordionItemContent",
+      "type": "Component",
+      "description": "For internal use only within AccordionItem"
+   },
+   "./#!/AddToHomescreen":{
+      "title":"AddToHomescreen",
+      "type": "Component",
+      "description":"Wraps another component to provides for interfacing with a browser's beforeinstallprompt event"
+   },
+   "./#!/AddToHomescreenIosBanner": {
+      "title": "AddToHomescreenIosBanner",
+      "type": "Component",
+      "description": "A banner with instructions of how to add the web app to the home screen on an iOS device"
+   },
+   "./#!/Badge": {
+      "title": "Badge",
+      "type": "Component",
+      "description": "Circular element used to display small amounts of important information, such as the number of items in a cart"
+   },
+   "./#!/Banner": {
+      "title": "Banner",
+      "type": "Component",
+      "description": "Accessible Banner component that includes promo and alert styles"
+   },
+   "./#!/BazaarvoiceReview": {
+      "title": "BazaarvoiceReview",
+      "type": "Component",
+      "description": "Allows you to render Bazaarvoice reviews for a product based on a product ID"
+   },
+   "./#!/Breadcrumbs": {
+      "title": "Breadcrumbs",
+      "type": "Component",
+      "description": "Shows the navigational path taken to get to the current page"
+   },
+   "./#!/Button": {
+      "title": "Button",
+      "type": "Component",
+      "description": "Adds styles and accessibility to the standard <button> tag"
+   },
+   "./#!/Card": {
+      "title": "Card",
+      "type": "Component",
+      "description": "Shows content in a card with header and footer"
+   },
+   "./#!/CardInput": {
+      "title": "CardInput",
+      "type": "Component",
+      "description": "Input field to capture credit card numbers"
+   },
+   "./#!/CardVerification": {
+      "title": "CardVerification",
+      "type": "Component",
+      "description": "Shows where the card verification value (CVV) appears on different credit cards"
+   },
+   "./#!/Carousel": {
+      "title": "Carousel",
+      "type": "Component",
+      "description": "Shows items one at a time and allows users to cycle through them by swiping left/right or using a next/previous button"
+   },
+   "./#!/CarouselItem": {
+      "title": "CarouselItem",
+      "type": "Component",
+      "description": "A single item to be displaced within the Carousel component"
+   },
+   "./#!/CheckoutCart": {
+      "title": "CheckoutCart",
+      "type": "Template",
+      "description": "Lists all the items the user has saved for purchase"
+   },
+   "./#!/CheckoutConfirmation": {
+      "title": "CheckoutConfirmation",
+      "type": "Template",
+      "description": "Tells the customer that their order has been processed"
+   },
+   "./#!/CheckoutPayment": {
+      "title": "CheckoutPayment",
+      "type": "Template",
+      "description": "Captures the payment information required to complete the purchase"
+   },
+   "./#!/CheckoutShipping": {
+      "title": "CheckoutShipping",
+      "type": "Template",
+      "description": "Collects the customer’s email address and shipping details for an order"
+   },
+   "./#!/DangerousHTML": {
+      "title": "DangerousHTML",
+      "type": "Component",
+      "description": "Allows you to include markup from another source within the React tree"
+   },
+   "./#!/DebugInfo": {
+      "title": "DebugInfo",
+      "type": "Component",
+      "description": "Displays project information for local development."
+   },
+   "./#!/DefaultAsk": {
+      "title": "DefaultAsk",
+      "type": "Component",
+      "description": "Asks the visitor whether they would like to subscribe to push messaging"
+   },
+   "./#!/Divider": {
+      "title": "Divider",
+      "type": "Component",
+      "description": "Horizontal rule element that can display an optional label as a heading"
+   },
+   "./#!/ExpiryDate": {
+      "title": "ExpiryDate",
+      "type": "Component",
+      "description": "Input field to capture credit card's expiry dates"
+   },
+   "./#!/ExposeApiBase": {
+      "title": "ExposeApiBase",
+      "type": "Component",
+      "description": "Base PWA methods exposed to window.Progressive.api namescope"
+   },
+   "./#!/Feedback": {
+      "title": "Feedback",
+      "type": "Component",
+      "description": "Displays error and success messages with enhanced accessibility"
+   },
+   "./#!/Field": {
+      "title": "Field",
+      "type": "Component",
+      "description": "Wrapper around a form input that standardizes layout of labels, hints and errors when using redux-form"
+   },
+   "./#!/FieldRow": {
+      "title": "FieldRow",
+      "type": "Component",
+      "description": "Groups multiple Field components on one line of a form"
+   },
+   "./#!/FieldSet": {
+      "title": "FieldSet",
+      "type": "Component",
+      "description": "Groups several inputs within a form"
+   },
+   "./#!/Grid": {
+      "title": "Grid (deprecated)",
+      "type": "Component",
+      "description": ""
+   },
+   "./#!/GridSpan": {
+      "title": "GridSpan (deprecated)",
+      "type": "Component",
+      "description": ""
+   },
+   "./#!/HeaderBar": {
+      "title": "HeaderBar",
+      "type": "Component",
+      "description": "Contains actions (HeaderBarActions) and a title (HeaderBarTitle)"
+   },
+   "./#!/HeaderBarActions": {
+      "title": "HeaderBarActions",
+      "type": "Component",
+      "description": "Contains the actions in a HeaderBar (menu, search, etc.)"
+   },
+   "./#!/HeaderBarTitle": {
+      "title": "HeaderBarTitle",
+      "type": "Component",
+      "description": "Contains the title in a HeaderBar"
+   },
+   "./#!/Homepage": {
+      "title": "Homepage",
+      "type": "Template",
+      "description": "Commonly the first page a user lands on when entering a site"
+   },
+   "./#!/Icon": {
+      "title": "Icon",
+      "type": "Component",
+      "description": "Renders an SVG that uses a symbol chosen from the SVG sprite present on the page"
+   },
+   "./#!/IconLabel": {
+      "title": "IconLabel",
+      "type": "Component",
+      "description": "An icon and label combination"
+   },
+   "./#!/Image": {
+      "title": "Image",
+      "type": "Component",
+      "description": "An image component with placeholder functionality built-in"
+   },
+   "./#!/InlineAsk": {
+      "title": "InlineAsk",
+      "type": "Component",
+      "description": "Groups together the prompts to sign up to the newsletter and for push notifications"
+   },
+   "./#!/InlineLoader": {
+      "title": "InlineLoader",
+      "type": "Component",
+      "description": "Displays an animation while content is loading"
+   },
+   "./#!/LazyLoadContent": {
+      "title": "LazyLoadContent",
+      "type": "Component",
+      "description": "Content will render immediately when it is in view or when scrolled to"
+   },
+   "./#!/LazyLoader": {
+      "title": "LazyLoader",
+      "type": "Component",
+      "description": "Delays rendering of content until the user has scrolled a certain distance through a page"
+   },
+   "./#!/Ledger": {
+      "title": "Ledger",
+      "type": "Component",
+      "description": "Displays order summaries"
+   },
+   "./#!/LedgerRow": {
+      "title": "LedgerRow",
+      "type": "Component",
+      "description": "Used inside a Ledger component to display each row of the order summary"
+   },
+   "./#!/Link": {
+      "title": "Link",
+      "type": "Component",
+      "description": "Creates hyperlinks based on the paths that can be handled by React Router"
+   },
+   "./#!/List": {
+      "title": "List",
+      "type": "Component",
+      "description": "Encloses a series of related items"
+   },
+   "./#!/ListTile": {
+      "title": "ListTile",
+      "type": "Component",
+      "description": "Displays text and/or links within a List"
+   },
+   "./#!/Lockup": {
+      "title": "Lockup",
+      "type": "Component",
+      "description": "Stops the user from being able to scroll the page"
+   },
+   "./#!/MegaMenu": {
+      "title": "MegaMenu",
+      "type": "Component",
+      "description": "Renders a tree of MegaMenuItems that users can traverse the navigation tree"
+   },
+   "./#!/MegaMenuItem": {
+      "title": "MegaMenuItem",
+      "type": "Component",
+      "description": "Renders a simple block link (and possible an additional block of children links) that is meant for use in other components"
+   },
+   "./#!/Nav": {
+      "title": "Nav",
+      "type": "Component",
+      "description": "Provides an arbitrarily nested navigation tree which can be used to manage transitions between navigation nodes"
+   },
+   "./#!/NavHeader": {
+      "title": "NavHeader",
+      "type": "Component",
+      "description": "Renders a header bar inside a Nav component"
+   },
+   "./#!/NavItem": {
+      "title": "NavItem",
+      "type": "Component",
+      "description": "Renders a simple block link that is meant for use in other components"
+   },
+   "./#!/NavMenu": {
+      "title": "NavMenu",
+      "type": "Component",
+      "description": "Renders the pages of NavItems as a user traverses the navigation tree"
+   },
+   "./#!/NavSlider": {
+      "title": "NavSlider",
+      "type": "Component",
+      "description": "Helper component for customizing the slide-in and slide-out animations used when traversing items in the Nav component"
+   },
+   "./#!/NestedNavigation": {
+      "title": "NestedNavigation (deprecated)",
+      "type": "Component",
+      "description": ""
+   },
+   "./#!/Pagination": {
+      "title": "Pagination",
+      "type": "Component",
+      "description": "Breaks down large listings into smaller, more digestible chunks and allowing the user to step through them in sequential or random order"
+   },
+   "./#!/PasswordInput": {
+      "title": "PasswordInput",
+      "type": "Component",
+      "description": "Input field to capture passwords"
+   },
+   "./#!/Popover": {
+      "title": "Popover",
+      "type": "Component",
+      "description": "A transient view that appears above other content onscreen when you tap a control"
+   },
+   "./#!/Price": {
+      "title": "Price",
+      "type": "Component",
+      "description": "Shows current and previous prices"
+   },
+   "./#!/ProgressSteps": {
+      "title": "ProgressSteps",
+      "type": "Component",
+      "description": "Shows the user which step they are currently on in a multistep process, such as checkout"
+   },
+   "./#!/ProgressStepsItem": {
+      "title": "ProgressStepsItem",
+      "description": "Used inside the ProgressSteps component to display each step"
+   },
+   "./#!/PushMessagingController": {
+      "title": "PushMessagingController",
+      "type": "Component",
+      "description": "Registers with the Messaging Client for state updates"
+   },
+   "./#!/Rating": {
+      "title": "Rating",
+      "type": "Component",
+      "description": "Displays user satisfaction of products or services"
+   },
+   "./#!/Ratio": {
+      "title": "Ratio",
+      "type": "Component",
+      "description": "Fluid-width element with an intrinsic width/height ratio, such as img or video"
+   },
+   "./#!/Review": {
+      "title": "Review",
+      "type": "Component",
+      "description": "Shows title, author's info and description for a product review"
+   },
+   "./#!/ReviewSummary": {
+      "title": "ReviewSummary",
+      "type": "Component",
+      "description": "Shows the rating and a text summary related to it"
+   },
+   "./#!/Scroller": {
+      "title": "Scroller",
+      "type": "Component",
+      "description": "Displays content side-by-side"
+   },
+   "./#!/ScrollTo": {
+      "title": "ScrollTo",
+      "type": "Component",
+      "description": "Wrapper component for the Button component that allows the user to scroll to different points on the page"
+   },
+   "./#!/ScrollTrigger": {
+      "title": "ScrollTrigger",
+      "type": "Component",
+      "description": "Registers callbacks when it is scrolled into or out of view"
+   },
+   "./#!/Search": {
+      "title": "Search",
+      "type": "Component",
+      "description": "Search component that includes two variants: inline and overlay"
+   },
+   "./#!/SearchResults": {
+      "title": "SearchResults",
+      "type": "Template",
+      "description": "Lists the items returned by a user's search query"
+   },
+   "./#!/Select": {
+      "title": "Select (deprecated)",
+      "type": "Component",
+      "description": ""
+   },
+   "./#!/SelectLabel": {
+      "title": "SelectLabel (deprecated)",
+      "type": "Component",
+      "description": ""
+   },
+   "./#!/SelectOption": {
+      "title": "SelectOption (deprecated)",
+      "type": "Component",
+      "description": ""
+   },
+   "./#!/Share": {
+      "title": "Share",
+      "type": "Component",
+      "description": "Shares the URL of the current page"
+   },
+   "./#!/Sheet": {
+      "title": "Sheet",
+      "type": "Component",
+      "description": "Modal container that animates into view from one side of the screen to reveal more content"
+   },
+   "./#!/SkeletonBlock": {
+      "title": "SkeletonBlock",
+      "type": "Component",
+      "description": "Placeholder component that can be used to mimic block-level components, such as images"
+   },
+   "./#!/SkeletonInline": {
+      "title": "SkeletonInline",
+      "type": "Component",
+      "description": "Placeholder component respects text properties such as line-height and font-size"
+   },
+   "./#!/SkeletonText": {
+      "title": "SkeletonText",
+      "type": "Component",
+      "description": "Placeholder component that mimics lines of text on a page"
+   },
+   "./#!/SkipLinks": {
+      "title": "SkipLinks",
+      "type": "Component",
+      "description": "Provide a fast navigation option for users of keyboards, screen readers, or other assistive technologies"
+   },
+   "./#!/Split": {
+      "title": "Split",
+      "type": "Component",
+      "description": "Maintains the split variant value in state when given a cookie name"
+   },
+   "./#!/Stepper": {
+      "title": "Stepper",
+      "type": "Component",
+      "description": "Inputs numbers that can be incremented or decremented by clicking buttons"
+   },
+   "./#!/Swatch": {
+      "title": "Swatch",
+      "type": "Component",
+      "description": "Select from a small list of options, such as S/M/L"
+   },
+   "./#!/SwatchItem": {
+      "title": "SwatchItem",
+      "type": "Component",
+      "description": "Displays items inside a Swatch component"
+   },
+   "./#!/Tabs": {
+      "title": "Tabs",
+      "type": "Component",
+      "description": "Displays tabbed navigation"
+   },
+   "./#!/TabsPanel": {
+      "title": "TabsPanel",
+      "type": "Component",
+      "description": "Used inside a Tabs component"
+   },
+   "./#!/Tile": {
+      "title": "Tile",
+      "type": "Component",
+      "description": "Displays a product or category list"
+   },
+   "./#!/Toggle": {
+      "title": "Toggle",
+      "type": "Component",
+      "description": "Visually truncates its contents if it crosses a preset height threshold. It will show/hide the toggle button if the contents doesn't overflow pass the threshold"
+   }
+}

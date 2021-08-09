@@ -1,0 +1,15 @@
+// Nav
+// ===
+
+.pw-nav {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+// Component accepts any children, but sets them to their min height
+// by default to allow the NavMenu to fill as much of the height as possible.
+
+.pw-nav > * {
+    flex: 0 0 auto;
+}

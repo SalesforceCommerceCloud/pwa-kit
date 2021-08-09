@@ -1,0 +1,17 @@
+{
+    "overview": {
+        "title": "About Push Messaging"
+    },
+    "configuration": {
+        "title": "Configuring Push Messaging"
+    },
+    "usage": {
+        "title": "Push Messaging Components"
+    },
+    "building-your-own": {
+        "title": "Building Your Own Opt-In Component"
+    },
+    "reference": {
+        "title": "Redux actions and Selectors Reference"
+    }
+}

@@ -1,0 +1,35 @@
+// Grid Component
+// ===
+//
+// The c-grid component create a column structure for content within. Use it to
+// wrap around any type of content; any direct children will be sorted into a
+// 2- or 3-up grid.
+//
+// 1. The spacing between two cards is 16px, therefore we’re using 8px + 8px on
+//    both sides of the card. The Grid itself then extends out the sides by 8px
+//    to align each card optically to the exterior container edges.
+
+.c-grid {
+    display: flex;
+    flex-wrap: wrap;
+
+    @include for-tablet-portrait-up {
+        margin-right: -$small-space; // 1
+        margin-left: -$small-space; // 1
+
+        @for $n from 2 through 6 {
+            &.c--#{$n}up > * {
+                width: calc(#{(100% / $n)} - #{$base-space});
+            }
+        }
+    }
+
+    > * {
+        margin-bottom: $base-space;
+
+        @include for-tablet-portrait-up {
+            margin-right: $small-space;
+            margin-left: $small-space;
+        }
+    }
+}

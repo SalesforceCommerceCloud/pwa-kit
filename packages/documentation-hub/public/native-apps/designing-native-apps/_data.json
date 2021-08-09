@@ -1,0 +1,18 @@
+{
+    "fundamentals": {
+        "title": "Fundamentals",
+        "intro": "An introduction to how Mobify delivers Progressive Web Apps as native iOS and Android apps using the Astro framework."
+    },
+    "native-app-patterns": {
+        "title": "Native app patterns",
+        "intro": "Important tips for designers including how web views work alongside native views."
+    },
+    "components": {
+        "title": "Components",
+        "intro": "How to use the UI kit to understand which components are available with Astro to deliver native experiences."
+    },
+    "layouts": {
+        "title": "Best practice layouts",
+        "intro": "Examples of how native components should be used in place of PWA components to create shopping templates on native apps."
+    }
+}

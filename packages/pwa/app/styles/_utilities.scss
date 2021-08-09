@@ -1,0 +1,25 @@
+// Utilities
+// ===
+//
+// Use wrap-at-root mixin to allow overriding existing styles with extreme
+// specificity while keeping source code clean and readable. Does not override
+// !important or inline styles; those must be dealt with separately.
+
+@import 'base/mixins';
+
+
+@include wrap-at-root("#app", 1) {
+    @import 'utilities/border';
+    @import 'utilities/box-shadow';
+    @import 'utilities/color';
+    @import 'utilities/flexbox';
+    @import 'utilities/heading';
+    @import 'utilities/layout';
+    @import 'utilities/margin';
+    @import 'utilities/padding';
+    @import 'utilities/text-content';
+    @import 'utilities/text';
+    @import 'utilities/display';
+    @import 'utilities/visibility';
+    @import 'utilities/z-index';
+}

@@ -1,0 +1,17 @@
+{
+    "about-the-platform": {
+        "title": "About the Platform"
+    },
+    "installation": {
+        "title": "Installation"
+    },
+    "running-dev-server": {
+        "title": "Running Your Dev Server"
+    },
+    "orientation-exercises": {
+        "title": "Orientation Exercises"
+    },
+    "recommended-resources": {
+        "title": "Recommended Resources"
+    }
+}

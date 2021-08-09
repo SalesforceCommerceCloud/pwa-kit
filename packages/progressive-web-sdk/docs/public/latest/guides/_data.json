@@ -1,0 +1,205 @@
+{
+    "ab-testing": {
+        "title": "A/B Testing Your PWA",
+        "type": "New",
+        "_excludeFromMenu": true,
+        "description": "Learn how to establish A/B testing for your PWA, and precisely measure the impact of your PWA experience."
+    },
+    "add-to-home-screen": {
+        "title": "Configuring and Testing Add to Home Screen",
+        "type": "Updated",
+        "_excludeFromMenu": true,
+        "description": "Ensure your PWA’s app-like functionality is complete by setting up Add to Home Screen."
+    },
+    "instant-page-transitions": {
+        "title": "Performant Design Principles: Instant Page Transitions",
+        "type": "Updated",
+        "_excludeFromMenu": true,
+        "description": "Learn how to make your PWA feel incredibly fast by using Mobify’s SkeletonBlock and SkeletonText components and strategically render product data from the Redux store."
+    },
+    "request-processor": {
+        "title": "Request Processor Tutorial",
+        "type": "New",
+        "_excludeFromMenu": true,
+        "description": "Learn how to use Mobify's request processor control how requests are routed to your app."
+    },
+    "responsive-grid": {
+        "title": "Creating Responsive Layout Grids With Susy",
+        "type": "Updated",
+        "_excludeFromMenu": true,
+        "description": "Create a readable and robust responsive grid system with the Susy SASS library."
+    },
+    "mobify-api": {
+        "title": "Mobify API Tutorial: Target Management",
+        "type": "New",
+        "_excludeFromMenu": true,
+        "description": "Get an intro to the Mobify API, which allows you to programatically create projects, targets, bundles and deployments."
+    },
+    "offline-mode": {
+        "title": "Performant Design Principles: Offline Mode",
+        "type": "Updated",
+        "_excludeFromMenu": true,
+        "description": "Build offline mode functionality into your PWA with Mobify’s offline components and the service worker."
+    },
+    "selectors": {
+        "title": "Getting Data Out of the Redux Store with Selectors",
+        "type": "Updated",
+        "_excludeFromMenu": true,
+        "description": "Get up to speed on selectors, and the two libraries that will help you write selector functions to provide data to your React components."
+    },
+    "web-scraping": {
+        "title": "How to Use Web Scraping",
+        "type": "New",
+        "_excludeFromMenu": true,
+        "description": "Projects that require web scraping to access the backend can be complex. Learn how to build a web scraping connector by extracting data from HTML, with several examples."
+    },
+    "developing-without-the-mobify-tag": {
+        "title": "Injecting Code for the Mobify Tag and the Service Worker",
+        "type": "Updated",
+        "_excludeFromMenu": true,
+        "description": "Access workarounds for adding the Mobify tag and service worker to your project, if you are unable to add them before starting development."
+    },
+    "internationalization": {
+        "title": "Internationalization and Localization",
+        "type": "Updated",
+        "_excludeFromMenu": true,
+        "description": "Learn how to support the needs of different languages, currencies, and other formats in your PWA with an introduction to the react-intl library, translations files, locales, and currencies."
+    },
+    "pwa-analytics": {
+        "title": "Introduction to PWA Analytics",
+        "type": "New",
+        "_excludeFromMenu": true,
+        "description": "Get to know the differences between your PWA’s analytics and traditional website analytics and learn how you can change your analytics implementation to support your PWA."
+    },
+    "performance": {
+        "title": "Managing Performance",
+        "type": "Updated",
+        "_excludeFromMenu": true,
+        "description": "Improve your PWA’s initial load speed and responsiveness with this guide to Mobify’s Performance Manager."
+    },
+    "navigation-menus": {
+        "title": "Rendering Components for Different Device Sizes",
+        "type": "New",
+        "_excludeFromMenu": true,
+        "description": "Learn how to render components that adjust for various device screen sizes, with hands-on exercises that you can follow along."
+    },
+    "routing": {
+        "title": "Routing URLs",
+        "type": "Updated",
+        "_excludeFromMenu": true,
+        "description": "Get to know the routing system, which is based on the react-router package."
+    },
+    "salesforce-commerce-concepts-session-bridging": {
+        "title": "Salesforce Commerce Concepts Lesson 1: Session Bridging",
+        "type": "New",
+        "_excludeFromMenu": true,
+        "description": "An advanced series to help you tackle the most challenging topics you may encounter while building your Mobify PWA with Salesforce B2C Commerce. Lesson one covers the session bridging problem and some common tactics to address it."
+    },
+    "salesforce-commerce-concepts-checkout": {
+        "title": "Salesforce Commerce Concepts Lesson 2: Checkout",
+        "type": "New",
+        "_excludeFromMenu": true,
+        "description": "An advanced series to help you tackle the most challenging topics you may encounter while building your Mobify PWA with Salesforce B2C Commerce. Lesson two covers checkout features that are not covered by session bridging."
+    },
+    "salesforce-commerce-concepts-content-slots": {
+        "title": "Salesforce Commerce Concepts Lesson 3: Content Slots",
+        "type": "New",
+        "_excludeFromMenu": true,
+        "description": "An advanced series to help you tackle the most challenging topics you may encounter while building your Mobify PWA with Salesforce B2C Commerce. Lesson three covers a workaround for accessing content slots, without introducing security issues."
+    },
+    "salesforce-commerce-concepts-troubleshooting": {
+        "title": "Salesforce Commerce Concepts Lesson 4: Troubleshooting",
+        "type": "New",
+        "_excludeFromMenu": true,
+        "description": "An advanced series to help you tackle the most challenging topics you may encounter while building your Mobify PWA with Salesforce B2C Commerce. Lesson four covers common issues that can arise while building a Mobify PWA with a Salesforce B2C Commerce backend."
+    },
+    "mobify-launch-guide": {
+        "title": "Launching your App on The Mobify Platform",
+        "type": "New",
+        "_excludeFromMenu": true,
+        "description": "Learn the steps for launching an app on the Mobify Platform."
+    },
+    "ssr-performance-application-cache": {
+        "title": "Server-Side Rendering Performance: Using Mobify's Application Cache to Boost PWA Performance",
+        "type": "New",
+        "_excludeFromMenu": true,
+        "description": "Learn how to build and test fast server-side rendered PWAs, by leveraging the Mobify Platform's Application Cache."
+    },
+    "ssr-performance-caching-overview": {
+        "title": "Server-Side Rendering Performance: Overview",
+        "type": "New",
+        "_excludeFromMenu": true,
+        "description": "Read an overview on how to build fast server-side rendered PWAs, by leveraging the Mobify Platform's caching and other techniques."
+    },
+    "ssr-performance-cdn-cache": {
+        "title": "Server-Side Rendering Performance: Using Mobify's CDN Cache to Boost PWA Performance",
+        "type": "New",
+        "_excludeFromMenu": true,
+        "description": "Learn about how to use Mobify's CDN Cache to boost your server-side rendered PWA's performance."
+    },
+    "ssr-performance-testing": {
+        "title": "Server-Side Rendering Performance: Testing and Debugging your Local Backend",
+        "type": "New",
+        "_excludeFromMenu": true,
+        "description": "Learn some key tools to test and debug your server-side rendered PWA's local backend."
+    },
+    "proxying": {
+        "title": "Configuring Proxies for Mobify Platform Projects",
+        "type": "New",
+        "_excludeFromMenu": true,
+        "description": "Learn proxy behavior, and how to configure proxies for projects running on Mobify's Application Delivery Network."
+    },
+    "styling": {
+        "title": "Styling Your PWA",
+        "type": "Updated",
+        "_excludeFromMenu": true,
+        "description": "Learn how to style your PWA using SCSS variables, component styles, and preloader styles."
+    },
+    "validating-analytics": {
+        "title": "Validating Your Analytics Data During Launch",
+        "type": "New",
+        "_excludeFromMenu": true,
+        "description": "Learn the key steps to take at launch, to ensure your analytics data comes through as expected."
+    },
+    "bypassing-mobify-preview": {
+        "title": "Using Mobify Preview with Automation Tools",
+        "type": "Updated",
+        "_excludeFromMenu": true,
+        "description": "Discover a workaround for using an automation tool together with Mobify Preview."
+    },
+    "mobify-cli-tool": {
+        "title": "Using the Mobify Command Line Interface (CLI)",
+        "type": "Updated",
+        "_excludeFromMenu": true,
+        "description": "Get to know Mobify’s command line interface for managing projects, targets, and bundles on Mobify Cloud."
+    },
+    "forms": {
+        "title": "Working with Forms",
+        "type": "Updated",
+        "_excludeFromMenu": true,
+        "description": "Review the Redux Form library, and understand how you can use it to manage state and handle validation within your PWA."
+    },
+    "payments": {
+        "title": "Working with Payment APIs",
+        "type": "Updated",
+        "_excludeFromMenu": true,
+        "description": "Learn how to integrate the most common payment APIs into your PWA, including PayPal, Apple Pay, and the Payment Request API."
+    },
+    "mobify-platform-versions": {
+        "title": "About Mobify Platform Versions",
+        "type": "New",
+        "_excludeFromMenu": true,
+        "description": "Learn about Mobify's release process, key version milestones, and how to check your version number."
+    },
+    "client-side-performance": {
+        "title": "Best practices for improving your PWA’s client-side performance",
+        "type": "New",
+        "description": "Learn about how to build a PWA that is highly performant when it runs in the user's browser."
+    },
+    "placeholders": {
+        "title": "Performant Design Principles: Placeholders",
+        "type": "New",
+        "_excludeFromMenu": true,
+        "description": "Make your site feel even faster than it is with Mobify's Skeleton component placeholders."
+    }
+}

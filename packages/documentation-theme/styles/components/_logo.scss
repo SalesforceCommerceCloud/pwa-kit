@@ -1,0 +1,46 @@
+// Logo Component
+// ===
+
+.c-logo {
+    width: $unit*12;
+    height: auto;
+}
+
+
+// Full-color logo
+// ---
+//
+// By default, the logo will inherit a single colour from its parent due to the
+// logo being an SVG. (e.g. white text colour on parent = white logo.) This
+// modifier converts the logo to use Mobify brand colours.
+
+.c-logo.c--full-color {
+
+    .c-logo__spark-light-orange {
+        color: $mobify-light-orange;
+    }
+
+    .c-logo__spark-dark-orange {
+        color: $mobify-dark-orange;
+    }
+
+    .c-logo__spark-light-blue {
+        color: $mobify-light-blue;
+    }
+
+    .c-logo__spark-dark-blue {
+        color: $mobify-dark-blue;
+    }
+
+    .c-logo__spark-light-red {
+        color: $mobify-light-red;
+    }
+
+    .c-logo__spark-dark-red {
+        color: $mobify-dark-red;
+    }
+
+    .c-logo__wordmark {
+        color: currentColor;
+    }
+}

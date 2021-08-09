@@ -1,0 +1,29 @@
+{
+    "presets": [
+        [
+            "@babel/preset-env",
+            {
+                "modules": false
+            }
+        ],
+        "@babel/preset-react"
+    ],
+    "plugins": [
+        "@babel/plugin-proposal-object-rest-spread",
+        "react-loadable/babel",
+        "@babel/plugin-transform-object-assign",
+        [
+            "@babel/plugin-transform-runtime",
+            {
+                "regenerator": false
+            }
+        ]
+    ],
+    "ignore": ["*/vendor/astro-client.js"],
+    "env": {
+        "test": {
+            "presets": ["@babel/preset-env", "@babel/preset-react"],
+            "plugins": ["dynamic-import-node-babel-7"]
+        }
+    }
+}

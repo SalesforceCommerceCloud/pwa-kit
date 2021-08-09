@@ -1,0 +1,17 @@
+{
+    "overview": {
+        "title": "Overview"
+    },
+    "content-types": {
+        "title": "Content Types"
+    },
+    "getting-started": {
+        "title": "Getting Started with Smart Content"
+    },
+    "debugging": {
+        "title": "Debugging Smart Content"
+    },
+    "best-practices": {
+        "title": "Smart Content Best Practices"
+    }
+}

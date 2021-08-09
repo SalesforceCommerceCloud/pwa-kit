@@ -1,0 +1,26 @@
+// Heading
+// ===
+
+.u-h1 {
+    @extend %h1;
+}
+
+.u-h2 {
+    @extend %h2;
+}
+
+.u-h3 {
+    @extend %h3;
+}
+
+.u-h4 {
+    @extend %h4;
+}
+
+.u-h5 {
+    @extend %h5;
+}
+
+.u-h6 {
+    @extend %h6;
+}

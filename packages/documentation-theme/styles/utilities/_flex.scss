@@ -1,0 +1,108 @@
+// Flexbox
+// ===
+//
+// Flexbox and align a row of items with a lot of control. Provides a
+// declarative, robust cross-browser way of using flexbox.
+
+
+// Flexbox root
+// ---
+//
+// Includes gutters, for grid-like functionality.
+//
+// 1. Use our own custom value for spacing between flex items. 6px + 6px = 12px
+
+.u-flexbox {
+    display: flex !important;
+
+    @include for-tablet-portrait-up {
+        &--for-tablet-portrait-up {
+            display: flex !important;
+        }
+    }
+}
+
+.u-flexbox-gutters {
+    margin-right: -($base-space / 2) !important; // 1
+    margin-left: -($base-space / 2) !important; // 1
+
+    > .u-flex,
+    > .u-flex-none {
+        margin-right: $base-space / 2 !important; // 1
+        margin-left: $base-space / 2 !important; // 1
+    }
+}
+
+
+// Align Items
+// ---
+
+.u-align-top {
+    align-items: flex-start !important;
+}
+
+.u-align-center {
+    align-items: center !important;
+}
+
+.u-align-bottom {
+    align-items: flex-end !important;
+}
+
+.u-align-flex-baseline {
+    align-items: baseline !important;
+}
+
+.u-align-flex-end {
+    align-items: flex-end !important;
+}
+
+
+// Justify Content
+// ---
+
+.u-justify-start {
+    justify-content: flex-start !important;
+}
+
+.u-justify-end {
+    justify-content: flex-end !important;
+}
+
+.u-justify-between {
+    justify-content: space-between !important;
+}
+
+.u-justify-center {
+    justify-content: center !important;
+}
+
+.u-justify-around {
+    justify-content: space-around !important;
+}
+
+
+// Flex Direction
+// ---
+
+.u-flex-column {
+    flex-direction: column !important;
+}
+
+.u-flex-row {
+    flex-direction: row !important;
+}
+
+// Flex (Grow)
+// ---
+
+.u-flex {
+    flex: 1 1 auto !important;
+}
+
+// Flex (none)
+// ---
+
+.u-flex-none {
+    flex: 0 0 auto !important;
+}

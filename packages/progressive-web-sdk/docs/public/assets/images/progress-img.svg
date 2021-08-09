@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="184px" height="26px" viewBox="0 0 184 26" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 44.1 (41455) - http://www.bohemiancoding.com/sketch -->
+    <title>progress-img</title>
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <circle id="path-1" cx="172" cy="12" r="12"></circle>
+    </defs>
+    <g id="Design-system-updates" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="SDK-Homepage-v2" transform="translate(-356.000000, -1645.000000)">
+            <g id="Web-Components---multiple-cards" transform="translate(341.000000, 1352.000000)">
+                <g id="2nd-row-components" transform="translate(0.000000, 232.000000)">
+                    <g id="progress-steps">
+                        <g id="progress-img" transform="translate(15.000000, 62.000000)">
+                            <path d="M22.5,11.5 L160.5,11.5" id="Line" stroke="#C4C4C4" stroke-linecap="square"></path>
+                            <path d="M72,11.5 L112,11.5" id="Line" stroke="#7D75B4" stroke-linecap="square"></path>
+                            <circle id="Oval-2" fill="#D8D8D8" cx="12" cy="12" r="12"></circle>
+                            <circle id="Oval-2-Copy" fill="#D8D8D8" cx="65" cy="12" r="12"></circle>
+                            <circle id="Oval-2-Copy-3" stroke="#7D75B4" stroke-width="2" fill="#F7F7F7" cx="119" cy="12" r="12"></circle>
+                            <g id="Oval-2-Copy-4">
+                                <use fill="#F7F7F7" fill-rule="evenodd" xlink:href="#path-1"></use>
+                                <circle stroke="#C4C4C4" stroke-width="1" cx="172" cy="12" r="11.5"></circle>
+                            </g>
+                            <path d="M124.927126,10.068323 C125.024291,9.97625137 125.024291,9.81841432 124.927126,9.72634271 L123.178138,8.06905371 C123.080972,7.9769821 122.914401,7.9769821 122.817235,8.06905371 L117.500868,13.1198392 L115.182765,10.9101206 C115.085599,10.818049 114.919028,10.818049 114.821862,10.9101206 L113.072874,12.5674096 C112.975709,12.6594812 112.975709,12.8173182 113.072874,12.9093898 L117.320416,16.9342346 C117.37594,16.9736938 117.431463,17 117.500868,17 C117.570272,17 117.625795,16.9736938 117.681319,16.9342346 L124.927126,10.068323 Z" id="svg" fill="#7D75B4"></path>
+                        </g>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

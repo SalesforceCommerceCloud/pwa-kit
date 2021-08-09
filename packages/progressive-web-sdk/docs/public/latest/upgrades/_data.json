@@ -1,0 +1,20 @@
+{
+    "analytics-manager": {
+        "title": "Adding the Analytics Manager"
+    },
+    "integration-manager-v0-4": {
+        "title": "Integration Manager 0.4"
+    },
+    "integration-manager-v0-1": {
+        "title": "Integration Manager 0.1"
+    },
+    "react-16": {
+        "title": "React 16"
+    },
+    "node": {
+        "title": "Node.js 10"
+    },
+    "webpack-4": {
+        "title": "Webpack 4"
+    }
+}

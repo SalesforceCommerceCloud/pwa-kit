@@ -1,0 +1,1874 @@
+[
+  {
+    "scope": "https://hybris.merlinspotions.com:443",
+    "method": "GET",
+    "path": "/rest/v2/apparel-uk/catalogs/apparelProductCatalog/Online/categories/categories",
+    "body": "",
+    "status": 200,
+    "response": {
+      "type": "categoryHierarchyWsDTO",
+      "id": "categories",
+      "name": "Categories",
+      "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/categories",
+      "subcategories": [
+        {
+          "id": "220000",
+          "name": "Accessories",
+          "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/220000",
+          "subcategories": [
+            {
+              "id": "221600",
+              "name": "Bandanas",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/221600",
+              "subcategories": []
+            },
+            {
+              "id": "221200",
+              "name": "Beach Towels",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/221200",
+              "subcategories": []
+            },
+            {
+              "id": "220500",
+              "name": "Beanies",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/220500",
+              "subcategories": []
+            },
+            {
+              "id": "221800",
+              "name": "Electronic Accessories",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/221800",
+              "subcategories": []
+            },
+            {
+              "id": "251100",
+              "name": "Belts",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/251100",
+              "subcategories": []
+            },
+            {
+              "id": "220600",
+              "name": "Caps",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/220600",
+              "subcategories": []
+            },
+            {
+              "id": "221900",
+              "name": "Cameras",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/221900",
+              "subcategories": []
+            },
+            {
+              "id": "221500",
+              "name": "Jewellery",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/221500",
+              "subcategories": []
+            },
+            {
+              "id": "190700",
+              "name": "Gloves",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/190700",
+              "subcategories": []
+            },
+            {
+              "id": "221300",
+              "name": "Headphones",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/221300",
+              "subcategories": []
+            },
+            {
+              "id": "221000",
+              "name": "Others",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/221000",
+              "subcategories": []
+            },
+            {
+              "id": "221100",
+              "name": "Socks",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/221100",
+              "subcategories": []
+            },
+            {
+              "id": "220700",
+              "name": "Wallets",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/220700",
+              "subcategories": []
+            },
+            {
+              "id": "222000",
+              "name": "Videocamera",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/222000",
+              "subcategories": []
+            },
+            {
+              "id": "221400",
+              "name": "Sticker",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/221400",
+              "subcategories": []
+            },
+            {
+              "id": "340000",
+              "name": "Watches",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/340000",
+              "subcategories": []
+            }
+          ]
+        },
+        {
+          "id": "370000",
+          "name": "Accessories women",
+          "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/370000",
+          "subcategories": [
+            {
+              "id": "160400",
+              "name": "Bags women",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/160400",
+              "subcategories": []
+            },
+            {
+              "id": "371600",
+              "name": "Bandanas women",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/371600",
+              "subcategories": []
+            },
+            {
+              "id": "370900",
+              "name": "Belts women",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/370900",
+              "subcategories": []
+            },
+            {
+              "id": "370800",
+              "name": "Beach towels women",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/370800",
+              "subcategories": []
+            },
+            {
+              "id": "370200",
+              "name": "Beanies women",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/370200",
+              "subcategories": []
+            },
+            {
+              "id": "370100",
+              "name": "Caps women",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/370100",
+              "subcategories": []
+            },
+            {
+              "id": "371100",
+              "name": "Gloves women",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/371100",
+              "subcategories": []
+            },
+            {
+              "id": "371800",
+              "name": "Jewellery women",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/371800",
+              "subcategories": []
+            },
+            {
+              "id": "221300",
+              "name": "Headphones",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/221300",
+              "subcategories": []
+            },
+            {
+              "id": "221500",
+              "name": "Jewellery",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/221500",
+              "subcategories": []
+            },
+            {
+              "id": "371200",
+              "name": "Others women",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/371200",
+              "subcategories": []
+            },
+            {
+              "id": "371700",
+              "name": "Scarves women",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/371700",
+              "subcategories": []
+            },
+            {
+              "id": "370600",
+              "name": "Socks women",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/370600",
+              "subcategories": []
+            },
+            {
+              "id": "371000",
+              "name": "Underwear technical women",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/371000",
+              "subcategories": []
+            },
+            {
+              "id": "370300",
+              "name": "Wallets women",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/370300",
+              "subcategories": []
+            },
+            {
+              "id": "370700",
+              "name": "Watches women",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/370700",
+              "subcategories": []
+            }
+          ]
+        },
+        {
+          "id": "380000",
+          "name": "Accessories youth",
+          "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/380000",
+          "subcategories": [
+            {
+              "id": "380200",
+              "name": "Beanies youth",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/380200",
+              "subcategories": []
+            },
+            {
+              "id": "380300",
+              "name": "Belts youth",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/380300",
+              "subcategories": []
+            },
+            {
+              "id": "330800",
+              "name": "Gloves youth",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/330800",
+              "subcategories": []
+            },
+            {
+              "id": "380100",
+              "name": "Caps youth",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/380100",
+              "subcategories": []
+            },
+            {
+              "id": "380400",
+              "name": "Socks youth",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/380400",
+              "subcategories": []
+            }
+          ]
+        },
+        {
+          "id": "160000",
+          "name": "Bags+Boardbags",
+          "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/160000",
+          "subcategories": [
+            {
+              "id": "160300",
+              "name": "Backpacks",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/160300",
+              "subcategories": []
+            },
+            {
+              "id": "160900",
+              "name": "Backpacks Women",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/160900",
+              "subcategories": []
+            },
+            {
+              "id": "160700",
+              "name": "Bags",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/160700",
+              "subcategories": []
+            },
+            {
+              "id": "160400",
+              "name": "Bags women",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/160400",
+              "subcategories": []
+            },
+            {
+              "id": "160100",
+              "name": "Board Bags",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/160100",
+              "subcategories": []
+            },
+            {
+              "id": "160500",
+              "name": "Travelbags",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/160500",
+              "subcategories": []
+            },
+            {
+              "id": "170300",
+              "name": "Touring Bags",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/170300",
+              "subcategories": []
+            },
+            {
+              "id": "160600",
+              "name": "Travelbags women",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/160600",
+              "subcategories": []
+            }
+          ]
+        },
+        {
+          "id": "320000",
+          "name": "Bikewear",
+          "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/320000",
+          "subcategories": [
+            {
+              "id": "320500",
+              "name": "MTB Jackets",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/320500",
+              "subcategories": []
+            },
+            {
+              "id": "321000",
+              "name": "MTB Gloves wmn",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/321000",
+              "subcategories": []
+            },
+            {
+              "id": "320700",
+              "name": "MTB Shirt wmn",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/320700",
+              "subcategories": []
+            },
+            {
+              "id": "321100",
+              "name": "MTB Jackets wmn",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/321100",
+              "subcategories": []
+            },
+            {
+              "id": "320100",
+              "name": "MTB Shirts",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/320100",
+              "subcategories": []
+            },
+            {
+              "id": "320800",
+              "name": "MTB Shorts wmn",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/320800",
+              "subcategories": []
+            }
+          ]
+        },
+        {
+          "id": "50000",
+          "name": "Bindings",
+          "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/50000",
+          "subcategories": [
+            {
+              "id": "50300",
+              "name": "Hard Bindings",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/50300",
+              "subcategories": []
+            },
+            {
+              "id": "50400",
+              "name": "Hard Bindings Step In",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/50400",
+              "subcategories": []
+            },
+            {
+              "id": "50100",
+              "name": "Soft Bindings",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/50100",
+              "subcategories": []
+            },
+            {
+              "id": "50500",
+              "name": "Soft Bindings Accessories",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/50500",
+              "subcategories": []
+            },
+            {
+              "id": "50600",
+              "name": "Soft Bindings women",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/50600",
+              "subcategories": []
+            },
+            {
+              "id": "51700",
+              "name": "Soft Bindings youth",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/51700",
+              "subcategories": []
+            }
+          ]
+        },
+        {
+          "id": "210000",
+          "name": "Eyewear",
+          "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/210000",
+          "subcategories": [
+            {
+              "id": "210300",
+              "name": "Eyewear Accessories",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/210300",
+              "subcategories": []
+            },
+            {
+              "id": "210200",
+              "name": "Goggles",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/210200",
+              "subcategories": []
+            },
+            {
+              "id": "210100",
+              "name": "Shades",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/210100",
+              "subcategories": []
+            }
+          ]
+        },
+        {
+          "id": "240000",
+          "name": "Eyewear Women",
+          "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/240000",
+          "subcategories": [
+            {
+              "id": "240100",
+              "name": "Shades Women",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/240100",
+              "subcategories": []
+            },
+            {
+              "id": "210300",
+              "name": "Eyewear Accessories",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/210300",
+              "subcategories": []
+            },
+            {
+              "id": "240200",
+              "name": "Goggles Women",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/240200",
+              "subcategories": []
+            }
+          ]
+        },
+        {
+          "id": "110000",
+          "name": "Freeski",
+          "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/110000",
+          "subcategories": [
+            {
+              "id": "110200",
+              "name": "Freestyle Ski women",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/110200",
+              "subcategories": []
+            },
+            {
+              "id": "111700",
+              "name": "Freeride Ski",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/111700",
+              "subcategories": []
+            },
+            {
+              "id": "111900",
+              "name": "Freeride Ski women",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/111900",
+              "subcategories": []
+            },
+            {
+              "id": "110100",
+              "name": "Freestyle Ski",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/110100",
+              "subcategories": []
+            },
+            {
+              "id": "110900",
+              "name": "Ski Bag",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/110900",
+              "subcategories": []
+            },
+            {
+              "id": "110800",
+              "name": "Sets Freeski",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/110800",
+              "subcategories": []
+            },
+            {
+              "id": "110300",
+              "name": "Freestyle+Freeride Ski youth",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/110300",
+              "subcategories": []
+            },
+            {
+              "id": "111300",
+              "name": "Ski Bag women",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/111300",
+              "subcategories": []
+            },
+            {
+              "id": "110500",
+              "name": "Ski Bindings",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/110500",
+              "subcategories": []
+            },
+            {
+              "id": "110600",
+              "name": "Ski Boots",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/110600",
+              "subcategories": []
+            },
+            {
+              "id": "111000",
+              "name": "Ski Boots women",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/111000",
+              "subcategories": []
+            },
+            {
+              "id": "111500",
+              "name": "Ski Boots youth",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/111500",
+              "subcategories": []
+            },
+            {
+              "id": "110700",
+              "name": "Ski poles",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/110700",
+              "subcategories": []
+            },
+            {
+              "id": "111100",
+              "name": "Ski Poles women",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/111100",
+              "subcategories": []
+            },
+            {
+              "id": "111600",
+              "name": "Ski Set youth",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/111600",
+              "subcategories": []
+            },
+            {
+              "id": "111800",
+              "name": "Ski Poles youth",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/111800",
+              "subcategories": []
+            }
+          ]
+        },
+        {
+          "id": "290000",
+          "name": "Eyewear youth",
+          "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/290000",
+          "subcategories": [
+            {
+              "id": "290200",
+              "name": "Shades youth",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/290200",
+              "subcategories": []
+            },
+            {
+              "id": "290100",
+              "name": "Goggles youth",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/290100",
+              "subcategories": []
+            }
+          ]
+        },
+        {
+          "id": "450000",
+          "name": "Helmets",
+          "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/450000",
+          "subcategories": [
+            {
+              "id": "450500",
+              "name": "Helmets Bike/Skate",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/450500",
+              "subcategories": []
+            },
+            {
+              "id": "450100",
+              "name": "Helmets Snow",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/450100",
+              "subcategories": []
+            },
+            {
+              "id": "450600",
+              "name": "Helmets Wakeboard",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/450600",
+              "subcategories": []
+            },
+            {
+              "id": "450300",
+              "name": "Helmets women",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/450300",
+              "subcategories": []
+            },
+            {
+              "id": "450200",
+              "name": "Helmets youth",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/450200",
+              "subcategories": []
+            },
+            {
+              "id": "450700",
+              "name": "Helmets youth Girls",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/450700",
+              "subcategories": []
+            }
+          ]
+        },
+        {
+          "id": "70000",
+          "name": "Protection",
+          "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/70000",
+          "subcategories": [
+            {
+              "id": "450500",
+              "name": "Helmets Bike/Skate",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/450500",
+              "subcategories": []
+            },
+            {
+              "id": "450100",
+              "name": "Helmets Snow",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/450100",
+              "subcategories": []
+            },
+            {
+              "id": "450600",
+              "name": "Helmets Wakeboard",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/450600",
+              "subcategories": []
+            },
+            {
+              "id": "450300",
+              "name": "Helmets women",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/450300",
+              "subcategories": []
+            },
+            {
+              "id": "450200",
+              "name": "Helmets youth",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/450200",
+              "subcategories": []
+            },
+            {
+              "id": "70500",
+              "name": "Protection women",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/70500",
+              "subcategories": []
+            },
+            {
+              "id": "70200",
+              "name": "Protectors",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/70200",
+              "subcategories": []
+            },
+            {
+              "id": "70600",
+              "name": "Protection youth",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/70600",
+              "subcategories": []
+            },
+            {
+              "id": "70700",
+              "name": "Protectors Bike",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/70700",
+              "subcategories": []
+            }
+          ]
+        },
+        {
+          "id": "20000",
+          "name": "Race+Freecarveboards",
+          "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/20000",
+          "subcategories": [
+            {
+              "id": "20400",
+              "name": "Raceboards women",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/20400",
+              "subcategories": []
+            },
+            {
+              "id": "20100",
+              "name": "Raceboards",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/20100",
+              "subcategories": []
+            }
+          ]
+        },
+        {
+          "id": "230000",
+          "name": "Shoes",
+          "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/230000",
+          "subcategories": [
+            {
+              "id": "230400",
+              "name": "Sandals men",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/230400",
+              "subcategories": []
+            },
+            {
+              "id": "230200",
+              "name": "Skate Shoes",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/230200",
+              "subcategories": []
+            },
+            {
+              "id": "230100",
+              "name": "Sneakers",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/230100",
+              "subcategories": []
+            },
+            {
+              "id": "230600",
+              "name": "Winter Shoes",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/230600",
+              "subcategories": []
+            }
+          ]
+        },
+        {
+          "id": "400000",
+          "name": "Shoes women",
+          "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/400000",
+          "subcategories": [
+            {
+              "id": "400400",
+              "name": "Ballerinas women",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/400400",
+              "subcategories": []
+            },
+            {
+              "id": "400600",
+              "name": "Boots Women",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/400600",
+              "subcategories": []
+            },
+            {
+              "id": "400500",
+              "name": "Fashion Shoes Women",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/400500",
+              "subcategories": []
+            },
+            {
+              "id": "400300",
+              "name": "Sandals women",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/400300",
+              "subcategories": []
+            },
+            {
+              "id": "400100",
+              "name": "Sneakers women",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/400100",
+              "subcategories": []
+            }
+          ]
+        },
+        {
+          "id": "390000",
+          "name": "Shoes youth",
+          "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/390000",
+          "subcategories": [
+            {
+              "id": "390200",
+              "name": "Sandals youth",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/390200",
+              "subcategories": []
+            },
+            {
+              "id": "390300",
+              "name": "Skateshoes youth",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/390300",
+              "subcategories": []
+            },
+            {
+              "id": "390100",
+              "name": "Sneakers youth",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/390100",
+              "subcategories": []
+            }
+          ]
+        },
+        {
+          "id": "280000",
+          "name": "Skate",
+          "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/280000",
+          "subcategories": [
+            {
+              "id": "280500",
+              "name": "Bearings",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/280500",
+              "subcategories": []
+            },
+            {
+              "id": "280900",
+              "name": "Cruisers",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/280900",
+              "subcategories": []
+            },
+            {
+              "id": "280700",
+              "name": "Complete Decks",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/280700",
+              "subcategories": []
+            },
+            {
+              "id": "180300",
+              "name": "DVD Skate",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/180300",
+              "subcategories": []
+            },
+            {
+              "id": "280800",
+              "name": "Grip Tape",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/280800",
+              "subcategories": []
+            },
+            {
+              "id": "280100",
+              "name": "Longboards",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/280100",
+              "subcategories": []
+            },
+            {
+              "id": "280200",
+              "name": "Skate Decks",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/280200",
+              "subcategories": []
+            },
+            {
+              "id": "280300",
+              "name": "Skate Accessories",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/280300",
+              "subcategories": []
+            },
+            {
+              "id": "280400",
+              "name": "Trucks",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/280400",
+              "subcategories": []
+            },
+            {
+              "id": "280600",
+              "name": "Wheels",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/280600",
+              "subcategories": []
+            }
+          ]
+        },
+        {
+          "id": "40000",
+          "name": "Snowboard Boots",
+          "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/40000",
+          "subcategories": [
+            {
+              "id": "40500",
+              "name": "Boots Accessories",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/40500",
+              "subcategories": []
+            },
+            {
+              "id": "40300",
+              "name": "Hardboots",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/40300",
+              "subcategories": []
+            },
+            {
+              "id": "40100",
+              "name": "Softboots",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/40100",
+              "subcategories": []
+            },
+            {
+              "id": "40400",
+              "name": "Softboots women",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/40400",
+              "subcategories": []
+            },
+            {
+              "id": "40600",
+              "name": "Softboots youth",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/40600",
+              "subcategories": []
+            }
+          ]
+        },
+        {
+          "id": "10000",
+          "name": "Snowboards",
+          "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/10000",
+          "subcategories": [
+            {
+              "id": "30300",
+              "name": "Freestyle+Freeride youth",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/30300",
+              "subcategories": []
+            },
+            {
+              "id": "10100",
+              "name": "Freestyle+Freeride",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/10100",
+              "subcategories": []
+            },
+            {
+              "id": "20000",
+              "name": "Race+Freecarveboards",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/20000",
+              "subcategories": [
+                {
+                  "id": "20400",
+                  "name": "Raceboards women",
+                  "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/20400",
+                  "subcategories": []
+                },
+                {
+                  "id": "20100",
+                  "name": "Raceboards",
+                  "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/20100",
+                  "subcategories": []
+                }
+              ]
+            },
+            {
+              "id": "20400",
+              "name": "Raceboards women",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/20400",
+              "subcategories": []
+            },
+            {
+              "id": "10200",
+              "name": "Sets Freestyle+Freeride",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/10200",
+              "subcategories": []
+            },
+            {
+              "id": "10500",
+              "name": "Snowboards women",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/10500",
+              "subcategories": []
+            },
+            {
+              "id": "10400",
+              "name": "Splitboard",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/10400",
+              "subcategories": []
+            },
+            {
+              "id": "10600",
+              "name": "Test Freestyle+Freeride women",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/10600",
+              "subcategories": []
+            },
+            {
+              "id": "30200",
+              "name": "Testboard youth",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/30200",
+              "subcategories": []
+            }
+          ]
+        },
+        {
+          "id": "30000",
+          "name": "Snowboards youth",
+          "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/30000",
+          "subcategories": [
+            {
+              "id": "30300",
+              "name": "Freestyle+Freeride youth",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/30300",
+              "subcategories": []
+            },
+            {
+              "id": "30200",
+              "name": "Testboard youth",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/30200",
+              "subcategories": []
+            },
+            {
+              "id": "30400",
+              "name": "Raceboards youth",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/30400",
+              "subcategories": []
+            }
+          ]
+        },
+        {
+          "id": "190000",
+          "name": "Snowwear men",
+          "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/190000",
+          "subcategories": [
+            {
+              "id": "190400",
+              "name": "Fleece",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/190400",
+              "subcategories": []
+            },
+            {
+              "id": "190700",
+              "name": "Gloves",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/190700",
+              "subcategories": []
+            },
+            {
+              "id": "190100",
+              "name": "Snow Jackets",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/190100",
+              "subcategories": []
+            },
+            {
+              "id": "190300",
+              "name": "Snow Pants",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/190300",
+              "subcategories": []
+            },
+            {
+              "id": "190800",
+              "name": "Softshell",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/190800",
+              "subcategories": []
+            }
+          ]
+        },
+        {
+          "id": "200000",
+          "name": "Snowwear women",
+          "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/200000",
+          "subcategories": [
+            {
+              "id": "200400",
+              "name": "Fleece women",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/200400",
+              "subcategories": []
+            },
+            {
+              "id": "371100",
+              "name": "Gloves women",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/371100",
+              "subcategories": []
+            },
+            {
+              "id": "200100",
+              "name": "Snow Jackets women",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/200100",
+              "subcategories": []
+            },
+            {
+              "id": "200200",
+              "name": "Snow Vests women",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/200200",
+              "subcategories": []
+            },
+            {
+              "id": "200300",
+              "name": "Snow Pants women",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/200300",
+              "subcategories": []
+            },
+            {
+              "id": "200800",
+              "name": "Softshell women",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/200800",
+              "subcategories": []
+            },
+            {
+              "id": "371000",
+              "name": "Underwear technical women",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/371000",
+              "subcategories": []
+            }
+          ]
+        },
+        {
+          "id": "330000",
+          "name": "Snowwear youth",
+          "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/330000",
+          "subcategories": [
+            {
+              "id": "330800",
+              "name": "Gloves youth",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/330800",
+              "subcategories": []
+            },
+            {
+              "id": "270900",
+              "name": "Fleece youth",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/270900",
+              "subcategories": []
+            },
+            {
+              "id": "330100",
+              "name": "Snow Jackets youth",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/330100",
+              "subcategories": []
+            },
+            {
+              "id": "330700",
+              "name": "Snow Pants youth",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/330700",
+              "subcategories": []
+            }
+          ]
+        },
+        {
+          "id": "250000",
+          "name": "Streetwear men",
+          "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/250000",
+          "subcategories": [
+            {
+              "id": "251100",
+              "name": "Belts",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/251100",
+              "subcategories": []
+            },
+            {
+              "id": "250800",
+              "name": "Boardshorts",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/250800",
+              "subcategories": []
+            },
+            {
+              "id": "251200",
+              "name": "Coats",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/251200",
+              "subcategories": []
+            },
+            {
+              "id": "190400",
+              "name": "Fleece",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/190400",
+              "subcategories": []
+            },
+            {
+              "id": "250500",
+              "name": "Denim Pants",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/250500",
+              "subcategories": []
+            },
+            {
+              "id": "250400",
+              "name": "Jackets",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/250400",
+              "subcategories": []
+            },
+            {
+              "id": "251500",
+              "name": "Long Sleeve",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/251500",
+              "subcategories": []
+            },
+            {
+              "id": "250900",
+              "name": "Pants",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/250900",
+              "subcategories": []
+            },
+            {
+              "id": "250700",
+              "name": "Polos",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/250700",
+              "subcategories": []
+            },
+            {
+              "id": "250300",
+              "name": "Shirts",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/250300",
+              "subcategories": []
+            },
+            {
+              "id": "250600",
+              "name": "Shorts",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/250600",
+              "subcategories": []
+            },
+            {
+              "id": "251300",
+              "name": "Suit",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/251300",
+              "subcategories": []
+            },
+            {
+              "id": "250200",
+              "name": "Sweater",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/250200",
+              "subcategories": []
+            },
+            {
+              "id": "252000",
+              "name": "Sweater Hooded",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/252000",
+              "subcategories": []
+            },
+            {
+              "id": "252100",
+              "name": "Sweater Hooded Zip",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/252100",
+              "subcategories": []
+            },
+            {
+              "id": "250100",
+              "name": "T-Shirts men",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/250100",
+              "subcategories": []
+            },
+            {
+              "id": "251600",
+              "name": "Tank Top",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/251600",
+              "subcategories": []
+            },
+            {
+              "id": "252300",
+              "name": "Underwear",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/252300",
+              "subcategories": []
+            },
+            {
+              "id": "251000",
+              "name": "Vests",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/251000",
+              "subcategories": []
+            },
+            {
+              "id": "251400",
+              "name": "Windbreaker",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/251400",
+              "subcategories": []
+            }
+          ]
+        },
+        {
+          "id": "260000",
+          "name": "Streetwear women",
+          "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/260000",
+          "subcategories": [
+            {
+              "id": "260800",
+              "name": "Bikinis women",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/260800",
+              "subcategories": []
+            },
+            {
+              "id": "260500",
+              "name": "Denim Pants women",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/260500",
+              "subcategories": []
+            },
+            {
+              "id": "262300",
+              "name": "Boardshorts women",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/262300",
+              "subcategories": []
+            },
+            {
+              "id": "261200",
+              "name": "Coats women",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/261200",
+              "subcategories": []
+            },
+            {
+              "id": "262400",
+              "name": "Cardigan women",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/262400",
+              "subcategories": []
+            },
+            {
+              "id": "262600",
+              "name": "Fashion Shirt LS Women",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/262600",
+              "subcategories": []
+            },
+            {
+              "id": "260400",
+              "name": "Jackets women",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/260400",
+              "subcategories": []
+            },
+            {
+              "id": "200400",
+              "name": "Fleece women",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/200400",
+              "subcategories": []
+            },
+            {
+              "id": "262500",
+              "name": "Fashion Shirt SS Women",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/262500",
+              "subcategories": []
+            },
+            {
+              "id": "261700",
+              "name": "Longsleeves women",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/261700",
+              "subcategories": []
+            },
+            {
+              "id": "261400",
+              "name": "Overall women",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/261400",
+              "subcategories": []
+            },
+            {
+              "id": "260900",
+              "name": "Pants women",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/260900",
+              "subcategories": []
+            },
+            {
+              "id": "261600",
+              "name": "Polos women",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/261600",
+              "subcategories": []
+            },
+            {
+              "id": "260300",
+              "name": "Shirts women",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/260300",
+              "subcategories": []
+            },
+            {
+              "id": "260600",
+              "name": "Shorts women",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/260600",
+              "subcategories": []
+            },
+            {
+              "id": "262000",
+              "name": "Sweater Hooded women",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/262000",
+              "subcategories": []
+            },
+            {
+              "id": "260700",
+              "name": "Skirts and Dresses women",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/260700",
+              "subcategories": []
+            },
+            {
+              "id": "262100",
+              "name": "Sweater Hooded Zip women",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/262100",
+              "subcategories": []
+            },
+            {
+              "id": "260200",
+              "name": "Sweater women",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/260200",
+              "subcategories": []
+            },
+            {
+              "id": "260100",
+              "name": "T-Shirts women",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/260100",
+              "subcategories": []
+            },
+            {
+              "id": "261800",
+              "name": "Tops",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/261800",
+              "subcategories": []
+            },
+            {
+              "id": "261000",
+              "name": "Vests women",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/261000",
+              "subcategories": []
+            },
+            {
+              "id": "261300",
+              "name": "Underwear women",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/261300",
+              "subcategories": []
+            },
+            {
+              "id": "261500",
+              "name": "Windbreaker women",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/261500",
+              "subcategories": []
+            }
+          ]
+        },
+        {
+          "id": "270000",
+          "name": "Streetwear youth",
+          "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/270000",
+          "subcategories": [
+            {
+              "id": "270500",
+              "name": "Denim Pants youth",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/270500",
+              "subcategories": []
+            },
+            {
+              "id": "460000",
+              "name": "Babies",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/460000",
+              "subcategories": []
+            },
+            {
+              "id": "270900",
+              "name": "Fleece youth",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/270900",
+              "subcategories": []
+            },
+            {
+              "id": "270600",
+              "name": "Boardshorts youth",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/270600",
+              "subcategories": []
+            },
+            {
+              "id": "270300",
+              "name": "Pants youth",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/270300",
+              "subcategories": []
+            },
+            {
+              "id": "270800",
+              "name": "Shorts youth",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/270800",
+              "subcategories": []
+            },
+            {
+              "id": "270200",
+              "name": "Sweater+Pullover youth",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/270200",
+              "subcategories": []
+            },
+            {
+              "id": "270700",
+              "name": "Jackets youth",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/270700",
+              "subcategories": []
+            },
+            {
+              "id": "271000",
+              "name": "Underwear youth",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/271000",
+              "subcategories": []
+            },
+            {
+              "id": "270100",
+              "name": "T-Shirts youth",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/270100",
+              "subcategories": []
+            }
+          ]
+        },
+        {
+          "id": "350000",
+          "name": "Surf",
+          "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/350000",
+          "subcategories": [
+            {
+              "id": "360500",
+              "name": "Booties",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/360500",
+              "subcategories": []
+            },
+            {
+              "id": "350400",
+              "name": "Bodyboards",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/350400",
+              "subcategories": []
+            },
+            {
+              "id": "180400",
+              "name": "DVD Surf",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/180400",
+              "subcategories": []
+            },
+            {
+              "id": "350800",
+              "name": "Fins Surf",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/350800",
+              "subcategories": []
+            },
+            {
+              "id": "350500",
+              "name": "Grip Pad Surf",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/350500",
+              "subcategories": []
+            },
+            {
+              "id": "350200",
+              "name": "Long + Funboards",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/350200",
+              "subcategories": []
+            },
+            {
+              "id": "350600",
+              "name": "Leash Surf",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/350600",
+              "subcategories": []
+            },
+            {
+              "id": "360400",
+              "name": "Lycras women",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/360400",
+              "subcategories": []
+            },
+            {
+              "id": "350900",
+              "name": "Repair Surf",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/350900",
+              "subcategories": []
+            },
+            {
+              "id": "360300",
+              "name": "Lycras",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/360300",
+              "subcategories": []
+            },
+            {
+              "id": "350100",
+              "name": "Shortboards + Fish",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/350100",
+              "subcategories": []
+            },
+            {
+              "id": "351200",
+              "name": "Skimboard",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/351200",
+              "subcategories": []
+            },
+            {
+              "id": "355000",
+              "name": "SUP - Stand Up Paddle",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/355000",
+              "subcategories": []
+            },
+            {
+              "id": "351000",
+              "name": "Surf Accessories",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/351000",
+              "subcategories": []
+            },
+            {
+              "id": "351100",
+              "name": "Surfboard Bags",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/351100",
+              "subcategories": []
+            },
+            {
+              "id": "350700",
+              "name": "Wax Surf",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/350700",
+              "subcategories": []
+            },
+            {
+              "id": "181200",
+              "name": "Surfbooks",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/181200",
+              "subcategories": []
+            },
+            {
+              "id": "360100",
+              "name": "Wetsuits",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/360100",
+              "subcategories": []
+            },
+            {
+              "id": "360200",
+              "name": "Wetsuits women",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/360200",
+              "subcategories": []
+            }
+          ]
+        },
+        {
+          "id": "170000",
+          "name": "Touring Equipment",
+          "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/170000",
+          "subcategories": [
+            {
+              "id": "170100",
+              "name": "Avalanche Transceiver",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/170100",
+              "subcategories": []
+            },
+            {
+              "id": "170200",
+              "name": "Climbing Systems",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/170200",
+              "subcategories": []
+            },
+            {
+              "id": "170400",
+              "name": "Shovel and Probes",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/170400",
+              "subcategories": []
+            },
+            {
+              "id": "170300",
+              "name": "Touring Bags",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/170300",
+              "subcategories": []
+            }
+          ]
+        },
+        {
+          "id": "100000",
+          "name": "Tuning",
+          "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/100000",
+          "subcategories": [
+            {
+              "id": "100300",
+              "name": "Gear",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/100300",
+              "subcategories": []
+            },
+            {
+              "id": "100400",
+              "name": "Technical accessories",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/100400",
+              "subcategories": []
+            },
+            {
+              "id": "100100",
+              "name": "Wax",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/100100",
+              "subcategories": []
+            },
+            {
+              "id": "100200",
+              "name": "Tools",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/100200",
+              "subcategories": []
+            }
+          ]
+        },
+        {
+          "id": "420000",
+          "name": "Wakeboard",
+          "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/420000",
+          "subcategories": [
+            {
+              "id": "450600",
+              "name": "Helmets Wakeboard",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/450600",
+              "subcategories": []
+            },
+            {
+              "id": "420100",
+              "name": "Wakeboard",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/420100",
+              "subcategories": []
+            },
+            {
+              "id": "420300",
+              "name": "Wakeboard Bindings",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/420300",
+              "subcategories": []
+            },
+            {
+              "id": "420200",
+              "name": "Wakeboard Set",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/420200",
+              "subcategories": []
+            },
+            {
+              "id": "420600",
+              "name": "Wakeboard Set women",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/420600",
+              "subcategories": []
+            }
+          ]
+        },
+        {
+          "id": "360000",
+          "name": "Wetsuits + Lycras",
+          "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/360000",
+          "subcategories": [
+            {
+              "id": "360500",
+              "name": "Booties",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/360500",
+              "subcategories": []
+            },
+            {
+              "id": "360400",
+              "name": "Lycras women",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/360400",
+              "subcategories": []
+            },
+            {
+              "id": "360300",
+              "name": "Lycras",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/360300",
+              "subcategories": []
+            },
+            {
+              "id": "360600",
+              "name": "Lycras youth",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/360600",
+              "subcategories": []
+            },
+            {
+              "id": "360100",
+              "name": "Wetsuits",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/360100",
+              "subcategories": []
+            },
+            {
+              "id": "360200",
+              "name": "Wetsuits women",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/360200",
+              "subcategories": []
+            },
+            {
+              "id": "360700",
+              "name": "Wetsuits youth",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/360700",
+              "subcategories": []
+            }
+          ]
+        },
+        {
+          "id": "others",
+          "name": "Others",
+          "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/others",
+          "subcategories": [
+            {
+              "id": "backpack",
+              "name": "Backpacks",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/backpack",
+              "subcategories": []
+            },
+            {
+              "id": "skigear",
+              "name": "Ski Gear",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/skigear",
+              "subcategories": []
+            },
+            {
+              "id": "goggles",
+              "name": "Goggles",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/goggles",
+              "subcategories": []
+            },
+            {
+              "id": "tools",
+              "name": "Tools",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/tools",
+              "subcategories": []
+            },
+            {
+              "id": "guides",
+              "name": "Guides",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/guides",
+              "subcategories": []
+            }
+          ]
+        },
+        {
+          "id": "clothes",
+          "name": "Clothes",
+          "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/clothes",
+          "subcategories": [
+            {
+              "id": "shirts",
+              "name": "Shirts",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/shirts",
+              "subcategories": []
+            },
+            {
+              "id": "helmet",
+              "name": "Helmets",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/helmet",
+              "subcategories": []
+            },
+            {
+              "id": "shoes",
+              "name": "Shoes",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/shoes",
+              "subcategories": [
+                {
+                  "id": "sandals",
+                  "name": "Sandals",
+                  "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/sandals",
+                  "subcategories": [
+                    {
+                      "id": "230400",
+                      "name": "Sandals men",
+                      "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/230400",
+                      "subcategories": []
+                    },
+                    {
+                      "id": "400300",
+                      "name": "Sandals women",
+                      "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/400300",
+                      "subcategories": []
+                    },
+                    {
+                      "id": "390200",
+                      "name": "Sandals youth",
+                      "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/390200",
+                      "subcategories": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "sunglasses",
+              "name": "Sunglasses",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/sunglasses",
+              "subcategories": []
+            },
+            {
+              "id": "caps",
+              "name": "Caps",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/caps",
+              "subcategories": []
+            },
+            {
+              "id": "tshirts",
+              "name": "T-Shirts",
+              "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/tshirts",
+              "subcategories": [
+                {
+                  "id": "250100",
+                  "name": "T-Shirts men",
+                  "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/250100",
+                  "subcategories": []
+                },
+                {
+                  "id": "260100",
+                  "name": "T-Shirts women",
+                  "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/260100",
+                  "subcategories": []
+                },
+                {
+                  "id": "270100",
+                  "name": "T-Shirts youth",
+                  "url": "/apparel-uk/catalogs/apparelProductCatalog/Online/categories/270100",
+                  "subcategories": []
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "rawHeaders": [
+      "Cache-Control",
+      "no-cache, no-store, max-age=0, must-revalidate",
+      "Content-Type",
+      "application/json",
+      "Date",
+      "Sat, 25 Aug 2018 00:58:09 GMT",
+      "Expires",
+      "0",
+      "Pragma",
+      "no-cache",
+      "Server",
+      "Apache-Coyote/1.1",
+      "Strict-Transport-Security",
+      "max-age=16070400 ; includeSubDomains",
+      "X-Content-Type-Options",
+      "nosniff",
+      "X-Frame-Options",
+      "SAMEORIGIN",
+      "X-XSS-Protection",
+      "1; mode=block",
+      "Content-Length",
+      "56712",
+      "Connection",
+      "Close"
+    ]
+  }
+]

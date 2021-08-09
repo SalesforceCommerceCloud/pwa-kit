@@ -1,0 +1,46 @@
+// Ratio
+// ===
+//
+// Root
+// ---
+//
+// 1. Position context for the `pw-ratio__inner` container
+
+.pw-ratio {
+    position: relative; // 1
+
+    display: block;
+    overflow: hidden;
+}
+
+
+// Fill
+// ---
+//
+// The fill is what applies the components ratio, occupying the physical space
+// in the DOM's flow.
+
+.pw-ratio__fill {
+    pointer-events: none;
+}
+
+
+// Inner
+// ---
+//
+// Should be the sole child of a Ratio container.
+//
+// 1. Absolute positioned relative to the parent `pw-ratio` container
+
+.pw-ratio__inner {
+    position: absolute; // 1
+    top: 0;
+    bottom: 0;
+    left: 0;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    max-height: 100%;
+}

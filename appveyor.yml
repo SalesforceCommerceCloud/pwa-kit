@@ -1,0 +1,45 @@
+# This script configures the build on continuous integration for Windows
+
+# Set the image to be used
+image:
+  - Visual Studio 2015
+
+# Set environment to the required version of node
+environment:
+  nodejs_version: "10"
+
+branches:
+  only:
+    - master
+    - develop
+
+# Install Scripts
+install:
+  # Install compatible version of chrome driver
+  # - choco install googlechrome --version 76.0.3809.132
+
+  # Get node version as listed in the enviroment
+  - ps: Install-Product node $env:nodejs_version
+
+  # Install npm version 5.7.1
+  - npm install -g npm@5.7.1
+
+  # Install the node dependencies
+  - npm ci
+
+# Disable automatic build phase
+build: off
+
+test_script:
+
+  # Print the version of node and npm that we are working with
+  - node --version
+  - npm --version
+
+  # Run fast unit tests
+  - npm run test
+
+  # Run the slow integration tests and end-to-end tests if the branch
+  # being merged to is the master branch
+  - if %APPVEYOR_REPO_BRANCH% == master (npm run test:integration)
+  # - if %APPVEYOR_REPO_BRANCH% == master (npm run test:e2e-ci)

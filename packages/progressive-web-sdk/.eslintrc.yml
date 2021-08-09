@@ -1,0 +1,10 @@
+env:
+  node: true
+  browser: true
+  jest: true
+rules:
+  # We're using Node 8, so we have to use require statements
+  import/no-commonjs: 'off'
+  react/prefer-stateless-function:
+    - error
+    - ignorePureComponents: true

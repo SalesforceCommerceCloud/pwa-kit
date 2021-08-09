@@ -1,0 +1,12 @@
+{
+    "index": {
+        "title": "Full Screen Mode",
+        "intro": "In this chapter you will learn best practices for designing great projects using the Mobify Platform."
+    },
+    "_homepage": {
+        "categories": {
+            "useCategoryList": true
+        }
+    }
+}
+

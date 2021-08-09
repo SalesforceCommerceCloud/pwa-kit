@@ -1,0 +1,27 @@
+// Text Content
+// ===
+//
+// This is used to apply text-based-content styles to a container. Think of a
+// blog post as an example of text content.
+
+.u-text-content {
+    .u-h1 {
+        text-transform: uppercase;
+    }
+
+    .u-h2 {
+        font-weight: $semi-bold-font-weight;
+    }
+
+    .u-h3 {
+        color: $brand-color;
+    }
+
+    .u-h4 {
+        text-transform: uppercase;
+    }
+
+    p + p {
+        margin-top: $unit;
+    }
+}

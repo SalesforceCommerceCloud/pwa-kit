@@ -1,0 +1,197 @@
+// AddToHomescreenIosBanner
+// ===
+//
+// This component is a banner with instructions on how to add the application to the homescreen of an ios device. It
+// only works with the safari browser of an ios device (We can only add the application to the homescreen from the
+// safari browser.).
+
+
+// Variables
+//
+$banner-border-color: #c0c0c0;
+$banner-background-color: #f7f8f8;
+
+// Media Queries for different ios devices.
+$iPad-1-2-mini-air: "only screen and (min-device-width: 768px) and (max-device-width: 1024px) and (-webkit-min-device-pixel-ratio: 1)"; // iPad 1, 2, mini, and air
+$iPad-3-4-pro9_7: "only screen and (min-device-width: 768px) and (max-device-width: 1024px) and (-webkit-min-device-pixel-ratio: 2)"; // iPad 3, 4, and Pro 9.7''
+$iPad-pro10_5: "only screen and (min-device-width: 834px) and (max-device-width: 1112px) and (-webkit-min-device-pixel-ratio: 2)"; // iPad Pro 10.5''
+$iPad-pro12_9: "only screen and (min-device-width: 1024px) and (max-device-width: 1366px) and (-webkit-min-device-pixel-ratio: 2)"; // iPad Pro 12.9''
+$iPhone-4-4s: "only screen and (min-device-width: 320px) and (max-device-width: 480px) and (-webkit-min-device-pixel-ratio: 2)";
+$iPhone-5-5s-5c-5se: "only screen and (min-device-width: 320px) and (max-device-width: 568px) and (-webkit-min-device-pixel-ratio: 2)"; // iPhone 5, 5S, 5C, and 5SE
+$iPhone-6-6s-7-7s-8: "only screen and (min-device-width: 375px) and (max-device-width: 667px) and (-webkit-min-device-pixel-ratio: 2) and (orientation: landscape)"; // iPhone 6, 6s, 7, 7s, and 8
+$iPhone-6p-6sp-7p-7sp-8p: "only screen and (min-device-width: 414px) and (max-device-width: 736px) and (-webkit-min-device-pixel-ratio: 3) and (orientation: landscape)"; // iPhone 6 plus, 6s plus, 7 plus, 7s plus, and 8 plus.
+$iPhone-X-XS: "only screen and (device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)"; // iPhone X and XS
+$iPhone-XR: "only screen and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)"; // iPhone XR
+$iPhone-XSM: "only screen and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)"; // iPhone XSM
+
+// AddToHomescreenIosBanner root
+// ---
+//
+
+// 1. This magic number is used to position the banner to either the bottom center of iPhones or top right corner of 
+// iPads. 
+// 2. This magic number is used to position the caret of the banner to point to the share button of the Safari browser.
+.pw-add-to-homescreen-ios-banner {
+    position: fixed;
+    right: 3%; // 1
+    bottom: 26px; // 1
+    z-index: $z4-depth;
+
+    display: none;
+    justify-content: space-between;
+    width: 94%; // 1
+    height: 50px; // 1
+    border: 1px solid $banner-border-color;
+
+    &.pw-inline-display {
+        position: static;
+        right: auto;
+        bottom: auto;
+        z-index: inherit;
+
+        display: flex;
+        justify-content: space-between;
+        max-width: 500px; //1
+        border: 1px solid $banner-border-color;
+
+        &:before,
+        &:after {
+            display: none;
+        }
+    }
+
+    &:before,
+    &:after {
+        content: '';
+
+        position: fixed;
+        z-index: $z4-depth;
+
+        width: 0;
+        height: 0;
+        border-style: solid;
+    }
+
+    &:before {
+        right: calc(50% - 19px); //2
+        bottom: -13px; //2
+
+        border-width: 20px; //2
+        border-color: $banner-border-color transparent transparent;
+    }
+
+    &:after {
+        right: calc(50% - 18px); //2
+        bottom: -11px; //2
+
+        border-width: 19px; //2
+        border-color: $banner-background-color transparent transparent;
+    }
+
+    @media (min-width: 569px) {
+        // All screens whose width is greater than 568px will show the banner at the top.
+        top: 25px; // 1
+        right: 21px; // 1
+
+        max-width: 500px; // 1
+
+        &:before {
+            top: -14px; //2
+
+            border-color: transparent transparent $banner-border-color;
+        }
+
+        &:after {
+            top: -12px; //2
+
+            border-color: transparent transparent $banner-background-color;
+        }
+    }
+
+    @media #{$iPad-1-2-mini-air}, #{$iPad-3-4-pro9_7}, #{$iPad-pro10_5}, #{$iPad-pro12_9} {
+        display: flex;
+
+        &:before {
+            right: 120px; //2
+        }
+
+        &:after {
+            right: 121px; //2
+        }
+    }
+
+    @media #{$iPhone-4-4s}, #{$iPhone-5-5s-5c-5se} {
+        display: flex;
+    }
+
+    @media #{$iPhone-6-6s-7-7s-8} {
+        display: flex;
+
+        &:before {
+            right: 100px; //2
+        }
+
+        &:after {
+            right: 101px; //2
+        }
+    }
+
+    @media #{$iPhone-6p-6sp-7p-7sp-8p} {
+        display: flex;
+
+        &:before {
+            right: 109px; //2
+        }
+
+        &:after {
+            right: 110px; //2
+        }
+    }
+
+    @media #{$iPhone-X-XS}, #{$iPhone-XR}, #{$iPhone-XSM} {
+        display: flex;
+
+        &:before {
+            right: 92px; //2
+        }
+
+        &:after {
+            right: 93px; //2
+        }
+    }
+}
+
+.pw-add-to-homescreen-ios-banner__close {
+    float: right;
+
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    width: 66px; // This number is from the design and it defines the size of the close button. 
+    height: 100%;
+    border-left: 1px solid $banner-border-color;
+}
+
+.pw-add-to-homescreen-ios-banner__instructions {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+}
+
+.pw-add-to-homescreen-ios-banner__add-to-homescreen-button {
+    margin-right: 10px;
+}
+
+.pw-add-to-homescreen-ios-banner__instruction-content {
+    line-height: 1;
+
+    .pw-add-to-homescreen-ios-banner__safari-share-button {
+        vertical-align: middle;
+    }
+}
+
+// Define a new icon size used by the Safari share icon.
+.pw-size-20 {
+    width: 20px;
+    height: 20px;
+}

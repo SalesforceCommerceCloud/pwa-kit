@@ -1,0 +1,243 @@
+.c-sidebar {
+    @include for-phone-only {
+        width: 80%;
+    }
+    @include for-tablet-only {
+        width: 70%;
+    }
+
+    width: calc(100% - #{$large-space});
+
+    &.c--hide {
+        display: none !important;
+    }
+
+    // need to place code here after .c--hide style so it will overide style
+    @include for-tablet-landscape-up {
+        width: $sidebar-width;
+
+        &.c--hide {
+            display: flex !important;
+        }
+    }
+}
+
+.sdk-sidebar__doc-title {
+    margin: 0;
+}
+
+/* Sidebar Accordion */
+/* 1. To absolutely position the accordion icon relative to accordion */
+/* 2. To align the icon to the text  */
+/* 3. A fix for Chrome Canary */
+
+.sdk-sidebar__accordion {
+    position: relative; /* 1 */
+    padding: $smallish-space $base-space $smallish-space $base-space;
+
+    width: 100%;
+
+    border-radius: unset; /* 3 */
+
+    background-color: $dark-accent-color;
+    color: $white;
+    text-align: left;
+
+    transition: color 0.2s ease-out;
+
+    border-style: none;
+}
+
+.sdk-sidebar__accordion.c--active {
+    background: $light-accent-color;
+}
+
+.sdk-sidebar__accordion:hover {
+    background: $light-accent-color;
+    cursor: pointer;
+}
+
+.sdk-sidebar__accordion ~ .sdk-sidebar__accordion-item {
+    visibility: hidden;
+}
+
+.sdk-sidebar__accordion.sdk--active ~ .sdk-sidebar__accordion-item {
+    visibility: visible;
+}
+
+.sdk-sidebar__accordion-title {
+    font-size: $smallish-font-size;
+    font-weight: bold;
+}
+
+.sdk-sidebar__accordion:before {
+    content: '';
+
+    position: absolute; /* 1 */
+    top: 18px; /* 2 */
+    left: 0;
+
+    width: 11px;
+    height: 11px;
+    background-size: 11px 11px;
+    margin-left: $base-space;
+
+    background-image: url('../icons/icon-plus.svg');
+
+    transform: rotate(0);
+
+    transition: transform 0.2s ease-out;
+}
+
+.sdk-sidebar__accordion.sdk--active:before {
+    transform: rotate(45deg);
+}
+
+.sdk-sidebar__accordion.sdk--active {
+    background: $darker-accent-color;
+}
+
+.sdk-sidebar__accordion.sdk--active::after {
+    content: '';
+
+    position: absolute; /* 1 */
+    right: 16px;
+    bottom: 0;
+    left: 16px;
+}
+
+.sdk-sidebar__accordion.sdk--active ~ .sdk-sidebar__accordion-item {
+    color: $white;
+    background: $dark-accent-color;
+}
+
+.sdk-sidebar__accordion-item,
+.c-sidebar__product-picker-item {
+    overflow: hidden;
+    max-height: 0;
+
+    transition: max-height 0.2s ease-out;
+}
+
+.sdk-sidebar__accordion.sdk--remove-transition ~ .sdk-sidebar__accordion-item {
+    transition: none;
+}
+
+.sdk-sidebar__link {
+    display: block;
+    padding: $smallish-space $base-space $smallish-space $base-space;
+    color: $white;
+}
+
+.sdk-sidebar__link.c--active {
+    background: $light-accent-color;
+}
+
+.sdk-sidebar__link:active, 
+.sdk-sidebar__link:focus,
+.sdk-sidebar__link:hover {
+    background: $light-accent-color;
+    color: $white;
+}
+
+.sdk-sidebar__list-link {
+    border-top-right-radius: 2px;
+    border-bottom-right-radius: 2px;
+    color: $white;
+    display: block;
+    font-size: $smallish-font-size;
+    margin: 1px 0;
+    overflow: hidden;
+    padding: $small-space $small-space $small-space $base-space;
+    text-decoration: none;
+    text-overflow: ellipsis;
+}
+
+/* Special padding for 3rd-level menu items */
+.sdk-sidebar__list li ul li ul a {
+    padding-left: 50px;
+}
+
+.sdk-sidebar__accordion-item a.c--active {
+    background-color: $light-accent-color;
+}
+
+.sdk-sidebar__list-link:hover,
+.sdk-sidebar__list-link:focus {
+    background: $light-accent-color;
+
+    color: $white;
+}
+
+.sdk-sidebar__accordion-item a:active {
+    background: $lighter-accent-color;
+
+    color: $white;
+}
+
+.sdk-sidebar__scroll {
+    overflow-y: scroll;
+
+    -webkit-overflow-scrolling: touch;
+}
+
+.sdk-sidebar__scroll::-webkit-scrollbar {
+    display: none;
+}
+
+.c-sidebar__product-picker {
+    button {
+        color: $white;
+        padding: 0;
+        border: 0;
+    }
+}
+
+.c-sidebar__product-picker-link {
+    display: block;
+
+    color: $white;
+
+    &:hover {
+        background: $light-accent-color;
+
+        color: $white;
+    }
+
+    &:active {
+        background: $lighter-accent-color;
+
+        color: $white;
+    }
+
+    &:focus {
+        color: $white;
+    }
+}
+
+
+.c-sidebar__product-picker-button {
+    outline: none;
+}
+
+.c-sidebar__product-picker-item ~ .c-sidebar__product-picker-item {
+    visibility: hidden;
+}
+
+.c-sidebar__product-picker-item.c--active ~ .c-sidebar__product-picker-item {
+    visibility: visible;
+}
+
+.c-sidebar__product-picker-chevron {
+    transition: transform 0.2s ease-out;
+
+    &.c--active {
+        transform: rotate(180deg);
+    }
+}
+
+.c-sidebar__doc-title {
+    &:hover {
+        background-color: $light-accent-color;
+    }
+}

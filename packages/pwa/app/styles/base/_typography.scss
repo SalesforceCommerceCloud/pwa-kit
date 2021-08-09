@@ -1,0 +1,112 @@
+// Typography
+// ===
+
+// Headers
+// ---
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    margin: 0;
+
+    font-family: $header-font-family;
+    font-weight: $regular-font-weight;
+    line-height: 1.25;
+
+    // Added with webfontloader. See loadFonts() in app/container.js
+    .wf-active & {
+        font-family: $loaded-header-font-family;
+    }
+}
+
+h1,
+%h1 {
+    font-weight: $light-font-weight;
+    font-size: $huge-font-size;
+    line-height: $huge-line-height;
+}
+
+h2,
+%h2 {
+    font-size: $bigger-font-size;
+    line-height: $bigger-line-height;
+}
+
+h3,
+%h3,
+h4,
+%h4 {
+    font-size: $big-font-size;
+    line-height: $big-line-height;
+}
+
+h5,
+%h5 {
+    font-size: $font-size + 2;
+    line-height: $line-height;
+}
+
+h6,
+%h6 {
+    font-size: $font-size;
+    line-height: $line-height;
+}
+
+
+// Text Elements
+// ---
+
+p {
+    margin: 0;
+}
+
+a {
+    color: $link-color;
+    text-decoration: none;
+
+    &:active,
+    &:focus {
+        color: $active-link-color;
+    }
+}
+
+b,
+strong {
+    font-weight: $semi-bold-font-weight;
+}
+
+small {
+    font-size: 80%;
+}
+
+
+// Miscellaneous Elements
+// ---
+//
+// 1. Address differences between Firefox and other browsers.
+
+hr {
+    box-sizing: content-box; // 1
+    height: 0; // 1
+    margin: ($unit * 2) 0;
+    border: $border;
+    border-width: 0 0 1px;
+
+    -moz-box-sizing: content-box; // 1
+}
+
+img {
+    max-width: 100%;
+    margin: 0;
+}
+
+blockquote {
+    margin: ($unit * 2) 0;
+    padding-left: $unit;
+    border-left: 2px solid $border-color;
+
+    color: lighten($font-color, 15);
+}

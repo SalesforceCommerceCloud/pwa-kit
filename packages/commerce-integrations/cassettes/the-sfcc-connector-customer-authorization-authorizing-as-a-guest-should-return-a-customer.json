@@ -1,0 +1,46 @@
+[
+  {
+    "scope": "https://mobify-tech-prtnr-na03-dw.demandware.net:443",
+    "method": "POST",
+    "path": "/s/2017refresh/dw/shop/v17_8/customers/auth",
+    "body": {
+      "type": "guest"
+    },
+    "status": 200,
+    "response": {
+      "_v": "17.8",
+      "_type": "customer",
+      "auth_type": "guest",
+      "customer_id": "ab7lR9eLoOFRm9lVCxMTPfObuF",
+      "preferred_locale": "default"
+    },
+    "rawHeaders": [
+      "Accept-Ranges",
+      "bytes",
+      "x-dw-request-base-id",
+      "7XbJ8KypgFt5AAAK",
+      "Allow",
+      "DELETE,OPTIONS,POST",
+      "x-dw-version-status",
+      "deprecated",
+      "Authorization",
+      "Bearer eyJfdiI6IjEiLCJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfdiI6IjEiLCJleHAiOjE1MzUxNjA1MDAsImlhdCI6MTUzNTE1ODcwMCwiaXNzIjoiNTY0MGNjNmItZjVlOS00NjZlLTkxMzQtOTg1M2U5ZjlkYjkzIiwic3ViIjoie1wiX3ZcIjpcIjFcIixcImN1c3RvbWVyX2luZm9cIjp7XCJjdXN0b21lcl9pZFwiOlwiYWI3bFI5ZUxvT0ZSbTlsVkN4TVRQZk9idUZcIixcImd1ZXN0XCI6dHJ1ZX19In0.dl8XgldAVo8SGRDrrSAdnbD_tnRnfYwIrohjhsPW78JgTif2kukQqnB74RgKHRx6U5CTBee8ktTVwqnmtguRT22BNYjnjcIKX4HE1grvG0MVs2f9HJSfap9SYzUk0ZqixJz5v-AP-qV2Xu3f4UstNTTbhRBBhy3rFH-wGno7e0Dh1KbLcx49rwBFH_lFjJEHvA0k9r70IXz4l9y4I8oqOr6uPPn5o-AKCf2xd90DkM16Y2NpG_mOX_gOmYm_m7hJzKuY4zU90SGc-GYkbBKfRPK3GthTr0LNXVsknydirpsZDI1hlBjrCxNz689-ogulCp37V20T0JJ_urMprMgv1PFSpgUtpnavy4CcGXjlW7BrGfrg4sOBVnFp4r1lRtSg3-RoGsk4N6kLozoGuuA2m0RSV1L2GIInWAkS_oKUAOp5V1YZ0-x9JG8e60DuGu1IXl2eTQodlj39zBlZQPo7MK9HHIZ2s_LM-10LzF6AXZ8",
+      "Cache-Control",
+      "no-cache, no-store, must-revalidate",
+      "Pragma",
+      "no-cache",
+      "Expires",
+      "Thu, 01 Dec 1994 16:00:00 GMT",
+      "Content-Type",
+      "application/json;charset=UTF-8",
+      "Content-Length",
+      "124",
+      "Date",
+      "Sat, 25 Aug 2018 00:58:20 GMT+00:00",
+      "Connection",
+      "close",
+      "Server",
+      "Apache"
+    ]
+  }
+]

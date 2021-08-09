@@ -1,0 +1,86 @@
+// Example Template Styles
+// ===
+//
+// Deprecated 🚨 since version 1.2. Will be deleted in a future version. 🚨
+//
+// If you need similar behaviour, please see our responsive grid documentation
+// https://docs.mobify.com/progressive-web/latest/guides/responsive-grid/
+//
+// This example.scss file is intended for use in the Progressive Web SDK Docs.
+// To view, run `npm run docs:dev` and visit here:
+//
+// @URL: http://localhost:9000/latest/components/#!/Grid
+// @URL: http://localhost:9000/latest/components/#!/GridSpan
+
+.t-example-template {
+    background-color: hsla(240, 100%, 96%, 1);
+}
+
+// Example Sub-Templates and Grid Breakpoint
+// ---
+
+.t-example-template__promo,
+.t-example-template__main,
+.t-example-template__aux {
+    position: relative;
+
+    &::before {
+        content: '';
+
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+
+        background-color: rgba(255, 0, 0, 0.2);
+    }
+}
+
+.t-example-template__aux {
+    background-color: rgba(250, 0, 0, 0.3);
+}
+
+.t-example-template__main {
+    background-color: rgba(250, 0, 0, 0.2);
+}
+
+@include susy-breakpoint($mobile-breakpoint, $mobile-layout) {
+    .t-example-template__promo,
+    .t-example-template__main,
+    .t-example-template__aux {
+        &::after {
+            content: ' Span of 4 columns (full width!)';
+        }
+    }
+}
+
+@include susy-breakpoint($tablet-breakpoint, $tablet-layout) {
+    .t-example-template__promo,
+    .t-example-template__main,
+    .t-example-template__aux {
+        &::after {
+            content: ' Span of 6 columns with empty column on left and right.';
+        }
+    }
+}
+
+@include susy-breakpoint($desktop-breakpoint, $desktop-layout) {
+    .t-example-template__promo {
+        &::after {
+            content: ' Span of 6 columns with 3 empty columns on left and right.';
+        }
+    }
+
+    .t-example-template__main {
+        &::after {
+            content: ' Span of 7 columns.';
+        }
+    }
+
+    .t-example-template__aux {
+        &::after {
+            content: ' Span of 5 columns.';
+        }
+    }
+}

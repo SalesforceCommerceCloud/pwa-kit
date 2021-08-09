@@ -1,0 +1,35 @@
+{
+    "function-glossary": {
+        "title": "Function Types"
+    },
+    "glossary": {
+        "title": "Glossary of Terms"
+    },
+    "ecommerce-schema": {
+        "title": "eCommerce Schema"
+    },
+    "analytics-schema": {
+        "title": "Analytics Schema"
+    },
+    "frame-bridge": {
+        "title": "Frame Bridge"
+    },
+    "modal-manager-and-actions": {
+        "title": "Modal Manager and Actions"
+    },
+    "browser-compatibility": {
+        "title": "Browser Compatibility Matrix"
+    },
+    "downloads": {
+        "title": "Downloads"
+    },
+    "javascript-utility-functions": {
+        "title": "JavaScript Utility Functions"
+    },
+    "upwa": {
+        "title": "Universal PWAs (Early Access)"
+    },
+    "mobify-cli-tool": {
+        "title": "Mobify CLI Tool Reference (Early Access)"
+    }
+}

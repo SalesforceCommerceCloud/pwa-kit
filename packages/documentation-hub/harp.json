@@ -1,0 +1,9 @@
+{
+    "globals": {
+        "PROJECT_NAME": "Documentation Home",
+        "SITE_TITLE": "Documentation - The Mobify Platform",
+        "SITE_DESCRIPTION": "Documentation to build, implement and run the Mobify Platform",
+        "PROD_ROOT": "/",
+        "DEV_ROOT": "/"
+    }
+}

@@ -1,0 +1,38 @@
+[
+    {
+        "scope": "https://mobify-tech-prtnr-na03-dw.demandware.net:443",
+        "method": "GET",
+        "path": "/s/2017refresh/dw/shop/v17_8/orders/1",
+        "body": "",
+        "status": 401,
+        "response": {
+            "_v": "17.8",
+            "fault": {
+                "type": "AuthorizationHeaderMissingException",
+                "message": "Unauthorized request: The 'Authorization' header is missing."
+            }
+        },
+        "rawHeaders": [
+            "Accept-Ranges",
+            "bytes",
+            "x-dw-request-base-id",
+            "sTQznREqQ11kAAAK",
+            "Cache-Control",
+            "no-cache, no-store, must-revalidate",
+            "Pragma",
+            "no-cache",
+            "Expires",
+            "Thu, 01 Dec 1994 16:00:00 GMT",
+            "Content-Type",
+            "application/json;charset=UTF-8",
+            "Content-Length",
+            "141",
+            "Date",
+            "Thu, 01 Aug 2019 18:06:09 GMT+00:00",
+            "Connection",
+            "close",
+            "Server",
+            "Apache"
+        ]
+    }
+]

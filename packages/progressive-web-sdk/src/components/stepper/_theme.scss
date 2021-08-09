@@ -1,0 +1,42 @@
+// Stepper Theme
+// ===
+
+$stepper__padding: $unit $unit*1.5;
+
+
+// Stepper Input
+// ---
+
+.pw-stepper__input {
+    padding: $stepper__padding;
+    border-right: 0;
+    border-left: 0;
+
+    text-align: center;
+}
+
+
+// Stepper Button
+// ---
+//
+// 1. web-kit default disabled style
+
+.pw-stepper__button {
+    padding: $stepper__padding;
+    border: $border;
+
+    background: $neutral-00;
+
+    color: $border-color;
+
+    fill: $border-color;
+
+    &[disabled] {
+        border-color: $disabled-border-color;
+
+        color: $tertiary-brand-color;
+
+        fill: $tertiary-brand-color;
+        -webkit-text-fill-color: $tertiary-brand-color; // 1
+    }
+}

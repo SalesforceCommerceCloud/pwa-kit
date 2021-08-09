@@ -1,0 +1,120 @@
+// Grid
+// ===
+
+// Only show this warning when this file is imported anywhere other than our docs
+@if (variable-exists('isStyleguidist') == false) {
+    @warn "🚨  The Grid component has been deprecated since version 1.2 and will be deleted in a future version of the SDK. If you need similar behaviour, please see our responsive grid documentation: https://bit.ly/2sT9emO";
+}
+
+// **Remember:** All the variables used below come from your project's
+// `_variable.scss` file! Look there to customize column counts, widths, and
+// gutter sizes.
+
+$grid__MOBILE_BREAKPOINT: 'mobile';
+$grid__TABLET_BREAKPOINT: 'tablet';
+$grid__DESKTOP_BREAKPOINT: 'desktop';
+
+
+// "Private" Mixin: Generate Modifiers
+// ---
+//
+// Creates classes for `span`, `pre`, `post` and `full-width`. Each class is
+// also paired with a breakpoint, so the output class will look something like:
+// `pw-grid__span.pw--span-1@mobile`, and so on. See the below "Grid Modifier"
+// section for more detail.
+
+@mixin grid__generate-modifiers($columnCount, $breakpoint) {
+    @for $i from 1 through $columnCount - 1 {
+        .pw-grid__span.pw--span-#{$i}\@#{$breakpoint} {
+            float: left;
+
+            width: span($i);
+            padding-right: gutter()/2;
+            padding-left: gutter()/2;
+        }
+    }
+
+    @for $i from 1 through ($columnCount - 1) {
+        .pw-grid__span.pw--pre-#{$i}\@#{$breakpoint} {
+            margin-left: span($i);
+        }
+
+        .pw-grid__span.pw--post-#{$i}\@#{$breakpoint} {
+            margin-right: span($i);
+        }
+    }
+
+    .pw-grid__span.pw--full-width\@#{$breakpoint} {
+        float: left;
+        clear: both;
+
+        width: 100%;
+        padding-right: gutter()/2;
+        padding-left: gutter()/2;
+    }
+}
+
+
+// Root
+// ---
+//
+// 1. Ensure that the grid container hides the overflowing children
+//    `.pw-grid__inner` container.
+
+.pw-grid {
+    overflow: hidden; // 1
+}
+
+
+// Grid Modifiers
+// ---
+//
+// Here is where we generate all the modifier classes necessary for all the
+// variations in grid spans and pre/post columns. Each modifier class has, in
+// addition to its name, also includes the breakpoint upon which it applies its
+// style. For example, a modifier class with `@mobile` in its classname will
+// only apply its styles at the "mobile" breakpoint, which is defined by the
+// `$mobile-breakpoint` variable.
+//
+// The modifier classes can be summarized as follows, but you can also see the
+// `grid__generate-modifiers` helper mixin, which is defined above.
+//
+// ### Spans
+//
+// For example `pw-grid__span.pw--span-4@mobile` is a container that spans four
+// columns of the grid. It applies this style on only the "mobile" breakpoint.
+//
+// ### Pre
+//
+// For example `pw-grid__span.pw--pre-4@tablet` adds an amount of `margin` equal
+// to four columns and their respective gutters to the "start" side (left for
+// Left-to- right text direction) of the span container. Useful for shifting
+// content over. It applies this style on only the "tablet" breakpoint.
+//
+// ### Post
+//
+// For example `pw-grid__span.pw--pre-4@desktop` adds an amount of `margin` equal
+// to four columns and their respective gutters to the "end" side (right for
+// Left-to- right text direction) of the span container. Useful for adding space
+// between adjacent spans. It applies this style only on the
+// "desktop" breakpoint.
+//
+// ### Full-Width
+//
+// For example `pw-grid__span.pw--full-width@mobile` sets the container to span
+// the full number of columns for the current grid context. If this example, the
+// "mobile" breakpoint's `$mobile-column-count` variable is set to four columns
+// then the full width modifier will span all four columns, and so on.
+
+
+@include susy-breakpoint($mobile-breakpoint, $mobile-layout) {
+    @include grid__generate-modifiers($mobile-column-count, $grid__MOBILE_BREAKPOINT);
+}
+
+@include susy-breakpoint($tablet-breakpoint, $tablet-layout) {
+    @include grid__generate-modifiers($tablet-column-count, $grid__TABLET_BREAKPOINT);
+}
+
+@include susy-breakpoint($desktop-breakpoint, $desktop-layout) {
+    @include grid__generate-modifiers($desktop-column-count, $grid__DESKTOP_BREAKPOINT);
+}

@@ -1,0 +1,142 @@
+// Padding Utilities
+// ===
+
+
+// padding all
+// ---
+
+
+.u-padding-xs {
+    padding: $very-small-space !important;
+}
+
+.u-padding-sm {
+    padding: $small-space !important;
+}
+
+.u-padding {
+    padding: $base-space !important;
+}
+
+.u-padding-lg {
+    padding: $large-space !important;
+}
+
+.u-padding-xl {
+    padding: $xlarge-space !important;
+}
+
+.u-padding-massive {
+    padding: $massive-space !important;
+}
+
+// Top padding
+// ---
+
+.u-padding-top-xs {
+    padding-top: $very-small-space !important;
+}
+
+.u-padding-top-sm {
+    padding-top: $small-space !important;
+}
+
+.u-padding-top {
+    padding-top: $base-space !important;
+}
+
+.u-padding-top-lg {
+    padding-top: $large-space !important;
+}
+
+.u-padding-top-xl {
+    padding-top: $very-large-space !important;
+}
+
+.u-padding-top-massive {
+    padding-top: $massive-space !important;
+}
+
+
+// Bottom padding
+// ---
+
+.u-padding-bottom-xs {
+    padding-bottom: $very-small-space !important;
+}
+
+.u-padding-bottom-sm {
+    padding-bottom: $small-space !important;
+}
+
+.u-padding-bottom {
+    padding-bottom: $base-space !important;
+}
+
+.u-padding-bottom-lg {
+    padding-bottom: $large-space !important;
+}
+
+.u-padding-bottom-xl {
+    padding-bottom: $very-large-space !important;
+}
+
+.u-padding-bottom-massive {
+    padding-bottom: $massive-space !important;
+}
+
+
+// Left padding
+// ---
+
+.u-padding-start-xs {
+    padding-left: $very-small-space !important;
+}
+
+.u-padding-start-sm {
+    padding-left: $small-space !important;
+}
+
+.u-padding-start {
+    padding-left: $base-space !important;
+}
+
+.u-padding-start-lg {
+    padding-left: $large-space !important;
+}
+
+.u-padding-start-xl {
+    padding-left: $very-large-space !important;
+}
+
+.u-padding-start-massive {
+    padding-left: $massive-space !important;
+}
+
+
+// Right padding
+// ---
+
+.u-padding-end-xs {
+    padding-right: $very-small-space !important;
+}
+
+.u-padding-end-sm {
+    padding-right: $small-space !important;
+}
+
+.u-padding-end {
+    padding-right: $base-space !important;
+}
+
+.u-padding-end-lg {
+    padding-right: $large-space !important;
+}
+
+.u-padding-end-xl {
+    padding-right: $very-large-space !important;
+}
+
+.u-padding-end-massive {
+    padding-right: $massive-space !important;
+}

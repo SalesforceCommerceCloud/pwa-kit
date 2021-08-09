@@ -1,0 +1,15 @@
+include ./icon
+
+mixin appbar(type, title)
+    if type == "compact"
+        - var back = ""
+        - for (i = 0; i < current.path.length - 2; i++) {
+        -     back = back + "/" + current.path[i]
+        - }
+        header.bg-white.h3.bb.b--black-20.shadow-3
+            .w-100.h-100.mw8.flex.items-center.justify-end.center.ph3
+                a(href="#{back}"): +icon("close")
+    else
+        header.bg-white.flex.justify-start.items-center.h4.util-small-shadow.util-min-width.mb6
+            .w-100.mw8.center.ph5-ns
+                h1.ma0.f2.gotham= title

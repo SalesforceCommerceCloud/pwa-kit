@@ -1,0 +1,213 @@
+import React from 'react'
+import PropTypes from 'prop-types'
+import {Provider} from 'react-redux'
+import {
+    Router as SDKRouter,
+    Route,
+    IndexRoute,
+    browserHistory
+} from 'progressive-web-sdk/dist/routing'
+import {ssrRenderingCompleted} from 'progressive-web-sdk/dist/utils/universal-utils'
+import Loadable from 'react-loadable'
+import PageLoader from './components/page-loader'
+import NonPWATemplate from './components/non-pwa-template'
+import SearchWrapper from './components/search/partials/search-wrapper'
+
+// Containers
+import App from '.'
+
+// Use Webpacks' import() with react-loadable to do code-splitting on a
+// per-component basis. We recommend doing this for pages in your app.
+
+export const ProductDetails = Loadable({
+    loader: () => import('./pages/product-details' /* webpackChunkName: "product-details" */),
+    loading: PageLoader
+})
+
+export const ProductList = Loadable({
+    loader: () => import('./pages/product-list' /* webpackChunkName: "product-list" */),
+    loading: PageLoader
+})
+
+export const Home = Loadable({
+    loader: () => import('./pages/home' /* webpackChunkName: "home" */),
+    loading: PageLoader
+})
+
+export const CartCheckout = Loadable({
+    loader: () => import('./pages/cart-checkout' /* webpackChunkName: "cart-checkout" */),
+    loading: PageLoader
+})
+
+export const BrandList = Loadable({
+    loader: () => import('./pages/brand-list' /* webpackChunkName: "brand-list" */),
+    loading: PageLoader
+})
+
+class Router extends React.Component {
+    constructor() {
+        super()
+    }
+
+    shouldComponentUpdate() {
+        // If server-side do not re-render after the initial render
+        // is complete.
+        return !ssrRenderingCompleted()
+    }
+
+    render() {
+        const {store, history} = this.props
+
+        return (
+            <Provider store={store}>
+                <SDKRouter history={history || SDKRouter.defaultProps.history}>
+                    <Route path="/" component={App}>
+                        <IndexRoute component={Home} />
+                        <Route path="/**/home-uk" component={Home} />
+                        <Route path="/**/home-us" component={Home} />
+                        <Route path="*/cart*" component={CartCheckout} />
+                        <Route path="*/checkout*" component={CartCheckout} />
+                        <Route path="*/COSummary-ShowConfirmation*" component={CartCheckout} />
+                        <Route path="*/Adyen-ShowConfirmation*" component={CartCheckout} />
+                        <Route component={NonPWATemplate} path="/**/account" />
+                        <Route component={NonPWATemplate} path="/**/*password" />
+                        <Route component={NonPWATemplate} path="/**/showotherwishlist" />
+                        <Route component={NonPWATemplate} path="/**/profile" />
+                        <Route component={NonPWATemplate} path="/**/addressbook" />
+                        <Route component={NonPWATemplate} path="/**/wallet" />
+                        <Route component={NonPWATemplate} path="/**/ndulgeaccount" />
+                        <Route
+                            component={NonPWATemplate}
+                            path="/**/Sites-spacenkgb-Site/en_GB/Account-Refer"
+                        />
+                        <Route
+                            component={NonPWATemplate}
+                            path="/**/Sites-spacenkus-Site/en_GB/Account-Refer"
+                        />
+                        <Route component={NonPWATemplate} path="/**/signup" />
+                        <Route component={NonPWATemplate} path="/**/orders" />
+                        <Route component={NonPWATemplate} path="/**/wishlist" />
+                        <Route component={NonPWATemplate} path="/**/Wishlist-Add" />
+                        <Route component={NonPWATemplate} path="/**/wishlistadd" />
+                        <Route component={NonPWATemplate} path="/**/NDULGE.html" />
+                        <Route component={NonPWATemplate} path="/**/EventsBooking.html" />
+                        <Route component={NonPWATemplate} path="/**/ndulge-faqs.html" />
+                        <Route component={NonPWATemplate} path="/**/stores" />
+                        <Route component={NonPWATemplate} path="/**/Stores/Stores-Details" />
+                        <Route component={NonPWATemplate} path="/**/inside-space" />
+                        <Route component={NonPWATemplate} path="/**/contactus" />
+                        <Route component={NonPWATemplate} path="/**/corporate-gifting.html" />
+                        <Route component={NonPWATemplate} path="/**/in-store-events.html" />
+                        <Route component={NonPWATemplate} path="/**/UK-Promotions-Page.html" />
+                        <Route component={NonPWATemplate} path="/**/refer-your-friend.html" />
+                        <Route component={NonPWATemplate} path="/**/new-brands.html" />
+                        <Route component={NonPWATemplate} path="/**/new-brands" />
+                        <Route
+                            component={NonPWATemplate}
+                            path="/**/same-day-delivery-coverage.html"
+                        />
+                        <Route
+                            component={NonPWATemplate}
+                            path="/**/customer-service/terms-conditions/terms.html"
+                        />
+                        <Route
+                            component={NonPWATemplate}
+                            path="/**/about-demandware/about-us.html"
+                        />
+                        <Route
+                            component={NonPWATemplate}
+                            path="/**/about-demandware/join-us/jobs-landing.html"
+                        />
+                        <Route
+                            component={NonPWATemplate}
+                            path="/**/margaret-dabbs-at-spacenk.htmll"
+                        />
+                        <Route component={NonPWATemplate} path="/**/GDPR-customer-data.html" />
+                        <Route
+                            component={NonPWATemplate}
+                            path="/**/GDPR-data-access-request.html"
+                        />
+                        <Route
+                            component={NonPWATemplate}
+                            path="/**/GDPR-data-deletion-request.html"
+                        />
+                        <Route
+                            component={NonPWATemplate}
+                            path="/**/affiliate-landing-page.html"
+                        />
+                        <Route component={NonPWATemplate} path="/**/be-in-the-know.html" />
+                        <Route component={NonPWATemplate} path="/**/Experts-Edit-19.html" />
+                        <Route component={NonPWATemplate} path="/**/sitemap" />
+                        <Route
+                            component={NonPWATemplate}
+                            path="/**/AW19-Inside-Space-Magazine.html"
+                        />
+                        <Route component={NonPWATemplate} path="/**/in-the-frow.html" />
+                        <Route component={NonPWATemplate} path="/**/about-klarna.html" />
+                        <Route component={NonPWATemplate} path="/**/US-Promotions-Page.html" />
+                        <Route
+                            component={NonPWATemplate}
+                            path="/**/about-spacenk/about-us.html"
+                        />
+                        <Route component={NonPWATemplate} path="/**/jobs-landing.html" />
+                        <Route
+                            component={NonPWATemplate}
+                            path="/**/SpaceNK-and-eSSENTIAL-Accessibility.html"
+                        />
+                        <Route
+                            component={NonPWATemplate}
+                            path="/**/thank-you-for-signing-up.html"
+                        />
+                        <Route component={NonPWATemplate} path="/inside-space.html" />
+                        <Route component={NonPWATemplate} path="/Page-Show" />
+                        <Route component={NonPWATemplate} path="/christmas-2019.html" />
+                        <Route
+                            component={NonPWATemplate}
+                            path="/Christmas19-Inside-Space-Magazine.html"
+                        />
+                        <Route component={NonPWATemplate} path="/party-favours-19.html" />
+                        <Route component={NonPWATemplate} path="/holiday-2019.html" />
+                        <Route component={NonPWATemplate} path="/hp_slot_" />
+                        <Route component={NonPWATemplate} path="/black-friday-beauty-deals.html" />
+                        <Route component={NonPWATemplate} path="/*-redirect.html" />
+                        <Route component={NonPWATemplate} path="/**/la-mer.html" />
+                        <Route component={NonPWATemplate} path="/**/erborian.html" />
+                        <Route component={NonPWATemplate} path="/**/19_wk29_splash*" />
+                        <Route component={NonPWATemplate} path="/**/de-mamiel.html" />
+                        <Route component={NonPWATemplate} path="/**/about-us.html" />
+                        <Route
+                            component={SearchWrapper}
+                            path="/**/search"
+                            routeName="search-results"
+                        />
+                        <Route component={BrandList} path="/**/brands" routeName="brand-list" />
+                        <Route component={BrandList} path="/**/marken" routeName="brand-list" />
+                        <Route component={BrandList} path="/**/marques" routeName="brand-list" />
+                        <Route component={BrandList} path="/**/marcas" routeName="brand-list" />
+                        <Route component={BrandList} path="/**/品牌" routeName="brand-list" />
+                        <Route path="/**/Product-Show*" component={ProductDetails} />
+                        <Route path="/**/Product-Variation*" component={ProductDetails} />
+                        <Route
+                            path="/**/((\\w|-)*)(MUK|MUS)(\\d*):productId.html"
+                            component={ProductDetails}
+                        />
+
+                        <Route path="/**/*" component={ProductList} routeName="product-list" />
+                    </Route>
+                </SDKRouter>
+            </Provider>
+        )
+    }
+}
+
+Router.defaultProps = {
+    history: browserHistory,
+    store: {}
+}
+
+Router.propTypes = {
+    history: PropTypes.object,
+    store: PropTypes.object
+}
+
+export default Router

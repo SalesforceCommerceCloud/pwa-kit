@@ -1,0 +1,30 @@
+// Overlay
+// ===
+//
+// Overlay sheet that used when menu is open and when user click on overlay and it will hide sheet
+//
+// Add c--active class to show overlay
+
+
+.c-overlay {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: $z4-depth;
+
+    display: none;
+
+    &.c--active {
+        display: block;
+    }
+
+    &.c--transparent {
+        background: rgba(0, 0, 0, 0);
+    }
+
+    &.c--transparent-half {
+        background: linear-gradient(to bottom, rgba(0, 0, 0, 0) $unit*6.75, rgba(0, 0, 0, 0.5) $unit*6.75);
+    }
+}

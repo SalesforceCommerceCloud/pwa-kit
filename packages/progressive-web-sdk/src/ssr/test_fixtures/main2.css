@@ -1,0 +1,123 @@
+/* * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
+/* Copyright (c) 2018 Mobify Research & Development Inc. All rights reserved. */
+/* * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
+
+/* These rules should appear in output CSS */
+* {
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box
+}
+
+html {
+    -ms-text-size-adjust: 100%;
+    -webkit-text-size-adjust: 100%;
+    color: #333;
+    font-family: San Francisco, Roboto, Fira Sans, Segoe UI, sans-serif;
+    font-size: 14px;
+    line-height: 20px
+}
+
+body {
+    margin: 0;
+}
+
+/* These rules are used for testing different url paths */
+.no-directory.single-quote {
+    background-image: url('test-image.png')
+}
+
+.no-directory.double-quote {
+    background-image: url("test-image.png")
+}
+
+.no-directory.no-quote {
+    background-image: url(test-image.png)
+}
+
+.current-directory.single-quote {
+    background-image: url('./test-image.png')
+}
+
+.current-directory.double-quote {
+    background-image: url("./test-image.png")
+}
+
+.current-directory.no-quote {
+    background-image: url(./test-image.png)
+}
+
+.parent-directory.single-quote {
+    background-image: url('../test-image.png')
+}
+
+.parent-directory.double-quote {
+    background-image: url("../test-image.png")
+}
+
+.parent-directory.no-quote {
+    background-image: url(../test-image.png)
+}
+
+.protocol.single-quote {
+    background-image: url('file://test-image.png')
+}
+
+.protocol.double-quote {
+    background-image: url("file://test-image.png")
+}
+
+.protocol.no-quote {
+    background-image: url(file://test-image.png)
+}
+
+.relative-protocol.single-quote {
+    background-image: url('//test-image.png')
+}
+
+.relative-protocol.double-quote {
+    background-image: url("//test-image.png")
+}
+
+.relative-protocol.no-quote {
+    background-image: url(//test-image.png)
+}
+
+.absolute.single-quote {
+    background-image: url('/test-image.png')
+}
+
+.absolute.double-quote {
+    background-image: url("/test-image.png")
+}
+
+.absolute.no-quote {
+    background-image: url(/test-image.png)
+}
+
+/* These CSS rules should not appear in output CSS */
+figure {
+    margin: 1em 40px
+}
+
+pre {
+    overflow: auto
+}
+
+code, kbd, pre, samp {
+    font-family: monospace, monospace;
+    font-size: 1em
+}
+
+main, menu {
+    display: block
+}
+
+audio, canvas, progress, video {
+    vertical-align: initial
+}
+
+audio:not([controls]) {
+    display: none;
+    height: 0
+}

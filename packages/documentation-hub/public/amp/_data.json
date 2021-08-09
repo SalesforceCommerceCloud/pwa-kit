@@ -1,0 +1,24 @@
+{   
+    "index": {
+        "layout": "../_layouts/homepage",
+        "name": "Designing for AMP",
+        "tagline": "Resources, best practice tips, industry learnings and live examples to help with your next AMP project."
+    },
+    "_homepage": {
+        "categories": {
+            "useCategoryList": true
+        }
+    },
+    "fundamentals": {
+        "title": "Fundamentals",
+        "intro": "An introduction to AMP and what every designer needs to be aware of."
+    },
+    "learning-amp": {
+        "title": "Learning AMP",
+        "intro": "Get familiar with the AMP technology and the tools that are available."
+    },
+    "designing-for-amp": {
+        "title": "Designing For AMP",
+        "intro": "How to structure the design phase, and how to go about designing the AMP UI."
+    }
+}

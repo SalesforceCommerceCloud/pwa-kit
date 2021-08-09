@@ -1,0 +1,23 @@
+// Example Email Subscribe Form
+// ===
+//
+// 1. Ensure that button align with input field
+// 2. Override flex style
+
+.c-email-subscribe {
+    .pw-field__input {
+        display: block; // 2
+    }
+
+    .pw-field-row {
+        max-width: 25em;
+    }
+}
+
+.c-email-subscribe__button {
+    .pw-field__label {
+        width: 1px; // 1
+        visibility: hidden; // 1
+        white-space: nowrap; // 1
+    }
+}

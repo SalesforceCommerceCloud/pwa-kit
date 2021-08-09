@@ -1,0 +1,13 @@
+// Divider Component
+// ===
+//
+// The c-divider component creates a horizontal line
+
+.c-divider,
+%c-divider {
+    width: 100%;
+    height: 1px;
+    border: 0;
+
+    background-color: $border-color;
+}

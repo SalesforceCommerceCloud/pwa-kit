@@ -1,0 +1,30 @@
+{
+    "requirements-and-assets": {
+        "title": "Requirements and Assets",
+        "intro": "Requirements and assets to generate a webpush project."
+    },
+    "hosting-option": {
+        "title": "Hosting Option",
+        "intro": "Understand the difference between Mobify Hosted Web Push and Client Hosted Web Push"
+    },
+    "project-generator": {
+        "title": "Project Generator",
+        "intro": "A project generator tool that will give the developer a set of files to start from."
+    },
+    "webpush-configurations": {
+        "title": "Webpush Configurations",
+        "intro": "Availble webpush settings allowed for customer customization including split testing."
+    },
+    "webpush-api": {
+        "title": "Webpush API",
+        "intro": "A quick description of the Webpush APIs used in generator and references the Webpush API documentation."
+    },
+    "styling": {
+        "title": "Styling",
+        "intro": "Styling web push assets."
+    },
+    "analytics": {
+        "title": "Analytics",
+        "intro": "Understand the analytics that are being collected with Webpush."
+    }
+}

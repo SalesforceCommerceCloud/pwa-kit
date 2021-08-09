@@ -1,0 +1,17 @@
+// SkeletonText
+// ===
+//
+// A skeleton component that mimics lines of text on a page.
+
+.pw-skeleton-text {
+    // Root Class. Contains all core styles, typically for the component's
+    // wrapper element.
+}
+
+
+// Sub components
+// ---
+
+.pw-skeleton-text__line {
+    display: inline-block;
+}

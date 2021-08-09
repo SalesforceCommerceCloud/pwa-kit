@@ -1,0 +1,19 @@
+// Price
+// ===
+
+.pw-price {
+    display: inline-flex;
+    align-items: baseline;
+}
+
+
+// Modifier Stacked price
+// ---
+
+.pw-price.pw--stack {
+    flex-direction: column;
+
+    .pw-price__previous {
+        margin: $sub-unit 0 0;
+    }
+}

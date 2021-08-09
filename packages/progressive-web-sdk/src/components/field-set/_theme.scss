@@ -1,0 +1,53 @@
+// FieldSet Theme
+// ===
+
+
+// Root
+// ---
+
+.pw-field-set {
+    + .pw-field-set {
+        margin-top: $unit;
+        padding-top: $unit;
+
+        &:not(.pw--grey) {
+            border-top: $border;
+        }
+    }
+}
+
+
+// FieldSet Legend
+// ---
+//
+// 1. Floating the legend so it will sit inside <field-set>'s padding
+//    and border
+
+.pw-field-set__legend {
+    width: 100%;
+    margin-bottom: $sub-unit*3;
+}
+
+
+// Modifier: Grey block
+// ---
+//
+// @TODO: Is this grey block example theme necessary? Does it represent base
+//        functionality in some way?
+//
+// .pw-field-set.pw--grey {
+//     padding: $unit;
+//
+//     background: $neutral-05;
+//
+//     + .pw-field-set.pw--grey {
+//         margin-top: 0;
+//         border-top: 0;
+//     }
+//
+//     .pw-field-set__legend {
+//         display: inline-block;
+//
+//         background: $neutral-05;
+//     }
+// }

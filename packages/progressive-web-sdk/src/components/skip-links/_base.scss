@@ -1,0 +1,34 @@
+// SkipLinks
+// ===
+//
+// 1. Above everything, but underneath modals and their masks
+
+$skip-links__z-index: 99; // 1
+
+.pw-skip-links__anchor {
+    position: absolute;
+    top: $unit;
+    left: -10000px;
+    z-index: $skip-links__z-index;
+
+    display: inline-block;
+    overflow: hidden;
+    width: 1px;
+    height: 1px;
+    padding: $unit/2 $unit;
+    border: 1px solid $neutral-60;
+
+    background-color: #fff;
+
+    color: $neutral-60;
+
+    &:active,
+    &:focus {
+        left: 50%;
+
+        width: auto;
+        height: auto;
+
+        transform: translateX(-50%);
+    }
+}

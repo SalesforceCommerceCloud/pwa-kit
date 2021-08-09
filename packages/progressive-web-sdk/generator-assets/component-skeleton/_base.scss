@@ -1,0 +1,33 @@
+// <%= context.Name %>
+// ===
+//
+// Component description here
+
+
+// Variables
+// ---
+
+
+// <%= context.Name %> root
+// ---
+
+.<%= context.COMPONENT_NAMESPACE %>-<%= context.dirname %> {
+    // Root Class. Contains all core styles, typically for the component's
+    // wrapper element.
+}
+
+
+// Modifiers
+// ---
+//
+// .<%= context.COMPONENT_NAMESPACE %>-<%= context.dirname %>.<%= context.COMPONENT_NAMESPACE %>--modifier {
+//     ...
+// }
+
+
+// Sub components
+// ---
+//
+// .<%= context.COMPONENT_NAMESPACE %>-<%= context.dirname %>__sub-component {
+//     ...
+// }

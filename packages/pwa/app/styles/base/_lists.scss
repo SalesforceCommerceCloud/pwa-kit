@@ -1,0 +1,40 @@
+// Lists
+// ===
+
+
+// Ordered and Unordered Lists
+// ---
+//
+// We default to unstyled lists because they seem to be a more common usecase.
+// Use the extensions to re-add the defaults back in.
+//
+// It is our recommendation that instead of styling the ul and ol directly that
+// you create a list component that can be added to lists when needed.
+
+ul,
+ol {
+    margin: 0;
+    padding: 0;
+
+    list-style-type: none;
+}
+
+
+// Definition Lists
+// ---
+
+dl {
+    margin-bottom: $unit;
+
+    line-height: $line-height;
+}
+
+dt {
+    margin-top: $unit;
+
+    font-weight: $semi-bold-font-weight;
+}
+
+dd {
+    margin: 0;
+}

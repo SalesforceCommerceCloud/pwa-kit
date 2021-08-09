@@ -1,0 +1,97 @@
+// Layout utils
+// ===
+
+// Floats
+// ---
+//
+// Writing-direction independent floats. For RTL stylesheets, re-define
+// these styles with the opposite direction. Templates need not be changed.
+
+.u-float-start {
+    float: left;
+}
+
+.u-float-end {
+    float: right;
+}
+
+
+// Contain floats
+// ---
+//
+// Contain all floated children and their margins.
+//
+// 1. Avoid an Opera bug when the contenteditable attribute is included anywhere
+//    else in the document.
+// 2. Contain the the first child’s top margin. Ensures rendering is consistent
+//    with the other common clearfix method, `overflow: hidden`.
+
+.u-clearfix {
+    &::before,
+    &::after {
+        content: ' '; // 1
+
+        display: table; // 2
+    }
+
+    &::after {
+        clear: both;
+    }
+}
+
+
+// Positioning relative
+// ---
+//
+// Create a new positioning context.
+
+.u-position-relative {
+    position: relative;
+}
+
+
+// Positioning absolute
+// ---
+//
+// Create a new positioning context.
+
+.u-position-absolute {
+    position: absolute;
+}
+
+
+// Positioning fixed
+// ---
+//
+// Create a new positioning context.
+
+.u-position-fixed {
+    position: fixed;
+}
+
+
+// Positioning coordinate
+// ---
+
+.u-position-top {
+    top: 0;
+}
+
+.u-position-right {
+    right: 0;
+}
+
+.u-position-bottom {
+    bottom: 0;
+}
+
+.u-position-left {
+    left: 0;
+}
+
+.u-position-full {
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+}

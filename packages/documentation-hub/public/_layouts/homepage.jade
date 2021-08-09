@@ -1,0 +1,22 @@
+extends ../../node_modules/@mobify/documentation-theme/layouts/base
+include ../../node_modules/@mobify/documentation-theme/mixins/block-contents
+
+include ../_partials/large-header
+
+append config
+    - hasPicker = false
+    - title = `${name} | ${SITE_TITLE}`
+
+block main
+    .u-flexbox.u-flex-column.u-height-full-vh
+        +largeHeader(name, tagline)
+        main.c-contain.c-text-content.u-flex.u-margin-bottom-xl.u-margin-start-auto.u-margin-end-auto(class='c--medium')
+            block content
+                != yield
+            +blockContents
+        //- Indicates this is the homepage of the site, where we don't need the footer
+        if current.path.length > 1
+            footer.t-footer.u-flex-none.u-background-neutral-40.u-padding-top-xl.u-padding-bottom-xl
+                div.c-contain.u-margin-bottom-xl.u-margin-start-auto.u-margin-end-auto.u-text-align-center
+                    p.u-margin-bottom Haven’t found what you’re looking for?
+                    a(href='/') Go back to the Mobify Documentation home page

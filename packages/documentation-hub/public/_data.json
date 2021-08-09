@@ -1,0 +1,123 @@
+{
+    "404": {
+        "layout": "_layouts/404"
+    },
+    "search": {
+        "layout": "_layouts/search"
+    },
+    "index": {
+        "layout": "_layouts/homepage",
+        "name": "Mobify Documentation Home",
+        "tagline": "The Mobify™ Platform"
+    },
+    "_homepage": {
+        "developers": {
+            "title": "The Mobify Platform",
+            "intro": "The Mobify Platform consists of the latest mobile technology and best practices, adapted specifically for retailers. Features like Progressive Web Apps, Accelerated Mobile Pages (AMP), and native apps come together to create fast, engaging mobile experiences that convert visitors and drive revenue for your business.",
+            "blocks": [
+                {
+                    "title": "Progressive Web Apps",
+                    "info": "Progressive Web Apps deliver app-like experiences to your mobile web users",
+                    "button": "Web Frameworks",
+                    "href": "/progressive-web/latest/"
+                },
+                {
+                    "title": "Accelerated Mobile Pages ⚡️ (AMP)",
+                    "info": "AMP provides a near-instant first page load when your customers arrive through search engines and distribution platforms.",
+                    "button": "Create AMP Pages",
+                    "href": "/amp-sdk/latest/"
+                },
+                {
+                    "title": "Commerce Integrations",
+                    "info": "Build a common data layer for your PWA or AMP apps using our customizable API abstraction for your ecommerce backend.",
+                    "button": "Get Started",
+                    "href": "/progressive-web/latest/integrations/commerce-integrations/"
+                },
+                {
+                    "title": "Release Notes",
+                    "info": "Stay informed on the latest releases and how they apply to your existing deployment.",
+                    "button": "See the Latest Enhancements",
+                    "href": "platform/release-notes/"
+                },
+                {
+                    "title": "Compatibility Matrix",
+                    "info": "Check the latest platforms, devices, and browsers supported by the Mobify Platform.",
+                    "button": "View Compatibility",
+                    "href": "platform/compatibility/"
+                },
+                {
+                    "title": "Support Policy",
+                    "info": "Review our shared responsibility model, and our policies for product releases, upgrades, and product end of life.",
+                    "button": "Learn about Our Support",
+                    "href": "platform/support/"
+                }
+            ]
+        },
+        "designers": {
+            "title": "Guides for Designers",
+            "intro": "Use Mobify’s design best practices to create a great mobile experience.",
+            "blocks": [
+                {
+                    "title": "Mobify Platform Design Process",
+                    "info": "A collection of guides for designers creating performant interactions with the Mobify Platform.",
+                    "button": "Design Documentation",
+                    "href": "/design/"
+                },
+                {
+                    "title": "Designing for Accelerated Mobile Pages ⚡️ (AMP)",
+                    "info": "Resources, best practices, tips, and examples to work from upon kicking off a new AMP project.",
+                    "button": "Designing for AMP",
+                    "href": "/amp/"
+                },
+                {
+                    "title": "Designing Native Apps",
+                    "info": "Best practices and guidance on using components from the Astro framework alongside Mobify SDK components to deliver a native experience.",
+                    "button": "Designing Apps",
+                    "href": "/native-apps/"
+                }
+            ]
+        },
+        "marketers": {
+            "title": "Guides for Marketers",
+            "intro": "Manage and optimize campaigns within the Mobify Platform via the Connection Center.",
+            "blocks": [
+                {
+                    "title": "Connection Center",
+                    "info": "Learn about the core features of the Connection Center to create powerful customer engagement.",
+                    "button": "Learn Connection Center",
+                    "href": "/connection-center/"
+                }
+            ]
+        },
+        "deprecated": {
+            "title": "Older Mobify Products",
+            "intro": "These Mobify products are maintained but new projects created with the Mobify Platform will not use these technologies.",
+            "blocks": [
+                {
+                    "title": "Web Experience Framework (Adaptive.js)",
+                    "info": "Adaptive.js is the JavaScript framework that powers Mobify’s Web Experience Framework for building amazing mobile frontends without changing your backend.",
+                    "button": "Adaptive.js Framework",
+                    "href": "http://adaptivejs.mobify.com"
+                },
+                {
+                    "title": "Native Apps",
+                    "info": "Deliver the best of native iOS and Android apps to your most loyal customers seeking you out in the app stores.",
+                    "button": "App Frameworks",
+                    "href": "http://astro.mobify.com"
+                },
+                {
+                    "title": "Web Push Notifications",
+                    "info": "Web push notifications enable your users to receive notifications on their device through a web browser without installing an app. Web push notifications are now part of Mobify's Progressive Web Apps.",
+                    "button": "Push Messaging",
+                    "href": "/messaging/"
+                },
+                {
+                    "title": "Store Drivers",
+                    "info": "Deliver contextualized, location-enriched engagement to customers to drive traffic to physical stores.",
+                    "button": "Set Up Store Drivers",
+                    "href": "/store-drivers/"
+                }
+            ]
+        }
+    }
+}

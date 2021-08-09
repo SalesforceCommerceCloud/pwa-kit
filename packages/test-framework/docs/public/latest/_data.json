@@ -1,0 +1,9 @@
+{
+    "index": {
+        "title": "Mobify Test Framework",
+        "intro": "A collection of CLI utilities to test your PWA project."
+    },
+    "changelog": {
+        "title": "Changelog"
+    }
+}

@@ -1,0 +1,103 @@
+// Accordion
+// ===
+
+.pw-accordion__content-wrapper {
+    overflow: hidden;
+}
+
+
+// Accordion Header
+// ---
+//
+// 1. Ensure the button element extends to full width
+// 2. Override base buttons tyles
+
+.pw-accordion__header {
+    width: 100%; // 1
+    padding: 0; // 2
+    border: 0; // 2
+
+    background: none; // 2
+}
+
+
+// Accordion Inner Header
+// ---
+//
+// 1. Remove default styles present on common root elements.
+// 2. Ensure in iOS 5 and 6 that flex-direction isn't inherited from
+//    any flexbox parents that has flex-direction set to direction-row-reverse
+
+.pw-accordion__inner-header {
+    display: flex;
+    flex-direction: row; // 2
+    min-height: $tap-size;
+    margin: 0; // 1
+    padding: 0; // 1
+
+    list-style: none; // 1
+
+    &.pw--icon-end {
+        flex-direction: row-reverse;
+    }
+}
+
+
+// Accordion Header Icon
+// ---
+//
+// 1. `.pw-accordion__close-icon` is positioned absolute
+//    to this container
+// 2. Position absolute to `.pw-accordion__icon`
+// 3. Ensure width collapses in old implementations.
+
+.pw-accordion__icon {
+    position: relative; // 1
+
+    flex: initial;
+    width: auto; // 3
+    min-width: $tap-size;
+
+    text-align: center;
+
+    .pw-icon {
+        pointer-events: none;
+    }
+}
+
+.pw-accordion__close-icon {
+    position: absolute; // 2
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+
+    opacity: 0;
+}
+
+
+// Accordion Header
+// ---
+//
+// 1. Ensure inline elements are treated as block-level.
+// 2. Prevent width collapsing in old implementations.
+
+.pw-accordion__title {
+    display: block; // 1
+    flex: 1 1 auto;
+    width: 100%; // 2
+}
+
+
+// States: Opened state
+// ---
+
+.pw-accordion__item.pw-accordion--is-open {
+    & > .pw-accordion__header .pw-accordion__open-icon {
+        opacity: 0;
+    }
+
+    & > .pw-accordion__header .pw-accordion__close-icon {
+        opacity: 1;
+    }
+}

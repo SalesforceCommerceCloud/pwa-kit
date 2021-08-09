@@ -1,0 +1,184 @@
+// Global Generic / Reset Styles
+// ===
+
+*,
+*::after,
+*::before {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    min-height: 100%;
+
+    color: $font-color;
+    font-family: $base-font-family;
+    font-weight: $base-font-weight;
+    font-size: $base-font-size;
+    line-height: $base-line-height;
+
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+button,
+input,
+optgroup,
+select,
+textarea {
+  font: inherit;
+  margin: 0;
+}
+
+html,
+body,
+div,
+span,
+applet,
+object,
+iframe,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+blockquote,
+pre,
+a,
+abbr,
+acronym,
+address,
+big,
+cite,
+code,
+del,
+dfn,
+em,
+img,
+ins,
+kbd,
+q,
+s,
+samp,
+small,
+strike,
+strong,
+sub,
+sup,
+tt,
+var,
+b,
+u,
+i,
+dl,
+dt,
+dd,
+ol,
+ul,
+li,
+fieldset,
+form,
+label,
+legend,
+table,
+caption,
+tbody,
+tfoot,
+thead,
+tr,
+th,
+td,
+article,
+aside,
+canvas,
+details,
+embed,
+figure,
+figcaption,
+footer,
+header,
+hgroup,
+menu,
+nav,
+output,
+ruby,
+section,
+summary,
+time,
+mark,
+audio,
+video {
+    margin: 0;
+    padding: 0;
+    border: 0;
+
+    vertical-align: baseline;
+}
+
+input {
+    font-family: $base-font-family;
+    font-size: $smallish-font-size;
+}
+
+article,
+aside,
+details,
+figcaption,
+figure,
+footer,
+header,
+hgroup,
+menu,
+nav,
+section,
+main {
+    display: block;
+}
+
+img {
+    max-width: 100%;
+    height: auto;
+}
+
+svg {
+    fill: currentColor;
+}
+
+table {
+    border-spacing: 0;
+    border-collapse: collapse;
+}
+
+code {
+    padding: 0 $very-small-space;
+    border: 1px solid $code-border-color;
+
+    background-color: $code-color;
+
+    font-family: $mono-font-family;
+    font-size: $smaller-font-size;
+}
+
+[hidden] {
+    display: none !important;
+}
+
+// Hide section anchors unless hovered
+h2>a[name],
+h3>a[name],
+h4>a[name],
+h5>a[name],
+h6>a[name] {
+    font-size: 1.125rem;
+    visibility: hidden;
+}
+
+h2:hover > a[name],
+h3:hover > a[name],
+h4:hover > a[name],
+h5:hover > a[name],
+h6:hover > a[name] {
+    visibility: visible;
+}

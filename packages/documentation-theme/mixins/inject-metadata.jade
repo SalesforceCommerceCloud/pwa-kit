@@ -1,0 +1,64 @@
+//-
+    This mixin is meant to inject a "metaData" variable into the current context
+    that includes information found in _data.json for things like title, intro
+    etc.
+
+    Usage:
+        include ./mixins/inject-metadata
+
+        append config
+            var metaData = {}
+            +injectMetadata
+
+mixin injectMetadata
+    //- current.path looks like:
+        ['latest', 'index']
+        ['latest', 'getting-started', 'quick-start', 'index']
+    - var devMode = environment === 'development'
+    - var path = [].concat(current.path)
+    - devMode && console.log('Path:', path)
+
+    //- public contains all the metadata from _data.json files
+        public = {
+            "latest": {
+                "_data": {
+                    "index": {
+                        "title": "Homepage"
+                    },
+                    "getting-started": {
+                        "title": "Getting Started"
+                    }
+                },
+                "getting-started": [...]
+    - var node = public[path[0]]
+
+    - var pathLength = path.length
+    //- Path lengths of 1 or 2 mean the root index page or the index page under
+        `latest`. In this case, we actually want to use that slug name.
+    - var lastIndex = pathLength <= 2 ? 1 : 2
+    - var slug = path[pathLength - lastIndex]
+
+    //- Recursively traverse the path array, using each index as a key lookup in
+        the `_data` child objects of `public` until we find the one we want.
+    -
+        var findData = function(slug, node, path) {
+            if (!node || !node._data) {
+                devMode && console.log(`No Metadata found for`, slug)
+                return {}
+            }
+
+            if (node._data[slug]) {
+                return node._data[slug]
+            } else {
+                //- If `_data` doesn't have a key for the current index, remove it
+                //- from the array and continue through the tree.
+                var pathSection = path.splice(0, 1)
+                return findData(slug, node[pathSection], path)
+            }
+        }
+
+    -
+        if (node) {
+            path.splice(0, 1)
+            metaData = findData(slug, node, path)
+        }

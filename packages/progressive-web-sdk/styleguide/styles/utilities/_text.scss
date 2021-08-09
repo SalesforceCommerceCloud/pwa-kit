@@ -1,0 +1,95 @@
+// Text utils
+// ===
+
+// All Caps
+// ---
+//
+// Set text uppercase, letterspaced for legibility.
+
+.u-text-all-caps {
+    text-transform: uppercase !important;
+}
+
+
+// Capitalize Text
+// ---
+//
+// Capitalize first letter of string.
+
+.u-text-capitalize {
+    text-transform: capitalize !important;
+}
+
+
+// Lowercase Text
+// ---
+//
+// Lowercase all text in string.
+
+.u-text-lowercase {
+    text-transform: lowercase !important;
+}
+
+
+// Text Flow Alignment
+// ---
+//
+// Writing-direction independent text alignment. For RTL stylesheets, re-define
+// these styles with the opposite direction. Templates need not be changed.
+
+.u-text-align-start {
+    text-align: left !important;
+}
+
+.u-text-align-center {
+    text-align: center !important;
+}
+
+.u-text-align-end {
+    text-align: right !important;
+}
+
+
+// Vertical Alignment
+// ---
+//
+// Vertical aligment of text and replaced (inline-block) elements within a line.
+
+.u-align-middle {
+    vertical-align: middle !important;
+}
+
+.u-align-baseline {
+    vertical-align: baseline !important;
+}
+
+
+// Weights & Style
+// ---
+
+.u-text-normal {
+    font-weight: $regular-font-weight !important;
+}
+
+.u-text-bold {
+    font-weight: $semi-bold-font-weight !important;
+}
+
+.u-text-italic {
+    font-style: italic !important;
+}
+
+.u-text-quiet {
+    color: $neutral-50 !important;
+    font-size: $smaller-font-size !important;
+
+    fill: $neutral-50 !important;
+}
+
+
+// Line Height
+// ---
+
+.u-text-height-single {
+    line-height: 1;
+}

@@ -1,0 +1,43 @@
+[
+  {
+    "scope": "https://mobify-tech-prtnr-na03-dw.demandware.net:443",
+    "method": "GET",
+    "path": "/s/2017refresh/dw/shop/v17_8/stores?latitude=34.014613&longitude=-118.225606&distance_unit=km&start=0&count=20",
+    "body": "",
+    "status": 200,
+    "response": [
+      "1f8b0800000000000000",
+      "9454cb6edb3010fc1542a716b0244af2433282a08e8ba2979cdce4d214c25aa22c22d45220a91842917fef52719e4583f4c69d1dec6376c0df417917ac836415e5c12c28ddd80b0aadd3469446d84139822b3da00bd6e92ca8c141b0fef9fb35932850d744b709412bce13f6cd00de2a896c732770f08c4aba91b2dfb552e351ebfab1ae19cb4ad7bed6d58eb05a5a075851cc23ce9fe37240493304b71d914407525170908db3adeebf7470905505d6291155da53644d79d78a122aa8453796ba292716a8128cb39e42b1efdb3ad7db751c777a2f9b3174a26ac3de38342102cfc2fa185101c0fa084644285cac317e81d07c4e567118efa41396320d906c717d4c57b558f0c52a860e42a50f3aeaf1e0fb226942ba8de534e4e5d496704575dce0a5c8e6114fe6cb242350e3e1848649924769ba58f2e52c40e8fcec3f5ac1360f1b32ddb0cb870dd9e661c3bed5e8599fb234fb1ce68b24ccb224f3096d4b81b057822668405931618ec4391da3e03cf596f0db8947700b4a36daa08429e34dd2eac1584a9df5e7971a6b185948c797fe91af39878ee284d3abefcee2fefc066f90a83b7083218e65c53ba4015f53f2178ca70194ae801ecfeb3833d036557972d79646bf06359c1c763f7bd7bc699ab02b941ad9ce3d9bf69a1ca8873b61fe36ed76f3cab4c96a9e45c5bf7c3bdd7b2fd07ad9acf89017e64594ae725e14",
+      "6fbc9066112ff29ccf9fbcb0050becab6017023f74e2ebe5865fccdfdef8c248276dcbb65a0dddfec5a5ff476852e5fed754d8d0f22487d3d498be90fb3f000000ffff",
+      "0300fe3f664771040000"
+    ],
+    "rawHeaders": [
+      "Accept-Ranges",
+      "bytes",
+      "x-dw-request-base-id",
+      "7XbD8KqpgFt5AAAK",
+      "Allow",
+      "GET,HEAD,OPTIONS",
+      "x-dw-version-status",
+      "deprecated",
+      "Content-Language",
+      "en-US",
+      "Cache-Control",
+      "max-age=60,must-revalidate",
+      "Content-Type",
+      "application/json;charset=UTF-8",
+      "Transfer-Encoding",
+      "chunked",
+      "Content-Encoding",
+      "gzip",
+      "Vary",
+      "Accept-Encoding",
+      "Date",
+      "Sat, 25 Aug 2018 00:58:17 GMT+00:00",
+      "Connection",
+      "close",
+      "Server",
+      "Apache"
+    ]
+  }
+]

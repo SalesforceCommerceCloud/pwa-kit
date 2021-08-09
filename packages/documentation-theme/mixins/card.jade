@@ -1,0 +1,17 @@
+mixin card(href, heading, message, button, image, isComponent)
+    //- Vertically center cases where there is only an image by setting flex-
+    //- direction to 'row' and adding align-items: center
+    - var shouldVerticalCenter = !heading && isComponent
+    article.c-card(class=[isComponent && 'c--small', shouldVerticalCenter && 'u-flex-row'])
+        a(href=href)
+            if heading
+                h4.c-card__heading #{heading}
+            div.u-flexbox(class={'u-align-center': shouldVerticalCenter})
+                if message
+                    p.u-flex.c-card__message #{message}
+                if image
+                    div.u-flex
+                        img(src=image)
+            if button
+                div.c-card__basement
+                    a.c-button.c--primary(href=href) #{button}

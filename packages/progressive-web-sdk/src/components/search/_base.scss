@@ -1,0 +1,180 @@
+// Search
+// ===
+
+// Variables
+// ---
+
+$suggestions__height: 70vh;
+
+// Search Inner
+// ---
+//
+// 1. Position relative is required to align search suggestions
+
+.pw-search__inner {
+    position: relative; // 1
+}
+
+
+// Search Bar
+// ---
+//
+// 1. Position context for below `.pw-search__icon`
+
+.pw-search__bar {
+    position: relative; // 1
+
+    display: flex;
+    align-items: center;
+}
+
+
+// Search Form
+// ---
+
+.pw-search__form {
+    background: $neutral-00;
+}
+
+
+// Search Input
+// ---
+//
+// 1. Make room for the absolutely positioned `.pw-search__icon`
+
+.pw-search__input {
+    padding-left: $tap-size; // 1
+}
+
+.pw-search__field {
+    flex: 1 1 auto;
+}
+
+
+// Search Buttons
+// ---
+
+.pw-search__button-submit,
+.pw-search__button-clear,
+.pw-search__button-close {
+    flex: 0 0 auto;
+}
+
+
+// Search Icon
+// ---
+//
+// 1. Position relative to the above `.pw-search__bar`
+
+.pw-search__icon {
+    position: absolute; // 1
+    top: 0; // 1
+    bottom: 0; // 1
+    left: 0; // 1
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex: 0 0 auto;
+    width: $tap-size;
+
+    &.pw--is-not-clickable {
+        pointer-events: none;
+    }
+}
+
+
+// Search Overlay
+// ---
+//
+// 1. To prevent clicks on overlay when it's not visible
+
+.pw-search__shade {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: $z3-depth;
+
+    opacity: 0;
+    background: rgba($neutral-30, 0.5);
+
+    transition: opacity 0.3s ease-out;
+
+    pointer-events: none; // 1
+}
+
+
+// Modifier isOverlay
+// ---
+//
+// 1. Hide the search while it is an overall and inactive
+
+.pw-search.pw--is-overlay {
+    .pw-search__inner {
+        position: fixed;
+        top: 0;
+        right: 0;
+        left: 0;
+
+        opacity: 0; // 1
+
+        transform: translateY(-100%);
+
+        transition: 0.3s transform ease-out;
+    }
+}
+
+
+// Search Suggestions
+// ---
+//
+// 1. Relative to '.pw-search__inner'
+// 2. To allow dismissing it by clicking outside of the search suggestions
+
+.pw-search__suggestions {
+    position: absolute; // 1
+    top: 100%;
+    right: 0;
+    left: 0;
+    z-index: $z1-depth;
+
+    overflow-y: auto;
+    max-height: $suggestions__height; // 2
+
+    background-color: $neutral-00;
+
+    transition: max-height 0.3s ease-out ;
+
+    -webkit-overflow-scrolling: touch;
+
+    &.pw--is-empty {
+        max-height: 0;
+    }
+}
+
+
+// Modifier active
+// ---
+//
+// Note: This modifier makes the search look active by adding the shade
+//
+// 1. Search shade appears
+// 2. Search itself appears
+
+.pw-search.pw--is-active {
+    .pw-search__inner {
+        z-index: $z4-depth;
+
+        opacity: 1; // 2
+
+        transform: translateY(0%);
+    }
+
+    .pw-search__shade {
+        opacity: 1; // 1
+
+        pointer-events: auto;
+    }
+}

@@ -1,0 +1,77 @@
+// Pagination
+// ===
+//
+// Pagination is a way of breaking down large listings into smaller,
+// more digestible chunks and allowing the user to step through them in sequential (or random) order.
+
+
+// Pagination root
+// ---
+
+.pw-pagination {
+    display: flex;
+}
+
+
+// Pagination Pages
+// ---
+
+.pw-pagination__pages {
+    display: flex;
+    align-items: center;
+}
+
+// Pagination Label
+// ---
+//
+// In the page buttons, we want to include a label like 'Page'
+// to provide some extra context to screen reader users
+// If we want to hide this content visually, we can use this class
+
+.pw-pagination__hidden-label {
+    position: absolute;
+
+    overflow: hidden;
+    clip: rect(1px, 1px, 1px, 1px);
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    border: 0;
+}
+
+
+// Pagination Select Wrapper
+// ---
+
+.pw-pagination__select-wrapper {
+    position: relative;
+}
+
+
+// Pagination Select
+// ---
+
+.pw-pagination__select {
+    padding-right: $tap-size;
+
+    -webkit-appearance: none;
+}
+
+
+// Pagination Select dropdown icon
+// ---
+
+.pw-pagination__select-icon {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-width: $tap-size;
+    min-height: $tap-size;
+
+    pointer-events: none;
+}

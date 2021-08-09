@@ -1,0 +1,14 @@
+mixin markdownify
+    //- Pretty markdown anchors. Allows us to write .md like:
+    //- # `isResuming` <a name="is-resuming">#</a>
+    //- And output a `#` that directly links to that point in the document.
+    script(type="text/javascript").
+        (function(){
+            var anchorLinks = document.querySelectorAll('a[name]')
+            for (var i=0, len=anchorLinks.length; i < len; i++) {
+                var anchorLink = anchorLinks[i];
+                if (anchorLink.text === '#') {
+                    anchorLink.setAttribute('href', '#' + anchorLink.getAttribute('name'));
+                }
+            }
+        })()

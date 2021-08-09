@@ -1,0 +1,202 @@
+// Search
+// ===
+//
+// We are using google custom search so, we use google's class and id names
+// to add our own styles and override their styles to match our design.
+//
+// 1. Override inline styles
+// 2. Subtract by 2 so wont be jumpy on load
+
+.c-search-box {
+    @include for-phone-only {
+        width: 100%;
+    }
+    @include for-tablet-only {
+        width: 100%;
+    }
+
+    overflow: hidden;
+    width: 100%;
+    min-height: $search-input-height;
+    border: 1px solid $border-color;
+
+    border-radius: $unit;
+    background-color: $white;
+
+    transition: width 0.3s ease-out;
+
+    &.c--focused {
+        // width: 100%;
+    }
+
+    .gsc-branding {
+        display: none !important; // Remove "Powered by Google"
+    }
+
+    .gsc-input-box {
+        position: relative;
+
+        height: $search-input-height - 2; // 2
+        border: 0;
+
+        border-radius: 1px;
+
+        text-align: center;
+    }
+
+    form.gsc-search-box,
+    table.gsc-search-box {
+        margin-bottom: 0;
+
+        font-size: $smallish-font-size;
+    }
+
+    table.gsc-search-box {
+        width: 100%;
+    }
+
+    .gsc-input-box-hover {
+        box-shadow: none;
+    }
+
+    td.gsc-input {
+        padding-right: 0 !important; // 1
+    }
+
+    .gsc-search-box-tools .gsc-search-box input.gsc-input {
+        margin: 0 !important; // 1
+        padding: 0 0 0 $unit*4 !important; // 1
+
+        text-indent: 0 !important; // 1
+    }
+
+    .gsc-input-box-focus {
+        position: relative;
+
+        box-shadow: $large-box-shadow;
+
+        transition: all $transition-duration ease-in-out;
+
+        &::after {
+            content: 'Press Enter to search';
+
+            position: absolute;
+            top: 40px;
+            left: 0;
+
+            display: block;
+
+            color: $neutral-10;
+            font-family: $base-font-family;
+            font-size: $small-font-size;
+        }
+
+        &::before {
+            opacity: 0;
+
+            transition: all $transition-duration ease-out;
+        }
+    }
+
+    .gsib_a {
+        position: relative;
+
+        transition: all $transition-duration linear;
+
+        &::before {
+            content: '';
+
+            position: absolute;
+            top: 50%;
+            left: 0;
+
+            width: 18px;
+            height: 18px;
+
+            background-image: url('../icons/search.svg');
+            background-size: contain;
+
+            transform: translate(50%, -50%);
+
+            pointer-events: none;
+        }
+    }
+
+    .gsib_a .gsc-input {
+        width: 100% !important; // 1
+        height: $search-input-height - 2 !important; // 1, 2
+        margin-left: $large-space !important;
+        padding: 0;
+
+        background: none !important; // 1
+
+        color: $neutral-60;
+        font-family: $base-font-family;
+        font-size: $smallish-font-size;
+        vertical-align: middle;
+    }
+
+    .gsc-search-button {
+        display: none;
+    }
+
+    .gsc-search-box td {
+        padding: 0;
+
+        vertical-align: inherit;
+    }
+
+    .gscb_a {
+        font-size: inherit;
+    }
+
+    .gsst_a {
+        position: relative;
+
+        &::after {
+            content: '';
+
+            position: absolute;
+            top: 50%;
+            left: 0;
+
+            width: 10px;
+            height: 10px;
+
+            background-image: url('../icons/icon-search-clear.svg');
+            background-size: contain;
+        }
+
+        .gscb_a {
+            visibility: hidden;
+        }
+    }
+}
+
+.gssb_a {
+    padding-top: $very-small-space !important; // 1
+    padding-bottom: $very-small-space !important; // 1
+}
+
+.gssb_a img {
+    display: none !important; // 1
+}
+
+.gssb_a img ~ span {
+    display: none !important; // 1
+}
+
+.gsc-completion-selected {
+    background: $mobify-light-blue-bg !important; // 1
+}
+
+.gssb_e {
+    box-shadow: none !important; // 1
+}
+
+.gsc-completion-container {
+    border-collapse: initial !important;
+
+    border-radius: $unit;
+    box-shadow: none;
+}

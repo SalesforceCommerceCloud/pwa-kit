@@ -1,0 +1,57 @@
+// Sheet Theme
+// ===
+
+// Mask
+// ---
+
+.pw-sheet__mask {
+    background: $neutral-70;
+}
+
+
+// Wrapper
+// ---
+
+.pw-sheet__wrapper {
+    box-shadow: $box-shadow;
+}
+
+
+// Inner
+// ---
+// 1. requested by designer
+// 2. to make modal stay on right of the container
+// 3. to cover the available space since it's absolute positioned
+
+.pw-sheet.pw--slide-right,
+.pw-sheet.pw--slide-left {
+    .pw-sheet__inner {
+        max-width: 340px; // 1
+    }
+}
+
+.pw-sheet.pw--slide-right {
+    .pw-sheet__inner {
+        left: initial; // 2
+
+        width: 100%; // 3
+    }
+}
+
+
+// States
+// ---
+//
+// @TODO: Replace pw--no-shadow by adding a similar class (but probably
+//        pw--has-shrink-to-content instead) so the shadow can be removed with
+//        built-in functionality.
+
+.pw-sheet.pw--no-shadow {
+    .pw-sheet__wrapper {
+        box-shadow: none;
+    }
+
+    .pw--shrink-to-content {
+        box-shadow: $box-shadow;
+    }
+}

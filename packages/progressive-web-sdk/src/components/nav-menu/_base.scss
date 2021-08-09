@@ -1,0 +1,23 @@
+// Nav Menu
+// ===
+//
+// 1. The positioning context for a NavSlider. The NavMenu is a TransitionGroup.
+
+.pw-nav-menu {
+    position: relative;  // 1
+
+    overflow: hidden;
+    flex: 1 1 auto;
+    width: 100%;
+    height: 100%;
+}
+
+
+.pw-nav-menu__panel {
+    overflow-x: hidden;
+    overflow-y: scroll;
+    width: 100%;
+    height: 100%;
+
+    -webkit-overflow-scrolling: touch;
+}

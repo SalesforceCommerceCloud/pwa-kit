@@ -1,0 +1,35 @@
+// Icon
+// ===
+//
+// 1. To avoid svg icon eating up your clicks
+
+.pw-icon {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    width: $unit*2;
+    max-width: 100%;
+    height: $unit*2;
+    max-height: 100%;
+
+    color: inherit;
+
+    pointer-events: none; // 1
+
+    fill: currentColor;
+
+    &.pw--small {
+        width: $unit;
+        height: $unit;
+    }
+
+    &.pw--medium {
+        width: $unit*3;
+        height: $unit*3;
+    }
+
+    &.pw--large {
+        width: $unit*4;
+        height: $unit*4;
+    }
+}

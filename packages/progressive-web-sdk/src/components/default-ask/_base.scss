@@ -1,0 +1,20 @@
+// Push Messaging - Default Ask component
+// ===
+
+// 1. Prevent the (transparent) mask from intercepting clicks
+
+.pw-push-messaging__default-ask {
+    .pw-sheet__content {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .pw-sheet__wrapper {
+        justify-content: flex-end;
+        box-shadow: none;
+    }
+
+    .pw-sheet__mask {
+        pointer-events: none; // [1]
+    }
+}

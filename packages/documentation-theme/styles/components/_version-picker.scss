@@ -1,0 +1,169 @@
+// Variables
+// ---
+$picker-font-size: 14px;
+$picker-icon-size: 6px;
+$green-circle-color: #4cb944;
+
+// Version Picker
+// ===
+//
+// 1. to cover search when version picker is open
+
+.c-version-picker {
+    position: relative;
+    z-index: 1; // 1
+}
+
+// Version Picker Button
+// ---
+//
+
+.c-version-picker__button {
+    position: relative;
+
+    padding: $small-space $base-space * 2 $small-space $small-space;
+    margin-bottom: $small-space;
+
+    border: none;
+
+    background: none;
+    outline: none;
+
+    font-weight: $medium-font-weight;
+    font-size: $picker-font-size;
+    text-align: left;
+
+    border: 1px solid $border-color;
+    border-radius: $border-radius * 2;
+    box-shadow: $small-box-shadow;
+
+    cursor: pointer;
+
+    &.is--latest::before {
+        content: '';
+
+        position: absolute;
+        top: 50%;
+        right: 0;
+
+        width: $picker-icon-size;
+        height: $picker-icon-size;
+
+        border-radius: $picker-icon-size/2;
+        background-color: $green-circle-color;
+
+        transform: translate(-($very-small-space + 1) * 4, -($very-small-space - 1));
+    }
+
+    &.is--loaded::after {
+        content: '';
+
+        position: absolute; // 1
+        top: 50%;
+        right: 0;
+
+        width: $picker-icon-size * 2;
+        height: $picker-icon-size;
+
+        background-image: url('./../icons/icon-chevron.svg');
+        background-size: $picker-icon-size * 2;
+
+        transform: translate(-($very-small-space + 1), -($very-small-space - 1));
+    }
+}
+
+// Version Picker List
+// ---
+//
+// 1. absolute positioned relative to c-version-picker__button
+
+.c-version-picker__list {
+    position: absolute; // 1
+    top: 0;
+
+    display: none;
+    margin: 0;
+    padding: 0;
+    border: 1px solid $border-color;
+    border-radius: $border-radius * 2;
+    box-shadow: $small-box-shadow;
+
+    text-align: left;
+    list-style: none;
+}
+
+// Version Picker Item
+// ---
+//
+// 1. absolute positioned relative to c-version-picker__item
+// 2. To align list item to picker button
+
+.c-version-picker__item {
+    position: relative;
+
+    padding: $very-small-space $smallish-space;
+
+    border-radius: $border-radius * 2;
+    background: $white;
+
+    font-size: $picker-font-size;
+    line-height: $base-line-height;
+
+    &:first-child::after {
+        content: '';
+
+        position: absolute; // 1
+        top: 50%;
+        right: 0;
+
+        width: $picker-icon-size * 2;
+        height: $picker-icon-size;
+
+        background-image: url('./../icons/icon-chevron.svg');
+        background-size: $picker-icon-size * 2;
+
+        transform: translate(-$small-space, $very-small-space/2) rotate(180deg);
+    }
+
+    &:first-child.c--selected::before {
+        content: '';
+
+        position: absolute; // 1
+        top: 50%;
+        right: 0;
+
+        width: $picker-icon-size;
+        height: $picker-icon-size;
+
+        border-radius: $picker-icon-size/2;
+        background-color: $green-circle-color;
+
+        transform: translate(-$large-space, $very-small-space/2);
+    }
+
+    &:first-child {
+        padding-top: $base-space - 1; // 2
+        padding-right: $xlarge-space + 3; // 2
+    }
+    &:last-child {
+        padding-bottom: $base-space;
+    }
+}
+
+.c-version-picker__item.c--selected {
+    font-weight: $medium-font-weight;
+
+    cursor: pointer;
+
+    .c-version-picker__link {
+        color: black;
+    }
+}
+
+// Version Picker Link
+// ---
+//
+
+.c-version-picker__link {
+    display: block;
+}

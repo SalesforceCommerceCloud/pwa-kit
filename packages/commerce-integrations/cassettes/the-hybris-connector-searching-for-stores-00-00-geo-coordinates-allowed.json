@@ -1,0 +1,50 @@
+[
+  {
+    "scope": "https://hybris.merlinspotions.com:443",
+    "method": "GET",
+    "path": "/rest/v2/apparel-uk/stores?latitude=0&pageSize=20&sort=relevance&currentPage=0&fields=FULL&longitude=0",
+    "body": "",
+    "status": 200,
+    "response": {
+      "boundEastLongitude": 0,
+      "boundNorthLatitude": 0,
+      "boundSouthLatitude": 0,
+      "boundWestLongitude": 0,
+      "pagination": {
+        "currentPage": 0,
+        "pageSize": 20,
+        "totalPages": 0,
+        "totalResults": 0
+      },
+      "sourceLatitude": 0,
+      "sourceLongitude": 0,
+      "stores": []
+    },
+    "rawHeaders": [
+      "Cache-Control",
+      "public, max-age=1800",
+      "Content-Type",
+      "application/json",
+      "Date",
+      "Sat, 25 Aug 2018 00:58:09 GMT",
+      "ETag",
+      "\"0a468264843f3c1fd0aee0c27e73337ad\"",
+      "Server",
+      "Apache-Coyote/1.1",
+      "Strict-Transport-Security",
+      "max-age=16070400 ; includeSubDomains",
+      "X-Content-Type-Options",
+      "nosniff",
+      "X-Frame-Options",
+      "SAMEORIGIN",
+      "X-Total-Count",
+      "0",
+      "X-XSS-Protection",
+      "1; mode=block",
+      "Content-Length",
+      "323",
+      "Connection",
+      "Close"
+    ]
+  }
+]

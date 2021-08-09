@@ -1,0 +1,15 @@
+// 404 page
+// ===
+
+.t-error {
+    .c-search-box {
+        float: none;
+
+        width: 100%;
+        .gsc-input-box-focus {
+            &::after {
+                color: $neutral-50;
+            }
+        }
+    }
+}

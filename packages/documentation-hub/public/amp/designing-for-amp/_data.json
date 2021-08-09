@@ -1,0 +1,12 @@
+{
+    "the-design-process": {
+        "title": "The Design Process",
+        "intro": "The Mobify-recommended structure when designing for AMP.",
+        "button": "The Design Process"
+    },
+    "common-issues-and-workarounds": {
+        "title": "Common Issues and Workarounds",
+        "intro": "Useful learnings from Mobify's experience working with AMP.",
+        "button": "Common Issues and Workarounds"
+    }
+}

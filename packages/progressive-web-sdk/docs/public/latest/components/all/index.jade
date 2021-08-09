@@ -1,0 +1,15 @@
+include ../../../../../node_modules/@mobify/documentation-theme/mixins/card-catalog
+
+p The React components included in the Progressive Web SDK are the building blocks of your PWA. Choose a component to learn about its props and methods and see examples of it in use. 
+
+p.u-padding-bottom In addition to the SDK components, we've included some templates, which are collections of components that work together.
+
+div.c-callout.u-margin-bottom-lg
+    p
+        <strong>Did you know?</strong> Each of the following component pages includes live code examples! And when you edit their source code, they will re-render instantly to reflect your changes.
+
+input#content-filter.u-padding-sm.u-width-full(type="text", placeholder="Filter components...")
+
++cardCatalog
+
+style .c-card__heading { margin-top: -10px !important; } #content-filter { margin-bottom: 16px !important; }

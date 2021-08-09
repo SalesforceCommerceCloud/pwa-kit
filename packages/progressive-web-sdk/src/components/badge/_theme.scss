@@ -1,0 +1,19 @@
+// Badge
+// ===
+
+$badge__size: $unit*2;
+
+.pw-badge {
+    min-width: $badge__size;
+    min-height: $badge__size;
+
+    border-radius: $badge__size/2;
+    background: $primary-action-color;
+
+    color: $neutral-00;
+    line-height: $small-line-height;
+
+    @if variable-exists('tiny-font-size') {
+        font-size: $tiny-font-size + 1;
+    }
+}

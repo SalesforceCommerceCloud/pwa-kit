@@ -1,0 +1,41 @@
+// Rating theme
+// ===
+
+.pw-rating {
+    color: $neutral-20;
+}
+
+// Rating Icon
+// ---
+
+.pw-rating__icon {
+    opacity: 0;
+
+    + .pw-rating__icon {
+        margin-left: 2px;
+    }
+}
+
+
+// Filled Icons
+// ---
+
+.pw-rating__filled-icons {
+    color: $accent-color;
+}
+
+
+// Modifier: Solid unfilled rating icons
+// ---
+
+.pw-rating.pw--solid .pw-rating__icon:not(.pw--filled) {
+    opacity: 1;
+}
+
+
+// Modifier: Opaque unfilled rating icons
+// ---
+
+.pw-rating.pw--opaque .pw-rating__icon:not(.pw--filled) {
+    opacity: 0.5;
+}

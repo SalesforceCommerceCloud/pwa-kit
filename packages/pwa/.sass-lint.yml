@@ -1,0 +1,16 @@
+options:
+    config-file: node_modules/mobify-code-style/css/.sass-lint.yml
+
+# Developers can override the default mobify-code-style lint rules below. See
+# all the available rules here:
+#
+#   @URL: https://github.com/sasstools/sass-lint/tree/master/docs/rules
+rules:
+    # class-name-format:
+    #     - 1
+    #     - convention: hyphenatedbem
+    # Fix for @include directive override issue
+    declarations-before-nesting:
+        enabled: false
+    mixins-before-declarations:
+        enabled: false

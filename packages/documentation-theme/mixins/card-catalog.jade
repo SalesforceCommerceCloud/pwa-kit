@@ -1,0 +1,39 @@
+//- This mixin used on the guides and component library overview pages
+
+mixin card(url, heading, message, type, image)
+    article.c-card(class=['c--small'])
+        //- Massage the href for component library overview page
+        if type === 'Component' || type === 'Template'
+            - var href = '../' + url
+        else
+            - var href = url
+        a(href=href)
+            if type === 'Component' || type === "Updated"
+                span.u-text-size-tiny.u-text-uppercase.u-text-bold.u-accent-color #{type}
+            else if type === 'Template' || type === 'New'
+                span.u-text-size-tiny.u-text-uppercase.u-text-bold.u-accent-red #{type}           
+            if heading
+                h2.u-text-size-smallish.u-margin-top-sm.u-margin-bottom-sm.c-card__heading #{heading}
+            div.u-flexbox
+                if message
+                    p.u-text-size-smallish.u-neutral-50.u-flex.c-card__message #{message}
+                if image
+                    div.u-flex
+                        img(src=image)
+
+mixin renderCards(cards)
+    - var gridSize = 3
+    - var classes = ["c-grid", `c--${gridSize}up`]
+
+    div(class=classes)
+        each cardObject, URLKey in cards
+            if !cardObject._excludeFromCatalog
+                +card(URLKey, cardObject.title, cardObject.description, cardObject.type)
+
+mixin cardCatalog
+    - var version = current.path[0]
+    - var category = current.path[1]
+    - var cards = public[version][category]._data
+    +renderCards(cards)
+
+    

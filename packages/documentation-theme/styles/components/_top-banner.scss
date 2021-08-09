@@ -1,0 +1,98 @@
+// Top Banner
+
+html {
+    --top-spacing:48px;
+    @include for-tablet-landscape-down {
+      --top-spacing: 0px;
+    }
+    // scroll-padding-top: var(--top-spacing);
+}
+
+body {
+    // ULTIMATELY this needs to go on <html>, not <body>.
+    scroll-padding-top: var(--top-spacing);
+}
+
+.u-place-top {
+    top: var(--top-spacing) !important;
+}
+
+.c-top-banner {
+    position: sticky;
+    top: 0;
+    left: 0;
+    width: 100%;
+    padding: 8px;
+    background-color: #000000;
+    text-align: center;
+    z-index: 10;
+    color: #ffffff;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+    @include for-tablet-landscape-down {
+      display: none;
+    }
+
+    .c-menu__close-icon{
+      margin: 0 10px;
+      vertical-align: middle;
+    }
+
+    .c-top-banner__content{
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: row;
+      @include for-tablet-landscape-down {
+        flex-direction: column;
+      }
+      @include for-desktop-up {
+        transform: translateX(16px); // Close icon width
+      }
+    }
+
+    span.internalLinkWrapper{
+      display: inline;
+      @include for-tablet-landscape-down {
+        display: none;
+      }
+    }
+
+    p {
+      white-space: normal;
+      @include for-tablet-landscape-up {
+        text-align: left;
+      }
+    }
+
+    a {
+      color: #ffffff;
+      text-decoration: none;
+      cursor: pointer;
+      margin: 0 10px;
+      padding: 8px;
+
+      &.internalLink {
+        border-bottom: 2px solid #ffffff;
+        padding: 1px;
+      }
+      &.externalLink{
+        border: 1px solid #ffffff;
+        border-radius: 5px;
+        padding: 4px 16px;
+        margin: 0 10px;
+
+        p {
+          white-space: nowrap;
+        }
+
+        @include for-tablet-portrait-up {
+          display: inline;
+        }
+      }
+    }
+}

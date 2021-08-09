@@ -1,0 +1,20 @@
+{
+  "presets": ["lint-recommended"],
+  "plugins": {
+    "lint": {
+        "fenced-code-marker": "`",
+        "fenced-code-flag": {
+            "allowEmpty": false
+        },
+        "no-duplicate-headings": true,
+        "no-file-name-articles": true,
+        "no-file-name-consecutive-dashes": true,
+        "no-file-name-irregular-characters": true,
+        "no-file-name-mixed-case": true,
+        "no-file-name-outer-dashes": true,
+        "no-heading-content-indent": true,
+        "no-heading-indent": true,
+        "no-multiple-toplevel-headings": 0
+    }
+  }
+}

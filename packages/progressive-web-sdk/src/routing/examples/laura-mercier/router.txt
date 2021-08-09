@@ -1,0 +1,96 @@
+import React from 'react'
+import PropTypes from 'prop-types'
+import {Provider} from 'react-redux'
+import {Router as SDKRouter, Route} from 'progressive-web-sdk/dist/routing'
+import {ssrRenderingCompleted} from 'progressive-web-sdk/dist/utils/universal-utils'
+
+import PageLoader from './components/page-loader'
+import Loadable from 'react-loadable'
+
+// Containers
+import App from '.'
+
+// Use Webpacks' import() with react-loadable to do code-splitting on a
+// per-component basis. We recommend doing this for pages in your app.
+
+export const Home = Loadable({
+    loader: () => import('./pages/home' /* webpackChunkName: "home" */),
+    loading: PageLoader
+})
+
+export const Cart = Loadable({
+    loader: () => import('./pages/cart' /* webpackChunkName: "cart" */),
+    loading: PageLoader
+})
+
+export const Shipping = Loadable({
+    loader: () => import('./pages/shipping'),
+    loading: PageLoader
+})
+
+export const Payment = Loadable({
+    loader: () => import('./pages/payment' /* webpackChunkName: "order-review" */),
+    loading: PageLoader
+})
+
+export const OrderReview = Loadable({
+    loader: () => import('./pages/order-review' /* webpackChunkName: "order-review" */),
+    loading: PageLoader
+})
+
+export const OrderConfirmation = Loadable({
+    loader: () => import('./pages/order-confirmation' /* webpackChunkName: "order-confirmation" */),
+    loading: PageLoader
+})
+
+export const ApplePayOrderConfirmation = Loadable({
+    loader: () => import('./pages/apple-pay-order-submit'),
+    loading: PageLoader
+})
+
+export const PayPalReturn = Loadable({
+    loader: () => import('./pages/paypal-redirect-handle'),
+    loading: PageLoader
+})
+
+class Router extends React.Component {
+    shouldComponentUpdate() {
+        // If server-side do not re-render after the initial render
+        // is complete.
+        return !ssrRenderingCompleted()
+    }
+
+    render() {
+        const {store} = this.props
+
+        return (
+            <Provider store={store}>
+                <SDKRouter>
+                    <Route path="/" component={App}>
+                        <Route path="cart" component={Cart} />
+                        <Route path="checkout/shipping" component={Shipping} />
+                        <Route path="checkout/payment" component={Payment} />
+                        <Route path="checkout/order-review" component={OrderReview} />
+                        <Route path="checkout/order-confirmation" component={OrderConfirmation} />
+                        <Route
+                            path="on/demandware.store/Sites-lauramercier_us-Site/default/paypalredirect"
+                            component={PayPalReturn}
+                        />
+                        <Route path="on/demandware.store/Sites-lauramercier_us-Site/default/submit" component={ApplePayOrderConfirmation} />
+                        <Route path="checkout/edit-payment" component={Payment} />
+                        <Route
+                            path="on/demandware.store/Sites-lauramercier_us-Site/default/order-review-section"
+                            component={OrderReview}
+                        />
+                    </Route>
+                </SDKRouter>
+            </Provider>
+        )
+    }
+}
+
+Router.propTypes = {
+    store: PropTypes.object
+}
+
+export default Router

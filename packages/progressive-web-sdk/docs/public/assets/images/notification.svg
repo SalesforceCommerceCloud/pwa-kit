@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="162px" height="62px" viewBox="0 0 162 62" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 44.1 (41455) - http://www.bohemiancoding.com/sketch -->
+    <title>notification</title>
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <linearGradient x1="15.4747596%" y1="0%" x2="87.6425368%" y2="94.5568356%" id="linearGradient-1">
+            <stop stop-color="#0288A7" offset="0%"></stop>
+            <stop stop-color="#4E439B" offset="100%"></stop>
+        </linearGradient>
+    </defs>
+    <g id="Design-system-updates" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="SDK-Homepage-v2" transform="translate(-593.000000, -1135.000000)">
+            <g id="Guides-2" transform="translate(341.000000, 768.000000)">
+                <g id="guide-3" transform="translate(1.000000, 301.000000)">
+                    <g id="notification" transform="translate(251.000000, 66.000000)">
+                        <path d="M44.15625,50.2278481 L159,50.2278481 C160.656854,50.2278481 162,49.1737337 162,47.8734177 L162,2.35443038 C162,1.05411439 160.656854,-2.38864173e-16 159,0 L3,0 C1.34314575,2.38864173e-16 -2.02906125e-16,1.05411439 0,2.35443038 L0,47.8734177 C2.02906125e-16,49.1737337 1.34314575,50.2278481 3,50.2278481 L18.84375,50.2278481 L31.5,62 L44.15625,50.2278481 Z" id="Combined-Shape" fill-opacity="0.8" fill="url(#linearGradient-1)"></path>
+                        <rect id="Rectangle-3" fill="#FFFFFF" opacity="0.797158062" x="11" y="10" width="29" height="29" rx="3"></rect>
+                        <rect id="Rectangle-3" fill="#FFFFFF" opacity="0.797158062" x="51" y="11" width="100" height="8"></rect>
+                        <rect id="Rectangle-3" fill="#FFFFFF" opacity="0.797158062" x="51" y="24" width="100" height="4"></rect>
+                        <rect id="Rectangle-3" fill="#FFFFFF" opacity="0.797158062" x="51" y="34" width="100" height="4"></rect>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

@@ -1,0 +1,30 @@
+{
+  "name": "scaffold-connector",
+  "version": "1.17.0",
+  "description": "",
+  "dependencies": {
+    "@mobify/commerce-integrations": "^1.17.0"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.4.4",
+    "@babel/core": "^7.4.5",
+    "@babel/preset-env": "^7.4.5",
+    "babel-jest": "^24.8.0",
+    "eslint": "4.19.1",
+    "jest-cli": "^24.9.0",
+    "jsdoc": "^3.6.3"
+  },
+  "main": "index.js",
+  "scripts": {
+    "build": "babel src --bail --ignore '*.test.js','test.js' --out-dir dist --copy-files --quiet",
+    "start": "babel src --bail --ignore '*.test.js','test.js' --out-dir dist --copy-files --watch",
+    "prepare": "npm run build",
+    "test": "jest",
+    "lint": "npm run lint:js",
+    "lint:js": "eslint 'src/**/*.{js,jsx}'"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "private": true
+}

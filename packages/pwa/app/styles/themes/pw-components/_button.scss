@@ -1,0 +1,115 @@
+// Button Theme
+// ===
+//
+// 1. Slightly larger than standard font size, at 18px
+
+.pw-button {
+    display: inline-table;
+    padding: 0;
+
+    background: none;
+
+    font-family: $font-family;
+    font-size: $font-size + 2; // 1
+    letter-spacing: 1px;
+
+    transition: background 0.5s ease-in;
+
+    -webkit-appearance: none;
+
+    &:active,
+    &:focus {
+        background: rgba(255, 255, 255, 0.1);
+    }
+}
+
+// Inner
+// ---
+//
+// 1. Ensures that the borderless and bordered buttons appear the same size
+// 2. Match the width of the parent `pw-button` container
+
+.pw-button__inner {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%; // 2
+    min-width: $tap-size;
+    min-height: $tap-size;
+    padding: $unit $unit * 2.5;
+    border-top: 1px solid transparent; // 1
+    border-bottom: 1px solid transparent; // 1
+
+    &.pw--no-min-width {
+        min-width: initial;
+    }
+
+    &.pw--no-min-height {
+        min-height: initial;
+    }
+}
+
+// Themes
+// ---
+
+.pw-button.pw--primary {
+    background-color: $primary-action-color;
+
+    color: #fff;
+
+    &:active,
+    &:focus {
+        background-color: $dark-primary-action-color;
+    }
+}
+
+.pw-button.pw--secondary {
+    background-color: $secondary-action-color;
+
+    color: #fff;
+
+    &:active,
+    &:focus {
+        background-color: $dark-secondary-action-color;
+    }
+}
+
+.pw-button.pw--tertiary {
+    background-color: transparent;
+
+    color: $brand-color;
+
+    &:active,
+    &:focus {
+        border-color: $tertiary-brand-color;
+
+        color: $tertiary-brand-color;
+    }
+
+    .pw-button__inner {
+        border: 1px solid $brand-color;
+    }
+
+    &[disabled] {
+        background-color: $neutral-15;
+
+        color: $neutral-30;
+
+        .pw-button__inner {
+            border-color: transparent;
+        }
+    }
+}
+
+.pw-button.pw--primary,
+.pw-button.pw--secondary {
+    &[disabled] {
+        background-color: $neutral-15;
+
+        color: $neutral-30;
+    }
+}
+
+.pw-button.pw--icon-only {
+    line-height: 0;
+}

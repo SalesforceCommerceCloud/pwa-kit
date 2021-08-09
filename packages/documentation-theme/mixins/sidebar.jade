@@ -1,0 +1,67 @@
+include ../mixins/logo
+
+- var path = [].concat(current.path)
+//- This is a "version" for some projects, and a "product" for others
+- var version = path[0]
+
+mixin buildMenu
+    //- We're looking for defined categories - keys with an underscore and other
+        specific keys are not valid here
+    - var filterMethod = function(value, key) {
+        - return !key.startsWith('_') && key !== 'styleguidist' && key !== 'index' && key !== 'sitemap.xml'
+    - }
+    - var categories = _.pickBy(public[version]._data, filterMethod)
+
+    for category, categorySlug in categories
+        - var isActiveCategory = path[1] === categorySlug
+        - var documents = _.pickBy(public[version][categorySlug]._data, filterMethod)
+
+        li
+            //- No defined data for a given category means there are no child documents
+            if Object.keys(documents).length === 0 || documents._excludeFromMenu || category._excludeFromMenu
+                a.sdk-sidebar__link.u-text-medium.u-padding-start-xl(href=`${DOCS_ROOT}${version}/${categorySlug}/` class={ 'c--active': isActiveCategory })
+                    .sdk-sidebar__accordion-title= category.title
+            else
+                -
+                    var accordionClasses = {
+                        'sdk--active': isActiveCategory,
+                        'sdk--remove-transition': isActiveCategory
+                    }
+                button.sdk-sidebar__accordion.u-text-medium(class=accordionClasses)
+                    .sdk-sidebar__accordion-title.u-padding-start-lg= category.title
+                ul.u-background-accent-darker.sdk-sidebar__accordion-item.u-list-style-none(style={ 'max-height': isActiveCategory ? 'initial': '' })
+                    for document, documentSlug in documents
+                        unless document._excludeFromMenu
+                            li
+                                a.sdk-sidebar__list-link.js-handle-active.u-padding-start-xl(href=`${DOCS_ROOT}${version}/${categorySlug}/${documentSlug}` class={ 'c--active': documentSlug === path[2] })= document.title
+
+mixin sidebar
+    - var isDocumentationHub = PROJECT_NAME === 'Documentation Home'
+    nav.c-sidebar.c--hide.u-flexbox.u-flex-column.u-fixed.u-place-top.u-place-bottom.u-place-start.u-clip.u-background-accent-dark(role='navigation' id='navigation')
+        h2.u-visually-hidden Menu
+
+        //- Logo and support link
+        div.u-flex-none.u-padding-start.u-padding-end.u-padding-top.u-padding-bottom.u-background-accent-darker
+            div.u-flexbox.u-align-center.u-justify-between
+                a#js-menu-first-focus.u-neutral-10(href='/')
+                    div.c-logo
+                        +logo
+                a.u-neutral-10(href='https://support.mobify.com/')
+                    span.u-block.u-padding-top-sm.u-padding-bottom-sm.u-text-medium Support
+            a.u-text-size-smallish.u-neutral-10(href='/') ← Documentation Home
+
+        //- Documentation Hub: Product type (i.e. Engagement Engine, Connection Center, etc.)
+        if isDocumentationHub
+            - var productName = public[version]._data.index.name
+        else
+            - var productName = PROJECT_NAME
+        h3
+            - var url = DOCS_ROOT + version + '/'
+            a.c-sidebar__doc-title.u-block.u-padding-top.u-padding-bottom.u-padding-start.u-padding-end.u-neutral-10.u-text-medium(href=url)= productName
+
+        //- The accordion menus
+        div.u-flex.u-context.u-background-accent-dark
+            div.sdk-sidebar__scroll.u-position.u-place-start.u-place-end.u-place-top.u-place-bottom.u-padding-bottom-lg
+                ul#sidebar-links.u-list-style-none.u-background-accent-dark
+                    +buildMenu
+                button#js-close-menu.u-visually-hidden Close Menu

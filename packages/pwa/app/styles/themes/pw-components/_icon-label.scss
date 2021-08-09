@@ -1,0 +1,18 @@
+// Icon Label Theme
+// ===
+
+.pw-icon-label {
+    line-height: 0;
+}
+
+
+// Label
+// ---
+
+.pw-icon-label__label {
+    margin-top: $unit/2;
+
+    font-size: 11px;
+    line-height: $unit*1.5;
+    letter-spacing: 0;
+}

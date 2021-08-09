@@ -1,0 +1,23 @@
+{
+    "overview": {
+        "title": "About Push Messaging"
+    },
+    "opt-in-customization": {
+        "title": "Customize Your Opt-In Flow"
+    },
+    "configuration": {
+        "title": "Configuring Push Messaging"
+    },
+    "push-messaging-usage": {
+        "title": "Push Messaging Components"
+    },
+    "building-your-own": {
+        "title": "Building Your Own Opt-In Component"
+    },
+    "redux-actions-and-selectors": {
+        "title": "Redux Actions and Selectors Reference"
+    },
+    "testing-your-push-opt-in-flow": {
+        "title": "Testing Your Push Opt-in Flow"
+    }
+}

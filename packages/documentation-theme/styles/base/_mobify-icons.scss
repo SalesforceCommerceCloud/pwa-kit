@@ -1,0 +1,14 @@
+// Typography
+// ===
+
+@font-face {
+    font-family: 'Mobify-Icons';
+    font-style: normal;
+    font-weight: normal;
+
+    src: url('../icons/Mobify-Icons.eot?1');
+    src: url('../icons/Mobify-Icons.eot') format('embedded-opentype'),
+    url('../icons/Mobify-Icons.woff') format('woff'),
+    url('../icons/Mobify-Icons.ttf') format('truetype'),
+    url('../icons/Mobify-Icons.svg') format('svg');
+}

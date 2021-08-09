@@ -1,0 +1,21 @@
+// Themes
+// ===
+
+// Progressive Web Themes
+// ---
+//
+// All styles for the Progressive Web SDK components live here. This includes
+// the component's base styles (that come from the SDK node module) as well as
+// their locally defined themes.
+
+@import 'themes/pw-components';
+
+
+// Other Project Themes
+// ---
+//
+// Project specific theme styles can be added here. For example, if your site
+// styles unique to the different localizations, or if different categories of
+// the site require unique themes.
+//
+// @import 'themes/your-theme';

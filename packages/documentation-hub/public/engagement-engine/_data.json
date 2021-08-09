@@ -1,0 +1,20 @@
+{
+    "index": {
+        "layout": "../_layouts/homepage",
+        "name": "Engagement Engine"
+    },
+    "_homepage": {
+        "": {
+            "blocks": [
+                {
+                    "title": "This content no longer exists!",
+                    "info": "If you still need information about the Engagement Engine, please reach out to your Mobify contact.",
+                    "href": "overview/introduction/"
+                }
+            ]
+        },
+        "categories": {
+            "useCategoryList": true
+        }
+    }
+}

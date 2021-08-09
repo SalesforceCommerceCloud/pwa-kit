@@ -1,0 +1,23 @@
+{
+    "source": {
+        "include": [
+            "src/utils",
+            "src/ssr"
+        ],
+        "includePattern": "\\.js$",
+        "excludePattern": "\\.test\\.js$"
+
+    },
+    "opts": {
+        "recurse": true,
+        "destination": "docs/public/latest/utility-functions/reference/",
+        "readme": "src/utils/doc-template/JSDOC_README.md"
+    },
+    "templates": {
+        "default": {
+            "layoutFile": "src/utils/doc-template/layout.tmpl",
+            "outputSourceFiles": false
+        }
+    },
+    "plugins": ["plugins/markdown"]
+}

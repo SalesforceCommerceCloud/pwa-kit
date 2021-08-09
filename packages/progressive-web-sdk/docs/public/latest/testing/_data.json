@@ -1,0 +1,11 @@
+{
+    "automated-testing": {
+        "title": "Automated Testing"
+    },
+    "manual-testing": {
+        "title": "Manual Testing"
+    },
+    "mobify-test-framework": {
+        "title": "The Mobify Test Framework"
+    }
+}

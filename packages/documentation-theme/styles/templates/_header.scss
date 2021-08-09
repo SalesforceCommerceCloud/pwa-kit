@@ -1,0 +1,15 @@
+// Header
+// ===
+
+.t-header {
+    .c-search-box {
+        float: none;
+        @include for-tablet-portrait-up {
+            max-width: calc(#{$narrow-content-width} + #{$xlarge-space * 2}); // 2
+            margin-right: auto;
+            margin-left: auto;
+        }
+
+        max-width: auto;
+    }
+}

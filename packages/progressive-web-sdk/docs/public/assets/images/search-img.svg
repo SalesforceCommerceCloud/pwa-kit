@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="184px" height="32px" viewBox="0 0 184 32" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 44.1 (41455) - http://www.bohemiancoding.com/sketch -->
+    <title>Search-img</title>
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <rect id="path-1" x="0" y="0" width="184" height="32"></rect>
+    </defs>
+    <g id="Design-system-updates" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="SDK-Homepage-v2" transform="translate(-590.000000, -1643.000000)">
+            <g id="Web-Components---multiple-cards" transform="translate(341.000000, 1352.000000)">
+                <g id="2nd-row-components" transform="translate(0.000000, 232.000000)">
+                    <g id="Search-img" transform="translate(249.000000, 59.000000)">
+                        <g id="Rectangle-14-Copy-3">
+                            <use fill="#FFFFFF" fill-rule="evenodd" xlink:href="#path-1"></use>
+                            <rect stroke="#C4C4C4" stroke-width="1" x="0.5" y="0.5" width="183" height="31"></rect>
+                        </g>
+                        <rect id="Rectangle-14-Copy-3" fill="#C4C4C4" x="151.246073" y="0" width="32.7539267" height="32"></rect>
+                        <text id="Search" font-family=".SFNSText, .SF NS Text" font-size="14" font-weight="normal" fill="#BBBBBB">
+                            <tspan x="29.8638743" y="21">Search</tspan>
+                        </text>
+                        <g id="search-icon" transform="translate(8.670157, 8.000000)" stroke="#7D75B4">
+                            <g id="Capa_1">
+                                <path d="M13.3687884,13.286031 L10.0912597,9.88381375 C10.9704508,8.8345898 11.5027501,7.46563193 11.5027501,5.96940133 C11.5027501,2.67583149 8.92199533,0 5.75212268,0 C2.57925959,0 0.00149522295,2.6789357 0.00149522295,5.96940133 C0.00149522295,9.25986696 2.58225003,11.9388027 5.75212268,11.9388027 C7.1935176,11.9388027 8.51230425,11.3862528 9.52307496,10.4736142 L12.8006037,13.8758315 C12.8783553,13.956541 12.9830209,14 13.084696,14 C13.1863712,14 13.2910368,13.9596452 13.3687884,13.8758315 C13.5242916,13.7144124 13.5242916,13.4474501 13.3687884,13.286031 L13.3687884,13.286031 Z M0.805925169,5.96940133 C0.805925169,3.1383592 3.02483602,0.838137472 5.74913224,0.838137472 C8.47641889,0.838137472 10.6923393,3.14146341 10.6923393,5.96940133 C10.6923393,8.79733925 8.47641889,11.1037694 5.74913224,11.1037694 C3.02483602,11.1037694 0.805925169,8.80044346 0.805925169,5.96940133 L0.805925169,5.96940133 Z" id="Shape"></path>
+                            </g>
+                        </g>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

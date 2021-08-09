@@ -1,0 +1,17 @@
+// Badge
+// ===
+
+// Badge root
+// ---
+
+.pw-badge {
+    display: inline-block;
+    min-width: 1.25em;
+    padding: 0 0.25em;
+
+    border-radius: 0.75em;
+    background: $neutral-20;
+
+    line-height: 1.25em;
+    text-align: center;
+}

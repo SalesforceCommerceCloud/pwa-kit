@@ -1,0 +1,76 @@
+// Text Content Component
+// ===
+//
+// Text content styles tag elements in a way that matches their component
+// equivalent in absence of any component classes, or styles tags to have
+// appropriate levels of margins that they would otherwise be lacking. You can
+// think of the c-text-content component as a way of creating a designated
+// WYSIWYG or markdown zone.
+
+.c-text-content {
+    > *:empty {
+        margin-bottom: 0px !important;
+    }
+
+    > *:not(:last-child) {
+        margin-bottom: $large-space;
+    }
+
+    h2 {
+        padding-top: $base-space;
+    }
+
+    ul,
+    ol {
+        margin-left: $base-space;
+        padding-left: $large-space;
+        
+        li {     
+            margin-bottom: $very-small-space;
+        }
+    }
+
+    a {
+        text-decoration: underline;
+
+        &:hover,
+        &:active,
+        &:focus {
+            text-decoration: none;
+        }
+    }
+
+    table {
+        min-width: 100%;
+
+        background: $neutral-10;
+    }
+
+    td,
+    th {
+        padding: $small-space;
+        border: 1px solid $border-color;
+
+        text-align: left;
+    }
+
+    th {
+        font-weight: bold;
+    }
+
+    blockquote {
+        padding-left: $base-space;
+        border-left: 4px solid $light-accent-color;
+    }
+
+    hr {
+        @extend %c-divider;
+    }
+
+    figcaption {
+        color: $neutral-50;
+        font-family: $mono-font-family;
+        font-size: $small-font-size;
+        text-align: center;
+    }
+}

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 53.2 (72643) - https://sketchapp.com -->
+    <title>icon/information </title>
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <path d="M1.13686838e-13,10 C1.13686838e-13,4.47666667 4.47666667,0 10,0 C15.5233333,0 20,4.47666667 20,10 C20,15.5233333 15.5233333,20 10,20 C4.47666667,20 1.13686838e-13,15.5233333 1.13686838e-13,10 Z M8.88888889,8.77866353 L8.88888889,14.5546698 C8.88888889,15.1151036 9.339774,15.5555556 9.89596897,15.5555556 L10.104031,15.5555556 C10.6614113,15.5555556 11.1111111,15.1074437 11.1111111,14.5546698 L11.1111111,8.77866353 C11.1111111,8.21822974 10.660226,7.77777778 10.104031,7.77777778 L9.89596897,7.77777778 C9.33858871,7.77777778 8.88888889,8.22588959 8.88888889,8.77866353 Z M10,6.66666667 C10.6136497,6.66666667 11.1111111,6.16920528 11.1111111,5.55555556 C11.1111111,4.94190583 10.6136497,4.44444444 10,4.44444444 C9.38635028,4.44444444 8.88888889,4.94190583 8.88888889,5.55555556 C8.88888889,6.16920528 9.38635028,6.66666667 10,6.66666667 Z" id="path-1"></path>
+    </defs>
+    <g id="Call-Outs" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Desktop" transform="translate(-76.000000, -357.000000)">
+            <g id="Message-" transform="translate(60.000000, 341.000000)">
+                <g id="Message-Copy">
+                    <g id="icon/information-" transform="translate(16.000000, 16.000000)">
+                        <mask id="mask-2" fill="white">
+                            <use xlink:href="#path-1"></use>
+                        </mask>
+                        <use id="Combined-Shape" fill="#42526E" fill-rule="nonzero" xlink:href="#path-1"></use>
+                        <g id="Fill/Solid/1.-Primary/Blue" mask="url(#mask-2)" fill="#005C83">
+                            <g transform="translate(-3.333333, -3.333333)" id="fillColor">
+                                <rect x="0" y="0" width="27" height="27"></rect>
+                            </g>
+                        </g>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

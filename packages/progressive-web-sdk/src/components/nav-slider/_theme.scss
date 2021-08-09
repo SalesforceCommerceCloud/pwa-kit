@@ -1,0 +1,29 @@
+// NavSlider Theme
+// ===
+//
+// 1. Absolutely positioned relative a `TransitionGroup` which is
+//    responsible for setting up the positioning context, eg:
+//
+//        <TransitionGroup component="div" style={{position: 'relative'}}>
+//            <NavSlider key={key}>
+//                content
+//            </NavSlider>
+//        </TransitionGroup>
+
+// @TODO: Re-implement these once the NavSlider bug that prevents us
+//        from rendering a custom version of this in the Styleguidist
+//        sandboxes has been fixed.
+//
+// .pw-nav-slider__example-transition-group {
+//     position: relative;
+//
+//     overflow: hidden;
+//     flex: 4 1 auto;
+//     align-self: stretch;
+// }
+//
+// .pw-nav-slider__example-custom-header-animation {
+//     position: absolute;  // 1
+//     top: 0;
+//     left: 0;
+// }

@@ -1,0 +1,473 @@
+//- 👉 The `base` layout!
+include ../mixins/markdownify
+include ../mixins/sidebar
+include ../mixins/header
+include ../mixins/inject-metadata
+include ../mixins/feedback
+include ../mixins/footer
+include ../mixins/icon-close-topbanner
+
+//- 👉 Just a nice location to place variables for use within the template.
+block config
+    - var rootPageRegEx = /(?:index|404|search)/i
+    - var getThemePath = function(rootPath, ver) {
+        - var isDocumentationHub = PROJECT_NAME === 'Documentation Home'
+
+        - if (isDocumentationHub) {
+            - ver = ''
+        - } else {
+            - var isRootPage = rootPageRegEx.test(ver)
+            - ver = isRootPage ? 'latest/' : `${ver}/`
+        - }
+
+        - return `${DOCS_ROOT}${ver}theme/`
+    - }
+
+    - var DOCS_ROOT = environment === 'production' ? PROD_ROOT : DEV_ROOT
+    //- This determines which domain to direct search requests to!
+    - var CSE_ID = environment === 'production' ? 'qko7xrhe0k4' : '5kfskqeb_xm'
+
+    - var metaData = {}
+    +injectMetadata
+    - var localPath = current.path
+    - var version = localPath[0]
+    - var fullProdUrl = "https://docs.mobify.com" + PROD_ROOT + localPath.slice(0, localPath.length - 1).join("/")
+    - var title = metaData.title ? `${metaData.title} | ${SITE_TITLE}` : SITE_TITLE
+    - var description = metaData.intro ? metaData.intro : SITE_DESCRIPTION
+    - var hasPicker = true
+    - var themePath = getThemePath(DOCS_ROOT, version)
+
+doctype html
+html(lang='en')
+    head
+        //
+            👋 docs.mobify.com, handcoded in Vancouver, Canada. http://www.mobify.com/jobs/
+              __    __     ______     ______     __     ______   __  __
+             /\ "-./  \   /\  __ \   /\  == \   /\ \   /\  ___\ /\ \_\ \
+             \ \ \-./\ \  \ \ \/\ \  \ \  __<   \ \ \  \ \  __\ \ \____ \
+              \ \_\ \ \_\  \ \_____\  \ \_____\  \ \_\  \ \_\    \/\_____\
+               \/_/  \/_/   \/_____/   \/_____/   \/_/   \/_/     \/_____/
+
+        //- 👉 Meta!
+        title=title
+
+        block meta
+            meta(charset='utf-8')
+            meta(name='viewport' content='width=device-width initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no')
+            meta(http-equiv='X-UA-Compatible' content='chrome=1')
+            meta(name='description' content=description)
+            meta(name='author' content='Mobify')
+            meta(name='google-site-verification' content='hcu0ZUGe8eYI-5_8gL5Nd1A7qCfxdzVCOtHEOF0kMkI')
+
+            //- 👉 Social!
+            meta(property='og:site_name' content='Mobify')
+            meta(property='og:type' content='article')
+            meta(property='fb:admins' content='146664288704690')
+            meta(name='twitter:card' content='summary')
+            meta(name='twitter:site' content='@mobify')
+            meta(property='og:title' content=title)
+            meta(name='twitter:title' content=title)
+            meta(property='og:url' content=fullProdUrl)
+            meta(name='twitter:description' content=description)
+            meta(property='og:description' content=description)
+            meta(property='og:image' content=`${themePath}img/share-thumbnail.png`)
+
+        link(rel='icon' href=`${themePath}img/favicon.ico`)
+
+        //- 👉 Main stylesheet
+        link(rel="stylesheet" href=`${themePath}css/main.css`)
+
+        //- 👉 Stylesheets for jQuery UI
+        link(rel="stylesheet" href=`${themePath}css/jquery-ui.min.css`)
+        link(rel="stylesheet" href=`${themePath}css/jquery-ui.theme.min.css`)
+
+        //- 👉 Stylesheet for table of contents generator
+        link(rel="stylesheet" href=`${themePath}css/jquery.tocify.css`)
+
+        //- 👉 Stylesheet for syntax highlighter
+        link(rel="stylesheet" href=`${themePath}css/prism.css`)
+
+        //- 👉 Typography.com font
+        link(rel="stylesheet" type="text/css" href="https://cloud.typography.com/7707534/6398772/css/fonts.css")
+
+        //- 📈 Google Tag Manager
+        script(type="text/javascript").
+            (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+            new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+            j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+            'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+            })(window,document,'script','dataLayer','GTM-W738TKG');
+
+    body.sdk-base
+        div.c-top-banner#top-banner
+            div.c-top-banner__content
+                p 🎉 Check out DevCenter, our new documentation site for v2.0! (Or keep using this site for earlier versions.)
+                a.externalLink(href="https://dev.mobify.com")
+                    p Switch to DevCenter
+            a(href="#" onclick="close_top_banner('top-banner')")
+                span.c-menu__close-icon
+                    +icon-close-topbanner
+                script(type="text/javascript").
+                    function close_top_banner(id) {
+                        var e = document.getElementById(id);
+                        e.style.display = 'none';
+
+                        const html = document.querySelector('html');
+                        html.style.setProperty('--top-spacing', '0px');
+
+                        if (!localStorage.getItem('top-banner-closed')) {
+                            localStorage.setItem('top-banner-closed', true);
+                        }
+                    }
+
+                    (function() {
+                        if (localStorage.getItem('top-banner-closed')) {
+                            close_top_banner('top-banner');
+                        }
+                    })()
+
+        //- 👉 The block `main` is the main block.
+        block main
+            div.t-category
+                block nav
+                    +sidebar
+
+                article.c-article.u-context.u-z1.u-large-shadow.u-flexbox.u-flex-column.u-background-neutral-10
+                    block header
+                        +header(metaData.title, metaData.intro, hasPicker)
+
+                    block content
+                        main.c-contain.c-text-content.u-margin-bottom-xl.u-flex
+                            != yield
+
+                    block feedback
+                        +feedback
+
+                    block footer
+                        +footer
+
+        block scripts
+            //- Expose version as a global so we can use it in JS (ex. styleguidist)
+            script(type="text/javascript").
+                window.Mobify = {
+                    version: "#{version}"
+                }
+
+            //- Pretty section anchors and permalinks
+            +markdownify
+
+            script(type="text/javascript").
+                (function() {
+                    var setHeight = function(node, value) {
+                        node.style.maxHeight = value
+                    };
+
+                    var productPicker = document.querySelector('.c-sidebar__product-picker');
+                    var products = document.querySelector('.c-sidebar__product-picker-item');
+                    var chevron = document.querySelector('.c-sidebar__product-picker-chevron')
+
+                    productPicker && productPicker.addEventListener('click', function() {
+                        var isActive = products.classList.toggle('c--active');
+
+                        if (isActive) {
+                            setHeight(products, products.scrollHeight + 'px');
+                            chevron.classList.add('c--active');
+                        } else {
+                            setHeight(products, null);
+                            chevron.classList.remove('c--active');
+                        }
+                    });
+                })()
+
+            //- 👉 jQuery and jQuery UI
+            script(src=`${themePath}js/jquery.min.js`)
+            script(src=`${themePath}js/jquery-ui.min.js`)
+
+            //- 👉 Browser and OS detection
+            script(src=`${themePath}js/pgwbrowser.min.js`)
+
+            //- 👉 Table of contents widget
+            script(src=`${themePath}js/tocify/jquery.tocify.min.js`)
+            script(src=`${themePath}js/tocify/jquery.tocify-user-timing.js`)
+
+            //- 👉 Copy to clipboard button
+            script(src=`${themePath}js/clipboard.min.js`)
+
+            //- 👉 Syntax highlighter
+            script(src=`${themePath}js/prism/prism.js`)
+
+            //- 👉 Version picker
+            if hasPicker
+                script(src=`${themePath}js/version-picker.js`)
+                script(type="text/javascript").
+                    versionPicker('#{DOCS_ROOT}', '#{localPath}', '#{changelogPath}', '#{version}')
+
+            //- 📈 Google Tag Manager
+            noscript
+                iframe(src="https://www.googletagmanager.com/ns.html?id=GTM-W738TKG",
+                height="0", width="0", style="display:none;visibility:hidden;")
+
+            //- 🔎 Google Custom Search Engine (more details in README.md)
+            script(type="text/javascript").
+                (function() {
+                    var cseId = "#{CSE_ID}";
+                    var gcse = document.createElement('script');
+                    gcse.type = 'text/javascript';
+                    gcse.async = true;
+                    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//cse.google.com/cse.js?cx=003287487325783809005:' + cseId;
+                    var s = document.getElementsByTagName('script')[0];
+                    s.parentNode.insertBefore(gcse, s);
+                    window.GCSECallback = function() {
+                        var search = document.getElementById('gsc-i-id1');
+                        if(!!search) {
+                            search.placeholder = "Type 'F' to Search";
+                        }
+                    }
+                    window.__gcse = {
+                        callback: window.GCSECallback
+                    }
+
+                    function searchStartingCallback() {
+                        document.getElementById('search-results-spinner').style.display = "block"
+                    }
+
+                    function renderedResultsCallback(name, q, promos, results) {
+                        document.getElementById('search-results-spinner').style.display = "none"
+                    }
+
+                    window.__gcse.searchCallbacks = {
+                        web: {
+                            starting: searchStartingCallback,
+                            rendered: renderedResultsCallback
+                        }
+                    }
+                    document.addEventListener('keyup', function(e){
+                        var searchInput = document.getElementById('gsc-i-id1');
+                        if(e.keyCode === 70 && e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA' ){
+                            searchInput.focus();
+                            document.getElementsByClassName('c-search-box')[0].classList.add('c--focused');
+                        }
+                    })
+                })();
+
+            script(type="text/javascript").
+                var setHeight = function(node, value) {
+                    node.style.maxHeight = value;
+                };
+
+                var handleAccClick = function() {
+                    var classList = this.classList;
+                    classList.toggle("sdk--active");
+                    classList.remove("sdk--remove-transition");
+
+                    var accordionItem = this.nextElementSibling;
+                    if (classList.toString().indexOf("sdk--active") > 0) {
+                        setHeight(accordionItem, accordionItem.scrollHeight + "px");
+                    } else {
+                        setHeight(accordionItem, null);
+                    }
+                };
+
+                // Handle click events for accordions
+                var acc = document.querySelectorAll(".sdk-sidebar__accordion");
+                for (var i = 0; i < acc.length; i++) {
+                    acc[i].onclick = handleAccClick;
+                };
+
+                // Initialize content accordions
+                $(function() {
+                    $( ".content-accordion" ).accordion({
+                        active: false,
+                        collapsible: true,
+                        heightStyle: "content",
+                        icons: { "header": "ui-icon-plus", "activeHeader": "ui-icon-close" }
+                    });
+                });
+
+                // Initialize the current set of on-page tabs
+                $(function () {
+                    $(".tabs").each(function (index, value) {
+                        $(this).tabs();
+
+                        // Preselect any on-page tabs based on operating system
+                        var theBrowser = $.pgwBrowser();
+                        var tabIndex = 0;
+                        var osSearchString = "Windows"; // Default to Windows
+
+                        if (typeof theBrowser != "undefined") {
+                            switch (theBrowser.os.group) {
+                                case 'Mac OS':
+                                    osSearchString = 'Mac'; break;
+                                case 'Linux':
+                                    osSearchString = 'Linux'; break;
+                                default:
+                                    osSearchString = 'Windows';
+                            }
+                            var osTab = $(this).find("a:contains('" + osSearchString + "')").first();
+                            var tabIndex = osTab.parent().index();
+                            $(this).tabs("option", "active", tabIndex);
+                        }
+                    });
+                });
+
+                // Initialize the table of contents if it exists
+                $(function() {
+                    // If the table of contents wasn't explicitly included on the page,
+                    // create a "phantom" one so we can still track user activity.
+                    if (!$("#toc").length) {
+                        $("body").append("<div id='toc' class='u-hidden'></div>");
+                    }
+
+                    var toc = $("#toc").tocify({ context: ".c-article",
+                                                 selectors: "h2",
+                                                 showAndHide: true,
+                                                 smoothScroll: true,
+                                                 scrollTo: 0,
+                                                 showAndHideOnScroll: true,
+                                                 highlightOnScroll: true,
+                                                 highlightOffset: 10,
+                                                 extendPage: false,
+                                                 history: true,
+                                                 hashGenerator: "pretty",
+                                                 highlightDefault: false,
+                                                 ignoreSelector: "h3,h4,h5,h6",
+                                                 scrollHistory: false
+                                                 });
+
+
+                    // If there is a TOC and a hash in the URL, click that TOC link automatically
+                    if (toc.length > 0 && window.location.hash !== '') {
+                        var hash = window.location.hash.substr(1);
+                        $('.tocify-item[data-unique="' + hash + '"]').click();
+                    }
+                });
+
+                $(function() {
+                    // Bind a click handler to highlight the currently selected component in the navbar
+                    $('.js-handle-active').click(function() {
+                        $("a.sdk-sidebar__list-link.c--active").removeClass('c--active');
+                        $(this).addClass('c--active');
+                    });
+
+                    // If the current URL has a hash in it and it corresponds to a component link in the sidebar, highlight that sidebar link
+                    $("a.sdk-sidebar__list-link[href$='" + window.location.hash + "']").addClass('c--active');
+                });
+
+                // Bind the content filter used on the guides and component library overview pages
+                $(function() {
+                    $('#content-filter').on('keyup', function() {
+                        var value = $(this).val().toLowerCase();
+                        $(".c-card").filter(
+                            function() {
+                                $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+                        });
+                    });
+                    $('#content-filter').keyup();
+                });
+
+                // Bind click handlers to the feedback buttons if they exist
+                $(function() {
+                    $('.t-feedback-layout__buttons > a').click(function() {
+                        // Push a 'feedback' event through the data layer to Google Tag Manager.
+                        window.dataLayer.push({
+                            'event': 'helpfulnessFeedback',
+                            'attributes': {
+                                'helpfulnessValue': $(this).text()
+                            }
+                        });
+
+                        $('.t-feedback-layout > p').text('Thank you for your feedback.');
+                        $('.t-feedback-layout__buttons').addClass('u-hidden');
+                    });
+                })
+
+                // Set the height properly for an accordion that is open on page load
+                var activeItem = document.querySelector(".sdk--active + .sdk-sidebar__accordion-item");
+                if (activeItem !== null) {
+                    var nav = document.getElementById('navigation');
+                    // Gross, but display the navigation briefly so we can calculate
+                    // the height properly in mobile mode
+                    nav.classList.remove('c--hide');
+                    setHeight(activeItem, activeItem.scrollHeight + "px");
+                    nav.classList.add('c--hide');
+                }
+
+            //-
+                Responsive Navigation
+                ---
+                1. Add delay to hide nav when the transition is done, otherwise
+                   user will be able to see hide nav in middle of transition.
+                2. Change Menu Icon
+                3. Add overlay so when user click on overlay and will close menu
+                4. Prevent from scrolling when menu is open
+                5. Improve a11y to focus on menu when its open
+            script(type="text/javascript").
+                var navToggle = document.getElementById('js-nav-toggle')
+                var menuSheet = document.getElementById('js-menu-sheet')
+                var closeMenu = document.getElementById('js-close-menu')
+                var searchToggle = document.getElementById('js-search-toggle')
+                var pageContainer = document.body
+
+                navToggle && navToggle.addEventListener('click', function() {
+                    document.getElementsByClassName('c-article')[0].classList.add('c--sidebar-open');
+                    document.getElementsByClassName('c-menu__close-icon')[0].classList.remove('u-hidden'); // 2
+                    document.getElementsByClassName('c-menu__menu-icon')[0].classList.add('u-hidden'); // 2
+                    document.getElementsByClassName('c-overlay')[0].classList.add('c--active'); // 3
+                    document.getElementsByClassName('c-sidebar')[0].classList.remove('c--hide'); // 1
+                    document.getElementsByClassName('c-article')[0].setAttribute('style', 'position: fixed !important; top: 0; right: 0; left: 0; width: 100%;'); // 4
+                    document.getElementsByClassName('c-sidebar')[0].setAttribute('tabindex', '1'); // 5
+                    document.getElementsByClassName('c-article')[0].setAttribute('tabindex', '0'); // 5
+                    document.getElementById('js-menu-first-focus').focus();
+
+                    document.getElementsByClassName('c-search-button__close-icon')[0].classList.add('u-hidden');
+                    document.getElementsByClassName('c-search-button__search-icon')[0].classList.remove('u-hidden');
+                    document.getElementsByClassName('c-search-sheet')[0].classList.remove('c--active');
+                    document.getElementsByClassName('js-search-input')[0].classList.add('u-hidden--for-phone-only');
+                    document.getElementsByClassName('js-search-input')[0].classList.add('u-hidden--for-tablet-only');
+                })
+
+                menuSheet && menuSheet.addEventListener('click', function() {
+                    document.getElementsByClassName('c-article')[0].classList.remove('c--sidebar-open');
+                    document.getElementsByClassName('c-menu__close-icon')[0].classList.add('u-hidden'); // 2
+                    document.getElementsByClassName('c-menu__menu-icon')[0].classList.remove('u-hidden'); // 2
+                    this.classList.remove('c--active'); // 3
+                    setTimeout(function(){document.getElementsByClassName('c-sidebar')[0].classList.add('c--hide')}, 210); // 1
+                    document.getElementsByClassName('c-article')[0].setAttribute('style', ''); // 4
+                    document.getElementsByClassName('c-sidebar')[0].setAttribute('tabindex', '0'); // 5
+                    document.getElementsByClassName('c-article')[0].setAttribute('tabindex', '1'); // 5
+                    document.getElementById('js-nav-toggle').focus(); // 5
+                })
+
+                closeMenu && closeMenu.addEventListener('click', function() {
+                    document.getElementsByClassName('c-article')[0].classList.remove('c--sidebar-open');
+                    document.getElementsByClassName('c-menu__close-icon')[0].classList.add('u-hidden'); // 2
+                    document.getElementsByClassName('c-menu__menu-icon')[0].classList.remove('u-hidden'); // 2
+                    this.classList.remove('c--active'); // 3
+                    setTimeout(function(){document.getElementsByClassName('c-sidebar')[0].classList.add('c--hide')}, 210); // 1
+                    document.getElementsByClassName('c-sidebar')[0].setAttribute('tabindex', '0'); // 5
+                    document.getElementsByClassName('c-article')[0].setAttribute('tabindex', '1'); // 5
+                    document.getElementById('js-nav-toggle').focus(); // 5
+                })
+
+                searchToggle && searchToggle.addEventListener('click', function() {
+                    document.getElementsByClassName('c-search-button__close-icon')[0].classList.toggle('u-hidden');
+                    document.getElementsByClassName('c-search-button__search-icon')[0].classList.toggle('u-hidden');
+                    document.getElementsByClassName('c-search-sheet')[0].classList.toggle('c--active');
+                    document.getElementsByClassName('js-search-input')[0].classList.toggle('u-hidden--for-phone-only');
+                    document.getElementsByClassName('js-search-input')[0].classList.toggle('u-hidden--for-tablet-only');
+                    document.querySelector('.gsc-input-box input.gsc-input').focus(); // 5
+                })
+
+                pageContainer && pageContainer.addEventListener('click', function(e) {
+                    var input = document.getElementsByClassName('gsc-input-box')[0]
+                    if(input && input.classList.contains('gsc-input-box-focus')) {
+                        document.getElementsByClassName('c-search-box')[0].classList.add('c--focused');
+                    }
+                    else {
+                        document.getElementsByClassName('c-search-box')[0].classList.remove('c--focused');
+                    }
+                })
+
+            div(data-pp-cfiw-widget='e5ac626a-6d54-11e7-b57b-22000a2145da', data-env='prod', data-static='')
+            script(async, type='text/javascript').
+                (function(d,id){var js,h = d.getElementsByTagName("head")[0];if (d.getElementById(id)) return;js=d.createElement("script"); js.id = id;js.src="https://widget.prodpad.com/customer_feedback_portal_app/inapp_widget/sdk.js";h.appendChild(js);}(document,"prodpad-cfiwjs"));

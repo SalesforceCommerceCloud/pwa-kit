@@ -1,0 +1,62 @@
+@charset 'UTF-8';
+// Import Susy first so susy-repeat() function can be called in variables.scss
+@import 'node_modules/susy/sass/susy';
+
+// Variables
+// ---
+//
+// Variables are scaffolded from github.com/mobify/vellum
+
+@import 'styles/variables.scss';
+
+
+// Mixins and Functions
+// ---
+
+@import 'styles/lib';
+
+
+// Component Animations
+// ---
+
+@import 'styles/animations';
+
+
+// Responsive
+// ---
+//
+// Mixins for Susy library
+
+@import 'styles/responsive';
+
+
+// SDK Wrapper
+// ---
+//
+// Apply the SDK component styles to only the code examples, and not the
+// surrounding documentation.
+//
+// Apologies for the long selector name, but was necessary for ensuring it is
+// self-documenting, AND to prevent component styles are properly scoped.
+
+.sdk-base [class*="rsg--preview"] {
+    // Base
+    // ---
+    //
+    // Default styles for html elements.
+    //
+    // Provides a base for look and feel; alter as needed.
+    // Base styles are generated from github.com/mobify/vellum
+    //
+    @import 'styles/base.scss';
+    //
+    // Components Themes
+    // ---
+    //
+    @import 'styles/components';
+    //
+    // Utility Classes
+    // ---
+    //
+    @import 'styles/utilities';
+}

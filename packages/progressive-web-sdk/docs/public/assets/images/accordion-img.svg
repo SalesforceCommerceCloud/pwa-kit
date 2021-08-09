@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="185px" height="58px" viewBox="0 0 185 58" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 44.1 (41455) - http://www.bohemiancoding.com/sketch -->
+    <title>accordion-img</title>
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <linearGradient x1="50%" y1="100%" x2="50%" y2="3.87436224%" id="linearGradient-1">
+            <stop stop-color="#F8F8F8" offset="0%"></stop>
+            <stop stop-color="#EFEFEF" offset="100%"></stop>
+        </linearGradient>
+        <rect id="path-2" x="0" y="2" width="184" height="17"></rect>
+        <filter x="-0.3%" y="-2.9%" width="100.5%" height="111.8%" filterUnits="objectBoundingBox" id="filter-3">
+            <feOffset dx="0" dy="1" in="SourceAlpha" result="shadowOffsetOuter1"></feOffset>
+            <feColorMatrix values="0 0 0 0 0.973161139   0 0 0 0 0.973161139   0 0 0 0 0.973161139  0 0 0 1 0" type="matrix" in="shadowOffsetOuter1"></feColorMatrix>
+        </filter>
+    </defs>
+    <g id="Design-system-updates" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="SDK-Homepage-v2" transform="translate(-589.000000, -1491.000000)">
+            <g id="Web-Components---multiple-cards" transform="translate(341.000000, 1352.000000)">
+                <g id="1st-row-components" transform="translate(0.000000, 76.000000)">
+                    <g id="accordion" transform="translate(234.333333, 7.000000)">
+                        <g id="accordion-img" transform="translate(14.000000, 56.000000)">
+                            <g id="Rectangle-14">
+                                <use fill="black" fill-opacity="1" filter="url(#filter-3)" xlink:href="#path-2"></use>
+                                <use fill="url(#linearGradient-1)" fill-rule="evenodd" xlink:href="#path-2"></use>
+                            </g>
+                            <rect id="Rectangle-14" fill="url(#linearGradient-1)" x="0" y="21" width="184" height="17"></rect>
+                            <rect id="Rectangle-14" fill="url(#linearGradient-1)" x="0" y="41" width="184" height="17"></rect>
+                            <text id="+" font-family="SFUIText-Medium, SF UI Text" font-size="16" font-weight="400" fill="#4E439B">
+                                <tspan x="6.81481481" y="15">+</tspan>
+                            </text>
+                            <text id="+" font-family="SFUIText-Medium, SF UI Text" font-size="16" font-weight="400" fill="#4E439B">
+                                <tspan x="6.81481481" y="34">+</tspan>
+                            </text>
+                            <text id="+" font-family="SFUIText-Medium, SF UI Text" font-size="16" font-weight="400" fill="#4E439B">
+                                <tspan x="6.81481481" y="53">+</tspan>
+                            </text>
+                            <rect id="Line" fill="#B4B4B4" x="0" y="19" width="184" height="1"></rect>
+                            <rect id="Line" fill="#B4B4B4" x="0" y="0" width="184" height="1"></rect>
+                            <rect id="Line" fill="#B4B4B4" x="0" y="39" width="184" height="1"></rect>
+                            <rect id="Line" fill="#B4B4B4" x="0" y="57" width="184" height="1"></rect>
+                        </g>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

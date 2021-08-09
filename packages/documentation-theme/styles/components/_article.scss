@@ -1,0 +1,23 @@
+// Article Component
+// ===
+
+.c-article {
+    @include for-tablet-landscape-up {
+        margin-left: $sidebar-width;
+    }
+    @include for-phone-only {
+        &.c--sidebar-open {
+            transform: translate(80%, 0);
+        }
+    }
+    @include for-tablet-only {
+        &.c--sidebar-open {
+            transform: translate(70%, 0);
+        }
+    }
+
+    overflow: hidden;
+    min-height: 100vh;
+
+    transition: all $transition-duration ease-out;
+}

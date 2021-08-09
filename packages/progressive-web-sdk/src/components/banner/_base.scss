@@ -1,0 +1,27 @@
+// Banner
+// ===
+//
+
+.pw-banner {
+    display: flex;
+    align-items: center;
+    max-width: $max-width;
+}
+
+
+// Banner Content
+// ---
+//
+.pw-banner__content {
+    flex: 1 1 auto;
+    padding: $sub-unit * 3;
+}
+
+
+// Banner Action
+// ---
+//
+
+.pw-banner__action {
+    flex: 0 0 auto;
+}

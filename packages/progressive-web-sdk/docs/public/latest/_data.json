@@ -1,0 +1,127 @@
+{
+    "getting-started": {
+        "title": "Getting Started"
+    },
+    "architecture": {
+        "title": "Architecture"
+    },
+    "faq": {
+        "title": "FAQ"
+    },
+    "guides": {
+        "title": "Guides",
+        "_excludeFromMenu": true
+    },
+    "analytics": {
+        "title": "Analytics Integrations"
+    },
+    "components": {
+        "title": "Component Library",
+        "crawlPriority": 1.0
+    },
+    "design": {
+        "title": "Design"
+    },
+    "integrations": {
+        "title": "Commerce Integrations"
+    },
+    "mobify-cloud": {
+        "title": "Mobify Cloud"
+    },
+    "testing": {
+        "title": "Testing"
+    },
+    "upgrades": {
+        "title": "Upgrades & Migrations"
+    },
+    "utility-functions": {
+        "title": "Utility Functions"
+    },
+    "_push-messaging": {
+        "title": "Push Messaging"
+    },
+    "_performance": {
+        "title": "Performance"
+    },
+    "_multivariate-testing": {
+        "title": "Multivariate Testing"
+    },
+    "_reference": {
+        "title": "Reference"
+    },
+    "_changelog": {
+        "title": "Changelog"
+    },
+    "_homepage": {
+        "getting-started": {
+            "title": "First steps",
+            "intro": "New to the Mobify Platform? Start here on your journey.",
+            "blocks": [
+                {
+                    "title": "Getting Started",
+                    "info": "Get up and running quickly, and get a head start on your initial deployment",
+                    "button": "Learn more",
+                    "href": "getting-started/"
+                },
+                {
+                    "title": "Architecture",
+                    "info": "Need a high-level view? Understand the building blocks before diving deeper",
+                    "button": "Learn more",
+                    "href": "architecture/"
+                },
+                {
+                    "title": "FAQ",
+                    "info": "Answers to frequently asked questions about the platform",
+                    "button": "Learn more",
+                    "href": "faq/"
+                },
+                {
+                    "title": "Guides",
+                    "info": "In-depth technical articles with lots of real-world examples and best practices",
+                    "button": "Learn more",
+                    "href": "guides/"
+                }
+            ]
+        },
+        "components": {
+            "title": "Component Library",
+            "intro": "We provide a library of pre-built web components to save you time.",
+            "blocks": [
+                {
+                    "title": "Button",
+                    "image": "../assets/images/button.png",
+                    "href": "components/#!/Button"
+                },
+                {
+                    "title": "Accordion",
+                    "image": "../assets/images/accordion-img.png",
+                    "href": "components/#!/Accordion"
+                },
+                {
+                    "title": "Field",
+                    "image": "../assets/images/field-img.png",
+                    "href": "components/#!/Field"
+                },
+                {
+                    "title": "Progress Steps",
+                    "image": "../assets/images/progress-img.png",
+                    "href": "components/#!/ProgressSteps"
+                },
+                {
+                    "title": "Search",
+                    "image": "../assets/images/search.png",
+                    "href": "components/#!/Search"
+                },
+                {
+                    "title": "Placeholder",
+                    "image": "../assets/images/skeleton-img.png",
+                    "href": "components/#!/SkeletonBlock"
+                },
+                {
+                    "image": "../assets/images/more.png",
+                    "href": "components/all/"
+                }
+            ]
+        }
+    }
+}

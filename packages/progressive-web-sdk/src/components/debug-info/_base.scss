@@ -1,0 +1,162 @@
+// As this component is less likely to need custom style from projects to projects
+// it will have its own completed styling in this scss file instead of creating custom styling outside of the sdk.
+// if you need to change custom style,
+// you can overwrite the style by importing custom style in your project (ect. the pwa)
+
+// Neutrals
+$debug-info-neutral-00: #fff;
+$debug-info-neutral-10: #efefef;
+$debug-info-neutral-20: #ddd;
+$debug-info-neutral-50: #555;
+$debug-info-neutral-60: #333;
+$debug-info-neutral-70: #000;
+
+//font sizes
+$debug-info-huge-font-size: 20px;
+$debug-info-font-size: 16px;
+$debug-info-small-font-size: 14px;
+$debug-info-smaller-font-size: 12px;
+$debug-info-tiny-font-size-: 8px;
+
+// Units
+$debug-info-sub-unit: 4px;
+$debug-info-unit: 8px;
+
+// Typography
+$debug-info-font-family: 'Roboto', 'Helvetica Neue', sans-serif;
+
+$debug-into-bold-font-weight: 700;
+
+// Appearance
+$debug-info-link-color: #09f;
+
+// Depth
+$debug-info-depth: 1000;
+
+// Debug Info
+// ---
+// 1. Limit the width in large screen
+
+.pw-debug-info {
+    position: fixed;
+    top: 100px;
+    right: 0;
+    z-index: $debug-info-depth;
+
+    .pw-sheet__inner {
+        max-width: 340px; // 1
+    }
+
+    .pw-sheet__wrapper {
+        box-shadow: none;
+    }
+}
+
+.pw-debug-info__content {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    padding: $debug-info-unit * 1.5; // 12px
+
+    background-color: $debug-info-neutral-70;
+
+    color: $debug-info-neutral-20;
+
+    font-family: $debug-info-font-family;
+    font-size: $debug-info-smaller-font-size;
+}
+
+.pw-debug-info__button.pw--toggle {
+    padding: $debug-info-sub-unit $debug-info-unit;
+    background: $debug-info-neutral-70;
+    color: $debug-info-neutral-00;
+    text-transform: uppercase;
+}
+
+// Debug Info Header
+// ---
+
+.pw-debug-info__header {
+    display: flex;
+    align-items: center;
+    margin: 0;
+    padding: 0;
+    background: $debug-info-neutral-70;
+    box-shadow: inset 0 -1px 0 0 rgb(85, 85, 85);
+    color: $debug-info-neutral-00;
+}
+
+.pw-debug-info__slider-container {
+    flex: 1 1 auto;
+    text-align: center;
+}
+
+.pw-debug-info__modal-title {
+    font-family: $debug-info-font-family;
+}
+
+.pw-debug-info__button {
+    flex-direction: column;
+    padding: $debug-info-unit $debug-info-unit * 1.5;
+}
+
+.pw-debug-info__header-actions-end {
+    flex: 1 0 auto;
+    align-self: stretch;
+}
+
+// Debug Info Item
+// ---
+
+.pw-debug-info__item {
+    margin: $debug-info-sub-unit 0;
+    padding-bottom: $debug-info-unit;
+}
+
+.pw-debug-info__link {
+    color: $debug-info-link-color;
+    text-decoration: underline;
+}
+
+.pw-debug-info__title {
+    font-family: $debug-info-font-family;
+    font-weight: $debug-into-bold-font-weight;
+    font-size: $debug-info-font-size;
+}
+
+// Debug Info Table
+// ---
+.pw-debug-info__table-label {
+    margin: $debug-info-unit 0;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.pw-debug-info__table {
+    table-layout: fixed;
+    border-collapse: collapse;
+    width: 100%;
+}
+
+.pw-debug-info__row {
+    background: $debug-info-neutral-50;
+}
+
+.pw-debug-info__row:nth-child(even) {
+    background: $debug-info-neutral-60;
+}
+
+.pw-debug-info__cell {
+    padding: $debug-info-sub-unit $debug-info-sub-unit * 1.5; // 4px 6px
+    vertical-align: top;
+}
+
+.pw-debug-info__cell.pw--name {
+    width: 75%;
+    word-break: break-all;
+}
+
+.pw-debug-info__cell.pw--duration {
+    width: 25%;
+    text-align: right;
+}

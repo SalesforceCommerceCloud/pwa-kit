@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="184px" height="50px" viewBox="0 0 184 50" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 44.1 (41455) - http://www.bohemiancoding.com/sketch -->
+    <title>skeleton-img</title>
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <linearGradient x1="0%" y1="99.2239773%" x2="178.1875%" y2="-16.3359375%" id="linearGradient-1">
+            <stop stop-color="#F0F0F0" offset="0%"></stop>
+            <stop stop-color="#C4C4C4" offset="100%"></stop>
+        </linearGradient>
+        <linearGradient x1="1.46683673%" y1="271.913448%" x2="100%" y2="50%" id="linearGradient-2">
+            <stop stop-color="#EDEDED" offset="0%"></stop>
+            <stop stop-color="#C4C4C4" offset="100%"></stop>
+        </linearGradient>
+        <linearGradient x1="-240.451389%" y1="100%" x2="613.591365%" y2="0.970583546%" id="linearGradient-3">
+            <stop stop-color="#EDEDED" offset="0%"></stop>
+            <stop stop-color="#C4C4C4" offset="100%"></stop>
+        </linearGradient>
+    </defs>
+    <g id="Design-system-updates" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="SDK-Homepage-v2" transform="translate(-825.000000, -1643.000000)">
+            <g id="Web-Components---multiple-cards" transform="translate(341.000000, 1352.000000)">
+                <g id="2nd-row-components" transform="translate(0.000000, 232.000000)">
+                    <g id="Skeleton" transform="translate(247.000000, 0.000000)">
+                        <g id="skeleton-img" transform="translate(237.000000, 59.000000)">
+                            <rect id="Rectangle-8-Copy-2" fill="url(#linearGradient-1)" x="0" y="0" width="50" height="50"></rect>
+                            <rect id="Rectangle-8-Copy-4" fill="url(#linearGradient-2)" x="60" y="0" width="124" height="9"></rect>
+                            <rect id="Rectangle-8-Copy-5" fill="url(#linearGradient-2)" x="60" y="15" width="124" height="9"></rect>
+                            <g id="stars" transform="translate(60.000000, 30.000000)" fill="url(#linearGradient-3)">
+                                <rect id="Rectangle-8-Copy-6" x="0" y="0" width="9" height="9"></rect>
+                                <rect id="Rectangle-8-Copy-6" x="12" y="0" width="9" height="9"></rect>
+                                <rect id="Rectangle-8-Copy-6" x="24" y="0" width="9" height="9"></rect>
+                                <rect id="Rectangle-8-Copy-6" x="36" y="0" width="9" height="9"></rect>
+                                <rect id="Rectangle-8-Copy-6" x="48" y="0" width="9" height="9"></rect>
+                            </g>
+                        </g>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

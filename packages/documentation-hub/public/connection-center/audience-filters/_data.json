@@ -1,0 +1,18 @@
+{
+    "introduction": {
+        "title": "Intro to Audience Filters",
+        "intro": "An Audience is a group of shoppers that can be reached by a particular medium."
+    },
+    "behaviour-filters": {
+        "title": "Behaviour Filters",
+        "intro": "Behavioural filters allow you to target your audience based on an event that has taken place, such as a visited page on your website."
+    },
+    "location-filters": {
+        "title": "Location Filters",
+        "intro": "Location filters allow you to target your audience based on a geographical location."
+    },
+    "language-filters": {
+        "title": "Language Filters",
+        "intro": "Target audiences based on language preferences."
+    }
+}

@@ -1,0 +1,42 @@
+// To enable your Connector, follow these 3 steps:
+
+// 1. Delete these lines
+import {DemoConnector as Connector} from '@mobify/commerce-integrations/dist/connectors/demo-connector'
+export const getConnector = () => Promise.resolve(new Connector())
+
+// 2. Uncomment these lines (NOTE: replace "[project-name]" with the name chossen at generation)
+// import Connector from '[project-name]-connector/dist'
+
+// export const getConnector = () => {
+//     // 3. Configure your Connector
+//     return Promise.resolve(Connector.fromConfig({
+//         clientConfig: {
+//             basePath: `https://www.example.com/rest/v2/storefront-us/`,
+//             defaultHeaders: {},
+//             timeout: 60000,
+//             cache: true,
+//             enableCookies: false,
+//             access_token: ''
+//         },
+//         catalogId: 'catalog_id',
+//         catalogVersionId: 'Online',
+//         authentication: {
+//             authorizationUrl: `https://www.example.com/authorizationserver/oauth/token`,
+//             clientId: 'client_id',
+//             clientSecret: 'client_secret'
+//         }
+//     }))
+// }
+
+// Return any connector-specific constants for root category ids, etc.
+export const getRootCategoryId = () => {
+    return 'categories'
+}
+
+export const getCarouselImageSizeType = () => {
+    return 'product'
+}
+
+export const getCarouselImagePropertyVariation = () => {
+    return 'style'
+}

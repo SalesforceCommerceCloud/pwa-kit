@@ -1,0 +1,18 @@
+.c-page-loader {
+    height: 100%;
+}
+
+.c-page-loader__offline {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    max-width: $narrow-width;
+    height: 100%;
+    margin: 0 auto;
+}
+
+.c-page-loader__offline-button {
+    width: 100%;
+}

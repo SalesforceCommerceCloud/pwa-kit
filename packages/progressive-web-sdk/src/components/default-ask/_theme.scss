@@ -1,0 +1,39 @@
+.pw-push-messaging__default-ask {
+    .pw-sheet__inner {
+        padding: $unit * 2;
+        border-top: 1px solid $border-color;
+    }
+}
+
+.pw-push-messaging__default-ask-title {
+    margin-bottom: $unit * 1.5;
+}
+
+.pw-push-messaging__default-ask-title-icon {
+    flex: 0 0 auto;
+}
+
+.pw-push-messaging__default-ask-title-content {
+    margin-left: $unit * 1.5;
+}
+
+.pw-push-messaging__default-ask-actions {
+    text-align: right;
+
+    button {
+        text-transform: uppercase;
+    }
+}
+
+.pw-push-messaging__default-ask-actions-accept {
+    &.pw-button {
+        background-color: $brand-color;
+
+        color: #fff;
+    }
+
+    &:active,
+    &:focus {
+        background-color: $tertiary-brand-color;
+    }
+}

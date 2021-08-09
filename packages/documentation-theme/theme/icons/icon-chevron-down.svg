@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="12px" height="8px" viewBox="0 0 12 8" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 47 (45396) - http://www.bohemiancoding.com/sketch -->
+    <title>icon/chevron-down</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Symbols" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="sidebar/Product-title" transform="translate(-272.000000, -27.000000)" fill="#FFFFFF">
+            <g id="icon/chevron-down/white" transform="translate(272.000000, 27.000000)">
+                <polygon id="Shape" points="10.6 -1.8e-15 6 4.6 1.4 -1.8e-15 0 1.4 6 7.4 12 1.4"></polygon>
+            </g>
+        </g>
+    </g>
+</svg>

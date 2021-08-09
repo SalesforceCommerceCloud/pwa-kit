@@ -1,0 +1,24 @@
+include ../mixins/top-nav
+include ../mixins/version-picker
+
+mixin header(title, intro, hasPicker)
+    - title = title || SITE_TITLE
+    header.t-header-layout.u-flex-none.u-margin-bottom-lg
+        +top-nav
+        div.c-contain
+            div.c-search-sheet.u-small-shadow-inset
+                span.u-visually-hidden Search Sheet
+            div.t-header-layout__content.u-flexbox.u-context.u-justify-between
+                div.t-header-layout__search.u-flex-none.js-search-input.u-hidden--for-phone-only.u-hidden--for-tablet-only
+                    div.c-search-box
+                        gcse:searchbox-only
+                div.u-flex
+                    if hasPicker
+                        div.u-hidden--for-tablet-landscape-up
+                            +versionPicker
+                div.u-flex.u-hidden--for-phone-only.u-hidden--for-tablet-only
+                    if hasPicker
+                        +versionPicker
+        if title !== 'Component Library'
+            div.t-header-layout__page-title.u-margin-top.c-contain
+                h1.c-heading.c--h1 #{title}

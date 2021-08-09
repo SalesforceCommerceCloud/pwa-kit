@@ -1,0 +1,64 @@
+// Card Theme
+// ===
+
+
+// Variables
+//
+$hover-box-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.2);
+
+// Card
+// ---
+//
+// 1. For phone screen card should be full width, if no width set then when content will give width value
+// 2. For phone screen small card's width is less than 50% + margin
+
+.c-card {
+    @include for-phone-only {
+        width: 100%; // 1
+
+        &.c--small {
+            width: 48%;
+            margin-left: $unit/2;
+        }
+    }
+
+    display: flex;
+    flex-direction: column;
+    margin-bottom: $base-space;
+    padding: $base-space;
+
+    border-radius: $border-radius;
+    background-color: $neutral-10;
+    box-shadow: $small-box-shadow;
+
+    & a {
+        text-decoration: none;
+    }
+
+    &:hover {
+        box-shadow: $hover-box-shadow;
+
+        transition: box-shadow .15s ease;
+    }
+}
+
+.c-card__heading,
+.c-card__message {
+    color: $black;
+    font-family: $base-font-family;
+    margin-bottom: $base-space;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding-right: $base-space;
+    text-decoration: none;
+}
+
+.c-card__heading {
+    a {
+        color: $font-color;
+    }
+}
+
+.c-card__basement {
+    margin-top: auto;
+}

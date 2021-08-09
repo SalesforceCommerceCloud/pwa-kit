@@ -1,0 +1,1309 @@
+[
+  {
+    "scope": "https://www.merlinspotions.com:443",
+    "method": "GET",
+    "path": "/",
+    "body": "",
+    "status": 200,
+    "response": [
+      "1f8b0800000000000003dd5ceb76db3892fe9f73f61d10768f25b549d197c44e64537d1cdbe978dab78d9c4ef7d81e1f4a84242614a926295f36f603ed6bec93ed57b8f022d1b6ecc9ece9b399694b028142a1502814be2a906dbef4a25e7a33e66c988e82f626fd65811b0e1c8387d6a78e8122ee7aaccd365f5a163b387ab7f7fe0f66b19d23767874c2b6f64f763fe2e7f156e76497ed1d1ceceeec6d9deceeffc1b6ded393a3e3ddc3bdc35fd887ddad1d76b2f50bb3acf666d28bfd71daaef727612ff5a3b0cecda8f1edd28d5962fa8e5dffe7edc659f2d3ed0fb70b8d51d4f5fb37d6d84d87cecff5d37f6e2c9cffd4b0cdd4e1cd20eab9d4ba397493a1e93a51b317455f7d6e867818ba97fec04da3b8394978bc35e0616ac68edfe4d7bc574f1bb7b7eaabdb307b4ebcb0109fae9c9b9ed3731cc730cc81fc92c6136e9881638751688daf5ca7be74bb8cdec74e9013525f41a8eb8c1716c6a7cbe74464d930fb8eed8febc328e4b791d7b0fd66ca93b41e36cca163bba11747be57281c39f651e72c59ac9f798b17f8affe738b3e1a3f534bc1365a5e413abd611c8df82d6418258d339bea17abdc38a3858511b86826e3c04febc685d130274edd265106bcb93888a241c0bb519a777e7bdb479b85859bd3a5f3b6f3f6f6b6debfbd1d361616aef07f48a6edbc5ec5af97f6ae37e067f6eddeee81209653302f9dc9eded0075bae6b5630cd3749cb46cbbe7854d3985989c91611e384610b91e8f9b5f12c3dc77ae170d3bf121177b1c47839827897fc9ad2bdeb5929edbef4781470fbc895013db583c30b79c7d73c731f252c33cc6d4e7ca102569338df6a32b1e6fbb09af37368e693e8637ddd84f9a231e077e988c23d29c4430b5b0504f1c904c5277c02d59cf403f73f0566c42dc35c00bfa4afabddee33d51ad27f5430d8abd805f3f1c3cd611aa3ca117d4165d6cd06aec98171b1e94e1f2e78eb3d5ba70b61a266fd2ccf76f9c6fe8fd371e271063ebf48df9eadc1c477e9826add3c5905fb11d37e5e7a69f1cc7fcd2e757ad81990ca349e0ed63f68f3f6fb52e4dac297c39883cdeea9ad1383d9aa42dcf4c6ec21ed5e171ab63ba855f1766eac6039eb6764c3748791ca283d6cb9789e9f989db0df8893b6865f6a4f14df3d9548f3d67d98c9a977ee26311f8e94d2745fb8585a839f43d8f8718a4361f8e211556da9c0dc6afc73e14d331b271d56970cd30baaa371657f9eb06d4ed9783934e1a4378283236983057b6d1b8bb333b2f1d679f3aba8aa1e77563d358346048f1ac51bff2432fba326180272318a8c6c6a6ad4ca332912c897bf72da627ac9b7cc931dfcbc677f9c6c21c1a0cf6298ea3d831243b6a82b5e020d77a039bc014676db2e3d36545831e4b83eec2164b8d8159d692553d9b11968ad80a0c987db759986e1878b799cffe86dfaffb6a8770e2662fe69881dd8093d4ea5103863b6e42375449f2ee065c1fba238e67b0681b4993e4e89b4913c30ff1217a725e2ee1ab1ebd5b18b0e935c76e0cda87d0ce26cc058fd377bc1fc5bc0e7d6bdcf120e12c5d5800cb5a15b1831466385aacc9a9ab2da68b354348bdb618d257dddf23d2ae2d468b46fb312da11d79f77027db953127239eba2cc4d81d431a7a8becab75c963bfefcb0dd360bd284c313cc738f67f0f263b97ef7f1df34f9fbe7efdededced1eed6d5d2afc37fec58a3837ff85f96df8cfe7e307cd5bfd835989deddc2f18fe918588f99f13ac0ee6b06fa28cca8d2ecceea738305a2cdb07aeaeae2aec940dfb99fa3d1bcc911d597ebdbab6b6bcfaf6f5aadd8f05879e7d009b1ca6911d4c46aecdc30b3824a2a3bb7cad3039e6ded08d138e314dd2bef5c6b0db2f64396d4516b179e918db72dcd609fc9d8214527e9ddae4f86c304d658a8814a8c7a5ba82d742ebcf3cc0de068588d881d85d6a093b56fb0bdbc64c04518aa27032eaf2982d4303b00371964cc6d89f5112f599da8e4cd6850793980c8624e69e8f91270c9e021b41f5f2114966e2085b7852e063ef7067f777f3fdd1fefed1e7bc7271f8bf5b9fb6aced6804f3e4c36416dbee3a1c5bbb297d0b67396f2f3b231b3e8ee2b4d0e4caf7e0937930ef3decd8f483f8f653df0d68f30e382c2e1bb9d7fe6832d205cd2593913f267e93d576c2487495fa69c0db1f488c63ccf8a62d0b5e6c42545f19d42ca0fdf926e0c9907370410eab638879eb2510021b415cae63b84160b061ccfbb9d5fc8eaa678fc09b4d630b3d1766887a263dfb6b3109b6b0b04856d6e8afcfe3b339c452e43c14cba33ef243a9822db6bef6667cddf8772a4141bec1b3b91fc359801efffb5495b8149de42c4ae3c58a8be78b7be9aa2d98959d8da72e9b8b9edb1b721bfef5807bf6ebf555bede5de7ddf565beb6ea2ead7aeef292b7feb6fb6aeded9bb76f569b98313a02e43e845e456589f461b093a6dcc8dc31fc77585a1b43fbb9ef8efce0c6394aaedcc0d3729c598d3e363a6d2c7cb178af2d5956eee69ec10aa362f77194041ddbe37d7712a4fa77730cc77a66f90f61247b9394fd9ff4ccd8a64d87f3f66637f26e98e7a6ae455bbb8bfd05fe1c151ab294c66e9175766adfd4096ceb8b7b8d2dfadb9dc95409fd6286e0fcdfb375db620e125bfaa3d64a73e0f78dbbbb1aeb056e020fbb374aac21ed01f405be31c76cd15fb12758817b134d526bb917c119088d36f91aea9f4614321f44f9255097b0ef0feab973420d3c8eb3293bcd2a6b2ab52f7f4e787c5333679f08dd4963374c02789e5535645b5b7e58099007881c2a5b2b113b2fd3c6561274ddded716d3471756ffb151f0a532d6b06bb204278c5e5adb7851224955c815c3a8b02df1b0e7f304fed8e954579a92f2b58eba5f2ae8fc0867d74f0fe1b32463b7c73b7214f59a501f3d7c783f7a7cb5c6c60c2f73d3e8038d20bf945cbf2a4239a718ce8fe2841f288ec8d9afe06a9ae20c6f7e9fd573b24df595e188c66a6eefd5faab9595f535bee42dbbeeeba5a5a557fd57ebfdb7abee5adf735f755d6fe5cdfaea6aad6a7e48bac509688e27c9b03ed3bf9e841a792e2fbf245641a63087904365134879a6fc6eb6e841a5d75d4be52ff25a56495daf4a354901c3c17de3a7962460f2cde0d3caca0c7808abc9eff74a4ef7f9639314ada985c29baee7d5ffde393aa4e318a01cd57f85d2690af439a52a381354a88a5aa03553f1f9749a333352e481becfae9a927e568bbd48a46cb58a4f8adf9512b79ea0c18fb27ef7608d076475c7c4d9f861ce2ba7796ad6aa17b89eb5c6432c54f23e3ba2bb291a790d3cc9a00d6cb1ca6d2a1c39ae2dd2531c4bc5966ab4458ff9988d9f68272db161880d44e2d3c9cc539a4e43e14c78184e8260563b0c0295f0d4b08d8a875e34c2ae4f8f9bd5ce4c55a384f726385862f771816854500dfc3e4ffd11553156d79696e4d95b6b5f416262b07705a9b1cd3092826b6f7afea5dee1b1b124101d1b0451d70d98ae033fb050895c1848178563200e29a08041fbef70543b022b6209e7a3844edb5dce34ba879327837710b36e1c5de180d9042bb221e66fec86edf751ccd221479b2425480f7008b64a8ec338a3668491e0f44da772a019a09d4e623c0919f5ab14a0a20ba2bc69834b1bec677ff5a8320f45444edeedfeb277c87e393afa657f976d1d6eedff71b2b7dd61db473bbbc5a0c80bdbde7c79babdb375b2752aa49a836a00b0ccc81c98b1e99aa3c637ffb4f68b80f2b74237b8018e926053e77010ce9d78c33f8dcf1dfa03685f47591a5227eb54dcfc533c6dfe797b7b7ade90db15f0558143268d3b53d4099ce59f34980b1cdd75e07f4f436f82c7119e3c80bf2968cf59de00a807246eb031ba1760a3a1496d9ac147cd9a9c899a59b36dd2720570b97afce27490fffa92a0e6c025df42507c3170eb353900d8fd1ab090f5372b6f5eadbf5db756a8c09da41155a66a097c292a233482c00fe9a0d8f6f939cefb19eea9f1b77b6715e6a3a0d844ccba8add31d40fda4dae3bf01fe5fc8a87b2a8bc1ca0643c6079b312417aa41bb14d57137345c084255ffdb106fb0068bafaa0f4835a62a20c6b8cf4b84375a1f9db72f5619052bb5da1c69b9340d3566c13e881031c4618f8fa11502b9eb22b0988a9a347172e3ce1bcd198638fea4d60c37148ac618cd4813c9ec83ae414b598ae516f34fb3084843fb19fd98fd8c415d066b2bf2dbfac359a311f077052ebb5bf2d63a62a9a35183a9c41e732708e58d0830c7cc437d53a7fccd093f99bb2eeb3069f2a19077297b8f8e4db5f12bb0710cfc6dcc398969b535dfa67e0703b063e8c23efbd75643d25c4076b95299205d7ec6cabe6c414e9b6ad655736ef4440ffcb4dbd2ea1cfd9d27249feabb83514f4052b0e0766ffbf441cd7228d524a13b85d82fc225a26ee7c28891e84edf67ad1244c71ca4478cc36da1d7f10b2bd70d37631df9868f4ff7ca2d27cd8066b6f0b4b08fc896dc90ef30eec0902e9c52da1b064f5a2d77b1c3918d93a90cb16c066344088d642101b80ab3c1bab158d224b3e550ba87d22eab243f732d366b17289b0d8023505c823c27addf44783b9a01e897e50ab0cfa90f876a2d0ed8b7d3cbbd8f707c354822188863886aaa321708349a0d85879fd16e687536dc778b54ad00918569bb4349302c0e82294fb15a1229c447bae409ca5007441c180ce98bb617425dbcc05ef00afea7d05a40044374e31a5b2fb92b9d29d5e288399992d352b64b28cf6c10d70fe3855f25713aa310dd24558f93fd31bc647e3542332d2e401ca22d0453c80e9031198bd64321ab9f10dfa44531ca0d812034823e4a242a3cc4fe81b0e63da8c967bb364b0010f6987fa0a77469ad62afa14c8a35a36aac9a01ed9fdca410082c1b2cca9fafd7b78d6349fd6b3e2d55f7e13c270c3231b2535c15291bde2776dbd0b3b5571bb15129372b3f44496e6208e108130908831461836dc41e42202a427d480fc754b036653355a40c9680f0fbd93c86819a705b5d5dd9c1b40d5705a1e0c787c22e2d6a8d844085cea273d845b0ddd23bbbc02a881eaf78228e147e14104b0679fbb97b9679e3ddb456405a1ab16a3d494bc8b6d5a22e8818c049ae1818c5fce967727698ac407a3757a0ee04dbadd2226ac969bc00fb10365ab6cde55a1260f93865d19a179067ff044fda83766a6b1601da16a321f483869b4afa840b45e9f145d3420bbf1180a4f0b4d0417556cf1cc3e13be207c0aec1fc5c48e335b13c037b43ac3c1c9d0454f2781c69331a69aef618cff99de3c9d42e27bbcebc66776898e602be6a3e85250fe17c8e644044d01b6ea29807264db3f606228fa99ceac3993b0ecc5959f0e2fba510c9f14b9397914770e41a3bad6fc03f79a0494fc46a9168831b65e43e8cae1c07ee187730f50353ad31bfa99dcd1e5d8928f08f8c538ed7c941168cf68c943ac415e7c0f8e54c053f46e44fd3e4dbb3b4e11da355adf0c8a3f5e60fc745afe66f809250975788813202d1d4d4508ef83d8ad308425d310059db80792a0870823724286738f45767f66ab76d91844f45cf37e671a8309cea7175a49ff720cde15c2eef3bacbb9af5bb29435ad30b5f319373653d559c7b9e4237fcbb44eefcf24b1ded00f3c646fd0f764d24d23a83b05026458e4be1af79523b907ed613041580413e81b60075839ecd0302b17ba8f0b3fec051729455596cd7baaf06b5d052a8565226c65616d9eb8d745b3a5657466eb4ece6cc50f94a572a0f2717394c4386810cfea4851e8e400cfcee0fc9f09ef7fcefed0ddf4f0b7e844d9cae6c0d23c5a32a70acba46284b273ade167f6434344fa54e50084949ec8ff34ad89bf9d89a638b60a96b7959f58c52cc257534cde4758e98c129a96d576a69744877c1e9c6b11c68981104c4ddf7c845594f2a3265239095523a2becfb4a76f4ca997604c98c069ae6676957c5e64fdc7845bbd1b4179ca02230ef6c82b83c441524d4993566053708760778f37d51e3bcde57db29b73b6a56c440f338c89d28edcda491bc01d9cedd88539e8c33d2c2fc1fbf8288f55b4dfa3e6440da9ae23914ef43c627973a5aa1411255234a84c4df05b690e56f4ac0e253e6da8958f2efd389db8c8f69a6906dee7942f5967427c6966b35559f058b205982b97b61b424404d9489f1627a5cc8dacc2e1b5baca9d459c102c198e264f5ca72d5743e8cf4a579b8a792f8b9877c6a24448727444a20665d4b0788c49b81bf7863881151085e273913645674279aeee88ead9315b6112f7b4d593d0de44a6e348a306e23b095b752d7219e5f70b2abea00a06d3c8c52312440222f99eb23dbca184122a0c646f0107024a883343796c7d9f071e107f356a71fed49cc9c32843ff8017650d795891c7ba9ce7ecd82ace891d2d13096f0a2a38ee16844282000d70e28763cae520fcb2d80199214b1f0ee1c2f5be4aa25855cc2079747800d714e855cbf841b62cc80aa7b30965473eaa6da24bdb459e06b67f9c2413880a8d918598fa487f46d8bca29f92fb7bc7905c91e399864a0cfdd340c64030c1d9d76002431d22d19e3246e430189622257552b40dd742b017359bcd0c881232b104f041e97dc8851b200fd0585e79633029792ce12e9213afa115b1ef5ab89e318ec693b163080f5d9516f9a45415c4b658b98c3c7760443431f90c5c14eb643c49195ba5670a812bcd6c08d1710f133b8d1cb9dea58b70509649f42435d68d3584a4d7822eb7247b467b4bf5c2a49c256088f1dd0b164a4a942625cfed6a2ee13c8c7cca82a4ac493d6b993064a37cd15469bd2497f54b3a9bfd100ce5703f1964c409f2004411f0a73d8489f44755ad124553cf8ee54d8e0459d00232c9b485e85bea46472261e0d929d27c8491a576cb4c00db8a45dd418909374d63606c3582046bc0ab645d5d15705be0278428006293685c2def01f55fce3610b8dc1d41c053fd56826684fc95185258dc0c1f82ec364e8a945e8cd9c8502d815a6b94a4b09ced9938f43775c41292558c97052b0e5bf39fafa6063fed81e8dd745b3b71f9fe3cddbb708d8a1b5d0123979838c5998a6618d16971490746eb124b48fe2000bb60aa55b1457a8814eb424559a4045f32d8a9db15c73904a442ee898b2030c6b46a70fe2750ac920d41cf122b6eb61f593ea5d641e08e25065250e61916ad04b80bb674b92424b48fed46154a1cfb07618991401f4e0036e36fc172dc230c8de355f0aaf7796955c9c64bcae545a942f004c72196ef66117c7ca58b75a4a3cadc174ada14269cc54f05e3f030b1df23be4557bc8c960230118a47823b0caf2e184784c4803aea8f6e303101efa7884b8ee178bb804be56fec170823924e01c344fc31f309f8250f96c4a09759df8f11ec0fa8083193b130fb730506f4ed30ba1280dc7285ade784980a99aa38c8f452bd87a195e7b0222e04341f63e41d5d1b98938dd5e7b051b890f028337bf9e58539597af51c96d4fd89e4517e3af2a2c5bcf279fd1c66e8dac8e87156b645b539a5b2f61c4690ae61b971ecc3bf7b9c9d435cd4db5295e7646a1d77839fb7a870d72746202cb1befae9e373a62ab35f7d1d569b0eafc2ec2897e5af6aaf558644293c2c9cabef62b325f54aa32de279aa5be19d2532b2479d23655cf020fee2ea14b2c6c446405fb29d41593c919222f2cad0cc15d55415386c48269177834a45d85c45cab66358cbe4c4207ba4b85f13459cf6441218258f886762c3289d43f21aea409cd72ba793e88a149725a90a52b20a7c5a8e2b09145ea552f2fce876f881eadc642e42af3545a0c6e0cfa9516b9ab324952b292be68dad1a5bd4836ad2690b3f6bf85f45a1ee0e994582d5896ff91ebc4ccdc72ca9bb5936683768e51d8a107471560bc7fc87e4a1c70917587ffdff2f14a9fc7366fa144217b3193e0f38d119bc23bc27fcc9512d789ef764ff505d434fc483b5444df2af45ae10e156da0f3f19e24a6c96d693119be18728d0bf3c4147fe967f674bcb25d5a0557199cb2b1a746e2d983a5908cc0091370dad480b42c7cf8baf1cc7248955a8f8810629c6fc8f7ff43f9f8c7be1efdbfdeb930ea58e48cb41b8000efd43022ce4ddd663421a4ac72d997946c97dd3d5700e15f7e4900220e33948bd854837c0dd3d11e90a222238ad039c1ff90087491ecf1d179c8d71ca04231120d454df47f1204a8f11e2bf4274f65fa00d3983d05811127d647775e789f216a37f2f7562c97cf1fe39571c2960beeae897f14385d02b9747b60a1e8d1a56522c03f57a456d6733941f6dcbcd2d016ee174520cc7654b0fa798c24a2db0580cc065b5a7831ed90302c6f310761545020ee08516c9ea20890a9cab1a33010c5cb210272edcdb1561718b96a3259057ca03a05f7b389f1503e704d35318a183dce91e85057457f2945f04e1c51cce5a4f51ac85fc1701e389a7dcd215b10ae938cda1c3df28e6f02d9be6b2f668b042ca8eea65a8067da7933862b2e2131f12016881206905a53a44f10d82b5931801c21ebe956aa0dbd37cf738c704658aabf2218516888c2341b2fa39c0dd28a15336f55a51455aa7ea3ac0a995a6112f5a232c72418818bc7f83f8d25091c2fb10b917f8e2990d3d140de5ef0cb67ab891cc79797abb5e0074fdbe66096e786326443206e56c889c1851590d425510e59515f4e875e6911e9b164216d09289491ee20594ad02b1dd5343a60c49c13f568bc030bc5005200ac5c4ee2509bc111ec4632429d83042d6d3bcf51e63141b2c1d02a0be48702b0b16caa1e4a29586ce9a96a8c43d05e8910a65d2cb32aaa41ad0c0ab479c5594ec514582650bd2c1da4386d84fc8895896930605c0afb17b432f1941b487eca0c4bd74ab9c13c92f582b5111fa63d18c7e7f5a898830412a9a411942cb46f4186f3957cfa03442d4ce4f86be48c82be68f20872d96af8a202392ab1e981cbbc1990db40f128234c469efe1d9873475337cf603bcd0e969ad699ba6e472a0bc98596942498b2f94c81417199f9522a3d11432e5f42a906f3522d3d48de1cfa6b8f72074458c72bec15d4182147a40fa1ddd71ceec9f2e27e2fa7b56273777fa5165b55ccb0b76608e16248b07ab09f354ac04a1298ba5db65bce21d2ea3a7d4c75de8b9aa2700d1b807793db1be262e19be03e778fd4a9852ea4647471748674b36886658bece46d85219177c28e7d4380728bda96f08cd19b579c069d09bb03431b9cf40f9df4f3f0a288783f6691722a47d59a022fbb8e877222efac97b7ea531cc3508729e72cf5dbe7b60faa88b053de0dbf49e0872e04b51f087444aade4eb25ce6c91ec405b2ee54889010c113fc0764daaab335830aa5182fc1b2c2bf997c68912418856b4fa5da871e17b17f4ea015a4e301ac80e75034a2dc5ae408e5a0cc749f8b923728909f142882da01c2d431041a10cbb160a26b18f5fe011aaa62ee96e0b61d3fd7a3c41e2d02536569dba78a1ea1808da8b037bae45c553b4104042ded108b739f240b62897c58c06822baa3867abab333031d90b8524f68a03f893ae815cdd24fed5cdc03e38bee8ba215e2f71b1dcfc3246b6bcb8f3915df24016c052e196c71a7ed0599d42991a5e537021eb0eacab21366242018bcf69a7659178af07b67c37c0bd46811958b25f156a43188cf2bdf3572db1c3e88a1df5fb4098b1fad415069105a33b96b13b128b26a5a6acfdfee36ee7035e59f961ebe36fbb788fe50ec32b2b3fe24d96bb87271d5093c9341959809afff162664ea4ec75debcba7620a6c91acad893c21767660accd28b9c6468ca2e059f209b7f759e56aae6e9d5f27a3e4d6b6bafee9d26313b15621c4f62248461828cf6f1d1c9ded1612ea78ae984f2dd88ba9d0f47c7786fe8e75c966aaa04509c6565cc8828b5e06ec08fcaa4a4bd0fa5cde53e958addc3bb41f3bdcb3a1ff68e8fe9d5a4effe60479ff7b3692e9312497ced4d3e6ae33230761c269c968491a7c37e7cbdb469e351369aa21e6be5eaa0af9ddd93adbd7d129154ccec93e0f1fb478d4bcaf9122e4402bf8356bcaad48a95b55c2b56d7579eaa1546fbddd1d1af0f69026ee33d530370655678e0c8d2d14a409b31de31aa5ffd59f972cfef20aad795a25a7e9d8beaa10554b073253387f32712910e39f7989f0277bcfa997dc23b5e00a8645a52bebea752fb3a27471f77d9fed1f616be3ca8b4eff14238f6a9f39ce5c67b9116b23d1b51fc0e325dab92e99bd74821d3370457d6ef374a05994eaf56982aa3bd4d2e1c449916c43975195249f370f733dbfaf871efb72db13aa5a19fa6893cdcf6bb8f479f3bbbf7c952465cb02914626bfa3b6d38945219d12dc062604d169531725d4de5c342d205005d584586f9488016805ab9a91a914efd446c5755cb94447154a09819cad9944fe49811ded5c56a0b2344937de0387cde34cf9c47bab820e9c4a449855c4f7194aa4816517d8914103889e2dda4dbf27e1be22370052d5144993a222299f76569362d0f2fc1f42981b33056994a9ad7c6d37bd3494bb584cd1697883f8d29db941de185118799785b6abd6eda73a492ca7807874e20b144063bd40f0a6514ba2de765ee8a2ba4e20517a23a039e44076915e8d0e3768c6fea1d409e4aa7a9e94796685713c577945659d4d48294e4ae55c838541a2bcbf17a0c359b0cde2b5d52cd72f03afa891e17aa8ec83d1056af9d3dcea4f5841444b52a543cbd707f9cf29204e8438ef07ca93de474f7f042f1088ee50db2a428266c116c43efd682d25923bcf3d58657232b8af70b4ab71d379aa90dc5b431d7e21eb95ecf4fe743a684da58c523787ce349e0c6e854e685b2139426dfa71f5ae1983bd0de96dfb0cb7c1fca02039518a94d3b33ba3812770785c83e727a83ca77eaaa9c35aed36a9f976e4b1347f7f39134a29680d42e98da64440e9e5278bcafe206e7c061a6c1dbba80fdcf7fb395a5e535367d0469b22db4178d12bcb214f70c2fb9476fa221a70f1f443e5b78f4723efca0587efb7f018557aba5855f0000"
+    ],
+    "rawHeaders": [
+      "Content-Encoding",
+      "gzip",
+      "Content-Type",
+      "text/html; charset=UTF-8",
+      "Date",
+      "Thu, 20 Sep 2018 18:27:22 GMT",
+      "Server",
+      "nginx/1.12.1",
+      "X-Content-Type-Options",
+      "nosniff",
+      "X-Frame-Options",
+      "SAMEORIGIN",
+      "X-XSS-Protection",
+      "1; mode=block",
+      "Content-Length",
+      "7871",
+      "Connection",
+      "Close"
+    ]
+  },
+  {
+    "scope": "https://www.merlinspotions.com:443",
+    "method": "POST",
+    "path": "/rest/default/V1/guest-carts",
+    "body": "",
+    "status": 200,
+    "response": [
+      "1f8b0800000000000003534a35b7304bb3344c4e36494b4a3149354c34334db634374e31b034b73430324e520200d72cc10222000000"
+    ],
+    "rawHeaders": [
+      "Cache-Control",
+      "no-store, no-cache, must-revalidate, post-check=0, pre-check=0",
+      "Content-Encoding",
+      "gzip",
+      "Content-Type",
+      "application/json; charset=utf-8",
+      "Date",
+      "Thu, 20 Sep 2018 18:27:22 GMT",
+      "Expires",
+      "Thu, 19 Nov 1981 08:52:00 GMT",
+      "Pragma",
+      "no-cache",
+      "Server",
+      "nginx/1.12.1",
+      "Set-Cookie",
+      "PHPSESSID=8rrfc4srf7mveo6154ga0molb6; expires=Thu, 20-Sep-2018 19:27:22 GMT; Max-Age=3600; path=/; domain=www.merlinspotions.com; HttpOnly",
+      "X-Content-Type-Options",
+      "nosniff",
+      "X-XSS-Protection",
+      "1; mode=block",
+      "Content-Length",
+      "54",
+      "Connection",
+      "Close"
+    ]
+  },
+  {
+    "scope": "https://www.merlinspotions.com:443",
+    "method": "GET",
+    "path": "/rest/default/V1/guest-carts/e786f91cc4fbd4e1a65c973d0979023b/selected-payment-method",
+    "body": "",
+    "status": 200,
+    "response": [
+      "1f8b08000000000000038b8e050029bb4c0d02000000"
+    ],
+    "rawHeaders": [
+      "Cache-Control",
+      "no-store, no-cache, must-revalidate, post-check=0, pre-check=0",
+      "Content-Encoding",
+      "gzip",
+      "Content-Type",
+      "application/json; charset=utf-8",
+      "Date",
+      "Thu, 20 Sep 2018 18:27:24 GMT",
+      "Expires",
+      "Thu, 19 Nov 1981 08:52:00 GMT",
+      "Pragma",
+      "no-cache",
+      "Server",
+      "nginx/1.12.1",
+      "X-Content-Type-Options",
+      "nosniff",
+      "X-XSS-Protection",
+      "1; mode=block",
+      "Content-Length",
+      "22",
+      "Connection",
+      "Close"
+    ]
+  },
+  {
+    "scope": "https://www.merlinspotions.com:443",
+    "method": "GET",
+    "path": "/rest/default/V1/guest-carts/e786f91cc4fbd4e1a65c973d0979023b/items",
+    "body": "",
+    "status": 200,
+    "response": [
+      "1f8b08000000000000038b8e050029bb4c0d02000000"
+    ],
+    "rawHeaders": [
+      "Cache-Control",
+      "no-store, no-cache, must-revalidate, post-check=0, pre-check=0",
+      "Content-Encoding",
+      "gzip",
+      "Content-Type",
+      "application/json; charset=utf-8",
+      "Date",
+      "Thu, 20 Sep 2018 18:27:24 GMT",
+      "Expires",
+      "Thu, 19 Nov 1981 08:52:00 GMT",
+      "Pragma",
+      "no-cache",
+      "Server",
+      "nginx/1.12.1",
+      "X-Content-Type-Options",
+      "nosniff",
+      "X-XSS-Protection",
+      "1; mode=block",
+      "Content-Length",
+      "22",
+      "Connection",
+      "Close"
+    ]
+  },
+  {
+    "scope": "https://www.merlinspotions.com:443",
+    "method": "GET",
+    "path": "/rest/default/V1/guest-carts/e786f91cc4fbd4e1a65c973d0979023b",
+    "body": "",
+    "status": 200,
+    "response": [
+      "1f8b08000000000000038d52c16ec3200cfd95c9e7542259bbb59cf707d34ed38468e26668045a03d5a2aaff3e20256d0f9516a1487ecf36ef199f4075c09bd5725d57d0124a8f9d901e3834ac5e2fd866d1b0a77acd9b57de345041d877d71416bf453e4f8cf17c628a7242b65e1d11b8a78019382af2416ae03ba95d823c0e4eb43698d88795f8e0c71cb5c1793b20013f010e52c53a13b4ae60a7c87923072c8096b7f1b982add25a995ec8ae23742e754806576cf3b2ac80b057d694e2291289bf035adbcd17648934de24394f8851f527c057051e35eebfad990bf6d6f9bb062a99fa97fceadeac8b84904e5c2ce5c9387944a14cb127b6d6fe44221ab7a47a61a943ca5af31489d0b4639a41afed566a51a08b45f8787f8b0fb6950e1f50f11de8117708d63fe2a63a6f45ee4d716526f9059e6a673c6745f82273c2eb2b7e9b5e9faf0b22e26af5019d9f176b664caa883fb51bcb1ece9c97bfa28db3777954cf45570aeaf31ff804023312030000"
+    ],
+    "rawHeaders": [
+      "Cache-Control",
+      "no-store, no-cache, must-revalidate, post-check=0, pre-check=0",
+      "Content-Encoding",
+      "gzip",
+      "Content-Type",
+      "application/json; charset=utf-8",
+      "Date",
+      "Thu, 20 Sep 2018 18:27:24 GMT",
+      "Expires",
+      "Thu, 19 Nov 1981 08:52:00 GMT",
+      "Pragma",
+      "no-cache",
+      "Server",
+      "nginx/1.12.1",
+      "X-Content-Type-Options",
+      "nosniff",
+      "X-XSS-Protection",
+      "1; mode=block",
+      "Content-Length",
+      "370",
+      "Connection",
+      "Close"
+    ]
+  },
+  {
+    "scope": "https://www.merlinspotions.com:443",
+    "method": "GET",
+    "path": "/rest/default/V1/guest-carts/e786f91cc4fbd4e1a65c973d0979023b/totals",
+    "body": "",
+    "status": 200,
+    "response": [
+      "1f8b08000000000000037592cd8e832014855fc5dcc5ac5874ed7a92997d3bab4943506f2d0982854b7f627cf722a5eaa8b3327ce71c2e07e9a0b642579c0c0905f98e41211cf22574be5838fe904abad2784d5c34c367726d09ef24bf493a8f8ef5ce1bba3bcbb695ba5ecdd91248dc57be05bb2126d6b64a62356ada2b9522a5b71675f9e0a5a91072f8d97f02838b37f49f26091bc72ff48833e20af2df633851ace5b06e50d3c03a48c1f1368349921ad07e4257a17c40bb9e4d8154781e4828fbc8bec3df532f75231b0acf6287b87adb18e09d503b6934174456169e301cb58bd7199fc5ab458524a48ac5fad9def38733cdf81a687658d461202c8a209f4cb84c0bfdb17f0296ab1a438f020000"
+    ],
+    "rawHeaders": [
+      "Cache-Control",
+      "no-store, no-cache, must-revalidate, post-check=0, pre-check=0",
+      "Content-Encoding",
+      "gzip",
+      "Content-Type",
+      "application/json; charset=utf-8",
+      "Date",
+      "Thu, 20 Sep 2018 18:27:24 GMT",
+      "Expires",
+      "Thu, 19 Nov 1981 08:52:00 GMT",
+      "Pragma",
+      "no-cache",
+      "Server",
+      "nginx/1.12.1",
+      "X-Content-Type-Options",
+      "nosniff",
+      "X-XSS-Protection",
+      "1; mode=block",
+      "Content-Length",
+      "273",
+      "Connection",
+      "Close"
+    ]
+  },
+  {
+    "scope": "https://www.merlinspotions.com:443",
+    "method": "POST",
+    "path": "/rest/default/V1/guest-carts/e786f91cc4fbd4e1a65c973d0979023b/items",
+    "body": {
+      "cartItem": {
+        "sku": "Beginners Guide To Transfiguration",
+        "qty": 1,
+        "quote_id": "e786f91cc4fbd4e1a65c973d0979023b"
+      }
+    },
+    "status": 200,
+    "response": [
+      "1f8b08000000000000037dce3b0ec2301004d0ab44d3d0b888f944914b1a2e903eb2e2255a813fd8eb2242dc1d4c454537c5bcd13cc1427e660773e887615428b70a8333ad1c02e5d25d2a3beaa6d84dd98672e5b5662b1c03141eb2c16885603dfd98dd5f94322f9fb6ee5b8cae2e32cb969a2fecd39dda6e8d42df4fd89f8ea3c6eb0d9fa2449fa7000000"
+    ],
+    "rawHeaders": [
+      "Cache-Control",
+      "no-store, no-cache, must-revalidate, post-check=0, pre-check=0",
+      "Content-Encoding",
+      "gzip",
+      "Content-Type",
+      "application/json; charset=utf-8",
+      "Date",
+      "Thu, 20 Sep 2018 18:27:25 GMT",
+      "Expires",
+      "Thu, 19 Nov 1981 08:52:00 GMT",
+      "Pragma",
+      "no-cache",
+      "Server",
+      "nginx/1.12.1",
+      "X-Content-Type-Options",
+      "nosniff",
+      "X-XSS-Protection",
+      "1; mode=block",
+      "Content-Length",
+      "140",
+      "Connection",
+      "Close"
+    ]
+  },
+  {
+    "scope": "https://www.merlinspotions.com:443",
+    "method": "GET",
+    "path": "/rest/default/V1/guest-carts/e786f91cc4fbd4e1a65c973d0979023b/totals",
+    "body": "",
+    "status": 200,
+    "response": [
+      "1f8b08000000000000039554cb6ae33014fd15731753189c9230a40cdeb514da45579374558251ec5b47a048ae1e9396e07f1f49b1e5873cb45dd93ae79efb96ce5049c2cb5c0b4d1864ab650a7ba2309fa0d7eb1494d94fadc6504955210cd73939ba0f649dd91cd149f313d5876031e37bce401d685d535e4591e68880cda53156cd5968f2de1f5d1fbc24424f882d5ad78c6219586e181b2431124ee34fc8d002ca0be6c8308a4ed01391af982a8c94c88b8fbc10254206cf9b7b48e1cd08fd3f8e6a3caafc4d7fd8c0ed09b297b3ffcb6909d9afe5cdcdef146a490b1ccc6e70eec4529ca2259b60e1381df9d7a7e0801a65810e597f732503163c2cdbd2a201f45546545fc59419d71cd1a2d65470db6078d9c1a70b35a53b9c93a39bdf1d56947394572a7930b4c4642b92adbdd3ea9556461217099a9d6d984f456175b4055f86db6e40b8dbd6886ae6a04d0ffd25ccf8095faf9bb4d7b4cb37d4b450f22379b44f0abbb0ad7c39d0ba4ef4b2ad3f7566ae3df8ae912b9b774eb496746f34da7ccf7ee4feb5ba9452a226945d2a19ad862dda092c1cc60beb41c4e7cde2f6e969f173f1c71a262bdf9d4a0a53fb455f35bb6690ecf079ec5d3c38d4763a6a510a4422b116afc25e36697d37ff00f88b670079050000"
+    ],
+    "rawHeaders": [
+      "Cache-Control",
+      "no-store, no-cache, must-revalidate, post-check=0, pre-check=0",
+      "Content-Encoding",
+      "gzip",
+      "Content-Type",
+      "application/json; charset=utf-8",
+      "Date",
+      "Thu, 20 Sep 2018 18:27:26 GMT",
+      "Expires",
+      "Thu, 19 Nov 1981 08:52:00 GMT",
+      "Pragma",
+      "no-cache",
+      "Server",
+      "nginx/1.12.1",
+      "X-Content-Type-Options",
+      "nosniff",
+      "X-XSS-Protection",
+      "1; mode=block",
+      "Content-Length",
+      "473",
+      "Connection",
+      "Close"
+    ]
+  },
+  {
+    "scope": "https://www.merlinspotions.com:443",
+    "method": "GET",
+    "path": "/rest/default/V1/guest-carts/e786f91cc4fbd4e1a65c973d0979023b/selected-payment-method",
+    "body": "",
+    "status": 200,
+    "response": [
+      "1f8b08000000000000038b8e050029bb4c0d02000000"
+    ],
+    "rawHeaders": [
+      "Cache-Control",
+      "no-store, no-cache, must-revalidate, post-check=0, pre-check=0",
+      "Content-Encoding",
+      "gzip",
+      "Content-Type",
+      "application/json; charset=utf-8",
+      "Date",
+      "Thu, 20 Sep 2018 18:27:26 GMT",
+      "Expires",
+      "Thu, 19 Nov 1981 08:52:00 GMT",
+      "Pragma",
+      "no-cache",
+      "Server",
+      "nginx/1.12.1",
+      "X-Content-Type-Options",
+      "nosniff",
+      "X-XSS-Protection",
+      "1; mode=block",
+      "Content-Length",
+      "22",
+      "Connection",
+      "Close"
+    ]
+  },
+  {
+    "scope": "https://www.merlinspotions.com:443",
+    "method": "GET",
+    "path": "/rest/default/V1/guest-carts/e786f91cc4fbd4e1a65c973d0979023b/items",
+    "body": "",
+    "status": 200,
+    "response": [
+      "1f8b08000000000000037dcebd0e82301405e0572177716168050b6564f105d88c21a5bd901b6d8bfd1988f1dd152727b7339cefe45c9e4009ed4806ba8a09d196106f193ae87121e730c4e29cc96031f86208cac599961c5422efa08447daa0e3253865f1c71cfea23590feb439dba33759a7316debee23d9f58efb6ef609bf9f009b56cc926b5dcf93a9912b71d2b2a90c938d64c76a82d7f50dec90a0e1c4000000"
+    ],
+    "rawHeaders": [
+      "Cache-Control",
+      "no-store, no-cache, must-revalidate, post-check=0, pre-check=0",
+      "Content-Encoding",
+      "gzip",
+      "Content-Type",
+      "application/json; charset=utf-8",
+      "Date",
+      "Thu, 20 Sep 2018 18:27:27 GMT",
+      "Expires",
+      "Thu, 19 Nov 1981 08:52:00 GMT",
+      "Pragma",
+      "no-cache",
+      "Server",
+      "nginx/1.12.1",
+      "X-Content-Type-Options",
+      "nosniff",
+      "X-XSS-Protection",
+      "1; mode=block",
+      "Content-Length",
+      "163",
+      "Connection",
+      "Close"
+    ]
+  },
+  {
+    "scope": "https://www.merlinspotions.com:443",
+    "method": "GET",
+    "path": "/rest/default/V1/guest-carts/e786f91cc4fbd4e1a65c973d0979023b",
+    "body": "",
+    "status": 200,
+    "response": [
+      "1f8b08000000000000038d52c14ec3300cfd15e47327b5658391337f8038211465ad5722d264739c896adabf93b44bb71d86b854f27b7eee7b8e8fa05b10f56ab9ae0a680815632b158380baacd68bf26551970fd55ad4cfa2aea180b06bff6a59c516eda56a581f100453c0113868e2a00c88ad323e418cbd978d0b36cea972bde761ac9ae0d9f548208e80bdd251678331056c3579b6aac70c18755d9f0ad86863b4eda46a5b42efd384147055be3c2d0b20ecb4b3593c5532f13740e3daf907a3451aae9a3c136274fd01f05900a3c1dd97b3b360e73cdf0cd029d4bfec17b7617d24a4f2f21c094499b0034a6d733cb971ee3b1231b823dd49472dd2e8b54c5b2442db0c69079d711b656486ce11e1fded353ed84679bc43c577a07bdc3e38bec74d3a76729c4df16426fb199eb4333e7645f86c73c2ab0b7edd5e9d2e0722e36975013dcf8735333629e2476f877c8733c7ea473671f77e5cd563f6958aeaf40beed0176c12030000"
+    ],
+    "rawHeaders": [
+      "Cache-Control",
+      "no-store, no-cache, must-revalidate, post-check=0, pre-check=0",
+      "Content-Encoding",
+      "gzip",
+      "Content-Type",
+      "application/json; charset=utf-8",
+      "Date",
+      "Thu, 20 Sep 2018 18:27:27 GMT",
+      "Expires",
+      "Thu, 19 Nov 1981 08:52:00 GMT",
+      "Pragma",
+      "no-cache",
+      "Server",
+      "nginx/1.12.1",
+      "X-Content-Type-Options",
+      "nosniff",
+      "X-XSS-Protection",
+      "1; mode=block",
+      "Content-Length",
+      "363",
+      "Connection",
+      "Close"
+    ]
+  },
+  {
+    "scope": "https://www.merlinspotions.com:443",
+    "method": "PUT",
+    "path": "/rest/default/V1/guest-carts/e786f91cc4fbd4e1a65c973d0979023b/items/30668",
+    "body": {
+      "cartItem": {
+        "sku": "Beginners Guide To Transfiguration",
+        "qty": 2,
+        "quote_id": "e786f91cc4fbd4e1a65c973d0979023b"
+      }
+    },
+    "status": 200,
+    "response": [
+      "1f8b08000000000000037dce3b0ec2301004d0ab58d3d0b8c807a2c8250d17481f59f112adc076b0d74584b83b988a8a6e8a79a3798285fccc0ea66f8661d4c8b7028333ad1c02a5ac2e851da929aa29d990afbc9664856380c64376984e23584f3fe6f0176d89974fbb6d6a8cae2c32cbbe559fd96f77aabb250a7d3fa13b1dc716af379f3468d7a7000000"
+    ],
+    "rawHeaders": [
+      "Cache-Control",
+      "no-store, no-cache, must-revalidate, post-check=0, pre-check=0",
+      "Content-Encoding",
+      "gzip",
+      "Content-Type",
+      "application/json; charset=utf-8",
+      "Date",
+      "Thu, 20 Sep 2018 18:27:28 GMT",
+      "Expires",
+      "Thu, 19 Nov 1981 08:52:00 GMT",
+      "Pragma",
+      "no-cache",
+      "Server",
+      "nginx/1.12.1",
+      "X-Content-Type-Options",
+      "nosniff",
+      "X-XSS-Protection",
+      "1; mode=block",
+      "Content-Length",
+      "140",
+      "Connection",
+      "Close"
+    ]
+  },
+  {
+    "scope": "https://www.merlinspotions.com:443",
+    "method": "GET",
+    "path": "/rest/default/V1/guest-carts/e786f91cc4fbd4e1a65c973d0979023b/selected-payment-method",
+    "body": "",
+    "status": 200,
+    "response": [
+      "1f8b08000000000000038b8e050029bb4c0d02000000"
+    ],
+    "rawHeaders": [
+      "Cache-Control",
+      "no-store, no-cache, must-revalidate, post-check=0, pre-check=0",
+      "Content-Encoding",
+      "gzip",
+      "Content-Type",
+      "application/json; charset=utf-8",
+      "Date",
+      "Thu, 20 Sep 2018 18:27:29 GMT",
+      "Expires",
+      "Thu, 19 Nov 1981 08:52:00 GMT",
+      "Pragma",
+      "no-cache",
+      "Server",
+      "nginx/1.12.1",
+      "X-Content-Type-Options",
+      "nosniff",
+      "X-XSS-Protection",
+      "1; mode=block",
+      "Content-Length",
+      "22",
+      "Connection",
+      "Close"
+    ]
+  },
+  {
+    "scope": "https://www.merlinspotions.com:443",
+    "method": "GET",
+    "path": "/rest/default/V1/guest-carts/e786f91cc4fbd4e1a65c973d0979023b",
+    "body": "",
+    "status": 200,
+    "response": [
+      "1f8b08000000000000038d52c16e83300cfd95c9672a016b37c6797f30ed344d510097450b499b38d550d57f9f030d6d0f9d7641f27b7ee63dc747501dd4e5665d1519b40e25612724410d655e54abfc6555e60f455597cf7559420661d7fdd552718bf242b6a40e0835b9801370508e82d4506fa5f611221cbc686d303ca748f59e46f6c23e82273ba083fa083848c53a13b4ce60ab9c2723074c8096d7f529834669ad4c2f64d739f43e4e880137f9cbd33a0387bdb22689e74a44fe06686db7fc60b2e8c6ab264f0e915d7f007c6640a871f765cd22d8594f3703540cf52ffbd96d58cf84905e9c23419d47ec804299144f34d67e33c1c1ad53bdb0ae433779cde3169d43d38e7107bdb68dd42241e788f0fef6ca0fd6488f77287e07778fdb074bf7b85947564cb31d9fcc6c3fc1b376c1a72e86cf3667bcb8e0d7edc5e97220824fab0fe86939ac853151c11fb51dd31d2e1cc91fd1f2eefdb4aac7e42b16c5e917dc0cd77a12030000"
+    ],
+    "rawHeaders": [
+      "Cache-Control",
+      "no-store, no-cache, must-revalidate, post-check=0, pre-check=0",
+      "Content-Encoding",
+      "gzip",
+      "Content-Type",
+      "application/json; charset=utf-8",
+      "Date",
+      "Thu, 20 Sep 2018 18:27:29 GMT",
+      "Expires",
+      "Thu, 19 Nov 1981 08:52:00 GMT",
+      "Pragma",
+      "no-cache",
+      "Server",
+      "nginx/1.12.1",
+      "X-Content-Type-Options",
+      "nosniff",
+      "X-XSS-Protection",
+      "1; mode=block",
+      "Content-Length",
+      "364",
+      "Connection",
+      "Close"
+    ]
+  },
+  {
+    "scope": "https://www.merlinspotions.com:443",
+    "method": "GET",
+    "path": "/rest/default/V1/guest-carts/e786f91cc4fbd4e1a65c973d0979023b/items",
+    "body": "",
+    "status": 200,
+    "response": [
+      "1f8b08000000000000037dcebd0e82301405e0572177716168010b6574f105d88c21a5bd901ba5c5fe0cc4f8ee5a2727b7339cefe45c9e4011d7910cf43513a22b21dc12f470c285ac451f8a732283c5e08ac12b1b665a9257919c85121e7187be2ac1aa157fcce12fda3ce94f9bb31c9d493a8e71dfb20fb46e77ccbbc945fc7e026c3b314bae75334fa641aec451cbb6364cb69255f504afeb1b8835f5fac4000000"
+    ],
+    "rawHeaders": [
+      "Cache-Control",
+      "no-store, no-cache, must-revalidate, post-check=0, pre-check=0",
+      "Content-Encoding",
+      "gzip",
+      "Content-Type",
+      "application/json; charset=utf-8",
+      "Date",
+      "Thu, 20 Sep 2018 18:27:30 GMT",
+      "Expires",
+      "Thu, 19 Nov 1981 08:52:00 GMT",
+      "Pragma",
+      "no-cache",
+      "Server",
+      "nginx/1.12.1",
+      "X-Content-Type-Options",
+      "nosniff",
+      "X-XSS-Protection",
+      "1; mode=block",
+      "Content-Length",
+      "163",
+      "Connection",
+      "Close"
+    ]
+  },
+  {
+    "scope": "https://www.merlinspotions.com:443",
+    "method": "GET",
+    "path": "/rest/default/V1/guest-carts/e786f91cc4fbd4e1a65c973d0979023b/totals",
+    "body": "",
+    "status": 200,
+    "response": [
+      "1f8b08000000000000039554cb6adc3014fd15a34503c553ec9609c5bb9640bac8aa335985c168ec1b47a0911c3d3a0983ffbd571e59961fa5edcabee7dca3fb942ea45154d4a5918672527cce5272a41aca299aa744dbe3dc670ad54c57d20a53d293fb9062705b2306697966e62578ac9cbde6a05f58db32d12c22ad11015b4b63aa5af330f42d98b917ccb03380c7da9633a803272ce75102b16c117b4686f299a8b823fd1006f7115e9cb4a42aab1488eabdac640da4208fbb3b9292572bcd9f3866e0a4cb57f38e61bd458aa74bff57b29a145fb2dbdbaf296915ab50950f91227b102b795e2cd70c0be67cd8ffd67f67b6a02a70f6f63f173160e184cc97153532cf3e6de30a17d458c1745ed36a67a46c0d93021b4b9e0ee4af6b34a7075cd0939bdb77689810a06e74726f590dc95e267bbcc3fa99355651178974076c569f8886e684c55e87ea271f6e333a31c31db41ba15f945b707977e9a8f02b172b3c947c487ee003c2afac176791d6756194ed7bcbbb616be0cd80d09873498d51ec680d60ae977ed4fdcb742da3064319bf56112d0496ebdc110c4325db28dae36ef3ede161f371f3131d93bcef4ba3a46dfbd5cebb4317251a3f84e311f70ec51ecf9a9312aa8022ff2cf172293cb9fb0d40f0cfb361050000"
+    ],
+    "rawHeaders": [
+      "Cache-Control",
+      "no-store, no-cache, must-revalidate, post-check=0, pre-check=0",
+      "Content-Encoding",
+      "gzip",
+      "Content-Type",
+      "application/json; charset=utf-8",
+      "Date",
+      "Thu, 20 Sep 2018 18:27:30 GMT",
+      "Expires",
+      "Thu, 19 Nov 1981 08:52:00 GMT",
+      "Pragma",
+      "no-cache",
+      "Server",
+      "nginx/1.12.1",
+      "X-Content-Type-Options",
+      "nosniff",
+      "X-XSS-Protection",
+      "1; mode=block",
+      "Content-Length",
+      "475",
+      "Connection",
+      "Close"
+    ]
+  },
+  {
+    "scope": "https://www.merlinspotions.com:443",
+    "method": "DELETE",
+    "path": "/rest/default/V1/guest-carts/e786f91cc4fbd4e1a65c973d0979023b/items/30668",
+    "body": "",
+    "status": 200,
+    "response": [
+      "1f8b08000000000000032b292a4d05008d4cfcfd04000000"
+    ],
+    "rawHeaders": [
+      "Cache-Control",
+      "no-store, no-cache, must-revalidate, post-check=0, pre-check=0",
+      "Content-Encoding",
+      "gzip",
+      "Content-Type",
+      "application/json; charset=utf-8",
+      "Date",
+      "Thu, 20 Sep 2018 18:27:31 GMT",
+      "Expires",
+      "Thu, 19 Nov 1981 08:52:00 GMT",
+      "Pragma",
+      "no-cache",
+      "Server",
+      "nginx/1.12.1",
+      "X-Content-Type-Options",
+      "nosniff",
+      "X-XSS-Protection",
+      "1; mode=block",
+      "Content-Length",
+      "24",
+      "Connection",
+      "Close"
+    ]
+  },
+  {
+    "scope": "https://www.merlinspotions.com:443",
+    "method": "GET",
+    "path": "/rest/default/V1/guest-carts/e786f91cc4fbd4e1a65c973d0979023b/items",
+    "body": "",
+    "status": 200,
+    "response": [
+      "1f8b08000000000000038b8e050029bb4c0d02000000"
+    ],
+    "rawHeaders": [
+      "Cache-Control",
+      "no-store, no-cache, must-revalidate, post-check=0, pre-check=0",
+      "Content-Encoding",
+      "gzip",
+      "Content-Type",
+      "application/json; charset=utf-8",
+      "Date",
+      "Thu, 20 Sep 2018 18:27:32 GMT",
+      "Expires",
+      "Thu, 19 Nov 1981 08:52:00 GMT",
+      "Pragma",
+      "no-cache",
+      "Server",
+      "nginx/1.12.1",
+      "X-Content-Type-Options",
+      "nosniff",
+      "X-XSS-Protection",
+      "1; mode=block",
+      "Content-Length",
+      "22",
+      "Connection",
+      "Close"
+    ]
+  },
+  {
+    "scope": "https://www.merlinspotions.com:443",
+    "method": "GET",
+    "path": "/rest/default/V1/guest-carts/e786f91cc4fbd4e1a65c973d0979023b/totals",
+    "body": "",
+    "status": 200,
+    "response": [
+      "1f8b080000000000000375923f6fc32010c5bf4a7443270f5147cf95da3de9544508db57070983034793c8f2772f10c77fc964f17bef1d77f83aa80d5715234d5c42becfa0e016d91a5a57ac1c0b52095b6aa788f1267c26574a7826d955d0797440febe2e9d32d8b3685ba1eacd4d296164a93696a99483f86d1358b12be2c0da560aac464d3929670da44abd12c7f1852a651097b32ce8b2d0562a9d31a8ca3b2b758590c3f7e10332b8384daf3441d85876a17b2c124f90ff9cfc6bc49e2cd60d2a0aac832138ae82370992011d26f4c7a5f368df67536068781e18d0ee6df7e5574f3ed444368c37c58ef1f4b4658037426585568c1319513842df6a177f65dce9c714151217320ed6cf6acfb77ebae333d0dd71354e06dc20f7f2aff68f69a03ff5ffe742641a4c030000"
+    ],
+    "rawHeaders": [
+      "Cache-Control",
+      "no-store, no-cache, must-revalidate, post-check=0, pre-check=0",
+      "Content-Encoding",
+      "gzip",
+      "Content-Type",
+      "application/json; charset=utf-8",
+      "Date",
+      "Thu, 20 Sep 2018 18:27:32 GMT",
+      "Expires",
+      "Thu, 19 Nov 1981 08:52:00 GMT",
+      "Pragma",
+      "no-cache",
+      "Server",
+      "nginx/1.12.1",
+      "X-Content-Type-Options",
+      "nosniff",
+      "X-XSS-Protection",
+      "1; mode=block",
+      "Content-Length",
+      "301",
+      "Connection",
+      "Close"
+    ]
+  },
+  {
+    "scope": "https://www.merlinspotions.com:443",
+    "method": "GET",
+    "path": "/rest/default/V1/guest-carts/e786f91cc4fbd4e1a65c973d0979023b",
+    "body": "",
+    "status": 200,
+    "response": [
+      "1f8b08000000000000038d52c16ec2300cfd95c9e722b50536e8797f30ed344d51da9a2e5a9a80e3a055887f5f92d20207a65d2af93d3ff73dc727502d54e57ab52932680825632b244305655e6c16f97651e64fc5a62a5faab2840cfcbefda365598416e5846c581d112a268f09382a622f35543ba95d84187b271aeb4d98934ff581875435deb1ed91a03a01f652059df15a67b053e4d8c81e2740cbdbfa9c41adb456a613b26d099d8b1362c075be7d5e6540d8296b26f15889c8df018d6de71f248b34dc343926c4e0fa03e03303468dfb2f6b66c1de3abe1ba062a87fd9cfeec3ba4008e9c42552da8c934714ca4cf1446ded772042704baa13965aa4e4356d91084d33c41d74dad6528b09ba4484f7b7d7f060b574f8800aef408fb883b7fc881b756c459a4de16446fb133c6a673c7505f86273c48b2b7edb5e9caf0722c269751e1dcf873533262ac247ed86e90e678ee58f68c2ee5d5ad572f2158be2fc0b5c5d991a12030000"
+    ],
+    "rawHeaders": [
+      "Cache-Control",
+      "no-store, no-cache, must-revalidate, post-check=0, pre-check=0",
+      "Content-Encoding",
+      "gzip",
+      "Content-Type",
+      "application/json; charset=utf-8",
+      "Date",
+      "Thu, 20 Sep 2018 18:27:32 GMT",
+      "Expires",
+      "Thu, 19 Nov 1981 08:52:00 GMT",
+      "Pragma",
+      "no-cache",
+      "Server",
+      "nginx/1.12.1",
+      "X-Content-Type-Options",
+      "nosniff",
+      "X-XSS-Protection",
+      "1; mode=block",
+      "Content-Length",
+      "363",
+      "Connection",
+      "Close"
+    ]
+  },
+  {
+    "scope": "https://www.merlinspotions.com:443",
+    "method": "GET",
+    "path": "/rest/default/V1/guest-carts/e786f91cc4fbd4e1a65c973d0979023b/selected-payment-method",
+    "body": "",
+    "status": 200,
+    "response": [
+      "1f8b08000000000000038b8e050029bb4c0d02000000"
+    ],
+    "rawHeaders": [
+      "Cache-Control",
+      "no-store, no-cache, must-revalidate, post-check=0, pre-check=0",
+      "Content-Encoding",
+      "gzip",
+      "Content-Type",
+      "application/json; charset=utf-8",
+      "Date",
+      "Thu, 20 Sep 2018 18:27:32 GMT",
+      "Expires",
+      "Thu, 19 Nov 1981 08:52:00 GMT",
+      "Pragma",
+      "no-cache",
+      "Server",
+      "nginx/1.12.1",
+      "X-Content-Type-Options",
+      "nosniff",
+      "X-XSS-Protection",
+      "1; mode=block",
+      "Content-Length",
+      "22",
+      "Connection",
+      "Close"
+    ]
+  },
+  {
+    "scope": "https://www.merlinspotions.com:443",
+    "method": "POST",
+    "path": "/rest/default/V1/guest-carts/e786f91cc4fbd4e1a65c973d0979023b/items",
+    "body": {
+      "cartItem": {
+        "sku": "Beginners Guide To Transfiguration",
+        "qty": 1,
+        "quote_id": "e786f91cc4fbd4e1a65c973d0979023b"
+      }
+    },
+    "status": 200,
+    "response": [
+      "1f8b08000000000000037dce3b0ec2301004d0ab44d3d0b888f944e092860ba48fac788956e00ff6ba881077075351d14d316f344fb0909fd8c1ecfa613829945b85c199160e8172e92e951d7563ecc66c43b9f252b3158e010a0f5961b442b09e7ecce62f4a99e74f5bf72d46576799644dcd17f6e94e6db746a1ef276c0ffba3c6eb0d2e77620fa7000000"
+    ],
+    "rawHeaders": [
+      "Cache-Control",
+      "no-store, no-cache, must-revalidate, post-check=0, pre-check=0",
+      "Content-Encoding",
+      "gzip",
+      "Content-Type",
+      "application/json; charset=utf-8",
+      "Date",
+      "Thu, 20 Sep 2018 18:27:33 GMT",
+      "Expires",
+      "Thu, 19 Nov 1981 08:52:00 GMT",
+      "Pragma",
+      "no-cache",
+      "Server",
+      "nginx/1.12.1",
+      "X-Content-Type-Options",
+      "nosniff",
+      "X-XSS-Protection",
+      "1; mode=block",
+      "Content-Length",
+      "140",
+      "Connection",
+      "Close"
+    ]
+  },
+  {
+    "scope": "https://www.merlinspotions.com:443",
+    "method": "GET",
+    "path": "/rest/default/V1/guest-carts/e786f91cc4fbd4e1a65c973d0979023b/selected-payment-method",
+    "body": "",
+    "status": 200,
+    "response": [
+      "1f8b08000000000000038b8e050029bb4c0d02000000"
+    ],
+    "rawHeaders": [
+      "Cache-Control",
+      "no-store, no-cache, must-revalidate, post-check=0, pre-check=0",
+      "Content-Encoding",
+      "gzip",
+      "Content-Type",
+      "application/json; charset=utf-8",
+      "Date",
+      "Thu, 20 Sep 2018 18:27:35 GMT",
+      "Expires",
+      "Thu, 19 Nov 1981 08:52:00 GMT",
+      "Pragma",
+      "no-cache",
+      "Server",
+      "nginx/1.12.1",
+      "X-Content-Type-Options",
+      "nosniff",
+      "X-XSS-Protection",
+      "1; mode=block",
+      "Content-Length",
+      "22",
+      "Connection",
+      "Close"
+    ]
+  },
+  {
+    "scope": "https://www.merlinspotions.com:443",
+    "method": "GET",
+    "path": "/rest/default/V1/guest-carts/e786f91cc4fbd4e1a65c973d0979023b/items",
+    "body": "",
+    "status": 200,
+    "response": [
+      "1f8b08000000000000037dcebd0e82301405e0572177716168055bcbe8e20bb019434a7b21374a5bfb3310e3bb2b4e4e6e6738dfc9b93c81322e0359e81a2684aa21dd0a7470c2999cc398aa73218b55efab3e6a97269a4bd499bc831a1e79858ed7e0f4823f66f7178548e6d3e66c8bde169387bc86cd275ac21db7dde2337e3f01caa3981437a69d46db22d7e260946c2c5352b17d33c2ebfa06f3ca113fc4000000"
+    ],
+    "rawHeaders": [
+      "Cache-Control",
+      "no-store, no-cache, must-revalidate, post-check=0, pre-check=0",
+      "Content-Encoding",
+      "gzip",
+      "Content-Type",
+      "application/json; charset=utf-8",
+      "Date",
+      "Thu, 20 Sep 2018 18:27:35 GMT",
+      "Expires",
+      "Thu, 19 Nov 1981 08:52:00 GMT",
+      "Pragma",
+      "no-cache",
+      "Server",
+      "nginx/1.12.1",
+      "X-Content-Type-Options",
+      "nosniff",
+      "X-XSS-Protection",
+      "1; mode=block",
+      "Content-Length",
+      "163",
+      "Connection",
+      "Close"
+    ]
+  },
+  {
+    "scope": "https://www.merlinspotions.com:443",
+    "method": "GET",
+    "path": "/rest/default/V1/guest-carts/e786f91cc4fbd4e1a65c973d0979023b",
+    "body": "",
+    "status": 200,
+    "response": [
+      "1f8b08000000000000038d52c16ec2300cfd95c9e722b50536e8797f30ed344d51da9a2e5a9a80e3a055887f5fd2920207a65d2af93d3ff73dc727502d54e57ab52932680825632b244305655e6c16f97651e64fc5a62a5faab2840cfcbefda365b90c2dca09d9b03a22544c1e47e0a888bdd450eda4761162ec9d68ac37614e91ea030f63d578c7b64782ea04d84b1574c66b9dc14e9163237b4c8096b7f539835a69ad4c2764db123a1727c480eb7cfbbcca80b053d624f15489c8df018d6de71f8c1669b869724c88c1f507c067068c1af75fd6cc82bd757c3740c550ffb29fdd87758110d2894b24a8f2881d512893e289dadaef4084e09654272cb548a3d73c6e91084d33c41d74dad6528b045d22c2fbdb6b78b05a3a7c408577a047dcc15b7ec44d3ab6629c4de16426fb099eb4333e7605f86273c28b2b7edb5e9caf0722c269751e1dcf873533262ac247ed86748733c7f2473461f76e5cd532f98a4571fe052adc352212030000"
+    ],
+    "rawHeaders": [
+      "Cache-Control",
+      "no-store, no-cache, must-revalidate, post-check=0, pre-check=0",
+      "Content-Encoding",
+      "gzip",
+      "Content-Type",
+      "application/json; charset=utf-8",
+      "Date",
+      "Thu, 20 Sep 2018 18:27:35 GMT",
+      "Expires",
+      "Thu, 19 Nov 1981 08:52:00 GMT",
+      "Pragma",
+      "no-cache",
+      "Server",
+      "nginx/1.12.1",
+      "X-Content-Type-Options",
+      "nosniff",
+      "X-XSS-Protection",
+      "1; mode=block",
+      "Content-Length",
+      "364",
+      "Connection",
+      "Close"
+    ]
+  },
+  {
+    "scope": "https://www.merlinspotions.com:443",
+    "method": "GET",
+    "path": "/rest/default/V1/guest-carts/e786f91cc4fbd4e1a65c973d0979023b/totals",
+    "body": "",
+    "status": 200,
+    "response": [
+      "1f8b08000000000000039554cb6ae33014fd15731753189c9230a430deb514da45579374558251ec5b47a048ae1e9396e07f1f49b1e5873cb45dd93ae79efb96ce5049c2cb5c0b4d1864ab650a7ba2309fa0d7eb1494d94fadc6504955210cd73939ba0f649dd91cd149f313d5876031e37bce401d685d535e4591e68880cda53156cd5968f2de1f5d1fbc24424f882d5ad78c6219586e181b2431124ee34fc8d002ca0be6c8308a4ed01391af982a8c94c88b8fbc10254206cf9b7b48e1cd08fd3f8e6a3caafc4d7fd8c0ed09b297b3ffcb6909d9afe5cdcdef146a490b1ccc6e70eec4529ca2259b60e1381df9d7a7e0801a65810e597f732503163c2cdbd2a201f45546545fc59419d71cd1a2d65470db6078d9c1a70b35a53b9c93a39bdf1d56947394572a7930b4c4642b92adbdd3ea9556461217099a9d6d984f456175b4055f86db6e40b8dbd6886ae6a04d0ffd25ccf8095faf9bb4d7b4cb37d4b450f22379b44f0abbb0ad7c39d0ba4ef4b2ad3f7566ae3df8ae912b9b774eb496746f34da7ccf7ee4feb5ba9452a226945d2a19ad862dda092c1cc60beb41c4e7cde2f6e969f173f1c71a262bdf9d4a0a53fb455f35bb6690ecf079ec5d3c38d4763a6a510a4422b116afc25e36697d37ff003db499ae79050000"
+    ],
+    "rawHeaders": [
+      "Cache-Control",
+      "no-store, no-cache, must-revalidate, post-check=0, pre-check=0",
+      "Content-Encoding",
+      "gzip",
+      "Content-Type",
+      "application/json; charset=utf-8",
+      "Date",
+      "Thu, 20 Sep 2018 18:27:36 GMT",
+      "Expires",
+      "Thu, 19 Nov 1981 08:52:00 GMT",
+      "Pragma",
+      "no-cache",
+      "Server",
+      "nginx/1.12.1",
+      "X-Content-Type-Options",
+      "nosniff",
+      "X-XSS-Protection",
+      "1; mode=block",
+      "Content-Length",
+      "473",
+      "Connection",
+      "Close"
+    ]
+  },
+  {
+    "scope": "https://www.merlinspotions.com:443",
+    "method": "POST",
+    "path": "/rest/default/V1/guest-carts/e786f91cc4fbd4e1a65c973d0979023b/billing-address",
+    "body": {
+      "address": {
+        "firstname": "Donald",
+        "lastname": "Trump",
+        "telephone": "5555555555",
+        "street": [
+          "1600 Pennsylvania Ave NW",
+          null
+        ],
+        "countryId": "US",
+        "regionId": "16",
+        "city": "Washington",
+        "postcode": "20500"
+      }
+    },
+    "status": 200,
+    "response": [
+      "1f8b0800000000000003533235b03433510200494557f307000000"
+    ],
+    "rawHeaders": [
+      "Cache-Control",
+      "no-store, no-cache, must-revalidate, post-check=0, pre-check=0",
+      "Content-Encoding",
+      "gzip",
+      "Content-Type",
+      "application/json; charset=utf-8",
+      "Date",
+      "Thu, 20 Sep 2018 18:27:37 GMT",
+      "Expires",
+      "Thu, 19 Nov 1981 08:52:00 GMT",
+      "Pragma",
+      "no-cache",
+      "Server",
+      "nginx/1.12.1",
+      "X-Content-Type-Options",
+      "nosniff",
+      "X-XSS-Protection",
+      "1; mode=block",
+      "Content-Length",
+      "27",
+      "Connection",
+      "Close"
+    ]
+  },
+  {
+    "scope": "https://www.merlinspotions.com:443",
+    "method": "POST",
+    "path": "/rest/default/V1/guest-carts/e786f91cc4fbd4e1a65c973d0979023b/estimate-shipping-methods",
+    "body": {
+      "address": {
+        "firstname": "Donald",
+        "lastname": "Trump",
+        "telephone": "5555555555",
+        "street": [
+          "1600 Pennsylvania Ave NW",
+          null
+        ],
+        "countryId": "US",
+        "regionId": "16",
+        "city": "Washington",
+        "postcode": "20500"
+      }
+    },
+    "status": 200,
+    "response": [
+      "1f8b08000000000000039dd04d6bc3300c06e0bf627c4e61e93083dec76ebbec58465062b515c47690953661f4bf2fdee80789c7a0474b795ffbc9f64b37c04cc855132cea8dde31623c50d791dfeb423b9443b07f2c2f512169d3daac5e54dd47f218a3b230c65bc1e5930f016f81adbaab01177a2f7af354e81a225677673802b550a7a8708f8546e6c0959b2e807dea9be21d5383150e4d5b090c3fb1df11f9ebe85c2ca12d0883e012795bcc81ebd5f37fc0d7a1e3b4cdf8ca39300d1e11a6dc9c58e68c928ab3c81aa39c60cc18df50148992e0c2f49293a29d0a6c91d1aa7a54e5ba734bf43b0e92fe87b2d8d21139f55e9166ae360faa4d466dce9fdf5f940320c4020000"
+    ],
+    "rawHeaders": [
+      "Cache-Control",
+      "no-store, no-cache, must-revalidate, post-check=0, pre-check=0",
+      "Content-Encoding",
+      "gzip",
+      "Content-Type",
+      "application/json; charset=utf-8",
+      "Date",
+      "Thu, 20 Sep 2018 18:27:38 GMT",
+      "Expires",
+      "Thu, 19 Nov 1981 08:52:00 GMT",
+      "Pragma",
+      "no-cache",
+      "Server",
+      "nginx/1.12.1",
+      "X-Content-Type-Options",
+      "nosniff",
+      "X-XSS-Protection",
+      "1; mode=block",
+      "Content-Length",
+      "264",
+      "Connection",
+      "Close"
+    ]
+  },
+  {
+    "scope": "https://www.merlinspotions.com:443",
+    "method": "POST",
+    "path": "/rest/default/V1/guest-carts/e786f91cc4fbd4e1a65c973d0979023b/shipping-information",
+    "body": {
+      "addressInformation": {
+        "shippingMethodCode": "freeshipping",
+        "shippingCarrierCode": "freeshipping",
+        "shipping_address": {
+          "firstname": "Donald",
+          "lastname": "Trump",
+          "telephone": "5555555555",
+          "street": [
+            "1600 Pennsylvania Ave NW",
+            null
+          ],
+          "countryId": "US",
+          "regionId": "16",
+          "city": "Washington",
+          "postcode": "20500",
+          "email": "engineer@mobify.com"
+        }
+      }
+    },
+    "status": 200,
+    "response": [
+      "1f8b08000000000000039554db8adb3010fd15a187168ab34d2859a8df7a816d615bca26fbb41b8c624d1c515b7274693684fc7b25c596e54b69fb64cf393323cd45e78c6b72aa80ebac02bd1754e1f4e98c734101a738df43feb31238c19ae9d2219f1c829edfa26f82c309094941e24b122276122072ff2ed08f6b7af495ef84ac886682a30738182681e2cbc6fa0a4d4a7bec191792709a791ba78b7982b7444136406f960956663bf4ea4394a95c185b14a9dc07a7addb14d1866647a6f7c16322f79483dab3ba66bc189d3445046cea1afda8290f4d5e3ad3f5c1878cd0234083d675c98006969bb28c2ed10b1c9e3f20430b18cf4b478651b4011d31ca35a6722325f0fc94356bf3b8fa6cb7e66084fe13c734542a3be8933db8b1fca6babf8c519cbe9bdfdebe4f702d590ed1ec22bb0d96e2385ab20116cce1c8ff7d0a0ea841e6e090e57fae64c042867953da68005d9523aaab62c8f46b1ed1a276cfd436183f6df05f176a48b73827959bdf472818e7205f2b74671805b416686ddfb4dab1c2482f089d0e640a0a27173d190a6fbb13965507fd22a5f113be594642d42e5f1cd340e815fa6225a5bcb24df83c8a759de8c2d6de6add5c7be0450357f6de19d15ab2add1e0f5cbf5c0abd5b5140a9a30a76cb692de6ad8a25d8085c378f1323af17135fb707f3f7b337bb08e68e1bb5348616abfe88bcbe6125d3696c72ec59d436da7472d4a3091409c520bfbd8ac76db64bf014a22419c04060000"
+    ],
+    "rawHeaders": [
+      "Cache-Control",
+      "no-store, no-cache, must-revalidate, post-check=0, pre-check=0",
+      "Content-Encoding",
+      "gzip",
+      "Content-Type",
+      "application/json; charset=utf-8",
+      "Date",
+      "Thu, 20 Sep 2018 18:27:40 GMT",
+      "Expires",
+      "Thu, 19 Nov 1981 08:52:00 GMT",
+      "Pragma",
+      "no-cache",
+      "Server",
+      "nginx/1.12.1",
+      "X-Content-Type-Options",
+      "nosniff",
+      "X-XSS-Protection",
+      "1; mode=block",
+      "Content-Length",
+      "545",
+      "Connection",
+      "Close"
+    ]
+  },
+  {
+    "scope": "https://www.merlinspotions.com:443",
+    "method": "GET",
+    "path": "/rest/default/V1/guest-carts/e786f91cc4fbd4e1a65c973d0979023b/payment-methods",
+    "body": "",
+    "status": 200,
+    "response": [
+      "1f8b08000000000000038bae564ace4f4955b2524ace484dcececd57d2512ac92cc901893883441462f4157cf3f3522b15f28b52528b946a75e03ad28a52539194fbe52b042456e6a6e6952878e6a5e517e5269664e6e72904a516966616a5a628d5c60200203374c16d000000"
+    ],
+    "rawHeaders": [
+      "Cache-Control",
+      "no-store, no-cache, must-revalidate, post-check=0, pre-check=0",
+      "Content-Encoding",
+      "gzip",
+      "Content-Type",
+      "application/json; charset=utf-8",
+      "Date",
+      "Thu, 20 Sep 2018 18:27:41 GMT",
+      "Expires",
+      "Thu, 19 Nov 1981 08:52:00 GMT",
+      "Pragma",
+      "no-cache",
+      "Server",
+      "nginx/1.12.1",
+      "X-Content-Type-Options",
+      "nosniff",
+      "X-XSS-Protection",
+      "1; mode=block",
+      "Content-Length",
+      "109",
+      "Connection",
+      "Close"
+    ]
+  },
+  {
+    "scope": "https://www.merlinspotions.com:443",
+    "method": "POST",
+    "path": "/rest/default/V1/guest-carts/e786f91cc4fbd4e1a65c973d0979023b/set-payment-information",
+    "body": {
+      "paymentMethod": {
+        "method": "checkmo"
+      },
+      "billingAddress": {
+        "firstname": "Donald",
+        "lastname": "Trump",
+        "telephone": "5555555555",
+        "street": [
+          "1600 Pennsylvania Ave NW",
+          null
+        ],
+        "countryId": "US",
+        "regionId": "16",
+        "city": "Washington",
+        "postcode": "20500"
+      },
+      "email": "engineer@mobify.com"
+    },
+    "status": 200,
+    "response": [
+      "1f8b08000000000000032b292a4d05008d4cfcfd04000000"
+    ],
+    "rawHeaders": [
+      "Cache-Control",
+      "no-store, no-cache, must-revalidate, post-check=0, pre-check=0",
+      "Content-Encoding",
+      "gzip",
+      "Content-Type",
+      "application/json; charset=utf-8",
+      "Date",
+      "Thu, 20 Sep 2018 18:27:42 GMT",
+      "Expires",
+      "Thu, 19 Nov 1981 08:52:00 GMT",
+      "Pragma",
+      "no-cache",
+      "Server",
+      "nginx/1.12.1",
+      "X-Content-Type-Options",
+      "nosniff",
+      "X-XSS-Protection",
+      "1; mode=block",
+      "Content-Length",
+      "24",
+      "Connection",
+      "Close"
+    ]
+  },
+  {
+    "scope": "https://www.merlinspotions.com:443",
+    "method": "GET",
+    "path": "/rest/default/V1/guest-carts/e786f91cc4fbd4e1a65c973d0979023b/selected-payment-method",
+    "body": "",
+    "status": 200,
+    "response": [
+      "1f8b0800000000000003ab56ca4d2dc9c84f51b2524ace484dcececd57aa05000959d70814000000"
+    ],
+    "rawHeaders": [
+      "Cache-Control",
+      "no-store, no-cache, must-revalidate, post-check=0, pre-check=0",
+      "Content-Encoding",
+      "gzip",
+      "Content-Type",
+      "application/json; charset=utf-8",
+      "Date",
+      "Thu, 20 Sep 2018 18:27:44 GMT",
+      "Expires",
+      "Thu, 19 Nov 1981 08:52:00 GMT",
+      "Pragma",
+      "no-cache",
+      "Server",
+      "nginx/1.12.1",
+      "X-Content-Type-Options",
+      "nosniff",
+      "X-XSS-Protection",
+      "1; mode=block",
+      "Content-Length",
+      "40",
+      "Connection",
+      "Close"
+    ]
+  },
+  {
+    "scope": "https://www.merlinspotions.com:443",
+    "method": "GET",
+    "path": "/rest/default/V1/guest-carts/e786f91cc4fbd4e1a65c973d0979023b/items",
+    "body": "",
+    "status": 200,
+    "response": [
+      "1f8b08000000000000037dcebd0e82301405e0572177716168055bcbe8e20bb019434a7b21374a5bfb3310e3bb2b4e4e6e6738dfc9b93c81322e0359e81a2684aa21dd0a7470c2999cc398aa73218b55efab3e6a97269a4bd499bc831a1e79858ed7e0f4823f66f7178548e6d3e66c8bde169387bc86cd275ac21db7dde2337e3f01caa3981437a69d46db22d7e260946c2c5352b17d33c2ebfa06f3ca113fc4000000"
+    ],
+    "rawHeaders": [
+      "Cache-Control",
+      "no-store, no-cache, must-revalidate, post-check=0, pre-check=0",
+      "Content-Encoding",
+      "gzip",
+      "Content-Type",
+      "application/json; charset=utf-8",
+      "Date",
+      "Thu, 20 Sep 2018 18:27:44 GMT",
+      "Expires",
+      "Thu, 19 Nov 1981 08:52:00 GMT",
+      "Pragma",
+      "no-cache",
+      "Server",
+      "nginx/1.12.1",
+      "X-Content-Type-Options",
+      "nosniff",
+      "X-XSS-Protection",
+      "1; mode=block",
+      "Content-Length",
+      "163",
+      "Connection",
+      "Close"
+    ]
+  },
+  {
+    "scope": "https://www.merlinspotions.com:443",
+    "method": "GET",
+    "path": "/rest/default/V1/guest-carts/e786f91cc4fbd4e1a65c973d0979023b",
+    "body": "",
+    "status": 200,
+    "response": [
+      "1f8b08000000000000037d524d6fdb300cfd2b06cfee203b4d9afab4a1390f03baa287a210649b7185c952aa0f634691ff5e4a89dcec90f960808f8fe4e3133f40f6d0d4ebdb6d5542675178ecb9f0d040cdaaed0dbbbfa959516d9bfaaea96b28211cfaff50562ba248c745e7e584d0781b300193b43e0805cd5e2817218fa3e39d099afa54397ef7738abae0bc19d142f301380a49753a2855c25e5ae7b51831034a5cc6c7125aa994d403177d6fd1b9d8212eb866f79bdb122c0ed26852be93ce5bd9f9c2ec8b07a3c2d84a0139cf6345b559c2cef4186b1e889124db3951e0e991106a84485bbc40b561acf8855abb594d424b51fc98b0f8f90caf2578547878333a365a2f1f951f8cf3e701355b331667c8e8033c0bf746ab7812fccfe6b0335aa81e2eb787df368c0782ce7601ea416a44fb7d34addccfdf3a3346ad44e6c2f1b34bd0b0884dc8a5ce8ef1d6983f94202f8d950337b6479bd665f161ac45ddcdd1d6419956289ea1ecd2d3e38e06b5c2e195143dadbd967b0fc65fcb9deabce1a9b7a52b3cc9cff0a976c1138be0b3cc135e7de197f4eaf875739cae7508e8fc72ab4b46c70afa919ff9b4979c177f7947efe19255abac2b5dd2f113bbaa563965030000"
+    ],
+    "rawHeaders": [
+      "Cache-Control",
+      "no-store, no-cache, must-revalidate, post-check=0, pre-check=0",
+      "Content-Encoding",
+      "gzip",
+      "Content-Type",
+      "application/json; charset=utf-8",
+      "Date",
+      "Thu, 20 Sep 2018 18:27:44 GMT",
+      "Expires",
+      "Thu, 19 Nov 1981 08:52:00 GMT",
+      "Pragma",
+      "no-cache",
+      "Server",
+      "nginx/1.12.1",
+      "X-Content-Type-Options",
+      "nosniff",
+      "X-XSS-Protection",
+      "1; mode=block",
+      "Content-Length",
+      "455",
+      "Connection",
+      "Close"
+    ]
+  },
+  {
+    "scope": "https://www.merlinspotions.com:443",
+    "method": "GET",
+    "path": "/rest/default/V1/guest-carts/e786f91cc4fbd4e1a65c973d0979023b/totals",
+    "body": "",
+    "status": 200,
+    "response": [
+      "1f8b08000000000000039554cb6ae33014fd15731753189c9230a430deb514da45579374558251ec5b47a048ae1e9396e07f1f49b1e5873cb45dd93ae79efb96ce5049c2cb5c0b4d1864ab650a7ba2309fa0d7eb1494d94fadc6504955210cd73939ba0f649dd91cd149f313d5876031e37bce401d685d535e4591e68880cda53156cd5968f2de1f5d1fbc24424f882d5ad78c6219586e181b2431124ee34fc8d002ca0be6c8308a4ed01391af982a8c94c88b8fbc10254206cf9b7b48e1cd08fd3f8e6a3caafc4d7fd8c0ed09b297b3ffcb6909d9afe5cdcdef146a490b1ccc6e70eec4529ca2259b60e1381df9d7a7e0801a65810e597f732503163c2cdbd2a201f45546545fc59419d71cd1a2d65470db6078d9c1a70b35a53b9c93a39bdf1d56947394572a7930b4c4642b92adbdd3ea9556461217099a9d6d984f456175b4055f86db6e40b8dbd6886ae6a04d0ffd25ccf8095faf9bb4d7b4cb37d4b450f22379b44f0abbb0ad7c39d0ba4ef4b2ad3f7566ae3df8ae912b9b774eb496746f34da7ccf7ee4feb5ba9452a226945d2a19ad862dda092c1cc60beb41c4e7cde2f6e969f173f1c71a262bdf9d4a0a53fb455f35bb6690ecf079ec5d3c38d4763a6a510a4422b116afc25e36697d37ff003db499ae79050000"
+    ],
+    "rawHeaders": [
+      "Cache-Control",
+      "no-store, no-cache, must-revalidate, post-check=0, pre-check=0",
+      "Content-Encoding",
+      "gzip",
+      "Content-Type",
+      "application/json; charset=utf-8",
+      "Date",
+      "Thu, 20 Sep 2018 18:27:44 GMT",
+      "Expires",
+      "Thu, 19 Nov 1981 08:52:00 GMT",
+      "Pragma",
+      "no-cache",
+      "Server",
+      "nginx/1.12.1",
+      "X-Content-Type-Options",
+      "nosniff",
+      "X-XSS-Protection",
+      "1; mode=block",
+      "Content-Length",
+      "473",
+      "Connection",
+      "Close"
+    ]
+  },
+  {
+    "scope": "https://www.merlinspotions.com:443",
+    "method": "PUT",
+    "path": "/rest/default/V1/guest-carts/e786f91cc4fbd4e1a65c973d0979023b/order",
+    "body": {
+      "method": "checkmo"
+    },
+    "status": 200,
+    "response": [
+      "1f8b0800000000000003533234b430560200909b032406000000"
+    ],
+    "rawHeaders": [
+      "Cache-Control",
+      "no-store, no-cache, must-revalidate, post-check=0, pre-check=0",
+      "Content-Encoding",
+      "gzip",
+      "Content-Type",
+      "application/json; charset=utf-8",
+      "Date",
+      "Thu, 20 Sep 2018 18:27:50 GMT",
+      "Expires",
+      "Thu, 19 Nov 1981 08:52:00 GMT",
+      "Pragma",
+      "no-cache",
+      "Server",
+      "nginx/1.12.1",
+      "X-Content-Type-Options",
+      "nosniff",
+      "X-XSS-Protection",
+      "1; mode=block",
+      "Content-Length",
+      "26",
+      "Connection",
+      "Close"
+    ]
+  }
+]

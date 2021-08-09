@@ -1,0 +1,20 @@
+mixin redirect(url)
+    - var timeout = 2;
+
+    doctype html
+    html(lang="en-US")
+        head
+            meta(charset="UTF-8")
+            meta(name="robots" content="noindex, nofollow")
+            meta(http-equiv="refresh" content='#{timeout};url=#{url}')
+            script(type="text/javascript").
+                (function() {
+                    setTimeout(function() {
+                        window.location.href = "#{url}";
+                    }, #{timeout} * 1000);
+                })();
+        body
+            h3 This URL has changed. Redirecting...
+            p If you are not redirected automatically,&nbsp;
+                a(href=url) click here
+                | .

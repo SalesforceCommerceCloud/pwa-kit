@@ -1,0 +1,10 @@
+{
+    "globals": {
+        "PROJECT_NAME": "Mobify Test Framework",
+        "SITE_TITLE": "Mobify Test Framework Docs",
+        "SITE_DESCRIPTION": "Home of the documentation for the Mobify Test Framework.",
+        "PROD_ROOT": "/mobify-test-framework/",
+        "DEV_ROOT": "/",
+        "changelogPath": "latest/changelog/"
+    }
+}

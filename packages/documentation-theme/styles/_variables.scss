@@ -1,0 +1,189 @@
+// Project-Wide Variables
+// ===
+//
+// Edit these as needed. Some guidelines:
+//
+// - Names should be lowercase and dash-separated;
+// - Qualifiers should be added to the beginning of related variables: use
+//   `$small-font-size`, not `$font-size-small`;
+// - Numeric scales should use increments of 10; these numbers are arbitrary and
+//   should not map to actual values. If really necessary, additional values can
+//   be added in between, e.g. $neutral-15 between 10 and 20.
+
+
+// Unit & Ratio
+// ---
+//
+// Our base units for spacing and alignment for the entire project. This base,
+// in combination with our ratio values, are responsible for laying out the
+// majority of the design system.
+
+$unit: 8px;
+$ratio: 1.5;
+
+
+// Spacing Values
+// ---
+
+$very-small-space: $unit/2; // 4px
+$small-space: $unit*1; // 8px
+$smallish-space: $unit*1.5; // 12px
+$base-space: $unit*2; // 16px
+$medium-space: $unit*2.5; // 20px
+$large-space: $unit*3; // 24px
+$larger-space: $unit*3.5; // 28px
+$xlarge-space: $unit*4; //32px
+$very-large-space: $unit*5; // 40px
+$massive-space: $unit*8; // 64px
+
+
+// Standard Tap-Target Size
+// ---
+
+$tap-size: $unit*4.75; // 38px
+
+
+// Font Families
+// ---
+
+$base-font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", helvetica, sans-serif;
+$brand-font-family: 'Gotham SSm A', 'Gotham SSm B', -apple-system, sans-serif;
+$mono-font-family: 'consolas', 'menlo', monospace;
+
+
+// Font Sizes
+// ---
+
+$tiny-font-size: 11px;
+$small-font-size: 12px;
+$smaller-font-size: 14px;
+$smallish-font-size: 15px;
+$base-font-size: 16px;
+$medium-font-size: 20px;
+$large-font-size: 24px;
+$larger-font-size: 28px;
+$very-large-font-size: 32px;
+$massive-font-size: 34px;
+$super-massive-font-size: 64px;
+
+
+// Leading (line-height)
+// ---
+
+$base-line-height: $ratio;
+
+
+// Font Weights
+// ---
+
+$light-font-weight: 200;
+$base-font-weight: 400;
+$medium-font-weight: 500;
+$heavy-font-weight: 700;
+
+
+// Content Area Widths
+// --
+
+$base-content-width: 43em;
+
+$narrow-content-width: 20em;
+$small-content-width: 35em;
+$medium-content-width: 60em;
+$large-content-width: 105em;
+$very-large-content-width: 125em;
+
+
+// Input height
+// ---
+
+$search-input-height: $unit*5; // 40px
+
+
+// Colour Options
+// ---
+
+$black: #000;
+$white: #fff;
+$neutral-70: $black;
+$neutral-60: #333;
+$neutral-50: #595959;
+$neutral-40: #ebebeb;
+$neutral-20: #f7f7f7;
+$neutral-10: #fff;
+
+$accent-color: #005c83;
+$lighter-accent-color: #0288a7;
+$light-accent-color: #0f7293;
+$dark-accent-color: #003e58;
+$darker-accent-color: darken($dark-accent-color, 5%);
+
+$warning-color: #fac46b;
+
+$mobify-light-orange: #f58431;
+$mobify-dark-orange: #ef4b34;
+$mobify-light-blue: #0688a7;
+$mobify-dark-blue: #005c83;
+$mobify-light-red: #db1d3e;
+$mobify-dark-red: #b41f24;
+$mobify-light-blue-bg: rgba(2,136,167,0.1);
+
+$tab-color: #f6f6f6;
+$tab-highlight-color: #ededed;
+
+$code-color: #f5f2f0;
+$code-border-color: #d3e0e7;
+
+$border-color: darken($neutral-40, 7.5%);
+
+$black-20: rgba(0,0,0,.2);
+
+// Appearance
+// ---
+
+$font-color: $black;
+
+$link-color: $accent-color;
+$active-link-color: $dark-accent-color;
+$hover-link-color: $lighter-accent-color;
+
+$border-radius: ($unit/4);
+$small-box-shadow: 0 -1px 1px 0 rgba(0,0,0,0.05), 0 1px 2px 0 rgba(0,0,0,0.2);
+$small-box-shadow-inset: inset 0 0.25rem 0.1rem -0.1rem rgba($neutral-70, 0.1);
+$large-box-shadow: 0 0 0.35rem rgba($neutral-70, 0.4);
+
+$button-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.2);
+$hover-button-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.3);
+
+$disabled-color: #c8c8c8;
+$disabled-text-color: #646362;
+
+$error-color: #b60000;
+$success-color: #5cb841;
+$hover-error-color: #dc0a3c;
+$active-error-color: $error-color;
+
+
+// Transition
+// ---
+
+$transition-duration: 0.15s;
+
+
+// Layer (z-index)
+// ---
+//
+// Organizes z-index usage by name. Values can be incremented/decremented
+// slightly as necessary. eg. $stage-layer + 1; Whenever possible though, use
+// one of these values.
+
+$z1-depth: 1;    // background
+$z2-depth: 10;   // icon or other ui element
+$z3-depth: 100;  // modal shade or similar
+$z4-depth: 1000; // modal dialog or similar
+
+
+// Specifics
+// ---
+
+$sidebar-width: $unit*35;

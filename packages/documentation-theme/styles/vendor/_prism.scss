@@ -1,0 +1,30 @@
+// Prismjs
+// ===
+//
+// Prism is a lightweight, extensible syntax highlighter, built with modern web standards in mind.
+
+
+@import '../../node_modules/prismjs/themes/prism';
+
+
+// Custom Default Theme
+// ---
+
+:not(pre) > code[class*="language-"],
+pre[class*="language-"] {
+    border: 1px solid $border-color;
+
+    border-radius: $border-radius;
+    background: $white;
+}
+
+
+// Override project code style
+//  ---
+
+pre code {
+    padding: 0;
+    border: 0;
+
+    font-family: inherit;
+}

@@ -1,0 +1,46 @@
+{
+    "index": {
+        "layout": "../_layouts/homepage",
+        "name": "Web Push Notifications",
+        "tagline": "Web push notifications enable your website visitors to receive notifications on their device without installing an app."
+    },
+    "_homepage": {
+        "overview": {
+            "blocks": [
+                {
+                    "title": "What are Web Push Notifications?",
+                    "info": "Web push notifications enable your website visitors to receive notifications on their device without installing an app.",
+                    "button": "Learn More",
+                    "href": "overview/what-are-web-push-notifications/"
+                }
+            ]
+        },
+        "categories": {
+            "useCategoryList": true
+        }
+    },
+    "overview": {
+        "title": "Overview",
+        "intro": "Introduction to Push Notifications on the Mobify platform"
+    },
+    "create-a-webpush-project": {
+        "title": "Create A Webpush Project",
+        "intro": "Create a customized notification subscription flow catered to client asset requirements"
+    },
+    "testing": {
+        "title": "Testing",
+        "intro": "Learn how to test the project and how to reset your browser from certain scenarios."
+    },
+    "deployment": {
+        "title": "Deployment",
+        "intro": "How to deploy to staging and production."
+    },
+    "troubleshooting": {
+        "title": "Troubleshooting",
+        "intro": "Common issues that may encounter during development and testing."
+    },
+    "go-live": {
+        "title": "Go Live",
+        "intro": "Follow this go-live checklist to make sure everything is in place for the launch."
+    }
+}

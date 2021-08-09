@@ -1,0 +1,41 @@
+{
+    "index": {
+        "layout": "../_layouts/homepage",
+        "name": "Designing Native Apps",
+        "tagline": "How to design with components from the Astro framework alongside the PWA SDK."
+    },
+    "_homepage": {
+        "designing-native-apps": {
+            "blocks": [
+                {
+                    "title": "Fundamentals",
+                    "info": "An introduction to delivering Progressive Web Apps as native iOS and Android apps using the Astro framework.",
+                    "button": "Learn fundamentals",
+                    "href": "designing-native-apps/fundamentals/"
+                },
+                {
+                    "title": "Native app patterns",
+                    "info": "Important tips for designers including how web views work alongside native views.",
+                    "button": "App Patterns",
+                    "href": "designing-native-apps/native-app-patterns/"
+                },
+                {
+                    "title": "Components",
+                    "info": "Using the UI kit to design a native experience within the application.",
+                    "button": "View components",
+                    "href": "designing-native-apps/components/"
+                },
+                {
+                    "title": "Best practice layouts",
+                    "info": "Examples of how native components should be used in place of PWA components to create shopping templates on native apps.",
+                    "button": "View layouts",
+                    "href": "designing-native-apps/layouts/"
+                }
+            ]
+        }
+    },
+    "designing-native-apps": {
+        "title": "Guides",
+        "intro": "How to design with components from the Astro framework alongside the PWA SDK."
+    }
+}

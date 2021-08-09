@@ -1,0 +1,14 @@
+{
+    "analytics-integrations-overview": {
+        "title": "Analytics Integrations Overview"
+    },
+    "analytics-integrations-events": {
+        "title": "Analytics Events"
+    },
+    "analytics-integrations/api/module-interface.AnalyticsConnector.html": {
+        "title": "Analytics Integrations API"
+    },
+    "legacy-analytics-manager": {
+        "title": "Analytics Manager (deprecated)"
+    }
+}

@@ -1,0 +1,7 @@
+extends ../../node_modules/@mobify/documentation-theme/layouts/base
+include ../../node_modules/@mobify/documentation-theme/mixins/redirect
+
+//- Removes the navigation, header, and footer
+block main
+    block content
+        +redirect(DOCS_ROOT + 'latest')

@@ -1,0 +1,27 @@
+// Search sheet Component
+// ===
+//
+// 1. to display the top-nav when search sheet is open
+
+.c-search-sheet {
+    @include for-tablet-landscape-up {
+        position: inherit;
+    }
+
+    position: absolute;
+    top: $unit*6.75; // 1
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: $z4-depth;
+
+    display: none;
+
+    background-color: $neutral-20;
+
+    transition: background-color $transition-duration ease-in-out;
+
+    &.c--active {
+        display: block;
+    }
+}

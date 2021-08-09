@@ -1,0 +1,31 @@
+{
+  "name": "@mobify/documentation-theme",
+  "version": "1.17.0",
+  "description": "Jade template theme for Mobify documentation",
+  "main": "index.js",
+  "bin": {
+    "mobify-docs": "scripts/manager.js",
+    "styleguide-rename": "scripts/styleguide-rename.js"
+  },
+  "files": [
+    "theme",
+    "layouts",
+    "mixins",
+    "scripts"
+  ],
+  "scripts": {
+    "sass": "node-sass styles -o theme/css --output-style compressed"
+  },
+  "author": "dev@mobify.com",
+  "license": "ISC",
+  "devDependencies": {
+    "node-sass": "^4.9.3",
+    "prismjs": "1.8.4"
+  },
+  "dependencies": {
+    "commander": "2.13.0",
+    "fs-extra": "5.0.0",
+    "glob": "7.1.2",
+    "harp": "0.30.0"
+  }
+}

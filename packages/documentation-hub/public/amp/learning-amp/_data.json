@@ -1,0 +1,10 @@
+{
+    "components": {
+        "title": "Components",
+        "intro": "How to use AMP's HTML library to build the UI."
+    },
+    "limitations": {
+        "title": "Limitations",
+        "intro": "Some key areas to be aware of that may affect the user experience."
+    }
+}

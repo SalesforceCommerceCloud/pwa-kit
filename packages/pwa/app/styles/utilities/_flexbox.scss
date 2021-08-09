@@ -1,0 +1,158 @@
+// Flexbox
+// ===
+//
+// Flexbox and align a row of items with a lot of control. Provides a
+// declarative, robust cross-browser way of using flexbox.
+
+
+// Flex (Grow)
+// ---
+//
+// Ensures that the flex child will grow to fill the available space.
+//
+// Note! This utility class should come **BEFORE** the `u-flexbox` class in
+// order to ensure that an element with both classes inherits only the
+// `display: flex` property.
+// 1. Ensure inline elements are treated as block-level.
+// 2. Prevent width collapsing in old implementations.
+
+.u-flex {
+    display: block; // 1
+    flex: 1 1 auto;
+    width: 100%; // 2
+}
+
+
+// Flex (Shrink)
+// ---
+//
+// 1. Ensure width collapses in old implementations.
+
+
+.u-flex-shrink {
+    flex: initial;
+    width: auto; // 1
+}
+
+
+// Flex (None)
+// ---
+//
+// Neither grow nor shrink!
+
+.u-flex-none {
+    flex: 0 0 auto;
+}
+
+
+// Flexbox
+// ---
+//
+// Includes gutters, for grid-like functionality.
+//
+// Note! This should come **AFTER** the `u-flex` utility class in order to
+// ensure an element that has both classes inherits `display: flex`!
+// 1. Remove default styles present on common root elements.
+// 2. Ensure in iOS 5 and 6 that flex-direction isn't inherited from
+//    any flexbox parents that has flex-direction set to row-reverse
+
+
+.u-flexbox {
+    display: flex;
+    flex-direction: row; // 2
+    margin: 0; // 1
+    padding: 0; // 1
+
+    list-style: none; // 1
+}
+
+
+// Directions
+// ---
+
+.u-direction-column {
+    flex-direction: column;
+}
+
+.u-direction-column-reverse {
+    flex-direction: column-reverse;
+}
+
+.u-direction-row {
+    flex-direction: row;
+}
+
+.u-direction-row-reverse {
+    flex-direction: row-reverse;
+}
+
+
+// Align Items
+// ---
+
+.u-align-top {
+    align-items: flex-start;
+}
+
+.u-align-center {
+    align-items: center;
+}
+
+.u-align-bottom {
+    align-items: flex-end;
+}
+
+
+// Justify Content
+// ---
+
+.u-justify-start {
+    justify-content: flex-start;
+}
+
+.u-justify-end {
+    justify-content: flex-end;
+}
+
+.u-justify-between {
+    justify-content: space-between;
+}
+
+.u-justify-center {
+    justify-content: center;
+}
+
+.u-justify-around {
+    justify-content: space-around;
+}
+
+
+// Order
+// ---
+//
+// Re-arrange the display order of up to six items. Add additional modifiers in
+// your own stylesheet to re-order more.
+
+.u-order-1 {
+    order: 1;
+}
+
+.u-order-2 {
+    order: 2;
+}
+
+.u-order-3 {
+    order: 3;
+}
+
+.u-order-4 {
+    order: 4;
+}
+
+.u-order-5 {
+    order: 5;
+}
+
+.u-order-6 {
+    order: 6;
+}

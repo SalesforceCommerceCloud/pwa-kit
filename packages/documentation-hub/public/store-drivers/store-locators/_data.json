@@ -1,0 +1,14 @@
+{
+    "getting-started": {
+        "title": "Getting Started",
+        "intro": "Get a store locator up and running in 3 simple steps."
+    },
+    "customize": {
+        "title": "Customize Your Locator",
+        "intro": "Customize the look and feel of your store locator to match your brand."
+    },
+    "install": {
+        "title": "Install Your Locator",
+        "intro": "Add your new store locator to your site"
+    }
+}

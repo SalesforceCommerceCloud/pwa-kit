@@ -1,0 +1,21 @@
+// Vendor Files
+// ===
+//
+// The vendor stylesheet is intended for styling 3rd party selectors that we
+// do not control.
+//
+//
+//     // jQuery UI plugin classes
+//     // ---
+//
+//     .ui-progressbar-value,
+//     .ui-progressbar-complete, {
+//         ...
+//     }
+
+@import 'vendor/prism';
+
+// Remove underlining on copy button in code blocks styled by Prism
+.code-toolbar > .toolbar a {
+    text-decoration: none;
+}

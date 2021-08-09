@@ -1,0 +1,4 @@
+mixin row(url, title, isTargetBlank)
+    - var target = isTargetBlank ? '_blank' : '_self'
+    a.bg-white.db.b--black-30.br2.ba.pa4.mt2.no-underline.trans-all.shadow-hover.link-no-decoration(href=url target=target)
+        h3.ma0.black.f3.fw4= title

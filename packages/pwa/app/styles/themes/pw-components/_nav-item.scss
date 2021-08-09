@@ -1,0 +1,87 @@
+// NavItem Theme
+// ===
+//
+// Compared to the original Progressive Web SDK's NavItem component, this one
+// is customized to include extra icons, etc
+//
+// 1) Provides the positioning context for (2)
+// 2) Is positioned relative to (1)
+
+$nav-item__active-color: #f1f0f7;
+
+.pw-nav-item {
+    display: block;
+    height: $unit * 5.5;
+    border-bottom: $border;
+
+    background-color: $neutral-00;
+
+    color: $neutral-60;
+    font-size: 15px;
+    line-height: 20px;
+    letter-spacing: 0;
+    text-align: left;
+
+    &:active,
+    &:focus {
+        border: 0;
+
+        background: none;
+    }
+}
+
+.pw-nav-item.pw--selected {
+    background-color: $nav-item__active-color;
+    color: $brand-color;
+}
+
+.pw-nav-item--with-before-icon {
+    padding: 0;
+}
+
+.pw-nav-item--with-before-icon.pw--selected {
+    background-color: $nav-item__active-color;
+    color: $neutral-60;
+}
+
+.pw-nav-item--with-before-icon,
+.pw-nav-item--sign-in.pw--selected {
+    background-color: $neutral-10;
+}
+
+.pw-nav-item__inner {
+    height: 100%;
+}
+
+.pw-nav-item__before-icon {
+    width: $unit * 2;
+    height: $unit * 2;
+}
+
+.pw-nav-item__icon {
+    position: relative; // 1
+
+    width: $unit * 5.5;
+    height: $unit * 5.5;
+}
+
+.pw-nav-item__icon-content {
+    position: absolute; // 2
+    top: 50%;
+    left: 50%;
+
+    width: $unit * 2;
+    height: $unit * 2;
+
+    transform: translate(-50%, -50%);
+}
+
+.pw-nav-item.pw--with-icon {
+    .pw-nav-item__inner {
+        padding: 0;
+    }
+}
+
+.pw-nav-item .pw-list-tile__primary {
+    color: inherit;
+}

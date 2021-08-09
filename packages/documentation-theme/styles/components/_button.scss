@@ -1,0 +1,141 @@
+// Button Theme
+// ===
+//
+// 1. We need a magic number for the top/bottom padding values. Because the base
+//    font-size is 15px, and our buttons are 44px, we are left with 30px of
+//    negative space above and below the text within the button. To make sure
+//    buttons keep the same padding value when buttons wrap, we need to split
+//    30px between top and bottom: 15px each, or $base-unit aka 16px minus 1.
+
+.c-button {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    min-width: $tap-size;
+    min-height: $tap-size;
+    padding: $small-space $base-space; // 1
+    border: 1px solid currentColor;
+
+    border-radius: $border-radius;
+    background: transparent;
+    box-shadow: $button-shadow;
+
+    color: $accent-color;
+    font-family: $base-font-family;
+    font-size: $smallish-font-size;
+    text-align: center;
+    text-decoration: none;
+
+    transition-property: color, background, border;
+    transition-duration: $transition-duration;
+
+    &[disabled] {
+        @extend %disable-button;
+    }
+}
+
+
+// Primary Button
+// ---
+
+.c-button.c--primary {
+    border-color: $accent-color;
+
+    background: $accent-color;
+
+    color: $white;
+
+    &:hover,
+    &:focus {
+        border-color: $hover-link-color;
+
+        background: $hover-link-color;
+    }
+
+    &:active {
+        border-color: $active-link-color;
+
+        background: $active-link-color;
+    }
+
+    &[disabled] {
+        @extend %disable-button;
+    }
+}
+
+
+// Secondary Button
+// ---
+
+.c-button.c--secondary {
+    border-color: $accent-color;
+
+    background: $white;
+
+    color: $accent-color;
+
+    &:hover,
+    &:focus {
+        border-color: $hover-link-color;
+
+        background: $white;
+
+        color: $hover-link-color;
+    }
+
+    &:active {
+        border-color: $active-link-color;
+
+        background: $white;
+
+        color: $active-link-color;
+    }
+
+    &[disabled] {
+        @extend %disable-button;
+    }
+}
+
+
+
+// Error Button
+// ---
+
+.c-button.c--error {
+    border-color: $error-color;
+
+    background: $error-color;
+
+    color: $white;
+
+    &:hover,
+    &:focus {
+        border-color: $hover-error-color;
+
+        background: $hover-error-color;
+    }
+
+    &:active {
+        border-color: $active-error-color;
+
+        background: $active-error-color;
+    }
+
+    &[disabled] {
+        @extend %disable-button;
+    }
+}
+
+
+// Disable style
+// ---
+
+%disable-button {
+    border-color: $disabled-color;
+
+    background-color: $disabled-color;
+
+    color: $disabled-text-color;
+
+    cursor: not-allowed;
+}

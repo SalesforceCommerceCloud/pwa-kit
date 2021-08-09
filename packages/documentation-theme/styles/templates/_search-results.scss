@@ -1,0 +1,14 @@
+// Search Results
+// ===
+//
+// 1. Override hover style
+
+.t-search {
+    .c-search-box {
+        @include for-phone-only {
+            width: 100%;
+        }
+
+        width: 75%;
+    }
+}

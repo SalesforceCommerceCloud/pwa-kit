@@ -1,0 +1,73 @@
+// Select theme
+// ===
+
+
+// Select root
+// ---
+//
+// 1. Match the `padding-right` size to the size of the overlaying `pw-select__icon`
+// 2. Match default user agent styling for inputs.
+
+.c-select {
+    background: $neutral-00; // 2
+
+    select {
+        padding-right: $tap-size; // 1
+        padding-left: $unit * 1.5;
+        border-width: 1px;
+        border-style: solid;
+        border-color: $input-border-color;
+
+        &:focus {
+            border-color: $focused-input-border-color;
+        }
+
+        &[disabled] {
+            border-width: 0;
+
+            background: $disabled-input-background-color;
+        }
+    }
+}
+
+
+// Select with Inner Label
+// ---
+
+.c-select.c--inner-label {
+    //
+}
+
+
+// Inner label element
+// ---
+
+.c-select__label {
+    margin: 0 auto;
+}
+
+
+// Select Icon
+// ---
+
+.c-select__icon {
+    border-width: 1px;
+    border-style: solid;
+    border-color: $focused-input-border-color;
+
+    background: $neutral-00;
+
+    color: $focused-input-border-color;
+}
+
+.c-select select[disabled] + .c-select__icon {
+    border-color: $disabled-button-background-color;
+
+    background-color: $disabled-button-background-color;
+
+    color: rgba($focused-input-border-color, 0.25);
+}
+
+.c-select.c--has-error .c-select__icon {
+    border-color: $error-color;
+}

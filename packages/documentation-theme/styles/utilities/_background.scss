@@ -1,0 +1,50 @@
+// Background Utilities
+// ===
+
+.u-background-neutral-10 {
+    background-color: $neutral-10 !important;
+}
+
+.u-background-neutral-20 {
+    background-color: $neutral-20 !important;
+}
+
+.u-background-neutral-40 {
+    background-color: $neutral-40 !important;
+}
+
+.u-background-neutral-50 {
+    background-color: $neutral-50 !important;
+}
+
+.u-background-neutral-60 {
+    background-color: $neutral-60 !important;
+}
+
+.u-background-neutral-70 {
+    background-color: $neutral-70 !important;
+}
+
+.u-background-accent {
+    background-color: $accent-color !important;
+}
+
+.u-background-accent-dark {
+    background-color: $dark-accent-color !important;
+}
+
+.u-background-accent-darker {
+    background-color: $darker-accent-color !important;
+}
+
+.u-background-accent-gradient {
+    background-image: linear-gradient(135deg, $dark-accent-color, $accent-color) !important;
+}
+
+.u-background-transparent {
+    background-color: transparent !important;
+}
+
+.u-background-warning {
+    background-color: $warning-color !important;
+}

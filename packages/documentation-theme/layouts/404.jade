@@ -1,0 +1,46 @@
+extends ../layouts/base
+
+//- 🚫 404 Page.
+include ../mixins/header-top
+
+append config
+    - title = 'Page Not Found'
+
+block main
+    main.t-error.u-context.u-flexbox.u-flex-column.u-height-full-vh
+        header.t-header-small.u-flex-none.u-margin-bottom-lg.u-context.u-clip.u-neutral-10.u-background-accent-gradient.u-large-shadow
+            div.c-contain.u-context.u-z1
+                +headerTop
+
+        div.c-contain.u-flex.u-margin-bottom-xl
+            a(href="javascript:history.go(-1)" id="js-back-path" class="u-text-size-large-fixed") &#171; Back
+
+            h1.c-heading.c--h2.u-margin-top-lg.u-text-capitalize Page not Found
+
+            p.u-margin-top-lg.u-text-size-massive.u-text-bold.u-text-leading-reset Whoops!
+
+            div.u-margin-top.u-margin-bottom
+                p Looks like we can't find what you're looking for.
+
+                p.u-text-medium Error Code: 404
+
+            p Here are some links to help you get back on track:
+
+            ul.u-list-style-none
+                li
+                    a(href="/") Home
+                li
+                    a(href="https://support.mobify.com/") Support
+
+            div.u-margin-top-xl
+                p.u-margin-bottom-sm.u-text-medium Or, why not search?
+
+                div.c-search-box
+                    gcse:searchbox-only
+
+        //- if history length return to 2 which means user open 404 page on new request 
+            rather than open 404 page from docs
+        script(type="text/javascript").
+            if (history.length === 2) {
+                document.getElementById('js-back-path').setAttribute('href', '/')
+            }

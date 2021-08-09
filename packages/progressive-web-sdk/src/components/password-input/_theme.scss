@@ -1,0 +1,9 @@
+// Password Input Theme
+// ===
+
+
+.pw-password-input__toggle {
+    &.pw--inactive {
+        color: $neutral-40;
+    }
+}

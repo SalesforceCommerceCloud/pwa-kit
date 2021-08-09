@@ -1,0 +1,8 @@
+# This folder exists so it can be built into the sidebar navigation, but the
+# contents are built and deployed separately.
+# See https://github.com/mobify/mobify-integration-manager
+
+# Ignore everything in this directory
+*
+# Except this file
+!.gitignore

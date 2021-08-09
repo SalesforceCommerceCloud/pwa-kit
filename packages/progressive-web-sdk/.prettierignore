@@ -1,0 +1,6 @@
+coverage
+dist
+generator-assets
+docs
+vendor
+src/ssr/test_fixtures/main-big.js
