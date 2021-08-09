@@ -59,6 +59,9 @@ export const BasketProvider = BasketContext.Provider
 export const CustomerContext = createContext()
 export const CustomerProvider = CustomerContext.Provider
 
+export const CustomerProductListsContext = createContext()
+export const CustomerProductListsProvider = CustomerProductListsContext.Provider
+
 // Returns fomrulated body for SopperLogin getToken endpoint
 export function createGetTokenBody(urlString, slasCallbackEndpoint, codeVerifier) {
     const url = new URL(urlString)
@@ -274,4 +277,14 @@ export const isError = (jsonResponse) => {
     }
 
     return false
+}
+
+/**
+ * Converts snake-case strings to space separated or sentence case
+ * strings by replacing '_' with a ' '.
+ * @param {string} text snake-case text.
+ * @returns {string} space separated string.
+ */
+export const convertSnakeCaseToSentenceCase = (text) => {
+    return text.split('_').join(' ')
 }

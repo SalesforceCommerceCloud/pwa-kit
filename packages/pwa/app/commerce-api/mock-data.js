@@ -2563,3 +2563,110 @@ export const mockOrderProducts = {
     ],
     total: 2
 }
+
+export const mockedCustomerProductLists = {
+    limit: 1,
+    data: [
+        {
+            creationDate: '2021-06-12T00:09:00.000Z',
+            customerProductListItems: [
+                {
+                    id: 'b41ad6634e83fc9673625bf087',
+                    priority: 1,
+                    productId: 'apple-ipod-nano-green-16gM',
+                    public: false,
+                    purchasedQuantity: 0,
+                    quantity: 1,
+                    type: 'product'
+                },
+                {
+                    id: 'ba16111f78ec14e967022074e6',
+                    priority: 1,
+                    productId: '883360541822M',
+                    public: false,
+                    purchasedQuantity: 0,
+                    quantity: 4,
+                    type: 'product'
+                },
+                {
+                    id: '2a59eccea6edd142f65927363a',
+                    priority: 1,
+                    productId: '25686544M',
+                    public: false,
+                    purchasedQuantity: 0,
+                    quantity: 1,
+                    type: 'product'
+                },
+                {
+                    id: '7a37e3bb49bd7e444efee3bb43',
+                    priority: 1,
+                    productId: '25686514M',
+                    public: false,
+                    purchasedQuantity: 0,
+                    quantity: 1,
+                    type: 'product'
+                },
+                {
+                    id: 'a46ba6991ad65c5dced0fae615',
+                    priority: 1,
+                    productId: '640188016365M',
+                    public: false,
+                    purchasedQuantity: 0,
+                    quantity: 1,
+                    type: 'product'
+                },
+                {
+                    id: '1864d4d4130724cceafd105e0a',
+                    priority: 1,
+                    productId: '883360513096M',
+                    public: false,
+                    purchasedQuantity: 0,
+                    quantity: 3,
+                    type: 'product'
+                },
+                {
+                    id: '9314b4f592ba8b36106f8c46b4',
+                    priority: 1,
+                    productId: '701642868026M',
+                    public: false,
+                    purchasedQuantity: 0,
+                    quantity: 1,
+                    type: 'product'
+                },
+                {
+                    id: 'd1ed0b4a039577af4ab9a24d91',
+                    priority: 1,
+                    productId: '25752235M',
+                    public: false,
+                    purchasedQuantity: 0,
+                    quantity: 1,
+                    type: 'product'
+                },
+                {
+                    id: 'ece92257324ac8d996ab44936a',
+                    priority: 1,
+                    productId: '793775370033M',
+                    public: false,
+                    purchasedQuantity: 0,
+                    quantity: 1,
+                    type: 'product'
+                },
+                {
+                    id: 'ab28684351d67ff593fc41e78c',
+                    priority: 1,
+                    productId: '750518699622M',
+                    public: false,
+                    purchasedQuantity: 0,
+                    quantity: 1,
+                    type: 'product'
+                }
+            ],
+            event: {},
+            id: 'c1b0edb2ad6fcfb153044ef3b0',
+            lastModified: '2021-06-30T04:11:12.602Z',
+            public: false,
+            type: 'wish_list'
+        }
+    ],
+    total: 1
+}

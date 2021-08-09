@@ -1,6 +1,5 @@
 import React, {useEffect} from 'react'
 import {Route, Switch} from 'react-router-dom'
-import {Crypto} from '@peculiar/webcrypto'
 import {screen, waitFor, within} from '@testing-library/react'
 import user from '@testing-library/user-event'
 import {rest} from 'msw'
@@ -84,9 +83,6 @@ beforeEach(() => {
     if (typeof TextEncoder === 'undefined') {
         global.TextEncoder = require('util').TextEncoder
     }
-
-    // Need to mock window.crypto for tests
-    window.crypto = new Crypto()
 
     // Since we're testing some navigation logic, we are using a simple Router
     // around our component. We need to initialize the default route/path here.

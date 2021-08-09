@@ -85,6 +85,10 @@ class Auth {
         }
 
         const response = await this._api.shopperLogin.getAccessToken(options)
+        // Check for error response before handling the token
+        if (response.status_code) {
+            throw new HTTPError(response.status_code, response.message)
+        }
         this._handleShopperLoginTokenResponse(response)
         return response
     }
@@ -311,6 +315,10 @@ class Auth {
             body: data
         }
         const response = await this._api.shopperLogin.getAccessToken(options)
+        // Check for error response before handling the token
+        if (response.status_code) {
+            throw new HTTPError(response.status_code, response.message)
+        }
         this._handleShopperLoginTokenResponse(response)
 
         const {id_token, enc_user_id, customer_id} = response

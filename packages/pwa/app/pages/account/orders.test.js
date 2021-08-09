@@ -4,7 +4,6 @@ import {screen} from '@testing-library/react'
 import user from '@testing-library/user-event'
 import {rest} from 'msw'
 import {setupServer} from 'msw/node'
-import {Crypto} from '@peculiar/webcrypto'
 import {renderWithProviders} from '../../utils/test-utils'
 import {
     mockedRegisteredCustomer,
@@ -97,8 +96,6 @@ beforeEach(() => {
         global.TextEncoder = require('util').TextEncoder
     }
 
-    // Need to mock window.crypto for tests
-    window.crypto = new Crypto()
     window.history.pushState({}, 'Account', '/en/orders')
 })
 afterEach(() => {

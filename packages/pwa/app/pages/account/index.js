@@ -28,8 +28,10 @@ import AccountDetail from './profile'
 import AccountAddresses from './addresses'
 import AccountOrders from './orders'
 import AccountPaymentMethods from './payments'
+import AccountWishlist from './wishlist/index'
 import {useLocale} from '../../locale'
 import {useLocation} from 'react-router-dom'
+
 import {messages, navLinks} from './constant'
 import useNavigation from '../../hooks/use-navigation'
 import LoadingSpinner from '../../components/loading-spinner'
@@ -180,6 +182,9 @@ const Account = () => {
                 <Switch>
                     <Route exact path={path}>
                         <AccountDetail />
+                    </Route>
+                    <Route exact path={`${path}/wishlist`}>
+                        <AccountWishlist />
                     </Route>
                     <Route exact path={`${path}/addresses`}>
                         <AccountAddresses />

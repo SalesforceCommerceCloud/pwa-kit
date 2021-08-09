@@ -1,6 +1,8 @@
 import {useEffect} from 'react'
 import useBasket from './useBasket'
 import useCustomer from './useCustomer'
+import useCustomerProductLists from './useCustomerProductLists'
+import {customerProductListTypes} from '../../constants'
 
 /**
  * Joins basket and customer hooks into a single hook for initializing their states
@@ -10,6 +12,7 @@ import useCustomer from './useCustomer'
 const useShopper = () => {
     const customer = useCustomer()
     const basket = useBasket()
+    const customerProductLists = useCustomerProductLists()
 
     // Create or restore the user session upon mounting
     useEffect(() => {
@@ -59,6 +62,19 @@ const useShopper = () => {
             }
         }
     }, [customer, basket])
+
+    // Load wishlists in context for logged-in users
+    useEffect(() => {
+        const hasCustomer = customer?.customerId
+        const hasCustomerProductLists = customerProductLists?.loaded()
+        if (hasCustomer && customer?.authType === 'registered' && !hasCustomerProductLists) {
+            // we are only interested in wishlist
+            customerProductLists.fetchOrCreateProductLists(customerProductListTypes.WISHLIST)
+        } else if (customer?.authType === 'guest' && hasCustomerProductLists) {
+            // customerProductLists need to be reset when the user logs out
+            customerProductLists.clearProductLists()
+        }
+    }, [customerProductLists, customer])
 
     return {customer, basket}
 }

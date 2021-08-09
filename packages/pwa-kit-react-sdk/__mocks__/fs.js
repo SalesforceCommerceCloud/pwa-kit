@@ -7,7 +7,7 @@
  */
 
 // Import the actual fs module
-const _fs = require.requireActual('fs')
+const _fs = jest.requireActual('fs')
 
 // Generate a mocked fs module
 const fs = jest.genMockFromModule('fs')

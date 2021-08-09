@@ -3,6 +3,7 @@
 /* * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
 
 /* eslint-env jest */
+/* global jsdom */
 
 import {
     getScriptOrigin,
@@ -351,7 +352,7 @@ describe('isInternalLink', () => {
     const windowLocationOrigin = 'http://localhost'
 
     beforeAll(() => {
-        global.jsdom.reconfigure({
+        jsdom.reconfigure({
             url: windowLocationOrigin
         })
     })

@@ -4,7 +4,6 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import {Link as RouteLink} from 'react-router-dom'
 
 // Components
 import {
@@ -12,12 +11,9 @@ import {
     Box,
     Img,
     Image,
-    Link,
     Skeleton as ChakraSkeleton,
     Text,
     Stack,
-
-    // Hooks
     useMultiStyleConfig
 } from '@chakra-ui/react'
 
@@ -27,6 +23,7 @@ import {useIntl} from 'react-intl'
 // Other
 import {productUrlBuilder} from '../../utils/url'
 import {isServer} from '../../utils/utils'
+import Link from '../link'
 
 // Component Skeleton
 export const Skeleton = () => {
@@ -52,25 +49,28 @@ export const Skeleton = () => {
  */
 const ProductTile = (props) => {
     const intl = useIntl()
-    const styles = useMultiStyleConfig('ProductTile')
 
+    const styles = useMultiStyleConfig('ProductTile')
     // eslint-disable-next-line react/prop-types
-    const {productSearchItem, staticContext, ...rest} = props
+    const {
+        productSearchItem,
+        // eslint-disable-next-line react/prop-types
+        staticContext,
+        ...rest
+    } = props
     const {currency, image, price, productName} = productSearchItem
 
     return (
         <Link
             {...styles.container}
-            {...rest}
-            as={RouteLink}
             to={productUrlBuilder({id: productSearchItem?.productId}, intl.local)}
+            {...rest}
         >
             <Box {...styles.imageWrapper}>
                 {/* Server Image */}
                 <AspectRatio {...styles.image} ratio={1} display={isServer ? 'block' : 'none'}>
                     <Img alt={image.alt} src={image.disBaseLink} />
                 </AspectRatio>
-
                 {/* Client Image */}
                 <AspectRatio {...styles.image} ratio={1} display={isServer ? 'none' : 'block'}>
                     <Image alt={image.alt} src={image.disBaseLink} ignoreFallback={true} />

@@ -3,7 +3,6 @@ import {screen, waitFor} from '@testing-library/react'
 import user from '@testing-library/user-event'
 import {rest} from 'msw'
 import {setupServer} from 'msw/node'
-import {Crypto} from '@peculiar/webcrypto'
 import {renderWithProviders} from '../../utils/test-utils'
 import AccountAddresses from './addresses'
 import useCustomer from '../../commerce-api/hooks/useCustomer'
@@ -118,9 +117,6 @@ beforeEach(() => {
     if (typeof TextEncoder === 'undefined') {
         global.TextEncoder = require('util').TextEncoder
     }
-
-    // Need to mock window.crypto for tests
-    window.crypto = new Crypto()
 })
 afterEach(() => {
     localStorage.clear()

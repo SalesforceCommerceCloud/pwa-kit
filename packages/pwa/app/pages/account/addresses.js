@@ -4,6 +4,8 @@
 
 import React, {useState} from 'react'
 import {FormattedMessage, useIntl} from 'react-intl'
+import PropTypes from 'prop-types'
+
 import {
     Alert,
     AlertIcon,
@@ -31,6 +33,80 @@ import AddressDisplay from '../../components/address-display'
 import PageActionPlaceHolder from '../../components/page-action-placeholder'
 
 const DEFAULT_SKELETON_COUNT = 3
+
+const BoxArrow = () => {
+    return (
+        <Box
+            width={3}
+            height={3}
+            borderLeft="1px solid"
+            borderTop="1px solid"
+            borderColor="blue.600"
+            position="absolute"
+            left="50%"
+            bottom="-23px"
+            zIndex={1}
+            background="white"
+            transform="rotate(45deg)"
+        />
+    )
+}
+
+const ShippingAddressForm = ({form, hasAddresses, selectedAddressId, toggleEdit, submitForm}) => {
+    return (
+        <Box
+            border="1px solid"
+            borderColor="gray.200"
+            borderRadius="base"
+            position="relative"
+            {...(hasAddresses && {
+                gridColumn: [1, 'span 2', 'span 2', 'span 2', 'span 3'],
+                paddingX: [4, 4, 6],
+                paddingY: 6,
+                rounded: 'base',
+                border: '1px solid',
+                borderColor: 'blue.600'
+            })}
+        >
+            {form.formState.isSubmitting && <LoadingSpinner />}
+            <Stack spacing={6} padding={6}>
+                <Heading as="h3" size="sm">
+                    {selectedAddressId ? (
+                        <FormattedMessage defaultMessage="Edit Address" />
+                    ) : (
+                        <FormattedMessage defaultMessage="Add New Address" />
+                    )}
+                </Heading>
+                <Box>
+                    <Container variant="form">
+                        <form onSubmit={form.handleSubmit(submitForm)}>
+                            <Stack spacing={6}>
+                                {form.errors?.global && (
+                                    <Alert status="error">
+                                        <AlertIcon color="red.500" boxSize={4} />
+                                        <Text fontSize="sm" ml={3}>
+                                            {form.errors.global.message}
+                                        </Text>
+                                    </Alert>
+                                )}
+                                <AddressFields form={form} />
+                                <FormActionButtons onCancel={toggleEdit} />
+                            </Stack>
+                        </form>
+                    </Container>
+                </Box>
+            </Stack>
+        </Box>
+    )
+}
+
+ShippingAddressForm.propTypes = {
+    form: PropTypes.object,
+    hasAddresses: PropTypes.bool,
+    selectedAddressId: PropTypes.string,
+    toggleEdit: PropTypes.func,
+    submitForm: PropTypes.func
+}
 
 const AccountAddresses = () => {
     const {formatMessage} = useIntl()
@@ -71,6 +147,11 @@ const AccountAddresses = () => {
 
     const removeAddress = async (addressId) => {
         try {
+            if (addressId === selectedAddressId) {
+                setSelectedAddressId(undefined)
+                setIsEditing(false)
+                form.reset({addressId: ''})
+            }
             await removeSavedAddress(addressId)
         } catch (error) {
             form.setError('global', {type: 'manual', message: error.message})
@@ -82,11 +163,11 @@ const AccountAddresses = () => {
 
         if (address?.addressId) {
             setSelectedAddressId(address.addressId)
+            setIsEditing(true)
         } else {
             setSelectedAddressId(undefined)
+            setIsEditing(!isEditing)
         }
-
-        setIsEditing(!isEditing)
     }
 
     return (
@@ -113,47 +194,9 @@ const AccountAddresses = () => {
                 </SimpleGrid>
             )}
 
-            {isEditing && (
-                <Box
-                    position="relative"
-                    border="1px solid"
-                    borderColor="gray.200"
-                    borderRadius="base"
-                >
-                    {form.formState.isSubmitting && <LoadingSpinner />}
-                    <Stack spacing={6} padding={6}>
-                        <Heading as="h3" size="sm">
-                            {selectedAddressId ? (
-                                <FormattedMessage defaultMessage="Edit Address" />
-                            ) : (
-                                <FormattedMessage defaultMessage="Add New Address" />
-                            )}
-                        </Heading>
-                        <Box>
-                            <Container variant="form">
-                                <form onSubmit={form.handleSubmit(submitForm)}>
-                                    <Stack spacing={6}>
-                                        {form.errors?.global && (
-                                            <Alert status="error">
-                                                <AlertIcon color="red.500" boxSize={4} />
-                                                <Text fontSize="sm" ml={3}>
-                                                    {form.errors.global.message}
-                                                </Text>
-                                            </Alert>
-                                        )}
-                                        <AddressFields form={form} />
-                                        <FormActionButtons onCancel={toggleEdit} />
-                                    </Stack>
-                                </form>
-                            </Container>
-                        </Box>
-                    </Stack>
-                </Box>
-            )}
-
-            {hasAddresses && !isEditing && (
-                <SimpleGrid columns={[1, 2, 2, 2, 3]} spacing={4}>
-                    {!isEditing && (
+            {hasAddresses && (
+                <SimpleGrid columns={[1, 2, 2, 2, 3]} spacing={4} gridAutoFlow="row dense">
+                    {
                         <Button
                             variant="outline"
                             border="1px dashed"
@@ -167,45 +210,85 @@ const AccountAddresses = () => {
                             onClick={toggleEdit}
                         >
                             <FormattedMessage defaultMessage="Add Address" />
+                            {isEditing && !selectedAddressId && <BoxArrow />}
                         </Button>
+                    }
+
+                    {isEditing && !selectedAddressId && (
+                        <ShippingAddressForm
+                            form={form}
+                            hasAddresses={hasAddresses}
+                            submitForm={submitForm}
+                            selectedAddressId={selectedAddressId}
+                            toggleEdit={toggleEdit}
+                        />
                     )}
 
                     {addresses.map((address) => (
-                        <ActionCard
-                            key={address.addressId}
-                            onRemove={() => removeAddress(address.addressId)}
-                            onEdit={() => toggleEdit(address)}
-                        >
-                            {address.preferred && (
-                                <Badge
-                                    position="absolute"
-                                    fontSize="xs"
-                                    right={4}
-                                    variant="solid"
-                                    bg="gray.100"
-                                    color="gray.900"
-                                >
-                                    <FormattedMessage defaultMessage="Default" />
-                                </Badge>
+                        <React.Fragment key={address.addressId}>
+                            <ActionCard
+                                borderColor="gray.200"
+                                key={address.addressId}
+                                onRemove={() => removeAddress(address.addressId)}
+                                onEdit={() => toggleEdit(address)}
+                            >
+                                {address.preferred && (
+                                    <Badge
+                                        position="absolute"
+                                        fontSize="xs"
+                                        right={4}
+                                        variant="solid"
+                                        bg="gray.100"
+                                        color="gray.900"
+                                    >
+                                        <FormattedMessage defaultMessage="Default" />
+                                    </Badge>
+                                )}
+                                <AddressDisplay address={address} />
+                                {isEditing && address.addressId === selectedAddressId && (
+                                    <BoxArrow />
+                                )}
+                            </ActionCard>
+
+                            {isEditing && address.addressId === selectedAddressId && (
+                                <ShippingAddressForm
+                                    form={form}
+                                    hasAddresses={hasAddresses}
+                                    submitForm={submitForm}
+                                    selectedAddressId={selectedAddressId}
+                                    toggleEdit={toggleEdit}
+                                />
                             )}
-                            <AddressDisplay address={address} />
-                        </ActionCard>
+                        </React.Fragment>
                     ))}
                 </SimpleGrid>
             )}
 
-            {!hasAddresses && !isEditing && isRegistered && (
-                <PageActionPlaceHolder
-                    icon={<LocationIcon boxSize={8} />}
-                    heading={formatMessage({defaultMessage: 'No Saved Addresses'})}
-                    text={formatMessage({
-                        defaultMessage: 'Add a new address method for faster checkout'
-                    })}
-                    buttonText={formatMessage({
-                        defaultMessage: 'Add Address'
-                    })}
-                    onButtonClick={toggleEdit}
-                />
+            {!hasAddresses && (
+                <>
+                    {!isEditing && isRegistered && (
+                        <PageActionPlaceHolder
+                            icon={<LocationIcon boxSize={8} />}
+                            heading={formatMessage({defaultMessage: 'No Saved Addresses'})}
+                            text={formatMessage({
+                                defaultMessage: 'Add a new address method for faster checkout'
+                            })}
+                            buttonText={formatMessage({
+                                defaultMessage: 'Add Address'
+                            })}
+                            onButtonClick={toggleEdit}
+                        />
+                    )}
+                    {isEditing && !selectedAddressId && (
+                        <ShippingAddressForm
+                            form={form}
+                            hasAddresses={hasAddresses}
+                            submitForm={submitForm}
+                            selectedAddressId={selectedAddressId}
+                            toggleEdit={toggleEdit}
+                        />
+                    )}
+                </>
             )}
         </Stack>
     )

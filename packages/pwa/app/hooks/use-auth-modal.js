@@ -21,12 +21,19 @@ import ResetPasswordForm from '../components/reset-password'
 import RegisterForm from '../components/register'
 import {useHistory} from 'react-router-dom'
 import {useLocale} from '../locale'
+import {noop} from '../utils/utils'
 
 const LOGIN_VIEW = 'login'
 const REGISTER_VIEW = 'register'
 const PASSWORD_VIEW = 'password'
 
-export const AuthModal = ({initialView = LOGIN_VIEW, ...props}) => {
+export const AuthModal = ({
+    initialView = LOGIN_VIEW,
+    onLoginSuccess = noop,
+    onRegistrationSuccess = noop,
+    onPasswordResetSuccess = noop,
+    ...props
+}) => {
     const {formatMessage} = useIntl()
     const customer = useCustomer()
     const [currentView, setCurrentView] = useState(initialView)
@@ -35,6 +42,7 @@ export const AuthModal = ({initialView = LOGIN_VIEW, ...props}) => {
     const history = useHistory()
     const toast = useToast()
     const [locale] = useLocale()
+
     const submitForm = async (data) => {
         form.clearErrors()
 
@@ -73,6 +81,8 @@ export const AuthModal = ({initialView = LOGIN_VIEW, ...props}) => {
     const handleResetPassword = async ({email}) => {
         try {
             await customer.getResetPasswordToken(email)
+            // Execute action to be perfromed on successful passoword reset
+            await onPasswordResetSuccess()
             submittedEmail.current = email
         } catch (error) {
             form.setError('global', {type: 'manual', message: error.message})
@@ -139,6 +149,14 @@ export const AuthModal = ({initialView = LOGIN_VIEW, ...props}) => {
                 position: 'top-right',
                 isClosable: true
             })
+
+            // Execute action to be performed on successful login
+            onLoginSuccess()
+        }
+
+        if (registering) {
+            // Execute action to be performed on successful registration
+            onRegistrationSuccess()
         }
     }, [customer])
 
@@ -208,7 +226,10 @@ AuthModal.propTypes = {
     initialView: PropTypes.oneOf([LOGIN_VIEW, REGISTER_VIEW, PASSWORD_VIEW]),
     isOpen: PropTypes.bool.isRequired,
     onOpen: PropTypes.func.isRequired,
-    onClose: PropTypes.func.isRequired
+    onClose: PropTypes.func.isRequired,
+    onLoginSuccess: PropTypes.func,
+    onRegistrationSuccess: PropTypes.func,
+    onPasswordResetSuccess: PropTypes.func
 }
 
 /**

@@ -1,6 +1,13 @@
 export default {
     baseStyle: {
-        container: {},
+        container: {
+            position: 'relative'
+        },
+        wishlistIcon: {
+            position: 'absolute',
+            top: 2,
+            right: 2
+        },
         imageWrapper: {
             marginBottom: 2
         },

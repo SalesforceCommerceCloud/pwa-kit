@@ -100,6 +100,10 @@ const App = (props) => {
         }
     }
 
+    const onWishlistClick = () => {
+        history.push(`/${targetLocale}/account/wishlist`)
+    }
+
     return (
         <Box className="sf-app" {...styles.container}>
             <IntlProvider locale={targetLocale} defaultLocale={defaultLocale} messages={messages}>
@@ -129,6 +133,7 @@ const App = (props) => {
                                     onLogoClick={onLogoClick}
                                     onMyCartClick={onCartClick}
                                     onMyAccountClick={onAccountClick}
+                                    onWishlistClick={onWishlistClick}
                                 >
                                     <HideOnDesktop>
                                         <DrawerMenu

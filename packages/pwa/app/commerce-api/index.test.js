@@ -1,10 +1,10 @@
-import {Crypto} from '@peculiar/webcrypto'
 import CommerceAPI from '.'
 
 // NOTE: this will need to be a fixed or known config for testing against
 // It will probably end up living in pwa-kit later on so we may want to
 // deal with it there.
 import {commerceAPIConfig} from '../commerce-api.config'
+import {einsteinAPIConfig} from '../einstein-api.config'
 import {createGetTokenBody} from './utils'
 import {generateCodeChallenge, createCodeVerifier} from './pkce'
 import {
@@ -19,7 +19,7 @@ import {
     ocapiFaultResponse
 } from './mock-data'
 
-const apiConfig = {...commerceAPIConfig, proxy: undefined}
+const apiConfig = {...commerceAPIConfig, einsteinConfig: einsteinAPIConfig, proxy: undefined}
 const getAPI = () => new CommerceAPI(apiConfig)
 
 jest.mock('commerce-sdk-isomorphic', () => {
@@ -88,9 +88,6 @@ beforeEach(() => {
     if (typeof TextEncoder === 'undefined') {
         global.TextEncoder = require('util').TextEncoder
     }
-
-    // Need to mock window.crypto for tests
-    window.crypto = new Crypto()
 })
 
 describe('CommerceAPI', () => {

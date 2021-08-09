@@ -6,10 +6,16 @@ import PropTypes from 'prop-types'
 
 import theme from '../theme'
 import CommerceAPI from '../commerce-api'
-import {BasketProvider, CommerceAPIProvider, CustomerProvider} from '../commerce-api/utils'
+import {
+    BasketProvider,
+    CommerceAPIProvider,
+    CustomerProvider,
+    CustomerProductListsProvider
+} from '../commerce-api/utils'
 import {commerceAPIConfig} from '../commerce-api.config'
 import {IntlProvider, DEFAULT_LOCALE} from '../locale'
 import {CategoriesContext} from '../contexts'
+import {einsteinAPIConfig} from '../einstein-api.config'
 
 export const renderWithReactIntl = (node, locale = DEFAULT_LOCALE) => {
     return render(
@@ -22,7 +28,11 @@ export const renderWithReactIntl = (node, locale = DEFAULT_LOCALE) => {
 export const renderWithRouter = (node) => renderWithReactIntl(<Router>{node}</Router>)
 
 export const renderWithRouterAndCommerceAPI = (node) => {
-    const api = new CommerceAPI({...commerceAPIConfig, proxy: undefined})
+    const api = new CommerceAPI({
+        ...commerceAPIConfig,
+        einsteinConfig: einsteinAPIConfig,
+        proxy: undefined
+    })
     return renderWithReactIntl(
         <CommerceAPIProvider value={api}>
             <Router>{node}</Router>
@@ -39,7 +49,8 @@ export const TestProviders = ({
     children,
     initialBasket = null,
     initialCustomer = null,
-    initialCategories = []
+    initialCategories = [],
+    initialProductLists = {}
 }) => {
     const mounted = useRef()
 
@@ -59,12 +70,14 @@ export const TestProviders = ({
 
     const api = new CommerceAPI({
         ...commerceAPIConfig,
+        einsteinConfig: einsteinAPIConfig,
         proxy,
         ocapiHost
     })
     const [basket, _setBasket] = useState(initialBasket)
     const [customer, setCustomer] = useState(initialCustomer)
     const [categories, setCategories] = useState(initialCategories)
+    const [customerProductLists, setCustomerProductLists] = useState(initialProductLists)
 
     const setBasket = useCallback((data) => {
         if (!mounted.current) {
@@ -79,9 +92,13 @@ export const TestProviders = ({
                 <CategoriesContext.Provider value={{categories, setCategories}}>
                     <CustomerProvider value={{customer, setCustomer}}>
                         <BasketProvider value={{basket, setBasket}}>
-                            <Router>
-                                <ChakraProvider theme={theme}>{children}</ChakraProvider>
-                            </Router>
+                            <CustomerProductListsProvider
+                                value={{customerProductLists, setCustomerProductLists}}
+                            >
+                                <Router>
+                                    <ChakraProvider theme={theme}>{children}</ChakraProvider>
+                                </Router>
+                            </CustomerProductListsProvider>
                         </BasketProvider>
                     </CustomerProvider>
                 </CategoriesContext.Provider>
@@ -94,7 +111,8 @@ TestProviders.propTypes = {
     children: PropTypes.element,
     initialBasket: PropTypes.object,
     initialCustomer: PropTypes.object,
-    initialCategories: PropTypes.element
+    initialCategories: PropTypes.element,
+    initialProductLists: PropTypes.object
 }
 
 /**

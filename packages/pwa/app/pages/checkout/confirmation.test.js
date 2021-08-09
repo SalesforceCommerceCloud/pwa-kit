@@ -4,7 +4,6 @@ import {screen, waitFor} from '@testing-library/react'
 import user from '@testing-library/user-event'
 import {rest} from 'msw'
 import {setupServer} from 'msw/node'
-import {Crypto} from '@peculiar/webcrypto'
 import {renderWithProviders} from '../../utils/test-utils'
 import Confirmation from './confirmation'
 import {keysToCamel} from '../../commerce-api/utils'
@@ -242,9 +241,6 @@ beforeAll(() => {
     if (typeof TextEncoder === 'undefined') {
         global.TextEncoder = require('util').TextEncoder
     }
-
-    // Need to mock window.crypto for tests
-    window.crypto = new Crypto()
 
     // Since we're testing some navigation logic, we are using a simple Router
     // around our component. We need to initialize the default route/path here.

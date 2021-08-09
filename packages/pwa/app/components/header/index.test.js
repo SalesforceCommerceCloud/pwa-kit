@@ -5,8 +5,7 @@ import {renderWithProviders} from '../../utils/test-utils'
 import useCustomer from '../../commerce-api/hooks/useCustomer'
 import {setupServer} from 'msw/node'
 import {rest} from 'msw'
-import {mockedRegisteredCustomer} from '../../commerce-api/mock-data'
-import {Crypto} from '@peculiar/webcrypto'
+import {mockedCustomerProductLists, mockedRegisteredCustomer} from '../../commerce-api/mock-data'
 import {Route, Switch} from 'react-router-dom'
 import Account from '../../pages/account'
 
@@ -77,9 +76,6 @@ beforeEach(() => {
         global.TextEncoder = require('util').TextEncoder
     }
 
-    // Need to mock window.crypto for tests
-    window.crypto = new Crypto()
-
     // Since we're testing some navigation logic, we are using a simple Router
     // around our component. We need to initialize the default route/path here.
     window.history.pushState({}, 'Account', '/en/account')
@@ -96,11 +92,13 @@ test('renders Header', () => {
     const logo = document.querySelector('button[aria-label="Logo"]')
     const account = document.querySelector('svg[aria-label="My account"]')
     const cart = document.querySelector('button[aria-label="My cart"]')
+    const wishlist = document.querySelector('button[aria-label="Wishlist"]')
     const searchInput = document.querySelector('input[type="search"]')
     expect(menu).toBeInTheDocument()
     expect(logo).toBeInTheDocument()
     expect(account).toBeInTheDocument()
     expect(cart).toBeInTheDocument()
+    expect(wishlist).toBeInTheDocument()
     expect(searchInput).toBeInTheDocument()
 })
 
@@ -237,7 +235,11 @@ test('shows dropdown menu when an authenticated users hover on the account icon'
                     firstName: 'Geordi'
                 })
             )
-        )
+        ),
+        // mock fetch product lists
+        rest.get('*/customers/:customerId/product-lists', (req, res, ctx) => {
+            return res(ctx.json(mockedCustomerProductLists))
+        })
     )
     renderWithProviders(<MockedComponent />)
     // Look for account icon

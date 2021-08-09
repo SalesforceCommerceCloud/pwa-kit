@@ -6,7 +6,7 @@ import React, {useEffect, useState} from 'react'
 import {useLocation, useHistory} from 'react-router-dom'
 import PropTypes from 'prop-types'
 import {Helmet} from 'react-helmet'
-import {useIntl} from 'react-intl'
+import {FormattedMessage, useIntl} from 'react-intl'
 
 // Components
 import {
@@ -19,11 +19,11 @@ import {
     Button,
     Fade,
     Heading,
-    HStack,
     Select,
+    Stack,
     Skeleton,
     Text,
-    VStack
+    useToast
 } from '@chakra-ui/react'
 
 // Project Components
@@ -31,25 +31,34 @@ import Breadcrumb from '../../components/breadcrumb'
 import ImageGallery from '../../components/image-gallery'
 import SwatchGroup from '../../components/swatch-group'
 import Swatch from '../../components/swatch-group/swatch'
+import RecommendedProducts from '../../components/recommended-products'
 
 // Hooks
 import {useVariationAttributes, useVariant, useVariationParams} from '../../hooks'
 import useBasket from '../../commerce-api/hooks/useBasket'
 
 // Others/Utils
+import useEinstein from '../../commerce-api/hooks/useEinstein'
 import {HTTPNotFound} from 'pwa-kit-react-sdk/dist/ssr/universal/errors'
 import {rebuildPathWithParams} from '../../utils/url'
-import useEinstein from '../../einstein/hooks/useEinstein'
+import withRegistration from '../../hoc/with-registration'
+import useCustomerProductLists, {
+    eventActions
+} from '../../commerce-api/hooks/useCustomerProductLists'
+import {customerProductListTypes} from '../../constants'
 
 const MAX_ORDER_QUANTITY = 10
 const OUT_OF_STOCK = 'OUT_OF_STOCK'
 const UNFULFILLABLE = 'UNFULFILLABLE'
+const ButtonWithRegistration = withRegistration(Button)
 
 const ProductDetail = ({category, product, isLoading}) => {
     const intl = useIntl()
     const basket = useBasket()
     const history = useHistory()
     const location = useLocation()
+    const customerProductLists = useCustomerProductLists()
+
     const einstein = useEinstein()
 
     const [quantity, setQuantity] = useState(1)
@@ -63,6 +72,9 @@ const ProductDetail = ({category, product, isLoading}) => {
     const stockLevel = product?.inventory?.stockLevel || 0
     const canOrder = !isLoading && variant?.orderable && quantity <= stockLevel
     const showLoading = !product
+
+    const canAddToWishlist = !isLoading && variant
+    const toast = useToast()
 
     // A product is considered out of stock if the stock level is 0 or if we have all our
     // variation attributes selected, but don't have a variant. We do this because the API
@@ -90,7 +102,7 @@ const ProductDetail = ({category, product, isLoading}) => {
         (isOutOfStock && inventoryMessages[OUT_OF_STOCK]) ||
         (unfulfillable && inventoryMessages[UNFULFILLABLE])
 
-    const handleAddToCart = async (variant, quantity) => {
+    const handleAddToCart = async () => {
         // The basket accepts an array of `ProductItems`, so lets create a single
         // item array to add to the basket.
         const productItems = [
@@ -102,6 +114,66 @@ const ProductDetail = ({category, product, isLoading}) => {
         ]
 
         basket.addItemToBasket(productItems)
+    }
+
+    const showToast = (title, status) => {
+        const toastId = `${title}-${status}`
+        if (!toast.isActive(toastId)) {
+            // Prevent duplicate toasts
+            toast({
+                id: toastId,
+                title,
+                status,
+                isClosable: true,
+                position: 'top-right',
+                variant: 'subtle'
+            })
+        }
+    }
+
+    const addItemToWishlist = async () => {
+        try {
+            // If product-lists have not loaded we push "Add to wishlist" event to eventQueue to be
+            // processed once the product-lists have loaded.
+            if (!customerProductLists?.loaded()) {
+                const event = {
+                    item: {...product, quantity},
+                    action: eventActions.ADD,
+                    listType: customerProductListTypes.WISHLIST
+                }
+
+                customerProductLists.addActionToEventQueue(event)
+            } else {
+                const wishlist = customerProductLists.data.find(
+                    (list) => list.type === customerProductListTypes.WISHLIST
+                )
+                const requestBody = {
+                    productId: product.id,
+                    priority: 1,
+                    quantity,
+                    public: false,
+                    type: 'product'
+                }
+
+                const wishlistItem = await customerProductLists.createCustomerProductListItem(
+                    requestBody,
+                    wishlist.id
+                )
+
+                if (wishlistItem?.id) {
+                    showToast(
+                        intl.formatMessage({defaultMessage: '1 item added to wishlist'}),
+                        'success'
+                    )
+                }
+            }
+        } catch (error) {
+            console.error(error)
+            showToast(
+                intl.formatMessage({defaultMessage: 'Something went wrong. Try again!'}),
+                'error'
+            )
+        }
     }
 
     // If the user has selected all required attributes as we now have the single product
@@ -128,300 +200,390 @@ const ProductDetail = ({category, product, isLoading}) => {
     }, [category])
 
     useEffect(() => {
-        if (!product) {
-            return
-        }
-        const sendViewProduct = async () => {
+        if (product) {
             einstein.sendViewProduct(product)
         }
-        sendViewProduct()
     }, [product])
 
     return (
-        <Box className="sf-product-detail-page" layerStyle="page">
+        <Box
+            className="sf-product-detail-page"
+            layerStyle="page"
+            data-testid="product-details-page"
+        >
             <Helmet>
                 <title>{product?.pageTitle}</title>
                 <meta name="description" content={product?.pageDescription} />
             </Helmet>
 
-            <HStack alignItems="stretch" spacing={[0, 0, 0, 16]} marginBottom={4}>
-                <Box display={['none', 'none', 'none', 'block']} flex={5}>
-                    {/* Image Gallery */}
-                    {product && (
-                        <ImageGallery
-                            imageGroups={product.imageGroups}
-                            selectedVariationAttributes={variationParams}
-                        />
-                    )}
-                </Box>
+            <Stack spacing={16}>
+                <Stack spacing={4}>
+                    <Stack direction="row" alignItems="stretch" spacing={[0, 0, 0, 16]}>
+                        <Box display={['none', 'none', 'none', 'block']} flex={5}>
+                            {/* Image Gallery */}
+                            {product && (
+                                <ImageGallery
+                                    data-testid="product-details-gallery"
+                                    imageGroups={product.imageGroups}
+                                    selectedVariationAttributes={variationParams}
+                                />
+                            )}
+                        </Box>
 
-                <Box flex={4}>
-                    {/* Header */}
-                    <VStack align="stretch" marginBottom={8} spacing={2}>
-                        {/* Breadcrumb */}
-                        <Skeleton isLoaded={!showLoading} width={64}>
-                            <Breadcrumb
-                                marginBottom={2}
-                                categories={primaryCategory?.parentCategoryTree || []}
-                            />
-                        </Skeleton>
+                        <Box flex={4}>
+                            {/* Header */}
+                            <Stack align="stretch" marginBottom={8} spacing={2}>
+                                {/* Breadcrumb */}
+                                <Skeleton isLoaded={!showLoading} width={64}>
+                                    <Breadcrumb
+                                        marginBottom={2}
+                                        categories={primaryCategory?.parentCategoryTree || []}
+                                    />
+                                </Skeleton>
 
-                        {/* Title */}
-                        <Skeleton isLoaded={!showLoading}>
-                            <Heading as="h2" size="lg">
-                                {`${product?.name}`}
-                            </Heading>
-                        </Skeleton>
+                                {/* Title */}
+                                <Skeleton isLoaded={!showLoading}>
+                                    <Heading as="h2" size="lg">
+                                        {`${product?.name}`}
+                                    </Heading>
+                                </Skeleton>
 
-                        {/* Price */}
-                        <Skeleton isLoaded={!showLoading} width={32}>
-                            <Text fontWeight="bold" fontSize="md" aria-label="price">
-                                {intl.formatNumber(variant?.price || product?.price, {
-                                    style: 'currency',
-                                    currency: product?.currency || 'USD'
-                                })}
-                            </Text>
-                        </Skeleton>
-                    </VStack>
+                                {/* Price */}
+                                <Skeleton isLoaded={!showLoading} width={32}>
+                                    <Text fontWeight="bold" fontSize="md" aria-label="price">
+                                        {intl.formatNumber(variant?.price || product?.price, {
+                                            style: 'currency',
+                                            currency: product?.currency || 'USD'
+                                        })}
+                                    </Text>
+                                </Skeleton>
+                            </Stack>
 
-                    {/* Image Gallery */}
-                    <Box align="stretch" display={['block', 'block', 'block', 'none']}>
-                        {product && (
-                            <ImageGallery
-                                imageGroups={product.imageGroups}
-                                selectedVariationAttributes={variationParams}
-                            />
-                        )}
-                    </Box>
+                            {/* Image Gallery */}
+                            <Box align="stretch" display={['block', 'block', 'block', 'none']}>
+                                {product && (
+                                    <ImageGallery
+                                        imageGroups={product.imageGroups}
+                                        selectedVariationAttributes={variationParams}
+                                    />
+                                )}
+                            </Box>
 
-                    {/* Variations & Quantity Selector */}
-                    <VStack align="stretch" spacing={8}>
-                        <VStack align="stretch" spacing={4}>
-                            {/* 
+                            {/* Variations & Quantity Selector */}
+                            <Stack align="stretch" spacing={8}>
+                                <Stack align="stretch" spacing={4}>
+                                    {/* 
                                 Customize the skeletons shown for attributes to suit your needs. At the point
                                 that we show the skeleton we do not know how many variations are selectable. So choose
                                 a a skeleton that will meet most of your needs. 
                             */}
-                            {showLoading ? (
-                                <>
-                                    {/* First Attribute Skeleton */}
-                                    <Skeleton height={6} width={32} />
-                                    <Skeleton height={20} width={64} />
+                                    {showLoading ? (
+                                        <>
+                                            {/* First Attribute Skeleton */}
+                                            <Skeleton height={6} width={32} />
+                                            <Skeleton height={20} width={64} />
 
-                                    {/* Second Attribute Skeleton */}
-                                    <Skeleton height={6} width={32} />
-                                    <Skeleton height={20} width={64} />
-                                </>
-                            ) : (
-                                <>
-                                    {/* Attribute Swatches */}
-                                    {variationAttributes.map((variationAttribute) => {
-                                        const {
-                                            id,
-                                            name,
-                                            selectedValue,
-                                            values = []
-                                        } = variationAttribute
+                                            {/* Second Attribute Skeleton */}
+                                            <Skeleton height={6} width={32} />
+                                            <Skeleton height={20} width={64} />
+                                        </>
+                                    ) : (
+                                        <>
+                                            {/* Attribute Swatches */}
+                                            {variationAttributes.map((variationAttribute) => {
+                                                const {
+                                                    id,
+                                                    name,
+                                                    selectedValue,
+                                                    values = []
+                                                } = variationAttribute
 
-                                        return (
-                                            <SwatchGroup
-                                                key={id}
-                                                onChange={(_, href) => history.replace(href)}
-                                                variant={id === 'color' ? 'circle' : 'square'}
-                                                value={selectedValue?.value}
-                                                displayName={selectedValue?.name || ''}
-                                                label={name}
+                                                return (
+                                                    <SwatchGroup
+                                                        key={id}
+                                                        onChange={(_, href) =>
+                                                            history.replace(href)
+                                                        }
+                                                        variant={
+                                                            id === 'color' ? 'circle' : 'square'
+                                                        }
+                                                        value={selectedValue?.value}
+                                                        displayName={selectedValue?.name || ''}
+                                                        label={name}
+                                                    >
+                                                        {values.map(
+                                                            ({
+                                                                href,
+                                                                name,
+                                                                image,
+                                                                value,
+                                                                orderable
+                                                            }) => (
+                                                                <Swatch
+                                                                    key={value}
+                                                                    href={href}
+                                                                    disabled={!orderable}
+                                                                    value={value}
+                                                                    name={name}
+                                                                >
+                                                                    {image ? (
+                                                                        <Box
+                                                                            height="100%"
+                                                                            width="100%"
+                                                                            minWidth="32px"
+                                                                            backgroundRepeat="no-repeat"
+                                                                            backgroundSize="cover"
+                                                                            backgroundColor={name.toLowerCase()}
+                                                                            backgroundImage={
+                                                                                image
+                                                                                    ? `url(${image.disBaseLink})`
+                                                                                    : ''
+                                                                            }
+                                                                        />
+                                                                    ) : (
+                                                                        name
+                                                                    )}
+                                                                </Swatch>
+                                                            )
+                                                        )}
+                                                    </SwatchGroup>
+                                                )
+                                            })}
+                                        </>
+                                    )}
+
+                                    {/* Quantity Selector */}
+                                    <Stack align="stretch" maxWidth={'125px'}>
+                                        <Box fontWeight="bold">
+                                            {intl.formatMessage({
+                                                defaultMessage: 'Quantity'
+                                            })}
+                                            :
+                                        </Box>
+                                        <Select
+                                            value={quantity}
+                                            onChange={({target}) => {
+                                                setQuantity(parseInt(target.value))
+                                            }}
+                                        >
+                                            {new Array(MAX_ORDER_QUANTITY)
+                                                .fill(0)
+                                                .map((_, index) => (
+                                                    <option
+                                                        key={index}
+                                                        value={index + stepQuantity}
+                                                    >
+                                                        {index + stepQuantity}
+                                                    </option>
+                                                ))}
+                                        </Select>
+                                    </Stack>
+                                </Stack>
+
+                                <Box width="100%">
+                                    {showInventoryMessage && (
+                                        <Fade in={true}>
+                                            <Text
+                                                color="orange.600"
+                                                fontWeight={600}
+                                                marginBottom={8}
                                             >
-                                                {values.map(
-                                                    ({href, name, image, value, orderable}) => (
-                                                        <Swatch
-                                                            key={value}
-                                                            href={href}
-                                                            disabled={!orderable}
-                                                            value={value}
-                                                            name={name}
-                                                        >
-                                                            {image ? (
-                                                                <Box
-                                                                    height="100%"
-                                                                    width="100%"
-                                                                    minWidth="32px"
-                                                                    backgroundRepeat="no-repeat"
-                                                                    backgroundSize="cover"
-                                                                    backgroundColor={name.toLowerCase()}
-                                                                    backgroundImage={
-                                                                        image
-                                                                            ? `url(${image.disBaseLink})`
-                                                                            : ''
-                                                                    }
-                                                                />
-                                                            ) : (
-                                                                name
-                                                            )}
-                                                        </Swatch>
-                                                    )
-                                                )}
-                                            </SwatchGroup>
-                                        )
-                                    })}
-                                </>
-                            )}
+                                                {inventoryMessage}
+                                            </Text>
+                                        </Fade>
+                                    )}
 
-                            {/* Quantity Selector */}
-                            <VStack align="stretch" maxWidth={'125px'}>
-                                <Box fontWeight="bold">
-                                    {intl.formatMessage({
-                                        defaultMessage: 'Quantity'
-                                    })}
-                                    :
+                                    <Stack spacing={4}>
+                                        <Button
+                                            disabled={!canOrder}
+                                            onClick={handleAddToCart}
+                                            width="100%"
+                                            variant="solid"
+                                        >
+                                            {intl.formatMessage({
+                                                defaultMessage: 'Add to Cart'
+                                            })}
+                                        </Button>
+
+                                        <Box>
+                                            <ButtonWithRegistration
+                                                disabled={
+                                                    customerProductLists.showLoader ||
+                                                    !canAddToWishlist
+                                                }
+                                                onClick={addItemToWishlist}
+                                                width={'100%'}
+                                                variant="outline"
+                                                isLoading={customerProductLists.showLoader}
+                                            >
+                                                {intl.formatMessage({
+                                                    defaultMessage: 'Add to Wishlist'
+                                                })}
+                                            </ButtonWithRegistration>
+                                        </Box>
+                                    </Stack>
                                 </Box>
-                                <Select
-                                    value={quantity}
-                                    onChange={({target}) => {
-                                        setQuantity(parseInt(target.value))
-                                    }}
-                                >
-                                    {new Array(MAX_ORDER_QUANTITY).fill(0).map((_, index) => (
-                                        <option key={index} value={index + stepQuantity}>
-                                            {index + stepQuantity}
-                                        </option>
-                                    ))}
-                                </Select>
-                            </VStack>
-                        </VStack>
-
-                        <Box width="100%">
-                            {showInventoryMessage && (
-                                <Fade in={true}>
-                                    <Text color="orange.600" fontWeight={600} marginBottom={8}>
-                                        {inventoryMessage}
-                                    </Text>
-                                </Fade>
-                            )}
-
-                            <Button
-                                display={['none', 'none', 'none', 'block']}
-                                disabled={!canOrder}
-                                onClick={() => {
-                                    handleAddToCart(variant, quantity)
-                                }}
-                                width="100%"
-                                variant="solid"
-                            >
-                                {intl.formatMessage({
-                                    defaultMessage: 'Add to Cart'
-                                })}
-                            </Button>
+                            </Stack>
                         </Box>
-                    </VStack>
-                </Box>
-            </HStack>
+                    </Stack>
 
-            {/* Information Accordion */}
-            <HStack spacing={[0, 0, 0, 16]}>
-                <Accordion allowMultiple allowToggle maxWidth={'896px'} flex={[1, 1, 1, 5]}>
-                    {/* Details */}
-                    <AccordionItem>
-                        <h2>
-                            <AccordionButton height="64px">
-                                <Box flex="1" textAlign="left" fontWeight="bold" fontSize="lg">
+                    {/* Information Accordion */}
+                    <Stack direction="row" spacing={[0, 0, 0, 16]}>
+                        <Accordion allowMultiple allowToggle maxWidth={'896px'} flex={[1, 1, 1, 5]}>
+                            {/* Details */}
+                            <AccordionItem>
+                                <h2>
+                                    <AccordionButton height="64px">
+                                        <Box
+                                            flex="1"
+                                            textAlign="left"
+                                            fontWeight="bold"
+                                            fontSize="lg"
+                                        >
+                                            {intl.formatMessage({
+                                                defaultMessage: 'Product Detail'
+                                            })}
+                                        </Box>
+                                        <AccordionIcon />
+                                    </AccordionButton>
+                                </h2>
+                                <AccordionPanel mb={6} mt={4}>
+                                    <div
+                                        dangerouslySetInnerHTML={{
+                                            __html: product?.longDescription
+                                        }}
+                                    />
+                                </AccordionPanel>
+                            </AccordionItem>
+
+                            {/* Size & Fit */}
+                            <AccordionItem>
+                                <h2>
+                                    <AccordionButton height="64px">
+                                        <Box
+                                            flex="1"
+                                            textAlign="left"
+                                            fontWeight="bold"
+                                            fontSize="lg"
+                                        >
+                                            {intl.formatMessage({
+                                                defaultMessage: 'Size & Fit'
+                                            })}
+                                        </Box>
+                                        <AccordionIcon />
+                                    </AccordionButton>
+                                </h2>
+                                <AccordionPanel mb={6} mt={4}>
+                                    Coming Soon
+                                </AccordionPanel>
+                            </AccordionItem>
+
+                            {/* Reviews */}
+                            <AccordionItem>
+                                <h2>
+                                    <AccordionButton height="64px">
+                                        <Box
+                                            flex="1"
+                                            textAlign="left"
+                                            fontWeight="bold"
+                                            fontSize="lg"
+                                        >
+                                            {intl.formatMessage({
+                                                defaultMessage: 'Reviews'
+                                            })}
+                                        </Box>
+                                        <AccordionIcon />
+                                    </AccordionButton>
+                                </h2>
+                                <AccordionPanel mb={6} mt={4}>
+                                    Coming Soon
+                                </AccordionPanel>
+                            </AccordionItem>
+
+                            {/* Questions */}
+                            <AccordionItem>
+                                <h2>
+                                    <AccordionButton height="64px">
+                                        <Box
+                                            flex="1"
+                                            textAlign="left"
+                                            fontWeight="bold"
+                                            fontSize="lg"
+                                        >
+                                            {intl.formatMessage({
+                                                defaultMessage: 'Questions'
+                                            })}
+                                        </Box>
+                                        <AccordionIcon />
+                                    </AccordionButton>
+                                </h2>
+                                <AccordionPanel mb={6} mt={4}>
+                                    Coming Soon
+                                </AccordionPanel>
+                            </AccordionItem>
+                        </Accordion>
+                        <Box display={['none', 'none', 'none', 'block']} flex={4}></Box>
+                    </Stack>
+
+                    {/* Add to Cart Button */}
+                    <Box
+                        position="sticky"
+                        bottom="0"
+                        pt={4}
+                        pb={11}
+                        px={4}
+                        display={{base: 'block', lg: 'none'}}
+                        width="full"
+                        backgroundColor="white"
+                    >
+                        <Box marginLeft="-16px" marginRight="-16px">
+                            <Stack spacing={4}>
+                                <Button width="full" disabled={!canOrder} onClick={handleAddToCart}>
+                                    <FormattedMessage defaultMessage="Add to Cart" />
+                                </Button>
+
+                                {/* Adding display styles to button instead of Box breaks spinner when isLoading is true */}
+                                <ButtonWithRegistration
+                                    disabled={customerProductLists.showLoader || !canAddToWishlist}
+                                    onClick={addItemToWishlist}
+                                    width={'100%'}
+                                    variant="outline"
+                                    isLoading={customerProductLists.showLoader}
+                                >
                                     {intl.formatMessage({
-                                        defaultMessage: 'Product Detail'
+                                        defaultMessage: 'Add to Wishlist'
                                     })}
-                                </Box>
-                                <AccordionIcon />
-                            </AccordionButton>
-                        </h2>
-                        <AccordionPanel mb={6} mt={4}>
-                            <div
-                                dangerouslySetInnerHTML={{
-                                    __html: product?.longDescription
-                                }}
-                            />
-                        </AccordionPanel>
-                    </AccordionItem>
+                                </ButtonWithRegistration>
+                            </Stack>
+                        </Box>
+                    </Box>
+                </Stack>
 
-                    {/* Size & Fit */}
-                    <AccordionItem>
-                        <h2>
-                            <AccordionButton height="64px">
-                                <Box flex="1" textAlign="left" fontWeight="bold" fontSize="lg">
-                                    {intl.formatMessage({
-                                        defaultMessage: 'Size & Fit'
-                                    })}
-                                </Box>
-                                <AccordionIcon />
-                            </AccordionButton>
-                        </h2>
-                        <AccordionPanel mb={6} mt={4}>
-                            Coming Soon
-                        </AccordionPanel>
-                    </AccordionItem>
+                {/* Product Recommendations */}
+                <Stack spacing={16}>
+                    <RecommendedProducts
+                        title={<FormattedMessage defaultMessage="Complete The Set" />}
+                        recommender={'complete-the-set'}
+                        products={product && [product.id]}
+                        mx={{base: -4, md: -8, lg: 0}}
+                        shouldFetch={() => product?.id}
+                    />
 
-                    {/* Reviews */}
-                    <AccordionItem>
-                        <h2>
-                            <AccordionButton height="64px">
-                                <Box flex="1" textAlign="left" fontWeight="bold" fontSize="lg">
-                                    {intl.formatMessage({
-                                        defaultMessage: 'Reviews'
-                                    })}
-                                </Box>
-                                <AccordionIcon />
-                            </AccordionButton>
-                        </h2>
-                        <AccordionPanel mb={6} mt={4}>
-                            Coming Soon
-                        </AccordionPanel>
-                    </AccordionItem>
+                    <RecommendedProducts
+                        title={<FormattedMessage defaultMessage="You Might Also Like" />}
+                        recommender={'pdp-similar-items'}
+                        products={product && [product.id]}
+                        mx={{base: -4, md: -8, lg: 0}}
+                        shouldFetch={() => product?.id}
+                    />
 
-                    {/* Questions */}
-                    <AccordionItem>
-                        <h2>
-                            <AccordionButton height="64px">
-                                <Box flex="1" textAlign="left" fontWeight="bold" fontSize="lg">
-                                    {intl.formatMessage({
-                                        defaultMessage: 'Questions'
-                                    })}
-                                </Box>
-                                <AccordionIcon />
-                            </AccordionButton>
-                        </h2>
-                        <AccordionPanel mb={6} mt={4}>
-                            Coming Soon
-                        </AccordionPanel>
-                    </AccordionItem>
-                </Accordion>
-                <Box display={['none', 'none', 'none', 'block']} flex={4}></Box>
-            </HStack>
-
-            {/* Add to Cart Button */}
-            <Box
-                layerStyle="page"
-                position="fixed"
-                left="0"
-                bottom="0"
-                backgroundColor="white"
-                width="100%"
-                display={['block', 'block', 'block', 'none']}
-                align="center"
-                zIndex={5000}
-            >
-                <Button
-                    disabled={!canOrder}
-                    onClick={() => {
-                        handleAddToCart(variant, quantity)
-                    }}
-                    width="100%"
-                    marginTop={4}
-                    marginBottom={4}
-                    variant="solid"
-                >
-                    {intl.formatMessage({
-                        defaultMessage: 'Add to Cart'
-                    })}
-                </Button>
-            </Box>
+                    <RecommendedProducts
+                        title={<FormattedMessage defaultMessage="Recently Viewed" />}
+                        recommender={'viewed-recently-einstein'}
+                        mx={{base: -4, md: -8, lg: 0}}
+                    />
+                </Stack>
+            </Stack>
         </Box>
     )
 }

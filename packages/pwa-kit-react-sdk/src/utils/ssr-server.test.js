@@ -969,6 +969,7 @@ describe('PerformanceTimer tests', () => {
         func.throws('Error', 'intentional error')
         expect(() => timer.time('test2', func, 1)).toThrow('intentional error')
         expect(func.callCount).toBe(1)
+        timer._observer.disconnect()
     })
 
     const timerTest = test('start() and end()', () => {
@@ -986,6 +987,7 @@ describe('PerformanceTimer tests', () => {
                 expect(entry.name).toEqual('test3')
                 expect(entry.duration).toBeGreaterThanOrEqual(5)
                 expect(entry.duration).toBeLessThanOrEqual(30)
+                timer._observer.disconnect()
             })
     })
 
@@ -993,6 +995,7 @@ describe('PerformanceTimer tests', () => {
         const timer = new PerformanceTimer(idTest.description)
         expect(timer.operationId).toBe(1)
         expect(timer.operationId).toBe(2)
+        timer._observer.disconnect()
     })
 })
 

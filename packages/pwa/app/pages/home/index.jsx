@@ -5,20 +5,15 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {useIntl, FormattedMessage} from 'react-intl'
-import {Box, Button, Grid, GridItem, SimpleGrid, Stack} from '@chakra-ui/react'
+import {Box, Button, Grid, GridItem, Stack} from '@chakra-ui/react'
 import {getAssetUrl} from 'pwa-kit-react-sdk/dist/ssr/universal/utils'
 import {Link} from 'react-router-dom'
-
-import useBasket from '../../commerce-api/hooks/useBasket'
-
 import Hero from '../../components/hero'
 import Seo from '../../components/seo'
 import Section from '../../components/section'
 import BasicTile from '../../components/basic-tile'
-import ProductTile from '../../components/product-tile'
-import {BasketIcon} from '../../components/icons'
-
 import {categories} from './data'
+import RecommendedProducts from '../../components/recommended-products'
 
 /**
  * This is the home page for Retail React App.
@@ -26,21 +21,9 @@ import {categories} from './data'
  * The page renders SEO metadata and a few promotion
  * categories and products, data is from local file.
  */
-const Home = (props) => {
+const Home = () => {
     const intl = useIntl()
-    const {productSearchResult} = props
-    const basket = useBasket()
-    const handleAddToCart = async (itemId, price) => {
-        const item = {
-            productId: itemId,
-            price: price,
-            quantity: 1
-        }
-        if (basket.basketId) {
-            basket.addItemToBasket([item])
-        }
-    }
-    const recommendedProducts = productSearchResult?.hits
+
     return (
         <Box data-testid="home-page" layerStyle="page">
             <Seo
@@ -101,71 +84,30 @@ const Home = (props) => {
                     </GridItem>
                 </Grid>
             </Section>
-            {recommendedProducts && recommendedProducts.length && (
-                <Section
-                    title={intl.formatMessage({
-                        defaultMessage: 'New Arrivals'
-                    })}
-                >
-                    <SimpleGrid columns={{base: 1, md: 3}} spacing={4}>
-                        {recommendedProducts.map((product) => {
-                            return (
-                                <Stack
-                                    key={product.productId}
-                                    direction="column"
-                                    spacing={2}
-                                    width="full"
-                                    justifyContent="space-between"
-                                >
-                                    <ProductTile productSearchItem={product} />
-                                    <Button
-                                        leftIcon={<BasketIcon />}
-                                        variant="outline"
-                                        onClick={() => {
-                                            let productId = product.productId
-                                            if (product?.productType?.master) {
-                                                productId = product.representedProduct.id
-                                            }
-                                            const price = product.price
 
-                                            handleAddToCart(productId, price)
-                                        }}
-                                    >
-                                        <FormattedMessage defaultMessage="Add to cart" />
-                                    </Button>
-                                </Stack>
-                            )
-                        })}
-                    </SimpleGrid>
-                </Section>
-            )}
+            <Stack spacing={16}>
+                <RecommendedProducts
+                    title={<FormattedMessage defaultMessage="Top Sellers" />}
+                    recommender={'home-top-revenue-for-category'}
+                    mx={{base: -4, md: -8, lg: 0}}
+                />
+
+                <RecommendedProducts
+                    title={<FormattedMessage defaultMessage="Most Viewed" />}
+                    recommender={'products-in-all-categories'}
+                    mx={{base: -4, md: -8, lg: 0}}
+                />
+            </Stack>
         </Box>
     )
 }
 
 Home.getTemplateName = () => 'home'
 Home.propTypes = {
-    /**
-     * The search result object showing all the recommended products
-     */
-    productSearchResult: PropTypes.object
+    recommendations: PropTypes.array,
+    isLoading: PropTypes.bool
 }
 
-Home.getProps = async ({api}) => {
-    const recommededCategoryId = 'womens-clothing-tops'
-
-    const [productSearchResult] = await Promise.all([
-        api.shopperSearch.productSearch({
-            parameters: {
-                refine: `cgid=${recommededCategoryId}`,
-                limit: 3,
-                offset: 0,
-                sort: 'best-matches'
-            }
-        })
-    ])
-
-    return {productSearchResult}
-}
+Home.getProps = async () => {}
 
 export default Home

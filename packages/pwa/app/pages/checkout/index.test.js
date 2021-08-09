@@ -1,5 +1,4 @@
 import React from 'react'
-import {Crypto} from '@peculiar/webcrypto'
 import Checkout from './index'
 import {Route, Switch} from 'react-router-dom'
 import {screen, waitFor, waitForElementToBeRemoved, within} from '@testing-library/react'
@@ -16,6 +15,7 @@ import {
     mockPaymentMethods,
     mockedRegisteredCustomer,
     mockedRegisteredCustomerWithTwoAddresses,
+    mockedCustomerProductLists,
     productsResponse
 } from '../../commerce-api/mock-data'
 
@@ -160,9 +160,6 @@ beforeAll(() => {
     if (typeof TextEncoder === 'undefined') {
         global.TextEncoder = require('util').TextEncoder
     }
-
-    // Need to mock window.crypto for tests
-    window.crypto = new Crypto()
 })
 afterEach(() => {
     localStorage.clear()
@@ -414,6 +411,11 @@ test('Can proceed through checkout as registered customer', async () => {
             return res(ctx.json(currentBasket))
         }),
 
+        // mock fetch product lists
+        rest.get('*/customers/:customerId/product-lists', (req, res, ctx) => {
+            return res(ctx.json(mockedCustomerProductLists))
+        }),
+
         // mock add shipping and billing address to basket
         rest.put('*/shipping_address', (req, res, ctx) => {
             const shippingBillingAddress = {
@@ -615,6 +617,11 @@ test('Can edit address during checkout as a registered customer', async () => {
             return res(ctx.json(mockedRegisteredCustomer))
         }),
 
+        // mock fetch product lists
+        rest.get('*/customers/:customerId/product-lists', (req, res, ctx) => {
+            return res(ctx.json(mockedCustomerProductLists))
+        }),
+
         // mock adding guest email to basket
         rest.put('*/baskets/:basketId/customer', (req, res, ctx) => {
             currentBasket.customer_info.email = 'customer@test.com'
@@ -726,6 +733,11 @@ test('Can add address during checkout as a registered customer', async () => {
             return res(ctx.json(currentBasket))
         }),
 
+        // mock fetch product lists
+        rest.get('*/customers/:customerId/product-lists', (req, res, ctx) => {
+            return res(ctx.json(mockedCustomerProductLists))
+        }),
+
         // mock add shipping and billing address to basket
         rest.put('*/shipping_address', (req, res, ctx) => {
             const shippingBillingAddress = {
@@ -807,5 +819,8 @@ test('Can add address during checkout as a registered customer', async () => {
     await waitFor(() => {
         expect(screen.getByTestId('sf-toggle-card-step-2-content')).not.toBeEmptyDOMElement()
     })
-    expect(await screen.findByText(/test2 mctester/i)).toBeInTheDocument()
+
+    await waitFor(async () => {
+        expect(await screen.findByText(/test2 mctester/i)).toBeInTheDocument()
+    })
 })

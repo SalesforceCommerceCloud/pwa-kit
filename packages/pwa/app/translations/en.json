@@ -20,6 +20,9 @@
   "1b9Q93": {
     "defaultMessage": "You will receive an email at <b>{email}</b> with a link to reset your password shortly."
   },
+  "1yoQ91": {
+    "defaultMessage": "No Wishlist Items"
+  },
   "25WwxF": {
     "defaultMessage": "Don't have an account?"
   },
@@ -31,6 +34,9 @@
   },
   "2bGejb": {
     "defaultMessage": "My Account"
+  },
+  "2gr0DV": {
+    "defaultMessage": "1 item added to wishlist"
   },
   "2tqQFl": {
     "defaultMessage": "Cart"
@@ -86,9 +92,6 @@
   "A8Tnga": {
     "defaultMessage": "Credit Card"
   },
-  "ADKef8": {
-    "defaultMessage": "Add to cart"
-  },
   "AYIKp4": {
     "defaultMessage": "Already have an account? Log in"
   },
@@ -109,6 +112,9 @@
   },
   "BlJFo9": {
     "defaultMessage": "This email already has an account."
+  },
+  "Cm91xY": {
+    "defaultMessage": "Complete The Set"
   },
   "CyOkb5": {
     "defaultMessage": "Promo Code"
@@ -193,6 +199,9 @@
   "MnpUD7": {
     "defaultMessage": "View details"
   },
+  "Mv2pEb": {
+    "defaultMessage": "Continue shopping and add items to your wishlist"
+  },
   "NTgwLi": {
     "defaultMessage": "Place Order"
   },
@@ -250,6 +259,9 @@
   },
   "Q6wcZ5": {
     "defaultMessage": "First Name"
+  },
+  "QRowXV": {
+    "defaultMessage": "Something went wrong. Try again!"
   },
   "QclMUn": {
     "defaultMessage": "Please select your country"
@@ -316,6 +328,9 @@
   },
   "V/JHlm": {
     "defaultMessage": "Forgot password?"
+  },
+  "V2AxNc": {
+    "defaultMessage": "Add to Wishlist"
   },
   "VSlYv6": {
     "defaultMessage": "Quantity:"
@@ -487,6 +502,9 @@
   "homepage.message.welcome": {
     "defaultMessage": "Hello World"
   },
+  "hp3uqR": {
+    "defaultMessage": "Wishlist"
+  },
   "huqKGl": {
     "defaultMessage": "Create account"
   },
@@ -508,6 +526,9 @@
   "kVzyDt": {
     "defaultMessage": "Thank you for your order!"
   },
+  "knAdWV": {
+    "defaultMessage": "Top Sellers"
+  },
   "ku+mDU": {
     "defaultMessage": "State"
   },
@@ -528,6 +549,9 @@
   },
   "mYx8sv": {
     "defaultMessage": "Account Details"
+  },
+  "mfahwZ": {
+    "defaultMessage": "Recently Viewed"
   },
   "mobile_navigation.actions.sign_in": {
     "defaultMessage": "Sign In"
@@ -660,6 +684,12 @@
   "uV4+68": {
     "defaultMessage": "Please enter your {postalOrZip}"
   },
+  "unUv/E": {
+    "defaultMessage": "You Might Also Like"
+  },
+  "v898P+": {
+    "defaultMessage": "You May Also Like"
+  },
   "vONi+O": {
     "defaultMessage": "Country"
   },
@@ -698,6 +728,9 @@
   },
   "xuTqgN": {
     "defaultMessage": "Payment Methods"
+  },
+  "y/sA02": {
+    "defaultMessage": "Most Viewed"
   },
   "z+Zrln": {
     "defaultMessage": "Set as default"

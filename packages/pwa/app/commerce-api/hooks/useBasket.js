@@ -1,5 +1,5 @@
 import {useContext, useMemo} from 'react'
-import useEinstein from '../../einstein/hooks/useEinstein'
+import useEinstein from './useEinstein'
 import {useCommerceAPI, BasketContext} from '../utils'
 import useCustomer from './useCustomer'
 

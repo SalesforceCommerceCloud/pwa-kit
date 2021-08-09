@@ -55,6 +55,12 @@
       "value": " with a link to reset your password shortly."
     }
   ],
+  "1yoQ91": [
+    {
+      "type": 0,
+      "value": "No Wishlist Items"
+    }
+  ],
   "25WwxF": [
     {
       "type": 0,
@@ -77,6 +83,12 @@
     {
       "type": 0,
       "value": "My Account"
+    }
+  ],
+  "2gr0DV": [
+    {
+      "type": 0,
+      "value": "1 item added to wishlist"
     }
   ],
   "2tqQFl": [
@@ -191,12 +203,6 @@
       "value": "Credit Card"
     }
   ],
-  "ADKef8": [
-    {
-      "type": 0,
-      "value": "Add to cart"
-    }
-  ],
   "AYIKp4": [
     {
       "type": 0,
@@ -237,6 +243,12 @@
     {
       "type": 0,
       "value": "This email already has an account."
+    }
+  ],
+  "Cm91xY": [
+    {
+      "type": 0,
+      "value": "Complete The Set"
     }
   ],
   "CyOkb5": [
@@ -417,6 +429,12 @@
       "value": "View details"
     }
   ],
+  "Mv2pEb": [
+    {
+      "type": 0,
+      "value": "Continue shopping and add items to your wishlist"
+    }
+  ],
   "NTgwLi": [
     {
       "type": 0,
@@ -563,6 +581,12 @@
       "value": "First Name"
     }
   ],
+  "QRowXV": [
+    {
+      "type": 0,
+      "value": "Something went wrong. Try again!"
+    }
+  ],
   "QclMUn": [
     {
       "type": 0,
@@ -703,6 +727,12 @@
     {
       "type": 0,
       "value": "Forgot password?"
+    }
+  ],
+  "V2AxNc": [
+    {
+      "type": 0,
+      "value": "Add to Wishlist"
     }
   ],
   "VSlYv6": [
@@ -1089,6 +1119,12 @@
       "value": "Hello World"
     }
   ],
+  "hp3uqR": [
+    {
+      "type": 0,
+      "value": "Wishlist"
+    }
+  ],
   "huqKGl": [
     {
       "type": 0,
@@ -1129,6 +1165,12 @@
     {
       "type": 0,
       "value": "Thank you for your order!"
+    }
+  ],
+  "knAdWV": [
+    {
+      "type": 0,
+      "value": "Top Sellers"
     }
   ],
   "ku+mDU": [
@@ -1179,6 +1221,12 @@
     {
       "type": 0,
       "value": "Account Details"
+    }
+  ],
+  "mfahwZ": [
+    {
+      "type": 0,
+      "value": "Recently Viewed"
     }
   ],
   "mobile_navigation.actions.sign_in": [
@@ -1497,6 +1545,18 @@
       "value": "postalOrZip"
     }
   ],
+  "unUv/E": [
+    {
+      "type": 0,
+      "value": "You Might Also Like"
+    }
+  ],
+  "v898P+": [
+    {
+      "type": 0,
+      "value": "You May Also Like"
+    }
+  ],
   "vONi+O": [
     {
       "type": 0,
@@ -1577,6 +1637,12 @@
     {
       "type": 0,
       "value": "Payment Methods"
+    }
+  ],
+  "y/sA02": [
+    {
+      "type": 0,
+      "value": "Most Viewed"
     }
   ],
   "z+Zrln": [

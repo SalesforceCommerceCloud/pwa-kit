@@ -1,5 +1,6 @@
 import 'raf/polyfill' // fix requestAnimationFrame issue with polyfill
 import '@testing-library/jest-dom/extend-expect'
+import {Crypto} from '@peculiar/webcrypto'
 
 // This file consists of global mocks for jsdom.
 class LocalStorageMock {
@@ -21,6 +22,10 @@ class LocalStorageMock {
 }
 
 const localStorageMock = new LocalStorageMock()
+
+Object.defineProperty(window, 'crypto', {
+    value: new Crypto()
+})
 
 Object.defineProperty(window, 'localStorage', {
     value: localStorageMock

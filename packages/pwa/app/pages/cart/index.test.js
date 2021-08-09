@@ -24,6 +24,8 @@ jest.mock('../../commerce-api/auth', () => {
     }
 })
 
+jest.mock('../../commerce-api/einstein')
+
 jest.mock('../../commerce-api/ocapi-shopper-baskets', () => {
     return class ShopperBasketsMock {
         async addCouponToBasket() {

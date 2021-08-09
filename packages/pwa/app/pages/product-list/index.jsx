@@ -86,6 +86,7 @@ const ProductList = (props) => {
     return (
         <Box
             className="sf-product-list-page"
+            data-testid="sf-product-list-page"
             layerStyle="page"
             paddingTop={{base: 6, lg: 8}}
             {...rest}

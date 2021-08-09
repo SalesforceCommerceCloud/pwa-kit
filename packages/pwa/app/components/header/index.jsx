@@ -27,12 +27,14 @@ import useCustomer from '../../commerce-api/hooks/useCustomer'
 
 import Link from '../link'
 import SearchInput from '../search-input'
+import withRegistration from '../../hoc/with-registration'
 import {
     AccountIcon,
     BrandLogo,
     BasketIcon,
     HamburgerIcon,
     ChevronDownIcon,
+    WishlistIcon,
     SignoutIcon
 } from '../icons'
 
@@ -43,6 +45,7 @@ import LoadingSpinner from '../loading-spinner'
 
 const ENTER_KEY = 'Enter'
 
+const IconButtonWithRegistration = withRegistration(IconButton)
 /**
  * The header is the main source for accessing
  * navigation, search, basket, and other
@@ -71,6 +74,7 @@ const Header = ({
     onMyAccountClick = noop,
     onLogoClick = noop,
     onMyCartClick = noop,
+    onWishlistClick = noop,
     ...props
 }) => {
     const intl = useIntl()
@@ -148,6 +152,15 @@ const Header = ({
                             />
                         </form>
                     </Box>
+                    <IconButtonWithRegistration
+                        aria-label={intl.formatMessage({
+                            defaultMessage: 'Wishlist'
+                        })}
+                        icon={<WishlistIcon />}
+                        variant="unstyled"
+                        {...styles.icons}
+                        onClick={onWishlistClick}
+                    />
                     <AccountIcon
                         {...styles.accountIcon}
                         tabIndex={0}
@@ -267,6 +280,7 @@ Header.propTypes = {
     onSearchSubmit: PropTypes.func,
     onSearchChange: PropTypes.func,
     onMyAccountClick: PropTypes.func,
+    onWishlistClick: PropTypes.func,
     onMyCartClick: PropTypes.func,
     searchInputRef: PropTypes.oneOfType([
         PropTypes.func,

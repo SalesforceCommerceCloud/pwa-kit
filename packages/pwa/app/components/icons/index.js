@@ -35,6 +35,8 @@ import '../../assets/svg/signout.svg'
 import '../../assets/svg/user.svg'
 import '../../assets/svg/visibility.svg'
 import '../../assets/svg/visibility-off.svg'
+import '../../assets/svg/wishlist.svg'
+import '../../assets/svg/wishlist-solid.svg'
 
 // For non-square SVGs, we can use the symbol data from the import to set the
 // proper viewBox attribute on the Icon wrapper.
@@ -124,3 +126,5 @@ export const UserIcon = icon('user')
 export const VisaIcon = icon('cc-visa', {viewBox: VisaSymbol.viewBox})
 export const VisibilityIcon = icon('visibility')
 export const VisibilityOffIcon = icon('visibility-off')
+export const WishlistIcon = icon('wishlist')
+export const WishlistSolidIcon = icon('wishlist-solid')

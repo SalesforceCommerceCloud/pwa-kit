@@ -3,7 +3,6 @@ import {screen, waitFor, within} from '@testing-library/react'
 import user from '@testing-library/user-event'
 import {rest} from 'msw'
 import {setupServer} from 'msw/node'
-import {Crypto} from '@peculiar/webcrypto'
 import {renderWithProviders} from '../../utils/test-utils'
 import ResetPassword from '.'
 
@@ -100,8 +99,6 @@ beforeEach(() => {
         global.TextEncoder = require('util').TextEncoder
     }
 
-    // Need to mock window.crypto for tests
-    window.crypto = new Crypto()
     window.history.pushState({}, 'Reset Password', '/en/reset-password')
 })
 afterEach(() => {
