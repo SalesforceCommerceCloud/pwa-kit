@@ -141,8 +141,7 @@ test('should render product list page', async () => {
 
 test('should render sort option list page', async () => {
     renderWithProviders(<MockedComponent />)
-    const countOfSortComponents = await screen.findAllByText('Sort by')
-    expect(countOfSortComponents.length).toEqual(2)
+    expect(await screen.findByTestId('sf-product-list-sort')).toBeInTheDocument()
 })
 
 test('should render skeleton', async () => {
