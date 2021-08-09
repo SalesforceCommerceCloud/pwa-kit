@@ -5,9 +5,9 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {useHistory} from 'react-router-dom'
-import {useIntl} from 'react-intl'
+import {FormattedMessage, useIntl} from 'react-intl'
 
-import {Flex, Heading, Button, Skeleton, Box, Text, VStack, Select, Fade} from '@chakra-ui/react'
+import {Flex, Heading, Button, Skeleton, Box, Text, VStack, Select, Fade, useDisclosure} from '@chakra-ui/react'
 
 import {useProduct} from '../../hooks'
 
@@ -20,6 +20,8 @@ import Link from '../../components/link'
 import withRegistration from '../../hoc/with-registration'
 import {DEFAULT_CURRENCY} from '../../constants'
 import {Skeleton as ImageGallerySkeleton} from '../../components/image-gallery'
+import AddToCartModal from '../../components/add-to-cart-modal'
+import RecommendedProducts from '../../components/recommended-products'
 const MAX_ORDER_QUANTITY = 10
 
 const ProductViewHeader = ({name, price, currency, category}) => {
@@ -79,6 +81,7 @@ const ProductView = ({
 }) => {
     const intl = useIntl()
     const history = useHistory()
+    const addToCartModalState = useDisclosure()
 
     const {
         showLoading,
@@ -102,9 +105,10 @@ const ProductView = ({
         if (addToCart || updateCart) {
             buttons.push(
                 <Button
-                    onClick={() =>
+                    onClick={() => {
                         addToCart?.(variant, quantity) || updateCart?.(variant, quantity)
-                    }
+                        addToCartModalState.onOpen()
+                    }}
                     disabled={!canOrder}
                     key="cart-button"
                     width="100%"
@@ -307,6 +311,18 @@ const ProductView = ({
             >
                 {renderActionButtons()}
             </Box>
+
+            {addToCartModalState.isOpen &&
+                <AddToCartModal product={product} variant={variant} quantity={quantity} {...addToCartModalState}>
+                    <RecommendedProducts
+                        title={<FormattedMessage defaultMessage="You Might Also Like" />}
+                        recommender={'pdp-similar-items'}
+                        products={product && [product.id]}
+                        mx={{base: -4, md: -8, lg: 0}}
+                        shouldFetch={() => product?.id}
+                    />
+                </AddToCartModal>
+            }
         </Flex>
     )
 }
