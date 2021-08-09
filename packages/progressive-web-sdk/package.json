@@ -1,6 +1,6 @@
 {
   "name": "progressive-web-sdk",
-  "version": "2.4.7",
+  "version": "2.4.8",
   "description": "A set of libraries and components which make up the SDK for Progressive Web",
   "main": "dist/index.js",
   "bin": {
