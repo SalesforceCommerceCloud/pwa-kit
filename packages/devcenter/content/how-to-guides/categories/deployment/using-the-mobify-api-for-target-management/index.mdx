@@ -1,6 +1,6 @@
 ---
-title: Using the Mobify Cloud API for Target Management
-metaTitle: Using the Mobify Cloud API for Target Management
+title: Mobify Cloud API Overview
+metaTitle: Mobify Cloud API Overview
 metaDescription: "An introduction to the Mobify Cloud API, which allows you to create projects, targets, bundles, and deployments."
 category: Deployment
 minVersion: 2.0.0
@@ -14,13 +14,12 @@ featured: false
 
 </Callout>
 
-## Introduction
 
 The Mobify Cloud API allows you to interact with resources via a [RESTful](https://developer.mozilla.org/en-US/docs/Glossary/REST) interface:
 
 -   **Projects** represent a specific application. _Projects have targets and bundles._
 -   **Targets** are environments that run your app. _They might be named and long lived like `production` or `staging`, or disposable and short lived like `september-load-testing` or `homepage-add-new-hero-banner`._
--   **Bundles** are app code at a specific point in time. _They are immutable artifacts containing JavaScript and other resources to run your app._
+-   **Bundles** are app code at a specific point in time. _They are immutable release artifacts containing JavaScript and other resources to run your app._
 -   **Deployments** put the code from a bundle onto a target.
 
 **[Access our Mobify Cloud API Reference →](/apis-and-sdks/mobify-cloud)**
@@ -96,7 +95,7 @@ If you're having trouble with the above commands:
 
 [Access our list of Target API endpoints →](/apis-and-sdks/mobify-cloud)
 
-## Another example: restricting target access to specific IPs
+## Restricting target access to specific IPs
 
 <Callout type="info">
 
@@ -104,7 +103,9 @@ If you're having trouble with the above commands:
 
 </Callout>
 
-Now let’s look at another example. Consider the `staging` target we created above, and imagine we wanted to restrict access to specific IPs. You can restrict access to `staging` using the Mobify Cloud API by updating its `ssr_whitelisted_ips`.
+Now let’s look at another example using the API.
+
+Consider the `staging` target we created above, and imagine we wanted to restrict access to specific IPs. You can restrict access to `staging` using the Mobify Cloud API by updating its `ssr_whitelisted_ips`.
 
 First, we will fetch the settings for the `staging` target:
 
@@ -117,7 +118,7 @@ Next, we will update `staging` by passing in the set of IPs that will be allowed
 
 ```bash
 curl 'https://cloud.mobify.com/api/projects/training/target/staging/' \
-  --request 'PATCH'  \
+  --request 'PATCH' \
   --header "Authorization: Bearer $MOBIFY_API_KEY" \
   --header 'Content-Type: application/json' \
   --data '{"ssr_whitelisted_ips": "104.255.11.140/32,104.255.11.141/32"}'

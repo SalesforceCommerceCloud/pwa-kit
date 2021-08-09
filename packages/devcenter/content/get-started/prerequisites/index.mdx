@@ -1,0 +1,83 @@
+---
+title: Prerequisites
+metaTitle: Prerequisites
+metaDescription: What you need to know before working with the Mobify Platform.
+---
+
+**This guide covers the technical skills required to get started working with Mobify.**
+
+The Mobify Platform is a front-end as a service for developing [React.js](https://reactjs.org/) based storefronts for Salesforce Commerce Cloud (SFCC) using [Commerce API](https://developer.commercecloud.com/s/commerce-api). To use it effectively, developers must have experience:
+
+-   Building [universal](https://cdb.reacttraining.com/universal-javascript-4761051b7ae9) React.js applications using [ES6](https://developer.mozilla.org/en-US/docs/Web/JavaScript) and [CSS](https://developer.mozilla.org/en-US/docs/Web/CSS)
+-   Working with RESTful APIs like SFCC Commerce API
+-   Developing Node.js based web applications with [Express.js](https://expressjs.com/)
+-   Using modern JavaScript build tools like [Webpack](https://webpack.js.org/)
+-   Using `npm` to manage packages and run scripts
+
+A complete list of skills used in creating a Mobify project is found below.
+
+## JavaScript
+
+The Mobify Platform uses code written in JavaScript. Developers must have intermediate experience with modern JavaScript.
+
+### ES6+ Fundamentals, Data Fetching and Concurrency
+
+-   Mobify apps make network requests, so knowledge of [`fetch()`](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) is crucial. Familiarity universal fetch libraries that work both in browser and Node.js environments like [`cross-fetch`](https://www.npmjs.com/package/cross-fetch) is recommended.
+    -   Suggested Reading: [MDN: Fetch API - Web APIs](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API)
+    -   Reference Guide: [`fetch()` cheatsheet](https://devhints.io/js-fetch)
+-   Fetching data is asynchronous. Developers should be familiar with [`Promise`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)s and [`async` and `await`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/async_function).
+    -   Suggested Course: [JavaScript Concurrency](https://www.executeprogram.com/courses/javascript-concurrency)
+
+### React.js
+
+-   Mobify apps are built using the React.js open source framework. Developers must have previously worked on React apps.
+    -   Suggested Reading: [All of the React.js Documentation](https://reactjs.org/docs/getting-started.html)
+-   Developers must be familiar with managing state in React apps.
+    -   Suggested Reading:
+        -   [Components and Props -- React](https://reactjs.org/docs/components-and-props.html)
+        -   [State Management](https://kentcdodds.com/blog/application-state-management-with-react)
+        -   [Lifecycle + State](https://reactjs.org/docs/state-and-lifecycle.html)
+-   Developers must be familiar with React Lifecycle hooks and React 16.8+ concepts:
+    -   Suggested Reading: [Context](https://kentcdodds.com/blog/how-to-use-react-context-effectively), [Error Boundaries](https://kentcdodds.com/blog/use-react-error-boundary-to-handle-errors-in-react), [Hooks](https://reactjs.org/docs/hooks-intro.html)
+-   Developers should be familiar with debugging React apps using [React DevTools](https://chrome.google.com/webstore/detail/react-developer-tools/fmkadmapgofadopljbjfkapdkoienihi?hl=en).
+-   Developers should be familiar with using React.js open source extensions like [`react-router`](https://reactrouter.com/web/guides/quick-start) and [`react-helmet`](https://github.com/nfl/react-helmet).
+
+### Node.js
+
+-   Developers should be familiar with the [Express.js](https://expressjs.com/) web server.
+-   Developers should be comfortable [debugging](https://nodejs.org/en/docs/guides/debugging-getting-started/) Node.js applications.
+
+### JavaScript Ecosystem
+
+-   Developers must be comfortable managing [`npm` packages](https://docs.npmjs.com/cli-commands/install.html).
+-   Using [`npm-run-scripts`](https://docs.npmjs.com/cli-commands/run-script.html).
+-   Have experiene using JavaScript build tools like [`webpack`](https://webpack.js.org/).
+
+### CSS
+
+<!-- Storefronts must be styled using CSS. -->
+
+-   Developers should be familiar with responsive web design layout techniques using [media queries](https://developer.mozilla.org/en-US/docs/Web/CSS/Media_Queries/Using_media_queries) and the [flexbox](https://developer.mozilla.org/en-US/docs/Learn/CSS/CSS_layout/Flexbox) and [grid](https://developer.mozilla.org/en-US/docs/Learn/CSS/CSS_layout/Grids) properties.
+
+## Salesforce Commerce Cloud Commerce API
+
+Mobify powered storefronts get data from Salesforce Commerce Cloud using Commerce API. Developers must be familiar with the API, and be familiar with working with RESTful APIs.
+
+-   Commerce Cloud APIs
+    -   Suggested Reading: [Commerce API](https://developer.commercecloud.com/s/commerce-api)
+-   [B2C Commerce Developer Sandbox Rest API](https://admin.us01.dx.commercecloud.salesforce.com/)
+-   HTTP Networking and Caching
+
+## Additional Skills
+
+Depending on the details of the project, additional skills may be required:
+
+-   General knowledge of Single Page Applications.
+-   Knowledge of Progressive Web Apps (PWA) and the [PWA Checklist](https://web.dev/pwa-checklist/).
+-   Experience architecting headless commerce applications including knowledge of the backend for frontend pattern.
+-   Interacting with APIs using a scripting language like Node.js or tools like [cURL](https://curl.haxx.se/docs/manpage.html) and [Postman](https://www.postman.com/).
+-   Web page performance testing using Lighthouse and WebPageTest.
+-   Knowledge of web analytics.
+-   Knowledge of search engine optimization.
+-   Experience making DNS changes and performing cutovers.
+-   Working with 3rd party JavaScript libraries to enhance site functionality.

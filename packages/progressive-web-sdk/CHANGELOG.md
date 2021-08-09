@@ -1,3 +1,7 @@
+## v2.3.0 (Oct 01, 2020)
+## v2.3.0-alpha.0 (Oct 01, 2020)
+- Fix MegaMenu double clicking issue. [#1393](https://github.com/mobify/mobify-platform-sdks/pull/1393)
+## v2.3.0-dev (Aug 07, 2020)
 ## v2.2.0 (Aug 07, 2020)
 ## v2.2.0-alpha.3 (Aug 07, 2020)
 ## v2.2.0-alpha.2 (Jul 22, 2020)

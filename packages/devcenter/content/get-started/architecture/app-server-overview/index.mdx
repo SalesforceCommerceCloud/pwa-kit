@@ -22,7 +22,7 @@ To use the App Server, it’s important to know a few details:
 
 - The App Server prints local development logs to your command line interface. To access the App Server’s logs from your target, reach out to your [Mobify Support](https://support.mobify.com/support/home) contact.
 
-- Because the App Server runs locally and on a target, your version of Node.js for local development matters. To prevent unexpected behaviors, your version of Node.js needs to be in sync with the target’s version. Targets will always run the latest version of Node.js that’s part of a Long Term Support (LTS) release. At the time we’re writing this article in February 2020, you’ll need to [upgrade to Node.js 10x](https://dev.mobify.com/v1.x/how-to-guides/categories/upgrades/node) for local development.
+- Because the App Server runs locally and on a target, your version of Node.js for local development matters. To prevent unexpected behaviors, your version of Node.js needs to be in sync with the target’s version. Targets will always run the latest version of Node.js that’s part of a Long Term Support (LTS) release.
 
 - Location matters: while targets are global, the App Server runs in a specific region. To get the best performance, it’s important to keep your App Server as close as possible to your primary backend. (Your primary backend is the one where you make the most requests. It could be your ecommerce backend, or your content management system.) Set the region of your target using the [Mobify Cloud API](/apis-and-sdks/mobify-cloud) and its `ssr_region` field.
 

@@ -140,6 +140,8 @@ Use the [`@span`](http://oddbird.net/susy/docs/api.html#function--susy-span) fun
 
 The Susy docs explain how to [add more parameters for context, nesting and other use cases](http://oddbird.net/susy/docs/api.html#function--susy-span).
 
+In the above code sample, one **important caveat** to be aware of is that `width: span(4)` is actually relative to the width of the _parent container_. When you inspect the resulting CSS (e.g. `width: calc(96px + ((100% - 264px) / 8 * 4))`), you will see that it uses `100%` in its calculation. So whenever you use `span`, please be aware of where that gets used and the styling of its parent container.
+
 _Note: Susy2 included a [`container` mixin](http://susy.readthedocs.io/toolkit/#container) that helped clearfix for your floats, but this was removed in Susy3. If you're using Susy with `float`, we've built our own `@include container` mixin into the SDK that provides similar functionality. It gets imported into your project in `app/stylesheet.scss` along with the other Susy mixins._
 
 ### Gutter

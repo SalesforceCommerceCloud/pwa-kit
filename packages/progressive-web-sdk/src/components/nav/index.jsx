@@ -5,8 +5,10 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
+import debounce from 'debounce'
 
 const noop = () => undefined
+const debounceTimer = 5
 
 /**
  * @typedef NavigationNode
@@ -47,10 +49,30 @@ class Nav extends React.PureComponent {
         this.goBack = this.goBack.bind(this)
         this.getDerivedState = this.getDerivedState.bind(this)
         this.state = this.getDerivedState({root: undefined, path: '/'}, this.props)
+
+        /* We expect onPathChange to make calls to setState, which trigger a rerender of the entire nav
+         *
+         * As users operate the Nav, they could trigger several near simulataneous events which could
+         * trigger extra renders such as a blur + focus
+         *
+         * React tries to avoid needless renders by batching setState calls in event handlers and lifecycle methods
+         * However, React 16 doesn't batch setState calls fired from event handlers containing timeouts or promises
+         * such as in the `MegaMenuItem` component
+         *
+         * For more details, see
+         * https://stackoverflow.com/questions/56885037/react-batch-updates-for-multiple-setstate-calls-inside-useeffect-hook
+         *
+         * We debounce here to limit extra renders when Nav or MegaMenu event handlers contain promises and/or timeouts
+         *
+         * TODO: This can be removed in React 17 as React will batch setState calls everywhere then
+         */
+
+        this.onPathChange = debounce(this.props.onPathChange, debounceTimer)
     }
 
     componentWillReceiveProps(newProps) {
         this.setState(this.getDerivedState(this.props, newProps))
+        this.onPathChange = debounce(this.props.onPathChange, debounceTimer)
     }
 
     /**
@@ -183,12 +205,15 @@ class Nav extends React.PureComponent {
     }
 
     goToPath(path, trigger = 'click') {
-        const {onPathChange} = this.props
-
         if (this.state.nodes.hasOwnProperty(path)) {
             const {node} = this.state.nodes[path]
             const isLeaf = (node.children || []).length === 0
-            onPathChange(path, isLeaf, trigger, node.originalPath)
+            this.onPathChange(path, isLeaf, trigger, node.originalPath)
+            if (trigger == 'click') {
+                // Flush the debouncer to ensure that onPathChange is called immediately
+                // to apply the click
+                this.onPathChange.flush()
+            }
         }
     }
 

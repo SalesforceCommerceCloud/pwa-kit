@@ -131,10 +131,12 @@ describe('allows navigation through the navigation tree', () => {
             path: '/',
             children: [{title: 'c1', path: '/child-1/'}, {title: 'c2', path: '/child-2/'}]
         }
+        jest.useFakeTimers()
         const onPathChange = jest.fn()
         const wrapper = shallow(<Nav root={root} path="/child-2/" onPathChange={onPathChange} />)
         const instance = wrapper.instance()
         instance.goBack()
+        jest.runAllTimers()
         expect(onPathChange).toHaveBeenCalledTimes(1)
         expect(onPathChange).toHaveBeenLastCalledWith('/', false, 'click', '/')
     })
@@ -145,10 +147,12 @@ describe('allows navigation through the navigation tree', () => {
             path: '/',
             children: [{title: 'c1', path: '/child-1/'}, {title: 'c2', path: '/child-2/'}]
         }
+        jest.useFakeTimers()
         const onPathChange = jest.fn()
         const wrapper = shallow(<Nav root={root} path="/child-2/" onPathChange={onPathChange} />)
         const instance = wrapper.instance()
         instance.goToPath('/child-1/')
+        jest.runAllTimers()
         expect(onPathChange).toHaveBeenCalledTimes(1)
         expect(onPathChange).toHaveBeenLastCalledWith('/child-1/', true, 'click', '/child-1/')
     })
@@ -159,10 +163,12 @@ describe('allows navigation through the navigation tree', () => {
             path: '/',
             children: [{title: 'c1', path: '/child-1/'}, {title: 'c2', path: '/child-2/'}]
         }
+        jest.useFakeTimers()
         const onPathChange = jest.fn()
         const wrapper = shallow(<Nav root={root} path="/child-2/" onPathChange={onPathChange} />)
         const instance = wrapper.instance()
         instance.goToPath('/invalid/')
+        jest.runAllTimers()
         expect(onPathChange).toHaveBeenCalledTimes(0)
     })
 })
@@ -274,10 +280,12 @@ describe('duplicate paths work as expected', () => {
             path: '/',
             children: [{title: 'c1', path: '/child/'}, {title: 'c2', path: '/child/'}]
         }
+        jest.useFakeTimers()
         const onPathChange = jest.fn()
         const wrapper = shallow(<Nav root={root} path="/child/#" onPathChange={onPathChange} />)
         const instance = wrapper.instance()
         instance.goToPath('/child/#')
+        jest.runAllTimers()
         expect(onPathChange).toHaveBeenCalledTimes(1)
         expect(onPathChange).toHaveBeenLastCalledWith('/child/#', true, 'click', '/child/')
     })
@@ -293,4 +301,55 @@ describe('duplicate paths work as expected', () => {
         }
         expect(Nav.encodePath('/child/', map)).toEqual('/child/##')
     })
+})
+
+test('onPathChange calls are debounced', () => {
+    jest.useFakeTimers()
+
+    const child1 = {title: 'child1', path: '/child1/'}
+    const child2 = {title: 'child2', path: '/child2/'}
+    const root = {title: 'root', path: '/', children: [child1, child2]}
+
+    const onPathChange = jest.fn()
+
+    const wrapper = shallow(<Nav root={root} path="/child1/" onPathChange={onPathChange} />)
+    const instance = wrapper.instance()
+
+    instance.goToPath('/child2/', 'mouseEnter')
+    instance.goToPath('/child1/', 'mouseLeave')
+    instance.goToPath('/child1/', 'blur')
+    instance.goToPath('/child2/', 'focus')
+    instance.goToPath('/child2/', 'click')
+
+    jest.runAllTimers()
+
+    //Only the last call should be applied
+    expect(onPathChange).toHaveBeenCalledTimes(1)
+    expect(onPathChange).toBeCalledWith('/child2/', true, 'click', '/child2/')
+})
+
+test('Ensure clicks trigger onPathChange', () => {
+    jest.useFakeTimers()
+
+    const child1 = {title: 'child1', path: '/child1/'}
+    const child2 = {title: 'child2', path: '/child2/'}
+    const root = {title: 'root', path: '/', children: [child1, child2]}
+
+    const onPathChange = jest.fn()
+
+    const wrapper = shallow(<Nav root={root} path="/child1/" onPathChange={onPathChange} />)
+    const instance = wrapper.instance()
+
+    instance.goToPath('/child2/', 'mouseEnter')
+    instance.goToPath('/child2/', 'focus')
+    instance.goToPath('/child2/', 'click')
+    instance.goToPath('/child2/', 'mouseLeave')
+    instance.goToPath('/child2/', 'blur')
+
+    jest.runAllTimers()
+
+    //Click + blur should both be fired
+    expect(onPathChange).toHaveBeenCalledTimes(2)
+    expect(onPathChange).toBeCalledWith('/child2/', true, 'click', '/child2/')
+    expect(onPathChange).toBeCalledWith('/child2/', true, 'blur', '/child2/')
 })

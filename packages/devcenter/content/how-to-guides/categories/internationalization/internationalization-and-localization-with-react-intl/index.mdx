@@ -18,7 +18,9 @@ Progressive Web Apps often need to support the needs of different languages, cur
 
 ## i18n Dependencies
 
-By default, your PWA comes installed with a library called [react-intl](https://github.com/yahoo/react-intl), which has a robust array of i18n features, from formatting text and numbers, to displaying localized date and times, and more. A brief overview of available features is listed below, but refer to the library's [official documentation](https://github.com/yahoo/react-intl/wiki) for a complete list of feature details.
+By default, your PWA does not come with any internationalization support installed.
+
+We recommend installing a library called [react-intl](https://github.com/formatjs/formatjs/tree/main/packages/react-intl), which has a robust array of i18n features, from formatting text and numbers, to displaying localized date and times, and more. A brief overview of available features is listed below, but refer to the library's [official documentation](https://formatjs.io/docs/getting-started/installation) for a complete list of feature details.
 
 -   Date and time formatting APIs
 -   Number and pluralization formatting APIs
@@ -27,9 +29,21 @@ By default, your PWA comes installed with a library called [react-intl](https://
 
 All of the instructions provided in this guide assume you are using the react-intl library.
 
-### Don't want react-intl as a dependency?
+### How to install react-intl in your SSR PWA
 
-Maybe your application doesn't need any i18n features, or maybe you want to use a different library. In either case, refer to the [How to Remove react-intl](#how-to-remove-react-intl) section below for more details on removing the unwanted library.
+In this guide we walk you through how to add the react-intl library and supporting Node.js functionality for the library.
+
+Node.js uses an underlying library called [ICU](http://site.icu-project.org/) to implement the internatlization functionality provided by react-intl. ICU is a library which allow you add internationalization to your site for any country in the world. full-icu needs to be installed as a dev dependency because AWS Lambdas running NodeJS already has full-icu installed.
+
+Browsers obtain the underlying internationalization functionality from the [Intl API](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl).
+
+#### Steps to installing react-intl and full-icu
+
+-   `cd PROJECT_DIR`
+-   `npm i react-intl`
+-   `npm i --save-dev full-icu`
+-   Import and use `react-intl` components and objects into your isomorphic PWAs (as described below)
+-   When running your app locally ensure you are setting the `NODE_ICU_DATA` environment variable => `NODE_ICU_DATA="node_modules/full-icu" npm run start`
 
 ## Using react-intl Functions and Components
 
@@ -393,43 +407,3 @@ dispatch(receiveSelectedCurrency(newCurrency))
 ```
 
 When the user changes their currency, send a [UIINTERACTION](/apis-and-sdks/progressive-web-sdk/analytics-integrations/types#module-colon-progressive-web-sdk-slash-dist-slash-analytics-integrations-slash-types-tilde-UIINTERACTION) event.
-
-## How to Remove react-intl
-
-If you are working on a project that does not need a i18n support, or you would rather use a library other than react-intl, you'll need to do the following:
-
--   Remove react-intl from your project
--   Verify react-intl has been removed
-
-### Remove react-intl
-
--   Go to `<PROJECT_DIR>/app/components/intl/index.jsx`
--   Delete this block of code:
-    ```javascript
-    import {
-        IntlProvider as ReactIntlProvider,
-        FormattedMessage as ReactFormattedMessage,
-        FormattedNumber as ReactFormattedNumber,
-        addLocaleData,
-        injectIntl
-    } from 'react-intl'
-    import en from 'react-intl/locale-data/en'
-    import ja from 'react-intl/locale-data/ja'
-    ```
--   Save the file
-
-### Verify react-intl Has Been Removed
-
--   Run `npm run analyze-build`
--   Open `build/report.html`
--   Check to make sure that `react-intl` (red border box in image below) is not in the `node_modules` section, the large yellow box (`vendor.js`)
-
-You should not see this in your report:
-
-<img src="analyze-build-check.png" alt="Analyze build check" />
-
-Despite `react-intl` being gone, instances of i18n/l10n components and functions (i.e. FormattedText, `context.intl.formatNumber`, etc.) should be gradually removed from your application. Until they are removed, they will operate at a very basic level, thereby allowing your application to work as normal.
-
-### Next Steps
-
-At this point, you can install an i18n library of your own, build one from scratch, or ignore i18n altogether. The choice is yours!

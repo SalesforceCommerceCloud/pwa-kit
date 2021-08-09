@@ -1,17 +1,27 @@
 ---
-title: REST API
-metaTitle: Mobify Cloud REST API
+title: Mobify Cloud API Reference
+metaTitle: Mobify Cloud API Reference
 metaDescription: Reference material for the RESTful Mobify Cloud API. Includes endpoint parameters and code examples.
 category: Mobify Cloud REST API
 subcategory: Overview
 ---
 import startCase from 'lodash/startCase'
 
+<Callout type="info">
+
+New to the Mobify Cloud API? [Read the Overview →](/how-to-guides/categories/deployment/using-the-mobify-api-for-target-management)
+
+</Callout>
+
 <CloudApiWrapper>
     {props.edges.map(({node, i}) => {
         return (
             <div key={node.id + i}>
                 <div dangerouslySetInnerHTML={{__html: node.description}} />
+                <p>
+                    The Mobify Cloud API is also documented as an&nbsp;
+                    <a href="https://docs.mobify.com/openapi/cloud/openapi-schema.json">OpenAPI Schema</a>.
+                </p>
                 {node.paths.map((item, i) => {
                     const operationName = startCase(item.operationId)
                     return (
