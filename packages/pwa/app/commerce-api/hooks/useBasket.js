@@ -336,6 +336,16 @@ export default function useBasket() {
                 // it on the confirmation page. The basket is automatically deleted
                 // in SF so we need to make sure a new one is created when leaving the confirmation.
                 setBasket(response)
+            },
+
+            /**
+             * Fetches the applicable shipping methods for the current basket
+             * @returns {Object} - API response containing data
+             */
+            getShippingMethods() {
+                return api.shopperBaskets.getShippingMethodsForShipment({
+                    parameters: {basketId: basket.basketId, shipmentId: 'me'}
+                })
             }
         }
     }, [customer, basket, setBasket])

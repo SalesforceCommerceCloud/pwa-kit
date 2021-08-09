@@ -49,7 +49,6 @@ const Account = () => {
         setShowLoading(true)
         await customer.logout()
         navigate('/login')
-        setShowLoading(false)
     }
 
     const LogoutButton = () => (

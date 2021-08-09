@@ -1,4 +1,4 @@
-import React from 'react'
+import React, {useEffect} from 'react'
 import {Box, Stack, Grid, GridItem, Container} from '@chakra-ui/react'
 import EmptyCart from './partials/empty-cart'
 import CartItem from './partials/cart-item'
@@ -10,6 +10,16 @@ import OrderSummary from '../../components/order-summary'
 
 const Cart = () => {
     const basket = useBasket()
+
+    useEffect(() => {
+        // Set the default shipping method if none is already selected
+        if (basket.basketId && basket.shipments.length > 0 && !basket.shipments[0].shippingMethod) {
+            ;(async () => {
+                const shippingMethods = await basket.getShippingMethods()
+                basket.setShippingMethod(shippingMethods.defaultShippingMethodId)
+            })()
+        }
+    }, [basket.basketId])
 
     if (!basket?.basketId) {
         return <CartSkeleton />
@@ -49,7 +59,7 @@ const Cart = () => {
                         </GridItem>
                         <GridItem>
                             <Stack spacing={4}>
-                                <OrderSummary />
+                                <OrderSummary showPromoCodeForm={true} isEstimate={true} />
                                 <Box display={{base: 'none', lg: 'block'}}>
                                     <CartCta />
                                 </Box>

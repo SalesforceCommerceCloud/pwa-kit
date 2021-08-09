@@ -22,6 +22,7 @@ export default function ShippingAddress() {
     }
 
     return (
+        // TODO: [l10n] localize this title
         <ToggleCard
             id="step-1"
             title="Shipping Address"
@@ -31,6 +32,7 @@ export default function ShippingAddress() {
             onEdit={() => setCheckoutStep(1)}
         >
             <ToggleCardEdit>
+                {/* TODO: [l10n] localize this button label */}
                 <ShippingAddressSelection
                     selectedAddress={selectedShippingAddress}
                     submitButtonLabel="Continue to Shipping Method"

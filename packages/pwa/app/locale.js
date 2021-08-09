@@ -1,11 +1,11 @@
 import React, {useState, useContext} from 'react'
 import PropTypes from 'prop-types'
 import {IntlProvider as ReactIntlProvider} from 'react-intl'
-import {l10n} from '../package.json'
+import packageInfo from '../package.json'
 
 // TODO: You can update these locales in 'pwa/package.json' file
-export const SUPPORTED_LOCALES = l10n.supportedLocales
-export const DEFAULT_LOCALE = l10n.defaultLocale
+export const SUPPORTED_LOCALES = packageInfo.l10n.supportedLocales
+export const DEFAULT_LOCALE = packageInfo.l10n.defaultLocale
 
 /**
  * Dynamically import the translations/messages for a given locale
@@ -13,6 +13,9 @@ export const DEFAULT_LOCALE = l10n.defaultLocale
  * @returns {Promise<Object>} The messages (compiled in AST format) in the given locale. If locale is not found, returns the default locale's messages.
  */
 export const loadLocaleData = async (locale) => {
+    // NOTE: the pseudo locale in this case is actually `en-XB` from react-intl. For more details:
+    // - see our npm script `compile-messages:pseudo`
+    // - and this react-intl PR: https://github.com/formatjs/formatjs/pull/2708
     const locales = [...SUPPORTED_LOCALES, 'pseudo']
     let localeToLoad
 

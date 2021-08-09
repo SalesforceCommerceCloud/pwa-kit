@@ -14,6 +14,7 @@ export default function ShippingOptions() {
         getShippingMethods,
         setCheckoutStep,
         selectedShippingMethod,
+        selectedShippingAddress,
         setShippingMethod,
         goToNextStep
     } = useCheckout()
@@ -47,13 +48,25 @@ export default function ShippingOptions() {
         goToNextStep()
     }
 
+    const shippingItem = basket?.shippingItems?.[0]
+
+    const selectedMethodDisplayPrice = Math.min(
+        shippingItem.price || 0,
+        shippingItem.priceAfterItemDiscount || 0
+    )
+
+    // Note that this card is disabled when there is no shipping address as well as no shipping method.
+    // We do this because we apply the default shipping method to the basket before checkout - so when
+    // landing on checkout the first time will put you at the first step (contact info), but the shipping
+    // method step would appear filled out already. This fix attempts to avoid any confusion in the UI.
     return (
+        // TODO: [l10n] localize this title
         <ToggleCard
             id="step-2"
             title="Shipping & Gift Options"
             editing={step === 2}
             isLoading={form.formState.isSubmitting}
-            disabled={selectedShippingMethod == null}
+            disabled={selectedShippingMethod == null || !selectedShippingAddress}
             onEdit={() => setCheckoutStep(2)}
         >
             <ToggleCardEdit>
@@ -90,6 +103,17 @@ export default function ShippingOptions() {
                                                         <Text fontSize="sm" color="gray.600">
                                                             {opt.description}
                                                         </Text>
+                                                        {opt.shippingPromotions?.map((promo) => {
+                                                            return (
+                                                                <Text
+                                                                    key={promo.promotionId}
+                                                                    fontSize="sm"
+                                                                    color="green.500"
+                                                                >
+                                                                    {promo.calloutMsg}
+                                                                </Text>
+                                                            )
+                                                        })}
                                                     </Radio>
                                                 )
                                             )}
@@ -115,21 +139,52 @@ export default function ShippingOptions() {
                 </form>
             </ToggleCardEdit>
 
-            {selectedShippingMethod && (
+            {selectedShippingMethod && selectedShippingAddress && (
                 <ToggleCardSummary>
                     <Flex justify="space-between" w="full">
                         <Text>{selectedShippingMethod.name}</Text>
-                        <Text fontWeight="bold">
-                            <FormattedNumber
-                                value={selectedShippingMethod.price}
-                                style="currency"
-                                currency={basket.currency}
-                            />
-                        </Text>
+                        <Flex alignItems="center">
+                            <Text fontWeight="bold">
+                                {selectedMethodDisplayPrice === 0 ? (
+                                    'Free'
+                                ) : (
+                                    <FormattedNumber
+                                        value={selectedMethodDisplayPrice}
+                                        style="currency"
+                                        currency={basket.currency}
+                                    />
+                                )}
+                            </Text>
+                            {selectedMethodDisplayPrice !== shippingItem.price && (
+                                <Text
+                                    fontWeight="normal"
+                                    textDecoration="line-through"
+                                    color="gray.500"
+                                    marginLeft={1}
+                                >
+                                    <FormattedNumber
+                                        style="currency"
+                                        currency={basket.currency}
+                                        value={shippingItem.price}
+                                    />
+                                </Text>
+                            )}
+                        </Flex>
                     </Flex>
                     <Text fontSize="sm" color="gray.700">
                         {selectedShippingMethod.description}
                     </Text>
+                    {shippingItem?.priceAdjustments?.map((adjustment) => {
+                        return (
+                            <Text
+                                key={adjustment.priceAdjustmentId}
+                                fontSize="sm"
+                                color="green.500"
+                            >
+                                {adjustment.itemText}
+                            </Text>
+                        )
+                    })}
                 </ToggleCardSummary>
             )}
         </ToggleCard>

@@ -53,23 +53,27 @@ export const CheckoutProvider = ({children}) => {
             mergeState({isGuestCheckout: true})
         }
 
+        // Derive the starting step for checkout based on current state of basket.
+        // A failed condition sets the current step and returns early (order matters).
         if (customer.customerId && basket.basketId && state.step == undefined) {
-            let step = 0
+            if (!basket.customerInfo?.email) {
+                mergeState({step: 0})
+                return
+            }
+            if (basket.shipments && !basket.shipments[0]?.shippingAddress) {
+                mergeState({step: 1})
+                return
+            }
+            if (basket.shipments && !basket.shipments[0]?.shippingMethod) {
+                mergeState({step: 2})
+                return
+            }
+            if (!basket.paymentInstruments || !basket.billingAddress) {
+                mergeState({step: 3})
+                return
+            }
 
-            if (basket.customerInfo?.email) {
-                step += 1
-            }
-            if (basket.shipments && basket.shipments[0]?.shippingAddress) {
-                step += 1
-            }
-            if (basket.shipments && basket.shipments[0]?.shippingMethod) {
-                step += 1
-            }
-            if (basket.paymentInstruments?.length === 1 && basket.billingAddress) {
-                step += 1
-            }
-
-            mergeState({step})
+            mergeState({step: 4})
         }
     }, [customer, basket])
 
@@ -195,9 +199,7 @@ export const CheckoutProvider = ({children}) => {
              * Gets the applicable shipping methods for the basket's items and stores it in local state.
              */
             async getShippingMethods() {
-                const shippingMethods = await api.shopperBaskets.getShippingMethodsForShipment({
-                    parameters: {basketId: basket.basketId, shipmentId: 'me'}
-                })
+                const shippingMethods = await basket.getShippingMethods()
                 mergeState({shippingMethods})
             },
 

@@ -19,6 +19,7 @@ const messages = defineMessages({
 export default function useCreditCardFields({form: {control, errors}, prefix = ''}) {
     const {formatMessage} = useIntl()
 
+    // TODO: [l10n] localize all of the labels
     const fields = {
         number: {
             name: `${prefix}number`,

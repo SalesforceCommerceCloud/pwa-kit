@@ -90,7 +90,7 @@ describe('loadLocaleData', () => {
     })
     test('loading the pseudo locale', async () => {
         const messages = await loadLocaleData('pseudo')
-        expect(messages[messageId][0].value).toMatch(/SSSSSSSS/)
+        expect(messages[messageId][0].value).toMatch(/^\[!! Ḣèĺĺĺĺŏ Ẅŏŕŕŕĺḋ !!\]$/)
     })
     test('handling a not-found translation file', async () => {
         expect(SUPPORTED_LOCALES[1]).not.toBe(DEFAULT_LOCALE)

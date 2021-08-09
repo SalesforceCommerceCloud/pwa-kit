@@ -130,6 +130,15 @@ test('Renders account detail page by default for logged-in customer', async () =
     expect(screen.getByText('(727) 555-1234')).toBeInTheDocument()
 })
 
+test('Allows customer to sign out', async () => {
+    renderWithProviders(<MockedComponent />)
+    expect(await screen.findByTestId('account-detail-page')).toBeInTheDocument()
+    user.click(screen.getAllByText('Log out')[0])
+    await waitFor(() => {
+        expect(window.location.pathname).toEqual('/en/login')
+    })
+})
+
 test('Allows customer to edit profile details', async () => {
     server.use(
         rest.get('*/customers/:customerId', (req, res, ctx) =>

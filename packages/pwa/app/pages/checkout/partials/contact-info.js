@@ -74,6 +74,7 @@ const ContactInfo = () => {
         setIsGuestCheckout(!isGuestCheckout)
     }
     return (
+        // TODO: [l10n] localize this title
         <ToggleCard
             id="step-0"
             title="Contact Info"

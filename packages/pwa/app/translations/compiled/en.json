@@ -149,10 +149,10 @@
       "value": "Please enter a valid date"
     }
   ],
-  "7gXPhB": [
+  "7PMLfK": [
     {
       "type": 0,
-      "value": "Qty"
+      "value": "Order Total"
     }
   ],
   "7xscgD": [
@@ -177,12 +177,6 @@
     {
       "type": 0,
       "value": "Payment Details"
-    }
-  ],
-  "9HRQUG": [
-    {
-      "type": 0,
-      "value": "Want shipping & tax estimates?"
     }
   ],
   "9Npj92": [
@@ -615,6 +609,12 @@
     {
       "type": 0,
       "value": "Zip Code"
+    }
+  ],
+  "T/K9MQ": [
+    {
+      "type": 0,
+      "value": "promo applied"
     }
   ],
   "TBI5GJ": [
@@ -1449,6 +1449,12 @@
     {
       "type": 0,
       "value": "Email"
+    }
+  ],
+  "tf1lIh": [
+    {
+      "type": 0,
+      "value": "Free"
     }
   ],
   "tiVXug": [

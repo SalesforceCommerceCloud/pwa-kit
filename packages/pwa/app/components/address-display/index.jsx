@@ -5,7 +5,7 @@ import {Box, Text} from '@chakra-ui/react'
 const AddressDisplay = ({address}) => {
     return (
         <Box>
-            <Text fontWeight="bold" mb={1}>
+            <Text>
                 {address.firstName} {address.lastName}
             </Text>
             <Text>{address.address1}</Text>

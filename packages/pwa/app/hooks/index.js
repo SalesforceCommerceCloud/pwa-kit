@@ -2,6 +2,7 @@
 /* Copyright (c) 2019 Mobify Research & Development Inc. All rights reserved. */
 /* * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
 
+/* istanbul ignore file */
 export {useSearchParams} from './use-search-params'
 export {useLimitUrls} from './use-limit-urls'
 export {usePageUrls} from './use-page-urls'

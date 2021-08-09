@@ -11,9 +11,7 @@ import path from 'path'
 
 import webpack from 'webpack'
 import WebpackNotifierPlugin from 'webpack-notifier'
-import TerserPlugin from 'terser-webpack-plugin'
 import CopyPlugin from 'copy-webpack-plugin'
-import TimeFixPlugin from 'time-fix-plugin'
 import {BundleAnalyzerPlugin} from 'webpack-bundle-analyzer'
 import LoadablePlugin from '@loadable/webpack-plugin'
 import {createModuleReplacementPlugin, BuildMarkerPlugin} from './plugins'
@@ -88,35 +86,6 @@ const defines = {
     ['global.GENTLY']: false
 }
 
-const minimizer = (mode) => {
-    switch (mode) {
-        case production:
-            return [
-                new TerserPlugin({
-                    cache: true,
-                    parallel: true,
-                    sourceMap: true
-                })
-            ]
-        case development:
-            return [
-                new TerserPlugin({
-                    cache: true,
-                    parallel: true,
-                    sourceMap: true,
-                    terserOptions: {
-                        ie8: false,
-                        mangle: false,
-                        warnings: false,
-                        compress: false
-                    }
-                })
-            ]
-        default:
-            throw new Error(`Invalid mode ${mode}`)
-    }
-}
-
 const babelLoader = [
     {
         loader: 'babel-loader?cacheDirectory',
@@ -158,6 +127,7 @@ const common = {
     devtool: 'source-map',
 
     output: {
+        publicPath: '',
         path: buildDir,
         filename: '[name].js',
         chunkFilename: '[name].js' // Support chunking with @loadable/components
@@ -167,7 +137,7 @@ const common = {
         symlinks: false,
         extensions: ['.js', '.jsx', '.json'],
         alias: {
-            '@loadable/components': resolve(nodeModules, '@loadable/components'),
+            '@loadable/component': resolve(nodeModules, '@loadable/component'),
             '@loadable/server': resolve(nodeModules, '@loadable/server'),
             '@loadable/webpack-plugin': resolve(nodeModules, '@loadable/webpack-plugin'),
             'babel-runtime': resolve(nodeModules, 'babel-runtime'),
@@ -201,11 +171,6 @@ const common = {
                 generateStatsFile: true
             }),
         mode === development && new webpack.NoEmitOnErrorsPlugin(),
-
-        // Avoid repeat builds with webpack for files created immediately
-        // before starting the server.
-        // See - https://github.com/webpack/watchpack/issues/25
-        new TimeFixPlugin(),
 
         buildMarkerPlugin,
 
@@ -251,8 +216,7 @@ const main = Object.assign({}, common, {
                     chunks: 'all'
                 }
             }
-        },
-        minimizer: minimizer(mode)
+        }
     },
     performance: {
         maxEntrypointSize: 905000,
@@ -268,9 +232,6 @@ const others = Object.assign({}, common, {
         worker: './worker/main.js',
         'core-polyfill': 'core-js',
         'fetch-polyfill': 'whatwg-fetch'
-    },
-    optimization: {
-        minimizer: minimizer(mode)
     }
 })
 
@@ -316,22 +277,7 @@ const ssrServerConfig = Object.assign(
             ]
         },
         stats
-    },
-    mode === production
-        ? {
-              optimization: {
-                  minimizer: [
-                      new TerserPlugin({
-                          terserOptions: {
-                              compress: false,
-                              mangle: false,
-                              ecma: 6
-                          }
-                      })
-                  ]
-              }
-          }
-        : undefined
+    }
 )
 
 const requestProcessor = Object.assign(

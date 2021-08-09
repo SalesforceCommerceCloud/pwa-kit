@@ -252,9 +252,19 @@ beforeAll(() => {
 })
 afterEach(() => {
     localStorage.clear()
+    sessionStorage.clear()
     server.resetHandlers()
+    window.history.pushState({}, 'Account', '/en/account')
 })
 afterAll(() => server.close())
+
+test('Navigates to homepage when no order present', async () => {
+    renderWithProviders(<Confirmation />)
+    expect(screen.queryByTestId('sf-checkout-confirmation-container')).not.toBeInTheDocument()
+    await waitFor(() => {
+        expect(window.location.pathname).toEqual('/')
+    })
+})
 
 test('Renders the order detail when present', async () => {
     renderWithProviders(<WrappedConfirmation />)

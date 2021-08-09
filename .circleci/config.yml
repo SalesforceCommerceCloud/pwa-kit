@@ -111,23 +111,6 @@ commands:
           command: |
             # Basic smoke-tests for uncommonly run scripts in a project
             node /home/circleci/project/scripts/smoke-test-npm-scripts.js --dir << parameters.dir >>
-  runaudits:
-    description: 'Run Snyk on the Monorepo'
-    steps:
-      - run: # run snyk test - we use --strict-out-of-sync flag to avoid out of sync issues with lockfiles
-          name: Run Snyk on the Monorepo
-          command: |
-            set +e
-            results=$(snyk test --strict-out-of-sync=false --all-projects --severity-threshold=high)
-            exitCode=$?
-            set -e
-
-            echo "$results"
-            if [[ "${CIRCLE_BRANCH}" == "salesforce-master" ]]; then
-              snyk monitor --strict-out-of-sync=false --ignore-policy --all-projects
-            fi
-
-            exit $exitCode
   lighthouse-ci:
     description: 'Run Lighthouse CI on the PWA'
     steps:
@@ -154,7 +137,6 @@ jobs:
     steps:
       - checkout
       - setup
-      - runaudits
       - runtests
       - lighthouse-ci
       - smoketestscripts
@@ -203,7 +185,6 @@ jobs:
     steps:
       - checkout
       - setup
-      - runaudits
       - runtests:
           enableIntegrationTests: false
       - smoketestscripts
@@ -248,7 +229,6 @@ jobs:
             # REMINDER: Have you bumped up our alpha versions? If you recently fixed some
             # vulnerabilities, you will need to increment the alpha versions (so that
             # publishing them to the local npm repo would be successful).
-            snyk test --strict-out-of-sync=false --severity-threshold=high
 
             if [[ "${CIRCLE_BRANCH}" == "salesforce-master" ]]; then
               snyk monitor --ignore-policy --remote-repo-url='https://github.com/mobify/mobify-platform-sdks.git' --project-name='generated-scaffold-pwa' --org='mobify'

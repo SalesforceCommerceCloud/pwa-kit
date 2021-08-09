@@ -3,29 +3,15 @@ import React, {useEffect, useState} from 'react'
 import PropTypes from 'prop-types'
 import {FormattedMessage, FormattedNumber} from 'react-intl'
 import useBasket from '../../commerce-api/hooks/useBasket'
-import {
-    Box,
-    Flex,
-    IconButton,
-    Popover,
-    PopoverArrow,
-    PopoverBody,
-    PopoverCloseButton,
-    PopoverContent,
-    PopoverHeader,
-    PopoverTrigger,
-    Stack,
-    Text,
-    Portal
-} from '@chakra-ui/react'
+import {Flex, Stack, Text} from '@chakra-ui/react'
 import {useCartItemVariant} from './'
-import {InfoIcon} from '../icons'
+import PromoPopover from '../promo-popover'
 
 /**
  * In the context of a cart product item variant, this component renders a styled
  * list of the selected variation values as well as any promos (w/ info popover).
  */
-const ItemAttributes = ({includeQuantity, ...props}) => {
+const ItemAttributes = ({includeQuantity, currency, ...props}) => {
     const variant = useCartItemVariant()
     const basket = useBasket()
     const [promos, setPromos] = useState([])
@@ -88,64 +74,20 @@ const ItemAttributes = ({includeQuantity, ...props}) => {
                         <Text as="span" color="green.500">
                             <FormattedNumber
                                 style="currency"
-                                currency={basket.currency}
+                                currency={currency || basket.currency}
                                 value={variant.priceAdjustments[0].price}
                             />
                         </Text>
                     </Text>
-                    <Box position="relative" ml={2}>
-                        <Popover
-                            placement="top"
-                            boundary="scrollParent"
-                            trigger="hover"
-                            variant="small"
-                        >
-                            <PopoverTrigger>
-                                <IconButton
-                                    icon={
-                                        <InfoIcon
-                                            display="block"
-                                            boxSize="18px"
-                                            mt="-2px"
-                                            ml="-1px"
-                                            color="gray.600"
-                                        />
-                                    }
-                                    display="block"
-                                    size="xs"
-                                    height="14px"
-                                    width="14px"
-                                    minWidth="auto"
-                                    position="relative"
-                                    variant="unstyled"
-                                >
-                                    <FormattedMessage defaultMessage="Applied promotions info" />
-                                </IconButton>
-                            </PopoverTrigger>
-                            <Portal>
-                                <PopoverContent border="none" borderRadius="base">
-                                    <Box boxShadow="lg" zIndex="-1">
-                                        <PopoverArrow />
-                                        <PopoverCloseButton />
-                                        <PopoverHeader borderBottom="none">
-                                            <Text fontWeight="bold" fontSize="md">
-                                                <FormattedMessage defaultMessage="Promotions Applied" />
-                                            </Text>
-                                        </PopoverHeader>
-                                        <PopoverBody pt={0}>
-                                            <Stack>
-                                                {promos?.map((promo) => (
-                                                    <Text key={promo?.id} fontSize="sm">
-                                                        {promo?.calloutMsg}
-                                                    </Text>
-                                                ))}
-                                            </Stack>
-                                        </PopoverBody>
-                                    </Box>
-                                </PopoverContent>
-                            </Portal>
-                        </Popover>
-                    </Box>
+                    <PromoPopover ml={2}>
+                        <Stack>
+                            {promos?.map((promo) => (
+                                <Text key={promo?.id} fontSize="sm">
+                                    {promo?.calloutMsg}
+                                </Text>
+                            ))}
+                        </Stack>
+                    </PromoPopover>
                 </Flex>
             )}
         </Stack>
@@ -153,7 +95,8 @@ const ItemAttributes = ({includeQuantity, ...props}) => {
 }
 
 ItemAttributes.propTypes = {
-    includeQuantity: PropTypes.bool
+    includeQuantity: PropTypes.bool,
+    currency: PropTypes.string
 }
 
 export default ItemAttributes

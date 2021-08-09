@@ -70,7 +70,7 @@ const commonDevDeps = {
     '@babel/runtime': '^7.7.2',
     '@babel/runtime-corejs2': '^7.4.5',
     '@babel/traverse': '^7.5.5',
-    '@loadable/babel-plugin': '5.12.0',
+    '@loadable/babel-plugin': '^5.13.2',
     'babel-eslint': '^10.1.0',
     'babel-jest': '^24.8.0',
     'babel-loader': '^8.0.6',

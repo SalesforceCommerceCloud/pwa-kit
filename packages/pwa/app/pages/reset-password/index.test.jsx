@@ -1,5 +1,5 @@
 import React from 'react'
-import {screen, within} from '@testing-library/react'
+import {screen, waitFor, within} from '@testing-library/react'
 import user from '@testing-library/user-event'
 import {rest} from 'msw'
 import {setupServer} from 'msw/node'
@@ -102,12 +102,24 @@ beforeEach(() => {
 
     // Need to mock window.crypto for tests
     window.crypto = new Crypto()
+    window.history.pushState({}, 'Reset Password', '/en/reset-password')
 })
 afterEach(() => {
     localStorage.clear()
     server.resetHandlers()
+    window.history.pushState({}, 'Reset Password', '/en/reset-password')
 })
 afterAll(() => server.close())
+
+test('Allows customer to go to sign in page', async () => {
+    // render our test component
+    renderWithProviders(<MockedComponent />)
+
+    user.click(screen.getByText('Sign in'))
+    await waitFor(() => {
+        expect(window.location.pathname).toEqual('/en/login')
+    })
+})
 
 test('Allows customer to generate password token', async () => {
     // mock reset password request
@@ -135,4 +147,33 @@ test('Allows customer to generate password token', async () => {
     // wait for success state
     expect(await screen.findByText(/password reset/i, {}, {timeout: 12000})).toBeInTheDocument()
     expect(screen.getByText(/foo@test.com/i)).toBeInTheDocument()
+
+    user.click(screen.getByText('Back to sign in'))
+    await waitFor(() => {
+        expect(window.location.pathname).toEqual('/en/login')
+    })
+})
+
+test('Renders error message from server', async () => {
+    server.use(
+        rest.post('*/create-reset-token', (req, res, ctx) =>
+            res(
+                ctx.delay(0),
+                ctx.json({
+                    detail: 'Something went wrong',
+                    title: 'Error',
+                    type: '/error'
+                })
+            )
+        )
+    )
+
+    renderWithProviders(<MockedComponent />)
+
+    user.type(screen.getByLabelText('Email'), 'foo@test.com')
+    user.click(within(screen.getByTestId('sf-auth-modal-form')).getByText(/reset password/i))
+
+    expect(await screen.findByText('Something went wrong')).toBeInTheDocument()
+
+    screen.debug()
 })

@@ -225,18 +225,43 @@ git push
 
 ```
 
-When you're finished, drop and update in #product-release and #changelog to let
-them know what's new.
+When you're finished, drop and update in #product-release and #changelog to let them know what's new.
 
 [lerna]: https://github.com/lerna/lerna
 
 ## NPM vulnerabilities
 
-When these are discovered they can prevent us from releasing – our Circle builds are
-set up to use Snyk CLI, it will fail if a high vulnerability is found across our packages
-not listed on its `.snyk` ignore policy file.
+When these are discovered they can prevent us from releasing – our repository is set up to use
+the [Snyk GitHub integration](https://support.snyk.io/hc/en-us/articles/360015951318-GitHub-Enterprise-Integration).
+Snyk test any newly created pull request in our repositories for security vulnerabilities, two Snyk status checks are
+displayed — one for security tests and the other for license checks.
 
-### Install and Authenticate Snyk CLI
+### Skip failed Snyk checks
+
+The GitHub Snyk checks are configured to fail when new high vulnerabilities are introduced. After evaluating the risks
+of merging the PR with the vulnerability, users with the Snyk Administrator role can unblock the PR
+by [marking a failed test as successful](https://support.snyk.io/hc/en-us/articles/360007301698-Skipping-Snyk-Pull-Request-Checks)
+.
+
+### Ignore vulnerabilities
+
+We ignore vulnerabilities using the Snyk UI. Navigate to the [projects page](https://app.snyk.io/org/mobify/projects),
+find the manifest file with the vulnerability you want to ignore, and clicking the Ignore button.
+
+### Fix vulnerabilities
+
+In simple cases these vulnerabilities can be fixed by upgrading a package. We've two approaches
+to [remediate vulnerabilities](https://support.snyk.io/hc/en-us/articles/360006113798-Remediate-your-vulnerabilities):
+
+#### Using the Snyk UI
+
+We
+can [manually generate a PR fom the UI](https://support.snyk.io/hc/en-us/articles/360011484018-Fixing-vulnerabilities)
+fixing individual or multiple vulnerabilities.
+
+#### Using the Snyk CLI
+
+**Install and Authenticate Snyk CLI:**
 
 1. Install Snyk CLI via npm.
     ```bash
@@ -248,7 +273,16 @@ not listed on its `.snyk` ignore policy file.
     ```
 3. Click the Authenticate button.
 
-### Test for vulnerabilities
+**Running `snyk wizard`:**
+
+To work around various issues with local-only monorepo packages, run the Snyk `wizard` at the root of each package of
+the monorepo to fix vulnerabilities.
+
+1. Remove any local-only dependencies from `package.json`.
+2. Run `snyk wizard`
+3. Add back the local-only dependencies to the `package.json`.
+
+**Test for vulnerabilities with `snyk test`:**
 
 Run the `test` command from the root of the monorepo.
 
@@ -256,22 +290,5 @@ Run the `test` command from the root of the monorepo.
 snyk test --strict-out-of-sync=false --all-projects
 ```
 
-This command will list all vulnerabilities for all the packages in the monorepo not listed
-on its `.snyk` ignore policy file. We can use the `--ignore-policy` to ignore the policy file.
 
-### Fix and ignore vulnerabilities
 
-In simple cases these vulnerabilities can be fixed by upgrading a package. To work around
-various issues with local-only monorepo packages, run the Snyk `wizard` at the root of each
-package of the monorepo to fix vulnerabilities or to ignore them by adding ignore rules to
-the `.snyk` policy file.
-
-1. Remove any local-only dependencies from `package.json`.
-2. Run `snyk wizard`
-3. Add back the local-only dependencies to the `package.json`.
-
-We can also add ignore rules directly from the CLI using `snyk ignore` like this:
-
-```bash
-snyk ignore --id='SNYK-JS-LODASH-1040724' --expiry='2021-04-01' --reason='No fix available'
-```

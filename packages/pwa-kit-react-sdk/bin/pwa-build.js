@@ -35,7 +35,7 @@ const deps = ['express', ...(mobifyConfig.externals || [])]
 
 sh.rm('-rf', 'build')
 
-sh.exec(`${webpack} --display errors-only --bail`)
+sh.exec(`${webpack} --bail`)
 
 ShellString(
     JSON.stringify({

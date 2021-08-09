@@ -75,11 +75,7 @@ const Checkout = () => {
                     </GridItem>
 
                     <GridItem py={6} px={[4, 4, 4, 0]}>
-                        <OrderSummary
-                            showPromoCodeForm={false}
-                            showTaxEstimationForm={false}
-                            showCartItems={true}
-                        />
+                        <OrderSummary showTaxEstimationForm={false} showCartItems={true} />
 
                         {step === 4 && (
                             <Box display={{base: 'none', lg: 'block'}} pt={2}>

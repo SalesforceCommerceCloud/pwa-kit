@@ -3,7 +3,7 @@
 /* * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
 
 import React, {useEffect} from 'react'
-import {FormattedMessage, FormattedNumber, useIntl} from 'react-intl'
+import {FormattedMessage, useIntl} from 'react-intl'
 import {useHistory, useRouteMatch} from 'react-router'
 import {
     Box,
@@ -15,8 +15,6 @@ import {
     Button,
     Divider,
     Grid,
-    AspectRatio,
-    Image,
     SimpleGrid,
     Skeleton
 } from '@chakra-ui/react'
@@ -24,6 +22,12 @@ import {getCreditCardIcon} from '../../utils/cc-utils'
 import {useAccountOrders} from './util/order-context'
 import Link from '../../components/link'
 import {ChevronLeftIcon} from '../../components/icons'
+import OrderSummary from '../../components/order-summary'
+import CartItemVariant from '../../components/cart-item-variant'
+import CartItemVariantImage from '../../components/cart-item-variant/item-image'
+import CartItemVariantName from '../../components/cart-item-variant/item-name'
+import CartItemVariantAttributes from '../../components/cart-item-variant/item-attributes'
+import CartItemVariantPrice from '../../components/cart-item-variant/item-price'
 
 const AccountOrderDetail = () => {
     const {url, params} = useRouteMatch()
@@ -212,71 +216,14 @@ const AccountOrderDetail = () => {
                     </SimpleGrid>
 
                     {!isLoading ? (
-                        <Stack
+                        <Box
                             py={{base: 6}}
                             px={{base: 6, xl: 8}}
                             background="gray.50"
                             borderRadius="base"
                         >
-                            <Text fontWeight="bold" fontSize="sm">
-                                <FormattedMessage defaultMessage="Order Summary" />
-                            </Text>
-
-                            <Stack spacing={1}>
-                                <Flex justify="space-between">
-                                    <Text fontSize="sm">
-                                        <FormattedMessage defaultMessage="Subtotal" />
-                                    </Text>
-                                    <Text fontSize="sm">
-                                        <FormattedNumber
-                                            value={order.productSubTotal}
-                                            style="currency"
-                                            currency={order.currency}
-                                        />
-                                    </Text>
-                                </Flex>
-                                <Flex justify="space-between">
-                                    <Text fontSize="sm">
-                                        <FormattedMessage defaultMessage="Shipping" />
-                                    </Text>
-                                    <Text fontSize="sm">
-                                        {order.shippingTotal != null ? (
-                                            <FormattedNumber
-                                                value={order.shippingTotal}
-                                                style="currency"
-                                                currency={order.currency}
-                                            />
-                                        ) : (
-                                            'TBD'
-                                        )}
-                                    </Text>
-                                </Flex>
-                                <Flex justify="space-between">
-                                    <Text fontSize="sm">
-                                        <FormattedMessage defaultMessage="Tax" />
-                                    </Text>
-                                    <Text fontSize="sm">
-                                        <FormattedNumber
-                                            value={order.taxTotal || order.merchandizeTotalTax}
-                                            style="currency"
-                                            currency={order.currency}
-                                        />
-                                    </Text>
-                                </Flex>
-                                <Flex justify="space-between">
-                                    <Text fontSize="sm" fontWeight="bold">
-                                        <FormattedMessage defaultMessage="Estimated Total" />
-                                    </Text>
-                                    <Text fontSize="sm" fontWeight="bold">
-                                        <FormattedNumber
-                                            value={order.orderTotal || order.productTotal}
-                                            style="currency"
-                                            currency={order.currency}
-                                        />
-                                    </Text>
-                                </Flex>
-                            </Stack>
-                        </Stack>
+                            <OrderSummary basket={order} fontSize="sm" />
+                        </Box>
                     ) : (
                         <Skeleton h="full" />
                     )}
@@ -316,70 +263,45 @@ const AccountOrderDetail = () => {
                         ))}
 
                     {!isLoading &&
-                        order?.productItems.map((item) => {
-                            const variant = productsById[item.productId]
-
-                            const image = variant?.imageGroups?.find(
-                                (group) => group.viewType === 'small'
-                            ).images[0]
-
-                            const variationValues = Object.keys(variant?.variationValues || []).map(
-                                (key) => {
-                                    const value = variant.variationValues[key]
-                                    const attr = variant.variationAttributes?.find(
-                                        (attr) => attr.id === key
-                                    )
-                                    return {
-                                        id: key,
-                                        name: attr?.name || key,
-                                        value:
-                                            attr.values.find((val) => val.value === value)?.name ||
-                                            value
-                                    }
-                                }
-                            )
-
+                        order.productItems?.map((product, idx) => {
+                            const variant = {
+                                ...product,
+                                ...productsById[product.productId],
+                                price: product.price
+                            }
                             return (
                                 <Box
-                                    key={item.itemId}
                                     p={[4, 6]}
+                                    key={product.productId}
                                     border="1px solid"
                                     borderColor="gray.100"
                                     borderRadius="base"
                                 >
-                                    <Flex width="full" align="flex-start">
-                                        <AspectRatio ratio={1} width={['88px', 36]} mr={4}>
-                                            <Image
-                                                alt={image?.alt}
-                                                src={image?.disBaseLink}
-                                                ignoreFallback={true}
-                                            />
-                                        </AspectRatio>
-                                        <Stack spacing={0} flex={1}>
-                                            <Text fontWeight="bold">{item.productName}</Text>
-                                            <Flex alignItems="flex-end">
-                                                <Box flex={1}>
-                                                    {variationValues.map((variationValue) => (
-                                                        <Text fontSize="sm" key={variationValue.id}>
-                                                            {variationValue.name}:{' '}
-                                                            {variationValue.value}
-                                                        </Text>
-                                                    ))}
-                                                    <Text fontSize="sm">
-                                                        <FormattedMessage defaultMessage="Qty" />:{' '}
-                                                        {item.quantity}
-                                                    </Text>
-                                                </Box>
-                                                <Text fontWeight="bold">
-                                                    <FormattedNumber
-                                                        value={item.price * item.quantity}
-                                                        style="currency"
+                                    <CartItemVariant
+                                        index={idx}
+                                        variant={variant}
+                                        currency={order.currency}
+                                    >
+                                        <Flex width="full" alignItems="flex-start">
+                                            <CartItemVariantImage width={['88px', 36]} mr={4} />
+                                            <Stack spacing={1} marginTop="-3px" flex={1}>
+                                                <CartItemVariantName />
+                                                <Flex
+                                                    width="full"
+                                                    justifyContent="space-between"
+                                                    alignItems="flex-end"
+                                                >
+                                                    <CartItemVariantAttributes
+                                                        includeQuantity
                                                         currency={order.currency}
                                                     />
-                                                </Text>
-                                            </Flex>
-                                        </Stack>
-                                    </Flex>
+                                                    <CartItemVariantPrice
+                                                        currency={order.currency}
+                                                    />
+                                                </Flex>
+                                            </Stack>
+                                        </Flex>
+                                    </CartItemVariant>
                                 </Box>
                             )
                         })}

@@ -1,5 +1,6 @@
 import {getAssetUrl} from 'pwa-kit-react-sdk/dist/ssr/universal/utils'
 
+// TODO: [l10n] localize these hardcoded strings
 export const categories = [
     {
         title: "Shop Women's Outfits",

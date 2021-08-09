@@ -65,8 +65,8 @@
   "6DCLcI": {
     "defaultMessage": "Please enter a valid date"
   },
-  "7gXPhB": {
-    "defaultMessage": "Qty"
+  "7PMLfK": {
+    "defaultMessage": "Order Total"
   },
   "7xscgD": {
     "defaultMessage": "Delivery Details"
@@ -79,9 +79,6 @@
   },
   "8pvKg1": {
     "defaultMessage": "Payment Details"
-  },
-  "9HRQUG": {
-    "defaultMessage": "Want shipping & tax estimates?"
   },
   "9Npj92": {
     "defaultMessage": "Enter your email to receive instructions on how to reset your password"
@@ -277,6 +274,9 @@
   },
   "Solm6E": {
     "defaultMessage": "Zip Code"
+  },
+  "T/K9MQ": {
+    "defaultMessage": "promo applied"
   },
   "TBI5GJ": {
     "defaultMessage": "This {length}-digit code can be found on the {side} of your card.",
@@ -638,6 +638,9 @@
   },
   "sy+pv5": {
     "defaultMessage": "Email"
+  },
+  "tf1lIh": {
+    "defaultMessage": "Free"
   },
   "tiVXug": {
     "defaultMessage": "Please enter your city"

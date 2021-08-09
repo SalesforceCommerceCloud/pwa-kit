@@ -389,7 +389,16 @@ export const mockShippingMethods = {
             description: 'The default shipping method.',
             id: 'DefaultShippingMethod',
             name: 'Default Shipping Method',
-            price: 5.55
+            price: 5.55,
+            shipping_promotions: [
+                {
+                    callout_msg: 'Free Shipping Amount Above 150',
+                    link:
+                        'https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com/s/RefArch/dw/shop/v21_3/promotions/3184d71eea54c9d27e88dc41ca',
+                    promotion_id: 'FreeShippingAmountAbove150',
+                    promotion_name: 'Free Shipping Amount Above 150'
+                }
+            ]
         },
         {
             _type: 'shipping_method',

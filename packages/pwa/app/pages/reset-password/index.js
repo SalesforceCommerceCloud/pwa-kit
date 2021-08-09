@@ -5,19 +5,18 @@
 import React, {useState} from 'react'
 import PropTypes from 'prop-types'
 import {FormattedMessage} from 'react-intl'
-import {useHistory} from 'react-router-dom'
 import {Box, Button, Container, Stack, Text} from '@chakra-ui/react'
 import useCustomer from '../../commerce-api/hooks/useCustomer'
 import Seo from '../../components/seo'
 import {useForm} from 'react-hook-form'
 import ResetPasswordForm from '../../components/reset-password'
 import {BrandLogo} from '../../components/icons'
+import useNavigation from '../../hooks/use-navigation'
 
-const ResetPassword = ({match}) => {
-    // eslint-disable-next-line no-unused-vars
+const ResetPassword = () => {
     const customer = useCustomer()
     const form = useForm()
-    const history = useHistory()
+    const navigate = useNavigation()
     const [submittedEmail, setSubmittedEmail] = useState('')
     const [showSubmittedSuccess, setShowSubmittedSuccess] = useState(false)
 
@@ -47,7 +46,7 @@ const ResetPassword = ({match}) => {
                     <ResetPasswordForm
                         form={form}
                         submitForm={submitForm}
-                        clickSignIn={() => history.push(`/${match.params.locale}/login`)}
+                        clickSignIn={() => navigate('/login')}
                     />
                 ) : (
                     <Stack justify="center" align="center" spacing={6}>
@@ -66,7 +65,7 @@ const ResetPassword = ({match}) => {
                                     }}
                                 />
                             </Text>
-                            <Button onClick={() => history.push(`/${match.params.locale}/login`)}>
+                            <Button onClick={() => navigate('/login')}>
                                 <FormattedMessage defaultMessage="Back to sign in" />
                             </Button>
                         </Stack>

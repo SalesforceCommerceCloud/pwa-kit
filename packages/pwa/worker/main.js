@@ -1,4 +1,5 @@
 /* global workbox, DEBUG */
+/* istanbul ignore file */
 /**
  * This is your project's Service Worker. For information on customizing your
  * Service Worker, see:

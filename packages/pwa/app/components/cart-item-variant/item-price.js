@@ -1,17 +1,15 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 import {FormattedMessage, FormattedNumber} from 'react-intl'
-import {Box, Text} from '@chakra-ui/react'
+import {Stack, Text} from '@chakra-ui/react'
 import useBasket from '../../commerce-api/hooks/useBasket'
 import {useCartItemVariant} from '.'
 
 /**
  * In the context of a cart product item variant, this component renders the item's
  * pricing, taking into account applied discounts as well as base item prices.
- *
- * @todo - The applied discounts and base pricing needs further investigation to ensure
- * we're properly handling the most common storefront configurations.
  */
-const ItemPrice = (props) => {
+const ItemPrice = ({currency, ...props}) => {
     const variant = useCartItemVariant()
     const basket = useBasket()
 
@@ -19,11 +17,25 @@ const ItemPrice = (props) => {
 
     const displayPrice = Math.min(price, priceAfterItemDiscount)
 
+    const hasDiscount = displayPrice !== price
+
     return (
-        <Box textAlign="right" {...props}>
+        <Stack
+            textAlign="right"
+            direction={hasDiscount ? 'column' : 'row'}
+            justifyContent="flex-end"
+            alignItems="baseline"
+            spacing={hasDiscount ? 0 : 1}
+            wrap="row"
+            {...props}
+        >
             <Text fontWeight="bold">
-                <FormattedNumber style="currency" currency={basket.currency} value={displayPrice} />
-                {displayPrice !== price && (
+                <FormattedNumber
+                    style="currency"
+                    currency={currency || basket.currency}
+                    value={displayPrice}
+                />
+                {hasDiscount && (
                     <Text
                         as="span"
                         fontSize="sm"
@@ -34,7 +46,7 @@ const ItemPrice = (props) => {
                     >
                         <FormattedNumber
                             style="currency"
-                            currency={basket.currency}
+                            currency={currency || basket.currency}
                             value={price}
                         />
                     </Text>
@@ -45,7 +57,7 @@ const ItemPrice = (props) => {
                 <Text fontSize="14px">
                     <FormattedNumber
                         style="currency"
-                        currency={basket.currency}
+                        currency={currency || basket.currency}
                         value={basePrice}
                     />
                     <FormattedMessage
@@ -54,8 +66,12 @@ const ItemPrice = (props) => {
                     />
                 </Text>
             )}
-        </Box>
+        </Stack>
     )
+}
+
+ItemPrice.propTypes = {
+    currency: PropTypes.string
 }
 
 export default ItemPrice

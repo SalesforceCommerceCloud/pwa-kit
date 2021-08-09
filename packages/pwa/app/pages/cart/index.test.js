@@ -5,16 +5,16 @@ import {renderWithProviders} from '../../utils/test-utils'
 import Cart from './index'
 import userEvent from '@testing-library/user-event'
 import useShopper from '../../commerce-api/hooks/useShopper'
-import {mockedGuestCustomer} from '../../commerce-api/mock-data'
+import {mockedGuestCustomer, mockShippingMethods} from '../../commerce-api/mock-data'
 import mockBasketWithSuit from '../../commerce-api/mocks/basket-with-suit'
 import mockVariant from '../../commerce-api/mocks/variant-750518699578M'
 import mockEmptyBasket from '../../commerce-api/mocks/empty-basket'
 import {keysToCamel} from '../../commerce-api/utils'
-import user from '@testing-library/user-event'
 
 jest.setTimeout(60000)
 
 let mockedBasketResponse = keysToCamel(mockBasketWithSuit)
+let mockedShippingMethodsResponse = keysToCamel(mockShippingMethods)
 
 jest.mock('../../commerce-api/auth', () => {
     return class AuthMock {
@@ -23,7 +23,7 @@ jest.mock('../../commerce-api/auth', () => {
         }
     }
 })
-// http://localhost:3000/mobify/proxy/ocapi/s/RefArch/dw/shop/v21_3/baskets/5e8f00d5cbf4317f915c927d02/items/67e6dab7714092a1e8925763f8
+
 jest.mock('../../commerce-api/ocapi-shopper-baskets', () => {
     return class ShopperBasketsMock {
         async addCouponToBasket() {
@@ -37,6 +37,12 @@ jest.mock('../../commerce-api/ocapi-shopper-baskets', () => {
         }
         async updateItemInBasket() {
             return mockedBasketResponse
+        }
+        async updateShippingMethodForShipment() {
+            return mockedBasketResponse
+        }
+        async getShippingMethodsForShipment() {
+            return mockedShippingMethodsResponse
         }
     }
 })
@@ -106,6 +112,16 @@ test('Renders cart components when there are items', async () => {
     expect(screen.getByText(/Black Single Pleat Athletic Fit Wool Suit/i)).toBeInTheDocument()
 })
 
+test('Applies default shipping method to basket and renders estimated pricing', async () => {
+    renderWithProviders(<WrappedCart />)
+    expect(await screen.findByTestId('sf-cart-container')).toBeInTheDocument()
+
+    const summary = screen.getByTestId('sf-order-summary')
+    expect(await within(summary).findByText(/promo applied/i)).toBeInTheDocument()
+    expect(within(summary).getByText(/free/i)).toBeInTheDocument()
+    expect(within(summary).getByText(/\$30.00/i)).toBeInTheDocument()
+})
+
 test('Can update item in the cart', async () => {
     renderWithProviders(<WrappedCart />)
     expect(await screen.findByTestId('sf-cart-container')).toBeInTheDocument()
@@ -113,57 +129,17 @@ test('Can update item in the cart', async () => {
 
     mockedBasketResponse = {
         ...mockedBasketResponse,
-        productItems: [
-            keysToCamel({
-                _type: 'product_item',
-                adjusted_tax: 30.0,
-                base_price: 299.99,
-                bonus_product_line_item: false,
-                gift: false,
-                item_id: '12d70b6c0c3cedd3523001906d',
-                item_text: 'Black Single Pleat Athletic Fit Wool Suit - Edit',
-                price: 599.98,
-                price_after_item_discount: 599.98,
-                price_after_order_discount: 599.98,
-                product_id: '750518699578M',
-                product_name: 'Black Single Pleat Athletic Fit Wool Suit - Edit',
-                quantity: 2,
-                shipment_id: 'me',
-                tax: 30.0,
-                tax_basis: 599.98,
-                tax_class_id: 'standard',
-                tax_rate: 0.05
-            })
-        ],
-        productSubTotal: 599.98,
-        productTotal: 599.98,
-        shipments: [
-            keysToCamel({
-                _type: 'shipment',
-                adjusted_merchandize_total_tax: 30.0,
-                adjusted_shipping_total_tax: null,
-                gift: false,
-                merchandize_total_tax: 30.0,
-                product_sub_total: 599.98,
-                product_total: 599.98,
-                shipment_id: 'me',
-                shipment_total: null,
-                shipping_status: 'not_shipped',
-                shipping_total: null,
-                shipping_total_tax: null,
-                tax_total: null
-            })
-        ]
+        productItems: [{...mockedBasketResponse.productItems[0], quantity: 3}]
     }
 
     const cartItem = await screen.findByTestId('sf-cart-item-0')
-    expect(within(cartItem).getByRole('combobox')).toHaveValue('1')
+    expect(within(cartItem).getByRole('combobox')).toHaveValue('2')
 
     // update item quantity
-    user.selectOptions(within(cartItem).getByRole('combobox'), ['2'])
+    userEvent.selectOptions(within(cartItem).getByRole('combobox'), ['3'])
 
     await waitForElementToBeRemoved(() => screen.getByText(/loading\.\.\./i))
-    expect(await within(cartItem).getByRole('combobox')).toHaveValue('2')
+    expect(await within(cartItem).getByRole('combobox')).toHaveValue('3')
 })
 
 test('Can remove item from the cart', async () => {
