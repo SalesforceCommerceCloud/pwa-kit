@@ -35,7 +35,7 @@ const AddToCartModal = ({product, variant, quantity, ...props}) => {
     const variationAttributes = useVariationAttributes(product)
     const {productId, variationValues} = variant
     const lineItemPrice = productItems?.find((item) => item.productId === productId)?.price
-
+console.log(variationAttributes)
     const image = filterImageGroups(product.imageGroups, {
         size: 'small',
         selectedVariationAttributes: variationValues
@@ -74,7 +74,7 @@ const AddToCartModal = ({product, variant, quantity, ...props}) => {
                         >
                             <Flex justifyContent="space-between">
                                 <Flex gridGap="4">
-                                    <Box w="20" flex="none">
+                                    <Box w="24" flex="none">
                                         <AspectRatio ratio="1">
                                             <Image src={image.link} alt={image.alt} />
                                         </AspectRatio>
@@ -85,7 +85,7 @@ const AddToCartModal = ({product, variant, quantity, ...props}) => {
                                             {variationAttributes.map((attr) => {
                                                 return (
                                                     <Text key={attr.id}>
-                                                        {attr.selectedValue.name}
+                                                        {attr.name}: {attr.selectedValue.name}
                                                     </Text>
                                                 )
                                             })}
