@@ -1664,7 +1664,7 @@ const applyPatches = once((options) => {
     // We patch once and once only, because otherwise
     // it's challenging to test the server under different
     // conditions.
-    const getAppHost = () => options.appHostName
+    const getAppHost = () => options.appHostname
     http.request = outgoingRequestHook(http.request, getAppHost)
     http.get = outgoingRequestHook(http.get, getAppHost)
     https.request = outgoingRequestHook(https.request, getAppHost)
