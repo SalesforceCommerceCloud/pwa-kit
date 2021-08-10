@@ -27,6 +27,9 @@ import {DEFAULT_CURRENCY} from '../../constants'
 import {useVariationAttributes} from '../../hooks'
 import {filterImageGroups} from '../../utils/image-groups-utils'
 
+/**
+ * Visual feedback for adding item to the cart.
+ */
 const AddToCartModal = ({product, variant, quantity, ...props}) => {
     const intl = useIntl()
     const basket = useBasket()
