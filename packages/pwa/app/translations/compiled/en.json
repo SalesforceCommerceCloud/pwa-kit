@@ -47,6 +47,20 @@
       "value": "See full details"
     }
   ],
+  "1LblQ6": [
+    {
+      "type": 0,
+      "value": "Cart Subtotal ("
+    },
+    {
+      "type": 1,
+      "value": "itemAccumulatedCount"
+    },
+    {
+      "type": 0,
+      "value": " item)"
+    }
+  ],
   "1TQMt0": [
     {
       "type": 1,
@@ -1437,20 +1451,6 @@
     {
       "type": 0,
       "value": "Your Cart is Empty"
-    }
-  ],
-  "o+cEYF": [
-    {
-      "type": 0,
-      "value": "Cart Subtotal ("
-    },
-    {
-      "type": 1,
-      "value": "itemCount"
-    },
-    {
-      "type": 0,
-      "value": " item)"
     }
   ],
   "o1QPc9": [

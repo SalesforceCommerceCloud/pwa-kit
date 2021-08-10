@@ -23,6 +23,9 @@
   "1LE+iY": {
     "defaultMessage": "See full details"
   },
+  "1LblQ6": {
+    "defaultMessage": "Cart Subtotal ({itemAccumulatedCount} item)"
+  },
   "1TQMt0": {
     "defaultMessage": "{quantity} {itemLabel} added to cart."
   },
@@ -652,9 +655,6 @@
   },
   "nYi7Xz": {
     "defaultMessage": "Your Cart is Empty"
-  },
-  "o+cEYF": {
-    "defaultMessage": "Cart Subtotal ({itemCount} item)"
   },
   "o1QPc9": {
     "defaultMessage": "Tracking Number"
