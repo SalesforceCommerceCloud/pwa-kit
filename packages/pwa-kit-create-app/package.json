@@ -1,12 +1,12 @@
 {
   "name": "pwa-kit-create-app",
-  "version": "0.8.1-alpha.0",
+  "version": "0.8.1",
   "description": "Salesforce's project generator tool",
   "author": "dev@mobify.com",
   "license": "See license in LICENSE",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/mobify/mobify-platform-sdks.git"
+    "url": "git+https://github.com/SalesforceCommerceCloud/pwa-kit.git"
   },
   "bin": "scripts/create-mobify-app.js",
   "files": [
