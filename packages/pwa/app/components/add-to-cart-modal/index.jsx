@@ -35,7 +35,7 @@ const AddToCartModal = ({product, variant, quantity, ...props}) => {
     const variationAttributes = useVariationAttributes(product)
     const {productId, variationValues} = variant
     const lineItemPrice = productItems?.find((item) => item.productId === productId)?.price
-console.log(variationAttributes)
+
     const image = filterImageGroups(product.imageGroups, {
         size: 'small',
         selectedVariationAttributes: variationValues
