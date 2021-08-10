@@ -27,7 +27,6 @@ import {productUrlBuilder} from '../../utils/url'
 import {isServer, noop} from '../../utils/utils'
 import Link from '../link'
 import withRegistration from '../../hoc/with-registration'
-import {customerProductListTypes} from '../../constants'
 
 const IconButtonWithRegistration = withRegistration(IconButton)
 
@@ -62,14 +61,13 @@ const ProductTile = (props) => {
         productSearchItem,
         // eslint-disable-next-line react/prop-types
         staticContext,
-        onWishlistItemToggled = noop,
-        existsInListTypes = {},
+        // onWishlistItemToggled = noop,
+        onAddToWishlistClick = noop,
+        onRemoveWishlistClick = noop,
+        isInWishlist,
         ...rest
     } = props
-    const {currency, image, price, productName, productId} = productSearchItem
-    const isProductInWishlist = existsInListTypes[customerProductListTypes.WISHLIST]?.includes(
-        productId
-    )
+    const {currency, image, price, productName} = productSearchItem
 
     return (
         <Link
@@ -87,7 +85,7 @@ const ProductTile = (props) => {
                 <AspectRatio {...styles.image} ratio={1} display={isServer ? 'none' : 'block'}>
                     <Image alt={image.alt} src={image.disBaseLink} ignoreFallback={true} />
                 </AspectRatio>
-                {isProductInWishlist ? (
+                {isInWishlist ? (
                     <IconButton
                         aria-label={intl.formatMessage({
                             defaultMessage: 'Wishlist'
@@ -97,7 +95,7 @@ const ProductTile = (props) => {
                         {...styles.iconButton}
                         onClick={(e) => {
                             e.preventDefault()
-                            onWishlistItemToggled()
+                            onRemoveWishlistClick()
                         }}
                     />
                 ) : (
@@ -108,7 +106,7 @@ const ProductTile = (props) => {
                         icon={<WishlistIcon />}
                         variant="unstyled"
                         {...styles.iconButton}
-                        onClick={onWishlistItemToggled}
+                        onClick={onAddToWishlistClick}
                     />
                 )}
             </Box>
@@ -137,11 +135,15 @@ ProductTile.propTypes = {
     /**
      * Types of lists the product/variant is added to. (eg: wishlist)
      */
-    existsInListTypes: PropTypes.object,
+    isInWishlist: PropTypes.bool,
     /**
-     * Callback function to be invoked when user toggles item from wishlist
+     * Callback function to be invoked when the user add item to wishlist
      */
-    onWishlistItemToggled: PropTypes.func
+    onAddToWishlistClick: PropTypes.func,
+    /**
+     * Callback function to be invoked when the user removes item to wishlist
+     */
+    onRemoveWishlistClick: PropTypes.func
 }
 
 export default ProductTile

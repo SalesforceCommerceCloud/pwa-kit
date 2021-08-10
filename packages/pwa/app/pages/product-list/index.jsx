@@ -56,12 +56,8 @@ export const REMOVE_WISHLIST_ITEM_CONFIRMATION_DIALOG_CONFIG = {
         defaultMessage: 'Are you sure you want to remove this item from your wishlist?'
     }),
     primaryActionLabel: defineMessage({defaultMessage: 'Yes, remove item'}),
-    alternateActionLabel: defineMessage({defaultMessage: 'No, keep item'}),
-    onPrimaryAction: noop
+    alternateActionLabel: defineMessage({defaultMessage: 'No, keep item'})
 }
-
-// Once loaded, we re-use the wishlist object to extract wishlistId for adding/removing items. Declaring it globally prevents unwanted re-initialization.
-let wishlist = {}
 
 /*
  * This is a simple product listing page. It displays a paginated list
@@ -77,7 +73,7 @@ const ProductList = (props) => {
     const customerProductLists = useCustomerProductLists()
     const navigate = useNavigation()
     const showToast = useToast()
-    const modalProps = useDisclosure()
+    const confirmingModalProps = useDisclosure()
 
     const {
         searchQuery,
@@ -93,7 +89,9 @@ const ProductList = (props) => {
      * Store which products exist in differnt list types.
      * Useful for handling toggle wishlist icon on product-tile
      */
-    const [productsExistInList, setProductsExistInList] = useState({})
+    const [wishlist, setWishlist] = useState({})
+    // store the clicked item for removing it from wishlist when confirming from modal
+    const [selectedItem, setSelectedItem] = useState({})
 
     const {total, sortingOptions} = productSearchResult || {}
 
@@ -118,36 +116,13 @@ const ProductList = (props) => {
     // If we are loaded and still have no products, show the no results component.
     const showNoResults = !isLoading && productSearchResult && !productSearchResult?.hits
 
-    /**
-     * Build productsFoundInListTypes object by comparing productId of items in wishlist
-     * with productId for products from productSearchResult
-     */
-    const checkProductsExistInWishlist = () => {
-        wishlist = customerProductLists.data.find(
-            (list) => list.type === customerProductListTypes.WISHLIST
-        )
-
-        const wishlistProductIds = wishlist?.customerProductListItems.map((item) => item.productId)
-
-        const productsInWishlist = []
-        productSearchResult.hits.map((product) => {
-            const isProductAddedToWishlist = wishlistProductIds.includes(product.productId)
-
-            if (isProductAddedToWishlist) {
-                productsInWishlist.push(product.productId)
-            }
-            return product
-        })
-
-        setProductsExistInList({
-            ...productsExistInList,
-            [customerProductListTypes.WISHLIST]: productsInWishlist
-        })
-    }
-
     useEffect(() => {
         if (customerProductLists.data && productSearchResult) {
-            checkProductsExistInWishlist()
+            // find the first wishlist in customer product list
+            const wishlist = customerProductLists.data.find(
+                (list) => list.type === customerProductListTypes.WISHLIST
+            )
+            setWishlist(wishlist)
         }
     }, [customerProductLists.data, productSearchResult])
 
@@ -155,59 +130,17 @@ const ProductList = (props) => {
         navigate('/account/wishlist')
     }
 
-    const handleWishlistItemToggled = (product) => {
-        // If product is found in wishlist, remove item from wishlist
-        if (productsExistInList[customerProductListTypes.WISHLIST]?.includes(product.productId)) {
-            REMOVE_WISHLIST_ITEM_CONFIRMATION_DIALOG_CONFIG.onPrimaryAction = () =>
-                removeItemFromWishlist(product.productId)
-            modalProps.onOpen()
-        } else {
-            // If product does not exist in wishlist, add item to wishlist
-            // Actively update wishlist icon while sdk call executes in the background. (Reverts if request fails)
-
-            setProductsExistInList({
-                ...productsExistInList,
-                [customerProductListTypes.WISHLIST]: [
-                    ...productsExistInList[customerProductListTypes.WISHLIST],
-                    product.productId
-                ]
-            })
-
-            try {
-                addItemToWishlist(product)
-            } catch (err) {
-                console.error(err)
-                showToast({
-                    title: intl.formatMessage(
-                        {defaultMessage: '{errorMessage}'},
-                        {errorMessage: API_ERROR_MESSAGE}
-                    ),
-                    status: 'error'
-                })
-            }
-        }
-    }
-
     /**
      * Removes product from wishlist
-     * @param {string} productId productId of item to be removed from wishlist.
      */
-    const removeItemFromWishlist = async (productId) => {
-        setProductsExistInList({
-            ...productsExistInList,
-            [customerProductListTypes.WISHLIST]: productsExistInList[
-                customerProductListTypes.WISHLIST
-            ].filter((item) => item.productId !== productId)
-        })
+    const removeItemFromWishlist = async () => {
         // Extract productListItemId corresponding to product from wishlist
-        console.log('removing from wishlist', wishlist)
-        const productListItemId = wishlist.customerProductListItems.find(
-            (item) => item.productId === productId
-        )?.id
-
+        const wishlistItemId = wishlist.customerProductListItems.find(
+            (item) => item.productId === selectedItem.productId
+        ).id
         try {
             await customerProductLists.deleteCustomerProductListItem(
-                {id: productListItemId},
+                {id: wishlistItemId},
                 wishlist.id
             )
 
@@ -220,50 +153,64 @@ const ProductList = (props) => {
             showToast({
                 title: intl.formatMessage(
                     {defaultMessage: '{errorMessage}'},
-                    {errorMessage: 'Something went wrong. Try again!'}
+                    {errorMessage: API_ERROR_MESSAGE}
                 ),
                 status: 'error'
             })
+        } finally {
+            // reset the selected state
+            setSelectedItem(undefined)
         }
     }
 
     const addItemToWishlist = async (product) => {
-        // If product-lists have not loaded we push "Add to wishlist" event to eventQueue to be
-        // processed once the product-lists have loaded.
-        if (!customerProductLists?.loaded) {
-            const event = {
-                item: {...product, id: product.productId, quantity: 1},
-                action: eventActions.ADD,
-                listType: customerProductListTypes.WISHLIST
-            }
+        try {
+            // If product-lists have not loaded we push "Add to wishlist" event to eventQueue to be
+            // processed once the product-lists have loaded.
+            if (!customerProductLists?.loaded) {
+                const event = {
+                    item: {...product, id: product.productId, quantity: 1},
+                    action: eventActions.ADD,
+                    listType: customerProductListTypes.WISHLIST
+                }
 
-            customerProductLists.addActionToEventQueue(event)
-        } else {
-            const requestBody = {
-                productId: product.productId,
-                priority: 1,
-                quantity: 1,
-                public: false,
-                type: 'product'
-            }
+                customerProductLists.addActionToEventQueue(event)
+            } else {
+                const requestBody = {
+                    productId: product.productId,
+                    priority: 1,
+                    quantity: 1,
+                    public: false,
+                    type: 'product'
+                }
 
-            const wishlistItem = await customerProductLists.createCustomerProductListItem(
-                requestBody,
-                wishlist.id
-            )
-
-            if (wishlistItem?.id) {
-                const toastAction = (
-                    <Button variant="link" onClick={handleViewWishlistClick}>
-                        View
-                    </Button>
+                const wishlistItem = await customerProductLists.createCustomerProductListItem(
+                    requestBody,
+                    wishlist.id
                 )
-                showToast({
-                    title: intl.formatMessage({defaultMessage: '1 item added to wishlist'}),
-                    status: 'success',
-                    action: toastAction
-                })
+
+                if (wishlistItem?.id) {
+                    const toastAction = (
+                        <Button variant="link" onClick={handleViewWishlistClick}>
+                            View
+                        </Button>
+                    )
+                    showToast({
+                        title: intl.formatMessage({defaultMessage: '1 item added to wishlist'}),
+                        status: 'success',
+                        action: toastAction
+                    })
+                }
             }
+        } catch (err) {
+            console.error(err)
+            showToast({
+                title: intl.formatMessage(
+                    {defaultMessage: '{errorMessage}'},
+                    {errorMessage: API_ERROR_MESSAGE}
+                ),
+                status: 'error'
+            })
         }
     }
 
@@ -326,17 +273,26 @@ const ProductList = (props) => {
                             ? new Array(searchParams.limit)
                                   .fill(0)
                                   .map((value, index) => <ProductTileSkeleton key={index} />)
-                            : productSearchResult.hits.map((productSearchItem) => (
-                                  <ProductTile
-                                      data-testid={`sf-product-tile-${productSearchItem.productId}`}
-                                      key={productSearchItem.productId}
-                                      productSearchItem={productSearchItem}
-                                      onWishlistItemToggled={() =>
-                                          handleWishlistItemToggled(productSearchItem)
-                                      }
-                                      existsInListTypes={productsExistInList}
-                                  />
-                              ))}
+                            : productSearchResult.hits.map((productSearchItem) => {
+                                  const isInWishlist = wishlist?.customerProductListItems
+                                      ?.map(({productId}) => productId)
+                                      .includes(productSearchItem.productId)
+                                  return (
+                                      <ProductTile
+                                          data-testid={`sf-product-tile-${productSearchItem.productId}`}
+                                          key={productSearchItem.productId}
+                                          productSearchItem={productSearchItem}
+                                          onAddToWishlistClick={() =>
+                                              addItemToWishlist(productSearchItem)
+                                          }
+                                          onRemoveWishlistClick={() => {
+                                              confirmingModalProps.onOpen()
+                                              setSelectedItem(productSearchItem)
+                                          }}
+                                          isInWishlist={isInWishlist}
+                                      />
+                                  )
+                              })}
                     </SimpleGrid>
 
                     {/* Footer */}
@@ -365,7 +321,8 @@ const ProductList = (props) => {
             )}
             <ConfirmationModal
                 {...REMOVE_WISHLIST_ITEM_CONFIRMATION_DIALOG_CONFIG}
-                {...modalProps}
+                onPrimaryAction={removeItemFromWishlist}
+                {...confirmingModalProps}
             />
         </Box>
     )
@@ -450,8 +407,9 @@ ProductList.propTypes = {
      * Notes: This prop is internally provided.
      */
     location: PropTypes.object,
-
-    searchQuery: PropTypes.string
+    searchQuery: PropTypes.string,
+    onAddToWishlistClick: PropTypes.func,
+    onRemoveWishlistClick: PropTypes.func
 }
 
 export default ProductList
