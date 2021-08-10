@@ -121,7 +121,8 @@ const AddToCartModal = ({product, variant, quantity, ...props}) => {
                                 <Text fontWeight="700">
                                     {intl.formatMessage(
                                         {
-                                            defaultMessage: 'Cart Subtotal ({itemAccumulatedCount} item)'
+                                            defaultMessage:
+                                                'Cart Subtotal ({itemAccumulatedCount} item)'
                                         },
                                         {itemAccumulatedCount}
                                     )}
