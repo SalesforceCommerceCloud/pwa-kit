@@ -124,7 +124,7 @@ const ProductView = ({
         }
 
         const handleWishlistItem = () => {
-            if (!updateWishlist && !updateWishlist) return null
+            if (!updateWishlist && !addToWishlist) return null
             if (updateWishlist) {
                 updateCart(variant, quantity)
                 return
