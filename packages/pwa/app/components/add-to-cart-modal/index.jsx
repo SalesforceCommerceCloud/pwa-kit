@@ -34,7 +34,7 @@ const AddToCartModal = ({product, variant, quantity, ...props}) => {
     const intl = useIntl()
     const basket = useBasket()
     const size = useBreakpointValue({base: 'full', lg: '2xl', xl: '4xl'})
-    const {currency, productItems, productSubTotal, itemCount} = basket
+    const {currency, productItems, productSubTotal, itemAccumulatedCount} = basket
     const variationAttributes = useVariationAttributes(product)
     const {productId, variationValues} = variant
     const lineItemPrice =
@@ -121,9 +121,9 @@ const AddToCartModal = ({product, variant, quantity, ...props}) => {
                                 <Text fontWeight="700">
                                     {intl.formatMessage(
                                         {
-                                            defaultMessage: 'Cart Subtotal ({itemCount} item)'
+                                            defaultMessage: 'Cart Subtotal ({itemAccumulatedCount} item)'
                                         },
-                                        {itemCount}
+                                        {itemAccumulatedCount}
                                     )}
                                 </Text>
                                 <Text alignSelf="flex-end" fontWeight="600">
