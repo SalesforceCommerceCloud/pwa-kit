@@ -125,6 +125,7 @@ const AccountWishlist = () => {
                         key={item.id}
                         product={{
                             ...wishlist._productItemsDetail[item.productId],
+                            productId: item.productId,
                             productName: wishlist._productItemsDetail[item.productId].name,
                             price: wishlist._productItemsDetail[item.productId].price,
                             quantity: item.quantity

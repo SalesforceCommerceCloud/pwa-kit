@@ -64,7 +64,12 @@ const WishlistSecondaryButtonGroup = ({productListItemId, listId, onClick = noop
     return (
         <>
             <ButtonGroup spacing="6">
-                <Button variant="link" size="sm" onClick={showRemoveItemConfirmation}>
+                <Button
+                    variant="link"
+                    size="sm"
+                    onClick={showRemoveItemConfirmation}
+                    data-testid={`sf-wishlist-remove-${productListItemId}`}
+                >
                     <FormattedMessage defaultMessage="Remove" />
                 </Button>
                 {/* <Button variant="link" size="sm" onClick={onItemEdit}>
