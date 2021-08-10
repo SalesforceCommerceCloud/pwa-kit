@@ -143,7 +143,7 @@ const ProductList = (props) => {
                     {/* Header */}
 
                     <Stack
-                        display={{base: 'none', md: 'flex'}}
+                        display={{base: 'none', lg: 'flex'}}
                         direction="row"
                         justify="flex-start"
                         align="center"
