@@ -1,6 +1,6 @@
 {
   "name": "progressive-web-sdk",
-  "version": "2.4.7",
+  "version": "2.4.8",
   "description": "A set of libraries and components which make up the SDK for Progressive Web",
   "main": "dist/index.js",
   "bin": {
@@ -42,7 +42,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/mobify/mobify-platform-sdks.git"
+    "url": "git+https://github.com/SalesforceCommerceCloud/pwa-kit.git"
   },
   "author": "dev@mobify.com",
   "license": "SEE LICENSE IN LICENSE",
