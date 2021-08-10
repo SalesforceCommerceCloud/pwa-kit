@@ -86,6 +86,9 @@
   "7PMLfK": {
     "defaultMessage": "Order Total"
   },
+  "7gXPhB": {
+    "defaultMessage": "Qty"
+  },
   "7xscgD": {
     "defaultMessage": "Delivery Details"
   },
@@ -107,6 +110,9 @@
   "A8Tnga": {
     "defaultMessage": "Credit Card"
   },
+  "ADKef8": {
+    "defaultMessage": "Add to cart"
+  },
   "AYIKp4": {
     "defaultMessage": "Already have an account? Log in"
   },
@@ -124,6 +130,9 @@
   },
   "BAoId6": {
     "defaultMessage": "Please enter your phone number"
+  },
+  "BWpuKl": {
+    "defaultMessage": "Update"
   },
   "BlJFo9": {
     "defaultMessage": "This email already has an account."
@@ -514,6 +523,9 @@
   "fuzq0p": {
     "defaultMessage": "Checkout as guest"
   },
+  "gXWNJQ": {
+    "defaultMessage": "1 item added to cart"
+  },
   "gg6vZx": {
     "defaultMessage": "Shop by Category"
   },
@@ -640,6 +652,9 @@
   },
   "nYi7Xz": {
     "defaultMessage": "Your Cart is Empty"
+  },
+  "o+cEYF": {
+    "defaultMessage": "Cart Subtotal ({itemCount} item)"
   },
   "o1QPc9": {
     "defaultMessage": "Tracking Number"
@@ -804,8 +819,5 @@
   },
   "zXbRZR": {
     "defaultMessage": "Order Number: {orderNumber}"
-  },
-  "zb24ln": {
-    "defaultMessage": "{content}"
   }
 }
