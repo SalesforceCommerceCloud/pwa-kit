@@ -67,7 +67,7 @@ const AddToCartModal = ({product, variant, quantity, ...props}) => {
                     >
                         <Box
                             flex="1"
-                            paddingX={{base: '4', xl: '8'}}
+                            paddingRight={{lg: '4', xl: '8'}}
                             paddingY={{base: '4', lg: '0'}}
                             // divider style
                             borderRightWidth={{lg: '1px'}}
@@ -114,7 +114,7 @@ const AddToCartModal = ({product, variant, quantity, ...props}) => {
                         </Box>
                         <Box
                             flex="1"
-                            paddingX={{base: '4', xl: '8'}}
+                            paddingLeft={{lg: '4', xl: '8'}}
                             paddingY={{base: '4', lg: '0'}}
                         >
                             <Flex justifyContent="space-between" marginBottom="8">
