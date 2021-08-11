@@ -2,7 +2,7 @@
  * Copyright (c) 2021 Mobify Research & Development Inc. All rights reserved. *
  * * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
 
-import {useEffect, useState} from 'react'
+import {useEffect, useState, useRef} from 'react'
 import {rebuildPathWithParams, removeQueryParamsFromPath} from '../utils/url'
 import {useHistory, useLocation} from 'react-router-dom'
 import {isError, useCommerceAPI} from '../commerce-api/utils'
@@ -26,7 +26,7 @@ export const useProductViewModal = (initialProduct) => {
     const [isFetching, setIsFetching] = useState(false)
     const toast = useToast()
     const variant = useVariant(product)
-
+    const previousLocation = useRef(location.pathname)
     const cleanUpVariantParams = () => {
         const paramToRemove = [...product.variationAttributes.map(({id}) => id), 'pid']
         const updatedUrl = removeQueryParamsFromPath(
@@ -37,12 +37,19 @@ export const useProductViewModal = (initialProduct) => {
     }
 
     useEffect(() => {
+        previousLocation.current = location.pathname
+    }, [location.pathname])
+
+    useEffect(() => {
         // when the modal is first mounted,
         // clean up the params in case there are variant params not related to current product
         cleanUpVariantParams()
         return () => {
-            // clean up the product and variant parameter from the url when the modal is unmouted
-            cleanUpVariantParams()
+            // do nothing when the user is navigating to another page
+            if (history.location.pathname === previousLocation.current) {
+                // clean up the product and variant parameter from the url when the modal is unmouted
+                cleanUpVariantParams()
+            }
         }
     }, [])
 
