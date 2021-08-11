@@ -40,7 +40,7 @@ export default function useCustomerProductLists() {
                         }
                         await addItemToCustomerProductList(
                             productItem,
-                            event.list.id,
+                            event.list?.id,
                             event.listType
                         )
                         showToast({
@@ -82,7 +82,7 @@ export default function useCustomerProductLists() {
         }
     }, [customerProductLists])
 
-    const addItemToCustomerProductList = async (item) => {
+    const addItemToCustomerProductList = async (item, listId, listType) => {
         const requestBody = {
             productId: item.productId,
             priority: 1,
@@ -91,10 +91,12 @@ export default function useCustomerProductLists() {
             type: 'product'
         }
 
-        const wishList = customerProductLists.data.find(
-            (list) => list.type === customerProductListTypes.WISHLIST
-        )
-        return await self.createCustomerProductListItem(wishList, requestBody)
+        // Either find the list by the id or by the type
+        const productList = listId
+            ? customerProductLists.data.find((list) => list.id === listId)
+            : customerProductLists.data.find((list) => list.type === listType)
+
+        return await self.createCustomerProductListItem(productList, requestBody)
     }
 
     const self = useMemo(() => {

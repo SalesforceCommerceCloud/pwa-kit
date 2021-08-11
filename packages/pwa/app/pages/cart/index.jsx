@@ -149,8 +149,8 @@ const Cart = () => {
                 }
 
                 const wishlistItem = await customerProductLists.createCustomerProductListItem(
-                    requestBody,
-                    wishlist.id
+                    wishlist,
+                    requestBody
                 )
 
                 if (wishlistItem?.id) {
