@@ -18,11 +18,10 @@ import CartSecondaryButtonGroup from './partials/cart-secondary-button-group'
 import ProductViewModal from '../../components/product-view-modal'
 
 import {useToast} from '../../hooks/use-toast'
-import {API_ERROR_MESSAGE} from '../account/constant'
 import useCustomerProductLists, {
     eventActions
 } from '../../commerce-api/hooks/useCustomerProductLists'
-import {customerProductListTypes} from '../../constants'
+import {API_ERROR_MESSAGE, customerProductListTypes} from '../../constants'
 import useNavigation from '../../hooks/use-navigation'
 
 const Cart = () => {

@@ -9,9 +9,8 @@ import {
     convertSnakeCaseToSentenceCase
 } from '../utils'
 import useCustomer from './useCustomer'
-import {customerProductListTypes} from '../../constants'
+import {API_ERROR_MESSAGE, customerProductListTypes} from '../../constants'
 import {useToast} from '../../hooks/use-toast'
-import {API_ERROR_MESSAGE} from '../../pages/account/constant'
 // If the customerProductLists haven't yet loaded we store user actions inside
 // eventQueue and process the eventQueue once productLists have loaded
 const eventQueue = []

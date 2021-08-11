@@ -9,12 +9,11 @@ import {WishlistIcon} from '../../../components/icons'
 import useNavigation from '../../../hooks/use-navigation'
 import useCustomerProductLists from '../../../commerce-api/hooks/useCustomerProductLists'
 import {Box, Flex, Skeleton} from '@chakra-ui/react'
-import {customerProductListTypes} from '../../../constants'
+import {API_ERROR_MESSAGE, customerProductListTypes} from '../../../constants'
 import ProductItem from '../../../components/product-item/index'
 import {useToast} from '../../../hooks/use-toast'
 import WishlistPrimaryAction from './partials/wishlist-primary-action'
 import WishlistSecondaryButtonGroup from './partials/wishlist-secondary-button-group'
-import {API_ERROR_MESSAGE} from '../constant'
 
 const numberOfSkeletonItems = 3
 

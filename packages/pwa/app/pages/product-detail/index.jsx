@@ -36,11 +36,10 @@ import ProductView from '../../partials/product-view'
 import {HTTPNotFound} from 'pwa-kit-react-sdk/dist/ssr/universal/errors'
 
 // constant
-import {customerProductListTypes} from '../../constants'
+import {API_ERROR_MESSAGE, customerProductListTypes} from '../../constants'
 import {rebuildPathWithParams} from '../../utils/url'
 import {useHistory} from 'react-router-dom'
 import {useToast} from '../../hooks/use-toast'
-import {API_ERROR_MESSAGE} from '../account/constant'
 
 const ProductDetail = ({category, product, isLoading}) => {
     const intl = useIntl()

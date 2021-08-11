@@ -10,7 +10,7 @@ import PropTypes from 'prop-types'
 import {useCartItemVariant} from '../../../../components/cart-item-variant'
 import {noop} from '../../../../utils/utils'
 import {useToast} from '../../../../hooks/use-toast'
-import {API_ERROR_MESSAGE} from '../../constant'
+import {API_ERROR_MESSAGE} from '../../../../constants'
 
 export const REMOVE_WISHLIST_ITEM_CONFIRMATION_DIALOG_CONFIG = {
     dialogTitle: defineMessage({defaultMessage: 'Confirm Remove Item'}),
