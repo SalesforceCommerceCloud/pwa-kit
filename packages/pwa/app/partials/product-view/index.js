@@ -337,12 +337,12 @@ const ProductView = ({
                 {renderActionButtons()}
             </Box>
 
-            {addToCartModalState.isOpen && (
+            {isAddToCartModalOpen && (
                 <AddToCartModal
                     product={product}
                     variant={variant}
                     quantity={quantity}
-                    {...addToCartModalState}
+                    isOpen={isAddToCartModalOpen}
                 >
                     <RecommendedProducts
                         title={<FormattedMessage defaultMessage="You Might Also Like" />}
