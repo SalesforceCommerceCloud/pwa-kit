@@ -61,7 +61,6 @@ const ProductTile = (props) => {
         productSearchItem,
         // eslint-disable-next-line react/prop-types
         staticContext,
-        // onWishlistItemToggled = noop,
         onAddToWishlistClick = noop,
         onRemoveWishlistClick = noop,
         isInWishlist,
