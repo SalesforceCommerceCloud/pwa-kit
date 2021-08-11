@@ -10,7 +10,6 @@ import {
     Button,
     Flex,
     Text,
-    Image,
     Modal,
     ModalHeader,
     ModalBody,
