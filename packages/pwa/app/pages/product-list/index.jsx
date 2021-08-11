@@ -72,7 +72,11 @@ const ProductList = (props) => {
     const customerProductLists = useCustomerProductLists()
     const navigate = useNavigation()
     const showToast = useToast()
-    const confirmingModalProps = useDisclosure()
+    const {
+        isOpen: isConfirmingModalOpen,
+        onOpen: onConfirmingModalOpen,
+        onClose: onConfirmingModalClose
+    } = useDisclosure()
 
     const {
         searchQuery,
@@ -285,7 +289,7 @@ const ProductList = (props) => {
                                               addItemToWishlist(productSearchItem)
                                           }
                                           onRemoveWishlistClick={() => {
-                                              confirmingModalProps.onOpen()
+                                              onConfirmingModalOpen()
                                               setSelectedItem(productSearchItem)
                                           }}
                                           isInWishlist={isInWishlist}
@@ -321,7 +325,8 @@ const ProductList = (props) => {
             <ConfirmationModal
                 {...REMOVE_WISHLIST_ITEM_CONFIRMATION_DIALOG_CONFIG}
                 onPrimaryAction={removeItemFromWishlist}
-                {...confirmingModalProps}
+                isOpen={isConfirmingModalOpen}
+                onClose={onConfirmingModalClose}
             />
         </Box>
     )
