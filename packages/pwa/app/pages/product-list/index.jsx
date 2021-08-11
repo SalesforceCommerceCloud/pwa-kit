@@ -40,7 +40,6 @@ import {useToast} from '../../hooks/use-toast'
 // Others
 import {CategoriesContext} from '../../contexts'
 import {HTTPNotFound} from 'pwa-kit-react-sdk/dist/ssr/universal/errors'
-import {noop} from '../../utils/utils'
 
 // Constants
 import {
