@@ -230,7 +230,7 @@ jobs:
             # publishing them to the local npm repo would be successful).
 
             if [[ "${CIRCLE_BRANCH}" == "develop" ]]; then
-              snyk monitor --ignore-policy --remote-repo-url='https://github.com/mobify/mobify-platform-sdks.git' --project-name='generated-scaffold-pwa' --org='mobify'
+              snyk monitor --ignore-policy --remote-repo-url='https://github.com/SalesforceCommerceCloud/pwa-kit.git' --project-name='generated-scaffold-pwa'
             fi
       - run:
           name: Count Generated Project Dependencies
