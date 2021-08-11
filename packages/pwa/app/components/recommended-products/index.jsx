@@ -5,7 +5,7 @@ import React, {useEffect, useRef, useState} from 'react'
 import PropTypes from 'prop-types'
 import ProductScroller from '../../components/product-scroller'
 import useEinstein from '../../commerce-api/hooks/useEinstein'
-import useIntersectionObserver from '../../hooks/useIntersectionObserver'
+import useIntersectionObserver from '../../hooks/use-intersection-observer'
 
 /**
  * A component for fetching and rendering product recommendations from the Einstein API
