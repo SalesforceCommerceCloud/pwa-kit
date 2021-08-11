@@ -44,7 +44,7 @@ const AddToCartModal = ({product, variant, quantity, isOpen, ...props}) => {
     }).images?.[0]
 
     return (
-        <Modal size={size} {...props}>
+        <Modal size={size} isOpen={isOpen} {...props}>
             <ModalOverlay />
             <ModalContent
                 margin="0"
