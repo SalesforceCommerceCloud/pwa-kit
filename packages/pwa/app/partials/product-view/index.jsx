@@ -5,9 +5,20 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {useHistory} from 'react-router-dom'
-import {useIntl} from 'react-intl'
+import {FormattedMessage, useIntl} from 'react-intl'
 
-import {Flex, Heading, Button, Skeleton, Box, Text, VStack, Select, Fade} from '@chakra-ui/react'
+import {
+    Flex,
+    Heading,
+    Button,
+    Skeleton,
+    Box,
+    Text,
+    VStack,
+    Select,
+    Fade,
+    useDisclosure
+} from '@chakra-ui/react'
 
 import {useProduct} from '../../hooks'
 
@@ -20,6 +31,9 @@ import Link from '../../components/link'
 import withRegistration from '../../hoc/with-registration'
 import {DEFAULT_CURRENCY} from '../../constants'
 import {Skeleton as ImageGallerySkeleton} from '../../components/image-gallery'
+import AddToCartModal from '../../components/add-to-cart-modal'
+import RecommendedProducts from '../../components/recommended-products'
+
 const MAX_ORDER_QUANTITY = 10
 
 const ProductViewHeader = ({name, price, currency, category}) => {
@@ -79,6 +93,7 @@ const ProductView = ({
 }) => {
     const intl = useIntl()
     const history = useHistory()
+    const {isOpen: isAddToCartModalOpen, onOpen: onAddToCartModalOpen} = useDisclosure()
 
     const {
         showLoading,
@@ -92,50 +107,64 @@ const ProductView = ({
         stepQuantity,
         stockLevel
     } = useProduct(product)
-
     const canAddToWishlist = !isProductLoading
     const canOrder = !isProductLoading && variant?.orderable && quantity <= stockLevel
+
     const renderActionButtons = () => {
         const buttons = []
-        const cartButtonContent = addToCart ? 'Add to cart' : 'Update'
-        const wishlistButtonContent = addToWishlist ? 'Add to wishlist' : 'Update'
-        if (addToCart || updateCart) {
+
+        const handleCartItem = () => {
+            if (!addToCart && !updateCart) return null
+            if (updateCart) {
+                updateCart(variant, quantity)
+                return
+            }
+            addToCart(variant, quantity)
+            onAddToCartModalOpen()
+        }
+
+        const handleWishlistItem = () => {
+            if (!updateWishlist && !addToWishlist) return null
+            if (updateWishlist) {
+                updateWishlist(variant, quantity)
+                return
+            }
+            addToWishlist(variant, quantity)
+        }
+
+        if (handleCartItem) {
             buttons.push(
                 <Button
-                    onClick={() =>
-                        addToCart?.(variant, quantity) || updateCart?.(variant, quantity)
-                    }
-                    disabled={!canOrder}
                     key="cart-button"
+                    onClick={handleCartItem}
+                    disabled={!canOrder}
                     width="100%"
+                    variant="solid"
                     marginTop={4}
                     marginBottom={4}
-                    variant="solid"
                 >
-                    {intl.formatMessage(
-                        {defaultMessage: '{content}'},
-                        {content: cartButtonContent}
-                    )}
+                    {updateCart
+                        ? intl.formatMessage({defaultMessage: 'Update'})
+                        : intl.formatMessage({defaultMessage: 'Add to cart'})}
                 </Button>
             )
         }
-        if (addToWishlist || updateWishlist) {
+
+        if (handleWishlistItem) {
             buttons.push(
                 <ButtonWithRegistration
-                    width={'100%'}
-                    variant="outline"
-                    my={4}
-                    onClick={() =>
-                        addToWishlist?.(variant, quantity) || updateWishlist?.(variant, quantity)
-                    }
                     key="wishlist-button"
+                    onClick={handleWishlistItem}
                     disabled={isCustomerProductListLoading || !canAddToWishlist}
                     isLoading={isCustomerProductListLoading}
+                    width="100%"
+                    variant="outline"
+                    marginTop={4}
+                    marginBottom={4}
                 >
-                    {intl.formatMessage(
-                        {defaultMessage: '{content}'},
-                        {content: wishlistButtonContent}
-                    )}
+                    {updateWishlist
+                        ? intl.formatMessage({defaultMessage: 'Update'})
+                        : intl.formatMessage({defaultMessage: 'Add to wishlist'})}
                 </ButtonWithRegistration>
             )
         }
@@ -307,6 +336,23 @@ const ProductView = ({
             >
                 {renderActionButtons()}
             </Box>
+
+            {isAddToCartModalOpen && (
+                <AddToCartModal
+                    product={product}
+                    variant={variant}
+                    quantity={quantity}
+                    isOpen={isAddToCartModalOpen}
+                >
+                    <RecommendedProducts
+                        title={<FormattedMessage defaultMessage="You Might Also Like" />}
+                        recommender={'pdp-similar-items'}
+                        products={product && [product.id]}
+                        mx={{base: -4, md: -8, lg: 0}}
+                        shouldFetch={() => product?.id}
+                    />
+                </AddToCartModal>
+            )}
         </Flex>
     )
 }
