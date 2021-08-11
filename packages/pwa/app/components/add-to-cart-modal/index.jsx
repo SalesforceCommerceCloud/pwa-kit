@@ -42,6 +42,8 @@ const AddToCartModal = ({product, variant, quantity, isOpen, onClose, ...props})
         size: 'small',
         selectedVariationAttributes: variationValues
     }).images?.[0]
+    console.log(lineItemPrice)
+    console.log(!!lineItemPrice)
 
     return (
         <Modal size={size} isOpen={isOpen} onClose={onClose} {...props}>
@@ -102,7 +104,7 @@ const AddToCartModal = ({product, variant, quantity, isOpen, onClose, ...props})
                                 </Flex>
                                 <Box flex="none" alignSelf="flex-end" fontWeight="600">
                                     <Text>
-                                        {lineItemPrice &&
+                                        {!!lineItemPrice &&
                                             intl.formatNumber(lineItemPrice, {
                                                 style: 'currency',
                                                 currency: currency || DEFAULT_CURRENCY
