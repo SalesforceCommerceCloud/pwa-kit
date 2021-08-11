@@ -93,7 +93,11 @@ const ProductView = ({
 }) => {
     const intl = useIntl()
     const history = useHistory()
-    const {isOpen: isAddToCartModalOpen, onOpen: onAddToCartModalOpen} = useDisclosure()
+    const {
+        isOpen: isAddToCartModalOpen,
+        onOpen: onAddToCartModalOpen,
+        onClose: onAddToCartModalClose
+    } = useDisclosure()
 
     const {
         showLoading,
@@ -132,7 +136,7 @@ const ProductView = ({
             addToWishlist(variant, quantity)
         }
 
-        if (handleCartItem) {
+        if (addToCart || updateCart) {
             buttons.push(
                 <Button
                     key="cart-button"
@@ -150,7 +154,7 @@ const ProductView = ({
             )
         }
 
-        if (handleWishlistItem) {
+        if (addToWishlist || updateWishlist) {
             buttons.push(
                 <ButtonWithRegistration
                     key="wishlist-button"
@@ -343,6 +347,7 @@ const ProductView = ({
                     variant={variant}
                     quantity={quantity}
                     isOpen={isAddToCartModalOpen}
+                    onClose={onAddToCartModalClose}
                 >
                     <RecommendedProducts
                         title={<FormattedMessage defaultMessage="You Might Also Like" />}

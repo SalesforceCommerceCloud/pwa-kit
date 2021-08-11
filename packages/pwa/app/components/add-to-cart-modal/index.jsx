@@ -29,7 +29,7 @@ import {filterImageGroups} from '../../utils/image-groups-utils'
 /**
  * Visual feedback for adding item to the cart.
  */
-const AddToCartModal = ({product, variant, quantity, isOpen, ...props}) => {
+const AddToCartModal = ({product, variant, quantity, isOpen, onClose, ...props}) => {
     const intl = useIntl()
     const basket = useBasket()
     const size = useBreakpointValue({base: 'full', lg: '2xl', xl: '4xl'})
@@ -44,7 +44,7 @@ const AddToCartModal = ({product, variant, quantity, isOpen, ...props}) => {
     }).images?.[0]
 
     return (
-        <Modal size={size} isOpen={isOpen} {...props}>
+        <Modal size={size} isOpen={isOpen} onClose={onClose} {...props}>
             <ModalOverlay />
             <ModalContent
                 margin="0"
@@ -173,6 +173,7 @@ AddToCartModal.propTypes = {
     }),
     quantity: PropTypes.number,
     isOpen: PropTypes.bool,
+    onClose: PropTypes.func,
     children: PropTypes.any
 }
 
