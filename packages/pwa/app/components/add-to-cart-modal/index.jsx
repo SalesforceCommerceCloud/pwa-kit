@@ -42,8 +42,6 @@ const AddToCartModal = ({product, variant, quantity, isOpen, onClose, ...props})
         size: 'small',
         selectedVariationAttributes: variationValues
     }).images?.[0]
-    console.log(lineItemPrice)
-    console.log(!!lineItemPrice)
 
     return (
         <Modal size={size} isOpen={isOpen} onClose={onClose} {...props}>
