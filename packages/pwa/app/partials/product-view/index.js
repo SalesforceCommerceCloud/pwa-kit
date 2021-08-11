@@ -93,7 +93,7 @@ const ProductView = ({
 }) => {
     const intl = useIntl()
     const history = useHistory()
-    const addToCartModalState = useDisclosure()
+    const {isOpen: isAddToCartModalOpen, onOpen: onAddToCartModalOpen} = useDisclosure()
 
     const {
         showLoading,
@@ -120,7 +120,7 @@ const ProductView = ({
                 return
             }
             addToCart(variant, quantity)
-            addToCartModalState.onOpen()
+            onAddToCartModalOpen()
         }
 
         const handleWishlistItem = () => {
