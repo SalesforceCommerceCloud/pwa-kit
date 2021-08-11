@@ -40,7 +40,7 @@ export default function useCustomerProductLists() {
                         }
                         await addItemToCustomerProductList(
                             productItem,
-                            event.listId,
+                            event.list.id,
                             event.listType
                         )
                         showToast({
@@ -60,7 +60,7 @@ export default function useCustomerProductLists() {
 
                 case eventActions.REMOVE:
                     try {
-                        await self.deleteCustomerProductListItem(event.item, event.listId)
+                        await self.deleteCustomerProductListItem(event.list, event.item)
                         showToast({
                             title: '1 item removed from {listType}',
                             status: 'success'
@@ -94,7 +94,7 @@ export default function useCustomerProductLists() {
         const wishList = customerProductLists.data.find(
             (list) => list.type === customerProductListTypes.WISHLIST
         )
-        return await self.createCustomerProductListItem(requestBody, wishList.id)
+        return await self.createCustomerProductListItem(wishList, requestBody)
     }
 
     const self = useMemo(() => {
@@ -186,7 +186,7 @@ export default function useCustomerProductLists() {
             /**
              * Event queue holds user actions that need to execute on product-lists
              * while the product list information has not yet loaded (eg: Adding to wishlist immedeately after login).
-             * @param {object} event Event to be added to queue. event object has properties: action: {item: Object, listId?: string, action: eventActions, listType: CustomerProductListType}
+             * @param {object} event Event to be added to queue. event object has properties: action: {item: Object, list?: object, action: eventActions, listType: CustomerProductListType}
              */
             addActionToEventQueue(event) {
                 eventQueue.push(event)
@@ -217,16 +217,17 @@ export default function useCustomerProductLists() {
 
             /**
              * Adds an item to the customer's product list.
+             * @param {object} list
+             * @param {string} list.id id of the list to add the item to.
              * @param {Object} item item to be added to the list.
-             * @param {string} listId id of the list to add the item to.
              */
-            async createCustomerProductListItem(item, listId) {
+            async createCustomerProductListItem(list, item) {
                 setIsLoading(true)
                 const response = await api.shopperCustomers.createCustomerProductListItem({
                     body: item,
                     parameters: {
                         customerId: customer.customerId,
-                        listId
+                        listId: list.id
                     }
                 })
 
@@ -286,17 +287,19 @@ export default function useCustomerProductLists() {
 
             /**
              * Remove an item from a customerProductList
-             * @param {string} itemId id of item (in product-list not productId) to be removed
-             * @param {string} listId id of list to remove item from
+             * @param {object} list
+             * @param {string} list.id id of list to remove item from
+             * @param {object} item
+             * @param {string} item.id id of item (in product-list not productId) to be removed
              */
-            async deleteCustomerProductListItem(item, listId) {
+            async deleteCustomerProductListItem(list, item) {
                 // Delete item API returns a void response which throws a json parse error,
                 // passing true as 2nd argument to get raw json response
                 const response = await api.shopperCustomers.deleteCustomerProductListItem(
                     {
                         parameters: {
                             itemId: item.id,
-                            listId,
+                            listId: list.id,
                             customerId: customer.customerId
                         }
                     },
@@ -311,16 +314,16 @@ export default function useCustomerProductLists() {
                 // from state and update UI without requesting updated list from API
                 const updatedProductLists = {
                     ...customerProductLists,
-                    data: customerProductLists.data.map((list) => {
-                        if (list.id === listId) {
+                    data: customerProductLists.data.map((productList) => {
+                        if (productList.id === list.id) {
                             return {
-                                ...list,
-                                customerProductListItems: list.customerProductListItems.filter(
+                                ...productList,
+                                customerProductListItems: productList.customerProductListItems.filter(
                                     (x) => x.id !== item.id
                                 )
                             }
                         }
-                        return list
+                        return productList
                     })
                 }
 
@@ -330,21 +333,22 @@ export default function useCustomerProductLists() {
             /**
              * Update an item from a customerProductList
              *
+             * @param {object} list
+             * @param {string} list.id id of the list to update the item in
              * @param {object} item
              * @param {string} item.id the id of the item in the product list
              * @param {number} item.quantity the quantity of the item
-             * @param {string} listId id of the list to update the item in
              */
-            async updateCustomerProductListItem(item, listId) {
+            async updateCustomerProductListItem(list, item) {
                 if (item.quantity === 0) {
-                    return this.deleteCustomerProductListItem(item, listId)
+                    return this.deleteCustomerProductListItem(list, item)
                 }
 
                 const response = await api.shopperCustomers.updateCustomerProductListItem({
                     body: item,
                     parameters: {
                         customerId: customer.customerId,
-                        listId,
+                        listId: list.id,
                         itemId: item.id
                     }
                 })
@@ -357,16 +361,16 @@ export default function useCustomerProductLists() {
                 // item by its id and update it
                 const updatedProductLists = {
                     ...customerProductLists,
-                    data: customerProductLists.data.map((list) => {
-                        if (list.id === listId) {
+                    data: customerProductLists.data.map((productList) => {
+                        if (productList.id === list.id) {
                             return {
-                                ...list,
-                                customerProductListItems: list.customerProductListItems.map(
+                                ...productList,
+                                customerProductListItems: productList.customerProductListItems.map(
                                     (item) => (item.id === response.id ? response : item)
                                 )
                             }
                         }
-                        return list
+                        return productList
                     })
                 }
 

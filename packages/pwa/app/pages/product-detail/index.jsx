@@ -107,8 +107,8 @@ const ProductDetail = ({category, product, isLoading}) => {
                 }
 
                 const wishlistItem = await customerProductLists.createCustomerProductListItem(
-                    requestBody,
-                    wishlist.id
+                    wishlist,
+                    requestBody
                 )
 
                 if (wishlistItem?.id) {

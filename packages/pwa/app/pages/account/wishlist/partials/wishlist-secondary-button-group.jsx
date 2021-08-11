@@ -26,7 +26,7 @@ export const REMOVE_WISHLIST_ITEM_CONFIRMATION_DIALOG_CONFIG = {
  * Renders secondary actions on a product-item card in the form of a button group.
  * Represents other actions you want the user to perform with the product-item (eg.: Remove or Edit)
  */
-const WishlistSecondaryButtonGroup = ({productListItemId, listId, onClick = noop}) => {
+const WishlistSecondaryButtonGroup = ({productListItemId, list, onClick = noop}) => {
     const {formatMessage} = useIntl()
     const variant = useCartItemVariant()
     const customerProductLists = useCustomerProductLists()
@@ -40,10 +40,7 @@ const WishlistSecondaryButtonGroup = ({productListItemId, listId, onClick = noop
     const handleItemRemove = async () => {
         onClick(variant.id)
         try {
-            await customerProductLists.deleteCustomerProductListItem(
-                {id: productListItemId},
-                listId
-            )
+            await customerProductLists.deleteCustomerProductListItem(list, {id: productListItemId})
             showToast({
                 title: formatMessage({defaultMessage: '1 item removed from wishlist'}),
                 status: 'success'
@@ -87,7 +84,7 @@ const WishlistSecondaryButtonGroup = ({productListItemId, listId, onClick = noop
 }
 
 WishlistSecondaryButtonGroup.propTypes = {
-    listId: PropTypes.string,
+    list: PropTypes.object,
     productListItemId: PropTypes.string,
     onClick: PropTypes.func
 }

@@ -31,10 +31,10 @@ const AccountWishlist = () => {
 
     const handleItemQuantityChanged = async (quantity, item) => {
         try {
-            await customerProductLists.updateCustomerProductListItem(
-                {...item, quantity: parseInt(quantity)},
-                wishlist.id
-            )
+            await customerProductLists.updateCustomerProductListItem(wishlist, {
+                ...item,
+                quantity: parseInt(quantity)
+            })
         } catch (err) {
             console.error(err)
             showToast({
@@ -137,7 +137,7 @@ const AccountWishlist = () => {
                         secondaryActions={
                             <WishlistSecondaryButtonGroup
                                 productListItemId={item.id}
-                                listId={wishlist.id}
+                                list={wishlist}
                                 onClick={handleActionClicked}
                             />
                         }
