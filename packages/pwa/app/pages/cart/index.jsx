@@ -103,15 +103,11 @@ const Cart = () => {
         setCartItemLoading(true)
         setSelectedItem(product)
         try {
-            if (quantity === 0) {
-                await basket.removeItemFromBasket(product.itemId)
-            } else {
-                const item = {
-                    productId: product.id,
-                    quantity: parseInt(quantity)
-                }
-                await basket.updateItemInBasket(item, product.itemId)
+            const item = {
+                productId: product.id,
+                quantity: parseInt(quantity)
             }
+            await basket.updateItemInBasket(item, product.itemId)
         } catch (err) {
             showToast({
                 title: formatMessage(
