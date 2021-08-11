@@ -2,7 +2,6 @@
  * Copyright (c) 2021 Mobify Research & Development Inc. All rights reserved. *
  * * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
 import {useContext, useMemo, useEffect, useState} from 'react'
-import {useIntl} from 'react-intl'
 import {
     isError,
     useCommerceAPI,
@@ -23,7 +22,6 @@ export const eventActions = {
 }
 
 export default function useCustomerProductLists() {
-    const {formatMessage} = useIntl()
     const api = useCommerceAPI()
     const customer = useCustomer()
     const {customerProductLists, setCustomerProductLists} = useContext(CustomerProductListsContext)
@@ -54,10 +52,7 @@ export default function useCustomerProductLists() {
                         })
                     } catch (error) {
                         showToast({
-                            title: formatMessage(
-                                {defaultMessage: '{errorMessage}'},
-                                {errorMessage: API_ERROR_MESSAGE}
-                            ),
+                            title: API_ERROR_MESSAGE,
                             status: 'error'
                         })
                     }
@@ -74,10 +69,7 @@ export default function useCustomerProductLists() {
                         break
                     } catch (error) {
                         showToast({
-                            title: formatMessage(
-                                {defaultMessage: '{errorMessage}'},
-                                {errorMessage: API_ERROR_MESSAGE}
-                            ),
+                            title: API_ERROR_MESSAGE,
                             status: 'error'
                         })
                     }
