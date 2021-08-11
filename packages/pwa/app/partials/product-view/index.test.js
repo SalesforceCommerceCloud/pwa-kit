@@ -22,6 +22,8 @@ jest.mock('../../commerce-api/utils', () => {
     }
 })
 
+jest.mock('../../commerce-api/einstein')
+
 const MockComponent = ({product, addToCart, addToWishlist}) => {
     const customer = useCustomer()
     useEffect(() => {
@@ -114,7 +116,7 @@ test('ProductView Component renders properly', () => {
     expect(screen.getAllByText(/add to cart/i).length).toEqual(2)
 })
 
-test('ProductView Component renders with addToCart evenHandler', () => {
+test('ProductView Component renders with addToCart event handler', () => {
     const addToCart = jest.fn()
     renderWithProviders(<MockComponent product={mockProductDetail} addToCart={addToCart} />)
 
@@ -123,7 +125,7 @@ test('ProductView Component renders with addToCart evenHandler', () => {
     expect(addToCart).toHaveBeenCalledTimes(1)
 })
 
-test('ProductView Component renders with addToWishList evenHandler', async () => {
+test('ProductView Component renders with addToWishList event handler', async () => {
     server.use(
         rest.post('*/oauth2/login', (req, res, ctx) =>
             res(ctx.delay(0), ctx.status(303), ctx.set('location', `/testcallback`))

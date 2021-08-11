@@ -47,6 +47,20 @@
       "value": "See full details"
     }
   ],
+  "1LblQ6": [
+    {
+      "type": 0,
+      "value": "Cart Subtotal ("
+    },
+    {
+      "type": 1,
+      "value": "itemAccumulatedCount"
+    },
+    {
+      "type": 0,
+      "value": " item)"
+    }
+  ],
   "1TQMt0": [
     {
       "type": 1,
@@ -167,6 +181,12 @@
       "value": "Confirm Remove Item"
     }
   ],
+  "5BTYa0": [
+    {
+      "type": 0,
+      "value": "View Cart"
+    }
+  ],
   "5JcXdV": [
     {
       "type": 0,
@@ -195,6 +215,12 @@
     {
       "type": 0,
       "value": "Order Total"
+    }
+  ],
+  "7gXPhB": [
+    {
+      "type": 0,
+      "value": "Qty"
     }
   ],
   "7xscgD": [
@@ -239,6 +265,12 @@
       "value": "Credit Card"
     }
   ],
+  "ADKef8": [
+    {
+      "type": 0,
+      "value": "Add to cart"
+    }
+  ],
   "AYIKp4": [
     {
       "type": 0,
@@ -273,6 +305,12 @@
     {
       "type": 0,
       "value": "Please enter your phone number"
+    }
+  ],
+  "BWpuKl": [
+    {
+      "type": 0,
+      "value": "Update"
     }
   ],
   "BlJFo9": [
@@ -1149,6 +1187,12 @@
       "value": "Checkout as guest"
     }
   ],
+  "gXWNJQ": [
+    {
+      "type": 0,
+      "value": "1 item added to cart"
+    }
+  ],
   "gg6vZx": [
     {
       "type": 0,
@@ -1809,12 +1853,6 @@
     {
       "type": 1,
       "value": "orderNumber"
-    }
-  ],
-  "zb24ln": [
-    {
-      "type": 1,
-      "value": "content"
     }
   ]
 }
