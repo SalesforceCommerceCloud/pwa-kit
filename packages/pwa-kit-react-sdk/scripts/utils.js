@@ -12,7 +12,7 @@ const archiver = require('archiver')
 
 const fileUtils = require('./file-utils')
 
-const Matcher = require('../dist/utils/glob').Matcher
+const Matcher = require('../utils/glob').Matcher
 
 const SDK_VERSION = require('../package.json').version
 const DEFAULT_DOCS_URL =
