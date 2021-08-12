@@ -27,6 +27,7 @@ const AccountWishlist = () => {
     const [isWishlistItemLoading, setWishlistItemLoading] = useState(false)
 
     const handleActionClicked = (itemId) => {
+        setWishlistItemLoading(!!itemId)
         setSelectedItem(itemId)
     }
 
