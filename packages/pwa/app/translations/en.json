@@ -23,6 +23,9 @@
   "1LE+iY": {
     "defaultMessage": "See full details"
   },
+  "1LblQ6": {
+    "defaultMessage": "Cart Subtotal ({itemAccumulatedCount} item)"
+  },
   "1TQMt0": {
     "defaultMessage": "{quantity} {itemLabel} added to cart."
   },
@@ -68,6 +71,9 @@
   "4UPOXx": {
     "defaultMessage": "Confirm Remove Item"
   },
+  "5BTYa0": {
+    "defaultMessage": "View Cart"
+  },
   "5JcXdV": {
     "defaultMessage": "Create Account"
   },
@@ -82,6 +88,9 @@
   },
   "7PMLfK": {
     "defaultMessage": "Order Total"
+  },
+  "7gXPhB": {
+    "defaultMessage": "Qty"
   },
   "7xscgD": {
     "defaultMessage": "Delivery Details"
@@ -104,6 +113,9 @@
   "A8Tnga": {
     "defaultMessage": "Credit Card"
   },
+  "ADKef8": {
+    "defaultMessage": "Add to cart"
+  },
   "AYIKp4": {
     "defaultMessage": "Already have an account? Log in"
   },
@@ -121,6 +133,9 @@
   },
   "BAoId6": {
     "defaultMessage": "Please enter your phone number"
+  },
+  "BWpuKl": {
+    "defaultMessage": "Update"
   },
   "BlJFo9": {
     "defaultMessage": "This email already has an account."
@@ -511,6 +526,9 @@
   "fuzq0p": {
     "defaultMessage": "Checkout as guest"
   },
+  "gXWNJQ": {
+    "defaultMessage": "1 item added to cart"
+  },
   "gg6vZx": {
     "defaultMessage": "Shop by Category"
   },
@@ -801,8 +819,5 @@
   },
   "zXbRZR": {
     "defaultMessage": "Order Number: {orderNumber}"
-  },
-  "zb24ln": {
-    "defaultMessage": "{content}"
   }
 }
