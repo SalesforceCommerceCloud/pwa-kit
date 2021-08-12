@@ -9,7 +9,7 @@ import {
     convertSnakeCaseToSentenceCase
 } from '../utils'
 import useCustomer from './useCustomer'
-import {API_ERROR_MESSAGE, customerProductListTypes} from '../../constants'
+import {API_ERROR_MESSAGE} from '../../constants'
 import {useToast} from '../../hooks/use-toast'
 // If the customerProductLists haven't yet loaded we store user actions inside
 // eventQueue and process the eventQueue once productLists have loaded
