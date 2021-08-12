@@ -24,7 +24,7 @@
     "directory": "dist"
   },
   "scripts": {
-    "prepare": "npm run prod:build",
+    "prepare": "npm run prod:build && node scripts/prepare-dist.js",
     "prod:build": "cross-env NODE_ENV=production scripts/build.js",
     "dev:watch": "watch 'npm run dev:build' src/",
     "lint": "npm run lint:js",
@@ -35,8 +35,7 @@
     "test:watch": "npm test -- --watch",
     "test:inspect": "node --inspect-brk jest --runInBand",
     "version": "node ./scripts/version.js",
-    "format": "prettier --write \"**/*.{js,jsx}\"",
-    "prepublishOnly": "node scripts/prepare-dist.js"
+    "format": "prettier --write \"**/*.{js,jsx}\""
   },
   "repository": {
     "type": "git",
