@@ -24,6 +24,7 @@ const AccountWishlist = () => {
     const [wishlist, setWishlist] = useState()
     const [selectedItem, setSelectedItem] = useState(undefined)
     const showToast = useToast()
+    const [isWishlistItemLoading, setWishlistItemLoading] = useState(false)
 
     const handleActionClicked = (itemId) => {
         setSelectedItem(itemId)
@@ -31,6 +32,8 @@ const AccountWishlist = () => {
 
     const handleItemQuantityChanged = async (quantity, item) => {
         try {
+            setWishlistItemLoading(true)
+            setSelectedItem(item.productId)
             await customerProductLists.updateCustomerProductListItem(wishlist, {
                 ...item,
                 quantity: parseInt(quantity)
@@ -44,6 +47,9 @@ const AccountWishlist = () => {
                 ),
                 status: 'error'
             })
+        } finally {
+            setWishlistItemLoading(false)
+            setSelectedItem(undefined)
         }
     }
 
@@ -129,7 +135,7 @@ const AccountWishlist = () => {
                             price: wishlist._productItemsDetail[item.productId].price,
                             quantity: item.quantity
                         }}
-                        showLoading={selectedItem === item.productId}
+                        showLoading={isWishlistItemLoading && selectedItem === item.productId}
                         primaryAction={<WishlistPrimaryAction />}
                         onItemQuantityChange={(quantity) =>
                             handleItemQuantityChanged(quantity, item)
