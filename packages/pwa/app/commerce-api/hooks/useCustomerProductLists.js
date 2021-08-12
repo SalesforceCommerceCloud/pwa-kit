@@ -245,6 +245,28 @@ export default function useCustomerProductLists() {
             },
 
             /**
+             * Returns a single customer's product list.
+             * @param {string} listId id of the list to find.
+             */
+            getCustomerProductList(listId) {
+                return customerProductLists.data.find((productList) => productList.id === listId)
+            },
+
+            /**
+             * Updates a single customer's product list.
+             * @param {object} list
+             */
+            updateCustomerProductList(list) {
+                const updatedCustomerProductLists = {
+                    ...customerProductLists,
+                    data: customerProductLists.data.map((productList) =>
+                        list.id === productList.id ? list : productList
+                    )
+                }
+                setCustomerProductLists(updatedCustomerProductLists)
+            },
+
+            /**
              * Fetch list of product details from list of ids.
              * The maximum number of productIDs that can be requested are 24.
              * @param {string} ids list of productIds
@@ -271,20 +293,12 @@ export default function useCustomerProductLists() {
                     return result
                 }, {})
 
-                const updatedProductLists = {
-                    ...customerProductLists,
-                    data: customerProductLists.data.map((list) => {
-                        if (list.id === listId) {
-                            return {
-                                ...list,
-                                _productItemsDetail: {...list._productItemsDetail, ...itemDetail}
-                            }
-                        }
-                        return list
-                    })
-                }
+                const listToUpdate = this.getCustomerProductList(listId)
 
-                setCustomerProductLists(updatedProductLists)
+                this.updateCustomerProductList({
+                    ...listToUpdate,
+                    _productItemsDetail: {...listToUpdate._productItemsDetail, ...itemDetail}
+                })
             },
 
             /**
@@ -314,22 +328,14 @@ export default function useCustomerProductLists() {
 
                 // Remove item API does not return an updated list in response so we manually remove item
                 // from state and update UI without requesting updated list from API
-                const updatedProductLists = {
-                    ...customerProductLists,
-                    data: customerProductLists.data.map((productList) => {
-                        if (productList.id === list.id) {
-                            return {
-                                ...productList,
-                                customerProductListItems: productList.customerProductListItems.filter(
-                                    (x) => x.id !== item.id
-                                )
-                            }
-                        }
-                        return productList
-                    })
-                }
+                const listToUpdate = this.getCustomerProductList(list.id)
 
-                setCustomerProductLists(updatedProductLists)
+                this.updateCustomerProductList({
+                    ...listToUpdate,
+                    customerProductListItems: listToUpdate.customerProductListItems.filter(
+                        (x) => x.id !== item.id
+                    )
+                })
             },
 
             /**
@@ -361,22 +367,14 @@ export default function useCustomerProductLists() {
 
                 // The response is the single updated item so we'll find that
                 // item by its id and update it
-                const updatedProductLists = {
-                    ...customerProductLists,
-                    data: customerProductLists.data.map((productList) => {
-                        if (productList.id === list.id) {
-                            return {
-                                ...productList,
-                                customerProductListItems: productList.customerProductListItems.map(
-                                    (item) => (item.id === response.id ? response : item)
-                                )
-                            }
-                        }
-                        return productList
-                    })
-                }
+                const listToUpdate = this.getCustomerProductList(list.id)
 
-                setCustomerProductLists(updatedProductLists)
+                this.updateCustomerProductList({
+                    ...listToUpdate,
+                    customerProductListItems: listToUpdate.customerProductListItems.map((item) =>
+                        item.id === response.id ? response : item
+                    )
+                })
             }
         }
     }, [customer, customerProductLists, setCustomerProductLists, isLoading])
