@@ -7,13 +7,13 @@
  * if they did `npm ci` at the root use ci everywhere.
  */
 const childProc = require('child_process')
-const argv = JSON.parse(process.env.npm_config_argv).original
 
 // Is this a CI environment?
 const ciEnvironment = Boolean(process.env.CI)
 
 // Did the user explicitly invoke `npm ci`?
-const ciCommand = argv[0] === 'ci'
+const npmCmd = process.env.npm_config_argv ? JSON.parse(process.env.npm_config_argv).original[0] : process.env.npm_command
+const ciCommand = npmCmd === 'ci'
 
 // Note: We reduce concurrency and increase verbosity on CI environments.
 // They are often memory-constrained and kill processes which produce no
