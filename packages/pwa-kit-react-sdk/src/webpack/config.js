@@ -60,6 +60,28 @@ const replacements = [
     {
         path: join('pwa-kit-react-sdk', 'ssr', 'universal', 'routes'),
         newPath: resolve('.', 'app', 'routes.jsx')
+    },
+
+    // Replacements when developing in monorepo.
+    {
+        path: join('pwa-kit-react-sdk', 'dist', 'ssr', 'universal', 'components', '_app-config'),
+        newPath: resolve('.', 'app', 'components', '_app-config', 'index.jsx')
+    },
+    {
+        path: join('pwa-kit-react-sdk', 'dist', 'ssr', 'universal', 'components', '_document'),
+        newPath: resolve('.', 'app', 'components', '_document', 'index.jsx')
+    },
+    {
+        path: join('pwa-kit-react-sdk', 'dist', 'ssr', 'universal', 'components', '_app'),
+        newPath: resolve('.', 'app', 'components', '_app', 'index.jsx')
+    },
+    {
+        path: join('pwa-kit-react-sdk', 'dist', 'ssr', 'universal', 'components', '_error'),
+        newPath: resolve('.', 'app', 'components', '_error', 'index.jsx')
+    },
+    {
+        path: join('pwa-kit-react-sdk', 'dist', 'ssr', 'universal', 'routes'),
+        newPath: resolve('.', 'app', 'routes.jsx')
     }
 ].filter(({newPath}) => fs.existsSync(newPath))
 
@@ -130,7 +152,6 @@ const common = {
     },
     // Tell webpack how to find specific modules
     resolve: {
-        symlinks: false,
         extensions: ['.js', '.jsx', '.json'],
         alias: {
             '@loadable/component': resolve(nodeModules, '@loadable/component'),
