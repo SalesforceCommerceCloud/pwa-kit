@@ -62,7 +62,11 @@ const replacements = [
         newPath: resolve('.', 'app', 'routes.jsx')
     },
 
-    // Replacements when developing in monorepo.
+    // The 'pwa-kit-react-sdk' is developed in a lerna monorepo and the final resovled paths
+    // are different (they include a `dist` foler) when developing. Because of this we have
+    // and similar yet slightly different set of replacement paths to account for this
+    // scenario. NOTE: There is no reliable/clean way to determine if we are developing within
+    // the monorepo so this solution, although not optimal, works.
     {
         path: join('pwa-kit-react-sdk', 'dist', 'ssr', 'universal', 'components', '_app-config'),
         newPath: resolve('.', 'app', 'components', '_app-config', 'index.jsx')

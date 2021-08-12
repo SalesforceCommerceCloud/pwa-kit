@@ -11,7 +11,7 @@ const path = require('path')
 const exec = require('child_process').exec
 const replace = require('replace-in-file')
 
-const {copyFile, mkdir} = fsPromises
+const {copyFile} = fsPromises
 
 const DEST_DIR = 'dist/'
 
@@ -74,10 +74,9 @@ const main = async () => {
         ignore: ['dist/scripts/**/*', 'dist/bin/**/*', 'dist/template/**/*'],
         files: 'dist/**/*.js',
         from: /..\/package.json/,
-        to: 'package.json',
+        to: 'package.json'
     })
     console.log('Files changed: ', results.filter(({hasChanged}) => hasChanged))
-    
 
     console.log('Successfully built!')
 }
