@@ -2,9 +2,9 @@
  * Copyright (c) 2021 Mobify Research & Development Inc. All rights reserved. *
  * * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
 
-import React from 'react'
+import React, {useEffect} from 'react'
 import PropTypes from 'prop-types'
-import {useHistory} from 'react-router-dom'
+import {useHistory, useLocation} from 'react-router-dom'
 import {FormattedMessage, useIntl} from 'react-intl'
 
 import {
@@ -93,6 +93,7 @@ const ProductView = ({
 }) => {
     const intl = useIntl()
     const history = useHistory()
+    const location = useLocation()
     const {
         isOpen: isAddToCartModalOpen,
         onOpen: onAddToCartModalOpen,
@@ -175,6 +176,12 @@ const ProductView = ({
 
         return buttons
     }
+
+    useEffect(() => {
+        if (isAddToCartModalOpen) {
+            onAddToCartModalClose()
+        }
+    }, [location.pathname])
 
     return (
         <Flex direction={'column'}>

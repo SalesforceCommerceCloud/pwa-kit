@@ -102,7 +102,7 @@ const AddToCartModal = ({product, variant, quantity, isOpen, onClose, ...props})
                                 </Flex>
                                 <Box flex="none" alignSelf="flex-end" fontWeight="600">
                                     <Text>
-                                        {lineItemPrice &&
+                                        {!!lineItemPrice &&
                                             intl.formatNumber(lineItemPrice, {
                                                 style: 'currency',
                                                 currency: currency || DEFAULT_CURRENCY
