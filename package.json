@@ -1,6 +1,6 @@
 {
   "name": "mobify-platform-sdks",
-  "version": "2.3.1",
+  "version": "2.3.2",
   "engines": {
     "node": "^10.17.0 || ^12.0.0",
     "npm": ">=5.7.1"
