@@ -18,7 +18,7 @@ export default {
                 : {},
         outline: (props) =>
             props.colorScheme === 'black'
-                ? {color: 'gray.900', _hover: {bg: 'gray.50'}}
+                ? {color: 'gray.900', _hover: {bg: 'gray.50'}, borderColor: 'gray.200'}
                 : {color: 'blue.600', _hover: {bg: 'gray.50'}},
         footer: {
             fontSize: 'sm',

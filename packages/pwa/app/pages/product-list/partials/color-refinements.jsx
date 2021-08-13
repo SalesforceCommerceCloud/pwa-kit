@@ -2,51 +2,81 @@
  * Copyright (c) 2021 Mobify Research & Development Inc. All rights reserved. *
  * * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
 
-import React from 'react'
+import React, {useEffect} from 'react'
 import {Box, SimpleGrid, HStack, Text, Button, Center, useMultiStyleConfig} from '@chakra-ui/react'
 import PropTypes from 'prop-types'
 import {cssColorGroups} from '../../../constants'
+import useRefinementToggle from '../../../commerce-api/hooks/useRefinementToggle'
 
 const ColorRefinements = ({filter, toggleFilter, selectedFilters}) => {
     const styles = useMultiStyleConfig('SwatchGroup', {
         variant: 'circle',
         disabled: false
     })
+
+    const {applyUIFeedback, selectedRefinements, setSelectedRefinements} = useRefinementToggle()
+
+    useEffect(() => {
+        if (!selectedRefinements && selectedFilters) {
+            setSelectedRefinements(selectedFilters)
+        } else if (selectedRefinements && !selectedFilters) {
+            setSelectedRefinements(undefined)
+        }
+    }, [selectedFilters])
+
+    const applyUIFeedbackAndToggle = (value, attributeId, selected) => {
+        applyUIFeedback(value, selected)
+        toggleFilter(value, attributeId, selected)
+    }
+
     return (
         <SimpleGrid columns={2} spacing={2} mt={1}>
             {filter.values
                 .filter((refinementValue) => refinementValue.hitCount > 0)
-                .map((value) => {
+                .map((value, idx) => {
                     return (
-                        <Box key={value.value}>
-                            <HStack>
+                        <Box key={idx}>
+                            <HStack
+                                spacing={1}
+                                cursor="pointer"
+                                onClick={() =>
+                                    applyUIFeedbackAndToggle(
+                                        value,
+                                        filter.attributeId,
+                                        selectedFilters?.includes(value.value)
+                                    )
+                                }
+                            >
                                 <Button
                                     {...styles.swatch}
                                     color={
-                                        selectedFilters?.includes(value.value)
+                                        // selectedFilters?.includes(value.value) ||
+                                        selectedRefinements?.includes(value.value)
                                             ? 'black'
                                             : 'gray.200'
                                     }
-                                    border={selectedFilters?.includes(value.value) ? '1px' : '0'}
-                                    onClick={() =>
-                                        toggleFilter(
-                                            value,
-                                            filter.attributeId,
-
-                                            selectedFilters?.includes(value.value)
-                                        )
+                                    border={
+                                        // selectedFilters?.includes(value.value) ||
+                                        selectedRefinements?.includes(value.value) ? '1px' : '0'
                                     }
-                                    aria-checked={selectedFilters?.includes(value.value)}
+                                    aria-checked={
+                                        // selectedFilters?.includes(value.value) ||
+                                        selectedRefinements?.includes(value.value)
+                                    }
                                     variant="outline"
+                                    marginRight={0}
+                                    marginBottom={0}
                                 >
                                     <Center
                                         {...styles.swatchButton}
+                                        marginRight={0}
                                         border={
                                             value.label.toLowerCase() === 'white' &&
                                             '1px solid black'
                                         }
                                     >
                                         <Box
+                                            marginRight={0}
                                             height="100%"
                                             width="100%"
                                             minWidth="32px"
@@ -55,10 +85,18 @@ const ColorRefinements = ({filter, toggleFilter, selectedFilters}) => {
                                             backgroundColor={
                                                 cssColorGroups[value.value.toLowerCase()]
                                             }
+                                            background={
+                                                value.value.toLowerCase() === 'miscellaneous' &&
+                                                cssColorGroups[value.value.toLowerCase()]
+                                            }
                                         />
                                     </Center>
                                 </Button>
-                                <Text fontSize="sm">{`${value.label} (${value.hitCount})`}</Text>
+                                <Text
+                                    display="flex"
+                                    alignItems="center"
+                                    fontSize="sm"
+                                >{`${value.label} (${value.hitCount})`}</Text>
                             </HStack>
                         </Box>
                     )

@@ -3,9 +3,8 @@
  * * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
 
 import React from 'react'
-import {Box, Stack, Button} from '@chakra-ui/react'
+import {Box, Button, Wrap, WrapItem} from '@chakra-ui/react'
 import PropTypes from 'prop-types'
-import {cssColorGroups} from '../../../constants'
 import useNavigation from '../../../hooks/use-navigation'
 import {CloseIcon} from '../../../components/icons'
 
@@ -40,48 +39,55 @@ const SelectedRefinements = ({toggleFilter, selectedFilterValues, categoryId, fi
     }
 
     return (
-        <Stack direction="row" align="center" display="flex" flexWrap="wrap">
-            {selectedFilters?.map((filter) => {
+        <Wrap direction="row" align="center" display="flex" flexWrap="wrap">
+            {selectedFilters?.map((filter, idx) => {
                 return (
-                    <Box key={filter.value} marginLeft={0} marginRight={1}>
-                        <Button
-                            marginTop={1}
-                            padding={5}
-                            // backgroundColor="gray.50"
-                            color="black"
-                            colorScheme="gray"
-                            // colorScheme="gray.50"
-                            size="sm"
-                            iconSpacing={1}
-                            rightIcon={<CloseIcon color="black" boxSize={4} mr="-7px" mb="-6px" />}
-                            onClick={() => toggleFilter(filter.label, filter.value, true)}
-                        >
-                            {filter.label}
-                        </Button>
-                    </Box>
+                    <WrapItem key={idx}>
+                        <Box marginLeft={0} marginRight={1}>
+                            <Button
+                                marginTop={1}
+                                padding={5}
+                                color="black"
+                                colorScheme="gray"
+                                size="sm"
+                                iconSpacing={1}
+                                rightIcon={
+                                    <CloseIcon color="black" boxSize={4} mr="-7px" mb="-6px" />
+                                }
+                                onClick={() =>
+                                    toggleFilter({value: filter.label}, filter.value, true)
+                                }
+                            >
+                                {filter.label}
+                            </Button>
+                        </Box>
+                    </WrapItem>
                 )
             })}
 
             {selectedFilters?.length > 0 && (
-                <Box>
-                    <Button
-                        padding={{sm: 0, base: 2}}
-                        variant="link"
-                        size="sm"
-                        onClick={resetFilters}
-                    >
-                        <FormattedMessage defaultMessage="Clear All" />
-                    </Button>
-                </Box>
+                <WrapItem>
+                    <Box>
+                        <Button
+                            padding={{sm: 0, base: 2}}
+                            variant="link"
+                            size="sm"
+                            onClick={resetFilters}
+                        >
+                            <FormattedMessage defaultMessage="Clear All" />
+                        </Button>
+                    </Box>
+                </WrapItem>
             )}
-        </Stack>
+        </Wrap>
     )
 }
 
 SelectedRefinements.propTypes = {
     filters: PropTypes.array,
     selectedFilterValues: PropTypes.object,
-    categoryId: PropTypes.string
+    categoryId: PropTypes.string,
+    toggleFilter: PropTypes.func
 }
 
 export default SelectedRefinements

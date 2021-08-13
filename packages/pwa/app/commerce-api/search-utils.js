@@ -1,3 +1,8 @@
+/* * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * *
+ * Copyright (c) 2021 Mobify Research & Development Inc. All rights reserved. *
+ * * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
+
+// Object that is used for creating search urls
 const filterMap = {
     prefn1: 'prefv1',
     prefn2: 'prefv2',
@@ -13,6 +18,10 @@ const filterMap = {
 /**
  * Takes url query params as a string or object and a categoryId and returns a
  * search params object that can be passed directly to `productStore.search`.
+ *
+ * @param {Object || string} queryParams
+ * @param {string} categoryId
+ * @returns {boolean}
  */
 export function queryToProductSearch(queryParams, categoryId) {
     // if given a string for queryParams convert it to <key, val> object
@@ -64,6 +73,14 @@ export function queryToProductSearch(queryParams, categoryId) {
     return searchParams
 }
 
+/**
+ * Adds a filter to the search url which can be digested by queryToProductSearch function
+ *
+ * @param {string} location
+ * @param {array} newFilters
+ * @param {array} asObject
+ * @returns {string || Object} // depending on asObject arguemnt
+ */
 export const addFilterToSearch = (location, newFilters, asObject) => {
     let currentParams = parseQueryString(location.search)
     let filterCount = 0
@@ -71,10 +88,6 @@ export const addFilterToSearch = (location, newFilters, asObject) => {
         if (`prefn${index}` in currentParams) {
             filterCount++
         }
-    }
-
-    if (newFilters.length > 1) {
-        // Modal Filter, applied in bulk need to check if multiple for one id
     }
 
     const updatedParams = Object.assign(
@@ -119,6 +132,13 @@ export const addFilterToSearch = (location, newFilters, asObject) => {
     return query.toString()
 }
 
+/**
+ * Removes a filter from the search url which can be digested by queryToProductSearch function
+ *
+ * @param {string} location
+ * @param {array} filtersToRemove
+ * @returns {string}
+ */
 export function removeFilterFromSearch(location, filtersToRemove) {
     let currentParams = parseQueryString(location.search)
 

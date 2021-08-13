@@ -28,7 +28,6 @@ import {
     ModalOverlay,
     Drawer,
     DrawerBody,
-    DrawerFooter,
     DrawerHeader,
     DrawerOverlay,
     DrawerContent,
@@ -109,11 +108,14 @@ const ProductList = (props) => {
 
     // If we are loaded and still have no products, show the no results component.
     const showNoResults = !isLoading && productSearchResult && !productSearchResult?.hits
+
+    // Toggles filter on and off
     const toggleFilter = (value, attributeId, selected) => {
         const newQueryString = toggleSelectedFilter(value, attributeId, selected)
         navigate(`${location.pathname}?${newQueryString}`)
     }
 
+    // Clears all filters
     const resetFilters = () => {
         navigate(window.location.pathname)
     }
@@ -165,7 +167,6 @@ const ProductList = (props) => {
                             <SelectedRefinements
                                 filters={productSearchResult?.refinements}
                                 toggleFilter={toggleFilter}
-                                // filters={productSearchResult?.refinements}
                                 selectedFilterValues={productSearchResult?.selectedRefinements}
                                 categoryId={category?.id}
                             />
@@ -192,7 +193,7 @@ const ProductList = (props) => {
                                 direction="row"
                                 justify="flex-start"
                                 align="center"
-                                spacing={0}
+                                spacing={1}
                                 height={12}
                                 borderColor="gray.100"
                             >
@@ -205,7 +206,6 @@ const ProductList = (props) => {
                                         display="inline-flex"
                                         leftIcon={<FilterIcon boxSize={5} />}
                                         onClick={onOpen}
-                                        // border="1px solid #C9C9C9"
                                     >
                                         <FormattedMessage defaultMessage="Filter" />
                                     </Button>
@@ -219,7 +219,6 @@ const ProductList = (props) => {
                                         display="inline-flex"
                                         rightIcon={<ChevronDownIcon boxSize={5} />}
                                         onClick={() => setSortOpen(true)}
-                                        // border="1px solid #C9C9C9"
                                     >
                                         {intl.formatMessage(
                                             {
@@ -247,6 +246,7 @@ const ProductList = (props) => {
                     <Grid templateColumns={{base: '1fr', md: '262px 1fr'}} columnGap={6}>
                         <Stack display={{base: 'none', md: 'flex'}}>
                             <Refinements
+                                isLoading={filtersLoading}
                                 toggleFilter={toggleFilter}
                                 filters={productSearchResult?.refinements}
                                 selectedFilters={productSearchResult?.selectedRefinements}
@@ -271,31 +271,33 @@ const ProductList = (props) => {
                                           />
                                       ))}
                             </SimpleGrid>
-                        </Box>
-                    </Grid>
+                            {/* Footer */}
+                            <Flex
+                                justifyContent={['center', 'center', 'flex-start']}
+                                paddingTop={8}
+                            >
+                                <Pagination currentURL={basePath} urls={pageUrls} />
 
-                    {/* Footer */}
-                    <Flex justifyContent={['center', 'center', 'flex-start']} paddingTop={8}>
-                        <Pagination currentURL={basePath} urls={pageUrls} />
-
-                        {/*
+                                {/*
                             Our design doesn't call for a page size select. Show this element if you want
                             to add one to your design.
                         */}
-                        <Select
-                            display="none"
-                            value={basePath}
-                            onChange={({target}) => {
-                                history.push(target.value)
-                            }}
-                        >
-                            {limitUrls.map((href, index) => (
-                                <option key={href} value={href}>
-                                    {DEFAULT_LIMIT_VALUES[index]}
-                                </option>
-                            ))}
-                        </Select>
-                    </Flex>
+                                <Select
+                                    display="none"
+                                    value={basePath}
+                                    onChange={({target}) => {
+                                        history.push(target.value)
+                                    }}
+                                >
+                                    {limitUrls.map((href, index) => (
+                                        <option key={href} value={href}>
+                                            {DEFAULT_LIMIT_VALUES[index]}
+                                        </option>
+                                    ))}
+                                </Select>
+                            </Flex>
+                        </Box>
+                    </Grid>
                 </>
             )}
             <Modal

@@ -32,7 +32,8 @@ export const cssColorGroups = {
     red: '#df5b5b',
     white: 'white',
     yellow: '#fbe85a',
-    gold: '#ffd700'
+    gold: '#ffd700',
+    miscellaneous: 'linear-gradient(to right, orange , yellow, green, cyan, blue, violet)'
 }
 
 export const DEFAULT_CURRENCY = 'USD'
