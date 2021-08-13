@@ -12,6 +12,7 @@ import ReactDOMServer from 'react-dom/server'
 import {Helmet} from 'react-helmet'
 import {ChunkExtractor} from '@loadable/server'
 import {StaticRouter as Router, matchPath} from 'react-router-dom'
+import serialize from 'serialize-javascript'
 
 import {getAssetUrl} from '../universal/utils'
 import DeviceContext from '../universal/device-context'
@@ -275,7 +276,7 @@ const renderApp = (args) => {
             key="mobify-data"
             type="application/json" // Not executable
             dangerouslySetInnerHTML={{
-                __html: JSON.stringify(windowGlobals, null, indent)
+                __html: serialize(windowGlobals, {isJSON: true, space: indent})
             }}
         />,
         ...bundles
