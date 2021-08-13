@@ -3,7 +3,7 @@
     "private": true,
     "description": "Mobify DevCenter site",
     "author": "Mobify",
-    "version": "2.4.8",
+    "version": "2.4.9",
     "dependencies": {
         "@emotion/core": "^10.0.28",
         "@emotion/styled": "^10.0.27",
@@ -47,7 +47,7 @@
         "node-fetch": "^2.6.0",
         "node-sass": "^4.14.1",
         "prism-react-renderer": "^0.1.7",
-        "progressive-web-sdk": "^2.4.8",
+        "progressive-web-sdk": "^2.4.9",
         "prop-types": "^15.7.2",
         "react": "^16.10.1",
         "react-copy-to-clipboard": "^5.0.2",
