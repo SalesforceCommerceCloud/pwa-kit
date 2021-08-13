@@ -500,7 +500,7 @@ describe('The Node SSR Environment', () => {
             }
         },
         {
-            description: `Renders script with escaped HTML characters to prevent XSS attacks`,
+            description: `Frozen state is escaped preventing injection attacks`,
             req: {url: '/xss/'},
             assertions: (res) => {
                 const html = res.text
