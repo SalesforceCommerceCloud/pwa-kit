@@ -1,6 +1,6 @@
 {
   "name": "pwa-kit-react-sdk",
-  "version": "0.8.1",
+  "version": "0.8.2",
   "description": "A library that supports the isomorphic React rendering pipeline for Commerce Cloud Managed Runtime apps",
   "main": "dist/index.js",
   "bin": {
@@ -69,6 +69,7 @@
     "react-uid": "^2.2.0",
     "request": "^2.88.0",
     "rimraf": "2.6.1",
+    "serialize-javascript": "^6.0.0",
     "set-cookie-parser": "^2.2.1",
     "tti-polyfill": "0.2.2",
     "ua-parser-js": "^0.7.24",
