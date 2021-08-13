@@ -41,7 +41,7 @@ const AddToCartModal = ({product, variant, quantity, isOpen, onClose, ...props})
     const image = filterImageGroups(product.imageGroups, {
         size: 'small',
         selectedVariationAttributes: variationValues
-    }).images?.[0]
+    })?.images?.[0]
 
     return (
         <Modal size={size} isOpen={isOpen} onClose={onClose} {...props}>
