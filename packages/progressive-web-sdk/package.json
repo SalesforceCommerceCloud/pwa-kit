@@ -99,6 +99,7 @@
     "request-promise": "4.2.2",
     "rimraf": "2.6.1",
     "sandy-tracking-pixel-client": "0.1.31",
+    "serialize-javascript": "^6.0.0",
     "set-cookie-parser": "^2.2.1",
     "source-map-support": "0.5.9",
     "sw-toolbox": "3.6.0",
