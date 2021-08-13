@@ -31,7 +31,7 @@ const useRefinementToggle = () => {
         /**
          * Updates the state when the selected refinements are updated
          *
-         * @param {arrays} refinements
+         * @param {array} refinements
          */
         setSelectedRefinements(refinements) {
             setState({selectedRefinements: refinements})
