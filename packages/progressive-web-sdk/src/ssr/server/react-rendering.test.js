@@ -573,7 +573,7 @@ describe('The Node SSR Environment', () => {
             req: {url: '/xss/'},
             assertions: (res) => {
                 const html = res.text
-                const doc = parse(html)
+                const doc = buildDoc(html)
                 const scriptContent = doc.querySelector('#mobify-data').innerHTML
 
                 expect(scriptContent).not.toContain('<script>')
