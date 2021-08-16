@@ -42,7 +42,7 @@ const WishlistSecondaryButtonGroup = ({productListItemId, list, onClick = noop})
         try {
             await customerProductLists.deleteCustomerProductListItem(list, {id: productListItemId})
             showToast({
-                title: formatMessage({defaultMessage: '1 item removed from wishlist'}),
+                title: formatMessage({defaultMessage: 'Item removed from wishlist'}),
                 status: 'success'
             })
         } catch (err) {

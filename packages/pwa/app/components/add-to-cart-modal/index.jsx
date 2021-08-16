@@ -54,9 +54,12 @@ const AddToCartModal = ({product, variant, quantity, isOpen, onClose, ...props})
                 bgColor="gray.50"
             >
                 <ModalHeader paddingTop="8" bgColor="white" fontSize="2xl" fontWeight="700">
-                    {intl.formatMessage({
-                        defaultMessage: '1 item added to cart'
-                    })}
+                    {intl.formatMessage(
+                        {
+                            defaultMessage: '{quantity} {label} added to cart'
+                        },
+                        {quantity, label: parseInt(quantity) > 1 ? 'items' : 'item'}
+                    )}
                 </ModalHeader>
                 <ModalCloseButton />
                 <ModalBody bgColor="white" paddingTop="4" paddingBottom="8" flex="none">

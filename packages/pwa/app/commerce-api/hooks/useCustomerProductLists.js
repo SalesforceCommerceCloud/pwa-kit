@@ -44,9 +44,9 @@ export default function useCustomerProductLists() {
                             event.listType
                         )
                         showToast({
-                            title: `1 item added to ${convertSnakeCaseToSentenceCase(
-                                event.listType
-                            )}`,
+                            title: `${event.item.quantity} ${
+                                parseInt(event.item.quantity) > 1 ? 'items' : 'item'
+                            } added to ${convertSnakeCaseToSentenceCase(event.listType)}`,
                             status: 'success'
                         })
                     } catch (error) {
@@ -62,7 +62,7 @@ export default function useCustomerProductLists() {
                     try {
                         await self.deleteCustomerProductListItem(event.list, event.item)
                         showToast({
-                            title: '1 item removed from {listType}',
+                            title: 'Item removed from {listType}',
                             status: 'success'
                         })
                         break
