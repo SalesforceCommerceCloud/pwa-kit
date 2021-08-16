@@ -169,7 +169,7 @@ const Cart = () => {
                             {defaultMessage: '{quantity} {label} added to wishlist'},
                             {
                                 quantity: product.quantity,
-                                label: parseInt(quantity) > 1 ? 'items' : 'item'
+                                label: parseInt(product.quantity) > 1 ? 'items' : 'item'
                             }
                         ),
                         status: 'success',
