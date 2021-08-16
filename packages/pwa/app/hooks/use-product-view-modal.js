@@ -15,6 +15,7 @@ import {API_ERROR_MESSAGE} from '../pages/account/constant'
  * This hooks is responsible for fetching a product detail based on the variation selection
  * and managing the variation params on the url when the modal is open/close
  * @param initialProduct - the initial product when the modal is first open
+ * @param isNavigating {React.MutableRefObject<undefined>} - the flag to navigate user to other page
  * @returns object
  */
 export const useProductViewModal = (initialProduct) => {
@@ -28,11 +29,9 @@ export const useProductViewModal = (initialProduct) => {
     const variant = useVariant(product)
     const cleanUpVariantParams = () => {
         const paramToRemove = [...product.variationAttributes.map(({id}) => id), 'pid']
-        const updatedUrl = removeQueryParamsFromPath(
-            `${location.pathname}${location.search}`,
-            paramToRemove
-        )
-        history.replace(updatedUrl)
+        const updatedParams = removeQueryParamsFromPath(`${location.search}`, paramToRemove)
+
+        history.replace({search: updatedParams})
     }
 
     useEffect(() => {
@@ -40,11 +39,7 @@ export const useProductViewModal = (initialProduct) => {
         // clean up the params in case there are variant params not related to current product
         cleanUpVariantParams()
         return () => {
-            // do nothing when the user is navigating to another page
-            if (history.location.pathname === location.pathname) {
-                // clean up the product and variant parameter from the url when the modal is unmouted
-                cleanUpVariantParams()
-            }
+            cleanUpVariantParams()
         }
     }, [])
 
