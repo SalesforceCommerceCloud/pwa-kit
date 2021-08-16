@@ -153,8 +153,9 @@ const ProductList = (props) => {
                         paddingBottom={16}
                         spacing={4}
                         height={12}
+                        marginBottom={6}
                     >
-                        <Flex align="left" width="270px">
+                        <Flex align="left" width="287px">
                             <PageHeader
                                 searchQuery={searchQuery}
                                 category={category}
@@ -243,7 +244,7 @@ const ProductList = (props) => {
                     </HideOnDesktop>
 
                     {/* Body  */}
-                    <Grid templateColumns={{base: '1fr', md: '262px 1fr'}} columnGap={6}>
+                    <Grid templateColumns={{base: '1fr', md: '280px 1fr'}} columnGap={6}>
                         <Stack display={{base: 'none', md: 'flex'}}>
                             <Refinements
                                 isLoading={filtersLoading}

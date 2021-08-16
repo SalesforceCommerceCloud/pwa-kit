@@ -30,6 +30,7 @@ const componentMap = {
 const Refinements = ({filters, toggleFilter, selectedFilters, isLoading}) => {
     // Getting the indices of filters to open accordions by default
     let filtersIndexes = filters?.map((filter, idx) => idx)
+
     return (
         <Stack spacing={8}>
             {/* Wait to have filters before rendering the Accordion to allow the deafult indexes to be accurate */}

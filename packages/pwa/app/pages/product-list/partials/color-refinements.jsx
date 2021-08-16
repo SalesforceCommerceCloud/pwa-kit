@@ -37,32 +37,27 @@ const ColorRefinements = ({filter, toggleFilter, selectedFilters}) => {
                     return (
                         <Box key={idx}>
                             <HStack
-                                spacing={1}
-                                cursor="pointer"
                                 onClick={() =>
                                     applyUIFeedbackAndToggle(
                                         value,
                                         filter.attributeId,
-                                        selectedFilters?.includes(value.value)
+                                        selectedRefinements?.includes(value.value)
                                     )
                                 }
+                                spacing={1}
+                                cursor="pointer"
                             >
                                 <Button
                                     {...styles.swatch}
                                     color={
-                                        // selectedFilters?.includes(value.value) ||
                                         selectedRefinements?.includes(value.value)
                                             ? 'black'
                                             : 'gray.200'
                                     }
                                     border={
-                                        // selectedFilters?.includes(value.value) ||
                                         selectedRefinements?.includes(value.value) ? '1px' : '0'
                                     }
-                                    aria-checked={
-                                        // selectedFilters?.includes(value.value) ||
-                                        selectedRefinements?.includes(value.value)
-                                    }
+                                    aria-checked={selectedRefinements?.includes(value.value)}
                                     variant="outline"
                                     marginRight={0}
                                     marginBottom={0}

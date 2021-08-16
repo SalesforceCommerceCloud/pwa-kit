@@ -49,10 +49,10 @@ const SizeRefinements = ({filter, toggleFilter, selectedFilters}) => {
                                 applyUIFeedbackAndToggle(
                                     value,
                                     filter.attributeId,
-                                    selectedFilters?.includes(value.value)
+                                    selectedRefinements?.includes(value.value)
                                 )
                             }
-                            aria-checked={selectedFilters?.includes(value.value)}
+                            aria-checked={selectedRefinements?.includes(value.value)}
                             variant="outline"
                         >
                             <Center {...styles.swatchButton}>{value.label}</Center>
