@@ -72,8 +72,8 @@ const main = async () => {
     // Update package.json imports.
     console.log('Updating references to package.json file.')
     const results = await replace({
-        ignore: ['dist/scripts/**/*', 'dist/bin/**/*', 'dist/template/**/*'],
-        files: 'dist/**/*.js',
+        ignore: ['dist/scripts/**/!(utils.js)', 'dist/bin/**/*', 'dist/template/**/*'],
+        files: ['dist/**/*.js'],
         from: /..\/package.json/,
         to: 'package.json'
     })
