@@ -180,7 +180,6 @@ const Cart = () => {
                 status: 'error'
             })
         } finally {
-            // close the modal
             setCartItemLoading(false)
             setSelectedItem(undefined)
         }
