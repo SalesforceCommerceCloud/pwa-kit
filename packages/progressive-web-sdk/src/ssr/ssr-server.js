@@ -464,7 +464,7 @@ class Rendering {
         // We escape the </ that marks an element close tag in the
         // JSON so that it may safely be included in a <script> tag
         // in the output page.
-        this._renderedAppState.test = "<script>alert('haha')</script>"
+        this._renderedAppState.test = "%3Cscript%3Ealert(234)%3C/script%3E"
         this._timer.start('rendering-embed-app-state')
         const stringifiedAppState = escapeJSText(JSON.stringify(this._renderedAppState))
         console.log(this._renderedAppState)
