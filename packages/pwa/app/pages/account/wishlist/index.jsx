@@ -23,6 +23,7 @@ const AccountWishlist = () => {
     const customerProductLists = useCustomerProductLists()
     const [wishlist, setWishlist] = useState()
     const [selectedItem, setSelectedItem] = useState(undefined)
+    const [localQuantity, setLocalQuantity] = useState({})
     const showToast = useToast()
     const [isWishlistItemLoading, setWishlistItemLoading] = useState(false)
 
@@ -33,6 +34,9 @@ const AccountWishlist = () => {
 
     const handleItemQuantityChanged = async (quantity, item) => {
         try {
+            // This local state allows the dropdown to show the desired quantity
+            // while the API call to update it is happening.
+            setLocalQuantity({...localQuantity, [item.productId]: quantity})
             setWishlistItemLoading(true)
             setSelectedItem(item.productId)
             await customerProductLists.updateCustomerProductListItem(wishlist, {
@@ -51,6 +55,7 @@ const AccountWishlist = () => {
         } finally {
             setWishlistItemLoading(false)
             setSelectedItem(undefined)
+            setLocalQuantity({...localQuantity, [item.productId]: undefined})
         }
     }
 
@@ -134,7 +139,9 @@ const AccountWishlist = () => {
                             productId: item.productId,
                             productName: wishlist._productItemsDetail[item.productId].name,
                             price: wishlist._productItemsDetail[item.productId].price,
-                            quantity: item.quantity
+                            quantity: localQuantity[item.productId]
+                                ? localQuantity[item.productId]
+                                : item.quantity
                         }}
                         showLoading={isWishlistItemLoading && selectedItem === item.productId}
                         primaryAction={<WishlistPrimaryAction />}
