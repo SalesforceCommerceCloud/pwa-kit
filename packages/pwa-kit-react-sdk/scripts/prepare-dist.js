@@ -17,8 +17,6 @@ const {copyFile} = fsPromises
 const DEST_DIR = 'dist/'
 
 const getPackageFiles = () => {
-    console.log(`Getting a list of files from the package.`)
-
     let output = ''
     const child = exec(`npm pack --dry-run --json --ignore-scripts`)
 
@@ -42,7 +40,6 @@ const getPackageFiles = () => {
 }
 
 const copyFiles = (srcs, dest, mode) => {
-    console.log(`Copying files to ${dest}`)
     return Promise.all(
         srcs.map((src) => {
             // Assign the full file path
@@ -59,6 +56,7 @@ const copyFiles = (srcs, dest, mode) => {
 }
 
 const main = async () => {
+    console.log('Preparing dist...')
     // Remove the dist/package.json so we don't end up including more files in
     // the package.
     await rimraf(`${DEST_DIR}/package.json`)
@@ -70,30 +68,21 @@ const main = async () => {
     await copyFiles(packageFiles, DEST_DIR)
 
     // Update package.json imports.
-    console.log('Updating references to package.json file.')
-    const packageJSONReplacements = await replace({
+    await replace({
         ignore: ['dist/scripts/**/*', 'dist/bin/**/*', 'dist/template/**/*'],
         files: ['dist/**/*.js'],
         from: /..\/package.json/,
         to: 'package.json'
     })
-    console.log(
-        'Adjusted package.json references in: ',
-        packageJSONReplacements.filter(({hasChanged}) => hasChanged)
-    )
 
-    console.log('Updating script module imports.')
-    const distReplacements = await replace({
+    // Update script to remove `dist` folder in imports.
+    await replace({
         files: ['dist/scripts/**/!(prepare-dist.js)'],
         from: /dist\//,
         to: ''
     })
-    console.log(
-        'Adjusted dist references in: ',
-        distReplacements.filter(({hasChanged}) => hasChanged)
-    )
 
-    console.log('Dist prepared!')
+    console.log('Successfully prepared!')
 }
 
 main()
