@@ -15,7 +15,6 @@ import {API_ERROR_MESSAGE} from '../pages/account/constant'
  * This hooks is responsible for fetching a product detail based on the variation selection
  * and managing the variation params on the url when the modal is open/close
  * @param initialProduct - the initial product when the modal is first open
- * @param isNavigating {React.MutableRefObject<undefined>} - the flag to navigate user to other page
  * @returns object
  */
 export const useProductViewModal = (initialProduct) => {
