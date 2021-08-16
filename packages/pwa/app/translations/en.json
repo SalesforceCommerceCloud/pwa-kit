@@ -17,6 +17,9 @@
   "0g/1TG": {
     "defaultMessage": "Continue to Payment"
   },
+  "0qeNni": {
+    "defaultMessage": "{quantity} {itemLabel} added to cart"
+  },
   "0yGJXJ": {
     "defaultMessage": "Password must contain at least one lowercase letter"
   },
@@ -25,9 +28,6 @@
   },
   "1LblQ6": {
     "defaultMessage": "Cart Subtotal ({itemAccumulatedCount} item)"
-  },
-  "1TQMt0": {
-    "defaultMessage": "{quantity} {itemLabel} added to cart."
   },
   "1b9Q93": {
     "defaultMessage": "You will receive an email at <b>{email}</b> with a link to reset your password shortly."
@@ -46,9 +46,6 @@
   },
   "2bGejb": {
     "defaultMessage": "My Account"
-  },
-  "2gr0DV": {
-    "defaultMessage": "1 item added to wishlist"
   },
   "2tqQFl": {
     "defaultMessage": "Cart"
@@ -109,6 +106,9 @@
   },
   "9Npj92": {
     "defaultMessage": "Enter your email to receive instructions on how to reset your password"
+  },
+  "9rqdrm": {
+    "defaultMessage": "Item removed from wishlist"
   },
   "A8Tnga": {
     "defaultMessage": "Credit Card"
@@ -237,6 +237,9 @@
   },
   "Mv2pEb": {
     "defaultMessage": "Continue shopping and add items to your wishlist"
+  },
+  "MxyfsT": {
+    "defaultMessage": "{quantity} {label} added to wishlist"
   },
   "NTgwLi": {
     "defaultMessage": "Place Order"
@@ -404,6 +407,9 @@
   "a5msuh": {
     "defaultMessage": "Yes"
   },
+  "aAGNsb": {
+    "defaultMessage": "{quantity} {label} added to cart"
+  },
   "aheQdn": {
     "defaultMessage": "Last Name"
   },
@@ -525,9 +531,6 @@
   },
   "fuzq0p": {
     "defaultMessage": "Checkout as guest"
-  },
-  "gXWNJQ": {
-    "defaultMessage": "1 item added to cart"
   },
   "gg6vZx": {
     "defaultMessage": "Shop by Category"
@@ -770,9 +773,6 @@
   },
   "wEQDC6": {
     "defaultMessage": "Edit"
-  },
-  "x3r6nd": {
-    "defaultMessage": "1 item removed from wishlist"
   },
   "x6hxSH": {
     "defaultMessage": "Something's not right with your email or password. Try again."
