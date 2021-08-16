@@ -42,7 +42,7 @@ const getPackageFiles = () => {
 }
 
 const copyFiles = (srcs, dest, mode) => {
-    console.log(`Copying first to ${dest}`)
+    console.log(`Copying files to ${dest}`)
     return Promise.all(
         srcs.map((src) => {
             // Assign the full file path
@@ -71,23 +71,29 @@ const main = async () => {
 
     // Update package.json imports.
     console.log('Updating references to package.json file.')
-    const results = await replace({
+    const packageJSONReplacements = await replace({
         ignore: ['dist/scripts/**/*', 'dist/bin/**/*', 'dist/template/**/*'],
         files: ['dist/**/*.js'],
         from: /..\/package.json/,
         to: 'package.json'
     })
-    console.log('Files changed: ', results.filter(({hasChanged}) => hasChanged))
+    console.log(
+        'Adjusted package.json references in: ',
+        packageJSONReplacements.filter(({hasChanged}) => hasChanged)
+    )
 
-    // TODO: Clean this up. What I'm acheiving here is fixing the scripts that reference
-    // `dist`. But what files to I check, which are for development only, which aren't?
-    await replace({
-        files: 'dist/scripts/utils.js',
+    console.log('Updating script module imports.')
+    const distReplacements = await replace({
+        files: ['dist/scripts/**/!(prepare-dist.js)'],
         from: /dist\//,
         to: ''
     })
+    console.log(
+        'Adjusted dist references in: ',
+        distReplacements.filter(({hasChanged}) => hasChanged)
+    )
 
-    console.log('Successfully built!')
+    console.log('Dist prepared!')
 }
 
 main()
