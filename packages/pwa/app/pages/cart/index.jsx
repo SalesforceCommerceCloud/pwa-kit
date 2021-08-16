@@ -28,6 +28,7 @@ const Cart = () => {
     const basket = useBasket()
     const intl = useIntl()
     const [selectedItem, setSelectedItem] = useState(undefined)
+    const [localQuantity, setLocalQuantity] = useState({})
     const {formatMessage} = useIntl()
     const showToast = useToast()
     const navigate = useNavigation()
@@ -99,6 +100,9 @@ const Cart = () => {
     }
 
     const changeItemQuantity = async (quantity, product) => {
+        // This local state allows the dropdown to show the desired quantity
+        // while the API call to update it is happening.
+        setLocalQuantity({...localQuantity, [product.itemId]: quantity})
         setCartItemLoading(true)
         setSelectedItem(product)
         try {
@@ -119,6 +123,7 @@ const Cart = () => {
             // reset the state
             setCartItemLoading(false)
             setSelectedItem(undefined)
+            setLocalQuantity({...localQuantity, [product.itemId]: undefined})
         }
     }
 
@@ -241,7 +246,10 @@ const Cart = () => {
                                                 ...product,
                                                 ...(basket._productItemsDetail &&
                                                     basket._productItemsDetail[product.productId]),
-                                                price: product.price
+                                                price: product.price,
+                                                quantity: localQuantity[product.itemId]
+                                                    ? localQuantity[product.itemId]
+                                                    : product.quantity
                                             }}
                                             onItemQuantityChange={(value) =>
                                                 changeItemQuantity(value, product)
