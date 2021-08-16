@@ -64,7 +64,7 @@ const main = async () => {
     // Get a list of files from the `npm pack --dry-run` command.
     const packageFiles = await getPackageFiles()
 
-    // Move the required files into the `dist` filder.
+    // Move the required files into the `dist` folder.
     await copyFiles(packageFiles, DEST_DIR)
 
     // Update package.json imports.
