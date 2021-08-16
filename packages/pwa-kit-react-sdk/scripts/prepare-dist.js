@@ -2,6 +2,7 @@
 /* * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * *
  * Copyright (c) 2021 Mobify Research & Development Inc. All rights reserved. *
  * * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
+/* istanbul ignore file */
 
 const Promise = require('bluebird')
 const fs = require('fs')
@@ -77,6 +78,14 @@ const main = async () => {
         to: 'package.json'
     })
     console.log('Files changed: ', results.filter(({hasChanged}) => hasChanged))
+
+    // TODO: Clean this up. What I'm acheiving here is fixing the scripts that reference
+    // `dist`. But what files to I check, which are for development only, which aren't?
+    await replace({
+        files: 'dist/scripts/utils.js',
+        from: /dist\//,
+        to: ''
+    })
 
     console.log('Successfully built!')
 }
