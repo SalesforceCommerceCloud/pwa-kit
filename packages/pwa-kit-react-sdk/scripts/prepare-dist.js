@@ -21,7 +21,6 @@ const DEST_DIR = 'dist/'
  * @private
  */
 const catcher = (message) => (error) => {
-    console.log('asldfkjas;ldfja;lsjdflsjdf;lajsdlkfjskdjfkjskdf')
     console.log(`${message}: ${error}`)
     process.exit(1)
 }
