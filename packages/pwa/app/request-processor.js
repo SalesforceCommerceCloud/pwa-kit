@@ -7,7 +7,7 @@
 // it processes requests in whatever way your project requires.
 
 // Uncomment the following line for the example code to work.
-// import {QueryParameters} from 'pwa-kit-react-sdk/dist/utils/ssr-request-processing'
+// import {QueryParameters} from 'pwa-kit-react-sdk/utils/ssr-request-processing'
 
 /**
  * The processRequest function is called for *every* non-proxy, non-bundle

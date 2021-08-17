@@ -2,7 +2,7 @@
  * Copyright (c) 2021 Mobify Research & Development Inc. All rights reserved. *
  * * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
 /**
- * @module progressive-web-sdk/dist/utils/ssr-cache
+ * @module progressive-web-sdk/utils/ssr-cache
  */
 const fs = require('fs')
 const os = require('os')

@@ -4,7 +4,7 @@
 
 /* eslint-disable no-unused-vars */
 import * as sdk from 'commerce-sdk-isomorphic'
-import {getAppOrigin} from 'pwa-kit-react-sdk/dist/utils/url'
+import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
 import OcapiShopperBaskets from './ocapi-shopper-baskets'
 import OcapiShopperOrders from './ocapi-shopper-orders'
 import {getTenantId, isError, isTokenValid} from './utils'

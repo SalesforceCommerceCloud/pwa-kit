@@ -3,7 +3,7 @@
  * * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
 
 /**
- * @module progressive-web-sdk/dist/ssr/server/react-rendering
+ * @module progressive-web-sdk/ssr/server/react-rendering
  */
 
 import path from 'path'

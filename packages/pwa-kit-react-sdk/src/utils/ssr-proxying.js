@@ -2,7 +2,7 @@
  * Copyright (c) 2021 Mobify Research & Development Inc. All rights reserved. *
  * * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
 /**
- * @module progressive-web-sdk/dist/utils/ssr-proxying
+ * @module progressive-web-sdk/utils/ssr-proxying
  */
 /*
  There are some special requirements for this module, which is used in the
