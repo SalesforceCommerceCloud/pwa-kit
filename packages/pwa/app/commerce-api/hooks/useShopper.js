@@ -84,7 +84,6 @@ const useShopper = () => {
     }, [customerProductLists.loaded, customer.authType])
 
     useEffect(() => {
-        console.log(customerProductLists)
         // Fetch product details for new items in product-lists
         const hasCustomerProductLists = customerProductLists?.loaded
         if (hasCustomerProductLists) {

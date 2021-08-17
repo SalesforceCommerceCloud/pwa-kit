@@ -237,8 +237,6 @@ export default function useCustomerProductLists() {
                     throw new Error(response)
                 }
 
-                // This function does not return an updated customerProductsList so we fetch manually
-                await self.getCustomerProductLists()
                 return response
             },
 
