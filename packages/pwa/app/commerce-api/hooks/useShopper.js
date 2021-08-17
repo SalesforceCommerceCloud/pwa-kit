@@ -73,11 +73,11 @@ const useShopper = () => {
     // Load wishlists in context for logged-in users
     useEffect(() => {
         const hasCustomer = customer?.customerId
-        const hasCustomerProductLists = customerProductLists?.loaded
-        if (hasCustomer && customer?.authType === 'registered' && !hasCustomerProductLists) {
+        const loaded = customerProductLists?.loaded
+        if (hasCustomer && customer?.authType === 'registered' && !loaded) {
             // we are only interested in wishlist
             customerProductLists.fetchOrCreateProductLists(customerProductListTypes.WISHLIST)
-        } else if (customer?.authType === 'guest' && hasCustomerProductLists) {
+        } else if (customer?.authType === 'guest' && loaded) {
             // customerProductLists need to be reset when the user logs out
             customerProductLists.clearProductLists()
         }
@@ -85,8 +85,8 @@ const useShopper = () => {
 
     useEffect(() => {
         // Fetch product details for new items in product-lists
-        const hasCustomerProductLists = customerProductLists?.loaded
-        if (hasCustomerProductLists) {
+        const loaded = customerProductLists?.loaded
+        if (loaded) {
             customerProductLists.data.forEach((list) => {
                 let ids = list.customerProductListItems?.map((item) => item.productId)
                 if (list?._productItemsDetail) {
