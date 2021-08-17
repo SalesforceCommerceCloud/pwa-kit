@@ -83,20 +83,18 @@ export default function useCustomerProductLists() {
     }, [customerProductLists])
 
     const addItemToCustomerProductList = async (item, listId, listType) => {
-        const requestBody = {
-            productId: item.productId,
-            priority: 1,
-            quantity: item.quantity,
-            public: false,
-            type: 'product'
-        }
-
         // Either find the list by the id or by the type
         const productList = listId
             ? customerProductLists.data.find((list) => list.id === listId)
             : customerProductLists.data.find((list) => list.type === listType)
 
-        return await self.createCustomerProductListItem(productList, requestBody)
+        return await self.createCustomerProductListItem(productList, {
+            productId: item.productId,
+            priority: 1,
+            quantity: item.quantity,
+            public: false,
+            type: 'product'
+        })
     }
 
     const self = useMemo(() => {
@@ -196,12 +194,12 @@ export default function useCustomerProductLists() {
 
             /**
              * Creates a new customer product list
-             * @param {Object} requestBody object containing type property to define the type of list to be created
+             * @param {Object} body object containing type property to define the type of list to be created
              */
-            async createCustomerProductList(requestBody) {
+            async createCustomerProductList(body) {
                 setIsLoading(true)
                 const response = await api.shopperCustomers.createCustomerProductList({
-                    body: requestBody,
+                    body,
                     parameters: {
                         customerId: customer.customerId
                     }

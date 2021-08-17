@@ -145,17 +145,16 @@ const Cart = () => {
                 const wishlist = customerProductLists.data.find(
                     (list) => list.type === customerProductListTypes.WISHLIST
                 )
-                const requestBody = {
-                    productId: product.productId,
-                    priority: 1,
-                    quantity: product.quantity,
-                    public: false,
-                    type: 'product'
-                }
 
                 const wishlistItem = await customerProductLists.createCustomerProductListItem(
                     wishlist,
-                    requestBody
+                    {
+                        productId: product.productId,
+                        priority: 1,
+                        quantity: product.quantity,
+                        public: false,
+                        type: 'product'
+                    }
                 )
 
                 if (wishlistItem?.id) {
