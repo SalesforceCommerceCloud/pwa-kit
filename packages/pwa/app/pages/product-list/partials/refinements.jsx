@@ -19,6 +19,8 @@ import SizeRefinements from './size-refinements'
 import RadioRefinements from './radio-refinements'
 import CheckboxRefinements from './checkbox-refinements'
 import LinkRefinements from './link-refinements'
+import {isServer} from '../../../utils/utils'
+import {FILTER_ACCORDION_SATE} from '../../../constants'
 
 const componentMap = {
     cgid: LinkRefinements,
@@ -31,11 +33,39 @@ const Refinements = ({filters, toggleFilter, selectedFilters, isLoading}) => {
     // Getting the indices of filters to open accordions by default
     let filtersIndexes = filters?.map((filter, idx) => idx)
 
+    // Use saved state for accordions
+    if (!isServer) {
+        const savedExpandedAccordionIndexes =
+            window.localStorage.getItem(FILTER_ACCORDION_SATE) &&
+            JSON.parse(window.localStorage.getItem(FILTER_ACCORDION_SATE))
+
+        if (savedExpandedAccordionIndexes) {
+            filtersIndexes = filters
+                .map((filter, index) => {
+                    if (savedExpandedAccordionIndexes.includes(filter.attributeId)) {
+                        return index
+                    }
+                })
+                .filter((index) => index !== undefined)
+
+            // filtersIndexes = savedExpandedAccordionIndexes
+        }
+    }
+
+    // Handle saving acccordion state
+    const updateAccordionState = (expandedIndex) => {
+        const filterState = filters
+            .filter((filter, index) => expandedIndex.includes(index))
+            .map((filter) => filter.attributeId)
+        window.localStorage.setItem(FILTER_ACCORDION_SATE, JSON.stringify(filterState))
+    }
+
     return (
         <Stack spacing={8}>
             {/* Wait to have filters before rendering the Accordion to allow the deafult indexes to be accurate */}
             {filtersIndexes && (
                 <Accordion
+                    onChange={updateAccordionState}
                     opacity={isLoading ? 0.2 : 1}
                     allowMultiple={true}
                     allowToggle={true}
