@@ -9,7 +9,7 @@ import useAddressFields from './useAddressFields'
 import Field from '../field'
 
 const AddressFields = ({form, prefix = ''}) => {
-    const {authType} = useCustomer()
+    const {isRegistered} = useCustomer()
     const fields = useAddressFields({form, prefix})
 
     return (
@@ -30,7 +30,7 @@ const AddressFields = ({form, prefix = ''}) => {
                     <Field {...fields.postalCode} />
                 </GridItem>
             </Grid>
-            {authType === 'registered' && <Field {...fields.preferred} />}
+            {isRegistered === 'registered' && <Field {...fields.preferred} />}
         </Stack>
     )
 }

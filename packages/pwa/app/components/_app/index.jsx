@@ -91,7 +91,7 @@ const App = (props) => {
 
     const onAccountClick = () => {
         // Link to account page for registered customer, open auth modal otherwise
-        if (customer?.authType === 'registered') {
+        if (customer.isRegistered) {
             history.push(`/${targetLocale}/account`)
         } else {
             // if they already are at the login page, do not show login modal

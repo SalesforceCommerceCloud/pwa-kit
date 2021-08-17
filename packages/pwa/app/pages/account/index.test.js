@@ -30,7 +30,7 @@ const MockedComponent = () => {
     const customer = useCustomer()
 
     useEffect(() => {
-        if (customer?.authType !== 'registered') {
+        if (customer.isRegistered) {
             customer.login('test@test.com', 'password1')
         }
     }, [])

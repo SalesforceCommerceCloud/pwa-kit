@@ -139,7 +139,7 @@ const CheckoutConfirmation = () => {
                         </Stack>
                     </Box>
 
-                    {customer.authType === 'guest' && (
+                    {customer.isGuest && (
                         <Box
                             layerStyle="card"
                             rounded={[0, 0, 'base']}

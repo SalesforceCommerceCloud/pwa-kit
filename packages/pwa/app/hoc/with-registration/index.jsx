@@ -22,7 +22,7 @@ const withRegistration = (Component) => {
         const showToast = useToast()
 
         const handleClick = () => {
-            if (customer?.authType !== 'registered') {
+            if (!customer.isRegistered) {
                 // Do not show auth modal if users is already on the login page
                 if (isLoginPage) {
                     showToast({

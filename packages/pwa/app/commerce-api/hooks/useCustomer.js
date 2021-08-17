@@ -22,6 +22,13 @@ export default function useCustomer() {
                 return customer?.authType === AuthTypes.REGISTERED
             },
 
+            /**
+             * Returns boolean value whether the customer is of type `guest` or not.
+             */
+            get isGuest() {
+                return customer?.authType === AuthTypes.GUEST
+            },
+
             /** Returns the customer's saved addresses with the 'preferred' address in the first index */
             get addresses() {
                 if (!customer?.addresses) {
@@ -46,7 +53,7 @@ export default function useCustomer() {
              */
             async login(credentials) {
                 const skeletonCustomer = await api.auth.login(credentials)
-                if (skeletonCustomer.authType === 'guest') {
+                if (skeletonCustomer.authType === AuthTypes.GUEST) {
                     setCustomer(skeletonCustomer)
                 } else {
                     const customer = await api.shopperCustomers.getCustomer({

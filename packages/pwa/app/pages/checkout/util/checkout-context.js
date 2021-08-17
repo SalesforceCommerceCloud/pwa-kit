@@ -48,11 +48,11 @@ export const CheckoutProvider = ({children}) => {
     }, [])
 
     useEffect(() => {
-        if (customer.authType === 'registered' && state.isGuestCheckout) {
+        if (customer.isRegistered && state.isGuestCheckout) {
             mergeState({isGuestCheckout: false})
         }
 
-        if (customer.authType === 'guest' && basket.customerInfo?.email && !state.isGuestCheckout) {
+        if (customer.isGuest && basket.customerInfo?.email && !state.isGuestCheckout) {
             mergeState({isGuestCheckout: true})
         }
 
