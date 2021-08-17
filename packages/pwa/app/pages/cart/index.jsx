@@ -165,10 +165,12 @@ const Cart = () => {
                     )
                     showToast({
                         title: intl.formatMessage(
-                            {defaultMessage: '{quantity} {label} added to wishlist'},
                             {
-                                quantity: product.quantity,
-                                label: parseInt(product.quantity) > 1 ? 'items' : 'item'
+                                defaultMessage:
+                                    '{quantity} {quantity, plural, one {item} other {items}} added to wishlist'
+                            },
+                            {
+                                quantity: product.quantity
                             }
                         ),
                         status: 'success',

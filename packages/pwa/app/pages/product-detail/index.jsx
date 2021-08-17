@@ -119,9 +119,10 @@ const ProductDetail = ({category, product, isLoading}) => {
                     showToast({
                         title: intl.formatMessage(
                             {
-                                defaultMessage: '{quantity} {label} added to wishlist'
+                                defaultMessage:
+                                    '{quantity} {quantity, plural, one {item} other {items}} added to wishlist'
                             },
-                            {quantity, label: parseInt(quantity) > 1 ? 'items' : 'item'}
+                            {quantity}
                         ),
                         status: 'success',
                         action: toastAction

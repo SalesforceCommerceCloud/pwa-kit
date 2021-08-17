@@ -17,9 +17,6 @@
   "0g/1TG": {
     "defaultMessage": "Continue to Payment"
   },
-  "0qeNni": {
-    "defaultMessage": "{quantity} {itemLabel} added to cart"
-  },
   "0yGJXJ": {
     "defaultMessage": "Password must contain at least one lowercase letter"
   },
@@ -43,6 +40,9 @@
   },
   "2SvpuI": {
     "defaultMessage": "Log in here"
+  },
+  "2WRHXI": {
+    "defaultMessage": "{quantity} {quantity, plural, one {item} other {items}} added to cart"
   },
   "2bGejb": {
     "defaultMessage": "My Account"
@@ -161,6 +161,9 @@
   "DPrDhw": {
     "defaultMessage": "Add New Payment Method"
   },
+  "DdR2q8": {
+    "defaultMessage": "{quantity} {quantity, plural, one {item} other {items}} added to wishlist"
+  },
   "DwzDiL": {
     "defaultMessage": "Clear recent searches"
   },
@@ -237,9 +240,6 @@
   },
   "Mv2pEb": {
     "defaultMessage": "Continue shopping and add items to your wishlist"
-  },
-  "MxyfsT": {
-    "defaultMessage": "{quantity} {label} added to wishlist"
   },
   "NTgwLi": {
     "defaultMessage": "Place Order"
@@ -406,9 +406,6 @@
   },
   "a5msuh": {
     "defaultMessage": "Yes"
-  },
-  "aAGNsb": {
-    "defaultMessage": "{quantity} {label} added to cart"
   },
   "aheQdn": {
     "defaultMessage": "Last Name"

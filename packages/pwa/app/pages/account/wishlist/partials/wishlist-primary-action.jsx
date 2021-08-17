@@ -35,12 +35,10 @@ const WishlistPrimaryAction = () => {
             showToast({
                 title: formatMessage(
                     {
-                        defaultMessage: '{quantity} {itemLabel} added to cart'
+                        defaultMessage:
+                            '{quantity} {quantity, plural, one {item} other {items}} added to cart'
                     },
-                    {
-                        quantity: variant.quantity,
-                        itemLabel: variant.quantity === 1 ? 'item' : 'items'
-                    }
+                    {quantity: variant.quantity}
                 ),
                 status: 'success'
             })
