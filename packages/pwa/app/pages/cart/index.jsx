@@ -26,7 +26,6 @@ import useNavigation from '../../hooks/use-navigation'
 
 const Cart = () => {
     const basket = useBasket()
-    const intl = useIntl()
     const [selectedItem, setSelectedItem] = useState(undefined)
     const [localQuantity, setLocalQuantity] = useState({})
     const {formatMessage} = useIntl()
@@ -54,6 +53,17 @@ const Cart = () => {
 
     if (!basket?.productItems) {
         return <EmptyCart />
+    }
+
+    const showError = (error) => {
+        console.log(error)
+        showToast({
+            title: formatMessage(
+                {defaultMessage: '{errorMessage}'},
+                {errorMessage: API_ERROR_MESSAGE}
+            ),
+            status: 'error'
+        })
     }
 
     const handleUpdateCart = async (variant, quantity) => {
@@ -85,14 +95,8 @@ const Cart = () => {
             if (selectedItem.quantity !== quantity) {
                 return await changeItemQuantity(quantity, selectedItem)
             }
-        } catch (err) {
-            showToast({
-                title: formatMessage(
-                    {defaultMessage: '{errorMessage}'},
-                    {errorMessage: API_ERROR_MESSAGE}
-                ),
-                status: 'error'
-            })
+        } catch (error) {
+            showError(error)
         } finally {
             setCartItemLoading(false)
             setSelectedItem(undefined)
@@ -111,20 +115,36 @@ const Cart = () => {
                 quantity: parseInt(quantity)
             }
             await basket.updateItemInBasket(item, product.itemId)
-        } catch (err) {
-            showToast({
-                title: formatMessage(
-                    {defaultMessage: '{errorMessage}'},
-                    {errorMessage: API_ERROR_MESSAGE}
-                ),
-                status: 'error'
-            })
+        } catch (error) {
+            showError(error)
         } finally {
             // reset the state
             setCartItemLoading(false)
             setSelectedItem(undefined)
             setLocalQuantity({...localQuantity, [product.itemId]: undefined})
         }
+    }
+
+    const showWishlistItemAdded = (quantityOrEvent) => {
+        const quantity = Number.isInteger(quantityOrEvent)
+            ? quantityOrEvent
+            : quantityOrEvent.item.quantity
+        const toastAction = (
+            <Button variant="link" onClick={() => navigate('/account/wishlist')}>
+                View
+            </Button>
+        )
+        showToast({
+            title: formatMessage(
+                {
+                    defaultMessage:
+                        '{quantity} {quantity, plural, one {item} other {items}} added to wishlist'
+                },
+                {quantity}
+            ),
+            status: 'success',
+            action: toastAction
+        })
     }
 
     const handleAddToWishlist = async (product) => {
@@ -137,7 +157,9 @@ const Cart = () => {
                 const event = {
                     item: product,
                     action: eventActions.ADD,
-                    listType: customerProductListTypes.WISHLIST
+                    listType: customerProductListTypes.WISHLIST,
+                    showStatus: showWishlistItemAdded,
+                    showError
                 }
 
                 customerProductLists.addActionToEventQueue(event)
@@ -158,34 +180,11 @@ const Cart = () => {
                 )
 
                 if (wishlistItem?.id) {
-                    const toastAction = (
-                        <Button variant="link" onClick={() => navigate('/account/wishlist')}>
-                            View
-                        </Button>
-                    )
-                    showToast({
-                        title: intl.formatMessage(
-                            {
-                                defaultMessage:
-                                    '{quantity} {quantity, plural, one {item} other {items}} added to wishlist'
-                            },
-                            {
-                                quantity: product.quantity
-                            }
-                        ),
-                        status: 'success',
-                        action: toastAction
-                    })
+                    showWishlistItemAdded(product.quantity)
                 }
             }
         } catch (error) {
-            showToast({
-                title: intl.formatMessage(
-                    {defaultMessage: '{errorMessage}'},
-                    {errorMessage: API_ERROR_MESSAGE}
-                ),
-                status: 'error'
-            })
+            showError(error)
         } finally {
             // close the modal
             setCartItemLoading(false)
@@ -199,17 +198,11 @@ const Cart = () => {
         try {
             await basket.removeItemFromBasket(product.itemId)
             showToast({
-                title: intl.formatMessage({defaultMessage: 'Item removed from cart'}),
+                title: formatMessage({defaultMessage: 'Item removed from cart'}),
                 status: 'success'
             })
-        } catch (err) {
-            showToast({
-                title: intl.formatMessage(
-                    {defaultMessage: '{errorMessage}'},
-                    {errorMessage: API_ERROR_MESSAGE}
-                ),
-                status: 'error'
-            })
+        } catch (error) {
+            showError(error)
         } finally {
             // reset the state
             setCartItemLoading(false)

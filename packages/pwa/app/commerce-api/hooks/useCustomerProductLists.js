@@ -2,15 +2,8 @@
  * Copyright (c) 2021 Mobify Research & Development Inc. All rights reserved. *
  * * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
 import {useContext, useMemo, useEffect, useState} from 'react'
-import {
-    isError,
-    useCommerceAPI,
-    CustomerProductListsContext,
-    convertSnakeCaseToSentenceCase
-} from '../utils'
+import {isError, useCommerceAPI, CustomerProductListsContext} from '../utils'
 import useCustomer from './useCustomer'
-import {API_ERROR_MESSAGE} from '../../constants'
-import {useToast} from '../../hooks/use-toast'
 // If the customerProductLists haven't yet loaded we store user actions inside
 // eventQueue and process the eventQueue once productLists have loaded
 const eventQueue = []
@@ -25,7 +18,6 @@ export default function useCustomerProductLists() {
     const customer = useCustomer()
     const {customerProductLists, setCustomerProductLists} = useContext(CustomerProductListsContext)
     const [isLoading, setIsLoading] = useState(false)
-    const showToast = useToast()
 
     const processEventQueue = () => {
         eventQueue.forEach(async (event) => {
@@ -43,17 +35,9 @@ export default function useCustomerProductLists() {
                             event.list?.id,
                             event.listType
                         )
-                        showToast({
-                            title: `${event.item.quantity} ${
-                                parseInt(event.item.quantity) > 1 ? 'items' : 'item'
-                            } added to ${convertSnakeCaseToSentenceCase(event.listType)}`,
-                            status: 'success'
-                        })
+                        event.showStatus(event)
                     } catch (error) {
-                        showToast({
-                            title: API_ERROR_MESSAGE,
-                            status: 'error'
-                        })
+                        event.showError(error)
                     }
                     break
                 }
@@ -61,17 +45,11 @@ export default function useCustomerProductLists() {
                 case eventActions.REMOVE:
                     try {
                         await self.deleteCustomerProductListItem(event.list, event.item)
-                        showToast({
-                            title: 'Item removed from {listType}',
-                            status: 'success'
-                        })
-                        break
+                        event.showStatus(event)
                     } catch (error) {
-                        showToast({
-                            title: API_ERROR_MESSAGE,
-                            status: 'error'
-                        })
+                        event.showError(error)
                     }
+                    break
             }
         })
     }
