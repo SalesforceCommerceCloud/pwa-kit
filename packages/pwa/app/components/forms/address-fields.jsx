@@ -30,7 +30,7 @@ const AddressFields = ({form, prefix = ''}) => {
                     <Field {...fields.postalCode} />
                 </GridItem>
             </Grid>
-            {isRegistered === 'registered' && <Field {...fields.preferred} />}
+            {isRegistered && <Field {...fields.preferred} />}
         </Stack>
     )
 }
