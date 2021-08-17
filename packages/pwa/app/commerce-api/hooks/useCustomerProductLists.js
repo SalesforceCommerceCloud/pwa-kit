@@ -28,10 +28,10 @@ export default function useCustomerProductLists() {
     const [isLoading, setIsLoading] = useState(false)
     const showToast = useToast()
 
-    const processEventQueue = () => {
-        eventQueue.forEach(async (event) => {
-            eventQueue.pop()
-
+    const processEventQueue = async () => {
+        while (eventQueue.length) {
+            // the first item
+            const event = eventQueue.shift()
             switch (event.action) {
                 case eventActions.ADD: {
                     try {
@@ -44,11 +44,13 @@ export default function useCustomerProductLists() {
                             event.listId,
                             event.listType
                         )
+
                         showToast({
                             title: `1 item added to ${convertSnakeCaseToSentenceCase(
                                 event.listType
                             )}`,
-                            status: 'success'
+                            status: 'success',
+                            action: event.toastAction
                         })
                     } catch (error) {
                         showToast({
@@ -74,7 +76,7 @@ export default function useCustomerProductLists() {
                         })
                     }
             }
-        })
+        }
     }
 
     useEffect(() => {

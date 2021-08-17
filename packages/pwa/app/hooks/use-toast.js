@@ -60,10 +60,6 @@ export function useToast() {
                 )
             }
         }
-
-        // Prevent duplicate toasts
-        if (!toast.isActive(toastId)) {
-            toast(toastConfig)
-        }
+        toast(toastConfig)
     }
 }

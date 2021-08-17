@@ -5,7 +5,7 @@
 import React, {useContext, useEffect, useState} from 'react'
 import PropTypes from 'prop-types'
 import {useHistory, useParams} from 'react-router-dom'
-import {defineMessage, useIntl} from 'react-intl'
+import {useIntl} from 'react-intl'
 import {Helmet} from 'react-helmet'
 
 // Components
@@ -17,8 +17,7 @@ import {
     FormLabel,
     FormControl,
     Stack,
-    Button,
-    useDisclosure
+    Button
 } from '@chakra-ui/react'
 
 // Project Components
@@ -27,7 +26,6 @@ import ProductTile, {Skeleton as ProductTileSkeleton} from '../../components/pro
 import {HideOnMobile, HideOnDesktop} from '../../components/responsive'
 import EmptySearchResults from './partials/empty-results'
 import PageHeader from './partials/page-header'
-import ConfirmationModal from '../../components/confirmation-modal/index'
 
 // Hooks
 import {useLimitUrls, usePageUrls, useSortUrls, useSearchParams} from '../../hooks'
@@ -49,15 +47,6 @@ import {
 } from '../../constants'
 import {API_ERROR_MESSAGE} from '../account/constant'
 
-export const REMOVE_WISHLIST_ITEM_CONFIRMATION_DIALOG_CONFIG = {
-    dialogTitle: defineMessage({defaultMessage: 'Confirm Remove Item'}),
-    confirmationMessage: defineMessage({
-        defaultMessage: 'Are you sure you want to remove this item from your wishlist?'
-    }),
-    primaryActionLabel: defineMessage({defaultMessage: 'Yes, remove item'}),
-    alternateActionLabel: defineMessage({defaultMessage: 'No, keep item'})
-}
-
 /*
  * This is a simple product listing page. It displays a paginated list
  * of product hit objects. Allowing for sorting and filtering based on the
@@ -72,11 +61,6 @@ const ProductList = (props) => {
     const customerProductLists = useCustomerProductLists()
     const navigate = useNavigation()
     const showToast = useToast()
-    const {
-        isOpen: isConfirmingModalOpen,
-        onOpen: onConfirmingModalOpen,
-        onClose: onConfirmingModalClose
-    } = useDisclosure()
 
     const {
         searchQuery,
@@ -93,8 +77,6 @@ const ProductList = (props) => {
      * Useful for handling toggle wishlist icon on product-tile
      */
     const [wishlist, setWishlist] = useState({})
-    // store the clicked item for removing it from wishlist when confirming from modal
-    const [selectedItem, setSelectedItem] = useState({})
 
     const {total, sortingOptions} = productSearchResult || {}
 
@@ -136,10 +118,10 @@ const ProductList = (props) => {
     /**
      * Removes product from wishlist
      */
-    const removeItemFromWishlist = async () => {
+    const removeItemFromWishlist = async (product) => {
         // Extract productListItemId corresponding to product from wishlist
         const wishlistItemId = wishlist.customerProductListItems.find(
-            (item) => item.productId === selectedItem.productId
+            (item) => item.productId === product.productId
         ).id
         try {
             await customerProductLists.deleteCustomerProductListItem(
@@ -148,7 +130,7 @@ const ProductList = (props) => {
             )
 
             showToast({
-                title: intl.formatMessage({defaultMessage: '1 item removed from wishlist'}),
+                title: intl.formatMessage({defaultMessage: 'Item removed from wishlist'}),
                 status: 'success'
             })
         } catch (err) {
@@ -160,9 +142,6 @@ const ProductList = (props) => {
                 ),
                 status: 'error'
             })
-        } finally {
-            // reset the selected state
-            setSelectedItem(undefined)
         }
     }
 
@@ -174,7 +153,12 @@ const ProductList = (props) => {
                 const event = {
                     item: {...product, id: product.productId, quantity: 1},
                     action: eventActions.ADD,
-                    listType: customerProductListTypes.WISHLIST
+                    listType: customerProductListTypes.WISHLIST,
+                    toastAction: (
+                        <Button variant="link" onClick={handleViewWishlistClick}>
+                            View
+                        </Button>
+                    )
                 }
 
                 customerProductLists.addActionToEventQueue(event)
@@ -289,8 +273,7 @@ const ProductList = (props) => {
                                               addItemToWishlist(productSearchItem)
                                           }
                                           onRemoveWishlistClick={() => {
-                                              onConfirmingModalOpen()
-                                              setSelectedItem(productSearchItem)
+                                              removeItemFromWishlist(productSearchItem)
                                           }}
                                           isInWishlist={isInWishlist}
                                       />
@@ -322,12 +305,6 @@ const ProductList = (props) => {
                     </Flex>
                 </>
             )}
-            <ConfirmationModal
-                {...REMOVE_WISHLIST_ITEM_CONFIRMATION_DIALOG_CONFIG}
-                onPrimaryAction={removeItemFromWishlist}
-                isOpen={isConfirmingModalOpen}
-                onClose={onConfirmingModalClose}
-            />
         </Box>
     )
 }

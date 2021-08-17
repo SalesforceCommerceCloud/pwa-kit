@@ -20,7 +20,7 @@ import {noop} from '../../../utils/utils'
 import useCustomer from '../../../commerce-api/hooks/useCustomer'
 
 export const REMOVE_CART_ITEM_CONFIRMATION_DIALOG_CONFIG = {
-    dialogTitle: defineMessage({defaultMessage: 'Confirm Remove Item'}),
+    dialogTitle: defineMessage({defaultMessage: 'Remove Item?'}),
     confirmationMessage: defineMessage({
         defaultMessage: 'Are you sure you want to remove this item from your cart?'
     }),
