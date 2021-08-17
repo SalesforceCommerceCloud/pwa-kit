@@ -16,6 +16,21 @@ const {copyFile} = fsPromises
 
 const DEST_DIR = 'dist/'
 
+/**
+ * Error catcher that will log an error and exit the process
+ * @private
+ */
+const catcher = (message) => (error) => {
+    console.log('asldfkjas;ldfja;lsjdflsjdf;lajsdlkfjskdjfkjskdf')
+    console.log(`${message}: ${error}`)
+    process.exit(1)
+}
+
+/**
+ * Get an array of files that will end up in the npm package.
+ * @private
+ * @returns {Promise<Array>} resolves with an array of files objects
+ */
 const getPackageFiles = () => {
     let output = ''
     const child = exec(`npm pack --dry-run --json --ignore-scripts`)
@@ -34,12 +49,17 @@ const getPackageFiles = () => {
             const files = JSON.parse(output)[0].files.map(({path}) => path)
             resolve(files)
         })
-    }).catch((e) => {
-        console.log(e)
     })
 }
 
-const copyFiles = (srcs, dest, mode) => {
+/**
+ * Copy files from their source to a given destination.
+ * @private
+ * @param srcs {Array<String>} any array of file paths
+ * @param dest {String} the destination path
+ * @returns {Promise} resolves when files are copied.
+ */
+const copyFiles = (srcs, dest) => {
     return Promise.all(
         srcs.map((src) => {
             // Assign the full file path
@@ -50,7 +70,7 @@ const copyFiles = (srcs, dest, mode) => {
                 fs.mkdirSync(path.dirname(newFilePath), {recursive: true})
             }
 
-            return copyFile(src, path.join(dest, src), mode)
+            return copyFile(src, path.join(dest, src))
         })
     )
 }
@@ -61,26 +81,34 @@ const main = async () => {
     // the package.
     await rimraf(`${DEST_DIR}/package.json`)
 
-    // Get a list of files from the `npm pack --dry-run` command.
-    const packageFiles = await getPackageFiles()
+    try {
+        // Get a list of files from the `npm pack --dry-run` command.
+        const packageFiles = await getPackageFiles()
 
-    // Move the required files into the `dist` folder.
-    await copyFiles(packageFiles, DEST_DIR)
+        // Move the required files into the `dist` folder.
+        await copyFiles(packageFiles, DEST_DIR)
+    } catch (e) {
+        catcher('Error while copying files')(e)
+    }
 
-    // Update package.json imports.
-    await replace({
-        ignore: ['dist/scripts/**/*', 'dist/bin/**/*', 'dist/template/**/*'],
-        files: ['dist/**/*.js'],
-        from: /..\/package.json/,
-        to: 'package.json'
-    })
+    try {
+        // Update package.json imports.
+        await replace({
+            ignore: ['dist/scripts/**/*', 'dist/bin/**/*', 'dist/template/**/*'],
+            files: ['dist/**/*.js'],
+            from: /..\/package.json/,
+            to: 'package.json'
+        })
 
-    // Update script to remove `dist` folder in imports.
-    await replace({
-        files: ['dist/scripts/**/!(prepare-dist.js)'],
-        from: /dist\//,
-        to: ''
-    })
+        // Update script to remove `dist` folder in imports.
+        await replace({
+            files: ['dist/scripts/**/!(prepare-dist.js)'],
+            from: /dist\//,
+            to: ''
+        })
+    } catch (e) {
+        catcher('Error replacing file references')(e)
+    }
 
     console.log('Successfully prepared!')
 }
