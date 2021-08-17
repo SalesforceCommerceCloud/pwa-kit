@@ -27,7 +27,7 @@ jest.mock('../../commerce-api/einstein')
 const MockComponent = ({product, addToCart, addToWishlist}) => {
     const customer = useCustomer()
     useEffect(() => {
-        if (customer.isRegistered) {
+        if (!customer.isRegistered) {
             customer.login('customer@test.com', 'password1')
         }
     }, [])

@@ -34,7 +34,7 @@ const MockedComponent = ({history}) => {
     }, [])
     const onAccountClick = () => {
         // Link to account page for registered customer, open auth modal otherwise
-        if (!customer.isRegistered) {
+        if (customer.isRegistered) {
             history.push('/en/account')
         }
     }
