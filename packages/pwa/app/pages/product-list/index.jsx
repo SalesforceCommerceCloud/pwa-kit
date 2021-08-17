@@ -421,7 +421,14 @@ ProductList.getProps = async ({res, params, location, api}) => {
         return {searchQuery: ' ', productSearchResult: {}}
     }
 
-    const searchParams = queryToProductSearch(location.search, categoryId)
+    const searchParams = queryToProductSearch(location.search)
+
+    if (!searchParams.refine.includes(`cgid=${categoryId}`) && categoryId) {
+        searchParams.refine.push(`cgid=${categoryId}`)
+    }
+
+    // only search master products
+    searchParams.refine.push('htype=master')
 
     // Set the `cache-control` header values to align with the Commerce API settings.
     if (res) {

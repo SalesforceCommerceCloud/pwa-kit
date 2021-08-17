@@ -18,7 +18,7 @@ export const customerProductListTypes = {
 
 export const cssColorGroups = {
     beige: '#d3bca9',
-    black: 'black',
+    black: '#000000',
     blue: '#4089c0',
     brown: '#8e6950',
     green: '#88c290',
@@ -30,7 +30,7 @@ export const cssColorGroups = {
     pink: '#f5a0ca',
     purple: '#9873b9',
     red: '#df5b5b',
-    white: 'white',
+    white: '#FFFFFFF',
     yellow: '#fbe85a',
     gold: '#ffd700',
     miscellaneous: 'linear-gradient(to right, orange , yellow, green, cyan, blue, violet)'

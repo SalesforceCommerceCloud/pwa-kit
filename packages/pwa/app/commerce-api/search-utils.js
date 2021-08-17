@@ -23,7 +23,7 @@ const filterMap = {
  * @param {string} categoryId
  * @returns {boolean}
  */
-export function queryToProductSearch(queryParams, categoryId) {
+export function queryToProductSearch(queryParams) {
     // if given a string for queryParams convert it to <key, val> object
     if (typeof queryParams === 'string') {
         queryParams = parseQueryString(queryParams)
@@ -55,13 +55,6 @@ export function queryToProductSearch(queryParams, categoryId) {
         limit = queryParams.limit || limit
     }
 
-    if (!refine.includes(`cgid=${categoryId}`) && categoryId) {
-        refine.push(`cgid=${categoryId}`)
-    }
-
-    // only search master products
-    refine.push('htype=master')
-
     const searchParams = {
         refine,
         ...(q && {q}),
@@ -78,10 +71,9 @@ export function queryToProductSearch(queryParams, categoryId) {
  *
  * @param {string} location
  * @param {array} newFilters
- * @param {array} asObject
- * @returns {string || Object} // depending on asObject arguemnt
+ * @returns {string}
  */
-export const addFilterToSearch = (location, newFilters, asObject) => {
+export const addFilterToSearch = (location, newFilters) => {
     let currentParams = parseQueryString(location.search)
     let filterCount = 0
     for (let index = 1; index < 10; index++) {
@@ -123,8 +115,10 @@ export const addFilterToSearch = (location, newFilters, asObject) => {
         currentParams
     )
 
-    if (asObject) {
-        return updatedParams
+    // Check for offset
+    if (updatedParams.offset) {
+        // Remove the offset when a new filter is applied or removed
+        delete updatedParams.offset
     }
 
     const query = new URLSearchParams(updatedParams)

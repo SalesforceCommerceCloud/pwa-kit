@@ -12,7 +12,6 @@ const RadioRefinements = ({filter, toggleFilter, selectedFilters}) => {
 
     useEffect(() => {
         if (!selectedRefinements && selectedFilters) {
-            console.log(selectedRefinements)
             setSelectedRefinements(selectedFilters)
         } else if (selectedRefinements && !selectedFilters) {
             setSelectedRefinements(undefined)
@@ -24,7 +23,6 @@ const RadioRefinements = ({filter, toggleFilter, selectedFilters}) => {
         toggleFilter(value, attributeId, selected)
     }
 
-    console.log(selectedRefinements && selectedRefinements[0])
     return (
         <Box>
             {/* <HStack marginBottom={2}>
@@ -56,7 +54,6 @@ const RadioRefinements = ({filter, toggleFilter, selectedFilters}) => {
                     {filter.values
                         .filter((refinementValue) => refinementValue.hitCount > 0)
                         .map((value) => {
-                            console.log(value.value)
                             return (
                                 <Box key={value.value}>
                                     <Radio
