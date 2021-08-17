@@ -10,7 +10,6 @@ import {
     AspectRatio,
     Box,
     Img,
-    Image,
     Skeleton as ChakraSkeleton,
     Text,
     Stack,
@@ -22,7 +21,6 @@ import {useIntl} from 'react-intl'
 
 // Other
 import {productUrlBuilder} from '../../utils/url'
-import {isServer} from '../../utils/utils'
 import Link from '../link'
 
 // Component Skeleton
@@ -68,13 +66,8 @@ const ProductTile = (props) => {
             {...rest}
         >
             <Box {...styles.imageWrapper}>
-                {/* Server Image */}
-                <AspectRatio {...styles.image} ratio={1} display={isServer ? 'block' : 'none'}>
+                <AspectRatio {...styles.image} ratio={1}>
                     <Img alt={image.alt} src={image.disBaseLink} />
-                </AspectRatio>
-                {/* Client Image */}
-                <AspectRatio {...styles.image} ratio={1} display={isServer ? 'none' : 'block'}>
-                    <Image alt={image.alt} src={image.disBaseLink} ignoreFallback={true} />
                 </AspectRatio>
             </Box>
 
