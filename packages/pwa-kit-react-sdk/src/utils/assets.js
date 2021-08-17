@@ -20,7 +20,7 @@ let loadScriptCounter = 0
  * @param {function} onload - The onload callback function
  * @param {boolean} onerror - Rejects the function
  * @example
- * import {loadScript} from 'pwa-kit-react-sdk/dist/utils/utils'
+ * import {loadScript} from 'pwa-kit-react-sdk/utils/utils'
  *
  * loadScript({
  *     id: 'loadScriptTest1',

@@ -3,8 +3,8 @@
  * * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
 
 /* eslint-disable no-unused-vars */
-import {getAppOrigin} from 'pwa-kit-react-sdk/dist/utils/url'
-import {HTTPError} from 'pwa-kit-react-sdk/dist/ssr/universal/errors'
+import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
+import {HTTPError} from 'pwa-kit-react-sdk/ssr/universal/errors'
 import {createCodeVerifier, generateCodeChallenge} from './pkce'
 import {createGetTokenBody} from './utils'
 
