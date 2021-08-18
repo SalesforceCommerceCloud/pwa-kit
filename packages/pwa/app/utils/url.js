@@ -2,6 +2,8 @@
  * Copyright (c) 2021 Mobify Research & Development Inc. All rights reserved. *
  * * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
 
+import {DEFAULT_LOCALE} from '../locale'
+
 /**
  * Modifies a given url by adding/updating query parameters.
  *
@@ -76,7 +78,7 @@ export const buildUrlSet = (url = '', key = '', values = [], extraParams = {}) =
  * @param {string} local
  * @returns {string}
  */
-export const categoryUrlBuilder = (category, local = 'en') =>
+export const categoryUrlBuilder = (category, local = DEFAULT_LOCALE) =>
     encodeURI(`/${local}/category/${category.id}`)
 
 /**
@@ -86,7 +88,7 @@ export const categoryUrlBuilder = (category, local = 'en') =>
  * @param {string} local
  * @returns {string}
  */
-export const productUrlBuilder = (product, local = 'en') =>
+export const productUrlBuilder = (product, local = DEFAULT_LOCALE) =>
     encodeURI(`/${local}/product/${product.id}`)
 
 /**
