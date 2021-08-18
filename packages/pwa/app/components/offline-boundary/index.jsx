@@ -7,8 +7,8 @@ import {withRouter} from 'react-router-dom'
 import {Button} from '@chakra-ui/react'
 import {AlertIcon} from '../icons'
 
-// import Button from 'pwa-kit-react-sdk/dist/components/button'
-// import Icon from 'pwa-kit-react-sdk/dist/components/icon'
+// import Button from 'pwa-kit-react-sdk/components/button'
+// import Icon from 'pwa-kit-react-sdk/components/icon'
 
 /**
  * OfflineBoundary is a React Error boundary that catches errors thrown when

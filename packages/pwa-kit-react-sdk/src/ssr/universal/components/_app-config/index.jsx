@@ -3,7 +3,7 @@
  * * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
 
 /**
- * @module progressive-web-sdk/dist/ssr/universal/components/_app-config
+ * @module progressive-web-sdk/ssr/universal/components/_app-config
  */
 
 import React from 'react'

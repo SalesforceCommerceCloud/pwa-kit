@@ -2,7 +2,7 @@
  * Copyright (c) 2021 Mobify Research & Development Inc. All rights reserved. *
  * * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
 import {useContext, useMemo, useEffect, useState} from 'react'
-import {isError, useCommerceAPI, CustomerProductListsContext} from '../utils'
+import {isError, useCommerceAPI, CustomerProductListsContext, noop} from '../utils'
 import useCustomer from './useCustomer'
 import {customerProductListTypes} from '../../constants'
 // If the customerProductLists haven't yet loaded we store user actions inside
@@ -14,7 +14,7 @@ export const eventActions = {
     REMOVE: 'remove'
 }
 
-export default function useCustomerProductLists() {
+export default function useCustomerProductLists({eventHandler = noop, errorHandler = noop} = {}) {
     const api = useCommerceAPI()
     const customer = useCustomer()
     const {customerProductLists, setCustomerProductLists} = useContext(CustomerProductListsContext)
@@ -42,28 +42,28 @@ export default function useCustomerProductLists() {
                                 event.item.quantity,
                                 wishlist.id
                             )
-                            return event.onSuccess(event.item.quantity)
+                            return eventHandler(event)
                         }
                         await self.addItemToWishlist(
                             event.item.id,
                             event.item.quantity,
                             wishlist.id
                         )
-                        return event.onSuccess?.(event.item.quantity)
+                        eventHandler(event)
                     } catch (error) {
-                        event.onError?.()
+                        errorHandler(error)
                     }
                     break
                 }
 
                 case eventActions.REMOVE:
                     try {
-                        await self.deleteCustomerProductListItem(event.item, event.listId)
-                        event.onSuccess?.()
-                        break
+                        await self.deleteCustomerProductListItem(event.list, event.item)
+                        eventHandler(event)
                     } catch (error) {
-                        event.onError?.()
+                        errorHandler(error)
                     }
+                    break
             }
         }
     }
@@ -82,7 +82,7 @@ export default function useCustomerProductLists() {
             },
 
             get loaded() {
-                return !!customerProductLists?.data?.length
+                return customerProductLists?.data?.length
             },
 
             getProductListPerType(type) {
@@ -208,7 +208,7 @@ export default function useCustomerProductLists() {
             /**
              * Event queue holds user actions that need to execute on product-lists
              * while the product list information has not yet loaded (eg: Adding to wishlist immedeately after login).
-             * @param {object} event Event to be added to queue. event object has properties: action: {item: Object, listId?: string, action: eventActions, listType: CustomerProductListType}
+             * @param {object} event Event to be added to queue. event object has properties: action: {item: Object, list?: object, action: eventActions, listType: CustomerProductListType}
              */
             addActionToEventQueue(event) {
                 eventQueue.push(event)
@@ -216,12 +216,12 @@ export default function useCustomerProductLists() {
 
             /**
              * Creates a new customer product list
-             * @param {Object} requestBody object containing type property to define the type of list to be created
+             * @param {Object} body object containing type property to define the type of list to be created
              */
-            async createCustomerProductList(requestBody) {
+            async createCustomerProductList(body) {
                 setIsLoading(true)
                 const response = await api.shopperCustomers.createCustomerProductList({
-                    body: requestBody,
+                    body,
                     parameters: {
                         customerId: customer.customerId
                     }
@@ -239,17 +239,17 @@ export default function useCustomerProductLists() {
 
             /**
              * Adds an item to the customer's product list.
+             * @param {object} list
+             * @param {string} list.id id of the list to add the item to.
              * @param {Object} item item to be added to the list.
-             * @param {string} listId id of the list to add the item to.
              */
-            async createCustomerProductListItem(item, listId) {
+            async createCustomerProductListItem(list, item) {
                 setIsLoading(true)
-                console.log('item', item)
                 const response = await api.shopperCustomers.createCustomerProductListItem({
                     body: item,
                     parameters: {
                         customerId: customer.customerId,
-                        listId
+                        listId: list.id
                     }
                 })
 
@@ -264,27 +264,26 @@ export default function useCustomerProductLists() {
                 return response
             },
 
-            async updateCustomerProductListItem(item, listId, itemId) {
-                setIsLoading(true)
-                console.log('item', item)
-                const response = await api.shopperCustomers.updateCustomerProductListItem({
-                    body: item,
-                    parameters: {
-                        customerId: customer.customerId,
-                        listId,
-                        itemId
-                    }
-                })
+            /**
+             * Returns a single customer's product list.
+             * @param {string} listId id of the list to find.
+             */
+            getCustomerProductList(listId) {
+                return customerProductLists.data.find((productList) => productList.id === listId)
+            },
 
-                setIsLoading(false)
-
-                if (isError(response)) {
-                    throw new Error(response)
+            /**
+             * Updates a single customer's product list.
+             * @param {object} list
+             */
+            updateCustomerProductList(list) {
+                const updatedCustomerProductLists = {
+                    ...customerProductLists,
+                    data: customerProductLists.data.map((productList) =>
+                        list.id === productList.id ? list : productList
+                    )
                 }
-
-                // This function does not return an updated customerProductsList so we fetch manually
-                await self.getCustomerProductLists()
-                return response
+                setCustomerProductLists(updatedCustomerProductLists)
             },
 
             /**
@@ -314,35 +313,29 @@ export default function useCustomerProductLists() {
                     return result
                 }, {})
 
-                const updatedProductLists = {
-                    ...customerProductLists,
-                    data: customerProductLists.data.map((list) => {
-                        if (list.id === listId) {
-                            return {
-                                ...list,
-                                _productItemsDetail: {...list._productItemsDetail, ...itemDetail}
-                            }
-                        }
-                        return list
-                    })
-                }
+                const listToUpdate = this.getCustomerProductList(listId)
 
-                setCustomerProductLists(updatedProductLists)
+                this.updateCustomerProductList({
+                    ...listToUpdate,
+                    _productItemsDetail: {...listToUpdate._productItemsDetail, ...itemDetail}
+                })
             },
 
             /**
-             * Remove an item from a customerProcuctList
-             * @param {string} itemId id of item (in product-list not productId) to be removed
-             * @param {string} listId id of list to remove item from
+             * Remove an item from a customerProductList
+             * @param {object} list
+             * @param {string} list.id id of list to remove item from
+             * @param {object} item
+             * @param {string} item.id id of item (in product-list not productId) to be removed
              */
-            async deleteCustomerProductListItem(item, listId) {
+            async deleteCustomerProductListItem(list, item) {
                 // Delete item API returns a void response which throws a json parse error,
                 // passing true as 2nd argument to get raw json response
                 const response = await api.shopperCustomers.deleteCustomerProductListItem(
                     {
                         parameters: {
                             itemId: item.id,
-                            listId,
+                            listId: list.id,
                             customerId: customer.customerId
                         }
                     },
@@ -355,22 +348,53 @@ export default function useCustomerProductLists() {
 
                 // Remove item API does not return an updated list in response so we manually remove item
                 // from state and update UI without requesting updated list from API
-                const updatedProductLists = {
-                    ...customerProductLists,
-                    data: customerProductLists.data.map((list) => {
-                        if (list.id === listId) {
-                            return {
-                                ...list,
-                                customerProductListItems: list.customerProductListItems.filter(
-                                    (x) => x.id !== item.id
-                                )
-                            }
-                        }
-                        return list
-                    })
+                const listToUpdate = this.getCustomerProductList(list.id)
+
+                this.updateCustomerProductList({
+                    ...listToUpdate,
+                    customerProductListItems: listToUpdate.customerProductListItems.filter(
+                        (x) => x.id !== item.id
+                    )
+                })
+            },
+
+            /**
+             * Update an item from a customerProductList
+             *
+             * @param {object} list
+             * @param {string} list.id id of the list to update the item in
+             * @param {object} item
+             * @param {string} item.id the id of the item in the product list
+             * @param {number} item.quantity the quantity of the item
+             */
+            async updateCustomerProductListItem(list, item) {
+                if (item.quantity === 0) {
+                    return this.deleteCustomerProductListItem(list, item)
                 }
 
-                setCustomerProductLists(updatedProductLists)
+                const response = await api.shopperCustomers.updateCustomerProductListItem({
+                    body: item,
+                    parameters: {
+                        customerId: customer.customerId,
+                        listId: list.id,
+                        itemId: item.id
+                    }
+                })
+
+                if (isError(response)) {
+                    throw new Error(response)
+                }
+
+                // The response is the single updated item so we'll find that
+                // item by its id and update it
+                const listToUpdate = this.getCustomerProductList(list.id)
+
+                this.updateCustomerProductList({
+                    ...listToUpdate,
+                    customerProductListItems: listToUpdate.customerProductListItems.map((item) =>
+                        item.id === response.id ? response : item
+                    )
+                })
             }
         }
     }, [customer, customerProductLists, setCustomerProductLists, isLoading])

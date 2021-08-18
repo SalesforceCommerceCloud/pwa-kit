@@ -41,7 +41,7 @@ const AddToCartModal = ({product, variant, quantity, isOpen, onClose, ...props})
     const image = filterImageGroups(product.imageGroups, {
         size: 'small',
         selectedVariationAttributes: variationValues
-    }).images?.[0]
+    })?.images?.[0]
 
     return (
         <Modal size={size} isOpen={isOpen} onClose={onClose} {...props}>
@@ -54,9 +54,13 @@ const AddToCartModal = ({product, variant, quantity, isOpen, onClose, ...props})
                 bgColor="gray.50"
             >
                 <ModalHeader paddingTop="8" bgColor="white" fontSize="2xl" fontWeight="700">
-                    {intl.formatMessage({
-                        defaultMessage: '1 item added to cart'
-                    })}
+                    {intl.formatMessage(
+                        {
+                            defaultMessage:
+                                '{quantity} {quantity, plural, one {item} other {items}} added to cart'
+                        },
+                        {quantity}
+                    )}
                 </ModalHeader>
                 <ModalCloseButton />
                 <ModalBody bgColor="white" paddingTop="4" paddingBottom="8" flex="none">

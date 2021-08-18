@@ -26,9 +26,6 @@
   "1LblQ6": {
     "defaultMessage": "Cart Subtotal ({itemAccumulatedCount} item)"
   },
-  "1TQMt0": {
-    "defaultMessage": "{quantity} {itemLabel} added to cart."
-  },
   "1b9Q93": {
     "defaultMessage": "You will receive an email at <b>{email}</b> with a link to reset your password shortly."
   },
@@ -44,11 +41,11 @@
   "2SvpuI": {
     "defaultMessage": "Log in here"
   },
+  "2WRHXI": {
+    "defaultMessage": "{quantity} {quantity, plural, one {item} other {items}} added to cart"
+  },
   "2bGejb": {
     "defaultMessage": "My Account"
-  },
-  "2gr0DV": {
-    "defaultMessage": "1 item added to wishlist"
   },
   "2tqQFl": {
     "defaultMessage": "Cart"
@@ -163,6 +160,9 @@
   },
   "DPrDhw": {
     "defaultMessage": "Add New Payment Method"
+  },
+  "DdR2q8": {
+    "defaultMessage": "{quantity} {quantity, plural, one {item} other {items}} added to wishlist"
   },
   "DwzDiL": {
     "defaultMessage": "Clear recent searches"
@@ -529,9 +529,6 @@
   "fuzq0p": {
     "defaultMessage": "Checkout as guest"
   },
-  "gXWNJQ": {
-    "defaultMessage": "1 item added to cart"
-  },
   "gg6vZx": {
     "defaultMessage": "Shop by Category"
   },
@@ -776,9 +773,6 @@
   },
   "wEQDC6": {
     "defaultMessage": "Edit"
-  },
-  "x3r6nd": {
-    "defaultMessage": "1 item removed from wishlist"
   },
   "x6hxSH": {
     "defaultMessage": "Something's not right with your email or password. Try again."

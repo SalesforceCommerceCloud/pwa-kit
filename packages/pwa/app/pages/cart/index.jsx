@@ -18,22 +18,41 @@ import CartSecondaryButtonGroup from './partials/cart-secondary-button-group'
 import ProductViewModal from '../../components/product-view-modal'
 
 import {useToast} from '../../hooks/use-toast'
-import {API_ERROR_MESSAGE} from '../account/constant'
 import useCustomerProductLists, {
     eventActions
 } from '../../commerce-api/hooks/useCustomerProductLists'
-import {customerProductListTypes} from '../../constants'
+import {API_ERROR_MESSAGE, customerProductListTypes} from '../../constants'
 import useNavigation from '../../hooks/use-navigation'
 
 const Cart = () => {
     const basket = useBasket()
-    const intl = useIntl()
     const [selectedItem, setSelectedItem] = useState(undefined)
+    const [localQuantity, setLocalQuantity] = useState({})
     const {formatMessage} = useIntl()
     const showToast = useToast()
     const navigate = useNavigation()
 
-    const customerProductLists = useCustomerProductLists()
+    const productListEventHandler = (event) => {
+        if (event.action === eventActions.ADD) {
+            showWishlistItemAdded(event.item?.quantity)
+        }
+    }
+
+    const showError = (error) => {
+        console.log(error)
+        showToast({
+            title: formatMessage(
+                {defaultMessage: '{errorMessage}'},
+                {errorMessage: API_ERROR_MESSAGE}
+            ),
+            status: 'error'
+        })
+    }
+
+    const customerProductLists = useCustomerProductLists({
+        eventHandler: productListEventHandler,
+        errorHandler: showError
+    })
 
     const [isCartItemLoading, setCartItemLoading] = useState(false)
     const {isOpen, onOpen, onClose} = useDisclosure()
@@ -85,14 +104,8 @@ const Cart = () => {
             if (selectedItem.quantity !== quantity) {
                 return await changeItemQuantity(quantity, selectedItem)
             }
-        } catch (err) {
-            showToast({
-                title: formatMessage(
-                    {defaultMessage: '{errorMessage}'},
-                    {errorMessage: API_ERROR_MESSAGE}
-                ),
-                status: 'error'
-            })
+        } catch (error) {
+            showError(error)
         } finally {
             setCartItemLoading(false)
             setSelectedItem(undefined)
@@ -100,31 +113,44 @@ const Cart = () => {
     }
 
     const changeItemQuantity = async (quantity, product) => {
+        // This local state allows the dropdown to show the desired quantity
+        // while the API call to update it is happening.
+        setLocalQuantity({...localQuantity, [product.itemId]: quantity})
         setCartItemLoading(true)
         setSelectedItem(product)
         try {
-            if (quantity === 0) {
-                await basket.removeItemFromBasket(product.itemId)
-            } else {
-                const item = {
-                    productId: product.id,
-                    quantity: parseInt(quantity)
-                }
-                await basket.updateItemInBasket(item, product.itemId)
+            const item = {
+                productId: product.id,
+                quantity: parseInt(quantity)
             }
-        } catch (err) {
-            showToast({
-                title: formatMessage(
-                    {defaultMessage: '{errorMessage}'},
-                    {errorMessage: API_ERROR_MESSAGE}
-                ),
-                status: 'error'
-            })
+            await basket.updateItemInBasket(item, product.itemId)
+        } catch (error) {
+            showError(error)
         } finally {
             // reset the state
             setCartItemLoading(false)
             setSelectedItem(undefined)
+            setLocalQuantity({...localQuantity, [product.itemId]: undefined})
         }
+    }
+
+    const showWishlistItemAdded = (quantity) => {
+        const toastAction = (
+            <Button variant="link" onClick={() => navigate('/account/wishlist')}>
+                View
+            </Button>
+        )
+        showToast({
+            title: formatMessage(
+                {
+                    defaultMessage:
+                        '{quantity} {quantity, plural, one {item} other {items}} added to wishlist'
+                },
+                {quantity}
+            ),
+            status: 'success',
+            action: toastAction
+        })
     }
 
     const handleAddToWishlist = async (product) => {
@@ -137,7 +163,9 @@ const Cart = () => {
                 const event = {
                     item: product,
                     action: eventActions.ADD,
-                    listType: customerProductListTypes.WISHLIST
+                    listType: customerProductListTypes.WISHLIST,
+                    showStatus: showWishlistItemAdded,
+                    showError
                 }
 
                 customerProductLists.addActionToEventQueue(event)
@@ -145,40 +173,24 @@ const Cart = () => {
                 const wishlist = customerProductLists.data.find(
                     (list) => list.type === customerProductListTypes.WISHLIST
                 )
-                const requestBody = {
-                    productId: product.productId,
-                    priority: 1,
-                    quantity: product.quantity,
-                    public: false,
-                    type: 'product'
-                }
 
                 const wishlistItem = await customerProductLists.createCustomerProductListItem(
-                    requestBody,
-                    wishlist.id
+                    wishlist,
+                    {
+                        productId: product.productId,
+                        priority: 1,
+                        quantity: product.quantity,
+                        public: false,
+                        type: 'product'
+                    }
                 )
 
                 if (wishlistItem?.id) {
-                    const toastAction = (
-                        <Button variant="link" onClick={() => navigate('/account/wishlist')}>
-                            View
-                        </Button>
-                    )
-                    showToast({
-                        title: intl.formatMessage({defaultMessage: '1 item added to wishlist'}),
-                        status: 'success',
-                        action: toastAction
-                    })
+                    showWishlistItemAdded(product.quantity)
                 }
             }
         } catch (error) {
-            showToast({
-                title: intl.formatMessage(
-                    {defaultMessage: '{errorMessage}'},
-                    {errorMessage: API_ERROR_MESSAGE}
-                ),
-                status: 'error'
-            })
+            showError(error)
         } finally {
             setCartItemLoading(false)
             setSelectedItem(undefined)
@@ -191,17 +203,11 @@ const Cart = () => {
         try {
             await basket.removeItemFromBasket(product.itemId)
             showToast({
-                title: intl.formatMessage({defaultMessage: 'Item removed from cart'}),
+                title: formatMessage({defaultMessage: 'Item removed from cart'}),
                 status: 'success'
             })
-        } catch (err) {
-            showToast({
-                title: intl.formatMessage(
-                    {defaultMessage: '{errorMessage}'},
-                    {errorMessage: API_ERROR_MESSAGE}
-                ),
-                status: 'error'
-            })
+        } catch (error) {
+            showError(error)
         } finally {
             // reset the state
             setCartItemLoading(false)
@@ -245,7 +251,10 @@ const Cart = () => {
                                                 ...product,
                                                 ...(basket._productItemsDetail &&
                                                     basket._productItemsDetail[product.productId]),
-                                                price: product.price
+                                                price: product.price,
+                                                quantity: localQuantity[product.itemId]
+                                                    ? localQuantity[product.itemId]
+                                                    : product.quantity
                                             }}
                                             onItemQuantityChange={(value) =>
                                                 changeItemQuantity(value, product)

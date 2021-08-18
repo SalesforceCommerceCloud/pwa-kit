@@ -9,7 +9,7 @@ import {isError, useCommerceAPI} from '../commerce-api/utils'
 import {useVariant} from './use-variant'
 import {useToast} from './use-toast'
 import {useIntl} from 'react-intl'
-import {API_ERROR_MESSAGE} from '../pages/account/constant'
+import {API_ERROR_MESSAGE} from '../constants'
 
 /**
  * This hooks is responsible for fetching a product detail based on the variation selection
@@ -26,14 +26,11 @@ export const useProductViewModal = (initialProduct) => {
     const [isFetching, setIsFetching] = useState(false)
     const toast = useToast()
     const variant = useVariant(product)
-
     const cleanUpVariantParams = () => {
         const paramToRemove = [...product.variationAttributes.map(({id}) => id), 'pid']
-        const updatedUrl = removeQueryParamsFromPath(
-            `${location.pathname}${location.search}`,
-            paramToRemove
-        )
-        history.replace(updatedUrl)
+        const updatedParams = removeQueryParamsFromPath(`${location.search}`, paramToRemove)
+
+        history.replace({search: updatedParams})
     }
 
     useEffect(() => {
@@ -41,7 +38,6 @@ export const useProductViewModal = (initialProduct) => {
         // clean up the params in case there are variant params not related to current product
         cleanUpVariantParams()
         return () => {
-            // clean up the product and variant parameter from the url when the modal is unmouted
             cleanUpVariantParams()
         }
     }, [])

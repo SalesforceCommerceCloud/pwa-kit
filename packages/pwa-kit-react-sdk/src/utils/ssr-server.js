@@ -2,7 +2,7 @@
  * Copyright (c) 2021 Mobify Research & Development Inc. All rights reserved. *
  * * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
 /**
- * @module progressive-web-sdk/dist/utils/ssr-server
+ * @module progressive-web-sdk/utils/ssr-server
  */
 import crypto from 'crypto'
 import proxy from 'http-proxy-middleware'
