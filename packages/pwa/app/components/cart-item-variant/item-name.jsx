@@ -19,7 +19,7 @@ const ItemName = (props) => {
             fontWeight="bold"
             {...props}
             color="black.600"
-            to={`/product/${variant.master.masterId}`}
+            to={`/product/${variant?.master?.masterId}`}
         >
             {variant.productName}
         </Link>

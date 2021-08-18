@@ -2,16 +2,9 @@
  * Copyright (c) 2021 Mobify Research & Development Inc. All rights reserved. *
  * * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
 import {useContext, useMemo, useEffect, useState} from 'react'
-import {
-    isError,
-    useCommerceAPI,
-    CustomerProductListsContext,
-    convertSnakeCaseToSentenceCase
-} from '../utils'
+import {isError, useCommerceAPI, CustomerProductListsContext} from '../utils'
 import useCustomer from './useCustomer'
 import {customerProductListTypes} from '../../constants'
-import {useToast} from '../../hooks/use-toast'
-import {API_ERROR_MESSAGE} from '../../pages/account/constant'
 // If the customerProductLists haven't yet loaded we store user actions inside
 // eventQueue and process the eventQueue once productLists have loaded
 const eventQueue = []
@@ -26,37 +19,39 @@ export default function useCustomerProductLists() {
     const customer = useCustomer()
     const {customerProductLists, setCustomerProductLists} = useContext(CustomerProductListsContext)
     const [isLoading, setIsLoading] = useState(false)
-    const showToast = useToast()
 
     const processEventQueue = async () => {
         while (eventQueue.length) {
-            // the first item
+            // get the first item
             const event = eventQueue.shift()
             switch (event.action) {
                 case eventActions.ADD: {
                     try {
-                        const productItem = {
-                            productId: event.item.id,
-                            quantity: event.item.quantity
-                        }
-                        await addItemToCustomerProductList(
-                            productItem,
-                            event.listId,
-                            event.listType
+                        const wishlist = self.getProductListPerType(
+                            customerProductListTypes.WISHLIST
                         )
-
-                        showToast({
-                            title: `1 item added to ${convertSnakeCaseToSentenceCase(
-                                event.listType
-                            )}`,
-                            status: 'success',
-                            action: event.toastAction
-                        })
+                        const productListItem = wishlist.customerProductListItems.find(
+                            ({productId}) => productId === event.item.id
+                        )
+                        // if the item is already in the wishlist
+                        // only update the quantity
+                        if (productListItem) {
+                            await self.updateItemToWishlist(
+                                event.item.id,
+                                productListItem,
+                                event.item.quantity,
+                                wishlist.id
+                            )
+                            return event.onSuccess(event.item.quantity)
+                        }
+                        await self.addItemToWishlist(
+                            event.item.id,
+                            event.item.quantity,
+                            wishlist.id
+                        )
+                        return event.onSuccess?.(event.item.quantity)
                     } catch (error) {
-                        showToast({
-                            title: API_ERROR_MESSAGE,
-                            status: 'error'
-                        })
+                        event.onError?.()
                     }
                     break
                 }
@@ -64,41 +59,20 @@ export default function useCustomerProductLists() {
                 case eventActions.REMOVE:
                     try {
                         await self.deleteCustomerProductListItem(event.item, event.listId)
-                        showToast({
-                            title: '1 item removed from {listType}',
-                            status: 'success'
-                        })
+                        event.onSuccess?.()
                         break
                     } catch (error) {
-                        showToast({
-                            title: API_ERROR_MESSAGE,
-                            status: 'error'
-                        })
+                        event.onError?.()
                     }
             }
         }
     }
 
     useEffect(() => {
-        if (eventQueue.length) {
+        if (eventQueue.length && customerProductLists?.data.length) {
             processEventQueue()
         }
     }, [customerProductLists])
-
-    const addItemToCustomerProductList = async (item) => {
-        const requestBody = {
-            productId: item.productId,
-            priority: 1,
-            quantity: item.quantity,
-            public: false,
-            type: 'product'
-        }
-
-        const wishList = customerProductLists.data.find(
-            (list) => list.type === customerProductListTypes.WISHLIST
-        )
-        return await self.createCustomerProductListItem(requestBody, wishList.id)
-    }
 
     const self = useMemo(() => {
         return {
@@ -121,7 +95,52 @@ export default function useCustomerProductLists() {
             },
 
             /**
+             * Add an item to wishlist
+             * @param {object} productId - the product id to be added to wishlist
+             * @param {number} quantity - the number of items to be added to wishlist
+             * @param {string} wishlistId - id of the wishlist to add item to
+             * @returns {object} product lists
+             */
+            async addItemToWishlist(productId, quantity, wishlistId) {
+                const requestBody = {
+                    productId,
+                    priority: 1,
+                    quantity,
+                    public: false,
+                    type: 'product'
+                }
+
+                return await self.createCustomerProductListItem(requestBody, wishlistId)
+            },
+
+            /**
+             * Update an item in wish list
+             * @param {string} productId - id of the product to be updated
+             * @param {object} productListItem - the product item in wishlist
+             * @param {number} quantity - number to be updated to the wishlist
+             * @param {string} wishlistId - wish list id
+             * @returns {Promise<*>}
+             */
+            async updateItemToWishlist(productId, productListItem, quantity, wishlistId) {
+                const requestBody = {
+                    productId,
+                    priority: 1,
+                    // increase the quantity if that item already exists in the wishlist
+                    // since we allow an item to be added multiple times
+                    quantity: productListItem.quantity + quantity,
+                    public: false,
+                    type: 'product'
+                }
+                return await self.updateCustomerProductListItem(
+                    requestBody,
+                    wishlistId,
+                    productListItem.id
+                )
+            },
+
+            /**
              * Fetches product lists for registered users or creates a new list if none exist
+             * due to the api limitation, we can not get the list based on type but all lists
              * @param {string} type type of list to fetch or create
              * @returns product lists for registered users
              */
@@ -225,11 +244,35 @@ export default function useCustomerProductLists() {
              */
             async createCustomerProductListItem(item, listId) {
                 setIsLoading(true)
+                console.log('item', item)
                 const response = await api.shopperCustomers.createCustomerProductListItem({
                     body: item,
                     parameters: {
                         customerId: customer.customerId,
                         listId
+                    }
+                })
+
+                setIsLoading(false)
+
+                if (isError(response)) {
+                    throw new Error(response)
+                }
+
+                // This function does not return an updated customerProductsList so we fetch manually
+                await self.getCustomerProductLists()
+                return response
+            },
+
+            async updateCustomerProductListItem(item, listId, itemId) {
+                setIsLoading(true)
+                console.log('item', item)
+                const response = await api.shopperCustomers.updateCustomerProductListItem({
+                    body: item,
+                    parameters: {
+                        customerId: customer.customerId,
+                        listId,
+                        itemId
                     }
                 })
 

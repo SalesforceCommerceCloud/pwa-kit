@@ -79,6 +79,35 @@ const ProductDetail = ({category, product, isLoading}) => {
         }
     }
 
+    const showSuccessfulToast = (quantity) => {
+        const toastAction = (
+            <Button variant="link" onClick={onViewWishlistClick}>
+                View
+            </Button>
+        )
+        showToast({
+            title: intl.formatMessage(
+                {
+                    defaultMessage:
+                        '{quantity, plural, one {# item} other {# items}} added to wishlist'
+                },
+                {quantity}
+            ),
+            status: 'success',
+            action: toastAction
+        })
+    }
+
+    const showErrorToast = () => {
+        showToast({
+            title: intl.formatMessage(
+                {defaultMessage: '{errorMessage}'},
+                {errorMessage: API_ERROR_MESSAGE}
+            ),
+            status: 'error'
+        })
+    }
+
     const onViewWishlistClick = () => {
         navigate('/account/wishlist')
     }
@@ -91,49 +120,37 @@ const ProductDetail = ({category, product, isLoading}) => {
                 const event = {
                     item: {...product, quantity},
                     action: eventActions.ADD,
-                    listType: customerProductListTypes.WISHLIST
+                    listType: customerProductListTypes.WISHLIST,
+                    onSuccess: showSuccessfulToast,
+                    onError: showErrorToast
                 }
 
                 customerProductLists.addActionToEventQueue(event)
             } else {
-                const wishlist = customerProductLists.data.find(
-                    (list) => list.type === customerProductListTypes.WISHLIST
+                const wishlist = customerProductLists.getProductListPerType(
+                    customerProductListTypes.WISHLIST
                 )
-                const requestBody = {
-                    productId: product.id,
-                    priority: 1,
-                    quantity,
-                    public: false,
-                    type: 'product'
-                }
-
-                const wishlistItem = await customerProductLists.createCustomerProductListItem(
-                    requestBody,
-                    wishlist.id
+                const productListItem = wishlist.customerProductListItems.find(
+                    ({productId}) => productId === product.id
                 )
-
-                if (wishlistItem?.id) {
-                    const toastAction = (
-                        <Button variant="link" onClick={onViewWishlistClick}>
-                            View
-                        </Button>
+                // if the product already exists in wishlist, update the quantity
+                if (productListItem) {
+                    await customerProductLists.updateItemToWishlist(
+                        product.id,
+                        productListItem,
+                        quantity,
+                        wishlist.id
                     )
-                    showToast({
-                        title: intl.formatMessage({defaultMessage: '1 item added to wishlist'}),
-                        status: 'success',
-                        action: toastAction
-                    })
+                    showSuccessfulToast(quantity)
+                } else {
+                    // other wise, just create a new product list item with given quantity number
+                    await customerProductLists.addItemToWishlist(product.id, quantity, wishlist.id)
+                    showSuccessfulToast(quantity)
                 }
             }
         } catch (error) {
             console.error(error)
-            showToast({
-                title: intl.formatMessage(
-                    {defaultMessage: '{errorMessage}'},
-                    {errorMessage: API_ERROR_MESSAGE}
-                ),
-                status: 'error'
-            })
+            showErrorToast()
         }
     }
 
