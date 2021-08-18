@@ -64,5 +64,3 @@ export const REMOVE_CART_ITEM_CONFIRMATION_DIALOG_CONFIG = {
     alternateActionLabel: defineMessage({defaultMessage: 'No, keep item'}),
     onPrimaryAction: noop
 }
-
-export const API_ERROR_MESSAGE = 'Something went wrong. Try again!'

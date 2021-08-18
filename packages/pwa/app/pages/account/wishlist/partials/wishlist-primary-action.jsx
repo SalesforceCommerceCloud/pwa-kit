@@ -7,7 +7,7 @@ import useBasket from '../../../../commerce-api/hooks/useBasket'
 import {useIntl} from 'react-intl'
 import {useCartItemVariant} from '../../../../components/cart-item-variant'
 import {useToast} from '../../../../hooks/use-toast'
-import {API_ERROR_MESSAGE} from '../../constant'
+import {API_ERROR_MESSAGE} from '../../../../constants'
 
 /**
  * Renders primary action on a product-item card in the form of a button.
@@ -35,12 +35,10 @@ const WishlistPrimaryAction = () => {
             showToast({
                 title: formatMessage(
                     {
-                        defaultMessage: `{quantity} {itemLabel} added to cart.`
+                        defaultMessage:
+                            '{quantity} {quantity, plural, one {item} other {items}} added to cart'
                     },
-                    {
-                        quantity: variant.quantity,
-                        itemLabel: variant.quantity === 1 ? 'item' : 'items'
-                    }
+                    {quantity: variant.quantity}
                 ),
                 status: 'success'
             })

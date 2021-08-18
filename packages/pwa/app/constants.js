@@ -16,3 +16,5 @@ export const customerProductListTypes = {
     WISHLIST: 'wish_list'
 }
 export const DEFAULT_CURRENCY = 'USD'
+
+export const API_ERROR_MESSAGE = 'Something went wrong. Try again!'

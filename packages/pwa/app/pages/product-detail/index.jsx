@@ -36,14 +36,13 @@ import ProductView from '../../partials/product-view'
 import {HTTPNotFound} from 'pwa-kit-react-sdk/ssr/universal/errors'
 
 // constant
-import {customerProductListTypes} from '../../constants'
+import {API_ERROR_MESSAGE, customerProductListTypes} from '../../constants'
 import {rebuildPathWithParams} from '../../utils/url'
 import {useHistory} from 'react-router-dom'
 import {useToast} from '../../hooks/use-toast'
-import {API_ERROR_MESSAGE} from '../account/constant'
 
 const ProductDetail = ({category, product, isLoading}) => {
-    const intl = useIntl()
+    const {formatMessage} = useIntl()
     const basket = useBasket()
     const history = useHistory()
     const einstein = useEinstein()
@@ -51,9 +50,31 @@ const ProductDetail = ({category, product, isLoading}) => {
     const [primaryCategory, setPrimaryCategory] = useState(category)
 
     const variant = useVariant(product)
-    const customerProductLists = useCustomerProductLists()
+
+    const productListEventHandler = (event) => {
+        if (event.action === eventActions.ADD) {
+            showWishlistItemAdded(event.item?.quantity)
+        }
+    }
+
+    const showError = (error) => {
+        console.log(error)
+        showToast({
+            title: formatMessage(
+                {defaultMessage: '{errorMessage}'},
+                {errorMessage: API_ERROR_MESSAGE}
+            ),
+            status: 'error'
+        })
+    }
+
+    const customerProductLists = useCustomerProductLists({
+        eventHandler: productListEventHandler,
+        errorHandler: showError
+    })
     const navigate = useNavigation()
     const showToast = useToast()
+
     const handleAddToCart = async (variant, quantity) => {
         try {
             if (!variant?.orderable || !quantity) return
@@ -68,19 +89,28 @@ const ProductDetail = ({category, product, isLoading}) => {
             ]
 
             basket.addItemToBasket(productItems)
-        } catch (err) {
-            showToast({
-                title: intl.formatMessage(
-                    {defaultMessage: '{errorMessage}'},
-                    {errorMessage: API_ERROR_MESSAGE}
-                ),
-                status: 'error'
-            })
+        } catch (error) {
+            showError(error)
         }
     }
 
-    const onViewWishlistClick = () => {
-        navigate('/account/wishlist')
+    const showWishlistItemAdded = (quantity) => {
+        const toastAction = (
+            <Button variant="link" onClick={() => navigate('/account/wishlist')}>
+                View
+            </Button>
+        )
+        showToast({
+            title: formatMessage(
+                {
+                    defaultMessage:
+                        '{quantity} {quantity, plural, one {item} other {items}} added to wishlist'
+                },
+                {quantity}
+            ),
+            status: 'success',
+            action: toastAction
+        })
     }
 
     const addItemToWishlist = async (quantity = 1) => {
@@ -91,7 +121,9 @@ const ProductDetail = ({category, product, isLoading}) => {
                 const event = {
                     item: {...product, quantity},
                     action: eventActions.ADD,
-                    listType: customerProductListTypes.WISHLIST
+                    listType: customerProductListTypes.WISHLIST,
+                    showStatus: showWishlistItemAdded,
+                    showError
                 }
 
                 customerProductLists.addActionToEventQueue(event)
@@ -99,41 +131,24 @@ const ProductDetail = ({category, product, isLoading}) => {
                 const wishlist = customerProductLists.data.find(
                     (list) => list.type === customerProductListTypes.WISHLIST
                 )
-                const requestBody = {
-                    productId: product.id,
-                    priority: 1,
-                    quantity,
-                    public: false,
-                    type: 'product'
-                }
 
                 const wishlistItem = await customerProductLists.createCustomerProductListItem(
-                    requestBody,
-                    wishlist.id
+                    wishlist,
+                    {
+                        productId: product.id,
+                        priority: 1,
+                        quantity,
+                        public: false,
+                        type: 'product'
+                    }
                 )
 
                 if (wishlistItem?.id) {
-                    const toastAction = (
-                        <Button variant="link" onClick={onViewWishlistClick}>
-                            View
-                        </Button>
-                    )
-                    showToast({
-                        title: intl.formatMessage({defaultMessage: '1 item added to wishlist'}),
-                        status: 'success',
-                        action: toastAction
-                    })
+                    showWishlistItemAdded(quantity)
                 }
             }
         } catch (error) {
-            console.error(error)
-            showToast({
-                title: intl.formatMessage(
-                    {defaultMessage: '{errorMessage}'},
-                    {errorMessage: API_ERROR_MESSAGE}
-                ),
-                status: 'error'
-            })
+            showError(error)
         }
     }
 
@@ -191,7 +206,7 @@ const ProductDetail = ({category, product, isLoading}) => {
                             <h2>
                                 <AccordionButton height="64px">
                                     <Box flex="1" textAlign="left" fontWeight="bold" fontSize="lg">
-                                        {intl.formatMessage({
+                                        {formatMessage({
                                             defaultMessage: 'Product Detail'
                                         })}
                                     </Box>
@@ -212,7 +227,7 @@ const ProductDetail = ({category, product, isLoading}) => {
                             <h2>
                                 <AccordionButton height="64px">
                                     <Box flex="1" textAlign="left" fontWeight="bold" fontSize="lg">
-                                        {intl.formatMessage({
+                                        {formatMessage({
                                             defaultMessage: 'Size & Fit'
                                         })}
                                     </Box>
@@ -220,7 +235,7 @@ const ProductDetail = ({category, product, isLoading}) => {
                                 </AccordionButton>
                             </h2>
                             <AccordionPanel mb={6} mt={4}>
-                                {intl.formatMessage({defaultMessage: 'Coming Soon'})}
+                                {formatMessage({defaultMessage: 'Coming Soon'})}
                             </AccordionPanel>
                         </AccordionItem>
 
@@ -229,7 +244,7 @@ const ProductDetail = ({category, product, isLoading}) => {
                             <h2>
                                 <AccordionButton height="64px">
                                     <Box flex="1" textAlign="left" fontWeight="bold" fontSize="lg">
-                                        {intl.formatMessage({
+                                        {formatMessage({
                                             defaultMessage: 'Reviews'
                                         })}
                                     </Box>
@@ -246,7 +261,7 @@ const ProductDetail = ({category, product, isLoading}) => {
                             <h2>
                                 <AccordionButton height="64px">
                                     <Box flex="1" textAlign="left" fontWeight="bold" fontSize="lg">
-                                        {intl.formatMessage({
+                                        {formatMessage({
                                             defaultMessage: 'Questions'
                                         })}
                                     </Box>
