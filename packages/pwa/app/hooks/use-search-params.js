@@ -3,6 +3,7 @@
  * * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
 
 import {useLocation} from 'react-router-dom'
+import qs from 'qs'
 
 // Constants
 import {DEFAULT_SEARCH_PARAMS} from '../constants'
@@ -13,12 +14,14 @@ import {DEFAULT_SEARCH_PARAMS} from '../constants'
  */
 export const useSearchParams = (searchParams = DEFAULT_SEARCH_PARAMS) => {
     const {search} = useLocation()
-    const params = new URLSearchParams(search)
+    const params = qs.parse(search.substring(1))
+
+    params.refine = Array.isArray(params.refine) ? params.refine : [params.refine]
 
     return Object.keys(searchParams).reduce((acc, key) => {
-        let value = params.get(`${key}`) || searchParams[key]
+        let value = params[`${key}`] || searchParams[key]
 
-        if (!isNaN(value)) {
+        if (!isNaN(value) && !Array.isArray(value)) {
             value = parseInt(value)
         }
 

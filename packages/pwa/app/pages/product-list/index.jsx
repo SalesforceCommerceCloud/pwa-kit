@@ -58,6 +58,8 @@ import {queryToProductSearch, toggleSelectedFilter} from '../../commerce-api/sea
 import useNavigation from '../../hooks/use-navigation'
 import LoadingSpinner from '../../components/loading-spinner'
 
+import qs from 'qs'
+
 /*
  * This is a simple product listing page. It displays a paginated list
  * of product hit objects. Allowing for sorting and filtering based on the
@@ -111,8 +113,50 @@ const ProductList = (props) => {
 
     // Toggles filter on and off
     const toggleFilter = (value, attributeId, selected) => {
-        const newQueryString = toggleSelectedFilter(value, attributeId, selected)
-        navigate(`${location.pathname}?${newQueryString}`)
+        let newSearchParams = {}
+        let newRefine
+        let updated = false // Indicate whether or not we updated a pre-existing refinment.
+
+        // 1. Update any refinements that already exist for the given attributeId.
+        newRefine = searchParams.refine.map((refinement) => {
+            const [key, keyvalue] = refinement.split('=')
+
+            // The value might be a pipe separated list. So always do this.
+            let values = keyvalue.split('|')
+
+            // Found a current refinement to update
+            if (key === attributeId) {
+                // Track that we are editing an existing value.
+                updated = true
+
+                // Add or remove refinement value.
+                values = !selected
+                    ? [...values, value.value]
+                    : values.filter((v) => v !== value.value)
+            }
+
+            return `${key}=${values.join('|')}`
+        })
+
+        // 2. If we didn't update any refinement above, add a new refinement.
+        if (!updated && !selected) {
+            newRefine = [...searchParams.refine, `${attributeId}=${value.value}`]
+        }
+
+        // 3. Filter out any values that may have been cleared.
+        newRefine = newRefine.filter((refinement) => {
+            const [, keyvalue] = refinement.split('=')
+
+            return !!keyvalue
+        })
+
+        // 4. Assign the new refinements along with existing other search params.
+        newSearchParams = {
+            ...searchParams,
+            refine: newRefine
+        }
+
+        navigate(`${location.pathname}?${qs.stringify(newSearchParams, {arrayFormat: 'repeat'})}`)
     }
 
     // Clears all filters
@@ -122,6 +166,14 @@ const ProductList = (props) => {
 
     const selectedSortingOptionLabel = productSearchResult?.sortingOptions.find(
         (option) => option.id === productSearchResult?.selectedSortingOption
+    )
+
+    // CHANGE
+    // ["n1=v1", "n2=v2"].reduce((acc, curr) => ({...acc, [curr.split('=')[0]]: curr.split('=')[1] }), {})
+    // const refine = Array.isArray(searchParams.refine) ? searchParams.refine : [searchParams.refine]
+    const selectedRefinements = searchParams.refine.reduce(
+        (acc, curr) => ({...acc, [curr.split('=')[0]]: curr.split('=')[1]}),
+        {}
     )
 
     return (
@@ -250,7 +302,8 @@ const ProductList = (props) => {
                                 isLoading={filtersLoading}
                                 toggleFilter={toggleFilter}
                                 filters={productSearchResult?.refinements}
-                                selectedFilters={productSearchResult?.selectedRefinements}
+                                // selectedFilters={productSearchResult?.selectedRefinements}
+                                selectedFilters={selectedRefinements}
                             />
                         </Stack>
                         <Box>
