@@ -32,7 +32,27 @@ const Cart = () => {
     const showToast = useToast()
     const navigate = useNavigation()
 
-    const customerProductLists = useCustomerProductLists()
+    const productListEventHandler = (event) => {
+        if (event.action === eventActions.ADD) {
+            showWishlistItemAdded(event.item?.quantity)
+        }
+    }
+
+    const showError = (error) => {
+        console.log(error)
+        showToast({
+            title: formatMessage(
+                {defaultMessage: '{errorMessage}'},
+                {errorMessage: API_ERROR_MESSAGE}
+            ),
+            status: 'error'
+        })
+    }
+
+    const customerProductLists = useCustomerProductLists({
+        eventHandler: productListEventHandler,
+        errorHandler: showError
+    })
 
     const [isCartItemLoading, setCartItemLoading] = useState(false)
     const {isOpen, onOpen, onClose} = useDisclosure()
@@ -53,17 +73,6 @@ const Cart = () => {
 
     if (!basket?.productItems) {
         return <EmptyCart />
-    }
-
-    const showError = (error) => {
-        console.log(error)
-        showToast({
-            title: formatMessage(
-                {defaultMessage: '{errorMessage}'},
-                {errorMessage: API_ERROR_MESSAGE}
-            ),
-            status: 'error'
-        })
     }
 
     const handleUpdateCart = async (variant, quantity) => {
@@ -125,10 +134,7 @@ const Cart = () => {
         }
     }
 
-    const showWishlistItemAdded = (quantityOrEvent) => {
-        const quantity = Number.isInteger(quantityOrEvent)
-            ? quantityOrEvent
-            : quantityOrEvent.item.quantity
+    const showWishlistItemAdded = (quantity) => {
         const toastAction = (
             <Button variant="link" onClick={() => navigate('/account/wishlist')}>
                 View

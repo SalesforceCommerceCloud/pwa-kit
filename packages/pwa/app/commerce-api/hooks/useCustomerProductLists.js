@@ -2,7 +2,7 @@
  * Copyright (c) 2021 Mobify Research & Development Inc. All rights reserved. *
  * * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
 import {useContext, useMemo, useEffect, useState} from 'react'
-import {isError, useCommerceAPI, CustomerProductListsContext} from '../utils'
+import {isError, useCommerceAPI, CustomerProductListsContext, noop} from '../utils'
 import useCustomer from './useCustomer'
 // If the customerProductLists haven't yet loaded we store user actions inside
 // eventQueue and process the eventQueue once productLists have loaded
@@ -13,7 +13,7 @@ export const eventActions = {
     REMOVE: 'remove'
 }
 
-export default function useCustomerProductLists() {
+export default function useCustomerProductLists({eventHandler = noop, errorHandler = noop} = {}) {
     const api = useCommerceAPI()
     const customer = useCustomer()
     const {customerProductLists, setCustomerProductLists} = useContext(CustomerProductListsContext)
@@ -35,9 +35,9 @@ export default function useCustomerProductLists() {
                             event.list?.id,
                             event.listType
                         )
-                        event.showStatus(event)
+                        eventHandler(event)
                     } catch (error) {
-                        event.showError(error)
+                        errorHandler(error)
                     }
                     break
                 }
@@ -45,9 +45,9 @@ export default function useCustomerProductLists() {
                 case eventActions.REMOVE:
                     try {
                         await self.deleteCustomerProductListItem(event.list, event.item)
-                        event.showStatus(event)
+                        eventHandler(event)
                     } catch (error) {
-                        event.showError(error)
+                        errorHandler(error)
                     }
                     break
             }

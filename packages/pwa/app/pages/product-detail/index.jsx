@@ -50,9 +50,12 @@ const ProductDetail = ({category, product, isLoading}) => {
     const [primaryCategory, setPrimaryCategory] = useState(category)
 
     const variant = useVariant(product)
-    const customerProductLists = useCustomerProductLists()
-    const navigate = useNavigation()
-    const showToast = useToast()
+
+    const productListEventHandler = (event) => {
+        if (event.action === eventActions.ADD) {
+            showWishlistItemAdded(event.item?.quantity)
+        }
+    }
 
     const showError = (error) => {
         console.log(error)
@@ -64,6 +67,13 @@ const ProductDetail = ({category, product, isLoading}) => {
             status: 'error'
         })
     }
+
+    const customerProductLists = useCustomerProductLists({
+        eventHandler: productListEventHandler,
+        errorHandler: showError
+    })
+    const navigate = useNavigation()
+    const showToast = useToast()
 
     const handleAddToCart = async (variant, quantity) => {
         try {
@@ -84,10 +94,7 @@ const ProductDetail = ({category, product, isLoading}) => {
         }
     }
 
-    const showWishlistItemAdded = (quantityOrEvent) => {
-        const quantity = Number.isInteger(quantityOrEvent)
-            ? quantityOrEvent
-            : quantityOrEvent.item.quantity
+    const showWishlistItemAdded = (quantity) => {
         const toastAction = (
             <Button variant="link" onClick={() => navigate('/account/wishlist')}>
                 View
