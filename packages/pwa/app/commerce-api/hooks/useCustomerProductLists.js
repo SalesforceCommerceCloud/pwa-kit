@@ -2,7 +2,9 @@
  * Copyright (c) 2021 Mobify Research & Development Inc. All rights reserved. *
  * * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
 import {useContext, useMemo, useEffect, useState} from 'react'
-import {isError, useCommerceAPI, CustomerProductListsContext, noop} from '../utils'
+import {isError, useCommerceAPI, CustomerProductListsContext} from '../utils'
+import {noop} from '../../utils/utils'
+
 import useCustomer from './useCustomer'
 import {customerProductListTypes} from '../../constants'
 // If the customerProductLists haven't yet loaded we store user actions inside
