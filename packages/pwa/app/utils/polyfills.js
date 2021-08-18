@@ -2,8 +2,8 @@
  * Copyright (c) 2021 Mobify Research & Development Inc. All rights reserved. *
  * * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
 
-import {getAssetUrl} from 'pwa-kit-react-sdk/dist/ssr/universal/utils'
-import {loadScript} from 'pwa-kit-react-sdk/dist/utils/assets'
+import {getAssetUrl} from 'pwa-kit-react-sdk/ssr/universal/utils'
+import {loadScript} from 'pwa-kit-react-sdk/utils/assets'
 
 export const availablePolyfills = [
     {

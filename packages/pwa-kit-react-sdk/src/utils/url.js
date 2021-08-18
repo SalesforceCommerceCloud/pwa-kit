@@ -11,7 +11,7 @@
  * @function
  * @returns {string} Returns the ORIGIN under which we are serving the page.
  * @example
- * import {getAppOrigin} from 'pwa-kit-react-sdk/dist/utils/url'
+ * import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
  *
  * const url = `${getAppOrigin()}/path`
  */

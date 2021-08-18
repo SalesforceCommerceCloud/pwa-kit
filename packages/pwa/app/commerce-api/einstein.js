@@ -2,7 +2,7 @@
  * Copyright (c) 2021 Mobify Research & Development Inc. All rights reserved. *
  * * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
 import fetch from 'cross-fetch'
-import {getAppOrigin} from 'pwa-kit-react-sdk/dist/utils/url'
+import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
 import {keysToCamel} from './utils'
 
 class EinsteinAPI {

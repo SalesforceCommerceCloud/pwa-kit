@@ -33,7 +33,7 @@ import RecommendedProducts from '../../components/recommended-products'
 import ProductView from '../../partials/product-view'
 
 // Others/Utils
-import {HTTPNotFound} from 'pwa-kit-react-sdk/dist/ssr/universal/errors'
+import {HTTPNotFound} from 'pwa-kit-react-sdk/ssr/universal/errors'
 
 // constant
 import {customerProductListTypes} from '../../constants'
