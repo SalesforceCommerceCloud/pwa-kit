@@ -38,20 +38,21 @@ export default function useCustomerProductLists({eventHandler = noop, errorHandl
                         // if the item is already in the wishlist
                         // only update the quantity
                         if (productListItem) {
-                            await self.updateItemToWishlist(
-                                event.item.id,
-                                productListItem,
-                                event.item.quantity,
-                                wishlist.id
-                            )
-                            return eventHandler(event)
+                            await self.updateCustomerProductListItem(wishlist, {
+                                ...productListItem,
+                                quantity: event.item.onItemQuantityChange
+                            })
+                            eventHandler(event)
+                        } else {
+                            await self.createCustomerProductListItem(wishlist, {
+                                productId: event.item.productId,
+                                priority: 1,
+                                quantity: parseInt(event.item.quantity),
+                                public: false,
+                                type: 'product'
+                            })
+                            eventHandler(event)
                         }
-                        await self.addItemToWishlist(
-                            event.item.id,
-                            event.item.quantity,
-                            wishlist.id
-                        )
-                        eventHandler(event)
                     } catch (error) {
                         errorHandler(error)
                     }
@@ -113,31 +114,6 @@ export default function useCustomerProductLists({eventHandler = noop, errorHandl
                 }
 
                 return await self.createCustomerProductListItem(requestBody, wishlistId)
-            },
-
-            /**
-             * Update an item in wish list
-             * @param {string} productId - id of the product to be updated
-             * @param {object} productListItem - the product item in wishlist
-             * @param {number} quantity - number to be updated to the wishlist
-             * @param {string} wishlistId - wish list id
-             * @returns {Promise<*>}
-             */
-            async updateItemToWishlist(productId, productListItem, quantity, wishlistId) {
-                const requestBody = {
-                    productId,
-                    priority: 1,
-                    // increase the quantity if that item already exists in the wishlist
-                    // since we allow an item to be added multiple times
-                    quantity: productListItem.quantity + quantity,
-                    public: false,
-                    type: 'product'
-                }
-                return await self.updateCustomerProductListItem(
-                    requestBody,
-                    wishlistId,
-                    productListItem.id
-                )
             },
 
             /**
@@ -242,7 +218,6 @@ export default function useCustomerProductLists({eventHandler = noop, errorHandl
             /**
              * Adds an item to the customer's product list.
              * @param {object} list
-             * @param {string} list.id id of the list to add the item to.
              * @param {Object} item item to be added to the list.
              */
             async createCustomerProductListItem(list, item) {

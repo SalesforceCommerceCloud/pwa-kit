@@ -113,7 +113,7 @@ const ProductDetail = ({category, product, isLoading}) => {
         })
     }
 
-    const addItemToWishlist = async (quantity = 1) => {
+    const addItemToWishlist = async (quantity) => {
         try {
             // If product-lists have not loaded we push "Add to wishlist" event to eventQueue to be
             // processed once the product-lists have loaded.
@@ -121,7 +121,7 @@ const ProductDetail = ({category, product, isLoading}) => {
                 const event = {
                     item: {...product, quantity},
                     action: eventActions.ADD,
-                    listType: customerProductListTypes.WISHLIST,
+                    listType: customerProductListTypes.WISHLIST
                 }
 
                 customerProductLists.addActionToEventQueue(event)
@@ -135,19 +135,22 @@ const ProductDetail = ({category, product, isLoading}) => {
                 )
                 // if the product already exists in wishlist, update the quantity
                 if (productListItem) {
-                    await customerProductLists.updateItemToWishlist(
-                        product.id,
-                        productListItem,
-                        quantity,
-                        wishlist.id
-                    )
+                    await customerProductLists.updateCustomerProductListItem(wishlist, {
+                        ...productListItem,
+                        quantity: parseInt(quantity)
+                    })
                     showWishlistItemAdded(quantity)
                 } else {
                     // other wise, just create a new product list item with given quantity number
-                    await customerProductLists.addItemToWishlist(product.id, quantity, wishlist.id)
+                    await customerProductLists.createCustomerProductListItem(wishlist, {
+                        productId: product.productId,
+                        priority: 1,
+                        quantity,
+                        public: false,
+                        type: 'product'
+                    })
                     showWishlistItemAdded(quantity)
                 }
-
             }
         } catch (error) {
             showError(error)

@@ -53,12 +53,32 @@ import {API_ERROR_MESSAGE} from '../account/constant'
  * allowable filters and sort refinements.
  */
 const ProductList = (props) => {
-    const intl = useIntl()
+    const {formatMessage} = useIntl()
     const history = useHistory()
     const params = useParams()
     const searchParams = useSearchParams()
     const {categories} = useContext(CategoriesContext)
-    const customerProductLists = useCustomerProductLists()
+
+    const productListEventHandler = (event) => {
+        if (event.action === eventActions.ADD) {
+            showWishlistItemAdded(event.item?.quantity)
+        }
+    }
+
+    const showError = () => {
+        showToast({
+            title: formatMessage(
+                {defaultMessage: '{errorMessage}'},
+                {errorMessage: API_ERROR_MESSAGE}
+            ),
+            status: 'error'
+        })
+    }
+
+    const customerProductLists = useCustomerProductLists({
+        eventHandler: productListEventHandler,
+        errorHandler: showError
+    })
     const navigate = useNavigation()
     const showToast = useToast()
 
@@ -111,67 +131,43 @@ const ProductList = (props) => {
         }
     }, [customerProductLists.data, productSearchResult])
 
-    const handleViewWishlistClick = () => {
-        navigate('/account/wishlist')
+    /**
+     * Removes product from wishlist
+     */
+    const removeItemFromWishlist = async (product) => {
+        // Extract productListItemId corresponding to product from wishlist
+        const productListItem = wishlist.customerProductListItems.find(
+            (item) => item.productId === product.productId
+        )
+        try {
+            await customerProductLists.deleteCustomerProductListItem(wishlist, productListItem)
+
+            showToast({
+                title: formatMessage({defaultMessage: 'Item removed from wishlist'}),
+                status: 'success'
+            })
+        } catch (err) {
+            showError()
+        }
     }
 
-    const showSuccessfulToast = (quantity) => {
+    const showWishlistItemAdded = (quantity) => {
         const toastAction = (
-            <Button variant="link" onClick={handleViewWishlistClick}>
+            <Button variant="link" onClick={() => navigate('/account/wishlist')}>
                 View
             </Button>
         )
         showToast({
-            title: intl.formatMessage(
+            title: formatMessage(
                 {
                     defaultMessage:
-                        '{quantity, plural, one {# item} other {# items}} added to wishlist'
+                        '{quantity} {quantity, plural, one {item} other {items}} added to wishlist'
                 },
                 {quantity}
             ),
             status: 'success',
             action: toastAction
         })
-    }
-
-    const showErrorToast = () => {
-        showToast({
-            title: intl.formatMessage(
-                {defaultMessage: '{errorMessage}'},
-                {errorMessage: API_ERROR_MESSAGE}
-            ),
-            status: 'error'
-        })
-    }
-
-    /**
-     * Removes product from wishlist
-     */
-    const removeItemFromWishlist = async (product) => {
-        // Extract productListItemId corresponding to product from wishlist
-        const wishlistItemId = wishlist.customerProductListItems.find(
-            (item) => item.productId === product.productId
-        ).id
-        try {
-            await customerProductLists.deleteCustomerProductListItem(
-                {id: wishlistItemId},
-                wishlist.id
-            )
-
-            showToast({
-                title: intl.formatMessage({defaultMessage: 'Item removed from wishlist'}),
-                status: 'success'
-            })
-        } catch (err) {
-            console.error(err)
-            showToast({
-                title: intl.formatMessage(
-                    {defaultMessage: '{errorMessage}'},
-                    {errorMessage: API_ERROR_MESSAGE}
-                ),
-                status: 'error'
-            })
-        }
     }
 
     const addItemToWishlist = async (product) => {
@@ -182,9 +178,7 @@ const ProductList = (props) => {
                 const event = {
                     item: {...product, id: product.productId, quantity: 1},
                     action: eventActions.ADD,
-                    listType: customerProductListTypes.WISHLIST,
-                    onSuccess: showSuccessfulToast,
-                    onError: showErrorToast
+                    listType: customerProductListTypes.WISHLIST
                 }
 
                 customerProductLists.addActionToEventQueue(event)
@@ -193,15 +187,17 @@ const ProductList = (props) => {
                 const wishlist = customerProductLists.getProductListPerType(
                     customerProductListTypes.WISHLIST
                 )
-                await customerProductLists.addItemToWishlist(
-                    product.productId,
-                    quantity,
-                    wishlist.id
-                )
-                showSuccessfulToast(quantity)
+                await customerProductLists.createCustomerProductListItem(wishlist, {
+                    productId: product.productId,
+                    priority: 1,
+                    quantity: product.quantity,
+                    public: false,
+                    type: 'product'
+                })
+                showWishlistItemAdded(quantity)
             }
         } catch (err) {
-            showErrorToast()
+            showError()
         }
     }
 
