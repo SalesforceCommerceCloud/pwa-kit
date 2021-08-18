@@ -3,10 +3,14 @@
  * * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
 
 import {useLocation} from 'react-router-dom'
-import qs from 'qs'
+import queryString from 'query-string'
 
 // Constants
 import {DEFAULT_SEARCH_PARAMS} from '../constants'
+
+const PARSE_OPTIONS = {
+    parseBooleans: true
+}
 
 /*
  * This hook will return all the location search params pertinant
@@ -14,17 +18,66 @@ import {DEFAULT_SEARCH_PARAMS} from '../constants'
  */
 export const useSearchParams = (searchParams = DEFAULT_SEARCH_PARAMS) => {
     const {search} = useLocation()
-    const params = qs.parse(search.substring(1))
 
+    // Encode the search query, including preset values.
+    const searchParamsObject = {
+        ...searchParams,
+        ...parse(search.substring(1))
+    }
+
+    return [searchParamsObject, {stringify, parse}]
+}
+
+/**
+ * Encode's the provided search parameters object, paying special attention to ensure
+ * that the child `refine` object is alway encoded correctly.
+ *
+ * @param {Object} searchParamsObj
+ * @returns
+ */
+export const stringify = (searchParamsObj) => {
+    let searchParamsObjCopy = {...searchParamsObj}
+
+    // "stringify" the nested refinements
+    searchParamsObjCopy.refine = queryString.stringify(searchParamsObjCopy.refine, {
+        arrayFormat: 'separator',
+        arrayFormatSeparator: '|',
+        encode: false
+    })
+
+    // "stringify" the entire object
+    searchParamsObjCopy = queryString.stringify(searchParamsObjCopy)
+
+    return searchParamsObjCopy
+}
+
+/**
+ * Decode's the provided query string representation of a search parameter object, paying
+ * special attention to also decode the 'refine' object.
+ *
+ * @param {Object} searchParamsStr
+ * @param {Boolean} parseRefine - opt out of parsing the inner refine object.
+ * @returns
+ */
+export const parse = (searchParamsStr, parseRefine = true) => {
+    const params = queryString.parse(searchParamsStr, PARSE_OPTIONS)
+
+    // Ensure the refinments is an array (make it easier to manipulate).
     params.refine = Array.isArray(params.refine) ? params.refine : [params.refine]
 
-    return Object.keys(searchParams).reduce((acc, key) => {
-        let value = params[`${key}`] || searchParams[key]
+    // Parse the nested refinement entries.
+    if (parseRefine) {
+        params.refine = params.refine.reduce((acc, curr) => {
+            return {
+                ...acc,
+                ...queryString.parse(curr, {
+                    ...PARSE_OPTIONS,
+                    arrayFormat: 'separator',
+                    arrayFormatSeparator: '|'
+                })
+            }
+        }, {})
+    }
 
-        if (!isNaN(value) && !Array.isArray(value)) {
-            value = parseInt(value)
-        }
-
-        return {...acc, [key]: value}
-    }, {})
+    return params
 }

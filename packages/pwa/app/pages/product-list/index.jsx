@@ -42,11 +42,13 @@ import Refinements from './partials/refinements'
 import SelectedRefinements from './partials/selected-refinements'
 import EmptySearchResults from './partials/empty-results'
 import PageHeader from './partials/page-header'
+
 // Icons
 import {FilterIcon, ChevronDownIcon} from '../../components/icons'
 
 // Hooks
 import {useLimitUrls, usePageUrls, useSortUrls, useSearchParams} from '../../hooks'
+import {parse as parseSearchParams} from '../../hooks/use-search-params'
 
 // Others
 import {CategoriesContext} from '../../contexts'
@@ -54,11 +56,8 @@ import {HTTPNotFound} from 'pwa-kit-react-sdk/dist/ssr/universal/errors'
 
 // Constants
 import {DEFAULT_LIMIT_VALUES} from '../../constants'
-import {queryToProductSearch, toggleSelectedFilter} from '../../commerce-api/search-utils'
 import useNavigation from '../../hooks/use-navigation'
 import LoadingSpinner from '../../components/loading-spinner'
-
-import qs from 'qs'
 
 /*
  * This is a simple product listing page. It displays a paginated list
@@ -73,7 +72,7 @@ const ProductList = (props) => {
 
     const history = useHistory()
     const params = useParams()
-    const searchParams = useSearchParams()
+    const [searchParams, {stringify: stringifySearchParams}] = useSearchParams()
     const {categories} = useContext(CategoriesContext)
     const [filtersLoading, setFiltersLoading] = useState(false)
 
@@ -112,51 +111,39 @@ const ProductList = (props) => {
     const showNoResults = !isLoading && productSearchResult && !productSearchResult?.hits
 
     // Toggles filter on and off
-    const toggleFilter = (value, attributeId, selected) => {
-        let newSearchParams = {}
-        let newRefine
-        let updated = false // Indicate whether or not we updated a pre-existing refinment.
+    const toggleFilter = (value, attributeId, selected, allowMultiple = true) => {
+        const searchParamsCopy = {...searchParams}
 
-        // 1. Update any refinements that already exist for the given attributeId.
-        newRefine = searchParams.refine.map((refinement) => {
-            const [key, keyvalue] = refinement.split('=')
+        // If we aren't allowing for multiple selections, simply clear any value set for the
+        // attribute, and apply a new one if required.
+        if (!allowMultiple) {
+            delete searchParamsCopy.refine[attributeId]
 
-            // The value might be a pipe separated list. So always do this.
-            let values = keyvalue.split('|')
+            if (!selected) {
+                searchParamsCopy.refine[attributeId] = value.value
+            }
+        } else {
+            // Get the attibute value as an array.
+            let attributeValue = searchParamsCopy.refine[attributeId] || []
+            let values = Array.isArray(attributeValue) ? attributeValue : attributeValue.split('|')
 
-            // Found a current refinement to update
-            if (key === attributeId) {
-                // Track that we are editing an existing value.
-                updated = true
-
-                // Add or remove refinement value.
-                values = !selected
-                    ? [...values, value.value]
-                    : values.filter((v) => v !== value.value)
+            // Either set the value, or filter the value out.
+            if (!selected) {
+                values.push(value.value)
+            } else {
+                values = values.filter((v) => v !== value.value)
             }
 
-            return `${key}=${values.join('|')}`
-        })
+            // Update the attribute value in the new search params.
+            searchParamsCopy.refine[attributeId] = values
 
-        // 2. If we didn't update any refinement above, add a new refinement.
-        if (!updated && !selected) {
-            newRefine = [...searchParams.refine, `${attributeId}=${value.value}`]
+            // If the update value is an empty array, remove the current attribute key.
+            if (searchParamsCopy.refine[attributeId].length === 0) {
+                delete searchParamsCopy.refine[attributeId]
+            }
         }
 
-        // 3. Filter out any values that may have been cleared.
-        newRefine = newRefine.filter((refinement) => {
-            const [, keyvalue] = refinement.split('=')
-
-            return !!keyvalue
-        })
-
-        // 4. Assign the new refinements along with existing other search params.
-        newSearchParams = {
-            ...searchParams,
-            refine: newRefine
-        }
-
-        navigate(`${location.pathname}?${qs.stringify(newSearchParams, {arrayFormat: 'repeat'})}`)
+        navigate(`${location.pathname}?${stringifySearchParams(searchParamsCopy)}`)
     }
 
     // Clears all filters
@@ -166,14 +153,6 @@ const ProductList = (props) => {
 
     const selectedSortingOptionLabel = productSearchResult?.sortingOptions.find(
         (option) => option.id === productSearchResult?.selectedSortingOption
-    )
-
-    // CHANGE
-    // ["n1=v1", "n2=v2"].reduce((acc, curr) => ({...acc, [curr.split('=')[0]]: curr.split('=')[1] }), {})
-    // const refine = Array.isArray(searchParams.refine) ? searchParams.refine : [searchParams.refine]
-    const selectedRefinements = searchParams.refine.reduce(
-        (acc, curr) => ({...acc, [curr.split('=')[0]]: curr.split('=')[1]}),
-        {}
     )
 
     return (
@@ -302,8 +281,7 @@ const ProductList = (props) => {
                                 isLoading={filtersLoading}
                                 toggleFilter={toggleFilter}
                                 filters={productSearchResult?.refinements}
-                                // selectedFilters={productSearchResult?.selectedRefinements}
-                                selectedFilters={selectedRefinements}
+                                selectedFilters={searchParams.refine}
                             />
                         </Stack>
                         <Box>
@@ -474,7 +452,7 @@ ProductList.getProps = async ({res, params, location, api}) => {
         return {searchQuery: ' ', productSearchResult: {}}
     }
 
-    const searchParams = queryToProductSearch(location.search)
+    const searchParams = parseSearchParams(location.search, false)
 
     if (!searchParams.refine.includes(`cgid=${categoryId}`) && categoryId) {
         searchParams.refine.push(`cgid=${categoryId}`)

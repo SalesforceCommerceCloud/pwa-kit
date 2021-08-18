@@ -47,8 +47,6 @@ const Refinements = ({filters, toggleFilter, selectedFilters, isLoading}) => {
                     }
                 })
                 .filter((index) => index !== undefined)
-
-            // filtersIndexes = savedExpandedAccordionIndexes
         }
     }
 
@@ -75,9 +73,7 @@ const Refinements = ({filters, toggleFilter, selectedFilters, isLoading}) => {
                     {filters?.map((filter, idx) => {
                         // Render the appropriate component for the refinement type, fallback to checkboxes
                         const Values = componentMap[filter.attributeId] || CheckboxRefinements
-                        const selectedFiltersArray = selectedFilters?.[filter.attributeId]?.split(
-                            '|'
-                        )
+                        const selectedFiltersArray = selectedFilters?.[filter.attributeId]
                         if (filter.values) {
                             return (
                                 <Stack key={filter.attributeId} divider={<Divider />}>

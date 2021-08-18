@@ -2,54 +2,14 @@
  * Copyright (c) 2021 Mobify Research & Development Inc. All rights reserved. *
  * * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
 
-import React, {useEffect} from 'react'
+import React from 'react'
 import {Box, Text, Radio, RadioGroup, Stack} from '@chakra-ui/react'
 import PropTypes from 'prop-types'
-import useRefinementToggle from '../../../commerce-api/hooks/useRefinementToggle'
 
 const RadioRefinements = ({filter, toggleFilter, selectedFilters}) => {
-    const {applyUIFeedback, selectedRefinements, setSelectedRefinements} = useRefinementToggle()
-
-    useEffect(() => {
-        if (!selectedRefinements && selectedFilters) {
-            setSelectedRefinements(selectedFilters)
-        } else if (selectedRefinements && !selectedFilters) {
-            setSelectedRefinements(undefined)
-        }
-    }, [selectedFilters])
-
-    const applyUIFeedbackAndToggle = (value, attributeId, selected) => {
-        applyUIFeedback(value, selected)
-        toggleFilter(value, attributeId, selected)
-    }
-
     return (
         <Box>
-            {/* <HStack marginBottom={2}>
-                <InputGroup>
-                    <InputLeftElement
-                        pointerEvents="none"
-                        color="gray.300"
-                        fontSize="1.2em"
-                        children="$"
-                    />
-                    <Input placeholder="Min" />
-                </InputGroup>
-                <Center>
-                    <Text>to</Text>
-                </Center>
-                <InputGroup>
-                    <InputLeftElement
-                        pointerEvents="none"
-                        color="gray.300"
-                        fontSize="1.2em"
-                        children="$"
-                    />
-                    <Input placeholder="Max" />
-                </InputGroup>
-                <IconButton icon={<ChevronRightIcon />} variant="unstyled" />
-            </HStack> */}
-            <RadioGroup value={selectedRefinements && selectedRefinements[0]}>
+            <RadioGroup value={selectedFilters}>
                 <Stack spacing={1}>
                     {filter.values
                         .filter((refinementValue) => refinementValue.hitCount > 0)
@@ -62,10 +22,11 @@ const RadioRefinements = ({filter, toggleFilter, selectedFilters}) => {
                                         height={{base: '44px', lg: '24px'}}
                                         value={value.value}
                                         onChange={() =>
-                                            applyUIFeedbackAndToggle(
+                                            toggleFilter(
                                                 value,
                                                 filter.attributeId,
-                                                selectedFilters?.includes(value.value)
+                                                selectedFilters?.includes(value.value),
+                                                false
                                             )
                                         }
                                         fontSize="sm"
