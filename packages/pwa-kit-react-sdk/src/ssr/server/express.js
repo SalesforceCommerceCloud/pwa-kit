@@ -2,7 +2,7 @@
  * Copyright (c) 2021 Mobify Research & Development Inc. All rights reserved. *
  * * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
 /**
- * @module progressive-web-sdk/dist/ssr/server/express
+ * @module progressive-web-sdk/ssr/server/express
  */
 
 import assert from 'assert'

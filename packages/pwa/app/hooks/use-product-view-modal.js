@@ -9,7 +9,7 @@ import {isError, useCommerceAPI} from '../commerce-api/utils'
 import {useVariant} from './use-variant'
 import {useToast} from './use-toast'
 import {useIntl} from 'react-intl'
-import {API_ERROR_MESSAGE} from '../pages/account/constant'
+import {API_ERROR_MESSAGE} from '../constants'
 
 /**
  * This hooks is responsible for fetching a product detail based on the variation selection

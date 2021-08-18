@@ -42,6 +42,32 @@ const buildMarkerPlugin = new BuildMarkerPlugin({
 
 const replacements = [
     {
+        path: join('pwa-kit-react-sdk', 'ssr', 'universal', 'components', '_app-config'),
+        newPath: resolve('.', 'app', 'components', '_app-config', 'index.jsx')
+    },
+    {
+        path: join('pwa-kit-react-sdk', 'ssr', 'universal', 'components', '_document'),
+        newPath: resolve('.', 'app', 'components', '_document', 'index.jsx')
+    },
+    {
+        path: join('pwa-kit-react-sdk', 'ssr', 'universal', 'components', '_app'),
+        newPath: resolve('.', 'app', 'components', '_app', 'index.jsx')
+    },
+    {
+        path: join('pwa-kit-react-sdk', 'ssr', 'universal', 'components', '_error'),
+        newPath: resolve('.', 'app', 'components', '_error', 'index.jsx')
+    },
+    {
+        path: join('pwa-kit-react-sdk', 'ssr', 'universal', 'routes'),
+        newPath: resolve('.', 'app', 'routes.jsx')
+    },
+
+    // The 'pwa-kit-react-sdk' is developed in a lerna monorepo and the final resovled paths
+    // are different (they include a `dist` foler) when developing. Because of this we have
+    // and similar yet slightly different set of replacement paths to account for this
+    // scenario. NOTE: There is no reliable/clean way to determine if we are developing within
+    // the monorepo so this solution, although not optimal, works.
+    {
         path: join('pwa-kit-react-sdk', 'dist', 'ssr', 'universal', 'components', '_app-config'),
         newPath: resolve('.', 'app', 'components', '_app-config', 'index.jsx')
     },
@@ -130,7 +156,6 @@ const common = {
     },
     // Tell webpack how to find specific modules
     resolve: {
-        symlinks: false,
         extensions: ['.js', '.jsx', '.json'],
         alias: {
             '@loadable/component': resolve(nodeModules, '@loadable/component'),

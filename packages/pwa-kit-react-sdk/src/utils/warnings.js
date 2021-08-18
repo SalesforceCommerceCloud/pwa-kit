@@ -2,7 +2,7 @@
  * Copyright (c) 2021 Mobify Research & Development Inc. All rights reserved. *
  * * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
 /**
- * @module progressive-web-sdk/dist/utils/warnings
+ * @module progressive-web-sdk/utils/warnings
  * @private
  */
 

@@ -61,24 +61,6 @@
       "value": " item)"
     }
   ],
-  "1TQMt0": [
-    {
-      "type": 1,
-      "value": "quantity"
-    },
-    {
-      "type": 0,
-      "value": " "
-    },
-    {
-      "type": 1,
-      "value": "itemLabel"
-    },
-    {
-      "type": 0,
-      "value": " added to cart."
-    }
-  ],
   "1b9Q93": [
     {
       "type": 0,
@@ -123,16 +105,48 @@
       "value": "Log in here"
     }
   ],
+  "2WRHXI": [
+    {
+      "type": 1,
+      "value": "quantity"
+    },
+    {
+      "type": 0,
+      "value": " "
+    },
+    {
+      "offset": 0,
+      "options": {
+        "one": {
+          "value": [
+            {
+              "type": 0,
+              "value": "item"
+            }
+          ]
+        },
+        "other": {
+          "value": [
+            {
+              "type": 0,
+              "value": "items"
+            }
+          ]
+        }
+      },
+      "pluralType": "cardinal",
+      "type": 6,
+      "value": "quantity"
+    },
+    {
+      "type": 0,
+      "value": " added to cart"
+    }
+  ],
   "2bGejb": [
     {
       "type": 0,
       "value": "My Account"
-    }
-  ],
-  "2gr0DV": [
-    {
-      "type": 0,
-      "value": "1 item added to wishlist"
     }
   ],
   "2tqQFl": [
@@ -259,6 +273,12 @@
       "value": "Enter your email to receive instructions on how to reset your password"
     }
   ],
+  "9rqdrm": [
+    {
+      "type": 0,
+      "value": "Item removed from wishlist"
+    }
+  ],
   "A8Tnga": [
     {
       "type": 0,
@@ -359,6 +379,44 @@
     {
       "type": 0,
       "value": "Add New Payment Method"
+    }
+  ],
+  "DdR2q8": [
+    {
+      "type": 1,
+      "value": "quantity"
+    },
+    {
+      "type": 0,
+      "value": " "
+    },
+    {
+      "offset": 0,
+      "options": {
+        "one": {
+          "value": [
+            {
+              "type": 0,
+              "value": "item"
+            }
+          ]
+        },
+        "other": {
+          "value": [
+            {
+              "type": 0,
+              "value": "items"
+            }
+          ]
+        }
+      },
+      "pluralType": "cardinal",
+      "type": 6,
+      "value": "quantity"
+    },
+    {
+      "type": 0,
+      "value": " added to wishlist"
     }
   ],
   "DwzDiL": [
@@ -1187,12 +1245,6 @@
       "value": "Checkout as guest"
     }
   ],
-  "gXWNJQ": [
-    {
-      "type": 0,
-      "value": "1 item added to cart"
-    }
-  ],
   "gg6vZx": [
     {
       "type": 0,
@@ -1749,12 +1801,6 @@
     {
       "type": 0,
       "value": "Edit"
-    }
-  ],
-  "x3r6nd": [
-    {
-      "type": 0,
-      "value": "1 item removed from wishlist"
     }
   ],
   "x6hxSH": [

@@ -2,7 +2,7 @@
  * Copyright (c) 2021 Mobify Research & Development Inc. All rights reserved. *
  * * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
 /**
- * @module progressive-web-sdk/dist/ssr/universal/utils
+ * @module progressive-web-sdk/ssr/universal/utils
  */
 import {proxyConfigs} from '../../utils/ssr-shared'
 

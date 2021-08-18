@@ -11,21 +11,27 @@
  */
 export const filterImageGroups = (imageGroups, options) => {
     const {size, selectedVariationAttributes = {}} = options
-    if (!imageGroups) return []
-    const imageGroup = imageGroups
-        .filter(({viewType}) => viewType === size)
-        .find(({variationAttributes}) => {
-            // if there is no variationAttributes in the imageGroups, no need to execute any further filter logic on it
-            if (!variationAttributes && Object.keys(selectedVariationAttributes).length === 0) {
-                return true
-            }
-            return (
-                variationAttributes &&
-                variationAttributes.every(({id, values}) => {
-                    const valueValues = values.map(({value}) => value)
-                    return valueValues.includes(selectedVariationAttributes[id])
-                })
-            )
-        })
-    return imageGroup
+
+    if (!imageGroups || imageGroups.length === 0) return
+
+    const sizeMatchedGroups = imageGroups.filter(({viewType}) => viewType === size)
+    if (sizeMatchedGroups.length === 0) return
+
+    // if there is no variationAttributes in the imageGroups, no need to execute any further filter logic on it
+    if (
+        sizeMatchedGroups[0].variationAttributes === 0 ||
+        Object.keys(selectedVariationAttributes).length === 0
+    ) {
+        return sizeMatchedGroups[0]
+    }
+
+    return sizeMatchedGroups.find(({variationAttributes}) => {
+        return (
+            variationAttributes &&
+            variationAttributes.every(({id, values}) => {
+                const valueValues = values.map(({value}) => value)
+                return valueValues.includes(selectedVariationAttributes[id])
+            })
+        )
+    })
 }
