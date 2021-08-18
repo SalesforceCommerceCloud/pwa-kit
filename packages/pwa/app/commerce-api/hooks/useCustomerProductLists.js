@@ -98,25 +98,6 @@ export default function useCustomerProductLists({eventHandler = noop, errorHandl
             },
 
             /**
-             * Add an item to wishlist
-             * @param {object} productId - the product id to be added to wishlist
-             * @param {number} quantity - the number of items to be added to wishlist
-             * @param {string} wishlistId - id of the wishlist to add item to
-             * @returns {object} product lists
-             */
-            async addItemToWishlist(productId, quantity, wishlistId) {
-                const requestBody = {
-                    productId,
-                    priority: 1,
-                    quantity,
-                    public: false,
-                    type: 'product'
-                }
-
-                return await self.createCustomerProductListItem(requestBody, wishlistId)
-            },
-
-            /**
              * Fetches product lists for registered users or creates a new list if none exist
              * due to the api limitation, we can not get the list based on type but all lists
              * @param {string} type type of list to fetch or create
