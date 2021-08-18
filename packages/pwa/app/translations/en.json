@@ -110,6 +110,9 @@
   "9Npj92": {
     "defaultMessage": "Enter your email to receive instructions on how to reset your password"
   },
+  "9rqdrm": {
+    "defaultMessage": "Item removed from wishlist"
+  },
   "A8Tnga": {
     "defaultMessage": "Credit Card"
   },
@@ -650,6 +653,9 @@
     "defaultMessage": "1 lowercase letter",
     "description": "Password requirement"
   },
+  "nEwlut": {
+    "defaultMessage": "Remove Item?"
+  },
   "nFQbxh": {
     "defaultMessage": "Payment Method"
   },
@@ -800,6 +806,9 @@
   },
   "y/sA02": {
     "defaultMessage": "Most Viewed"
+  },
+  "yddLi0": {
+    "defaultMessage": "{quantity, plural, one {# item} other {# items}} added to wishlist"
   },
   "z+Zrln": {
     "defaultMessage": "Set as default"

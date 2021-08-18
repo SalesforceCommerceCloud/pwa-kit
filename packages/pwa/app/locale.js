@@ -3,7 +3,7 @@
  * * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
 import React, {useState, useContext} from 'react'
 import PropTypes from 'prop-types'
-import {IntlProvider as ReactIntlProvider} from 'react-intl'
+import {IntlProvider as ReactIntlProvider, createIntl, createIntlCache} from 'react-intl'
 import packageInfo from '../package.json'
 
 // TODO: You can update these locales in 'pwa/package.json' file
@@ -131,4 +131,11 @@ IntlProvider.propTypes = {
 export const useLocale = () => {
     const {activeLocale, changeLocale} = useContext(LocaleContext)
     return [activeLocale, changeLocale]
+}
+
+const globalIntl = (locale, message) => {
+    // This is optional but highly recommended
+    // since it prevents memory leak
+    const cache = createIntlCache()
+    const intl = createIntl({locale, messages}, cache)
 }
