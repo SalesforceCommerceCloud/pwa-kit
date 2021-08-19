@@ -25,7 +25,7 @@ import RegisterForm from '../components/register'
 import {useHistory} from 'react-router-dom'
 import {useLocale} from '../locale'
 import {noop} from '../utils/utils'
-import {API_ERROR_MESSAGE} from '../pages/account/constant'
+import {API_ERROR_MESSAGE} from '../constants'
 
 const LOGIN_VIEW = 'login'
 const REGISTER_VIEW = 'register'

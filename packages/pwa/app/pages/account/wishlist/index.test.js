@@ -12,13 +12,18 @@ import {
 } from '../../../commerce-api/mock-data'
 import {renderWithProviders} from '../../../utils/test-utils'
 import {screen, waitFor} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import {mockedCustomerProductLists} from '../../../commerce-api/mock-data'
 
 let mockedWishlist = mockedCustomerProductLists
+const testProductId = 'apple-ipod-nano-green-16gM'
 const productDetail = {
-    'apple-ipod-nano-green-16gM': mockedCustomerProductListsDetails.data[0]
+    [testProductId]: mockedCustomerProductListsDetails.data[0]
 }
 mockedWishlist.data[0]._productItemsDetail = productDetail
+const wishlistItemId = mockedWishlist.data[0].customerProductListItems.find(
+    (e) => e.productId === testProductId
+).id
 
 jest.setTimeout(60000)
 
@@ -133,6 +138,19 @@ test('renders product item name, attributes and price', async () => {
         expect(screen.getByText(/memory size: 16 GB/i)).toBeInTheDocument()
         expect(screen.getByText(/199/i)).toBeInTheDocument()
     })
+})
+
+test('Can remove item from the wishlist', async () => {
+    renderWithProviders(<MockedComponent />)
+    expect(await screen.findByTestId('account-wishlist-page')).toBeInTheDocument()
+    expect(screen.getByText(/apple ipod nano/i)).toBeInTheDocument()
+
+    const wishlistRemoveButton = await screen.findByTestId(`sf-wishlist-remove-${wishlistItemId}`)
+    userEvent.click(wishlistRemoveButton)
+    mockedWishlist.data[0].customerProductListItems = []
+    userEvent.click(screen.getByRole('button', {name: /yes, remove item/i}))
+
+    expect(await screen.getByText(/no wishlist items/i)).toBeInTheDocument()
 })
 
 test('renders no wishlist items for empty wishlist', () => {

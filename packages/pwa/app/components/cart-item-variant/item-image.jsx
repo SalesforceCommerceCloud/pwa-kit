@@ -23,7 +23,7 @@ const ItemImage = ({imageProps, ratio = 1, ...props}) => {
     const image = filterImageGroups(variant?.imageGroups, {
         size: 'small',
         selectedVariationAttributes: variant?.variationValues
-    }).images?.[0]
+    })?.images?.[0]
 
     return (
         <Box width="84px" backgroundColor="gray.100" {...props}>

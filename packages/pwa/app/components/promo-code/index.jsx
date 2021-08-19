@@ -17,7 +17,7 @@ import {useForm} from 'react-hook-form'
 import {ChevronDownIcon, ChevronUpIcon} from '../../components/icons'
 import useBasket from '../../commerce-api/hooks/useBasket'
 import PromoCodeFields from '../../components/forms/promo-code-fields'
-import {API_ERROR_MESSAGE} from '../../pages/account/constant'
+import {API_ERROR_MESSAGE} from '../../constants'
 
 export const usePromoCode = () => {
     const {formatMessage} = useIntl()
