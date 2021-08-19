@@ -40,7 +40,7 @@ export default function useCustomerProductLists({eventHandler = noop, errorHandl
                         if (productListItem) {
                             await self.updateCustomerProductListItem(wishlist, {
                                 ...productListItem,
-                                quantity: event.item.onItemQuantityChange
+                                quantity: event.item.quantity + productListItem.quantity
                             })
                             eventHandler(event)
                         } else {

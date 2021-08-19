@@ -137,7 +137,7 @@ const ProductDetail = ({category, product, isLoading}) => {
                 if (productListItem) {
                     await customerProductLists.updateCustomerProductListItem(wishlist, {
                         ...productListItem,
-                        quantity: parseInt(quantity)
+                        quantity: productListItem.quantity + parseInt(quantity)
                     })
                     showWishlistItemAdded(quantity)
                 } else {

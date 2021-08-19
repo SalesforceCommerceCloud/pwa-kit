@@ -45,7 +45,7 @@ import {
     DEFAULT_LIMIT_VALUES,
     customerProductListTypes
 } from '../../constants'
-import {API_ERROR_MESSAGE} from '../account/constant'
+import {API_ERROR_MESSAGE} from '../../constants'
 
 /*
  * This is a simple product listing page. It displays a paginated list
@@ -190,7 +190,7 @@ const ProductList = (props) => {
                 await customerProductLists.createCustomerProductListItem(wishlist, {
                     productId: product.productId,
                     priority: 1,
-                    quantity: product.quantity,
+                    quantity,
                     public: false,
                     type: 'product'
                 })
