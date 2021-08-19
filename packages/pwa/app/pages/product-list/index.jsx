@@ -42,11 +42,13 @@ import Refinements from './partials/refinements'
 import SelectedRefinements from './partials/selected-refinements'
 import EmptySearchResults from './partials/empty-results'
 import PageHeader from './partials/page-header'
+
 // Icons
 import {FilterIcon, ChevronDownIcon} from '../../components/icons'
 
 // Hooks
 import {useLimitUrls, usePageUrls, useSortUrls, useSearchParams} from '../../hooks'
+import {parse as parseSearchParams} from '../../hooks/use-search-params'
 
 // Others
 import {CategoriesContext} from '../../contexts'
@@ -54,7 +56,6 @@ import {HTTPNotFound} from 'pwa-kit-react-sdk/dist/ssr/universal/errors'
 
 // Constants
 import {DEFAULT_LIMIT_VALUES} from '../../constants'
-import {queryToProductSearch, toggleSelectedFilter} from '../../commerce-api/search-utils'
 import useNavigation from '../../hooks/use-navigation'
 import LoadingSpinner from '../../components/loading-spinner'
 
@@ -71,7 +72,7 @@ const ProductList = (props) => {
 
     const history = useHistory()
     const params = useParams()
-    const searchParams = useSearchParams()
+    const [searchParams, {stringify: stringifySearchParams}] = useSearchParams()
     const {categories} = useContext(CategoriesContext)
     const [filtersLoading, setFiltersLoading] = useState(false)
 
@@ -110,9 +111,39 @@ const ProductList = (props) => {
     const showNoResults = !isLoading && productSearchResult && !productSearchResult?.hits
 
     // Toggles filter on and off
-    const toggleFilter = (value, attributeId, selected) => {
-        const newQueryString = toggleSelectedFilter(value, attributeId, selected)
-        navigate(`${location.pathname}?${newQueryString}`)
+    const toggleFilter = (value, attributeId, selected, allowMultiple = true) => {
+        const searchParamsCopy = {...searchParams}
+
+        // If we aren't allowing for multiple selections, simply clear any value set for the
+        // attribute, and apply a new one if required.
+        if (!allowMultiple) {
+            delete searchParamsCopy.refine[attributeId]
+
+            if (!selected) {
+                searchParamsCopy.refine[attributeId] = value.value
+            }
+        } else {
+            // Get the attibute value as an array.
+            let attributeValue = searchParamsCopy.refine[attributeId] || []
+            let values = Array.isArray(attributeValue) ? attributeValue : attributeValue.split('|')
+
+            // Either set the value, or filter the value out.
+            if (!selected) {
+                values.push(value.value)
+            } else {
+                values = values.filter((v) => v !== value.value)
+            }
+
+            // Update the attribute value in the new search params.
+            searchParamsCopy.refine[attributeId] = values
+
+            // If the update value is an empty array, remove the current attribute key.
+            if (searchParamsCopy.refine[attributeId].length === 0) {
+                delete searchParamsCopy.refine[attributeId]
+            }
+        }
+
+        navigate(`${location.pathname}?${stringifySearchParams(searchParamsCopy)}`)
     }
 
     // Clears all filters
@@ -250,7 +281,7 @@ const ProductList = (props) => {
                                 isLoading={filtersLoading}
                                 toggleFilter={toggleFilter}
                                 filters={productSearchResult?.refinements}
-                                selectedFilters={productSearchResult?.selectedRefinements}
+                                selectedFilters={searchParams.refine}
                             />
                         </Stack>
                         <Box>
@@ -421,7 +452,7 @@ ProductList.getProps = async ({res, params, location, api}) => {
         return {searchQuery: ' ', productSearchResult: {}}
     }
 
-    const searchParams = queryToProductSearch(location.search)
+    const searchParams = parseSearchParams(location.search, false)
 
     if (!searchParams.refine.includes(`cgid=${categoryId}`) && categoryId) {
         searchParams.refine.push(`cgid=${categoryId}`)

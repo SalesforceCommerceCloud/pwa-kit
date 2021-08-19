@@ -23,16 +23,17 @@ const SelectedRefinements = ({toggleFilter, selectedFilterValues, categoryId, fi
         const filters = selectedFilterValues[key].split('|')
         filters?.forEach((filter) => {
             const selected = {
-                label:
+                uiLabel:
                     key === 'price'
                         ? priceFilterValues?.values?.find(
                               (priceFilter) => priceFilter.value === filter
                           )?.label
                         : filter,
-                value: key
+                value: key,
+                apiLabel: filter
             }
 
-            if (selected.value !== 'htype' && selected.label !== categoryId) {
+            if (selected.value !== 'htype' && selected.uiLabel !== categoryId) {
                 selectedFilters.push(selected)
             }
         })
@@ -55,10 +56,10 @@ const SelectedRefinements = ({toggleFilter, selectedFilterValues, categoryId, fi
                                     <CloseIcon color="black" boxSize={4} mr="-7px" mb="-6px" />
                                 }
                                 onClick={() =>
-                                    toggleFilter({value: filter.label}, filter.value, true)
+                                    toggleFilter({value: filter.apiLabel}, filter.value, true)
                                 }
                             >
-                                {filter.label}
+                                {filter.uiLabel}
                             </Button>
                         </Box>
                     </WrapItem>

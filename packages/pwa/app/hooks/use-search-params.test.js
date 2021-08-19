@@ -10,7 +10,7 @@ import {createMemoryHistory} from 'history'
 import {useSearchParams} from './use-search-params'
 
 const MockComponent = () => {
-    const params = useSearchParams()
+    const [params] = useSearchParams()
 
     return (
         <script data-testid="limits" type="application/json">

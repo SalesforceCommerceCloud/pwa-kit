@@ -17,7 +17,7 @@ import {useSearchParams} from './use-search-params'
  */
 export const usePageUrls = ({total = 0, limit}) => {
     const location = useLocation()
-    const searchParams = useSearchParams()
+    const [searchParams] = useSearchParams()
     const _limit = limit || searchParams.limit
 
     return useMemo(() => {

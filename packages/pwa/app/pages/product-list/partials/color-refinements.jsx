@@ -2,32 +2,16 @@
  * Copyright (c) 2021 Mobify Research & Development Inc. All rights reserved. *
  * * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
 
-import React, {useEffect} from 'react'
+import React from 'react'
 import {Box, SimpleGrid, HStack, Text, Button, Center, useMultiStyleConfig} from '@chakra-ui/react'
 import PropTypes from 'prop-types'
 import {cssColorGroups} from '../../../constants'
-import useRefinementToggle from '../../../commerce-api/hooks/useRefinementToggle'
 
 const ColorRefinements = ({filter, toggleFilter, selectedFilters}) => {
     const styles = useMultiStyleConfig('SwatchGroup', {
         variant: 'circle',
         disabled: false
     })
-
-    const {applyUIFeedback, selectedRefinements, setSelectedRefinements} = useRefinementToggle()
-
-    useEffect(() => {
-        if (!selectedRefinements && selectedFilters) {
-            setSelectedRefinements(selectedFilters)
-        } else if (selectedRefinements && !selectedFilters) {
-            setSelectedRefinements(undefined)
-        }
-    }, [selectedFilters])
-
-    const applyUIFeedbackAndToggle = (value, attributeId, selected) => {
-        applyUIFeedback(value, selected)
-        toggleFilter(value, attributeId, selected)
-    }
 
     return (
         <SimpleGrid columns={2} spacing={2} mt={1}>
@@ -38,10 +22,10 @@ const ColorRefinements = ({filter, toggleFilter, selectedFilters}) => {
                         <Box key={idx}>
                             <HStack
                                 onClick={() =>
-                                    applyUIFeedbackAndToggle(
+                                    toggleFilter(
                                         value,
                                         filter.attributeId,
-                                        selectedRefinements?.includes(value.value)
+                                        selectedFilters?.includes(value.value)
                                     )
                                 }
                                 spacing={1}
@@ -50,14 +34,12 @@ const ColorRefinements = ({filter, toggleFilter, selectedFilters}) => {
                                 <Button
                                     {...styles.swatch}
                                     color={
-                                        selectedRefinements?.includes(value.value)
+                                        selectedFilters?.includes(value.value)
                                             ? 'black'
                                             : 'gray.200'
                                     }
-                                    border={
-                                        selectedRefinements?.includes(value.value) ? '1px' : '0'
-                                    }
-                                    aria-checked={selectedRefinements?.includes(value.value)}
+                                    border={selectedFilters?.includes(value.value) ? '1px' : '0'}
+                                    aria-checked={selectedFilters?.includes(value.value)}
                                     variant="outline"
                                     marginRight={0}
                                     marginBottom={0}
