@@ -39,11 +39,16 @@ export const stringify = (searchParamsObj) => {
     let searchParamsObjCopy = {...searchParamsObj}
 
     // "stringify" the nested refinements
-    searchParamsObjCopy.refine = queryString.stringify(searchParamsObjCopy.refine, {
-        arrayFormat: 'separator',
-        arrayFormatSeparator: '|',
-        encode: false
-    })
+    searchParamsObjCopy.refine = Object.keys(searchParamsObjCopy.refine).map((key) =>
+        queryString.stringify(
+            {[key]: searchParamsObjCopy.refine[key]},
+            {
+                arrayFormat: 'separator',
+                arrayFormatSeparator: '|',
+                encode: false
+            }
+        )
+    )
 
     // "stringify" the entire object
     searchParamsObjCopy = queryString.stringify(searchParamsObjCopy)
