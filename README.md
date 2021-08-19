@@ -241,4 +241,4 @@ snyk test --strict-out-of-sync=false --all-projects
 
 ## License Information
 
-The PWA Kit is licensed under BSD-3-Clause license. See the [license](./LICENSE.txt) for details.
+The PWA Kit is licensed under BSD-3-Clause license. See the [license](./LICENSE) for details.
