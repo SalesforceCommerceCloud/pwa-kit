@@ -7,6 +7,9 @@ import {encode as base64encode} from 'base64-arraybuffer'
 // Server Side
 const crypto = require('crypto')
 const randomstring = require('randomstring')
+// This needs to be defined or the browser will complain
+
+import * as Buffer from 'Buffer' // eslint-disable-line
 
 // Creates Code Verifier
 export const createCodeVerifier = () => nanoid(128)

@@ -123,9 +123,7 @@ class Auth {
 
         let retries = 0
         const startLoginFlow = () => {
-            let authorizationMethod = this._onClient
-                ? '_loginAsGuestClientSide'
-                : '_loginAsGuestClientSide'
+            let authorizationMethod = '_loginAsGuest'
             if (credentials) {
                 authorizationMethod = '_loginWithCredentials'
             } else if (this._authToken && this._refreshToken) {
@@ -239,36 +237,10 @@ class Auth {
     }
 
     /**
-     * Fetches an auth token for server side requests
-     * @private
-     * @returns {{authToken: string, customer: Customer}}
-     */
-    async _loginAsGuestServerSide() {
-        let rawResponse = await this._createGuestSession()
-
-        const resJson = await rawResponse.json()
-        const authToken = rawResponse.headers.get('authorization')
-
-        if (rawResponse.status >= 400) {
-            if (resJson.title === 'Expired Token') {
-                throw new HTTPError(rawResponse.status, 'EXPIRED_TOKEN')
-            }
-            throw new HTTPError(rawResponse.status, resJson.detail)
-        }
-        this._customerId = resJson.customerId
-        this._saveAccessToken(authToken)
-
-        return {
-            authToken,
-            customer: resJson
-        }
-    }
-
-    /**
      * Begins oAuth PCKE Flow for guest
      * @returns {object} - a guest customer object
      */
-    async _loginAsGuestClientSide() {
+    async _loginAsGuest() {
         const codeVerifier = this._onClient ? createCodeVerifier() : createCodeVerifierServer()
         const codeChallenge = this._onClient
             ? await generateCodeChallenge(codeVerifier)
