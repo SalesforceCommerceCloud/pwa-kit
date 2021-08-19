@@ -5,7 +5,12 @@
 /* eslint-disable no-unused-vars */
 import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
 import {HTTPError} from 'pwa-kit-react-sdk/ssr/universal/errors'
-import {createCodeVerifier, generateCodeChallenge} from './pkce'
+import {
+    createCodeVerifier,
+    generateCodeChallenge,
+    createCodeVerifierServer,
+    generateCodeChallengeServer
+} from './pkce'
 import {createGetTokenBody} from './utils'
 
 /**
@@ -120,7 +125,7 @@ class Auth {
         const startLoginFlow = () => {
             let authorizationMethod = this._onClient
                 ? '_loginAsGuestClientSide'
-                : '_loginAsGuestServerSide'
+                : '_loginAsGuestClientSide'
             if (credentials) {
                 authorizationMethod = '_loginWithCredentials'
             } else if (this._authToken && this._refreshToken) {
@@ -182,7 +187,9 @@ class Auth {
             this._saveEncUserId(enc_user_id)
         }
 
-        sessionStorage.removeItem('codeVerifier')
+        if (this._onClient) {
+            sessionStorage.removeItem('codeVerifier')
+        }
     }
 
     /**
@@ -262,10 +269,15 @@ class Auth {
      * @returns {object} - a guest customer object
      */
     async _loginAsGuestClientSide() {
-        const codeVerifier = createCodeVerifier()
-        const codeChallenge = await generateCodeChallenge(codeVerifier)
+        const codeVerifier = this._onClient ? createCodeVerifier() : createCodeVerifierServer()
+        const codeChallenge = this._onClient
+            ? await generateCodeChallenge(codeVerifier)
+            : await generateCodeChallengeServer(codeVerifier)
 
-        sessionStorage.setItem('codeVerifier', codeVerifier)
+        if (this._onClient) {
+            sessionStorage.setItem('codeVerifier', codeVerifier)
+        }
+
         const options = {
             headers: {
                 Authorization: '',
@@ -281,6 +293,7 @@ class Auth {
         }
 
         const response = await this._api.shopperLogin.authorizeCustomer(options, true)
+
         if (response.status >= 400) {
             const json = await response.json()
             throw new HTTPError(response.status, json.message)
@@ -289,7 +302,7 @@ class Auth {
         const tokenBody = createGetTokenBody(
             response.url,
             `${getAppOrigin()}${slasCallbackEndpoint}`,
-            window.sessionStorage.getItem('codeVerifier')
+            this._onClient ? window.sessionStorage.getItem('codeVerifier') : codeVerifier
         )
 
         const {customer_id} = await this.getLoggedInToken(tokenBody)

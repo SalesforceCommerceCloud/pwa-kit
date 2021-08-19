@@ -35,6 +35,10 @@ const app = createApp({
     protocol: 'http'
 })
 
+app.get('/callback?*', (req, res) => {
+    console.log('OH IM IN HERE BOY')
+    res.send()
+})
 app.get('/robots.txt', serveStaticFile('static/robots.txt'))
 app.get('/*', render)
 
