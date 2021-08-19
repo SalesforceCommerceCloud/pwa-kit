@@ -3,7 +3,7 @@
  * * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
 import React, {useState, useContext} from 'react'
 import PropTypes from 'prop-types'
-import {IntlProvider as ReactIntlProvider} from 'react-intl'
+import {defineMessages, IntlProvider as ReactIntlProvider} from 'react-intl'
 import packageInfo from '../package.json'
 
 // TODO: You can update these locales in 'pwa/package.json' file
@@ -132,3 +132,14 @@ export const useLocale = () => {
     const {activeLocale, changeLocale} = useContext(LocaleContext)
     return [activeLocale, changeLocale]
 }
+/**
+ *  OCAPI and Commerce API `locale` parameter format: <language code>-<country code>
+ *  https://documentation.b2c.commercecloud.salesforce.com/DOC1/topic/com.demandware.dochelp/OCAPI/current/usage/Localization.html
+ *  */
+export const localeMessages = defineMessages({
+    'en-GB': {defaultMessage: 'English (United Kingdom)'},
+    'fr-FR': {defaultMessage: 'French (France)'},
+    'it-IT': {defaultMessage: 'Italian (Italy)'},
+    'zh-CN': {defaultMessage: 'Chinese (China)'},
+    'ja-JA': {defaultMessage: 'Japanese (Japan)'}
+})

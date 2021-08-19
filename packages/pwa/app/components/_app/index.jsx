@@ -34,6 +34,7 @@ import {AuthModal, useAuthModal} from '../../hooks/use-auth-modal'
 // Others
 import {watchOnlineStatus, flatten} from '../../utils/utils'
 import {IntlProvider, getLocaleConfig} from '../../locale'
+// import {useLocale} from '../../locale'
 
 import Seo from '../seo'
 
@@ -51,6 +52,8 @@ const App = (props) => {
     const [isOnline, setIsOnline] = useState(true)
     const [categories, setCategories] = useState(allCategories)
     const styles = useStyleConfig('App')
+    // const [activeLocale] = useLocale()
+    // activeLocale && console.log('activeLocale:', activeLocale)
 
     const {isOpen, onOpen, onClose} = useDisclosure()
 
@@ -207,7 +210,12 @@ App.getProps = async ({api, params}) => {
 
     // Get the root category, this will be used for things like the navigation.
     const rootCategory = await api.shopperProducts.getCategory({
-        parameters: {id: DEFAULT_ROOT_CATEGORY, levels: DEFAULT_NAV_DEPTH}
+        parameters: {
+            id: DEFAULT_ROOT_CATEGORY,
+            levels: DEFAULT_NAV_DEPTH,
+            // TODO: Use the current locale set on the `useLocale` hook
+            locale: localeConfig.app.targetLocale
+        }
     })
 
     // Flatten the root so we can easily access all the categories throughout

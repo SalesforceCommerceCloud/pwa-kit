@@ -182,9 +182,12 @@
     ],
     "l10n": {
         "supportedLocales": [
-            "en",
-            "fr"
+            "en-GB",
+            "fr-FR",
+            "it-IT",
+            "zh-CN",
+            "ja-JA"
         ],
-        "defaultLocale": "en"
+        "defaultLocale": "en-GB"
     }
 }

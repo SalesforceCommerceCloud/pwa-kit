@@ -16,17 +16,20 @@ import {
     Input,
     InputGroup,
     InputRightElement,
-    Button
+    Button,
+    FormControl
 } from '@chakra-ui/react'
 import {useIntl} from 'react-intl'
 
 import LinksList from '../links-list'
 import SocialIcons from '../social-icons'
 import {HideOnDesktop, HideOnMobile} from '../responsive'
+import {useLocale, SUPPORTED_LOCALES, localeMessages} from '../../locale'
 
 const Footer = ({...otherProps}) => {
     const styles = useMultiStyleConfig('Footer')
     const intl = useIntl()
+    const [activeLocale, changeLocale] = useLocale()
 
     return (
         <Box as="footer" {...styles.container} {...otherProps}>
@@ -111,12 +114,27 @@ const Footer = ({...otherProps}) => {
                     </HideOnDesktop>
 
                     <Box {...styles.localeSelector}>
-                        <Select variant="filled" {...styles.localeDropdown}>
-                            {/* TODO: how to localize this locale selector */}
-                            <option value="en-US">USA (English)</option>
-                            <option value="en-CA">Canada (English)</option>
-                            <option value="fr-CA">Canada (French)</option>
-                        </Select>
+                        <FormControl
+                            data-testid="sf-footer-locale-selector"
+                            id="page_sort"
+                            width="auto"
+                            {...otherProps}
+                        >
+                            <Select
+                                value={activeLocale}
+                                onChange={({target}) => {
+                                    changeLocale(target.value)
+                                }}
+                                variant="filled"
+                                {...styles.localeDropdown}
+                            >
+                                {SUPPORTED_LOCALES.map((locale) => (
+                                    <option key={locale} value={locale}>
+                                        {intl.formatMessage(localeMessages[locale])}
+                                    </option>
+                                ))}
+                            </Select>
+                        </FormControl>
                     </Box>
 
                     <Divider {...styles.horizontalRule} />
