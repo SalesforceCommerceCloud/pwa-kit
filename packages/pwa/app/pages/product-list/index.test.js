@@ -1,7 +1,7 @@
 /* * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * *
  * Copyright (c) 2021 Mobify Research & Development Inc. All rights reserved. *
  * * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
-import React from 'react'
+import React, {useEffect} from 'react'
 import PropTypes from 'prop-types'
 
 import {rest} from 'msw'
@@ -9,13 +9,15 @@ import {setupServer} from 'msw/node'
 import {
     mockedRegisteredCustomer,
     mockProductSearch,
-    mockCategories
+    mockCategories,
+    mockedEmptyCustomerProductList
 } from '../../commerce-api/mock-data'
-import {screen} from '@testing-library/react'
+import {fireEvent, screen, waitFor} from '@testing-library/react'
 import {Route, Switch} from 'react-router-dom'
 import {renderWithProviders} from '../../utils/test-utils'
 import ProductList from '.'
 import EmptySearchResults from './partials/empty-results'
+import useCustomer from '../../commerce-api/hooks/useCustomer'
 
 jest.setTimeout(60000)
 let mockCategoriesResponse = mockCategories
@@ -41,22 +43,36 @@ jest.mock('commerce-sdk-isomorphic', () => {
             async getCategory() {
                 return mockCategoriesResponse
             }
+        },
+        ShopperCustomers: class ShopperCustomersMock extends sdk.ShopperCustomers {
+            async getCustomerProductLists() {
+                return mockedEmptyCustomerProductList
+            }
         }
     }
 })
 
-const MockedComponent = ({isLoading}) => {
+const MockedComponent = ({isLoading, isLoggedIn = false, searchQuery}) => {
+    const customer = useCustomer()
+    useEffect(() => {
+        if (isLoggedIn) {
+            customer.login('test@test.com', 'password')
+        }
+    }, [])
     return (
         <Switch>
             <Route
                 path="/:locale/category/:categoryId"
                 render={(props) => (
-                    <ProductList
-                        {...props}
-                        isLoading={isLoading}
-                        searchQuery="dresses"
-                        productSearchResult={mockProductListSearchResponse}
-                    />
+                    <div>
+                        <div>{customer.customerId}</div>
+                        <ProductList
+                            {...props}
+                            isLoading={isLoading}
+                            searchQuery={searchQuery}
+                            productSearchResult={mockProductListSearchResponse}
+                        />
+                    </div>
                 )}
             />
         </Switch>
@@ -130,7 +146,9 @@ beforeEach(() => {
 })
 
 afterEach(() => {
+    mockProductListSearchResponse = mockProductSearch
     jest.resetModules()
+    localStorage.clear()
 })
 afterAll(() => server.close())
 
@@ -161,12 +179,22 @@ test('should display Search Results for when searching ', async () => {
     expect(await screen.findByTestId('sf-product-list-page')).toBeInTheDocument()
 })
 
-// test('product tile is rendered', async () => {
-//     renderWithProviders(<MockedComponent />)
-//     expect(await screen.findByTestId('sf-product-tile-25565616M')).toBeInTheDocument()
-// })
+test('product tile is rendered', async () => {
+    renderWithProviders(<MockedComponent />)
+    expect(await screen.findByText(/Navy Single Pleat Wool Suit/)).toBeInTheDocument()
+    expect(await screen.findByText(/Charcoal Single Pleat Wool Suit/)).toBeInTheDocument()
+})
 
 test('pagination is rendered', async () => {
     renderWithProviders(<MockedComponent />)
     expect(await screen.findByTestId('sf-pagination')).toBeInTheDocument()
+})
+
+test('show login modal when an unauthenticated user tries to add an item to wishlist', async () => {
+    renderWithProviders(<MockedComponent />)
+    const wishlistButton = screen.getAllByLabelText('wishlist')
+    expect(wishlistButton.length).toBe(2)
+    fireEvent.click(wishlistButton[0])
+    expect(await screen.findByText(/Email/)).toBeInTheDocument()
+    expect(await screen.findByText(/Password/)).toBeInTheDocument()
 })

@@ -58,7 +58,6 @@ const ProductList = (props) => {
     const params = useParams()
     const searchParams = useSearchParams()
     const {categories} = useContext(CategoriesContext)
-
     const productListEventHandler = (event) => {
         if (event.action === eventActions.ADD) {
             showWishlistItemAdded(event.item?.quantity)
@@ -91,7 +90,6 @@ const ProductList = (props) => {
         isLoading,
         ...rest
     } = props
-
     /**
      * Store which products exist in differnt list types.
      * Useful for handling toggle wishlist icon on product-tile
@@ -101,7 +99,7 @@ const ProductList = (props) => {
     const {total, sortingOptions} = productSearchResult || {}
 
     // Get the current category from global state.
-    let category = ''
+    let category = undefined
     if (!searchQuery) {
         category = categories[params.categoryId]
     }
@@ -144,14 +142,15 @@ const ProductList = (props) => {
 
             showToast({
                 title: formatMessage({defaultMessage: 'Item removed from wishlist'}),
-                status: 'success'
+                status: 'success',
+                id: product.productId
             })
         } catch (err) {
             showError()
         }
     }
 
-    const showWishlistItemAdded = (quantity) => {
+    const showWishlistItemAdded = (quantity, productId) => {
         const toastAction = (
             <Button variant="link" onClick={() => navigate('/account/wishlist')}>
                 View
@@ -166,7 +165,8 @@ const ProductList = (props) => {
                 {quantity}
             ),
             status: 'success',
-            action: toastAction
+            action: toastAction,
+            id: productId
         })
     }
 
@@ -194,7 +194,7 @@ const ProductList = (props) => {
                     public: false,
                     type: 'product'
                 })
-                showWishlistItemAdded(quantity)
+                showWishlistItemAdded(quantity, product.productId)
             }
         } catch (err) {
             showError()

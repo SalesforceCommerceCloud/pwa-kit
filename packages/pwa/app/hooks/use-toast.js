@@ -17,6 +17,7 @@ import {
  * to toasts when required. It supports all props supported by Chakra toast.
  *
  * @param {string} title Message text to be displayed in toast
+ * @param {string} id - id provided to the toast to avoid duplicate toast ids, use it if multiple toasts are needed
  * @param {string} status Semantic state of the toast - success | error | info | warning
  * @param {node} action Optional component to be displayed in the toast (eg. Button to allow user to perform action)
  * @param {string} position The placement of the toast on screen
@@ -24,7 +25,9 @@ import {
  */
 export function useToast() {
     const toast = useChakraToast()
+
     return ({
+        id,
         title,
         status,
         action,
@@ -33,7 +36,7 @@ export function useToast() {
         variant = 'subtle',
         isClosable = true
     }) => {
-        const toastId = `${title}-${status}`.toLowerCase()
+        const toastId = `${title}-${status}-${id}`.toLowerCase()
         let toastConfig = {
             id: toastId,
             title,

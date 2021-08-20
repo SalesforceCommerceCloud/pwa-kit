@@ -143,7 +143,7 @@ const ProductDetail = ({category, product, isLoading}) => {
                 } else {
                     // other wise, just create a new product list item with given quantity number
                     await customerProductLists.createCustomerProductListItem(wishlist, {
-                        productId: product.productId,
+                        productId: product.id,
                         priority: 1,
                         quantity,
                         public: false,

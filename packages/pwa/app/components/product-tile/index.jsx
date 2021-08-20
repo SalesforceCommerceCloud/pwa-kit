@@ -87,7 +87,7 @@ const ProductTile = (props) => {
                 {isInWishlist ? (
                     <IconButton
                         aria-label={intl.formatMessage({
-                            defaultMessage: 'Wishlist'
+                            defaultMessage: 'wishlist-solid'
                         })}
                         icon={<WishlistSolidIcon />}
                         variant="unstyled"
@@ -100,7 +100,7 @@ const ProductTile = (props) => {
                 ) : (
                     <IconButtonWithRegistration
                         aria-label={intl.formatMessage({
-                            defaultMessage: 'Wishlist'
+                            defaultMessage: 'wishlist'
                         })}
                         icon={<WishlistIcon />}
                         variant="unstyled"
