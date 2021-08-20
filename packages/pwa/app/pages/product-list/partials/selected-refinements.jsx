@@ -40,7 +40,13 @@ const SelectedRefinements = ({toggleFilter, selectedFilterValues, categoryId, fi
     }
 
     return (
-        <Wrap direction="row" align="center" display="flex" flexWrap="wrap">
+        <Wrap
+            direction="row"
+            align="center"
+            display="flex"
+            flexWrap="wrap"
+            data-testid="sf-selected-refinements"
+        >
             {selectedFilters?.map((filter, idx) => {
                 return (
                     <WrapItem key={idx}>

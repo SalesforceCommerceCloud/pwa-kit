@@ -52,7 +52,6 @@ export const stringify = (searchParamsObj) => {
 
     // "stringify" the entire object
     searchParamsObjCopy = queryString.stringify(searchParamsObjCopy)
-
     return searchParamsObjCopy
 }
 

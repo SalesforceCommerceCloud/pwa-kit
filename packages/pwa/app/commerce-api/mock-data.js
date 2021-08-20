@@ -3041,77 +3041,50 @@ export const mockCategories = {
 }
 
 export const mockProductSearch = {
-    limit: 3,
+    limit: 25,
     hits: [
         {
             currency: 'USD',
             hitType: 'master',
             image: {
-                alt: 'Navy Single Pleat Wool Suit, , large',
+                alt: 'Slim Skirt With Back Kick Pleats, , large',
                 disBaseLink:
-                    'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwe052b45b/images/large/PG.52002RUBN4Q.NAVYWL.PZ.jpg',
+                    'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw1c5f9222/images/large/PG.10221626.JJ3WCXX.PZ.jpg',
                 link:
-                    'https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwe052b45b/images/large/PG.52002RUBN4Q.NAVYWL.PZ.jpg',
-                title: 'Navy Single Pleat Wool Suit, '
+                    'https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw1c5f9222/images/large/PG.10221626.JJ3WCXX.PZ.jpg',
+                title: 'Slim Skirt With Back Kick Pleats, '
             },
             orderable: true,
-            price: 299.99,
-            productId: '25686514M',
-            productName: 'Navy Single Pleat Wool Suit',
+            price: 73.99,
+            productId: '25588993M',
+            productName: 'Slim Skirt With Back Kick Pleats',
             productType: {
                 master: true
             },
             representedProduct: {
-                id: '750518548272M'
+                id: '701644042639M'
             },
             representedProducts: [
                 {
-                    id: '750518548272M'
+                    id: '701644042639M'
                 },
                 {
-                    id: '750518548180M'
+                    id: '701644042622M'
                 },
                 {
-                    id: '750518548258M'
+                    id: '701644042653M'
                 },
                 {
-                    id: '750518548265M'
+                    id: '701644042646M'
                 },
                 {
-                    id: '750518548227M'
+                    id: '701644042592M'
                 },
                 {
-                    id: '750518548197M'
+                    id: '701644042608M'
                 },
                 {
-                    id: '750518548234M'
-                },
-                {
-                    id: '750518548203M'
-                },
-                {
-                    id: '750518548241M'
-                },
-                {
-                    id: '750518548432M'
-                },
-                {
-                    id: '750518548487M'
-                },
-                {
-                    id: '750518548456M'
-                },
-                {
-                    id: '750518548319M'
-                },
-                {
-                    id: '750518548357M'
-                },
-                {
-                    id: '750518548371M'
-                },
-                {
-                    id: '750518548296M'
+                    id: '701644042615M'
                 }
             ],
             variationAttributes: [
@@ -3120,9 +3093,9 @@ export const mockProductSearch = {
                     name: 'Color',
                     values: [
                         {
-                            name: 'Navy',
+                            name: 'Black',
                             orderable: true,
-                            value: 'NAVYWL'
+                            value: 'JJ3WCXX'
                         }
                     ]
                 },
@@ -3131,75 +3104,39 @@ export const mockProductSearch = {
                     name: 'Size',
                     values: [
                         {
-                            name: '36',
+                            name: '4',
                             orderable: true,
-                            value: '036'
+                            value: '004'
                         },
                         {
-                            name: '38',
+                            name: '6',
                             orderable: true,
-                            value: '038'
+                            value: '006'
                         },
                         {
-                            name: '39',
+                            name: '8',
                             orderable: true,
-                            value: '039'
+                            value: '008'
                         },
                         {
-                            name: '40',
+                            name: '10',
                             orderable: true,
-                            value: '040'
+                            value: '010'
                         },
                         {
-                            name: '42',
+                            name: '12',
                             orderable: true,
-                            value: '042'
+                            value: '012'
                         },
                         {
-                            name: '43',
+                            name: '14',
                             orderable: true,
-                            value: '043'
+                            value: '014'
                         },
                         {
-                            name: '44',
+                            name: '16',
                             orderable: true,
-                            value: '044'
-                        },
-                        {
-                            name: '46',
-                            orderable: true,
-                            value: '046'
-                        },
-                        {
-                            name: '48',
-                            orderable: true,
-                            value: '048'
-                        },
-                        {
-                            name: '50',
-                            orderable: true,
-                            value: '050'
-                        }
-                    ]
-                },
-                {
-                    id: 'width',
-                    name: 'Width',
-                    values: [
-                        {
-                            name: 'Short',
-                            orderable: true,
-                            value: 'S'
-                        },
-                        {
-                            name: 'Regular',
-                            orderable: true,
-                            value: 'V'
-                        },
-                        {
-                            name: 'Long',
-                            orderable: true,
-                            value: 'L'
+                            value: '016'
                         }
                     ]
                 }
@@ -3209,77 +3146,38 @@ export const mockProductSearch = {
             currency: 'USD',
             hitType: 'master',
             image: {
-                alt: 'Charcoal Single Pleat Wool Suit, , large',
+                alt: 'Pull On Neutral Pant, , large',
                 disBaseLink:
-                    'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw4de8166b/images/large/PG.33698RUBN4Q.CHARCWL.PZ.jpg',
+                    'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw22e88fa3/images/large/PG.10224484.JJ0CZXX.PZ.jpg',
                 link:
-                    'https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw4de8166b/images/large/PG.33698RUBN4Q.CHARCWL.PZ.jpg',
-                title: 'Charcoal Single Pleat Wool Suit, '
+                    'https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw22e88fa3/images/large/PG.10224484.JJ0CZXX.PZ.jpg',
+                title: 'Pull On Neutral Pant, '
             },
             orderable: true,
-            price: 299.99,
-            productId: '25686571M',
-            productName: 'Charcoal Single Pleat Wool Suit',
+            price: 69.0,
+            productId: '25565094M',
+            productName: 'Pull On Neutral Pant',
             productType: {
                 master: true
             },
             representedProduct: {
-                id: '750518894461M'
+                id: '701643458462M'
             },
             representedProducts: [
                 {
-                    id: '750518894461M'
+                    id: '701643458462M'
                 },
                 {
-                    id: '750518894515M'
+                    id: '701643458509M'
                 },
                 {
-                    id: '750518894522M'
+                    id: '701643458479M'
                 },
                 {
-                    id: '750518894539M'
+                    id: '701643458493M'
                 },
                 {
-                    id: '750518894508M'
-                },
-                {
-                    id: '750518894447M'
-                },
-                {
-                    id: '750518894478M'
-                },
-                {
-                    id: '750518894485M'
-                },
-                {
-                    id: '750518894713M'
-                },
-                {
-                    id: '750518894690M'
-                },
-                {
-                    id: '750518894744M'
-                },
-                {
-                    id: '750518894737M'
-                },
-                {
-                    id: '750518894751M'
-                },
-                {
-                    id: '750518894577M'
-                },
-                {
-                    id: '750518894591M'
-                },
-                {
-                    id: '750518894553M'
-                },
-                {
-                    id: '750518894638M'
-                },
-                {
-                    id: '750518894614M'
+                    id: '701643458486M'
                 }
             ],
             variationAttributes: [
@@ -3288,9 +3186,9 @@ export const mockProductSearch = {
                     name: 'Color',
                     values: [
                         {
-                            name: 'Charcoal',
+                            name: 'Black & Sugar',
                             orderable: true,
-                            value: 'CHARCWL'
+                            value: 'JJ0CZXX'
                         }
                     ]
                 },
@@ -3299,70 +3197,2131 @@ export const mockProductSearch = {
                     name: 'Size',
                     values: [
                         {
-                            name: '36',
+                            name: 'XS',
                             orderable: true,
-                            value: '036'
+                            value: '9XS'
                         },
                         {
-                            name: '38',
+                            name: 'S',
                             orderable: true,
-                            value: '038'
+                            value: '9SM'
                         },
                         {
-                            name: '40',
+                            name: 'M',
                             orderable: true,
-                            value: '040'
+                            value: '9MD'
                         },
                         {
-                            name: '41',
+                            name: 'L',
                             orderable: true,
-                            value: '041'
+                            value: '9LG'
                         },
                         {
-                            name: '42',
+                            name: 'XL',
                             orderable: true,
-                            value: '042'
-                        },
+                            value: '9XL'
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            currency: 'USD',
+            hitType: 'master',
+            image: {
+                alt: 'Washable Linen Slim Pant, , large',
+                disBaseLink:
+                    'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwab413b1b/images/large/PG.10243116.JJ2DGXX.PZ.jpg',
+                link:
+                    'https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwab413b1b/images/large/PG.10243116.JJ2DGXX.PZ.jpg',
+                title: 'Washable Linen Slim Pant, '
+            },
+            orderable: true,
+            price: 89.0,
+            productId: '25593301M',
+            productName: 'Washable Linen Slim Pant',
+            productType: {
+                master: true
+            },
+            representedProduct: {
+                id: '701644068349M'
+            },
+            representedProducts: [
+                {
+                    id: '701644068349M'
+                },
+                {
+                    id: '701644068301M'
+                },
+                {
+                    id: '701644068318M'
+                },
+                {
+                    id: '701644068356M'
+                },
+                {
+                    id: '701644068325M'
+                },
+                {
+                    id: '701644068332M'
+                },
+                {
+                    id: '701644068363M'
+                }
+            ],
+            variationAttributes: [
+                {
+                    id: 'color',
+                    name: 'Color',
+                    values: [
                         {
-                            name: '44',
+                            name: 'Black',
                             orderable: true,
-                            value: '044'
-                        },
-                        {
-                            name: '46',
-                            orderable: true,
-                            value: '046'
-                        },
-                        {
-                            name: '48',
-                            orderable: true,
-                            value: '048'
-                        },
-                        {
-                            name: '50',
-                            orderable: true,
-                            value: '050'
+                            value: 'JJ3WCXX'
                         }
                     ]
                 },
                 {
-                    id: 'width',
-                    name: 'Width',
+                    id: 'size',
+                    name: 'Size',
                     values: [
                         {
-                            name: 'Short',
+                            name: '4',
                             orderable: true,
-                            value: 'S'
+                            value: '004'
                         },
                         {
-                            name: 'Regular',
+                            name: '6',
                             orderable: true,
-                            value: 'V'
+                            value: '006'
                         },
                         {
-                            name: 'Long',
+                            name: '8',
                             orderable: true,
-                            value: 'L'
+                            value: '008'
+                        },
+                        {
+                            name: '10',
+                            orderable: true,
+                            value: '010'
+                        },
+                        {
+                            name: '12',
+                            orderable: true,
+                            value: '012'
+                        },
+                        {
+                            name: '14',
+                            orderable: true,
+                            value: '014'
+                        },
+                        {
+                            name: '16',
+                            orderable: true,
+                            value: '016'
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            currency: 'USD',
+            hitType: 'master',
+            image: {
+                alt: 'Classic Crop Pant, , large',
+                disBaseLink:
+                    'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwbce5c490/images/large/PG.10232332.JJ169XX.PZ.jpg',
+                link:
+                    'https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwbce5c490/images/large/PG.10232332.JJ169XX.PZ.jpg',
+                title: 'Classic Crop Pant, '
+            },
+            orderable: true,
+            price: 69.0,
+            productId: '25564454M',
+            productName: 'Classic Crop Pant',
+            productType: {
+                master: true
+            },
+            representedProduct: {
+                id: '701643370818M'
+            },
+            representedProducts: [
+                {
+                    id: '701643370818M'
+                },
+                {
+                    id: '701643370801M'
+                },
+                {
+                    id: '701643370825M'
+                },
+                {
+                    id: '701643370849M'
+                },
+                {
+                    id: '701643370832M'
+                },
+                {
+                    id: '701643370856M'
+                },
+                {
+                    id: '701643370795M'
+                }
+            ],
+            variationAttributes: [
+                {
+                    id: 'color',
+                    name: 'Color',
+                    values: [
+                        {
+                            name: 'Black',
+                            orderable: true,
+                            value: 'JJ169XX'
+                        }
+                    ]
+                },
+                {
+                    id: 'size',
+                    name: 'Size',
+                    values: [
+                        {
+                            name: '4',
+                            orderable: true,
+                            value: '004'
+                        },
+                        {
+                            name: '6',
+                            orderable: true,
+                            value: '006'
+                        },
+                        {
+                            name: '8',
+                            orderable: true,
+                            value: '008'
+                        },
+                        {
+                            name: '10',
+                            orderable: true,
+                            value: '010'
+                        },
+                        {
+                            name: '12',
+                            orderable: true,
+                            value: '012'
+                        },
+                        {
+                            name: '14',
+                            orderable: true,
+                            value: '014'
+                        },
+                        {
+                            name: '16',
+                            orderable: true,
+                            value: '016'
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            currency: 'USD',
+            hitType: 'master',
+            image: {
+                alt: 'Slim Floral Skirt, , large',
+                disBaseLink:
+                    'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwea207073/images/large/PG.10225656.JJ3WDXX.PZ.jpg',
+                link:
+                    'https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwea207073/images/large/PG.10225656.JJ3WDXX.PZ.jpg',
+                title: 'Slim Floral Skirt, '
+            },
+            orderable: true,
+            price: 73.99,
+            productId: '25589419M',
+            productName: 'Slim Floral Skirt',
+            productType: {
+                master: true
+            },
+            representedProduct: {
+                id: '701643415397M'
+            },
+            representedProducts: [
+                {
+                    id: '701643415397M'
+                },
+                {
+                    id: '701643415434M'
+                },
+                {
+                    id: '701643415403M'
+                },
+                {
+                    id: '701643415410M'
+                },
+                {
+                    id: '701643415380M'
+                },
+                {
+                    id: '701643415427M'
+                },
+                {
+                    id: '701643415441M'
+                }
+            ],
+            variationAttributes: [
+                {
+                    id: 'color',
+                    name: 'Color',
+                    values: [
+                        {
+                            name: 'Black Multi',
+                            orderable: true,
+                            value: 'JJ3WDXX'
+                        }
+                    ]
+                },
+                {
+                    id: 'size',
+                    name: 'Size',
+                    values: [
+                        {
+                            name: '4',
+                            orderable: true,
+                            value: '004'
+                        },
+                        {
+                            name: '6',
+                            orderable: true,
+                            value: '006'
+                        },
+                        {
+                            name: '8',
+                            orderable: true,
+                            value: '008'
+                        },
+                        {
+                            name: '10',
+                            orderable: true,
+                            value: '010'
+                        },
+                        {
+                            name: '12',
+                            orderable: true,
+                            value: '012'
+                        },
+                        {
+                            name: '14',
+                            orderable: true,
+                            value: '014'
+                        },
+                        {
+                            name: '16',
+                            orderable: true,
+                            value: '016'
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            currency: 'USD',
+            hitType: 'master',
+            image: {
+                alt: 'Trouser Leg Pant, , large',
+                disBaseLink:
+                    'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw56926d5f/images/large/PG.10207088.JJ169XX.PZ.jpg',
+                link:
+                    'https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw56926d5f/images/large/PG.10207088.JJ169XX.PZ.jpg',
+                title: 'Trouser Leg Pant, '
+            },
+            orderable: true,
+            price: 47.99,
+            productId: '25518746M',
+            productName: 'Trouser Leg Pant',
+            productType: {
+                master: true
+            },
+            representedProduct: {
+                id: '701642867753M'
+            },
+            representedProducts: [
+                {
+                    id: '701642867753M'
+                },
+                {
+                    id: '701642867777M'
+                },
+                {
+                    id: '701642867715M'
+                },
+                {
+                    id: '701642867722M'
+                },
+                {
+                    id: '701642867746M'
+                },
+                {
+                    id: '701642867760M'
+                },
+                {
+                    id: '701642867739M'
+                }
+            ],
+            variationAttributes: [
+                {
+                    id: 'color',
+                    name: 'Color',
+                    values: [
+                        {
+                            name: 'Black',
+                            orderable: true,
+                            value: 'JJ169XX'
+                        }
+                    ]
+                },
+                {
+                    id: 'size',
+                    name: 'Size',
+                    values: [
+                        {
+                            name: '4',
+                            orderable: true,
+                            value: '004'
+                        },
+                        {
+                            name: '6',
+                            orderable: true,
+                            value: '006'
+                        },
+                        {
+                            name: '8',
+                            orderable: true,
+                            value: '008'
+                        },
+                        {
+                            name: '10',
+                            orderable: true,
+                            value: '010'
+                        },
+                        {
+                            name: '12',
+                            orderable: true,
+                            value: '012'
+                        },
+                        {
+                            name: '14',
+                            orderable: true,
+                            value: '014'
+                        },
+                        {
+                            name: '16',
+                            orderable: true,
+                            value: '016'
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            currency: 'USD',
+            hitType: 'master',
+            image: {
+                alt: 'Tribal Inspired Slim Skirt, , large',
+                disBaseLink:
+                    'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw0ecd95d1/images/large/PG.10244521.JJ3WDXX.PZ.jpg',
+                link:
+                    'https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw0ecd95d1/images/large/PG.10244521.JJ3WDXX.PZ.jpg',
+                title: 'Tribal Inspired Slim Skirt, '
+            },
+            orderable: true,
+            price: 73.99,
+            productId: '25762759M',
+            productName: 'Tribal Inspired Slim Skirt',
+            productType: {
+                master: true
+            },
+            representedProduct: {
+                id: '701643636334M'
+            },
+            representedProducts: [
+                {
+                    id: '701643636334M'
+                },
+                {
+                    id: '701643636365M'
+                },
+                {
+                    id: '701643636372M'
+                },
+                {
+                    id: '701643636310M'
+                },
+                {
+                    id: '701643636341M'
+                }
+            ],
+            variationAttributes: [
+                {
+                    id: 'color',
+                    name: 'Color',
+                    values: [
+                        {
+                            name: 'Black Multi',
+                            orderable: true,
+                            value: 'JJ3WDXX'
+                        }
+                    ]
+                },
+                {
+                    id: 'size',
+                    name: 'Size',
+                    values: [
+                        {
+                            name: '6',
+                            orderable: true,
+                            value: '006'
+                        },
+                        {
+                            name: '8',
+                            orderable: true,
+                            value: '008'
+                        },
+                        {
+                            name: '10',
+                            orderable: true,
+                            value: '010'
+                        },
+                        {
+                            name: '14',
+                            orderable: true,
+                            value: '014'
+                        },
+                        {
+                            name: '16',
+                            orderable: true,
+                            value: '016'
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            currency: 'USD',
+            hitType: 'master',
+            image: {
+                alt: 'Relaxed Fit Pant, , large',
+                disBaseLink:
+                    'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw4eee8da9/images/large/PG.10228765.JJ169XX.PZ.jpg',
+                link:
+                    'https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw4eee8da9/images/large/PG.10228765.JJ169XX.PZ.jpg',
+                title: 'Relaxed Fit Pant, '
+            },
+            orderable: true,
+            price: 69.0,
+            productId: '25565572M',
+            productName: 'Relaxed Fit Pant',
+            productType: {
+                master: true
+            },
+            representedProduct: {
+                id: '701644025151M'
+            },
+            representedProducts: [
+                {
+                    id: '701644025151M'
+                },
+                {
+                    id: '701644025182M'
+                },
+                {
+                    id: '701644025175M'
+                },
+                {
+                    id: '701644025168M'
+                },
+                {
+                    id: '701644025199M'
+                }
+            ],
+            variationAttributes: [
+                {
+                    id: 'color',
+                    name: 'Color',
+                    values: [
+                        {
+                            name: 'Black',
+                            orderable: true,
+                            value: 'JJ169XX'
+                        }
+                    ]
+                },
+                {
+                    id: 'size',
+                    name: 'Size',
+                    values: [
+                        {
+                            name: 'XS',
+                            orderable: true,
+                            value: '9XS'
+                        },
+                        {
+                            name: 'S',
+                            orderable: true,
+                            value: '9SM'
+                        },
+                        {
+                            name: 'M',
+                            orderable: true,
+                            value: '9MD'
+                        },
+                        {
+                            name: 'L',
+                            orderable: true,
+                            value: '9LG'
+                        },
+                        {
+                            name: 'XL',
+                            orderable: true,
+                            value: '9XL'
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            currency: 'USD',
+            hitType: 'master',
+            image: {
+                alt: '5 Pocket Cuffed Capri, , large',
+                disBaseLink:
+                    'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwb4de158c/images/large/PG.60113984.JJ169XX.PZ.jpg',
+                link:
+                    'https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwb4de158c/images/large/PG.60113984.JJ169XX.PZ.jpg',
+                title: '5 Pocket Cuffed Capri, '
+            },
+            orderable: true,
+            price: 49.0,
+            productId: '25688156M',
+            productName: '5 Pocket Cuffed Capri',
+            productType: {
+                master: true
+            },
+            representedProduct: {
+                id: '609717696089M'
+            },
+            representedProducts: [
+                {
+                    id: '609717696089M'
+                },
+                {
+                    id: '609717696041M'
+                },
+                {
+                    id: '609717696096M'
+                },
+                {
+                    id: '609717696027M'
+                },
+                {
+                    id: '609717696102M'
+                },
+                {
+                    id: '609717696034M'
+                },
+                {
+                    id: '609717696058M'
+                }
+            ],
+            variationAttributes: [
+                {
+                    id: 'color',
+                    name: 'Color',
+                    values: [
+                        {
+                            name: 'Black',
+                            orderable: true,
+                            value: 'JJ169XX'
+                        }
+                    ]
+                },
+                {
+                    id: 'size',
+                    name: 'Size',
+                    values: [
+                        {
+                            name: '4',
+                            orderable: true,
+                            value: '004'
+                        },
+                        {
+                            name: '6',
+                            orderable: true,
+                            value: '006'
+                        },
+                        {
+                            name: '8',
+                            orderable: true,
+                            value: '008'
+                        },
+                        {
+                            name: '10',
+                            orderable: true,
+                            value: '010'
+                        },
+                        {
+                            name: '12',
+                            orderable: true,
+                            value: '012'
+                        },
+                        {
+                            name: '14',
+                            orderable: true,
+                            value: '014'
+                        },
+                        {
+                            name: '16',
+                            orderable: true,
+                            value: '016'
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            currency: 'USD',
+            hitType: 'master',
+            image: {
+                alt: 'Pleated Skirt., , large',
+                disBaseLink:
+                    'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwf573a20b/images/large/PG.10255878.JJ3WCXX.PZ.jpg',
+                link:
+                    'https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwf573a20b/images/large/PG.10255878.JJ3WCXX.PZ.jpg',
+                title: 'Pleated Skirt., '
+            },
+            orderable: true,
+            price: 109.0,
+            productId: '25697392M',
+            productName: 'Pleated Skirt.',
+            productType: {
+                master: true
+            },
+            representedProduct: {
+                id: '701644443054M'
+            },
+            representedProducts: [
+                {
+                    id: '701644443054M'
+                },
+                {
+                    id: '701644443061M'
+                },
+                {
+                    id: '701644443085M'
+                },
+                {
+                    id: '701644443078M'
+                }
+            ],
+            variationAttributes: [
+                {
+                    id: 'color',
+                    name: 'Color',
+                    values: [
+                        {
+                            name: 'Black',
+                            orderable: true,
+                            value: 'JJ3WCXX'
+                        }
+                    ]
+                },
+                {
+                    id: 'size',
+                    name: 'Size',
+                    values: [
+                        {
+                            name: 'S',
+                            orderable: true,
+                            value: '9SM'
+                        },
+                        {
+                            name: 'M',
+                            orderable: true,
+                            value: '9MD'
+                        },
+                        {
+                            name: 'L',
+                            orderable: true,
+                            value: '9LG'
+                        },
+                        {
+                            name: 'XL',
+                            orderable: true,
+                            value: '9XL'
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            currency: 'USD',
+            hitType: 'master',
+            image: {
+                alt: 'Classic Glen Plaid Pant, , large',
+                disBaseLink:
+                    'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw6d0a44b0/images/large/PG.10233641.JJ3WRXX.PZ.jpg',
+                link:
+                    'https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw6d0a44b0/images/large/PG.10233641.JJ3WRXX.PZ.jpg',
+                title: 'Classic Glen Plaid Pant, '
+            },
+            orderable: true,
+            price: 80.99,
+            productId: '25589157M',
+            productName: 'Classic Glen Plaid Pant',
+            productType: {
+                master: true
+            },
+            representedProduct: {
+                id: '701643409747M'
+            },
+            representedProducts: [
+                {
+                    id: '701643409747M'
+                },
+                {
+                    id: '701643409716M'
+                },
+                {
+                    id: '701643409761M'
+                },
+                {
+                    id: '701643409723M'
+                },
+                {
+                    id: '701643409730M'
+                }
+            ],
+            variationAttributes: [
+                {
+                    id: 'color',
+                    name: 'Color',
+                    values: [
+                        {
+                            name: 'Black & Ivory',
+                            orderable: true,
+                            value: 'JJ3WRXX'
+                        }
+                    ]
+                },
+                {
+                    id: 'size',
+                    name: 'Size',
+                    values: [
+                        {
+                            name: '6',
+                            orderable: true,
+                            value: '006'
+                        },
+                        {
+                            name: '10',
+                            orderable: true,
+                            value: '010'
+                        },
+                        {
+                            name: '12',
+                            orderable: true,
+                            value: '012'
+                        },
+                        {
+                            name: '14',
+                            orderable: true,
+                            value: '014'
+                        },
+                        {
+                            name: '16',
+                            orderable: true,
+                            value: '016'
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            currency: 'USD',
+            hitType: 'master',
+            image: {
+                alt: 'Long Pleated Skirt, , large',
+                disBaseLink:
+                    'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw26c8763f/images/large/PG.10239110.JJ3WCXX.PZ.jpg',
+                link:
+                    'https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw26c8763f/images/large/PG.10239110.JJ3WCXX.PZ.jpg',
+                title: 'Long Pleated Skirt, '
+            },
+            orderable: true,
+            price: 109.0,
+            productId: '25589795M',
+            productName: 'Long Pleated Skirt',
+            productType: {
+                master: true
+            },
+            representedProduct: {
+                id: '701644066987M'
+            },
+            representedProducts: [
+                {
+                    id: '701644066987M'
+                },
+                {
+                    id: '701644066994M'
+                },
+                {
+                    id: '701644067007M'
+                }
+            ],
+            variationAttributes: [
+                {
+                    id: 'color',
+                    name: 'Color',
+                    values: [
+                        {
+                            name: 'Black',
+                            orderable: true,
+                            value: 'JJ3WCXX'
+                        }
+                    ]
+                },
+                {
+                    id: 'size',
+                    name: 'Size',
+                    values: [
+                        {
+                            name: 'S',
+                            orderable: true,
+                            value: '9SM'
+                        },
+                        {
+                            name: 'M',
+                            orderable: true,
+                            value: '9MD'
+                        },
+                        {
+                            name: 'XL',
+                            orderable: true,
+                            value: '9XL'
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            currency: 'USD',
+            hitType: 'master',
+            image: {
+                alt: 'Pleated Skirt With Embroidery., , large',
+                disBaseLink:
+                    'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw07b70fb1/images/large/PG.10245262.JJ3WCXX.PZ.jpg',
+                link:
+                    'https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw07b70fb1/images/large/PG.10245262.JJ3WCXX.PZ.jpg',
+                title: 'Pleated Skirt With Embroidery., '
+            },
+            orderable: true,
+            price: 149.0,
+            productId: '25696693M',
+            productName: 'Pleated Skirt With Embroidery.',
+            productType: {
+                master: true
+            },
+            representedProduct: {
+                id: '701644335342M'
+            },
+            representedProducts: [
+                {
+                    id: '701644335342M'
+                },
+                {
+                    id: '701644335397M'
+                },
+                {
+                    id: '701644335373M'
+                },
+                {
+                    id: '701644335380M'
+                },
+                {
+                    id: '701644335366M'
+                },
+                {
+                    id: '701644335359M'
+                },
+                {
+                    id: '701644335403M'
+                }
+            ],
+            variationAttributes: [
+                {
+                    id: 'color',
+                    name: 'Color',
+                    values: [
+                        {
+                            name: 'Black',
+                            orderable: true,
+                            value: 'JJ3WCXX'
+                        }
+                    ]
+                },
+                {
+                    id: 'size',
+                    name: 'Size',
+                    values: [
+                        {
+                            name: '4',
+                            orderable: true,
+                            value: '004'
+                        },
+                        {
+                            name: '6',
+                            orderable: true,
+                            value: '006'
+                        },
+                        {
+                            name: '8',
+                            orderable: true,
+                            value: '008'
+                        },
+                        {
+                            name: '10',
+                            orderable: true,
+                            value: '010'
+                        },
+                        {
+                            name: '12',
+                            orderable: true,
+                            value: '012'
+                        },
+                        {
+                            name: '14',
+                            orderable: true,
+                            value: '014'
+                        },
+                        {
+                            name: '16',
+                            orderable: true,
+                            value: '016'
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            currency: 'USD',
+            hitType: 'master',
+            image: {
+                alt: 'Straight Ankle Pant., , large',
+                disBaseLink:
+                    'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwdaccb91d/images/large/PG.10246102.JJ0DDXX.PZ.jpg',
+                link:
+                    'https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwdaccb91d/images/large/PG.10246102.JJ0DDXX.PZ.jpg',
+                title: 'Straight Ankle Pant., '
+            },
+            orderable: true,
+            price: 79.0,
+            productId: '25697630M',
+            productName: 'Straight Ankle Pant.',
+            productType: {
+                master: true
+            },
+            representedProduct: {
+                id: '701644389383M'
+            },
+            representedProducts: [
+                {
+                    id: '701644389383M'
+                },
+                {
+                    id: '701644389369M'
+                },
+                {
+                    id: '701644389413M'
+                },
+                {
+                    id: '701644389420M'
+                },
+                {
+                    id: '701644389376M'
+                },
+                {
+                    id: '701644389437M'
+                },
+                {
+                    id: '701644389390M'
+                }
+            ],
+            variationAttributes: [
+                {
+                    id: 'color',
+                    name: 'Color',
+                    values: [
+                        {
+                            name: 'Black & White',
+                            orderable: true,
+                            value: 'JJ0DDXX'
+                        }
+                    ]
+                },
+                {
+                    id: 'size',
+                    name: 'Size',
+                    values: [
+                        {
+                            name: '4',
+                            orderable: true,
+                            value: '004'
+                        },
+                        {
+                            name: '6',
+                            orderable: true,
+                            value: '006'
+                        },
+                        {
+                            name: '8',
+                            orderable: true,
+                            value: '008'
+                        },
+                        {
+                            name: '10',
+                            orderable: true,
+                            value: '010'
+                        },
+                        {
+                            name: '12',
+                            orderable: true,
+                            value: '012'
+                        },
+                        {
+                            name: '14',
+                            orderable: true,
+                            value: '014'
+                        },
+                        {
+                            name: '16',
+                            orderable: true,
+                            value: '016'
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            currency: 'USD',
+            hitType: 'master',
+            image: {
+                alt: 'Classic Tweed Pant, , large',
+                disBaseLink:
+                    'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw8ae5dac1/images/large/PG.10208897.JJ0QRXX.PZ.jpg',
+                link:
+                    'https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw8ae5dac1/images/large/PG.10208897.JJ0QRXX.PZ.jpg',
+                title: 'Classic Tweed Pant, '
+            },
+            orderable: true,
+            price: 80.99,
+            productId: '25502027M',
+            productName: 'Classic Tweed Pant',
+            productType: {
+                master: true
+            },
+            representedProduct: {
+                id: '701642884323M'
+            },
+            representedProducts: [
+                {
+                    id: '701642884323M'
+                },
+                {
+                    id: '701642884347M'
+                },
+                {
+                    id: '701642884309M'
+                },
+                {
+                    id: '701642884354M'
+                },
+                {
+                    id: '701642884361M'
+                },
+                {
+                    id: '701642884330M'
+                },
+                {
+                    id: '701642884316M'
+                }
+            ],
+            variationAttributes: [
+                {
+                    id: 'color',
+                    name: 'Color',
+                    values: [
+                        {
+                            name: 'Laurel Multi',
+                            orderable: true,
+                            value: 'JJ0QRXX'
+                        }
+                    ]
+                },
+                {
+                    id: 'size',
+                    name: 'Size',
+                    values: [
+                        {
+                            name: '4',
+                            orderable: true,
+                            value: '004'
+                        },
+                        {
+                            name: '6',
+                            orderable: true,
+                            value: '006'
+                        },
+                        {
+                            name: '8',
+                            orderable: true,
+                            value: '008'
+                        },
+                        {
+                            name: '10',
+                            orderable: true,
+                            value: '010'
+                        },
+                        {
+                            name: '12',
+                            orderable: true,
+                            value: '012'
+                        },
+                        {
+                            name: '14',
+                            orderable: true,
+                            value: '014'
+                        },
+                        {
+                            name: '16',
+                            orderable: true,
+                            value: '016'
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            currency: 'USD',
+            hitType: 'master',
+            image: {
+                alt: 'Ribbed Pleated Skirt, , large',
+                disBaseLink:
+                    'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwa7953e0e/images/large/PG.10218193.JJ0NLE5.PZ.jpg',
+                link:
+                    'https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwa7953e0e/images/large/PG.10218193.JJ0NLE5.PZ.jpg',
+                title: 'Ribbed Pleated Skirt, '
+            },
+            orderable: true,
+            price: 68.99,
+            productId: '25503070M',
+            productName: 'Ribbed Pleated Skirt',
+            productType: {
+                master: true
+            },
+            representedProduct: {
+                id: '701643037582M'
+            },
+            representedProducts: [
+                {
+                    id: '701643037582M'
+                },
+                {
+                    id: '701643037612M'
+                },
+                {
+                    id: '701643037599M'
+                },
+                {
+                    id: '701643037605M'
+                }
+            ],
+            variationAttributes: [
+                {
+                    id: 'color',
+                    name: 'Color',
+                    values: [
+                        {
+                            name: 'Laurel',
+                            orderable: true,
+                            value: 'JJ0NLE5'
+                        }
+                    ]
+                },
+                {
+                    id: 'size',
+                    name: 'Size',
+                    values: [
+                        {
+                            name: 'S',
+                            orderable: true,
+                            value: '9SM'
+                        },
+                        {
+                            name: 'M',
+                            orderable: true,
+                            value: '9MD'
+                        },
+                        {
+                            name: 'L',
+                            orderable: true,
+                            value: '9LG'
+                        },
+                        {
+                            name: 'XL',
+                            orderable: true,
+                            value: '9XL'
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            currency: 'USD',
+            hitType: 'master',
+            image: {
+                alt: 'Bootleg Trouser, , large',
+                disBaseLink:
+                    'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw8641f0b8/images/large/PG.10204133.JJ0CZXX.PZ.jpg',
+                link:
+                    'https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw8641f0b8/images/large/PG.10204133.JJ0CZXX.PZ.jpg',
+                title: 'Bootleg Trouser, '
+            },
+            orderable: true,
+            price: 68.99,
+            productId: '25518397M',
+            productName: 'Bootleg Trouser',
+            productType: {
+                master: true
+            },
+            representedProduct: {
+                id: '701642853077M'
+            },
+            representedProducts: [
+                {
+                    id: '701642853077M'
+                },
+                {
+                    id: '701642853084M'
+                },
+                {
+                    id: '701642853107M'
+                },
+                {
+                    id: '701642853145M'
+                },
+                {
+                    id: '701642853121M'
+                },
+                {
+                    id: '701642853091M'
+                }
+            ],
+            variationAttributes: [
+                {
+                    id: 'color',
+                    name: 'Color',
+                    values: [
+                        {
+                            name: 'Black & Sugar',
+                            orderable: true,
+                            value: 'JJ0CZXX'
+                        }
+                    ]
+                },
+                {
+                    id: 'size',
+                    name: 'Size',
+                    values: [
+                        {
+                            name: '4',
+                            orderable: true,
+                            value: '004'
+                        },
+                        {
+                            name: '8',
+                            orderable: true,
+                            value: '008'
+                        },
+                        {
+                            name: '10',
+                            orderable: true,
+                            value: '010'
+                        },
+                        {
+                            name: '12',
+                            orderable: true,
+                            value: '012'
+                        },
+                        {
+                            name: '14',
+                            orderable: true,
+                            value: '014'
+                        },
+                        {
+                            name: '16',
+                            orderable: true,
+                            value: '016'
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            currency: 'USD',
+            hitType: 'master',
+            image: {
+                alt: 'Wide Leg Pant., , large',
+                disBaseLink:
+                    'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw2c21e32c/images/large/PG.10245233.JJ3WDXX.PZ.jpg',
+                link:
+                    'https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw2c21e32c/images/large/PG.10245233.JJ3WDXX.PZ.jpg',
+                title: 'Wide Leg Pant., '
+            },
+            orderable: true,
+            price: 119.0,
+            productId: '25696685M',
+            productName: 'Wide Leg Pant.',
+            productType: {
+                master: true
+            },
+            representedProduct: {
+                id: '701644334871M'
+            },
+            representedProducts: [
+                {
+                    id: '701644334871M'
+                },
+                {
+                    id: '701644334895M'
+                },
+                {
+                    id: '701644334864M'
+                },
+                {
+                    id: '701644334901M'
+                },
+                {
+                    id: '701644334840M'
+                },
+                {
+                    id: '701644334857M'
+                },
+                {
+                    id: '701644334888M'
+                }
+            ],
+            variationAttributes: [
+                {
+                    id: 'color',
+                    name: 'Color',
+                    values: [
+                        {
+                            name: 'Black Multi',
+                            orderable: true,
+                            value: 'JJ3WDXX'
+                        }
+                    ]
+                },
+                {
+                    id: 'size',
+                    name: 'Size',
+                    values: [
+                        {
+                            name: '4',
+                            orderable: true,
+                            value: '004'
+                        },
+                        {
+                            name: '6',
+                            orderable: true,
+                            value: '006'
+                        },
+                        {
+                            name: '8',
+                            orderable: true,
+                            value: '008'
+                        },
+                        {
+                            name: '10',
+                            orderable: true,
+                            value: '010'
+                        },
+                        {
+                            name: '12',
+                            orderable: true,
+                            value: '012'
+                        },
+                        {
+                            name: '14',
+                            orderable: true,
+                            value: '014'
+                        },
+                        {
+                            name: '16',
+                            orderable: true,
+                            value: '016'
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            currency: 'USD',
+            hitType: 'master',
+            image: {
+                alt: 'Eyelet Skirt., , large',
+                disBaseLink:
+                    'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw9efe5554/images/large/PG.10253481.JJ169XX.PZ.jpg',
+                link:
+                    'https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw9efe5554/images/large/PG.10253481.JJ169XX.PZ.jpg',
+                title: 'Eyelet Skirt., '
+            },
+            orderable: true,
+            price: 89.0,
+            productId: '25697659M',
+            productName: 'Eyelet Skirt.',
+            productType: {
+                master: true
+            },
+            representedProduct: {
+                id: '701644390952M'
+            },
+            representedProducts: [
+                {
+                    id: '701644390952M'
+                },
+                {
+                    id: '701644390891M'
+                },
+                {
+                    id: '701644390907M'
+                },
+                {
+                    id: '701644390921M'
+                },
+                {
+                    id: '701644390945M'
+                },
+                {
+                    id: '701644390914M'
+                },
+                {
+                    id: '701644390969M'
+                }
+            ],
+            variationAttributes: [
+                {
+                    id: 'color',
+                    name: 'Color',
+                    values: [
+                        {
+                            name: 'Black',
+                            orderable: true,
+                            value: 'JJ169XX'
+                        }
+                    ]
+                },
+                {
+                    id: 'size',
+                    name: 'Size',
+                    values: [
+                        {
+                            name: '4',
+                            orderable: true,
+                            value: '004'
+                        },
+                        {
+                            name: '6',
+                            orderable: true,
+                            value: '006'
+                        },
+                        {
+                            name: '8',
+                            orderable: true,
+                            value: '008'
+                        },
+                        {
+                            name: '10',
+                            orderable: true,
+                            value: '010'
+                        },
+                        {
+                            name: '12',
+                            orderable: true,
+                            value: '012'
+                        },
+                        {
+                            name: '14',
+                            orderable: true,
+                            value: '014'
+                        },
+                        {
+                            name: '16',
+                            orderable: true,
+                            value: '016'
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            currency: 'USD',
+            hitType: 'master',
+            image: {
+                alt: 'Washable Wool Classic Straight Skirt , , large',
+                disBaseLink:
+                    'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwf6272a34/images/large/PG.10176157.JJ5AJXX.PZ.jpg',
+                link:
+                    'https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwf6272a34/images/large/PG.10176157.JJ5AJXX.PZ.jpg',
+                title: 'Washable Wool Classic Straight Skirt , '
+            },
+            orderable: true,
+            price: 89.0,
+            productId: '25328702M',
+            productName: 'Washable Wool Classic Straight Skirt ',
+            productType: {
+                master: true
+            },
+            representedProduct: {
+                id: '701641312858M'
+            },
+            representedProducts: [
+                {
+                    id: '701641312858M'
+                },
+                {
+                    id: '701641312865M'
+                },
+                {
+                    id: '701641312834M'
+                },
+                {
+                    id: '701641312841M'
+                },
+                {
+                    id: '701641312810M'
+                },
+                {
+                    id: '701641312827M'
+                },
+                {
+                    id: '701641312872M'
+                }
+            ],
+            variationAttributes: [
+                {
+                    id: 'color',
+                    name: 'Color',
+                    values: [
+                        {
+                            name: 'Black',
+                            orderable: true,
+                            value: 'JJ3WCXX'
+                        }
+                    ]
+                },
+                {
+                    id: 'size',
+                    name: 'Size',
+                    values: [
+                        {
+                            name: '4',
+                            orderable: true,
+                            value: '004'
+                        },
+                        {
+                            name: '6',
+                            orderable: true,
+                            value: '006'
+                        },
+                        {
+                            name: '8',
+                            orderable: true,
+                            value: '008'
+                        },
+                        {
+                            name: '10',
+                            orderable: true,
+                            value: '010'
+                        },
+                        {
+                            name: '12',
+                            orderable: true,
+                            value: '012'
+                        },
+                        {
+                            name: '14',
+                            orderable: true,
+                            value: '014'
+                        },
+                        {
+                            name: '16',
+                            orderable: true,
+                            value: '016'
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            currency: 'USD',
+            hitType: 'master',
+            image: {
+                alt: 'Roll Up Cargo Pant, , large',
+                disBaseLink:
+                    'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw9f11c8e4/images/large/PG.10224067.JJ169XX.PZ.jpg',
+                link:
+                    'https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw9f11c8e4/images/large/PG.10224067.JJ169XX.PZ.jpg',
+                title: 'Roll Up Cargo Pant, '
+            },
+            orderable: true,
+            price: 47.99,
+            productId: '25564782M',
+            productName: 'Roll Up Cargo Pant',
+            productType: {
+                master: true
+            },
+            representedProduct: {
+                id: '701643422074M'
+            },
+            representedProducts: [
+                {
+                    id: '701643422074M'
+                },
+                {
+                    id: '701643422128M'
+                },
+                {
+                    id: '701643422111M'
+                },
+                {
+                    id: '701643422098M'
+                },
+                {
+                    id: '701643422104M'
+                },
+                {
+                    id: '701643422081M'
+                },
+                {
+                    id: '701643422135M'
+                }
+            ],
+            variationAttributes: [
+                {
+                    id: 'color',
+                    name: 'Color',
+                    values: [
+                        {
+                            name: 'Black',
+                            orderable: true,
+                            value: 'JJ169XX'
+                        }
+                    ]
+                },
+                {
+                    id: 'size',
+                    name: 'Size',
+                    values: [
+                        {
+                            name: '4',
+                            orderable: true,
+                            value: '004'
+                        },
+                        {
+                            name: '6',
+                            orderable: true,
+                            value: '006'
+                        },
+                        {
+                            name: '8',
+                            orderable: true,
+                            value: '008'
+                        },
+                        {
+                            name: '10',
+                            orderable: true,
+                            value: '010'
+                        },
+                        {
+                            name: '12',
+                            orderable: true,
+                            value: '012'
+                        },
+                        {
+                            name: '14',
+                            orderable: true,
+                            value: '014'
+                        },
+                        {
+                            name: '16',
+                            orderable: true,
+                            value: '016'
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            currency: 'USD',
+            hitType: 'master',
+            image: {
+                alt: 'Side Button Pleated Skirt, , large',
+                disBaseLink:
+                    'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw05ea84dc/images/large/PG.10227169.JJ3WCXX.PZ.jpg',
+                link:
+                    'https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw05ea84dc/images/large/PG.10227169.JJ3WCXX.PZ.jpg',
+                title: 'Side Button Pleated Skirt, '
+            },
+            orderable: true,
+            price: 95.99,
+            productId: '25629003M',
+            productName: 'Side Button Pleated Skirt',
+            productType: {
+                master: true
+            },
+            representedProduct: {
+                id: '701643408139M'
+            },
+            representedProducts: [
+                {
+                    id: '701643408139M'
+                },
+                {
+                    id: '701643408177M'
+                }
+            ],
+            variationAttributes: [
+                {
+                    id: 'color',
+                    name: 'Color',
+                    values: [
+                        {
+                            name: 'Black',
+                            orderable: true,
+                            value: 'JJ3WCXX'
+                        }
+                    ]
+                },
+                {
+                    id: 'size',
+                    name: 'Size',
+                    values: [
+                        {
+                            name: '4',
+                            orderable: true,
+                            value: '004'
+                        },
+                        {
+                            name: '10',
+                            orderable: true,
+                            value: '010'
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            currency: 'USD',
+            hitType: 'master',
+            image: {
+                alt: 'Flat Front Pant, , large',
+                disBaseLink:
+                    'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw7e830b49/images/large/PG.10240166.JJ3WCXX.PZ.jpg',
+                link:
+                    'https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw7e830b49/images/large/PG.10240166.JJ3WCXX.PZ.jpg',
+                title: 'Flat Front Pant, '
+            },
+            orderable: true,
+            price: 99.0,
+            productId: '25589652M',
+            productName: 'Flat Front Pant',
+            productType: {
+                master: true
+            },
+            representedProduct: {
+                id: '701643632909M'
+            },
+            representedProducts: [
+                {
+                    id: '701643632909M'
+                },
+                {
+                    id: '701643632930M'
+                },
+                {
+                    id: '701643632916M'
+                },
+                {
+                    id: '701643632893M'
+                },
+                {
+                    id: '701643632886M'
+                },
+                {
+                    id: '701643632879M'
+                },
+                {
+                    id: '701643632923M'
+                }
+            ],
+            variationAttributes: [
+                {
+                    id: 'color',
+                    name: 'Color',
+                    values: [
+                        {
+                            name: 'Black',
+                            orderable: true,
+                            value: 'JJ3WCXX'
+                        }
+                    ]
+                },
+                {
+                    id: 'size',
+                    name: 'Size',
+                    values: [
+                        {
+                            name: '4',
+                            orderable: true,
+                            value: '004'
+                        },
+                        {
+                            name: '6',
+                            orderable: true,
+                            value: '006'
+                        },
+                        {
+                            name: '8',
+                            orderable: true,
+                            value: '008'
+                        },
+                        {
+                            name: '10',
+                            orderable: true,
+                            value: '010'
+                        },
+                        {
+                            name: '12',
+                            orderable: true,
+                            value: '012'
+                        },
+                        {
+                            name: '14',
+                            orderable: true,
+                            value: '014'
+                        },
+                        {
+                            name: '16',
+                            orderable: true,
+                            value: '016'
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            currency: 'USD',
+            hitType: 'master',
+            image: {
+                alt: 'Pencil Skirt, , large',
+                disBaseLink:
+                    'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw900cf60d/images/large/PG.10235198.JJ3WCXX.PZ.jpg',
+                link:
+                    'https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw900cf60d/images/large/PG.10235198.JJ3WCXX.PZ.jpg',
+                title: 'Pencil Skirt, '
+            },
+            orderable: true,
+            price: 79.0,
+            productId: '25688325M',
+            productName: 'Pencil Skirt',
+            productType: {
+                master: true
+            },
+            representedProduct: {
+                id: '701643317820M'
+            },
+            representedProducts: [
+                {
+                    id: '701643317820M'
+                },
+                {
+                    id: '701643317806M'
+                },
+                {
+                    id: '701643317813M'
+                },
+                {
+                    id: '701643317844M'
+                },
+                {
+                    id: '701643317790M'
+                },
+                {
+                    id: '701643317837M'
+                },
+                {
+                    id: '701643317851M'
+                }
+            ],
+            variationAttributes: [
+                {
+                    id: 'color',
+                    name: 'Color',
+                    values: [
+                        {
+                            name: 'Black',
+                            orderable: true,
+                            value: 'JJ3WCXX'
+                        }
+                    ]
+                },
+                {
+                    id: 'size',
+                    name: 'Size',
+                    values: [
+                        {
+                            name: '4',
+                            orderable: true,
+                            value: '004'
+                        },
+                        {
+                            name: '6',
+                            orderable: true,
+                            value: '006'
+                        },
+                        {
+                            name: '8',
+                            orderable: true,
+                            value: '008'
+                        },
+                        {
+                            name: '10',
+                            orderable: true,
+                            value: '010'
+                        },
+                        {
+                            name: '12',
+                            orderable: true,
+                            value: '012'
+                        },
+                        {
+                            name: '14',
+                            orderable: true,
+                            value: '014'
+                        },
+                        {
+                            name: '16',
+                            orderable: true,
+                            value: '016'
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            currency: 'USD',
+            hitType: 'master',
+            image: {
+                alt: 'Light Weight Cargo Capri (Master), , large',
+                disBaseLink:
+                    'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwe7549446/images/large/PG.60114143.JJ169XX.PZ.jpg',
+                link:
+                    'https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwe7549446/images/large/PG.60114143.JJ169XX.PZ.jpg',
+                title: 'Light Weight Cargo Capri (Master), '
+            },
+            orderable: true,
+            price: 29.0,
+            priceMax: 49.0,
+            productId: '25688228M',
+            productName: 'Light Weight Cargo Capri (Master)',
+            productType: {
+                master: true
+            },
+            representedProduct: {
+                id: '609717701479M'
+            },
+            representedProducts: [
+                {
+                    id: '609717701479M'
+                },
+                {
+                    id: '609717701547M'
+                },
+                {
+                    id: '609717701493M'
+                },
+                {
+                    id: '609717701554M'
+                },
+                {
+                    id: '609717701530M'
+                },
+                {
+                    id: '609717701509M'
+                },
+                {
+                    id: '609717701486M'
+                }
+            ],
+            variationAttributes: [
+                {
+                    id: 'color',
+                    name: 'Color',
+                    values: [
+                        {
+                            name: 'Black',
+                            orderable: true,
+                            value: 'JJ169XX'
+                        }
+                    ]
+                },
+                {
+                    id: 'size',
+                    name: 'Size',
+                    values: [
+                        {
+                            name: '4',
+                            orderable: true,
+                            value: '004'
+                        },
+                        {
+                            name: '6',
+                            orderable: true,
+                            value: '006'
+                        },
+                        {
+                            name: '8',
+                            orderable: true,
+                            value: '008'
+                        },
+                        {
+                            name: '10',
+                            orderable: true,
+                            value: '010'
+                        },
+                        {
+                            name: '12',
+                            orderable: true,
+                            value: '012'
+                        },
+                        {
+                            name: '14',
+                            orderable: true,
+                            value: '014'
+                        },
+                        {
+                            name: '16',
+                            orderable: true,
+                            value: '016'
                         }
                     ]
                 }
@@ -3376,24 +5335,24 @@ export const mockProductSearch = {
             label: 'Category',
             values: [
                 {
-                    hitCount: 6,
+                    hitCount: 43,
                     label: 'New Arrivals',
                     value: 'newarrivals'
                 },
                 {
-                    hitCount: 6,
-                    label: 'Mens',
-                    value: 'mens',
+                    hitCount: 43,
+                    label: 'Womens',
+                    value: 'womens',
                     values: [
                         {
-                            hitCount: 6,
+                            hitCount: 43,
                             label: 'Clothing',
-                            value: 'mens-clothing',
+                            value: 'womens-clothing',
                             values: [
                                 {
-                                    hitCount: 6,
-                                    label: 'Suits',
-                                    value: 'mens-clothing-suits'
+                                    hitCount: 43,
+                                    label: 'Bottoms',
+                                    value: 'womens-clothing-bottoms'
                                 }
                             ]
                         }
@@ -3406,19 +5365,19 @@ export const mockProductSearch = {
             label: 'Color',
             values: [
                 {
-                    hitCount: 0,
+                    hitCount: 6,
                     label: 'Beige',
                     presentationId: 'beige',
                     value: 'Beige'
                 },
                 {
-                    hitCount: 5,
+                    hitCount: 43,
                     label: 'Black',
                     presentationId: 'black',
                     value: 'Black'
                 },
                 {
-                    hitCount: 1,
+                    hitCount: 27,
                     label: 'Blue',
                     presentationId: 'blue',
                     value: 'Blue'
@@ -3430,19 +5389,19 @@ export const mockProductSearch = {
                     value: 'Navy'
                 },
                 {
-                    hitCount: 0,
+                    hitCount: 15,
                     label: 'Brown',
                     presentationId: 'brown',
                     value: 'Brown'
                 },
                 {
-                    hitCount: 0,
+                    hitCount: 4,
                     label: 'Green',
                     presentationId: 'green',
                     value: 'Green'
                 },
                 {
-                    hitCount: 0,
+                    hitCount: 13,
                     label: 'Grey',
                     presentationId: 'grey',
                     value: 'Grey'
@@ -3454,7 +5413,7 @@ export const mockProductSearch = {
                     value: 'Orange'
                 },
                 {
-                    hitCount: 0,
+                    hitCount: 3,
                     label: 'Pink',
                     presentationId: 'pink',
                     value: 'Pink'
@@ -3466,13 +5425,13 @@ export const mockProductSearch = {
                     value: 'Purple'
                 },
                 {
-                    hitCount: 0,
+                    hitCount: 1,
                     label: 'Red',
                     presentationId: 'red',
                     value: 'Red'
                 },
                 {
-                    hitCount: 0,
+                    hitCount: 30,
                     label: 'White',
                     presentationId: 'white',
                     value: 'White'
@@ -3484,7 +5443,7 @@ export const mockProductSearch = {
                     value: 'Yellow'
                 },
                 {
-                    hitCount: 0,
+                    hitCount: 2,
                     label: 'Miscellaneous',
                     presentationId: 'miscellaneous',
                     value: 'Miscellaneous'
@@ -3503,84 +5462,177 @@ export const mockProductSearch = {
             ]
         },
         {
-            attributeId: 'price',
-            label: 'Price',
-            values: [
-                {
-                    hitCount: 6,
-                    label: '$250 - $299.99',
-                    value: '(250..300)'
-                }
-            ]
+            attributeId: 'c_bottomType',
+            label: 'Type | Use'
         },
         {
             attributeId: 'c_size',
             label: 'Size',
             values: [
                 {
+                    hitCount: 31,
+                    label: '4',
+                    value: '4'
+                },
+                {
+                    hitCount: 32,
+                    label: '6',
+                    value: '6'
+                },
+                {
+                    hitCount: 32,
+                    label: '8',
+                    value: '8'
+                },
+                {
+                    hitCount: 34,
+                    label: '10',
+                    value: '10'
+                },
+                {
+                    hitCount: 31,
+                    label: '12',
+                    value: '12'
+                },
+                {
+                    hitCount: 33,
+                    label: '14',
+                    value: '14'
+                },
+                {
+                    hitCount: 32,
+                    label: '16',
+                    value: '16'
+                },
+                {
                     hitCount: 5,
-                    label: '36',
-                    value: '36'
+                    label: 'XS',
+                    value: 'XS'
+                },
+                {
+                    hitCount: 8,
+                    label: 'S',
+                    value: 'S'
+                },
+                {
+                    hitCount: 8,
+                    label: 'M',
+                    value: 'M'
                 },
                 {
                     hitCount: 6,
-                    label: '38',
-                    value: '38'
+                    label: 'L',
+                    value: 'L'
                 },
                 {
-                    hitCount: 3,
-                    label: '39',
-                    value: '39'
+                    hitCount: 7,
+                    label: 'XL',
+                    value: 'XL'
                 },
                 {
-                    hitCount: 6,
-                    label: '40',
-                    value: '40'
+                    hitCount: 0,
+                    label: '10P',
+                    value: '10P'
                 },
                 {
-                    hitCount: 3,
-                    label: '41',
-                    value: '41'
+                    hitCount: 0,
+                    label: '12P',
+                    value: '12P'
                 },
+                {
+                    hitCount: 0,
+                    label: '14P',
+                    value: '14P'
+                },
+                {
+                    hitCount: 0,
+                    label: '14W',
+                    value: '14W'
+                },
+                {
+                    hitCount: 0,
+                    label: '16W',
+                    value: '16W'
+                },
+                {
+                    hitCount: 0,
+                    label: '18W',
+                    value: '18W'
+                },
+                {
+                    hitCount: 0,
+                    label: '20W',
+                    value: '20W'
+                },
+                {
+                    hitCount: 0,
+                    label: '22W',
+                    value: '22W'
+                },
+                {
+                    hitCount: 0,
+                    label: '24W',
+                    value: '24W'
+                },
+                {
+                    hitCount: 0,
+                    label: '2P',
+                    value: '2P'
+                },
+                {
+                    hitCount: 0,
+                    label: '4P',
+                    value: '4P'
+                },
+                {
+                    hitCount: 0,
+                    label: '6P',
+                    value: '6P'
+                },
+                {
+                    hitCount: 0,
+                    label: '8P',
+                    value: '8P'
+                }
+            ]
+        },
+        {
+            attributeId: 'c_waist',
+            label: 'Waist'
+        },
+        {
+            attributeId: 'c_length',
+            label: 'Length'
+        },
+        {
+            attributeId: 'price',
+            label: 'Price',
+            values: [
                 {
                     hitCount: 5,
-                    label: '42',
-                    value: '42'
+                    label: '$20 - $49.99',
+                    value: '(20..50)'
                 },
                 {
-                    hitCount: 4,
-                    label: '43',
-                    value: '43'
-                },
-                {
-                    hitCount: 6,
-                    label: '44',
-                    value: '44'
+                    hitCount: 32,
+                    label: '$50 - $99.99',
+                    value: '(50..100)'
                 },
                 {
                     hitCount: 6,
-                    label: '46',
-                    value: '46'
-                },
-                {
-                    hitCount: 6,
-                    label: '48',
-                    value: '48'
-                },
-                {
-                    hitCount: 6,
-                    label: '50',
-                    value: '50'
+                    label: '$100 - $499.99',
+                    value: '(100..500)'
                 }
             ]
         }
     ],
     searchPhraseSuggestions: {},
     selectedRefinements: {
-        cgid: 'mens-clothing-suits',
+        cgid: 'womens-clothing-bottoms',
+        c_refinementColor: 'Black',
         htype: 'master'
     },
-    selectedSortingOption: 'price-low-to-high',
+    selectedSortingOption: 'best-matches',
     sortingOptions: [
         {
             id: 'best-matches',
@@ -3616,5 +5668,5 @@ export const mockProductSearch = {
         }
     ],
     offset: 0,
-    total: 3
+    total: 43
 }

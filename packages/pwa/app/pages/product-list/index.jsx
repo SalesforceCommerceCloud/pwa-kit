@@ -113,7 +113,6 @@ const ProductList = (props) => {
     // Toggles filter on and off
     const toggleFilter = (value, attributeId, selected, allowMultiple = true) => {
         const searchParamsCopy = {...searchParams}
-
         // If we aren't allowing for multiple selections, simply clear any value set for the
         // attribute, and apply a new one if required.
         if (!allowMultiple) {
@@ -142,7 +141,6 @@ const ProductList = (props) => {
                 delete searchParamsCopy.refine[attributeId]
             }
         }
-
         navigate(`${location.pathname}?${stringifySearchParams(searchParamsCopy)}`)
     }
 
