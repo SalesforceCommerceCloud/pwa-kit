@@ -2,7 +2,7 @@
  * Copyright (c) 2021 Mobify Research & Development Inc. All rights reserved. *
  * * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
 
-import {getLocaleConfig, DEFAULT_LOCALE} from '../locale'
+import {DEFAULT_LOCALE} from '../locale'
 
 /**
  * Modifies a given url by adding/updating query parameters.
@@ -88,8 +88,7 @@ export const categoryUrlBuilder = (category, locale = DEFAULT_LOCALE) =>
  * @param {string} locale
  * @returns {string}
  */
-export const productUrlBuilder = (product, locale = DEFAULT_LOCALE) =>
-    encodeURI(`/${locale}/product/${product.id}`)
+export const productUrlBuilder = (product) => encodeURI(`/product/${product.id}`)
 
 /**
  * Given a search term, contructs a search url.
@@ -132,5 +131,3 @@ export const removeQueryParamsFromPath = (path, keys) => {
 
     return `${pathname}${paramStr && '?'}${paramStr}`
 }
-
-

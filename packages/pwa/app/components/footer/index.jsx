@@ -24,9 +24,8 @@ import {useIntl} from 'react-intl'
 import LinksList from '../links-list'
 import SocialIcons from '../social-icons'
 import {HideOnDesktop, HideOnMobile} from '../responsive'
-import {useLocale, SUPPORTED_LOCALES, localeMessages} from '../../locale'
-import {buildUrlSet} from '../../utils/url'
-import {useHistory, useParams} from 'react-router-dom'
+import {useLocale, SUPPORTED_LOCALES, localesDefaultMessage} from '../../locale'
+import {useHistory} from 'react-router-dom'
 
 const Footer = ({...otherProps}) => {
     const styles = useMultiStyleConfig('Footer')
@@ -126,6 +125,7 @@ const Footer = ({...otherProps}) => {
                             <Select
                                 value={activeLocale}
                                 onChange={({target}) => {
+                                    // TODO: Replace the `locale`, the first pathname in the URL in a better way
                                     const newUrl = window.location.pathname.replace(
                                         activeLocale,
                                         target.value
@@ -139,7 +139,7 @@ const Footer = ({...otherProps}) => {
                             >
                                 {SUPPORTED_LOCALES.map((locale) => (
                                     <option key={locale} value={locale}>
-                                        {intl.formatMessage(localeMessages[locale])}
+                                        {intl.formatMessage(localesDefaultMessage[locale])}
                                     </option>
                                 ))}
                             </Select>

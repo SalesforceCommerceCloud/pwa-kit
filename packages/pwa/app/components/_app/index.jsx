@@ -34,7 +34,6 @@ import {AuthModal, useAuthModal} from '../../hooks/use-auth-modal'
 // Others
 import {watchOnlineStatus, flatten} from '../../utils/utils'
 import {IntlProvider, getLocaleConfig} from '../../locale'
-// import {useLocale} from '../../locale'
 
 import Seo from '../seo'
 
@@ -52,8 +51,6 @@ const App = (props) => {
     const [isOnline, setIsOnline] = useState(true)
     const [categories, setCategories] = useState(allCategories)
     const styles = useStyleConfig('App')
-    // const [activeLocale] = useLocale()
-    // activeLocale && console.log('activeLocale:', activeLocale)
 
     const {isOpen, onOpen, onClose} = useDisclosure()
 
@@ -205,12 +202,6 @@ App.getProps = async ({api, params}) => {
     })
 
     // Set the target local.
-    // NOTE: We should be using the target locale, but instead are using the users preferred
-    // locale because we don't have a translation for japanese, but we still want to see the api
-    // data in that language.
-    // api.setLocale(localeConfig.user.preferredLocales[0])
-
-    // Uncomment the line below and delete the line above when you are ready.
     api.setLocale(localeConfig.app.targetLocale)
 
     // Login as `guest` to get session.
@@ -221,7 +212,6 @@ App.getProps = async ({api, params}) => {
         parameters: {
             id: DEFAULT_ROOT_CATEGORY,
             levels: DEFAULT_NAV_DEPTH,
-            // TODO: Use the current locale set on the `useLocale` hook
             locale: localeConfig.app.targetLocale
         }
     })

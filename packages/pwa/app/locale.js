@@ -134,7 +134,7 @@ export const useLocale = () => {
  *  OCAPI and Commerce API `locale` parameter format: <language code>-<country code>
  *  https://documentation.b2c.commercecloud.salesforce.com/DOC1/topic/com.demandware.dochelp/OCAPI/current/usage/Localization.html
  *  */
-export const localeMessages = defineMessages({
+export const localesDefaultMessage = defineMessages({
     'en-GB': {defaultMessage: 'English (United Kingdom)'},
     'fr-FR': {defaultMessage: 'French (France)'},
     'it-IT': {defaultMessage: 'Italian (Italy)'},
