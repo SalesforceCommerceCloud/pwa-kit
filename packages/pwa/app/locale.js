@@ -75,9 +75,7 @@ export const getLocaleConfig = async ({getUserPreferredLocales} = {}) => {
  * @returns {string} The target locale if there's a match. Otherwise, returns `fallbackLocale`.
  */
 export const whichLocaleToLoad = (preferredLocales, supportedLocales, fallbackLocale) => {
-    const targetLocale = preferredLocales
-        .map((locale) => locale.toLowerCase())
-        .filter((locale) => supportedLocales.includes(locale))[0]
+    const targetLocale = preferredLocales.filter((locale) => supportedLocales.includes(locale))[0]
 
     return targetLocale || fallbackLocale
 }
@@ -141,5 +139,5 @@ export const localeMessages = defineMessages({
     'fr-FR': {defaultMessage: 'French (France)'},
     'it-IT': {defaultMessage: 'Italian (Italy)'},
     'zh-CN': {defaultMessage: 'Chinese (China)'},
-    'ja-JA': {defaultMessage: 'Japanese (Japan)'}
+    'ja-JP': {defaultMessage: 'Japanese (Japan)'}
 })

@@ -2,7 +2,7 @@
  * Copyright (c) 2021 Mobify Research & Development Inc. All rights reserved. *
  * * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
 
-import {DEFAULT_LOCALE} from '../locale'
+import {getLocaleConfig, DEFAULT_LOCALE} from '../locale'
 
 /**
  * Modifies a given url by adding/updating query parameters.
@@ -72,24 +72,24 @@ export const buildUrlSet = (url = '', key = '', values = [], extraParams = {}) =
     values.map((value) => rebuildPathWithParams(url, {[key]: value, ...extraParams}))
 
 /**
- * Given a category and the current locale refutn an href to the product list page.
+ * Given a category and the current locale returns an href to the product list page.
  *
  * @param {Object} category
- * @param {string} local
+ * @param {string} locale
  * @returns {string}
  */
-export const categoryUrlBuilder = (category, local = DEFAULT_LOCALE) =>
-    encodeURI(`/${local}/category/${category.id}`)
+export const categoryUrlBuilder = (category, locale = DEFAULT_LOCALE) =>
+    encodeURI(`/${locale}/category/${category.id}`)
 
 /**
  * Given a product and the current locale refutn an href to the product detail page.
  *
  * @param {Object} product
- * @param {string} local
+ * @param {string} locale
  * @returns {string}
  */
-export const productUrlBuilder = (product, local = DEFAULT_LOCALE) =>
-    encodeURI(`/${local}/product/${product.id}`)
+export const productUrlBuilder = (product, locale = DEFAULT_LOCALE) =>
+    encodeURI(`/${locale}/product/${product.id}`)
 
 /**
  * Given a search term, contructs a search url.
@@ -132,3 +132,5 @@ export const removeQueryParamsFromPath = (path, keys) => {
 
     return `${pathname}${paramStr && '?'}${paramStr}`
 }
+
+

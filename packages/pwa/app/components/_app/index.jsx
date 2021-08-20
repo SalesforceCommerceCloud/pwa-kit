@@ -193,10 +193,9 @@ App.getProps = async ({api, params}) => {
         getUserPreferredLocales: () => {
             // TODO: You can detect their preferred locales from:
             // - client side: window.navigator.languages
-            // - the page URL they're on (example.com/en/home)
+            // - the page URL they're on (example.com/en-GB/home)
             // - cookie (if their previous preference is saved there)
             // And decide which one takes precedence.
-
             const localeInPageUrl = params.locale
             return localeInPageUrl ? [localeInPageUrl] : []
 
@@ -209,10 +208,10 @@ App.getProps = async ({api, params}) => {
     // NOTE: We should be using the target locale, but instead are using the users preferred
     // locale because we don't have a translation for japanese, but we still want to see the api
     // data in that language.
-    api.setLocale(localeConfig.user.preferredLocales[0])
+    // api.setLocale(localeConfig.user.preferredLocales[0])
 
     // Uncomment the line below and delete the line above when you are ready.
-    // api.setLocale(localeConfig.app.targetLocale)
+    api.setLocale(localeConfig.app.targetLocale)
 
     // Login as `guest` to get session.
     await api.auth.login()

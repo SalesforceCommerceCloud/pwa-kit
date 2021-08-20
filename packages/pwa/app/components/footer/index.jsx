@@ -25,11 +25,14 @@ import LinksList from '../links-list'
 import SocialIcons from '../social-icons'
 import {HideOnDesktop, HideOnMobile} from '../responsive'
 import {useLocale, SUPPORTED_LOCALES, localeMessages} from '../../locale'
+import {buildUrlSet} from '../../utils/url'
+import {useHistory, useParams} from 'react-router-dom'
 
 const Footer = ({...otherProps}) => {
     const styles = useMultiStyleConfig('Footer')
     const intl = useIntl()
     const [activeLocale, changeLocale] = useLocale()
+    const history = useHistory()
 
     return (
         <Box as="footer" {...styles.container} {...otherProps}>
@@ -116,14 +119,20 @@ const Footer = ({...otherProps}) => {
                     <Box {...styles.localeSelector}>
                         <FormControl
                             data-testid="sf-footer-locale-selector"
-                            id="page_sort"
+                            id="locale_selector"
                             width="auto"
                             {...otherProps}
                         >
                             <Select
                                 value={activeLocale}
                                 onChange={({target}) => {
+                                    const newUrl = window.location.pathname.replace(
+                                        activeLocale,
+                                        target.value
+                                    )
+
                                     changeLocale(target.value)
+                                    history.push(newUrl)
                                 }}
                                 variant="filled"
                                 {...styles.localeDropdown}
