@@ -43,7 +43,6 @@
         "@chakra-ui/skip-nav": "^1.1.4",
         "@emotion/react": "^11.1.5",
         "@emotion/styled": "^11.1.5",
-        "Buffer": "0.0.0",
         "base64-arraybuffer": "^0.2.0",
         "bluebird": "^3.5.1",
         "card-validator": "^8.1.0",
