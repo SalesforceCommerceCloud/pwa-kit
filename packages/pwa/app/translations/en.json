@@ -41,6 +41,9 @@
   "2SvpuI": {
     "defaultMessage": "Log in here"
   },
+  "2WOdRo": {
+    "defaultMessage": "wishlist"
+  },
   "2WRHXI": {
     "defaultMessage": "{quantity} {quantity, plural, one {item} other {items}} added to cart"
   },
@@ -82,6 +85,9 @@
   },
   "6DCLcI": {
     "defaultMessage": "Please enter a valid date"
+  },
+  "6yVHs9": {
+    "defaultMessage": "wishlist-solid"
   },
   "7PMLfK": {
     "defaultMessage": "Order Total"
@@ -800,9 +806,6 @@
   },
   "y/sA02": {
     "defaultMessage": "Most Viewed"
-  },
-  "yddLi0": {
-    "defaultMessage": "{quantity, plural, one {# item} other {# items}} added to wishlist"
   },
   "z+Zrln": {
     "defaultMessage": "Set as default"

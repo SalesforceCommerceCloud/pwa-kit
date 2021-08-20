@@ -1493,6 +1493,12 @@
       "value": "1 lowercase letter"
     }
   ],
+  "nEwlut": [
+    {
+      "type": 0,
+      "value": "Remove Item?"
+    }
+  ],
   "nFQbxh": [
     {
       "type": 0,
@@ -1859,6 +1865,42 @@
     {
       "type": 0,
       "value": "Most Viewed"
+    }
+  ],
+  "yddLi0": [
+    {
+      "offset": 0,
+      "options": {
+        "one": {
+          "value": [
+            {
+              "type": 7
+            },
+            {
+              "type": 0,
+              "value": " item"
+            }
+          ]
+        },
+        "other": {
+          "value": [
+            {
+              "type": 7
+            },
+            {
+              "type": 0,
+              "value": " items"
+            }
+          ]
+        }
+      },
+      "pluralType": "cardinal",
+      "type": 6,
+      "value": "quantity"
+    },
+    {
+      "type": 0,
+      "value": " added to wishlist"
     }
   ],
   "z+Zrln": [
