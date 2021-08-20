@@ -165,6 +165,13 @@ test('clicking a filter will change url', async () => {
     )
 })
 
+test('clicking a filter will change url', async () => {
+    renderWithProviders(<MockedComponent />)
+    const clearAllButton = screen.queryAllByText(/Clear All/i)
+    user.click(clearAllButton[0])
+    await waitFor(() => expect(window.location.search).toEqual(''))
+})
+
 test('should display Search Results for when searching ', async () => {
     renderWithProviders(<MockedComponent />)
     window.history.pushState({}, 'ProductList', 'en/search?q=test')
