@@ -47,6 +47,12 @@ class CommerceAPI {
      * @param {ClientConfig} config - The config used to instantiate SDK apis.
      */
     constructor(config = {}) {
+        const me = this
+
+        // Note we probably want a better way to set the initial locale value, maybe via
+        // the config, and that will come from elsewhere like a config file.
+        this.locale = 'en-GB'
+
         const {proxyPath, ...restConfig} = config
 
         // Client-side requests should be proxied via the configured path.
@@ -90,6 +96,22 @@ class CommerceAPI {
                                     return obj[prop](...args)
                                 }
                                 return self.willSendRequest(prop, ...args).then((newArgs) => {
+                                    // Inject the locale to the API call via it's parameters.
+                                    //
+                                    // NOTE: The commerce sdk isomorphic will complain if you pass parameters to
+                                    // it that it doesn't expect, this is why I'm only adding the local to some of
+                                    // the API calls. We'll want a better pattern to do this.
+                                    if (
+                                        ['getCategory', 'productSearch', 'getProduct'].includes(
+                                            prop
+                                        )
+                                    ) {
+                                        newArgs[0].parameters = {
+                                            ...newArgs[0].parameters,
+                                            locale: me.locale
+                                        }
+                                    }
+
                                     return obj[prop](...newArgs).then((res) =>
                                         self.didReceiveResponse(res, newArgs)
                                     )
@@ -115,6 +137,21 @@ class CommerceAPI {
      */
     getConfig() {
         return this._config
+    }
+
+    /**
+     *
+     * @param {*} locale
+     */
+    setLocale(locale) {
+        this.locale = locale
+    }
+
+    /**
+     *
+     */
+    getLocale() {
+        return this.locale
     }
 
     /**
