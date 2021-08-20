@@ -5,12 +5,12 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import {FormattedMessage} from 'react-intl'
 import {Box, Flex, Stack, Text, Select} from '@chakra-ui/react'
-import CartItemVariant from '../cart-item-variant/index.js'
+import CartItemVariant from '../cart-item-variant'
 import CartItemVariantImage from '../cart-item-variant/item-image'
 import CartItemVariantName from '../cart-item-variant/item-name'
 import CartItemVariantAttributes from '../cart-item-variant/item-attributes'
 import CartItemVariantPrice from '../cart-item-variant/item-price'
-import LoadingSpinner from '../loading-spinner/index.jsx'
+import LoadingSpinner from '../loading-spinner'
 import {noop} from '../../utils/utils'
 
 const ProductItem = ({
@@ -44,7 +44,6 @@ const ProductItem = ({
                                         value={product.quantity}
                                         width="75px"
                                     >
-                                        <option value="0">0 / Remove</option>
                                         <option value="1">1</option>
                                         <option value="2">2</option>
                                         <option value="3">3</option>

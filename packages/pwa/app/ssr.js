@@ -6,8 +6,8 @@
 /* global WEBPACK_PACKAGE_JSON_MOBIFY */
 
 import path from 'path'
-import {createApp, createHandler, serveStaticFile} from 'pwa-kit-react-sdk/dist/ssr/server/express'
-import {render} from 'pwa-kit-react-sdk/dist/ssr/server/react-rendering'
+import {createApp, createHandler, serveStaticFile} from 'pwa-kit-react-sdk/ssr/server/express'
+import {render} from 'pwa-kit-react-sdk/ssr/server/react-rendering'
 
 const app = createApp({
     // The build directory (an absolute path)

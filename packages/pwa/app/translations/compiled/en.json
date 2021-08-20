@@ -47,22 +47,18 @@
       "value": "See full details"
     }
   ],
-  "1TQMt0": [
-    {
-      "type": 1,
-      "value": "quantity"
-    },
+  "1LblQ6": [
     {
       "type": 0,
-      "value": " "
+      "value": "Cart Subtotal ("
     },
     {
       "type": 1,
-      "value": "itemLabel"
+      "value": "itemAccumulatedCount"
     },
     {
       "type": 0,
-      "value": " added to cart."
+      "value": " item)"
     }
   ],
   "1b9Q93": [
@@ -109,16 +105,48 @@
       "value": "Log in here"
     }
   ],
+  "2WRHXI": [
+    {
+      "type": 1,
+      "value": "quantity"
+    },
+    {
+      "type": 0,
+      "value": " "
+    },
+    {
+      "offset": 0,
+      "options": {
+        "one": {
+          "value": [
+            {
+              "type": 0,
+              "value": "item"
+            }
+          ]
+        },
+        "other": {
+          "value": [
+            {
+              "type": 0,
+              "value": "items"
+            }
+          ]
+        }
+      },
+      "pluralType": "cardinal",
+      "type": 6,
+      "value": "quantity"
+    },
+    {
+      "type": 0,
+      "value": " added to cart"
+    }
+  ],
   "2bGejb": [
     {
       "type": 0,
       "value": "My Account"
-    }
-  ],
-  "2gr0DV": [
-    {
-      "type": 0,
-      "value": "1 item added to wishlist"
     }
   ],
   "2tqQFl": [
@@ -181,6 +209,12 @@
       "value": "Confirm Remove Item"
     }
   ],
+  "5BTYa0": [
+    {
+      "type": 0,
+      "value": "View Cart"
+    }
+  ],
   "5JcXdV": [
     {
       "type": 0,
@@ -209,6 +243,12 @@
     {
       "type": 0,
       "value": "Order Total"
+    }
+  ],
+  "7gXPhB": [
+    {
+      "type": 0,
+      "value": "Qty"
     }
   ],
   "7xscgD": [
@@ -259,10 +299,22 @@
       "value": "Filter"
     }
   ],
+  "9rqdrm": [
+    {
+      "type": 0,
+      "value": "Item removed from wishlist"
+    }
+  ],
   "A8Tnga": [
     {
       "type": 0,
       "value": "Credit Card"
+    }
+  ],
+  "ADKef8": [
+    {
+      "type": 0,
+      "value": "Add to cart"
     }
   ],
   "AYIKp4": [
@@ -299,6 +351,12 @@
     {
       "type": 0,
       "value": "Please enter your phone number"
+    }
+  ],
+  "BWpuKl": [
+    {
+      "type": 0,
+      "value": "Update"
     }
   ],
   "BlJFo9": [
@@ -347,6 +405,44 @@
     {
       "type": 0,
       "value": "Add New Payment Method"
+    }
+  ],
+  "DdR2q8": [
+    {
+      "type": 1,
+      "value": "quantity"
+    },
+    {
+      "type": 0,
+      "value": " "
+    },
+    {
+      "offset": 0,
+      "options": {
+        "one": {
+          "value": [
+            {
+              "type": 0,
+              "value": "item"
+            }
+          ]
+        },
+        "other": {
+          "value": [
+            {
+              "type": 0,
+              "value": "items"
+            }
+          ]
+        }
+      },
+      "pluralType": "cardinal",
+      "type": 6,
+      "value": "quantity"
+    },
+    {
+      "type": 0,
+      "value": " added to wishlist"
     }
   ],
   "DwzDiL": [
@@ -1749,12 +1845,6 @@
       "value": "Edit"
     }
   ],
-  "x3r6nd": [
-    {
-      "type": 0,
-      "value": "1 item removed from wishlist"
-    }
-  ],
   "x6hxSH": [
     {
       "type": 0,
@@ -1851,12 +1941,6 @@
     {
       "type": 1,
       "value": "orderNumber"
-    }
-  ],
-  "zb24ln": [
-    {
-      "type": 1,
-      "value": "content"
     }
   ]
 }

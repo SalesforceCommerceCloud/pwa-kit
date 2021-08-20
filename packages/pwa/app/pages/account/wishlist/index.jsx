@@ -9,8 +9,9 @@ import {WishlistIcon} from '../../../components/icons'
 import useNavigation from '../../../hooks/use-navigation'
 import useCustomerProductLists from '../../../commerce-api/hooks/useCustomerProductLists'
 import {Box, Flex, Skeleton} from '@chakra-ui/react'
-import {customerProductListTypes} from '../../../constants'
+import {API_ERROR_MESSAGE, customerProductListTypes} from '../../../constants'
 import ProductItem from '../../../components/product-item/index'
+import {useToast} from '../../../hooks/use-toast'
 import WishlistPrimaryAction from './partials/wishlist-primary-action'
 import WishlistSecondaryButtonGroup from './partials/wishlist-secondary-button-group'
 
@@ -22,26 +23,40 @@ const AccountWishlist = () => {
     const customerProductLists = useCustomerProductLists()
     const [wishlist, setWishlist] = useState()
     const [selectedItem, setSelectedItem] = useState(undefined)
+    const [localQuantity, setLocalQuantity] = useState({})
+    const showToast = useToast()
+    const [isWishlistItemLoading, setWishlistItemLoading] = useState(false)
 
     const handleActionClicked = (itemId) => {
+        setWishlistItemLoading(!!itemId)
         setSelectedItem(itemId)
     }
 
-    const handleItemQuantityChanged = (quantity, item) => {
-        const updatedProductList = {
-            ...wishlist,
-            customerProductListItems: wishlist.customerProductListItems.map((product) => {
-                if (product.id === item.id) {
-                    return {
-                        ...product,
-                        quantity: parseInt(quantity)
-                    }
-                }
-                return product
+    const handleItemQuantityChanged = async (quantity, item) => {
+        try {
+            // This local state allows the dropdown to show the desired quantity
+            // while the API call to update it is happening.
+            setLocalQuantity({...localQuantity, [item.productId]: quantity})
+            setWishlistItemLoading(true)
+            setSelectedItem(item.productId)
+            await customerProductLists.updateCustomerProductListItem(wishlist, {
+                ...item,
+                quantity: parseInt(quantity)
             })
+        } catch (err) {
+            console.error(err)
+            showToast({
+                title: formatMessage(
+                    {defaultMessage: '{errorMessage}'},
+                    {errorMessage: API_ERROR_MESSAGE}
+                ),
+                status: 'error'
+            })
+        } finally {
+            setWishlistItemLoading(false)
+            setSelectedItem(undefined)
+            setLocalQuantity({...localQuantity, [item.productId]: undefined})
         }
-        // TODO: Call product-list API to update item quantity in wishlist.
-        setWishlist(updatedProductList)
     }
 
     useEffect(() => {
@@ -121,11 +136,14 @@ const AccountWishlist = () => {
                         key={item.id}
                         product={{
                             ...wishlist._productItemsDetail[item.productId],
+                            productId: item.productId,
                             productName: wishlist._productItemsDetail[item.productId].name,
                             price: wishlist._productItemsDetail[item.productId].price,
-                            quantity: item.quantity
+                            quantity: localQuantity[item.productId]
+                                ? localQuantity[item.productId]
+                                : item.quantity
                         }}
-                        showLoading={selectedItem === item.productId}
+                        showLoading={isWishlistItemLoading && selectedItem === item.productId}
                         primaryAction={<WishlistPrimaryAction />}
                         onItemQuantityChange={(quantity) =>
                             handleItemQuantityChanged(quantity, item)
@@ -133,7 +151,7 @@ const AccountWishlist = () => {
                         secondaryActions={
                             <WishlistSecondaryButtonGroup
                                 productListItemId={item.id}
-                                listId={wishlist.id}
+                                list={wishlist}
                                 onClick={handleActionClicked}
                             />
                         }

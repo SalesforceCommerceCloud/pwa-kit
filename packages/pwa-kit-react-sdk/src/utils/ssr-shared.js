@@ -2,7 +2,7 @@
  * Copyright (c) 2021 Mobify Research & Development Inc. All rights reserved. *
  * * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
 /**
- * @module progressive-web-sdk/dist/utils/ssr-shared
+ * @module progressive-web-sdk/utils/ssr-shared
  * @private
  */
 /*

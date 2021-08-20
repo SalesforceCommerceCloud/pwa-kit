@@ -1,6 +1,6 @@
 {
   "name": "pwa-kit-react-sdk",
-  "version": "0.9.0-dev",
+  "version": "0.10.0-dev",
   "description": "A library that supports the isomorphic React rendering pipeline for Commerce Cloud Managed Runtime apps",
   "main": "dist/index.js",
   "bin": {
@@ -14,15 +14,17 @@
   },
   "files": [
     "bin",
-    "generator-assets",
-    "dist",
     "LICENSE",
-    "src",
     "scripts",
-    "vendor"
+    "ssr",
+    "utils",
+    "webpack"
   ],
+  "publishConfig": {
+    "directory": "dist"
+  },
   "scripts": {
-    "prepare": "npm run prod:build",
+    "prepare": "npm run prod:build && node scripts/prepare-dist.js",
     "prod:build": "cross-env NODE_ENV=production scripts/build.js",
     "dev:watch": "watch 'npm run dev:build' src/",
     "lint": "npm run lint:js",
@@ -60,13 +62,14 @@
     "merge-descriptors": "^1.0.1",
     "mime-types": "2.1.20",
     "minimatch": "3.0.4",
-    "mkdirp": "0.5.2",
+    "mkdirp": "^1.0.4",
     "morgan": "1.9.1",
     "prop-types": "^15.6.0",
     "raf": "^3.4.0",
     "react-uid": "^2.2.0",
     "request": "^2.88.0",
     "rimraf": "2.6.1",
+    "serialize-javascript": "^6.0.0",
     "set-cookie-parser": "^2.2.1",
     "tti-polyfill": "0.2.2",
     "ua-parser-js": "^0.7.24",
@@ -129,6 +132,7 @@
     "react-dom": "16.14.0",
     "react-helmet": "5.2.0",
     "react-router-dom": "^5.1.2",
+    "replace-in-file": "^6.2.0",
     "s3rver": "^3.1.0",
     "semver": "^7.3.2",
     "shelljs": "^0.8.4",
@@ -204,7 +208,7 @@
     "coverageThreshold": {
       "global": {
         "branches": 94,
-        "functions": 88,
+        "functions": 87,
         "lines": 90,
         "statements": 90
       }

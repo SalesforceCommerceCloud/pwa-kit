@@ -52,7 +52,7 @@ import {parse as parseSearchParams} from '../../hooks/use-search-params'
 
 // Others
 import {CategoriesContext} from '../../contexts'
-import {HTTPNotFound} from 'pwa-kit-react-sdk/dist/ssr/universal/errors'
+import {HTTPNotFound} from 'pwa-kit-react-sdk/ssr/universal/errors'
 
 // Constants
 import {DEFAULT_LIMIT_VALUES} from '../../constants'

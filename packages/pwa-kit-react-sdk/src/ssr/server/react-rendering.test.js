@@ -4,6 +4,7 @@
 /* * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * *
  * Copyright (c) 2021 Mobify Research & Development Inc. All rights reserved. *
  * * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
+/* eslint-disable header/header */
 import {render, ALLOWLISTED_INLINE_SCRIPTS} from './react-rendering'
 import {createApp} from './express'
 import request from 'supertest'
@@ -212,6 +213,16 @@ jest.mock('../universal/routes', () => {
         }
     }
 
+    class XSSPage extends React.Component {
+        static getProps() {
+            return {prop: '<script>alert("hey! give me your money")</script>'}
+        }
+
+        render() {
+            return <div>XSS attack</div>
+        }
+    }
+
     GetPropsReturnsObject.propTypes = {
         prop: PropTypes.node
     }
@@ -262,6 +273,10 @@ jest.mock('../universal/routes', () => {
             {
                 path: '/render-helmet/',
                 component: fakeLoadable(HelmetPage)
+            },
+            {
+                path: '/xss/',
+                component: XSSPage
             }
         ]
     }
@@ -482,6 +497,17 @@ describe('The Node SSR Environment', () => {
                         .querySelector('script[type="application/ld+json"]')
                         .innerHTML.includes(`"@context": "http://schema.org"`)
                 ).toBe(true)
+            }
+        },
+        {
+            description: `Frozen state is escaped preventing injection attacks`,
+            req: {url: '/xss/'},
+            assertions: (res) => {
+                const html = res.text
+                const doc = parse(html)
+                const scriptContent = doc.querySelector('#mobify-data').innerHTML
+
+                expect(scriptContent).not.toContain('<script>')
             }
         }
     ]

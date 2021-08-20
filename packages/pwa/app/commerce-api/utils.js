@@ -3,8 +3,8 @@
  * * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
 import {createContext, useContext} from 'react'
 import jwtDecode from 'jwt-decode'
-import {getAppOrigin} from 'pwa-kit-react-sdk/dist/utils/url'
-import {HTTPError} from 'pwa-kit-react-sdk/dist/ssr/universal/errors'
+import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
+import {HTTPError} from 'pwa-kit-react-sdk/ssr/universal/errors'
 
 /**
  * Compares the token age against the issued and expiry times. If the token's age is
@@ -291,3 +291,11 @@ export const isError = (jsonResponse) => {
 export const convertSnakeCaseToSentenceCase = (text) => {
     return text.split('_').join(' ')
 }
+
+/**
+ * No operation function. You can use this
+ * empty function when you wish to pass
+ * around a function that will do nothing.
+ * Usually used as default for event handlers.
+ */
+export const noop = () => {}

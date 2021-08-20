@@ -23,8 +23,8 @@
   "1LE+iY": {
     "defaultMessage": "See full details"
   },
-  "1TQMt0": {
-    "defaultMessage": "{quantity} {itemLabel} added to cart."
+  "1LblQ6": {
+    "defaultMessage": "Cart Subtotal ({itemAccumulatedCount} item)"
   },
   "1b9Q93": {
     "defaultMessage": "You will receive an email at <b>{email}</b> with a link to reset your password shortly."
@@ -41,11 +41,11 @@
   "2SvpuI": {
     "defaultMessage": "Log in here"
   },
+  "2WRHXI": {
+    "defaultMessage": "{quantity} {quantity, plural, one {item} other {items}} added to cart"
+  },
   "2bGejb": {
     "defaultMessage": "My Account"
-  },
-  "2gr0DV": {
-    "defaultMessage": "1 item added to wishlist"
   },
   "2tqQFl": {
     "defaultMessage": "Cart"
@@ -71,6 +71,9 @@
   "4UPOXx": {
     "defaultMessage": "Confirm Remove Item"
   },
+  "5BTYa0": {
+    "defaultMessage": "View Cart"
+  },
   "5JcXdV": {
     "defaultMessage": "Create Account"
   },
@@ -85,6 +88,9 @@
   },
   "7PMLfK": {
     "defaultMessage": "Order Total"
+  },
+  "7gXPhB": {
+    "defaultMessage": "Qty"
   },
   "7xscgD": {
     "defaultMessage": "Delivery Details"
@@ -110,8 +116,14 @@
   "9Obw6C": {
     "defaultMessage": "Filter"
   },
+  "9rqdrm": {
+    "defaultMessage": "Item removed from wishlist"
+  },
   "A8Tnga": {
     "defaultMessage": "Credit Card"
+  },
+  "ADKef8": {
+    "defaultMessage": "Add to cart"
   },
   "AYIKp4": {
     "defaultMessage": "Already have an account? Log in"
@@ -130,6 +142,9 @@
   },
   "BAoId6": {
     "defaultMessage": "Please enter your phone number"
+  },
+  "BWpuKl": {
+    "defaultMessage": "Update"
   },
   "BlJFo9": {
     "defaultMessage": "This email already has an account."
@@ -154,6 +169,9 @@
   },
   "DPrDhw": {
     "defaultMessage": "Add New Payment Method"
+  },
+  "DdR2q8": {
+    "defaultMessage": "{quantity} {quantity, plural, one {item} other {items}} added to wishlist"
   },
   "DwzDiL": {
     "defaultMessage": "Clear recent searches"
@@ -768,9 +786,6 @@
   "wEQDC6": {
     "defaultMessage": "Edit"
   },
-  "x3r6nd": {
-    "defaultMessage": "1 item removed from wishlist"
-  },
   "x6hxSH": {
     "defaultMessage": "Something's not right with your email or password. Try again."
   },
@@ -816,8 +831,5 @@
   },
   "zXbRZR": {
     "defaultMessage": "Order Number: {orderNumber}"
-  },
-  "zb24ln": {
-    "defaultMessage": "{content}"
   }
 }

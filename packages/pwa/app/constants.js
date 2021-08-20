@@ -37,4 +37,7 @@ export const cssColorGroups = {
 }
 
 export const DEFAULT_CURRENCY = 'USD'
+
 export const FILTER_ACCORDION_SATE = 'filters-expanded-index'
+
+export const API_ERROR_MESSAGE = 'Something went wrong. Try again!'
