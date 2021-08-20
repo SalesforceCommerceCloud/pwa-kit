@@ -5,12 +5,7 @@
 /* eslint-disable no-unused-vars */
 import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
 import {HTTPError} from 'pwa-kit-react-sdk/ssr/universal/errors'
-import {
-    createCodeVerifier,
-    generateCodeChallenge,
-    createCodeVerifierServer,
-    generateCodeChallengeServer
-} from './pkce'
+import {createCodeVerifier, generateCodeChallenge} from './pkce'
 import {createGetTokenBody} from './utils'
 
 /**
@@ -241,10 +236,8 @@ class Auth {
      * @returns {object} - a guest customer object
      */
     async _loginAsGuest() {
-        const codeVerifier = this._onClient ? createCodeVerifier() : createCodeVerifierServer()
-        const codeChallenge = this._onClient
-            ? await generateCodeChallenge(codeVerifier)
-            : await generateCodeChallengeServer(codeVerifier)
+        const codeVerifier = createCodeVerifier()
+        const codeChallenge = await generateCodeChallenge(codeVerifier)
 
         if (this._onClient) {
             sessionStorage.setItem('codeVerifier', codeVerifier)

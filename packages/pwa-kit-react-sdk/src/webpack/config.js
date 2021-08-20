@@ -171,8 +171,7 @@ const common = {
             process: 'process/browser'
         },
         fallback: {
-            crypto: require.resolve('crypto-browserify'),
-            stream: require.resolve('stream-browserify')
+            crypto: false
         }
     },
 
