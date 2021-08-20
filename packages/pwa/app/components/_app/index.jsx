@@ -205,6 +205,15 @@ App.getProps = async ({api, params}) => {
         }
     })
 
+    // Set the target local.
+    // NOTE: We should be using the target locale, but instead are using the users preferred
+    // locale because we don't have a translation for japanese, but we still want to see the api
+    // data in that language.
+    api.setLocale(localeConfig.user.preferredLocales[0])
+
+    // Uncomment the line below and delete the line above when you are ready.
+    // api.setLocale(localeConfig.app.targetLocale)
+
     // Login as `guest` to get session.
     await api.auth.login()
 
