@@ -57,6 +57,7 @@ const ProductList = (props) => {
     const history = useHistory()
     const params = useParams()
     const searchParams = useSearchParams()
+
     const {categories} = useContext(CategoriesContext)
     const productListEventHandler = (event) => {
         if (event.action === eventActions.ADD) {
@@ -95,6 +96,8 @@ const ProductList = (props) => {
      * Useful for handling toggle wishlist icon on product-tile
      */
     const [wishlist, setWishlist] = useState({})
+    // keep track of the items has been add/remove to/from wishlist
+    const [wishlistLoading, setWishlistLoading] = useState([])
 
     const {total, sortingOptions} = productSearchResult || {}
 
@@ -105,7 +108,6 @@ const ProductList = (props) => {
     }
 
     const basePath = `${location.pathname}${location.search}`
-
     // Reset scroll position when `isLoaded` becomes `true`.
     useEffect(() => {
         isLoading && window.scrollTo(0, 0)
@@ -133,11 +135,12 @@ const ProductList = (props) => {
      * Removes product from wishlist
      */
     const removeItemFromWishlist = async (product) => {
-        // Extract productListItemId corresponding to product from wishlist
-        const productListItem = wishlist.customerProductListItems.find(
-            (item) => item.productId === product.productId
-        )
         try {
+            setWishlistLoading([...wishlistLoading, product.productId])
+            // Extract productListItem corresponding to product from wishlist
+            const productListItem = wishlist.customerProductListItems.find(
+                (item) => item.productId === product.productId
+            )
             await customerProductLists.deleteCustomerProductListItem(wishlist, productListItem)
 
             showToast({
@@ -147,6 +150,9 @@ const ProductList = (props) => {
             })
         } catch (err) {
             showError()
+        } finally {
+            // remove the loading id
+            setWishlistLoading(wishlistLoading.filter((id) => id !== product.productId))
         }
     }
 
@@ -165,13 +171,13 @@ const ProductList = (props) => {
                 {quantity}
             ),
             status: 'success',
-            action: toastAction,
-            id: productId
+            action: toastAction
         })
     }
 
     const addItemToWishlist = async (product) => {
         try {
+            setWishlistLoading([...wishlistLoading, product.productId])
             // If product-lists have not loaded we push "Add to wishlist" event to eventQueue to be
             // processed once the product-lists have loaded.
             if (!customerProductLists?.loaded) {
@@ -198,6 +204,8 @@ const ProductList = (props) => {
             }
         } catch (err) {
             showError()
+        } finally {
+            setWishlistLoading(wishlistLoading.filter((id) => id !== product.productId))
         }
     }
 
@@ -266,6 +274,9 @@ const ProductList = (props) => {
                                       .includes(productSearchItem.productId)
                                   return (
                                       <ProductTile
+                                          isWishlistLoading={wishlistLoading.includes(
+                                              productSearchItem.productId
+                                          )}
                                           data-testid={`sf-product-tile-${productSearchItem.productId}`}
                                           key={productSearchItem.productId}
                                           productSearchItem={productSearchItem}

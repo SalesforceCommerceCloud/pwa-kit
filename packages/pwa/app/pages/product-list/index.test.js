@@ -12,7 +12,7 @@ import {
     mockCategories,
     mockedEmptyCustomerProductList
 } from '../../commerce-api/mock-data'
-import {fireEvent, screen, waitFor} from '@testing-library/react'
+import {fireEvent, screen} from '@testing-library/react'
 import {Route, Switch} from 'react-router-dom'
 import {renderWithProviders} from '../../utils/test-utils'
 import ProductList from '.'
@@ -80,7 +80,9 @@ const MockedComponent = ({isLoading, isLoggedIn = false, searchQuery}) => {
 }
 
 MockedComponent.propTypes = {
-    isLoading: PropTypes.bool
+    isLoading: PropTypes.bool,
+    isLoggedIn: PropTypes.bool,
+    searchQuery: PropTypes.string
 }
 
 const MockedEmptyPage = () => {

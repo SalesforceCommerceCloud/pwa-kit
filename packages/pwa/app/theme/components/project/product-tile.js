@@ -2,14 +2,15 @@
  * Copyright (c) 2021 Mobify Research & Development Inc. All rights reserved. *
  * * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
 export default {
-    baseStyle: {
+    baseStyle: (props) => ({
         container: {
             position: 'relative'
         },
         iconButton: {
             position: 'absolute',
             top: 2,
-            right: 2
+            right: 2,
+            opacity: `${props.isLoading ? 0.5 : 1}`
         },
         imageWrapper: {
             marginBottom: 2
@@ -23,6 +24,6 @@ export default {
         },
         rating: {},
         variations: {}
-    },
+    }),
     parts: ['container', 'imageWrapper', 'image', 'price', 'title', 'rating', 'variations']
 }

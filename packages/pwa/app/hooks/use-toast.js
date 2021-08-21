@@ -36,9 +36,7 @@ export function useToast() {
         variant = 'subtle',
         isClosable = true
     }) => {
-        const toastId = `${title}-${status}-${id}`.toLowerCase()
         let toastConfig = {
-            id: toastId,
             title,
             status,
             isClosable,
@@ -51,14 +49,14 @@ export function useToast() {
             toastConfig = {
                 ...toastConfig,
                 // eslint-disable-next-line react/display-name
-                render: () => (
+                render: ({onClose}) => (
                     <Alert status={status} variant="subtle" borderRadius="md" py={3} width="sm">
                         <AlertIcon />
                         <AlertTitle> {title} </AlertTitle>
                         <Spacer />
                         {action}
                         <Spacer />
-                        <CloseButton onClick={() => toast.close(toastId)} />
+                        <CloseButton onClick={onClose} />
                     </Alert>
                 )
             }

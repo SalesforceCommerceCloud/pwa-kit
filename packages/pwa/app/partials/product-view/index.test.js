@@ -47,7 +47,8 @@ const MockComponent = ({product, addToCart, addToWishlist, updateWishlist}) => {
 MockComponent.propTypes = {
     product: PropTypes.object,
     addToCart: PropTypes.func,
-    addToWishlist: PropTypes.func
+    addToWishlist: PropTypes.func,
+    updateWishlist: PropTypes.func
 }
 
 const server = setupServer(
@@ -202,7 +203,9 @@ test('ProductView Component renders with updateWishlist event handler', async ()
     )
     const updateWishlist = jest.fn()
 
-    renderWithProviders(<MockComponent product={mockProductDetail} updateWishlist={updateWishlist} />)
+    renderWithProviders(
+        <MockComponent product={mockProductDetail} updateWishlist={updateWishlist} />
+    )
 
     await waitFor(() => {
         expect(screen.getByText(/customer: registered/)).toBeInTheDocument()

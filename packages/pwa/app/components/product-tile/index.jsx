@@ -55,7 +55,6 @@ export const Skeleton = () => {
 const ProductTile = (props) => {
     const intl = useIntl()
 
-    const styles = useMultiStyleConfig('ProductTile')
     // eslint-disable-next-line react/prop-types
     const {
         productSearchItem,
@@ -64,9 +63,11 @@ const ProductTile = (props) => {
         onAddToWishlistClick = noop,
         onRemoveWishlistClick = noop,
         isInWishlist,
+        isWishlistLoading,
         ...rest
     } = props
     const {currency, image, price, productName} = productSearchItem
+    const styles = useMultiStyleConfig('ProductTile', {isLoading: isWishlistLoading})
 
     return (
         <Link
@@ -94,6 +95,7 @@ const ProductTile = (props) => {
                         {...styles.iconButton}
                         onClick={(e) => {
                             e.preventDefault()
+                            if (isWishlistLoading) return
                             onRemoveWishlistClick()
                         }}
                     />
@@ -105,7 +107,10 @@ const ProductTile = (props) => {
                         icon={<WishlistIcon />}
                         variant="unstyled"
                         {...styles.iconButton}
-                        onClick={onAddToWishlistClick}
+                        onClick={() => {
+                            if (isWishlistLoading) return
+                            onAddToWishlistClick()
+                        }}
                     />
                 )}
             </Box>
