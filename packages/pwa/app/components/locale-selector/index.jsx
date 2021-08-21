@@ -27,27 +27,32 @@ import {
     FlagUsaIcon
 } from '../../components/icons'
 
-// NOTE: If you want to have flags shown nect to a selecable locale, update this
+import {DEFAULT_LOCALE, localesDefaultMessage} from '../../locale'
+import {useIntl} from 'react-intl'
+
+// NOTE: If you want to have flags shown next to a selectable locale, update this
 // mapping object with the short code as the key for the desired icon.
 const flags = {
-    'en-CA': <FlagCanIcon />,
-    'fr-CA': <FlagCanIcon />,
-    'en-US': <FlagUsaIcon />
+    'en-GB': <FlagCanIcon />,
+    'fr-FR': <FlagUsaIcon />,
+    'it-IT': <FlagCanIcon />,
+    'zh-CN': <FlagCanIcon />,
+    'ja-JP': <FlagCanIcon />
 }
 
 /**
  * The Locale Selector is a disclosure in the form of an accordion. It is
- * populated with all the suported locales for the application allowing the
+ * populated with all the supported locales for the application allowing the
  * user to change the current locale.
  */
 const LocaleSelector = ({
-    selectedLocale = 'en-US',
+    selectedLocale = DEFAULT_LOCALE,
     locales = [],
     onSelect = () => {},
     ...props
 }) => {
     const styles = useStyleConfig('LocaleSelector')
-    const selectedLocaleObject = locales.find(({shortCode}) => shortCode === selectedLocale)
+    const intl = useIntl()
 
     return (
         <Box className="sf-locale-selector">
@@ -62,32 +67,32 @@ const LocaleSelector = ({
                                 ) : (
                                     <ChevronRightIcon {...styles.selectedButtonIcon} />
                                 )}
-
                                 {/* Display flag icon if one exists */}
                                 {flags[selectedLocale]}
-
-                                {selectedLocaleObject && (
-                                    <Text {...styles.selectedText}>
-                                        {selectedLocaleObject.name}
-                                    </Text>
-                                )}
+                                <Text {...styles.selectedText}>
+                                    {intl.formatMessage(localesDefaultMessage[selectedLocale])}
+                                </Text>
                             </AccordionButton>
                             <AccordionPanel>
                                 <Accordion allowToggle={true} {...styles.accordion}>
-                                    {locales.map(({name, shortCode}) => (
-                                        <AccordionItem border="none" key={shortCode}>
+                                    {locales.map((locale) => (
+                                        <AccordionItem border="none" key={locale}>
                                             <AccordionButton
                                                 {...styles.optionButton}
-                                                onClick={() => onSelect(shortCode)}
+                                                onClick={() => onSelect(locale)}
                                             >
                                                 {/* Display flag icon if one exists */}
-                                                {flags[shortCode]}
+                                                {flags[locale]}
 
                                                 {/* Locale name */}
-                                                <Text {...styles.optionText}>{name}</Text>
+                                                <Text {...styles.optionText}>
+                                                    {intl.formatMessage(
+                                                        localesDefaultMessage[locale]
+                                                    )}
+                                                </Text>
 
                                                 {/* Selection indicator */}
-                                                {selectedLocale === shortCode && (
+                                                {selectedLocale === locale && (
                                                     <CheckIcon {...styles.selectedIcon} />
                                                 )}
                                             </AccordionButton>

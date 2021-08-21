@@ -49,6 +49,7 @@ import useCustomer from '../../commerce-api/hooks/useCustomer'
 import LoadingSpinner from '../loading-spinner'
 
 import useNavigation from '../../hooks/use-navigation'
+import {useLocale, SUPPORTED_LOCALES} from '../../locale'
 
 // The FONT_SIZES and FONT_WEIGHTS constants are used to control the styling for
 // the accordion buttons as their current depth. In the below definition we assign
@@ -67,20 +68,6 @@ const DrawerSeparator = () => (
 // CUSTOMIZE YOUR NAVIGATION BY ALTERING THESE VALUES
 const SIGN_IN_HREF = '/login'
 const STORE_LOCATOR_HREF = '/store-locator'
-const SUPPORTED_LOCALES = [
-    {
-        name: 'Canada (English)',
-        shortCode: 'en-CA'
-    },
-    {
-        name: 'Canada (French)',
-        shortCode: 'fr-CA'
-    },
-    {
-        name: 'USA (English)',
-        shortCode: 'en-US'
-    }
-]
 
 /**
  * This is the navigation component used for mobile devices (phone and tablet). It's
@@ -94,7 +81,7 @@ const DrawerMenu = ({isOpen, onClose = noop, onLogoClick = noop, root}) => {
     const styles = useMultiStyleConfig('DrawerMenu')
     const drawerSize = useBreakpointValue({sm: PHONE_DRAWER_SIZE, md: TABLET_DRAWER_SIZE})
     const socialIconVariant = useBreakpointValue({base: 'flex', md: 'flex-start'})
-    const [selectedLocale, setSelectedLocale] = useState('en-US')
+
     const [showLoading, setShowLoading] = useState(false)
     const onSignoutClick = async () => {
         setShowLoading(true)
@@ -102,6 +89,8 @@ const DrawerMenu = ({isOpen, onClose = noop, onLogoClick = noop, root}) => {
         navigate('/login')
         setShowLoading(false)
     }
+    const [activeLocale, changeLocale] = useLocale()
+
     return (
         <Drawer isOpen={isOpen} onClose={onClose} placement="left" size={drawerSize}>
             <DrawerOverlay>
@@ -264,12 +253,12 @@ const DrawerMenu = ({isOpen, onClose = noop, onLogoClick = noop, root}) => {
                             <Box>
                                 <LocaleSelector
                                     {...styles.localeSelector}
-                                    selectedLocale={selectedLocale}
+                                    selectedLocale={activeLocale}
                                     locales={SUPPORTED_LOCALES}
                                     onSelect={(locale) => {
                                         /* istanbul ignore next */
-                                        // NOTE: This implementation is just mocked info this version.
-                                        setSelectedLocale(locale)
+
+                                        changeLocale(locale)
                                     }}
                                 />
                             </Box>
