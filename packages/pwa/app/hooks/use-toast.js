@@ -27,7 +27,6 @@ export function useToast() {
     const toast = useChakraToast()
 
     return ({
-        id,
         title,
         status,
         action,
@@ -48,7 +47,7 @@ export function useToast() {
         if (action) {
             toastConfig = {
                 ...toastConfig,
-                // eslint-disable-next-line react/display-name
+                /* eslint-disable-next-line react/display-name, react/prop-types */
                 render: ({onClose}) => (
                     <Alert status={status} variant="subtle" borderRadius="md" py={3} width="sm">
                         <AlertIcon />

@@ -156,7 +156,7 @@ const ProductList = (props) => {
         }
     }
 
-    const showWishlistItemAdded = (quantity, productId) => {
+    const showWishlistItemAdded = (quantity) => {
         const toastAction = (
             <Button variant="link" onClick={() => navigate('/account/wishlist')}>
                 View
@@ -200,7 +200,7 @@ const ProductList = (props) => {
                     public: false,
                     type: 'product'
                 })
-                showWishlistItemAdded(quantity, product.productId)
+                showWishlistItemAdded(quantity)
             }
         } catch (err) {
             showError()

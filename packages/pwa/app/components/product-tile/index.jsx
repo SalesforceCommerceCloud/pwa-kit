@@ -147,7 +147,8 @@ ProductTile.propTypes = {
     /**
      * Callback function to be invoked when the user removes item to wishlist
      */
-    onRemoveWishlistClick: PropTypes.func
+    onRemoveWishlistClick: PropTypes.func,
+    isWishlistLoading: PropTypes.func
 }
 
 export default ProductTile
