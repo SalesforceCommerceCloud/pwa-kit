@@ -1,6 +1,9 @@
-/* * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * *
- * Copyright (c) 2021 Mobify Research & Development Inc. All rights reserved. *
- * * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
+/*
+ * Copyright (c) 2021, salesforce.com, inc.
+ * All rights reserved.
+ * SPDX-License-Identifier: BSD-3-Clause
+ * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
+ */
 import {createContext, useContext} from 'react'
 import jwtDecode from 'jwt-decode'
 import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
@@ -291,3 +294,11 @@ export const isError = (jsonResponse) => {
 export const convertSnakeCaseToSentenceCase = (text) => {
     return text.split('_').join(' ')
 }
+
+/**
+ * No operation function. You can use this
+ * empty function when you wish to pass
+ * around a function that will do nothing.
+ * Usually used as default for event handlers.
+ */
+export const noop = () => {}

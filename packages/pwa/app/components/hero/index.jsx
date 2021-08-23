@@ -1,12 +1,13 @@
-/* * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * *
- * Copyright (c) 2021 Mobify Research & Development Inc. All rights reserved. *
- * * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
+/*
+ * Copyright (c) 2021, salesforce.com, inc.
+ * All rights reserved.
+ * SPDX-License-Identifier: BSD-3-Clause
+ * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
+ */
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import {AspectRatio, Box, Flex, Heading, Image, Img, Text, VStack, useTheme} from '@chakra-ui/react'
-
-import {isServer} from '../../utils/utils'
+import {AspectRatio, Box, Flex, Heading, Img, Text, VStack, useTheme} from '@chakra-ui/react'
 
 const Hero = ({title, label, img, actions, ...props}) => {
     const {src, alt} = img
@@ -22,23 +23,8 @@ const Hero = ({title, label, img, actions, ...props}) => {
                 paddingRight={{lg: '16'}}
                 borderRadius="base"
             >
-                {/* Server Image */}
-                <AspectRatio
-                    ratio={1}
-                    width="full"
-                    maxWidth={{lg: 'lg'}}
-                    display={isServer ? 'block' : 'none'}
-                >
+                <AspectRatio ratio={1} width="full" maxWidth={{lg: 'lg'}}>
                     <Img alt={alt} src={src} />
-                </AspectRatio>
-                {/* Client Image */}
-                <AspectRatio
-                    ratio={1}
-                    width="full"
-                    maxWidth={{lg: 'lg'}}
-                    display={isServer ? 'none' : 'block'}
-                >
-                    <Image alt={alt} src={src} ignoreFallback={true} />
                 </AspectRatio>
             </Flex>
             <VStack

@@ -1,6 +1,9 @@
-/* * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * *
- * Copyright (c) 2021 Mobify Research & Development Inc. All rights reserved. *
- * * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
+/*
+ * Copyright (c) 2021, salesforce.com, inc.
+ * All rights reserved.
+ * SPDX-License-Identifier: BSD-3-Clause
+ * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
+ */
 
 import React from 'react'
 import PropTypes from 'prop-types'
@@ -11,7 +14,6 @@ import {
     AspectRatio,
     Box,
     Img,
-    Image,
     Skeleton as ChakraSkeleton,
     Text,
     Stack,
@@ -24,7 +26,7 @@ import {useIntl} from 'react-intl'
 
 // Other
 import {productUrlBuilder} from '../../utils/url'
-import {isServer, noop} from '../../utils/utils'
+import {noop} from '../../utils/utils'
 import Link from '../link'
 import withRegistration from '../../hoc/with-registration'
 
@@ -77,13 +79,8 @@ const ProductTile = (props) => {
             {...rest}
         >
             <Box {...styles.imageWrapper}>
-                {/* Server Image */}
-                <AspectRatio {...styles.image} ratio={1} display={isServer ? 'block' : 'none'}>
+                <AspectRatio {...styles.image} ratio={1}>
                     <Img alt={image.alt} src={image.disBaseLink} />
-                </AspectRatio>
-                {/* Client Image */}
-                <AspectRatio {...styles.image} ratio={1} display={isServer ? 'none' : 'block'}>
-                    <Image alt={image.alt} src={image.disBaseLink} ignoreFallback={true} />
                 </AspectRatio>
                 {isInWishlist ? (
                     <IconButton

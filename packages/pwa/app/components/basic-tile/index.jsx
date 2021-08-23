@@ -1,13 +1,14 @@
-/* * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * *
- * Copyright (c) 2021 Mobify Research & Development Inc. All rights reserved. *
- * * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
+/*
+ * Copyright (c) 2021, salesforce.com, inc.
+ * All rights reserved.
+ * SPDX-License-Identifier: BSD-3-Clause
+ * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
+ */
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import {Box, Image, Img, Text, AspectRatio, useTheme} from '@chakra-ui/react'
+import {Box, Img, Text, AspectRatio, useTheme} from '@chakra-ui/react'
 import {Link} from 'react-router-dom'
-
-import {isServer} from '../../utils/utils'
 
 import {ChevronRightIcon} from '../icons'
 
@@ -23,21 +24,10 @@ const BasicTile = ({img, href, title, ...props}) => {
         <Box {...props}>
             <Box paddingBottom="4">
                 <Link to={href}>
-                    <AspectRatio ratio={3 / 4} display={isServer ? 'block' : 'none'}>
-                        {/* Server Image */}
+                    <AspectRatio ratio={3 / 4}>
                         <Img
                             alt={alt}
                             src={src}
-                            borderRadius="base"
-                            bgGradient={theme.gradients.imageBackground}
-                        />
-                    </AspectRatio>
-                    <AspectRatio ratio={3 / 4} display={isServer ? 'none' : 'block'}>
-                        {/* Client Image */}
-                        <Image
-                            alt={alt}
-                            src={src}
-                            ignoreFallback={true}
                             borderRadius="base"
                             bgGradient={theme.gradients.imageBackground}
                         />
