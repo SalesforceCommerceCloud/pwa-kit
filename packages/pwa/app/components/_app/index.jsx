@@ -76,6 +76,10 @@ const App = (props) => {
         onClose()
     }, [location])
 
+    useEffect(() => {
+        setCategories(allCategories)
+    }, [allCategories])
+
     const onLogoClick = () => {
         // Goto the home page.
         history.push(HOME_HREF)
