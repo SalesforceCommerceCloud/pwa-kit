@@ -38,23 +38,21 @@ export default function useCustomerProductLists({eventHandler = noop, errorHandl
             switch (action) {
                 case CustomerProductListEventQueue.eventTypes.ADD: {
                     try {
-                        const wishlist = self.getProductListPerType(
-                            customerProductListTypes.WISHLIST
-                        )
-                        const productListItem = wishlist.customerProductListItems.find(
+                        const productList = self.getProductListPerType(listType)
+                        const productListItem = productList.customerProductListItems.find(
                             ({productId}) => productId === event.item.id
                         )
                         // if the item is already in the wishlist
                         // only update the quantity
                         if (productListItem) {
-                            await self.updateCustomerProductListItem(wishlist, {
+                            await self.updateCustomerProductListItem(productList, {
                                 ...productListItem,
                                 quantity: event.item.quantity + productListItem.quantity
                             })
                             eventHandler(event)
                         } else {
-                            await self.createCustomerProductListItem(wishlist, {
-                                productId: event.item.productId,
+                            await self.createCustomerProductListItem(productList, {
+                                productId: event.item.id,
                                 priority: 1,
                                 quantity: parseInt(event.item.quantity),
                                 public: false,

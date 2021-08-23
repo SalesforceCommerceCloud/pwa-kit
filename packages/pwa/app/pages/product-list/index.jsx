@@ -32,9 +32,7 @@ import PageHeader from './partials/page-header'
 
 // Hooks
 import {useLimitUrls, usePageUrls, useSortUrls, useSearchParams} from '../../hooks'
-import useCustomerProductLists, {
-    eventActions
-} from '../../commerce-api/hooks/useCustomerProductLists'
+import useCustomerProductLists from '../../commerce-api/hooks/useCustomerProductLists'
 import useNavigation from '../../hooks/use-navigation'
 import {useToast} from '../../hooks/use-toast'
 
@@ -63,7 +61,7 @@ const ProductList = (props) => {
 
     const {categories} = useContext(CategoriesContext)
     const productListEventHandler = (event) => {
-        if (event.action === eventActions.ADD) {
+        if (event.action === 'add') {
             showWishlistItemAdded(event.item?.quantity)
         }
     }
@@ -186,12 +184,13 @@ const ProductList = (props) => {
             if (!customerProductLists?.loaded) {
                 const event = {
                     item: {...product, id: product.productId, quantity: 1},
-                    action: eventActions.ADD,
+                    action: 'add',
                     listType: customerProductListTypes.WISHLIST
                 }
 
                 customerProductLists.addActionToEventQueue(event)
             } else {
+                console.log('product', product)
                 const quantity = 1
                 const wishlist = customerProductLists.getProductListPerType(
                     customerProductListTypes.WISHLIST
