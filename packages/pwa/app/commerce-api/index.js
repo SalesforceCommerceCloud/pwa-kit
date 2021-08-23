@@ -13,6 +13,7 @@ import OcapiShopperOrders from './ocapi-shopper-orders'
 import {getTenantId, isError, isTokenValid} from './utils'
 import Auth from './auth'
 import EinsteinAPI from './einstein'
+import {DEFAULT_LOCALE} from '../locale'
 
 /**
  * The configuration details for the connecting to the API.
@@ -52,9 +53,7 @@ class CommerceAPI {
     constructor(config = {}) {
         const me = this
 
-        // Note we probably want a better way to set the initial locale value, maybe via
-        // the config, and that will come from elsewhere like a config file.
-        this.locale = 'en-GB'
+        this.locale = DEFAULT_LOCALE
 
         const {proxyPath, ...restConfig} = config
 

@@ -11,6 +11,5 @@ export const commerceAPIConfig = {
         organizationId: 'f_ecom_zzrf_001',
         shortCode: '8o7m175y',
         siteId: 'RefArchGlobal'
-        // locale: 'fr-FR'
     }
 }
