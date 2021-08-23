@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useContext, useEffect} from 'react'
+import React, {useContext, useEffect, useState} from 'react'
 import PropTypes from 'prop-types'
 import {useHistory, useParams} from 'react-router-dom'
 import {FormattedMessage, useIntl} from 'react-intl'
@@ -145,6 +145,7 @@ const ProductList = (props) => {
                 delete searchParamsCopy.refine[attributeId]
             }
         }
+
         navigate(`${location.pathname}?${stringifySearchParams(searchParamsCopy)}`)
     }
 

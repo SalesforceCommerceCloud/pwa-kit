@@ -1,6 +1,9 @@
-/* * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * *
- * Copyright (c) 2021 Mobify Research & Development Inc. All rights reserved. *
- * * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
+/*
+ * Copyright (c) 2021, salesforce.com, inc.
+ * All rights reserved.
+ * SPDX-License-Identifier: BSD-3-Clause
+ * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
+ */
 
 import React from 'react'
 import {
@@ -29,7 +32,7 @@ const componentMap = {
     price: RadioRefinements
 }
 
-const Refinements = ({filters = [], toggleFilter, selectedFilters, isLoading}) => {
+const Refinements = ({filters, toggleFilter, selectedFilters, isLoading}) => {
     // Getting the indices of filters to open accordions by default
     let filtersIndexes = filters?.map((filter, idx) => idx)
 
@@ -41,7 +44,7 @@ const Refinements = ({filters = [], toggleFilter, selectedFilters, isLoading}) =
 
         if (savedExpandedAccordionIndexes) {
             filtersIndexes = filters
-                .map((filter, index) => {
+                ?.map((filter, index) => {
                     if (savedExpandedAccordionIndexes.includes(filter.attributeId)) {
                         return index
                     }
@@ -53,7 +56,7 @@ const Refinements = ({filters = [], toggleFilter, selectedFilters, isLoading}) =
     // Handle saving acccordion state
     const updateAccordionState = (expandedIndex) => {
         const filterState = filters
-            .filter((filter, index) => expandedIndex.includes(index))
+            ?.filter((filter, index) => expandedIndex.includes(index))
             .map((filter) => filter.attributeId)
         window.localStorage.setItem(FILTER_ACCORDION_SATE, JSON.stringify(filterState))
     }
@@ -70,7 +73,7 @@ const Refinements = ({filters = [], toggleFilter, selectedFilters, isLoading}) =
                     defaultIndex={filtersIndexes}
                     reduceMotion={true}
                 >
-                    {filters.map((filter, idx) => {
+                    {filters?.map((filter, idx) => {
                         // Render the appropriate component for the refinement type, fallback to checkboxes
                         const Values = componentMap[filter.attributeId] || CheckboxRefinements
                         const selectedFiltersArray = selectedFilters?.[filter.attributeId]
