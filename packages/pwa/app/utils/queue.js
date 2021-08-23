@@ -27,10 +27,10 @@ export default class Queue {
         return this._queue.shift()
     }
 
-    process(callback) {
+    async process(callback) {
         while (!this.isEmpty) {
             const item = this.dequeue()
-            callback(item)
+            await callback(item)
         }
     }
 }
