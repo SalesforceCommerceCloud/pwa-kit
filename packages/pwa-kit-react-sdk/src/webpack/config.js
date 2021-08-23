@@ -171,6 +171,9 @@ const common = {
             'react-dom': resolve(nodeModules, 'react-dom'),
             'react-helmet': resolve(nodeModules, 'react-helmet'),
             bluebird: resolve(nodeModules, 'bluebird')
+        },
+        fallback: {
+            crypto: false
         }
     },
 

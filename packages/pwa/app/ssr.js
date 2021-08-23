@@ -38,6 +38,10 @@ const app = createApp({
     protocol: 'http'
 })
 
+// Handle the redirect from SLAS as to avoid error
+app.get('/callback?*', (req, res) => {
+    res.send()
+})
 app.get('/robots.txt', serveStaticFile('static/robots.txt'))
 app.get('/*', render)
 

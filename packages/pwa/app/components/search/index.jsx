@@ -184,7 +184,7 @@ const Search = (props) => {
                                     <SearchIcon />
                                 </InputLeftElement>
                                 <Input
-                                    autocomplete="off"
+                                    autoComplete="off"
                                     id="search-input"
                                     onChange={(e) => onSearchInputChange(e)}
                                     onFocus={() => shouldOpenPopover()}
