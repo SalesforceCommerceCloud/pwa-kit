@@ -92,7 +92,7 @@ export const whichLocaleToLoad = (preferredLocales, supportedLocales, fallbackLo
  */
 export const getTargetLocale = (preferredLocales, supportedLocales, defaultLocale) => {
     return (
-        process.env.TARGET_LOCALE ||
+
         whichLocaleToLoad(preferredLocales, supportedLocales, defaultLocale)
     )
 }

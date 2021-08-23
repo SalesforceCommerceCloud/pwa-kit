@@ -30,6 +30,7 @@ import {HTTPNotFound} from 'pwa-kit-react-sdk/ssr/universal/errors'
 
 // Constants
 import {DEFAULT_SEARCH_PARAMS, DEFAULT_LIMIT_VALUES} from '../../constants'
+import {getLocaleConfig} from '../../locale'
 
 /*
  * This is a simple product listing page. It displays a paginated list
@@ -180,6 +181,24 @@ ProductList.shouldGetProps = ({previousLocation, location}) =>
     previousLocation.search !== location.search
 
 ProductList.getProps = async ({res, params, location, api}) => {
+    const localeConfig = await getLocaleConfig({
+        getUserPreferredLocales: () => {
+            // TODO: You can detect their preferred locales from:
+            // - client side: window.navigator.languages
+            // - the page URL they're on (example.com/en-GB/home)
+            // - cookie (if their previous preference is saved there)
+            // And decide which one takes precedence.
+            const localeInPageUrl = params.locale
+            return localeInPageUrl ? [localeInPageUrl] : []
+
+            // If in this function an empty array is returned (e.g. there isn't locale in the page url),
+            // then the app would use the default locale as the fallback.
+        }
+    })
+
+    // Set the target local.
+    api.setLocale(localeConfig.app.targetLocale)
+
     const {categoryId} = params
     const urlParams = new URLSearchParams(location.search)
     let searchQuery = urlParams.get('q')

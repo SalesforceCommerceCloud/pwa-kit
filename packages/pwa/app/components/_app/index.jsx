@@ -183,12 +183,16 @@ const App = (props) => {
     )
 }
 
-App.shouldGetProps = () => {
+App.shouldGetProps = ({previousLocation, location}) => {
     // In this case, we only want to fetch data for the app once, on the server.
-    return typeof window === 'undefined'
+    return (
+        typeof window === 'undefined' ||
+        !previousLocation ||
+        previousLocation.pathname !== location.pathname
+    )
 }
 
-App.getProps = async ({api, params}) => {
+App.getProps = async ({api, params, location}) => {
     const localeConfig = await getLocaleConfig({
         getUserPreferredLocales: () => {
             // TODO: You can detect their preferred locales from:
@@ -196,7 +200,11 @@ App.getProps = async ({api, params}) => {
             // - the page URL they're on (example.com/en-GB/home)
             // - cookie (if their previous preference is saved there)
             // And decide which one takes precedence.
-            const localeInPageUrl = params.locale
+
+            // TODO: Extract the `locale` in a better way (first pathname in the URL)
+            let part = location.pathname.match(/^\/([a-z]{2}-[A-Z]{2})\//)
+
+            const localeInPageUrl = params.locale ? params.locale : part[1]
             return localeInPageUrl ? [localeInPageUrl] : []
 
             // If in this function an empty array is returned (e.g. there isn't locale in the page url),
