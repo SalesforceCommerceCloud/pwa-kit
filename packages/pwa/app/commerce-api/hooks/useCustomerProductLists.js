@@ -104,7 +104,6 @@ export default function useCustomerProductLists({eventHandler = noop, errorHandl
              * @returns product lists for registered users
              */
             async fetchOrCreateProductLists(type) {
-                console.log('fetchOrCreateProductLists')
                 setIsLoading(true)
                 // fetch customer productLists
                 const response = await api.shopperCustomers.getCustomerProductLists({
@@ -217,12 +216,9 @@ export default function useCustomerProductLists({eventHandler = noop, errorHandl
                 if (isError(response)) {
                     throw new Error(response)
                 }
-                // the api does not return updated list, so we update it manuall
-                const listToUpdate = this.getCustomerProductList(list.id)
-                this.updateCustomerProductList({
-                    ...listToUpdate,
-                    customerProductListItems: [...listToUpdate.customerProductListItems, response]
-                })
+
+                // This function does not return an updated customerProductsList so we fetch manually
+                await self.getCustomerProductLists()
                 return response
             },
 

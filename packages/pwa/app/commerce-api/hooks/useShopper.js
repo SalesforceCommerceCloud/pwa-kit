@@ -64,7 +64,6 @@ const useShopper = () => {
                 if (basket?._productItemsDetail) {
                     ids = ids.filter((id) => !basket?._productItemsDetail[id])
                 }
-                console.log(' baseket ids', ids)
 
                 basket.getProductsInBasket(ids.toString(), {allImages})
             }
@@ -88,17 +87,14 @@ const useShopper = () => {
         // Fetch product details for new items in product-lists
         const hasCustomerProductLists = customerProductLists?.loaded
         if (!hasCustomerProductLists) return
+        customerProductLists.data.forEach((list) => {
+            let ids = list.customerProductListItems?.map((item) => item.productId)
+            if (list?._productItemsDetail) {
+                ids = ids.filter((id) => !list?._productItemsDetail[id])
+            }
 
-        // find the wishlist in customerProduct list
-        // we current only take the first wishlist into the account
-        const wishlist = customerProductLists.getProductListPerType(
-            customerProductListTypes.WISHLIST
-        )
-        let ids = wishlist.customerProductListItems?.map((item) => item.productId)
-        if (wishlist?._productItemsDetail) {
-            ids = ids.filter((id) => !wishlist?._productItemsDetail[id])
-        }
-        customerProductLists.getProductsInList(ids?.toString(), wishlist.id)
+            customerProductLists.getProductsInList(ids?.toString(), list.id)
+        })
     }, [customerProductLists.data])
 
     return {customer, basket}
