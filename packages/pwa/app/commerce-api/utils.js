@@ -291,3 +291,11 @@ export const isError = (jsonResponse) => {
 export const convertSnakeCaseToSentenceCase = (text) => {
     return text.split('_').join(' ')
 }
+
+/**
+ * No operation function. You can use this
+ * empty function when you wish to pass
+ * around a function that will do nothing.
+ * Usually used as default for event handlers.
+ */
+export const noop = () => {}
