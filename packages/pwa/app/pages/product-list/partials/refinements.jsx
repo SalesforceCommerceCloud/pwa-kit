@@ -29,7 +29,7 @@ const componentMap = {
     price: RadioRefinements
 }
 
-const Refinements = ({filters, toggleFilter, selectedFilters, isLoading}) => {
+const Refinements = ({filters = [], toggleFilter, selectedFilters, isLoading}) => {
     // Getting the indices of filters to open accordions by default
     let filtersIndexes = filters?.map((filter, idx) => idx)
 
@@ -70,7 +70,7 @@ const Refinements = ({filters, toggleFilter, selectedFilters, isLoading}) => {
                     defaultIndex={filtersIndexes}
                     reduceMotion={true}
                 >
-                    {filters?.map((filter, idx) => {
+                    {filters.map((filter, idx) => {
                         // Render the appropriate component for the refinement type, fallback to checkboxes
                         const Values = componentMap[filter.attributeId] || CheckboxRefinements
                         const selectedFiltersArray = selectedFilters?.[filter.attributeId]
@@ -79,27 +79,39 @@ const Refinements = ({filters, toggleFilter, selectedFilters, isLoading}) => {
                                 <Stack key={filter.attributeId} divider={<Divider />}>
                                     <AccordionItem
                                         paddingTop={idx !== 0 ? 6 : 0}
-                                        borderBottom="none"
+                                        borderBottom={
+                                            idx === filters.length - 1
+                                                ? '1px solid gray.200'
+                                                : 'none'
+                                        }
+                                        paddingBottom={6}
                                         borderTop={idx === 0 && 'none'}
                                     >
-                                        <AccordionButton paddingTop={0}>
-                                            <Text
-                                                flex="1"
-                                                textAlign="left"
-                                                fontSize="sm"
-                                                fontWeight="bold"
-                                            >
-                                                {filter.label}
-                                            </Text>
-                                            <AccordionIcon />
-                                        </AccordionButton>
-                                        <AccordionPanel paddingLeft={0} paddingBottom={6}>
-                                            <Values
-                                                selectedFilters={selectedFiltersArray}
-                                                filter={filter}
-                                                toggleFilter={toggleFilter}
-                                            />
-                                        </AccordionPanel>
+                                        {({isExpanded}) => (
+                                            <>
+                                                <AccordionButton
+                                                    paddingTop={0}
+                                                    paddingBottom={isExpanded ? 2 : 0}
+                                                >
+                                                    <Text
+                                                        flex="1"
+                                                        textAlign="left"
+                                                        fontSize="md"
+                                                        fontWeight={600}
+                                                    >
+                                                        {filter.label}
+                                                    </Text>
+                                                    <AccordionIcon />
+                                                </AccordionButton>
+                                                <AccordionPanel paddingLeft={0} paddingBottom={6}>
+                                                    <Values
+                                                        selectedFilters={selectedFiltersArray}
+                                                        filter={filter}
+                                                        toggleFilter={toggleFilter}
+                                                    />
+                                                </AccordionPanel>
+                                            </>
+                                        )}
                                     </AccordionItem>
                                 </Stack>
                             )

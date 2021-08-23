@@ -13,7 +13,7 @@ const SizeRefinements = ({filter, toggleFilter, selectedFilters}) => {
     })
 
     return (
-        <SimpleGrid templateColumns="repeat(auto-fit, 40px)" spacing={2} mt={1}>
+        <SimpleGrid templateColumns="repeat(auto-fit, 44px)" spacing={4} mt={1}>
             {filter.values
                 ?.filter((refinementValue) => refinementValue.hitCount > 0)
                 .map((value, idx) => {
@@ -31,6 +31,8 @@ const SizeRefinements = ({filter, toggleFilter, selectedFilters}) => {
                             onClick={() => toggleFilter(value, filter.attributeId, selected)}
                             aria-checked={selectedFilters == value.value}
                             variant="outline"
+                            marginBottom={0}
+                            marginRight={0}
                         >
                             <Center {...styles.swatchButton}>{value.label}</Center>
                         </Button>

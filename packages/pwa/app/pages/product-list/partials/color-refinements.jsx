@@ -42,7 +42,7 @@ const ColorRefinements = ({filter, toggleFilter, selectedFilters}) => {
                                     aria-checked={selectedFilters?.includes(value.value)}
                                     variant="outline"
                                     marginRight={0}
-                                    marginBottom={0}
+                                    marginBottom="-1px"
                                 >
                                     <Center
                                         {...styles.swatchButton}
@@ -73,6 +73,7 @@ const ColorRefinements = ({filter, toggleFilter, selectedFilters}) => {
                                     display="flex"
                                     alignItems="center"
                                     fontSize="sm"
+                                    marginBottom="1px"
                                 >{`${value.label} (${value.hitCount})`}</Text>
                             </HStack>
                         </Box>
