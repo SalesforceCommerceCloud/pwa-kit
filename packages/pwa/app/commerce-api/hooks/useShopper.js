@@ -77,10 +77,10 @@ const useShopper = () => {
     useEffect(() => {
         const hasCustomer = customer?.customerId
         const hasCustomerProductLists = customerProductLists?.loaded
-        if (hasCustomer && customer?.authType === 'registered' && !hasCustomerProductLists) {
+        if (hasCustomer && customer.isRegistered && !hasCustomerProductLists) {
             // we are only interested in wishlist
             customerProductLists.fetchOrCreateProductLists(customerProductListTypes.WISHLIST)
-        } else if (customer?.authType === 'guest' && hasCustomerProductLists) {
+        } else if (customer.isGuest && hasCustomerProductLists) {
             // customerProductLists need to be reset when the user logs out
             customerProductLists.clearProductLists()
         }

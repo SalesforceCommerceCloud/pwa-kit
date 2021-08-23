@@ -67,7 +67,7 @@ const CartSecondaryButtonGroup = ({
                     <Button variant="link" size="sm" onClick={showRemoveItemConfirmation}>
                         <FormattedMessage defaultMessage="Remove" />
                     </Button>
-                    {customer.authType === 'registered' && (
+                    {customer.isRegistered && (
                         <Button
                             variant="link"
                             size="sm"
