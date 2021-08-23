@@ -1,6 +1,9 @@
-/* * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * *
- * Copyright (c) 2021 Mobify Research & Development Inc. All rights reserved. *
- * * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
+/*
+ * Copyright (c) 2021, salesforce.com, inc.
+ * All rights reserved.
+ * SPDX-License-Identifier: BSD-3-Clause
+ * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
+ */
 export const mockRecommendationsResponse = {
     recommenderName: 'test-recommender',
     recoUUID: '05e0bd80-64eb-4149-ad5a-dfe1996f8f57',

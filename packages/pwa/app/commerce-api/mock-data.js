@@ -1,6 +1,9 @@
-/* * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * *
- * Copyright (c) 2021 Mobify Research & Development Inc. All rights reserved. *
- * * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
+/*
+ * Copyright (c) 2021, salesforce.com, inc.
+ * All rights reserved.
+ * SPDX-License-Identifier: BSD-3-Clause
+ * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
+ */
 export const examplePKCEVerifier =
     'sWSk9W.BiH7Ssv-_mwe6EsYk3OeH9OZ3qE9210l9L9mYDtZL9zETSHzOJPj4Oymp5VGkCn_1r7IOW7-IpGDVzPfTzUdY25TQuBkM1BKTG_41iOB3AI9JOd3f.~Q.DvvY'
 export const exampleTokenReponse = {
