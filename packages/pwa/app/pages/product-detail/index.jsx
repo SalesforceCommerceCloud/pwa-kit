@@ -25,9 +25,7 @@ import {
 
 // Hooks
 import useBasket from '../../commerce-api/hooks/useBasket'
-import useCustomerProductLists, {
-    eventActions
-} from '../../commerce-api/hooks/useCustomerProductLists'
+import useCustomerProductLists from '../../commerce-api/hooks/useCustomerProductLists'
 import {useVariant} from '../../hooks'
 import useEinstein from '../../commerce-api/hooks/useEinstein'
 
@@ -55,7 +53,7 @@ const ProductDetail = ({category, product, isLoading}) => {
     const variant = useVariant(product)
 
     const productListEventHandler = (event) => {
-        if (event.action === eventActions.ADD) {
+        if (event.action === 'add') {
             showWishlistItemAdded(event.item?.quantity)
         }
     }
@@ -120,10 +118,14 @@ const ProductDetail = ({category, product, isLoading}) => {
         try {
             // If product-lists have not loaded we push "Add to wishlist" event to eventQueue to be
             // processed once the product-lists have loaded.
+
+            // @TODO: move the logic to useCustomerProductLists
+            // PDP shouldn't need to know the implementation detail of the event queue
+            // PDP should just do "customerProductLists.addItem(item)"!
             if (!customerProductLists?.loaded) {
                 const event = {
                     item: {...product, quantity},
-                    action: eventActions.ADD,
+                    action: 'add',
                     listType: customerProductListTypes.WISHLIST
                 }
 

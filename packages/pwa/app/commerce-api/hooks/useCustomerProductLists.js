@@ -9,15 +9,22 @@ import {isError, useCommerceAPI, CustomerProductListsContext} from '../utils'
 import {noop} from '../../utils/utils'
 
 import useCustomer from './useCustomer'
+import Queue from '../../utils/queue'
 import {customerProductListTypes} from '../../constants'
-// If the customerProductLists haven't yet loaded we store user actions inside
-// eventQueue and process the eventQueue once productLists have loaded
-const eventQueue = []
 
-export const eventActions = {
-    ADD: 'add',
-    REMOVE: 'remove'
+// A event queue for the following use cases:
+// 1. Allow user to add item to wishlist before wishlist is initialized
+// 2. Allow user to add item to wishlist before logging in
+// e.g. user clicks add to wishlist, push event to the queue, show login
+// modal, pop the event after successfuly logged in
+export class CustomerProductListEventQueue extends Queue {
+    static eventTypes = {
+        ADD: 'add',
+        REMOVE: 'remove'
+    }
 }
+
+const eventQueue = new CustomerProductListEventQueue()
 
 export default function useCustomerProductLists({eventHandler = noop, errorHandler = noop} = {}) {
     const api = useCommerceAPI()
@@ -25,12 +32,11 @@ export default function useCustomerProductLists({eventHandler = noop, errorHandl
     const {customerProductLists, setCustomerProductLists} = useContext(CustomerProductListsContext)
     const [isLoading, setIsLoading] = useState(false)
 
-    const processEventQueue = async () => {
-        while (eventQueue.length) {
-            // get the first item
-            const event = eventQueue.shift()
-            switch (event.action) {
-                case eventActions.ADD: {
+    useEffect(() => {
+        eventQueue.process(async (event) => {
+            const {action, item, list, listType} = event
+            switch (action) {
+                case CustomerProductListEventQueue.eventTypes.ADD: {
                     try {
                         const wishlist = self.getProductListPerType(
                             customerProductListTypes.WISHLIST
@@ -62,22 +68,16 @@ export default function useCustomerProductLists({eventHandler = noop, errorHandl
                     break
                 }
 
-                case eventActions.REMOVE:
+                case CustomerProductListEventQueue.eventTypes.REMOVE:
                     try {
-                        await self.deleteCustomerProductListItem(event.list, event.item)
+                        await self.deleteCustomerProductListItem(list, item)
                         eventHandler(event)
                     } catch (error) {
                         errorHandler(error)
                     }
                     break
             }
-        }
-    }
-
-    useEffect(() => {
-        if (eventQueue.length && customerProductLists?.data.length) {
-            processEventQueue()
-        }
+        })
     }, [customerProductLists])
 
     const self = useMemo(() => {
@@ -168,12 +168,16 @@ export default function useCustomerProductLists({eventHandler = noop, errorHandl
             },
 
             /**
+             * @TODO: remove this function as it exposes unnecessary knowledge
+             * to outside systems. The queue logic should be encapsulated in this
+             * hook only. The API for outside consuming should be something like:
+             * addItemToList, removeItemToList...
              * Event queue holds user actions that need to execute on product-lists
              * while the product list information has not yet loaded (eg: Adding to wishlist immedeately after login).
              * @param {object} event Event to be added to queue. event object has properties: action: {item: Object, list?: object, action: eventActions, listType: CustomerProductListType}
              */
             addActionToEventQueue(event) {
-                eventQueue.push(event)
+                eventQueue.enqueue(event)
             },
 
             /**

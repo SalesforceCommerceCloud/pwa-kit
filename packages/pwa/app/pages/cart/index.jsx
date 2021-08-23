@@ -21,9 +21,7 @@ import CartSecondaryButtonGroup from './partials/cart-secondary-button-group'
 import ProductViewModal from '../../components/product-view-modal'
 
 import {useToast} from '../../hooks/use-toast'
-import useCustomerProductLists, {
-    eventActions
-} from '../../commerce-api/hooks/useCustomerProductLists'
+import useCustomerProductLists from '../../commerce-api/hooks/useCustomerProductLists'
 import {API_ERROR_MESSAGE, customerProductListTypes} from '../../constants'
 import useNavigation from '../../hooks/use-navigation'
 
@@ -36,7 +34,7 @@ const Cart = () => {
     const navigate = useNavigation()
 
     const productListEventHandler = (event) => {
-        if (event.action === eventActions.ADD) {
+        if (event.action === 'add') {
             showWishlistItemAdded(event.item?.quantity)
         }
     }
@@ -162,10 +160,14 @@ const Cart = () => {
         try {
             // If product-lists have not loaded we push "Add to wishlist" event to eventQueue to be
             // processed once the product-lists have loaded.
+
+            // @TODO: move the logic to useCustomerProductLists
+            // Cart shouldn't need to know the implementation detail of the event queue
+            // Cart should just do "customerProductLists.addItem(item)"!
             if (!customerProductLists?.loaded) {
                 const event = {
                     item: product,
-                    action: eventActions.ADD,
+                    action: 'add',
                     listType: customerProductListTypes.WISHLIST,
                     showStatus: showWishlistItemAdded,
                     showError
