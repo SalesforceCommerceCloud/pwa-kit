@@ -14,11 +14,14 @@ import Queue from '../../utils/queue'
 // 2. Allow user to add item to wishlist before logging in
 // e.g. user clicks add to wishlist, push event to the queue, show login
 // modal, pop the event after successfuly logged in
-const eventQueue = new Queue()
-export const eventActions = {
-    ADD: 'add',
-    REMOVE: 'remove'
+export class CustomerProductListEventQueue extends Queue {
+    static eventTypes = {
+        ADD: 'add',
+        REMOVE: 'remove'
+    }
 }
+
+const eventQueue = new CustomerProductListEventQueue()
 
 export default function useCustomerProductLists({eventHandler = noop, errorHandler = noop} = {}) {
     const api = useCommerceAPI()
@@ -30,7 +33,7 @@ export default function useCustomerProductLists({eventHandler = noop, errorHandl
         eventQueue.process(async (event) => {
             const {action, item, list, listType} = event
             switch (action) {
-                case eventActions.ADD: {
+                case CustomerProductListEventQueue.ADD: {
                     try {
                         const productItem = {
                             productId: item.id,
@@ -44,7 +47,7 @@ export default function useCustomerProductLists({eventHandler = noop, errorHandl
                     break
                 }
 
-                case eventActions.REMOVE:
+                case CustomerProductListEventQueue.REMOVE:
                     try {
                         await self.deleteCustomerProductListItem(list, item)
                         eventHandler(event)
@@ -158,12 +161,16 @@ export default function useCustomerProductLists({eventHandler = noop, errorHandl
             },
 
             /**
+             * @TODO: remove this function as it exposes unnecessary knowledge
+             * to outside systems. The queue logic should be encapsulated in this
+             * hook only. The API for outside consuming should be something like:
+             * addItemToList, removeItemToList...
              * Event queue holds user actions that need to execute on product-lists
              * while the product list information has not yet loaded (eg: Adding to wishlist immedeately after login).
              * @param {object} event Event to be added to queue. event object has properties: action: {item: Object, list?: object, action: eventActions, listType: CustomerProductListType}
              */
             addActionToEventQueue(event) {
-                eventQueue.push(event)
+                eventQueue.enqueue(event)
             },
 
             /**
