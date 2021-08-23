@@ -118,9 +118,7 @@ class Auth {
 
         let retries = 0
         const startLoginFlow = () => {
-            let authorizationMethod = this._onClient
-                ? '_loginAsGuestClientSide'
-                : '_loginAsGuestServerSide'
+            let authorizationMethod = '_loginAsGuest'
             if (credentials) {
                 authorizationMethod = '_loginWithCredentials'
             } else if (this._authToken && this._refreshToken) {
@@ -182,7 +180,9 @@ class Auth {
             this._saveEncUserId(enc_user_id)
         }
 
-        sessionStorage.removeItem('codeVerifier')
+        if (this._onClient) {
+            sessionStorage.removeItem('codeVerifier')
+        }
     }
 
     /**
@@ -232,40 +232,17 @@ class Auth {
     }
 
     /**
-     * Fetches an auth token for server side requests
-     * @private
-     * @returns {{authToken: string, customer: Customer}}
-     */
-    async _loginAsGuestServerSide() {
-        let rawResponse = await this._createGuestSession()
-
-        const resJson = await rawResponse.json()
-        const authToken = rawResponse.headers.get('authorization')
-
-        if (rawResponse.status >= 400) {
-            if (resJson.title === 'Expired Token') {
-                throw new HTTPError(rawResponse.status, 'EXPIRED_TOKEN')
-            }
-            throw new HTTPError(rawResponse.status, resJson.detail)
-        }
-        this._customerId = resJson.customerId
-        this._saveAccessToken(authToken)
-
-        return {
-            authToken,
-            customer: resJson
-        }
-    }
-
-    /**
      * Begins oAuth PCKE Flow for guest
      * @returns {object} - a guest customer object
      */
-    async _loginAsGuestClientSide() {
+    async _loginAsGuest() {
         const codeVerifier = createCodeVerifier()
         const codeChallenge = await generateCodeChallenge(codeVerifier)
 
-        sessionStorage.setItem('codeVerifier', codeVerifier)
+        if (this._onClient) {
+            sessionStorage.setItem('codeVerifier', codeVerifier)
+        }
+
         const options = {
             headers: {
                 Authorization: '',
@@ -281,6 +258,7 @@ class Auth {
         }
 
         const response = await this._api.shopperLogin.authorizeCustomer(options, true)
+
         if (response.status >= 400) {
             const json = await response.json()
             throw new HTTPError(response.status, json.message)
@@ -289,7 +267,7 @@ class Auth {
         const tokenBody = createGetTokenBody(
             response.url,
             `${getAppOrigin()}${slasCallbackEndpoint}`,
-            window.sessionStorage.getItem('codeVerifier')
+            this._onClient ? window.sessionStorage.getItem('codeVerifier') : codeVerifier
         )
 
         const {customer_id} = await this.getLoggedInToken(tokenBody)
