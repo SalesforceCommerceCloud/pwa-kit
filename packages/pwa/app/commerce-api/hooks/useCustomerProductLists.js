@@ -7,10 +7,14 @@
 import {useContext, useMemo, useEffect, useState} from 'react'
 import {isError, useCommerceAPI, CustomerProductListsContext, noop} from '../utils'
 import useCustomer from './useCustomer'
-// If the customerProductLists haven't yet loaded we store user actions inside
-// eventQueue and process the eventQueue once productLists have loaded
-const eventQueue = []
+import Queue from '../../utils/queue'
 
+// A event queue for the following use cases:
+// 1. Allow user to add item to wishlist before wishlist is initialized
+// 2. Allow user to add item to wishlist before logging in
+// e.g. user clicks add to wishlist, push event to the queue, show login
+// modal, pop the event after successfuly logged in
+const eventQueue = new Queue()
 export const eventActions = {
     ADD: 'add',
     REMOVE: 'remove'
@@ -22,22 +26,17 @@ export default function useCustomerProductLists({eventHandler = noop, errorHandl
     const {customerProductLists, setCustomerProductLists} = useContext(CustomerProductListsContext)
     const [isLoading, setIsLoading] = useState(false)
 
-    const processEventQueue = () => {
-        eventQueue.forEach(async (event) => {
-            eventQueue.pop()
-
-            switch (event.action) {
+    useEffect(() => {
+        eventQueue.process(async (event) => {
+            const {action, item, list, listType} = event
+            switch (action) {
                 case eventActions.ADD: {
                     try {
                         const productItem = {
-                            productId: event.item.id,
-                            quantity: event.item.quantity
+                            productId: item.id,
+                            quantity: item.quantity
                         }
-                        await addItemToCustomerProductList(
-                            productItem,
-                            event.list?.id,
-                            event.listType
-                        )
+                        await addItemToCustomerProductList(productItem, list?.id, listType)
                         eventHandler(event)
                     } catch (error) {
                         errorHandler(error)
@@ -47,7 +46,7 @@ export default function useCustomerProductLists({eventHandler = noop, errorHandl
 
                 case eventActions.REMOVE:
                     try {
-                        await self.deleteCustomerProductListItem(event.list, event.item)
+                        await self.deleteCustomerProductListItem(list, item)
                         eventHandler(event)
                     } catch (error) {
                         errorHandler(error)
@@ -55,12 +54,6 @@ export default function useCustomerProductLists({eventHandler = noop, errorHandl
                     break
             }
         })
-    }
-
-    useEffect(() => {
-        if (eventQueue.length) {
-            processEventQueue()
-        }
     }, [customerProductLists])
 
     const addItemToCustomerProductList = async (item, listId, listType) => {
