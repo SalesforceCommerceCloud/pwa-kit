@@ -154,9 +154,14 @@ const ProductList = (props) => {
         navigate(window.location.pathname)
     }
 
-    const selectedSortingOptionLabel = productSearchResult?.sortingOptions.find(
+    let selectedSortingOptionLabel = productSearchResult?.sortingOptions.find(
         (option) => option.id === productSearchResult?.selectedSortingOption
     )
+
+    // API does not always return a selected sorting order
+    if (!selectedSortingOptionLabel) {
+        selectedSortingOptionLabel = productSearchResult?.sortingOptions[0]
+    }
 
     return (
         <Box
@@ -244,6 +249,7 @@ const ProductList = (props) => {
                                 </Flex>
                                 <Flex align="center">
                                     <Button
+                                        maxWidth="245px"
                                         fontSize="sm"
                                         marginRight={2}
                                         colorScheme="black"
