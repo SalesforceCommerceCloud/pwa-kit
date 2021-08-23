@@ -105,6 +105,12 @@
       "value": "Log in here"
     }
   ],
+  "2WOdRo": [
+    {
+      "type": 0,
+      "value": "wishlist"
+    }
+  ],
   "2WRHXI": [
     {
       "type": 1,
@@ -223,6 +229,12 @@
     {
       "type": 0,
       "value": "Please enter a valid date"
+    }
+  ],
+  "6yVHs9": [
+    {
+      "type": 0,
+      "value": "wishlist-solid"
     }
   ],
   "7PMLfK": [
@@ -1865,42 +1877,6 @@
     {
       "type": 0,
       "value": "Most Viewed"
-    }
-  ],
-  "yddLi0": [
-    {
-      "offset": 0,
-      "options": {
-        "one": {
-          "value": [
-            {
-              "type": 7
-            },
-            {
-              "type": 0,
-              "value": " item"
-            }
-          ]
-        },
-        "other": {
-          "value": [
-            {
-              "type": 7
-            },
-            {
-              "type": 0,
-              "value": " items"
-            }
-          ]
-        }
-      },
-      "pluralType": "cardinal",
-      "type": 6,
-      "value": "quantity"
-    },
-    {
-      "type": 0,
-      "value": " added to wishlist"
     }
   ],
   "z+Zrln": [
