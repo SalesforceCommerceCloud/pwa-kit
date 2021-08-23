@@ -66,6 +66,7 @@ const Refinements = ({filters, toggleFilter, selectedFilters, isLoading}) => {
             {/* Wait to have filters before rendering the Accordion to allow the deafult indexes to be accurate */}
             {filtersIndexes && (
                 <Accordion
+                    pointerEvents={isLoading ? 'none' : 'auto'}
                     onChange={updateAccordionState}
                     opacity={isLoading ? 0.2 : 1}
                     allowMultiple={true}
