@@ -107,7 +107,7 @@ const Refinements = ({filters, toggleFilter, selectedFilters, isLoading}) => {
                                                     </Text>
                                                     <AccordionIcon />
                                                 </AccordionButton>
-                                                <AccordionPanel paddingLeft={0} paddingBottom={6}>
+                                                <AccordionPanel paddingLeft={0}>
                                                     <Values
                                                         selectedFilters={selectedFiltersArray}
                                                         filter={filter}

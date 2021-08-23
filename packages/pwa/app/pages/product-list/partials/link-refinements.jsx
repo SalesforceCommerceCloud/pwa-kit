@@ -6,7 +6,7 @@
  */
 
 import React from 'react'
-import {Stack} from '@chakra-ui/react'
+import {Stack, Text} from '@chakra-ui/react'
 import PropTypes from 'prop-types'
 import Link from '../../../components/link'
 
@@ -23,7 +23,7 @@ const LinkRefinements = ({filter}) => {
                         href={`/category/${value.value}`}
                         useNavLink
                     >
-                        {value.label}
+                        <Text fontSize="sm">{value.label}</Text>
                     </Link>
                 )
             })}

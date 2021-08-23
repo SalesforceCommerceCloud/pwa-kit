@@ -182,11 +182,8 @@ const ProductList = (props) => {
                         display={{base: 'none', lg: 'flex'}}
                         direction="row"
                         justify="flex-start"
-                        align="center"
-                        paddingTop={12}
-                        paddingBottom={16}
+                        align="flex-start"
                         spacing={4}
-                        height={12}
                         marginBottom={6}
                     >
                         <Flex align="left" width="287px">
