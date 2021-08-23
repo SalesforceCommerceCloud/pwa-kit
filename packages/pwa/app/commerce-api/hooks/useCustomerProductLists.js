@@ -33,7 +33,7 @@ export default function useCustomerProductLists({eventHandler = noop, errorHandl
         eventQueue.process(async (event) => {
             const {action, item, list, listType} = event
             switch (action) {
-                case CustomerProductListEventQueue.ADD: {
+                case CustomerProductListEventQueue.eventTypes.ADD: {
                     try {
                         const productItem = {
                             productId: item.id,
@@ -47,7 +47,7 @@ export default function useCustomerProductLists({eventHandler = noop, errorHandl
                     break
                 }
 
-                case CustomerProductListEventQueue.REMOVE:
+                case CustomerProductListEventQueue.eventTypes.REMOVE:
                     try {
                         await self.deleteCustomerProductListItem(list, item)
                         eventHandler(event)
