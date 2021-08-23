@@ -24,7 +24,9 @@ export const eventActions = {
 export default function useCustomerProductLists() {
     const api = useCommerceAPI()
     const customer = useCustomer()
-    const {customerProductLists, setCustomerProductLists} = useContext(CustomerProductListsContext)
+    const {customerProductLists, setCustomerProductLists, initialized, setInitialized} = useContext(
+        CustomerProductListsContext
+    )
     const [isLoading, setIsLoading] = useState(false)
     const showToast = useToast()
 
@@ -101,12 +103,12 @@ export default function useCustomerProductLists() {
     const self = useMemo(() => {
         return {
             ...customerProductLists,
-            get showLoader() {
+            get isLoading() {
                 return isLoading
             },
 
             get loaded() {
-                return customerProductLists?.data?.length
+                return customerProductLists?.data?.length >= 0
             },
 
             getProductListPerType(type) {
@@ -123,43 +125,15 @@ export default function useCustomerProductLists() {
              * @param {string} type type of list to fetch or create
              * @returns product lists for registered users
              */
-            async fetchOrCreateProductLists(type) {
-                setIsLoading(true)
-                // fetch customer productLists
-                const response = await api.shopperCustomers.getCustomerProductLists({
-                    body: [],
-                    parameters: {
-                        customerId: customer.customerId
-                    }
-                })
+            async getOrCreateProductLists(type) {
+                let response = await this.getCustomerProductLists()
 
-                setIsLoading(false)
-                if (isError(response)) {
-                    throw new Error(response)
+                const hasCorrectType = response.data.some((list) => list.type === type)
+                if (!hasCorrectType) {
+                    response = await this.createCustomerProductList()
                 }
 
-                if (response?.data?.length && response?.data?.some((list) => list.type === type)) {
-                    // only set the lists when there is at least one type we need. etc wishlist
-                    return setCustomerProductLists(response)
-                }
-
-                setIsLoading(true)
-                // create a new list to be used later
-                const newProductList = await api.shopperCustomers.createCustomerProductList({
-                    body: {
-                        type
-                    },
-                    parameters: {
-                        customerId: customer.customerId
-                    }
-                })
-
-                setIsLoading(false)
-                if (isError(newProductList)) {
-                    throw new Error(newProductList)
-                }
-                // This function does not return an updated customerProductsList so we fetch manually
-                await this.getCustomerProductLists()
+                return response
             },
 
             /**
@@ -212,8 +186,7 @@ export default function useCustomerProductLists() {
                 }
 
                 // This function does not return an updated customerProductsLists so we fetch manually
-                await this.getCustomerProductLists()
-                return response
+                return this.getCustomerProductLists()
             },
 
             /**
@@ -266,7 +239,9 @@ export default function useCustomerProductLists() {
                     result[key] = item
                     return result
                 }, {})
-
+                setCustomerProductLists(1)
+                console.log(customerProductLists)
+                debugger
                 const updatedProductLists = {
                     ...customerProductLists,
                     data: customerProductLists.data.map((list) => {

@@ -24,18 +24,21 @@ const useShopper = () => {
 
     // Handle basket init/updates in response to customer/basket changes.
     useEffect(() => {
-        const hasCustomer = customer?.customerId
         const hasBasket = basket?.loaded
 
         // We have a customer but no basket, so we fetch a new or existing basket
-        if (hasCustomer && !hasBasket) {
+        if (customer.isRegistered && !hasBasket) {
             basket.getOrCreateBasket()
             return
         }
 
         // We have a customer and a basket, but the basket does not belong to this customer
         // so we get their existing basket or create a new one for them
-        if (hasCustomer && hasBasket && customer.customerId !== basket.customerInfo.customerId) {
+        if (
+            customer.isRegistered &&
+            hasBasket &&
+            customer.customerId !== basket.customerInfo.customerId
+        ) {
             basket.getOrCreateBasket()
             return
         }
@@ -44,7 +47,7 @@ const useShopper = () => {
         // but the email applied to the basket is missing or doesn't match the customer
         // email. In this case, we update the basket with their email.
         if (
-            hasCustomer &&
+            customer.isRegistered &&
             hasBasket &&
             customer.email &&
             customer.customerId === basket.customerInfo.customerId &&
@@ -57,7 +60,7 @@ const useShopper = () => {
 
     useEffect(() => {
         // Fetch product details for all items in cart
-        if (customer.customerId && basket?.basketId) {
+        if (customer.isRegistered && basket?.basketId) {
             if (basket.itemCount > 0) {
                 const allImages = true
                 let ids = basket.productItems?.map((item) => item.productId)
@@ -72,31 +75,34 @@ const useShopper = () => {
 
     // Load wishlists in context for logged-in users
     useEffect(() => {
-        const hasCustomer = customer?.customerId
-        const loaded = customerProductLists?.loaded
-        if (hasCustomer && customer.isRegistered && !loaded) {
-            // we are only interested in wishlist
-            customerProductLists.fetchOrCreateProductLists(customerProductListTypes.WISHLIST)
-        } else if (customer.isGuest && loaded) {
-            // customerProductLists need to be reset when the user logs out
-            customerProductLists.clearProductLists()
-        }
-    }, [customerProductLists.loaded, customer.authType])
+        const initWishlist = async () => {
+            // console.log('useShopper')
+            // console.log(customer.isRegistered)
+            // console.log(customerProductLists.loaded)
+            const loaded = customerProductLists.loaded
+            if (customer.isRegistered) {
+                const response = await customerProductLists.getOrCreateProductLists(
+                    customerProductListTypes.WISHLIST
+                )
+                response.data.forEach((list) => {
+                    let ids = list.customerProductListItems.map((item) => item.productId)
+                    if (list._productItemsDetail) {
+                        ids = ids.filter((id) => !list?._productItemsDetail[id])
+                    }
+                    customerProductLists.getProductsInList(ids.toString(), list.id)
+                })
 
-    useEffect(() => {
-        // Fetch product details for new items in product-lists
-        const loaded = customerProductLists?.loaded
-        if (loaded) {
-            customerProductLists.data.forEach((list) => {
-                let ids = list.customerProductListItems?.map((item) => item.productId)
-                if (list?._productItemsDetail) {
-                    ids = ids.filter((id) => !list?._productItemsDetail[id])
-                }
+                return
+            }
 
-                customerProductLists.getProductsInList(ids?.toString(), list.id)
-            })
+            if (loaded && customer.isGuest) {
+                // clear customerProductLists when the user logs out
+                customerProductLists.clearProductLists()
+            }
         }
-    }, [customerProductLists.loaded])
+
+        initWishlist()
+    }, [customer.isRegistered, customerProductLists.loaded])
 
     return {customer, basket}
 }

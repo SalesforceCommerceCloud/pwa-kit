@@ -180,7 +180,7 @@ const ProductDetail = ({category, product, isLoading}) => {
                     addToCart={(variant, quantity) => handleAddToCart(variant, quantity)}
                     addToWishlist={(variant, quantity) => addItemToWishlist(quantity)}
                     isProductLoading={isLoading}
-                    isCustomerProductListLoading={customerProductLists.showLoader}
+                    isCustomerProductListLoading={customerProductLists.isLoading}
                 />
 
                 {/* Information Accordion */}

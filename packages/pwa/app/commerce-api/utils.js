@@ -1,7 +1,7 @@
 /* * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * *
  * Copyright (c) 2021 Mobify Research & Development Inc. All rights reserved. *
  * * *  *  * *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  * */
-import {createContext, useContext} from 'react'
+import React, {createContext, useContext, useState} from 'react'
 import jwtDecode from 'jwt-decode'
 import {getAppOrigin} from 'pwa-kit-react-sdk/dist/utils/url'
 import {HTTPError} from 'pwa-kit-react-sdk/dist/ssr/universal/errors'
@@ -63,7 +63,16 @@ export const CustomerContext = createContext()
 export const CustomerProvider = CustomerContext.Provider
 
 export const CustomerProductListsContext = createContext()
-export const CustomerProductListsProvider = CustomerProductListsContext.Provider
+export const CustomerProductListsProvider = ({value, children}) => {
+    // customer's product list is used on many components
+    // we use a initialized state to dedupe network requests
+    const [initialized, setInitialized] = useState(false)
+    return (
+        <CustomerProductListsContext.Provider value={{initialized, setInitialized, ...value}}>
+            {children}
+        </CustomerProductListsContext.Provider>
+    )
+}
 
 // Returns fomrulated body for SopperLogin getToken endpoint
 export function createGetTokenBody(urlString, slasCallbackEndpoint, codeVerifier) {

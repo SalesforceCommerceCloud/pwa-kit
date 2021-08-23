@@ -20,40 +20,29 @@ const AccountWishlist = () => {
     const navigate = useNavigation()
     const {formatMessage} = useIntl()
     const customerProductLists = useCustomerProductLists()
-    const [wishlist, setWishlist] = useState()
+    const wishlist = customerProductLists.getProductListPerType(customerProductListTypes.WISHLIST)
     const [selectedItem, setSelectedItem] = useState(undefined)
+    console.log(wishlist)
 
     const handleActionClicked = (itemId) => {
         setSelectedItem(itemId)
     }
 
-    const handleItemQuantityChanged = (quantity, item) => {
-        const updatedProductList = {
-            ...wishlist,
-            customerProductListItems: wishlist.customerProductListItems.map((product) => {
-                if (product.id === item.id) {
-                    return {
-                        ...product,
-                        quantity: parseInt(quantity)
-                    }
-                }
-                return product
-            })
-        }
-        // TODO: Call product-list API to update item quantity in wishlist.
-        setWishlist(updatedProductList)
+    const handleItemQuantityChanged = () => {
+        console.log('Not implemented')
     }
 
-    useEffect(() => {
-        if (customerProductLists.loaded) {
-            const wishlist = customerProductLists.getProductListPerType(
-                customerProductListTypes.WISHLIST
-            )
+    // useEffect(() => {
+    //     console.log('customerProductLists updated')
+    //     // console.log(customerProductLists)
+    //     // console.log(wishlist)
+    // }, [customerProductLists])
 
-            setWishlist(wishlist)
-        }
-    }, [customerProductLists])
-
+    // useEffect(() => {
+    //     console.log('PAGE fetching wishlist')
+    //     customerProductLists.getCustomerProductLists()
+    // }, [])
+    // console.log(wishlist)
     if (!wishlist) {
         return (
             <Stack spacing={4} data-testid="account-wishlist-page">
