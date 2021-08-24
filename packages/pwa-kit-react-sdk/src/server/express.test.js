@@ -161,7 +161,7 @@ describe('createApp validates the options object', () => {
 
     test('createApp warns on missing favicon', () => {
         const options = opts({
-            buildDir: path.resolve(process.cwd(), 'src/ssr/server/test_fixtures'),
+            buildDir: path.resolve(process.cwd(), 'src/server/test_fixtures'),
             faviconPath: 'nosuchfile.ico'
         })
 

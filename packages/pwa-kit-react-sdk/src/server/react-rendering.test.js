@@ -15,7 +15,7 @@ import {parse} from 'node-html-parser'
 import path from 'path'
 
 const opts = (overrides = {}) => {
-    const fixtures = path.join(__dirname, '..', '..', 'ssr', 'server', 'test_fixtures')
+    const fixtures = path.join(__dirname, '..', '..', 'server', 'test_fixtures')
     const defaults = {
         buildDir: fixtures,
         mobify: {
@@ -37,10 +37,10 @@ const mobile =
 const tablet =
     'Mozilla/5.0 (iPad; CPU OS 6_1 like Mac OS X) AppleWebKit/536.26 (KHTML, like Gecko) Version/6.0 Mobile/10B141 Safari/8536.25'
 
-jest.mock('../universal/routes', () => {
+jest.mock('../react/routes', () => {
     const React = require('react')
     const PropTypes = require('prop-types')
-    const errors = require('../../utils/errors')
+    const errors = require('../utils/errors')
     const {Redirect} = require('react-router-dom')
     const {Helmet} = require('react-helmet')
 

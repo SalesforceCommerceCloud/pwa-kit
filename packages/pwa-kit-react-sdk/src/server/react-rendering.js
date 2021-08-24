@@ -6,7 +6,7 @@
  */
 
 /**
- * @module progressive-web-sdk/ssr/server/react-rendering
+ * @module progressive-web-sdk/server/react-rendering
  */
 
 import path from 'path'
@@ -260,7 +260,7 @@ const renderApp = (args) => {
     // full-stop, whenever possible.
 
     // Each key in `windowGlobals` is expected to be set on the window
-    // object, client-side, by code in ssr/browser/main.jsx.
+    // object, client-side, by code in browser/main.jsx.
     //
     // Do *not* add to these without a very good reason - globals are a liability.
     const windowGlobals = {
