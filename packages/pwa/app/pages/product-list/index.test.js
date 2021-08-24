@@ -201,12 +201,6 @@ test('should display Search Results for when searching ', async () => {
     expect(await screen.findByTestId('sf-product-list-page')).toBeInTheDocument()
 })
 
-test('product tile is rendered', async () => {
-    renderWithProviders(<MockedComponent />)
-    expect(await screen.findByText(/Navy Single Pleat Wool Suit/)).toBeInTheDocument()
-    expect(await screen.findByText(/Charcoal Single Pleat Wool Suit/)).toBeInTheDocument()
-})
-
 test('pagination is rendered', async () => {
     renderWithProviders(<MockedComponent />)
     expect(await screen.findByTestId('sf-pagination')).toBeInTheDocument()
@@ -221,7 +215,7 @@ test('should display Selected refinements as there are some in the response', as
 test('show login modal when an unauthenticated user tries to add an item to wishlist', async () => {
     renderWithProviders(<MockedComponent />)
     const wishlistButton = screen.getAllByLabelText('wishlist')
-    expect(wishlistButton.length).toBe(2)
+    expect(wishlistButton.length).toBe(25)
     user.click(wishlistButton[0])
     expect(await screen.findByText(/Email/)).toBeInTheDocument()
     expect(await screen.findByText(/Password/)).toBeInTheDocument()
