@@ -211,6 +211,7 @@ export const getAssetUrl = (path) => {
  * @returns {Array<ProxyConfig>}
  */
 export const getProxyConfigs = () => {
+    console.log('onClient: ', onClient)
     const configs = onClient
         ? (window.Progressive.ssrOptions || {}).proxyConfigs || []
         : proxyConfigs

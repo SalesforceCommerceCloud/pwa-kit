@@ -15,7 +15,7 @@ import {parse} from 'node-html-parser'
 import path from 'path'
 
 const opts = (overrides = {}) => {
-    const fixtures = path.join(__dirname, '..', '..', 'server', 'test_fixtures')
+    const fixtures = path.join(__dirname, '..', 'server', 'test_fixtures')
     const defaults = {
         buildDir: fixtures,
         mobify: {
