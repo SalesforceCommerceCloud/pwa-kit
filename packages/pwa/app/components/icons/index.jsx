@@ -24,8 +24,13 @@ import '../../assets/svg/chevron-left.svg'
 import '../../assets/svg/chevron-right.svg'
 import '../../assets/svg/chevron-up.svg'
 import '../../assets/svg/filter.svg'
-import '../../assets/svg/flag-can.svg'
-import '../../assets/svg/flag-usa.svg'
+import '../../assets/svg/flag-ca.svg'
+import '../../assets/svg/flag-us.svg'
+import '../../assets/svg/flag-gb.svg'
+import '../../assets/svg/flag-fr.svg'
+import '../../assets/svg/flag-it.svg'
+import '../../assets/svg/flag-cn.svg'
+import '../../assets/svg/flag-jp.svg'
 import '../../assets/svg/hamburger.svg'
 import '../../assets/svg/info.svg'
 import '../../assets/svg/social-facebook.svg'
@@ -108,8 +113,13 @@ export const ChevronUpIcon = icon('chevron-up')
 export const CVVIcon = icon('cc-cvv', {viewBox: CVVSymbol.viewBox})
 export const DiscoverIcon = icon('cc-discover', {viewBox: DiscoverSymbol.viewBox})
 export const FilterIcon = icon('filter')
-export const FlagCanIcon = icon('flag-can')
-export const FlagUsaIcon = icon('flag-usa')
+export const FlagCAIcon = icon('flag-ca')
+export const FlagUSIcon = icon('flag-us')
+export const FlagGBIcon = icon('flag-gb')
+export const FlagFRIcon = icon('flag-fr')
+export const FlagITIcon = icon('flag-it')
+export const FlagCNIcon = icon('flag-cn')
+export const FlagJPIcon = icon('flag-jp')
 export const HamburgerIcon = icon('hamburger')
 export const InfoIcon = icon('info')
 export const LockIcon = icon('lock')

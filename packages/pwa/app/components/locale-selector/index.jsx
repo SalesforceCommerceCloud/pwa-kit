@@ -26,8 +26,11 @@ import {
     CheckIcon,
     ChevronDownIcon,
     ChevronRightIcon,
-    FlagCanIcon,
-    FlagUsaIcon
+    FlagGBIcon,
+    FlagFRIcon,
+    FlagITIcon,
+    FlagCNIcon,
+    FlagJPIcon
 } from '../../components/icons'
 
 import {DEFAULT_LOCALE, localesDefaultMessage} from '../../locale'
@@ -36,11 +39,11 @@ import {useIntl} from 'react-intl'
 // NOTE: If you want to have flags shown next to a selectable locale, update this
 // mapping object with the short code as the key for the desired icon.
 const flags = {
-    'en-GB': <FlagCanIcon />,
-    'fr-FR': <FlagUsaIcon />,
-    'it-IT': <FlagCanIcon />,
-    'zh-CN': <FlagCanIcon />,
-    'ja-JP': <FlagCanIcon />
+    'en-GB': <FlagGBIcon />,
+    'fr-FR': <FlagFRIcon />,
+    'it-IT': <FlagITIcon />,
+    'zh-CN': <FlagCNIcon />,
+    'ja-JP': <FlagJPIcon />
 }
 
 /**

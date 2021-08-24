@@ -53,6 +53,7 @@ import LoadingSpinner from '../loading-spinner'
 
 import useNavigation from '../../hooks/use-navigation'
 import {useLocale, SUPPORTED_LOCALES} from '../../locale'
+import {useHistory, useLocation} from 'react-router-dom'
 
 // The FONT_SIZES and FONT_WEIGHTS constants are used to control the styling for
 // the accordion buttons as their current depth. In the below definition we assign
@@ -84,6 +85,8 @@ const DrawerMenu = ({isOpen, onClose = noop, onLogoClick = noop, root}) => {
     const styles = useMultiStyleConfig('DrawerMenu')
     const drawerSize = useBreakpointValue({sm: PHONE_DRAWER_SIZE, md: TABLET_DRAWER_SIZE})
     const socialIconVariant = useBreakpointValue({base: 'flex', md: 'flex-start'})
+    const history = useHistory()
+    const location = useLocation()
 
     const [showLoading, setShowLoading] = useState(false)
     const onSignoutClick = async () => {
@@ -261,7 +264,13 @@ const DrawerMenu = ({isOpen, onClose = noop, onLogoClick = noop, root}) => {
                                     onSelect={(locale) => {
                                         /* istanbul ignore next */
 
+                                        const newUrl = location.pathname.replace(
+                                            activeLocale,
+                                            locale
+                                        )
+
                                         changeLocale(locale)
+                                        history.push(newUrl)
                                     }}
                                 />
                             </Box>
