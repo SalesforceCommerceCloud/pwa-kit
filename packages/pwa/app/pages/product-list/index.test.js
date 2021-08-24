@@ -14,7 +14,8 @@ import {
     mockProductSearch,
     mockCategories
 } from '../../commerce-api/mock-data'
-import {screen} from '@testing-library/react'
+import {screen, waitFor} from '@testing-library/react'
+import user from '@testing-library/user-event'
 import {Route, Switch} from 'react-router-dom'
 import {renderWithProviders} from '../../utils/test-utils'
 import ProductList from '.'
@@ -144,8 +145,7 @@ test('should render product list page', async () => {
 
 test('should render sort option list page', async () => {
     renderWithProviders(<MockedComponent />)
-    const countOfSortComponents = await screen.findAllByText('Sort by')
-    expect(countOfSortComponents.length).toEqual(2)
+    expect(await screen.findByTestId('sf-product-list-sort')).toBeInTheDocument()
 })
 
 test('should render skeleton', async () => {
@@ -156,6 +156,23 @@ test('should render skeleton', async () => {
 test('should render empty list page', async () => {
     renderWithProviders(<MockedEmptyPage />)
     expect(await screen.findByTestId('sf-product-empty-list-page')).toBeInTheDocument()
+})
+
+test('clicking a filter will change url', async () => {
+    renderWithProviders(<MockedComponent />)
+    user.click(screen.getByText(/Beige/i))
+    await waitFor(() =>
+        expect(window.location.search).toEqual(
+            '?limit=25&offset=0&refine=c_refinementColor%3DBeige&sort=best-matches'
+        )
+    )
+})
+
+test('clicking a filter will change url', async () => {
+    renderWithProviders(<MockedComponent />)
+    const clearAllButton = screen.queryAllByText(/Clear All/i)
+    user.click(clearAllButton[0])
+    await waitFor(() => expect(window.location.search).toEqual(''))
 })
 
 test('should display Search Results for when searching ', async () => {
@@ -172,4 +189,10 @@ test('should display Search Results for when searching ', async () => {
 test('pagination is rendered', async () => {
     renderWithProviders(<MockedComponent />)
     expect(await screen.findByTestId('sf-pagination')).toBeInTheDocument()
+})
+
+test('should display Selected refinements as there are some in the response', async () => {
+    renderWithProviders(<MockedComponent />)
+    const countOfRefinements = await screen.findAllByText('Black')
+    expect(countOfRefinements.length).toEqual(2)
 })

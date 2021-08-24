@@ -161,6 +161,20 @@
       "value": "Please enter your first name"
     }
   ],
+  "3cfRtZ": [
+    {
+      "type": 0,
+      "value": "View "
+    },
+    {
+      "type": 1,
+      "value": "prroductCount"
+    },
+    {
+      "type": 0,
+      "value": " items"
+    }
+  ],
   "3gXwAV": [
     {
       "type": 0,
@@ -243,6 +257,12 @@
       "value": "Delivery Details"
     }
   ],
+  "8d6kio": [
+    {
+      "type": 0,
+      "value": "Sort By"
+    }
+  ],
   "8iXlvA": [
     {
       "type": 0,
@@ -271,6 +291,12 @@
     {
       "type": 0,
       "value": "Enter your email to receive instructions on how to reset your password"
+    }
+  ],
+  "9Obw6C": [
+    {
+      "type": 0,
+      "value": "Filter"
     }
   ],
   "9rqdrm": [
@@ -579,6 +605,12 @@
       "value": "View details"
     }
   ],
+  "MsGXc3": [
+    {
+      "type": 0,
+      "value": "Clear Filters"
+    }
+  ],
   "Mv2pEb": [
     {
       "type": 0,
@@ -753,6 +785,16 @@
     {
       "type": 0,
       "value": "New Arrivals"
+    }
+  ],
+  "RlxeOk": [
+    {
+      "type": 0,
+      "value": "Sort By: "
+    },
+    {
+      "type": 1,
+      "value": "sortOption"
     }
   ],
   "SQJto2": [
@@ -1057,6 +1099,12 @@
       "value": "Add New Card"
     }
   ],
+  "cqlObT": [
+    {
+      "type": 0,
+      "value": "Clear All"
+    }
+  ],
   "dUxyza": [
     {
       "type": 0,
@@ -1255,12 +1303,6 @@
     {
       "type": 0,
       "value": "Please enter your name as shown on your card"
-    }
-  ],
-  "hDI+JM": [
-    {
-      "type": 0,
-      "value": "Sort by"
     }
   ],
   "header.button.assistive_msg.logo": [
