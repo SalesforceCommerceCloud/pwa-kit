@@ -149,11 +149,10 @@ const ProductList = (props) => {
                 status: 'success',
                 id: product.productId
             })
-        } catch (err) {
-            showError()
-        } finally {
             // remove the loading id
             setWishlistLoading(wishlistLoading.filter((id) => id !== product.productId))
+        } catch (err) {
+            showError()
         }
     }
 
@@ -190,7 +189,6 @@ const ProductList = (props) => {
 
                 customerProductLists.addActionToEventQueue(event)
             } else {
-                console.log('product', product)
                 const quantity = 1
                 const wishlist = customerProductLists.getProductListPerType(
                     customerProductListTypes.WISHLIST
@@ -203,11 +201,10 @@ const ProductList = (props) => {
                     type: 'product'
                 })
                 showWishlistItemAdded(quantity)
+                setWishlistLoading(wishlistLoading.filter((id) => id !== product.productId))
             }
         } catch (err) {
             showError()
-        } finally {
-            setWishlistLoading(wishlistLoading.filter((id) => id !== product.productId))
         }
     }
 
