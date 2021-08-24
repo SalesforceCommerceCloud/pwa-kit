@@ -14,12 +14,14 @@
   },
   "files": [
     "bin",
-    "LICENSE",
+    "browser",
+    "react",
     "scripts",
-    "ssr",
-    "TERMS_OF_USE.md",
+    "server",
     "utils",
-    "webpack"
+    "webpack",
+    "LICENSE",
+    "TERMS_OF_USE.md"
   ],
   "publishConfig": {
     "directory": "dist"
