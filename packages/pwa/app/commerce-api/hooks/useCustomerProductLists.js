@@ -10,13 +10,12 @@ import {noop} from '../../utils/utils'
 
 import useCustomer from './useCustomer'
 import Queue from '../../utils/queue'
-import {customerProductListTypes} from '../../constants'
 
 // A event queue for the following use cases:
 // 1. Allow user to add item to wishlist before wishlist is initialized
 // 2. Allow user to add item to wishlist before logging in
 // e.g. user clicks add to wishlist, push event to the queue, show login
-// modal, pop the event after successfuly logged in
+// modal, pop the event after successfully logged in
 export class CustomerProductListEventQueue extends Queue {
     static eventTypes = {
         ADD: 'add',
