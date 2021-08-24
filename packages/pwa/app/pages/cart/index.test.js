@@ -197,9 +197,8 @@ test('Can update item quantity from product view modal', async () => {
     expect(within(cartItem).getByRole('combobox')).toHaveValue('2')
     const editCartButton = within(cartItem).getByRole('button', {name: 'Edit'})
     userEvent.click(editCartButton)
-    const productView = await screen.findByTestId('product-view')
+    const productView = screen.getByTestId('product-view')
     expect(productView).toBeInTheDocument()
-
     // update item quantity
     userEvent.selectOptions(within(productView).getByRole('combobox'), ['3'])
     userEvent.click(within(productView).getAllByText(/Update/)[0])
