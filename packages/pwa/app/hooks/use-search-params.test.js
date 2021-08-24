@@ -67,7 +67,7 @@ describe('The useSearchParams', () => {
 
         const stringifiedObject = stringify(objectToStringify)
         expect(stringifiedObject).toEqual(
-            'limit=25&offset=0&refine=c_refinementColor%3DBlack%7CPurple&sort=best-matches'
+            'limit=25&offset=0&refine=c_refinementColor%3DBlack%26c_refinementColor%3DPurple&sort=best-matches'
         )
     })
 
@@ -80,7 +80,7 @@ describe('The useSearchParams', () => {
             {
                 limit: '25',
                 offset: '0',
-                refine: {c_refinementColor: ['Black', 'Purple']},
+                refine: {c_refinementColor: 'Black|Purple'},
                 sort: 'best-matches'
             } // eslint-disable-line
         )

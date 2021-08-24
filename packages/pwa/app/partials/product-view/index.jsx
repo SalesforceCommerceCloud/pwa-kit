@@ -187,7 +187,7 @@ const ProductView = ({
     }, [location.pathname])
 
     return (
-        <Flex direction={'column'}>
+        <Flex direction={'column'} data-testid="product-view">
             {/* Basic information etc. title, price, breadcrumb*/}
             <Box display={['block', 'block', 'block', 'none']}>
                 <ProductViewHeader

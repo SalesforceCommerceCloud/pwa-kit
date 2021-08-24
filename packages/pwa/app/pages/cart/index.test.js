@@ -69,6 +69,22 @@ jest.mock('commerce-sdk-isomorphic', () => {
             async getProducts() {
                 return {data: [mockVariant]}
             }
+            async getProduct() {
+                return {
+                    ...mockVariant,
+                    id: '750518699660M',
+                    variationValues: {
+                        color: 'BLACKFB',
+                        size: '050',
+                        width: 'V'
+                    },
+                    c_color: 'BLACKFB',
+                    c_isNew: true,
+                    c_refinementColor: 'black',
+                    c_size: '050',
+                    c_width: 'V'
+                }
+            }
         },
         ShopperPromotions: class ShopperPromotionsMock extends sdk.ShopperPromotions {
             async getPromotions() {
@@ -131,7 +147,7 @@ test('Applies default shipping method to basket and renders estimated pricing', 
     expect(within(summary).getByText(/\$30.00/i)).toBeInTheDocument()
 })
 
-test('Can update item in the cart', async () => {
+test('Can update item quantity in the cart', async () => {
     renderWithProviders(<WrappedCart />)
     expect(await screen.findByTestId('sf-cart-container')).toBeInTheDocument()
     expect(screen.getByText(/Black Single Pleat Athletic Fit Wool Suit/i)).toBeInTheDocument()
@@ -154,6 +170,39 @@ test('Can update item in the cart', async () => {
 
     // update item quantity
     userEvent.selectOptions(within(cartItem).getByRole('combobox'), ['3'])
+
+    await waitForElementToBeRemoved(() => screen.getByText(/loading\.\.\./i))
+    expect(await within(cartItem).getByRole('combobox')).toHaveValue('3')
+})
+
+test('Can update item quantity from product view modal', async () => {
+    renderWithProviders(<WrappedCart />)
+    expect(await screen.findByTestId('sf-cart-container')).toBeInTheDocument()
+    expect(screen.getByText(/Black Single Pleat Athletic Fit Wool Suit/i)).toBeInTheDocument()
+
+    mockedBasketResponse = {
+        ...mockedBasketResponse,
+        productItems: [
+            {
+                ...mockedBasketResponse.productItems[0],
+                quantity: 3,
+                id: mockedBasketResponse.productItems[0].item_id
+            }
+        ]
+    }
+
+    const cartItem = await screen.findByTestId(
+        `sf-cart-item-${mockedBasketResponse.productItems[0].productId}`
+    )
+    expect(within(cartItem).getByRole('combobox')).toHaveValue('2')
+    const editCartButton = within(cartItem).getByRole('button', {name: 'Edit'})
+    userEvent.click(editCartButton)
+    const productView = await screen.findByTestId('product-view')
+    expect(productView).toBeInTheDocument()
+
+    // update item quantity
+    userEvent.selectOptions(within(productView).getByRole('combobox'), ['3'])
+    userEvent.click(within(productView).getAllByText(/Update/)[0])
 
     await waitForElementToBeRemoved(() => screen.getByText(/loading\.\.\./i))
     expect(await within(cartItem).getByRole('combobox')).toHaveValue('3')
