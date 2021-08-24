@@ -77,7 +77,12 @@ describe('The useSearchParams', () => {
 
         const parsedString = parse(stringToParse)
         expect(parsedString).toEqual(
-            {"limit": "25", "offset": "0", "refine": {"c_refinementColor": ["Black", "Purple"]}, "sort": "best-matches"}  // eslint-disable-line 
+            {
+                limit: '25',
+                offset: '0',
+                refine: {c_refinementColor: ['Black', 'Purple']},
+                sort: 'best-matches'
+            } // eslint-disable-line
         )
     })
 })

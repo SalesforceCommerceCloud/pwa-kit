@@ -197,7 +197,6 @@ const Cart = () => {
         } catch (error) {
             showError(error)
         } finally {
-            // close the modal
             setCartItemLoading(false)
             setSelectedItem(undefined)
         }

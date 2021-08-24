@@ -105,6 +105,12 @@
       "value": "Log in here"
     }
   ],
+  "2WOdRo": [
+    {
+      "type": 0,
+      "value": "wishlist"
+    }
+  ],
   "2WRHXI": [
     {
       "type": 1,
@@ -237,6 +243,12 @@
     {
       "type": 0,
       "value": "Please enter a valid date"
+    }
+  ],
+  "6yVHs9": [
+    {
+      "type": 0,
+      "value": "wishlist-solid"
     }
   ],
   "7PMLfK": [
@@ -1533,6 +1545,12 @@
     {
       "type": 0,
       "value": "1 lowercase letter"
+    }
+  ],
+  "nEwlut": [
+    {
+      "type": 0,
+      "value": "Remove Item?"
     }
   ],
   "nFQbxh": [

@@ -5,7 +5,9 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import {useContext, useMemo, useEffect, useState} from 'react'
-import {isError, useCommerceAPI, CustomerProductListsContext, noop} from '../utils'
+import {isError, useCommerceAPI, CustomerProductListsContext} from '../utils'
+import {noop} from '../../utils/utils'
+
 import useCustomer from './useCustomer'
 import Queue from '../../utils/queue'
 
@@ -13,7 +15,7 @@ import Queue from '../../utils/queue'
 // 1. Allow user to add item to wishlist before wishlist is initialized
 // 2. Allow user to add item to wishlist before logging in
 // e.g. user clicks add to wishlist, push event to the queue, show login
-// modal, pop the event after successfuly logged in
+// modal, pop the event after successfully logged in
 export class CustomerProductListEventQueue extends Queue {
     static eventTypes = {
         ADD: 'add',
@@ -35,12 +37,28 @@ export default function useCustomerProductLists({eventHandler = noop, errorHandl
             switch (action) {
                 case CustomerProductListEventQueue.eventTypes.ADD: {
                     try {
-                        const productItem = {
-                            productId: item.id,
-                            quantity: item.quantity
+                        const productList = self.getProductListPerType(listType)
+                        const productListItem = productList.customerProductListItems.find(
+                            ({productId}) => productId === event.item.id
+                        )
+                        // if the item is already in the wishlist
+                        // only update the quantity
+                        if (productListItem) {
+                            await self.updateCustomerProductListItem(productList, {
+                                ...productListItem,
+                                quantity: event.item.quantity + productListItem.quantity
+                            })
+                            eventHandler(event)
+                        } else {
+                            await self.createCustomerProductListItem(productList, {
+                                productId: event.item.id,
+                                priority: 1,
+                                quantity: parseInt(event.item.quantity),
+                                public: false,
+                                type: 'product'
+                            })
+                            eventHandler(event)
                         }
-                        await addItemToCustomerProductList(productItem, list?.id, listType)
-                        eventHandler(event)
                     } catch (error) {
                         errorHandler(error)
                     }
@@ -58,21 +76,6 @@ export default function useCustomerProductLists({eventHandler = noop, errorHandl
             }
         })
     }, [customerProductLists])
-
-    const addItemToCustomerProductList = async (item, listId, listType) => {
-        // Either find the list by the id or by the type
-        const productList = listId
-            ? customerProductLists.data.find((list) => list.id === listId)
-            : customerProductLists.data.find((list) => list.type === listType)
-
-        return await self.createCustomerProductListItem(productList, {
-            productId: item.productId,
-            priority: 1,
-            quantity: item.quantity,
-            public: false,
-            type: 'product'
-        })
-    }
 
     const self = useMemo(() => {
         return {
@@ -96,6 +99,7 @@ export default function useCustomerProductLists({eventHandler = noop, errorHandl
 
             /**
              * Fetches product lists for registered users or creates a new list if none exist
+             * due to the api limitation, we can not get the list based on type but all lists
              * @param {string} type type of list to fetch or create
              * @returns product lists for registered users
              */
@@ -199,7 +203,6 @@ export default function useCustomerProductLists({eventHandler = noop, errorHandl
             /**
              * Adds an item to the customer's product list.
              * @param {object} list
-             * @param {string} list.id id of the list to add the item to.
              * @param {Object} item item to be added to the list.
              */
             async createCustomerProductListItem(list, item) {

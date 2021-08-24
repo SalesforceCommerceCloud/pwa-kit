@@ -41,6 +41,9 @@
   "2SvpuI": {
     "defaultMessage": "Log in here"
   },
+  "2WOdRo": {
+    "defaultMessage": "wishlist"
+  },
   "2WRHXI": {
     "defaultMessage": "{quantity} {quantity, plural, one {item} other {items}} added to cart"
   },
@@ -85,6 +88,9 @@
   },
   "6DCLcI": {
     "defaultMessage": "Please enter a valid date"
+  },
+  "6yVHs9": {
+    "defaultMessage": "wishlist-solid"
   },
   "7PMLfK": {
     "defaultMessage": "Order Total"
@@ -664,6 +670,9 @@
   "nA8PRt": {
     "defaultMessage": "1 lowercase letter",
     "description": "Password requirement"
+  },
+  "nEwlut": {
+    "defaultMessage": "Remove Item?"
   },
   "nFQbxh": {
     "defaultMessage": "Payment Method"
