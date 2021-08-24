@@ -76,10 +76,10 @@ const WrappedCheckout = () => {
     useShopper()
     return (
         <Switch>
-            <Route exact path="/en/checkout">
+            <Route exact path="/en-GB/checkout">
                 <Checkout />
             </Route>
-            <Route exact path="/en/checkout/confirmation">
+            <Route exact path="/en-GB/checkout/confirmation">
                 <div>success</div>
             </Route>
         </Switch>
@@ -290,7 +290,7 @@ test('Can proceed through checkout steps as guest', async () => {
     )
 
     // Set the initial browser router path and render our component tree.
-    window.history.pushState({}, 'Checkout', '/en/checkout')
+    window.history.pushState({}, 'Checkout', '/en-GB/checkout')
     renderWithProviders(<WrappedCheckout history={history} />)
 
     // Wait for checkout to load and display first step
@@ -524,7 +524,7 @@ test('Can proceed through checkout as registered customer', async () => {
     )
 
     // Set the initial browser router path and render our component tree.
-    window.history.pushState({}, 'Checkout', '/en/checkout')
+    window.history.pushState({}, 'Checkout', '/en-GB/checkout')
     renderWithProviders(<WrappedCheckout history={history} />)
 
     // Wait for checkout to load and display first step
@@ -603,7 +603,7 @@ test('Can proceed through checkout as registered customer', async () => {
     user.click(placeOrderBtn)
 
     await waitFor(() => {
-        expect(window.location.pathname).toEqual('/en/checkout/confirmation')
+        expect(window.location.pathname).toEqual('/en-GB/checkout/confirmation')
     })
 })
 
@@ -677,7 +677,7 @@ test('Can edit address during checkout as a registered customer', async () => {
     )
 
     // Set the initial browser router path and render our component tree.
-    window.history.pushState({}, 'Checkout', '/en/checkout')
+    window.history.pushState({}, 'Checkout', '/en-GB/checkout')
     renderWithProviders(<WrappedCheckout history={history} />)
 
     // Wait for checkout to load and display first step
@@ -800,7 +800,7 @@ test('Can add address during checkout as a registered customer', async () => {
     )
 
     // Set the initial browser router path and render our component tree.
-    window.history.pushState({}, 'Checkout', '/en/checkout')
+    window.history.pushState({}, 'Checkout', '/en-GB/checkout')
     renderWithProviders(<WrappedCheckout history={history} />)
 
     // Wait for checkout to load and display first step

@@ -71,11 +71,11 @@ describe('url builder test', () => {
     test('productUrlBuilder returns expect', () => {
         const url = productUrlBuilder({id: 'productId'})
 
-        expect(url).toEqual('/en/product/productId')
+        expect(url).toEqual('/en-GB/product/productId')
     })
 
     test('categoryUrlBuilder returns expect', () => {
         const url = categoryUrlBuilder({id: 'men'})
-        expect(url).toEqual(`/en/category/men`)
+        expect(url).toEqual(`/en-GB/category/men`)
     })
 })

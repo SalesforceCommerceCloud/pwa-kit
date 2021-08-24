@@ -38,11 +38,11 @@ const MockedComponent = ({history}) => {
     const onAccountClick = () => {
         // Link to account page for registered customer, open auth modal otherwise
         if (customer?.authType === 'registered') {
-            history.push('/en/account')
+            history.push('/en-GB/account')
         }
     }
     const onWishlistClick = () => {
-        history.push('/en/account/wishlist')
+        history.push('/en-GB/account/wishlist')
     }
 
     return (
@@ -108,7 +108,7 @@ beforeEach(() => {
 
     // Since we're testing some navigation logic, we are using a simple Router
     // around our component. We need to initialize the default route/path here.
-    window.history.pushState({}, 'Account', '/en/account')
+    window.history.pushState({}, 'Account', '/en-GB/account')
 })
 afterEach(() => {
     localStorage.clear()
@@ -228,12 +228,12 @@ test('route to account page when an authenticated users click on account icon', 
     const accountIcon = document.querySelector('svg[aria-label="My account"]')
     fireEvent.click(accountIcon)
     await waitFor(() => {
-        expect(history.push).toHaveBeenCalledWith('/en/account')
+        expect(history.push).toHaveBeenCalledWith('/en-GB/account')
     })
 
     fireEvent.keyDown(accountIcon, {key: 'Enter', code: 'Enter'})
     await waitFor(() => {
-        expect(history.push).toHaveBeenCalledWith('/en/account')
+        expect(history.push).toHaveBeenCalledWith('/en-GB/account')
     })
 })
 
@@ -279,7 +279,7 @@ test('route to wishlist page when an authenticated users click on wishlist icon'
     const wishlistIcon = document.querySelector('button[aria-label="Wishlist"]')
     fireEvent.click(wishlistIcon)
     await waitFor(() => {
-        expect(history.push).toHaveBeenCalledWith('/en/account/wishlist')
+        expect(history.push).toHaveBeenCalledWith('/en-GB/account/wishlist')
     })
 })
 

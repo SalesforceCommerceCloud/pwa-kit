@@ -17,6 +17,7 @@ import Section from '../../components/section'
 import BasicTile from '../../components/basic-tile'
 import {categories} from './data'
 import RecommendedProducts from '../../components/recommended-products'
+import {useLocale, getLocaleConfig} from '../../locale'
 
 /**
  * This is the home page for Retail React App.
@@ -24,8 +25,11 @@ import RecommendedProducts from '../../components/recommended-products'
  * The page renders SEO metadata and a few promotion
  * categories and products, data is from local file.
  */
-const Home = () => {
+const Home = ({categories: allCategories = {}}) => {
     const intl = useIntl()
+
+    const [activeLocale] = useLocale()
+    console.log('activeLocale:',activeLocale)
 
     return (
         <Box data-testid="home-page" layerStyle="page">
@@ -48,7 +52,7 @@ const Home = () => {
                 actions={
                     <Button
                         as={Link}
-                        to="/en/category/newarrivals"
+                        to={`/${activeLocale}/category/newarrivals`}
                         width={{base: 'full', md: 'inherit'}}
                     >
                         <FormattedMessage defaultMessage="Shop New Arrivals" />
@@ -71,19 +75,19 @@ const Home = () => {
                     rowGap={8}
                 >
                     <GridItem rowSpan={1} colSpan={{base: 1, md: 2}}>
-                        <BasicTile {...categories[0]} />
+                        <BasicTile {...categories(activeLocale)[0]} />
                     </GridItem>
                     <GridItem rowSpan={1} colSpan={{base: 1, md: 2}}>
-                        <BasicTile {...categories[1]} />
+                        <BasicTile {...categories(activeLocale)[1]} />
                     </GridItem>
                     <GridItem rowSpan={1} colSpan={{base: 1, md: 2}}>
-                        <BasicTile {...categories[2]} />
+                        <BasicTile {...categories(activeLocale)[2]} />
                     </GridItem>
                     <GridItem rowSpan={1} colSpan={{base: 1, md: 3}}>
-                        <BasicTile {...categories[3]} />
+                        <BasicTile {...categories(activeLocale)[3]} />
                     </GridItem>
                     <GridItem rowSpan={1} colSpan={{base: 1, md: 3}}>
-                        <BasicTile {...categories[4]} />
+                        <BasicTile {...categories(activeLocale)[4]} />
                     </GridItem>
                 </Grid>
             </Section>
@@ -111,6 +115,28 @@ Home.propTypes = {
     isLoading: PropTypes.bool
 }
 
-Home.getProps = async () => {}
+Home.shouldGetProps = ({previousLocation, location}) => {
+    return previousLocation?.pathname !== location.pathname
+}
+
+Home.getProps = async ({params, location, api}) => {
+    const localeConfig = await getLocaleConfig({
+        getUserPreferredLocales: () => {
+            // TODO: You can detect their preferred locales from:
+            // - client side: window.navigator.languages
+            // - the page URL they're on (example.com/en-GB/home)
+            // - cookie (if their previous preference is saved there)
+            // And decide which one takes precedence.
+            const localeInPageUrl = params.locale
+            return localeInPageUrl ? [localeInPageUrl] : []
+
+            // If in this function an empty array is returned (e.g. there isn't locale in the page url),
+            // then the app would use the default locale as the fallback.
+        }
+    })
+
+    // Set the target local.
+    api.setLocale(localeConfig.app.targetLocale)
+}
 
 export default Home

@@ -30,7 +30,7 @@ MockComponent.propTypes = {
 describe('Image Gallery Component', () => {
     test('renders component with all images', () => {
         const history = createMemoryHistory()
-        history.push('/en/image-gallery')
+        history.push('/en-GB/image-gallery')
 
         renderWithProviders(<MockComponent imageGroups={data} selectedVariationAttributes={{}} />)
         expect(screen.getAllByAltText(/Ruffle Front V-Neck Cardigan/).length).toEqual(3)
@@ -43,7 +43,7 @@ describe('Image Gallery Component', () => {
 
     test('can select thumbnail image with enter keyboard', async () => {
         const history = createMemoryHistory()
-        history.push('/en/image-gallery')
+        history.push('/en-GB/image-gallery')
 
         renderWithProviders(
             <MockComponent imageGroups={data} selectedVariationAttributes={{}} history={history} />

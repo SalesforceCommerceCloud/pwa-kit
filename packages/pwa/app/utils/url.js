@@ -17,12 +17,12 @@ import {DEFAULT_LOCALE} from '../locale'
  * import {rebuildPathWithParams} from '/path/to/utils/url'
  *
  * rebuildPathWithParams(
- *     '/en/product/25501032M',
+ *     '/en-GB/product/25501032M',
  *     {color: 'JJ2SKXX', size: 'MD'}
  * )
  *
  * // Returns
- * // '/en/product/25501032M?color=JJ2SKXX&size=9MD'
+ * // '/en-GB/product/25501032M?color=JJ2SKXX&size=9MD'
  */
 export const rebuildPathWithParams = (url, extraParams) => {
     const [pathname, search] = url.split('?')
@@ -111,11 +111,11 @@ export const searchUrlBuilder = (searchTerm) => `/search?q=${searchTerm}`
  * import {removeQueryParamsFromPath} from /path/to/util/url
  *
  * removeQueryParamsFromPath(
- *   /en/cart?pid=1234&color=black&size=s&abc=12,
+ *   /en-GB/cart?pid=1234&color=black&size=s&abc=12,
  *   ['pid', 'color', 'size']
  * )
  * // returns
- * // '/en/cart?abc=12'
+ * // '/en-GB/cart?abc=12'
  */
 export const removeQueryParamsFromPath = (path, keys) => {
     const [pathname, search] = path.split('?')

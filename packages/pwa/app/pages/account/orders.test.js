@@ -42,7 +42,7 @@ const MockedComponent = () => {
 
     return (
         <Switch>
-            <Route path="/en/orders">
+            <Route path="/en-GB/orders">
                 <Orders />
             </Route>
         </Switch>
@@ -103,7 +103,7 @@ beforeEach(() => {
         global.TextEncoder = require('util').TextEncoder
     }
 
-    window.history.pushState({}, 'Account', '/en/orders')
+    window.history.pushState({}, 'Account', '/en-GB/orders')
 })
 afterEach(() => {
     localStorage.clear()

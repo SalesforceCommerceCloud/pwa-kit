@@ -40,7 +40,7 @@ const MockedComponent = () => {
 
     return (
         <Switch>
-            <Route path="/en/account" render={(props) => <Account {...props} />} />
+            <Route path="/en-GB/account" render={(props) => <Account {...props} />} />
         </Switch>
     )
 }
@@ -97,7 +97,7 @@ beforeEach(() => {
 
     // Since we're testing some navigation logic, we are using a simple Router
     // around our component. We need to initialize the default route/path here.
-    window.history.pushState({}, 'Account', '/en/account')
+    window.history.pushState({}, 'Account', '/en-GB/account')
 })
 afterEach(() => {
     localStorage.clear()
@@ -112,7 +112,7 @@ test('Redirects to login page if the customer is not logged in', async () => {
         })
     )
     renderWithProviders(<MockedComponent />)
-    await waitFor(() => expect(window.location.pathname).toEqual('/en/login'))
+    await waitFor(() => expect(window.location.pathname).toEqual('/en-GB/login'))
 })
 
 test('Provides navigation for subpages', async () => {

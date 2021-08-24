@@ -113,7 +113,20 @@ const App = (props) => {
 
     return (
         <Box className="sf-app" {...styles.container}>
-            <IntlProvider locale={targetLocale} defaultLocale={defaultLocale} messages={messages}>
+            <IntlProvider
+                onError={(err) => {
+                    if (err.code === 'MISSING_TRANSLATION') {
+                        // Remove the console error for missing translations during development,
+                        // as we knew translations would be added later.
+                        // console.warn('Missing translation', err.message)
+                        return
+                    }
+                    throw err
+                }}
+                locale={targetLocale}
+                defaultLocale={defaultLocale}
+                messages={messages}
+            >
                 <CategoriesContext.Provider value={{categories, setCategories}}>
                     <Seo>
                         <meta name="theme-color" content="#0288a7" />
@@ -208,7 +221,7 @@ App.getProps = async ({api, params, location}) => {
             // TODO: Extract the `locale` in a better way (first pathname in the URL)
             let part = location.pathname.match(/^\/([a-z]{2}-[A-Z]{2})\//)
 
-            const localeInPageUrl = params.locale ? params.locale : part[1]
+            const localeInPageUrl = params.locale ? params.locale : part?.length > 0 && part[1]
             return localeInPageUrl ? [localeInPageUrl] : []
 
             // If in this function an empty array is returned (e.g. there isn't locale in the page url),
