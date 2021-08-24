@@ -8,9 +8,9 @@
 /* eslint-env jest */
 /* eslint max-nested-callbacks:0 */
 
-import {PersistentCache} from '../../utils/ssr-cache'
-import {CachedResponse} from '../../utils/ssr-server'
-import {X_PROXY_REQUEST_URL, X_MOBIFY_REQUEST_CLASS} from '../../utils/ssr-proxying'
+import {PersistentCache} from '../utils/ssr-cache'
+import {CachedResponse} from '../utils/ssr-server'
+import {X_PROXY_REQUEST_URL, X_MOBIFY_REQUEST_CLASS} from '../utils/ssr-proxying'
 import {X_MOBIFY_QUERYSTRING} from './constants'
 
 // Mock static assets (require path is relative to the 'ssr' directory)
@@ -36,7 +36,7 @@ const {
     once,
     serveStaticFile
 } = require('./express')
-const {getHashForString} = require('../../utils/ssr-server')
+const {getHashForString} = require('../utils/ssr-server')
 const fetch = require('node-fetch')
 const fs = require('fs')
 const https = require('https')
@@ -50,7 +50,7 @@ const request = require('supertest')
 const superagent = require('superagent')
 
 const TEST_PORT = 3444
-const testFixtures = path.resolve(process.cwd(), 'src/ssr/server/test_fixtures')
+const testFixtures = path.resolve(process.cwd(), 'src/server/test_fixtures')
 
 /**
  * An HTTPS.Agent that allows self-signed certificates
@@ -62,7 +62,7 @@ export const httpsAgent = new https.Agent({
 
 const opts = (overrides = {}) => {
     const defaults = {
-        buildDir: './src/ssr/server/test_fixtures',
+        buildDir: './src/server/test_fixtures',
         mobify: {
             ssrEnabled: true,
             ssrOnly: ['main.js.map', 'ssr.js', 'ssr.js.map'],
@@ -89,7 +89,7 @@ const opts = (overrides = {}) => {
                 ]
             }
         },
-        sslFilePath: './src/ssr/server/test_fixtures/localhost.pem',
+        sslFilePath: './src/server/test_fixtures/localhost.pem',
         quiet: true,
         port: TEST_PORT,
         protocol: 'https',

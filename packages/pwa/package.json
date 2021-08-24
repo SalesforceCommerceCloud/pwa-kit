@@ -153,7 +153,7 @@
         "format": "prettier --write \"**/*.{js,jsx}\"",
         "lint": "eslint \"**/*.{js,jsx}\"",
         "lint:fix": "npm run lint -- --fix",
-        "prod:build": "npm run extract-messages && npm run compile-messages && cross-env NODE_ENV=production sdk-pwa-build",
+        "prod:build": "cross-env NODE_ENV=production sdk-pwa-build",
         "push": "cross-env NODE_ENV=production npm run prod:build && sdk-upload",
         "save-credentials": "sdk-save-credentials",
         "start": "cross-env NODE_ICU_DATA=node_modules/full-icu node ./scripts/start ssr",

@@ -8,11 +8,11 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import {BrowserRouter as Router} from 'react-router-dom'
-import DeviceContext from '../universal/device-context'
-import App from '../universal/components/_app'
-import AppConfig from '../universal/components/_app-config'
-import Switch from '../universal/components/switch'
-import {getRoutes, routeComponent} from '../universal/components/route-component'
+import DeviceContext from '../react/context/device'
+import App from '../react/components/_app'
+import AppConfig from '../react/components/_app-config'
+import Switch from '../react/components/switch'
+import {getRoutes, routeComponent} from '../react/components/route-component'
 import {loadableReady} from '@loadable/component'
 
 /* istanbul ignore next */

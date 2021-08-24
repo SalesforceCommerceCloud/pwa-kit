@@ -7,7 +7,7 @@
 import {createContext, useContext} from 'react'
 import jwtDecode from 'jwt-decode'
 import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
-import {HTTPError} from 'pwa-kit-react-sdk/ssr/universal/errors'
+import {HTTPError} from 'pwa-kit-react-sdk/utils/errors'
 
 /**
  * Compares the token age against the issued and expiry times. If the token's age is

@@ -6,7 +6,7 @@
  */
 
 import React from 'react'
-import * as errors from '../../errors'
+import * as errors from '../../../utils/errors'
 
 /**
  * This is designed to be put into a react-router config as a fallback

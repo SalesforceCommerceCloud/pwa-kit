@@ -8,7 +8,7 @@
 import React from 'react'
 import {mount} from 'enzyme'
 import {AppErrorBoundaryWithoutRouter as AppErrorBoundary} from './index'
-import * as errors from '../../errors'
+import * as errors from '../../../utils/errors'
 
 describe('AppErrorBoundary', () => {
     const cases = [

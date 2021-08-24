@@ -6,7 +6,7 @@
  */
 
 /**
- * @module progressive-web-sdk/ssr/universal/components/_document
+ * @module progressive-web-sdk/react/components/_document
  */
 
 import React from 'react'

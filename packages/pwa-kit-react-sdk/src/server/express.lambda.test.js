@@ -22,7 +22,7 @@ const https = require('https')
 const path = require('path')
 const zlib = require('zlib')
 
-const {X_HEADERS_TO_REMOVE} = require('../../utils/ssr-proxying')
+const {X_HEADERS_TO_REMOVE} = require('../utils/ssr-proxying')
 
 const TEST_PORT = 3446
 
@@ -41,7 +41,7 @@ const testPackageMobify = {
     }
 }
 
-const testFixtures = path.resolve(process.cwd(), 'src/ssr/server/test_fixtures')
+const testFixtures = path.resolve(process.cwd(), 'src/server/test_fixtures')
 
 /**
  * An HTTPS.Agent that allows self-signed certificates

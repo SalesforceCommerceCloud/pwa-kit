@@ -17,7 +17,7 @@ import {
     PROXY_PATH_PREFIX,
     X_ORIGINAL_CONTENT_TYPE,
     X_MOBIFY_FROM_CACHE
-} from '../ssr/server/constants'
+} from '../server/constants'
 import {proxyConfigs} from './ssr-shared'
 import {rewriteProxyRequestHeaders, rewriteProxyResponseHeaders} from './ssr-proxying'
 

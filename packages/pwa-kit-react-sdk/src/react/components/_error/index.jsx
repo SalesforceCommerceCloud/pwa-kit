@@ -6,7 +6,7 @@
  */
 
 /**
- * @module progressive-web-sdk/ssr/universal/components/_error
+ * @module progressive-web-sdk/react/components/_error
  */
 
 import React from 'react'

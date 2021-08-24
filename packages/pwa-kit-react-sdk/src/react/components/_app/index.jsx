@@ -8,7 +8,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 
 /**
- * @module progressive-web-sdk/ssr/universal/components/_app
+ * @module progressive-web-sdk/react/components/_app
  */
 
 /**

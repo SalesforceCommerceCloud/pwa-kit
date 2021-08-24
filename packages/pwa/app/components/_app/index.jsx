@@ -8,7 +8,7 @@
 import React, {useState, useEffect} from 'react'
 import PropTypes from 'prop-types'
 import {useHistory, useLocation} from 'react-router-dom'
-import {getAssetUrl} from 'pwa-kit-react-sdk/ssr/universal/utils'
+import {getAssetUrl} from 'pwa-kit-react-sdk/utils/ssr-shared'
 
 // Chakra
 import {Box, useDisclosure, useStyleConfig} from '@chakra-ui/react'

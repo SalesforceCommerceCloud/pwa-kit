@@ -8,7 +8,7 @@
 import React from 'react'
 import {shallow} from 'enzyme'
 import Throw404 from './index'
-import * as errors from '../../errors'
+import * as errors from '../../../utils/errors'
 
 describe('Throw404', () => {
     test('Renders correctly', () => {

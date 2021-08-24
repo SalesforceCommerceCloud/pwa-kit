@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {getAssetUrl} from 'pwa-kit-react-sdk/ssr/universal/utils'
+import {getAssetUrl} from 'pwa-kit-react-sdk/utils/ssr-shared'
 import {loadScript} from 'pwa-kit-react-sdk/utils/assets'
 
 export const availablePolyfills = [

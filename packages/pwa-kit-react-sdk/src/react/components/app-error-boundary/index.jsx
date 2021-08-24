@@ -8,7 +8,7 @@ import React from 'react'
 import {withRouter} from 'react-router-dom'
 import PropTypes from 'prop-types'
 import Error from '../../components/_error'
-import {HTTPError} from '../../errors'
+import {HTTPError} from '../../../utils/errors'
 
 export const AppErrorContext = React.createContext()
 

@@ -46,7 +46,7 @@ import {
     X_ORIGINAL_CONTENT_TYPE,
     APPLICATION_OCTET_STREAM,
     PROXY_PATH_PREFIX
-} from '../ssr/server/constants'
+} from '../server/constants'
 
 const baseMobify = {
     pageNotFoundURL: '/page-not-found',

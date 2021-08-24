@@ -12,7 +12,7 @@ import {AppErrorContext} from '../../components/app-error-boundary'
 import Throw404 from '../../components/throw-404'
 import AppConfig from '../../components/_app-config'
 import routes from '../../routes'
-import {pages as pageEvents} from '../../events'
+import {pages as pageEvents} from '../../../utils/events'
 
 const noop = () => undefined
 

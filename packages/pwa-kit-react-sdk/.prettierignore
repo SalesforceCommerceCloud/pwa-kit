@@ -3,4 +3,4 @@ dist
 generator-assets
 docs
 vendor
-src/ssr/server/test_fixtures/main-big.js
+src/server/test_fixtures/main-big.js

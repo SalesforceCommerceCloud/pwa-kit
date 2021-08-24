@@ -7,7 +7,7 @@
 
 /* eslint-disable no-unused-vars */
 import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
-import {HTTPError} from 'pwa-kit-react-sdk/ssr/universal/errors'
+import {HTTPError} from 'pwa-kit-react-sdk/utils/errors'
 import {createCodeVerifier, generateCodeChallenge} from './pkce'
 import {createGetTokenBody} from './utils'
 

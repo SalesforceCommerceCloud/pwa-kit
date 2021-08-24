@@ -21,11 +21,11 @@ import compression from 'compression'
 import express from 'express'
 import mimeTypes from 'mime-types'
 import expressLogging from 'morgan'
-import pkg from '../../../package.json'
+import pkg from '../../package.json'
 import semver from 'semver'
 import URL from 'url'
 import merge from 'merge-descriptors'
-import {PersistentCache} from '../../utils/ssr-cache'
+import {PersistentCache} from '../utils/ssr-cache'
 
 import {
     CachedResponse,
@@ -47,8 +47,8 @@ import {
     shouldCompress,
     wrapResponseWrite,
     detectDeviceType
-} from '../../utils/ssr-server'
-import {proxyConfigs, updatePackageMobify} from '../../utils/ssr-shared'
+} from '../utils/ssr-server'
+import {proxyConfigs, updatePackageMobify} from '../utils/ssr-shared'
 
 import {
     BUILD,
@@ -56,14 +56,14 @@ import {
     CONTENT_TYPE,
     X_MOBIFY_QUERYSTRING,
     X_MOBIFY_FROM_CACHE
-} from '../../ssr/server/constants'
+} from './constants'
 
 import {
     Headers,
     parseHost,
     X_HEADERS_TO_REMOVE,
     X_MOBIFY_REQUEST_CLASS
-} from '../../utils/ssr-proxying'
+} from '../utils/ssr-proxying'
 
 const sdkVersion = pkg.version
 

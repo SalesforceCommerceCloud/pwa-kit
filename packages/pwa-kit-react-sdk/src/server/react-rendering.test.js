@@ -40,7 +40,7 @@ const tablet =
 jest.mock('../universal/routes', () => {
     const React = require('react')
     const PropTypes = require('prop-types')
-    const errors = require('../universal/errors')
+    const errors = require('../../utils/errors')
     const {Redirect} = require('react-router-dom')
     const {Helmet} = require('react-helmet')
 
