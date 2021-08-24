@@ -367,7 +367,7 @@ const ProductList = (props) => {
                                         rightIcon={<ChevronDownIcon boxSize={5} />}
                                         onClick={() => setSortOpen(true)}
                                     >
-                                        {intl.formatMessage(
+                                        {formatMessage(
                                             {
                                                 defaultMessage: 'Sort By: {sortOption}'
                                             },
@@ -407,30 +407,32 @@ const ProductList = (props) => {
                             >
                                 {isLoading || !productSearchResult
                                     ? new Array(searchParams.limit)
-                                        .fill(0)
-                                        .map((value, index) => <ProductTileSkeleton key={index} />)
+                                          .fill(0)
+                                          .map((value, index) => (
+                                              <ProductTileSkeleton key={index} />
+                                          ))
                                     : productSearchResult.hits.map((productSearchItem) => {
-                                        const isInWishlist = wishlist?.customerProductListItems
-                                            ?.map(({productId}) => productId)
-                                            .includes(productSearchItem.productId)
-                                        return (
-                                            <ProductTile
-                                                isWishlistLoading={wishlistLoading.includes(
-                                                    productSearchItem.productId
-                                                )}
-                                                data-testid={`sf-product-tile-${productSearchItem.productId}`}
-                                                key={productSearchItem.productId}
-                                                productSearchItem={productSearchItem}
-                                                onAddToWishlistClick={() =>
-                                                    addItemToWishlist(productSearchItem)
-                                                }
-                                                onRemoveWishlistClick={() => {
-                                                    removeItemFromWishlist(productSearchItem)
-                                                }}
-                                                isInWishlist={isInWishlist}
-                                            />
-                                        )
-                                    })}
+                                          const isInWishlist = wishlist?.customerProductListItems
+                                              ?.map(({productId}) => productId)
+                                              .includes(productSearchItem.productId)
+                                          return (
+                                              <ProductTile
+                                                  isWishlistLoading={wishlistLoading.includes(
+                                                      productSearchItem.productId
+                                                  )}
+                                                  data-testid={`sf-product-tile-${productSearchItem.productId}`}
+                                                  key={productSearchItem.productId}
+                                                  productSearchItem={productSearchItem}
+                                                  onAddToWishlistClick={() =>
+                                                      addItemToWishlist(productSearchItem)
+                                                  }
+                                                  onRemoveWishlistClick={() => {
+                                                      removeItemFromWishlist(productSearchItem)
+                                                  }}
+                                                  isInWishlist={isInWishlist}
+                                              />
+                                          )
+                                      })}
                             </SimpleGrid>
                             {/* Footer */}
                             <Flex
@@ -495,7 +497,7 @@ const ProductList = (props) => {
                     >
                         <Stack>
                             <Button width="full" onClick={onClose}>
-                                {intl.formatMessage(
+                                {formatMessage(
                                     {
                                         defaultMessage: 'View {prroductCount} items'
                                     },
