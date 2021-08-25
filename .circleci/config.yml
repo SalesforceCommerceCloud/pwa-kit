@@ -183,7 +183,7 @@ jobs:
                 # Publish all changed packages. The "from-package" arg means "look
                 # at the version numbers in each package.json file and if that doesn't
                 # exist on NPM, publish"
-                npm run lerna -- publish from-package --yes
+                npm run lerna -- publish from-package --yes --no-verify-access
               fi
 
               # Cleanup
