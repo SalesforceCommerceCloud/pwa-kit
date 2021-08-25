@@ -16,6 +16,38 @@ import mockProductDetail from '../commerce-api/mocks/variant-750518699578M'
 import {useProductViewModal} from './use-product-view-modal'
 import {DEFAULT_LOCALE} from '../locale'
 
+jest.mock('../commerce-api/utils', () => {
+    const originalModule = jest.requireActual('../commerce-api/utils')
+    return {
+        ...originalModule,
+        isTokenValid: jest.fn().mockReturnValue(true)
+    }
+})
+jest.mock('commerce-sdk-isomorphic', () => {
+    const sdk = jest.requireActual('commerce-sdk-isomorphic')
+    return {
+        ...sdk,
+        ShopperProducts: class ShopperProductsMock extends sdk.ShopperProducts {
+            async getProduct() {
+                return {
+                    ...mockProductDetail,
+                    id: '750518699660M',
+                    variationValues: {
+                        color: 'BLACKFB',
+                        size: '050',
+                        width: 'V'
+                    },
+                    c_color: 'BLACKFB',
+                    c_isNew: true,
+                    c_refinementColor: 'black',
+                    c_size: '050',
+                    c_width: 'V'
+                }
+            }
+        }
+    }
+})
+
 const MockComponent = ({product}) => {
     const productViewModalData = useProductViewModal(product)
     const [isShown, setIsShown] = React.useState(false)
@@ -121,5 +153,25 @@ describe('useProductViewModal hook', () => {
             expect(searchParams.get('width')).toEqual(undefined)
             expect(searchParams.get('pid')).toEqual(undefined)
         })
+    })
+    test('load new variant on variant selection', () => {
+        const history = createMemoryHistory()
+        history.push('/test/path')
+
+        render(
+            <Router history={history}>
+                <IntlProvider locale={DEFAULT_LOCALE} defaultLocale={DEFAULT_LOCALE}>
+                    <MockComponent product={mockProductDetail} />
+                </IntlProvider>
+            </Router>
+        )
+
+        const toggleButton = screen.getByText(/Toggle the content/)
+        fireEvent.click(toggleButton)
+        expect(screen.getByText('750518699578M')).toBeInTheDocument()
+        history.push('/test/path?color=BLACKFB&size=050&width=V&pid=750518699660M')
+        expect(screen.getByTestId('variant')).toHaveTextContent(
+            '{"orderable":true,"price":299.99,"productId":"750518699660M","variationValues":{"color":"BLACKFB","size":"050","width":"V"}}'
+        )
     })
 })

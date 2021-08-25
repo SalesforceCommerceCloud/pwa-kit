@@ -5,7 +5,14 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {buildUrlSet, categoryUrlBuilder, productUrlBuilder, searchUrlBuilder} from './url'
+import {
+    buildUrlSet,
+    categoryUrlBuilder,
+    productUrlBuilder,
+    searchUrlBuilder,
+    rebuildPathWithParams,
+    removeQueryParamsFromPath
+} from './url'
 
 describe('buildUrlSet returns the expected set of urls', () => {
     test('when no values are passed in', () => {
@@ -77,5 +84,21 @@ describe('url builder test', () => {
     test('categoryUrlBuilder returns expect', () => {
         const url = categoryUrlBuilder({id: 'men'})
         expect(url).toEqual(`/en/category/men`)
+    })
+})
+
+describe('rebuildPathWithParams test', () => {
+    test('returns updated url', () => {
+        const url = '/en/product/25501032M?color=black&size=M'
+        const updatedUrl = rebuildPathWithParams(url, {pid: undefined})
+        expect(updatedUrl).toEqual('/en/product/25501032M?color=black&size=M')
+    })
+})
+
+describe('removeQueryParamsFromPath test', () => {
+    test('returns updated url', () => {
+        const url = '/en/product/25501032M?color=black&size=M&something=123'
+        const updatedUrl = removeQueryParamsFromPath(url, ['color', 'size'])
+        expect(updatedUrl).toEqual('/en/product/25501032M?something=123')
     })
 })

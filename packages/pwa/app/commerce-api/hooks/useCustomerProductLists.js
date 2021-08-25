@@ -5,16 +5,25 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import {useContext, useMemo, useEffect, useState} from 'react'
-import {isError, useCommerceAPI, CustomerProductListsContext, noop} from '../utils'
-import useCustomer from './useCustomer'
-// If the customerProductLists haven't yet loaded we store user actions inside
-// eventQueue and process the eventQueue once productLists have loaded
-const eventQueue = []
+import {isError, useCommerceAPI, CustomerProductListsContext} from '../utils'
+import {noop} from '../../utils/utils'
 
-export const eventActions = {
-    ADD: 'add',
-    REMOVE: 'remove'
+import useCustomer from './useCustomer'
+import Queue from '../../utils/queue'
+
+// A event queue for the following use cases:
+// 1. Allow user to add item to wishlist before wishlist is initialized
+// 2. Allow user to add item to wishlist before logging in
+// e.g. user clicks add to wishlist, push event to the queue, show login
+// modal, pop the event after successfully logged in
+export class CustomerProductListEventQueue extends Queue {
+    static eventTypes = {
+        ADD: 'add',
+        REMOVE: 'remove'
+    }
 }
+
+const eventQueue = new CustomerProductListEventQueue()
 
 export default function useCustomerProductLists({eventHandler = noop, errorHandler = noop} = {}) {
     const api = useCommerceAPI()
@@ -22,32 +31,43 @@ export default function useCustomerProductLists({eventHandler = noop, errorHandl
     const {customerProductLists, setCustomerProductLists} = useContext(CustomerProductListsContext)
     const [isLoading, setIsLoading] = useState(false)
 
-    const processEventQueue = () => {
-        eventQueue.forEach(async (event) => {
-            eventQueue.pop()
-
-            switch (event.action) {
-                case eventActions.ADD: {
+    useEffect(() => {
+        eventQueue.process(async (event) => {
+            const {action, item, list, listType} = event
+            switch (action) {
+                case CustomerProductListEventQueue.eventTypes.ADD: {
                     try {
-                        const productItem = {
-                            productId: event.item.id,
-                            quantity: event.item.quantity
-                        }
-                        await addItemToCustomerProductList(
-                            productItem,
-                            event.list?.id,
-                            event.listType
+                        const productList = self.getProductListPerType(listType)
+                        const productListItem = productList.customerProductListItems.find(
+                            ({productId}) => productId === event.item.id
                         )
-                        eventHandler(event)
+                        // if the item is already in the wishlist
+                        // only update the quantity
+                        if (productListItem) {
+                            await self.updateCustomerProductListItem(productList, {
+                                ...productListItem,
+                                quantity: event.item.quantity + productListItem.quantity
+                            })
+                            eventHandler(event)
+                        } else {
+                            await self.createCustomerProductListItem(productList, {
+                                productId: event.item.id,
+                                priority: 1,
+                                quantity: parseInt(event.item.quantity),
+                                public: false,
+                                type: 'product'
+                            })
+                            eventHandler(event)
+                        }
                     } catch (error) {
                         errorHandler(error)
                     }
                     break
                 }
 
-                case eventActions.REMOVE:
+                case CustomerProductListEventQueue.eventTypes.REMOVE:
                     try {
-                        await self.deleteCustomerProductListItem(event.list, event.item)
+                        await self.deleteCustomerProductListItem(list, item)
                         eventHandler(event)
                     } catch (error) {
                         errorHandler(error)
@@ -55,28 +75,7 @@ export default function useCustomerProductLists({eventHandler = noop, errorHandl
                     break
             }
         })
-    }
-
-    useEffect(() => {
-        if (eventQueue.length) {
-            processEventQueue()
-        }
     }, [customerProductLists])
-
-    const addItemToCustomerProductList = async (item, listId, listType) => {
-        // Either find the list by the id or by the type
-        const productList = listId
-            ? customerProductLists.data.find((list) => list.id === listId)
-            : customerProductLists.data.find((list) => list.type === listType)
-
-        return await self.createCustomerProductListItem(productList, {
-            productId: item.productId,
-            priority: 1,
-            quantity: item.quantity,
-            public: false,
-            type: 'product'
-        })
-    }
 
     const self = useMemo(() => {
         return {
@@ -100,6 +99,7 @@ export default function useCustomerProductLists({eventHandler = noop, errorHandl
 
             /**
              * Fetches product lists for registered users or creates a new list if none exist
+             * due to the api limitation, we can not get the list based on type but all lists
              * @param {string} type type of list to fetch or create
              * @returns product lists for registered users
              */
@@ -165,12 +165,16 @@ export default function useCustomerProductLists({eventHandler = noop, errorHandl
             },
 
             /**
+             * @TODO: remove this function as it exposes unnecessary knowledge
+             * to outside systems. The queue logic should be encapsulated in this
+             * hook only. The API for outside consuming should be something like:
+             * addItemToList, removeItemToList...
              * Event queue holds user actions that need to execute on product-lists
              * while the product list information has not yet loaded (eg: Adding to wishlist immedeately after login).
              * @param {object} event Event to be added to queue. event object has properties: action: {item: Object, list?: object, action: eventActions, listType: CustomerProductListType}
              */
             addActionToEventQueue(event) {
-                eventQueue.push(event)
+                eventQueue.enqueue(event)
             },
 
             /**
@@ -199,7 +203,6 @@ export default function useCustomerProductLists({eventHandler = noop, errorHandl
             /**
              * Adds an item to the customer's product list.
              * @param {object} list
-             * @param {string} list.id id of the list to add the item to.
              * @param {Object} item item to be added to the list.
              */
             async createCustomerProductListItem(list, item) {

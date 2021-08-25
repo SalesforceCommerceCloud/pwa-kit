@@ -5,8 +5,8 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import {Text} from '@chakra-ui/react'
 import {useCartItemVariant} from '.'
+import Link from '../link'
 
 /**
  * In the context of a cart product item variant, this components simply renders
@@ -18,9 +18,14 @@ const ItemName = (props) => {
     const variant = useCartItemVariant()
 
     return (
-        <Text fontWeight="bold" {...props}>
+        <Link
+            fontWeight="bold"
+            {...props}
+            color="black.600"
+            to={`/product/${variant?.master?.masterId}`}
+        >
             {variant.productName}
-        </Text>
+        </Link>
     )
 }
 

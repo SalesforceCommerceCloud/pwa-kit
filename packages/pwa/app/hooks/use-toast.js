@@ -20,6 +20,7 @@ import {
  * to toasts when required. It supports all props supported by Chakra toast.
  *
  * @param {string} title Message text to be displayed in toast
+ * @param {string} id - id provided to the toast to avoid duplicate toast ids, use it if multiple toasts are needed
  * @param {string} status Semantic state of the toast - success | error | info | warning
  * @param {node} action Optional component to be displayed in the toast (eg. Button to allow user to perform action)
  * @param {string} position The placement of the toast on screen
@@ -27,6 +28,7 @@ import {
  */
 export function useToast() {
     const toast = useChakraToast()
+
     return ({
         title,
         status,
@@ -36,9 +38,7 @@ export function useToast() {
         variant = 'subtle',
         isClosable = true
     }) => {
-        const toastId = `${title}-${status}`.toLowerCase()
         let toastConfig = {
-            id: toastId,
             title,
             status,
             isClosable,
@@ -50,23 +50,19 @@ export function useToast() {
         if (action) {
             toastConfig = {
                 ...toastConfig,
-                // eslint-disable-next-line react/display-name
-                render: () => (
+                /* eslint-disable-next-line react/display-name, react/prop-types */
+                render: ({onClose}) => (
                     <Alert status={status} variant="subtle" borderRadius="md" py={3} width="sm">
                         <AlertIcon />
                         <AlertTitle> {title} </AlertTitle>
                         <Spacer />
                         {action}
                         <Spacer />
-                        <CloseButton onClick={() => toast.close(toastId)} />
+                        <CloseButton onClick={onClose} />
                     </Alert>
                 )
             }
         }
-
-        // Prevent duplicate toasts
-        if (!toast.isActive(toastId)) {
-            toast(toastConfig)
-        }
+        toast(toastConfig)
     }
 }

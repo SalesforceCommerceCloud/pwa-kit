@@ -25,9 +25,7 @@ import {
 
 // Hooks
 import useBasket from '../../commerce-api/hooks/useBasket'
-import useCustomerProductLists, {
-    eventActions
-} from '../../commerce-api/hooks/useCustomerProductLists'
+import useCustomerProductLists from '../../commerce-api/hooks/useCustomerProductLists'
 import {useVariant} from '../../hooks'
 import useEinstein from '../../commerce-api/hooks/useEinstein'
 
@@ -55,7 +53,7 @@ const ProductDetail = ({category, product, isLoading}) => {
     const variant = useVariant(product)
 
     const productListEventHandler = (event) => {
-        if (event.action === eventActions.ADD) {
+        if (event.action === 'add') {
             showWishlistItemAdded(event.item?.quantity)
         }
     }
@@ -116,37 +114,46 @@ const ProductDetail = ({category, product, isLoading}) => {
         })
     }
 
-    const addItemToWishlist = async (quantity = 1) => {
+    const addItemToWishlist = async (quantity) => {
         try {
             // If product-lists have not loaded we push "Add to wishlist" event to eventQueue to be
             // processed once the product-lists have loaded.
+
+            // @TODO: move the logic to useCustomerProductLists
+            // PDP shouldn't need to know the implementation detail of the event queue
+            // PDP should just do "customerProductLists.addItem(item)"!
             if (!customerProductLists?.loaded) {
                 const event = {
                     item: {...product, quantity},
-                    action: eventActions.ADD,
-                    listType: customerProductListTypes.WISHLIST,
-                    showStatus: showWishlistItemAdded,
-                    showError
+                    action: 'add',
+                    listType: customerProductListTypes.WISHLIST
                 }
 
                 customerProductLists.addActionToEventQueue(event)
             } else {
-                const wishlist = customerProductLists.data.find(
-                    (list) => list.type === customerProductListTypes.WISHLIST
+                const wishlist = customerProductLists.getProductListPerType(
+                    customerProductListTypes.WISHLIST
                 )
 
-                const wishlistItem = await customerProductLists.createCustomerProductListItem(
-                    wishlist,
-                    {
+                const productListItem = wishlist.customerProductListItems.find(
+                    ({productId}) => productId === product.id
+                )
+                // if the product already exists in wishlist, update the quantity
+                if (productListItem) {
+                    await customerProductLists.updateCustomerProductListItem(wishlist, {
+                        ...productListItem,
+                        quantity: productListItem.quantity + parseInt(quantity)
+                    })
+                    showWishlistItemAdded(quantity)
+                } else {
+                    // other wise, just create a new product list item with given quantity number
+                    await customerProductLists.createCustomerProductListItem(wishlist, {
                         productId: product.id,
                         priority: 1,
                         quantity,
                         public: false,
                         type: 'product'
-                    }
-                )
-
-                if (wishlistItem?.id) {
+                    })
                     showWishlistItemAdded(quantity)
                 }
             }

@@ -6,7 +6,7 @@
  */
 import * as utils from './utils'
 import EventEmitter from 'events'
-import {flatten} from './utils'
+import {flatten, shallowEquals} from './utils'
 
 describe('requestIdleCallback should be a working shim', () => {
     test('without a working implementation built in', () => {
@@ -77,5 +77,14 @@ describe('flatten', () => {
         expect(JSON.stringify(result)).toEqual(
             '{"1":{"id":1,"item":1,"children":[{"id":2,"item":2,"children":[{"id":3,"item":3}]}]},"2":{"id":2,"item":2,"children":[{"id":3,"item":3}]},"3":{"id":3,"item":3}}'
         )
+    })
+})
+
+describe('shallow', function() {
+    test('should return false', () => {
+        const a = {a: '123'}
+        const b = {a: '123', b: '456'}
+        const result = shallowEquals(a, b)
+        expect(result).toBeFalsy()
     })
 })
