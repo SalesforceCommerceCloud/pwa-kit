@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 /**
- * @module progressive-web-sdk/utils/ssr-request-processing
+ * @module pwa-kit-react-sdk/utils/ssr-request-processing
  */
 /*
  There are some special requirements for this module, which is used in the

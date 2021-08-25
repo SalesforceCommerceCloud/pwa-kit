@@ -6,7 +6,7 @@
  */
 
 /**
- * @module progressive-web-sdk/server/react-rendering
+ * @module pwa-kit-react-sdk/server/react-rendering
  */
 
 import path from 'path'

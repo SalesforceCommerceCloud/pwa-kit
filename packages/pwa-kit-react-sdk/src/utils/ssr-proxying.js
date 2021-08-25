@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 /**
- * @module progressive-web-sdk/utils/ssr-proxying
+ * @module pwa-kit-react-sdk/utils/ssr-proxying
  */
 /*
  There are some special requirements for this module, which is used in the

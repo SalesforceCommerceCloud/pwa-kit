@@ -6,7 +6,7 @@
  */
 
 /**
- * @module progressive-web-sdk/react/components/_document
+ * @module pwa-kit-react-sdk/react/components/_document
  */
 
 import React from 'react'

@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 /**
- * @module progressive-web-sdk/server/express
+ * @module pwa-kit-react-sdk/server/express
  */
 
 import assert from 'assert'

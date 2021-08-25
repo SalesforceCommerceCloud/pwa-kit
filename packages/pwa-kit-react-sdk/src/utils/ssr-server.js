@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 /**
- * @module progressive-web-sdk/utils/ssr-server
+ * @module pwa-kit-react-sdk/utils/ssr-server
  */
 import crypto from 'crypto'
 import proxy from 'http-proxy-middleware'
