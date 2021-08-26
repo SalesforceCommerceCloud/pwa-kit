@@ -26,7 +26,6 @@ import {useIntl} from 'react-intl'
 
 // Other
 import {productUrlBuilder} from '../../utils/url'
-import {noop} from '../../utils/utils'
 import Link from '../link'
 import withRegistration from '../../hoc/with-registration'
 
@@ -62,8 +61,8 @@ const ProductTile = (props) => {
         productSearchItem,
         // eslint-disable-next-line react/prop-types
         staticContext,
-        onAddToWishlistClick = noop,
-        onRemoveWishlistClick = noop,
+        onAddToWishlistClick,
+        onRemoveWishlistClick,
         isInWishlist,
         isWishlistLoading,
         ...rest
@@ -82,33 +81,37 @@ const ProductTile = (props) => {
                 <AspectRatio {...styles.image} ratio={1}>
                     <Img alt={image.alt} src={image.disBaseLink} />
                 </AspectRatio>
-                {isInWishlist ? (
-                    <IconButton
-                        aria-label={intl.formatMessage({
-                            defaultMessage: 'wishlist-solid'
-                        })}
-                        icon={<WishlistSolidIcon />}
-                        variant="unstyled"
-                        {...styles.iconButton}
-                        onClick={(e) => {
-                            e.preventDefault()
-                            if (isWishlistLoading) return
-                            onRemoveWishlistClick()
-                        }}
-                    />
-                ) : (
-                    <IconButtonWithRegistration
-                        aria-label={intl.formatMessage({
-                            defaultMessage: 'wishlist'
-                        })}
-                        icon={<WishlistIcon />}
-                        variant="unstyled"
-                        {...styles.iconButton}
-                        onClick={() => {
-                            if (isWishlistLoading) return
-                            onAddToWishlistClick()
-                        }}
-                    />
+                {onAddToWishlistClick && onRemoveWishlistClick && (
+                    <>
+                        {isInWishlist ? (
+                            <IconButton
+                                aria-label={intl.formatMessage({
+                                    defaultMessage: 'wishlist-solid'
+                                })}
+                                icon={<WishlistSolidIcon />}
+                                variant="unstyled"
+                                {...styles.iconButton}
+                                onClick={(e) => {
+                                    e.preventDefault()
+                                    if (isWishlistLoading) return
+                                    onRemoveWishlistClick()
+                                }}
+                            />
+                        ) : (
+                            <IconButtonWithRegistration
+                                aria-label={intl.formatMessage({
+                                    defaultMessage: 'wishlist'
+                                })}
+                                icon={<WishlistIcon />}
+                                variant="unstyled"
+                                {...styles.iconButton}
+                                onClick={() => {
+                                    if (isWishlistLoading) return
+                                    onAddToWishlistClick()
+                                }}
+                            />
+                        )}
+                    </>
                 )}
             </Box>
 
