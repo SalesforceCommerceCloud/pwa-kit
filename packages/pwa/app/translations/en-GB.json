@@ -14,6 +14,9 @@
   "/vJwLB": {
     "defaultMessage": "Please enter your email address"
   },
+  "/yBi9v": {
+    "defaultMessage": "Shop Women's Jackets & Coats"
+  },
   "0g/1TG": {
     "defaultMessage": "Continue to Payment"
   },
@@ -50,6 +53,9 @@
   "2tqQFl": {
     "defaultMessage": "Cart"
   },
+  "3FyRaO": {
+    "defaultMessage": "Shop Women's Outfits"
+  },
   "3NVyN7": {
     "defaultMessage": "Please enter your first name"
   },
@@ -76,6 +82,9 @@
   },
   "5S2I6Q": {
     "defaultMessage": "Incorrect username or password, please try again."
+  },
+  "5ryYe9": {
+    "defaultMessage": "Japanese (Japan)"
   },
   "5sg7KC": {
     "defaultMessage": "Password"
@@ -109,6 +118,9 @@
   },
   "9rqdrm": {
     "defaultMessage": "Item removed from wishlist"
+  },
+  "A2v4cr": {
+    "defaultMessage": "English (United Kingdom)"
   },
   "A8Tnga": {
     "defaultMessage": "Credit Card"
@@ -232,6 +244,9 @@
   "LiHQih": {
     "defaultMessage": "Coming Soon"
   },
+  "LrQ8C0": {
+    "defaultMessage": "Shop Feeling Red"
+  },
   "MPcjO/": {
     "defaultMessage": "Are you sure you want to sign out? You will need to sign back in to proceed with your current order."
   },
@@ -258,6 +273,9 @@
   },
   "O9nLUc": {
     "defaultMessage": "Please select your {stateOrProvince}"
+  },
+  "OHPaLj": {
+    "defaultMessage": "Shop Men's Suits"
   },
   "OKPeJz": {
     "defaultMessage": "Item removed from cart"
@@ -289,6 +307,9 @@
   },
   "PNj3WE": {
     "defaultMessage": "Review Order"
+  },
+  "PO4nBj": {
+    "defaultMessage": "French (France)"
   },
   "PRlD0A": {
     "defaultMessage": "Shipping"
@@ -414,6 +435,9 @@
     "defaultMessage": "{itemCount, plural, =0 {0 items} one {# item} other {# items}}",
     "description": "# item(s) in order"
   },
+  "b24hho": {
+    "defaultMessage": "Chinese (China)"
+  },
   "bTjwXj": {
     "defaultMessage": "Welcome Back"
   },
@@ -447,6 +471,9 @@
   },
   "dfEp3Z": {
     "defaultMessage": "Yes, remove item"
+  },
+  "e//rzS": {
+    "defaultMessage": "Italian (Italy)"
   },
   "e6Ph5+": {
     "defaultMessage": "Address"
@@ -770,6 +797,9 @@
   },
   "wEQDC6": {
     "defaultMessage": "Edit"
+  },
+  "wPc1n9": {
+    "defaultMessage": "Shop Women's Dresses"
   },
   "x6hxSH": {
     "defaultMessage": "Something's not right with your email or password. Try again."

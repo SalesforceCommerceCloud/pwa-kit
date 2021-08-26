@@ -110,7 +110,7 @@ class CommerceAPI {
                                     ) {
                                         newArgs[0].parameters = {
                                             ...newArgs[0].parameters,
-                                            locale: me.locale
+                                            locale: me.getLocale()
                                         }
                                     }
 

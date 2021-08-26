@@ -25,11 +25,10 @@ import {useLocale, getLocaleConfig} from '../../locale'
  * The page renders SEO metadata and a few promotion
  * categories and products, data is from local file.
  */
-const Home = ({categories: allCategories = {}}) => {
+const Home = () => {
     const intl = useIntl()
 
     const [activeLocale] = useLocale()
-    console.log('activeLocale:',activeLocale)
 
     return (
         <Box data-testid="home-page" layerStyle="page">
@@ -119,24 +118,6 @@ Home.shouldGetProps = ({previousLocation, location}) => {
     return previousLocation?.pathname !== location.pathname
 }
 
-Home.getProps = async ({params, location, api}) => {
-    const localeConfig = await getLocaleConfig({
-        getUserPreferredLocales: () => {
-            // TODO: You can detect their preferred locales from:
-            // - client side: window.navigator.languages
-            // - the page URL they're on (example.com/en-GB/home)
-            // - cookie (if their previous preference is saved there)
-            // And decide which one takes precedence.
-            const localeInPageUrl = params.locale
-            return localeInPageUrl ? [localeInPageUrl] : []
-
-            // If in this function an empty array is returned (e.g. there isn't locale in the page url),
-            // then the app would use the default locale as the fallback.
-        }
-    })
-
-    // Set the target local.
-    api.setLocale(localeConfig.app.targetLocale)
-}
+Home.getProps = async () => {}
 
 export default Home
