@@ -27,7 +27,7 @@ jest.mock('../../commerce-api/utils', () => {
 
 jest.mock('../../commerce-api/einstein')
 
-const MockComponent = ({product, addToCart, addToWishlist}) => {
+const MockComponent = ({product, addToCart, addToWishlist, updateWishlist}) => {
     const customer = useCustomer()
     useEffect(() => {
         if (customer?.authType !== 'registered') {
@@ -39,8 +39,9 @@ const MockComponent = ({product, addToCart, addToWishlist}) => {
             <div>customer: {customer?.authType}</div>
             <ProductView
                 product={product}
-                addToCart={() => addToCart()}
-                addToWishlist={() => addToWishlist()}
+                addToCart={addToCart}
+                addToWishlist={addToWishlist}
+                updateWishlist={updateWishlist}
             />
         </div>
     )
@@ -49,7 +50,8 @@ const MockComponent = ({product, addToCart, addToWishlist}) => {
 MockComponent.propTypes = {
     product: PropTypes.object,
     addToCart: PropTypes.func,
-    addToWishlist: PropTypes.func
+    addToWishlist: PropTypes.func,
+    updateWishlist: PropTypes.func
 }
 
 const server = setupServer(
@@ -170,6 +172,53 @@ test('ProductView Component renders with addToWishList event handler', async () 
 
         fireEvent.click(addToWishListButton)
         expect(addToWishlist).toHaveBeenCalledTimes(1)
+    })
+})
+
+test('ProductView Component renders with updateWishlist event handler', async () => {
+    server.use(
+        rest.post('*/oauth2/login', (req, res, ctx) =>
+            res(ctx.delay(0), ctx.status(303), ctx.set('location', `/testcallback`))
+        ),
+        rest.get('*/testcallback', (req, res, ctx) => {
+            return res(ctx.delay(0), ctx.status(200))
+        }),
+
+        rest.post('*/oauth2/token', (req, res, ctx) =>
+            res(
+                ctx.delay(0),
+                ctx.json({
+                    customer_id: 'test',
+                    access_token: 'testtoken',
+                    refresh_token: 'testrefeshtoken',
+                    usid: 'testusid',
+                    enc_user_id: 'testEncUserId'
+                })
+            )
+        ),
+        rest.get('*/customers/:customerId', (req, res, ctx) =>
+            res(
+                ctx.json({
+                    ...mockedRegisteredCustomer
+                })
+            )
+        )
+    )
+    const updateWishlist = jest.fn()
+
+    renderWithProviders(
+        <MockComponent product={mockProductDetail} updateWishlist={updateWishlist} />
+    )
+
+    await waitFor(() => {
+        expect(screen.getByText(/customer: registered/)).toBeInTheDocument()
+    })
+
+    await waitFor(() => {
+        const updateWishlistButton = screen.getAllByText(/Update/i)[0]
+
+        fireEvent.click(updateWishlistButton)
+        expect(updateWishlist).toHaveBeenCalledTimes(1)
     })
 })
 

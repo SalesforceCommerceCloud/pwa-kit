@@ -89,17 +89,16 @@ const useShopper = () => {
     useEffect(() => {
         // Fetch product details for new items in product-lists
         const hasCustomerProductLists = customerProductLists?.loaded
-        if (hasCustomerProductLists) {
-            customerProductLists.data.forEach((list) => {
-                let ids = list.customerProductListItems?.map((item) => item.productId)
-                if (list?._productItemsDetail) {
-                    ids = ids.filter((id) => !list?._productItemsDetail[id])
-                }
+        if (!hasCustomerProductLists) return
+        customerProductLists.data.forEach((list) => {
+            let ids = list.customerProductListItems?.map((item) => item.productId)
+            if (list?._productItemsDetail) {
+                ids = ids.filter((id) => !list?._productItemsDetail[id])
+            }
 
-                customerProductLists.getProductsInList(ids?.toString(), list.id)
-            })
-        }
-    }, [customerProductLists])
+            customerProductLists.getProductsInList(ids?.toString(), list.id)
+        })
+    }, [customerProductLists.data])
 
     return {customer, basket}
 }

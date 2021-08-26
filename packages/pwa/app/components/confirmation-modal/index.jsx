@@ -32,18 +32,23 @@ const ConfirmationModal = ({
 }) => {
     const {formatMessage} = useIntl()
 
-    const handleConfirmClicked = () => {
+    const handleConfirmClick = () => {
         onPrimaryAction()
         props.onClose()
     }
 
-    const handleCancelClicked = () => {
+    const handleAlternateActionClick = () => {
         onAlternateAction()
         props.onClose()
     }
 
     return (
-        <AlertDialog isOpen={props.isOpen} isCentered onClose={handleCancelClicked} {...props}>
+        <AlertDialog
+            isOpen={props.isOpen}
+            isCentered
+            onClose={handleAlternateActionClick}
+            {...props}
+        >
             <AlertDialogOverlay />
             <AlertDialogContent>
                 <AlertDialogHeader>{formatMessage(dialogTitle)}</AlertDialogHeader>
@@ -52,10 +57,10 @@ const ConfirmationModal = ({
                 </AlertDialogBody>
 
                 <AlertDialogFooter>
-                    <Button variant="ghost" mr={3} onClick={handleCancelClicked}>
+                    <Button variant="ghost" mr={3} onClick={handleAlternateActionClick}>
                         {formatMessage(alternateActionLabel)}
                     </Button>
-                    <Button variant="solid" onClick={handleConfirmClicked}>
+                    <Button variant="solid" onClick={handleConfirmClick}>
                         {formatMessage(primaryActionLabel)}
                     </Button>
                 </AlertDialogFooter>

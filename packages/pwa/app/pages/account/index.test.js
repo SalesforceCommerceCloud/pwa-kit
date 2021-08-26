@@ -152,7 +152,8 @@ test('Allows customer to edit profile details', async () => {
             res(
                 ctx.json({
                     ...mockedRegisteredCustomer,
-                    firstName: 'Geordi'
+                    firstName: 'Geordi',
+                    phoneHome: '(567) 123-5585'
                 })
             )
         ),
@@ -160,7 +161,8 @@ test('Allows customer to edit profile details', async () => {
             res(
                 ctx.json({
                     ...mockedRegisteredCustomer,
-                    firstName: 'Geordi'
+                    firstName: 'Geordi',
+                    phoneHome: '(567) 123-5585'
                 })
             )
         )
@@ -173,8 +175,10 @@ test('Allows customer to edit profile details', async () => {
     const el = within(screen.getByTestId('sf-toggle-card-my-profile'))
     user.click(el.getByText(/edit/i))
     user.type(el.getByLabelText(/first name/i), 'Geordi')
+    user.type(el.getByLabelText(/Phone Number/i), '5671235585')
     user.click(el.getByText(/save/i))
     expect(await screen.findByText('Geordi Tester')).toBeInTheDocument()
+    expect(await screen.findByText('(567) 123-5585')).toBeInTheDocument()
 })
 
 test('Allows customer to update password', async () => {
@@ -188,6 +192,10 @@ test('Allows customer to update password', async () => {
     user.click(el.getByText(/edit/i))
     user.type(el.getByLabelText(/current password/i), 'Password!12345')
     user.type(el.getByLabelText(/new password/i), 'Password!98765')
+    user.click(el.getByText(/Forgot password/i))
+
+    expect(await screen.findByTestId('account-detail-page')).toBeInTheDocument()
+
     user.click(el.getByText(/save/i))
     expect(await screen.findByText('••••••••')).toBeInTheDocument()
 })
