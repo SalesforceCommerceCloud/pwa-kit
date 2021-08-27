@@ -82,7 +82,7 @@ const App = (props) => {
 
     const onLogoClick = () => {
         // Goto the home page.
-        history.push(`${HOME_HREF}${targetLocale !== defaultLocale ? targetLocale : ''}`)
+        history.push(`${HOME_HREF}${targetLocale !== defaultLocale ? targetLocale + '/' : ''}`)
 
         // Close the drawer.
         onClose()
@@ -109,12 +109,6 @@ const App = (props) => {
 
     const onWishlistClick = () => {
         history.push(`/${targetLocale}/account/wishlist`)
-    }
-
-    // Initialize locale in localStorage
-    const onClient = typeof window !== 'undefined'
-    if (onClient && window.localStorage.getItem('locale') === null) {
-        window.localStorage.setItem('locale', targetLocale)
     }
 
     return (
@@ -216,6 +210,7 @@ App.shouldGetProps = ({previousLocation, location}) => {
 }
 
 App.getProps = async ({api, params, location}) => {
+    const onClient = typeof window !== 'undefined'
     const localeConfig = await getLocaleConfig({
         getUserPreferredLocales: () => {
             // TODO: You can detect their preferred locales from:
@@ -234,6 +229,10 @@ App.getProps = async ({api, params, location}) => {
             // then the app would use the default locale as the fallback.
         }
     })
+
+    // Set the `locale` for Commerce API and localStorage
+    api.setLocale(localeConfig.app.targetLocale)
+    onClient && window.localStorage.setItem('locale', localeConfig.app.targetLocale)
 
     // Login as `guest` to get session.
     await api.auth.login()

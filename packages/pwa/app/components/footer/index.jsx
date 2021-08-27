@@ -134,7 +134,7 @@ const Footer = ({...otherProps}) => {
                                     // TODO: Replace the `locale` in a better way (first pathname in the URL)
                                     const newUrl =
                                         location.pathname === HOME_HREF
-                                            ? location.pathname + target.value
+                                            ? `${location.pathname}${target.value}/`
                                             : location.pathname.replace(activeLocale, target.value)
 
                                     changeLocale(target.value)
