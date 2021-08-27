@@ -462,19 +462,12 @@ class Rendering {
             this._headContent.push(this._renderedHeadContent)
         }
 
-        console.log('Starting test')
-
-        this._renderedAppState.test = "</script><script>alert('hahahahaha')</script>"
-
         // We escape the </ that marks an element close tag in the
         // JSON so that it may safely be included in a <script> tag
         // in the output page.
         this._timer.start('rendering-embed-app-state')
         const stringifiedAppState = serialize(this._renderedAppState, {isJSON: true})
         this._timer.end('rendering-embed-app-state')
-
-        console.log(this._renderedAppState)
-        console.log(stringifiedAppState)
 
         const timingOutput = this._timer.summary
             .map((entry) => `  ${entry.name}: ${entry.duration.toFixed(2)} mS`)
