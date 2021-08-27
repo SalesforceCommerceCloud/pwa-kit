@@ -723,7 +723,7 @@ describe('SSRServer operation', () => {
                     '<p>hi from javascript</p>',
                     'JQuery is present',
                     '<script id="srcless">',
-                    '<script>I am a script\\x3c\\x2fscript><p>\\x3c\\x2fp>',
+                    '\\u003Cscript\\u003EI am a script\\u003C\\u002Fscript\\u003E\\u003Cp\\u003E\\u003C\\u002Fp\\u003E',
                     `window.location is "${LOCALHOST_BASE}${path}"`,
                     `src="/mobify/bundle/development/ssr-loader.js"`,
                     `"${scriptUrl}"`
