@@ -112,15 +112,6 @@ Home.propTypes = {
     match: PropTypes.object
 }
 
-Home.shouldGetProps = ({previousLocation, location}) => {
-    return previousLocation?.pathname !== location.pathname
-}
-
-Home.getProps = async ({api, params}) => {
-    if (params?.locale && params?.locale !== api.getLocale()) {
-        // Set the target local.
-        api.setLocale(params?.locale)
-    }
-}
+Home.getProps = async () => {}
 
 export default Home

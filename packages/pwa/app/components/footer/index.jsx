@@ -139,6 +139,8 @@ const Footer = ({...otherProps}) => {
 
                                     changeLocale(target.value)
                                     history.push(newUrl)
+
+                                    window.localStorage.setItem('locale', target.value)
                                 }}
                                 variant="filled"
                                 {...styles.localeDropdown}

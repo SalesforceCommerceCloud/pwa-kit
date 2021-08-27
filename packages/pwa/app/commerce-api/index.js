@@ -51,10 +51,6 @@ class CommerceAPI {
      * @param {ClientConfig} config - The config used to instantiate SDK apis.
      */
     constructor(config = {}) {
-        const me = this
-
-        this.locale = DEFAULT_LOCALE
-
         const {proxyPath, ...restConfig} = config
 
         // Client-side requests should be proxied via the configured path.
@@ -98,19 +94,22 @@ class CommerceAPI {
                                     return obj[prop](...args)
                                 }
                                 return self.willSendRequest(prop, ...args).then((newArgs) => {
-                                    // Inject the locale to the API call via it's parameters.
-                                    //
-                                    // NOTE: The commerce sdk isomorphic will complain if you pass parameters to
-                                    // it that it doesn't expect, this is why I'm only adding the local to some of
-                                    // the API calls. We'll want a better pattern to do this.
-                                    if (
-                                        ['getCategory', 'productSearch', 'getProduct'].includes(
-                                            prop
-                                        )
-                                    ) {
-                                        newArgs[0].parameters = {
-                                            ...newArgs[0].parameters,
-                                            locale: me.getLocale()
+                                    const onClient = typeof window !== 'undefined'
+                                    if (onClient) {
+                                        // Inject the locale to the API call via it's parameters.
+                                        //
+                                        // NOTE: The commerce sdk isomorphic will complain if you pass parameters to
+                                        // it that it doesn't expect, this is why I'm only adding the local to some of
+                                        // the API calls. We'll want a better pattern to do this.
+                                        if (
+                                            ['getCategory', 'productSearch', 'getProduct'].includes(
+                                                prop
+                                            )
+                                        ) {
+                                            newArgs[0].parameters = {
+                                                ...newArgs[0].parameters,
+                                                locale: window.localStorage.getItem('locale')
+                                            }
                                         }
                                     }
 
@@ -139,21 +138,6 @@ class CommerceAPI {
      */
     getConfig() {
         return this._config
-    }
-
-    /**
-     *
-     * @param {*} locale
-     */
-    setLocale(locale) {
-        this.locale = locale
-    }
-
-    /**
-     *
-     */
-    getLocale() {
-        return this.locale
     }
 
     /**
