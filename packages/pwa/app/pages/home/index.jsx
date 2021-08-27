@@ -17,7 +17,6 @@ import Section from '../../components/section'
 import BasicTile from '../../components/basic-tile'
 import {categories} from './data'
 import RecommendedProducts from '../../components/recommended-products'
-import {useLocale, getLocaleConfig} from '../../locale'
 
 /**
  * This is the home page for Retail React App.
@@ -25,10 +24,8 @@ import {useLocale, getLocaleConfig} from '../../locale'
  * The page renders SEO metadata and a few promotion
  * categories and products, data is from local file.
  */
-const Home = () => {
+const Home = ({match}) => {
     const intl = useIntl()
-
-    const [activeLocale] = useLocale()
 
     return (
         <Box data-testid="home-page" layerStyle="page">
@@ -51,7 +48,7 @@ const Home = () => {
                 actions={
                     <Button
                         as={Link}
-                        to={`/${activeLocale}/category/newarrivals`}
+                        to={`/${match?.params?.locale}/category/newarrivals`}
                         width={{base: 'full', md: 'inherit'}}
                     >
                         <FormattedMessage defaultMessage="Shop New Arrivals" />
@@ -74,19 +71,19 @@ const Home = () => {
                     rowGap={8}
                 >
                     <GridItem rowSpan={1} colSpan={{base: 1, md: 2}}>
-                        <BasicTile {...categories(activeLocale)[0]} />
+                        <BasicTile {...categories(match?.params?.locale)[0]} />
                     </GridItem>
                     <GridItem rowSpan={1} colSpan={{base: 1, md: 2}}>
-                        <BasicTile {...categories(activeLocale)[1]} />
+                        <BasicTile {...categories(match?.params?.locale)[1]} />
                     </GridItem>
                     <GridItem rowSpan={1} colSpan={{base: 1, md: 2}}>
-                        <BasicTile {...categories(activeLocale)[2]} />
+                        <BasicTile {...categories(match?.params?.locale)[2]} />
                     </GridItem>
                     <GridItem rowSpan={1} colSpan={{base: 1, md: 3}}>
-                        <BasicTile {...categories(activeLocale)[3]} />
+                        <BasicTile {...categories(match?.params?.locale)[3]} />
                     </GridItem>
                     <GridItem rowSpan={1} colSpan={{base: 1, md: 3}}>
-                        <BasicTile {...categories(activeLocale)[4]} />
+                        <BasicTile {...categories(match?.params?.locale)[4]} />
                     </GridItem>
                 </Grid>
             </Section>
@@ -111,13 +108,19 @@ const Home = () => {
 Home.getTemplateName = () => 'home'
 Home.propTypes = {
     recommendations: PropTypes.array,
-    isLoading: PropTypes.bool
+    isLoading: PropTypes.bool,
+    match: PropTypes.object
 }
 
 Home.shouldGetProps = ({previousLocation, location}) => {
     return previousLocation?.pathname !== location.pathname
 }
 
-Home.getProps = async () => {}
+Home.getProps = async ({api, params}) => {
+    if (params?.locale && params?.locale !== api.getLocale()) {
+        // Set the target local.
+        api.setLocale(params?.locale)
+    }
+}
 
 export default Home

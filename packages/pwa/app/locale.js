@@ -91,10 +91,7 @@ export const whichLocaleToLoad = (preferredLocales, supportedLocales, fallbackLo
  * @returns {string} Either `TARGET_LOCALE` environment variable if it's set OR the calculated target locale
  */
 export const getTargetLocale = (preferredLocales, supportedLocales, defaultLocale) => {
-    return (
-
-        whichLocaleToLoad(preferredLocales, supportedLocales, defaultLocale)
-    )
+    return whichLocaleToLoad(preferredLocales, supportedLocales, defaultLocale)
 }
 
 const LocaleContext = React.createContext()
@@ -133,8 +130,10 @@ export const useLocale = () => {
     const {activeLocale, changeLocale} = useContext(LocaleContext)
     return [activeLocale, changeLocale]
 }
+
 /**
- *  OCAPI and Commerce API `locale` parameter format: <language code>-<country code>
+ *  Default message for the supported locales.
+ *  `locale` parameter format for OCAPI and Commerce API: <language code>-<country code>
  *  https://documentation.b2c.commercecloud.salesforce.com/DOC1/topic/com.demandware.dochelp/OCAPI/current/usage/Localization.html
  *  */
 export const localesDefaultMessage = defineMessages({

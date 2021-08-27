@@ -30,6 +30,8 @@ import {HideOnDesktop, HideOnMobile} from '../responsive'
 import {useLocale, SUPPORTED_LOCALES, localesDefaultMessage} from '../../locale'
 import {useHistory, useLocation} from 'react-router-dom'
 
+const HOME_HREF = '/'
+
 const Footer = ({...otherProps}) => {
     const styles = useMultiStyleConfig('Footer')
     const intl = useIntl()
@@ -130,10 +132,10 @@ const Footer = ({...otherProps}) => {
                                 value={activeLocale}
                                 onChange={({target}) => {
                                     // TODO: Replace the `locale` in a better way (first pathname in the URL)
-                                    const newUrl = location.pathname.replace(
-                                        activeLocale,
-                                        target.value
-                                    )
+                                    const newUrl =
+                                        location.pathname === HOME_HREF
+                                            ? location.pathname + target.value
+                                            : location.pathname.replace(activeLocale, target.value)
 
                                     changeLocale(target.value)
                                     history.push(newUrl)

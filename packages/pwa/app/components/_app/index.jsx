@@ -82,7 +82,7 @@ const App = (props) => {
 
     const onLogoClick = () => {
         // Goto the home page.
-        history.push(HOME_HREF)
+        history.push(`${HOME_HREF}${targetLocale !== defaultLocale ? targetLocale : ''}`)
 
         // Close the drawer.
         onClose()
@@ -228,9 +228,6 @@ App.getProps = async ({api, params, location}) => {
             // then the app would use the default locale as the fallback.
         }
     })
-
-    // Set the target local.
-    api.setLocale(localeConfig.app.targetLocale)
 
     // Login as `guest` to get session.
     await api.auth.login()

@@ -62,7 +62,6 @@ import {HTTPNotFound} from 'pwa-kit-react-sdk/ssr/universal/errors'
 
 // Constants
 import {DEFAULT_LIMIT_VALUES, customerProductListTypes} from '../../constants'
-import {getLocaleConfig} from '../../locale'
 import useNavigation from '../../hooks/use-navigation'
 import LoadingSpinner from '../../components/loading-spinner'
 import {API_ERROR_MESSAGE} from '../../constants'
@@ -570,23 +569,10 @@ ProductList.shouldGetProps = ({previousLocation, location}) =>
     previousLocation.search !== location.search
 
 ProductList.getProps = async ({res, params, location, api}) => {
-    const localeConfig = await getLocaleConfig({
-        getUserPreferredLocales: () => {
-            // TODO: You can detect their preferred locales from:
-            // - client side: window.navigator.languages
-            // - the page URL they're on (example.com/en-GB/home)
-            // - cookie (if their previous preference is saved there)
-            // And decide which one takes precedence.
-            const localeInPageUrl = params.locale
-            return localeInPageUrl ? [localeInPageUrl] : []
-
-            // If in this function an empty array is returned (e.g. there isn't locale in the page url),
-            // then the app would use the default locale as the fallback.
-        }
-    })
-
-    // Set the target local.
-    api.setLocale(localeConfig.app.targetLocale)
+    if (params?.locale && params?.locale !== api.getLocale()) {
+        // Set the target local.
+        api.setLocale(params?.locale)
+    }
 
     const {categoryId} = params
     const urlParams = new URLSearchParams(location.search)
