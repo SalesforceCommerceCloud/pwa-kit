@@ -111,6 +111,12 @@ const App = (props) => {
         history.push(`/${targetLocale}/account/wishlist`)
     }
 
+    // Initialize locale in localStorage
+    const onClient = typeof window !== 'undefined'
+    if (onClient && window.localStorage.getItem('locale') === null) {
+        window.localStorage.setItem('locale', targetLocale)
+    }
+
     return (
         <Box className="sf-app" {...styles.container}>
             <IntlProvider
