@@ -6,35 +6,55 @@
  */
 
 /**
- * Filter out an image group from image groups based on size and selected variation attribute
+ * Find the ImageGroup that matches the criteria supplied
  *
- * @param imageGroups - image groups to be filtered
- * @param options - contains size and selected variation attributes as filter criteria
- * @returns object
+ * @param {Object} imageGroups - The product/variations image groups you want to search.
+ * @param {Object} options - Search criteria to match on the ImageGroup object.
+ * @param {string} options.viewType - contains size and selected variation attributes as filter criteria
+ * @param {Object} options.selectedVariationAttributes - contains size and selected variation attributes as filter criteria
+ * @returns {Object} - The ImageGroup matching the search criteria
  */
-export const filterImageGroups = (imageGroups, options) => {
-    const {size, selectedVariationAttributes = {}} = options
+export const findImageGroupBy = (imageGroups = [], options) => {
+    let {size, selectedVariationAttributes = {}} = options
 
-    if (!imageGroups || imageGroups.length === 0) return
+    // Start by filtering out any imageGroup that isn't the correct viewType.
+    imageGroups = imageGroups.filter(({viewType}) => viewType === size)
 
-    const sizeMatchedGroups = imageGroups.filter(({viewType}) => viewType === size)
-    if (sizeMatchedGroups.length === 0) return
-
-    // if there is no variationAttributes in the imageGroups, no need to execute any further filter logic on it
-    if (
-        sizeMatchedGroups[0].variationAttributes === 0 ||
-        Object.keys(selectedVariationAttributes).length === 0
-    ) {
-        return sizeMatchedGroups[0]
-    }
-
-    return sizeMatchedGroups.find(({variationAttributes}) => {
-        return (
-            variationAttributes &&
-            variationAttributes.every(({id, values}) => {
-                const valueValues = values.map(({value}) => value)
-                return valueValues.includes(selectedVariationAttributes[id])
-            })
+    // Not all variation attributes are reflected in images. For example, you probably
+    // won't have a separate image group for various sizes, but you might for colors. For that
+    // reason we need to know what are valid attribute values to filter on.
+    const refineableAttributeIds = [
+        ...new Set(
+            imageGroups
+                .reduce((acc, {variationAttributes = []}) => [...acc, ...variationAttributes], [])
+                .map(({id}) => id)
         )
+    ]
+
+    // Update the `selectedVariationAttributes` by filtering out the attributes that have no
+    // representation in this imageGroup.
+    selectedVariationAttributes = Object.keys(selectedVariationAttributes).reduce((acc, curr) => {
+        return refineableAttributeIds.includes(curr)
+            ? {
+                  ...acc,
+                  [`${curr}`]: selectedVariationAttributes[curr]
+              }
+            : acc
+    }, {})
+
+    // Find the image group that has all the all the selected variation value attributes.
+    imageGroups = imageGroups.find(({variationAttributes = []}) => {
+        const selectedIds = Object.keys(selectedVariationAttributes)
+
+        return selectedIds.every((selectedId) => {
+            const selectedValue = selectedVariationAttributes[selectedId]
+
+            return variationAttributes.find(
+                ({id, values}) =>
+                    id === selectedId && values.every(({value}) => value === selectedValue)
+            )
+        })
     })
+
+    return imageGroups
 }
