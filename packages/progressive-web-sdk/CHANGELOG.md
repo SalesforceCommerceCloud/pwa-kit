@@ -1,3 +1,4 @@
+## v1.18.2 (Aug 27, 2021)
 ## v1.18.1 (Jun 22, 2020)
 - Hotfix: Fix incorrect handling of capital letters inside querystrings in request processor code [#2760](https://mobify.atlassian.net/browse/WEB-2760)
 
