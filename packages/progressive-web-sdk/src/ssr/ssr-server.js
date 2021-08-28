@@ -25,6 +25,7 @@ const pkg = require('../../package.json')
 const sdkVersion = pkg.version
 const semver = require('semver')
 const URL = require('url')
+const serialize = require('serialize-javascript')
 
 import {initCacheManifest} from '../asset-utils'
 import {PersistentCache} from '../utils/ssr-cache-utils'
@@ -465,7 +466,7 @@ class Rendering {
         // JSON so that it may safely be included in a <script> tag
         // in the output page.
         this._timer.start('rendering-embed-app-state')
-        const stringifiedAppState = escapeJSText(JSON.stringify(this._renderedAppState))
+        const stringifiedAppState = serialize(this._renderedAppState, {isJSON: true})
         this._timer.end('rendering-embed-app-state')
 
         const timingOutput = this._timer.summary
