@@ -1,9 +1,9 @@
 {
   "name": "scaffold-connector",
-  "version": "1.20.4",
+  "version": "1.20.5",
   "description": "",
   "dependencies": {
-    "@mobify/commerce-integrations": "^1.20.4"
+    "@mobify/commerce-integrations": "^1.20.5"
   },
   "devDependencies": {
     "@babel/cli": "^7.4.4",

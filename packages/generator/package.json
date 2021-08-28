@@ -1,6 +1,6 @@
 {
   "name": "@mobify/generator",
-  "version": "1.20.4",
+  "version": "1.20.5",
   "description": "Mobify's project generator tool",
   "private": true,
   "main": "scripts/mobify-generator.js",
