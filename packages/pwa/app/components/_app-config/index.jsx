@@ -27,6 +27,9 @@ const apiConfig = {
     einsteinConfig: einsteinAPIConfig
 }
 
+const getLocale = ({originalUrl}) =>
+    originalUrl ? originalUrl.split('/')[1] : window.__PRELOADED_STATE__.appProps.targetLocale
+
 /**
  * Use the AppConfig component to inject extra arguments into the getProps
  * methods for all Route Components in the app – typically you'd want to do this
@@ -56,7 +59,9 @@ const AppConfig = ({children, locals = {}}) => {
 }
 
 AppConfig.restore = (locals = {}) => {
-    locals.api = new CommerceAPI(apiConfig)
+    const locale = getLocale(locals)
+    console.log('local local: ', locale)
+    locals.api = new CommerceAPI({...apiConfig, locale})
 }
 
 AppConfig.freeze = () => undefined

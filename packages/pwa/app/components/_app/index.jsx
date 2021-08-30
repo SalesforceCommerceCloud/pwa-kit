@@ -200,18 +200,7 @@ const App = (props) => {
     )
 }
 
-App.shouldGetProps = ({previousLocation, location}) => {
-    // We want to fetch data for the app on the server once and everytime the locale
-    // in the URL pathname changes.
-    return (
-        typeof window === 'undefined' ||
-        !previousLocation ||
-        previousLocation.pathname !== location.pathname
-    )
-}
-
 App.getProps = async ({api, params, location}) => {
-    const onClient = typeof window !== 'undefined'
     const localeConfig = await getLocaleConfig({
         getUserPreferredLocales: () => {
             // TODO: You can detect their preferred locales from:
@@ -221,6 +210,7 @@ App.getProps = async ({api, params, location}) => {
             // And decide which one takes precedence.
 
             // TODO: Extract the `locale` in a better way (first pathname in the URL)
+            // NOTE: Lets assume that the locale will always be in the `params.locale`.
             let part = location.pathname.match(/^\/([a-z]{2}-[A-Z]{2})\//)
 
             const localeInPageUrl = params.locale ? params.locale : part?.length > 0 && part[1]
@@ -230,10 +220,6 @@ App.getProps = async ({api, params, location}) => {
             // then the app would use the default locale as the fallback.
         }
     })
-
-    // Set the `locale` for Commerce API and localStorage
-    api.setLocale(localeConfig.app.targetLocale)
-    onClient && window.localStorage.setItem('locale', localeConfig.app.targetLocale)
 
     // Login as `guest` to get session.
     await api.auth.login()

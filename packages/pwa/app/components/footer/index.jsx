@@ -137,10 +137,11 @@ const Footer = ({...otherProps}) => {
                                             ? `${location.pathname}${target.value}/`
                                             : location.pathname.replace(activeLocale, target.value)
 
-                                    changeLocale(target.value)
-                                    history.push(newUrl)
+                                    window.location = newUrl
+                                    // changeLocale(target.value)
+                                    // history.push(newUrl)
 
-                                    window.localStorage.setItem('locale', target.value)
+                                    // window.localStorage.setItem('locale', target.value)
                                 }}
                                 variant="filled"
                                 {...styles.localeDropdown}

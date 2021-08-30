@@ -330,11 +330,6 @@ ProductDetail.shouldGetProps = ({previousLocation, location}) => {
 }
 
 ProductDetail.getProps = async ({params, location, api}) => {
-    if (params?.locale && params?.locale !== api.getLocale()) {
-        // Set the target local.
-        api.setLocale(params?.locale)
-    }
-
     const {productId} = params
     let category, product
     const urlParams = new URLSearchParams(location.search)

@@ -43,7 +43,11 @@ app.get('/callback?*', (req, res) => {
     res.send()
 })
 app.get('/robots.txt', serveStaticFile('static/robots.txt'))
-app.get('/*', render)
+app.get('/*', (req, res) => {
+    // Set the originalUrl
+    res.locals.originalUrl = req.originalUrl
+    return render(req, res)
+})
 
 // SSR requires that we export a single handler function called 'get', that
 // supports AWS use of the server that we created above.

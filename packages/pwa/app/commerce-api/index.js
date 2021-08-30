@@ -53,9 +53,9 @@ class CommerceAPI {
     constructor(config = {}) {
         const me = this
 
-        this.locale = DEFAULT_LOCALE
+        const {proxyPath, locale, ...restConfig} = config
 
-        const {proxyPath, ...restConfig} = config
+        this.locale = locale || DEFAULT_LOCALE
 
         // Client-side requests should be proxied via the configured path.
         const proxy = `${getAppOrigin()}${proxyPath}`
@@ -100,8 +100,6 @@ class CommerceAPI {
                                 return self.willSendRequest(prop, ...args).then((newArgs) => {
                                     const onClient = typeof window !== 'undefined'
 
-                                    onClient && me.setLocale(window.localStorage.getItem('locale'))
-
                                     // Inject the locale to the API call via it's parameters.
                                     //
                                     // NOTE: The commerce sdk isomorphic will complain if you pass parameters to
@@ -114,7 +112,7 @@ class CommerceAPI {
                                     ) {
                                         newArgs[0].parameters = {
                                             ...newArgs[0].parameters,
-                                            locale: me.getLocale()
+                                            locale: me.locale
                                         }
                                     }
 
@@ -143,21 +141,6 @@ class CommerceAPI {
      */
     getConfig() {
         return this._config
-    }
-
-    /**
-     *
-     * @param {*} locale
-     */
-    setLocale(locale) {
-        this.locale = locale
-    }
-
-    /**
-     *
-     */
-    getLocale() {
-        return this.locale
     }
 
     /**
