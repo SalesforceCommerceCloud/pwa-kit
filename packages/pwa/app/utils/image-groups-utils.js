@@ -34,7 +34,7 @@ export const findImageGroupBy = (imageGroups = [], options) => {
     // Update the `selectedVariationAttributes` by filtering out the attributes that have no
     // representation in this imageGroup.
     selectedVariationAttributes = Object.keys(selectedVariationAttributes).reduce((acc, curr) => {
-        return refineableAttributeIds.includes(curr)
+        return refinableAttributeIds.includes(curr)
             ? {
                   ...acc,
                   [`${curr}`]: selectedVariationAttributes[curr]
