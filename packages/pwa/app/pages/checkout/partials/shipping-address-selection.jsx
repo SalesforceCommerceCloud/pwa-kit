@@ -130,7 +130,6 @@ const ShippingAddressSelection = ({
         // Automatically select the customer's default/preferred shipping address
         if (customer.addresses) {
             const address = customer.addresses.find((addr) => addr.preferred === true)
-            console.log(address)
             if (address) {
                 form.reset({...address})
             }
