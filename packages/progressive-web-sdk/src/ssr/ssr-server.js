@@ -34,7 +34,6 @@ import {
     catchAndLog,
     configureProxyConfigs,
     getHashForString,
-    escapeJSText,
     getAssetUrl,
     getBrowserSize,
     getBundleBaseUrl,
@@ -2817,7 +2816,7 @@ export class SSRServer {
                 headContent.push(`<!-- Embedded ${baseFilename} -->`)
                 // We use the base filename as the id
                 headContent.push(
-                    new ScriptTag({id: baseFilename}, escapeJSText(scriptText).trimRight())
+                    new ScriptTag({id: baseFilename}, serialize(scriptText).trimRight())
                 )
                 // For JQuery - set up window.Progressive.$
                 if (scriptFilename === JQUERY_JS) {
