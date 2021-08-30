@@ -89,7 +89,7 @@ commands:
           command: |
               # Quick and dirty check of number of dependencies. We want to
               # start bringing these down - many are duplicated.
-              MAX_PACKAGES="389"
+              MAX_PACKAGES="390"
 
               uniques=$(ls ./package.json ./packages/*/package.json | xargs -I _ -n 1 \
                   node -e "const p = require('_'); console.log(Object.keys(p.dependencies || {}).join('\n')); console.log(Object.keys(p.devDependencies || {}).join('\n'))" \
