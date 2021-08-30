@@ -5,12 +5,13 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
+import PropTypes from 'prop-types'
 import {FormattedMessage} from 'react-intl'
 import {Box, Button, Stack, Center, Text} from '@chakra-ui/react'
 import {AccountIcon, BasketIcon} from '../../../components/icons'
 import Link from '../../../components/link'
 
-const EmptyCart = () => {
+const EmptyCart = ({isRegistered}) => {
     return (
         <Box data-testid="sf-cart-empty" flex="1" minWidth="100%" width="full" background="gray.50">
             <Center>
@@ -30,10 +31,14 @@ const EmptyCart = () => {
                             </Text>
 
                             <Text align="center" fontSize="md" color="gray.700">
-                                <FormattedMessage defaultMessage="Sign in to retrieve your saved items or continue shopping" />
+                                {isRegistered ? (
+                                    <FormattedMessage defaultMessage="Continue shopping to add items to your cart" />
+                                ) : (
+                                    <FormattedMessage defaultMessage="Sign in to retrieve your saved items or continue shopping" />
+                                )}
                             </Text>
                         </Stack>
-                        <Stack direction={['column', 'row']} spacing={4}>
+                        <Stack justify="center" direction={['column', 'row']} spacing={4}>
                             <Button
                                 as={Link}
                                 href={'/'}
@@ -43,15 +48,17 @@ const EmptyCart = () => {
                             >
                                 <FormattedMessage defaultMessage="Continue Shopping" />
                             </Button>
-                            <Button
-                                as={Link}
-                                href="/account"
-                                width={['343px', '220px']}
-                                rightIcon={<AccountIcon />}
-                                variant="solid"
-                            >
-                                <FormattedMessage defaultMessage="Sign In" />
-                            </Button>
+                            {!isRegistered && (
+                                <Button
+                                    as={Link}
+                                    href="/account"
+                                    width={['343px', '220px']}
+                                    rightIcon={<AccountIcon />}
+                                    variant="solid"
+                                >
+                                    <FormattedMessage defaultMessage="Sign In" />
+                                </Button>
+                            )}
                         </Stack>
                     </Stack>
                 </Stack>
@@ -59,5 +66,6 @@ const EmptyCart = () => {
         </Box>
     )
 }
+EmptyCart.propTypes = {isRegistered: PropTypes.bool}
 
 export default EmptyCart
