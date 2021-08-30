@@ -88,6 +88,7 @@ const usePaymentForms = () => {
         billingAddressForm,
         billingSameAsShipping,
         setBillingSameAsShipping,
+        submitBillingAddressForm,
         reviewOrder
     }
 }

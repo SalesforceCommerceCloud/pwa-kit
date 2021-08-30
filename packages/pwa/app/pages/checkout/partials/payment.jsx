@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useEffect} from 'react'
+import React, {useEffect, useState} from 'react'
 import PropTypes from 'prop-types'
 import {FormattedMessage} from 'react-intl'
 import {Box, Button, Checkbox, Container, Heading, Stack, Text, Divider} from '@chakra-ui/react'
@@ -33,14 +33,23 @@ const Payment = () => {
         billingAddressForm,
         billingSameAsShipping,
         setBillingSameAsShipping,
-        reviewOrder
+        reviewOrder,
+        submitBillingAddressForm
     } = usePaymentForms()
 
     const {removePromoCode, ...promoCodeProps} = usePromoCode()
+    const [isLoading, setIsLoading] = useState()
 
     useEffect(() => {
         getPaymentMethods()
     }, [])
+
+    const submitAndContinue = async (address) => {
+        setIsLoading(true)
+        await reviewOrder()
+        await submitBillingAddressForm(address)
+        setIsLoading(false)
+    }
 
     return (
         // TODO: [l10n] localize this title
@@ -50,7 +59,8 @@ const Payment = () => {
             editing={step === 3}
             isLoading={
                 paymentMethodForm.formState.isSubmitting ||
-                billingAddressForm.formState.isSubmitting
+                billingAddressForm.formState.isSubmitting ||
+                isLoading
             }
             disabled={selectedPayment == null}
             onEdit={() => setCheckoutStep(3)}
@@ -110,6 +120,7 @@ const Payment = () => {
                         <ShippingAddressSelection
                             form={billingAddressForm}
                             selectedAddress={selectedBillingAddress}
+                            onSubmit={submitAndContinue}
                             hideSubmitButton
                         />
                     )}
