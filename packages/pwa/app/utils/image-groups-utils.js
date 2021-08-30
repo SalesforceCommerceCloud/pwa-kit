@@ -23,7 +23,7 @@ export const findImageGroupBy = (imageGroups = [], options) => {
     // Not all variation attributes are reflected in images. For example, you probably
     // won't have a separate image group for various sizes, but you might for colors. For that
     // reason we need to know what are valid attribute values to filter on.
-    const refineableAttributeIds = [
+    const refinableAttributeIds = [
         ...new Set(
             imageGroups
                 .reduce((acc, {variationAttributes = []}) => [...acc, ...variationAttributes], [])
@@ -34,7 +34,7 @@ export const findImageGroupBy = (imageGroups = [], options) => {
     // Update the `selectedVariationAttributes` by filtering out the attributes that have no
     // representation in this imageGroup.
     selectedVariationAttributes = Object.keys(selectedVariationAttributes).reduce((acc, curr) => {
-        return refineableAttributeIds.includes(curr)
+        return refinableAttributeIds.includes(curr)
             ? {
                   ...acc,
                   [`${curr}`]: selectedVariationAttributes[curr]
