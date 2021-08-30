@@ -201,7 +201,8 @@ const App = (props) => {
 }
 
 App.shouldGetProps = ({previousLocation, location}) => {
-    // In this case, we only want to fetch data for the app once, on the server.
+    // We want to fetch data for the app on the server once and everytime the locale
+    // in the URL pathname changes.
     return (
         typeof window === 'undefined' ||
         !previousLocation ||
