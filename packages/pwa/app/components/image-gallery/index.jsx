@@ -71,7 +71,7 @@ const ImageGallery = ({imageGroups = [], selectedVariationAttributes = {}, size}
     const heroImageGroup = useMemo(
         () =>
             findImageGroupBy(imageGroups, {
-                size: LARGE,
+                viewType: LARGE,
                 selectedVariationAttributes
             }),
         [selectedVariationAttributes]
@@ -88,7 +88,7 @@ const ImageGallery = ({imageGroups = [], selectedVariationAttributes = {}, size}
     const thumbnailImageGroup = useMemo(
         () =>
             findImageGroupBy(imageGroups, {
-                size: SMALL,
+                viewType: SMALL,
                 selectedVariationAttributes
             }),
         [selectedVariationAttributes]

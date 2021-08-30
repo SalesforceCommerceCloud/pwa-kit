@@ -42,7 +42,7 @@ const AddToCartModal = ({product, variant, quantity, isOpen, onClose, ...props})
     const lineItemPrice =
         productItems?.find((item) => item.productId === productId)?.basePrice * quantity
     const image = findImageGroupBy(product.imageGroups, {
-        size: 'small',
+        viewType: 'small',
         selectedVariationAttributes: variationValues
     })?.images?.[0]
 

@@ -15,10 +15,12 @@
  * @returns {Object} - The ImageGroup matching the search criteria
  */
 export const findImageGroupBy = (imageGroups = [], options) => {
-    let {size, selectedVariationAttributes = {}} = options
+    let {viewType, selectedVariationAttributes = {}} = options
 
     // Start by filtering out any imageGroup that isn't the correct viewType.
-    imageGroups = imageGroups.filter(({viewType}) => viewType === size)
+    imageGroups = imageGroups.filter(
+        ({viewType: imageGroupViewType}) => imageGroupViewType === viewType
+    )
 
     // Not all variation attributes are reflected in images. For example, you probably
     // won't have a separate image group for various sizes, but you might for colors. For that

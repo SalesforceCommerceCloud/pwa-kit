@@ -12,17 +12,17 @@ it.each([undefined, []])('returns undefined', (groups) => {
 })
 
 test('returns undefined for image groups with no size match', () => {
-    expect(findImageGroupBy([{viewType: 'small'}], {size: 'large'})).toBeUndefined()
+    expect(findImageGroupBy([{viewType: 'small'}], {viewType: 'large'})).toBeUndefined()
 })
 
 test('returns first match for image groups with no variationAttributes', () => {
     const groups = [{viewType: 'small'}]
-    expect(findImageGroupBy(groups, {size: 'small'})).toBe(groups[0])
+    expect(findImageGroupBy(groups, {viewType: 'small'})).toBe(groups[0])
 })
 
 test('returns first match for image groups with empty variationAttributes', () => {
     const groups = [{viewType: 'small', variationAttributes: []}]
-    expect(findImageGroupBy(groups, {size: 'small'})).toBe(groups[0])
+    expect(findImageGroupBy(groups, {viewType: 'small'})).toBe(groups[0])
 })
 
 test('returns first match for image groups with no selectedVariationAttributes', () => {
@@ -41,7 +41,7 @@ test('returns first match for image groups with no selectedVariationAttributes',
             ]
         }
     ]
-    expect(findImageGroupBy(groups, {size: 'small'})).toBe(groups[0])
+    expect(findImageGroupBy(groups, {viewType: 'small'})).toBe(groups[0])
 })
 
 test('returns first match for image groups with matching selectedVariationAttributes', () => {
@@ -59,7 +59,7 @@ test('returns first match for image groups with matching selectedVariationAttrib
             variationAttributes: [variation]
         }
     ]
-    expect(findImageGroupBy(groups, {size: 'small', selectedVariationValues: variation})).toBe(
+    expect(findImageGroupBy(groups, {viewType: 'small', selectedVariationValues: variation})).toBe(
         groups[0]
     )
 })
