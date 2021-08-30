@@ -15,7 +15,6 @@ import fileUrl from 'file-url'
 import {
     AGENT_OPTIONS_TO_COPY,
     CachedResponse,
-    escapeJSText,
     getBrowserSizeNames,
     getBrowserSize,
     getBuildOrigin,
