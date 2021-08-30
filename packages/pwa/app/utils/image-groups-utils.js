@@ -10,8 +10,8 @@
  *
  * @param {Object} imageGroups - The product/variations image groups you want to search.
  * @param {Object} options - Search criteria to match on the ImageGroup object.
- * @param {string} options.viewType - contains size and selected variation attributes as filter criteria
- * @param {Object} options.selectedVariationAttributes - contains size and selected variation attributes as filter criteria
+ * @param {string} options.viewType - Typically this refers to image sizes like small, medium, large. But can vary based on your back-end configuration.
+ * @param {Object} options.selectedVariationAttributes - A key/value object consisting of attibute id's and their values.
  * @returns {Object} - The ImageGroup matching the search criteria
  */
 export const findImageGroupBy = (imageGroups = [], options) => {
