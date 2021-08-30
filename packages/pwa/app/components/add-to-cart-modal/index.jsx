@@ -27,7 +27,7 @@ import useBasket from '../../commerce-api/hooks/useBasket'
 import {LockIcon} from '../icons'
 import {DEFAULT_CURRENCY} from '../../constants'
 import {useVariationAttributes} from '../../hooks'
-import {filterImageGroups} from '../../utils/image-groups-utils'
+import {findImageGroupBy} from '../../utils/image-groups-utils'
 
 /**
  * Visual feedback for adding item to the cart.
@@ -41,7 +41,7 @@ const AddToCartModal = ({product, variant, quantity, isOpen, onClose, ...props})
     const {productId, variationValues} = variant
     const lineItemPrice =
         productItems?.find((item) => item.productId === productId)?.basePrice * quantity
-    const image = filterImageGroups(product.imageGroups, {
+    const image = findImageGroupBy(product.imageGroups, {
         size: 'small',
         selectedVariationAttributes: variationValues
     })?.images?.[0]
