@@ -49,7 +49,7 @@ jest.mock('../../../commerce-api/hooks/useCustomerProductLists', () => {
             ...mockedWishlist,
             loaded: jest.fn().mockReturnValue(true),
             getProductsInList: jest.fn(),
-            fetchOrCreateProductLists: jest.fn(),
+            getOrCreateProductLists: jest.fn(),
             getProductListPerType: jest.fn().mockReturnValue(mockedWishlist.data[0])
         }
     }

@@ -86,7 +86,7 @@ const useShopper = () => {
         }
         if (customer.isRegistered) {
             // we are only interested in wishlist
-            customerProductLists.fetchOrCreateProductLists(customerProductListTypes.WISHLIST)
+            customerProductLists.getOrCreateProductLists(customerProductListTypes.WISHLIST)
         }
         if (customer.isGuest) {
             // customerProductLists need to be reset when the user logs out

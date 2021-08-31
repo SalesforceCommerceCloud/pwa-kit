@@ -103,7 +103,7 @@ export default function useCustomerProductLists({eventHandler = noop, errorHandl
              * @param {string} type type of list to fetch or create
              * @returns product lists for registered users
              */
-            async fetchOrCreateProductLists(type) {
+            async getOrCreateProductLists(type) {
                 setIsLoading(true)
                 // fetch customer productLists
                 const response = await api.shopperCustomers.getCustomerProductLists({
