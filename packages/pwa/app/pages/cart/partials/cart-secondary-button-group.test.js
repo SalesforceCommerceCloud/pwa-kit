@@ -92,7 +92,7 @@ jest.mock('../../../commerce-api/hooks/useCustomer', () => {
 
         return {
             ...customer,
-            authType: 'registered'
+            isRegistered: () => true
         }
     }
 })
