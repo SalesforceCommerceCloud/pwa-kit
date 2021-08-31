@@ -1134,24 +1134,6 @@ Reflect.setPrototypeOf(JSDOMCustomResourceLoader.prototype, ResourceLoader.proto
 Reflect.setPrototypeOf(JSDOMCustomResourceLoader, ResourceLoader)
 
 /**
- * Given a piece of JavaScript or JSON as text, escape any
- * '</' so that it can be embedded within HTML.
- *
- * @private
- * @param {String} text
- * @returns {String}
- */
-export const escapeJSText = (text) =>
-    (text &&
-        text.replace(
-            // This must be a regex so that the replacement
-            // is applied to all occurrences
-            /<\//gm,
-            '\\x3c\\x2f'
-        )) ||
-    text
-
-/**
  * Called by responseSend to adjust the headers of a response before
  * it's handled by aws-serverless-express
  *
