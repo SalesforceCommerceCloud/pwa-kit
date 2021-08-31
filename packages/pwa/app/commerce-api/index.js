@@ -50,7 +50,7 @@ class CommerceAPI {
      * @param {ClientConfig} config - The config used to instantiate SDK apis.
      */
     constructor(config = {}) {
-        const {proxyPath, locale, ...restConfig} = config
+        const {proxyPath, ...restConfig} = config
 
         // Client-side requests should be proxied via the configured path.
         const proxy = `${getAppOrigin()}${proxyPath}`
