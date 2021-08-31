@@ -92,7 +92,7 @@ export default function useCustomerProductLists({eventHandler = noop, errorHandl
                 return customerProductLists?.data.find((list) => list.type === type)
             },
 
-            clearProductLists() {
+            clear() {
                 // clear out the product lists in context
                 setCustomerProductLists({})
             },

@@ -19,6 +19,13 @@ export default function useCustomer() {
             ...customer,
 
             /**
+             * Returns boolean value whether the user data is initialized
+             */
+            get isInitialized() {
+                return !!customer?.customerId
+            },
+
+            /**
              * Returns boolean value whether the customer is of type `registered` or not.
              */
             get isRegistered() {
