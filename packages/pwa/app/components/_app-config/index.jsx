@@ -60,7 +60,6 @@ const AppConfig = ({children, locals = {}}) => {
 
 AppConfig.restore = (locals = {}) => {
     const locale = getLocale(locals)
-    console.log('local local: ', locale)
     locals.api = new CommerceAPI({...apiConfig, locale})
 }
 

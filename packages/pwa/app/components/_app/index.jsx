@@ -36,7 +36,7 @@ import {AuthModal, useAuthModal} from '../../hooks/use-auth-modal'
 
 // Others
 import {watchOnlineStatus, flatten} from '../../utils/utils'
-import {IntlProvider, getLocaleConfig} from '../../locale'
+import {IntlProvider, getLocaleConfig, DEFAULT_LOCALE} from '../../locale'
 
 import Seo from '../seo'
 
@@ -211,9 +211,14 @@ App.getProps = async ({api, params, location}) => {
 
             // TODO: Extract the `locale` in a better way (first pathname in the URL)
             // NOTE: Lets assume that the locale will always be in the `params.locale`.
-            let part = location.pathname.match(/^\/([a-z]{2}-[A-Z]{2})\//)
+            const part = location.pathname.match(/^\/([a-z]{2}-[A-Z]{2})\//)
 
-            const localeInPageUrl = params.locale ? params.locale : part?.length > 0 && part[1]
+            const localeInPageUrl = params.locale
+                ? params.locale
+                : part?.length > 0
+                ? part[1]
+                : DEFAULT_LOCALE
+
             return localeInPageUrl ? [localeInPageUrl] : []
 
             // If in this function an empty array is returned (e.g. there isn't locale in the page url),
