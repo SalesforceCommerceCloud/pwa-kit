@@ -50,11 +50,7 @@ class CommerceAPI {
      * @param {ClientConfig} config - The config used to instantiate SDK apis.
      */
     constructor(config = {}) {
-        const me = this
-
         const {proxyPath, locale, ...restConfig} = config
-
-        this.locale = locale
 
         // Client-side requests should be proxied via the configured path.
         const proxy = `${getAppOrigin()}${proxyPath}`
@@ -104,9 +100,12 @@ class CommerceAPI {
                     get: function(obj, prop) {
                         if (typeof obj[prop] === 'function') {
                             return (...args) => {
+                                const {locale} = self._config
+
                                 if (args[0].ignoreHooks) {
                                     return obj[prop](...args)
                                 }
+
                                 return self.willSendRequest(prop, ...args).then((newArgs) => {
                                     // Inject the locale to the API call via it's parameters.
                                     //
@@ -116,7 +115,7 @@ class CommerceAPI {
                                     if (apiConfigs[key].canLocalize) {
                                         newArgs[0].parameters = {
                                             ...newArgs[0].parameters,
-                                            ...(me.locale && {locale: me.locale})
+                                            ...(locale && {locale})
                                         }
                                     }
 
