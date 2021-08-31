@@ -163,7 +163,7 @@ const DrawerMenu = ({isOpen, onClose = noop, onLogoClick = noop, root}) => {
                         {/* Application Actions */}
                         <VStack align="stretch" spacing={0} {...styles.actions} px={0}>
                             <Box {...styles.actionsItem}>
-                                {customer?.authType === 'registered' ? (
+                                {customer.isRegistered ? (
                                     <NestedAccordion
                                         urlBuilder={(item, locale) =>
                                             `/${locale}/account${item.path}`

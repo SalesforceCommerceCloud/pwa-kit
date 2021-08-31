@@ -162,7 +162,7 @@ const Header = ({
                         })}
                     />
 
-                    {customer?.authType === 'registered' && (
+                    {customer.isRegistered && (
                         <Popover
                             arrowSize={15}
                             isOpen={isOpen}

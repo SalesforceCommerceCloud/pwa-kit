@@ -29,7 +29,7 @@ const Registration = () => {
 
     // If customer is registered push to account page
     useEffect(() => {
-        if (customer.authType != null && customer.authType === 'registered') {
+        if (customer.authType != null && customer.isRegistered) {
             navigate('/account')
         }
     }, [customer])

@@ -13,6 +13,7 @@ import gradients from './foundations/gradients'
 import sizes from './foundations/sizes'
 import space from './foundations/space'
 import layerStyles from './foundations/layerStyles'
+import shadows from './foundations/shadows'
 
 // Base component style overrides
 import Alert from './components/base/alert'
@@ -60,6 +61,7 @@ const overrides = {
     sizes,
     space,
     gradients,
+    shadows,
     components: {
         // base components
         Accordion,
