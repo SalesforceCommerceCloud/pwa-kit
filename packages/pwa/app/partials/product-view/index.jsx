@@ -51,9 +51,7 @@ const ProductViewHeader = ({name, price, currency, category}) => {
 
             {/* Title */}
             <Skeleton isLoaded={name}>
-                <Heading as="h2" size="lg">
-                    {`${name}`}
-                </Heading>
+                <Heading fontSize="2xl">{`${name}`}</Heading>
             </Skeleton>
 
             {/* Price */}
@@ -198,7 +196,7 @@ const ProductView = ({
                 />
             </Box>
             <Flex direction={['column', 'column', 'column', 'row']}>
-                <Box flex={2} mr={[0, 0, 4, 4]}>
+                <Box flex={1} mr={[0, 0, 6, 6]}>
                     {product ? (
                         <>
                             <ImageGallery
@@ -303,7 +301,7 @@ const ProductView = ({
 
                         {/* Quantity Selector */}
                         <VStack align="stretch" maxWidth={'125px'}>
-                            <Box fontWeight="bold">
+                            <Box fontWeight="600">
                                 {intl.formatMessage({
                                     defaultMessage: 'Quantity'
                                 })}
