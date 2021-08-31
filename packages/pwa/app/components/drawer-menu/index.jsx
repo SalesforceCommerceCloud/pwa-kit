@@ -50,10 +50,11 @@ import {noop} from '../../utils/utils'
 import {categoryUrlBuilder} from '../../utils/url'
 import useCustomer from '../../commerce-api/hooks/useCustomer'
 import LoadingSpinner from '../loading-spinner'
+import {HOME_HREF} from '../../constants'
 
 import useNavigation from '../../hooks/use-navigation'
 import {useLocale, SUPPORTED_LOCALES} from '../../locale'
-import {useHistory, useLocation} from 'react-router-dom'
+import {useLocation} from 'react-router-dom'
 
 // The FONT_SIZES and FONT_WEIGHTS constants are used to control the styling for
 // the accordion buttons as their current depth. In the below definition we assign
@@ -85,7 +86,6 @@ const DrawerMenu = ({isOpen, onClose = noop, onLogoClick = noop, root}) => {
     const styles = useMultiStyleConfig('DrawerMenu')
     const drawerSize = useBreakpointValue({sm: PHONE_DRAWER_SIZE, md: TABLET_DRAWER_SIZE})
     const socialIconVariant = useBreakpointValue({base: 'flex', md: 'flex-start'})
-    const history = useHistory()
     const location = useLocation()
 
     const [showLoading, setShowLoading] = useState(false)
@@ -95,7 +95,7 @@ const DrawerMenu = ({isOpen, onClose = noop, onLogoClick = noop, root}) => {
         navigate('/login')
         setShowLoading(false)
     }
-    const [activeLocale, changeLocale] = useLocale()
+    const [activeLocale] = useLocale()
 
     return (
         <Drawer isOpen={isOpen} onClose={onClose} placement="left" size={drawerSize}>
@@ -262,15 +262,13 @@ const DrawerMenu = ({isOpen, onClose = noop, onLogoClick = noop, root}) => {
                                     selectedLocale={activeLocale}
                                     locales={SUPPORTED_LOCALES}
                                     onSelect={(locale) => {
-                                        /* istanbul ignore next */
+                                        // TODO: Replace the `locale` in a better way (first pathname in the URL)
+                                        const newUrl =
+                                            location.pathname === HOME_HREF
+                                                ? `${location.pathname}${locale}/`
+                                                : location.pathname.replace(activeLocale, locale)
 
-                                        const newUrl = location.pathname.replace(
-                                            activeLocale,
-                                            locale
-                                        )
-
-                                        changeLocale(locale)
-                                        history.push(newUrl)
+                                        window.location = newUrl
                                     }}
                                 />
                             </Box>

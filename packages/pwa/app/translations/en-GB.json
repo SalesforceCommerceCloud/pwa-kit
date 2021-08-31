@@ -44,6 +44,9 @@
   "2SvpuI": {
     "defaultMessage": "Log in here"
   },
+  "2WOdRo": {
+    "defaultMessage": "wishlist"
+  },
   "2WRHXI": {
     "defaultMessage": "{quantity} {quantity, plural, one {item} other {items}} added to cart"
   },
@@ -58,6 +61,9 @@
   },
   "3NVyN7": {
     "defaultMessage": "Please enter your first name"
+  },
+  "3cfRtZ": {
+    "defaultMessage": "View {prroductCount} items"
   },
   "3gXwAV": {
     "defaultMessage": "Sign in to retrieve your saved items or continue shopping"
@@ -92,6 +98,9 @@
   "6DCLcI": {
     "defaultMessage": "Please enter a valid date"
   },
+  "6yVHs9": {
+    "defaultMessage": "wishlist-solid"
+  },
   "7PMLfK": {
     "defaultMessage": "Order Total"
   },
@@ -100,6 +109,9 @@
   },
   "7xscgD": {
     "defaultMessage": "Delivery Details"
+  },
+  "8d6kio": {
+    "defaultMessage": "Sort By"
   },
   "8iXlvA": {
     "defaultMessage": "Save & Continue"
@@ -115,6 +127,9 @@
   },
   "9Npj92": {
     "defaultMessage": "Enter your email to receive instructions on how to reset your password"
+  },
+  "9Obw6C": {
+    "defaultMessage": "Filter"
   },
   "9rqdrm": {
     "defaultMessage": "Item removed from wishlist"
@@ -253,6 +268,9 @@
   "MnpUD7": {
     "defaultMessage": "View details"
   },
+  "MsGXc3": {
+    "defaultMessage": "Clear Filters"
+  },
   "Mv2pEb": {
     "defaultMessage": "Continue shopping and add items to your wishlist"
   },
@@ -331,6 +349,9 @@
   },
   "Qpxx+l": {
     "defaultMessage": "New Arrivals"
+  },
+  "RlxeOk": {
+    "defaultMessage": "Sort By: {sortOption}"
   },
   "SQJto2": {
     "defaultMessage": "Sign in"
@@ -466,6 +487,9 @@
   "cUwO+6": {
     "defaultMessage": "Add New Card"
   },
+  "cqlObT": {
+    "defaultMessage": "Clear All"
+  },
   "dUxyza": {
     "defaultMessage": "Reviews"
   },
@@ -561,9 +585,6 @@
   },
   "hCj9FS": {
     "defaultMessage": "Please enter your name as shown on your card"
-  },
-  "hDI+JM": {
-    "defaultMessage": "Sort by"
   },
   "header.button.assistive_msg.logo": {
     "defaultMessage": "Logo"
@@ -676,6 +697,9 @@
   "nA8PRt": {
     "defaultMessage": "1 lowercase letter",
     "description": "Password requirement"
+  },
+  "nEwlut": {
+    "defaultMessage": "Remove Item?"
   },
   "nFQbxh": {
     "defaultMessage": "Payment Method"

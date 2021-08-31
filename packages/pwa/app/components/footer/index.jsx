@@ -28,15 +28,13 @@ import LinksList from '../links-list'
 import SocialIcons from '../social-icons'
 import {HideOnDesktop, HideOnMobile} from '../responsive'
 import {useLocale, SUPPORTED_LOCALES, localesDefaultMessage} from '../../locale'
-import {useHistory, useLocation} from 'react-router-dom'
-
-const HOME_HREF = '/'
+import {useLocation} from 'react-router-dom'
+import {HOME_HREF} from '../../constants'
 
 const Footer = ({...otherProps}) => {
     const styles = useMultiStyleConfig('Footer')
     const intl = useIntl()
-    const [activeLocale, changeLocale] = useLocale()
-    const history = useHistory()
+    const [activeLocale] = useLocale()
     const location = useLocation()
 
     return (
@@ -138,10 +136,6 @@ const Footer = ({...otherProps}) => {
                                             : location.pathname.replace(activeLocale, target.value)
 
                                     window.location = newUrl
-                                    // changeLocale(target.value)
-                                    // history.push(newUrl)
-
-                                    // window.localStorage.setItem('locale', target.value)
                                 }}
                                 variant="filled"
                                 {...styles.localeDropdown}

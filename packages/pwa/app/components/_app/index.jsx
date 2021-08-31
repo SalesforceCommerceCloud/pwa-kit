@@ -37,12 +37,12 @@ import {AuthModal, useAuthModal} from '../../hooks/use-auth-modal'
 // Others
 import {watchOnlineStatus, flatten} from '../../utils/utils'
 import {IntlProvider, getLocaleConfig, DEFAULT_LOCALE} from '../../locale'
+import {HOME_HREF} from '../../constants'
 
 import Seo from '../seo'
 
 const DEFAULT_NAV_DEPTH = 3
 const DEFAULT_ROOT_CATEGORY = 'root'
-const HOME_HREF = '/'
 
 const App = (props) => {
     const {children, targetLocale, defaultLocale, messages, categories: allCategories = {}} = props
