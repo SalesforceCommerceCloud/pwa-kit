@@ -6,7 +6,7 @@
  */
 import {useContext, useMemo} from 'react'
 import {nanoid} from 'nanoid'
-import {useCommerceAPI, CustomerContext} from '../utils'
+import {useCommerceAPI, CustomerContext} from '../contexts'
 
 const AuthTypes = Object.freeze({GUEST: 'guest', REGISTERED: 'registered'})
 

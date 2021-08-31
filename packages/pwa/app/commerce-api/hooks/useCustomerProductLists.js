@@ -5,7 +5,8 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import {useContext, useMemo, useEffect, useState} from 'react'
-import {isError, useCommerceAPI, CustomerProductListsContext} from '../utils'
+import {useCommerceAPI, CustomerProductListsContext} from '../contexts'
+import {isError} from '../utils'
 import {noop} from '../../utils/utils'
 
 import useCustomer from './useCustomer'

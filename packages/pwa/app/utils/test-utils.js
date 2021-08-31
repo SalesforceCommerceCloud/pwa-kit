@@ -17,7 +17,7 @@ import {
     CommerceAPIProvider,
     CustomerProvider,
     CustomerProductListsProvider
-} from '../commerce-api/utils'
+} from '../commerce-api/contexts'
 import {commerceAPIConfig} from '../commerce-api.config'
 import {IntlProvider, DEFAULT_LOCALE} from '../locale'
 import {CategoriesContext} from '../contexts'

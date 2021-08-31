@@ -18,7 +18,7 @@ import {
     CustomerProvider,
     BasketProvider,
     CustomerProductListsProvider
-} from '../../commerce-api/utils'
+} from '../../commerce-api/contexts'
 import {commerceAPIConfig} from '../../commerce-api.config'
 import {einsteinAPIConfig} from '../../einstein-api.config'
 
