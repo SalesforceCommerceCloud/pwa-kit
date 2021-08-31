@@ -148,7 +148,6 @@ const ProductView = ({
                     disabled={!canOrder}
                     width="100%"
                     variant="solid"
-                    marginTop={4}
                     marginBottom={4}
                 >
                     {updateCart
@@ -167,7 +166,6 @@ const ProductView = ({
                     isLoading={isCustomerProductListLoading}
                     width="100%"
                     variant="outline"
-                    marginTop={4}
                     marginBottom={4}
                 >
                     {updateWishlist
@@ -343,10 +341,10 @@ const ProductView = ({
                 width="100%"
                 display={['block', 'block', 'block', 'none']}
                 p={[4, 4, 6]}
-                paddingBottom={11}
                 left={0}
                 bottom={0}
                 zIndex={2}
+                boxShadow="0px -1px 3px rgba(0, 0, 0, 0.1), 0px -1px 2px rgba(0, 0, 0, 0.06)"
             >
                 {renderActionButtons()}
             </Box>
