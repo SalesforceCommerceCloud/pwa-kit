@@ -24,9 +24,11 @@ import {useToast} from '../../hooks/use-toast'
 import useCustomerProductLists from '../../commerce-api/hooks/useCustomerProductLists'
 import {API_ERROR_MESSAGE, customerProductListTypes} from '../../constants'
 import useNavigation from '../../hooks/use-navigation'
+import useCustomer from '../../commerce-api/hooks/useCustomer'
 
 const Cart = () => {
     const basket = useBasket()
+    const customer = useCustomer()
     const [selectedItem, setSelectedItem] = useState(undefined)
     const [localQuantity, setLocalQuantity] = useState({})
     const {formatMessage} = useIntl()
@@ -73,7 +75,7 @@ const Cart = () => {
     }
 
     if (!basket?.productItems) {
-        return <EmptyCart />
+        return <EmptyCart isRegistered={customer.isRegistered} />
     }
 
     const handleUpdateCart = async (variant, quantity) => {
