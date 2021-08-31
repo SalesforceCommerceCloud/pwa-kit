@@ -127,8 +127,7 @@ export const AuthModal = ({
         const loggingIn = currentView === LOGIN_VIEW
         const registering = currentView === REGISTER_VIEW
         const {isOpen} = props
-        const isNowRegistered =
-            isOpen && customer?.authType === 'registered' && (loggingIn || registering)
+        const isNowRegistered = isOpen && customer.isRegistered && (loggingIn || registering)
 
         // If the customer changed, but it's not because they logged in or registered. Do nothing.
         if (!isNowRegistered) {
