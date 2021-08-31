@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React from 'react'
+import React, {useEffect} from 'react'
 import PropTypes from 'prop-types'
 
 import {rest} from 'msw'
@@ -12,13 +12,16 @@ import {setupServer} from 'msw/node'
 import {
     mockedRegisteredCustomer,
     mockProductSearch,
-    mockCategories
+    mockCategories,
+    mockedEmptyCustomerProductList
 } from '../../commerce-api/mock-data'
-import {screen} from '@testing-library/react'
+import {screen, waitFor} from '@testing-library/react'
+import user from '@testing-library/user-event'
 import {Route, Switch} from 'react-router-dom'
 import {renderWithProviders} from '../../utils/test-utils'
 import ProductList from '.'
 import EmptySearchResults from './partials/empty-results'
+import useCustomer from '../../commerce-api/hooks/useCustomer'
 
 jest.setTimeout(60000)
 let mockCategoriesResponse = mockCategories
@@ -44,22 +47,36 @@ jest.mock('commerce-sdk-isomorphic', () => {
             async getCategory() {
                 return mockCategoriesResponse
             }
+        },
+        ShopperCustomers: class ShopperCustomersMock extends sdk.ShopperCustomers {
+            async getCustomerProductLists() {
+                return mockedEmptyCustomerProductList
+            }
         }
     }
 })
 
-const MockedComponent = ({isLoading}) => {
+const MockedComponent = ({isLoading, isLoggedIn = false, searchQuery}) => {
+    const customer = useCustomer()
+    useEffect(() => {
+        if (isLoggedIn) {
+            customer.login('test@test.com', 'password')
+        }
+    }, [])
     return (
         <Switch>
             <Route
                 path="/:locale/category/:categoryId"
                 render={(props) => (
-                    <ProductList
-                        {...props}
-                        isLoading={isLoading}
-                        searchQuery="dresses"
-                        productSearchResult={mockProductListSearchResponse}
-                    />
+                    <div>
+                        <div>{customer.customerId}</div>
+                        <ProductList
+                            {...props}
+                            isLoading={isLoading}
+                            searchQuery={searchQuery}
+                            productSearchResult={mockProductListSearchResponse}
+                        />
+                    </div>
                 )}
             />
         </Switch>
@@ -67,7 +84,9 @@ const MockedComponent = ({isLoading}) => {
 }
 
 MockedComponent.propTypes = {
-    isLoading: PropTypes.bool
+    isLoading: PropTypes.bool,
+    isLoggedIn: PropTypes.bool,
+    searchQuery: PropTypes.string
 }
 
 const MockedEmptyPage = () => {
@@ -133,7 +152,9 @@ beforeEach(() => {
 })
 
 afterEach(() => {
+    mockProductListSearchResponse = mockProductSearch
     jest.resetModules()
+    localStorage.clear()
 })
 afterAll(() => server.close())
 
@@ -144,8 +165,7 @@ test('should render product list page', async () => {
 
 test('should render sort option list page', async () => {
     renderWithProviders(<MockedComponent />)
-    const countOfSortComponents = await screen.findAllByText('Sort by')
-    expect(countOfSortComponents.length).toEqual(2)
+    expect(await screen.findByTestId('sf-product-list-sort')).toBeInTheDocument()
 })
 
 test('should render skeleton', async () => {
@@ -158,18 +178,45 @@ test('should render empty list page', async () => {
     expect(await screen.findByTestId('sf-product-empty-list-page')).toBeInTheDocument()
 })
 
+test('clicking a filter will change url', async () => {
+    renderWithProviders(<MockedComponent />)
+    user.click(screen.getByText(/Beige/i))
+    await waitFor(() =>
+        expect(window.location.search).toEqual(
+            '?limit=25&offset=0&refine=c_refinementColor%3DBeige&sort=best-matches'
+        )
+    )
+})
+
+test('clicking a filter will change url', async () => {
+    renderWithProviders(<MockedComponent />)
+    const clearAllButton = screen.queryAllByText(/Clear All/i)
+    user.click(clearAllButton[0])
+    await waitFor(() => expect(window.location.search).toEqual(''))
+})
+
 test('should display Search Results for when searching ', async () => {
     renderWithProviders(<MockedComponent />)
     window.history.pushState({}, 'ProductList', 'en/search?q=test')
     expect(await screen.findByTestId('sf-product-list-page')).toBeInTheDocument()
 })
 
-// test('product tile is rendered', async () => {
-//     renderWithProviders(<MockedComponent />)
-//     expect(await screen.findByTestId('sf-product-tile-25565616M')).toBeInTheDocument()
-// })
-
 test('pagination is rendered', async () => {
     renderWithProviders(<MockedComponent />)
     expect(await screen.findByTestId('sf-pagination')).toBeInTheDocument()
+})
+
+test('should display Selected refinements as there are some in the response', async () => {
+    renderWithProviders(<MockedComponent />)
+    const countOfRefinements = await screen.findAllByText('Black')
+    expect(countOfRefinements.length).toEqual(2)
+})
+
+test('show login modal when an unauthenticated user tries to add an item to wishlist', async () => {
+    renderWithProviders(<MockedComponent />)
+    const wishlistButton = screen.getAllByLabelText('wishlist')
+    expect(wishlistButton.length).toBe(25)
+    user.click(wishlistButton[0])
+    expect(await screen.findByText(/Email/)).toBeInTheDocument()
+    expect(await screen.findByText(/Password/)).toBeInTheDocument()
 })

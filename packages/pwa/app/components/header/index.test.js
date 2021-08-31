@@ -325,7 +325,7 @@ test('shows dropdown menu when an authenticated users hover on the account icon'
     await waitFor(() => {
         // Look for account icon
         const accountTrigger = document.querySelector('svg[aria-label="My account trigger"]')
-        expect(accountTrigger).toBeInTheDocument
+        expect(accountTrigger).toBeInTheDocument()
         expect(screen.getByText('My Account')).toBeInTheDocument()
     })
 })

@@ -60,6 +60,25 @@ describe('Image Gallery Component', () => {
             )
         })
     })
+
+    test('can select thumbnail image by clicking on the image', async () => {
+        const history = createMemoryHistory()
+        history.push('/en/image-gallery')
+
+        renderWithProviders(
+            <MockComponent imageGroups={data} selectedVariationAttributes={{}} history={history} />
+        )
+        const thumbnailImages = screen.getAllByTestId('image-gallery-thumbnails')
+        const lastThumbnailImage = thumbnailImages[thumbnailImages.length - 1]
+
+        fireEvent.click(lastThumbnailImage)
+        await waitFor(() => {
+            expect(screen.getByAltText(/Ruffle Front V-Neck Cardigan, , large/)).toHaveAttribute(
+                'src',
+                'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwf67d39ef/images/large/PG.10216885.JJ169XX.BZ.jpg'
+            )
+        })
+    })
 })
 
 const data = [
