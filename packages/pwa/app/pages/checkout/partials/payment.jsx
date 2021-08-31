@@ -110,7 +110,7 @@ const Payment = () => {
                         <ShippingAddressSelection
                             form={billingAddressForm}
                             selectedAddress={selectedBillingAddress}
-                            hideSubmitButton={true}
+                            hideSubmitButton
                         />
                     )}
 

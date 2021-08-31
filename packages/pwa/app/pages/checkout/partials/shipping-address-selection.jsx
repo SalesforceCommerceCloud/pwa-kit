@@ -127,6 +127,16 @@ const ShippingAddressSelection = ({
         })
 
     useEffect(() => {
+        // Automatically select the customer's default/preferred shipping address
+        if (customer.addresses) {
+            const address = customer.addresses.find((addr) => addr.preferred === true)
+            if (address) {
+                form.reset({...address})
+            }
+        }
+    }, [])
+
+    useEffect(() => {
         // If the customer deletes all their saved addresses during checkout,
         // we need to make sure to display the address form.
         if (!customer?.addresses && !isEditingAddress) {
