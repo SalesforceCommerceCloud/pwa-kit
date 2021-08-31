@@ -38,15 +38,12 @@ const apiConfig = {
 const AppConfig = ({children, locals = {}}) => {
     const [basket, setBasket] = useState(null)
     const [customer, setCustomer] = useState(null)
-    const [customerProductLists, setCustomerProductLists] = useState()
 
     return (
         <CommerceAPIProvider value={locals.api}>
             <CustomerProvider value={{customer, setCustomer}}>
                 <BasketProvider value={{basket, setBasket}}>
-                    <CustomerProductListsProvider
-                        value={{customerProductLists, setCustomerProductLists}}
-                    >
+                    <CustomerProductListsProvider>
                         <ChakraProvider theme={theme}>{children}</ChakraProvider>
                     </CustomerProductListsProvider>
                 </BasketProvider>

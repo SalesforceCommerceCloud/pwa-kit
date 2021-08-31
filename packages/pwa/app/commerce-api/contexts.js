@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {createContext, useContext} from 'react'
+import React, {createContext, useContext, useReducer} from 'react'
 
 /**
  * Provider and associated hook for accessing the Commerce API in React components.
@@ -35,11 +35,33 @@ export const useCommerceAPI = () => useContext(CommerceAPIContext)
  * }
  *
  */
+
+/************ Basket ************/
 export const BasketContext = createContext()
 export const BasketProvider = BasketContext.Provider
 
+/************ Customer ************/
 export const CustomerContext = createContext()
 export const CustomerProvider = CustomerContext.Provider
 
-export const CustomerProductListsContext = createContext()
-export const CustomerProductListsProvider = CustomerProductListsContext.Provider
+/************ Customer Product Lists ************/
+const CPLInitialValue = {}
+export const CustomerProductListsContext = createContext(CPLInitialValue)
+const _CustomerProductListsProvider = CustomerProductListsContext.Provider
+export const CustomerProductListsProvider = ({children}) => {
+    const [state, dispatch] = useReducer((state, action) => {
+        switch (action.type) {
+            case 'action description':
+                //   const newState = // do something with the action
+                return '11111111111'
+            default:
+                throw new Error()
+        }
+    }, CPLInitialValue)
+
+    return (
+        <_CustomerProductListsProvider value={{state, dispatch}}>
+            {children}
+        </_CustomerProductListsProvider>
+    )
+}
