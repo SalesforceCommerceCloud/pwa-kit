@@ -28,14 +28,12 @@ import LinksList from '../links-list'
 import SocialIcons from '../social-icons'
 import {HideOnDesktop, HideOnMobile} from '../responsive'
 import {useLocale, SUPPORTED_LOCALES, localesDefaultMessage} from '../../locale'
-import {useLocation} from 'react-router-dom'
-import {HOME_HREF} from '../../constants'
+import {buildUrlLocale} from '../../utils/url'
 
 const Footer = ({...otherProps}) => {
     const styles = useMultiStyleConfig('Footer')
     const intl = useIntl()
     const [activeLocale] = useLocale()
-    const location = useLocation()
 
     return (
         <Box as="footer" {...styles.container} {...otherProps}>
@@ -129,12 +127,8 @@ const Footer = ({...otherProps}) => {
                             <Select
                                 value={activeLocale}
                                 onChange={({target}) => {
-                                    // TODO: Replace the `locale` in a better way (first pathname in the URL)
-                                    const newUrl =
-                                        location.pathname === HOME_HREF
-                                            ? `${location.pathname}${target.value}/`
-                                            : location.pathname.replace(activeLocale, target.value)
-
+                                    // Update the `locale` in the URL.
+                                    const newUrl = buildUrlLocale(activeLocale, target.value)
                                     window.location = newUrl
                                 }}
                                 variant="filled"

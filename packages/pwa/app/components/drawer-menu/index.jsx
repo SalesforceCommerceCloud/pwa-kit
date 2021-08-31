@@ -47,10 +47,9 @@ import {BrandLogo, LocationIcon, SignoutIcon, UserIcon} from '../icons'
 
 // Others
 import {noop} from '../../utils/utils'
-import {categoryUrlBuilder} from '../../utils/url'
+import {buildUrlLocale, categoryUrlBuilder} from '../../utils/url'
 import useCustomer from '../../commerce-api/hooks/useCustomer'
 import LoadingSpinner from '../loading-spinner'
-import {HOME_HREF} from '../../constants'
 
 import useNavigation from '../../hooks/use-navigation'
 import {useLocale, SUPPORTED_LOCALES} from '../../locale'
@@ -262,12 +261,8 @@ const DrawerMenu = ({isOpen, onClose = noop, onLogoClick = noop, root}) => {
                                     selectedLocale={activeLocale}
                                     locales={SUPPORTED_LOCALES}
                                     onSelect={(locale) => {
-                                        // TODO: Replace the `locale` in a better way (first pathname in the URL)
-                                        const newUrl =
-                                            location.pathname === HOME_HREF
-                                                ? `${location.pathname}${locale}/`
-                                                : location.pathname.replace(activeLocale, locale)
-
+                                        // Update the `locale` in the URL.
+                                        const newUrl = buildUrlLocale(activeLocale, locale)
                                         window.location = newUrl
                                     }}
                                 />

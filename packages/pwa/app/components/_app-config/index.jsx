@@ -31,11 +31,16 @@ const apiConfig = {
 /**
  * Returns the locale in the URL's pathname or the locale set in the frozen state PRELOADED_STATE.
  * @private
- * @param originalUrl
- * @returns {*}
+ * @param locals
+ * @returns {String} the locale shortcode
  */
-const getLocale = ({originalUrl}) =>
-    originalUrl ? originalUrl.split('/')[1] : window.__PRELOADED_STATE__.appProps.targetLocale
+const getLocale = (locals) => {
+    const {originalUrl} = locals
+
+    return originalUrl
+        ? originalUrl.split('/')[1]
+        : window.__PRELOADED_STATE__.appProps.targetLocale
+}
 
 /**
  * Use the AppConfig component to inject extra arguments into the getProps

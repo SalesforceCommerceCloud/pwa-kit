@@ -6,6 +6,7 @@
  */
 
 import {DEFAULT_LOCALE} from '../locale'
+import {HOME_HREF} from '../constants'
 
 /**
  * Modifies a given url by adding/updating query parameters.
@@ -100,6 +101,21 @@ export const productUrlBuilder = (product) => encodeURI(`/product/${product.id}`
  * @returns {string}
  */
 export const searchUrlBuilder = (searchTerm) => `/search?q=${searchTerm}`
+
+/**
+ * Returns a URL using the new locale.
+ *
+ * @param previousLocale
+ * @param newLocale
+ * @returns {string}
+ */
+export const buildUrlLocale = (previousLocale, newLocale) => {
+    const params = new URLSearchParams(location.search)
+    params.delete('refine')
+    return location.pathname === HOME_HREF
+        ? homeUrlBuilder(HOME_HREF, newLocale)
+        : `${location.pathname.replace(previousLocale, newLocale)}?${params}`
+}
 
 /**
  * Builds the Home page URL for a given locale.
