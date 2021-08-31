@@ -50,7 +50,7 @@ const ShippingAddressEditForm = ({
                 <Stack spacing={6}>
                     <AddressFields form={form} />
 
-                    {hasSavedAddresses ? (
+                    {hasSavedAddresses && !hideSubmitButton ? (
                         <FormActionButtons
                             saveButtonLabel={formatMessage({
                                 defaultMessage: 'Save & Continue to Shipping Method'
