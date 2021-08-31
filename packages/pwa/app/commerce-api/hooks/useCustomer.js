@@ -25,6 +25,13 @@ export default function useCustomer() {
                 return customer?.authType === AuthTypes.REGISTERED
             },
 
+            /**
+             * Returns boolean value whether the customer is of type `guest` or not.
+             */
+            get isGuest() {
+                return customer?.authType === AuthTypes.GUEST
+            },
+
             /** Returns the customer's saved addresses with the 'preferred' address in the first index */
             get addresses() {
                 if (!customer?.addresses) {

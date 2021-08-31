@@ -31,13 +31,13 @@ jest.mock('../../commerce-api/utils', () => {
 const MockedComponent = ({history}) => {
     const customer = useCustomer()
     useEffect(() => {
-        if (customer?.authType !== 'registered') {
+        if (!customer.isRegistered) {
             customer.login('customer@test.com', 'password1')
         }
     }, [])
     const onAccountClick = () => {
         // Link to account page for registered customer, open auth modal otherwise
-        if (customer?.authType === 'registered') {
+        if (customer.isRegistered) {
             history.push('/en/account')
         }
     }
