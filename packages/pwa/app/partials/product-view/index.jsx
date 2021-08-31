@@ -20,7 +20,8 @@ import {
     VStack,
     Select,
     Fade,
-    useDisclosure
+    useDisclosure,
+    useTheme
 } from '@chakra-ui/react'
 
 import {useProduct} from '../../hooks'
@@ -102,6 +103,7 @@ const ProductView = ({
         onOpen: onAddToCartModalOpen,
         onClose: onAddToCartModalClose
     } = useDisclosure()
+    const theme = useTheme()
 
     const {
         showLoading,
@@ -344,7 +346,7 @@ const ProductView = ({
                 left={0}
                 bottom={0}
                 zIndex={2}
-                boxShadow="0px -1px 3px rgba(0, 0, 0, 0.1), 0px -1px 2px rgba(0, 0, 0, 0.06)"
+                boxShadow={theme.shadows.top}
             >
                 {renderActionButtons()}
             </Box>
