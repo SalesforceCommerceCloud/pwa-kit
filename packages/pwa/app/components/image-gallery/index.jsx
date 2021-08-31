@@ -22,7 +22,7 @@ import {
     List,
     useMultiStyleConfig
 } from '@chakra-ui/react'
-import {filterImageGroups} from '../../utils/image-groups-utils'
+import {findImageGroupBy} from '../../utils/image-groups-utils'
 
 const EnterKeyNumber = 13
 
@@ -70,8 +70,8 @@ const ImageGallery = ({imageGroups = [], selectedVariationAttributes = {}, size}
     // Get the 'hero' image for the current variation.
     const heroImageGroup = useMemo(
         () =>
-            filterImageGroups(imageGroups, {
-                size: LARGE,
+            findImageGroupBy(imageGroups, {
+                viewType: LARGE,
                 selectedVariationAttributes
             }),
         [selectedVariationAttributes]
@@ -87,8 +87,8 @@ const ImageGallery = ({imageGroups = [], selectedVariationAttributes = {}, size}
     // selected variation attributes haven't changed.
     const thumbnailImageGroup = useMemo(
         () =>
-            filterImageGroups(imageGroups, {
-                size: SMALL,
+            findImageGroupBy(imageGroups, {
+                viewType: SMALL,
                 selectedVariationAttributes
             }),
         [selectedVariationAttributes]
