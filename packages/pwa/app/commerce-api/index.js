@@ -13,7 +13,6 @@ import OcapiShopperOrders from './ocapi-shopper-orders'
 import {getTenantId, isError, isTokenValid} from './utils'
 import Auth from './auth'
 import EinsteinAPI from './einstein'
-import {DEFAULT_LOCALE} from '../locale'
 
 /**
  * The configuration details for the connecting to the API.
@@ -55,7 +54,7 @@ class CommerceAPI {
 
         const {proxyPath, locale, ...restConfig} = config
 
-        this.locale = locale || DEFAULT_LOCALE
+        this.locale = locale
 
         // Client-side requests should be proxied via the configured path.
         const proxy = `${getAppOrigin()}${proxyPath}`
@@ -81,13 +80,24 @@ class CommerceAPI {
             shopperSearch: sdk.ShopperSearch
         }
 
+        const apiConfigs = {
+            shopperCustomers: {api: sdk.ShopperCustomers, canLocalize: false},
+            shopperBaskets: {api: OcapiShopperBaskets, canLocalize: false},
+            shopperGiftCertificates: {api: sdk.ShopperGiftCertificates, canLocalize: true},
+            shopperLogin: {api: sdk.ShopperLogin, canLocalize: false},
+            shopperOrders: {api: OcapiShopperOrders, canLocalize: true},
+            shopperProducts: {api: sdk.ShopperProducts, canLocalize: true},
+            shopperPromotions: {api: sdk.ShopperPromotions, canLocalize: true},
+            shopperSearch: {api: sdk.ShopperSearch, canLocalize: true}
+        }
+
         // Instantiate the SDK class proxies and create getters from our api mapping.
         // The proxy handlers are called when accessing any of the mapped SDK class
         // proxies, executing various pre-defined hooks for tapping into or modifying
         // the outgoing method parameters and/or incoming SDK responses
         const self = this
-        Object.keys(apis).forEach((key) => {
-            const SdkClass = apis[key]
+        Object.keys(apiConfigs).forEach((key) => {
+            const SdkClass = apiConfigs[key].api
             self._sdkInstances = {
                 ...self._sdkInstances,
                 [key]: new Proxy(new SdkClass(this._config), {
@@ -98,21 +108,15 @@ class CommerceAPI {
                                     return obj[prop](...args)
                                 }
                                 return self.willSendRequest(prop, ...args).then((newArgs) => {
-                                    const onClient = typeof window !== 'undefined'
-
                                     // Inject the locale to the API call via it's parameters.
                                     //
                                     // NOTE: The commerce sdk isomorphic will complain if you pass parameters to
-                                    // it that it doesn't expect, this is why I'm only adding the local to some of
-                                    // the API calls. We'll want a better pattern to do this.
-                                    if (
-                                        ['getCategory', 'productSearch', 'getProduct'].includes(
-                                            prop
-                                        )
-                                    ) {
+                                    // it that it doesn't expect, this is why we only add the local to some of
+                                    // the API calls.
+                                    if (apiConfigs[key].canLocalize) {
                                         newArgs[0].parameters = {
                                             ...newArgs[0].parameters,
-                                            locale: me.locale
+                                            ...(me.locale && {locale: me.locale})
                                         }
                                     }
 

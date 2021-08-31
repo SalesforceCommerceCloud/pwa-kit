@@ -21,12 +21,19 @@ import {
 } from '../../commerce-api/utils'
 import {commerceAPIConfig} from '../../commerce-api.config'
 import {einsteinAPIConfig} from '../../einstein-api.config'
+import {DEFAULT_LOCALE} from '../../locale'
 
 const apiConfig = {
     ...commerceAPIConfig,
     einsteinConfig: einsteinAPIConfig
 }
 
+/**
+ * Returns the locale in the URL's pathname or the locale set in the frozen state PRELOADED_STATE.
+ * @private
+ * @param originalUrl
+ * @returns {*}
+ */
 const getLocale = ({originalUrl}) =>
     originalUrl ? originalUrl.split('/')[1] : window.__PRELOADED_STATE__.appProps.targetLocale
 
@@ -59,7 +66,7 @@ const AppConfig = ({children, locals = {}}) => {
 }
 
 AppConfig.restore = (locals = {}) => {
-    const locale = getLocale(locals)
+    const locale = getLocale(locals) || DEFAULT_LOCALE
     locals.api = new CommerceAPI({...apiConfig, locale})
 }
 

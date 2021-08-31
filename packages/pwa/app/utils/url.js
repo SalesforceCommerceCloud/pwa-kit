@@ -85,7 +85,7 @@ export const categoryUrlBuilder = (category, locale = DEFAULT_LOCALE) =>
     encodeURI(`/${locale}/category/${category.id}`)
 
 /**
- * Given a product and the current locale refutn an href to the product detail page.
+ * Given a product and the current locale returns an href to the product detail page.
  *
  * @param {Object} product
  * @param {string} locale
@@ -100,6 +100,17 @@ export const productUrlBuilder = (product) => encodeURI(`/product/${product.id}`
  * @returns {string}
  */
 export const searchUrlBuilder = (searchTerm) => `/search?q=${searchTerm}`
+
+/**
+ * Builds the Home page URL for a given locale.
+ * We don't add the locale to the URL for the default locale.
+ *
+ * @param homeHref
+ * @param locale
+ * @returns {string}
+ */
+export const homeUrlBuilder = (homeHref, locale) =>
+    encodeURI(`${homeHref}${locale !== DEFAULT_LOCALE ? locale + '/' : ''}`)
 
 /*
  * Remove query params from a give url path based on a given list of keys

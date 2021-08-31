@@ -36,6 +36,7 @@ import {AuthModal, useAuthModal} from '../../hooks/use-auth-modal'
 
 // Others
 import {watchOnlineStatus, flatten} from '../../utils/utils'
+import {homeUrlBuilder} from '../../utils/url'
 import {IntlProvider, getLocaleConfig, DEFAULT_LOCALE} from '../../locale'
 import {HOME_HREF} from '../../constants'
 
@@ -82,7 +83,7 @@ const App = (props) => {
 
     const onLogoClick = () => {
         // Goto the home page.
-        history.push(`${HOME_HREF}${targetLocale !== defaultLocale ? targetLocale + '/' : ''}`)
+        history.push(homeUrlBuilder(HOME_HREF, targetLocale))
 
         // Close the drawer.
         onClose()
