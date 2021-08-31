@@ -50,7 +50,7 @@ const ShippingAddressEditForm = ({
                 <Stack spacing={6}>
                     <AddressFields form={form} />
 
-                    {hasSavedAddresses ? (
+                    {hasSavedAddresses && !hideSubmitButton ? (
                         <FormActionButtons
                             saveButtonLabel={formatMessage({
                                 defaultMessage: 'Save & Continue to Shipping Method'
@@ -125,6 +125,16 @@ const ShippingAddressSelection = ({
             const {id, _type, ...selectedAddr} = selectedAddress
             return shallowEquals(address, selectedAddr)
         })
+
+    useEffect(() => {
+        // Automatically select the customer's default/preferred shipping address
+        if (customer.addresses) {
+            const address = customer.addresses.find((addr) => addr.preferred === true)
+            if (address) {
+                form.reset({...address})
+            }
+        }
+    }, [])
 
     useEffect(() => {
         // If the customer deletes all their saved addresses during checkout,
