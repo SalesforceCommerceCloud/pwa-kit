@@ -85,7 +85,7 @@ export default function useCreditCardFields({form: {control, errors}, prefix = '
             name: `${prefix}securityCode`,
             label: 'Security Code',
             defaultValue: '',
-            type: 'text',
+            type: 'password',
             rules: {
                 required: formatMessage({
                     defaultMessage: 'Please enter your security code'
