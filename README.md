@@ -1,22 +1,22 @@
-# Mobify Platform SDKs
+# PWA Kit React SDK
 
 This is a _monorepo_ that includes the following packages that make
 up the front end of the PWA Kit for Salesforce Commerce Cloud:
 
--   `pwa-kit-create-app` - The project generator for PWA Kit
--   `pwa-kit-react-sdk` - A set of components and utilities for PWA Kit
--   `pwa` - The scaffold for PWA Kit projects
+- `pwa-kit-create-app` - The project generator for PWA Kit
+- `pwa-kit-react-sdk` - A set of components and utilities for PWA Kit
+- `pwa` - The scaffold for PWA Kit projects
 
 Old branches include retired packages, such as:
 
--   `commerce-integrations`: ecommerce backend interface for Mobify v1 and v2
--   `connector` - The scaffold for an old project's data layer
--   `devcenter`: source files for the [DevCenter](https://dev.mobify.com), which includes docs for v1 and v2
--   `documentation-hub` - Mobify's documentation hub for v1 and earlier, hosted on https://docs.mobify.com
--   `documentation-theme` - A common theme shared across docs sites for v1 and earlier
--   `generator` - Project generator for v1 and v2
--   `progressive-web-sdk` - SDK for v1 and v2 that includes Analytics Integrations, the component library, and utility functions
--   `test-framework` - Mobify's testing best practices
+- `commerce-integrations`: ecommerce backend interface for Mobify v1 and v2 SDKs
+- `connector` - The scaffold for an old project's data layer
+- `devcenter`: source files for the [DevCenter](https://dev.mobify.com), which includes docs for Mobify v1 and v2 SDK
+- `documentation-hub` - Documentation hub for Mobify v1 SDK and earlier, hosted on https://docs.mobify.com
+- `documentation-theme` - A common theme shared across docs sites for Mobify v1 SDK and earlier
+- `generator` - Project generator for Mobify v1 and v2 SDK
+- `progressive-web-sdk` - SDK for Mobify v1 and v2 SDK that includes Analytics Integrations, the component library, and utility functions
+- `test-framework` - Testing best practices for Mobify v1 and v2 SDK
 
 ## Product Documentation
 
@@ -82,8 +82,8 @@ release the packages in the monorepo.
 
 Bear these branch naming conventions in mind:
 
--   We use the `develop` branch for normal feature development.
--   We use `release-` branches to review and release release-candidates.
+- We use the `develop` branch for normal feature development.
+- We use `release-` branches to review and release release-candidates.
 
 When we release, we always make a "normal" or a "hotfix" release. Hotfixes are
 something we _only_ do when we have found a bug in a released package and that we
@@ -110,7 +110,7 @@ The steps are as follows:
 git checkout develop
 git pull
 
-# We want a long-lived branch to collect and review changes before releasing. 
+# We want a long-lived branch to collect and review changes before releasing.
 # We'll also use this branch for making hotfix releases in the future.
 git checkout -b release-1.1.x
 
@@ -139,10 +139,10 @@ git commit -am "Version 1.1.0"
 git tag v1.1.0
 git push --tags && git push
 
-# Now that the newly minted release branch is finalized, there are two administration 
-# tasks that you'll want to complete. Firstly, you'll want to ensure that the new 
+# Now that the newly minted release branch is finalized, there are two administration
+# tasks that you'll want to complete. Firstly, you'll want to ensure that the new
 # branch is protected. Ask your Github admin to do this and ensure that they check
-# the "Require status checks to pass before merging" flag. Secondly, update the 
+# the "Require status checks to pass before merging" flag. Secondly, update the
 # weekly builds in CircleCi adding this branch and removing any that fall out of our
 # SLA (we currently support the last 3 minor versions).
 
@@ -170,8 +170,8 @@ to a package that we already released to NPM. It's not possible to replace packa
 on NPM that we've already released though – we can only publish new versions to fix
 the bugs and get people to upgrade. These new versions are hotfixes.
 
-Executing hotfixes is simple, start by identifying which of the supported versions exhibits 
-the bug and create a PR for each branch, addresses the bug and bumping the branches patch 
+Executing hotfixes is simple, start by identifying which of the supported versions exhibits
+the bug and create a PR for each branch, addresses the bug and bumping the branches patch
 version. (NOTE: If the bug exists in `develop` you do not have to bump the version number.)
 
 When you're finished, drop and update in #product-release and #changelog to let them know what's new.
@@ -213,13 +213,13 @@ fixing individual or multiple vulnerabilities.
 **Install and Authenticate Snyk CLI:**
 
 1. Install Snyk CLI via npm.
-    ```bash
-    npm install -g snyk
-    ```
+   ```bash
+   npm install -g snyk
+   ```
 2. Run the `auth` command to open a browser tab.
-    ```bash
-    snyk auth
-    ```
+   ```bash
+   snyk auth
+   ```
 3. Click the Authenticate button.
 
 **Running `snyk wizard`:**
