@@ -29,7 +29,7 @@ const apiConfig = {
 }
 
 /**
- * Returns the locale in the URL's pathname or the locale set in the frozen state PRELOADED_STATE.
+ * Returns the locale set in the URL's pathname or the locale set in the frozen state PRELOADED_STATE.
  * @private
  * @param locals
  * @returns {String} the locale shortcode

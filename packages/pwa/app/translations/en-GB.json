@@ -17,6 +17,9 @@
   "/yBi9v": {
     "defaultMessage": "Shop Women's Jackets & Coats"
   },
+  "08dLrR": {
+    "defaultMessage": "/{activeLocale}/category/womens-clothing-jackets"
+  },
   "0g/1TG": {
     "defaultMessage": "Continue to Payment"
   },
@@ -194,6 +197,9 @@
   "DwzDiL": {
     "defaultMessage": "Clear recent searches"
   },
+  "DyMLTN": {
+    "defaultMessage": "/{activeLocale}/category/mens-clothing-suits"
+  },
   "EKKW2e": {
     "defaultMessage": "1 uppercase letter",
     "description": "Password requirement"
@@ -332,6 +338,9 @@
   "PRlD0A": {
     "defaultMessage": "Shipping"
   },
+  "PW5i35": {
+    "defaultMessage": "/{activeLocale}/category/womens-outfits"
+  },
   "PlBReU": {
     "defaultMessage": "Log out"
   },
@@ -416,6 +425,9 @@
   "V/JHlm": {
     "defaultMessage": "Forgot password?"
   },
+  "V8WZRT": {
+    "defaultMessage": "Continue shopping to add items to your cart"
+  },
   "VSlYv6": {
     "defaultMessage": "Quantity:"
   },
@@ -489,6 +501,12 @@
   },
   "cqlObT": {
     "defaultMessage": "Clear All"
+  },
+  "cv1LY7": {
+    "defaultMessage": "static/img/women-outfit.png"
+  },
+  "dS8BmB": {
+    "defaultMessage": "static/img/feeling-red.png"
   },
   "dUxyza": {
     "defaultMessage": "Reviews"
@@ -607,8 +625,14 @@
   "hp3uqR": {
     "defaultMessage": "Wishlist"
   },
+  "hqoiIz": {
+    "defaultMessage": "static/img/women-dresses.png"
+  },
   "huqKGl": {
     "defaultMessage": "Create account"
+  },
+  "hwGJRL": {
+    "defaultMessage": "/{activeLocale}/category/womens-clothing-feeling-red"
   },
   "iPMbLb": {
     "defaultMessage": "Please select a payment method."
@@ -618,6 +642,9 @@
   },
   "ipwTkh": {
     "defaultMessage": "Same as shipping address"
+  },
+  "iqQeTp": {
+    "defaultMessage": "static/img/men-suits.png"
   },
   "ivNR8s": {
     "defaultMessage": "Order Summary"
@@ -630,6 +657,9 @@
   },
   "kVzyDt": {
     "defaultMessage": "Thank you for your order!"
+  },
+  "kfvFzC": {
+    "defaultMessage": "static/img/women-coats.png"
   },
   "knAdWV": {
     "defaultMessage": "Top Sellers"
@@ -851,6 +881,9 @@
   },
   "y/sA02": {
     "defaultMessage": "Most Viewed"
+  },
+  "ymw1eE": {
+    "defaultMessage": "/{activeLocale}/category/womens-clothing-dresses"
   },
   "z+Zrln": {
     "defaultMessage": "Set as default"

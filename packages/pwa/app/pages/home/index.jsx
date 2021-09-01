@@ -15,8 +15,9 @@ import Hero from '../../components/hero'
 import Seo from '../../components/seo'
 import Section from '../../components/section'
 import BasicTile from '../../components/basic-tile'
-import {categories} from './data'
+import {categoriesThreeColumns, categoriesTwoColumns} from './data'
 import RecommendedProducts from '../../components/recommended-products'
+import {useLocale} from '../../locale'
 
 /**
  * This is the home page for Retail React App.
@@ -24,8 +25,9 @@ import RecommendedProducts from '../../components/recommended-products'
  * The page renders SEO metadata and a few promotion
  * categories and products, data is from local file.
  */
-const Home = ({match}) => {
+const Home = () => {
     const intl = useIntl()
+    const [activeLocale] = useLocale()
 
     return (
         <Box data-testid="home-page" layerStyle="page">
@@ -48,7 +50,7 @@ const Home = ({match}) => {
                 actions={
                     <Button
                         as={Link}
-                        to={`/${match?.params?.locale}/category/newarrivals`}
+                        to={`/${activeLocale}/category/newarrivals`}
                         width={{base: 'full', md: 'inherit'}}
                     >
                         <FormattedMessage defaultMessage="Shop New Arrivals" />
@@ -70,21 +72,37 @@ const Home = ({match}) => {
                     columnGap={6}
                     rowGap={8}
                 >
-                    <GridItem rowSpan={1} colSpan={{base: 1, md: 2}}>
-                        <BasicTile {...categories(match?.params?.locale)[0]} />
-                    </GridItem>
-                    <GridItem rowSpan={1} colSpan={{base: 1, md: 2}}>
-                        <BasicTile {...categories(match?.params?.locale)[1]} />
-                    </GridItem>
-                    <GridItem rowSpan={1} colSpan={{base: 1, md: 2}}>
-                        <BasicTile {...categories(match?.params?.locale)[2]} />
-                    </GridItem>
-                    <GridItem rowSpan={1} colSpan={{base: 1, md: 3}}>
-                        <BasicTile {...categories(match?.params?.locale)[3]} />
-                    </GridItem>
-                    <GridItem rowSpan={1} colSpan={{base: 1, md: 3}}>
-                        <BasicTile {...categories(match?.params?.locale)[4]} />
-                    </GridItem>
+                    {categoriesThreeColumns.map((item, index) => {
+                        const category = item.message
+                        return (
+                            <GridItem key={index} rowSpan={1} colSpan={{base: 1, md: 2}}>
+                                <BasicTile
+                                    title={intl.formatMessage(category.title)}
+                                    href={intl.formatMessage(category.href, {activeLocale})}
+                                    img={{
+                                        src: getAssetUrl(intl.formatMessage(category.imgSrc)),
+                                        alt: intl.formatMessage(category.imgAlt)
+                                    }}
+                                />
+                            </GridItem>
+                        )
+                    })}
+
+                    {categoriesTwoColumns.map((item, index) => {
+                        const category = item.message
+                        return (
+                            <GridItem key={index} rowSpan={1} colSpan={{base: 1, md: 3}}>
+                                <BasicTile
+                                    title={intl.formatMessage(category.title)}
+                                    href={intl.formatMessage(category.href, {activeLocale})}
+                                    img={{
+                                        src: getAssetUrl(intl.formatMessage(category.imgSrc)),
+                                        alt: intl.formatMessage(category.imgAlt)
+                                    }}
+                                />
+                            </GridItem>
+                        )
+                    })}
                 </Grid>
             </Section>
 
@@ -108,8 +126,7 @@ const Home = ({match}) => {
 Home.getTemplateName = () => 'home'
 Home.propTypes = {
     recommendations: PropTypes.array,
-    isLoading: PropTypes.bool,
-    match: PropTypes.object
+    isLoading: PropTypes.bool
 }
 
 Home.getProps = async () => {}
