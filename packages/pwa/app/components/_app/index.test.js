@@ -9,6 +9,7 @@ import {screen} from '@testing-library/react'
 
 import App from './index.jsx'
 import {renderWithProviders} from '../../utils/test-utils'
+import {DEFAULT_LOCALE} from '../../locale'
 
 let windowSpy
 
@@ -34,7 +35,7 @@ afterEach(() => {
 describe('App', () => {
     test('App component is rendered appropriately', () => {
         renderWithProviders(
-            <App>
+            <App targetLocale={DEFAULT_LOCALE} defaultLocale={DEFAULT_LOCALE}>
                 <p>Any children here</p>
             </App>
         )

@@ -201,6 +201,11 @@ const App = (props) => {
     )
 }
 
+App.shouldGetProps = () => {
+    // In this case, we only want to fetch data for the app once, on the server.
+    return typeof window === 'undefined'
+}
+
 App.getProps = async ({api, params, location}) => {
     const localeConfig = await getLocaleConfig({
         getUserPreferredLocales: () => {
