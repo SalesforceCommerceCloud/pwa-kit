@@ -24,7 +24,7 @@ jest.mock('react-router', () => {
 })
 
 jest.mock('../locale', () => {
-    return {useLocale: jest.fn().mockReturnValue(['en'])}
+    return {useLocale: jest.fn().mockReturnValue(['en-GB'])}
 })
 
 beforeEach(() => {

@@ -19,11 +19,11 @@ import {screen, fireEvent, act} from '@testing-library/react'
 import {FormattedMessage} from 'react-intl'
 import {renderWithReactIntl} from './utils/test-utils'
 
-const nonSupportedLocale = 'nl'
+const nonSupportedLocale = 'nl-NL'
 const supportedLocale = SUPPORTED_LOCALES[0]
 const helloWorld = {
-    en: 'Hello World',
-    fr: 'Bonjour le monde',
+    'en-GB': 'Hello World',
+    'fr-FR': 'Bonjour le monde',
     messageId: 'homepage.message.welcome'
 }
 
@@ -36,14 +36,14 @@ const SampleHomepage = () => {
                 {/* NOTE: Looks like we had to hardcode the values of these props, now that we're using babel-plugin-formatjs */}
                 <FormattedMessage id="homepage.message.welcome" defaultMessage="Hello World" />
             </h1>
-            <button onClick={() => changeLocale('fr')}>change locale</button>
+            <button onClick={() => changeLocale('fr-FR')}>change locale</button>
         </div>
     )
 }
 
 test('our assumptions before further testing', () => {
     expect(SUPPORTED_LOCALES.includes(nonSupportedLocale)).toBe(false)
-    expect(DEFAULT_LOCALE).toBe('en')
+    expect(DEFAULT_LOCALE).toBe('en-GB')
 })
 
 describe('whichLocaleToLoad', () => {
@@ -138,12 +138,12 @@ describe('getLocaleConfig', () => {
 describe('useLocale', () => {
     test('changing locale', async () => {
         renderWithReactIntl(<SampleHomepage />)
-        expect(screen.getByText(helloWorld.en)).toBeInTheDocument()
+        expect(screen.getByText(helloWorld['en-GB'])).toBeInTheDocument()
 
         act(() => {
             fireEvent.click(screen.getByText('change locale'))
         })
-        const newH1 = await screen.findByText(helloWorld.fr)
+        const newH1 = await screen.findByText(helloWorld['fr-FR'])
         expect(newH1).toBeInTheDocument()
     })
 })

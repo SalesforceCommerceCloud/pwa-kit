@@ -39,7 +39,7 @@ const getLocale = (locals) => {
 
     return originalUrl
         ? originalUrl.split('/')[1]
-        : window.__PRELOADED_STATE__.appProps.targetLocale
+        : window?.__PRELOADED_STATE__?.appProps?.targetLocale
 }
 
 /**

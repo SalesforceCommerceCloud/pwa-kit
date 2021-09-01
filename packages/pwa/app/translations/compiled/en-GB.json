@@ -35,6 +35,20 @@
       "value": "Shop Women's Jackets & Coats"
     }
   ],
+  "08dLrR": [
+    {
+      "type": 0,
+      "value": "/"
+    },
+    {
+      "type": 1,
+      "value": "activeLocale"
+    },
+    {
+      "type": 0,
+      "value": "/category/womens-clothing-jackets"
+    }
+  ],
   "0g/1TG": [
     {
       "type": 0,
@@ -487,6 +501,20 @@
       "value": "Clear recent searches"
     }
   ],
+  "DyMLTN": [
+    {
+      "type": 0,
+      "value": "/"
+    },
+    {
+      "type": 1,
+      "value": "activeLocale"
+    },
+    {
+      "type": 0,
+      "value": "/category/mens-clothing-suits"
+    }
+  ],
   "EKKW2e": [
     {
       "type": 0,
@@ -805,6 +833,20 @@
       "value": "Shipping"
     }
   ],
+  "PW5i35": [
+    {
+      "type": 0,
+      "value": "/"
+    },
+    {
+      "type": 1,
+      "value": "activeLocale"
+    },
+    {
+      "type": 0,
+      "value": "/category/womens-outfits"
+    }
+  ],
   "PlBReU": [
     {
       "type": 0,
@@ -987,6 +1029,12 @@
       "value": "Forgot password?"
     }
   ],
+  "V8WZRT": [
+    {
+      "type": 0,
+      "value": "Continue shopping to add items to your cart"
+    }
+  ],
   "VSlYv6": [
     {
       "type": 0,
@@ -1163,6 +1211,18 @@
     {
       "type": 0,
       "value": "Clear All"
+    }
+  ],
+  "cv1LY7": [
+    {
+      "type": 0,
+      "value": "static/img/women-outfit.png"
+    }
+  ],
+  "dS8BmB": [
+    {
+      "type": 0,
+      "value": "static/img/feeling-red.png"
     }
   ],
   "dUxyza": [
@@ -1413,10 +1473,30 @@
       "value": "Wishlist"
     }
   ],
+  "hqoiIz": [
+    {
+      "type": 0,
+      "value": "static/img/women-dresses.png"
+    }
+  ],
   "huqKGl": [
     {
       "type": 0,
       "value": "Create account"
+    }
+  ],
+  "hwGJRL": [
+    {
+      "type": 0,
+      "value": "/"
+    },
+    {
+      "type": 1,
+      "value": "activeLocale"
+    },
+    {
+      "type": 0,
+      "value": "/category/womens-clothing-feeling-red"
     }
   ],
   "iPMbLb": [
@@ -1435,6 +1515,12 @@
     {
       "type": 0,
       "value": "Same as shipping address"
+    }
+  ],
+  "iqQeTp": [
+    {
+      "type": 0,
+      "value": "static/img/men-suits.png"
     }
   ],
   "ivNR8s": [
@@ -1459,6 +1545,12 @@
     {
       "type": 0,
       "value": "Thank you for your order!"
+    }
+  ],
+  "kfvFzC": [
+    {
+      "type": 0,
+      "value": "static/img/women-coats.png"
     }
   ],
   "knAdWV": [
@@ -1979,6 +2071,20 @@
     {
       "type": 0,
       "value": "Most Viewed"
+    }
+  ],
+  "ymw1eE": [
+    {
+      "type": 0,
+      "value": "/"
+    },
+    {
+      "type": 1,
+      "value": "activeLocale"
+    },
+    {
+      "type": 0,
+      "value": "/category/womens-clothing-dresses"
     }
   ],
   "z+Zrln": [

@@ -39,7 +39,7 @@ export const categoriesThreeColumns = [
             imgAlt: {defaultMessage: "Shop Women's Dresses"}
         })
     }
-    ]
+]
 export const categoriesTwoColumns = [
     {
         message: defineMessages({

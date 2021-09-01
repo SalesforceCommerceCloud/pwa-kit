@@ -91,7 +91,10 @@ export const whichLocaleToLoad = (preferredLocales, supportedLocales, fallbackLo
  * @returns {string} Either `TARGET_LOCALE` environment variable if it's set OR the calculated target locale
  */
 export const getTargetLocale = (preferredLocales, supportedLocales, defaultLocale) => {
-    return whichLocaleToLoad(preferredLocales, supportedLocales, defaultLocale)
+    return (
+        process.env.TARGET_LOCALE ||
+        whichLocaleToLoad(preferredLocales, supportedLocales, defaultLocale)
+    )
 }
 
 const LocaleContext = React.createContext()
