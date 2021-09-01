@@ -48,11 +48,16 @@ export const CustomerProvider = CustomerContext.Provider
 /************ Customer Product Lists ************/
 const CPLInitialValue = {
     isLoading: true,
-    productLists: [],
+    productLists: {
+        // this is a map of product lists
+        // keyed by list id
+    },
     wishlist: {}
 }
 const CPLActionTypes = {
-    RECEIVE: 'RECEIVE',
+    RECEIVE_LISTS: 'RECEIVE_LISTS',
+    UPDATE_LIST_ITEM: 'UPDATE_LIST_ITEM',
+    REMOVE_LIST_ITEM: 'REMOVE_LIST_ITEM',
     SET_LOADING: 'SET_LOADING',
     RESET: 'RESET'
 }
@@ -63,12 +68,44 @@ export const CustomerProductListsProvider = ({children}) => {
         let productLists
         let wishlist
         switch (type) {
-            case CPLActionTypes.RECEIVE:
-                productLists = [...payload]
-                wishlist = productLists.find((list) => {
-                    return list.name === PWA_DEFAULT_WISHLIST_NAME
-                })
+            case CPLActionTypes.RECEIVE_LISTS:
+                productLists = payload.reduce((prev, curr) => {
+                    // todo remove this
+                    if (curr.name === PWA_DEFAULT_WISHLIST_NAME) {
+                        wishlist = curr
+                    }
+                    return {
+                        ...prev,
+                        [curr.id]: curr
+                    }
+                }, {})
                 return {...state, wishlist, productLists}
+            case CPLActionTypes.UPDATE_LIST_ITEM:
+                productLists = {
+                    ...state.productLists
+                }
+                productLists[payload.listId].customerProductListItems = productLists[
+                    payload.listId
+                ].customerProductListItems.map((listItem) => {
+                    if (listItem.id === payload.item.id) {
+                        return {
+                            ...listItem,
+                            ...payload.item
+                        }
+                    }
+                    return listItem
+                })
+                return {...state, productLists}
+            case CPLActionTypes.REMOVE_LIST_ITEM:
+                productLists = {
+                    ...state.productLists
+                }
+                productLists[payload.listId].customerProductListItems = productLists[
+                    payload.listId
+                ].customerProductListItems.filter((listItem) => {
+                    return listItem.id !== payload.itemId
+                })
+                return {...state, productLists}
             case CPLActionTypes.SET_LOADING:
                 return {...state, isLoading: payload}
             case CPLActionTypes.RESET:
@@ -79,7 +116,11 @@ export const CustomerProductListsProvider = ({children}) => {
     }, CPLInitialValue)
 
     const actions = {
-        receive: (list) => dispatch({type: CPLActionTypes.RECEIVE, payload: list}),
+        receiveLists: (lists) => dispatch({type: CPLActionTypes.RECEIVE_LISTS, payload: lists}),
+        updateListItem: (listId, item) =>
+            dispatch({type: CPLActionTypes.UPDATE_LIST_ITEM, payload: {listId, item}}),
+        removeListItem: (listId, itemId) =>
+            dispatch({type: CPLActionTypes.REMOVE_LIST_ITEM, payload: {listId, itemId}}),
         setLoading: (isLoading) => dispatch({type: CPLActionTypes.SET_LOADING, payload: isLoading}),
         reset: () => dispatch({type: CPLActionTypes.RESET})
     }

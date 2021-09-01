@@ -140,7 +140,7 @@ const ProductDetail = ({category, product, isLoading}) => {
                 )
                 // if the product already exists in wishlist, update the quantity
                 if (productListItem) {
-                    await customerProductLists.updateCustomerProductListItem(wishlist, {
+                    await customerProductLists._updateListItem(wishlist, {
                         ...productListItem,
                         quantity: productListItem.quantity + parseInt(quantity)
                     })

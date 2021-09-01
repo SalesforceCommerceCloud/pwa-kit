@@ -23,8 +23,8 @@ const numberOfSkeletonItems = 3
 const AccountWishlist = () => {
     const navigate = useNavigation()
     const {formatMessage} = useIntl()
-    const {wishlist, isLoading, isEmpty} = useCustomerProductLists()
-    console.log(isEmpty)
+    const {wishlist, isLoading, isEmpty, updateListItem} = useCustomerProductLists()
+    // console.log(wishlist)
     // const [wishlist, setWishlist] = useState()
     const [selectedItem, setSelectedItem] = useState(undefined)
     const [localQuantity, setLocalQuantity] = useState({})
@@ -36,32 +36,32 @@ const AccountWishlist = () => {
         setSelectedItem(itemId)
     }
 
-    // const handleItemQuantityChanged = async (quantity, item) => {
-    //     try {
-    //         // This local state allows the dropdown to show the desired quantity
-    //         // while the API call to update it is happening.
-    //         setLocalQuantity({...localQuantity, [item.productId]: quantity})
-    //         setWishlistItemLoading(true)
-    //         setSelectedItem(item.productId)
-    //         await customerProductLists.updateCustomerProductListItem(wishlist, {
-    //             ...item,
-    //             quantity: parseInt(quantity)
-    //         })
-    //     } catch (err) {
-    //         console.error(err)
-    //         showToast({
-    //             title: formatMessage(
-    //                 {defaultMessage: '{errorMessage}'},
-    //                 {errorMessage: API_ERROR_MESSAGE}
-    //             ),
-    //             status: 'error'
-    //         })
-    //     } finally {
-    //         setWishlistItemLoading(false)
-    //         setSelectedItem(undefined)
-    //         setLocalQuantity({...localQuantity, [item.productId]: undefined})
-    //     }
-    // }
+    const handleItemQuantityChanged = async (quantity, item) => {
+        try {
+            // This local state allows the dropdown to show the desired quantity
+            // while the API call to update it is happening.
+            setLocalQuantity({...localQuantity, [item.productId]: quantity})
+            setWishlistItemLoading(true)
+            setSelectedItem(item.productId)
+            await updateListItem(wishlist.id, {
+                ...item,
+                quantity: parseInt(quantity)
+            })
+        } catch (err) {
+            console.error(err)
+            showToast({
+                title: formatMessage(
+                    {defaultMessage: '{errorMessage}'},
+                    {errorMessage: API_ERROR_MESSAGE}
+                ),
+                status: 'error'
+            })
+        } finally {
+            setWishlistItemLoading(false)
+            setSelectedItem(undefined)
+            setLocalQuantity({...localQuantity, [item.productId]: undefined})
+        }
+    }
 
     // useEffect(() => {
     //     if (customerProductLists.loaded) {

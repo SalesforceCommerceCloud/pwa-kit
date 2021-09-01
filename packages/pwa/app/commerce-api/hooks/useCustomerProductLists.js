@@ -49,7 +49,7 @@ export default function useCustomerProductLists({eventHandler = noop, errorHandl
     //                     // if the item is already in the wishlist
     //                     // only update the quantity
     //                     if (productListItem) {
-    //                         await self.updateCustomerProductListItem(productList, {
+    //                         await self._updateListItem(productList, {
     //                             ...productListItem,
     //                             quantity: event.item.quantity + productListItem.quantity
     //                         })
@@ -97,11 +97,11 @@ export default function useCustomerProductLists({eventHandler = noop, errorHandl
              */
             async init() {
                 actions.setLoading(true)
-                const productLists = await this._getOrCreateProductLists()
+                const productLists = await self._getOrCreateLists()
                 const wishlist = productLists.data.find(
                     (list) => list.name === PWA_DEFAULT_WISHLIST_NAME
                 )
-                const productDetails = await this._getProductsInList(wishlist)
+                const productDetails = await self._getProductsInList(wishlist)
                 actions.setLoading(false)
 
                 // merge product details into the list
@@ -121,7 +121,7 @@ export default function useCustomerProductLists({eventHandler = noop, errorHandl
                     return list
                 })
 
-                actions.receive(result)
+                actions.receiveLists(result)
             },
 
             reset() {
@@ -146,18 +146,18 @@ export default function useCustomerProductLists({eventHandler = noop, errorHandl
              * @param {string} type type of list to fetch or create
              * @returns product lists for registered users
              */
-            async _getOrCreateProductLists() {
-                let response = await self._getProductLists()
+            async _getOrCreateLists() {
+                let response = await self._getLists()
 
                 if (!response.data.some((list) => list.name === PWA_DEFAULT_WISHLIST_NAME)) {
-                    await self._createProductList()
-                    response = await self._getProductLists()
+                    await self._createList()
+                    response = await self._getLists()
                 }
 
                 return response
             },
 
-            async _getProductLists() {
+            async _getLists() {
                 const response = await api.shopperCustomers.getCustomerProductLists({
                     parameters: {
                         customerId: customer.customerId
@@ -170,7 +170,7 @@ export default function useCustomerProductLists({eventHandler = noop, errorHandl
                 return response
             },
 
-            async _createProductList(name = PWA_DEFAULT_WISHLIST_NAME, type = WISHLIST_TYPE) {
+            async _createList(name = PWA_DEFAULT_WISHLIST_NAME, type = WISHLIST_TYPE) {
                 const response = await api.shopperCustomers.createCustomerProductList({
                     body: {
                         type,
@@ -226,31 +226,33 @@ export default function useCustomerProductLists({eventHandler = noop, errorHandl
             //     eventQueue.enqueue(event)
             // },
 
-            // /**
-            //  * Adds an item to the customer's product list.
-            //  * @param {object} list
-            //  * @param {Object} item item to be added to the list.
-            //  */
-            // async createCustomerProductListItem(list, item) {
-            //     setIsLoading(true)
-            //     const response = await api.shopperCustomers.createCustomerProductListItem({
-            //         body: item,
-            //         parameters: {
-            //             customerId: customer.customerId,
-            //             listId: list.id
-            //         }
-            //     })
+            // todo
+            async createListItem(listId, item) {
+                const createdItem = await self._createListItem(listId, item)
+                // actions.updateListItem(listId, updatedItem)
+                console.log(createdItem)
+            },
 
-            //     setIsLoading(false)
+            /**
+             * Adds an item to the customer's product list.
+             * @param {object} listId
+             * @param {Object} item item to be added to the list.
+             */
+            async _createListItem(listId, item) {
+                const response = await api.shopperCustomers.createCustomerProductListItem({
+                    body: item,
+                    parameters: {
+                        customerId: customer.customerId,
+                        listId
+                    }
+                })
 
-            //     if (isError(response)) {
-            //         throw new Error(response)
-            //     }
+                if (isError(response)) {
+                    throw new Error(response)
+                }
 
-            //     // This function does not return an updated customerProductsList so we fetch manually
-            //     await self.getCustomerProductLists()
-            //     return response
-            // },
+                return response
+            },
 
             // /**
             //  * Returns a single customer's product list.
@@ -311,44 +313,72 @@ export default function useCustomerProductLists({eventHandler = noop, errorHandl
             //     })
             // },
 
-            // /**
-            //  * Update an item from a customerProductList
-            //  *
-            //  * @param {object} list
-            //  * @param {string} list.id id of the list to update the item in
-            //  * @param {object} item
-            //  * @param {string} item.id the id of the item in the product list
-            //  * @param {number} item.quantity the quantity of the item
-            //  */
-            // async updateCustomerProductListItem(list, item) {
-            //     if (item.quantity === 0) {
-            //         return this.deleteCustomerProductListItem(list, item)
-            //     }
+            async updateListItem(listId, item) {
+                const {id, quantity} = item
+                if (quantity === 0) {
+                    await self._removeListItem(listId, id)
+                    actions.removeListItem(listId, id)
+                    return
+                }
+                const updatedItem = await self._updateListItem(listId, item)
+                actions.updateListItem(listId, updatedItem)
+            },
 
-            //     const response = await api.shopperCustomers.updateCustomerProductListItem({
-            //         body: item,
-            //         parameters: {
-            //             customerId: customer.customerId,
-            //             listId: list.id,
-            //             itemId: item.id
-            //         }
-            //     })
+            /**
+             * Update an item in a customer product list
+             *
+             * @param {string} listId id of the list to update the item in
+             * @param {object} item
+             * @param {string} item.id the id of the item in the product list
+             * @param {number} item.quantity the quantity of the item
+             */
+            async _updateListItem(listId, item) {
+                const {id, quantity} = item
+                const response = await api.shopperCustomers.updateCustomerProductListItem({
+                    body: {
+                        id,
+                        quantity,
+                        public: false,
+                        priority: 1
+                    },
+                    parameters: {
+                        customerId: customer.customerId,
+                        listId: listId,
+                        itemId: item.id
+                    }
+                })
 
-            //     if (isError(response)) {
-            //         throw new Error(response)
-            //     }
+                if (isError(response)) {
+                    throw new Error(response)
+                }
 
-            //     // The response is the single updated item so we'll find that
-            //     // item by its id and update it
-            //     const listToUpdate = this.getCustomerProductList(list.id)
+                return response
+            },
 
-            //     this.updateCustomerProductList({
-            //         ...listToUpdate,
-            //         customerProductListItems: listToUpdate.customerProductListItems.map((item) =>
-            //             item.id === response.id ? response : item
-            //         )
-            //     })
-            // }
+            /**
+             * Remove an item from a customer product list
+             *
+             * @param {string} listId id of the list to update the item in
+             * @param {string} itemId the id of the item in the product list
+             */
+            async _removeListItem(listId, itemId) {
+                const response = await api.shopperCustomers.deleteCustomerProductListItem(
+                    {
+                        parameters: {
+                            itemId,
+                            listId,
+                            customerId: customer.customerId
+                        }
+                    },
+                    true
+                )
+
+                if (isError(response)) {
+                    throw new Error(response)
+                }
+
+                return response
+            }
         }
     }, [customer.customerId, state])
     return self
