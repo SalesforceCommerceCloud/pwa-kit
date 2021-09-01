@@ -197,7 +197,7 @@ const ProductView = ({
                 />
             </Box>
             <Flex direction={['column', 'column', 'column', 'row']}>
-                <Box flex={2} mr={[0, 0, 0, 6, 6]}>
+                <Box flex={1} mr={[0, 0, 0, 6, 6]}>
                     {product ? (
                         <>
                             <ImageGallery
