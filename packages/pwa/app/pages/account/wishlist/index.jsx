@@ -23,7 +23,7 @@ const numberOfSkeletonItems = 3
 const AccountWishlist = () => {
     const navigate = useNavigation()
     const {formatMessage} = useIntl()
-    const {wishlist, isLoading, isEmpty, updateListItem} = useWishlist()
+    const {wishlist, isLoading, isEmpty, updateWishlistItem} = useWishlist()
     // console.log(wishlist)
     // const [wishlist, setWishlist] = useState()
     const [selectedItem, setSelectedItem] = useState(undefined)
@@ -43,7 +43,7 @@ const AccountWishlist = () => {
             setLocalQuantity({...localQuantity, [item.productId]: quantity})
             setWishlistItemLoading(true)
             setSelectedItem(item.productId)
-            await updateListItem(wishlist.id, {
+            await updateWishlistItem(wishlist.id, {
                 ...item,
                 quantity: parseInt(quantity)
             })

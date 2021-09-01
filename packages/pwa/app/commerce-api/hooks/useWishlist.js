@@ -169,23 +169,6 @@ export function useCustomerProductLists() {
             //     eventQueue.enqueue(event)
             // },
 
-            // todo
-            async createListItem(listId, item) {
-                const createdItem = await self._createListItem(listId, item)
-                actions.createListItem(listId, createdItem)
-            },
-
-            async updateListItem(listId, item) {
-                const {id, quantity} = item
-                if (quantity === 0) {
-                    await self._removeListItem(listId, id)
-                    actions.removeListItem(listId, id)
-                    return
-                }
-                const updatedItem = await self._updateListItem(listId, item)
-                actions.updateListItem(listId, updatedItem)
-            },
-
             /**
              * Adds an item to the customer's product list.
              * @param {object} listId
@@ -327,6 +310,22 @@ export default function useWishlist() {
                 actions.receiveLists(result)
             },
 
+            async createWishlistItem(item) {
+                const createdItem = await self._createListItem(self.wishlist.id, item)
+                actions.createListItem(self.wishlist.id, createdItem)
+            },
+
+            async updateWishlistItem(item) {
+                const {id, quantity} = item
+                if (quantity === 0) {
+                    await self._removeListItem(self.wishlist.id, id)
+                    actions.removeListItem(self.wishlist.id, id)
+                    return
+                }
+                const updatedItem = await self._updateListItem(self.wishlist.id, item)
+                actions.updateListItem(self.wishlist.id, updatedItem)
+            },
+
             /**
              * Fetches product lists for registered users or creates a new list if none exist
              * due to the api limitation, we can not get the list based on type but all lists
@@ -344,5 +343,6 @@ export default function useWishlist() {
             }
         }
     }, [_super])
+
     return self
 }

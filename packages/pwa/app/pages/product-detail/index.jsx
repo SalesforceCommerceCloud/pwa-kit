@@ -63,7 +63,7 @@ const ProductDetail = ({category, product, isLoading}) => {
         })
     }
 
-    const {wishlist, createListItem} = useWishlist()
+    const {wishlist, createWishlistItem} = useWishlist()
 
     const navigate = useNavigation()
     const showToast = useToast()
@@ -89,7 +89,7 @@ const ProductDetail = ({category, product, isLoading}) => {
 
     const handleAddToWishlist = async (quantity) => {
         try {
-            await createListItem(wishlist.id, {
+            await createWishlistItem(wishlist.id, {
                 id: product.id,
                 quantity
             })
