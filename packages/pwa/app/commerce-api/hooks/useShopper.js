@@ -7,7 +7,7 @@
 import {useEffect} from 'react'
 import useBasket from './useBasket'
 import useCustomer from './useCustomer'
-import useWishlist from './useWishlist'
+import useCustomerProductList from './useCustomerProductList'
 
 /**
  * Joins basket and customer hooks into a single hook for initializing their states
@@ -17,7 +17,7 @@ import useWishlist from './useWishlist'
 const useShopper = () => {
     const customer = useCustomer()
     const basket = useBasket()
-    const wishlist = useWishlist()
+    const wishlist = useCustomerProductList()
 
     // Create or restore the user session upon mounting
     useEffect(() => {

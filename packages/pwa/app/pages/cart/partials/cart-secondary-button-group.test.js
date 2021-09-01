@@ -69,8 +69,8 @@ jest.mock('../../../commerce-api/hooks/useBasket', () => {
     }
 })
 
-jest.mock('../../../commerce-api/hooks/useWishlist', () => {
-    const originalModule = jest.requireActual('../../../commerce-api/hooks/useWishlist')
+jest.mock('../../../commerce-api/hooks/useCustomerProductList', () => {
+    const originalModule = jest.requireActual('../../../commerce-api/hooks/useCustomerProductList')
     const useCustomerProductLists = originalModule.default
     return () => {
         const customerProductLists = useCustomerProductLists()

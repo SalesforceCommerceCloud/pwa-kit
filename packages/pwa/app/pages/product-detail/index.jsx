@@ -25,7 +25,7 @@ import {
 
 // Hooks
 import useBasket from '../../commerce-api/hooks/useBasket'
-import useWishlist from '../../commerce-api/hooks/useWishlist'
+import useCustomerProductList from '../../commerce-api/hooks/useCustomerProductList'
 import {useVariant} from '../../hooks'
 import useEinstein from '../../commerce-api/hooks/useEinstein'
 
@@ -63,7 +63,7 @@ const ProductDetail = ({category, product, isLoading}) => {
         })
     }
 
-    const {wishlist, createWishlistItem} = useWishlist()
+    const {wishlist, createWishlistItem} = useCustomerProductList()
 
     const navigate = useNavigation()
     const showToast = useToast()

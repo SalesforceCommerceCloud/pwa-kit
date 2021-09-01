@@ -32,12 +32,12 @@ const eventQueue = new CustomerProductListEventQueue()
  *
  * By default, the Shopper Customer Product List API allows a shopper to
  * save multiple product lists. However, the PWA only use a single
- * product list, which is the wishlist. There is another hook useWishlist,
+ * product list, which is the wishlist. There is another hook useCustomerProductList,
  * which is built on top of this hook to add wishlist specific logic.
- * You can think this hook as the "parent class" for the useWishlist hook.
+ * You can think this hook as the "parent class" for the useCustomerProductList hook.
  *
  * If your application need to handle multiple customer product lists, this
- * is the hook for you, otherwise it is recommended to use useWishlist hook.
+ * is the hook for you, otherwise it is recommended to use useCustomerProductList hook.
  */
 export function useCustomerProductLists() {
     const api = useCommerceAPI()
@@ -98,7 +98,7 @@ export function useCustomerProductLists() {
                 actions.reset()
             },
 
-            async _getLists() {
+            async getLists() {
                 const response = await api.shopperCustomers.getCustomerProductLists({
                     parameters: {
                         customerId: customer.customerId
@@ -112,7 +112,7 @@ export function useCustomerProductLists() {
                 return response
             },
 
-            async _createList(name, type) {
+            async createList(name, type) {
                 const response = await api.shopperCustomers.createCustomerProductList({
                     body: {
                         type,
@@ -153,7 +153,7 @@ export function useCustomerProductLists() {
                 }
 
                 return response
-            },
+            }
 
             // /**
             //  * @TODO: remove this function as it exposes unnecessary knowledge
@@ -167,13 +167,88 @@ export function useCustomerProductLists() {
             // addActionToEventQueue(event) {
             //     eventQueue.enqueue(event)
             // },
+        }
+    }, [customer.customerId, state])
+    return self
+}
+
+/**
+ * This hook is the "child class" of useCustomerProductLists.
+ * It provides functionalities to manage a single wishlist for shoppers.
+ */
+export default function useCustomerProductList() {
+    const api = useCommerceAPI()
+    const customer = useCustomer()
+    const _super = useCustomerProductLists()
+    const {actions} = useContext(CustomerProductListsContext)
+    const PWA_DEFAULT_WISHLIST_NAME = 'PWA wishlist'
+    const API_WISHLIST_TYPE = 'wish_list'
+
+    const self = useMemo(() => {
+        return {
+            ..._super,
+
+            get wishlist() {
+                return Object.values(self.productLists).find(
+                    (list) => list.name === PWA_DEFAULT_WISHLIST_NAME
+                )
+            },
+
+            /**
+             * Initialize customer's wishlist.
+             * This should only be used during shopper login.
+             */
+            async init() {
+                actions.setLoading(true)
+                const productLists = await self._getOrCreateWishlist()
+                const wishlist = productLists.data.find(
+                    (list) => list.name === PWA_DEFAULT_WISHLIST_NAME
+                )
+                const productDetails = await self._getProductsInList(wishlist)
+                actions.setLoading(false)
+
+                // merge product details into the list
+                const result = productLists.data.map((list) => {
+                    if (list.id === wishlist.id) {
+                        list.customerProductListItems = list.customerProductListItems?.map(
+                            (item) => {
+                                return {
+                                    ...productDetails.data.find(
+                                        (product) => product.id === item.productId
+                                    ),
+                                    ...item
+                                }
+                            }
+                        )
+                    }
+                    return list
+                })
+
+                actions.receiveLists(result)
+            },
+
+            async createWishlistItem(item) {
+                const createdItem = await self._createListItem(self.wishlist.id, item)
+                actions.createListItem(self.wishlist.id, createdItem)
+            },
+
+            async updateWishlistItem(item) {
+                const {id, quantity} = item
+                if (quantity === 0) {
+                    await self._removeListItem(self.wishlist.id, id)
+                    actions.removeListItem(self.wishlist.id, id)
+                    return
+                }
+                const updatedItem = await self._updateListItem(self.wishlist.id, item)
+                actions.updateListItem(self.wishlist.id, updatedItem)
+            },
 
             /**
              * Adds an item to the customer's product list.
              * @param {object} listId
              * @param {Object} item item to be added to the list.
              */
-            async _createListItem(listId, item) {
+             async _createListItem(listId, item) {
                 const {id, quantity} = item
                 const response = await api.shopperCustomers.createCustomerProductListItem({
                     body: {
@@ -250,79 +325,6 @@ export function useCustomerProductLists() {
                 }
 
                 return response
-            }
-        }
-    }, [customer.customerId, state])
-    return self
-}
-
-/**
- * This hook is the "child class" of useCustomerProductLists.
- * It provides functionalities to manage a single wishlist for shoppers.
- */
-export default function useWishlist() {
-    const _super = useCustomerProductLists()
-    const {actions} = useContext(CustomerProductListsContext)
-    const PWA_DEFAULT_WISHLIST_NAME = 'PWA wishlist'
-    const API_WISHLIST_TYPE = 'wish_list'
-
-    const self = useMemo(() => {
-        return {
-            ..._super,
-
-            get wishlist() {
-                return Object.values(self.productLists).find(
-                    (list) => list.name === PWA_DEFAULT_WISHLIST_NAME
-                )
-            },
-
-            /**
-             * Initialize customer's wishlist.
-             * This should only be used during shopper login.
-             */
-            async init() {
-                actions.setLoading(true)
-                const productLists = await self._getOrCreateWishlist()
-                const wishlist = productLists.data.find(
-                    (list) => list.name === PWA_DEFAULT_WISHLIST_NAME
-                )
-                const productDetails = await self._getProductsInList(wishlist)
-                actions.setLoading(false)
-
-                // merge product details into the list
-                const result = productLists.data.map((list) => {
-                    if (list.id === wishlist.id) {
-                        list.customerProductListItems = list.customerProductListItems?.map(
-                            (item) => {
-                                return {
-                                    ...productDetails.data.find(
-                                        (product) => product.id === item.productId
-                                    ),
-                                    ...item
-                                }
-                            }
-                        )
-                    }
-                    return list
-                })
-
-                actions.receiveLists(result)
-            },
-
-            async createWishlistItem(item) {
-                const createdItem = await self._createListItem(self.wishlist.id, item)
-                actions.createListItem(self.wishlist.id, createdItem)
-            },
-
-            async updateWishlistItem(item) {
-                const {id, quantity} = item
-                if (quantity === 0) {
-                    await self._removeListItem(self.wishlist.id, id)
-                    actions.removeListItem(self.wishlist.id, id)
-                    return
-                }
-                const updatedItem = await self._updateListItem(self.wishlist.id, item)
-                actions.updateListItem(self.wishlist.id, updatedItem)
             },
 
             /**

@@ -10,7 +10,7 @@ import {FormattedMessage, useIntl} from 'react-intl'
 import PageActionPlaceHolder from '../../../components/page-action-placeholder'
 import {WishlistIcon} from '../../../components/icons'
 import useNavigation from '../../../hooks/use-navigation'
-import useWishlist from '../../../commerce-api/hooks/useWishlist'
+import useCustomerProductList from '../../../commerce-api/hooks/useCustomerProductList'
 import useCustomer from '../../../commerce-api/hooks/useCustomer'
 import {Box, Flex, Skeleton} from '@chakra-ui/react'
 import {API_ERROR_MESSAGE} from '../../../constants'
@@ -25,7 +25,7 @@ const AccountWishlist = () => {
     const customer = useCustomer()
     const navigate = useNavigation()
     const {formatMessage} = useIntl()
-    const {wishlist, isLoading, isEmpty, updateWishlistItem, init} = useWishlist()
+    const {wishlist, isLoading, isEmpty, updateWishlistItem, init} = useCustomerProductList()
     // console.log(wishlist)
     // const [wishlist, setWishlist] = useState()
     const [selectedItem, setSelectedItem] = useState(undefined)

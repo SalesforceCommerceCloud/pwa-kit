@@ -21,7 +21,7 @@ import CartSecondaryButtonGroup from './partials/cart-secondary-button-group'
 import ProductViewModal from '../../components/product-view-modal'
 
 import {useToast} from '../../hooks/use-toast'
-import useWishlist from '../../commerce-api/hooks/useWishlist'
+import useCustomerProductList from '../../commerce-api/hooks/useCustomerProductList'
 import {API_ERROR_MESSAGE, customerProductListTypes} from '../../constants'
 import useNavigation from '../../hooks/use-navigation'
 import useCustomer from '../../commerce-api/hooks/useCustomer'
@@ -52,7 +52,7 @@ const Cart = () => {
         })
     }
 
-    const customerProductLists = useWishlist()
+    const customerProductLists = useCustomerProductList()
 
     const [isCartItemLoading, setCartItemLoading] = useState(false)
     const {isOpen, onOpen, onClose} = useDisclosure()
