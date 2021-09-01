@@ -40,7 +40,7 @@ const Login = () => {
 
     // If customer is registered push to account page
     useEffect(() => {
-        if (customer.authType != null && customer.authType === 'registered') {
+        if (customer.authType != null && customer.isRegistered) {
             if (location?.state?.directedFrom) {
                 navigate(location.state.directedFrom)
             } else {
