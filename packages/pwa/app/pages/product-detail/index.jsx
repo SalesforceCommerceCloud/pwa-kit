@@ -37,7 +37,7 @@ import ProductView from '../../partials/product-view'
 import {HTTPNotFound} from 'pwa-kit-react-sdk/ssr/universal/errors'
 
 // constant
-import {API_ERROR_MESSAGE, customerProductListTypes} from '../../constants'
+import {API_ERROR_MESSAGE} from '../../constants'
 import {rebuildPathWithParams} from '../../utils/url'
 import {useHistory} from 'react-router-dom'
 import {useToast} from '../../hooks/use-toast'
@@ -89,7 +89,7 @@ const ProductDetail = ({category, product, isLoading}) => {
 
     const handleAddToWishlist = async (quantity) => {
         try {
-            await createWishlistItem(wishlist.id, {
+            await createWishlistItem({
                 id: product.id,
                 quantity
             })

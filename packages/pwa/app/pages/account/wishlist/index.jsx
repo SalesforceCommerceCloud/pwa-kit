@@ -11,8 +11,9 @@ import PageActionPlaceHolder from '../../../components/page-action-placeholder'
 import {WishlistIcon} from '../../../components/icons'
 import useNavigation from '../../../hooks/use-navigation'
 import useWishlist from '../../../commerce-api/hooks/useWishlist'
+import useCustomer from '../../../commerce-api/hooks/useCustomer'
 import {Box, Flex, Skeleton} from '@chakra-ui/react'
-import {API_ERROR_MESSAGE, customerProductListTypes} from '../../../constants'
+import {API_ERROR_MESSAGE} from '../../../constants'
 import ProductItem from '../../../components/product-item/index'
 import {useToast} from '../../../hooks/use-toast'
 import WishlistPrimaryAction from './partials/wishlist-primary-action'
@@ -21,9 +22,10 @@ import WishlistSecondaryButtonGroup from './partials/wishlist-secondary-button-g
 const numberOfSkeletonItems = 3
 
 const AccountWishlist = () => {
+    const customer = useCustomer()
     const navigate = useNavigation()
     const {formatMessage} = useIntl()
-    const {wishlist, isLoading, isEmpty, updateWishlistItem} = useWishlist()
+    const {wishlist, isLoading, isEmpty, updateWishlistItem, init} = useWishlist()
     // console.log(wishlist)
     // const [wishlist, setWishlist] = useState()
     const [selectedItem, setSelectedItem] = useState(undefined)
@@ -43,7 +45,7 @@ const AccountWishlist = () => {
             setLocalQuantity({...localQuantity, [item.productId]: quantity})
             setWishlistItemLoading(true)
             setSelectedItem(item.productId)
-            await updateWishlistItem(wishlist.id, {
+            await updateWishlistItem({
                 ...item,
                 quantity: parseInt(quantity)
             })
@@ -63,16 +65,11 @@ const AccountWishlist = () => {
         }
     }
 
-    // useEffect(() => {
-    //     if (customerProductLists.loaded) {
-    //         const wishlist = customerProductLists.getProductListPerType(
-    //             customerProductListTypes.WISHLIST
-    //         )
-    //         if (wishlist?._productItemsDetail) {
-    //             setWishlist(wishlist)
-    //         }
-    //     }
-    // }, [customerProductLists.data])
+    useEffect(() => {
+        if (customer.isRegistered) {
+            init()
+        }
+    }, [customer.isRegistered])
 
     return (
         <Stack spacing={4} data-testid="account-wishlist-page">
