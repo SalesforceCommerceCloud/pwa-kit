@@ -8,7 +8,6 @@ import {useEffect} from 'react'
 import useBasket from './useBasket'
 import useCustomer from './useCustomer'
 import useCustomerProductLists from './useCustomerProductLists'
-import {customerProductListTypes} from '../../constants'
 
 /**
  * Joins basket and customer hooks into a single hook for initializing their states
@@ -75,24 +74,21 @@ const useShopper = () => {
         }
     }, [customer, basket])
 
-    // Load wishlists in context for logged-in users
     useEffect(() => {
-        console.log(customer)
-        console.log(customer.isRegistered)
-        console.log(customer.isGuest)
-
         if (!customer.isInitialized) {
             return
         }
         if (customer.isRegistered) {
-            // we are only interested in wishlist
-            customerProductLists.getOrCreateProductLists(customerProductListTypes.WISHLIST)
+            customerProductLists.init()
         }
         if (customer.isGuest) {
-            // customerProductLists need to be reset when the user logs out
-            customerProductLists.clear()
+            customerProductLists.reset()
         }
     }, [customer.authType])
+
+    useEffect(() => {
+        console.log(customerProductLists)
+    }, [customerProductLists])
 
     return {customer, basket}
 }

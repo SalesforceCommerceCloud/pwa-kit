@@ -5,6 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React, {createContext, useContext, useReducer} from 'react'
+import {PWA_DEFAULT_WISHLIST_NAME} from '../constants'
 
 /**
  * Provider and associated hook for accessing the Commerce API in React components.
@@ -45,22 +46,37 @@ export const CustomerContext = createContext()
 export const CustomerProvider = CustomerContext.Provider
 
 /************ Customer Product Lists ************/
-const CPLInitialValue = {}
-export const CustomerProductListsContext = createContext(CPLInitialValue)
+const CustomerProductListsInitialValue = {
+    productLists: [],
+    defaultList: {}
+}
+export const CustomerProductListsContext = createContext(CustomerProductListsInitialValue)
 const _CustomerProductListsProvider = CustomerProductListsContext.Provider
 export const CustomerProductListsProvider = ({children}) => {
-    const [state, dispatch] = useReducer((state, action) => {
-        switch (action.type) {
-            case 'action description':
-                //   const newState = // do something with the action
-                return '11111111111'
+    const [state, dispatch] = useReducer((state, {type, payload}) => {
+        let productLists
+        let defaultList
+        switch (type) {
+            case 'receive':
+                productLists = [...payload.data]
+                defaultList = productLists.find((list) => {
+                    return list.name === PWA_DEFAULT_WISHLIST_NAME
+                })
+                return {...state, defaultList, productLists}
+            case 'reset':
+                return {...CustomerProductListsInitialValue}
             default:
-                throw new Error()
+                throw new Error('Unknown action.')
         }
-    }, CPLInitialValue)
+    }, CustomerProductListsInitialValue)
+
+    const actions = {
+        receive: (list) => dispatch({type: 'receive', payload: list}),
+        reset: () => dispatch({type: 'reset'})
+    }
 
     return (
-        <_CustomerProductListsProvider value={{state, dispatch}}>
+        <_CustomerProductListsProvider value={{state, actions}}>
             {children}
         </_CustomerProductListsProvider>
     )
