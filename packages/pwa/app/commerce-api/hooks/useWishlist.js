@@ -281,12 +281,6 @@ export default function useWishlist() {
              * This should only be used during shopper login.
              */
             async init() {
-                console.log(self.isLoading)
-                console.log(self.isInitialized)
-                if (self.isLoading) {
-                    console.log('return')
-                    return
-                }
                 actions.setLoading(true)
                 const productLists = await self._getOrCreateWishlist()
                 const wishlist = productLists.data.find(
@@ -313,7 +307,6 @@ export default function useWishlist() {
                 })
 
                 actions.receiveLists(result)
-                actions.setInitialized(true)
             },
 
             async createWishlistItem(item) {
@@ -322,7 +315,6 @@ export default function useWishlist() {
             },
 
             async updateWishlistItem(item) {
-                console.log(item)
                 const {id, quantity} = item
                 if (quantity === 0) {
                     await self._removeListItem(self.wishlist.id, id)
