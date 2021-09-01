@@ -109,6 +109,7 @@ export function useCustomerProductLists() {
                 if (isError(response)) {
                     throw new Error(response)
                 }
+
                 return response
             },
 
@@ -329,7 +330,6 @@ export default function useWishlist() {
             /**
              * Fetches product lists for registered users or creates a new list if none exist
              * due to the api limitation, we can not get the list based on type but all lists
-             * @param {string} type type of list to fetch or create
              * @returns product lists for registered users
              */
             async _getOrCreateWishlist() {

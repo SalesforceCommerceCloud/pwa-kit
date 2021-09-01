@@ -14,10 +14,9 @@ export const CommerceAPIProvider = CommerceAPIContext.Provider
 export const useCommerceAPI = () => useContext(CommerceAPIContext)
 
 /**
- * There are two sources of global state in the react retail storefront. One is
- * the customer and the other is the customers basket. Using React Context we
- * implement a simple shared global state allowing you can update and use either state
- * from anywhere in the application.
+ * There are a few sources of global state in the react retail storefront.
+ * Using React Context we implement a simple shared global state allowing
+ * you can update and use either state from anywhere in the application.
  *
  * If your global state needs require a more robust solution, these contexts can be
  * replaced by a third party state management library of your choosing, such as MobX

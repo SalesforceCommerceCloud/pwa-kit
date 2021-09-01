@@ -25,7 +25,7 @@ import {
 
 // Hooks
 import useBasket from '../../commerce-api/hooks/useBasket'
-import useWishlist from '../../commerce-api/hooks/useCustomerProductLists'
+import useWishlist from '../../commerce-api/hooks/useWishlist'
 import {useVariant} from '../../hooks'
 import useEinstein from '../../commerce-api/hooks/useEinstein'
 

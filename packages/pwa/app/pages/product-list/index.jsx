@@ -52,7 +52,7 @@ import {FilterIcon, ChevronDownIcon} from '../../components/icons'
 
 // Hooks
 import {useLimitUrls, usePageUrls, useSortUrls, useSearchParams} from '../../hooks'
-import useWishlist from '../../commerce-api/hooks/useCustomerProductLists'
+import useWishlist from '../../commerce-api/hooks/useWishlist'
 import {useToast} from '../../hooks/use-toast'
 import {parse as parseSearchParams} from '../../hooks/use-search-params'
 

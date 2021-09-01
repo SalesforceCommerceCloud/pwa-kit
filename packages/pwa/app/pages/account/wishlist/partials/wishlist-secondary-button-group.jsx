@@ -6,7 +6,7 @@
  */
 import React from 'react'
 import {Button, ButtonGroup, useDisclosure} from '@chakra-ui/react'
-import useWishlist from '../../../../commerce-api/hooks/useCustomerProductLists'
+import useWishlist from '../../../../commerce-api/hooks/useWishlist'
 import ConfirmationModal from '../../../../components/confirmation-modal/index'
 import {defineMessage, FormattedMessage, useIntl} from 'react-intl'
 import PropTypes from 'prop-types'

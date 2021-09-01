@@ -7,7 +7,7 @@
 import {useEffect} from 'react'
 import useBasket from './useBasket'
 import useCustomer from './useCustomer'
-import useWishlist from './useCustomerProductLists'
+import useWishlist from './useWishlist'
 
 /**
  * Joins basket and customer hooks into a single hook for initializing their states
@@ -86,9 +86,9 @@ const useShopper = () => {
         }
     }, [customer.authType])
 
-    // useEffect(() => {
-    //     console.log(customerProductLists)
-    // }, [customerProductLists])
+    useEffect(() => {
+        console.log(wishlist)
+    }, [wishlist])
 
     return {customer, basket}
 }
