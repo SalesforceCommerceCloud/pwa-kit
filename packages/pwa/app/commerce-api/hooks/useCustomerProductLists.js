@@ -229,8 +229,7 @@ export default function useCustomerProductLists({eventHandler = noop, errorHandl
             // todo
             async createListItem(listId, item) {
                 const createdItem = await self._createListItem(listId, item)
-                // actions.updateListItem(listId, updatedItem)
-                console.log(createdItem)
+                actions.createListItem(listId, createdItem)
             },
 
             /**
@@ -239,8 +238,15 @@ export default function useCustomerProductLists({eventHandler = noop, errorHandl
              * @param {Object} item item to be added to the list.
              */
             async _createListItem(listId, item) {
+                const {id, quantity} = item
                 const response = await api.shopperCustomers.createCustomerProductListItem({
-                    body: item,
+                    body: {
+                        productId: id,
+                        quantity,
+                        public: false,
+                        priority: 1,
+                        type: 'product'
+                    },
                     parameters: {
                         customerId: customer.customerId,
                         listId

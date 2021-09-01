@@ -56,6 +56,7 @@ const CPLInitialValue = {
 }
 const CPLActionTypes = {
     RECEIVE_LISTS: 'RECEIVE_LISTS',
+    CREATE_LIST_ITEM: 'CREATE_LIST_ITEM',
     UPDATE_LIST_ITEM: 'UPDATE_LIST_ITEM',
     REMOVE_LIST_ITEM: 'REMOVE_LIST_ITEM',
     SET_LOADING: 'SET_LOADING',
@@ -80,6 +81,17 @@ export const CustomerProductListsProvider = ({children}) => {
                     }
                 }, {})
                 return {...state, wishlist, productLists}
+            case CPLActionTypes.CREATE_LIST_ITEM:
+                productLists = {
+                    ...state.productLists
+                }
+
+                productLists[payload.listId].customerProductListItems = [
+                    ...productLists[payload.listId].customerProductListItems,
+                    payload.item
+                ]
+
+                return {...state, productLists}
             case CPLActionTypes.UPDATE_LIST_ITEM:
                 productLists = {
                     ...state.productLists
@@ -117,6 +129,8 @@ export const CustomerProductListsProvider = ({children}) => {
 
     const actions = {
         receiveLists: (lists) => dispatch({type: CPLActionTypes.RECEIVE_LISTS, payload: lists}),
+        createListItem: (listId, item) =>
+            dispatch({type: CPLActionTypes.CREATE_LIST_ITEM, payload: {listId, item}}),
         updateListItem: (listId, item) =>
             dispatch({type: CPLActionTypes.UPDATE_LIST_ITEM, payload: {listId, item}}),
         removeListItem: (listId, itemId) =>

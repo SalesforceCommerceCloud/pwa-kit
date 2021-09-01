@@ -52,12 +52,6 @@ const ProductDetail = ({category, product, isLoading}) => {
 
     const variant = useVariant(product)
 
-    const productListEventHandler = (event) => {
-        if (event.action === 'add') {
-            showWishlistItemAdded(event.item?.quantity)
-        }
-    }
-
     const showError = (error) => {
         console.log(error)
         showToast({
@@ -69,10 +63,7 @@ const ProductDetail = ({category, product, isLoading}) => {
         })
     }
 
-    const customerProductLists = useCustomerProductLists({
-        eventHandler: productListEventHandler,
-        errorHandler: showError
-    })
+    const {wishlist, createListItem} = useCustomerProductLists()
     const navigate = useNavigation()
     const showToast = useToast()
 
@@ -95,6 +86,17 @@ const ProductDetail = ({category, product, isLoading}) => {
         }
     }
 
+    const handleAddToWishlist = async (quantity) => {
+        try {
+            await createListItem(wishlist.id, {
+                id: product.id,
+                quantity
+            })
+        } catch (e) {
+            showError(e)
+        }
+    }
+
     const showWishlistItemAdded = (quantity) => {
         const toastAction = (
             <Button variant="link" onClick={() => navigate('/account/wishlist')}>
@@ -112,54 +114,6 @@ const ProductDetail = ({category, product, isLoading}) => {
             status: 'success',
             action: toastAction
         })
-    }
-
-    const addItemToWishlist = async (quantity) => {
-        try {
-            // If product-lists have not loaded we push "Add to wishlist" event to eventQueue to be
-            // processed once the product-lists have loaded.
-
-            // @TODO: move the logic to useCustomerProductLists
-            // PDP shouldn't need to know the implementation detail of the event queue
-            // PDP should just do "customerProductLists.addItem(item)"!
-            if (!customerProductLists?.loaded) {
-                const event = {
-                    item: {...product, quantity},
-                    action: 'add',
-                    listType: customerProductListTypes.WISHLIST
-                }
-
-                customerProductLists.addActionToEventQueue(event)
-            } else {
-                const wishlist = customerProductLists.getProductListPerType(
-                    customerProductListTypes.WISHLIST
-                )
-
-                const productListItem = wishlist.customerProductListItems.find(
-                    ({productId}) => productId === product.id
-                )
-                // if the product already exists in wishlist, update the quantity
-                if (productListItem) {
-                    await customerProductLists._updateListItem(wishlist, {
-                        ...productListItem,
-                        quantity: productListItem.quantity + parseInt(quantity)
-                    })
-                    showWishlistItemAdded(quantity)
-                } else {
-                    // other wise, just create a new product list item with given quantity number
-                    await customerProductLists.createCustomerProductListItem(wishlist, {
-                        productId: product.id,
-                        priority: 1,
-                        quantity,
-                        public: false,
-                        type: 'product'
-                    })
-                    showWishlistItemAdded(quantity)
-                }
-            }
-        } catch (error) {
-            showError(error)
-        }
     }
 
     // This page uses the `primaryCategoryId` to retrieve the category data. This attribute
@@ -203,9 +157,9 @@ const ProductDetail = ({category, product, isLoading}) => {
                     product={product}
                     category={primaryCategory?.parentCategoryTree || []}
                     addToCart={(variant, quantity) => handleAddToCart(variant, quantity)}
-                    addToWishlist={(variant, quantity) => addItemToWishlist(quantity)}
+                    addToWishlist={(variant, quantity) => handleAddToWishlist(quantity)}
                     isProductLoading={isLoading}
-                    isCustomerProductListLoading={customerProductLists.showLoader}
+                    // isCustomerProductListLoading={customerProductLists.showLoader}
                 />
 
                 {/* Information Accordion */}
