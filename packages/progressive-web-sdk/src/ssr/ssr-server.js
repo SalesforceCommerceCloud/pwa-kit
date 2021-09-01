@@ -10,6 +10,7 @@ const https = require('https')
 const fs = require('fs')
 const path = require('path')
 const crypto = require('crypto')
+const serialize = require('serialize-javascript')
 
 const awsServerlessExpress = require('aws-serverless-express')
 // body-parser is included when we install express
@@ -33,7 +34,6 @@ import {
     catchAndLog,
     configureProxyConfigs,
     getHashForString,
-    escapeJSText,
     getAssetUrl,
     getBrowserSize,
     getBundleBaseUrl,
@@ -465,7 +465,7 @@ class Rendering {
         // JSON so that it may safely be included in a <script> tag
         // in the output page.
         this._timer.start('rendering-embed-app-state')
-        const stringifiedAppState = escapeJSText(JSON.stringify(this._renderedAppState))
+        const stringifiedAppState = serialize(this._renderedAppState, {isJSON: true})
         this._timer.end('rendering-embed-app-state')
 
         const timingOutput = this._timer.summary
@@ -2816,7 +2816,7 @@ export class SSRServer {
                 headContent.push(`<!-- Embedded ${baseFilename} -->`)
                 // We use the base filename as the id
                 headContent.push(
-                    new ScriptTag({id: baseFilename}, escapeJSText(scriptText).trimRight())
+                    new ScriptTag({id: baseFilename}, serialize(scriptText).trimRight())
                 )
                 // For JQuery - set up window.Progressive.$
                 if (scriptFilename === JQUERY_JS) {

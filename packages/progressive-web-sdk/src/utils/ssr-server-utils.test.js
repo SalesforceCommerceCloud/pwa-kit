@@ -15,7 +15,6 @@ import fileUrl from 'file-url'
 import {
     AGENT_OPTIONS_TO_COPY,
     CachedResponse,
-    escapeJSText,
     getBrowserSizeNames,
     getBrowserSize,
     getBuildOrigin,
@@ -1100,11 +1099,6 @@ describe('setBuildDir', () => {
         expect(getBuildOrigin()).toEqual(fileUrl(absolutePath))
         expect(getWebpackChunkPath()).toEqual(`${fileUrl(absolutePath)}/`)
     })
-})
-
-test('escapeJSText', () => {
-    expect(escapeJSText()).toEqual(undefined)
-    expect(escapeJSText('</script>')).toEqual('\\x3c\\x2fscript>')
 })
 
 describe('MetricsSender', () => {
