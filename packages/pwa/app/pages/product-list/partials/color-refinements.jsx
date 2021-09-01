@@ -66,7 +66,7 @@ const ColorRefinements = ({filter, toggleFilter, selectedFilters}) => {
                                                 cssColorGroups[value.presentationId.toLowerCase()]
                                             }
                                             background={
-                                                value.value.toLowerCase() === 'miscellaneous' &&
+                                                value.presentationId.toLowerCase() === 'miscellaneous' &&
                                                 cssColorGroups[value.presentationId.toLowerCase()]
                                             }
                                         />
