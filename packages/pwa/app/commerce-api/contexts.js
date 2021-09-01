@@ -58,7 +58,7 @@ export const CustomerProductListsProvider = ({children}) => {
         let defaultList
         switch (type) {
             case 'receive':
-                productLists = [...payload.data]
+                productLists = [...payload]
                 defaultList = productLists.find((list) => {
                     return list.name === PWA_DEFAULT_WISHLIST_NAME
                 })

@@ -93,7 +93,29 @@ export default function useCustomerProductLists({eventHandler = noop, errorHandl
              */
             async init() {
                 const productLists = await this._getOrCreateProductLists()
-                actions.receive(productLists)
+                const defaultList = productLists.data.find(
+                    (list) => list.name === PWA_DEFAULT_WISHLIST_NAME
+                )
+                const productDetails = await this._getProductsInList(defaultList)
+
+                // merge product details into the list
+                const result = productLists.data.map((list) => {
+                    if (list.id === defaultList.id) {
+                        list.customerProductListItems = list.customerProductListItems?.map(
+                            (item) => {
+                                return {
+                                    ...productDetails.data.find(
+                                        (product) => product.id === item.productId
+                                    ),
+                                    ...item
+                                }
+                            }
+                        )
+                    }
+                    return list
+                })
+
+                actions.receive(result)
             },
 
             reset() {
@@ -159,7 +181,32 @@ export default function useCustomerProductLists({eventHandler = noop, errorHandl
                 }
 
                 return response
-            }
+            },
+
+            /**
+             * Fetch list of product details from a product list.
+             * The maximum number of productIDs that can be requested are 24.
+             * @param {array} list product list
+             * @returns {Object[]} list of product details for requested productIds
+             */
+            async _getProductsInList(list) {
+                if (!list.customerProductListItems) {
+                    return
+                }
+
+                const ids = list.customerProductListItems.map((item) => item.productId)
+                const response = await api.shopperProducts.getProducts({
+                    parameters: {
+                        ids: ids.join(',')
+                    }
+                })
+
+                if (isError(response)) {
+                    throw new Error(response)
+                }
+
+                return response
+            },
 
             // /**
             //  * @TODO: remove this function as it exposes unnecessary knowledge
@@ -173,7 +220,6 @@ export default function useCustomerProductLists({eventHandler = noop, errorHandl
             // addActionToEventQueue(event) {
             //     eventQueue.enqueue(event)
             // },
-
 
             // /**
             //  * Adds an item to the customer's product list.
@@ -221,41 +267,6 @@ export default function useCustomerProductLists({eventHandler = noop, errorHandl
             //         )
             //     }
             //     setCustomerProductLists(updatedCustomerProductLists)
-            // },
-
-            // /**
-            //  * Fetch list of product details from list of ids.
-            //  * The maximum number of productIDs that can be requested are 24.
-            //  * @param {string} ids list of productIds
-            //  * @returns {Object[]} list of product details for requested productIds
-            //  */
-            // async getProductsInList(ids, listId) {
-            //     if (!ids) {
-            //         return
-            //     }
-
-            //     const response = await api.shopperProducts.getProducts({
-            //         parameters: {
-            //             ids
-            //         }
-            //     })
-
-            //     if (isError(response)) {
-            //         throw new Error(response)
-            //     }
-
-            //     const itemDetail = response.data.reduce((result, item) => {
-            //         const key = item.id
-            //         result[key] = item
-            //         return result
-            //     }, {})
-
-            //     const listToUpdate = this.getCustomerProductList(listId)
-
-            //     this.updateCustomerProductList({
-            //         ...listToUpdate,
-            //         _productItemsDetail: {...listToUpdate._productItemsDetail, ...itemDetail}
-            //     })
             // },
 
             // /**
