@@ -7,7 +7,7 @@
 import {useEffect} from 'react'
 import useBasket from './useBasket'
 import useCustomer from './useCustomer'
-import useCustomerProductLists from './useCustomerProductLists'
+import useWishlist from './useCustomerProductLists'
 
 /**
  * Joins basket and customer hooks into a single hook for initializing their states
@@ -17,7 +17,7 @@ import useCustomerProductLists from './useCustomerProductLists'
 const useShopper = () => {
     const customer = useCustomer()
     const basket = useBasket()
-    const customerProductLists = useCustomerProductLists()
+    const wishlist = useWishlist()
 
     // Create or restore the user session upon mounting
     useEffect(() => {
@@ -79,10 +79,10 @@ const useShopper = () => {
             return
         }
         if (customer.isRegistered) {
-            customerProductLists.init()
+            wishlist.init()
         }
         if (customer.isGuest) {
-            customerProductLists.reset()
+            wishlist.reset()
         }
     }, [customer.authType])
 

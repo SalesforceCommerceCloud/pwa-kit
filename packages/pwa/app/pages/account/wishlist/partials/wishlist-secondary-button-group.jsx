@@ -6,7 +6,7 @@
  */
 import React from 'react'
 import {Button, ButtonGroup, useDisclosure} from '@chakra-ui/react'
-import useCustomerProductLists from '../../../../commerce-api/hooks/useCustomerProductLists'
+import useWishlist from '../../../../commerce-api/hooks/useCustomerProductLists'
 import ConfirmationModal from '../../../../components/confirmation-modal/index'
 import {defineMessage, FormattedMessage, useIntl} from 'react-intl'
 import PropTypes from 'prop-types'
@@ -32,7 +32,7 @@ export const REMOVE_WISHLIST_ITEM_CONFIRMATION_DIALOG_CONFIG = {
 const WishlistSecondaryButtonGroup = ({productListItemId, list, onClick = noop}) => {
     const {formatMessage} = useIntl()
     const variant = useCartItemVariant()
-    const customerProductLists = useCustomerProductLists()
+    const customerProductLists = useWishlist()
     const modalProps = useDisclosure()
     const showToast = useToast()
 

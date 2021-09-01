@@ -26,15 +26,24 @@ export class CustomerProductListEventQueue extends Queue {
 
 const eventQueue = new CustomerProductListEventQueue()
 
-const PWA_DEFAULT_WISHLIST_NAME = 'PWA wishlist'
-const WISHLIST_TYPE = 'wish_list'
-
-export default function useCustomerProductLists({eventHandler = noop, errorHandler = noop} = {}) {
+/**
+ * This hook is designed to add customer product list capabilities
+ * to your app, it leverages the Commerce API - Shopper Customer endpoints.
+ * It uses a React context to store customer product list globally.
+ *
+ * By default, the Shopper Customer Product List API allows a shopper to
+ * save multiple product lists. However, the PWA only use a single
+ * product list, which is the wishlist. There is another hook useWishlist,
+ * which is built on top of this hook to add wishlist specific logic.
+ * You can think this hook as the "parent class" for the useWishlist hook.
+ *
+ * If your application need to handle multiple customer product lists, this
+ * is the hook for you, otherwise it is recommended to use useWishlist hook.
+ */
+export function useCustomerProductLists() {
     const api = useCommerceAPI()
     const customer = useCustomer()
-    // const {customerProductLists, setCustomerProductLists} = useContext(CustomerProductListsContext)
     const {state, actions} = useContext(CustomerProductListsContext)
-    // const [isLoading, setIsLoading] = useState(false)
 
     // useEffect(() => {
     //     eventQueue.process(async (event) => {
@@ -84,77 +93,10 @@ export default function useCustomerProductLists({eventHandler = noop, errorHandl
 
     const self = useMemo(() => {
         return {
-            // ...customerProductLists,
             ...state,
-
-            get isEmpty() {
-                return !self.wishlist?.customerProductListItems?.length
-            },
-
-            /**
-             * Initialize customer's product lists.
-             * This should only be used during customer login.
-             */
-            async init() {
-                actions.setLoading(true)
-                const productLists = await self._getOrCreateLists()
-                const wishlist = productLists.data.find(
-                    (list) => list.name === PWA_DEFAULT_WISHLIST_NAME
-                )
-                const productDetails = await self._getProductsInList(wishlist)
-                actions.setLoading(false)
-
-                // merge product details into the list
-                const result = productLists.data.map((list) => {
-                    if (list.id === wishlist.id) {
-                        list.customerProductListItems = list.customerProductListItems?.map(
-                            (item) => {
-                                return {
-                                    ...productDetails.data.find(
-                                        (product) => product.id === item.productId
-                                    ),
-                                    ...item
-                                }
-                            }
-                        )
-                    }
-                    return list
-                })
-
-                actions.receiveLists(result)
-            },
 
             reset() {
                 actions.reset()
-            },
-
-            // get showLoader() {
-            //     return isLoading
-            // },
-
-            // get loaded() {
-            //     return customerProductLists?.data?.length
-            // },
-
-            // getProductListPerType(type) {
-            //     return customerProductLists?.data.find((list) => list.type === type)
-            // },
-
-            /**
-             * Fetches product lists for registered users or creates a new list if none exist
-             * due to the api limitation, we can not get the list based on type but all lists
-             * @param {string} type type of list to fetch or create
-             * @returns product lists for registered users
-             */
-            async _getOrCreateLists() {
-                let response = await self._getLists()
-
-                if (!response.data.some((list) => list.name === PWA_DEFAULT_WISHLIST_NAME)) {
-                    await self._createList()
-                    response = await self._getLists()
-                }
-
-                return response
             },
 
             async _getLists() {
@@ -170,7 +112,7 @@ export default function useCustomerProductLists({eventHandler = noop, errorHandl
                 return response
             },
 
-            async _createList(name = PWA_DEFAULT_WISHLIST_NAME, type = WISHLIST_TYPE) {
+            async _createList(name, type) {
                 const response = await api.shopperCustomers.createCustomerProductList({
                     body: {
                         type,
@@ -232,6 +174,17 @@ export default function useCustomerProductLists({eventHandler = noop, errorHandl
                 actions.createListItem(listId, createdItem)
             },
 
+            async updateListItem(listId, item) {
+                const {id, quantity} = item
+                if (quantity === 0) {
+                    await self._removeListItem(listId, id)
+                    actions.removeListItem(listId, id)
+                    return
+                }
+                const updatedItem = await self._updateListItem(listId, item)
+                actions.updateListItem(listId, updatedItem)
+            },
+
             /**
              * Adds an item to the customer's product list.
              * @param {object} listId
@@ -258,76 +211,6 @@ export default function useCustomerProductLists({eventHandler = noop, errorHandl
                 }
 
                 return response
-            },
-
-            // /**
-            //  * Returns a single customer's product list.
-            //  * @param {string} listId id of the list to find.
-            //  */
-            // getCustomerProductList(listId) {
-            //     return customerProductLists.data.find((productList) => productList.id === listId)
-            // },
-
-            // /**
-            //  * Updates a single customer's product list.
-            //  * @param {object} list
-            //  */
-            // updateCustomerProductList(list) {
-            //     const updatedCustomerProductLists = {
-            //         ...customerProductLists,
-            //         data: customerProductLists.data.map((productList) =>
-            //             list.id === productList.id ? list : productList
-            //         )
-            //     }
-            //     setCustomerProductLists(updatedCustomerProductLists)
-            // },
-
-            // /**
-            //  * Remove an item from a customerProductList
-            //  * @param {object} list
-            //  * @param {string} list.id id of list to remove item from
-            //  * @param {object} item
-            //  * @param {string} item.id id of item (in product-list not productId) to be removed
-            //  */
-            // async deleteCustomerProductListItem(list, item) {
-            //     // Delete item API returns a void response which throws a json parse error,
-            //     // passing true as 2nd argument to get raw json response
-            //     const response = await api.shopperCustomers.deleteCustomerProductListItem(
-            //         {
-            //             parameters: {
-            //                 itemId: item.id,
-            //                 listId: list.id,
-            //                 customerId: customer.customerId
-            //             }
-            //         },
-            //         true
-            //     )
-
-            //     if (isError(response)) {
-            //         throw new Error(response)
-            //     }
-
-            //     // Remove item API does not return an updated list in response so we manually remove item
-            //     // from state and update UI without requesting updated list from API
-            //     const listToUpdate = this.getCustomerProductList(list.id)
-
-            //     this.updateCustomerProductList({
-            //         ...listToUpdate,
-            //         customerProductListItems: listToUpdate.customerProductListItems.filter(
-            //             (x) => x.id !== item.id
-            //         )
-            //     })
-            // },
-
-            async updateListItem(listId, item) {
-                const {id, quantity} = item
-                if (quantity === 0) {
-                    await self._removeListItem(listId, id)
-                    actions.removeListItem(listId, id)
-                    return
-                }
-                const updatedItem = await self._updateListItem(listId, item)
-                actions.updateListItem(listId, updatedItem)
             },
 
             /**
@@ -387,5 +270,79 @@ export default function useCustomerProductLists({eventHandler = noop, errorHandl
             }
         }
     }, [customer.customerId, state])
+    return self
+}
+
+/**
+ * This hook is the "child class" of useCustomerProductLists.
+ * It provides functionalities to manage a single wishlist for shoppers.
+ */
+export default function useWishlist() {
+    const _super = useCustomerProductLists()
+    const {actions} = useContext(CustomerProductListsContext)
+    const PWA_DEFAULT_WISHLIST_NAME = 'PWA wishlist'
+    const API_WISHLIST_TYPE = 'wish_list'
+
+    const self = useMemo(() => {
+        return {
+            ..._super,
+
+            get wishlist() {
+                return Object.values(self.productLists).find(
+                    (list) => list.name === PWA_DEFAULT_WISHLIST_NAME
+                )
+            },
+
+            /**
+             * Initialize customer's wishlist.
+             * This should only be used during shopper login.
+             */
+            async init() {
+                actions.setLoading(true)
+                const productLists = await self._getOrCreateWishlist()
+                const wishlist = productLists.data.find(
+                    (list) => list.name === PWA_DEFAULT_WISHLIST_NAME
+                )
+                const productDetails = await self._getProductsInList(wishlist)
+                actions.setLoading(false)
+
+                // merge product details into the list
+                const result = productLists.data.map((list) => {
+                    if (list.id === wishlist.id) {
+                        list.customerProductListItems = list.customerProductListItems?.map(
+                            (item) => {
+                                return {
+                                    ...productDetails.data.find(
+                                        (product) => product.id === item.productId
+                                    ),
+                                    ...item
+                                }
+                            }
+                        )
+                    }
+                    return list
+                })
+
+                actions.receiveLists(result)
+            },
+
+            /**
+             * Fetches product lists for registered users or creates a new list if none exist
+             * due to the api limitation, we can not get the list based on type but all lists
+             * @param {string} type type of list to fetch or create
+             * @returns product lists for registered users
+             */
+            async _getOrCreateWishlist() {
+                let response = await self._getLists()
+
+                if (!response.data.some((list) => list.name === PWA_DEFAULT_WISHLIST_NAME)) {
+                    await self._createList(PWA_DEFAULT_WISHLIST_NAME, API_WISHLIST_TYPE)
+                    response = await self._getLists()
+                }
+
+                return response
+            }
+        }
+    }, [_super])
     return self
 }

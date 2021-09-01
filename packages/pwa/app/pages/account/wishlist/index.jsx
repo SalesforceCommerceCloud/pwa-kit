@@ -10,7 +10,7 @@ import {FormattedMessage, useIntl} from 'react-intl'
 import PageActionPlaceHolder from '../../../components/page-action-placeholder'
 import {WishlistIcon} from '../../../components/icons'
 import useNavigation from '../../../hooks/use-navigation'
-import useCustomerProductLists from '../../../commerce-api/hooks/useCustomerProductLists'
+import useWishlist from '../../../commerce-api/hooks/useCustomerProductLists'
 import {Box, Flex, Skeleton} from '@chakra-ui/react'
 import {API_ERROR_MESSAGE, customerProductListTypes} from '../../../constants'
 import ProductItem from '../../../components/product-item/index'
@@ -23,7 +23,7 @@ const numberOfSkeletonItems = 3
 const AccountWishlist = () => {
     const navigate = useNavigation()
     const {formatMessage} = useIntl()
-    const {wishlist, isLoading, isEmpty, updateListItem} = useCustomerProductLists()
+    const {wishlist, isLoading, isEmpty, updateListItem} = useWishlist()
     // console.log(wishlist)
     // const [wishlist, setWishlist] = useState()
     const [selectedItem, setSelectedItem] = useState(undefined)

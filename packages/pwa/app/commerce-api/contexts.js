@@ -5,7 +5,6 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React, {createContext, useContext, useReducer} from 'react'
-import {PWA_DEFAULT_WISHLIST_NAME} from '../constants'
 
 /**
  * Provider and associated hook for accessing the Commerce API in React components.
@@ -51,8 +50,7 @@ const CPLInitialValue = {
     productLists: {
         // this is a map of product lists
         // keyed by list id
-    },
-    wishlist: {}
+    }
 }
 const CPLActionTypes = {
     RECEIVE_LISTS: 'RECEIVE_LISTS',
@@ -67,20 +65,16 @@ const _CustomerProductListsProvider = CustomerProductListsContext.Provider
 export const CustomerProductListsProvider = ({children}) => {
     const [state, dispatch] = useReducer((state, {type, payload}) => {
         let productLists
-        let wishlist
+
         switch (type) {
             case CPLActionTypes.RECEIVE_LISTS:
                 productLists = payload.reduce((prev, curr) => {
-                    // todo remove this
-                    if (curr.name === PWA_DEFAULT_WISHLIST_NAME) {
-                        wishlist = curr
-                    }
                     return {
                         ...prev,
                         [curr.id]: curr
                     }
                 }, {})
-                return {...state, wishlist, productLists}
+                return {...state, productLists}
             case CPLActionTypes.CREATE_LIST_ITEM:
                 productLists = {
                     ...state.productLists

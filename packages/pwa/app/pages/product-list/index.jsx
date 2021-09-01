@@ -52,7 +52,7 @@ import {FilterIcon, ChevronDownIcon} from '../../components/icons'
 
 // Hooks
 import {useLimitUrls, usePageUrls, useSortUrls, useSearchParams} from '../../hooks'
-import useCustomerProductLists from '../../commerce-api/hooks/useCustomerProductLists'
+import useWishlist from '../../commerce-api/hooks/useCustomerProductLists'
 import {useToast} from '../../hooks/use-toast'
 import {parse as parseSearchParams} from '../../hooks/use-search-params'
 
@@ -98,10 +98,7 @@ const ProductList = (props) => {
         })
     }
 
-    const customerProductLists = useCustomerProductLists({
-        eventHandler: productListEventHandler,
-        errorHandler: showError
-    })
+    const customerProductLists = useWishlist()
     const showToast = useToast()
     const {
         searchQuery,
