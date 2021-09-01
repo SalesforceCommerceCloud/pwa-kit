@@ -15,7 +15,7 @@ Old branches include retired packages, such as:
 - `documentation-hub` - Documentation hub for Mobify v1 SDK and earlier, hosted on https://docs.mobify.com
 - `documentation-theme` - A common theme shared across docs sites for Mobify v1 SDK and earlier
 - `generator` - Project generator for Mobify v1 and v2 SDK
-- `progressive-web-sdk` - SDK for Mobify v1 and v2 SDK that includes Analytics Integrations, the component library, and utility functions
+- `progressive-web-sdk` - Mobify v1 and v2 SDK that includes Analytics Integrations, the component library, and utility functions
 - `test-framework` - Testing best practices for Mobify v1 and v2 SDK
 
 ## Product Documentation
@@ -174,7 +174,7 @@ Executing hotfixes is simple, start by identifying which of the supported versio
 the bug and create a PR for each branch, addresses the bug and bumping the branches patch
 version. (NOTE: If the bug exists in `develop` you do not have to bump the version number.)
 
-When you're finished, drop and update in #product-release and #changelog to let them know what's new.
+When you're finished, drop an update in #product-release and #changelog to let them know what's new.
 
 [lerna]: https://github.com/lerna/lerna
 
