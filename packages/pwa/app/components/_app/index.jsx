@@ -37,7 +37,7 @@ import {AuthModal, useAuthModal} from '../../hooks/use-auth-modal'
 // Others
 import {watchOnlineStatus, flatten} from '../../utils/utils'
 import {homeUrlBuilder} from '../../utils/url'
-import {IntlProvider, getLocaleConfig, DEFAULT_LOCALE} from '../../locale'
+import {IntlProvider, getLocaleConfig} from '../../locale'
 import {HOME_HREF} from '../../constants'
 
 import Seo from '../seo'
@@ -206,29 +206,28 @@ App.shouldGetProps = () => {
     return typeof window === 'undefined'
 }
 
-App.getProps = async ({api, params, location}) => {
+App.getProps = async ({api}) => {
     const localeConfig = await getLocaleConfig({
         getUserPreferredLocales: () => {
-            // TODO: You can detect their preferred locales from:
+            // CONFIG: This function should return an array of preferred locales. They can be
+            // derived from various sources. Below are some examples of those:
+            //
             // - client side: window.navigator.languages
             // - the page URL they're on (example.com/en-GB/home)
             // - cookie (if their previous preference is saved there)
-            // And decide which one takes precedence.
-
-            // TODO: Extract the `locale` in a better way (first pathname in the URL)
-            // NOTE: Lets assume that the locale will always be in the `params.locale`.
-            const part = location.pathname.match(/^\/([a-z]{2}-[A-Z]{2})\//)
-
-            const localeInPageUrl = params.locale
-                ? params.locale
-                : part?.length > 0
-                ? part[1]
-                : DEFAULT_LOCALE
-
-            return localeInPageUrl ? [localeInPageUrl] : []
-
-            // If in this function an empty array is returned (e.g. there isn't locale in the page url),
+            //
+            // If this function returns an empty array (e.g. there isn't locale in the page url),
             // then the app would use the default locale as the fallback.
+
+            // NOTE: Your implementation may differ, this is jsut what we did.
+            //
+            // Since the CommerceAPI client already has the current `locale` set,
+            // we can use it's value to load the correct messages for the application.
+            // Take a look at the `app/components/_app-config` component on how the
+            // preferred locale was derived.
+            const {locale} = api.getConfig()
+
+            return [locale]
         }
     })
 
