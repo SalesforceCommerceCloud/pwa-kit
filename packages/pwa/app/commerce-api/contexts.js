@@ -46,33 +46,42 @@ export const CustomerContext = createContext()
 export const CustomerProvider = CustomerContext.Provider
 
 /************ Customer Product Lists ************/
-const CustomerProductListsInitialValue = {
+const CPLInitialValue = {
+    isLoading: true,
     productLists: [],
-    defaultList: {}
+    wishlist: {}
 }
-export const CustomerProductListsContext = createContext(CustomerProductListsInitialValue)
+const CPLActionTypes = {
+    RECEIVE: 'RECEIVE',
+    SET_LOADING: 'SET_LOADING',
+    RESET: 'RESET'
+}
+export const CustomerProductListsContext = createContext(CPLInitialValue)
 const _CustomerProductListsProvider = CustomerProductListsContext.Provider
 export const CustomerProductListsProvider = ({children}) => {
     const [state, dispatch] = useReducer((state, {type, payload}) => {
         let productLists
-        let defaultList
+        let wishlist
         switch (type) {
-            case 'receive':
+            case CPLActionTypes.RECEIVE:
                 productLists = [...payload]
-                defaultList = productLists.find((list) => {
+                wishlist = productLists.find((list) => {
                     return list.name === PWA_DEFAULT_WISHLIST_NAME
                 })
-                return {...state, defaultList, productLists}
-            case 'reset':
-                return {...CustomerProductListsInitialValue}
+                return {...state, wishlist, productLists}
+            case CPLActionTypes.SET_LOADING:
+                return {...state, isLoading: payload}
+            case CPLActionTypes.RESET:
+                return {...CPLInitialValue}
             default:
                 throw new Error('Unknown action.')
         }
-    }, CustomerProductListsInitialValue)
+    }, CPLInitialValue)
 
     const actions = {
-        receive: (list) => dispatch({type: 'receive', payload: list}),
-        reset: () => dispatch({type: 'reset'})
+        receive: (list) => dispatch({type: CPLActionTypes.RECEIVE, payload: list}),
+        setLoading: (isLoading) => dispatch({type: CPLActionTypes.SET_LOADING, payload: isLoading}),
+        reset: () => dispatch({type: CPLActionTypes.RESET})
     }
 
     return (

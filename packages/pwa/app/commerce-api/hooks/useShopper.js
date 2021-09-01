@@ -86,9 +86,9 @@ const useShopper = () => {
         }
     }, [customer.authType])
 
-    useEffect(() => {
-        console.log(customerProductLists)
-    }, [customerProductLists])
+    // useEffect(() => {
+    //     console.log(customerProductLists)
+    // }, [customerProductLists])
 
     return {customer, basket}
 }

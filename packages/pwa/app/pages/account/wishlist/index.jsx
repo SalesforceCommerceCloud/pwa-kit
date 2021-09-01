@@ -23,8 +23,9 @@ const numberOfSkeletonItems = 3
 const AccountWishlist = () => {
     const navigate = useNavigation()
     const {formatMessage} = useIntl()
-    const customerProductLists = useCustomerProductLists()
-    const [wishlist, setWishlist] = useState()
+    const {wishlist, isLoading, isEmpty} = useCustomerProductLists()
+    console.log(isEmpty)
+    // const [wishlist, setWishlist] = useState()
     const [selectedItem, setSelectedItem] = useState(undefined)
     const [localQuantity, setLocalQuantity] = useState({})
     const showToast = useToast()
@@ -35,50 +36,50 @@ const AccountWishlist = () => {
         setSelectedItem(itemId)
     }
 
-    const handleItemQuantityChanged = async (quantity, item) => {
-        try {
-            // This local state allows the dropdown to show the desired quantity
-            // while the API call to update it is happening.
-            setLocalQuantity({...localQuantity, [item.productId]: quantity})
-            setWishlistItemLoading(true)
-            setSelectedItem(item.productId)
-            await customerProductLists.updateCustomerProductListItem(wishlist, {
-                ...item,
-                quantity: parseInt(quantity)
-            })
-        } catch (err) {
-            console.error(err)
-            showToast({
-                title: formatMessage(
-                    {defaultMessage: '{errorMessage}'},
-                    {errorMessage: API_ERROR_MESSAGE}
-                ),
-                status: 'error'
-            })
-        } finally {
-            setWishlistItemLoading(false)
-            setSelectedItem(undefined)
-            setLocalQuantity({...localQuantity, [item.productId]: undefined})
-        }
-    }
+    // const handleItemQuantityChanged = async (quantity, item) => {
+    //     try {
+    //         // This local state allows the dropdown to show the desired quantity
+    //         // while the API call to update it is happening.
+    //         setLocalQuantity({...localQuantity, [item.productId]: quantity})
+    //         setWishlistItemLoading(true)
+    //         setSelectedItem(item.productId)
+    //         await customerProductLists.updateCustomerProductListItem(wishlist, {
+    //             ...item,
+    //             quantity: parseInt(quantity)
+    //         })
+    //     } catch (err) {
+    //         console.error(err)
+    //         showToast({
+    //             title: formatMessage(
+    //                 {defaultMessage: '{errorMessage}'},
+    //                 {errorMessage: API_ERROR_MESSAGE}
+    //             ),
+    //             status: 'error'
+    //         })
+    //     } finally {
+    //         setWishlistItemLoading(false)
+    //         setSelectedItem(undefined)
+    //         setLocalQuantity({...localQuantity, [item.productId]: undefined})
+    //     }
+    // }
 
-    useEffect(() => {
-        if (customerProductLists.loaded) {
-            const wishlist = customerProductLists.getProductListPerType(
-                customerProductListTypes.WISHLIST
-            )
-            if (wishlist?._productItemsDetail) {
-                setWishlist(wishlist)
-            }
-        }
-    }, [customerProductLists.data])
+    // useEffect(() => {
+    //     if (customerProductLists.loaded) {
+    //         const wishlist = customerProductLists.getProductListPerType(
+    //             customerProductListTypes.WISHLIST
+    //         )
+    //         if (wishlist?._productItemsDetail) {
+    //             setWishlist(wishlist)
+    //         }
+    //     }
+    // }, [customerProductLists.data])
 
-    if (!wishlist) {
-        return (
-            <Stack spacing={4} data-testid="account-wishlist-page">
-                <Heading as="h1" fontSize="2xl">
-                    <FormattedMessage defaultMessage="Wishlist" />
-                </Heading>
+    return (
+        <Stack spacing={4} data-testid="account-wishlist-page">
+            <Heading as="h1" fontSize="2xl">
+                <FormattedMessage defaultMessage="Wishlist" />
+            </Heading>
+            {isLoading && (
                 <Box data-testid="sf-wishlist-skeleton">
                     {new Array(numberOfSkeletonItems).fill(0).map((i, idx) => (
                         <Box
@@ -101,16 +102,9 @@ const AccountWishlist = () => {
                         </Box>
                     ))}
                 </Box>
-            </Stack>
-        )
-    }
+            )}
 
-    if (!wishlist.customerProductListItems || wishlist.customerProductListItems.length === 0) {
-        return (
-            <Stack spacing={4} data-testid="account-wishlist-page">
-                <Heading as="h1" fontSize="2xl">
-                    <FormattedMessage defaultMessage="Wishlist" />
-                </Heading>
+            {!isLoading && isEmpty && (
                 <PageActionPlaceHolder
                     data-testid="empty-wishlist"
                     icon={<WishlistIcon boxSize={8} />}
@@ -124,25 +118,15 @@ const AccountWishlist = () => {
                     buttonProps={{leftIcon: undefined}}
                     onButtonClick={() => navigate('/')}
                 />
-            </Stack>
-        )
-    }
+            )}
 
-    return (
-        <Stack spacing={4} data-testid="account-wishlist-page">
-            <Heading as="h1" fontSize="2xl">
-                <FormattedMessage defaultMessage="Wishlist" />
-            </Heading>
-
-            {wishlist._productItemsDetail &&
+            {!isLoading &&
+                !isEmpty &&
                 wishlist?.customerProductListItems.map((item) => (
                     <ProductItem
                         key={item.id}
                         product={{
-                            ...wishlist._productItemsDetail[item.productId],
-                            productId: item.productId,
-                            productName: wishlist._productItemsDetail[item.productId].name,
-                            price: wishlist._productItemsDetail[item.productId].price,
+                            ...item,
                             quantity: localQuantity[item.productId]
                                 ? localQuantity[item.productId]
                                 : item.quantity

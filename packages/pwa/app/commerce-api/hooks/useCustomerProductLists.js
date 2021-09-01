@@ -87,20 +87,26 @@ export default function useCustomerProductLists({eventHandler = noop, errorHandl
             // ...customerProductLists,
             ...state,
 
+            get isEmpty() {
+                return !self.wishlist?.customerProductListItems?.length
+            },
+
             /**
              * Initialize customer's product lists.
              * This should only be used during customer login.
              */
             async init() {
+                actions.setLoading(true)
                 const productLists = await this._getOrCreateProductLists()
-                const defaultList = productLists.data.find(
+                const wishlist = productLists.data.find(
                     (list) => list.name === PWA_DEFAULT_WISHLIST_NAME
                 )
-                const productDetails = await this._getProductsInList(defaultList)
+                const productDetails = await this._getProductsInList(wishlist)
+                actions.setLoading(false)
 
                 // merge product details into the list
                 const result = productLists.data.map((list) => {
-                    if (list.id === defaultList.id) {
+                    if (list.id === wishlist.id) {
                         list.customerProductListItems = list.customerProductListItems?.map(
                             (item) => {
                                 return {
@@ -161,7 +167,6 @@ export default function useCustomerProductLists({eventHandler = noop, errorHandl
                 if (isError(response)) {
                     throw new Error(response)
                 }
-
                 return response
             },
 
