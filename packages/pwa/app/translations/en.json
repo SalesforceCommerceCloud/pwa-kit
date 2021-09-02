@@ -1,4 +1,7 @@
 {
+  "+M9bOh": {
+    "defaultMessage": "Please try retyping the address, head back to the previous page or go home."
+  },
   "+O5yEM": {
     "defaultMessage": "Promotions Applied"
   },
@@ -16,6 +19,9 @@
   },
   "0g/1TG": {
     "defaultMessage": "Continue to Payment"
+  },
+  "0nWAOY": {
+    "defaultMessage": "Go to home page"
   },
   "0yGJXJ": {
     "defaultMessage": "Password must contain at least one lowercase letter"
@@ -262,6 +268,9 @@
   "NTgwLi": {
     "defaultMessage": "Place Order"
   },
+  "NV26qx": {
+    "defaultMessage": "Back to previous page"
+  },
   "NymXNv": {
     "defaultMessage": "New Payment Method Saved"
   },
@@ -328,6 +337,9 @@
   },
   "Qpxx+l": {
     "defaultMessage": "New Arrivals"
+  },
+  "Rbfrrp": {
+    "defaultMessage": "We’ve move a lot of stuff around, and it must’ve gotten lost in the mix."
   },
   "RlxeOk": {
     "defaultMessage": "Sort By: {sortOption}"
@@ -462,6 +474,9 @@
   "cChish": {
     "defaultMessage": "8 characters minimum",
     "description": "Password requirement"
+  },
+  "cPs3ME": {
+    "defaultMessage": "Sorry, we couldn't find this page"
   },
   "cUwO+6": {
     "defaultMessage": "Add New Card"
