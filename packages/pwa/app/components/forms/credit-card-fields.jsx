@@ -42,6 +42,7 @@ const CreditCardFields = ({form, prefix = ''}) => {
                         </Flex>
                     }
                     inputProps={({onChange}) => ({
+                        ...fields.number.inputProps,
                         onChange(evt) {
                             const number = evt.target.value.replace(/[^0-9 ]+/, '')
                             const {card} = ccValidator.number(number)
@@ -66,6 +67,7 @@ const CreditCardFields = ({form, prefix = ''}) => {
                     <Field
                         {...fields.expiry}
                         inputProps={({onChange}) => ({
+                            ...fields.expiry.inputProps,
                             onChange(evt) {
                                 let value = evt.target.value.replace('/', '')
 
