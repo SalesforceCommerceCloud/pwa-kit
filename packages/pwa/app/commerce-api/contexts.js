@@ -45,7 +45,7 @@ export const CustomerProvider = CustomerContext.Provider
 
 /************ Customer Product Lists ************/
 const CPLInitialValue = {
-    isInitialized: true,
+    isInitialized: false,
     productLists: {
         // this is a map of product lists
         // keyed by list id
