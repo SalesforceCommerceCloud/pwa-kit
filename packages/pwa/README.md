@@ -13,12 +13,6 @@ Developers enjoy a streamlined experience without having to worry about the unde
   npm ^6.14.4
 ```
 
-## Installing Dependencies
-
-```bash
-npm i
-```
-
 ## Getting Started
 
 To start your web server for local development, run the following command in your project directory:
@@ -30,6 +24,10 @@ npm start
 Now that the development server is running, you can open a browser and preview your commerce app:
 
 -   Go to http://localhost:3000/
+
+## Localization
+
+See [Localization README.md](./app/translations/README.md)
 
 ## Documentation
 
