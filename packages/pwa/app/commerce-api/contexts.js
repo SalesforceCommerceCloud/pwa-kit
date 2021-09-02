@@ -45,7 +45,7 @@ export const CustomerProvider = CustomerContext.Provider
 
 /************ Customer Product Lists ************/
 const CPLInitialValue = {
-    isLoading: false,
+    isLoading: true,
     productLists: {
         // this is a map of product lists
         // keyed by list id
@@ -62,6 +62,7 @@ const CPLActionTypes = {
 }
 export const CustomerProductListsContext = createContext(CPLInitialValue)
 const _CustomerProductListsProvider = CustomerProductListsContext.Provider
+// eslint-disable-next-line react/prop-types
 export const CustomerProductListsProvider = ({children}) => {
     const [state, dispatch] = useReducer((state, {type, payload}) => {
         let productLists
@@ -76,25 +77,31 @@ export const CustomerProductListsProvider = ({children}) => {
                 }, {})
                 return {...state, productLists}
             case CPLActionTypes.RECEIVE_LIST:
-                productLists = {
-                    ...state.productLists,
-                    [payload.id]: payload
+                return {
+                    ...state,
+                    productLists: {
+                        ...state.productLists,
+                        [payload.id]: payload
+                    }
                 }
-                return {...state, productLists}
             case CPLActionTypes.CREATE_LIST_ITEM:
-                productLists = {
-                    ...state.productLists
+                // Tips: if you are unfamiliar with the concept of
+                // reducers, keep in mind that reducers must be pure.
+                // For an action like this, you must update every
+                // level of nested data to avoid unexpected side effects
+                return {
+                    ...state,
+                    productLists: {
+                        ...state.productLists,
+                        [payload.listId]: {
+                            ...state.productLists[payload.listId],
+                            customerProductListItems: [
+                                ...(state.productLists[payload.listId].customerProductListItems || []),
+                                payload.item
+                            ]
+                        }
+                    }
                 }
-
-                // @TODO: if there is a product already exists in list
-                // we need to add the quantity instead of adding a new entry
-
-                productLists[payload.listId].customerProductListItems = [
-                    ...(productLists[payload.listId].customerProductListItems || []),
-                    payload.item
-                ]
-
-                return {...state, productLists}
             case CPLActionTypes.UPDATE_LIST_ITEM:
                 productLists = {
                     ...state.productLists

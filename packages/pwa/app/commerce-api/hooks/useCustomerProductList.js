@@ -187,6 +187,7 @@ export function useCustomerProductList(name, options = {}) {
             isProductInList(productId) {
                 return !!self.findItemByProductId(productId)
             },
+
             /**
              * Initialize customer's product list.
              */
@@ -216,8 +217,11 @@ export function useCustomerProductList(name, options = {}) {
                 return response
             },
 
-            async addItem(item) {
-                const createdItem = await self.createListItem(self.data.id, item)
+            async addItem(product) {
+                if (self.isProductInList(product.id)) {
+                    return
+                }
+                const createdItem = await self.createListItem(self.data.id, product)
                 actions.createListItem(self.data.id, createdItem)
             },
 
