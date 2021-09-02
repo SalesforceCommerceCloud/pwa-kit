@@ -17,7 +17,6 @@ import {Helmet} from 'react-helmet'
 // It must not throw an error. Keep it as simple as possible.
 const Error = (props) => {
     const {stack, status} = props
-    console.log('props', props)
 
     const isNotFoundError = status === 404
     const title = isNotFoundError
