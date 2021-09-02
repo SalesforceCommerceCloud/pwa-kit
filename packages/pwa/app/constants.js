@@ -15,12 +15,6 @@ export const RECENT_SEARCH_LIMIT = 5
 export const RECENT_SEARCH_KEY = 'recent-search-key'
 export const RECENT_SEARCH_MIN_LENGTH = 3
 
-// Constants for Customer Product List
-export const PWA_DEFAULT_WISHLIST_NAME = 'PWA wishlist'
-export const customerProductListTypes = {
-    WISHLIST: 'wish_list'
-}
-
 export const cssColorGroups = {
     beige: '#d3bca9',
     black: '#000000',
