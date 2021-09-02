@@ -7,9 +7,8 @@
 import {useEffect} from 'react'
 import useBasket from './useBasket'
 import useCustomer from './useCustomer'
-import useCustomerProductList from './useCustomerProductList'
 
-// todo
+// todo: Commerce api should not import from the user land
 import useWishlist from '../../hooks/use-wishlist'
 
 /**

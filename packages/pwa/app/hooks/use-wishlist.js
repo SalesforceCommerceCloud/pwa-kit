@@ -63,6 +63,13 @@ const useWishlist = (options = {}) => {
             onSuccess: onSuccessAdd,
             onError
         }),
+        updateItem: withAsync(wishlist.updateItem, {
+            onError
+        }),
+        removeItem: withAsync(wishlist.removeItem, {
+            onSuccess: onSuccessRemove,
+            onError
+        }),
         removeItemByProductId: withAsync(wishlist.removeItemByProductId, {
             onSuccess: onSuccessRemove,
             onError

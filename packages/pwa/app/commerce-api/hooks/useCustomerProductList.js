@@ -92,9 +92,8 @@ export function useCustomerProductLists() {
 
     const self = useMemo(() => {
         return {
-            get data() {
-                return state.productLists
-            },
+            isLoading: state.isLoading,
+            data: state.productLists,
 
             reset() {
                 actions.reset()
@@ -163,8 +162,16 @@ export function useCustomerProductList(name, options = {}) {
 
     const self = useMemo(() => {
         return {
+            get isLoading() {
+                return _super.isLoading
+            },
+
             get data() {
                 return Object.values(_super.data).find((list) => list.name === name)
+            },
+
+            get isEmpty() {
+                return !self.data?.customerProductListItems?.length
             },
 
             reset() {
@@ -184,10 +191,10 @@ export function useCustomerProductList(name, options = {}) {
              * Initialize customer's product list.
              */
             async init() {
-                // actions.setLoading(true)
+                actions.setLoading(true)
                 const list = await self._getOrCreatelistByName(name, {type})
                 const productDetails = await self._getProductDetails(list)
-                // actions.setLoading(false)
+                actions.setLoading(false)
 
                 const result = self._mergeProductDetailsIntoList(list, productDetails)
 
@@ -225,17 +232,17 @@ export function useCustomerProductList(name, options = {}) {
                 actions.updateListItem(self.data.id, updatedItem)
             },
 
+            async removeItem(itemId) {
+                await self.removeListItem(self.data.id, itemId)
+                actions.removeListItem(self.data.id, itemId)
+            },
+
             async removeItemByProductId(productId) {
                 const item = self.findItemByProductId(productId)
                 if (!item) {
                     return
                 }
                 await self.removeItem(item.id)
-            },
-
-            async removeItem(itemId) {
-                await self.removeListItem(self.data.id, itemId)
-                actions.removeListItem(self.data.id, itemId)
             },
 
             /**

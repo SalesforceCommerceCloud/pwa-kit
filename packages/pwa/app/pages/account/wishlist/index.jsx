@@ -7,15 +7,15 @@
 import React, {useEffect, useState} from 'react'
 import {Stack, Heading} from '@chakra-ui/layout'
 import {FormattedMessage, useIntl} from 'react-intl'
+import {Box, Flex, Skeleton} from '@chakra-ui/react'
+
+import useCustomer from '../../../commerce-api/hooks/useCustomer'
+import useNavigation from '../../../hooks/use-navigation'
+import useWishlist from '../../../hooks/use-wishlist'
+
 import PageActionPlaceHolder from '../../../components/page-action-placeholder'
 import {WishlistIcon} from '../../../components/icons'
-import useNavigation from '../../../hooks/use-navigation'
-import useCustomerProductList from '../../../commerce-api/hooks/useCustomerProductList'
-import useCustomer from '../../../commerce-api/hooks/useCustomer'
-import {Box, Flex, Skeleton} from '@chakra-ui/react'
-import {API_ERROR_MESSAGE} from '../../../constants'
 import ProductItem from '../../../components/product-item/index'
-import {useToast} from '../../../hooks/use-toast'
 import WishlistPrimaryAction from './partials/wishlist-primary-action'
 import WishlistSecondaryButtonGroup from './partials/wishlist-secondary-button-group'
 
@@ -25,13 +25,10 @@ const AccountWishlist = () => {
     const customer = useCustomer()
     const navigate = useNavigation()
     const {formatMessage} = useIntl()
-    const {wishlist, isLoading, isEmpty, updateWishlistItem, init} = useCustomerProductList()
-    // console.log(wishlist)
-    // const [wishlist, setWishlist] = useState()
     const [selectedItem, setSelectedItem] = useState(undefined)
     const [localQuantity, setLocalQuantity] = useState({})
-    const showToast = useToast()
     const [isWishlistItemLoading, setWishlistItemLoading] = useState(false)
+    const {isLoading, isEmpty, ...wishlist} = useWishlist({enableToast: true})
 
     const handleActionClicked = (itemId) => {
         setWishlistItemLoading(!!itemId)
@@ -39,35 +36,23 @@ const AccountWishlist = () => {
     }
 
     const handleItemQuantityChanged = async (quantity, item) => {
-        try {
-            // This local state allows the dropdown to show the desired quantity
-            // while the API call to update it is happening.
-            setLocalQuantity({...localQuantity, [item.productId]: quantity})
-            setWishlistItemLoading(true)
-            setSelectedItem(item.productId)
-            await updateWishlistItem({
-                ...item,
-                quantity: parseInt(quantity)
-            })
-        } catch (err) {
-            console.error(err)
-            showToast({
-                title: formatMessage(
-                    {defaultMessage: '{errorMessage}'},
-                    {errorMessage: API_ERROR_MESSAGE}
-                ),
-                status: 'error'
-            })
-        } finally {
-            setWishlistItemLoading(false)
-            setSelectedItem(undefined)
-            setLocalQuantity({...localQuantity, [item.productId]: undefined})
-        }
+        // This local state allows the dropdown to show the desired quantity
+        // while the API call to update it is happening.
+        setLocalQuantity({...localQuantity, [item.productId]: quantity})
+        setWishlistItemLoading(true)
+        setSelectedItem(item.productId)
+        await wishlist.updateItem({
+            ...item,
+            quantity: parseInt(quantity)
+        })
+        setWishlistItemLoading(false)
+        setSelectedItem(undefined)
+        setLocalQuantity({...localQuantity, [item.productId]: undefined})
     }
 
     useEffect(() => {
         if (customer.isRegistered) {
-            init()
+            wishlist.init()
         }
     }, [customer.isRegistered])
 
@@ -119,7 +104,7 @@ const AccountWishlist = () => {
 
             {!isLoading &&
                 !isEmpty &&
-                wishlist?.customerProductListItems.map((item) => (
+                wishlist?.data?.customerProductListItems?.map((item) => (
                     <ProductItem
                         key={item.id}
                         product={{
