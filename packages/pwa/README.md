@@ -1,36 +1,29 @@
 <img alt="logo" src="react-retail-app.png" />
 
-# PWA Kit - Retail React App
+# The Retail React App
 
-The Retail React App is an isomorphic JavaScript storefront [Progressive Web App](https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps) built using [React](https://reactjs.org/) and [Express](https://expressjs.com/). It uses a modern headless architecture that enables developers to decouple the frontend from backend systems. It leverages popular open-source libraries in the React ecosystem, such as [Chakra UI](https://chakra-ui.com/) components, [Emotion](https://emotion.sh/docs/introduction) (CSS-in-JS), [Webpack](https://webpack.js.org/), and many more.
+The Retail React App is an isomorphic JavaScript storefront and [Progressive Web App](https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps) built using [React](https://reactjs.org/) and [Express](https://expressjs.com/). It uses a modern headless architecture that enables developers to decouple the frontend from backend systems. It leverages popular open-source libraries in the React ecosystem, such as [Chakra UI](https://chakra-ui.com/) components, [Emotion](https://emotion.sh/docs/introduction) (CSS-in-JS), [Webpack](https://webpack.js.org/), and many more.
 
-Developers enjoy a streamlined experience without having to worry about the underlying infrastructure, whether they're developing their app locally, deploying it to a [Managed Runtime](https://developer.commercecloud.com/s/article/PWA-Kit) environment, or testing the app live.
+Developers enjoy a streamlined experience without having to worry about the underlying infrastructure, whether they're developing their app locally, deploying it to a [Managed Runtime](https://developer.commercecloud.com/s/article/Managed-Runtime-Infrastructure) environment, or testing the app live.
 
-## 📖 Table of Contents
+## Requirements
 
--   [**Prerequisites**](#-prerequisites)
--   [**Getting Started**](#-getting-started)
--   [**Configurations**](#-configurations)
--   [**NPM Scripts**](#-npm-scripts)
--   [**Directory Structure**](#-directory-structure)
--   [**Commerce API Integration**](#commerce-api-integration)
--   [**Localization**](#localization)
--   [**Theming**](#-theming)
--   [**Testing**](#-testing)
--   [**Deploying**](#deploying)
--   [**SVG icons**](#svg-icons)
--   [**Useful External Links**](#useful-external-links)
+```
+  Node ^12.x or ^14.x
+  npm ^6.14.4
+```
 
-## 🔌 Prerequisites
+## Install Dependencies
 
--   Node.js 12.x (14.x support coming soon)
+```bash
+npm i
+```
 
 ## 🚀 Getting Started
 
 To start the Server Side Rendering (SSR) server, run:
 
 ```bash
-npm install
 npm start
 # then open http://localhost:3000 in your browser
 ```
@@ -116,62 +109,6 @@ You can run `npm run <SCRIPT_NAME>` to run the following available scripts:
 | `test:e2e-ci`        | Run end-to-end tests in CI mode                                                                                                                                                                                                         |
 | `test:lighthouse`    | Run [Lighthouse](https://developers.google.com/web/tools/lighthouse) test                                                                                                                                                               |
 | `test:max-file-size` | Run [bundlesize](https://github.com/siddharthkp/bundlesize) test                                                                                                                                                                        |
-
-## 🔖 Directory Structure
-
-```
-.eslintrc.js                                Code style rules for ESLint
-.npmignore                                  Exclusion rules for npm
-.prettierignore                             Exclusion rules for Prettier code formatting
-.prettierrc.yaml                            Code formatting rules for Prettier
-LICENSE                                     Software licensing agreement
-README.md                                   The documentation that you're reading right now!
-__mocks__/                                  Mocking objects for unit testing with Jest
-├── app/                                    Application code lives here
-    ├── assets/svg/                         SVG icon assets
-    ├── commerce-api/                       Commerce API client and hooks
-    ├── components/                         React components
-    │   ├── _app                            Root component
-    │   ├── _app-config                     Wrapper component for injecting context providers, state management, etc.
-    │   └── _error                          Generic error component
-    │   └── ...
-    ├── contexts/                           React contexts
-    ├── hoc                                 Higher order components (HOCs)
-    │   └── with-registration               HOC for adding login flow onClick of wrapped component
-    ├── hooks/                              React hooks
-    ├── pages/                              Ecommerce pages like home, PLP, PDP, etc.
-    ├── static/                             Static assets
-    │   └── manifest.json                   PWA manifest
-    │   └── ...
-    ├── theme/                              Theme files for components
-    │   ├── components/
-    │   │   ├── base/                       Theme files for Chakra components
-    │   │   └── project/                    Theme files for custom components
-    │   ├── foundations/                    Frequently used theme values like colors, spacing, etc.
-    │   └── index.js
-    ├── translations/                       Localization
-    ├── commerce-api.config.js              Authentication and proxying settings for Commerce API
-    ├── locale.js                           Locale settings for internationalization with react-intl
-    ├── main.jsx                            Client-side rendering entry point
-    ├── request-processor.js                Request processing functions (run at CDN edge, not locally)
-    ├── routes.jsx                          Maps request paths to route components
-    └── ssr.js                              Server-side rendering entry point
-babel.config.js                             Transpilation rules for Babel
-cache-hash-config.json                      Cache breaking hash used by the CDN
-cypress/                                    Support files for Cypress
-cypress.json                                End-to-end testing configuration for Cypress
-jest-babel-transform.js                     Babel configuration file for Jest
-jest-setup.js                               Unit testing setup for Jest
-jest.config.js                              Unit testing configuration for Jest
-node_modules/                               Package dependencies
-package-lock.json
-package.json                                General project configuration
-react-retail-app.png                        Screenshot for README.md
-scripts/                                    Automation tools
-tests/                                      Unit tests
-webpack.config.js                           Code bundling rules for Webpack
-worker/                                     Service worker
-```
 
 ## Commerce API Integration
 
