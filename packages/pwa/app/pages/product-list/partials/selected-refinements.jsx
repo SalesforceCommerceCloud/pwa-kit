@@ -36,7 +36,7 @@ const SelectedRefinements = ({toggleFilter, selectedFilterValues, categoryId, fi
                 apiLabel: filter
             }
 
-            if (selected.value !== 'htype' && selected.uiLabel !== categoryId) {
+            if (selected.value !== 'htype' && selected.value !== 'cgid') {
                 selectedFilters.push(selected)
             }
         })
