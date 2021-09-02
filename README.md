@@ -5,7 +5,7 @@ The PWA Kit is a storefront technology for headless commerce using Salesforce Co
 This repository is a [monorepo](https://en.wikipedia.org/wiki/Monorepo) that includes the code that powers the PWA Kit. The code is divided into the following packages:
 
 -   `pwa`: A set of sample code and tooling for PWA Kit projects called the Retail React App
--   `pwa-kit-create-app`: The tool that generates PWA Kit projects based on the Retail React App
+-   `pwa-kit-create-app`: A tool that generates PWA Kit projects based on the Retail React App
 -   `pwa-kit-react-sdk`: A set of components and utilities for PWA Kit projects
 
 Old branches include retired packages, such as:
@@ -34,7 +34,7 @@ Useful links:
 ## Requirements
 
 ```
-  Node ^12.x || ^14.x
+  Node ^12.x or ^14.x
   npm ^6.14.4
 ```
 

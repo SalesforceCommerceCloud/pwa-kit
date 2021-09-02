@@ -1,10 +1,13 @@
 # pwa-kit-create-app
-A Salesforce Commmerce Cloud PWA Kit application generator that allows you to generate a new project on top of the [Commerce APIs](https://developer.commercecloud.com/s/commerce-api).
 
-## Prerequisites
-Download and install Node.js and npm [here](https://nodejs.org/en/download/).
+A tool for generating Progressive Web App (PWA) Kit projects based on the Retail React App.
 
-> **Note:** Only Node.js 12 LTS is supported. Any other version can cause unexpected results. To use a different version of Node.js for other projects, you can manage multiple versions of Node.js with [nvm](https://github.com/nvm-sh/nvm).
+## Requirements
+
+```
+  Node ^12.x or ^14.x
+  npm ^6.14.4
+```
 
 ## Quick Start
 

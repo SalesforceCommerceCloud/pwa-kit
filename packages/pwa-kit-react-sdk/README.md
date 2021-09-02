@@ -6,12 +6,10 @@ A library of components and utilities that supports the rendering pipeline for t
 
 ## Requirements
 
--   [Git](https://git-scm.com/)
--   We recommend you use [nvm](https://github.com/creationix/nvm#installation) to
-    manage node and npm versions.
--   Node ^12.0.0 || ^14.17.0 [LTS](https://github.com/nodejs/LTS#lts-schedule). We recommend
-    using the latest supported version of Node whenever possible.
--   npm ^6.x
+```
+  Node ^12.x or ^14.x
+  npm ^6.14.4
+```
 
 ## Install Dependencies
 
