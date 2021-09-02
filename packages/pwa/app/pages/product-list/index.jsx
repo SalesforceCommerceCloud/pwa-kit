@@ -53,7 +53,6 @@ import {FilterIcon, ChevronDownIcon} from '../../components/icons'
 // Hooks
 import {useLimitUrls, usePageUrls, useSortUrls, useSearchParams} from '../../hooks'
 import useWishlist from '../../hooks/use-wishlist'
-import {useToast} from '../../hooks/use-toast'
 import {parse as parseSearchParams} from '../../hooks/use-search-params'
 
 // Others
@@ -61,10 +60,9 @@ import {CategoriesContext} from '../../contexts'
 import {HTTPNotFound} from 'pwa-kit-react-sdk/ssr/universal/errors'
 
 // Constants
-import {DEFAULT_LIMIT_VALUES, customerProductListTypes} from '../../constants'
+import {DEFAULT_LIMIT_VALUES} from '../../constants'
 import useNavigation from '../../hooks/use-navigation'
 import LoadingSpinner from '../../components/loading-spinner'
-import {API_ERROR_MESSAGE} from '../../constants'
 
 /*
  * This is a simple product listing page. It displays a paginated list
@@ -81,39 +79,15 @@ const ProductList = (props) => {
         isLoading,
         ...rest
     } = props
+    const {total, sortingOptions} = productSearchResult || {}
+
     const {isOpen, onOpen, onClose} = useDisclosure()
     const [sortOpen, setSortOpen] = useState(false)
     const {formatMessage} = useIntl()
     const navigate = useNavigation()
-
     const history = useHistory()
     const params = useParams()
-    const [searchParams, {stringify: stringifySearchParams}] = useSearchParams()
     const {categories} = useContext(CategoriesContext)
-    const [filtersLoading, setFiltersLoading] = useState(false)
-    // const productListEventHandler = (event) => {
-    //     if (event.action === 'add') {
-    //         showWishlistItemAdded(event.item?.quantity)
-    //     }
-    // }
-
-    const showError = () => {
-        showToast({
-            title: formatMessage(
-                {defaultMessage: '{errorMessage}'},
-                {errorMessage: API_ERROR_MESSAGE}
-            ),
-            status: 'error'
-        })
-    }
-
-    const wishlist = useWishlist()
-    const showToast = useToast()
-
-    // keep track of the items has been add/remove to/from wishlist
-    const [wishlistLoading, setWishlistLoading] = useState([])
-
-    const {total, sortingOptions} = productSearchResult || {}
 
     // Get the current category from global state.
     let category = undefined
@@ -136,57 +110,29 @@ const ProductList = (props) => {
     // If we are loaded and still have no products, show the no results component.
     const showNoResults = !isLoading && productSearchResult && !productSearchResult?.hits
 
-    /**
-     * Removes product from wishlist
-     */
-    const removeItemFromWishlist = async (product) => {
-        try {
-            setWishlistLoading([...wishlistLoading, product.productId])
-            await wishlist.removeItemByProductId(product.productId)
-            showToast({
-                title: formatMessage({defaultMessage: 'Item removed from wishlist'}),
-                status: 'success',
-                id: product.productId
-            })
-            // remove the loading id
-            setWishlistLoading(wishlistLoading.filter((id) => id !== product.productId))
-        } catch (err) {
-            showError()
-        }
-    }
+    /**************** Wishlist ****************/
+    const wishlist = useWishlist({enableToast: true})
+    // keep track of the items has been add/remove to/from wishlist
+    const [wishlistLoading, setWishlistLoading] = useState([])
 
-    const showWishlistItemAdded = (quantity) => {
-        const toastAction = (
-            <Button variant="link" onClick={() => navigate('/account/wishlist')}>
-                View
-            </Button>
-        )
-        showToast({
-            title: formatMessage(
-                {
-                    defaultMessage:
-                        '{quantity} {quantity, plural, one {item} other {items}} added to wishlist'
-                },
-                {quantity}
-            ),
-            status: 'success',
-            action: toastAction
-        })
+    const removeItemFromWishlist = async (product) => {
+        setWishlistLoading([...wishlistLoading, product.productId])
+        await wishlist.removeItemByProductId(product.productId)
+        setWishlistLoading(wishlistLoading.filter((id) => id !== product.productId))
     }
 
     const addItemToWishlist = async (product) => {
-        try {
-            setWishlistLoading([...wishlistLoading, product.productId])
-            await wishlist.addItem({
-                id: product.productId,
-                quantity: 1
-            })
-            showWishlistItemAdded(1)
-            setWishlistLoading(wishlistLoading.filter((id) => id !== product.productId))
-        } catch (err) {
-            showError()
-        }
+        setWishlistLoading([...wishlistLoading, product.productId])
+        await wishlist.addItem({
+            id: product.productId,
+            quantity: 1
+        })
+        setWishlistLoading(wishlistLoading.filter((id) => id !== product.productId))
     }
+
+    /**************** Filters ****************/
+    const [searchParams, {stringify: stringifySearchParams}] = useSearchParams()
+    const [filtersLoading, setFiltersLoading] = useState(false)
     // Toggles filter on and off
     const toggleFilter = (value, attributeId, selected, allowMultiple = true) => {
         const searchParamsCopy = {...searchParams}
