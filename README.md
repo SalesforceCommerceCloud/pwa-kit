@@ -21,7 +21,7 @@ Old branches include retired packages, such as:
 
 ## Documentation
 
-The documentation for PWA Kit lives on the [Commerce Cloud Developer Center](https://developer.commercecloud.com/s/article/PWA-Kit).
+The documentation for PWA Kit is hosted on the [Commerce Cloud Developer Center](https://developer.commercecloud.com/s/article/PWA-Kit).
 
 Useful links:
 

@@ -1,18 +1,8 @@
-```
- (                                                                              (    (         )
- )\ )                                                   (  (               )    )\ ) )\ )   ( /(
-(()/( (         (  (  (      (         (    )      (    )\))(   '   (   ( /(   (()/((()/(   )\())
- /(_)))(    (   )\))( )(    ))\ (   (  )\  /((    ))\  ((_)()\ )   ))\  )\())   /(_))/(_))|((_)\
-(_)) (()\   )\ ((_))\(()\  /((_))\  )\((_)(_))\  /((_) _(())\_)() /((_)((_)\   (_)) (_))_ |_ ((_)
-| _ \ ((_) ((_) (()(_)((_)(_)) ((_)((_)(_)_)((_)(_))   \ \((_)/ /(_))  | |(_)  / __| |   \| |/ /
-|  _/| '_|/ _ \/ _` || '_|/ -_)(_-<(_-<| |\ V / / -_)   \ \/\/ / / -_) | '_ \  \__ \ | |) | ' <
-|_|  |_|  \___/\__, ||_|  \___|/__//__/|_| \_/  \___|    \_/\_/  \___| |_.__/  |___/ |___/ _|\_\
-               |___/
-```
+# The Progressive Web App (PWA) Kit SDK
 
 [![NPM](https://nodei.co/npm/pwa-kit-react-sdk.png?downloads=true&stars=true)](https://nodei.co/npm/pwa-kit-react-sdk/) [![CircleCI](https://circleci.com/gh/mobify/mobify-platform-sdks.svg?style=svg&circle-token=2fa991127044320858c98be882401b68423f0adb)](https://circleci.com/gh/mobify/mobify-platform-sdks)
 
-A library that supports the isomorphic React rendering pipeline for Commerce Cloud Managed Runtime apps.
+A library of components and utilities that supports the rendering pipeline for the Progressive Web App (PWA) Kit from Salesforce.
 
 ## Requirements
 
@@ -20,7 +10,7 @@ A library that supports the isomorphic React rendering pipeline for Commerce Clo
 -   We recommend you use [nvm](https://github.com/creationix/nvm#installation) to
     manage node and npm versions.
 -   Node ^12.0.0 || ^14.17.0 [LTS](https://github.com/nodejs/LTS#lts-schedule). We recommend
-    using the latest version of Node supported whenever possible.
+    using the latest supported version of Node whenever possible.
 -   npm ^6.x
 
 ## Install Dependencies
@@ -65,4 +55,4 @@ This is the warning that will print in your browser:
 
 ## Documentation
 
-Please see the [Documentation README](https://github.com/mobify/progressive-web-sdk/blob/develop/docs/README.md).
+The documentation for PWA Kit is hosted on the [Commerce Cloud Developer Center](https://developer.commercecloud.com/s/article/PWA-Kit).
