@@ -9,7 +9,6 @@ import React, {useEffect, useState} from 'react'
 import PropTypes from 'prop-types'
 import {Helmet} from 'react-helmet'
 import {FormattedMessage, useIntl} from 'react-intl'
-import useNavigation from '../../hooks/use-navigation'
 
 // Components
 import {
@@ -19,14 +18,13 @@ import {
     AccordionPanel,
     AccordionIcon,
     Box,
-    Button,
     Stack
 } from '@chakra-ui/react'
 
 // Hooks
 import useBasket from '../../commerce-api/hooks/useBasket'
-import useCustomerProductList from '../../commerce-api/hooks/useCustomerProductList'
 import {useVariant} from '../../hooks'
+import useWishlist from '../../hooks/use-wishlist'
 import useEinstein from '../../commerce-api/hooks/useEinstein'
 
 // Project Components
@@ -47,13 +45,42 @@ const ProductDetail = ({category, product, isLoading}) => {
     const basket = useBasket()
     const history = useHistory()
     const einstein = useEinstein()
-
+    const variant = useVariant(product)
     const [primaryCategory, setPrimaryCategory] = useState(category)
 
-    const variant = useVariant(product)
+    // This page uses the `primaryCategoryId` to retrieve the category data. This attribute
+    // is only available on `master` products. Since a variation will be loaded once all the
+    // attributes are selected (to get the correct inventory values), the category information
+    // is overridden. This will allow us to keep the initial category around until a different
+    // master product is loaded.
+    useEffect(() => {
+        if (category) {
+            setPrimaryCategory(category)
+        }
+    }, [category])
 
-    const showError = (error) => {
-        console.log(error)
+    /**************** Product Variant ****************/
+    useEffect(() => {
+        // update the variation attributes parameter on
+        // the url accordingly as the variant changes
+        const updatedUrl = rebuildPathWithParams(`${location.pathname}${location.search}`, {
+            pid: variant?.productId
+        })
+        history.replace(updatedUrl)
+    }, [variant])
+
+    /**************** Wishlist ****************/
+    const wishlist = useWishlist({enableToast: true})
+    const handleAddToWishlist = async (quantity) => {
+        await wishlist.addItem({
+            id: product.id,
+            quantity: quantity
+        })
+    }
+
+    /**************** Add To Cart ****************/
+    const showToast = useToast()
+    const showError = () => {
         showToast({
             title: formatMessage(
                 {defaultMessage: '{errorMessage}'},
@@ -62,12 +89,6 @@ const ProductDetail = ({category, product, isLoading}) => {
             status: 'error'
         })
     }
-
-    const {wishlist, createWishlistItem} = useCustomerProductList()
-
-    const navigate = useNavigation()
-    const showToast = useToast()
-
     const handleAddToCart = async (variant, quantity) => {
         try {
             if (!variant?.orderable || !quantity) return
@@ -81,66 +102,18 @@ const ProductDetail = ({category, product, isLoading}) => {
                 }
             ]
 
-            basket.addItemToBasket(productItems)
+            await basket.addItemToBasket(productItems)
         } catch (error) {
             showError(error)
         }
     }
 
-    const handleAddToWishlist = async (quantity) => {
-        try {
-            await createWishlistItem({
-                id: product.id,
-                quantity
-            })
-        } catch (e) {
-            showError(e)
-        }
-    }
-
-    const showWishlistItemAdded = (quantity) => {
-        const toastAction = (
-            <Button variant="link" onClick={() => navigate('/account/wishlist')}>
-                View
-            </Button>
-        )
-        showToast({
-            title: formatMessage(
-                {
-                    defaultMessage:
-                        '{quantity} {quantity, plural, one {item} other {items}} added to wishlist'
-                },
-                {quantity}
-            ),
-            status: 'success',
-            action: toastAction
-        })
-    }
-
-    // This page uses the `primaryCategoryId` to retrieve the category data. This attribute
-    // is only available on `master` products. Since a variation will be loaded once all the
-    // attributes are selected (to get the correct inventory values), the category information
-    // is overridden. This will allow us to keep the initial category around until a different
-    // master product is loaded.
-    useEffect(() => {
-        if (category) {
-            setPrimaryCategory(category)
-        }
-    }, [category])
-
+    /**************** Einstein ****************/
     useEffect(() => {
         if (product) {
             einstein.sendViewProduct(product)
         }
     }, [product])
-
-    // update the variation attributes parameter on the url accordingly as the variant changes
-    useEffect(() => {
-        const updatedUrl = rebuildPathWithParams(`${location.pathname}${location.search}`, {
-            pid: variant?.productId
-        })
-        history.replace(updatedUrl)
-    }, [variant])
 
     return (
         <Box
@@ -158,7 +131,7 @@ const ProductDetail = ({category, product, isLoading}) => {
                     product={product}
                     category={primaryCategory?.parentCategoryTree || []}
                     addToCart={(variant, quantity) => handleAddToCart(variant, quantity)}
-                    addToWishlist={(variant, quantity) => handleAddToWishlist(quantity)}
+                    addToWishlist={(_, quantity) => handleAddToWishlist(quantity)}
                     isProductLoading={isLoading}
                     // isCustomerProductListLoading={customerProductLists.showLoader}
                 />

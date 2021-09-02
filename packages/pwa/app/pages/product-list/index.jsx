@@ -114,19 +114,17 @@ const ProductList = (props) => {
     const wishlist = useWishlist({enableToast: true})
     // keep track of the items has been add/remove to/from wishlist
     const [wishlistLoading, setWishlistLoading] = useState([])
-
-    const removeItemFromWishlist = async (product) => {
-        setWishlistLoading([...wishlistLoading, product.productId])
-        await wishlist.removeItemByProductId(product.productId)
-        setWishlistLoading(wishlistLoading.filter((id) => id !== product.productId))
-    }
-
     const addItemToWishlist = async (product) => {
         setWishlistLoading([...wishlistLoading, product.productId])
         await wishlist.addItem({
             id: product.productId,
             quantity: 1
         })
+        setWishlistLoading(wishlistLoading.filter((id) => id !== product.productId))
+    }
+    const removeItemFromWishlist = async (product) => {
+        setWishlistLoading([...wishlistLoading, product.productId])
+        await wishlist.removeItemByProductId(product.productId)
         setWishlistLoading(wishlistLoading.filter((id) => id !== product.productId))
     }
 
