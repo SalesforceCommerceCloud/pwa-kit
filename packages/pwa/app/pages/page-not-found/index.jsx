@@ -12,13 +12,13 @@ import {useIntl} from 'react-intl'
 import {SearchIcon} from '../../components/icons'
 import {useHistory} from 'react-router-dom'
 
-const NotFound404Page = () => {
+const PageNotFound = () => {
     const intl = useIntl()
     const history = useHistory()
     return (
         <Box
             layerStyle="page"
-            className="404-not-found"
+            className="page-not-found"
             height={'100%'}
             padding={{lg: 8, md: 6, sm: 0, base: 0}}
         >
@@ -81,4 +81,4 @@ const NotFound404Page = () => {
     )
 }
 
-export default NotFound404Page
+export default PageNotFound
