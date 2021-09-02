@@ -92,7 +92,9 @@ export function useCustomerProductLists() {
 
     const self = useMemo(() => {
         return {
-            ...state,
+            get data() {
+                return state.productLists
+            },
 
             reset() {
                 actions.reset()
@@ -112,39 +114,14 @@ export function useCustomerProductLists() {
                 return response
             },
 
-            async createList(name, type) {
+            async createList(name, options) {
                 const response = await api.shopperCustomers.createCustomerProductList({
                     body: {
-                        type,
+                        ...options,
                         name
                     },
                     parameters: {
                         customerId: customer.customerId
-                    }
-                })
-
-                if (isError(response)) {
-                    throw new Error(response)
-                }
-
-                return response
-            },
-
-            /**
-             * Fetch list of product details from a product list.
-             * The maximum number of productIDs that can be requested are 24.
-             * @param {array} list product list
-             * @returns {Object[]} list of product details for requested productIds
-             */
-            async _getProductsInList(list) {
-                if (!list.customerProductListItems) {
-                    return
-                }
-
-                const ids = list.customerProductListItems.map((item) => item.productId)
-                const response = await api.shopperProducts.getProducts({
-                    parameters: {
-                        ids: ids.join(',')
                     }
                 })
 
@@ -176,70 +153,66 @@ export function useCustomerProductLists() {
  * This hook is the "child class" of useCustomerProductLists.
  * It provides functionalities to manage a single wishlist for shoppers.
  */
-export default function useCustomerProductList() {
+export function useCustomerProductList(name, options = {}) {
     const api = useCommerceAPI()
     const customer = useCustomer()
     const _super = useCustomerProductLists()
     const {actions} = useContext(CustomerProductListsContext)
-    const PWA_DEFAULT_WISHLIST_NAME = 'PWA wishlist'
-    const API_WISHLIST_TYPE = 'wish_list'
+    const DEFAULT_LIST_TYPE = 'wish_list'
+    const type = options?.type || DEFAULT_LIST_TYPE
 
     const self = useMemo(() => {
         return {
-            ..._super,
+            get data() {
+                return Object.values(_super.data).find((list) => list.name === name)
+            },
 
-            get wishlist() {
-                return Object.values(self.productLists).find(
-                    (list) => list.name === PWA_DEFAULT_WISHLIST_NAME
-                )
+            reset() {
+                actions.receiveList({})
             },
 
             /**
-             * Initialize customer's wishlist.
-             * This should only be used during shopper login.
+             * Initialize customer's product list.
              */
             async init() {
-                actions.setLoading(true)
-                const productLists = await self._getOrCreateWishlist()
-                const wishlist = productLists.data.find(
-                    (list) => list.name === PWA_DEFAULT_WISHLIST_NAME
-                )
-                const productDetails = await self._getProductsInList(wishlist)
-                actions.setLoading(false)
+                // actions.setLoading(true)
+                const list = await self._getOrCreatelistByName(name, {type})
+                const productDetails = await self._getProductDetails(list)
+                // actions.setLoading(false)
 
-                // merge product details into the list
-                const result = productLists.data.map((list) => {
-                    if (list.id === wishlist.id) {
-                        list.customerProductListItems = list.customerProductListItems?.map(
-                            (item) => {
-                                return {
-                                    ...productDetails.data.find(
-                                        (product) => product.id === item.productId
-                                    ),
-                                    ...item
-                                }
-                            }
-                        )
+                const result = self._mergeProductDetailsIntoList(list, productDetails)
+
+                actions.receiveList(result)
+            },
+
+            async getList(listId) {
+                const response = await api.shopperCustomers.getCustomerProductList({
+                    parameters: {
+                        customerId: customer.customerId,
+                        listId
                     }
-                    return list
                 })
 
-                actions.receiveLists(result)
+                if (isError(response)) {
+                    throw new Error(response)
+                }
+
+                return response
             },
 
             async createWishlistItem(item) {
-                const createdItem = await self._createListItem(self.wishlist.id, item)
+                const createdItem = await self.createListItem(self.wishlist.id, item)
                 actions.createListItem(self.wishlist.id, createdItem)
             },
 
             async updateWishlistItem(item) {
                 const {id, quantity} = item
                 if (quantity === 0) {
-                    await self._removeListItem(self.wishlist.id, id)
+                    await self.removeListItem(self.wishlist.id, id)
                     actions.removeListItem(self.wishlist.id, id)
                     return
                 }
-                const updatedItem = await self._updateListItem(self.wishlist.id, item)
+                const updatedItem = await self.updateListItem(self.wishlist.id, item)
                 actions.updateListItem(self.wishlist.id, updatedItem)
             },
 
@@ -248,7 +221,7 @@ export default function useCustomerProductList() {
              * @param {object} listId
              * @param {Object} item item to be added to the list.
              */
-             async _createListItem(listId, item) {
+            async createListItem(listId, item) {
                 const {id, quantity} = item
                 const response = await api.shopperCustomers.createCustomerProductListItem({
                     body: {
@@ -279,7 +252,7 @@ export default function useCustomerProductList() {
              * @param {string} item.id the id of the item in the product list
              * @param {number} item.quantity the quantity of the item
              */
-            async _updateListItem(listId, item) {
+            async updateListItem(listId, item) {
                 const {id, quantity} = item
                 const response = await api.shopperCustomers.updateCustomerProductListItem({
                     body: {
@@ -308,7 +281,7 @@ export default function useCustomerProductList() {
              * @param {string} listId id of the list to update the item in
              * @param {string} itemId the id of the item in the product list
              */
-            async _removeListItem(listId, itemId) {
+            async removeListItem(listId, itemId) {
                 const response = await api.shopperCustomers.deleteCustomerProductListItem(
                     {
                         parameters: {
@@ -328,19 +301,57 @@ export default function useCustomerProductList() {
             },
 
             /**
-             * Fetches product lists for registered users or creates a new list if none exist
-             * due to the api limitation, we can not get the list based on type but all lists
+             * Fetches product lists for registered users or
+             * creates a new list if none exists, due to the api
+             * limitation, we can not get the list based on
+             * name/type, therefore it fetches all lists
              * @returns product lists for registered users
              */
-            async _getOrCreateWishlist() {
-                let response = await self._getLists()
+            async _getOrCreatelistByName(name, options) {
+                let response = await _super.getLists()
 
-                if (!response.data.some((list) => list.name === PWA_DEFAULT_WISHLIST_NAME)) {
-                    await self._createList(PWA_DEFAULT_WISHLIST_NAME, API_WISHLIST_TYPE)
-                    response = await self._getLists()
+                if (!response.data.some((list) => list.name === name)) {
+                    const {id} = await _super.createList(name, options)
+                    response = await self.getList(id)
+                    return response
+                }
+
+                return response.data.find((list) => list.name === name)
+            },
+
+            /**
+             * Fetch list of product details from a product list.
+             * The maximum number of productIDs that can be requested are 24.
+             * @param {array} list product list
+             * @returns {Object[]} list of product details for requested productIds
+             */
+            async _getProductDetails(list) {
+                if (!list.customerProductListItems) {
+                    return
+                }
+
+                const ids = list.customerProductListItems.map((item) => item.productId)
+                const response = await api.shopperProducts.getProducts({
+                    parameters: {
+                        ids: ids.join(',')
+                    }
+                })
+
+                if (isError(response)) {
+                    throw new Error(response)
                 }
 
                 return response
+            },
+
+            _mergeProductDetailsIntoList(list, productDetails) {
+                list.customerProductListItems = list.customerProductListItems?.map((item) => {
+                    return {
+                        ...productDetails.data.find((product) => product.id === item.productId),
+                        ...item
+                    }
+                })
+                return list
             }
         }
     }, [_super])

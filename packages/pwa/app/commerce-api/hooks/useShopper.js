@@ -9,6 +9,9 @@ import useBasket from './useBasket'
 import useCustomer from './useCustomer'
 import useCustomerProductList from './useCustomerProductList'
 
+// todo
+import useWishlist from '../../hooks/use-wishlist'
+
 /**
  * Joins basket and customer hooks into a single hook for initializing their states
  * when the app loads on the client-side. Should only be use at top-level of app.
@@ -17,7 +20,7 @@ import useCustomerProductList from './useCustomerProductList'
 const useShopper = () => {
     const customer = useCustomer()
     const basket = useBasket()
-    const wishlist = useCustomerProductList()
+    const wishlist = useWishlist()
 
     // Create or restore the user session upon mounting
     useEffect(() => {
