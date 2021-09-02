@@ -19,18 +19,6 @@ Old branches include retired packages, such as:
 -   `progressive-web-sdk`: Mobify v1 and v2 SDKs that includes Analytics Integrations, the component library, and utility functions
 -   `test-framework`: Testing framework for Mobify v1 and v2
 
-## Documentation
-
-The documentation for PWA Kit is hosted on the [Commerce Cloud Developer Center](https://developer.commercecloud.com/s/article/PWA-Kit).
-
-Useful links:
-
--   [Getting Started](https://developer.commercecloud.com/s/article/Getting-Started-with-PWA-Kit)
--   [Pushing and Deploying Bundles](https://developer.commercecloud.com/s/article/Pushing-and-Deploying-Bundles)
--   [The Retail React App](https://developer.commercecloud.com/s/article/The-Retail-React-App)
--   [Rendering and Routing](https://developer.commercecloud.com/s/article/Rendering-and-Routing)
--   [Managed Runtime Infrastructure](https://developer.commercecloud.com/s/article/Managed-Runtime-Infrastructure)
-
 ## Requirements
 
 ```
@@ -38,7 +26,7 @@ Useful links:
   npm ^6.14.4
 ```
 
-## Installation
+## Installing Dependencies
 
 Behind the scenes, we're using [Lerna](https://lerna.js.org/) to manage the monorepo. Lerna lets
 us install all dependencies and link all packages together with one command:
@@ -82,3 +70,15 @@ Run integration tests against live APIs for all packages with:
 ## License Information
 
 The PWA Kit is licensed under a BSD 3-Clause license. See the [license](./LICENSE) for details.
+
+## Documentation
+
+The full documentation for PWA Kit is hosted on the [Commerce Cloud Developer Center](https://developer.commercecloud.com/s/article/PWA-Kit).
+
+### Useful Links:
+
+-   [Getting Started](https://developer.commercecloud.com/s/article/Getting-Started-with-PWA-Kit)
+-   [Pushing and Deploying Bundles](https://developer.commercecloud.com/s/article/Pushing-and-Deploying-Bundles)
+-   [The Retail React App](https://developer.commercecloud.com/s/article/The-Retail-React-App)
+-   [Rendering and Routing](https://developer.commercecloud.com/s/article/Rendering-and-Routing)
+-   [Managed Runtime Infrastructure](https://developer.commercecloud.com/s/article/Managed-Runtime-Infrastructure)
