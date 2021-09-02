@@ -59,10 +59,11 @@ export default function useAddressFields({form: {watch, control, errors}, prefix
             name: `${prefix}phone`,
             label: formatMessage(messages.phone),
             defaultValue: '',
-            type: 'text',
+            type: 'tel',
             rules: {required: formatMessage({defaultMessage: 'Please enter your phone number'})},
             error: errors[`${prefix}phone`],
             inputProps: ({onChange}) => ({
+                inputmode: 'numeric',
                 onChange(evt) {
                     onChange(formatPhoneNumber(evt.target.value))
                 }
