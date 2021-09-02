@@ -45,7 +45,7 @@ export const CustomerProvider = CustomerContext.Provider
 
 /************ Customer Product Lists ************/
 const CPLInitialValue = {
-    isLoading: true,
+    isInitialized: true,
     productLists: {
         // this is a map of product lists
         // keyed by list id
@@ -57,7 +57,7 @@ const CPLActionTypes = {
     CREATE_LIST_ITEM: 'CREATE_LIST_ITEM',
     UPDATE_LIST_ITEM: 'UPDATE_LIST_ITEM',
     REMOVE_LIST_ITEM: 'REMOVE_LIST_ITEM',
-    SET_LOADING: 'SET_LOADING',
+    SET_INITIALIZED: 'SET_INITIALIZED',
     RESET: 'RESET'
 }
 export const CustomerProductListsContext = createContext(CPLInitialValue)
@@ -96,7 +96,8 @@ export const CustomerProductListsProvider = ({children}) => {
                         [payload.listId]: {
                             ...state.productLists[payload.listId],
                             customerProductListItems: [
-                                ...(state.productLists[payload.listId].customerProductListItems || []),
+                                ...(state.productLists[payload.listId].customerProductListItems ||
+                                    []),
                                 payload.item
                             ]
                         }
@@ -128,8 +129,8 @@ export const CustomerProductListsProvider = ({children}) => {
                     return listItem.id !== payload.itemId
                 })
                 return {...state, productLists}
-            case CPLActionTypes.SET_LOADING:
-                return {...state, isLoading: payload}
+            case CPLActionTypes.SET_INITIALIZED:
+                return {...state, isInitialized: payload}
             case CPLActionTypes.RESET:
                 return {...CPLInitialValue}
             default:
@@ -146,7 +147,8 @@ export const CustomerProductListsProvider = ({children}) => {
             dispatch({type: CPLActionTypes.UPDATE_LIST_ITEM, payload: {listId, item}}),
         removeListItem: (listId, itemId) =>
             dispatch({type: CPLActionTypes.REMOVE_LIST_ITEM, payload: {listId, itemId}}),
-        setLoading: (isLoading) => dispatch({type: CPLActionTypes.SET_LOADING, payload: isLoading}),
+        setInitialized: (isInitialized) =>
+            dispatch({type: CPLActionTypes.SET_INITIALIZED, payload: isInitialized}),
         reset: () => dispatch({type: CPLActionTypes.RESET})
     }
 

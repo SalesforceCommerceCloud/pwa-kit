@@ -16,14 +16,14 @@ import Queue from '../../utils/queue'
 // 2. Allow user to add item to wishlist before logging in
 // e.g. user clicks add to wishlist, push event to the queue, show login
 // modal, pop the event after successfully logged in
-export class CustomerProductListEventQueue extends Queue {
-    static eventTypes = {
-        ADD: 'add',
-        REMOVE: 'remove'
-    }
-}
+// export class CustomerProductListEventQueue extends Queue {
+//     static eventTypes = {
+//         ADD: 'add',
+//         REMOVE: 'remove'
+//     }
+// }
 
-const eventQueue = new CustomerProductListEventQueue()
+// const eventQueue = new CustomerProductListEventQueue()
 
 /**
  * This hook is designed to add customer product list capabilities
@@ -92,7 +92,7 @@ export function useCustomerProductLists() {
 
     const self = useMemo(() => {
         return {
-            isLoading: state.isLoading,
+            isInitialized: state.isInitialized,
             data: state.productLists,
 
             reset() {
@@ -162,9 +162,8 @@ export function useCustomerProductList(name, options = {}) {
 
     const self = useMemo(() => {
         return {
-            get isLoading() {
-                return _super.isLoading
-            },
+            isInitialized: _super.isInitialized,
+            reset: _super.reset,
 
             get data() {
                 return Object.values(_super.data).find((list) => list.name === name)
@@ -174,9 +173,6 @@ export function useCustomerProductList(name, options = {}) {
                 return !self.data?.customerProductListItems?.length
             },
 
-            reset() {
-                actions.receiveList({})
-            },
 
             findItemByProductId(productId) {
                 return self.data?.customerProductListItems?.find(
@@ -192,14 +188,12 @@ export function useCustomerProductList(name, options = {}) {
              * Initialize customer's product list.
              */
             async init() {
-                actions.setLoading(true)
+                actions.setInitialized(false)
                 const list = await self._getOrCreatelistByName(name, {type})
                 const productDetails = await self._getProductDetails(list)
-                actions.setLoading(false)
-
                 const result = self._mergeProductDetailsIntoList(list, productDetails)
-
                 actions.receiveList(result)
+                actions.setInitialized(true)
             },
 
             async getList(listId) {
@@ -343,7 +337,9 @@ export function useCustomerProductList(name, options = {}) {
             async _getOrCreatelistByName(name, options) {
                 let response = await _super.getLists()
 
-                if (!response.data.some((list) => list.name === name)) {
+                // Note: if list is empty, the API response doesn't
+                // contain the "data" key.
+                if (!response.data?.some((list) => list.name === name)) {
                     const {id} = await _super.createList(name, options)
                     response = await self.getList(id)
                     return response

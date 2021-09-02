@@ -28,7 +28,7 @@ const AccountWishlist = () => {
     const [selectedItem, setSelectedItem] = useState(undefined)
     const [localQuantity, setLocalQuantity] = useState({})
     const [isWishlistItemLoading, setWishlistItemLoading] = useState(false)
-    const {isLoading, isEmpty, ...wishlist} = useWishlist({enableToast: true})
+    const {isInitialized, isEmpty, ...wishlist} = useWishlist({enableToast: true})
 
     const handleActionClicked = (itemId) => {
         setWishlistItemLoading(!!itemId)
@@ -61,7 +61,7 @@ const AccountWishlist = () => {
             <Heading as="h1" fontSize="2xl">
                 <FormattedMessage defaultMessage="Wishlist" />
             </Heading>
-            {isLoading && (
+            {!isInitialized && (
                 <Box data-testid="sf-wishlist-skeleton">
                     {new Array(numberOfSkeletonItems).fill(0).map((i, idx) => (
                         <Box
@@ -86,7 +86,7 @@ const AccountWishlist = () => {
                 </Box>
             )}
 
-            {!isLoading && isEmpty && (
+            {isInitialized && isEmpty && (
                 <PageActionPlaceHolder
                     data-testid="empty-wishlist"
                     icon={<WishlistIcon boxSize={8} />}
@@ -102,7 +102,7 @@ const AccountWishlist = () => {
                 />
             )}
 
-            {!isLoading &&
+            {isInitialized &&
                 !isEmpty &&
                 wishlist?.data?.customerProductListItems?.map((item) => (
                     <ProductItem
@@ -121,7 +121,6 @@ const AccountWishlist = () => {
                         secondaryActions={
                             <WishlistSecondaryButtonGroup
                                 productListItemId={item.id}
-                                list={wishlist}
                                 onClick={handleActionClicked}
                             />
                         }
