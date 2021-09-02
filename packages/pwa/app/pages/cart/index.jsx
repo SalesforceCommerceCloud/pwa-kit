@@ -6,7 +6,7 @@
  */
 
 import React, {useEffect, useState} from 'react'
-import {Box, Stack, Grid, GridItem, Container, useDisclosure, Button} from '@chakra-ui/react'
+import {Box, Stack, Grid, GridItem, Container, useDisclosure} from '@chakra-ui/react'
 import {FormattedMessage, useIntl} from 'react-intl'
 
 import EmptyCart from './partials/empty-cart'
@@ -21,9 +21,8 @@ import CartSecondaryButtonGroup from './partials/cart-secondary-button-group'
 import ProductViewModal from '../../components/product-view-modal'
 
 import {useToast} from '../../hooks/use-toast'
-import useCustomerProductList from '../../commerce-api/hooks/useCustomerProductList'
-import {API_ERROR_MESSAGE, customerProductListTypes} from '../../constants'
-import useNavigation from '../../hooks/use-navigation'
+import useWishlist from '../../hooks/use-wishlist'
+import {API_ERROR_MESSAGE} from '../../constants'
 import useCustomer from '../../commerce-api/hooks/useCustomer'
 
 const Cart = () => {
@@ -31,18 +30,11 @@ const Cart = () => {
     const customer = useCustomer()
     const [selectedItem, setSelectedItem] = useState(undefined)
     const [localQuantity, setLocalQuantity] = useState({})
+    const [isCartItemLoading, setCartItemLoading] = useState(false)
+    const {isOpen, onOpen, onClose} = useDisclosure()
     const {formatMessage} = useIntl()
     const showToast = useToast()
-    const navigate = useNavigation()
-
-    const productListEventHandler = (event) => {
-        if (event.action === 'add') {
-            showWishlistItemAdded(event.item?.quantity)
-        }
-    }
-
-    const showError = (error) => {
-        console.log(error)
+    const showError = () => {
         showToast({
             title: formatMessage(
                 {defaultMessage: '{errorMessage}'},
@@ -52,10 +44,14 @@ const Cart = () => {
         })
     }
 
-    const customerProductLists = useCustomerProductList()
-
-    const [isCartItemLoading, setCartItemLoading] = useState(false)
-    const {isOpen, onOpen, onClose} = useDisclosure()
+    /**************** Wishlist ****************/
+    const wishlist = useWishlist({enableToast: true})
+    const handleAddToWishlist = async (product) => {
+        await wishlist.addItem({
+            id: product.id,
+            quantity: product.quantity
+        })
+    }
 
     useEffect(() => {
         // Set the default shipping method if none is already selected
@@ -111,7 +107,6 @@ const Cart = () => {
             setSelectedItem(undefined)
         }
     }
-
     const changeItemQuantity = async (quantity, product) => {
         // This local state allows the dropdown to show the desired quantity
         // while the API call to update it is happening.
@@ -133,74 +128,6 @@ const Cart = () => {
             setLocalQuantity({...localQuantity, [product.itemId]: undefined})
         }
     }
-
-    const showWishlistItemAdded = (quantity) => {
-        const toastAction = (
-            <Button variant="link" onClick={() => navigate('/account/wishlist')}>
-                View
-            </Button>
-        )
-        showToast({
-            title: formatMessage(
-                {
-                    defaultMessage:
-                        '{quantity} {quantity, plural, one {item} other {items}} added to wishlist'
-                },
-                {quantity}
-            ),
-            status: 'success',
-            action: toastAction
-        })
-    }
-
-    const handleAddToWishlist = async (product) => {
-        setCartItemLoading(true)
-        setSelectedItem(product)
-        try {
-            // If product-lists have not loaded we push "Add to wishlist" event to eventQueue to be
-            // processed once the product-lists have loaded.
-
-            // @TODO: move the logic to useCustomerProductLists
-            // Cart shouldn't need to know the implementation detail of the event queue
-            // Cart should just do "customerProductLists.addItem(item)"!
-            if (!customerProductLists?.loaded) {
-                const event = {
-                    item: product,
-                    action: 'add',
-                    listType: customerProductListTypes.WISHLIST,
-                    showStatus: showWishlistItemAdded,
-                    showError
-                }
-
-                customerProductLists.addActionToEventQueue(event)
-            } else {
-                const wishlist = customerProductLists.data.find(
-                    (list) => list.type === customerProductListTypes.WISHLIST
-                )
-
-                const wishlistItem = await customerProductLists.createCustomerProductListItem(
-                    wishlist,
-                    {
-                        productId: product.productId,
-                        priority: 1,
-                        quantity: product.quantity,
-                        public: false,
-                        type: 'product'
-                    }
-                )
-
-                if (wishlistItem?.id) {
-                    showWishlistItemAdded(product.quantity)
-                }
-            }
-        } catch (error) {
-            showError(error)
-        } finally {
-            setCartItemLoading(false)
-            setSelectedItem(undefined)
-        }
-    }
-
     const handleRemoveItem = async (product) => {
         setSelectedItem(product)
         setCartItemLoading(true)
