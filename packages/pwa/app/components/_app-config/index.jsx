@@ -23,21 +23,23 @@ import {commerceAPIConfig} from '../../commerce-api.config'
 import {einsteinAPIConfig} from '../../einstein-api.config'
 import {DEFAULT_LOCALE} from '../../locale'
 
+const apiConfig = {
+    ...commerceAPIConfig,
+    einsteinConfig: einsteinAPIConfig
+}
+
 /**
- * Parses and returns the locale from the provided locals object. If the locale cannot be parsed
- * return undefined.
+ * Returns the locale set in the URL's pathname or the locale set in the frozen state PRELOADED_STATE.
  * @private
  * @param locals
  * @returns {String} the locale shortcode
  */
-const parseLocale = (locals) => {
+const getLocale = (locals) => {
     const {originalUrl} = locals
 
-    if (!originalUrl) {
-        return
-    }
-
-    return originalUrl.split('/')[1]
+    return originalUrl
+        ? originalUrl.split('/')[1]
+        : window?.__PRELOADED_STATE__?.appProps?.targetLocale
 }
 
 /**
@@ -69,15 +71,8 @@ const AppConfig = ({children, locals = {}}) => {
 }
 
 AppConfig.restore = (locals = {}) => {
-    const locale =
-        parseLocale(locals) || window?.__PRELOADED_STATE__?.appProps?.targetLocale || DEFAULT_LOCALE
-    const config = {
-        ...commerceAPIConfig,
-        einsteinConfig: einsteinAPIConfig,
-        locale: locale
-    }
-
-    locals.api = new CommerceAPI(config)
+    const locale = getLocale(locals) || DEFAULT_LOCALE
+    locals.api = new CommerceAPI({...apiConfig, locale})
 }
 
 AppConfig.freeze = () => undefined
