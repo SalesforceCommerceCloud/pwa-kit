@@ -88,10 +88,6 @@ const useShopper = () => {
         }
     }, [customer.authType])
 
-    useEffect(() => {
-        console.log(wishlist)
-    }, [wishlist])
-
     return {customer, basket}
 }
 
