@@ -171,6 +171,15 @@ export function useCustomerProductList(name, options = {}) {
                 actions.receiveList({})
             },
 
+            findItemByProductId(productId) {
+                return self.data?.customerProductListItems?.find(
+                    (item) => item.productId === productId
+                )
+            },
+
+            isProductInList(productId) {
+                return !!self.findItemByProductId(productId)
+            },
             /**
              * Initialize customer's product list.
              */
@@ -200,20 +209,33 @@ export function useCustomerProductList(name, options = {}) {
                 return response
             },
 
-            async createWishlistItem(item) {
-                const createdItem = await self.createListItem(self.wishlist.id, item)
-                actions.createListItem(self.wishlist.id, createdItem)
+            async addItem(item) {
+                const createdItem = await self.createListItem(self.data.id, item)
+                actions.createListItem(self.data.id, createdItem)
             },
 
-            async updateWishlistItem(item) {
+            async updateItem(item) {
                 const {id, quantity} = item
                 if (quantity === 0) {
-                    await self.removeListItem(self.wishlist.id, id)
-                    actions.removeListItem(self.wishlist.id, id)
+                    await self.removeListItem(self.data.id, id)
+                    actions.removeListItem(self.data.id, id)
                     return
                 }
-                const updatedItem = await self.updateListItem(self.wishlist.id, item)
-                actions.updateListItem(self.wishlist.id, updatedItem)
+                const updatedItem = await self.updateListItem(self.data.id, item)
+                actions.updateListItem(self.data.id, updatedItem)
+            },
+
+            async removeItemByProductId(productId) {
+                const item = self.findItemByProductId(productId)
+                if (!item) {
+                    return
+                }
+                await self.removeItem(item.id)
+            },
+
+            async removeItem(itemId) {
+                await self.removeListItem(self.data.id, itemId)
+                actions.removeListItem(self.data.id, itemId)
             },
 
             /**

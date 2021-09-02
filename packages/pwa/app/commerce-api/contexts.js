@@ -86,8 +86,11 @@ export const CustomerProductListsProvider = ({children}) => {
                     ...state.productLists
                 }
 
+                // @TODO: if there is a product already exists in list
+                // we need to add the quantity instead of adding a new entry
+
                 productLists[payload.listId].customerProductListItems = [
-                    ...productLists[payload.listId].customerProductListItems,
+                    ...(productLists[payload.listId].customerProductListItems || []),
                     payload.item
                 ]
 
@@ -98,7 +101,7 @@ export const CustomerProductListsProvider = ({children}) => {
                 }
                 productLists[payload.listId].customerProductListItems = productLists[
                     payload.listId
-                ].customerProductListItems.map((listItem) => {
+                ].customerProductListItems?.map((listItem) => {
                     if (listItem.id === payload.item.id) {
                         return {
                             ...listItem,
@@ -114,7 +117,7 @@ export const CustomerProductListsProvider = ({children}) => {
                 }
                 productLists[payload.listId].customerProductListItems = productLists[
                     payload.listId
-                ].customerProductListItems.filter((listItem) => {
+                ].customerProductListItems?.filter((listItem) => {
                     return listItem.id !== payload.itemId
                 })
                 return {...state, productLists}

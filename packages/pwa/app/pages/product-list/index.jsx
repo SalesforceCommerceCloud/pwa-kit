@@ -52,7 +52,7 @@ import {FilterIcon, ChevronDownIcon} from '../../components/icons'
 
 // Hooks
 import {useLimitUrls, usePageUrls, useSortUrls, useSearchParams} from '../../hooks'
-import useCustomerProductList from '../../commerce-api/hooks/useCustomerProductList'
+import useWishlist from '../../hooks/use-wishlist'
 import {useToast} from '../../hooks/use-toast'
 import {parse as parseSearchParams} from '../../hooks/use-search-params'
 
@@ -72,6 +72,15 @@ import {API_ERROR_MESSAGE} from '../../constants'
  * allowable filters and sort refinements.
  */
 const ProductList = (props) => {
+    const {
+        searchQuery,
+        productSearchResult,
+        // eslint-disable-next-line react/prop-types
+        staticContext,
+        location,
+        isLoading,
+        ...rest
+    } = props
     const {isOpen, onOpen, onClose} = useDisclosure()
     const [sortOpen, setSortOpen] = useState(false)
     const {formatMessage} = useIntl()
@@ -82,11 +91,11 @@ const ProductList = (props) => {
     const [searchParams, {stringify: stringifySearchParams}] = useSearchParams()
     const {categories} = useContext(CategoriesContext)
     const [filtersLoading, setFiltersLoading] = useState(false)
-    const productListEventHandler = (event) => {
-        if (event.action === 'add') {
-            showWishlistItemAdded(event.item?.quantity)
-        }
-    }
+    // const productListEventHandler = (event) => {
+    //     if (event.action === 'add') {
+    //         showWishlistItemAdded(event.item?.quantity)
+    //     }
+    // }
 
     const showError = () => {
         showToast({
@@ -98,19 +107,9 @@ const ProductList = (props) => {
         })
     }
 
-    const customerProductLists = useCustomerProductList()
+    const wishlist = useWishlist()
     const showToast = useToast()
-    const {
-        searchQuery,
-        productSearchResult,
-        // eslint-disable-next-line react/prop-types
-        staticContext,
-        location,
-        isLoading,
-        ...rest
-    } = props
 
-    const [wishlist, setWishlist] = useState({})
     // keep track of the items has been add/remove to/from wishlist
     const [wishlistLoading, setWishlistLoading] = useState([])
 
@@ -136,15 +135,6 @@ const ProductList = (props) => {
 
     // If we are loaded and still have no products, show the no results component.
     const showNoResults = !isLoading && productSearchResult && !productSearchResult?.hits
-    useEffect(() => {
-        if (customerProductLists.data && productSearchResult) {
-            // find the first wishlist in customer product list
-            const wishlist = customerProductLists.data.find(
-                (list) => list.type === customerProductListTypes.WISHLIST
-            )
-            setWishlist(wishlist)
-        }
-    }, [customerProductLists.data, productSearchResult])
 
     /**
      * Removes product from wishlist
@@ -152,12 +142,7 @@ const ProductList = (props) => {
     const removeItemFromWishlist = async (product) => {
         try {
             setWishlistLoading([...wishlistLoading, product.productId])
-            // Extract productListItem corresponding to product from wishlist
-            const productListItem = wishlist.customerProductListItems.find(
-                (item) => item.productId === product.productId
-            )
-            await customerProductLists.deleteCustomerProductListItem(wishlist, productListItem)
-
+            await wishlist.removeItemByProductId(product.productId)
             showToast({
                 title: formatMessage({defaultMessage: 'Item removed from wishlist'}),
                 status: 'success',
@@ -192,31 +177,12 @@ const ProductList = (props) => {
     const addItemToWishlist = async (product) => {
         try {
             setWishlistLoading([...wishlistLoading, product.productId])
-            // If product-lists have not loaded we push "Add to wishlist" event to eventQueue to be
-            // processed once the product-lists have loaded.
-            if (!customerProductLists?.loaded) {
-                const event = {
-                    item: {...product, id: product.productId, quantity: 1},
-                    action: 'add',
-                    listType: customerProductListTypes.WISHLIST
-                }
-
-                customerProductLists.addActionToEventQueue(event)
-            } else {
-                const quantity = 1
-                const wishlist = customerProductLists.getProductListPerType(
-                    customerProductListTypes.WISHLIST
-                )
-                await customerProductLists.createCustomerProductListItem(wishlist, {
-                    productId: product.productId,
-                    priority: 1,
-                    quantity,
-                    public: false,
-                    type: 'product'
-                })
-                showWishlistItemAdded(quantity)
-                setWishlistLoading(wishlistLoading.filter((id) => id !== product.productId))
-            }
+            await wishlist.addItem({
+                id: product.productId,
+                quantity: 1
+            })
+            showWishlistItemAdded(1)
+            setWishlistLoading(wishlistLoading.filter((id) => id !== product.productId))
         } catch (err) {
             showError()
         }
@@ -409,13 +375,12 @@ const ProductList = (props) => {
                                               <ProductTileSkeleton key={index} />
                                           ))
                                     : productSearchResult.hits.map((productSearchItem) => {
-                                          const isInWishlist = wishlist?.customerProductListItems
-                                              ?.map(({productId}) => productId)
-                                              .includes(productSearchItem.productId)
+                                          const productId = productSearchItem.productId
+                                          const isInWishlist = wishlist.isProductInList(productId)
                                           return (
                                               <ProductTile
                                                   isWishlistLoading={wishlistLoading.includes(
-                                                      productSearchItem.productId
+                                                      productId
                                                   )}
                                                   data-testid={`sf-product-tile-${productSearchItem.productId}`}
                                                   key={productSearchItem.productId}
