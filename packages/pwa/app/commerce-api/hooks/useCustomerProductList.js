@@ -9,21 +9,6 @@ import {useCommerceAPI, CustomerProductListsContext} from '../contexts'
 import {isError} from '../utils'
 
 import useCustomer from './useCustomer'
-import Queue from '../../utils/queue'
-
-// A event queue for the following use cases:
-// 1. Allow user to add item to wishlist before wishlist is initialized
-// 2. Allow user to add item to wishlist before logging in
-// e.g. user clicks add to wishlist, push event to the queue, show login
-// modal, pop the event after successfully logged in
-// export class CustomerProductListEventQueue extends Queue {
-//     static eventTypes = {
-//         ADD: 'add',
-//         REMOVE: 'remove'
-//     }
-// }
-
-// const eventQueue = new CustomerProductListEventQueue()
 
 /**
  * This hook is designed to add customer product list capabilities
@@ -43,52 +28,6 @@ export function useCustomerProductLists() {
     const api = useCommerceAPI()
     const customer = useCustomer()
     const {state, actions} = useContext(CustomerProductListsContext)
-
-    // useEffect(() => {
-    //     eventQueue.process(async (event) => {
-    //         const {action, item, list, listType} = event
-    //         switch (action) {
-    //             case CustomerProductListEventQueue.eventTypes.ADD: {
-    //                 try {
-    //                     const productList = self.getProductListPerType(listType)
-    //                     const productListItem = productList.customerProductListItems.find(
-    //                         ({productId}) => productId === event.item.id
-    //                     )
-    //                     // if the item is already in the wishlist
-    //                     // only update the quantity
-    //                     if (productListItem) {
-    //                         await self._updateListItem(productList, {
-    //                             ...productListItem,
-    //                             quantity: event.item.quantity + productListItem.quantity
-    //                         })
-    //                         eventHandler(event)
-    //                     } else {
-    //                         await self.createCustomerProductListItem(productList, {
-    //                             productId: event.item.id,
-    //                             priority: 1,
-    //                             quantity: parseInt(event.item.quantity),
-    //                             public: false,
-    //                             type: 'product'
-    //                         })
-    //                         eventHandler(event)
-    //                     }
-    //                 } catch (error) {
-    //                     errorHandler(error)
-    //                 }
-    //                 break
-    //             }
-
-    //             case CustomerProductListEventQueue.eventTypes.REMOVE:
-    //                 try {
-    //                     await self.deleteCustomerProductListItem(list, item)
-    //                     eventHandler(event)
-    //                 } catch (error) {
-    //                     errorHandler(error)
-    //                 }
-    //                 break
-    //         }
-    //     })
-    // }, [customerProductLists])
 
     const self = useMemo(() => {
         return {
@@ -130,19 +69,6 @@ export function useCustomerProductLists() {
 
                 return response
             }
-
-            // /**
-            //  * @TODO: remove this function as it exposes unnecessary knowledge
-            //  * to outside systems. The queue logic should be encapsulated in this
-            //  * hook only. The API for outside consuming should be something like:
-            //  * addItemToList, removeItemToList...
-            //  * Event queue holds user actions that need to execute on product-lists
-            //  * while the product list information has not yet loaded (eg: Adding to wishlist immedeately after login).
-            //  * @param {object} event Event to be added to queue. event object has properties: action: {item: Object, list?: object, action: eventActions, listType: CustomerProductListType}
-            //  */
-            // addActionToEventQueue(event) {
-            //     eventQueue.enqueue(event)
-            // },
         }
     }, [customer.customerId, state])
     return self
@@ -173,7 +99,6 @@ export function useCustomerProductList(name, options = {}) {
                 return !self.data?.customerProductListItems?.length
             },
 
-
             findItemByProductId(productId) {
                 return self.data?.customerProductListItems?.find(
                     (item) => item.productId === productId
@@ -194,6 +119,7 @@ export function useCustomerProductList(name, options = {}) {
                 const result = self._mergeProductDetailsIntoList(list, productDetails)
                 actions.receiveList(result)
                 actions.setInitialized(true)
+                return list
             },
 
             async getList(listId) {
@@ -212,11 +138,12 @@ export function useCustomerProductList(name, options = {}) {
             },
 
             async addItem(product) {
-                if (self.isProductInList(product.id)) {
-                    return
+                let list = self.data
+                if (!self.isInitialized) {
+                    list = await self.init()
                 }
-                const createdItem = await self.createListItem(self.data.id, product)
-                actions.createListItem(self.data.id, createdItem)
+                const createdItem = await self.createListItem(list.id, product)
+                actions.createListItem(list.id, createdItem)
             },
 
             async updateItem(item) {
