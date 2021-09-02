@@ -314,7 +314,6 @@ const ProductList = (props) => {
                                 filters={productSearchResult?.refinements}
                                 toggleFilter={toggleFilter}
                                 selectedFilterValues={productSearchResult?.selectedRefinements}
-                                categoryId={category?.id}
                             />
                         </Box>
                         <Box paddingTop={'45px'}>
@@ -383,7 +382,6 @@ const ProductList = (props) => {
                             <SelectedRefinements
                                 filters={productSearchResult?.refinements}
                                 toggleFilter={toggleFilter}
-                                categoryId={category?.id}
                                 selectedFilterValues={productSearchResult?.selectedRefinements}
                             />
                         </Box>
