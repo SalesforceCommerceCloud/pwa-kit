@@ -4,20 +4,9 @@ The PWA Kit is a storefront technology for headless commerce using Salesforce Co
 
 This repository is a [monorepo](https://en.wikipedia.org/wiki/Monorepo) that includes the code that powers the PWA Kit. The code is divided into the following packages:
 
--   `pwa`: A set of sample code and tooling for PWA Kit projects called the Retail React App
--   `pwa-kit-create-app`: A tool that generates PWA Kit projects based on the Retail React App
--   `pwa-kit-react-sdk`: A set of components and utilities for PWA Kit projects
-
-Old branches include retired packages, such as:
-
--   `commerce-integrations`: ecommerce backend interface for Mobify v1 and v2
--   `connector`: The scaffold for an old project's data layer
--   `devcenter`: source files for the [DevCenter](https://dev.mobify.com), which includes docs for Mobify v1 and v2
--   `documentation-hub`: Documentation hub for Mobify v1 and earlier, hosted on https://docs.mobify.com
--   `documentation-theme`: A common theme shared across docs sites for Mobify v1 and earlier
--   `generator`: Project generator for Mobify v1 and v2
--   `progressive-web-sdk`: Mobify v1 and v2 SDKs that includes Analytics Integrations, the component library, and utility functions
--   `test-framework`: Testing framework for Mobify v1 and v2
+- `pwa`: A set of sample code and tooling for PWA Kit projects called the Retail React App
+- `pwa-kit-create-app`: A tool that generates PWA Kit projects based on the Retail React App
+- `pwa-kit-react-sdk`: A set of components and utilities for PWA Kit projects
 
 ## Requirements
 
@@ -77,8 +66,8 @@ The full documentation for PWA Kit is hosted on the [Commerce Cloud Developer Ce
 
 ### Useful Links:
 
--   [Getting Started](https://developer.commercecloud.com/s/article/Getting-Started-with-PWA-Kit)
--   [Pushing and Deploying Bundles](https://developer.commercecloud.com/s/article/Pushing-and-Deploying-Bundles)
--   [The Retail React App](https://developer.commercecloud.com/s/article/The-Retail-React-App)
--   [Rendering and Routing](https://developer.commercecloud.com/s/article/Rendering-and-Routing)
--   [Managed Runtime Infrastructure](https://developer.commercecloud.com/s/article/Managed-Runtime-Infrastructure)
+- [Getting Started](https://developer.commercecloud.com/s/article/Getting-Started-with-PWA-Kit)
+- [Pushing and Deploying Bundles](https://developer.commercecloud.com/s/article/Pushing-and-Deploying-Bundles)
+- [The Retail React App](https://developer.commercecloud.com/s/article/The-Retail-React-App)
+- [Rendering and Routing](https://developer.commercecloud.com/s/article/Rendering-and-Routing)
+- [Managed Runtime Infrastructure](https://developer.commercecloud.com/s/article/Managed-Runtime-Infrastructure)
