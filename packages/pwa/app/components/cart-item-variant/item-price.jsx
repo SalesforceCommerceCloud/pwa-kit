@@ -16,7 +16,7 @@ import {DEFAULT_CURRENCY} from '../../constants'
  * In the context of a cart product item variant, this component renders the item's
  * pricing, taking into account applied discounts as well as base item prices.
  */
-const ItemPrice = ({currency, ...props}) => {
+const ItemPrice = ({currency, align = 'right', ...props}) => {
     const variant = useCartItemVariant()
     const basket = useBasket()
 
@@ -28,9 +28,9 @@ const ItemPrice = ({currency, ...props}) => {
 
     return (
         <Stack
-            textAlign="right"
+            textAlign={align}
             direction={hasDiscount ? 'column' : 'row'}
-            justifyContent="flex-end"
+            justifyContent={align === 'left' ? 'flex-start' : 'flex-end'}
             alignItems="baseline"
             spacing={hasDiscount ? 0 : 1}
             wrap="row"
@@ -78,7 +78,8 @@ const ItemPrice = ({currency, ...props}) => {
 }
 
 ItemPrice.propTypes = {
-    currency: PropTypes.string
+    currency: PropTypes.string,
+    align: PropTypes.string
 }
 
 export default ItemPrice

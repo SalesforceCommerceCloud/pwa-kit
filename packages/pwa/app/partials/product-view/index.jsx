@@ -18,10 +18,14 @@ import {
     Box,
     Text,
     VStack,
-    Select,
     Fade,
     useDisclosure,
-    useTheme
+    useTheme,
+    NumberInput,
+    NumberInputField,
+    NumberInputStepper,
+    NumberIncrementStepper,
+    NumberDecrementStepper
 } from '@chakra-ui/react'
 
 import {useProduct} from '../../hooks'
@@ -33,12 +37,10 @@ import ImageGallery from '../../components/image-gallery'
 import Breadcrumb from '../../components/breadcrumb'
 import Link from '../../components/link'
 import withRegistration from '../../hoc/with-registration'
-import {DEFAULT_CURRENCY} from '../../constants'
+import {DEFAULT_CURRENCY, MAX_ORDER_QUANTITY} from '../../constants'
 import {Skeleton as ImageGallerySkeleton} from '../../components/image-gallery'
 import AddToCartModal from '../../components/add-to-cart-modal'
 import RecommendedProducts from '../../components/recommended-products'
-
-const MAX_ORDER_QUANTITY = 10
 
 const ProductViewHeader = ({name, price, currency, category}) => {
     const intl = useIntl()
@@ -114,7 +116,6 @@ const ProductView = ({
         variant,
         variationParams,
         variationAttributes,
-        stepQuantity,
         stockLevel
     } = useProduct(product)
     const canAddToWishlist = !isProductLoading
@@ -309,18 +310,21 @@ const ProductView = ({
                                 })}
                                 :
                             </Box>
-                            <Select
-                                value={quantity}
-                                onChange={({target}) => {
-                                    setQuantity(parseInt(target.value))
+                            <NumberInput
+                                onChange={(valueString) => {
+                                    console.log(valueString)
+                                    setQuantity(parseInt(valueString))
                                 }}
+                                value={quantity}
+                                min={1}
+                                max={MAX_ORDER_QUANTITY}
                             >
-                                {new Array(MAX_ORDER_QUANTITY).fill(0).map((_, index) => (
-                                    <option key={index} value={index + stepQuantity}>
-                                        {index + stepQuantity}
-                                    </option>
-                                ))}
-                            </Select>
+                                <NumberInputField />
+                                <NumberInputStepper>
+                                    <NumberIncrementStepper />
+                                    <NumberDecrementStepper />
+                                </NumberInputStepper>
+                            </NumberInput>
                         </VStack>
                     </VStack>
 

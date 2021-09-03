@@ -7,7 +7,21 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {FormattedMessage} from 'react-intl'
-import {Box, Flex, Stack, Text, Select} from '@chakra-ui/react'
+import {
+    Box,
+    Flex,
+    Stack,
+    Text,
+    NumberInput,
+    NumberInputField,
+    NumberInputStepper,
+    NumberIncrementStepper,
+    NumberDecrementStepper,
+    useNumberInput,
+    HStack,
+    Button,
+    Input
+} from '@chakra-ui/react'
 import CartItemVariant from '../cart-item-variant'
 import CartItemVariantImage from '../cart-item-variant/item-image'
 import CartItemVariantName from '../cart-item-variant/item-name'
@@ -15,6 +29,8 @@ import CartItemVariantAttributes from '../cart-item-variant/item-attributes'
 import CartItemVariantPrice from '../cart-item-variant/item-price'
 import LoadingSpinner from '../loading-spinner'
 import {noop} from '../../utils/utils'
+import {HideOnDesktop, HideOnMobile} from '../responsive'
+import {MAX_ORDER_QUANTITY} from '../../constants'
 
 /**
  * Component representing a product item usually in a list with details about the product - name, variant, pricing, etc.
@@ -32,6 +48,19 @@ const ProductItem = ({
     onItemQuantityChange = noop,
     showLoading = false
 }) => {
+    // Mobile Quantity Stepper Logic
+    const {getInputProps, getIncrementButtonProps, getDecrementButtonProps} = useNumberInput({
+        step: 1,
+        min: 1,
+        max: MAX_ORDER_QUANTITY,
+        onChange: (valueString) => onItemQuantityChange(valueString)
+    })
+
+    const inc = getIncrementButtonProps()
+    const dec = getDecrementButtonProps()
+    const input = getInputProps()
+    // Mobile Quantity Stepper Logic
+
     return (
         <Box position="relative" data-testid={`sf-cart-item-${product.productId}`}>
             <CartItemVariant variant={product}>
@@ -44,6 +73,12 @@ const ProductItem = ({
                             <Stack spacing={1}>
                                 <CartItemVariantName />
                                 <CartItemVariantAttributes />
+                                <HideOnDesktop>
+                                    <Text fontSize="sm" color="gray.700">
+                                        <FormattedMessage defaultMessage="Price:" />
+                                    </Text>
+                                    <CartItemVariantPrice align="left" />
+                                </HideOnDesktop>
                             </Stack>
 
                             <Flex align="flex-end" justify="space-between">
@@ -51,24 +86,35 @@ const ProductItem = ({
                                     <Text fontSize="sm" color="gray.700">
                                         <FormattedMessage defaultMessage="Quantity:" />
                                     </Text>
-                                    <Select
-                                        onChange={(e) => onItemQuantityChange(e.target.value)}
-                                        value={product.quantity}
-                                        width="75px"
-                                    >
-                                        <option value="1">1</option>
-                                        <option value="2">2</option>
-                                        <option value="3">3</option>
-                                        <option value="4">4</option>
-                                        <option value="5">5</option>
-                                        <option value="6">6</option>
-                                        <option value="7">7</option>
-                                        <option value="8">8</option>
-                                        <option value="9">9</option>
-                                    </Select>
+                                    <HideOnMobile>
+                                        <NumberInput
+                                            width="100px"
+                                            onChange={(valueString) =>
+                                                onItemQuantityChange(valueString)
+                                            }
+                                            value={product.quantity}
+                                            min={1}
+                                            max={10}
+                                        >
+                                            <NumberInputField />
+                                            <NumberInputStepper>
+                                                <NumberIncrementStepper />
+                                                <NumberDecrementStepper />
+                                            </NumberInputStepper>
+                                        </NumberInput>
+                                    </HideOnMobile>
+                                    <HideOnDesktop>
+                                        <HStack maxW="80%">
+                                            <Button {...dec}>-</Button>
+                                            <Input {...input} value={product.quantity} />
+                                            <Button {...inc}>+</Button>
+                                        </HStack>
+                                    </HideOnDesktop>
                                 </Stack>
                                 <Stack>
-                                    <CartItemVariantPrice />
+                                    <HideOnMobile>
+                                        <CartItemVariantPrice />
+                                    </HideOnMobile>
                                     <Box display={['none', 'block', 'block', 'block']}>
                                         {primaryAction}
                                     </Box>
