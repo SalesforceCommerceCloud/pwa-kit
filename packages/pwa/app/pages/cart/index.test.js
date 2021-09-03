@@ -166,13 +166,13 @@ test('Can update item quantity in the cart', async () => {
     const cartItem = await screen.findByTestId(
         `sf-cart-item-${mockedBasketResponse.productItems[0].productId}`
     )
-    expect(within(cartItem).getByRole('combobox')).toHaveValue('2')
+    expect(within(cartItem).getByRole('spinbutton')).toHaveValue('2')
 
     // update item quantity
-    userEvent.selectOptions(within(cartItem).getByRole('combobox'), ['3'])
+    userEvent.type(within(cartItem).getByRole('spinbutton'), '{backspace}3')
 
     await waitForElementToBeRemoved(() => screen.getByText(/loading\.\.\./i))
-    expect(await within(cartItem).getByRole('combobox')).toHaveValue('3')
+    expect(await within(cartItem).getByRole('spinbutton')).toHaveValue('3')
 })
 
 test('Can update item quantity from product view modal', async () => {
@@ -194,17 +194,17 @@ test('Can update item quantity from product view modal', async () => {
     const cartItem = await screen.findByTestId(
         `sf-cart-item-${mockedBasketResponse.productItems[0].productId}`
     )
-    expect(within(cartItem).getByRole('combobox')).toHaveValue('2')
+    expect(within(cartItem).getByRole('spinbutton')).toHaveValue('2')
     const editCartButton = within(cartItem).getByRole('button', {name: 'Edit'})
     userEvent.click(editCartButton)
     const productView = screen.getByTestId('product-view')
     expect(productView).toBeInTheDocument()
     // update item quantity
-    userEvent.selectOptions(within(productView).getByRole('combobox'), ['3'])
+    userEvent.type(within(productView).getByRole('spinbutton'), '{backspace}3')
     userEvent.click(within(productView).getAllByText(/Update/)[0])
 
     await waitForElementToBeRemoved(() => screen.getByText(/loading\.\.\./i))
-    expect(await within(cartItem).getByRole('combobox')).toHaveValue('3')
+    expect(await within(cartItem).getByRole('spinbutton')).toHaveValue('3')
 })
 
 test('Can remove item from the cart', async () => {
