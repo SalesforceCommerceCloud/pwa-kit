@@ -51,7 +51,7 @@ const ContactInfo = () => {
     const fields = useLoginFields({form})
 
     const [error, setError] = useState(null)
-    const [showPasswordField, setShowPasswordField] = useState(true)
+    const [showPasswordField, setShowPasswordField] = useState(false)
     const [signOutConfirmDialogIsOpen, setSignOutConfirmDialogIsOpen] = useState(false)
 
     const submitForm = async (data) => {

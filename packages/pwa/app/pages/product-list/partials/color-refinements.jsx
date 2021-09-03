@@ -63,11 +63,12 @@ const ColorRefinements = ({filter, toggleFilter, selectedFilters}) => {
                                             backgroundRepeat="no-repeat"
                                             backgroundSize="cover"
                                             backgroundColor={
-                                                cssColorGroups[value.value.toLowerCase()]
+                                                cssColorGroups[value.presentationId.toLowerCase()]
                                             }
                                             background={
-                                                value.value.toLowerCase() === 'miscellaneous' &&
-                                                cssColorGroups[value.value.toLowerCase()]
+                                                value.presentationId.toLowerCase() ===
+                                                    'miscellaneous' &&
+                                                cssColorGroups[value.presentationId.toLowerCase()]
                                             }
                                         />
                                     </Center>
