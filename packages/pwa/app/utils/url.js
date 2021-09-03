@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {DEFAULT_LOCALE} from '../locale'
+import {SUPPORTED_LOCALES, DEFAULT_LOCALE} from '../locale'
 import {HOME_HREF} from '../constants'
 
 /**
@@ -114,7 +114,11 @@ export const buildUrlLocale = (previousLocale, newLocale) => {
     params.delete('refine')
     return location.pathname === HOME_HREF
         ? homeUrlBuilder(HOME_HREF, newLocale)
-        : `${location.pathname.replace(previousLocale, newLocale)}?${params}`
+        : `/${
+              SUPPORTED_LOCALES.includes(newLocale) ? newLocale : DEFAULT_LOCALE
+          }${location.pathname.slice(location.pathname.indexOf('/', 1))}${
+              Array.from(params).length > 0 ? `?${params}` : ''
+          }`
 }
 
 /**

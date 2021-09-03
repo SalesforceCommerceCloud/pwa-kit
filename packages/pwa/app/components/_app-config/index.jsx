@@ -21,7 +21,7 @@ import {
 } from '../../commerce-api/utils'
 import {commerceAPIConfig} from '../../commerce-api.config'
 import {einsteinAPIConfig} from '../../einstein-api.config'
-import {DEFAULT_LOCALE} from '../../locale'
+import {DEFAULT_LOCALE, SUPPORTED_LOCALES} from '../../locale'
 
 const apiConfig = {
     ...commerceAPIConfig,
@@ -37,8 +37,12 @@ const apiConfig = {
 const getLocale = (locals) => {
     const {originalUrl} = locals
 
+    const localeUrl = originalUrl && originalUrl.split('/')[1]
+
     return originalUrl
-        ? originalUrl.split('/')[1]
+        ? SUPPORTED_LOCALES.includes(localeUrl)
+            ? localeUrl
+            : DEFAULT_LOCALE
         : window?.__PRELOADED_STATE__?.appProps?.targetLocale
 }
 
