@@ -9,7 +9,7 @@ import {screen} from '@testing-library/react'
 
 import App from './index.jsx'
 import {renderWithProviders} from '../../utils/test-utils'
-import {DEFAULT_LOCALE} from '../../locale'
+import {DEFAULT_LOCALE} from '../../utils/locale'
 
 let windowSpy
 

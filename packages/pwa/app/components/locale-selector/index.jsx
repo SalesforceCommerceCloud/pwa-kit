@@ -33,7 +33,8 @@ import {
     FlagJPIcon
 } from '../../components/icons'
 
-import {DEFAULT_LOCALE, localesDefaultMessage} from '../../locale'
+import {localesDefaultMessage} from '../_app' // TODO: We should pass this in as a prop
+import {DEFAULT_LOCALE} from '../../utils/locale'
 import {useIntl} from 'react-intl'
 
 // NOTE: If you want to have flags shown next to a selectable locale, update this

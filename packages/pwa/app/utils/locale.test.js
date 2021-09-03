@@ -4,20 +4,15 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React from 'react'
+
 import {
     whichLocaleToLoad,
     getTargetLocale,
     loadLocaleData,
     SUPPORTED_LOCALES,
     DEFAULT_LOCALE,
-    useLocale,
     getLocaleConfig
 } from './locale'
-
-import {screen, fireEvent, act} from '@testing-library/react'
-import {FormattedMessage} from 'react-intl'
-import {renderWithReactIntl} from './utils/test-utils'
 
 const nonSupportedLocale = 'nl-NL'
 const supportedLocale = SUPPORTED_LOCALES[0]
@@ -27,24 +22,10 @@ const helloWorld = {
     messageId: 'homepage.message.welcome'
 }
 
-const SampleHomepage = () => {
-    const [, changeLocale] = useLocale()
-
-    return (
-        <div>
-            <h1>
-                {/* NOTE: Looks like we had to hardcode the values of these props, now that we're using babel-plugin-formatjs */}
-                <FormattedMessage id="homepage.message.welcome" defaultMessage="Hello World" />
-            </h1>
-            <button onClick={() => changeLocale('fr-FR')}>change locale</button>
-        </div>
-    )
-}
-
-test('our assumptions before further testing', () => {
-    expect(SUPPORTED_LOCALES.includes(nonSupportedLocale)).toBe(false)
-    expect(DEFAULT_LOCALE).toBe('en-GB')
-})
+// test('our assumptions before further testing', () => {
+//     expect(SUPPORTED_LOCALES.includes(nonSupportedLocale)).toBe(false)
+//     expect(DEFAULT_LOCALE).toBe('en-GB')
+// })
 
 describe('whichLocaleToLoad', () => {
     test('default to fallback locale', () => {
@@ -132,18 +113,5 @@ describe('getLocaleConfig', () => {
             getUserPreferredLocales: () => [locale]
         })
         expect(config.app.targetLocale).toBe(locale)
-    })
-})
-
-describe('useLocale', () => {
-    test('changing locale', async () => {
-        renderWithReactIntl(<SampleHomepage />)
-        expect(screen.getByText(helloWorld['en-GB'])).toBeInTheDocument()
-
-        act(() => {
-            fireEvent.click(screen.getByText('change locale'))
-        })
-        const newH1 = await screen.findByText(helloWorld['fr-FR'])
-        expect(newH1).toBeInTheDocument()
     })
 })

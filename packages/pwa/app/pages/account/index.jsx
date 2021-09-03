@@ -32,7 +32,6 @@ import AccountAddresses from './addresses'
 import AccountOrders from './orders'
 import AccountPaymentMethods from './payments'
 import AccountWishlist from './wishlist/index'
-import {useLocale} from '../../locale'
 import {useLocation} from 'react-router-dom'
 
 import {messages, navLinks} from './constant'
@@ -43,7 +42,7 @@ const Account = () => {
     const {path, url} = useRouteMatch()
     const {formatMessage} = useIntl()
     const customer = useCustomer()
-    const [locale] = useLocale()
+    const {locale} = useIntl()
     const location = useLocation()
     const navigate = useNavigation()
 

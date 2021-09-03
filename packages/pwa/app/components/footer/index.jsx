@@ -27,13 +27,13 @@ import {useIntl} from 'react-intl'
 import LinksList from '../links-list'
 import SocialIcons from '../social-icons'
 import {HideOnDesktop, HideOnMobile} from '../responsive'
-import {useLocale, SUPPORTED_LOCALES, localesDefaultMessage} from '../../locale'
+import {localesDefaultMessage} from '../_app' // TODO: We should pass this in as a prop?
+import {SUPPORTED_LOCALES} from '../../utils/locale'
 import {buildUrlLocale} from '../../utils/url'
 
 const Footer = ({...otherProps}) => {
     const styles = useMultiStyleConfig('Footer')
     const intl = useIntl()
-    const [activeLocale] = useLocale()
 
     return (
         <Box as="footer" {...styles.container} {...otherProps}>
@@ -125,10 +125,10 @@ const Footer = ({...otherProps}) => {
                             {...otherProps}
                         >
                             <Select
-                                value={activeLocale}
+                                value={intl.locale}
                                 onChange={({target}) => {
                                     // Update the `locale` in the URL.
-                                    const newUrl = buildUrlLocale(activeLocale, target.value)
+                                    const newUrl = buildUrlLocale(intl.locale, target.value)
                                     window.location = newUrl
                                 }}
                                 variant="filled"

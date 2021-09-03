@@ -4,12 +4,11 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useState, useContext} from 'react'
-import PropTypes from 'prop-types'
-import {defineMessages, IntlProvider as ReactIntlProvider} from 'react-intl'
-import packageInfo from '../package.json'
+
+import packageInfo from '../../package.json'
 
 // TODO: You can update these locales in 'pwa/package.json' file
+// TODO: Maybe this should be in the app/constants file?
 export const SUPPORTED_LOCALES = packageInfo.l10n.supportedLocales
 export const DEFAULT_LOCALE = packageInfo.l10n.defaultLocale
 
@@ -36,11 +35,11 @@ export const loadLocaleData = async (locale) => {
 
     let module
     try {
-        module = await import(`./translations/compiled/${localeToLoad}.json`)
+        module = await import(`../translations/compiled/${localeToLoad}.json`)
     } catch (err) {
         console.error(err)
         console.log(`Loading the default locale '${DEFAULT_LOCALE}' instead`)
-        module = await import(`./translations/compiled/${DEFAULT_LOCALE}.json`)
+        module = await import(`../translations/compiled/${DEFAULT_LOCALE}.json`)
     }
 
     return module.default
@@ -96,53 +95,3 @@ export const getTargetLocale = (preferredLocales, supportedLocales, defaultLocal
         whichLocaleToLoad(preferredLocales, supportedLocales, defaultLocale)
     )
 }
-
-const LocaleContext = React.createContext()
-
-export const IntlProvider = ({children, locale, messages, ...otherProps}) => {
-    const [activeLocale, setActiveLocale] = useState(locale)
-    const [activeMessages, setActiveMessages] = useState(messages)
-
-    // NOTE: if changing locale this way causes some issue in your app, you may want to
-    // consider doing it with a page refresh instead (by setting `window.location` with a localized URL)
-    const changeLocale = async (locale) => {
-        const newMessages = await loadLocaleData(locale)
-        setActiveMessages(newMessages)
-        setActiveLocale(locale)
-    }
-
-    return (
-        <ReactIntlProvider locale={activeLocale} messages={activeMessages} {...otherProps}>
-            <LocaleContext.Provider value={{activeLocale, changeLocale}}>
-                {children}
-            </LocaleContext.Provider>
-        </ReactIntlProvider>
-    )
-}
-IntlProvider.propTypes = {
-    children: PropTypes.node,
-    locale: PropTypes.string,
-    messages: PropTypes.object
-}
-
-/**
- * Custom React hook to get the currently active locale and to change it to a different locale
- * @returns {{activeLocale: string, changeLocale: function}[]}
- */
-export const useLocale = () => {
-    const {activeLocale, changeLocale} = useContext(LocaleContext)
-    return [activeLocale, changeLocale]
-}
-
-/**
- *  Default message for the supported locales.
- *  `locale` parameter format for OCAPI and Commerce API: <language code>-<country code>
- *  https://documentation.b2c.commercecloud.salesforce.com/DOC1/topic/com.demandware.dochelp/OCAPI/current/usage/Localization.html
- *  */
-export const localesDefaultMessage = defineMessages({
-    'en-GB': {defaultMessage: 'English (United Kingdom)'},
-    'fr-FR': {defaultMessage: 'French (France)'},
-    'it-IT': {defaultMessage: 'Italian (Italy)'},
-    'zh-CN': {defaultMessage: 'Chinese (China)'},
-    'ja-JP': {defaultMessage: 'Japanese (Japan)'}
-})

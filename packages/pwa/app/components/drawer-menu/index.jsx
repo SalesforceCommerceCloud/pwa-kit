@@ -52,7 +52,7 @@ import useCustomer from '../../commerce-api/hooks/useCustomer'
 import LoadingSpinner from '../loading-spinner'
 
 import useNavigation from '../../hooks/use-navigation'
-import {useLocale, SUPPORTED_LOCALES} from '../../locale'
+import {SUPPORTED_LOCALES} from '../../utils/locale'
 
 // The FONT_SIZES and FONT_WEIGHTS constants are used to control the styling for
 // the accordion buttons as their current depth. In the below definition we assign
@@ -92,7 +92,6 @@ const DrawerMenu = ({isOpen, onClose = noop, onLogoClick = noop, root}) => {
         navigate('/login')
         setShowLoading(false)
     }
-    const [activeLocale] = useLocale()
 
     return (
         <Drawer isOpen={isOpen} onClose={onClose} placement="left" size={drawerSize}>
@@ -256,11 +255,11 @@ const DrawerMenu = ({isOpen, onClose = noop, onLogoClick = noop, root}) => {
                             <Box>
                                 <LocaleSelector
                                     {...styles.localeSelector}
-                                    selectedLocale={activeLocale}
+                                    selectedLocale={intl.locale}
                                     locales={SUPPORTED_LOCALES}
-                                    onSelect={(locale) => {
+                                    onSelect={(newLocale) => {
                                         // Update the `locale` in the URL.
-                                        const newUrl = buildUrlLocale(activeLocale, locale)
+                                        const newUrl = buildUrlLocale(locale, newLocale)
                                         window.location = newUrl
                                     }}
                                 />

@@ -17,7 +17,6 @@ import Section from '../../components/section'
 import BasicTile from '../../components/basic-tile'
 import {categoriesThreeColumns, categoriesTwoColumns} from './data'
 import RecommendedProducts from '../../components/recommended-products'
-import {useLocale} from '../../locale'
 
 /**
  * This is the home page for Retail React App.
@@ -27,7 +26,6 @@ import {useLocale} from '../../locale'
  */
 const Home = () => {
     const intl = useIntl()
-    const [activeLocale] = useLocale()
 
     return (
         <Box data-testid="home-page" layerStyle="page">
@@ -50,7 +48,7 @@ const Home = () => {
                 actions={
                     <Button
                         as={Link}
-                        to={`/${activeLocale}/category/newarrivals`}
+                        to={`/${intl.locale}/category/newarrivals`}
                         width={{base: 'full', md: 'inherit'}}
                     >
                         <FormattedMessage defaultMessage="Shop New Arrivals" />
@@ -78,7 +76,9 @@ const Home = () => {
                             <GridItem key={index} rowSpan={1} colSpan={{base: 1, md: 2}}>
                                 <BasicTile
                                     title={intl.formatMessage(category.title)}
-                                    href={intl.formatMessage(category.href, {activeLocale})}
+                                    href={intl.formatMessage(category.href, {
+                                        activeLocale: intl.locale
+                                    })}
                                     img={{
                                         src: getAssetUrl(intl.formatMessage(category.imgSrc)),
                                         alt: intl.formatMessage(category.imgAlt)
@@ -94,7 +94,9 @@ const Home = () => {
                             <GridItem key={index} rowSpan={1} colSpan={{base: 1, md: 3}}>
                                 <BasicTile
                                     title={intl.formatMessage(category.title)}
-                                    href={intl.formatMessage(category.href, {activeLocale})}
+                                    href={intl.formatMessage(category.href, {
+                                        activeLocale: intl.locale
+                                    })}
                                     img={{
                                         src: getAssetUrl(intl.formatMessage(category.imgSrc)),
                                         alt: intl.formatMessage(category.imgAlt)

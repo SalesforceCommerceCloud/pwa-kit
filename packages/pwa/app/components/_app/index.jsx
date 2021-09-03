@@ -34,16 +34,32 @@ import useShopper from '../../commerce-api/hooks/useShopper'
 import useCustomer from '../../commerce-api/hooks/useCustomer'
 import {AuthModal, useAuthModal} from '../../hooks/use-auth-modal'
 
+// Localization
+import {defineMessages, IntlProvider} from 'react-intl'
+
 // Others
 import {watchOnlineStatus, flatten} from '../../utils/utils'
 import {homeUrlBuilder} from '../../utils/url'
-import {IntlProvider, getLocaleConfig} from '../../locale'
+import {getLocaleConfig} from '../../utils/locale'
 import {HOME_HREF} from '../../constants'
 
 import Seo from '../seo'
 
 const DEFAULT_NAV_DEPTH = 3
 const DEFAULT_ROOT_CATEGORY = 'root'
+
+/**
+ *  Default message for the supported locales.
+ *  `locale` parameter format for OCAPI and Commerce API: <language code>-<country code>
+ *  https://documentation.b2c.commercecloud.salesforce.com/DOC1/topic/com.demandware.dochelp/OCAPI/current/usage/Localization.html
+ *  */
+export const localesDefaultMessage = defineMessages({
+    'en-GB': {defaultMessage: 'English (United Kingdom)'},
+    'fr-FR': {defaultMessage: 'French (France)'},
+    'it-IT': {defaultMessage: 'Italian (Italy)'},
+    'zh-CN': {defaultMessage: 'Chinese (China)'},
+    'ja-JP': {defaultMessage: 'Japanese (Japan)'}
+})
 
 const App = (props) => {
     const {children, targetLocale, defaultLocale, messages, categories: allCategories = {}} = props
