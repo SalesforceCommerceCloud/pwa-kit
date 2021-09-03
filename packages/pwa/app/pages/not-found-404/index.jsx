@@ -11,6 +11,7 @@ import {Helmet} from 'react-helmet'
 import {useIntl} from 'react-intl'
 import {SearchIcon} from '../../components/icons'
 import {useHistory} from 'react-router-dom'
+import Link from '../../components/link'
 
 const NotFound404Page = () => {
     const intl = useIntl()
@@ -70,7 +71,7 @@ const NotFound404Page = () => {
                             defaultMessage: 'Back to previous page'
                         })}
                     </Button>
-                    <Button onClick={() => history.push('/')}>
+                    <Button as={Link} to={'/'}>
                         {intl.formatMessage({
                             defaultMessage: 'Go to home page'
                         })}
