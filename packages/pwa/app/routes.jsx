@@ -33,7 +33,7 @@ const LoginRedirect = loadable(() => import('./pages/login-redirect'), {fallback
 const ProductDetail = loadable(() => import('./pages/product-detail'), {fallback})
 const ProductList = loadable(() => import('./pages/product-list'), {fallback})
 const Wishlist = loadable(() => import('./pages/account/wishlist'), {fallback})
-const NotFound404Page = loadable(() => import('./pages/not-found-404'))
+const PageNotFound = loadable(() => import('./pages/page-not-found'))
 
 const routes = [
     {
@@ -98,7 +98,7 @@ const routes = [
     },
     {
         path: '*',
-        component: NotFound404Page
+        component: PageNotFound
     }
 ]
 
