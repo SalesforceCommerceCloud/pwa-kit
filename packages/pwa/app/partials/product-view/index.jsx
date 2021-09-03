@@ -312,7 +312,6 @@ const ProductView = ({
                             </Box>
                             <NumberInput
                                 onChange={(valueString) => {
-                                    console.log(valueString)
                                     setQuantity(parseInt(valueString))
                                 }}
                                 value={quantity}

@@ -225,9 +225,9 @@ test('ProductView Component renders with updateWishlist event handler', async ()
 test('Product View can update quantity', () => {
     const addToCart = jest.fn()
     renderWithProviders(<MockComponent product={mockProductDetail} addToCart={addToCart} />)
-    const quantityBox = screen.getByRole('combobox')
+    const quantityBox = screen.getByRole('spinbutton')
     expect(quantityBox).toHaveValue('1')
     // update item quantity
-    userEvent.selectOptions(quantityBox, ['3'])
+    userEvent.type(quantityBox, '{backspace}3')
     expect(quantityBox).toHaveValue('3')
 })
