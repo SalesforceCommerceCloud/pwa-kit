@@ -25,7 +25,7 @@ const PageNotFound = () => {
         >
             <Helmet>
                 <title>
-                    {intl.formatMessage({defaultMessage: "Sorry, we couldn't find this page"})}
+                    {intl.formatMessage({defaultMessage: 'Sorry, we couldn’t find this page.'})}
                 </title>
             </Helmet>
 
@@ -41,14 +41,14 @@ const PageNotFound = () => {
                 <SearchIcon boxSize={['30px', '32px']} mb={8} />
                 <Heading as="h2" fontSize={['xl', '2xl', '2xl', '3xl']} mb={2}>
                     {intl.formatMessage({
-                        defaultMessage: "Sorry, we couldn't find this page"
+                        defaultMessage: 'Sorry, we couldn’t find this page.'
                     })}
                 </Heading>
                 <Box>
                     <Text textAlign="center">
                         {intl.formatMessage({
                             defaultMessage:
-                                'We’ve move a lot of stuff around, and it must’ve gotten lost in the mix. '
+                                'We’ve moved a lot of stuff around, and it must’ve gotten lost in the mix.'
                         })}
                     </Text>
                 </Box>
@@ -56,7 +56,7 @@ const PageNotFound = () => {
                     <Text textAlign="center">
                         {intl.formatMessage({
                             defaultMessage:
-                                'Please try retyping the address, head back to the previous page or go home.'
+                                'Please try retyping the address, going back to the previous page, or going to the home page.'
                         })}
                     </Text>
                 </Box>
