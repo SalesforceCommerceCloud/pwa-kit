@@ -5,12 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import packageInfo from '../../package.json'
-
-// TODO: You can update these locales in 'pwa/package.json' file
-// TODO: Maybe this should be in the app/constants file?
-export const SUPPORTED_LOCALES = packageInfo.l10n.supportedLocales
-export const DEFAULT_LOCALE = packageInfo.l10n.defaultLocale
+import {SUPPORTED_LOCALES, DEFAULT_LOCALE} from '../constants'
 
 /**
  * Dynamically import the translations/messages for a given locale

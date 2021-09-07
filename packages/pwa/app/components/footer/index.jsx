@@ -27,8 +27,8 @@ import {useIntl} from 'react-intl'
 import LinksList from '../links-list'
 import SocialIcons from '../social-icons'
 import {HideOnDesktop, HideOnMobile} from '../responsive'
-import {localesDefaultMessage} from '../_app' // TODO: We should pass this in as a prop?
-import {SUPPORTED_LOCALES} from '../../utils/locale'
+import {defaultLocaleMessages} from '../_app' // TODO: We should pass this in as a prop?
+import {SUPPORTED_LOCALES} from '../../constants'
 import {buildUrlLocale} from '../../utils/url'
 
 const Footer = ({...otherProps}) => {
@@ -136,7 +136,7 @@ const Footer = ({...otherProps}) => {
                             >
                                 {SUPPORTED_LOCALES.map((locale) => (
                                     <option key={locale} value={locale}>
-                                        {intl.formatMessage(localesDefaultMessage[locale])}
+                                        {intl.formatMessage(defaultLocaleMessages[locale])}
                                     </option>
                                 ))}
                             </Select>

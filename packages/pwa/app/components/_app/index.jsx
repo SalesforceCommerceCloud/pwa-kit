@@ -53,9 +53,7 @@ const DEFAULT_ROOT_CATEGORY = 'root'
  *  `locale` parameter format for OCAPI and Commerce API: <language code>-<country code>
  *  https://documentation.b2c.commercecloud.salesforce.com/DOC1/topic/com.demandware.dochelp/OCAPI/current/usage/Localization.html
  *  */
-
-// TODO: Maybe we call defaultLocaleMessages?
-export const localesDefaultMessage = defineMessages({
+export const defaultLocaleMessages = defineMessages({
     'en-GB': {defaultMessage: 'English (United Kingdom)'},
     'fr-FR': {defaultMessage: 'French (France)'},
     'it-IT': {defaultMessage: 'Italian (Italy)'},

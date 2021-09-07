@@ -33,8 +33,8 @@ import {
     FlagJPIcon
 } from '../../components/icons'
 
-import {localesDefaultMessage} from '../_app' // TODO: We should pass this in as a prop
-import {DEFAULT_LOCALE} from '../../utils/locale'
+import {defaultLocaleMessages} from '../_app' // TODO: We should pass this in as a prop
+import {DEFAULT_LOCALE} from '../../constants'
 import {useIntl} from 'react-intl'
 
 // NOTE: If you want to have flags shown next to a selectable locale, update this
@@ -77,7 +77,7 @@ const LocaleSelector = ({
                                 {/* Display flag icon if one exists */}
                                 {flags[selectedLocale]}
                                 <Text {...styles.selectedText}>
-                                    {intl.formatMessage(localesDefaultMessage[selectedLocale])}
+                                    {intl.formatMessage(defaultLocaleMessages[selectedLocale])}
                                 </Text>
                             </AccordionButton>
                             <AccordionPanel>
@@ -94,7 +94,7 @@ const LocaleSelector = ({
                                                 {/* Locale name */}
                                                 <Text {...styles.optionText}>
                                                     {intl.formatMessage(
-                                                        localesDefaultMessage[locale]
+                                                        defaultLocaleMessages[locale]
                                                     )}
                                                 </Text>
 

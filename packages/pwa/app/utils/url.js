@@ -5,8 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {DEFAULT_LOCALE, SUPPORTED_LOCALES} from './locale'
-import {HOME_HREF} from '../constants'
+import {HOME_HREF, DEFAULT_LOCALE, SUPPORTED_LOCALES} from '../constants'
 
 /**
  * Modifies a given url by adding/updating query parameters.

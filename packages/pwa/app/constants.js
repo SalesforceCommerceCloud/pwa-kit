@@ -6,6 +6,8 @@
  */
 
 // Constants used in the used for product searching.
+import packageInfo from '../package.json'
+
 export const DEFAULT_SEARCH_PARAMS = {limit: 25, offset: 0, sort: 'best-matches', refine: []}
 export const DEFAULT_LIMIT_VALUES = [25, 50, 100] // Page sizes
 
@@ -46,3 +48,7 @@ export const FILTER_ACCORDION_SATE = 'filters-expanded-index'
 export const API_ERROR_MESSAGE = 'Something went wrong. Try again!'
 
 export const HOME_HREF = '/'
+
+// TODO: You can update these locales in 'pwa/package.json' file
+export const SUPPORTED_LOCALES = packageInfo.l10n.supportedLocales
+export const DEFAULT_LOCALE = packageInfo.l10n.defaultLocale

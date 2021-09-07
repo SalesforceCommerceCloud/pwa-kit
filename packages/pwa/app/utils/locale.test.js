@@ -5,27 +5,18 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {
-    whichLocaleToLoad,
-    getTargetLocale,
-    loadLocaleData,
-    SUPPORTED_LOCALES,
-    DEFAULT_LOCALE,
-    getLocaleConfig
-} from './locale'
+import {whichLocaleToLoad, getTargetLocale, loadLocaleData, getLocaleConfig} from './locale'
+
+import {SUPPORTED_LOCALES, DEFAULT_LOCALE} from '../constants'
 
 const nonSupportedLocale = 'nl-NL'
 const supportedLocale = SUPPORTED_LOCALES[0]
-const helloWorld = {
-    'en-GB': 'Hello World',
-    'fr-FR': 'Bonjour le monde',
-    messageId: 'homepage.message.welcome'
-}
+const testMessageId = 'login-redirect.message.welcome'
 
-// test('our assumptions before further testing', () => {
-//     expect(SUPPORTED_LOCALES.includes(nonSupportedLocale)).toBe(false)
-//     expect(DEFAULT_LOCALE).toBe('en-GB')
-// })
+test('our assumptions before further testing', () => {
+    expect(SUPPORTED_LOCALES.includes(nonSupportedLocale)).toBe(false)
+    expect(DEFAULT_LOCALE).toBe('en-GB')
+})
 
 describe('whichLocaleToLoad', () => {
     test('default to fallback locale', () => {
@@ -65,29 +56,28 @@ describe('getTargetLocale', () => {
 })
 
 describe('loadLocaleData', () => {
-    const messageId = helloWorld.messageId
-
     test('default to English as the fallback locale', async () => {
         const messages = await loadLocaleData(nonSupportedLocale)
-        expect(messages[messageId][0].value).toMatch(/hello world/i)
+        console.log('messages: ', messages)
+        expect(messages[testMessageId][0].value).toMatch(/login redirect/i)
     })
     test('loading one of the supported locales', async () => {
         const messages = await loadLocaleData(supportedLocale)
-        expect(messages[messageId]).toBeDefined()
+        expect(messages[testMessageId]).toBeDefined()
     })
     test('loading the pseudo locale', async () => {
         const messages = await loadLocaleData('pseudo')
-        expect(messages[messageId][0].value).toMatch(/^\[!! Ḣèĺĺĺĺŏ Ẅŏŕŕŕĺḋ !!\]$/)
+        expect(messages[testMessageId][0].value).toMatch(/^\[!! Ļŏĝĝĝíń Ŕèḋḋḋíŕèèèćṭ !!]$/)
     })
     test('handling a not-found translation file', async () => {
         expect(SUPPORTED_LOCALES[1]).not.toBe(DEFAULT_LOCALE)
 
-        jest.mock(`./translations/compiled/${SUPPORTED_LOCALES[1]}.json`, () => {
+        jest.mock(`../translations/compiled/${SUPPORTED_LOCALES[1]}.json`, () => {
             throw new Error()
         })
 
         let importDefaultLocale = false
-        jest.mock(`./translations/compiled/${DEFAULT_LOCALE}.json`, () => {
+        jest.mock(`../translations/compiled/${DEFAULT_LOCALE}.json`, () => {
             importDefaultLocale = true
         })
 
@@ -95,8 +85,8 @@ describe('loadLocaleData', () => {
         expect(importDefaultLocale).toBe(true)
 
         // Reset
-        jest.unmock(`./translations/compiled/${SUPPORTED_LOCALES[1]}.json`)
-        jest.unmock(`./translations/compiled/${DEFAULT_LOCALE}.json`)
+        jest.unmock(`../translations/compiled/${SUPPORTED_LOCALES[1]}.json`)
+        jest.unmock(`../translations/compiled/${DEFAULT_LOCALE}.json`)
     })
 })
 
