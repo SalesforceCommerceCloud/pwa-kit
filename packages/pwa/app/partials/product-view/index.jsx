@@ -33,12 +33,10 @@ import ImageGallery from '../../components/image-gallery'
 import Breadcrumb from '../../components/breadcrumb'
 import Link from '../../components/link'
 import withRegistration from '../../hoc/with-registration'
-import {DEFAULT_CURRENCY} from '../../constants'
+import {DEFAULT_CURRENCY, MAX_ORDER_QUANTITY} from '../../constants'
 import {Skeleton as ImageGallerySkeleton} from '../../components/image-gallery'
 import AddToCartModal from '../../components/add-to-cart-modal'
 import RecommendedProducts from '../../components/recommended-products'
-
-const MAX_ORDER_QUANTITY = 10
 
 const ProductViewHeader = ({name, price, currency, category}) => {
     const intl = useIntl()
