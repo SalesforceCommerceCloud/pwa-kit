@@ -29,8 +29,11 @@ import CartItemVariantAttributes from '../cart-item-variant/item-attributes'
 import CartItemVariantPrice from '../cart-item-variant/item-price'
 import LoadingSpinner from '../loading-spinner'
 import {noop} from '../../utils/utils'
+
 import {HideOnDesktop, HideOnMobile} from '../responsive'
 import {MAX_ORDER_QUANTITY} from '../../constants'
+
+import {useProduct} from '../../hooks'
 
 /**
  * Component representing a product item usually in a list with details about the product - name, variant, pricing, etc.
@@ -48,6 +51,7 @@ const ProductItem = ({
     onItemQuantityChange = noop,
     showLoading = false
 }) => {
+    const {stepQuantity, stockLevel} = useProduct(product)
     // Mobile Quantity Stepper Logic
     const {getInputProps, getIncrementButtonProps, getDecrementButtonProps} = useNumberInput({
         step: 1,
@@ -86,6 +90,7 @@ const ProductItem = ({
                                     <Text fontSize="sm" color="gray.700">
                                         <FormattedMessage defaultMessage="Quantity:" />
                                     </Text>
+
                                     <HideOnMobile>
                                         <NumberInput
                                             width="100px"

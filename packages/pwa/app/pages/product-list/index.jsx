@@ -227,6 +227,10 @@ const ProductList = (props) => {
     // Toggles filter on and off
     const toggleFilter = (value, attributeId, selected, allowMultiple = true) => {
         const searchParamsCopy = {...searchParams}
+
+        // Remove the `offset` search param if present.
+        delete searchParamsCopy.offset
+
         // If we aren't allowing for multiple selections, simply clear any value set for the
         // attribute, and apply a new one if required.
         if (!allowMultiple) {
