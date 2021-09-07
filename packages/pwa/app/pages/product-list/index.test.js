@@ -183,7 +183,7 @@ test('clicking a filter will change url', async () => {
     user.click(screen.getByText(/Beige/i))
     await waitFor(() =>
         expect(window.location.search).toEqual(
-            '?limit=25&offset=0&refine=c_refinementColor%3DBeige&sort=best-matches'
+            '?limit=25&refine=c_refinementColor%3DBeige&sort=best-matches'
         )
     )
 })
