@@ -313,11 +313,15 @@ const ProductView = ({
                                     setQuantity(parseInt(target.value))
                                 }}
                             >
-                                {new Array(MAX_ORDER_QUANTITY).fill(0).map((_, index) => (
-                                    <option key={index} value={index + stepQuantity}>
-                                        {index + stepQuantity}
-                                    </option>
-                                ))}
+                                {new Array(MAX_ORDER_QUANTITY).fill(0).map((_, index) => {
+                                    if ((index + 1) % stepQuantity === 0) {
+                                        return (
+                                            <option key={index} value={index + 1}>
+                                                {index + 1}
+                                            </option>
+                                        )
+                                    }
+                                })}
                             </Select>
                         </VStack>
                     </VStack>

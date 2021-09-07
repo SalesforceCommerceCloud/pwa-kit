@@ -58,11 +58,15 @@ const ProductItem = ({
                                         value={product.quantity}
                                         width="75px"
                                     >
-                                        {new Array(stockLevel).fill(0).map((_, index) => (
-                                            <option key={index} value={index + stepQuantity}>
-                                                {index + stepQuantity}
-                                            </option>
-                                        ))}
+                                        {new Array(stockLevel).fill(0).map((_, index) => {
+                                            if ((index + 1) % stepQuantity === 0) {
+                                                return (
+                                                    <option key={index} value={index + 1}>
+                                                        {index + 1}
+                                                    </option>
+                                                )
+                                            }
+                                        })}
                                     </Select>
                                 </Stack>
                                 <Stack>
