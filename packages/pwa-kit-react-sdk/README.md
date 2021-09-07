@@ -17,40 +17,6 @@ A library of components and utilities that supports the rendering pipeline for t
 npm i
 ```
 
-## Marking public API functions as experimental or deprecated
-
-To mark a function as experimental or deprecated in code, you can use the utility functions `experimental()` or `deprecate()` from `progressive-web-sdk/src/utils/warnings` within your experimental/deprecated function. This will prompt a warning in the browser whenever your function is used. You can add an additional custom message to the warning by passing a string into the first parameter.
-
-Example usage:
-
-```javascript
-import {experimental} from './utils/warnings'
-
-someExperimentalFunction() => {
-  // regular usage
-  experimental()
-
-  // the function implementation
-}
-```
-
-This is the warning that will print in your browser:
-`[PWA Kit API WARNING]: You are currently using an experimental function: [someExperimentalFunction] This function may change at any time.`
-
-```javascript
-import {deprecate} from './utils/warnings'
-
-someFunctionToBeDeprecated() => {
-  // with custom message
-  deprecate("It will be removed in version 1.2.3. Please use [newFunction] instead.")
-
-  // the function implementation
-}
-```
-
-This is the warning that will print in your browser:
-`[PWA Kit API WARNING]: You are currently using an deprecated function: [someFunctionToBeDeprecated]. It will be removed in version 1.2.3. Please use [newFunction] instead.`
-
 ## Documentation
 
 The full documentation for PWA Kit is hosted on the [Commerce Cloud Developer Center](https://developer.commercecloud.com/s/article/PWA-Kit).
