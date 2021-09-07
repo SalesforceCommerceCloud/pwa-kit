@@ -25,33 +25,26 @@ const PageNotFound = () => {
         >
             <Helmet>
                 <title>
-                    {intl.formatMessage({defaultMessage: 'Sorry, we couldn’t find this page'})}
+                    {intl.formatMessage({
+                        defaultMessage: "The page you're looking for can't be found"
+                    })}
                 </title>
             </Helmet>
 
             <Flex
                 h="100%"
-                bgColor="gray.50"
                 justify="center"
                 align="center"
                 flexDirection="column"
                 px={{base: 5, md: 12}}
-                py={20}
+                py={{base: 48, md: 60}}
             >
                 <SearchIcon boxSize={['30px', '32px']} mb={8} />
-                <Heading as="h2" fontSize={['xl', '2xl', '2xl', '3xl']} mb={2}>
+                <Heading as="h2" fontSize={['xl', '2xl', '2xl', '3xl']} mb={2} align="center">
                     {intl.formatMessage({
-                        defaultMessage: 'Sorry, we couldn’t find this page'
+                        defaultMessage: "The page you're looking for can't be found"
                     })}
                 </Heading>
-                <Box>
-                    <Text textAlign="center">
-                        {intl.formatMessage({
-                            defaultMessage:
-                                'We’ve moved a lot of stuff around, and it must’ve gotten lost in the mix.'
-                        })}
-                    </Text>
-                </Box>
                 <Box mb={12}>
                     <Text textAlign="center">
                         {intl.formatMessage({
