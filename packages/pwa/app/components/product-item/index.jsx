@@ -54,10 +54,16 @@ const ProductItem = ({
     const {stepQuantity, stockLevel} = useProduct(product)
     // Mobile Quantity Stepper Logic
     const {getInputProps, getIncrementButtonProps, getDecrementButtonProps} = useNumberInput({
+        keepWithinRange: false,
+        clampValueOnBlur: false,
         step: 1,
         min: 1,
         max: MAX_ORDER_QUANTITY,
-        onChange: (valueString) => onItemQuantityChange(valueString)
+        // onChange: (valueString) => onItemQuantityChange(valueString),
+        onBlur: (event) => {
+            console.log(event.target.value)
+        },
+        defaultValue: product.quantity
     })
 
     const inc = getIncrementButtonProps()
@@ -90,7 +96,7 @@ const ProductItem = ({
                                     <Text fontSize="sm" color="gray.700">
                                         <FormattedMessage defaultMessage="Quantity:" />
                                     </Text>
-
+                                    {/* 
                                     <HideOnMobile>
                                         <NumberInput
                                             width="100px"
@@ -108,13 +114,13 @@ const ProductItem = ({
                                             </NumberInputStepper>
                                         </NumberInput>
                                     </HideOnMobile>
-                                    <HideOnDesktop>
-                                        <HStack maxW="80%">
-                                            <Button {...dec}>-</Button>
-                                            <Input {...input} value={product.quantity} />
-                                            <Button {...inc}>+</Button>
-                                        </HStack>
-                                    </HideOnDesktop>
+                                    <HideOnDesktop> */}
+                                    <HStack maxW="80%">
+                                        <Button {...dec}>-</Button>
+                                        <Input {...input} />
+                                        <Button {...inc}>+</Button>
+                                    </HStack>
+                                    {/* </HideOnDesktop> */}
                                 </Stack>
                                 <Stack>
                                     <HideOnMobile>
