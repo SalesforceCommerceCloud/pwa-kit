@@ -294,14 +294,11 @@ test('Can proceed through checkout steps as guest', async () => {
     renderWithProviders(<WrappedCheckout history={history} />)
 
     // Wait for checkout to load and display first step
-    const guestCheckoutBtn = await screen.findByText(/checkout as guest/i)
+    await screen.findByText(/checkout as guest/i)
 
     // Verify cart products display
     user.click(screen.getByText(/2 items in cart/i))
     expect(await screen.findByText(/Long Sleeve Crew Neck/i)).toBeInTheDocument
-
-    // Switch to guest checkout
-    user.click(guestCheckoutBtn)
 
     // Provide customer email and submit
     const emailInput = screen.getByLabelText(/email/i)
@@ -527,6 +524,10 @@ test('Can proceed through checkout as registered customer', async () => {
     window.history.pushState({}, 'Checkout', '/en-GB/checkout')
     renderWithProviders(<WrappedCheckout history={history} />)
 
+    // Switch to login
+    const haveAccountButton = await screen.findByText(/already have an account/i)
+    user.click(haveAccountButton)
+
     // Wait for checkout to load and display first step
     const loginBtn = await screen.findByText(/log in/i)
 
@@ -680,6 +681,10 @@ test('Can edit address during checkout as a registered customer', async () => {
     window.history.pushState({}, 'Checkout', '/en-GB/checkout')
     renderWithProviders(<WrappedCheckout history={history} />)
 
+    // Switch to login
+    const haveAccountButton = await screen.findByText(/already have an account/i)
+    user.click(haveAccountButton)
+
     // Wait for checkout to load and display first step
     const loginBtn = await screen.findByText(/log in/i)
 
@@ -802,6 +807,10 @@ test('Can add address during checkout as a registered customer', async () => {
     // Set the initial browser router path and render our component tree.
     window.history.pushState({}, 'Checkout', '/en-GB/checkout')
     renderWithProviders(<WrappedCheckout history={history} />)
+
+    // Switch to login
+    const haveAccountButton = await screen.findByText(/already have an account/i)
+    user.click(haveAccountButton)
 
     // Wait for checkout to load and display first step
     const loginBtn = await screen.findByText(/log in/i)

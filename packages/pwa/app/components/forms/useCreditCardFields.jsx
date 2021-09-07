@@ -38,6 +38,9 @@ export default function useCreditCardFields({form: {control, errors}, prefix = '
                     cardValidator.number(value).isValid || formatMessage(messages.cardNumberInvalid)
             },
             error: errors[`${prefix}number`],
+            inputProps: {
+                inputmode: 'numeric'
+            },
             control
         },
         cardType: {
@@ -79,6 +82,9 @@ export default function useCreditCardFields({form: {control, errors}, prefix = '
                     formatMessage(messages.dateInvalid)
             },
             error: errors[`${prefix}expiry`],
+            inputProps: {
+                inputmode: 'numeric'
+            },
             control
         },
         securityCode: {
@@ -95,6 +101,7 @@ export default function useCreditCardFields({form: {control, errors}, prefix = '
             },
             error: errors[`${prefix}securityCode`],
             inputProps: ({onChange}) => ({
+                inputmode: 'numeric',
                 maxLength: 4,
                 onChange(evt) {
                     onChange(evt.target.value.replace(/[^0-9 ]+/, ''))
