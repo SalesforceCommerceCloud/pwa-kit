@@ -129,9 +129,9 @@ const App = (props) => {
             <IntlProvider
                 onError={(err) => {
                     if (err.code === 'MISSING_TRANSLATION') {
-                        // Remove the console error for missing translations during development,
+                        // NOTE: Remove the console error for missing translations during development,
                         // as we knew translations would be added later.
-                        // console.warn('Missing translation', err.message)
+                        console.warn('Missing translation', err.message)
                         return
                     }
                     throw err
