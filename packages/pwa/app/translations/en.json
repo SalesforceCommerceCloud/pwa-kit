@@ -17,6 +17,9 @@
   "0g/1TG": {
     "defaultMessage": "Continue to Payment"
   },
+  "0nWAOY": {
+    "defaultMessage": "Go to home page"
+  },
   "0yGJXJ": {
     "defaultMessage": "Password must contain at least one lowercase letter"
   },
@@ -100,6 +103,9 @@
   },
   "7xscgD": {
     "defaultMessage": "Delivery Details"
+  },
+  "8+0PQZ": {
+    "defaultMessage": "The page you're looking for can't be found"
   },
   "8d6kio": {
     "defaultMessage": "Sort By"
@@ -261,6 +267,9 @@
   },
   "NTgwLi": {
     "defaultMessage": "Place Order"
+  },
+  "NV26qx": {
+    "defaultMessage": "Back to previous page"
   },
   "NymXNv": {
     "defaultMessage": "New Payment Method Saved"
@@ -452,6 +461,9 @@
   },
   "c+bH65": {
     "defaultMessage": "Confirm Action"
+  },
+  "c0a6lZ": {
+    "defaultMessage": "Please try retyping the address, going back to the previous page, or going to the home page."
   },
   "c1zaMK": {
     "defaultMessage": "Please enter your address"
