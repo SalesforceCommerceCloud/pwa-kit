@@ -33,4 +33,4 @@ The team periodically closes any abandoned pull requests that they find.
 
 ## Contributor License Agreement (CLA)
 
-All external contributors must sign the [Contributor License Agreement](https://cla.salesforce.com/sign-cla) (CLA).
+All external contributors must sign the [Contributor License Agreement](https://cla.salesforce.com/sign-cla) (CLA). A prompt to sign the agreement appears whenever a pull request is submitted.
