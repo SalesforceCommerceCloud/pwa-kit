@@ -33,7 +33,7 @@ import {
     FlagJPIcon
 } from '../../components/icons'
 
-import {defaultLocaleMessages} from '../_app' // TODO: We should pass this in as a prop
+import {defaultLocaleMessages} from '../_app'
 import {DEFAULT_LOCALE} from '../../constants'
 import {useIntl} from 'react-intl'
 

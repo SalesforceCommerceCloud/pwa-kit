@@ -27,7 +27,7 @@ import {useIntl} from 'react-intl'
 import LinksList from '../links-list'
 import SocialIcons from '../social-icons'
 import {HideOnDesktop, HideOnMobile} from '../responsive'
-import {defaultLocaleMessages} from '../_app' // TODO: We should pass this in as a prop?
+import {defaultLocaleMessages} from '../_app'
 import {SUPPORTED_LOCALES} from '../../constants'
 import {buildUrlLocale} from '../../utils/url'
 
