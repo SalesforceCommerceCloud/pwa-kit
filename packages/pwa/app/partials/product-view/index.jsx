@@ -38,8 +38,6 @@ import {Skeleton as ImageGallerySkeleton} from '../../components/image-gallery'
 import AddToCartModal from '../../components/add-to-cart-modal'
 import RecommendedProducts from '../../components/recommended-products'
 
-const MAX_ORDER_QUANTITY = 10
-
 const ProductViewHeader = ({name, price, currency, category}) => {
     const intl = useIntl()
     return (
@@ -315,11 +313,13 @@ const ProductView = ({
                                     setQuantity(parseInt(target.value))
                                 }}
                             >
-                                {new Array(MAX_ORDER_QUANTITY).fill(0).map((_, index) => (
-                                    <option key={index} value={index + stepQuantity}>
-                                        {index + stepQuantity}
-                                    </option>
-                                ))}
+                                {new Array(Math.floor(stockLevel / stepQuantity))
+                                    .fill(0)
+                                    .map((_, index) => (
+                                        <option key={index} value={(index + 1) * stepQuantity}>
+                                            {(index + 1) * stepQuantity}
+                                        </option>
+                                    ))}
                             </Select>
                         </VStack>
                     </VStack>
