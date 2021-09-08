@@ -260,7 +260,9 @@ App.getProps = async ({api}) => {
     if (rootCategory.isError) {
         const message =
             rootCategory.title === 'Unsupported Locale'
-                ? '' + rootCategory.detail
+                ? `Hey! It looks like the locale \`en-GB\` isn't enabled. Either enable it in business manager by following this document
+https://documentation.b2c.commercecloud.salesforce.com/DOC2/topic/com.demandware.dochelp/content/b2c_commerce/topics/admin/b2c_configuring_site_locales.html, 
+or following the steps for setting up a different locale defined in your projects README file.`
                 : rootCategory.detail
         throw new Error(message)
     }
