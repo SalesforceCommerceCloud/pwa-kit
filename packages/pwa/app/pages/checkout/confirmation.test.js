@@ -252,13 +252,13 @@ beforeAll(() => {
 
     // Since we're testing some navigation logic, we are using a simple Router
     // around our component. We need to initialize the default route/path here.
-    window.history.pushState({}, 'Account', '/en/account')
+    window.history.pushState({}, 'Account', '/en-GB/account')
 })
 afterEach(() => {
     localStorage.clear()
     sessionStorage.clear()
     server.resetHandlers()
-    window.history.pushState({}, 'Account', '/en/account')
+    window.history.pushState({}, 'Account', '/en-GB/account')
 })
 afterAll(() => server.close())
 
@@ -331,6 +331,6 @@ test('Create Account form - successful submission results in redirect to the Acc
     user.click(createAccountButton)
 
     await waitFor(() => {
-        expect(window.location.pathname).toEqual('/en/account')
+        expect(window.location.pathname).toEqual('/en-GB/account')
     })
 })

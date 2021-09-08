@@ -15,6 +15,7 @@ import CartItemVariantAttributes from '../cart-item-variant/item-attributes'
 import CartItemVariantPrice from '../cart-item-variant/item-price'
 import LoadingSpinner from '../loading-spinner'
 import {noop} from '../../utils/utils'
+import {useProduct} from '../../hooks'
 
 /**
  * Component representing a product item usually in a list with details about the product - name, variant, pricing, etc.
@@ -32,6 +33,7 @@ const ProductItem = ({
     onItemQuantityChange = noop,
     showLoading = false
 }) => {
+    const {stepQuantity, stockLevel} = useProduct(product)
     return (
         <Box position="relative" data-testid={`sf-cart-item-${product.productId}`}>
             <CartItemVariant variant={product}>
@@ -56,15 +58,15 @@ const ProductItem = ({
                                         value={product.quantity}
                                         width="75px"
                                     >
-                                        <option value="1">1</option>
-                                        <option value="2">2</option>
-                                        <option value="3">3</option>
-                                        <option value="4">4</option>
-                                        <option value="5">5</option>
-                                        <option value="6">6</option>
-                                        <option value="7">7</option>
-                                        <option value="8">8</option>
-                                        <option value="9">9</option>
+                                        {new Array(stockLevel).fill(0).map((_, index) => {
+                                            if ((index + 1) % stepQuantity === 0) {
+                                                return (
+                                                    <option key={index} value={index + 1}>
+                                                        {index + 1}
+                                                    </option>
+                                                )
+                                            }
+                                        })}
                                     </Select>
                                 </Stack>
                                 <Stack>

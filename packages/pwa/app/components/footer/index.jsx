@@ -19,13 +19,17 @@ import {
     Input,
     InputGroup,
     InputRightElement,
-    Button
+    Button,
+    FormControl
 } from '@chakra-ui/react'
 import {useIntl} from 'react-intl'
 
 import LinksList from '../links-list'
 import SocialIcons from '../social-icons'
 import {HideOnDesktop, HideOnMobile} from '../responsive'
+import {defaultLocaleMessages} from '../_app'
+import {SUPPORTED_LOCALES} from '../../constants'
+import {buildUrlLocale} from '../../utils/url'
 
 const Footer = ({...otherProps}) => {
     const styles = useMultiStyleConfig('Footer')
@@ -114,12 +118,29 @@ const Footer = ({...otherProps}) => {
                     </HideOnDesktop>
 
                     <Box {...styles.localeSelector}>
-                        <Select variant="filled" {...styles.localeDropdown}>
-                            {/* TODO: how to localize this locale selector */}
-                            <option value="en-US">USA (English)</option>
-                            <option value="en-CA">Canada (English)</option>
-                            <option value="fr-CA">Canada (French)</option>
-                        </Select>
+                        <FormControl
+                            data-testid="sf-footer-locale-selector"
+                            id="locale_selector"
+                            width="auto"
+                            {...otherProps}
+                        >
+                            <Select
+                                value={intl.locale}
+                                onChange={({target}) => {
+                                    // Update the `locale` in the URL.
+                                    const newUrl = buildUrlLocale(intl.locale, target.value)
+                                    window.location = newUrl
+                                }}
+                                variant="filled"
+                                {...styles.localeDropdown}
+                            >
+                                {SUPPORTED_LOCALES.map((locale) => (
+                                    <option key={locale} value={locale}>
+                                        {intl.formatMessage(defaultLocaleMessages[locale])}
+                                    </option>
+                                ))}
+                            </Select>
+                        </FormControl>
                     </Box>
 
                     <Divider {...styles.horizontalRule} />
