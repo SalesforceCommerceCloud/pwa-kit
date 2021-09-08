@@ -37,11 +37,12 @@ import {DEFAULT_CURRENCY} from '../../constants'
 import {Skeleton as ImageGallerySkeleton} from '../../components/image-gallery'
 import AddToCartModal from '../../components/add-to-cart-modal'
 import RecommendedProducts from '../../components/recommended-products'
+import {HideOnDesktop, HideOnMobile} from '../../components/responsive'
 
 const ProductViewHeader = ({name, price, currency, category}) => {
     const intl = useIntl()
     return (
-        <VStack mr={4} spacing={2} align="flex-start">
+        <VStack mr={4} spacing={2} align="flex-start" marginBottom={[4, 4, 4, 0, 0]}>
             {category && (
                 <Skeleton isLoaded={category} width={64}>
                     <Breadcrumb categories={category} />
@@ -50,9 +51,7 @@ const ProductViewHeader = ({name, price, currency, category}) => {
 
             {/* Title */}
             <Skeleton isLoaded={name}>
-                <Heading as="h2" size="lg">
-                    {`${name}`}
-                </Heading>
+                <Heading fontSize="2xl">{`${name}`}</Heading>
             </Skeleton>
 
             {/* Price */}
@@ -196,7 +195,7 @@ const ProductView = ({
                 />
             </Box>
             <Flex direction={['column', 'column', 'column', 'row']}>
-                <Box flex={2} mr={[0, 0, 4, 4]}>
+                <Box flex={1} mr={[0, 0, 0, 6, 6]}>
                     {product ? (
                         <>
                             <ImageGallery
@@ -204,13 +203,17 @@ const ProductView = ({
                                 imageGroups={product.imageGroups}
                                 selectedVariationAttributes={variationParams}
                             />
-                            {showFullLink && product && (
-                                <Link to={`/product/${product.master.masterId}`}>
-                                    <Text color="blue.600">
-                                        {intl.formatMessage({defaultMessage: 'See full details'})}
-                                    </Text>
-                                </Link>
-                            )}
+                            <HideOnMobile>
+                                {showFullLink && product && (
+                                    <Link to={`/product/${product.master.masterId}`}>
+                                        <Text color="blue.600">
+                                            {intl.formatMessage({
+                                                defaultMessage: 'See full details'
+                                            })}
+                                        </Text>
+                                    </Link>
+                                )}
+                            </HideOnMobile>
                         </>
                     ) : (
                         <ImageGallerySkeleton />
@@ -218,7 +221,7 @@ const ProductView = ({
                 </Box>
 
                 {/* Variations & Quantity Selector */}
-                <VStack align="stretch" spacing={8} flex={1}>
+                <VStack align="stretch" spacing={8} flex={1} marginBottom={[16, 16, 16, 0, 0]}>
                     <Box display={['none', 'none', 'none', 'block']}>
                         <ProductViewHeader
                             name={product?.name}
@@ -301,7 +304,7 @@ const ProductView = ({
 
                         {/* Quantity Selector */}
                         <VStack align="stretch" maxWidth={'125px'}>
-                            <Box fontWeight="bold">
+                            <Box fontWeight="600">
                                 {intl.formatMessage({
                                     defaultMessage: 'Quantity'
                                 })}
@@ -322,6 +325,17 @@ const ProductView = ({
                                     ))}
                             </Select>
                         </VStack>
+                        <HideOnDesktop>
+                            {showFullLink && product && (
+                                <Link to={`/product/${product.master.masterId}`}>
+                                    <Text color="blue.600">
+                                        {intl.formatMessage({
+                                            defaultMessage: 'See full details'
+                                        })}
+                                    </Text>
+                                </Link>
+                            )}
+                        </HideOnDesktop>
                     </VStack>
 
                     <Box display={['none', 'none', 'none', 'block']}>
