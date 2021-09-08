@@ -67,9 +67,7 @@ const AccountWishlist = () => {
             const wishlist = customerProductLists.getProductListPerType(
                 customerProductListTypes.WISHLIST
             )
-            if (wishlist?._productItemsDetail) {
-                setWishlist(wishlist)
-            }
+            setWishlist(wishlist)
         }
     }, [customerProductLists.data])
 
