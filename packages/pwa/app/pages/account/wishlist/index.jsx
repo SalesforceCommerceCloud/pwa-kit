@@ -67,7 +67,7 @@ const AccountWishlist = () => {
             const wishlist = customerProductLists.getProductListPerType(
                 customerProductListTypes.WISHLIST
             )
-            if (!wishlist.customerProductListItems?.length || wishlist?._productItemsDetail) {
+            if (!wishlist?.customerProductListItems?.length || wishlist?._productItemsDetail) {
                 setWishlist(wishlist)
             }
         }
