@@ -264,7 +264,7 @@ App.getProps = async ({api}) => {
                 
 🚫 This page isn’t working.
 It looks like the locale ‘${rootCategory.locale}’ hasn’t been set up, yet. 
-You can either follow this doc, https://sfdc.co/B4Z1m to enable it in business manager or define a different locale in your project’s README file.
+You can either follow this doc, https://sfdc.co/B4Z1m to enable it in business manager or define a different locale by using the instructions for Localization in the README file.
 `
                 : rootCategory.detail
         throw new Error(message)
