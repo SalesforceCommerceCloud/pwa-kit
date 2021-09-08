@@ -260,7 +260,12 @@ App.getProps = async ({api}) => {
     if (rootCategory.isError) {
         const message =
             rootCategory.title === 'Unsupported Locale'
-                ? '' + rootCategory.detail
+                ? `
+                
+🚫 This page isn’t working.
+It looks like the locale ‘en-GB’ hasn’t been set up, yet. 
+You can either follow this doc, https://sfdc.co/B4Z1m to enable it in business manager or define a different locale in your project’s README file.
+`
                 : rootCategory.detail
         throw new Error(message)
     }
