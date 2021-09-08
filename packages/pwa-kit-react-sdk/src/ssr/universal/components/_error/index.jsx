@@ -31,7 +31,7 @@ import PropTypes from 'prop-types'
  *      <br/>
  *      <i>This property is typically used to distinguish 404 errors from other types.</i>
  */
-const Error = ({message, stack, status}) => {
+const Error = ({message, stack, status, location}) => {
     return (
         <div>
             <h1>Error Status: {status}</h1>

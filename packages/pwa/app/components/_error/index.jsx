@@ -4,9 +4,24 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React from 'react'
+import React, {useEffect} from 'react'
 import PropTypes from 'prop-types'
 import {Helmet} from 'react-helmet'
+import {
+    Box,
+    Button,
+    Flex,
+    Heading,
+    IconButton,
+    Stack,
+    Text,
+    useMultiStyleConfig
+} from '@chakra-ui/react'
+
+import {createIntl, createIntlCache, RawIntlProvider} from 'react-intl'
+import {BrandLogo, FileIcon} from '../icons'
+import {useHistory} from 'react-router-dom'
+import {DEFAULT_LOCALE} from '../../locale'
 
 // <Error> is rendered when:
 //
@@ -15,66 +30,126 @@ import {Helmet} from 'react-helmet'
 // 3. A routed component throws an error in `render()`.
 //
 // It must not throw an error. Keep it as simple as possible.
-const Error = (props) => {
-    const {stack, status} = props
 
-    const isNotFoundError = status === 404
-    const title = isNotFoundError
-        ? 'Sorry, we cannot find this page 😓'
-        : 'Sorry, there is a problem with this page 😔'
-    const message = 'To continue, go back home.'
+const messages = {
+    en: {
+        logo: 'Logo',
+        title: "The page isn't working",
+        description:
+            'An error has occurred and we’re working to fix the problem. \n' +
+            'Try refreshing the page or if you need immediate help please contact support',
+        stackTrace: 'Stack Trace',
+        contactSupport: 'Contact Support',
+        refreshThePage: 'Refresh the page'
+    },
+    fr: {
+        logo: 'Logo',
+        title: 'La page ne fonctionne pas',
+        description:
+            "Une erreur s'est produite et nous travaillons pour résoudre le problème. \n" +
+            "Essayez d'actualiser la page ou si vous avez besoin d'une aide immédiate, veuillez contacter le support'",
+        stackTrace: 'Stack Trace',
+        contactSupport: 'Contactez le support',
+        refreshThePage: 'Actualiser la page'
+    }
+}
+
+// const targetLocale = getTargetLocale([DEFAULT_LOCALE], SUPPORTED_LOCALES, DEFAULT_LOCALE)
+// console.log('targetLocale', targetLocale)
+const initialLocale = DEFAULT_LOCALE
+
+// This is optional but highly recommended
+// since it prevents memory leak
+// https://formatjs.io/docs/react-intl/api/#createintl
+const cache = createIntlCache()
+/**
+ * You can use this variable in other files even after reassigning it.
+ * As error component has no access to the intl, we need to create one to be able to use formatMessage for translation
+ * This mean this component will handle its own translation message
+ * */
+let intl = createIntl({locale: initialLocale, messages: messages[initialLocale]}, cache)
+let formatMessage = intl.formatMessage
+const Error = (props) => {
+    const {stack, location} = props
+    const history = useHistory()
+    const styles = useMultiStyleConfig('Error')
+
+    useEffect(() => {
+        const isHome = location.pathname === '/'
+        const activeLocale = isHome ? DEFAULT_LOCALE : location.pathname.split('/')[1]
+        intl = createIntl({locale: activeLocale, messages: messages[activeLocale]}, cache)
+        formatMessage = intl.formatMessage
+    }, [])
 
     return (
-        <div id="app" className="t-error">
-            <Helmet>
-                <title>{title}</title>
-            </Helmet>
+        <RawIntlProvider value={intl}>
+            <Flex id="sf-app" {...styles.container} flexDirection="column">
+                <Helmet>
+                    <title>{formatMessage({id: 'title'})}</title>
+                </Helmet>
 
-            <div className="t-error__header">
-                <a href="/">
-                    <img
-                        src="https://www.mobify.com/wp-content/uploads/logo-mobify-white.png"
-                        alt="Mobify Logo"
-                        height="35"
-                    />
-                </a>
-            </div>
+                <Box as="header" {...styles.header}>
+                    <Box {...styles.headerContent}>
+                        <IconButton
+                            aria-label={formatMessage({
+                                id: 'logo'
+                            })}
+                            icon={<BrandLogo {...styles.logo} />}
+                            {...styles.icons}
+                            variant="unstyled"
+                            onClick={() => history.push('/')}
+                        />
+                    </Box>
+                </Box>
+                <Box
+                    as="main"
+                    id="app-main"
+                    role="main"
+                    flex={1}
+                    layerStyle="page"
+                    {...styles.main}
+                >
+                    <Flex {...styles.content} flexDirection="column" justify="center">
+                        <Stack align="center" mb={20}>
+                            <FileIcon boxSize={['30px', '32px']} mb={8} />
 
-            <main id="app-main" role="main">
-                <div className="t-error__container">
-                    <div className="t-error__container-flexbox">
-                        <div className="t-error__container-cloud u-margin-top-lg u-margin-bottom-lg">
-                            <svg
-                                aria-hidden="true"
-                                className="t-error__cloud-icon"
-                                title="Error Cloud"
-                                aria-labelledby="icon-1-1"
-                            >
-                                <title id="icon-1-1">Error Cloud</title>
-                                <use role="presentation" xlinkHref="#pw-error-cloud"></use>
-                            </svg>
-                        </div>
+                            <Heading as="h2" fontSize={['xl', '2xl', '2xl', '3xl']} mb={2}>
+                                {formatMessage({id: 'title'})}
+                            </Heading>
 
-                        <div className="t-error__container-content u-margin-top-lg u-margin-bottom-lg">
-                            <h1 className="u-margin-bottom-md">{title}</h1>
+                            <Box maxWidth="700px">
+                                <Text align="center">{formatMessage({id: 'description'})}</Text>
+                            </Box>
 
-                            <p className="u-margin-bottom-lg">{message}</p>
-
-                            <div className="u-width-block-full">
-                                <a href="/" className="pw-link pw-button pw--anchor pw--primary">
-                                    <div className="pw-button__inner">Go Back Home</div>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                    {stack && (
-                        <pre className="t-error__container-stack u-text-align-start u-margin-top-md u-margin-bottom-md">
-                            {stack}
-                        </pre>
-                    )}
-                </div>
-            </main>
-        </div>
+                            <Stack direction={['column', 'row']} width={['100%', 'auto']}>
+                                <Button variant="outline" bg="white" borderColor={'gray.200'}>
+                                    {formatMessage({
+                                        id: 'contactSupport'
+                                    })}
+                                </Button>
+                                <Button onClick={() => window.location.reload()}>
+                                    {formatMessage({
+                                        id: 'refreshThePage'
+                                    })}
+                                </Button>
+                            </Stack>
+                        </Stack>
+                        <Box>
+                            <Text fontWeight="700">
+                                {formatMessage({
+                                    id: 'stackTrace'
+                                })}
+                            </Text>
+                            {stack && (
+                                <Box as="pre" {...styles.pre}>
+                                    {stack}
+                                </Box>
+                            )}
+                        </Box>
+                    </Flex>
+                </Box>
+            </Flex>
+        </RawIntlProvider>
     )
 }
 
