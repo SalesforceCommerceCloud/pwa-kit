@@ -49,7 +49,9 @@ const DEFAULT_NAV_DEPTH = 3
 const DEFAULT_ROOT_CATEGORY = 'root'
 
 /**
- *  Default message for the supported locales.
+ *  Default messages for the supported locales.
+ *  NOTE: Because the messages are statically analyzed, we have to maintain the list of locales asynchronously
+ *  to those in the package.json.
  *  `locale` parameter format for OCAPI and Commerce API: <language code>-<country code>
  *  https://documentation.b2c.commercecloud.salesforce.com/DOC1/topic/com.demandware.dochelp/OCAPI/current/usage/Localization.html
  *  */
