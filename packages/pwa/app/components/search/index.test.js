@@ -226,7 +226,7 @@ test('changes url when enter is pressed', async () => {
     renderWithProviders(<SearchInput />)
     const searchInput = document.querySelector('input[type="search"]')
     await user.type(searchInput, 'Dresses{enter}')
-    await waitFor(() => expect(window.location.pathname).toEqual('/en/search'))
+    await waitFor(() => expect(window.location.pathname).toEqual('/en-GB/search'))
     await waitFor(() => expect(window.location.search).toEqual('?q=Dresses'))
 })
 

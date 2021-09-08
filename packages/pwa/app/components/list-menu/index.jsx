@@ -7,6 +7,7 @@
 
 import React, {Fragment, useRef, forwardRef} from 'react'
 import PropTypes from 'prop-types'
+import {useIntl} from 'react-intl'
 import {Link as RouteLink} from 'react-router-dom'
 
 // Project Components
@@ -49,6 +50,7 @@ const ChevronIconTrigger = forwardRef(function ChevronIconTrigger(props, ref) {
 const ListMenuTrigger = ({item, name, isOpen, onOpen, onClose, hasItems}) => {
     const theme = useTheme()
     const {baseStyle} = theme.components.ListMenu
+    const {locale} = useIntl()
 
     const keyMap = {
         Escape: () => onClose(),
@@ -59,7 +61,7 @@ const ListMenuTrigger = ({item, name, isOpen, onOpen, onClose, hasItems}) => {
         <Box {...baseStyle.listMenuTriggerContainer}>
             <Link
                 as={RouteLink}
-                to={categoryUrlBuilder(item)}
+                to={categoryUrlBuilder(item, locale)}
                 onMouseOver={onOpen}
                 {...baseStyle.listMenuTriggerLink}
                 {...(hasItems ? {name: name + ' __'} : {name: name})}
@@ -99,6 +101,7 @@ ListMenuTrigger.propTypes = {
 const ListMenuContent = ({maxColumns, items, itemsKey, onClose, initialFocusRef}) => {
     const theme = useTheme()
     const {baseStyle} = theme.components.ListMenu
+    const {locale} = useIntl()
 
     return (
         <PopoverContent data-testid="popover-menu" {...baseStyle.popoverContent}>
@@ -117,7 +120,7 @@ const ListMenuContent = ({maxColumns, items, itemsKey, onClose, initialFocusRef}
                             const items = item[itemsKey]
 
                             const heading = {
-                                href: categoryUrlBuilder(item),
+                                href: categoryUrlBuilder(item, locale),
                                 text: name,
                                 styles: {
                                     fontSize: 'md',
@@ -129,7 +132,7 @@ const ListMenuContent = ({maxColumns, items, itemsKey, onClose, initialFocusRef}
                                 ? items.map((item) => {
                                       const {name} = item
                                       return {
-                                          href: categoryUrlBuilder(item),
+                                          href: categoryUrlBuilder(item, locale),
                                           text: name,
                                           styles: {
                                               fontSize: 'md',

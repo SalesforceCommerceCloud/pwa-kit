@@ -34,15 +34,34 @@ import useShopper from '../../commerce-api/hooks/useShopper'
 import useCustomer from '../../commerce-api/hooks/useCustomer'
 import {AuthModal, useAuthModal} from '../../hooks/use-auth-modal'
 
+// Localization
+import {defineMessages, IntlProvider} from 'react-intl'
+
 // Others
 import {watchOnlineStatus, flatten} from '../../utils/utils'
-import {IntlProvider, getLocaleConfig} from '../../locale'
+import {homeUrlBuilder} from '../../utils/url'
+import {getLocaleConfig} from '../../utils/locale'
+import {HOME_HREF} from '../../constants'
 
 import Seo from '../seo'
 
 const DEFAULT_NAV_DEPTH = 3
 const DEFAULT_ROOT_CATEGORY = 'root'
-const HOME_HREF = '/'
+
+/**
+ *  Default messages for the supported locales.
+ *  NOTE: Because the messages are statically analyzed, we have to maintain the list of locales asynchronously
+ *  to those in the package.json.
+ *  `locale` parameter format for OCAPI and Commerce API: <language code>-<country code>
+ *  https://documentation.b2c.commercecloud.salesforce.com/DOC1/topic/com.demandware.dochelp/OCAPI/current/usage/Localization.html
+ *  */
+export const defaultLocaleMessages = defineMessages({
+    'en-GB': {defaultMessage: 'English (United Kingdom)'},
+    'fr-FR': {defaultMessage: 'French (France)'},
+    'it-IT': {defaultMessage: 'Italian (Italy)'},
+    'zh-CN': {defaultMessage: 'Chinese (China)'},
+    'ja-JP': {defaultMessage: 'Japanese (Japan)'}
+})
 
 const App = (props) => {
     const {children, targetLocale, defaultLocale, messages, categories: allCategories = {}} = props
@@ -78,7 +97,7 @@ const App = (props) => {
 
     const onLogoClick = () => {
         // Goto the home page.
-        history.push(HOME_HREF)
+        history.push(homeUrlBuilder(HOME_HREF, targetLocale))
 
         // Close the drawer.
         onClose()
@@ -109,7 +128,20 @@ const App = (props) => {
 
     return (
         <Box className="sf-app" {...styles.container}>
-            <IntlProvider locale={targetLocale} defaultLocale={defaultLocale} messages={messages}>
+            <IntlProvider
+                onError={(err) => {
+                    if (err.code === 'MISSING_TRANSLATION') {
+                        // NOTE: Remove the console error for missing translations during development,
+                        // as we knew translations would be added later.
+                        console.warn('Missing translation', err.message)
+                        return
+                    }
+                    throw err
+                }}
+                locale={targetLocale}
+                defaultLocale={defaultLocale}
+                messages={messages}
+            >
                 <CategoriesContext.Provider value={{categories, setCategories}}>
                     <Seo>
                         <meta name="theme-color" content="#0288a7" />
@@ -188,20 +220,28 @@ App.shouldGetProps = () => {
     return typeof window === 'undefined'
 }
 
-App.getProps = async ({api, params}) => {
+App.getProps = async ({api}) => {
     const localeConfig = await getLocaleConfig({
         getUserPreferredLocales: () => {
-            // TODO: You can detect their preferred locales from:
+            // CONFIG: This function should return an array of preferred locales. They can be
+            // derived from various sources. Below are some examples of those:
+            //
             // - client side: window.navigator.languages
-            // - the page URL they're on (example.com/en/home)
+            // - the page URL they're on (example.com/en-GB/home)
             // - cookie (if their previous preference is saved there)
-            // And decide which one takes precedence.
-
-            const localeInPageUrl = params.locale
-            return localeInPageUrl ? [localeInPageUrl] : []
-
-            // If in this function an empty array is returned (e.g. there isn't locale in the page url),
+            //
+            // If this function returns an empty array (e.g. there isn't locale in the page url),
             // then the app would use the default locale as the fallback.
+
+            // NOTE: Your implementation may differ, this is jsut what we did.
+            //
+            // Since the CommerceAPI client already has the current `locale` set,
+            // we can use it's value to load the correct messages for the application.
+            // Take a look at the `app/components/_app-config` component on how the
+            // preferred locale was derived.
+            const {locale} = api.getConfig()
+
+            return [locale]
         }
     })
 
@@ -210,7 +250,11 @@ App.getProps = async ({api, params}) => {
 
     // Get the root category, this will be used for things like the navigation.
     const rootCategory = await api.shopperProducts.getCategory({
-        parameters: {id: DEFAULT_ROOT_CATEGORY, levels: DEFAULT_NAV_DEPTH}
+        parameters: {
+            id: DEFAULT_ROOT_CATEGORY,
+            levels: DEFAULT_NAV_DEPTH,
+            locale: localeConfig.app.targetLocale
+        }
     })
 
     // Flatten the root so we can easily access all the categories throughout

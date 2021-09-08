@@ -9,23 +9,10 @@ import {fireEvent} from '@testing-library/react'
 import LocaleSelector from './index'
 import {renderWithProviders} from '../../utils/test-utils'
 
-const mockLocales = [
-    {
-        name: 'Canada (English)',
-        shortCode: 'en-CA'
-    },
-    {
-        name: 'Canada (French)',
-        shortCode: 'fr-CA'
-    },
-    {
-        name: 'USA (English)',
-        shortCode: 'en-US'
-    }
-]
+const supportedLocales = ['en-GB', 'fr-FR', 'it-IT', 'zh-CN', 'ja-JP']
 
 test('Renders LocaleSelector', () => {
-    renderWithProviders(<LocaleSelector selectedLocale="en-US" locales={mockLocales} />)
+    renderWithProviders(<LocaleSelector selectedLocale="en-GB" locales={supportedLocales} />)
     const accordion = document.querySelector('.chakra-accordion')
     const selectedLocale = document.querySelector('button[aria-expanded="false"]')
 
@@ -37,7 +24,7 @@ test('Renders LocaleSelector with event handlers', () => {
     const onSelect = jest.fn()
 
     renderWithProviders(
-        <LocaleSelector selectedLocale="en-US" locales={mockLocales} onSelect={onSelect} />
+        <LocaleSelector selectedLocale="fr-FR" locales={supportedLocales} onSelect={onSelect} />
     )
 
     const firstLocale = document.querySelector(
@@ -46,5 +33,5 @@ test('Renders LocaleSelector with event handlers', () => {
 
     fireEvent.click(firstLocale)
     expect(onSelect).toHaveBeenCalledTimes(1)
-    expect(onSelect).toBeCalledWith('en-CA')
+    expect(onSelect).toBeCalledWith('en-GB')
 })

@@ -125,7 +125,7 @@ const MockedComponent = () => {
         <Router>
             <button onClick={authModal.onOpen}>Open Modal</button>
             <AuthModal {...authModal} />
-            <Route path="/en/account">
+            <Route path="/en-GB/account">
                 <Account match={match} />
             </Route>
         </Router>

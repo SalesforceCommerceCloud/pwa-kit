@@ -42,7 +42,7 @@ const MockedComponent = () => {
 
     return (
         <Switch>
-            <Route path="/en/orders">
+            <Route path="/en-GB/orders">
                 <Orders />
             </Route>
         </Switch>
@@ -103,7 +103,7 @@ beforeEach(() => {
         global.TextEncoder = require('util').TextEncoder
     }
 
-    window.history.pushState({}, 'Account', '/en/orders')
+    window.history.pushState({}, 'Account', '/en-GB/orders')
 })
 afterEach(() => {
     localStorage.clear()
@@ -114,7 +114,7 @@ afterAll(() => server.close())
 test('Renders order history and details', async () => {
     renderWithProviders(<MockedComponent />)
     expect(await screen.findByTestId('account-order-history-page')).toBeInTheDocument()
-    expect(await screen.findAllByText('Ordered: Apr 6, 2021')).toHaveLength(3)
+    expect(await screen.findAllByText(/Ordered: /i)).toHaveLength(3)
     expect(
         await screen.findAllByAltText(
             'Pleated Bib Long Sleeve Shirt, Silver Grey, small',

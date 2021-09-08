@@ -27,7 +27,8 @@ export default {
         },
         optionText: {
             paddingLeft: 2,
-            paddingRight: 4
+            paddingRight: 4,
+            textAlign: 'left'
         }
     },
     parts: [

@@ -5,6 +5,8 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
+import {HOME_HREF, DEFAULT_LOCALE, SUPPORTED_LOCALES} from '../constants'
+
 /**
  * Modifies a given url by adding/updating query parameters.
  *
@@ -15,12 +17,12 @@
  * import {rebuildPathWithParams} from '/path/to/utils/url'
  *
  * rebuildPathWithParams(
- *     '/en/product/25501032M',
+ *     '/en-GB/product/25501032M',
  *     {color: 'JJ2SKXX', size: 'MD'}
  * )
  *
  * // Returns
- * // '/en/product/25501032M?color=JJ2SKXX&size=9MD'
+ * // '/en-GB/product/25501032M?color=JJ2SKXX&size=9MD'
  */
 export const rebuildPathWithParams = (url, extraParams) => {
     const [pathname, search] = url.split('?')
@@ -73,24 +75,23 @@ export const buildUrlSet = (url = '', key = '', values = [], extraParams = {}) =
     values.map((value) => rebuildPathWithParams(url, {[key]: value, ...extraParams}))
 
 /**
- * Given a category and the current locale refutn an href to the product list page.
+ * Given a category and the current locale returns an href to the product list page.
  *
  * @param {Object} category
- * @param {string} local
+ * @param {string} locale
  * @returns {string}
  */
-export const categoryUrlBuilder = (category, local = 'en') =>
-    encodeURI(`/${local}/category/${category.id}`)
+export const categoryUrlBuilder = (category, locale = DEFAULT_LOCALE) =>
+    encodeURI(`/${locale}/category/${category.id}`)
 
 /**
- * Given a product and the current locale refutn an href to the product detail page.
+ * Given a product and the current locale returns an href to the product detail page.
  *
  * @param {Object} product
- * @param {string} local
+ * @param {string} locale
  * @returns {string}
  */
-export const productUrlBuilder = (product, local = 'en') =>
-    encodeURI(`/${local}/product/${product.id}`)
+export const productUrlBuilder = (product) => encodeURI(`/product/${product.id}`)
 
 /**
  * Given a search term, contructs a search url.
@@ -99,6 +100,36 @@ export const productUrlBuilder = (product, local = 'en') =>
  * @returns {string}
  */
 export const searchUrlBuilder = (searchTerm) => `/search?q=${searchTerm}`
+
+/**
+ * Returns a URL using the new locale.
+ *
+ * @param previousLocale
+ * @param newLocale
+ * @returns {string}
+ */
+export const buildUrlLocale = (previousLocale, newLocale) => {
+    const params = new URLSearchParams(location.search)
+    params.delete('refine')
+    return location.pathname === HOME_HREF
+        ? homeUrlBuilder(HOME_HREF, newLocale)
+        : `/${
+              SUPPORTED_LOCALES.includes(newLocale) ? newLocale : DEFAULT_LOCALE
+          }${location.pathname.slice(location.pathname.indexOf('/', 1))}${
+              Array.from(params).length > 0 ? `?${params}` : ''
+          }`
+}
+
+/**
+ * Builds the Home page URL for a given locale.
+ * We don't add the locale to the URL for the default locale.
+ *
+ * @param homeHref
+ * @param locale
+ * @returns {string}
+ */
+export const homeUrlBuilder = (homeHref, locale) =>
+    encodeURI(`${homeHref}${locale !== DEFAULT_LOCALE ? locale + '/' : ''}`)
 
 /*
  * Remove query params from a give url path based on a given list of keys
@@ -110,11 +141,11 @@ export const searchUrlBuilder = (searchTerm) => `/search?q=${searchTerm}`
  * import {removeQueryParamsFromPath} from /path/to/util/url
  *
  * removeQueryParamsFromPath(
- *   /en/cart?pid=1234&color=black&size=s&abc=12,
+ *   /en-GB/cart?pid=1234&color=black&size=s&abc=12,
  *   ['pid', 'color', 'size']
  * )
  * // returns
- * // '/en/cart?abc=12'
+ * // '/en-GB/cart?abc=12'
  */
 export const removeQueryParamsFromPath = (path, keys) => {
     const [pathname, search] = path.split('?')
