@@ -17,7 +17,7 @@ The supported locales and default locales are defined in the `pwa/package.json` 
 These values have to match the supported locales and the default locale set in your ODS instance.
 https://documentation.b2c.commercecloud.salesforce.com/DOC2/topic/com.demandware.dochelp/content/b2c_commerce/topics/admin/b2c_configuring_site_locales.html
 
-The `supportedLocales` and `defaultLocale` parameter follows the format supported by OCAPI and Commerce API: <language code>-<country code>
+The `supportedLocales` and `defaultLocale` parameter follows the format supported by OCAPI and Commerce API: `<language code>-<country code>`
 https://documentation.b2c.commercecloud.salesforce.com/DOC1/topic/com.demandware.dochelp/OCAPI/current/usage/Localization.html
 
 This is the default locale configuration in `pwa/package.json`:
