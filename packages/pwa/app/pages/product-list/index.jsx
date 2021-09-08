@@ -156,7 +156,7 @@ const ProductList = (props) => {
         try {
             setWishlistLoading([...wishlistLoading, product.productId])
             // Extract productListItem corresponding to product from wishlist
-            const productListItem = wishlist.customerProductListItems.find(
+            const productListItem = wishlist.customerProductListItems?.find(
                 (item) => item.productId === product.productId
             )
             await customerProductLists.deleteCustomerProductListItem(wishlist, productListItem)
