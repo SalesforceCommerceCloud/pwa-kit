@@ -55,6 +55,9 @@ Run integration tests against live APIs for all packages with:
   cd [repo root]
   npm run test:integration
 ```
+## Localization
+
+See [Localization README.md](./app/translations/README.md)
 
 ## License Information
 
