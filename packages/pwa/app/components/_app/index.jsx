@@ -257,6 +257,19 @@ App.getProps = async ({api}) => {
         }
     })
 
+    if (rootCategory.isError) {
+        const message =
+            rootCategory.title === 'Unsupported Locale'
+                ? `
+                
+🚫 This page isn’t working.
+It looks like the locale ‘${rootCategory.locale}’ hasn’t been set up, yet. 
+You can either follow this doc, https://sfdc.co/B4Z1m to enable it in business manager or define a different locale with the instructions for Localization in the README file.
+`
+                : rootCategory.detail
+        throw new Error(message)
+    }
+
     // Flatten the root so we can easily access all the categories throughout
     // the application.
     const categories = flatten(rootCategory, 'categories')
