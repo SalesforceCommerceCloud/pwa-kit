@@ -11,6 +11,30 @@ Several **npm scripts** are available to you that make it easier to use this CLI
 - To **extract the default messages** in your app, run `npm run extract-messages` to have all of the default English messages extracted into their own json file.
 - To **compile the messages** from all of the locales, run `npm run compile-messages`.
 
+### Define the default and supported locales
+
+The supported locales and default locales are defined in the `pwa/package.json`.
+These values have to match the supported locales and the default set your ODS instance.
+https://documentation.b2c.commercecloud.salesforce.com/DOC2/topic/com.demandware.dochelp/content/b2c_commerce/topics/admin/b2c_configuring_site_locales.html
+
+The `supportedLocales` and `defaultLocale` parameter follow the format supported by OCAPI and Commerce API: <language code>-<country code>
+https://documentation.b2c.commercecloud.salesforce.com/DOC1/topic/com.demandware.dochelp/OCAPI/current/usage/Localization.html
+
+This is the default locale configuration in `pwa/package.json`:
+
+```
+"l10n": {
+        "supportedLocales": [
+            "en-GB",
+            "fr-FR",
+            "it-IT",
+            "zh-CN",
+            "ja-JP"
+        ],
+        "defaultLocale": "en-GB"
+    }
+```
+
 ### Formatting messages
 
 To support localization for multiple locales, you will be writing the messages:

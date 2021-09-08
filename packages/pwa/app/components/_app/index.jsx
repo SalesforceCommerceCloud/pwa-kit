@@ -257,6 +257,14 @@ App.getProps = async ({api}) => {
         }
     })
 
+    if (rootCategory.isError) {
+        const message =
+            rootCategory.title === 'Unsupported Locale'
+                ? '' + rootCategory.detail
+                : rootCategory.detail
+        throw new Error(message)
+    }
+
     // Flatten the root so we can easily access all the categories throughout
     // the application.
     const categories = flatten(rootCategory, 'categories')
