@@ -12,16 +12,14 @@ import {noop} from '../../utils/utils'
 import {useIntl} from 'react-intl'
 import {useLocation} from 'react-router-dom'
 import {useToast} from '../../hooks/use-toast'
-import {useLocale} from '../../locale'
 
 const withRegistration = (Component) => {
     const WrappedComponent = ({onClick = noop, ...passThroughProps}) => {
         const customer = useCustomer()
         const authModal = useAuthModal()
         const location = useLocation()
-        const [locale] = useLocale()
+        const {formatMessage, locale} = useIntl()
         const isLoginPage = new RegExp(`^/${locale}/login$`).test(location.pathname)
-        const {formatMessage} = useIntl()
         const showToast = useToast()
 
         const handleClick = (e) => {

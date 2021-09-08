@@ -170,7 +170,7 @@
     "bundlesize": [
         {
             "path": "build/main.js",
-            "maxSize": "38 kB"
+            "maxSize": "39 kB"
         },
         {
             "path": "build/vendor.js",
@@ -184,9 +184,12 @@
     ],
     "l10n": {
         "supportedLocales": [
-            "en",
-            "fr"
+            "en-GB",
+            "fr-FR",
+            "it-IT",
+            "zh-CN",
+            "ja-JP"
         ],
-        "defaultLocale": "en"
+        "defaultLocale": "en-GB"
     }
 }

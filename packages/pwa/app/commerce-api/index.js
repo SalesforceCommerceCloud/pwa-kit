@@ -76,23 +76,49 @@ class CommerceAPI {
             shopperSearch: sdk.ShopperSearch
         }
 
+        const apiConfigs = {
+            shopperCustomers: {api: sdk.ShopperCustomers, canLocalize: false},
+            shopperBaskets: {api: OcapiShopperBaskets, canLocalize: false},
+            shopperGiftCertificates: {api: sdk.ShopperGiftCertificates, canLocalize: true},
+            shopperLogin: {api: sdk.ShopperLogin, canLocalize: false},
+            shopperOrders: {api: OcapiShopperOrders, canLocalize: true},
+            shopperProducts: {api: sdk.ShopperProducts, canLocalize: true},
+            shopperPromotions: {api: sdk.ShopperPromotions, canLocalize: true},
+            shopperSearch: {api: sdk.ShopperSearch, canLocalize: true}
+        }
+
         // Instantiate the SDK class proxies and create getters from our api mapping.
         // The proxy handlers are called when accessing any of the mapped SDK class
         // proxies, executing various pre-defined hooks for tapping into or modifying
         // the outgoing method parameters and/or incoming SDK responses
         const self = this
-        Object.keys(apis).forEach((key) => {
-            const SdkClass = apis[key]
+        Object.keys(apiConfigs).forEach((key) => {
+            const SdkClass = apiConfigs[key].api
             self._sdkInstances = {
                 ...self._sdkInstances,
                 [key]: new Proxy(new SdkClass(this._config), {
                     get: function(obj, prop) {
                         if (typeof obj[prop] === 'function') {
                             return (...args) => {
+                                const {locale} = self._config
+
                                 if (args[0].ignoreHooks) {
                                     return obj[prop](...args)
                                 }
+
                                 return self.willSendRequest(prop, ...args).then((newArgs) => {
+                                    // Inject the locale to the API call via it's parameters.
+                                    //
+                                    // NOTE: The commerce sdk isomorphic will complain if you pass parameters to
+                                    // it that it doesn't expect, this is why we only add the local to some of
+                                    // the API calls.
+                                    if (apiConfigs[key].canLocalize) {
+                                        newArgs[0].parameters = {
+                                            ...newArgs[0].parameters,
+                                            ...(locale && {locale})
+                                        }
+                                    }
+
                                     return obj[prop](...newArgs).then((res) =>
                                         self.didReceiveResponse(res, newArgs)
                                     )

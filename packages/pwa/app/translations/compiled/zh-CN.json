@@ -1,0 +1,8 @@
+{
+  "homepage.message.welcome": [
+    {
+      "type": 0,
+      "value": "你好世界"
+    }
+  ]
+}
