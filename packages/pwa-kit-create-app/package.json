@@ -11,7 +11,8 @@
   "bin": "scripts/create-mobify-app.js",
   "files": [
     "assets",
-    "template"
+    "template",
+    "template-minimal"
   ],
   "scripts": {
     "prepare": "node scripts/build.js",

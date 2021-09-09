@@ -14,11 +14,13 @@ sh.config.silent = false
 
 const monorepoRoot = p.resolve(__dirname, '..', '..', '..')
 const templatePath = p.resolve(__dirname, '..', 'template')
+const minimalTemplatePath = p.resolve(__dirname, '..', 'template-minimal')
 
 const mkdtempSync = () => fs.mkdtempSync(p.resolve(os.tmpdir(), 'pwa-template-tmp'))
 
 const main = () => {
     sh.rm('-rf', templatePath)
+    sh.rm('-rf', minimalTemplatePath)
 
     const tmpDir = mkdtempSync()
     const checkoutDir = p.join(tmpDir, 'mobify-platform-sdks')
@@ -29,6 +31,7 @@ const main = () => {
     )
 
     sh.cp('-R', p.join(checkoutDir, 'packages', 'pwa'), templatePath)
+    sh.cp('-R', p.join(checkoutDir, 'packages', 'pwa-test-app'), minimalTemplatePath)
     sh.rm('-rf', tmpDir)
 }
 

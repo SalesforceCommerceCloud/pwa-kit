@@ -45,10 +45,11 @@ sh.set('-e')
 
 const GENERATED_PROJECT_VERSION = '0.0.1'
 
+const MINIMAL_TEST_APP = 'minimal-test-app'
 const TEST_PROJECT = 'test-project' // TODO: This will be replaced with the `isomorphic-client` config.
 const PROMPT = 'prompt'
 
-const PRESETS = [TEST_PROJECT, PROMPT]
+const PRESETS = [TEST_PROJECT, PROMPT, MINIMAL_TEST_APP]
 
 const GENERATOR_PRESET = process.env.GENERATOR_PRESET || PROMPT
 
@@ -306,6 +307,36 @@ const testProjectAnswers = () => {
     return buildAnswers(config)
 }
 
+const minimalTestAppPrompts = () => {
+    const validProjectId = (s) =>
+        /^[a-z0-9-]{1,20}$/.test(s) ||
+        'Value can only contain lowercase letters, numbers, and hyphens.'
+    const questions = [
+        {
+            name: 'projectId',
+            validate: validProjectId,
+            message: 'What is your project ID (example-project) in Managed Runtime Admin?'
+        }
+    ]
+    return inquirer.prompt(questions)
+}
+
+const copyMinimalTestApp = ({projectId}, {outputDir}) => {
+    sh.cp('-R', p.join(__dirname, '..', 'template-minimal'), outputDir)
+
+    const pkgJsonPath = p.resolve(outputDir, 'package.json')
+    const pkgJSON = readJson(pkgJsonPath)
+    const finalPkgData = merge(pkgJSON, {name: projectId})
+    writeJson(pkgJsonPath, finalPkgData)
+
+    console.log('Installing dependencies for the generated project (this can take a while)')
+    sh.exec(`npm install --no-progress`, {
+        env: process.env,
+        cwd: outputDir,
+        silent: true
+    })
+}
+
 const main = (opts) => {
     if (!(opts.outputDir === DEFAULT_OUTPUT_DIR) && sh.test('-e', opts.outputDir)) {
         console.error(
@@ -316,6 +347,8 @@ const main = (opts) => {
     }
 
     switch (GENERATOR_PRESET) {
+        case MINIMAL_TEST_APP:
+            return minimalTestAppPrompts(opts).then((answers) => copyMinimalTestApp(answers, opts))
         case TEST_PROJECT:
             return runGenerator(testProjectAnswers(), opts)
         case PROMPT:
