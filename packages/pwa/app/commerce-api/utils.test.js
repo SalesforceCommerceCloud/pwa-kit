@@ -5,7 +5,12 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import jwt from 'njwt'
-import {camelCaseKeysToUnderscore, isTokenValid, convertSnakeCaseToSentenceCase} from './utils'
+import {
+    camelCaseKeysToUnderscore,
+    isTokenValid,
+    keysToCamel,
+    convertSnakeCaseToSentenceCase
+} from './utils'
 
 const createJwt = (secondsToExp) => {
     const token = jwt.create({}, 'test')
@@ -58,5 +63,154 @@ describe('isTokenValid', () => {
         expect(convertSnakeCaseToSentenceCase(snakeCaseString) === expectedSentenceCaseString).toBe(
             true
         )
+    })
+})
+
+describe('keysToCamel', () => {
+    it('converts object keys to camelcase', () => {
+        const input = {
+            numba_one: true,
+            'numba-two': false,
+            number3: 'un-changed',
+            c_Custom: 'un_changed',
+            _custom: 'unchanged'
+        }
+
+        const result = keysToCamel(input)
+
+        expect(result).toEqual({
+            numbaOne: true,
+            numbaTwo: false,
+            number3: 'un-changed',
+            c_Custom: 'un_changed',
+            _custom: 'unchanged'
+        })
+    })
+
+    it('converts arrays of objects to camelcase', () => {
+        const input = [
+            {
+                numba_one: true,
+                number3: 'un-changed',
+                c_Custom: 'un_changed',
+                _custom: 'unchanged'
+            },
+            {
+                'numba-two': false
+            }
+        ]
+
+        const result = keysToCamel(input)
+
+        expect(result).toEqual([
+            {
+                numbaOne: true,
+                number3: 'un-changed',
+                c_Custom: 'un_changed',
+                _custom: 'unchanged'
+            },
+            {
+                numbaTwo: false
+            }
+        ])
+    })
+
+    it('converts converts nested keys to camelcase', () => {
+        const input = {
+            numba_one: {
+                sub1: 'unchanged',
+                sub2: {sub_sub_2: 'changed'},
+                sub3: [{sub_sub_3: 'changed', sub3Sub4: 'unchanged'}]
+            }
+        }
+
+        const result = keysToCamel(input)
+
+        expect(result).toEqual({
+            numbaOne: {
+                sub1: 'unchanged',
+                sub2: {subSub_2: 'changed'},
+                sub3: [{subSub_3: 'changed', sub3Sub4: 'unchanged'}]
+            }
+        })
+    })
+})
+
+describe('camelCaseKeysToUnderscore', () => {
+    it('doesnt mutate input object', () => {
+        const input = {
+            testKey: {
+                nestedTestKey: {
+                    deepDownKey: 'value'
+                }
+            }
+        }
+
+        camelCaseKeysToUnderscore(input)
+
+        expect(input).toStrictEqual({
+            testKey: {
+                nestedTestKey: {
+                    deepDownKey: 'value'
+                }
+            }
+        })
+    })
+
+    it('converts camel case keys to snake case', () => {
+        const input = {
+            testKey: {
+                nestedTestKey: {
+                    deepDownKey: 'value'
+                },
+                nestedArr: [{myKey: 'changed', my_key2: 'unchanged'}]
+            }
+        }
+
+        const result = camelCaseKeysToUnderscore(input)
+
+        expect(result).toEqual({
+            test_key: {
+                nested_arr: [{my_key: 'changed', my_key2: 'unchanged'}],
+                nested_test_key: {
+                    deep_down_key: 'value'
+                }
+            }
+        })
+    })
+
+    it('converts keys in array of objects', () => {
+        const input = [
+            {
+                testKey: 'changed'
+            },
+            {
+                test_key: 'unchanged'
+            }
+        ]
+
+        const result = camelCaseKeysToUnderscore(input)
+
+        expect(result).toEqual([
+            {
+                test_key: 'changed'
+            },
+            {
+                test_key: 'unchanged'
+            }
+        ])
+    })
+
+    it('avoids collision with existing key name', () => {
+        const input = {
+            test_key: 'unchanged',
+            testKey: 'unchanged'
+        }
+
+        const result = camelCaseKeysToUnderscore(input)
+
+        expect(result).toEqual({
+            test_key: 'unchanged'
+        })
     })
 })
