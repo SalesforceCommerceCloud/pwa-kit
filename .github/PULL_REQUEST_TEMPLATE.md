@@ -53,4 +53,4 @@ _or..._
 
 ## Localization
 
-- [ ] Changes includes a UI text update in the Retail React App (which requires translation)
+- [ ] Changes include a UI text update in the Retail React App (which requires translation)
