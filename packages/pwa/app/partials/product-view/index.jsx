@@ -351,7 +351,9 @@ const ProductView = ({
                             <HStack>
                                 <Button {...dec}>-</Button>
                                 <Input {...input} />
-                                <Button {...inc}>+</Button>
+                                <Button data-testid="quantity-increment" {...inc}>
+                                    +
+                                </Button>
                             </HStack>
                         </VStack>
                         <HideOnDesktop>

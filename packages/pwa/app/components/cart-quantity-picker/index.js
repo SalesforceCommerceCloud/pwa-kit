@@ -48,6 +48,7 @@ const CartQuantityPicker = ({product, handleRemoveItem, onItemQuantityChange}) =
                 }}
             >
                 <Input
+                    data-testid="cart-quantity"
                     width={11}
                     onBlur={(e) => {
                         const quantity = e.target.value
@@ -72,6 +73,7 @@ const CartQuantityPicker = ({product, handleRemoveItem, onItemQuantityChange}) =
                 />
             </form>
             <Button
+                data-testid="cart-quantity-increment"
                 variant="outline"
                 onClick={() => {
                     setUpdatedQuantity(product.quantity + stepQuantity)

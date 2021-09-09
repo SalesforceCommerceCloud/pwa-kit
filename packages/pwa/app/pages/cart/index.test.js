@@ -7,7 +7,7 @@
 
 /* eslint-disable no-unused-vars */
 import React from 'react'
-import {screen, within, waitForElementToBeRemoved} from '@testing-library/react'
+import {screen, within, waitForElementToBeRemoved, fireEvent} from '@testing-library/react'
 import {renderWithProviders} from '../../utils/test-utils'
 import Cart from './index'
 import userEvent from '@testing-library/user-event'
@@ -166,13 +166,15 @@ test('Can update item quantity in the cart', async () => {
     const cartItem = await screen.findByTestId(
         `sf-cart-item-${mockedBasketResponse.productItems[0].productId}`
     )
-    expect(within(cartItem).getByRole('spinbutton')).toHaveValue('2')
+
+    expect(await within(cartItem).getByDisplayValue('2'))
+
+    const incrementButton = await within(cartItem).findByTestId('cart-quantity-increment')
 
     // update item quantity
-    userEvent.type(within(cartItem).getByRole('spinbutton'), '{backspace}3')
+    fireEvent.click(incrementButton)
 
-    await waitForElementToBeRemoved(() => screen.getByText(/loading\.\.\./i))
-    expect(await within(cartItem).getByRole('spinbutton')).toHaveValue('3')
+    expect(await within(cartItem).getByDisplayValue('3'))
 })
 
 test('Can update item quantity from product view modal', async () => {
@@ -194,17 +196,20 @@ test('Can update item quantity from product view modal', async () => {
     const cartItem = await screen.findByTestId(
         `sf-cart-item-${mockedBasketResponse.productItems[0].productId}`
     )
-    expect(within(cartItem).getByRole('spinbutton')).toHaveValue('2')
+
     const editCartButton = within(cartItem).getByRole('button', {name: 'Edit'})
     userEvent.click(editCartButton)
     const productView = screen.getByTestId('product-view')
     expect(productView).toBeInTheDocument()
     // update item quantity
-    userEvent.type(within(productView).getByRole('spinbutton'), '{backspace}3')
-    userEvent.click(within(productView).getAllByText(/Update/)[0])
+    expect(await within(cartItem).getByDisplayValue('2'))
 
-    await waitForElementToBeRemoved(() => screen.getByText(/loading\.\.\./i))
-    expect(await within(cartItem).getByRole('spinbutton')).toHaveValue('3')
+    const incrementButton = await within(cartItem).findByTestId('cart-quantity-increment')
+
+    // update item quantity
+    fireEvent.click(incrementButton)
+
+    expect(await within(cartItem).getByDisplayValue('3'))
 })
 
 test('Can remove item from the cart', async () => {
