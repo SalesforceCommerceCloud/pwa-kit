@@ -4,14 +4,8 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useState, useContext} from 'react'
-import PropTypes from 'prop-types'
-import {IntlProvider as ReactIntlProvider} from 'react-intl'
-import packageInfo from '../package.json'
 
-// TODO: You can update these locales in 'pwa/package.json' file
-export const SUPPORTED_LOCALES = packageInfo.l10n.supportedLocales
-export const DEFAULT_LOCALE = packageInfo.l10n.defaultLocale
+import {SUPPORTED_LOCALES, DEFAULT_LOCALE} from '../constants'
 
 /**
  * Dynamically import the translations/messages for a given locale
@@ -36,11 +30,11 @@ export const loadLocaleData = async (locale) => {
 
     let module
     try {
-        module = await import(`./translations/compiled/${localeToLoad}.json`)
+        module = await import(`../translations/compiled/${localeToLoad}.json`)
     } catch (err) {
         console.error(err)
         console.log(`Loading the default locale '${DEFAULT_LOCALE}' instead`)
-        module = await import(`./translations/compiled/${DEFAULT_LOCALE}.json`)
+        module = await import(`../translations/compiled/${DEFAULT_LOCALE}.json`)
     }
 
     return module.default
@@ -78,9 +72,7 @@ export const getLocaleConfig = async ({getUserPreferredLocales} = {}) => {
  * @returns {string} The target locale if there's a match. Otherwise, returns `fallbackLocale`.
  */
 export const whichLocaleToLoad = (preferredLocales, supportedLocales, fallbackLocale) => {
-    const targetLocale = preferredLocales
-        .map((locale) => locale.toLowerCase())
-        .filter((locale) => supportedLocales.includes(locale))[0]
+    const targetLocale = preferredLocales.filter((locale) => supportedLocales.includes(locale))[0]
 
     return targetLocale || fallbackLocale
 }
@@ -97,41 +89,4 @@ export const getTargetLocale = (preferredLocales, supportedLocales, defaultLocal
         process.env.TARGET_LOCALE ||
         whichLocaleToLoad(preferredLocales, supportedLocales, defaultLocale)
     )
-}
-
-const LocaleContext = React.createContext()
-
-export const IntlProvider = ({children, locale, messages, ...otherProps}) => {
-    const [activeLocale, setActiveLocale] = useState(locale)
-    const [activeMessages, setActiveMessages] = useState(messages)
-
-    // NOTE: if changing locale this way causes some issue in your app, you may want to
-    // consider doing it with a page refresh instead (by setting `window.location` with a localized URL)
-    const changeLocale = async (locale) => {
-        const newMessages = await loadLocaleData(locale)
-        setActiveMessages(newMessages)
-        setActiveLocale(locale)
-    }
-
-    return (
-        <ReactIntlProvider locale={activeLocale} messages={activeMessages} {...otherProps}>
-            <LocaleContext.Provider value={{activeLocale, changeLocale}}>
-                {children}
-            </LocaleContext.Provider>
-        </ReactIntlProvider>
-    )
-}
-IntlProvider.propTypes = {
-    children: PropTypes.node,
-    locale: PropTypes.string,
-    messages: PropTypes.object
-}
-
-/**
- * Custom React hook to get the currently active locale and to change it to a different locale
- * @returns {{activeLocale: string, changeLocale: function}[]}
- */
-export const useLocale = () => {
-    const {activeLocale, changeLocale} = useContext(LocaleContext)
-    return [activeLocale, changeLocale]
 }

@@ -20,7 +20,7 @@ const data = {
             name: 'Black',
             orderable: false,
             value: 'BLACKFB',
-            href: '/en/swatch-example?color=BLACKFB',
+            href: '/en-GB/swatch-example?color=BLACKFB',
             image: {
                 alt: 'Navy Single Pleat Wool Suit, Navy, swatch',
                 disBaseLink:
@@ -34,7 +34,7 @@ const data = {
             name: 'Grey Heather',
             orderable: true,
             value: 'JJ2XNXX',
-            href: '/en/swatch-example?color=JJ2XNXX',
+            href: '/en-GB/swatch-example?color=JJ2XNXX',
             image: {
                 alt: 'Long Sleeve Crew Neck, Grey Heather, swatch',
                 disBaseLink:
@@ -48,7 +48,7 @@ const data = {
             name: 'Meadow Violet',
             orderable: true,
             value: 'JJ3HDXX',
-            href: '/en/swatch-example?color=JJ3HDXX',
+            href: '/en-GB/swatch-example?color=JJ3HDXX',
             image: {
                 alt: 'Long Sleeve Crew Neck, Meadow Violet, swatch',
                 disBaseLink:
@@ -109,7 +109,7 @@ const Page = () => {
 describe('Swatch Component', () => {
     test('renders component', () => {
         const history = createMemoryHistory()
-        history.push('/en/swatch-example?color=JJ2XNXX')
+        history.push('/en-GB/swatch-example?color=JJ2XNXX')
 
         render(
             <Router history={history}>
@@ -121,7 +121,7 @@ describe('Swatch Component', () => {
 
     test('swatch can be selected', () => {
         const history = createMemoryHistory()
-        history.push('/en/swatch-example')
+        history.push('/en-GB/swatch-example')
 
         render(
             <Router history={history}>

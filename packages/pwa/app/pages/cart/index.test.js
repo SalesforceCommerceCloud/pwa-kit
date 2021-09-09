@@ -289,7 +289,7 @@ test('Can apply and remove product-level coupon code with promotion', async () =
     expect(await screen.findByText(/MENSSUITS/i)).toBeInTheDocument()
 
     const cartItem = await screen.findByTestId('sf-cart-item-750518699578M')
-    expect(await within(cartItem).findByText('-$30.00')).toBeInTheDocument()
+    expect(await within(cartItem).findByText(/^-([A-Z]{2})?\$30\.00$/)).toBeInTheDocument()
 
     // remove coupon
     mockedBasketResponse = keysToCamel(mockBasketWithSuit)
@@ -298,5 +298,5 @@ test('Can apply and remove product-level coupon code with promotion', async () =
 
     expect(await screen.findByText('Promotion removed')).toBeInTheDocument()
     expect(await screen.queryByText(/MENSSUITS/i)).not.toBeInTheDocument()
-    expect(await within(cartItem).queryByText('-$30.00')).not.toBeInTheDocument()
+    expect(await within(cartItem).queryByText(/^-([A-Z]{2})?\$30\.00$/)).not.toBeInTheDocument()
 })

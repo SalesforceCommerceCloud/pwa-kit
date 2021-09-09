@@ -106,12 +106,12 @@ beforeEach(() => {
         global.TextEncoder = require('util').TextEncoder
     }
 
-    window.history.pushState({}, 'Reset Password', '/en/reset-password')
+    window.history.pushState({}, 'Reset Password', '/en-GB/reset-password')
 })
 afterEach(() => {
     localStorage.clear()
     server.resetHandlers()
-    window.history.pushState({}, 'Reset Password', '/en/reset-password')
+    window.history.pushState({}, 'Reset Password', '/en-GB/reset-password')
 })
 afterAll(() => server.close())
 
@@ -121,7 +121,7 @@ test('Allows customer to go to sign in page', async () => {
 
     user.click(screen.getByText('Sign in'))
     await waitFor(() => {
-        expect(window.location.pathname).toEqual('/en/login')
+        expect(window.location.pathname).toEqual('/en-GB/login')
     })
 })
 
@@ -154,7 +154,7 @@ test('Allows customer to generate password token', async () => {
 
     user.click(screen.getByText('Back to sign in'))
     await waitFor(() => {
-        expect(window.location.pathname).toEqual('/en/login')
+        expect(window.location.pathname).toEqual('/en-GB/login')
     })
 })
 

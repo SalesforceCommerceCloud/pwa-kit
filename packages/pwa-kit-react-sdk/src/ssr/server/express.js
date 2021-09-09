@@ -1137,6 +1137,7 @@ const ssrRequestProcessorMiddleware = (req, res, next) => {
     locals.responseCaching = {}
     locals.requestId = _nextRequestId++
     locals.timer = new PerformanceTimer(`req${locals.requestId}`)
+    locals.originalUrl = req.originalUrl
 
     // Track this response
     req.app._requestMonitor._responseStarted(res)
