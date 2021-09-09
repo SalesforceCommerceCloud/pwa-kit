@@ -48,10 +48,9 @@ const ProductItem = ({
                                 <CartItemVariantName />
                                 <CartItemVariantAttributes />
                                 <HideOnDesktop>
-                                    <Text fontSize="sm" color="gray.700">
-                                        <FormattedMessage defaultMessage="Price:" />
-                                    </Text>
-                                    <CartItemVariantPrice align="left" />
+                                    <Box marginTop={2}>
+                                        <CartItemVariantPrice align="left" />
+                                    </Box>
                                 </HideOnDesktop>
                             </Stack>
 

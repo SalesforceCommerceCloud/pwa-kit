@@ -48,6 +48,7 @@ const CartQuantityPicker = ({product, handleRemoveItem, onItemQuantityChange}) =
                 }}
             >
                 <Input
+                    width={11}
                     onBlur={(e) => {
                         const quantity = e.target.value
                         if (parseInt(quantity)) {

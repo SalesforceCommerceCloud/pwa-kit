@@ -11,6 +11,23 @@ import {Stack, Text} from '@chakra-ui/react'
 import useBasket from '../../commerce-api/hooks/useBasket'
 import {useCartItemVariant} from '.'
 import {DEFAULT_CURRENCY} from '../../constants'
+import {HideOnDesktop, HideOnMobile} from '../responsive'
+
+const PricePerItem = ({currency, basket, basePrice}) => {
+    return (
+        <Text fontSize={{base: '12px', lg: '14px'}}>
+            <FormattedNumber
+                style="currency"
+                currency={currency || basket.currency || DEFAULT_CURRENCY}
+                value={basePrice}
+            />
+            <FormattedMessage
+                defaultMessage="ea"
+                description="Abbreviated 'each', follows price per item, like $10/ea"
+            />
+        </Text>
+    )
+}
 
 /**
  * In the context of a cart product item variant, this component renders the item's
@@ -29,14 +46,19 @@ const ItemPrice = ({currency, align = 'right', ...props}) => {
     return (
         <Stack
             textAlign={align}
-            direction={hasDiscount ? 'column' : 'row'}
+            direction={hasDiscount ? 'column' : {base: 'column', lg: 'row'}}
             justifyContent={align === 'left' ? 'flex-start' : 'flex-end'}
             alignItems="baseline"
             spacing={hasDiscount ? 0 : 1}
             wrap="row"
             {...props}
         >
-            <Text fontWeight="bold">
+            {basePrice && price !== basePrice && (
+                <HideOnDesktop>
+                    <PricePerItem currency={currency} basePrice={basePrice} basket={basket} />
+                </HideOnDesktop>
+            )}
+            <Text fontWeight="bold" lineHeight={{base: '0.5', lg: '24px'}}>
                 <FormattedNumber
                     style="currency"
                     currency={currency || basket.currency || DEFAULT_CURRENCY}
@@ -61,17 +83,9 @@ const ItemPrice = ({currency, align = 'right', ...props}) => {
             </Text>
 
             {basePrice && price !== basePrice && (
-                <Text fontSize="14px">
-                    <FormattedNumber
-                        style="currency"
-                        currency={currency || basket.currency || DEFAULT_CURRENCY}
-                        value={basePrice}
-                    />
-                    <FormattedMessage
-                        defaultMessage="ea"
-                        description="Abbreviated 'each', follows price per item, like $10/ea"
-                    />
-                </Text>
+                <HideOnMobile>
+                    <PricePerItem currency={currency} basePrice={basePrice} basket={basket} />
+                </HideOnMobile>
             )}
         </Stack>
     )
