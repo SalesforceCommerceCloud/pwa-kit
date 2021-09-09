@@ -38,7 +38,7 @@ export default function useCustomerProductLists({eventHandler = noop, errorHandl
                 case CustomerProductListEventQueue.eventTypes.ADD: {
                     try {
                         const productList = self.getProductListPerType(listType)
-                        const productListItem = productList.customerProductListItems.find(
+                        const productListItem = productList?.customerProductListItems.find(
                             ({productId}) => productId === event.item.id
                         )
                         // if the item is already in the wishlist
