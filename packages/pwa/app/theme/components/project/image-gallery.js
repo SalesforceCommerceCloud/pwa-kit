@@ -37,18 +37,18 @@ export default {
     sizes: {
         sm: {
             heroImageSkeleton: {
-                maxWidth: ['none', 'none', '500px']
+                maxWidth: ['none', 'none', 'none', '500px']
             },
             heroImage: {
-                maxWidth: ['none', 'none', '500px']
+                maxWidth: ['none', 'none', 'none', '500px']
             }
         },
         md: {
             heroImageSkeleton: {
-                maxWidth: ['none', 'none', '680px']
+                maxWidth: ['none', 'none', 'none', '680px']
             },
             heroImage: {
-                maxWidth: ['none', 'none', '680px']
+                maxWidth: ['none', 'none', 'none', '680px']
             }
         }
     },

@@ -37,7 +37,7 @@ const MockedComponent = () => {
     return (
         <Switch>
             <Route
-                path="/en/product/:productId"
+                path="/en-GB/product/:productId"
                 render={(props) => <ProductDetail {...props} product={product} />}
             />
         </Switch>
@@ -93,7 +93,7 @@ beforeAll(() => {
 
     // Since we're testing some navigation logic, we are using a simple Router
     // around our component. We need to initialize the default route/path here.
-    window.history.pushState({}, 'ProductDetail', '/en/product/test-product')
+    window.history.pushState({}, 'ProductDetail', '/en-GB/product/test-product')
 })
 
 beforeEach(() => {

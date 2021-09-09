@@ -10,6 +10,7 @@ import {
     categoryUrlBuilder,
     productUrlBuilder,
     searchUrlBuilder,
+    homeUrlBuilder,
     rebuildPathWithParams,
     removeQueryParamsFromPath
 } from './url'
@@ -78,12 +79,20 @@ describe('url builder test', () => {
     test('productUrlBuilder returns expect', () => {
         const url = productUrlBuilder({id: 'productId'})
 
-        expect(url).toEqual('/en/product/productId')
+        expect(url).toEqual('/product/productId')
     })
 
     test('categoryUrlBuilder returns expect', () => {
         const url = categoryUrlBuilder({id: 'men'})
-        expect(url).toEqual(`/en/category/men`)
+        expect(url).toEqual(`/en-GB/category/men`)
+    })
+
+    test('homeUrlBuilder returns expect', () => {
+        const url = homeUrlBuilder('/', 'fr-FR')
+        expect(url).toEqual(`/fr-FR/`)
+
+        const homeUrlDefaultLocale = homeUrlBuilder('/', 'en-GB')
+        expect(homeUrlDefaultLocale).toEqual(`/`)
     })
 })
 

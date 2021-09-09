@@ -1,27 +1,15 @@
-```
- (                                                                              (    (         )
- )\ )                                                   (  (               )    )\ ) )\ )   ( /(
-(()/( (         (  (  (      (         (    )      (    )\))(   '   (   ( /(   (()/((()/(   )\())
- /(_)))(    (   )\))( )(    ))\ (   (  )\  /((    ))\  ((_)()\ )   ))\  )\())   /(_))/(_))|((_)\
-(_)) (()\   )\ ((_))\(()\  /((_))\  )\((_)(_))\  /((_) _(())\_)() /((_)((_)\   (_)) (_))_ |_ ((_)
-| _ \ ((_) ((_) (()(_)((_)(_)) ((_)((_)(_)_)((_)(_))   \ \((_)/ /(_))  | |(_)  / __| |   \| |/ /
-|  _/| '_|/ _ \/ _` || '_|/ -_)(_-<(_-<| |\ V / / -_)   \ \/\/ / / -_) | '_ \  \__ \ | |) | ' <
-|_|  |_|  \___/\__, ||_|  \___|/__//__/|_| \_/  \___|    \_/\_/  \___| |_.__/  |___/ |___/ _|\_\
-               |___/
-```
+# The Progressive Web App (PWA) Kit SDK
 
 [![NPM](https://nodei.co/npm/pwa-kit-react-sdk.png?downloads=true&stars=true)](https://nodei.co/npm/pwa-kit-react-sdk/) [![CircleCI](https://circleci.com/gh/mobify/mobify-platform-sdks.svg?style=svg&circle-token=2fa991127044320858c98be882401b68423f0adb)](https://circleci.com/gh/mobify/mobify-platform-sdks)
 
-A library that supports the isomorphic React rendering pipeline for Commerce Cloud Managed Runtime apps.
+A library of components and utilities that supports the rendering pipeline for the Progressive Web App (PWA) Kit from Salesforce.
 
 ## Requirements
 
--   [Git](https://git-scm.com/)
--   We recommend you use [nvm](https://github.com/creationix/nvm#installation) to
-    manage node and npm versions.
--   Node ^12.0.0 || ^14.17.0 [LTS](https://github.com/nodejs/LTS#lts-schedule). We recommend
-    using the latest version of Node supported whenever possible.
--   npm ^6.x
+```
+  Node ^12.x or ^14.x
+  npm ^6.14.4
+```
 
 ## Install Dependencies
 
@@ -29,40 +17,14 @@ A library that supports the isomorphic React rendering pipeline for Commerce Clo
 npm i
 ```
 
-## Marking public API functions as experimental or deprecated
-
-To mark a function as experimental or deprecated in code, you can use the utility functions `experimental()` or `deprecate()` from `progressive-web-sdk/src/utils/warnings` within your experimental/deprecated function. This will prompt a warning in the browser whenever your function is used. You can add an additional custom message to the warning by passing a string into the first parameter.
-
-Example usage:
-
-```javascript
-import {experimental} from './utils/warnings'
-
-someExperimentalFunction() => {
-  // regular usage
-  experimental()
-
-  // the function implementation
-}
-```
-
-This is the warning that will print in your browser:
-`[PWA Kit API WARNING]: You are currently using an experimental function: [someExperimentalFunction] This function may change at any time.`
-
-```javascript
-import {deprecate} from './utils/warnings'
-
-someFunctionToBeDeprecated() => {
-  // with custom message
-  deprecate("It will be removed in version 1.2.3. Please use [newFunction] instead.")
-
-  // the function implementation
-}
-```
-
-This is the warning that will print in your browser:
-`[PWA Kit API WARNING]: You are currently using an deprecated function: [someFunctionToBeDeprecated]. It will be removed in version 1.2.3. Please use [newFunction] instead.`
-
 ## Documentation
 
-Please see the [Documentation README](https://github.com/mobify/progressive-web-sdk/blob/develop/docs/README.md).
+The full documentation for PWA Kit is hosted on the [Commerce Cloud Developer Center](https://developer.commercecloud.com/s/article/PWA-Kit).
+
+### Useful Links:
+
+-   [Getting Started](https://developer.commercecloud.com/s/article/Getting-Started-with-PWA-Kit)
+-   [Pushing and Deploying Bundles](https://developer.commercecloud.com/s/article/Pushing-and-Deploying-Bundles)
+-   [The Retail React App](https://developer.commercecloud.com/s/article/The-Retail-React-App)
+-   [Rendering and Routing](https://developer.commercecloud.com/s/article/Rendering-and-Routing)
+-   [Managed Runtime Infrastructure](https://developer.commercecloud.com/s/article/Managed-Runtime-Infrastructure)

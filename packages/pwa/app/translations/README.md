@@ -56,7 +56,7 @@ How a locale gets chosen depends on whether there’s a match found between 2 se
 
 #### How to detect the active locale
 
--   Within component render, useLocale hook is available to you: `const [locale, changeLocale] = useLocale()`
+-   Within component render, `useIntl` hook is available to you: `const {locale} = useIntl()`
 -   Within a page’s `getProps` , there’s a `params` prop (specifically `params.locale`) coming from the routes that can tell you about which locale is being used in the current page URL.
 
 #### Dynamic loading of the translation files

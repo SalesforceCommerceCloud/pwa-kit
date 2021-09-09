@@ -122,7 +122,7 @@ const MockedComponent = () => {
     return (
         <Router>
             <Registration />
-            <Route path="/en/account">
+            <Route path="/en-GB/account">
                 <Account match={match} />
             </Route>
         </Router>

@@ -26,7 +26,6 @@ import LoginForm from '../components/login'
 import ResetPasswordForm from '../components/reset-password'
 import RegisterForm from '../components/register'
 import {useHistory} from 'react-router-dom'
-import {useLocale} from '../locale'
 import {noop} from '../utils/utils'
 import {API_ERROR_MESSAGE} from '../constants'
 
@@ -41,14 +40,13 @@ export const AuthModal = ({
     onPasswordResetSuccess = noop,
     ...props
 }) => {
-    const {formatMessage} = useIntl()
+    const {formatMessage, locale} = useIntl()
     const customer = useCustomer()
     const [currentView, setCurrentView] = useState(initialView)
     const form = useForm()
     const submittedEmail = useRef()
     const history = useHistory()
     const toast = useToast()
-    const [locale] = useLocale()
 
     const submitForm = async (data) => {
         form.clearErrors()
