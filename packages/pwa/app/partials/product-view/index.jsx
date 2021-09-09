@@ -21,11 +21,9 @@ import {
     Fade,
     useDisclosure,
     useTheme,
-    NumberInput,
-    NumberInputField,
-    NumberInputStepper,
-    NumberIncrementStepper,
-    NumberDecrementStepper
+    HStack,
+    Input,
+    useNumberInput
 } from '@chakra-ui/react'
 
 import {useProduct} from '../../hooks'
@@ -116,10 +114,15 @@ const ProductView = ({
         variant,
         variationParams,
         variationAttributes,
-        stockLevel
+        stockLevel,
+        stepQuantity
     } = useProduct(product)
     const canAddToWishlist = !isProductLoading
-    const canOrder = !isProductLoading && variant?.orderable && quantity <= stockLevel
+    const canOrder =
+        !isProductLoading &&
+        variant?.orderable &&
+        parseInt(quantity) > 0 &&
+        parseInt(quantity) <= stockLevel
 
     const renderActionButtons = () => {
         const buttons = []
@@ -186,6 +189,37 @@ const ProductView = ({
             onAddToCartModalClose()
         }
     }, [location.pathname])
+
+    // Chakra Number Input Hook
+    const {getInputProps, getIncrementButtonProps, getDecrementButtonProps} = useNumberInput({
+        step: stepQuantity,
+        value: quantity,
+        min: 0,
+        max: stockLevel,
+        onChange: (stringValue, numberValue) => {
+            // Set the Quantity of product to value of input if value number
+            if (numberValue >= 0) {
+                setQuantity(numberValue)
+            } else if (stringValue === '') {
+                // We want to allow the use to clear the input to start a new input so here we set the quantity to '' so NAN is not displayed
+                // User will not be able to add '' qauntity to the cart due to the add to cart button enablement rules
+                setQuantity(stringValue)
+            }
+        },
+        onBlur: (e) => {
+            // Default to 1 if a user leaves the box with an invalid value
+            const value = e.target.value
+            if (parseInt(value) < 0 || value === '') {
+                setQuantity(1)
+            }
+        }
+    })
+
+    const inc = getIncrementButtonProps({variant: 'outline'})
+    const dec = getDecrementButtonProps({variant: 'outline'})
+    const input = getInputProps()
+
+    // Chakra Number Input Hook
 
     return (
         <Flex direction={'column'} data-testid="product-view">
@@ -303,27 +337,18 @@ const ProductView = ({
                         )}
 
                         {/* Quantity Selector */}
-                        <VStack align="stretch" maxWidth={'125px'}>
+                        <VStack align="stretch" maxWidth={'200px'}>
                             <Box fontWeight="bold">
                                 {intl.formatMessage({
                                     defaultMessage: 'Quantity'
                                 })}
                                 :
                             </Box>
-                            <NumberInput
-                                onChange={(valueString) => {
-                                    setQuantity(parseInt(valueString))
-                                }}
-                                value={quantity}
-                                min={1}
-                                max={MAX_ORDER_QUANTITY}
-                            >
-                                <NumberInputField />
-                                <NumberInputStepper>
-                                    <NumberIncrementStepper />
-                                    <NumberDecrementStepper />
-                                </NumberInputStepper>
-                            </NumberInput>
+                            <HStack>
+                                <Button {...dec}>-</Button>
+                                <Input {...input} />
+                                <Button {...inc}>+</Button>
+                            </HStack>
                         </VStack>
                     </VStack>
 

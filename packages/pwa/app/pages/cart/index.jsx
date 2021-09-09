@@ -270,6 +270,7 @@ const Cart = () => {
                                                 isCartItemLoading &&
                                                 selectedItem?.itemId === product.itemId
                                             }
+                                            handleRemoveItem={handleRemoveItem}
                                         />
                                     ))}
                                 </Stack>

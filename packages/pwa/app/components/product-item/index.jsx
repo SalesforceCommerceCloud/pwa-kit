@@ -7,21 +7,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {FormattedMessage} from 'react-intl'
-import {
-    Box,
-    Flex,
-    Stack,
-    Text,
-    NumberInput,
-    NumberInputField,
-    NumberInputStepper,
-    NumberIncrementStepper,
-    NumberDecrementStepper,
-    useNumberInput,
-    HStack,
-    Button,
-    Input
-} from '@chakra-ui/react'
+import {Box, Flex, Stack, Text} from '@chakra-ui/react'
 import CartItemVariant from '../cart-item-variant'
 import CartItemVariantImage from '../cart-item-variant/item-image'
 import CartItemVariantName from '../cart-item-variant/item-name'
@@ -29,11 +15,8 @@ import CartItemVariantAttributes from '../cart-item-variant/item-attributes'
 import CartItemVariantPrice from '../cart-item-variant/item-price'
 import LoadingSpinner from '../loading-spinner'
 import {noop} from '../../utils/utils'
-
 import {HideOnDesktop, HideOnMobile} from '../responsive'
-import {MAX_ORDER_QUANTITY} from '../../constants'
-
-import {useProduct} from '../../hooks'
+import CartQuantityPicker from '../cart-quantity-picker'
 
 /**
  * Component representing a product item usually in a list with details about the product - name, variant, pricing, etc.
@@ -42,6 +25,7 @@ import {useProduct} from '../../hooks'
  * @param {node} secondaryActions Child component representing the other actions relevant to the product to be performed by the user.
  * @param {func} onItemQuantityChange callback function to be invoked whenever item quantity changes.
  * @param {boolean} showLoading Renders a loading spinner with overlay if set to true.
+ * @param {boolean} handleRemoveItem Handles removal of items from cart
  * @returns A JSX element representing product item in a list (eg: wishlist, cart, etc).
  */
 const ProductItem = ({
@@ -49,28 +33,9 @@ const ProductItem = ({
     primaryAction,
     secondaryActions,
     onItemQuantityChange = noop,
-    showLoading = false
+    showLoading = false,
+    handleRemoveItem
 }) => {
-    const {stepQuantity, stockLevel} = useProduct(product)
-    // Mobile Quantity Stepper Logic
-    const {getInputProps, getIncrementButtonProps, getDecrementButtonProps} = useNumberInput({
-        keepWithinRange: false,
-        clampValueOnBlur: false,
-        step: 1,
-        min: 1,
-        max: MAX_ORDER_QUANTITY,
-        // onChange: (valueString) => onItemQuantityChange(valueString),
-        onBlur: (event) => {
-            console.log(event.target.value)
-        },
-        defaultValue: product.quantity
-    })
-
-    const inc = getIncrementButtonProps()
-    const dec = getDecrementButtonProps()
-    const input = getInputProps()
-    // Mobile Quantity Stepper Logic
-
     return (
         <Box position="relative" data-testid={`sf-cart-item-${product.productId}`}>
             <CartItemVariant variant={product}>
@@ -78,7 +43,6 @@ const ProductItem = ({
                 <Stack layerStyle="cardBordered" align="flex-start">
                     <Flex width="full" alignItems="flex-start" backgroundColor="white">
                         <CartItemVariantImage width={['88px', '136px']} mr={4} />
-
                         <Stack spacing={3} flex={1}>
                             <Stack spacing={1}>
                                 <CartItemVariantName />
@@ -96,31 +60,11 @@ const ProductItem = ({
                                     <Text fontSize="sm" color="gray.700">
                                         <FormattedMessage defaultMessage="Quantity:" />
                                     </Text>
-                                    {/* 
-                                    <HideOnMobile>
-                                        <NumberInput
-                                            width="100px"
-                                            onChange={(valueString) =>
-                                                onItemQuantityChange(valueString)
-                                            }
-                                            value={product.quantity}
-                                            min={1}
-                                            max={10}
-                                        >
-                                            <NumberInputField />
-                                            <NumberInputStepper>
-                                                <NumberIncrementStepper />
-                                                <NumberDecrementStepper />
-                                            </NumberInputStepper>
-                                        </NumberInput>
-                                    </HideOnMobile>
-                                    <HideOnDesktop> */}
-                                    <HStack maxW="80%">
-                                        <Button {...dec}>-</Button>
-                                        <Input {...input} />
-                                        <Button {...inc}>+</Button>
-                                    </HStack>
-                                    {/* </HideOnDesktop> */}
+                                    <CartQuantityPicker
+                                        product={product}
+                                        handleRemoveItem={handleRemoveItem}
+                                        onItemQuantityChange={onItemQuantityChange}
+                                    />
                                 </Stack>
                                 <Stack>
                                     <HideOnMobile>
@@ -153,7 +97,8 @@ ProductItem.propTypes = {
     showLoading: PropTypes.bool,
     isWishlistItem: PropTypes.bool,
     primaryAction: PropTypes.node,
-    secondaryActions: PropTypes.node
+    secondaryActions: PropTypes.node,
+    handleRemoveItem: PropTypes.func
 }
 
 export default ProductItem
