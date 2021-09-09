@@ -33,15 +33,6 @@ describe('isTokenValid', () => {
     test('returns false if token expires within 60 econds', () => {
         expect(isTokenValid(createJwt(59))).toBe(false)
     })
-
-    test('convertSnakeCaseToSentenceCase returns correct formatted string', () => {
-        const snakeCaseString = 'test_snake_case_string'
-        const expectedSentenceCaseString = 'test snake case string'
-
-        expect(convertSnakeCaseToSentenceCase(snakeCaseString) === expectedSentenceCaseString).toBe(
-            true
-        )
-    })
 })
 
 describe('keysToCamel', () => {
@@ -212,5 +203,16 @@ describe('camelCaseKeysToUnderscore', () => {
         expect(result).toEqual({
             test_key: 'unchanged'
         })
+    })
+})
+
+describe('convertSnakeCaseToSentenceCase', () => {
+    test('convertSnakeCaseToSentenceCase returns correct formatted string', () => {
+        const snakeCaseString = 'test_snake_case_string'
+        const expectedSentenceCaseString = 'test snake case string'
+
+        expect(convertSnakeCaseToSentenceCase(snakeCaseString) === expectedSentenceCaseString).toBe(
+            true
+        )
     })
 })
