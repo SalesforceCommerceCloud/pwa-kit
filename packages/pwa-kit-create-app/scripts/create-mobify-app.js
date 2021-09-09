@@ -297,7 +297,7 @@ const testProjectAnswers = () => {
         projectId: 'scaffold-pwa',
         instanceUrl: 'https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com',
         clientId: 'c9c45bfd-0ed3-4aa2-9971-40f88962b836',
-        siteId: 'RefArch',
+        siteId: 'RefArchGlobal',
         organizationId: 'f_ecom_zzrf_001',
         shortCode: 'kv7kzm78',
         einsteinId: '1ea06c6e-c936-4324-bcf0-fada93f83bb1'
