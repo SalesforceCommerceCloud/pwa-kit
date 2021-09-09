@@ -134,8 +134,7 @@ const ProductDetail = ({category, product, isLoading}) => {
                 const wishlist = customerProductLists.getProductListPerType(
                     customerProductListTypes.WISHLIST
                 )
-
-                const productListItem = wishlist.customerProductListItems.find(
+                const productListItem = wishlist.customerProductListItems?.find(
                     ({productId}) => productId === product.id
                 )
                 // if the product already exists in wishlist, update the quantity
