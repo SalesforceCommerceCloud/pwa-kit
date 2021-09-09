@@ -1,0 +1,41 @@
+{
+    "name": "pwa-test-app",
+    "version": "0.11.0-dev",
+    "license": "See license in LICENSE",
+    "private": true,
+    "engines": {
+        "node": "^14"
+    },
+    "dependencies": {
+        "aws-serverless-express": "^3.3.6",
+        "express": "^4.17.1",
+        "pwa-kit-react-sdk": "^0.11.0-dev"
+    },
+    "devDependencies": {
+        "@babel/cli": "^7.14.3",
+        "@babel/core": "^7.14.3",
+        "@babel/runtime": "^7.14.0",
+        "prettier": "1.18.2",
+        "webpack": "^4.39.2",
+        "webpack-cli": "^3.3.7"
+    },
+    "scripts": {
+        "format": "prettier --write \"**/*.{js,jsx}\"",
+        "start": "node src",
+        "build": "rm -fr dist && webpack",
+        "push": "npm run build && sdk-upload --buildDirectory dist --projectSlug $npm_package_name",
+        "save-credentials": "sdk-save-credentials"
+    },
+    "mobify": {
+        "ssrEnabled": true,
+        "ssrParameters": {
+            "ssrFunctionNodeVersion": "14.x"
+        },
+        "ssrOnly": [
+            "ssr.js"
+        ],
+        "ssrShared": [
+            "intentionally-does-not-exist"
+        ]
+    }
+}
