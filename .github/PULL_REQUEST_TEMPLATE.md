@@ -35,9 +35,9 @@
 
 ## General
 
-- [ ] My code follows the code style of this project
-- [ ] The code changes are covered by test cases
-- [ ] Add a high-level description of your changes to relevant CHANGELOG.md files (**not** required for documentation updates)
+- [ ] Code follows the code style of this project
+- [ ] Changes are covered by test cases
+- [ ] CHANGELOG.md updated with a short description of changes (_not_ required for documentation updates)
 
 ## Accessibility Compliance
 
@@ -53,4 +53,4 @@ _or..._
 
 ## Localization
 
-- [ ] The change includes UI text update in Retail React App (which requires translation)
+- [ ] Changes includes a UI text update in the Retail React App (which requires translation)
