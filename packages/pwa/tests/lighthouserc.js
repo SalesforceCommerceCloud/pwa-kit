@@ -11,7 +11,12 @@ module.exports = {
         collect: {
             startServerCommand: 'npm run start',
             //TODO: Add key pages URLs here as they are implemented.
-            url: ['http://localhost:3000/'],
+            url: [
+                'http://localhost:3000/',
+                'http://localhost:3000/en-GB/category/womens',
+                'http://localhost:3000/en-GB/product/25493613M',
+                'http://localhost:3000/en-GB/search?q=suit'
+            ],
             startServerReadyPattern: 'HTTP development server listening on',
             startServerReadyTimeout: 15000
         },
@@ -22,10 +27,10 @@ module.exports = {
             aggregationMethod: 'median',
             assertions: {
                 //TODO: Adjust scores and the assertions level from 'warn' to 'error' to fail the build if the scores are not met.
-                'categories:performance': ['warn', {minScore: 0.8}],
-                'categories:pwa': ['warn', {minScore: 0.9}],
-                'categories:seo': ['warn', {minScore: 0.9}],
-                'categories:accessibility': ['error', {minScore: 0.96}]
+                'categories:performance': ['error', {minScore: 0.28}],
+                'categories:pwa': ['error', {minScore: 0.9}],
+                'categories:seo': ['error', {minScore: 0.85}],
+                'categories:accessibility': ['error', {minScore: 0.88}]
             }
         }
     }
