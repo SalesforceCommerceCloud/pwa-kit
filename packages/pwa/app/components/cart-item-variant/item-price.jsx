@@ -29,6 +29,12 @@ const PricePerItem = ({currency, basket, basePrice}) => {
     )
 }
 
+PricePerItem.propTypes = {
+    currency: PropTypes.string,
+    basket: PropTypes.object,
+    basePrice: PropTypes.string
+}
+
 /**
  * In the context of a cart product item variant, this component renders the item's
  * pricing, taking into account applied discounts as well as base item prices.

@@ -22,9 +22,10 @@ const CartQuantityPicker = ({product, handleRemoveItem, onItemQuantityChange}) =
     return (
         <HStack maxW="80%">
             <Button
+                data-testid="cart-quantity-decrement"
                 variant="outline"
                 onClick={() => {
-                    if (product.quantity - 1 === 0) {
+                    if (product.quantity - stepQuantity === 0) {
                         showRemoveItemConfirmation()
                     } else {
                         setUpdatedQuantity(product.quantity - stepQuantity)

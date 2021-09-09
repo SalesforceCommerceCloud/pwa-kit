@@ -7,7 +7,7 @@
 
 /* eslint-disable no-unused-vars */
 import React from 'react'
-import {screen, within, waitForElementToBeRemoved, fireEvent} from '@testing-library/react'
+import {screen, within, fireEvent} from '@testing-library/react'
 import {renderWithProviders} from '../../utils/test-utils'
 import Cart from './index'
 import userEvent from '@testing-library/user-event'
