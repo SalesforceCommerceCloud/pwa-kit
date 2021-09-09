@@ -63,8 +63,9 @@ const CartQuantityPicker = ({product, handleRemoveItem, onItemQuantityChange}) =
                         }
                     }}
                     onChange={(e) => {
-                        if (parseInt(e.target.value) >= 0 || e.target.value === '') {
-                            setUpdatedQuantity(e.target.value)
+                        const quantity = e.target.value
+                        if (parseInt(quantity) >= 0 || quantity === '') {
+                            setUpdatedQuantity(quantity)
                         }
                     }}
                     value={updatedQuantity}
