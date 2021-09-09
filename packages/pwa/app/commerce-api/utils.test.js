@@ -34,28 +34,6 @@ describe('isTokenValid', () => {
         expect(isTokenValid(createJwt(59))).toBe(false)
     })
 
-    test('camelCaseToUnderScore returns a copy of the object with renamed keys (deep/recursvive)', () => {
-        const camelCaseObject = {
-            testKey: {
-                nestedTestKey: {
-                    deepDownKey: 'value'
-                }
-            }
-        }
-        const underScoreKeys = camelCaseKeysToUnderscore(camelCaseObject)
-
-        expect(camelCaseObject).toStrictEqual({
-            testKey: {
-                nestedTestKey: {
-                    deepDownKey: 'value'
-                }
-            }
-        })
-        expect(underScoreKeys.test_key).toBeDefined()
-        expect(underScoreKeys.test_key.nested_test_key).toBeDefined()
-        expect(underScoreKeys.test_key.nested_test_key.deep_down_key).toBeDefined()
-    })
-
     test('convertSnakeCaseToSentenceCase returns correct formatted string', () => {
         const snakeCaseString = 'test_snake_case_string'
         const expectedSentenceCaseString = 'test snake case string'
@@ -67,7 +45,7 @@ describe('isTokenValid', () => {
 })
 
 describe('keysToCamel', () => {
-    it('converts object keys to camelcase', () => {
+    test('converts object keys to camelcase', () => {
         const input = {
             numba_one: true,
             'numba-two': false,
@@ -87,7 +65,7 @@ describe('keysToCamel', () => {
         })
     })
 
-    it('converts arrays of objects to camelcase', () => {
+    test('converts arrays of objects to camelcase', () => {
         const input = [
             {
                 numba_one: true,
@@ -115,7 +93,7 @@ describe('keysToCamel', () => {
         ])
     })
 
-    it('converts converts nested keys to camelcase', () => {
+    test('converts nested keys to camelcase', () => {
         const input = {
             numba_one: {
                 sub1: 'unchanged',
@@ -137,7 +115,29 @@ describe('keysToCamel', () => {
 })
 
 describe('camelCaseKeysToUnderscore', () => {
-    it('doesnt mutate input object', () => {
+    test('camelCaseToUnderScore returns a copy of the object with renamed keys (deep/recursvive)', () => {
+        const camelCaseObject = {
+            testKey: {
+                nestedTestKey: {
+                    deepDownKey: 'value'
+                }
+            }
+        }
+        const underScoreKeys = camelCaseKeysToUnderscore(camelCaseObject)
+
+        expect(camelCaseObject).toStrictEqual({
+            testKey: {
+                nestedTestKey: {
+                    deepDownKey: 'value'
+                }
+            }
+        })
+        expect(underScoreKeys.test_key).toBeDefined()
+        expect(underScoreKeys.test_key.nested_test_key).toBeDefined()
+        expect(underScoreKeys.test_key.nested_test_key.deep_down_key).toBeDefined()
+    })
+
+    test('doesnt mutate input object', () => {
         const input = {
             testKey: {
                 nestedTestKey: {
@@ -157,7 +157,7 @@ describe('camelCaseKeysToUnderscore', () => {
         })
     })
 
-    it('converts camel case keys to snake case', () => {
+    test('converts camel case keys to snake case', () => {
         const input = {
             testKey: {
                 nestedTestKey: {
@@ -179,7 +179,7 @@ describe('camelCaseKeysToUnderscore', () => {
         })
     })
 
-    it('converts keys in array of objects', () => {
+    test('converts keys in array of objects', () => {
         const input = [
             {
                 testKey: 'changed'
@@ -201,7 +201,7 @@ describe('camelCaseKeysToUnderscore', () => {
         ])
     })
 
-    it('avoids collision with existing key name', () => {
+    test('avoids collision with existing key name', () => {
         const input = {
             test_key: 'unchanged',
             testKey: 'unchanged'
