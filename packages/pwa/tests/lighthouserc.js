@@ -27,7 +27,7 @@ module.exports = {
             aggregationMethod: 'median',
             assertions: {
                 //TODO: Adjust scores and the assertions level from 'warn' to 'error' to fail the build if the scores are not met.
-                'categories:performance': ['error', {minScore: 0.28}],
+                'categories:performance': ['error', {minScore: 0.5}],
                 'categories:pwa': ['error', {minScore: 0.9}],
                 'categories:seo': ['error', {minScore: 0.85}],
                 'categories:accessibility': ['error', {minScore: 0.88}]
