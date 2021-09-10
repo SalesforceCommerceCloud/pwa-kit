@@ -45,11 +45,11 @@ sh.set('-e')
 
 const GENERATED_PROJECT_VERSION = '0.0.1'
 
-const MINIMAL_TEST_APP = 'minimal-test-app'
+const HELLO_WORLD = 'hello-world'
 const TEST_PROJECT = 'test-project' // TODO: This will be replaced with the `isomorphic-client` config.
 const PROMPT = 'prompt'
 
-const PRESETS = [TEST_PROJECT, PROMPT, MINIMAL_TEST_APP]
+const PRESETS = [TEST_PROJECT, PROMPT, HELLO_WORLD]
 
 const GENERATOR_PRESET = process.env.GENERATOR_PRESET || PROMPT
 
@@ -307,7 +307,7 @@ const testProjectAnswers = () => {
     return buildAnswers(config)
 }
 
-const minimalTestAppPrompts = () => {
+const helloWorldPrompts = () => {
     const validProjectId = (s) =>
         /^[a-z0-9-]{1,20}$/.test(s) ||
         'Value can only contain lowercase letters, numbers, and hyphens.'
@@ -321,8 +321,8 @@ const minimalTestAppPrompts = () => {
     return inquirer.prompt(questions)
 }
 
-const copyMinimalTestApp = ({projectId}, {outputDir}) => {
-    sh.cp('-R', p.join(__dirname, '..', 'template-minimal'), outputDir)
+const generateHelloWorld = ({projectId}, {outputDir}) => {
+    sh.cp('-R', p.join(__dirname, '..', 'template-hello-world'), outputDir)
 
     const pkgJsonPath = p.resolve(outputDir, 'package.json')
     const pkgJSON = readJson(pkgJsonPath)
@@ -347,8 +347,8 @@ const main = (opts) => {
     }
 
     switch (GENERATOR_PRESET) {
-        case MINIMAL_TEST_APP:
-            return minimalTestAppPrompts(opts).then((answers) => copyMinimalTestApp(answers, opts))
+        case HELLO_WORLD:
+            return helloWorldPrompts(opts).then((answers) => generateHelloWorld(answers, opts))
         case TEST_PROJECT:
             return runGenerator(testProjectAnswers(), opts)
         case PROMPT:
