@@ -62,6 +62,36 @@ commands:
           key: npm-cache
           paths:
             - /root/.npm
+  setupWin:
+    description: 'Setup Machine'
+    steps:
+      - run:
+          name: 'Install Dependencies'
+          command: |
+
+            # Install node dependencies
+            npm ci
+
+            # Build the PWA
+            npm run lerna -- run analyze-build --scope "scaffold-pwa"
+
+            # Report bundle sizes
+            #node ./scripts/report-bundle-size.js
+
+            # Add credentials file at ~/.mobify so we can upload to Mobify Cloud
+            #npm run save-credentials --prefix packages/pwa -- --user "${MOBIFY_CLIENT_USER}" --key "${MOBIFY_CLIENT_API_KEY}"
+
+            # Check that packages are all using the same versions of compilers, etc.
+            #node ./scripts/check-dependencies.js
+
+            # Install Snyk CLI
+            #sudo npm install -g snyk
+
+            # Run snyk auth - authenticate snyk using environment variables to add the token
+            #snyk auth $SNYK_TOKEN
+
+            # Install Lighthouse CI CLI
+            #sudo npm install -g @lhci/cli
   runtests:
     description: 'Run tests'
     parameters:
@@ -154,6 +184,8 @@ jobs:
       name: win/default
       size: "medium"
     steps:
+      - checkout
+      - setupWin
       - run:
          command: $(echo hello | Out-Host; $?) -and $(echo world | Out-Host; $?)
          shell: powershell.exe
