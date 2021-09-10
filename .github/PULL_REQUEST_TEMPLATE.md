@@ -35,7 +35,6 @@
 
 ## General
 
-- [ ] My code follows the code style of this project
 - [ ] The code changes are covered by test cases
 - [ ] Add a high-level description of your changes to relevant CHANGELOG.md files (**not** required for doc updates)
 
