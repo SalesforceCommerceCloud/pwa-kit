@@ -62,7 +62,7 @@ commands:
           key: npm-cache
           paths:
             - /root/.npm
-  setupWin:
+  setupwin:
     description: 'Setup Machine'
     steps:
       - run:
@@ -185,7 +185,7 @@ jobs:
       size: "medium"
     steps:
       - checkout
-      - setupWin
+      - setupwin
       - run:
          command: $(echo hello | Out-Host; $?) -and $(echo world | Out-Host; $?)
          shell: powershell.exe
