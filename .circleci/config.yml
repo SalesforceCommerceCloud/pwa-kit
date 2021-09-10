@@ -150,10 +150,9 @@ jobs:
           fail_only: true
           only_for_branches: develop
   testNode12Win:
-    build:
-      executor:
-        name: win/default
-        size: "medium"
+    executor:
+      name: win/default
+      size: "medium"
     steps:
       - run:
          command: $(echo hello | Out-Host; $?) -and $(echo world | Out-Host; $?)
