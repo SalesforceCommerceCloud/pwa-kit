@@ -1,42 +1,42 @@
-<!--- Provide a general summary of your changes in the Title above -->
+<!--- Provide a short summary of your changes in the Title field above -->
 
 # Description
 
-<!--- Please include a summary of the change and which issue is fixed. Please also include relevant motivation and context. List any dependencies that are required for this change. -->
+<!--- A longer summary of your changes, including: a description of the issue that you’re addressing, a list of required dependencies (if applicable), and any other relavant context. -->
 
-# Types of changes
+# Types of Changes
 
 <!--- What types of changes does your code introduce? Put an `x` in all the boxes that apply: -->
 
-- [ ] **Bug fix** (non-breaking change which fixes an issue)
-- [ ] **New feature** (non-breaking change which adds functionality)
+- [ ] **Bug fix** (non-breaking change that fixes an issue)
+- [ ] **New feature** (non-breaking change that adds functionality)
 - [ ] **Documentation update**
-- [ ] **Breaking change** (fix or feature that would cause existing functionality to not work as expected)
+- [ ] **Breaking change** (could cause existing functionality to not work as expected)
 
 > Breaking changes include:
 >
-> - Removing a public function/Component/Prop
-> - Adding required arguments to functions
-> - Changing the data-types of function params or return values
-> - Adding new peerDependency to package.json
+> - Removing a public function or component or prop
+> - Adding a required argument to a function
+> - Changing the data type of a function parameter or return value
+> - Adding a new peer dependency to `package.json`
 
 # Changes
 
 - (change1)
 
-# How to test-drive this PR
+# How to Test-Drive This PR
 
 - (step1)
 
 # Checklists
 
-<!--- Go over all the following points, and put an `x` in all the boxes that apply. -->
-<!--- If you're unsure about any of these, don't hesitate to ask. We're here to help! -->
+<!--- Enter an `x` in all the boxes that apply. -->
+<!--- If you’re unsure about any of these, don’t hesitate to ask. We’re here to help! -->
 
 ## General
 
-- [ ] The code changes are covered by test cases
-- [ ] Add a high-level description of your changes to relevant CHANGELOG.md files (**not** required for doc updates)
+- [ ] Changes are covered by test cases
+- [ ] CHANGELOG.md updated with a short description of changes (_not_ required for documentation updates)
 
 ## Accessibility Compliance
 
@@ -52,4 +52,4 @@ _or..._
 
 ## Localization
 
-- [ ] The change includes UI text update in Retail React App (which requires translation)
+- [ ] Changes include a UI text update in the Retail React App (which requires translation)
