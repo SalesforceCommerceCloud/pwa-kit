@@ -216,7 +216,7 @@ const ProductView = ({
 
     const inc = getIncrementButtonProps({variant: 'outline'})
     const dec = getDecrementButtonProps({variant: 'outline'})
-    const input = getInputProps()
+    const input = getInputProps({maxWidth: '44px'})
 
     // Chakra Number Input Hook
 

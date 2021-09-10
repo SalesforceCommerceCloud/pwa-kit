@@ -39,7 +39,7 @@ PricePerItem.propTypes = {
  * In the context of a cart product item variant, this component renders the item's
  * pricing, taking into account applied discounts as well as base item prices.
  */
-const ItemPrice = ({currency, align = 'right', ...props}) => {
+const ItemPrice = ({currency, align = 'right', baseDirection = 'column', ...props}) => {
     const variant = useCartItemVariant()
     const basket = useBasket()
 
@@ -52,7 +52,7 @@ const ItemPrice = ({currency, align = 'right', ...props}) => {
     return (
         <Stack
             textAlign={align}
-            direction={hasDiscount ? 'column' : {base: 'column', lg: 'row'}}
+            direction={hasDiscount ? 'column' : {base: baseDirection, lg: 'row'}}
             justifyContent={align === 'left' ? 'flex-start' : 'flex-end'}
             alignItems="baseline"
             spacing={hasDiscount ? 0 : 1}
@@ -99,7 +99,8 @@ const ItemPrice = ({currency, align = 'right', ...props}) => {
 
 ItemPrice.propTypes = {
     currency: PropTypes.string,
-    align: PropTypes.string
+    align: PropTypes.string,
+    baseDirection: PropTypes.string
 }
 
 export default ItemPrice

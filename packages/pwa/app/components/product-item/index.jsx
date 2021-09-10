@@ -78,11 +78,10 @@ const ProductItem = ({
                             {secondaryActions}
                         </Stack>
                     </Flex>
-                    {!showLoading && (
-                        <Box display={['block', 'none', 'none', 'none']} w={'full'}>
-                            {primaryAction}
-                        </Box>
-                    )}
+
+                    <Box display={['block', 'none', 'none', 'none']} w={'full'}>
+                        {primaryAction}
+                    </Box>
                 </Stack>
             </CartItemVariant>
         </Box>
