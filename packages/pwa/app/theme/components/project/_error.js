@@ -5,9 +5,6 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {Box} from '@chakra-ui/react'
-import React from 'react'
-
 export default {
     baseStyle: {
         container: {

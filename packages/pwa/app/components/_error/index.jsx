@@ -17,7 +17,6 @@ import {
     Text,
     useMultiStyleConfig
 } from '@chakra-ui/react'
-import Link from '../../components/link'
 
 import {BrandLogo, FileIcon} from '../icons'
 import {useHistory} from 'react-router-dom'
@@ -41,7 +40,6 @@ const Error = (props) => {
             <Helmet>
                 <title>{title}</title>
             </Helmet>
-
             <Box as="header" {...styles.header}>
                 <Box {...styles.headerContent}>
                     <IconButton
@@ -57,26 +55,23 @@ const Error = (props) => {
                 <Flex {...styles.content} flexDirection="column" justify="center">
                     <Stack align="center" mb={20}>
                         <FileIcon boxSize={['30px', '32px']} mb={8} />
-
                         <Heading as="h2" fontSize={['xl', '2xl', '2xl', '3xl']} mb={2}>
                             {title}
                         </Heading>
-
                         <Box maxWidth="700px">
                             <Text align="center">
                                 An error has occurred. Try refreshing the page or if you need
                                 immediate help please contact support
                             </Text>
                         </Box>
-
                         <Stack direction={['column', 'row']} width={['100%', 'auto']}>
                             <Button
                                 variant="outline"
                                 bg="white"
+                                as="a"
                                 borderColor={'gray.200'}
-                                as={Link}
-                                _target="blank"
-                                to="https://help.salesforce.com/s/support"
+                                target="_blank"
+                                href="https://help.salesforce.com/s/support"
                             >
                                 Contact Support
                             </Button>
