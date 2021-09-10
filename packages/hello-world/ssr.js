@@ -21,7 +21,6 @@ const app = express()
 app.all('*', echo)
 app.set('json spaces', 4)
 
-
 if (IS_LOCAL) {
     app.listen(PORT, () => console.log(`Running Express server @ http://127.0.0.1:${PORT}`))
     exports.get = () => {}
