@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useEffect} from 'react'
+import React from 'react'
 import PropTypes from 'prop-types'
 import {Helmet} from 'react-helmet'
 import {
@@ -17,6 +17,7 @@ import {
     Text,
     useMultiStyleConfig
 } from '@chakra-ui/react'
+import Link from '../../components/link'
 
 import {BrandLogo, FileIcon} from '../icons'
 import {useHistory} from 'react-router-dom'
@@ -69,7 +70,14 @@ const Error = (props) => {
                         </Box>
 
                         <Stack direction={['column', 'row']} width={['100%', 'auto']}>
-                            <Button variant="outline" bg="white" borderColor={'gray.200'}>
+                            <Button
+                                variant="outline"
+                                bg="white"
+                                borderColor={'gray.200'}
+                                as={Link}
+                                _target="blank"
+                                to="https://help.salesforce.com/s/support"
+                            >
                                 Contact Support
                             </Button>
                             <Button onClick={() => window.location.reload()}>
