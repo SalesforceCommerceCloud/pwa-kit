@@ -65,9 +65,16 @@ commands:
   setupwin:
     description: 'Setup Machine'
     steps:
+      - restore_cache:
+          keys:
+            - npm-cache
       - run:
           name: 'Install Dependencies'
           command: |
+
+            # Install and use correct version of npm
+            nvm install 6.14.4
+            nvm use 6.14.4
 
             # Install node dependencies
             npm ci
@@ -76,7 +83,7 @@ commands:
             npm run lerna -- run analyze-build --scope "scaffold-pwa"
 
             # Report bundle sizes
-            #node ./scripts/report-bundle-size.js
+            node ./scripts/report-bundle-size.js
 
             # Add credentials file at ~/.mobify so we can upload to Mobify Cloud
             #npm run save-credentials --prefix packages/pwa -- --user "${MOBIFY_CLIENT_USER}" --key "${MOBIFY_CLIENT_API_KEY}"
@@ -92,6 +99,10 @@ commands:
 
             # Install Lighthouse CI CLI
             #sudo npm install -g @lhci/cli
+        - save_cache:
+          key: npm-cache
+          paths:
+            - /root/.npm
   runtests:
     description: 'Run tests'
     parameters:
@@ -186,9 +197,8 @@ jobs:
     steps:
       - checkout
       - setupwin
-      - run:
-         command: $(echo hello | Out-Host; $?) -and $(echo world | Out-Host; $?)
-         shell: powershell.exe
+      - runtests:
+          enableIntegrationTests: false
   testNode14:
     docker:
       - image: circleci/node:14-stretch-browsers
