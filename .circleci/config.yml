@@ -99,7 +99,7 @@ commands:
 
             # Install Lighthouse CI CLI
             #sudo npm install -g @lhci/cli
-        - save_cache:
+      - save_cache:
           key: npm-cache
           paths:
             - /root/.npm
