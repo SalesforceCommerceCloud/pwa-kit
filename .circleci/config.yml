@@ -1,6 +1,7 @@
 version: 2.1
 orbs:
   slack: circleci/slack@3.2.0
+  win: circleci/windows@2.2.0
 
 commands:
   setup:
@@ -61,7 +62,6 @@ commands:
           key: npm-cache
           paths:
             - /root/.npm
-
   runtests:
     description: 'Run tests'
     parameters:
@@ -149,6 +149,15 @@ jobs:
       - slack/status:
           fail_only: true
           only_for_branches: develop
+  testNode12Win:
+    build:
+      executor:
+        name: win/default
+        size: "medium"
+    steps:
+      - run:
+         command: $(echo hello | Out-Host; $?) -and $(echo world | Out-Host; $?)
+         shell: powershell.exe
   testNode14:
     docker:
       - image: circleci/node:14-stretch-browsers
@@ -270,6 +279,7 @@ workflows:
   test:
     jobs:
       - testNode12
+      - testNode12Win
       - testNode14
       - generatedSFCCProjectTest
   nightly-build:
