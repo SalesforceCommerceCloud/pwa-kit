@@ -37,7 +37,6 @@ const CartQuantityPicker = ({product, handleRemoveItem, onItemQuantityChange}) =
             </Button>
             <form
                 onSubmit={(e) => {
-                    console.log(updatedQuantity)
                     if (parseInt(updatedQuantity)) {
                         onItemQuantityChange(updatedQuantity)
                     } else if (updatedQuantity === '0') {
@@ -49,6 +48,7 @@ const CartQuantityPicker = ({product, handleRemoveItem, onItemQuantityChange}) =
                 }}
             >
                 <Input
+                    type="numeric"
                     data-testid="cart-quantity"
                     width={11}
                     onBlur={(e) => {
