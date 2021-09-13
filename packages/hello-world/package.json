@@ -1,0 +1,49 @@
+{
+    "name": "hello-world",
+    "version": "1.1.0-dev",
+    "license": "See license in LICENSE",
+    "private": true,
+    "dependencies": {
+        "aws-serverless-express": "^3.3.6",
+        "express": "^4.17.1"
+    },
+    "devDependencies": {
+        "@babel/cli": "^7.14.3",
+        "@babel/core": "^7.14.3",
+        "@babel/runtime": "^7.14.0",
+        "babel-eslint": "^10.1.0",
+        "eslint": "7.31.0",
+        "eslint-config-prettier": "4.0.0",
+        "eslint-import-resolver-webpack": "0.10.0",
+        "eslint-plugin-cypress": "^2.11.2",
+        "eslint-plugin-header": "^3.1.1",
+        "eslint-plugin-import": "2.23.4",
+        "eslint-plugin-jsx-a11y": "6.4.1",
+        "eslint-plugin-prettier": "3.0.1",
+        "eslint-plugin-react": "7.24.0",
+        "prettier": "1.18.2",
+        "pwa-kit-react-sdk": "^1.1.0-dev"
+    },
+    "scripts": {
+        "format": "prettier --write \"**/*.{js,jsx}\"",
+        "lint": "eslint \"**/*.{js,jsx}\"",
+        "lint:fix": "npm run lint -- --fix",
+        "start": "node ssr.js",
+        "build": "rm -rf dist && mkdir dist && cp -R $(find . -depth 1 ! -iname 'node_modules' ! -iname 'dist' ! -iname '.*' ! -iname 'build.tar') dist/ && cd dist && npm install --production",
+        "push": "npm run build && sdk-upload --buildDirectory dist --projectSlug $npm_package_name",
+        "save-credentials": "sdk-save-credentials"
+    },
+    "mobify": {
+        "ssrEnabled": true,
+        "ssrParameters": {
+            "ssrFunctionNodeVersion": "14.x"
+        },
+        "ssrOnly": [
+            "ssr.js",
+            "node_modules/**/*.*"
+        ],
+        "ssrShared": [
+            "intentionally-does-not-exist"
+        ]
+    }
+}
