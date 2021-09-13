@@ -76,6 +76,7 @@ commands:
             # Install and use correct version of npm
             nvm install 12.22.6
             nvm use 12.22.6
+            nvm alias default v12.22.6
 
             # Install node dependencies
             npm ci
