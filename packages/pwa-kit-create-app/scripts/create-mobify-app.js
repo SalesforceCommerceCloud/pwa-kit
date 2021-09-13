@@ -53,7 +53,7 @@ const HELLO_WORLD = 'hello-world'
 const TEST_PROJECT = 'test-project' // TODO: This will be replaced with the `isomorphic-client` config.
 const PROMPT = 'prompt'
 
-const PRESETS = [TEST_PROJECT, PROMPT, HELLO_WORLD]
+const PRESETS = [TEST_PROJECT, PROMPT, HELLO_WORLD, HELLO_WORLD_TEST_PROJECT]
 
 const GENERATOR_PRESET = process.env.GENERATOR_PRESET || PROMPT
 
