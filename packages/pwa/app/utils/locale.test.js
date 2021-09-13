@@ -66,7 +66,7 @@ describe('loadLocaleData', () => {
         expect(messages[testMessageId]).toBeDefined()
     })
     test('loading the pseudo locale', async () => {
-        const messages = await loadLocaleData('pseudo')
+        const messages = await loadLocaleData('en-XB')
         expect(messages[testMessageId][0].value).toMatch(/^\[!! Ļŏĝĝĝíń Ŕèḋḋḋíŕèèèćṭ !!]$/)
     })
     test('handling a not-found translation file', async () => {
