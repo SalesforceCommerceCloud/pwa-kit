@@ -42,7 +42,6 @@ import {
 import Pagination from '../../components/pagination'
 import ProductTile, {Skeleton as ProductTileSkeleton} from '../../components/product-tile'
 import {HideOnDesktop} from '../../components/responsive'
-import Link from '../../components/link'
 import Refinements from './partials/refinements'
 import SelectedRefinements from './partials/selected-refinements'
 import EmptySearchResults from './partials/empty-results'
@@ -138,10 +137,14 @@ const ProductList = (props) => {
                 ),
                 status: 'success',
                 action: (
-                    // <Button variant="link" as={Link} to="/account/wishlist">
-                    //     View
-                    // </Button>
-                    null
+                    // it would be better if we could use <Button as={Link}>
+                    // but unfortunately the Link component is not compatible
+                    // with Chakra Toast, since the ToastManager is rendered via portal
+                    // and the toast doesn't have access to intl provider, which is a
+                    // requirement of the Link component.
+                    <Button variant="link" onClick={() => navigate('/account/wishlist')}>
+                        View
+                    </Button>
                 )
             })
         } catch {
