@@ -13,6 +13,7 @@ import OcapiShopperOrders from './ocapi-shopper-orders'
 import {getTenantId, isError, isTokenValid} from './utils'
 import Auth from './auth'
 import EinsteinAPI from './einstein'
+import {DEFAULT_LOCALE} from '../constants'
 
 /**
  * The configuration details for the connecting to the API.
@@ -115,7 +116,9 @@ class CommerceAPI {
                                     if (apiConfigs[key].canLocalize) {
                                         newArgs[0].parameters = {
                                             ...newArgs[0].parameters,
-                                            ...(locale && {locale})
+                                            ...(locale && locale !== 'en-XB'
+                                                ? {locale}
+                                                : {locale: DEFAULT_LOCALE})
                                         }
                                     }
 

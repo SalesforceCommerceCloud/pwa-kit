@@ -272,7 +272,7 @@ const ProductList = (props) => {
         navigate(window.location.pathname)
     }
 
-    let selectedSortingOptionLabel = productSearchResult?.sortingOptions.find(
+    let selectedSortingOptionLabel = productSearchResult?.sortingOptions?.find(
         (option) => option.id === productSearchResult?.selectedSortingOption
     )
 
