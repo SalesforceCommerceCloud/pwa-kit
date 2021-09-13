@@ -131,6 +131,11 @@ Home.propTypes = {
     isLoading: PropTypes.bool
 }
 
-Home.getProps = async () => {}
+Home.getProps = async ({res}) => {
+    // Set the `cache-control` header values to align with the Commerce API settings.
+    if (res) {
+        res.set('Cache-Control', 'public, must-revalidate, max-age=900')
+    }
+}
 
 export default Home
