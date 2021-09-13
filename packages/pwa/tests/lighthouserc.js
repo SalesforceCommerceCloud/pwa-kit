@@ -10,7 +10,7 @@ module.exports = {
     ci: {
         collect: {
             startServerCommand: 'npm run start',
-            //TODO: Add key pages URLs here as they are implemented.
+            //NOTE: Adjust the key pages URLs that you find important to your website.
             url: [
                 'http://localhost:3000/',
                 'http://localhost:3000/en-GB/category/womens',
@@ -26,7 +26,7 @@ module.exports = {
         assert: {
             aggregationMethod: 'median',
             assertions: {
-                //TODO: Adjust scores and the assertions level from 'warn' to 'error' to fail the build if the scores are not met.
+                // NOTE: Adjust the scores accordingly as the performance is improved
                 'categories:performance': ['error', {minScore: 0.3}],
                 'categories:pwa': ['error', {minScore: 0.9}],
                 'categories:seo': ['error', {minScore: 0.85}],
