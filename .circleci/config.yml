@@ -86,20 +86,11 @@ commands:
             # Report bundle sizes
             node ./scripts/report-bundle-size.js
 
-            # Add credentials file at ~/.mobify so we can upload to Mobify Cloud
-            #npm run save-credentials --prefix packages/pwa -- --user "${MOBIFY_CLIENT_USER}" --key "${MOBIFY_CLIENT_API_KEY}"
-
             # Check that packages are all using the same versions of compilers, etc.
-            #node ./scripts/check-dependencies.js
-
-            # Install Snyk CLI
-            #sudo npm install -g snyk
-
-            # Run snyk auth - authenticate snyk using environment variables to add the token
-            #snyk auth $SNYK_TOKEN
+            node ./scripts/check-dependencies.js
 
             # Install Lighthouse CI CLI
-            #sudo npm install -g @lhci/cli
+            sudo npm install -g @lhci/cli
       - save_cache:
           key: npm-cache
           paths:
