@@ -1,7 +1,7 @@
 version: 2.1
 orbs:
   slack: circleci/slack@3.2.0
-  win: circleci/windows@2.2.0
+  win: circleci/windows@2.0.0
 
 commands:
   setup:
@@ -74,7 +74,6 @@ commands:
 
             # FIX: After changing node versions, `npm` command cannot be found. Maybe a circle issue, cannot replicate via ssh.
             # Install and use correct version of npm
-            (Get-Item "C:\Program Files\nodejs").Delete()
             nvm install 12.22.6
             nvm use 12.22.6
 
