@@ -45,6 +45,7 @@ sh.set('-e')
 
 const GENERATED_PROJECT_VERSION = '0.0.1'
 
+const HELLO_WORLD_TEST_PROJECT = 'hello-world-test-project'
 const HELLO_WORLD = 'hello-world'
 const TEST_PROJECT = 'test-project' // TODO: This will be replaced with the `isomorphic-client` config.
 const PROMPT = 'prompt'
@@ -347,6 +348,8 @@ const main = (opts) => {
     }
 
     switch (GENERATOR_PRESET) {
+        case HELLO_WORLD_TEST_PROJECT:
+            return generateHelloWorld({projectId: 'hello-world'}, opts)
         case HELLO_WORLD:
             return helloWorldPrompts(opts).then((answers) => generateHelloWorld(answers, opts))
         case TEST_PROJECT:

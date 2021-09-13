@@ -216,7 +216,7 @@ jobs:
       - run:
           name: Generate hello-world project
           environment:
-            GENERATOR_PRESET: 'hello-world'
+            GENERATOR_PRESET: 'hello-world-test-project'
           command: |
             node packages/pwa-kit-create-app/scripts/create-mobify-app-dev.js --outputDir /tmp/hello-world
       - run:
