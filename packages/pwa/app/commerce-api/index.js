@@ -118,11 +118,7 @@ class CommerceAPI {
                                     if (apiConfigs[key].canLocalize) {
                                         newArgs[0].parameters = {
                                             ...newArgs[0].parameters,
-                                            ...(locale
-                                                ? locale !== 'en-XB'
-                                                    ? {locale}
-                                                    : {locale: DEFAULT_LOCALE}
-                                                : [])
+                                            ...(!locale || locale === 'en-XB' ? [] : {locale})
                                         }
                                     }
 
