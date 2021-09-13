@@ -214,6 +214,12 @@ jobs:
             cd /tmp/project
             npm run prod:build
       - run:
+          name: Generate hello-world project
+          environment:
+            GENERATOR_PRESET: 'hello-world-test-project'
+          command: |
+            node packages/pwa-kit-create-app/scripts/create-mobify-app-dev.js --outputDir /tmp/hello-world
+      - run:
           name: Audit Generated Project
           environment:
           command: |
