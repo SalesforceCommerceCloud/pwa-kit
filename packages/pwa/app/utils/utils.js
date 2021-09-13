@@ -154,23 +154,3 @@ export const capitalize = (text) => {
         .map((s) => s.charAt(0).toUpperCase() + s.substring(1))
         .join(' ')
 }
-
-/**
- * Decorate an async function with
- * onSuccess and onError handlers
- * @param {function} func
- * @param {object} options
- * @param {func} options.onSuccess
- * @param {func} options.onError
- */
-export const withAsync = (func, options) => {
-    return async (...props) => {
-        try {
-            await func(...props)
-            options?.onSuccess?.(...props)
-        } catch (e) {
-            options?.onError?.(...props)
-            throw e
-        }
-    }
-}

@@ -39,6 +39,7 @@ import {watchOnlineStatus, flatten} from '../../utils/utils'
 import {IntlProvider, getLocaleConfig} from '../../locale'
 
 import Seo from '../seo'
+import useWishlist from '../../hooks/use-wishlist'
 
 const DEFAULT_NAV_DEPTH = 3
 const DEFAULT_ROOT_CATEGORY = 'root'
@@ -62,6 +63,19 @@ const App = (props) => {
 
     // Set up customer and basket
     useShopper()
+
+    const wishlist = useWishlist()
+    useEffect(() => {
+        if (!customer.isInitialized) {
+            return
+        }
+        if (customer.isRegistered) {
+            wishlist.init()
+        }
+        if (customer.isGuest) {
+            wishlist.reset()
+        }
+    }, [customer.authType])
 
     useEffect(() => {
         // Listen for online status changes.

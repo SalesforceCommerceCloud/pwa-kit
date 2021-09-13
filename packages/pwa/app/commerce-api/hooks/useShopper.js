@@ -8,9 +8,6 @@ import {useEffect} from 'react'
 import useBasket from './useBasket'
 import useCustomer from './useCustomer'
 
-// todo: Commerce api should not import from the user land
-import useWishlist from '../../hooks/use-wishlist'
-
 /**
  * Joins basket and customer hooks into a single hook for initializing their states
  * when the app loads on the client-side. Should only be use at top-level of app.
@@ -19,7 +16,6 @@ import useWishlist from '../../hooks/use-wishlist'
 const useShopper = () => {
     const customer = useCustomer()
     const basket = useBasket()
-    const wishlist = useWishlist()
 
     // Create or restore the user session upon mounting
     useEffect(() => {
@@ -76,17 +72,6 @@ const useShopper = () => {
         }
     }, [customer, basket])
 
-    useEffect(() => {
-        if (!customer.isInitialized) {
-            return
-        }
-        if (customer.isRegistered) {
-            wishlist.init()
-        }
-        if (customer.isGuest) {
-            wishlist.reset()
-        }
-    }, [customer.authType])
 
     return {customer, basket}
 }
