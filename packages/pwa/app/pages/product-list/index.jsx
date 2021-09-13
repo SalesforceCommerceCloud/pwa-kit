@@ -42,6 +42,7 @@ import {
 import Pagination from '../../components/pagination'
 import ProductTile, {Skeleton as ProductTileSkeleton} from '../../components/product-tile'
 import {HideOnDesktop} from '../../components/responsive'
+import Link from '../../components/link'
 import Refinements from './partials/refinements'
 import SelectedRefinements from './partials/selected-refinements'
 import EmptySearchResults from './partials/empty-results'
@@ -52,6 +53,7 @@ import {FilterIcon, ChevronDownIcon} from '../../components/icons'
 
 // Hooks
 import {useLimitUrls, usePageUrls, useSortUrls, useSearchParams} from '../../hooks'
+import {useToast} from '../../hooks/use-toast'
 import useWishlist from '../../hooks/use-wishlist'
 import {parse as parseSearchParams} from '../../hooks/use-search-params'
 
@@ -60,7 +62,7 @@ import {CategoriesContext} from '../../contexts'
 import {HTTPNotFound} from 'pwa-kit-react-sdk/ssr/universal/errors'
 
 // Constants
-import {DEFAULT_LIMIT_VALUES} from '../../constants'
+import {DEFAULT_LIMIT_VALUES, API_ERROR_MESSAGE} from '../../constants'
 import useNavigation from '../../hooks/use-navigation'
 import LoadingSpinner from '../../components/loading-spinner'
 
@@ -88,6 +90,7 @@ const ProductList = (props) => {
     const history = useHistory()
     const params = useParams()
     const {categories} = useContext(CategoriesContext)
+    const toast = useToast()
 
     // Get the current category from global state.
     let category = undefined
@@ -116,11 +119,38 @@ const ProductList = (props) => {
     const [wishlistLoading, setWishlistLoading] = useState([])
     const addItemToWishlist = async (product) => {
         setWishlistLoading([...wishlistLoading, product.productId])
-        await wishlist.addItem({
-            id: product.productId,
-            quantity: 1
-        })
-        setWishlistLoading(wishlistLoading.filter((id) => id !== product.productId))
+        try {
+            await wishlist.addItem({
+                id: product.productId,
+                quantity: 1
+            })
+            toast({
+                title: formatMessage(
+                    {
+                        defaultMessage:
+                            '{quantity} {quantity, plural, one {item} other {items}} added to wishlist'
+                    },
+                    {quantity: 1}
+                ),
+                status: 'success',
+                action: (
+                    // <Button variant="link" as={Link} to="/account/wishlist">
+                    //     View
+                    // </Button>
+                    null
+                )
+            })
+        } catch {
+            toast({
+                title: formatMessage(
+                    {defaultMessage: '{errorMessage}'},
+                    {errorMessage: API_ERROR_MESSAGE}
+                ),
+                status: 'error'
+            })
+        } finally {
+            setWishlistLoading(wishlistLoading.filter((id) => id !== product.productId))
+        }
     }
     const removeItemFromWishlist = async (product) => {
         setWishlistLoading([...wishlistLoading, product.productId])
