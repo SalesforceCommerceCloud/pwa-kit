@@ -183,6 +183,7 @@ jobs:
     executor:
       name: win/default
       size: "medium"
+      shell: cmd.exe
     steps:
       - checkout
       - setupwin
