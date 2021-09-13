@@ -53,9 +53,8 @@ const upload = (options) => {
             console.log(`Beginning upload to ${options.origin}...`)
             return buildRequest(requestOptions, dataBuffer)
         })
-        .then((data) => {
+        .then(() => {
             console.log('Bundle Uploaded!')
-            console.log(`Link to preview the bundle: ${data.bundle_preview_url}`)
         })
 }
 

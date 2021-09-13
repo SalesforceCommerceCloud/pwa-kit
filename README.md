@@ -4,9 +4,9 @@ The PWA Kit is a storefront technology for headless commerce using Salesforce Co
 
 This repository is a [monorepo](https://en.wikipedia.org/wiki/Monorepo) that includes the code that powers the PWA Kit. The code is divided into the following packages:
 
-- `pwa`: A set of sample code and tooling for PWA Kit projects called the Retail React App
-- `pwa-kit-create-app`: A tool that generates PWA Kit projects based on the Retail React App
-- `pwa-kit-react-sdk`: A set of components and utilities for PWA Kit projects
+-   `pwa`: A set of sample code and tooling for PWA Kit projects called the Retail React App
+-   `pwa-kit-create-app`: A tool that generates PWA Kit projects based on the Retail React App
+-   `pwa-kit-react-sdk`: A set of components and utilities for PWA Kit projects
 
 ## Requirements
 
@@ -40,6 +40,10 @@ For more information, see the [Lerna docs](https://lerna.js.org/).
   npm run lint
 ```
 
+## Localization
+
+See the [Localization README.md](./packages/pwa/app/translations/README.md) for important setup instructions for localization.
+
 ## Testing
 
 Run tests for all packages with:
@@ -66,8 +70,8 @@ The full documentation for PWA Kit is hosted on the [Commerce Cloud Developer Ce
 
 ### Useful Links:
 
-- [Getting Started](https://developer.commercecloud.com/s/article/Getting-Started-with-PWA-Kit)
-- [Pushing and Deploying Bundles](https://developer.commercecloud.com/s/article/Pushing-and-Deploying-Bundles)
-- [The Retail React App](https://developer.commercecloud.com/s/article/The-Retail-React-App)
-- [Rendering and Routing](https://developer.commercecloud.com/s/article/Rendering-and-Routing)
-- [Managed Runtime Infrastructure](https://developer.commercecloud.com/s/article/Managed-Runtime-Infrastructure)
+-   [Getting Started](https://developer.commercecloud.com/s/article/Getting-Started-with-PWA-Kit)
+-   [Pushing and Deploying Bundles](https://developer.commercecloud.com/s/article/Pushing-and-Deploying-Bundles)
+-   [The Retail React App](https://developer.commercecloud.com/s/article/The-Retail-React-App)
+-   [Rendering and Routing](https://developer.commercecloud.com/s/article/Rendering-and-Routing)
+-   [Managed Runtime Infrastructure](https://developer.commercecloud.com/s/article/Managed-Runtime-Infrastructure)
