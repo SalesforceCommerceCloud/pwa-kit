@@ -20,7 +20,10 @@ import {
     VStack,
     Fade,
     useDisclosure,
-    useTheme
+    useTheme,
+    HStack,
+    Input,
+    useNumberInput
 } from '@chakra-ui/react'
 
 import {useProduct} from '../../hooks'
@@ -37,7 +40,6 @@ import {Skeleton as ImageGallerySkeleton} from '../../components/image-gallery'
 import AddToCartModal from '../../components/add-to-cart-modal'
 import RecommendedProducts from '../../components/recommended-products'
 import {HideOnDesktop, HideOnMobile} from '../../components/responsive'
-import QuantityPicker from '../../components/quantity-picker'
 
 const ProductViewHeader = ({name, price, currency, category}) => {
     const intl = useIntl()
@@ -187,6 +189,37 @@ const ProductView = ({
         }
     }, [location.pathname])
 
+    // Chakra Number Input Hook
+    const {getInputProps, getIncrementButtonProps, getDecrementButtonProps} = useNumberInput({
+        step: stepQuantity,
+        value: quantity,
+        min: 0,
+        max: stockLevel,
+        onChange: (stringValue, numberValue) => {
+            // Set the Quantity of product to value of input if value number
+            if (numberValue >= 0) {
+                setQuantity(numberValue)
+            } else if (stringValue === '') {
+                // We want to allow the use to clear the input to start a new input so here we set the quantity to '' so NAN is not displayed
+                // User will not be able to add '' qauntity to the cart due to the add to cart button enablement rules
+                setQuantity(stringValue)
+            }
+        },
+        onBlur: (e) => {
+            // Default to 1 if a user leaves the box with an invalid value
+            const value = e.target.value
+            if (parseInt(value) < 0 || value === '') {
+                setQuantity(1)
+            }
+        }
+    })
+
+    const inc = getIncrementButtonProps({variant: 'outline'})
+    const dec = getDecrementButtonProps({variant: 'outline'})
+    const input = getInputProps({maxWidth: '44px'})
+
+    // Chakra Number Input Hook
+
     return (
         <Flex direction={'column'} data-testid="product-view">
             {/* Basic information etc. title, price, breadcrumb*/}
@@ -315,37 +348,13 @@ const ProductView = ({
                                 :
                             </Box>
 
-                            {/* <HStack>
+                            <HStack>
                                 <Button {...dec}>-</Button>
                                 <Input {...input} />
                                 <Button data-testid="quantity-increment" {...inc}>
                                     +
                                 </Button>
-                            </HStack> */}
-
-                            <QuantityPicker
-                                step={stepQuantity}
-                                value={quantity}
-                                min={1}
-                                max={stockLevel}
-                                onChange={(stringValue, numberValue) => {
-                                    // Set the Quantity of product to value of input if value number
-                                    if (numberValue >= 0) {
-                                        setQuantity(numberValue)
-                                    } else if (stringValue === '') {
-                                        // We want to allow the use to clear the input to start a new input so here we set the quantity to '' so NAN is not displayed
-                                        // User will not be able to add '' qauntity to the cart due to the add to cart button enablement rules
-                                        setQuantity(stringValue)
-                                    }
-                                }}
-                                onBlur={(e) => {
-                                    // Default to 1 if a user leaves the box with an invalid value
-                                    const value = e.target.value
-                                    if (parseInt(value) < 0 || value === '') {
-                                        setQuantity(1)
-                                    }
-                                }}
-                            />
+                            </HStack>
                         </VStack>
                         <HideOnDesktop>
                             {showFullLink && product && (
