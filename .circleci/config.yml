@@ -74,11 +74,11 @@ commands:
 
             # FIX: After changing node versions, `npm` command cannot be found. Maybe a circle issue, cannot replicate via ssh.
             # Install and use correct version of npm
-            # nvm install 12.22.6
-            # nvm use 12.22.6
+            nvm install 12.22.6
+            nvm use 12.22.6
 
             # Install node dependencies
-            npm i
+            npm ci
 
             # Build the PWA
             npm run lerna -- run analyze-build --scope "scaffold-pwa"
@@ -88,9 +88,6 @@ commands:
 
             # Check that packages are all using the same versions of compilers, etc.
             node ./scripts/check-dependencies.js
-
-            # Install Lighthouse CI CLI
-            sudo npm install -g @lhci/cli
       - save_cache:
           key: npm-cache
           paths:
