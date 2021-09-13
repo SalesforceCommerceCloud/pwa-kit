@@ -19,7 +19,8 @@ import {
     CustomerProductListsProvider
 } from '../commerce-api/contexts'
 import {commerceAPIConfig} from '../commerce-api.config'
-import {IntlProvider, DEFAULT_LOCALE} from '../locale'
+import {IntlProvider} from 'react-intl'
+import {DEFAULT_LOCALE} from '../constants'
 import {CategoriesContext} from '../contexts'
 import {einsteinAPIConfig} from '../einstein-api.config'
 import {mockCategories as initialMockCategories} from '../commerce-api/mock-data'

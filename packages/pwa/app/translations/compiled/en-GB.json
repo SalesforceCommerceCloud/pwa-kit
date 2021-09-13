@@ -29,10 +29,36 @@
       "value": "Please enter your email address"
     }
   ],
+  "/yBi9v": [
+    {
+      "type": 0,
+      "value": "Shop Women's Jackets & Coats"
+    }
+  ],
+  "08dLrR": [
+    {
+      "type": 0,
+      "value": "/"
+    },
+    {
+      "type": 1,
+      "value": "activeLocale"
+    },
+    {
+      "type": 0,
+      "value": "/category/womens-clothing-jackets"
+    }
+  ],
   "0g/1TG": [
     {
       "type": 0,
       "value": "Continue to Payment"
+    }
+  ],
+  "0nWAOY": [
+    {
+      "type": 0,
+      "value": "Go to home page"
     }
   ],
   "0yGJXJ": [
@@ -161,6 +187,12 @@
       "value": "Cart"
     }
   ],
+  "3FyRaO": [
+    {
+      "type": 0,
+      "value": "Shop Women's Outfits"
+    }
+  ],
   "3NVyN7": [
     {
       "type": 0,
@@ -233,6 +265,12 @@
       "value": "Incorrect username or password, please try again."
     }
   ],
+  "5ryYe9": [
+    {
+      "type": 0,
+      "value": "Japanese (Japan)"
+    }
+  ],
   "5sg7KC": [
     {
       "type": 0,
@@ -267,6 +305,12 @@
     {
       "type": 0,
       "value": "Delivery Details"
+    }
+  ],
+  "8+0PQZ": [
+    {
+      "type": 0,
+      "value": "The page you're looking for can't be found"
     }
   ],
   "8d6kio": [
@@ -315,6 +359,12 @@
     {
       "type": 0,
       "value": "Item removed from wishlist"
+    }
+  ],
+  "A2v4cr": [
+    {
+      "type": 0,
+      "value": "English (United Kingdom)"
     }
   ],
   "A8Tnga": [
@@ -463,6 +513,20 @@
       "value": "Clear recent searches"
     }
   ],
+  "DyMLTN": [
+    {
+      "type": 0,
+      "value": "/"
+    },
+    {
+      "type": 1,
+      "value": "activeLocale"
+    },
+    {
+      "type": 0,
+      "value": "/category/mens-clothing-suits"
+    }
+  ],
   "EKKW2e": [
     {
       "type": 0,
@@ -605,6 +669,12 @@
       "value": "Coming Soon"
     }
   ],
+  "LrQ8C0": [
+    {
+      "type": 0,
+      "value": "Shop Feeling Red"
+    }
+  ],
   "MPcjO/": [
     {
       "type": 0,
@@ -633,6 +703,12 @@
     {
       "type": 0,
       "value": "Place Order"
+    }
+  ],
+  "NV26qx": [
+    {
+      "type": 0,
+      "value": "Back to previous page"
     }
   ],
   "NymXNv": [
@@ -667,6 +743,12 @@
     {
       "type": 1,
       "value": "stateOrProvince"
+    }
+  ],
+  "OHPaLj": [
+    {
+      "type": 0,
+      "value": "Shop Men's Suits"
     }
   ],
   "OKPeJz": [
@@ -757,10 +839,30 @@
       "value": "Review Order"
     }
   ],
+  "PO4nBj": [
+    {
+      "type": 0,
+      "value": "French (France)"
+    }
+  ],
   "PRlD0A": [
     {
       "type": 0,
       "value": "Shipping"
+    }
+  ],
+  "PW5i35": [
+    {
+      "type": 0,
+      "value": "/"
+    },
+    {
+      "type": 1,
+      "value": "activeLocale"
+    },
+    {
+      "type": 0,
+      "value": "/category/womens-outfits"
     }
   ],
   "PlBReU": [
@@ -1063,6 +1165,12 @@
       "value": "itemCount"
     }
   ],
+  "b24hho": [
+    {
+      "type": 0,
+      "value": "Chinese (China)"
+    }
+  ],
   "bTjwXj": [
     {
       "type": 0,
@@ -1091,6 +1199,12 @@
     {
       "type": 0,
       "value": "Confirm Action"
+    }
+  ],
+  "c0a6lZ": [
+    {
+      "type": 0,
+      "value": "Please try retyping the address, going back to the previous page, or going to the home page."
     }
   ],
   "c1zaMK": [
@@ -1123,6 +1237,18 @@
       "value": "Clear All"
     }
   ],
+  "cv1LY7": [
+    {
+      "type": 0,
+      "value": "static/img/women-outfit.png"
+    }
+  ],
+  "dS8BmB": [
+    {
+      "type": 0,
+      "value": "static/img/feeling-red.png"
+    }
+  ],
   "dUxyza": [
     {
       "type": 0,
@@ -1133,6 +1259,12 @@
     {
       "type": 0,
       "value": "Yes, remove item"
+    }
+  ],
+  "e//rzS": [
+    {
+      "type": 0,
+      "value": "Italian (Italy)"
     }
   ],
   "e6Ph5+": [
@@ -1353,22 +1485,36 @@
       "value": "Search for products..."
     }
   ],
-  "homepage.message.welcome": [
-    {
-      "type": 0,
-      "value": "Hello World"
-    }
-  ],
   "hp3uqR": [
     {
       "type": 0,
       "value": "Wishlist"
     }
   ],
+  "hqoiIz": [
+    {
+      "type": 0,
+      "value": "static/img/women-dresses.png"
+    }
+  ],
   "huqKGl": [
     {
       "type": 0,
       "value": "Create account"
+    }
+  ],
+  "hwGJRL": [
+    {
+      "type": 0,
+      "value": "/"
+    },
+    {
+      "type": 1,
+      "value": "activeLocale"
+    },
+    {
+      "type": 0,
+      "value": "/category/womens-clothing-feeling-red"
     }
   ],
   "iPMbLb": [
@@ -1387,6 +1533,12 @@
     {
       "type": 0,
       "value": "Same as shipping address"
+    }
+  ],
+  "iqQeTp": [
+    {
+      "type": 0,
+      "value": "static/img/men-suits.png"
     }
   ],
   "ivNR8s": [
@@ -1411,6 +1563,12 @@
     {
       "type": 0,
       "value": "Thank you for your order!"
+    }
+  ],
+  "kfvFzC": [
+    {
+      "type": 0,
+      "value": "static/img/women-coats.png"
     }
   ],
   "knAdWV": [
@@ -1869,6 +2027,12 @@
       "value": "Edit"
     }
   ],
+  "wPc1n9": [
+    {
+      "type": 0,
+      "value": "Shop Women's Dresses"
+    }
+  ],
   "x6hxSH": [
     {
       "type": 0,
@@ -1925,6 +2089,20 @@
     {
       "type": 0,
       "value": "Most Viewed"
+    }
+  ],
+  "ymw1eE": [
+    {
+      "type": 0,
+      "value": "/"
+    },
+    {
+      "type": 1,
+      "value": "activeLocale"
+    },
+    {
+      "type": 0,
+      "value": "/category/womens-clothing-dresses"
     }
   ],
   "z+Zrln": [

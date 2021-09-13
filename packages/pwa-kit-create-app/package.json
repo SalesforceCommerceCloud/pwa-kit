@@ -1,6 +1,6 @@
 {
   "name": "pwa-kit-create-app",
-  "version": "0.11.0-dev",
+  "version": "1.1.0-dev",
   "description": "Salesforce's project generator tool",
   "author": "dev@mobify.com",
   "license": "See license in LICENSE",
@@ -11,7 +11,8 @@
   "bin": "scripts/create-mobify-app.js",
   "files": [
     "assets",
-    "template"
+    "template",
+    "template-hello-world"
   ],
   "scripts": {
     "prepare": "node scripts/build.js",

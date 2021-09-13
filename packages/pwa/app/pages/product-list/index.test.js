@@ -178,26 +178,9 @@ test('should render empty list page', async () => {
     expect(await screen.findByTestId('sf-product-empty-list-page')).toBeInTheDocument()
 })
 
-test('clicking a filter will change url', async () => {
-    renderWithProviders(<MockedComponent />)
-    user.click(screen.getByText(/Beige/i))
-    await waitFor(() =>
-        expect(window.location.search).toEqual(
-            '?limit=25&offset=0&refine=c_refinementColor%3DBeige&sort=best-matches'
-        )
-    )
-})
-
-test('clicking a filter will change url', async () => {
-    renderWithProviders(<MockedComponent />)
-    const clearAllButton = screen.queryAllByText(/Clear All/i)
-    user.click(clearAllButton[0])
-    await waitFor(() => expect(window.location.search).toEqual(''))
-})
-
 test('should display Search Results for when searching ', async () => {
     renderWithProviders(<MockedComponent />)
-    window.history.pushState({}, 'ProductList', 'en/search?q=test')
+    window.history.pushState({}, 'ProductList', 'en-GB/search?q=test')
     expect(await screen.findByTestId('sf-product-list-page')).toBeInTheDocument()
 })
 
@@ -219,4 +202,21 @@ test('show login modal when an unauthenticated user tries to add an item to wish
     user.click(wishlistButton[0])
     expect(await screen.findByText(/Email/)).toBeInTheDocument()
     expect(await screen.findByText(/Password/)).toBeInTheDocument()
+})
+
+test('clicking a filter will change url', async () => {
+    renderWithProviders(<MockedComponent />)
+    user.click(screen.getByText(/Beige/i))
+    await waitFor(() =>
+        expect(window.location.search).toEqual(
+            '?limit=25&q=test&refine=c_refinementColor%3DBeige&sort=best-matches'
+        )
+    )
+})
+
+test('clicking a filter will change url', async () => {
+    renderWithProviders(<MockedComponent />)
+    const clearAllButton = screen.queryAllByText(/Clear All/i)
+    user.click(clearAllButton[0])
+    await waitFor(() => expect(window.location.search).toEqual(''))
 })

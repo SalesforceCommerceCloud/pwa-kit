@@ -6,7 +6,7 @@
  */
 import {useCallback} from 'react'
 import {useHistory} from 'react-router'
-import {useLocale} from '../locale'
+import {useIntl} from 'react-intl'
 
 /**
  * A convenience hook for programmatic navigation uses history's `push` or `replace`. The proper locale
@@ -15,7 +15,7 @@ import {useLocale} from '../locale'
  */
 const useNavigation = () => {
     const history = useHistory()
-    const [locale] = useLocale()
+    const {locale} = useIntl()
 
     return useCallback(
         /**

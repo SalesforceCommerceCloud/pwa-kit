@@ -13,7 +13,7 @@ import {CloseIcon} from '../../../components/icons'
 
 import {FormattedMessage} from 'react-intl'
 
-const SelectedRefinements = ({toggleFilter, selectedFilterValues, categoryId, filters}) => {
+const SelectedRefinements = ({toggleFilter, selectedFilterValues, filters}) => {
     const priceFilterValues = filters?.find((filter) => filter.attributeId === 'price')
     const navigate = useNavigation()
     const resetFilters = () => {
@@ -36,7 +36,7 @@ const SelectedRefinements = ({toggleFilter, selectedFilterValues, categoryId, fi
                 apiLabel: filter
             }
 
-            if (selected.value !== 'htype' && selected.uiLabel !== categoryId) {
+            if (selected.value !== 'htype' && selected.value !== 'cgid') {
                 selectedFilters.push(selected)
             }
         })
@@ -96,7 +96,6 @@ const SelectedRefinements = ({toggleFilter, selectedFilterValues, categoryId, fi
 SelectedRefinements.propTypes = {
     filters: PropTypes.array,
     selectedFilterValues: PropTypes.object,
-    categoryId: PropTypes.string,
     toggleFilter: PropTypes.func
 }
 

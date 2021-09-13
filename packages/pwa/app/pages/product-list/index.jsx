@@ -66,6 +66,10 @@ import {DEFAULT_LIMIT_VALUES, API_ERROR_MESSAGE} from '../../constants'
 import useNavigation from '../../hooks/use-navigation'
 import LoadingSpinner from '../../components/loading-spinner'
 
+// NOTE: You can ignore certain refinements on a template level by updating the below
+// list of ignored refinements.
+const REFINEMENT_DISALLOW_LIST = ['c_isNew']
+
 /*
  * This is a simple product listing page. It displays a paginated list
  * of product hit objects. Allowing for sorting and filtering based on the
@@ -164,6 +168,10 @@ const ProductList = (props) => {
     // Toggles filter on and off
     const toggleFilter = (value, attributeId, selected, allowMultiple = true) => {
         const searchParamsCopy = {...searchParams}
+
+        // Remove the `offset` search param if present.
+        delete searchParamsCopy.offset
+
         // If we aren't allowing for multiple selections, simply clear any value set for the
         // attribute, and apply a new one if required.
         if (!allowMultiple) {
@@ -251,7 +259,6 @@ const ProductList = (props) => {
                                 filters={productSearchResult?.refinements}
                                 toggleFilter={toggleFilter}
                                 selectedFilterValues={productSearchResult?.selectedRefinements}
-                                categoryId={category?.id}
                             />
                         </Box>
                         <Box paddingTop={'45px'}>
@@ -320,7 +327,6 @@ const ProductList = (props) => {
                             <SelectedRefinements
                                 filters={productSearchResult?.refinements}
                                 toggleFilter={toggleFilter}
-                                categoryId={category?.id}
                                 selectedFilterValues={productSearchResult?.selectedRefinements}
                             />
                         </Box>
@@ -543,6 +549,11 @@ ProductList.getProps = async ({res, params, location, api}) => {
             parameters: searchParams
         })
     ])
+
+    // Apply disallow list to refinements.
+    productSearchResult.refinements = productSearchResult.refinements.filter(
+        ({attributeId}) => !REFINEMENT_DISALLOW_LIST.includes(attributeId)
+    )
 
     // The `isomorphic-sdk` returns error objects when they occur, so we
     // need to check the category type and throw if required.

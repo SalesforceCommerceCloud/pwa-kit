@@ -21,7 +21,7 @@ const ProductViewModal = ({product, isOpen, onClose, ...props}) => {
             <ModalOverlay />
             <ModalContent>
                 <ModalCloseButton />
-                <ModalBody pb={8} bg="white" paddingBottom={14} marginTop={14}>
+                <ModalBody pb={8} bg="white" paddingBottom={6} marginTop={6}>
                     <ProductView
                         showFullLink={true}
                         imageSize="sm"

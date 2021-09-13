@@ -15,7 +15,7 @@ import Hero from '../../components/hero'
 import Seo from '../../components/seo'
 import Section from '../../components/section'
 import BasicTile from '../../components/basic-tile'
-import {categories} from './data'
+import {categoriesThreeColumns, categoriesTwoColumns} from './data'
 import RecommendedProducts from '../../components/recommended-products'
 
 /**
@@ -48,7 +48,7 @@ const Home = () => {
                 actions={
                     <Button
                         as={Link}
-                        to="/en/category/newarrivals"
+                        to={`/${intl.locale}/category/newarrivals`}
                         width={{base: 'full', md: 'inherit'}}
                     >
                         <FormattedMessage defaultMessage="Shop New Arrivals" />
@@ -70,21 +70,41 @@ const Home = () => {
                     columnGap={6}
                     rowGap={8}
                 >
-                    <GridItem rowSpan={1} colSpan={{base: 1, md: 2}}>
-                        <BasicTile {...categories[0]} />
-                    </GridItem>
-                    <GridItem rowSpan={1} colSpan={{base: 1, md: 2}}>
-                        <BasicTile {...categories[1]} />
-                    </GridItem>
-                    <GridItem rowSpan={1} colSpan={{base: 1, md: 2}}>
-                        <BasicTile {...categories[2]} />
-                    </GridItem>
-                    <GridItem rowSpan={1} colSpan={{base: 1, md: 3}}>
-                        <BasicTile {...categories[3]} />
-                    </GridItem>
-                    <GridItem rowSpan={1} colSpan={{base: 1, md: 3}}>
-                        <BasicTile {...categories[4]} />
-                    </GridItem>
+                    {categoriesThreeColumns.map((item, index) => {
+                        const category = item.message
+                        return (
+                            <GridItem key={index} rowSpan={1} colSpan={{base: 1, md: 2}}>
+                                <BasicTile
+                                    title={intl.formatMessage(category.title)}
+                                    href={intl.formatMessage(category.href, {
+                                        activeLocale: intl.locale
+                                    })}
+                                    img={{
+                                        src: getAssetUrl(intl.formatMessage(category.imgSrc)),
+                                        alt: intl.formatMessage(category.imgAlt)
+                                    }}
+                                />
+                            </GridItem>
+                        )
+                    })}
+
+                    {categoriesTwoColumns.map((item, index) => {
+                        const category = item.message
+                        return (
+                            <GridItem key={index} rowSpan={1} colSpan={{base: 1, md: 3}}>
+                                <BasicTile
+                                    title={intl.formatMessage(category.title)}
+                                    href={intl.formatMessage(category.href, {
+                                        activeLocale: intl.locale
+                                    })}
+                                    img={{
+                                        src: getAssetUrl(intl.formatMessage(category.imgSrc)),
+                                        alt: intl.formatMessage(category.imgAlt)
+                                    }}
+                                />
+                            </GridItem>
+                        )
+                    })}
                 </Grid>
             </Section>
 

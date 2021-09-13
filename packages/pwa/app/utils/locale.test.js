@@ -4,46 +4,18 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React from 'react'
-import {
-    whichLocaleToLoad,
-    getTargetLocale,
-    loadLocaleData,
-    SUPPORTED_LOCALES,
-    DEFAULT_LOCALE,
-    useLocale,
-    getLocaleConfig
-} from './locale'
 
-import {screen, fireEvent, act} from '@testing-library/react'
-import {FormattedMessage} from 'react-intl'
-import {renderWithReactIntl} from './utils/test-utils'
+import {whichLocaleToLoad, getTargetLocale, loadLocaleData, getLocaleConfig} from './locale'
 
-const nonSupportedLocale = 'nl'
+import {SUPPORTED_LOCALES, DEFAULT_LOCALE} from '../constants'
+
+const nonSupportedLocale = 'nl-NL'
 const supportedLocale = SUPPORTED_LOCALES[0]
-const helloWorld = {
-    en: 'Hello World',
-    fr: 'Bonjour le monde',
-    messageId: 'homepage.message.welcome'
-}
-
-const SampleHomepage = () => {
-    const [, changeLocale] = useLocale()
-
-    return (
-        <div>
-            <h1>
-                {/* NOTE: Looks like we had to hardcode the values of these props, now that we're using babel-plugin-formatjs */}
-                <FormattedMessage id="homepage.message.welcome" defaultMessage="Hello World" />
-            </h1>
-            <button onClick={() => changeLocale('fr')}>change locale</button>
-        </div>
-    )
-}
+const testMessageId = 'login-redirect.message.welcome'
 
 test('our assumptions before further testing', () => {
     expect(SUPPORTED_LOCALES.includes(nonSupportedLocale)).toBe(false)
-    expect(DEFAULT_LOCALE).toBe('en')
+    expect(DEFAULT_LOCALE).toBe('en-GB')
 })
 
 describe('whichLocaleToLoad', () => {
@@ -84,29 +56,28 @@ describe('getTargetLocale', () => {
 })
 
 describe('loadLocaleData', () => {
-    const messageId = helloWorld.messageId
-
     test('default to English as the fallback locale', async () => {
         const messages = await loadLocaleData(nonSupportedLocale)
-        expect(messages[messageId][0].value).toMatch(/hello world/i)
+        console.log('messages: ', messages)
+        expect(messages[testMessageId][0].value).toMatch(/login redirect/i)
     })
     test('loading one of the supported locales', async () => {
         const messages = await loadLocaleData(supportedLocale)
-        expect(messages[messageId]).toBeDefined()
+        expect(messages[testMessageId]).toBeDefined()
     })
     test('loading the pseudo locale', async () => {
         const messages = await loadLocaleData('pseudo')
-        expect(messages[messageId][0].value).toMatch(/^\[!! Ḣèĺĺĺĺŏ Ẅŏŕŕŕĺḋ !!\]$/)
+        expect(messages[testMessageId][0].value).toMatch(/^\[!! Ļŏĝĝĝíń Ŕèḋḋḋíŕèèèćṭ !!]$/)
     })
     test('handling a not-found translation file', async () => {
         expect(SUPPORTED_LOCALES[1]).not.toBe(DEFAULT_LOCALE)
 
-        jest.mock(`./translations/compiled/${SUPPORTED_LOCALES[1]}.json`, () => {
+        jest.mock(`../translations/compiled/${SUPPORTED_LOCALES[1]}.json`, () => {
             throw new Error()
         })
 
         let importDefaultLocale = false
-        jest.mock(`./translations/compiled/${DEFAULT_LOCALE}.json`, () => {
+        jest.mock(`../translations/compiled/${DEFAULT_LOCALE}.json`, () => {
             importDefaultLocale = true
         })
 
@@ -114,8 +85,8 @@ describe('loadLocaleData', () => {
         expect(importDefaultLocale).toBe(true)
 
         // Reset
-        jest.unmock(`./translations/compiled/${SUPPORTED_LOCALES[1]}.json`)
-        jest.unmock(`./translations/compiled/${DEFAULT_LOCALE}.json`)
+        jest.unmock(`../translations/compiled/${SUPPORTED_LOCALES[1]}.json`)
+        jest.unmock(`../translations/compiled/${DEFAULT_LOCALE}.json`)
     })
 })
 
@@ -132,18 +103,5 @@ describe('getLocaleConfig', () => {
             getUserPreferredLocales: () => [locale]
         })
         expect(config.app.targetLocale).toBe(locale)
-    })
-})
-
-describe('useLocale', () => {
-    test('changing locale', async () => {
-        renderWithReactIntl(<SampleHomepage />)
-        expect(screen.getByText(helloWorld.en)).toBeInTheDocument()
-
-        act(() => {
-            fireEvent.click(screen.getByText('change locale'))
-        })
-        const newH1 = await screen.findByText(helloWorld.fr)
-        expect(newH1).toBeInTheDocument()
     })
 })

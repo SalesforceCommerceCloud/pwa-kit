@@ -14,7 +14,7 @@ import {IntlProvider} from 'react-intl'
 
 import mockProductDetail from '../commerce-api/mocks/variant-750518699578M'
 import {useProductViewModal} from './use-product-view-modal'
-import {DEFAULT_LOCALE} from '../locale'
+import {DEFAULT_LOCALE} from '../constants'
 
 jest.mock('../commerce-api/utils', () => {
     const originalModule = jest.requireActual('../commerce-api/utils')
