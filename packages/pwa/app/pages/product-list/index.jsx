@@ -121,8 +121,8 @@ const ProductList = (props) => {
     // keep track of the items has been add/remove to/from wishlist
     const [wishlistLoading, setWishlistLoading] = useState([])
     const addItemToWishlist = async (product) => {
-        setWishlistLoading([...wishlistLoading, product.productId])
         try {
+            setWishlistLoading([...wishlistLoading, product.productId])
             await wishlist.addItem({
                 id: product.productId,
                 quantity: 1
@@ -160,9 +160,25 @@ const ProductList = (props) => {
         }
     }
     const removeItemFromWishlist = async (product) => {
-        setWishlistLoading([...wishlistLoading, product.productId])
-        await wishlist.removeItemByProductId(product.productId)
-        setWishlistLoading(wishlistLoading.filter((id) => id !== product.productId))
+        try {
+            setWishlistLoading([...wishlistLoading, product.productId])
+            await wishlist.removeItemByProductId(product.productId)
+            toast({
+                title: formatMessage({defaultMessage: 'Item removed from wishlist'}),
+                status: 'success',
+                id: product.productId
+            })
+        } catch {
+            toast({
+                title: formatMessage(
+                    {defaultMessage: '{errorMessage}'},
+                    {errorMessage: API_ERROR_MESSAGE}
+                ),
+                status: 'error'
+            })
+        } finally {
+            setWishlistLoading(wishlistLoading.filter((id) => id !== product.productId))
+        }
     }
 
     /**************** Filters ****************/
