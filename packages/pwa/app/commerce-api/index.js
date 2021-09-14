@@ -13,7 +13,6 @@ import OcapiShopperOrders from './ocapi-shopper-orders'
 import {getTenantId, isError, isTokenValid} from './utils'
 import Auth from './auth'
 import EinsteinAPI from './einstein'
-import {DEFAULT_LOCALE} from '../constants'
 
 /**
  * The configuration details for the connecting to the API.
@@ -78,14 +77,30 @@ class CommerceAPI {
         }
 
         const apiConfigs = {
-            shopperCustomers: {api: sdk.ShopperCustomers, canLocalize: false},
-            shopperBaskets: {api: OcapiShopperBaskets, canLocalize: false},
-            shopperGiftCertificates: {api: sdk.ShopperGiftCertificates, canLocalize: true},
-            shopperLogin: {api: sdk.ShopperLogin, canLocalize: false},
-            shopperOrders: {api: OcapiShopperOrders, canLocalize: true},
-            shopperProducts: {api: sdk.ShopperProducts, canLocalize: true},
-            shopperPromotions: {api: sdk.ShopperPromotions, canLocalize: true},
-            shopperSearch: {api: sdk.ShopperSearch, canLocalize: true}
+            shopperCustomers: {
+                api: sdk.ShopperCustomers,
+                useLocale: false,
+                useCurrency: []
+            },
+            shopperBaskets: {api: OcapiShopperBaskets, useLocale: false, useCurrency: []},
+            shopperGiftCertificates: {
+                api: sdk.ShopperGiftCertificates,
+                useLocale: true,
+                useCurrency: []
+            },
+            shopperLogin: {api: sdk.ShopperLogin, useLocale: false, useCurrency: []},
+            shopperOrders: {api: OcapiShopperOrders, useLocale: true, useCurrency: []},
+            shopperProducts: {
+                api: sdk.ShopperProducts,
+                useLocale: true,
+                useCurrency: ['getProduct']
+            },
+            shopperPromotions: {
+                api: sdk.ShopperPromotions,
+                useLocale: true,
+                useCurrency: []
+            },
+            shopperSearch: {api: sdk.ShopperSearch, useLocale: true, useCurrency: ['productSearch']}
         }
 
         // Instantiate the SDK class proxies and create getters from our api mapping.
@@ -101,7 +116,7 @@ class CommerceAPI {
                     get: function(obj, prop) {
                         if (typeof obj[prop] === 'function') {
                             return (...args) => {
-                                const {locale} = self._config
+                                const {locale, currency} = self._config
 
                                 if (args[0].ignoreHooks) {
                                     return obj[prop](...args)
@@ -115,11 +130,16 @@ class CommerceAPI {
                                     // the API calls.
                                     // We use the default locale for the API calls when running the app using the
                                     // pseudo locale 'en-XB'.
-                                    if (apiConfigs[key].canLocalize) {
-                                        newArgs[0].parameters = {
-                                            ...newArgs[0].parameters,
-                                            ...(!locale || locale === 'en-XB' ? {} : {locale})
-                                        }
+                                    newArgs[0].parameters = {
+                                        ...newArgs[0].parameters,
+                                        ...(locale &&
+                                        locale !== 'en-XB' &&
+                                        apiConfigs[key].useLocale
+                                            ? {locale}
+                                            : {}),
+                                        ...(currency && apiConfigs[key].useCurrency.includes(prop)
+                                            ? {currency}
+                                            : {})
                                     }
 
                                     return obj[prop](...newArgs).then((res) =>

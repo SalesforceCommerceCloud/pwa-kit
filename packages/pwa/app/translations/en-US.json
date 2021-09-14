@@ -1,0 +1,916 @@
+{
+  "+O5yEM": {
+    "defaultMessage": "Promotions Applied"
+  },
+  "+dLAnb": {
+    "defaultMessage": "Estimated Total"
+  },
+  "+y/wae": {
+    "defaultMessage": "{errorMessage}"
+  },
+  "/kLqfV": {
+    "defaultMessage": "This is a gift."
+  },
+  "/vJwLB": {
+    "defaultMessage": "Please enter your email address"
+  },
+  "/yBi9v": {
+    "defaultMessage": "Shop Women's Jackets & Coats"
+  },
+  "08dLrR": {
+    "defaultMessage": "/{activeLocale}/category/womens-clothing-jackets"
+  },
+  "0g/1TG": {
+    "defaultMessage": "Continue to Payment"
+  },
+  "0nWAOY": {
+    "defaultMessage": "Go to home page"
+  },
+  "0yGJXJ": {
+    "defaultMessage": "Password must contain at least one lowercase letter"
+  },
+  "1LE+iY": {
+    "defaultMessage": "See full details"
+  },
+  "1LblQ6": {
+    "defaultMessage": "Cart Subtotal ({itemAccumulatedCount} item)"
+  },
+  "1b9Q93": {
+    "defaultMessage": "You will receive an email at <b>{email}</b> with a link to reset your password shortly."
+  },
+  "1yoQ91": {
+    "defaultMessage": "No Wishlist Items"
+  },
+  "25WwxF": {
+    "defaultMessage": "Don't have an account?"
+  },
+  "2BHb6K": {
+    "defaultMessage": "Applied promotions info"
+  },
+  "2SvpuI": {
+    "defaultMessage": "Log in here"
+  },
+  "2WOdRo": {
+    "defaultMessage": "wishlist"
+  },
+  "2WRHXI": {
+    "defaultMessage": "{quantity} {quantity, plural, one {item} other {items}} added to cart"
+  },
+  "2bGejb": {
+    "defaultMessage": "My Account"
+  },
+  "2tqQFl": {
+    "defaultMessage": "Cart"
+  },
+  "3FyRaO": {
+    "defaultMessage": "Shop Women's Outfits"
+  },
+  "3NVyN7": {
+    "defaultMessage": "Please enter your first name"
+  },
+  "3cfRtZ": {
+    "defaultMessage": "View {prroductCount} items"
+  },
+  "3gXwAV": {
+    "defaultMessage": "Sign in to retrieve your saved items or continue shopping"
+  },
+  "3rGMFt": {
+    "defaultMessage": "Sale"
+  },
+  "47FYwb": {
+    "defaultMessage": "Cancel"
+  },
+  "4JYnp2": {
+    "defaultMessage": "Ordered: {date}"
+  },
+  "4UPOXx": {
+    "defaultMessage": "Confirm Remove Item"
+  },
+  "5BTYa0": {
+    "defaultMessage": "View Cart"
+  },
+  "5JcXdV": {
+    "defaultMessage": "Create Account"
+  },
+  "5S2I6Q": {
+    "defaultMessage": "Incorrect username or password, please try again."
+  },
+  "5ryYe9": {
+    "defaultMessage": "Japanese (Japan)"
+  },
+  "5sg7KC": {
+    "defaultMessage": "Password"
+  },
+  "6DCLcI": {
+    "defaultMessage": "Please enter a valid date"
+  },
+  "6yVHs9": {
+    "defaultMessage": "wishlist-solid"
+  },
+  "7PMLfK": {
+    "defaultMessage": "Order Total"
+  },
+  "7gXPhB": {
+    "defaultMessage": "Qty"
+  },
+  "7xscgD": {
+    "defaultMessage": "Delivery Details"
+  },
+  "8+0PQZ": {
+    "defaultMessage": "The page you're looking for can't be found"
+  },
+  "8d6kio": {
+    "defaultMessage": "Sort By"
+  },
+  "8iXlvA": {
+    "defaultMessage": "Save & Continue"
+  },
+  "8j72eG": {
+    "defaultMessage": "Please provide a new password"
+  },
+  "8pvKg1": {
+    "defaultMessage": "Payment Details"
+  },
+  "92jEbC": {
+    "defaultMessage": "Are you sure you want to remove this item from your wishlist?"
+  },
+  "9Npj92": {
+    "defaultMessage": "Enter your email to receive instructions on how to reset your password"
+  },
+  "9Obw6C": {
+    "defaultMessage": "Filter"
+  },
+  "9rqdrm": {
+    "defaultMessage": "Item removed from wishlist"
+  },
+  "A2v4cr": {
+    "defaultMessage": "English (United Kingdom)"
+  },
+  "A8Tnga": {
+    "defaultMessage": "Credit Card"
+  },
+  "ADKef8": {
+    "defaultMessage": "Add to cart"
+  },
+  "AYIKp4": {
+    "defaultMessage": "Already have an account? Log in"
+  },
+  "Au/ysp": {
+    "defaultMessage": "This is a secure SSL encrypted payment."
+  },
+  "AwzkSM": {
+    "defaultMessage": "Tax"
+  },
+  "B/orA3": {
+    "defaultMessage": "Promotions"
+  },
+  "B5/YE0": {
+    "defaultMessage": "Profile updated"
+  },
+  "BAoId6": {
+    "defaultMessage": "Please enter your phone number"
+  },
+  "BWpuKl": {
+    "defaultMessage": "Update"
+  },
+  "BlJFo9": {
+    "defaultMessage": "This email already has an account."
+  },
+  "Cl4TrE": {
+    "defaultMessage": "Add to wishlist"
+  },
+  "Cm91xY": {
+    "defaultMessage": "Complete The Set"
+  },
+  "CyOkb5": {
+    "defaultMessage": "Promo Code"
+  },
+  "D+bY29": {
+    "defaultMessage": "Shipping Method"
+  },
+  "D8RblK": {
+    "defaultMessage": "Do you have a promo code?"
+  },
+  "DP5VOH": {
+    "defaultMessage": "Shipping Address"
+  },
+  "DPrDhw": {
+    "defaultMessage": "Add New Payment Method"
+  },
+  "DdR2q8": {
+    "defaultMessage": "{quantity} {quantity, plural, one {item} other {items}} added to wishlist"
+  },
+  "DwzDiL": {
+    "defaultMessage": "Clear recent searches"
+  },
+  "DyMLTN": {
+    "defaultMessage": "/{activeLocale}/category/mens-clothing-suits"
+  },
+  "EKKW2e": {
+    "defaultMessage": "1 uppercase letter",
+    "description": "Password requirement"
+  },
+  "EOUB63": {
+    "defaultMessage": "Only {stockLevel} Left!"
+  },
+  "EWw/tK": {
+    "defaultMessage": "Apply"
+  },
+  "Ev6SEF": {
+    "defaultMessage": "New Password"
+  },
+  "F62y+K": {
+    "defaultMessage": "Sign Out"
+  },
+  "G/yZLu": {
+    "defaultMessage": "Remove"
+  },
+  "GH9wCg": {
+    "defaultMessage": "Please provide a valid promo code"
+  },
+  "GretYf": {
+    "defaultMessage": "Current Password"
+  },
+  "Gu0oq5": {
+    "defaultMessage": "1 special character (example: , S ! % #)",
+    "description": "Password requirement"
+  },
+  "I866h3": {
+    "defaultMessage": "Password must contain at least one number"
+  },
+  "IUXVjJ": {
+    "defaultMessage": "Continue Shopping"
+  },
+  "Ihg+6O": {
+    "defaultMessage": "Let's get started"
+  },
+  "ItDqLZ": {
+    "defaultMessage": "{count} items"
+  },
+  "IyXU3R": {
+    "defaultMessage": "Please enter a valid card number"
+  },
+  "JAcwxt": {
+    "defaultMessage": "Order Number"
+  },
+  "JQ1EGX": {
+    "defaultMessage": "Promotions applied"
+  },
+  "JWbGSW": {
+    "defaultMessage": "Shipped to: {name}"
+  },
+  "KV/9Hv": {
+    "defaultMessage": "Questions"
+  },
+  "Kz7I2o": {
+    "defaultMessage": "Password updated"
+  },
+  "L8seEc": {
+    "defaultMessage": "Subtotal"
+  },
+  "LiHQih": {
+    "defaultMessage": "Coming Soon"
+  },
+  "LrQ8C0": {
+    "defaultMessage": "Shop Feeling Red"
+  },
+  "MPcjO/": {
+    "defaultMessage": "Are you sure you want to sign out? You will need to sign back in to proceed with your current order."
+  },
+  "MnpUD7": {
+    "defaultMessage": "View details"
+  },
+  "MsGXc3": {
+    "defaultMessage": "Clear Filters"
+  },
+  "Mv2pEb": {
+    "defaultMessage": "Continue shopping and add items to your wishlist"
+  },
+  "NTgwLi": {
+    "defaultMessage": "Place Order"
+  },
+  "NV26qx": {
+    "defaultMessage": "Back to previous page"
+  },
+  "NymXNv": {
+    "defaultMessage": "New Payment Method Saved"
+  },
+  "O3zHDW": {
+    "defaultMessage": "{submitButtonLabel}"
+  },
+  "O8DHNx": {
+    "defaultMessage": "Check the code and try again, it may already be applied or the promo has expired"
+  },
+  "O95R3Z": {
+    "defaultMessage": "Phone"
+  },
+  "O9nLUc": {
+    "defaultMessage": "Please select your {stateOrProvince}"
+  },
+  "OHPaLj": {
+    "defaultMessage": "Shop Men's Suits"
+  },
+  "OKPeJz": {
+    "defaultMessage": "Item removed from cart"
+  },
+  "ONNUqG": {
+    "defaultMessage": "By creating an account, you agree to Salesforce’s <policy>Privacy Policy</policy> and <terms>Terms & Conditions</terms>"
+  },
+  "OUPaUZ": {
+    "defaultMessage": "{count} items",
+    "description": "Number of items in order"
+  },
+  "OVAmhz": {
+    "defaultMessage": "Back to cart"
+  },
+  "OVvfLK": {
+    "defaultMessage": "You're now signed in"
+  },
+  "Olgsm/": {
+    "defaultMessage": "Create an account for faster checkout"
+  },
+  "OrvEHn": {
+    "defaultMessage": "Product Detail"
+  },
+  "P5ouV8": {
+    "defaultMessage": "Please enter your security code"
+  },
+  "PBSfL4": {
+    "defaultMessage": "Please enter a valid name"
+  },
+  "PNj3WE": {
+    "defaultMessage": "Review Order"
+  },
+  "PO4nBj": {
+    "defaultMessage": "French (France)"
+  },
+  "PRlD0A": {
+    "defaultMessage": "Shipping"
+  },
+  "PW5i35": {
+    "defaultMessage": "/{activeLocale}/category/womens-outfits"
+  },
+  "PlBReU": {
+    "defaultMessage": "Log out"
+  },
+  "Pwi/Wk": {
+    "defaultMessage": "New In"
+  },
+  "Q6wcZ5": {
+    "defaultMessage": "First Name"
+  },
+  "QclMUn": {
+    "defaultMessage": "Please select your country"
+  },
+  "Qm3TN9": {
+    "defaultMessage": "Are you sure you want to continue ?"
+  },
+  "Qpxx+l": {
+    "defaultMessage": "New Arrivals"
+  },
+  "RlxeOk": {
+    "defaultMessage": "Sort By: {sortOption}"
+  },
+  "SQJto2": {
+    "defaultMessage": "Sign in"
+  },
+  "SRkOX8": {
+    "defaultMessage": "No, keep item"
+  },
+  "SeGQoh": {
+    "defaultMessage": "Address Updated"
+  },
+  "Seanpx": {
+    "defaultMessage": "Required"
+  },
+  "SmKUxZ": {
+    "defaultMessage": "Add a new address method for faster checkout"
+  },
+  "Solm6E": {
+    "defaultMessage": "Zip Code"
+  },
+  "T/K9MQ": {
+    "defaultMessage": "promo applied"
+  },
+  "TBI5GJ": {
+    "defaultMessage": "This {length}-digit code can be found on the {side} of your card.",
+    "description": "Credit card security code help text"
+  },
+  "TE4fIS": {
+    "defaultMessage": "City"
+  },
+  "TR+DHM": {
+    "defaultMessage": "Or return to",
+    "description": "Precedes link to return to sign in"
+  },
+  "TSYROF": {
+    "defaultMessage": "You haven't placed an order yet"
+  },
+  "TdTXXf": {
+    "defaultMessage": "Learn more"
+  },
+  "TemVby": {
+    "defaultMessage": "Full Name"
+  },
+  "Ty4jOO": {
+    "defaultMessage": "1 number",
+    "description": "Password requirement"
+  },
+  "UE9zNR": {
+    "defaultMessage": "Recent Searches"
+  },
+  "Ub+AGc": {
+    "defaultMessage": "Sign In"
+  },
+  "UqKMjl": {
+    "defaultMessage": "Postal Code"
+  },
+  "V+9Zzz": {
+    "defaultMessage": "Size & Fit"
+  },
+  "V+R4NC": {
+    "defaultMessage": "Add Payment Method"
+  },
+  "V/JHlm": {
+    "defaultMessage": "Forgot password?"
+  },
+  "V8WZRT": {
+    "defaultMessage": "Continue shopping to add items to your cart"
+  },
+  "VSlYv6": {
+    "defaultMessage": "Quantity:"
+  },
+  "WHgdsk": {
+    "defaultMessage": "Out of stock"
+  },
+  "XBfvKN": {
+    "defaultMessage": "Order History"
+  },
+  "XQPWe6": {
+    "defaultMessage": "Once you place an order the details will show up here"
+  },
+  "YDGR5k": {
+    "defaultMessage": "No Saved Payment Methods"
+  },
+  "Yy/yDL": {
+    "defaultMessage": "Reset password"
+  },
+  "YzZa8+": {
+    "defaultMessage": "My Profile"
+  },
+  "ZJkXve": {
+    "defaultMessage": "Sign me up for Salesforce emails (you can unsubscribe at any time)"
+  },
+  "ZMphaV": {
+    "defaultMessage": "Promotion applied"
+  },
+  "Zhsl4Z": {
+    "defaultMessage": "Back to Order History"
+  },
+  "a5msuh": {
+    "defaultMessage": "Yes"
+  },
+  "aheQdn": {
+    "defaultMessage": "Last Name"
+  },
+  "au3Vns": {
+    "defaultMessage": "{itemCount, plural, =0 {0 items} one {# item} other {# items}}",
+    "description": "# item(s) in order"
+  },
+  "b24hho": {
+    "defaultMessage": "Chinese (China)"
+  },
+  "bTjwXj": {
+    "defaultMessage": "Welcome Back"
+  },
+  "bXv4wB": {
+    "defaultMessage": "Shop New Arrivals"
+  },
+  "bhUBy4": {
+    "defaultMessage": "Save & Continue to Shipping Method"
+  },
+  "bk7ZVA": {
+    "defaultMessage": "Are you sure you want to remove this item ?"
+  },
+  "c+bH65": {
+    "defaultMessage": "Confirm Action"
+  },
+  "c0a6lZ": {
+    "defaultMessage": "Please try retyping the address, going back to the previous page, or going to the home page."
+  },
+  "c1zaMK": {
+    "defaultMessage": "Please enter your address"
+  },
+  "c7/79+": {
+    "defaultMessage": "Billing Address"
+  },
+  "cChish": {
+    "defaultMessage": "8 characters minimum",
+    "description": "Password requirement"
+  },
+  "cUwO+6": {
+    "defaultMessage": "Add New Card"
+  },
+  "cqlObT": {
+    "defaultMessage": "Clear All"
+  },
+  "cv1LY7": {
+    "defaultMessage": "static/img/women-outfit.png"
+  },
+  "dS8BmB": {
+    "defaultMessage": "static/img/feeling-red.png"
+  },
+  "dUxyza": {
+    "defaultMessage": "Reviews"
+  },
+  "dfEp3Z": {
+    "defaultMessage": "Yes, remove item"
+  },
+  "e//rzS": {
+    "defaultMessage": "Italian (Italy)"
+  },
+  "e6Ph5+": {
+    "defaultMessage": "Address"
+  },
+  "eKEL/g": {
+    "defaultMessage": "Pending"
+  },
+  "f9teca": {
+    "defaultMessage": "Province"
+  },
+  "fCRlK5": {
+    "defaultMessage": "We will send an email to <b>{email}</b> with your confirmation number and receipt shortly."
+  },
+  "fE3ujL": {
+    "defaultMessage": "Order Details"
+  },
+  "fG2sM9": {
+    "defaultMessage": "Please sign in to continue!"
+  },
+  "fIHFDI": {
+    "defaultMessage": "Add New Address"
+  },
+  "fWz2xP": {
+    "defaultMessage": "Please enter your expiry date"
+  },
+  "ffE6Xw": {
+    "defaultMessage": "Password must contain at least 8 characters"
+  },
+  "footer.column.account": {
+    "defaultMessage": "Account"
+  },
+  "footer.column.customer_support": {
+    "defaultMessage": "Customer Support"
+  },
+  "footer.column.our_company": {
+    "defaultMessage": "Our Company"
+  },
+  "footer.link.about_us": {
+    "defaultMessage": "About Us"
+  },
+  "footer.link.contact_us": {
+    "defaultMessage": "Contact Us"
+  },
+  "footer.link.order_status": {
+    "defaultMessage": "Order Status"
+  },
+  "footer.link.privacy_policy": {
+    "defaultMessage": "Privacy Policy"
+  },
+  "footer.link.returns_exchanges": {
+    "defaultMessage": "Returns & Exchanges"
+  },
+  "footer.link.shipping": {
+    "defaultMessage": "Shipping"
+  },
+  "footer.link.signin_create_account": {
+    "defaultMessage": "Sign in or Create Account"
+  },
+  "footer.link.site_map": {
+    "defaultMessage": "Site Map"
+  },
+  "footer.link.store_locator": {
+    "defaultMessage": "Store Locator"
+  },
+  "footer.link.terms_conditions": {
+    "defaultMessage": "Terms & Conditions"
+  },
+  "footer.message.copyright": {
+    "defaultMessage": "2021 Salesforce or its affiliates. All rights reserved. This is a demo store only. Orders made WILL NOT be processed."
+  },
+  "footer.subscribe.button.sign_up": {
+    "defaultMessage": "Sign Up"
+  },
+  "footer.subscribe.description.sign_up": {
+    "defaultMessage": "Sign up to stay in the loop about the hottest deals"
+  },
+  "footer.subscribe.heading.first_to_know": {
+    "defaultMessage": "Be the first to know"
+  },
+  "fuzq0p": {
+    "defaultMessage": "Checkout as guest"
+  },
+  "gg6vZx": {
+    "defaultMessage": "Shop by Category"
+  },
+  "hCj9FS": {
+    "defaultMessage": "Please enter your name as shown on your card"
+  },
+  "header.button.assistive_msg.logo": {
+    "defaultMessage": "Logo"
+  },
+  "header.button.assistive_msg.menu": {
+    "defaultMessage": "Menu"
+  },
+  "header.button.assistive_msg.my_account": {
+    "defaultMessage": "My account"
+  },
+  "header.button.assistive_msg.my_cart": {
+    "defaultMessage": "My cart"
+  },
+  "header.search.field.value.placeholder": {
+    "defaultMessage": "Search for products..."
+  },
+  "hp3uqR": {
+    "defaultMessage": "Wishlist"
+  },
+  "hqoiIz": {
+    "defaultMessage": "static/img/women-dresses.png"
+  },
+  "huqKGl": {
+    "defaultMessage": "Create account"
+  },
+  "hwGJRL": {
+    "defaultMessage": "/{activeLocale}/category/womens-clothing-feeling-red"
+  },
+  "iPMbLb": {
+    "defaultMessage": "Please select a payment method."
+  },
+  "iiYrag": {
+    "defaultMessage": "Please enter your password"
+  },
+  "ipwTkh": {
+    "defaultMessage": "Same as shipping address"
+  },
+  "iqQeTp": {
+    "defaultMessage": "static/img/men-suits.png"
+  },
+  "ivNR8s": {
+    "defaultMessage": "Order Summary"
+  },
+  "jAOn1A": {
+    "defaultMessage": "Are you sure you want to remove this item from your cart?"
+  },
+  "jvo0vs": {
+    "defaultMessage": "Save"
+  },
+  "kVzyDt": {
+    "defaultMessage": "Thank you for your order!"
+  },
+  "kfvFzC": {
+    "defaultMessage": "static/img/women-coats.png"
+  },
+  "knAdWV": {
+    "defaultMessage": "Top Sellers"
+  },
+  "ku+mDU": {
+    "defaultMessage": "State"
+  },
+  "lKv8ex": {
+    "defaultMessage": "Default"
+  },
+  "llHgJz": {
+    "defaultMessage": "Welcome {name},"
+  },
+  "login-redirect.message.welcome": {
+    "defaultMessage": "Login Redirect"
+  },
+  "m/CSCf": {
+    "defaultMessage": "Add a new payment method for faster checkout"
+  },
+  "mXiD5u": {
+    "defaultMessage": "Phone Number"
+  },
+  "mYx8sv": {
+    "defaultMessage": "Account Details"
+  },
+  "mfahwZ": {
+    "defaultMessage": "Recently Viewed"
+  },
+  "mobile_navigation.actions.sign_in": {
+    "defaultMessage": "Sign In"
+  },
+  "mobile_navigation.actions.store_locator": {
+    "defaultMessage": "Store Locator"
+  },
+  "mobile_navigation.categories.shop_all": {
+    "defaultMessage": "Shop All"
+  },
+  "mobile_navigation.links.customer_support": {
+    "defaultMessage": "Customer Support"
+  },
+  "mobile_navigation.links.customer_support.contact_us": {
+    "defaultMessage": "Contact Us"
+  },
+  "mobile_navigation.links.customer_support.shipping_and_returns": {
+    "defaultMessage": "Shipping & Returns"
+  },
+  "mobile_navigation.links.out_company": {
+    "defaultMessage": "Our Company"
+  },
+  "mobile_navigation.links.out_company.about_us": {
+    "defaultMessage": "About Us"
+  },
+  "mobile_navigation.links.privacy_and_security": {
+    "defaultMessage": "Privacy & Security"
+  },
+  "mobile_navigation.links.privacy_and_security.privacy_policy": {
+    "defaultMessage": "Privacy Policy"
+  },
+  "mobile_navigation.links.privacy_and_security.stie_map": {
+    "defaultMessage": "Site Map"
+  },
+  "mobile_navigation.links.privacy_and_security.terms_and_conditions": {
+    "defaultMessage": "Terms & Conditions"
+  },
+  "nA8PRt": {
+    "defaultMessage": "1 lowercase letter",
+    "description": "Password requirement"
+  },
+  "nEwlut": {
+    "defaultMessage": "Remove Item?"
+  },
+  "nFQbxh": {
+    "defaultMessage": "Payment Method"
+  },
+  "nYi7Xz": {
+    "defaultMessage": "Your Cart is Empty"
+  },
+  "o1QPc9": {
+    "defaultMessage": "Tracking Number"
+  },
+  "o40Ymt": {
+    "defaultMessage": "Please enter a valid security code"
+  },
+  "oLpv29": {
+    "defaultMessage": "Please enter a valid email address"
+  },
+  "oUWADl": {
+    "defaultMessage": "No"
+  },
+  "odTkf5": {
+    "defaultMessage": "Back to sign in"
+  },
+  "odXlk8": {
+    "defaultMessage": "Log in"
+  },
+  "offline_banner.message": {
+    "defaultMessage": "You're currently browsing in offline mode"
+  },
+  "p2EAP0": {
+    "defaultMessage": "Promotion removed"
+  },
+  "pQ2F3h": {
+    "defaultMessage": "Edit Shipping Address"
+  },
+  "pS9/Sw": {
+    "defaultMessage": "Please enter your card number"
+  },
+  "pagination.actions.current_page_verb": {
+    "defaultMessage": "of"
+  },
+  "pagination.actions.next": {
+    "defaultMessage": "Next"
+  },
+  "pagination.actions.prev": {
+    "defaultMessage": "Prev"
+  },
+  "product_list_page.no_results": {
+    "defaultMessage": "We couldn’t find anything for {category}. Try searching for a product or {link}."
+  },
+  "product_list_page.no_results.contact_us": {
+    "defaultMessage": "contact us"
+  },
+  "product_list_page.no_results_double_check": {
+    "defaultMessage": "Double-check your spelling and try again or {link}"
+  },
+  "product_list_page.no_results_search_query": {
+    "defaultMessage": "We couldn’t find anything for \"{searchQuery}\""
+  },
+  "py3qts": {
+    "defaultMessage": "New Address Saved"
+  },
+  "qGl7SR": {
+    "defaultMessage": "Please create a password"
+  },
+  "qVGRIE": {
+    "defaultMessage": "Quantity"
+  },
+  "rkxMdY": {
+    "defaultMessage": "{itemCount, plural, =0 {0 items} one {# item} other {# items}} in cart",
+    "description": "# item(s) in cart"
+  },
+  "s/qo4z": {
+    "defaultMessage": "Please enter your last name"
+  },
+  "s7dATg": {
+    "defaultMessage": "Edit cart"
+  },
+  "sy+pv5": {
+    "defaultMessage": "Email"
+  },
+  "tf1lIh": {
+    "defaultMessage": "Free"
+  },
+  "tiVXug": {
+    "defaultMessage": "Please enter your city"
+  },
+  "tpMVg1": {
+    "defaultMessage": "Lighter layers for lighter days."
+  },
+  "uCk8r+": {
+    "defaultMessage": "Already have an account?"
+  },
+  "uE6ELS": {
+    "defaultMessage": "Not provided"
+  },
+  "uSpe21": {
+    "defaultMessage": "Edit Address"
+  },
+  "uV4+68": {
+    "defaultMessage": "Please enter your {postalOrZip}"
+  },
+  "unUv/E": {
+    "defaultMessage": "You Might Also Like"
+  },
+  "v898P+": {
+    "defaultMessage": "You May Also Like"
+  },
+  "vONi+O": {
+    "defaultMessage": "Country"
+  },
+  "vrBTnC": {
+    "defaultMessage": "Do you want to send this as a gift?"
+  },
+  "vvTcAr": {
+    "defaultMessage": "Create an account and get first access to the very best products, inspiration and community."
+  },
+  "wBVQL7": {
+    "defaultMessage": "Password must contain at least one uppercase letter"
+  },
+  "wEQDC6": {
+    "defaultMessage": "Edit"
+  },
+  "wPc1n9": {
+    "defaultMessage": "Shop Women's Dresses"
+  },
+  "x6hxSH": {
+    "defaultMessage": "Something's not right with your email or password. Try again."
+  },
+  "xBrtnx": {
+    "defaultMessage": "Addresses"
+  },
+  "xD3Bn3": {
+    "defaultMessage": "Quantity: {quantity}"
+  },
+  "xHP4/6": {
+    "defaultMessage": "Password Reset"
+  },
+  "xYH2SF": {
+    "defaultMessage": "No Saved Addresses"
+  },
+  "xg14pg": {
+    "defaultMessage": "Add Address"
+  },
+  "xl27nc": {
+    "defaultMessage": "Reset Password"
+  },
+  "xuTqgN": {
+    "defaultMessage": "Payment Methods"
+  },
+  "y/sA02": {
+    "defaultMessage": "Most Viewed"
+  },
+  "ymw1eE": {
+    "defaultMessage": "/{activeLocale}/category/womens-clothing-dresses"
+  },
+  "z+Zrln": {
+    "defaultMessage": "Set as default"
+  },
+  "z34C7B": {
+    "defaultMessage": "Password must contain at least one special character"
+  },
+  "z3Qj9h": {
+    "defaultMessage": "Proceed to Checkout"
+  },
+  "zHi6BD": {
+    "defaultMessage": "Please enter 2-letter state/province"
+  },
+  "zODu/+": {
+    "defaultMessage": "ea",
+    "description": "Abbreviated 'each', follows price per item, like $10/ea"
+  },
+  "zXbRZR": {
+    "defaultMessage": "Order Number: {orderNumber}"
+  }
+}

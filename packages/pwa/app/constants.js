@@ -41,16 +41,16 @@ export const cssColorGroups = {
     miscellaneous: 'linear-gradient(to right, orange , yellow, green, cyan, blue, violet)'
 }
 
-export const DEFAULT_CURRENCY = 'USD'
-
 export const FILTER_ACCORDION_SATE = 'filters-expanded-index'
 
 export const API_ERROR_MESSAGE = 'Something went wrong. Try again!'
 
 export const HOME_HREF = '/'
 
+export const MAX_ORDER_QUANTITY = 10
+
 // TODO: You can update these locales in 'pwa/package.json' file
 export const SUPPORTED_LOCALES = packageInfo.l10n.supportedLocales
 export const DEFAULT_LOCALE = packageInfo.l10n.defaultLocale
 
-export const MAX_ORDER_QUANTITY = 10
+export const DEFAULT_CURRENCY = 'GBP'

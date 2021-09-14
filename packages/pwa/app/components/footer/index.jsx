@@ -135,8 +135,8 @@ const Footer = ({...otherProps}) => {
                                 {...styles.localeDropdown}
                             >
                                 {SUPPORTED_LOCALES.map((locale) => (
-                                    <option key={locale} value={locale}>
-                                        {intl.formatMessage(defaultLocaleMessages[locale])}
+                                    <option key={locale.id} value={locale.id}>
+                                        {intl.formatMessage(defaultLocaleMessages[locale.id])}
                                     </option>
                                 ))}
                             </Select>

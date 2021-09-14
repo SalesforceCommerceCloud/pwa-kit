@@ -21,7 +21,7 @@ import {
 } from '../../commerce-api/utils'
 import {commerceAPIConfig} from '../../commerce-api.config'
 import {einsteinAPIConfig} from '../../einstein-api.config'
-import {DEFAULT_LOCALE, SUPPORTED_LOCALES} from '../../constants'
+import {DEFAULT_CURRENCY, DEFAULT_LOCALE, SUPPORTED_LOCALES} from '../../constants'
 
 const apiConfig = {
     ...commerceAPIConfig,
@@ -40,7 +40,7 @@ const getLocale = (locals) => {
     const localeUrl = originalUrl && originalUrl.split('/')[1]
 
     return originalUrl
-        ? SUPPORTED_LOCALES.includes(localeUrl)
+        ? SUPPORTED_LOCALES.find((locale) => locale.id === localeUrl)
             ? localeUrl
             : DEFAULT_LOCALE
         : window?.__PRELOADED_STATE__?.appProps?.targetLocale
@@ -76,7 +76,10 @@ const AppConfig = ({children, locals = {}}) => {
 
 AppConfig.restore = (locals = {}) => {
     const locale = getLocale(locals) || DEFAULT_LOCALE
-    locals.api = new CommerceAPI({...apiConfig, locale})
+    const currency =
+        SUPPORTED_LOCALES.find((supportedLocale) => supportedLocale.id === locale)?.currencyCode ||
+        DEFAULT_CURRENCY
+    locals.api = new CommerceAPI({...apiConfig, locale, currency})
 }
 
 AppConfig.freeze = () => undefined

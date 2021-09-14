@@ -72,7 +72,9 @@ export const getLocaleConfig = async ({getUserPreferredLocales} = {}) => {
  * @returns {string} The target locale if there's a match. Otherwise, returns `fallbackLocale`.
  */
 export const whichLocaleToLoad = (preferredLocales, supportedLocales, fallbackLocale) => {
-    const targetLocale = preferredLocales.filter((locale) => supportedLocales.includes(locale))[0]
+    const targetLocale = preferredLocales.filter((perfLocale) =>
+        supportedLocales.some((locale) => locale.id === perfLocale)
+    )[0]
 
     return targetLocale || fallbackLocale
 }

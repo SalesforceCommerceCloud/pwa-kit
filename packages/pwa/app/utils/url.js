@@ -114,7 +114,9 @@ export const buildUrlLocale = (previousLocale, newLocale) => {
     return location.pathname === HOME_HREF
         ? homeUrlBuilder(HOME_HREF, newLocale)
         : `/${
-              SUPPORTED_LOCALES.includes(newLocale) ? newLocale : DEFAULT_LOCALE
+              SUPPORTED_LOCALES.find((locale) => locale.id === newLocale)
+                  ? newLocale
+                  : DEFAULT_LOCALE
           }${location.pathname.slice(location.pathname.indexOf('/', 1))}${
               Array.from(params).length > 0 ? `?${params}` : ''
           }`

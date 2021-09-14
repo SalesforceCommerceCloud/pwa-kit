@@ -184,11 +184,26 @@
     ],
     "l10n": {
         "supportedLocales": [
-            "en-GB",
-            "fr-FR",
-            "it-IT",
-            "zh-CN",
-            "ja-JP"
+            {
+                "id": "en-GB",
+                "currencyCode": "GBP"
+            },
+            {
+                "id": "fr-FR",
+                "currencyCode": "EUR"
+            },
+            {
+                "id": "it-IT",
+                "currencyCode": "EUR"
+            },
+            {
+                "id": "zh-CN",
+                "currencyCode": "CNY"
+            },
+            {
+                "id": "ja-JP",
+                "currencyCode": "JPY"
+            }
         ],
         "defaultLocale": "en-GB"
     }
