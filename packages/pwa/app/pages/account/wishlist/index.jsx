@@ -33,6 +33,7 @@ const AccountWishlist = () => {
     const [localQuantity, setLocalQuantity] = useState({})
     const [isWishlistItemLoading, setWishlistItemLoading] = useState(false)
     const {isInitialized, isEmpty, ...wishlist} = useWishlist()
+    console.log(useWishlist())
 
     const handleActionClicked = (itemId) => {
         setWishlistItemLoading(!!itemId)

@@ -2590,6 +2590,7 @@ export const mockedCustomerProductLists = {
             id: 'c1b0edb2ad6fcfb153044ef3b0',
             lastModified: '2021-06-30T04:11:12.602Z',
             public: false,
+            name: 'PWA wishlist',
             type: 'wish_list'
         }
     ],
