@@ -12,6 +12,7 @@ import {Box, Flex, Skeleton} from '@chakra-ui/react'
 import useCustomer from '../../../commerce-api/hooks/useCustomer'
 import useNavigation from '../../../hooks/use-navigation'
 import useWishlist from '../../../hooks/use-wishlist'
+import {useToast} from '../../../hooks/use-toast'
 
 import PageActionPlaceHolder from '../../../components/page-action-placeholder'
 import {WishlistIcon} from '../../../components/icons'
@@ -19,12 +20,15 @@ import ProductItem from '../../../components/product-item/index'
 import WishlistPrimaryAction from './partials/wishlist-primary-action'
 import WishlistSecondaryButtonGroup from './partials/wishlist-secondary-button-group'
 
+import {API_ERROR_MESSAGE} from '../../../constants'
+
 const numberOfSkeletonItems = 3
 
 const AccountWishlist = () => {
     const customer = useCustomer()
     const navigate = useNavigation()
     const {formatMessage} = useIntl()
+    const toast = useToast()
     const [selectedItem, setSelectedItem] = useState(undefined)
     const [localQuantity, setLocalQuantity] = useState({})
     const [isWishlistItemLoading, setWishlistItemLoading] = useState(false)
@@ -41,10 +45,20 @@ const AccountWishlist = () => {
         setLocalQuantity({...localQuantity, [item.productId]: quantity})
         setWishlistItemLoading(true)
         setSelectedItem(item.productId)
-        await wishlist.updateItem({
-            ...item,
-            quantity: parseInt(quantity)
-        })
+        try {
+            await wishlist.updateItem({
+                ...item,
+                quantity: parseInt(quantity)
+            })
+        } catch {
+            toast({
+                title: formatMessage(
+                    {defaultMessage: '{errorMessage}'},
+                    {errorMessage: API_ERROR_MESSAGE}
+                ),
+                status: 'error'
+            })
+        }
         setWishlistItemLoading(false)
         setSelectedItem(undefined)
         setLocalQuantity({...localQuantity, [item.productId]: undefined})
