@@ -81,7 +81,7 @@ const Error = (props) => {
                         </Stack>
                     </Stack>
                     <Box>
-                        <Text fontWeight="700" fontSize="0.8750em">
+                        <Text fontWeight="bold" fontSize="sm">
                             Stack Trace
                         </Text>
                         {stack && (

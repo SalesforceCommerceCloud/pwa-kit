@@ -16,7 +16,7 @@ export default {
         },
         content: {
             px: {base: 4, md: 6, lg: 50},
-            py: {base: 10, md: 7},
+            py: {base: 10, md: 24},
             height: 'full'
         },
         header: {
