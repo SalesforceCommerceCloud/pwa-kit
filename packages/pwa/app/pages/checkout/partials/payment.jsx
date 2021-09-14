@@ -6,7 +6,7 @@
  */
 import React, {useEffect} from 'react'
 import PropTypes from 'prop-types'
-import {FormattedMessage} from 'react-intl'
+import {FormattedMessage, useIntl} from 'react-intl'
 import {Box, Button, Checkbox, Container, Heading, Stack, Text, Divider} from '@chakra-ui/react'
 import {useCheckout} from '../util/checkout-context'
 import usePaymentForms from '../util/usePaymentForms'
@@ -18,6 +18,8 @@ import AddressDisplay from '../../../components/address-display'
 import {PromoCode, usePromoCode} from '../../../components/promo-code'
 
 const Payment = () => {
+    const {formatMessage} = useIntl()
+
     const {
         step,
         setCheckoutStep,
@@ -43,10 +45,9 @@ const Payment = () => {
     }, [])
 
     return (
-        // TODO: [l10n] localize this title
         <ToggleCard
             id="step-3"
-            title="Payment"
+            title={formatMessage({defaultMessage: "Payment"})}
             editing={step === 3}
             isLoading={
                 paymentMethodForm.formState.isSubmitting ||
