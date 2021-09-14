@@ -53,5 +53,15 @@ export default {
             padding: 4
         }
     },
-    parts: ['container', 'main', 'content', 'header', 'headerContent']
+    parts: [
+        'container',
+        'main',
+        'content',
+        'header',
+        'headerContent',
+        'logo',
+        'icons',
+        'description',
+        'pre'
+    ]
 }
