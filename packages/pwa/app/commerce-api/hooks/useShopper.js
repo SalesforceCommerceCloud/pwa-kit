@@ -72,7 +72,6 @@ const useShopper = () => {
         }
     }, [customer, basket])
 
-
     return {customer, basket}
 }
 
