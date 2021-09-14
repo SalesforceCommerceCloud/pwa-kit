@@ -6,7 +6,7 @@
  */
 
 import React, {useEffect, useState} from 'react'
-import {Box, Stack, Grid, GridItem, Container, useDisclosure} from '@chakra-ui/react'
+import {Box, Button, Stack, Grid, GridItem, Container, useDisclosure} from '@chakra-ui/react'
 import {FormattedMessage, useIntl} from 'react-intl'
 
 import EmptyCart from './partials/empty-cart'
@@ -24,6 +24,7 @@ import {useToast} from '../../hooks/use-toast'
 import useWishlist from '../../hooks/use-wishlist'
 import {API_ERROR_MESSAGE} from '../../constants'
 import useCustomer from '../../commerce-api/hooks/useCustomer'
+import useNavigation from '../../hooks/use-navigation'
 
 const Cart = () => {
     const basket = useBasket()
@@ -33,9 +34,10 @@ const Cart = () => {
     const [isCartItemLoading, setCartItemLoading] = useState(false)
     const {isOpen, onOpen, onClose} = useDisclosure()
     const {formatMessage} = useIntl()
-    const showToast = useToast()
+    const toast = useToast()
+    const navigate = useNavigation()
     const showError = () => {
-        showToast({
+        toast({
             title: formatMessage(
                 {defaultMessage: '{errorMessage}'},
                 {errorMessage: API_ERROR_MESSAGE}
@@ -45,12 +47,31 @@ const Cart = () => {
     }
 
     /**************** Wishlist ****************/
-    const wishlist = useWishlist({enableToast: true})
+    const wishlist = useWishlist()
     const handleAddToWishlist = async (product) => {
-        await wishlist.addItem({
-            id: product.id,
-            quantity: product.quantity
-        })
+        try {
+            await wishlist.addItem({
+                id: product.productId,
+                quantity: product.quantity
+            })
+            toast({
+                title: formatMessage(
+                    {
+                        defaultMessage:
+                            '{quantity} {quantity, plural, one {item} other {items}} added to wishlist'
+                    },
+                    {quantity: 1}
+                ),
+                status: 'success',
+                action: (
+                    <Button variant="link" onClick={() => navigate('/account/wishlist')}>
+                        View
+                    </Button>
+                )
+            })
+        } catch {
+            showError()
+        }
     }
 
     useEffect(() => {
@@ -100,8 +121,8 @@ const Cart = () => {
             if (selectedItem.quantity !== quantity) {
                 return await changeItemQuantity(quantity, selectedItem)
             }
-        } catch (error) {
-            showError(error)
+        } catch {
+            showError()
         } finally {
             setCartItemLoading(false)
             setSelectedItem(undefined)
@@ -119,8 +140,8 @@ const Cart = () => {
                 quantity: parseInt(quantity)
             }
             await basket.updateItemInBasket(item, product.itemId)
-        } catch (error) {
-            showError(error)
+        } catch {
+            showError()
         } finally {
             // reset the state
             setCartItemLoading(false)
@@ -133,12 +154,12 @@ const Cart = () => {
         setCartItemLoading(true)
         try {
             await basket.removeItemFromBasket(product.itemId)
-            showToast({
+            toast({
                 title: formatMessage({defaultMessage: 'Item removed from cart'}),
                 status: 'success'
             })
-        } catch (error) {
-            showError(error)
+        } catch {
+            showError()
         } finally {
             // reset the state
             setCartItemLoading(false)

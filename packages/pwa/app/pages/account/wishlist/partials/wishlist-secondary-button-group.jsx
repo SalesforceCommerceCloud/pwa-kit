@@ -7,13 +7,15 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {Button, ButtonGroup, useDisclosure} from '@chakra-ui/react'
-import {defineMessage, FormattedMessage} from 'react-intl'
+import {useIntl, defineMessage, FormattedMessage} from 'react-intl'
 
 import useWishlist from '../../../../hooks/use-wishlist'
+import {useToast} from '../../../../hooks/use-toast'
 
 import ConfirmationModal from '../../../../components/confirmation-modal/index'
 import {useCartItemVariant} from '../../../../components/cart-item-variant'
 import {noop} from '../../../../utils/utils'
+import {API_ERROR_MESSAGE} from '../../../../constants'
 
 export const REMOVE_WISHLIST_ITEM_CONFIRMATION_DIALOG_CONFIG = {
     dialogTitle: defineMessage({defaultMessage: 'Confirm Remove Item'}),
@@ -31,8 +33,10 @@ export const REMOVE_WISHLIST_ITEM_CONFIRMATION_DIALOG_CONFIG = {
  */
 const WishlistSecondaryButtonGroup = ({productListItemId, onClick = noop}) => {
     const variant = useCartItemVariant()
-    const wishlist = useWishlist({enableToast: true})
+    const wishlist = useWishlist()
     const modalProps = useDisclosure()
+    const toast = useToast()
+    const {formatMessage} = useIntl()
 
     const showRemoveItemConfirmation = () => {
         modalProps.onOpen()
@@ -40,7 +44,17 @@ const WishlistSecondaryButtonGroup = ({productListItemId, onClick = noop}) => {
 
     const handleItemRemove = async () => {
         onClick(variant.id)
-        await wishlist.removeItem(productListItemId)
+        try {
+            await wishlist.removeItem(productListItemId)
+        } catch {
+            toast({
+                title: formatMessage(
+                    {defaultMessage: '{errorMessage}'},
+                    {errorMessage: API_ERROR_MESSAGE}
+                ),
+                status: 'error'
+            })
+        }
         onClick('')
     }
 

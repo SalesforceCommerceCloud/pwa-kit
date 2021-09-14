@@ -28,7 +28,7 @@ const AccountWishlist = () => {
     const [selectedItem, setSelectedItem] = useState(undefined)
     const [localQuantity, setLocalQuantity] = useState({})
     const [isWishlistItemLoading, setWishlistItemLoading] = useState(false)
-    const {isInitialized, isEmpty, ...wishlist} = useWishlist({enableToast: true})
+    const {isInitialized, isEmpty, ...wishlist} = useWishlist()
 
     const handleActionClicked = (itemId) => {
         setWishlistItemLoading(!!itemId)

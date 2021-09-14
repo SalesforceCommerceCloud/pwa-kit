@@ -117,7 +117,7 @@ const ProductList = (props) => {
     const showNoResults = !isLoading && productSearchResult && !productSearchResult?.hits
 
     /**************** Wishlist ****************/
-    const wishlist = useWishlist({enableToast: true})
+    const wishlist = useWishlist()
     // keep track of the items has been add/remove to/from wishlist
     const [wishlistLoading, setWishlistLoading] = useState([])
     const addItemToWishlist = async (product) => {

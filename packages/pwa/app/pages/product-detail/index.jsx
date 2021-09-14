@@ -18,6 +18,7 @@ import {
     AccordionPanel,
     AccordionIcon,
     Box,
+    Button,
     Stack
 } from '@chakra-ui/react'
 
@@ -25,6 +26,7 @@ import {
 import useBasket from '../../commerce-api/hooks/useBasket'
 import {useVariant} from '../../hooks'
 import useWishlist from '../../hooks/use-wishlist'
+import useNavigation from '../../hooks/use-navigation'
 import useEinstein from '../../commerce-api/hooks/useEinstein'
 
 // Project Components
@@ -46,6 +48,8 @@ const ProductDetail = ({category, product, isLoading}) => {
     const history = useHistory()
     const einstein = useEinstein()
     const variant = useVariant(product)
+    const toast = useToast()
+    const navigate = useNavigation()
     const [primaryCategory, setPrimaryCategory] = useState(category)
 
     // This page uses the `primaryCategoryId` to retrieve the category data. This attribute
@@ -70,12 +74,37 @@ const ProductDetail = ({category, product, isLoading}) => {
     }, [variant])
 
     /**************** Wishlist ****************/
-    const wishlist = useWishlist({enableToast: true})
+    const wishlist = useWishlist()
     const handleAddToWishlist = async (quantity) => {
-        await wishlist.addItem({
-            id: product.id,
-            quantity: quantity
-        })
+        try {
+            await wishlist.addItem({
+                id: product.id,
+                quantity: quantity
+            })
+            toast({
+                title: formatMessage(
+                    {
+                        defaultMessage:
+                            '{quantity} {quantity, plural, one {item} other {items}} added to wishlist'
+                    },
+                    {quantity: 1}
+                ),
+                status: 'success',
+                action: (
+                    <Button variant="link" onClick={() => navigate('/account/wishlist')}>
+                        View
+                    </Button>
+                )
+            })
+        } catch {
+            toast({
+                title: formatMessage(
+                    {defaultMessage: '{errorMessage}'},
+                    {errorMessage: API_ERROR_MESSAGE}
+                ),
+                status: 'error'
+            })
+        }
     }
 
     /**************** Add To Cart ****************/
