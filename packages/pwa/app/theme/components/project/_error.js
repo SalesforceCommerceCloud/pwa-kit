@@ -41,10 +41,12 @@ export default {
             marginBottom: [1, 1, 2, 0]
         },
         description: {
-            maxWidth: '440px'
+            maxWidth: '440px',
+            marginBottom: 8
         },
         pre: {
             mt: 4,
+            fontSize: 'sm',
             background: 'gray.50',
             borderColor: 'gray.200',
             borderStyle: 'solid',

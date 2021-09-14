@@ -53,7 +53,7 @@ const Error = (props) => {
             </Box>
             <Box as="main" id="app-main" role="main" flex={1} layerStyle="page" {...styles.main}>
                 <Flex {...styles.content} flexDirection="column" justify="center">
-                    <Stack align="center" mb={20}>
+                    <Flex align="center" mb={20} flexDirection="column">
                         <FileIcon boxSize={['30px', '32px']} mb={8} />
                         <Heading as="h2" fontSize={['xl', '2xl', '2xl', '3xl']} mb={2}>
                             {title}
@@ -64,7 +64,7 @@ const Error = (props) => {
                                 immediate help please contact support.
                             </Text>
                         </Box>
-                        <Stack direction={['column', 'row']} width={['100%', 'auto']}>
+                        <Stack direction={['column', 'row']} width={['100%', 'auto']} spacing={4}>
                             <Button
                                 variant="outline"
                                 bg="white"
@@ -79,9 +79,9 @@ const Error = (props) => {
                                 Refresh the page
                             </Button>
                         </Stack>
-                    </Stack>
+                    </Flex>
                     <Box>
-                        <Text fontWeight="bold" fontSize="sm">
+                        <Text fontWeight="bold" fontSize="md">
                             Stack Trace
                         </Text>
                         {stack && (
