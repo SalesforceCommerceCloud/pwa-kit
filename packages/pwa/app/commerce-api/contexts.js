@@ -61,7 +61,6 @@ const CPLActionTypes = {
     RESET: 'RESET'
 }
 export const CustomerProductListsContext = createContext(CPLInitialValue)
-const _CustomerProductListsProvider = CustomerProductListsContext.Provider
 // eslint-disable-next-line react/prop-types
 export const CustomerProductListsProvider = ({children}) => {
     const [state, dispatch] = useReducer((state, {type, payload}) => {
@@ -164,8 +163,8 @@ export const CustomerProductListsProvider = ({children}) => {
     }
 
     return (
-        <_CustomerProductListsProvider value={{state, actions}}>
+        <CustomerProductListsContext.Provider value={{state, actions}}>
             {children}
-        </_CustomerProductListsProvider>
+        </CustomerProductListsContext.Provider>
     )
 }
