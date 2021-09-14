@@ -76,6 +76,10 @@ export const CustomerProductListsProvider = ({children}) => {
                 return {...state, productLists}
             }
             case CPLActionTypes.RECEIVE_LIST: {
+                // Tips: if you are unfamiliar with the concept of
+                // reducers, keep in mind that reducers must be pure.
+                // For an action like this, you must update every
+                // level of nested data to avoid unexpected side effects
                 return {
                     ...state,
                     productLists: {
@@ -85,11 +89,6 @@ export const CustomerProductListsProvider = ({children}) => {
                 }
             }
             case CPLActionTypes.CREATE_LIST_ITEM: {
-                // Tips: if you are unfamiliar with the concept of
-                // reducers, keep in mind that reducers must be pure.
-                // For an action like this, you must update every
-                // level of nested data to avoid unexpected side effects
-
                 const items = state[payload.listId]?.customerProductListItems || []
 
                 // if the item is already added to the list
