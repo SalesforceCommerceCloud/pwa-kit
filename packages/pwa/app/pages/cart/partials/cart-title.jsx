@@ -16,7 +16,8 @@ const CartTitle = () => {
             <FormattedMessage defaultMessage="Cart" /> (
             <FormattedMessage
                 defaultMessage="{itemCount, plural, =0 {0 items} one {# item} other {# items}})"
-                values={{itemCount: basket.itemAccumulatedCount}}/>
+                values={{itemCount: basket.itemAccumulatedCount}}
+            />
         </Text>
     )
 }

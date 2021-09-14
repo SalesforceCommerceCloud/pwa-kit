@@ -42,7 +42,9 @@ export default function ShippingAddress() {
             <ToggleCardEdit>
                 <ShippingAddressSelection
                     selectedAddress={selectedShippingAddress}
-                    submitButtonLabel={formatMessage({defaultMessage: 'Continue to Shipping Method'})}
+                    submitButtonLabel={formatMessage({
+                        defaultMessage: 'Continue to Shipping Method'
+                    })}
                     onSubmit={submitAndContinue}
                 />
             </ToggleCardEdit>
