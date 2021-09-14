@@ -208,7 +208,7 @@ const ProductList = (props) => {
             if (!selected) {
                 values.push(value.value)
             } else {
-                values = values.filter((v) => v !== value.value)
+                values = values?.filter((v) => v !== value.value)
             }
 
             // Update the attribute value in the new search params.
@@ -228,7 +228,7 @@ const ProductList = (props) => {
         navigate(window.location.pathname)
     }
 
-    let selectedSortingOptionLabel = productSearchResult?.sortingOptions.find(
+    let selectedSortingOptionLabel = productSearchResult?.sortingOptions?.find(
         (option) => option.id === productSearchResult?.selectedSortingOption
     )
 
@@ -570,7 +570,7 @@ ProductList.getProps = async ({res, params, location, api}) => {
     ])
 
     // Apply disallow list to refinements.
-    productSearchResult.refinements = productSearchResult.refinements.filter(
+    productSearchResult.refinements = productSearchResult?.refinements?.filter(
         ({attributeId}) => !REFINEMENT_DISALLOW_LIST.includes(attributeId)
     )
 
