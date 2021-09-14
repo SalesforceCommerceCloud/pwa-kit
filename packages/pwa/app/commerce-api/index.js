@@ -13,6 +13,7 @@ import OcapiShopperOrders from './ocapi-shopper-orders'
 import {getTenantId, isError, isTokenValid} from './utils'
 import Auth from './auth'
 import EinsteinAPI from './einstein'
+import {DEFAULT_LOCALE} from '../constants'
 
 /**
  * The configuration details for the connecting to the API.
@@ -112,10 +113,12 @@ class CommerceAPI {
                                     // NOTE: The commerce sdk isomorphic will complain if you pass parameters to
                                     // it that it doesn't expect, this is why we only add the local to some of
                                     // the API calls.
+                                    // We use the default locale for the API calls when running the app using the
+                                    // pseudo locale 'en-XB'.
                                     if (apiConfigs[key].canLocalize) {
                                         newArgs[0].parameters = {
                                             ...newArgs[0].parameters,
-                                            ...(locale && {locale})
+                                            ...(!locale || locale === 'en-XB' ? {} : {locale})
                                         }
                                     }
 

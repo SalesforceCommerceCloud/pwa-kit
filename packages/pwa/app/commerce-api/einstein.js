@@ -200,7 +200,7 @@ class EinsteinAPI {
             return {
                 ...reco,
                 recs: reco.recs.map((rec) => {
-                    const product = products?.data.find((product) => product.id === rec.id)
+                    const product = products?.data?.find((product) => product.id === rec.id)
                     return {
                         ...rec,
                         ...product,
