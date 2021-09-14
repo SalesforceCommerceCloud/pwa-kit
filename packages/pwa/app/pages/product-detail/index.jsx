@@ -162,7 +162,7 @@ const ProductDetail = ({category, product, isLoading}) => {
                     addToCart={(variant, quantity) => handleAddToCart(variant, quantity)}
                     addToWishlist={(_, quantity) => handleAddToWishlist(quantity)}
                     isProductLoading={isLoading}
-                    // isCustomerProductListLoading={customerProductLists.showLoader}
+                    isCustomerProductListLoading={!wishlist.isInitialized}
                 />
 
                 {/* Information Accordion */}
