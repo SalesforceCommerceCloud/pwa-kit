@@ -302,9 +302,18 @@ export function useCustomerProductList(name, options = {}) {
 
             _mergeProductDetailsIntoList(list, productDetails) {
                 list.customerProductListItems = list.customerProductListItems?.map((item) => {
+                    const detail = {
+                        ...productDetails.data.find((product) => product.id === item.productId)
+                    }
                     return {
-                        ...productDetails.data.find((product) => product.id === item.productId),
-                        ...item
+                        ...detail,
+                        ...item,
+
+                        // Both customer product list and the product detail API returns 'type'
+                        // but the type can be different depending on the API endpoint
+                        // We use the type from product detail endpoint, this is mainly used
+                        // to determine whether the product is a master or a variant.
+                        type: detail.type
                     }
                 })
                 return list
