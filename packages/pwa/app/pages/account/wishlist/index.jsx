@@ -118,7 +118,7 @@ const AccountWishlist = () => {
 
             {isInitialized &&
                 !isEmpty &&
-                wishlist?.data?.customerProductListItems?.map((item) => (
+                wishlist.data.customerProductListItems.map((item) => (
                     <ProductItem
                         key={item.id}
                         product={{
