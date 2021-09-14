@@ -15,7 +15,6 @@ export default {
             padding: {lg: 8, md: 6, sm: 0, base: 0}
         },
         content: {
-            background: 'gray.50',
             px: {base: 4, md: 6, lg: 50},
             py: {base: 10, md: 20},
             height: 'full'
@@ -41,9 +40,12 @@ export default {
         icons: {
             marginBottom: [1, 1, 2, 0]
         },
+        description: {
+            maxWidth: '440px'
+        },
         pre: {
             mt: 4,
-            background: 'white',
+            background: 'gray.50',
             borderColor: 'gray.200',
             borderStyle: 'solid',
             borderWidth: '1px',

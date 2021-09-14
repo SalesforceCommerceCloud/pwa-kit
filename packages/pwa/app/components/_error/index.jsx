@@ -58,10 +58,10 @@ const Error = (props) => {
                         <Heading as="h2" fontSize={['xl', '2xl', '2xl', '3xl']} mb={2}>
                             {title}
                         </Heading>
-                        <Box maxWidth="700px">
+                        <Box {...styles.description}>
                             <Text align="center">
                                 An error has occurred. Try refreshing the page or if you need
-                                immediate help please contact support
+                                immediate help please contact support.
                             </Text>
                         </Box>
                         <Stack direction={['column', 'row']} width={['100%', 'auto']}>
@@ -81,7 +81,9 @@ const Error = (props) => {
                         </Stack>
                     </Stack>
                     <Box>
-                        <Text fontWeight="700">Stack Trace</Text>
+                        <Text fontWeight="700" fontSize="0.8750em">
+                            Stack Trace
+                        </Text>
                         {stack && (
                             <Box as="pre" {...styles.pre}>
                                 {stack}
