@@ -33,7 +33,7 @@ export default function ShippingAddress() {
     return (
         <ToggleCard
             id="step-1"
-            title={formatMessage({defaultMessage: "Shipping Address"})}
+            title={formatMessage({defaultMessage: 'Shipping Address'})}
             editing={step === 1}
             isLoading={isLoading}
             disabled={selectedShippingAddress == null}
@@ -42,7 +42,7 @@ export default function ShippingAddress() {
             <ToggleCardEdit>
                 <ShippingAddressSelection
                     selectedAddress={selectedShippingAddress}
-                    submitButtonLabel={formatMessage({defaultMessage: "Continue to Shipping Method"})}
+                    submitButtonLabel={formatMessage({defaultMessage: 'Continue to Shipping Method'})}
                     onSubmit={submitAndContinue}
                 />
             </ToggleCardEdit>

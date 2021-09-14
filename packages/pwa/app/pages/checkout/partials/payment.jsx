@@ -47,7 +47,7 @@ const Payment = () => {
     return (
         <ToggleCard
             id="step-3"
-            title={formatMessage({defaultMessage: "Payment"})}
+            title={formatMessage({defaultMessage: 'Payment'})}
             editing={step === 3}
             isLoading={
                 paymentMethodForm.formState.isSubmitting ||

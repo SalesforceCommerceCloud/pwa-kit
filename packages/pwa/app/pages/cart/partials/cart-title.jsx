@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import {FormattedMessage, FormattedPlural, useIntl} from 'react-intl'
+import {FormattedMessage} from 'react-intl'
 import {Text} from '@chakra-ui/react'
 import useBasket from '../../../commerce-api/hooks/useBasket'
 
@@ -16,9 +16,7 @@ const CartTitle = () => {
             <FormattedMessage defaultMessage="Cart" /> (
             <FormattedMessage
                 defaultMessage="{itemCount, plural, =0 {0 items} one {# item} other {# items}})"
-                values={{
-                    itemCount: basket.itemAccumulatedCount
-                }}/>
+                values={{itemCount: basket.itemAccumulatedCount}}/>
         </Text>
     )
 }

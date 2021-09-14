@@ -82,7 +82,7 @@ const ContactInfo = () => {
     return (
         <ToggleCard
             id="step-0"
-            title={formatMessage({defaultMessage: "Contact Info"})}
+            title={formatMessage({defaultMessage: 'Contact Info'})}
             editing={step === 0}
             isLoading={form.formState.isSubmitting}
             onEdit={() => {
