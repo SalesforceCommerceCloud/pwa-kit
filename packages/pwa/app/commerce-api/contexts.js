@@ -65,18 +65,17 @@ const _CustomerProductListsProvider = CustomerProductListsContext.Provider
 // eslint-disable-next-line react/prop-types
 export const CustomerProductListsProvider = ({children}) => {
     const [state, dispatch] = useReducer((state, {type, payload}) => {
-        let productLists
-
         switch (type) {
-            case CPLActionTypes.RECEIVE_LISTS:
-                productLists = payload.reduce((prev, curr) => {
+            case CPLActionTypes.RECEIVE_LISTS: {
+                const productLists = payload.reduce((prev, curr) => {
                     return {
                         ...prev,
                         [curr.id]: curr
                     }
                 }, {})
                 return {...state, productLists}
-            case CPLActionTypes.RECEIVE_LIST:
+            }
+            case CPLActionTypes.RECEIVE_LIST: {
                 return {
                     ...state,
                     productLists: {
@@ -84,27 +83,36 @@ export const CustomerProductListsProvider = ({children}) => {
                         [payload.id]: payload
                     }
                 }
-            case CPLActionTypes.CREATE_LIST_ITEM:
+            }
+            case CPLActionTypes.CREATE_LIST_ITEM: {
                 // Tips: if you are unfamiliar with the concept of
                 // reducers, keep in mind that reducers must be pure.
                 // For an action like this, you must update every
                 // level of nested data to avoid unexpected side effects
+
+                const items = state[payload.listId]?.customerProductListItems || []
+
+                // if the item is already added to the list
+                // we update the existing item
+                const existingItemIndex = items.findIndex((item) => item.id === payload.item.id)
+                if (existingItemIndex >= 0) {
+                    items[existingItemIndex] = payload.item
+                } else {
+                    items.push(payload.item)
+                }
                 return {
                     ...state,
                     productLists: {
                         ...state.productLists,
                         [payload.listId]: {
                             ...state.productLists[payload.listId],
-                            customerProductListItems: [
-                                ...(state.productLists[payload.listId].customerProductListItems ||
-                                    []),
-                                payload.item
-                            ]
+                            customerProductListItems: items
                         }
                     }
                 }
-            case CPLActionTypes.UPDATE_LIST_ITEM:
-                productLists = {
+            }
+            case CPLActionTypes.UPDATE_LIST_ITEM: {
+                const productLists = {
                     ...state.productLists
                 }
                 productLists[payload.listId].customerProductListItems = productLists[
@@ -119,8 +127,9 @@ export const CustomerProductListsProvider = ({children}) => {
                     return listItem
                 })
                 return {...state, productLists}
-            case CPLActionTypes.REMOVE_LIST_ITEM:
-                productLists = {
+            }
+            case CPLActionTypes.REMOVE_LIST_ITEM: {
+                const productLists = {
                     ...state.productLists
                 }
                 productLists[payload.listId].customerProductListItems = productLists[
@@ -129,10 +138,13 @@ export const CustomerProductListsProvider = ({children}) => {
                     return listItem.id !== payload.itemId
                 })
                 return {...state, productLists}
-            case CPLActionTypes.SET_INITIALIZED:
+            }
+            case CPLActionTypes.SET_INITIALIZED: {
                 return {...state, isInitialized: payload}
-            case CPLActionTypes.RESET:
+            }
+            case CPLActionTypes.RESET: {
                 return {...CPLInitialValue}
+            }
             default:
                 throw new Error('Unknown action.')
         }
