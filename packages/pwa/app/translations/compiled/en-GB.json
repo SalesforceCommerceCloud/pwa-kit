@@ -187,6 +187,12 @@
       "value": "Cart"
     }
   ],
+  "3AmUG3": [
+    {
+      "type": 0,
+      "value": "Card Type"
+    }
+  ],
   "3FyRaO": [
     {
       "type": 0,
@@ -253,10 +259,60 @@
       "value": "View Cart"
     }
   ],
+  "5H7Fzu": [
+    {
+      "offset": 0,
+      "options": {
+        "=0": {
+          "value": [
+            {
+              "type": 0,
+              "value": "0 items"
+            }
+          ]
+        },
+        "one": {
+          "value": [
+            {
+              "type": 7
+            },
+            {
+              "type": 0,
+              "value": " item"
+            }
+          ]
+        },
+        "other": {
+          "value": [
+            {
+              "type": 7
+            },
+            {
+              "type": 0,
+              "value": " items"
+            }
+          ]
+        }
+      },
+      "pluralType": "cardinal",
+      "type": 6,
+      "value": "itemCount"
+    },
+    {
+      "type": 0,
+      "value": ")"
+    }
+  ],
   "5JcXdV": [
     {
       "type": 0,
       "value": "Create Account"
+    }
+  ],
+  "5R9heZ": [
+    {
+      "type": 0,
+      "value": "Expiry Date"
     }
   ],
   "5S2I6Q": [
@@ -415,6 +471,12 @@
       "value": "Please enter your phone number"
     }
   ],
+  "BEqvr/": [
+    {
+      "type": 0,
+      "value": "Contact Info"
+    }
+  ],
   "BWpuKl": [
     {
       "type": 0,
@@ -565,6 +627,12 @@
       "value": "Sign Out"
     }
   ],
+  "Fmc5ut": [
+    {
+      "type": 0,
+      "value": "Continue to Shipping Method"
+    }
+  ],
   "G/yZLu": [
     {
       "type": 0,
@@ -709,6 +777,12 @@
     {
       "type": 0,
       "value": "Back to previous page"
+    }
+  ],
+  "NmK6zy": [
+    {
+      "type": 0,
+      "value": "Payment"
     }
   ],
   "NymXNv": [
@@ -1065,6 +1139,12 @@
       "value": "Out of stock"
     }
   ],
+  "WTocjo": [
+    {
+      "type": 0,
+      "value": "Card Number"
+    }
+  ],
   "XBfvKN": [
     {
       "type": 0,
@@ -1075,6 +1155,12 @@
     {
       "type": 0,
       "value": "Once you place an order the details will show up here"
+    }
+  ],
+  "XU21FV": [
+    {
+      "type": 0,
+      "value": "Shipping & Gift Options"
     }
   ],
   "YDGR5k": [
@@ -1279,6 +1365,12 @@
       "value": "Pending"
     }
   ],
+  "f0EhUc": [
+    {
+      "type": 0,
+      "value": "Security Code"
+    }
+  ],
   "f9teca": [
     {
       "type": 0,
@@ -1441,6 +1533,12 @@
     {
       "type": 0,
       "value": "Checkout as guest"
+    }
+  ],
+  "gW8EGu": [
+    {
+      "type": 0,
+      "value": "Name on Card"
     }
   ],
   "gg6vZx": [

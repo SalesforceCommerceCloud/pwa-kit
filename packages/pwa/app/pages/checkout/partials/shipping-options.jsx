@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React, {useEffect} from 'react'
-import {FormattedMessage, FormattedNumber} from 'react-intl'
+import {FormattedMessage, FormattedNumber, useIntl} from 'react-intl'
 import {Box, Button, Container, Flex, Radio, RadioGroup, Stack, Text} from '@chakra-ui/react'
 import {useForm, Controller} from 'react-hook-form'
 import {useCheckout} from '../util/checkout-context'
@@ -13,6 +13,8 @@ import {ChevronDownIcon} from '../../../components/icons'
 import {ToggleCard, ToggleCardEdit, ToggleCardSummary} from '../../../components/toggle-card'
 
 export default function ShippingOptions() {
+    const {formatMessage} = useIntl()
+
     const {
         basket,
         step,
@@ -66,10 +68,9 @@ export default function ShippingOptions() {
     // landing on checkout the first time will put you at the first step (contact info), but the shipping
     // method step would appear filled out already. This fix attempts to avoid any confusion in the UI.
     return (
-        // TODO: [l10n] localize this title
         <ToggleCard
             id="step-2"
-            title="Shipping & Gift Options"
+            title={formatMessage({defaultMessage: 'Shipping & Gift Options'})}
             editing={step === 2}
             isLoading={form.formState.isSubmitting}
             disabled={selectedShippingMethod == null || !selectedShippingAddress}
