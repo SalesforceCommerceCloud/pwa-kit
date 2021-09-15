@@ -12,12 +12,15 @@ export default {
             minWidth: '375px'
         },
         main: {
-            padding: {lg: 8, md: 6, sm: 0, base: 0}
+            padding: {lg: 8, md: 6, sm: 0, base: 0},
+            flex: 1
         },
         content: {
             px: {base: 4, md: 6, lg: 50},
             py: {base: 20, md: 24},
-            height: 'full'
+            height: 'full',
+            flexDirection: 'column',
+            justifyContent: 'center'
         },
         header: {
             width: 'full',
@@ -40,9 +43,15 @@ export default {
         icons: {
             marginBottom: [1, 1, 2, 0]
         },
+        buttons: {
+            width: ['100%', 'auto']
+        },
         description: {
             maxWidth: '440px',
             marginBottom: 8
+        },
+        stackTrace: {
+            marginTop: 8
         },
         pre: {
             mt: 4,
@@ -61,9 +70,12 @@ export default {
         'content',
         'header',
         'headerContent',
+        'buttons',
         'logo',
         'icons',
+        'buttons',
         'description',
-        'pre'
+        'pre',
+        'stackTrace'
     ]
 }
