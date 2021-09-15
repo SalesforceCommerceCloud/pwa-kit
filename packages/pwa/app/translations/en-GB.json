@@ -92,6 +92,9 @@
   "5BTYa0": {
     "defaultMessage": "View Cart"
   },
+  "5H7Fzu": {
+    "defaultMessage": "{itemCount, plural, =0 {0 items} one {# item} other {# items}})"
+  },
   "5JcXdV": {
     "defaultMessage": "Create Account"
   },
