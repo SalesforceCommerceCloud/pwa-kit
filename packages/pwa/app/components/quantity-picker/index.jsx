@@ -6,8 +6,6 @@
  */
 
 import React from 'react'
-import PropTypes from 'prop-types'
-
 import {Button, HStack, Input, useNumberInput} from '@chakra-ui/react'
 
 /**
