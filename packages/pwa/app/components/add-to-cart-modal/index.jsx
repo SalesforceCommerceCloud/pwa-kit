@@ -25,7 +25,8 @@ import {
 import Link from '../link'
 import useBasket from '../../commerce-api/hooks/useBasket'
 import {LockIcon} from '../icons'
-import {DEFAULT_CURRENCY} from '../../constants'
+import {DEFAULT_LOCALE} from '../../constants'
+import {getCurrency} from '../../utils/locale'
 import {useVariationAttributes} from '../../hooks'
 import {findImageGroupBy} from '../../utils/image-groups-utils'
 
@@ -112,7 +113,7 @@ const AddToCartModal = ({product, variant, quantity, isOpen, onClose, ...props})
                                         {!!lineItemPrice &&
                                             intl.formatNumber(lineItemPrice, {
                                                 style: 'currency',
-                                                currency: currency || DEFAULT_CURRENCY
+                                                currency: currency || getCurrency(DEFAULT_LOCALE)
                                             })}
                                     </Text>
                                 </Box>
@@ -137,7 +138,7 @@ const AddToCartModal = ({product, variant, quantity, isOpen, onClose, ...props})
                                     {productSubTotal &&
                                         intl.formatNumber(productSubTotal, {
                                             style: 'currency',
-                                            currency: currency || DEFAULT_CURRENCY
+                                            currency: currency || getCurrency(DEFAULT_LOCALE)
                                         })}
                                 </Text>
                             </Flex>

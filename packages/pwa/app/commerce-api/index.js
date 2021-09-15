@@ -85,6 +85,7 @@ class CommerceAPI {
             shopperBaskets: {
                 api: OcapiShopperBaskets,
                 useLocale: false,
+                //TODO: Clean up the calls that accept `currency` param or doesn't complain if we add it
                 useCurrency: [
                     'createBasket',
                     'addItemToBasket',
@@ -146,7 +147,6 @@ class CommerceAPI {
                                 if (args[0].ignoreHooks) {
                                     return obj[prop](...args)
                                 }
-
 
                                 return self.willSendRequest(prop, ...args).then((newArgs) => {
                                     // Inject the locale and currency to the API call via it's parameters.

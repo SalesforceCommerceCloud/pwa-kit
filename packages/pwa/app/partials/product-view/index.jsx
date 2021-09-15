@@ -33,7 +33,8 @@ import ImageGallery from '../../components/image-gallery'
 import Breadcrumb from '../../components/breadcrumb'
 import Link from '../../components/link'
 import withRegistration from '../../hoc/with-registration'
-import {DEFAULT_CURRENCY} from '../../constants'
+import {DEFAULT_LOCALE} from '../../constants'
+import {getCurrency} from '../../utils/locale'
 import {Skeleton as ImageGallerySkeleton} from '../../components/image-gallery'
 import AddToCartModal from '../../components/add-to-cart-modal'
 import RecommendedProducts from '../../components/recommended-products'
@@ -59,7 +60,7 @@ const ProductViewHeader = ({name, price, currency, category}) => {
                 <Text fontWeight="bold" fontSize="md" aria-label="price">
                     {intl.formatNumber(price, {
                         style: 'currency',
-                        currency: currency || DEFAULT_CURRENCY
+                        currency: currency || getCurrency(DEFAULT_LOCALE)
                     })}
                 </Text>
             </Skeleton>

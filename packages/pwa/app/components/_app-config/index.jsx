@@ -21,7 +21,7 @@ import {
 } from '../../commerce-api/utils'
 import {commerceAPIConfig} from '../../commerce-api.config'
 import {einsteinAPIConfig} from '../../einstein-api.config'
-import {DEFAULT_CURRENCY, DEFAULT_LOCALE, SUPPORTED_LOCALES} from '../../constants'
+import {DEFAULT_LOCALE, SUPPORTED_LOCALES} from '../../constants'
 import {getCurrency} from '../../utils/locale'
 
 const apiConfig = {

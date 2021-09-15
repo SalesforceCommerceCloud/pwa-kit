@@ -10,7 +10,8 @@ import {FormattedMessage, FormattedNumber} from 'react-intl'
 import {Stack, Text} from '@chakra-ui/react'
 import useBasket from '../../commerce-api/hooks/useBasket'
 import {useCartItemVariant} from '.'
-import {DEFAULT_CURRENCY} from '../../constants'
+import {DEFAULT_LOCALE} from '../../constants'
+import {getCurrency} from '../../utils/locale'
 
 /**
  * In the context of a cart product item variant, this component renders the item's
@@ -39,7 +40,7 @@ const ItemPrice = ({currency, ...props}) => {
             <Text fontWeight="bold">
                 <FormattedNumber
                     style="currency"
-                    currency={currency || basket.currency || DEFAULT_CURRENCY}
+                    currency={currency || basket.currency || getCurrency(DEFAULT_LOCALE)}
                     value={displayPrice}
                 />
                 {hasDiscount && (
@@ -53,7 +54,7 @@ const ItemPrice = ({currency, ...props}) => {
                     >
                         <FormattedNumber
                             style="currency"
-                            currency={currency || basket.currency || DEFAULT_CURRENCY}
+                            currency={currency || basket.currency || getCurrency(DEFAULT_LOCALE)}
                             value={price}
                         />
                     </Text>
@@ -64,7 +65,7 @@ const ItemPrice = ({currency, ...props}) => {
                 <Text fontSize="14px">
                     <FormattedNumber
                         style="currency"
-                        currency={currency || basket.currency || DEFAULT_CURRENCY}
+                        currency={currency || basket.currency || getCurrency(DEFAULT_LOCALE)}
                         value={basePrice}
                     />
                     <FormattedMessage
