@@ -73,7 +73,7 @@ const Error = (props) => {
                                 immediate help please contact support.
                             </Text>
                         </Box>
-                        <Stack direction={['column', 'row']} spacing={4} widht={['100%', 'auto']}>
+                        <Stack direction={['column', 'row']} spacing={4} width={['100%', 'auto']}>
                             <Button
                                 variant="outline"
                                 bg="white"
