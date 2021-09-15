@@ -35,7 +35,6 @@ import Popover from './components/base/popover'
 
 // Project Component style overrides
 import App from './components/project/_app'
-import Error from './components/project/_error'
 import Breadcrumb from './components/project/breadcrumb'
 import Header from './components/project/header'
 import ListMenu from './components/project/list-menu'
@@ -84,7 +83,6 @@ const overrides = {
 
         // project components
         App,
-        Error,
         Breadcrumb,
         Header,
         Footer,
