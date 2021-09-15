@@ -24,6 +24,7 @@ import '../../assets/svg/chevron-left.svg'
 import '../../assets/svg/chevron-right.svg'
 import '../../assets/svg/chevron-up.svg'
 import '../../assets/svg/filter.svg'
+import '../../assets/svg/file.svg'
 import '../../assets/svg/flag-ca.svg'
 import '../../assets/svg/flag-us.svg'
 import '../../assets/svg/flag-gb.svg'
@@ -114,6 +115,7 @@ export const ChevronUpIcon = icon('chevron-up')
 export const CVVIcon = icon('cc-cvv', {viewBox: CVVSymbol.viewBox})
 export const DiscoverIcon = icon('cc-discover', {viewBox: DiscoverSymbol.viewBox})
 export const FilterIcon = icon('filter')
+export const FileIcon = icon('file')
 export const FlagCAIcon = icon('flag-ca')
 export const FlagUSIcon = icon('flag-us')
 export const FlagGBIcon = icon('flag-gb')
