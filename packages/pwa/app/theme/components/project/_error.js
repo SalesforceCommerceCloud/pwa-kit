@@ -51,7 +51,7 @@ export default {
             marginBottom: 8
         },
         stackTrace: {
-            marginTop: 8
+            marginTop: 20
         },
         pre: {
             mt: 4,
