@@ -33,9 +33,13 @@ const QuantityPicker = (props) => {
 
     return (
         <HStack>
-            <Button {...dec}>-</Button>
+            <Button data-testid="quantity-decrement" {...dec}>
+                -
+            </Button>
             <Input {...input} />
-            <Button {...inc}>+</Button>
+            <Button data-testid="quantity-increment" {...inc}>
+                +
+            </Button>
         </HStack>
     )
 }

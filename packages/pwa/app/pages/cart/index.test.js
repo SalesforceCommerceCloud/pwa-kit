@@ -158,7 +158,8 @@ test('Can update item quantity in the cart', async () => {
             {
                 ...mockedBasketResponse.productItems[0],
                 quantity: 3,
-                id: mockedBasketResponse.productItems[0].item_id
+                id: mockedBasketResponse.productItems[0].item_id,
+                stepQuantity: 1
             }
         ]
     }
@@ -169,10 +170,10 @@ test('Can update item quantity in the cart', async () => {
 
     expect(await within(cartItem).getByDisplayValue('2'))
 
-    const incrementButton = await within(cartItem).findByTestId('cart-quantity-increment')
+    const incrementButton = await within(cartItem).findByTestId('quantity-increment')
 
     // update item quantity
-    fireEvent.click(incrementButton)
+    fireEvent.mouseDown(incrementButton)
 
     expect(await within(cartItem).getByDisplayValue('3'))
 })
@@ -204,10 +205,10 @@ test('Can update item quantity from product view modal', async () => {
     // update item quantity
     expect(await within(cartItem).getByDisplayValue('2'))
 
-    const incrementButton = await within(cartItem).findByTestId('cart-quantity-increment')
+    const incrementButton = await within(cartItem).findByTestId('quantity-increment')
 
     // update item quantity
-    fireEvent.click(incrementButton)
+    fireEvent.mouseDown(incrementButton)
 
     expect(await within(cartItem).getByDisplayValue('3'))
 })
