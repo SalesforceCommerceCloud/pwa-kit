@@ -132,9 +132,10 @@ Home.propTypes = {
 }
 
 Home.getProps = async ({res}) => {
-    // Set the `cache-control` header values to align with the Commerce API settings.
+    // Since the home page is static, it is safe to set max age to a high value
+    // we set it to a year here, but you can set the value that is suitable for your project
     if (res) {
-        res.set('Cache-Control', 'public, must-revalidate, max-age=900')
+        res.set('Cache-Control', 'max-age=31536000')
     }
 }
 
