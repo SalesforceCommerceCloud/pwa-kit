@@ -401,10 +401,12 @@ describe('CommerceAPI', () => {
         expect(response).toBeDefined()
         expect(response.customerInfo.customerId).toBeDefined()
     })
-    test('calling getBasket without basketId returns decriptive error', async () => {
+    test('calling getBasket without basketId returns descriptive error', async () => {
         const api = getAPI()
         const response = await api.shopperBaskets.getBasket({})
-        expect(response.title).toEqual('Parameters are required for this request')
+        expect(response.title).toEqual(
+            'The following parameters were missing from your resquest: basketId'
+        )
         expect(response.type).toEqual('MissingParameters')
     })
     test('calling addItemToBasket with basketId & body returns basket object in camelCase', async () => {

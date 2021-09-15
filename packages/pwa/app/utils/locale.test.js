@@ -25,15 +25,15 @@ describe('whichLocaleToLoad', () => {
     })
     test('matches one of the supported locales', () => {
         const locale = whichLocaleToLoad([supportedLocale], SUPPORTED_LOCALES, DEFAULT_LOCALE)
-        expect(locale).toBe(supportedLocale)
+        expect(locale).toBe(supportedLocale.id)
     })
     test('case-insensitivity', () => {
         const locale = whichLocaleToLoad(
-            [supportedLocale.toUpperCase()],
+            [supportedLocale.id.toUpperCase()],
             SUPPORTED_LOCALES,
             DEFAULT_LOCALE
         )
-        expect(locale).toBe(supportedLocale)
+        expect(locale).toBe(supportedLocale.id)
     })
 })
 
@@ -46,11 +46,11 @@ describe('getTargetLocale', () => {
     })
 
     test('forcing the target locale', () => {
-        const locale = getTargetLocale([supportedLocale], SUPPORTED_LOCALES, DEFAULT_LOCALE)
-        expect(locale).toBe(supportedLocale)
+        const locale = getTargetLocale([supportedLocale.id], SUPPORTED_LOCALES, DEFAULT_LOCALE)
+        expect(locale).toBe(supportedLocale.id)
 
         process.env.TARGET_LOCALE = nonSupportedLocale
-        const locale2 = getTargetLocale([supportedLocale], SUPPORTED_LOCALES, DEFAULT_LOCALE)
+        const locale2 = getTargetLocale([supportedLocale.id], SUPPORTED_LOCALES, DEFAULT_LOCALE)
         expect(locale2).toBe(process.env.TARGET_LOCALE)
     })
 })
@@ -70,9 +70,9 @@ describe('loadLocaleData', () => {
         expect(messages[testMessageId][0].value).toMatch(/^\[!! Ļŏĝĝĝíń Ŕèḋḋḋíŕèèèćṭ !!]$/)
     })
     test('handling a not-found translation file', async () => {
-        expect(SUPPORTED_LOCALES[1]).not.toBe(DEFAULT_LOCALE)
+        expect(SUPPORTED_LOCALES[1].id).not.toBe(DEFAULT_LOCALE)
 
-        jest.mock(`../translations/compiled/${SUPPORTED_LOCALES[1]}.json`, () => {
+        jest.mock(`../translations/compiled/${SUPPORTED_LOCALES[1].id}.json`, () => {
             throw new Error()
         })
 
@@ -81,11 +81,11 @@ describe('loadLocaleData', () => {
             importDefaultLocale = true
         })
 
-        await loadLocaleData(SUPPORTED_LOCALES[1])
+        await loadLocaleData(SUPPORTED_LOCALES[1].id)
         expect(importDefaultLocale).toBe(true)
 
         // Reset
-        jest.unmock(`../translations/compiled/${SUPPORTED_LOCALES[1]}.json`)
+        jest.unmock(`../translations/compiled/${SUPPORTED_LOCALES[1].id}.json`)
         jest.unmock(`../translations/compiled/${DEFAULT_LOCALE}.json`)
     })
 })
@@ -96,7 +96,7 @@ describe('getLocaleConfig', () => {
         expect(config.app.targetLocale).toBe(DEFAULT_LOCALE)
     })
     test('with getUserPreferredLocales parameter', async () => {
-        const locale = SUPPORTED_LOCALES[1]
+        const locale = SUPPORTED_LOCALES[1].id
         expect(locale).not.toBe(DEFAULT_LOCALE)
 
         const config = await getLocaleConfig({

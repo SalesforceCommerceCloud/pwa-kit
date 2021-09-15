@@ -9,7 +9,28 @@ import {fireEvent} from '@testing-library/react'
 import LocaleSelector from './index'
 import {renderWithProviders} from '../../utils/test-utils'
 
-const supportedLocales = ['en-GB', 'fr-FR', 'it-IT', 'zh-CN', 'ja-JP']
+const supportedLocales = [
+    {
+        id: 'en-GB',
+        currencyCode: 'GBP'
+    },
+    {
+        id: 'fr-FR',
+        currencyCode: 'EUR'
+    },
+    {
+        id: 'it-IT',
+        currencyCode: 'EUR'
+    },
+    {
+        id: 'zh-CN',
+        currencyCode: 'CNY'
+    },
+    {
+        id: 'ja-JP',
+        currencyCode: 'JPY'
+    }
+]
 
 test('Renders LocaleSelector', () => {
     renderWithProviders(<LocaleSelector selectedLocale="en-GB" locales={supportedLocales} />)
@@ -33,5 +54,5 @@ test('Renders LocaleSelector with event handlers', () => {
 
     fireEvent.click(firstLocale)
     expect(onSelect).toHaveBeenCalledTimes(1)
-    expect(onSelect).toBeCalledWith('en-GB')
+    expect(onSelect).toBeCalledWith({currencyCode: 'GBP', id: 'en-GB'})
 })
