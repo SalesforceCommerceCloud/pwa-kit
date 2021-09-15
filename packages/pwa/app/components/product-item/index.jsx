@@ -51,7 +51,7 @@ const ProductItem = ({
         modalProps.onOpen()
     }
 
-    onItemQuantityChange = useMemo(() => debounce(onItemQuantityChange, 1000), [])
+    onItemQuantityChange = useMemo(() => debounce(onItemQuantityChange, 750), [])
 
     return (
         <Box position="relative" data-testid={`sf-cart-item-${product.productId}`}>
