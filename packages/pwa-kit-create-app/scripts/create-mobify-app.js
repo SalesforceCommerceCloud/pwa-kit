@@ -34,11 +34,14 @@
  */
 
 const p = require('path')
+const fs = require('fs')
+const os = require('os')
 const program = require('commander')
 const inquirer = require('inquirer')
 const {URL} = require('url')
 const deepmerge = require('deepmerge')
 const sh = require('shelljs')
+const tar = require('tar')
 const generatorPkg = require('../package.json')
 
 sh.set('-e')
@@ -50,7 +53,7 @@ const HELLO_WORLD = 'hello-world'
 const TEST_PROJECT = 'test-project' // TODO: This will be replaced with the `isomorphic-client` config.
 const PROMPT = 'prompt'
 
-const PRESETS = [TEST_PROJECT, PROMPT, HELLO_WORLD]
+const PRESETS = [TEST_PROJECT, PROMPT, HELLO_WORLD, HELLO_WORLD_TEST_PROJECT]
 
 const GENERATOR_PRESET = process.env.GENERATOR_PRESET || PROMPT
 
@@ -112,7 +115,7 @@ const runGenerator = (answers, {outputDir}) => {
         }
     })
 
-    sh.cp('-R', p.join(__dirname, '..', 'template'), outputDir)
+    extractTemplate('pwa', outputDir)
 
     const pkgJsonPath = p.resolve(outputDir, 'package.json')
     const pkgJSON = readJson(pkgJsonPath)
@@ -323,8 +326,7 @@ const helloWorldPrompts = () => {
 }
 
 const generateHelloWorld = ({projectId}, {outputDir}) => {
-    sh.cp('-R', p.join(__dirname, '..', 'template-hello-world'), outputDir)
-
+    extractTemplate('hello-world', outputDir)
     const pkgJsonPath = p.resolve(outputDir, 'package.json')
     const pkgJSON = readJson(pkgJsonPath)
     const finalPkgData = merge(pkgJSON, {name: projectId})
@@ -336,6 +338,17 @@ const generateHelloWorld = ({projectId}, {outputDir}) => {
         cwd: outputDir,
         silent: true
     })
+}
+
+const extractTemplate = (templateName, outputDir) => {
+    const tmp = fs.mkdtempSync(p.resolve(os.tmpdir(), 'extract-template'))
+    tar.x({
+        file: p.join(__dirname, '..', 'templates', `${templateName}.tar.gz`),
+        cwd: p.join(tmp),
+        sync: true
+    })
+    sh.mv(p.join(tmp, templateName), outputDir)
+    sh.rm('-rf', tmp)
 }
 
 const main = (opts) => {
