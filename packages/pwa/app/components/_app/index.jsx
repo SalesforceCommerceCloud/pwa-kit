@@ -40,7 +40,7 @@ import {defineMessages, IntlProvider} from 'react-intl'
 // Others
 import {watchOnlineStatus, flatten} from '../../utils/utils'
 import {homeUrlBuilder} from '../../utils/url'
-import {getLocaleConfig} from '../../utils/locale'
+import {getLocaleConfig, getCurrency} from '../../utils/locale'
 import {HOME_HREF} from '../../constants'
 
 import Seo from '../seo'
@@ -79,8 +79,11 @@ const App = (props) => {
     // Used to conditionally render header/footer for checkout page
     const isCheckout = /\/checkout$/.test(location?.pathname)
 
+    // Used to set the basket currency
+    const currency = getCurrency(targetLocale)
+
     // Set up customer and basket
-    useShopper()
+    useShopper(currency)
 
     useEffect(() => {
         // Listen for online status changes.

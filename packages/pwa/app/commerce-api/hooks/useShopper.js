@@ -15,11 +15,10 @@ import {customerProductListTypes} from '../../constants'
  * when the app loads on the client-side. Should only be use at top-level of app.
  * @returns {Object} - customer and basket objects
  */
-const useShopper = () => {
+const useShopper = (currency) => {
     const customer = useCustomer()
     const basket = useBasket()
     const customerProductLists = useCustomerProductLists()
-
     // Create or restore the user session upon mounting
     useEffect(() => {
         customer.login()
@@ -32,14 +31,14 @@ const useShopper = () => {
 
         // We have a customer but no basket, so we fetch a new or existing basket
         if (hasCustomer && !hasBasket) {
-            basket.getOrCreateBasket()
+            basket.getOrCreateBasket(currency)
             return
         }
 
         // We have a customer and a basket, but the basket does not belong to this customer
         // so we get their existing basket or create a new one for them
         if (hasCustomer && hasBasket && customer.customerId !== basket.customerInfo.customerId) {
-            basket.getOrCreateBasket()
+            basket.getOrCreateBasket(currency)
             return
         }
 

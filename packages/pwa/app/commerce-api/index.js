@@ -82,7 +82,28 @@ class CommerceAPI {
                 useLocale: false,
                 useCurrency: []
             },
-            shopperBaskets: {api: OcapiShopperBaskets, useLocale: false, useCurrency: []},
+            shopperBaskets: {
+                api: OcapiShopperBaskets,
+                useLocale: false,
+                useCurrency: [
+                    'createBasket',
+                    'addItemToBasket',
+                    'addToBasket',
+                    'updateItemInBasket',
+                    'removeItemFromBasket',
+                    'addPaymentInstrumentToBasket',
+                    'removePaymentInstrumentFromBasket',
+                    'getPaymentMethodsForShipment',
+                    'getShippingMethodsForShipment',
+                    'updateBillingAddressForBasket',
+                    'updateShippingAddressForShipment',
+                    'updateShippingMethodForShipment',
+                    'updateCustomerForBasket',
+                    'deleteBasket',
+                    'addCouponToBasket',
+                    'removeCouponFromBasket'
+                ]
+            },
             shopperGiftCertificates: {
                 api: sdk.ShopperGiftCertificates,
                 useLocale: true,
@@ -93,14 +114,18 @@ class CommerceAPI {
             shopperProducts: {
                 api: sdk.ShopperProducts,
                 useLocale: true,
-                useCurrency: ['getProduct']
+                useCurrency: ['getProduct', 'getProducts']
             },
             shopperPromotions: {
                 api: sdk.ShopperPromotions,
                 useLocale: true,
                 useCurrency: []
             },
-            shopperSearch: {api: sdk.ShopperSearch, useLocale: true, useCurrency: ['productSearch']}
+            shopperSearch: {
+                api: sdk.ShopperSearch,
+                useLocale: true,
+                useCurrency: ['productSearch', 'getSearchSuggestions']
+            }
         }
 
         // Instantiate the SDK class proxies and create getters from our api mapping.
@@ -122,8 +147,9 @@ class CommerceAPI {
                                     return obj[prop](...args)
                                 }
 
+
                                 return self.willSendRequest(prop, ...args).then((newArgs) => {
-                                    // Inject the locale to the API call via it's parameters.
+                                    // Inject the locale and currency to the API call via it's parameters.
                                     //
                                     // NOTE: The commerce sdk isomorphic will complain if you pass parameters to
                                     // it that it doesn't expect, this is why we only add the local to some of
@@ -137,7 +163,10 @@ class CommerceAPI {
                                         apiConfigs[key].useLocale
                                             ? {locale}
                                             : {}),
-                                        ...(currency && apiConfigs[key].useCurrency.includes(prop)
+                                        ...((currency &&
+                                            apiConfigs[key].useCurrency.includes(prop)) ||
+                                        key === 'shopperPromotions' ||
+                                        key === 'shopperSearch'
                                             ? {currency}
                                             : {})
                                     }

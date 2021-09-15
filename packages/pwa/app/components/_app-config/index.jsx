@@ -22,6 +22,7 @@ import {
 import {commerceAPIConfig} from '../../commerce-api.config'
 import {einsteinAPIConfig} from '../../einstein-api.config'
 import {DEFAULT_CURRENCY, DEFAULT_LOCALE, SUPPORTED_LOCALES} from '../../constants'
+import {getCurrency} from '../../utils/locale'
 
 const apiConfig = {
     ...commerceAPIConfig,
@@ -76,9 +77,8 @@ const AppConfig = ({children, locals = {}}) => {
 
 AppConfig.restore = (locals = {}) => {
     const locale = getLocale(locals) || DEFAULT_LOCALE
-    const currency =
-        SUPPORTED_LOCALES.find((supportedLocale) => supportedLocale.id === locale)?.currencyCode ||
-        DEFAULT_CURRENCY
+    const currency = getCurrency(locale)
+
     locals.api = new CommerceAPI({...apiConfig, locale, currency})
 }
 

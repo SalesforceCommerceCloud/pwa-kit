@@ -54,18 +54,50 @@ export default function useBasket() {
              * to interact with a customer basket. All other calls are done through the
              * ShopperBaskets API, which in our case, uses OCAPI rather than commerce sdk.
              */
-            async getOrCreateBasket() {
+            async getOrCreateBasket(currency) {
                 const customerBaskets = await api.shopperCustomers.getCustomerBaskets({
                     parameters: {customerId: customer?.customerId}
                 })
 
                 if (Array.isArray(customerBaskets?.baskets)) {
-                    return setBasket(customerBaskets.baskets[0])
+                    let result
+
+                    result = setBasket(customerBaskets.baskets[0])
+
+                    // Update basket currency if necessary
+                    result =
+                        currency &&
+                        customerBaskets.baskets[0].currency !== currency &&
+                        this.updateBasketCurrency(currency, customerBaskets.baskets[0].basketId)
+
+                    return result
                 }
 
                 // Back to using ShopperBaskets for all basket interaction.
                 const newBasket = await api.shopperBaskets.createBasket({})
                 setBasket(newBasket)
+
+                // Update basket currency if necessary
+                newBasket.currency !== currency &&
+                    this.updateBasketCurrency(currency, newBasket.basketId)
+            },
+
+            /**
+             * Update the currency of the basket
+             * @param currency
+             * @param basketID
+             * @returns {Promise<void>}
+             */
+            async updateBasketCurrency(currency, basketId) {
+                const updateBasket = await api.shopperBaskets.updateBasket({
+                    body: {currency},
+                    parameters: {basketId}
+                })
+                if (updateBasket.fault) {
+                    throw new Error(updateBasket)
+                } else {
+                    setBasket(updateBasket)
+                }
             },
 
             /**

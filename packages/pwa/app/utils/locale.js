@@ -92,3 +92,16 @@ export const getTargetLocale = (preferredLocales, supportedLocales, defaultLocal
         whichLocaleToLoad(preferredLocales, supportedLocales, defaultLocale)
     )
 }
+
+/**
+ * Get the currency for a specific locale
+ * @param locale The locale that we want the currency
+ * @returns {string} Either the currency specific for the locale OR the currency for the default locale
+ */
+export const getCurrency = (locale) => {
+    return (
+        SUPPORTED_LOCALES.find((supportedLocale) => supportedLocale.id === locale)?.currencyCode ||
+        SUPPORTED_LOCALES.find((supportedLocale) => supportedLocale.id === DEFAULT_LOCALE)
+            ?.currencyCode
+    )
+}
