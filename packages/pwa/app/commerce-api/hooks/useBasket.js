@@ -6,7 +6,7 @@
  */
 import {useContext, useMemo} from 'react'
 import useEinstein from './useEinstein'
-import {useCommerceAPI, BasketContext} from '../utils'
+import {useCommerceAPI, BasketContext, isError} from '../utils'
 import useCustomer from './useCustomer'
 
 export default function useBasket() {
@@ -54,32 +54,32 @@ export default function useBasket() {
              * to interact with a customer basket. All other calls are done through the
              * ShopperBaskets API, which in our case, uses OCAPI rather than commerce sdk.
              */
-            async getOrCreateBasket(currency) {
+            async getOrCreateBasket(opts = {}) {
+                const {currency} = opts
                 const customerBaskets = await api.shopperCustomers.getCustomerBaskets({
                     parameters: {customerId: customer?.customerId}
                 })
 
-                if (Array.isArray(customerBaskets?.baskets)) {
-                    let result
-
-                    result = setBasket(customerBaskets.baskets[0])
-
-                    // Update basket currency if necessary
-                    result =
-                        currency &&
-                        customerBaskets.baskets[0].currency !== currency &&
-                        this.updateBasketCurrency(currency, customerBaskets.baskets[0].basketId)
-
-                    return result
+                // Throw if there was a problem getting the customer baskets
+                if (isError(customerBaskets)) {
+                    throw new Error(customerBaskets)
                 }
 
-                // Back to using ShopperBaskets for all basket interaction.
-                const newBasket = await api.shopperBaskets.createBasket({})
-                setBasket(newBasket)
+                // We only support single baskets for now. Grab the first one.
+                let basket = Array.isArray(customerBaskets?.baskets) && customerBaskets.baskets[0]
 
-                // Update basket currency if necessary
-                newBasket.currency !== currency &&
-                    this.updateBasketCurrency(currency, newBasket.basketId)
+                if (!basket) {
+                    // Back to using ShopperBaskets for all basket interaction.
+                    basket = await api.shopperBaskets.createBasket({})
+                    setBasket(basket)
+                }
+
+                // Update basket currency if it was created with the wrong one, this will also set the state.
+                if (basket.currency !== currency) {
+                    this.updateBasketCurrency(currency, basket.basketId)
+                }
+
+                return basket
             },
 
             /**

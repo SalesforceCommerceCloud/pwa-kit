@@ -31,14 +31,14 @@ const useShopper = (currency) => {
 
         // We have a customer but no basket, so we fetch a new or existing basket
         if (hasCustomer && !hasBasket) {
-            basket.getOrCreateBasket(currency)
+            basket.getOrCreateBasket({currency})
             return
         }
 
         // We have a customer and a basket, but the basket does not belong to this customer
         // so we get their existing basket or create a new one for them
         if (hasCustomer && hasBasket && customer.customerId !== basket.customerInfo.customerId) {
-            basket.getOrCreateBasket(currency)
+            basket.getOrCreateBasket({currency})
             return
         }
 
