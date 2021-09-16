@@ -23,8 +23,8 @@
     "@mobify/documentation-theme": "^1.19.0",
     "chromedriver": "latest",
     "commander": "2.9.0",
-    "lighthouse": "4.2.0",
-    "nightwatch": "^1.2.4",
+    "lighthouse": "7.0.0",
+    "nightwatch": "^1.4.0",
     "rimraf": "2.6.2"
   },
   "harp": {
