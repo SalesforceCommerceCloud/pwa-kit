@@ -107,6 +107,7 @@ const ProductView = ({
         showInventoryMessage,
         inventoryMessage,
         quantity,
+        minOrderQuantity,
         setQuantity,
         variant,
         variationParams,
@@ -321,7 +322,7 @@ const ProductView = ({
                                 id="quantity"
                                 step={stepQuantity}
                                 value={quantity}
-                                min={1}
+                                min={minOrderQuantity}
                                 max={stockLevel}
                                 onChange={(stringValue, numberValue) => {
                                     // Set the Quantity of product to value of input if value number
@@ -334,11 +335,17 @@ const ProductView = ({
                                     }
                                 }}
                                 onBlur={(e) => {
-                                    // Default to 1 if a user leaves the box with an invalid value
+                                    // Default to 1the `minOrderQuantity` if a user leaves the box with an invalid value
                                     const value = e.target.value
                                     if (parseInt(value) < 0 || value === '') {
-                                        setQuantity(1)
+                                        setQuantity(minOrderQuantity)
                                     }
+                                }}
+                                onFocus={(e) => {
+                                    // This is useful for mobile devices, this allows the user to pop open the keyboard and set the
+                                    // new quantity with one click. NOTE: This is something that can be refactored into the parent
+                                    // component, potentially as a prop called `selectInputOnFocus`.
+                                    e.target.select()
                                 }}
                             />
                         </VStack>

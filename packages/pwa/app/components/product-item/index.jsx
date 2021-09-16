@@ -7,22 +7,29 @@
 import React, {useMemo, useState} from 'react'
 import PropTypes from 'prop-types'
 import {FormattedMessage} from 'react-intl'
+
+// Chakra Components
 import {Box, Flex, Stack, Text, useDisclosure} from '@chakra-ui/react'
+
+// Project Components
+import {HideOnDesktop, HideOnMobile} from '../responsive'
 import CartItemVariant from '../cart-item-variant'
 import CartItemVariantImage from '../cart-item-variant/item-image'
 import CartItemVariantName from '../cart-item-variant/item-name'
 import CartItemVariantAttributes from '../cart-item-variant/item-attributes'
 import CartItemVariantPrice from '../cart-item-variant/item-price'
+import ConfirmationModal from '../confirmation-modal'
 import LoadingSpinner from '../loading-spinner'
-import {noop} from '../../utils/utils'
-import {HideOnDesktop, HideOnMobile} from '../responsive'
-// import CartQuantityPicker from '../cart-quantity-picker'
 import QuantityPicker from '../quantity-picker'
+
+// Utilities
+import {noop} from '../../utils/utils'
 import debounce from 'lodash.debounce'
 
+// Hooks
 import {useProduct} from '../../hooks'
-import ConfirmationModal from '../confirmation-modal'
 
+// Others
 import {REMOVE_CART_ITEM_CONFIRMATION_DIALOG_CONFIG} from '../../pages/cart/partials/cart-secondary-button-group'
 
 /**
@@ -77,13 +84,12 @@ const ProductItem = ({
                                         <FormattedMessage defaultMessage="Quantity:" />
                                     </Text>
                                     <QuantityPicker
-                                        // NOTE: The 'product' property isn't a real product, it's a cart item, so be weary or using
-                                        // it directly.
                                         step={stepQuantity}
                                         value={quantity}
                                         min={0}
                                         max={stockLevel}
                                         onBlur={(e) => {
+                                            // Default to last known quantity if a user leaves the box with an invalid value
                                             const {value} = e.target
 
                                             if (!value) {
