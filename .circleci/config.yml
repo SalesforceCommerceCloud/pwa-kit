@@ -78,7 +78,7 @@ commands:
             # nvm use 12.22.6
 
             # Install node dependencies
-            npm ci
+            npm install
 
             # Build the PWA
             # npm run lerna -- run analyze-build --scope "scaffold-pwa"
@@ -183,7 +183,7 @@ jobs:
     executor:
       name: win/default
       size: "medium"
-      shell: cmd.exe
+      shell: bash.exe
     steps:
       - checkout
       - setupwin
