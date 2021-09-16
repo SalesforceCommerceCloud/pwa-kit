@@ -176,7 +176,7 @@ jobs:
   testNode12Win:
     executor:
       name: win/default
-      size: "medium"
+      size: "large"
       shell: bash.exe
     steps:
       - checkout
