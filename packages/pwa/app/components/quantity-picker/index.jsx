@@ -22,6 +22,7 @@ import {Button, HStack, Input, useNumberInput} from '@chakra-ui/react'
 const QuantityPicker = (props) => {
     const {getInputProps, getIncrementButtonProps, getDecrementButtonProps} = useNumberInput({
         ...props,
+        // Defaults
         focusInputOnChange: false
     })
 
