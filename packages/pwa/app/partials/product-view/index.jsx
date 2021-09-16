@@ -309,21 +309,16 @@ const ProductView = ({
                         {/* Quantity Selector */}
                         <VStack align="stretch" maxWidth={'200px'}>
                             <Box fontWeight="bold">
-                                {intl.formatMessage({
-                                    defaultMessage: 'Quantity'
-                                })}
-                                :
+                                <label htmlFor="quantity">
+                                    {intl.formatMessage({
+                                        defaultMessage: 'Quantity'
+                                    })}
+                                    :
+                                </label>
                             </Box>
 
-                            {/* <HStack>
-                                <Button {...dec}>-</Button>
-                                <Input {...input} />
-                                <Button data-testid="quantity-increment" {...inc}>
-                                    +
-                                </Button>
-                            </HStack> */}
-
                             <QuantityPicker
+                                id="quantity"
                                 step={stepQuantity}
                                 value={quantity}
                                 min={1}
