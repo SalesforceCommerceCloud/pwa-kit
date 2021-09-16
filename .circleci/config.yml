@@ -77,6 +77,7 @@ commands:
             nvm install 12.22.6
             nvm use 12.22.6
 
+            export NVM_DIR="$HOME/.nvm"
             echo 'export NVM_DIR="$HOME/.nvm"' >> $BASH_ENV
             echo '[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"' >> $BASH_ENV
 
