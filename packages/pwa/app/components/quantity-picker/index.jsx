@@ -23,7 +23,19 @@ const QuantityPicker = (props) => {
     const {getInputProps, getIncrementButtonProps, getDecrementButtonProps} = useNumberInput({
         ...props,
         // Defaults
-        focusInputOnChange: false
+        focusInputOnChange: false,
+        onFocus: (e) => {
+            // eslint-disable-next-line react/prop-types
+            const {onFocus} = props
+
+            // This is useful for mobile devices, this allows the user to pop open the keyboard and set the
+            // new quantity with one click.
+            e.target.select()
+
+            // If there is a `onFocus` property define, call it with the event captured.
+            // eslint-disable-next-line react/prop-types
+            onFocus && onFocus.call(this, e)
+        }
     })
 
     const inc = getIncrementButtonProps({variant: 'outline'})
