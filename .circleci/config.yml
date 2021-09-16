@@ -72,13 +72,12 @@ commands:
           name: 'Install Dependencies'
           command: |
 
-            # FIX: After changing node versions, `npm` command cannot be found. Maybe a circle issue, cannot replicate via ssh.
-            # Install and use correct version of npm
-            # nvm install 12.22.6
-            # nvm use 12.22.6
+            # Display node and npm versions
+            npm -v
+            node -v
 
             # Install node dependencies
-            npm install
+            npm ci
 
             # Build the PWA
             # npm run lerna -- run analyze-build --scope "scaffold-pwa"
