@@ -78,11 +78,11 @@ export default function useBasket(opts = {}) {
                     }
                 }
 
-                setBasket(basket)
-
                 // Update basket currency if it was created with the wrong one, this will also set the state.
                 if (currency && basket.currency !== currency) {
                     await this.updateBasketCurrency(currency, basket.basketId)
+                } else {
+                    setBasket(basket)
                 }
 
                 return basket
