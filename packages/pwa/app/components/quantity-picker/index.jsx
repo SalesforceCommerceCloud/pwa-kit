@@ -40,7 +40,7 @@ const QuantityPicker = (props) => {
 
     const inc = getIncrementButtonProps({variant: 'outline'})
     const dec = getDecrementButtonProps({variant: 'outline'})
-    const input = getInputProps({maxWidth: '44px'})
+    const input = getInputProps({maxWidth: '44px', textAlign: 'center'})
 
     return (
         <HStack>
