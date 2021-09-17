@@ -9,7 +9,8 @@ import useEinstein from './useEinstein'
 import {useCommerceAPI, BasketContext, isError} from '../utils'
 import useCustomer from './useCustomer'
 
-export default function useBasket() {
+export default function useBasket(opts = {}) {
+    const {currency} = opts
     const api = useCommerceAPI()
     const customer = useCustomer()
     const einstein = useEinstein()
@@ -54,8 +55,7 @@ export default function useBasket() {
              * to interact with a customer basket. All other calls are done through the
              * ShopperBaskets API, which in our case, uses OCAPI rather than commerce sdk.
              */
-            async getOrCreateBasket(opts = {}) {
-                const {currency} = opts
+            async getOrCreateBasket() {
                 const customerBaskets = await api.shopperCustomers.getCustomerBaskets({
                     parameters: {customerId: customer?.customerId}
                 })
@@ -71,12 +71,18 @@ export default function useBasket() {
                 if (!basket) {
                     // Back to using ShopperBaskets for all basket interaction.
                     basket = await api.shopperBaskets.createBasket({})
-                    setBasket(basket)
+
+                    // Throw if there was a problem creating the basket
+                    if (isError(basket)) {
+                        throw new Error(basket)
+                    }
                 }
 
+                setBasket(basket)
+
                 // Update basket currency if it was created with the wrong one, this will also set the state.
-                if (basket.currency !== currency) {
-                    this.updateBasketCurrency(currency, basket.basketId)
+                if (currency && basket.currency !== currency) {
+                    await this.updateBasketCurrency(currency, basket.basketId)
                 }
 
                 return basket
@@ -93,7 +99,7 @@ export default function useBasket() {
                     body: {currency},
                     parameters: {basketId}
                 })
-                if (updateBasket.fault) {
+                if (isError(updateBasket)) {
                     throw new Error(updateBasket)
                 } else {
                     setBasket(updateBasket)

@@ -83,7 +83,7 @@ const App = (props) => {
     const currency = getCurrency(targetLocale)
 
     // Set up customer and basket
-    useShopper(currency)
+    useShopper({currency})
 
     useEffect(() => {
         // Listen for online status changes.
