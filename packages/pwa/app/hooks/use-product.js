@@ -16,17 +16,17 @@ const UNFULFILLABLE = 'UNFULFILLABLE'
 
 // TODO: This needs to be refactored.
 export const useProduct = (product) => {
-    const intl = useIntl()
-
-    // take the product quantity as initial value or set it to 1 by default
-    const [quantity, setQuantity] = useState(product?.quantity || product?.minOrderQuantity || 1)
+    const showLoading = !product
     const stockLevel = product?.inventory?.stockLevel || 0
+    const stepQuantity = product?.stepQuantity || 1
+    const minOrderQuantity = stockLevel > 0 ? product?.minOrderQuantity || 1 : 0
+    const initialQuantity = stockLevel > 0 ? product?.quantity || product?.minOrderQuantity || 1 : 0
+
+    const intl = useIntl()
     const variant = useVariant(product)
     const variationParams = useVariationParams(product)
     const variationAttributes = useVariationAttributes(product)
-    const showLoading = !product
-    const stepQuantity = product?.stepQuantity || 1
-    const minOrderQuantity = product?.minOrderQuantity || 1
+    const [quantity, setQuantity] = useState(initialQuantity)
 
     // A product is considered out of stock if the stock level is 0 or if we have all our
     // variation attributes selected, but don't have a variant. We do this because the API
@@ -53,10 +53,12 @@ export const useProduct = (product) => {
         (isOutOfStock && inventoryMessages[OUT_OF_STOCK]) ||
         (unfulfillable && inventoryMessages[UNFULFILLABLE])
 
-    // Reset the quantity state if the master product changes.
+    // If the `initialQuantity` changes, update the state. This typically happens
+    // when either the master product changes, or the inventory of the product changes
+    // from out-of-stock to in-stock or vice versa.
     useEffect(() => {
-        setQuantity(product?.quantity || product?.minOrderQuantity || 1)
-    }, [product?.master?.masterId])
+        setQuantity(initialQuantity)
+    }, [initialQuantity])
 
     return {
         showLoading,
