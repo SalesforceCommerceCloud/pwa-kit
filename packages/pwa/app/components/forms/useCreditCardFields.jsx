@@ -12,7 +12,12 @@ const messages = defineMessages({
     cardNumberInvalid: {defaultMessage: 'Please enter a valid card number'},
     nameInvalid: {defaultMessage: 'Please enter a valid name'},
     dateInvalid: {defaultMessage: 'Please enter a valid date'},
-    codeInvalid: {defaultMessage: 'Please enter a valid security code'}
+    codeInvalid: {defaultMessage: 'Please enter a valid security code'},
+    cardNumber: {defaultMessage: 'Card Number'},
+    cardType: {defaultMessage: 'Card Type'},
+    cardName: {defaultMessage: 'Name on Card'},
+    expiryDate: {defaultMessage: 'Expiry Date'},
+    securityCode: {defaultMessage: 'Security Code'}
 })
 
 /**
@@ -25,11 +30,10 @@ const messages = defineMessages({
 export default function useCreditCardFields({form: {control, errors}, prefix = ''}) {
     const {formatMessage} = useIntl()
 
-    // TODO: [l10n] localize all of the labels
     const fields = {
         number: {
             name: `${prefix}number`,
-            label: 'Card Number',
+            label: formatMessage(messages.cardNumber),
             defaultValue: '',
             type: 'text',
             rules: {
@@ -45,7 +49,7 @@ export default function useCreditCardFields({form: {control, errors}, prefix = '
         },
         cardType: {
             name: `${prefix}cardType`,
-            label: 'Card Type',
+            label: formatMessage(messages.cardType),
             defaultValue: '',
             type: 'hidden',
             error: errors[`${prefix}cardType`],
@@ -53,7 +57,7 @@ export default function useCreditCardFields({form: {control, errors}, prefix = '
         },
         holder: {
             name: `${prefix}holder`,
-            label: 'Name on Card',
+            label: formatMessage(messages.cardName),
             defaultValue: '',
             type: 'text',
             rules: {
@@ -69,7 +73,7 @@ export default function useCreditCardFields({form: {control, errors}, prefix = '
         },
         expiry: {
             name: `${prefix}expiry`,
-            label: 'Expiry Date',
+            label: formatMessage(messages.expiryDate),
             defaultValue: '',
             type: 'text',
             placeholder: 'MM/YY',
@@ -89,7 +93,7 @@ export default function useCreditCardFields({form: {control, errors}, prefix = '
         },
         securityCode: {
             name: `${prefix}securityCode`,
-            label: 'Security Code',
+            label: formatMessage(messages.securityCode),
             defaultValue: '',
             type: 'password',
             rules: {
