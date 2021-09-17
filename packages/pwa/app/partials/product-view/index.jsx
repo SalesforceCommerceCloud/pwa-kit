@@ -323,7 +323,6 @@ const ProductView = ({
                                 step={stepQuantity}
                                 value={quantity}
                                 min={minOrderQuantity}
-                                max={stockLevel}
                                 onChange={(stringValue, numberValue) => {
                                     // Set the Quantity of product to value of input if value number
                                     if (numberValue >= 0) {

@@ -20,7 +20,7 @@ export const useProduct = (product) => {
     const stockLevel = product?.inventory?.stockLevel || 0
     const stepQuantity = product?.stepQuantity || 1
     const minOrderQuantity = stockLevel > 0 ? product?.minOrderQuantity || 1 : 0
-    const initialQuantity = stockLevel > 0 ? product?.quantity || product?.minOrderQuantity || 1 : 0
+    const initialQuantity = product?.quantity || product?.minOrderQuantity || 1
 
     const intl = useIntl()
     const variant = useVariant(product)
@@ -36,7 +36,6 @@ export const useProduct = (product) => {
         !stockLevel ||
         (!variant && Object.keys(variationParams).length === variationAttributes.length)
     const unfulfillable = stockLevel < quantity
-
     const inventoryMessages = {
         [OUT_OF_STOCK]: intl.formatMessage({
             defaultMessage: 'Out of stock'

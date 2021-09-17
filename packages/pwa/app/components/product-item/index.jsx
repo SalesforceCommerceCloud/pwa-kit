@@ -9,7 +9,7 @@ import PropTypes from 'prop-types'
 import {FormattedMessage} from 'react-intl'
 
 // Chakra Components
-import {Box, Flex, Stack, Text, useDisclosure} from '@chakra-ui/react'
+import {Box, Fade, Flex, Stack, Text, useDisclosure} from '@chakra-ui/react'
 
 // Project Components
 import {HideOnDesktop, HideOnMobile} from '../responsive'
@@ -50,8 +50,14 @@ const ProductItem = ({
     showLoading = false,
     handleRemoveItem
 }) => {
-    const {stepQuantity, stockLevel} = useProduct(product)
-    const [quantity, setQuantity] = useState(product.quantity)
+    const {
+        stepQuantity,
+        stockLevel,
+        showInventoryMessage,
+        inventoryMessage,
+        quantity,
+        setQuantity
+    } = useProduct(product)
     const modalProps = useDisclosure()
 
     const showRemoveItemConfirmation = () => {
@@ -87,7 +93,6 @@ const ProductItem = ({
                                         step={stepQuantity}
                                         value={quantity}
                                         min={0}
-                                        max={stockLevel}
                                         onBlur={(e) => {
                                             // Default to last known quantity if a user leaves the box with an invalid value
                                             const {value} = e.target
@@ -100,11 +105,6 @@ const ProductItem = ({
                                             // Prevents any previous updates from being made.
                                             onItemQuantityChange.cancel()
 
-                                            // Do nothing if the user enters the current value.
-                                            if (product.quantity === numberValue) {
-                                                return
-                                            }
-
                                             // Remove the item if the users selects `0`.
                                             if (numberValue === 0) {
                                                 showRemoveItemConfirmation()
@@ -115,8 +115,9 @@ const ProductItem = ({
                                             if (numberValue >= 0) {
                                                 setQuantity(numberValue)
 
-                                                // Call debounced handler.
-                                                onItemQuantityChange(numberValue)
+                                                // Call debounced handler
+                                                numberValue <= stockLevel &&
+                                                    onItemQuantityChange(numberValue)
                                             } else if (stringValue === '') {
                                                 // We want to allow the use to clear the input to start a new input so here we set the quantity to '' so NAN is not displayed
                                                 // User will not be able to add '' qauntity to the cart due to the add to cart button enablement rules
@@ -135,6 +136,16 @@ const ProductItem = ({
                                 </Stack>
                             </Flex>
 
+                            <Box>
+                                {!showLoading && showInventoryMessage && (
+                                    <Fade in={true}>
+                                        <Text color="orange.600" fontWeight={600}>
+                                            {inventoryMessage}
+                                        </Text>
+                                    </Fade>
+                                )}
+                            </Box>
+
                             {secondaryActions}
                         </Stack>
                     </Flex>
@@ -144,7 +155,6 @@ const ProductItem = ({
                     </Box>
                 </Stack>
             </CartItemVariant>
-            {/* NOTE: I'm note certain if the modal should belong here, or go up even one more level. */}
             <ConfirmationModal
                 {...REMOVE_CART_ITEM_CONFIRMATION_DIALOG_CONFIG}
                 onPrimaryAction={() => handleRemoveItem(product)}
