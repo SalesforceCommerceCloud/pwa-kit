@@ -68,20 +68,18 @@ const ProductTile = (props) => {
             {...rest}
         >
             <Box {...styles.imageWrapper}>
-                <AspectRatio {...styles.image} ratio={1}>
+                <AspectRatio {...styles.image}>
                     <Img alt={image.alt} src={image.disBaseLink} />
                 </AspectRatio>
 
                 {enableFavourite && (
                     <IconButtonWithRegistration
                         aria-label={intl.formatMessage({
-                            defaultMessage: 'add to wishlist'
+                            defaultMessage: 'favourite'
                         })}
                         icon={isFavourite ? <WishlistSolidIcon /> : <WishlistIcon />}
-                        variant="unstyled"
-                        {...styles.iconButton}
+                        {...styles.favIcon}
                         onClick={() => {
-                            console.log('icon click')
                             onFavouriteToggle(!isFavourite)
                         }}
                     />
@@ -89,14 +87,10 @@ const ProductTile = (props) => {
             </Box>
 
             {/* Title */}
-            <Text {...styles.title} aria-label="product name">
-                {productName}
-            </Text>
+            <Text {...styles.title}>{productName}</Text>
 
             {/* Price */}
-            <Text {...styles.price} aria-label="price">
-                {intl.formatNumber(price, {style: 'currency', currency})}
-            </Text>
+            <Text {...styles.price}>{intl.formatNumber(price, {style: 'currency', currency})}</Text>
         </Link>
     )
 }
@@ -114,7 +108,7 @@ ProductTile.propTypes = {
             alt: PropTypes.string,
             disBaseLink: PropTypes.string
         }),
-        price: PropTypes.string,
+        price: PropTypes.number,
         productName: PropTypes.string,
         productId: PropTypes.string
     }),
