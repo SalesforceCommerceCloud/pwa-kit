@@ -378,19 +378,18 @@ const ProductList = (props) => {
                                           const isInWishlist = wishlist.isProductInList(productId)
                                           return (
                                               <ProductTile
-                                                  isWishlistLoading={wishlistLoading.includes(
-                                                      productId
-                                                  )}
                                                   data-testid={`sf-product-tile-${productSearchItem.productId}`}
                                                   key={productSearchItem.productId}
                                                   product={productSearchItem}
-                                                  onAddToWishlistClick={() =>
-                                                      addItemToWishlist(productSearchItem)
-                                                  }
-                                                  onRemoveWishlistClick={() => {
-                                                      removeItemFromWishlist(productSearchItem)
+                                                  enableFavourite={wishlist.isInitialized}
+                                                  isFavourite={isInWishlist}
+                                                  onFavouriteToggle={(isFavourite) => {
+                                                      if (isFavourite) {
+                                                          addItemToWishlist(productSearchItem)
+                                                      } else {
+                                                          removeItemFromWishlist(productSearchItem)
+                                                      }
                                                   }}
-                                                  isInWishlist={isInWishlist}
                                               />
                                           )
                                       })}
