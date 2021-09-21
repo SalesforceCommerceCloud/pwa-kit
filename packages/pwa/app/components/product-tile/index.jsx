@@ -56,7 +56,7 @@ export const Skeleton = () => {
  */
 const ProductTile = (props) => {
     const intl = useIntl()
-    const {product, enableFavourite = true, isFavourite = true, onFavouriteToggle, ...rest} = props
+    const {product, enableFavourite = false, isFavourite, onFavouriteToggle, ...rest} = props
     const {currency, image, price, productName, productId} = product
     const styles = useMultiStyleConfig('ProductTile')
 
