@@ -7,7 +7,7 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import {WishlistIcon, WishlistSolidIcon} from '../icons'
+import {HeartIcon, HeartSolidIcon} from '../icons'
 
 // Components
 import {
@@ -77,7 +77,7 @@ const ProductTile = (props) => {
                         aria-label={intl.formatMessage({
                             defaultMessage: 'favourite'
                         })}
-                        icon={isFavourite ? <WishlistSolidIcon /> : <WishlistIcon />}
+                        icon={isFavourite ? <HeartSolidIcon /> : <HeartIcon />}
                         {...styles.favIcon}
                         onClick={() => {
                             onFavouriteToggle(!isFavourite)
