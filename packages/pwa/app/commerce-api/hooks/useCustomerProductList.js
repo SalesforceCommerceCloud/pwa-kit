@@ -83,18 +83,18 @@ export function useCustomerProductLists() {
 export function useCustomerProductList(name, options = {}) {
     const api = useCommerceAPI()
     const customer = useCustomer()
-    const _super = useCustomerProductLists()
+    const customerProductLists = useCustomerProductLists()
     const {actions} = useContext(CustomerProductListsContext)
     const DEFAULT_LIST_TYPE = 'wish_list'
     const type = options?.type || DEFAULT_LIST_TYPE
 
     const self = useMemo(() => {
         return {
-            isInitialized: _super.isInitialized,
-            reset: _super.reset,
+            isInitialized: customerProductLists.isInitialized,
+            reset: customerProductLists.reset,
 
             get data() {
-                return Object.values(_super.data).find((list) => list.name === name)
+                return Object.values(customerProductLists.data).find((list) => list.name === name)
             },
 
             get isEmpty() {
@@ -264,12 +264,12 @@ export function useCustomerProductList(name, options = {}) {
              * @returns product lists for registered users
              */
             async _getOrCreatelistByName(name, options) {
-                let response = await _super.getLists()
+                let response = await customerProductLists.getLists()
 
                 // Note: if list is empty, the API response doesn't
                 // contain the "data" key.
                 if (!response.data?.some((list) => list.name === name)) {
-                    const {id} = await _super.createList(name, options)
+                    const {id} = await customerProductLists.createList(name, options)
                     response = await self.getList(id)
                     return response
                 }
@@ -321,7 +321,7 @@ export function useCustomerProductList(name, options = {}) {
                 return list
             }
         }
-    }, [_super])
+    }, [customerProductLists])
 
     return self
 }
