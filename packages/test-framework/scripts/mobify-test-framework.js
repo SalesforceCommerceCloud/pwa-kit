@@ -66,7 +66,7 @@ const runLighthouse = (
         const opts = mobifyPreview
             ? `--disable-device-emulation=true --chrome-flags='--user-agent="MobileMobifyPreview" ${sharedChromeFlags}'`
             : `--chrome-flags='${sharedChromeFlags}'`
-        const cmd = `${lighthouse} "${url}" --config-path ${lighthouseConfig} --emulated-form-factor ${device} --quiet --output json --output html ${opts}`
+        const cmd = `${lighthouse} "${url}" --config-path ${lighthouseConfig} --formFactor ${device} --quiet --output json --output html ${opts}`
         console.log(cmd)
         childProcess.execSync(cmd, {cwd: outputDir, stdio: [0, 1, 2]})
     })
