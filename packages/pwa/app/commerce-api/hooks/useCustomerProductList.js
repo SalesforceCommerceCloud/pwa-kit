@@ -268,7 +268,7 @@ export function useCustomerProductList(name, options = {}) {
                 if (!item) {
                     return
                 }
-                await customerProductLists.removeItem(item.id)
+                await self.removeItem(item.id)
             },
 
             /**
