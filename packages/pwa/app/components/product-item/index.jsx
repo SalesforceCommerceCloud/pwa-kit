@@ -114,7 +114,7 @@ const ProductItem = ({
                             </Flex>
 
                             <Box>
-                                {!showLoading && showInventoryMessage && (
+                                {product && showInventoryMessage && (
                                     <Fade in={true}>
                                         <Text color="orange.600" fontWeight={600}>
                                             {inventoryMessage}

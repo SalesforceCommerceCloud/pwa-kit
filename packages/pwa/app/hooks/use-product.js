@@ -47,7 +47,7 @@ export const useProduct = (product) => {
             {stockLevel}
         )
     }
-    const showInventoryMessage = isOutOfStock || unfulfillable
+    const showInventoryMessage = variant && (isOutOfStock || unfulfillable)
     const inventoryMessage =
         (isOutOfStock && inventoryMessages[OUT_OF_STOCK]) ||
         (unfulfillable && inventoryMessages[UNFULFILLABLE])
