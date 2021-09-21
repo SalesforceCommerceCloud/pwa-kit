@@ -9,7 +9,7 @@ import PropTypes from 'prop-types'
 import {FormattedMessage} from 'react-intl'
 
 // Chakra Components
-import {Box, Fade, Flex, Stack, Text, useDisclosure} from '@chakra-ui/react'
+import {Box, Fade, Flex, Stack, Text} from '@chakra-ui/react'
 
 // Project Components
 import {HideOnDesktop, HideOnMobile} from '../responsive'
@@ -92,12 +92,8 @@ const ProductItem = ({
                                             if (numberValue >= 0) {
                                                 // Call handler
                                                 onItemQuantityChange(numberValue).then(
-                                                    (isValidChange) => {
-                                                        if (isValidChange) {
-                                                            debugger
-                                                            setQuantity(numberValue)
-                                                        }
-                                                    }
+                                                    (isValidChange) =>
+                                                        isValidChange && setQuantity(numberValue)
                                                 )
                                             } else if (stringValue === '') {
                                                 // We want to allow the use to clear the input to start a new input so here we set the quantity to '' so NAN is not displayed
