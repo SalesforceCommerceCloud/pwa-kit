@@ -50,19 +50,13 @@ export const Skeleton = () => {
 }
 
 /**
- * The ProductTile is a simple visual representation of a product search hit
- * object. It will show it's default image, name and price.
+ * The ProductTile is a simple visual representation of a
+ * product object. It will show it's default image, name and price.
+ * It also supports favourite products, controlled by a heart icon.
  */
 const ProductTile = (props) => {
     const intl = useIntl()
-
-    const {
-        product,
-        enableFavourite = true,
-        isFavourite = true,
-        onFavouriteToggle,
-        ...rest
-    } = props
+    const {product, enableFavourite = true, isFavourite = true, onFavouriteToggle, ...rest} = props
     const {currency, image, price, productName, productId} = product
     const styles = useMultiStyleConfig('ProductTile')
 
@@ -114,20 +108,30 @@ ProductTile.propTypes = {
      * The product search hit that will be represented in this
      * component.
      */
-    productSearchItem: PropTypes.object.isRequired,
+    product: PropTypes.shape({
+        currency: PropTypes.string,
+        image: PropTypes.shape({
+            alt: PropTypes.string,
+            disBaseLink: PropTypes.string
+        }),
+        price: PropTypes.string,
+        productName: PropTypes.string,
+        productId: PropTypes.string
+    }),
     /**
-     * Types of lists the product/variant is added to. (eg: wishlist)
+     * Enable adding/removing product as a favourite.
+     * Use case: wishlist.
      */
-    isInWishlist: PropTypes.bool,
+    enableFavourite: PropTypes.bool,
     /**
-     * Callback function to be invoked when the user add item to wishlist
+     * Display the product as a faviourite.
      */
-    onAddToWishlistClick: PropTypes.func,
+    isFavourite: PropTypes.bool,
     /**
-     * Callback function to be invoked when the user removes item to wishlist
+     * Callback function to be invoked when the user
+     * interacts with favourite icon/button.
      */
-    onRemoveWishlistClick: PropTypes.func,
-    isWishlistLoading: PropTypes.bool
+    onFavouriteToggle: PropTypes.func
 }
 
 export default ProductTile
