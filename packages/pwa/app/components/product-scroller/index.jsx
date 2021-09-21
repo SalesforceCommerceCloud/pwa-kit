@@ -94,7 +94,7 @@ const ProductScroller = forwardRef(
                                     ) : (
                                         <ProductTile
                                             data-testid="product-scroller-item"
-                                            productSearchItem={product}
+                                            product={product}
                                             onClick={() => onProductClick(product)}
                                         />
                                     )}

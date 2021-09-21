@@ -56,62 +56,41 @@ export const Skeleton = () => {
 const ProductTile = (props) => {
     const intl = useIntl()
 
-    // eslint-disable-next-line react/prop-types
     const {
-        productSearchItem,
-        // eslint-disable-next-line react/prop-types
-        staticContext,
-        onAddToWishlistClick,
-        onRemoveWishlistClick,
-        isInWishlist,
-        isWishlistLoading,
+        product,
+        enableFavourite = true,
+        isFavourite = true,
+        onFavouriteToggle,
         ...rest
     } = props
-    const {currency, image, price, productName} = productSearchItem
-    const styles = useMultiStyleConfig('ProductTile', {isLoading: isWishlistLoading})
+    const {currency, image, price, productName, productId} = product
+    const styles = useMultiStyleConfig('ProductTile')
 
     return (
         <Link
             data-testid="product-tile"
             {...styles.container}
-            to={productUrlBuilder({id: productSearchItem?.productId}, intl.local)}
+            to={productUrlBuilder({id: productId}, intl.local)}
             {...rest}
         >
             <Box {...styles.imageWrapper}>
                 <AspectRatio {...styles.image} ratio={1}>
                     <Img alt={image.alt} src={image.disBaseLink} />
                 </AspectRatio>
-                {onAddToWishlistClick && onRemoveWishlistClick && (
-                    <>
-                        {isInWishlist ? (
-                            <IconButton
-                                aria-label={intl.formatMessage({
-                                    defaultMessage: 'wishlist-solid'
-                                })}
-                                icon={<WishlistSolidIcon />}
-                                variant="unstyled"
-                                {...styles.iconButton}
-                                onClick={(e) => {
-                                    e.preventDefault()
-                                    if (isWishlistLoading) return
-                                    onRemoveWishlistClick()
-                                }}
-                            />
-                        ) : (
-                            <IconButtonWithRegistration
-                                aria-label={intl.formatMessage({
-                                    defaultMessage: 'wishlist'
-                                })}
-                                icon={<WishlistIcon />}
-                                variant="unstyled"
-                                {...styles.iconButton}
-                                onClick={() => {
-                                    if (isWishlistLoading) return
-                                    onAddToWishlistClick()
-                                }}
-                            />
-                        )}
-                    </>
+
+                {enableFavourite && (
+                    <IconButtonWithRegistration
+                        aria-label={intl.formatMessage({
+                            defaultMessage: 'add to wishlist'
+                        })}
+                        icon={isFavourite ? <WishlistSolidIcon /> : <WishlistIcon />}
+                        variant="unstyled"
+                        {...styles.iconButton}
+                        onClick={() => {
+                            console.log('icon click')
+                            onFavouriteToggle(!isFavourite)
+                        }}
+                    />
                 )}
             </Box>
 

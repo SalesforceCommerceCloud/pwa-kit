@@ -383,7 +383,7 @@ const ProductList = (props) => {
                                                   )}
                                                   data-testid={`sf-product-tile-${productSearchItem.productId}`}
                                                   key={productSearchItem.productId}
-                                                  productSearchItem={productSearchItem}
+                                                  product={productSearchItem}
                                                   onAddToWishlistClick={() =>
                                                       addItemToWishlist(productSearchItem)
                                                   }
