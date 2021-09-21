@@ -23,7 +23,7 @@ import useCustomer from './useCustomer'
  *
  * If your application need to handle multiple customer product lists, this
  * is the hook for you, otherwise it is recommended to use useCustomerProductList hook.
- * 
+ *
  * This Hook only works when your components are wrapped in CustomerProductListProvider.
  */
 export function useCustomerProductLists() {
@@ -303,18 +303,18 @@ export function useCustomerProductList(name, options = {}) {
 
             _mergeProductDetailsIntoList(list, productDetails) {
                 list.customerProductListItems = list.customerProductListItems?.map((item) => {
-                    const detail = {
+                    const product = {
                         ...productDetails.data.find((product) => product.id === item.productId)
                     }
                     return {
-                        ...detail,
+                        ...product,
                         ...item,
 
                         // Both customer product list and the product detail API returns 'type'
                         // but the type can be different depending on the API endpoint
                         // We use the type from product detail endpoint, this is mainly used
                         // to determine whether the product is a master or a variant.
-                        type: detail.type
+                        type: product.type
                     }
                 })
                 return list
