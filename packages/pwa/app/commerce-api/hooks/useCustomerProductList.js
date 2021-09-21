@@ -7,7 +7,6 @@
 import {useContext, useMemo} from 'react'
 import {useCommerceAPI, CustomerProductListsContext} from '../contexts'
 import {isError} from '../utils'
-
 import useCustomer from './useCustomer'
 
 /**
@@ -40,6 +39,9 @@ export function useCustomerProductLists() {
                 actions.reset()
             },
 
+            /**
+             * Get customer's product lists.
+             */
             async getLists() {
                 const response = await api.shopperCustomers.getCustomerProductLists({
                     parameters: {
@@ -54,6 +56,11 @@ export function useCustomerProductLists() {
                 return response
             },
 
+            /**
+             * Create a new product list.
+             * @param {string} name
+             * @param {options} object
+             */
             async createList(name, options) {
                 const response = await api.shopperCustomers.createCustomerProductList({
                     body: {
@@ -72,6 +79,10 @@ export function useCustomerProductLists() {
                 return response
             },
 
+            /**
+             * Get a specific product list by id.
+             * @param {string} listId
+             */
             async getList(listId) {
                 const response = await api.shopperCustomers.getCustomerProductList({
                     parameters: {
@@ -89,10 +100,10 @@ export function useCustomerProductLists() {
 
             /**
              * Adds an item to the customer's product list.
-             * @param {object} listId
+             * @param {string} listId
              * @param {Object} item item to be added to the list.
              */
-             async createListItem(listId, item) {
+            async createListItem(listId, item) {
                 const {id, quantity} = item
                 const response = await api.shopperCustomers.createCustomerProductListItem({
                     body: {
