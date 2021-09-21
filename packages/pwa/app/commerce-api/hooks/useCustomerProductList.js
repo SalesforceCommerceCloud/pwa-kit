@@ -23,6 +23,8 @@ import useCustomer from './useCustomer'
  *
  * If your application need to handle multiple customer product lists, this
  * is the hook for you, otherwise it is recommended to use useCustomerProductList hook.
+ * 
+ * This Hook only works when your components are wrapped in CustomerProductListProvider.
  */
 export function useCustomerProductLists() {
     const api = useCommerceAPI()
