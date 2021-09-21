@@ -7,7 +7,7 @@
 
 /* eslint-disable no-unused-vars */
 import React from 'react'
-import {screen, within, fireEvent} from '@testing-library/react'
+import {screen, within, fireEvent, waitFor} from '@testing-library/react'
 import {renderWithProviders} from '../../utils/test-utils'
 import Cart from './index'
 import userEvent from '@testing-library/user-event'
@@ -175,7 +175,9 @@ test('Can update item quantity in the cart', async () => {
     // update item quantity
     fireEvent.mouseDown(incrementButton)
 
-    expect(await within(cartItem).getByDisplayValue('3'))
+    await waitFor(() => {
+        expect(within(cartItem).getByDisplayValue('3'))
+    })
 })
 
 test('Can update item quantity from product view modal', async () => {
@@ -210,7 +212,9 @@ test('Can update item quantity from product view modal', async () => {
     // update item quantity
     fireEvent.mouseDown(incrementButton)
 
-    expect(await within(cartItem).getByDisplayValue('3'))
+    await waitFor(() => {
+        expect(within(cartItem).getByDisplayValue('3'))
+    })
 })
 
 test('Can remove item from the cart', async () => {
