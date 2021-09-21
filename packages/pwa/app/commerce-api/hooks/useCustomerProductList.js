@@ -209,7 +209,7 @@ export function useCustomerProductList(name, options = {}) {
             },
 
             get isInitialized() {
-                return self.data.isInitialized
+                return !!self.data?.isInitialized
             },
 
             get isEmpty() {
