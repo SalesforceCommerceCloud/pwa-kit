@@ -32,8 +32,11 @@ export function useCustomerProductLists() {
 
     const self = useMemo(() => {
         return {
-            isInitialized: state.isInitialized,
             data: state.productLists,
+
+            get isInitialized() {
+                return Object.keys(state.productLists).length === 0
+            },
 
             reset() {
                 actions.reset()
@@ -199,11 +202,14 @@ export function useCustomerProductList(name, options = {}) {
 
     const self = useMemo(() => {
         return {
-            isInitialized: customerProductLists.isInitialized,
             reset: customerProductLists.reset,
 
             get data() {
                 return Object.values(customerProductLists.data).find((list) => list.name === name)
+            },
+
+            get isInitialized() {
+                return self.data.isInitialized
             },
 
             get isEmpty() {
@@ -224,12 +230,11 @@ export function useCustomerProductList(name, options = {}) {
              * Initialize customer's product list.
              */
             async init() {
-                actions.setInitialized(false)
                 const list = await self._getOrCreatelistByName(name, {type})
                 const productDetails = await self._getProductDetails(list)
                 const result = self._mergeProductDetailsIntoList(list, productDetails)
+                result.isInitialized = true
                 actions.receiveList(result)
-                actions.setInitialized(true)
                 return list
             },
 

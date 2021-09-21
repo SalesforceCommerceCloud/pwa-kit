@@ -45,7 +45,6 @@ export const CustomerProvider = CustomerContext.Provider
 
 /************ Customer Product Lists ************/
 const CPLInitialValue = {
-    isInitialized: false,
     productLists: {
         // this is a map of product lists
         // keyed by list id
@@ -57,7 +56,6 @@ const CPLActionTypes = {
     CREATE_LIST_ITEM: 'CREATE_LIST_ITEM',
     UPDATE_LIST_ITEM: 'UPDATE_LIST_ITEM',
     REMOVE_LIST_ITEM: 'REMOVE_LIST_ITEM',
-    SET_INITIALIZED: 'SET_INITIALIZED',
     RESET: 'RESET'
 }
 export const CustomerProductListsContext = createContext(CPLInitialValue)
@@ -137,9 +135,6 @@ export const CustomerProductListsProvider = ({children}) => {
                 })
                 return {...state, productLists}
             }
-            case CPLActionTypes.SET_INITIALIZED: {
-                return {...state, isInitialized: payload}
-            }
             case CPLActionTypes.RESET: {
                 return {...CPLInitialValue}
             }
@@ -157,8 +152,6 @@ export const CustomerProductListsProvider = ({children}) => {
             dispatch({type: CPLActionTypes.UPDATE_LIST_ITEM, payload: {listId, item}}),
         removeListItem: (listId, itemId) =>
             dispatch({type: CPLActionTypes.REMOVE_LIST_ITEM, payload: {listId, itemId}}),
-        setInitialized: (isInitialized) =>
-            dispatch({type: CPLActionTypes.SET_INITIALIZED, payload: isInitialized}),
         reset: () => dispatch({type: CPLActionTypes.RESET})
     }
 
