@@ -138,6 +138,7 @@ jobs:
       - setup
       - runtests:
           enableIntegrationTests: false
+      - lighthouse-ci
       - smoketestscripts
       - checkclean
       - store_test_results:
