@@ -70,58 +70,6 @@ export function useCustomerProductLists() {
                 }
 
                 return response
-            }
-        }
-    }, [customer.customerId, state])
-    return self
-}
-
-/**
- * This hook is the "child class" of useCustomerProductLists.
- * It provides functionalities to manage a single wishlist for shoppers.
- */
-export function useCustomerProductList(name, options = {}) {
-    const api = useCommerceAPI()
-    const customer = useCustomer()
-    const customerProductLists = useCustomerProductLists()
-    const {actions} = useContext(CustomerProductListsContext)
-    const DEFAULT_LIST_TYPE = 'wish_list'
-    const type = options?.type || DEFAULT_LIST_TYPE
-
-    const self = useMemo(() => {
-        return {
-            isInitialized: customerProductLists.isInitialized,
-            reset: customerProductLists.reset,
-
-            get data() {
-                return Object.values(customerProductLists.data).find((list) => list.name === name)
-            },
-
-            get isEmpty() {
-                return !self.data?.customerProductListItems?.length
-            },
-
-            findItemByProductId(productId) {
-                return self.data?.customerProductListItems?.find(
-                    (item) => item.productId === productId
-                )
-            },
-
-            isProductInList(productId) {
-                return !!self.findItemByProductId(productId)
-            },
-
-            /**
-             * Initialize customer's product list.
-             */
-            async init() {
-                actions.setInitialized(false)
-                const list = await self._getOrCreatelistByName(name, {type})
-                const productDetails = await self._getProductDetails(list)
-                const result = self._mergeProductDetailsIntoList(list, productDetails)
-                actions.receiveList(result)
-                actions.setInitialized(true)
-                return list
             },
 
             async getList(listId) {
@@ -139,45 +87,12 @@ export function useCustomerProductList(name, options = {}) {
                 return response
             },
 
-            async addItem(product) {
-                let list = self.data
-                if (!self.isInitialized) {
-                    list = await self.init()
-                }
-                const createdItem = await self.createListItem(list.id, product)
-                actions.createListItem(list.id, createdItem)
-            },
-
-            async updateItem(item) {
-                const {id, quantity} = item
-                if (quantity === 0) {
-                    await self.removeListItem(self.data.id, id)
-                    actions.removeListItem(self.data.id, id)
-                    return
-                }
-                const updatedItem = await self.updateListItem(self.data.id, item)
-                actions.updateListItem(self.data.id, updatedItem)
-            },
-
-            async removeItem(itemId) {
-                await self.removeListItem(self.data.id, itemId)
-                actions.removeListItem(self.data.id, itemId)
-            },
-
-            async removeItemByProductId(productId) {
-                const item = self.findItemByProductId(productId)
-                if (!item) {
-                    return
-                }
-                await self.removeItem(item.id)
-            },
-
             /**
              * Adds an item to the customer's product list.
              * @param {object} listId
              * @param {Object} item item to be added to the list.
              */
-            async createListItem(listId, item) {
+             async createListItem(listId, item) {
                 const {id, quantity} = item
                 const response = await api.shopperCustomers.createCustomerProductListItem({
                     body: {
@@ -254,6 +169,90 @@ export function useCustomerProductList(name, options = {}) {
                 }
 
                 return response
+            }
+        }
+    }, [customer.customerId, state])
+    return self
+}
+
+/**
+ * This hook is the "child class" of useCustomerProductLists.
+ * It provides functionalities to manage a single wishlist for shoppers.
+ */
+export function useCustomerProductList(name, options = {}) {
+    const api = useCommerceAPI()
+    const customerProductLists = useCustomerProductLists()
+    const {actions} = useContext(CustomerProductListsContext)
+    const DEFAULT_LIST_TYPE = 'wish_list'
+    const type = options?.type || DEFAULT_LIST_TYPE
+
+    const self = useMemo(() => {
+        return {
+            isInitialized: customerProductLists.isInitialized,
+            reset: customerProductLists.reset,
+
+            get data() {
+                return Object.values(customerProductLists.data).find((list) => list.name === name)
+            },
+
+            get isEmpty() {
+                return !self.data?.customerProductListItems?.length
+            },
+
+            findItemByProductId(productId) {
+                return self.data?.customerProductListItems?.find(
+                    (item) => item.productId === productId
+                )
+            },
+
+            isProductInList(productId) {
+                return !!self.findItemByProductId(productId)
+            },
+
+            /**
+             * Initialize customer's product list.
+             */
+            async init() {
+                actions.setInitialized(false)
+                const list = await self._getOrCreatelistByName(name, {type})
+                const productDetails = await self._getProductDetails(list)
+                const result = self._mergeProductDetailsIntoList(list, productDetails)
+                actions.receiveList(result)
+                actions.setInitialized(true)
+                return list
+            },
+
+            async addItem(product) {
+                let list = self.data
+                if (!self.isInitialized) {
+                    list = await self.init()
+                }
+                const createdItem = await customerProductLists.createListItem(list.id, product)
+                actions.createListItem(list.id, createdItem)
+            },
+
+            async updateItem(item) {
+                const {id, quantity} = item
+                if (quantity === 0) {
+                    await customerProductLists.removeListItem(self.data.id, id)
+                    actions.removeListItem(self.data.id, id)
+                    return
+                }
+                const updatedItem = await customerProductLists.updateListItem(self.data.id, item)
+                actions.updateListItem(self.data.id, updatedItem)
+            },
+
+            async removeItem(itemId) {
+                await customerProductLists.removeListItem(self.data.id, itemId)
+                actions.removeListItem(self.data.id, itemId)
+            },
+
+            async removeItemByProductId(productId) {
+                const item = self.findItemByProductId(productId)
+                if (!item) {
+                    return
+                }
+                await customerProductLists.removeItem(item.id)
             },
 
             /**
@@ -270,7 +269,7 @@ export function useCustomerProductList(name, options = {}) {
                 // contain the "data" key.
                 if (!response.data?.some((list) => list.name === name)) {
                     const {id} = await customerProductLists.createList(name, options)
-                    response = await self.getList(id)
+                    response = await customerProductLists.getList(id)
                     return response
                 }
 
