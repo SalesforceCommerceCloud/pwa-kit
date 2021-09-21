@@ -152,15 +152,23 @@ const Cart = () => {
     const handleChangeItemQuantity = async (product, value) => {
         const {stockLevel} = basket._productItemsDetail[product.productId].inventory
 
-        // Cancel any pending handlers.
-        changeItemQuantity.cancel()
-
         // Handle removing of the items when 0 is selected.
         if (value === 0) {
+            // Flush last call to keep ui in sync with data.
+            changeItemQuantity.flush()
+
+            // Set the selected item to the current product to the modal acts on it.
             setSelectedItem(product)
+
+            // Show the modal.
             modalProps.onOpen()
+
+            // Return false as 0 isn't valid section.
             return false
         }
+
+        // Cancel any pending handlers.
+        changeItemQuantity.cancel()
 
         // Allow use to selected values above the inventory.
         if (value > stockLevel || value === product.quantity) {
