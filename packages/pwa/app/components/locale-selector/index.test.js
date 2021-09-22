@@ -12,23 +12,23 @@ import {renderWithProviders} from '../../utils/test-utils'
 const supportedLocales = [
     {
         id: 'en-GB',
-        currencyCode: 'GBP'
+        preferredCurrency: 'GBP'
     },
     {
         id: 'fr-FR',
-        currencyCode: 'EUR'
+        preferredCurrency: 'EUR'
     },
     {
         id: 'it-IT',
-        currencyCode: 'EUR'
+        preferredCurrency: 'EUR'
     },
     {
         id: 'zh-CN',
-        currencyCode: 'CNY'
+        preferredCurrency: 'CNY'
     },
     {
         id: 'ja-JP',
-        currencyCode: 'JPY'
+        preferredCurrency: 'JPY'
     }
 ]
 
@@ -54,5 +54,5 @@ test('Renders LocaleSelector with event handlers', () => {
 
     fireEvent.click(firstLocale)
     expect(onSelect).toHaveBeenCalledTimes(1)
-    expect(onSelect).toBeCalledWith({currencyCode: 'GBP', id: 'en-GB'})
+    expect(onSelect).toBeCalledWith({preferredCurrency: 'GBP', id: 'en-GB'})
 })

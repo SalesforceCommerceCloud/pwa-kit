@@ -100,8 +100,9 @@ export const getTargetLocale = (preferredLocales, supportedLocales, defaultLocal
  */
 export const getCurrency = (locale) => {
     return (
-        SUPPORTED_LOCALES.find((supportedLocale) => supportedLocale.id === locale)?.currencyCode ||
+        SUPPORTED_LOCALES.find((supportedLocale) => supportedLocale.id === locale)
+            ?.preferredCurrency ||
         SUPPORTED_LOCALES.find((supportedLocale) => supportedLocale.id === DEFAULT_LOCALE)
-            ?.currencyCode
+            ?.preferredCurrency
     )
 }
