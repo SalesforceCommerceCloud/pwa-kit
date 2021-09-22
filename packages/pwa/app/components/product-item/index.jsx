@@ -7,14 +7,24 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {FormattedMessage} from 'react-intl'
-import {Box, Flex, Stack, Text, Select} from '@chakra-ui/react'
+
+// Chakra Components
+import {Box, Fade, Flex, Stack, Text} from '@chakra-ui/react'
+
+// Project Components
+import {HideOnDesktop, HideOnMobile} from '../responsive'
 import CartItemVariant from '../cart-item-variant'
 import CartItemVariantImage from '../cart-item-variant/item-image'
 import CartItemVariantName from '../cart-item-variant/item-name'
 import CartItemVariantAttributes from '../cart-item-variant/item-attributes'
 import CartItemVariantPrice from '../cart-item-variant/item-price'
 import LoadingSpinner from '../loading-spinner'
+import QuantityPicker from '../quantity-picker'
+
+// Utilities
 import {noop} from '../../utils/utils'
+
+// Hooks
 import {useProduct} from '../../hooks'
 
 /**
@@ -33,7 +43,14 @@ const ProductItem = ({
     onItemQuantityChange = noop,
     showLoading = false
 }) => {
-    const {stepQuantity, stockLevel} = useProduct(product)
+    const {
+        stepQuantity,
+        showInventoryMessage,
+        inventoryMessage,
+        quantity,
+        setQuantity
+    } = useProduct(product)
+
     return (
         <Box position="relative" data-testid={`sf-cart-item-${product.productId}`}>
             <CartItemVariant variant={product}>
@@ -41,11 +58,15 @@ const ProductItem = ({
                 <Stack layerStyle="cardBordered" align="flex-start">
                     <Flex width="full" alignItems="flex-start" backgroundColor="white">
                         <CartItemVariantImage width={['88px', '136px']} mr={4} />
-
                         <Stack spacing={3} flex={1}>
                             <Stack spacing={1}>
                                 <CartItemVariantName />
                                 <CartItemVariantAttributes />
+                                <HideOnDesktop>
+                                    <Box marginTop={2}>
+                                        <CartItemVariantPrice align="left" />
+                                    </Box>
+                                </HideOnDesktop>
                             </Stack>
 
                             <Flex align="flex-end" justify="space-between">
@@ -53,38 +74,62 @@ const ProductItem = ({
                                     <Text fontSize="sm" color="gray.700">
                                         <FormattedMessage defaultMessage="Quantity:" />
                                     </Text>
-                                    <Select
-                                        onChange={(e) => onItemQuantityChange(e.target.value)}
-                                        value={product.quantity}
-                                        width="75px"
-                                    >
-                                        {new Array(stockLevel).fill(0).map((_, index) => {
-                                            if ((index + 1) % stepQuantity === 0) {
-                                                return (
-                                                    <option key={index} value={index + 1}>
-                                                        {index + 1}
-                                                    </option>
-                                                )
+                                    <QuantityPicker
+                                        step={stepQuantity}
+                                        value={quantity}
+                                        min={0}
+                                        clampValueOnBlur={false}
+                                        onBlur={(e) => {
+                                            // Default to last known quantity if a user leaves the box with an invalid value
+                                            const {value} = e.target
+
+                                            if (!value) {
+                                                setQuantity(product.quantity)
                                             }
-                                        })}
-                                    </Select>
+                                        }}
+                                        onChange={(stringValue, numberValue) => {
+                                            // Set the Quantity of product to value of input if value number
+                                            if (numberValue >= 0) {
+                                                // Call handler
+                                                onItemQuantityChange(numberValue).then(
+                                                    (isValidChange) =>
+                                                        isValidChange && setQuantity(numberValue)
+                                                )
+                                            } else if (stringValue === '') {
+                                                // We want to allow the use to clear the input to start a new input so here we set the quantity to '' so NAN is not displayed
+                                                // User will not be able to add '' qauntity to the cart due to the add to cart button enablement rules
+                                                setQuantity(stringValue)
+                                            }
+                                        }}
+                                    />
                                 </Stack>
                                 <Stack>
-                                    <CartItemVariantPrice />
+                                    <HideOnMobile>
+                                        <CartItemVariantPrice />
+                                    </HideOnMobile>
                                     <Box display={['none', 'block', 'block', 'block']}>
                                         {primaryAction}
                                     </Box>
                                 </Stack>
                             </Flex>
 
+                            <Box>
+                                {product && showInventoryMessage && (
+                                    <Fade in={true}>
+                                        <Text color="orange.600" fontWeight={600}>
+                                            {inventoryMessage}
+                                        </Text>
+                                    </Fade>
+                                )}
+                            </Box>
+
                             {secondaryActions}
                         </Stack>
                     </Flex>
-                    {!showLoading && (
-                        <Box display={['block', 'none', 'none', 'none']} w={'full'}>
-                            {primaryAction}
-                        </Box>
-                    )}
+
+                    <Box display={['block', 'none', 'none', 'none']} w={'full'}>
+                        {primaryAction}
+                    </Box>
                 </Stack>
             </CartItemVariant>
         </Box>

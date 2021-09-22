@@ -12,12 +12,36 @@ import useBasket from '../../commerce-api/hooks/useBasket'
 import {useCartItemVariant} from '.'
 import {DEFAULT_LOCALE} from '../../constants'
 import {getCurrency} from '../../utils/locale'
+import {HideOnDesktop, HideOnMobile} from '../responsive'
+
+const PricePerItem = ({currency, basket, basePrice}) => {
+    const defaultLocaleCurrency = getCurrency(DEFAULT_LOCALE)
+    return (
+        <Text fontSize={{base: '12px', lg: '14px'}}>
+            <FormattedNumber
+                style="currency"
+                currency={currency || basket.currency || defaultLocaleCurrency}
+                value={basePrice}
+            />
+            <FormattedMessage
+                defaultMessage="ea"
+                description="Abbreviated 'each', follows price per item, like $10/ea"
+            />
+        </Text>
+    )
+}
+
+PricePerItem.propTypes = {
+    currency: PropTypes.string,
+    basket: PropTypes.object,
+    basePrice: PropTypes.string
+}
 
 /**
  * In the context of a cart product item variant, this component renders the item's
  * pricing, taking into account applied discounts as well as base item prices.
  */
-const ItemPrice = ({currency, ...props}) => {
+const ItemPrice = ({currency, align = 'right', baseDirection = 'column', ...props}) => {
     const variant = useCartItemVariant()
     const basket = useBasket()
 
@@ -31,15 +55,20 @@ const ItemPrice = ({currency, ...props}) => {
 
     return (
         <Stack
-            textAlign="right"
-            direction={hasDiscount ? 'column' : 'row'}
-            justifyContent="flex-end"
+            textAlign={align}
+            direction={hasDiscount ? 'column' : {base: baseDirection, lg: 'row'}}
+            justifyContent={align === 'left' ? 'flex-start' : 'flex-end'}
             alignItems="baseline"
             spacing={hasDiscount ? 0 : 1}
             wrap="row"
             {...props}
         >
-            <Text fontWeight="bold">
+            {basePrice && price !== basePrice && (
+                <HideOnDesktop>
+                    <PricePerItem currency={currency} basePrice={basePrice} basket={basket} />
+                </HideOnDesktop>
+            )}
+            <Text fontWeight="bold" lineHeight={{base: '0.5', lg: '24px'}}>
                 <FormattedNumber
                     style="currency"
                     currency={currency || basket.currency || defaultLocaleCurrency}
@@ -64,24 +93,18 @@ const ItemPrice = ({currency, ...props}) => {
             </Text>
 
             {basePrice && price !== basePrice && (
-                <Text fontSize="14px">
-                    <FormattedNumber
-                        style="currency"
-                        currency={currency || basket.currency || defaultLocaleCurrency}
-                        value={basePrice}
-                    />
-                    <FormattedMessage
-                        defaultMessage="ea"
-                        description="Abbreviated 'each', follows price per item, like $10/ea"
-                    />
-                </Text>
+                <HideOnMobile>
+                    <PricePerItem currency={currency} basePrice={basePrice} basket={basket} />
+                </HideOnMobile>
             )}
         </Stack>
     )
 }
 
 ItemPrice.propTypes = {
-    currency: PropTypes.string
+    currency: PropTypes.string,
+    align: PropTypes.string,
+    baseDirection: PropTypes.string
 }
 
 export default ItemPrice

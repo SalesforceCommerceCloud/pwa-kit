@@ -7,7 +7,7 @@
 
 /* eslint-disable no-unused-vars */
 import React from 'react'
-import {screen, within, waitForElementToBeRemoved} from '@testing-library/react'
+import {screen, within, fireEvent, waitFor} from '@testing-library/react'
 import {renderWithProviders} from '../../utils/test-utils'
 import Cart from './index'
 import userEvent from '@testing-library/user-event'
@@ -158,7 +158,8 @@ test('Can update item quantity in the cart', async () => {
             {
                 ...mockedBasketResponse.productItems[0],
                 quantity: 3,
-                id: mockedBasketResponse.productItems[0].item_id
+                id: mockedBasketResponse.productItems[0].item_id,
+                stepQuantity: 1
             }
         ]
     }
@@ -166,13 +167,17 @@ test('Can update item quantity in the cart', async () => {
     const cartItem = await screen.findByTestId(
         `sf-cart-item-${mockedBasketResponse.productItems[0].productId}`
     )
-    expect(within(cartItem).getByRole('combobox')).toHaveValue('2')
+
+    expect(await within(cartItem).getByDisplayValue('2'))
+
+    const incrementButton = await within(cartItem).findByTestId('quantity-increment')
 
     // update item quantity
-    userEvent.selectOptions(within(cartItem).getByRole('combobox'), ['3'])
+    fireEvent.mouseDown(incrementButton)
 
-    await waitForElementToBeRemoved(() => screen.getByText(/loading\.\.\./i))
-    expect(await within(cartItem).getByRole('combobox')).toHaveValue('3')
+    await waitFor(() => {
+        expect(within(cartItem).getByDisplayValue('3'))
+    })
 })
 
 test('Can update item quantity from product view modal', async () => {
@@ -194,17 +199,22 @@ test('Can update item quantity from product view modal', async () => {
     const cartItem = await screen.findByTestId(
         `sf-cart-item-${mockedBasketResponse.productItems[0].productId}`
     )
-    expect(within(cartItem).getByRole('combobox')).toHaveValue('2')
+
     const editCartButton = within(cartItem).getByRole('button', {name: 'Edit'})
     userEvent.click(editCartButton)
     const productView = screen.getByTestId('product-view')
     expect(productView).toBeInTheDocument()
     // update item quantity
-    userEvent.selectOptions(within(productView).getByRole('combobox'), ['3'])
-    userEvent.click(within(productView).getAllByText(/Update/)[0])
+    expect(await within(cartItem).getByDisplayValue('2'))
 
-    await waitForElementToBeRemoved(() => screen.getByText(/loading\.\.\./i))
-    expect(await within(cartItem).getByRole('combobox')).toHaveValue('3')
+    const incrementButton = await within(cartItem).findByTestId('quantity-increment')
+
+    // update item quantity
+    fireEvent.mouseDown(incrementButton)
+
+    await waitFor(() => {
+        expect(within(cartItem).getByDisplayValue('3'))
+    })
 })
 
 test('Can remove item from the cart', async () => {
