@@ -6,7 +6,7 @@
  */
 import {useContext, useMemo} from 'react'
 import {useCommerceAPI, CustomerProductListsContext} from '../contexts'
-import {isError} from '../utils'
+import {isError, handleAsyncError} from '../utils'
 import useCustomer from './useCustomer'
 
 /**
@@ -45,27 +45,21 @@ export function useCustomerProductLists() {
             /**
              * Get customer's product lists.
              */
-            async getLists() {
-                const response = await api.shopperCustomers.getCustomerProductLists({
+            getLists: handleAsyncError(() => {
+                return api.shopperCustomers.getCustomerProductLists({
                     parameters: {
                         customerId: customer.customerId
                     }
                 })
-
-                if (isError(response)) {
-                    throw new Error(response)
-                }
-
-                return response
-            },
+            }),
 
             /**
              * Create a new product list.
              * @param {string} name
              * @param {options} object
              */
-            async createList(name, options) {
-                const response = await api.shopperCustomers.createCustomerProductList({
+            createList: handleAsyncError((name, options) => {
+                return api.shopperCustomers.createCustomerProductList({
                     body: {
                         ...options,
                         name
@@ -74,41 +68,29 @@ export function useCustomerProductLists() {
                         customerId: customer.customerId
                     }
                 })
-
-                if (isError(response)) {
-                    throw new Error(response)
-                }
-
-                return response
-            },
+            }),
 
             /**
              * Get a specific product list by id.
              * @param {string} listId
              */
-            async getList(listId) {
-                const response = await api.shopperCustomers.getCustomerProductList({
+            getList: handleAsyncError((listId) => {
+                return api.shopperCustomers.getCustomerProductList({
                     parameters: {
                         customerId: customer.customerId,
                         listId
                     }
                 })
-
-                if (isError(response)) {
-                    throw new Error(response)
-                }
-
-                return response
-            },
+            }),
 
             /**
              * Adds an item to the customer's product list.
              * @param {string} listId
              * @param {Object} item item to be added to the list.
              */
-            async createListItem(listId, item) {
+            createListItem: handleAsyncError((listId, item) => {
                 const {id, quantity} = item
-                const response = await api.shopperCustomers.createCustomerProductListItem({
+                return api.shopperCustomers.createCustomerProductListItem({
                     body: {
                         productId: id,
                         quantity,
@@ -121,13 +103,7 @@ export function useCustomerProductLists() {
                         listId
                     }
                 })
-
-                if (isError(response)) {
-                    throw new Error(response)
-                }
-
-                return response
-            },
+            }),
 
             /**
              * Update an item in a customer product list
@@ -137,9 +113,9 @@ export function useCustomerProductLists() {
              * @param {string} item.id the id of the item in the product list
              * @param {number} item.quantity the quantity of the item
              */
-            async updateListItem(listId, item) {
+            updateListItem: handleAsyncError((listId, item) => {
                 const {id, quantity} = item
-                const response = await api.shopperCustomers.updateCustomerProductListItem({
+                return api.shopperCustomers.updateCustomerProductListItem({
                     body: {
                         id,
                         quantity,
@@ -152,13 +128,7 @@ export function useCustomerProductLists() {
                         itemId: item.id
                     }
                 })
-
-                if (isError(response)) {
-                    throw new Error(response)
-                }
-
-                return response
-            },
+            }),
 
             /**
              * Remove an item from a customer product list
@@ -166,8 +136,8 @@ export function useCustomerProductLists() {
              * @param {string} listId id of the list to update the item in
              * @param {string} itemId the id of the item in the product list
              */
-            async removeListItem(listId, itemId) {
-                const response = await api.shopperCustomers.deleteCustomerProductListItem(
+            removeListItem: handleAsyncError((listId, itemId) => {
+                return api.shopperCustomers.deleteCustomerProductListItem(
                     {
                         parameters: {
                             itemId,
@@ -177,17 +147,25 @@ export function useCustomerProductLists() {
                     },
                     true
                 )
-
-                if (isError(response)) {
-                    throw new Error(response)
-                }
-
-                return response
-            }
+            })
         }
     }, [customer.customerId, state])
     return self
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 /**
  * This hook is the "child class" of useCustomerProductLists.
