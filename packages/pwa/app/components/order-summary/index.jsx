@@ -56,7 +56,7 @@ const CartItems = ({basket}) => {
                                     <Stack spacing={1} marginTop="-3px">
                                         <CartItemVariantName />
                                         <CartItemVariantAttributes includeQuantity />
-                                        <CartItemVariantPrice />
+                                        <CartItemVariantPrice baseDirection="row" />
                                     </Stack>
                                 </Flex>
                             </CartItemVariant>

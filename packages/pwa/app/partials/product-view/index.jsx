@@ -18,7 +18,6 @@ import {
     Box,
     Text,
     VStack,
-    Select,
     Fade,
     useDisclosure,
     useTheme
@@ -38,6 +37,7 @@ import {Skeleton as ImageGallerySkeleton} from '../../components/image-gallery'
 import AddToCartModal from '../../components/add-to-cart-modal'
 import RecommendedProducts from '../../components/recommended-products'
 import {HideOnDesktop, HideOnMobile} from '../../components/responsive'
+import QuantityPicker from '../../components/quantity-picker'
 
 const ProductViewHeader = ({name, price, currency, category}) => {
     const intl = useIntl()
@@ -107,15 +107,20 @@ const ProductView = ({
         showInventoryMessage,
         inventoryMessage,
         quantity,
+        minOrderQuantity,
         setQuantity,
         variant,
         variationParams,
         variationAttributes,
-        stepQuantity,
-        stockLevel
+        stockLevel,
+        stepQuantity
     } = useProduct(product)
     const canAddToWishlist = !isProductLoading
-    const canOrder = !isProductLoading && variant?.orderable && quantity <= stockLevel
+    const canOrder =
+        !isProductLoading &&
+        variant?.orderable &&
+        parseInt(quantity) > 0 &&
+        parseInt(quantity) <= stockLevel
 
     const renderActionButtons = () => {
         const buttons = []
@@ -303,27 +308,45 @@ const ProductView = ({
                         )}
 
                         {/* Quantity Selector */}
-                        <VStack align="stretch" maxWidth={'125px'}>
-                            <Box fontWeight="600">
-                                {intl.formatMessage({
-                                    defaultMessage: 'Quantity'
-                                })}
-                                :
+                        <VStack align="stretch" maxWidth={'200px'}>
+                            <Box fontWeight="bold">
+                                <label htmlFor="quantity">
+                                    {intl.formatMessage({
+                                        defaultMessage: 'Quantity'
+                                    })}
+                                    :
+                                </label>
                             </Box>
-                            <Select
+
+                            <QuantityPicker
+                                id="quantity"
+                                step={stepQuantity}
                                 value={quantity}
-                                onChange={({target}) => {
-                                    setQuantity(parseInt(target.value))
+                                min={minOrderQuantity}
+                                onChange={(stringValue, numberValue) => {
+                                    // Set the Quantity of product to value of input if value number
+                                    if (numberValue >= 0) {
+                                        setQuantity(numberValue)
+                                    } else if (stringValue === '') {
+                                        // We want to allow the use to clear the input to start a new input so here we set the quantity to '' so NAN is not displayed
+                                        // User will not be able to add '' qauntity to the cart due to the add to cart button enablement rules
+                                        setQuantity(stringValue)
+                                    }
                                 }}
-                            >
-                                {new Array(Math.floor(stockLevel / stepQuantity))
-                                    .fill(0)
-                                    .map((_, index) => (
-                                        <option key={index} value={(index + 1) * stepQuantity}>
-                                            {(index + 1) * stepQuantity}
-                                        </option>
-                                    ))}
-                            </Select>
+                                onBlur={(e) => {
+                                    // Default to 1the `minOrderQuantity` if a user leaves the box with an invalid value
+                                    const value = e.target.value
+                                    if (parseInt(value) < 0 || value === '') {
+                                        setQuantity(minOrderQuantity)
+                                    }
+                                }}
+                                onFocus={(e) => {
+                                    // This is useful for mobile devices, this allows the user to pop open the keyboard and set the
+                                    // new quantity with one click. NOTE: This is something that can be refactored into the parent
+                                    // component, potentially as a prop called `selectInputOnFocus`.
+                                    e.target.select()
+                                }}
+                            />
                         </VStack>
                         <HideOnDesktop>
                             {showFullLink && product && (
