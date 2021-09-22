@@ -165,8 +165,7 @@ const ProductList = (props) => {
             await wishlist.removeItemByProductId(product.productId)
             toast({
                 title: formatMessage({defaultMessage: 'Item removed from wishlist'}),
-                status: 'success',
-                id: product.productId
+                status: 'success'
             })
         } catch {
             toast({
