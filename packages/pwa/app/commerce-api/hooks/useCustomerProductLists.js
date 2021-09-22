@@ -231,25 +231,35 @@ export default function useCustomerProductLists() {
                     return undefined
                 }
                 return Object.values(self.data).find((list) => list.name === name)
+            },
+
+            /**
+             * Find the product list by its id.
+             * @param {string} id
+             * @returns {object} customer product list
+             */
+            findListById(id) {
+                if (!self.data) {
+                    return undefined
+                }
+                return Object.values(self.data).find((list) => list.id === id)
+            },
+
+            /**
+             * Find the item from list.
+             * @param {string} listId
+             * @param {string} productId
+             * @returns {object} product list item
+             */
+            findItem(listId, productId) {
+                return self
+                    .findListById(listId)
+                    ?.customerProductListItems?.find((item) => item.productId === productId)
             }
         }
     }, [customer.customerId, state])
     return self
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 /**
  * This hook is the "child class" of useCustomerProductLists.

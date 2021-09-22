@@ -45,6 +45,15 @@ const useWishlist = () => {
                 const result = cpl.mergeProductDetailsIntoList(wishlist, productDetails)
                 result.isInitialized = true
                 cpl.actions.receiveList(result)
+            },
+
+            /**
+             * Find the item from wishlist.
+             * @param {string} productId
+             * @returns {object} product list item
+             */
+            findItem(productId) {
+                return self.items.find((item) => item.productId === productId)
             }
         }
     }, [cpl])
