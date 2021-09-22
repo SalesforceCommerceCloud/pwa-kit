@@ -35,7 +35,7 @@ export function useCustomerProductLists() {
             data: state.productLists,
 
             get isInitialized() {
-                return Object.keys(state.productLists).length === 0
+                return state.productLists !== undefined
             },
 
             reset() {
@@ -202,9 +202,10 @@ export function useCustomerProductList(name, options = {}) {
 
     const self = useMemo(() => {
         return {
-            reset: customerProductLists.reset,
-
             get data() {
+                if (!customerProductLists.isInitialized) {
+                    return undefined
+                }
                 return Object.values(customerProductLists.data).find((list) => list.name === name)
             },
 
@@ -214,6 +215,10 @@ export function useCustomerProductList(name, options = {}) {
 
             get isEmpty() {
                 return !self.data?.customerProductListItems?.length
+            },
+
+            reset() {
+                actions.receiveList({id: self.data.id})
             },
 
             findItemByProductId(productId) {

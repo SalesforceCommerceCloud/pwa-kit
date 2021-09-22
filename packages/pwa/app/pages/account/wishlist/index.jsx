@@ -66,6 +66,17 @@ const AccountWishlist = () => {
 
     useEffect(() => {
         if (customer.isRegistered) {
+            // We want to reset the wishlist here
+            // because it is possible that a user
+            // adds an item to the wishlist on another page
+            // and the wishlist page may not have enough
+            // data to render the page.
+            // Reset the wishlist will make sure the
+            // initialization state is correct.
+            if (isInitialized) {
+                wishlist.reset()
+            }
+
             wishlist.init()
         }
     }, [customer.isRegistered])

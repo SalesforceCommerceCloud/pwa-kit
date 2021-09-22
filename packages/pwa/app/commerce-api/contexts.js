@@ -45,10 +45,11 @@ export const CustomerProvider = CustomerContext.Provider
 
 /************ Customer Product Lists ************/
 const CPLInitialValue = {
-    productLists: {
-        // this is a map of product lists
-        // keyed by list id
-    }
+    // this is an object of product lists
+    // keyed by list id, initial state
+    // being undefined indicates the
+    // product lists is not initialized
+    productLists: undefined
 }
 const CPLActionTypes = {
     RECEIVE_LISTS: 'RECEIVE_LISTS',
