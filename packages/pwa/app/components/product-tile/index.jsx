@@ -75,7 +75,7 @@ const ProductTile = (props) => {
                 {enableFavourite && (
                     <IconButtonWithRegistration
                         aria-label={intl.formatMessage({
-                            defaultMessage: 'favourite'
+                            defaultMessage: 'wishlist'
                         })}
                         icon={isFavourite ? <HeartSolidIcon /> : <HeartIcon />}
                         {...styles.favIcon}

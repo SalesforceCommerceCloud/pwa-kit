@@ -22,11 +22,14 @@ import {renderWithProviders} from '../../utils/test-utils'
 import ProductList from '.'
 import EmptySearchResults from './partials/empty-results'
 import useCustomer from '../../commerce-api/hooks/useCustomer'
+import useWishlist from '../../hooks/use-wishlist'
 
 jest.setTimeout(60000)
 let mockCategoriesResponse = mockCategories
 let mockProductListSearchResponse = mockProductSearch
 jest.useFakeTimers()
+
+jest.mock('../../hooks/use-wishlist')
 
 jest.mock('../../commerce-api/utils', () => {
     const originalModule = jest.requireActual('../../commerce-api/utils')
@@ -149,6 +152,12 @@ beforeAll(() => {
 beforeEach(() => {
     jest.resetModules()
     server.listen({onUnhandledRequest: 'error'})
+    useWishlist.mockReturnValue({
+        isInitialized: true,
+        isEmpty: false,
+        data: {},
+        isProductInList: () => {}
+    })
 })
 
 afterEach(() => {
