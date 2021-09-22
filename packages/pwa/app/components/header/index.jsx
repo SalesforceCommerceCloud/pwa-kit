@@ -120,7 +120,7 @@ const Header = ({
                     <IconButton
                         aria-label={intl.formatMessage({
                             defaultMessage: 'Menu',
-                            description: 'icon.assistive_msg'
+                            description: 'icon.assistive_msg.menu'
                         })}
                         icon={<HamburgerIcon />}
                         variant="unstyled"
@@ -131,7 +131,7 @@ const Header = ({
                     <IconButton
                         aria-label={intl.formatMessage({
                             defaultMessage: 'Logo',
-                            description: 'icon.assistive_msg'
+                            description: 'icon.assistive_msg.logo'
                         })}
                         icon={<BrandLogo {...styles.logo} />}
                         {...styles.icons}
@@ -143,7 +143,7 @@ const Header = ({
                         <Search
                             placeholder={intl.formatMessage({
                                 defaultMessage: 'Search for products...',
-                                description: 'search.info'
+                                description: 'search.info.placeholder'
                             })}
                             {...styles.search}
                         />
@@ -158,7 +158,7 @@ const Header = ({
                         onClick={onMyAccountClick}
                         aria-label={intl.formatMessage({
                             defaultMessage: 'My account',
-                            description: 'icon.assistive_msg'
+                            description: 'icon.assistive_msg.my_account'
                         })}
                     />
 
@@ -174,7 +174,8 @@ const Header = ({
                                 <ChevronDownIcon
                                     aria-label={intl.formatMessage({
                                         defaultMessage: 'My account chevron down icon',
-                                        description: 'icon.assistive_msg'
+                                        description:
+                                            'icon.assistive_msg.my_account_chevron_down_icon'
                                     })}
                                     onMouseLeave={handleIconsMouseLeave}
                                     onKeyDown={(e) => {
@@ -201,7 +202,7 @@ const Header = ({
                                     <Text>
                                         {intl.formatMessage({
                                             defaultMessage: 'My Account',
-                                            description: 'icon.assistive_msg'
+                                            description: 'header.heading.my_account'
                                         })}
                                     </Text>
                                 </PopoverHeader>
@@ -232,7 +233,7 @@ const Header = ({
                                             <Text as="span" {...styles.signoutText}>
                                                 {intl.formatMessage({
                                                     defaultMessage: 'Log out',
-                                                    description: 'button'
+                                                    description: 'header.button.log_out'
                                                 })}
                                             </Text>
                                         </Flex>
@@ -244,7 +245,7 @@ const Header = ({
                     <IconButtonWithRegistration
                         aria-label={intl.formatMessage({
                             defaultMessage: 'Wishlist',
-                            description: 'icon.assistive_msg'
+                            description: 'icon.assistive_msg.wishlist'
                         })}
                         icon={<WishlistIcon />}
                         variant="unstyled"
@@ -254,7 +255,7 @@ const Header = ({
                     <IconButton
                         aria-label={intl.formatMessage({
                             defaultMessage: 'My cart',
-                            description: 'icon.assistive_msg'
+                            description: 'icon.assistive_msg.my_cart'
                         })}
                         icon={
                             <>

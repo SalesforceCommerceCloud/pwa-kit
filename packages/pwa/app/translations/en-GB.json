@@ -18,6 +18,10 @@
   "/vJwLB": {
     "defaultMessage": "Please enter your email address"
   },
+  "0OPuwi": {
+    "defaultMessage": "Wishlist",
+    "description": "icon.assistive_msg.wishlist"
+  },
   "0g/1TG": {
     "defaultMessage": "Continue to Payment"
   },
@@ -43,9 +47,6 @@
     "defaultMessage": "Shop Feeling Red",
     "description": "image.info"
   },
-  "25WwxF": {
-    "defaultMessage": "Don't have an account?"
-  },
   "2BHb6K": {
     "defaultMessage": "Applied promotions info"
   },
@@ -60,6 +61,10 @@
   },
   "2bGejb": {
     "defaultMessage": "My Account"
+  },
+  "2l5mcq": {
+    "defaultMessage": "My account",
+    "description": "icon.assistive_msg.my_account"
   },
   "2p8liT": {
     "defaultMessage": "static/img/women-coats.png",
@@ -92,6 +97,10 @@
   "4UPOXx": {
     "defaultMessage": "Confirm Remove Item"
   },
+  "4Vb2xf": {
+    "defaultMessage": "Welcome Back",
+    "description": "login_form.heading.welcome_back"
+  },
   "5BTYa0": {
     "defaultMessage": "View Cart"
   },
@@ -116,10 +125,6 @@
   "6DCLcI": {
     "defaultMessage": "Please enter a valid date"
   },
-  "6mL4UX": {
-    "defaultMessage": "My cart",
-    "description": "icon.assistive_msg"
-  },
   "6yVHs9": {
     "defaultMessage": "wishlist-solid"
   },
@@ -133,15 +138,19 @@
     "defaultMessage": "static/img/men-suits.png",
     "description": "link"
   },
+  "7uS4jV": {
+    "defaultMessage": "Search for products...",
+    "description": "search.info.placeholder"
+  },
+  "7ux8FR": {
+    "defaultMessage": "Forgot password?",
+    "description": "login_form.button.forgot_password"
+  },
   "7xscgD": {
     "defaultMessage": "Delivery Details"
   },
   "8+0PQZ": {
     "defaultMessage": "The page you're looking for can't be found"
-  },
-  "8DygoO": {
-    "defaultMessage": "Menu",
-    "description": "icon.assistive_msg"
   },
   "8d6kio": {
     "defaultMessage": "Sort By"
@@ -166,10 +175,6 @@
   },
   "9rqdrm": {
     "defaultMessage": "Item removed from wishlist"
-  },
-  "9vpo13": {
-    "defaultMessage": "Search for products...",
-    "description": "search.info"
   },
   "A2v4cr": {
     "defaultMessage": "English (United Kingdom)"
@@ -239,6 +244,10 @@
   "DdR2q8": {
     "defaultMessage": "{quantity} {quantity, plural, one {item} other {items}} added to wishlist"
   },
+  "Dr+2FW": {
+    "defaultMessage": "Don't have an account?",
+    "description": "login_form.description.dont_have_an_account"
+  },
   "DwzDiL": {
     "defaultMessage": "Clear recent searches"
   },
@@ -261,6 +270,10 @@
   },
   "F62y+K": {
     "defaultMessage": "Sign Out"
+  },
+  "FkRd7K": {
+    "defaultMessage": "My Account",
+    "description": "header.heading.my_account"
   },
   "Fkpwhy": {
     "defaultMessage": "Payment Methods",
@@ -342,6 +355,10 @@
   },
   "MsGXc3": {
     "defaultMessage": "Clear Filters"
+  },
+  "MsvQlx": {
+    "defaultMessage": "Menu",
+    "description": "icon.assistive_msg.menu"
   },
   "Mv2pEb": {
     "defaultMessage": "Continue shopping and add items to your wishlist"
@@ -492,10 +509,6 @@
   "V8WZRT": {
     "defaultMessage": "Continue shopping to add items to your cart"
   },
-  "VR4muK": {
-    "defaultMessage": "Wishlist",
-    "description": "icon.assistive_msg"
-  },
   "VSlYv6": {
     "defaultMessage": "Quantity:"
   },
@@ -553,6 +566,10 @@
     "defaultMessage": "static/img/feeling-red.png",
     "description": "link"
   },
+  "Zd02Xe": {
+    "defaultMessage": "Log out",
+    "description": "header.button.log_out"
+  },
   "Zhsl4Z": {
     "defaultMessage": "Back to Order History"
   },
@@ -566,15 +583,16 @@
   "aheQdn": {
     "defaultMessage": "Last Name"
   },
+  "aiBOyf": {
+    "defaultMessage": "My cart",
+    "description": "icon.assistive_msg.my_cart"
+  },
   "au3Vns": {
     "defaultMessage": "{itemCount, plural, =0 {0 items} one {# item} other {# items}}",
     "description": "# item(s) in order"
   },
   "b24hho": {
     "defaultMessage": "Chinese (China)"
-  },
-  "bTjwXj": {
-    "defaultMessage": "Welcome Back"
   },
   "bhUBy4": {
     "defaultMessage": "Save & Continue to Shipping Method"
@@ -608,6 +626,10 @@
   },
   "cUwO+6": {
     "defaultMessage": "Add New Card"
+  },
+  "cf7J4T": {
+    "defaultMessage": "My account chevron down icon",
+    "description": "icon.assistive_msg.my_account_chevron_down_icon"
   },
   "cqlObT": {
     "defaultMessage": "Clear All"
@@ -718,6 +740,10 @@
   },
   "hCj9FS": {
     "defaultMessage": "Please enter your name as shown on your card"
+  },
+  "hMt9hl": {
+    "defaultMessage": "Create account",
+    "description": "login_form.button.create_account"
   },
   "hp3uqR": {
     "defaultMessage": "Wishlist"
@@ -851,10 +877,6 @@
   "offline_banner.message": {
     "defaultMessage": "You're currently browsing in offline mode"
   },
-  "ofxZFr": {
-    "defaultMessage": "Logo",
-    "description": "icon.assistive_msg"
-  },
   "p2EAP0": {
     "defaultMessage": "Promotion removed"
   },
@@ -895,24 +917,8 @@
   "qGl7SR": {
     "defaultMessage": "Please create a password"
   },
-  "qKRULX": {
-    "defaultMessage": "My account",
-    "description": "icon.assistive_msg"
-  },
-  "qLbse5": {
-    "defaultMessage": "Log out",
-    "description": "button"
-  },
   "qVGRIE": {
     "defaultMessage": "Quantity"
-  },
-  "rN9eS+": {
-    "defaultMessage": "My Account",
-    "description": "icon.assistive_msg"
-  },
-  "raTmyJ": {
-    "defaultMessage": "My Account Icon",
-    "description": "icon.assistive_msg"
   },
   "rc7KYy": {
     "defaultMessage": "Lighter layers for lighter days.",
@@ -930,6 +936,10 @@
   },
   "sy+pv5": {
     "defaultMessage": "Email"
+  },
+  "tANUBZ": {
+    "defaultMessage": "Logo",
+    "description": "icon.assistive_msg.logo"
   },
   "tf1lIh": {
     "defaultMessage": "Free"
@@ -985,6 +995,10 @@
   "wkj0+G": {
     "defaultMessage": "New Arrivals",
     "description": "image.info"
+  },
+  "wzQjyU": {
+    "defaultMessage": "Sign in",
+    "description": "login_form.button.sign_in"
   },
   "x6hxSH": {
     "defaultMessage": "Something's not right with your email or password. Try again."
