@@ -46,6 +46,7 @@ const AddToCartModal = ({product, variant, quantity, isOpen, onClose, ...props})
         viewType: 'small',
         selectedVariationAttributes: variationValues
     })?.images?.[0]
+    const defaultLocaleCurrency = getCurrency(DEFAULT_LOCALE)
 
     return (
         <Modal size={size} isOpen={isOpen} onClose={onClose} {...props}>
@@ -113,7 +114,7 @@ const AddToCartModal = ({product, variant, quantity, isOpen, onClose, ...props})
                                         {!!lineItemPrice &&
                                             intl.formatNumber(lineItemPrice, {
                                                 style: 'currency',
-                                                currency: currency || getCurrency(DEFAULT_LOCALE)
+                                                currency: currency || defaultLocaleCurrency
                                             })}
                                     </Text>
                                 </Box>
@@ -138,7 +139,7 @@ const AddToCartModal = ({product, variant, quantity, isOpen, onClose, ...props})
                                     {productSubTotal &&
                                         intl.formatNumber(productSubTotal, {
                                             style: 'currency',
-                                            currency: currency || getCurrency(DEFAULT_LOCALE)
+                                            currency: currency || defaultLocaleCurrency
                                         })}
                                 </Text>
                             </Flex>

@@ -183,6 +183,12 @@
         "last 4 ChromeAndroid versions"
     ],
     "l10n": {
+        "supportedCurrencies": [
+            "GBP",
+            "EUR",
+            "CNY",
+            "JPY"
+        ],
         "supportedLocales": [
             {
                 "id": "en-GB",
@@ -205,12 +211,6 @@
                 "preferredCurrency": "JPY"
             }
         ],
-        "defaultLocale": "en-GB",
-        "supportedCurrencies": [
-            "GBP",
-            "EUR",
-            "CNY",
-            "JPY"
-        ]
+        "defaultLocale": "en-GB"
     }
 }

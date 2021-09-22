@@ -90,8 +90,8 @@ export default function useBasket(opts = {}) {
 
             /**
              * Update the currency of the basket
-             * @param currency
-             * @param basketID
+             * @param currency - The currency code.
+             * @param basketID - The id of the basket.
              * @returns {Promise<void>}
              */
             async updateBasketCurrency(currency, basketId) {

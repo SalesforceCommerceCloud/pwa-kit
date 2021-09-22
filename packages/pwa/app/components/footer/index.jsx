@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React from 'react'
+import React, {useState} from 'react'
 import PropTypes from 'prop-types'
 import {
     Box,
@@ -34,6 +34,7 @@ import {buildUrlLocale} from '../../utils/url'
 const Footer = ({...otherProps}) => {
     const styles = useMultiStyleConfig('Footer')
     const intl = useIntl()
+    const [locale, setLocale] = useState(intl.locale)
 
     return (
         <Box as="footer" {...styles.container} {...otherProps}>
@@ -125,8 +126,10 @@ const Footer = ({...otherProps}) => {
                             {...otherProps}
                         >
                             <Select
-                                value={intl.locale}
+                                value={locale}
                                 onChange={({target}) => {
+                                    setLocale(target.value)
+
                                     // Update the `locale` in the URL.
                                     const newUrl = buildUrlLocale(intl.locale, target.value)
                                     window.location = newUrl

@@ -27,6 +27,8 @@ const ItemPrice = ({currency, ...props}) => {
 
     const hasDiscount = displayPrice !== price
 
+    const defaultLocaleCurrency = getCurrency(DEFAULT_LOCALE)
+
     return (
         <Stack
             textAlign="right"
@@ -40,7 +42,7 @@ const ItemPrice = ({currency, ...props}) => {
             <Text fontWeight="bold">
                 <FormattedNumber
                     style="currency"
-                    currency={currency || basket.currency || getCurrency(DEFAULT_LOCALE)}
+                    currency={currency || basket.currency || defaultLocaleCurrency}
                     value={displayPrice}
                 />
                 {hasDiscount && (
@@ -54,7 +56,7 @@ const ItemPrice = ({currency, ...props}) => {
                     >
                         <FormattedNumber
                             style="currency"
-                            currency={currency || basket.currency || getCurrency(DEFAULT_LOCALE)}
+                            currency={currency || basket.currency || defaultLocaleCurrency}
                             value={price}
                         />
                     </Text>
@@ -65,7 +67,7 @@ const ItemPrice = ({currency, ...props}) => {
                 <Text fontSize="14px">
                     <FormattedNumber
                         style="currency"
-                        currency={currency || basket.currency || getCurrency(DEFAULT_LOCALE)}
+                        currency={currency || basket.currency || defaultLocaleCurrency}
                         value={basePrice}
                     />
                     <FormattedMessage

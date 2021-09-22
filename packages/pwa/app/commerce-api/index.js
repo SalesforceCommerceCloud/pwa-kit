@@ -79,53 +79,35 @@ class CommerceAPI {
         const apiConfigs = {
             shopperCustomers: {
                 api: sdk.ShopperCustomers,
-                useLocale: false,
-                useCurrency: []
+                sendLocale: false,
+                sendCurrency: []
             },
             shopperBaskets: {
                 api: OcapiShopperBaskets,
-                useLocale: false,
-                //TODO: Clean up the calls that accept `currency` param or doesn't complain if we add it
-                useCurrency: [
-                    'createBasket',
-                    'addItemToBasket',
-                    'addToBasket',
-                    'updateItemInBasket',
-                    'removeItemFromBasket',
-                    'addPaymentInstrumentToBasket',
-                    'removePaymentInstrumentFromBasket',
-                    'getPaymentMethodsForShipment',
-                    'getShippingMethodsForShipment',
-                    'updateBillingAddressForBasket',
-                    'updateShippingAddressForShipment',
-                    'updateShippingMethodForShipment',
-                    'updateCustomerForBasket',
-                    'deleteBasket',
-                    'addCouponToBasket',
-                    'removeCouponFromBasket'
-                ]
+                sendLocale: false,
+                sendCurrency: ['createBasket']
             },
             shopperGiftCertificates: {
                 api: sdk.ShopperGiftCertificates,
-                useLocale: true,
-                useCurrency: []
+                sendLocale: true,
+                sendCurrency: []
             },
-            shopperLogin: {api: sdk.ShopperLogin, useLocale: false, useCurrency: []},
-            shopperOrders: {api: OcapiShopperOrders, useLocale: true, useCurrency: []},
+            shopperLogin: {api: sdk.ShopperLogin, sendLocale: false, sendCurrency: []},
+            shopperOrders: {api: OcapiShopperOrders, sendLocale: true, sendCurrency: []},
             shopperProducts: {
                 api: sdk.ShopperProducts,
-                useLocale: true,
-                useCurrency: ['getProduct', 'getProducts']
+                sendLocale: true,
+                sendCurrency: ['getProduct', 'getProducts']
             },
             shopperPromotions: {
                 api: sdk.ShopperPromotions,
-                useLocale: true,
-                useCurrency: []
+                sendLocale: true,
+                sendCurrency: []
             },
             shopperSearch: {
                 api: sdk.ShopperSearch,
-                useLocale: true,
-                useCurrency: ['productSearch', 'getSearchSuggestions']
+                sendLocale: true,
+                sendCurrency: ['productSearch', 'getSearchSuggestions']
             }
         }
 
@@ -152,21 +134,18 @@ class CommerceAPI {
                                     // Inject the locale and currency to the API call via it's parameters.
                                     //
                                     // NOTE: The commerce sdk isomorphic will complain if you pass parameters to
-                                    // it that it doesn't expect, this is why we only add the local to some of
-                                    // the API calls.
+                                    // it that it doesn't expect, this is why we only add the locale and currency
+                                    // to some of the API calls.
                                     // We use the default locale for the API calls when running the app using the
                                     // pseudo locale 'en-XB'.
                                     newArgs[0].parameters = {
                                         ...newArgs[0].parameters,
                                         ...(locale &&
                                         locale !== 'en-XB' &&
-                                        apiConfigs[key].useLocale
+                                        apiConfigs[key].sendLocale
                                             ? {locale}
                                             : {}),
-                                        ...((currency &&
-                                            apiConfigs[key].useCurrency.includes(prop)) ||
-                                        key === 'shopperPromotions' ||
-                                        key === 'shopperSearch'
+                                        ...(currency && apiConfigs[key].sendCurrency.includes(prop)
                                             ? {currency}
                                             : {})
                                     }
