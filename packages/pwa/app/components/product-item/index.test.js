@@ -32,5 +32,4 @@ test('renders product item name, attributes and price', () => {
     expect(screen.getByText(/apple ipod nano/i)).toBeInTheDocument()
     expect(screen.getByText(/color: green/i)).toBeInTheDocument()
     expect(screen.getByText(/memory size: 16 GB/i)).toBeInTheDocument()
-    expect(screen.getByText(/199/i)).toBeInTheDocument()
 })
