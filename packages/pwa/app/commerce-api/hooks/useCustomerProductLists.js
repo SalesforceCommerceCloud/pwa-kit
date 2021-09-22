@@ -103,8 +103,7 @@ export default function useCustomerProductLists() {
                     return list
                 }
 
-                const {id} = await self.createList(name, type)
-                return self.getList(id)
+                return self.createList(name, type)
             },
 
             /**
@@ -228,6 +227,9 @@ export default function useCustomerProductLists() {
              * @returns {object} customer product list
              */
             findListByName(name) {
+                if (!self.data) {
+                    return undefined
+                }
                 return Object.values(self.data).find((list) => list.name === name)
             }
         }

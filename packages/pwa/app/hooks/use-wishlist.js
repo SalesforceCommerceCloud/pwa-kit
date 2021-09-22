@@ -29,7 +29,7 @@ const useWishlist = () => {
             const wishlist = await cpl.getOrCreateList(PWA_DEFAULT_WISHLIST_NAME, PWA_DEFAULT_WISHLIST_TYPE)
             const productDetails = await cpl.getProductDetails(wishlist)
             const result = cpl.mergeProductDetailsIntoList(wishlist, productDetails)
-            result.isInitialized = true
+            // result.isInitialized = true
             cpl.actions.receiveList(result)
         },
     }
