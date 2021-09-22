@@ -173,7 +173,7 @@ const Header = ({
                             <PopoverTrigger>
                                 <ChevronDownIcon
                                     aria-label={intl.formatMessage({
-                                        defaultMessage: 'My Account Icon',
+                                        defaultMessage: 'My account chevron down icon',
                                         description: 'icon.assistive_msg'
                                     })}
                                     onMouseLeave={handleIconsMouseLeave}

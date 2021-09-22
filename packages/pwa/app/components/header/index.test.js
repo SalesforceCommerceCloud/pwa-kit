@@ -222,7 +222,9 @@ test('route to account page when an authenticated users click on account icon', 
 
     await waitFor(() => {
         // Look for account icon
-        const accountTrigger = document.querySelector('svg[aria-label="My account trigger"]')
+        const accountTrigger = document.querySelector(
+            'svg[aria-label="My account chevron down icon"]'
+        )
         expect(accountTrigger).toBeInTheDocument()
     })
     const accountIcon = document.querySelector('svg[aria-label="My account"]')
@@ -273,7 +275,9 @@ test('route to wishlist page when an authenticated users click on wishlist icon'
 
     await waitFor(() => {
         // Look for account icon
-        const accountTrigger = document.querySelector('svg[aria-label="My account trigger"]')
+        const accountTrigger = document.querySelector(
+            'svg[aria-label="My account chevron down icon"]'
+        )
         expect(accountTrigger).toBeInTheDocument()
     })
     const wishlistIcon = document.querySelector('button[aria-label="Wishlist"]')
@@ -324,7 +328,9 @@ test('shows dropdown menu when an authenticated users hover on the account icon'
 
     await waitFor(() => {
         // Look for account icon
-        const accountTrigger = document.querySelector('svg[aria-label="My account trigger"]')
+        const accountTrigger = document.querySelector(
+            'svg[aria-label="My account chevron down icon"]'
+        )
         expect(accountTrigger).toBeInTheDocument()
         expect(screen.getByText('My Account')).toBeInTheDocument()
     })
