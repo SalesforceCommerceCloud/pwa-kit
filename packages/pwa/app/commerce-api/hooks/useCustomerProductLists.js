@@ -25,13 +25,14 @@ import useCustomer from './useCustomer'
  *
  * This Hook only works when your components are wrapped in CustomerProductListProvider.
  */
-export function useCustomerProductLists() {
+export default function useCustomerProductLists() {
     const api = useCommerceAPI()
     const customer = useCustomer()
     const {state, actions} = useContext(CustomerProductListsContext)
 
     const self = useMemo(() => {
         return {
+            actions,
             data: state.productLists,
 
             get isInitialized() {
@@ -56,12 +57,12 @@ export function useCustomerProductLists() {
             /**
              * Create a new product list.
              * @param {string} name
-             * @param {options} object
+             * @param {string} type
              */
-            createList: handleAsyncError((name, options) => {
+            createList: handleAsyncError((name, type) => {
                 return api.shopperCustomers.createCustomerProductList({
                     body: {
-                        ...options,
+                        type,
                         name
                     },
                     parameters: {
@@ -82,6 +83,28 @@ export function useCustomerProductLists() {
                     }
                 })
             }),
+
+            /**
+             * Get a product list for the registered user or
+             * creates a new list if none exists, due to the api
+             * limitation, we can not filter the lists based on
+             * name/type, therefore it fetches all lists.
+             * @param {string} name
+             * @param {string} type
+             */
+            getOrCreateList: async (name, type) => {
+                let response = await self.getLists()
+
+                // Note: if list is empty, the API response
+                // does NOT contain the "data" key.
+                const list = response.data?.find((list) => list.name === name)
+                if (list) {
+                    return list
+                }
+
+                const {id} = await self.createList(name, type)
+                return self.getList(id)
+            },
 
             /**
              * Adds an item to the customer's product list.
@@ -147,7 +170,56 @@ export function useCustomerProductLists() {
                     },
                     true
                 )
-            })
+            }),
+
+            /**
+             * Get all item details for a product list.
+             * @param {object} list product list
+             * @param {array} list.customerProductListItems items array
+             * @returns {Object[]} list of item details
+             */
+            getProductDetails: handleAsyncError((list) => {
+                // Warning, there is a weird API behavior
+                // where if the product list is newly created
+                // the "customerProductListItems" key will be missing
+                // from the response, so we need to guard it.
+                if (!list.customerProductListItems) {
+                    return
+                }
+
+                const ids = list.customerProductListItems.map((item) => item.productId)
+                return api.shopperProducts.getProducts({
+                    parameters: {
+                        ids: ids.join(',')
+                    }
+                })
+            }),
+
+            /**
+             * The customer product list API does NOT return the
+             * product item details, this utility function is used
+             * when you fetch the item details manually and insert
+             * into the lists.
+             * This function is often used with getProductDetails.
+             */
+            mergeProductDetailsIntoList(list, productDetails) {
+                list.customerProductListItems = list.customerProductListItems?.map((item) => {
+                    const product = {
+                        ...productDetails.data.find((product) => product.id === item.productId)
+                    }
+                    return {
+                        ...product,
+                        ...item,
+
+                        // Both customer product list and the product detail API returns 'type'
+                        // but the type can be different depending on the API endpoint
+                        // We use the type from product detail endpoint, this is mainly used
+                        // to determine whether the product is a master or a variant.
+                        type: product.type
+                    }
+                })
+                return list
+            }
         }
     }, [customer.customerId, state])
     return self
@@ -278,7 +350,7 @@ export function useCustomerProductList(name, options = {}) {
             /**
              * Fetch list of product details from a product list.
              * The maximum number of productIDs that can be requested are 24.
-             * @param {array} list product list
+             * @param {object} list product list
              * @returns {Object[]} list of product details for requested productIds
              */
             async _getProductDetails(list) {

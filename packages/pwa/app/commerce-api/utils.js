@@ -252,8 +252,8 @@ export const isError = (jsonResponse) => {
  * @returns {function}
  */
 export const handleAsyncError = (func) => {
-    return async () => {
-        const result = await func()
+    return async (...args) => {
+        const result = await func(...args)
         if (isError(result)) {
             throw new Error(result.detail)
         }
