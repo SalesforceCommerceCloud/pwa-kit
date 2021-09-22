@@ -64,9 +64,9 @@ export const CustomerProductListsProvider = ({children}) => {
     const [state, dispatch] = useReducer((state, {type, payload}) => {
         switch (type) {
             case CPLActionTypes.RECEIVE_LISTS: {
-                const productLists = payload.reduce((prev, curr) => {
+                const productLists = payload.reduce((acc, curr) => {
                     return {
-                        ...prev,
+                        ...acc,
                         [curr.id]: curr
                     }
                 }, {})
