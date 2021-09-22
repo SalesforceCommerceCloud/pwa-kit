@@ -16,11 +16,11 @@ import {
 import {noop} from '../../utils/utils'
 
 export const messages = defineMessages({
-    profile: {defaultMessage: 'Account Details'},
-    addresses: {defaultMessage: 'Addresses'},
-    orders: {defaultMessage: 'Order History'},
-    payments: {defaultMessage: 'Payment Methods'},
-    wishlist: {defaultMessage: 'Wishlist'}
+    profile: {defaultMessage: 'Account Details', description: 'link'},
+    addresses: {defaultMessage: 'Addresses', description: 'link'},
+    orders: {defaultMessage: 'Order History', description: 'link'},
+    payments: {defaultMessage: 'Payment Methods', description: 'link'},
+    wishlist: {defaultMessage: 'Wishlist', description: 'link'}
 })
 
 export const navLinks = [

@@ -17,44 +17,66 @@ import {defineMessages} from 'react-intl'
 export const categoriesThreeColumns = [
     {
         message: defineMessages({
-            title: {defaultMessage: "Shop Women's Outfits"},
-            href: {defaultMessage: '/{activeLocale}/category/womens-outfits'},
-            imgSrc: {defaultMessage: 'static/img/women-outfit.png'},
-            imgAlt: {defaultMessage: "Shop Women's Outfits"}
+            title: {defaultMessage: "Shop Women's Outfits", description: 'tile.title'},
+            // this line does not need translation
+            href: {defaultMessage: '/{activeLocale}/category/womens-outfits', description: 'link'},
+            // this line does not need translation
+            imgSrc: {defaultMessage: 'static/img/women-outfit.png', description: 'link'},
+            imgAlt: {defaultMessage: "Shop Women's Outfits", description: 'image.info'}
         })
     },
     {
         message: defineMessages({
-            title: {defaultMessage: "Shop Men's Suits"},
-            href: {defaultMessage: '/{activeLocale}/category/mens-clothing-suits'},
-            imgSrc: {defaultMessage: 'static/img/men-suits.png'},
-            imgAlt: {defaultMessage: "Shop Men's Suits"}
+            title: {defaultMessage: "Shop Men's Suits", description: 'tile.title'},
+            // this line does not need translation
+            href: {
+                defaultMessage: '/{activeLocale}/category/mens-clothing-suits',
+                description: 'link'
+            },
+            // this line does not need translation
+            imgSrc: {defaultMessage: 'static/img/men-suits.png', description: 'link'},
+            imgAlt: {defaultMessage: "Shop Men's Suits", description: 'image.info'}
         })
     },
     {
         message: defineMessages({
-            title: {defaultMessage: "Shop Women's Dresses"},
-            href: {defaultMessage: '/{activeLocale}/category/womens-clothing-dresses'},
-            imgSrc: {defaultMessage: 'static/img/women-dresses.png'},
-            imgAlt: {defaultMessage: "Shop Women's Dresses"}
+            title: {defaultMessage: "Shop Women's Dresses", description: 'tile.title'},
+            // this line does not need translation
+            href: {
+                defaultMessage: '/{activeLocale}/category/womens-clothing-dresses',
+                description: 'link'
+            },
+            // this line does not need translation
+            imgSrc: {defaultMessage: 'static/img/women-dresses.png', description: 'link'},
+            imgAlt: {defaultMessage: "Shop Women's Dresses", description: 'image.info'}
         })
     }
 ]
 export const categoriesTwoColumns = [
     {
         message: defineMessages({
-            title: {defaultMessage: "Shop Women's Jackets & Coats"},
-            href: {defaultMessage: '/{activeLocale}/category/womens-clothing-jackets'},
-            imgSrc: {defaultMessage: 'static/img/women-coats.png'},
-            imgAlt: {defaultMessage: "Shop Women's Jackets & Coats"}
+            title: {defaultMessage: "Shop Women's Jackets & Coats", description: 'tile.title'},
+            // this line does not need translation
+            href: {
+                defaultMessage: '/{activeLocale}/category/womens-clothing-jackets',
+                description: 'link'
+            },
+            // this line does not need translation
+            imgSrc: {defaultMessage: 'static/img/women-coats.png', description: 'link'},
+            imgAlt: {defaultMessage: "Shop Women's Jackets & Coats", description: 'image.info'}
         })
     },
     {
         message: defineMessages({
-            title: {defaultMessage: 'Shop Feeling Red'},
-            href: {defaultMessage: '/{activeLocale}/category/womens-clothing-feeling-red'},
-            imgSrc: {defaultMessage: 'static/img/feeling-red.png'},
-            imgAlt: {defaultMessage: 'Shop Feeling Red'}
+            title: {defaultMessage: 'Shop Feeling Red', description: 'tile.title'},
+            // this line does not need translation
+            href: {
+                defaultMessage: '/{activeLocale}/category/womens-clothing-feeling-red',
+                description: 'link'
+            },
+            // this line does not need translation
+            imgSrc: {defaultMessage: 'static/img/feeling-red.png', description: 'link'},
+            imgAlt: {defaultMessage: 'Shop Feeling Red', description: 'image.info'}
         })
     }
 ]

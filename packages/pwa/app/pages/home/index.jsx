@@ -37,12 +37,14 @@ const Home = () => {
 
             <Hero
                 title={intl.formatMessage({
-                    defaultMessage: 'Lighter layers for lighter days.'
+                    defaultMessage: 'Lighter layers for lighter days.',
+                    description: 'image.title'
                 })}
                 img={{
                     src: getAssetUrl('static/img/hero.png'),
                     alt: intl.formatMessage({
-                        defaultMessage: 'New Arrivals'
+                        defaultMessage: 'New Arrivals',
+                        description: 'image.info'
                     })
                 }}
                 actions={
@@ -51,17 +53,19 @@ const Home = () => {
                         to={`/${intl.locale}/category/newarrivals`}
                         width={{base: 'full', md: 'inherit'}}
                     >
-                        <FormattedMessage defaultMessage="Shop New Arrivals" />
+                        <FormattedMessage defaultMessage="Shop New Arrivals" description="button" />
                     </Button>
                 }
                 label={intl.formatMessage({
-                    defaultMessage: 'New In'
+                    defaultMessage: 'New In',
+                    description: 'image.label'
                 })}
                 marginBottom="16"
             />
             <Section
                 title={intl.formatMessage({
-                    defaultMessage: 'Shop by Category'
+                    defaultMessage: 'Shop by Category',
+                    description: 'section.title'
                 })}
             >
                 <Grid

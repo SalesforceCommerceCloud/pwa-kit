@@ -119,8 +119,8 @@ const Header = ({
                 <Flex wrap="wrap" alignItems={['baseline', 'baseline', 'baseline', 'center']}>
                     <IconButton
                         aria-label={intl.formatMessage({
-                            id: 'header.button.assistive_msg.menu',
-                            defaultMessage: 'Menu'
+                            defaultMessage: 'Menu',
+                            description: 'icon.assistive_msg'
                         })}
                         icon={<HamburgerIcon />}
                         variant="unstyled"
@@ -130,8 +130,8 @@ const Header = ({
                     />
                     <IconButton
                         aria-label={intl.formatMessage({
-                            id: 'header.button.assistive_msg.logo',
-                            defaultMessage: 'Logo'
+                            defaultMessage: 'Logo',
+                            description: 'icon.assistive_msg'
                         })}
                         icon={<BrandLogo {...styles.logo} />}
                         {...styles.icons}
@@ -142,8 +142,8 @@ const Header = ({
                     <Box {...styles.searchContainer}>
                         <Search
                             placeholder={intl.formatMessage({
-                                id: 'header.search.field.value.placeholder',
-                                defaultMessage: 'Search for products...'
+                                defaultMessage: 'Search for products...',
+                                description: 'search.info'
                             })}
                             {...styles.search}
                         />
@@ -157,8 +157,8 @@ const Header = ({
                         }}
                         onClick={onMyAccountClick}
                         aria-label={intl.formatMessage({
-                            id: 'header.button.assistive_msg.my_account',
-                            defaultMessage: 'My account'
+                            defaultMessage: 'My account',
+                            description: 'icon.assistive_msg'
                         })}
                     />
 
@@ -172,7 +172,10 @@ const Header = ({
                         >
                             <PopoverTrigger>
                                 <ChevronDownIcon
-                                    aria-label="My account trigger"
+                                    aria-label={intl.formatMessage({
+                                        defaultMessage: 'My Account Icon',
+                                        description: 'icon.assistive_msg'
+                                    })}
                                     onMouseLeave={handleIconsMouseLeave}
                                     onKeyDown={(e) => {
                                         keyMap[e.key]?.(e)
@@ -197,7 +200,8 @@ const Header = ({
                                 <PopoverHeader>
                                     <Text>
                                         {intl.formatMessage({
-                                            defaultMessage: 'My Account'
+                                            defaultMessage: 'My Account',
+                                            description: 'icon.assistive_msg'
                                         })}
                                     </Text>
                                 </PopoverHeader>
@@ -227,7 +231,8 @@ const Header = ({
                                             <SignoutIcon boxSize={5} {...styles.signoutIcon} />
                                             <Text as="span" {...styles.signoutText}>
                                                 {intl.formatMessage({
-                                                    defaultMessage: 'Log out'
+                                                    defaultMessage: 'Log out',
+                                                    description: 'button'
                                                 })}
                                             </Text>
                                         </Flex>
@@ -238,7 +243,8 @@ const Header = ({
                     )}
                     <IconButtonWithRegistration
                         aria-label={intl.formatMessage({
-                            defaultMessage: 'Wishlist'
+                            defaultMessage: 'Wishlist',
+                            description: 'icon.assistive_msg'
                         })}
                         icon={<WishlistIcon />}
                         variant="unstyled"
@@ -247,8 +253,8 @@ const Header = ({
                     />
                     <IconButton
                         aria-label={intl.formatMessage({
-                            id: 'header.button.assistive_msg.my_cart',
-                            defaultMessage: 'My cart'
+                            defaultMessage: 'My cart',
+                            description: 'icon.assistive_msg'
                         })}
                         icon={
                             <>

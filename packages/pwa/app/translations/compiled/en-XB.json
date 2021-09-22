@@ -259,6 +259,50 @@
       "value": "[!! Ṽíèèèẘ ḈḈḈâŕṭṭṭ !!]"
     }
   ],
+  "5H7Fzu": [
+    {
+      "offset": 0,
+      "options": {
+        "=0": {
+          "value": [
+            {
+              "type": 0,
+              "value": "[!! 0 íííṭèṁṁṁś !!]"
+            }
+          ]
+        },
+        "one": {
+          "value": [
+            {
+              "type": 7
+            },
+            {
+              "type": 0,
+              "value": "[!!  íṭṭṭèṁ !!]"
+            }
+          ]
+        },
+        "other": {
+          "value": [
+            {
+              "type": 7
+            },
+            {
+              "type": 0,
+              "value": "[!!  íṭṭṭèṁśśś !!]"
+            }
+          ]
+        }
+      },
+      "pluralType": "cardinal",
+      "type": 6,
+      "value": "itemCount"
+    },
+    {
+      "type": 0,
+      "value": "[!! ) !!]"
+    }
+  ],
   "5JcXdV": [
     {
       "type": 0,
