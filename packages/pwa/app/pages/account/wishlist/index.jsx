@@ -32,7 +32,7 @@ const AccountWishlist = () => {
     const [selectedItem, setSelectedItem] = useState(undefined)
     const [localQuantity, setLocalQuantity] = useState({})
     const [isWishlistItemLoading, setWishlistItemLoading] = useState(false)
-    const {isInitialized, isEmpty, ...wishlist} = useWishlist()
+    const wishlist = useWishlist()
 
     const handleActionClicked = (itemId) => {
         setWishlistItemLoading(!!itemId)
@@ -73,7 +73,7 @@ const AccountWishlist = () => {
             // data to render the page.
             // Reset the wishlist will make sure the
             // initialization state is correct.
-            if (isInitialized) {
+            if (wishlist.isInitialized) {
                 wishlist.reset()
             }
 
@@ -86,7 +86,7 @@ const AccountWishlist = () => {
             <Heading as="h1" fontSize="2xl">
                 <FormattedMessage defaultMessage="Wishlist" />
             </Heading>
-            {!isInitialized && (
+            {!wishlist.isInitialized && (
                 <Box data-testid="sf-wishlist-skeleton">
                     {new Array(numberOfSkeletonItems).fill(0).map((i, idx) => (
                         <Box
@@ -111,7 +111,7 @@ const AccountWishlist = () => {
                 </Box>
             )}
 
-            {isInitialized && isEmpty && (
+            {wishlist.isInitialized && wishlist.isEmpty && (
                 <PageActionPlaceHolder
                     data-testid="empty-wishlist"
                     icon={<WishlistIcon boxSize={8} />}
@@ -127,9 +127,9 @@ const AccountWishlist = () => {
                 />
             )}
 
-            {isInitialized &&
-                !isEmpty &&
-                wishlist.data.customerProductListItems.map((item) => (
+            {wishlist.isInitialized &&
+                !wishlist.isEmpty &&
+                wishlist.items.map((item) => (
                     <ProductItem
                         key={item.id}
                         product={{
