@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {useCustomerProductList} from '../commerce-api/hooks/useCustomerProductList'
+import {useCustomerProductList} from '../commerce-api/hooks/useCustomerProductLists'
 
 const PWA_DEFAULT_WISHLIST_NAME = 'PWA wishlist'
 
