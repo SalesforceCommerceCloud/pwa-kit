@@ -33,6 +33,7 @@ export default function useCustomerProductLists() {
     const self = useMemo(() => {
         return {
             actions,
+
             data: state.productLists,
 
             get isInitialized() {
@@ -219,6 +220,15 @@ export default function useCustomerProductLists() {
                     }
                 })
                 return list
+            },
+
+            /**
+             * Find the product list by its name.
+             * @param {string} name
+             * @returns {object} customer product list
+             */
+            findListByName(name) {
+                return Object.values(self.data).find((list) => list.name === name)
             }
         }
     }, [customer.customerId, state])

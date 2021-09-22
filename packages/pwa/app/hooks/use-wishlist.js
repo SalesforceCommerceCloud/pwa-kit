@@ -19,7 +19,7 @@ const useWishlist = () => {
         ...cpl,
 
         get data() {
-            return Object.values(cpl.data).find((list) => list.name === PWA_DEFAULT_WISHLIST_NAME)
+            return cpl.findListByName(PWA_DEFAULT_WISHLIST_NAME)
         },
 
         /**
