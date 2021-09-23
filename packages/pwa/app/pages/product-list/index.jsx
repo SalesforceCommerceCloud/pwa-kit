@@ -123,7 +123,7 @@ const ProductList = (props) => {
     const addItemToWishlist = async (product) => {
         try {
             setWishlistLoading([...wishlistLoading, product.productId])
-            await wishlist.addItem({
+            await wishlist.createListItem({
                 id: product.productId,
                 quantity: 1
             })
@@ -162,11 +162,10 @@ const ProductList = (props) => {
     const removeItemFromWishlist = async (product) => {
         try {
             setWishlistLoading([...wishlistLoading, product.productId])
-            await wishlist.removeItemByProductId(product.productId)
+            await wishlist.removeListItemByProductId(product.productId)
             toast({
                 title: formatMessage({defaultMessage: 'Item removed from wishlist'}),
-                status: 'success',
-                id: product.productId
+                status: 'success'
             })
         } catch {
             toast({
@@ -375,7 +374,9 @@ const ProductList = (props) => {
                                           ))
                                     : productSearchResult.hits.map((productSearchItem) => {
                                           const productId = productSearchItem.productId
-                                          const isInWishlist = wishlist.isProductInList(productId)
+                                          const isInWishlist = !!wishlist.findItemByProductId(
+                                              productId
+                                          )
                                           return (
                                               <ProductTile
                                                   data-testid={`sf-product-tile-${productSearchItem.productId}`}

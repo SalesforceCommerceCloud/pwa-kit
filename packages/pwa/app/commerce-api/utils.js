@@ -247,6 +247,21 @@ export const isError = (jsonResponse) => {
 }
 
 /**
+ * Decorator that wraps async functions to handle error response.
+ * @param {function} func - The async function that gets wrapped
+ * @returns {function}
+ */
+export const handleAsyncError = (func) => {
+    return async (...args) => {
+        const result = await func(...args)
+        if (isError(result)) {
+            throw new Error(result.detail)
+        }
+        return result
+    }
+}
+
+/**
  * Converts snake-case strings to space separated or sentence case
  * strings by replacing '_' with a ' '.
  * @param {string} text snake-case text.

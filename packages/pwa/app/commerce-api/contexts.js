@@ -45,10 +45,11 @@ export const CustomerProvider = CustomerContext.Provider
 
 /************ Customer Product Lists ************/
 const CPLInitialValue = {
-    productLists: {
-        // this is a map of product lists
-        // keyed by list id
-    }
+    // this is an object of product lists
+    // keyed by list id, initial state
+    // being undefined indicates the
+    // product lists is not initialized
+    productLists: undefined
 }
 const CPLActionTypes = {
     RECEIVE_LISTS: 'RECEIVE_LISTS',
@@ -64,15 +65,16 @@ export const CustomerProductListsProvider = ({children}) => {
     const [state, dispatch] = useReducer((state, {type, payload}) => {
         switch (type) {
             case CPLActionTypes.RECEIVE_LISTS: {
-                const productLists = payload.reduce((prev, curr) => {
+                const productLists = payload.reduce((acc, curr) => {
                     return {
-                        ...prev,
+                        ...acc,
                         [curr.id]: curr
                     }
                 }, {})
                 return {...state, productLists}
             }
             case CPLActionTypes.RECEIVE_LIST: {
+                const {id} = payload
                 // Tips: if you are unfamiliar with the concept of
                 // reducers, keep in mind that reducers must be pure.
                 // For an action like this, you must update every
@@ -81,57 +83,67 @@ export const CustomerProductListsProvider = ({children}) => {
                     ...state,
                     productLists: {
                         ...state.productLists,
-                        [payload.id]: payload
+                        [id]: payload
                     }
                 }
             }
             case CPLActionTypes.CREATE_LIST_ITEM: {
-                const items = state.productLists[payload.listId]?.customerProductListItems || []
+                const {listId, item} = payload
+                const {productId} = item
+                const items = state.productLists[listId]?.customerProductListItems || []
 
                 // if the item is already added to the list
                 // we update the existing item
-                const existingItemIndex = items.findIndex((item) => item.id === payload.item.id)
+                const existingItemIndex = items.findIndex((i) => i.productId === productId)
                 if (existingItemIndex >= 0) {
-                    items[existingItemIndex] = payload.item
+                    items[existingItemIndex] = item
                 } else {
-                    items.push(payload.item)
+                    items.push(item)
                 }
                 return {
                     ...state,
                     productLists: {
                         ...state.productLists,
-                        [payload.listId]: {
-                            ...state.productLists[payload.listId],
+                        [listId]: {
+                            ...state.productLists[listId],
                             customerProductListItems: items
                         }
                     }
                 }
             }
             case CPLActionTypes.UPDATE_LIST_ITEM: {
-                const productLists = {
-                    ...state.productLists
-                }
-                productLists[payload.listId].customerProductListItems = productLists[
-                    payload.listId
-                ].customerProductListItems?.map((listItem) => {
-                    if (listItem.id === payload.item.id) {
-                        return {
-                            ...listItem,
-                            ...payload.item
+                const {listId, item} = payload
+                const items = state.productLists[listId].customerProductListItems?.map(
+                    (listItem) => {
+                        if (listItem.id === item.id) {
+                            return {
+                                ...listItem,
+                                ...item
+                            }
+                        }
+                        return listItem
+                    }
+                )
+                return {
+                    ...state,
+                    productLists: {
+                        ...state.productLists,
+                        [listId]: {
+                            ...state.productLists[listId],
+                            customerProductListItems: items
                         }
                     }
-                    return listItem
-                })
-                return {...state, productLists}
+                }
             }
             case CPLActionTypes.REMOVE_LIST_ITEM: {
+                const {listId, itemId} = payload
                 const productLists = {
                     ...state.productLists
                 }
-                productLists[payload.listId].customerProductListItems = productLists[
-                    payload.listId
+                productLists[listId].customerProductListItems = productLists[
+                    listId
                 ].customerProductListItems?.filter((listItem) => {
-                    return listItem.id !== payload.itemId
+                    return listItem.id !== itemId
                 })
                 return {...state, productLists}
             }

@@ -77,9 +77,9 @@ const ProductDetail = ({category, product, isLoading}) => {
     const wishlist = useWishlist()
     const handleAddToWishlist = async (quantity) => {
         try {
-            await wishlist.addItem({
+            await wishlist.createListItem({
                 id: product.id,
-                quantity: quantity
+                quantity
             })
             toast({
                 title: formatMessage(

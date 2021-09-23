@@ -6,25 +6,36 @@
  */
 
 import React, {useEffect, useState} from 'react'
-import {Box, Button, Stack, Grid, GridItem, Container, useDisclosure} from '@chakra-ui/react'
 import {FormattedMessage, useIntl} from 'react-intl'
 
-import EmptyCart from './partials/empty-cart'
-import ProductItem from '../../components/product-item/index'
-import CartTitle from './partials/cart-title'
-import CartCta from './partials/cart-cta'
-import CartSkeleton from './partials/cart-skeleton'
-import useBasket from '../../commerce-api/hooks/useBasket'
-import OrderSummary from '../../components/order-summary'
-import RecommendedProducts from '../../components/recommended-products'
-import CartSecondaryButtonGroup from './partials/cart-secondary-button-group'
-import ProductViewModal from '../../components/product-view-modal'
+// Chakra Components
+import {Box, Stack, Grid, GridItem, Container, useDisclosure, Button} from '@chakra-ui/react'
 
+// Project Components
+import CartCta from './partials/cart-cta'
+import CartSecondaryButtonGroup from './partials/cart-secondary-button-group'
+import CartSkeleton from './partials/cart-skeleton'
+import CartTitle from './partials/cart-title'
+import ConfirmationModal from '../../components/confirmation-modal'
+import EmptyCart from './partials/empty-cart'
+import OrderSummary from '../../components/order-summary'
+import ProductItem from '../../components/product-item/index'
+import ProductViewModal from '../../components/product-view-modal'
+import RecommendedProducts from '../../components/recommended-products'
+
+// Hooks
 import {useToast} from '../../hooks/use-toast'
 import useWishlist from '../../hooks/use-wishlist'
-import {API_ERROR_MESSAGE} from '../../constants'
 import useCustomer from '../../commerce-api/hooks/useCustomer'
 import useNavigation from '../../hooks/use-navigation'
+import useBasket from '../../commerce-api/hooks/useBasket'
+
+// Constants
+import {API_ERROR_MESSAGE} from '../../constants'
+import {REMOVE_CART_ITEM_CONFIRMATION_DIALOG_CONFIG} from './partials/cart-secondary-button-group'
+
+// Utilities
+import debounce from 'lodash.debounce'
 
 const Cart = () => {
     const basket = useBasket()
@@ -36,6 +47,7 @@ const Cart = () => {
     const {formatMessage} = useIntl()
     const toast = useToast()
     const navigate = useNavigation()
+    const modalProps = useDisclosure()
     const showError = () => {
         toast({
             title: formatMessage(
@@ -50,7 +62,7 @@ const Cart = () => {
     const wishlist = useWishlist()
     const handleAddToWishlist = async (product) => {
         try {
-            await wishlist.addItem({
+            await wishlist.createListItem({
                 id: product.productId,
                 quantity: product.quantity
             })
@@ -128,7 +140,8 @@ const Cart = () => {
             setSelectedItem(undefined)
         }
     }
-    const changeItemQuantity = async (quantity, product) => {
+
+    const changeItemQuantity = debounce(async (quantity, product) => {
         // This local state allows the dropdown to show the desired quantity
         // while the API call to update it is happening.
         setLocalQuantity({...localQuantity, [product.itemId]: quantity})
@@ -148,6 +161,38 @@ const Cart = () => {
             setSelectedItem(undefined)
             setLocalQuantity({...localQuantity, [product.itemId]: undefined})
         }
+    }, 750)
+
+    const handleChangeItemQuantity = async (product, value) => {
+        const {stockLevel} = basket._productItemsDetail[product.productId].inventory
+
+        // Handle removing of the items when 0 is selected.
+        if (value === 0) {
+            // Flush last call to keep ui in sync with data.
+            changeItemQuantity.flush()
+
+            // Set the selected item to the current product to the modal acts on it.
+            setSelectedItem(product)
+
+            // Show the modal.
+            modalProps.onOpen()
+
+            // Return false as 0 isn't valid section.
+            return false
+        }
+
+        // Cancel any pending handlers.
+        changeItemQuantity.cancel()
+
+        // Allow use to selected values above the inventory.
+        if (value > stockLevel || value === product.quantity) {
+            return true
+        }
+
+        // Take action.
+        changeItemQuantity(value, product)
+
+        return true
     }
     const handleRemoveItem = async (product) => {
         setSelectedItem(product)
@@ -208,13 +253,15 @@ const Cart = () => {
                                                     ? localQuantity[product.itemId]
                                                     : product.quantity
                                             }}
-                                            onItemQuantityChange={(value) =>
-                                                changeItemQuantity(value, product)
-                                            }
+                                            onItemQuantityChange={handleChangeItemQuantity.bind(
+                                                this,
+                                                product
+                                            )}
                                             showLoading={
                                                 isCartItemLoading &&
                                                 selectedItem?.itemId === product.itemId
                                             }
+                                            handleRemoveItem={handleRemoveItem}
                                         />
                                     ))}
                                 </Stack>
@@ -274,6 +321,15 @@ const Cart = () => {
             >
                 <CartCta />
             </Box>
+
+            <ConfirmationModal
+                {...REMOVE_CART_ITEM_CONFIRMATION_DIALOG_CONFIG}
+                onPrimaryAction={() => {
+                    handleRemoveItem(selectedItem)
+                }}
+                onAlternateAction={() => {}}
+                {...modalProps}
+            />
         </Box>
     )
 }

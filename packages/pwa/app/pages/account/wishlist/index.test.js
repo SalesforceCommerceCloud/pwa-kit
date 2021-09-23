@@ -329,14 +329,14 @@ test('Renders wishlist page', () => {
     useWishlist.mockReturnValue({
         isInitialized: true,
         isEmpty: false,
-        data: mockData
+        hasDetail: true,
+        items: mockData.customerProductListItems
     })
 
     renderWithProviders(<AccountWishlist />)
     expect(screen.getByTestId('account-wishlist-page')).toBeInTheDocument()
     expect(screen.getByText(mockData.customerProductListItems[0].name)).toBeInTheDocument()
     expect(screen.getByText(/Zinc Heather/)).toBeInTheDocument()
-    expect(screen.getByText(/53.11/)).toBeInTheDocument()
 })
 
 test('Can remove item from the wishlist', async () => {
@@ -344,8 +344,9 @@ test('Can remove item from the wishlist', async () => {
     useWishlist.mockReturnValue({
         isInitialized: true,
         isEmpty: false,
-        data: mockData,
-        removeItem: removeItemMock
+        hasDetail: true,
+        items: mockData.customerProductListItems,
+        removeListItem: removeItemMock
     })
 
     renderWithProviders(<AccountWishlist />)
@@ -361,7 +362,8 @@ test('Can remove item from the wishlist', async () => {
 test('renders no wishlist items for empty wishlist', () => {
     useWishlist.mockReturnValue({
         isInitialized: true,
-        isEmpty: true
+        isEmpty: true,
+        hasDetail: true
     })
     renderWithProviders(<AccountWishlist />)
 
