@@ -30,17 +30,14 @@ const useWishlist = () => {
             },
 
             get isInitialized() {
-                return !!self.data?.isInitialized
+                return !!self.data?.id
             },
 
             /**
              * Initialize the wishlist.
              */
             init() {
-                return cpl.getOrCreateList(
-                    PWA_DEFAULT_WISHLIST_NAME,
-                    PWA_DEFAULT_WISHLIST_TYPE
-                )
+                cpl.getOrCreateList(PWA_DEFAULT_WISHLIST_NAME, PWA_DEFAULT_WISHLIST_TYPE)
             },
 
             /**
@@ -67,8 +64,11 @@ const useWishlist = () => {
              * @param {string} productId
              * @returns {object} product list item
              */
-            findItem(productId) {
-                return self.items.find((item) => item.productId === productId)
+            findItemByProductId(productId) {
+                if (!self.isInitialized) {
+                    return undefined
+                }
+                return cpl.findItemByProductId(self.data.id, productId)
             }
         }
     }, [cpl])

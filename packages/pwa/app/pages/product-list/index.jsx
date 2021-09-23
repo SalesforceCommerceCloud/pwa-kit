@@ -374,7 +374,9 @@ const ProductList = (props) => {
                                           ))
                                     : productSearchResult.hits.map((productSearchItem) => {
                                           const productId = productSearchItem.productId
-                                          const isInWishlist = !!wishlist.findItem(productId)
+                                          const isInWishlist = !!wishlist.findItemByProductId(
+                                              productId
+                                          )
                                           return (
                                               <ProductTile
                                                   isWishlistLoading={wishlistLoading.includes(
