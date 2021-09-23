@@ -26,6 +26,82 @@ export default function useCustomerProductLists() {
     const customer = useCustomer()
     const {state, actions} = useContext(CustomerProductListsContext)
 
+    const getLists = handleAsyncError(() => {
+        return api.shopperCustomers.getCustomerProductLists({
+            parameters: {
+                customerId: customer.customerId
+            }
+        })
+    })
+
+    const createList = handleAsyncError((name, type) => {
+        return api.shopperCustomers.createCustomerProductList({
+            body: {
+                type,
+                name
+            },
+            parameters: {
+                customerId: customer.customerId
+            }
+        })
+    })
+
+    const getList = handleAsyncError((listId) => {
+        return api.shopperCustomers.getCustomerProductList({
+            parameters: {
+                customerId: customer.customerId,
+                listId
+            }
+        })
+    })
+
+    const createListItem = handleAsyncError((listId, item) => {
+        const {id, quantity} = item
+        return api.shopperCustomers.createCustomerProductListItem({
+            body: {
+                productId: id,
+                quantity,
+                public: false,
+                priority: 1,
+                type: 'product'
+            },
+            parameters: {
+                customerId: customer.customerId,
+                listId
+            }
+        })
+    })
+
+    const updateListItem = handleAsyncError((listId, item) => {
+        const {id, quantity} = item
+        return api.shopperCustomers.updateCustomerProductListItem({
+            body: {
+                id,
+                quantity,
+                public: false,
+                priority: 1
+            },
+            parameters: {
+                customerId: customer.customerId,
+                listId: listId,
+                itemId: item.id
+            }
+        })
+    })
+
+    const removeListItem = handleAsyncError((listId, itemId) => {
+        return api.shopperCustomers.deleteCustomerProductListItem(
+            {
+                parameters: {
+                    itemId,
+                    listId,
+                    customerId: customer.customerId
+                }
+            },
+            true
+        )
+    })
+
     const self = useMemo(() => {
         return {
             data: state.productLists,
@@ -38,123 +114,11 @@ export default function useCustomerProductLists() {
                 actions.reset()
             },
 
-            // methods that purely send network requests
-            // these methods does not alter states stored
-            // in the context
-            requests: {
-                /**
-                 * Get customer's product lists.
-                 */
-                getLists: handleAsyncError(() => {
-                    return api.shopperCustomers.getCustomerProductLists({
-                        parameters: {
-                            customerId: customer.customerId
-                        }
-                    })
-                }),
-
-                /**
-                 * Create a new product list.
-                 * @param {string} name
-                 * @param {string} type
-                 */
-                createList: handleAsyncError((name, type) => {
-                    return api.shopperCustomers.createCustomerProductList({
-                        body: {
-                            type,
-                            name
-                        },
-                        parameters: {
-                            customerId: customer.customerId
-                        }
-                    })
-                }),
-
-                /**
-                 * Get a specific product list by id.
-                 * @param {string} listId
-                 */
-                getList: handleAsyncError((listId) => {
-                    return api.shopperCustomers.getCustomerProductList({
-                        parameters: {
-                            customerId: customer.customerId,
-                            listId
-                        }
-                    })
-                }),
-
-                /**
-                 * Adds an item to the customer's product list.
-                 * @param {string} listId
-                 * @param {Object} item item to be added to the list.
-                 */
-                createListItem: handleAsyncError((listId, item) => {
-                    const {id, quantity} = item
-                    return api.shopperCustomers.createCustomerProductListItem({
-                        body: {
-                            productId: id,
-                            quantity,
-                            public: false,
-                            priority: 1,
-                            type: 'product'
-                        },
-                        parameters: {
-                            customerId: customer.customerId,
-                            listId
-                        }
-                    })
-                }),
-
-                /**
-                 * Update an item in a customer product list
-                 *
-                 * @param {string} listId id of the list to update the item in
-                 * @param {object} item
-                 * @param {string} item.id the id of the item in the product list
-                 * @param {number} item.quantity the quantity of the item
-                 */
-                updateListItem: handleAsyncError((listId, item) => {
-                    const {id, quantity} = item
-                    return api.shopperCustomers.updateCustomerProductListItem({
-                        body: {
-                            id,
-                            quantity,
-                            public: false,
-                            priority: 1
-                        },
-                        parameters: {
-                            customerId: customer.customerId,
-                            listId: listId,
-                            itemId: item.id
-                        }
-                    })
-                }),
-
-                /**
-                 * Remove an item from a customer product list
-                 *
-                 * @param {string} listId id of the list to update the item in
-                 * @param {string} itemId the id of the item in the product list
-                 */
-                removeListItem: handleAsyncError((listId, itemId) => {
-                    return api.shopperCustomers.deleteCustomerProductListItem(
-                        {
-                            parameters: {
-                                itemId,
-                                listId,
-                                customerId: customer.customerId
-                            }
-                        },
-                        true
-                    )
-                })
-            },
-
             /**
              * Get customer's product lists.
              */
             getLists: async () => {
-                const lists = await self.requests.getLists()
+                const lists = await getLists()
                 actions.receiveLists(lists)
                 return lists
             },
@@ -165,7 +129,7 @@ export default function useCustomerProductLists() {
              * @param {string} type
              */
             createList: async (name, type) => {
-                const list = await self.requests.createList(name, type)
+                const list = await createList(name, type)
                 actions.receiveList(list)
                 return list
             },
@@ -177,7 +141,7 @@ export default function useCustomerProductLists() {
              */
             getList: async (listId, options) => {
                 const {detail} = options || {}
-                let list = await self.requests.getList(listId)
+                let list = await getList(listId)
 
                 if (detail) {
                     // automatically fetch details of the items in the list
@@ -200,14 +164,14 @@ export default function useCustomerProductLists() {
              */
             getOrCreateList: async (name, type, options) => {
                 const {detail} = options || {}
-                let response = await self.requests.getLists()
+                let response = await getLists()
 
                 // Note: if list is empty, the API response
                 // does NOT contain the "data" key.
                 let list = response.data?.find((list) => list.name === name)
 
                 if (!list) {
-                    list = await self.requests.createList(name, type)
+                    list = await createList(name, type)
                 }
 
                 if (list && detail) {
@@ -224,7 +188,7 @@ export default function useCustomerProductLists() {
              * @param {Object} item item to be added to the list.
              */
             createListItem: async (listId, item) => {
-                const createdItem = await self.requests.createListItem(listId, item)
+                const createdItem = await createListItem(listId, item)
                 actions.createListItem(listId, createdItem)
                 return createdItem
             },
@@ -240,7 +204,7 @@ export default function useCustomerProductLists() {
             updateListItem: async (listId, item) => {
                 const {id, quantity} = item
                 if (quantity === 0) {
-                    await self.requests.removeListItem(listId, id)
+                    await removeListItem(listId, id)
                     actions.removeListItem(listId, id)
                     return
                 }
@@ -248,7 +212,7 @@ export default function useCustomerProductLists() {
                 // the customer product list API.
                 // Because it conflicts with the product 'type', and we
                 // only use the product 'type' to determine master products
-                const {type, ...updatedItem} = await self.requests.updateListItem(listId, item)
+                const {type, ...updatedItem} = await updateListItem(listId, item)
                 actions.updateListItem(listId, updatedItem)
                 return updatedItem
             },
@@ -260,7 +224,7 @@ export default function useCustomerProductLists() {
              * @param {string} itemId the id of the item in the product list
              */
             removeListItem: async (listId, itemId) => {
-                await self.requests.removeListItem(listId, itemId)
+                await removeListItem(listId, itemId)
                 actions.removeListItem(listId, itemId)
             },
 
