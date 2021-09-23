@@ -11,7 +11,7 @@ const useWishlist = () => {
     const PWA_DEFAULT_WISHLIST_NAME = 'PWA wishlist'
     const PWA_DEFAULT_WISHLIST_TYPE = 'wish_list'
 
-    // cpl is the shorthand for "Cutomer Product List"
+    // cpl is the shorthand for "Cutomer Product Lists"
     const cpl = useCustomerProductLists()
     const self = useMemo(() => {
         return {
@@ -33,11 +33,17 @@ const useWishlist = () => {
                 return !!self.data?.id
             },
 
+            // boolean value indicate the wishlist
+            // is populated with product details
+            get hasDetail() {
+                return !!self.data?.hasDetail
+            },
+
             /**
              * Initialize the wishlist.
              */
-            init() {
-                cpl.getOrCreateList(PWA_DEFAULT_WISHLIST_NAME, PWA_DEFAULT_WISHLIST_TYPE)
+            init(options) {
+                cpl.getOrCreateList(PWA_DEFAULT_WISHLIST_NAME, PWA_DEFAULT_WISHLIST_TYPE, options)
             },
 
             /**

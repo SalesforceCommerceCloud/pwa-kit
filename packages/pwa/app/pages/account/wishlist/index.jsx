@@ -77,7 +77,7 @@ const AccountWishlist = () => {
                 wishlist.reset()
             }
 
-            wishlist.init()
+            wishlist.init({detail: true})
         }
     }, [customer.isRegistered])
 
@@ -86,7 +86,7 @@ const AccountWishlist = () => {
             <Heading as="h1" fontSize="2xl">
                 <FormattedMessage defaultMessage="Wishlist" />
             </Heading>
-            {!wishlist.isInitialized && (
+            {!wishlist.hasDetail && (
                 <Box data-testid="sf-wishlist-skeleton">
                     {new Array(numberOfSkeletonItems).fill(0).map((i, idx) => (
                         <Box
@@ -111,7 +111,7 @@ const AccountWishlist = () => {
                 </Box>
             )}
 
-            {wishlist.isInitialized && wishlist.isEmpty && (
+            {wishlist.hasDetail && wishlist.isEmpty && (
                 <PageActionPlaceHolder
                     data-testid="empty-wishlist"
                     icon={<WishlistIcon boxSize={8} />}
@@ -127,7 +127,7 @@ const AccountWishlist = () => {
                 />
             )}
 
-            {wishlist.isInitialized &&
+            {wishlist.hasDetail &&
                 !wishlist.isEmpty &&
                 wishlist.items.map((item) => (
                     <ProductItem

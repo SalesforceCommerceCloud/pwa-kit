@@ -75,7 +75,6 @@ export default function useCustomerProductLists() {
                 /**
                  * Get a specific product list by id.
                  * @param {string} listId
-                 * @param {object} options
                  */
                 getList: handleAsyncError((listId) => {
                     return api.shopperCustomers.getCustomerProductList({
@@ -195,6 +194,8 @@ export default function useCustomerProductLists() {
              * name/type, therefore it fetches all lists.
              * @param {string} name
              * @param {string} type
+             * @param {object} options
+             * @param {boolean} options.detail boolean flag to enable/disable fetching product details
              */
             getOrCreateList: async (name, type, options) => {
                 const {detail} = options || {}
@@ -203,16 +204,13 @@ export default function useCustomerProductLists() {
                 // Note: if list is empty, the API response
                 // does NOT contain the "data" key.
                 let list = response.data?.find((list) => list.name === name)
-                if (list) {
-                    if (detail) {
-                        // automatically fetch details of the items in the list
-                        list = await self.getProductDetails(list)
-                    }
 
-                    // automatically fetch details of the items in the list
-                    list = await self.getProductDetails(list)
-                } else {
+                if (!list) {
                     list = await self.requests.createList(name, type)
+                }
+
+                if (list && detail) {
+                    list = await self.getProductDetails(list)
                 }
 
                 actions.receiveList(list)
