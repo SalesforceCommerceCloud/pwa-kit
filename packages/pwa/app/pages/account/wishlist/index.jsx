@@ -133,7 +133,7 @@ const AccountWishlist = () => {
                     <ProductItem
                         key={item.id}
                         product={{
-                            ...item,
+                            ...item.product,
                             quantity: localQuantity[item.productId]
                                 ? localQuantity[item.productId]
                                 : item.quantity

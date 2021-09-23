@@ -267,6 +267,10 @@ export default function useCustomerProductLists() {
                     }
                 })
                 const result = self.mergeProductDetailsIntoList(list, productDetails)
+
+                // hasDetail is a flag to indicate
+                // the list items are populated
+                // with product detail data
                 result.hasDetail = true
                 return {...result, hasDetail: true}
             }),
@@ -284,14 +288,8 @@ export default function useCustomerProductLists() {
                         ...productDetails.data.find((product) => product.id === item.productId)
                     }
                     return {
-                        ...product,
                         ...item,
-
-                        // Both customer product list and the product detail API returns 'type'
-                        // but the type can be different depending on the API endpoint
-                        // We use the type from product detail endpoint, this is mainly used
-                        // to determine whether the product is a master or a variant.
-                        type: product.type
+                        product
                     }
                 })
                 return {
