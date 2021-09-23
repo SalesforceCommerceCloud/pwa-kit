@@ -62,7 +62,7 @@ const Cart = () => {
     const wishlist = useWishlist()
     const handleAddToWishlist = async (product) => {
         try {
-            await wishlist.addItem({
+            await wishlist.createListItem({
                 id: product.productId,
                 quantity: product.quantity
             })

@@ -61,6 +61,15 @@ const useWishlist = () => {
             },
 
             /**
+             * Remove an item from a customer product list
+             *
+             * @param {string} itemId the id of the item in the product list
+             */
+            removeListItem: (itemId) => {
+                cpl.removeListItem(self.data.id, itemId)
+            },
+
+            /**
              * Remove an item from the customer's wishlist.
              *
              * @param {string} productId the id of the product
