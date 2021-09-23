@@ -208,11 +208,7 @@ export default function useCustomerProductLists() {
                     actions.removeListItem(listId, id)
                     return
                 }
-                // Warning: we intentionally ignore the 'type' field from
-                // the customer product list API.
-                // Because it conflicts with the product 'type', and we
-                // only use the product 'type' to determine master products
-                const {type, ...updatedItem} = await updateListItem(listId, item)
+                const updatedItem = await updateListItem(listId, item)
                 actions.updateListItem(listId, updatedItem)
                 return updatedItem
             },
