@@ -147,7 +147,8 @@ const ProductList = (props) => {
                     </Button>
                 )
             })
-        } catch {
+        } catch(e) {
+            console.error(e)
             toast({
                 title: formatMessage(
                     {defaultMessage: '{errorMessage}'},

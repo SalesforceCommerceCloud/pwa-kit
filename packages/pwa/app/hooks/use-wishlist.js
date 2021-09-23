@@ -43,7 +43,11 @@ const useWishlist = () => {
              * Initialize the wishlist.
              */
             init(options) {
-                cpl.getOrCreateList(PWA_DEFAULT_WISHLIST_NAME, PWA_DEFAULT_WISHLIST_TYPE, options)
+                return cpl.getOrCreateList(
+                    PWA_DEFAULT_WISHLIST_NAME,
+                    PWA_DEFAULT_WISHLIST_TYPE,
+                    options
+                )
             },
 
             /**
@@ -52,7 +56,12 @@ const useWishlist = () => {
              * @param {string} item.id
              * @param {number} item.quantity
              */
-            createListItem: (item) => {
+            createListItem: async (item) => {
+                if (!self.isInitialized) {
+                    const list = await self.init()
+                    cpl.createListItem(list.id, item)
+                    return
+                }
                 cpl.createListItem(self.data.id, item)
             },
 

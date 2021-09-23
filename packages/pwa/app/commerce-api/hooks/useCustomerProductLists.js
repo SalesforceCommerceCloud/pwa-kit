@@ -158,6 +158,7 @@ export default function useCustomerProductLists() {
             getLists: async () => {
                 const lists = await self.requests.getLists()
                 actions.receiveLists(lists)
+                return lists
             },
 
             /**
@@ -168,6 +169,7 @@ export default function useCustomerProductLists() {
             createList: async (name, type) => {
                 const list = await self.requests.createList(name, type)
                 actions.receiveList(list)
+                return list
             },
 
             /**
@@ -185,6 +187,7 @@ export default function useCustomerProductLists() {
                 }
 
                 actions.receiveList(list)
+                return list
             },
 
             /**
@@ -214,6 +217,7 @@ export default function useCustomerProductLists() {
                 }
 
                 actions.receiveList(list)
+                return list
             },
 
             /**
@@ -224,6 +228,7 @@ export default function useCustomerProductLists() {
             createListItem: async (listId, item) => {
                 const createdItem = await self.requests.createListItem(listId, item)
                 actions.createListItem(listId, createdItem)
+                return createdItem
             },
 
             /**
@@ -247,6 +252,7 @@ export default function useCustomerProductLists() {
                 // only use the product 'type' to determine master products
                 const {type, ...updatedItem} = await self.requests.updateListItem(listId, item)
                 actions.updateListItem(listId, updatedItem)
+                return updatedItem
             },
 
             /**
