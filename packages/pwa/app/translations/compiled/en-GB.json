@@ -35,6 +35,12 @@
       "value": "Please enter your email address"
     }
   ],
+  "0OPuwi": [
+    {
+      "type": 0,
+      "value": "Wishlist"
+    }
+  ],
   "0g/1TG": [
     {
       "type": 0,
@@ -105,12 +111,6 @@
       "value": "Shop Feeling Red"
     }
   ],
-  "25WwxF": [
-    {
-      "type": 0,
-      "value": "Don't have an account?"
-    }
-  ],
   "2BHb6K": [
     {
       "type": 0,
@@ -171,6 +171,12 @@
     {
       "type": 0,
       "value": "My Account"
+    }
+  ],
+  "2l5mcq": [
+    {
+      "type": 0,
+      "value": "My account"
     }
   ],
   "2p8liT": [
@@ -243,6 +249,12 @@
     {
       "type": 0,
       "value": "Confirm Remove Item"
+    }
+  ],
+  "4Vb2xf": [
+    {
+      "type": 0,
+      "value": "Welcome Back"
     }
   ],
   "5BTYa0": [
@@ -331,12 +343,6 @@
       "value": "Please enter a valid date"
     }
   ],
-  "6mL4UX": [
-    {
-      "type": 0,
-      "value": "My cart"
-    }
-  ],
   "6yVHs9": [
     {
       "type": 0,
@@ -361,6 +367,18 @@
       "value": "static/img/men-suits.png"
     }
   ],
+  "7uS4jV": [
+    {
+      "type": 0,
+      "value": "Search for products..."
+    }
+  ],
+  "7ux8FR": [
+    {
+      "type": 0,
+      "value": "Forgot password?"
+    }
+  ],
   "7xscgD": [
     {
       "type": 0,
@@ -371,12 +389,6 @@
     {
       "type": 0,
       "value": "The page you're looking for can't be found"
-    }
-  ],
-  "8DygoO": [
-    {
-      "type": 0,
-      "value": "Menu"
     }
   ],
   "8d6kio": [
@@ -425,12 +437,6 @@
     {
       "type": 0,
       "value": "Item removed from wishlist"
-    }
-  ],
-  "9vpo13": [
-    {
-      "type": 0,
-      "value": "Search for products..."
     }
   ],
   "A2v4cr": [
@@ -605,6 +611,12 @@
       "value": " added to wishlist"
     }
   ],
+  "Dr+2FW": [
+    {
+      "type": 0,
+      "value": "Don't have an account?"
+    }
+  ],
   "DwzDiL": [
     {
       "type": 0,
@@ -653,6 +665,12 @@
     {
       "type": 0,
       "value": "Sign Out"
+    }
+  ],
+  "FkRd7K": [
+    {
+      "type": 0,
+      "value": "My Account"
     }
   ],
   "Fkpwhy": [
@@ -819,6 +837,12 @@
     {
       "type": 0,
       "value": "Clear Filters"
+    }
+  ],
+  "MsvQlx": [
+    {
+      "type": 0,
+      "value": "Menu"
     }
   ],
   "Mv2pEb": [
@@ -1169,12 +1193,6 @@
       "value": "Continue shopping to add items to your cart"
     }
   ],
-  "VR4muK": [
-    {
-      "type": 0,
-      "value": "Wishlist"
-    }
-  ],
   "VSlYv6": [
     {
       "type": 0,
@@ -1277,6 +1295,12 @@
       "value": "static/img/feeling-red.png"
     }
   ],
+  "Zd02Xe": [
+    {
+      "type": 0,
+      "value": "Log out"
+    }
+  ],
   "Zhsl4Z": [
     {
       "type": 0,
@@ -1299,6 +1323,12 @@
     {
       "type": 0,
       "value": "Last Name"
+    }
+  ],
+  "aiBOyf": [
+    {
+      "type": 0,
+      "value": "My cart"
     }
   ],
   "au3Vns": [
@@ -1345,12 +1375,6 @@
     {
       "type": 0,
       "value": "Chinese (China)"
-    }
-  ],
-  "bTjwXj": [
-    {
-      "type": 0,
-      "value": "Welcome Back"
     }
   ],
   "bhUBy4": [
@@ -1411,6 +1435,12 @@
     {
       "type": 0,
       "value": "Add New Card"
+    }
+  ],
+  "cf7J4T": [
+    {
+      "type": 0,
+      "value": "My account chevron down icon"
     }
   ],
   "cqlObT": [
@@ -1649,6 +1679,12 @@
     {
       "type": 0,
       "value": "Please enter your name as shown on your card"
+    }
+  ],
+  "hMt9hl": [
+    {
+      "type": 0,
+      "value": "Create account"
     }
   ],
   "hp3uqR": [
@@ -1917,12 +1953,6 @@
       "value": "You're currently browsing in offline mode"
     }
   ],
-  "ofxZFr": [
-    {
-      "type": 0,
-      "value": "Logo"
-    }
-  ],
   "p2EAP0": [
     {
       "type": 0,
@@ -2029,34 +2059,10 @@
       "value": "Please create a password"
     }
   ],
-  "qKRULX": [
-    {
-      "type": 0,
-      "value": "My account"
-    }
-  ],
-  "qLbse5": [
-    {
-      "type": 0,
-      "value": "Log out"
-    }
-  ],
   "qVGRIE": [
     {
       "type": 0,
       "value": "Quantity"
-    }
-  ],
-  "rN9eS+": [
-    {
-      "type": 0,
-      "value": "My Account"
-    }
-  ],
-  "raTmyJ": [
-    {
-      "type": 0,
-      "value": "My Account Icon"
     }
   ],
   "rc7KYy": [
@@ -2125,6 +2131,12 @@
     {
       "type": 0,
       "value": "Email"
+    }
+  ],
+  "tANUBZ": [
+    {
+      "type": 0,
+      "value": "Logo"
     }
   ],
   "tf1lIh": [
@@ -2239,6 +2251,12 @@
     {
       "type": 0,
       "value": "New Arrivals"
+    }
+  ],
+  "wzQjyU": [
+    {
+      "type": 0,
+      "value": "Sign in"
     }
   ],
   "x6hxSH": [

@@ -59,6 +59,10 @@
   "2WRHXI": {
     "defaultMessage": "{quantity} {quantity, plural, one {item} other {items}} added to cart"
   },
+  "2Z13uI": {
+    "defaultMessage": "Account Details",
+    "description": "my_account.link"
+  },
   "2bGejb": {
     "defaultMessage": "My Account"
   },
@@ -275,10 +279,6 @@
     "defaultMessage": "My Account",
     "description": "header.heading.my_account"
   },
-  "Fkpwhy": {
-    "defaultMessage": "Payment Methods",
-    "description": "link"
-  },
   "Fmc5ut": {
     "defaultMessage": "Continue to Shipping Method"
   },
@@ -340,9 +340,9 @@
   "L8seEc": {
     "defaultMessage": "Subtotal"
   },
-  "LObwrD": {
-    "defaultMessage": "Wishlist",
-    "description": "link"
+  "LBPsnA": {
+    "defaultMessage": "Order History",
+    "description": "my_account.link"
   },
   "LiHQih": {
     "defaultMessage": "Coming Soon"
@@ -397,6 +397,10 @@
     "defaultMessage": "{count} items",
     "description": "Number of items in order"
   },
+  "OV4Kt4": {
+    "defaultMessage": "Payment Methods",
+    "description": "my_account.link"
+  },
   "OVAmhz": {
     "defaultMessage": "Back to cart"
   },
@@ -436,6 +440,10 @@
   },
   "QclMUn": {
     "defaultMessage": "Please select your country"
+  },
+  "QeNmhz": {
+    "defaultMessage": "Addresses",
+    "description": "my_account.link"
   },
   "Qm3TN9": {
     "defaultMessage": "Are you sure you want to continue ?"
@@ -575,10 +583,6 @@
   },
   "a5msuh": {
     "defaultMessage": "Yes"
-  },
-  "aMLHDP": {
-    "defaultMessage": "Addresses",
-    "description": "link"
   },
   "aheQdn": {
     "defaultMessage": "Last Name"
@@ -734,10 +738,6 @@
   "gW8EGu": {
     "defaultMessage": "Name on Card"
   },
-  "h85xzU": {
-    "defaultMessage": "Order History",
-    "description": "link"
-  },
   "hCj9FS": {
     "defaultMessage": "Please enter your name as shown on your card"
   },
@@ -768,6 +768,10 @@
   },
   "jvo0vs": {
     "defaultMessage": "Save"
+  },
+  "k8FdKT": {
+    "defaultMessage": "Wishlist",
+    "description": "my_account.link"
   },
   "kVzyDt": {
     "defaultMessage": "Thank you for your order!"
@@ -906,10 +910,6 @@
   },
   "product_list_page.no_results_search_query": {
     "defaultMessage": "We couldn’t find anything for \"{searchQuery}\""
-  },
-  "pv21oR": {
-    "defaultMessage": "Account Details",
-    "description": "link"
   },
   "py3qts": {
     "defaultMessage": "New Address Saved"
