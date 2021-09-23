@@ -156,7 +156,7 @@ beforeEach(() => {
         isInitialized: true,
         isEmpty: false,
         data: {},
-        isProductInList: () => {}
+        findItemByProductId: () => {}
     })
 })
 

@@ -113,7 +113,7 @@ const RecommendedProducts = ({zone, recommender, products, title, shouldFetch, .
     // provider is available globally
     const addItemToWishlist = async (product) => {
         try {
-            await wishlist.addItem({
+            await wishlist.createListItem({
                 id: product.productId,
                 quantity: 1
             })
@@ -149,7 +149,7 @@ const RecommendedProducts = ({zone, recommender, products, title, shouldFetch, .
     }
     const removeItemFromWishlist = async (product) => {
         try {
-            await wishlist.removeItemByProductId(product.productId)
+            await wishlist.removeListItemByProductId(product.productId)
             toast({
                 title: formatMessage({defaultMessage: 'Item removed from wishlist'}),
                 status: 'success',
@@ -186,7 +186,7 @@ const RecommendedProducts = ({zone, recommender, products, title, shouldFetch, .
                         )
                     }}
                     enableFavourite={wishlist.isInitialized}
-                    isFavourite={wishlist.isProductInList(product?.productId)}
+                    isFavourite={!!wishlist.findItemByProductId(product?.productId)}
                     onFavouriteToggle={(isFavourite) => {
                         if (isFavourite) {
                             addItemToWishlist(product)
