@@ -263,6 +263,23 @@ export default function useCustomerProductLists() {
             },
 
             /**
+             * Remove an item from a customer product list
+             *
+             * @param {string} listId id of the list to update the item in
+             * @param {string} productId the id of the product
+             */
+            removeListItemByProductId(listId, productId) {
+                const item = self.findItemByProductId(listId, productId)
+                if (!item) {
+                    console.warn(
+                        `Cannot remove item because product ${productId} is not in the list.`
+                    )
+                    return
+                }
+                self.removeListItem(listId, item.id)
+            },
+
+            /**
              * Get all item details for a product list.
              * @param {object} list product list
              * @param {array} list.customerProductListItems items array
@@ -347,7 +364,7 @@ export default function useCustomerProductLists() {
              * @param {string} productId
              * @returns {object} product list item
              */
-            findItem(listId, productId) {
+            findItemByProductId(listId, productId) {
                 return self
                     .findListById(listId)
                     ?.customerProductListItems?.find((item) => item.productId === productId)

@@ -162,7 +162,7 @@ const ProductList = (props) => {
     const removeItemFromWishlist = async (product) => {
         try {
             setWishlistLoading([...wishlistLoading, product.productId])
-            await wishlist.removeItemByProductId(product.productId)
+            await wishlist.removeListItemByProductId(product.productId)
             toast({
                 title: formatMessage({defaultMessage: 'Item removed from wishlist'}),
                 status: 'success'
