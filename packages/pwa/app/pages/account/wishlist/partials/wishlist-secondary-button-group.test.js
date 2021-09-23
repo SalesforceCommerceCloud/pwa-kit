@@ -340,8 +340,9 @@ test('can remove item', async () => {
     useWishlist.mockReturnValue({
         isInitialized: true,
         isEmpty: false,
+        hasDetail: true,
         data: mockData,
-        removeItem: removeItemMock
+        removeListItem: removeItemMock
     })
     renderWithProviders(<MockedComponent />)
     const removeButton = screen.getByRole('button', {

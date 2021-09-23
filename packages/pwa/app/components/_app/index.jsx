@@ -96,11 +96,6 @@ const App = (props) => {
         }
     }, [customer.authType])
 
-    // for testing purposes!!!!
-    useEffect(() => {
-        console.log(wishlist)
-    }, [wishlist])
-
     useEffect(() => {
         // Listen for online status changes.
         watchOnlineStatus((isOnline) => {
