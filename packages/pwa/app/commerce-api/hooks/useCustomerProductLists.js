@@ -28,8 +28,6 @@ export default function useCustomerProductLists() {
 
     const self = useMemo(() => {
         return {
-            actions,
-
             data: state.productLists,
 
             get isInitialized() {
