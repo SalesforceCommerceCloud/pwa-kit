@@ -15,300 +15,326 @@ const mockData = {
     creationDate: '2021-09-13T23:29:23.396Z',
     customerProductListItems: [
         {
-            currency: 'GBP',
-            id: '7847846d4562e4b4b1c658886d',
-            imageGroups: [
-                {
-                    images: [
-                        {
-                            alt: 'Long Center Seam Skirt, Zinc Heather, large',
-                            disBaseLink:
-                                'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwe33f0bf7/images/large/PG.10206908.JJS91A5.PZ.jpg',
-                            link:
-                                'https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwe33f0bf7/images/large/PG.10206908.JJS91A5.PZ.jpg',
-                            title: 'Long Center Seam Skirt, Zinc Heather'
-                        },
-                        {
-                            alt: 'Long Center Seam Skirt, Zinc Heather, large',
-                            disBaseLink:
-                                'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwd86c8e3e/images/large/PG.10206908.JJS91A5.BZ.jpg',
-                            link:
-                                'https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwd86c8e3e/images/large/PG.10206908.JJS91A5.BZ.jpg',
-                            title: 'Long Center Seam Skirt, Zinc Heather'
-                        }
-                    ],
-                    variationAttributes: [
-                        {
-                            id: 'color',
-                            values: [
-                                {
-                                    value: 'JJS91A5'
-                                }
-                            ]
-                        }
-                    ],
-                    viewType: 'large'
-                },
-                {
-                    images: [
-                        {
-                            alt: 'Long Center Seam Skirt, Zinc Heather, medium',
-                            disBaseLink:
-                                'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw8bcf8941/images/medium/PG.10206908.JJS91A5.PZ.jpg',
-                            link:
-                                'https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw8bcf8941/images/medium/PG.10206908.JJS91A5.PZ.jpg',
-                            title: 'Long Center Seam Skirt, Zinc Heather'
-                        },
-                        {
-                            alt: 'Long Center Seam Skirt, Zinc Heather, medium',
-                            disBaseLink:
-                                'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw2623bc6f/images/medium/PG.10206908.JJS91A5.BZ.jpg',
-                            link:
-                                'https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw2623bc6f/images/medium/PG.10206908.JJS91A5.BZ.jpg',
-                            title: 'Long Center Seam Skirt, Zinc Heather'
-                        }
-                    ],
-                    variationAttributes: [
-                        {
-                            id: 'color',
-                            values: [
-                                {
-                                    value: 'JJS91A5'
-                                }
-                            ]
-                        }
-                    ],
-                    viewType: 'medium'
-                },
-                {
-                    images: [
-                        {
-                            alt: 'Long Center Seam Skirt, Zinc Heather, small',
-                            disBaseLink:
-                                'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwbd2b4434/images/small/PG.10206908.JJS91A5.PZ.jpg',
-                            link:
-                                'https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwbd2b4434/images/small/PG.10206908.JJS91A5.PZ.jpg',
-                            title: 'Long Center Seam Skirt, Zinc Heather'
-                        },
-                        {
-                            alt: 'Long Center Seam Skirt, Zinc Heather, small',
-                            disBaseLink:
-                                'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw8a687afe/images/small/PG.10206908.JJS91A5.BZ.jpg',
-                            link:
-                                'https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw8a687afe/images/small/PG.10206908.JJS91A5.BZ.jpg',
-                            title: 'Long Center Seam Skirt, Zinc Heather'
-                        }
-                    ],
-                    variationAttributes: [
-                        {
-                            id: 'color',
-                            values: [
-                                {
-                                    value: 'JJS91A5'
-                                }
-                            ]
-                        }
-                    ],
-                    viewType: 'small'
-                },
-                {
-                    images: [
-                        {
-                            alt: 'Long Center Seam Skirt, Zinc Heather, swatch',
-                            disBaseLink:
-                                'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwa9ee14b8/images/swatch/PG.10206908.JJS91A5.CP.jpg',
-                            link:
-                                'https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwa9ee14b8/images/swatch/PG.10206908.JJS91A5.CP.jpg',
-                            title: 'Long Center Seam Skirt, Zinc Heather'
-                        }
-                    ],
-                    variationAttributes: [
-                        {
-                            id: 'color',
-                            values: [
-                                {
-                                    value: 'JJS91A5'
-                                }
-                            ]
-                        }
-                    ],
-                    viewType: 'swatch'
-                }
-            ],
-            inventory: {
-                ats: 100,
-                backorderable: false,
-                id: 'inventory_m',
-                orderable: true,
-                preorderable: false,
-                stockLevel: 100
-            },
-            longDescription:
-                'This long center seam skirt is stunning.  It is perfect for nine-to-five and beyond.',
-            master: {
-                masterId: '25493613M',
-                orderable: true,
-                price: 53.11
-            },
-            minOrderQuantity: 1,
-            name: 'Long Center Seam Skirt',
-            pageDescription:
-                'This long center seam skirt is stunning.  It is perfect for nine-to-five and beyond.',
-            pageTitle: 'Long Center Seam Skirt',
-            price: 53.11,
-            pricePerUnit: 53.11,
-            productPromotions: [
-                {
-                    calloutMsg: 'Buy one Long Center Seam Skirt and get 2 tops',
-                    promotionId: 'ChoiceOfBonusProdect-ProductLevel-ruleBased'
-                }
-            ],
-            shortDescription:
-                'This long center seam skirt is stunning.  It is perfect for nine-to-five and beyond.',
-            stepQuantity: 1,
-            type: {
-                variant: true
-            },
-            unitMeasure: '',
-            unitQuantity: 0,
-            upc: '701642842620',
-            validFrom: {
-                default: '2010-10-21T04:00:00.000Z'
-            },
-            variants: [
-                {
-                    orderable: true,
-                    price: 53.11,
-                    productId: '701642842682M',
-                    variationValues: {
-                        color: 'JJS91A5',
-                        size: '008'
-                    }
-                },
-                {
-                    orderable: true,
-                    price: 53.11,
-                    productId: '701642842668M',
-                    variationValues: {
-                        color: 'JJS91A5',
-                        size: '004'
-                    }
-                },
-                {
-                    orderable: true,
-                    price: 53.11,
-                    productId: '701642842675M',
-                    variationValues: {
-                        color: 'JJS91A5',
-                        size: '006'
-                    }
-                },
-                {
-                    orderable: true,
-                    price: 53.11,
-                    productId: '701642842637M',
-                    variationValues: {
-                        color: 'JJS91A5',
-                        size: '012'
-                    }
-                },
-                {
-                    orderable: true,
-                    price: 53.11,
-                    productId: '701642842644M',
-                    variationValues: {
-                        color: 'JJS91A5',
-                        size: '014'
-                    }
-                },
-                {
-                    orderable: true,
-                    price: 53.11,
-                    productId: '701642842651M',
-                    variationValues: {
-                        color: 'JJS91A5',
-                        size: '016'
-                    }
-                },
-                {
-                    orderable: true,
-                    price: 53.11,
-                    productId: '701642842620M',
-                    variationValues: {
-                        color: 'JJS91A5',
-                        size: '010'
-                    }
-                }
-            ],
-            variationAttributes: [
-                {
-                    id: 'color',
-                    name: 'Colour',
-                    values: [
-                        {
-                            name: 'Zinc Heather',
-                            orderable: true,
-                            value: 'JJS91A5'
-                        }
-                    ]
-                },
-                {
-                    id: 'size',
-                    name: 'Size',
-                    values: [
-                        {
-                            name: '4',
-                            orderable: true,
-                            value: '004'
-                        },
-                        {
-                            name: '6',
-                            orderable: true,
-                            value: '006'
-                        },
-                        {
-                            name: '8',
-                            orderable: true,
-                            value: '008'
-                        },
-                        {
-                            name: '10',
-                            orderable: true,
-                            value: '010'
-                        },
-                        {
-                            name: '12',
-                            orderable: true,
-                            value: '012'
-                        },
-                        {
-                            name: '14',
-                            orderable: true,
-                            value: '014'
-                        },
-                        {
-                            name: '16',
-                            orderable: true,
-                            value: '016'
-                        }
-                    ]
-                }
-            ],
-            variationValues: {
-                color: 'JJS91A5',
-                size: '010'
-            },
-            c_color: 'JJS91A5',
-            c_isNew: true,
-            c_isNewtest: true,
-            c_refinementColor: 'grey',
-            c_size: '010',
-            c_width: 'Z',
+            id: '98ca9a3a9c8ee803543dc45cdc',
             priority: 1,
-            productId: '701642842620M',
+            productId: '25518837M',
             public: false,
             purchasedQuantity: 0,
-            quantity: 1
+            quantity: 4,
+            type: 'product',
+            product: {
+                currency: 'GBP',
+                id: '25518837M',
+                imageGroups: [
+                    {
+                        images: [
+                            {
+                                alt: 'Ruffle Front V-Neck Cardigan, , large',
+                                disBaseLink:
+                                    'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw4cd0a798/images/large/PG.10216885.JJ169XX.PZ.jpg',
+                                link:
+                                    'https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw4cd0a798/images/large/PG.10216885.JJ169XX.PZ.jpg',
+                                title: 'Ruffle Front V-Neck Cardigan, '
+                            },
+                            {
+                                alt: 'Ruffle Front V-Neck Cardigan, , large',
+                                disBaseLink:
+                                    'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwf67d39ef/images/large/PG.10216885.JJ169XX.BZ.jpg',
+                                link:
+                                    'https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwf67d39ef/images/large/PG.10216885.JJ169XX.BZ.jpg',
+                                title: 'Ruffle Front V-Neck Cardigan, '
+                            }
+                        ],
+                        viewType: 'large'
+                    },
+                    {
+                        images: [
+                            {
+                                alt: 'Ruffle Front V-Neck Cardigan, , medium',
+                                disBaseLink:
+                                    'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwc31527c1/images/medium/PG.10216885.JJ169XX.PZ.jpg',
+                                link:
+                                    'https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwc31527c1/images/medium/PG.10216885.JJ169XX.PZ.jpg',
+                                title: 'Ruffle Front V-Neck Cardigan, '
+                            },
+                            {
+                                alt: 'Ruffle Front V-Neck Cardigan, , medium',
+                                disBaseLink:
+                                    'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw3b11511c/images/medium/PG.10216885.JJ169XX.BZ.jpg',
+                                link:
+                                    'https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw3b11511c/images/medium/PG.10216885.JJ169XX.BZ.jpg',
+                                title: 'Ruffle Front V-Neck Cardigan, '
+                            }
+                        ],
+                        viewType: 'medium'
+                    },
+                    {
+                        images: [
+                            {
+                                alt: 'Ruffle Front V-Neck Cardigan, , small',
+                                disBaseLink:
+                                    'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw4ada76e4/images/small/PG.10216885.JJ169XX.PZ.jpg',
+                                link:
+                                    'https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw4ada76e4/images/small/PG.10216885.JJ169XX.PZ.jpg',
+                                title: 'Ruffle Front V-Neck Cardigan, '
+                            },
+                            {
+                                alt: 'Ruffle Front V-Neck Cardigan, , small',
+                                disBaseLink:
+                                    'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw5c3e4bf4/images/small/PG.10216885.JJ169XX.BZ.jpg',
+                                link:
+                                    'https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw5c3e4bf4/images/small/PG.10216885.JJ169XX.BZ.jpg',
+                                title: 'Ruffle Front V-Neck Cardigan, '
+                            }
+                        ],
+                        viewType: 'small'
+                    }
+                ],
+                inventory: {
+                    ats: 1597,
+                    backorderable: false,
+                    id: 'inventory_m',
+                    orderable: true,
+                    preorderable: false,
+                    stockLevel: 1597
+                },
+                longDescription:
+                    "This flirty ruffle cardigan can take you from day to night. Don't leave home with out a great pair of Commerce Cloud Store earrings.",
+                master: {
+                    masterId: '25518837M',
+                    orderable: true,
+                    price: 26.23
+                },
+                minOrderQuantity: 1,
+                name: 'Ruffle Front V-Neck Cardigan',
+                pageDescription:
+                    "This flirty ruffle cardigan can take you from day to night. Don't leave home with out a great pair of Commerce Cloud Store earrings.",
+                pageTitle: 'Ruffle Front V-Neck Cardigan',
+                price: 26.23,
+                pricePerUnit: 26.23,
+                primaryCategoryId: 'womens-clothing-tops',
+                productPromotions: [
+                    {
+                        calloutMsg: '$50 Fixed Products Amount Above 100',
+                        promotionId: '$50FixedProductsAmountAbove100'
+                    },
+                    {
+                        calloutMsg: 'Buy one Long Center Seam Skirt and get 2 tops',
+                        promotionId: 'ChoiceOfBonusProdect-ProductLevel-ruleBased'
+                    }
+                ],
+                shortDescription:
+                    "This flirty ruffle cardigan can take you from day to night. Don't leave home with out a great pair of Commerce Cloud Store earrings.",
+                stepQuantity: 1,
+                type: {
+                    master: true
+                },
+                validFrom: {
+                    default: '2010-11-18T05:00:00.000Z'
+                },
+                variants: [
+                    {
+                        orderable: true,
+                        price: 26.23,
+                        productId: '701642873211M',
+                        variationValues: {
+                            color: 'JJ169XX',
+                            size: '9LG'
+                        }
+                    },
+                    {
+                        orderable: true,
+                        price: 26.23,
+                        productId: '701642873334M',
+                        variationValues: {
+                            color: 'JJ908XX',
+                            size: '9LG'
+                        }
+                    },
+                    {
+                        orderable: true,
+                        price: 26.23,
+                        productId: '701642873297M',
+                        variationValues: {
+                            color: 'JJ8UTXX',
+                            size: '9LG'
+                        }
+                    },
+                    {
+                        orderable: true,
+                        price: 26.23,
+                        productId: '701642873372M',
+                        variationValues: {
+                            color: 'JJI15XX',
+                            size: '9LG'
+                        }
+                    },
+                    {
+                        orderable: true,
+                        price: 26.23,
+                        productId: '701642873402M',
+                        variationValues: {
+                            color: 'JJI15XX',
+                            size: '9XL'
+                        }
+                    },
+                    {
+                        orderable: true,
+                        price: 26.23,
+                        productId: '701642873303M',
+                        variationValues: {
+                            color: 'JJ8UTXX',
+                            size: '9MD'
+                        }
+                    },
+                    {
+                        orderable: true,
+                        price: 26.23,
+                        productId: '701642873310M',
+                        variationValues: {
+                            color: 'JJ8UTXX',
+                            size: '9SM'
+                        }
+                    },
+                    {
+                        orderable: true,
+                        price: 26.23,
+                        productId: '701642873228M',
+                        variationValues: {
+                            color: 'JJ169XX',
+                            size: '9MD'
+                        }
+                    },
+                    {
+                        orderable: true,
+                        price: 26.23,
+                        productId: '701642873235M',
+                        variationValues: {
+                            color: 'JJ169XX',
+                            size: '9SM'
+                        }
+                    },
+                    {
+                        orderable: true,
+                        price: 26.23,
+                        productId: '701642873396M',
+                        variationValues: {
+                            color: 'JJI15XX',
+                            size: '9SM'
+                        }
+                    },
+                    {
+                        orderable: true,
+                        price: 26.23,
+                        productId: '701642873389M',
+                        variationValues: {
+                            color: 'JJI15XX',
+                            size: '9MD'
+                        }
+                    },
+                    {
+                        orderable: true,
+                        price: 26.23,
+                        productId: '701642873327M',
+                        variationValues: {
+                            color: 'JJ8UTXX',
+                            size: '9XL'
+                        }
+                    },
+                    {
+                        orderable: true,
+                        price: 26.23,
+                        productId: '701642873341M',
+                        variationValues: {
+                            color: 'JJ908XX',
+                            size: '9MD'
+                        }
+                    },
+                    {
+                        orderable: true,
+                        price: 26.23,
+                        productId: '701642873358M',
+                        variationValues: {
+                            color: 'JJ908XX',
+                            size: '9SM'
+                        }
+                    },
+                    {
+                        orderable: true,
+                        price: 26.23,
+                        productId: '701642873365M',
+                        variationValues: {
+                            color: 'JJ908XX',
+                            size: '9XL'
+                        }
+                    },
+                    {
+                        orderable: true,
+                        price: 26.23,
+                        productId: '701642873242M',
+                        variationValues: {
+                            color: 'JJ169XX',
+                            size: '9XL'
+                        }
+                    }
+                ],
+                variationAttributes: [
+                    {
+                        id: 'color',
+                        name: 'Colour',
+                        values: [
+                            {
+                                name: 'Black',
+                                orderable: true,
+                                value: 'JJ169XX'
+                            },
+                            {
+                                name: 'Icy Mint',
+                                orderable: true,
+                                value: 'JJ8UTXX'
+                            },
+                            {
+                                name: 'Grey Heather',
+                                orderable: true,
+                                value: 'JJ908XX'
+                            },
+                            {
+                                name: 'White',
+                                orderable: true,
+                                value: 'JJI15XX'
+                            }
+                        ]
+                    },
+                    {
+                        id: 'size',
+                        name: 'Size',
+                        values: [
+                            {
+                                name: 'S',
+                                orderable: true,
+                                value: '9SM'
+                            },
+                            {
+                                name: 'M',
+                                orderable: true,
+                                value: '9MD'
+                            },
+                            {
+                                name: 'L',
+                                orderable: true,
+                                value: '9LG'
+                            },
+                            {
+                                name: 'XL',
+                                orderable: true,
+                                value: '9XL'
+                            }
+                        ]
+                    }
+                ],
+                c_isNewtest: true,
+                c_isSale: true
+            }
         }
     ],
     event: {},
@@ -335,8 +361,7 @@ test('Renders wishlist page', () => {
 
     renderWithProviders(<AccountWishlist />)
     expect(screen.getByTestId('account-wishlist-page')).toBeInTheDocument()
-    expect(screen.getByText(mockData.customerProductListItems[0].name)).toBeInTheDocument()
-    expect(screen.getByText(/Zinc Heather/)).toBeInTheDocument()
+    expect(screen.getByText(mockData.customerProductListItems[0].product.name)).toBeInTheDocument()
 })
 
 test('Can remove item from the wishlist', async () => {
@@ -352,7 +377,7 @@ test('Can remove item from the wishlist', async () => {
     renderWithProviders(<AccountWishlist />)
 
     const wishlistRemoveButton = await screen.findByTestId(
-        'sf-wishlist-remove-7847846d4562e4b4b1c658886d'
+        'sf-wishlist-remove-98ca9a3a9c8ee803543dc45cdc'
     )
     userEvent.click(wishlistRemoveButton)
     userEvent.click(screen.getByRole('button', {name: /yes, remove item/i}))
