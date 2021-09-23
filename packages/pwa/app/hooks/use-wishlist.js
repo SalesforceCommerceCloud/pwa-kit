@@ -59,10 +59,9 @@ const useWishlist = () => {
             createListItem: async (item) => {
                 if (!self.isInitialized) {
                     const list = await self.init()
-                    cpl.createListItem(list.id, item)
-                    return
+                    return cpl.createListItem(list.id, item)
                 }
-                cpl.createListItem(self.data.id, item)
+                return cpl.createListItem(self.data.id, item)
             },
 
             /**
@@ -72,7 +71,7 @@ const useWishlist = () => {
              * @param {number} item.quantity
              */
             updateListItem: (item) => {
-                cpl.updateListItem(self.data.id, item)
+                return cpl.updateListItem(self.data.id, item)
             },
 
             /**
@@ -81,7 +80,7 @@ const useWishlist = () => {
              * @param {string} itemId the id of the item in the product list
              */
             removeListItem: (itemId) => {
-                cpl.removeListItem(self.data.id, itemId)
+                return cpl.removeListItem(self.data.id, itemId)
             },
 
             /**
@@ -90,7 +89,7 @@ const useWishlist = () => {
              * @param {string} productId the id of the product
              */
             removeListItemByProductId: (productId) => {
-                cpl.removeListItemByProductId(self.data.id, productId)
+                return cpl.removeListItemByProductId(self.data.id, productId)
             },
 
             /**

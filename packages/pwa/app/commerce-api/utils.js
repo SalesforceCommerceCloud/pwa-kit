@@ -247,8 +247,8 @@ export const isError = (jsonResponse) => {
 }
 
 /**
- * Decorator that wraps async functions to handle error response.
- * @param {function} func - The async function that gets wrapped
+ * Decorator that wraps functions to handle error response.
+ * @param {function} func - A function which returns a promise
  * @returns {function}
  */
 export const handleAsyncError = (func) => {

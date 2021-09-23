@@ -274,6 +274,51 @@ describe('useWishlist hook', () => {
 
         expect(mock).toBeCalled()
     })
+    test('updateListItem', () => {
+        const mock = jest.fn()
+        const mockFindListByName = jest
+            .fn()
+            .mockReturnValue(mockData.data['f25ad12f60bdf2fb6ec932b78e'])
+
+        useCustomerProductLists.mockReturnValue({
+            updateListItem: mock,
+            findListByName: mockFindListByName
+        })
+        renderWithProviders(<MockComponent />)
+        result.updateListItem()
+
+        expect(mock).toBeCalled()
+    })
+    test('removeListItem', () => {
+        const mock = jest.fn()
+        const mockFindListByName = jest
+            .fn()
+            .mockReturnValue(mockData.data['f25ad12f60bdf2fb6ec932b78e'])
+
+        useCustomerProductLists.mockReturnValue({
+            removeListItem: mock,
+            findListByName: mockFindListByName
+        })
+        renderWithProviders(<MockComponent />)
+        result.removeListItem()
+
+        expect(mock).toBeCalled()
+    })
+    test('removeListItemByProductId', () => {
+        const mock = jest.fn()
+        const mockFindListByName = jest
+            .fn()
+            .mockReturnValue(mockData.data['f25ad12f60bdf2fb6ec932b78e'])
+
+        useCustomerProductLists.mockReturnValue({
+            removeListItemByProductId: mock,
+            findListByName: mockFindListByName
+        })
+        renderWithProviders(<MockComponent />)
+        result.removeListItemByProductId()
+
+        expect(mock).toBeCalled()
+    })
     test('createListItem also calls init if not already initialized', () => {
         const mock = jest.fn()
         const mockFindListByName = jest.fn().mockReturnValue({})
