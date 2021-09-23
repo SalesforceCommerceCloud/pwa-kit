@@ -123,7 +123,7 @@ const ProductList = (props) => {
     const addItemToWishlist = async (product) => {
         try {
             setWishlistLoading([...wishlistLoading, product.productId])
-            await wishlist.addItem({
+            await wishlist.createListItem({
                 id: product.productId,
                 quantity: 1
             })

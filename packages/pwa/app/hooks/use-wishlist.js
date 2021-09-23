@@ -44,6 +44,16 @@ const useWishlist = () => {
             },
 
             /**
+             * Adds an item to the customer's wishlist.
+             * @param {Object} item item to be added to the list.
+             * @param {string} item.id
+             * @param {number} item.quantity
+             */
+            createListItem: (item) => {
+                cpl.createListItem(self.data.id, item)
+            },
+
+            /**
              * Find the item from wishlist.
              * @param {string} productId
              * @returns {object} product list item

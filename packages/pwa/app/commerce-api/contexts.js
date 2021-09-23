@@ -89,11 +89,12 @@ export const CustomerProductListsProvider = ({children}) => {
             }
             case CPLActionTypes.CREATE_LIST_ITEM: {
                 const {listId, item} = payload
+                const {productId} = item
                 const items = state.productLists[listId]?.customerProductListItems || []
 
                 // if the item is already added to the list
                 // we update the existing item
-                const existingItemIndex = items.findIndex((item) => item.id === item.id)
+                const existingItemIndex = items.findIndex((i) => i.productId === productId)
                 if (existingItemIndex >= 0) {
                     items[existingItemIndex] = item
                 } else {
