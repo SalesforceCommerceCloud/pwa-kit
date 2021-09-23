@@ -36,14 +36,6 @@ jest.mock('../../../../commerce-api/hooks/useCustomerProductLists', () => {
     }
 })
 
-// Set up and clean up
-beforeAll(() => {
-    // Need to mock TextEncoder for tests
-    if (typeof TextEncoder === 'undefined') {
-        global.TextEncoder = require('util').TextEncoder
-    }
-})
-
 beforeEach(() => {
     jest.resetModules()
 })

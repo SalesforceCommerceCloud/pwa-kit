@@ -98,11 +98,6 @@ beforeEach(() => {
     jest.resetModules()
     server.listen({onUnhandledRequest: 'error'})
 
-    // Need to mock TextEncoder for tests
-    if (typeof TextEncoder === 'undefined') {
-        global.TextEncoder = require('util').TextEncoder
-    }
-
     window.history.pushState({}, 'Account', '/en-GB/orders')
 })
 afterEach(() => {
