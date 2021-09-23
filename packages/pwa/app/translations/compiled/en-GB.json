@@ -17,6 +17,12 @@
       "value": "Estimated Total"
     }
   ],
+  "+rizW1": [
+    {
+      "type": 0,
+      "value": "My Account"
+    }
+  ],
   "+y/wae": [
     {
       "type": 1,
@@ -59,24 +65,16 @@
       "value": "Password must contain at least one lowercase letter"
     }
   ],
+  "1EBSCe": [
+    {
+      "type": 0,
+      "value": "Our Company"
+    }
+  ],
   "1LE+iY": [
     {
       "type": 0,
       "value": "See full details"
-    }
-  ],
-  "1LblQ6": [
-    {
-      "type": 0,
-      "value": "Cart Subtotal ("
-    },
-    {
-      "type": 1,
-      "value": "itemAccumulatedCount"
-    },
-    {
-      "type": 0,
-      "value": " item)"
     }
   ],
   "1b9Q93": [
@@ -167,6 +165,12 @@
       "value": " added to cart"
     }
   ],
+  "2Z13uI": [
+    {
+      "type": 0,
+      "value": "Account Details"
+    }
+  ],
   "2bGejb": [
     {
       "type": 0,
@@ -223,16 +227,16 @@
       "value": "Sign in to retrieve your saved items or continue shopping"
     }
   ],
-  "3rGMFt": [
-    {
-      "type": 0,
-      "value": "Sale"
-    }
-  ],
   "47FYwb": [
     {
       "type": 0,
       "value": "Cancel"
+    }
+  ],
+  "47UssE": [
+    {
+      "type": 0,
+      "value": "2021 Salesforce or its affiliates. All rights reserved. This is a demo store only. Orders made WILL NOT be processed."
     }
   ],
   "4JYnp2": [
@@ -257,10 +261,10 @@
       "value": "Welcome Back"
     }
   ],
-  "5BTYa0": [
+  "56zS9h": [
     {
       "type": 0,
-      "value": "View Cart"
+      "value": "Shop All"
     }
   ],
   "5H7Fzu": [
@@ -347,6 +351,12 @@
     {
       "type": 0,
       "value": "wishlist-solid"
+    }
+  ],
+  "7AA4E/": [
+    {
+      "type": 0,
+      "value": "View Cart"
     }
   ],
   "7PMLfK": [
@@ -457,6 +467,18 @@
       "value": "Add to cart"
     }
   ],
+  "AQB47r": [
+    {
+      "type": 0,
+      "value": "Promotions"
+    }
+  ],
+  "AUCbMr": [
+    {
+      "type": 0,
+      "value": "Shipping"
+    }
+  ],
   "AYIKp4": [
     {
       "type": 0,
@@ -477,6 +499,12 @@
       "value": "/category/womens-outfits"
     }
   ],
+  "Ar42pW": [
+    {
+      "type": 0,
+      "value": "Sign up to stay in the loop about the hottest deals"
+    }
+  ],
   "Au/ysp": [
     {
       "type": 0,
@@ -487,12 +515,6 @@
     {
       "type": 0,
       "value": "Tax"
-    }
-  ],
-  "B/orA3": [
-    {
-      "type": 0,
-      "value": "Promotions"
     }
   ],
   "B5/YE0": [
@@ -523,6 +545,12 @@
     {
       "type": 0,
       "value": "This email already has an account."
+    }
+  ],
+  "CLoSfA": [
+    {
+      "type": 0,
+      "value": "Site Map"
     }
   ],
   "COv2e6": [
@@ -673,16 +701,16 @@
       "value": "My Account"
     }
   ],
-  "Fkpwhy": [
-    {
-      "type": 0,
-      "value": "Payment Methods"
-    }
-  ],
   "Fmc5ut": [
     {
       "type": 0,
       "value": "Continue to Shipping Method"
+    }
+  ],
+  "Fx8ky7": [
+    {
+      "type": 0,
+      "value": "Privacy Policy"
     }
   ],
   "G/yZLu": [
@@ -709,6 +737,30 @@
       "value": "1 special character (example: , S ! % #)"
     }
   ],
+  "HFCLZi": [
+    {
+      "type": 0,
+      "value": "Our Company"
+    }
+  ],
+  "HLijnS": [
+    {
+      "type": 0,
+      "value": "Privacy & Security"
+    }
+  ],
+  "HZ0xpH": [
+    {
+      "type": 0,
+      "value": "Store Locator"
+    }
+  ],
+  "HtJAMH": [
+    {
+      "type": 0,
+      "value": "Terms & Conditions"
+    }
+  ],
   "I3DIjj": [
     {
       "type": 0,
@@ -719,6 +771,12 @@
     {
       "type": 0,
       "value": "Password must contain at least one number"
+    }
+  ],
+  "IGyE5D": [
+    {
+      "type": 0,
+      "value": "Log out"
     }
   ],
   "IUXVjJ": [
@@ -771,10 +829,22 @@
       "value": "name"
     }
   ],
-  "Ja7gHc": [
+  "JcWqR6": [
     {
       "type": 0,
-      "value": "Edit"
+      "value": "Remove"
+    }
+  ],
+  "KKiRBO": [
+    {
+      "type": 0,
+      "value": "Addresses"
+    }
+  ],
+  "KUzw+/": [
+    {
+      "type": 0,
+      "value": "Payment Methods"
     }
   ],
   "KV/9Hv": [
@@ -809,10 +879,10 @@
       "value": "Subtotal"
     }
   ],
-  "LObwrD": [
+  "LBPsnA": [
     {
       "type": 0,
-      "value": "Wishlist"
+      "value": "Order History"
     }
   ],
   "LiHQih": [
@@ -849,6 +919,12 @@
     {
       "type": 0,
       "value": "Continue shopping and add items to your wishlist"
+    }
+  ],
+  "N1RudH": [
+    {
+      "type": 0,
+      "value": "Order History"
     }
   ],
   "NTgwLi": [
@@ -949,6 +1025,12 @@
       "value": " items"
     }
   ],
+  "OV4Kt4": [
+    {
+      "type": 0,
+      "value": "Payment Methods"
+    }
+  ],
   "OVAmhz": [
     {
       "type": 0,
@@ -1009,6 +1091,12 @@
       "value": "Log out"
     }
   ],
+  "PmbzvQ": [
+    {
+      "type": 0,
+      "value": "Order Status"
+    }
+  ],
   "PzdHrf": [
     {
       "type": 0,
@@ -1023,6 +1111,16 @@
       "value": "/category/womens-clothing-jackets"
     }
   ],
+  "PzkRME": [
+    {
+      "type": 0,
+      "value": "Quantity: "
+    },
+    {
+      "type": 1,
+      "value": "quantity"
+    }
+  ],
   "Q6wcZ5": [
     {
       "type": 0,
@@ -1035,10 +1133,42 @@
       "value": "Please select your country"
     }
   ],
+  "QeNmhz": [
+    {
+      "type": 0,
+      "value": "Addresses"
+    }
+  ],
+  "QhOlCJ": [
+    {
+      "type": 0,
+      "value": "Cart Subtotal ("
+    },
+    {
+      "type": 1,
+      "value": "itemAccumulatedCount"
+    },
+    {
+      "type": 0,
+      "value": " item)"
+    }
+  ],
   "Qm3TN9": [
     {
       "type": 0,
       "value": "Are you sure you want to continue ?"
+    }
+  ],
+  "Qy5U+9": [
+    {
+      "type": 0,
+      "value": "Contact Us"
+    }
+  ],
+  "Rl521J": [
+    {
+      "type": 0,
+      "value": "Sign In"
     }
   ],
   "RlxeOk": [
@@ -1091,6 +1221,12 @@
     {
       "type": 0,
       "value": "promo applied"
+    }
+  ],
+  "T/XubR": [
+    {
+      "type": 0,
+      "value": "Contact Us"
     }
   ],
   "TBI5GJ": [
@@ -1295,6 +1431,12 @@
       "value": "static/img/feeling-red.png"
     }
   ],
+  "ZbB8tS": [
+    {
+      "type": 0,
+      "value": "Sale"
+    }
+  ],
   "Zd02Xe": [
     {
       "type": 0,
@@ -1313,10 +1455,10 @@
       "value": "Yes"
     }
   ],
-  "aMLHDP": [
+  "agJWDW": [
     {
       "type": 0,
-      "value": "Addresses"
+      "value": "Customer Support"
     }
   ],
   "aheQdn": [
@@ -1389,12 +1531,6 @@
       "value": "Are you sure you want to remove this item ?"
     }
   ],
-  "bu/fC1": [
-    {
-      "type": 0,
-      "value": "Remove"
-    }
-  ],
   "c+bH65": [
     {
       "type": 0,
@@ -1459,6 +1595,12 @@
     {
       "type": 0,
       "value": "Yes, remove item"
+    }
+  ],
+  "dfJ/bG": [
+    {
+      "type": 0,
+      "value": "Privacy Policy"
     }
   ],
   "e//rzS": [
@@ -1541,42 +1683,6 @@
       "value": "Password must contain at least 8 characters"
     }
   ],
-  "footer.column.account": [
-    {
-      "type": 0,
-      "value": "Account"
-    }
-  ],
-  "footer.column.customer_support": [
-    {
-      "type": 0,
-      "value": "Customer Support"
-    }
-  ],
-  "footer.column.our_company": [
-    {
-      "type": 0,
-      "value": "Our Company"
-    }
-  ],
-  "footer.link.about_us": [
-    {
-      "type": 0,
-      "value": "About Us"
-    }
-  ],
-  "footer.link.contact_us": [
-    {
-      "type": 0,
-      "value": "Contact Us"
-    }
-  ],
-  "footer.link.order_status": [
-    {
-      "type": 0,
-      "value": "Order Status"
-    }
-  ],
   "footer.link.privacy_policy": [
     {
       "type": 0,
@@ -1595,22 +1701,10 @@
       "value": "Shipping"
     }
   ],
-  "footer.link.signin_create_account": [
-    {
-      "type": 0,
-      "value": "Sign in or Create Account"
-    }
-  ],
   "footer.link.site_map": [
     {
       "type": 0,
       "value": "Site Map"
-    }
-  ],
-  "footer.link.store_locator": [
-    {
-      "type": 0,
-      "value": "Store Locator"
     }
   ],
   "footer.link.terms_conditions": [
@@ -1625,28 +1719,48 @@
       "value": "2021 Salesforce or its affiliates. All rights reserved. This is a demo store only. Orders made WILL NOT be processed."
     }
   ],
-  "footer.subscribe.button.sign_up": [
-    {
-      "type": 0,
-      "value": "Sign Up"
-    }
-  ],
-  "footer.subscribe.description.sign_up": [
-    {
-      "type": 0,
-      "value": "Sign up to stay in the loop about the hottest deals"
-    }
-  ],
-  "footer.subscribe.heading.first_to_know": [
-    {
-      "type": 0,
-      "value": "Be the first to know"
-    }
-  ],
   "fuzq0p": [
     {
       "type": 0,
       "value": "Checkout as guest"
+    }
+  ],
+  "fwdqBg": [
+    {
+      "type": 1,
+      "value": "quantity"
+    },
+    {
+      "type": 0,
+      "value": " "
+    },
+    {
+      "offset": 0,
+      "options": {
+        "one": {
+          "value": [
+            {
+              "type": 0,
+              "value": "item"
+            }
+          ]
+        },
+        "other": {
+          "value": [
+            {
+              "type": 0,
+              "value": "items"
+            }
+          ]
+        }
+      },
+      "pluralType": "cardinal",
+      "type": 6,
+      "value": "quantity"
+    },
+    {
+      "type": 0,
+      "value": " added to cart"
     }
   ],
   "gJd+GO": [
@@ -1663,22 +1777,28 @@
       "value": "/category/mens-clothing-suits"
     }
   ],
+  "gTFQm2": [
+    {
+      "type": 0,
+      "value": "Be the first to know"
+    }
+  ],
   "gW8EGu": [
     {
       "type": 0,
       "value": "Name on Card"
     }
   ],
-  "h85xzU": [
-    {
-      "type": 0,
-      "value": "Order History"
-    }
-  ],
   "hCj9FS": [
     {
       "type": 0,
       "value": "Please enter your name as shown on your card"
+    }
+  ],
+  "hDETfE": [
+    {
+      "type": 0,
+      "value": "Account"
     }
   ],
   "hMt9hl": [
@@ -1723,16 +1843,40 @@
       "value": "Order Summary"
     }
   ],
+  "ix4Syl": [
+    {
+      "type": 0,
+      "value": "Edit"
+    }
+  ],
+  "j0KEyv": [
+    {
+      "type": 0,
+      "value": "Site Map"
+    }
+  ],
   "jAOn1A": [
     {
       "type": 0,
       "value": "Are you sure you want to remove this item from your cart?"
     }
   ],
+  "jHI+R+": [
+    {
+      "type": 0,
+      "value": "About Us"
+    }
+  ],
   "jvo0vs": [
     {
       "type": 0,
       "value": "Save"
+    }
+  ],
+  "k8FdKT": [
+    {
+      "type": 0,
+      "value": "Wishlist"
     }
   ],
   "kVzyDt": [
@@ -1803,82 +1947,16 @@
       "value": "Account Details"
     }
   ],
+  "mdxIJK": [
+    {
+      "type": 0,
+      "value": "Sign in or Create Account"
+    }
+  ],
   "mfahwZ": [
     {
       "type": 0,
       "value": "Recently Viewed"
-    }
-  ],
-  "mobile_navigation.actions.sign_in": [
-    {
-      "type": 0,
-      "value": "Sign In"
-    }
-  ],
-  "mobile_navigation.actions.store_locator": [
-    {
-      "type": 0,
-      "value": "Store Locator"
-    }
-  ],
-  "mobile_navigation.categories.shop_all": [
-    {
-      "type": 0,
-      "value": "Shop All"
-    }
-  ],
-  "mobile_navigation.links.customer_support": [
-    {
-      "type": 0,
-      "value": "Customer Support"
-    }
-  ],
-  "mobile_navigation.links.customer_support.contact_us": [
-    {
-      "type": 0,
-      "value": "Contact Us"
-    }
-  ],
-  "mobile_navigation.links.customer_support.shipping_and_returns": [
-    {
-      "type": 0,
-      "value": "Shipping & Returns"
-    }
-  ],
-  "mobile_navigation.links.out_company": [
-    {
-      "type": 0,
-      "value": "Our Company"
-    }
-  ],
-  "mobile_navigation.links.out_company.about_us": [
-    {
-      "type": 0,
-      "value": "About Us"
-    }
-  ],
-  "mobile_navigation.links.privacy_and_security": [
-    {
-      "type": 0,
-      "value": "Privacy & Security"
-    }
-  ],
-  "mobile_navigation.links.privacy_and_security.privacy_policy": [
-    {
-      "type": 0,
-      "value": "Privacy Policy"
-    }
-  ],
-  "mobile_navigation.links.privacy_and_security.stie_map": [
-    {
-      "type": 0,
-      "value": "Site Map"
-    }
-  ],
-  "mobile_navigation.links.privacy_and_security.terms_and_conditions": [
-    {
-      "type": 0,
-      "value": "Terms & Conditions"
     }
   ],
   "n1I3Yf": [
@@ -1951,6 +2029,12 @@
     {
       "type": 0,
       "value": "You're currently browsing in offline mode"
+    }
+  ],
+  "oip/1I": [
+    {
+      "type": 0,
+      "value": "Shipping & Returns"
     }
   ],
   "p2EAP0": [
@@ -2041,12 +2125,6 @@
       "value": "\""
     }
   ],
-  "pv21oR": [
-    {
-      "type": 0,
-      "value": "Account Details"
-    }
-  ],
   "py3qts": [
     {
       "type": 0,
@@ -2063,6 +2141,12 @@
     {
       "type": 0,
       "value": "Quantity"
+    }
+  ],
+  "r9a120": [
+    {
+      "type": 0,
+      "value": "Proceed to Checkout"
     }
   ],
   "rc7KYy": [
@@ -2125,6 +2209,12 @@
     {
       "type": 0,
       "value": "Edit cart"
+    }
+  ],
+  "suvRii": [
+    {
+      "type": 0,
+      "value": "Sign Up"
     }
   ],
   "sy+pv5": [
@@ -2253,6 +2343,12 @@
       "value": "New Arrivals"
     }
   ],
+  "wlu9Ld": [
+    {
+      "type": 0,
+      "value": "About Us"
+    }
+  ],
   "wzQjyU": [
     {
       "type": 0,
@@ -2271,14 +2367,10 @@
       "value": "Addresses"
     }
   ],
-  "xD3Bn3": [
+  "xFHIhz": [
     {
       "type": 0,
-      "value": "Quantity: "
-    },
-    {
-      "type": 1,
-      "value": "quantity"
+      "value": "Store Locator"
     }
   ],
   "xHP4/6": [
@@ -2315,6 +2407,18 @@
     {
       "type": 0,
       "value": "Most Viewed"
+    }
+  ],
+  "yJ7GtP": [
+    {
+      "type": 0,
+      "value": "Customer Support"
+    }
+  ],
+  "yyWrC0": [
+    {
+      "type": 0,
+      "value": "Terms & Conditions"
     }
   ],
   "z+Zrln": [
@@ -2355,6 +2459,12 @@
     {
       "type": 1,
       "value": "orderNumber"
+    }
+  ],
+  "zwz3bt": [
+    {
+      "type": 0,
+      "value": "Account Details"
     }
   ]
 }

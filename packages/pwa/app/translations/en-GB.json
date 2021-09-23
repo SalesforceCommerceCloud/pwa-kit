@@ -9,6 +9,10 @@
   "+dLAnb": {
     "defaultMessage": "Estimated Total"
   },
+  "+rizW1": {
+    "defaultMessage": "My Account",
+    "description": "drawer_menu.link.my_account"
+  },
   "+y/wae": {
     "defaultMessage": "{errorMessage}"
   },
@@ -31,11 +35,12 @@
   "0yGJXJ": {
     "defaultMessage": "Password must contain at least one lowercase letter"
   },
+  "1EBSCe": {
+    "defaultMessage": "Our Company",
+    "description": "footer.column.our_company"
+  },
   "1LE+iY": {
     "defaultMessage": "See full details"
-  },
-  "1LblQ6": {
-    "defaultMessage": "Cart Subtotal ({itemAccumulatedCount} item)"
   },
   "1b9Q93": {
     "defaultMessage": "You will receive an email at <b>{email}</b> with a link to reset your password shortly."
@@ -89,11 +94,12 @@
   "3gXwAV": {
     "defaultMessage": "Sign in to retrieve your saved items or continue shopping"
   },
-  "3rGMFt": {
-    "defaultMessage": "Sale"
-  },
   "47FYwb": {
     "defaultMessage": "Cancel"
+  },
+  "47UssE": {
+    "defaultMessage": "2021 Salesforce or its affiliates. All rights reserved. This is a demo store only. Orders made WILL NOT be processed.",
+    "description": "footer.message.copyright"
   },
   "4JYnp2": {
     "defaultMessage": "Ordered: {date}"
@@ -105,8 +111,9 @@
     "defaultMessage": "Welcome Back",
     "description": "login_form.heading.welcome_back"
   },
-  "5BTYa0": {
-    "defaultMessage": "View Cart"
+  "56zS9h": {
+    "defaultMessage": "Shop All",
+    "description": "drawer_menu.button.shop_all"
   },
   "5H7Fzu": {
     "defaultMessage": "{itemCount, plural, =0 {0 items} one {# item} other {# items}})"
@@ -131,6 +138,10 @@
   },
   "6yVHs9": {
     "defaultMessage": "wishlist-solid"
+  },
+  "7AA4E/": {
+    "defaultMessage": "View Cart",
+    "description": "add_to_cart_modal.button.view_cart"
   },
   "7PMLfK": {
     "defaultMessage": "Order Total"
@@ -189,6 +200,14 @@
   "ADKef8": {
     "defaultMessage": "Add to cart"
   },
+  "AQB47r": {
+    "defaultMessage": "Promotions",
+    "description": "item_attribute.label"
+  },
+  "AUCbMr": {
+    "defaultMessage": "Shipping",
+    "description": "footer.link.shipping"
+  },
   "AYIKp4": {
     "defaultMessage": "Already have an account? Log in"
   },
@@ -196,14 +215,15 @@
     "defaultMessage": "/{activeLocale}/category/womens-outfits",
     "description": "link"
   },
+  "Ar42pW": {
+    "defaultMessage": "Sign up to stay in the loop about the hottest deals",
+    "description": "footer.subscribe.description.sign_up"
+  },
   "Au/ysp": {
     "defaultMessage": "This is a secure SSL encrypted payment."
   },
   "AwzkSM": {
     "defaultMessage": "Tax"
-  },
-  "B/orA3": {
-    "defaultMessage": "Promotions"
   },
   "B5/YE0": {
     "defaultMessage": "Profile updated"
@@ -219,6 +239,10 @@
   },
   "BlJFo9": {
     "defaultMessage": "This email already has an account."
+  },
+  "CLoSfA": {
+    "defaultMessage": "Site Map",
+    "description": "footer.link.site_map"
   },
   "COv2e6": {
     "defaultMessage": "Shop Women's Dresses",
@@ -282,6 +306,10 @@
   "Fmc5ut": {
     "defaultMessage": "Continue to Shipping Method"
   },
+  "Fx8ky7": {
+    "defaultMessage": "Privacy Policy",
+    "description": "footer.link.privacy_policy"
+  },
   "G/yZLu": {
     "defaultMessage": "Remove"
   },
@@ -295,12 +323,32 @@
     "defaultMessage": "1 special character (example: , S ! % #)",
     "description": "Password requirement"
   },
+  "HFCLZi": {
+    "defaultMessage": "Our Company",
+    "description": "drawer_menu.link.our_company"
+  },
+  "HLijnS": {
+    "defaultMessage": "Privacy & Security",
+    "description": "drawer_menu.link.privacy_and_security"
+  },
+  "HZ0xpH": {
+    "defaultMessage": "Store Locator",
+    "description": "footer.link.store_locator"
+  },
+  "HtJAMH": {
+    "defaultMessage": "Terms & Conditions",
+    "description": "drawer_menu.link.terms_and_conditions"
+  },
   "I3DIjj": {
     "defaultMessage": "Shop Women's Outfits",
     "description": "image.info"
   },
   "I866h3": {
     "defaultMessage": "Password must contain at least one number"
+  },
+  "IGyE5D": {
+    "defaultMessage": "Log out",
+    "description": "drawer_menu.button.log_out"
   },
   "IUXVjJ": {
     "defaultMessage": "Continue Shopping"
@@ -323,9 +371,17 @@
   "JWbGSW": {
     "defaultMessage": "Shipped to: {name}"
   },
-  "Ja7gHc": {
-    "defaultMessage": "Edit",
-    "description": "button"
+  "JcWqR6": {
+    "defaultMessage": "Remove",
+    "description": "action_card.button.remove"
+  },
+  "KKiRBO": {
+    "defaultMessage": "Addresses",
+    "description": "drawer_menu.link.addresses"
+  },
+  "KUzw+/": {
+    "defaultMessage": "Payment Methods",
+    "description": "drawer_menu.link.payment_methods"
   },
   "KV/9Hv": {
     "defaultMessage": "Questions"
@@ -362,6 +418,10 @@
   },
   "Mv2pEb": {
     "defaultMessage": "Continue shopping and add items to your wishlist"
+  },
+  "N1RudH": {
+    "defaultMessage": "Order History",
+    "description": "drawer_menu.link.order_history"
   },
   "NTgwLi": {
     "defaultMessage": "Place Order"
@@ -431,9 +491,17 @@
   "PlBReU": {
     "defaultMessage": "Log out"
   },
+  "PmbzvQ": {
+    "defaultMessage": "Order Status",
+    "description": "footer.link.order_status"
+  },
   "PzdHrf": {
     "defaultMessage": "/{activeLocale}/category/womens-clothing-jackets",
     "description": "link"
+  },
+  "PzkRME": {
+    "defaultMessage": "Quantity: {quantity}",
+    "description": "item_attribute.info"
   },
   "Q6wcZ5": {
     "defaultMessage": "First Name"
@@ -445,8 +513,20 @@
     "defaultMessage": "Addresses",
     "description": "my_account.link"
   },
+  "QhOlCJ": {
+    "defaultMessage": "Cart Subtotal ({itemAccumulatedCount} item)",
+    "description": "add_to_cart_modal.message.cart_subtotal"
+  },
   "Qm3TN9": {
     "defaultMessage": "Are you sure you want to continue ?"
+  },
+  "Qy5U+9": {
+    "defaultMessage": "Contact Us",
+    "description": "footer.link.contact_us"
+  },
+  "Rl521J": {
+    "defaultMessage": "Sign In",
+    "description": "drawer_menu.link.sign_in"
   },
   "RlxeOk": {
     "defaultMessage": "Sort By: {sortOption}"
@@ -471,6 +551,10 @@
   },
   "T/K9MQ": {
     "defaultMessage": "promo applied"
+  },
+  "T/XubR": {
+    "defaultMessage": "Contact Us",
+    "description": "drawer_menu.link.contact_us"
   },
   "TBI5GJ": {
     "defaultMessage": "This {length}-digit code can be found on the {side} of your card.",
@@ -574,6 +658,10 @@
     "defaultMessage": "static/img/feeling-red.png",
     "description": "link"
   },
+  "ZbB8tS": {
+    "defaultMessage": "Sale",
+    "description": "item_image.label.badge"
+  },
   "Zd02Xe": {
     "defaultMessage": "Log out",
     "description": "header.button.log_out"
@@ -583,6 +671,10 @@
   },
   "a5msuh": {
     "defaultMessage": "Yes"
+  },
+  "agJWDW": {
+    "defaultMessage": "Customer Support",
+    "description": "drawer_menu.link.customer_support"
   },
   "aheQdn": {
     "defaultMessage": "Last Name"
@@ -603,10 +695,6 @@
   },
   "bk7ZVA": {
     "defaultMessage": "Are you sure you want to remove this item ?"
-  },
-  "bu/fC1": {
-    "defaultMessage": "Remove",
-    "description": "button"
   },
   "c+bH65": {
     "defaultMessage": "Confirm Action"
@@ -644,6 +732,10 @@
   "dfEp3Z": {
     "defaultMessage": "Yes, remove item"
   },
+  "dfJ/bG": {
+    "defaultMessage": "Privacy Policy",
+    "description": "drawer_menu.link.privacy_policy"
+  },
   "e//rzS": {
     "defaultMessage": "Italian (Italy)"
   },
@@ -677,24 +769,6 @@
   "ffE6Xw": {
     "defaultMessage": "Password must contain at least 8 characters"
   },
-  "footer.column.account": {
-    "defaultMessage": "Account"
-  },
-  "footer.column.customer_support": {
-    "defaultMessage": "Customer Support"
-  },
-  "footer.column.our_company": {
-    "defaultMessage": "Our Company"
-  },
-  "footer.link.about_us": {
-    "defaultMessage": "About Us"
-  },
-  "footer.link.contact_us": {
-    "defaultMessage": "Contact Us"
-  },
-  "footer.link.order_status": {
-    "defaultMessage": "Order Status"
-  },
   "footer.link.privacy_policy": {
     "defaultMessage": "Privacy Policy"
   },
@@ -704,14 +778,8 @@
   "footer.link.shipping": {
     "defaultMessage": "Shipping"
   },
-  "footer.link.signin_create_account": {
-    "defaultMessage": "Sign in or Create Account"
-  },
   "footer.link.site_map": {
     "defaultMessage": "Site Map"
-  },
-  "footer.link.store_locator": {
-    "defaultMessage": "Store Locator"
   },
   "footer.link.terms_conditions": {
     "defaultMessage": "Terms & Conditions"
@@ -719,27 +787,30 @@
   "footer.message.copyright": {
     "defaultMessage": "2021 Salesforce or its affiliates. All rights reserved. This is a demo store only. Orders made WILL NOT be processed."
   },
-  "footer.subscribe.button.sign_up": {
-    "defaultMessage": "Sign Up"
-  },
-  "footer.subscribe.description.sign_up": {
-    "defaultMessage": "Sign up to stay in the loop about the hottest deals"
-  },
-  "footer.subscribe.heading.first_to_know": {
-    "defaultMessage": "Be the first to know"
-  },
   "fuzq0p": {
     "defaultMessage": "Checkout as guest"
+  },
+  "fwdqBg": {
+    "defaultMessage": "{quantity} {quantity, plural, one {item} other {items}} added to cart",
+    "description": "add_to_cart_modal.header.number_of_item_added_to_cart"
   },
   "gJd+GO": {
     "defaultMessage": "/{activeLocale}/category/mens-clothing-suits",
     "description": "link"
+  },
+  "gTFQm2": {
+    "defaultMessage": "Be the first to know",
+    "description": "footer.subscribe.heading.first_to_know"
   },
   "gW8EGu": {
     "defaultMessage": "Name on Card"
   },
   "hCj9FS": {
     "defaultMessage": "Please enter your name as shown on your card"
+  },
+  "hDETfE": {
+    "defaultMessage": "Account",
+    "description": "footer.column.account"
   },
   "hMt9hl": {
     "defaultMessage": "Create account",
@@ -763,8 +834,20 @@
   "ivNR8s": {
     "defaultMessage": "Order Summary"
   },
+  "ix4Syl": {
+    "defaultMessage": "Edit",
+    "description": "action_card.button.edit"
+  },
+  "j0KEyv": {
+    "defaultMessage": "Site Map",
+    "description": "drawer_menu.link.site_map"
+  },
   "jAOn1A": {
     "defaultMessage": "Are you sure you want to remove this item from your cart?"
+  },
+  "jHI+R+": {
+    "defaultMessage": "About Us",
+    "description": "footer.link.about_us"
   },
   "jvo0vs": {
     "defaultMessage": "Save"
@@ -804,44 +887,12 @@
   "mYx8sv": {
     "defaultMessage": "Account Details"
   },
+  "mdxIJK": {
+    "defaultMessage": "Sign in or Create Account",
+    "description": "footer.link.sign_in_or_create_account"
+  },
   "mfahwZ": {
     "defaultMessage": "Recently Viewed"
-  },
-  "mobile_navigation.actions.sign_in": {
-    "defaultMessage": "Sign In"
-  },
-  "mobile_navigation.actions.store_locator": {
-    "defaultMessage": "Store Locator"
-  },
-  "mobile_navigation.categories.shop_all": {
-    "defaultMessage": "Shop All"
-  },
-  "mobile_navigation.links.customer_support": {
-    "defaultMessage": "Customer Support"
-  },
-  "mobile_navigation.links.customer_support.contact_us": {
-    "defaultMessage": "Contact Us"
-  },
-  "mobile_navigation.links.customer_support.shipping_and_returns": {
-    "defaultMessage": "Shipping & Returns"
-  },
-  "mobile_navigation.links.out_company": {
-    "defaultMessage": "Our Company"
-  },
-  "mobile_navigation.links.out_company.about_us": {
-    "defaultMessage": "About Us"
-  },
-  "mobile_navigation.links.privacy_and_security": {
-    "defaultMessage": "Privacy & Security"
-  },
-  "mobile_navigation.links.privacy_and_security.privacy_policy": {
-    "defaultMessage": "Privacy Policy"
-  },
-  "mobile_navigation.links.privacy_and_security.stie_map": {
-    "defaultMessage": "Site Map"
-  },
-  "mobile_navigation.links.privacy_and_security.terms_and_conditions": {
-    "defaultMessage": "Terms & Conditions"
   },
   "n1I3Yf": {
     "defaultMessage": "Shop Women's Dresses",
@@ -880,6 +931,10 @@
   },
   "offline_banner.message": {
     "defaultMessage": "You're currently browsing in offline mode"
+  },
+  "oip/1I": {
+    "defaultMessage": "Shipping & Returns",
+    "description": "drawer_menu.link.shipping_and_return"
   },
   "p2EAP0": {
     "defaultMessage": "Promotion removed"
@@ -920,6 +975,10 @@
   "qVGRIE": {
     "defaultMessage": "Quantity"
   },
+  "r9a120": {
+    "defaultMessage": "Proceed to Checkout",
+    "description": "add_to_cart_modal.button.proceed_checkout"
+  },
   "rc7KYy": {
     "defaultMessage": "Lighter layers for lighter days.",
     "description": "image.title"
@@ -933,6 +992,10 @@
   },
   "s7dATg": {
     "defaultMessage": "Edit cart"
+  },
+  "suvRii": {
+    "defaultMessage": "Sign Up",
+    "description": "footer.subscribe.button.sign_up"
   },
   "sy+pv5": {
     "defaultMessage": "Email"
@@ -996,6 +1059,10 @@
     "defaultMessage": "New Arrivals",
     "description": "image.info"
   },
+  "wlu9Ld": {
+    "defaultMessage": "About Us",
+    "description": "drawer_menu.link.about_us"
+  },
   "wzQjyU": {
     "defaultMessage": "Sign in",
     "description": "login_form.button.sign_in"
@@ -1006,8 +1073,9 @@
   "xBrtnx": {
     "defaultMessage": "Addresses"
   },
-  "xD3Bn3": {
-    "defaultMessage": "Quantity: {quantity}"
+  "xFHIhz": {
+    "defaultMessage": "Store Locator",
+    "description": "drawer_menu.link.store_locator"
   },
   "xHP4/6": {
     "defaultMessage": "Password Reset"
@@ -1027,6 +1095,14 @@
   "y/sA02": {
     "defaultMessage": "Most Viewed"
   },
+  "yJ7GtP": {
+    "defaultMessage": "Customer Support",
+    "description": "footer.column.customer_support"
+  },
+  "yyWrC0": {
+    "defaultMessage": "Terms & Conditions",
+    "description": "footer.link.terms_conditions"
+  },
   "z+Zrln": {
     "defaultMessage": "Set as default"
   },
@@ -1045,5 +1121,9 @@
   },
   "zXbRZR": {
     "defaultMessage": "Order Number: {orderNumber}"
+  },
+  "zwz3bt": {
+    "defaultMessage": "Account Details",
+    "description": "drawer_menu.link.account_details"
   }
 }

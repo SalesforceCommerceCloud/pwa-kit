@@ -60,7 +60,8 @@ const AddToCartModal = ({product, variant, quantity, isOpen, onClose, ...props})
                     {intl.formatMessage(
                         {
                             defaultMessage:
-                                '{quantity} {quantity, plural, one {item} other {items}} added to cart'
+                                '{quantity} {quantity, plural, one {item} other {items}} added to cart',
+                            description: 'add_to_cart_modal.header.number_of_item_added_to_cart'
                         },
                         {quantity}
                     )}
@@ -128,7 +129,8 @@ const AddToCartModal = ({product, variant, quantity, isOpen, onClose, ...props})
                                     {intl.formatMessage(
                                         {
                                             defaultMessage:
-                                                'Cart Subtotal ({itemAccumulatedCount} item)'
+                                                'Cart Subtotal ({itemAccumulatedCount} item)',
+                                            description: 'add_to_cart_modal.message.cart_subtotal'
                                         },
                                         {itemAccumulatedCount}
                                     )}
@@ -144,7 +146,8 @@ const AddToCartModal = ({product, variant, quantity, isOpen, onClose, ...props})
                             <Stack spacing="4">
                                 <Button as={Link} to="/cart" width="100%" variant="solid">
                                     {intl.formatMessage({
-                                        defaultMessage: 'View Cart'
+                                        defaultMessage: 'View Cart',
+                                        description: 'add_to_cart_modal.button.view_cart'
                                     })}
                                 </Button>
 
@@ -156,7 +159,8 @@ const AddToCartModal = ({product, variant, quantity, isOpen, onClose, ...props})
                                     rightIcon={<LockIcon />}
                                 >
                                     {intl.formatMessage({
-                                        defaultMessage: 'Proceed to Checkout'
+                                        defaultMessage: 'Proceed to Checkout',
+                                        description: 'add_to_cart_modal.button.proceed_checkout'
                                     })}
                                 </Button>
                             </Stack>

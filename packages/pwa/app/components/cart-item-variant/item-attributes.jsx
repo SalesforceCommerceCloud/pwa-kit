@@ -70,6 +70,7 @@ const ItemAttributes = ({includeQuantity, currency, ...props}) => {
                     <FormattedMessage
                         defaultMessage="Quantity: {quantity}"
                         values={{quantity: variant.quantity}}
+                        description="item_attribute.info"
                     />
                 </Text>
             )}
@@ -77,7 +78,10 @@ const ItemAttributes = ({includeQuantity, currency, ...props}) => {
             {variant.priceAdjustments?.length > 0 && (
                 <Flex alignItems="center">
                     <Text lineHeight={1} color="gray.700" fontSize="sm">
-                        <FormattedMessage defaultMessage="Promotions" />
+                        <FormattedMessage
+                            defaultMessage="Promotions"
+                            description="item_attribute.label"
+                        />
                         {': '}
                         <Text as="span" color="green.500">
                             <FormattedNumber

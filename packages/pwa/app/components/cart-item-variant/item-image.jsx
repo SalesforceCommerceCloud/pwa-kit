@@ -43,7 +43,10 @@ const ItemImage = ({imageProps, ratio = 1, ...props}) => {
                             variant="solid"
                             colorScheme="blue"
                         >
-                            <FormattedMessage defaultMessage="Sale" />
+                            <FormattedMessage
+                                defaultMessage="Sale"
+                                description="item_image.label.badge"
+                            />
                         </Badge>
                     )}
 

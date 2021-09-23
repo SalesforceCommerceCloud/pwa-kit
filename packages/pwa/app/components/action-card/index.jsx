@@ -45,12 +45,18 @@ const ActionCard = ({children, onEdit, onRemove, ...props}) => {
                 <Stack direction="row" spacing={4}>
                     {onEdit && (
                         <Button onClick={onEdit} variant="link" size="sm">
-                            <FormattedMessage defaultMessage="Edit" description="button" />
+                            <FormattedMessage
+                                defaultMessage="Edit"
+                                description="action_card.button.edit"
+                            />
                         </Button>
                     )}
                     {onRemove && (
                         <Button variant="link" size="sm" colorScheme="red" onClick={handleRemove}>
-                            <FormattedMessage defaultMessage="Remove" description="button" />
+                            <FormattedMessage
+                                defaultMessage="Remove"
+                                description="action_card.button.remove"
+                            />
                         </Button>
                     )}
                 </Stack>

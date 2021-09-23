@@ -43,66 +43,66 @@ const Footer = ({...otherProps}) => {
                         <SimpleGrid columns={4} spacing={3}>
                             <LinksList
                                 heading={intl.formatMessage({
-                                    id: 'footer.column.customer_support',
-                                    defaultMessage: 'Customer Support'
+                                    defaultMessage: 'Customer Support',
+                                    description: 'footer.column.customer_support'
                                 })}
                                 links={[
                                     {
                                         href: '/',
                                         text: intl.formatMessage({
-                                            id: 'footer.link.contact_us',
-                                            defaultMessage: 'Contact Us'
+                                            defaultMessage: 'Contact Us',
+                                            description: 'footer.link.contact_us'
                                         })
                                     },
                                     {
                                         href: '/',
                                         text: intl.formatMessage({
-                                            id: 'footer.link.shipping',
-                                            defaultMessage: 'Shipping'
+                                            defaultMessage: 'Shipping',
+                                            description: 'footer.link.shipping'
                                         })
                                     }
                                 ]}
                             />
                             <LinksList
                                 heading={intl.formatMessage({
-                                    id: 'footer.column.account',
-                                    defaultMessage: 'Account'
+                                    defaultMessage: 'Account',
+                                    description: 'footer.column.account'
                                 })}
                                 links={[
                                     {
                                         href: '/',
                                         text: intl.formatMessage({
-                                            id: 'footer.link.order_status',
-                                            defaultMessage: 'Order Status'
+                                            defaultMessage: 'Order Status',
+                                            description: 'footer.link.order_status'
                                         })
                                     },
                                     {
                                         href: '/',
                                         text: intl.formatMessage({
-                                            id: 'footer.link.signin_create_account',
-                                            defaultMessage: 'Sign in or Create Account'
+                                            defaultMessage: 'Sign in or Create Account',
+                                            description: 'footer.link.sign_in_or_create_account'
                                         })
                                     }
                                 ]}
                             />
                             <LinksList
                                 heading={intl.formatMessage({
-                                    id: 'footer.column.our_company',
-                                    defaultMessage: 'Our Company'
+                                    defaultMessage: 'Our Company',
+                                    description: 'footer.column.our_company'
                                 })}
                                 links={[
                                     {
                                         href: '/',
                                         text: intl.formatMessage({
-                                            id: 'footer.link.store_locator',
-                                            defaultMessage: 'Store Locator'
+                                            defaultMessage: 'Store Locator',
+                                            description: 'footer.link.store_locator'
                                         })
                                     },
                                     {
                                         href: '/',
                                         text: intl.formatMessage({
-                                            id: 'footer.link.about_us',
-                                            defaultMessage: 'About Us'
+                                            defaultMessage: 'About Us',
+                                            description: 'footer.link.about_us'
                                         })
                                     }
                                 ]}
@@ -149,9 +149,9 @@ const Footer = ({...otherProps}) => {
                         <Text {...styles.copyright}>
                             &copy;{' '}
                             {intl.formatMessage({
-                                id: 'footer.message.copyright',
                                 defaultMessage:
-                                    '2021 Salesforce or its affiliates. All rights reserved. This is a demo store only. Orders made WILL NOT be processed.'
+                                    '2021 Salesforce or its affiliates. All rights reserved. This is a demo store only. Orders made WILL NOT be processed.',
+                                description: 'footer.message.copyright'
                             })}
                         </Text>
 
@@ -178,14 +178,14 @@ const Subscribe = ({...otherProps}) => {
         <Box {...styles.subscribe} {...otherProps}>
             <Heading {...styles.subscribeHeading}>
                 {intl.formatMessage({
-                    id: 'footer.subscribe.heading.first_to_know',
-                    defaultMessage: 'Be the first to know'
+                    defaultMessage: 'Be the first to know',
+                    description: 'footer.subscribe.heading.first_to_know'
                 })}
             </Heading>
             <Text {...styles.subscribeMessage}>
                 {intl.formatMessage({
-                    id: 'footer.subscribe.description.sign_up',
-                    defaultMessage: 'Sign up to stay in the loop about the hottest deals'
+                    defaultMessage: 'Sign up to stay in the loop about the hottest deals',
+                    description: 'footer.subscribe.description.sign_up'
                 })}
             </Text>
 
@@ -195,8 +195,8 @@ const Subscribe = ({...otherProps}) => {
                     <InputRightElement {...styles.subscribeButtonContainer}>
                         <Button variant="footer">
                             {intl.formatMessage({
-                                id: 'footer.subscribe.button.sign_up',
-                                defaultMessage: 'Sign Up'
+                                defaultMessage: 'Sign Up',
+                                description: 'footer.subscribe.button.sign_up'
                             })}
                         </Button>
                     </InputRightElement>
@@ -216,22 +216,22 @@ const LegalLinks = ({variant}) => {
                 {
                     href: '/',
                     text: intl.formatMessage({
-                        id: 'footer.link.terms_conditions',
-                        defaultMessage: 'Terms & Conditions'
+                        defaultMessage: 'Terms & Conditions',
+                        description: 'footer.link.terms_conditions'
                     })
                 },
                 {
                     href: '/',
                     text: intl.formatMessage({
-                        id: 'footer.link.privacy_policy',
-                        defaultMessage: 'Privacy Policy'
+                        defaultMessage: 'Privacy Policy',
+                        description: 'footer.link.privacy_policy'
                     })
                 },
                 {
                     href: '/',
                     text: intl.formatMessage({
-                        id: 'footer.link.site_map',
-                        defaultMessage: 'Site Map'
+                        defaultMessage: 'Site Map',
+                        description: 'footer.link.site_map'
                     })
                 }
             ]}

@@ -136,9 +136,9 @@ const DrawerMenu = ({isOpen, onClose = noop, onLogoClick = noop, root}) => {
                                                         color="black"
                                                     >
                                                         {intl.formatMessage({
-                                                            id:
-                                                                'mobile_navigation.categories.shop_all',
-                                                            defaultMessage: 'Shop All'
+                                                            defaultMessage: 'Shop All',
+                                                            description:
+                                                                'drawer_menu.button.shop_all'
                                                         })}
                                                     </AccordionButton>
                                                 </AccordionItem>
@@ -177,7 +177,9 @@ const DrawerMenu = ({isOpen, onClose = noop, onLogoClick = noop, root}) => {
                                                         <SignoutIcon boxSize={5} />
                                                         <Text {...styles.signoutText} as="span">
                                                             {intl.formatMessage({
-                                                                defaultMessage: 'Log out'
+                                                                defaultMessage: 'Log out',
+                                                                description:
+                                                                    'drawer_menu.button.log_out'
                                                             })}
                                                         </Text>
                                                     </Flex>
@@ -190,35 +192,44 @@ const DrawerMenu = ({isOpen, onClose = noop, onLogoClick = noop, root}) => {
                                                 {
                                                     id: 'my-account',
                                                     name: intl.formatMessage({
-                                                        defaultMessage: 'My Account'
+                                                        defaultMessage: 'My Account',
+                                                        description: 'drawer_menu.link.my_account'
                                                     }),
                                                     items: [
                                                         {
                                                             id: 'profile',
                                                             path: '',
                                                             name: intl.formatMessage({
-                                                                defaultMessage: 'Account Details'
+                                                                defaultMessage: 'Account Details',
+                                                                description:
+                                                                    'drawer_menu.link.account_details'
                                                             })
                                                         },
                                                         {
                                                             id: 'orders',
                                                             path: '/orders',
                                                             name: intl.formatMessage({
-                                                                defaultMessage: 'Order History'
+                                                                defaultMessage: 'Order History',
+                                                                description:
+                                                                    'drawer_menu.link.order_history'
                                                             })
                                                         },
                                                         {
                                                             id: 'addresses',
                                                             path: '/addresses',
                                                             name: intl.formatMessage({
-                                                                defaultMessage: 'Addresses'
+                                                                defaultMessage: 'Addresses',
+                                                                description:
+                                                                    'drawer_menu.link.addresses'
                                                             })
                                                         },
                                                         {
                                                             id: 'payments',
                                                             path: '/payments',
                                                             name: intl.formatMessage({
-                                                                defaultMessage: 'Payment Methods'
+                                                                defaultMessage: 'Payment Methods',
+                                                                description:
+                                                                    'drawer_menu.link.payment_methods'
                                                             })
                                                         }
                                                     ]
@@ -232,8 +243,8 @@ const DrawerMenu = ({isOpen, onClose = noop, onLogoClick = noop, root}) => {
                                             <UserIcon {...styles.icon} />{' '}
                                             <Text>
                                                 {intl.formatMessage({
-                                                    id: 'mobile_navigation.actions.sign_in',
-                                                    defaultMessage: 'Sign In'
+                                                    defaultMessage: 'Sign In',
+                                                    description: 'drawer_menu.link.sign_in'
                                                 })}
                                             </Text>
                                         </HStack>
@@ -246,8 +257,8 @@ const DrawerMenu = ({isOpen, onClose = noop, onLogoClick = noop, root}) => {
                                         <LocationIcon {...styles.icon} />{' '}
                                         <Text>
                                             {intl.formatMessage({
-                                                id: 'mobile_navigation.actions.store_locator',
-                                                defaultMessage: 'Store Locator'
+                                                defaultMessage: 'Store Locator',
+                                                description: 'drawer_menu.link.store_locator'
                                             })}
                                         </Text>
                                     </HStack>
@@ -283,23 +294,22 @@ const DrawerMenu = ({isOpen, onClose = noop, onLogoClick = noop, root}) => {
                                             {
                                                 id: 'contactus',
                                                 name: intl.formatMessage({
-                                                    id:
-                                                        'mobile_navigation.links.customer_support.contact_us',
-                                                    defaultMessage: 'Contact Us'
+                                                    defaultMessage: 'Contact Us',
+                                                    description: 'drawer_menu.link.contact_us'
                                                 })
                                             },
                                             {
                                                 id: 'shippingandreturns',
                                                 name: intl.formatMessage({
-                                                    id:
-                                                        'mobile_navigation.links.customer_support.shipping_and_returns',
-                                                    defaultMessage: 'Shipping & Returns'
+                                                    defaultMessage: 'Shipping & Returns',
+                                                    description:
+                                                        'drawer_menu.link.shipping_and_return'
                                                 })
                                             }
                                         ],
                                         name: intl.formatMessage({
-                                            id: 'mobile_navigation.links.customer_support',
-                                            defaultMessage: 'Customer Support'
+                                            defaultMessage: 'Customer Support',
+                                            description: 'drawer_menu.link.customer_support'
                                         })
                                     },
                                     {
@@ -308,15 +318,14 @@ const DrawerMenu = ({isOpen, onClose = noop, onLogoClick = noop, root}) => {
                                             {
                                                 id: 'aboutus',
                                                 name: intl.formatMessage({
-                                                    id:
-                                                        'mobile_navigation.links.out_company.about_us',
-                                                    defaultMessage: 'About Us'
+                                                    defaultMessage: 'About Us',
+                                                    description: 'drawer_menu.link.about_us'
                                                 })
                                             }
                                         ],
                                         name: intl.formatMessage({
-                                            id: 'mobile_navigation.links.out_company',
-                                            defaultMessage: 'Our Company'
+                                            defaultMessage: 'Our Company',
+                                            description: 'drawer_menu.link.our_company'
                                         })
                                     },
                                     {
@@ -325,31 +334,29 @@ const DrawerMenu = ({isOpen, onClose = noop, onLogoClick = noop, root}) => {
                                             {
                                                 id: 'termsandconditions',
                                                 name: intl.formatMessage({
-                                                    id:
-                                                        'mobile_navigation.links.privacy_and_security.terms_and_conditions',
-                                                    defaultMessage: 'Terms & Conditions'
+                                                    defaultMessage: 'Terms & Conditions',
+                                                    description:
+                                                        'drawer_menu.link.terms_and_conditions'
                                                 })
                                             },
                                             {
                                                 id: 'privacypolicy',
                                                 name: intl.formatMessage({
-                                                    id:
-                                                        'mobile_navigation.links.privacy_and_security.privacy_policy',
-                                                    defaultMessage: 'Privacy Policy'
+                                                    defaultMessage: 'Privacy Policy',
+                                                    description: 'drawer_menu.link.privacy_policy'
                                                 })
                                             },
                                             {
                                                 id: 'sitemap',
                                                 name: intl.formatMessage({
-                                                    id:
-                                                        'mobile_navigation.links.privacy_and_security.stie_map',
-                                                    defaultMessage: 'Site Map'
+                                                    defaultMessage: 'Site Map',
+                                                    description: 'drawer_menu.link.site_map'
                                                 })
                                             }
                                         ],
                                         name: intl.formatMessage({
-                                            id: 'mobile_navigation.links.privacy_and_security',
-                                            defaultMessage: 'Privacy & Security'
+                                            defaultMessage: 'Privacy & Security',
+                                            description: 'drawer_menu.link.privacy_and_security'
                                         })
                                     }
                                 ]
