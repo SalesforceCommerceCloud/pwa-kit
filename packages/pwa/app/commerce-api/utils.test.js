@@ -232,7 +232,7 @@ describe('handleAsyncError', () => {
         const func = jest.fn().mockResolvedValue(errorResponse)
         await expect(handleAsyncError(func)()).rejects.toThrow(new Error(errorResponse.detail))
     })
-    test('works even if func is async', async () => {
+    test('works even if func is not async', async () => {
         const func = jest.fn().mockReturnValue(1)
         expect(await handleAsyncError(func)()).toBe(1)
     })
