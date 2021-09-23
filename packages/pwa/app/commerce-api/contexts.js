@@ -113,21 +113,27 @@ export const CustomerProductListsProvider = ({children}) => {
             }
             case CPLActionTypes.UPDATE_LIST_ITEM: {
                 const {listId, item} = payload
-                const productLists = {
-                    ...state.productLists
-                }
-                productLists[listId].customerProductListItems = productLists[
-                    listId
-                ].customerProductListItems?.map((listItem) => {
-                    if (listItem.id === item.id) {
-                        return {
-                            ...listItem,
-                            ...item
+                const items = state.productLists[listId].customerProductListItems?.map(
+                    (listItem) => {
+                        if (listItem.id === item.id) {
+                            return {
+                                ...listItem,
+                                ...item
+                            }
+                        }
+                        return listItem
+                    }
+                )
+                return {
+                    ...state,
+                    productLists: {
+                        ...state.productLists,
+                        [listId]: {
+                            ...state.productLists[listId],
+                            customerProductListItems: items
                         }
                     }
-                    return listItem
-                })
-                return {...state, productLists}
+                }
             }
             case CPLActionTypes.REMOVE_LIST_ITEM: {
                 const {listId, itemId} = payload

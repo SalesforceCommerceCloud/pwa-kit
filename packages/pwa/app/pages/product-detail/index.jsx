@@ -79,7 +79,7 @@ const ProductDetail = ({category, product, isLoading}) => {
         try {
             await wishlist.createListItem({
                 id: product.id,
-                quantity: quantity
+                quantity
             })
             toast({
                 title: formatMessage(

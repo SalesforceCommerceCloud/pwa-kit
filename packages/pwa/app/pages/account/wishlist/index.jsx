@@ -46,7 +46,7 @@ const AccountWishlist = () => {
         setWishlistItemLoading(true)
         setSelectedItem(item.productId)
         try {
-            await wishlist.updateItem({
+            await wishlist.updateListItem({
                 ...item,
                 quantity: parseInt(quantity)
             })

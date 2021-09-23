@@ -51,6 +51,16 @@ const useWishlist = () => {
             },
 
             /**
+             * Update an item to the customer's wishlist.
+             * @param {Object} item item to be updated
+             * @param {string} item.id
+             * @param {number} item.quantity
+             */
+            updateListItem: (item) => {
+                cpl.updateListItem(self.data.id, item)
+            },
+
+            /**
              * Remove an item from the customer's wishlist.
              *
              * @param {string} productId the id of the product
