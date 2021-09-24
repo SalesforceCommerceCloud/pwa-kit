@@ -86,11 +86,6 @@ const server = setupServer(
 
 // Set up and clean up
 beforeAll(() => {
-    // Need to mock TextEncoder for tests
-    if (typeof TextEncoder === 'undefined') {
-        global.TextEncoder = require('util').TextEncoder
-    }
-
     // Since we're testing some navigation logic, we are using a simple Router
     // around our component. We need to initialize the default route/path here.
     window.history.pushState({}, 'ProductDetail', '/en-GB/product/test-product')

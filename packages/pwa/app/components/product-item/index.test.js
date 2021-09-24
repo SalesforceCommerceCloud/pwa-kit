@@ -13,11 +13,6 @@ import {screen} from '@testing-library/react'
 // Set up and clean up
 beforeEach(() => {
     jest.resetModules()
-
-    // Need to mock TextEncoder for tests
-    if (typeof TextEncoder === 'undefined') {
-        global.TextEncoder = require('util').TextEncoder
-    }
 })
 
 jest.setTimeout(60000)
