@@ -85,7 +85,7 @@ const ProductView = ({
     category,
     showFullLink = false,
     imageSize = 'md',
-    isCustomerProductListLoading = false,
+    isWishlistLoading = false,
     addToCart,
     updateCart,
     addToWishlist,
@@ -166,8 +166,8 @@ const ProductView = ({
                 <ButtonWithRegistration
                     key="wishlist-button"
                     onClick={handleWishlistItem}
-                    disabled={isCustomerProductListLoading || !canAddToWishlist}
-                    isLoading={isCustomerProductListLoading}
+                    disabled={isWishlistLoading || !canAddToWishlist}
+                    isLoading={isWishlistLoading}
                     width="100%"
                     variant="outline"
                     marginBottom={4}
@@ -413,7 +413,7 @@ ProductView.propTypes = {
     product: PropTypes.object,
     category: PropTypes.array,
     isProductLoading: PropTypes.bool,
-    isCustomerProductListLoading: PropTypes.bool,
+    isWishlistLoading: PropTypes.bool,
     addToCart: PropTypes.func,
     addToWishlist: PropTypes.func,
     updateCart: PropTypes.func,

@@ -18,7 +18,7 @@ import {
     CustomerProvider,
     BasketProvider,
     CustomerProductListsProvider
-} from '../../commerce-api/utils'
+} from '../../commerce-api/contexts'
 import {commerceAPIConfig} from '../../commerce-api.config'
 import {einsteinAPIConfig} from '../../einstein-api.config'
 import {DEFAULT_LOCALE, SUPPORTED_LOCALES} from '../../constants'
@@ -57,15 +57,12 @@ const getLocale = (locals) => {
 const AppConfig = ({children, locals = {}}) => {
     const [basket, setBasket] = useState(null)
     const [customer, setCustomer] = useState(null)
-    const [customerProductLists, setCustomerProductLists] = useState()
 
     return (
         <CommerceAPIProvider value={locals.api}>
             <CustomerProvider value={{customer, setCustomer}}>
                 <BasketProvider value={{basket, setBasket}}>
-                    <CustomerProductListsProvider
-                        value={{customerProductLists, setCustomerProductLists}}
-                    >
+                    <CustomerProductListsProvider>
                         <ChakraProvider theme={theme}>{children}</ChakraProvider>
                     </CustomerProductListsProvider>
                 </BasketProvider>

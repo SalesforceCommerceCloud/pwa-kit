@@ -28,7 +28,7 @@ const WishlistPrimaryAction = () => {
         setIsLoading(true)
         const productItem = [
             {
-                productId: variant.id,
+                productId: variant.productId,
                 quantity: variant.quantity,
                 price: variant.price
             }
