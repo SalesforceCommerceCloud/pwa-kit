@@ -361,12 +361,7 @@ test('Renders wishlist page', () => {
 
     renderWithProviders(<AccountWishlist />)
     expect(screen.getByTestId('account-wishlist-page')).toBeInTheDocument()
-<<<<<<< HEAD
-    expect(screen.getByText(mockData.customerProductListItems[0].name)).toBeInTheDocument()
-    expect(screen.getByText(/Zinc Heather/)).toBeInTheDocument()
-=======
     expect(screen.getByText(mockData.customerProductListItems[0].product.name)).toBeInTheDocument()
->>>>>>> develop
 })
 
 test('Can remove item from the wishlist', async () => {
@@ -382,11 +377,7 @@ test('Can remove item from the wishlist', async () => {
     renderWithProviders(<AccountWishlist />)
 
     const wishlistRemoveButton = await screen.findByTestId(
-<<<<<<< HEAD
-        'sf-wishlist-remove-7847846d4562e4b4b1c658886d'
-=======
         'sf-wishlist-remove-98ca9a3a9c8ee803543dc45cdc'
->>>>>>> develop
     )
     userEvent.click(wishlistRemoveButton)
     userEvent.click(screen.getByRole('button', {name: /yes, remove item/i}))

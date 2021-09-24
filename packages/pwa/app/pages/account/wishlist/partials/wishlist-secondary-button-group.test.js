@@ -349,11 +349,7 @@ const mockData = {
 jest.mock('../../../../hooks/use-wishlist')
 
 const MockedComponent = () => {
-<<<<<<< HEAD
-    const product = mockData.customerProductListItems[0]
-=======
     const product = mockData.customerProductListItems[0].product
->>>>>>> develop
     return (
         <CartItemVariant variant={{...product, productName: product.name}}>
             <WishlistSecondaryButtonGroup />
