@@ -41,7 +41,7 @@ import QuantityPicker from '../../components/quantity-picker'
 
 const ProductViewHeader = ({name, price, currency, category}) => {
     const intl = useIntl()
-    const {activeCurrency} = useCurrency()
+    const {currency: activeCurrency} = useCurrency()
     return (
         <VStack mr={4} spacing={2} align="flex-start" marginBottom={[4, 4, 4, 0, 0]}>
             {category && (

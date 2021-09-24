@@ -23,7 +23,7 @@ const ItemAttributes = ({includeQuantity, currency, ...props}) => {
     const variant = useCartItemVariant()
     const basket = useBasket()
     const [promos, setPromos] = useState([])
-    const {activeCurrency} = useCurrency()
+    const {currency: activeCurrency} = useCurrency()
 
     // Create a mapping of variation values to their associated attributes. This allows us
     // the render the readable names/labels rather than variation value IDs.

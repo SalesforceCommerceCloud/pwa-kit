@@ -14,7 +14,7 @@ import {HideOnDesktop, HideOnMobile} from '../responsive'
 import {useCurrency} from '../../hooks'
 
 const PricePerItem = ({currency, basket, basePrice}) => {
-    const {activeCurrency} = useCurrency()
+    const {currency: activeCurrency} = useCurrency()
     return (
         <Text fontSize={{base: '12px', lg: '14px'}}>
             <FormattedNumber
@@ -43,7 +43,7 @@ PricePerItem.propTypes = {
 const ItemPrice = ({currency, align = 'right', baseDirection = 'column', ...props}) => {
     const variant = useCartItemVariant()
     const basket = useBasket()
-    const {activeCurrency} = useCurrency()
+    const {currency: activeCurrency} = useCurrency()
 
     const {price, basePrice, priceAfterItemDiscount} = variant
 

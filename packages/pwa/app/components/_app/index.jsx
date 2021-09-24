@@ -15,7 +15,7 @@ import {Box, useDisclosure, useStyleConfig} from '@chakra-ui/react'
 import {SkipNavLink, SkipNavContent} from '@chakra-ui/skip-nav'
 
 // Contexts
-import {CategoriesContext, CurrencyContext} from '../../contexts'
+import {CategoriesProvider, CurrencyProvider} from '../../contexts'
 
 // Local Project Components
 import Header from '../../components/header'
@@ -71,14 +71,15 @@ const App = (props) => {
     const authModal = useAuthModal()
     const customer = useCustomer()
     const [isOnline, setIsOnline] = useState(true)
-    const [categories, setCategories] = useState(allCategories)
-    const [currency, setCurrency] = useState(getCurrency(targetLocale) || DEFAULT_CURRENCY)
     const styles = useStyleConfig('App')
 
     const {isOpen, onOpen, onClose} = useDisclosure()
 
     // Used to conditionally render header/footer for checkout page
     const isCheckout = /\/checkout$/.test(location?.pathname)
+
+    // Get the current currency to be used throught the app
+    const currency = getCurrency(targetLocale) || DEFAULT_CURRENCY
 
     // Set up customer and basket
     useShopper({currency})
@@ -143,8 +144,8 @@ const App = (props) => {
                 defaultLocale={defaultLocale}
                 messages={messages}
             >
-                <CategoriesContext.Provider value={{categories, setCategories}}>
-                    <CurrencyContext.Provider value={{currency, setCurrency}}>
+                <CategoriesProvider categories={allCategories}>
+                    <CurrencyProvider currency={currency}>
                         <Seo>
                             <meta name="theme-color" content="#0288a7" />
                             <meta
@@ -177,12 +178,12 @@ const App = (props) => {
                                                 isOpen={isOpen}
                                                 onClose={onClose}
                                                 onLogoClick={onLogoClick}
-                                                root={categories[DEFAULT_ROOT_CATEGORY]}
+                                                root={allCategories[DEFAULT_ROOT_CATEGORY]}
                                             />
                                         </HideOnDesktop>
 
                                         <HideOnMobile>
-                                            <ListMenu root={categories[DEFAULT_ROOT_CATEGORY]} />
+                                            <ListMenu root={allCategories[DEFAULT_ROOT_CATEGORY]} />
                                         </HideOnMobile>
                                     </Header>
                                 ) : (
@@ -216,8 +217,8 @@ const App = (props) => {
 
                             <AuthModal {...authModal} />
                         </Box>
-                    </CurrencyContext.Provider>
-                </CategoriesContext.Provider>
+                    </CurrencyProvider>
+                </CategoriesProvider>
             </IntlProvider>
         </Box>
     )

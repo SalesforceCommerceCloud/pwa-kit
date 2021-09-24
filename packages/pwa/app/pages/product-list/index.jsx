@@ -57,7 +57,7 @@ import {useToast} from '../../hooks/use-toast'
 import {parse as parseSearchParams} from '../../hooks/use-search-params'
 
 // Others
-import {CategoriesContext} from '../../contexts'
+import {useCategories} from '../../hooks/use-categories'
 import {HTTPNotFound} from 'pwa-kit-react-sdk/ssr/universal/errors'
 
 // Constants
@@ -84,7 +84,7 @@ const ProductList = (props) => {
     const history = useHistory()
     const params = useParams()
     const [searchParams, {stringify: stringifySearchParams}] = useSearchParams()
-    const {categories} = useContext(CategoriesContext)
+    const {categories} = useCategories()
     const [filtersLoading, setFiltersLoading] = useState(false)
     const productListEventHandler = (event) => {
         if (event.action === 'add') {

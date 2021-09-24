@@ -45,7 +45,7 @@ const AddToCartModal = ({product, variant, quantity, isOpen, onClose, ...props})
         viewType: 'small',
         selectedVariationAttributes: variationValues
     })?.images?.[0]
-    const {activeCurrency} = useCurrency()
+    const {currency: activeCurrency} = useCurrency()
 
     return (
         <Modal size={size} isOpen={isOpen} onClose={onClose} {...props}>
