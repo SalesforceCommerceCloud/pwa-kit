@@ -45,20 +45,10 @@ const AccountWishlist = () => {
         setLocalQuantity({...localQuantity, [item.productId]: quantity})
         setWishlistItemLoading(true)
         setSelectedItem(item.productId)
-        try {
-            await wishlist.updateListItem({
-                ...item,
-                quantity: parseInt(quantity)
-            })
-        } catch {
-            toast({
-                title: formatMessage(
-                    {defaultMessage: '{errorMessage}'},
-                    {errorMessage: API_ERROR_MESSAGE}
-                ),
-                status: 'error'
-            })
-        }
+        await wishlist.updateListItem({
+            ...item,
+            quantity: parseInt(quantity)
+        })
         setWishlistItemLoading(false)
         setSelectedItem(undefined)
         setLocalQuantity({...localQuantity, [item.productId]: undefined})

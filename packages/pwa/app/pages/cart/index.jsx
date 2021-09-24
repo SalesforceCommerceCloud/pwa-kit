@@ -60,30 +60,11 @@ const Cart = () => {
 
     /**************** Wishlist ****************/
     const wishlist = useWishlist()
-    const handleAddToWishlist = async (product) => {
-        try {
-            await wishlist.createListItem({
-                id: product.productId,
-                quantity: product.quantity
-            })
-            toast({
-                title: formatMessage(
-                    {
-                        defaultMessage:
-                            '{quantity} {quantity, plural, one {item} other {items}} added to wishlist'
-                    },
-                    {quantity: 1}
-                ),
-                status: 'success',
-                action: (
-                    <Button variant="link" onClick={() => navigate('/account/wishlist')}>
-                        View
-                    </Button>
-                )
-            })
-        } catch {
-            showError()
-        }
+    const handleAddToWishlist = (product) => {
+        return wishlist.createListItem({
+            id: product.productId,
+            quantity: product.quantity
+        })
     }
 
     useEffect(() => {

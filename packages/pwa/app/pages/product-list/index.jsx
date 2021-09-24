@@ -121,63 +121,17 @@ const ProductList = (props) => {
     // keep track of the items has been add/remove to/from wishlist
     const [wishlistLoading, setWishlistLoading] = useState([])
     const addItemToWishlist = async (product) => {
-        try {
-            setWishlistLoading([...wishlistLoading, product.productId])
-            await wishlist.createListItem({
-                id: product.productId,
-                quantity: 1
-            })
-            toast({
-                title: formatMessage(
-                    {
-                        defaultMessage:
-                            '{quantity} {quantity, plural, one {item} other {items}} added to wishlist'
-                    },
-                    {quantity: 1}
-                ),
-                status: 'success',
-                action: (
-                    // it would be better if we could use <Button as={Link}>
-                    // but unfortunately the Link component is not compatible
-                    // with Chakra Toast, since the ToastManager is rendered via portal
-                    // and the toast doesn't have access to intl provider, which is a
-                    // requirement of the Link component.
-                    <Button variant="link" onClick={() => navigate('/account/wishlist')}>
-                        View
-                    </Button>
-                )
-            })
-        } catch {
-            toast({
-                title: formatMessage(
-                    {defaultMessage: '{errorMessage}'},
-                    {errorMessage: API_ERROR_MESSAGE}
-                ),
-                status: 'error'
-            })
-        } finally {
-            setWishlistLoading(wishlistLoading.filter((id) => id !== product.productId))
-        }
+        setWishlistLoading([...wishlistLoading, product.productId])
+        await wishlist.createListItem({
+            id: product.productId,
+            quantity: 1
+        })
+        setWishlistLoading(wishlistLoading.filter((id) => id !== product.productId))
     }
     const removeItemFromWishlist = async (product) => {
-        try {
-            setWishlistLoading([...wishlistLoading, product.productId])
-            await wishlist.removeListItemByProductId(product.productId)
-            toast({
-                title: formatMessage({defaultMessage: 'Item removed from wishlist'}),
-                status: 'success'
-            })
-        } catch {
-            toast({
-                title: formatMessage(
-                    {defaultMessage: '{errorMessage}'},
-                    {errorMessage: API_ERROR_MESSAGE}
-                ),
-                status: 'error'
-            })
-        } finally {
-            setWishlistLoading(wishlistLoading.filter((id) => id !== product.productId))
-        }
+        setWishlistLoading([...wishlistLoading, product.productId])
+        await wishlist.removeListItemByProductId(product.productId)
+        setWishlistLoading(wishlistLoading.filter((id) => id !== product.productId))
     }
 
     /**************** Filters ****************/
