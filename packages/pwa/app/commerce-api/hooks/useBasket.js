@@ -6,7 +6,7 @@
  */
 import {useContext, useMemo} from 'react'
 import useEinstein from './useEinstein'
-import {useCommerceAPI, BasketContext} from '../utils'
+import {useCommerceAPI, BasketContext} from '../contexts'
 import useCustomer from './useCustomer'
 
 export default function useBasket() {

@@ -54,19 +54,6 @@ jest.mock('../../commerce-api/pkce', () => {
     }
 })
 
-jest.mock('../../commerce-api/hooks/useCustomerProductLists', () => {
-    const originalModule = jest.requireActual('../../commerce-api/hooks/useCustomerProductLists')
-    const useCustomerProductLists = originalModule.default
-
-    return () => {
-        const customerProductLists = useCustomerProductLists()
-
-        customerProductLists.getProductsInList = jest.fn()
-
-        return customerProductLists
-    }
-})
-
 const {keysToCamel} = jest.requireActual('../../commerce-api/utils')
 
 // This is our wrapped component for testing. It handles initialization of the customer

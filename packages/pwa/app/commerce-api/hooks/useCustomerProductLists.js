@@ -4,361 +4,332 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {useContext, useMemo, useEffect, useState} from 'react'
-import {isError, useCommerceAPI, CustomerProductListsContext} from '../utils'
-import {noop} from '../../utils/utils'
-
+import {useContext, useMemo} from 'react'
+import {useCommerceAPI, CustomerProductListsContext} from '../contexts'
+import {handleAsyncError} from '../utils'
 import useCustomer from './useCustomer'
-import Queue from '../../utils/queue'
 
-// A event queue for the following use cases:
-// 1. Allow user to add item to wishlist before wishlist is initialized
-// 2. Allow user to add item to wishlist before logging in
-// e.g. user clicks add to wishlist, push event to the queue, show login
-// modal, pop the event after successfully logged in
-export class CustomerProductListEventQueue extends Queue {
-    static eventTypes = {
-        ADD: 'add',
-        REMOVE: 'remove'
-    }
-}
-
-const eventQueue = new CustomerProductListEventQueue()
-
-export default function useCustomerProductLists({eventHandler = noop, errorHandler = noop} = {}) {
+/**
+ * This hook is designed to add customer product list capabilities
+ * to your app, it leverages the Commerce API - Shopper Customer endpoints.
+ * It uses a React context to store customer product list globally.
+ *
+ * By default, the Shopper Customer Product List API allows a shopper to
+ * save multiple product lists. However, the PWA only use a single
+ * product list, which is the wishlist. There is another hook useWishlist,
+ * which is built on top of this hook to add wishlist specific logic.
+ *
+ * This Hook only works when your components are wrapped in CustomerProductListProvider.
+ */
+export default function useCustomerProductLists() {
     const api = useCommerceAPI()
     const customer = useCustomer()
-    const {customerProductLists, setCustomerProductLists} = useContext(CustomerProductListsContext)
-    const [isLoading, setIsLoading] = useState(false)
+    const {state, actions} = useContext(CustomerProductListsContext)
 
-    useEffect(() => {
-        eventQueue.process(async (event) => {
-            const {action, item, list, listType} = event
-            switch (action) {
-                case CustomerProductListEventQueue.eventTypes.ADD: {
-                    try {
-                        const productList = self.getProductListPerType(listType)
-                        const productListItem = productList?.customerProductListItems.find(
-                            ({productId}) => productId === event.item.id
-                        )
-                        // if the item is already in the wishlist
-                        // only update the quantity
-                        if (productListItem) {
-                            await self.updateCustomerProductListItem(productList, {
-                                ...productListItem,
-                                quantity: event.item.quantity + productListItem.quantity
-                            })
-                            eventHandler(event)
-                        } else {
-                            await self.createCustomerProductListItem(productList, {
-                                productId: event.item.id,
-                                priority: 1,
-                                quantity: parseInt(event.item.quantity),
-                                public: false,
-                                type: 'product'
-                            })
-                            eventHandler(event)
-                        }
-                    } catch (error) {
-                        errorHandler(error)
-                    }
-                    break
-                }
-
-                case CustomerProductListEventQueue.eventTypes.REMOVE:
-                    try {
-                        await self.deleteCustomerProductListItem(list, item)
-                        eventHandler(event)
-                    } catch (error) {
-                        errorHandler(error)
-                    }
-                    break
+    const getLists = handleAsyncError(() => {
+        return api.shopperCustomers.getCustomerProductLists({
+            parameters: {
+                customerId: customer.customerId
             }
         })
-    }, [customerProductLists])
+    })
+
+    const createList = handleAsyncError((name, type) => {
+        return api.shopperCustomers.createCustomerProductList({
+            body: {
+                type,
+                name
+            },
+            parameters: {
+                customerId: customer.customerId
+            }
+        })
+    })
+
+    const getList = handleAsyncError((listId) => {
+        return api.shopperCustomers.getCustomerProductList({
+            parameters: {
+                customerId: customer.customerId,
+                listId
+            }
+        })
+    })
+
+    const createListItem = handleAsyncError((listId, item) => {
+        const {id, quantity} = item
+        return api.shopperCustomers.createCustomerProductListItem({
+            body: {
+                productId: id,
+                quantity,
+                public: false,
+                priority: 1,
+                type: 'product'
+            },
+            parameters: {
+                customerId: customer.customerId,
+                listId
+            }
+        })
+    })
+
+    const updateListItem = handleAsyncError((listId, item) => {
+        const {id, quantity} = item
+        return api.shopperCustomers.updateCustomerProductListItem({
+            body: {
+                id,
+                quantity,
+                public: false,
+                priority: 1
+            },
+            parameters: {
+                customerId: customer.customerId,
+                listId: listId,
+                itemId: item.id
+            }
+        })
+    })
+
+    const removeListItem = handleAsyncError((listId, itemId) => {
+        return api.shopperCustomers.deleteCustomerProductListItem(
+            {
+                parameters: {
+                    itemId,
+                    listId,
+                    customerId: customer.customerId
+                }
+            },
+            true
+        )
+    })
 
     const self = useMemo(() => {
         return {
-            ...customerProductLists,
-            get showLoader() {
-                return isLoading
+            data: state.productLists,
+
+            get isInitialized() {
+                return state.productLists !== undefined
             },
 
-            get loaded() {
-                return customerProductLists?.data?.length
-            },
-
-            getProductListPerType(type) {
-                return customerProductLists?.data.find((list) => list.type === type)
-            },
-
-            clearProductLists() {
-                // clear out the product lists in context
-                setCustomerProductLists({})
+            reset() {
+                actions.reset()
             },
 
             /**
-             * Fetches product lists for registered users or creates a new list if none exist
-             * due to the api limitation, we can not get the list based on type but all lists
-             * @param {string} type type of list to fetch or create
-             * @returns product lists for registered users
+             * Get customer's product lists.
              */
-            async fetchOrCreateProductLists(type) {
-                setIsLoading(true)
-                // fetch customer productLists
-                const response = await api.shopperCustomers.getCustomerProductLists({
-                    body: [],
-                    parameters: {
-                        customerId: customer.customerId
-                    }
-                })
-
-                setIsLoading(false)
-                if (isError(response)) {
-                    throw new Error(response)
-                }
-
-                if (response?.data?.length && response?.data?.some((list) => list.type === type)) {
-                    // only set the lists when there is at least one type we need. etc wishlist
-                    return setCustomerProductLists(response)
-                }
-
-                setIsLoading(true)
-                // create a new list to be used later
-                const newProductList = await api.shopperCustomers.createCustomerProductList({
-                    body: {
-                        type
-                    },
-                    parameters: {
-                        customerId: customer.customerId
-                    }
-                })
-
-                setIsLoading(false)
-                if (isError(newProductList)) {
-                    throw new Error(newProductList)
-                }
-                // This function does not return an updated customerProductsList so we fetch manually
-                await this.getCustomerProductLists()
+            getLists: async () => {
+                const lists = await getLists()
+                actions.receiveLists(lists)
+                return lists
             },
 
             /**
-             * Fetches product lists for registered users
-             * @returns product lists for registered users
+             * Create a new product list.
+             * @param {string} name
+             * @param {string} type
              */
-            async getCustomerProductLists() {
-                setIsLoading(true)
-                const response = await api.shopperCustomers.getCustomerProductLists({
-                    body: [],
-                    parameters: {
-                        customerId: customer.customerId
-                    }
-                })
-
-                setIsLoading(false)
-                if (isError(response)) {
-                    throw new Error(response)
-                }
-
-                setCustomerProductLists(response)
-                return response
+            createList: async (name, type) => {
+                const list = await createList(name, type)
+                actions.receiveList(list)
+                return list
             },
 
             /**
-             * @TODO: remove this function as it exposes unnecessary knowledge
-             * to outside systems. The queue logic should be encapsulated in this
-             * hook only. The API for outside consuming should be something like:
-             * addItemToList, removeItemToList...
-             * Event queue holds user actions that need to execute on product-lists
-             * while the product list information has not yet loaded (eg: Adding to wishlist immedeately after login).
-             * @param {object} event Event to be added to queue. event object has properties: action: {item: Object, list?: object, action: eventActions, listType: CustomerProductListType}
+             * Get a specific product list by id.
+             * @param {string} listId
+             * @param {object} options
              */
-            addActionToEventQueue(event) {
-                eventQueue.enqueue(event)
+            getList: async (listId, options) => {
+                const {detail} = options || {}
+                let list = await getList(listId)
+
+                if (detail) {
+                    // automatically fetch details of the items in the list
+                    list = await self.getProductDetails(list)
+                }
+
+                actions.receiveList(list)
+                return list
             },
 
             /**
-             * Creates a new customer product list
-             * @param {Object} body object containing type property to define the type of list to be created
+             * Get a product list for the registered user or
+             * creates a new list if none exists, due to the api
+             * limitation, we can not filter the lists based on
+             * name/type, therefore it fetches all lists.
+             * @param {string} name
+             * @param {string} type
+             * @param {object} options
+             * @param {boolean} options.detail boolean flag to enable/disable fetching product details
              */
-            async createCustomerProductList(body) {
-                setIsLoading(true)
-                const response = await api.shopperCustomers.createCustomerProductList({
-                    body,
-                    parameters: {
-                        customerId: customer.customerId
-                    }
-                })
+            getOrCreateList: async (name, type, options) => {
+                const {detail} = options || {}
+                let response = await getLists()
 
-                setIsLoading(true)
-                if (isError(response)) {
-                    throw new Error(response)
+                // Note: if list is empty, the API response
+                // does NOT contain the "data" key.
+                let list = response.data?.find((list) => list.name === name)
+
+                if (!list) {
+                    list = await createList(name, type)
                 }
 
-                // This function does not return an updated customerProductsLists so we fetch manually
-                await this.getCustomerProductLists()
-                return response
+                if (list && detail) {
+                    list = await self.getProductDetails(list)
+                }
+
+                actions.receiveList(list)
+                return list
             },
 
             /**
              * Adds an item to the customer's product list.
-             * @param {object} list
+             * @param {string} listId
              * @param {Object} item item to be added to the list.
              */
-            async createCustomerProductListItem(list, item) {
-                setIsLoading(true)
-                const response = await api.shopperCustomers.createCustomerProductListItem({
-                    body: item,
-                    parameters: {
-                        customerId: customer.customerId,
-                        listId: list.id
-                    }
-                })
-
-                setIsLoading(false)
-
-                if (isError(response)) {
-                    throw new Error(response)
-                }
-
-                // This function does not return an updated customerProductsList so we fetch manually
-                await self.getCustomerProductLists()
-                return response
+            createListItem: async (listId, item) => {
+                const createdItem = await createListItem(listId, item)
+                actions.createListItem(listId, createdItem)
+                return createdItem
             },
 
             /**
-             * Returns a single customer's product list.
-             * @param {string} listId id of the list to find.
-             */
-            getCustomerProductList(listId) {
-                return customerProductLists.data.find((productList) => productList.id === listId)
-            },
-
-            /**
-             * Updates a single customer's product list.
-             * @param {object} list
-             */
-            updateCustomerProductList(list) {
-                const updatedCustomerProductLists = {
-                    ...customerProductLists,
-                    data: customerProductLists.data.map((productList) =>
-                        list.id === productList.id ? list : productList
-                    )
-                }
-                setCustomerProductLists(updatedCustomerProductLists)
-            },
-
-            /**
-             * Fetch list of product details from list of ids.
-             * The maximum number of productIDs that can be requested are 24.
-             * @param {string} ids list of productIds
-             * @returns {Object[]} list of product details for requested productIds
-             */
-            async getProductsInList(ids, listId) {
-                if (!ids) {
-                    return
-                }
-
-                const response = await api.shopperProducts.getProducts({
-                    parameters: {
-                        ids
-                    }
-                })
-
-                if (isError(response)) {
-                    throw new Error(response)
-                }
-
-                const itemDetail = response.data.reduce((result, item) => {
-                    const key = item.id
-                    result[key] = item
-                    return result
-                }, {})
-
-                const listToUpdate = this.getCustomerProductList(listId)
-
-                this.updateCustomerProductList({
-                    ...listToUpdate,
-                    _productItemsDetail: {...listToUpdate._productItemsDetail, ...itemDetail}
-                })
-            },
-
-            /**
-             * Remove an item from a customerProductList
-             * @param {object} list
-             * @param {string} list.id id of list to remove item from
-             * @param {object} item
-             * @param {string} item.id id of item (in product-list not productId) to be removed
-             */
-            async deleteCustomerProductListItem(list, item) {
-                // Delete item API returns a void response which throws a json parse error,
-                // passing true as 2nd argument to get raw json response
-                const response = await api.shopperCustomers.deleteCustomerProductListItem(
-                    {
-                        parameters: {
-                            itemId: item.id,
-                            listId: list.id,
-                            customerId: customer.customerId
-                        }
-                    },
-                    true
-                )
-
-                if (isError(response)) {
-                    throw new Error(response)
-                }
-
-                // Remove item API does not return an updated list in response so we manually remove item
-                // from state and update UI without requesting updated list from API
-                const listToUpdate = this.getCustomerProductList(list.id)
-
-                this.updateCustomerProductList({
-                    ...listToUpdate,
-                    customerProductListItems: listToUpdate.customerProductListItems.filter(
-                        (x) => x.id !== item.id
-                    )
-                })
-            },
-
-            /**
-             * Update an item from a customerProductList
+             * Update an item in a customer product list
              *
-             * @param {object} list
-             * @param {string} list.id id of the list to update the item in
+             * @param {string} listId id of the list to update the item in
              * @param {object} item
              * @param {string} item.id the id of the item in the product list
              * @param {number} item.quantity the quantity of the item
              */
-            async updateCustomerProductListItem(list, item) {
-                if (item.quantity === 0) {
-                    return this.deleteCustomerProductListItem(list, item)
+            updateListItem: async (listId, item) => {
+                const {id, quantity} = item
+                if (quantity === 0) {
+                    await removeListItem(listId, id)
+                    actions.removeListItem(listId, id)
+                    return
+                }
+                const updatedItem = await updateListItem(listId, item)
+                actions.updateListItem(listId, updatedItem)
+                return updatedItem
+            },
+
+            /**
+             * Remove an item from a customer product list
+             *
+             * @param {string} listId id of the list to update the item in
+             * @param {string} itemId the id of the item in the product list
+             */
+            removeListItem: async (listId, itemId) => {
+                await removeListItem(listId, itemId)
+                actions.removeListItem(listId, itemId)
+            },
+
+            /**
+             * Remove an item from a customer product list
+             *
+             * @param {string} listId id of the list to update the item in
+             * @param {string} productId the id of the product
+             */
+            removeListItemByProductId(listId, productId) {
+                const item = self.findItemByProductId(listId, productId)
+                if (!item) {
+                    console.warn(
+                        `Cannot remove item because product ${productId} is not in the list.`
+                    )
+                    return
+                }
+                self.removeListItem(listId, item.id)
+            },
+
+            /**
+             * Get all item details for a product list.
+             * @param {object} list product list
+             * @param {array} list.customerProductListItems items array
+             * @returns {Object} customer product list
+             */
+            getProductDetails: handleAsyncError(async (list) => {
+                // Warning, there is a weird API behavior
+                // where if the product list is newly created
+                // the "customerProductListItems" key will be missing
+                // from the response, so we need to guard it.
+                if (!list.customerProductListItems) {
+                    return {...list, hasDetail: true}
                 }
 
-                const response = await api.shopperCustomers.updateCustomerProductListItem({
-                    body: item,
+                const ids = list.customerProductListItems.map((item) => item.productId)
+                const productDetails = await api.shopperProducts.getProducts({
                     parameters: {
-                        customerId: customer.customerId,
-                        listId: list.id,
-                        itemId: item.id
+                        ids: ids.join(',')
                     }
                 })
+                const result = self.mergeProductDetailsIntoList(list, productDetails)
 
-                if (isError(response)) {
-                    throw new Error(response)
-                }
+                // hasDetail is a flag to indicate
+                // the list items are populated
+                // with product detail data
+                result.hasDetail = true
+                return {...result, hasDetail: true}
+            }),
 
-                // The response is the single updated item so we'll find that
-                // item by its id and update it
-                const listToUpdate = this.getCustomerProductList(list.id)
-
-                this.updateCustomerProductList({
-                    ...listToUpdate,
-                    customerProductListItems: listToUpdate.customerProductListItems.map((item) =>
-                        item.id === response.id ? response : item
-                    )
+            /**
+             * The customer product list API does NOT return the
+             * product item details, this utility function is used
+             * when you fetch the item details manually and insert
+             * into the lists.
+             * This function is often used with getProductDetails.
+             */
+            mergeProductDetailsIntoList(list, productDetails) {
+                const items = list.customerProductListItems?.map((item) => {
+                    const product = {
+                        ...productDetails.data.find((product) => product.id === item.productId)
+                    }
+                    return {
+                        ...item,
+                        product
+                    }
                 })
+                return {
+                    ...list,
+                    customerProductListItems: items
+                }
+            },
+
+            /**
+             * Find the product list by its name.
+             * @param {string} name
+             * @returns {object} customer product list
+             */
+            findListByName(name) {
+                if (!self.data) {
+                    return undefined
+                }
+                return Object.values(self.data).find((list) => list.name === name)
+            },
+
+            /**
+             * Find the product list by its id.
+             * @param {string} id
+             * @returns {object} customer product list
+             */
+            findListById(id) {
+                if (!self.data) {
+                    return undefined
+                }
+                return Object.values(self.data).find((list) => list.id === id)
+            },
+
+            /**
+             * Find the item from list.
+             * @param {string} listId
+             * @param {string} productId
+             * @returns {object} product list item
+             */
+            findItemByProductId(listId, productId) {
+                return self
+                    .findListById(listId)
+                    ?.customerProductListItems?.find((item) => item.productId === productId)
             }
         }
-    }, [customer, customerProductLists, setCustomerProductLists, isLoading])
+    }, [customer.customerId, state])
     return self
 }

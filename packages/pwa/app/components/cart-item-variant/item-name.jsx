@@ -24,7 +24,7 @@ const ItemName = (props) => {
             color="black.600"
             to={`/product/${variant?.master?.masterId}`}
         >
-            {variant.productName}
+            {variant.productName || variant.name}
         </Link>
     )
 }

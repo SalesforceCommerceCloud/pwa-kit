@@ -12,32 +12,17 @@ import WishlistPrimaryAction from './wishlist-primary-action'
 import user from '@testing-library/user-event'
 import {screen, waitFor} from '@testing-library/react'
 
-let mockedProductItem = {}
-
-const MockedComponent = () => {
+const MockedComponent = (variant) => {
     return (
-        <CartItemVariant variant={mockedProductItem}>
+        <CartItemVariant variant={variant}>
             <WishlistPrimaryAction />
         </CartItemVariant>
     )
 }
 
-jest.mock('../../../../commerce-api/utils', () => {
-    const originalModule = jest.requireActual('../../../../commerce-api/utils')
-    return {
-        ...originalModule,
-        isTokenValid: jest.fn().mockReturnValue(true)
-    }
-})
-
 jest.mock('../../../../commerce-api/hooks/useBasket', () => {
-    const originalModule = jest.requireActual('../../../../commerce-api/hooks/useBasket')
-    const useBasket = originalModule.default
     return () => {
-        const basket = useBasket()
-
         return {
-            ...basket,
             addItemToBasket: jest.fn()
         }
     }
@@ -47,13 +32,10 @@ beforeEach(() => {
     jest.resetModules()
 })
 
-afterEach(() => {
-    jest.resetModules()
-})
-
 test('renders primary action component', async () => {
-    mockedProductItem = mockedCustomerProductListsDetails.data[0]
-    const {getByRole} = renderWithProviders(<MockedComponent />)
+    const {getByRole} = renderWithProviders(
+        <MockedComponent variant={mockedCustomerProductListsDetails.data[0]} />
+    )
     const addToCartButton = getByRole('button', {
         name: /add to cart/i
     })
