@@ -98,11 +98,6 @@ beforeEach(() => {
     // Clearing out mocked local storage before each test so tokens don't get mixed
     const api = getAPI()
     api.auth._clearAuth()
-
-    // Need to mock TextEncoder for tests
-    if (typeof TextEncoder === 'undefined') {
-        global.TextEncoder = require('util').TextEncoder
-    }
 })
 
 describe('CommerceAPI', () => {
