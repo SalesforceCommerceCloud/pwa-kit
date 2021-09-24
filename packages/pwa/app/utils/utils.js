@@ -163,7 +163,7 @@ export const capitalize = (text) => {
  * @param {func} options.onSuccess
  * @param {func} options.onError
  */
-export const withAsync = (func, options) => {
+export const withAsyncCallback = (func, options) => {
     return async (...props) => {
         try {
             await func(...props)

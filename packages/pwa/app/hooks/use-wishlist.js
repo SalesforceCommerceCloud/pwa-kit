@@ -10,7 +10,7 @@ import {useHistory} from 'react-router'
 
 import useCustomerProductList from '../commerce-api/hooks/useCustomerProductList'
 import {useToast} from './use-toast'
-import {withAsync} from '../utils/utils'
+import {withAsyncCallback} from '../utils/utils'
 import {API_ERROR_MESSAGE} from '../constants'
 
 const PWA_DEFAULT_WISHLIST_NAME = 'PWA wishlist'
@@ -53,14 +53,14 @@ const useWishlist = () => {
 
     return {
         ...wishlist,
-        createListItem: withAsync(wishlist.createListItem, {
+        createListItem: withAsyncCallback(wishlist.createListItem, {
             onSuccess: onSuccessAdd,
             onError
         }),
-        updateListItem: withAsync(wishlist.updateListItem, {
+        updateListItem: withAsyncCallback(wishlist.updateListItem, {
             onError
         }),
-        removeListItemByProductId: withAsync(wishlist.removeListItemByProductId, {
+        removeListItemByProductId: withAsyncCallback(wishlist.removeListItemByProductId, {
             onSuccess: onSuccessRemove,
             onError
         })
