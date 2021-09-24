@@ -32,8 +32,7 @@ import ImageGallery from '../../components/image-gallery'
 import Breadcrumb from '../../components/breadcrumb'
 import Link from '../../components/link'
 import withRegistration from '../../hoc/with-registration'
-import {DEFAULT_LOCALE} from '../../constants'
-import {getCurrency} from '../../utils/locale'
+import {useCurrency} from '../../hooks'
 import {Skeleton as ImageGallerySkeleton} from '../../components/image-gallery'
 import AddToCartModal from '../../components/add-to-cart-modal'
 import RecommendedProducts from '../../components/recommended-products'
@@ -42,6 +41,7 @@ import QuantityPicker from '../../components/quantity-picker'
 
 const ProductViewHeader = ({name, price, currency, category}) => {
     const intl = useIntl()
+    const {activeCurrency} = useCurrency()
     return (
         <VStack mr={4} spacing={2} align="flex-start" marginBottom={[4, 4, 4, 0, 0]}>
             {category && (
@@ -60,7 +60,7 @@ const ProductViewHeader = ({name, price, currency, category}) => {
                 <Text fontWeight="bold" fontSize="md" aria-label="price">
                     {intl.formatNumber(price, {
                         style: 'currency',
-                        currency: currency || getCurrency(DEFAULT_LOCALE)
+                        currency: currency || activeCurrency
                     })}
                 </Text>
             </Skeleton>

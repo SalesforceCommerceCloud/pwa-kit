@@ -10,17 +10,16 @@ import {FormattedMessage, FormattedNumber} from 'react-intl'
 import {Stack, Text} from '@chakra-ui/react'
 import useBasket from '../../commerce-api/hooks/useBasket'
 import {useCartItemVariant} from '.'
-import {DEFAULT_LOCALE} from '../../constants'
-import {getCurrency} from '../../utils/locale'
 import {HideOnDesktop, HideOnMobile} from '../responsive'
+import {useCurrency} from '../../hooks'
 
 const PricePerItem = ({currency, basket, basePrice}) => {
-    const defaultLocaleCurrency = getCurrency(DEFAULT_LOCALE)
+    const {activeCurrency} = useCurrency()
     return (
         <Text fontSize={{base: '12px', lg: '14px'}}>
             <FormattedNumber
                 style="currency"
-                currency={currency || basket.currency || defaultLocaleCurrency}
+                currency={currency || basket.currency || activeCurrency}
                 value={basePrice}
             />
             <FormattedMessage
@@ -44,14 +43,13 @@ PricePerItem.propTypes = {
 const ItemPrice = ({currency, align = 'right', baseDirection = 'column', ...props}) => {
     const variant = useCartItemVariant()
     const basket = useBasket()
+    const {activeCurrency} = useCurrency()
 
     const {price, basePrice, priceAfterItemDiscount} = variant
 
     const displayPrice = priceAfterItemDiscount ? Math.min(price, priceAfterItemDiscount) : price
 
     const hasDiscount = displayPrice !== price
-
-    const defaultLocaleCurrency = getCurrency(DEFAULT_LOCALE)
 
     return (
         <Stack
@@ -71,7 +69,7 @@ const ItemPrice = ({currency, align = 'right', baseDirection = 'column', ...prop
             <Text fontWeight="bold" lineHeight={{base: '0.5', lg: '24px'}}>
                 <FormattedNumber
                     style="currency"
-                    currency={currency || basket.currency || defaultLocaleCurrency}
+                    currency={currency || basket.currency || activeCurrency}
                     value={displayPrice}
                 />
                 {hasDiscount && (
@@ -85,7 +83,7 @@ const ItemPrice = ({currency, align = 'right', baseDirection = 'column', ...prop
                     >
                         <FormattedNumber
                             style="currency"
-                            currency={currency || basket.currency || defaultLocaleCurrency}
+                            currency={currency || basket.currency || activeCurrency}
                             value={price}
                         />
                     </Text>

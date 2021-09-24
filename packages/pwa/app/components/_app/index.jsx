@@ -15,7 +15,7 @@ import {Box, useDisclosure, useStyleConfig} from '@chakra-ui/react'
 import {SkipNavLink, SkipNavContent} from '@chakra-ui/skip-nav'
 
 // Contexts
-import {CategoriesContext} from '../../contexts'
+import {CategoriesContext, CurrencyContext} from '../../contexts'
 
 // Local Project Components
 import Header from '../../components/header'
@@ -41,7 +41,7 @@ import {defineMessages, IntlProvider} from 'react-intl'
 import {watchOnlineStatus, flatten} from '../../utils/utils'
 import {homeUrlBuilder} from '../../utils/url'
 import {getLocaleConfig, getCurrency} from '../../utils/locale'
-import {HOME_HREF} from '../../constants'
+import {DEFAULT_CURRENCY, HOME_HREF} from '../../constants'
 
 import Seo from '../seo'
 
@@ -72,15 +72,13 @@ const App = (props) => {
     const customer = useCustomer()
     const [isOnline, setIsOnline] = useState(true)
     const [categories, setCategories] = useState(allCategories)
+    const [currency, setCurrency] = useState(getCurrency(targetLocale) || DEFAULT_CURRENCY)
     const styles = useStyleConfig('App')
 
     const {isOpen, onOpen, onClose} = useDisclosure()
 
     // Used to conditionally render header/footer for checkout page
     const isCheckout = /\/checkout$/.test(location?.pathname)
-
-    // Used to set the basket currency
-    const currency = getCurrency(targetLocale)
 
     // Set up customer and basket
     useShopper({currency})
@@ -146,72 +144,79 @@ const App = (props) => {
                 messages={messages}
             >
                 <CategoriesContext.Provider value={{categories, setCategories}}>
-                    <Seo>
-                        <meta name="theme-color" content="#0288a7" />
-                        <meta
-                            name="apple-mobile-web-app-title"
-                            content="PWA-Kit-Retail-React-App"
-                        />
-                        <link
-                            rel="apple-touch-icon"
-                            href={getAssetUrl('static/img/global/apple-touch-icon.png')}
-                        />
-                        <link rel="manifest" href={getAssetUrl('static/manifest.json')} />
-                    </Seo>
+                    <CurrencyContext.Provider value={{currency, setCurrency}}>
+                        <Seo>
+                            <meta name="theme-color" content="#0288a7" />
+                            <meta
+                                name="apple-mobile-web-app-title"
+                                content="PWA-Kit-Retail-React-App"
+                            />
+                            <link
+                                rel="apple-touch-icon"
+                                href={getAssetUrl('static/img/global/apple-touch-icon.png')}
+                            />
+                            <link rel="manifest" href={getAssetUrl('static/manifest.json')} />
+                        </Seo>
 
-                    <ScrollToTop />
+                        <ScrollToTop />
 
-                    <Box id="app" display="flex" flexDirection="column" flex={1}>
-                        <SkipNavLink zIndex="skipLink">Skip to Content</SkipNavLink>
+                        <Box id="app" display="flex" flexDirection="column" flex={1}>
+                            <SkipNavLink zIndex="skipLink">Skip to Content</SkipNavLink>
 
-                        <Box {...styles.headerWrapper}>
-                            {!isCheckout ? (
-                                <Header
-                                    onMenuClick={onOpen}
-                                    onLogoClick={onLogoClick}
-                                    onMyCartClick={onCartClick}
-                                    onMyAccountClick={onAccountClick}
-                                    onWishlistClick={onWishlistClick}
-                                >
-                                    <HideOnDesktop>
-                                        <DrawerMenu
-                                            isOpen={isOpen}
-                                            onClose={onClose}
-                                            onLogoClick={onLogoClick}
-                                            root={categories[DEFAULT_ROOT_CATEGORY]}
-                                        />
-                                    </HideOnDesktop>
+                            <Box {...styles.headerWrapper}>
+                                {!isCheckout ? (
+                                    <Header
+                                        onMenuClick={onOpen}
+                                        onLogoClick={onLogoClick}
+                                        onMyCartClick={onCartClick}
+                                        onMyAccountClick={onAccountClick}
+                                        onWishlistClick={onWishlistClick}
+                                    >
+                                        <HideOnDesktop>
+                                            <DrawerMenu
+                                                isOpen={isOpen}
+                                                onClose={onClose}
+                                                onLogoClick={onLogoClick}
+                                                root={categories[DEFAULT_ROOT_CATEGORY]}
+                                            />
+                                        </HideOnDesktop>
 
-                                    <HideOnMobile>
-                                        <ListMenu root={categories[DEFAULT_ROOT_CATEGORY]} />
-                                    </HideOnMobile>
-                                </Header>
-                            ) : (
-                                <CheckoutHeader />
-                            )}
-                        </Box>
-
-                        {!isOnline && <OfflineBanner />}
-
-                        <SkipNavContent
-                            style={{display: 'flex', flexDirection: 'column', flex: 1, outline: 0}}
-                        >
-                            <Box
-                                as="main"
-                                id="app-main"
-                                role="main"
-                                display="flex"
-                                flexDirection="column"
-                                flex="1"
-                            >
-                                <OfflineBoundary isOnline={false}>{children}</OfflineBoundary>
+                                        <HideOnMobile>
+                                            <ListMenu root={categories[DEFAULT_ROOT_CATEGORY]} />
+                                        </HideOnMobile>
+                                    </Header>
+                                ) : (
+                                    <CheckoutHeader />
+                                )}
                             </Box>
-                        </SkipNavContent>
 
-                        {!isCheckout ? <Footer /> : <CheckoutFooter />}
+                            {!isOnline && <OfflineBanner />}
 
-                        <AuthModal {...authModal} />
-                    </Box>
+                            <SkipNavContent
+                                style={{
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    flex: 1,
+                                    outline: 0
+                                }}
+                            >
+                                <Box
+                                    as="main"
+                                    id="app-main"
+                                    role="main"
+                                    display="flex"
+                                    flexDirection="column"
+                                    flex="1"
+                                >
+                                    <OfflineBoundary isOnline={false}>{children}</OfflineBoundary>
+                                </Box>
+                            </SkipNavContent>
+
+                            {!isCheckout ? <Footer /> : <CheckoutFooter />}
+
+                            <AuthModal {...authModal} />
+                        </Box>
+                    </CurrencyContext.Provider>
                 </CategoriesContext.Provider>
             </IntlProvider>
         </Box>

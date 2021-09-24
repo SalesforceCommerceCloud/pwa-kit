@@ -52,3 +52,5 @@ export const MAX_ORDER_QUANTITY = 10
 // TODO: You can update these locales in 'pwa/package.json' file
 export const SUPPORTED_LOCALES = packageInfo.l10n.supportedLocales
 export const DEFAULT_LOCALE = packageInfo.l10n.defaultLocale
+export const SUPPORTED_CURRENCIES = packageInfo.l10n.supportedCurrencies
+export const DEFAULT_CURRENCY = packageInfo.l10n.defaultCurrency
