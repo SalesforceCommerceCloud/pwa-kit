@@ -212,7 +212,7 @@ test('renders Popover if recent searches populated', async () => {
     renderWithProviders(<SearchInput />)
     const searchInput = document.querySelector('input[type="search"]')
     await user.type(searchInput, 'Dresses')
-    expect(await screen.findByTestId('sf-suggestion-popover')).toBeInTheDocument()
+    expect(await screen.findByTestId('sf-suggestion')).toBeInTheDocument()
     const countOfSuggestions = await screen.findAllByText('Dresses')
     expect(countOfSuggestions.length).toEqual(2)
 })
