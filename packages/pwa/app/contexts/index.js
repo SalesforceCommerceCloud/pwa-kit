@@ -56,7 +56,7 @@ CategoriesProvider.propTypes = {
  * import React, {useContext} from 'react'
  * import {CurrencyContext} from './contexts'
  *
- * export const RootCategoryLabel = () => {
+ * export const RootCurrencyLabel = () => {
  *    const {currency} = useContext(CurrencyContext)
  *    return <div>{currency}</div>
  * }
