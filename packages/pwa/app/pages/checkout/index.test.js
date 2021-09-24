@@ -175,11 +175,6 @@ const server = setupServer(
 beforeAll(() => {
     jest.resetModules()
     server.listen({onUnhandledRequest: 'error'})
-
-    // Need to mock TextEncoder for tests
-    if (typeof TextEncoder === 'undefined') {
-        global.TextEncoder = require('util').TextEncoder
-    }
 })
 afterEach(() => {
     localStorage.clear()
