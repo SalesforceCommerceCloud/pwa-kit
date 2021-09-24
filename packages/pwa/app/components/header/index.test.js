@@ -20,6 +20,15 @@ import {
 } from '../../commerce-api/mock-data'
 import {Route, Switch} from 'react-router-dom'
 import {createMemoryHistory} from 'history'
+
+jest.mock('@chakra-ui/react', () => {
+    const originalModule = jest.requireActual('@chakra-ui/react')
+    return {
+        ...originalModule,
+        useMediaQuery: jest.fn().mockReturnValue([true])
+    }
+})
+
 jest.mock('../../commerce-api/utils', () => {
     const originalModule = jest.requireActual('../../commerce-api/utils')
     return {
