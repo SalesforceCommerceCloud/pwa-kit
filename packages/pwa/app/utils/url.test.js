@@ -10,10 +10,13 @@ import {
     categoryUrlBuilder,
     productUrlBuilder,
     searchUrlBuilder,
+    getUrlWithLocale,
     homeUrlBuilder,
     rebuildPathWithParams,
     removeQueryParamsFromPath
 } from './url'
+
+import {DEFAULT_LOCALE} from '../constants'
 
 describe('buildUrlSet returns the expected set of urls', () => {
     test('when no values are passed in', () => {
@@ -93,6 +96,71 @@ describe('url builder test', () => {
 
         const homeUrlDefaultLocale = homeUrlBuilder('/', 'en-GB')
         expect(homeUrlDefaultLocale).toEqual(`/`)
+    })
+    test('getUrlWithLocale returns expected for PLP', () => {
+        const location = new URL('http://localhost:3000/it-IT/category/newarrivals-womens')
+
+        delete window.location
+        window.location = location
+
+        const relativeUrl = getUrlWithLocale('fr-FR')
+        expect(relativeUrl).toEqual(`/fr-FR/category/newarrivals-womens`)
+    })
+
+    test('getUrlWithLocale returns expected for PLP without refine param', () => {
+        const location = new URL(
+            'http://localhost:3000/it-IT/category/newarrivals-womens?limit=25&refine=c_refinementColor%3DBianco&sort=best-matches&offset=25'
+        )
+
+        delete window.location
+        window.location = location
+
+        const relativeUrl = getUrlWithLocale('fr-FR', {
+            disallowParams: ['refine']
+        })
+        expect(relativeUrl).toEqual(
+            `/fr-FR/category/newarrivals-womens?limit=25&sort=best-matches&offset=25`
+        )
+    })
+
+    test('getUrlWithLocale returns expected for PLP', () => {
+        const location = new URL('http://localhost:3000/it-IT/category/newarrivals-womens')
+
+        delete window.location
+        window.location = location
+
+        const relativeUrl = getUrlWithLocale('fr-FR')
+        expect(relativeUrl).toEqual(`/fr-FR/category/newarrivals-womens`)
+    })
+
+    test('getUrlWithLocale returns expected for Homepage', () => {
+        const location = new URL('http://localhost:3000/it-IT/')
+
+        delete window.location
+        window.location = location
+
+        const relativeUrl = getUrlWithLocale('fr-FR')
+        expect(relativeUrl).toEqual(`/fr-FR`)
+    })
+
+    test('getUrlWithLocale returns expected for Homepage with Default locale', () => {
+        const location = new URL('http://localhost:3000/it-IT/')
+
+        delete window.location
+        window.location = location
+
+        const relativeUrl = getUrlWithLocale(DEFAULT_LOCALE)
+        expect(relativeUrl).toEqual(`/`)
+    })
+
+    test('getUrlWithLocale returns expected for Homepage without trailing slash', () => {
+        const location = new URL('http://localhost:3000/it-IT')
+
+        delete window.location
+        window.location = location
+
+        const relativeUrl = getUrlWithLocale(DEFAULT_LOCALE)
+        expect(relativeUrl).toEqual(`/`)
     })
 })
 
