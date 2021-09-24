@@ -95,11 +95,6 @@ beforeEach(() => {
     jest.resetModules()
     server.listen({onUnhandledRequest: 'error'})
 
-    // Need to mock TextEncoder for tests
-    if (typeof TextEncoder === 'undefined') {
-        global.TextEncoder = require('util').TextEncoder
-    }
-
     // Since we're testing some navigation logic, we are using a simple Router
     // around our component. We need to initialize the default route/path here.
     window.history.pushState({}, 'Account', '/en/account')

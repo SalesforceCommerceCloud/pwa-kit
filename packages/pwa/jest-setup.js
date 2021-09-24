@@ -8,6 +8,11 @@ import 'raf/polyfill' // fix requestAnimationFrame issue with polyfill
 import '@testing-library/jest-dom/extend-expect'
 import {Crypto} from '@peculiar/webcrypto'
 
+// TextEncoder is a web API, need to import it
+// from nodejs util in testing environment.
+// This is used in commerce-api/pkce.js
+global.TextEncoder = require('util').TextEncoder
+
 // This file consists of global mocks for jsdom.
 class LocalStorageMock {
     constructor() {
