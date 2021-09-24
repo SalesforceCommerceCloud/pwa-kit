@@ -164,6 +164,7 @@ const Header = ({
 
                     {customer.isRegistered && (
                         <Popover
+                            isLazy
                             arrowSize={15}
                             isOpen={isOpen}
                             placement="bottom-end"
