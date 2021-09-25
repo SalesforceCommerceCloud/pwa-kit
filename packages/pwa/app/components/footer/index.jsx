@@ -128,7 +128,7 @@ const Footer = ({...otherProps}) => {
                                 value={intl.locale}
                                 onChange={({target}) => {
                                     // Update the `locale` in the URL.
-                                    const newUrl = buildUrlLocale(intl.locale, target.value)
+                                    const newUrl = buildUrlLocale(target.value)
                                     window.location = newUrl
                                 }}
                                 variant="filled"

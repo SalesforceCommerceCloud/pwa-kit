@@ -92,7 +92,6 @@ const DrawerMenu = ({isOpen, onClose = noop, onLogoClick = noop, root}) => {
         navigate('/login')
         setShowLoading(false)
     }
-    const {locale} = useIntl()
 
     return (
         <Drawer isOpen={isOpen} onClose={onClose} placement="left" size={drawerSize}>
@@ -260,7 +259,7 @@ const DrawerMenu = ({isOpen, onClose = noop, onLogoClick = noop, root}) => {
                                     locales={SUPPORTED_LOCALES}
                                     onSelect={(newLocale) => {
                                         // Update the `locale` in the URL.
-                                        const newUrl = buildUrlLocale(locale, newLocale)
+                                        const newUrl = buildUrlLocale(newLocale)
                                         window.location = newUrl
                                     }}
                                 />

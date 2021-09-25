@@ -6,6 +6,7 @@
  */
 
 import {HOME_HREF, DEFAULT_LOCALE, SUPPORTED_LOCALES} from '../constants'
+import {useLocation} from 'react-router-dom'
 
 /**
  * Modifies a given url by adding/updating query parameters.
@@ -104,13 +105,14 @@ export const searchUrlBuilder = (searchTerm) => `/search?q=${searchTerm}`
 /**
  * Returns a URL using the new locale.
  *
- * @param previousLocale
  * @param newLocale
  * @returns {string}
  */
-export const buildUrlLocale = (previousLocale, newLocale) => {
+export const buildUrlLocale = (newLocale) => {
+    const location = typeof window !== 'undefined' ? window.location : useLocation()
     const params = new URLSearchParams(location.search)
     params.delete('refine')
+
     return location.pathname === HOME_HREF
         ? homeUrlBuilder(HOME_HREF, newLocale)
         : `/${
