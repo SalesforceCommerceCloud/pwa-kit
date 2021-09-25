@@ -9,6 +9,7 @@ import React, {useState, useEffect} from 'react'
 import PropTypes from 'prop-types'
 import {useHistory, useLocation} from 'react-router-dom'
 import {getAssetUrl} from 'pwa-kit-react-sdk/ssr/universal/utils'
+import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
 
 // Chakra
 import {Box, useDisclosure, useStyleConfig} from '@chakra-ui/react'
@@ -39,9 +40,9 @@ import {defineMessages, IntlProvider} from 'react-intl'
 
 // Others
 import {watchOnlineStatus, flatten} from '../../utils/utils'
-import {homeUrlBuilder} from '../../utils/url'
+import {homeUrlBuilder, buildUrlLocale} from '../../utils/url'
 import {getLocaleConfig} from '../../utils/locale'
-import {HOME_HREF} from '../../constants'
+import {HOME_HREF, SUPPORTED_LOCALES} from '../../constants'
 
 import Seo from '../seo'
 import useWishlist from '../../hooks/use-wishlist'
@@ -168,6 +169,17 @@ const App = (props) => {
                             href={getAssetUrl('static/img/global/apple-touch-icon.png')}
                         />
                         <link rel="manifest" href={getAssetUrl('static/manifest.json')} />
+
+                        {/* Urls for all localized versions of this page (including current page)
+                        For more details on hrefLang, see https://developers.google.com/search/docs/advanced/crawling/localized-versions */}
+                        {SUPPORTED_LOCALES.map((locale) => (
+                            <link
+                                rel="alternate"
+                                hrefLang={locale.toLowerCase()}
+                                href={`${getAppOrigin()}${buildUrlLocale(locale)}`}
+                                key={locale}
+                            />
+                        ))}
                     </Seo>
 
                     <ScrollToTop />
@@ -275,9 +287,9 @@ App.getProps = async ({api}) => {
         const message =
             rootCategory.title === 'Unsupported Locale'
                 ? `
-                
+
 🚫 This page isn’t working.
-It looks like the locale ‘${rootCategory.locale}’ hasn’t been set up, yet. 
+It looks like the locale ‘${rootCategory.locale}’ hasn’t been set up, yet.
 You can either follow this doc, https://sfdc.co/B4Z1m to enable it in business manager or define a different locale with the instructions for Localization in the README file.
 `
                 : rootCategory.detail
