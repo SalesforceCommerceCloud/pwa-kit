@@ -9,7 +9,8 @@ import {
     camelCaseKeysToUnderscore,
     isTokenValid,
     keysToCamel,
-    convertSnakeCaseToSentenceCase
+    convertSnakeCaseToSentenceCase,
+    handleAsyncError
 } from './utils'
 
 const createJwt = (secondsToExp) => {
@@ -214,5 +215,25 @@ describe('convertSnakeCaseToSentenceCase', () => {
         expect(convertSnakeCaseToSentenceCase(snakeCaseString) === expectedSentenceCaseString).toBe(
             true
         )
+    })
+})
+
+describe('handleAsyncError', () => {
+    test('returns result when no error is thrown', async () => {
+        const func = jest.fn().mockResolvedValue(1)
+        expect(await handleAsyncError(func)()).toBe(1)
+    })
+    test('throws error correctly', async () => {
+        const errorResponse = {
+            detail: 'detail',
+            title: 'title',
+            type: 'type'
+        }
+        const func = jest.fn().mockResolvedValue(errorResponse)
+        await expect(handleAsyncError(func)()).rejects.toThrow(new Error(errorResponse.detail))
+    })
+    test('works even if func is not async', async () => {
+        const func = jest.fn().mockReturnValue(1)
+        expect(await handleAsyncError(func)()).toBe(1)
     })
 })

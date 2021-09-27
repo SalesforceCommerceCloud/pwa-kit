@@ -7,8 +7,6 @@
 import {useEffect} from 'react'
 import useBasket from './useBasket'
 import useCustomer from './useCustomer'
-import useCustomerProductLists from './useCustomerProductLists'
-import {customerProductListTypes} from '../../constants'
 
 /**
  * Joins basket and customer hooks into a single hook for initializing their states
@@ -19,7 +17,7 @@ const useShopper = (opts = {}) => {
     const {currency} = opts
     const customer = useCustomer()
     const basket = useBasket({currency})
-    const customerProductLists = useCustomerProductLists()
+
     // Create or restore the user session upon mounting
     useEffect(() => {
         customer.login()
@@ -27,18 +25,21 @@ const useShopper = (opts = {}) => {
 
     // Handle basket init/updates in response to customer/basket changes.
     useEffect(() => {
-        const hasCustomer = customer?.customerId
         const hasBasket = basket?.loaded
 
         // We have a customer but no basket, so we fetch a new or existing basket
-        if (hasCustomer && !hasBasket) {
+        if (customer.isInitialized && !hasBasket) {
             basket.getOrCreateBasket()
             return
         }
 
         // We have a customer and a basket, but the basket does not belong to this customer
         // so we get their existing basket or create a new one for them
-        if (hasCustomer && hasBasket && customer.customerId !== basket.customerInfo.customerId) {
+        if (
+            hasBasket &&
+            customer.isInitialized &&
+            customer.customerId !== basket.customerInfo.customerId
+        ) {
             basket.getOrCreateBasket()
             return
         }
@@ -47,16 +48,15 @@ const useShopper = (opts = {}) => {
         // but the email applied to the basket is missing or doesn't match the customer
         // email. In this case, we update the basket with their email.
         if (
-            hasCustomer &&
             hasBasket &&
-            customer.email &&
+            customer.isRegistered &&
             customer.customerId === basket.customerInfo.customerId &&
             customer.email !== basket.customerInfo.email
         ) {
             basket.updateCustomerInfo({email: customer.email})
             return
         }
-    }, [customer, basket.loaded])
+    }, [customer.authType, basket.loaded])
 
     useEffect(() => {
         // Fetch product details for all items in cart
@@ -72,33 +72,6 @@ const useShopper = (opts = {}) => {
             }
         }
     }, [customer, basket])
-
-    // Load wishlists in context for logged-in users
-    useEffect(() => {
-        const hasCustomer = customer?.customerId
-        const hasCustomerProductLists = customerProductLists?.loaded
-        if (hasCustomer && customer.isRegistered && !hasCustomerProductLists) {
-            // we are only interested in wishlist
-            customerProductLists.fetchOrCreateProductLists(customerProductListTypes.WISHLIST)
-        } else if (customer.isGuest && hasCustomerProductLists) {
-            // customerProductLists need to be reset when the user logs out
-            customerProductLists.clearProductLists()
-        }
-    }, [customerProductLists.loaded, customer.authType])
-
-    useEffect(() => {
-        // Fetch product details for new items in product-lists
-        const hasCustomerProductLists = customerProductLists?.loaded
-        if (!hasCustomerProductLists) return
-        customerProductLists.data.forEach((list) => {
-            let ids = list.customerProductListItems?.map((item) => item.productId)
-            if (list?._productItemsDetail) {
-                ids = ids.filter((id) => !list?._productItemsDetail[id])
-            }
-
-            customerProductLists.getProductsInList(ids?.toString(), list.id)
-        })
-    }, [customerProductLists.data])
 
     return {customer, basket}
 }

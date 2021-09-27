@@ -5,14 +5,16 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import {Button, ButtonGroup, useDisclosure} from '@chakra-ui/react'
-import useCustomerProductLists from '../../../../commerce-api/hooks/useCustomerProductLists'
-import ConfirmationModal from '../../../../components/confirmation-modal/index'
-import {defineMessage, FormattedMessage, useIntl} from 'react-intl'
 import PropTypes from 'prop-types'
+import {Button, ButtonGroup, useDisclosure} from '@chakra-ui/react'
+import {useIntl, defineMessage, FormattedMessage} from 'react-intl'
+
+import useWishlist from '../../../../hooks/use-wishlist'
+import {useToast} from '../../../../hooks/use-toast'
+
+import ConfirmationModal from '../../../../components/confirmation-modal/index'
 import {useCartItemVariant} from '../../../../components/cart-item-variant'
 import {noop} from '../../../../utils/utils'
-import {useToast} from '../../../../hooks/use-toast'
 import {API_ERROR_MESSAGE} from '../../../../constants'
 
 export const REMOVE_WISHLIST_ITEM_CONFIRMATION_DIALOG_CONFIG = {
@@ -29,12 +31,12 @@ export const REMOVE_WISHLIST_ITEM_CONFIRMATION_DIALOG_CONFIG = {
  * Renders secondary actions on a product-item card in the form of a button group.
  * Represents other actions you want the user to perform with the product-item (eg.: Remove or Edit)
  */
-const WishlistSecondaryButtonGroup = ({productListItemId, list, onClick = noop}) => {
-    const {formatMessage} = useIntl()
+const WishlistSecondaryButtonGroup = ({productListItemId, onClick = noop}) => {
     const variant = useCartItemVariant()
-    const customerProductLists = useCustomerProductLists()
+    const wishlist = useWishlist()
     const modalProps = useDisclosure()
-    const showToast = useToast()
+    const toast = useToast()
+    const {formatMessage} = useIntl()
 
     const showRemoveItemConfirmation = () => {
         modalProps.onOpen()
@@ -43,14 +45,13 @@ const WishlistSecondaryButtonGroup = ({productListItemId, list, onClick = noop})
     const handleItemRemove = async () => {
         onClick(variant.id)
         try {
-            await customerProductLists.deleteCustomerProductListItem(list, {id: productListItemId})
-            showToast({
+            await wishlist.removeListItem(productListItemId)
+            toast({
                 title: formatMessage({defaultMessage: 'Item removed from wishlist'}),
                 status: 'success'
             })
-        } catch (err) {
-            console.error(err)
-            showToast({
+        } catch {
+            toast({
                 title: formatMessage(
                     {defaultMessage: '{errorMessage}'},
                     {errorMessage: API_ERROR_MESSAGE}
@@ -87,7 +88,6 @@ const WishlistSecondaryButtonGroup = ({productListItemId, list, onClick = noop})
 }
 
 WishlistSecondaryButtonGroup.propTypes = {
-    list: PropTypes.object,
     productListItemId: PropTypes.string,
     onClick: PropTypes.func
 }

@@ -25,13 +25,13 @@ import RecommendedProducts from '../../components/recommended-products'
 
 // Hooks
 import {useToast} from '../../hooks/use-toast'
-import useBasket from '../../commerce-api/hooks/useBasket'
+import useWishlist from '../../hooks/use-wishlist'
 import useCustomer from '../../commerce-api/hooks/useCustomer'
-import useCustomerProductLists from '../../commerce-api/hooks/useCustomerProductLists'
 import useNavigation from '../../hooks/use-navigation'
+import useBasket from '../../commerce-api/hooks/useBasket'
 
 // Constants
-import {API_ERROR_MESSAGE, customerProductListTypes} from '../../constants'
+import {API_ERROR_MESSAGE} from '../../constants'
 import {REMOVE_CART_ITEM_CONFIRMATION_DIALOG_CONFIG} from './partials/cart-secondary-button-group'
 
 // Utilities
@@ -42,20 +42,14 @@ const Cart = () => {
     const customer = useCustomer()
     const [selectedItem, setSelectedItem] = useState(undefined)
     const [localQuantity, setLocalQuantity] = useState({})
+    const [isCartItemLoading, setCartItemLoading] = useState(false)
+    const {isOpen, onOpen, onClose} = useDisclosure()
     const {formatMessage} = useIntl()
-    const showToast = useToast()
+    const toast = useToast()
     const navigate = useNavigation()
     const modalProps = useDisclosure()
-
-    const productListEventHandler = (event) => {
-        if (event.action === 'add') {
-            showWishlistItemAdded(event.item?.quantity)
-        }
-    }
-
-    const showError = (error) => {
-        console.log(error)
-        showToast({
+    const showError = () => {
+        toast({
             title: formatMessage(
                 {defaultMessage: '{errorMessage}'},
                 {errorMessage: API_ERROR_MESSAGE}
@@ -64,13 +58,33 @@ const Cart = () => {
         })
     }
 
-    const customerProductLists = useCustomerProductLists({
-        eventHandler: productListEventHandler,
-        errorHandler: showError
-    })
-
-    const [isCartItemLoading, setCartItemLoading] = useState(false)
-    const {isOpen, onOpen, onClose} = useDisclosure()
+    /**************** Wishlist ****************/
+    const wishlist = useWishlist()
+    const handleAddToWishlist = async (product) => {
+        try {
+            await wishlist.createListItem({
+                id: product.productId,
+                quantity: product.quantity
+            })
+            toast({
+                title: formatMessage(
+                    {
+                        defaultMessage:
+                            '{quantity} {quantity, plural, one {item} other {items}} added to wishlist'
+                    },
+                    {quantity: 1}
+                ),
+                status: 'success',
+                action: (
+                    <Button variant="link" onClick={() => navigate('/account/wishlist')}>
+                        View
+                    </Button>
+                )
+            })
+        } catch {
+            showError()
+        }
+    }
 
     useEffect(() => {
         // Set the default shipping method if none is already selected
@@ -119,8 +133,8 @@ const Cart = () => {
             if (selectedItem.quantity !== quantity) {
                 return await changeItemQuantity(quantity, selectedItem)
             }
-        } catch (error) {
-            showError(error)
+        } catch {
+            showError()
         } finally {
             setCartItemLoading(false)
             setSelectedItem(undefined)
@@ -139,8 +153,8 @@ const Cart = () => {
                 quantity: parseInt(quantity)
             }
             await basket.updateItemInBasket(item, product.itemId)
-        } catch (error) {
-            showError(error)
+        } catch {
+            showError()
         } finally {
             // reset the state
             setCartItemLoading(false)
@@ -180,85 +194,17 @@ const Cart = () => {
 
         return true
     }
-
-    const showWishlistItemAdded = (quantity) => {
-        const toastAction = (
-            <Button variant="link" onClick={() => navigate('/account/wishlist')}>
-                View
-            </Button>
-        )
-        showToast({
-            title: formatMessage(
-                {
-                    defaultMessage:
-                        '{quantity} {quantity, plural, one {item} other {items}} added to wishlist'
-                },
-                {quantity}
-            ),
-            status: 'success',
-            action: toastAction
-        })
-    }
-
-    const handleAddToWishlist = async (product) => {
-        setCartItemLoading(true)
-        setSelectedItem(product)
-        try {
-            // If product-lists have not loaded we push "Add to wishlist" event to eventQueue to be
-            // processed once the product-lists have loaded.
-
-            // @TODO: move the logic to useCustomerProductLists
-            // Cart shouldn't need to know the implementation detail of the event queue
-            // Cart should just do "customerProductLists.addItem(item)"!
-            if (!customerProductLists?.loaded) {
-                const event = {
-                    item: product,
-                    action: 'add',
-                    listType: customerProductListTypes.WISHLIST,
-                    showStatus: showWishlistItemAdded,
-                    showError
-                }
-
-                customerProductLists.addActionToEventQueue(event)
-            } else {
-                const wishlist = customerProductLists.data.find(
-                    (list) => list.type === customerProductListTypes.WISHLIST
-                )
-
-                const wishlistItem = await customerProductLists.createCustomerProductListItem(
-                    wishlist,
-                    {
-                        productId: product.productId,
-                        priority: 1,
-                        quantity: product.quantity,
-                        public: false,
-                        type: 'product'
-                    }
-                )
-
-                if (wishlistItem?.id) {
-                    showWishlistItemAdded(product.quantity)
-                }
-            }
-        } catch (error) {
-            showError(error)
-        } finally {
-            setCartItemLoading(false)
-            setSelectedItem(undefined)
-        }
-    }
-
     const handleRemoveItem = async (product) => {
         setSelectedItem(product)
         setCartItemLoading(true)
         try {
             await basket.removeItemFromBasket(product.itemId)
-            showToast({
+            toast({
                 title: formatMessage({defaultMessage: 'Item removed from cart'}),
                 status: 'success'
             })
-        } catch (error) {
-            showError(error)
+        } catch {
+            showError()
         } finally {
             // reset the state
             setCartItemLoading(false)

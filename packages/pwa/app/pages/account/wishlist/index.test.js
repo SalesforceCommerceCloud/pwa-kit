@@ -4,167 +4,404 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {rest} from 'msw'
-import {setupServer} from 'msw/node'
-import React, {useEffect} from 'react'
+import React from 'react'
 import AccountWishlist from '.'
-import useCustomer from '../../../commerce-api/hooks/useCustomer'
-import {
-    mockedCustomerProductListsDetails,
-    mockedRegisteredCustomer
-} from '../../../commerce-api/mock-data'
 import {renderWithProviders} from '../../../utils/test-utils'
-import {screen, waitFor} from '@testing-library/react'
+import {screen} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import {mockedCustomerProductLists} from '../../../commerce-api/mock-data'
+import useWishlist from '../../../hooks/use-wishlist'
 
-let mockedWishlist = mockedCustomerProductLists
-const testProductId = 'apple-ipod-nano-green-16gM'
-const productDetail = {
-    [testProductId]: mockedCustomerProductListsDetails.data[0]
-}
-mockedWishlist.data[0]._productItemsDetail = productDetail
-const wishlistItemId = mockedWishlist.data[0].customerProductListItems.find(
-    (e) => e.productId === testProductId
-).id
-
-jest.setTimeout(60000)
-
-jest.mock('../../../commerce-api/utils', () => {
-    const originalModule = jest.requireActual('../../../commerce-api/utils')
-    return {
-        ...originalModule,
-        isTokenValid: jest.fn().mockReturnValue(true)
-    }
-})
-
-jest.mock('../../../commerce-api/hooks/useCustomerProductLists', () => {
-    const originalModule = jest.requireActual('../../../commerce-api/hooks/useCustomerProductLists')
-    const useCustomerProductLists = originalModule.default
-    return () => {
-        const customerProductLists = useCustomerProductLists()
-
-        return {
-            ...customerProductLists,
-            ...mockedWishlist,
-            loaded: jest.fn().mockReturnValue(true),
-            getProductsInList: jest.fn(),
-            fetchOrCreateProductLists: jest.fn(),
-            getProductListPerType: jest.fn().mockReturnValue(mockedWishlist.data[0])
+const mockData = {
+    creationDate: '2021-09-13T23:29:23.396Z',
+    customerProductListItems: [
+        {
+            id: '98ca9a3a9c8ee803543dc45cdc',
+            priority: 1,
+            productId: '25518837M',
+            public: false,
+            purchasedQuantity: 0,
+            quantity: 4,
+            type: 'product',
+            product: {
+                currency: 'GBP',
+                id: '25518837M',
+                imageGroups: [
+                    {
+                        images: [
+                            {
+                                alt: 'Ruffle Front V-Neck Cardigan, , large',
+                                disBaseLink:
+                                    'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw4cd0a798/images/large/PG.10216885.JJ169XX.PZ.jpg',
+                                link:
+                                    'https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw4cd0a798/images/large/PG.10216885.JJ169XX.PZ.jpg',
+                                title: 'Ruffle Front V-Neck Cardigan, '
+                            },
+                            {
+                                alt: 'Ruffle Front V-Neck Cardigan, , large',
+                                disBaseLink:
+                                    'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwf67d39ef/images/large/PG.10216885.JJ169XX.BZ.jpg',
+                                link:
+                                    'https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwf67d39ef/images/large/PG.10216885.JJ169XX.BZ.jpg',
+                                title: 'Ruffle Front V-Neck Cardigan, '
+                            }
+                        ],
+                        viewType: 'large'
+                    },
+                    {
+                        images: [
+                            {
+                                alt: 'Ruffle Front V-Neck Cardigan, , medium',
+                                disBaseLink:
+                                    'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwc31527c1/images/medium/PG.10216885.JJ169XX.PZ.jpg',
+                                link:
+                                    'https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwc31527c1/images/medium/PG.10216885.JJ169XX.PZ.jpg',
+                                title: 'Ruffle Front V-Neck Cardigan, '
+                            },
+                            {
+                                alt: 'Ruffle Front V-Neck Cardigan, , medium',
+                                disBaseLink:
+                                    'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw3b11511c/images/medium/PG.10216885.JJ169XX.BZ.jpg',
+                                link:
+                                    'https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw3b11511c/images/medium/PG.10216885.JJ169XX.BZ.jpg',
+                                title: 'Ruffle Front V-Neck Cardigan, '
+                            }
+                        ],
+                        viewType: 'medium'
+                    },
+                    {
+                        images: [
+                            {
+                                alt: 'Ruffle Front V-Neck Cardigan, , small',
+                                disBaseLink:
+                                    'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw4ada76e4/images/small/PG.10216885.JJ169XX.PZ.jpg',
+                                link:
+                                    'https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw4ada76e4/images/small/PG.10216885.JJ169XX.PZ.jpg',
+                                title: 'Ruffle Front V-Neck Cardigan, '
+                            },
+                            {
+                                alt: 'Ruffle Front V-Neck Cardigan, , small',
+                                disBaseLink:
+                                    'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw5c3e4bf4/images/small/PG.10216885.JJ169XX.BZ.jpg',
+                                link:
+                                    'https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw5c3e4bf4/images/small/PG.10216885.JJ169XX.BZ.jpg',
+                                title: 'Ruffle Front V-Neck Cardigan, '
+                            }
+                        ],
+                        viewType: 'small'
+                    }
+                ],
+                inventory: {
+                    ats: 1597,
+                    backorderable: false,
+                    id: 'inventory_m',
+                    orderable: true,
+                    preorderable: false,
+                    stockLevel: 1597
+                },
+                longDescription:
+                    "This flirty ruffle cardigan can take you from day to night. Don't leave home with out a great pair of Commerce Cloud Store earrings.",
+                master: {
+                    masterId: '25518837M',
+                    orderable: true,
+                    price: 26.23
+                },
+                minOrderQuantity: 1,
+                name: 'Ruffle Front V-Neck Cardigan',
+                pageDescription:
+                    "This flirty ruffle cardigan can take you from day to night. Don't leave home with out a great pair of Commerce Cloud Store earrings.",
+                pageTitle: 'Ruffle Front V-Neck Cardigan',
+                price: 26.23,
+                pricePerUnit: 26.23,
+                primaryCategoryId: 'womens-clothing-tops',
+                productPromotions: [
+                    {
+                        calloutMsg: '$50 Fixed Products Amount Above 100',
+                        promotionId: '$50FixedProductsAmountAbove100'
+                    },
+                    {
+                        calloutMsg: 'Buy one Long Center Seam Skirt and get 2 tops',
+                        promotionId: 'ChoiceOfBonusProdect-ProductLevel-ruleBased'
+                    }
+                ],
+                shortDescription:
+                    "This flirty ruffle cardigan can take you from day to night. Don't leave home with out a great pair of Commerce Cloud Store earrings.",
+                stepQuantity: 1,
+                type: {
+                    master: true
+                },
+                validFrom: {
+                    default: '2010-11-18T05:00:00.000Z'
+                },
+                variants: [
+                    {
+                        orderable: true,
+                        price: 26.23,
+                        productId: '701642873211M',
+                        variationValues: {
+                            color: 'JJ169XX',
+                            size: '9LG'
+                        }
+                    },
+                    {
+                        orderable: true,
+                        price: 26.23,
+                        productId: '701642873334M',
+                        variationValues: {
+                            color: 'JJ908XX',
+                            size: '9LG'
+                        }
+                    },
+                    {
+                        orderable: true,
+                        price: 26.23,
+                        productId: '701642873297M',
+                        variationValues: {
+                            color: 'JJ8UTXX',
+                            size: '9LG'
+                        }
+                    },
+                    {
+                        orderable: true,
+                        price: 26.23,
+                        productId: '701642873372M',
+                        variationValues: {
+                            color: 'JJI15XX',
+                            size: '9LG'
+                        }
+                    },
+                    {
+                        orderable: true,
+                        price: 26.23,
+                        productId: '701642873402M',
+                        variationValues: {
+                            color: 'JJI15XX',
+                            size: '9XL'
+                        }
+                    },
+                    {
+                        orderable: true,
+                        price: 26.23,
+                        productId: '701642873303M',
+                        variationValues: {
+                            color: 'JJ8UTXX',
+                            size: '9MD'
+                        }
+                    },
+                    {
+                        orderable: true,
+                        price: 26.23,
+                        productId: '701642873310M',
+                        variationValues: {
+                            color: 'JJ8UTXX',
+                            size: '9SM'
+                        }
+                    },
+                    {
+                        orderable: true,
+                        price: 26.23,
+                        productId: '701642873228M',
+                        variationValues: {
+                            color: 'JJ169XX',
+                            size: '9MD'
+                        }
+                    },
+                    {
+                        orderable: true,
+                        price: 26.23,
+                        productId: '701642873235M',
+                        variationValues: {
+                            color: 'JJ169XX',
+                            size: '9SM'
+                        }
+                    },
+                    {
+                        orderable: true,
+                        price: 26.23,
+                        productId: '701642873396M',
+                        variationValues: {
+                            color: 'JJI15XX',
+                            size: '9SM'
+                        }
+                    },
+                    {
+                        orderable: true,
+                        price: 26.23,
+                        productId: '701642873389M',
+                        variationValues: {
+                            color: 'JJI15XX',
+                            size: '9MD'
+                        }
+                    },
+                    {
+                        orderable: true,
+                        price: 26.23,
+                        productId: '701642873327M',
+                        variationValues: {
+                            color: 'JJ8UTXX',
+                            size: '9XL'
+                        }
+                    },
+                    {
+                        orderable: true,
+                        price: 26.23,
+                        productId: '701642873341M',
+                        variationValues: {
+                            color: 'JJ908XX',
+                            size: '9MD'
+                        }
+                    },
+                    {
+                        orderable: true,
+                        price: 26.23,
+                        productId: '701642873358M',
+                        variationValues: {
+                            color: 'JJ908XX',
+                            size: '9SM'
+                        }
+                    },
+                    {
+                        orderable: true,
+                        price: 26.23,
+                        productId: '701642873365M',
+                        variationValues: {
+                            color: 'JJ908XX',
+                            size: '9XL'
+                        }
+                    },
+                    {
+                        orderable: true,
+                        price: 26.23,
+                        productId: '701642873242M',
+                        variationValues: {
+                            color: 'JJ169XX',
+                            size: '9XL'
+                        }
+                    }
+                ],
+                variationAttributes: [
+                    {
+                        id: 'color',
+                        name: 'Colour',
+                        values: [
+                            {
+                                name: 'Black',
+                                orderable: true,
+                                value: 'JJ169XX'
+                            },
+                            {
+                                name: 'Icy Mint',
+                                orderable: true,
+                                value: 'JJ8UTXX'
+                            },
+                            {
+                                name: 'Grey Heather',
+                                orderable: true,
+                                value: 'JJ908XX'
+                            },
+                            {
+                                name: 'White',
+                                orderable: true,
+                                value: 'JJI15XX'
+                            }
+                        ]
+                    },
+                    {
+                        id: 'size',
+                        name: 'Size',
+                        values: [
+                            {
+                                name: 'S',
+                                orderable: true,
+                                value: '9SM'
+                            },
+                            {
+                                name: 'M',
+                                orderable: true,
+                                value: '9MD'
+                            },
+                            {
+                                name: 'L',
+                                orderable: true,
+                                value: '9LG'
+                            },
+                            {
+                                name: 'XL',
+                                orderable: true,
+                                value: '9XL'
+                            }
+                        ]
+                    }
+                ],
+                c_isNewtest: true,
+                c_isSale: true
+            }
         }
-    }
-})
-
-const MockedComponent = () => {
-    const customer = useCustomer()
-    useEffect(() => {
-        customer.login('test@test.com', 'password')
-    }, [])
-
-    return (
-        <div>
-            <div>{customer.customerId}</div>
-            <AccountWishlist />
-        </div>
-    )
+    ],
+    event: {},
+    id: 'eba7a6682031bfa931949708d7',
+    lastModified: '2021-09-14T00:47:12.612Z',
+    name: 'PWA wishlist',
+    public: false,
+    type: 'wish_list'
 }
 
-const server = setupServer(
-    rest.post('*/customers/actions/login', (req, res, ctx) =>
-        res(
-            ctx.delay(0),
-            ctx.set('authorization', `Bearer fakeToken`),
-            ctx.json(mockedRegisteredCustomer)
-        )
-    ),
-    rest.get('*/customers/:customerId', (req, res, ctx) =>
-        res(ctx.delay(0), ctx.json(mockedRegisteredCustomer))
-    ),
-    rest.post('*/oauth2/authorize', (req, res, ctx) =>
-        res(ctx.delay(0), ctx.status(303), ctx.set('location', `/testcallback`))
-    ),
+jest.mock('../../../hooks/use-wishlist')
 
-    rest.get('*/oauth2/authorize', (req, res, ctx) =>
-        res(ctx.delay(0), ctx.status(303), ctx.set('location', `/testcallback`))
-    ),
-
-    rest.post('*/oauth2/login', (req, res, ctx) =>
-        res(ctx.delay(0), ctx.status(200), ctx.json(mockedRegisteredCustomer))
-    ),
-
-    rest.get('*/testcallback', (req, res, ctx) => {
-        return res(ctx.delay(0), ctx.status(200))
-    }),
-
-    rest.post('*/oauth2/token', (req, res, ctx) =>
-        res(
-            ctx.delay(0),
-            ctx.json({
-                customer_id: 'test',
-                access_token: 'testtoken',
-                refresh_token: 'testrefeshtoken',
-                usid: 'testusid',
-                enc_user_id: 'testEncUserId'
-            })
-        )
-    )
-)
-
-// Set up and clean up
 beforeEach(() => {
     jest.resetModules()
-    server.listen({onUnhandledRequest: 'error'})
-
-    // Need to mock TextEncoder for tests
-    if (typeof TextEncoder === 'undefined') {
-        global.TextEncoder = require('util').TextEncoder
-    }
 })
 
-afterEach(() => {
-    localStorage.clear()
-    server.resetHandlers()
-})
-afterAll(() => server.close())
-
-test('Renders wishlist page for registered customers', () => {
-    renderWithProviders(<MockedComponent />)
-    expect(screen.getByTestId('account-wishlist-page')).toBeInTheDocument()
-})
-
-test('renders product item name, attributes and price', async () => {
-    renderWithProviders(<MockedComponent />)
-
-    await waitFor(() => {
-        expect(screen.getByText(/apple ipod nano/i)).toBeInTheDocument()
-        expect(screen.getByText(/color: green/i)).toBeInTheDocument()
-        expect(screen.getByText(/memory size: 16 GB/i)).toBeInTheDocument()
+test('Renders wishlist page', () => {
+    useWishlist.mockReturnValue({
+        isInitialized: true,
+        isEmpty: false,
+        hasDetail: true,
+        items: mockData.customerProductListItems
     })
+
+    renderWithProviders(<AccountWishlist />)
+    expect(screen.getByTestId('account-wishlist-page')).toBeInTheDocument()
+    expect(screen.getByText(mockData.customerProductListItems[0].product.name)).toBeInTheDocument()
 })
 
 test('Can remove item from the wishlist', async () => {
-    renderWithProviders(<MockedComponent />)
-    expect(await screen.findByTestId('account-wishlist-page')).toBeInTheDocument()
-    expect(screen.getByText(/apple ipod nano/i)).toBeInTheDocument()
+    const removeItemMock = jest.fn()
+    useWishlist.mockReturnValue({
+        isInitialized: true,
+        isEmpty: false,
+        hasDetail: true,
+        items: mockData.customerProductListItems,
+        removeListItem: removeItemMock
+    })
 
-    const wishlistRemoveButton = await screen.findByTestId(`sf-wishlist-remove-${wishlistItemId}`)
+    renderWithProviders(<AccountWishlist />)
+
+    const wishlistRemoveButton = await screen.findByTestId(
+        'sf-wishlist-remove-98ca9a3a9c8ee803543dc45cdc'
+    )
     userEvent.click(wishlistRemoveButton)
-    mockedWishlist.data[0].customerProductListItems = []
     userEvent.click(screen.getByRole('button', {name: /yes, remove item/i}))
-
-    expect(await screen.getByText(/no wishlist items/i)).toBeInTheDocument()
+    expect(removeItemMock).toBeCalled()
 })
 
 test('renders no wishlist items for empty wishlist', () => {
-    mockedWishlist.data[0].customerProductListItems = []
-    renderWithProviders(<MockedComponent />)
+    useWishlist.mockReturnValue({
+        isInitialized: true,
+        isEmpty: true,
+        hasDetail: true
+    })
+    renderWithProviders(<AccountWishlist />)
 
     expect(screen.getByText(/no wishlist items/i)).toBeInTheDocument()
     expect(screen.getByRole('button', {name: /continue shopping/i})).toBeInTheDocument()
 })
 
 test('renders skeleton when product list is loading', () => {
-    mockedWishlist.data[0] = undefined
-    renderWithProviders(<MockedComponent />)
+    useWishlist.mockReturnValue({
+        isInitialized: false,
+        isEmpty: true
+    })
+
+    renderWithProviders(<AccountWishlist />)
     expect(screen.getByTestId('sf-wishlist-skeleton')).toBeInTheDocument()
 })

@@ -17,10 +17,6 @@ export const RECENT_SEARCH_LIMIT = 5
 export const RECENT_SEARCH_KEY = 'recent-search-key'
 export const RECENT_SEARCH_MIN_LENGTH = 3
 
-export const customerProductListTypes = {
-    WISHLIST: 'wish_list'
-}
-
 export const cssColorGroups = {
     beige: '#d3bca9',
     black: '#000000',
