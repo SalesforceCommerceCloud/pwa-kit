@@ -1,8 +1,7 @@
 version: 2.1
 orbs:
   slack: circleci/slack@3.2.0
-  win_node12: circleci/windows@2.2.0
-  win_node14: circleci/windows@2.4.1
+  win: circleci/windows@2.4.1
 
 commands:
   setup:
@@ -169,9 +168,9 @@ jobs:
       - slack/status:
           fail_only: true
           only_for_branches: develop
-  testNode12Windows:
+  testNode14Windows:
     executor:
-      name: win_node12/default
+      name: win/default
       size: "large"
       shell: bash.exe
     steps:
@@ -306,8 +305,8 @@ workflows:
   test:
     jobs:
       - testNode12
-      - testNode12Windows
       - testNode14
+      - testNode14Windows
       - generatedSFCCProjectTest
   nightly-build:
     triggers:
@@ -320,9 +319,9 @@ workflows:
     jobs:
       - testNode12:
           context: nightly-build
-      - testNode12Windows:
-          context: nightly-build
       - testNode14:
+          context: nightly-build
+      - testNode14Windows:
           context: nightly-build
       - generatedSFCCProjectTest:
           context: nightly-build
