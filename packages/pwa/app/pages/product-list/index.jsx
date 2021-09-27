@@ -75,37 +75,6 @@ const REFINEMENT_DISALLOW_LIST = ['c_isNew']
  * allowable filters and sort refinements.
  */
 const ProductList = (props) => {
-    const {isOpen, onOpen, onClose} = useDisclosure()
-    const [sortOpen, setSortOpen] = useState(false)
-    const {formatMessage} = useIntl()
-    const navigate = useNavigation()
-
-    const history = useHistory()
-    const params = useParams()
-    const [searchParams, {stringify: stringifySearchParams}] = useSearchParams()
-    const {categories} = useCategories()
-    const [filtersLoading, setFiltersLoading] = useState(false)
-    const productListEventHandler = (event) => {
-        if (event.action === 'add') {
-            showWishlistItemAdded(event.item?.quantity)
-        }
-    }
-
-    const showError = () => {
-        showToast({
-            title: formatMessage(
-                {defaultMessage: '{errorMessage}'},
-                {errorMessage: API_ERROR_MESSAGE}
-            ),
-            status: 'error'
-        })
-    }
-
-    const customerProductLists = useCustomerProductLists({
-        eventHandler: productListEventHandler,
-        errorHandler: showError
-    })
-    const showToast = useToast()
     const {
         searchQuery,
         productSearchResult,
@@ -123,7 +92,7 @@ const ProductList = (props) => {
     const navigate = useNavigation()
     const history = useHistory()
     const params = useParams()
-    const {categories} = useContext(CategoriesContext)
+    const {categories} = useCategories()
     const toast = useToast()
 
     // Get the current category from global state.

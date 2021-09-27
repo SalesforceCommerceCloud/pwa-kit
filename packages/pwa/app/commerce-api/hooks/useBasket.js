@@ -6,8 +6,9 @@
  */
 import {useContext, useMemo} from 'react'
 import useEinstein from './useEinstein'
-import {useCommerceAPI, BasketContext, isError} from '../contexts'
+import {useCommerceAPI, BasketContext} from '../contexts'
 import useCustomer from './useCustomer'
+import {isError} from '../utils'
 
 export default function useBasket(opts = {}) {
     const {currency} = opts
