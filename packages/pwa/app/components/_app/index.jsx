@@ -42,7 +42,7 @@ import {defineMessages, IntlProvider} from 'react-intl'
 import {watchOnlineStatus, flatten} from '../../utils/utils'
 import {homeUrlBuilder, buildUrlLocale} from '../../utils/url'
 import {getLocaleConfig} from '../../utils/locale'
-import {HOME_HREF, SUPPORTED_LOCALES} from '../../constants'
+import {HOME_HREF, SUPPORTED_LOCALES, DEFAULT_LOCALE} from '../../constants'
 
 import Seo from '../seo'
 import useWishlist from '../../hooks/use-wishlist'
@@ -180,6 +180,12 @@ const App = (props) => {
                                 key={locale}
                             />
                         ))}
+                        <link
+                            rel="alternate"
+                            hrefLang={DEFAULT_LOCALE.slice(0, 2)}
+                            href={`${getAppOrigin()}${buildUrlLocale(DEFAULT_LOCALE)}`}
+                        />
+                        <link rel="alternate" hrefLang="x-default" href={`${getAppOrigin()}/`} />
                     </Seo>
 
                     <ScrollToTop />
