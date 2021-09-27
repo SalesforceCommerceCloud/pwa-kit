@@ -10,7 +10,6 @@
 -   Add default cache control header to home page. [#103](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/103)
 -   Security - `inquirer` package upgrade. [#121](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/121)
 -   New quantity picker. [#102](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/102)
--   Lazy load Popover component. [#134](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/134)
 
 ## v1.0.0 (Sep 08, 2021)
 
