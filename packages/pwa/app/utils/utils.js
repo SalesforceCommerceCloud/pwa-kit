@@ -166,8 +166,9 @@ export const capitalize = (text) => {
 export const withAsyncCallback = (func, options) => {
     return async (...props) => {
         try {
-            await func(...props)
+            const result = await func(...props)
             options?.onSuccess?.(...props)
+            return result
         } catch (e) {
             options?.onError?.(...props)
             throw e
