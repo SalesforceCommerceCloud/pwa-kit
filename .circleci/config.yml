@@ -63,7 +63,7 @@ commands:
           key: npm-cache
           paths:
             - /root/.npm
-  setupwindows:
+  setup_windows:
     description: 'Setup Machine'
     steps:
       - restore_cache:
@@ -175,11 +175,9 @@ jobs:
       shell: bash.exe
     steps:
       - checkout
-      - setupwindows
+      - setup_windows
       - runtests:
           enableIntegrationTests: false
-      - smoketestscripts
-      - checkclean
   testNode14:
     docker:
       - image: circleci/node:14-stretch-browsers
