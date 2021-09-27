@@ -31,6 +31,7 @@ Here’s the default locale configuration in `pwa/package.json`:
         "CNY",
         "JPY"
     ],
+    "defaultCurrency": "GBP",
     "supportedLocales": [
         {
             "id": "en-GB",
