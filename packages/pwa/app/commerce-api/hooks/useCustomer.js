@@ -6,7 +6,7 @@
  */
 import {useContext, useMemo} from 'react'
 import {nanoid} from 'nanoid'
-import {useCommerceAPI, CustomerContext} from '../utils'
+import {useCommerceAPI, CustomerContext} from '../contexts'
 
 const AuthTypes = Object.freeze({GUEST: 'guest', REGISTERED: 'registered'})
 
@@ -17,6 +17,13 @@ export default function useCustomer() {
     const self = useMemo(() => {
         return {
             ...customer,
+
+            /**
+             * Returns boolean value whether the user data is initialized
+             */
+            get isInitialized() {
+                return !!customer?.customerId
+            },
 
             /**
              * Returns boolean value whether the customer is of type `registered` or not.

@@ -20,6 +20,15 @@ import {
 } from '../../commerce-api/mock-data'
 import {Route, Switch} from 'react-router-dom'
 import {createMemoryHistory} from 'history'
+
+jest.mock('@chakra-ui/react', () => {
+    const originalModule = jest.requireActual('@chakra-ui/react')
+    return {
+        ...originalModule,
+        useMediaQuery: jest.fn().mockReturnValue([true])
+    }
+})
+
 jest.mock('../../commerce-api/utils', () => {
     const originalModule = jest.requireActual('../../commerce-api/utils')
     return {
@@ -100,11 +109,6 @@ const server = setupServer(
 beforeEach(() => {
     jest.resetModules()
     server.listen({onUnhandledRequest: 'error'})
-
-    // Need to mock TextEncoder for tests
-    if (typeof TextEncoder === 'undefined') {
-        global.TextEncoder = require('util').TextEncoder
-    }
 
     // Since we're testing some navigation logic, we are using a simple Router
     // around our component. We need to initialize the default route/path here.

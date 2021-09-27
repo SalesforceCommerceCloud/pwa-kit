@@ -30,7 +30,7 @@ import {FormattedMessage} from 'react-intl'
 const PromoPopover = ({header, children, ...props}) => {
     return (
         <Box position="relative" {...props}>
-            <Popover placement="top" boundary="scrollParent" trigger="hover" variant="small">
+            <Popover isLazy placement="top" boundary="scrollParent" trigger="hover" variant="small">
                 <PopoverTrigger>
                     <IconButton
                         icon={

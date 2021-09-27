@@ -95,11 +95,6 @@ beforeEach(() => {
     jest.resetModules()
     server.listen({onUnhandledRequest: 'error'})
 
-    // Need to mock TextEncoder for tests
-    if (typeof TextEncoder === 'undefined') {
-        global.TextEncoder = require('util').TextEncoder
-    }
-
     // Since we're testing some navigation logic, we are using a simple Router
     // around our component. We need to initialize the default route/path here.
     window.history.pushState({}, 'Account', '/en/account')
@@ -225,9 +220,9 @@ test('ProductView Component renders with updateWishlist event handler', async ()
 test('Product View can update quantity', () => {
     const addToCart = jest.fn()
     renderWithProviders(<MockComponent product={mockProductDetail} addToCart={addToCart} />)
-    const quantityBox = screen.getByRole('combobox')
+    const quantityBox = screen.getByRole('spinbutton')
     expect(quantityBox).toHaveValue('1')
     // update item quantity
-    userEvent.selectOptions(quantityBox, ['3'])
+    userEvent.type(quantityBox, '{backspace}3')
     expect(quantityBox).toHaveValue('3')
 })

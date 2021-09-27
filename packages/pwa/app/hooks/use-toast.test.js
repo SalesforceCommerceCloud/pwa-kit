@@ -34,11 +34,6 @@ const MockedComponent = (props) => {
 // Set up and clean up
 beforeEach(() => {
     jest.resetModules()
-
-    // Need to mock TextEncoder for tests
-    if (typeof TextEncoder === 'undefined') {
-        global.TextEncoder = require('util').TextEncoder
-    }
 })
 
 test('renders toast with action', async () => {

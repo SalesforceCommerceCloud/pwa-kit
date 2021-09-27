@@ -173,6 +173,7 @@ const ListMenuPopover = ({items, item, name, itemsKey, maxColumns}) => {
     return (
         <Box onMouseLeave={onClose}>
             <Popover
+                isLazy
                 placement={'bottom-start'}
                 initialFocusRef={initialFocusRef}
                 onOpen={onOpen}

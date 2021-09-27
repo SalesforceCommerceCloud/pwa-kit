@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import {useState} from 'react'
-import {useCommerceAPI} from '../utils'
+import {useCommerceAPI} from '../contexts'
 
 const useEinstein = () => {
     const api = useCommerceAPI()
