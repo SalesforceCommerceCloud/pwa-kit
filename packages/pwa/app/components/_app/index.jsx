@@ -327,9 +327,9 @@ App.propTypes = {
     children: PropTypes.node,
     targetLocale: PropTypes.string,
     defaultLocale: PropTypes.string,
-    location: PropTypes.object,
     messages: PropTypes.object,
-    categories: PropTypes.object
+    categories: PropTypes.object,
+    appOrigin: PropTypes.string
 }
 
 export default App
