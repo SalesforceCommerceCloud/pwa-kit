@@ -42,7 +42,7 @@ import {defineMessages, IntlProvider} from 'react-intl'
 import {watchOnlineStatus, flatten} from '../../utils/utils'
 import {homeUrlBuilder, buildUrlLocale} from '../../utils/url'
 import {getLocaleConfig} from '../../utils/locale'
-import {HOME_HREF, SUPPORTED_LOCALES, DEFAULT_LOCALE} from '../../constants'
+import {HOME_HREF, SUPPORTED_LOCALES} from '../../constants'
 
 import Seo from '../seo'
 import useWishlist from '../../hooks/use-wishlist'
@@ -66,7 +66,14 @@ export const defaultLocaleMessages = defineMessages({
 })
 
 const App = (props) => {
-    const {children, targetLocale, defaultLocale, messages, categories: allCategories = {}} = props
+    const {
+        children,
+        targetLocale,
+        defaultLocale,
+        messages,
+        categories: allCategories = {},
+        appOrigin = getAppOrigin()
+    } = props
 
     const history = useHistory()
     const location = useLocation()
@@ -176,16 +183,18 @@ const App = (props) => {
                             <link
                                 rel="alternate"
                                 hrefLang={locale.toLowerCase()}
-                                href={`${getAppOrigin()}${buildUrlLocale(locale)}`}
+                                href={`${appOrigin}${buildUrlLocale(locale)}`}
                                 key={locale}
                             />
                         ))}
+                        {/* A general locale as fallback. For example: "en" if default locale is "en-GB" */}
                         <link
                             rel="alternate"
-                            hrefLang={DEFAULT_LOCALE.slice(0, 2)}
-                            href={`${getAppOrigin()}${buildUrlLocale(DEFAULT_LOCALE)}`}
+                            hrefLang={defaultLocale.slice(0, 2)}
+                            href={`${appOrigin}${buildUrlLocale(defaultLocale)}`}
                         />
-                        <link rel="alternate" hrefLang="x-default" href={`${getAppOrigin()}/`} />
+                        {/* A wider fallback for user locales that the app does not support */}
+                        <link rel="alternate" hrefLang="x-default" href={`${appOrigin}/`} />
                     </Seo>
 
                     <ScrollToTop />
