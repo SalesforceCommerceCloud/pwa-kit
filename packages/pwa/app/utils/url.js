@@ -113,7 +113,7 @@ export const buildUrlLocale = (newLocale) => {
     const params = new URLSearchParams(location.search)
     params.delete('refine')
 
-    return location.pathname === HOME_HREF
+    return isHomepage(location.pathname)
         ? homeUrlBuilder(HOME_HREF, newLocale)
         : `/${
               SUPPORTED_LOCALES.includes(newLocale) ? newLocale : DEFAULT_LOCALE
@@ -121,6 +121,9 @@ export const buildUrlLocale = (newLocale) => {
               Array.from(params).length > 0 ? `?${params}` : ''
           }`
 }
+
+// Accepts '/', '/en-GB', '/zh-CN/', etc. as homepage
+const isHomepage = (pathname) => /^\/([a-z]{2}-[A-Z]{2})?\/?$/.test(pathname)
 
 /**
  * Builds the Home page URL for a given locale.
