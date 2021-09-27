@@ -170,7 +170,7 @@ export const withAsyncCallback = (func, options) => {
             options?.onSuccess?.(...props)
             return result
         } catch (e) {
-            options?.onError?.(...props)
+            options?.onError?.(e)
             throw e
         }
     }
