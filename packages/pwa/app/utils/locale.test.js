@@ -5,7 +5,13 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {whichLocaleToLoad, getTargetLocale, loadLocaleData, getLocaleConfig, getCurrency} from './locale'
+import {
+    whichLocaleToLoad,
+    getTargetLocale,
+    loadLocaleData,
+    getLocaleConfig,
+    getCurrency
+} from './locale'
 
 import {SUPPORTED_LOCALES, DEFAULT_LOCALE} from '../constants'
 
@@ -108,8 +114,8 @@ describe('getLocaleConfig', () => {
 
 describe('getCurrency', () => {
     test('returns the preferred currency for a supported locale', () => {
-        const currency = getCurrency(supportedLocale)
-        expect(currency).toBe(SUPPORTED_LOCALES[0].preferredLocale)
+        const currency = getCurrency(supportedLocale.id)
+        expect(currency).toBe(SUPPORTED_LOCALES[0].preferredCurrency)
     })
 
     test('returns undefined for a unsupported locale', () => {

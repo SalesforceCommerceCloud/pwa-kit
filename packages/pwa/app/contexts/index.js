@@ -42,7 +42,7 @@ export const CategoriesProvider = ({categories: initialCategories = {}, children
 }
 
 CategoriesProvider.propTypes = {
-    children: PropTypes.node.required,
+    children: PropTypes.node.isRequired,
     categories: PropTypes.object
 }
 
@@ -80,6 +80,6 @@ export const CurrencyProvider = ({currency: initialCurrency, children}) => {
 }
 
 CurrencyProvider.propTypes = {
-    children: PropTypes.node.required,
+    children: PropTypes.node.isRequired,
     currency: PropTypes.string
 }

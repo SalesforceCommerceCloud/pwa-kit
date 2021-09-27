@@ -20,10 +20,12 @@ import {
 } from '../commerce-api/utils'
 import {commerceAPIConfig} from '../commerce-api.config'
 import {IntlProvider} from 'react-intl'
-import {DEFAULT_LOCALE} from '../constants'
-import {CategoriesContext} from '../contexts'
+import {DEFAULT_LOCALE, DEFAULT_CURRENCY} from '../constants'
 import {einsteinAPIConfig} from '../einstein-api.config'
 import {mockCategories as initialMockCategories} from '../commerce-api/mock-data'
+
+// Contexts
+import {CategoriesProvider, CurrencyProvider} from '../contexts'
 
 export const renderWithReactIntl = (node, locale = DEFAULT_LOCALE) => {
     return render(
@@ -83,7 +85,6 @@ export const TestProviders = ({
     })
     const [basket, _setBasket] = useState(initialBasket)
     const [customer, setCustomer] = useState(initialCustomer)
-    const [categories, setCategories] = useState(initialCategories)
     const [customerProductLists, setCustomerProductLists] = useState(initialProductLists)
 
     const setBasket = useCallback((data) => {
@@ -96,19 +97,21 @@ export const TestProviders = ({
     return (
         <IntlProvider locale={DEFAULT_LOCALE} defaultLocale={DEFAULT_LOCALE}>
             <CommerceAPIProvider value={api}>
-                <CategoriesContext.Provider value={{categories, setCategories}}>
-                    <CustomerProvider value={{customer, setCustomer}}>
-                        <BasketProvider value={{basket, setBasket}}>
-                            <CustomerProductListsProvider
-                                value={{customerProductLists, setCustomerProductLists}}
-                            >
-                                <Router>
-                                    <ChakraProvider theme={theme}>{children}</ChakraProvider>
-                                </Router>
-                            </CustomerProductListsProvider>
-                        </BasketProvider>
-                    </CustomerProvider>
-                </CategoriesContext.Provider>
+                <CategoriesProvider categories={initialCategories}>
+                    <CurrencyProvider currency={DEFAULT_CURRENCY}>
+                        <CustomerProvider value={{customer, setCustomer}}>
+                            <BasketProvider value={{basket, setBasket}}>
+                                <CustomerProductListsProvider
+                                    value={{customerProductLists, setCustomerProductLists}}
+                                >
+                                    <Router>
+                                        <ChakraProvider theme={theme}>{children}</ChakraProvider>
+                                    </Router>
+                                </CustomerProductListsProvider>
+                            </BasketProvider>
+                        </CustomerProvider>
+                    </CurrencyProvider>
+                </CategoriesProvider>
             </CommerceAPIProvider>
         </IntlProvider>
     )
