@@ -1,7 +1,8 @@
 version: 2.1
 orbs:
   slack: circleci/slack@3.2.0
-  win: circleci/windows@2.4.0
+  win_node12: circleci/windows@2.2.0
+  win_node14: circleci/windows@2.4.1
 
 commands:
   setup:
@@ -170,7 +171,7 @@ jobs:
           only_for_branches: develop
   testNode12Windows:
     executor:
-      name: win/default
+      name: win_node12/default
       size: "large"
       shell: bash.exe
     steps:
