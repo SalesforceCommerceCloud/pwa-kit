@@ -63,7 +63,7 @@ commands:
           key: npm-cache
           paths:
             - /root/.npm
-  setupwin:
+  setupwindows:
     description: 'Setup Machine'
     steps:
       - restore_cache:
@@ -168,16 +168,18 @@ jobs:
       - slack/status:
           fail_only: true
           only_for_branches: develop
-  testNode12Win:
+  testNode12Windows:
     executor:
       name: win/default
       size: "large"
       shell: bash.exe
     steps:
       - checkout
-      - setupwin
+      - setupwindows
       - runtests:
           enableIntegrationTests: false
+      - smoketestscripts
+      - checkclean
   testNode14:
     docker:
       - image: circleci/node:14-stretch-browsers
@@ -305,7 +307,7 @@ workflows:
   test:
     jobs:
       - testNode12
-      - testNode12Win
+      - testNode12Windows
       - testNode14
       - generatedSFCCProjectTest
   nightly-build:
@@ -318,6 +320,8 @@ workflows:
                 - develop
     jobs:
       - testNode12:
+          context: nightly-build
+      - testNode12Windows:
           context: nightly-build
       - testNode14:
           context: nightly-build
