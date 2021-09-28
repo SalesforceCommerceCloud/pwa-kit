@@ -51,24 +51,24 @@ export const SUPPORTED_LOCALES = packageInfo.l10n.supportedLocales
 export const DEFAULT_LOCALE = packageInfo.l10n.defaultLocale
 
 /**
- *  Default messages for the supported locales.
+ *  Default messages for the supported locales shown in the locale selector.
  *  NOTE: Because the messages are statically analyzed, we have to maintain the list of locales asynchronously
  *  to those in the package.json.
  *  `locale` parameter format for OCAPI and Commerce API: <language code>-<country code>
  *  https://documentation.b2c.commercecloud.salesforce.com/DOC1/topic/com.demandware.dochelp/OCAPI/current/usage/Localization.html
  *  */
 export const localeSelectorMessages = defineMessages({
+    'de-DE': {defaultMessage: 'German (Germany)'},
+    'en-CA': {defaultMessage: 'English (Canada)'},
     'en-GB': {defaultMessage: 'English (United Kingdom)'},
     'en-US': {defaultMessage: 'English (United States)'},
-    'en-CA': {defaultMessage: 'English (Canada)'},
-    'fr-FR': {defaultMessage: 'French (France)'},
+    'es-ES': {defaultMessage: 'Spanish (Spain)'},
     'fr-CA': {defaultMessage: 'French (Canada)'},
+    'fr-FR': {defaultMessage: 'French (France)'},
     'it-IT': {defaultMessage: 'Italian (Italy)'},
-    'zh-CN': {defaultMessage: 'Chinese (China)'},
     'ja-JP': {defaultMessage: 'Japanese (Japan)'},
     'nl-NL': {defaultMessage: 'Dutch (Netherlands)'},
-    'de-DE': {defaultMessage: 'German (Germany)'},
-    'es-ES': {defaultMessage: 'Spanish (Spain)'}
+    'zh-CN': {defaultMessage: 'Chinese (China)'}
 })
 
 export const MAX_ORDER_QUANTITY = 10
