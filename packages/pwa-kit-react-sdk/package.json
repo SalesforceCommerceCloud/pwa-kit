@@ -58,7 +58,7 @@
     "glob": "7.1.1",
     "header-case": "1.0.1",
     "hoist-non-react-statics": "^3.3.1",
-    "http-proxy-middleware": "0.19.0",
+    "http-proxy-middleware": "0.21.0",
     "lodash": "^4.17.20",
     "merge-descriptors": "^1.0.1",
     "mime-types": "2.1.20",
