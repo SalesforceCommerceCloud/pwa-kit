@@ -114,8 +114,9 @@ export const buildUrlLocale = (newLocale, options = {}) => {
     const location = options.location
         ? options.location
         : typeof window !== 'undefined'
-        ? window.location
-        : useLocation()
+        ? window.location // to be used within event handlers
+        : useLocation() // to be used within React components
+
     const params = new URLSearchParams(location.search)
     params.delete('refine')
 
