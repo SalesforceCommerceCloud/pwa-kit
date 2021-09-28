@@ -385,11 +385,10 @@ const ProductList = (props) => {
                                                   enableFavourite={wishlist.isInitialized}
                                                   isFavourite={isInWishlist}
                                                   onFavouriteToggle={(isFavourite) => {
-                                                      if (isFavourite) {
-                                                          addItemToWishlist(productSearchItem)
-                                                      } else {
-                                                          removeItemFromWishlist(productSearchItem)
-                                                      }
+                                                      const action = isFavourite
+                                                          ? addItemToWishlist
+                                                          : removeItemFromWishlist
+                                                      return action(productSearchItem)
                                                   }}
                                               />
                                           )

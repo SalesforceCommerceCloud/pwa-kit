@@ -12,7 +12,7 @@ export default {
             variant: 'unstyled',
             top: 2,
             right: 2,
-            opacity: `${props.isLoading ? 0.5 : 1}`
+            opacity: `${props.isFavouriteLoading ? 0.5 : 1}`
         },
         imageWrapper: {
             position: 'relative',

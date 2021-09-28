@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React from 'react'
+import React, {useState} from 'react'
 import PropTypes from 'prop-types'
 import {HeartIcon, HeartSolidIcon} from '../icons'
 
@@ -58,7 +58,8 @@ const ProductTile = (props) => {
     const intl = useIntl()
     const {product, enableFavourite = false, isFavourite, onFavouriteToggle, ...rest} = props
     const {currency, image, price, productName, productId} = product
-    const styles = useMultiStyleConfig('ProductTile')
+    const [isFavouriteLoading, setFavouriteLoading] = useState(false)
+    const styles = useMultiStyleConfig('ProductTile', {isFavouriteLoading})
 
     return (
         <Link
@@ -79,15 +80,19 @@ const ProductTile = (props) => {
                         })}
                         icon={isFavourite ? <HeartSolidIcon /> : <HeartIcon />}
                         {...styles.favIcon}
-                        onClick={() => {
-                            onFavouriteToggle(!isFavourite)
+                        onClick={async () => {
+                            setFavouriteLoading(true)
+                            await onFavouriteToggle(!isFavourite)
+                            setFavouriteLoading(false)
                         }}
                     />
                 )}
             </Box>
 
             {/* Title */}
-            <Text {...styles.title}>{productName}</Text>
+            <Text {...styles.title}>
+                {productName} {isFavouriteLoading && 'isLoading'}
+            </Text>
 
             {/* Price */}
             <Text {...styles.price}>{intl.formatNumber(price, {style: 'currency', currency})}</Text>

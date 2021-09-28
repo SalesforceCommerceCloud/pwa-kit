@@ -185,11 +185,8 @@ const RecommendedProducts = ({zone, recommender, products, title, shouldFetch, .
                 enableFavourite: wishlist.isInitialized,
                 isFavourite: !!wishlist.findItemByProductId(product?.productId),
                 onFavouriteToggle: (isFavourite) => {
-                    if (isFavourite) {
-                        addItemToWishlist(product)
-                    } else {
-                        removeItemFromWishlist(product)
-                    }
+                    const action = isFavourite ? addItemToWishlist : removeItemFromWishlist
+                    return action(product)
                 }
             })}
             {...props}
