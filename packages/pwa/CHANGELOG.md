@@ -1,3 +1,7 @@
+## To be released
+
+-   Add localized urls (`hreflang`) to the current page's html [#137](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/137)
+
 ## v1.1.0 (Sep 27, 2021)
 
 -   Fix wishlist bugs and provide better hooks for wishlist features. [#64](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/64)
