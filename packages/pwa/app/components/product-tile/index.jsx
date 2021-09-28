@@ -59,7 +59,7 @@ const ProductTile = (props) => {
     const {product, enableFavourite = false, isFavourite, onFavouriteToggle, ...rest} = props
     const {currency, image, price, productName, productId} = product
     const [isFavouriteLoading, setFavouriteLoading] = useState(false)
-    const styles = useMultiStyleConfig('ProductTile', {isFavouriteLoading})
+    const styles = useMultiStyleConfig('ProductTile')
 
     return (
         <Link
@@ -80,6 +80,7 @@ const ProductTile = (props) => {
                         })}
                         icon={isFavourite ? <HeartSolidIcon /> : <HeartIcon />}
                         {...styles.favIcon}
+                        disabled={isFavouriteLoading}
                         onClick={async () => {
                             setFavouriteLoading(true)
                             await onFavouriteToggle(!isFavourite)
