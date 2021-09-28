@@ -1,6 +1,6 @@
 ## To be released
 
--   Add localized urls (`hreflang`) to the current page's html [#137](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/137)
+-   For search engine crawlers, add `hreflang` links to the current page's html [#137](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/137)
 
 ## v1.1.0 (Sep 27, 2021)
 
