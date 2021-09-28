@@ -14,6 +14,7 @@ import AppConfig from '../universal/components/_app-config'
 import Switch from '../universal/components/switch'
 import {getRoutes, routeComponent} from '../universal/components/route-component'
 import {loadableReady} from '@loadable/component'
+import {getLocaleConfig} from '../../utils/locale'
 
 /* istanbul ignore next */
 export const registerServiceWorker = (url) => {
@@ -72,6 +73,16 @@ export const start = () => {
     return Promise.resolve()
         .then(() => new Promise((resolve) => loadableReady(resolve)))
         .then(() => {
+            return getLocaleConfig({
+                getUserPreferredLocales: AppConfig.getUserPreferredLocales.bind(this, {
+                    // TODO: Might feel better to place the original url in the locals above,
+                    // but that will involve refactoring this function to be async/await style
+                    // if we havea hope of making it look nice.
+                    originalUrl: window.location.pathname
+                })
+            })
+        })
+        .then((localeConfig) => {
             ReactDOM.hydrate(
                 <Router>
                     <DeviceContext.Provider value={{type: window.__DEVICE_TYPE__}}>
@@ -81,6 +92,7 @@ export const start = () => {
                                 appState={window.__PRELOADED_STATE__}
                                 routes={routes}
                                 App={WrappedApp}
+                                localeConfig={localeConfig}
                             />
                         </AppConfig>
                     </DeviceContext.Provider>

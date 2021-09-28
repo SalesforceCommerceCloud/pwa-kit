@@ -34,13 +34,9 @@ import useShopper from '../../commerce-api/hooks/useShopper'
 import useCustomer from '../../commerce-api/hooks/useCustomer'
 import {AuthModal, useAuthModal} from '../../hooks/use-auth-modal'
 
-// Localization
-import {defineMessages, IntlProvider} from 'react-intl'
-
 // Others
 import {watchOnlineStatus, flatten} from '../../utils/utils'
 import {homeUrlBuilder} from '../../utils/url'
-import {getLocaleConfig} from '../../utils/locale'
 import {HOME_HREF} from '../../constants'
 
 import Seo from '../seo'
@@ -49,23 +45,8 @@ import useWishlist from '../../hooks/use-wishlist'
 const DEFAULT_NAV_DEPTH = 3
 const DEFAULT_ROOT_CATEGORY = 'root'
 
-/**
- *  Default messages for the supported locales.
- *  NOTE: Because the messages are statically analyzed, we have to maintain the list of locales asynchronously
- *  to those in the package.json.
- *  `locale` parameter format for OCAPI and Commerce API: <language code>-<country code>
- *  https://documentation.b2c.commercecloud.salesforce.com/DOC1/topic/com.demandware.dochelp/OCAPI/current/usage/Localization.html
- *  */
-export const defaultLocaleMessages = defineMessages({
-    'en-GB': {defaultMessage: 'English (United Kingdom)'},
-    'fr-FR': {defaultMessage: 'French (France)'},
-    'it-IT': {defaultMessage: 'Italian (Italy)'},
-    'zh-CN': {defaultMessage: 'Chinese (China)'},
-    'ja-JP': {defaultMessage: 'Japanese (Japan)'}
-})
-
 const App = (props) => {
-    const {children, targetLocale, defaultLocale, messages, categories: allCategories = {}} = props
+    const {children, categories: allCategories = {}} = props
 
     const history = useHistory()
     const location = useLocation()
@@ -74,6 +55,9 @@ const App = (props) => {
     const [isOnline, setIsOnline] = useState(true)
     const [categories, setCategories] = useState(allCategories)
     const styles = useStyleConfig('App')
+
+    // TODO: Replace this with `useLocale` hook.
+    const targetLocale = 'en-GB'
 
     const {isOpen, onOpen, onClose} = useDisclosure()
 
@@ -142,89 +126,71 @@ const App = (props) => {
 
     return (
         <Box className="sf-app" {...styles.container}>
-            <IntlProvider
-                onError={(err) => {
-                    if (err.code === 'MISSING_TRANSLATION') {
-                        // NOTE: Remove the console error for missing translations during development,
-                        // as we knew translations would be added later.
-                        console.warn('Missing translation', err.message)
-                        return
-                    }
-                    throw err
-                }}
-                locale={targetLocale}
-                defaultLocale={defaultLocale}
-                messages={messages}
-            >
-                <CategoriesContext.Provider value={{categories, setCategories}}>
-                    <Seo>
-                        <meta name="theme-color" content="#0288a7" />
-                        <meta
-                            name="apple-mobile-web-app-title"
-                            content="PWA-Kit-Retail-React-App"
-                        />
-                        <link
-                            rel="apple-touch-icon"
-                            href={getAssetUrl('static/img/global/apple-touch-icon.png')}
-                        />
-                        <link rel="manifest" href={getAssetUrl('static/manifest.json')} />
-                    </Seo>
+            <CategoriesContext.Provider value={{categories, setCategories}}>
+                <Seo>
+                    <meta name="theme-color" content="#0288a7" />
+                    <meta name="apple-mobile-web-app-title" content="PWA-Kit-Retail-React-App" />
+                    <link
+                        rel="apple-touch-icon"
+                        href={getAssetUrl('static/img/global/apple-touch-icon.png')}
+                    />
+                    <link rel="manifest" href={getAssetUrl('static/manifest.json')} />
+                </Seo>
 
-                    <ScrollToTop />
+                <ScrollToTop />
 
-                    <Box id="app" display="flex" flexDirection="column" flex={1}>
-                        <SkipNavLink zIndex="skipLink">Skip to Content</SkipNavLink>
+                <Box id="app" display="flex" flexDirection="column" flex={1}>
+                    <SkipNavLink zIndex="skipLink">Skip to Content</SkipNavLink>
 
-                        <Box {...styles.headerWrapper}>
-                            {!isCheckout ? (
-                                <Header
-                                    onMenuClick={onOpen}
-                                    onLogoClick={onLogoClick}
-                                    onMyCartClick={onCartClick}
-                                    onMyAccountClick={onAccountClick}
-                                    onWishlistClick={onWishlistClick}
-                                >
-                                    <HideOnDesktop>
-                                        <DrawerMenu
-                                            isOpen={isOpen}
-                                            onClose={onClose}
-                                            onLogoClick={onLogoClick}
-                                            root={categories[DEFAULT_ROOT_CATEGORY]}
-                                        />
-                                    </HideOnDesktop>
-
-                                    <HideOnMobile>
-                                        <ListMenu root={categories[DEFAULT_ROOT_CATEGORY]} />
-                                    </HideOnMobile>
-                                </Header>
-                            ) : (
-                                <CheckoutHeader />
-                            )}
-                        </Box>
-
-                        {!isOnline && <OfflineBanner />}
-
-                        <SkipNavContent
-                            style={{display: 'flex', flexDirection: 'column', flex: 1, outline: 0}}
-                        >
-                            <Box
-                                as="main"
-                                id="app-main"
-                                role="main"
-                                display="flex"
-                                flexDirection="column"
-                                flex="1"
+                    <Box {...styles.headerWrapper}>
+                        {!isCheckout ? (
+                            <Header
+                                onMenuClick={onOpen}
+                                onLogoClick={onLogoClick}
+                                onMyCartClick={onCartClick}
+                                onMyAccountClick={onAccountClick}
+                                onWishlistClick={onWishlistClick}
                             >
-                                <OfflineBoundary isOnline={false}>{children}</OfflineBoundary>
-                            </Box>
-                        </SkipNavContent>
+                                <HideOnDesktop>
+                                    <DrawerMenu
+                                        isOpen={isOpen}
+                                        onClose={onClose}
+                                        onLogoClick={onLogoClick}
+                                        root={categories[DEFAULT_ROOT_CATEGORY]}
+                                    />
+                                </HideOnDesktop>
 
-                        {!isCheckout ? <Footer /> : <CheckoutFooter />}
-
-                        <AuthModal {...authModal} />
+                                <HideOnMobile>
+                                    <ListMenu root={categories[DEFAULT_ROOT_CATEGORY]} />
+                                </HideOnMobile>
+                            </Header>
+                        ) : (
+                            <CheckoutHeader />
+                        )}
                     </Box>
-                </CategoriesContext.Provider>
-            </IntlProvider>
+
+                    {!isOnline && <OfflineBanner />}
+
+                    <SkipNavContent
+                        style={{display: 'flex', flexDirection: 'column', flex: 1, outline: 0}}
+                    >
+                        <Box
+                            as="main"
+                            id="app-main"
+                            role="main"
+                            display="flex"
+                            flexDirection="column"
+                            flex="1"
+                        >
+                            <OfflineBoundary isOnline={false}>{children}</OfflineBoundary>
+                        </Box>
+                    </SkipNavContent>
+
+                    {!isCheckout ? <Footer /> : <CheckoutFooter />}
+
+                    <AuthModal {...authModal} />
+                </Box>
+            </CategoriesContext.Provider>
         </Box>
     )
 }
@@ -235,30 +201,6 @@ App.shouldGetProps = () => {
 }
 
 App.getProps = async ({api}) => {
-    const localeConfig = await getLocaleConfig({
-        getUserPreferredLocales: () => {
-            // CONFIG: This function should return an array of preferred locales. They can be
-            // derived from various sources. Below are some examples of those:
-            //
-            // - client side: window.navigator.languages
-            // - the page URL they're on (example.com/en-GB/home)
-            // - cookie (if their previous preference is saved there)
-            //
-            // If this function returns an empty array (e.g. there isn't locale in the page url),
-            // then the app would use the default locale as the fallback.
-
-            // NOTE: Your implementation may differ, this is jsut what we did.
-            //
-            // Since the CommerceAPI client already has the current `locale` set,
-            // we can use it's value to load the correct messages for the application.
-            // Take a look at the `app/components/_app-config` component on how the
-            // preferred locale was derived.
-            const {locale} = api.getConfig()
-
-            return [locale]
-        }
-    })
-
     // Login as `guest` to get session.
     await api.auth.login()
 
@@ -266,8 +208,7 @@ App.getProps = async ({api}) => {
     const rootCategory = await api.shopperProducts.getCategory({
         parameters: {
             id: DEFAULT_ROOT_CATEGORY,
-            levels: DEFAULT_NAV_DEPTH,
-            locale: localeConfig.app.targetLocale
+            levels: DEFAULT_NAV_DEPTH
         }
     })
 
@@ -289,19 +230,13 @@ You can either follow this doc, https://sfdc.co/B4Z1m to enable it in business m
     const categories = flatten(rootCategory, 'categories')
 
     return {
-        targetLocale: localeConfig.app.targetLocale,
-        defaultLocale: localeConfig.app.defaultLocale,
-        messages: localeConfig.messages,
         categories: categories
     }
 }
 
 App.propTypes = {
     children: PropTypes.node,
-    targetLocale: PropTypes.string,
-    defaultLocale: PropTypes.string,
     location: PropTypes.object,
-    messages: PropTypes.object,
     categories: PropTypes.object
 }
 

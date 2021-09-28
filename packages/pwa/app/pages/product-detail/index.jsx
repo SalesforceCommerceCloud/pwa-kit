@@ -313,6 +313,7 @@ ProductDetail.getProps = async ({params, location, api}) => {
         throw new HTTPNotFound(category.detail)
     }
 
+    throw new Error('Forcing an error to show that the error page can be translated.')
     return {category, product}
 }
 

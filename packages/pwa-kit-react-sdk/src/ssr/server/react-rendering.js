@@ -33,6 +33,8 @@ import {proxyConfigs} from '../../utils/ssr-shared'
 
 import sprite from 'svg-sprite-loader/runtime/sprite.build'
 
+import {getLocaleConfig} from '../../utils/locale'
+
 const CWD = process.cwd()
 const BUNDLES_PATH = path.resolve(CWD, 'build/loadable-stats.json')
 
@@ -174,8 +176,16 @@ export const render = async (req, res) => {
         location
     })
 
+    // Step 4 - Get the App locale config
+    const localeConfig = await getLocaleConfig({
+        getUserPreferredLocales: AppConfig.getUserPreferredLocales.bind(this, {
+            originalUrl: req.originalUrl
+        })
+    })
+
     // Step 4 - Render the App
     let renderResult
+
     const args = {
         App: WrappedApp,
         appState,
@@ -183,7 +193,8 @@ export const render = async (req, res) => {
         routes,
         req,
         res,
-        location
+        location,
+        localeConfig
     }
     try {
         renderResult = renderApp(args)
@@ -205,7 +216,7 @@ export const render = async (req, res) => {
 }
 
 const renderApp = (args) => {
-    const {req, res, location, routes, appState, error, App} = args
+    const {req, res, location, routes, appState, error, App, localeConfig} = args
 
     const ssrOnly = 'mobify_server_only' in req.query
     const prettyPrint = 'mobify_pretty' in req.query
@@ -219,7 +230,13 @@ const renderApp = (args) => {
         <Router location={location} context={routerContext}>
             <DeviceContext.Provider value={{type: deviceType}}>
                 <AppConfig locals={res.locals}>
-                    <Switch error={error} appState={appState} routes={routes} App={App} />
+                    <Switch
+                        error={error}
+                        appState={appState}
+                        routes={routes}
+                        App={App}
+                        localeConfig={localeConfig}
+                    />
                 </AppConfig>
             </DeviceContext.Provider>
         </Router>

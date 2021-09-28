@@ -5,7 +5,31 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {SUPPORTED_LOCALES, DEFAULT_LOCALE} from '../constants'
+// TODO: Might want to make this a dynamic import, but at the least we'll error out if there,
+// is no configuration found.
+import pwakitConfig from 'pwa-kit-config'
+import {defineMessages} from 'react-intl'
+
+const SUPPORTED_LOCALES = pwakitConfig.l10n.supportedLocales
+const DEFAULT_LOCALE = pwakitConfig.l10n.defaultLocale
+
+/**
+ *  Default messages for the supported locales.
+ *  NOTE: Because the messages are statically analyzed, we have to maintain the list of locales asynchronously
+ *  to those in the package.json.
+ *  `locale` parameter format for OCAPI and Commerce API: <language code>-<country code>
+ *  https://documentation.b2c.commercecloud.salesforce.com/DOC1/topic/com.demandware.dochelp/OCAPI/current/usage/Localization.html
+ *  */
+// TODO: There is probably a better place for this is it belongs in the SDK at all. Think about it more.
+export const defaultLocaleMessages = defineMessages({
+    'en-GB': {defaultMessage: 'English (United Kingdom)'},
+    'fr-FR': {defaultMessage: 'French (France)'},
+    'it-IT': {defaultMessage: 'Italian (Italy)'},
+    'zh-CN': {defaultMessage: 'Chinese (China)'},
+    'ja-JP': {defaultMessage: 'Japanese (Japan)'}
+})
+
+export const supportedLocales = SUPPORTED_LOCALES
 
 /**
  * Dynamically import the translations/messages for a given locale
@@ -30,11 +54,16 @@ export const loadLocaleData = async (locale) => {
 
     let module
     try {
-        module = await import(`../translations/compiled/${localeToLoad}.json`)
+        // TODO: This import doesn't work. It also causes a warning in webpack.
+        // This is probably a result of use compiling the sdk with webpack and it not being
+        // in the context of the pwa.
+        module = await import(`./app/translations/compiled/${localeToLoad}.json`)
     } catch (err) {
         console.error(err)
         console.log(`Loading the default locale '${DEFAULT_LOCALE}' instead`)
-        module = await import(`../translations/compiled/${DEFAULT_LOCALE}.json`)
+        // TODO: This import doesn't work. It also causes a warning in webpack.
+        // module = await import(`./app/translations/compiled/${DEFAULT_LOCALE}.json`)
+        module = await import('translation-en-gb')
     }
 
     return module.default
@@ -51,6 +80,7 @@ export const getLocaleConfig = async ({getUserPreferredLocales} = {}) => {
     const targetLocale = getTargetLocale(preferredLocales, SUPPORTED_LOCALES, DEFAULT_LOCALE)
     const messages = await loadLocaleData(targetLocale)
 
+    // TODO: Lets revisit this object structure.
     return {
         app: {
             supportedLocales: SUPPORTED_LOCALES,
@@ -85,8 +115,6 @@ export const whichLocaleToLoad = (preferredLocales, supportedLocales, fallbackLo
  * @returns {string} Either `TARGET_LOCALE` environment variable if it's set OR the calculated target locale
  */
 export const getTargetLocale = (preferredLocales, supportedLocales, defaultLocale) => {
-    return (
-        process.env.TARGET_LOCALE ||
-        whichLocaleToLoad(preferredLocales, supportedLocales, defaultLocale)
-    )
+    // TODO: Rework `process.env.TARGET_LOCALE` into this logic.
+    return whichLocaleToLoad(preferredLocales, supportedLocales, defaultLocale)
 }

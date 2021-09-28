@@ -33,7 +33,9 @@ import {
     FlagJPIcon
 } from '../../components/icons'
 
-import {defaultLocaleMessages} from '../_app'
+import {defaultLocaleMessages} from 'pwa-kit-react-sdk/utils/locale'
+
+// import {defaultLocaleMessages} from '../_app'
 import {DEFAULT_LOCALE} from '../../constants'
 import {useIntl} from 'react-intl'
 

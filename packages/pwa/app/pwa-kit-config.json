@@ -1,0 +1,12 @@
+{
+    "l10n": {
+        "supportedLocales": [
+            "en-GB",
+            "fr-FR",
+            "it-IT",
+            "zh-CN",
+            "ja-JP"
+        ],
+        "defaultLocale": "en-GB"
+    }
+}

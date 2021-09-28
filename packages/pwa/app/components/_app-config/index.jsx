@@ -29,24 +29,6 @@ const apiConfig = {
 }
 
 /**
- * Returns the locale set in the URL's pathname or the locale set in the frozen state PRELOADED_STATE.
- * @private
- * @param locals
- * @returns {String} the locale shortcode
- */
-const getLocale = (locals) => {
-    const {originalUrl} = locals
-
-    const localeUrl = originalUrl && originalUrl.split('/')[1]
-
-    return originalUrl
-        ? SUPPORTED_LOCALES.includes(localeUrl)
-            ? localeUrl
-            : DEFAULT_LOCALE
-        : window?.__PRELOADED_STATE__?.appProps?.targetLocale
-}
-
-/**
  * Use the AppConfig component to inject extra arguments into the getProps
  * methods for all Route Components in the app – typically you'd want to do this
  * to inject a connector instance that can be used in all Pages.
@@ -72,7 +54,13 @@ const AppConfig = ({children, locals = {}}) => {
 }
 
 AppConfig.restore = (locals = {}) => {
-    const locale = getLocale(locals) || DEFAULT_LOCALE
+    // TODO: There is probably a better way to do this. Maybe build it into the SDK too.
+    if (typeof window !== 'undefined') {
+        locals.originalUrl = window.location.pathname
+    }
+
+    const [locale] = AppConfig.getUserPreferredLocales(locals)
+
     locals.api = new CommerceAPI({...apiConfig, locale})
 }
 
@@ -82,6 +70,22 @@ AppConfig.extraGetPropsArgs = (locals = {}) => {
     return {
         api: locals.api
     }
+}
+
+AppConfig.getUserPreferredLocales = (locals) => {
+    // TODO: `locals` as an argument doesn't seem right think a little bit more about this one.
+    // Like do we need the request object here?
+    const {originalUrl} = locals
+
+    const localeUrl = originalUrl && originalUrl.split('/')[1]
+
+    const locale = originalUrl
+        ? SUPPORTED_LOCALES.includes(localeUrl)
+            ? localeUrl
+            : DEFAULT_LOCALE
+        : window?.__PRELOADED_STATE__?.appProps?.targetLocale
+
+    return [locale]
 }
 
 AppConfig.propTypes = {

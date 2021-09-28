@@ -12,6 +12,8 @@ import {Box, Button, Flex, Heading, IconButton, Stack, Text} from '@chakra-ui/re
 import {BrandLogo, FileIcon} from '../icons'
 import {useHistory} from 'react-router-dom'
 
+import {useIntl} from 'react-intl'
+
 // <Error> is rendered when:
 //
 // 1. A user requests a page that is not routable from `app/routes.jsx`.
@@ -23,12 +25,15 @@ import {useHistory} from 'react-router-dom'
 const Error = (props) => {
     const {stack} = props
     const history = useHistory()
+    const intl = useIntl()
 
     const title = "This page isn't working"
     return (
         <Flex id="sf-app" flex={1} direction="column" minWidth={'375px'}>
             <Helmet>
-                <title>{title}</title>
+                <title>
+                    {intl.locale}: {title}
+                </title>
             </Helmet>
             <Box as="header" width="full" boxShadow="base" backgroudColor="white">
                 <Box
@@ -67,6 +72,7 @@ const Error = (props) => {
                         <Heading as="h2" fontSize={['xl', '2xl', '2xl', '3xl']} mb={2}>
                             {title}
                         </Heading>
+
                         <Box maxWidth="440px" marginBottom={8}>
                             <Text align="center">
                                 An error has occurred. Try refreshing the page or if you need
