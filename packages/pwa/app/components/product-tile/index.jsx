@@ -74,19 +74,28 @@ const ProductTile = (props) => {
                 </AspectRatio>
 
                 {enableFavourite && (
-                    <IconButtonWithRegistration
-                        aria-label={intl.formatMessage({
-                            defaultMessage: 'wishlist'
-                        })}
-                        icon={isFavourite ? <HeartSolidIcon /> : <HeartIcon />}
-                        {...styles.favIcon}
-                        disabled={isFavouriteLoading}
-                        onClick={async () => {
-                            setFavouriteLoading(true)
-                            await onFavouriteToggle(!isFavourite)
-                            setFavouriteLoading(false)
+                    <Box
+                        onClick={(e) => {
+                            // stop click event from bubbling
+                            // to avoid user from clicking the link
+                            // while the favourite icon is disabled
+                            e.preventDefault()
                         }}
-                    />
+                    >
+                        <IconButtonWithRegistration
+                            aria-label={intl.formatMessage({
+                                defaultMessage: 'wishlist'
+                            })}
+                            icon={isFavourite ? <HeartSolidIcon /> : <HeartIcon />}
+                            {...styles.favIcon}
+                            disabled={isFavouriteLoading}
+                            onClick={async () => {
+                                setFavouriteLoading(true)
+                                await onFavouriteToggle(!isFavourite)
+                                setFavouriteLoading(false)
+                            }}
+                        />
+                    </Box>
                 )}
             </Box>
 
