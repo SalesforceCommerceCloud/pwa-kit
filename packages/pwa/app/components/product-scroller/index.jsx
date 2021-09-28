@@ -7,6 +7,7 @@
 import React, {forwardRef, useRef} from 'react'
 import PropTypes from 'prop-types'
 import {AspectRatio, Box, Heading, IconButton, Skeleton, Stack} from '@chakra-ui/react'
+import ProductTile from '../../components/product-tile'
 import {ChevronLeftIcon, ChevronRightIcon} from '../icons'
 
 /**
@@ -22,7 +23,7 @@ const ProductScroller = forwardRef(
             isLoading,
             scrollProps,
             itemWidth = {base: '70%', md: '40%', lg: 'calc(33.33% - 10px)'},
-            renderProduct,
+            productTilePropsFactory,
             ...props
         },
         ref
@@ -91,7 +92,10 @@ const ProductScroller = forwardRef(
                                             </Stack>
                                         </Stack>
                                     ) : (
-                                        renderProduct(product)
+                                        <ProductTile
+                                            data-testid="product-scroller-item"
+                                            {...productTilePropsFactory(product)}
+                                        />
                                     )}
                                 </Box>
                             )
@@ -155,8 +159,8 @@ ProductScroller.propTypes = {
     products: PropTypes.array,
     isLoading: PropTypes.bool,
     scrollProps: PropTypes.object,
-    renderProduct: PropTypes.func,
-    itemWidth: PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.object])
+    itemWidth: PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.object]),
+    productTilePropsFactory: PropTypes.func
 }
 
 export default ProductScroller

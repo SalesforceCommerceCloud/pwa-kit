@@ -9,7 +9,6 @@ import PropTypes from 'prop-types'
 import {useIntl} from 'react-intl'
 import {Button} from '@chakra-ui/react'
 import ProductScroller from '../../components/product-scroller'
-import ProductTile from '../../components/product-tile'
 import useEinstein from '../../commerce-api/hooks/useEinstein'
 import useIntersectionObserver from '../../hooks/use-intersection-observer'
 import useWishlist from '../../hooks/use-wishlist'
@@ -172,30 +171,27 @@ const RecommendedProducts = ({zone, recommender, products, title, shouldFetch, .
             title={title || recommendations?.displayMessage}
             products={recommendations.recs}
             isLoading={loading}
-            renderProduct={(product) => (
-                <ProductTile
-                    data-testid="product-scroller-item"
-                    product={product}
-                    onClick={() => {
-                        sendClickReco(
-                            {
-                                recommenderName: recommendations.recommenderName,
-                                __recoUUID: recommendations.recoUUID
-                            },
-                            product
-                        )
-                    }}
-                    enableFavourite={wishlist.isInitialized}
-                    isFavourite={!!wishlist.findItemByProductId(product?.productId)}
-                    onFavouriteToggle={(isFavourite) => {
-                        if (isFavourite) {
-                            addItemToWishlist(product)
-                        } else {
-                            removeItemFromWishlist(product)
-                        }
-                    }}
-                />
-            )}
+            productTilePropsFactory={(product) => ({
+                product,
+                onClick: () => {
+                    sendClickReco(
+                        {
+                            recommenderName: recommendations.recommenderName,
+                            __recoUUID: recommendations.recoUUID
+                        },
+                        product
+                    )
+                },
+                enableFavourite: wishlist.isInitialized,
+                isFavourite: !!wishlist.findItemByProductId(product?.productId),
+                onFavouriteToggle: (isFavourite) => {
+                    if (isFavourite) {
+                        addItemToWishlist(product)
+                    } else {
+                        removeItemFromWishlist(product)
+                    }
+                }
+            })}
             {...props}
         />
     )
