@@ -35,7 +35,7 @@ import useCustomer from '../../commerce-api/hooks/useCustomer'
 import {AuthModal, useAuthModal} from '../../hooks/use-auth-modal'
 
 // Localization
-import {defineMessages, IntlProvider} from 'react-intl'
+import {IntlProvider} from 'react-intl'
 
 // Others
 import {watchOnlineStatus, flatten} from '../../utils/utils'
@@ -48,21 +48,6 @@ import useWishlist from '../../hooks/use-wishlist'
 
 const DEFAULT_NAV_DEPTH = 3
 const DEFAULT_ROOT_CATEGORY = 'root'
-
-/**
- *  Default messages for the supported locales.
- *  NOTE: Because the messages are statically analyzed, we have to maintain the list of locales asynchronously
- *  to those in the package.json.
- *  `locale` parameter format for OCAPI and Commerce API: <language code>-<country code>
- *  https://documentation.b2c.commercecloud.salesforce.com/DOC1/topic/com.demandware.dochelp/OCAPI/current/usage/Localization.html
- *  */
-export const defaultLocaleMessages = defineMessages({
-    'en-GB': {defaultMessage: 'English (United Kingdom)'},
-    'fr-FR': {defaultMessage: 'French (France)'},
-    'it-IT': {defaultMessage: 'Italian (Italy)'},
-    'zh-CN': {defaultMessage: 'Chinese (China)'},
-    'ja-JP': {defaultMessage: 'Japanese (Japan)'}
-})
 
 const App = (props) => {
     const {children, targetLocale, defaultLocale, messages, categories: allCategories = {}} = props
@@ -275,9 +260,9 @@ App.getProps = async ({api}) => {
         const message =
             rootCategory.title === 'Unsupported Locale'
                 ? `
-                
+
 🚫 This page isn’t working.
-It looks like the locale ‘${rootCategory.locale}’ hasn’t been set up, yet. 
+It looks like the locale ‘${rootCategory.locale}’ hasn’t been set up, yet.
 You can either follow this doc, https://sfdc.co/B4Z1m to enable it in business manager or define a different locale with the instructions for Localization in the README file.
 `
                 : rootCategory.detail

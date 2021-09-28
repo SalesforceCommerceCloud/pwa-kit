@@ -6,6 +6,7 @@
  */
 
 import packageInfo from '../package.json'
+import {defineMessages} from 'react-intl'
 
 // Constants used in the used for product searching.
 export const DEFAULT_SEARCH_PARAMS = {limit: 25, offset: 0, sort: 'best-matches', refine: []}
@@ -48,5 +49,26 @@ export const HOME_HREF = '/'
 // TODO: You can update these locales in 'pwa/package.json' file
 export const SUPPORTED_LOCALES = packageInfo.l10n.supportedLocales
 export const DEFAULT_LOCALE = packageInfo.l10n.defaultLocale
+
+/**
+ *  Default messages for the supported locales.
+ *  NOTE: Because the messages are statically analyzed, we have to maintain the list of locales asynchronously
+ *  to those in the package.json.
+ *  `locale` parameter format for OCAPI and Commerce API: <language code>-<country code>
+ *  https://documentation.b2c.commercecloud.salesforce.com/DOC1/topic/com.demandware.dochelp/OCAPI/current/usage/Localization.html
+ *  */
+export const localeSelectorMessages = defineMessages({
+    'en-GB': {defaultMessage: 'English (United Kingdom)'},
+    'en-US': {defaultMessage: 'English (United States)'},
+    'en-CA': {defaultMessage: 'English (Canada)'},
+    'fr-FR': {defaultMessage: 'French (France)'},
+    'fr-CA': {defaultMessage: 'French (Canada)'},
+    'it-IT': {defaultMessage: 'Italian (Italy)'},
+    'zh-CN': {defaultMessage: 'Chinese (China)'},
+    'ja-JP': {defaultMessage: 'Japanese (Japan)'},
+    'nl-NL': {defaultMessage: 'Dutch (Netherlands)'},
+    'de-DE': {defaultMessage: 'German (Germany)'},
+    'es-ES': {defaultMessage: 'Spanish (Spain)'}
+})
 
 export const MAX_ORDER_QUANTITY = 10
