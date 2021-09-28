@@ -1,6 +1,6 @@
 {
   "name": "pwa-kit-react-sdk",
-  "version": "1.1.0-dev",
+  "version": "1.2.0-dev",
   "description": "A library that supports the isomorphic React rendering pipeline for Commerce Cloud Managed Runtime apps",
   "main": "dist/index.js",
   "bin": {
