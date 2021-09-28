@@ -90,9 +90,7 @@ const ProductTile = (props) => {
             </Box>
 
             {/* Title */}
-            <Text {...styles.title}>
-                {productName} {isFavouriteLoading && 'isLoading'}
-            </Text>
+            <Text {...styles.title}>{productName}</Text>
 
             {/* Price */}
             <Text {...styles.price}>{intl.formatNumber(price, {style: 'currency', currency})}</Text>
