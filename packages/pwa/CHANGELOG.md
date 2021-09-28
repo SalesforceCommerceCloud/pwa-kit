@@ -1,4 +1,4 @@
-## v1.2.0 (Month Day, 2021)
+## To be released
 -   Use the preferred currency when switching locales. [#105](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/105) 
 
 ## v1.1.0 (Sep 27, 2021)
