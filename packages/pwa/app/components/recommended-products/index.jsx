@@ -171,7 +171,7 @@ const RecommendedProducts = ({zone, recommender, products, title, shouldFetch, .
             title={title || recommendations?.displayMessage}
             products={recommendations.recs}
             isLoading={loading}
-            productTilePropsFactory={(product) => ({
+            productTileProps={(product) => ({
                 product,
                 onClick: () => {
                     sendClickReco(

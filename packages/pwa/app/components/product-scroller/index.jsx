@@ -23,7 +23,7 @@ const ProductScroller = forwardRef(
             isLoading,
             scrollProps,
             itemWidth = {base: '70%', md: '40%', lg: 'calc(33.33% - 10px)'},
-            productTilePropsFactory,
+            productTileProps,
             ...props
         },
         ref
@@ -94,7 +94,7 @@ const ProductScroller = forwardRef(
                                     ) : (
                                         <ProductTile
                                             data-testid="product-scroller-item"
-                                            {...productTilePropsFactory(product)}
+                                            {...productTileProps(product)}
                                         />
                                     )}
                                 </Box>
@@ -160,7 +160,7 @@ ProductScroller.propTypes = {
     isLoading: PropTypes.bool,
     scrollProps: PropTypes.object,
     itemWidth: PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.object]),
-    productTilePropsFactory: PropTypes.func
+    productTileProps: PropTypes.func
 }
 
 export default ProductScroller
