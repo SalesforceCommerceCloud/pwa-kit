@@ -46,7 +46,7 @@
   "license": "SEE LICENSE IN LICENSE",
   "dependencies": {
     "archiver": "1.3.0",
-    "aws-sdk": "^2.814.0",
+    "aws-sdk": "^2.984.0",
     "aws-serverless-express": "3.3.5",
     "bluebird": "^3.5.1",
     "body-parser": "^1.19.0",
