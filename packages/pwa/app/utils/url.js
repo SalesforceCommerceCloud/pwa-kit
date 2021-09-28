@@ -103,13 +103,19 @@ export const productUrlBuilder = (product) => encodeURI(`/product/${product.id}`
 export const searchUrlBuilder = (searchTerm) => `/search?q=${searchTerm}`
 
 /**
- * Returns a URL using the new locale.
+ * Returns a URL pathname using the new locale.
  *
- * @param newLocale
+ * @param {string} newLocale
+ * @param {Object} [options]
+ * @param {Object} options.location - original location (similar value to `window.location`)
  * @returns {string}
  */
-export const buildUrlLocale = (newLocale) => {
-    const location = typeof window !== 'undefined' ? window.location : useLocation()
+export const buildUrlLocale = (newLocale, options = {}) => {
+    const location = options.location
+        ? options.location
+        : typeof window !== 'undefined'
+        ? window.location
+        : useLocation()
     const params = new URLSearchParams(location.search)
     params.delete('refine')
 
