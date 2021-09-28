@@ -749,6 +749,12 @@
       "value": "Are you sure you want to sign out? You will need to sign back in to proceed with your current order."
     }
   ],
+  "MQHbcd": [
+    {
+      "type": 0,
+      "value": "English (Canada)"
+    }
+  ],
   "MnpUD7": [
     {
       "type": 0,
@@ -1025,6 +1031,12 @@
     {
       "type": 0,
       "value": "promo applied"
+    }
+  ],
+  "T8HBFR": [
+    {
+      "type": 0,
+      "value": "German (Germany)"
     }
   ],
   "TBI5GJ": [

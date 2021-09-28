@@ -188,7 +188,9 @@
             "fr-FR",
             "it-IT",
             "zh-CN",
-            "ja-JP"
+            "ja-JP",
+            "en-CA",
+            "de-DE"
         ],
         "defaultLocale": "en-GB"
     }

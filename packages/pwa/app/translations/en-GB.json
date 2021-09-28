@@ -292,6 +292,9 @@
   "MPcjO/": {
     "defaultMessage": "Are you sure you want to sign out? You will need to sign back in to proceed with your current order."
   },
+  "MQHbcd": {
+    "defaultMessage": "English (Canada)"
+  },
   "MnpUD7": {
     "defaultMessage": "View details"
   },
@@ -409,6 +412,9 @@
   },
   "T/K9MQ": {
     "defaultMessage": "promo applied"
+  },
+  "T8HBFR": {
+    "defaultMessage": "German (Germany)"
   },
   "TBI5GJ": {
     "defaultMessage": "This {length}-digit code can be found on the {side} of your card.",
