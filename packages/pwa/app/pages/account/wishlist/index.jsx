@@ -7,28 +7,32 @@
 import React, {useEffect, useState} from 'react'
 import {Stack, Heading} from '@chakra-ui/layout'
 import {FormattedMessage, useIntl} from 'react-intl'
+import {Box, Flex, Skeleton} from '@chakra-ui/react'
+
+import useCustomer from '../../../commerce-api/hooks/useCustomer'
+import useNavigation from '../../../hooks/use-navigation'
+import useWishlist from '../../../hooks/use-wishlist'
+import {useToast} from '../../../hooks/use-toast'
+
 import PageActionPlaceHolder from '../../../components/page-action-placeholder'
 import {WishlistIcon} from '../../../components/icons'
-import useNavigation from '../../../hooks/use-navigation'
-import useCustomerProductLists from '../../../commerce-api/hooks/useCustomerProductLists'
-import {Box, Flex, Skeleton} from '@chakra-ui/react'
-import {API_ERROR_MESSAGE, customerProductListTypes} from '../../../constants'
 import ProductItem from '../../../components/product-item/index'
-import {useToast} from '../../../hooks/use-toast'
 import WishlistPrimaryAction from './partials/wishlist-primary-action'
 import WishlistSecondaryButtonGroup from './partials/wishlist-secondary-button-group'
+
+import {API_ERROR_MESSAGE} from '../../../constants'
 
 const numberOfSkeletonItems = 3
 
 const AccountWishlist = () => {
+    const customer = useCustomer()
     const navigate = useNavigation()
     const {formatMessage} = useIntl()
-    const customerProductLists = useCustomerProductLists()
-    const [wishlist, setWishlist] = useState()
+    const toast = useToast()
     const [selectedItem, setSelectedItem] = useState(undefined)
     const [localQuantity, setLocalQuantity] = useState({})
-    const showToast = useToast()
     const [isWishlistItemLoading, setWishlistItemLoading] = useState(false)
+    const wishlist = useWishlist()
 
     const handleActionClicked = (itemId) => {
         setWishlistItemLoading(!!itemId)
@@ -36,49 +40,53 @@ const AccountWishlist = () => {
     }
 
     const handleItemQuantityChanged = async (quantity, item) => {
+        // This local state allows the dropdown to show the desired quantity
+        // while the API call to update it is happening.
+        setLocalQuantity({...localQuantity, [item.productId]: quantity})
+        setWishlistItemLoading(true)
+        setSelectedItem(item.productId)
         try {
-            // This local state allows the dropdown to show the desired quantity
-            // while the API call to update it is happening.
-            setLocalQuantity({...localQuantity, [item.productId]: quantity})
-            setWishlistItemLoading(true)
-            setSelectedItem(item.productId)
-            await customerProductLists.updateCustomerProductListItem(wishlist, {
+            await wishlist.updateListItem({
                 ...item,
                 quantity: parseInt(quantity)
             })
-        } catch (err) {
-            console.error(err)
-            showToast({
+        } catch {
+            toast({
                 title: formatMessage(
                     {defaultMessage: '{errorMessage}'},
                     {errorMessage: API_ERROR_MESSAGE}
                 ),
                 status: 'error'
             })
-        } finally {
-            setWishlistItemLoading(false)
-            setSelectedItem(undefined)
-            setLocalQuantity({...localQuantity, [item.productId]: undefined})
         }
+        setWishlistItemLoading(false)
+        setSelectedItem(undefined)
+        setLocalQuantity({...localQuantity, [item.productId]: undefined})
     }
 
     useEffect(() => {
-        if (customerProductLists.loaded) {
-            const wishlist = customerProductLists.getProductListPerType(
-                customerProductListTypes.WISHLIST
-            )
-            if (!wishlist?.customerProductListItems?.length || wishlist?._productItemsDetail) {
-                setWishlist(wishlist)
+        if (customer.isRegistered) {
+            // We want to reset the wishlist here
+            // because it is possible that a user
+            // adds an item to the wishlist on another page
+            // and the wishlist page may not have enough
+            // data to render the page.
+            // Reset the wishlist will make sure the
+            // initialization state is correct.
+            if (wishlist.isInitialized) {
+                wishlist.reset()
             }
-        }
-    }, [customerProductLists.data])
 
-    if (!wishlist) {
-        return (
-            <Stack spacing={4} data-testid="account-wishlist-page">
-                <Heading as="h1" fontSize="2xl">
-                    <FormattedMessage defaultMessage="Wishlist" />
-                </Heading>
+            wishlist.init({detail: true})
+        }
+    }, [customer.isRegistered])
+
+    return (
+        <Stack spacing={4} data-testid="account-wishlist-page">
+            <Heading as="h1" fontSize="2xl">
+                <FormattedMessage defaultMessage="Wishlist" />
+            </Heading>
+            {!wishlist.hasDetail && (
                 <Box data-testid="sf-wishlist-skeleton">
                     {new Array(numberOfSkeletonItems).fill(0).map((i, idx) => (
                         <Box
@@ -101,16 +109,9 @@ const AccountWishlist = () => {
                         </Box>
                     ))}
                 </Box>
-            </Stack>
-        )
-    }
+            )}
 
-    if (!wishlist.customerProductListItems || wishlist.customerProductListItems.length === 0) {
-        return (
-            <Stack spacing={4} data-testid="account-wishlist-page">
-                <Heading as="h1" fontSize="2xl">
-                    <FormattedMessage defaultMessage="Wishlist" />
-                </Heading>
+            {wishlist.hasDetail && wishlist.isEmpty && (
                 <PageActionPlaceHolder
                     data-testid="empty-wishlist"
                     icon={<WishlistIcon boxSize={8} />}
@@ -124,25 +125,15 @@ const AccountWishlist = () => {
                     buttonProps={{leftIcon: undefined}}
                     onButtonClick={() => navigate('/')}
                 />
-            </Stack>
-        )
-    }
+            )}
 
-    return (
-        <Stack spacing={4} data-testid="account-wishlist-page">
-            <Heading as="h1" fontSize="2xl">
-                <FormattedMessage defaultMessage="Wishlist" />
-            </Heading>
-
-            {wishlist._productItemsDetail &&
-                wishlist?.customerProductListItems.map((item) => (
+            {wishlist.hasDetail &&
+                !wishlist.isEmpty &&
+                wishlist.items.map((item) => (
                     <ProductItem
                         key={item.id}
                         product={{
-                            ...wishlist._productItemsDetail[item.productId],
-                            productId: item.productId,
-                            productName: wishlist._productItemsDetail[item.productId].name,
-                            price: wishlist._productItemsDetail[item.productId].price,
+                            ...item.product,
                             quantity: localQuantity[item.productId]
                                 ? localQuantity[item.productId]
                                 : item.quantity
@@ -155,7 +146,6 @@ const AccountWishlist = () => {
                         secondaryActions={
                             <WishlistSecondaryButtonGroup
                                 productListItemId={item.id}
-                                list={wishlist}
                                 onClick={handleActionClicked}
                             />
                         }

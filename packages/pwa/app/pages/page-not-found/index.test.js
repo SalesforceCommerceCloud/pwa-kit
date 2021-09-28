@@ -5,8 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import ProductItem from './index'
-import {mockedCustomerProductListsDetails} from '../../commerce-api/mock-data'
+import PageNotFound from './index'
 import {renderWithProviders} from '../../utils/test-utils'
 import {screen} from '@testing-library/react'
 
@@ -15,16 +14,18 @@ beforeEach(() => {
     jest.resetModules()
 })
 
-jest.setTimeout(60000)
 const MockedComponent = () => {
-    const product = mockedCustomerProductListsDetails.data[0]
-    return <ProductItem product={{...product, productName: product.name}} />
+    return <PageNotFound />
 }
 
 test('renders product item name, attributes and price', () => {
     renderWithProviders(<MockedComponent />)
 
-    expect(screen.getByText(/apple ipod nano/i)).toBeInTheDocument()
-    expect(screen.getByText(/color: green/i)).toBeInTheDocument()
-    expect(screen.getByText(/memory size: 16 GB/i)).toBeInTheDocument()
+    expect(screen.getByText(/The page you're looking for can't be found/i)).toBeInTheDocument()
+    expect(
+        screen.getByText(
+            /Please try retyping the address, going back to the previous page, or going to the home page./i
+        )
+    ).toBeInTheDocument()
+    expect(screen.getByText(/Go to home page/i)).toBeInTheDocument()
 })

@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import {screen} from '@testing-library/react'
+import {screen, fireEvent} from '@testing-library/react'
 import ListMenu from './index'
 import {renderWithProviders} from '../../utils/test-utils'
 
@@ -44,9 +44,12 @@ const mockRoot = {
     ]
 }
 
-describe('ScrollToTop', () => {
+describe('ListMenu', () => {
     test('ListMenu renders without errors', () => {
         renderWithProviders(<ListMenu root={mockRoot} />)
+
+        const popoverTrigger = document.querySelector('[id^="popover-trigger"]')
+        fireEvent.mouseOver(popoverTrigger)
 
         expect(screen.getByRole('navigation', {name: 'main'})).toBeInTheDocument()
 

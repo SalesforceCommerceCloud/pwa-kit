@@ -17,7 +17,7 @@ import {
     CommerceAPIProvider,
     CustomerProvider,
     CustomerProductListsProvider
-} from '../commerce-api/utils'
+} from '../commerce-api/contexts'
 import {commerceAPIConfig} from '../commerce-api.config'
 import {IntlProvider} from 'react-intl'
 import {DEFAULT_LOCALE} from '../constants'
@@ -57,8 +57,7 @@ export const TestProviders = ({
     children,
     initialBasket = null,
     initialCustomer = null,
-    initialCategories = initialMockCategories,
-    initialProductLists = {}
+    initialCategories = initialMockCategories
 }) => {
     const mounted = useRef()
     // We use this to track mounted state.
@@ -84,7 +83,6 @@ export const TestProviders = ({
     const [basket, _setBasket] = useState(initialBasket)
     const [customer, setCustomer] = useState(initialCustomer)
     const [categories, setCategories] = useState(initialCategories)
-    const [customerProductLists, setCustomerProductLists] = useState(initialProductLists)
 
     const setBasket = useCallback((data) => {
         if (!mounted.current) {
@@ -99,9 +97,7 @@ export const TestProviders = ({
                 <CategoriesContext.Provider value={{categories, setCategories}}>
                     <CustomerProvider value={{customer, setCustomer}}>
                         <BasketProvider value={{basket, setBasket}}>
-                            <CustomerProductListsProvider
-                                value={{customerProductLists, setCustomerProductLists}}
-                            >
+                            <CustomerProductListsProvider>
                                 <Router>
                                     <ChakraProvider theme={theme}>{children}</ChakraProvider>
                                 </Router>

@@ -101,10 +101,6 @@ beforeEach(() => {
     server.listen({
         onUnhandledRequest: 'error'
     })
-    // Need to mock TextEncoder for tests
-    if (typeof TextEncoder === 'undefined') {
-        global.TextEncoder = require('util').TextEncoder
-    }
 
     window.history.pushState({}, 'Reset Password', '/en-GB/reset-password')
 })
