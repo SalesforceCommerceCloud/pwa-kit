@@ -29,7 +29,7 @@
     "homepage": "https://github.com/mobify/commerce-integrations#readme",
     "dependencies": {
         "btoa": "^1.2.1",
-        "commercecloud-ocapi-client": "^0.1.12",
+        "commercecloud-ocapi-client": "^0.2.0",
         "fast-json-stable-stringify": "^2.1.0",
         "fs-extra": "^7.0.1",
         "hybris-occ-client": "^0.1.5",
