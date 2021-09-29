@@ -163,7 +163,7 @@ ProductScroller.propTypes = {
     isLoading: PropTypes.bool,
     scrollProps: PropTypes.object,
     itemWidth: PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.object]),
-    productTileProps: PropTypes.func
+    productTileProps: PropTypes.oneOfType([PropTypes.func, PropTypes.object])
 }
 
 export default ProductScroller
