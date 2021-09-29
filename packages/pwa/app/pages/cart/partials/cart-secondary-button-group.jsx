@@ -17,7 +17,7 @@ import {
     useDisclosure
 } from '@chakra-ui/react'
 import {defineMessage, FormattedMessage} from 'react-intl'
-import {useItemVariantContext} from '../../../components/cart-item-variant'
+import {useItemVariantContext} from '../../../components/item-variant'
 import ConfirmationModal from '../../../components/confirmation-modal/index'
 import {noop} from '../../../utils/utils'
 import useCustomer from '../../../commerce-api/hooks/useCustomer'

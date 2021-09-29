@@ -13,7 +13,7 @@ import useWishlist from '../../../../hooks/use-wishlist'
 import {useToast} from '../../../../hooks/use-toast'
 
 import ConfirmationModal from '../../../../components/confirmation-modal/index'
-import {useItemVariantContext} from '../../../../components/cart-item-variant'
+import {useItemVariantContext} from '../../../../components/item-variant'
 import {noop} from '../../../../utils/utils'
 import {API_ERROR_MESSAGE} from '../../../../constants'
 

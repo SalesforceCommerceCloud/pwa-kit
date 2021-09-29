@@ -6,7 +6,7 @@
  */
 import React from 'react'
 import {mockedCustomerProductListsDetails} from '../../../../commerce-api/mock-data'
-import ItemVariantProvider from '../../../../components/cart-item-variant'
+import ItemVariantProvider from '../../../../components/item-variant'
 import {renderWithProviders} from '../../../../utils/test-utils'
 import WishlistPrimaryAction from './wishlist-primary-action'
 import user from '@testing-library/user-event'

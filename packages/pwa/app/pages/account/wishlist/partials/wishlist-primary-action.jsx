@@ -8,7 +8,7 @@ import React, {useState} from 'react'
 import {Button} from '@chakra-ui/react'
 import useBasket from '../../../../commerce-api/hooks/useBasket'
 import {useIntl} from 'react-intl'
-import {useItemVariantContext} from '../../../../components/cart-item-variant'
+import {useItemVariantContext} from '../../../../components/item-variant'
 import {useToast} from '../../../../hooks/use-toast'
 import {API_ERROR_MESSAGE} from '../../../../constants'
 

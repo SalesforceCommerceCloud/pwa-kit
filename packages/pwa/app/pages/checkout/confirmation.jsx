@@ -29,11 +29,11 @@ import Link from '../../components/link'
 import AddressDisplay from '../../components/address-display'
 import PostCheckoutRegistrationFields from '../../components/forms/post-checkout-registration-fields'
 import PromoPopover from '../../components/promo-popover'
-import ItemVariantProvider from '../../components/cart-item-variant'
-import CartItemVariantImage from '../../components/cart-item-variant/item-image'
-import CartItemVariantName from '../../components/cart-item-variant/item-name'
-import CartItemVariantAttributes from '../../components/cart-item-variant/item-attributes'
-import CartItemVariantPrice from '../../components/cart-item-variant/item-price'
+import ItemVariantProvider from '../../components/item-variant'
+import CartItemVariantImage from '../../components/item-variant/item-image'
+import CartItemVariantName from '../../components/item-variant/item-name'
+import CartItemVariantAttributes from '../../components/item-variant/item-attributes'
+import CartItemVariantPrice from '../../components/item-variant/item-price'
 
 const CheckoutConfirmation = () => {
     const navigate = useNavigation()

@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import ItemVariantProvider from '../../../../components/cart-item-variant'
+import ItemVariantProvider from '../../../../components/item-variant'
 import {renderWithProviders} from '../../../../utils/test-utils'
 import WishlistSecondaryButtonGroup from './wishlist-secondary-button-group'
 import {screen, waitFor} from '@testing-library/react'

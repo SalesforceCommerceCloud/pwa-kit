@@ -13,11 +13,11 @@ import {Box, Fade, Flex, Stack, Text} from '@chakra-ui/react'
 
 // Project Components
 import {HideOnDesktop, HideOnMobile} from '../responsive'
-import ItemVariantProvider from '../cart-item-variant'
-import CartItemVariantImage from '../cart-item-variant/item-image'
-import CartItemVariantName from '../cart-item-variant/item-name'
-import CartItemVariantAttributes from '../cart-item-variant/item-attributes'
-import CartItemVariantPrice from '../cart-item-variant/item-price'
+import ItemVariantProvider from '../item-variant'
+import CartItemVariantImage from '../item-variant/item-image'
+import CartItemVariantName from '../item-variant/item-name'
+import CartItemVariantAttributes from '../item-variant/item-attributes'
+import CartItemVariantPrice from '../item-variant/item-price'
 import LoadingSpinner from '../loading-spinner'
 import QuantityPicker from '../quantity-picker'
 

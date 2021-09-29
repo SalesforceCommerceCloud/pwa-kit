@@ -10,7 +10,7 @@ import {
     mockedCustomerProductLists,
     mockedCustomerProductListsDetails
 } from '../../../commerce-api/mock-data'
-import ItemVariantProvider from '../../../components/cart-item-variant'
+import ItemVariantProvider from '../../../components/item-variant'
 import {renderWithProviders} from '../../../utils/test-utils'
 import CartSecondaryButtonGroup from './cart-secondary-button-group'
 import {screen, waitFor} from '@testing-library/react'
