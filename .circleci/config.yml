@@ -92,16 +92,17 @@ commands:
         type: string
     steps:
       - run:
-          name: 'failing step'
-          command: npm run test:max-file-size
-      - run:
           name: 'Run tests'
           command: |
+            set -e
 
             cd << parameters.cwd >>
 
             # Note: Each of these test commands need to be exposed on the monorepo
             # root and *also* on the PWA package. This section is run on both.
+
+            # This should fail and cause execution of the other commands to not happen.
+            mkdir .
 
             # Always run fast unit tests
             npm run test
