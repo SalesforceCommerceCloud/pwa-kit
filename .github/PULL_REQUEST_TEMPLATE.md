@@ -12,6 +12,7 @@
 - [ ] **New feature** (non-breaking change that adds functionality)
 - [ ] **Documentation update**
 - [ ] **Breaking change** (could cause existing functionality to not work as expected)
+- [ ] **Small changes** (small non-breaking changes that does not fit any of the above. E.g changing a file or a function name)
 
 > Breaking changes include:
 >
