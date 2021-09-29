@@ -94,7 +94,10 @@ const ProductScroller = forwardRef(
                                     ) : (
                                         <ProductTile
                                             data-testid="product-scroller-item"
-                                            {...productTileProps(product)}
+                                            product={product}
+                                            {...(typeof productTileProps === 'function'
+                                                ? {...productTileProps(product)}
+                                                : {...productTileProps})}
                                         />
                                     )}
                                 </Box>

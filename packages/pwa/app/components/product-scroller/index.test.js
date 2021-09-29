@@ -17,7 +17,7 @@ window.HTMLElement.prototype.scrollBy = jest.fn()
 
 const testProducts = [1, 2, 3, 4].map((i) => ({
     id: i,
-    productId: i,
+    productId: `${i}`,
     productName: `Product ${i}`,
     image: {disBaseLink: '/testimage'},
     price: 9.99,
@@ -28,26 +28,15 @@ const noop = () => {}
 
 describe('Product Scroller', () => {
     test('renders loading skeletons', () => {
-        renderWithProviders(<ProductScroller isLoading renderProduct={noop} />)
+        renderWithProviders(<ProductScroller isLoading />)
         expect(screen.getAllByTestId('product-scroller-item-skeleton')).toHaveLength(4)
     })
     test('renders nothing when no products and not loading', () => {
-        renderWithProviders(<ProductScroller renderProduct={noop} />)
+        renderWithProviders(<ProductScroller products={undefined} />)
         expect(screen.queryByTestId('product-scroller')).not.toBeInTheDocument()
     })
-    test('renders products with renderProduct prop', () => {
-        const mock = jest.fn()
-        renderWithProviders(<ProductScroller products={testProducts} renderProduct={mock} />)
-        expect(mock).toHaveBeenCalledTimes(testProducts.length)
-    })
     test('Renders product items', () => {
-        renderWithProviders(
-            <ProductScroller
-                title="Scroller Title"
-                products={testProducts}
-                renderProduct={() => <div data-testid="product-scroller-item"></div>}
-            />
-        )
+        renderWithProviders(<ProductScroller title="Scroller Title" products={testProducts} />)
         expect(screen.getByText('Scroller Title')).toBeInTheDocument()
         expect(screen.getAllByTestId('product-scroller-item')).toHaveLength(4)
     })
@@ -56,15 +45,12 @@ describe('Product Scroller', () => {
             <ProductScroller
                 header={<h1 data-testid="custom-header">Scroller Header</h1>}
                 products={testProducts}
-                renderProduct={noop}
             />
         )
         expect(screen.getByTestId('custom-header')).toBeInTheDocument()
     })
     test('Renders left/right scroll buttons', () => {
-        renderWithProviders(
-            <ProductScroller title="Scroller Title" products={testProducts} renderProduct={noop} />
-        )
+        renderWithProviders(<ProductScroller title="Scroller Title" products={testProducts} />)
         user.click(screen.getByTestId('product-scroller-nav-right'))
         expect(window.HTMLElement.prototype.scrollBy).toHaveBeenCalledWith({
             top: 0,
@@ -82,11 +68,7 @@ describe('Product Scroller', () => {
     })
     test('Does not render left/right scroll buttons when less than 4 products', () => {
         renderWithProviders(
-            <ProductScroller
-                title="Scroller Title"
-                products={testProducts.slice(0, 2)}
-                renderProduct={noop}
-            />
+            <ProductScroller title="Scroller Title" products={testProducts.slice(0, 2)} />
         )
         expect(screen.queryByTestId('product-scroller-nav-left')).not.toBeInTheDocument()
         expect(screen.queryByTestId('product-scroller-nav-right')).not.toBeInTheDocument()
