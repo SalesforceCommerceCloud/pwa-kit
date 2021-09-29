@@ -238,7 +238,7 @@ export default function useCustomerProductLists() {
                     )
                     return
                 }
-                self.removeListItem(listId, item.id)
+                return self.removeListItem(listId, item.id)
             },
 
             /**

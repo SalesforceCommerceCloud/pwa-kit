@@ -20,9 +20,7 @@ const mockProductSearchItem = {
 }
 
 test('Renders Breadcrumb', () => {
-    const {getAllByRole} = renderWithProviders(
-        <ProductTile productSearchItem={mockProductSearchItem} />
-    )
+    const {getAllByRole} = renderWithProviders(<ProductTile product={mockProductSearchItem} />)
 
     const link = getAllByRole('link')
     const img = getAllByRole('img')

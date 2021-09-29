@@ -47,8 +47,8 @@ import '../../assets/svg/signout.svg'
 import '../../assets/svg/user.svg'
 import '../../assets/svg/visibility.svg'
 import '../../assets/svg/visibility-off.svg'
-import '../../assets/svg/wishlist.svg'
-import '../../assets/svg/wishlist-solid.svg'
+import '../../assets/svg/heart.svg'
+import '../../assets/svg/heart-solid.svg'
 import '../../assets/svg/close.svg'
 
 // For non-square SVGs, we can use the symbol data from the import to set the
@@ -145,6 +145,6 @@ export const UserIcon = icon('user')
 export const VisaIcon = icon('cc-visa', {viewBox: VisaSymbol.viewBox})
 export const VisibilityIcon = icon('visibility')
 export const VisibilityOffIcon = icon('visibility-off')
-export const WishlistIcon = icon('wishlist')
-export const WishlistSolidIcon = icon('wishlist-solid')
+export const HeartIcon = icon('heart')
+export const HeartSolidIcon = icon('heart-solid')
 export const CloseIcon = icon('close')
