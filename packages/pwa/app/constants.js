@@ -5,8 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import packageInfo from '../package.json'
-import {defineMessages} from 'react-intl'
+import {localizationConfig} from './localization.config'
 
 // Constants used in the used for product searching.
 export const DEFAULT_SEARCH_PARAMS = {limit: 25, offset: 0, sort: 'best-matches', refine: []}
@@ -46,29 +45,11 @@ export const API_ERROR_MESSAGE = 'Something went wrong. Try again!'
 
 export const HOME_HREF = '/'
 
-// TODO: You can update these locales in 'pwa/package.json' file
-export const SUPPORTED_LOCALES = packageInfo.l10n.supportedLocales
-export const DEFAULT_LOCALE = packageInfo.l10n.defaultLocale
-
-/**
- *  Default messages for the supported locales shown in the locale selector.
- *  NOTE: Because the messages are statically analyzed, we have to maintain the list of locales asynchronously
- *  to those in the package.json.
- *  `locale` parameter format for OCAPI and Commerce API: <language code>-<country code>
- *  https://documentation.b2c.commercecloud.salesforce.com/DOC1/topic/com.demandware.dochelp/OCAPI/current/usage/Localization.html
- *  */
-export const localeSelectorMessages = defineMessages({
-    'de-DE': {defaultMessage: 'German (Germany)'},
-    'en-CA': {defaultMessage: 'English (Canada)'},
-    'en-GB': {defaultMessage: 'English (United Kingdom)'},
-    'en-US': {defaultMessage: 'English (United States)'},
-    'es-ES': {defaultMessage: 'Spanish (Spain)'},
-    'fr-CA': {defaultMessage: 'French (Canada)'},
-    'fr-FR': {defaultMessage: 'French (France)'},
-    'it-IT': {defaultMessage: 'Italian (Italy)'},
-    'ja-JP': {defaultMessage: 'Japanese (Japan)'},
-    'nl-NL': {defaultMessage: 'Dutch (Netherlands)'},
-    'zh-CN': {defaultMessage: 'Chinese (China)'}
-})
+export const SUPPORTED_LOCALES = localizationConfig.supportedLocales.map((locale) => locale.id)
+export const DEFAULT_LOCALE = localizationConfig.defaultLocale
+export const LOCALE_SELECTOR_MESSSAGES = localizationConfig.supportedLocales.reduce(
+    (messages, locale) => ({...messages, [locale.id]: locale.message}),
+    {}
+)
 
 export const MAX_ORDER_QUANTITY = 10
