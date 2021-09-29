@@ -24,8 +24,6 @@ const testProducts = [1, 2, 3, 4].map((i) => ({
     currency: 'USD'
 }))
 
-const noop = () => {}
-
 describe('Product Scroller', () => {
     test('renders loading skeletons', () => {
         renderWithProviders(<ProductScroller isLoading />)
