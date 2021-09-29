@@ -1,3 +1,7 @@
+## To be released
+
+-   Integrate wishlist with einstein recommended products. [#131](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/131)
+
 ## v1.1.0 (Sep 27, 2021)
 
 -   Fix wishlist bugs and provide better hooks for wishlist features. [#64](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/64)

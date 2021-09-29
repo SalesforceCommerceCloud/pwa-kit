@@ -11,7 +11,7 @@ import {
     LocationIcon,
     PaymentIcon,
     ReceiptIcon,
-    WishlistIcon
+    HeartIcon
 } from '../../components/icons'
 import {noop} from '../../utils/utils'
 
@@ -32,7 +32,7 @@ export const navLinks = [
     {
         name: 'wishlist',
         path: '/wishlist',
-        icon: WishlistIcon
+        icon: HeartIcon
     },
     {
         name: 'orders',
