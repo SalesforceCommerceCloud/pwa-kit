@@ -108,8 +108,6 @@ const RecommendedProducts = ({zone, recommender, products, title, shouldFetch, .
         return null
     }
 
-    // TODO: DRY the wishlist handlers when intl
-    // provider is available globally
     const addItemToWishlist = async (product) => {
         try {
             await wishlist.createListItem({

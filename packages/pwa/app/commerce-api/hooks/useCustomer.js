@@ -104,9 +104,6 @@ export default function useCustomer() {
              * @param {string} data.password
              */
             async registerCustomer(data) {
-                // TODO: investigate how to submit/include the checkbox input
-                // for receiving email communication.
-
                 const body = {
                     customer: {
                         firstName: data.firstName,
@@ -203,7 +200,7 @@ export default function useCustomer() {
             },
 
             /**
-             * @todo - Backend set up required
+             * Backend set up required
              * @param {string} login - customer email address
              */
             async getResetPasswordToken(login) {

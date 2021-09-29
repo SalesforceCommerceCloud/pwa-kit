@@ -63,8 +63,6 @@ import PaypalSymbol from '../../assets/svg/paypal.svg'
 import SocialPinterestSymbol from '../../assets/svg/social-pinterest.svg'
 import VisaSymbol from '../../assets/svg/cc-visa.svg'
 
-// TODO: We're hardcoding the `viewBox` for these imported SVGs temporarily as the
-// SVG loader plugin is not properly providing us the symbol data on the client side.
 AmexSymbol.viewBox = AmexSymbol.viewBox || '0 0 38 22'
 BrandLogoSymbol.viewBox = BrandLogoSymbol.viewBox || '0 0 46 32'
 CVVSymbol.viewBox = CVVSymbol.viewBox || '0 0 41 24'

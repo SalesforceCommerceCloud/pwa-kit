@@ -94,10 +94,6 @@ export const createCreditCardPaymentBodyFromForm = (paymentFormData) => {
             cardType: getPaymentInstrumentCardType(selectedPayment.cardType),
             expirationMonth: parseInt(expirationMonth),
             expirationYear: parseInt(`20${expirationYear}`),
-
-            // TODO: These fields are required for saving the card to the customer's
-            // account. Im not sure what they are for or how to get them, so for now
-            // we're just passing some values to make it work. Need to investigate.
             issueNumber: '',
             validFromMonth: 1,
             validFromYear: 2020

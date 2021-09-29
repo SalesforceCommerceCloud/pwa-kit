@@ -167,15 +167,11 @@ NestedAccordion.propTypes = {
     /**
      * An array of font size strings, the position in the array will
      * indicate at what depth that size is applied.
-     * TODO: Think about making this optionally a string value to make it behave like
-     * chakra-ui responsive properties.
      */
     fontSizes: PropTypes.array,
     /**
      * An array of font weight strings, the position in the array will
      * indicate at what depth that weight is applied.
-     * TODO: Think about making this optionally a string value to make it behave like
-     * chakra-ui responsive properties.
      */
     fontWeights: PropTypes.array,
     /**

@@ -75,10 +75,6 @@ const usePaymentForms = () => {
     // We need to submit the payment form and billing address form one at a time,
     // but from a single control/button. So we kick off the payment submit first
     // and let that function take over the next step.
-    // ------
-    // TODO: Figure out how to run the form validations simultaneuously before
-    // submitting the forms, so one doesn't need to wait on the other to check for
-    // client-side validation errors.
     const reviewOrder = () => {
         return paymentMethodForm.handleSubmit(submitPaymentMethodForm)()
     }

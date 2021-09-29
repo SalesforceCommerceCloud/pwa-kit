@@ -45,7 +45,6 @@ export const API_ERROR_MESSAGE = 'Something went wrong. Try again!'
 
 export const HOME_HREF = '/'
 
-// TODO: You can update these locales in 'pwa/package.json' file
 export const SUPPORTED_LOCALES = packageInfo.l10n.supportedLocales
 export const DEFAULT_LOCALE = packageInfo.l10n.defaultLocale
 

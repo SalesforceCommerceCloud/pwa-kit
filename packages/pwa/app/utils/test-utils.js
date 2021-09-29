@@ -71,7 +71,6 @@ export const TestProviders = ({
     // API config overrides for disabling localhost proxy.
     const proxy = undefined
 
-    // @TODO: make this dynamic (getting from package.json during CI tests fails, so hardcoding for now)
     const ocapiHost = 'zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com'
 
     const api = new CommerceAPI({

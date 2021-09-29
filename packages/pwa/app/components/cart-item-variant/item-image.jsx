@@ -14,10 +14,6 @@ import {findImageGroupBy} from '../../utils/image-groups-utils'
 /**
  * In the context of a cart product item variant, this component renders the item's
  * main image.
- *
- * @todo = This component will render a `SALE` badge when the qualifier is available
- * on the custom property `c_isSale`. This will need to be expanded upon to handle
- * different badge/qualifiers and property names.
  */
 const ItemImage = ({imageProps, ratio = 1, ...props}) => {
     const variant = useCartItemVariant()
