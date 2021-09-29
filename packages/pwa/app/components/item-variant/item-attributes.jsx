@@ -11,7 +11,7 @@ import PropTypes from 'prop-types'
 import {FormattedMessage, FormattedNumber} from 'react-intl'
 import useBasket from '../../commerce-api/hooks/useBasket'
 import {Flex, Stack, Text} from '@chakra-ui/react'
-import {useItemVariantContext} from './'
+import {useItemVariant} from './'
 import PromoPopover from '../promo-popover'
 import {DEFAULT_CURRENCY} from '../../constants'
 
@@ -20,7 +20,7 @@ import {DEFAULT_CURRENCY} from '../../constants'
  * list of the selected variation values as well as any promos (w/ info popover).
  */
 const ItemAttributes = ({includeQuantity, currency, ...props}) => {
-    const variant = useItemVariantContext()
+    const variant = useItemVariant()
     const basket = useBasket()
     const [promos, setPromos] = useState([])
 

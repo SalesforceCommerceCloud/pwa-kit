@@ -14,7 +14,7 @@ import PropTypes from 'prop-types'
 
 const ItemVariantContext = createContext()
 
-export const useItemVariantContext = () => {
+export const useItemVariant = () => {
     return useContext(ItemVariantContext)
 }
 
