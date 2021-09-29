@@ -26,11 +26,11 @@ import {useAccountOrders} from './util/order-context'
 import Link from '../../components/link'
 import {ChevronLeftIcon} from '../../components/icons'
 import OrderSummary from '../../components/order-summary'
-import CartItemVariant from '../../components/cart-item-variant'
-import CartItemVariantImage from '../../components/cart-item-variant/item-image'
-import CartItemVariantName from '../../components/cart-item-variant/item-name'
-import CartItemVariantAttributes from '../../components/cart-item-variant/item-attributes'
-import CartItemVariantPrice from '../../components/cart-item-variant/item-price'
+import ItemVariantProvider from '../../components/item-variant'
+import CartItemVariantImage from '../../components/item-variant/item-image'
+import CartItemVariantName from '../../components/item-variant/item-name'
+import CartItemVariantAttributes from '../../components/item-variant/item-attributes'
+import CartItemVariantPrice from '../../components/item-variant/item-price'
 
 const AccountOrderDetail = () => {
     const {url, params} = useRouteMatch()
@@ -280,7 +280,7 @@ const AccountOrderDetail = () => {
                                     borderColor="gray.100"
                                     borderRadius="base"
                                 >
-                                    <CartItemVariant
+                                    <ItemVariantProvider
                                         index={idx}
                                         variant={variant}
                                         currency={order.currency}
@@ -304,7 +304,7 @@ const AccountOrderDetail = () => {
                                                 </Flex>
                                             </Stack>
                                         </Flex>
-                                    </CartItemVariant>
+                                    </ItemVariantProvider>
                                 </Box>
                             )
                         })}

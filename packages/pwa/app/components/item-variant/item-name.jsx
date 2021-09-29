@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import {useCartItemVariant} from '.'
+import {useItemVariant} from '.'
 import Link from '../link'
 
 /**
@@ -15,7 +15,7 @@ import Link from '../link'
  * available upon rendering.
  */
 const ItemName = (props) => {
-    const variant = useCartItemVariant()
+    const variant = useItemVariant()
 
     return (
         <Link
