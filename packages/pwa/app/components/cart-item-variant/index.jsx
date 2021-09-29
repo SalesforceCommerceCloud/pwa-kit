@@ -9,30 +9,25 @@ import PropTypes from 'prop-types'
 
 /**
  * This component and associated context/hook provide a convenient wrapper
- * around a group of components used for rendering product variant details
- * from items in a customer basket or order.
+ * around a group of components used for rendering product variant details.
  */
 
-const CartItemVariantContext = createContext()
+const ItemVariantContext = createContext()
 
-export const useCartItemVariant = () => {
-    return useContext(CartItemVariantContext)
+export const useItemVariantContext = () => {
+    return useContext(ItemVariantContext)
 }
 
 /**
  * The Provider component for rendering product item and variant detail.
  */
-const CartItemVariant = ({variant, children}) => {
-    return (
-        <CartItemVariantContext.Provider value={variant}>
-            {children}
-        </CartItemVariantContext.Provider>
-    )
+const ItemVariantProvider = ({variant, children}) => {
+    return <ItemVariantContext.Provider value={variant}>{children}</ItemVariantContext.Provider>
 }
 
-CartItemVariant.propTypes = {
+ItemVariantProvider.propTypes = {
     variant: PropTypes.object,
     children: PropTypes.any
 }
 
-export default CartItemVariant
+export default ItemVariantProvider

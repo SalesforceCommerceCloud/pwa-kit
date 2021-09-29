@@ -7,7 +7,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {AspectRatio, Box, Badge, Image} from '@chakra-ui/react'
-import {useCartItemVariant} from '.'
+import {useItemVariantContext} from '.'
 import {FormattedMessage} from 'react-intl'
 import {findImageGroupBy} from '../../utils/image-groups-utils'
 
@@ -20,7 +20,7 @@ import {findImageGroupBy} from '../../utils/image-groups-utils'
  * different badge/qualifiers and property names.
  */
 const ItemImage = ({imageProps, ratio = 1, ...props}) => {
-    const variant = useCartItemVariant()
+    const variant = useItemVariantContext()
 
     // We find the 'small' images in the variant's image groups based on variationValues and pick the first one
     const image = findImageGroupBy(variant?.imageGroups, {

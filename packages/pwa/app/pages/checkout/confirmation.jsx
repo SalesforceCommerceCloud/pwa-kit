@@ -29,7 +29,7 @@ import Link from '../../components/link'
 import AddressDisplay from '../../components/address-display'
 import PostCheckoutRegistrationFields from '../../components/forms/post-checkout-registration-fields'
 import PromoPopover from '../../components/promo-popover'
-import CartItemVariant from '../../components/cart-item-variant'
+import ItemVariantProvider from '../../components/cart-item-variant'
 import CartItemVariantImage from '../../components/cart-item-variant/item-image'
 import CartItemVariantName from '../../components/cart-item-variant/item-name'
 import CartItemVariantAttributes from '../../components/cart-item-variant/item-attributes'
@@ -250,7 +250,7 @@ const CheckoutConfirmation = () => {
                                                     price: product.price
                                                 }
                                                 return (
-                                                    <CartItemVariant
+                                                    <ItemVariantProvider
                                                         key={product.productId}
                                                         index={idx}
                                                         variant={variant}
@@ -278,7 +278,7 @@ const CheckoutConfirmation = () => {
                                                                 </Flex>
                                                             </Stack>
                                                         </Flex>
-                                                    </CartItemVariant>
+                                                    </ItemVariantProvider>
                                                 )
                                             })}
                                         </Stack>

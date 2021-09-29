@@ -6,7 +6,7 @@
  */
 import React from 'react'
 import {mockedCustomerProductListsDetails} from '../../../../commerce-api/mock-data'
-import CartItemVariant from '../../../../components/cart-item-variant'
+import ItemVariantProvider from '../../../../components/cart-item-variant'
 import {renderWithProviders} from '../../../../utils/test-utils'
 import WishlistPrimaryAction from './wishlist-primary-action'
 import user from '@testing-library/user-event'
@@ -14,9 +14,9 @@ import {screen, waitFor} from '@testing-library/react'
 
 const MockedComponent = (variant) => {
     return (
-        <CartItemVariant variant={variant}>
+        <ItemVariantProvider variant={variant}>
             <WishlistPrimaryAction />
-        </CartItemVariant>
+        </ItemVariantProvider>
     )
 }
 

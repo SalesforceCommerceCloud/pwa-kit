@@ -13,7 +13,7 @@ import {Box, Fade, Flex, Stack, Text} from '@chakra-ui/react'
 
 // Project Components
 import {HideOnDesktop, HideOnMobile} from '../responsive'
-import CartItemVariant from '../cart-item-variant'
+import ItemVariantProvider from '../cart-item-variant'
 import CartItemVariantImage from '../cart-item-variant/item-image'
 import CartItemVariantName from '../cart-item-variant/item-name'
 import CartItemVariantAttributes from '../cart-item-variant/item-attributes'
@@ -53,7 +53,7 @@ const ProductItem = ({
 
     return (
         <Box position="relative" data-testid={`sf-cart-item-${product.productId}`}>
-            <CartItemVariant variant={product}>
+            <ItemVariantProvider variant={product}>
                 {showLoading && <LoadingSpinner />}
                 <Stack layerStyle="cardBordered" align="flex-start">
                     <Flex width="full" alignItems="flex-start" backgroundColor="white">
@@ -131,7 +131,7 @@ const ProductItem = ({
                         {primaryAction}
                     </Box>
                 </Stack>
-            </CartItemVariant>
+            </ItemVariantProvider>
         </Box>
     )
 }

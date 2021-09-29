@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import CartItemVariant from '../../../../components/cart-item-variant'
+import ItemVariantProvider from '../../../../components/cart-item-variant'
 import {renderWithProviders} from '../../../../utils/test-utils'
 import WishlistSecondaryButtonGroup from './wishlist-secondary-button-group'
 import {screen, waitFor} from '@testing-library/react'
@@ -351,9 +351,9 @@ jest.mock('../../../../hooks/use-wishlist')
 const MockedComponent = () => {
     const product = mockData.customerProductListItems[0].product
     return (
-        <CartItemVariant variant={{...product, productName: product.name}}>
+        <ItemVariantProvider variant={{...product, productName: product.name}}>
             <WishlistSecondaryButtonGroup />
-        </CartItemVariant>
+        </ItemVariantProvider>
     )
 }
 

@@ -13,7 +13,7 @@ import useWishlist from '../../../../hooks/use-wishlist'
 import {useToast} from '../../../../hooks/use-toast'
 
 import ConfirmationModal from '../../../../components/confirmation-modal/index'
-import {useCartItemVariant} from '../../../../components/cart-item-variant'
+import {useItemVariantContext} from '../../../../components/cart-item-variant'
 import {noop} from '../../../../utils/utils'
 import {API_ERROR_MESSAGE} from '../../../../constants'
 
@@ -32,7 +32,7 @@ export const REMOVE_WISHLIST_ITEM_CONFIRMATION_DIALOG_CONFIG = {
  * Represents other actions you want the user to perform with the product-item (eg.: Remove or Edit)
  */
 const WishlistSecondaryButtonGroup = ({productListItemId, onClick = noop}) => {
-    const variant = useCartItemVariant()
+    const variant = useItemVariantContext()
     const wishlist = useWishlist()
     const modalProps = useDisclosure()
     const toast = useToast()

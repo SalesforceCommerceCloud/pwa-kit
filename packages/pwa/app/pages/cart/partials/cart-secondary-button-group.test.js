@@ -10,7 +10,7 @@ import {
     mockedCustomerProductLists,
     mockedCustomerProductListsDetails
 } from '../../../commerce-api/mock-data'
-import CartItemVariant from '../../../components/cart-item-variant'
+import ItemVariantProvider from '../../../components/cart-item-variant'
 import {renderWithProviders} from '../../../utils/test-utils'
 import CartSecondaryButtonGroup from './cart-secondary-button-group'
 import {screen, waitFor} from '@testing-library/react'
@@ -32,13 +32,13 @@ const MockedComponent = ({
     }, [])
     const product = mockedCustomerProductListsDetails.data[0]
     return (
-        <CartItemVariant variant={{...product, productName: product.name}}>
+        <ItemVariantProvider variant={{...product, productName: product.name}}>
             <CartSecondaryButtonGroup
                 onAddToWishlistClick={onAddToWishlistClick}
                 onEditClick={onEditClick}
                 onRemoveItemClick={onRemoveItemClick}
             />
-        </CartItemVariant>
+        </ItemVariantProvider>
     )
 }
 
