@@ -9,6 +9,6 @@ import {CategoriesContext} from '../contexts'
 
 /**
  * Custom React hook to get the categories
- * @returns {{currency: string, setCurrency: function}[]}
+ * @returns {{categories: Object, setCategories: function}[]}
  */
 export const useCategories = () => useContext(CategoriesContext)
