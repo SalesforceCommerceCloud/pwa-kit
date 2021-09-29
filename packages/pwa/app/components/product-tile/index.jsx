@@ -5,9 +5,9 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React from 'react'
+import React, {useState} from 'react'
 import PropTypes from 'prop-types'
-import {WishlistIcon, WishlistSolidIcon} from '../icons'
+import {HeartIcon, HeartSolidIcon} from '../icons'
 
 // Components
 import {
@@ -50,80 +50,60 @@ export const Skeleton = () => {
 }
 
 /**
- * The ProductTile is a simple visual representation of a product search hit
- * object. It will show it's default image, name and price.
+ * The ProductTile is a simple visual representation of a
+ * product object. It will show it's default image, name and price.
+ * It also supports favourite products, controlled by a heart icon.
  */
 const ProductTile = (props) => {
     const intl = useIntl()
-
-    // eslint-disable-next-line react/prop-types
-    const {
-        productSearchItem,
-        // eslint-disable-next-line react/prop-types
-        staticContext,
-        onAddToWishlistClick,
-        onRemoveWishlistClick,
-        isInWishlist,
-        isWishlistLoading,
-        ...rest
-    } = props
-    const {currency, image, price, productName} = productSearchItem
-    const styles = useMultiStyleConfig('ProductTile', {isLoading: isWishlistLoading})
+    const {product, enableFavourite = false, isFavourite, onFavouriteToggle, ...rest} = props
+    const {currency, image, price, productName, productId} = product
+    const [isFavouriteLoading, setFavouriteLoading] = useState(false)
+    const styles = useMultiStyleConfig('ProductTile')
 
     return (
         <Link
             data-testid="product-tile"
             {...styles.container}
-            to={productUrlBuilder({id: productSearchItem?.productId}, intl.local)}
+            to={productUrlBuilder({id: productId}, intl.local)}
             {...rest}
         >
             <Box {...styles.imageWrapper}>
-                <AspectRatio {...styles.image} ratio={1}>
+                <AspectRatio {...styles.image}>
                     <Img alt={image.alt} src={image.disBaseLink} />
                 </AspectRatio>
-                {onAddToWishlistClick && onRemoveWishlistClick && (
-                    <>
-                        {isInWishlist ? (
-                            <IconButton
-                                aria-label={intl.formatMessage({
-                                    defaultMessage: 'wishlist-solid'
-                                })}
-                                icon={<WishlistSolidIcon />}
-                                variant="unstyled"
-                                {...styles.iconButton}
-                                onClick={(e) => {
-                                    e.preventDefault()
-                                    if (isWishlistLoading) return
-                                    onRemoveWishlistClick()
-                                }}
-                            />
-                        ) : (
-                            <IconButtonWithRegistration
-                                aria-label={intl.formatMessage({
-                                    defaultMessage: 'wishlist'
-                                })}
-                                icon={<WishlistIcon />}
-                                variant="unstyled"
-                                {...styles.iconButton}
-                                onClick={() => {
-                                    if (isWishlistLoading) return
-                                    onAddToWishlistClick()
-                                }}
-                            />
-                        )}
-                    </>
+
+                {enableFavourite && (
+                    <Box
+                        onClick={(e) => {
+                            // stop click event from bubbling
+                            // to avoid user from clicking the underlying
+                            // product while the favourite icon is disabled
+                            e.preventDefault()
+                        }}
+                    >
+                        <IconButtonWithRegistration
+                            aria-label={intl.formatMessage({
+                                defaultMessage: 'wishlist'
+                            })}
+                            icon={isFavourite ? <HeartSolidIcon /> : <HeartIcon />}
+                            {...styles.favIcon}
+                            disabled={isFavouriteLoading}
+                            onClick={async () => {
+                                setFavouriteLoading(true)
+                                await onFavouriteToggle(!isFavourite)
+                                setFavouriteLoading(false)
+                            }}
+                        />
+                    </Box>
                 )}
             </Box>
 
             {/* Title */}
-            <Text {...styles.title} aria-label="product name">
-                {productName}
-            </Text>
+            <Text {...styles.title}>{productName}</Text>
 
             {/* Price */}
-            <Text {...styles.price} aria-label="price">
-                {intl.formatNumber(price, {style: 'currency', currency})}
-            </Text>
+            <Text {...styles.price}>{intl.formatNumber(price, {style: 'currency', currency})}</Text>
         </Link>
     )
 }
@@ -135,20 +115,30 @@ ProductTile.propTypes = {
      * The product search hit that will be represented in this
      * component.
      */
-    productSearchItem: PropTypes.object.isRequired,
+    product: PropTypes.shape({
+        currency: PropTypes.string,
+        image: PropTypes.shape({
+            alt: PropTypes.string,
+            disBaseLink: PropTypes.string
+        }),
+        price: PropTypes.number,
+        productName: PropTypes.string,
+        productId: PropTypes.string
+    }),
     /**
-     * Types of lists the product/variant is added to. (eg: wishlist)
+     * Enable adding/removing product as a favourite.
+     * Use case: wishlist.
      */
-    isInWishlist: PropTypes.bool,
+    enableFavourite: PropTypes.bool,
     /**
-     * Callback function to be invoked when the user add item to wishlist
+     * Display the product as a faviourite.
      */
-    onAddToWishlistClick: PropTypes.func,
+    isFavourite: PropTypes.bool,
     /**
-     * Callback function to be invoked when the user removes item to wishlist
+     * Callback function to be invoked when the user
+     * interacts with favourite icon/button.
      */
-    onRemoveWishlistClick: PropTypes.func,
-    isWishlistLoading: PropTypes.bool
+    onFavouriteToggle: PropTypes.func
 }
 
 export default ProductTile

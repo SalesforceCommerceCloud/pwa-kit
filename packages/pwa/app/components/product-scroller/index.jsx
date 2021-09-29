@@ -23,7 +23,7 @@ const ProductScroller = forwardRef(
             isLoading,
             scrollProps,
             itemWidth = {base: '70%', md: '40%', lg: 'calc(33.33% - 10px)'},
-            onProductClick = () => null,
+            productTileProps,
             ...props
         },
         ref
@@ -94,8 +94,10 @@ const ProductScroller = forwardRef(
                                     ) : (
                                         <ProductTile
                                             data-testid="product-scroller-item"
-                                            productSearchItem={product}
-                                            onClick={() => onProductClick(product)}
+                                            product={product}
+                                            {...(typeof productTileProps === 'function'
+                                                ? {...productTileProps(product)}
+                                                : {...productTileProps})}
                                         />
                                     )}
                                 </Box>
@@ -161,7 +163,7 @@ ProductScroller.propTypes = {
     isLoading: PropTypes.bool,
     scrollProps: PropTypes.object,
     itemWidth: PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.object]),
-    onProductClick: PropTypes.func
+    productTileProps: PropTypes.oneOfType([PropTypes.func, PropTypes.object])
 }
 
 export default ProductScroller

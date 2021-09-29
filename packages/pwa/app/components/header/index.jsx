@@ -40,7 +40,7 @@ import {
     BasketIcon,
     HamburgerIcon,
     ChevronDownIcon,
-    WishlistIcon,
+    HeartIcon,
     SignoutIcon
 } from '../icons'
 
@@ -241,7 +241,7 @@ const Header = ({
                         aria-label={intl.formatMessage({
                             defaultMessage: 'Wishlist'
                         })}
-                        icon={<WishlistIcon />}
+                        icon={<HeartIcon />}
                         variant="unstyled"
                         {...styles.icons}
                         onClick={onWishlistClick}
