@@ -19,7 +19,6 @@ import {API_ERROR_MESSAGE} from '../../../../constants'
  */
 const WishlistPrimaryAction = () => {
     const variant = useItemVariantContext()
-    console.log(variant)
     const basket = useBasket()
     const {formatMessage} = useIntl()
     const isMasterProduct = variant?.type?.master || false
