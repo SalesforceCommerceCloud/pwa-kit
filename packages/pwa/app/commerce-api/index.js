@@ -79,8 +79,7 @@ class CommerceAPI {
         const apiConfigs = {
             shopperCustomers: {
                 api: sdk.ShopperCustomers,
-                sendLocale: false,
-                sendCurrency: []
+                sendLocale: false
             },
             shopperBaskets: {
                 api: OcapiShopperBaskets,
@@ -88,25 +87,19 @@ class CommerceAPI {
                 sendCurrency: ['createBasket']
             },
             shopperGiftCertificates: {
-                api: sdk.ShopperGiftCertificates,
-                sendLocale: true,
-                sendCurrency: []
+                api: sdk.ShopperGiftCertificates
             },
-            shopperLogin: {api: sdk.ShopperLogin, sendLocale: false, sendCurrency: []},
-            shopperOrders: {api: OcapiShopperOrders, sendLocale: true, sendCurrency: []},
+            shopperLogin: {api: sdk.ShopperLogin, sendLocale: false},
+            shopperOrders: {api: OcapiShopperOrders},
             shopperProducts: {
                 api: sdk.ShopperProducts,
-                sendLocale: true,
                 sendCurrency: ['getProduct', 'getProducts']
             },
             shopperPromotions: {
-                api: sdk.ShopperPromotions,
-                sendLocale: true,
-                sendCurrency: []
+                api: sdk.ShopperPromotions
             },
             shopperSearch: {
                 api: sdk.ShopperSearch,
-                sendLocale: true,
                 sendCurrency: ['productSearch', 'getSearchSuggestions']
             }
         }
@@ -131,6 +124,24 @@ class CommerceAPI {
                                 }
 
                                 return self.willSendRequest(prop, ...args).then((newArgs) => {
+                                    let {sendLocale = true, sendCurrency = false} = apiConfigs[key]
+
+                                    // By default we send the local param and don't send the currency param.
+                                    // You can modify when these are send by using a boolean value send the
+                                    // currency/locale for all calls for a given API, or define an array listing
+                                    // the API's methods you want the currency/locale information to be sent.
+                                    sendLocale = Array.isArray(sendLocale)
+                                        ? sendLocale.includes(prop)
+                                        : !!sendLocale
+                                    sendCurrency = Array.isArray(sendCurrency)
+                                        ? sendCurrency.includes(prop)
+                                        : !!sendCurrency
+
+                                    // Ensure we don't send the pseudo locale.
+                                    if (locale !== 'en-XB') {
+                                        sendLocale = false
+                                    }
+
                                     // Inject the locale and currency to the API call via it's parameters.
                                     //
                                     // NOTE: The commerce sdk isomorphic will complain if you pass parameters to
@@ -140,14 +151,8 @@ class CommerceAPI {
                                     // pseudo locale 'en-XB'.
                                     newArgs[0].parameters = {
                                         ...newArgs[0].parameters,
-                                        ...(locale &&
-                                        locale !== 'en-XB' &&
-                                        apiConfigs[key].sendLocale
-                                            ? {locale}
-                                            : {}),
-                                        ...(currency && apiConfigs[key].sendCurrency.includes(prop)
-                                            ? {currency}
-                                            : {})
+                                        ...(sendLocale ? {locale} : {}),
+                                        ...(sendCurrency ? {currency} : {})
                                     }
 
                                     return obj[prop](...newArgs).then((res) =>
