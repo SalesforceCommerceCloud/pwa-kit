@@ -55,12 +55,25 @@ const DEFAULT_ROOT_CATEGORY = 'root'
  *  `locale` parameter format for OCAPI and Commerce API: <language code>-<country code>
  *  https://documentation.b2c.commercecloud.salesforce.com/DOC1/topic/com.demandware.dochelp/OCAPI/current/usage/Localization.html
  *  */
-let messages = {}
-SUPPORTED_LOCALES.map(locale => 
-    Object.assign(messages, {[locale]: {defaultValue: LOCALE_MAP[locale]}})
-)
-console.log(messages)
-export const defaultLocaleMessages = defineMessages({})
+ export const defaultLocaleMessages = defineMessages({
+    'zh': {defaultMessage: 'Chinese'},
+    'zh-CN': {defaultMessage: 'Chinese (China)'},
+    'nl': {defaultMessage: 'Dutch'},
+    'en': {defaultMessage: 'English'},
+    'en-CA': {defaultMessage: 'English (Canada)'},
+    'en-GB': {defaultMessage: 'English (United Kingdom)'},
+    'en-US': {defaultMessage: 'English (United States)'},
+    'fr': {defaultMessage: 'French'},
+    'fr-CA': {defaultMessage: 'French (Canada)'},
+    'fr-FR': {defaultMessage: 'French (France)'},
+    'de': {defaultMessage: 'German'},
+    'de-DE': {defaultMessage: 'German (Germany)'},
+    'it': {defaultMessage: 'Italian'},
+    'it-IT': {defaultMessage: 'Italian (Italy)'},
+    'ja': {defaultMessage: 'Japanese'},
+    'ja-JP': {defaultMessage: 'Japanese (Japan)'},
+    'es': {defaultMessage: 'Spanish'}
+})
 
 const App = (props) => {
     const {children, targetLocale, defaultLocale, messages, categories: allCategories = {}} = props

@@ -53,31 +53,4 @@ export const HOME_HREF = '/'
 export const SUPPORTED_LOCALES = packageInfo.l10n.supportedLocales
 export const DEFAULT_LOCALE = packageInfo.l10n.defaultLocale
 
-/**
- *  Default messages for the supported locales.
- *  NOTE: Because the messages are statically analyzed, we have to maintain the list of locales asynchronously
- *  to those in the package.json.
- *  `locale` parameter format for OCAPI and Commerce API: <language code>-<country code>
- *  https://documentation.b2c.commercecloud.salesforce.com/DOC1/topic/com.demandware.dochelp/OCAPI/current/usage/Localization.html
- *  */
-export const LOCALE_MAP = {
-    zh: 'Chinese',
-    'zh-CN': 'Chinese (China)',
-    nl: 'Dutch',
-    en: 'English',
-    'en-CA': 'English (Canada)',
-    'en-GB': 'English (United Kingdom)',
-    'en-US': 'English (United States)',
-    fr: 'French',
-    'fr-CA': 'French (Canada)',
-    'fr-FR': 'French (France)',
-    de: 'German',
-    'de-DE': 'German (Germany)',
-    it: 'Italian',
-    'it-IT': 'Italian (Italy)',
-    ja: 'Japanese',
-    'ja-JP': 'Japanese (Japan)',
-    es: 'Spanish'
-}
-
 export const MAX_ORDER_QUANTITY = 10
