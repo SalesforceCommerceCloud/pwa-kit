@@ -50,7 +50,11 @@ const CartItems = ({basket}) => {
                             price: product.price
                         }
                         return (
-                            <ItemVariantProvider key={product.productId} index={idx} variant={variant}>
+                            <ItemVariantProvider
+                                key={product.productId}
+                                index={idx}
+                                variant={variant}
+                            >
                                 <Flex width="full" alignItems="flex-start">
                                     <CartItemVariantImage width="80px" mr={2} />
                                     <Stack spacing={1} marginTop="-3px">
