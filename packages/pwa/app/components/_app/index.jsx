@@ -66,14 +66,9 @@ export const defaultLocaleMessages = defineMessages({
 })
 
 const App = (props) => {
-    const {
-        children,
-        targetLocale,
-        defaultLocale,
-        messages,
-        categories: allCategories = {},
-        appOrigin = getAppOrigin()
-    } = props
+    const {children, targetLocale, defaultLocale, messages, categories: allCategories = {}} = props
+
+    const appOrigin = getAppOrigin()
 
     const history = useHistory()
     const location = useLocation()
@@ -328,8 +323,7 @@ App.propTypes = {
     targetLocale: PropTypes.string,
     defaultLocale: PropTypes.string,
     messages: PropTypes.object,
-    categories: PropTypes.object,
-    appOrigin: PropTypes.string
+    categories: PropTypes.object
 }
 
 export default App
