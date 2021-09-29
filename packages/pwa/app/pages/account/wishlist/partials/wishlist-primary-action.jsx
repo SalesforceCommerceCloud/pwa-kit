@@ -27,15 +27,15 @@ const WishlistPrimaryAction = () => {
 
     const handleAddToCart = async () => {
         setIsLoading(true)
-        const productItem = [
+        const productItems = [
             {
-                productId: variant.productId,
+                productId: variant.id,
                 quantity: variant.quantity,
                 price: variant.price
             }
         ]
         try {
-            await basket.addItemToBasket(productItem)
+            await basket.addItemToBasket(productItems)
             showToast({
                 title: formatMessage(
                     {
