@@ -94,7 +94,6 @@ commands:
       - run:
           name: 'Run tests'
           command: |
-            set -e
 
             cd << parameters.cwd >>
 
