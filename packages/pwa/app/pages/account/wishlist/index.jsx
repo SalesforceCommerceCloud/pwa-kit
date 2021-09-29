@@ -15,7 +15,7 @@ import useWishlist from '../../../hooks/use-wishlist'
 import {useToast} from '../../../hooks/use-toast'
 
 import PageActionPlaceHolder from '../../../components/page-action-placeholder'
-import {WishlistIcon} from '../../../components/icons'
+import {HeartIcon} from '../../../components/icons'
 import ProductItem from '../../../components/product-item/index'
 import WishlistPrimaryAction from './partials/wishlist-primary-action'
 import WishlistSecondaryButtonGroup from './partials/wishlist-secondary-button-group'
