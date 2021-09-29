@@ -73,4 +73,23 @@ describe('Product Scroller', () => {
         expect(screen.queryByTestId('product-scroller-nav-left')).not.toBeInTheDocument()
         expect(screen.queryByTestId('product-scroller-nav-right')).not.toBeInTheDocument()
     })
+    test('productTileProps as object', () => {
+        const onClickMock = jest.fn()
+        renderWithProviders(
+            <ProductScroller products={testProducts} productTileProps={{onClick: onClickMock}} />
+        )
+        user.click(screen.getByText(testProducts[0].productName))
+        expect(onClickMock).toHaveBeenCalled()
+    })
+    test('productTileProps as function', () => {
+        const onClickMock = jest.fn()
+        renderWithProviders(
+            <ProductScroller
+                products={testProducts}
+                productTileProps={() => ({onClick: onClickMock})}
+            />
+        )
+        user.click(screen.getByText(testProducts[0].productName))
+        expect(onClickMock).toHaveBeenCalled()
+    })
 })
