@@ -95,7 +95,7 @@ commands:
       - run:
           name: 'Run tests'
           command: |
-            set -eo
+            set -eo pipefail
 
             cd << parameters.cwd >>
 
