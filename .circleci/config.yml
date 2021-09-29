@@ -92,6 +92,9 @@ commands:
         type: string
     steps:
       - run:
+          name: 'failing step'
+          command: npm run test:max-file-size
+      - run:
           name: 'Run tests'
           command: |
 
@@ -99,10 +102,6 @@ commands:
 
             # Note: Each of these test commands need to be exposed on the monorepo
             # root and *also* on the PWA package. This section is run on both.
-
-            # Simulate a command that returns a non-zero exist status. It should hopefully make the 
-            # command fail.
-            type file-doesnt-exists.txt
 
             # Always run fast unit tests
             npm run test
