@@ -17,7 +17,7 @@ window.HTMLElement.prototype.scrollBy = jest.fn()
 
 const testProducts = [1, 2, 3, 4].map((i) => ({
     id: i,
-    productId: i,
+    productId: `${i}`,
     productName: `Product ${i}`,
     image: {disBaseLink: '/testimage'},
     price: 9.99,
@@ -30,10 +30,10 @@ describe('Product Scroller', () => {
         expect(screen.getAllByTestId('product-scroller-item-skeleton')).toHaveLength(4)
     })
     test('renders nothing when no products and not loading', () => {
-        renderWithProviders(<ProductScroller />)
+        renderWithProviders(<ProductScroller products={undefined} />)
         expect(screen.queryByTestId('product-scroller')).not.toBeInTheDocument()
     })
-    test('Renders scrollable product tiles and title', () => {
+    test('Renders product items', () => {
         renderWithProviders(<ProductScroller title="Scroller Title" products={testProducts} />)
         expect(screen.getByText('Scroller Title')).toBeInTheDocument()
         expect(screen.getAllByTestId('product-scroller-item')).toHaveLength(4)
@@ -70,5 +70,24 @@ describe('Product Scroller', () => {
         )
         expect(screen.queryByTestId('product-scroller-nav-left')).not.toBeInTheDocument()
         expect(screen.queryByTestId('product-scroller-nav-right')).not.toBeInTheDocument()
+    })
+    test('productTileProps as object', () => {
+        const onClickMock = jest.fn()
+        renderWithProviders(
+            <ProductScroller products={testProducts} productTileProps={{onClick: onClickMock}} />
+        )
+        user.click(screen.getByText(testProducts[0].productName))
+        expect(onClickMock).toHaveBeenCalled()
+    })
+    test('productTileProps as function', () => {
+        const onClickMock = jest.fn()
+        renderWithProviders(
+            <ProductScroller
+                products={testProducts}
+                productTileProps={() => ({onClick: onClickMock})}
+            />
+        )
+        user.click(screen.getByText(testProducts[0].productName))
+        expect(onClickMock).toHaveBeenCalled()
     })
 })

@@ -12,11 +12,11 @@ import useBasket from '../../commerce-api/hooks/useBasket'
 import {BasketIcon, ChevronDownIcon, ChevronUpIcon} from '../icons'
 import Link from '../link'
 import {PromoCode, usePromoCode} from '../promo-code'
-import CartItemVariant from '../cart-item-variant'
-import CartItemVariantImage from '../cart-item-variant/item-image'
-import CartItemVariantName from '../cart-item-variant/item-name'
-import CartItemVariantAttributes from '../cart-item-variant/item-attributes'
-import CartItemVariantPrice from '../cart-item-variant/item-price'
+import ItemVariantProvider from '../item-variant'
+import CartItemVariantImage from '../item-variant/item-image'
+import CartItemVariantName from '../item-variant/item-name'
+import CartItemVariantAttributes from '../item-variant/item-attributes'
+import CartItemVariantPrice from '../item-variant/item-price'
 import PromoPopover from '../promo-popover'
 
 const CartItems = ({basket}) => {
@@ -50,7 +50,11 @@ const CartItems = ({basket}) => {
                             price: product.price
                         }
                         return (
-                            <CartItemVariant key={product.productId} index={idx} variant={variant}>
+                            <ItemVariantProvider
+                                key={product.productId}
+                                index={idx}
+                                variant={variant}
+                            >
                                 <Flex width="full" alignItems="flex-start">
                                     <CartItemVariantImage width="80px" mr={2} />
                                     <Stack spacing={1} marginTop="-3px">
@@ -59,7 +63,7 @@ const CartItems = ({basket}) => {
                                         <CartItemVariantPrice baseDirection="row" />
                                     </Stack>
                                 </Flex>
-                            </CartItemVariant>
+                            </ItemVariantProvider>
                         )
                     })}
 

@@ -9,7 +9,7 @@ import PropTypes from 'prop-types'
 import {FormattedMessage, FormattedNumber} from 'react-intl'
 import {Stack, Text} from '@chakra-ui/react'
 import useBasket from '../../commerce-api/hooks/useBasket'
-import {useCartItemVariant} from '.'
+import {useItemVariant} from '.'
 import {HideOnDesktop, HideOnMobile} from '../responsive'
 import {useCurrency} from '../../hooks'
 
@@ -41,7 +41,7 @@ PricePerItem.propTypes = {
  * pricing, taking into account applied discounts as well as base item prices.
  */
 const ItemPrice = ({currency, align = 'right', baseDirection = 'column', ...props}) => {
-    const variant = useCartItemVariant()
+    const variant = useItemVariant()
     const basket = useBasket()
     const {currency: activeCurrency} = useCurrency()
 

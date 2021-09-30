@@ -15,7 +15,7 @@ import useWishlist from '../../../hooks/use-wishlist'
 import {useToast} from '../../../hooks/use-toast'
 
 import PageActionPlaceHolder from '../../../components/page-action-placeholder'
-import {WishlistIcon} from '../../../components/icons'
+import {HeartIcon} from '../../../components/icons'
 import ProductItem from '../../../components/product-item/index'
 import WishlistPrimaryAction from './partials/wishlist-primary-action'
 import WishlistSecondaryButtonGroup from './partials/wishlist-secondary-button-group'
@@ -114,7 +114,7 @@ const AccountWishlist = () => {
             {wishlist.hasDetail && wishlist.isEmpty && (
                 <PageActionPlaceHolder
                     data-testid="empty-wishlist"
-                    icon={<WishlistIcon boxSize={8} />}
+                    icon={<HeartIcon boxSize={8} />}
                     heading={formatMessage({defaultMessage: 'No Wishlist Items'})}
                     text={formatMessage({
                         defaultMessage: 'Continue shopping and add items to your wishlist'
