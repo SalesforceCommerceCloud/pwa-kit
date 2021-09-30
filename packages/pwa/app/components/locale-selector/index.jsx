@@ -83,18 +83,18 @@ const LocaleSelector = ({
                             <AccordionPanel>
                                 <Accordion allowToggle={true} {...styles.accordion}>
                                     {locales.map((locale) => (
-                                        <AccordionItem border="none" key={locale}>
+                                        <AccordionItem border="none" key={locale.id}>
                                             <AccordionButton
                                                 {...styles.optionButton}
                                                 onClick={() => onSelect(locale)}
                                             >
                                                 {/* Display flag icon if one exists */}
-                                                {flags[locale]}
+                                                {flags[locale.id]}
 
                                                 {/* Locale name */}
                                                 <Text {...styles.optionText}>
                                                     {intl.formatMessage(
-                                                        defaultLocaleMessages[locale]
+                                                        defaultLocaleMessages[locale.id]
                                                     )}
                                                 </Text>
 

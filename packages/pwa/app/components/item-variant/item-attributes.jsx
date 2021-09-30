@@ -11,18 +11,19 @@ import PropTypes from 'prop-types'
 import {FormattedMessage, FormattedNumber} from 'react-intl'
 import useBasket from '../../commerce-api/hooks/useBasket'
 import {Flex, Stack, Text} from '@chakra-ui/react'
-import {useCartItemVariant} from './'
+import {useItemVariant} from './'
 import PromoPopover from '../promo-popover'
-import {DEFAULT_CURRENCY} from '../../constants'
+import {useCurrency} from '../../hooks'
 
 /**
  * In the context of a cart product item variant, this component renders a styled
  * list of the selected variation values as well as any promos (w/ info popover).
  */
 const ItemAttributes = ({includeQuantity, currency, ...props}) => {
-    const variant = useCartItemVariant()
+    const variant = useItemVariant()
     const basket = useBasket()
     const [promos, setPromos] = useState([])
+    const {currency: activeCurrency} = useCurrency()
 
     // Create a mapping of variation values to their associated attributes. This allows us
     // the render the readable names/labels rather than variation value IDs.
@@ -82,7 +83,7 @@ const ItemAttributes = ({includeQuantity, currency, ...props}) => {
                         <Text as="span" color="green.500">
                             <FormattedNumber
                                 style="currency"
-                                currency={currency || basket.currency || DEFAULT_CURRENCY}
+                                currency={currency || basket.currency || activeCurrency}
                                 value={variant.priceAdjustments[0].price}
                             />
                         </Text>

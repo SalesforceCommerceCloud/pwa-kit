@@ -5,8 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {HOME_HREF, DEFAULT_LOCALE, SUPPORTED_LOCALES} from '../constants'
-import {useLocation} from 'react-router-dom'
+import {DEFAULT_LOCALE} from '../constants'
 
 /**
  * Modifies a given url by adding/updating query parameters.
@@ -103,30 +102,40 @@ export const productUrlBuilder = (product) => encodeURI(`/product/${product.id}`
 export const searchUrlBuilder = (searchTerm) => `/search?q=${searchTerm}`
 
 /**
- * Returns a URL pathname using the new locale.
+ * Returns a relative URL for a locale short code.
  *
- * @param {string} newLocale
- * @param {Object} [options]
- * @param {Object} options.location - original location (similar value to `window.location`)
- * @returns {string}
+ * @param shortCode - The locale short code.
+ * @param opts - The options like `disallowParams` an array parameters to remove.
+ * @returns {string} - The relative URL for the specific locale.
  */
-export const buildUrlLocale = (newLocale, options = {}) => {
-    const location = options.location
-        ? options.location
-        : typeof window !== 'undefined'
-        ? window.location // to be used within event handlers
-        : useLocation() // to be used within React components
+export const getUrlWithLocale = (shortCode, opts = {}) => {
+    const {location} = window
+    const {disallowParams = []} = opts
+    let relativeUrl = location.pathname
 
     const params = new URLSearchParams(location.search)
-    params.delete('refine')
 
-    return isHomepage(location.pathname)
-        ? homeUrlBuilder(HOME_HREF, newLocale)
-        : `/${
-              SUPPORTED_LOCALES.includes(newLocale) ? newLocale : DEFAULT_LOCALE
-          }${location.pathname.slice(location.pathname.indexOf('/', 1))}${
-              Array.from(params).length > 0 ? `?${params}` : ''
-          }`
+    // Remove any disallowed params.
+    if (disallowParams.length) {
+        disallowParams.forEach((param) => {
+            params.delete(param)
+        })
+    }
+
+    // Array of the paths without empty items
+    const paths = relativeUrl.split('/').filter((path) => path !== '')
+
+    // Remove the previous locale
+    paths.shift()
+
+    // Add the new locale
+    if (shortCode !== DEFAULT_LOCALE || paths?.length > 0) {
+        paths.unshift(shortCode)
+    }
+
+    relativeUrl = `/${paths.join('/')}${Array.from(params).length > 0 ? `?${params}` : ''}`
+
+    return relativeUrl
 }
 
 // Accepts '/', '/en-GB', '/zh-CN/', etc. as homepage

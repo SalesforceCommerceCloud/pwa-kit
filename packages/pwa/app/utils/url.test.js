@@ -10,13 +10,13 @@ import {
     categoryUrlBuilder,
     productUrlBuilder,
     searchUrlBuilder,
+    getUrlWithLocale,
     homeUrlBuilder,
     rebuildPathWithParams,
-    removeQueryParamsFromPath,
-    buildUrlLocale
+    removeQueryParamsFromPath
 } from './url'
 
-import {DEFAULT_LOCALE, SUPPORTED_LOCALES} from '../constants'
+import {DEFAULT_LOCALE} from '../constants'
 
 describe('buildUrlSet returns the expected set of urls', () => {
     test('when no values are passed in', () => {
@@ -73,6 +73,17 @@ describe('buildUrlSet returns the expected set of urls', () => {
 })
 
 describe('url builder test', () => {
+    // Save the original `window.location` object to not affect other test
+    const originalLocation = window.location
+
+    beforeEach(() => {
+        delete window.location
+        window.location = {...originalLocation, assign: jest.fn()}
+    })
+    afterEach(() => {
+        // Restore `window.location` to the `jsdom` `Location` object
+        window.location = originalLocation
+    })
     test('searchUrlBuilder returns expect', () => {
         const url = searchUrlBuilder('term')
 
@@ -94,8 +105,68 @@ describe('url builder test', () => {
         const url = homeUrlBuilder('/', 'fr-FR')
         expect(url).toEqual(`/fr-FR/`)
 
-        const homeUrlDefaultLocale = homeUrlBuilder('/', 'en-GB')
+        const homeUrlDefaultLocale = homeUrlBuilder('/', DEFAULT_LOCALE)
         expect(homeUrlDefaultLocale).toEqual(`/`)
+    })
+
+    test('getUrlWithLocale returns expected for PLP', () => {
+        const location = new URL('http://localhost:3000/it-IT/category/newarrivals-womens')
+
+        window.location = location
+
+        const relativeUrl = getUrlWithLocale('fr-FR')
+        expect(relativeUrl).toEqual(`/fr-FR/category/newarrivals-womens`)
+    })
+
+    test('getUrlWithLocale returns expected for PLP without refine param', () => {
+        const location = new URL(
+            'http://localhost:3000/it-IT/category/newarrivals-womens?limit=25&refine=c_refinementColor%3DBianco&sort=best-matches&offset=25'
+        )
+
+        window.location = location
+
+        const relativeUrl = getUrlWithLocale('fr-FR', {
+            disallowParams: ['refine']
+        })
+        expect(relativeUrl).toEqual(
+            `/fr-FR/category/newarrivals-womens?limit=25&sort=best-matches&offset=25`
+        )
+    })
+
+    test('getUrlWithLocale returns expected for PLP', () => {
+        const location = new URL('http://localhost:3000/it-IT/category/newarrivals-womens')
+
+        window.location = location
+
+        const relativeUrl = getUrlWithLocale('fr-FR')
+        expect(relativeUrl).toEqual(`/fr-FR/category/newarrivals-womens`)
+    })
+
+    test('getUrlWithLocale returns expected for Homepage', () => {
+        const location = new URL('http://localhost:3000/it-IT/')
+
+        window.location = location
+
+        const relativeUrl = getUrlWithLocale('fr-FR')
+        expect(relativeUrl).toEqual(`/fr-FR`)
+    })
+
+    test('getUrlWithLocale returns expected for Homepage with Default locale', () => {
+        const location = new URL('http://localhost:3000/it-IT/')
+
+        window.location = location
+
+        const relativeUrl = getUrlWithLocale(DEFAULT_LOCALE)
+        expect(relativeUrl).toEqual(`/`)
+    })
+
+    test('getUrlWithLocale returns expected for Homepage without trailing slash', () => {
+        const location = new URL('http://localhost:3000/it-IT')
+
+        window.location = location
+
+        const relativeUrl = getUrlWithLocale(DEFAULT_LOCALE)
+        expect(relativeUrl).toEqual(`/`)
     })
 })
 
@@ -112,27 +183,5 @@ describe('removeQueryParamsFromPath test', () => {
         const url = '/en/product/25501032M?color=black&size=M&something=123'
         const updatedUrl = removeQueryParamsFromPath(url, ['color', 'size'])
         expect(updatedUrl).toEqual('/en/product/25501032M?something=123')
-    })
-})
-
-describe('buildUrlLocale test', () => {
-    const homepageURL = new URL('http://localhost/')
-    const nonDefaultLocale = SUPPORTED_LOCALES.find((locale) => locale !== DEFAULT_LOCALE)
-
-    test('homepage - if given default locale, the result is just `/`', () => {
-        const pathname = buildUrlLocale(DEFAULT_LOCALE, {location: homepageURL})
-        expect(pathname).toEqual('/')
-    })
-
-    test('homepage - if given non-default locale, the result has locale code in it', () => {
-        const pathname = buildUrlLocale(nonDefaultLocale, {location: homepageURL})
-        expect(pathname).toEqual(`/${nonDefaultLocale}/`)
-    })
-
-    test('other pages - the result has a different locale code', () => {
-        const pathname = buildUrlLocale(nonDefaultLocale, {
-            location: new URL(`http://localhost:3000/${DEFAULT_LOCALE}/category/newarrivals`)
-        })
-        expect(pathname).toEqual(`/${nonDefaultLocale}/category/newarrivals`)
     })
 })

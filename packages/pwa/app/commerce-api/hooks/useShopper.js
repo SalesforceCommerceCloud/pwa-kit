@@ -13,9 +13,10 @@ import useCustomer from './useCustomer'
  * when the app loads on the client-side. Should only be use at top-level of app.
  * @returns {Object} - customer and basket objects
  */
-const useShopper = () => {
+const useShopper = (opts = {}) => {
+    const {currency} = opts
     const customer = useCustomer()
-    const basket = useBasket()
+    const basket = useBasket({currency})
 
     // Create or restore the user session upon mounting
     useEffect(() => {

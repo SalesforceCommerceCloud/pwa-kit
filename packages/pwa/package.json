@@ -92,6 +92,7 @@
         "@peculiar/webcrypto": "^1.1.6",
         "@testing-library/jest-dom": "5.11.9",
         "@testing-library/react": "^11.2.5",
+        "@testing-library/react-hooks": "^7.0.2",
         "@testing-library/user-event": "^12.8.1",
         "babel-eslint": "^10.1.0",
         "babel-jest": "^26.6.3",
@@ -183,12 +184,34 @@
         "last 4 ChromeAndroid versions"
     ],
     "l10n": {
+        "supportedCurrencies": [
+            "GBP",
+            "EUR",
+            "CNY",
+            "JPY"
+        ],
+        "defaultCurrency": "GBP",
         "supportedLocales": [
-            "en-GB",
-            "fr-FR",
-            "it-IT",
-            "zh-CN",
-            "ja-JP"
+            {
+                "id": "en-GB",
+                "preferredCurrency": "GBP"
+            },
+            {
+                "id": "fr-FR",
+                "preferredCurrency": "EUR"
+            },
+            {
+                "id": "it-IT",
+                "preferredCurrency": "EUR"
+            },
+            {
+                "id": "zh-CN",
+                "preferredCurrency": "CNY"
+            },
+            {
+                "id": "ja-JP",
+                "preferredCurrency": "JPY"
+            }
         ],
         "defaultLocale": "en-GB"
     }

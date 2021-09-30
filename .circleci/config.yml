@@ -1,6 +1,7 @@
 version: 2.1
 orbs:
   slack: circleci/slack@3.2.0
+  win: circleci/windows@2.4.1
 
 commands:
   setup:
@@ -20,6 +21,7 @@ commands:
       - run:
           name: 'Install Dependencies'
           command: |
+
             # Add Chrome to apt sources
             wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
             sudo sh -c 'echo "deb http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list'
@@ -61,7 +63,22 @@ commands:
           key: npm-cache
           paths:
             - /root/.npm
+  setup_windows:
+    description: 'Setup Machine'
+    steps:
+      - restore_cache:
+          keys:
+            - npm-cache
+      - run:
+          name: 'Install Dependencies'
+          command: |
 
+            # Install node dependencies
+            npm ci
+      - save_cache:
+          key: npm-cache
+          paths:
+            - /root/.npm
   runtests:
     description: 'Run tests'
     parameters:
@@ -77,13 +94,14 @@ commands:
       - run:
           name: 'Run tests'
           command: |
+            # Explicitly set pipefile policy. This is the default for non-windows, but seems
+            # that is needs to be set on windows to fail immediately.
+            set -eo pipefail
+
             cd << parameters.cwd >>
 
             # Note: Each of these test commands need to be exposed on the monorepo
             # root and *also* on the PWA package. This section is run on both.
-
-            # Ensure bundlesize is in check
-            npm run test:max-file-size
 
             # Always run fast unit tests
             npm run test
@@ -150,6 +168,15 @@ jobs:
       - slack/status:
           fail_only: true
           only_for_branches: develop
+  testNode14Windows:
+    executor:
+      name: win/default
+      size: "large"
+      shell: bash.exe
+    steps:
+      - checkout
+      - setup_windows
+      - runtests
   testNode14:
     docker:
       - image: circleci/node:14-stretch-browsers
@@ -278,6 +305,7 @@ workflows:
     jobs:
       - testNode12
       - testNode14
+      - testNode14Windows
       - generatedSFCCProjectTest
   nightly-build:
     triggers:
@@ -291,6 +319,8 @@ workflows:
       - testNode12:
           context: nightly-build
       - testNode14:
+          context: nightly-build
+      - testNode14Windows:
           context: nightly-build
       - generatedSFCCProjectTest:
           context: nightly-build

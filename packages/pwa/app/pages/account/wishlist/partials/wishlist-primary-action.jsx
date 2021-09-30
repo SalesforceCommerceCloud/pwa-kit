@@ -8,16 +8,17 @@ import React, {useState} from 'react'
 import {Button} from '@chakra-ui/react'
 import useBasket from '../../../../commerce-api/hooks/useBasket'
 import {useIntl} from 'react-intl'
-import {useCartItemVariant} from '../../../../components/cart-item-variant'
+import {useItemVariant} from '../../../../components/item-variant'
 import {useToast} from '../../../../hooks/use-toast'
 import {API_ERROR_MESSAGE} from '../../../../constants'
 
 /**
  * Renders primary action on a product-item card in the form of a button.
- * Represents the most prominent action you want the user to perform with the product-item (eg.: Add to cart option for wishlist items)
+ * Represents the most prominent action you want the user to perform with the product-item
+ * eg.: Add to cart option for wishlist items
  */
 const WishlistPrimaryAction = () => {
-    const variant = useCartItemVariant()
+    const variant = useItemVariant()
     const basket = useBasket()
     const {formatMessage} = useIntl()
     const isMasterProduct = variant?.type?.master || false

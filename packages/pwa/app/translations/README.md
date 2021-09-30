@@ -13,9 +13,11 @@ Several **npm scripts** are available to you that make it easier to use the CLI 
 
 ### Supported Locales and Default Locale
 
-The supported locales and default locale settings are defined in `pwa/package.json` in an object called `l10n`.
+The supported locales, default locale and currency settings are defined in `pwa/package.json` in an object called `l10n`.
 
-The strings in `l10n.supportedLocales` and `l10n.defaultLocale` follow the format supported by OCAPI and Commerce API: `<language code>-<country code>` as defined in this InfoCenter topic: [OCAPI localization 21.8](https://documentation.b2c.commercecloud.salesforce.com/DOC1/topic/com.demandware.dochelp/OCAPI/current/usage/Localization.html).
+The strings in `l10n.supportedLocales[n].id` and `l10n.defaultLocale` follow the format supported by OCAPI and Commerce API: `<language code>-<country code>` as defined in this InfoCenter topic: [OCAPI localization 21.8](https://documentation.b2c.commercecloud.salesforce.com/DOC1/topic/com.demandware.dochelp/OCAPI/current/usage/Localization.html).
+
+The currency code in `l10n.supportedCurrencies` and `l10n.supportedLocales[n].preferredCurrency` follow the ISO 4217 standard.
 
 **Important**: The supported locales and default locale settings in `pwa/package.json` must match the locale settings for your B2C Commerce instance. For more information about configuring locales on a B2C Commerce instance, see this InfoCenter topic: [Configure Site Locales](https://documentation.b2c.commercecloud.salesforce.com/DOC2/topic/com.demandware.dochelp/content/b2c_commerce/topics/admin/b2c_configuring_site_locales.html).
 
@@ -23,15 +25,37 @@ Here’s the default locale configuration in `pwa/package.json`:
 
 ```
 "l10n": {
-        "supportedLocales": [
-            "en-GB",
-            "fr-FR",
-            "it-IT",
-            "zh-CN",
-            "ja-JP"
-        ],
-        "defaultLocale": "en-GB"
-    }
+    "supportedCurrencies": [
+        "GBP",
+        "EUR",
+        "CNY",
+        "JPY"
+    ],
+    "defaultCurrency": "GBP",
+    "supportedLocales": [
+        {
+            "id": "en-GB",
+            "preferredCurrency": "GBP"
+        },
+        {
+            "id": "fr-FR",
+            "preferredCurrency": "EUR"
+        },
+        {
+            "id": "it-IT",
+            "preferredCurrency": "EUR"
+        },
+        {
+            "id": "zh-CN",
+            "preferredCurrency": "CNY"
+        },
+        {
+            "id": "ja-JP",
+            "preferredCurrency": "JPY"
+        }
+    ],
+    "defaultLocale": "en-GB"
+}
 ```
 
 ### Formatting Messages

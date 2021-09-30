@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React from 'react'
+import React, {useState} from 'react'
 import PropTypes from 'prop-types'
 import {
     Box,
@@ -29,11 +29,12 @@ import SocialIcons from '../social-icons'
 import {HideOnDesktop, HideOnMobile} from '../responsive'
 import {defaultLocaleMessages} from '../_app'
 import {SUPPORTED_LOCALES} from '../../constants'
-import {buildUrlLocale} from '../../utils/url'
+import {getUrlWithLocale} from '../../utils/url'
 
 const Footer = ({...otherProps}) => {
     const styles = useMultiStyleConfig('Footer')
     const intl = useIntl()
+    const [locale, setLocale] = useState(intl.locale)
 
     return (
         <Box as="footer" {...styles.container} {...otherProps}>
@@ -125,18 +126,23 @@ const Footer = ({...otherProps}) => {
                             {...otherProps}
                         >
                             <Select
-                                value={intl.locale}
+                                value={locale}
                                 onChange={({target}) => {
+                                    setLocale(target.value)
+
                                     // Update the `locale` in the URL.
-                                    const newUrl = buildUrlLocale(target.value)
+                                    const newUrl = getUrlWithLocale(target.value, {
+                                        disallowParams: ['refine']
+                                    })
+
                                     window.location = newUrl
                                 }}
                                 variant="filled"
                                 {...styles.localeDropdown}
                             >
                                 {SUPPORTED_LOCALES.map((locale) => (
-                                    <option key={locale} value={locale}>
-                                        {intl.formatMessage(defaultLocaleMessages[locale])}
+                                    <option key={locale.id} value={locale.id}>
+                                        {intl.formatMessage(defaultLocaleMessages[locale.id])}
                                     </option>
                                 ))}
                             </Select>
