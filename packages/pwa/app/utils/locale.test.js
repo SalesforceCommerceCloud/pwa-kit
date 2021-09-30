@@ -10,7 +10,7 @@ import {
     getTargetLocale,
     loadLocaleData,
     getLocaleConfig,
-    getCurrency
+    getPreferredCurrency
 } from './locale'
 
 import {SUPPORTED_LOCALES, DEFAULT_LOCALE} from '../constants'
@@ -114,12 +114,12 @@ describe('getLocaleConfig', () => {
 
 describe('getCurrency', () => {
     test('returns the preferred currency for a supported locale', () => {
-        const currency = getCurrency(supportedLocale.id)
+        const currency = getPreferredCurrency(supportedLocale.id)
         expect(currency).toBe(SUPPORTED_LOCALES[0].preferredCurrency)
     })
 
     test('returns undefined for a unsupported locale', () => {
-        const currency = getCurrency(nonSupportedLocale)
+        const currency = getPreferredCurrency(nonSupportedLocale)
         expect(currency).toBeFalsy()
     })
 })

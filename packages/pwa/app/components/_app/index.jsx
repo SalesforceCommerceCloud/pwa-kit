@@ -40,7 +40,7 @@ import {defineMessages, IntlProvider} from 'react-intl'
 // Others
 import {watchOnlineStatus, flatten} from '../../utils/utils'
 import {homeUrlBuilder} from '../../utils/url'
-import {getLocaleConfig, getCurrency} from '../../utils/locale'
+import {getLocaleConfig, getPreferredCurrency} from '../../utils/locale'
 import {DEFAULT_CURRENCY, HOME_HREF} from '../../constants'
 
 import Seo from '../seo'
@@ -80,7 +80,7 @@ const App = (props) => {
     const isCheckout = /\/checkout$/.test(location?.pathname)
 
     // Get the current currency to be used throught the app
-    const currency = getCurrency(targetLocale) || DEFAULT_CURRENCY
+    const currency = getPreferredCurrency(targetLocale) || DEFAULT_CURRENCY
 
     // Set up customer and basket
     useShopper({currency})
