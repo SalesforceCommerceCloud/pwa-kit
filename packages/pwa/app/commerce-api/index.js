@@ -13,7 +13,6 @@ import OcapiShopperOrders from './ocapi-shopper-orders'
 import {getTenantId, isError, isTokenValid} from './utils'
 import Auth from './auth'
 import EinsteinAPI from './einstein'
-import {DEFAULT_LOCALE} from '../constants'
 
 /**
  * The configuration details for the connecting to the API.
@@ -78,14 +77,31 @@ class CommerceAPI {
         }
 
         const apiConfigs = {
-            shopperCustomers: {api: sdk.ShopperCustomers, canLocalize: false},
-            shopperBaskets: {api: OcapiShopperBaskets, canLocalize: false},
-            shopperGiftCertificates: {api: sdk.ShopperGiftCertificates, canLocalize: true},
-            shopperLogin: {api: sdk.ShopperLogin, canLocalize: false},
-            shopperOrders: {api: OcapiShopperOrders, canLocalize: true},
-            shopperProducts: {api: sdk.ShopperProducts, canLocalize: true},
-            shopperPromotions: {api: sdk.ShopperPromotions, canLocalize: true},
-            shopperSearch: {api: sdk.ShopperSearch, canLocalize: true}
+            shopperCustomers: {
+                api: sdk.ShopperCustomers,
+                sendLocale: false
+            },
+            shopperBaskets: {
+                api: OcapiShopperBaskets,
+                sendLocale: false,
+                sendCurrency: ['createBasket']
+            },
+            shopperGiftCertificates: {
+                api: sdk.ShopperGiftCertificates
+            },
+            shopperLogin: {api: sdk.ShopperLogin, sendLocale: false},
+            shopperOrders: {api: OcapiShopperOrders},
+            shopperProducts: {
+                api: sdk.ShopperProducts,
+                sendCurrency: ['getProduct', 'getProducts']
+            },
+            shopperPromotions: {
+                api: sdk.ShopperPromotions
+            },
+            shopperSearch: {
+                api: sdk.ShopperSearch,
+                sendCurrency: ['productSearch', 'getSearchSuggestions']
+            }
         }
 
         // Instantiate the SDK class proxies and create getters from our api mapping.
@@ -101,25 +117,42 @@ class CommerceAPI {
                     get: function(obj, prop) {
                         if (typeof obj[prop] === 'function') {
                             return (...args) => {
-                                const {locale} = self._config
+                                const {locale, currency} = self._config
 
                                 if (args[0].ignoreHooks) {
                                     return obj[prop](...args)
                                 }
 
                                 return self.willSendRequest(prop, ...args).then((newArgs) => {
-                                    // Inject the locale to the API call via it's parameters.
+                                    let {sendLocale = true, sendCurrency = false} = apiConfigs[key]
+
+                                    // By default we send the local param and don't send the currency param.
+                                    // You can modify when these are send by using a boolean value send the
+                                    // currency/locale for all calls for a given API, or define an array listing
+                                    // the API's methods you want the currency/locale information to be sent.
+                                    sendLocale = Array.isArray(sendLocale)
+                                        ? sendLocale.includes(prop)
+                                        : !!sendLocale
+                                    sendCurrency = Array.isArray(sendCurrency)
+                                        ? sendCurrency.includes(prop)
+                                        : !!sendCurrency
+
+                                    // Ensure we don't send the pseudo locale.
+                                    if (locale !== 'en-XB') {
+                                        sendLocale = false
+                                    }
+
+                                    // Inject the locale and currency to the API call via it's parameters.
                                     //
                                     // NOTE: The commerce sdk isomorphic will complain if you pass parameters to
-                                    // it that it doesn't expect, this is why we only add the local to some of
-                                    // the API calls.
+                                    // it that it doesn't expect, this is why we only add the locale and currency
+                                    // to some of the API calls.
                                     // We use the default locale for the API calls when running the app using the
                                     // pseudo locale 'en-XB'.
-                                    if (apiConfigs[key].canLocalize) {
-                                        newArgs[0].parameters = {
-                                            ...newArgs[0].parameters,
-                                            ...(!locale || locale === 'en-XB' ? {} : {locale})
-                                        }
+                                    newArgs[0].parameters = {
+                                        ...newArgs[0].parameters,
+                                        ...(sendLocale ? {locale} : {}),
+                                        ...(sendCurrency ? {currency} : {})
                                     }
 
                                     return obj[prop](...newArgs).then((res) =>

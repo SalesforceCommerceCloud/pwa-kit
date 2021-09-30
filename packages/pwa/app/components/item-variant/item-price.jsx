@@ -10,15 +10,16 @@ import {FormattedMessage, FormattedNumber} from 'react-intl'
 import {Stack, Text} from '@chakra-ui/react'
 import useBasket from '../../commerce-api/hooks/useBasket'
 import {useItemVariant} from '.'
-import {DEFAULT_CURRENCY} from '../../constants'
 import {HideOnDesktop, HideOnMobile} from '../responsive'
+import {useCurrency} from '../../hooks'
 
 const PricePerItem = ({currency, basket, basePrice}) => {
+    const {currency: activeCurrency} = useCurrency()
     return (
         <Text fontSize={{base: '12px', lg: '14px'}}>
             <FormattedNumber
                 style="currency"
-                currency={currency || basket.currency || DEFAULT_CURRENCY}
+                currency={currency || basket.currency || activeCurrency}
                 value={basePrice}
             />
             <FormattedMessage
@@ -42,6 +43,7 @@ PricePerItem.propTypes = {
 const ItemPrice = ({currency, align = 'right', baseDirection = 'column', ...props}) => {
     const variant = useItemVariant()
     const basket = useBasket()
+    const {currency: activeCurrency} = useCurrency()
 
     const {price, basePrice, priceAfterItemDiscount} = variant
 
@@ -67,7 +69,7 @@ const ItemPrice = ({currency, align = 'right', baseDirection = 'column', ...prop
             <Text fontWeight="bold" lineHeight={{base: '0.5', lg: '24px'}}>
                 <FormattedNumber
                     style="currency"
-                    currency={currency || basket.currency || DEFAULT_CURRENCY}
+                    currency={currency || basket.currency || activeCurrency}
                     value={displayPrice}
                 />
                 {hasDiscount && (
@@ -81,7 +83,7 @@ const ItemPrice = ({currency, align = 'right', baseDirection = 'column', ...prop
                     >
                         <FormattedNumber
                             style="currency"
-                            currency={currency || basket.currency || DEFAULT_CURRENCY}
+                            currency={currency || basket.currency || activeCurrency}
                             value={price}
                         />
                     </Text>
