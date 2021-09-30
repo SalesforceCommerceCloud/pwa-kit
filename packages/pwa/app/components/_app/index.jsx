@@ -180,9 +180,9 @@ const App = (props) => {
                             {SUPPORTED_LOCALES.map((locale) => (
                                 <link
                                     rel="alternate"
-                                    hrefLang={locale.toLowerCase()}
-                                    href={`${appOrigin}${getUrlWithLocale(locale)}`}
-                                    key={locale}
+                                    hrefLang={locale.id.toLowerCase()}
+                                    href={`${appOrigin}${getUrlWithLocale(locale.id)}`}
+                                    key={locale.id}
                                 />
                             ))}
                             {/* A general locale as fallback. For example: "en" if default locale is "en-GB" */}
