@@ -9,6 +9,7 @@
 // is no configuration found.
 import pwakitConfig from 'pwa-kit-config'
 import {defineMessages} from 'react-intl'
+import AppConfig from '../ssr/universal/components/_app-config'
 
 const SUPPORTED_LOCALES = pwakitConfig.l10n.supportedLocales
 const DEFAULT_LOCALE = pwakitConfig.l10n.defaultLocale
@@ -52,21 +53,9 @@ export const loadLocaleData = async (locale) => {
         localeToLoad = DEFAULT_LOCALE
     }
 
-    let module
-    try {
-        // TODO: This import doesn't work. It also causes a warning in webpack.
-        // This is probably a result of use compiling the sdk with webpack and it not being
-        // in the context of the pwa.
-        module = await import(`./app/translations/compiled/${localeToLoad}.json`)
-    } catch (err) {
-        console.error(err)
-        console.log(`Loading the default locale '${DEFAULT_LOCALE}' instead`)
-        // TODO: This import doesn't work. It also causes a warning in webpack.
-        // module = await import(`./app/translations/compiled/${DEFAULT_LOCALE}.json`)
-        module = await import('translation-en-gb')
-    }
-
-    return module.default
+    // TODO: remove AppConfig as a side effect and get it from function param instead
+    const data = await AppConfig.importLocaleData(localeToLoad)
+    return data
 }
 
 /**
@@ -75,6 +64,8 @@ export const loadLocaleData = async (locale) => {
  * @param {function} [options.getUserPreferredLocales] - Identify what set of locales the user prefers
  * @returns {Promise<Object>} The configuration data
  */
+// TODO: this is one of the few functions that we want exported.
+// Most other functions are supposed to be for this file only.
 export const getLocaleConfig = async ({getUserPreferredLocales} = {}) => {
     const preferredLocales = getUserPreferredLocales ? getUserPreferredLocales() : [DEFAULT_LOCALE]
     const targetLocale = getTargetLocale(preferredLocales, SUPPORTED_LOCALES, DEFAULT_LOCALE)
