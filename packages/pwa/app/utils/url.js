@@ -106,10 +106,12 @@ export const searchUrlBuilder = (searchTerm) => `/search?q=${searchTerm}`
  *
  * @param shortCode - The locale short code.
  * @param opts - The options like `disallowParams` an array parameters to remove.
+ * TODO: update jsdoc
  * @returns {string} - The relative URL for the specific locale.
  */
 export const getUrlWithLocale = (shortCode, opts = {}) => {
-    const {location} = window
+    const location = opts.location ? opts.location : window.location
+
     const {disallowParams = []} = opts
     let relativeUrl = location.pathname
 
@@ -137,9 +139,6 @@ export const getUrlWithLocale = (shortCode, opts = {}) => {
 
     return relativeUrl
 }
-
-// Accepts '/', '/en-GB', '/zh-CN/', etc. as homepage
-const isHomepage = (pathname) => /^\/([a-z]{2}-[A-Z]{2})?\/?$/.test(pathname)
 
 /**
  * Builds the Home page URL for a given locale.
