@@ -104,12 +104,15 @@ export const searchUrlBuilder = (searchTerm) => `/search?q=${searchTerm}`
 /**
  * Returns a relative URL for a locale short code.
  *
- * @param shortCode - The locale short code.
- * @param opts - The options like `disallowParams` an array parameters to remove.
+ * @param {string} shortCode - The locale short code.
+ * @param {Object} [opts] - Options, if there's any.
+ * @param {string[]} opts.disallowParams - URL parameters to remove
+ * @param {Object} opts.location - location object to replace the default `window.location`
  * @returns {string} - The relative URL for the specific locale.
  */
 export const getUrlWithLocale = (shortCode, opts = {}) => {
-    const {location} = window
+    const location = opts.location ? opts.location : window.location
+
     const {disallowParams = []} = opts
     let relativeUrl = location.pathname
 
