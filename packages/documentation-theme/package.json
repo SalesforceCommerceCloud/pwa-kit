@@ -23,7 +23,7 @@
     "prismjs": "1.8.4"
   },
   "dependencies": {
-    "commander": "2.13.0",
+    "commander": "2.20.3",
     "fs-extra": "5.0.0",
     "glob": "7.1.2",
     "harp": "^0.40.3"
