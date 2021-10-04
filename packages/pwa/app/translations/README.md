@@ -13,7 +13,7 @@ Several **npm scripts** are available to you that make it easier to use the CLI 
 -   To **compile the translations** from all of the locales, run `npm run compile-translations`.
 -   To run both an extract and compile, run `npm run build-translations`
 
-### Supported Locales and Default Locale
+## Supported Locales and Default Locale
 
 The supported locales, default locale and currency settings are defined in `pwa/package.json` in an object called `l10n`.
 
@@ -60,7 +60,7 @@ Here’s the default locale configuration in `pwa/package.json`:
 }
 ```
 
-### Formatting Messages
+## Formatting Messages
 
 To support localization for multiple locales, write messages...
 
@@ -71,7 +71,7 @@ For example, in your React component, you can add formatted messages like `intl.
 
 At the minimum, only defaultMessage is the required parameter. The message id is optional. If you don’t specify it, the id is auto-generated for you.
 
-### Workflow Between Developers and Translation Team
+## Workflow Between Developers and Translation Team
 
 During your development, you extract and compile the messages and pass the generated JSON files to the translation team, as well as using the translated files in the app.
 
@@ -86,13 +86,13 @@ We’ve provided a few npm scripts to help you:
 
 Whenever you do a build, the extract and compile scripts are run automatically in case you forgot to extract the latest messages.
 
-### Testing with a Pseudo Locale
+## Testing with a Pseudo Locale
 
 To check whether you’ve wrapped all of the hardcoded strings with either `intl.formatMessage()` or `<FormattedMessage />` , there’s a quick way to test that by running `npm run start:pseudolocale`. It runs your local dev server with the locale forced to the pseudo locale.
 
 Loading the site in your browser, you can quickly see that those messages that have been formatted have a long `SSS` appended to them.
 
-### Summary
+## Summary
 
 Putting all of the above together, the process for adding a new locale is as follows:
 
@@ -106,11 +106,11 @@ Putting all of the above together, the process for adding a new locale is as fol
 4. Add the new locale's transtions from your translation team to `pwa/app/translations/[locale].json`
 5. Run `npm run compile-translations`
 
-### Tips
+## Tips
 
 Here are a few useful things to know for developers.
 
-#### User-Preferred Locales vs. App-Supported Locales
+### User-Preferred Locales vs. App-Supported Locales
 
 How a locale gets chosen depends on whether there’s a match found between 2 sets of locales. On a high level, it looks like this:
 
@@ -119,12 +119,12 @@ How a locale gets chosen depends on whether there’s a match found between 2 se
 3. If there’s a match between these 2 sets of locales, then the app would use it as the target locale.
 4. Otherwise, the app would fall back to its default locale (which is also defined in `package.json` under `l10n.defaultLocale` ).
 
-#### How to Detect the Active Locale
+### How to Detect the Active Locale
 
 -   Within component render, `useIntl` hook is available to you: `const {locale} = useIntl()`
 -   Within a page’s `getProps` there’s a `params` prop (specifically `params.locale`) coming from the routes that can tell you about which locale is being used in the current page URL.
 
-#### Dynamic Loading of the Translation Files
+### Dynamic Loading of the Translation Files
 
 Using dynamic import, regardless of how many locales the app supports, it would load only one locale at a time.
 
@@ -133,6 +133,6 @@ Initially, on app load, the translated messages are part of the server-rendered 
 -   Each locale is a separate JSON file in the bundle. And it’s served with a 1-year cache header.
 -   When a new bundle is deployed, you must download the JSON files again.
 
-#### Link Component
+### Link Component
 
 The generated project comes with its own `Link` component. It automatically inserts the locale in the URLs for you.
