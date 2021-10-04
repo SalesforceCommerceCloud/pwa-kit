@@ -1,6 +1,6 @@
 {
   "name": "@mobify/test-framework",
-  "version": "1.20.5",
+  "version": "1.20.6",
   "description": "Mobify Platform Test Framwork",
   "main": "index.js",
   "bin": {
@@ -20,7 +20,7 @@
     "deployDocs": "node ./scripts/deployDocs.js"
   },
   "dependencies": {
-    "@mobify/documentation-theme": "^1.20.5",
+    "@mobify/documentation-theme": "^1.20.6",
     "chromedriver": "latest",
     "commander": "2.9.0",
     "lighthouse": "^6.0.0",
