@@ -88,18 +88,6 @@ AppConfig.getUserPreferredLocales = (locals) => {
     return [locale]
 }
 
-AppConfig.importLocaleData = async (locale) => {
-    let module
-    try {
-        module = await import(`../../translations/compiled/${locale}.json`)
-    } catch (err) {
-        console.error(err)
-        console.log(`Loading the default locale '${DEFAULT_LOCALE}' instead`)
-        module = await import(`../../translations/compiled/${DEFAULT_LOCALE}.json`)
-    }
-    return module.default
-}
-
 AppConfig.propTypes = {
     children: PropTypes.node,
     locals: PropTypes.object
