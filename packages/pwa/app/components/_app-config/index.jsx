@@ -21,7 +21,6 @@ import {
 } from '../../commerce-api/contexts'
 import {commerceAPIConfig} from '../../commerce-api.config'
 import {einsteinAPIConfig} from '../../einstein-api.config'
-import {DEFAULT_LOCALE, SUPPORTED_LOCALES} from '../../constants'
 
 const apiConfig = {
     ...commerceAPIConfig,
@@ -74,11 +73,6 @@ AppConfig.extraGetPropsArgs = (locals = {}) => {
 
 AppConfig.getUserPreferredLocales = ({originalUrl}) => {
     let shortCode = originalUrl.split('/')[1].split('?')[0]
-
-    // TODO: The user shouldn't have to define the line below, it should be done in the background.
-    // NOTE: If we are saying locale is going to be in the url why does the user have to define
-    // code to get the locale, we should know how to do that.
-    shortCode = SUPPORTED_LOCALES.includes(shortCode) ? shortCode : DEFAULT_LOCALE
 
     return [shortCode]
 }
