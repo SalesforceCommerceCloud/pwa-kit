@@ -137,16 +137,29 @@ class CommerceAPI {
                                         ? sendCurrency.includes(prop)
                                         : !!sendCurrency
 
-
                                     // Inject the locale and currency to the API call via it's parameters.
                                     //
                                     // NOTE: The commerce sdk isomorphic will complain if you pass parameters to
                                     // it that it doesn't expect, this is why we only add the locale and currency
                                     // to some of the API calls.
-                                    newArgs[0].parameters = {
-                                        ...newArgs[0].parameters,
-                                        ...(sendLocale ? {locale} : {}),
-                                        ...(sendCurrency ? {currency} : {})
+
+                                    const firstArg = newArgs[0]
+                                    if (sendLocale) {
+                                        firstArg.parameters = {
+                                            ...firstArg.parameters,
+                                            ...{locale}
+                                        }
+                                    } else {
+                                        delete firstArg.parameters?.locale
+                                    }
+
+                                    if (sendCurrency) {
+                                        firstArg.parameters = {
+                                            ...firstArg.parameters,
+                                            ...{currency}
+                                        }
+                                    } else {
+                                        delete firstArg.parameters?.currency
                                     }
 
                                     return obj[prop](...newArgs).then((res) =>
