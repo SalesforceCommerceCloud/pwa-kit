@@ -15,13 +15,15 @@ Several **npm scripts** are available to you that make it easier to use the CLI 
 
 ## Supported Locales and Default Locale
 
-The supported locales, default locale and currency settings are defined in `pwa/package.json` in an object called `l10n`.
+The default locale and currency settings are defined in `pwa/package.json` in an object called `l10n`.
 
-The strings in `l10n.supportedLocales[n].id` and `l10n.defaultLocale` follow the format supported by OCAPI and Commerce API: `<language code>-<country code>` as defined in this InfoCenter topic: [OCAPI localization 21.8](https://documentation.b2c.commercecloud.salesforce.com/DOC1/topic/com.demandware.dochelp/OCAPI/current/usage/Localization.html).
+The supported locale are defined in `pwa/app/locale.config.js`.
+
+The locale Ids in `pwa/package.json` and `pwa/app/locale.config.js` follow the format supported by OCAPI and Commerce API: `<language code>-<country code>` as defined in this InfoCenter topic: [OCAPI localization 21.8](https://documentation.b2c.commercecloud.salesforce.com/DOC1/topic/com.demandware.dochelp/OCAPI/current/usage/Localization.html).
 
 The currency code in `l10n.supportedCurrencies` and `l10n.supportedLocales[n].preferredCurrency` follow the ISO 4217 standard.
 
-**Important**: The supported locales and default locale settings in `pwa/package.json` must match the locale settings for your B2C Commerce instance. For more information about configuring locales on a B2C Commerce instance, see this InfoCenter topic: [Configure Site Locales](https://documentation.b2c.commercecloud.salesforce.com/DOC2/topic/com.demandware.dochelp/content/b2c_commerce/topics/admin/b2c_configuring_site_locales.html).
+**Important**: The supported locales and default locale settings in `pwa/package.json` and `pwa/app/locale.config.js` must match the locale settings for your B2C Commerce instance. For more information about configuring locales on a B2C Commerce instance, see this InfoCenter topic: [Configure Site Locales](https://documentation.b2c.commercecloud.salesforce.com/DOC2/topic/com.demandware.dochelp/content/b2c_commerce/topics/admin/b2c_configuring_site_locales.html).
 
 Here’s the default locale configuration in `pwa/package.json`:
 
@@ -34,28 +36,6 @@ Here’s the default locale configuration in `pwa/package.json`:
         "JPY"
     ],
     "defaultCurrency": "GBP",
-    "supportedLocales": [
-        {
-            "id": "en-GB",
-            "preferredCurrency": "GBP"
-        },
-        {
-            "id": "fr-FR",
-            "preferredCurrency": "EUR"
-        },
-        {
-            "id": "it-IT",
-            "preferredCurrency": "EUR"
-        },
-        {
-            "id": "zh-CN",
-            "preferredCurrency": "CNY"
-        },
-        {
-            "id": "ja-JP",
-            "preferredCurrency": "JPY"
-        }
-    ],
     "defaultLocale": "en-GB"
 }
 ```
@@ -97,13 +77,21 @@ Loading the site in your browser, you can quickly see that those messages that h
 Putting all of the above together, the process for adding a new locale is as follows:
 
 1. Enable the new locale in Business Manager of your B2C Commerce instance
+<<<<<<< Updated upstream
 2. Add the new locale to locale.config.js
+=======
+2. Add the new locale to `pwa/app/locale.config.js`
+>>>>>>> Stashed changes
 3. If the new locale is the new default:
     - Update your React components' default messages to the new default locale's language
-    - In locale.config.js, set the new default locale
+    - In `pwa/package.json`, set the new default locale
     - Run `npm run extract-default-translations` to extract the new default locale's translations into `pwa/app/translations/[defaultLocale].json`
     - Send the extracted translations to your translation team
+<<<<<<< Updated upstream
 4. Place the files you receive from your translation team into the `pwa/app/translations/` folder
+=======
+4. Place the files you receive from your translation team into the `pwa/app/translations/[locale].json` folder
+>>>>>>> Stashed changes
 5. Run `npm run compile-translations`
 
 ## Tips
@@ -114,10 +102,10 @@ Here are a few useful things to know for developers.
 
 How a locale gets chosen depends on whether there’s a match found between 2 sets of locales. On a high level, it looks like this:
 
-1. Get the app-supported locales, which are defined in `package.json` (under `l10n.supportedLocales`).
+1. Get the app-supported locales, which are defined in `locale.config.js`.
 2. Get the user-preferred locales, which are what the visitors prefer to see. The developer is responsible for fully implementing them in their own projects within the special `_app` component.
 3. If there’s a match between these 2 sets of locales, then the app would use it as the target locale.
-4. Otherwise, the app would fall back to its default locale (which is also defined in `package.json` under `l10n.defaultLocale` ).
+4. Otherwise, the app would fall back to its default locale (which is defined in `package.json` under `l10n.defaultLocale` ).
 
 ### How to Detect the Active Locale
 
