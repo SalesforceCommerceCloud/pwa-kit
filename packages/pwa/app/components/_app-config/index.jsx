@@ -72,20 +72,15 @@ AppConfig.extraGetPropsArgs = (locals = {}) => {
     }
 }
 
-AppConfig.getUserPreferredLocales = (locals) => {
-    // TODO: `locals` as an argument doesn't seem right think a little bit more about this one.
-    // Like do we need the request object here?
-    const {originalUrl} = locals
+AppConfig.getUserPreferredLocales = ({originalUrl}) => {
+    let shortCode = originalUrl.split('/')[1].split('?')[0]
 
-    const localeUrl = originalUrl && originalUrl.split('/')[1]
+    // TODO: The user shouldn't have to define the line below, it should be done in the background.
+    // NOTE: If we are saying locale is going to be in the url why does the user have to define
+    // code to get the locale, we should know how to do that.
+    shortCode = SUPPORTED_LOCALES.includes(shortCode) ? shortCode : DEFAULT_LOCALE
 
-    const locale = originalUrl
-        ? SUPPORTED_LOCALES.includes(localeUrl)
-            ? localeUrl
-            : DEFAULT_LOCALE
-        : window?.__PRELOADED_STATE__?.appProps?.targetLocale
-
-    return [locale]
+    return [shortCode]
 }
 
 AppConfig.propTypes = {

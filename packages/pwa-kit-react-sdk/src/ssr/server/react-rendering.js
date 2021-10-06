@@ -35,8 +35,10 @@ import sprite from 'svg-sprite-loader/runtime/sprite.build'
 
 import {getLocaleConfig} from '../../utils/locale'
 
-const CWD = process.cwd()
-const BUNDLES_PATH = path.resolve(CWD, 'build/loadable-stats.json')
+const BUILD_DIR = path.resolve(process.cwd(), 'build')
+const BUNDLES_PATH = path.resolve(BUILD_DIR, 'loadable-stats.json')
+
+const TRANSLATIONS_PATH = path.resolve(BUILD_DIR, 'translations')
 
 const VALID_TAG_NAMES = [
     'base',
@@ -176,14 +178,23 @@ export const render = async (req, res) => {
         location
     })
 
-    // Step 4 - Get the App locale config
+    // TODO: The below steps can probably be moved back into a utility file.
+
+    // Step 4a - Get the App locale config
     const localeConfig = await getLocaleConfig({
         getUserPreferredLocales: AppConfig.getUserPreferredLocales.bind(this, {
             originalUrl: req.originalUrl
         })
     })
 
-    // Step 4 - Render the App
+    // Step 4b - Get the messages file.
+    // We use `eval` here to use the native require, otherwise webpack will interfere.
+    const messages = eval('require')(
+        `${TRANSLATIONS_PATH}/${localeConfig.user.preferredLocales[0]}.json`
+    )
+    localeConfig.messages = messages
+
+    // Step 5 - Render the App
     let renderResult
 
     const args = {
@@ -202,7 +213,7 @@ export const render = async (req, res) => {
         renderResult = renderApp({...args, error: logAndFormatError(error)})
     }
 
-    // Step 5 - Determine what is going to happen, redirect, or send html with
+    // Step 6 - Determine what is going to happen, redirect, or send html with
     // the correct status code.
     const {html, routerContext, error} = renderResult
     const redirectUrl = routerContext.url
@@ -283,6 +294,7 @@ const renderApp = (args) => {
     // Do *not* add to these without a very good reason - globals are a liability.
     const windowGlobals = {
         __DEVICE_TYPE__: deviceType,
+        __LOCALE_CONFIG__: localeConfig,
         __PRELOADED_STATE__: appState,
         __ERROR__: error,
         // `window.Progressive` has a long history at Mobify and some

@@ -104,9 +104,6 @@
   "5S2I6Q": {
     "defaultMessage": "Incorrect username or password, please try again."
   },
-  "5ryYe9": {
-    "defaultMessage": "Japanese (Japan)"
-  },
   "5sg7KC": {
     "defaultMessage": "Password"
   },
@@ -151,9 +148,6 @@
   },
   "9rqdrm": {
     "defaultMessage": "Item removed from wishlist"
-  },
-  "A2v4cr": {
-    "defaultMessage": "English (United Kingdom)"
   },
   "A8Tnga": {
     "defaultMessage": "Credit Card"
@@ -359,9 +353,6 @@
   "PNj3WE": {
     "defaultMessage": "Review Order"
   },
-  "PO4nBj": {
-    "defaultMessage": "French (France)"
-  },
   "PRlD0A": {
     "defaultMessage": "Shipping"
   },
@@ -501,9 +492,6 @@
     "defaultMessage": "{itemCount, plural, =0 {0 items} one {# item} other {# items}}",
     "description": "# item(s) in order"
   },
-  "b24hho": {
-    "defaultMessage": "Chinese (China)"
-  },
   "bTjwXj": {
     "defaultMessage": "Welcome Back"
   },
@@ -549,9 +537,6 @@
   },
   "dfEp3Z": {
     "defaultMessage": "Yes, remove item"
-  },
-  "e//rzS": {
-    "defaultMessage": "Italian (Italy)"
   },
   "e6Ph5+": {
     "defaultMessage": "Address"

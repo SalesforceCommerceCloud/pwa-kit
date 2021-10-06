@@ -61,9 +61,7 @@ export const loadLocaleData = async (locale) => {
     } catch (err) {
         console.error(err)
         console.log(`Loading the default locale '${DEFAULT_LOCALE}' instead`)
-        // TODO: This import doesn't work. It also causes a warning in webpack.
-        // module = await import(`./app/translations/compiled/${DEFAULT_LOCALE}.json`)
-        module = await import('translation-en-gb')
+        module = await import(`./app/translations/compiled/${DEFAULT_LOCALE}.json`)
     }
 
     return module.default
@@ -78,7 +76,7 @@ export const loadLocaleData = async (locale) => {
 export const getLocaleConfig = async ({getUserPreferredLocales} = {}) => {
     const preferredLocales = getUserPreferredLocales ? getUserPreferredLocales() : [DEFAULT_LOCALE]
     const targetLocale = getTargetLocale(preferredLocales, SUPPORTED_LOCALES, DEFAULT_LOCALE)
-    const messages = await loadLocaleData(targetLocale)
+    // const messages = await loadLocaleData(targetLocale)
 
     // TODO: Lets revisit this object structure.
     return {
@@ -89,8 +87,9 @@ export const getLocaleConfig = async ({getUserPreferredLocales} = {}) => {
         },
         user: {
             preferredLocales
-        },
-        messages
+        }
+        // ,
+        // messages
     }
 }
 
