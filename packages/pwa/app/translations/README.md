@@ -55,16 +55,18 @@ At the minimum, only defaultMessage is the required parameter. The message id is
 
 During your development, you extract and compile the messages and pass the generated JSON files to the translation team, as well as using the translated files in the app.
 
-We’ve provided a few npm scripts to help you:
+We’ve provided a the following npm scripts to help you:
 
--   `npm run extract-default-translations` to extract the default messages
-    -   so you don’t have to create the JSON file yourself by hand
--   `npm run compile-translations` to compile all locales into Abstract Syntax Tree (AST) format
-    -   `react-intl` can use this AST format to bypass the parsing step and thus, save a bit of time.
--   `npm run build-translations` to run both of the above
+-   `npm run build-translations` to extract and compile default messages into the default locale
     -   run this whenever you add a new formatted message to your components to update the default locale's translations
 
-Whenever you do a build, the extract and compile scripts are run automatically in case you forgot to extract the latest messages.
+The above script can be further broken down into two sub scripts:
+
+-   `npm run extract-default-translations` to extract the default messages
+-   `npm run compile-translations` to compile all translation files in the `pwa/app/translations/` folder into Abstract Syntax Tree (AST) format
+    -   `react-intl` can use this AST format to bypass the parsing step and thus, save a bit of time.
+
+Whenever you run `npm run prod:build`, `build-translations` is run automatically in case you forgot to extract the latest messages.
 
 ## Testing with a Pseudo Locale
 
@@ -77,21 +79,13 @@ Loading the site in your browser, you can quickly see that those messages that h
 Putting all of the above together, the process for adding a new locale is as follows:
 
 1. Enable the new locale in Business Manager of your B2C Commerce instance
-<<<<<<< Updated upstream
-2. Add the new locale to locale.config.js
-=======
 2. Add the new locale to `pwa/app/locale.config.js`
->>>>>>> Stashed changes
-3. If the new locale is the new default:
+3. If the new locale is your new default locale:
     - Update your React components' default messages to the new default locale's language
     - In `pwa/package.json`, set the new default locale
     - Run `npm run extract-default-translations` to extract the new default locale's translations into `pwa/app/translations/[defaultLocale].json`
     - Send the extracted translations to your translation team
-<<<<<<< Updated upstream
 4. Place the files you receive from your translation team into the `pwa/app/translations/` folder
-=======
-4. Place the files you receive from your translation team into the `pwa/app/translations/[locale].json` folder
->>>>>>> Stashed changes
 5. Run `npm run compile-translations`
 
 ## Tips
