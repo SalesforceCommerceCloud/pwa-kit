@@ -103,7 +103,7 @@ Putting all of the above together, the process for adding a new locale is as fol
     - In locale.config.js, set the new default locale
     - Run `npm run extract-default-translations` to extract the new default locale's translations into `pwa/app/translations/[defaultLocale].json`
     - Send the extracted translations to your translation team
-4. Add the new locale's transtions from your translation team to `pwa/app/translations/[locale].json`
+4. Place the files you receive from your translation team into the `pwa/app/translations/` folder
 5. Run `npm run compile-translations`
 
 ## Tips
