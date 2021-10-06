@@ -96,7 +96,7 @@ Loading the site in your browser, you can quickly see that those messages that h
 
 Putting all of the above together, the process for adding a new locale is as follows:
 
-1. Enable the new locale in your B2C Commerce instance
+1. Enable the new locale in Business Manager of your B2C Commerce instance
 2. Add the new locale to locale.config.js
 3. If the new locale is the new default:
     - Update your React components' default messages to the new default locale's language
