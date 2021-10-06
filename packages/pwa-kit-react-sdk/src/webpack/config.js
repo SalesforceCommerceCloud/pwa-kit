@@ -44,13 +44,7 @@ const buildMarkerPlugin = new BuildMarkerPlugin({
 })
 
 const replacements = [
-    // This is a hack until we get those dynamic imports working.
-    {
-        path: join('translation-en-gb'),
-        newPath: resolve('.', 'app', 'translations', 'compiled', 'en-GB.json')
-    },
     // TODO: This is a hack, a better idea might be to provide a util to getting the config values 🤷🏻‍♂️
-
     {
         path: join('pwa-kit-config'),
         newPath: resolve('.', 'app', 'pwa-kit-config.json')
