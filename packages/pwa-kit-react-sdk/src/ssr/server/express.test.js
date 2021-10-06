@@ -22,7 +22,6 @@ jest.mock('../static/assets.json', () => mockStaticAssets, {virtual: true})
 const {
     RESOLVED_PROMISE,
     REMOTE_REQUIRED_ENV_VARS,
-    POWERED_BY,
     NO_CACHE,
     generateCacheKey,
     createApp,
