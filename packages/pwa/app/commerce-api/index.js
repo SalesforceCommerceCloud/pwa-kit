@@ -137,22 +137,29 @@ class CommerceAPI {
                                         ? sendCurrency.includes(prop)
                                         : !!sendCurrency
 
-                                    // Ensure we don't send the pseudo locale.
-                                    if (locale === 'en-XB') {
-                                        sendLocale = false
-                                    }
-
                                     // Inject the locale and currency to the API call via it's parameters.
                                     //
                                     // NOTE: The commerce sdk isomorphic will complain if you pass parameters to
                                     // it that it doesn't expect, this is why we only add the locale and currency
                                     // to some of the API calls.
-                                    // We use the default locale for the API calls when running the app using the
-                                    // pseudo locale 'en-XB'.
-                                    newArgs[0].parameters = {
-                                        ...newArgs[0].parameters,
-                                        ...(sendLocale ? {locale} : {}),
-                                        ...(sendCurrency ? {currency} : {})
+
+                                    const firstArg = newArgs[0]
+                                    if (sendLocale) {
+                                        firstArg.parameters = {
+                                            ...firstArg.parameters,
+                                            ...{locale}
+                                        }
+                                    } else {
+                                        delete firstArg.parameters?.locale
+                                    }
+
+                                    if (sendCurrency) {
+                                        firstArg.parameters = {
+                                            ...firstArg.parameters,
+                                            ...{currency}
+                                        }
+                                    } else {
+                                        delete firstArg.parameters?.currency
                                     }
 
                                     return obj[prop](...newArgs).then((res) =>
