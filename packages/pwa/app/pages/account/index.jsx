@@ -46,6 +46,7 @@ const Account = () => {
     const {locale} = useIntl()
     const location = useLocation()
     const navigate = useNavigation()
+    console.log('path', path)
 
     const [mobileNavIndex, setMobileNavIndex] = useState(-1)
     const [showLoading, setShowLoading] = useState(false)
