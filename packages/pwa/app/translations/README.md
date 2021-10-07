@@ -15,7 +15,7 @@ Several **npm scripts** are available to you that make it easier to use the CLI 
 
 ## Supported Locales and Default Locale
 
-The default locale, suppoted locales, and currency settings are defined in `pwa/package.json` in an object called `l10n`.
+The default locale, supported locales, and currency settings are defined in `pwa/package.json` in an object called `l10n`.
 
 The locale ids in `pwa/package.json` follow the format supported by OCAPI and Commerce API: `<language code>-<country code>` as defined in this InfoCenter topic: [OCAPI localization 21.8](https://documentation.b2c.commercecloud.salesforce.com/DOC1/topic/com.demandware.dochelp/OCAPI/current/usage/Localization.html).
 
