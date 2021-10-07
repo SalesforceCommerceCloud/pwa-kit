@@ -85,7 +85,7 @@ export const buildUrlSet = (url = '', key = '', values = [], extraParams = {}) =
  * @returns {string}
  */
 export const categoryUrlBuilder = (category, locale = DEFAULT_LOCALE) =>
-    encodeURI(buildRoutePath(`/${locale}/category/${category.id}`, pwaKitConfig.multiSite))
+    encodeURI(buildMultiSiteRoute(`/${locale}/category/${category.id}`))
 
 /**
  * Given a product and the current locale returns an href to the product detail page.
@@ -95,7 +95,7 @@ export const categoryUrlBuilder = (category, locale = DEFAULT_LOCALE) =>
  * @returns {string}
  */
 export const productUrlBuilder = (product, locale) =>
-    encodeURI(buildRoutePath(`/${locale}/product/${product.id}`, pwaKitConfig.multiSite))
+    encodeURI(buildMultiSiteRoute(`/${locale}/product/${product.id}`))
 
 /**
  * Given a search term, contructs a search url.
@@ -158,12 +158,7 @@ export const getUrlWithLocale = (shortCode, opts = {}) => {
  * @returns {string}
  */
 export const homeUrlBuilder = (homeHref, locale) =>
-    encodeURI(
-        buildRoutePath(
-            `${homeHref}${locale !== DEFAULT_LOCALE ? locale + '/' : ''}`,
-            pwaKitConfig.multiSite
-        )
-    )
+    encodeURI(buildMultiSiteRoute(`${homeHref}${locale !== DEFAULT_LOCALE ? locale + '/' : ''}`))
 
 /*
  * Remove query params from a give url path based on a given list of keys
@@ -200,7 +195,7 @@ export const removeQueryParamsFromPath = (path, keys) => {
 }
 
 /**
- * Build a route with/without siteIdAlias based on multisite config
+ * Build a route  based on the project configuration (pwa-kit.config.json)
  * This function can potentially be expanded to build route with other params like locale
  * @param path
  * @param opts
@@ -208,15 +203,13 @@ export const removeQueryParamsFromPath = (path, keys) => {
  */
 const buildRoutePath = (path, opts = {}) => {
     const {withSiteIdAlias} = opts
-    // console.log('siteIdAlias', siteIdAlias)
-    // console.log('withSiteIdAlias', withSiteIdAlias)
 
     const newPath = `${withSiteIdAlias ? `/${siteIdAlias}` : ''}${path}`
-    // console.log('test', test)
     return newPath
 }
 
 /**
+ * a function that pass multiSite config to buildRoutePath so it can be used in other places
  * @param path
  * @returns {string}
  */

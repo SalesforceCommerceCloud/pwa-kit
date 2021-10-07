@@ -148,7 +148,7 @@ const AddToCartModal = ({product, variant, quantity, isOpen, onClose, ...props})
                             <Stack spacing="4">
                                 <Button
                                     as={Link}
-                                    to={buildMultiSiteRoute(`/${locale}/cart`)}
+                                    to={`/${locale}/cart`}
                                     width="100%"
                                     variant="solid"
                                 >
@@ -159,7 +159,7 @@ const AddToCartModal = ({product, variant, quantity, isOpen, onClose, ...props})
 
                                 <Button
                                     as={Link}
-                                    to={buildMultiSiteRoute(`/${locale}/checkout`)}
+                                    to={`/${locale}/checkout`}
                                     width="100%"
                                     variant="outline"
                                     rightIcon={<LockIcon />}
