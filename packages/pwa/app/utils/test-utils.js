@@ -18,6 +18,7 @@ import {
     CustomerProvider,
     CustomerProductListsProvider
 } from '../commerce-api/contexts'
+import {useAddToCartModal, AddToCartModalContext} from '../hooks/use-add-to-cart-modal'
 import {commerceAPIConfig} from '../commerce-api.config'
 import {IntlProvider} from 'react-intl'
 import {DEFAULT_LOCALE, DEFAULT_CURRENCY} from '../constants'
@@ -92,6 +93,8 @@ export const TestProviders = ({
         _setBasket(data)
     })
 
+    const addToCartModal = useAddToCartModal()
+
     return (
         <IntlProvider locale={DEFAULT_LOCALE} defaultLocale={DEFAULT_LOCALE}>
             <CommerceAPIProvider value={api}>
@@ -101,7 +104,11 @@ export const TestProviders = ({
                             <BasketProvider value={{basket, setBasket}}>
                                 <CustomerProductListsProvider>
                                     <Router>
-                                        <ChakraProvider theme={theme}>{children}</ChakraProvider>
+                                        <ChakraProvider theme={theme}>
+                                            <AddToCartModalContext.Provider value={addToCartModal}>
+                                                {children}
+                                            </AddToCartModalContext.Provider>
+                                        </ChakraProvider>
                                     </Router>
                                 </CustomerProductListsProvider>
                             </BasketProvider>
