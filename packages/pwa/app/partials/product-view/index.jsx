@@ -102,6 +102,7 @@ const ProductView = ({
         stockLevel,
         stepQuantity
     } = useProduct(product)
+    console.log(product)
     const canAddToWishlist = !isProductLoading
     const canOrder =
         !isProductLoading &&
@@ -248,7 +249,7 @@ const ProductView = ({
                                         selectedValue,
                                         values = []
                                     } = variationAttribute
-
+                                    console.log(variationAttribute)
                                     return (
                                         <SwatchGroup
                                             key={id}
