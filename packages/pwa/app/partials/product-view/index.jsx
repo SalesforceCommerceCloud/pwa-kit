@@ -8,22 +8,11 @@
 import React, {useEffect} from 'react'
 import PropTypes from 'prop-types'
 import {useHistory, useLocation} from 'react-router-dom'
-import {FormattedMessage, useIntl} from 'react-intl'
+import {useIntl} from 'react-intl'
 
-import {
-    Flex,
-    Heading,
-    Button,
-    Skeleton,
-    Box,
-    Text,
-    VStack,
-    Fade,
-    useDisclosure,
-    useTheme
-} from '@chakra-ui/react'
-
+import {Flex, Heading, Button, Skeleton, Box, Text, VStack, Fade, useTheme} from '@chakra-ui/react'
 import {useProduct} from '../../hooks'
+import {useAddToCartModalContext} from '../../hooks/use-add-to-cart-modal'
 
 // project components
 import SwatchGroup from '../../components/swatch-group'
@@ -34,8 +23,6 @@ import Link from '../../components/link'
 import withRegistration from '../../hoc/with-registration'
 import {DEFAULT_CURRENCY} from '../../constants'
 import {Skeleton as ImageGallerySkeleton} from '../../components/image-gallery'
-import AddToCartModal from '../../components/add-to-cart-modal'
-import RecommendedProducts from '../../components/recommended-products'
 import {HideOnDesktop, HideOnMobile} from '../../components/responsive'
 import QuantityPicker from '../../components/quantity-picker'
 
@@ -99,7 +86,7 @@ const ProductView = ({
         isOpen: isAddToCartModalOpen,
         onOpen: onAddToCartModalOpen,
         onClose: onAddToCartModalClose
-    } = useDisclosure()
+    } = useAddToCartModalContext()
     const theme = useTheme()
 
     const {
@@ -132,7 +119,7 @@ const ProductView = ({
                 return
             }
             addToCart(variant, quantity)
-            onAddToCartModalOpen()
+            onAddToCartModalOpen({product, variant, quantity})
         }
 
         const handleWishlistItem = () => {
@@ -387,24 +374,6 @@ const ProductView = ({
             >
                 {renderActionButtons()}
             </Box>
-
-            {isAddToCartModalOpen && (
-                <AddToCartModal
-                    product={product}
-                    variant={variant}
-                    quantity={quantity}
-                    isOpen={isAddToCartModalOpen}
-                    onClose={onAddToCartModalClose}
-                >
-                    <RecommendedProducts
-                        title={<FormattedMessage defaultMessage="You Might Also Like" />}
-                        recommender={'pdp-similar-items'}
-                        products={product && [product.id]}
-                        mx={{base: -4, md: -8, lg: 0}}
-                        shouldFetch={() => product?.id}
-                    />
-                </AddToCartModal>
-            )}
         </Flex>
     )
 }

@@ -33,6 +33,11 @@ import {HideOnDesktop, HideOnMobile} from '../responsive'
 import useShopper from '../../commerce-api/hooks/useShopper'
 import useCustomer from '../../commerce-api/hooks/useCustomer'
 import {AuthModal, useAuthModal} from '../../hooks/use-auth-modal'
+import {
+    AddToCartModal,
+    useAddToCartModal,
+    AddToCartModalContext
+} from '../../hooks/use-add-to-cart-modal'
 
 // Localization
 import {defineMessages, IntlProvider} from 'react-intl'
@@ -70,6 +75,7 @@ const App = (props) => {
     const history = useHistory()
     const location = useLocation()
     const authModal = useAuthModal()
+    const addToCartModal = useAddToCartModal()
     const customer = useCustomer()
     const [isOnline, setIsOnline] = useState(true)
     const [categories, setCategories] = useState(allCategories)
@@ -203,25 +209,32 @@ const App = (props) => {
                         </Box>
 
                         {!isOnline && <OfflineBanner />}
-
-                        <SkipNavContent
-                            style={{display: 'flex', flexDirection: 'column', flex: 1, outline: 0}}
-                        >
-                            <Box
-                                as="main"
-                                id="app-main"
-                                role="main"
-                                display="flex"
-                                flexDirection="column"
-                                flex="1"
+                        <AddToCartModalContext.Provider value={addToCartModal}>
+                            <SkipNavContent
+                                style={{
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    flex: 1,
+                                    outline: 0
+                                }}
                             >
-                                <OfflineBoundary isOnline={false}>{children}</OfflineBoundary>
-                            </Box>
-                        </SkipNavContent>
+                                <Box
+                                    as="main"
+                                    id="app-main"
+                                    role="main"
+                                    display="flex"
+                                    flexDirection="column"
+                                    flex="1"
+                                >
+                                    <OfflineBoundary isOnline={false}>{children}</OfflineBoundary>
+                                </Box>
+                            </SkipNavContent>
 
-                        {!isCheckout ? <Footer /> : <CheckoutFooter />}
+                            {!isCheckout ? <Footer /> : <CheckoutFooter />}
 
-                        <AuthModal {...authModal} />
+                            <AuthModal {...authModal} />
+                            <AddToCartModal />
+                        </AddToCartModalContext.Provider>
                     </Box>
                 </CategoriesContext.Provider>
             </IntlProvider>
