@@ -82,7 +82,11 @@ const AppConfig = ({children, locals = {}}) => {
 }
 
 AppConfig.restore = (locals = {}) => {
+    // Parse the locale from the page url.
+    // NOTE: If pseudo locale is enabled, `locale` will not be 'en-XB' but whatever that's in the page url.
+    // CommerceAPI should not know about the pseudo locale anyways.
     const locale = getLocale(locals) || DEFAULT_LOCALE
+
     const currency = getPreferredCurrency(locale) || DEFAULT_CURRENCY
 
     locals.api = new CommerceAPI({...apiConfig, locale, currency})
