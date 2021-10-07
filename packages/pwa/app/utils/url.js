@@ -6,6 +6,8 @@
  */
 
 import {DEFAULT_LOCALE} from '../constants'
+import pwaKitConfig from '../../pwa-kit-config.json'
+import {siteIdAlias} from '../commerce-api.config'
 
 /**
  * Modifies a given url by adding/updating query parameters.
@@ -79,10 +81,11 @@ export const buildUrlSet = (url = '', key = '', values = [], extraParams = {}) =
  *
  * @param {Object} category
  * @param {string} locale
+ * @param {string} siteIdAlias
  * @returns {string}
  */
 export const categoryUrlBuilder = (category, locale = DEFAULT_LOCALE) =>
-    encodeURI(`/${locale}/category/${category.id}`)
+    encodeURI(buildRoutePath(`/${locale}/category/${category.id}`, pwaKitConfig.multiSite))
 
 /**
  * Given a product and the current locale returns an href to the product detail page.
@@ -91,7 +94,8 @@ export const categoryUrlBuilder = (category, locale = DEFAULT_LOCALE) =>
  * @param {string} locale
  * @returns {string}
  */
-export const productUrlBuilder = (product) => encodeURI(`/product/${product.id}`)
+export const productUrlBuilder = (product, locale) =>
+    encodeURI(buildRoutePath(`/${locale}/product/${product.id}`, pwaKitConfig.multiSite))
 
 /**
  * Given a search term, contructs a search url.
@@ -128,16 +132,20 @@ export const getUrlWithLocale = (shortCode, opts = {}) => {
     // Array of the paths without empty items
     const paths = relativeUrl.split('/').filter((path) => path !== '')
 
+    // pattern for shortCode jp-JP, us-GB
+    const reg = /^([a-z]{2}-[A-Z]{2})?$/
+
+    const oldLocaleIndex = paths.findIndex((path) => reg.test(path))
+
     // Remove the previous locale
-    paths.shift()
+    paths.splice(oldLocaleIndex, 1)
 
     // Add the new locale
     if (shortCode !== DEFAULT_LOCALE || paths?.length > 0) {
-        paths.unshift(shortCode)
+        paths.splice(oldLocaleIndex, 0, shortCode)
     }
 
     relativeUrl = `/${paths.join('/')}${Array.from(params).length > 0 ? `?${params}` : ''}`
-
     return relativeUrl
 }
 
@@ -150,7 +158,12 @@ export const getUrlWithLocale = (shortCode, opts = {}) => {
  * @returns {string}
  */
 export const homeUrlBuilder = (homeHref, locale) =>
-    encodeURI(`${homeHref}${locale !== DEFAULT_LOCALE ? locale + '/' : ''}`)
+    encodeURI(
+        buildRoutePath(
+            `${homeHref}${locale !== DEFAULT_LOCALE ? locale + '/' : ''}`,
+            pwaKitConfig.multiSite
+        )
+    )
 
 /*
  * Remove query params from a give url path based on a given list of keys
@@ -184,4 +197,29 @@ export const removeQueryParamsFromPath = (path, keys) => {
         .replace(/=$/, '')
 
     return `${pathname}${paramStr && '?'}${paramStr}`
+}
+
+/**
+ * Build a route with/without siteIdAlias based on multisite config
+ * This function can potentially be expanded to build route with other params like locale
+ * @param path
+ * @param opts
+ * @returns {string}
+ */
+const buildRoutePath = (path, opts = {}) => {
+    const {withSiteIdAlias} = opts
+    // console.log('siteIdAlias', siteIdAlias)
+    // console.log('withSiteIdAlias', withSiteIdAlias)
+
+    const newPath = `${withSiteIdAlias ? `/${siteIdAlias}` : ''}${path}`
+    // console.log('test', test)
+    return newPath
+}
+
+/**
+ * @param path
+ * @returns {string}
+ */
+export const buildMultiSiteRoute = (path) => {
+    return buildRoutePath(path, pwaKitConfig.multiSite)
 }

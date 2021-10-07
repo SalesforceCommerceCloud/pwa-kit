@@ -65,7 +65,7 @@ const ProductTile = (props) => {
         <Link
             data-testid="product-tile"
             {...styles.container}
-            to={productUrlBuilder({id: productId}, intl.local)}
+            to={productUrlBuilder({id: productId}, intl.locale)}
             {...rest}
         >
             <Box {...styles.imageWrapper}>

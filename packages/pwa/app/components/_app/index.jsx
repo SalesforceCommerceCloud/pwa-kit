@@ -40,7 +40,7 @@ import {defineMessages, IntlProvider} from 'react-intl'
 
 // Others
 import {watchOnlineStatus, flatten} from '../../utils/utils'
-import {homeUrlBuilder, getUrlWithLocale} from '../../utils/url'
+import {homeUrlBuilder, getUrlWithLocale, buildMultiSiteRoute} from '../../utils/url'
 import {getLocaleConfig, getPreferredCurrency} from '../../utils/locale'
 import {DEFAULT_CURRENCY, HOME_HREF, SUPPORTED_LOCALES} from '../../constants'
 
@@ -123,8 +123,7 @@ const App = (props) => {
     }
 
     const onCartClick = () => {
-        // Goto the home page.
-        history.push(`/${targetLocale}/cart`)
+        history.push(buildMultiSiteRoute(`/${targetLocale}/cart`))
 
         // Close the drawer.
         onClose()
@@ -133,7 +132,7 @@ const App = (props) => {
     const onAccountClick = () => {
         // Link to account page for registered customer, open auth modal otherwise
         if (customer.isRegistered) {
-            history.push(`/${targetLocale}/account`)
+            history.push(buildMultiSiteRoute(`/${targetLocale}/account`))
         } else {
             // if they already are at the login page, do not show login modal
             if (new RegExp(`^/${targetLocale}/login$`).test(location.pathname)) return
@@ -142,7 +141,7 @@ const App = (props) => {
     }
 
     const onWishlistClick = () => {
-        history.push(`/${targetLocale}/account/wishlist`)
+        history.push(buildMultiSiteRoute(`/${targetLocale}/account/wishlist`))
     }
 
     return (

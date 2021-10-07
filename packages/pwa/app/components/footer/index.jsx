@@ -135,7 +135,10 @@ const Footer = ({...otherProps}) => {
                                         disallowParams: ['refine']
                                     })
 
+                                    console.log('newUrl', newUrl)
+
                                     window.location = newUrl
+                                    console.log('change ======================= locale')
                                 }}
                                 variant="filled"
                                 {...styles.localeDropdown}

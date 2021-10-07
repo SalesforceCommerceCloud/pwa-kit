@@ -46,7 +46,12 @@ const getLocale = (locals = {}) => {
 
     // Parse the pathname from the partial using the URL object and a placeholder host
     const {pathname} = new URL(`http://hostname${originalUrl}`)
-    let shortCode = pathname.split('/')[1]
+
+    // pattern for shortCode jp-JP, us-GB
+    const reg = /^([a-z]{2}-[A-Z]{2})?$/
+    // split the pathname into array and filter out empty string
+    const paths = pathname.split('/').filter(Boolean)
+    let shortCode = paths.find((path) => reg.test(path))
 
     // Ensure that the locale is in the seported list, otherwise return the default.
     shortCode = SUPPORTED_LOCALES.find((locale) => locale.id === shortCode)

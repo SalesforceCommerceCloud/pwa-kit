@@ -37,41 +37,36 @@ const PageNotFound = loadable(() => import('./pages/page-not-found'))
 
 const routes = [
     {
-        path: '/',
+        path: '/:siteIdAlias?',
         component: Home,
         exact: true
     },
     {
-        path: '/:locale',
-        component: Home,
-        exact: true
-    },
-    {
-        path: '/:locale/login',
+        path: '/:siteIdAlias?/:locale/login',
         component: Login,
         exact: true
     },
     {
-        path: '/:locale/registration',
+        path: '/:siteIdAlias?/:locale/registration',
         component: Registration,
         exact: true
     },
     {
-        path: '/:locale/reset-password',
+        path: '/:siteIdAlias?/:locale/reset-password',
         component: ResetPassword,
         exact: true
     },
     {
-        path: '/:locale/account',
+        path: '/:siteIdAlias?/:locale/account',
         component: Account
     },
     {
-        path: '/:locale/checkout',
+        path: '/:siteIdAlias?/:locale/checkout',
         component: Checkout,
         exact: true
     },
     {
-        path: '/:locale/checkout/confirmation',
+        path: '/:siteIdAlias?/:locale/checkout/confirmation',
         component: CheckoutConfirmation,
         exact: true
     },
@@ -81,25 +76,30 @@ const routes = [
         exact: true
     },
     {
-        path: '/:locale/cart',
+        path: '/:siteIdAlias?/:locale/cart',
         component: Cart,
         exact: true
     },
     {
-        path: '/:locale/product/:productId',
+        path: '/:siteIdAlias?/:locale/product/:productId',
         component: ProductDetail
     },
     {
-        path: '/:locale/search',
+        path: '/:siteIdAlias?/:locale/search',
         component: ProductList
     },
     {
-        path: '/:locale/category/:categoryId',
+        path: '/:siteIdAlias?/:locale/category/:categoryId',
         component: ProductList
     },
     {
-        path: '/:locale/account/wishlist',
+        path: '/siteIdAlias?/:locale/account/wishlist',
         component: Wishlist
+    },
+    {
+        path: '/:siteIdAlias?/:locale',
+        component: Home,
+        exact: true
     },
     {
         path: '*',

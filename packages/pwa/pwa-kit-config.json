@@ -1,0 +1,7 @@
+{
+    "multiSite": {
+        "withSiteIdAlias": true,
+        "defaultSiteAlias": "intl",
+        "defaultSiteId": "RefArchGlobal"
+    }
+}
