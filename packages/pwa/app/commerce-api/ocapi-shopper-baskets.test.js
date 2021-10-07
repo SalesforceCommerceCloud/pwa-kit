@@ -35,6 +35,38 @@ describe('test OcapiShopperBaskets class', () => {
         expect(basket.customerInfo.customerId).toBeDefined()
         expect(basket.shipments[0].shipmentId).toBeDefined()
     })
+    test.only('updateBasket returns a basket object in camelCase', async () => {
+        const ocapiShopperBaskets = getOcapiShopperBaskets()
+        global.fetch = jest.fn().mockImplementation(() => {
+            return {
+                status: 200,
+                json: async () => {
+                    return ocapiBasketResponse
+                }
+            }
+        })
+        const basket = await ocapiShopperBaskets.updateBasket({
+            parameters: {basketId: 'testBasketId'},
+            body: {}
+        })
+        expect(basket).toBeDefined()
+        expect(basket.customerInfo.customerId).toBeDefined()
+        expect(basket.shipments[0].shipmentId).toBeDefined()
+    })
+    test.only('updateBasket returns error object when no params are passed', async () => {
+        const ocapiShopperBaskets = getOcapiShopperBaskets()
+        global.fetch = jest.fn().mockImplementation(() => {
+            return {
+                status: 200,
+                json: async () => {
+                    return ocapiBasketResponse
+                }
+            }
+        })
+        const response = await ocapiShopperBaskets.updateBasket({})
+        expect(response).toBeDefined()
+        expect(response.title).toEqual('Parameters are required for this request')
+    })
     test('getBasket returns error object when no params are passed', async () => {
         const ocapiShopperBaskets = getOcapiShopperBaskets()
         global.fetch = jest.fn().mockImplementation(() => {

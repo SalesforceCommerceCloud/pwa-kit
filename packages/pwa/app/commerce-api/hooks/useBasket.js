@@ -8,8 +8,10 @@ import {useContext, useMemo} from 'react'
 import useEinstein from './useEinstein'
 import {useCommerceAPI, BasketContext} from '../contexts'
 import useCustomer from './useCustomer'
+import {isError} from '../utils'
 
-export default function useBasket() {
+export default function useBasket(opts = {}) {
+    const {currency} = opts
     const api = useCommerceAPI()
     const customer = useCustomer()
     const einstein = useEinstein()
@@ -59,13 +61,50 @@ export default function useBasket() {
                     parameters: {customerId: customer?.customerId}
                 })
 
-                if (Array.isArray(customerBaskets?.baskets)) {
-                    return setBasket(customerBaskets.baskets[0])
+                // Throw if there was a problem getting the customer baskets
+                if (isError(customerBaskets)) {
+                    throw new Error(customerBaskets)
                 }
 
-                // Back to using ShopperBaskets for all basket interaction.
-                const newBasket = await api.shopperBaskets.createBasket({})
-                setBasket(newBasket)
+                // We only support single baskets for now. Grab the first one.
+                let basket = Array.isArray(customerBaskets?.baskets) && customerBaskets.baskets[0]
+
+                if (!basket) {
+                    // Back to using ShopperBaskets for all basket interaction.
+                    basket = await api.shopperBaskets.createBasket({})
+
+                    // Throw if there was a problem creating the basket
+                    if (isError(basket)) {
+                        throw new Error(basket)
+                    }
+                }
+
+                // Update basket currency if it was created with the wrong one, this will also set the state.
+                if (currency && basket.currency !== currency) {
+                    await this.updateBasketCurrency(currency, basket.basketId)
+                } else {
+                    setBasket(basket)
+                }
+
+                return basket
+            },
+
+            /**
+             * Update the currency of the basket
+             * @param currency - The currency code.
+             * @param basketID - The id of the basket.
+             * @returns {Promise<void>}
+             */
+            async updateBasketCurrency(currency, basketId) {
+                const updateBasket = await api.shopperBaskets.updateBasket({
+                    body: {currency},
+                    parameters: {basketId}
+                })
+                if (isError(updateBasket)) {
+                    throw new Error(updateBasket)
+                } else {
+                    setBasket(updateBasket)
+                }
             },
 
             /**

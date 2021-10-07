@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useContext, useEffect, useState} from 'react'
+import React, {useEffect, useState} from 'react'
 import PropTypes from 'prop-types'
 import {useHistory, useParams} from 'react-router-dom'
 import {FormattedMessage, useIntl} from 'react-intl'
@@ -55,9 +55,9 @@ import {useLimitUrls, usePageUrls, useSortUrls, useSearchParams} from '../../hoo
 import {useToast} from '../../hooks/use-toast'
 import useWishlist from '../../hooks/use-wishlist'
 import {parse as parseSearchParams} from '../../hooks/use-search-params'
+import {useCategories} from '../../hooks/use-categories'
 
 // Others
-import {CategoriesContext} from '../../contexts'
 import {HTTPNotFound} from 'pwa-kit-react-sdk/ssr/universal/errors'
 
 // Constants
@@ -92,7 +92,7 @@ const ProductList = (props) => {
     const navigate = useNavigation()
     const history = useHistory()
     const params = useParams()
-    const {categories} = useContext(CategoriesContext)
+    const {categories} = useCategories()
     const toast = useToast()
 
     // Get the current category from global state.

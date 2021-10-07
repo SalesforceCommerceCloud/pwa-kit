@@ -9,13 +9,14 @@ import React, {useState, useEffect} from 'react'
 import PropTypes from 'prop-types'
 import {useHistory, useLocation} from 'react-router-dom'
 import {getAssetUrl} from 'pwa-kit-react-sdk/ssr/universal/utils'
+import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
 
 // Chakra
 import {Box, useDisclosure, useStyleConfig} from '@chakra-ui/react'
 import {SkipNavLink, SkipNavContent} from '@chakra-ui/skip-nav'
 
 // Contexts
-import {CategoriesContext} from '../../contexts'
+import {CategoriesProvider, CurrencyProvider} from '../../contexts'
 
 // Local Project Components
 import Header from '../../components/header'
@@ -44,9 +45,9 @@ import {defineMessages, IntlProvider} from 'react-intl'
 
 // Others
 import {watchOnlineStatus, flatten} from '../../utils/utils'
-import {homeUrlBuilder} from '../../utils/url'
-import {getLocaleConfig} from '../../utils/locale'
-import {HOME_HREF} from '../../constants'
+import {homeUrlBuilder, getUrlWithLocale} from '../../utils/url'
+import {getLocaleConfig, getPreferredCurrency} from '../../utils/locale'
+import {DEFAULT_CURRENCY, HOME_HREF, SUPPORTED_LOCALES} from '../../constants'
 
 import Seo from '../seo'
 import useWishlist from '../../hooks/use-wishlist'
@@ -72,13 +73,14 @@ export const defaultLocaleMessages = defineMessages({
 const App = (props) => {
     const {children, targetLocale, defaultLocale, messages, categories: allCategories = {}} = props
 
+    const appOrigin = getAppOrigin()
+
     const history = useHistory()
     const location = useLocation()
     const authModal = useAuthModal()
     const addToCartModal = useAddToCartModal()
     const customer = useCustomer()
     const [isOnline, setIsOnline] = useState(true)
-    const [categories, setCategories] = useState(allCategories)
     const styles = useStyleConfig('App')
 
     const {isOpen, onOpen, onClose} = useDisclosure()
@@ -86,8 +88,11 @@ const App = (props) => {
     // Used to conditionally render header/footer for checkout page
     const isCheckout = /\/checkout$/.test(location?.pathname)
 
+    // Get the current currency to be used throught the app
+    const currency = getPreferredCurrency(targetLocale) || DEFAULT_CURRENCY
+
     // Set up customer and basket
-    useShopper()
+    useShopper({currency})
 
     const wishlist = useWishlist()
     useEffect(() => {
@@ -162,81 +167,104 @@ const App = (props) => {
                 defaultLocale={defaultLocale}
                 messages={messages}
             >
-                <CategoriesContext.Provider value={{categories, setCategories}}>
-                    <Seo>
-                        <meta name="theme-color" content="#0288a7" />
-                        <meta
-                            name="apple-mobile-web-app-title"
-                            content="PWA-Kit-Retail-React-App"
-                        />
-                        <link
-                            rel="apple-touch-icon"
-                            href={getAssetUrl('static/img/global/apple-touch-icon.png')}
-                        />
-                        <link rel="manifest" href={getAssetUrl('static/manifest.json')} />
-                    </Seo>
+                <CategoriesProvider categories={allCategories}>
+                    <CurrencyProvider currency={currency}>
+                        <Seo>
+                            <meta name="theme-color" content="#0288a7" />
+                            <meta
+                                name="apple-mobile-web-app-title"
+                                content="PWA-Kit-Retail-React-App"
+                            />
+                            <link
+                                rel="apple-touch-icon"
+                                href={getAssetUrl('static/img/global/apple-touch-icon.png')}
+                            />
+                            <link rel="manifest" href={getAssetUrl('static/manifest.json')} />
 
-                    <ScrollToTop />
+                            {/* Urls for all localized versions of this page (including current page)
+                            For more details on hrefLang, see https://developers.google.com/search/docs/advanced/crawling/localized-versions */}
+                            {SUPPORTED_LOCALES.map((locale) => (
+                                <link
+                                    rel="alternate"
+                                    hrefLang={locale.id.toLowerCase()}
+                                    href={`${appOrigin}${getUrlWithLocale(locale.id, {location})}`}
+                                    key={locale.id}
+                                />
+                            ))}
+                            {/* A general locale as fallback. For example: "en" if default locale is "en-GB" */}
+                            <link
+                                rel="alternate"
+                                hrefLang={defaultLocale.slice(0, 2)}
+                                href={`${appOrigin}${getUrlWithLocale(defaultLocale, {location})}`}
+                            />
+                            {/* A wider fallback for user locales that the app does not support */}
+                            <link rel="alternate" hrefLang="x-default" href={`${appOrigin}/`} />
+                        </Seo>
 
-                    <Box id="app" display="flex" flexDirection="column" flex={1}>
-                        <SkipNavLink zIndex="skipLink">Skip to Content</SkipNavLink>
+                        <ScrollToTop />
 
-                        <Box {...styles.headerWrapper}>
-                            {!isCheckout ? (
-                                <Header
-                                    onMenuClick={onOpen}
-                                    onLogoClick={onLogoClick}
-                                    onMyCartClick={onCartClick}
-                                    onMyAccountClick={onAccountClick}
-                                    onWishlistClick={onWishlistClick}
+                        <Box id="app" display="flex" flexDirection="column" flex={1}>
+                            <SkipNavLink zIndex="skipLink">Skip to Content</SkipNavLink>
+
+                            <Box {...styles.headerWrapper}>
+                                {!isCheckout ? (
+                                    <Header
+                                        onMenuClick={onOpen}
+                                        onLogoClick={onLogoClick}
+                                        onMyCartClick={onCartClick}
+                                        onMyAccountClick={onAccountClick}
+                                        onWishlistClick={onWishlistClick}
+                                    >
+                                        <HideOnDesktop>
+                                            <DrawerMenu
+                                                isOpen={isOpen}
+                                                onClose={onClose}
+                                                onLogoClick={onLogoClick}
+                                                root={allCategories[DEFAULT_ROOT_CATEGORY]}
+                                            />
+                                        </HideOnDesktop>
+
+                                        <HideOnMobile>
+                                            <ListMenu root={allCategories[DEFAULT_ROOT_CATEGORY]} />
+                                        </HideOnMobile>
+                                    </Header>
+                                ) : (
+                                    <CheckoutHeader />
+                                )}
+                            </Box>
+
+                            {!isOnline && <OfflineBanner />}
+                            <AddToCartModalContext.Provider value={addToCartModal}>
+                                <SkipNavContent
+                                    style={{
+                                        display: 'flex',
+                                        flexDirection: 'column',
+                                        flex: 1,
+                                        outline: 0
+                                    }}
                                 >
-                                    <HideOnDesktop>
-                                        <DrawerMenu
-                                            isOpen={isOpen}
-                                            onClose={onClose}
-                                            onLogoClick={onLogoClick}
-                                            root={categories[DEFAULT_ROOT_CATEGORY]}
-                                        />
-                                    </HideOnDesktop>
+                                    <Box
+                                        as="main"
+                                        id="app-main"
+                                        role="main"
+                                        display="flex"
+                                        flexDirection="column"
+                                        flex="1"
+                                    >
+                                        <OfflineBoundary isOnline={false}>
+                                            {children}
+                                        </OfflineBoundary>
+                                    </Box>
+                                </SkipNavContent>
 
-                                    <HideOnMobile>
-                                        <ListMenu root={categories[DEFAULT_ROOT_CATEGORY]} />
-                                    </HideOnMobile>
-                                </Header>
-                            ) : (
-                                <CheckoutHeader />
-                            )}
+                                {!isCheckout ? <Footer /> : <CheckoutFooter />}
+
+                                <AuthModal {...authModal} />
+                                <AddToCartModal />
+                            </AddToCartModalContext.Provider>
                         </Box>
-
-                        {!isOnline && <OfflineBanner />}
-                        <AddToCartModalContext.Provider value={addToCartModal}>
-                            <SkipNavContent
-                                style={{
-                                    display: 'flex',
-                                    flexDirection: 'column',
-                                    flex: 1,
-                                    outline: 0
-                                }}
-                            >
-                                <Box
-                                    as="main"
-                                    id="app-main"
-                                    role="main"
-                                    display="flex"
-                                    flexDirection="column"
-                                    flex="1"
-                                >
-                                    <OfflineBoundary isOnline={false}>{children}</OfflineBoundary>
-                                </Box>
-                            </SkipNavContent>
-
-                            {!isCheckout ? <Footer /> : <CheckoutFooter />}
-
-                            <AuthModal {...authModal} />
-                            <AddToCartModal />
-                        </AddToCartModalContext.Provider>
-                    </Box>
-                </CategoriesContext.Provider>
+                    </CurrencyProvider>
+                </CategoriesProvider>
             </IntlProvider>
         </Box>
     )
@@ -288,9 +316,9 @@ App.getProps = async ({api}) => {
         const message =
             rootCategory.title === 'Unsupported Locale'
                 ? `
-                
+
 🚫 This page isn’t working.
-It looks like the locale ‘${rootCategory.locale}’ hasn’t been set up, yet. 
+It looks like the locale ‘${rootCategory.locale}’ hasn’t been set up, yet.
 You can either follow this doc, https://sfdc.co/B4Z1m to enable it in business manager or define a different locale with the instructions for Localization in the README file.
 `
                 : rootCategory.detail
@@ -313,7 +341,6 @@ App.propTypes = {
     children: PropTypes.node,
     targetLocale: PropTypes.string,
     defaultLocale: PropTypes.string,
-    location: PropTypes.object,
     messages: PropTypes.object,
     categories: PropTypes.object
 }

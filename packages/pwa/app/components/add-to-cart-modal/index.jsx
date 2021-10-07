@@ -25,7 +25,7 @@ import {
 import Link from '../link'
 import useBasket from '../../commerce-api/hooks/useBasket'
 import {LockIcon} from '../icons'
-import {DEFAULT_CURRENCY} from '../../constants'
+import {useCurrency} from '../../hooks'
 import {useVariationAttributes} from '../../hooks'
 import {findImageGroupBy} from '../../utils/image-groups-utils'
 
@@ -45,6 +45,7 @@ const AddToCartModal = ({product, variant, quantity, isOpen, onClose, ...props})
         viewType: 'small',
         selectedVariationAttributes: variationValues
     })?.images?.[0]
+    const {currency: activeCurrency} = useCurrency()
 
     return (
         <Modal size={size} isOpen={isOpen} onClose={onClose} {...props}>
@@ -112,7 +113,7 @@ const AddToCartModal = ({product, variant, quantity, isOpen, onClose, ...props})
                                         {!!lineItemPrice &&
                                             intl.formatNumber(lineItemPrice, {
                                                 style: 'currency',
-                                                currency: currency || DEFAULT_CURRENCY
+                                                currency: currency || activeCurrency
                                             })}
                                     </Text>
                                 </Box>
@@ -137,7 +138,7 @@ const AddToCartModal = ({product, variant, quantity, isOpen, onClose, ...props})
                                     {productSubTotal &&
                                         intl.formatNumber(productSubTotal, {
                                             style: 'currency',
-                                            currency: currency || DEFAULT_CURRENCY
+                                            currency: currency || activeCurrency
                                         })}
                                 </Text>
                             </Flex>

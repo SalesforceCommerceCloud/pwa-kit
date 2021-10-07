@@ -25,6 +25,19 @@ class OcapiShopperBaskets {
         return await this.fetch('baskets', 'POST', args, 'createBasket')
     }
 
+    async updateBasket(...args) {
+        const required = ['basketId', 'body']
+        let requiredParametersError = checkRequiredParameters(args[0], required)
+        if (requiredParametersError) {
+            return requiredParametersError
+        }
+        let {
+            parameters: {basketId},
+            body
+        } = args[0]
+        return this.fetch(`baskets/${basketId}`, 'PATCH', args, 'updateBasket', body)
+    }
+
     async getBasket(...args) {
         const required = ['basketId']
         let requiredParametersError = checkRequiredParameters(args[0], required)

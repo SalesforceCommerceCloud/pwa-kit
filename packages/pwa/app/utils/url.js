@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {HOME_HREF, DEFAULT_LOCALE, SUPPORTED_LOCALES} from '../constants'
+import {DEFAULT_LOCALE} from '../constants'
 
 /**
  * Modifies a given url by adding/updating query parameters.
@@ -102,22 +102,43 @@ export const productUrlBuilder = (product) => encodeURI(`/product/${product.id}`
 export const searchUrlBuilder = (searchTerm) => `/search?q=${searchTerm}`
 
 /**
- * Returns a URL using the new locale.
+ * Returns a relative URL for a locale short code.
  *
- * @param previousLocale
- * @param newLocale
- * @returns {string}
+ * @param {string} shortCode - The locale short code.
+ * @param {Object} [opts] - Options, if there's any.
+ * @param {string[]} opts.disallowParams - URL parameters to remove
+ * @param {Object} opts.location - location object to replace the default `window.location`
+ * @returns {string} - The relative URL for the specific locale.
  */
-export const buildUrlLocale = (previousLocale, newLocale) => {
+export const getUrlWithLocale = (shortCode, opts = {}) => {
+    const location = opts.location ? opts.location : window.location
+
+    const {disallowParams = []} = opts
+    let relativeUrl = location.pathname
+
     const params = new URLSearchParams(location.search)
-    params.delete('refine')
-    return location.pathname === HOME_HREF
-        ? homeUrlBuilder(HOME_HREF, newLocale)
-        : `/${
-              SUPPORTED_LOCALES.includes(newLocale) ? newLocale : DEFAULT_LOCALE
-          }${location.pathname.slice(location.pathname.indexOf('/', 1))}${
-              Array.from(params).length > 0 ? `?${params}` : ''
-          }`
+
+    // Remove any disallowed params.
+    if (disallowParams.length) {
+        disallowParams.forEach((param) => {
+            params.delete(param)
+        })
+    }
+
+    // Array of the paths without empty items
+    const paths = relativeUrl.split('/').filter((path) => path !== '')
+
+    // Remove the previous locale
+    paths.shift()
+
+    // Add the new locale
+    if (shortCode !== DEFAULT_LOCALE || paths?.length > 0) {
+        paths.unshift(shortCode)
+    }
+
+    relativeUrl = `/${paths.join('/')}${Array.from(params).length > 0 ? `?${params}` : ''}`
+
+    return relativeUrl
 }
 
 /**

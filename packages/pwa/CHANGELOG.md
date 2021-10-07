@@ -1,5 +1,8 @@
 ## To be released
 
+-   Remove `x-powered-by` HTTP response header [#165](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/165)
+-   For search engine crawlers, add `hreflang` links to the current page's html [#137](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/137)
+-   Use the preferred currency when switching locales. [#105](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/105)
 -   Integrate wishlist with einstein recommended products. [#131](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/131)
 
 ## v1.1.0 (Sep 27, 2021)
@@ -17,4 +20,4 @@
 
 ## v1.0.0 (Sep 08, 2021)
 
--   PWA Kit General Avaliability and open source. 🎉
+-   PWA Kit General Availability and open source. 🎉

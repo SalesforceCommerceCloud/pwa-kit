@@ -47,7 +47,7 @@ import {BrandLogo, LocationIcon, SignoutIcon, UserIcon} from '../icons'
 
 // Others
 import {noop} from '../../utils/utils'
-import {buildUrlLocale, categoryUrlBuilder} from '../../utils/url'
+import {getUrlWithLocale, categoryUrlBuilder} from '../../utils/url'
 import useCustomer from '../../commerce-api/hooks/useCustomer'
 import LoadingSpinner from '../loading-spinner'
 
@@ -92,7 +92,6 @@ const DrawerMenu = ({isOpen, onClose = noop, onLogoClick = noop, root}) => {
         navigate('/login')
         setShowLoading(false)
     }
-    const {locale} = useIntl()
 
     return (
         <Drawer isOpen={isOpen} onClose={onClose} placement="left" size={drawerSize}>
@@ -260,7 +259,9 @@ const DrawerMenu = ({isOpen, onClose = noop, onLogoClick = noop, root}) => {
                                     locales={SUPPORTED_LOCALES}
                                     onSelect={(newLocale) => {
                                         // Update the `locale` in the URL.
-                                        const newUrl = buildUrlLocale(locale, newLocale)
+                                        const newUrl = getUrlWithLocale(newLocale, {
+                                            disallowParams: ['refine']
+                                        })
                                         window.location = newUrl
                                     }}
                                 />
