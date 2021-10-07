@@ -62,7 +62,7 @@ Here’s the default locale configuration in `pwa/package.json`:
 
 ## Default Messages for Supported Locales
 
-The deafult messages used by the locale selector are defined in the `_app` component:
+The default messages used by the locale selector are defined in the `_app` component:
 
 ```
 export const defaultLocaleMessages = defineMessages({
