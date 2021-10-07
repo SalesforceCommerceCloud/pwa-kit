@@ -119,7 +119,7 @@ const ProductView = ({
                 return
             }
             addToCart(variant, quantity)
-            onAddToCartModalOpen({product, variant, quantity})
+            onAddToCartModalOpen({product, quantity})
         }
 
         const handleWishlistItem = () => {

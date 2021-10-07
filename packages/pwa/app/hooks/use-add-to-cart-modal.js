@@ -38,7 +38,7 @@ export const useAddToCartModalContext = () => useContext(AddToCartModalContext)
  */
 export const AddToCartModal = () => {
     const {isOpen, onClose, data} = useAddToCartModalContext()
-    const {product, variant, quantity} = data || {}
+    const {product, quantity} = data || {}
     const intl = useIntl()
     const basket = useBasket()
     const size = useBreakpointValue({base: 'full', lg: '2xl', xl: '4xl'})
@@ -47,9 +47,8 @@ export const AddToCartModal = () => {
         return null
     }
     const {currency, productItems, productSubTotal, itemAccumulatedCount} = basket
-    const {productId, variationValues} = variant
-    const lineItemPrice =
-        productItems?.find((item) => item.productId === productId)?.basePrice * quantity
+    const {id, variationValues} = product
+    const lineItemPrice = productItems?.find((item) => item.productId === id)?.basePrice * quantity
     const image = findImageGroupBy(product.imageGroups, {
         viewType: 'small',
         selectedVariationAttributes: variationValues
