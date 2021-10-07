@@ -93,7 +93,7 @@ At the minimum, only defaultMessage is the required parameter. The message id is
 
 During your development, you extract and compile the messages and pass the generated JSON files to the translation team, as well as using the translated files in the app.
 
-We’ve provided a the following npm scripts to help you:
+We’ve provided the following npm scripts to help you:
 
 -   `npm run build-translations` to extract and compile default messages into the default locale
     -   run this whenever you add a new formatted message to your components to update the default locale's translations
