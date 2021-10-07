@@ -11,7 +11,6 @@ import {useIntl} from 'react-intl'
 import {useItemVariant} from '../../../../components/item-variant'
 import ProductViewModal from '../../../../components/product-view-modal'
 import {useToast} from '../../../../hooks/use-toast'
-import {useAddToCartModalContext} from '../../../../hooks/use-add-to-cart-modal'
 import {API_ERROR_MESSAGE} from '../../../../constants'
 
 /**
@@ -27,10 +26,6 @@ const WishlistPrimaryAction = () => {
     const showToast = useToast()
     const [isLoading, setIsLoading] = useState(false)
     const {isOpen, onOpen, onClose} = useDisclosure()
-    const {
-        onOpen: onAddToCartModalOpen,
-    } = useAddToCartModalContext()
-
     const handleAddToCart = async (item, quantity) => {
         setIsLoading(true)
         const productItems = [
@@ -53,8 +48,6 @@ const WishlistPrimaryAction = () => {
                 status: 'success'
             })
             onClose()
-            // console.log(item)
-            // onAddToCartModalOpen({product: item, quantity})
         } catch (error) {
             showToast({
                 title: formatMessage(

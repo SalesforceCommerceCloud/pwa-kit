@@ -112,17 +112,17 @@ const ProductView = ({
     const renderActionButtons = () => {
         const buttons = []
 
-        const handleCartItem = () => {
+        const handleCartItem = async () => {
             if (!addToCart && !updateCart) return null
             if (updateCart) {
-                updateCart(variant, quantity)
+                await updateCart(variant, quantity)
                 return
             }
-            addToCart(variant, quantity)
+            await addToCart(variant, quantity)
             onAddToCartModalOpen({product, quantity})
         }
 
-        const handleWishlistItem = () => {
+        const handleWishlistItem = async () => {
             if (!updateWishlist && !addToWishlist) return null
             if (updateWishlist) {
                 updateWishlist(variant, quantity)
