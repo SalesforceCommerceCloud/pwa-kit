@@ -76,6 +76,10 @@ class CommerceAPI {
             shopperSearch: sdk.ShopperSearch
         }
 
+        // NOTE:
+        // `sendLocale` and `sendCurrency` for sending locale and currency info to the API:
+        // - boolean, if you want to affect _all_ methods for a given API
+        // - OR an array (listing the API's methods), if you want to affect only certain methods of an API
         const apiConfigs = {
             shopperCustomers: {
                 api: sdk.ShopperCustomers,
@@ -124,16 +128,15 @@ class CommerceAPI {
                                 }
 
                                 return self.willSendRequest(prop, ...args).then((newArgs) => {
-                                    let {sendLocale = true, sendCurrency = false} = apiConfigs[key]
+                                    // By default we send the locale param and don't send the currency param.
+                                    const {sendLocale = true, sendCurrency = false} = apiConfigs[
+                                        key
+                                    ]
 
-                                    // By default we send the local param and don't send the currency param.
-                                    // You can modify when these are send by using a boolean value send the
-                                    // currency/locale for all calls for a given API, or define an array listing
-                                    // the API's methods you want the currency/locale information to be sent.
-                                    sendLocale = Array.isArray(sendLocale)
+                                    const sendLocaleForCurrentProp = Array.isArray(sendLocale)
                                         ? sendLocale.includes(prop)
                                         : !!sendLocale
-                                    sendCurrency = Array.isArray(sendCurrency)
+                                    const sendCurrencyForCurrentProp = Array.isArray(sendCurrency)
                                         ? sendCurrency.includes(prop)
                                         : !!sendCurrency
 
@@ -144,7 +147,7 @@ class CommerceAPI {
                                     // to some of the API calls.
 
                                     const firstArg = newArgs[0]
-                                    if (sendLocale) {
+                                    if (sendLocaleForCurrentProp) {
                                         firstArg.parameters = {
                                             ...firstArg.parameters,
                                             ...{locale}
@@ -153,7 +156,7 @@ class CommerceAPI {
                                         delete firstArg.parameters?.locale
                                     }
 
-                                    if (sendCurrency) {
+                                    if (sendCurrencyForCurrentProp) {
                                         firstArg.parameters = {
                                             ...firstArg.parameters,
                                             ...{currency}
