@@ -32,7 +32,6 @@ const siteId =
     typeof window !== 'undefined'
         ? getSiteId(window.location)
         : pwaKitConfig.multiSite.defaultSiteId
-console.log('siteId', siteId)
 
 /**
  * get the siteId alias based on siteId and current location
@@ -60,5 +59,3 @@ export const commerceAPIConfig = {
         siteId
     }
 }
-
-console.log('commerceAPIConfig', commerceAPIConfig)
