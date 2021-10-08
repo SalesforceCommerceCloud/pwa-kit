@@ -147,115 +147,100 @@ const App = (props) => {
 
     return (
         <Box className="sf-app" {...styles.container}>
-            <IntlProvider
-                onError={(err) => {
-                    if (err.code === 'MISSING_TRANSLATION') {
-                        // NOTE: Remove the console error for missing translations during development,
-                        // as we knew translations would be added later.
-                        console.warn('Missing translation', err.message)
-                        return
-                    }
-                    throw err
-                }}
-                locale={targetLocale}
-                defaultLocale={defaultLocale}
-                messages={messages}
-            >
-                <CategoriesProvider categories={allCategories}>
-                    <CurrencyProvider currency={currency}>
-                        <Seo>
-                            <meta name="theme-color" content="#0288a7" />
-                            <meta
-                                name="apple-mobile-web-app-title"
-                                content="PWA-Kit-Retail-React-App"
-                            />
-                            <link
-                                rel="apple-touch-icon"
-                                href={getAssetUrl('static/img/global/apple-touch-icon.png')}
-                            />
-                            <link rel="manifest" href={getAssetUrl('static/manifest.json')} />
+            <CategoriesProvider categories={allCategories}>
+                <CurrencyProvider currency={currency}>
+                    <Seo>
+                        <meta name="theme-color" content="#0288a7" />
+                        <meta
+                            name="apple-mobile-web-app-title"
+                            content="PWA-Kit-Retail-React-App"
+                        />
+                        <link
+                            rel="apple-touch-icon"
+                            href={getAssetUrl('static/img/global/apple-touch-icon.png')}
+                        />
+                        <link rel="manifest" href={getAssetUrl('static/manifest.json')} />
 
-                            {/* Urls for all localized versions of this page (including current page)
+                        {/* Urls for all localized versions of this page (including current page)
                             For more details on hrefLang, see https://developers.google.com/search/docs/advanced/crawling/localized-versions */}
-                            {SUPPORTED_LOCALES.map((locale) => (
-                                <link
-                                    rel="alternate"
-                                    hrefLang={locale.id.toLowerCase()}
-                                    href={`${appOrigin}${getUrlWithLocale(locale.id, {location})}`}
-                                    key={locale.id}
-                                />
-                            ))}
-                            {/* A general locale as fallback. For example: "en" if default locale is "en-GB" */}
+                        {SUPPORTED_LOCALES.map((locale) => (
                             <link
                                 rel="alternate"
-                                hrefLang={defaultLocale.slice(0, 2)}
-                                href={`${appOrigin}${getUrlWithLocale(defaultLocale, {location})}`}
+                                hrefLang={locale.id.toLowerCase()}
+                                href={`${appOrigin}${getUrlWithLocale(locale.id, {location})}`}
+                                key={locale.id}
                             />
-                            {/* A wider fallback for user locales that the app does not support */}
-                            <link rel="alternate" hrefLang="x-default" href={`${appOrigin}/`} />
-                        </Seo>
+                        ))}
+                        {/* A general locale as fallback. For example: "en" if default locale is "en-GB" */}
+                        <link
+                            rel="alternate"
+                            hrefLang={defaultLocale.slice(0, 2)}
+                            href={`${appOrigin}${getUrlWithLocale(defaultLocale, {location})}`}
+                        />
+                        {/* A wider fallback for user locales that the app does not support */}
+                        <link rel="alternate" hrefLang="x-default" href={`${appOrigin}/`} />
+                    </Seo>
 
-                        <ScrollToTop />
+                    <ScrollToTop />
 
-                        <Box id="app" display="flex" flexDirection="column" flex={1}>
-                            <SkipNavLink zIndex="skipLink">Skip to Content</SkipNavLink>
+                    <Box id="app" display="flex" flexDirection="column" flex={1}>
+                        <SkipNavLink zIndex="skipLink">Skip to Content</SkipNavLink>
 
-                            <Box {...styles.headerWrapper}>
-                                {!isCheckout ? (
-                                    <Header
-                                        onMenuClick={onOpen}
-                                        onLogoClick={onLogoClick}
-                                        onMyCartClick={onCartClick}
-                                        onMyAccountClick={onAccountClick}
-                                        onWishlistClick={onWishlistClick}
-                                    >
-                                        <HideOnDesktop>
-                                            <DrawerMenu
-                                                isOpen={isOpen}
-                                                onClose={onClose}
-                                                onLogoClick={onLogoClick}
-                                                root={allCategories[DEFAULT_ROOT_CATEGORY]}
-                                            />
-                                        </HideOnDesktop>
-
-                                        <HideOnMobile>
-                                            <ListMenu root={allCategories[DEFAULT_ROOT_CATEGORY]} />
-                                        </HideOnMobile>
-                                    </Header>
-                                ) : (
-                                    <CheckoutHeader />
-                                )}
-                            </Box>
-
-                            {!isOnline && <OfflineBanner />}
-
-                            <SkipNavContent
-                                style={{
-                                    display: 'flex',
-                                    flexDirection: 'column',
-                                    flex: 1,
-                                    outline: 0
-                                }}
-                            >
-                                <Box
-                                    as="main"
-                                    id="app-main"
-                                    role="main"
-                                    display="flex"
-                                    flexDirection="column"
-                                    flex="1"
+                        <Box {...styles.headerWrapper}>
+                            {!isCheckout ? (
+                                <Header
+                                    onMenuClick={onOpen}
+                                    onLogoClick={onLogoClick}
+                                    onMyCartClick={onCartClick}
+                                    onMyAccountClick={onAccountClick}
+                                    onWishlistClick={onWishlistClick}
                                 >
-                                    <OfflineBoundary isOnline={false}>{children}</OfflineBoundary>
-                                </Box>
-                            </SkipNavContent>
+                                    <HideOnDesktop>
+                                        <DrawerMenu
+                                            isOpen={isOpen}
+                                            onClose={onClose}
+                                            onLogoClick={onLogoClick}
+                                            root={allCategories[DEFAULT_ROOT_CATEGORY]}
+                                        />
+                                    </HideOnDesktop>
 
-                            {!isCheckout ? <Footer /> : <CheckoutFooter />}
-
-                            <AuthModal {...authModal} />
+                                    <HideOnMobile>
+                                        <ListMenu root={allCategories[DEFAULT_ROOT_CATEGORY]} />
+                                    </HideOnMobile>
+                                </Header>
+                            ) : (
+                                <CheckoutHeader />
+                            )}
                         </Box>
-                    </CurrencyProvider>
-                </CategoriesProvider>
-            </IntlProvider>
+
+                        {!isOnline && <OfflineBanner />}
+
+                        <SkipNavContent
+                            style={{
+                                display: 'flex',
+                                flexDirection: 'column',
+                                flex: 1,
+                                outline: 0
+                            }}
+                        >
+                            <Box
+                                as="main"
+                                id="app-main"
+                                role="main"
+                                display="flex"
+                                flexDirection="column"
+                                flex="1"
+                            >
+                                <OfflineBoundary isOnline={false}>{children}</OfflineBoundary>
+                            </Box>
+                        </SkipNavContent>
+
+                        {!isCheckout ? <Footer /> : <CheckoutFooter />}
+
+                        <AuthModal {...authModal} />
+                    </Box>
+                </CurrencyProvider>
+            </CategoriesProvider>
         </Box>
     )
 }

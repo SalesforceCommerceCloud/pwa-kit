@@ -96,6 +96,20 @@ AppConfig.extraGetPropsArgs = (locals = {}) => {
     }
 }
 
+AppConfig.getIntlProps = async ({params}) => {
+    const defaultLocale = 'en-GB' // This value should align with the locale your `defaultMessages` are in.
+    const {locale = defaultLocale} = params
+
+    // Dynamically load the messages for the given default.
+    const messages = (await import(`../../translations/compiled/${locale}.json`)).default
+
+    return {
+        locale,
+        defaultLocale,
+        messages
+    }
+}
+
 AppConfig.propTypes = {
     children: PropTypes.node,
     locals: PropTypes.object
