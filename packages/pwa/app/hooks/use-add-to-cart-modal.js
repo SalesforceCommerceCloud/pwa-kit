@@ -4,7 +4,8 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useContext, useState} from 'react'
+import React, {useContext, useState, useEffect} from 'react'
+import {useLocation} from 'react-router-dom'
 import PropTypes from 'prop-types'
 import {useIntl, FormattedMessage} from 'react-intl'
 import {
@@ -205,6 +206,15 @@ export const useAddToCartModal = () => {
         isOpen: false,
         data: null
     })
+
+    const {pathname} = useLocation()
+    useEffect(() => {
+        setState({
+            ...state,
+            isOpen: false
+        })
+    }, [pathname])
+
     return {
         isOpen: state.isOpen,
         data: state.data,
