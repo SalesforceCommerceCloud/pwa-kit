@@ -32,8 +32,8 @@ const main = (opts) => {
         /^format$/,
         /^prod:build$/,
         /^start.*$/,
-        /^compile-messages.*$/,
-        /^extract-messages.*$/
+        /^compile-translations.*$/,
+        /^extract-default-translations.*$/
     ]
 
     const scripts = Object.keys(pkg.scripts).filter((script) => !exclude.some((re) => script.match(re)))
