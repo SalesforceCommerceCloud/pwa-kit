@@ -6,10 +6,11 @@
  */
 import React from 'react'
 import {screen} from '@testing-library/react'
+import {Helmet} from 'react-helmet'
 
 import App from './index.jsx'
 import {renderWithProviders} from '../../utils/test-utils'
-import {DEFAULT_LOCALE} from '../../constants'
+import {DEFAULT_LOCALE, SUPPORTED_LOCALES} from '../../constants'
 
 let windowSpy
 
@@ -54,5 +55,20 @@ describe('App', () => {
             }
         }))
         expect(App.shouldGetProps()).toBe(false)
+    })
+
+    test('The localized hreflang links exist in the html head', () => {
+        renderWithProviders(<App targetLocale={DEFAULT_LOCALE} defaultLocale={DEFAULT_LOCALE} />)
+
+        const helmet = Helmet.peek()
+        const hreflangLinks = helmet.linkTags.filter((link) => link.rel === 'alternate')
+
+        const hasGeneralLocale = ({hrefLang}) => hrefLang === DEFAULT_LOCALE.slice(0, 2)
+
+        // `length + 2` because one for a general locale and the other with x-default value
+        expect(hreflangLinks.length).toBe(SUPPORTED_LOCALES.length + 2)
+
+        expect(hreflangLinks.some((link) => hasGeneralLocale(link))).toBe(true)
+        expect(hreflangLinks.some((link) => link.hrefLang === 'x-default')).toBe(true)
     })
 })
