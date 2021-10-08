@@ -34,11 +34,7 @@ import {HideOnDesktop, HideOnMobile} from '../responsive'
 import useShopper from '../../commerce-api/hooks/useShopper'
 import useCustomer from '../../commerce-api/hooks/useCustomer'
 import {AuthModal, useAuthModal} from '../../hooks/use-auth-modal'
-import {
-    AddToCartModal,
-    useAddToCartModal,
-    AddToCartModalContext
-} from '../../hooks/use-add-to-cart-modal'
+import {AddToCartModalProvider} from '../../hooks/use-add-to-cart-modal'
 
 // Localization
 import {defineMessages, IntlProvider} from 'react-intl'
@@ -78,7 +74,6 @@ const App = (props) => {
     const history = useHistory()
     const location = useLocation()
     const authModal = useAuthModal()
-    const addToCartModal = useAddToCartModal()
     const customer = useCustomer()
     const [isOnline, setIsOnline] = useState(true)
     const styles = useStyleConfig('App')
@@ -234,7 +229,7 @@ const App = (props) => {
                             </Box>
 
                             {!isOnline && <OfflineBanner />}
-                            <AddToCartModalContext.Provider value={addToCartModal}>
+                            <AddToCartModalProvider>
                                 <SkipNavContent
                                     style={{
                                         display: 'flex',
@@ -260,8 +255,7 @@ const App = (props) => {
                                 {!isCheckout ? <Footer /> : <CheckoutFooter />}
 
                                 <AuthModal {...authModal} />
-                                <AddToCartModal />
-                            </AddToCartModalContext.Provider>
+                            </AddToCartModalProvider>
                         </Box>
                     </CurrencyProvider>
                 </CategoriesProvider>

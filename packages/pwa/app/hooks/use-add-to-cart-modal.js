@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useContext, useState, useEffect} from 'react'
+import React, {useContext, useState, useEffect, useMemo} from 'react'
 import {useLocation} from 'react-router-dom'
 import PropTypes from 'prop-types'
 import {useIntl, FormattedMessage} from 'react-intl'
@@ -31,8 +31,25 @@ import {DEFAULT_CURRENCY} from '../constants'
 import {useVariationAttributes} from './'
 import {findImageGroupBy} from '../utils/image-groups-utils'
 
+/**
+ * This is the context for managing the AddToCartModal.
+ * Used in top level App component.
+ */
 export const AddToCartModalContext = React.createContext()
 export const useAddToCartModalContext = () => useContext(AddToCartModalContext)
+export const AddToCartModalProvider = ({children}) => {
+    const addToCartModal = useAddToCartModal()
+    const value = useMemo(() => addToCartModal, [addToCartModal.isOpen, addToCartModal.data])
+    return (
+        <AddToCartModalContext.Provider value={value}>
+            {children}
+            <AddToCartModal />
+        </AddToCartModalContext.Provider>
+    )
+}
+AddToCartModalProvider.propTypes = {
+    children: PropTypes.node.isRequired
+}
 
 /**
  * Visual feedback (a modal) for adding item to the cart.
