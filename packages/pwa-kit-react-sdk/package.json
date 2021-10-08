@@ -132,6 +132,7 @@
     "react": "16.14.0",
     "react-dom": "16.14.0",
     "react-helmet": "5.2.0",
+    "react-intl": "^5.13.1",
     "react-router-dom": "^5.1.2",
     "replace-in-file": "^6.2.0",
     "s3rver": "^3.1.0",
@@ -153,6 +154,7 @@
     "react": ">=16.14",
     "react-dom": ">=16.14",
     "react-helmet": "6",
+    "react-intl": "^5.13.1",
     "react-router-dom": "^5.1.2",
     "webpack": "5",
     "webpack-cli": "4"

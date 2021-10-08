@@ -64,6 +64,17 @@ class AppConfig extends React.Component {
         return {}
     }
 
+    // TODO: Clean up these comments.
+    /**
+     * Return any props to be used on the internationalization provider object
+     *
+     * @return {Object}
+     */
+    // eslint-disable-next-line no-unused-vars
+    static async getIntlProps(req, res) {
+        return {}
+    }
+
     /**
      * This class is a React Component in order to provide this hook, which lets
      * you set up context Providers for a state-management library such as Redux.

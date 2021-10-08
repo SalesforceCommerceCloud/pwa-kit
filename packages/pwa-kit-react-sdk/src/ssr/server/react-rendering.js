@@ -55,6 +55,8 @@ const TTI_POLYFILL_SCRIPT = [
     `g.o.observe({entryTypes:['longtask']})}}();`
 ].join('')
 
+const noop = () => {}
+
 export const ALLOWLISTED_INLINE_SCRIPTS = [TTI_POLYFILL_SCRIPT]
 
 /**
@@ -141,6 +143,8 @@ export const render = async (req, res) => {
     const routes = getRoutes(res.locals)
     const WrappedApp = routeComponent(App, false, res.locals)
 
+    const {getIntlProps = noop} = AppConfig
+
     const [pathname, search] = req.originalUrl.split('?')
     const location = {
         pathname,
@@ -163,7 +167,10 @@ export const render = async (req, res) => {
     // Step 2 - Get the component
     const component = await route.component.getComponent()
 
-    // Step 3 - Init the app state
+    // Step 3 - Get the localization props
+    const intlProps = await getIntlProps({req, res})
+
+    // Step 4 - Init the app state
     const {appState, error: appStateError} = await initAppState({
         App: WrappedApp,
         component,
@@ -174,12 +181,13 @@ export const render = async (req, res) => {
         location
     })
 
-    // Step 4 - Render the App
+    // Step 5 - Render the App
     let renderResult
     const args = {
         App: WrappedApp,
         appState,
         error: appStateError && logAndFormatError(appStateError),
+        intlProps,
         routes,
         req,
         res,
@@ -191,7 +199,7 @@ export const render = async (req, res) => {
         renderResult = renderApp({...args, error: logAndFormatError(error)})
     }
 
-    // Step 5 - Determine what is going to happen, redirect, or send html with
+    // Step 6 - Determine what is going to happen, redirect, or send html with
     // the correct status code.
     const {html, routerContext, error} = renderResult
     const redirectUrl = routerContext.url
@@ -205,7 +213,7 @@ export const render = async (req, res) => {
 }
 
 const renderApp = (args) => {
-    const {req, res, location, routes, appState, error, App} = args
+    const {req, res, location, routes, appState, error, intlProps, App} = args
 
     const ssrOnly = 'mobify_server_only' in req.query
     const prettyPrint = 'mobify_pretty' in req.query
@@ -219,7 +227,13 @@ const renderApp = (args) => {
         <Router location={location} context={routerContext}>
             <DeviceContext.Provider value={{type: deviceType}}>
                 <AppConfig locals={res.locals}>
-                    <Switch error={error} appState={appState} routes={routes} App={App} />
+                    <Switch
+                        error={error}
+                        appState={appState}
+                        intlProps={intlProps}
+                        routes={routes}
+                        App={App}
+                    />
                 </AppConfig>
             </DeviceContext.Provider>
         </Router>
