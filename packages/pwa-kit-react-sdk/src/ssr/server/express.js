@@ -65,11 +65,7 @@ import {
     X_MOBIFY_REQUEST_CLASS
 } from '../../utils/ssr-proxying'
 
-const sdkVersion = pkg.version
-
 const SET_COOKIE = 'set-cookie'
-const X_POWERED_BY = 'x-powered-by'
-export const POWERED_BY = `Mobify ${sdkVersion}`
 
 const CACHE_CONTROL = 'cache-control'
 export const NO_CACHE = 'max-age=0, nocache, nostore, must-revalidate'
@@ -1239,20 +1235,11 @@ const setLocalAssetHeaders = (res, assetPath) => {
  * Set default headers on a response. The arguments to this function
  * are the same as those for the responseHook function.
  *
- * By default, this function sets the X-Powered-By to a value identifying
- * the SDK version and the X-Mobify-Request-Class (if and only if the
- * request has a defined class).
- *
  * @private
  */
 const setDefaultHeaders = (req, res) => {
-    // Override 'x-powered-by: express' header
-    res.set(X_POWERED_BY, POWERED_BY)
-
-    // If there's a requestClass, add an response header for it
     const requestClass = res.locals.requestClass
     if (requestClass) {
-        // If there's a requestClass, add an response header for it
         res.set(X_MOBIFY_REQUEST_CLASS, requestClass)
     }
 }
@@ -1369,7 +1356,6 @@ const serveServiceWorker = (req, res) => {
     // Serve the file, with a strong ETag
     res.set('etag', getHashForString(content))
     res.set(CONTENT_TYPE, 'application/javascript')
-    res.set(X_POWERED_BY, POWERED_BY)
     res.send(content)
 }
 
@@ -1405,6 +1391,7 @@ const errorHandlerMiddleware = (err, req, res, next) => {
 
 const createExpressApp = (options) => {
     const app = express()
+    app.disable('x-powered-by')
 
     const mixin = {
         options,
