@@ -136,20 +136,29 @@ const initAppState = async ({App, component, match, route, req, res, location}) 
  * @return {Promise}
  */
 export const render = async (req, res) => {
+    const [pathname, search] = req.originalUrl.split('?')
+    const location = {
+        pathname,
+        search: search ? `?${search}` : ''
+    }
+    const {getIntlProps = noop} = AppConfig
+
+    // Step 0 - Get the localization props and put it in our locals
+    const intlProps = await getIntlProps({
+        req,
+        location
+    })
+
+    // TODO: Think about if this is a good place to put the locale, or just pass it
+    // into `restore` as an additional argument since it's essentially in the api now.
+    res.locals.locale = intlProps.locale
+
     // AppConfig.restore *must* come before using getRoutes() or routeComponent()
     // to inject arguments into the wrapped component's getProps methods.
     AppConfig.restore(res.locals)
 
     const routes = getRoutes(res.locals)
     const WrappedApp = routeComponent(App, false, res.locals)
-
-    const {getIntlProps = noop} = AppConfig
-
-    const [pathname, search] = req.originalUrl.split('?')
-    const location = {
-        pathname,
-        search: search ? `?${search}` : ''
-    }
 
     // Step 1 - Find the match.
     let route
@@ -167,15 +176,7 @@ export const render = async (req, res) => {
     // Step 2 - Get the component
     const component = await route.component.getComponent()
 
-    // Step 3 - Get the localization props
-    const intlProps = await getIntlProps({
-        req,
-        // res,
-        params: match.params,
-        location
-    })
-
-    // Step 4 - Init the app state
+    // Step 3 - Init the app state
     const {appState, error: appStateError} = await initAppState({
         App: WrappedApp,
         component,
@@ -186,7 +187,7 @@ export const render = async (req, res) => {
         location
     })
 
-    // Step 5 - Render the App
+    // Step 4 - Render the App
     let renderResult
     const args = {
         App: WrappedApp,
@@ -204,7 +205,7 @@ export const render = async (req, res) => {
         renderResult = renderApp({...args, error: logAndFormatError(error)})
     }
 
-    // Step 6 - Determine what is going to happen, redirect, or send html with
+    // Step 5 - Determine what is going to happen, redirect, or send html with
     // the correct status code.
     const {html, routerContext, error} = renderResult
     const redirectUrl = routerContext.url

@@ -50,7 +50,11 @@ export const start = () => {
     // On the browser we don't have request.locals, so we just provide an empty
     // object that exists for the lifetime of the app. AppConfig components can use
     // this to set up, eg. Redux stores.
-    const locals = {}
+    const locals = {
+        // TODO: Determine if we should place other frozen locale arguments here, or make them a
+        // argument of the frozen method.
+        locale: window.__INTL_LOCALE__
+    }
 
     // AppConfig.restore *must* come before getRoutes()
     AppConfig.restore(locals, window.__PRELOADED_STATE__.__STATE_MANAGEMENT_LIBRARY)
@@ -82,7 +86,7 @@ export const start = () => {
                                 intlProps={{
                                     // We need to spread the defaults here too.
                                     defaultLocal: window.__INTL_DAFAULT_LOCALE__,
-                                    local: window.__INTL_LOCALE__,
+                                    locale: window.__INTL_LOCALE__,
                                     messages: window.__INTL_MESSAGES__
                                 }}
                                 routes={routes}

@@ -68,10 +68,21 @@ class AppConfig extends React.Component {
     /**
      * Return any props to be used on the internationalization provider object
      *
-     * @return {Object}
+     * @param {Object} args
+     *
+     * @param {Request} args.req - an Express HTTP Request object on the server,
+     *   undefined on the client.
+     *
+     * @param {Response} args.res - an Express HTTP Response object on the server,
+     *   undefined on the client.
+     *
+     * @param {Location} args.location - the current value of window.location,
+     *   or a server-side equivalent.
+     *
+     * @return {Promise<Object>}
      */
     // eslint-disable-next-line no-unused-vars
-    static async getIntlProps(req, res) {
+    static async getIntlProps(args) {
         return {}
     }
 
