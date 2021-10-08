@@ -170,6 +170,7 @@ const common = {
             'react-router-dom': resolve(nodeModules, 'react-router-dom'),
             'react-dom': resolve(nodeModules, 'react-dom'),
             'react-helmet': resolve(nodeModules, 'react-helmet'),
+            'react-intl': resolve(nodeModules, 'react-intl'),
             bluebird: resolve(nodeModules, 'bluebird')
         },
         fallback: {

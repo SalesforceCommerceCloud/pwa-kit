@@ -79,6 +79,12 @@ export const start = () => {
                             <Switch
                                 error={error}
                                 appState={window.__PRELOADED_STATE__}
+                                intlProps={{
+                                    // We need to spread the defaults here too.
+                                    defaultLocal: window.__INTL_DAFAULT_LOCALE__,
+                                    local: window.__INTL_LOCALE__,
+                                    messages: window.__INTL_MESSAGES__
+                                }}
                                 routes={routes}
                                 App={WrappedApp}
                             />

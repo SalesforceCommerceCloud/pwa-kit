@@ -26,6 +26,21 @@ const Switch = (props) => {
     const {error, appState, intlProps, routes, App} = props
     const IntlProvider = intlProps ? ReactIntlProvider : Fragment
 
+    // TODO: Figure out why this isn't working.
+    // const defaultIntlProps = intlProps
+    //     ? {
+    //           onError: (err) => {
+    //               if (err.code === 'MISSING_TRANSLATION') {
+    //                   // NOTE: Remove the console error for missing translations during development,
+    //                   // as we knew translations would be added later.
+    //                   console.warn('Missing translation', err.message)
+    //                   return
+    //               }
+    //               throw err
+    //           }
+    //       }
+    //     : {}
+
     return (
         <UIDReset>
             {/* TODO: Where do we have defaults?  */}

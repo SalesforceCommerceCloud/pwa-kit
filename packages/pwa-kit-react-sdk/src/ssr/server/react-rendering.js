@@ -168,7 +168,12 @@ export const render = async (req, res) => {
     const component = await route.component.getComponent()
 
     // Step 3 - Get the localization props
-    const intlProps = await getIntlProps({req, res})
+    const intlProps = await getIntlProps({
+        req,
+        // res,
+        params: match.params,
+        location
+    })
 
     // Step 4 - Init the app state
     const {appState, error: appStateError} = await initAppState({
@@ -280,6 +285,9 @@ const renderApp = (args) => {
     // Do *not* add to these without a very good reason - globals are a liability.
     const windowGlobals = {
         __DEVICE_TYPE__: deviceType,
+        __INTL_DAFAULT_LOCALE__: intlProps.defaultLocale,
+        __INTL_LOCALE__: intlProps.locale,
+        __INTL_MESSAGES__: intlProps.messages,
         __PRELOADED_STATE__: appState,
         __ERROR__: error,
         // `window.Progressive` has a long history at Mobify and some
