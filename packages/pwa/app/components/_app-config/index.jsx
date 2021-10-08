@@ -21,39 +21,12 @@ import {
 } from '../../commerce-api/contexts'
 import {commerceAPIConfig} from '../../commerce-api.config'
 import {einsteinAPIConfig} from '../../einstein-api.config'
-import {DEFAULT_LOCALE, SUPPORTED_LOCALES, DEFAULT_CURRENCY} from '../../constants'
+import {DEFAULT_CURRENCY} from '../../constants'
 import {getPreferredCurrency} from '../../utils/locale'
 
 const apiConfig = {
     ...commerceAPIConfig,
     einsteinConfig: einsteinAPIConfig
-}
-
-/**
- * Returns the validated locale short code parsed from the url.
- * @private
- * @param locals the request locals (only defined when executing on the server.)
- * @returns {String} the locale short code
- */
-const getLocale = (locals = {}) => {
-    let {originalUrl} = locals
-
-    // If there is no originalUrl value in the locals, create it from the window location.
-    // This happens when executing on the client.
-    if (!originalUrl) {
-        originalUrl = window?.location.href.replace(window.location.origin, '')
-    }
-
-    // Parse the pathname from the partial using the URL object and a placeholder host
-    const {pathname} = new URL(`http://hostname${originalUrl}`)
-    let shortCode = pathname.split('/')[1]
-
-    // Ensure that the locale is in the seported list, otherwise return the default.
-    shortCode = SUPPORTED_LOCALES.find((locale) => locale.id === shortCode)
-        ? shortCode
-        : DEFAULT_LOCALE
-
-    return shortCode
 }
 
 /**
@@ -82,7 +55,7 @@ const AppConfig = ({children, locals = {}}) => {
 }
 
 AppConfig.restore = (locals = {}) => {
-    const locale = getLocale(locals) || DEFAULT_LOCALE
+    const {locale} = locals
     const currency = getPreferredCurrency(locale) || DEFAULT_CURRENCY
 
     locals.api = new CommerceAPI({...apiConfig, locale, currency})
@@ -96,9 +69,10 @@ AppConfig.extraGetPropsArgs = (locals = {}) => {
     }
 }
 
-AppConfig.getIntlProps = async ({params}) => {
+AppConfig.getIntlProps = async ({location}) => {
     const defaultLocale = 'en-GB' // This value should align with the locale your `defaultMessages` are in.
-    const {locale = defaultLocale} = params
+    // eslint-disable-next-line no-unused-vars
+    const [_, locale = defaultLocale] = location.pathname.split('/')
 
     // Dynamically load the messages for the given default.
     const messages = (await import(`../../translations/compiled/${locale}.json`)).default
