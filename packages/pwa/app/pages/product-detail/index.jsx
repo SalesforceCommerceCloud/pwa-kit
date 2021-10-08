@@ -306,7 +306,7 @@ ProductDetail.getProps = async ({res, params, location, api}) => {
 
     // Set the `cache-control` header values similar to those on the product-list.
     if (res) {
-        res.set('Cache-Control', 'public, must-revalidate, max-age=900')
+        res.set('Cache-Control', 'max-age=900')
     }
 
     // The `commerce-isomorphic-sdk` package does not throw errors, so
