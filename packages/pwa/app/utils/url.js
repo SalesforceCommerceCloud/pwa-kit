@@ -7,7 +7,7 @@
 
 import {DEFAULT_LOCALE} from '../constants'
 import pwaKitConfig from '../../pwa-kit-config.json'
-import {siteIdAlias} from '../commerce-api.config'
+import {siteInfo} from '../commerce-api.config'
 
 /**
  * Modifies a given url by adding/updating query parameters.
@@ -204,7 +204,7 @@ export const removeQueryParamsFromPath = (path, keys) => {
 const buildRoutePath = (path, opts = {}) => {
     const {withSiteIdAlias} = opts
 
-    const newPath = `${withSiteIdAlias ? `/${siteIdAlias}` : ''}${path}`
+    const newPath = `${withSiteIdAlias ? `/${siteInfo.alias}` : ''}${path}`
     return newPath
 }
 
