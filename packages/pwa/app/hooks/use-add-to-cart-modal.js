@@ -39,9 +39,8 @@ export const AddToCartModalContext = React.createContext()
 export const useAddToCartModalContext = () => useContext(AddToCartModalContext)
 export const AddToCartModalProvider = ({children}) => {
     const addToCartModal = useAddToCartModal()
-    const value = useMemo(() => addToCartModal, [addToCartModal.isOpen, addToCartModal.data])
     return (
-        <AddToCartModalContext.Provider value={value}>
+        <AddToCartModalContext.Provider value={addToCartModal}>
             {children}
             <AddToCartModal />
         </AddToCartModalContext.Provider>
