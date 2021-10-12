@@ -14,7 +14,7 @@ import {SUPPORTED_LOCALES, DEFAULT_LOCALE, MESSAGES_OF_COMMON_LOCALES} from '../
  */
 export const loadLocaleData = async (locale) => {
     // NOTE: the pseudo locale in this case is actually `en-XB` from react-intl. For more details:
-    // - see our npm script `compile-messages:pseudo`
+    // - see our npm script `compile-translations:pseudo`
     // - and this react-intl PR: https://github.com/formatjs/formatjs/pull/2708
     const locales = [...SUPPORTED_LOCALES, 'en-XB']
     let localeToLoad
