@@ -10,7 +10,8 @@ import {
     getTargetLocale,
     loadLocaleData,
     getLocaleConfig,
-    getPreferredCurrency
+    getPreferredCurrency,
+    getMessageForLocaleCode
 } from './locale'
 
 import {SUPPORTED_LOCALES, DEFAULT_LOCALE} from '../constants'
@@ -64,7 +65,6 @@ describe('getTargetLocale', () => {
 describe('loadLocaleData', () => {
     test('default to English as the fallback locale', async () => {
         const messages = await loadLocaleData(nonSupportedLocale)
-        console.log('messages: ', messages)
         expect(messages[testMessageId][0].value).toMatch(/login redirect/i)
     })
     test('loading one of the supported locales', async () => {
@@ -121,5 +121,17 @@ describe('getCurrency', () => {
     test('returns undefined for a unsupported locale', () => {
         const currency = getPreferredCurrency(nonSupportedLocale)
         expect(currency).toBeFalsy()
+    })
+})
+
+describe('getMessageForLocaleCode', () => {
+    test('returns a translation message when passing in a default locale code', () => {
+        expect(getMessageForLocaleCode(DEFAULT_LOCALE)?.defaultMessage).toBeTruthy()
+    })
+
+    test('throws an error if the given locale code is not found', () => {
+        expect(() => {
+            getMessageForLocaleCode('xx-XX')
+        }).toThrow()
     })
 })
