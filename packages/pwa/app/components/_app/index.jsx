@@ -36,12 +36,12 @@ import useCustomer from '../../commerce-api/hooks/useCustomer'
 import {AuthModal, useAuthModal} from '../../hooks/use-auth-modal'
 
 // Localization
-import {defineMessages, IntlProvider} from 'react-intl'
+import {defineMessages, useIntl} from 'react-intl'
 
 // Others
 import {watchOnlineStatus, flatten} from '../../utils/utils'
 import {homeUrlBuilder, getUrlWithLocale} from '../../utils/url'
-import {getLocaleConfig, getPreferredCurrency} from '../../utils/locale'
+import {getPreferredCurrency} from '../../utils/locale'
 import {DEFAULT_CURRENCY, HOME_HREF, SUPPORTED_LOCALES} from '../../constants'
 
 import Seo from '../seo'
@@ -66,10 +66,11 @@ export const defaultLocaleMessages = defineMessages({
 })
 
 const App = (props) => {
-    const {children, targetLocale, defaultLocale, messages, categories: allCategories = {}} = props
+    const {children, categories: allCategories = {}} = props
 
     const appOrigin = getAppOrigin()
 
+    const intl = useIntl()
     const history = useHistory()
     const location = useLocation()
     const authModal = useAuthModal()
@@ -82,8 +83,11 @@ const App = (props) => {
     // Used to conditionally render header/footer for checkout page
     const isCheckout = /\/checkout$/.test(location?.pathname)
 
+    // Get the default and current locales
+    const {locale, defaultLocale} = intl
+
     // Get the current currency to be used throught the app
-    const currency = getPreferredCurrency(targetLocale) || DEFAULT_CURRENCY
+    const currency = getPreferredCurrency(locale) || DEFAULT_CURRENCY
 
     // Set up customer and basket
     useShopper({currency})
@@ -116,7 +120,7 @@ const App = (props) => {
 
     const onLogoClick = () => {
         // Goto the home page.
-        history.push(homeUrlBuilder(HOME_HREF, targetLocale))
+        history.push(homeUrlBuilder(HOME_HREF, locale))
 
         // Close the drawer.
         onClose()
@@ -124,7 +128,7 @@ const App = (props) => {
 
     const onCartClick = () => {
         // Goto the home page.
-        history.push(`/${targetLocale}/cart`)
+        history.push(`/${locale}/cart`)
 
         // Close the drawer.
         onClose()
@@ -133,16 +137,16 @@ const App = (props) => {
     const onAccountClick = () => {
         // Link to account page for registered customer, open auth modal otherwise
         if (customer.isRegistered) {
-            history.push(`/${targetLocale}/account`)
+            history.push(`/${locale}/account`)
         } else {
             // if they already are at the login page, do not show login modal
-            if (new RegExp(`^/${targetLocale}/login$`).test(location.pathname)) return
+            if (new RegExp(`^/${locale}/login$`).test(location.pathname)) return
             authModal.onOpen()
         }
     }
 
     const onWishlistClick = () => {
-        history.push(`/${targetLocale}/account/wishlist`)
+        history.push(`/${locale}/account/wishlist`)
     }
 
     return (
@@ -251,30 +255,6 @@ App.shouldGetProps = () => {
 }
 
 App.getProps = async ({api}) => {
-    const localeConfig = await getLocaleConfig({
-        getUserPreferredLocales: () => {
-            // CONFIG: This function should return an array of preferred locales. They can be
-            // derived from various sources. Below are some examples of those:
-            //
-            // - client side: window.navigator.languages
-            // - the page URL they're on (example.com/en-GB/home)
-            // - cookie (if their previous preference is saved there)
-            //
-            // If this function returns an empty array (e.g. there isn't locale in the page url),
-            // then the app would use the default locale as the fallback.
-
-            // NOTE: Your implementation may differ, this is jsut what we did.
-            //
-            // Since the CommerceAPI client already has the current `locale` set,
-            // we can use it's value to load the correct messages for the application.
-            // Take a look at the `app/components/_app-config` component on how the
-            // preferred locale was derived.
-            const {locale} = api.getConfig()
-
-            return [locale]
-        }
-    })
-
     // Login as `guest` to get session.
     await api.auth.login()
 
@@ -282,8 +262,7 @@ App.getProps = async ({api}) => {
     const rootCategory = await api.shopperProducts.getCategory({
         parameters: {
             id: DEFAULT_ROOT_CATEGORY,
-            levels: DEFAULT_NAV_DEPTH,
-            locale: localeConfig.app.targetLocale
+            levels: DEFAULT_NAV_DEPTH
         }
     })
 
@@ -305,18 +284,12 @@ You can either follow this doc, https://sfdc.co/B4Z1m to enable it in business m
     const categories = flatten(rootCategory, 'categories')
 
     return {
-        targetLocale: localeConfig.app.targetLocale,
-        defaultLocale: localeConfig.app.defaultLocale,
-        messages: localeConfig.messages,
         categories: categories
     }
 }
 
 App.propTypes = {
     children: PropTypes.node,
-    targetLocale: PropTypes.string,
-    defaultLocale: PropTypes.string,
-    messages: PropTypes.object,
     categories: PropTypes.object
 }
 
