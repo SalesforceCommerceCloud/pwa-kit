@@ -53,15 +53,11 @@ export const SUPPORTED_CURRENCIES = packageInfo.l10n.supportedCurrencies
 export const DEFAULT_CURRENCY = packageInfo.l10n.defaultCurrency
 
 /**
- *  Default messages for the supported locales.
- *  NOTE: Because the messages are statically analyzed, we have to maintain the list of locales asynchronously
- *  to those in the package.json.
+ *  Translations for names of the commonly-used locales.
  *  `locale` parameter format for OCAPI and Commerce API: <language code>-<country code>
  *  https://documentation.b2c.commercecloud.salesforce.com/DOC1/topic/com.demandware.dochelp/OCAPI/current/usage/Localization.html
- *  */
-// Source: https://www.techonthenet.com/js/language_tags.php
-// TODO: investigate performance (bundle size, translation file size, html)
-export const COMMON_LOCALES = defineMessages({
+ */
+export const MESSAGES_OF_COMMON_LOCALES = defineMessages({
     'ar-SA': {defaultMessage: 'Arabic (Saudi Arabia)'},
     'bn-BD': {defaultMessage: 'Bangla (Bangladesh)'},
     'bn-IN': {defaultMessage: 'Bangla (India)'},
