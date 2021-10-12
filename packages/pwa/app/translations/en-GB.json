@@ -1,6 +1,12 @@
 {
+  "+MBxFF": {
+    "defaultMessage": "English (United States)"
+  },
   "+O5yEM": {
     "defaultMessage": "Promotions Applied"
+  },
+  "+ZbX4W": {
+    "defaultMessage": "Czech (Czech Republic)"
   },
   "+dLAnb": {
     "defaultMessage": "Estimated Total"
@@ -20,8 +26,14 @@
   "08dLrR": {
     "defaultMessage": "/{activeLocale}/category/womens-clothing-jackets"
   },
+  "0Tjkj3": {
+    "defaultMessage": "German (Austria)"
+  },
   "0g/1TG": {
     "defaultMessage": "Continue to Payment"
+  },
+  "0n0dWe": {
+    "defaultMessage": "Hebrew (Israel)"
   },
   "0nWAOY": {
     "defaultMessage": "Go to home page"
@@ -38,11 +50,17 @@
   "1b9Q93": {
     "defaultMessage": "You will receive an email at <b>{email}</b> with a link to reset your password shortly."
   },
+  "1g+gvg": {
+    "defaultMessage": "French (Belgium)"
+  },
   "1yoQ91": {
     "defaultMessage": "No Wishlist Items"
   },
   "25WwxF": {
     "defaultMessage": "Don't have an account?"
+  },
+  "26gvH3": {
+    "defaultMessage": "French (Canada)"
   },
   "2BHb6K": {
     "defaultMessage": "Applied promotions info"
@@ -104,14 +122,23 @@
   "5S2I6Q": {
     "defaultMessage": "Incorrect username or password, please try again."
   },
+  "5e/Fjo": {
+    "defaultMessage": "Portuguese (Brazil)"
+  },
   "5ryYe9": {
     "defaultMessage": "Japanese (Japan)"
   },
   "5sg7KC": {
     "defaultMessage": "Password"
   },
+  "68qUv0": {
+    "defaultMessage": "Chinese (Hong Kong)"
+  },
   "6DCLcI": {
     "defaultMessage": "Please enter a valid date"
+  },
+  "74fug6": {
+    "defaultMessage": "Tamil (India)"
   },
   "7PMLfK": {
     "defaultMessage": "Order Total"
@@ -124,6 +151,9 @@
   },
   "8+0PQZ": {
     "defaultMessage": "The page you're looking for can't be found"
+  },
+  "8CDRAt": {
+    "defaultMessage": "Spanish (Mexico)"
   },
   "8d6kio": {
     "defaultMessage": "Sort By"
@@ -155,11 +185,17 @@
   "A8Tnga": {
     "defaultMessage": "Credit Card"
   },
+  "ABWZu0": {
+    "defaultMessage": "Spanish (Argentina)"
+  },
   "ADKef8": {
     "defaultMessage": "Add to cart"
   },
   "AYIKp4": {
     "defaultMessage": "Already have an account? Log in"
+  },
+  "AiDBu2": {
+    "defaultMessage": "Slovak (Slovakia)"
   },
   "Au/ysp": {
     "defaultMessage": "This is a secure SSL encrypted payment."
@@ -191,6 +227,9 @@
   "Cm91xY": {
     "defaultMessage": "Complete The Set"
   },
+  "CutQ+m": {
+    "defaultMessage": "Spanish (Columbia)"
+  },
   "CyOkb5": {
     "defaultMessage": "Promo Code"
   },
@@ -221,6 +260,9 @@
   },
   "EOUB63": {
     "defaultMessage": "Only {stockLevel} Left!"
+  },
+  "ES4Hjg": {
+    "defaultMessage": "Danish (Denmark)"
   },
   "EWw/tK": {
     "defaultMessage": "Apply"
@@ -271,6 +313,9 @@
   "JWbGSW": {
     "defaultMessage": "Shipped to: {name}"
   },
+  "KE5qj+": {
+    "defaultMessage": "French (Switzerland)"
+  },
   "KV/9Hv": {
     "defaultMessage": "Questions"
   },
@@ -288,6 +333,9 @@
   },
   "MPcjO/": {
     "defaultMessage": "Are you sure you want to sign out? You will need to sign back in to proceed with your current order."
+  },
+  "MQHbcd": {
+    "defaultMessage": "English (Canada)"
   },
   "MnpUD7": {
     "defaultMessage": "View details"
@@ -316,6 +364,9 @@
   "O8DHNx": {
     "defaultMessage": "Check the code and try again, it may already be applied or the promo has expired"
   },
+  "O8s+yR": {
+    "defaultMessage": "Spanish (Spain)"
+  },
   "O95R3Z": {
     "defaultMessage": "Phone"
   },
@@ -341,6 +392,9 @@
   "OVvfLK": {
     "defaultMessage": "You're now signed in"
   },
+  "OkmnSf": {
+    "defaultMessage": "Hungarian (Hungary)"
+  },
   "Olgsm/": {
     "defaultMessage": "Create an account for faster checkout"
   },
@@ -350,8 +404,14 @@
   "P5ouV8": {
     "defaultMessage": "Please enter your security code"
   },
+  "P87iMu": {
+    "defaultMessage": "Tamil (Sri Lanka)"
+  },
   "PBSfL4": {
     "defaultMessage": "Please enter a valid name"
+  },
+  "PEVXku": {
+    "defaultMessage": "Thai (Thailand)"
   },
   "PNj3WE": {
     "defaultMessage": "Review Order"
@@ -374,6 +434,12 @@
   "Q6wcZ5": {
     "defaultMessage": "First Name"
   },
+  "QEUh37": {
+    "defaultMessage": "English (Ireland)"
+  },
+  "Qb4dDN": {
+    "defaultMessage": "German (Switzerland)"
+  },
   "QclMUn": {
     "defaultMessage": "Please select your country"
   },
@@ -386,11 +452,17 @@
   "RlxeOk": {
     "defaultMessage": "Sort By: {sortOption}"
   },
+  "SFjs9b": {
+    "defaultMessage": "English (New Zealand)"
+  },
   "SQJto2": {
     "defaultMessage": "Sign in"
   },
   "SRkOX8": {
     "defaultMessage": "No, keep item"
+  },
+  "SXDujd": {
+    "defaultMessage": "Dutch (Belgium)"
   },
   "SeGQoh": {
     "defaultMessage": "Address Updated"
@@ -406,6 +478,9 @@
   },
   "T/K9MQ": {
     "defaultMessage": "promo applied"
+  },
+  "T8HBFR": {
+    "defaultMessage": "German (Germany)"
   },
   "TBI5GJ": {
     "defaultMessage": "This {length}-digit code can be found on the {side} of your card.",
@@ -427,9 +502,15 @@
   "TemVby": {
     "defaultMessage": "Full Name"
   },
+  "TvauRz": {
+    "defaultMessage": "Bangla (Bangladesh)"
+  },
   "Ty4jOO": {
     "defaultMessage": "1 number",
     "description": "Password requirement"
+  },
+  "U8vSQS": {
+    "defaultMessage": "Bangla (India)"
   },
   "UE9zNR": {
     "defaultMessage": "Recent Searches"
@@ -473,6 +554,9 @@
   "YDGR5k": {
     "defaultMessage": "No Saved Payment Methods"
   },
+  "YQhbMR": {
+    "defaultMessage": "Norwegian (Norway)"
+  },
   "Yy/yDL": {
     "defaultMessage": "Reset password"
   },
@@ -484,6 +568,12 @@
   },
   "ZMphaV": {
     "defaultMessage": "Promotion applied"
+  },
+  "ZWTTz6": {
+    "defaultMessage": "Polish (Poland)"
+  },
+  "Zgc/KO": {
+    "defaultMessage": "Spanish (United States)"
   },
   "Zhsl4Z": {
     "defaultMessage": "Back to Order History"
@@ -500,6 +590,9 @@
   },
   "b24hho": {
     "defaultMessage": "Chinese (China)"
+  },
+  "b2zNZE": {
+    "defaultMessage": "Russian (Russian Federation)"
   },
   "bTjwXj": {
     "defaultMessage": "Welcome Back"
@@ -538,6 +631,9 @@
   "cv1LY7": {
     "defaultMessage": "static/img/women-outfit.png"
   },
+  "d/RGdS": {
+    "defaultMessage": "Portuguese (Portugal)"
+  },
   "dS8BmB": {
     "defaultMessage": "static/img/feeling-red.png"
   },
@@ -555,6 +651,12 @@
   },
   "eKEL/g": {
     "defaultMessage": "Pending"
+  },
+  "eSl9Vh": {
+    "defaultMessage": "Finnish (Finland)"
+  },
+  "eYVKts": {
+    "defaultMessage": "English (India)"
   },
   "f0EhUc": {
     "defaultMessage": "Security Code"
@@ -634,11 +736,20 @@
   "fuzq0p": {
     "defaultMessage": "Checkout as guest"
   },
+  "g3uXY2": {
+    "defaultMessage": "Swedish (Sweden)"
+  },
   "gW8EGu": {
     "defaultMessage": "Name on Card"
   },
   "gg6vZx": {
     "defaultMessage": "Shop by Category"
+  },
+  "gguIJ8": {
+    "defaultMessage": "Hindi (India)"
+  },
+  "gzeOf+": {
+    "defaultMessage": "Chinese (Taiwan)"
   },
   "hCj9FS": {
     "defaultMessage": "Please enter your name as shown on your card"
@@ -669,6 +780,9 @@
   },
   "hwGJRL": {
     "defaultMessage": "/{activeLocale}/category/womens-clothing-feeling-red"
+  },
+  "i0/00S": {
+    "defaultMessage": "English (Australia)"
   },
   "iPMbLb": {
     "defaultMessage": "Please select a payment method."
@@ -760,6 +874,12 @@
   "mobile_navigation.links.privacy_and_security.terms_and_conditions": {
     "defaultMessage": "Terms & Conditions"
   },
+  "n/iZlE": {
+    "defaultMessage": "Spanish (Chile)"
+  },
+  "n9j5bS": {
+    "defaultMessage": "Turkish (Turkey)"
+  },
   "nA8PRt": {
     "defaultMessage": "1 lowercase letter",
     "description": "Password requirement"
@@ -833,6 +953,9 @@
   "qVGRIE": {
     "defaultMessage": "Quantity"
   },
+  "rU+Ph/": {
+    "defaultMessage": "Dutch (The Netherlands)"
+  },
   "rkxMdY": {
     "defaultMessage": "{itemCount, plural, =0 {0 items} one {# item} other {# items}} in cart",
     "description": "# item(s) in cart"
@@ -846,14 +969,26 @@
   "sy+pv5": {
     "defaultMessage": "Email"
   },
+  "tYBua6": {
+    "defaultMessage": "Indonesian (Indonesia)"
+  },
+  "tclGo+": {
+    "defaultMessage": "Arabic (Saudi Arabia)"
+  },
   "tf1lIh": {
     "defaultMessage": "Free"
   },
   "tiVXug": {
     "defaultMessage": "Please enter your city"
   },
+  "tnSBvt": {
+    "defaultMessage": "Korean (Republic of Korea)"
+  },
   "tpMVg1": {
     "defaultMessage": "Lighter layers for lighter days."
+  },
+  "uCdcPZ": {
+    "defaultMessage": "Romanian (Romania)"
   },
   "uCk8r+": {
     "defaultMessage": "Already have an account?"
@@ -873,8 +1008,14 @@
   "v898P+": {
     "defaultMessage": "You May Also Like"
   },
+  "vMvXOp": {
+    "defaultMessage": "Greek (Greece)"
+  },
   "vONi+O": {
     "defaultMessage": "Country"
+  },
+  "vSNTMO": {
+    "defaultMessage": "Italian (Switzerland)"
   },
   "vrBTnC": {
     "defaultMessage": "Do you want to send this as a gift?"
@@ -939,5 +1080,8 @@
   },
   "zXbRZR": {
     "defaultMessage": "Order Number: {orderNumber}"
+  },
+  "zdzY+u": {
+    "defaultMessage": "English (South Africa)"
   }
 }

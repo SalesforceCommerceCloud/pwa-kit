@@ -1,8 +1,20 @@
 {
+  "+MBxFF": [
+    {
+      "type": 0,
+      "value": "English (United States)"
+    }
+  ],
   "+O5yEM": [
     {
       "type": 0,
       "value": "Promotions Applied"
+    }
+  ],
+  "+ZbX4W": [
+    {
+      "type": 0,
+      "value": "Czech (Czech Republic)"
     }
   ],
   "+dLAnb": [
@@ -49,10 +61,22 @@
       "value": "/category/womens-clothing-jackets"
     }
   ],
+  "0Tjkj3": [
+    {
+      "type": 0,
+      "value": "German (Austria)"
+    }
+  ],
   "0g/1TG": [
     {
       "type": 0,
       "value": "Continue to Payment"
+    }
+  ],
+  "0n0dWe": [
+    {
+      "type": 0,
+      "value": "Hebrew (Israel)"
     }
   ],
   "0nWAOY": [
@@ -107,6 +131,12 @@
       "value": " with a link to reset your password shortly."
     }
   ],
+  "1g+gvg": [
+    {
+      "type": 0,
+      "value": "French (Belgium)"
+    }
+  ],
   "1yoQ91": [
     {
       "type": 0,
@@ -117,6 +147,12 @@
     {
       "type": 0,
       "value": "Don't have an account?"
+    }
+  ],
+  "26gvH3": [
+    {
+      "type": 0,
+      "value": "French (Canada)"
     }
   ],
   "2BHb6K": [
@@ -321,6 +357,12 @@
       "value": "Incorrect username or password, please try again."
     }
   ],
+  "5e/Fjo": [
+    {
+      "type": 0,
+      "value": "Portuguese (Brazil)"
+    }
+  ],
   "5ryYe9": [
     {
       "type": 0,
@@ -333,10 +375,22 @@
       "value": "Password"
     }
   ],
+  "68qUv0": [
+    {
+      "type": 0,
+      "value": "Chinese (Hong Kong)"
+    }
+  ],
   "6DCLcI": [
     {
       "type": 0,
       "value": "Please enter a valid date"
+    }
+  ],
+  "74fug6": [
+    {
+      "type": 0,
+      "value": "Tamil (India)"
     }
   ],
   "7PMLfK": [
@@ -361,6 +415,12 @@
     {
       "type": 0,
       "value": "The page you're looking for can't be found"
+    }
+  ],
+  "8CDRAt": [
+    {
+      "type": 0,
+      "value": "Spanish (Mexico)"
     }
   ],
   "8d6kio": [
@@ -423,6 +483,12 @@
       "value": "Credit Card"
     }
   ],
+  "ABWZu0": [
+    {
+      "type": 0,
+      "value": "Spanish (Argentina)"
+    }
+  ],
   "ADKef8": [
     {
       "type": 0,
@@ -433,6 +499,12 @@
     {
       "type": 0,
       "value": "Already have an account? Log in"
+    }
+  ],
+  "AiDBu2": [
+    {
+      "type": 0,
+      "value": "Slovak (Slovakia)"
     }
   ],
   "Au/ysp": [
@@ -493,6 +565,12 @@
     {
       "type": 0,
       "value": "Complete The Set"
+    }
+  ],
+  "CutQ+m": [
+    {
+      "type": 0,
+      "value": "Spanish (Columbia)"
     }
   ],
   "CyOkb5": [
@@ -603,6 +681,12 @@
       "value": " Left!"
     }
   ],
+  "ES4Hjg": [
+    {
+      "type": 0,
+      "value": "Danish (Denmark)"
+    }
+  ],
   "EWw/tK": [
     {
       "type": 0,
@@ -707,6 +791,12 @@
       "value": "name"
     }
   ],
+  "KE5qj+": [
+    {
+      "type": 0,
+      "value": "French (Switzerland)"
+    }
+  ],
   "KV/9Hv": [
     {
       "type": 0,
@@ -741,6 +831,12 @@
     {
       "type": 0,
       "value": "Are you sure you want to sign out? You will need to sign back in to proceed with your current order."
+    }
+  ],
+  "MQHbcd": [
+    {
+      "type": 0,
+      "value": "English (Canada)"
     }
   ],
   "MnpUD7": [
@@ -795,6 +891,12 @@
     {
       "type": 0,
       "value": "Check the code and try again, it may already be applied or the promo has expired"
+    }
+  ],
+  "O8s+yR": [
+    {
+      "type": 0,
+      "value": "Spanish (Spain)"
     }
   ],
   "O95R3Z": [
@@ -877,6 +979,12 @@
       "value": "You're now signed in"
     }
   ],
+  "OkmnSf": [
+    {
+      "type": 0,
+      "value": "Hungarian (Hungary)"
+    }
+  ],
   "Olgsm/": [
     {
       "type": 0,
@@ -895,10 +1003,22 @@
       "value": "Please enter your security code"
     }
   ],
+  "P87iMu": [
+    {
+      "type": 0,
+      "value": "Tamil (Sri Lanka)"
+    }
+  ],
   "PBSfL4": [
     {
       "type": 0,
       "value": "Please enter a valid name"
+    }
+  ],
+  "PEVXku": [
+    {
+      "type": 0,
+      "value": "Thai (Thailand)"
     }
   ],
   "PNj3WE": [
@@ -951,6 +1071,18 @@
       "value": "First Name"
     }
   ],
+  "QEUh37": [
+    {
+      "type": 0,
+      "value": "English (Ireland)"
+    }
+  ],
+  "Qb4dDN": [
+    {
+      "type": 0,
+      "value": "German (Switzerland)"
+    }
+  ],
   "QclMUn": [
     {
       "type": 0,
@@ -979,6 +1111,12 @@
       "value": "sortOption"
     }
   ],
+  "SFjs9b": [
+    {
+      "type": 0,
+      "value": "English (New Zealand)"
+    }
+  ],
   "SQJto2": [
     {
       "type": 0,
@@ -989,6 +1127,12 @@
     {
       "type": 0,
       "value": "No, keep item"
+    }
+  ],
+  "SXDujd": [
+    {
+      "type": 0,
+      "value": "Dutch (Belgium)"
     }
   ],
   "SeGQoh": [
@@ -1019,6 +1163,12 @@
     {
       "type": 0,
       "value": "promo applied"
+    }
+  ],
+  "T8HBFR": [
+    {
+      "type": 0,
+      "value": "German (Germany)"
     }
   ],
   "TBI5GJ": [
@@ -1073,10 +1223,22 @@
       "value": "Full Name"
     }
   ],
+  "TvauRz": [
+    {
+      "type": 0,
+      "value": "Bangla (Bangladesh)"
+    }
+  ],
   "Ty4jOO": [
     {
       "type": 0,
       "value": "1 number"
+    }
+  ],
+  "U8vSQS": [
+    {
+      "type": 0,
+      "value": "Bangla (India)"
     }
   ],
   "UE9zNR": [
@@ -1163,6 +1325,12 @@
       "value": "No Saved Payment Methods"
     }
   ],
+  "YQhbMR": [
+    {
+      "type": 0,
+      "value": "Norwegian (Norway)"
+    }
+  ],
   "Yy/yDL": [
     {
       "type": 0,
@@ -1185,6 +1353,18 @@
     {
       "type": 0,
       "value": "Promotion applied"
+    }
+  ],
+  "ZWTTz6": [
+    {
+      "type": 0,
+      "value": "Polish (Poland)"
+    }
+  ],
+  "Zgc/KO": [
+    {
+      "type": 0,
+      "value": "Spanish (United States)"
     }
   ],
   "Zhsl4Z": [
@@ -1249,6 +1429,12 @@
     {
       "type": 0,
       "value": "Chinese (China)"
+    }
+  ],
+  "b2zNZE": [
+    {
+      "type": 0,
+      "value": "Russian (Russian Federation)"
     }
   ],
   "bTjwXj": [
@@ -1323,6 +1509,12 @@
       "value": "static/img/women-outfit.png"
     }
   ],
+  "d/RGdS": [
+    {
+      "type": 0,
+      "value": "Portuguese (Portugal)"
+    }
+  ],
   "dS8BmB": [
     {
       "type": 0,
@@ -1357,6 +1549,18 @@
     {
       "type": 0,
       "value": "Pending"
+    }
+  ],
+  "eSl9Vh": [
+    {
+      "type": 0,
+      "value": "Finnish (Finland)"
+    }
+  ],
+  "eYVKts": [
+    {
+      "type": 0,
+      "value": "English (India)"
     }
   ],
   "f0EhUc": [
@@ -1529,6 +1733,12 @@
       "value": "Checkout as guest"
     }
   ],
+  "g3uXY2": [
+    {
+      "type": 0,
+      "value": "Swedish (Sweden)"
+    }
+  ],
   "gW8EGu": [
     {
       "type": 0,
@@ -1539,6 +1749,18 @@
     {
       "type": 0,
       "value": "Shop by Category"
+    }
+  ],
+  "gguIJ8": [
+    {
+      "type": 0,
+      "value": "Hindi (India)"
+    }
+  ],
+  "gzeOf+": [
+    {
+      "type": 0,
+      "value": "Chinese (Taiwan)"
     }
   ],
   "hCj9FS": [
@@ -1607,6 +1829,12 @@
     {
       "type": 0,
       "value": "/category/womens-clothing-feeling-red"
+    }
+  ],
+  "i0/00S": [
+    {
+      "type": 0,
+      "value": "English (Australia)"
     }
   ],
   "iPMbLb": [
@@ -1797,6 +2025,18 @@
       "value": "Terms & Conditions"
     }
   ],
+  "n/iZlE": [
+    {
+      "type": 0,
+      "value": "Spanish (Chile)"
+    }
+  ],
+  "n9j5bS": [
+    {
+      "type": 0,
+      "value": "Turkish (Turkey)"
+    }
+  ],
   "nA8PRt": [
     {
       "type": 0,
@@ -1969,6 +2209,12 @@
       "value": "Quantity"
     }
   ],
+  "rU+Ph/": [
+    {
+      "type": 0,
+      "value": "Dutch (The Netherlands)"
+    }
+  ],
   "rkxMdY": [
     {
       "offset": 0,
@@ -2031,6 +2277,18 @@
       "value": "Email"
     }
   ],
+  "tYBua6": [
+    {
+      "type": 0,
+      "value": "Indonesian (Indonesia)"
+    }
+  ],
+  "tclGo+": [
+    {
+      "type": 0,
+      "value": "Arabic (Saudi Arabia)"
+    }
+  ],
   "tf1lIh": [
     {
       "type": 0,
@@ -2043,10 +2301,22 @@
       "value": "Please enter your city"
     }
   ],
+  "tnSBvt": [
+    {
+      "type": 0,
+      "value": "Korean (Republic of Korea)"
+    }
+  ],
   "tpMVg1": [
     {
       "type": 0,
       "value": "Lighter layers for lighter days."
+    }
+  ],
+  "uCdcPZ": [
+    {
+      "type": 0,
+      "value": "Romanian (Romania)"
     }
   ],
   "uCk8r+": [
@@ -2089,10 +2359,22 @@
       "value": "You May Also Like"
     }
   ],
+  "vMvXOp": [
+    {
+      "type": 0,
+      "value": "Greek (Greece)"
+    }
+  ],
   "vONi+O": [
     {
       "type": 0,
       "value": "Country"
+    }
+  ],
+  "vSNTMO": [
+    {
+      "type": 0,
+      "value": "Italian (Switzerland)"
     }
   ],
   "vrBTnC": [
@@ -2235,6 +2517,12 @@
     {
       "type": 1,
       "value": "orderNumber"
+    }
+  ],
+  "zdzY+u": [
+    {
+      "type": 0,
+      "value": "English (South Africa)"
     }
   ]
 }
