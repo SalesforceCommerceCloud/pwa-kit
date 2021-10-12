@@ -138,7 +138,7 @@ class CommerceAPI {
                                         : !!sendCurrency
 
                                     // Ensure we don't send the pseudo locale.
-                                    if (locale !== 'en-XB') {
+                                    if (locale === 'en-XB') {
                                         sendLocale = false
                                     }
 
