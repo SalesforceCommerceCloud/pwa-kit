@@ -48,8 +48,11 @@ export const loadLocaleData = async (locale) => {
  */
 export const getLocaleConfig = async ({getUserPreferredLocales} = {}) => {
     const preferredLocales = getUserPreferredLocales ? getUserPreferredLocales() : [DEFAULT_LOCALE]
-    const targetLocale = getTargetLocale(preferredLocales, SUPPORTED_LOCALES, DEFAULT_LOCALE)
-    const messages = await loadLocaleData(targetLocale)
+    const targetLocale = whichLocaleToLoad(preferredLocales, SUPPORTED_LOCALES, DEFAULT_LOCALE)
+
+    const messages = await loadLocaleData(
+        typeof window === 'undefined' ? process.env.TARGET_LOCALE || targetLocale : targetLocale
+    )
 
     return {
         app: {
@@ -77,20 +80,6 @@ export const whichLocaleToLoad = (preferredLocales, supportedLocales, fallbackLo
     )[0]
 
     return targetLocale || fallbackLocale
-}
-
-/**
- * Get the target locale
- * @param {string[]} preferredLocales - All locales that the user prefers
- * @param {string[]} supportedLocales - All locales that your app supports
- * @param {string} defaultLocale - App's default locale
- * @returns {string} Either `TARGET_LOCALE` environment variable if it's set OR the calculated target locale
- */
-export const getTargetLocale = (preferredLocales, supportedLocales, defaultLocale) => {
-    return (
-        process.env.TARGET_LOCALE ||
-        whichLocaleToLoad(preferredLocales, supportedLocales, defaultLocale)
-    )
 }
 
 /**
