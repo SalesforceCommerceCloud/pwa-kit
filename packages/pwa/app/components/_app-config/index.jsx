@@ -22,7 +22,7 @@ import {
 import {commerceAPIConfig} from '../../commerce-api.config'
 import {einsteinAPIConfig} from '../../einstein-api.config'
 import {DEFAULT_CURRENCY} from '../../constants'
-import {getPreferredCurrency} from '../../utils/locale'
+import {getLocaleConfig, getPreferredCurrency} from '../../utils/locale'
 
 const apiConfig = {
     ...commerceAPIConfig,
@@ -70,18 +70,27 @@ AppConfig.extraGetPropsArgs = (locals = {}) => {
 }
 
 AppConfig.getIntlProps = async ({location}) => {
-    const defaultLocale = 'en-GB' // This value should align with the locale your `defaultMessages` are in.
-    // eslint-disable-next-line no-unused-vars
-    const [_, locale = defaultLocale] = location.pathname.split('/')
+    const config = await getLocaleConfig({
+        getUserPreferredLocales: () => {
+            // CONFIG: This function should return an array of preferred locales. They can be
+            // derived from various sources. Below are some examples of those:
+            //
+            // - client side: window.navigator.languages
+            // - the page URL they're on (example.com/en-GB/home)
+            // - cookie (if their previous preference is saved there)
+            //
+            // If this function returns an empty array (e.g. there isn't locale in the page url),
+            // then the app would use the default locale as the fallback.
+            // NOTE: Your implementation may differ, this is jsut what we did.
 
-    // Dynamically load the messages for the given default.
-    const messages = (await import(`../../translations/compiled/${locale}.json`)).default
+            // eslint-disable-next-line no-unused-vars
+            let [_, locale] = location.pathname.split('/')
 
-    return {
-        locale,
-        defaultLocale,
-        messages
-    }
+            return [locale]
+        }
+    })
+
+    return config
 }
 
 AppConfig.propTypes = {
