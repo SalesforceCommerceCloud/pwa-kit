@@ -225,10 +225,12 @@ export const useAddToCartModal = () => {
 
     const {pathname} = useLocation()
     useEffect(() => {
-        setState({
-            ...state,
-            isOpen: false
-        })
+        if (state.isOpen) {
+            setState({
+                ...state,
+                isOpen: false
+            })
+        }
     }, [pathname])
 
     return {
