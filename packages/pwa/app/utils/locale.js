@@ -7,16 +7,22 @@
 
 import {SUPPORTED_LOCALES, DEFAULT_LOCALE} from '../constants'
 
+// TODO: Retind how we access the config file, maybe we need a wrapper.
+// In the interim we need to address the webpack issues importing this json file with names exports.
+import config from '../../pwa-kit-config.json'
+
 /**
  * Dynamically import the translations/messages for a given locale
  * @param {string} locale - The locale code
  * @returns {Promise<Object>} The messages (compiled in AST format) in the given locale. If locale is not found, returns the default locale's messages.
  */
 export const loadLocaleData = async (locale) => {
+    const supportedShortCodes = config.l10n.supportedLocales.map(({id}) => id)
+
     // NOTE: the pseudo locale in this case is actually `en-XB` from react-intl. For more details:
     // - see our npm script `compile-translations:pseudo`
     // - and this react-intl PR: https://github.com/formatjs/formatjs/pull/2708
-    const locales = [...SUPPORTED_LOCALES, 'en-XB']
+    const locales = [...supportedShortCodes, 'en-XB']
     let localeToLoad
 
     if (locales.includes(locale)) {
@@ -52,14 +58,8 @@ export const getLocaleConfig = async ({getUserPreferredLocales} = {}) => {
     const messages = await loadLocaleData(targetLocale)
 
     return {
-        app: {
-            supportedLocales: SUPPORTED_LOCALES,
-            defaultLocale: DEFAULT_LOCALE,
-            targetLocale
-        },
-        user: {
-            preferredLocales
-        },
+        defaultLocale: DEFAULT_LOCALE,
+        locale: targetLocale,
         messages
     }
 }
@@ -99,6 +99,6 @@ export const getTargetLocale = (preferredLocales, supportedLocales, defaultLocal
  * @returns {string} The specific currency for the locale
  */
 export const getPreferredCurrency = (locale) => {
-    return SUPPORTED_LOCALES.find((supportedLocale) => supportedLocale.id === locale)
+    return config.l10n.supportedLocales.find((supportedLocale) => supportedLocale.id === locale)
         ?.preferredCurrency
 }
