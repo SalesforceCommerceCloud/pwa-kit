@@ -71,8 +71,6 @@ export const AddToCartModal = () => {
         selectedVariationAttributes: variationValues
     })?.images?.[0]
 
-    const {locale} = useIntl()
-
     return (
         <Modal size={size} isOpen={isOpen} onClose={onClose}>
             <ModalOverlay />
