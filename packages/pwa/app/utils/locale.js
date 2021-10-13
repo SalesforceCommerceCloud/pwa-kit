@@ -51,7 +51,7 @@ export const getLocaleConfig = async ({getUserPreferredLocales} = {}) => {
     const targetLocale = whichLocaleToLoad(preferredLocales, SUPPORTED_LOCALES, DEFAULT_LOCALE)
 
     const messages = await loadLocaleData(
-        typeof window === 'undefined' ? process.env.TARGET_LOCALE || targetLocale : targetLocale
+        typeof window === 'undefined' ? process.env.PSEUDOLOCALE || targetLocale : targetLocale
     )
 
     return {
