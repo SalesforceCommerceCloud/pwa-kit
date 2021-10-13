@@ -93,7 +93,12 @@ export const TestProviders = ({
         _setBasket(data)
     })
 
-    const addToCartModal = useAddToCartModal()
+    const addToCartModal = {
+        isOpen: false,
+        data: null,
+        onOpen: () => {},
+        onClose: () => {}
+    }
 
     return (
         <IntlProvider locale={DEFAULT_LOCALE} defaultLocale={DEFAULT_LOCALE}>
