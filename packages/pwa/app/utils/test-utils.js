@@ -18,7 +18,7 @@ import {
     CustomerProvider,
     CustomerProductListsProvider
 } from '../commerce-api/contexts'
-import {useAddToCartModal, AddToCartModalContext} from '../hooks/use-add-to-cart-modal'
+import {AddToCartModalContext} from '../hooks/use-add-to-cart-modal'
 import {commerceAPIConfig} from '../commerce-api.config'
 import {IntlProvider} from 'react-intl'
 import {DEFAULT_LOCALE, DEFAULT_CURRENCY} from '../constants'
