@@ -133,22 +133,13 @@ class CommerceAPI {
                                     ? sendCurrency.includes(prop)
                                     : !!sendCurrency
 
-                                if (sendLocaleForCurrentProp) {
-                                    fetchOptions.parameters = {
-                                        ...fetchOptions.parameters,
-                                        ...{locale}
-                                    }
-                                } else {
-                                    delete fetchOptions.parameters?.locale
-                                }
+                                const {locale: _l, currency: _c, ...rest} =
+                                    fetchOptions.parameters || {}
 
-                                if (sendCurrencyForCurrentProp) {
-                                    fetchOptions.parameters = {
-                                        ...fetchOptions.parameters,
-                                        ...{currency}
-                                    }
-                                } else {
-                                    delete fetchOptions.parameters?.currency
+                                fetchOptions.parameters = {
+                                    ...rest,
+                                    ...(sendLocaleForCurrentProp ? {locale} : {}),
+                                    ...(sendCurrencyForCurrentProp ? {currency} : {})
                                 }
 
                                 return self.willSendRequest(prop, ...args).then((newArgs) => {
