@@ -83,7 +83,7 @@ export const start = () => {
                             <Switch
                                 error={error}
                                 appState={window.__PRELOADED_STATE__}
-                                intlProps={{
+                                intlConfig={{
                                     // We need to spread the defaults here too.
                                     defaultLocal: window.__INTL_DAFAULT_LOCALE__,
                                     locale: window.__INTL_LOCALE__,

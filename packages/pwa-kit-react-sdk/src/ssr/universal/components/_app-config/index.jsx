@@ -64,16 +64,13 @@ class AppConfig extends React.Component {
         return {}
     }
 
-    // TODO: Clean up these comments.
     /**
-     * Return any props to be used on the internationalization provider object
+     * Return a {@link https://formatjs.io/docs/react-intl/components/#intlprovider IntlConfig}
+     * object to be used on the provider component.
      *
      * @param {Object} args
      *
      * @param {Request} args.req - an Express HTTP Request object on the server,
-     *   undefined on the client.
-     *
-     * @param {Response} args.res - an Express HTTP Response object on the server,
      *   undefined on the client.
      *
      * @param {Location} args.location - the current value of window.location,
@@ -82,7 +79,7 @@ class AppConfig extends React.Component {
      * @return {Promise<Object>}
      */
     // eslint-disable-next-line no-unused-vars
-    static async getIntlProps(args) {
+    static async getIntlConfig(args) {
         return {}
     }
 

@@ -141,14 +141,14 @@ export const render = async (req, res) => {
     }
 
     // Step 0 - Get the localization props and put it in our locals
-    const intlProps = await AppConfig.getIntlProps({
+    const intlConfig = await AppConfig.getIntlConfig({
         req,
         location
     })
 
     // TODO: Think about if this is a good place to put the locale, or just pass it
     // into `restore` as an additional argument since it's essentially in the api now.
-    res.locals.locale = intlProps.locale
+    res.locals.locale = intlConfig.locale
 
     // AppConfig.restore *must* come before using getRoutes() or routeComponent()
     // to inject arguments into the wrapped component's getProps methods.
@@ -190,7 +190,7 @@ export const render = async (req, res) => {
         App: WrappedApp,
         appState,
         error: appStateError && logAndFormatError(appStateError),
-        intlProps,
+        intlConfig,
         routes,
         req,
         res,
@@ -216,7 +216,7 @@ export const render = async (req, res) => {
 }
 
 const renderApp = (args) => {
-    const {req, res, location, routes, appState, error, intlProps, App} = args
+    const {req, res, location, routes, appState, error, intlConfig, App} = args
 
     const ssrOnly = 'mobify_server_only' in req.query
     const prettyPrint = 'mobify_pretty' in req.query
@@ -233,7 +233,7 @@ const renderApp = (args) => {
                     <Switch
                         error={error}
                         appState={appState}
-                        intlProps={intlProps}
+                        intlConfig={intlConfig}
                         routes={routes}
                         App={App}
                     />
@@ -283,9 +283,9 @@ const renderApp = (args) => {
     // Do *not* add to these without a very good reason - globals are a liability.
     const windowGlobals = {
         __DEVICE_TYPE__: deviceType,
-        __INTL_DAFAULT_LOCALE__: intlProps.defaultLocale,
-        __INTL_LOCALE__: intlProps.locale,
-        __INTL_MESSAGES__: intlProps.messages,
+        __INTL_DAFAULT_LOCALE__: intlConfig.defaultLocale,
+        __INTL_LOCALE__: intlConfig.locale,
+        __INTL_MESSAGES__: intlConfig.messages,
         __PRELOADED_STATE__: appState,
         __ERROR__: error,
         // `window.Progressive` has a long history at Mobify and some

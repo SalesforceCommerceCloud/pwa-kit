@@ -23,11 +23,11 @@ import {IntlProvider as ReactIntlProvider} from 'react-intl'
  * @private
  */
 const Switch = (props) => {
-    const {error, appState, intlProps, routes, App} = props
-    const IntlProvider = intlProps ? ReactIntlProvider : Fragment
+    const {error, appState, intlConfig, routes, App} = props
+    const IntlProvider = intlConfig ? ReactIntlProvider : Fragment
 
     // TODO: Figure out why this isn't working.
-    // const defaultIntlProps = intlProps
+    // const defaultIntlConfig = intlConfig
     //     ? {
     //           onError: (err) => {
     //               if (err.code === 'MISSING_TRANSLATION') {
@@ -43,8 +43,7 @@ const Switch = (props) => {
 
     return (
         <UIDReset>
-            {/* TODO: Where do we have defaults?  */}
-            <IntlProvider {...intlProps}>
+            <IntlProvider {...intlConfig}>
                 <AppErrorBoundary error={error}>
                     {!error && (
                         <App preloadedProps={appState.appProps}>
@@ -74,7 +73,7 @@ Switch.propTypes = {
     routes: PropTypes.array,
     App: PropTypes.func,
     preloadedProps: PropTypes.object,
-    intlProps: PropTypes.object
+    intlConfig: PropTypes.object
 }
 
 export default Switch

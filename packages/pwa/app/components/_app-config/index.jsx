@@ -69,7 +69,7 @@ AppConfig.extraGetPropsArgs = (locals = {}) => {
     }
 }
 
-AppConfig.getIntlProps = async ({location}) => {
+AppConfig.getIntlConfig = async ({location}) => {
     const config = await getLocaleConfig({
         getUserPreferredLocales: () => {
             // CONFIG: This function should return an array of preferred locales. They can be
