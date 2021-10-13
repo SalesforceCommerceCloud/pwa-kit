@@ -283,9 +283,7 @@ const renderApp = (args) => {
     // Do *not* add to these without a very good reason - globals are a liability.
     const windowGlobals = {
         __DEVICE_TYPE__: deviceType,
-        __INTL_DAFAULT_LOCALE__: intlConfig.defaultLocale,
-        __INTL_LOCALE__: intlConfig.locale,
-        __INTL_MESSAGES__: intlConfig.messages,
+        __INTL_CONFIG__: intlConfig,
         __PRELOADED_STATE__: appState,
         __ERROR__: error,
         // `window.Progressive` has a long history at Mobify and some

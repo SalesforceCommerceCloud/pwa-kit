@@ -70,27 +70,47 @@ AppConfig.extraGetPropsArgs = (locals = {}) => {
 }
 
 AppConfig.getIntlConfig = async ({location}) => {
-    const config = await getLocaleConfig({
-        getUserPreferredLocales: () => {
-            // CONFIG: This function should return an array of preferred locales. They can be
-            // derived from various sources. Below are some examples of those:
-            //
-            // - client side: window.navigator.languages
-            // - the page URL they're on (example.com/en-GB/home)
-            // - cookie (if their previous preference is saved there)
-            //
-            // If this function returns an empty array (e.g. there isn't locale in the page url),
-            // then the app would use the default locale as the fallback.
-            // NOTE: Your implementation may differ, this is jsut what we did.
-
-            // eslint-disable-next-line no-unused-vars
-            let [_, locale] = location.pathname.split('/')
-
-            return [locale]
+    let localeConfig
+    const defaults = {
+        onError: (err) => {
+            if (err.code === 'MISSING_TRANSLATION') {
+                // NOTE: Remove the console error for missing translations during development,
+                // as we knew translations would be added later.
+                console.warn('Missing translation', err.message)
+                return
+            }
+            throw err
         }
-    })
+    }
 
-    return config
+    if (typeof window !== 'undefined') {
+        localeConfig = window.__INTL_CONFIG__
+    } else {
+        localeConfig = await getLocaleConfig({
+            getUserPreferredLocales: () => {
+                // CONFIG: This function should return an array of preferred locales. They can be
+                // derived from various sources. Below are some examples of those:
+                //
+                // - client side: window.navigator.languages
+                // - the page URL they're on (example.com/en-GB/home)
+                // - cookie (if their previous preference is saved there)
+                //
+                // If this function returns an empty array (e.g. there isn't locale in the page url),
+                // then the app would use the default locale as the fallback.
+                // NOTE: Your implementation may differ, this is jsut what we did.
+
+                // eslint-disable-next-line no-unused-vars
+                let [_, locale] = location.pathname.split('/')
+
+                return [locale]
+            }
+        })
+    }
+
+    return {
+        ...localeConfig,
+        ...defaults
+    }
 }
 
 AppConfig.propTypes = {
