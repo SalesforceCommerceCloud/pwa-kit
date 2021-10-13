@@ -55,8 +55,6 @@ const TTI_POLYFILL_SCRIPT = [
     `g.o.observe({entryTypes:['longtask']})}}();`
 ].join('')
 
-const noop = () => {}
-
 export const ALLOWLISTED_INLINE_SCRIPTS = [TTI_POLYFILL_SCRIPT]
 
 /**
@@ -141,10 +139,9 @@ export const render = async (req, res) => {
         pathname,
         search: search ? `?${search}` : ''
     }
-    const {getIntlProps = noop} = AppConfig
 
     // Step 0 - Get the localization props and put it in our locals
-    const intlProps = await getIntlProps({
+    const intlProps = await AppConfig.getIntlProps({
         req,
         location
     })
