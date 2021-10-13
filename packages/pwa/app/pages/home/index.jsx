@@ -29,7 +29,6 @@ const Home = () => {
     const intl = useIntl()
 
     const siteAlias = useSiteAlias()
-    console.log('siteAlias', siteAlias)
 
     return (
         <Box data-testid="home-page" layerStyle="page">

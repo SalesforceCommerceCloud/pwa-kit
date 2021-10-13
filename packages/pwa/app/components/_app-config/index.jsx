@@ -89,12 +89,13 @@ const AppConfig = ({children, locals = {}}) => {
 AppConfig.restore = (locals = {}) => {
     const siteId = getSiteId(locals.originalUrl)
     if (!siteId) {
-        console.warn(
+        console.error(
             `Cannot find the siteID, the fallback siteId ${commerceAPIConfig.parameters.siteId} will be used`
         )
+    } else {
+        apiConfig.parameters.siteId = siteId
     }
 
-    apiConfig.parameters.siteId = siteId
     const locale = getLocale(locals) || DEFAULT_LOCALE
     const currency = getPreferredCurrency(locale) || DEFAULT_CURRENCY
 

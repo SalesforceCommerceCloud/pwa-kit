@@ -134,11 +134,7 @@ const Footer = ({...otherProps}) => {
                                     const newUrl = getUrlWithLocale(target.value, {
                                         disallowParams: ['refine']
                                     })
-
-                                    console.log('newUrl', newUrl)
-
                                     window.location = newUrl
-                                    console.log('change ======================= locale')
                                 }}
                                 variant="filled"
                                 {...styles.localeDropdown}

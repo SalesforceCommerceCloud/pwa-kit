@@ -59,14 +59,11 @@ const ListMenuTrigger = ({item, name, isOpen, onOpen, onClose, hasItems}) => {
     }
 
     const siteAlias = useSiteAlias()
-    console.log('siteAlias cate', siteAlias)
-    const url = categoryUrlBuilder(item, locale, siteAlias)
-    console.log('url', url)
     return (
         <Box {...baseStyle.listMenuTriggerContainer}>
             <Link
                 as={RouteLink}
-                to={url}
+                to={categoryUrlBuilder(item, locale, siteAlias)}
                 onMouseOver={onOpen}
                 {...baseStyle.listMenuTriggerLink}
                 {...(hasItems ? {name: name + ' __'} : {name: name})}

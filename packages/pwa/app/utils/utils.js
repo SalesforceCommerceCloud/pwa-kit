@@ -165,9 +165,13 @@ export const getSiteId = (originalUrl) => {
     if (!path) {
         path = window?.location.href.replace(window.location.origin, '')
     }
-    debugger
 
-    if (path === HOME_HREF) return pwaKitConfig.app.defaultSiteId
+    if (path === HOME_HREF) {
+        const siteIdArr = pwaKitConfig.app.sites.map((site) => site.id)
+        // check if the default value is in the sites array config
+        if (!siteIdArr.includes(pwaKitConfig.app.defaultSiteId)) return undefined
+        return pwaKitConfig.app.defaultSiteId
+    }
 
     // Parse the pathname from the partial using the URL object and a placeholder host
     const {pathname} = new URL(`http://hostname${path}`)
@@ -181,5 +185,5 @@ export const getSiteId = (originalUrl) => {
 
 export const getSiteAlias = (siteId) => {
     if (!siteId) throw new Error('Cannot find siteId')
-    return pwaKitConfig.app.sites.find((site) => site.id === siteId).alias
+    return pwaKitConfig.app.sites.find((site) => site.id === siteId)?.alias
 }
