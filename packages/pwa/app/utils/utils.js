@@ -5,6 +5,9 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
+import pwaKitConfig from '../../pwa-kit-config.json'
+import {HOME_HREF} from '../constants'
+
 /**
  * Call requestIdleCallback in supported browsers.
  *
@@ -153,4 +156,30 @@ export const capitalize = (text) => {
         .split(' ')
         .map((s) => s.charAt(0).toUpperCase() + s.substring(1))
         .join(' ')
+}
+
+export const getSiteId = (originalUrl) => {
+    let path = originalUrl
+    // If there is no originalUrl value in the locals, create it from the window location.
+    // This happens when executing on the client.
+    if (!path) {
+        path = window?.location.href.replace(window.location.origin, '')
+    }
+    debugger
+
+    if (path === HOME_HREF) return pwaKitConfig.app.defaultSiteId
+
+    // Parse the pathname from the partial using the URL object and a placeholder host
+    const {pathname} = new URL(`http://hostname${path}`)
+    const siteAlias = pathname.split('/')[1]
+    const siteId = pwaKitConfig.app.sites.find((site) => {
+        return site.alias === siteAlias
+    })?.id
+
+    return siteId
+}
+
+export const getSiteAlias = (siteId) => {
+    if (!siteId) throw new Error('Cannot find siteId')
+    return pwaKitConfig.app.sites.find((site) => site.id === siteId).alias
 }

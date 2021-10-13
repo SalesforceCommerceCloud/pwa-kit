@@ -46,6 +46,7 @@ import {DEFAULT_CURRENCY, HOME_HREF, SUPPORTED_LOCALES} from '../../constants'
 
 import Seo from '../seo'
 import useWishlist from '../../hooks/use-wishlist'
+import {useSiteAlias} from '../../hooks/use-site-alias'
 
 const DEFAULT_NAV_DEPTH = 3
 const DEFAULT_ROOT_CATEGORY = 'root'
@@ -74,6 +75,7 @@ const App = (props) => {
     const location = useLocation()
     const authModal = useAuthModal()
     const customer = useCustomer()
+    const siteAlias = useSiteAlias()
     const [isOnline, setIsOnline] = useState(true)
     const styles = useStyleConfig('App')
 
@@ -116,14 +118,14 @@ const App = (props) => {
 
     const onLogoClick = () => {
         // Goto the home page.
-        history.push(homeUrlBuilder(HOME_HREF, targetLocale))
+        history.push(homeUrlBuilder(HOME_HREF, targetLocale, siteAlias))
 
         // Close the drawer.
         onClose()
     }
 
     const onCartClick = () => {
-        history.push(buildMultiSiteRoute(`/${targetLocale}/cart`))
+        history.push(`/${siteAlias}/${targetLocale}/cart`)
 
         // Close the drawer.
         onClose()
@@ -132,16 +134,16 @@ const App = (props) => {
     const onAccountClick = () => {
         // Link to account page for registered customer, open auth modal otherwise
         if (customer.isRegistered) {
-            history.push(buildMultiSiteRoute(`/${targetLocale}/account`))
+            history.push(`/${siteAlias}/${targetLocale}/account`)
         } else {
             // if they already are at the login page, do not show login modal
-            if (new RegExp(`^/${targetLocale}/login$`).test(location.pathname)) return
+            if (new RegExp(`^${siteAlias}/${targetLocale}/login$`).test(location.pathname)) return
             authModal.onOpen()
         }
     }
 
     const onWishlistClick = () => {
-        history.push(buildMultiSiteRoute(`/${targetLocale}/account/wishlist`))
+        history.push(`/${siteAlias}/${targetLocale}/account/wishlist`)
     }
 
     return (

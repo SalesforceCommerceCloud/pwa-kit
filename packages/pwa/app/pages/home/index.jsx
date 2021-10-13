@@ -17,6 +17,7 @@ import Section from '../../components/section'
 import BasicTile from '../../components/basic-tile'
 import {categoriesThreeColumns, categoriesTwoColumns} from './data'
 import RecommendedProducts from '../../components/recommended-products'
+import {useSiteAlias} from '../../hooks/use-site-alias'
 
 /**
  * This is the home page for Retail React App.
@@ -26,6 +27,9 @@ import RecommendedProducts from '../../components/recommended-products'
  */
 const Home = () => {
     const intl = useIntl()
+
+    const siteAlias = useSiteAlias()
+    console.log('siteAlias', siteAlias)
 
     return (
         <Box data-testid="home-page" layerStyle="page">
@@ -48,7 +52,7 @@ const Home = () => {
                 actions={
                     <Button
                         as={Link}
-                        to={`/${intl.locale}/category/newarrivals`}
+                        to={`/${siteAlias}/${intl.locale}/category/newarrivals`}
                         width={{base: 'full', md: 'inherit'}}
                     >
                         <FormattedMessage defaultMessage="Shop New Arrivals" />

@@ -28,7 +28,6 @@ import {LockIcon} from '../icons'
 import {useCurrency} from '../../hooks'
 import {useVariationAttributes} from '../../hooks'
 import {findImageGroupBy} from '../../utils/image-groups-utils'
-import {buildMultiSiteRoute} from '../../utils/url'
 
 /**
  * Visual feedback for adding item to the cart.
@@ -146,12 +145,7 @@ const AddToCartModal = ({product, variant, quantity, isOpen, onClose, ...props})
                                 </Text>
                             </Flex>
                             <Stack spacing="4">
-                                <Button
-                                    as={Link}
-                                    to={`/${locale}/cart`}
-                                    width="100%"
-                                    variant="solid"
-                                >
+                                <Button as={Link} to={`/cart`} width="100%" variant="solid">
                                     {intl.formatMessage({
                                         defaultMessage: 'View Cart'
                                     })}
@@ -159,7 +153,7 @@ const AddToCartModal = ({product, variant, quantity, isOpen, onClose, ...props})
 
                                 <Button
                                     as={Link}
-                                    to={`/${locale}/checkout`}
+                                    to={`/checkout`}
                                     width="100%"
                                     variant="outline"
                                     rightIcon={<LockIcon />}

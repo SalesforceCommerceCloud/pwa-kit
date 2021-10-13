@@ -36,6 +36,7 @@ import {
 // Others
 import {categoryUrlBuilder} from '../../utils/url'
 import {ChevronDownIcon} from '../icons'
+import {getSiteAlias, useSiteAlias} from '../../hooks/use-site-alias'
 
 const MAXIMUM_NUMBER_COLUMNS = 5
 
@@ -57,11 +58,15 @@ const ListMenuTrigger = ({item, name, isOpen, onOpen, onClose, hasItems}) => {
         Enter: () => onOpen()
     }
 
+    const siteAlias = useSiteAlias()
+    console.log('siteAlias cate', siteAlias)
+    const url = categoryUrlBuilder(item, locale, siteAlias)
+    console.log('url', url)
     return (
         <Box {...baseStyle.listMenuTriggerContainer}>
             <Link
                 as={RouteLink}
-                to={categoryUrlBuilder(item, locale)}
+                to={url}
                 onMouseOver={onOpen}
                 {...baseStyle.listMenuTriggerLink}
                 {...(hasItems ? {name: name + ' __'} : {name: name})}
@@ -102,7 +107,7 @@ const ListMenuContent = ({maxColumns, items, itemsKey, onClose, initialFocusRef}
     const theme = useTheme()
     const {baseStyle} = theme.components.ListMenu
     const {locale} = useIntl()
-
+    const siteAlias = useSiteAlias()
     return (
         <PopoverContent data-testid="popover-menu" {...baseStyle.popoverContent}>
             <PopoverBody>
@@ -120,7 +125,7 @@ const ListMenuContent = ({maxColumns, items, itemsKey, onClose, initialFocusRef}
                             const items = item[itemsKey]
 
                             const heading = {
-                                href: categoryUrlBuilder(item, locale),
+                                href: categoryUrlBuilder(item, locale, siteAlias),
                                 text: name,
                                 styles: {
                                     fontSize: 'md',

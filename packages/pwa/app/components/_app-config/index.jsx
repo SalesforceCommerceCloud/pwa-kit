@@ -23,6 +23,7 @@ import {commerceAPIConfig} from '../../commerce-api.config'
 import {einsteinAPIConfig} from '../../einstein-api.config'
 import {DEFAULT_LOCALE, SUPPORTED_LOCALES, DEFAULT_CURRENCY} from '../../constants'
 import {getPreferredCurrency} from '../../utils/locale'
+import {getSiteId} from '../../utils/utils'
 
 const apiConfig = {
     ...commerceAPIConfig,
@@ -37,7 +38,6 @@ const apiConfig = {
  */
 const getLocale = (locals = {}) => {
     let {originalUrl} = locals
-
     // If there is no originalUrl value in the locals, create it from the window location.
     // This happens when executing on the client.
     if (!originalUrl) {
@@ -87,6 +87,14 @@ const AppConfig = ({children, locals = {}}) => {
 }
 
 AppConfig.restore = (locals = {}) => {
+    const siteId = getSiteId(locals.originalUrl)
+    if (!siteId) {
+        console.warn(
+            `Cannot find the siteID, the fallback siteId ${commerceAPIConfig.parameters.siteId} will be used`
+        )
+    }
+
+    apiConfig.parameters.siteId = siteId
     const locale = getLocale(locals) || DEFAULT_LOCALE
     const currency = getPreferredCurrency(locale) || DEFAULT_CURRENCY
 

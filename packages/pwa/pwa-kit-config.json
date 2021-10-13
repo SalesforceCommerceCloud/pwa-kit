@@ -1,10 +1,6 @@
 {
-    "multiSite": {
-        "withSiteIdAlias": true,
-        "defaultSiteAlias": "intl",
-        "defaultSiteId": "RefArchGlobal"
-    },
     "app": {
+        "defaultSiteId": "RefArchGlobal",
         "sites": [{
             "id": "RefArch",
             "alias": "us",

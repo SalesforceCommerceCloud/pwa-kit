@@ -37,7 +37,6 @@ import {useLocation} from 'react-router-dom'
 import {messages, navLinks} from './constant'
 import useNavigation from '../../hooks/use-navigation'
 import LoadingSpinner from '../../components/loading-spinner'
-import {buildMultiSiteRoute} from '../../utils/url'
 
 const Account = () => {
     const {path, url} = useRouteMatch()
@@ -91,7 +90,7 @@ const Account = () => {
         return (
             <Redirect
                 to={{
-                    pathname: buildMultiSiteRoute(`/${locale}/login`),
+                    pathname: `/${locale}/login`,
                     state: {directedFrom: location.pathname}
                 }}
             />

@@ -28,6 +28,7 @@ import {useIntl} from 'react-intl'
 import {productUrlBuilder} from '../../utils/url'
 import Link from '../link'
 import withRegistration from '../../hoc/with-registration'
+import {useSiteAlias} from '../../hooks/use-site-alias'
 
 const IconButtonWithRegistration = withRegistration(IconButton)
 
@@ -60,12 +61,12 @@ const ProductTile = (props) => {
     const {currency, image, price, productName, productId} = product
     const [isFavouriteLoading, setFavouriteLoading] = useState(false)
     const styles = useMultiStyleConfig('ProductTile')
-
+    const siteAlias = useSiteAlias()
     return (
         <Link
             data-testid="product-tile"
             {...styles.container}
-            to={productUrlBuilder({id: productId}, intl.locale)}
+            to={productUrlBuilder({id: productId}, intl.locale, siteAlias)}
             {...rest}
         >
             <Box {...styles.imageWrapper}>
