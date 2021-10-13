@@ -160,7 +160,7 @@
         "save-credentials": "sdk-save-credentials",
         "start": "cross-env NODE_ICU_DATA=node_modules/full-icu node ./scripts/start ssr",
         "start:inspect": "npm run start -- --inspect",
-        "start:pseudolocale": "npm run extract-messages && npm run compile-messages:pseudo && cross-env TARGET_LOCALE=en-XB npm run start",
+        "start:pseudolocale": "npm run extract-messages && npm run compile-messages:pseudo && cross-env PSEUDOLOCALE=en-XB npm run start",
         "test": "jest --maxWorkers=2",
         "test:e2e": "cypress run",
         "test:e2e-ci": "node ./scripts/run-e2e.js",
