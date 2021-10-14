@@ -35,12 +35,6 @@ const Home = () => {
                 keywords="Commerce Cloud, Retail React App, React Storefront"
             />
 
-            <h1>
-                {intl.formatMessage({
-                    id: 'homepage.message.welcome'
-                })}
-            </h1>
-
             <Hero
                 title={intl.formatMessage({
                     defaultMessage: 'Lighter layers for lighter days.'
