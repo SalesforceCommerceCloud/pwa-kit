@@ -71,6 +71,7 @@ AppConfig.extraGetPropsArgs = (locals = {}) => {
 
 AppConfig.getIntlConfig = async ({location}) => {
     let localeConfig
+    const isServer = typeof window === 'undefined'
     const defaults = {
         onError: (err) => {
             if (err.code === 'MISSING_TRANSLATION') {
@@ -83,9 +84,10 @@ AppConfig.getIntlConfig = async ({location}) => {
         }
     }
 
-    if (typeof window !== 'undefined') {
-        localeConfig = window.__INTL_CONFIG__
-    } else {
+    // If we are on the server get the local configuration (defaultLocale, localte, and message)
+    // using our utils. The config information will be frozen into the html so we can access it later
+    // so we don't have to block hydration by dynamically loading the localization messages.
+    if (isServer) {
         localeConfig = await getLocaleConfig({
             getUserPreferredLocales: () => {
                 // CONFIG: This function should return an array of preferred locales. They can be
@@ -105,8 +107,12 @@ AppConfig.getIntlConfig = async ({location}) => {
                 return [locale]
             }
         })
+    } else {
+        localeConfig = window.__INTL_CONFIG__
     }
 
+    // Some of the `localeConfig` properties cannot be serialized (maining the function handlers), for this reason
+    // we always have to return them and cannot solely rely on frozen state when on the client.
     return {
         ...localeConfig,
         ...defaults
