@@ -66,7 +66,14 @@ class AppConfig extends React.Component {
 
     /**
      * Return a {@link https://formatjs.io/docs/react-intl/components/#intlprovider IntlConfig}
-     * object to be used on the provider component.
+     * object and it will a IntlProvider component will be use to wrap your application, leaving this
+     * method undefined or returning a falsy value will result in no IntlProvider being used. You may
+     * choose to leave this undefined if your application already has it's own internationalization
+     * implementation.
+     *
+     * NOTE: Any serializable configuration values will be frozen in the html when running on the server
+     * and can be accessed via the `window.__INTL_CONFIG__` object for client-side setup. This means you
+     * can avoid costly actions to retreive messages etc.
      *
      * @param {Object} args
      *
@@ -80,7 +87,7 @@ class AppConfig extends React.Component {
      */
     // eslint-disable-next-line no-unused-vars
     static async getIntlConfig(args) {
-        return {}
+        return undefined
     }
 
     /**

@@ -99,7 +99,7 @@ AppConfig.getIntlConfig = async ({location}) => {
                 //
                 // If this function returns an empty array (e.g. there isn't locale in the page url),
                 // then the app would use the default locale as the fallback.
-                // NOTE: Your implementation may differ, this is jsut what we did.
+                // NOTE: Your implementation may differ, this is just what we did.
 
                 // eslint-disable-next-line no-unused-vars
                 let [_, locale] = location.pathname.split('/')
