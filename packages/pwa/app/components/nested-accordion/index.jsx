@@ -24,6 +24,7 @@ import {Link as RouteLink} from 'react-router-dom'
 
 // Icons
 import {ChevronDownIcon, ChevronRightIcon} from '../icons'
+import {useSiteAlias} from '../../hooks/use-site-alias'
 
 /**
  * The nested accordion allows you to create, as the name suggest, a nests
@@ -48,6 +49,7 @@ const NestedAccordion = (props) => {
 
     const depth = initialDepth
     const items = item[itemsKey]
+    const siteAlias = useSiteAlias()
 
     // Handle filters in the folr of a function or a object key string.
     const filter = (item) =>
@@ -89,7 +91,7 @@ const NestedAccordion = (props) => {
                                         <AccordionButton
                                             {...styles.leafButton}
                                             as={RouteLink}
-                                            to={urlBuilder(item, intl.locale)}
+                                            to={urlBuilder(item, intl.locale, siteAlias)}
                                         >
                                             <Text
                                                 fontSize={fontSizes[depth]}

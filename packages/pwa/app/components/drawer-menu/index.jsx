@@ -53,6 +53,7 @@ import LoadingSpinner from '../loading-spinner'
 
 import useNavigation from '../../hooks/use-navigation'
 import {SUPPORTED_LOCALES} from '../../constants'
+import {useSiteAlias} from '../../hooks/use-site-alias'
 
 // The FONT_SIZES and FONT_WEIGHTS constants are used to control the styling for
 // the accordion buttons as their current depth. In the below definition we assign
@@ -84,7 +85,7 @@ const DrawerMenu = ({isOpen, onClose = noop, onLogoClick = noop, root}) => {
     const styles = useMultiStyleConfig('DrawerMenu')
     const drawerSize = useBreakpointValue({sm: PHONE_DRAWER_SIZE, md: TABLET_DRAWER_SIZE})
     const socialIconVariant = useBreakpointValue({base: 'flex', md: 'flex-start'})
-
+    const siteAlias = useSiteAlias()
     const [showLoading, setShowLoading] = useState(false)
     const onSignoutClick = async () => {
         setShowLoading(true)
@@ -129,7 +130,11 @@ const DrawerMenu = ({isOpen, onClose = noop, onLogoClick = noop, root}) => {
                                                     <AccordionButton
                                                         paddingLeft={8}
                                                         as={Link}
-                                                        to={categoryUrlBuilder(item)}
+                                                        to={categoryUrlBuilder(
+                                                            item,
+                                                            intl.locale,
+                                                            siteAlias
+                                                        )}
                                                         fontSize={FONT_SIZES[depth]}
                                                         fontWeight={FONT_WEIGHTS[depth]}
                                                         color="black"
@@ -163,7 +168,7 @@ const DrawerMenu = ({isOpen, onClose = noop, onLogoClick = noop, root}) => {
                                 {customer.isRegistered ? (
                                     <NestedAccordion
                                         urlBuilder={(item, locale) =>
-                                            `/${locale}/account${item.path}`
+                                            `/${siteAlias}/${locale}/account${item.path}`
                                         }
                                         itemsAfter={({depth}) =>
                                             depth === 1 && (
@@ -259,7 +264,7 @@ const DrawerMenu = ({isOpen, onClose = noop, onLogoClick = noop, root}) => {
                                     locales={SUPPORTED_LOCALES}
                                     onSelect={(newLocale) => {
                                         // Update the `locale` in the URL.
-                                        const newUrl = getUrlWithLocale(newLocale, {
+                                        const newUrl = getUrlWithLocale(newLocale.id, {
                                             disallowParams: ['refine']
                                         })
                                         window.location = newUrl
