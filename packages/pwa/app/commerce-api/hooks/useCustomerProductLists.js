@@ -259,7 +259,8 @@ export default function useCustomerProductLists() {
                 const ids = list.customerProductListItems.map((item) => item.productId)
                 const productDetails = await api.shopperProducts.getProducts({
                     parameters: {
-                        ids: ids.join(',')
+                        ids: ids.join(','),
+                        allImages: true
                     }
                 })
                 const result = self.mergeProductDetailsIntoList(list, productDetails)
