@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
+/* eslint-disable no-undef */
+
 import React, {useState} from 'react'
 import PropTypes from 'prop-types'
 import {ChakraProvider} from '@chakra-ui/react'
@@ -70,9 +72,35 @@ AppConfig.extraGetPropsArgs = (locals = {}) => {
 }
 
 AppConfig.getIntlConfig = async ({location}) => {
-    let localeConfig
-    const isServer = typeof window === 'undefined'
-    const defaults = {
+    // If `__INTL_CONFIG__` exists in the global, use it otherwise get the config using our utils, it will
+    // later be frozen into the global object for client-side use.
+    const localeConfig =
+        typeof globalThis.__INTL_CONFIG__ === 'undefined'
+            ? await getLocaleConfig({
+                  getUserPreferredLocales: () => {
+                      // CONFIG: This function should return an array of preferred locales. They can be
+                      // derived from various sources. Below are some examples of those:
+                      //
+                      // - client side: window.navigator.languages
+                      // - the page URL they're on (example.com/en-GB/home)
+                      // - cookie (if their previous preference is saved there)
+                      //
+                      // If this function returns an empty array (e.g. there isn't locale in the page url),
+                      // then the app would use the default locale as the fallback.
+                      // NOTE: Your implementation may differ, this is just what we did.
+
+                      // eslint-disable-next-line no-unused-vars
+                      let [_, locale] = location.pathname.split('/')
+
+                      return [locale]
+                  }
+              })
+            : globalThis.__INTL_CONFIG__
+
+    // Some of the `localeConfig` properties cannot be serialized (maining the function handlers), for this reason
+    // always return them as they donot exist in the frozen state.
+    return {
+        ...localeConfig,
         onError: (err) => {
             if (err.code === 'MISSING_TRANSLATION') {
                 // NOTE: Remove the console error for missing translations during development,
@@ -82,40 +110,6 @@ AppConfig.getIntlConfig = async ({location}) => {
             }
             throw err
         }
-    }
-
-    // If we are on the server get the local configuration (defaultLocale, localte, and message)
-    // using our utils. The config information will be frozen into the html so we can access it later
-    // so we don't have to block hydration by dynamically loading the localization messages.
-    if (isServer) {
-        localeConfig = await getLocaleConfig({
-            getUserPreferredLocales: () => {
-                // CONFIG: This function should return an array of preferred locales. They can be
-                // derived from various sources. Below are some examples of those:
-                //
-                // - client side: window.navigator.languages
-                // - the page URL they're on (example.com/en-GB/home)
-                // - cookie (if their previous preference is saved there)
-                //
-                // If this function returns an empty array (e.g. there isn't locale in the page url),
-                // then the app would use the default locale as the fallback.
-                // NOTE: Your implementation may differ, this is just what we did.
-
-                // eslint-disable-next-line no-unused-vars
-                let [_, locale] = location.pathname.split('/')
-
-                return [locale]
-            }
-        })
-    } else {
-        localeConfig = window.__INTL_CONFIG__
-    }
-
-    // Some of the `localeConfig` properties cannot be serialized (maining the function handlers), for this reason
-    // we always have to return them and cannot solely rely on frozen state when on the client.
-    return {
-        ...localeConfig,
-        ...defaults
     }
 }
 
