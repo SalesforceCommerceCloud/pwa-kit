@@ -286,7 +286,7 @@ ProductDetail.shouldGetProps = ({previousLocation, location}) => {
     )
 }
 
-ProductDetail.getProps = async ({res, params, location, api}) => {
+ProductDetail.getProps = async ({params, location, api}) => {
     const {productId} = params
     let category, product
     const urlParams = new URLSearchParams(location.search)
@@ -302,11 +302,6 @@ ProductDetail.getProps = async ({res, params, location, api}) => {
         category = await api.shopperProducts.getCategory({
             parameters: {id: product?.primaryCategoryId, levels: 1}
         })
-    }
-
-    // Set the `cache-control` header values similar to those on the product-list.
-    if (res) {
-        res.set('Cache-Control', 'max-age=900')
     }
 
     // The `commerce-isomorphic-sdk` package does not throw errors, so

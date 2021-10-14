@@ -5,11 +5,10 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React, {useState} from 'react'
-import {Button, useDisclosure} from '@chakra-ui/react'
+import {Button} from '@chakra-ui/react'
 import useBasket from '../../../../commerce-api/hooks/useBasket'
 import {useIntl} from 'react-intl'
 import {useItemVariant} from '../../../../components/item-variant'
-import ProductViewModal from '../../../../components/product-view-modal'
 import {useToast} from '../../../../hooks/use-toast'
 import {API_ERROR_MESSAGE} from '../../../../constants'
 
@@ -25,29 +24,28 @@ const WishlistPrimaryAction = () => {
     const isMasterProduct = variant?.type?.master || false
     const showToast = useToast()
     const [isLoading, setIsLoading] = useState(false)
-    const {isOpen, onOpen, onClose} = useDisclosure()
-    const handleAddToCart = async (item, quantity) => {
+
+    const handleAddToCart = async () => {
         setIsLoading(true)
-        const productItems = [
+        const productItem = [
             {
-                productId: item.id || item.productId,
-                price: item.price,
-                quantity
+                productId: variant.productId,
+                quantity: variant.quantity,
+                price: variant.price
             }
         ]
         try {
-            await basket.addItemToBasket(productItems)
+            await basket.addItemToBasket(productItem)
             showToast({
                 title: formatMessage(
                     {
                         defaultMessage:
                             '{quantity} {quantity, plural, one {item} other {items}} added to cart'
                     },
-                    {quantity: quantity}
+                    {quantity: variant.quantity}
                 ),
                 status: 'success'
             })
-            onClose()
         } catch (error) {
             showToast({
                 title: formatMessage(
@@ -63,24 +61,13 @@ const WishlistPrimaryAction = () => {
     return (
         <>
             {isMasterProduct ? (
-                <>
-                    <Button w={'full'} variant={'solid'} onClick={onOpen}>
-                        Select Options
-                    </Button>
-                    {isOpen && (
-                        <ProductViewModal
-                            isOpen={isOpen}
-                            onOpen={onOpen}
-                            onClose={onClose}
-                            product={variant}
-                            addToCart={(variant, quantity) => handleAddToCart(variant, quantity)}
-                        />
-                    )}
-                </>
+                <Button w={'full'} variant={'solid'}>
+                    Select Options
+                </Button>
             ) : (
                 <Button
                     variant={'solid'}
-                    onClick={() => handleAddToCart(variant, variant.quantity)}
+                    onClick={handleAddToCart}
                     w={'full'}
                     isLoading={isLoading}
                 >

@@ -181,7 +181,7 @@ const RecommendedProducts = ({zone, recommender, products, title, shouldFetch, .
                         product
                     )
                 },
-                enableFavourite: true,
+                enableFavourite: wishlist.isInitialized,
                 isFavourite: !!wishlist.findItemByProductId(product?.productId),
                 onFavouriteToggle: (isFavourite) => {
                     const action = isFavourite ? addItemToWishlist : removeItemFromWishlist

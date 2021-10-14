@@ -22,6 +22,7 @@ jest.mock('../static/assets.json', () => mockStaticAssets, {virtual: true})
 const {
     RESOLVED_PROMISE,
     REMOTE_REQUIRED_ENV_VARS,
+    POWERED_BY,
     NO_CACHE,
     generateCacheKey,
     createApp,
@@ -389,8 +390,8 @@ describe('SSRServer operation', () => {
         return request(app)
             .get('/')
             .expect(200)
+            .expect('x-powered-by', POWERED_BY)
             .then((res) => {
-                expect(res.headers['x-powered-by']).toBeUndefined()
                 expect(res.text).toBe(body)
                 expect(route).toHaveBeenCalled()
             })

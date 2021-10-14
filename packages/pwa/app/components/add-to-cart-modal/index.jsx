@@ -4,10 +4,9 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useContext, useState, useEffect} from 'react'
-import {useLocation} from 'react-router-dom'
+import React from 'react'
 import PropTypes from 'prop-types'
-import {useIntl, FormattedMessage} from 'react-intl'
+import {useIntl} from 'react-intl'
 import {
     AspectRatio,
     Box,
@@ -23,56 +22,33 @@ import {
     Stack,
     useBreakpointValue
 } from '@chakra-ui/react'
-import useBasket from '../commerce-api/hooks/useBasket'
-import Link from '../components/link'
-import RecommendedProducts from '../components/recommended-products'
-import {LockIcon} from '../components/icons'
-import {DEFAULT_CURRENCY} from '../constants'
-import {useVariationAttributes} from './'
-import {findImageGroupBy} from '../utils/image-groups-utils'
+import Link from '../link'
+import useBasket from '../../commerce-api/hooks/useBasket'
+import {LockIcon} from '../icons'
+import {useCurrency} from '../../hooks'
+import {useVariationAttributes} from '../../hooks'
+import {findImageGroupBy} from '../../utils/image-groups-utils'
 
 /**
- * This is the context for managing the AddToCartModal.
- * Used in top level App component.
+ * Visual feedback for adding item to the cart.
  */
-export const AddToCartModalContext = React.createContext()
-export const useAddToCartModalContext = () => useContext(AddToCartModalContext)
-export const AddToCartModalProvider = ({children}) => {
-    const addToCartModal = useAddToCartModal()
-    return (
-        <AddToCartModalContext.Provider value={addToCartModal}>
-            {children}
-            <AddToCartModal />
-        </AddToCartModalContext.Provider>
-    )
-}
-AddToCartModalProvider.propTypes = {
-    children: PropTypes.node.isRequired
-}
-
-/**
- * Visual feedback (a modal) for adding item to the cart.
- */
-export const AddToCartModal = () => {
-    const {isOpen, onClose, data} = useAddToCartModalContext()
-    const {product, quantity} = data || {}
+const AddToCartModal = ({product, variant, quantity, isOpen, onClose, ...props}) => {
     const intl = useIntl()
     const basket = useBasket()
     const size = useBreakpointValue({base: 'full', lg: '2xl', xl: '4xl'})
-    const variationAttributes = useVariationAttributes(product)
-    if (!isOpen) {
-        return null
-    }
     const {currency, productItems, productSubTotal, itemAccumulatedCount} = basket
-    const {id, variationValues} = product
-    const lineItemPrice = productItems?.find((item) => item.productId === id)?.basePrice * quantity
+    const variationAttributes = useVariationAttributes(product)
+    const {productId, variationValues} = variant
+    const lineItemPrice =
+        productItems?.find((item) => item.productId === productId)?.basePrice * quantity
     const image = findImageGroupBy(product.imageGroups, {
         viewType: 'small',
         selectedVariationAttributes: variationValues
     })?.images?.[0]
+    const {currency: activeCurrency} = useCurrency()
 
     return (
-        <Modal size={size} isOpen={isOpen} onClose={onClose}>
+        <Modal size={size} isOpen={isOpen} onClose={onClose} {...props}>
             <ModalOverlay />
             <ModalContent
                 margin="0"
@@ -137,7 +113,7 @@ export const AddToCartModal = () => {
                                         {!!lineItemPrice &&
                                             intl.formatNumber(lineItemPrice, {
                                                 style: 'currency',
-                                                currency: currency || DEFAULT_CURRENCY
+                                                currency: currency || activeCurrency
                                             })}
                                     </Text>
                                 </Box>
@@ -162,7 +138,7 @@ export const AddToCartModal = () => {
                                     {productSubTotal &&
                                         intl.formatNumber(productSubTotal, {
                                             style: 'currency',
-                                            currency: currency || DEFAULT_CURRENCY
+                                            currency: currency || activeCurrency
                                         })}
                                 </Text>
                             </Flex>
@@ -188,15 +164,7 @@ export const AddToCartModal = () => {
                         </Box>
                     </Flex>
                 </ModalBody>
-                <Box padding="8">
-                    <RecommendedProducts
-                        title={<FormattedMessage defaultMessage="You Might Also Like" />}
-                        recommender={'pdp-similar-items'}
-                        products={product && [product.id]}
-                        mx={{base: -4, md: -8, lg: 0}}
-                        shouldFetch={() => product?.id}
-                    />
-                </Box>
+                <Box padding="8">{props.children}</Box>
             </ModalContent>
         </Modal>
     )
@@ -217,36 +185,4 @@ AddToCartModal.propTypes = {
     children: PropTypes.any
 }
 
-export const useAddToCartModal = () => {
-    const [state, setState] = useState({
-        isOpen: false,
-        data: null
-    })
-
-    const {pathname} = useLocation()
-    useEffect(() => {
-        if (state.isOpen) {
-            setState({
-                ...state,
-                isOpen: false
-            })
-        }
-    }, [pathname])
-
-    return {
-        isOpen: state.isOpen,
-        data: state.data,
-        onOpen: (data) => {
-            setState({
-                isOpen: true,
-                data
-            })
-        },
-        onClose: () => {
-            setState({
-                isOpen: false,
-                data: null
-            })
-        }
-    }
-}
+export default AddToCartModal

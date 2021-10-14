@@ -382,7 +382,7 @@ const ProductList = (props) => {
                                                   data-testid={`sf-product-tile-${productSearchItem.productId}`}
                                                   key={productSearchItem.productId}
                                                   product={productSearchItem}
-                                                  enableFavourite={true}
+                                                  enableFavourite={wishlist.isInitialized}
                                                   isFavourite={isInWishlist}
                                                   onFavouriteToggle={(isFavourite) => {
                                                       const action = isFavourite

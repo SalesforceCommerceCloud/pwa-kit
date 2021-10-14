@@ -5,8 +5,8 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import {AddToCartModal, AddToCartModalContext} from './use-add-to-cart-modal'
-import {renderWithProviders} from '../utils/test-utils'
+import AddToCartModal from './index'
+import {renderWithProviders} from '../../utils/test-utils'
 
 const MOCK_PRODUCT = {
     currency: 'USD',
@@ -569,32 +569,13 @@ const MOCK_PRODUCT = {
 
 test('Renders AddToCartModal', () => {
     const {getByText} = renderWithProviders(
-        <AddToCartModalContext.Provider
-            value={{
-                isOpen: true,
-                data: {
-                    product: MOCK_PRODUCT,
-                    quantity: 22
-                }
-            }}
-        >
-            <AddToCartModal />
-        </AddToCartModalContext.Provider>
+        <AddToCartModal
+            product={MOCK_PRODUCT}
+            variant={MOCK_PRODUCT.variants[0]}
+            quantity={2}
+            isOpen={true}
+        />
     )
 
     expect(getByText(MOCK_PRODUCT.name)).toBeInTheDocument()
-})
-
-test('Do not render when isOpen is false', () => {
-    const {queryByText} = renderWithProviders(
-        <AddToCartModalContext.Provider
-            value={{
-                isOpen: false
-            }}
-        >
-            <AddToCartModal />
-        </AddToCartModalContext.Provider>
-    )
-
-    expect(queryByText(MOCK_PRODUCT.name)).not.toBeInTheDocument()
 })
