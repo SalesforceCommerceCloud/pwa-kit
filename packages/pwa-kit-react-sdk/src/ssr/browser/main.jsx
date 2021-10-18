@@ -33,8 +33,7 @@ export const registerServiceWorker = (url) => {
 }
 
 /* istanbul ignore next */
-export const start = () => {
-    // TODO: Now would be a good time to change this function to use async/await style.
+export const start = async () => {
     const rootEl = document.getElementsByClassName('react-target')[0]
     const data = JSON.parse(document.getElementById('mobify-data').innerHTML)
 
@@ -74,33 +73,30 @@ export const start = () => {
     const WrappedApp = routeComponent(App, false, locals)
     const error = window.__ERROR__
 
-    return (
-        Promise.resolve()
-            .then(() => new Promise((resolve) => loadableReady(resolve)))
-            // TODO: This isn't ideal. As it will block hydration on the network request to get
-            // the locale file again, which it already has. We need to figure out a way to
-            // make this sync without makinga network request.
-            .then(() => AppConfig.getIntlConfig({location: window.location}))
-            .then((intlConfig) => {
-                ReactDOM.hydrate(
-                    <Router>
-                        <DeviceContext.Provider value={{type: window.__DEVICE_TYPE__}}>
-                            <AppConfig locals={locals}>
-                                <Switch
-                                    error={error}
-                                    appState={window.__PRELOADED_STATE__}
-                                    intlConfig={intlConfig}
-                                    routes={routes}
-                                    App={WrappedApp}
-                                />
-                            </AppConfig>
-                        </DeviceContext.Provider>
-                    </Router>,
-                    rootEl,
-                    () => {
-                        window.__HYDRATING__ = false
-                    }
-                )
-            })
-    )
+    // Get the the configuration object for the `IntlProvider` component. By default
+    // this value is undefined.
+    const intlConfig = await AppConfig.getIntlConfig({location: window.location})
+
+    // Hydrate once the loadable component are available.
+    loadableReady(() => {
+        ReactDOM.hydrate(
+            <Router>
+                <DeviceContext.Provider value={{type: window.__DEVICE_TYPE__}}>
+                    <AppConfig locals={locals}>
+                        <Switch
+                            error={error}
+                            appState={window.__PRELOADED_STATE__}
+                            intlConfig={intlConfig}
+                            routes={routes}
+                            App={WrappedApp}
+                        />
+                    </AppConfig>
+                </DeviceContext.Provider>
+            </Router>,
+            rootEl,
+            () => {
+                window.__HYDRATING__ = false
+            }
+        )
+    })
 }
