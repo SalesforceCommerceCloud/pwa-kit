@@ -6,15 +6,25 @@
  */
 
 import {useParams} from 'react-router-dom'
-import pwaKitConfig from '../../pwa-kit-config.json'
-import {getSiteAlias} from '../utils/utils'
+import {getAppConfig, getSiteAliasByHostname, getSiteAliasById} from '../utils/utils'
+import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
 
 export const useSiteAlias = () => {
-    let {siteAlias} = useParams()
+    const appConfig = getAppConfig()
+    const {sites, defaultSiteId} = appConfig
 
+    const appOrigin = getAppOrigin()
+    const {hostname} = new URL(appOrigin)
+    // prioritize returning alias from hostname
+    const alias = getSiteAliasByHostname(sites, hostname)
+    if (alias) {
+        return alias
+    }
+
+    let {siteAlias} = useParams()
+    // if there is no alias from the url, use the default value from app config
     if (!siteAlias) {
-        const siteId = pwaKitConfig.app.defaultSiteId
-        return getSiteAlias(siteId)
+        return getSiteAliasById(defaultSiteId)
     }
 
     return siteAlias

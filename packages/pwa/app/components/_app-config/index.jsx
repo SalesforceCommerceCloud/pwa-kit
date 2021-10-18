@@ -23,7 +23,8 @@ import {commerceAPIConfig} from '../../commerce-api.config'
 import {einsteinAPIConfig} from '../../einstein-api.config'
 import {DEFAULT_LOCALE, SUPPORTED_LOCALES, DEFAULT_CURRENCY} from '../../constants'
 import {getPreferredCurrency} from '../../utils/locale'
-import {getSiteId} from '../../utils/utils'
+import {getAppConfig, getSiteId} from '../../utils/utils'
+import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
 
 const apiConfig = {
     ...commerceAPIConfig,
@@ -87,7 +88,9 @@ const AppConfig = ({children, locals = {}}) => {
 }
 
 AppConfig.restore = (locals = {}) => {
-    const siteId = getSiteId(locals.originalUrl)
+    const appConfig = getAppConfig()
+    const appOrigin = getAppOrigin()
+    const siteId = getSiteId(appConfig, locals.originalUrl, appOrigin)
     if (!siteId) {
         console.error(
             `Cannot find the siteID, the fallback siteId ${commerceAPIConfig.parameters.siteId} will be used`

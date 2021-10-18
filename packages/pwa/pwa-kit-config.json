@@ -1,22 +1,25 @@
 {
     "app": {
         "defaultSiteId": "RefArchGlobal",
-        "sites": [{
-            "id": "RefArch",
-            "alias": "us",
-            "hostname": [],
-            "l10n": {
-                "defaultLocale": "en-US",
-                "supportedLocales": ["en-US"]
+        "sites": [
+            {
+                "id": "RefArch",
+                "alias": "us",
+                "hostname": ["localhost"],
+                "l10n": {
+                    "defaultLocale": "en-US",
+                    "supportedLocales": ["en-US"]
+                }
+            },
+            {
+                "id": "RefArchGlobal",
+                "alias": "global",
+                "hostname": ["localhost"],
+                "l10n": {
+                    "defaultLocale": "en-GB",
+                    "supportedLocales": ["en-GB", "ja-JP", "fr-FR"]
+                }
             }
-        }, {
-            "id": "RefArchGlobal",
-            "alias": "global",
-            "hostname": ["localhost"],
-            "l10n": {
-                "defaultLocale": "en-GB",
-                "supportedLocales": ["en-GB", "ja-JP", "fr-FR"]
-            }
-        }]
+        ]
     }
 }

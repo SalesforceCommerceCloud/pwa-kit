@@ -7,6 +7,7 @@
 
 import pwaKitConfig from '../../pwa-kit-config.json'
 import {HOME_HREF} from '../constants'
+import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
 
 /**
  * Call requestIdleCallback in supported browsers.
@@ -158,7 +159,19 @@ export const capitalize = (text) => {
         .join(' ')
 }
 
-export const getSiteId = (originalUrl) => {
+export const getAppConfig = () => {
+    return pwaKitConfig.app
+}
+
+/**
+ * get siteId based on the site configuration
+ * @param appConfig
+ * @param originalUrl
+ * @param appOrigin
+ * @returns {string|undefined|*}
+ */
+export const getSiteId = (appConfig = {}, originalUrl, appOrigin) => {
+    const {sites, defaultSiteId} = appConfig
     let path = originalUrl
     // If there is no originalUrl value in the locals, create it from the window location.
     // This happens when executing on the client.
@@ -166,24 +179,64 @@ export const getSiteId = (originalUrl) => {
         path = window?.location.href.replace(window.location.origin, '')
     }
 
+    const {hostname, pathname} = new URL(`${appOrigin}/${path}`)
+    console.log('hostname>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>', hostname)
+    let siteInfo
+    siteInfo = sites.filter((site) => {
+        return site.hostname.includes(hostname)
+    })
+
+    if (!siteInfo.length) {
+        throw new Error(
+            'Cannot find SiteID from hostname, please take a look at your configuration file'
+        )
+    }
+
+    // return the id when there is one match
+    if (siteInfo.length === 1) {
+        console.log('return by hostname', siteId)
+        return siteInfo.id
+    }
+
+    // if there are more than two matches, we need to rely on siteAlias to determine the siteID
+    // The home page does not have siteAlias param, we take the default value
     if (path === HOME_HREF) {
-        const siteIdArr = pwaKitConfig.app.sites.map((site) => site.id)
+        const siteIdArr = sites.map((site) => site.id)
         // check if the default value is in the sites array config
-        if (!siteIdArr.includes(pwaKitConfig.app.defaultSiteId)) return undefined
+        if (!siteIdArr.includes(defaultSiteId)) {
+            throw new Error(
+                'The default SiteId does not match any values from the site configuration. Please check your config'
+            )
+        }
         return pwaKitConfig.app.defaultSiteId
     }
 
-    // Parse the pathname from the partial using the URL object and a placeholder host
-    const {pathname} = new URL(`http://hostname${path}`)
     const siteAlias = pathname.split('/')[1]
-    const siteId = pwaKitConfig.app.sites.find((site) => {
+    const siteId = sites.find((site) => {
         return site.alias === siteAlias
     })?.id
 
     return siteId
 }
 
-export const getSiteAlias = (siteId) => {
+/**
+ * returns alias by on siteId
+ * @param siteId
+ * @returns {*}
+ */
+export const getSiteAliasById = (siteId) => {
     if (!siteId) throw new Error('Cannot find siteId')
     return pwaKitConfig.app.sites.find((site) => site.id === siteId)?.alias
+}
+
+/**
+ * return alias by on the hostname
+ * @param sites
+ * @param hostname
+ * @returns {*}
+ */
+export const getSiteAliasByHostname = (sites, hostname) => {
+    if (!sites.length) throw new Error('No site config found. Please check you configuration')
+    if (!hostname) throw new Error('Hostname is required to find the alias')
+    return sites.find((site) => site.hostnames.includes(hostname))
 }
