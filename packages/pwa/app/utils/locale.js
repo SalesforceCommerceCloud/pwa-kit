@@ -7,7 +7,7 @@
 
 import {SUPPORTED_LOCALES, DEFAULT_LOCALE} from '../constants'
 
-// TODO: Retind how we access the config file, maybe we need a wrapper.
+// TODO: Rethink how we access the config file, maybe we need a wrapper.
 // In the interim we need to address the webpack issues importing this json file with names exports.
 import config from '../../pwa-kit-config.json'
 
