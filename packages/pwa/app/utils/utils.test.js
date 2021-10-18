@@ -6,7 +6,7 @@
  */
 import * as utils from './utils'
 import EventEmitter from 'events'
-import {flatten, shallowEquals} from './utils'
+import {flatten, getSiteId, shallowEquals} from './utils'
 
 describe('requestIdleCallback should be a working shim', () => {
     test('without a working implementation built in', () => {
@@ -86,5 +86,131 @@ describe('shallow', function() {
         const b = {a: '123', b: '456'}
         const result = shallowEquals(a, b)
         expect(result).toBeFalsy()
+    })
+})
+
+describe('get site Id', function() {
+    test('return site id based on different hostname', () => {
+        const appConfig = {
+            defaultSiteId: 'RefArchGlobal',
+            sites: [
+                {
+                    id: 'RefArch',
+                    alias: 'us',
+                    hostname: ['company.co.uk'],
+                    l10n: {
+                        defaultLocale: 'en-US',
+                        supportedLocales: ['en-US']
+                    }
+                },
+                {
+                    id: 'RefArchGlobal',
+                    alias: 'global',
+                    hostname: ['company.com'],
+                    l10n: {
+                        defaultLocale: 'en-GB',
+                        supportedLocales: ['en-GB', 'ja-JP', 'fr-FR']
+                    }
+                }
+            ]
+        }
+
+        const currentUrl = new URL('https://company.co.uk/')
+        const siteId = getSiteId(appConfig, '/', currentUrl)
+        expect(siteId).toEqual('RefArch')
+    })
+
+    test('return site id by using the default value', () => {
+        const appConfig = {
+            defaultSiteId: 'siteId-1',
+            sites: [
+                {
+                    id: 'siteId-1',
+                    alias: 'us',
+                    hostname: ['company.co.uk'],
+                    l10n: {
+                        defaultLocale: 'en-US',
+                        supportedLocales: ['en-US']
+                    }
+                },
+                {
+                    id: 'siteId-2',
+                    alias: 'global',
+                    hostname: ['company.co.uk'],
+                    l10n: {
+                        defaultLocale: 'en-GB',
+                        supportedLocales: ['en-GB', 'ja-JP', 'fr-FR']
+                    }
+                }
+            ]
+        }
+
+        const currentUrl = new URL('https://company.co.uk/')
+        const siteId = getSiteId(appConfig, '/', currentUrl)
+        expect(siteId).toEqual('siteId-1')
+    })
+
+    test('return site id based on the siteAlias param from the pathname', () => {
+        const appConfig = {
+            defaultSiteId: 'siteId-2',
+            sites: [
+                {
+                    id: 'siteId-1',
+                    alias: 'us',
+                    hostname: [],
+                    l10n: {
+                        defaultLocale: 'en-US',
+                        supportedLocales: ['en-US']
+                    }
+                },
+                {
+                    id: 'siteId-2',
+                    alias: 'global',
+                    hostname: [],
+                    l10n: {
+                        defaultLocale: 'en-GB',
+                        supportedLocales: ['en-GB', 'ja-JP', 'fr-FR']
+                    }
+                }
+            ]
+        }
+
+        const pathname = '/global/en-GB/women/dress'
+        const currentUrl = 'https://example.org'
+        const siteId = getSiteId(appConfig, pathname, currentUrl)
+        expect(siteId).toEqual('siteId-2')
+    })
+
+    test('throw error when there is default value is not in the sites configuration on home page', () => {
+        const appConfig = {
+            defaultSiteId: 'site-2',
+            sites: [
+                {
+                    id: 'siteId-1',
+                    alias: 'us',
+                    hostname: [],
+                    l10n: {
+                        defaultLocale: 'en-US',
+                        supportedLocales: ['en-US']
+                    }
+                },
+                {
+                    id: 'siteId-2',
+                    alias: 'global',
+                    hostname: [],
+                    l10n: {
+                        defaultLocale: 'en-GB',
+                        supportedLocales: ['en-GB', 'ja-JP', 'fr-FR']
+                    }
+                }
+            ]
+        }
+
+        const pathname = '/'
+        const currentUrl = 'https://example.org'
+
+        expect(() => getSiteId(appConfig, pathname, currentUrl)).toThrow(
+            'The default SiteId does not match any values from the site configuration. Please check your config'
+        )
     })
 })

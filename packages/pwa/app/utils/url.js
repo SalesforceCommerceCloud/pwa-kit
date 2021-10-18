@@ -6,8 +6,7 @@
  */
 
 import {DEFAULT_LOCALE} from '../constants'
-import {getSiteAlias} from './utils'
-import pwaKitConfig from '../../pwa-kit-config.json'
+import {getAppConfig, getSiteAliasById} from './utils'
 /**
  * Modifies a given url by adding/updating query parameters.
  *
@@ -130,10 +129,11 @@ export const getUrlWithLocale = (shortCode, opts = {}) => {
 
     // Array of the paths without empty items
     let paths = relativeUrl.split('/').filter((path) => path !== '')
-
+    const appConfig = getAppConfig()
+    const {sites, defaultSiteId} = appConfig
     // append siteAlias to the path
     if (!paths.length) {
-        const siteAlias = getSiteAlias(pwaKitConfig.app.defaultSiteId)
+        const siteAlias = getSiteAliasById(defaultSiteId, sites)
         paths.push(siteAlias)
     }
     // pattern for locale shortCode jp-JP, us-GB

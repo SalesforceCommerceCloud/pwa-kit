@@ -15,8 +15,8 @@ export const useSiteAlias = () => {
 
     const appOrigin = getAppOrigin()
     const {hostname} = new URL(appOrigin)
-    // prioritize returning alias from hostname
-    const alias = getSiteAliasByHostname(sites, hostname)
+    // prioritize returning site alias based on hostname
+    const alias = getSiteAliasByHostname(hostname, sites)
     if (alias) {
         return alias
     }
@@ -24,7 +24,8 @@ export const useSiteAlias = () => {
     let {siteAlias} = useParams()
     // if there is no alias from the url, use the default value from app config
     if (!siteAlias) {
-        return getSiteAliasById(defaultSiteId)
+        const alias = getSiteAliasById(defaultSiteId, sites)
+        return alias
     }
 
     return siteAlias
