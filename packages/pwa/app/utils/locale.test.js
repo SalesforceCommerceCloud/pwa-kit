@@ -99,7 +99,7 @@ describe('loadLocaleData', () => {
 describe('getLocaleConfig', () => {
     test('without parameter', async () => {
         const config = await getLocaleConfig()
-        expect(config.app.targetLocale).toBe(DEFAULT_LOCALE)
+        expect(config.locale).toBe(DEFAULT_LOCALE)
     })
     test('with getUserPreferredLocales parameter', async () => {
         const locale = SUPPORTED_LOCALES[1].id
@@ -108,7 +108,7 @@ describe('getLocaleConfig', () => {
         const config = await getLocaleConfig({
             getUserPreferredLocales: () => [locale]
         })
-        expect(config.app.targetLocale).toBe(locale)
+        expect(config.locale).toBe(locale)
     })
 })
 
