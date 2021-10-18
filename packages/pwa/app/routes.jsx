@@ -42,31 +42,31 @@ const routes = [
         exact: true
     },
     {
-        path: '/:siteIdAlias',
+        path: '/:siteAlias',
         component: Home,
         exact: true
     },
     {
-        path: '/:siteIdAlias/:locale/login',
+        path: '/:siteAlias/:locale/login',
         component: Login,
         exact: true
     },
     {
-        path: '/:siteIdAlias/:locale/registration',
+        path: '/:siteAlias/:locale/registration',
         component: Registration,
         exact: true
     },
     {
-        path: '/:siteIdAlias/:locale/reset-password',
+        path: '/:siteAlias/:locale/reset-password',
         component: ResetPassword,
         exact: true
     },
     {
-        path: '/:siteIdAlias/:locale/account',
+        path: '/:siteAlias/:locale/account',
         component: Account
     },
     {
-        path: '/:siteIdAlias/:locale/checkout',
+        path: '/:siteAlias/:locale/checkout',
         component: Checkout,
         exact: true
     },
@@ -81,7 +81,7 @@ const routes = [
         exact: true
     },
     {
-        path: '/:siteIdAlias/:locale/cart',
+        path: '/:siteAlias/:locale/cart',
         component: Cart,
         exact: true
     },
@@ -90,19 +90,19 @@ const routes = [
         component: ProductDetail
     },
     {
-        path: '/:siteIdAlias/:locale/search',
+        path: '/:siteAlias/:locale/search',
         component: ProductList
     },
     {
-        path: '/:siteIdAlias/:locale/category/:categoryId',
+        path: '/:siteAlias/:locale/category/:categoryId',
         component: ProductList
     },
     {
-        path: '/siteIdAlias/:locale/account/wishlist',
+        path: '/siteAlias/:locale/account/wishlist',
         component: Wishlist
     },
     {
-        path: '/:siteIdAlias/:locale',
+        path: '/:siteAlias/:locale',
         component: Home,
         exact: true
     },
