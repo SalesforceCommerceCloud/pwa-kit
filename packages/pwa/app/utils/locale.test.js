@@ -99,7 +99,7 @@ describe('getLocaleConfig', () => {
         expect(config.app.targetLocale).toBe(locale)
     })
     test('with pseudo locale', async () => {
-        process.env.PSEUDOLOCALE = 'en-XB'
+        process.env.USE_PSEUDOLOCALE = 'true'
         // Simulate server side
         windowSpy.mockImplementation(() => undefined)
 
