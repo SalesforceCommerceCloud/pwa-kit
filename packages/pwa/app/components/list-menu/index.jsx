@@ -134,7 +134,7 @@ const ListMenuContent = ({maxColumns, items, itemsKey, onClose, initialFocusRef}
                                 ? items.map((item) => {
                                       const {name} = item
                                       return {
-                                          href: categoryUrlBuilder(item, locale),
+                                          href: categoryUrlBuilder(item, locale, siteAlias),
                                           text: name,
                                           styles: {
                                               fontSize: 'md',

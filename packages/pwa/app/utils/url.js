@@ -79,7 +79,7 @@ export const buildUrlSet = (url = '', key = '', values = [], extraParams = {}) =
  *
  * @param {Object} category
  * @param {string} locale
- * @param {string} siteIdAlias
+ * @param {string} siteAlias
  * @returns {string}
  */
 export const categoryUrlBuilder = (category, locale = DEFAULT_LOCALE, siteAlias) =>
@@ -90,6 +90,7 @@ export const categoryUrlBuilder = (category, locale = DEFAULT_LOCALE, siteAlias)
  *
  * @param {Object} product
  * @param {string} locale
+ * @param {string} siteAlias
  * @returns {string}
  */
 export const productUrlBuilder = (product, locale, siteAlias) =>

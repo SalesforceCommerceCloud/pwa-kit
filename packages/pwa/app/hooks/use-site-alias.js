@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {useParams} from 'react-router-dom'
+import {useLocation} from 'react-router-dom'
 import {getAppConfig, getSiteAliasByHostname, getSiteAliasById} from '../utils/utils'
 import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
 
@@ -21,7 +21,8 @@ export const useSiteAlias = () => {
         return alias
     }
 
-    let {siteAlias} = useParams()
+    let {pathname} = useLocation()
+    const siteAlias = pathname.split('/')[1]
     // if there is no alias from the url, use the default value from app config
     if (!siteAlias) {
         const alias = getSiteAliasById(defaultSiteId, sites)

@@ -7,8 +7,36 @@
                 "alias": "us",
                 "hostname": ["localhost"],
                 "l10n": {
-                    "defaultLocale": "en-US",
-                    "supportedLocales": ["en-US"]
+                    "supportedCurrencies": [
+                        "USD",
+                        "EUR",
+                        "CNY",
+                        "JPY"
+                    ],
+                    "defaultCurrency": "USD",
+                    "supportedLocales": [
+                        {
+                            "id": "en-US",
+                            "preferredCurrency": "USD"
+                        },
+                        {
+                            "id": "fr-FR",
+                            "preferredCurrency": "EUR"
+                        },
+                        {
+                            "id": "it-IT",
+                            "preferredCurrency": "EUR"
+                        },
+                        {
+                            "id": "zh-CN",
+                            "preferredCurrency": "CNY"
+                        },
+                        {
+                            "id": "ja-JP",
+                            "preferredCurrency": "JPY"
+                        }
+                    ],
+                    "defaultLocale": "en-US"
                 }
             },
             {
@@ -16,8 +44,36 @@
                 "alias": "global",
                 "hostname": ["localhost"],
                 "l10n": {
-                    "defaultLocale": "en-GB",
-                    "supportedLocales": ["en-GB", "ja-JP", "fr-FR"]
+                    "supportedCurrencies": [
+                        "GBP",
+                        "EUR",
+                        "CNY",
+                        "JPY"
+                    ],
+                    "defaultCurrency": "GBP",
+                    "supportedLocales": [
+                        {
+                            "id": "en-GB",
+                            "preferredCurrency": "GBP"
+                        },
+                        {
+                            "id": "fr-FR",
+                            "preferredCurrency": "EUR"
+                        },
+                        {
+                            "id": "it-IT",
+                            "preferredCurrency": "EUR"
+                        },
+                        {
+                            "id": "zh-CN",
+                            "preferredCurrency": "CNY"
+                        },
+                        {
+                            "id": "ja-JP",
+                            "preferredCurrency": "JPY"
+                        }
+                    ],
+                    "defaultLocale": "en-GB"
                 }
             }
         ]

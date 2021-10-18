@@ -201,6 +201,7 @@ export const getSiteId = (appConfig = {}, originalUrl, appOrigin) => {
                 'The default SiteId does not match any values from the site configuration. Please check your config'
             )
         }
+        console.log('homepage default siteId', defaultSiteId)
         return defaultSiteId
     }
 
@@ -209,6 +210,8 @@ export const getSiteId = (appConfig = {}, originalUrl, appOrigin) => {
     const siteId = sites.find((site) => {
         return site.alias === siteAlias
     })?.id
+
+    console.log('siteSite from url site alias', siteId)
 
     return siteId
 }
@@ -235,5 +238,5 @@ export const getSiteAliasByHostname = (hostname, sites) => {
     if (!hostname) throw new Error('Hostname is required to find the alias')
     const results = sites.find((site) => site.hostname.includes(hostname))
     // we only want to return the alias when there is one site info as a result
-    return results.length === 1 ? results[0].alias : undefined
+    return results?.length === 1 ? results[0].alias : undefined
 }

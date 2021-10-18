@@ -71,7 +71,7 @@ const routes = [
         exact: true
     },
     {
-        path: '/:siteIdAlias/:locale/checkout/confirmation',
+        path: '/:siteAlias/:locale/checkout/confirmation',
         component: CheckoutConfirmation,
         exact: true
     },
@@ -86,7 +86,7 @@ const routes = [
         exact: true
     },
     {
-        path: '/:siteIdAlias/:locale/product/:productId',
+        path: '/:siteAlias/:locale/product/:productId',
         component: ProductDetail
     },
     {
