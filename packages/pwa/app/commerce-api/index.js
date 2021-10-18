@@ -126,20 +126,32 @@ class CommerceAPI {
                                 // By default we send the locale param and don't send the currency param.
                                 const {sendLocale = true, sendCurrency = false} = apiConfigs[key]
 
-                                const sendLocaleForCurrentProp = Array.isArray(sendLocale)
-                                    ? sendLocale.includes(prop)
-                                    : !!sendLocale
-                                const sendCurrencyForCurrentProp = Array.isArray(sendCurrency)
-                                    ? sendCurrency.includes(prop)
-                                    : !!sendCurrency
+                                const {
+                                    locale: overrideLocale,
+                                    currency: overrideCurrency,
+                                    ...rest
+                                } = fetchOptions.parameters || {}
 
-                                const {locale: _l, currency: _c, ...rest} =
-                                    fetchOptions.parameters || {}
+                                const sendLocaleForCurrentProp =
+                                    !!overrideLocale ||
+                                    (Array.isArray(sendLocale)
+                                        ? sendLocale.includes(prop)
+                                        : !!sendLocale)
+
+                                const sendCurrencyForCurrentProp =
+                                    !!overrideCurrency ||
+                                    (Array.isArray(sendCurrency)
+                                        ? sendCurrency.includes(prop)
+                                        : !!sendCurrency)
 
                                 fetchOptions.parameters = {
                                     ...rest,
-                                    ...(sendLocaleForCurrentProp ? {locale} : {}),
-                                    ...(sendCurrencyForCurrentProp ? {currency} : {})
+                                    ...(sendLocaleForCurrentProp
+                                        ? {locale: overrideLocale || locale}
+                                        : {}),
+                                    ...(sendCurrencyForCurrentProp
+                                        ? {currency: overrideCurrency || currency}
+                                        : {})
                                 }
 
                                 return self.willSendRequest(prop, ...args).then((newArgs) => {
