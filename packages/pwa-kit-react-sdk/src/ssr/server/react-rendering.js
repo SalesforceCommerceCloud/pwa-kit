@@ -148,7 +148,7 @@ export const render = async (req, res) => {
 
     // TODO: Think about if this is a good place to put the locale, or just pass it
     // into `restore` as an additional argument since it's essentially in the api now.
-    res.locals.locale = intlConfig.locale
+    res.locals.locale = intlConfig?.locale
 
     // AppConfig.restore *must* come before using getRoutes() or routeComponent()
     // to inject arguments into the wrapped component's getProps methods.
