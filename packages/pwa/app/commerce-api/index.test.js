@@ -127,12 +127,12 @@ describe('CommerceAPI', () => {
         const config = getAPI().getConfig()
         expect(config.parameters).toEqual(apiConfig.parameters)
     })
-    test('calls willSendResponse with request name and options', () => {
+    test('calls willSendResponse with request name and options (including auto-injected locale and currency)', () => {
         const api = getAPI()
         const spy = jest.spyOn(api, 'willSendRequest')
         api.shopperProducts.getProduct({parameters: {id: '123'}})
         expect(spy).toHaveBeenCalledWith('getProduct', {
-            parameters: {id: '123'}
+            parameters: {id: '123', locale: 'en-GB', currency: 'GBP'}
         })
     })
     test('can optionally ignore req/res hooks', () => {
@@ -143,16 +143,6 @@ describe('CommerceAPI', () => {
             ignoreHooks: true
         })
         expect(spy).not.toHaveBeenCalled()
-    })
-    test('auto-injecting currency, locale', () => {
-        const api = getAPI()
-        const spy = jest.spyOn(api, 'willSendRequest')
-        api.shopperProducts.getProduct({
-            parameters: {id: '123'}
-        })
-        expect(spy).toHaveBeenCalledWith('getProduct', {
-            parameters: {id: '123', locale: 'en-GB', currency: 'GBP'}
-        })
     })
     test('passing in locale/currency in the API method would override the global values', () => {
         const api = getAPI()
@@ -199,7 +189,10 @@ describe('CommerceAPI', () => {
         const result = await myAPI.shopperProducts.getProducts({
             parameters: {ids: ['123']}
         })
-        expect(spy).toHaveBeenCalledWith([{id: '123'}], [{parameters: {ids: ['123']}}])
+        expect(spy).toHaveBeenCalledWith(
+            [{id: '123'}],
+            [{parameters: {ids: ['123'], locale: 'en-GB', currency: 'GBP'}}]
+        )
         expect(result).toBe('1 product')
     })
     test('authorizes guest user', async () => {
