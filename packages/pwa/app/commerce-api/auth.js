@@ -26,8 +26,9 @@ import {createGetTokenBody} from './utils'
 
 const usidStorageKey = 'usid'
 const encUserIdStorageKey = 'enc-user-id'
-const tokenStorageKey = 'token'
 const refreshTokenStorageKey = 'refresh-token'
+
+let tokenStorageKey
 
 /**
  * A  class that provides auth functionality for pwa.
@@ -37,6 +38,9 @@ class Auth {
     constructor(api) {
         this._api = api
         this._config = api._config
+
+        tokenStorageKey = this._config.parameters.organizationId
+
         this._onClient = typeof window !== 'undefined'
         this._pendingAuth = undefined
         this._customerId = undefined
