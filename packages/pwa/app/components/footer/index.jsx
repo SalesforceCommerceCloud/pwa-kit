@@ -30,6 +30,7 @@ import {HideOnDesktop, HideOnMobile} from '../responsive'
 import {getMessageForLocaleCode} from '../../utils/locale'
 import {SUPPORTED_LOCALES} from '../../constants'
 import {getUrlWithLocale} from '../../utils/url'
+import LocaleSelectorText from '../locale-selector-text'
 
 const Footer = ({...otherProps}) => {
     const styles = useMultiStyleConfig('Footer')
@@ -141,9 +142,11 @@ const Footer = ({...otherProps}) => {
                                 {...styles.localeDropdown}
                             >
                                 {SUPPORTED_LOCALES.map((locale) => (
-                                    <option key={locale.id} value={locale.id}>
-                                        {intl.formatMessage(getMessageForLocaleCode(locale.id))}
-                                    </option>
+                                    <LocaleSelectorText
+                                        asDropdownOption
+                                        localeId={locale.id}
+                                        key={locale.id}
+                                    />
                                 ))}
                             </Select>
                         </FormControl>

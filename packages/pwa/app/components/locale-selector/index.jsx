@@ -36,6 +36,7 @@ import {
 import {getMessageForLocaleCode} from '../../utils/locale'
 import {DEFAULT_LOCALE} from '../../constants'
 import {useIntl} from 'react-intl'
+import LocaleSelectorText from '../locale-selector-text'
 
 // NOTE: If you want to have flags shown next to a selectable locale, update this
 // mapping object with the short code as the key for the desired icon.
@@ -76,9 +77,10 @@ const LocaleSelector = ({
                                 )}
                                 {/* Display flag icon if one exists */}
                                 {flags[selectedLocale]}
-                                <Text {...styles.selectedText}>
-                                    {intl.formatMessage(getMessageForLocaleCode(selectedLocale))}
-                                </Text>
+                                <LocaleSelectorText
+                                    {...styles.selectedText}
+                                    localeId={selectedLocale}
+                                />
                             </AccordionButton>
                             <AccordionPanel>
                                 <Accordion allowToggle={true} {...styles.accordion}>
@@ -86,17 +88,16 @@ const LocaleSelector = ({
                                         <AccordionItem border="none" key={locale.id}>
                                             <AccordionButton
                                                 {...styles.optionButton}
-                                                onClick={() => onSelect(locale)}
+                                                onClick={() => onSelect(locale.id)}
                                             >
                                                 {/* Display flag icon if one exists */}
                                                 {flags[locale.id]}
 
                                                 {/* Locale name */}
-                                                <Text {...styles.optionText}>
-                                                    {intl.formatMessage(
-                                                        getMessageForLocaleCode(locale.id)
-                                                    )}
-                                                </Text>
+                                                <LocaleSelectorText
+                                                    {...styles.optionText}
+                                                    localeId={locale.id}
+                                                />
 
                                                 {/* Selection indicator */}
                                                 {selectedLocale === locale && (
