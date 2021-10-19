@@ -25,7 +25,13 @@ import {
     ocapiFaultResponse
 } from './mock-data'
 
-const apiConfig = {...commerceAPIConfig, einsteinConfig: einsteinAPIConfig, proxy: undefined}
+const apiConfig = {
+    ...commerceAPIConfig,
+    einsteinConfig: einsteinAPIConfig,
+    proxy: undefined,
+    locale: 'en-GB',
+    currency: 'GBP'
+}
 const getAPI = () => new CommerceAPI(apiConfig)
 
 jest.mock('commerce-sdk-isomorphic', () => {
@@ -137,6 +143,34 @@ describe('CommerceAPI', () => {
             ignoreHooks: true
         })
         expect(spy).not.toHaveBeenCalled()
+    })
+    test('auto-injecting currency, locale', () => {
+        const api = getAPI()
+        const spy = jest.spyOn(api, 'willSendRequest')
+        api.shopperProducts.getProduct({
+            parameters: {id: '123'}
+        })
+        expect(spy).toHaveBeenCalledWith('getProduct', {
+            parameters: {id: '123', locale: 'en-GB', currency: 'GBP'}
+        })
+    })
+    test('passing in locale/currency in the API method would override the global values', () => {
+        const api = getAPI()
+        const spy = jest.spyOn(api, 'willSendRequest')
+
+        api.shopperProducts.getProduct({
+            parameters: {id: '123', locale: 'en-US'}
+        })
+        expect(spy).toHaveBeenCalledWith('getProduct', {
+            parameters: {id: '123', locale: 'en-US', currency: 'GBP'}
+        })
+
+        api.shopperProducts.getProduct({
+            parameters: {id: '123', currency: 'EUR'}
+        })
+        expect(spy).toHaveBeenCalledWith('getProduct', {
+            parameters: {id: '123', locale: 'en-GB', currency: 'EUR'}
+        })
     })
     test('applies updated options when calling sdk methods', async () => {
         class MyAPI extends CommerceAPI {
