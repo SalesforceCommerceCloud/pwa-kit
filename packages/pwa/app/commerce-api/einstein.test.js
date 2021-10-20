@@ -55,7 +55,7 @@ describe('EinsteinAPI', () => {
                     'x-cq-client-id': 'test-id'
                 },
                 body:
-                    '{"product":{"id":"56736828M","sku":"","altId":"","altIdType":""},"userId":"test-usid","cookieId":""}'
+                    '{"product":{"id":"56736828M","sku":"","altId":"","altIdType":""},"cookieId":"test-usid"}'
             }
         )
     })
@@ -71,7 +71,7 @@ describe('EinsteinAPI', () => {
                     'x-cq-client-id': 'test-id'
                 },
                 body:
-                    '{"products":[{"id":"883360544021M","sku":"","price":155,"quantity":1}],"userId":"test-usid","cookieId":""}'
+                    '{"products":[{"id":"883360544021M","sku":"","price":155,"quantity":1}],"cookieId":"test-usid"}'
             }
         )
     })
@@ -87,7 +87,7 @@ describe('EinsteinAPI', () => {
                     'x-cq-client-id': 'test-id'
                 },
                 body:
-                    '{"recommenderName":"testRecommender","__recoUUID":"883360544021M","product":{"id":"56736828M","sku":"","altId":"","altIdType":""},"userId":"test-usid","cookieId":""}'
+                    '{"recommenderName":"testRecommender","__recoUUID":"883360544021M","product":{"id":"56736828M","sku":"","altId":"","altIdType":""},"cookieId":"test-usid"}'
             }
         )
     })
@@ -103,7 +103,7 @@ describe('EinsteinAPI', () => {
                     'x-cq-client-id': 'test-id'
                 },
                 body:
-                    '{"recommenderName":"testRecommender","__recoUUID":"883360544021M","products":{"id":"test-reco"},"userId":"test-usid","cookieId":""}'
+                    '{"recommenderName":"testRecommender","__recoUUID":"883360544021M","products":{"id":"test-reco"},"cookieId":"test-usid"}'
             }
         )
     })
