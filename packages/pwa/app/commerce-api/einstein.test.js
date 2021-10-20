@@ -189,7 +189,7 @@ describe('EinsteinAPI', () => {
                     'Content-Type': 'application/json',
                     'x-cq-client-id': 'test-id'
                 },
-                body: '{"userId":"test-usid","cookieId":""}'
+                body: '{"cookieId":"test-usid"}'
             }
         )
 
