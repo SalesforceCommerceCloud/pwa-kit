@@ -14,6 +14,30 @@ class EinsteinAPI {
         this.config = commerceAPI?._config?.einsteinConfig
     }
 
+    /**
+     * Given a POJO append the correct user and cookie identifier values using the current auth state.
+     *
+     * @param {object} params
+     * @returns {object} The decorated body object.
+     */
+    _buildBody(params) {
+        const body = {...params}
+
+        // If we have an encrypted user id (authenticaed users only) use it as the `userId` otherwise
+        // we won't send a `userId` param for guest users.
+        if (this.commerceAPI.auth.encUserId) {
+            body.userId = this.commerceAPI.auth.encUserId
+        }
+
+        // Append the `usid` as the `cookieId` value if present. (It should always be present as long
+        // as the user is initilized)
+        if (this.commerceAPI.auth.usid) {
+            body.cookieId = this.commerceAPI.auth.usid
+        }
+
+        return body
+    }
+
     async einsteinFetch(endpoint, method, body) {
         const config = this.config
         const {proxyPath, einsteinId} = config
@@ -46,19 +70,15 @@ class EinsteinAPI {
         const endpoint = `/activities/${this.config.siteId}/viewProduct`
         const method = 'POST'
         const {id, sku = '', altId = '', altIdType = ''} = product
-        const body = {
+        const body = this._buildBody({
             product: {
                 id,
                 sku,
                 altId,
                 altIdType
             },
-            userId: this.commerceAPI.auth.encUserId
-                ? this.commerceAPI.auth.encUserId
-                : this.commerceAPI.auth.usid,
-            cookieId: this.commerceAPI.auth.encUserId ? this.commerceAPI.auth.usid : '',
             ...args
-        }
+        })
 
         return this.einsteinFetch(endpoint, method, body)
     }
@@ -71,16 +91,12 @@ class EinsteinAPI {
         const endpoint = `/activities/${this.config.siteId}/viewReco`
         const method = 'POST'
         const {__recoUUID, recommenderName} = recommenderDetails
-        const body = {
+        const body = this._buildBody({
             recommenderName,
             __recoUUID,
             products: products,
-            userId: this.commerceAPI.auth.encUserId
-                ? this.commerceAPI.auth.encUserId
-                : this.commerceAPI.auth.usid,
-            cookieId: this.commerceAPI.auth.encUserId ? this.commerceAPI.auth.usid : '',
             ...args
-        }
+        })
 
         return this.einsteinFetch(endpoint, method, body)
     }
@@ -94,7 +110,7 @@ class EinsteinAPI {
         const method = 'POST'
         const {__recoUUID, recommenderName} = recommenderDetails
         const {id, sku = '', altId = '', altIdType = ''} = product
-        const body = {
+        const body = this._buildBody({
             recommenderName,
             __recoUUID,
             product: {
@@ -103,12 +119,8 @@ class EinsteinAPI {
                 altId,
                 altIdType
             },
-            userId: this.commerceAPI.auth.encUserId
-                ? this.commerceAPI.auth.encUserId
-                : this.commerceAPI.auth.usid,
-            cookieId: this.commerceAPI.auth.encUserId ? this.commerceAPI.auth.usid : '',
             ...args
-        }
+        })
 
         return this.einsteinFetch(endpoint, method, body)
     }
@@ -120,14 +132,10 @@ class EinsteinAPI {
     async sendAddToCart(product, args) {
         const endpoint = `/activities/${this.config.siteId}/addToCart`
         const method = 'POST'
-        const body = {
+        const body = this._buildBody({
             products: [product],
-            userId: this.commerceAPI.auth.encUserId
-                ? this.commerceAPI.auth.encUserId
-                : this.commerceAPI.auth.usid,
-            cookieId: this.commerceAPI.auth.encUserId ? this.commerceAPI.auth.usid : '',
             ...args
-        }
+        })
 
         return this.einsteinFetch(endpoint, method, body)
     }
@@ -151,13 +159,7 @@ class EinsteinAPI {
     async getRecommendations(recommenderName, args) {
         const endpoint = `/personalization/recs/${this.config.siteId}/${recommenderName}`
         const method = 'POST'
-        const body = {
-            userId: this.commerceAPI.auth.encUserId
-                ? this.commerceAPI.auth.encUserId
-                : this.commerceAPI.auth.usid,
-            cookieId: this.commerceAPI.auth.encUserId ? this.commerceAPI.auth.usid : '',
-            ...args
-        }
+        const body = this._buildBody(args)
 
         // Fetch the recommendations
         const reco = await this.einsteinFetch(endpoint, method, body)
@@ -174,13 +176,7 @@ class EinsteinAPI {
     async getZoneRecommendations(zoneName, args) {
         const endpoint = `/personalization/${this.config.siteId}/zones/${zoneName}/recs`
         const method = 'POST'
-        const body = {
-            userId: this.commerceAPI.auth.encUserId
-                ? this.commerceAPI.auth.encUserId
-                : this.commerceAPI.auth.usid,
-            cookieId: this.commerceAPI.auth.encUserId ? this.commerceAPI.auth.usid : '',
-            ...args
-        }
+        const body = this._buildBody(args)
 
         // Fetch the recommendations
         const reco = await this.einsteinFetch(endpoint, method, body)
