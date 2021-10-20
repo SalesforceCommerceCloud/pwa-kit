@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {SUPPORTED_LOCALES, DEFAULT_LOCALE, MESSAGES_OF_COMMON_LOCALES} from '../constants'
+import {SUPPORTED_LOCALES, DEFAULT_LOCALE} from '../constants'
 
 /**
  * Dynamically import the translations/messages for a given locale
@@ -101,18 +101,4 @@ export const getTargetLocale = (preferredLocales, supportedLocales, defaultLocal
 export const getPreferredCurrency = (locale) => {
     return SUPPORTED_LOCALES.find((supportedLocale) => supportedLocale.id === locale)
         ?.preferredCurrency
-}
-
-/**
- * Get human-readable name for the given locale code
- * @returns {Object} translation message
- */
-export const getMessageForLocaleCode = (localeCode) => {
-    const message = MESSAGES_OF_COMMON_LOCALES[localeCode]
-    if (!message) {
-        throw new Error(
-            `No locale message found for "${localeCode}". Please update the list accordingly.`
-        )
-    }
-    return message
 }

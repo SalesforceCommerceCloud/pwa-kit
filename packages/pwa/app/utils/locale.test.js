@@ -10,8 +10,7 @@ import {
     getTargetLocale,
     loadLocaleData,
     getLocaleConfig,
-    getPreferredCurrency,
-    getMessageForLocaleCode
+    getPreferredCurrency
 } from './locale'
 
 import {SUPPORTED_LOCALES, DEFAULT_LOCALE} from '../constants'
@@ -121,17 +120,5 @@ describe('getCurrency', () => {
     test('returns undefined for a unsupported locale', () => {
         const currency = getPreferredCurrency(nonSupportedLocale)
         expect(currency).toBeFalsy()
-    })
-})
-
-describe('getMessageForLocaleCode', () => {
-    test('returns a translation message when passing in a default locale code', () => {
-        expect(getMessageForLocaleCode(DEFAULT_LOCALE)?.defaultMessage).toBeTruthy()
-    })
-
-    test('throws an error if the given locale code is not found', () => {
-        expect(() => {
-            getMessageForLocaleCode('xx-XX')
-        }).toThrow()
     })
 })

@@ -15,7 +15,6 @@ import {
     AccordionItem,
     AccordionPanel,
     Box,
-    Text,
 
     // Hooks
     useStyleConfig
@@ -33,9 +32,7 @@ import {
     FlagJPIcon
 } from '../../components/icons'
 
-import {getMessageForLocaleCode} from '../../utils/locale'
 import {DEFAULT_LOCALE} from '../../constants'
-import {useIntl} from 'react-intl'
 import LocaleSelectorText from '../locale-selector-text'
 
 // NOTE: If you want to have flags shown next to a selectable locale, update this
@@ -60,7 +57,6 @@ const LocaleSelector = ({
     ...props
 }) => {
     const styles = useStyleConfig('LocaleSelector')
-    const intl = useIntl()
 
     return (
         <Box className="sf-locale-selector">
