@@ -1,5 +1,6 @@
 ## To be released
 
+-   Ensure `cookieId` value is sent always for Einstein recommendations [179](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/179)
 -   Remove `x-powered-by` HTTP response header [#165](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/165)
 -   For search engine crawlers, add `hreflang` links to the current page's html [#137](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/137)
 -   Use the preferred currency when switching locales. [#105](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/105)
