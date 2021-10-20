@@ -6,7 +6,6 @@
  */
 
 import packageInfo from '../package.json'
-import {defineMessages} from 'react-intl'
 
 // Constants used in the used for product searching.
 export const DEFAULT_SEARCH_PARAMS = {limit: 25, offset: 0, sort: 'best-matches', refine: []}
