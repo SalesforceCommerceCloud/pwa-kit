@@ -301,8 +301,7 @@ App.getProps = async ({api}) => {
     const rootCategory = await api.shopperProducts.getCategory({
         parameters: {
             id: DEFAULT_ROOT_CATEGORY,
-            levels: DEFAULT_NAV_DEPTH,
-            locale: localeConfig.app.targetLocale
+            levels: DEFAULT_NAV_DEPTH
         }
     })
 

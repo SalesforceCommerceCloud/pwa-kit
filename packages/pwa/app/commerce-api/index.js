@@ -65,17 +65,10 @@ class CommerceAPI {
 
         // A mapping of property names to the SDK class constructors we'll be
         // providing instances for.
-        const apis = {
-            shopperCustomers: sdk.ShopperCustomers,
-            shopperBaskets: OcapiShopperBaskets,
-            shopperGiftCertificates: sdk.ShopperGiftCertificates,
-            shopperLogin: sdk.ShopperLogin,
-            shopperOrders: OcapiShopperOrders,
-            shopperProducts: sdk.ShopperProducts,
-            shopperPromotions: sdk.ShopperPromotions,
-            shopperSearch: sdk.ShopperSearch
-        }
-
+        //
+        // NOTE: `sendLocale` and `sendCurrency` for sending locale and currency info to the API:
+        // - boolean, if you want to affect _all_ methods for a given API
+        // - OR an array (listing the API's methods), if you want to affect only certain methods of an API
         const apiConfigs = {
             shopperCustomers: {
                 api: sdk.ShopperCustomers,
@@ -117,44 +110,38 @@ class CommerceAPI {
                     get: function(obj, prop) {
                         if (typeof obj[prop] === 'function') {
                             return (...args) => {
+                                const fetchOptions = args[0]
                                 const {locale, currency} = self._config
 
-                                if (args[0].ignoreHooks) {
+                                if (fetchOptions.ignoreHooks) {
                                     return obj[prop](...args)
                                 }
 
+                                // Inject the locale and currency to the API call via its parameters.
+                                //
+                                // NOTE: The commerce sdk isomorphic will complain if you pass parameters to
+                                // it that it doesn't expect, this is why we only add the locale and currency
+                                // to some of the API calls.
+
+                                // By default we send the locale param and don't send the currency param.
+                                const {sendLocale = true, sendCurrency = false} = apiConfigs[key]
+
+                                const includeGlobalLocale = Array.isArray(sendLocale)
+                                    ? sendLocale.includes(prop)
+                                    : !!sendLocale
+
+                                const includeGlobalCurrency = Array.isArray(sendCurrency)
+                                    ? sendCurrency.includes(prop)
+                                    : !!sendCurrency
+
+                                fetchOptions.parameters = {
+                                    ...(includeGlobalLocale ? {locale} : {}),
+                                    ...(includeGlobalCurrency ? {currency} : {}),
+                                    // Allowing individual API calls to override the global locale/currency
+                                    ...fetchOptions.parameters
+                                }
+
                                 return self.willSendRequest(prop, ...args).then((newArgs) => {
-                                    let {sendLocale = true, sendCurrency = false} = apiConfigs[key]
-
-                                    // By default we send the local param and don't send the currency param.
-                                    // You can modify when these are send by using a boolean value send the
-                                    // currency/locale for all calls for a given API, or define an array listing
-                                    // the API's methods you want the currency/locale information to be sent.
-                                    sendLocale = Array.isArray(sendLocale)
-                                        ? sendLocale.includes(prop)
-                                        : !!sendLocale
-                                    sendCurrency = Array.isArray(sendCurrency)
-                                        ? sendCurrency.includes(prop)
-                                        : !!sendCurrency
-
-                                    // Ensure we don't send the pseudo locale.
-                                    if (locale === 'en-XB') {
-                                        sendLocale = false
-                                    }
-
-                                    // Inject the locale and currency to the API call via it's parameters.
-                                    //
-                                    // NOTE: The commerce sdk isomorphic will complain if you pass parameters to
-                                    // it that it doesn't expect, this is why we only add the locale and currency
-                                    // to some of the API calls.
-                                    // We use the default locale for the API calls when running the app using the
-                                    // pseudo locale 'en-XB'.
-                                    newArgs[0].parameters = {
-                                        ...newArgs[0].parameters,
-                                        ...(sendLocale ? {locale} : {}),
-                                        ...(sendCurrency ? {currency} : {})
-                                    }
-
                                     return obj[prop](...newArgs).then((res) =>
                                         self.didReceiveResponse(res, newArgs)
                                     )
