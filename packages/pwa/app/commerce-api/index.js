@@ -126,32 +126,19 @@ class CommerceAPI {
                                 // By default we send the locale param and don't send the currency param.
                                 const {sendLocale = true, sendCurrency = false} = apiConfigs[key]
 
-                                const {
-                                    locale: overrideLocale,
-                                    currency: overrideCurrency,
-                                    ...rest
-                                } = fetchOptions.parameters || {}
+                                const includeGlobalLocale = Array.isArray(sendLocale)
+                                    ? sendLocale.includes(prop)
+                                    : !!sendLocale
 
-                                const sendLocaleForCurrentProp =
-                                    !!overrideLocale ||
-                                    (Array.isArray(sendLocale)
-                                        ? sendLocale.includes(prop)
-                                        : !!sendLocale)
-
-                                const sendCurrencyForCurrentProp =
-                                    !!overrideCurrency ||
-                                    (Array.isArray(sendCurrency)
-                                        ? sendCurrency.includes(prop)
-                                        : !!sendCurrency)
+                                const includeGlobalCurrency = Array.isArray(sendCurrency)
+                                    ? sendCurrency.includes(prop)
+                                    : !!sendCurrency
 
                                 fetchOptions.parameters = {
-                                    ...rest,
-                                    ...(sendLocaleForCurrentProp
-                                        ? {locale: overrideLocale || locale}
-                                        : {}),
-                                    ...(sendCurrencyForCurrentProp
-                                        ? {currency: overrideCurrency || currency}
-                                        : {})
+                                    ...(includeGlobalLocale ? {locale} : {}),
+                                    ...(includeGlobalCurrency ? {currency} : {}),
+                                    // Allowing individual API calls to override the global locale/currency
+                                    ...fetchOptions.parameters
                                 }
 
                                 return self.willSendRequest(prop, ...args).then((newArgs) => {
