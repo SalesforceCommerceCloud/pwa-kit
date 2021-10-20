@@ -26,9 +26,9 @@ import {createGetTokenBody} from './utils'
 
 const usidStorageKey = 'usid'
 const encUserIdStorageKey = 'enc-user-id'
+const tokenStorageKey = 'token'
 const refreshTokenStorageKey = 'refresh-token'
-
-let tokenStorageKey
+const oidStorageKey = 'oid'
 
 /**
  * A  class that provides auth functionality for pwa.
@@ -38,20 +38,29 @@ class Auth {
     constructor(api) {
         this._api = api
         this._config = api._config
-
-        tokenStorageKey = this._config.parameters.organizationId
-
         this._onClient = typeof window !== 'undefined'
         this._pendingAuth = undefined
         this._customerId = undefined
-        this._authToken = this._onClient ? window.localStorage.getItem(tokenStorageKey) : undefined
-        this._refreshToken = this._onClient
-            ? window.localStorage.getItem(refreshTokenStorageKey)
-            : undefined
-        this._usid = this._onClient ? window.localStorage.getItem(usidStorageKey) : undefined
-        this._encUserId = this._onClient
-            ? window.localStorage.getItem(encUserIdStorageKey)
-            : undefined
+
+        this._oid = this._onClient ? window.localStorage.getItem(oidStorageKey) : undefined
+
+        let configOid = api._config.parameters.organizationId
+        if (this._oid != configOid) {
+            this._clearAuth()
+            this._saveOid(configOid)
+        } else {
+            this._authToken = this._onClient
+                ? window.localStorage.getItem(tokenStorageKey)
+                : undefined
+            this._refreshToken = this._onClient
+                ? window.localStorage.getItem(refreshTokenStorageKey)
+                : undefined
+            this._usid = this._onClient ? window.localStorage.getItem(usidStorageKey) : undefined
+            this._encUserId = this._onClient
+                ? window.localStorage.getItem(encUserIdStorageKey)
+                : undefined
+        }
+
         this.login = this.login.bind(this)
         this.logout = this.logout.bind(this)
     }
@@ -78,6 +87,10 @@ class Auth {
 
     get encUserId() {
         return this._encUserId
+    }
+
+    get oid() {
+        return this._oid
     }
 
     /**
@@ -373,6 +386,18 @@ class Auth {
         this._encUserId = encUserId
         if (this._onClient) {
             window.localStorage.setItem(encUserIdStorageKey, encUserId)
+        }
+    }
+
+    /**
+     * Stores the given oid token.
+     * @private
+     * @param {string} oid - Unique organization Id.
+     */
+    _saveOid(oid) {
+        this._oid = oid
+        if (this._onClient) {
+            window.localStorage.setItem(oidStorageKey, oid)
         }
     }
 
