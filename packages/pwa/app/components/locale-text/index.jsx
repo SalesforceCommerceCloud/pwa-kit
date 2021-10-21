@@ -5,47 +5,35 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {Text} from '@chakra-ui/layout'
+import {chakra, Text} from '@chakra-ui/react'
 import React from 'react'
-import {FormattedMessage, defineMessages, useIntl, defineMessage} from 'react-intl'
+import {defineMessages, useIntl, defineMessage} from 'react-intl'
 
-const LocaleSelectorText = ({localeId, asDropdownOption = false, ...otherProps}) => {
-    const found = LOCALE_MESSAGES[localeId]
-    const intl = useIntl()
+const LocaleText = ({shortCode, as, ...otherProps}) => {
+    const found = LOCALE_MESSAGES[shortCode]
 
-    if (found) {
-        return asDropdownOption ? (
-            <option value={localeId} {...otherProps}>
-                {intl.formatMessage(found)}
-            </option>
-        ) : (
-            <Text {...otherProps}>
-                <FormattedMessage {...found} />
-            </Text>
-        )
-    } else {
+    if (!found) {
         console.error(
-            `No locale message found for "${localeId}". Please update the list accordingly.`
-        )
-
-        return asDropdownOption ? (
-            <option value={localeId} {...otherProps}>
-                {intl.formatMessage(FALLBACK_MESSAGE, {localeId})}
-            </option>
-        ) : (
-            <Text {...otherProps}>
-                <FormattedMessage {...FALLBACK_MESSAGE} values={{localeId}} />
-            </Text>
+            `No locale message found for "${shortCode}". Please update the list accordingly.`
         )
     }
+
+    const intl = useIntl()
+    const args = [
+        ...[found ? found : FALLBACK_MESSAGE],
+        ...[found ? [] : {localeShortCode: shortCode}]
+    ]
+    const message = intl.formatMessage(...args)
+
+    const Wrapper = as ? chakra(as) : Text
+    return <Wrapper {...otherProps}>{message}</Wrapper>
 }
 // TODO: prop type
 // TODO: add tests
-// TODO: clean up old code
 
-export default LocaleSelectorText
+export default LocaleText
 
-const FALLBACK_MESSAGE = defineMessage({defaultMessage: 'Unknown {localeId}'})
+const FALLBACK_MESSAGE = defineMessage({defaultMessage: 'Unknown {localeShortCode}'})
 
 /**
  *  Translations for names of the commonly-used locales.

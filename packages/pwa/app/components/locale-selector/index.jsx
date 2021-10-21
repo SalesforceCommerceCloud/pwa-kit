@@ -33,7 +33,7 @@ import {
 } from '../../components/icons'
 
 import {DEFAULT_LOCALE} from '../../constants'
-import LocaleSelectorText from '../locale-selector-text'
+import LocaleText from '../locale-text'
 
 // NOTE: If you want to have flags shown next to a selectable locale, update this
 // mapping object with the short code as the key for the desired icon.
@@ -73,10 +73,7 @@ const LocaleSelector = ({
                                 )}
                                 {/* Display flag icon if one exists */}
                                 {flags[selectedLocale]}
-                                <LocaleSelectorText
-                                    {...styles.selectedText}
-                                    localeId={selectedLocale}
-                                />
+                                <LocaleText {...styles.selectedText} shortCode={selectedLocale} />
                             </AccordionButton>
                             <AccordionPanel>
                                 <Accordion allowToggle={true} {...styles.accordion}>
@@ -90,9 +87,9 @@ const LocaleSelector = ({
                                                 {flags[locale.id]}
 
                                                 {/* Locale name */}
-                                                <LocaleSelectorText
+                                                <LocaleText
                                                     {...styles.optionText}
-                                                    localeId={locale.id}
+                                                    shortCode={locale.id}
                                                 />
 
                                                 {/* Selection indicator */}

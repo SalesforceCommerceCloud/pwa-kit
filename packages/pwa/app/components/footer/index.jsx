@@ -29,7 +29,7 @@ import SocialIcons from '../social-icons'
 import {HideOnDesktop, HideOnMobile} from '../responsive'
 import {SUPPORTED_LOCALES} from '../../constants'
 import {getUrlWithLocale} from '../../utils/url'
-import LocaleSelectorText from '../locale-selector-text'
+import LocaleText from '../locale-text'
 
 const Footer = ({...otherProps}) => {
     const styles = useMultiStyleConfig('Footer')
@@ -141,9 +141,10 @@ const Footer = ({...otherProps}) => {
                                 {...styles.localeDropdown}
                             >
                                 {SUPPORTED_LOCALES.map((locale) => (
-                                    <LocaleSelectorText
-                                        asDropdownOption
-                                        localeId={locale.id}
+                                    <LocaleText
+                                        as="option"
+                                        value={locale.id}
+                                        shortCode={locale.id}
                                         key={locale.id}
                                     />
                                 ))}
