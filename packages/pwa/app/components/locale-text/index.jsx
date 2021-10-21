@@ -5,31 +5,41 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {chakra, Text} from '@chakra-ui/react'
 import React from 'react'
-import {defineMessages, useIntl, defineMessage} from 'react-intl'
+import PropTypes from 'prop-types'
+import {defineMessage, defineMessages, useIntl} from 'react-intl'
+import {chakra, Text} from '@chakra-ui/react'
 
 const LocaleText = ({shortCode, as, ...otherProps}) => {
-    const found = LOCALE_MESSAGES[shortCode]
+    const intl = useIntl()
+    const Wrapper = as ? chakra(as) : Text
+    const message = LOCALE_MESSAGES[shortCode] || FALLBACK_MESSAGE
 
-    if (!found) {
+    if (message === FALLBACK_MESSAGE) {
         console.error(
             `No locale message found for "${shortCode}". Please update the list accordingly.`
         )
     }
 
-    const intl = useIntl()
-    const args = [
-        ...[found ? found : FALLBACK_MESSAGE],
-        ...[found ? [] : {localeShortCode: shortCode}]
-    ]
-    const message = intl.formatMessage(...args)
-
-    const Wrapper = as ? chakra(as) : Text
-    return <Wrapper {...otherProps}>{message}</Wrapper>
+    return (
+        <Wrapper {...otherProps}>
+            {intl.formatMessage(message, {localeShortCode: shortCode})}
+        </Wrapper>
+    )
 }
-// TODO: prop type
-// TODO: add tests
+
+LocaleText.displayName = 'LocaleText'
+
+LocaleText.propTypes = {
+    /**
+     * The locale shortcode that you would like the localized text for.
+     */
+    shortCode: PropTypes.string.isRequired,
+    /**
+     * The element type to render this component as, defaults to a Text component.
+     */
+    as: PropTypes.string
+}
 
 export default LocaleText
 
