@@ -15,7 +15,6 @@ import {
     AccordionItem,
     AccordionPanel,
     Box,
-    Text,
 
     // Hooks
     useStyleConfig
@@ -33,9 +32,8 @@ import {
     FlagJPIcon
 } from '../../components/icons'
 
-import {defaultLocaleMessages} from '../_app'
 import {DEFAULT_LOCALE} from '../../constants'
-import {useIntl} from 'react-intl'
+import LocaleText from '../locale-text'
 
 // NOTE: If you want to have flags shown next to a selectable locale, update this
 // mapping object with the short code as the key for the desired icon.
@@ -59,7 +57,6 @@ const LocaleSelector = ({
     ...props
 }) => {
     const styles = useStyleConfig('LocaleSelector')
-    const intl = useIntl()
 
     return (
         <Box className="sf-locale-selector">
@@ -76,9 +73,7 @@ const LocaleSelector = ({
                                 )}
                                 {/* Display flag icon if one exists */}
                                 {flags[selectedLocale]}
-                                <Text {...styles.selectedText}>
-                                    {intl.formatMessage(defaultLocaleMessages[selectedLocale])}
-                                </Text>
+                                <LocaleText {...styles.selectedText} shortCode={selectedLocale} />
                             </AccordionButton>
                             <AccordionPanel>
                                 <Accordion allowToggle={true} {...styles.accordion}>
@@ -86,17 +81,16 @@ const LocaleSelector = ({
                                         <AccordionItem border="none" key={locale.id}>
                                             <AccordionButton
                                                 {...styles.optionButton}
-                                                onClick={() => onSelect(locale)}
+                                                onClick={() => onSelect(locale.id)}
                                             >
                                                 {/* Display flag icon if one exists */}
                                                 {flags[locale.id]}
 
                                                 {/* Locale name */}
-                                                <Text {...styles.optionText}>
-                                                    {intl.formatMessage(
-                                                        defaultLocaleMessages[locale.id]
-                                                    )}
-                                                </Text>
+                                                <LocaleText
+                                                    {...styles.optionText}
+                                                    shortCode={locale.id}
+                                                />
 
                                                 {/* Selection indicator */}
                                                 {selectedLocale === locale && (

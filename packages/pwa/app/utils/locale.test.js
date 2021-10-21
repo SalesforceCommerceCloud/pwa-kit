@@ -40,7 +40,6 @@ describe('whichLocaleToLoad', () => {
 describe('loadLocaleData', () => {
     test('default to English as the fallback locale', async () => {
         const messages = await loadLocaleData(nonSupportedLocale)
-        console.log('messages: ', messages)
         expect(messages[testMessageId][0].value).toMatch(/login redirect/i)
     })
     test('loading one of the supported locales', async () => {
