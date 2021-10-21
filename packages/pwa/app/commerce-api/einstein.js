@@ -40,7 +40,7 @@ class EinsteinAPI {
         return body
     }
 
-    async einsteinFetch(endpoint, method, body = {}) {
+    async einsteinFetch(endpoint, method, body) {
         const config = this.config
         const {proxyPath, einsteinId} = config
         const host = `${getAppOrigin()}${proxyPath}`
@@ -51,7 +51,9 @@ class EinsteinAPI {
         }
 
         // Include `userId` and `cookieId` parameters.
-        body = this._buildBody(body)
+        if (body) {
+            body = this._buildBody(body)
+        }
 
         let response
         response = await fetch(`${host}/v3${endpoint}`, {
