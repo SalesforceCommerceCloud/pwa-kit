@@ -33,6 +33,8 @@ class EinsteinAPI {
         // as the user is initilized)
         if (this.commerceAPI.auth.usid) {
             body.cookieId = this.commerceAPI.auth.usid
+        } else {
+            console.warn('Missing `cookieId`. For optimal results this value must be defined.')
         }
 
         return body
