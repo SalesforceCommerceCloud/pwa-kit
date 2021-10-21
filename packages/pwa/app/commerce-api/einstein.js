@@ -38,7 +38,7 @@ class EinsteinAPI {
         return body
     }
 
-    async einsteinFetch(endpoint, method, body) {
+    async einsteinFetch(endpoint, method, body = {}) {
         const config = this.config
         const {proxyPath, einsteinId} = config
         const host = `${getAppOrigin()}${proxyPath}`
@@ -47,6 +47,9 @@ class EinsteinAPI {
             'Content-Type': 'application/json',
             'x-cq-client-id': einsteinId
         }
+
+        // Include `userId` and `cookieId` parameters.
+        body = this._buildBody(body)
 
         let response
         response = await fetch(`${host}/v3${endpoint}`, {
@@ -70,7 +73,7 @@ class EinsteinAPI {
         const endpoint = `/activities/${this.config.siteId}/viewProduct`
         const method = 'POST'
         const {id, sku = '', altId = '', altIdType = ''} = product
-        const body = this._buildBody({
+        const body = {
             product: {
                 id,
                 sku,
@@ -78,7 +81,7 @@ class EinsteinAPI {
                 altIdType
             },
             ...args
-        })
+        }
 
         return this.einsteinFetch(endpoint, method, body)
     }
@@ -91,12 +94,12 @@ class EinsteinAPI {
         const endpoint = `/activities/${this.config.siteId}/viewReco`
         const method = 'POST'
         const {__recoUUID, recommenderName} = recommenderDetails
-        const body = this._buildBody({
+        const body = {
             recommenderName,
             __recoUUID,
             products: products,
             ...args
-        })
+        }
 
         return this.einsteinFetch(endpoint, method, body)
     }
@@ -110,7 +113,7 @@ class EinsteinAPI {
         const method = 'POST'
         const {__recoUUID, recommenderName} = recommenderDetails
         const {id, sku = '', altId = '', altIdType = ''} = product
-        const body = this._buildBody({
+        const body = {
             recommenderName,
             __recoUUID,
             product: {
@@ -120,7 +123,7 @@ class EinsteinAPI {
                 altIdType
             },
             ...args
-        })
+        }
 
         return this.einsteinFetch(endpoint, method, body)
     }
@@ -132,10 +135,10 @@ class EinsteinAPI {
     async sendAddToCart(product, args) {
         const endpoint = `/activities/${this.config.siteId}/addToCart`
         const method = 'POST'
-        const body = this._buildBody({
+        const body = {
             products: [product],
             ...args
-        })
+        }
 
         return this.einsteinFetch(endpoint, method, body)
     }
@@ -159,7 +162,7 @@ class EinsteinAPI {
     async getRecommendations(recommenderName, args) {
         const endpoint = `/personalization/recs/${this.config.siteId}/${recommenderName}`
         const method = 'POST'
-        const body = this._buildBody(args)
+        const body = args
 
         // Fetch the recommendations
         const reco = await this.einsteinFetch(endpoint, method, body)
@@ -176,7 +179,7 @@ class EinsteinAPI {
     async getZoneRecommendations(zoneName, args) {
         const endpoint = `/personalization/${this.config.siteId}/zones/${zoneName}/recs`
         const method = 'POST'
-        const body = this._buildBody(args)
+        const body = args
 
         // Fetch the recommendations
         const reco = await this.einsteinFetch(endpoint, method, body)
