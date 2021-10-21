@@ -86,6 +86,9 @@
   "3FyRaO": {
     "defaultMessage": "Shop Women's Outfits"
   },
+  "3HK3af": {
+    "defaultMessage": "Unknown {localeShortCode}"
+  },
   "3NVyN7": {
     "defaultMessage": "Please enter your first name"
   },
@@ -321,9 +324,6 @@
   },
   "Kz7I2o": {
     "defaultMessage": "Password updated"
-  },
-  "L+I9IR": {
-    "defaultMessage": "Unknown {localeId}"
   },
   "L8seEc": {
     "defaultMessage": "Subtotal"

@@ -235,6 +235,16 @@
       "value": "Shop Women's Outfits"
     }
   ],
+  "3HK3af": [
+    {
+      "type": 0,
+      "value": "Unknown "
+    },
+    {
+      "type": 1,
+      "value": "localeShortCode"
+    }
+  ],
   "3NVyN7": [
     {
       "type": 0,
@@ -807,16 +817,6 @@
     {
       "type": 0,
       "value": "Password updated"
-    }
-  ],
-  "L+I9IR": [
-    {
-      "type": 0,
-      "value": "Unknown "
-    },
-    {
-      "type": 1,
-      "value": "localeId"
     }
   ],
   "L8seEc": [
