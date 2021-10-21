@@ -1,3 +1,5 @@
+## v1.0.2 (Oct 21, 2021)
+- Security upgrade for `http-proxy-middleware`
 ## v1.0.1 (Oct 07, 2021)
 ## v1.0.0 (Sep 08, 2021)
 ## v1.0.0-alpha.1 (Sep 08, 2021)
