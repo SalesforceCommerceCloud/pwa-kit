@@ -82,6 +82,7 @@ const AppConfig = ({children, locals = {}}) => {
 }
 
 AppConfig.restore = (locals = {}) => {
+    // Parse the locale from the page url.
     const locale = getLocale(locals) || DEFAULT_LOCALE
     const currency = getPreferredCurrency(locale) || DEFAULT_CURRENCY
 

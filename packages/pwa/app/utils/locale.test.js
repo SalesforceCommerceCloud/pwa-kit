@@ -5,13 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {
-    whichLocaleToLoad,
-    getTargetLocale,
-    loadLocaleData,
-    getLocaleConfig,
-    getPreferredCurrency
-} from './locale'
+import {whichLocaleToLoad, loadLocaleData, getLocaleConfig, getPreferredCurrency} from './locale'
 
 import {SUPPORTED_LOCALES, DEFAULT_LOCALE} from '../constants'
 
@@ -40,24 +34,6 @@ describe('whichLocaleToLoad', () => {
             DEFAULT_LOCALE
         )
         expect(locale).toBe(supportedLocale.id)
-    })
-})
-
-describe('getTargetLocale', () => {
-    const originalEnv = {...process.env}
-
-    afterEach(() => {
-        // Reset the environment variables
-        process.env = {...originalEnv}
-    })
-
-    test('forcing the target locale', () => {
-        const locale = getTargetLocale([supportedLocale.id], SUPPORTED_LOCALES, DEFAULT_LOCALE)
-        expect(locale).toBe(supportedLocale.id)
-
-        process.env.TARGET_LOCALE = nonSupportedLocale
-        const locale2 = getTargetLocale([supportedLocale.id], SUPPORTED_LOCALES, DEFAULT_LOCALE)
-        expect(locale2).toBe(process.env.TARGET_LOCALE)
     })
 })
 
@@ -96,6 +72,18 @@ describe('loadLocaleData', () => {
 })
 
 describe('getLocaleConfig', () => {
+    const originalEnv = {...process.env}
+    let windowSpy
+
+    beforeEach(() => {
+        windowSpy = jest.spyOn(window, 'window', 'get')
+    })
+    afterEach(() => {
+        // Reset
+        process.env = {...originalEnv}
+        windowSpy.mockRestore()
+    })
+
     test('without parameter', async () => {
         const config = await getLocaleConfig()
         expect(config.app.targetLocale).toBe(DEFAULT_LOCALE)
@@ -108,6 +96,18 @@ describe('getLocaleConfig', () => {
             getUserPreferredLocales: () => [locale]
         })
         expect(config.app.targetLocale).toBe(locale)
+    })
+    test('with pseudo locale', async () => {
+        process.env.USE_PSEUDOLOCALE = 'true'
+        // Simulate server side
+        windowSpy.mockImplementation(() => undefined)
+
+        const config = await getLocaleConfig()
+
+        // The app should still think its target locale is the default one
+        expect(config.app.targetLocale).toBe(DEFAULT_LOCALE)
+        // But the actual translation should be using the pseudo locale
+        expect(config.messages[testMessageId][0].value).toMatch(/^\[!! Ļŏĝĝĝíń Ŕèḋḋḋíŕèèèćṭ !!]$/)
     })
 })
 
