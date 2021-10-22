@@ -14,6 +14,32 @@ class EinsteinAPI {
         this.config = commerceAPI?._config?.einsteinConfig
     }
 
+    /**
+     * Given a POJO append the correct user and cookie identifier values using the current auth state.
+     *
+     * @param {object} params
+     * @returns {object} The decorated body object.
+     */
+    _buildBody(params) {
+        const body = {...params}
+
+        // If we have an encrypted user id (authenticaed users only) use it as the `userId` otherwise
+        // we won't send a `userId` param for guest users.
+        if (this.commerceAPI.auth.encUserId) {
+            body.userId = this.commerceAPI.auth.encUserId
+        }
+
+        // Append the `usid` as the `cookieId` value if present. (It should always be present as long
+        // as the user is initilized)
+        if (this.commerceAPI.auth.usid) {
+            body.cookieId = this.commerceAPI.auth.usid
+        } else {
+            console.warn('Missing `cookieId`. For optimal results this value must be defined.')
+        }
+
+        return body
+    }
+
     async einsteinFetch(endpoint, method, body) {
         const config = this.config
         const {proxyPath, einsteinId} = config
@@ -22,6 +48,11 @@ class EinsteinAPI {
         const headers = {
             'Content-Type': 'application/json',
             'x-cq-client-id': einsteinId
+        }
+
+        // Include `userId` and `cookieId` parameters.
+        if (body) {
+            body = this._buildBody(body)
         }
 
         let response
@@ -53,10 +84,6 @@ class EinsteinAPI {
                 altId,
                 altIdType
             },
-            userId: this.commerceAPI.auth.encUserId
-                ? this.commerceAPI.auth.encUserId
-                : this.commerceAPI.auth.usid,
-            cookieId: this.commerceAPI.auth.encUserId ? this.commerceAPI.auth.usid : '',
             ...args
         }
 
@@ -75,10 +102,6 @@ class EinsteinAPI {
             recommenderName,
             __recoUUID,
             products: products,
-            userId: this.commerceAPI.auth.encUserId
-                ? this.commerceAPI.auth.encUserId
-                : this.commerceAPI.auth.usid,
-            cookieId: this.commerceAPI.auth.encUserId ? this.commerceAPI.auth.usid : '',
             ...args
         }
 
@@ -103,10 +126,6 @@ class EinsteinAPI {
                 altId,
                 altIdType
             },
-            userId: this.commerceAPI.auth.encUserId
-                ? this.commerceAPI.auth.encUserId
-                : this.commerceAPI.auth.usid,
-            cookieId: this.commerceAPI.auth.encUserId ? this.commerceAPI.auth.usid : '',
             ...args
         }
 
@@ -122,10 +141,6 @@ class EinsteinAPI {
         const method = 'POST'
         const body = {
             products: [product],
-            userId: this.commerceAPI.auth.encUserId
-                ? this.commerceAPI.auth.encUserId
-                : this.commerceAPI.auth.usid,
-            cookieId: this.commerceAPI.auth.encUserId ? this.commerceAPI.auth.usid : '',
             ...args
         }
 
@@ -151,13 +166,7 @@ class EinsteinAPI {
     async getRecommendations(recommenderName, args) {
         const endpoint = `/personalization/recs/${this.config.siteId}/${recommenderName}`
         const method = 'POST'
-        const body = {
-            userId: this.commerceAPI.auth.encUserId
-                ? this.commerceAPI.auth.encUserId
-                : this.commerceAPI.auth.usid,
-            cookieId: this.commerceAPI.auth.encUserId ? this.commerceAPI.auth.usid : '',
-            ...args
-        }
+        const body = {...args}
 
         // Fetch the recommendations
         const reco = await this.einsteinFetch(endpoint, method, body)
@@ -174,13 +183,7 @@ class EinsteinAPI {
     async getZoneRecommendations(zoneName, args) {
         const endpoint = `/personalization/${this.config.siteId}/zones/${zoneName}/recs`
         const method = 'POST'
-        const body = {
-            userId: this.commerceAPI.auth.encUserId
-                ? this.commerceAPI.auth.encUserId
-                : this.commerceAPI.auth.usid,
-            cookieId: this.commerceAPI.auth.encUserId ? this.commerceAPI.auth.usid : '',
-            ...args
-        }
+        const body = {...args}
 
         // Fetch the recommendations
         const reco = await this.einsteinFetch(endpoint, method, body)
