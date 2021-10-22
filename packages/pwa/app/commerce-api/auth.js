@@ -45,7 +45,7 @@ class Auth {
         this._oid = this._onClient ? window.localStorage.getItem(oidStorageKey) : undefined
 
         const configOid = api._config.parameters.organizationId
-        if (this._oid != configOid) {
+        if (this._oid !== configOid) {
             this._clearAuth()
             this._saveOid(configOid)
         } else {
