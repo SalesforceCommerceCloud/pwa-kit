@@ -9,6 +9,7 @@ import PropTypes from 'prop-types'
 import {useIntl} from 'react-intl'
 import {Button} from '@chakra-ui/react'
 import ProductScroller from '../../components/product-scroller'
+import useCustomer from '../../commerce-api/hooks/useCustomer'
 import useEinstein from '../../commerce-api/hooks/useEinstein'
 import useIntersectionObserver from '../../hooks/use-intersection-observer'
 import useWishlist from '../../hooks/use-wishlist'
@@ -30,6 +31,7 @@ const RecommendedProducts = ({zone, recommender, products, title, shouldFetch, .
         sendClickReco,
         sendViewReco
     } = useEinstein()
+    const {isInitialized} = useCustomer()
     const wishlist = useWishlist()
     const toast = useToast()
     const navigate = useNavigation()
@@ -41,7 +43,7 @@ const RecommendedProducts = ({zone, recommender, products, title, shouldFetch, .
 
     useEffect(() => {
         // Return early if we have no Einstein API instance
-        if (!api) {
+        if (!api || !isInitialized) {
             return
         }
 
@@ -64,7 +66,7 @@ const RecommendedProducts = ({zone, recommender, products, title, shouldFetch, .
             getRecommendations(recommender, args)
             return
         }
-    }, [zone, recommender, _products])
+    }, [zone, recommender, _products, isInitialized])
 
     useEffect(() => {
         // Return early if we have no Einstein API instance
