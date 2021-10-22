@@ -14,7 +14,7 @@
 
 import React from 'react'
 import loadable from '@loadable/component'
-
+import {getUrlsConfig, routesModifier} from './utils/utils'
 // Components
 import {Skeleton} from '@chakra-ui/react'
 
@@ -47,31 +47,31 @@ const routes = [
         exact: true
     },
     {
-        path: '/:locale/login',
+        path: '/login',
         component: Login,
         exact: true
     },
     {
-        path: '/:locale/registration',
+        path: '/registration',
         component: Registration,
         exact: true
     },
     {
-        path: '/:locale/reset-password',
+        path: '/reset-password',
         component: ResetPassword,
         exact: true
     },
     {
-        path: '/:locale/account',
+        path: '/account',
         component: Account
     },
     {
-        path: '/:locale/checkout',
+        path: '/checkout',
         component: Checkout,
         exact: true
     },
     {
-        path: '/:locale/checkout/confirmation',
+        path: '/checkout/confirmation',
         component: CheckoutConfirmation,
         exact: true
     },
@@ -81,24 +81,24 @@ const routes = [
         exact: true
     },
     {
-        path: '/:locale/cart',
+        path: '/cart',
         component: Cart,
         exact: true
     },
     {
-        path: '/:locale/product/:productId',
+        path: '/product/:productId',
         component: ProductDetail
     },
     {
-        path: '/:locale/search',
+        path: '/search',
         component: ProductList
     },
     {
-        path: '/:locale/category/:categoryId',
+        path: '/category/:categoryId',
         component: ProductList
     },
     {
-        path: '/:locale/account/wishlist',
+        path: '/account/wishlist',
         component: Wishlist
     },
     {
@@ -106,5 +106,5 @@ const routes = [
         component: PageNotFound
     }
 ]
-
-export default routes
+const urlsConfig = getUrlsConfig()
+export default routesModifier(routes, urlsConfig)

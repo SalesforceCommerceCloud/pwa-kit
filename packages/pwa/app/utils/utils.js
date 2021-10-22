@@ -5,6 +5,9 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
+import pwaKitConfig from '../../pwa-kit-config.json'
+import {HOME_HREF} from '../constants'
+
 /**
  * Call requestIdleCallback in supported browsers.
  *
@@ -153,4 +156,113 @@ export const capitalize = (text) => {
         .split(' ')
         .map((s) => s.charAt(0).toUpperCase() + s.substring(1))
         .join(' ')
+}
+
+export const getSiteConfig = () => {
+    return pwaKitConfig.app
+}
+
+export const getUrlsConfig = () => pwaKitConfig.app.urls
+
+/**
+ * get siteId based on the site configuration
+ * @param appConfig
+ * @param originalUrl
+ * @param appOrigin
+ * @returns {string|undefined|*}
+ */
+export const getSiteId = (appConfig = {}, originalUrl, appOrigin) => {
+    const {sites, defaultSiteId} = appConfig
+    let path = originalUrl
+    // If there is no originalUrl value in the locals, create it from the window location.
+    // This happens when executing on the client.
+    if (!path) {
+        path = window?.location.href.replace(window.location.origin, '')
+    }
+
+    const {hostname, pathname} = new URL(`${appOrigin}${path}`)
+    let siteInfo
+    siteInfo = sites.filter((site) => {
+        return site.hostname.includes(hostname)
+    })
+
+    // return the id when there is one match
+    if (siteInfo.length === 1) {
+        console.log('return by hostname', siteInfo)
+        return siteInfo[0].id
+    }
+
+    // if there are more than two matches, we need to rely on siteAlias to determine the siteID
+    // The home page does not have siteAlias param, we take the default value
+    if (path === HOME_HREF) {
+        const siteIdArr = sites.map((site) => site.id)
+        // check if the default value is in the sites array config
+        if (!siteIdArr.includes(defaultSiteId)) {
+            throw new Error(
+                'The default SiteId does not match any values from the site configuration. Please check your config'
+            )
+        }
+        console.log('homepage default siteId', defaultSiteId)
+        return defaultSiteId
+    }
+
+    // return site Id based on site alias from the pathname
+    const siteAlias = pathname.split('/')[1]
+    const siteId = sites.find((site) => {
+        return site.alias === siteAlias
+    })?.id
+
+    console.log('siteSite from url site alias', siteId)
+
+    return siteId
+}
+
+/**
+ * returns alias by on siteId
+ * @param siteId
+ * @param sites
+ * @returns {*}
+ */
+export const getSiteAliasById = (siteId, sites) => {
+    if (!siteId) throw new Error('Cannot find siteId')
+    return sites.find((site) => site.id === siteId)?.alias
+}
+
+/**
+ * return alias by on the hostname
+ * @param sites
+ * @param hostname
+ * @returns {*}
+ */
+export const getSiteAliasByHostname = (hostname, sites) => {
+    if (!sites.length) throw new Error('No site config found. Please check you configuration')
+    if (!hostname) throw new Error('Hostname is required to find the alias')
+    const results = sites.find((site) => site.hostname.includes(hostname))
+    // we only want to return the alias when there is one site info as a result
+    return results?.length === 1 ? results[0].alias : undefined
+}
+
+/**
+ * Modify the routes to add extra dynamic params to each route based on urls configuration
+ * @param routes - array of routes
+ * @param urlsConfig - urls config
+ */
+export const routesModifier = (routes, urlsConfig) => {
+    console.log('urlsConfig', urlsConfig)
+    if (!urlsConfig) return routes
+    if (!routes.length) return []
+    return routes.map(({path, ...rest}) => {
+        if (path === HOME_HREF) return {path, ...rest}
+        let tempPathSegment = []
+
+        Object.keys(urlsConfig).forEach((key) => {
+            if (urlsConfig[key] === 'path') {
+                tempPathSegment.push(`:${key}`)
+            }
+        })
+        return {
+            path: `/${tempPathSegment.join('/')}${path}`,
+            ...rest
+        }
+    })
 }

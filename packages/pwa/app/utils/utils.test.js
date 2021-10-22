@@ -6,7 +6,7 @@
  */
 import * as utils from './utils'
 import EventEmitter from 'events'
-import {flatten, shallowEquals} from './utils'
+import {flatten, shallowEquals, routesModifier} from './utils'
 
 describe('requestIdleCallback should be a working shim', () => {
     test('without a working implementation built in', () => {
@@ -86,5 +86,41 @@ describe('shallow', function() {
         const b = {a: '123', b: '456'}
         const result = shallowEquals(a, b)
         expect(result).toBeFalsy()
+    })
+})
+
+describe('routeModifier', function() {
+    test('should return modified routes', () => {
+        const urlsConfig = {
+            alias: 'path',
+            locale: 'path'
+        }
+        const fakeComp = () => <div>fake component</div>
+        const routes = [
+            {
+                path: '/reset-password',
+                component: fakeComp,
+                exact: true
+            }
+        ]
+        const newRoutes = routesModifier(routes, urlsConfig)
+        expect(newRoutes[0].path).toEqual('/:alias/:locale/reset-password')
+    })
+
+    test('should return modified routes with only :alias in the path', () => {
+        const urlsConfig = {
+            alias: 'path',
+            locale: 'query'
+        }
+        const fakeComp = () => <div>fake component</div>
+        const routes = [
+            {
+                path: '/reset-password',
+                component: fakeComp,
+                exact: true
+            }
+        ]
+        const newRoutes = routesModifier(routes, urlsConfig)
+        expect(newRoutes[0].path).toEqual('/:alias/reset-password')
     })
 })
