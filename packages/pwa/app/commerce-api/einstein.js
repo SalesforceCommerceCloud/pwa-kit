@@ -166,7 +166,7 @@ class EinsteinAPI {
     async getRecommendations(recommenderName, args) {
         const endpoint = `/personalization/recs/${this.config.siteId}/${recommenderName}`
         const method = 'POST'
-        const body = args
+        const body = {...args}
 
         // Fetch the recommendations
         const reco = await this.einsteinFetch(endpoint, method, body)
@@ -183,7 +183,7 @@ class EinsteinAPI {
     async getZoneRecommendations(zoneName, args) {
         const endpoint = `/personalization/${this.config.siteId}/zones/${zoneName}/recs`
         const method = 'POST'
-        const body = args
+        const body = {...args}
 
         // Fetch the recommendations
         const reco = await this.einsteinFetch(endpoint, method, body)
