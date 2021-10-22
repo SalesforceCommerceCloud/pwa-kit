@@ -210,7 +210,7 @@ export const routeBuilder = (url, options = {}) => {
         }
         const urlParamTypes = Object.values(urlsConfigTypes)
         if (!urlParamTypes.includes(type)) {
-            const error = `urlsConfig type need to be one of three ${urlParamTypes.join(', ')}`
+            const error = `urlsConfig type need to be one of [${urlParamTypes.join(', ')}]`
             throw new Error(error)
         }
         if (type === urlsConfigTypes.PATH) {
