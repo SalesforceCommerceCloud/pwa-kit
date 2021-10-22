@@ -27,9 +27,9 @@ import {useIntl} from 'react-intl'
 import LinksList from '../links-list'
 import SocialIcons from '../social-icons'
 import {HideOnDesktop, HideOnMobile} from '../responsive'
-import {defaultLocaleMessages} from '../_app'
 import {SUPPORTED_LOCALES} from '../../constants'
 import {getUrlWithLocale} from '../../utils/url'
+import LocaleText from '../locale-text'
 
 const Footer = ({...otherProps}) => {
     const styles = useMultiStyleConfig('Footer')
@@ -141,9 +141,12 @@ const Footer = ({...otherProps}) => {
                                 {...styles.localeDropdown}
                             >
                                 {SUPPORTED_LOCALES.map((locale) => (
-                                    <option key={locale.id} value={locale.id}>
-                                        {intl.formatMessage(defaultLocaleMessages[locale.id])}
-                                    </option>
+                                    <LocaleText
+                                        as="option"
+                                        value={locale.id}
+                                        shortCode={locale.id}
+                                        key={locale.id}
+                                    />
                                 ))}
                             </Select>
                         </FormControl>

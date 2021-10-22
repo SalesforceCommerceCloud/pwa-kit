@@ -54,5 +54,5 @@ test('Renders LocaleSelector with event handlers', () => {
 
     fireEvent.click(firstLocale)
     expect(onSelect).toHaveBeenCalledTimes(1)
-    expect(onSelect).toBeCalledWith({preferredCurrency: 'GBP', id: 'en-GB'})
+    expect(onSelect).toBeCalledWith('en-GB')
 })
