@@ -50,3 +50,8 @@ export const SUPPORTED_LOCALES = packageInfo.l10n.supportedLocales
 export const DEFAULT_LOCALE = packageInfo.l10n.defaultLocale
 export const SUPPORTED_CURRENCIES = packageInfo.l10n.supportedCurrencies
 export const DEFAULT_CURRENCY = packageInfo.l10n.defaultCurrency
+
+export const urlsConfigTypes = {
+    PATH: 'path',
+    QUERY_PARAM: 'query_param'
+}

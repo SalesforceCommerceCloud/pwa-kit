@@ -6,6 +6,8 @@
  */
 
 import {DEFAULT_LOCALE} from '../constants'
+import {getUrlsConfig} from './utils'
+import {urlsConfigTypes} from '../constants'
 
 /**
  * Modifies a given url by adding/updating query parameters.
@@ -184,4 +186,46 @@ export const removeQueryParamsFromPath = (path, keys) => {
         .replace(/=$/, '')
 
     return `${pathname}${paramStr && '?'}${paramStr}`
+}
+
+/**
+ * Build a route based on the url configuration
+ * if the type = path => append its value to the url
+ * if the type = query param => build the url with updated query params
+ * if the type is none => do nothing
+ * @param {string} url - based url of the output url
+ * @param {object} options - object that contains values of url config key
+ * @return {string} - an output url
+ */
+export const routeBuilder = (url, options = {}) => {
+    const urlsConfig = getUrlsConfig()
+    if (!Object.keys(urlsConfig).length) return url
+    let urlSegments = []
+    const queryParams = {}
+
+    Object.keys(urlsConfig).forEach((key) => {
+        const type = urlsConfig[key]
+        if (!options[key]) {
+            throw new Error(`Can\'t find the value for ${key}`)
+        }
+        const urlParamTypes = Object.values(urlsConfigTypes)
+        if (!urlParamTypes.includes(type)) {
+            const error = `urlsConfig type need to be one of three ${urlParamTypes.join(', ')}`
+            throw new Error(error)
+        }
+        if (type === urlsConfigTypes.PATH) {
+            urlSegments.push(options[key])
+        }
+        if (type === urlsConfigTypes.QUERY_PARAM) {
+            queryParams[key] = options[key]
+        }
+    })
+    // build the pathname
+    let updatedPath = `${urlSegments.length ? `/${urlSegments.join('/')}` : ''}${url}`
+    // append the query param to pathname
+    if (Object.keys(queryParams).length) {
+        updatedPath = rebuildPathWithParams(updatedPath, queryParams)
+    }
+
+    return updatedPath
 }

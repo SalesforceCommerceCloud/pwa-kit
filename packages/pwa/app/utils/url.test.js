@@ -13,10 +13,20 @@ import {
     getUrlWithLocale,
     homeUrlBuilder,
     rebuildPathWithParams,
-    removeQueryParamsFromPath
+    removeQueryParamsFromPath,
+    routeBuilder
 } from './url'
+import {getUrlsConfig} from './utils'
 
 import {DEFAULT_LOCALE} from '../constants'
+
+jest.mock('./utils', () => {
+    const original = jest.requireActual('./utils')
+    return {
+        ...original,
+        getUrlsConfig: jest.fn()
+    }
+})
 
 describe('buildUrlSet returns the expected set of urls', () => {
     test('when no values are passed in', () => {
@@ -183,5 +193,45 @@ describe('removeQueryParamsFromPath test', () => {
         const url = '/en/product/25501032M?color=black&size=M&something=123'
         const updatedUrl = removeQueryParamsFromPath(url, ['color', 'size'])
         expect(updatedUrl).toEqual('/en/product/25501032M?something=123')
+    })
+})
+
+describe('routeBuilder test', () => {
+    test('returns updated url with alias and locale', () => {
+        getUrlsConfig.mockImplementation(() => ({
+            alias: 'path',
+            locale: 'query_param'
+        }))
+        const updateUrl = routeBuilder('/woman/category?color=red', {
+            alias: 'global',
+            locale: 'en-US'
+        })
+        console.log('updateUrl', updateUrl)
+        expect(updateUrl).toEqual('/global/woman/category?color=red&locale=en-US')
+    })
+
+    test('throw an error on missing type', () => {
+        getUrlsConfig.mockImplementation(() => ({
+            alias: 'something',
+            locale: 'path'
+        }))
+        expect(() => {
+            routeBuilder('/woman/category?color=red', {
+                alias: 'hello',
+                locale: 'en-US'
+            })
+        }).toThrow('urlsConfig type need to be one of three path, query_param')
+    })
+
+    test('throw an error on missing type values', () => {
+        getUrlsConfig.mockImplementation(() => ({
+            alias: 'path',
+            locale: 'path'
+        }))
+        expect(() => {
+            routeBuilder('/woman/category?color=red', {
+                locale: 'en-US'
+            })
+        }).toThrow("Can't find the value for alias")
     })
 })
