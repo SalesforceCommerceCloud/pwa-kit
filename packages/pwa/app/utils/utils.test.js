@@ -6,8 +6,7 @@
  */
 import * as utils from './utils'
 import EventEmitter from 'events'
-import {flatten, shallowEquals, routesModifier} from './utils'
-import {getUrlsConfig1} from './url'
+import {flatten, shallowEquals} from './utils'
 
 jest.mock('./url', () => {
     const original = jest.requireActual('./url')

@@ -206,7 +206,7 @@ export const routeBuilder = (url, options = {}) => {
     Object.keys(urlsConfig).forEach((key) => {
         const type = urlsConfig[key]
         if (!options[key]) {
-            throw new Error(`Can\'t find the value for ${key}`)
+            throw new Error(`Can't find the value for ${key}`)
         }
         const urlParamTypes = Object.values(urlsConfigTypes)
         if (!urlParamTypes.includes(type)) {

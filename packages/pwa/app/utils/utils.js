@@ -6,7 +6,6 @@
  */
 
 import pwaKitConfig from '../../pwa-kit-config.json'
-import {HOME_HREF} from '../constants'
 
 /**
  * Call requestIdleCallback in supported browsers.
