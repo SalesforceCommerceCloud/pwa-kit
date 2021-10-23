@@ -6,7 +6,7 @@
  */
 
 import {HOME_HREF} from '../constants'
-import {getUrlsConfig} from './utils'
+import {getUrlsConfig, urlsConfigValidator} from './utils'
 import {urlsConfigTypes} from '../constants'
 
 /**
@@ -15,6 +15,7 @@ import {urlsConfigTypes} from '../constants'
  */
 export const routesModifier = (routes) => {
     const urlsConfig = getUrlsConfig()
+    if (!urlsConfigValidator(urlsConfig, Object.values(urlsConfigTypes))) return routes
     if (!urlsConfig) return routes
     if (!routes.length) return []
     return routes.map(({path, ...rest}) => {

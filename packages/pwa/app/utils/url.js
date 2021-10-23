@@ -6,7 +6,7 @@
  */
 
 import {DEFAULT_LOCALE} from '../constants'
-import {getUrlsConfig} from './utils'
+import {getUrlsConfig, urlsConfigValidator} from './utils'
 import {urlsConfigTypes} from '../constants'
 
 /**
@@ -199,6 +199,7 @@ export const removeQueryParamsFromPath = (path, keys) => {
  */
 export const routeBuilder = (url, options = {}) => {
     const urlsConfig = getUrlsConfig()
+    if (!urlsConfigValidator(urlsConfig, Object.values(urlsConfigTypes))) return url
     if (!Object.keys(urlsConfig).length) return url
     let urlSegments = []
     const queryParams = {}
@@ -207,11 +208,6 @@ export const routeBuilder = (url, options = {}) => {
         const type = urlsConfig[key]
         if (!options[key]) {
             throw new Error(`Can't find the value for ${key}`)
-        }
-        const urlParamTypes = Object.values(urlsConfigTypes)
-        if (!urlParamTypes.includes(type)) {
-            const error = `urlsConfig type need to be one of [${urlParamTypes.join(', ')}]`
-            throw new Error(error)
         }
         if (type === urlsConfigTypes.PATH) {
             urlSegments.push(options[key])

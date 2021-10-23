@@ -51,4 +51,20 @@ describe('routeModifier', function() {
         const newRoutes = routesModifier(routes)
         expect(newRoutes[0].path).toEqual('/:alias/reset-password')
     })
+
+    test('should return non-modified url as the config type is invalid', () => {
+        getUrlsConfig.mockImplementation(() => ({
+            alias: 'something',
+            locale: 'query_param'
+        }))
+        const fakeComp = () => <div>fake component</div>
+        const routes = [
+            {
+                path: '/reset-password',
+                component: fakeComp,
+                exact: true
+            }
+        ]
+        expect(() => routesModifier(routes)).toThrow()
+    })
 })

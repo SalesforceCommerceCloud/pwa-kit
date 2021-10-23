@@ -220,7 +220,7 @@ describe('routeBuilder test', () => {
                 alias: 'hello',
                 locale: 'en-US'
             })
-        }).toThrow('urlsConfig type need to be one of three path, query_param')
+        }).toThrow('The type for alias is invalid. It should be one of [path, query_param]')
     })
 
     test('throw an error on missing type values', () => {

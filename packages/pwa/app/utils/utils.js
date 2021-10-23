@@ -162,3 +162,15 @@ export const getSiteConfig = () => {
 }
 
 export const getUrlsConfig = () => pwaKitConfig.app.urls
+
+export const urlsConfigValidator = (urlsConfig, types) => {
+    return Object.keys(urlsConfig).every((key) => {
+        if (!types.includes(urlsConfig[key])) {
+            const errorMsg = `The type for ${key} is invalid. It should be one of [${types.join(
+                ', '
+            )}]`
+            throw new Error(errorMsg)
+        }
+        return true
+    })
+}
