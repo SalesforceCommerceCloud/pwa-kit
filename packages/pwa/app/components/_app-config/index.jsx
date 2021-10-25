@@ -75,7 +75,7 @@ const getLocale = (locals = {}) => {
  * You can also use the AppConfig to configure a state-management library such
  * as Redux, or Mobx, if you like.
  */
-const AppConfig = ({children, targetLocale, defaultLocale, messages, locals = {}}) => {
+const AppConfig = ({children, targetLocale, defaultLocale, messages, location, locals = {}}) => {
     const [basket, setBasket] = useState(null)
     const [customer, setCustomer] = useState(null)
 
@@ -107,20 +107,20 @@ const AppConfig = ({children, targetLocale, defaultLocale, messages, locals = {}
 
                 {/* Urls for all localized versions of this page (including current page)
                             For more details on hrefLang, see https://developers.google.com/search/docs/advanced/crawling/localized-versions */}
-                {/* {SUPPORTED_LOCALES.map((locale) => (
+                {SUPPORTED_LOCALES.map((locale) => (
                     <link
                         rel="alternate"
                         hrefLang={locale.id.toLowerCase()}
                         href={`${appOrigin}${getUrlWithLocale(targetLocale, {location})}`}
                         key={locale.id}
                     />
-                ))} */}
+                ))}
                 {/* A general locale as fallback. For example: "en" if default locale is "en-GB" */}
-                {/* <link
+                <link
                     rel="alternate"
                     hrefLang={defaultLocale.slice(0, 2)}
                     href={`${appOrigin}${getUrlWithLocale(defaultLocale, {location})}`}
-                /> */}
+                />
                 {/* A wider fallback for user locales that the app does not support */}
                 <link rel="alternate" hrefLang="x-default" href={`${appOrigin}/`} />
             </Seo>
@@ -191,6 +191,7 @@ AppConfig.propTypes = {
     targetLocale: PropTypes.string,
     defaultLocale: PropTypes.string,
     messages: PropTypes.object,
+    location: PropTypes.object,
     locals: PropTypes.object
 }
 
