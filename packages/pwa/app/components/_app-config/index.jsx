@@ -22,7 +22,18 @@ import {
 import {commerceAPIConfig} from '../../commerce-api.config'
 import {einsteinAPIConfig} from '../../einstein-api.config'
 import {DEFAULT_LOCALE, SUPPORTED_LOCALES, DEFAULT_CURRENCY} from '../../constants'
-import {getPreferredCurrency} from '../../utils/locale'
+import {getLocaleConfig, getPreferredCurrency} from '../../utils/locale'
+import {getUrlWithLocale} from '../../utils/url'
+
+// Components
+import Seo from '../seo'
+
+// Localization
+import {IntlProvider} from 'react-intl'
+
+// SDK Utils
+import {getAssetUrl} from 'pwa-kit-react-sdk/ssr/universal/utils'
+import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
 
 const apiConfig = {
     ...commerceAPIConfig,
@@ -64,20 +75,66 @@ const getLocale = (locals = {}) => {
  * You can also use the AppConfig to configure a state-management library such
  * as Redux, or Mobx, if you like.
  */
-const AppConfig = ({children, locals = {}}) => {
+const AppConfig = ({children, targetLocale, defaultLocale, messages, locals = {}}) => {
     const [basket, setBasket] = useState(null)
     const [customer, setCustomer] = useState(null)
 
+    const appOrigin = getAppOrigin()
+
     return (
-        <CommerceAPIProvider value={locals.api}>
-            <CustomerProvider value={{customer, setCustomer}}>
-                <BasketProvider value={{basket, setBasket}}>
-                    <CustomerProductListsProvider>
-                        <ChakraProvider theme={theme}>{children}</ChakraProvider>
-                    </CustomerProductListsProvider>
-                </BasketProvider>
-            </CustomerProvider>
-        </CommerceAPIProvider>
+        <IntlProvider
+            onError={(err) => {
+                if (err.code === 'MISSING_TRANSLATION') {
+                    // NOTE: Remove the console error for missing translations during development,
+                    // as we knew translations would be added later.
+                    console.warn('Missing translation', err.message)
+                    return
+                }
+                throw err
+            }}
+            locale={targetLocale}
+            defaultLocale={defaultLocale}
+            messages={messages}
+        >
+            <Seo>
+                <meta name="theme-color" content="#0288a7" />
+                <meta name="apple-mobile-web-app-title" content="PWA-Kit-Retail-React-App" />
+                <link
+                    rel="apple-touch-icon"
+                    href={getAssetUrl('static/img/global/apple-touch-icon.png')}
+                />
+                <link rel="manifest" href={getAssetUrl('static/manifest.json')} />
+
+                {/* Urls for all localized versions of this page (including current page)
+                            For more details on hrefLang, see https://developers.google.com/search/docs/advanced/crawling/localized-versions */}
+                {/* {SUPPORTED_LOCALES.map((locale) => (
+                    <link
+                        rel="alternate"
+                        hrefLang={locale.id.toLowerCase()}
+                        href={`${appOrigin}${getUrlWithLocale(targetLocale, {location})}`}
+                        key={locale.id}
+                    />
+                ))} */}
+                {/* A general locale as fallback. For example: "en" if default locale is "en-GB" */}
+                {/* <link
+                    rel="alternate"
+                    hrefLang={defaultLocale.slice(0, 2)}
+                    href={`${appOrigin}${getUrlWithLocale(defaultLocale, {location})}`}
+                /> */}
+                {/* A wider fallback for user locales that the app does not support */}
+                <link rel="alternate" hrefLang="x-default" href={`${appOrigin}/`} />
+            </Seo>
+
+            <CommerceAPIProvider value={locals.api}>
+                <CustomerProvider value={{customer, setCustomer}}>
+                    <BasketProvider value={{basket, setBasket}}>
+                        <CustomerProductListsProvider>
+                            <ChakraProvider theme={theme}>{children}</ChakraProvider>
+                        </CustomerProductListsProvider>
+                    </BasketProvider>
+                </CustomerProvider>
+            </CommerceAPIProvider>
+        </IntlProvider>
     )
 }
 
@@ -97,8 +154,43 @@ AppConfig.extraGetPropsArgs = (locals = {}) => {
     }
 }
 
+AppConfig.getProps = async ({api}) => {
+    const localeConfig = await getLocaleConfig({
+        getUserPreferredLocales: () => {
+            // CONFIG: This function should return an array of preferred locales. They can be
+            // derived from various sources. Below are some examples of those:
+            //
+            // - client side: window.navigator.languages
+            // - the page URL they're on (example.com/en-GB/home)
+            // - cookie (if their previous preference is saved there)
+            //
+            // If this function returns an empty array (e.g. there isn't locale in the page url),
+            // then the app would use the default locale as the fallback.
+
+            // NOTE: Your implementation may differ, this is jsut what we did.
+            //
+            // Since the CommerceAPI client already has the current `locale` set,
+            // we can use it's value to load the correct messages for the application.
+            // Take a look at the `app/components/_app-config` component on how the
+            // preferred locale was derived.
+            const {locale} = api.getConfig()
+
+            return [locale]
+        }
+    })
+
+    return {
+        targetLocale: localeConfig.app.targetLocale,
+        defaultLocale: localeConfig.app.defaultLocale,
+        messages: localeConfig.messages
+    }
+}
+
 AppConfig.propTypes = {
     children: PropTypes.node,
+    targetLocale: PropTypes.string,
+    defaultLocale: PropTypes.string,
+    messages: PropTypes.object,
     locals: PropTypes.object
 }
 

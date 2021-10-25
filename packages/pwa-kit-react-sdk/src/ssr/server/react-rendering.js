@@ -77,7 +77,7 @@ const logAndFormatError = (err) => {
     }
 }
 
-const initAppState = async ({App, component, match, route, req, res, location}) => {
+const initAppState = async ({App, AppConfig, component, match, route, req, res, location}) => {
     if (component === Throw404) {
         // Don't init if there was no match
         return {
@@ -88,7 +88,7 @@ const initAppState = async ({App, component, match, route, req, res, location}) 
 
     const {params} = match
 
-    const components = [App, route.component]
+    const components = [App, AppConfig, route.component]
     const promises = components.map((c) =>
         c.getProps
             ? c.getProps({
@@ -102,7 +102,7 @@ const initAppState = async ({App, component, match, route, req, res, location}) 
     let returnVal = {}
 
     try {
-        const [appProps, pageProps] = await Promise.all(promises)
+        const [appProps, appConfigProps, pageProps] = await Promise.all(promises)
         const appState = {
             appProps,
             pageProps,
@@ -111,12 +111,14 @@ const initAppState = async ({App, component, match, route, req, res, location}) 
 
         returnVal = {
             error: undefined,
-            appState: appState
+            appState: appState,
+            appConfigState: appConfigProps
         }
     } catch (error) {
         returnVal = {
             error: error || new Error(),
-            appState: {}
+            appState: {},
+            appConfigState: {}
         }
     }
 
@@ -140,6 +142,7 @@ export const render = async (req, res) => {
 
     const routes = getRoutes(res.locals)
     const WrappedApp = routeComponent(App, false, res.locals)
+    const WrappedAppConfig = routeComponent(AppConfig, false, res.locals)
 
     const [pathname, search] = req.originalUrl.split('?')
     const location = {
@@ -164,8 +167,9 @@ export const render = async (req, res) => {
     const component = await route.component.getComponent()
 
     // Step 3 - Init the app state
-    const {appState, error: appStateError} = await initAppState({
+    const {appState, appConfigState, error: appStateError} = await initAppState({
         App: WrappedApp,
+        AppConfig: WrappedAppConfig,
         component,
         match,
         route,
@@ -178,7 +182,9 @@ export const render = async (req, res) => {
     let renderResult
     const args = {
         App: WrappedApp,
+        AppConfig: WrappedAppConfig,
         appState,
+        appConfigState,
         error: appStateError && logAndFormatError(appStateError),
         routes,
         req,
@@ -205,7 +211,7 @@ export const render = async (req, res) => {
 }
 
 const renderApp = (args) => {
-    const {req, res, location, routes, appState, error, App} = args
+    const {req, res, location, routes, appState, appConfigState, error, App, AppConfig} = args
 
     const ssrOnly = 'mobify_server_only' in req.query
     const prettyPrint = 'mobify_pretty' in req.query
@@ -218,7 +224,7 @@ const renderApp = (args) => {
     let appJSX = (
         <Router location={location} context={routerContext}>
             <DeviceContext.Provider value={{type: deviceType}}>
-                <AppConfig locals={res.locals}>
+                <AppConfig preloadedProps={appConfigState} locals={res.locals}>
                     <Switch error={error} appState={appState} routes={routes} App={App} />
                 </AppConfig>
             </DeviceContext.Provider>
@@ -266,6 +272,7 @@ const renderApp = (args) => {
     // Do *not* add to these without a very good reason - globals are a liability.
     const windowGlobals = {
         __DEVICE_TYPE__: deviceType,
+        __CONFIG_STATE__: appConfigState,
         __PRELOADED_STATE__: appState,
         __ERROR__: error,
         // `window.Progressive` has a long history at Mobify and some
