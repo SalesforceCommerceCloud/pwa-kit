@@ -7,7 +7,7 @@
 
 import {HOME_HREF} from '../constants'
 import {getUrlsConfig, urlsConfigValidator} from './utils'
-import {urlsConfigTypes} from '../constants'
+import {urlParamTypes} from '../constants'
 
 /**
  * Modify the routes to add extra dynamic params to each route based on urls configuration
@@ -15,7 +15,7 @@ import {urlsConfigTypes} from '../constants'
  */
 export const routesModifier = (routes) => {
     const urlsConfig = getUrlsConfig()
-    if (!urlsConfigValidator(urlsConfig, Object.values(urlsConfigTypes))) return routes
+    if (!urlsConfigValidator(urlsConfig, Object.values(urlParamTypes))) return routes
     if (!urlsConfig) return routes
     if (!routes.length) return []
     return routes.map(({path, ...rest}) => {
@@ -23,7 +23,7 @@ export const routesModifier = (routes) => {
         let tempPathSegment = []
 
         Object.keys(urlsConfig).forEach((key) => {
-            if (urlsConfig[key] === urlsConfigTypes.PATH) {
+            if (urlsConfig[key] === urlParamTypes.PATH) {
                 tempPathSegment.push(`:${key}`)
             }
         })

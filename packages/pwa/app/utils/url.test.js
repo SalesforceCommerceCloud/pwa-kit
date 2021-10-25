@@ -222,16 +222,4 @@ describe('routeBuilder test', () => {
             })
         }).toThrow('The type for alias is invalid. It should be one of [path, query_param]')
     })
-
-    test('throw an error on missing type values', () => {
-        getUrlsConfig.mockImplementation(() => ({
-            alias: 'path',
-            locale: 'path'
-        }))
-        expect(() => {
-            routeBuilder('/woman/category?color=red', {
-                locale: 'en-US'
-            })
-        }).toThrow("Can't find the value for alias")
-    })
 })

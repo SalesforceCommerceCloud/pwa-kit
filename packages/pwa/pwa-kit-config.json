@@ -2,8 +2,7 @@
     "app": {
         "defaultSiteId": "RefArchGlobal",
         "urls": {
-          "alias": "query_param",
-          "locale": "path"
+          "locale": "query_param"
         },
         "sites": [
             {

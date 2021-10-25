@@ -24,19 +24,20 @@ import useSearchSuggestions from '../../commerce-api/hooks/useSearchSuggestions'
 import {capitalize, boldString, getSessionJSONItem, setSessionJSONItem} from '../../utils/utils'
 import useNavigation from '../../hooks/use-navigation'
 import {HideOnDesktop, HideOnMobile} from '../responsive'
-import {FormattedMessage} from 'react-intl'
+import {FormattedMessage, useIntl} from 'react-intl'
 import debounce from 'lodash.debounce'
 import {RECENT_SEARCH_KEY, RECENT_SEARCH_LIMIT, RECENT_SEARCH_MIN_LENGTH} from '../../constants'
 import {productUrlBuilder, searchUrlBuilder, categoryUrlBuilder} from '../../utils/url'
 
 const formatSuggestions = (searchSuggestions, input) => {
+    const intl = useIntl()
     return {
         categorySuggestions: searchSuggestions?.categorySuggestions?.categories?.map(
             (suggestion) => {
                 return {
                     type: 'category',
                     id: suggestion.id,
-                    link: categoryUrlBuilder({id: suggestion.id}),
+                    link: categoryUrlBuilder({id: suggestion.id}, {locale: intl.locale}),
                     name: boldString(suggestion.name, capitalize(input))
                 }
             }
@@ -48,7 +49,7 @@ const formatSuggestions = (searchSuggestions, input) => {
                 price: product.price,
                 productId: product.productId,
                 name: boldString(product.productName, capitalize(input)),
-                link: productUrlBuilder({id: product.productId})
+                link: productUrlBuilder({id: product.productId}, {locale: intl.locale})
             }
         }),
         phraseSuggestions: searchSuggestions?.categorySuggestions?.suggestedPhrases?.map(
@@ -75,6 +76,7 @@ const Search = (props) => {
     const navigate = useNavigation()
     const searchSuggestion = useSearchSuggestions()
     const searchInputRef = useRef()
+    const intl = useIntl()
     const [isOpen, setIsOpen] = useState(false)
     const recentSearches = getSessionJSONItem(RECENT_SEARCH_KEY)
     const searchSuggestions = formatSuggestions(
@@ -141,10 +143,12 @@ const Search = (props) => {
         }
         saveRecentSearch(searchText)
         clearInput()
-        navigate(searchUrlBuilder(searchText))
+        const path = searchUrlBuilder(searchText)
+        navigate(path)
     }
 
     const closeAndNavigate = (link) => {
+        console.log('link', link)
         if (!link) {
             clearInput()
             setIsOpen(false)

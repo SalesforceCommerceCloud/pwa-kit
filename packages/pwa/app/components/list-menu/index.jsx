@@ -61,7 +61,7 @@ const ListMenuTrigger = ({item, name, isOpen, onOpen, onClose, hasItems}) => {
         <Box {...baseStyle.listMenuTriggerContainer}>
             <Link
                 as={RouteLink}
-                to={categoryUrlBuilder(item, locale)}
+                to={categoryUrlBuilder(item, {locale})}
                 onMouseOver={onOpen}
                 {...baseStyle.listMenuTriggerLink}
                 {...(hasItems ? {name: name + ' __'} : {name: name})}
@@ -120,7 +120,7 @@ const ListMenuContent = ({maxColumns, items, itemsKey, onClose, initialFocusRef}
                             const items = item[itemsKey]
 
                             const heading = {
-                                href: categoryUrlBuilder(item, locale),
+                                href: categoryUrlBuilder(item, {locale}),
                                 text: name,
                                 styles: {
                                     fontSize: 'md',
@@ -132,7 +132,7 @@ const ListMenuContent = ({maxColumns, items, itemsKey, onClose, initialFocusRef}
                                 ? items.map((item) => {
                                       const {name} = item
                                       return {
-                                          href: categoryUrlBuilder(item, locale),
+                                          href: categoryUrlBuilder(item, {locale}),
                                           text: name,
                                           styles: {
                                               fontSize: 'md',

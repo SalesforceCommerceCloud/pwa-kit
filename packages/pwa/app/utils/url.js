@@ -7,7 +7,7 @@
 
 import {DEFAULT_LOCALE} from '../constants'
 import {getUrlsConfig, urlsConfigValidator} from './utils'
-import {urlsConfigTypes} from '../constants'
+import {urlParamTypes} from '../constants'
 
 /**
  * Modifies a given url by adding/updating query parameters.
@@ -80,28 +80,43 @@ export const buildUrlSet = (url = '', key = '', values = [], extraParams = {}) =
  * Given a category and the current locale returns an href to the product list page.
  *
  * @param {Object} category
- * @param {string} locale
+ * @param {Object} options
  * @returns {string}
  */
-export const categoryUrlBuilder = (category, locale = DEFAULT_LOCALE) =>
-    encodeURI(`/${locale}/category/${category.id}`)
+export const categoryUrlBuilder = (category, options = {}) => {
+    const {locale = DEFAULT_LOCALE, ...rest} = options
+    const categoryPath = `/category/${category.id}`
+    const updatedUrl = routeBuilder(categoryPath, {locale, ...rest})
+    return encodeURI(updatedUrl)
+}
 
 /**
  * Given a product and the current locale returns an href to the product detail page.
  *
  * @param {Object} product
- * @param {string} locale
+ * @param {Object} options
  * @returns {string}
  */
-export const productUrlBuilder = (product) => encodeURI(`/product/${product.id}`)
+export const productUrlBuilder = (product, options = {}) => {
+    const productPath = `/product/${product.id}`
+    const {locale = DEFAULT_LOCALE, ...rest} = options
+    const updatedUrl = routeBuilder(productPath, {locale, ...rest})
+    return encodeURI(updatedUrl)
+}
 
 /**
  * Given a search term, contructs a search url.
  *
  * @param {string} searchTerm
+ * @param {object} options
  * @returns {string}
  */
-export const searchUrlBuilder = (searchTerm) => `/search?q=${searchTerm}`
+export const searchUrlBuilder = (searchTerm, options = {}) => {
+    const searchPath = `/search?q=${searchTerm}`
+    const updatedPath = routeBuilder(searchPath, options)
+    console.log('updatePath', updatedPath)
+    return encodeURI(updatedPath)
+}
 
 /**
  * Returns a relative URL for a locale short code.
@@ -151,8 +166,9 @@ export const getUrlWithLocale = (shortCode, opts = {}) => {
  * @param locale
  * @returns {string}
  */
-export const homeUrlBuilder = (homeHref, locale) =>
-    encodeURI(`${homeHref}${locale !== DEFAULT_LOCALE ? locale + '/' : ''}`)
+export const homeUrlBuilder = (homeHref, locale) => {
+    return encodeURI(`${homeHref}${locale !== DEFAULT_LOCALE ? locale + '/' : ''}`)
+}
 
 /*
  * Remove query params from a give url path based on a given list of keys
@@ -184,6 +200,7 @@ export const removeQueryParamsFromPath = (path, keys) => {
         .toString()
         .replace(/=&/g, '&')
         .replace(/=$/, '')
+    console.log('paramStr', paramStr)
 
     return `${pathname}${paramStr && '?'}${paramStr}`
 }
@@ -199,7 +216,7 @@ export const removeQueryParamsFromPath = (path, keys) => {
  */
 export const routeBuilder = (url, options = {}) => {
     const urlsConfig = getUrlsConfig()
-    if (!urlsConfigValidator(urlsConfig, Object.values(urlsConfigTypes))) return url
+    if (!urlsConfigValidator(urlsConfig, Object.values(urlParamTypes))) return url
     if (!Object.keys(urlsConfig).length) return url
     let urlSegments = []
     const queryParams = {}
@@ -207,18 +224,19 @@ export const routeBuilder = (url, options = {}) => {
     Object.keys(urlsConfig).forEach((key) => {
         const type = urlsConfig[key]
         if (!options[key]) {
-            throw new Error(`Can't find the value for ${key}`)
+            return
         }
-        if (type === urlsConfigTypes.PATH) {
+        if (type === urlParamTypes.PATH) {
             urlSegments.push(options[key])
         }
-        if (type === urlsConfigTypes.QUERY_PARAM) {
+        if (type === urlParamTypes.QUERY_PARAM) {
             queryParams[key] = options[key]
         }
     })
+
     // build the pathname
     let updatedPath = `${urlSegments.length ? `/${urlSegments.join('/')}` : ''}${url}`
-    // append the query param to pathname
+    // append the query param to pathname if there is any
     if (Object.keys(queryParams).length) {
         updatedPath = rebuildPathWithParams(updatedPath, queryParams)
     }

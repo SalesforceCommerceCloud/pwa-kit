@@ -21,8 +21,9 @@ import {
 } from '../../commerce-api/contexts'
 import {commerceAPIConfig} from '../../commerce-api.config'
 import {einsteinAPIConfig} from '../../einstein-api.config'
-import {DEFAULT_LOCALE, SUPPORTED_LOCALES, DEFAULT_CURRENCY} from '../../constants'
+import {DEFAULT_LOCALE, SUPPORTED_LOCALES, DEFAULT_CURRENCY, urlParamTypes} from '../../constants'
 import {getPreferredCurrency} from '../../utils/locale'
+import {getUrlsConfig} from '../../utils/utils'
 
 const apiConfig = {
     ...commerceAPIConfig,
@@ -37,21 +38,27 @@ const apiConfig = {
  */
 const getLocale = (locals = {}) => {
     let {originalUrl} = locals
-
+    const {locale} = getUrlsConfig()
     // If there is no originalUrl value in the locals, create it from the window location.
     // This happens when executing on the client.
     if (!originalUrl) {
         originalUrl = window?.location.href.replace(window.location.origin, '')
     }
+    let shortCode
+    const {pathname, searchParams} = new URL(`http://hostname${originalUrl}`)
 
-    // Parse the pathname from the partial using the URL object and a placeholder host
-    const {pathname} = new URL(`http://hostname${originalUrl}`)
-    let shortCode = pathname.split('/')[1]
+    if (locale === urlParamTypes.PATH) {
+        // Parse the pathname from the partial using the URL object and a placeholder host
+        shortCode = pathname.split('/')[1]
+    } else if (locale === urlParamTypes.QUERY_PARAM) {
+        shortCode = searchParams.get('locale')
+    }
 
     // Ensure that the locale is in the seported list, otherwise return the default.
     shortCode = SUPPORTED_LOCALES.find((locale) => locale.id === shortCode)
         ? shortCode
         : DEFAULT_LOCALE
+    console.log('shortCode', shortCode)
 
     return shortCode
 }

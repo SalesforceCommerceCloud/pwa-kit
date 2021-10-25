@@ -44,7 +44,7 @@ const Breadcrumb = ({categories, ...rest}) => {
                 <ChakraBreadcrumbItem key={category.id} data-testid="sf-crumb-item">
                     <ChakraBreadcrumbLink
                         as={RouteLink}
-                        to={categoryUrlBuilder(category, intl.locale)}
+                        to={categoryUrlBuilder(category, {locale: intl.locale})}
                         {...styles.link}
                     >
                         {category.name}

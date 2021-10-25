@@ -41,7 +41,7 @@ import {IntlProvider} from 'react-intl'
 
 // Others
 import {watchOnlineStatus, flatten} from '../../utils/utils'
-import {homeUrlBuilder, getUrlWithLocale} from '../../utils/url'
+import {homeUrlBuilder, getUrlWithLocale, routeBuilder} from '../../utils/url'
 import {getLocaleConfig, getPreferredCurrency} from '../../utils/locale'
 import {DEFAULT_CURRENCY, HOME_HREF, SUPPORTED_LOCALES} from '../../constants'
 
@@ -110,25 +110,27 @@ const App = (props) => {
 
     const onCartClick = () => {
         // Goto the home page.
-        history.push(`/${targetLocale}/cart`)
+        history.push(routeBuilder(`/cart`, {locale: targetLocale}))
 
         // Close the drawer.
         onClose()
     }
 
     const onAccountClick = () => {
+        const path = routeBuilder(`/account`, {locale: targetLocale})
         // Link to account page for registered customer, open auth modal otherwise
         if (customer.isRegistered) {
-            history.push(`/${targetLocale}/account`)
+            history.push(path)
         } else {
             // if they already are at the login page, do not show login modal
-            if (new RegExp(`^/${targetLocale}/login$`).test(location.pathname)) return
+            if (new RegExp(path).test(location.pathname)) return
             authModal.onOpen()
         }
     }
 
     const onWishlistClick = () => {
-        history.push(`/${targetLocale}/account/wishlist`)
+        const path = routeBuilder('/account/wishlist', {locale: targetLocale})
+        history.push(path)
     }
 
     return (

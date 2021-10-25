@@ -42,11 +42,6 @@ const routes = [
         exact: true
     },
     {
-        path: '/:locale',
-        component: Home,
-        exact: true
-    },
-    {
         path: '/login',
         component: Login,
         exact: true
