@@ -114,7 +114,6 @@ export const productUrlBuilder = (product, options = {}) => {
 export const searchUrlBuilder = (searchTerm, options = {}) => {
     const searchPath = `/search?q=${searchTerm}`
     const updatedPath = routeBuilder(searchPath, options)
-    console.log('updatePath', updatedPath)
     return encodeURI(updatedPath)
 }
 
@@ -128,8 +127,8 @@ export const searchUrlBuilder = (searchTerm, options = {}) => {
  * @returns {string} - The relative URL for the specific locale.
  */
 export const getUrlWithLocale = (shortCode, opts = {}) => {
+    const {locale: localeType} = getUrlsConfig()
     const location = opts.location ? opts.location : window.location
-
     const {disallowParams = []} = opts
     let relativeUrl = location.pathname
 
@@ -142,15 +141,21 @@ export const getUrlWithLocale = (shortCode, opts = {}) => {
         })
     }
 
-    // Array of the paths without empty items
-    const paths = relativeUrl.split('/').filter((path) => path !== '')
+    let paths = []
+    paths = relativeUrl.split('/').filter((path) => path !== '')
 
-    // Remove the previous locale
-    paths.shift()
+    if (localeType === urlParamTypes.PATH) {
+        // Array of the paths without empty items
 
-    // Add the new locale
-    if (shortCode !== DEFAULT_LOCALE || paths?.length > 0) {
-        paths.unshift(shortCode)
+        // Remove the previous locale
+        paths.shift()
+
+        // Add the new locale
+        if (shortCode !== DEFAULT_LOCALE || paths?.length > 0) {
+            paths.unshift(shortCode)
+        }
+    } else if (localeType === urlParamTypes.QUERY_PARAM) {
+        params.set('locale', shortCode)
     }
 
     relativeUrl = `/${paths.join('/')}${Array.from(params).length > 0 ? `?${params}` : ''}`
@@ -163,11 +168,12 @@ export const getUrlWithLocale = (shortCode, opts = {}) => {
  * We don't add the locale to the URL for the default locale.
  *
  * @param homeHref
- * @param locale
+ * @param options
  * @returns {string}
  */
-export const homeUrlBuilder = (homeHref, locale) => {
-    return encodeURI(`${homeHref}${locale !== DEFAULT_LOCALE ? locale + '/' : ''}`)
+export const homeUrlBuilder = (homeHref, options) => {
+    const updatedUrl = routeBuilder(homeHref, options)
+    return encodeURI(updatedUrl)
 }
 
 /*
@@ -209,7 +215,6 @@ export const removeQueryParamsFromPath = (path, keys) => {
  * Build a route based on the url configuration
  * if the type = path => append its value to the url
  * if the type = query param => build the url with updated query params
- * if the type is none => do nothing
  * @param {string} url - based url of the output url
  * @param {object} options - object that contains values of url config key
  * @return {string} - an output url

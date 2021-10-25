@@ -42,6 +42,11 @@ const routes = [
         exact: true
     },
     {
+        path: '/:locale',
+        component: Home,
+        exact: true
+    },
+    {
         path: '/login',
         component: Login,
         exact: true
@@ -101,4 +106,4 @@ const routes = [
         component: PageNotFound
     }
 ]
-export default routesModifier(routes)
+export default routesModifier(routes, ['/:locale'])

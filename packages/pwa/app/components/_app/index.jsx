@@ -102,7 +102,7 @@ const App = (props) => {
 
     const onLogoClick = () => {
         // Goto the home page.
-        history.push(homeUrlBuilder(HOME_HREF, targetLocale))
+        history.push(homeUrlBuilder(HOME_HREF, {locale: targetLocale}))
 
         // Close the drawer.
         onClose()

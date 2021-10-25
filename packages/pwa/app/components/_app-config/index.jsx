@@ -38,7 +38,7 @@ const apiConfig = {
  */
 const getLocale = (locals = {}) => {
     let {originalUrl} = locals
-    const {locale} = getUrlsConfig()
+    const {locale: localeType} = getUrlsConfig()
     // If there is no originalUrl value in the locals, create it from the window location.
     // This happens when executing on the client.
     if (!originalUrl) {
@@ -47,10 +47,10 @@ const getLocale = (locals = {}) => {
     let shortCode
     const {pathname, searchParams} = new URL(`http://hostname${originalUrl}`)
 
-    if (locale === urlParamTypes.PATH) {
+    if (localeType === urlParamTypes.PATH) {
         // Parse the pathname from the partial using the URL object and a placeholder host
         shortCode = pathname.split('/')[1]
-    } else if (locale === urlParamTypes.QUERY_PARAM) {
+    } else if (localeType === urlParamTypes.QUERY_PARAM) {
         shortCode = searchParams.get('locale')
     }
 

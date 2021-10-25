@@ -27,7 +27,7 @@ const CheckoutHeader = () => {
 
                     <Button
                         as={Link}
-                        href="/cart"
+                        to="/cart"
                         display="inline-flex"
                         variant="unstyled"
                         color="gray.900"
