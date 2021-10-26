@@ -5,8 +5,8 @@
         "shortCode": "8o7m175y",
         "siteId": "RefArchGlobal"
     },
-    "einstein": {
-        "id": "1ea06c6e-c936-4324-bcf0-fada93f83bb1",
+    "einsteinApi": {
+        "clientId": "1ea06c6e-c936-4324-bcf0-fada93f83bb1",
         "siteId": "aaij-MobileFirst"
     },
     "webpack": {
