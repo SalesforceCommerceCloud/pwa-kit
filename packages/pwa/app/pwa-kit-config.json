@@ -9,8 +9,10 @@
         "id": "1ea06c6e-c936-4324-bcf0-fada93f83bb1",
         "siteId": "aaij-MobileFirst"
     },
+    "webpack": {
+        "externals": []
+    },
     "managedRuntime": {
-        "externals": [],
         "ssrEnabled": true,
         "ssrOnly": ["ssr.js", "ssr.js.map", "node_modules/**/*.*"],
         "ssrShared": [
