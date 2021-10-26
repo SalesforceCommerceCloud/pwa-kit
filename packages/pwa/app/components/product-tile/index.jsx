@@ -18,7 +18,8 @@ import {
     Text,
     Stack,
     useMultiStyleConfig,
-    IconButton
+    IconButton,
+    useBreakpoint
 } from '@chakra-ui/react'
 
 // Hooks
@@ -56,10 +57,20 @@ export const Skeleton = () => {
  */
 const ProductTile = (props) => {
     const intl = useIntl()
-    const {product, enableFavourite = false, isFavourite, onFavouriteToggle, ...rest} = props
-    const {currency, image, price, productName, productId} = product
+    const {
+        product,
+        enableFavourite = false,
+        isFavourite,
+        onFavouriteToggle,
+        imageProps,
+        ...rest
+    } = props
+    const {currency, price, productName, productId} = product
     const [isFavouriteLoading, setFavouriteLoading] = useState(false)
     const styles = useMultiStyleConfig('ProductTile')
+
+    const breakpoint = useBreakpoint()
+    console.log('--- current breakpoint', breakpoint)
 
     return (
         <Link
@@ -70,7 +81,7 @@ const ProductTile = (props) => {
         >
             <Box {...styles.imageWrapper}>
                 <AspectRatio {...styles.image}>
-                    <Img alt={image.alt} src={image.disBaseLink} />
+                    <Img {...imageProps} />
                 </AspectRatio>
 
                 {enableFavourite && (
@@ -138,7 +149,11 @@ ProductTile.propTypes = {
      * Callback function to be invoked when the user
      * interacts with favourite icon/button.
      */
-    onFavouriteToggle: PropTypes.func
+    onFavouriteToggle: PropTypes.func,
+    /**
+     * Props for the image component within this product tile
+     */
+    imageProps: PropTypes.object
 }
 
 export default ProductTile
