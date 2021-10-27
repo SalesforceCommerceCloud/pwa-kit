@@ -8,29 +8,38 @@
 export const getImageProps = ({src, sizes, widths, transformations, ...otherProps}) => {
     const url = transformImageUrl(src, transformations)
 
-    const srcsetWidths = widths.map((width) => {
-        url.searchParams.set('sw', width)
-        return `${url} ${width}w`
-    })
+    const srcset = widths
+        .map((width) => {
+            url.searchParams.set('sw', width)
+            return `${url} ${width}w`
+        })
+        .join(', ')
 
     return {
+        // TODO: src should be transformed? and have average width?
         src,
         sizes: buildSizes(sizes),
-        srcset: srcsetWidths.join(', '),
+        srcset,
         ...otherProps
     }
 }
 
 export const transformImageUrl = (src, transformations = {}) => {
-    const url = new URL(src, 'https://edge.disstg.commercecloud.salesforce.com/')
-    // First, set some default values
-    url.searchParams.set('q', 60)
+    const fallbackOrigin = 'https://edge.disstg.commercecloud.salesforce.com/'
+    const url = new URL(src, fallbackOrigin)
 
+    for (const key in DEFAULT_TRANSFORMATIONS) {
+        url.searchParams.set(key, DEFAULT_TRANSFORMATIONS[key])
+    }
     for (const key in transformations) {
         url.searchParams.set(key, transformations[key])
     }
 
     return url
+}
+
+const DEFAULT_TRANSFORMATIONS = {
+    q: 60
 }
 
 /**
