@@ -64,7 +64,6 @@ import {HTTPNotFound} from 'pwa-kit-react-sdk/ssr/universal/errors'
 import {DEFAULT_LIMIT_VALUES, API_ERROR_MESSAGE} from '../../constants'
 import useNavigation from '../../hooks/use-navigation'
 import LoadingSpinner from '../../components/loading-spinner'
-import {getImageProps} from '../../utils/responsive-image'
 
 // NOTE: You can ignore certain refinements on a template level by updating the below
 // list of ignored refinements.
@@ -383,7 +382,6 @@ const ProductList = (props) => {
                                           const isInWishlist = !!wishlist.findItemByProductId(
                                               productId
                                           )
-                                          const image = productSearchItem.image
 
                                           return (
                                               <ProductTile
@@ -398,17 +396,14 @@ const ProductList = (props) => {
                                                           : removeItemFromWishlist
                                                       return action(productSearchItem)
                                                   }}
-                                                  imageProps={getImageProps({
-                                                      src: image.disBaseLink,
-                                                      alt: image.alt,
+                                                  imageProps={{
                                                       sizes: {
                                                           base: 'calc(100vw / 2)',
                                                           md: `calc((100vw - ${filtersContainerWidth}) / 3)`,
                                                           '2xl': '387px'
                                                       },
-                                                      // sm: 500, md: 800, lg: 1000
-                                                      widths: [240, 480, 800, 1200]
-                                                  })}
+                                                      widths: [400, 800, 1200]
+                                                  }}
                                               />
                                           )
                                       })}

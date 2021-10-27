@@ -29,6 +29,7 @@ import {useIntl} from 'react-intl'
 import {productUrlBuilder} from '../../utils/url'
 import Link from '../link'
 import withRegistration from '../../hoc/with-registration'
+import {getImageProps} from '../../utils/responsive-image'
 
 const IconButtonWithRegistration = withRegistration(IconButton)
 
@@ -65,7 +66,7 @@ const ProductTile = (props) => {
         imageProps,
         ...rest
     } = props
-    const {currency, price, productName, productId} = product
+    const {currency, image, price, productName, productId} = product
     const [isFavouriteLoading, setFavouriteLoading] = useState(false)
     const styles = useMultiStyleConfig('ProductTile')
 
@@ -81,7 +82,13 @@ const ProductTile = (props) => {
         >
             <Box {...styles.imageWrapper}>
                 <AspectRatio {...styles.image}>
-                    <Img {...imageProps} />
+                    <Img
+                        {...getImageProps({
+                            alt: image.alt,
+                            src: image.disBaseLink,
+                            ...imageProps
+                        })}
+                    />
                 </AspectRatio>
 
                 {enableFavourite && (
