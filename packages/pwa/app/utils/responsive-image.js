@@ -5,6 +5,8 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
+import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
+
 /**
  * @param {Object} props
  * @param {string} props.src - The image's url
@@ -38,7 +40,7 @@ export const getImageProps = ({src, sizes, widths, transformations, ...otherProp
  * @return {URL} url object
  */
 export const transformImageUrl = (src, transformations = {}) => {
-    const fallbackOrigin = 'https://edge.disstg.commercecloud.salesforce.com/'
+    const fallbackOrigin = getAppOrigin()
     const url = new URL(src, fallbackOrigin)
 
     for (const key in DEFAULT_TRANSFORMATIONS) {
