@@ -67,6 +67,8 @@ export const start = () => {
     window.__HYDRATING__ = true
 
     const WrappedApp = routeComponent(App, false, locals)
+    const WrappedAppConfig = routeComponent(AppConfig, false, locals)
+
     const error = window.__ERROR__
 
     return Promise.resolve()
@@ -75,14 +77,14 @@ export const start = () => {
             ReactDOM.hydrate(
                 <Router>
                     <DeviceContext.Provider value={{type: window.__DEVICE_TYPE__}}>
-                        <AppConfig locals={locals}>
+                        <WrappedAppConfig locals={locals}>
                             <Switch
                                 error={error}
                                 appState={window.__PRELOADED_STATE__}
                                 routes={routes}
                                 App={WrappedApp}
                             />
-                        </AppConfig>
+                        </WrappedAppConfig>
                     </DeviceContext.Provider>
                 </Router>,
                 rootEl,
