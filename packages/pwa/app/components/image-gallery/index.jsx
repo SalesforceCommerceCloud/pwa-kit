@@ -23,6 +23,7 @@ import {
     useMultiStyleConfig
 } from '@chakra-ui/react'
 import {findImageGroupBy} from '../../utils/image-groups-utils'
+import {getImageProps} from '../../utils/responsive-image'
 
 const EnterKeyNumber = 13
 
@@ -101,7 +102,17 @@ const ImageGallery = ({imageGroups = [], selectedVariationAttributes = {}, size}
             {heroImage && (
                 <Box {...styles.heroImageGroup}>
                     <AspectRatio {...styles.heroImage} ratio={1}>
-                        <Img alt={heroImage.alt} src={heroImage.disBaseLink} />
+                        <Img
+                            {...getImageProps({
+                                alt: heroImage.alt,
+                                src: heroImage.disBaseLink,
+                                sizes: {
+                                    base: '100vw',
+                                    lg: '680px'
+                                },
+                                widths: [750, 1000, 1500, 2000]
+                            })}
+                        />
                     </AspectRatio>
                 </Box>
             )}
