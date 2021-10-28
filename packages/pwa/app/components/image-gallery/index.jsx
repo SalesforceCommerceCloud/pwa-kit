@@ -108,9 +108,10 @@ const ImageGallery = ({imageGroups = [], selectedVariationAttributes = {}, size}
                                 src: heroImage.disBaseLink,
                                 sizes: {
                                     base: '100vw',
-                                    lg: '680px'
+                                    lg: styles.heroImage.maxWidth[3]
                                 },
                                 // TODO: For a 'large' image, it's only 800px wide - can we get larger images to work with?
+                                // TODO: revisit these numbers
                                 widths: [750, 1000, 1500, 2000]
                             })}
                         />
