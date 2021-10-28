@@ -65,6 +65,22 @@ class AppConfig extends React.Component {
     }
 
     /**
+     * Returned pojo will be passed to the AppConfig component as a prop named
+     * `derivedConfig`. The intended purpose of this method is to provide a configuration
+     * object to be used by various provider components in the AppConfig.
+     *
+     * This is similar to `getProps` but will only be called once during rendering server-side
+     * and once during app start on the client.
+     *
+     * @param req - the request.
+     * @return {Object}
+     */
+    // eslint-disable-next-line no-unused-vars
+    static getDerivedConfigFromRequest(req) {
+        return {}
+    }
+
+    /**
      * This class is a React Component in order to provide this hook, which lets
      * you set up context Providers for a state-management library such as Redux.
      */

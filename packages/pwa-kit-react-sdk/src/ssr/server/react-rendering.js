@@ -23,7 +23,6 @@ import DeviceContext from '../universal/device-context'
 import Document from '../universal/components/_document'
 import App from '../universal/components/_app'
 import Throw404 from '../universal/components/throw-404'
-import AppErrorBoundary from '../universal/components/app-error-boundary'
 
 import AppConfig from '../universal/components/_app-config'
 import Switch from '../universal/components/switch'
@@ -89,7 +88,7 @@ const initAppState = async ({App, AppConfig, component, match, route, req, res, 
 
     const {params} = match
 
-    const components = [AppConfig, App, route.component]
+    const components = [App, route.component]
     const promises = components.map((c) =>
         c.getProps
             ? c.getProps({
@@ -102,33 +101,8 @@ const initAppState = async ({App, AppConfig, component, match, route, req, res, 
     )
     let returnVal = {}
 
-    // try {
-    //     const [appProps, appConfigProps, pageProps] = await Promise.all(promises)
-    //     const appState = {
-    //         appProps,
-    //         pageProps,
-    //         __STATE_MANAGEMENT_LIBRARY: AppConfig.freeze(res.locals)
-    //     }
-
-    // returnVal = {
-    //     error: undefined,
-    //     appState: appState,
-    //     appConfigState: appConfigProps
-    // }
-    // } catch (error) {
-    // returnVal = {
-    //     error: error || new Error(),
-    //     appState: {},
-    //     appConfigState: {}
-    // }
-    // }
-
-    const values = await Promise.allSettled(promises)
-    const hasError = values.some(({status}) => status === 'rejected')
-
-    if (!hasError) {
-        // NOTE: This is bad that the order is important.
-        const [appConfigProps, appProps, pageProps] = values.map(({value}) => value)
+    try {
+        const [appProps, pageProps] = await Promise.all(promises)
         const appState = {
             appProps,
             pageProps,
@@ -137,16 +111,12 @@ const initAppState = async ({App, AppConfig, component, match, route, req, res, 
 
         returnVal = {
             error: undefined,
-            appState: appState,
-            appConfigState: appConfigProps
+            appState: appState
         }
-    } else {
-        const rejected = values.find(({status}) => status === 'rejected')
+    } catch (error) {
         returnVal = {
-            error: rejected.reason || new Error(),
-            isAppConfigError: !!values[0].reason,
-            appState: {},
-            appConfigState: {}
+            error: error || new Error(),
+            appState: {}
         }
     }
 
@@ -168,9 +138,11 @@ export const render = async (req, res) => {
     // to inject arguments into the wrapped component's getProps methods.
     AppConfig.restore(res.locals)
 
-    const routes = getRoutes(res.locals)
-    const WrappedApp = routeComponent(App, false, res.locals)
-    const WrappedAppConfig = routeComponent(AppConfig, false, res.locals)
+    // Freeze this config later
+    const derivedConfig = await AppConfig.getDerivedConfigFromRequest(req)
+
+    const routes = getRoutes(res.locals, derivedConfig)
+    const WrappedApp = routeComponent(App, false, res.locals, derivedConfig)
 
     const [pathname, search] = req.originalUrl.split('?')
     const location = {
@@ -195,9 +167,9 @@ export const render = async (req, res) => {
     const component = await route.component.getComponent()
 
     // Step 3 - Init the app state
-    const {appState, appConfigState, error: appStateError, isAppConfigError} = await initAppState({
+    const {appState, error: appStateError} = await initAppState({
         App: WrappedApp,
-        AppConfig: WrappedAppConfig,
+        AppConfig,
         component,
         match,
         route,
@@ -210,11 +182,10 @@ export const render = async (req, res) => {
     let renderResult
     const args = {
         App: WrappedApp,
-        AppConfig: WrappedAppConfig,
+        AppConfig,
         appState,
-        appConfigState,
+        derivedConfig,
         error: appStateError && logAndFormatError(appStateError),
-        isAppConfigError,
         routes,
         req,
         res,
@@ -240,18 +211,7 @@ export const render = async (req, res) => {
 }
 
 const renderApp = (args) => {
-    const {
-        req,
-        res,
-        location,
-        routes,
-        appState,
-        appConfigState,
-        isAppConfigError,
-        error,
-        App,
-        AppConfig
-    } = args
+    const {req, res, location, routes, appState, derivedConfig, error, App, AppConfig} = args
 
     const ssrOnly = 'mobify_server_only' in req.query
     const prettyPrint = 'mobify_pretty' in req.query
@@ -259,25 +219,15 @@ const renderApp = (args) => {
     const deviceType = detectDeviceType(req)
     const routerContext = {}
 
-    let configError
-
-    if (error && isAppConfigError) {
-        configError = error
-    }
-
     let extractor
     let bundles = []
     let appJSX = (
         <Router location={location} context={routerContext}>
-            <AppErrorBoundary error={configError}>
-                {!configError && (
-                    <DeviceContext.Provider value={{type: deviceType}}>
-                        <AppConfig preloadedProps={appConfigState} locals={res.locals}>
-                            <Switch error={error} appState={appState} routes={routes} App={App} />
-                        </AppConfig>
-                    </DeviceContext.Provider>
-                )}
-            </AppErrorBoundary>
+            <DeviceContext.Provider value={{type: deviceType}}>
+                <AppConfig locals={res.locals} derivedConfig={derivedConfig}>
+                    <Switch error={error} appState={appState} routes={routes} App={App} />
+                </AppConfig>
+            </DeviceContext.Provider>
         </Router>
     )
 
@@ -321,7 +271,7 @@ const renderApp = (args) => {
     //
     // Do *not* add to these without a very good reason - globals are a liability.
     const windowGlobals = {
-        __CONFIG_STATE__: appConfigState,
+        __DERIVED_CONFIG__: derivedConfig,
         __DEVICE_TYPE__: deviceType,
         __PRELOADED_STATE__: appState,
         __ERROR__: error,

@@ -54,7 +54,7 @@ export const start = () => {
 
     // AppConfig.restore *must* come before getRoutes()
     AppConfig.restore(locals, window.__PRELOADED_STATE__.__STATE_MANAGEMENT_LIBRARY)
-    const routes = getRoutes(locals)
+    const routes = getRoutes(locals, window.__DERIVED_CONFIG__)
 
     // We need to tell the routeComponent HOC when the app is hydrating in order to
     // prevent pages from re-fetching data on the first client-side render. The
@@ -66,8 +66,7 @@ export const start = () => {
     // been warned.
     window.__HYDRATING__ = true
 
-    const WrappedApp = routeComponent(App, false, locals)
-    const WrappedAppConfig = routeComponent(AppConfig, false, locals)
+    const WrappedApp = routeComponent(App, false, locals, window.__DERIVED_CONFIG__)
 
     const error = window.__ERROR__
 
@@ -77,14 +76,14 @@ export const start = () => {
             ReactDOM.hydrate(
                 <Router>
                     <DeviceContext.Provider value={{type: window.__DEVICE_TYPE__}}>
-                        <WrappedAppConfig locals={locals}>
+                        <AppConfig locals={locals} derivedConfig={window.__DERIVED_CONFIG__}>
                             <Switch
                                 error={error}
                                 appState={window.__PRELOADED_STATE__}
                                 routes={routes}
                                 App={WrappedApp}
                             />
-                        </WrappedAppConfig>
+                        </AppConfig>
                     </DeviceContext.Provider>
                 </Router>,
                 rootEl,

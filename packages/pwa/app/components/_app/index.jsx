@@ -273,9 +273,9 @@ App.getProps = async ({api}) => {
             // we can use it's value to load the correct messages for the application.
             // Take a look at the `app/components/_app-config` component on how the
             // preferred locale was derived.
-            const {locale} = api.getConfig()
+            // const {locale} = api.getConfig()
 
-            return [locale]
+            return ['en-GB']
         }
     })
 

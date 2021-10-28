@@ -35,17 +35,8 @@ const apiConfig = {
  * @param locals the request locals (only defined when executing on the server.)
  * @returns {String} the locale short code
  */
-const getLocale = (locals = {}) => {
-    let {originalUrl} = locals
-
-    // If there is no originalUrl value in the locals, create it from the window location.
-    // This happens when executing on the client.
-    if (!originalUrl) {
-        originalUrl = window?.location.href.replace(window.location.origin, '')
-    }
-
-    // Parse the pathname from the partial using the URL object and a placeholder host
-    const {pathname} = new URL(`http://hostname${originalUrl}`)
+const getLocale = (path) => {
+    const {pathname} = new URL(`http://hostname${path}`)
     let shortCode = pathname.split('/')[1]
 
     // Ensure that the locale is in the seported list, otherwise return the default.
@@ -64,12 +55,16 @@ const getLocale = (locals = {}) => {
  * You can also use the AppConfig to configure a state-management library such
  * as Redux, or Mobx, if you like.
  */
-const AppConfig = ({children, locals = {}}) => {
+const AppConfig = ({children, locals = {}, derivedConfig = {}}) => {
     const [basket, setBasket] = useState(null)
     const [customer, setCustomer] = useState(null)
 
+    // TODO: This is probably going to introduce issues as the instance of this api client
+    // is difference than the one use in the pages `getProps` methods
+    const api = new CommerceAPI({...apiConfig, ...derivedConfig})
+
     return (
-        <CommerceAPIProvider value={locals.api}>
+        <CommerceAPIProvider value={api}>
             <CustomerProvider value={{customer, setCustomer}}>
                 <BasketProvider value={{basket, setBasket}}>
                     <CustomerProductListsProvider>
@@ -81,19 +76,27 @@ const AppConfig = ({children, locals = {}}) => {
     )
 }
 
-AppConfig.restore = (locals = {}) => {
-    // Parse the locale from the page url.
-    const locale = getLocale(locals) || DEFAULT_LOCALE
-    const currency = getPreferredCurrency(locale) || DEFAULT_CURRENCY
+AppConfig.getDerivedConfigFromRequest = async (req) => {
+    const path = typeof window === `undefined` ? req.originalUrl : window.location.path
+    const shortCode = getLocale(path) || DEFAULT_LOCALE
+    const currency = getPreferredCurrency(shortCode) || DEFAULT_CURRENCY
 
-    locals.api = new CommerceAPI({...apiConfig, locale, currency})
+    return {
+        currency,
+        locale: shortCode
+    }
 }
+
+AppConfig.restore = () => {}
 
 AppConfig.freeze = () => undefined
 
-AppConfig.extraGetPropsArgs = (locals = {}) => {
+// eslint-disable-next-line no-unused-vars
+AppConfig.extraGetPropsArgs = (locals = {}, derivedConfig = {}) => {
+    const api = new CommerceAPI({...apiConfig, ...derivedConfig})
+
     return {
-        api: locals.api
+        api
     }
 }
 
