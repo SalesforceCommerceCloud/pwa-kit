@@ -110,6 +110,7 @@ const ImageGallery = ({imageGroups = [], selectedVariationAttributes = {}, size}
                                     base: '100vw',
                                     lg: '680px'
                                 },
+                                // TODO: For a 'large' image, it's only 800px wide - can we get larger images to work with?
                                 widths: [750, 1000, 1500, 2000]
                             })}
                         />

@@ -63,6 +63,8 @@ const DEFAULT_TRANSFORMATIONS = {
 const buildSizes = (sizes = {}) => {
     const s = []
 
+    // Aligned with default Chakra breakpoints:
+    // https://chakra-ui.com/docs/features/responsive-styles
     sizes['2xl'] && s.push(`(min-width: 96em) ${sizes['2xl']}`)
     sizes.xl && s.push(`(min-width: 80em) ${sizes.xl}`)
     sizes.lg && s.push(`(min-width: 62em) ${sizes.lg}`)
@@ -70,5 +72,5 @@ const buildSizes = (sizes = {}) => {
     sizes.sm && s.push(`(min-width: 30em) ${sizes.sm}`)
     sizes.base && s.push(sizes.base)
 
-    return s.length > 0 ? s.join(', ') : ''
+    return s.join(', ')
 }
