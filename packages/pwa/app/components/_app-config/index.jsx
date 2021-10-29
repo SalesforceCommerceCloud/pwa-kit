@@ -97,10 +97,8 @@ const AppConfig = ({children, locals = {}}) => {
 
 AppConfig.restore = (locals = {}) => {
     // Parse the locale from the page url.
-    const {originalUrl} = locals
     const locale = getLocale(locals) || DEFAULT_LOCALE
-    const basePath = originalUrl !== HOME_HREF ? getLocaleAndSiteBasePath(locale) : undefined
-    console.log('basePath', basePath)
+    const basePath = getLocaleAndSiteBasePath(locale)
 
     const currency = getPreferredCurrency(locale) || DEFAULT_CURRENCY
 
