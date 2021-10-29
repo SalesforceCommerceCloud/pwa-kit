@@ -6,6 +6,7 @@
  */
 
 import pwaKitConfig from '../../pwa-kit-config.json'
+import {urlParamTypes} from '../constants'
 
 /**
  * Call requestIdleCallback in supported browsers.
@@ -161,11 +162,11 @@ export const getSiteConfig = () => {
     return pwaKitConfig.app
 }
 
-export const getUrlsConfig = () => pwaKitConfig.app.urls
+export const getUrlConfig = () => pwaKitConfig.app.url
 
-export const urlsConfigValidator = (urlsConfig, types) => {
-    return Object.keys(urlsConfig).every((key) => {
-        if (!types.includes(urlsConfig[key])) {
+export const urlsConfigValidator = (urlConfig) => {
+    return Object.keys(urlConfig).every((key) => {
+        if (!Object.values(urlParamTypes).includes(urlConfig[key])) {
             const errorMsg = `The type for ${key} is invalid. It should be one of [${types.join(
                 ', '
             )}]`

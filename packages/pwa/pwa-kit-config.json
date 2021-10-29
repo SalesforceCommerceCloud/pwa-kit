@@ -1,74 +1,8 @@
 {
     "app": {
-        "defaultSiteId": "RefArchGlobal",
-        "urls": {
-          "locale": "query_param"
-        },
-        "sites": [
-            {
-                "id": "RefArch",
-                "alias": "us",
-                "hostname": ["localhost"],
-                "l10n": {
-                    "supportedCurrencies": ["USD", "EUR", "CNY", "JPY"],
-                    "defaultCurrency": "USD",
-                    "supportedLocales": [
-                        {
-                            "id": "en-US",
-                            "preferredCurrency": "USD"
-                        },
-                        {
-                            "id": "fr-FR",
-                            "preferredCurrency": "EUR"
-                        },
-                        {
-                            "id": "it-IT",
-                            "preferredCurrency": "EUR"
-                        },
-                        {
-                            "id": "zh-CN",
-                            "preferredCurrency": "CNY"
-                        },
-                        {
-                            "id": "ja-JP",
-                            "preferredCurrency": "JPY"
-                        }
-                    ],
-                    "defaultLocale": "en-US"
-                }
-            },
-            {
-                "id": "RefArchGlobal",
-                "alias": "global",
-                "hostname": ["localhost"],
-                "l10n": {
-                    "supportedCurrencies": ["GBP", "EUR", "CNY", "JPY"],
-                    "defaultCurrency": "GBP",
-                    "supportedLocales": [
-                        {
-                            "id": "en-GB",
-                            "preferredCurrency": "GBP"
-                        },
-                        {
-                            "id": "fr-FR",
-                            "preferredCurrency": "EUR"
-                        },
-                        {
-                            "id": "it-IT",
-                            "preferredCurrency": "EUR"
-                        },
-                        {
-                            "id": "zh-CN",
-                            "preferredCurrency": "CNY"
-                        },
-                        {
-                            "id": "ja-JP",
-                            "preferredCurrency": "JPY"
-                        }
-                    ],
-                    "defaultLocale": "en-GB"
-                }
-            }
-        ]
+        "url": {
+          "locale": "path",
+          "siteId": "path"
+        }
     }
 }

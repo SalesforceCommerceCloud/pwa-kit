@@ -151,11 +151,14 @@ export const render = async (req, res) => {
     let route
     let match
 
+    const {basePath} = res.locals
+
     routes.some((_route) => {
-        const _match = matchPath(req.path, _route)
+        const _path = basePath ? `${basePath}${_route.path}` : _route.path
+        const _match = matchPath(req.path, {..._route, path: _path})
         if (_match) {
             match = _match
-            route = _route
+            route = {..._route, path: _path}
         }
         return !!match
     })
@@ -213,10 +216,13 @@ const renderApp = (args) => {
     const deviceType = detectDeviceType(req)
     const routerContext = {}
 
+    const {basePath} = res.locals
+    console.log('basenamePath', basePath)
+
     let extractor
     let bundles = []
     let appJSX = (
-        <Router location={location} context={routerContext}>
+        <Router location={location} context={routerContext} basename={basePath}>
             <DeviceContext.Provider value={{type: deviceType}}>
                 <AppConfig locals={res.locals}>
                     <Switch error={error} appState={appState} routes={routes} App={App} />

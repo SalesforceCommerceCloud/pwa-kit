@@ -39,7 +39,7 @@ import {HTTPNotFound} from 'pwa-kit-react-sdk/ssr/universal/errors'
 // constant
 import {API_ERROR_MESSAGE} from '../../constants'
 import {rebuildPathWithParams} from '../../utils/url'
-import {useHistory} from 'react-router-dom'
+import {useHistory, useLocation} from 'react-router-dom'
 import {useToast} from '../../hooks/use-toast'
 
 const ProductDetail = ({category, product, isLoading}) => {
@@ -50,6 +50,7 @@ const ProductDetail = ({category, product, isLoading}) => {
     const variant = useVariant(product)
     const toast = useToast()
     const navigate = useNavigation()
+    const location = useLocation()
     const [primaryCategory, setPrimaryCategory] = useState(category)
 
     // This page uses the `primaryCategoryId` to retrieve the category data. This attribute

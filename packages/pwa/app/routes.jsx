@@ -16,7 +16,6 @@ import React from 'react'
 import loadable from '@loadable/component'
 // Components
 import {Skeleton} from '@chakra-ui/react'
-import {routesModifier} from './utils/routes-utils'
 
 const fallback = <Skeleton height="75vh" width="100%" />
 
@@ -38,11 +37,6 @@ const PageNotFound = loadable(() => import('./pages/page-not-found'))
 const routes = [
     {
         path: '/',
-        component: Home,
-        exact: true
-    },
-    {
-        path: '/:locale',
         component: Home,
         exact: true
     },
@@ -106,4 +100,5 @@ const routes = [
         component: PageNotFound
     }
 ]
-export default routesModifier(routes, ['/:locale'])
+// export default routesModifier(routes, ['/:locale'])
+export default routes

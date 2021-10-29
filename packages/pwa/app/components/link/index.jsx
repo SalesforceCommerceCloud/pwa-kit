@@ -15,14 +15,13 @@ const Link = React.forwardRef(({href, to, useNavLink = false, ...props}, ref) =>
     const _href = to || href
     const {locale} = useIntl()
     const basePath = `/${locale}`
-    const localizedHref = _href && _href.includes(basePath) ? _href : routeBuilder(to, {locale})
-
+    console.log('_href', _href)
     return (
         <ChakraLink
             as={useNavLink ? NavSPALink : SPALink}
             {...(useNavLink && {exact: true})}
             {...props}
-            to={_href === '/' ? '/' : localizedHref}
+            to={_href === '/' ? '/' : _href}
             ref={ref}
         />
     )

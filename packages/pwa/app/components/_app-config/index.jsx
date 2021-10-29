@@ -21,9 +21,16 @@ import {
 } from '../../commerce-api/contexts'
 import {commerceAPIConfig} from '../../commerce-api.config'
 import {einsteinAPIConfig} from '../../einstein-api.config'
-import {DEFAULT_LOCALE, SUPPORTED_LOCALES, DEFAULT_CURRENCY, urlParamTypes} from '../../constants'
+import {
+    DEFAULT_LOCALE,
+    SUPPORTED_LOCALES,
+    DEFAULT_CURRENCY,
+    urlParamTypes,
+    HOME_HREF
+} from '../../constants'
 import {getPreferredCurrency} from '../../utils/locale'
-import {getUrlsConfig} from '../../utils/utils'
+import {getUrlConfig} from '../../utils/utils'
+import {getLocaleAndSiteBasePath} from '../../utils/routes-utils'
 
 const apiConfig = {
     ...commerceAPIConfig,
@@ -38,7 +45,7 @@ const apiConfig = {
  */
 const getLocale = (locals = {}) => {
     let {originalUrl} = locals
-    const {locale: localeType} = getUrlsConfig()
+    const {locale: localeType} = getUrlConfig()
     // If there is no originalUrl value in the locals, create it from the window location.
     // This happens when executing on the client.
     if (!originalUrl) {
@@ -90,10 +97,15 @@ const AppConfig = ({children, locals = {}}) => {
 
 AppConfig.restore = (locals = {}) => {
     // Parse the locale from the page url.
+    const {originalUrl} = locals
     const locale = getLocale(locals) || DEFAULT_LOCALE
+    const basePath = originalUrl !== HOME_HREF ? getLocaleAndSiteBasePath(locale) : undefined
+    console.log('basePath', basePath)
+
     const currency = getPreferredCurrency(locale) || DEFAULT_CURRENCY
 
     locals.api = new CommerceAPI({...apiConfig, locale, currency})
+    locals.basePath = basePath
 }
 
 AppConfig.freeze = () => undefined

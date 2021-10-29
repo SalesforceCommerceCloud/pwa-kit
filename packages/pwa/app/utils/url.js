@@ -6,7 +6,7 @@
  */
 
 import {DEFAULT_LOCALE} from '../constants'
-import {getUrlsConfig, urlsConfigValidator} from './utils'
+import {getUrlConfig, urlsConfigValidator} from './utils'
 import {urlParamTypes} from '../constants'
 
 /**
@@ -83,11 +83,9 @@ export const buildUrlSet = (url = '', key = '', values = [], extraParams = {}) =
  * @param {Object} options
  * @returns {string}
  */
-export const categoryUrlBuilder = (category, options = {}) => {
-    const {locale = DEFAULT_LOCALE, ...rest} = options
-    const categoryPath = `/category/${category.id}`
-    const updatedUrl = routeBuilder(categoryPath, {locale, ...rest})
-    return encodeURI(updatedUrl)
+export const categoryUrlBuilder = (category, options) => {
+    const {locale} = options
+    return encodeURI(`/category/${category.id}`)
 }
 
 /**
@@ -101,7 +99,7 @@ export const productUrlBuilder = (product, options = {}) => {
     const productPath = `/product/${product.id}`
     const {locale = DEFAULT_LOCALE, ...rest} = options
     const updatedUrl = routeBuilder(productPath, {locale, ...rest})
-    return encodeURI(updatedUrl)
+    return encodeURI(productPath)
 }
 
 /**
@@ -127,7 +125,7 @@ export const searchUrlBuilder = (searchTerm, options = {}) => {
  * @returns {string} - The relative URL for the specific locale.
  */
 export const getUrlWithLocale = (shortCode, opts = {}) => {
-    const {locale: localeType} = getUrlsConfig()
+    const {locale: localeType} = getUrlConfig()
     const location = opts.location ? opts.location : window.location
     const {disallowParams = []} = opts
     let relativeUrl = location.pathname
@@ -206,7 +204,6 @@ export const removeQueryParamsFromPath = (path, keys) => {
         .toString()
         .replace(/=&/g, '&')
         .replace(/=$/, '')
-    console.log('paramStr', paramStr)
 
     return `${pathname}${paramStr && '?'}${paramStr}`
 }
@@ -220,7 +217,7 @@ export const removeQueryParamsFromPath = (path, keys) => {
  * @return {string} - an output url
  */
 export const routeBuilder = (url, options = {}) => {
-    const urlsConfig = getUrlsConfig()
+    const urlsConfig = getUrlConfig()
     if (!urlsConfigValidator(urlsConfig, Object.values(urlParamTypes))) return url
     if (!Object.keys(urlsConfig).length) return url
     let urlSegments = []

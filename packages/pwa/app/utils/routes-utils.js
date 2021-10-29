@@ -5,32 +5,28 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {HOME_HREF} from '../constants'
-import {getUrlsConfig, urlsConfigValidator} from './utils'
+import {getUrlConfig} from './utils'
 import {urlParamTypes} from '../constants'
 
 /**
- * Modify the routes to add extra dynamic params to each route based on urls configuration
- * @param {array }routes - array of routes
- * @param {array} excludes - array of paths that do need to be modified
+ *  a function returns basePath string for locale/siteId/siteAlias
+ *  by reading over the url config inside the pwa-kit-config.json file
+ * @param locale
+ * @param siteId
+ * @returns {string}
  */
-export const routesModifier = (routes, excludes = []) => {
-    const urlsConfig = getUrlsConfig()
-    if (!urlsConfigValidator(urlsConfig, Object.values(urlParamTypes))) return routes
-    if (!urlsConfig) return routes
-    if (!routes.length) return []
-    return routes.map(({path, ...rest}) => {
-        if (path === HOME_HREF || path === '*' || excludes.includes(path)) return {path, ...rest}
-        let tempPathSegment = []
+export const getLocaleAndSiteBasePath = (locale, siteId) => {
+    const urlConfig = getUrlConfig()
+    const paths = []
+    const localeReplacement = urlConfig['locale']
+    if (localeReplacement === urlParamTypes.PATH && locale) {
+        paths.push(locale)
+    }
 
-        Object.keys(urlsConfig).forEach((key) => {
-            if (urlsConfig[key] === urlParamTypes.PATH) {
-                tempPathSegment.push(`:${key}`)
-            }
-        })
-        return {
-            path: `${tempPathSegment.length ? `/${tempPathSegment.join('/')}` : ''}${path}`,
-            ...rest
-        }
-    })
+    const siteIdReplacement = urlConfig['siteId']
+    if (siteIdReplacement === urlParamTypes.PATH && siteId) {
+        paths.push(siteId)
+    }
+
+    return `${paths.length ? `/${paths.join('/')}` : ''}`
 }

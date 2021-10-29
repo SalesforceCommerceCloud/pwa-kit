@@ -17,7 +17,6 @@ import Section from '../../components/section'
 import BasicTile from '../../components/basic-tile'
 import {categoriesThreeColumns, categoriesTwoColumns} from './data'
 import RecommendedProducts from '../../components/recommended-products'
-import {routeBuilder} from '../../utils/url'
 
 /**
  * This is the home page for Retail React App.
@@ -49,7 +48,7 @@ const Home = () => {
                 actions={
                     <Button
                         as={Link}
-                        to={routeBuilder(`/category/newarrivals`, {locale: intl.locale})}
+                        to={`/category/newarrivals`}
                         width={{base: 'full', md: 'inherit'}}
                     >
                         <FormattedMessage defaultMessage="Shop New Arrivals" />

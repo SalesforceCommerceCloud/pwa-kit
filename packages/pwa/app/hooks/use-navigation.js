@@ -7,7 +7,6 @@
 import {useCallback} from 'react'
 import {useHistory} from 'react-router'
 import {useIntl} from 'react-intl'
-import {routeBuilder} from '../utils/url'
 
 /**
  * A convenience hook for programmatic navigation uses history's `push` or `replace`. The proper locale
@@ -27,9 +26,7 @@ const useNavigation = () => {
          */
         (path, action = 'push', ...args) => {
             const basePath = `/${locale}`
-            const localizedHref =
-                path && path.includes(basePath) ? path : routeBuilder(path, {locale})
-            history[action](path === '/' ? '/' : localizedHref, ...args)
+            history[action](path === '/' ? '/' : path, ...args)
         },
         [locale]
     )
