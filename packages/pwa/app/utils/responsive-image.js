@@ -18,6 +18,11 @@ import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
 export const getImageProps = ({src, sizes, widths, transformations, ...otherProps}) => {
     const url = transformImageUrl(src, transformations)
 
+    if (widths) {
+        url.searchParams.set('sw', averageWidth(widths))
+    }
+    const fallbackSrc = `${url}`
+
     const srcSet = (widths || [])
         .map((width) => {
             url.searchParams.set('sw', width)
@@ -26,8 +31,7 @@ export const getImageProps = ({src, sizes, widths, transformations, ...otherProp
         .join(', ')
 
     return {
-        // TODO: src should be transformed? and have average width?
-        src,
+        src: fallbackSrc,
         ...(sizes ? {sizes: buildSizes(sizes)} : {}),
         ...(srcSet ? {srcSet} : {}),
         ...otherProps
@@ -57,9 +61,6 @@ const DEFAULT_TRANSFORMATIONS = {
     q: 60
 }
 
-/**
- * @private
- */
 const buildSizes = (sizes = {}) => {
     const s = []
 
@@ -74,3 +75,5 @@ const buildSizes = (sizes = {}) => {
 
     return s.join(', ')
 }
+
+const averageWidth = (widths = []) => Math.round(widths.reduce((a, b) => a + b) / widths.length)
