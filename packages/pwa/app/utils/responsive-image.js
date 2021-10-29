@@ -12,8 +12,18 @@ import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
  * @param {string} props.src - The image's url
  * @param {Object} [props.sizes] - Defines how the image responds across Chakra breakpoints
  * @param {number[]} [props.widths] - Will be used to generate the image's srcset
- * @param {Object} [props.transformations] - How to transform the image's url
+ * @param {Object} [props.transformations] - How to transform the image's url {@link https://documentation.b2c.commercecloud.salesforce.com/DOC1/topic/com.demandware.dochelp/content/b2c_commerce/topics/image_management/b2c_creating_image_transformation_urls.html}
  * @return {Object} - Props for an image component
+ *
+ * @example
+ * <Img
+ *     {...getImageProps({
+ *         src,
+ *         sizes: {base: 'calc(100vw / 2)', md: '500px'},
+ *         widths: [500, 1000, 1500],
+ *         transformations: {q: 60}
+ *     })}
+ * />
  */
 export const getImageProps = ({src, sizes, widths, transformations, ...otherProps}) => {
     const url = transformImageUrl(src, transformations)
