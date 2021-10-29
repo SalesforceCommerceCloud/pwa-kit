@@ -18,13 +18,12 @@ jest.mock('./utils', () => {
 })
 
 describe('routeModifier', function() {
-    test('should return modified routes', () => {
+    test('should return basePath with locale', () => {
         getUrlConfig.mockImplementation(() => ({
             locale: 'path'
         }))
         const locale = 'en-GB'
         const url = getLocaleAndSiteBasePath(locale)
-        console.log('nurlew', url)
         expect(url).toEqual('/en-GB')
     })
 })

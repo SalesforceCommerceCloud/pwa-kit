@@ -7,21 +7,19 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {Link as ChakraLink} from '@chakra-ui/react'
-import {Link as SPALink, NavLink as NavSPALink} from 'react-router-dom'
+import {Link as SPALink, NavLink as NavSPALink, useLocation} from 'react-router-dom'
 import {useIntl} from 'react-intl'
-import {routeBuilder} from '../../utils/url'
+import {buildPathWithLocaleAndSiteParams} from '../../utils/url'
 
 const Link = React.forwardRef(({href, to, useNavLink = false, ...props}, ref) => {
     const _href = to || href
     const {locale} = useIntl()
-    const basePath = `/${locale}`
-    console.log('_href', _href)
     return (
         <ChakraLink
             as={useNavLink ? NavSPALink : SPALink}
             {...(useNavLink && {exact: true})}
             {...props}
-            to={_href === '/' ? '/' : _href}
+            to={_href === '/' ? '/' : buildPathWithLocaleAndSiteParams(_href, {locale})}
             ref={ref}
         />
     )

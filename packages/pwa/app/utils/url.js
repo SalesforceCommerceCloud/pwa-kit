@@ -6,7 +6,7 @@
  */
 
 import {DEFAULT_LOCALE} from '../constants'
-import {getUrlConfig, urlsConfigValidator} from './utils'
+import {getUrlConfig} from './utils'
 import {urlParamTypes} from '../constants'
 
 /**
@@ -84,8 +84,12 @@ export const buildUrlSet = (url = '', key = '', values = [], extraParams = {}) =
  * @returns {string}
  */
 export const categoryUrlBuilder = (category, options) => {
-    const {locale} = options
-    return encodeURI(`/category/${category.id}`)
+    const {locale = DEFAULT_LOCALE} = options
+    console.log('locale', locale)
+    const url = `/category/${category.id}`
+    const updatedUrl = buildPathWithLocaleAndSiteParams(url, {locale})
+    console.log('updatedUrl', updatedUrl)
+    return encodeURI(updatedUrl)
 }
 
 /**
@@ -97,9 +101,9 @@ export const categoryUrlBuilder = (category, options) => {
  */
 export const productUrlBuilder = (product, options = {}) => {
     const productPath = `/product/${product.id}`
-    const {locale = DEFAULT_LOCALE, ...rest} = options
-    const updatedUrl = routeBuilder(productPath, {locale, ...rest})
-    return encodeURI(productPath)
+    const {locale = DEFAULT_LOCALE} = options
+    const updatedUrl = buildPathWithLocaleAndSiteParams(productPath, {locale})
+    return encodeURI(updatedUrl)
 }
 
 /**
@@ -110,9 +114,10 @@ export const productUrlBuilder = (product, options = {}) => {
  * @returns {string}
  */
 export const searchUrlBuilder = (searchTerm, options = {}) => {
+    const {locale = DEFAULT_LOCALE} = options
     const searchPath = `/search?q=${searchTerm}`
-    const updatedPath = routeBuilder(searchPath, options)
-    return encodeURI(updatedPath)
+    const updatedUrl = buildPathWithLocaleAndSiteParams(searchPath, {locale})
+    return encodeURI(updatedUrl)
 }
 
 /**
@@ -170,8 +175,7 @@ export const getUrlWithLocale = (shortCode, opts = {}) => {
  * @returns {string}
  */
 export const homeUrlBuilder = (homeHref, options) => {
-    const updatedUrl = routeBuilder(homeHref, options)
-    return encodeURI(updatedUrl)
+    return encodeURI(homeHref)
 }
 
 /*
@@ -209,39 +213,34 @@ export const removeQueryParamsFromPath = (path, keys) => {
 }
 
 /**
- * Build a route based on the url configuration
- * if the type = path => append its value to the url
- * if the type = query param => build the url with updated query params
+ * Rebuild the path by adding/removing locale/site query params based on url config
  * @param {string} url - based url of the output url
  * @param {object} options - object that contains values of url config key
  * @return {string} - an output url
+ *
+ * @example
+ * //pwa-kit config
+ * url {
+ *    locale: "query_param"
+ * }
+ * buildPathWithLocaleAndSiteParams('/women/dresses/', {locale: 'en-GB'})
+ *
+ * Returns
+ *  /women/dresses/?locale=en-GB
+ *
  */
-export const routeBuilder = (url, options = {}) => {
-    const urlsConfig = getUrlConfig()
-    if (!urlsConfigValidator(urlsConfig, Object.values(urlParamTypes))) return url
-    if (!Object.keys(urlsConfig).length) return url
-    let urlSegments = []
+export const buildPathWithLocaleAndSiteParams = (url, options = {}) => {
+    const urlConfig = getUrlConfig()
+    const {locale: localeParamType, siteId: siteIdParamType} = urlConfig
     const queryParams = {}
 
-    Object.keys(urlsConfig).forEach((key) => {
-        const type = urlsConfig[key]
-        if (!options[key]) {
-            return
-        }
-        if (type === urlParamTypes.PATH) {
-            urlSegments.push(options[key])
-        }
-        if (type === urlParamTypes.QUERY_PARAM) {
-            queryParams[key] = options[key]
-        }
-    })
-
-    // build the pathname
-    let updatedPath = `${urlSegments.length ? `/${urlSegments.join('/')}` : ''}${url}`
-    // append the query param to pathname if there is any
-    if (Object.keys(queryParams).length) {
-        updatedPath = rebuildPathWithParams(updatedPath, queryParams)
+    if (localeParamType === urlParamTypes.QUERY_PARAM && options['locale']) {
+        queryParams.locale = options.locale
     }
 
-    return updatedPath
+    if (siteIdParamType === urlParamTypes.QUERY_PARAM && options['locale']) {
+        queryParams.siteId = options.siteId
+    }
+
+    return Object.keys(queryParams).length ? rebuildPathWithParams(url, queryParams) : url
 }

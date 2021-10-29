@@ -57,7 +57,7 @@ const formatSuggestions = (searchSuggestions, input) => {
                 return {
                     type: 'phrase',
                     name: boldString(phrase.phrase, capitalize(input)),
-                    link: searchUrlBuilder(phrase.phrase)
+                    link: searchUrlBuilder(phrase.phrase, {locale: intl.locale})
                 }
             }
         )
@@ -143,12 +143,11 @@ const Search = (props) => {
         }
         saveRecentSearch(searchText)
         clearInput()
-        const path = searchUrlBuilder(searchText)
+        const path = searchUrlBuilder(searchText, {locale: intl.locale})
         navigate(path)
     }
 
     const closeAndNavigate = (link) => {
-        console.log('link', link)
         if (!link) {
             clearInput()
             setIsOpen(false)

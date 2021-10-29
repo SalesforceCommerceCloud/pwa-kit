@@ -154,8 +154,8 @@ export const render = async (req, res) => {
     const {basePath} = res.locals
 
     routes.some((_route) => {
-        const _path = basePath ? `${basePath}${_route.path}` : _route.path
-        const _match = matchPath(req.path, {..._route, path: _path})
+        const _path = req.path.replace(basePath, '')
+        const _match = matchPath(req.path, _route)
         if (_match) {
             match = _match
             route = {..._route, path: _path}
