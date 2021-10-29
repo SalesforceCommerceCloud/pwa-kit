@@ -41,7 +41,7 @@ import {IntlProvider} from 'react-intl'
 
 // Others
 import {watchOnlineStatus, flatten} from '../../utils/utils'
-import {getUrlWithLocale} from '../../utils/url'
+import {buildPathWithLocaleAndSiteParams, getUrlWithLocale} from '../../utils/url'
 import {getLocaleConfig, getPreferredCurrency} from '../../utils/locale'
 import {DEFAULT_CURRENCY, HOME_HREF, SUPPORTED_LOCALES} from '../../constants'
 
@@ -102,7 +102,7 @@ const App = (props) => {
 
     const onLogoClick = () => {
         // Goto the home page.
-        history.push(HOME_HREF)
+        history.push(buildPathWithLocaleAndSiteParams(HOME_HREF, {locale: targetLocale}))
 
         // Close the drawer.
         onClose()
@@ -110,14 +110,14 @@ const App = (props) => {
 
     const onCartClick = () => {
         // Goto the home page.
-        history.push(`/cart`)
+        history.push(buildPathWithLocaleAndSiteParams(`/cart`, {locale: targetLocale}))
 
         // Close the drawer.
         onClose()
     }
 
     const onAccountClick = () => {
-        const path = '/account'
+        const path = buildPathWithLocaleAndSiteParams('/account', {locale: targetLocale})
         // Link to account page for registered customer, open auth modal otherwise
         if (customer.isRegistered) {
             history.push(path)
@@ -129,7 +129,7 @@ const App = (props) => {
     }
 
     const onWishlistClick = () => {
-        const path = '/account/wishlist'
+        const path = buildPathWithLocaleAndSiteParams('/account/wishlist', {locale: targetLocale})
         history.push(path)
     }
 
