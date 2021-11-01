@@ -85,7 +85,7 @@ const ProductTile = (props) => {
                     <Img
                         {...getImageProps({
                             alt: image.alt,
-                            src: image.disBaseLink,
+                            src: image.disBaseLink || image.link,
                             ...imageProps
                         })}
                     />
@@ -137,7 +137,8 @@ ProductTile.propTypes = {
         currency: PropTypes.string,
         image: PropTypes.shape({
             alt: PropTypes.string,
-            disBaseLink: PropTypes.string
+            disBaseLink: PropTypes.string,
+            link: PropTypes.string
         }),
         price: PropTypes.number,
         productName: PropTypes.string,

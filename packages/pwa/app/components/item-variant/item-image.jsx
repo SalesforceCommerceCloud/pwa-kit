@@ -50,7 +50,7 @@ const ItemImage = ({imageProps, ratio = 1, ...props}) => {
                     {image && (
                         <Image
                             alt={image.alt}
-                            src={image.disBaseLink}
+                            src={image.disBaseLink || image.link}
                             ignoreFallback={true}
                             {...imageProps}
                         />

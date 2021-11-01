@@ -108,7 +108,7 @@ const ImageGallery = ({imageGroups = [], selectedVariationAttributes = {}, size}
                         <Img
                             {...getImageProps({
                                 alt: heroImage.alt,
-                                src: heroImage.disBaseLink,
+                                src: heroImage.disBaseLink || heroImage.link,
                                 sizes: {
                                     base: '100vw',
                                     lg: heroImageMaxWidth
