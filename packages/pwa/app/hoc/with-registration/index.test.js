@@ -35,11 +35,7 @@ const MockedComponent = (props) => {
     )
 }
 
-jest.mock('../../commerce-api/hooks/useCustomer', () => {
-    return () => ({
-        isRegistered: false
-    })
-})
+jest.mock('../../commerce-api/hooks/useCustomer', () => jest.fn())
 
 beforeEach(() => {
     jest.resetModules()
@@ -47,6 +43,9 @@ beforeEach(() => {
 
 test('should execute onClick for registered users', async () => {
     const onClick = jest.fn()
+    useCustomer.mockImplementation(() => ({
+        isRegistered: true
+    }))
 
     renderWithProviders(<MockedComponent onClick={onClick} />)
 
@@ -58,7 +57,9 @@ test('should execute onClick for registered users', async () => {
 
 test('should show login modal if user not registered', () => {
     const onClick = jest.fn()
-
+    useCustomer.mockImplementation(() => ({
+        isRegistered: false
+    }))
     renderWithProviders(<MockedComponent onClick={onClick} />)
 
     const trigger = screen.getByText(/button/i)
