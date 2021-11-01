@@ -7,14 +7,19 @@
 import React, {useEffect} from 'react'
 import {screen, waitFor} from '@testing-library/react'
 import user from '@testing-library/user-event'
-import {rest} from 'msw'
-import {setupServer} from 'msw/node'
 import {renderWithProviders} from '../../utils/test-utils'
 import AccountAddresses from './addresses'
 import useCustomer from '../../commerce-api/hooks/useCustomer'
-import {mockedRegisteredCustomer} from '../../commerce-api/mock-data'
 
-let mockCustomer = {}
+const mockCustomer = {
+    authType: 'registered',
+    customerId: 'registeredCustomerId',
+    customerNo: 'testno',
+    email: 'darek@test.com',
+    firstName: 'Tester',
+    lastName: 'Testing',
+    login: 'darek@test.com'
+}
 
 jest.setTimeout(30000)
 
@@ -23,6 +28,14 @@ jest.mock('../../commerce-api/utils', () => {
     return {
         ...originalModule,
         isTokenValid: jest.fn().mockReturnValue(true)
+    }
+})
+
+jest.mock('../../commerce-api/auth', () => {
+    return class AuthMock {
+        login() {
+            return mockCustomer
+        }
     }
 })
 
@@ -45,6 +58,10 @@ jest.mock('commerce-sdk-isomorphic', () => {
                 mockCustomer.addresses = undefined
                 return {}
             }
+
+            async getCustomer() {
+                return mockCustomer
+            }
         }
     }
 })
@@ -56,7 +73,7 @@ jest.mock('@chakra-ui/toast', () => {
     }
 })
 
-const MockedComponent = () => {
+const WrappedAddress = () => {
     const customer = useCustomer()
     useEffect(() => {
         customer.login('test@test.com', 'password')
@@ -69,67 +86,14 @@ const MockedComponent = () => {
     )
 }
 
-const server = setupServer(
-    rest.post('*/customers/actions/login', (req, res, ctx) =>
-        res(ctx.delay(0), ctx.set('authorization', `Bearer fakeToken`), ctx.json(mockCustomer))
-    ),
-    rest.get('*/customers/:customerId', (req, res, ctx) =>
-        res(ctx.delay(0), ctx.json(mockCustomer))
-    ),
-    rest.post('*/oauth2/authorize', (req, res, ctx) =>
-        res(ctx.delay(0), ctx.status(303), ctx.set('location', `/testcallback`))
-    ),
-
-    rest.get('*/oauth2/authorize', (req, res, ctx) =>
-        res(ctx.delay(0), ctx.status(303), ctx.set('location', `/testcallback`))
-    ),
-
-    rest.post('*/oauth2/login', (req, res, ctx) =>
-        res(ctx.delay(0), ctx.status(200), ctx.json(mockedRegisteredCustomer))
-    ),
-
-    rest.get('*/testcallback', (req, res, ctx) => {
-        return res(ctx.delay(0), ctx.status(200))
-    }),
-
-    rest.post('*/oauth2/token', (req, res, ctx) =>
-        res(
-            ctx.delay(0),
-            ctx.json({
-                customer_id: 'test',
-                access_token: 'testtoken',
-                refresh_token: 'testrefeshtoken',
-                usid: 'testusid',
-                enc_user_id: 'testEncUserId'
-            })
-        )
-    )
-)
-
 // Set up and clean up
 beforeEach(() => {
     jest.resetModules()
-    server.listen({onUnhandledRequest: 'error'})
-    mockCustomer = {
-        authType: 'registered',
-        customerId: 'registeredCustomerId',
-        customerNo: '00151503',
-        email: 'jkeane@64labs.com',
-        firstName: 'John',
-        lastName: 'Keane',
-        login: 'jkeane@64labs.com'
-    }
 })
-afterEach(() => {
-    localStorage.clear()
-    server.resetHandlers()
-})
-afterAll(() => server.close())
 
 test('Allows customer to add/edit/remove addresses', async () => {
-    renderWithProviders(<MockedComponent />)
+    renderWithProviders(<WrappedAddress />)
     await waitFor(() => expect(screen.getByText('registeredCustomerId')).toBeInTheDocument())
-
     expect(screen.getByText(/no saved addresses/i)).toBeInTheDocument()
 
     // add
