@@ -97,6 +97,9 @@ const ImageGallery = ({imageGroups = [], selectedVariationAttributes = {}, size}
 
     const heroImage = heroImageGroup?.images?.[selectedIndex]
     const thumbnailImages = thumbnailImageGroup?.images || []
+
+    const heroImageMaxWidth = styles.heroImage.maxWidth[3] // in px
+
     return (
         <Flex direction="column">
             {heroImage && (
@@ -108,11 +111,15 @@ const ImageGallery = ({imageGroups = [], selectedVariationAttributes = {}, size}
                                 src: heroImage.disBaseLink,
                                 sizes: {
                                     base: '100vw',
-                                    lg: styles.heroImage.maxWidth[3]
+                                    lg: heroImageMaxWidth
                                 },
-                                // TODO: For a 'large' image, it's only 800px wide - can we get larger images to work with?
-                                // TODO: revisit these numbers
-                                widths: [750, 1000, 1500, 2000]
+                                widths: [
+                                    393,
+                                    786,
+                                    1179,
+                                    parseInt(heroImageMaxWidth),
+                                    parseInt(styles.heroImage.maxWidth[3]) * 2
+                                ]
                             })}
                         />
                     </AspectRatio>

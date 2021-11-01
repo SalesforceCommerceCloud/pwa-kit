@@ -102,9 +102,10 @@ const ProductScroller = forwardRef(
                                                 sizes: {
                                                     base: '70vw',
                                                     md: '40vw',
-                                                    lg: '380px'
+                                                    lg: '30vw',
+                                                    '2xl': '489px'
                                                 },
-                                                widths: [380, 480, 760, 960, 1440]
+                                                widths: [275, 550, 825, 489, 978]
                                             }}
                                         />
                                     )}

@@ -402,7 +402,7 @@ const ProductList = (props) => {
                                                           md: `calc((100vw - ${filtersContainerWidth}) / 3)`,
                                                           '2xl': '387px'
                                                       },
-                                                      widths: [400, 800, 1200]
+                                                      widths: [189, 567, 387, 774]
                                                   }}
                                               />
                                           )
