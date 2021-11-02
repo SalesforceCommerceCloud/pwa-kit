@@ -17,14 +17,6 @@ import useCustomer from '../../commerce-api/hooks/useCustomer'
 jest.setTimeout(60000)
 jest.useFakeTimers()
 
-jest.mock('../../commerce-api/utils', () => {
-    const originalModule = jest.requireActual('../../commerce-api/utils')
-    return {
-        ...originalModule,
-        isTokenValid: jest.fn().mockReturnValue(true)
-    }
-})
-
 const ButtonWithRegistration = withRegistration(Button)
 
 const MockedComponent = (props) => {
