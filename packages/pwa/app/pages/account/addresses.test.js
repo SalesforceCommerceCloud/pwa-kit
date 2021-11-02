@@ -13,12 +13,7 @@ import useCustomer from '../../commerce-api/hooks/useCustomer'
 
 const mockCustomer = {
     authType: 'registered',
-    customerId: 'registeredCustomerId',
-    customerNo: 'testno',
-    email: 'darek@test.com',
-    firstName: 'Tester',
-    lastName: 'Testing',
-    login: 'darek@test.com'
+    customerId: 'registeredCustomerId'
 }
 
 jest.setTimeout(30000)
@@ -91,7 +86,7 @@ beforeEach(() => {
     jest.resetModules()
 })
 
-test('Allows customer to add/edit/remove addresses', async () => {
+test('Allows customer to add addresses', async () => {
     renderWithProviders(<WrappedAddress />)
     await waitFor(() => expect(screen.getByText('registeredCustomerId')).toBeInTheDocument())
     expect(screen.getByText(/no saved addresses/i)).toBeInTheDocument()
@@ -107,6 +102,11 @@ test('Allows customer to add/edit/remove addresses', async () => {
     user.type(screen.getByLabelText('Zip Code'), '33701')
     user.click(screen.getByText(/^Save$/i))
     expect(await screen.findByText(/Tropicana Field/i)).toBeInTheDocument()
+})
+
+test('Allows customer to edit addresses', async () => {
+    renderWithProviders(<WrappedAddress />)
+    await waitFor(() => expect(screen.getByText('registeredCustomerId')).toBeInTheDocument())
 
     // edit
     user.click(screen.getByText(/edit/i))
@@ -115,6 +115,11 @@ test('Allows customer to add/edit/remove addresses', async () => {
     user.click(screen.getByText(/Save$/i))
     expect(await screen.findByText(/333 main st/i)).toBeInTheDocument()
     expect(await screen.findByText(/default/i)).toBeInTheDocument()
+})
+
+test('Allows customer to remove addresses', async () => {
+    renderWithProviders(<WrappedAddress />)
+    await waitFor(() => expect(screen.getByText('registeredCustomerId')).toBeInTheDocument())
 
     // remove
     user.click(screen.getByText(/remove/i))
