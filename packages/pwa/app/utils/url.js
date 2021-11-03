@@ -218,7 +218,7 @@ export const removeQueryParamsFromPath = (path, keys) => {
  *  /women/dresses/?locale=en-GB
  *
  */
-export const buildPathWithPrefixedQuery = (url, configValues = {}) => {
+export const buildPathWithUrlConfigParams = (url, configValues = {}) => {
     const urlConfig = getUrlConfig()
     const {locale: localeParamType, siteId: siteIdParamType} = urlConfig
     const {locale, siteId} = configValues

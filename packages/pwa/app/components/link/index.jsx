@@ -9,7 +9,7 @@ import PropTypes from 'prop-types'
 import {Link as ChakraLink} from '@chakra-ui/react'
 import {Link as SPALink, NavLink as NavSPALink} from 'react-router-dom'
 import {useIntl} from 'react-intl'
-import {buildPathWithPrefixedQuery} from '../../utils/url'
+import {buildPathWithUrlConfigParams} from '../../utils/url'
 
 const Link = React.forwardRef(({href, to, useNavLink = false, ...props}, ref) => {
     const _href = to || href
@@ -19,7 +19,7 @@ const Link = React.forwardRef(({href, to, useNavLink = false, ...props}, ref) =>
             as={useNavLink ? NavSPALink : SPALink}
             {...(useNavLink && {exact: true})}
             {...props}
-            to={_href === '/' ? '/' : buildPathWithPrefixedQuery(_href, {locale})}
+            to={_href === '/' ? '/' : buildPathWithUrlConfigParams(_href, {locale})}
             ref={ref}
         />
     )
