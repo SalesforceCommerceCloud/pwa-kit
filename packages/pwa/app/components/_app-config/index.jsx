@@ -30,7 +30,7 @@ import {
 } from '../../constants'
 import {getPreferredCurrency} from '../../utils/locale'
 import {getUrlConfig} from '../../utils/utils'
-import {getLocaleAndSiteBasePath} from '../../utils/routes-utils'
+import {getBasePath} from '../../utils/routes-utils'
 
 const apiConfig = {
     ...commerceAPIConfig,
@@ -98,7 +98,7 @@ const AppConfig = ({children, locals = {}}) => {
 AppConfig.restore = (locals = {}) => {
     // Parse the locale from the page url.
     const locale = getLocale(locals) || DEFAULT_LOCALE
-    const basePath = getLocaleAndSiteBasePath(locale)
+    const basePath = getBasePath({locale})
 
     const currency = getPreferredCurrency(locale) || DEFAULT_CURRENCY
 

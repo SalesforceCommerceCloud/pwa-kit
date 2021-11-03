@@ -8,8 +8,7 @@
 import React, {Fragment, useRef, forwardRef} from 'react'
 import PropTypes from 'prop-types'
 import {useIntl} from 'react-intl'
-import {Link as RouteLink} from 'react-router-dom'
-
+import Link from '../link'
 // Project Components
 import LinksList from '../links-list'
 
@@ -19,7 +18,6 @@ import {
     Container,
     SimpleGrid,
     Flex,
-    Link,
     Stack,
     Popover,
     PopoverTrigger,
@@ -50,7 +48,6 @@ const ChevronIconTrigger = forwardRef(function ChevronIconTrigger(props, ref) {
 const ListMenuTrigger = ({item, name, isOpen, onOpen, onClose, hasItems}) => {
     const theme = useTheme()
     const {baseStyle} = theme.components.ListMenu
-    const {locale} = useIntl()
 
     const keyMap = {
         Escape: () => onClose(),
@@ -60,8 +57,7 @@ const ListMenuTrigger = ({item, name, isOpen, onOpen, onClose, hasItems}) => {
     return (
         <Box {...baseStyle.listMenuTriggerContainer}>
             <Link
-                as={RouteLink}
-                to={categoryUrlBuilder(item, {locale})}
+                to={categoryUrlBuilder(item)}
                 onMouseOver={onOpen}
                 {...baseStyle.listMenuTriggerLink}
                 {...(hasItems ? {name: name + ' __'} : {name: name})}
@@ -73,7 +69,6 @@ const ListMenuTrigger = ({item, name, isOpen, onOpen, onClose, hasItems}) => {
 
             {hasItems && (
                 <Link
-                    as={RouteLink}
                     to={'#'}
                     onMouseOver={onOpen}
                     onKeyDown={(e) => {

@@ -195,31 +195,3 @@ describe('removeQueryParamsFromPath test', () => {
         expect(updatedUrl).toEqual('/en/product/25501032M?something=123')
     })
 })
-
-describe('routeBuilder test', () => {
-    test('returns updated url with alias and locale', () => {
-        getUrlsConfig.mockImplementation(() => ({
-            alias: 'path',
-            locale: 'query_param'
-        }))
-        const updateUrl = routeBuilder('/woman/category?color=red', {
-            alias: 'global',
-            locale: 'en-US'
-        })
-        console.log('updateUrl', updateUrl)
-        expect(updateUrl).toEqual('/global/woman/category?color=red&locale=en-US')
-    })
-
-    test('throw an error on missing type', () => {
-        getUrlsConfig.mockImplementation(() => ({
-            alias: 'something',
-            locale: 'path'
-        }))
-        expect(() => {
-            routeBuilder('/woman/category?color=red', {
-                alias: 'hello',
-                locale: 'en-US'
-            })
-        }).toThrow('The type for alias is invalid. It should be one of [path, query_param]')
-    })
-})

@@ -30,14 +30,13 @@ import {RECENT_SEARCH_KEY, RECENT_SEARCH_LIMIT, RECENT_SEARCH_MIN_LENGTH} from '
 import {productUrlBuilder, searchUrlBuilder, categoryUrlBuilder} from '../../utils/url'
 
 const formatSuggestions = (searchSuggestions, input) => {
-    const intl = useIntl()
     return {
         categorySuggestions: searchSuggestions?.categorySuggestions?.categories?.map(
             (suggestion) => {
                 return {
                     type: 'category',
                     id: suggestion.id,
-                    link: categoryUrlBuilder({id: suggestion.id}, {locale: intl.locale}),
+                    link: categoryUrlBuilder({id: suggestion.id}),
                     name: boldString(suggestion.name, capitalize(input))
                 }
             }
@@ -49,7 +48,7 @@ const formatSuggestions = (searchSuggestions, input) => {
                 price: product.price,
                 productId: product.productId,
                 name: boldString(product.productName, capitalize(input)),
-                link: productUrlBuilder({id: product.productId}, {locale: intl.locale})
+                link: productUrlBuilder({id: product.productId})
             }
         }),
         phraseSuggestions: searchSuggestions?.categorySuggestions?.suggestedPhrases?.map(
@@ -57,7 +56,7 @@ const formatSuggestions = (searchSuggestions, input) => {
                 return {
                     type: 'phrase',
                     name: boldString(phrase.phrase, capitalize(input)),
-                    link: searchUrlBuilder(phrase.phrase, {locale: intl.locale})
+                    link: searchUrlBuilder(phrase.phrase)
                 }
             }
         )
@@ -76,7 +75,6 @@ const Search = (props) => {
     const navigate = useNavigation()
     const searchSuggestion = useSearchSuggestions()
     const searchInputRef = useRef()
-    const intl = useIntl()
     const [isOpen, setIsOpen] = useState(false)
     const recentSearches = getSessionJSONItem(RECENT_SEARCH_KEY)
     const searchSuggestions = formatSuggestions(
@@ -143,7 +141,7 @@ const Search = (props) => {
         }
         saveRecentSearch(searchText)
         clearInput()
-        const path = searchUrlBuilder(searchText, {locale: intl.locale})
+        const path = searchUrlBuilder(searchText)
         navigate(path)
     }
 

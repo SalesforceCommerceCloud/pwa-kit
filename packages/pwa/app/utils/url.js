@@ -80,44 +80,33 @@ export const buildUrlSet = (url = '', key = '', values = [], extraParams = {}) =
  * Given a category and the current locale returns an href to the product list page.
  *
  * @param {Object} category
- * @param {Object} options
  * @returns {string}
  */
-export const categoryUrlBuilder = (category, options) => {
-    const {locale = DEFAULT_LOCALE} = options
-    console.log('locale', locale)
+export const categoryUrlBuilder = (category) => {
     const url = `/category/${category.id}`
-    const updatedUrl = buildPathWithLocaleAndSiteParams(url, {locale})
-    console.log('updatedUrl', updatedUrl)
-    return encodeURI(updatedUrl)
+    return encodeURI(url)
 }
 
 /**
  * Given a product and the current locale returns an href to the product detail page.
  *
  * @param {Object} product
- * @param {Object} options
  * @returns {string}
  */
-export const productUrlBuilder = (product, options = {}) => {
+export const productUrlBuilder = (product) => {
     const productPath = `/product/${product.id}`
-    const {locale = DEFAULT_LOCALE} = options
-    const updatedUrl = buildPathWithLocaleAndSiteParams(productPath, {locale})
-    return encodeURI(updatedUrl)
+    return encodeURI(productPath)
 }
 
 /**
  * Given a search term, contructs a search url.
  *
  * @param {string} searchTerm
- * @param {object} options
  * @returns {string}
  */
-export const searchUrlBuilder = (searchTerm, options = {}) => {
-    const {locale = DEFAULT_LOCALE} = options
+export const searchUrlBuilder = (searchTerm) => {
     const searchPath = `/search?q=${searchTerm}`
-    const updatedUrl = buildPathWithLocaleAndSiteParams(searchPath, {locale})
-    return encodeURI(updatedUrl)
+    return encodeURI(searchPath)
 }
 
 /**
@@ -215,11 +204,11 @@ export const removeQueryParamsFromPath = (path, keys) => {
 /**
  * Rebuild the path by adding/removing locale/site query params based on url config
  * @param {string} url - based url of the output url
- * @param {object} options - object that contains values of url config key
+ * @param {object} configValues - object that contains values of url param config
  * @return {string} - an output url
  *
  * @example
- * //pwa-kit config
+ * //pwa-kit-config.json
  * url {
  *    locale: "query_param"
  * }
@@ -229,17 +218,25 @@ export const removeQueryParamsFromPath = (path, keys) => {
  *  /women/dresses/?locale=en-GB
  *
  */
-export const buildPathWithLocaleAndSiteParams = (url, options = {}) => {
+export const buildPathWithPrefixedQuery = (url, configValues = {}) => {
+    console.log('configValues', configValues)
     const urlConfig = getUrlConfig()
     const {locale: localeParamType, siteId: siteIdParamType} = urlConfig
+    const {locale, siteId} = configValues
     const queryParams = {}
 
-    if (localeParamType === urlParamTypes.QUERY_PARAM && options['locale']) {
-        queryParams.locale = options.locale
+    if (localeParamType === urlParamTypes.QUERY_PARAM) {
+        if (!locale) {
+            throw new Error("Can't find value for locale")
+        }
+        queryParams.locale = locale
     }
 
-    if (siteIdParamType === urlParamTypes.QUERY_PARAM && options['locale']) {
-        queryParams.siteId = options.siteId
+    if (siteIdParamType === urlParamTypes.QUERY_PARAM) {
+        if (!siteId) {
+            throw new Error("Can't find value for siteId")
+        }
+        queryParams.siteId = siteId
     }
 
     return Object.keys(queryParams).length ? rebuildPathWithParams(url, queryParams) : url

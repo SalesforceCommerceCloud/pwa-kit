@@ -1,8 +1,8 @@
 {
     "app": {
         "url": {
-          "locale": "path",
-          "siteId": "path"
+          "locale": "query_param",
+          "siteId": "none"
         }
     }
 }

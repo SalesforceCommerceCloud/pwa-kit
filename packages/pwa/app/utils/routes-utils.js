@@ -11,20 +11,26 @@ import {urlParamTypes} from '../constants'
 /**
  *  a function returns basePath string for locale/siteId/siteAlias
  *  by reading over the url config inside the pwa-kit-config.json file
- * @param locale
- * @param siteId
+ * @param configValues {object} - object contains values for prefixed url params
  * @returns {string}
  */
-export const getLocaleAndSiteBasePath = (locale, siteId) => {
+export const getBasePath = (configValues = {}) => {
     const urlConfig = getUrlConfig()
     const paths = []
-    const localeReplacement = urlConfig['locale']
-    if (localeReplacement === urlParamTypes.PATH && locale) {
+    const {locale, siteId} = configValues
+    const localePlacement = urlConfig['locale']
+    if (localePlacement === urlParamTypes.PATH) {
+        if (!locale) {
+            throw new Error("Can't find the value of locale")
+        }
         paths.push(locale)
     }
 
-    const siteIdReplacement = urlConfig['siteId']
-    if (siteIdReplacement === urlParamTypes.PATH && siteId) {
+    const siteIdPlacement = urlConfig['siteId']
+    if (siteIdPlacement === urlParamTypes.PATH) {
+        if (!siteId) {
+            throw new Error("Can' find the value of siteId")
+        }
         paths.push(siteId)
     }
 

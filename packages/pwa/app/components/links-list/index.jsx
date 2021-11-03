@@ -6,8 +6,9 @@
  */
 import React from 'react'
 import PropTypes from 'prop-types'
-import {Box, List, ListItem, Link, Heading, HStack, useMultiStyleConfig} from '@chakra-ui/react'
-import {Link as RouteLink} from 'react-router-dom'
+import {Box, List, ListItem, Heading, HStack, useMultiStyleConfig} from '@chakra-ui/react'
+// import {Link as RouteLink} from 'react-router-dom'
+import Link from '../link'
 
 const LinksList = ({
     links = [],
@@ -24,7 +25,6 @@ const LinksList = ({
             {heading &&
                 (heading.href ? (
                     <Link
-                        as={RouteLink}
                         to={heading.href}
                         onClick={onLinkClick}
                         ref={headingLinkRef}
@@ -45,7 +45,7 @@ const LinksList = ({
                             {links.map((link, i) => (
                                 <ListItem key={i} {...styles.listItem} sx={styles.listItemSx}>
                                     <Link
-                                        as={RouteLink}
+                                        as={Link}
                                         to={link.href}
                                         onClick={onLinkClick}
                                         {...(link.styles ? link.styles : {})}
@@ -59,7 +59,7 @@ const LinksList = ({
                         links.map((link, i) => (
                             <ListItem key={i}>
                                 <Link
-                                    as={RouteLink}
+                                    as={Link}
                                     to={link.href}
                                     onClick={onLinkClick}
                                     {...(link.styles ? link.styles : {})}
