@@ -7,7 +7,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {Link as ChakraLink} from '@chakra-ui/react'
-import {Link as SPALink, NavLink as NavSPALink, useLocation} from 'react-router-dom'
+import {Link as SPALink, NavLink as NavSPALink} from 'react-router-dom'
 import {useIntl} from 'react-intl'
 import {buildPathWithPrefixedQuery} from '../../utils/url'
 

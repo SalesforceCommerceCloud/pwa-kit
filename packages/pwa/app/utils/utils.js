@@ -166,7 +166,8 @@ export const getUrlConfig = () => pwaKitConfig.app.url
 
 export const urlsConfigValidator = (urlConfig) => {
     return Object.keys(urlConfig).every((key) => {
-        if (!Object.values(urlParamTypes).includes(urlConfig[key])) {
+        const types = Object.values(urlParamTypes)
+        if (!types.includes(urlConfig[key])) {
             const errorMsg = `The type for ${key} is invalid. It should be one of [${types.join(
                 ', '
             )}]`

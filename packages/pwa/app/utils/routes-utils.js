@@ -34,5 +34,5 @@ export const getBasePath = (configValues = {}) => {
         paths.push(siteId)
     }
 
-    return `${paths.length ? `/${paths.join('/')}` : ''}`
+    return paths.length ? `/${paths.join('/')}` : ''
 }

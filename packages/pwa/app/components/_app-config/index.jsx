@@ -21,13 +21,7 @@ import {
 } from '../../commerce-api/contexts'
 import {commerceAPIConfig} from '../../commerce-api.config'
 import {einsteinAPIConfig} from '../../einstein-api.config'
-import {
-    DEFAULT_LOCALE,
-    SUPPORTED_LOCALES,
-    DEFAULT_CURRENCY,
-    urlParamTypes,
-    HOME_HREF
-} from '../../constants'
+import {DEFAULT_LOCALE, SUPPORTED_LOCALES, DEFAULT_CURRENCY, urlParamTypes} from '../../constants'
 import {getPreferredCurrency} from '../../utils/locale'
 import {getUrlConfig} from '../../utils/utils'
 import {getBasePath} from '../../utils/routes-utils'
@@ -65,7 +59,6 @@ const getLocale = (locals = {}) => {
     shortCode = SUPPORTED_LOCALES.find((locale) => locale.id === shortCode)
         ? shortCode
         : DEFAULT_LOCALE
-    console.log('shortCode', shortCode)
 
     return shortCode
 }

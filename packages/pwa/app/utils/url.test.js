@@ -13,10 +13,8 @@ import {
     getUrlWithLocale,
     homeUrlBuilder,
     rebuildPathWithParams,
-    removeQueryParamsFromPath,
-    routeBuilder
+    removeQueryParamsFromPath
 } from './url'
-import {getUrlsConfig} from './utils'
 
 import {DEFAULT_LOCALE} from '../constants'
 

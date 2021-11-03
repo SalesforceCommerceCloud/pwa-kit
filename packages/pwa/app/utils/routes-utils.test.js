@@ -5,9 +5,8 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React from 'react'
 import {getUrlConfig} from './utils'
-import {getLocaleAndSiteBasePath} from './routes-utils'
+import {getBasePath} from './routes-utils'
 
 jest.mock('./utils', () => {
     const original = jest.requireActual('./utils')
@@ -23,7 +22,7 @@ describe('routeModifier', function() {
             locale: 'path'
         }))
         const locale = 'en-GB'
-        const url = getLocaleAndSiteBasePath(locale)
+        const url = getBasePath(locale)
         expect(url).toEqual('/en-GB')
     })
 })

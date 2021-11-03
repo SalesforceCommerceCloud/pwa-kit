@@ -163,7 +163,7 @@ export const getUrlWithLocale = (shortCode, opts = {}) => {
  * @param options
  * @returns {string}
  */
-export const homeUrlBuilder = (homeHref, options) => {
+export const homeUrlBuilder = (homeHref) => {
     return encodeURI(homeHref)
 }
 
@@ -219,7 +219,6 @@ export const removeQueryParamsFromPath = (path, keys) => {
  *
  */
 export const buildPathWithPrefixedQuery = (url, configValues = {}) => {
-    console.log('configValues', configValues)
     const urlConfig = getUrlConfig()
     const {locale: localeParamType, siteId: siteIdParamType} = urlConfig
     const {locale, siteId} = configValues
