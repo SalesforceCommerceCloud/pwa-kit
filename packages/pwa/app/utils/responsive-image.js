@@ -96,78 +96,58 @@ const buildSizes = (sizes = {}) => {
 const FOO = () => {
     const DISImage = (
         <Image
-            {...getImageProps({
-                // With the special syntax `[{}]`, this `src` will be mapped to
-                // the fallback src attribute (for old browser that doesn't support srcSet)
-                // of "https://edge.disstg.commercecloud.salesforce.com/...jpg" (without ?sw=)
-                src:
-                    'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw1e4fcb17/images/large/PG.10212867.JJ3XYXX.PZ.jpg[?sw={width}]',
-                transformations: {
-                    q: 60
-                },
+            // With the special syntax `[{}]`, this `src` will be mapped to
+            // the fallback src attribute (for old browser that doesn't support srcSet)
+            // of "https://edge.disstg.commercecloud.salesforce.com/...jpg" (without ?sw=)
+            src="https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw1e4fcb17/images/large/PG.10212867.JJ3XYXX.PZ.jpg[?sw={width}]"
+            transformations={{
+                q: 60
+            }}
+            // `vwSizes` will be automatically mapped to sizes and srcSet attributes
+            // and thus less work for the users when implementing responsive images.
 
-                // `vwSizes` will be automatically mapped to sizes and srcSet attributes
-                // and thus less work for the users when implementing responsive images.
-
-                // Why I chose this name?
-                // - 'vw', because the values are in vw unit (not px)
-                // - 'Sizes' and not width/srcset, because the values correspond to responsive breakpoints
-                vwSizes: [100, 100, 100, 50]
-                // OR vwSizes: {base: 100, lg: 50}
-            })}
+            // Why I chose this name?
+            // - 'vw', because the values are in vw unit (not px)
+            // - 'Sizes' and not width/srcset, because the values correspond to responsive breakpoints
+            vwSizes={[100, 100, 100, 50]}
+            // OR vwSizes={{base: 100, lg: 50}}
         />
     )
 
     // Flexible enough to support other kinds of image urls
     const nonDISImage = (
         <Image
-            {...getImageProps({
-                // This is a static bundled image
-                src: 'https://example.com/image[_{width}].jpg', // e.g. image_720.jpg
-
-                // While an image service allows us to use any sized images, we can't do that with static bundled images.
-                // Thus we can't accept `vwSizes` here but we can let the users manually specify the sizes and srcSet.
-                sizes: ['100vw', '100vw', '50vw', '350px'], // Remember: sizes relate to Chakra breakpoints
-                srcSet: [300, 720, 1000, 1500] // srcSet values will be interpreted in px unit
-            })}
+            // This is a static bundled image
+            src="https://example.com/image[_{width}].jpg" // e.g. image_720.jpg
+            // While an image service allows us to use any sized images, we can't do that with static bundled images.
+            // Thus we can't accept `vwSizes` here but we can let the users manually specify the sizes and srcSet.
+            sizes={['100vw', '100vw', '50vw', '350px']} // Remember: sizes relate to Chakra breakpoints
+            srcSet={[300, 720, 1000, 1500]} // srcSet values will be interpreted in px unit
         />
     )
 
     // Mimicking Chakra's style prop, you can pass in either object or array for `sizes`
-    // (Note: this is already implemented in the PR)
     const sizesWithObjectOrArray = (
         <Image
-            {...getImageProps({
-                src: 'https://example.com/image[_{width}].jpg',
-                sizes: {
-                    base: 'calc(100vw / 2)',
-                    md: `calc((100vw - 280px) / 3)`,
-                    '2xl': '387px'
-                },
-                srcSet: [189, 567, 387, 774]
-            })}
+            src="https://example.com/image[_{width}].jpg"
+            sizes={{
+                base: 'calc(100vw / 2)',
+                md: `calc((100vw - 280px) / 3)`,
+                '2xl': '387px'
+            }}
+            srcSet={[189, 567, 387, 774]}
         />
     )
 
     // Can pass in literal, handcrafted values
     const withLiteralValues = (
         <Image
-            {...getImageProps({
-                src: 'https://example.com/image.jpg',
-                sizes: '(min-width: 1200px) 800px, (min-width: 720px) 50vw, 100vw',
-                srcSet:
-                    'https://example.com/image_800.jpg 800w, https://example.com/image_1600.jpg 1600w'
-            })}
+            src="https://example.com/image.jpg"
+            sizes="(min-width: 1200px) 800px, (min-width: 720px) 50vw, 100vw"
+            srcSet="https://example.com/image_800.jpg 800w, https://example.com/image_1600.jpg 1600w"
         />
     )
 
     // No sizes or srcSet attributes? No problem.
-    // (Note: this is already implemented in the PR)
-    const nonResponsiveImage = (
-        <Image
-            {...getImageProps({
-                src: 'https://example.com/image.jpg'
-            })}
-        />
-    )
+    const nonResponsiveImage = <Image src="https://example.com/image.jpg" />
 }
