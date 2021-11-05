@@ -10,10 +10,27 @@ import user from '@testing-library/user-event'
 import {renderWithProviders} from '../../utils/test-utils'
 import useCustomer from '../../commerce-api/hooks/useCustomer'
 import Orders from './orders'
+import OrderHistory from './order-history'
+import OrderDetail from './order-detail'
 
-const MockedComponent = () => {
+jest.useFakeTimers()
+jest.setTimeout(30000)
+
+const mockCustomer = {
+    authType: 'registered',
+    customerId: 'registeredCustomerId'
+}
+
+const MockedOrderHistory = () => {
     const customer = useCustomer()
-    customer.login('test@test.com', 'password')
+    useEffect(() => {
+        customer.login('test@test.com', 'password')
+    }, [])
+
+    //Only render orders after login is complete
+    if (!customer.customerId) {
+        return null
+    }
     return (
         <div>
             <div>{customer.customerId}</div>
@@ -22,9 +39,22 @@ const MockedComponent = () => {
     )
 }
 
-const mockCustomer = {
-    authType: 'registered',
-    customerId: 'registeredCustomerId'
+const MockedOrderDetails = () => {
+    const customer = useCustomer()
+    useEffect(() => {
+        customer.login('test@test.com', 'password')
+    }, [])
+
+    //Only render orders after login is complete
+    if (!customer.customerId) {
+        return null
+    }
+    return (
+        <div>
+            <div>{customer.customerId}</div>
+            <OrderDetail />
+        </div>
+    )
 }
 
 const mockOrderHistory = {
@@ -1319,12 +1349,13 @@ jest.mock('commerce-sdk-isomorphic', () => {
                 return mockOrderHistory
             }
 
-            async getCustomerOrderProductsDetail() {
-                return mockOrderProducts
-            }
-
             async getCustomer() {
                 return mockCustomer
+            }
+        },
+        ShopperProducts: class ShopperProductsMock extends sdk.ShopperProducts {
+            async getProducts() {
+                return mockOrderProducts
             }
         }
     }
@@ -1335,8 +1366,8 @@ beforeEach(() => {
     jest.resetModules()
 })
 
-test('Renders order history and details', async () => {
-    renderWithProviders(<MockedComponent />)
+test('Renders order history', async () => {
+    renderWithProviders(<MockedOrderHistory />)
     expect(await screen.findByTestId('account-order-history-page')).toBeInTheDocument()
     expect(await screen.findAllByText(/Ordered: /i)).toHaveLength(3)
     expect(
@@ -1346,8 +1377,10 @@ test('Renders order history and details', async () => {
             {timeout: 15000}
         )
     ).toHaveLength(3)
+})
 
-    user.click((await screen.findAllByText(/view details/i))[0])
+test('Renders order details', async () => {
+    renderWithProviders(<MockedOrderDetails />)
     expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
     expect(await screen.findByText(/order number: 00028011/i)).toBeInTheDocument()
     expect(
