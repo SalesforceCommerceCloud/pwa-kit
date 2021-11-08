@@ -82,10 +82,7 @@ export const buildUrlSet = (url = '', key = '', values = [], extraParams = {}) =
  * @param {Object} category
  * @returns {string}
  */
-export const categoryUrlBuilder = (category) => {
-    const url = `/category/${category.id}`
-    return encodeURI(url)
-}
+export const categoryUrlBuilder = (category) => encodeURI(`/category/${category.id}`)
 
 /**
  * Given a product and the current locale returns an href to the product detail page.
@@ -93,10 +90,7 @@ export const categoryUrlBuilder = (category) => {
  * @param {Object} product
  * @returns {string}
  */
-export const productUrlBuilder = (product) => {
-    const productPath = `/product/${product.id}`
-    return encodeURI(productPath)
-}
+export const productUrlBuilder = (product) => encodeURI(`/product/${product.id}`)
 
 /**
  * Given a search term, contructs a search url.
@@ -104,10 +98,7 @@ export const productUrlBuilder = (product) => {
  * @param {string} searchTerm
  * @returns {string}
  */
-export const searchUrlBuilder = (searchTerm) => {
-    const searchPath = `/search?q=${searchTerm}`
-    return encodeURI(searchPath)
-}
+export const searchUrlBuilder = (searchTerm) => `/search?q=${searchTerm}`
 
 /**
  * Returns a relative URL for a locale short code.
