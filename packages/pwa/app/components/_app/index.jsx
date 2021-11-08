@@ -41,12 +41,13 @@ import {IntlProvider} from 'react-intl'
 
 // Others
 import {watchOnlineStatus, flatten} from '../../utils/utils'
-import {buildPathWithUrlConfigParams, getUrlWithLocale} from '../../utils/url'
+import {getUrlWithLocale} from '../../utils/url'
 import {getLocaleConfig, getPreferredCurrency} from '../../utils/locale'
 import {DEFAULT_CURRENCY, HOME_HREF, SUPPORTED_LOCALES} from '../../constants'
 
 import Seo from '../seo'
 import useWishlist from '../../hooks/use-wishlist'
+import usePreserveParamsHistory from '../../hooks/use-preserve-params-history'
 
 const DEFAULT_NAV_DEPTH = 3
 const DEFAULT_ROOT_CATEGORY = 'root'
@@ -56,7 +57,7 @@ const App = (props) => {
 
     const appOrigin = getAppOrigin()
 
-    const history = useHistory()
+    const historyNavigator = usePreserveParamsHistory({locale: targetLocale})
     const location = useLocation()
     const authModal = useAuthModal()
     const customer = useCustomer()
@@ -68,7 +69,7 @@ const App = (props) => {
     // Used to conditionally render header/footer for checkout page
     const isCheckout = /\/checkout$/.test(location?.pathname)
 
-    // Get the current currency to be used throught the app
+    // Get the current currency to be used through out the app
     const currency = getPreferredCurrency(targetLocale) || DEFAULT_CURRENCY
 
     // Set up customer and basket
@@ -102,35 +103,31 @@ const App = (props) => {
 
     const onLogoClick = () => {
         // Goto the home page.
-        history.push(buildPathWithUrlConfigParams(HOME_HREF, {locale: targetLocale}))
-
+        historyNavigator('/')
         // Close the drawer.
         onClose()
     }
 
     const onCartClick = () => {
-        // Goto the home page.
-        history.push(buildPathWithUrlConfigParams(`/cart`, {locale: targetLocale}))
+        historyNavigator('/cart')
 
         // Close the drawer.
         onClose()
     }
 
     const onAccountClick = () => {
-        const path = buildPathWithUrlConfigParams('/account', {locale: targetLocale})
         // Link to account page for registered customer, open auth modal otherwise
         if (customer.isRegistered) {
-            history.push(path)
+            historyNavigator('/account')
         } else {
             // if they already are at the login page, do not show login modal
-            if (new RegExp(path).test(location.pathname)) return
+            if (new RegExp(`^/login$`).test(location.pathname)) return
             authModal.onOpen()
         }
     }
 
     const onWishlistClick = () => {
-        const path = buildPathWithUrlConfigParams('/account/wishlist', {locale: targetLocale})
-        history.push(path)
+        historyNavigator('/account/wishlist')
     }
 
     return (
