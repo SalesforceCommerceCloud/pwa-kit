@@ -25,6 +25,7 @@ import {DEFAULT_LOCALE, SUPPORTED_LOCALES, DEFAULT_CURRENCY, urlParamTypes} from
 import {getPreferredCurrency} from '../../utils/locale'
 import {getUrlConfig} from '../../utils/utils'
 import {getBasePath} from '../../utils/routes-utils'
+import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
 
 const apiConfig = {
     ...commerceAPIConfig,
@@ -46,7 +47,7 @@ const getLocale = (locals = {}) => {
         originalUrl = window?.location.href.replace(window.location.origin, '')
     }
     let shortCode
-    const {pathname, searchParams} = new URL(`http://hostname${originalUrl}`)
+    const {pathname, searchParams} = new URL(`${getAppOrigin()}${originalUrl}`)
 
     if (localeType === urlParamTypes.PATH) {
         // Parse the pathname from the partial using the URL object and a placeholder host

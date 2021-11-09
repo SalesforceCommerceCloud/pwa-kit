@@ -6,19 +6,19 @@
  */
 
 import {useHistory} from 'react-router-dom'
-import {rebuildPathWithParams} from '../utils/url'
+import {buildPathWithUrlConfigParams} from '../utils/url'
 
 /**
  * A hook to preserve query param on history's `push` and `replace`
  *
- * @param preserve {object} - contains key-value for url query param
+ * @param {object} preservedQuery - contains key-value for url query param
  * @returns {function(*=, *=, ...[*]): void} - returns a navigate function that passes args to history
  */
-const usePreserveParamsHistory = (preserve = {}) => {
+const usePreserveParamsHistory = (preservedQuery = {}) => {
     const history = useHistory()
 
     return (path, action = 'push', ...args) => {
-        const _path = rebuildPathWithParams(path, preserve)
+        const _path = buildPathWithUrlConfigParams(path, preservedQuery)
         history[action](_path, ...args)
     }
 }
