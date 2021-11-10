@@ -3,40 +3,6 @@
     "version": "1.2.0-dev",
     "license": "See license in LICENSE",
     "private": true,
-    "mobify": {
-        "externals": [],
-        "pageNotFoundURL": "/page-not-found",
-        "ssrEnabled": true,
-        "ssrOnly": [
-            "ssr.js",
-            "ssr.js.map",
-            "node_modules/**/*.*"
-        ],
-        "ssrShared": [
-            "static/ico/favicon.ico",
-            "static/robots.txt",
-            "**/*.js",
-            "**/*.js.map",
-            "**/*.json"
-        ],
-        "ssrParameters": {
-            "ssrFunctionNodeVersion": "14.x",
-            "proxyConfigs": [
-                {
-                    "host": "kv7kzm78.api.commercecloud.salesforce.com",
-                    "path": "api"
-                },
-                {
-                    "host": "zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com",
-                    "path": "ocapi"
-                },
-                {
-                    "host": "api.cquotient.com",
-                    "path": "einstein"
-                }
-            ]
-        }
-    },
     "dependencies": {
         "@chakra-ui/icons": "^1.0.6",
         "@chakra-ui/react": "^1.6.12",
@@ -157,7 +123,7 @@
         "lint": "eslint \"**/*.{js,jsx}\"",
         "lint:fix": "npm run lint -- --fix",
         "prod:build": "npm run build-translations && cross-env NODE_ENV=production sdk-pwa-build",
-        "push": "cross-env NODE_ENV=production npm run prod:build && sdk-upload",
+        "push": "cross-env NODE_ENV=production sdk-upload",
         "save-credentials": "sdk-save-credentials",
         "start": "cross-env NODE_ICU_DATA=node_modules/full-icu node ./scripts/start ssr",
         "start:inspect": "npm run start -- --inspect",
