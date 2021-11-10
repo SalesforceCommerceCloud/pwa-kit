@@ -47,7 +47,7 @@ const argv = require('yargs')
     .option(POTENTIAL_OPTIONS.config, {
         alias: 'config',
         describe:
-            'relative path to the configuration file, default to the mobify key in package.json',
+            'the relative path to a configuration file, if not defined, configuration is taken from the mobify key in package.json',
         type: 'string'
     })
     .help('h')
@@ -55,7 +55,6 @@ const argv = require('yargs')
     .strict().argv
 
 const getOptions = (configFilePath) => {
-    console.log('getoptions')
     if (configFilePath) {
         return getOptionsFromConfig(configFilePath)
     }
