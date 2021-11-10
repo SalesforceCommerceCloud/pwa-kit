@@ -584,6 +584,12 @@
   "a5msuh": {
     "defaultMessage": "Yes"
   },
+  "action_card.button.edit": {
+    "defaultMessage": "Edit"
+  },
+  "action_card.button.remove": {
+    "defaultMessage": "Remove"
+  },
   "aheQdn": {
     "defaultMessage": "Last Name"
   },
@@ -645,6 +651,60 @@
   },
   "dfEp3Z": {
     "defaultMessage": "Yes, remove item"
+  },
+  "drawer_menu.button.account_details": {
+    "defaultMessage": "Account Details"
+  },
+  "drawer_menu.button.addresses": {
+    "defaultMessage": "Addresses"
+  },
+  "drawer_menu.button.log_out": {
+    "defaultMessage": "Log out"
+  },
+  "drawer_menu.button.my_account": {
+    "defaultMessage": "My Account"
+  },
+  "drawer_menu.button.order_history": {
+    "defaultMessage": "Order History"
+  },
+  "drawer_menu.button.payment_methods": {
+    "defaultMessage": "Payment Methods"
+  },
+  "drawer_menu.categories.shop_all": {
+    "defaultMessage": "Shop All"
+  },
+  "drawer_menu.link.about_us": {
+    "defaultMessage": "About Us"
+  },
+  "drawer_menu.link.customer_support": {
+    "defaultMessage": "Customer Support"
+  },
+  "drawer_menu.link.customer_support.contact_us": {
+    "defaultMessage": "Contact Us"
+  },
+  "drawer_menu.link.customer_support.shipping_and_returns": {
+    "defaultMessage": "Shipping & Returns"
+  },
+  "drawer_menu.link.our_company": {
+    "defaultMessage": "Our Company"
+  },
+  "drawer_menu.link.privacy_and_security": {
+    "defaultMessage": "Privacy & Security"
+  },
+  "drawer_menu.link.privacy_policy": {
+    "defaultMessage": "Privacy Policy"
+  },
+  "drawer_menu.link.sign_in": {
+    "defaultMessage": "Sign In"
+  },
+  "drawer_menu.link.site_map": {
+    "defaultMessage": "Site Map"
+  },
+  "drawer_menu.link.store_locator": {
+    "defaultMessage": "Store Locator"
+  },
+  "drawer_menu.link.terms_and_conditions": {
+    "defaultMessage": "Terms & Conditions"
   },
   "e//rzS": {
     "defaultMessage": "Italian (Italy)"
@@ -840,42 +900,6 @@
   },
   "mfahwZ": {
     "defaultMessage": "Recently Viewed"
-  },
-  "mobile_navigation.actions.sign_in": {
-    "defaultMessage": "Sign In"
-  },
-  "mobile_navigation.actions.store_locator": {
-    "defaultMessage": "Store Locator"
-  },
-  "mobile_navigation.categories.shop_all": {
-    "defaultMessage": "Shop All"
-  },
-  "mobile_navigation.links.customer_support": {
-    "defaultMessage": "Customer Support"
-  },
-  "mobile_navigation.links.customer_support.contact_us": {
-    "defaultMessage": "Contact Us"
-  },
-  "mobile_navigation.links.customer_support.shipping_and_returns": {
-    "defaultMessage": "Shipping & Returns"
-  },
-  "mobile_navigation.links.out_company": {
-    "defaultMessage": "Our Company"
-  },
-  "mobile_navigation.links.out_company.about_us": {
-    "defaultMessage": "About Us"
-  },
-  "mobile_navigation.links.privacy_and_security": {
-    "defaultMessage": "Privacy & Security"
-  },
-  "mobile_navigation.links.privacy_and_security.privacy_policy": {
-    "defaultMessage": "Privacy Policy"
-  },
-  "mobile_navigation.links.privacy_and_security.stie_map": {
-    "defaultMessage": "Site Map"
-  },
-  "mobile_navigation.links.privacy_and_security.terms_and_conditions": {
-    "defaultMessage": "Terms & Conditions"
   },
   "n/iZlE": {
     "defaultMessage": "Spanish (Chile)"

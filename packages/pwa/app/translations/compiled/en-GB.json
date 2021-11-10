@@ -1389,6 +1389,18 @@
       "value": "Yes"
     }
   ],
+  "action_card.button.edit": [
+    {
+      "type": 0,
+      "value": "Edit"
+    }
+  ],
+  "action_card.button.remove": [
+    {
+      "type": 0,
+      "value": "Remove"
+    }
+  ],
   "aheQdn": [
     {
       "type": 0,
@@ -1541,6 +1553,114 @@
     {
       "type": 0,
       "value": "Yes, remove item"
+    }
+  ],
+  "drawer_menu.button.account_details": [
+    {
+      "type": 0,
+      "value": "Account Details"
+    }
+  ],
+  "drawer_menu.button.addresses": [
+    {
+      "type": 0,
+      "value": "Addresses"
+    }
+  ],
+  "drawer_menu.button.log_out": [
+    {
+      "type": 0,
+      "value": "Log out"
+    }
+  ],
+  "drawer_menu.button.my_account": [
+    {
+      "type": 0,
+      "value": "My Account"
+    }
+  ],
+  "drawer_menu.button.order_history": [
+    {
+      "type": 0,
+      "value": "Order History"
+    }
+  ],
+  "drawer_menu.button.payment_methods": [
+    {
+      "type": 0,
+      "value": "Payment Methods"
+    }
+  ],
+  "drawer_menu.categories.shop_all": [
+    {
+      "type": 0,
+      "value": "Shop All"
+    }
+  ],
+  "drawer_menu.link.about_us": [
+    {
+      "type": 0,
+      "value": "About Us"
+    }
+  ],
+  "drawer_menu.link.customer_support": [
+    {
+      "type": 0,
+      "value": "Customer Support"
+    }
+  ],
+  "drawer_menu.link.customer_support.contact_us": [
+    {
+      "type": 0,
+      "value": "Contact Us"
+    }
+  ],
+  "drawer_menu.link.customer_support.shipping_and_returns": [
+    {
+      "type": 0,
+      "value": "Shipping & Returns"
+    }
+  ],
+  "drawer_menu.link.our_company": [
+    {
+      "type": 0,
+      "value": "Our Company"
+    }
+  ],
+  "drawer_menu.link.privacy_and_security": [
+    {
+      "type": 0,
+      "value": "Privacy & Security"
+    }
+  ],
+  "drawer_menu.link.privacy_policy": [
+    {
+      "type": 0,
+      "value": "Privacy Policy"
+    }
+  ],
+  "drawer_menu.link.sign_in": [
+    {
+      "type": 0,
+      "value": "Sign In"
+    }
+  ],
+  "drawer_menu.link.site_map": [
+    {
+      "type": 0,
+      "value": "Site Map"
+    }
+  ],
+  "drawer_menu.link.store_locator": [
+    {
+      "type": 0,
+      "value": "Store Locator"
+    }
+  ],
+  "drawer_menu.link.terms_and_conditions": [
+    {
+      "type": 0,
+      "value": "Terms & Conditions"
     }
   ],
   "e//rzS": [
@@ -1961,78 +2081,6 @@
     {
       "type": 0,
       "value": "Recently Viewed"
-    }
-  ],
-  "mobile_navigation.actions.sign_in": [
-    {
-      "type": 0,
-      "value": "Sign In"
-    }
-  ],
-  "mobile_navigation.actions.store_locator": [
-    {
-      "type": 0,
-      "value": "Store Locator"
-    }
-  ],
-  "mobile_navigation.categories.shop_all": [
-    {
-      "type": 0,
-      "value": "Shop All"
-    }
-  ],
-  "mobile_navigation.links.customer_support": [
-    {
-      "type": 0,
-      "value": "Customer Support"
-    }
-  ],
-  "mobile_navigation.links.customer_support.contact_us": [
-    {
-      "type": 0,
-      "value": "Contact Us"
-    }
-  ],
-  "mobile_navigation.links.customer_support.shipping_and_returns": [
-    {
-      "type": 0,
-      "value": "Shipping & Returns"
-    }
-  ],
-  "mobile_navigation.links.out_company": [
-    {
-      "type": 0,
-      "value": "Our Company"
-    }
-  ],
-  "mobile_navigation.links.out_company.about_us": [
-    {
-      "type": 0,
-      "value": "About Us"
-    }
-  ],
-  "mobile_navigation.links.privacy_and_security": [
-    {
-      "type": 0,
-      "value": "Privacy & Security"
-    }
-  ],
-  "mobile_navigation.links.privacy_and_security.privacy_policy": [
-    {
-      "type": 0,
-      "value": "Privacy Policy"
-    }
-  ],
-  "mobile_navigation.links.privacy_and_security.stie_map": [
-    {
-      "type": 0,
-      "value": "Site Map"
-    }
-  ],
-  "mobile_navigation.links.privacy_and_security.terms_and_conditions": [
-    {
-      "type": 0,
-      "value": "Terms & Conditions"
     }
   ],
   "n/iZlE": [
