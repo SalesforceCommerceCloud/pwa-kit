@@ -1,3 +1,7 @@
+## v1.1.2 (Nov 10, 2021)
+
+-   Security upgrade for `copy-webpack-plugin`, `valdator` and  `webpack-notifier` dependencies.
+
 ## v1.1.1 (Oct 21, 2021)
 
 -   Security upgrade for `http-proxy-middleware`
