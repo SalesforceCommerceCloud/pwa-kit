@@ -8,15 +8,6 @@ import * as utils from './utils'
 import EventEmitter from 'events'
 import {flatten, shallowEquals} from './utils'
 
-jest.mock('./url', () => {
-    const original = jest.requireActual('./url')
-    console.log('original', original)
-    return {
-        ...original,
-        getUrlsConfig1: jest.fn()
-    }
-})
-
 describe('requestIdleCallback should be a working shim', () => {
     test('without a working implementation built in', () => {
         return new Promise((resolve) => {

@@ -146,18 +146,6 @@ export const getUrlWithLocale = (shortCode, opts = {}) => {
     return relativeUrl
 }
 
-/**
- * Builds the Home page URL for a given locale.
- * We don't add the locale to the URL for the default locale.
- *
- * @param homeHref
- * @param options
- * @returns {string}
- */
-export const homeUrlBuilder = (homeHref) => {
-    return encodeURI(homeHref)
-}
-
 /*
  * Remove query params from a give url path based on a given list of keys
  *
