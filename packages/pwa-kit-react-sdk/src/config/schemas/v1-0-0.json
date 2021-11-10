@@ -1,0 +1,264 @@
+{
+    "definitions": {},
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "https://example.com/object1636505239.json",
+    "title": "Root",
+    "type": "object",
+    "required": ["version", "app", "server"],
+    "properties": {
+        "version": {
+            "$id": "#root/version",
+            "title": "Version",
+            "type": "string",
+            "default": "",
+            "examples": ["1.0.0"],
+            "pattern": "^.*$"
+        },
+        "app": {
+            "$id": "#root/app",
+            "title": "App",
+            "type": "object",
+            "required": ["commerceApi", "einsteinApi"],
+            "properties": {
+                "commerceApi": {
+                    "$id": "#root/app/commerceApi",
+                    "title": "Commerceapi",
+                    "type": "object",
+                    "required": ["clientId", "organizationId", "shortCode", "siteId"],
+                    "properties": {
+                        "clientId": {
+                            "$id": "#root/app/commerceApi/clientId",
+                            "title": "Clientid",
+                            "type": "string",
+                            "default": "",
+                            "examples": ["c9c45bfd-0ed3-4aa2-9971-40f88962b836"],
+                            "pattern": "^.*$"
+                        },
+                        "organizationId": {
+                            "$id": "#root/app/commerceApi/organizationId",
+                            "title": "Organizationid",
+                            "type": "string",
+                            "default": "",
+                            "examples": ["f_ecom_zzrf_001"],
+                            "pattern": "^.*$"
+                        },
+                        "shortCode": {
+                            "$id": "#root/app/commerceApi/shortCode",
+                            "title": "Shortcode",
+                            "type": "string",
+                            "default": "",
+                            "examples": ["8o7m175y"],
+                            "pattern": "^.*$"
+                        },
+                        "siteId": {
+                            "$id": "#root/app/commerceApi/siteId",
+                            "title": "Siteid",
+                            "type": "string",
+                            "default": "",
+                            "examples": ["RefArchGlobal"],
+                            "pattern": "^.*$"
+                        }
+                    }
+                },
+                "einsteinApi": {
+                    "$id": "#root/app/einsteinApi",
+                    "title": "Einsteinapi",
+                    "type": "object",
+                    "required": ["clientId", "siteId"],
+                    "properties": {
+                        "clientId": {
+                            "$id": "#root/app/einsteinApi/clientId",
+                            "title": "Clientid",
+                            "type": "string",
+                            "default": "",
+                            "examples": ["1ea06c6e-c936-4324-bcf0-fada93f83bb1"],
+                            "pattern": "^.*$"
+                        },
+                        "siteId": {
+                            "$id": "#root/app/einsteinApi/siteId",
+                            "title": "Siteid",
+                            "type": "string",
+                            "default": "",
+                            "examples": ["aaij-MobileFirst"],
+                            "pattern": "^.*$"
+                        }
+                    }
+                }
+            }
+        },
+        "server": {
+            "$id": "#root/server",
+            "title": "Server",
+            "type": "object",
+            "required": [
+                "buildDir",
+                "defaultCacheTimeSeconds",
+                "faviconPath",
+                "manifestPath",
+                "mobify",
+                "port",
+                "protocol"
+            ],
+            "properties": {
+                "buildDir": {
+                    "$id": "#root/server/buildDir",
+                    "title": "Builddir",
+                    "type": "string",
+                    "default": "",
+                    "examples": ["1"],
+                    "pattern": "^.*$"
+                },
+                "defaultCacheTimeSeconds": {
+                    "$id": "#root/server/defaultCacheTimeSeconds",
+                    "title": "Defaultcachetimeseconds",
+                    "type": "integer",
+                    "examples": [600],
+                    "default": 0
+                },
+                "faviconPath": {
+                    "$id": "#root/server/faviconPath",
+                    "title": "Faviconpath",
+                    "type": "string",
+                    "default": "",
+                    "examples": ["1"],
+                    "pattern": "^.*$"
+                },
+                "manifestPath": {
+                    "$id": "#root/server/manifestPath",
+                    "title": "Manifestpath",
+                    "type": "string",
+                    "default": "",
+                    "examples": ["static/manifest.json"],
+                    "pattern": "^.*$"
+                },
+                "mobify": {
+                    "$id": "#root/server/mobify",
+                    "title": "Mobify",
+                    "type": "object",
+                    "required": [
+                        "externals",
+                        "pageNotFoundURL",
+                        "ssrEnabled",
+                        "ssrOnly",
+                        "ssrShared",
+                        "ssrParameters"
+                    ],
+                    "properties": {
+                        "externals": {
+                            "$id": "#root/server/mobify/externals",
+                            "title": "Externals",
+                            "type": "array",
+                            "default": []
+                        },
+                        "pageNotFoundURL": {
+                            "$id": "#root/server/mobify/pageNotFoundURL",
+                            "title": "Pagenotfoundurl",
+                            "type": "string",
+                            "default": "",
+                            "examples": ["/page-not-found"],
+                            "pattern": "^.*$"
+                        },
+                        "ssrEnabled": {
+                            "$id": "#root/server/mobify/ssrEnabled",
+                            "title": "Ssrenabled",
+                            "type": "boolean",
+                            "examples": [true],
+                            "default": true
+                        },
+                        "ssrOnly": {
+                            "$id": "#root/server/mobify/ssrOnly",
+                            "title": "Ssronly",
+                            "type": "array",
+                            "default": [],
+                            "items": {
+                                "$id": "#root/server/mobify/ssrOnly/items",
+                                "title": "Items",
+                                "type": "string",
+                                "default": "",
+                                "examples": ["ssr.js"],
+                                "pattern": "^.*$"
+                            }
+                        },
+                        "ssrShared": {
+                            "$id": "#root/server/mobify/ssrShared",
+                            "title": "Ssrshared",
+                            "type": "array",
+                            "default": [],
+                            "items": {
+                                "$id": "#root/server/mobify/ssrShared/items",
+                                "title": "Items",
+                                "type": "string",
+                                "default": "",
+                                "examples": ["static/ico/favicon.ico"],
+                                "pattern": "^.*$"
+                            }
+                        },
+                        "ssrParameters": {
+                            "$id": "#root/server/mobify/ssrParameters",
+                            "title": "Ssrparameters",
+                            "type": "object",
+                            "required": ["ssrFunctionNodeVersion", "proxyConfigs"],
+                            "properties": {
+                                "ssrFunctionNodeVersion": {
+                                    "$id": "#root/server/mobify/ssrParameters/ssrFunctionNodeVersion",
+                                    "title": "Ssrfunctionnodeversion",
+                                    "type": "string",
+                                    "default": "",
+                                    "examples": ["14.x"],
+                                    "pattern": "^.*$"
+                                },
+                                "proxyConfigs": {
+                                    "$id": "#root/server/mobify/ssrParameters/proxyConfigs",
+                                    "title": "Proxyconfigs",
+                                    "type": "array",
+                                    "default": [],
+                                    "items": {
+                                        "$id": "#root/server/mobify/ssrParameters/proxyConfigs/items",
+                                        "title": "Items",
+                                        "type": "object",
+                                        "required": ["host", "path"],
+                                        "properties": {
+                                            "host": {
+                                                "$id": "#root/server/mobify/ssrParameters/proxyConfigs/items/host",
+                                                "title": "Host",
+                                                "type": "string",
+                                                "default": "",
+                                                "examples": [
+                                                    "kv7kzm78.api.commercecloud.salesforce.com"
+                                                ],
+                                                "pattern": "^.*$"
+                                            },
+                                            "path": {
+                                                "$id": "#root/server/mobify/ssrParameters/proxyConfigs/items/path",
+                                                "title": "Path",
+                                                "type": "string",
+                                                "default": "",
+                                                "examples": ["api"],
+                                                "pattern": "^.*$"
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "port": {
+                    "$id": "#root/server/port",
+                    "title": "Port",
+                    "type": "integer",
+                    "examples": [3000],
+                    "default": 0
+                },
+                "protocol": {
+                    "$id": "#root/server/protocol",
+                    "title": "Protocol",
+                    "type": "string",
+                    "default": "",
+                    "examples": ["http"],
+                    "pattern": "^.*$"
+                }
+            }
+        }
+    }
+}
