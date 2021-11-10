@@ -11,6 +11,8 @@
 import path from 'path'
 import {createApp, createHandler, serveStaticFile} from 'pwa-kit-react-sdk/ssr/server/express'
 import {render} from 'pwa-kit-react-sdk/ssr/server/react-rendering'
+import {createProxyMiddleware} from 'http-proxy-middleware'
+import querystring from 'querystring'
 
 const app = createApp({
     // The build directory (an absolute path)
@@ -37,6 +39,42 @@ const app = createApp({
     // Note that http://localhost is treated as a secure context for development.
     protocol: 'http'
 })
+
+const scapiProxy = createProxyMiddleware({
+    target: 'https://8o7m175y.api.commercecloud.salesforce.com',
+    changeOrigin: true,
+    secure: true,
+    pathRewrite: {
+        '^/scapi-proxy/': '/'
+    },
+    onProxyReq: function(proxyReq, req) {
+        // Drop the nefarious `Origin` header.
+        delete proxyReq['origin']
+
+        // Work around the built in body parser:
+        // https://github.com/chimurai/http-proxy-middleware/issues/320
+        // https://github.com/SalesforceCommerceCloud/pwa-kit/blob/107d7d9aab2a65718b3e029ef0f7515de9b247a8/packages/pwa-kit-react-sdk/src/ssr/server/express.js#L284-L294
+        if (!req.body || !Object.keys(req.body).length) {
+            return
+        }
+
+        const contentType = proxyReq.getHeader('Content-Type')
+        const writeBody = (bodyData) => {
+            proxyReq.setHeader('Content-Length', Buffer.byteLength(bodyData))
+            proxyReq.write(bodyData)
+        }
+
+        if (contentType === 'application/json') {
+            writeBody(JSON.stringify(req.body))
+        }
+
+        if (contentType === 'application/x-www-form-urlencoded') {
+            writeBody(querystring.stringify(req.body))
+        }
+    }
+})
+
+app.all('/scapi-proxy/*', scapiProxy)
 
 // Handle the redirect from SLAS as to avoid error
 app.get('/callback?*', (req, res) => {
