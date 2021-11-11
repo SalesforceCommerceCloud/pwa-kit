@@ -256,7 +256,7 @@ const DrawerMenu = ({isOpen, onClose = noop, onLogoClick = noop, root}) => {
                                 <LocaleSelector
                                     {...styles.localeSelector}
                                     selectedLocale={intl.locale}
-                                    locales={SUPPORTED_LOCALES}
+                                    locales={SUPPORTED_LOCALES.map((locale) => locale.id)}
                                     onSelect={(newLocale) => {
                                         // Update the `locale` in the URL.
                                         const newUrl = getUrlWithLocale(newLocale, {
