@@ -1,0 +1,11 @@
+{
+    "productTag": "a1aB0000000cf9VIAQ",
+    "defaultBuild": "N/A",
+    "issueTypeLabels": {
+        "feature": "USER STORY",
+        "regression": "BUG P1",
+        "bug": "BUG P3"
+    },
+    "hideWorkItemUrl": true,
+    "statusWhenClosed": "CLOSED"
+}
