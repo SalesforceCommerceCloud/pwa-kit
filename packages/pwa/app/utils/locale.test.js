@@ -9,6 +9,7 @@ import {whichLocaleToLoad, loadLocaleData, getLocaleConfig, getPreferredCurrency
 
 import {SUPPORTED_LOCALES, DEFAULT_LOCALE} from '../constants'
 
+const supportedLocales = SUPPORTED_LOCALES.map((locale) => locale.id)
 const nonSupportedLocale = 'nl-NL'
 // Make sure this supported locale is not the default locale.
 // Otherwise, our code would fall back to default and incorrectly pass the tests
@@ -18,13 +19,12 @@ const testId1 = 'login-redirect.message.welcome'
 const testId2 = 'homepage.message.welcome'
 
 test('our assumptions before further testing', () => {
-    expect(SUPPORTED_LOCALES.map((locale) => locale.id).includes(nonSupportedLocale)).toBe(false)
+    expect(supportedLocales.includes(nonSupportedLocale)).toBe(false)
     expect(DEFAULT_LOCALE).toBe('en-GB')
+    expect(supportedLocale).not.toBe(DEFAULT_LOCALE)
 })
 
 describe('whichLocaleToLoad', () => {
-    const supportedLocales = SUPPORTED_LOCALES.map((locale) => locale.id)
-
     test('default to fallback locale', () => {
         const locale = whichLocaleToLoad([nonSupportedLocale], supportedLocales, DEFAULT_LOCALE)
         expect(locale).toBe(DEFAULT_LOCALE)
@@ -49,9 +49,9 @@ describe('loadLocaleData', () => {
         expect(messages[testId1][0].value).toMatch(/^\[!! Ļŏĝĝĝíń Ŕèḋḋḋíŕèèèćṭ !!]$/)
     })
     test('handling a not-found translation file', async () => {
-        expect(SUPPORTED_LOCALES[1].id).not.toBe(DEFAULT_LOCALE)
+        expect(supportedLocale).not.toBe(DEFAULT_LOCALE)
 
-        jest.mock(`../translations/compiled/${SUPPORTED_LOCALES[1].id}.json`, () => {
+        jest.mock(`../translations/compiled/${supportedLocale}.json`, () => {
             throw new Error()
         })
 
@@ -60,11 +60,11 @@ describe('loadLocaleData', () => {
             importDefaultLocale = true
         })
 
-        await loadLocaleData(SUPPORTED_LOCALES[1].id)
+        await loadLocaleData(supportedLocale)
         expect(importDefaultLocale).toBe(true)
 
         // Reset
-        jest.unmock(`../translations/compiled/${SUPPORTED_LOCALES[1].id}.json`)
+        jest.unmock(`../translations/compiled/${supportedLocale}.json`)
         jest.unmock(`../translations/compiled/${DEFAULT_LOCALE}.json`)
     })
 })
@@ -87,7 +87,7 @@ describe('getLocaleConfig', () => {
         expect(config.app.targetLocale).toBe(DEFAULT_LOCALE)
     })
     test('with getUserPreferredLocales parameter', async () => {
-        const locale = SUPPORTED_LOCALES[1].id
+        const locale = supportedLocale
         expect(locale).not.toBe(DEFAULT_LOCALE)
 
         const config = await getLocaleConfig({
