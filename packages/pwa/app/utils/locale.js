@@ -10,6 +10,11 @@ import {SUPPORTED_LOCALES, DEFAULT_LOCALE} from '../constants'
 const supportedLocales = SUPPORTED_LOCALES.map((locale) => locale.id)
 
 /**
+ * @returns {string[]} short codes of all the app's supported locales
+ */
+export const getSupportedLocales = () => supportedLocales
+
+/**
  * Dynamically import the translations/messages for a given locale
  * @private
  * @param {string} locale - The locale code

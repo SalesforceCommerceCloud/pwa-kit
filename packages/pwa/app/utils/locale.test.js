@@ -5,15 +5,21 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {whichLocaleToLoad, loadLocaleData, getLocaleConfig, getPreferredCurrency} from './locale'
+import {
+    whichLocaleToLoad,
+    loadLocaleData,
+    getLocaleConfig,
+    getPreferredCurrency,
+    getSupportedLocales
+} from './locale'
 
 import {SUPPORTED_LOCALES, DEFAULT_LOCALE} from '../constants'
 
-const supportedLocales = SUPPORTED_LOCALES.map((locale) => locale.id)
+const supportedLocales = getSupportedLocales()
 const nonSupportedLocale = 'nl-NL'
 // Make sure this supported locale is not the default locale.
 // Otherwise, our code would fall back to default and incorrectly pass the tests
-const supportedLocale = SUPPORTED_LOCALES[1].id
+const supportedLocale = supportedLocales[1]
 
 const testId1 = 'login-redirect.message.welcome'
 const testId2 = 'homepage.message.welcome'
