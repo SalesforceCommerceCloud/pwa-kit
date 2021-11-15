@@ -99,10 +99,7 @@ const FOO = () => {
             // With the special syntax `[{}]`, this `src` will be mapped to
             // the fallback src attribute (for old browser that doesn't support srcSet)
             // of "https://edge.disstg.commercecloud.salesforce.com/...jpg" (without ?sw=)
-            src="https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw1e4fcb17/images/large/PG.10212867.JJ3XYXX.PZ.jpg[?sw={width}]"
-            transformations={{
-                q: 60
-            }}
+            src="https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw1e4fcb17/images/large/PG.10212867.JJ3XYXX.PZ.jpg[?sw={width}&q=60]"
             // `vwSizes` will be automatically mapped to sizes and srcSet attributes
             // and thus less work for the users when implementing responsive images.
 
