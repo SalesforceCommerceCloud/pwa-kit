@@ -7,19 +7,30 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import {Box, Heading} from '@chakra-ui/react'
+import {Box, Heading, Stack, Text, Container} from '@chakra-ui/react'
 
 /**
  * Section component used on content pages like home page.
  * This component helps with creating a consistent layout and
  * consistent typography styles for section headings.
  */
-const Section = ({title, children, ...props}) => {
+const Section = ({title, subtitle, actions, maxWidth, children, ...props}) => {
+    const sectionMaxWidth = maxWidth || '3xl'
     return (
         <Box paddingBottom="16" {...props}>
-            <Heading as="h2" fontSize="xl" textAlign="center" marginBottom="8">
-                {title}
-            </Heading>
+            <Stack spacing={4} as={Container} maxW={sectionMaxWidth} textAlign={'center'}>
+                <Heading as="h2" fontSize={40} textAlign="center">
+                    {title}
+                </Heading>
+                <Text color={'gray.700'} fontSize={'xl'}>
+                    {subtitle}
+                </Text>
+                {actions && (
+                    <Box paddingTop="2" width={{base: 'full', md: 'auto'}}>
+                        {actions}
+                    </Box>
+                )}
+            </Stack>
             {children}
         </Box>
     )
@@ -28,8 +39,24 @@ const Section = ({title, children, ...props}) => {
 Section.displayName = 'Section'
 
 Section.propTypes = {
+    /**
+     * Section component main title
+     */
     title: PropTypes.string,
-    children: PropTypes.node
+    /**
+     * Section component subtitle
+     */
+    subtitle: PropTypes.string,
+    /**
+     * Section children node(s)
+     */
+    children: PropTypes.node,
+    /**
+     * Call to action component(s)
+     */
+    actions: PropTypes.element,
+
+    maxWidth: PropTypes.string
 }
 
 export default Section

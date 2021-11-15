@@ -8,15 +8,30 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {useIntl, FormattedMessage} from 'react-intl'
-import {Box, Button, Grid, GridItem, Stack} from '@chakra-ui/react'
+import {
+    Box,
+    Button,
+    Grid,
+    GridItem,
+    SimpleGrid,
+    HStack,
+    VStack,
+    Text,
+    Icon,
+    Flex,
+    Stack,
+    Container,
+    IconButton
+} from '@chakra-ui/react'
 import {getAssetUrl} from 'pwa-kit-react-sdk/ssr/universal/utils'
 import {Link} from 'react-router-dom'
 import Hero from '../../components/hero'
 import Seo from '../../components/seo'
 import Section from '../../components/section'
 import BasicTile from '../../components/basic-tile'
-import {categoriesThreeColumns, categoriesTwoColumns} from './data'
+import {heroFeatures, features} from './data'
 import RecommendedProducts from '../../components/recommended-products'
+
 
 /**
  * This is the home page for Retail React App.
@@ -37,7 +52,7 @@ const Home = () => {
 
             <Hero
                 title={intl.formatMessage({
-                    defaultMessage: 'Lighter layers for lighter days.'
+                    defaultMessage: 'Retail React App: PWA Kit starter store'
                 })}
                 img={{
                     src: getAssetUrl('static/img/hero.png'),
@@ -50,8 +65,9 @@ const Home = () => {
                         as={Link}
                         to={`/${intl.locale}/category/newarrivals`}
                         width={{base: 'full', md: 'inherit'}}
+                        px={7}
                     >
-                        <FormattedMessage defaultMessage="Shop New Arrivals" />
+                        <FormattedMessage defaultMessage="Get started" />
                     </Button>
                 }
                 label={intl.formatMessage({
@@ -59,68 +75,171 @@ const Home = () => {
                 })}
                 marginBottom="16"
             />
+            {/*<Section*/}
+            {/*    title={intl.formatMessage({*/}
+            {/*        defaultMessage: 'Shop by Category'*/}
+            {/*    })}*/}
+            {/*>*/}
+            {/*    <Grid*/}
+            {/*        templateRows={{base: 'repeat(1, 1fr)', md: 'repeat(auto, 1fr)'}}*/}
+            {/*        templateColumns={{base: 'repeat(1, 1fr)', md: 'repeat(6, 1fr)'}}*/}
+            {/*        columnGap={6}*/}
+            {/*        rowGap={8}*/}
+            {/*    >*/}
+            {/*        {categoriesThreeColumns.map((item, index) => {*/}
+            {/*            const category = item.message*/}
+            {/*            return (*/}
+            {/*                <GridItem key={index} rowSpan={1} colSpan={{base: 1, md: 2}}>*/}
+            {/*                    <BasicTile*/}
+            {/*                        title={intl.formatMessage(category.title)}*/}
+            {/*                        href={intl.formatMessage(category.href, {*/}
+            {/*                            activeLocale: intl.locale*/}
+            {/*                        })}*/}
+            {/*                        img={{*/}
+            {/*                            src: getAssetUrl(intl.formatMessage(category.imgSrc)),*/}
+            {/*                            alt: intl.formatMessage(category.imgAlt)*/}
+            {/*                        }}*/}
+            {/*                    />*/}
+            {/*                </GridItem>*/}
+            {/*            )*/}
+            {/*        })}*/}
+            {/*    </Grid>*/}
+            {/*</Section>*/}
+
+            <Box
+                as="section"
+                bg={'gray.50'}
+                mx="auto"
+                py="12"
+                px={{
+                    base: '6',
+                    md: '8'
+                }}
+            >
+                <SimpleGrid
+                    columns={{
+                        base: 1,
+                        md: 1,
+                        lg: 3
+                    }}
+                    spacingX={4}
+                    spacingY={{
+                        base: '8',
+                        md: '14'
+                    }}
+                >
+                    {heroFeatures.map((feature, index) => {
+                        const featureMessage = feature.message
+                        return (
+                            <HStack
+                                key={index}
+                                align={'center'}
+                                bg={'white'}
+                                boxShadow={'0px 2px 2px rgba(0, 0, 0, 0.1)'}
+                                borderRadius={'4px'}
+                            >
+                                <Flex pl={6} h={24} align={'center'} justify={'center'}>
+                                    {feature.icon}
+                                </Flex>
+                                <VStack align={'start'}>
+                                    <Text fontWeight="700">
+                                        {intl.formatMessage(featureMessage.title)}
+                                    </Text>
+                                </VStack>
+                            </HStack>
+                        )
+                    })}
+                </SimpleGrid>
+            </Box>
+
             <Section
+                p={4}
+                pt={16}
                 title={intl.formatMessage({
-                    defaultMessage: 'Shop by Category'
+                    defaultMessage: 'Shop Products'
+                })}
+                subtitle={intl.formatMessage({
+                    defaultMessage:
+                        'This section contains content from the catalog. Read docs on how to replace it.'
                 })}
             >
-                <Grid
-                    templateRows={{base: 'repeat(1, 1fr)', md: 'repeat(auto, 1fr)'}}
-                    templateColumns={{base: 'repeat(1, 1fr)', md: 'repeat(6, 1fr)'}}
-                    columnGap={6}
-                    rowGap={8}
-                >
-                    {categoriesThreeColumns.map((item, index) => {
-                        const category = item.message
-                        return (
-                            <GridItem key={index} rowSpan={1} colSpan={{base: 1, md: 2}}>
-                                <BasicTile
-                                    title={intl.formatMessage(category.title)}
-                                    href={intl.formatMessage(category.href, {
-                                        activeLocale: intl.locale
-                                    })}
-                                    img={{
-                                        src: getAssetUrl(intl.formatMessage(category.imgSrc)),
-                                        alt: intl.formatMessage(category.imgAlt)
-                                    }}
-                                />
-                            </GridItem>
-                        )
-                    })}
+                <Stack spacing={16}>
+                    <RecommendedProducts
+                        title={<FormattedMessage defaultMessage="Top Sellers" />}
+                        recommender={'home-top-revenue-for-category'}
+                        mx={{base: -4, md: -8, lg: 0}}
+                    />
 
-                    {categoriesTwoColumns.map((item, index) => {
-                        const category = item.message
-                        return (
-                            <GridItem key={index} rowSpan={1} colSpan={{base: 1, md: 3}}>
-                                <BasicTile
-                                    title={intl.formatMessage(category.title)}
-                                    href={intl.formatMessage(category.href, {
-                                        activeLocale: intl.locale
-                                    })}
-                                    img={{
-                                        src: getAssetUrl(intl.formatMessage(category.imgSrc)),
-                                        alt: intl.formatMessage(category.imgAlt)
-                                    }}
-                                />
-                            </GridItem>
-                        )
-                    })}
-                </Grid>
+                    <RecommendedProducts
+                        title={<FormattedMessage defaultMessage="Most Viewed" />}
+                        recommender={'products-in-all-categories'}
+                        mx={{base: -4, md: -8, lg: 0}}
+                    />
+                </Stack>
             </Section>
-
-            <Stack spacing={16}>
-                <RecommendedProducts
-                    title={<FormattedMessage defaultMessage="Top Sellers" />}
-                    recommender={'home-top-revenue-for-category'}
-                    mx={{base: -4, md: -8, lg: 0}}
-                />
-
-                <RecommendedProducts
-                    title={<FormattedMessage defaultMessage="Most Viewed" />}
-                    recommender={'products-in-all-categories'}
-                    mx={{base: -4, md: -8, lg: 0}}
-                />
-            </Stack>
+            <Section
+                p={4}
+                pt={32}
+                title={intl.formatMessage({
+                    defaultMessage: 'Features'
+                })}
+                subtitle={intl.formatMessage({
+                    defaultMessage:
+                        'Out-of-the-box features so that you focus only on adding enhancements.'
+                })}
+            >
+                <Container maxW={'6xl'} mt={10}>
+                    <SimpleGrid columns={{base: 1, md: 2, lg: 3}} spacing={10}>
+                        {features.map((feature, index) => {
+                            const featureMessage = feature.message
+                            return (
+                                <HStack key={index} align={'top'}>
+                                    <VStack align={'start'}>
+                                        <Flex
+                                            w={16}
+                                            h={16}
+                                            align={'center'}
+                                            justify={'left'}
+                                            color={'gray.900'}
+                                            px={2}
+                                        >
+                                            {feature.icon}
+                                        </Flex>
+                                        <Text color={'black'} fontWeight={700} fontSize={20}>
+                                            {intl.formatMessage(featureMessage.title)}
+                                        </Text>
+                                        <Text color={'black'}>
+                                            {intl.formatMessage(featureMessage.text)}
+                                        </Text>
+                                    </VStack>
+                                </HStack>
+                            )
+                        })}
+                    </SimpleGrid>
+                </Container>
+            </Section>
+            <Section
+                p={4}
+                pt={32}
+                title={intl.formatMessage({
+                    defaultMessage: "We're here to help"
+                })}
+                subtitle={intl.formatMessage({
+                    defaultMessage:
+                        'Contact our support staff and they’ll get \nyou to the right place.'
+                })}
+                actions={
+                    <Button
+                        as={Link}
+                        to={`/${intl.locale}/category/newarrivals`}
+                        width={{base: 'full', md: 'inherit'}}
+                        px={7}
+                    >
+                        <FormattedMessage defaultMessage="Contact Us" />
+                    </Button>
+                }
+                maxWidth={'xl'}
+            />
         </Box>
     )
 }

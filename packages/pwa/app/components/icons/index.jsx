@@ -23,6 +23,8 @@ import '../../assets/svg/chevron-right.svg'
 import '../../assets/svg/chevron-left.svg'
 import '../../assets/svg/chevron-right.svg'
 import '../../assets/svg/chevron-up.svg'
+import '../../assets/svg/dashboard.svg'
+import '../../assets/svg/figma-logo.svg'
 import '../../assets/svg/filter.svg'
 import '../../assets/svg/file.svg'
 import '../../assets/svg/flag-ca.svg'
@@ -38,8 +40,10 @@ import '../../assets/svg/social-facebook.svg'
 import '../../assets/svg/social-instagram.svg'
 import '../../assets/svg/social-twitter.svg'
 import '../../assets/svg/social-youtube.svg'
+import '../../assets/svg/like.svg'
 import '../../assets/svg/lock.svg'
 import '../../assets/svg/payment.svg'
+import '../../assets/svg/plug.svg'
 import '../../assets/svg/plus.svg'
 import '../../assets/svg/receipt.svg'
 import '../../assets/svg/search.svg'
@@ -113,7 +117,9 @@ export const ChevronLeftIcon = icon('chevron-left')
 export const ChevronRightIcon = icon('chevron-right')
 export const ChevronUpIcon = icon('chevron-up')
 export const CVVIcon = icon('cc-cvv', {viewBox: CVVSymbol.viewBox})
+export const DashboardIcon = icon('dashboard')
 export const DiscoverIcon = icon('cc-discover', {viewBox: DiscoverSymbol.viewBox})
+export const FigmaLogo = icon('figma-logo')
 export const FilterIcon = icon('filter')
 export const FileIcon = icon('file')
 export const FlagCAIcon = icon('flag-ca')
@@ -125,10 +131,12 @@ export const FlagCNIcon = icon('flag-cn')
 export const FlagJPIcon = icon('flag-jp')
 export const HamburgerIcon = icon('hamburger')
 export const InfoIcon = icon('info')
+export const LikeIcon = icon('like')
 export const LockIcon = icon('lock')
 export const LocationIcon = icon('location')
 export const PaymentIcon = icon('payment')
 export const PaypalIcon = icon('paypal', {viewBox: PaypalSymbol.viewBox})
+export const PlugIcon = icon('plug')
 export const PlusIcon = icon('plus')
 export const MastercardIcon = icon('cc-mastercard', {viewBox: MastercardSymbol.viewBox})
 export const ReceiptIcon = icon('receipt')
