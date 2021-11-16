@@ -151,14 +151,15 @@ export const render = async (req, res) => {
     let route
     let match
 
-    const {basePath} = res.locals
+    const {basePath, locale} = res.locals
 
     routes.some((_route) => {
-        const _path = req.path.replace(basePath, '')
+        // const _path = req.path.replace(basePath, '')
+        _route.path = _route.localized ? `/${locale}${_route.path}` : _route.path
         const _match = matchPath(req.path, _route)
         if (_match) {
             match = _match
-            route = {..._route, path: _path}
+            route = _route
         }
         return !!match
     })
@@ -216,16 +217,23 @@ const renderApp = (args) => {
     const deviceType = detectDeviceType(req)
     const routerContext = {}
 
-    const {basePath} = res.locals
+    const {basePath, locale} = res.locals
     console.log('basenamePath', basePath)
+    console.log('locale', locale)
 
     let extractor
     let bundles = []
     let appJSX = (
-        <Router location={location} context={routerContext} basename={basePath}>
+        <Router location={location} context={routerContext}>
             <DeviceContext.Provider value={{type: deviceType}}>
                 <AppConfig locals={res.locals}>
-                    <Switch error={error} appState={appState} routes={routes} App={App} />
+                    <Switch
+                        error={error}
+                        appState={appState}
+                        routes={routes}
+                        App={App}
+                        locale={locale}
+                    />
                 </AppConfig>
             </DeviceContext.Provider>
         </Router>

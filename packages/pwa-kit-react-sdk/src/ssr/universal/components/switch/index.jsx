@@ -20,7 +20,7 @@ import {UIDReset, UIDFork} from 'react-uid'
  * @private
  */
 const Switch = (props) => {
-    const {error, appState, routes, App} = props
+    const {error, appState, routes, App, locale} = props
     return (
         <UIDReset>
             <AppErrorBoundary error={error}>
@@ -28,9 +28,12 @@ const Switch = (props) => {
                     <App preloadedProps={appState.appProps}>
                         <RouterSwitch>
                             {routes.map((route, i) => {
-                                const {component: Component, ...routeProps} = route
+                                const {component: Component, path, localized, ...routeProps} = route
+
+                                let localizedPath = localized ? `/${locale}${path}` : path
+
                                 return (
-                                    <Route key={i} {...routeProps}>
+                                    <Route key={i} path={localizedPath} {...routeProps}>
                                         <UIDFork>
                                             <Component preloadedProps={appState.pageProps} />
                                         </UIDFork>

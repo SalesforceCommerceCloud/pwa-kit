@@ -98,6 +98,7 @@ AppConfig.restore = (locals = {}) => {
 
     locals.api = new CommerceAPI({...apiConfig, locale, currency})
     locals.basePath = basePath
+    locals.locale = locale
 }
 
 AppConfig.freeze = () => undefined

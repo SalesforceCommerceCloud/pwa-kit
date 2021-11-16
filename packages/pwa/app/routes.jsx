@@ -81,7 +81,8 @@ const routes = [
     },
     {
         path: '/product/:productId',
-        component: ProductDetail
+        component: ProductDetail,
+        localized: true
     },
     {
         path: '/search',
