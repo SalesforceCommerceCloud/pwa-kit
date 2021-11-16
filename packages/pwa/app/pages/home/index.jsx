@@ -17,10 +17,11 @@ import {
     Text,
     Flex,
     Stack,
-    Container
+    Container,
+    Link
 } from '@chakra-ui/react'
 import {getAssetUrl} from 'pwa-kit-react-sdk/ssr/universal/utils'
-import {Link} from 'react-router-dom'
+import {Link as RouteLink} from 'react-router-dom'
 import Hero from '../../components/hero'
 import Seo from '../../components/seo'
 import Section from '../../components/section'
@@ -86,11 +87,14 @@ const Home = () => {
                 bg={'gray.50'}
                 mx="auto"
                 py="12"
-                px={{
-                    base: '6',
-                    md: '8'
-                }}
+                px={{base: '6', md: '8'}}
                 borderRadius="base"
+                width={{base: '100vw', md: 'inherit'}}
+                position={{base: 'relative', md: 'inherit'}}
+                left={{base: '50%', md: 'inherit'}}
+                right={{base: '50%', md: 'inherit'}}
+                marginLeft={{base: '-50vw', md: 'auto'}}
+                marginRight={{base: '-50vw', md: 'auto'}}
             >
                 <SimpleGrid
                     columns={{
@@ -107,22 +111,25 @@ const Home = () => {
                     {heroFeatures.map((feature, index) => {
                         const featureMessage = feature.message
                         return (
-                            <HStack
+                            <Box
                                 key={index}
-                                align={'center'}
                                 bg={'white'}
                                 boxShadow={'0px 2px 2px rgba(0, 0, 0, 0.1)'}
                                 borderRadius={'4px'}
                             >
-                                <Flex pl={6} h={24} align={'center'} justify={'center'}>
-                                    {feature.icon}
-                                </Flex>
-                                <VStack align={'start'}>
-                                    <Text fontWeight="700">
-                                        {intl.formatMessage(featureMessage.title)}
-                                    </Text>
-                                </VStack>
-                            </HStack>
+                                <RouteLink target="_blank" href={feature.href}>
+                                    <HStack>
+                                        <Flex pl={6} h={24} align={'center'} justify={'center'}>
+                                            {feature.icon}
+                                        </Flex>
+                                        <VStack align={'start'}>
+                                            <Text fontWeight="700">
+                                                {intl.formatMessage(featureMessage.title)}
+                                            </Text>
+                                        </VStack>
+                                    </HStack>
+                                </RouteLink>
+                            </Box>
                         )
                     })}
                 </SimpleGrid>
@@ -134,10 +141,39 @@ const Home = () => {
                 title={intl.formatMessage({
                     defaultMessage: 'Shop Products'
                 })}
-                subtitle={intl.formatMessage({
-                    defaultMessage:
-                        'This section contains content from the catalog. Read docs on how to replace it.'
-                })}
+                subtitle={intl.formatMessage(
+                    {
+                        defaultMessage:
+                            'This section contains content from the catalog. {link} on how to replace it.'
+                    },
+                    {
+                        link: (
+                            <Link
+                                target="_blank"
+                                href={
+                                    'https://documentation.b2c.commercecloud.salesforce.com/DOC2/topic/com.demandware.dochelp/content/b2c_commerce/topics/catalogs/b2c_manage_catalogs.html'
+                                }
+                                textDecoration={'none'}
+                                position={'relative'}
+                                _after={{
+                                    position: 'absolute',
+                                    content: `""`,
+                                    height: '2px',
+                                    bottom: '-2px',
+                                    margin: '0 auto',
+                                    left: 0,
+                                    right: 0,
+                                    background: 'gray.700'
+                                }}
+                                _hover={{textDecoration: 'none'}}
+                            >
+                                {intl.formatMessage({
+                                    defaultMessage: 'Read docs'
+                                })}
+                            </Link>
+                        )
+                    }
+                )}
             >
                 <Stack spacing={16}>
                     <RecommendedProducts
@@ -200,10 +236,15 @@ const Home = () => {
                 title={intl.formatMessage({
                     defaultMessage: "We're here to help"
                 })}
-                subtitle={intl.formatMessage({
-                    defaultMessage:
-                        'Contact our support staff and they’ll get \nyou to the right place.'
-                })}
+                subtitle={intl.formatMessage(
+                    {
+                        defaultMessage:
+                            'Contact our support staff and they’ll get {br} you to the right place.'
+                    },
+                    {
+                        br: <br />
+                    }
+                )}
                 actions={
                     <Button
                         as={Link}

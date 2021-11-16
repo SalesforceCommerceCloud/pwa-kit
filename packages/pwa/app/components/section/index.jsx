@@ -22,7 +22,7 @@ const Section = ({title, subtitle, actions, maxWidth, children, ...props}) => {
                 <Heading as="h2" fontSize={40} textAlign="center">
                     {title}
                 </Heading>
-                <Text color={'gray.700'} fontSize={'xl'}>
+                <Text color={'gray.700'} fontWeight={600}>
                     {subtitle}
                 </Text>
                 {actions && (
@@ -46,7 +46,7 @@ Section.propTypes = {
     /**
      * Section component subtitle
      */
-    subtitle: PropTypes.string,
+    subtitle: PropTypes.oneOfType([PropTypes.array, PropTypes.string]),
     /**
      * Section children node(s)
      */
