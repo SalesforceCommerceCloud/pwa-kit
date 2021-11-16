@@ -42,7 +42,7 @@ import {IntlProvider} from 'react-intl'
 // Others
 import {watchOnlineStatus, flatten} from '../../utils/utils'
 import {homeUrlBuilder, getUrlWithLocale} from '../../utils/url'
-import {getLocaleConfig, getPreferredCurrency, getSupportedLocales} from '../../utils/locale'
+import {getLocaleConfig, getPreferredCurrency, getSupportedLocalesIds} from '../../utils/locale'
 import {DEFAULT_CURRENCY, HOME_HREF} from '../../constants'
 
 import Seo from '../seo'
@@ -163,7 +163,7 @@ const App = (props) => {
 
                             {/* Urls for all localized versions of this page (including current page)
                             For more details on hrefLang, see https://developers.google.com/search/docs/advanced/crawling/localized-versions */}
-                            {getSupportedLocales().map((locale) => (
+                            {getSupportedLocalesIds().map((locale) => (
                                 <link
                                     rel="alternate"
                                     hrefLang={locale.toLowerCase()}

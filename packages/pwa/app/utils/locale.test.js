@@ -10,12 +10,12 @@ import {
     loadLocaleData,
     getLocaleConfig,
     getPreferredCurrency,
-    getSupportedLocales
+    getSupportedLocalesIds
 } from './locale'
 
 import {SUPPORTED_LOCALES, DEFAULT_LOCALE} from '../constants'
 
-const supportedLocales = getSupportedLocales()
+const supportedLocales = getSupportedLocalesIds()
 const nonSupportedLocale = 'nl-NL'
 // Make sure this supported locale is not the default locale.
 // Otherwise, our code would fall back to default and incorrectly pass the tests

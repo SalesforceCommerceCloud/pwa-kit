@@ -22,7 +22,7 @@ import {
 import {commerceAPIConfig} from '../../commerce-api.config'
 import {einsteinAPIConfig} from '../../einstein-api.config'
 import {DEFAULT_LOCALE, DEFAULT_CURRENCY} from '../../constants'
-import {getPreferredCurrency, getSupportedLocales} from '../../utils/locale'
+import {getPreferredCurrency, getSupportedLocalesIds} from '../../utils/locale'
 
 const apiConfig = {
     ...commerceAPIConfig,
@@ -49,7 +49,7 @@ const getLocale = (locals = {}) => {
     let shortCode = pathname.split('/')[1]
 
     // Ensure that the locale is in the supported list, otherwise return the default.
-    shortCode = getSupportedLocales().includes(shortCode) ? shortCode : DEFAULT_LOCALE
+    shortCode = getSupportedLocalesIds().includes(shortCode) ? shortCode : DEFAULT_LOCALE
 
     return shortCode
 }

@@ -11,7 +11,7 @@ import {Helmet} from 'react-helmet'
 import App from './index.jsx'
 import {renderWithProviders} from '../../utils/test-utils'
 import {DEFAULT_LOCALE} from '../../constants'
-import {getSupportedLocales} from '../../utils/locale.js'
+import {getSupportedLocalesIds} from '../../utils/locale.js'
 
 let windowSpy
 
@@ -67,7 +67,7 @@ describe('App', () => {
         const hasGeneralLocale = ({hrefLang}) => hrefLang === DEFAULT_LOCALE.slice(0, 2)
 
         // `length + 2` because one for a general locale and the other with x-default value
-        expect(hreflangLinks.length).toBe(getSupportedLocales().length + 2)
+        expect(hreflangLinks.length).toBe(getSupportedLocalesIds().length + 2)
 
         expect(hreflangLinks.some((link) => hasGeneralLocale(link))).toBe(true)
         expect(hreflangLinks.some((link) => link.hrefLang === 'x-default')).toBe(true)
