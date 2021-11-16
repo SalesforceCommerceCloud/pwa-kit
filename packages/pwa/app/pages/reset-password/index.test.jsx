@@ -13,13 +13,6 @@ import {ShopperCustomers} from 'commerce-sdk-isomorphic'
 
 jest.setTimeout(60000)
 
-const response = {
-    email: 'foo@test.com',
-    expiresInMinutes: 10,
-    login: 'foo@test.com',
-    resetToken: 'testresettoken'
-}
-
 const mockCustomer = {
     authType: 'registered',
     customerId: 'registeredCustomerId'
