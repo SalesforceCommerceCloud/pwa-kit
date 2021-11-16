@@ -512,7 +512,8 @@ export const ocapiOrderResponse = {
                 name: 'Base Shipping Method',
                 price: 0.01,
                 c_somestring: 'ShippingMethod String Value'
-            }
+            },
+            shipping_status: 'not_shipped'
         }
     ],
     shipping_items: [
