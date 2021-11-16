@@ -17,14 +17,18 @@ import {Box, Heading, Stack, Text, Container} from '@chakra-ui/react'
 const Section = ({title, subtitle, actions, maxWidth, children, ...props}) => {
     const sectionMaxWidth = maxWidth || '3xl'
     return (
-        <Box paddingBottom="16" {...props}>
+        <Box as={'section'} paddingBottom="16" {...props}>
             <Stack spacing={4} as={Container} maxW={sectionMaxWidth} textAlign={'center'}>
-                <Heading as="h2" fontSize={40} textAlign="center">
-                    {title}
-                </Heading>
-                <Text color={'gray.700'} fontWeight={600}>
-                    {subtitle}
-                </Text>
+                {title && (
+                    <Heading as="h2" fontSize={40} textAlign="center">
+                        {title}
+                    </Heading>
+                )}
+                {subtitle && (
+                    <Text color={'gray.700'} fontWeight={600}>
+                        {subtitle}
+                    </Text>
+                )}
                 {actions && (
                     <Box paddingTop="2" width={{base: 'full', md: 'auto'}}>
                         {actions}
@@ -55,7 +59,9 @@ Section.propTypes = {
      * Call to action component(s)
      */
     actions: PropTypes.element,
-
+    /**
+     * Section maximum width
+     */
     maxWidth: PropTypes.string
 }
 

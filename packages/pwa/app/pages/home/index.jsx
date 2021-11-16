@@ -21,7 +21,6 @@ import {
     Link
 } from '@chakra-ui/react'
 import {getAssetUrl} from 'pwa-kit-react-sdk/ssr/universal/utils'
-import {Link as RouteLink} from 'react-router-dom'
 import Hero from '../../components/hero'
 import Seo from '../../components/seo'
 import Section from '../../components/section'
@@ -58,7 +57,7 @@ const Home = () => {
                 actions={
                     <Stack spacing={{base: 4, sm: 6}} direction={{base: 'column', sm: 'row'}}>
                         <Button
-                            as="a"
+                            as={Link}
                             target="_blank"
                             href="https://developer.commercecloud.com/s/article/PWA-Kit"
                             width={{base: 'full', md: 'inherit'}}
@@ -68,7 +67,7 @@ const Home = () => {
                         </Button>
 
                         <Button
-                            as="a"
+                            as={Link}
                             target="_blank"
                             href="https://trailhead.salesforce.com/content/learn/modules/commerce-pwa-kit-and-managed-runtime"
                             width={{base: 'full', md: 'inherit'}}
@@ -79,15 +78,14 @@ const Home = () => {
                         </Button>
                     </Stack>
                 }
-                marginBottom="16"
+                marginBottom={10}
             />
 
-            <Box
-                as="section"
+            <Section
                 bg={'gray.50'}
                 mx="auto"
-                py="12"
-                px={{base: '6', md: '8'}}
+                py={{base: 8, md: 16}}
+                px={{base: 4, md: 8}}
                 borderRadius="base"
                 width={{base: '100vw', md: 'inherit'}}
                 position={{base: 'relative', md: 'inherit'}}
@@ -97,16 +95,9 @@ const Home = () => {
                 marginRight={{base: '-50vw', md: 'auto'}}
             >
                 <SimpleGrid
-                    columns={{
-                        base: 1,
-                        md: 1,
-                        lg: 3
-                    }}
-                    spacingX={4}
-                    spacingY={{
-                        base: '8',
-                        md: '14'
-                    }}
+                    columns={{base: 1, md: 1, lg: 3}}
+                    spacingX={{base: 1, md: 4}}
+                    spacingY={{base: 4, md: 14}}
                 >
                     {heroFeatures.map((feature, index) => {
                         const featureMessage = feature.message
@@ -117,7 +108,7 @@ const Home = () => {
                                 boxShadow={'0px 2px 2px rgba(0, 0, 0, 0.1)'}
                                 borderRadius={'4px'}
                             >
-                                <RouteLink target="_blank" href={feature.href}>
+                                <Link target="_blank" href={feature.href}>
                                     <HStack>
                                         <Flex pl={6} h={24} align={'center'} justify={'center'}>
                                             {feature.icon}
@@ -128,12 +119,12 @@ const Home = () => {
                                             </Text>
                                         </VStack>
                                     </HStack>
-                                </RouteLink>
+                                </Link>
                             </Box>
                         )
                     })}
                 </SimpleGrid>
-            </Box>
+            </Section>
 
             <Section
                 p={4}
@@ -175,20 +166,14 @@ const Home = () => {
                     }
                 )}
             >
-                <Stack spacing={16}>
+                <Stack pt={8} spacing={16}>
                     <RecommendedProducts
-                        title={<FormattedMessage defaultMessage="Top Sellers" />}
-                        recommender={'home-top-revenue-for-category'}
-                        mx={{base: -4, md: -8, lg: 0}}
-                    />
-
-                    <RecommendedProducts
-                        title={<FormattedMessage defaultMessage="Most Viewed" />}
                         recommender={'products-in-all-categories'}
                         mx={{base: -4, md: -8, lg: 0}}
                     />
                 </Stack>
             </Section>
+
             <Section
                 p={4}
                 pt={32}
@@ -230,6 +215,7 @@ const Home = () => {
                     </SimpleGrid>
                 </Container>
             </Section>
+
             <Section
                 p={4}
                 pt={32}
@@ -248,8 +234,9 @@ const Home = () => {
                 actions={
                     <Button
                         as={Link}
-                        to={`/${intl.locale}/category/newarrivals`}
-                        width={{base: 'full', md: 'inherit'}}
+                        href={'https://help.salesforce.com/s/?language=en_US'}
+                        target="_blank"
+                        width={'auto'}
                         px={7}
                     >
                         <FormattedMessage defaultMessage="Contact Us" />

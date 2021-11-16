@@ -29,6 +29,12 @@
       "value": "errorMessage"
     }
   ],
+  "/aBLH2": [
+    {
+      "type": 0,
+      "value": "Get started"
+    }
+  ],
   "/kLqfV": [
     {
       "type": 0,
@@ -41,24 +47,10 @@
       "value": "Please enter your email address"
     }
   ],
-  "/yBi9v": [
+  "0LrnyG": [
     {
       "type": 0,
-      "value": "Shop Women's Jackets & Coats"
-    }
-  ],
-  "08dLrR": [
-    {
-      "type": 0,
-      "value": "/"
-    },
-    {
-      "type": 1,
-      "value": "activeLocale"
-    },
-    {
-      "type": 0,
-      "value": "/category/womens-clothing-jackets"
+      "value": "Components & Design kit"
     }
   ],
   "0Tjkj3": [
@@ -409,6 +401,12 @@
       "value": "Order Total"
     }
   ],
+  "7Z41IR": [
+    {
+      "type": 0,
+      "value": "Einstein Recommendations"
+    }
+  ],
   "7gXPhB": [
     {
       "type": 0,
@@ -503,6 +501,20 @@
     {
       "type": 0,
       "value": "Add to cart"
+    }
+  ],
+  "AJlIwK": [
+    {
+      "type": 0,
+      "value": "This section contains content from the catalog. "
+    },
+    {
+      "type": 1,
+      "value": "link"
+    },
+    {
+      "type": 0,
+      "value": " on how to replace it."
     }
   ],
   "AYIKp4": [
@@ -601,6 +613,12 @@
       "value": "Do you have a promo code?"
     }
   ],
+  "DKTjIJ": [
+    {
+      "type": 0,
+      "value": "Deploy on Managed Runtime"
+    }
+  ],
   "DP5VOH": [
     {
       "type": 0,
@@ -649,6 +667,12 @@
     {
       "type": 0,
       "value": " added to wishlist"
+    }
+  ],
+  "DtaKaA": [
+    {
+      "type": 0,
+      "value": "Retail React App: PWA Kit starter store"
     }
   ],
   "DwzDiL": [
@@ -713,6 +737,12 @@
     {
       "type": 0,
       "value": "Sign Out"
+    }
+  ],
+  "FdbYXD": [
+    {
+      "type": 0,
+      "value": "Shop Products"
     }
   ],
   "Fmc5ut": [
@@ -813,6 +843,18 @@
       "value": "Questions"
     }
   ],
+  "KcHWA3": [
+    {
+      "type": 0,
+      "value": "Shopper Login and API Access Service"
+    }
+  ],
+  "KlaAVE": [
+    {
+      "type": 0,
+      "value": "npx pwa-kit-create-app"
+    }
+  ],
   "Kz7I2o": [
     {
       "type": 0,
@@ -831,12 +873,6 @@
       "value": "Coming Soon"
     }
   ],
-  "LrQ8C0": [
-    {
-      "type": 0,
-      "value": "Shop Feeling Red"
-    }
-  ],
   "MPcjO/": [
     {
       "type": 0,
@@ -847,6 +883,12 @@
     {
       "type": 0,
       "value": "English (Canada)"
+    }
+  ],
+  "MQoJ1Y": [
+    {
+      "type": 0,
+      "value": "Enable shoppers to easily log in with a more personalized shopping experience."
     }
   ],
   "MnpUD7": [
@@ -995,6 +1037,12 @@
       "value": "Hungarian (Hungary)"
     }
   ],
+  "OlItur": [
+    {
+      "type": 0,
+      "value": "Create with the Figma PWA Design Kit"
+    }
+  ],
   "Olgsm/": [
     {
       "type": 0,
@@ -1069,10 +1117,10 @@
       "value": "Log out"
     }
   ],
-  "Pwi/Wk": [
+  "PpMdwV": [
     {
       "type": 0,
-      "value": "New In"
+      "value": "We're here to help"
     }
   ],
   "Q6wcZ5": [
@@ -1103,12 +1151,6 @@
     {
       "type": 0,
       "value": "Are you sure you want to continue ?"
-    }
-  ],
-  "Qpxx+l": [
-    {
-      "type": 0,
-      "value": "New Arrivals"
     }
   ],
   "RlxeOk": [
@@ -1293,6 +1335,18 @@
       "value": "Continue shopping to add items to your cart"
     }
   ],
+  "VALef7": [
+    {
+      "type": 0,
+      "value": "Ecommerce best practice for a shopper's cart and checkout experience."
+    }
+  ],
+  "VB8cgA": [
+    {
+      "type": 0,
+      "value": "Deliver the next best product or offer to every shopper through product recommendations."
+    }
+  ],
   "VSlYv6": [
     {
       "type": 0,
@@ -1311,10 +1365,22 @@
       "value": "Card Number"
     }
   ],
+  "X9OkqP": [
+    {
+      "type": 0,
+      "value": "Built using Chakra UI, a simple, modular and accessible React component library."
+    }
+  ],
   "XBfvKN": [
     {
       "type": 0,
       "value": "Order History"
+    }
+  ],
+  "XEwDqS": [
+    {
+      "type": 0,
+      "value": "Learn with Trailhead"
     }
   ],
   "XQPWe6": [
@@ -1327,6 +1393,12 @@
     {
       "type": 0,
       "value": "Shipping & Gift Options"
+    }
+  ],
+  "Xpu6m3": [
+    {
+      "type": 0,
+      "value": "Registered shopper's can add product items to their wishlist from purchasing later."
     }
   ],
   "YDGR5k": [
@@ -1369,6 +1441,12 @@
     {
       "type": 0,
       "value": "Polish (Poland)"
+    }
+  ],
+  "ZXp0z1": [
+    {
+      "type": 0,
+      "value": "Features"
     }
   ],
   "Zgc/KO": [
@@ -1453,12 +1531,6 @@
       "value": "Welcome Back"
     }
   ],
-  "bXv4wB": [
-    {
-      "type": 0,
-      "value": "Shop New Arrivals"
-    }
-  ],
   "bhUBy4": [
     {
       "type": 0,
@@ -1501,10 +1573,22 @@
       "value": "8 characters minimum"
     }
   ],
+  "cLJrsY": [
+    {
+      "type": 0,
+      "value": "Cart & Checkout"
+    }
+  ],
   "cUwO+6": [
     {
       "type": 0,
       "value": "Add New Card"
+    }
+  ],
+  "cqE+QI": [
+    {
+      "type": 0,
+      "value": "Shopper's can manage account information such as their profile, addresses, payments and orders."
     }
   ],
   "cqlObT": [
@@ -1523,12 +1607,6 @@
     {
       "type": 0,
       "value": "Portuguese (Portugal)"
-    }
-  ],
-  "dS8BmB": [
-    {
-      "type": 0,
-      "value": "static/img/feeling-red.png"
     }
   ],
   "dUxyza": [
@@ -1755,12 +1833,6 @@
       "value": "Name on Card"
     }
   ],
-  "gg6vZx": [
-    {
-      "type": 0,
-      "value": "Shop by Category"
-    }
-  ],
   "gguIJ8": [
     {
       "type": 0,
@@ -1777,6 +1849,12 @@
     {
       "type": 0,
       "value": "Please enter your name as shown on your card"
+    }
+  ],
+  "hZOGLS": [
+    {
+      "type": 0,
+      "value": "Contact Us"
     }
   ],
   "header.button.assistive_msg.logo": [
@@ -1827,20 +1905,6 @@
       "value": "Create account"
     }
   ],
-  "hwGJRL": [
-    {
-      "type": 0,
-      "value": "/"
-    },
-    {
-      "type": 1,
-      "value": "activeLocale"
-    },
-    {
-      "type": 0,
-      "value": "/category/womens-clothing-feeling-red"
-    }
-  ],
   "i0/00S": [
     {
       "type": 0,
@@ -1889,16 +1953,16 @@
       "value": "Save"
     }
   ],
+  "kBAj4C": [
+    {
+      "type": 0,
+      "value": "Download on Github"
+    }
+  ],
   "kVzyDt": [
     {
       "type": 0,
       "value": "Thank you for your order!"
-    }
-  ],
-  "kfvFzC": [
-    {
-      "type": 0,
-      "value": "static/img/women-coats.png"
     }
   ],
   "knAdWV": [
@@ -1919,6 +1983,12 @@
       "value": "Default"
     }
   ],
+  "lc9tAq": [
+    {
+      "type": 0,
+      "value": "Read docs"
+    }
+  ],
   "llHgJz": [
     {
       "type": 0,
@@ -1931,6 +2001,12 @@
     {
       "type": 0,
       "value": ","
+    }
+  ],
+  "lmhMZ6": [
+    {
+      "type": 0,
+      "value": "Out-of-the-box features so that you focus only on adding enhancements."
     }
   ],
   "login-redirect.message.welcome": [
@@ -2051,6 +2127,20 @@
     {
       "type": 0,
       "value": "1 lowercase letter"
+    }
+  ],
+  "nEtDrF": [
+    {
+      "type": 0,
+      "value": "Contact our support staff and they’ll get "
+    },
+    {
+      "type": 1,
+      "value": "br"
+    },
+    {
+      "type": 0,
+      "value": " you to the right place."
     }
   ],
   "nEwlut": [
@@ -2315,12 +2405,6 @@
     {
       "type": 0,
       "value": "Korean (Republic of Korea)"
-    }
-  ],
-  "tpMVg1": [
-    {
-      "type": 0,
-      "value": "Lighter layers for lighter days."
     }
   ],
   "uCdcPZ": [

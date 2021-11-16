@@ -18,7 +18,7 @@ const Hero = ({title, img, actions, ...props}) => {
                 align={'center'}
                 spacing={{base: 8, md: 10}}
                 py={{base: 12, md: 10}}
-                direction={{base: 'column', md: 'row'}}
+                direction={{base: 'column', lg: 'row'}}
             >
                 <Stack flex={1} spacing={{base: 5, md: 10}}>
                     <Heading
@@ -35,8 +35,15 @@ const Hero = ({title, img, actions, ...props}) => {
                         </Box>
                     )}
                 </Stack>
-                <Flex flex={1} justify={'center'} align={'center'} position={'relative'} w={'full'}>
-                    <Box position={'relative'} width={'full'}>
+                <Flex
+                    flex={1}
+                    justify={'center'}
+                    align={'center'}
+                    position={'relative'}
+                    w={'full'}
+                    pt={{base: 12, lg: 0}}
+                >
+                    <Box position={'relative'} width={{base: 'full', md: '80%', lg: 'full'}}>
                         <Image
                             fit={'cover'}
                             align={'center'}
