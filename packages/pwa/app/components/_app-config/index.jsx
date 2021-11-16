@@ -48,7 +48,7 @@ const getLocale = (locals = {}) => {
     const {pathname} = new URL(`http://hostname${originalUrl}`)
     let shortCode = pathname.split('/')[1]
 
-    // Ensure that the locale is in the seported list, otherwise return the default.
+    // Ensure that the locale is in the supported list, otherwise return the default.
     shortCode = getSupportedLocales().includes(shortCode) ? shortCode : DEFAULT_LOCALE
 
     return shortCode
