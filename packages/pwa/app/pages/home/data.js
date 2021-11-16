@@ -56,19 +56,22 @@ export const heroFeatures = [
         message: defineMessages({
             title: {defaultMessage: 'Download on Github'}
         }),
-        icon: <BrandLogo width={12} height={8} />
+        icon: <BrandLogo width={12} height={8} />,
+        href: 'https://github.com/SalesforceCommerceCloud/pwa-kit'
     },
     {
         message: defineMessages({
             title: {defaultMessage: 'Deploy on Managed Runtime'}
         }),
-        icon: <BrandLogo width={12} height={8} />
+        icon: <BrandLogo width={12} height={8} />,
+        href: 'https://developer.commercecloud.com/s/article/Pushing-and-Deploying-Bundles'
     },
     {
         message: defineMessages({
             title: {defaultMessage: 'Create with the Figma PWA Design Kit'}
         }),
-        icon: <FigmaLogo width={12} height={8} />
+        icon: <FigmaLogo width={12} height={8} />,
+        href: 'https://www.figma.com/file/gOUKasMrK16zS5qrLCTSJl/PWA-Design-Kit?node-id=406%3A21'
     }
 ]
 

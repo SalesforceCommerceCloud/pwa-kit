@@ -11,27 +11,21 @@ import {useIntl, FormattedMessage} from 'react-intl'
 import {
     Box,
     Button,
-    Grid,
-    GridItem,
     SimpleGrid,
     HStack,
     VStack,
     Text,
-    Icon,
     Flex,
     Stack,
-    Container,
-    IconButton
+    Container
 } from '@chakra-ui/react'
 import {getAssetUrl} from 'pwa-kit-react-sdk/ssr/universal/utils'
 import {Link} from 'react-router-dom'
 import Hero from '../../components/hero'
 import Seo from '../../components/seo'
 import Section from '../../components/section'
-import BasicTile from '../../components/basic-tile'
 import {heroFeatures, features} from './data'
 import RecommendedProducts from '../../components/recommended-products'
-
 
 /**
  * This is the home page for Retail React App.
@@ -57,54 +51,35 @@ const Home = () => {
                 img={{
                     src: getAssetUrl('static/img/hero.png'),
                     alt: intl.formatMessage({
-                        defaultMessage: 'New Arrivals'
+                        defaultMessage: 'npx pwa-kit-create-app'
                     })
                 }}
                 actions={
-                    <Button
-                        as={Link}
-                        to={`/${intl.locale}/category/newarrivals`}
-                        width={{base: 'full', md: 'inherit'}}
-                        px={7}
-                    >
-                        <FormattedMessage defaultMessage="Get started" />
-                    </Button>
+                    <Stack spacing={{base: 4, sm: 6}} direction={{base: 'column', sm: 'row'}}>
+                        <Button
+                            as="a"
+                            target="_blank"
+                            href="https://developer.commercecloud.com/s/article/PWA-Kit"
+                            width={{base: 'full', md: 'inherit'}}
+                            px={7}
+                        >
+                            <FormattedMessage defaultMessage="Get started" />
+                        </Button>
+
+                        <Button
+                            as="a"
+                            target="_blank"
+                            href="https://trailhead.salesforce.com/content/learn/modules/commerce-pwa-kit-and-managed-runtime"
+                            width={{base: 'full', md: 'inherit'}}
+                            px={7}
+                            variant="outline"
+                        >
+                            <FormattedMessage defaultMessage="Learn with Trailhead" />
+                        </Button>
+                    </Stack>
                 }
-                label={intl.formatMessage({
-                    defaultMessage: 'New In'
-                })}
                 marginBottom="16"
             />
-            {/*<Section*/}
-            {/*    title={intl.formatMessage({*/}
-            {/*        defaultMessage: 'Shop by Category'*/}
-            {/*    })}*/}
-            {/*>*/}
-            {/*    <Grid*/}
-            {/*        templateRows={{base: 'repeat(1, 1fr)', md: 'repeat(auto, 1fr)'}}*/}
-            {/*        templateColumns={{base: 'repeat(1, 1fr)', md: 'repeat(6, 1fr)'}}*/}
-            {/*        columnGap={6}*/}
-            {/*        rowGap={8}*/}
-            {/*    >*/}
-            {/*        {categoriesThreeColumns.map((item, index) => {*/}
-            {/*            const category = item.message*/}
-            {/*            return (*/}
-            {/*                <GridItem key={index} rowSpan={1} colSpan={{base: 1, md: 2}}>*/}
-            {/*                    <BasicTile*/}
-            {/*                        title={intl.formatMessage(category.title)}*/}
-            {/*                        href={intl.formatMessage(category.href, {*/}
-            {/*                            activeLocale: intl.locale*/}
-            {/*                        })}*/}
-            {/*                        img={{*/}
-            {/*                            src: getAssetUrl(intl.formatMessage(category.imgSrc)),*/}
-            {/*                            alt: intl.formatMessage(category.imgAlt)*/}
-            {/*                        }}*/}
-            {/*                    />*/}
-            {/*                </GridItem>*/}
-            {/*            )*/}
-            {/*        })}*/}
-            {/*    </Grid>*/}
-            {/*</Section>*/}
 
             <Box
                 as="section"
@@ -115,6 +90,7 @@ const Home = () => {
                     base: '6',
                     md: '8'
                 }}
+                borderRadius="base"
             >
                 <SimpleGrid
                     columns={{
