@@ -13,42 +13,44 @@ const Hero = ({title, img, actions, ...props}) => {
     const {src, alt} = img
 
     return (
-        <Box height={{lg: 'xl'}} position={{lg: 'relative'}} {...props}>
+        <Box
+            marginBottom={{base: 0, md: 10}}
+            height={{lg: 'xl'}}
+            position={{lg: 'relative'}}
+            {...props}
+        >
             <Stack
                 align={'center'}
                 spacing={{base: 8, md: 10}}
-                py={{base: 12, md: 10}}
+                paddingTop={{base: 12, md: 10}}
+                paddingBottom={{base: 6, md: 10}}
                 direction={{base: 'column', lg: 'row'}}
             >
-                <Stack flex={1} spacing={{base: 5, md: 10}}>
+                <Stack flex={1} spacing={{base: 5, md: 8}}>
                     <Heading
                         as="h1"
-                        fontSize={{base: '4xl', lg: '5xl'}}
+                        fontSize={{base: '4xl', md: '5xl', lg: '6xl'}}
                         maxWidth={{base: '75%', md: '50%', lg: 'md'}}
                     >
                         {title}
                     </Heading>
 
-                    {actions && (
-                        <Box paddingTop="2" width={{base: 'full', lg: 'inherit'}}>
-                            {actions}
-                        </Box>
-                    )}
+                    {actions && <Box width={{base: 'full', lg: 'inherit'}}>{actions}</Box>}
                 </Stack>
                 <Flex
                     flex={1}
                     justify={'center'}
                     align={'center'}
                     position={'relative'}
-                    w={'full'}
-                    pt={{base: 12, lg: 0}}
+                    width={'full'}
+                    paddingTop={{base: 4, lg: 0}}
                 >
                     <Box position={'relative'} width={{base: 'full', md: '80%', lg: 'full'}}>
                         <Image
                             fit={'cover'}
                             align={'center'}
-                            w={'100%'}
-                            h={'100%'}
+                            width={'100%'}
+                            height={'100%'}
                             src={src}
                             alt={alt}
                         />

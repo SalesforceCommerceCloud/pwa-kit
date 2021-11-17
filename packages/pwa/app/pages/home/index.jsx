@@ -24,6 +24,7 @@ import {getAssetUrl} from 'pwa-kit-react-sdk/ssr/universal/utils'
 import Hero from '../../components/hero'
 import Seo from '../../components/seo'
 import Section from '../../components/section'
+import {Link as RouterLink} from 'react-router-dom'
 import {heroFeatures, features} from './data'
 import RecommendedProducts from '../../components/recommended-products'
 
@@ -46,7 +47,7 @@ const Home = () => {
 
             <Hero
                 title={intl.formatMessage({
-                    defaultMessage: 'Retail React App: PWA Kit starter store'
+                    defaultMessage: 'The React PWA Starter Store for Retail'
                 })}
                 img={{
                     src: getAssetUrl('static/img/hero.png'),
@@ -55,35 +56,23 @@ const Home = () => {
                 actions={
                     <Stack spacing={{base: 4, sm: 6}} direction={{base: 'column', sm: 'row'}}>
                         <Button
-                            as={Link}
+                            as={RouterLink}
                             target="_blank"
-                            href="http://sfdc.co/pwa-kit-developer-center"
+                            to="http://sfdc.co/pwa-kit-developer-center"
                             width={{base: 'full', md: 'inherit'}}
-                            px={7}
+                            paddingX={7}
                         >
                             <FormattedMessage defaultMessage="Get started" />
                         </Button>
-
-                        <Button
-                            as={Link}
-                            target="_blank"
-                            href="https://sfdc.co/pwa-kit-and-managed-runtime-trailhead"
-                            width={{base: 'full', md: 'inherit'}}
-                            px={7}
-                            variant="outline"
-                        >
-                            <FormattedMessage defaultMessage="Learn with Trailhead" />
-                        </Button>
                     </Stack>
                 }
-                marginBottom={10}
             />
 
             <Section
-                bg={'gray.50'}
-                mx="auto"
-                py={{base: 8, md: 16}}
-                px={{base: 4, md: 8}}
+                background={'gray.50'}
+                marginX="auto"
+                paddingY={{base: 8, md: 16}}
+                paddingX={{base: 4, md: 8}}
                 borderRadius="base"
                 width={{base: '100vw', md: 'inherit'}}
                 position={{base: 'relative', md: 'inherit'}}
@@ -102,13 +91,18 @@ const Home = () => {
                         return (
                             <Box
                                 key={index}
-                                bg={'white'}
+                                background={'white'}
                                 boxShadow={'0px 2px 2px rgba(0, 0, 0, 0.1)'}
                                 borderRadius={'4px'}
                             >
                                 <Link target="_blank" href={feature.href}>
                                     <HStack>
-                                        <Flex pl={6} h={24} align={'center'} justify={'center'}>
+                                        <Flex
+                                            paddingLeft={6}
+                                            height={24}
+                                            align={'center'}
+                                            justify={'center'}
+                                        >
                                             {feature.icon}
                                         </Flex>
                                         <Text fontWeight="700">
@@ -123,8 +117,8 @@ const Home = () => {
             </Section>
 
             <Section
-                p={4}
-                pt={16}
+                padding={4}
+                paddingTop={16}
                 title={intl.formatMessage({
                     defaultMessage: 'Shop Products'
                 })}
@@ -163,14 +157,14 @@ const Home = () => {
                 <Stack pt={8} spacing={16}>
                     <RecommendedProducts
                         recommender={'products-in-all-categories'}
-                        mx={{base: -4, md: -8, lg: 0}}
+                        marginX={{base: -4, md: -8, lg: 0}}
                     />
                 </Stack>
             </Section>
 
             <Section
-                p={4}
-                pt={32}
+                padding={4}
+                paddingTop={32}
                 title={intl.formatMessage({
                     defaultMessage: 'Features'
                 })}
@@ -179,7 +173,7 @@ const Home = () => {
                         'Out-of-the-box features so that you focus only on adding enhancements.'
                 })}
             >
-                <Container maxW={'6xl'} mt={10}>
+                <Container maxWith={'6xl'} marginTop={10}>
                     <SimpleGrid columns={{base: 1, md: 2, lg: 3}} spacing={10}>
                         {features.map((feature, index) => {
                             const featureMessage = feature.message
@@ -187,12 +181,12 @@ const Home = () => {
                                 <HStack key={index} align={'top'}>
                                     <VStack align={'start'}>
                                         <Flex
-                                            w={16}
-                                            h={16}
+                                            width={16}
+                                            height={16}
                                             align={'center'}
                                             justify={'left'}
                                             color={'gray.900'}
-                                            px={2}
+                                            paddingX={2}
                                         >
                                             {feature.icon}
                                         </Flex>
@@ -211,8 +205,8 @@ const Home = () => {
             </Section>
 
             <Section
-                p={4}
-                pt={32}
+                padding={4}
+                paddingTop={32}
                 title={intl.formatMessage({
                     defaultMessage: "We're here to help"
                 })}
@@ -227,11 +221,11 @@ const Home = () => {
                 )}
                 actions={
                     <Button
-                        as={Link}
-                        href={'https://help.salesforce.com/s/?language=en_US'}
+                        as={RouterLink}
+                        to={'https://help.salesforce.com/s/?language=en_US'}
                         target="_blank"
                         width={'auto'}
-                        px={7}
+                        paddingX={7}
                     >
                         <FormattedMessage defaultMessage="Contact Us" />
                     </Button>

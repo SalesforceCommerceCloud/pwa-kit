@@ -353,6 +353,12 @@
       "value": "Incorrect username or password, please try again."
     }
   ],
+  "5UVtyp": [
+    {
+      "type": 0,
+      "value": "The React PWA Starter Store for Retail"
+    }
+  ],
   "5e/Fjo": [
     {
       "type": 0,
@@ -661,12 +667,6 @@
     {
       "type": 0,
       "value": " added to wishlist"
-    }
-  ],
-  "DtaKaA": [
-    {
-      "type": 0,
-      "value": "Retail React App: PWA Kit starter store"
     }
   ],
   "DwzDiL": [
@@ -1329,12 +1329,6 @@
     {
       "type": 0,
       "value": "Order History"
-    }
-  ],
-  "XEwDqS": [
-    {
-      "type": 0,
-      "value": "Learn with Trailhead"
     }
   ],
   "XQPWe6": [

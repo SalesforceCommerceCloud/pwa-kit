@@ -122,6 +122,9 @@
   "5S2I6Q": {
     "defaultMessage": "Incorrect username or password, please try again."
   },
+  "5UVtyp": {
+    "defaultMessage": "The React PWA Starter Store for Retail"
+  },
   "5e/Fjo": {
     "defaultMessage": "Portuguese (Brazil)"
   },
@@ -256,9 +259,6 @@
   },
   "DdR2q8": {
     "defaultMessage": "{quantity} {quantity, plural, one {item} other {items}} added to wishlist"
-  },
-  "DtaKaA": {
-    "defaultMessage": "Retail React App: PWA Kit starter store"
   },
   "DwzDiL": {
     "defaultMessage": "Clear recent searches"
@@ -562,9 +562,6 @@
   },
   "XBfvKN": {
     "defaultMessage": "Order History"
-  },
-  "XEwDqS": {
-    "defaultMessage": "Learn with Trailhead"
   },
   "XQPWe6": {
     "defaultMessage": "Once you place an order the details will show up here"
