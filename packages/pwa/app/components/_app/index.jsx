@@ -42,8 +42,8 @@ import {IntlProvider} from 'react-intl'
 // Others
 import {watchOnlineStatus, flatten} from '../../utils/utils'
 import {homeUrlBuilder, getUrlWithLocale} from '../../utils/url'
-import {getLocaleConfig, getPreferredCurrency} from '../../utils/locale'
-import {DEFAULT_CURRENCY, HOME_HREF, SUPPORTED_LOCALES} from '../../constants'
+import {getLocaleConfig, getPreferredCurrency, getSupportedLocalesIds} from '../../utils/locale'
+import {DEFAULT_CURRENCY, HOME_HREF} from '../../constants'
 
 import Seo from '../seo'
 import useWishlist from '../../hooks/use-wishlist'
@@ -163,12 +163,12 @@ const App = (props) => {
 
                             {/* Urls for all localized versions of this page (including current page)
                             For more details on hrefLang, see https://developers.google.com/search/docs/advanced/crawling/localized-versions */}
-                            {SUPPORTED_LOCALES.map((locale) => (
+                            {getSupportedLocalesIds().map((locale) => (
                                 <link
                                     rel="alternate"
-                                    hrefLang={locale.id.toLowerCase()}
-                                    href={`${appOrigin}${getUrlWithLocale(locale.id, {location})}`}
-                                    key={locale.id}
+                                    hrefLang={locale.toLowerCase()}
+                                    href={`${appOrigin}${getUrlWithLocale(locale, {location})}`}
+                                    key={locale}
                                 />
                             ))}
                             {/* A general locale as fallback. For example: "en" if default locale is "en-GB" */}
