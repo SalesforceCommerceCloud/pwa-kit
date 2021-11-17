@@ -7,14 +7,14 @@
 import React, {useEffect} from 'react'
 import {screen, waitFor} from '@testing-library/react'
 import user from '@testing-library/user-event'
+import {rest} from 'msw'
+import {setupServer} from 'msw/node'
 import {renderWithProviders} from '../../utils/test-utils'
 import AccountAddresses from './addresses'
 import useCustomer from '../../commerce-api/hooks/useCustomer'
+import {mockedRegisteredCustomer} from '../../commerce-api/mock-data'
 
-const mockCustomer = {
-    authType: 'registered',
-    customerId: 'registeredCustomerId'
-}
+let mockCustomer = {}
 
 jest.setTimeout(30000)
 
@@ -23,14 +23,6 @@ jest.mock('../../commerce-api/utils', () => {
     return {
         ...originalModule,
         isTokenValid: jest.fn().mockReturnValue(true)
-    }
-})
-
-jest.mock('../../commerce-api/auth', () => {
-    return class AuthMock {
-        login() {
-            return mockCustomer
-        }
     }
 })
 
@@ -53,10 +45,6 @@ jest.mock('commerce-sdk-isomorphic', () => {
                 mockCustomer.addresses = undefined
                 return {}
             }
-
-            async getCustomer() {
-                return mockCustomer
-            }
         }
     }
 })
@@ -68,7 +56,7 @@ jest.mock('@chakra-ui/toast', () => {
     }
 })
 
-const WrappedAddress = () => {
+const MockedComponent = () => {
     const customer = useCustomer()
     useEffect(() => {
         customer.login('test@test.com', 'password')
@@ -81,14 +69,67 @@ const WrappedAddress = () => {
     )
 }
 
+const server = setupServer(
+    rest.post('*/customers/actions/login', (req, res, ctx) =>
+        res(ctx.delay(0), ctx.set('authorization', `Bearer fakeToken`), ctx.json(mockCustomer))
+    ),
+    rest.get('*/customers/:customerId', (req, res, ctx) =>
+        res(ctx.delay(0), ctx.json(mockCustomer))
+    ),
+    rest.post('*/oauth2/authorize', (req, res, ctx) =>
+        res(ctx.delay(0), ctx.status(303), ctx.set('location', `/testcallback`))
+    ),
+
+    rest.get('*/oauth2/authorize', (req, res, ctx) =>
+        res(ctx.delay(0), ctx.status(303), ctx.set('location', `/testcallback`))
+    ),
+
+    rest.post('*/oauth2/login', (req, res, ctx) =>
+        res(ctx.delay(0), ctx.status(200), ctx.json(mockedRegisteredCustomer))
+    ),
+
+    rest.get('*/testcallback', (req, res, ctx) => {
+        return res(ctx.delay(0), ctx.status(200))
+    }),
+
+    rest.post('*/oauth2/token', (req, res, ctx) =>
+        res(
+            ctx.delay(0),
+            ctx.json({
+                customer_id: 'test',
+                access_token: 'testtoken',
+                refresh_token: 'testrefeshtoken',
+                usid: 'testusid',
+                enc_user_id: 'testEncUserId'
+            })
+        )
+    )
+)
+
 // Set up and clean up
 beforeEach(() => {
     jest.resetModules()
+    server.listen({onUnhandledRequest: 'error'})
+    mockCustomer = {
+        authType: 'registered',
+        customerId: 'registeredCustomerId',
+        customerNo: '00151503',
+        email: 'jkeane@64labs.com',
+        firstName: 'John',
+        lastName: 'Keane',
+        login: 'jkeane@64labs.com'
+    }
 })
+afterEach(() => {
+    localStorage.clear()
+    server.resetHandlers()
+})
+afterAll(() => server.close())
 
-test('Allows customer to add addresses', async () => {
-    renderWithProviders(<WrappedAddress />)
+test('Allows customer to add/edit/remove addresses', async () => {
+    renderWithProviders(<MockedComponent />)
     await waitFor(() => expect(screen.getByText('registeredCustomerId')).toBeInTheDocument())
+
     expect(screen.getByText(/no saved addresses/i)).toBeInTheDocument()
 
     // add
@@ -102,11 +143,6 @@ test('Allows customer to add addresses', async () => {
     user.type(screen.getByLabelText('Zip Code'), '33701')
     user.click(screen.getByText(/^Save$/i))
     expect(await screen.findByText(/Tropicana Field/i)).toBeInTheDocument()
-})
-
-test('Allows customer to edit addresses', async () => {
-    renderWithProviders(<WrappedAddress />)
-    await waitFor(() => expect(screen.getByText('registeredCustomerId')).toBeInTheDocument())
 
     // edit
     user.click(screen.getByText(/edit/i))
@@ -115,11 +151,6 @@ test('Allows customer to edit addresses', async () => {
     user.click(screen.getByText(/Save$/i))
     expect(await screen.findByText(/333 main st/i)).toBeInTheDocument()
     expect(await screen.findByText(/default/i)).toBeInTheDocument()
-})
-
-test('Allows customer to remove addresses', async () => {
-    renderWithProviders(<WrappedAddress />)
-    await waitFor(() => expect(screen.getByText('registeredCustomerId')).toBeInTheDocument())
 
     // remove
     user.click(screen.getByText(/remove/i))
