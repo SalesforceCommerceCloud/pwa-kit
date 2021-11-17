@@ -671,12 +671,6 @@
       "value": "/category/mens-clothing-suits"
     }
   ],
-  "EKKW2e": [
-    {
-      "type": 0,
-      "value": "1 uppercase letter"
-    }
-  ],
   "EOUB63": [
     {
       "type": 0,
@@ -695,12 +689,6 @@
     {
       "type": 0,
       "value": "Danish (Denmark)"
-    }
-  ],
-  "EWw/tK": [
-    {
-      "type": 0,
-      "value": "Apply"
     }
   ],
   "Ev6SEF": [
@@ -737,12 +725,6 @@
     {
       "type": 0,
       "value": "Current Password"
-    }
-  ],
-  "Gu0oq5": [
-    {
-      "type": 0,
-      "value": "1 special character (example: , S ! % #)"
     }
   ],
   "I866h3": [
@@ -907,12 +889,6 @@
     {
       "type": 0,
       "value": "Spanish (Spain)"
-    }
-  ],
-  "O95R3Z": [
-    {
-      "type": 0,
-      "value": "Phone"
     }
   ],
   "O9nLUc": [
@@ -1163,12 +1139,6 @@
       "value": "Add a new address method for faster checkout"
     }
   ],
-  "Solm6E": [
-    {
-      "type": 0,
-      "value": "Zip Code"
-    }
-  ],
   "T/K9MQ": [
     {
       "type": 0,
@@ -1179,34 +1149,6 @@
     {
       "type": 0,
       "value": "German (Germany)"
-    }
-  ],
-  "TBI5GJ": [
-    {
-      "type": 0,
-      "value": "This "
-    },
-    {
-      "type": 1,
-      "value": "length"
-    },
-    {
-      "type": 0,
-      "value": "-digit code can be found on the "
-    },
-    {
-      "type": 1,
-      "value": "side"
-    },
-    {
-      "type": 0,
-      "value": " of your card."
-    }
-  ],
-  "TE4fIS": [
-    {
-      "type": 0,
-      "value": "City"
     }
   ],
   "TR+DHM": [
@@ -1239,12 +1181,6 @@
       "value": "Bangla (Bangladesh)"
     }
   ],
-  "Ty4jOO": [
-    {
-      "type": 0,
-      "value": "1 number"
-    }
-  ],
   "U8vSQS": [
     {
       "type": 0,
@@ -1261,12 +1197,6 @@
     {
       "type": 0,
       "value": "Sign In"
-    }
-  ],
-  "UqKMjl": [
-    {
-      "type": 0,
-      "value": "Postal Code"
     }
   ],
   "V+9Zzz": [
@@ -1389,13 +1319,13 @@
       "value": "Yes"
     }
   ],
-  "action_card.button.edit": [
+  "action_card.action.edit": [
     {
       "type": 0,
       "value": "Edit"
     }
   ],
-  "action_card.button.remove": [
+  "action_card.action.remove": [
     {
       "type": 0,
       "value": "Remove"
@@ -1505,12 +1435,6 @@
     {
       "type": 0,
       "value": "Billing Address"
-    }
-  ],
-  "cChish": [
-    {
-      "type": 0,
-      "value": "8 characters minimum"
     }
   ],
   "cUwO+6": [
@@ -1669,12 +1593,6 @@
       "value": "Italian (Italy)"
     }
   ],
-  "e6Ph5+": [
-    {
-      "type": 0,
-      "value": "Address"
-    }
-  ],
   "eKEL/g": [
     {
       "type": 0,
@@ -1697,12 +1615,6 @@
     {
       "type": 0,
       "value": "Security Code"
-    }
-  ],
-  "f9teca": [
-    {
-      "type": 0,
-      "value": "Province"
     }
   ],
   "fCRlK5": [
@@ -1857,6 +1769,18 @@
       "value": "Be the first to know"
     }
   ],
+  "form_action_buttons.button.cancel": [
+    {
+      "type": 0,
+      "value": "Cancel"
+    }
+  ],
+  "form_action_buttons.button.save": [
+    {
+      "type": 0,
+      "value": "Save"
+    }
+  ],
   "fuzq0p": [
     {
       "type": 0,
@@ -2003,12 +1927,6 @@
       "value": "Are you sure you want to remove this item from your cart?"
     }
   ],
-  "jvo0vs": [
-    {
-      "type": 0,
-      "value": "Save"
-    }
-  ],
   "kVzyDt": [
     {
       "type": 0,
@@ -2025,12 +1943,6 @@
     {
       "type": 0,
       "value": "Top Sellers"
-    }
-  ],
-  "ku+mDU": [
-    {
-      "type": 0,
-      "value": "State"
     }
   ],
   "lKv8ex": [
@@ -2093,12 +2005,6 @@
     {
       "type": 0,
       "value": "Turkish (Turkey)"
-    }
-  ],
-  "nA8PRt": [
-    {
-      "type": 0,
-      "value": "1 lowercase letter"
     }
   ],
   "nEwlut": [
@@ -2197,6 +2103,36 @@
       "value": "Prev"
     }
   ],
+  "password_requirement.error.eight_letter_minimum": [
+    {
+      "type": 0,
+      "value": "8 characters minimum"
+    }
+  ],
+  "password_requirement.error.one_lowercase_letter": [
+    {
+      "type": 0,
+      "value": "1 lowercase letter"
+    }
+  ],
+  "password_requirement.error.one_number": [
+    {
+      "type": 0,
+      "value": "1 number"
+    }
+  ],
+  "password_requirement.error.one_special_character": [
+    {
+      "type": 0,
+      "value": "1 special character (example: , S ! % #)"
+    }
+  ],
+  "password_requirement.error.one_uppercase_letter": [
+    {
+      "type": 0,
+      "value": "1 uppercase letter"
+    }
+  ],
   "product_list_page.no_results": [
     {
       "type": 0,
@@ -2247,6 +2183,12 @@
     {
       "type": 0,
       "value": "\""
+    }
+  ],
+  "promo_code_field.button.apply": [
+    {
+      "type": 0,
+      "value": "Apply"
     }
   ],
   "py3qts": [
@@ -2365,6 +2307,28 @@
       "value": "Korean (Republic of Korea)"
     }
   ],
+  "tool_tip.info.cvv_code": [
+    {
+      "type": 0,
+      "value": "This "
+    },
+    {
+      "type": 1,
+      "value": "length"
+    },
+    {
+      "type": 0,
+      "value": "-digit code can be found on the "
+    },
+    {
+      "type": 1,
+      "value": "side"
+    },
+    {
+      "type": 0,
+      "value": " of your card."
+    }
+  ],
   "tpMVg1": [
     {
       "type": 0,
@@ -2411,6 +2375,96 @@
       "value": "You Might Also Like"
     }
   ],
+  "update_password_field.button.forgot_password": [
+    {
+      "type": 0,
+      "value": "Forgot password?"
+    }
+  ],
+  "use_address_fields.error.no_first_name": [
+    {
+      "type": 0,
+      "value": "Please enter your first name"
+    }
+  ],
+  "use_address_fields.error.required": [
+    {
+      "type": 0,
+      "value": "Required"
+    }
+  ],
+  "use_address_fields.error.state_code_invalid": [
+    {
+      "type": 0,
+      "value": "Please enter 2-letter state/province"
+    }
+  ],
+  "use_address_fields.label.address": [
+    {
+      "type": 0,
+      "value": "Address"
+    }
+  ],
+  "use_address_fields.label.city": [
+    {
+      "type": 0,
+      "value": "City"
+    }
+  ],
+  "use_address_fields.label.country": [
+    {
+      "type": 0,
+      "value": "Country"
+    }
+  ],
+  "use_address_fields.label.first_name": [
+    {
+      "type": 0,
+      "value": "First Name"
+    }
+  ],
+  "use_address_fields.label.last_name": [
+    {
+      "type": 0,
+      "value": "Last Name"
+    }
+  ],
+  "use_address_fields.label.phone": [
+    {
+      "type": 0,
+      "value": "Phone"
+    }
+  ],
+  "use_address_fields.label.postal_code": [
+    {
+      "type": 0,
+      "value": "Postal Code"
+    }
+  ],
+  "use_address_fields.label.preferred": [
+    {
+      "type": 0,
+      "value": "Set as default"
+    }
+  ],
+  "use_address_fields.label.province": [
+    {
+      "type": 0,
+      "value": "Province"
+    }
+  ],
+  "use_address_fields.label.state": [
+    {
+      "type": 0,
+      "value": "State"
+    }
+  ],
+  "use_address_fields.label.zipCode": [
+    {
+      "type": 0,
+      "value": "Zip Code"
+    }
+  ],
   "v898P+": [
     {
       "type": 0,
@@ -2421,12 +2475,6 @@
     {
       "type": 0,
       "value": "Greek (Greece)"
-    }
-  ],
-  "vONi+O": [
-    {
-      "type": 0,
-      "value": "Country"
     }
   ],
   "vSNTMO": [
@@ -2537,12 +2585,6 @@
       "value": "/category/womens-clothing-dresses"
     }
   ],
-  "z+Zrln": [
-    {
-      "type": 0,
-      "value": "Set as default"
-    }
-  ],
   "z34C7B": [
     {
       "type": 0,
@@ -2553,12 +2595,6 @@
     {
       "type": 0,
       "value": "Proceed to Checkout"
-    }
-  ],
-  "zHi6BD": [
-    {
-      "type": 0,
-      "value": "Please enter 2-letter state/province"
     }
   ],
   "zODu/+": [
