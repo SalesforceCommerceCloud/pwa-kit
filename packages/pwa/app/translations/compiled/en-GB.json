@@ -221,12 +221,6 @@
       "value": "Card Type"
     }
   ],
-  "3FyRaO": [
-    {
-      "type": 0,
-      "value": "Shop Women's Outfits"
-    }
-  ],
   "3HK3af": [
     {
       "type": 0,
@@ -681,20 +675,6 @@
       "value": "Clear recent searches"
     }
   ],
-  "DyMLTN": [
-    {
-      "type": 0,
-      "value": "/"
-    },
-    {
-      "type": 1,
-      "value": "activeLocale"
-    },
-    {
-      "type": 0,
-      "value": "/category/mens-clothing-suits"
-    }
-  ],
   "EKKW2e": [
     {
       "type": 0,
@@ -849,12 +829,6 @@
       "value": "Shopper Login and API Access Service"
     }
   ],
-  "KlaAVE": [
-    {
-      "type": 0,
-      "value": "npx pwa-kit-create-app"
-    }
-  ],
   "Kz7I2o": [
     {
       "type": 0,
@@ -965,12 +939,6 @@
     {
       "type": 1,
       "value": "stateOrProvince"
-    }
-  ],
-  "OHPaLj": [
-    {
-      "type": 0,
-      "value": "Shop Men's Suits"
     }
   ],
   "OKPeJz": [
@@ -1095,20 +1063,6 @@
     {
       "type": 0,
       "value": "Shipping"
-    }
-  ],
-  "PW5i35": [
-    {
-      "type": 0,
-      "value": "/"
-    },
-    {
-      "type": 1,
-      "value": "activeLocale"
-    },
-    {
-      "type": 0,
-      "value": "/category/womens-outfits"
     }
   ],
   "PlBReU": [
@@ -1597,12 +1551,6 @@
       "value": "Clear All"
     }
   ],
-  "cv1LY7": [
-    {
-      "type": 0,
-      "value": "static/img/women-outfit.png"
-    }
-  ],
   "d/RGdS": [
     {
       "type": 0,
@@ -1893,12 +1841,6 @@
       "value": "Wishlist"
     }
   ],
-  "hqoiIz": [
-    {
-      "type": 0,
-      "value": "static/img/women-dresses.png"
-    }
-  ],
   "huqKGl": [
     {
       "type": 0,
@@ -1927,12 +1869,6 @@
     {
       "type": 0,
       "value": "Same as shipping address"
-    }
-  ],
-  "iqQeTp": [
-    {
-      "type": 0,
-      "value": "static/img/men-suits.png"
     }
   ],
   "ivNR8s": [
@@ -2495,12 +2431,6 @@
       "value": "Edit"
     }
   ],
-  "wPc1n9": [
-    {
-      "type": 0,
-      "value": "Shop Women's Dresses"
-    }
-  ],
   "x6hxSH": [
     {
       "type": 0,
@@ -2557,20 +2487,6 @@
     {
       "type": 0,
       "value": "Most Viewed"
-    }
-  ],
-  "ymw1eE": [
-    {
-      "type": 0,
-      "value": "/"
-    },
-    {
-      "type": 1,
-      "value": "activeLocale"
-    },
-    {
-      "type": 0,
-      "value": "/category/womens-clothing-dresses"
     }
   ],
   "z+Zrln": [

@@ -24,33 +24,6 @@ import {
     PlugIcon
 } from '../../components/icons'
 
-export const categoriesThreeColumns = [
-    {
-        message: defineMessages({
-            title: {defaultMessage: "Shop Women's Outfits"},
-            href: {defaultMessage: '/{activeLocale}/category/womens-outfits'},
-            imgSrc: {defaultMessage: 'static/img/women-outfit.png'},
-            imgAlt: {defaultMessage: "Shop Women's Outfits"}
-        })
-    },
-    {
-        message: defineMessages({
-            title: {defaultMessage: "Shop Men's Suits"},
-            href: {defaultMessage: '/{activeLocale}/category/mens-clothing-suits'},
-            imgSrc: {defaultMessage: 'static/img/men-suits.png'},
-            imgAlt: {defaultMessage: "Shop Men's Suits"}
-        })
-    },
-    {
-        message: defineMessages({
-            title: {defaultMessage: "Shop Women's Dresses"},
-            href: {defaultMessage: '/{activeLocale}/category/womens-clothing-dresses'},
-            imgSrc: {defaultMessage: 'static/img/women-dresses.png'},
-            imgAlt: {defaultMessage: "Shop Women's Dresses"}
-        })
-    }
-]
-
 export const heroFeatures = [
     {
         message: defineMessages({
@@ -64,14 +37,14 @@ export const heroFeatures = [
             title: {defaultMessage: 'Deploy on Managed Runtime'}
         }),
         icon: <BrandLogo width={12} height={8} />,
-        href: 'https://developer.commercecloud.com/s/article/Pushing-and-Deploying-Bundles'
+        href: 'https://sfdc.co/deploy-on-managed-runtime'
     },
     {
         message: defineMessages({
             title: {defaultMessage: 'Create with the Figma PWA Design Kit'}
         }),
         icon: <FigmaLogo width={12} height={8} />,
-        href: 'https://www.figma.com/file/gOUKasMrK16zS5qrLCTSJl/PWA-Design-Kit?node-id=406%3A21'
+        href: 'https://sfdc.co/figma-pwa-design-kit'
     }
 ]
 

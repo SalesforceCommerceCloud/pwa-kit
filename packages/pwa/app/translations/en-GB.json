@@ -83,9 +83,6 @@
   "3AmUG3": {
     "defaultMessage": "Card Type"
   },
-  "3FyRaO": {
-    "defaultMessage": "Shop Women's Outfits"
-  },
   "3HK3af": {
     "defaultMessage": "Unknown {localeShortCode}"
   },
@@ -266,9 +263,6 @@
   "DwzDiL": {
     "defaultMessage": "Clear recent searches"
   },
-  "DyMLTN": {
-    "defaultMessage": "/{activeLocale}/category/mens-clothing-suits"
-  },
   "EKKW2e": {
     "defaultMessage": "1 uppercase letter",
     "description": "Password requirement"
@@ -340,9 +334,6 @@
   "KcHWA3": {
     "defaultMessage": "Shopper Login and API Access Service"
   },
-  "KlaAVE": {
-    "defaultMessage": "npx pwa-kit-create-app"
-  },
   "Kz7I2o": {
     "defaultMessage": "Password updated"
   },
@@ -397,9 +388,6 @@
   "O9nLUc": {
     "defaultMessage": "Please select your {stateOrProvince}"
   },
-  "OHPaLj": {
-    "defaultMessage": "Shop Men's Suits"
-  },
   "OKPeJz": {
     "defaultMessage": "Item removed from cart"
   },
@@ -448,9 +436,6 @@
   },
   "PRlD0A": {
     "defaultMessage": "Shipping"
-  },
-  "PW5i35": {
-    "defaultMessage": "/{activeLocale}/category/womens-outfits"
   },
   "PlBReU": {
     "defaultMessage": "Log out"
@@ -673,9 +658,6 @@
   "cqlObT": {
     "defaultMessage": "Clear All"
   },
-  "cv1LY7": {
-    "defaultMessage": "static/img/women-outfit.png"
-  },
   "d/RGdS": {
     "defaultMessage": "Portuguese (Portugal)"
   },
@@ -814,9 +796,6 @@
   "hp3uqR": {
     "defaultMessage": "Wishlist"
   },
-  "hqoiIz": {
-    "defaultMessage": "static/img/women-dresses.png"
-  },
   "huqKGl": {
     "defaultMessage": "Create account"
   },
@@ -831,9 +810,6 @@
   },
   "ipwTkh": {
     "defaultMessage": "Same as shipping address"
-  },
-  "iqQeTp": {
-    "defaultMessage": "static/img/men-suits.png"
   },
   "ivNR8s": {
     "defaultMessage": "Order Summary"
@@ -1074,9 +1050,6 @@
   "wEQDC6": {
     "defaultMessage": "Edit"
   },
-  "wPc1n9": {
-    "defaultMessage": "Shop Women's Dresses"
-  },
   "x6hxSH": {
     "defaultMessage": "Something's not right with your email or password. Try again."
   },
@@ -1103,9 +1076,6 @@
   },
   "y/sA02": {
     "defaultMessage": "Most Viewed"
-  },
-  "ymw1eE": {
-    "defaultMessage": "/{activeLocale}/category/womens-clothing-dresses"
   },
   "z+Zrln": {
     "defaultMessage": "Set as default"

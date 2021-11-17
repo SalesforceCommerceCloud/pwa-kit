@@ -50,16 +50,14 @@ const Home = () => {
                 })}
                 img={{
                     src: getAssetUrl('static/img/hero.png'),
-                    alt: intl.formatMessage({
-                        defaultMessage: 'npx pwa-kit-create-app'
-                    })
+                    alt: 'npx pwa-kit-create-app'
                 }}
                 actions={
                     <Stack spacing={{base: 4, sm: 6}} direction={{base: 'column', sm: 'row'}}>
                         <Button
                             as={Link}
                             target="_blank"
-                            href="https://developer.commercecloud.com/s/article/PWA-Kit"
+                            href="http://sfdc.co/pwa-kit-developer-center"
                             width={{base: 'full', md: 'inherit'}}
                             px={7}
                         >
@@ -69,7 +67,7 @@ const Home = () => {
                         <Button
                             as={Link}
                             target="_blank"
-                            href="https://trailhead.salesforce.com/content/learn/modules/commerce-pwa-kit-and-managed-runtime"
+                            href="https://sfdc.co/pwa-kit-and-managed-runtime-trailhead"
                             width={{base: 'full', md: 'inherit'}}
                             px={7}
                             variant="outline"
@@ -139,9 +137,7 @@ const Home = () => {
                         link: (
                             <Link
                                 target="_blank"
-                                href={
-                                    'https://documentation.b2c.commercecloud.salesforce.com/DOC2/topic/com.demandware.dochelp/content/b2c_commerce/topics/catalogs/b2c_manage_catalogs.html'
-                                }
+                                href={'https://sfdc.co/business-manager-manage-catalgos'}
                                 textDecoration={'none'}
                                 position={'relative'}
                                 _after={{
