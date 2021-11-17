@@ -130,6 +130,8 @@ const AccountPaymentMethods = () => {
         setIsEditing(!isEditing)
     }
 
+    console.log(hasSavedPayments)
+
     return (
         <Stack spacing={4} data-testid="account-payment-methods-page">
             <Heading as="h1" fontSize="2xl">

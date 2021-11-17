@@ -173,6 +173,8 @@ const AccountAddresses = () => {
         }
     }
 
+    console.log(hasAddresses)
+
     return (
         <Stack spacing={4} data-testid="account-addresses-page">
             <Heading as="h1" fontSize="2xl">
