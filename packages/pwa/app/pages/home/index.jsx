@@ -24,7 +24,6 @@ import {getAssetUrl} from 'pwa-kit-react-sdk/ssr/universal/utils'
 import Hero from '../../components/hero'
 import Seo from '../../components/seo'
 import Section from '../../components/section'
-import {Link as RouterLink} from 'react-router-dom'
 import {heroFeatures, features} from './data'
 import RecommendedProducts from '../../components/recommended-products'
 
@@ -56,11 +55,12 @@ const Home = () => {
                 actions={
                     <Stack spacing={{base: 4, sm: 6}} direction={{base: 'column', sm: 'row'}}>
                         <Button
-                            as={RouterLink}
+                            as={Link}
+                            href="http://sfdc.co/pwa-kit-developer-center"
                             target="_blank"
-                            to="http://sfdc.co/pwa-kit-developer-center"
                             width={{base: 'full', md: 'inherit'}}
                             paddingX={7}
+                            _hover={{textDecoration: 'none'}}
                         >
                             <FormattedMessage defaultMessage="Get started" />
                         </Button>
@@ -173,7 +173,7 @@ const Home = () => {
                         'Out-of-the-box features so that you focus only on adding enhancements.'
                 })}
             >
-                <Container maxWith={'6xl'} marginTop={10}>
+                <Container maxW={'6xl'} marginTop={10}>
                     <SimpleGrid columns={{base: 1, md: 2, lg: 3}} spacing={10}>
                         {features.map((feature, index) => {
                             const featureMessage = feature.message
@@ -221,11 +221,12 @@ const Home = () => {
                 )}
                 actions={
                     <Button
-                        as={RouterLink}
-                        to={'https://help.salesforce.com/s/?language=en_US'}
+                        as={Link}
+                        href="https://help.salesforce.com/s/?language=en_US"
                         target="_blank"
                         width={'auto'}
                         paddingX={7}
+                        _hover={{textDecoration: 'none'}}
                     >
                         <FormattedMessage defaultMessage="Contact Us" />
                     </Button>
