@@ -4,14 +4,12 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {useEffect} from 'react'
 import {Button} from '@chakra-ui/react'
-import {screen, waitFor} from '@testing-library/react'
+import {screen} from '@testing-library/react'
 import React from 'react'
 import withRegistration from './index'
 import {renderWithProviders} from '../../utils/test-utils'
 import user from '@testing-library/user-event'
-import {mockedRegisteredCustomer, mockedGuestCustomer} from '../../commerce-api/mock-data'
 import useCustomer from '../../commerce-api/hooks/useCustomer'
 
 jest.setTimeout(60000)
