@@ -14,17 +14,17 @@
   "+y/wae": {
     "defaultMessage": "{errorMessage}"
   },
+  "/aBLH2": {
+    "defaultMessage": "Get started"
+  },
   "/kLqfV": {
     "defaultMessage": "This is a gift."
   },
   "/vJwLB": {
     "defaultMessage": "Please enter your email address"
   },
-  "/yBi9v": {
-    "defaultMessage": "Shop Women's Jackets & Coats"
-  },
-  "08dLrR": {
-    "defaultMessage": "/{activeLocale}/category/womens-clothing-jackets"
+  "0LrnyG": {
+    "defaultMessage": "Components & Design kit"
   },
   "0Tjkj3": {
     "defaultMessage": "German (Austria)"
@@ -83,9 +83,6 @@
   "3AmUG3": {
     "defaultMessage": "Card Type"
   },
-  "3FyRaO": {
-    "defaultMessage": "Shop Women's Outfits"
-  },
   "3HK3af": {
     "defaultMessage": "Unknown {localeShortCode}"
   },
@@ -125,6 +122,9 @@
   "5S2I6Q": {
     "defaultMessage": "Incorrect username or password, please try again."
   },
+  "5UVtyp": {
+    "defaultMessage": "The React PWA Starter Store for Retail"
+  },
   "5e/Fjo": {
     "defaultMessage": "Portuguese (Brazil)"
   },
@@ -145,6 +145,9 @@
   },
   "7PMLfK": {
     "defaultMessage": "Order Total"
+  },
+  "7Z41IR": {
+    "defaultMessage": "Einstein Recommendations"
   },
   "7gXPhB": {
     "defaultMessage": "Qty"
@@ -194,6 +197,9 @@
   "ADKef8": {
     "defaultMessage": "Add to cart"
   },
+  "AJlIwK": {
+    "defaultMessage": "This section contains content from the catalog. {link} on how to replace it."
+  },
   "AYIKp4": {
     "defaultMessage": "Already have an account? Log in"
   },
@@ -242,6 +248,9 @@
   "D8RblK": {
     "defaultMessage": "Do you have a promo code?"
   },
+  "DKTjIJ": {
+    "defaultMessage": "Deploy on Managed Runtime"
+  },
   "DP5VOH": {
     "defaultMessage": "Shipping Address"
   },
@@ -253,9 +262,6 @@
   },
   "DwzDiL": {
     "defaultMessage": "Clear recent searches"
-  },
-  "DyMLTN": {
-    "defaultMessage": "/{activeLocale}/category/mens-clothing-suits"
   },
   "EKKW2e": {
     "defaultMessage": "1 uppercase letter",
@@ -275,6 +281,9 @@
   },
   "F62y+K": {
     "defaultMessage": "Sign Out"
+  },
+  "FdbYXD": {
+    "defaultMessage": "Shop Products"
   },
   "Fmc5ut": {
     "defaultMessage": "Continue to Shipping Method"
@@ -322,6 +331,9 @@
   "KV/9Hv": {
     "defaultMessage": "Questions"
   },
+  "KcHWA3": {
+    "defaultMessage": "Shopper Login and API Access Service"
+  },
   "Kz7I2o": {
     "defaultMessage": "Password updated"
   },
@@ -331,14 +343,14 @@
   "LiHQih": {
     "defaultMessage": "Coming Soon"
   },
-  "LrQ8C0": {
-    "defaultMessage": "Shop Feeling Red"
-  },
   "MPcjO/": {
     "defaultMessage": "Are you sure you want to sign out? You will need to sign back in to proceed with your current order."
   },
   "MQHbcd": {
     "defaultMessage": "English (Canada)"
+  },
+  "MQoJ1Y": {
+    "defaultMessage": "Enable shoppers to easily log in with a more personalized shopping experience."
   },
   "MnpUD7": {
     "defaultMessage": "View details"
@@ -376,9 +388,6 @@
   "O9nLUc": {
     "defaultMessage": "Please select your {stateOrProvince}"
   },
-  "OHPaLj": {
-    "defaultMessage": "Shop Men's Suits"
-  },
   "OKPeJz": {
     "defaultMessage": "Item removed from cart"
   },
@@ -397,6 +406,9 @@
   },
   "OkmnSf": {
     "defaultMessage": "Hungarian (Hungary)"
+  },
+  "OlItur": {
+    "defaultMessage": "Create with the Figma PWA Design Kit"
   },
   "Olgsm/": {
     "defaultMessage": "Create an account for faster checkout"
@@ -425,14 +437,11 @@
   "PRlD0A": {
     "defaultMessage": "Shipping"
   },
-  "PW5i35": {
-    "defaultMessage": "/{activeLocale}/category/womens-outfits"
-  },
   "PlBReU": {
     "defaultMessage": "Log out"
   },
-  "Pwi/Wk": {
-    "defaultMessage": "New In"
+  "PpMdwV": {
+    "defaultMessage": "We're here to help"
   },
   "Q6wcZ5": {
     "defaultMessage": "First Name"
@@ -448,9 +457,6 @@
   },
   "Qm3TN9": {
     "defaultMessage": "Are you sure you want to continue ?"
-  },
-  "Qpxx+l": {
-    "defaultMessage": "New Arrivals"
   },
   "RlxeOk": {
     "defaultMessage": "Sort By: {sortOption}"
@@ -536,6 +542,12 @@
   "V8WZRT": {
     "defaultMessage": "Continue shopping to add items to your cart"
   },
+  "VALef7": {
+    "defaultMessage": "Ecommerce best practice for a shopper's cart and checkout experience."
+  },
+  "VB8cgA": {
+    "defaultMessage": "Deliver the next best product or offer to every shopper through product recommendations."
+  },
   "VSlYv6": {
     "defaultMessage": "Quantity:"
   },
@@ -545,6 +557,9 @@
   "WTocjo": {
     "defaultMessage": "Card Number"
   },
+  "X9OkqP": {
+    "defaultMessage": "Built using Chakra UI, a simple, modular and accessible React component library."
+  },
   "XBfvKN": {
     "defaultMessage": "Order History"
   },
@@ -553,6 +568,9 @@
   },
   "XU21FV": {
     "defaultMessage": "Shipping & Gift Options"
+  },
+  "Xpu6m3": {
+    "defaultMessage": "Registered shopper's can add product items to their wishlist from purchasing later."
   },
   "YDGR5k": {
     "defaultMessage": "No Saved Payment Methods"
@@ -574,6 +592,9 @@
   },
   "ZWTTz6": {
     "defaultMessage": "Polish (Poland)"
+  },
+  "ZXp0z1": {
+    "defaultMessage": "Features"
   },
   "Zgc/KO": {
     "defaultMessage": "Spanish (United States)"
@@ -600,9 +621,6 @@
   "bTjwXj": {
     "defaultMessage": "Welcome Back"
   },
-  "bXv4wB": {
-    "defaultMessage": "Shop New Arrivals"
-  },
   "bhUBy4": {
     "defaultMessage": "Save & Continue to Shipping Method"
   },
@@ -625,20 +643,20 @@
     "defaultMessage": "8 characters minimum",
     "description": "Password requirement"
   },
+  "cLJrsY": {
+    "defaultMessage": "Cart & Checkout"
+  },
   "cUwO+6": {
     "defaultMessage": "Add New Card"
+  },
+  "cqE+QI": {
+    "defaultMessage": "Shopper's can manage account information such as their profile, addresses, payments and orders."
   },
   "cqlObT": {
     "defaultMessage": "Clear All"
   },
-  "cv1LY7": {
-    "defaultMessage": "static/img/women-outfit.png"
-  },
   "d/RGdS": {
     "defaultMessage": "Portuguese (Portugal)"
-  },
-  "dS8BmB": {
-    "defaultMessage": "static/img/feeling-red.png"
   },
   "dUxyza": {
     "defaultMessage": "Reviews"
@@ -745,9 +763,6 @@
   "gW8EGu": {
     "defaultMessage": "Name on Card"
   },
-  "gg6vZx": {
-    "defaultMessage": "Shop by Category"
-  },
   "gguIJ8": {
     "defaultMessage": "Hindi (India)"
   },
@@ -756,6 +771,9 @@
   },
   "hCj9FS": {
     "defaultMessage": "Please enter your name as shown on your card"
+  },
+  "hZOGLS": {
+    "defaultMessage": "Contact Us"
   },
   "header.button.assistive_msg.logo": {
     "defaultMessage": "Logo"
@@ -775,14 +793,8 @@
   "hp3uqR": {
     "defaultMessage": "Wishlist"
   },
-  "hqoiIz": {
-    "defaultMessage": "static/img/women-dresses.png"
-  },
   "huqKGl": {
     "defaultMessage": "Create account"
-  },
-  "hwGJRL": {
-    "defaultMessage": "/{activeLocale}/category/womens-clothing-feeling-red"
   },
   "i0/00S": {
     "defaultMessage": "English (Australia)"
@@ -796,9 +808,6 @@
   "ipwTkh": {
     "defaultMessage": "Same as shipping address"
   },
-  "iqQeTp": {
-    "defaultMessage": "static/img/men-suits.png"
-  },
   "ivNR8s": {
     "defaultMessage": "Order Summary"
   },
@@ -808,11 +817,11 @@
   "jvo0vs": {
     "defaultMessage": "Save"
   },
+  "kBAj4C": {
+    "defaultMessage": "Download on Github"
+  },
   "kVzyDt": {
     "defaultMessage": "Thank you for your order!"
-  },
-  "kfvFzC": {
-    "defaultMessage": "static/img/women-coats.png"
   },
   "knAdWV": {
     "defaultMessage": "Top Sellers"
@@ -823,8 +832,14 @@
   "lKv8ex": {
     "defaultMessage": "Default"
   },
+  "lc9tAq": {
+    "defaultMessage": "Read docs"
+  },
   "llHgJz": {
     "defaultMessage": "Welcome {name},"
+  },
+  "lmhMZ6": {
+    "defaultMessage": "Out-of-the-box features so that you focus only on adding enhancements."
   },
   "login-redirect.message.welcome": {
     "defaultMessage": "Login Redirect"
@@ -886,6 +901,9 @@
   "nA8PRt": {
     "defaultMessage": "1 lowercase letter",
     "description": "Password requirement"
+  },
+  "nEtDrF": {
+    "defaultMessage": "Contact our support staff and they’ll get {br} you to the right place."
   },
   "nEwlut": {
     "defaultMessage": "Remove Item?"
@@ -987,9 +1005,6 @@
   "tnSBvt": {
     "defaultMessage": "Korean (Republic of Korea)"
   },
-  "tpMVg1": {
-    "defaultMessage": "Lighter layers for lighter days."
-  },
   "uCdcPZ": {
     "defaultMessage": "Romanian (Romania)"
   },
@@ -1032,9 +1047,6 @@
   "wEQDC6": {
     "defaultMessage": "Edit"
   },
-  "wPc1n9": {
-    "defaultMessage": "Shop Women's Dresses"
-  },
   "x6hxSH": {
     "defaultMessage": "Something's not right with your email or password. Try again."
   },
@@ -1061,9 +1073,6 @@
   },
   "y/sA02": {
     "defaultMessage": "Most Viewed"
-  },
-  "ymw1eE": {
-    "defaultMessage": "/{activeLocale}/category/womens-clothing-dresses"
   },
   "z+Zrln": {
     "defaultMessage": "Set as default"
