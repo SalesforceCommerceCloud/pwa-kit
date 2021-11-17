@@ -106,6 +106,7 @@ const CreditCardFields = ({form, prefix = ''}) => {
                                     placement="top"
                                     label={formatMessage(
                                         {
+                                            id: 'tool_tip.info.cvv_code',
                                             defaultMessage:
                                                 'This {length}-digit code can be found on the {side} of your card.',
                                             description: 'Credit card security code help text'

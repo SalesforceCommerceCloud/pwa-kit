@@ -54,27 +54,35 @@ const PasswordRequirements = ({value}) => {
         <Stack spacing={2}>
             <PasswordRequirement isValid={pwValidations.hasMinChars}>
                 <FormattedMessage
+                    id="password_requirement.error.eight_letter_minimum"
                     defaultMessage="8 characters minimum"
                     description="Password requirement"
                 />
             </PasswordRequirement>
             <PasswordRequirement isValid={pwValidations.hasUppercase}>
                 <FormattedMessage
+                    id="password_requirement.error.one_uppercase_letter"
                     defaultMessage="1 uppercase letter"
                     description="Password requirement"
                 />
             </PasswordRequirement>
             <PasswordRequirement isValid={pwValidations.hasLowercase}>
                 <FormattedMessage
+                    id="password_requirement.error.one_lowercase_letter"
                     defaultMessage="1 lowercase letter"
                     description="Password requirement"
                 />
             </PasswordRequirement>
             <PasswordRequirement isValid={pwValidations.hasNumber}>
-                <FormattedMessage defaultMessage="1 number" description="Password requirement" />
+                <FormattedMessage
+                    defaultMessage="1 number"
+                    description="Password requirement"
+                    id="password_requirement.error.one_number"
+                />
             </PasswordRequirement>
             <PasswordRequirement isValid={pwValidations.hasSpecialChar}>
                 <FormattedMessage
+                    id="password_requirement.error.one_special_character"
                     defaultMessage="1 special character (example: , S ! % #)"
                     description="Password requirement"
                 />

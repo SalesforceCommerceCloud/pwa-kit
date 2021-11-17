@@ -9,19 +9,22 @@ import {formatPhoneNumber} from '../../utils/phone-utils'
 import {stateOptions, provinceOptions} from './state-province-options'
 
 const messages = defineMessages({
-    required: {defaultMessage: 'Required'},
-    firstName: {defaultMessage: 'First Name'},
-    lastName: {defaultMessage: 'Last Name'},
-    phone: {defaultMessage: 'Phone'},
-    country: {defaultMessage: 'Country'},
-    address: {defaultMessage: 'Address'},
-    city: {defaultMessage: 'City'},
-    state: {defaultMessage: 'State'},
-    province: {defaultMessage: 'Province'},
-    zipCode: {defaultMessage: 'Zip Code'},
-    postalCode: {defaultMessage: 'Postal Code'},
-    stateCodeInvalid: {defaultMessage: 'Please enter 2-letter state/province'},
-    preferred: {defaultMessage: 'Set as default'}
+    required: {defaultMessage: 'Required', id: 'use_address_fields.error.required'},
+    firstName: {defaultMessage: 'First Name', id: 'use_address_fields.label.first_name'},
+    lastName: {defaultMessage: 'Last Name', id: 'use_address_fields.label.last_name'},
+    phone: {defaultMessage: 'Phone', id: 'use_address_fields.label.phone'},
+    country: {defaultMessage: 'Country', id: 'use_address_fields.label.country'},
+    address: {defaultMessage: 'Address', id: 'use_address_fields.label.address'},
+    city: {defaultMessage: 'City', id: 'use_address_fields.label.city'},
+    state: {defaultMessage: 'State', id: 'use_address_fields.label.state'},
+    province: {defaultMessage: 'Province', id: 'use_address_fields.label.province'},
+    zipCode: {defaultMessage: 'Zip Code', id: 'use_address_fields.label.zipCode'},
+    postalCode: {defaultMessage: 'Postal Code', id: 'use_address_fields.label.postal_code'},
+    stateCodeInvalid: {
+        defaultMessage: 'Please enter 2-letter state/province',
+        id: 'use_address_fields.error.state_code_invalid'
+    },
+    preferred: {defaultMessage: 'Set as default', id: 'use_address_fields.label.preferred'}
 })
 
 /**
@@ -42,7 +45,12 @@ export default function useAddressFields({form: {watch, control, errors}, prefix
             label: formatMessage(messages.firstName),
             defaultValue: '',
             type: 'text',
-            rules: {required: formatMessage({defaultMessage: 'Please enter your first name'})},
+            rules: {
+                required: formatMessage({
+                    defaultMessage: 'Please enter your first name',
+                    id: 'use_address_fields.error.no_first_name'
+                })
+            },
             error: errors[`${prefix}firstName`],
             control
         },
