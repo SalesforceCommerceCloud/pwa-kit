@@ -49,7 +49,12 @@ export const ToggleCard = ({
                         </Heading>
                         {!editing && !disabled && onEdit && (
                             <Button variant="link" size="sm" onClick={onEdit}>
-                                {editLabel || <FormattedMessage defaultMessage="Edit" />}
+                                {editLabel || (
+                                    <FormattedMessage
+                                        defaultMessage="Edit"
+                                        id="toggle_card.action.edit"
+                                    />
+                                )}
                             </Button>
                         )}
                     </Flex>
