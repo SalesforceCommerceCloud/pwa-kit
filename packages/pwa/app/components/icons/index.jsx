@@ -34,6 +34,7 @@ import '../../assets/svg/flag-fr.svg'
 import '../../assets/svg/flag-it.svg'
 import '../../assets/svg/flag-cn.svg'
 import '../../assets/svg/flag-jp.svg'
+import '../../assets/svg/github-logo.svg'
 import '../../assets/svg/hamburger.svg'
 import '../../assets/svg/info.svg'
 import '../../assets/svg/social-facebook.svg'
@@ -129,6 +130,7 @@ export const FlagFRIcon = icon('flag-fr')
 export const FlagITIcon = icon('flag-it')
 export const FlagCNIcon = icon('flag-cn')
 export const FlagJPIcon = icon('flag-jp')
+export const GithubLogo = icon('github-logo')
 export const HamburgerIcon = icon('hamburger')
 export const InfoIcon = icon('info')
 export const LikeIcon = icon('like')

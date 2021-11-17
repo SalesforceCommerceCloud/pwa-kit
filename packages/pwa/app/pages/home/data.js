@@ -18,6 +18,7 @@ import {
     BasketIcon,
     BrandLogo,
     FigmaLogo,
+    GithubLogo,
     DashboardIcon,
     HeartIcon,
     LikeIcon,
@@ -29,7 +30,7 @@ export const heroFeatures = [
         message: defineMessages({
             title: {defaultMessage: 'Download on Github'}
         }),
-        icon: <BrandLogo width={12} height={8} />,
+        icon: <GithubLogo width={12} height={12} />,
         href: 'https://github.com/SalesforceCommerceCloud/pwa-kit'
     },
     {
