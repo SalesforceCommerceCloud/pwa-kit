@@ -113,11 +113,9 @@ const Home = () => {
                                         <Flex pl={6} h={24} align={'center'} justify={'center'}>
                                             {feature.icon}
                                         </Flex>
-                                        <VStack align={'start'}>
-                                            <Text fontWeight="700">
-                                                {intl.formatMessage(featureMessage.title)}
-                                            </Text>
-                                        </VStack>
+                                        <Text fontWeight="700">
+                                            {intl.formatMessage(featureMessage.title)}
+                                        </Text>
                                     </HStack>
                                 </Link>
                             </Box>
