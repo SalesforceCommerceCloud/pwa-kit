@@ -2215,6 +2215,38 @@
       "value": "Dutch (The Netherlands)"
     }
   ],
+  "reset_password.button.back_to_sign_in": [
+    {
+      "type": 0,
+      "value": "Back to sign in"
+    }
+  ],
+  "reset_password.info.receive_email_shortly": [
+    {
+      "type": 0,
+      "value": "You will receive an email at "
+    },
+    {
+      "children": [
+        {
+          "type": 1,
+          "value": "email"
+        }
+      ],
+      "type": 8,
+      "value": "b"
+    },
+    {
+      "type": 0,
+      "value": " with a link to reset your password shortly."
+    }
+  ],
+  "reset_password.title.password_reset": [
+    {
+      "type": 0,
+      "value": "Password Reset"
+    }
+  ],
   "rkxMdY": [
     {
       "offset": 0,
@@ -2271,6 +2303,12 @@
       "value": "Edit cart"
     }
   ],
+  "search.action.cancel": [
+    {
+      "type": 0,
+      "value": "Cancel"
+    }
+  ],
   "sy+pv5": [
     {
       "type": 0,
@@ -2305,6 +2343,12 @@
     {
       "type": 0,
       "value": "Korean (Republic of Korea)"
+    }
+  ],
+  "toggle_card.action.edit": [
+    {
+      "type": 0,
+      "value": "Edit"
     }
   ],
   "tool_tip.info.cvv_code": [
