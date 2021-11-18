@@ -140,10 +140,7 @@ const RecommendedProducts = ({zone, recommender, products, title, shouldFetch, .
             })
         } catch {
             toast({
-                title: formatMessage(
-                    {defaultMessage: '{errorMessage}'},
-                    {errorMessage: API_ERROR_MESSAGE}
-                ),
+                title: formatMessage(API_ERROR_MESSAGE),
                 status: 'error'
             })
         }
@@ -158,10 +155,7 @@ const RecommendedProducts = ({zone, recommender, products, title, shouldFetch, .
             })
         } catch {
             toast({
-                title: formatMessage(
-                    {defaultMessage: '{errorMessage}'},
-                    {errorMessage: API_ERROR_MESSAGE}
-                ),
+                title: formatMessage(API_ERROR_MESSAGE),
                 status: 'error'
             })
         }

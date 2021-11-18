@@ -5,6 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
+import {defineMessage} from 'react-intl'
 import packageInfo from '../package.json'
 
 // Constants used in the used for product searching.
@@ -39,7 +40,10 @@ export const cssColorGroups = {
 
 export const FILTER_ACCORDION_SATE = 'filters-expanded-index'
 
-export const API_ERROR_MESSAGE = 'Something went wrong. Try again!'
+export const API_ERROR_MESSAGE = defineMessage({
+    id: 'global.error.something_went_wrong',
+    defaultMessage: 'Something went wrong. Try again!'
+})
 
 export const HOME_HREF = '/'
 

@@ -130,6 +130,7 @@ const ProductList = (props) => {
             toast({
                 title: formatMessage(
                     {
+                        id: 'product_list.info.added_to_wishlist',
                         defaultMessage:
                             '{quantity} {quantity, plural, one {item} other {items}} added to wishlist'
                     },
@@ -149,10 +150,7 @@ const ProductList = (props) => {
             })
         } catch {
             toast({
-                title: formatMessage(
-                    {defaultMessage: '{errorMessage}'},
-                    {errorMessage: API_ERROR_MESSAGE}
-                ),
+                title: formatMessage(API_ERROR_MESSAGE),
                 status: 'error'
             })
         } finally {
@@ -169,10 +167,7 @@ const ProductList = (props) => {
             })
         } catch {
             toast({
-                title: formatMessage(
-                    {defaultMessage: '{errorMessage}'},
-                    {errorMessage: API_ERROR_MESSAGE}
-                ),
+                title: formatMessage(API_ERROR_MESSAGE),
                 status: 'error'
             })
         } finally {

@@ -23,12 +23,6 @@
       "value": "Estimated Total"
     }
   ],
-  "+y/wae": [
-    {
-      "type": 1,
-      "value": "errorMessage"
-    }
-  ],
   "/aBLH2": [
     {
       "type": 0,
@@ -1803,6 +1797,12 @@
       "value": "Hindi (India)"
     }
   ],
+  "global.error.something_went_wrong": [
+    {
+      "type": 0,
+      "value": "Something went wrong. Try again!"
+    }
+  ],
   "gzeOf+": [
     {
       "type": 0,
@@ -2129,6 +2129,44 @@
     {
       "type": 0,
       "value": "1 uppercase letter"
+    }
+  ],
+  "product_list.info.added_to_wishlist": [
+    {
+      "type": 1,
+      "value": "quantity"
+    },
+    {
+      "type": 0,
+      "value": " "
+    },
+    {
+      "offset": 0,
+      "options": {
+        "one": {
+          "value": [
+            {
+              "type": 0,
+              "value": "item"
+            }
+          ]
+        },
+        "other": {
+          "value": [
+            {
+              "type": 0,
+              "value": "items"
+            }
+          ]
+        }
+      },
+      "pluralType": "cardinal",
+      "type": 6,
+      "value": "quantity"
+    },
+    {
+      "type": 0,
+      "value": " added to wishlist"
     }
   ],
   "product_list_page.no_results": [
