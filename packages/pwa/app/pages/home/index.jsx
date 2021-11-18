@@ -26,6 +26,7 @@ import Seo from '../../components/seo'
 import Section from '../../components/section'
 import {heroFeatures, features} from './data'
 import RecommendedProducts from '../../components/recommended-products'
+import useEinstein from '../../commerce-api/hooks/useEinstein'
 
 /**
  * This is the home page for Retail React App.
@@ -35,6 +36,7 @@ import RecommendedProducts from '../../components/recommended-products'
  */
 const Home = () => {
     const intl = useIntl()
+    const {api} = useEinstein()
 
     return (
         <Box data-testid="home-page" layerStyle="page">
@@ -115,52 +117,53 @@ const Home = () => {
                     })}
                 </SimpleGrid>
             </Section>
-
-            <Section
-                padding={4}
-                paddingTop={16}
-                title={intl.formatMessage({
-                    defaultMessage: 'Shop Products'
-                })}
-                subtitle={intl.formatMessage(
-                    {
-                        defaultMessage:
-                            'This section contains content from the catalog. {link} on how to replace it.'
-                    },
-                    {
-                        link: (
-                            <Link
-                                target="_blank"
-                                href={'https://sfdc.co/business-manager-manage-catalgos'}
-                                textDecoration={'none'}
-                                position={'relative'}
-                                _after={{
-                                    position: 'absolute',
-                                    content: `""`,
-                                    height: '2px',
-                                    bottom: '-2px',
-                                    margin: '0 auto',
-                                    left: 0,
-                                    right: 0,
-                                    background: 'gray.700'
-                                }}
-                                _hover={{textDecoration: 'none'}}
-                            >
-                                {intl.formatMessage({
-                                    defaultMessage: 'Read docs'
-                                })}
-                            </Link>
-                        )
-                    }
-                )}
-            >
-                <Stack pt={8} spacing={16}>
-                    <RecommendedProducts
-                        recommender={'products-in-all-categories'}
-                        marginX={{base: -4, md: -8, lg: 0}}
-                    />
-                </Stack>
-            </Section>
+            {api && (
+                <Section
+                    padding={4}
+                    paddingTop={16}
+                    title={intl.formatMessage({
+                        defaultMessage: 'Shop Products'
+                    })}
+                    subtitle={intl.formatMessage(
+                        {
+                            defaultMessage:
+                                'This section contains content from the catalog. {link} on how to replace it.'
+                        },
+                        {
+                            link: (
+                                <Link
+                                    target="_blank"
+                                    href={'https://sfdc.co/business-manager-manage-catalgos'}
+                                    textDecoration={'none'}
+                                    position={'relative'}
+                                    _after={{
+                                        position: 'absolute',
+                                        content: `""`,
+                                        height: '2px',
+                                        bottom: '-2px',
+                                        margin: '0 auto',
+                                        left: 0,
+                                        right: 0,
+                                        background: 'gray.700'
+                                    }}
+                                    _hover={{textDecoration: 'none'}}
+                                >
+                                    {intl.formatMessage({
+                                        defaultMessage: 'Read docs'
+                                    })}
+                                </Link>
+                            )
+                        }
+                    )}
+                >
+                    <Stack pt={8} spacing={16}>
+                        <RecommendedProducts
+                            recommender={'products-in-all-categories'}
+                            marginX={{base: -4, md: -8, lg: 0}}
+                        />
+                    </Stack>
+                </Section>
+            )}
 
             <Section
                 padding={4}
