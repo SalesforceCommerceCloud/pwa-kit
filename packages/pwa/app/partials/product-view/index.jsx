@@ -372,6 +372,13 @@ const ProductView = ({
                 zIndex={2}
                 boxShadow={theme.shadows.top}
             >
+                {!showLoading && showInventoryMessage && (
+                            <Fade in={true}>
+                                <Text align="center" color="orange.600" fontWeight={600} marginBottom={4}>
+                                    {inventoryMessage}
+                                </Text>
+                            </Fade>
+                        )}
                 {renderActionButtons()}
             </Box>
         </Flex>
