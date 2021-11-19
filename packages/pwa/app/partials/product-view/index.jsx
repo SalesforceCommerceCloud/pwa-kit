@@ -347,8 +347,7 @@ const ProductView = ({
                             )}
                         </HideOnDesktop>
                     </VStack>
-
-                    <Box display={['none', 'none', 'none', 'block']}>
+                    <Box>
                         {!showLoading && showInventoryMessage && (
                             <Fade in={true}>
                                 <Text color="orange.600" fontWeight={600} marginBottom={8}>
@@ -356,8 +355,8 @@ const ProductView = ({
                                 </Text>
                             </Fade>
                         )}
-                        {renderActionButtons()}
                     </Box>
+                    <Box display={['none', 'none', 'none', 'block']}>{renderActionButtons()}</Box>
                 </VStack>
             </Flex>
             {/*Add to Cart Button for mobile versions*/}
