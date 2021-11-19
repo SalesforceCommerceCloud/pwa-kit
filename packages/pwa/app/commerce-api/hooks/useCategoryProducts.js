@@ -10,8 +10,8 @@ import {useCommerceAPI} from '../contexts'
 const useCategoryProducts = () => {
     const api = useCommerceAPI()
     const [state, setState] = useState({
-        loadingCategoryProducts: false,
-        recommendationsCategoryProducts: undefined
+        loading: false,
+        products: undefined
     })
 
     return {
@@ -20,16 +20,16 @@ const useCategoryProducts = () => {
         api: api.shopperProducts.getCategory,
 
         async getCategoryProducts(categoryId, limit) {
-            setState((s) => ({...s, loadingCategoryProducts: true}))
+            setState((s) => ({...s, loading: true}))
 
-            const recommendationsCategoryProducts = await api.shopperSearch.productSearch({
+            const products = await api.shopperSearch.productSearch({
                 parameters: {
                     refine: [`cgid=${categoryId}`, 'htype=master'],
                     limit: limit
                 }
             })
 
-            setState({loadingCategoryProducts: false, recommendationsCategoryProducts})
+            setState({loading: false, products})
         }
     }
 }

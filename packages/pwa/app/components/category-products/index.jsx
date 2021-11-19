@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useEffect, useRef, useState} from 'react'
+import React, {useEffect, useRef} from 'react'
 import PropTypes from 'prop-types'
 import {useIntl} from 'react-intl'
 import {Button} from '@chakra-ui/react'
@@ -18,12 +18,8 @@ import useCategoryProducts from '../../commerce-api/hooks/useCategoryProducts'
 /**
  * A component for fetching and rendering products from a specific Category.
  */
-const CategoryProducts = ({categoryId, limit, products, shouldFetch, ...props}) => {
-    const {
-        loadingCategoryProducts,
-        recommendationsCategoryProducts,
-        getCategoryProducts
-    } = useCategoryProducts()
+const CategoryProducts = ({categoryId, limit, ...props}) => {
+    const {loading, products, getCategoryProducts} = useCategoryProducts()
 
     const wishlist = useWishlist()
     const toast = useToast()
@@ -31,22 +27,6 @@ const CategoryProducts = ({categoryId, limit, products, shouldFetch, ...props}) 
     const {formatMessage} = useIntl()
 
     const ref = useRef()
-
-    const [_products, setProducts] = useState(products)
-
-    useEffect(() => {
-        // This is an optimization that eliminates superfluous rerenders/fetching by
-        // keeping a copy of the `products` array prop in state for shallow comparison.
-        if (!Array.isArray(products)) {
-            return
-        }
-        if (
-            products.length !== _products?.length ||
-            !products.every((val, index) => val === _products?.[index])
-        ) {
-            setProducts(products)
-        }
-    }, [products])
 
     useEffect(() => {
         getCategoryProducts(categoryId, limit)
@@ -112,8 +92,8 @@ const CategoryProducts = ({categoryId, limit, products, shouldFetch, ...props}) 
     return (
         <ProductScroller
             ref={ref}
-            products={recommendationsCategoryProducts?.hits}
-            isLoading={loadingCategoryProducts}
+            products={products?.hits}
+            isLoading={loading}
             productTileProps={(product) => ({
                 enableFavourite: true,
                 isFavourite: !!wishlist.findItemByProductId(product?.productId),
@@ -132,13 +112,7 @@ CategoryProducts.propTypes = {
     categoryId: PropTypes.string,
 
     /* The number of products to fetch from a category */
-    limit: PropTypes.number,
-
-    /* The product IDs to use for recommendation context */
-    products: PropTypes.arrayOf(PropTypes.string),
-
-    /* Callback to determine if the component should fetch results */
-    shouldFetch: PropTypes.func
+    limit: PropTypes.number
 }
 
 export default CategoryProducts
