@@ -1,3 +1,4 @@
+## v1.3.0-dev (Nov 18, 2021)
 ## v1.2.0 (Nov 18, 2021)
 
 -   Security package updates
