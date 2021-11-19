@@ -25,7 +25,11 @@ import Hero from '../../components/hero'
 import Seo from '../../components/seo'
 import Section from '../../components/section'
 import {heroFeatures, features} from './data'
-import RecommendedProducts from '../../components/recommended-products'
+import CategoryProducts from '../../components/category-products'
+import {useCategories} from '../../hooks/use-categories'
+
+const SHOP_PRODUCTS_CATEGORY = 0
+const SHOP_PRODUCTS_RESULTS = 10
 
 /**
  * This is the home page for Retail React App.
@@ -35,6 +39,10 @@ import RecommendedProducts from '../../components/recommended-products'
  */
 const Home = () => {
     const intl = useIntl()
+    const {categories} = useCategories()
+
+    // The category ID from which fetch products
+    const categoryId = categories['root'].categories[SHOP_PRODUCTS_CATEGORY].id
 
     return (
         <Box data-testid="home-page" layerStyle="page">
@@ -155,10 +163,13 @@ const Home = () => {
                 )}
             >
                 <Stack pt={8} spacing={16}>
-                    <RecommendedProducts
-                        recommender={'products-in-all-categories'}
-                        marginX={{base: -4, md: -8, lg: 0}}
-                    />
+                    {categories && (
+                        <CategoryProducts
+                            categoryId={categoryId}
+                            limit={SHOP_PRODUCTS_RESULTS}
+                            marginX={{base: -4, md: -8, lg: 0}}
+                        />
+                    )}
                 </Stack>
             </Section>
 
