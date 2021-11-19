@@ -1459,6 +1459,28 @@
       "value": "Clear All"
     }
   ],
+  "credit_card_fields.tool_tip.security_code": [
+    {
+      "type": 0,
+      "value": "This "
+    },
+    {
+      "type": 1,
+      "value": "length"
+    },
+    {
+      "type": 0,
+      "value": "-digit code can be found on the "
+    },
+    {
+      "type": 1,
+      "value": "side"
+    },
+    {
+      "type": 0,
+      "value": " of your card."
+    }
+  ],
   "d/RGdS": [
     {
       "type": 0,
@@ -2101,31 +2123,31 @@
       "value": "Prev"
     }
   ],
-  "password_requirement.error.eight_letter_minimum": [
+  "password_requirements.error.eight_letter_minimum": [
     {
       "type": 0,
       "value": "8 characters minimum"
     }
   ],
-  "password_requirement.error.one_lowercase_letter": [
+  "password_requirements.error.one_lowercase_letter": [
     {
       "type": 0,
       "value": "1 lowercase letter"
     }
   ],
-  "password_requirement.error.one_number": [
+  "password_requirements.error.one_number": [
     {
       "type": 0,
       "value": "1 number"
     }
   ],
-  "password_requirement.error.one_special_character": [
+  "password_requirements.error.one_special_character": [
     {
       "type": 0,
       "value": "1 special character (example: , S ! % #)"
     }
   ],
-  "password_requirement.error.one_uppercase_letter": [
+  "password_requirements.error.one_uppercase_letter": [
     {
       "type": 0,
       "value": "1 uppercase letter"
@@ -2183,7 +2205,7 @@
       "value": "\""
     }
   ],
-  "promo_code_field.button.apply": [
+  "promo_code_fields.button.apply": [
     {
       "type": 0,
       "value": "Apply"
@@ -2343,28 +2365,6 @@
       "value": "Edit"
     }
   ],
-  "tool_tip.info.cvv_code": [
-    {
-      "type": 0,
-      "value": "This "
-    },
-    {
-      "type": 1,
-      "value": "length"
-    },
-    {
-      "type": 0,
-      "value": "-digit code can be found on the "
-    },
-    {
-      "type": 1,
-      "value": "side"
-    },
-    {
-      "type": 0,
-      "value": " of your card."
-    }
-  ],
   "uCdcPZ": [
     {
       "type": 0,
@@ -2395,7 +2395,7 @@
       "value": "You Might Also Like"
     }
   ],
-  "update_password_field.button.forgot_password": [
+  "update_password_fields.button.forgot_password": [
     {
       "type": 0,
       "value": "Forgot password?"
