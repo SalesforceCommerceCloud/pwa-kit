@@ -243,7 +243,6 @@ const OrderSummary = ({
                                         <Text
                                             flex="1"
                                             fontSize="sm"
-                                            textTransform="uppercase"
                                             color="gray.800"
                                         >
                                             {item.code}
