@@ -348,7 +348,7 @@ const ProductView = ({
                         </HideOnDesktop>
                     </VStack>
 
-                    <Box display={['none', 'none', 'none', 'block']}>
+                    <Box>
                         {!showLoading && showInventoryMessage && (
                             <Fade in={true}>
                                 <Text color="orange.600" fontWeight={600} marginBottom={8}>
@@ -356,8 +356,8 @@ const ProductView = ({
                                 </Text>
                             </Fade>
                         )}
-                        {renderActionButtons()}
                     </Box>
+                    <Box display={['none', 'none', 'none', 'block']}>{renderActionButtons()}</Box>
                 </VStack>
             </Flex>
             {/*Add to Cart Button for mobile versions*/}
@@ -372,13 +372,6 @@ const ProductView = ({
                 zIndex={2}
                 boxShadow={theme.shadows.top}
             >
-                {!showLoading && showInventoryMessage && (
-                    <Fade in={true}>
-                        <Text align="center" color="orange.600" fontWeight={600} marginBottom={4}>
-                            {inventoryMessage}
-                        </Text>
-                    </Fade>
-                )}
                 {renderActionButtons()}
             </Box>
         </Flex>
