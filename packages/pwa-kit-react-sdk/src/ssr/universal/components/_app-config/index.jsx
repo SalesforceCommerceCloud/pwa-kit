@@ -52,6 +52,25 @@ class AppConfig extends React.Component {
     }
 
     /**
+     * Freeze the request into the rendered HTML and is also made available globally
+     * in the `render` function. This function is only called once on the server-side
+     *
+     * @param req - the request object.
+     * @param res - the response object.
+     * @return {Object} - the application state as an object, which will be
+     *    serialized into JSON and embedded in the page HTML.
+     */
+    // eslint-disable-next-line no-unused-vars
+    static freezeRequest(req, res) {
+        return {
+            url: req.url,
+            headers: {
+                'Accept-Language': req.headers['Accept-Language']
+            }
+        }
+    }
+
+    /**
      * Return any extra arguments to be injected into `getProps` methods across
      * the entire app, such as a Redux store.
      *

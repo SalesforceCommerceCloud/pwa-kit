@@ -138,6 +138,7 @@ export const render = async (req, res) => {
     // to inject arguments into the wrapped component's getProps methods.
     AppConfig.restore(res.locals)
 
+    const frozenReq = AppConfig.freezeRequest(req, res)
     const routes = getRoutes(res.locals)
     const WrappedApp = routeComponent(App, false, res.locals)
 
@@ -180,6 +181,7 @@ export const render = async (req, res) => {
         App: WrappedApp,
         appState,
         error: appStateError && logAndFormatError(appStateError),
+        frozenReq,
         routes,
         req,
         res,
@@ -205,7 +207,7 @@ export const render = async (req, res) => {
 }
 
 const renderApp = (args) => {
-    const {req, res, location, routes, appState, error, App} = args
+    const {req, res, location, routes, appState, error, frozenReq, App} = args
 
     const ssrOnly = 'mobify_server_only' in req.query
     const prettyPrint = 'mobify_pretty' in req.query
@@ -267,6 +269,7 @@ const renderApp = (args) => {
     const windowGlobals = {
         __DEVICE_TYPE__: deviceType,
         __PRELOADED_STATE__: appState,
+        __FROZEN_REQ__: frozenReq,
         __ERROR__: error,
         // `window.Progressive` has a long history at Mobify and some
         // client-side code depends on it. Maintain its name out of tradition.

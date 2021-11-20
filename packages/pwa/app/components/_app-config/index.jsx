@@ -89,7 +89,16 @@ AppConfig.restore = (locals = {}) => {
 
 AppConfig.freeze = () => undefined
 
+AppConfig.freezeRequest = (req) => ({
+    url: req.url,
+    headers: {
+        'Accept-Language': req.headers['Accept-Language']
+    }
+})
+
 AppConfig.extraGetPropsArgs = (locals = {}) => {
+    // eslint-disable-next-line no-undef
+    console.log('__extraGetPropsArgs__: ', this)
     return {
         api: locals.api
     }
