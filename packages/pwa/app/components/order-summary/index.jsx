@@ -240,11 +240,7 @@ const OrderSummary = ({
                             <Stack>
                                 {basket.couponItems.map((item) => (
                                     <Flex key={item.couponItemId} alignItems="center">
-                                        <Text
-                                            flex="1"
-                                            fontSize="sm"
-                                            color="gray.800"
-                                        >
+                                        <Text flex="1" fontSize="sm" color="gray.800">
                                             {item.code}
                                         </Text>
                                         {!basket.orderNo && (
