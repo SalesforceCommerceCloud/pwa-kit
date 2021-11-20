@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useEffect} from 'react'
+import React, {useEffect, useState} from 'react'
 import PropTypes from 'prop-types'
 import {useHistory, useLocation} from 'react-router-dom'
 import {useIntl} from 'react-intl'
@@ -89,7 +89,7 @@ const ProductView = ({
         onClose: onAddToCartModalClose
     } = useAddToCartModalContext()
     const theme = useTheme()
-
+    const [optionsMessage, toggleOptionsMessage] = useState(false)
     const {
         showLoading,
         showInventoryMessage,
@@ -114,6 +114,10 @@ const ProductView = ({
         const buttons = []
 
         const handleCartItem = async () => {
+            if (!canOrder) {
+                toggleOptionsMessage(true)
+                return null
+            }
             if (!addToCart && !updateCart) return null
             if (updateCart) {
                 await updateCart(variant, quantity)
@@ -137,7 +141,7 @@ const ProductView = ({
                 <Button
                     key="cart-button"
                     onClick={handleCartItem}
-                    disabled={!canOrder}
+                    disabled={showInventoryMessage}
                     width="100%"
                     variant="solid"
                     marginBottom={4}
@@ -175,6 +179,12 @@ const ProductView = ({
             onAddToCartModalClose()
         }
     }, [location.pathname])
+
+    useEffect(() => {
+        if (canOrder) {
+            toggleOptionsMessage(false)
+        }
+    })
 
     return (
         <Flex direction={'column'} data-testid="product-view">
@@ -335,6 +345,17 @@ const ProductView = ({
                                 }}
                             />
                         </VStack>
+                        <Box>
+                            {!showLoading && optionsMessage && (
+                                <Fade in={true}>
+                                    <Text color="orange.600" fontWeight={600} marginBottom={8}>
+                                        {intl.formatMessage({
+                                            defaultMessage: 'Please select all your options above'
+                                        })}
+                                    </Text>
+                                </Fade>
+                            )}
+                        </Box>
                         <HideOnDesktop>
                             {showFullLink && product && (
                                 <Link to={`/product/${product.master.masterId}`}>
