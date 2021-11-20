@@ -1,8 +1,11 @@
 ## v1.3.0-dev (Nov 18, 2021)
+
+-   [Proxying is disabled when not running locally](https://sfdc.co/cc-mrt-proxy-setup). [#205](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/205)
+
 ## v1.2.0 (Nov 18, 2021)
 
 -   Security package updates
--   Upgrade `copy-webpack-plugin` to latest `^9.0.1` version. [3191](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/181)
+-   Upgrade `copy-webpack-plugin` to latest `^9.0.1` version. [#3191](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/181)
 
 ## v1.1.0 (Sep 27, 2021)
 
