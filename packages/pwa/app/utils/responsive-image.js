@@ -27,7 +27,6 @@ import {Image} from '@chakra-ui/react'
  *     })}
  * />
  */
-// TODO: try lighthouse test right now!
 export const getImageProps = ({src, sizes, widths, transformations, ...otherProps}) => {
     const url = transformImageUrl(src, transformations)
 
