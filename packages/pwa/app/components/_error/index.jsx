@@ -30,7 +30,7 @@ const Error = (props) => {
             <Helmet>
                 <title>{title}</title>
             </Helmet>
-            <Box as="header" width="full" boxShadow="base" backgroudColor="white">
+            <Box as="header" width="full" boxShadow="base" backgroundColor="white">
                 <Box
                     maxWidth="container.xxxl"
                     marginLeft="auto"
