@@ -135,7 +135,7 @@ const DrawerMenu = ({isOpen, onClose = noop, onLogoClick = noop, root}) => {
                                                         color="black"
                                                     >
                                                         {intl.formatMessage({
-                                                            id: 'drawer_menu.categories.shop_all',
+                                                            id: 'drawer_menu.link.shop_all',
                                                             defaultMessage: 'Shop All'
                                                         })}
                                                     </AccordionButton>
