@@ -389,6 +389,12 @@
       "value": "Please enter a valid date"
     }
   ],
+  "6ful6x": [
+    {
+      "type": 0,
+      "value": "Shoppers can manage account information such as their profile, addresses, payments and orders."
+    }
+  ],
   "74fug6": [
     {
       "type": 0,
@@ -1323,12 +1329,6 @@
       "value": "Shipping & Gift Options"
     }
   ],
-  "Xpu6m3": [
-    {
-      "type": 0,
-      "value": "Registered shopper's can add product items to their wishlist from purchasing later."
-    }
-  ],
   "YDGR5k": [
     {
       "type": 0,
@@ -1339,6 +1339,12 @@
     {
       "type": 0,
       "value": "Norwegian (Norway)"
+    }
+  ],
+  "YwT8JW": [
+    {
+      "type": 0,
+      "value": "Registered shoppers can add product items to their wishlist from purchasing later."
     }
   ],
   "Yy/yDL": [
@@ -1511,12 +1517,6 @@
     {
       "type": 0,
       "value": "Add New Card"
-    }
-  ],
-  "cqE+QI": [
-    {
-      "type": 0,
-      "value": "Shopper's can manage account information such as their profile, addresses, payments and orders."
     }
   ],
   "cqlObT": [
