@@ -25,11 +25,10 @@ import Hero from '../../components/hero'
 import Seo from '../../components/seo'
 import Section from '../../components/section'
 import {heroFeatures, features} from './data'
-import CategoryProducts from '../../components/category-products'
-import {useCategories} from '../../hooks/use-categories'
+import ProductScroller from '../../components/product-scroller'
 
-const SHOP_PRODUCTS_CATEGORY = 0
-const SHOP_PRODUCTS_RESULTS = 10
+const SHOP_PRODUCTS_CATEGORY_ID = 'newarrivals'
+const SHOP_PRODUCTS_LIMIT = 10
 
 /**
  * This is the home page for Retail React App.
@@ -37,12 +36,8 @@ const SHOP_PRODUCTS_RESULTS = 10
  * The page renders SEO metadata and a few promotion
  * categories and products, data is from local file.
  */
-const Home = () => {
+const Home = ({productSearchResult, isLoading}) => {
     const intl = useIntl()
-    const {categories} = useCategories()
-
-    // The category ID from which fetch products
-    const categoryId = categories['root'].categories[SHOP_PRODUCTS_CATEGORY].id
 
     return (
         <Box data-testid="home-page" layerStyle="page">
@@ -124,54 +119,53 @@ const Home = () => {
                 </SimpleGrid>
             </Section>
 
-            <Section
-                padding={4}
-                paddingTop={16}
-                title={intl.formatMessage({
-                    defaultMessage: 'Shop Products'
-                })}
-                subtitle={intl.formatMessage(
-                    {
-                        defaultMessage:
-                            'This section contains content from the catalog. {link} on how to replace it.'
-                    },
-                    {
-                        link: (
-                            <Link
-                                target="_blank"
-                                href={'https://sfdc.co/business-manager-manage-catalgos'}
-                                textDecoration={'none'}
-                                position={'relative'}
-                                _after={{
-                                    position: 'absolute',
-                                    content: `""`,
-                                    height: '2px',
-                                    bottom: '-2px',
-                                    margin: '0 auto',
-                                    left: 0,
-                                    right: 0,
-                                    background: 'gray.700'
-                                }}
-                                _hover={{textDecoration: 'none'}}
-                            >
-                                {intl.formatMessage({
-                                    defaultMessage: 'Read docs'
-                                })}
-                            </Link>
-                        )
-                    }
-                )}
-            >
-                <Stack pt={8} spacing={16}>
-                    {categories && (
-                        <CategoryProducts
-                            categoryId={categoryId}
-                            limit={SHOP_PRODUCTS_RESULTS}
-                            marginX={{base: -4, md: -8, lg: 0}}
-                        />
+            {productSearchResult && (
+                <Section
+                    padding={4}
+                    paddingTop={16}
+                    title={intl.formatMessage({
+                        defaultMessage: 'Shop Products'
+                    })}
+                    subtitle={intl.formatMessage(
+                        {
+                            defaultMessage:
+                                'This section contains content from the catalog. {link} on how to replace it.'
+                        },
+                        {
+                            link: (
+                                <Link
+                                    target="_blank"
+                                    href={'https://sfdc.co/business-manager-manage-catalgos'}
+                                    textDecoration={'none'}
+                                    position={'relative'}
+                                    _after={{
+                                        position: 'absolute',
+                                        content: `""`,
+                                        height: '2px',
+                                        bottom: '-2px',
+                                        margin: '0 auto',
+                                        left: 0,
+                                        right: 0,
+                                        background: 'gray.700'
+                                    }}
+                                    _hover={{textDecoration: 'none'}}
+                                >
+                                    {intl.formatMessage({
+                                        defaultMessage: 'Read docs'
+                                    })}
+                                </Link>
+                            )
+                        }
                     )}
-                </Stack>
-            </Section>
+                >
+                    <Stack pt={8} spacing={16}>
+                        <ProductScroller
+                            products={productSearchResult?.hits}
+                            isLoading={isLoading}
+                        />
+                    </Stack>
+                </Section>
+            )}
 
             <Section
                 padding={4}
@@ -249,17 +243,38 @@ const Home = () => {
 }
 
 Home.getTemplateName = () => 'home'
-Home.propTypes = {
-    recommendations: PropTypes.array,
-    isLoading: PropTypes.bool
-}
 
-Home.getProps = async ({res}) => {
+Home.shouldGetProps = ({previousLocation, location}) =>
+    !previousLocation || previousLocation.pathname !== location.pathname
+
+Home.getProps = async ({res, api}) => {
     // Since the home page is static, it is safe to set max age to a high value
     // we set it to a year here, but you can set the value that is suitable for your project
     if (res) {
         res.set('Cache-Control', 'max-age=31536000')
     }
+
+    const productSearchResult = await api.shopperSearch.productSearch({
+        parameters: {
+            refine: [`cgid=${SHOP_PRODUCTS_CATEGORY_ID}`, 'htype=master'],
+            limit: SHOP_PRODUCTS_LIMIT
+        }
+    })
+
+    return {productSearchResult}
+}
+
+Home.propTypes = {
+    /**
+     * The search result object showing all the product hits, that belong
+     * in the supplied category.
+     */
+    productSearchResult: PropTypes.object,
+    /**
+     * The current state of `getProps` when running this value is `true`, otherwise it's
+     * `false`. (Provided internally)
+     */
+    isLoading: PropTypes.bool
 }
 
 export default Home
