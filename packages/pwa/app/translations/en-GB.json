@@ -642,9 +642,6 @@
   "drawer_menu.button.payment_methods": {
     "defaultMessage": "Payment Methods"
   },
-  "drawer_menu.categories.shop_all": {
-    "defaultMessage": "Shop All"
-  },
   "drawer_menu.link.about_us": {
     "defaultMessage": "About Us"
   },
@@ -665,6 +662,9 @@
   },
   "drawer_menu.link.privacy_policy": {
     "defaultMessage": "Privacy Policy"
+  },
+  "drawer_menu.link.shop_all": {
+    "defaultMessage": "Shop All"
   },
   "drawer_menu.link.sign_in": {
     "defaultMessage": "Sign In"

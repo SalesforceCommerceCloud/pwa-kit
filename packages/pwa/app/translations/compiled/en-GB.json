@@ -1515,12 +1515,6 @@
       "value": "Payment Methods"
     }
   ],
-  "drawer_menu.categories.shop_all": [
-    {
-      "type": 0,
-      "value": "Shop All"
-    }
-  ],
   "drawer_menu.link.about_us": [
     {
       "type": 0,
@@ -1561,6 +1555,12 @@
     {
       "type": 0,
       "value": "Privacy Policy"
+    }
+  ],
+  "drawer_menu.link.shop_all": [
+    {
+      "type": 0,
+      "value": "Shop All"
     }
   ],
   "drawer_menu.link.sign_in": [
