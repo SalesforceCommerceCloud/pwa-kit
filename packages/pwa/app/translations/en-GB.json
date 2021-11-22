@@ -614,6 +614,10 @@
   "cqlObT": {
     "defaultMessage": "Clear All"
   },
+  "credit_card_fields.tool_tip.security_code": {
+    "defaultMessage": "This {length}-digit code can be found on the {side} of your card.",
+    "description": "Credit card security code help text"
+  },
   "d/RGdS": {
     "defaultMessage": "Portuguese (Portugal)"
   },
@@ -923,23 +927,23 @@
   "pagination.actions.prev": {
     "defaultMessage": "Prev"
   },
-  "password_requirement.error.eight_letter_minimum": {
+  "password_requirements.error.eight_letter_minimum": {
     "defaultMessage": "8 characters minimum",
     "description": "Password requirement"
   },
-  "password_requirement.error.one_lowercase_letter": {
+  "password_requirements.error.one_lowercase_letter": {
     "defaultMessage": "1 lowercase letter",
     "description": "Password requirement"
   },
-  "password_requirement.error.one_number": {
+  "password_requirements.error.one_number": {
     "defaultMessage": "1 number",
     "description": "Password requirement"
   },
-  "password_requirement.error.one_special_character": {
+  "password_requirements.error.one_special_character": {
     "defaultMessage": "1 special character (example: , S ! % #)",
     "description": "Password requirement"
   },
-  "password_requirement.error.one_uppercase_letter": {
+  "password_requirements.error.one_uppercase_letter": {
     "defaultMessage": "1 uppercase letter",
     "description": "Password requirement"
   },
@@ -958,7 +962,7 @@
   "product_list_page.no_results_search_query": {
     "defaultMessage": "We couldn’t find anything for \"{searchQuery}\""
   },
-  "promo_code_field.button.apply": {
+  "promo_code_fields.button.apply": {
     "defaultMessage": "Apply"
   },
   "py3qts": {
@@ -1013,10 +1017,6 @@
   "toggle_card.action.edit": {
     "defaultMessage": "Edit"
   },
-  "tool_tip.info.cvv_code": {
-    "defaultMessage": "This {length}-digit code can be found on the {side} of your card.",
-    "description": "Credit card security code help text"
-  },
   "uCdcPZ": {
     "defaultMessage": "Romanian (Romania)"
   },
@@ -1032,7 +1032,7 @@
   "unUv/E": {
     "defaultMessage": "You Might Also Like"
   },
-  "update_password_field.button.forgot_password": {
+  "update_password_fields.button.forgot_password": {
     "defaultMessage": "Forgot password?"
   },
   "use_address_fields.error.please_enter_first_name": {

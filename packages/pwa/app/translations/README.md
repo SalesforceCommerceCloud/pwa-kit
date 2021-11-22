@@ -87,22 +87,9 @@ To support localization for multiple locales, write messages...
 
 For example, in your React component, you can add formatted messages like `intl.formatMessage({defaultMessage: '...'})` or `<FormattedMessage defaultMessage="..." />`
 
+### Adding message id
+
 At the minimum, only defaultMessage is the required parameter. The message id is optional. If you don’t specify it, the id is auto-generated for you.
-
-### Creating message id
-
-Message ids is optional. If it is omitted, the ids will be generated automatically when you extract and compiled default messages.
-However, if you find that it is best to create message id manually, it is advised to include three elements as below order to provide the best context for translators 
-
-- Location: the place where this message is located (e.g component/page name, “global”) 
-- UI Type.  
-- Identification: the unique string of this message
-
-For example:
-
-- 'header.button.wishlist'
-- 'footer.column.customer_support'
-    
 
 ## Workflow Between Developers and Translation Team
 
