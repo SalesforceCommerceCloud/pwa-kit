@@ -140,6 +140,9 @@
   "6DCLcI": {
     "defaultMessage": "Please enter a valid date"
   },
+  "6ful6x": {
+    "defaultMessage": "Shoppers can manage account information such as their profile, addresses, payments and orders."
+  },
   "74fug6": {
     "defaultMessage": "Tamil (India)"
   },
@@ -569,14 +572,14 @@
   "XU21FV": {
     "defaultMessage": "Shipping & Gift Options"
   },
-  "Xpu6m3": {
-    "defaultMessage": "Registered shopper's can add product items to their wishlist from purchasing later."
-  },
   "YDGR5k": {
     "defaultMessage": "No Saved Payment Methods"
   },
   "YQhbMR": {
     "defaultMessage": "Norwegian (Norway)"
+  },
+  "YwT8JW": {
+    "defaultMessage": "Registered shoppers can add product items to their wishlist from purchasing later."
   },
   "Yy/yDL": {
     "defaultMessage": "Reset password"
@@ -648,9 +651,6 @@
   },
   "cUwO+6": {
     "defaultMessage": "Add New Card"
-  },
-  "cqE+QI": {
-    "defaultMessage": "Shopper's can manage account information such as their profile, addresses, payments and orders."
   },
   "cqlObT": {
     "defaultMessage": "Clear All"
