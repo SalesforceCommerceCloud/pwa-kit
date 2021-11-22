@@ -667,12 +667,6 @@
       "value": "Clear recent searches"
     }
   ],
-  "EKKW2e": [
-    {
-      "type": 0,
-      "value": "1 uppercase letter"
-    }
-  ],
   "EOUB63": [
     {
       "type": 0,
@@ -691,12 +685,6 @@
     {
       "type": 0,
       "value": "Danish (Denmark)"
-    }
-  ],
-  "EWw/tK": [
-    {
-      "type": 0,
-      "value": "Apply"
     }
   ],
   "Ev6SEF": [
@@ -733,12 +721,6 @@
     {
       "type": 0,
       "value": "Current Password"
-    }
-  ],
-  "Gu0oq5": [
-    {
-      "type": 0,
-      "value": "1 special character (example: , S ! % #)"
     }
   ],
   "I866h3": [
@@ -911,22 +893,6 @@
       "value": "Spanish (Spain)"
     }
   ],
-  "O95R3Z": [
-    {
-      "type": 0,
-      "value": "Phone"
-    }
-  ],
-  "O9nLUc": [
-    {
-      "type": 0,
-      "value": "Please select your "
-    },
-    {
-      "type": 1,
-      "value": "stateOrProvince"
-    }
-  ],
   "OKPeJz": [
     {
       "type": 0,
@@ -1081,12 +1047,6 @@
       "value": "German (Switzerland)"
     }
   ],
-  "QclMUn": [
-    {
-      "type": 0,
-      "value": "Please select your country"
-    }
-  ],
   "Qm3TN9": [
     {
       "type": 0,
@@ -1145,12 +1105,6 @@
       "value": "Add a new address method for faster checkout"
     }
   ],
-  "Solm6E": [
-    {
-      "type": 0,
-      "value": "Zip Code"
-    }
-  ],
   "T/K9MQ": [
     {
       "type": 0,
@@ -1161,34 +1115,6 @@
     {
       "type": 0,
       "value": "German (Germany)"
-    }
-  ],
-  "TBI5GJ": [
-    {
-      "type": 0,
-      "value": "This "
-    },
-    {
-      "type": 1,
-      "value": "length"
-    },
-    {
-      "type": 0,
-      "value": "-digit code can be found on the "
-    },
-    {
-      "type": 1,
-      "value": "side"
-    },
-    {
-      "type": 0,
-      "value": " of your card."
-    }
-  ],
-  "TE4fIS": [
-    {
-      "type": 0,
-      "value": "City"
     }
   ],
   "TR+DHM": [
@@ -1221,12 +1147,6 @@
       "value": "Bangla (Bangladesh)"
     }
   ],
-  "Ty4jOO": [
-    {
-      "type": 0,
-      "value": "1 number"
-    }
-  ],
   "U8vSQS": [
     {
       "type": 0,
@@ -1243,12 +1163,6 @@
     {
       "type": 0,
       "value": "Sign In"
-    }
-  ],
-  "UqKMjl": [
-    {
-      "type": 0,
-      "value": "Postal Code"
     }
   ],
   "V+9Zzz": [
@@ -1401,6 +1315,18 @@
       "value": "Yes"
     }
   ],
+  "action_card.action.edit": [
+    {
+      "type": 0,
+      "value": "Edit"
+    }
+  ],
+  "action_card.action.remove": [
+    {
+      "type": 0,
+      "value": "Remove"
+    }
+  ],
   "aheQdn": [
     {
       "type": 0,
@@ -1489,22 +1415,10 @@
       "value": "Please try retyping the address, going back to the previous page, or going to the home page."
     }
   ],
-  "c1zaMK": [
-    {
-      "type": 0,
-      "value": "Please enter your address"
-    }
-  ],
   "c7/79+": [
     {
       "type": 0,
       "value": "Billing Address"
-    }
-  ],
-  "cChish": [
-    {
-      "type": 0,
-      "value": "8 characters minimum"
     }
   ],
   "cLJrsY": [
@@ -1525,6 +1439,28 @@
       "value": "Clear All"
     }
   ],
+  "credit_card_fields.tool_tip.security_code": [
+    {
+      "type": 0,
+      "value": "This "
+    },
+    {
+      "type": 1,
+      "value": "length"
+    },
+    {
+      "type": 0,
+      "value": "-digit code can be found on the "
+    },
+    {
+      "type": 1,
+      "value": "side"
+    },
+    {
+      "type": 0,
+      "value": " of your card."
+    }
+  ],
   "d/RGdS": [
     {
       "type": 0,
@@ -1543,16 +1479,118 @@
       "value": "Yes, remove item"
     }
   ],
+  "drawer_menu.button.account_details": [
+    {
+      "type": 0,
+      "value": "Account Details"
+    }
+  ],
+  "drawer_menu.button.addresses": [
+    {
+      "type": 0,
+      "value": "Addresses"
+    }
+  ],
+  "drawer_menu.button.log_out": [
+    {
+      "type": 0,
+      "value": "Log out"
+    }
+  ],
+  "drawer_menu.button.my_account": [
+    {
+      "type": 0,
+      "value": "My Account"
+    }
+  ],
+  "drawer_menu.button.order_history": [
+    {
+      "type": 0,
+      "value": "Order History"
+    }
+  ],
+  "drawer_menu.button.payment_methods": [
+    {
+      "type": 0,
+      "value": "Payment Methods"
+    }
+  ],
+  "drawer_menu.link.about_us": [
+    {
+      "type": 0,
+      "value": "About Us"
+    }
+  ],
+  "drawer_menu.link.customer_support": [
+    {
+      "type": 0,
+      "value": "Customer Support"
+    }
+  ],
+  "drawer_menu.link.customer_support.contact_us": [
+    {
+      "type": 0,
+      "value": "Contact Us"
+    }
+  ],
+  "drawer_menu.link.customer_support.shipping_and_returns": [
+    {
+      "type": 0,
+      "value": "Shipping & Returns"
+    }
+  ],
+  "drawer_menu.link.our_company": [
+    {
+      "type": 0,
+      "value": "Our Company"
+    }
+  ],
+  "drawer_menu.link.privacy_and_security": [
+    {
+      "type": 0,
+      "value": "Privacy & Security"
+    }
+  ],
+  "drawer_menu.link.privacy_policy": [
+    {
+      "type": 0,
+      "value": "Privacy Policy"
+    }
+  ],
+  "drawer_menu.link.shop_all": [
+    {
+      "type": 0,
+      "value": "Shop All"
+    }
+  ],
+  "drawer_menu.link.sign_in": [
+    {
+      "type": 0,
+      "value": "Sign In"
+    }
+  ],
+  "drawer_menu.link.site_map": [
+    {
+      "type": 0,
+      "value": "Site Map"
+    }
+  ],
+  "drawer_menu.link.store_locator": [
+    {
+      "type": 0,
+      "value": "Store Locator"
+    }
+  ],
+  "drawer_menu.link.terms_and_conditions": [
+    {
+      "type": 0,
+      "value": "Terms & Conditions"
+    }
+  ],
   "e//rzS": [
     {
       "type": 0,
       "value": "Italian (Italy)"
-    }
-  ],
-  "e6Ph5+": [
-    {
-      "type": 0,
-      "value": "Address"
     }
   ],
   "eKEL/g": [
@@ -1577,12 +1615,6 @@
     {
       "type": 0,
       "value": "Security Code"
-    }
-  ],
-  "f9teca": [
-    {
-      "type": 0,
-      "value": "Province"
     }
   ],
   "fCRlK5": [
@@ -1737,6 +1769,18 @@
       "value": "Be the first to know"
     }
   ],
+  "form_action_buttons.button.cancel": [
+    {
+      "type": 0,
+      "value": "Cancel"
+    }
+  ],
+  "form_action_buttons.button.save": [
+    {
+      "type": 0,
+      "value": "Save"
+    }
+  ],
   "fuzq0p": [
     {
       "type": 0,
@@ -1857,12 +1901,6 @@
       "value": "Are you sure you want to remove this item from your cart?"
     }
   ],
-  "jvo0vs": [
-    {
-      "type": 0,
-      "value": "Save"
-    }
-  ],
   "kBAj4C": [
     {
       "type": 0,
@@ -1879,12 +1917,6 @@
     {
       "type": 0,
       "value": "Top Sellers"
-    }
-  ],
-  "ku+mDU": [
-    {
-      "type": 0,
-      "value": "State"
     }
   ],
   "lKv8ex": [
@@ -1943,78 +1975,6 @@
       "value": "Recently Viewed"
     }
   ],
-  "mobile_navigation.actions.sign_in": [
-    {
-      "type": 0,
-      "value": "Sign In"
-    }
-  ],
-  "mobile_navigation.actions.store_locator": [
-    {
-      "type": 0,
-      "value": "Store Locator"
-    }
-  ],
-  "mobile_navigation.categories.shop_all": [
-    {
-      "type": 0,
-      "value": "Shop All"
-    }
-  ],
-  "mobile_navigation.links.customer_support": [
-    {
-      "type": 0,
-      "value": "Customer Support"
-    }
-  ],
-  "mobile_navigation.links.customer_support.contact_us": [
-    {
-      "type": 0,
-      "value": "Contact Us"
-    }
-  ],
-  "mobile_navigation.links.customer_support.shipping_and_returns": [
-    {
-      "type": 0,
-      "value": "Shipping & Returns"
-    }
-  ],
-  "mobile_navigation.links.out_company": [
-    {
-      "type": 0,
-      "value": "Our Company"
-    }
-  ],
-  "mobile_navigation.links.out_company.about_us": [
-    {
-      "type": 0,
-      "value": "About Us"
-    }
-  ],
-  "mobile_navigation.links.privacy_and_security": [
-    {
-      "type": 0,
-      "value": "Privacy & Security"
-    }
-  ],
-  "mobile_navigation.links.privacy_and_security.privacy_policy": [
-    {
-      "type": 0,
-      "value": "Privacy Policy"
-    }
-  ],
-  "mobile_navigation.links.privacy_and_security.stie_map": [
-    {
-      "type": 0,
-      "value": "Site Map"
-    }
-  ],
-  "mobile_navigation.links.privacy_and_security.terms_and_conditions": [
-    {
-      "type": 0,
-      "value": "Terms & Conditions"
-    }
-  ],
   "n/iZlE": [
     {
       "type": 0,
@@ -2025,12 +1985,6 @@
     {
       "type": 0,
       "value": "Turkish (Turkey)"
-    }
-  ],
-  "nA8PRt": [
-    {
-      "type": 0,
-      "value": "1 lowercase letter"
     }
   ],
   "nEtDrF": [
@@ -2143,6 +2097,36 @@
       "value": "Prev"
     }
   ],
+  "password_requirements.error.eight_letter_minimum": [
+    {
+      "type": 0,
+      "value": "8 characters minimum"
+    }
+  ],
+  "password_requirements.error.one_lowercase_letter": [
+    {
+      "type": 0,
+      "value": "1 lowercase letter"
+    }
+  ],
+  "password_requirements.error.one_number": [
+    {
+      "type": 0,
+      "value": "1 number"
+    }
+  ],
+  "password_requirements.error.one_special_character": [
+    {
+      "type": 0,
+      "value": "1 special character (example: , S ! % #)"
+    }
+  ],
+  "password_requirements.error.one_uppercase_letter": [
+    {
+      "type": 0,
+      "value": "1 uppercase letter"
+    }
+  ],
   "product_list_page.no_results": [
     {
       "type": 0,
@@ -2195,6 +2179,12 @@
       "value": "\""
     }
   ],
+  "promo_code_fields.button.apply": [
+    {
+      "type": 0,
+      "value": "Apply"
+    }
+  ],
   "py3qts": [
     {
       "type": 0,
@@ -2217,6 +2207,38 @@
     {
       "type": 0,
       "value": "Dutch (The Netherlands)"
+    }
+  ],
+  "reset_password.button.back_to_sign_in": [
+    {
+      "type": 0,
+      "value": "Back to sign in"
+    }
+  ],
+  "reset_password.info.receive_email_shortly": [
+    {
+      "type": 0,
+      "value": "You will receive an email at "
+    },
+    {
+      "children": [
+        {
+          "type": 1,
+          "value": "email"
+        }
+      ],
+      "type": 8,
+      "value": "b"
+    },
+    {
+      "type": 0,
+      "value": " with a link to reset your password shortly."
+    }
+  ],
+  "reset_password.title.password_reset": [
+    {
+      "type": 0,
+      "value": "Password Reset"
     }
   ],
   "rkxMdY": [
@@ -2275,6 +2297,12 @@
       "value": "Edit cart"
     }
   ],
+  "search.action.cancel": [
+    {
+      "type": 0,
+      "value": "Cancel"
+    }
+  ],
   "sy+pv5": [
     {
       "type": 0,
@@ -2299,16 +2327,16 @@
       "value": "Free"
     }
   ],
-  "tiVXug": [
-    {
-      "type": 0,
-      "value": "Please enter your city"
-    }
-  ],
   "tnSBvt": [
     {
       "type": 0,
       "value": "Korean (Republic of Korea)"
+    }
+  ],
+  "toggle_card.action.edit": [
+    {
+      "type": 0,
+      "value": "Edit"
     }
   ],
   "uCdcPZ": [
@@ -2335,7 +2363,37 @@
       "value": "Edit Address"
     }
   ],
-  "uV4+68": [
+  "unUv/E": [
+    {
+      "type": 0,
+      "value": "You Might Also Like"
+    }
+  ],
+  "update_password_fields.button.forgot_password": [
+    {
+      "type": 0,
+      "value": "Forgot password?"
+    }
+  ],
+  "use_address_fields.error.please_enter_first_name": [
+    {
+      "type": 0,
+      "value": "Please enter your first name"
+    }
+  ],
+  "use_address_fields.error.please_enter_last_name": [
+    {
+      "type": 0,
+      "value": "Please enter your last name"
+    }
+  ],
+  "use_address_fields.error.please_enter_phone_number": [
+    {
+      "type": 0,
+      "value": "Please enter your phone number"
+    }
+  ],
+  "use_address_fields.error.please_enter_your_postal_or_zip": [
     {
       "type": 0,
       "value": "Please enter your "
@@ -2345,10 +2403,110 @@
       "value": "postalOrZip"
     }
   ],
-  "unUv/E": [
+  "use_address_fields.error.please_select_your_address": [
     {
       "type": 0,
-      "value": "You Might Also Like"
+      "value": "Please enter your address"
+    }
+  ],
+  "use_address_fields.error.please_select_your_city": [
+    {
+      "type": 0,
+      "value": "Please enter your city"
+    }
+  ],
+  "use_address_fields.error.please_select_your_country": [
+    {
+      "type": 0,
+      "value": "Please select your country"
+    }
+  ],
+  "use_address_fields.error.please_select_your_state_or_province": [
+    {
+      "type": 0,
+      "value": "Please select your "
+    },
+    {
+      "type": 1,
+      "value": "stateOrProvince"
+    }
+  ],
+  "use_address_fields.error.required": [
+    {
+      "type": 0,
+      "value": "Required"
+    }
+  ],
+  "use_address_fields.error.state_code_invalid": [
+    {
+      "type": 0,
+      "value": "Please enter 2-letter state/province"
+    }
+  ],
+  "use_address_fields.label.address": [
+    {
+      "type": 0,
+      "value": "Address"
+    }
+  ],
+  "use_address_fields.label.city": [
+    {
+      "type": 0,
+      "value": "City"
+    }
+  ],
+  "use_address_fields.label.country": [
+    {
+      "type": 0,
+      "value": "Country"
+    }
+  ],
+  "use_address_fields.label.first_name": [
+    {
+      "type": 0,
+      "value": "First Name"
+    }
+  ],
+  "use_address_fields.label.last_name": [
+    {
+      "type": 0,
+      "value": "Last Name"
+    }
+  ],
+  "use_address_fields.label.phone": [
+    {
+      "type": 0,
+      "value": "Phone"
+    }
+  ],
+  "use_address_fields.label.postal_code": [
+    {
+      "type": 0,
+      "value": "Postal Code"
+    }
+  ],
+  "use_address_fields.label.preferred": [
+    {
+      "type": 0,
+      "value": "Set as default"
+    }
+  ],
+  "use_address_fields.label.province": [
+    {
+      "type": 0,
+      "value": "Province"
+    }
+  ],
+  "use_address_fields.label.state": [
+    {
+      "type": 0,
+      "value": "State"
+    }
+  ],
+  "use_address_fields.label.zipCode": [
+    {
+      "type": 0,
+      "value": "Zip Code"
     }
   ],
   "v898P+": [
@@ -2361,12 +2519,6 @@
     {
       "type": 0,
       "value": "Greek (Greece)"
-    }
-  ],
-  "vONi+O": [
-    {
-      "type": 0,
-      "value": "Country"
     }
   ],
   "vSNTMO": [
@@ -2457,12 +2609,6 @@
       "value": "Most Viewed"
     }
   ],
-  "z+Zrln": [
-    {
-      "type": 0,
-      "value": "Set as default"
-    }
-  ],
   "z34C7B": [
     {
       "type": 0,
@@ -2473,12 +2619,6 @@
     {
       "type": 0,
       "value": "Proceed to Checkout"
-    }
-  ],
-  "zHi6BD": [
-    {
-      "type": 0,
-      "value": "Please enter 2-letter state/province"
     }
   ],
   "zODu/+": [
