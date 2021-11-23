@@ -84,7 +84,7 @@ const EmptySearchResults = ({searchQuery, category}) => {
                             title={
                                 <FormattedMessage
                                     defaultMessage="Top Sellers"
-                                    id="empty_search_results.title.top_sellers"
+                                    id="empty_search_results.recommended_products.title.top_sellers"
                                 />
                             }
                             recommender={'home-top-revenue-for-category'}
@@ -95,7 +95,7 @@ const EmptySearchResults = ({searchQuery, category}) => {
                             title={
                                 <FormattedMessage
                                     defaultMessage="Most Viewed"
-                                    id="empty_search_results.title.most_viewed"
+                                    id="empty_search_results.recommended_products.title.most_viewed"
                                 />
                             }
                             recommender={'products-in-all-categories'}
@@ -106,7 +106,7 @@ const EmptySearchResults = ({searchQuery, category}) => {
                             title={
                                 <FormattedMessage
                                     defaultMessage="Most Viewed"
-                                    id="empty_search_results.title.most_viewed"
+                                    id="empty_search_results.recommended_products.title.most_viewed"
                                 />
                             }
                             recommender={'products-in-all-categories'}
