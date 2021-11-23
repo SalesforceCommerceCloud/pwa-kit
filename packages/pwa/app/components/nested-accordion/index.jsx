@@ -7,7 +7,6 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import {useIntl} from 'react-intl'
 
 // Components
 import {
@@ -30,7 +29,6 @@ import {ChevronDownIcon, ChevronRightIcon} from '../icons'
  * be indented to further enhance the hierary view.
  */
 const NestedAccordion = (props) => {
-    const intl = useIntl()
     const styles = useStyleConfig('NestedAccordion')
     const {
         item,

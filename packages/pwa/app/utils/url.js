@@ -48,7 +48,7 @@ export const rebuildPathWithParams = (url, extraParams) => {
         .replace(/=$/, '')
 
     // Generate the newly updated url.
-    return `${pathname}${Array.from(params).length > 0 ? `?${params}` : ''}`
+    return `${pathname}${Array.from(paramStr).length > 0 ? `?${paramStr}` : ''}`
 }
 
 /**
@@ -80,11 +80,9 @@ export const buildUrlSet = (url = '', key = '', values = [], extraParams = {}) =
  * Given a category and the current locale returns an href to the product list page.
  *
  * @param {Object} category
- * @param {string} locale
  * @returns {string}
  */
-export const categoryUrlBuilder = (category, locale = DEFAULT_LOCALE) =>
-    encodeURI(`/category/${category.id}`)
+export const categoryUrlBuilder = (category) => encodeURI(`/category/${category.id}`)
 
 /**
  * Given a product and the current locale returns an href to the product detail page.
@@ -251,8 +249,6 @@ export const buildPathWithUrlConfigParams = (url, configValues = {}) => {
     if (siteAliasParamType === urlParamTypes.PATH) {
         basePathSegments.push(siteAlias)
     }
-    console.log('basePathSegments', basePathSegments)
-    console.log('queryParams', queryParams)
     // build the pathname
     let updatedPath = `${
         basePathSegments.filter(Boolean).length ? `/${basePathSegments.join('/')}` : ''

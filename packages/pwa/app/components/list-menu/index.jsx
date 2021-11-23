@@ -49,7 +49,6 @@ const ChevronIconTrigger = forwardRef(function ChevronIconTrigger(props, ref) {
 const ListMenuTrigger = ({item, name, isOpen, onOpen, onClose, hasItems}) => {
     const theme = useTheme()
     const {baseStyle} = theme.components.ListMenu
-    const {locale} = useIntl()
 
     const keyMap = {
         Escape: () => onClose(),
