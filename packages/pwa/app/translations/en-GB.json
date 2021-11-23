@@ -8,9 +8,6 @@
   "+ZbX4W": {
     "defaultMessage": "Czech (Czech Republic)"
   },
-  "+dLAnb": {
-    "defaultMessage": "Estimated Total"
-  },
   "/aBLH2": {
     "defaultMessage": "Get started"
   },
@@ -53,9 +50,6 @@
   "1yoQ91": {
     "defaultMessage": "No Wishlist Items"
   },
-  "25WwxF": {
-    "defaultMessage": "Don't have an account?"
-  },
   "26gvH3": {
     "defaultMessage": "French (Canada)"
   },
@@ -64,9 +58,6 @@
   },
   "2SvpuI": {
     "defaultMessage": "Log in here"
-  },
-  "2WOdRo": {
-    "defaultMessage": "wishlist"
   },
   "2WRHXI": {
     "defaultMessage": "{quantity} {quantity, plural, one {item} other {items}} added to cart"
@@ -86,14 +77,8 @@
   "3NVyN7": {
     "defaultMessage": "Please enter your first name"
   },
-  "3cfRtZ": {
-    "defaultMessage": "View {prroductCount} items"
-  },
   "3gXwAV": {
     "defaultMessage": "Sign in to retrieve your saved items or continue shopping"
-  },
-  "3rGMFt": {
-    "defaultMessage": "Sale"
   },
   "47FYwb": {
     "defaultMessage": "Cancel"
@@ -161,9 +146,6 @@
   "8CDRAt": {
     "defaultMessage": "Spanish (Mexico)"
   },
-  "8d6kio": {
-    "defaultMessage": "Sort By"
-  },
   "8iXlvA": {
     "defaultMessage": "Save & Continue"
   },
@@ -178,9 +160,6 @@
   },
   "9Npj92": {
     "defaultMessage": "Enter your email to receive instructions on how to reset your password"
-  },
-  "9Obw6C": {
-    "defaultMessage": "Filter"
   },
   "9rqdrm": {
     "defaultMessage": "Item removed from wishlist"
@@ -208,9 +187,6 @@
   },
   "AwzkSM": {
     "defaultMessage": "Tax"
-  },
-  "B/orA3": {
-    "defaultMessage": "Promotions"
   },
   "B5/YE0": {
     "defaultMessage": "Profile updated"
@@ -302,9 +278,6 @@
   "JAcwxt": {
     "defaultMessage": "Order Number"
   },
-  "JQ1EGX": {
-    "defaultMessage": "Promotions applied"
-  },
   "JWbGSW": {
     "defaultMessage": "Shipped to: {name}"
   },
@@ -337,9 +310,6 @@
   },
   "MnpUD7": {
     "defaultMessage": "View details"
-  },
-  "MsGXc3": {
-    "defaultMessage": "Clear Filters"
   },
   "Mv2pEb": {
     "defaultMessage": "Continue shopping and add items to your wishlist"
@@ -432,9 +402,6 @@
   "Qm3TN9": {
     "defaultMessage": "Are you sure you want to continue ?"
   },
-  "RlxeOk": {
-    "defaultMessage": "Sort By: {sortOption}"
-  },
   "SFjs9b": {
     "defaultMessage": "English (New Zealand)"
   },
@@ -504,9 +471,6 @@
   },
   "VB8cgA": {
     "defaultMessage": "Deliver the next best product or offer to every shopper through product recommendations."
-  },
-  "VSlYv6": {
-    "defaultMessage": "Quantity:"
   },
   "WHgdsk": {
     "defaultMessage": "Out of stock"
@@ -581,9 +545,6 @@
   "b2zNZE": {
     "defaultMessage": "Russian (Russian Federation)"
   },
-  "bTjwXj": {
-    "defaultMessage": "Welcome Back"
-  },
   "bhUBy4": {
     "defaultMessage": "Save & Continue to Shipping Method"
   },
@@ -604,9 +565,6 @@
   },
   "cUwO+6": {
     "defaultMessage": "Add New Card"
-  },
-  "cqlObT": {
-    "defaultMessage": "Clear All"
   },
   "credit_card_fields.tool_tip.security_code": {
     "defaultMessage": "This {length}-digit code can be found on the {side} of your card.",
@@ -686,6 +644,24 @@
   },
   "eYVKts": {
     "defaultMessage": "English (India)"
+  },
+  "empty_search_results.info.cant_find_anything_for_category": {
+    "defaultMessage": "We couldn’t find anything for {category}. Try searching for a product or {link}."
+  },
+  "empty_search_results.info.cant_find_anything_for_query": {
+    "defaultMessage": "We couldn’t find anything for \"{searchQuery}\""
+  },
+  "empty_search_results.info.double_check_spelling": {
+    "defaultMessage": "Double-check your spelling and try again or {link}"
+  },
+  "empty_search_results.link.contact_us": {
+    "defaultMessage": "contact us"
+  },
+  "empty_search_results.title.most_viewed": {
+    "defaultMessage": "Most Viewed"
+  },
+  "empty_search_results.title.top_sellers": {
+    "defaultMessage": "Top Sellers"
   },
   "f0EhUc": {
     "defaultMessage": "Security Code"
@@ -801,8 +777,17 @@
   "header.button.assistive_msg.my_cart": {
     "defaultMessage": "My cart"
   },
-  "header.search.field.value.placeholder": {
+  "header.button.assistive_msg.wishlist": {
+    "defaultMessage": "Wishlist"
+  },
+  "header.field.placeholder.search_for_products": {
     "defaultMessage": "Search for products..."
+  },
+  "header.popover.action.log_out": {
+    "defaultMessage": "Log out"
+  },
+  "header.popover.title.my_account": {
+    "defaultMessage": "My Account"
   },
   "hp3uqR": {
     "defaultMessage": "Wishlist"
@@ -822,6 +807,16 @@
   "ipwTkh": {
     "defaultMessage": "Same as shipping address"
   },
+  "item_attributes.label.promotions": {
+    "defaultMessage": "Promotions"
+  },
+  "item_attributes.label.quantity": {
+    "defaultMessage": "Quantity: {quantity}"
+  },
+  "item_image.label.sale": {
+    "defaultMessage": "Sale",
+    "description": "A sale badge placed on top of a product image"
+  },
   "ivNR8s": {
     "defaultMessage": "Order Summary"
   },
@@ -834,9 +829,6 @@
   "kVzyDt": {
     "defaultMessage": "Thank you for your order!"
   },
-  "knAdWV": {
-    "defaultMessage": "Top Sellers"
-  },
   "lKv8ex": {
     "defaultMessage": "Default"
   },
@@ -848,6 +840,21 @@
   },
   "login-redirect.message.welcome": {
     "defaultMessage": "Login Redirect"
+  },
+  "login_form.action.create_account": {
+    "defaultMessage": "Create account"
+  },
+  "login_form.button.sign_in": {
+    "defaultMessage": "Sign in"
+  },
+  "login_form.link.forgot_password": {
+    "defaultMessage": "Forgot password?"
+  },
+  "login_form.message.dont_have_account": {
+    "defaultMessage": "Don't have an account?"
+  },
+  "login_form.message.welcome_back": {
+    "defaultMessage": "Welcome Back"
   },
   "m/CSCf": {
     "defaultMessage": "Add a new payment method for faster checkout"
@@ -897,8 +904,45 @@
   "odXlk8": {
     "defaultMessage": "Log in"
   },
-  "offline_banner.message": {
+  "offline_banner.description.browsing_offline_mode": {
     "defaultMessage": "You're currently browsing in offline mode"
+  },
+  "order_summary.action.remove_promo": {
+    "defaultMessage": "Remove"
+  },
+  "order_summary.cart_items.action.num_of_items_in_cart": {
+    "defaultMessage": "{itemCount, plural, =0 {0 items} one {# item} other {# items}} in cart",
+    "description": "clicking it would expand/show the items in cart"
+  },
+  "order_summary.cart_items.link.edit_cart": {
+    "defaultMessage": "Edit cart"
+  },
+  "order_summary.heading.order_summary": {
+    "defaultMessage": "Order Summary"
+  },
+  "order_summary.label.estimated_total": {
+    "defaultMessage": "Estimated Total"
+  },
+  "order_summary.label.free": {
+    "defaultMessage": "Free"
+  },
+  "order_summary.label.order_total": {
+    "defaultMessage": "Order Total"
+  },
+  "order_summary.label.promo_applied": {
+    "defaultMessage": "promo applied"
+  },
+  "order_summary.label.promotions_applied": {
+    "defaultMessage": "Promotions applied"
+  },
+  "order_summary.label.shipping": {
+    "defaultMessage": "Shipping"
+  },
+  "order_summary.label.subtotal": {
+    "defaultMessage": "Subtotal"
+  },
+  "order_summary.label.tax": {
+    "defaultMessage": "Tax"
   },
   "p2EAP0": {
     "defaultMessage": "Promotion removed"
@@ -909,13 +953,13 @@
   "pS9/Sw": {
     "defaultMessage": "Please enter your card number"
   },
-  "pagination.actions.current_page_verb": {
-    "defaultMessage": "of"
+  "pagination.field.num_of_pages": {
+    "defaultMessage": "of {numOfPages}"
   },
-  "pagination.actions.next": {
+  "pagination.link.next": {
     "defaultMessage": "Next"
   },
-  "pagination.actions.prev": {
+  "pagination.link.prev": {
     "defaultMessage": "Prev"
   },
   "password_requirements.error.eight_letter_minimum": {
@@ -938,20 +982,42 @@
     "defaultMessage": "1 uppercase letter",
     "description": "Password requirement"
   },
+  "price_per_item.label.each": {
+    "defaultMessage": "ea",
+    "description": "Abbreviated 'each', follows price per item, like $10/ea"
+  },
+  "product_item.label.quantity": {
+    "defaultMessage": "Quantity:"
+  },
+  "product_list.button.filter": {
+    "defaultMessage": "Filter"
+  },
+  "product_list.button.sort_by": {
+    "defaultMessage": "Sort By: {sortOption}"
+  },
+  "product_list.drawer.title.sort_by": {
+    "defaultMessage": "Sort By"
+  },
   "product_list.info.added_to_wishlist": {
     "defaultMessage": "{quantity} {quantity, plural, one {item} other {items}} added to wishlist"
   },
-  "product_list_page.no_results": {
-    "defaultMessage": "We couldn’t find anything for {category}. Try searching for a product or {link}."
+  "product_list.info.removed_from_wishlist": {
+    "defaultMessage": "Item removed from wishlist"
   },
-  "product_list_page.no_results.contact_us": {
-    "defaultMessage": "contact us"
+  "product_list.modal.button.clear_filters": {
+    "defaultMessage": "Clear Filters"
   },
-  "product_list_page.no_results_double_check": {
-    "defaultMessage": "Double-check your spelling and try again or {link}"
+  "product_list.modal.button.view_items": {
+    "defaultMessage": "View {prroductCount} items"
   },
-  "product_list_page.no_results_search_query": {
-    "defaultMessage": "We couldn’t find anything for \"{searchQuery}\""
+  "product_list.modal.title.filter": {
+    "defaultMessage": "Filter"
+  },
+  "product_list.select.sort_by": {
+    "defaultMessage": "Sort By: {sortOption}"
+  },
+  "product_tile.assistive_msg.wishlist": {
+    "defaultMessage": "wishlist"
   },
   "promo_code_fields.button.apply": {
     "defaultMessage": "Apply"
@@ -977,18 +1043,14 @@
   "reset_password.title.password_reset": {
     "defaultMessage": "Password Reset"
   },
-  "rkxMdY": {
-    "defaultMessage": "{itemCount, plural, =0 {0 items} one {# item} other {# items}} in cart",
-    "description": "# item(s) in cart"
-  },
   "s/qo4z": {
     "defaultMessage": "Please enter your last name"
   },
-  "s7dATg": {
-    "defaultMessage": "Edit cart"
-  },
   "search.action.cancel": {
     "defaultMessage": "Cancel"
+  },
+  "selected_refinements.action.clear_all": {
+    "defaultMessage": "Clear All"
   },
   "sy+pv5": {
     "defaultMessage": "Email"
@@ -1116,9 +1178,6 @@
   "xBrtnx": {
     "defaultMessage": "Addresses"
   },
-  "xD3Bn3": {
-    "defaultMessage": "Quantity: {quantity}"
-  },
   "xHP4/6": {
     "defaultMessage": "Password Reset"
   },
@@ -1134,18 +1193,11 @@
   "xuTqgN": {
     "defaultMessage": "Payment Methods"
   },
-  "y/sA02": {
-    "defaultMessage": "Most Viewed"
-  },
   "z34C7B": {
     "defaultMessage": "Password must contain at least one special character"
   },
   "z3Qj9h": {
     "defaultMessage": "Proceed to Checkout"
-  },
-  "zODu/+": {
-    "defaultMessage": "ea",
-    "description": "Abbreviated 'each', follows price per item, like $10/ea"
   },
   "zXbRZR": {
     "defaultMessage": "Order Number: {orderNumber}"
