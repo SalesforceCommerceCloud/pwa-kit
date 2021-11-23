@@ -46,14 +46,16 @@ export default function useProfileFields({form: {control, errors}, prefix = ''})
             label: formatMessage({defaultMessage: 'Phone Number'}),
             defaultValue: '',
             type: 'text',
-            rules: {required: formatMessage({defaultMessage: 'Please enter your phone number'}),
-            validate: {
-                isPhoneNumberValid: (val) =>
-                    validatePhone(val).isPhoneNumberValid ||
-                    formatMessage({
-                        defaultMessage: 'Please enter a valid phone number'
-                    })
-            }},
+            rules: {
+                required: formatMessage({defaultMessage: 'Please enter your phone number'}),
+                validate: {
+                    isPhoneNumberValid: (val) =>
+                        validatePhone(val).isPhoneNumberValid ||
+                        formatMessage({
+                            defaultMessage: 'Please enter a valid phone number'
+                        })
+                }
+            },
             error: errors[`${prefix}phone`],
             inputProps: ({onChange}) => ({
                 onChange(evt) {
