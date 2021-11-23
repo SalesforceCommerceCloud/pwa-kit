@@ -87,6 +87,8 @@ To support localization for multiple locales, write messages...
 
 For example, in your React component, you can add formatted messages like `intl.formatMessage({defaultMessage: '...'})` or `<FormattedMessage defaultMessage="..." />`
 
+### Adding message id
+
 At the minimum, only defaultMessage is the required parameter. The message id is optional. If you don’t specify it, the id is auto-generated for you.
 
 ## Workflow Between Developers and Translation Team

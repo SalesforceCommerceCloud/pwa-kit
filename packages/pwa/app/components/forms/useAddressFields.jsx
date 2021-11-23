@@ -9,19 +9,22 @@ import {formatPhoneNumber} from '../../utils/phone-utils'
 import {stateOptions, provinceOptions} from './state-province-options'
 
 const messages = defineMessages({
-    required: {defaultMessage: 'Required'},
-    firstName: {defaultMessage: 'First Name'},
-    lastName: {defaultMessage: 'Last Name'},
-    phone: {defaultMessage: 'Phone'},
-    country: {defaultMessage: 'Country'},
-    address: {defaultMessage: 'Address'},
-    city: {defaultMessage: 'City'},
-    state: {defaultMessage: 'State'},
-    province: {defaultMessage: 'Province'},
-    zipCode: {defaultMessage: 'Zip Code'},
-    postalCode: {defaultMessage: 'Postal Code'},
-    stateCodeInvalid: {defaultMessage: 'Please enter 2-letter state/province'},
-    preferred: {defaultMessage: 'Set as default'}
+    required: {defaultMessage: 'Required', id: 'use_address_fields.error.required'},
+    firstName: {defaultMessage: 'First Name', id: 'use_address_fields.label.first_name'},
+    lastName: {defaultMessage: 'Last Name', id: 'use_address_fields.label.last_name'},
+    phone: {defaultMessage: 'Phone', id: 'use_address_fields.label.phone'},
+    country: {defaultMessage: 'Country', id: 'use_address_fields.label.country'},
+    address: {defaultMessage: 'Address', id: 'use_address_fields.label.address'},
+    city: {defaultMessage: 'City', id: 'use_address_fields.label.city'},
+    state: {defaultMessage: 'State', id: 'use_address_fields.label.state'},
+    province: {defaultMessage: 'Province', id: 'use_address_fields.label.province'},
+    zipCode: {defaultMessage: 'Zip Code', id: 'use_address_fields.label.zipCode'},
+    postalCode: {defaultMessage: 'Postal Code', id: 'use_address_fields.label.postal_code'},
+    stateCodeInvalid: {
+        defaultMessage: 'Please enter 2-letter state/province',
+        id: 'use_address_fields.error.state_code_invalid'
+    },
+    preferred: {defaultMessage: 'Set as default', id: 'use_address_fields.label.preferred'}
 })
 
 /**
@@ -42,7 +45,12 @@ export default function useAddressFields({form: {watch, control, errors}, prefix
             label: formatMessage(messages.firstName),
             defaultValue: '',
             type: 'text',
-            rules: {required: formatMessage({defaultMessage: 'Please enter your first name'})},
+            rules: {
+                required: formatMessage({
+                    defaultMessage: 'Please enter your first name',
+                    id: 'use_address_fields.error.please_enter_first_name'
+                })
+            },
             error: errors[`${prefix}firstName`],
             control
         },
@@ -51,7 +59,12 @@ export default function useAddressFields({form: {watch, control, errors}, prefix
             label: formatMessage(messages.lastName),
             defaultValue: '',
             type: 'text',
-            rules: {required: formatMessage({defaultMessage: 'Please enter your last name'})},
+            rules: {
+                required: formatMessage({
+                    defaultMessage: 'Please enter your last name',
+                    id: 'use_address_fields.error.please_enter_last_name'
+                })
+            },
             error: errors[`${prefix}lastName`],
             control
         },
@@ -60,7 +73,12 @@ export default function useAddressFields({form: {watch, control, errors}, prefix
             label: formatMessage(messages.phone),
             defaultValue: '',
             type: 'tel',
-            rules: {required: formatMessage({defaultMessage: 'Please enter your phone number'})},
+            rules: {
+                required: formatMessage({
+                    defaultMessage: 'Please enter your phone number',
+                    id: 'use_address_fields.error.please_enter_phone_number'
+                })
+            },
             error: errors[`${prefix}phone`],
             inputProps: ({onChange}) => ({
                 inputmode: 'numeric',
@@ -76,7 +94,12 @@ export default function useAddressFields({form: {watch, control, errors}, prefix
             defaultValue: 'US',
             type: 'select',
             options: [{value: 'CA', label: 'Canada'}, {value: 'US', label: 'United States'}],
-            rules: {required: formatMessage({defaultMessage: 'Please select your country'})},
+            rules: {
+                required: formatMessage({
+                    defaultMessage: 'Please select your country',
+                    id: 'use_address_fields.error.please_select_your_country'
+                })
+            },
             error: errors[`${prefix}countryCode`],
             control
         },
@@ -85,7 +108,12 @@ export default function useAddressFields({form: {watch, control, errors}, prefix
             label: formatMessage(messages.address),
             defaultValue: '',
             type: 'text',
-            rules: {required: formatMessage({defaultMessage: 'Please enter your address'})},
+            rules: {
+                required: formatMessage({
+                    defaultMessage: 'Please enter your address',
+                    id: 'use_address_fields.error.please_select_your_address'
+                })
+            },
             error: errors[`${prefix}address1`],
             control
         },
@@ -94,7 +122,12 @@ export default function useAddressFields({form: {watch, control, errors}, prefix
             label: formatMessage(messages.city),
             defaultValue: '',
             type: 'text',
-            rules: {required: formatMessage({defaultMessage: 'Please enter your city'})},
+            rules: {
+                required: formatMessage({
+                    defaultMessage: 'Please enter your city',
+                    id: 'use_address_fields.error.please_select_your_city'
+                })
+            },
             error: errors[`${prefix}city`],
             control
         },
@@ -110,7 +143,8 @@ export default function useAddressFields({form: {watch, control, errors}, prefix
             rules: {
                 required: formatMessage(
                     {
-                        defaultMessage: 'Please select your {stateOrProvince}'
+                        defaultMessage: 'Please select your {stateOrProvince}',
+                        id: 'use_address_fields.error.please_select_your_state_or_province'
                     },
                     {stateOrProvince: countryCode === 'CA' ? 'province' : 'state'}
                 )
@@ -126,7 +160,8 @@ export default function useAddressFields({form: {watch, control, errors}, prefix
             rules: {
                 required: formatMessage(
                     {
-                        defaultMessage: 'Please enter your {postalOrZip}'
+                        defaultMessage: 'Please enter your {postalOrZip}',
+                        id: 'use_address_fields.error.please_enter_your_postal_or_zip'
                     },
                     {postalOrZip: countryCode === 'CA' ? 'postal code' : 'zip code'}
                 )

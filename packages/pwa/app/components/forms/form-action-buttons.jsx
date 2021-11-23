@@ -23,10 +23,17 @@ const FormActionButtons = ({
     return (
         <Stack direction={{base: 'column', lg: 'row-reverse'}} spacing={4}>
             <Button type="submit" minWidth={28} {...saveButtonProps}>
-                {saveButtonLabel || <FormattedMessage defaultMessage="Save" />}
+                {saveButtonLabel || (
+                    <FormattedMessage defaultMessage="Save" id="form_action_buttons.button.save" />
+                )}
             </Button>
             <Button variant="outline" minWidth={28} onClick={onCancel} {...cancelButtonProps}>
-                {cancelButtonLabel || <FormattedMessage defaultMessage="Cancel" />}
+                {cancelButtonLabel || (
+                    <FormattedMessage
+                        id="form_action_buttons.button.cancel"
+                        defaultMessage="Cancel"
+                    />
+                )}
             </Button>
         </Stack>
     )

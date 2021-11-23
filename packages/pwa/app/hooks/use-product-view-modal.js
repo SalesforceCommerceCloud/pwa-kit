@@ -61,10 +61,7 @@ export const useProductViewModal = (initialProduct) => {
                 if (isError(res)) {
                     setIsFetching(false)
                     toast({
-                        title: intl.formatMessage(
-                            {defaultMessage: '{errorMessage}'},
-                            {errorMessage: API_ERROR_MESSAGE}
-                        ),
+                        title: intl.formatMessage(API_ERROR_MESSAGE),
                         status: 'error'
                     })
                     throw new Error(res)
