@@ -110,6 +110,5 @@ const routes = [
 ]
 
 const modifiedRoutes = modifyRoutesWithUrlConfig(routes, [HOME_HREF, '/callback', '/:locale', '*'])
-console.log('modifiedRoutes', modifiedRoutes)
 
 export default modifiedRoutes
