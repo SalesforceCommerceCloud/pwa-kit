@@ -24,6 +24,7 @@ const PricePerItem = ({currency, basket, basePrice}) => {
             />
             <FormattedMessage
                 defaultMessage="ea"
+                id="price_per_item.label.each"
                 description="Abbreviated 'each', follows price per item, like $10/ea"
             />
         </Text>

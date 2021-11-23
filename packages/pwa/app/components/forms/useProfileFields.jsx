@@ -13,40 +13,67 @@ export default function useProfileFields({form: {control, errors}, prefix = ''})
     const fields = {
         firstName: {
             name: `${prefix}firstName`,
-            label: formatMessage({defaultMessage: 'First Name'}),
+            label: formatMessage({
+                defaultMessage: 'First Name',
+                id: 'use_profile_fields.label.first_name'
+            }),
             type: 'text',
             defaultValue: '',
-            rules: {required: formatMessage({defaultMessage: 'Please enter your first name'})},
+            rules: {
+                required: formatMessage({
+                    defaultMessage: 'Please enter your first name',
+                    id: 'use_profile_fields.error.required_first_name'
+                })
+            },
             error: errors[`${prefix}firstName`],
             control
         },
         lastName: {
             name: `${prefix}lastName`,
-            label: formatMessage({defaultMessage: 'Last Name'}),
+            label: formatMessage({
+                defaultMessage: 'Last Name',
+                id: 'use_profile_fields.label.last_name'
+            }),
             type: 'text',
             defaultValue: '',
-            rules: {required: formatMessage({defaultMessage: 'Please enter your last name'})},
+            rules: {
+                required: formatMessage({
+                    defaultMessage: 'Please enter your last name',
+                    id: 'use_profile_fields.error.required_last_name'
+                })
+            },
             error: errors[`${prefix}lastName`],
             control
         },
         email: {
             name: `${prefix}email`,
-            label: formatMessage({defaultMessage: 'Email'}),
+            label: formatMessage({defaultMessage: 'Email', id: 'use_profile_fields.label.email'}),
             placeholder: 'you@email.com',
             type: 'email',
             defaultValue: '',
             rules: {
-                required: formatMessage({defaultMessage: 'Please enter a valid email address'})
+                required: formatMessage({
+                    defaultMessage: 'Please enter a valid email address',
+                    id: 'use_profile_fields.error.required_email'
+                })
             },
             error: errors[`${prefix}email`],
             control
         },
         phone: {
             name: `${prefix}phone`,
-            label: formatMessage({defaultMessage: 'Phone Number'}),
+            label: formatMessage({
+                defaultMessage: 'Phone Number',
+                id: 'use_profile_fields.label.phone'
+            }),
             defaultValue: '',
             type: 'text',
-            rules: {required: formatMessage({defaultMessage: 'Please enter your phone number'})},
+            rules: {
+                required: formatMessage({
+                    defaultMessage: 'Please enter your phone number',
+                    id: 'use_profile_fields.error.required_phone'
+                })
+            },
             error: errors[`${prefix}phone`],
             inputProps: ({onChange}) => ({
                 onChange(evt) {

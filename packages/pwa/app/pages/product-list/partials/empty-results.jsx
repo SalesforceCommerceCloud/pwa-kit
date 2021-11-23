@@ -9,9 +9,14 @@ import React, {Fragment} from 'react'
 import {Button, Text, Flex, Stack, Link} from '@chakra-ui/react'
 import PropTypes from 'prop-types'
 import {Link as RouteLink} from 'react-router-dom'
-import {FormattedMessage, useIntl} from 'react-intl'
+import {defineMessage, FormattedMessage, useIntl} from 'react-intl'
 import {SearchIcon} from '../../../components/icons'
 import RecommendedProducts from '../../../components/recommended-products'
+
+const contactUsMessage = defineMessage({
+    id: 'empty_search_results.link.contact_us',
+    defaultMessage: 'contact us'
+})
 
 const EmptySearchResults = ({searchQuery, category}) => {
     const intl = useIntl()
@@ -31,7 +36,7 @@ const EmptySearchResults = ({searchQuery, category}) => {
                     <Text fontSize={['l', 'l', 'xl', '2xl']} fontWeight="700" marginBottom={2}>
                         {intl.formatMessage(
                             {
-                                id: 'product_list_page.no_results',
+                                id: 'empty_search_results.info.cant_find_anything_for_category',
                                 defaultMessage:
                                     'We couldn’t find anything for {category}. Try searching for a product or {link}.'
                             },
@@ -39,10 +44,7 @@ const EmptySearchResults = ({searchQuery, category}) => {
                                 category: category.name,
                                 link: (
                                     <Link as={RouteLink} to={'/'}>
-                                        {intl.formatMessage({
-                                            id: 'product_list_page.no_results.contact_us',
-                                            defaultMessage: 'contact us'
-                                        })}
+                                        {intl.formatMessage(contactUsMessage)}
                                     </Link>
                                 )
                             }
@@ -54,8 +56,7 @@ const EmptySearchResults = ({searchQuery, category}) => {
                     <Text fontSize={['lg', 'lg', 'xl', '3xl']} fontWeight="700" marginBottom={2}>
                         {intl.formatMessage(
                             {
-                                id: 'product_list_page.no_results_search_query',
-
+                                id: 'empty_search_results.info.cant_find_anything_for_query',
                                 defaultMessage: 'We couldn’t find anything for "{searchQuery}"'
                             },
                             {
@@ -66,16 +67,13 @@ const EmptySearchResults = ({searchQuery, category}) => {
                     <Text fontSize={['md', 'md', 'md', 'md']} fontWeight="400">
                         {intl.formatMessage(
                             {
-                                id: 'product_list_page.no_results_double_check',
+                                id: 'empty_search_results.info.double_check_spelling',
                                 defaultMessage: 'Double-check your spelling and try again or {link}'
                             },
                             {
                                 link: (
                                     <Button variant="link" to={'/'}>
-                                        {intl.formatMessage({
-                                            id: 'product_list_page.no_results.contact_us',
-                                            defaultMessage: 'contact us'
-                                        })}
+                                        {intl.formatMessage(contactUsMessage)}
                                     </Button>
                                 )
                             }
@@ -83,19 +81,34 @@ const EmptySearchResults = ({searchQuery, category}) => {
                     </Text>
                     <Stack spacing={16} marginTop={32}>
                         <RecommendedProducts
-                            title={<FormattedMessage defaultMessage="Top Sellers" />}
+                            title={
+                                <FormattedMessage
+                                    defaultMessage="Top Sellers"
+                                    id="empty_search_results.recommended_products.title.top_sellers"
+                                />
+                            }
                             recommender={'home-top-revenue-for-category'}
                             mx={{base: -4, md: -8, lg: 0}}
                         />
 
                         <RecommendedProducts
-                            title={<FormattedMessage defaultMessage="Most Viewed" />}
+                            title={
+                                <FormattedMessage
+                                    defaultMessage="Most Viewed"
+                                    id="empty_search_results.recommended_products.title.most_viewed"
+                                />
+                            }
                             recommender={'products-in-all-categories'}
                             mx={{base: -4, md: -8, lg: 0}}
                         />
 
                         <RecommendedProducts
-                            title={<FormattedMessage defaultMessage="Most Viewed" />}
+                            title={
+                                <FormattedMessage
+                                    defaultMessage="Most Viewed"
+                                    id="empty_search_results.recommended_products.title.most_viewed"
+                                />
+                            }
                             recommender={'products-in-all-categories'}
                             mx={{base: -4, md: -8, lg: 0}}
                         />

@@ -8,20 +8,11 @@
   "+ZbX4W": {
     "defaultMessage": "Czech (Czech Republic)"
   },
-  "+dLAnb": {
-    "defaultMessage": "Estimated Total"
-  },
-  "+y/wae": {
-    "defaultMessage": "{errorMessage}"
-  },
   "/aBLH2": {
     "defaultMessage": "Get started"
   },
   "/kLqfV": {
     "defaultMessage": "This is a gift."
-  },
-  "/vJwLB": {
-    "defaultMessage": "Please enter your email address"
   },
   "0LrnyG": {
     "defaultMessage": "Components & Design kit"
@@ -38,9 +29,6 @@
   "0nWAOY": {
     "defaultMessage": "Go to home page"
   },
-  "0yGJXJ": {
-    "defaultMessage": "Password must contain at least one lowercase letter"
-  },
   "1LE+iY": {
     "defaultMessage": "See full details"
   },
@@ -56,9 +44,6 @@
   "1yoQ91": {
     "defaultMessage": "No Wishlist Items"
   },
-  "25WwxF": {
-    "defaultMessage": "Don't have an account?"
-  },
   "26gvH3": {
     "defaultMessage": "French (Canada)"
   },
@@ -67,9 +52,6 @@
   },
   "2SvpuI": {
     "defaultMessage": "Log in here"
-  },
-  "2WOdRo": {
-    "defaultMessage": "wishlist"
   },
   "2WRHXI": {
     "defaultMessage": "{quantity} {quantity, plural, one {item} other {items}} added to cart"
@@ -80,23 +62,11 @@
   "2tqQFl": {
     "defaultMessage": "Cart"
   },
-  "3AmUG3": {
-    "defaultMessage": "Card Type"
-  },
   "3HK3af": {
     "defaultMessage": "Unknown {localeShortCode}"
   },
-  "3NVyN7": {
-    "defaultMessage": "Please enter your first name"
-  },
-  "3cfRtZ": {
-    "defaultMessage": "View {prroductCount} items"
-  },
   "3gXwAV": {
     "defaultMessage": "Sign in to retrieve your saved items or continue shopping"
-  },
-  "3rGMFt": {
-    "defaultMessage": "Sale"
   },
   "47FYwb": {
     "defaultMessage": "Cancel"
@@ -116,9 +86,6 @@
   "5JcXdV": {
     "defaultMessage": "Create Account"
   },
-  "5R9heZ": {
-    "defaultMessage": "Expiry Date"
-  },
   "5S2I6Q": {
     "defaultMessage": "Incorrect username or password, please try again."
   },
@@ -136,9 +103,6 @@
   },
   "68qUv0": {
     "defaultMessage": "Chinese (Hong Kong)"
-  },
-  "6DCLcI": {
-    "defaultMessage": "Please enter a valid date"
   },
   "6ful6x": {
     "defaultMessage": "Shoppers can manage account information such as their profile, addresses, payments and orders."
@@ -164,14 +128,8 @@
   "8CDRAt": {
     "defaultMessage": "Spanish (Mexico)"
   },
-  "8d6kio": {
-    "defaultMessage": "Sort By"
-  },
   "8iXlvA": {
     "defaultMessage": "Save & Continue"
-  },
-  "8j72eG": {
-    "defaultMessage": "Please provide a new password"
   },
   "8pvKg1": {
     "defaultMessage": "Payment Details"
@@ -181,9 +139,6 @@
   },
   "9Npj92": {
     "defaultMessage": "Enter your email to receive instructions on how to reset your password"
-  },
-  "9Obw6C": {
-    "defaultMessage": "Filter"
   },
   "9rqdrm": {
     "defaultMessage": "Item removed from wishlist"
@@ -200,6 +155,9 @@
   "ADKef8": {
     "defaultMessage": "Add to cart"
   },
+  "AJlIwK": {
+    "defaultMessage": "This section contains content from the catalog. {link} on how to replace it."
+  },
   "AYIKp4": {
     "defaultMessage": "Already have an account? Log in"
   },
@@ -212,14 +170,8 @@
   "AwzkSM": {
     "defaultMessage": "Tax"
   },
-  "B/orA3": {
-    "defaultMessage": "Promotions"
-  },
   "B5/YE0": {
     "defaultMessage": "Profile updated"
-  },
-  "BAoId6": {
-    "defaultMessage": "Please enter your phone number"
   },
   "BEqvr/": {
     "defaultMessage": "Contact Info"
@@ -238,9 +190,6 @@
   },
   "CutQ+m": {
     "defaultMessage": "Spanish (Columbia)"
-  },
-  "CyOkb5": {
-    "defaultMessage": "Promo Code"
   },
   "D+bY29": {
     "defaultMessage": "Shipping Method"
@@ -269,26 +218,17 @@
   "ES4Hjg": {
     "defaultMessage": "Danish (Denmark)"
   },
-  "Ev6SEF": {
-    "defaultMessage": "New Password"
-  },
   "F62y+K": {
     "defaultMessage": "Sign Out"
+  },
+  "FdbYXD": {
+    "defaultMessage": "Shop Products"
   },
   "Fmc5ut": {
     "defaultMessage": "Continue to Shipping Method"
   },
   "G/yZLu": {
     "defaultMessage": "Remove"
-  },
-  "GH9wCg": {
-    "defaultMessage": "Please provide a valid promo code"
-  },
-  "GretYf": {
-    "defaultMessage": "Current Password"
-  },
-  "I866h3": {
-    "defaultMessage": "Password must contain at least one number"
   },
   "IUXVjJ": {
     "defaultMessage": "Continue Shopping"
@@ -299,14 +239,8 @@
   "ItDqLZ": {
     "defaultMessage": "{count} items"
   },
-  "IyXU3R": {
-    "defaultMessage": "Please enter a valid card number"
-  },
   "JAcwxt": {
     "defaultMessage": "Order Number"
-  },
-  "JQ1EGX": {
-    "defaultMessage": "Promotions applied"
   },
   "JWbGSW": {
     "defaultMessage": "Shipped to: {name}"
@@ -340,9 +274,6 @@
   },
   "MnpUD7": {
     "defaultMessage": "View details"
-  },
-  "MsGXc3": {
-    "defaultMessage": "Clear Filters"
   },
   "Mv2pEb": {
     "defaultMessage": "Continue shopping and add items to your wishlist"
@@ -396,14 +327,8 @@
   "OrvEHn": {
     "defaultMessage": "Product Detail"
   },
-  "P5ouV8": {
-    "defaultMessage": "Please enter your security code"
-  },
   "P87iMu": {
     "defaultMessage": "Tamil (Sri Lanka)"
-  },
-  "PBSfL4": {
-    "defaultMessage": "Please enter a valid name"
   },
   "PEVXku": {
     "defaultMessage": "Thai (Thailand)"
@@ -423,9 +348,6 @@
   "PpMdwV": {
     "defaultMessage": "We're here to help"
   },
-  "Q6wcZ5": {
-    "defaultMessage": "First Name"
-  },
   "QEUh37": {
     "defaultMessage": "English (Ireland)"
   },
@@ -434,9 +356,6 @@
   },
   "Qm3TN9": {
     "defaultMessage": "Are you sure you want to continue ?"
-  },
-  "RlxeOk": {
-    "defaultMessage": "Sort By: {sortOption}"
   },
   "SFjs9b": {
     "defaultMessage": "English (New Zealand)"
@@ -452,9 +371,6 @@
   },
   "SeGQoh": {
     "defaultMessage": "Address Updated"
-  },
-  "Seanpx": {
-    "defaultMessage": "Required"
   },
   "SmKUxZ": {
     "defaultMessage": "Add a new address method for faster checkout"
@@ -508,14 +424,8 @@
   "VB8cgA": {
     "defaultMessage": "Deliver the next best product or offer to every shopper through product recommendations."
   },
-  "VSlYv6": {
-    "defaultMessage": "Quantity:"
-  },
   "WHgdsk": {
     "defaultMessage": "Out of stock"
-  },
-  "WTocjo": {
-    "defaultMessage": "Card Number"
   },
   "X9OkqP": {
     "defaultMessage": "Built using Chakra UI, a simple, modular and accessible React component library."
@@ -544,9 +454,6 @@
   "YzZa8+": {
     "defaultMessage": "My Profile"
   },
-  "ZJkXve": {
-    "defaultMessage": "Sign me up for Salesforce emails (you can unsubscribe at any time)"
-  },
   "ZMphaV": {
     "defaultMessage": "Promotion applied"
   },
@@ -571,9 +478,6 @@
   "action_card.action.remove": {
     "defaultMessage": "Remove"
   },
-  "aheQdn": {
-    "defaultMessage": "Last Name"
-  },
   "au3Vns": {
     "defaultMessage": "{itemCount, plural, =0 {0 items} one {# item} other {# items}}",
     "description": "# item(s) in order"
@@ -583,9 +487,6 @@
   },
   "b2zNZE": {
     "defaultMessage": "Russian (Russian Federation)"
-  },
-  "bTjwXj": {
-    "defaultMessage": "Welcome Back"
   },
   "bhUBy4": {
     "defaultMessage": "Save & Continue to Shipping Method"
@@ -607,9 +508,6 @@
   },
   "cUwO+6": {
     "defaultMessage": "Add New Card"
-  },
-  "cqlObT": {
-    "defaultMessage": "Clear All"
   },
   "credit_card_fields.tool_tip.security_code": {
     "defaultMessage": "This {length}-digit code can be found on the {side} of your card.",
@@ -690,8 +588,23 @@
   "eYVKts": {
     "defaultMessage": "English (India)"
   },
-  "f0EhUc": {
-    "defaultMessage": "Security Code"
+  "empty_search_results.info.cant_find_anything_for_category": {
+    "defaultMessage": "We couldn’t find anything for {category}. Try searching for a product or {link}."
+  },
+  "empty_search_results.info.cant_find_anything_for_query": {
+    "defaultMessage": "We couldn’t find anything for \"{searchQuery}\""
+  },
+  "empty_search_results.info.double_check_spelling": {
+    "defaultMessage": "Double-check your spelling and try again or {link}"
+  },
+  "empty_search_results.link.contact_us": {
+    "defaultMessage": "contact us"
+  },
+  "empty_search_results.recommended_products.title.most_viewed": {
+    "defaultMessage": "Most Viewed"
+  },
+  "empty_search_results.recommended_products.title.top_sellers": {
+    "defaultMessage": "Top Sellers"
   },
   "fCRlK5": {
     "defaultMessage": "We will send an email to <b>{email}</b> with your confirmation number and receipt shortly."
@@ -704,12 +617,6 @@
   },
   "fIHFDI": {
     "defaultMessage": "Add New Address"
-  },
-  "fWz2xP": {
-    "defaultMessage": "Please enter your expiry date"
-  },
-  "ffE6Xw": {
-    "defaultMessage": "Password must contain at least 8 characters"
   },
   "footer.column.account": {
     "defaultMessage": "Account"
@@ -774,17 +681,14 @@
   "g3uXY2": {
     "defaultMessage": "Swedish (Sweden)"
   },
-  "gW8EGu": {
-    "defaultMessage": "Name on Card"
-  },
   "gguIJ8": {
     "defaultMessage": "Hindi (India)"
   },
+  "global.error.something_went_wrong": {
+    "defaultMessage": "Something went wrong. Try again!"
+  },
   "gzeOf+": {
     "defaultMessage": "Chinese (Taiwan)"
-  },
-  "hCj9FS": {
-    "defaultMessage": "Please enter your name as shown on your card"
   },
   "hZOGLS": {
     "defaultMessage": "Contact Us"
@@ -801,8 +705,17 @@
   "header.button.assistive_msg.my_cart": {
     "defaultMessage": "My cart"
   },
-  "header.search.field.value.placeholder": {
+  "header.button.assistive_msg.wishlist": {
+    "defaultMessage": "Wishlist"
+  },
+  "header.field.placeholder.search_for_products": {
     "defaultMessage": "Search for products..."
+  },
+  "header.popover.action.log_out": {
+    "defaultMessage": "Log out"
+  },
+  "header.popover.title.my_account": {
+    "defaultMessage": "My Account"
   },
   "hp3uqR": {
     "defaultMessage": "Wishlist"
@@ -816,11 +729,18 @@
   "iPMbLb": {
     "defaultMessage": "Please select a payment method."
   },
-  "iiYrag": {
-    "defaultMessage": "Please enter your password"
-  },
   "ipwTkh": {
     "defaultMessage": "Same as shipping address"
+  },
+  "item_attributes.label.promotions": {
+    "defaultMessage": "Promotions"
+  },
+  "item_attributes.label.quantity": {
+    "defaultMessage": "Quantity: {quantity}"
+  },
+  "item_image.label.sale": {
+    "defaultMessage": "Sale",
+    "description": "A sale badge placed on top of a product image"
   },
   "ivNR8s": {
     "defaultMessage": "Order Summary"
@@ -834,11 +754,11 @@
   "kVzyDt": {
     "defaultMessage": "Thank you for your order!"
   },
-  "knAdWV": {
-    "defaultMessage": "Top Sellers"
-  },
   "lKv8ex": {
     "defaultMessage": "Default"
+  },
+  "lc9tAq": {
+    "defaultMessage": "Read docs"
   },
   "llHgJz": {
     "defaultMessage": "Welcome {name},"
@@ -848,6 +768,21 @@
   },
   "login-redirect.message.welcome": {
     "defaultMessage": "Login Redirect"
+  },
+  "login_form.action.create_account": {
+    "defaultMessage": "Create account"
+  },
+  "login_form.button.sign_in": {
+    "defaultMessage": "Sign in"
+  },
+  "login_form.link.forgot_password": {
+    "defaultMessage": "Forgot password?"
+  },
+  "login_form.message.dont_have_account": {
+    "defaultMessage": "Don't have an account?"
+  },
+  "login_form.message.welcome_back": {
+    "defaultMessage": "Welcome Back"
   },
   "m/CSCf": {
     "defaultMessage": "Add a new payment method for faster checkout"
@@ -882,12 +817,6 @@
   "o1QPc9": {
     "defaultMessage": "Tracking Number"
   },
-  "o40Ymt": {
-    "defaultMessage": "Please enter a valid security code"
-  },
-  "oLpv29": {
-    "defaultMessage": "Please enter a valid email address"
-  },
   "oUWADl": {
     "defaultMessage": "No"
   },
@@ -897,8 +826,45 @@
   "odXlk8": {
     "defaultMessage": "Log in"
   },
-  "offline_banner.message": {
+  "offline_banner.description.browsing_offline_mode": {
     "defaultMessage": "You're currently browsing in offline mode"
+  },
+  "order_summary.action.remove_promo": {
+    "defaultMessage": "Remove"
+  },
+  "order_summary.cart_items.action.num_of_items_in_cart": {
+    "defaultMessage": "{itemCount, plural, =0 {0 items} one {# item} other {# items}} in cart",
+    "description": "clicking it would expand/show the items in cart"
+  },
+  "order_summary.cart_items.link.edit_cart": {
+    "defaultMessage": "Edit cart"
+  },
+  "order_summary.heading.order_summary": {
+    "defaultMessage": "Order Summary"
+  },
+  "order_summary.label.estimated_total": {
+    "defaultMessage": "Estimated Total"
+  },
+  "order_summary.label.free": {
+    "defaultMessage": "Free"
+  },
+  "order_summary.label.order_total": {
+    "defaultMessage": "Order Total"
+  },
+  "order_summary.label.promo_applied": {
+    "defaultMessage": "promo applied"
+  },
+  "order_summary.label.promotions_applied": {
+    "defaultMessage": "Promotions applied"
+  },
+  "order_summary.label.shipping": {
+    "defaultMessage": "Shipping"
+  },
+  "order_summary.label.subtotal": {
+    "defaultMessage": "Subtotal"
+  },
+  "order_summary.label.tax": {
+    "defaultMessage": "Tax"
   },
   "p2EAP0": {
     "defaultMessage": "Promotion removed"
@@ -906,16 +872,13 @@
   "pQ2F3h": {
     "defaultMessage": "Edit Shipping Address"
   },
-  "pS9/Sw": {
-    "defaultMessage": "Please enter your card number"
+  "pagination.field.num_of_pages": {
+    "defaultMessage": "of {numOfPages}"
   },
-  "pagination.actions.current_page_verb": {
-    "defaultMessage": "of"
-  },
-  "pagination.actions.next": {
+  "pagination.link.next": {
     "defaultMessage": "Next"
   },
-  "pagination.actions.prev": {
+  "pagination.link.prev": {
     "defaultMessage": "Prev"
   },
   "password_requirements.error.eight_letter_minimum": {
@@ -938,26 +901,48 @@
     "defaultMessage": "1 uppercase letter",
     "description": "Password requirement"
   },
-  "product_list_page.no_results": {
-    "defaultMessage": "We couldn’t find anything for {category}. Try searching for a product or {link}."
+  "price_per_item.label.each": {
+    "defaultMessage": "ea",
+    "description": "Abbreviated 'each', follows price per item, like $10/ea"
   },
-  "product_list_page.no_results.contact_us": {
-    "defaultMessage": "contact us"
+  "product_item.label.quantity": {
+    "defaultMessage": "Quantity:"
   },
-  "product_list_page.no_results_double_check": {
-    "defaultMessage": "Double-check your spelling and try again or {link}"
+  "product_list.button.filter": {
+    "defaultMessage": "Filter"
   },
-  "product_list_page.no_results_search_query": {
-    "defaultMessage": "We couldn’t find anything for \"{searchQuery}\""
+  "product_list.button.sort_by": {
+    "defaultMessage": "Sort By: {sortOption}"
+  },
+  "product_list.drawer.title.sort_by": {
+    "defaultMessage": "Sort By"
+  },
+  "product_list.info.added_to_wishlist": {
+    "defaultMessage": "{quantity} {quantity, plural, one {item} other {items}} added to wishlist"
+  },
+  "product_list.info.removed_from_wishlist": {
+    "defaultMessage": "Item removed from wishlist"
+  },
+  "product_list.modal.button.clear_filters": {
+    "defaultMessage": "Clear Filters"
+  },
+  "product_list.modal.button.view_items": {
+    "defaultMessage": "View {prroductCount} items"
+  },
+  "product_list.modal.title.filter": {
+    "defaultMessage": "Filter"
+  },
+  "product_list.select.sort_by": {
+    "defaultMessage": "Sort By: {sortOption}"
+  },
+  "product_tile.assistive_msg.wishlist": {
+    "defaultMessage": "wishlist"
   },
   "promo_code_fields.button.apply": {
     "defaultMessage": "Apply"
   },
   "py3qts": {
     "defaultMessage": "New Address Saved"
-  },
-  "qGl7SR": {
-    "defaultMessage": "Please create a password"
   },
   "qVGRIE": {
     "defaultMessage": "Quantity"
@@ -974,18 +959,11 @@
   "reset_password.title.password_reset": {
     "defaultMessage": "Password Reset"
   },
-  "rkxMdY": {
-    "defaultMessage": "{itemCount, plural, =0 {0 items} one {# item} other {# items}} in cart",
-    "description": "# item(s) in cart"
-  },
-  "s/qo4z": {
-    "defaultMessage": "Please enter your last name"
-  },
-  "s7dATg": {
-    "defaultMessage": "Edit cart"
-  },
   "search.action.cancel": {
     "defaultMessage": "Cancel"
+  },
+  "selected_refinements.action.clear_all": {
+    "defaultMessage": "Clear All"
   },
   "sy+pv5": {
     "defaultMessage": "Email"
@@ -1086,6 +1064,165 @@
   "use_address_fields.label.zipCode": {
     "defaultMessage": "Zip Code"
   },
+  "use_credit_card_fields.error.required": {
+    "defaultMessage": "Required"
+  },
+  "use_credit_card_fields.error.required_card_number": {
+    "defaultMessage": "Please enter your card number"
+  },
+  "use_credit_card_fields.error.required_expiry": {
+    "defaultMessage": "Please enter your expiry date"
+  },
+  "use_credit_card_fields.error.required_name": {
+    "defaultMessage": "Please enter your name as shown on your card"
+  },
+  "use_credit_card_fields.error.required_security_code": {
+    "defaultMessage": "Please enter your security code"
+  },
+  "use_credit_card_fields.error.valid_card_number": {
+    "defaultMessage": "Please enter a valid card number"
+  },
+  "use_credit_card_fields.error.valid_date": {
+    "defaultMessage": "Please enter a valid date"
+  },
+  "use_credit_card_fields.error.valid_name": {
+    "defaultMessage": "Please enter a valid name"
+  },
+  "use_credit_card_fields.error.valid_security_code": {
+    "defaultMessage": "Please enter a valid security code"
+  },
+  "use_credit_card_fields.label.card_number": {
+    "defaultMessage": "Card Number"
+  },
+  "use_credit_card_fields.label.card_type": {
+    "defaultMessage": "Card Type"
+  },
+  "use_credit_card_fields.label.expiry": {
+    "defaultMessage": "Expiry Date"
+  },
+  "use_credit_card_fields.label.name": {
+    "defaultMessage": "Name on Card"
+  },
+  "use_credit_card_fields.label.security_code": {
+    "defaultMessage": "Security Code"
+  },
+  "use_login_fields.error.required_email": {
+    "defaultMessage": "Please enter your email address"
+  },
+  "use_login_fields.error.required_password": {
+    "defaultMessage": "Please enter your password"
+  },
+  "use_login_fields.label.email": {
+    "defaultMessage": "Email"
+  },
+  "use_login_fields.label.password": {
+    "defaultMessage": "Password"
+  },
+  "use_profile_fields.error.required_email": {
+    "defaultMessage": "Please enter a valid email address"
+  },
+  "use_profile_fields.error.required_first_name": {
+    "defaultMessage": "Please enter your first name"
+  },
+  "use_profile_fields.error.required_last_name": {
+    "defaultMessage": "Please enter your last name"
+  },
+  "use_profile_fields.error.required_phone": {
+    "defaultMessage": "Please enter your phone number"
+  },
+  "use_profile_fields.label.email": {
+    "defaultMessage": "Email"
+  },
+  "use_profile_fields.label.first_name": {
+    "defaultMessage": "First Name"
+  },
+  "use_profile_fields.label.last_name": {
+    "defaultMessage": "Last Name"
+  },
+  "use_profile_fields.label.phone": {
+    "defaultMessage": "Phone Number"
+  },
+  "use_promo_code_fields.error.required_promo_code": {
+    "defaultMessage": "Please provide a valid promo code"
+  },
+  "use_promo_code_fields.label.promo_code": {
+    "defaultMessage": "Promo Code"
+  },
+  "use_registration_fields.error.contain_number": {
+    "defaultMessage": "Password must contain at least one number"
+  },
+  "use_registration_fields.error.lowercase_letter": {
+    "defaultMessage": "Password must contain at least one lowercase letter"
+  },
+  "use_registration_fields.error.minimum_characters": {
+    "defaultMessage": "Password must contain at least 8 characters"
+  },
+  "use_registration_fields.error.required_email": {
+    "defaultMessage": "Please enter a valid email address"
+  },
+  "use_registration_fields.error.required_first_name": {
+    "defaultMessage": "Please enter your first name"
+  },
+  "use_registration_fields.error.required_last_name": {
+    "defaultMessage": "Please enter your last name"
+  },
+  "use_registration_fields.error.required_password": {
+    "defaultMessage": "Please create a password"
+  },
+  "use_registration_fields.error.special_character": {
+    "defaultMessage": "Password must contain at least one special character"
+  },
+  "use_registration_fields.error.uppercase_letter": {
+    "defaultMessage": "Password must contain at least one uppercase letter"
+  },
+  "use_registration_fields.label.email": {
+    "defaultMessage": "Email"
+  },
+  "use_registration_fields.label.first_name": {
+    "defaultMessage": "First Name"
+  },
+  "use_registration_fields.label.last_name": {
+    "defaultMessage": "Last Name"
+  },
+  "use_registration_fields.label.password": {
+    "defaultMessage": "Password"
+  },
+  "use_registration_fields.label.sign_up_to_emails": {
+    "defaultMessage": "Sign me up for Salesforce emails (you can unsubscribe at any time)"
+  },
+  "use_reset_password_fields.error.required_email": {
+    "defaultMessage": "Please enter a valid email address"
+  },
+  "use_reset_password_fields.label.email": {
+    "defaultMessage": "Email"
+  },
+  "use_update_password_fields.error.contain_number": {
+    "defaultMessage": "Password must contain at least one number"
+  },
+  "use_update_password_fields.error.lowercase_letter": {
+    "defaultMessage": "Password must contain at least one lowercase letter"
+  },
+  "use_update_password_fields.error.minimum_characters": {
+    "defaultMessage": "Password must contain at least 8 characters"
+  },
+  "use_update_password_fields.error.required_new_password": {
+    "defaultMessage": "Please provide a new password"
+  },
+  "use_update_password_fields.error.required_password": {
+    "defaultMessage": "Please enter your password"
+  },
+  "use_update_password_fields.error.special_character": {
+    "defaultMessage": "Password must contain at least one special character"
+  },
+  "use_update_password_fields.error.uppercase_letter": {
+    "defaultMessage": "Password must contain at least one uppercase letter"
+  },
+  "use_update_password_fields.label.current_password": {
+    "defaultMessage": "Current Password"
+  },
+  "use_update_password_fields.label.new_password": {
+    "defaultMessage": "New Password"
+  },
   "v898P+": {
     "defaultMessage": "You May Also Like"
   },
@@ -1101,9 +1238,6 @@
   "vvTcAr": {
     "defaultMessage": "Create an account and get first access to the very best products, inspiration and community."
   },
-  "wBVQL7": {
-    "defaultMessage": "Password must contain at least one uppercase letter"
-  },
   "wEQDC6": {
     "defaultMessage": "Edit"
   },
@@ -1112,9 +1246,6 @@
   },
   "xBrtnx": {
     "defaultMessage": "Addresses"
-  },
-  "xD3Bn3": {
-    "defaultMessage": "Quantity: {quantity}"
   },
   "xHP4/6": {
     "defaultMessage": "Password Reset"
@@ -1131,18 +1262,8 @@
   "xuTqgN": {
     "defaultMessage": "Payment Methods"
   },
-  "y/sA02": {
-    "defaultMessage": "Most Viewed"
-  },
-  "z34C7B": {
-    "defaultMessage": "Password must contain at least one special character"
-  },
   "z3Qj9h": {
     "defaultMessage": "Proceed to Checkout"
-  },
-  "zODu/+": {
-    "defaultMessage": "ea",
-    "description": "Abbreviated 'each', follows price per item, like $10/ea"
   },
   "zXbRZR": {
     "defaultMessage": "Order Number: {orderNumber}"
