@@ -35,8 +35,8 @@ const apiConfig = {
  * @param locals the request locals (only defined when executing on the server.)
  * @returns {String} the locale short code
  */
-const getLocale = (frozenReq = {}) => {
-    let {url} = frozenReq
+const getLocale = (originalRequest = {}) => {
+    let {url} = originalRequest
 
     // Parse the pathname from the partial using the URL object and a placeholder host
     const {pathname} = new URL(`http://hostname${url}`)
@@ -85,9 +85,7 @@ class AppConfig extends React.Component {
 
     // eslint-disable-next-line no-unused-vars
     static extraGetPropsArgs(locals) {
-        console.log('__extraGetPropsArgs__: ', this)
-
-        const locale = getLocale(this.frozenReq) || DEFAULT_LOCALE
+        const locale = getLocale(this.originalRequest) || DEFAULT_LOCALE
         const currency = getPreferredCurrency(locale) || DEFAULT_CURRENCY
 
         return {
@@ -96,6 +94,7 @@ class AppConfig extends React.Component {
     }
 
     render() {
+        console.log('__AppConfig_Render__', this)
         const {children} = this.props
         const {basket, customer} = this.state
 
@@ -104,6 +103,7 @@ class AppConfig extends React.Component {
 
         // TODO: From the looks of it, the render method should have the same manually set scope
         // as the `extraGetPropsArgs` function, which begs the question, do we need to standardize it.
+        // Or is it even possible? Is binding the wrong solution.
         const api = new CommerceAPI({...apiConfig, locale: 'en-GB', currency: 'GBP'})
 
         return (

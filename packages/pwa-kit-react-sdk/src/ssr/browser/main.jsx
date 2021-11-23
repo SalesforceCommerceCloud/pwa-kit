@@ -52,9 +52,12 @@ export const start = () => {
     // this to set up, eg. Redux stores.
     const locals = {}
 
+    const context = {
+        originalRequest: window.__ORIGINAL_REQUEST__
+    }
     // AppConfig.restore *must* come before getRoutes()
-    AppConfig.restore(locals, window.__PRELOADED_STATE__.__STATE_MANAGEMENT_LIBRARY)
-    const routes = getRoutes(locals)
+    AppConfig.restore(locals, window.__PRELOADED_STATE__.__STATE_MANAGEMENT_LIBRARY, context)
+    const routes = getRoutes(locals, context)
 
     // We need to tell the routeComponent HOC when the app is hydrating in order to
     // prevent pages from re-fetching data on the first client-side render. The
@@ -66,7 +69,7 @@ export const start = () => {
     // been warned.
     window.__HYDRATING__ = true
 
-    const WrappedApp = routeComponent(App, false, locals)
+    const WrappedApp = routeComponent(App, false, locals, context)
     const error = window.__ERROR__
 
     return Promise.resolve()

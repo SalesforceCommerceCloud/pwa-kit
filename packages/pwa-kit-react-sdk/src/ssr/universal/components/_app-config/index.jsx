@@ -51,9 +51,11 @@ class AppConfig extends React.Component {
         return undefined
     }
 
+    // TODO: Fix vagueness of this description.
     /**
-     * Freeze the request into the rendered HTML and is also made available globally
-     * in the `render` function. This function is only called once on the server-side
+     * Freezes the request into the rendered HTML as `__ORIGINAL_REQUEST__`. Its value is
+     * also made available in the scope of the `getProps` et al as an object names `originalRequest`.
+     * It's important to note that this function is only called once on the server-side.
      *
      * @param req - the request object.
      * @param res - the response object.

@@ -140,7 +140,7 @@ export const render = async (req, res) => {
 
     const frozenReq = AppConfig.freezeRequest(req, res)
     const context = {
-        frozenReq
+        originalRequest: frozenReq
     }
 
     const routes = getRoutes(res.locals, context)
@@ -274,7 +274,7 @@ const renderApp = (args) => {
     const windowGlobals = {
         __DEVICE_TYPE__: deviceType,
         __PRELOADED_STATE__: appState,
-        __FROZEN_REQ__: frozenReq,
+        __ORIGINAL_REQUEST__: frozenReq,
         __ERROR__: error,
         // `window.Progressive` has a long history at Mobify and some
         // client-side code depends on it. Maintain its name out of tradition.
