@@ -52,10 +52,7 @@ const WishlistSecondaryButtonGroup = ({productListItemId, onClick = noop}) => {
             })
         } catch {
             toast({
-                title: formatMessage(
-                    {defaultMessage: '{errorMessage}'},
-                    {errorMessage: API_ERROR_MESSAGE}
-                ),
+                title: formatMessage(API_ERROR_MESSAGE),
                 status: 'error'
             })
         }

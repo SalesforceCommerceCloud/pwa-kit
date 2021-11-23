@@ -202,7 +202,10 @@ const Search = (props) => {
                                     size="sm"
                                     onMouseDown={() => closeAndNavigate(false)}
                                 >
-                                    <FormattedMessage defaultMessage="Cancel" />
+                                    <FormattedMessage
+                                        defaultMessage="Cancel"
+                                        id="search.action.cancel"
+                                    />
                                 </Button>
                             </HideOnDesktop>
                         </HStack>
