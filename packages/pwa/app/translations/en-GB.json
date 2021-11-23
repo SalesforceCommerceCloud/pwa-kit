@@ -266,18 +266,11 @@
   "DwzDiL": {
     "defaultMessage": "Clear recent searches"
   },
-  "EKKW2e": {
-    "defaultMessage": "1 uppercase letter",
-    "description": "Password requirement"
-  },
   "EOUB63": {
     "defaultMessage": "Only {stockLevel} Left!"
   },
   "ES4Hjg": {
     "defaultMessage": "Danish (Denmark)"
-  },
-  "EWw/tK": {
-    "defaultMessage": "Apply"
   },
   "Ev6SEF": {
     "defaultMessage": "New Password"
@@ -299,10 +292,6 @@
   },
   "GretYf": {
     "defaultMessage": "Current Password"
-  },
-  "Gu0oq5": {
-    "defaultMessage": "1 special character (example: , S ! % #)",
-    "description": "Password requirement"
   },
   "I866h3": {
     "defaultMessage": "Password must contain at least one number"
@@ -385,12 +374,6 @@
   "O8s+yR": {
     "defaultMessage": "Spanish (Spain)"
   },
-  "O95R3Z": {
-    "defaultMessage": "Phone"
-  },
-  "O9nLUc": {
-    "defaultMessage": "Please select your {stateOrProvince}"
-  },
   "OKPeJz": {
     "defaultMessage": "Item removed from cart"
   },
@@ -455,9 +438,6 @@
   "Qb4dDN": {
     "defaultMessage": "German (Switzerland)"
   },
-  "QclMUn": {
-    "defaultMessage": "Please select your country"
-  },
   "Qm3TN9": {
     "defaultMessage": "Are you sure you want to continue ?"
   },
@@ -485,21 +465,11 @@
   "SmKUxZ": {
     "defaultMessage": "Add a new address method for faster checkout"
   },
-  "Solm6E": {
-    "defaultMessage": "Zip Code"
-  },
   "T/K9MQ": {
     "defaultMessage": "promo applied"
   },
   "T8HBFR": {
     "defaultMessage": "German (Germany)"
-  },
-  "TBI5GJ": {
-    "defaultMessage": "This {length}-digit code can be found on the {side} of your card.",
-    "description": "Credit card security code help text"
-  },
-  "TE4fIS": {
-    "defaultMessage": "City"
   },
   "TR+DHM": {
     "defaultMessage": "Or return to",
@@ -517,10 +487,6 @@
   "TvauRz": {
     "defaultMessage": "Bangla (Bangladesh)"
   },
-  "Ty4jOO": {
-    "defaultMessage": "1 number",
-    "description": "Password requirement"
-  },
   "U8vSQS": {
     "defaultMessage": "Bangla (India)"
   },
@@ -529,9 +495,6 @@
   },
   "Ub+AGc": {
     "defaultMessage": "Sign In"
-  },
-  "UqKMjl": {
-    "defaultMessage": "Postal Code"
   },
   "V+9Zzz": {
     "defaultMessage": "Size & Fit"
@@ -608,6 +571,12 @@
   "a5msuh": {
     "defaultMessage": "Yes"
   },
+  "action_card.action.edit": {
+    "defaultMessage": "Edit"
+  },
+  "action_card.action.remove": {
+    "defaultMessage": "Remove"
+  },
   "aheQdn": {
     "defaultMessage": "Last Name"
   },
@@ -636,15 +605,8 @@
   "c0a6lZ": {
     "defaultMessage": "Please try retyping the address, going back to the previous page, or going to the home page."
   },
-  "c1zaMK": {
-    "defaultMessage": "Please enter your address"
-  },
   "c7/79+": {
     "defaultMessage": "Billing Address"
-  },
-  "cChish": {
-    "defaultMessage": "8 characters minimum",
-    "description": "Password requirement"
   },
   "cLJrsY": {
     "defaultMessage": "Cart & Checkout"
@@ -655,6 +617,10 @@
   "cqlObT": {
     "defaultMessage": "Clear All"
   },
+  "credit_card_fields.tool_tip.security_code": {
+    "defaultMessage": "This {length}-digit code can be found on the {side} of your card.",
+    "description": "Credit card security code help text"
+  },
   "d/RGdS": {
     "defaultMessage": "Portuguese (Portugal)"
   },
@@ -664,11 +630,62 @@
   "dfEp3Z": {
     "defaultMessage": "Yes, remove item"
   },
+  "drawer_menu.button.account_details": {
+    "defaultMessage": "Account Details"
+  },
+  "drawer_menu.button.addresses": {
+    "defaultMessage": "Addresses"
+  },
+  "drawer_menu.button.log_out": {
+    "defaultMessage": "Log out"
+  },
+  "drawer_menu.button.my_account": {
+    "defaultMessage": "My Account"
+  },
+  "drawer_menu.button.order_history": {
+    "defaultMessage": "Order History"
+  },
+  "drawer_menu.button.payment_methods": {
+    "defaultMessage": "Payment Methods"
+  },
+  "drawer_menu.link.about_us": {
+    "defaultMessage": "About Us"
+  },
+  "drawer_menu.link.customer_support": {
+    "defaultMessage": "Customer Support"
+  },
+  "drawer_menu.link.customer_support.contact_us": {
+    "defaultMessage": "Contact Us"
+  },
+  "drawer_menu.link.customer_support.shipping_and_returns": {
+    "defaultMessage": "Shipping & Returns"
+  },
+  "drawer_menu.link.our_company": {
+    "defaultMessage": "Our Company"
+  },
+  "drawer_menu.link.privacy_and_security": {
+    "defaultMessage": "Privacy & Security"
+  },
+  "drawer_menu.link.privacy_policy": {
+    "defaultMessage": "Privacy Policy"
+  },
+  "drawer_menu.link.shop_all": {
+    "defaultMessage": "Shop All"
+  },
+  "drawer_menu.link.sign_in": {
+    "defaultMessage": "Sign In"
+  },
+  "drawer_menu.link.site_map": {
+    "defaultMessage": "Site Map"
+  },
+  "drawer_menu.link.store_locator": {
+    "defaultMessage": "Store Locator"
+  },
+  "drawer_menu.link.terms_and_conditions": {
+    "defaultMessage": "Terms & Conditions"
+  },
   "e//rzS": {
     "defaultMessage": "Italian (Italy)"
-  },
-  "e6Ph5+": {
-    "defaultMessage": "Address"
   },
   "eKEL/g": {
     "defaultMessage": "Pending"
@@ -681,9 +698,6 @@
   },
   "f0EhUc": {
     "defaultMessage": "Security Code"
-  },
-  "f9teca": {
-    "defaultMessage": "Province"
   },
   "fCRlK5": {
     "defaultMessage": "We will send an email to <b>{email}</b> with your confirmation number and receipt shortly."
@@ -754,6 +768,12 @@
   "footer.subscribe.heading.first_to_know": {
     "defaultMessage": "Be the first to know"
   },
+  "form_action_buttons.button.cancel": {
+    "defaultMessage": "Cancel"
+  },
+  "form_action_buttons.button.save": {
+    "defaultMessage": "Save"
+  },
   "fuzq0p": {
     "defaultMessage": "Checkout as guest"
   },
@@ -814,9 +834,6 @@
   "jAOn1A": {
     "defaultMessage": "Are you sure you want to remove this item from your cart?"
   },
-  "jvo0vs": {
-    "defaultMessage": "Save"
-  },
   "kBAj4C": {
     "defaultMessage": "Download on Github"
   },
@@ -825,9 +842,6 @@
   },
   "knAdWV": {
     "defaultMessage": "Top Sellers"
-  },
-  "ku+mDU": {
-    "defaultMessage": "State"
   },
   "lKv8ex": {
     "defaultMessage": "Default"
@@ -856,51 +870,11 @@
   "mfahwZ": {
     "defaultMessage": "Recently Viewed"
   },
-  "mobile_navigation.actions.sign_in": {
-    "defaultMessage": "Sign In"
-  },
-  "mobile_navigation.actions.store_locator": {
-    "defaultMessage": "Store Locator"
-  },
-  "mobile_navigation.categories.shop_all": {
-    "defaultMessage": "Shop All"
-  },
-  "mobile_navigation.links.customer_support": {
-    "defaultMessage": "Customer Support"
-  },
-  "mobile_navigation.links.customer_support.contact_us": {
-    "defaultMessage": "Contact Us"
-  },
-  "mobile_navigation.links.customer_support.shipping_and_returns": {
-    "defaultMessage": "Shipping & Returns"
-  },
-  "mobile_navigation.links.out_company": {
-    "defaultMessage": "Our Company"
-  },
-  "mobile_navigation.links.out_company.about_us": {
-    "defaultMessage": "About Us"
-  },
-  "mobile_navigation.links.privacy_and_security": {
-    "defaultMessage": "Privacy & Security"
-  },
-  "mobile_navigation.links.privacy_and_security.privacy_policy": {
-    "defaultMessage": "Privacy Policy"
-  },
-  "mobile_navigation.links.privacy_and_security.stie_map": {
-    "defaultMessage": "Site Map"
-  },
-  "mobile_navigation.links.privacy_and_security.terms_and_conditions": {
-    "defaultMessage": "Terms & Conditions"
-  },
   "n/iZlE": {
     "defaultMessage": "Spanish (Chile)"
   },
   "n9j5bS": {
     "defaultMessage": "Turkish (Turkey)"
-  },
-  "nA8PRt": {
-    "defaultMessage": "1 lowercase letter",
-    "description": "Password requirement"
   },
   "nEtDrF": {
     "defaultMessage": "Contact our support staff and they’ll get {br} you to the right place."
@@ -953,6 +927,26 @@
   "pagination.actions.prev": {
     "defaultMessage": "Prev"
   },
+  "password_requirements.error.eight_letter_minimum": {
+    "defaultMessage": "8 characters minimum",
+    "description": "Password requirement"
+  },
+  "password_requirements.error.one_lowercase_letter": {
+    "defaultMessage": "1 lowercase letter",
+    "description": "Password requirement"
+  },
+  "password_requirements.error.one_number": {
+    "defaultMessage": "1 number",
+    "description": "Password requirement"
+  },
+  "password_requirements.error.one_special_character": {
+    "defaultMessage": "1 special character (example: , S ! % #)",
+    "description": "Password requirement"
+  },
+  "password_requirements.error.one_uppercase_letter": {
+    "defaultMessage": "1 uppercase letter",
+    "description": "Password requirement"
+  },
   "product_list_page.no_results": {
     "defaultMessage": "We couldn’t find anything for {category}. Try searching for a product or {link}."
   },
@@ -964,6 +958,9 @@
   },
   "product_list_page.no_results_search_query": {
     "defaultMessage": "We couldn’t find anything for \"{searchQuery}\""
+  },
+  "promo_code_fields.button.apply": {
+    "defaultMessage": "Apply"
   },
   "py3qts": {
     "defaultMessage": "New Address Saved"
@@ -977,6 +974,15 @@
   "rU+Ph/": {
     "defaultMessage": "Dutch (The Netherlands)"
   },
+  "reset_password.button.back_to_sign_in": {
+    "defaultMessage": "Back to sign in"
+  },
+  "reset_password.info.receive_email_shortly": {
+    "defaultMessage": "You will receive an email at <b>{email}</b> with a link to reset your password shortly."
+  },
+  "reset_password.title.password_reset": {
+    "defaultMessage": "Password Reset"
+  },
   "rkxMdY": {
     "defaultMessage": "{itemCount, plural, =0 {0 items} one {# item} other {# items}} in cart",
     "description": "# item(s) in cart"
@@ -986,6 +992,9 @@
   },
   "s7dATg": {
     "defaultMessage": "Edit cart"
+  },
+  "search.action.cancel": {
+    "defaultMessage": "Cancel"
   },
   "sy+pv5": {
     "defaultMessage": "Email"
@@ -999,11 +1008,11 @@
   "tf1lIh": {
     "defaultMessage": "Free"
   },
-  "tiVXug": {
-    "defaultMessage": "Please enter your city"
-  },
   "tnSBvt": {
     "defaultMessage": "Korean (Republic of Korea)"
+  },
+  "toggle_card.action.edit": {
+    "defaultMessage": "Edit"
   },
   "uCdcPZ": {
     "defaultMessage": "Romanian (Romania)"
@@ -1017,20 +1026,80 @@
   "uSpe21": {
     "defaultMessage": "Edit Address"
   },
-  "uV4+68": {
-    "defaultMessage": "Please enter your {postalOrZip}"
-  },
   "unUv/E": {
     "defaultMessage": "You Might Also Like"
+  },
+  "update_password_fields.button.forgot_password": {
+    "defaultMessage": "Forgot password?"
+  },
+  "use_address_fields.error.please_enter_first_name": {
+    "defaultMessage": "Please enter your first name"
+  },
+  "use_address_fields.error.please_enter_last_name": {
+    "defaultMessage": "Please enter your last name"
+  },
+  "use_address_fields.error.please_enter_phone_number": {
+    "defaultMessage": "Please enter your phone number"
+  },
+  "use_address_fields.error.please_enter_your_postal_or_zip": {
+    "defaultMessage": "Please enter your {postalOrZip}"
+  },
+  "use_address_fields.error.please_select_your_address": {
+    "defaultMessage": "Please enter your address"
+  },
+  "use_address_fields.error.please_select_your_city": {
+    "defaultMessage": "Please enter your city"
+  },
+  "use_address_fields.error.please_select_your_country": {
+    "defaultMessage": "Please select your country"
+  },
+  "use_address_fields.error.please_select_your_state_or_province": {
+    "defaultMessage": "Please select your {stateOrProvince}"
+  },
+  "use_address_fields.error.required": {
+    "defaultMessage": "Required"
+  },
+  "use_address_fields.error.state_code_invalid": {
+    "defaultMessage": "Please enter 2-letter state/province"
+  },
+  "use_address_fields.label.address": {
+    "defaultMessage": "Address"
+  },
+  "use_address_fields.label.city": {
+    "defaultMessage": "City"
+  },
+  "use_address_fields.label.country": {
+    "defaultMessage": "Country"
+  },
+  "use_address_fields.label.first_name": {
+    "defaultMessage": "First Name"
+  },
+  "use_address_fields.label.last_name": {
+    "defaultMessage": "Last Name"
+  },
+  "use_address_fields.label.phone": {
+    "defaultMessage": "Phone"
+  },
+  "use_address_fields.label.postal_code": {
+    "defaultMessage": "Postal Code"
+  },
+  "use_address_fields.label.preferred": {
+    "defaultMessage": "Set as default"
+  },
+  "use_address_fields.label.province": {
+    "defaultMessage": "Province"
+  },
+  "use_address_fields.label.state": {
+    "defaultMessage": "State"
+  },
+  "use_address_fields.label.zipCode": {
+    "defaultMessage": "Zip Code"
   },
   "v898P+": {
     "defaultMessage": "You May Also Like"
   },
   "vMvXOp": {
     "defaultMessage": "Greek (Greece)"
-  },
-  "vONi+O": {
-    "defaultMessage": "Country"
   },
   "vSNTMO": {
     "defaultMessage": "Italian (Switzerland)"
@@ -1074,17 +1143,11 @@
   "y/sA02": {
     "defaultMessage": "Most Viewed"
   },
-  "z+Zrln": {
-    "defaultMessage": "Set as default"
-  },
   "z34C7B": {
     "defaultMessage": "Password must contain at least one special character"
   },
   "z3Qj9h": {
     "defaultMessage": "Proceed to Checkout"
-  },
-  "zHi6BD": {
-    "defaultMessage": "Please enter 2-letter state/province"
   },
   "zODu/+": {
     "defaultMessage": "ea",
