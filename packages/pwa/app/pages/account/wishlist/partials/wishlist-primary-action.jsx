@@ -50,10 +50,7 @@ const WishlistPrimaryAction = () => {
             onClose()
         } catch (error) {
             showToast({
-                title: formatMessage(
-                    {defaultMessage: '{errorMessage}'},
-                    {errorMessage: API_ERROR_MESSAGE}
-                ),
+                title: formatMessage(API_ERROR_MESSAGE),
                 status: 'error'
             })
         }
