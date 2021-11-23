@@ -266,7 +266,8 @@ export const createApp = (options) => {
     } else {
         app.all('/mobify/proxy/*', (_, res) => {
             return res.status(501).json({
-                message: 'Environment proxies are not set: https://sfdc.co/managed-runtime-setup-proxies'
+                message:
+                    'Environment proxies are not set: https://sfdc.co/managed-runtime-setup-proxies'
             })
         })
     }
