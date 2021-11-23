@@ -139,8 +139,13 @@ export const render = async (req, res) => {
     AppConfig.restore(res.locals)
 
     const frozenReq = AppConfig.freezeRequest(req, res)
-    const routes = getRoutes(res.locals)
-    const WrappedApp = routeComponent(App, false, res.locals)
+    const context = {
+        frozenReq
+    }
+
+    const routes = getRoutes(res.locals, context)
+
+    const WrappedApp = routeComponent(App, false, res.locals, context)
 
     const [pathname, search] = req.originalUrl.split('?')
     const location = {

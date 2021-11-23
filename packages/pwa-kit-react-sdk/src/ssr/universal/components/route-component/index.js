@@ -53,8 +53,13 @@ const withErrorHandling = (Wrapped) => {
  * route-config. It provides an interface, via static methods on React components,
  * that can be used to fetch data on the server and on the client, seamlessly.
  */
-export const routeComponent = (Wrapped, isPage, locals) => {
-    const extraArgs = AppConfig.extraGetPropsArgs(locals)
+export const routeComponent = (Wrapped, isPage, locals, context) => {
+    const {extraGetPropsArgs} = AppConfig
+
+    // bind new scope
+    const boundExtraGetPropsArgs = extraGetPropsArgs.bind(context)
+
+    const extraArgs = boundExtraGetPropsArgs(locals)
 
     /* istanbul ignore next */
     const wrappedComponentName = Wrapped.displayName || Wrapped.name
@@ -409,11 +414,11 @@ export const routeComponent = (Wrapped, isPage, locals) => {
  *
  * @private
  */
-export const getRoutes = (locals) => {
+export const getRoutes = (locals, context) => {
     const allRoutes = [...routes, {path: '*', component: Throw404}]
     return allRoutes.map(({component, ...rest}) => {
         return {
-            component: component ? routeComponent(component, true, locals) : component,
+            component: component ? routeComponent(component, true, locals, context) : component,
             ...rest
         }
     })

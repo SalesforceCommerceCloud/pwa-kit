@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useState} from 'react'
+import React from 'react'
 import PropTypes from 'prop-types'
 import {ChakraProvider} from '@chakra-ui/react'
 
@@ -35,17 +35,11 @@ const apiConfig = {
  * @param locals the request locals (only defined when executing on the server.)
  * @returns {String} the locale short code
  */
-const getLocale = (locals = {}) => {
-    let {originalUrl} = locals
-
-    // If there is no originalUrl value in the locals, create it from the window location.
-    // This happens when executing on the client.
-    if (!originalUrl) {
-        originalUrl = window?.location.href.replace(window.location.origin, '')
-    }
+const getLocale = (frozenReq = {}) => {
+    let {url} = frozenReq
 
     // Parse the pathname from the partial using the URL object and a placeholder host
-    const {pathname} = new URL(`http://hostname${originalUrl}`)
+    const {pathname} = new URL(`http://hostname${url}`)
     let shortCode = pathname.split('/')[1]
 
     // Ensure that the locale is in the supported list, otherwise return the default.
@@ -62,45 +56,67 @@ const getLocale = (locals = {}) => {
  * You can also use the AppConfig to configure a state-management library such
  * as Redux, or Mobx, if you like.
  */
-const AppConfig = ({children, locals = {}}) => {
-    const [basket, setBasket] = useState(null)
-    const [customer, setCustomer] = useState(null)
-
-    return (
-        <CommerceAPIProvider value={locals.api}>
-            <CustomerProvider value={{customer, setCustomer}}>
-                <BasketProvider value={{basket, setBasket}}>
-                    <CustomerProductListsProvider>
-                        <ChakraProvider theme={theme}>{children}</ChakraProvider>
-                    </CustomerProductListsProvider>
-                </BasketProvider>
-            </CustomerProvider>
-        </CommerceAPIProvider>
-    )
-}
-
-AppConfig.restore = (locals = {}) => {
-    // Parse the locale from the page url.
-    const locale = getLocale(locals) || DEFAULT_LOCALE
-    const currency = getPreferredCurrency(locale) || DEFAULT_CURRENCY
-
-    locals.api = new CommerceAPI({...apiConfig, locale, currency})
-}
-
-AppConfig.freeze = () => undefined
-
-AppConfig.freezeRequest = (req) => ({
-    url: req.url,
-    headers: {
-        'Accept-Language': req.headers['Accept-Language']
+class AppConfig extends React.Component {
+    constructor(props) {
+        super(props)
+        this.state = {
+            basket: null,
+            customer: null
+        }
     }
-})
 
-AppConfig.extraGetPropsArgs = (locals = {}) => {
-    // eslint-disable-next-line no-undef
-    console.log('__extraGetPropsArgs__: ', this)
-    return {
-        api: locals.api
+    // eslint-disable-next-line no-unused-vars
+    static restore(locals, frozen = {}) {}
+
+    // eslint-disable-next-line no-unused-vars
+    static freeze(locals) {
+        return undefined
+    }
+
+    // eslint-disable-next-line no-unused-vars
+    static freezeRequest(req, res) {
+        return {
+            url: req.url,
+            headers: {
+                'Accept-Language': req.headers['Accept-Language']
+            }
+        }
+    }
+
+    // eslint-disable-next-line no-unused-vars
+    static extraGetPropsArgs(locals) {
+        console.log('__extraGetPropsArgs__: ', this)
+
+        const locale = getLocale(this.frozenReq) || DEFAULT_LOCALE
+        const currency = getPreferredCurrency(locale) || DEFAULT_CURRENCY
+
+        return {
+            api: new CommerceAPI({...apiConfig, locale, currency})
+        }
+    }
+
+    render() {
+        const {children} = this.props
+        const {basket, customer} = this.state
+
+        const setCustomer = (customer) => this.setState({...this.state, customer})
+        const setBasket = (basket) => this.setState({...this.state, basket})
+
+        // TODO: From the looks of it, the render method should have the same manually set scope
+        // as the `extraGetPropsArgs` function, which begs the question, do we need to standardize it.
+        const api = new CommerceAPI({...apiConfig, locale: 'en-GB', currency: 'GBP'})
+
+        return (
+            <CommerceAPIProvider value={api}>
+                <CustomerProvider value={{customer, setCustomer}}>
+                    <BasketProvider value={{basket, setBasket}}>
+                        <CustomerProductListsProvider>
+                            <ChakraProvider theme={theme}>{children}</ChakraProvider>
+                        </CustomerProductListsProvider>
+                    </BasketProvider>
+                </CustomerProvider>
+            </CommerceAPIProvider>
+        )
     }
 }
 
