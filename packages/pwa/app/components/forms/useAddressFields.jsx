@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import {useIntl, defineMessages} from 'react-intl'
-import {formatPhoneNumber} from '../../utils/phone-utils'
+import {formatPhoneNumber, validatePhone} from '../../utils/phone-utils'
 import {stateOptions, provinceOptions} from './state-province-options'
 
 const messages = defineMessages({
@@ -60,7 +60,16 @@ export default function useAddressFields({form: {watch, control, errors}, prefix
             label: formatMessage(messages.phone),
             defaultValue: '',
             type: 'tel',
-            rules: {required: formatMessage({defaultMessage: 'Please enter your phone number'})},
+            rules: {
+                required: formatMessage({defaultMessage: 'Please enter your phone number'}),
+                validate: {
+                    isPhoneNumberValid: (val) =>
+                        validatePhone(val).isPhoneNumberValid ||
+                        formatMessage({
+                            defaultMessage: 'Please enter a valid phone number'
+                        })
+                }
+            },
             error: errors[`${prefix}phone`],
             inputProps: ({onChange}) => ({
                 inputmode: 'numeric',
