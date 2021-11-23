@@ -509,6 +509,20 @@
       "value": "Add to cart"
     }
   ],
+  "AJlIwK": [
+    {
+      "type": 0,
+      "value": "This section contains content from the catalog. "
+    },
+    {
+      "type": 1,
+      "value": "link"
+    },
+    {
+      "type": 0,
+      "value": " on how to replace it."
+    }
+  ],
   "AYIKp4": [
     {
       "type": 0,
@@ -697,6 +711,12 @@
     {
       "type": 0,
       "value": "Sign Out"
+    }
+  ],
+  "FdbYXD": [
+    {
+      "type": 0,
+      "value": "Shop Products"
     }
   ],
   "Fmc5ut": [
@@ -1923,6 +1943,12 @@
     {
       "type": 0,
       "value": "Default"
+    }
+  ],
+  "lc9tAq": [
+    {
+      "type": 0,
+      "value": "Read docs"
     }
   ],
   "llHgJz": [

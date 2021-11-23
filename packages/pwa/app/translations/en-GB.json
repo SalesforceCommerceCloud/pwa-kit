@@ -200,6 +200,9 @@
   "ADKef8": {
     "defaultMessage": "Add to cart"
   },
+  "AJlIwK": {
+    "defaultMessage": "This section contains content from the catalog. {link} on how to replace it."
+  },
   "AYIKp4": {
     "defaultMessage": "Already have an account? Log in"
   },
@@ -274,6 +277,9 @@
   },
   "F62y+K": {
     "defaultMessage": "Sign Out"
+  },
+  "FdbYXD": {
+    "defaultMessage": "Shop Products"
   },
   "Fmc5ut": {
     "defaultMessage": "Continue to Shipping Method"
@@ -839,6 +845,9 @@
   },
   "lKv8ex": {
     "defaultMessage": "Default"
+  },
+  "lc9tAq": {
+    "defaultMessage": "Read docs"
   },
   "llHgJz": {
     "defaultMessage": "Welcome {name},"
