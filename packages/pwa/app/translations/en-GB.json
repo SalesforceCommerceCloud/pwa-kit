@@ -137,6 +137,9 @@
   "6DCLcI": {
     "defaultMessage": "Please enter a valid date"
   },
+  "6ful6x": {
+    "defaultMessage": "Shoppers can manage account information such as their profile, addresses, payments and orders."
+  },
   "74fug6": {
     "defaultMessage": "Tamil (India)"
   },
@@ -193,9 +196,6 @@
   },
   "ADKef8": {
     "defaultMessage": "Add to cart"
-  },
-  "AJlIwK": {
-    "defaultMessage": "This section contains content from the catalog. {link} on how to replace it."
   },
   "AYIKp4": {
     "defaultMessage": "Already have an account? Log in"
@@ -271,9 +271,6 @@
   },
   "F62y+K": {
     "defaultMessage": "Sign Out"
-  },
-  "FdbYXD": {
-    "defaultMessage": "Shop Products"
   },
   "Fmc5ut": {
     "defaultMessage": "Continue to Shipping Method"
@@ -529,14 +526,14 @@
   "XU21FV": {
     "defaultMessage": "Shipping & Gift Options"
   },
-  "Xpu6m3": {
-    "defaultMessage": "Registered shopper's can add product items to their wishlist from purchasing later."
-  },
   "YDGR5k": {
     "defaultMessage": "No Saved Payment Methods"
   },
   "YQhbMR": {
     "defaultMessage": "Norwegian (Norway)"
+  },
+  "YwT8JW": {
+    "defaultMessage": "Registered shoppers can add product items to their wishlist from purchasing later."
   },
   "Yy/yDL": {
     "defaultMessage": "Reset password"
@@ -608,9 +605,6 @@
   "cUwO+6": {
     "defaultMessage": "Add New Card"
   },
-  "cqE+QI": {
-    "defaultMessage": "Shopper's can manage account information such as their profile, addresses, payments and orders."
-  },
   "cqlObT": {
     "defaultMessage": "Clear All"
   },
@@ -645,9 +639,6 @@
   "drawer_menu.button.payment_methods": {
     "defaultMessage": "Payment Methods"
   },
-  "drawer_menu.categories.shop_all": {
-    "defaultMessage": "Shop All"
-  },
   "drawer_menu.link.about_us": {
     "defaultMessage": "About Us"
   },
@@ -668,6 +659,9 @@
   },
   "drawer_menu.link.privacy_policy": {
     "defaultMessage": "Privacy Policy"
+  },
+  "drawer_menu.link.shop_all": {
+    "defaultMessage": "Shop All"
   },
   "drawer_menu.link.sign_in": {
     "defaultMessage": "Sign In"
@@ -845,9 +839,6 @@
   },
   "lKv8ex": {
     "defaultMessage": "Default"
-  },
-  "lc9tAq": {
-    "defaultMessage": "Read docs"
   },
   "llHgJz": {
     "defaultMessage": "Welcome {name},"
