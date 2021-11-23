@@ -20,8 +20,7 @@ import {
     // Hooks
     useStyleConfig
 } from '@chakra-ui/react'
-import {Link as RouteLink} from 'react-router-dom'
-
+import Link from '../link'
 // Icons
 import {ChevronDownIcon, ChevronRightIcon} from '../icons'
 
@@ -88,8 +87,8 @@ const NestedAccordion = (props) => {
                                     ) : (
                                         <AccordionButton
                                             {...styles.leafButton}
-                                            as={RouteLink}
-                                            to={urlBuilder(item, intl.locale)}
+                                            as={Link}
+                                            to={urlBuilder(item)}
                                         >
                                             <Text
                                                 fontSize={fontSizes[depth]}
