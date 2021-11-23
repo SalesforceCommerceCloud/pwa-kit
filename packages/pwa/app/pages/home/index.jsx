@@ -8,6 +8,8 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {useIntl, FormattedMessage} from 'react-intl'
+
+// Components
 import {
     Box,
     Button,
@@ -20,15 +22,19 @@ import {
     Container,
     Link
 } from '@chakra-ui/react'
-import {getAssetUrl} from 'pwa-kit-react-sdk/ssr/universal/utils'
+
+// Project Components
 import Hero from '../../components/hero'
 import Seo from '../../components/seo'
 import Section from '../../components/section'
-import {heroFeatures, features} from './data'
 import ProductScroller from '../../components/product-scroller'
 
-const SHOP_PRODUCTS_CATEGORY_ID = 'newarrivals'
-const SHOP_PRODUCTS_LIMIT = 10
+// Others
+import {getAssetUrl} from 'pwa-kit-react-sdk/ssr/universal/utils'
+import {heroFeatures, features} from './data'
+
+// Constants
+import {HOME_SHOP_PRODUCTS_CATEGORY_ID, HOME_SHOP_PRODUCTS_LIMIT} from '../../constants'
 
 /**
  * This is the home page for Retail React App.
@@ -256,8 +262,8 @@ Home.getProps = async ({res, api}) => {
 
     const productSearchResult = await api.shopperSearch.productSearch({
         parameters: {
-            refine: [`cgid=${SHOP_PRODUCTS_CATEGORY_ID}`, 'htype=master'],
-            limit: SHOP_PRODUCTS_LIMIT
+            refine: [`cgid=${HOME_SHOP_PRODUCTS_CATEGORY_ID}`, 'htype=master'],
+            limit: HOME_SHOP_PRODUCTS_LIMIT
         }
     })
 
