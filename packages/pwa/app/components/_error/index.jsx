@@ -21,7 +21,7 @@ import {useHistory} from 'react-router-dom'
 // It must not throw an error. Keep it as simple as possible.
 
 const Error = (props) => {
-    const {stack} = props
+    const {message, stack} = props
     const history = useHistory()
 
     const title = "This page isn't working"
@@ -72,6 +72,21 @@ const Error = (props) => {
                                 An error has occurred. Try refreshing the page or if you need
                                 immediate help please contact support.
                             </Text>
+                            {message && (
+                                <Box
+                                    as="pre"
+                                    mt={4}
+                                    fontSize="sm"
+                                    background="gray.50"
+                                    borderColor="gray.200"
+                                    borderStyle="solid"
+                                    borderWidth="1px"
+                                    overflow="auto"
+                                    padding={4}
+                                >
+                                    {message}
+                                </Box>
+                            )}
                         </Box>
                         <Stack direction={['column', 'row']} spacing={4} width={['100%', 'auto']}>
                             <Button
@@ -119,7 +134,9 @@ Error.propTypes = {
     // JavaScript error stack trace: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error/stack
     stack: PropTypes.string,
     // HTTP status code: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
-    status: PropTypes.number
+    status: PropTypes.number,
+    // A description of the error, if available. 
+    message: PropTypes.string
 }
 
 export default Error
