@@ -13,10 +13,13 @@ export const DEFAULT_SEARCH_PARAMS = {limit: 25, offset: 0, sort: 'best-matches'
 export const DEFAULT_LIMIT_VALUES = [25, 50, 100] // Page sizes
 
 // Constants for Search Component
-
 export const RECENT_SEARCH_LIMIT = 5
 export const RECENT_SEARCH_KEY = 'recent-search-key'
 export const RECENT_SEARCH_MIN_LENGTH = 3
+
+// Constants for the Homepage's Shop Products section.
+export const HOME_SHOP_PRODUCTS_CATEGORY_ID = 'newarrivals'
+export const HOME_SHOP_PRODUCTS_LIMIT = 10
 
 export const cssColorGroups = {
     beige: '#d3bca9',

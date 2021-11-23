@@ -17,6 +17,18 @@
       "value": "Czech (Czech Republic)"
     }
   ],
+  "+dLAnb": [
+    {
+      "type": 0,
+      "value": "Estimated Total"
+    }
+  ],
+  "+y/wae": [
+    {
+      "type": 1,
+      "value": "errorMessage"
+    }
+  ],
   "/aBLH2": [
     {
       "type": 0,
@@ -27,6 +39,12 @@
     {
       "type": 0,
       "value": "This is a gift."
+    }
+  ],
+  "/vJwLB": [
+    {
+      "type": 0,
+      "value": "Please enter your email address"
     }
   ],
   "0LrnyG": [
@@ -57,6 +75,12 @@
     {
       "type": 0,
       "value": "Go to home page"
+    }
+  ],
+  "0yGJXJ": [
+    {
+      "type": 0,
+      "value": "Password must contain at least one lowercase letter"
     }
   ],
   "1LE+iY": [
@@ -111,6 +135,12 @@
       "value": "No Wishlist Items"
     }
   ],
+  "25WwxF": [
+    {
+      "type": 0,
+      "value": "Don't have an account?"
+    }
+  ],
   "26gvH3": [
     {
       "type": 0,
@@ -127,6 +157,12 @@
     {
       "type": 0,
       "value": "Log in here"
+    }
+  ],
+  "2WOdRo": [
+    {
+      "type": 0,
+      "value": "wishlist"
     }
   ],
   "2WRHXI": [
@@ -179,6 +215,12 @@
       "value": "Cart"
     }
   ],
+  "3AmUG3": [
+    {
+      "type": 0,
+      "value": "Card Type"
+    }
+  ],
   "3HK3af": [
     {
       "type": 0,
@@ -189,10 +231,36 @@
       "value": "localeShortCode"
     }
   ],
+  "3NVyN7": [
+    {
+      "type": 0,
+      "value": "Please enter your first name"
+    }
+  ],
+  "3cfRtZ": [
+    {
+      "type": 0,
+      "value": "View "
+    },
+    {
+      "type": 1,
+      "value": "prroductCount"
+    },
+    {
+      "type": 0,
+      "value": " items"
+    }
+  ],
   "3gXwAV": [
     {
       "type": 0,
       "value": "Sign in to retrieve your saved items or continue shopping"
+    }
+  ],
+  "3rGMFt": [
+    {
+      "type": 0,
+      "value": "Sale"
     }
   ],
   "47FYwb": [
@@ -273,6 +341,12 @@
       "value": "Create Account"
     }
   ],
+  "5R9heZ": [
+    {
+      "type": 0,
+      "value": "Expiry Date"
+    }
+  ],
   "5S2I6Q": [
     {
       "type": 0,
@@ -307,6 +381,12 @@
     {
       "type": 0,
       "value": "Chinese (Hong Kong)"
+    }
+  ],
+  "6DCLcI": [
+    {
+      "type": 0,
+      "value": "Please enter a valid date"
     }
   ],
   "6ful6x": [
@@ -357,10 +437,22 @@
       "value": "Spanish (Mexico)"
     }
   ],
+  "8d6kio": [
+    {
+      "type": 0,
+      "value": "Sort By"
+    }
+  ],
   "8iXlvA": [
     {
       "type": 0,
       "value": "Save & Continue"
+    }
+  ],
+  "8j72eG": [
+    {
+      "type": 0,
+      "value": "Please provide a new password"
     }
   ],
   "8pvKg1": [
@@ -379,6 +471,12 @@
     {
       "type": 0,
       "value": "Enter your email to receive instructions on how to reset your password"
+    }
+  ],
+  "9Obw6C": [
+    {
+      "type": 0,
+      "value": "Filter"
     }
   ],
   "9rqdrm": [
@@ -411,6 +509,20 @@
       "value": "Add to cart"
     }
   ],
+  "AJlIwK": [
+    {
+      "type": 0,
+      "value": "This section contains content from the catalog. "
+    },
+    {
+      "type": 1,
+      "value": "link"
+    },
+    {
+      "type": 0,
+      "value": " on how to replace it."
+    }
+  ],
   "AYIKp4": [
     {
       "type": 0,
@@ -435,10 +547,22 @@
       "value": "Tax"
     }
   ],
+  "B/orA3": [
+    {
+      "type": 0,
+      "value": "Promotions"
+    }
+  ],
   "B5/YE0": [
     {
       "type": 0,
       "value": "Profile updated"
+    }
+  ],
+  "BAoId6": [
+    {
+      "type": 0,
+      "value": "Please enter your phone number"
     }
   ],
   "BEqvr/": [
@@ -475,6 +599,12 @@
     {
       "type": 0,
       "value": "Spanish (Columbia)"
+    }
+  ],
+  "CyOkb5": [
+    {
+      "type": 0,
+      "value": "Promo Code"
     }
   ],
   "D+bY29": [
@@ -571,10 +701,22 @@
       "value": "Danish (Denmark)"
     }
   ],
+  "Ev6SEF": [
+    {
+      "type": 0,
+      "value": "New Password"
+    }
+  ],
   "F62y+K": [
     {
       "type": 0,
       "value": "Sign Out"
+    }
+  ],
+  "FdbYXD": [
+    {
+      "type": 0,
+      "value": "Shop Products"
     }
   ],
   "Fmc5ut": [
@@ -587,6 +729,24 @@
     {
       "type": 0,
       "value": "Remove"
+    }
+  ],
+  "GH9wCg": [
+    {
+      "type": 0,
+      "value": "Please provide a valid promo code"
+    }
+  ],
+  "GretYf": [
+    {
+      "type": 0,
+      "value": "Current Password"
+    }
+  ],
+  "I866h3": [
+    {
+      "type": 0,
+      "value": "Password must contain at least one number"
     }
   ],
   "IUXVjJ": [
@@ -611,10 +771,22 @@
       "value": " items"
     }
   ],
+  "IyXU3R": [
+    {
+      "type": 0,
+      "value": "Please enter a valid card number"
+    }
+  ],
   "JAcwxt": [
     {
       "type": 0,
       "value": "Order Number"
+    }
+  ],
+  "JQ1EGX": [
+    {
+      "type": 0,
+      "value": "Promotions applied"
     }
   ],
   "JWbGSW": [
@@ -685,6 +857,12 @@
     {
       "type": 0,
       "value": "View details"
+    }
+  ],
+  "MsGXc3": [
+    {
+      "type": 0,
+      "value": "Clear Filters"
     }
   ],
   "Mv2pEb": [
@@ -817,10 +995,22 @@
       "value": "Product Detail"
     }
   ],
+  "P5ouV8": [
+    {
+      "type": 0,
+      "value": "Please enter your security code"
+    }
+  ],
   "P87iMu": [
     {
       "type": 0,
       "value": "Tamil (Sri Lanka)"
+    }
+  ],
+  "PBSfL4": [
+    {
+      "type": 0,
+      "value": "Please enter a valid name"
     }
   ],
   "PEVXku": [
@@ -859,6 +1049,12 @@
       "value": "We're here to help"
     }
   ],
+  "Q6wcZ5": [
+    {
+      "type": 0,
+      "value": "First Name"
+    }
+  ],
   "QEUh37": [
     {
       "type": 0,
@@ -875,6 +1071,16 @@
     {
       "type": 0,
       "value": "Are you sure you want to continue ?"
+    }
+  ],
+  "RlxeOk": [
+    {
+      "type": 0,
+      "value": "Sort By: "
+    },
+    {
+      "type": 1,
+      "value": "sortOption"
     }
   ],
   "SFjs9b": [
@@ -905,6 +1111,12 @@
     {
       "type": 0,
       "value": "Address Updated"
+    }
+  ],
+  "Seanpx": [
+    {
+      "type": 0,
+      "value": "Required"
     }
   ],
   "SmKUxZ": [
@@ -1009,10 +1221,22 @@
       "value": "Deliver the next best product or offer to every shopper through product recommendations."
     }
   ],
+  "VSlYv6": [
+    {
+      "type": 0,
+      "value": "Quantity:"
+    }
+  ],
   "WHgdsk": [
     {
       "type": 0,
       "value": "Out of stock"
+    }
+  ],
+  "WTocjo": [
+    {
+      "type": 0,
+      "value": "Card Number"
     }
   ],
   "X9OkqP": [
@@ -1069,6 +1293,12 @@
       "value": "My Profile"
     }
   ],
+  "ZJkXve": [
+    {
+      "type": 0,
+      "value": "Sign me up for Salesforce emails (you can unsubscribe at any time)"
+    }
+  ],
   "ZMphaV": [
     {
       "type": 0,
@@ -1115,6 +1345,12 @@
     {
       "type": 0,
       "value": "Remove"
+    }
+  ],
+  "aheQdn": [
+    {
+      "type": 0,
+      "value": "Last Name"
     }
   ],
   "au3Vns": [
@@ -1169,6 +1405,12 @@
       "value": "Russian (Russian Federation)"
     }
   ],
+  "bTjwXj": [
+    {
+      "type": 0,
+      "value": "Welcome Back"
+    }
+  ],
   "bhUBy4": [
     {
       "type": 0,
@@ -1209,6 +1451,12 @@
     {
       "type": 0,
       "value": "Add New Card"
+    }
+  ],
+  "cqlObT": [
+    {
+      "type": 0,
+      "value": "Clear All"
     }
   ],
   "credit_card_fields.tool_tip.security_code": [
@@ -1383,68 +1631,10 @@
       "value": "English (India)"
     }
   ],
-  "empty_search_results.info.cant_find_anything_for_category": [
+  "f0EhUc": [
     {
       "type": 0,
-      "value": "We couldn’t find anything for "
-    },
-    {
-      "type": 1,
-      "value": "category"
-    },
-    {
-      "type": 0,
-      "value": ". Try searching for a product or "
-    },
-    {
-      "type": 1,
-      "value": "link"
-    },
-    {
-      "type": 0,
-      "value": "."
-    }
-  ],
-  "empty_search_results.info.cant_find_anything_for_query": [
-    {
-      "type": 0,
-      "value": "We couldn’t find anything for \""
-    },
-    {
-      "type": 1,
-      "value": "searchQuery"
-    },
-    {
-      "type": 0,
-      "value": "\""
-    }
-  ],
-  "empty_search_results.info.double_check_spelling": [
-    {
-      "type": 0,
-      "value": "Double-check your spelling and try again or "
-    },
-    {
-      "type": 1,
-      "value": "link"
-    }
-  ],
-  "empty_search_results.link.contact_us": [
-    {
-      "type": 0,
-      "value": "contact us"
-    }
-  ],
-  "empty_search_results.recommended_products.title.most_viewed": [
-    {
-      "type": 0,
-      "value": "Most Viewed"
-    }
-  ],
-  "empty_search_results.recommended_products.title.top_sellers": [
-    {
-      "type": 0,
-      "value": "Top Sellers"
+      "value": "Security Code"
     }
   ],
   "fCRlK5": [
@@ -1483,6 +1673,18 @@
     {
       "type": 0,
       "value": "Add New Address"
+    }
+  ],
+  "fWz2xP": [
+    {
+      "type": 0,
+      "value": "Please enter your expiry date"
+    }
+  ],
+  "ffE6Xw": [
+    {
+      "type": 0,
+      "value": "Password must contain at least 8 characters"
     }
   ],
   "footer.column.account": [
@@ -1611,22 +1813,28 @@
       "value": "Swedish (Sweden)"
     }
   ],
+  "gW8EGu": [
+    {
+      "type": 0,
+      "value": "Name on Card"
+    }
+  ],
   "gguIJ8": [
     {
       "type": 0,
       "value": "Hindi (India)"
     }
   ],
-  "global.error.something_went_wrong": [
-    {
-      "type": 0,
-      "value": "Something went wrong. Try again!"
-    }
-  ],
   "gzeOf+": [
     {
       "type": 0,
       "value": "Chinese (Taiwan)"
+    }
+  ],
+  "hCj9FS": [
+    {
+      "type": 0,
+      "value": "Please enter your name as shown on your card"
     }
   ],
   "hZOGLS": [
@@ -1659,28 +1867,10 @@
       "value": "My cart"
     }
   ],
-  "header.button.assistive_msg.wishlist": [
-    {
-      "type": 0,
-      "value": "Wishlist"
-    }
-  ],
-  "header.field.placeholder.search_for_products": [
+  "header.search.field.value.placeholder": [
     {
       "type": 0,
       "value": "Search for products..."
-    }
-  ],
-  "header.popover.action.log_out": [
-    {
-      "type": 0,
-      "value": "Log out"
-    }
-  ],
-  "header.popover.title.my_account": [
-    {
-      "type": 0,
-      "value": "My Account"
     }
   ],
   "hp3uqR": [
@@ -1707,32 +1897,16 @@
       "value": "Please select a payment method."
     }
   ],
+  "iiYrag": [
+    {
+      "type": 0,
+      "value": "Please enter your password"
+    }
+  ],
   "ipwTkh": [
     {
       "type": 0,
       "value": "Same as shipping address"
-    }
-  ],
-  "item_attributes.label.promotions": [
-    {
-      "type": 0,
-      "value": "Promotions"
-    }
-  ],
-  "item_attributes.label.quantity": [
-    {
-      "type": 0,
-      "value": "Quantity: "
-    },
-    {
-      "type": 1,
-      "value": "quantity"
-    }
-  ],
-  "item_image.label.sale": [
-    {
-      "type": 0,
-      "value": "Sale"
     }
   ],
   "ivNR8s": [
@@ -1759,10 +1933,22 @@
       "value": "Thank you for your order!"
     }
   ],
+  "knAdWV": [
+    {
+      "type": 0,
+      "value": "Top Sellers"
+    }
+  ],
   "lKv8ex": [
     {
       "type": 0,
       "value": "Default"
+    }
+  ],
+  "lc9tAq": [
+    {
+      "type": 0,
+      "value": "Read docs"
     }
   ],
   "llHgJz": [
@@ -1789,36 +1975,6 @@
     {
       "type": 0,
       "value": "Login Redirect"
-    }
-  ],
-  "login_form.action.create_account": [
-    {
-      "type": 0,
-      "value": "Create account"
-    }
-  ],
-  "login_form.button.sign_in": [
-    {
-      "type": 0,
-      "value": "Sign in"
-    }
-  ],
-  "login_form.link.forgot_password": [
-    {
-      "type": 0,
-      "value": "Forgot password?"
-    }
-  ],
-  "login_form.message.dont_have_account": [
-    {
-      "type": 0,
-      "value": "Don't have an account?"
-    }
-  ],
-  "login_form.message.welcome_back": [
-    {
-      "type": 0,
-      "value": "Welcome Back"
     }
   ],
   "m/CSCf": [
@@ -1895,6 +2051,18 @@
       "value": "Tracking Number"
     }
   ],
+  "o40Ymt": [
+    {
+      "type": 0,
+      "value": "Please enter a valid security code"
+    }
+  ],
+  "oLpv29": [
+    {
+      "type": 0,
+      "value": "Please enter a valid email address"
+    }
+  ],
   "oUWADl": [
     {
       "type": 0,
@@ -1913,120 +2081,10 @@
       "value": "Log in"
     }
   ],
-  "offline_banner.description.browsing_offline_mode": [
+  "offline_banner.message": [
     {
       "type": 0,
       "value": "You're currently browsing in offline mode"
-    }
-  ],
-  "order_summary.action.remove_promo": [
-    {
-      "type": 0,
-      "value": "Remove"
-    }
-  ],
-  "order_summary.cart_items.action.num_of_items_in_cart": [
-    {
-      "offset": 0,
-      "options": {
-        "=0": {
-          "value": [
-            {
-              "type": 0,
-              "value": "0 items"
-            }
-          ]
-        },
-        "one": {
-          "value": [
-            {
-              "type": 7
-            },
-            {
-              "type": 0,
-              "value": " item"
-            }
-          ]
-        },
-        "other": {
-          "value": [
-            {
-              "type": 7
-            },
-            {
-              "type": 0,
-              "value": " items"
-            }
-          ]
-        }
-      },
-      "pluralType": "cardinal",
-      "type": 6,
-      "value": "itemCount"
-    },
-    {
-      "type": 0,
-      "value": " in cart"
-    }
-  ],
-  "order_summary.cart_items.link.edit_cart": [
-    {
-      "type": 0,
-      "value": "Edit cart"
-    }
-  ],
-  "order_summary.heading.order_summary": [
-    {
-      "type": 0,
-      "value": "Order Summary"
-    }
-  ],
-  "order_summary.label.estimated_total": [
-    {
-      "type": 0,
-      "value": "Estimated Total"
-    }
-  ],
-  "order_summary.label.free": [
-    {
-      "type": 0,
-      "value": "Free"
-    }
-  ],
-  "order_summary.label.order_total": [
-    {
-      "type": 0,
-      "value": "Order Total"
-    }
-  ],
-  "order_summary.label.promo_applied": [
-    {
-      "type": 0,
-      "value": "promo applied"
-    }
-  ],
-  "order_summary.label.promotions_applied": [
-    {
-      "type": 0,
-      "value": "Promotions applied"
-    }
-  ],
-  "order_summary.label.shipping": [
-    {
-      "type": 0,
-      "value": "Shipping"
-    }
-  ],
-  "order_summary.label.subtotal": [
-    {
-      "type": 0,
-      "value": "Subtotal"
-    }
-  ],
-  "order_summary.label.tax": [
-    {
-      "type": 0,
-      "value": "Tax"
     }
   ],
   "p2EAP0": [
@@ -2041,23 +2099,25 @@
       "value": "Edit Shipping Address"
     }
   ],
-  "pagination.field.num_of_pages": [
+  "pS9/Sw": [
     {
       "type": 0,
-      "value": "of "
-    },
-    {
-      "type": 1,
-      "value": "numOfPages"
+      "value": "Please enter your card number"
     }
   ],
-  "pagination.link.next": [
+  "pagination.actions.current_page_verb": [
+    {
+      "type": 0,
+      "value": "of"
+    }
+  ],
+  "pagination.actions.next": [
     {
       "type": 0,
       "value": "Next"
     }
   ],
-  "pagination.link.prev": [
+  "pagination.actions.prev": [
     {
       "type": 0,
       "value": "Prev"
@@ -2093,124 +2153,56 @@
       "value": "1 uppercase letter"
     }
   ],
-  "price_per_item.label.each": [
+  "product_list_page.no_results": [
     {
       "type": 0,
-      "value": "ea"
-    }
-  ],
-  "product_item.label.quantity": [
-    {
-      "type": 0,
-      "value": "Quantity:"
-    }
-  ],
-  "product_list.button.filter": [
-    {
-      "type": 0,
-      "value": "Filter"
-    }
-  ],
-  "product_list.button.sort_by": [
-    {
-      "type": 0,
-      "value": "Sort By: "
+      "value": "We couldn’t find anything for "
     },
     {
       "type": 1,
-      "value": "sortOption"
-    }
-  ],
-  "product_list.drawer.title.sort_by": [
-    {
-      "type": 0,
-      "value": "Sort By"
-    }
-  ],
-  "product_list.info.added_to_wishlist": [
-    {
-      "type": 1,
-      "value": "quantity"
+      "value": "category"
     },
     {
       "type": 0,
-      "value": " "
-    },
-    {
-      "offset": 0,
-      "options": {
-        "one": {
-          "value": [
-            {
-              "type": 0,
-              "value": "item"
-            }
-          ]
-        },
-        "other": {
-          "value": [
-            {
-              "type": 0,
-              "value": "items"
-            }
-          ]
-        }
-      },
-      "pluralType": "cardinal",
-      "type": 6,
-      "value": "quantity"
-    },
-    {
-      "type": 0,
-      "value": " added to wishlist"
-    }
-  ],
-  "product_list.info.removed_from_wishlist": [
-    {
-      "type": 0,
-      "value": "Item removed from wishlist"
-    }
-  ],
-  "product_list.modal.button.clear_filters": [
-    {
-      "type": 0,
-      "value": "Clear Filters"
-    }
-  ],
-  "product_list.modal.button.view_items": [
-    {
-      "type": 0,
-      "value": "View "
+      "value": ". Try searching for a product or "
     },
     {
       "type": 1,
-      "value": "prroductCount"
+      "value": "link"
     },
     {
       "type": 0,
-      "value": " items"
+      "value": "."
     }
   ],
-  "product_list.modal.title.filter": [
+  "product_list_page.no_results.contact_us": [
     {
       "type": 0,
-      "value": "Filter"
+      "value": "contact us"
     }
   ],
-  "product_list.select.sort_by": [
+  "product_list_page.no_results_double_check": [
     {
       "type": 0,
-      "value": "Sort By: "
+      "value": "Double-check your spelling and try again or "
     },
     {
       "type": 1,
-      "value": "sortOption"
+      "value": "link"
     }
   ],
-  "product_tile.assistive_msg.wishlist": [
+  "product_list_page.no_results_search_query": [
     {
       "type": 0,
-      "value": "wishlist"
+      "value": "We couldn’t find anything for \""
+    },
+    {
+      "type": 1,
+      "value": "searchQuery"
+    },
+    {
+      "type": 0,
+      "value": "\""
     }
   ],
   "promo_code_fields.button.apply": [
@@ -2223,6 +2215,12 @@
     {
       "type": 0,
       "value": "New Address Saved"
+    }
+  ],
+  "qGl7SR": [
+    {
+      "type": 0,
+      "value": "Please create a password"
     }
   ],
   "qVGRIE": [
@@ -2269,16 +2267,66 @@
       "value": "Password Reset"
     }
   ],
+  "rkxMdY": [
+    {
+      "offset": 0,
+      "options": {
+        "=0": {
+          "value": [
+            {
+              "type": 0,
+              "value": "0 items"
+            }
+          ]
+        },
+        "one": {
+          "value": [
+            {
+              "type": 7
+            },
+            {
+              "type": 0,
+              "value": " item"
+            }
+          ]
+        },
+        "other": {
+          "value": [
+            {
+              "type": 7
+            },
+            {
+              "type": 0,
+              "value": " items"
+            }
+          ]
+        }
+      },
+      "pluralType": "cardinal",
+      "type": 6,
+      "value": "itemCount"
+    },
+    {
+      "type": 0,
+      "value": " in cart"
+    }
+  ],
+  "s/qo4z": [
+    {
+      "type": 0,
+      "value": "Please enter your last name"
+    }
+  ],
+  "s7dATg": [
+    {
+      "type": 0,
+      "value": "Edit cart"
+    }
+  ],
   "search.action.cancel": [
     {
       "type": 0,
       "value": "Cancel"
-    }
-  ],
-  "selected_refinements.action.clear_all": [
-    {
-      "type": 0,
-      "value": "Clear All"
     }
   ],
   "sy+pv5": [
@@ -2487,324 +2535,6 @@
       "value": "Zip Code"
     }
   ],
-  "use_credit_card_fields.error.required": [
-    {
-      "type": 0,
-      "value": "Required"
-    }
-  ],
-  "use_credit_card_fields.error.required_card_number": [
-    {
-      "type": 0,
-      "value": "Please enter your card number"
-    }
-  ],
-  "use_credit_card_fields.error.required_expiry": [
-    {
-      "type": 0,
-      "value": "Please enter your expiry date"
-    }
-  ],
-  "use_credit_card_fields.error.required_name": [
-    {
-      "type": 0,
-      "value": "Please enter your name as shown on your card"
-    }
-  ],
-  "use_credit_card_fields.error.required_security_code": [
-    {
-      "type": 0,
-      "value": "Please enter your security code"
-    }
-  ],
-  "use_credit_card_fields.error.valid_card_number": [
-    {
-      "type": 0,
-      "value": "Please enter a valid card number"
-    }
-  ],
-  "use_credit_card_fields.error.valid_date": [
-    {
-      "type": 0,
-      "value": "Please enter a valid date"
-    }
-  ],
-  "use_credit_card_fields.error.valid_name": [
-    {
-      "type": 0,
-      "value": "Please enter a valid name"
-    }
-  ],
-  "use_credit_card_fields.error.valid_security_code": [
-    {
-      "type": 0,
-      "value": "Please enter a valid security code"
-    }
-  ],
-  "use_credit_card_fields.label.card_number": [
-    {
-      "type": 0,
-      "value": "Card Number"
-    }
-  ],
-  "use_credit_card_fields.label.card_type": [
-    {
-      "type": 0,
-      "value": "Card Type"
-    }
-  ],
-  "use_credit_card_fields.label.expiry": [
-    {
-      "type": 0,
-      "value": "Expiry Date"
-    }
-  ],
-  "use_credit_card_fields.label.name": [
-    {
-      "type": 0,
-      "value": "Name on Card"
-    }
-  ],
-  "use_credit_card_fields.label.security_code": [
-    {
-      "type": 0,
-      "value": "Security Code"
-    }
-  ],
-  "use_login_fields.error.required_email": [
-    {
-      "type": 0,
-      "value": "Please enter your email address"
-    }
-  ],
-  "use_login_fields.error.required_password": [
-    {
-      "type": 0,
-      "value": "Please enter your password"
-    }
-  ],
-  "use_login_fields.label.email": [
-    {
-      "type": 0,
-      "value": "Email"
-    }
-  ],
-  "use_login_fields.label.password": [
-    {
-      "type": 0,
-      "value": "Password"
-    }
-  ],
-  "use_profile_fields.error.required_email": [
-    {
-      "type": 0,
-      "value": "Please enter a valid email address"
-    }
-  ],
-  "use_profile_fields.error.required_first_name": [
-    {
-      "type": 0,
-      "value": "Please enter your first name"
-    }
-  ],
-  "use_profile_fields.error.required_last_name": [
-    {
-      "type": 0,
-      "value": "Please enter your last name"
-    }
-  ],
-  "use_profile_fields.error.required_phone": [
-    {
-      "type": 0,
-      "value": "Please enter your phone number"
-    }
-  ],
-  "use_profile_fields.label.email": [
-    {
-      "type": 0,
-      "value": "Email"
-    }
-  ],
-  "use_profile_fields.label.first_name": [
-    {
-      "type": 0,
-      "value": "First Name"
-    }
-  ],
-  "use_profile_fields.label.last_name": [
-    {
-      "type": 0,
-      "value": "Last Name"
-    }
-  ],
-  "use_profile_fields.label.phone": [
-    {
-      "type": 0,
-      "value": "Phone Number"
-    }
-  ],
-  "use_promo_code_fields.error.required_promo_code": [
-    {
-      "type": 0,
-      "value": "Please provide a valid promo code"
-    }
-  ],
-  "use_promo_code_fields.label.promo_code": [
-    {
-      "type": 0,
-      "value": "Promo Code"
-    }
-  ],
-  "use_registration_fields.error.contain_number": [
-    {
-      "type": 0,
-      "value": "Password must contain at least one number"
-    }
-  ],
-  "use_registration_fields.error.lowercase_letter": [
-    {
-      "type": 0,
-      "value": "Password must contain at least one lowercase letter"
-    }
-  ],
-  "use_registration_fields.error.minimum_characters": [
-    {
-      "type": 0,
-      "value": "Password must contain at least 8 characters"
-    }
-  ],
-  "use_registration_fields.error.required_email": [
-    {
-      "type": 0,
-      "value": "Please enter a valid email address"
-    }
-  ],
-  "use_registration_fields.error.required_first_name": [
-    {
-      "type": 0,
-      "value": "Please enter your first name"
-    }
-  ],
-  "use_registration_fields.error.required_last_name": [
-    {
-      "type": 0,
-      "value": "Please enter your last name"
-    }
-  ],
-  "use_registration_fields.error.required_password": [
-    {
-      "type": 0,
-      "value": "Please create a password"
-    }
-  ],
-  "use_registration_fields.error.special_character": [
-    {
-      "type": 0,
-      "value": "Password must contain at least one special character"
-    }
-  ],
-  "use_registration_fields.error.uppercase_letter": [
-    {
-      "type": 0,
-      "value": "Password must contain at least one uppercase letter"
-    }
-  ],
-  "use_registration_fields.label.email": [
-    {
-      "type": 0,
-      "value": "Email"
-    }
-  ],
-  "use_registration_fields.label.first_name": [
-    {
-      "type": 0,
-      "value": "First Name"
-    }
-  ],
-  "use_registration_fields.label.last_name": [
-    {
-      "type": 0,
-      "value": "Last Name"
-    }
-  ],
-  "use_registration_fields.label.password": [
-    {
-      "type": 0,
-      "value": "Password"
-    }
-  ],
-  "use_registration_fields.label.sign_up_to_emails": [
-    {
-      "type": 0,
-      "value": "Sign me up for Salesforce emails (you can unsubscribe at any time)"
-    }
-  ],
-  "use_reset_password_fields.error.required_email": [
-    {
-      "type": 0,
-      "value": "Please enter a valid email address"
-    }
-  ],
-  "use_reset_password_fields.label.email": [
-    {
-      "type": 0,
-      "value": "Email"
-    }
-  ],
-  "use_update_password_fields.error.contain_number": [
-    {
-      "type": 0,
-      "value": "Password must contain at least one number"
-    }
-  ],
-  "use_update_password_fields.error.lowercase_letter": [
-    {
-      "type": 0,
-      "value": "Password must contain at least one lowercase letter"
-    }
-  ],
-  "use_update_password_fields.error.minimum_characters": [
-    {
-      "type": 0,
-      "value": "Password must contain at least 8 characters"
-    }
-  ],
-  "use_update_password_fields.error.required_new_password": [
-    {
-      "type": 0,
-      "value": "Please provide a new password"
-    }
-  ],
-  "use_update_password_fields.error.required_password": [
-    {
-      "type": 0,
-      "value": "Please enter your password"
-    }
-  ],
-  "use_update_password_fields.error.special_character": [
-    {
-      "type": 0,
-      "value": "Password must contain at least one special character"
-    }
-  ],
-  "use_update_password_fields.error.uppercase_letter": [
-    {
-      "type": 0,
-      "value": "Password must contain at least one uppercase letter"
-    }
-  ],
-  "use_update_password_fields.label.current_password": [
-    {
-      "type": 0,
-      "value": "Current Password"
-    }
-  ],
-  "use_update_password_fields.label.new_password": [
-    {
-      "type": 0,
-      "value": "New Password"
-    }
-  ],
   "v898P+": [
     {
       "type": 0,
@@ -2835,6 +2565,12 @@
       "value": "Create an account and get first access to the very best products, inspiration and community."
     }
   ],
+  "wBVQL7": [
+    {
+      "type": 0,
+      "value": "Password must contain at least one uppercase letter"
+    }
+  ],
   "wEQDC6": [
     {
       "type": 0,
@@ -2851,6 +2587,16 @@
     {
       "type": 0,
       "value": "Addresses"
+    }
+  ],
+  "xD3Bn3": [
+    {
+      "type": 0,
+      "value": "Quantity: "
+    },
+    {
+      "type": 1,
+      "value": "quantity"
     }
   ],
   "xHP4/6": [
@@ -2883,10 +2629,28 @@
       "value": "Payment Methods"
     }
   ],
+  "y/sA02": [
+    {
+      "type": 0,
+      "value": "Most Viewed"
+    }
+  ],
+  "z34C7B": [
+    {
+      "type": 0,
+      "value": "Password must contain at least one special character"
+    }
+  ],
   "z3Qj9h": [
     {
       "type": 0,
       "value": "Proceed to Checkout"
+    }
+  ],
+  "zODu/+": [
+    {
+      "type": 0,
+      "value": "ea"
     }
   ],
   "zXbRZR": [
