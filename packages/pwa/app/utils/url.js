@@ -249,11 +249,10 @@ export const buildPathWithUrlConfigParams = (url, configValues = {}) => {
     if (siteAliasParamType === urlParamTypes.PATH) {
         basePathSegments.push(siteAlias)
     }
-    // build the pathname
+    // filter the array and build the pathname
     let updatedPath = `${
         basePathSegments.filter(Boolean).length ? `/${basePathSegments.join('/')}` : ''
     }${url}`
-    console.log('updatedPath 1', updatedPath)
     // append the query param to pathname
     if (Object.keys(queryParams).length) {
         updatedPath = rebuildPathWithParams(updatedPath, queryParams)
