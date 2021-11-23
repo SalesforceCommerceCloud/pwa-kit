@@ -29,12 +29,6 @@
       "value": "This is a gift."
     }
   ],
-  "/vJwLB": [
-    {
-      "type": 0,
-      "value": "Please enter your email address"
-    }
-  ],
   "0LrnyG": [
     {
       "type": 0,
@@ -63,12 +57,6 @@
     {
       "type": 0,
       "value": "Go to home page"
-    }
-  ],
-  "0yGJXJ": [
-    {
-      "type": 0,
-      "value": "Password must contain at least one lowercase letter"
     }
   ],
   "1LE+iY": [
@@ -191,12 +179,6 @@
       "value": "Cart"
     }
   ],
-  "3AmUG3": [
-    {
-      "type": 0,
-      "value": "Card Type"
-    }
-  ],
   "3HK3af": [
     {
       "type": 0,
@@ -205,12 +187,6 @@
     {
       "type": 1,
       "value": "localeShortCode"
-    }
-  ],
-  "3NVyN7": [
-    {
-      "type": 0,
-      "value": "Please enter your first name"
     }
   ],
   "3gXwAV": [
@@ -297,12 +273,6 @@
       "value": "Create Account"
     }
   ],
-  "5R9heZ": [
-    {
-      "type": 0,
-      "value": "Expiry Date"
-    }
-  ],
   "5S2I6Q": [
     {
       "type": 0,
@@ -337,12 +307,6 @@
     {
       "type": 0,
       "value": "Chinese (Hong Kong)"
-    }
-  ],
-  "6DCLcI": [
-    {
-      "type": 0,
-      "value": "Please enter a valid date"
     }
   ],
   "6ful6x": [
@@ -397,12 +361,6 @@
     {
       "type": 0,
       "value": "Save & Continue"
-    }
-  ],
-  "8j72eG": [
-    {
-      "type": 0,
-      "value": "Please provide a new password"
     }
   ],
   "8pvKg1": [
@@ -483,12 +441,6 @@
       "value": "Profile updated"
     }
   ],
-  "BAoId6": [
-    {
-      "type": 0,
-      "value": "Please enter your phone number"
-    }
-  ],
   "BEqvr/": [
     {
       "type": 0,
@@ -523,12 +475,6 @@
     {
       "type": 0,
       "value": "Spanish (Columbia)"
-    }
-  ],
-  "CyOkb5": [
-    {
-      "type": 0,
-      "value": "Promo Code"
     }
   ],
   "D+bY29": [
@@ -625,12 +571,6 @@
       "value": "Danish (Denmark)"
     }
   ],
-  "Ev6SEF": [
-    {
-      "type": 0,
-      "value": "New Password"
-    }
-  ],
   "F62y+K": [
     {
       "type": 0,
@@ -647,24 +587,6 @@
     {
       "type": 0,
       "value": "Remove"
-    }
-  ],
-  "GH9wCg": [
-    {
-      "type": 0,
-      "value": "Please provide a valid promo code"
-    }
-  ],
-  "GretYf": [
-    {
-      "type": 0,
-      "value": "Current Password"
-    }
-  ],
-  "I866h3": [
-    {
-      "type": 0,
-      "value": "Password must contain at least one number"
     }
   ],
   "IUXVjJ": [
@@ -687,12 +609,6 @@
     {
       "type": 0,
       "value": " items"
-    }
-  ],
-  "IyXU3R": [
-    {
-      "type": 0,
-      "value": "Please enter a valid card number"
     }
   ],
   "JAcwxt": [
@@ -901,22 +817,10 @@
       "value": "Product Detail"
     }
   ],
-  "P5ouV8": [
-    {
-      "type": 0,
-      "value": "Please enter your security code"
-    }
-  ],
   "P87iMu": [
     {
       "type": 0,
       "value": "Tamil (Sri Lanka)"
-    }
-  ],
-  "PBSfL4": [
-    {
-      "type": 0,
-      "value": "Please enter a valid name"
     }
   ],
   "PEVXku": [
@@ -953,12 +857,6 @@
     {
       "type": 0,
       "value": "We're here to help"
-    }
-  ],
-  "Q6wcZ5": [
-    {
-      "type": 0,
-      "value": "First Name"
     }
   ],
   "QEUh37": [
@@ -1007,12 +905,6 @@
     {
       "type": 0,
       "value": "Address Updated"
-    }
-  ],
-  "Seanpx": [
-    {
-      "type": 0,
-      "value": "Required"
     }
   ],
   "SmKUxZ": [
@@ -1123,12 +1015,6 @@
       "value": "Out of stock"
     }
   ],
-  "WTocjo": [
-    {
-      "type": 0,
-      "value": "Card Number"
-    }
-  ],
   "X9OkqP": [
     {
       "type": 0,
@@ -1183,12 +1069,6 @@
       "value": "My Profile"
     }
   ],
-  "ZJkXve": [
-    {
-      "type": 0,
-      "value": "Sign me up for Salesforce emails (you can unsubscribe at any time)"
-    }
-  ],
   "ZMphaV": [
     {
       "type": 0,
@@ -1235,12 +1115,6 @@
     {
       "type": 0,
       "value": "Remove"
-    }
-  ],
-  "aheQdn": [
-    {
-      "type": 0,
-      "value": "Last Name"
     }
   ],
   "au3Vns": [
@@ -1561,22 +1435,16 @@
       "value": "contact us"
     }
   ],
-  "empty_search_results.title.most_viewed": [
+  "empty_search_results.recommended_products.title.most_viewed": [
     {
       "type": 0,
       "value": "Most Viewed"
     }
   ],
-  "empty_search_results.title.top_sellers": [
+  "empty_search_results.recommended_products.title.top_sellers": [
     {
       "type": 0,
       "value": "Top Sellers"
-    }
-  ],
-  "f0EhUc": [
-    {
-      "type": 0,
-      "value": "Security Code"
     }
   ],
   "fCRlK5": [
@@ -1615,18 +1483,6 @@
     {
       "type": 0,
       "value": "Add New Address"
-    }
-  ],
-  "fWz2xP": [
-    {
-      "type": 0,
-      "value": "Please enter your expiry date"
-    }
-  ],
-  "ffE6Xw": [
-    {
-      "type": 0,
-      "value": "Password must contain at least 8 characters"
     }
   ],
   "footer.column.account": [
@@ -1755,12 +1611,6 @@
       "value": "Swedish (Sweden)"
     }
   ],
-  "gW8EGu": [
-    {
-      "type": 0,
-      "value": "Name on Card"
-    }
-  ],
   "gguIJ8": [
     {
       "type": 0,
@@ -1777,12 +1627,6 @@
     {
       "type": 0,
       "value": "Chinese (Taiwan)"
-    }
-  ],
-  "hCj9FS": [
-    {
-      "type": 0,
-      "value": "Please enter your name as shown on your card"
     }
   ],
   "hZOGLS": [
@@ -1861,12 +1705,6 @@
     {
       "type": 0,
       "value": "Please select a payment method."
-    }
-  ],
-  "iiYrag": [
-    {
-      "type": 0,
-      "value": "Please enter your password"
     }
   ],
   "ipwTkh": [
@@ -2057,18 +1895,6 @@
       "value": "Tracking Number"
     }
   ],
-  "o40Ymt": [
-    {
-      "type": 0,
-      "value": "Please enter a valid security code"
-    }
-  ],
-  "oLpv29": [
-    {
-      "type": 0,
-      "value": "Please enter a valid email address"
-    }
-  ],
   "oUWADl": [
     {
       "type": 0,
@@ -2213,12 +2039,6 @@
     {
       "type": 0,
       "value": "Edit Shipping Address"
-    }
-  ],
-  "pS9/Sw": [
-    {
-      "type": 0,
-      "value": "Please enter your card number"
     }
   ],
   "pagination.field.num_of_pages": [
@@ -2405,12 +2225,6 @@
       "value": "New Address Saved"
     }
   ],
-  "qGl7SR": [
-    {
-      "type": 0,
-      "value": "Please create a password"
-    }
-  ],
   "qVGRIE": [
     {
       "type": 0,
@@ -2453,12 +2267,6 @@
     {
       "type": 0,
       "value": "Password Reset"
-    }
-  ],
-  "s/qo4z": [
-    {
-      "type": 0,
-      "value": "Please enter your last name"
     }
   ],
   "search.action.cancel": [
@@ -2679,6 +2487,324 @@
       "value": "Zip Code"
     }
   ],
+  "use_credit_card_fields.error.required": [
+    {
+      "type": 0,
+      "value": "Required"
+    }
+  ],
+  "use_credit_card_fields.error.required_card_number": [
+    {
+      "type": 0,
+      "value": "Please enter your card number"
+    }
+  ],
+  "use_credit_card_fields.error.required_expiry": [
+    {
+      "type": 0,
+      "value": "Please enter your expiry date"
+    }
+  ],
+  "use_credit_card_fields.error.required_name": [
+    {
+      "type": 0,
+      "value": "Please enter your name as shown on your card"
+    }
+  ],
+  "use_credit_card_fields.error.required_security_code": [
+    {
+      "type": 0,
+      "value": "Please enter your security code"
+    }
+  ],
+  "use_credit_card_fields.error.valid_card_number": [
+    {
+      "type": 0,
+      "value": "Please enter a valid card number"
+    }
+  ],
+  "use_credit_card_fields.error.valid_date": [
+    {
+      "type": 0,
+      "value": "Please enter a valid date"
+    }
+  ],
+  "use_credit_card_fields.error.valid_name": [
+    {
+      "type": 0,
+      "value": "Please enter a valid name"
+    }
+  ],
+  "use_credit_card_fields.error.valid_security_code": [
+    {
+      "type": 0,
+      "value": "Please enter a valid security code"
+    }
+  ],
+  "use_credit_card_fields.label.card_number": [
+    {
+      "type": 0,
+      "value": "Card Number"
+    }
+  ],
+  "use_credit_card_fields.label.card_type": [
+    {
+      "type": 0,
+      "value": "Card Type"
+    }
+  ],
+  "use_credit_card_fields.label.expiry": [
+    {
+      "type": 0,
+      "value": "Expiry Date"
+    }
+  ],
+  "use_credit_card_fields.label.name": [
+    {
+      "type": 0,
+      "value": "Name on Card"
+    }
+  ],
+  "use_credit_card_fields.label.security_code": [
+    {
+      "type": 0,
+      "value": "Security Code"
+    }
+  ],
+  "use_login_fields.error.required_email": [
+    {
+      "type": 0,
+      "value": "Please enter your email address"
+    }
+  ],
+  "use_login_fields.error.required_password": [
+    {
+      "type": 0,
+      "value": "Please enter your password"
+    }
+  ],
+  "use_login_fields.label.email": [
+    {
+      "type": 0,
+      "value": "Email"
+    }
+  ],
+  "use_login_fields.label.password": [
+    {
+      "type": 0,
+      "value": "Password"
+    }
+  ],
+  "use_profile_fields.error.required_email": [
+    {
+      "type": 0,
+      "value": "Please enter a valid email address"
+    }
+  ],
+  "use_profile_fields.error.required_first_name": [
+    {
+      "type": 0,
+      "value": "Please enter your first name"
+    }
+  ],
+  "use_profile_fields.error.required_last_name": [
+    {
+      "type": 0,
+      "value": "Please enter your last name"
+    }
+  ],
+  "use_profile_fields.error.required_phone": [
+    {
+      "type": 0,
+      "value": "Please enter your phone number"
+    }
+  ],
+  "use_profile_fields.label.email": [
+    {
+      "type": 0,
+      "value": "Email"
+    }
+  ],
+  "use_profile_fields.label.first_name": [
+    {
+      "type": 0,
+      "value": "First Name"
+    }
+  ],
+  "use_profile_fields.label.last_name": [
+    {
+      "type": 0,
+      "value": "Last Name"
+    }
+  ],
+  "use_profile_fields.label.phone": [
+    {
+      "type": 0,
+      "value": "Phone Number"
+    }
+  ],
+  "use_promo_code_fields.error.required_promo_code": [
+    {
+      "type": 0,
+      "value": "Please provide a valid promo code"
+    }
+  ],
+  "use_promo_code_fields.label.promo_code": [
+    {
+      "type": 0,
+      "value": "Promo Code"
+    }
+  ],
+  "use_registration_fields.error.contain_number": [
+    {
+      "type": 0,
+      "value": "Password must contain at least one number"
+    }
+  ],
+  "use_registration_fields.error.lowercase_letter": [
+    {
+      "type": 0,
+      "value": "Password must contain at least one lowercase letter"
+    }
+  ],
+  "use_registration_fields.error.minimum_characters": [
+    {
+      "type": 0,
+      "value": "Password must contain at least 8 characters"
+    }
+  ],
+  "use_registration_fields.error.required_email": [
+    {
+      "type": 0,
+      "value": "Please enter a valid email address"
+    }
+  ],
+  "use_registration_fields.error.required_first_name": [
+    {
+      "type": 0,
+      "value": "Please enter your first name"
+    }
+  ],
+  "use_registration_fields.error.required_last_name": [
+    {
+      "type": 0,
+      "value": "Please enter your last name"
+    }
+  ],
+  "use_registration_fields.error.required_password": [
+    {
+      "type": 0,
+      "value": "Please create a password"
+    }
+  ],
+  "use_registration_fields.error.special_character": [
+    {
+      "type": 0,
+      "value": "Password must contain at least one special character"
+    }
+  ],
+  "use_registration_fields.error.uppercase_letter": [
+    {
+      "type": 0,
+      "value": "Password must contain at least one uppercase letter"
+    }
+  ],
+  "use_registration_fields.label.email": [
+    {
+      "type": 0,
+      "value": "Email"
+    }
+  ],
+  "use_registration_fields.label.first_name": [
+    {
+      "type": 0,
+      "value": "First Name"
+    }
+  ],
+  "use_registration_fields.label.last_name": [
+    {
+      "type": 0,
+      "value": "Last Name"
+    }
+  ],
+  "use_registration_fields.label.password": [
+    {
+      "type": 0,
+      "value": "Password"
+    }
+  ],
+  "use_registration_fields.label.sign_up_to_emails": [
+    {
+      "type": 0,
+      "value": "Sign me up for Salesforce emails (you can unsubscribe at any time)"
+    }
+  ],
+  "use_reset_password_fields.error.required_email": [
+    {
+      "type": 0,
+      "value": "Please enter a valid email address"
+    }
+  ],
+  "use_reset_password_fields.label.email": [
+    {
+      "type": 0,
+      "value": "Email"
+    }
+  ],
+  "use_update_password_fields.error.contain_number": [
+    {
+      "type": 0,
+      "value": "Password must contain at least one number"
+    }
+  ],
+  "use_update_password_fields.error.lowercase_letter": [
+    {
+      "type": 0,
+      "value": "Password must contain at least one lowercase letter"
+    }
+  ],
+  "use_update_password_fields.error.minimum_characters": [
+    {
+      "type": 0,
+      "value": "Password must contain at least 8 characters"
+    }
+  ],
+  "use_update_password_fields.error.required_new_password": [
+    {
+      "type": 0,
+      "value": "Please provide a new password"
+    }
+  ],
+  "use_update_password_fields.error.required_password": [
+    {
+      "type": 0,
+      "value": "Please enter your password"
+    }
+  ],
+  "use_update_password_fields.error.special_character": [
+    {
+      "type": 0,
+      "value": "Password must contain at least one special character"
+    }
+  ],
+  "use_update_password_fields.error.uppercase_letter": [
+    {
+      "type": 0,
+      "value": "Password must contain at least one uppercase letter"
+    }
+  ],
+  "use_update_password_fields.label.current_password": [
+    {
+      "type": 0,
+      "value": "Current Password"
+    }
+  ],
+  "use_update_password_fields.label.new_password": [
+    {
+      "type": 0,
+      "value": "New Password"
+    }
+  ],
   "v898P+": [
     {
       "type": 0,
@@ -2707,12 +2833,6 @@
     {
       "type": 0,
       "value": "Create an account and get first access to the very best products, inspiration and community."
-    }
-  ],
-  "wBVQL7": [
-    {
-      "type": 0,
-      "value": "Password must contain at least one uppercase letter"
     }
   ],
   "wEQDC6": [
@@ -2761,12 +2881,6 @@
     {
       "type": 0,
       "value": "Payment Methods"
-    }
-  ],
-  "z34C7B": [
-    {
-      "type": 0,
-      "value": "Password must contain at least one special character"
     }
   ],
   "z3Qj9h": [
