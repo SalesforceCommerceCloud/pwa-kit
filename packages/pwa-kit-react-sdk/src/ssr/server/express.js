@@ -127,6 +127,9 @@ export const REMOTE_REQUIRED_ENV_VARS = [
  * @param {String} options.sslFilePath - the absolute path to a PEM format
  * certificate file to be used by the local development server. This should
  * contain both the certificate and the private key.
+ * @param {Boolean} [options.enableLegacyRemoteProxying=true] - When running remotely (as
+ * oppsed to locally), enables legacy proxying behaviour, allowing "proxy" requests to route through
+ * the express server. In the future, this behaviour and setting will be removed.
  */
 
 export const createApp = (options) => {
@@ -413,7 +416,7 @@ const validateConfiguration = (options) => {
         console.warn(
             'Legacy proxying behaviour is enabled. ' +
                 'This behaviour is deprecated and will be removed in the future.' +
-                'To disable it, set `options.enableLegacyRemoteProxying: false`.'
+                'To disable it, pass `createApp({ enableLegacyRemoteProxying: false` })'
         )
     }
 }

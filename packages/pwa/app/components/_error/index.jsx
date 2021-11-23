@@ -135,7 +135,7 @@ Error.propTypes = {
     stack: PropTypes.string,
     // HTTP status code: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
     status: PropTypes.number,
-    // A description of the error, if available.
+    // A description of the error, if available
     message: PropTypes.string
 }
 
