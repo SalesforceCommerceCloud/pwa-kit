@@ -225,7 +225,7 @@ const renderApp = (args) => {
     let appJSX = (
         <Router location={location} context={routerContext}>
             <DeviceContext.Provider value={{type: deviceType}}>
-                <AppConfig locals={res.locals}>
+                <AppConfig locals={res.locals} originalRequest={frozenReq}>
                     <Switch error={error} appState={appState} routes={routes} App={App} />
                 </AppConfig>
             </DeviceContext.Provider>

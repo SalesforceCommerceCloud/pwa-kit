@@ -78,7 +78,7 @@ export const start = () => {
             ReactDOM.hydrate(
                 <Router>
                     <DeviceContext.Provider value={{type: window.__DEVICE_TYPE__}}>
-                        <AppConfig locals={locals}>
+                        <AppConfig locals={locals} originalRequest={window.__ORIGINAL_REQUEST__}>
                             <Switch
                                 error={error}
                                 appState={window.__PRELOADED_STATE__}

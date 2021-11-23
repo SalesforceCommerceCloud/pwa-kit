@@ -94,17 +94,16 @@ class AppConfig extends React.Component {
     }
 
     render() {
-        console.log('__AppConfig_Render__', this)
-        const {children} = this.props
+        const {children, originalRequest} = this.props
         const {basket, customer} = this.state
 
         const setCustomer = (customer) => this.setState({...this.state, customer})
         const setBasket = (basket) => this.setState({...this.state, basket})
 
-        // TODO: From the looks of it, the render method should have the same manually set scope
-        // as the `extraGetPropsArgs` function, which begs the question, do we need to standardize it.
-        // Or is it even possible? Is binding the wrong solution.
-        const api = new CommerceAPI({...apiConfig, locale: 'en-GB', currency: 'GBP'})
+        // TODO: DRY this up.
+        const locale = getLocale(originalRequest) || DEFAULT_LOCALE
+        const currency = getPreferredCurrency(locale) || DEFAULT_CURRENCY
+        const api = new CommerceAPI({...apiConfig, locale, currency})
 
         return (
             <CommerceAPIProvider value={api}>
@@ -122,7 +121,7 @@ class AppConfig extends React.Component {
 
 AppConfig.propTypes = {
     children: PropTypes.node,
-    locals: PropTypes.object
+    originalRequest: PropTypes.object
 }
 
 export default AppConfig
