@@ -60,10 +60,7 @@ export const usePromoCode = () => {
             })
         } catch (err) {
             toast({
-                title: formatMessage(
-                    {defaultMessage: '{errorMessage}'},
-                    {errorMessage: API_ERROR_MESSAGE}
-                ),
+                title: formatMessage(API_ERROR_MESSAGE),
                 status: 'error',
                 position: 'top-right',
                 isClosable: true
