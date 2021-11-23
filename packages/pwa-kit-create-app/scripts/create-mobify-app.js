@@ -240,7 +240,7 @@ const prompts = () => {
             validate: validSiteId,
             default: () => {
                 const defaults = testProjectAnswers()
-                return defaults[['commerce-api']].siteId
+                return defaults['commerce-api'].siteId
             }
         },
         {
