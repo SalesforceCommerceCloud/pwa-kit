@@ -1,4 +1,4 @@
-import loadable from "pwa-kit-react-sdk/loadable";
+import loadable from '@loadable/component'
 
 const Home = loadable(() => import("./pages/home"));
 
