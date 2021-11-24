@@ -225,7 +225,7 @@ const common = {
 
 // The main PWA entry point gets special treatment for chunking
 const main = Object.assign({}, common, {
-    name: 'pwa-main',
+    name: 'client',
     entry: {
         main: './app/main.jsx',
     },
@@ -248,15 +248,27 @@ const main = Object.assign({}, common, {
     plugins: [...common.plugins, new LoadablePlugin()],
 })
 
-const others = Object.assign({}, common, {
-    name: 'pwa-others',
-    entry: {
-        loader: './app/loader.js',
-        worker: './worker/main.js',
-        'core-polyfill': 'core-js',
-        'fetch-polyfill': 'whatwg-fetch',
-    },
-})
+const getOptionalEntries = () => {
+    const config = Object.assign({}, common, {
+        name: 'pwa-others',
+        entry: {},
+    })
+    const optionals = [
+        [resolve(projectDir, 'app', 'loader.js'), {loader: './app/loader.js'}],
+        [resolve(projectDir, 'worker', 'main.js'), {worker: './worker/main.js'}],
+        [resolve(projectDir, 'node_modules', 'core-js'), {'core-polyfill': 'core-js'}],
+        [resolve(projectDir, 'node_modules', 'whatwg-fetch'), {'fetch-polyfill': 'whatwg-fetch'}],
+    ]
+    optionals.forEach(([path, entry]) => {
+        if (fs.existsSync(path)) {
+            config.entry = {...config.entry, ...entry}
+        }
+    })
+    return config
+}
+
+const others = getOptionalEntries()
+console.log(JSON.stringify(others, null, 4))
 
 /**
  * Configuration for the Express app which is run under Node.
@@ -264,10 +276,10 @@ const others = Object.assign({}, common, {
 const ssrServerConfig = Object.assign(
     {},
     {
-        name: 'ssr-server',
+        name: 'server',
         mode,
         devtool: 'source-map', // Always use source map, makes debugging the server much easier.
-        entry: './app/ssr.js',
+        entry: './app/server-renderer.jsx',
         target: 'node',
         output: {
             path: buildDir,

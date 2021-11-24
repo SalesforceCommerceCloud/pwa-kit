@@ -369,9 +369,9 @@ const validateConfiguration = (options) => {
 
     // Fix up the path in case we were passed a relative one
     options.buildDir = path.resolve(process.cwd(), options.buildDir)
-    if (!fs.existsSync(options.buildDir)) {
-        throw new Error(`The build directory ${options.buildDir} was not found`)
-    }
+    // if (!fs.existsSync(options.buildDir)) {
+    //     throw new Error(`The build directory ${options.buildDir} was not found`)
+    // }
 
     if (options.faviconPath) {
         options.faviconPath = path.resolve(options.buildDir, options.faviconPath)
