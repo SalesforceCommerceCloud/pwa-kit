@@ -28,7 +28,7 @@ export const createModuleReplacementPlugin = (options = {}) => {
 
         const sdkPaths = [
             path.join('packages', 'pwa-kit-react-sdk'),
-            path.join('node_modules', 'pwa-kit-react-sdk')
+            path.join('node_modules', 'pwa-kit-react-sdk'),
         ]
 
         const requestedFromSDK = sdkPaths.some((p) => resource.context.includes(p))

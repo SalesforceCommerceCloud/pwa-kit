@@ -16,15 +16,17 @@ import WebpackNotifierPlugin from 'webpack-notifier'
 import CopyPlugin from 'copy-webpack-plugin'
 import {BundleAnalyzerPlugin} from 'webpack-bundle-analyzer'
 import LoadablePlugin from '@loadable/webpack-plugin'
-import {createModuleReplacementPlugin, BuildMarkerPlugin} from './plugins'
+import {createModuleReplacementPlugin} from './plugins'
 
-const root = process.cwd()
+const projectDir = process.cwd()
+const sdkDir = path.resolve(path.join(__dirname, '..', '..'))
+
 const {resolve, join} = path
 
-const pkg = require(resolve(root, 'package.json'))
-const nodeModules = resolve(root, 'node_modules')
-const appDir = resolve(root, 'app')
-const buildDir = resolve(root, 'build')
+const pkg = require(resolve(projectDir, 'package.json'))
+const nodeModules = resolve(projectDir, 'node_modules')
+const appDir = resolve(projectDir, 'app')
+const buildDir = resolve(projectDir, 'build')
 
 const production = 'production'
 const development = 'development'
@@ -39,30 +41,26 @@ if (modes.indexOf(mode) < 0) {
     throw new Error(`Mode '${mode}' must be one of '${modes.toString()}'`)
 }
 
-const buildMarkerPlugin = new BuildMarkerPlugin({
-    filename: resolve(root, 'build', 'build.marker')
-})
-
 const replacements = [
     {
         path: join('pwa-kit-react-sdk', 'ssr', 'universal', 'components', '_app-config'),
-        newPath: resolve('.', 'app', 'components', '_app-config', 'index.jsx')
+        newPath: resolve('.', 'app', 'components', '_app-config', 'index.jsx'),
     },
     {
         path: join('pwa-kit-react-sdk', 'ssr', 'universal', 'components', '_document'),
-        newPath: resolve('.', 'app', 'components', '_document', 'index.jsx')
+        newPath: resolve('.', 'app', 'components', '_document', 'index.jsx'),
     },
     {
         path: join('pwa-kit-react-sdk', 'ssr', 'universal', 'components', '_app'),
-        newPath: resolve('.', 'app', 'components', '_app', 'index.jsx')
+        newPath: resolve('.', 'app', 'components', '_app', 'index.jsx'),
     },
     {
         path: join('pwa-kit-react-sdk', 'ssr', 'universal', 'components', '_error'),
-        newPath: resolve('.', 'app', 'components', '_error', 'index.jsx')
+        newPath: resolve('.', 'app', 'components', '_error', 'index.jsx'),
     },
     {
         path: join('pwa-kit-react-sdk', 'ssr', 'universal', 'routes'),
-        newPath: resolve('.', 'app', 'routes.jsx')
+        newPath: resolve('.', 'app', 'routes.jsx'),
     },
 
     // The 'pwa-kit-react-sdk' is developed in a lerna monorepo and the final resovled paths
@@ -72,24 +70,24 @@ const replacements = [
     // the monorepo so this solution, although not optimal, works.
     {
         path: join('pwa-kit-react-sdk', 'dist', 'ssr', 'universal', 'components', '_app-config'),
-        newPath: resolve('.', 'app', 'components', '_app-config', 'index.jsx')
+        newPath: resolve('.', 'app', 'components', '_app-config', 'index.jsx'),
     },
     {
         path: join('pwa-kit-react-sdk', 'dist', 'ssr', 'universal', 'components', '_document'),
-        newPath: resolve('.', 'app', 'components', '_document', 'index.jsx')
+        newPath: resolve('.', 'app', 'components', '_document', 'index.jsx'),
     },
     {
         path: join('pwa-kit-react-sdk', 'dist', 'ssr', 'universal', 'components', '_app'),
-        newPath: resolve('.', 'app', 'components', '_app', 'index.jsx')
+        newPath: resolve('.', 'app', 'components', '_app', 'index.jsx'),
     },
     {
         path: join('pwa-kit-react-sdk', 'dist', 'ssr', 'universal', 'components', '_error'),
-        newPath: resolve('.', 'app', 'components', '_error', 'index.jsx')
+        newPath: resolve('.', 'app', 'components', '_error', 'index.jsx'),
     },
     {
         path: join('pwa-kit-react-sdk', 'dist', 'ssr', 'universal', 'routes'),
-        newPath: resolve('.', 'app', 'routes.jsx')
-    }
+        newPath: resolve('.', 'app', 'routes.jsx'),
+    },
 ].filter(({newPath}) => fs.existsSync(newPath))
 
 const moduleReplacementPlugin = createModuleReplacementPlugin({replacements})
@@ -108,16 +106,16 @@ const defines = {
     DEBUG,
     WEBPACK_PAGE_NOT_FOUND_URL: `'${(pkg.mobify || {}).pageNotFoundURL || ''}' `,
     NODE_ENV: `'${process.env.NODE_ENV}'`,
-    ['global.GENTLY']: false
+    ['global.GENTLY']: false,
 }
 
 const babelLoader = [
     {
         loader: 'babel-loader?cacheDirectory',
         options: {
-            rootMode: 'upward'
-        }
-    }
+            rootMode: 'upward',
+        },
+    },
 ]
 
 // Avoid compiling server-side only libraries with webpack by setting the
@@ -141,7 +139,7 @@ const stats = {
     errorDetails: true,
     colors: true,
     assets: false,
-    excludeAssets: [/.*img\/.*/, /.*svg\/.*/, /.*json\/.*/, /.*static\/.*/]
+    excludeAssets: [/.*img\/.*/, /.*svg\/.*/, /.*json\/.*/, /.*static\/.*/],
 }
 
 const common = {
@@ -155,26 +153,26 @@ const common = {
         publicPath: '',
         path: buildDir,
         filename: '[name].js',
-        chunkFilename: '[name].js' // Support chunking with @loadable/components
+        chunkFilename: '[name].js', // Support chunking with @loadable/components
     },
     // Tell webpack how to find specific modules
     resolve: {
         extensions: ['.js', '.jsx', '.json'],
         alias: {
+            'babel-runtime': resolve(sdkDir, 'node_modules', 'babel-runtime'),
             '@loadable/component': resolve(nodeModules, '@loadable/component'),
             '@loadable/server': resolve(nodeModules, '@loadable/server'),
             '@loadable/webpack-plugin': resolve(nodeModules, '@loadable/webpack-plugin'),
-            'babel-runtime': resolve(nodeModules, 'babel-runtime'),
             'svg-sprite-loader': resolve(nodeModules, 'svg-sprite-loader'),
             react: resolve(nodeModules, 'react'),
             'react-router-dom': resolve(nodeModules, 'react-router-dom'),
             'react-dom': resolve(nodeModules, 'react-dom'),
             'react-helmet': resolve(nodeModules, 'react-helmet'),
-            bluebird: resolve(nodeModules, 'bluebird')
+            bluebird: resolve(nodeModules, 'bluebird'),
         },
         fallback: {
-            crypto: false
-        }
+            crypto: false,
+        },
     },
 
     plugins: [
@@ -183,11 +181,11 @@ const common = {
         new WebpackNotifierPlugin({
             title: `Mobify Project: ${pkg.name}`,
             excludeWarnings: true,
-            skipFirstNotification: true
+            skipFirstNotification: true,
         }),
 
         new CopyPlugin({
-            patterns: [{from: 'app/static/', to: 'static/'}]
+            patterns: [{from: 'app/static/', to: 'static/'}],
         }),
 
         analyzeBundle &&
@@ -195,13 +193,11 @@ const common = {
                 analyzerMode: 'static',
                 defaultSizes: 'gzip',
                 openAnalyzer: CI !== 'true',
-                generateStatsFile: true
+                generateStatsFile: true,
             }),
         mode === development && new webpack.NoEmitOnErrorsPlugin(),
 
-        buildMarkerPlugin,
-
-        moduleReplacementPlugin
+        moduleReplacementPlugin,
     ].filter((x) => !!x),
 
     module: {
@@ -209,29 +205,29 @@ const common = {
             {
                 test: /\.js(x?)$/,
                 exclude: /node_modules/,
-                use: babelLoader
+                use: babelLoader,
             },
             {
                 test: /\.svg$/,
-                loader: 'ignore-loader'
+                loader: 'ignore-loader',
             },
             {
                 test: /\.html$/,
                 exclude: /node_modules/,
                 use: {
-                    loader: 'html-loader'
-                }
-            }
-        ]
+                    loader: 'html-loader',
+                },
+            },
+        ],
     },
-    externals
+    externals,
 }
 
 // The main PWA entry point gets special treatment for chunking
 const main = Object.assign({}, common, {
     name: 'pwa-main',
     entry: {
-        main: './app/main.jsx'
+        main: './app/main.jsx',
     },
     optimization: {
         splitChunks: {
@@ -240,16 +236,16 @@ const main = Object.assign({}, common, {
                     // Anything imported from node_modules lands in vendor.js
                     test: /node_modules/,
                     name: 'vendor',
-                    chunks: 'all'
-                }
-            }
-        }
+                    chunks: 'all',
+                },
+            },
+        },
     },
     performance: {
         maxEntrypointSize: 905000,
-        maxAssetSize: 825000
+        maxAssetSize: 825000,
     },
-    plugins: [...common.plugins, new LoadablePlugin()]
+    plugins: [...common.plugins, new LoadablePlugin()],
 })
 
 const others = Object.assign({}, common, {
@@ -258,8 +254,8 @@ const others = Object.assign({}, common, {
         loader: './app/loader.js',
         worker: './worker/main.js',
         'core-polyfill': 'core-js',
-        'fetch-polyfill': 'whatwg-fetch'
-    }
+        'fetch-polyfill': 'whatwg-fetch',
+    },
 })
 
 /**
@@ -276,18 +272,17 @@ const ssrServerConfig = Object.assign(
         output: {
             path: buildDir,
             filename: 'ssr.js',
-            libraryTarget: 'commonjs2'
+            libraryTarget: 'commonjs2',
         },
         resolve: {
             extensions: ['.js', '.jsx', '.json'],
-            alias: common.resolve.alias
+            alias: common.resolve.alias,
         },
         plugins: [
             new webpack.DefinePlugin(defines),
             // Output a single server file for faster Lambda startup
             new webpack.optimize.LimitChunkCountPlugin({maxChunks: 1}),
-            buildMarkerPlugin,
-            moduleReplacementPlugin
+            moduleReplacementPlugin,
         ],
         externals,
         module: {
@@ -295,15 +290,15 @@ const ssrServerConfig = Object.assign(
                 {
                     test: /\.js(x?)$/,
                     exclude: /node_modules/,
-                    use: babelLoader
+                    use: babelLoader,
                 },
                 {
                     test: /\.svg$/,
-                    loader: 'svg-sprite-loader'
-                }
-            ]
+                    loader: 'svg-sprite-loader',
+                },
+            ],
         },
-        stats
+        stats,
     }
 )
 
@@ -317,18 +312,18 @@ const requestProcessor = Object.assign(
             path: resolve(process.cwd(), 'build'),
             filename: 'request-processor.js',
             // Output a CommonJS module for use in Node
-            libraryTarget: 'commonjs2'
+            libraryTarget: 'commonjs2',
         },
         module: {
             rules: [
                 {
                     test: /\.js$/,
                     exclude: /node_modules/,
-                    use: babelLoader
-                }
-            ]
+                    use: babelLoader,
+                },
+            ],
         },
-        stats
+        stats,
     }
 )
 

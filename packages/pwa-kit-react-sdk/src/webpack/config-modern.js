@@ -1,12 +1,12 @@
-import fs from 'fs';
-import p from 'path';
-import {createModuleReplacementPlugin} from './plugins';
-import resolveFrom from 'resolve-from';
-import webpack from "webpack";
-import LoadablePlugin from "@loadable/webpack-plugin";
-import CopyPlugin from "copy-webpack-plugin"
+import fs from 'fs'
+import p from 'path'
+import {createModuleReplacementPlugin} from './plugins'
+import resolveFrom from 'resolve-from'
+import webpack from 'webpack'
+import LoadablePlugin from '@loadable/webpack-plugin'
+import CopyPlugin from 'copy-webpack-plugin'
 
-const mode = process.env.NODE_ENV === 'production' ? 'production' : 'development';
+const mode = process.env.NODE_ENV === 'production' ? 'production' : 'development'
 const pkg = p.resolve(p.join(__dirname, '..', '..'))
 const rf = (path) => resolveFrom(p.resolve(pkg, 'node_modules'), path)
 
@@ -15,40 +15,40 @@ const context = process.cwd()
 const replacements = [
     {
         path: p.join('ssr', 'universal', 'components', '_app-config'),
-        newPath: p.join('app', 'components', '_app-config', 'index')
+        newPath: p.join('app', 'components', '_app-config', 'index'),
     },
     {
         path: p.join('ssr', 'universal', 'components', '_document'),
-        newPath: p.join('app', 'components', '_document', 'index')
+        newPath: p.join('app', 'components', '_document', 'index'),
     },
     {
         path: p.join('ssr', 'universal', 'components', '_app'),
-        newPath: p.join('app', 'components', '_app', 'index')
+        newPath: p.join('app', 'components', '_app', 'index'),
     },
     {
         path: p.join('ssr', 'universal', 'components', '_error'),
-        newPath: p.join('app', 'components', '_error', 'index')
+        newPath: p.join('app', 'components', '_error', 'index'),
     },
     {
         path: p.join('ssr', 'universal', 'routes'),
-        newPath: p.join('app', 'routes')
-    }
+        newPath: p.join('app', 'routes'),
+    },
 ]
 
 const allReplacements = []
 
 replacements.forEach(({path, newPath}) => {
-    ['dist', ''].forEach((prefix) => {
+    ;['dist', ''].forEach((prefix) => {
         const prefixedPath = p.join('pwa-kit-react-sdk', prefix, path)
-        const extensions = ['.jsx', '.tsx'];
+        const extensions = ['.jsx', '.tsx']
         for (let i = 0; i < extensions.length; i++) {
-          const extension = extensions[i];
-          const withExtension = p.resolve(context, `${newPath}${extension}`);
-          if (fs.existsSync(withExtension)) {
-            allReplacements.push(({path: prefixedPath, newPath: withExtension}))
-          }
+            const extension = extensions[i]
+            const withExtension = p.resolve(context, `${newPath}${extension}`)
+            if (fs.existsSync(withExtension)) {
+                allReplacements.push({path: prefixedPath, newPath: withExtension})
+            }
         }
-    });
+    })
 })
 
 const moduleReplacementPlugin = createModuleReplacementPlugin({replacements: allReplacements})
@@ -61,8 +61,8 @@ const babelLoaderCommon = {
         [
             rf('@babel/plugin-transform-runtime'),
             {
-                regenerator: true
-            }
+                regenerator: true,
+            },
         ],
         rf('@babel/plugin-syntax-dynamic-import'),
         rf('@loadable/babel-plugin'),
@@ -78,11 +78,10 @@ const babelLoaderCommon = {
     env: {
         test: {
             presets: [rf('@babel/preset-env'), rf('@babel/preset-react')],
-            plugins: [rf('babel-plugin-dynamic-import-node-babel-7')]
-        }
-    }
+            plugins: [rf('babel-plugin-dynamic-import-node-babel-7')],
+        },
+    },
 }
-
 
 const common = {
     mode,
@@ -96,7 +95,7 @@ const common = {
         errorDetails: true,
         colors: true,
         assets: false,
-        excludeAssets: [/.*img\/.*/, /.*svg\/.*/, /.*json\/.*/, /.*static\/.*/]
+        excludeAssets: [/.*img\/.*/, /.*svg\/.*/, /.*json\/.*/, /.*static\/.*/],
     },
     devtool: 'source-map',
     resolveLoader: {
@@ -105,77 +104,79 @@ const common = {
         mainFields: ['loader', 'main'],
     },
     resolve: {
-      extensions: [".js", ".jsx", ".json", ".ts", ".tsx"],
-      alias: {
-        'babel-runtime': p.resolve(pkg, 'babel-runtime'),
-        'svg-sprite-loader': p.resolve(context, 'node_modules', 'svg-sprite-loader'),
-        bluebird: p.resolve(pkg, 'bluebird'),
-        react: p.resolve(context, 'node_modules', 'react'),
-        'react-router-dom': p.resolve(context, 'node_modules', 'react-router-dom'),
-        'react-dom': p.resolve(context, 'node_modules', 'react-dom'),
-        'react-helmet': p.resolve(context, 'node_modules', 'react-helmet'),
-        '@loadable/component': p.resolve(context, 'node_modules', '@loadable/component'),
-        '@loadable/server': p.resolve(context, 'node_modules', '@loadable/server'),
-        '@loadable/webpack-plugin': p.resolve(context, 'node_modules', '@loadable/webpack-plugin'),
-      },
-      fallback: {
-        crypto: false
-      },
+        extensions: ['.js', '.jsx', '.json', '.ts', '.tsx'],
+        alias: {
+            'babel-runtime': p.resolve(pkg, 'babel-runtime'),
+            'svg-sprite-loader': p.resolve(context, 'node_modules', 'svg-sprite-loader'),
+            bluebird: p.resolve(pkg, 'bluebird'),
+            react: p.resolve(context, 'node_modules', 'react'),
+            'react-router-dom': p.resolve(context, 'node_modules', 'react-router-dom'),
+            'react-dom': p.resolve(context, 'node_modules', 'react-dom'),
+            'react-helmet': p.resolve(context, 'node_modules', 'react-helmet'),
+            '@loadable/component': p.resolve(context, 'node_modules', '@loadable/component'),
+            '@loadable/server': p.resolve(context, 'node_modules', '@loadable/server'),
+            '@loadable/webpack-plugin': p.resolve(
+                context,
+                'node_modules',
+                '@loadable/webpack-plugin'
+            ),
+        },
+        fallback: {
+            crypto: false,
+        },
     },
-    plugins: [
-        moduleReplacementPlugin,
-    ],
+    plugins: [moduleReplacementPlugin],
     module: {
         rules: [
             {
                 test: /(\.m?jsx?$)/,
                 exclude: /node_modules/,
                 use: {
-                    loader: "babel-loader",
+                    loader: 'babel-loader',
                     options: {
                         presets: [
                             [
-                                rf("@babel/preset-env"),
+                                rf('@babel/preset-env'),
                                 {
                                     targets: {
-                                        node: 12
-                                    }
+                                        node: 12,
+                                    },
                                 },
                             ],
-                            rf('@babel/preset-react')
+                            rf('@babel/preset-react'),
                         ],
                         ...babelLoaderCommon,
-                    }
-                }
+                    },
+                },
             },
             {
                 test: /\.tsx?$/,
                 exclude: /node_modules/,
                 use: {
-                    loader: "babel-loader",
+                    loader: 'babel-loader',
                     options: {
                         presets: [
-                            rf("@babel/preset-typescript"),
+                            rf('@babel/preset-typescript'),
                             [
-                                rf("@babel/preset-env"),
+                                rf('@babel/preset-env'),
                                 {
                                     targets: {
-                                        node: 12
-                                    }
+                                        node: 12,
+                                    },
                                 },
                             ],
-                            rf('@babel/preset-react')
+                            rf('@babel/preset-react'),
                         ],
-                        ...babelLoaderCommon
-                    }
-                }
+                        ...babelLoaderCommon,
+                    },
+                },
             },
             {
                 test: /\.svg$/,
-                loader: rf('ignore-loader')
-            }
-        ]
-    }
+                loader: rf('ignore-loader'),
+            },
+        ],
+    },
 }
 
 module.exports = [
@@ -187,7 +188,7 @@ module.exports = [
             publicPath: '',
             path: p.resolve(context, 'build'),
             filename: '[name].js',
-            chunkFilename: '[name].js' // Support chunking with @loadable/components
+            chunkFilename: '[name].js', // Support chunking with @loadable/components
         },
         optimization: {
             splitChunks: {
@@ -196,23 +197,21 @@ module.exports = [
                         // Anything imported from node_modules lands in vendor.js
                         test: /node_modules/,
                         name: 'vendor',
-                        chunks: 'all'
-                    }
-                }
-            }
+                        chunks: 'all',
+                    },
+                },
+            },
         },
         performance: {
             maxEntrypointSize: 905000,
-            maxAssetSize: 825000
+            maxAssetSize: 825000,
         },
         plugins: [
             ...common.plugins,
             new LoadablePlugin({writeToDisk: true}),
             new CopyPlugin({
-                patterns: [
-                    { from: "./app/static", to: "static" }
-                ]
-            })
+                patterns: [{from: './app/static', to: 'static'}],
+            }),
         ],
         target: 'web',
     },
@@ -220,9 +219,10 @@ module.exports = [
         ...common,
         name: 'server',
         entry: ['./app/server-renderer.jsx'],
-        output: {path: p.resolve(context, 'build'),
+        output: {
+            path: p.resolve(context, 'build'),
             filename: './server-renderer.js',
-            libraryTarget: 'commonjs2'
+            libraryTarget: 'commonjs2',
         },
         module: {
             rules: [
@@ -231,14 +231,11 @@ module.exports = [
                 // be a noop on the server?
                 {
                     test: /\.svg$/,
-                    loader: p.resolve(context, 'node_modules', 'svg-sprite-loader')
-                }
-            ]
+                    loader: p.resolve(context, 'node_modules', 'svg-sprite-loader'),
+                },
+            ],
         },
-        plugins: [
-            ...common.plugins,
-            new webpack.optimize.LimitChunkCountPlugin({maxChunks: 1})
-        ],
+        plugins: [...common.plugins, new webpack.optimize.LimitChunkCountPlugin({maxChunks: 1})],
         target: 'node',
-    }
+    },
 ]
