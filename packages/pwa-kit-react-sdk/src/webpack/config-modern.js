@@ -35,11 +35,9 @@ const replacements = [
     }
 ]
 
-const allReplacements = []
-
 replacements.forEach(({path, newPath}) => {
-    ['dist', 'src'].forEach((prefix) => {
-        const prefixedPath = p.join('common-runtime', prefix, path)
+    ['dist', ''].forEach((prefix) => {
+        const prefixedPath = p.join('pwa-kit-react-sdk', prefix, path)
         const extensions = ['.jsx', '.tsx'];
         for (let i = 0; i < extensions.length; i++) {
           const extension = extensions[i];
