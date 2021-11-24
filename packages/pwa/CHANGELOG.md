@@ -1,5 +1,5 @@
 ## To be release
-- Provide Url Customization for the Retail React App
+- Provide Url Customization for the Retail React App [#228](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/228/files)
 
 ## v1.2.0 (Nov 18, 2021)
 
