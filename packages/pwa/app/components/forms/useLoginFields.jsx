@@ -12,22 +12,33 @@ export default function useLoginFields({form: {control, errors}, prefix = ''}) {
     const fields = {
         email: {
             name: `${prefix}email`,
-            label: formatMessage({defaultMessage: 'Email'}),
+            label: formatMessage({defaultMessage: 'Email', id: 'use_login_fields.label.email'}),
             placeholder: 'you@email.com',
             defaultValue: '',
             type: 'email',
             rules: {
-                required: formatMessage({defaultMessage: 'Please enter your email address'})
+                required: formatMessage({
+                    defaultMessage: 'Please enter your email address',
+                    id: 'use_login_fields.error.required_email'
+                })
             },
             error: errors[`${prefix}email`],
             control
         },
         password: {
             name: `${prefix}password`,
-            label: formatMessage({defaultMessage: 'Password'}),
+            label: formatMessage({
+                defaultMessage: 'Password',
+                id: 'use_login_fields.label.password'
+            }),
             defaultValue: '',
             type: 'password',
-            rules: {required: formatMessage({defaultMessage: 'Please enter your password'})},
+            rules: {
+                required: formatMessage({
+                    defaultMessage: 'Please enter your password',
+                    id: 'use_login_fields.error.required_password'
+                })
+            },
             error: errors[`${prefix}password`],
             control
         }
