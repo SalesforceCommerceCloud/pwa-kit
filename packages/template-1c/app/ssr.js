@@ -20,7 +20,6 @@ const app = createApp({
   manifestPath: "static/manifest.json",
 
   // This is the value of the 'mobify' object from package.json
-  // provided by a webpack DefinePlugin
   mobify: require(path.join(process.cwd(), "package.json")).mobify,
 
   // The port that the local dev server listens on

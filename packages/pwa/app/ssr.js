@@ -6,11 +6,8 @@
  */
 'use strict'
 
-/* global WEBPACK_PACKAGE_JSON_MOBIFY */
-
-import path from 'path'
-import {createApp, createHandler, serveStaticFile} from 'pwa-kit-react-sdk/ssr/server/express'
-import {render} from 'pwa-kit-react-sdk/ssr/server/react-rendering'
+const path = require('path')
+const {createApp, createHandler, serveStaticFile} = require('pwa-kit-react-sdk/ssr/server/express')
 
 const app = createApp({
     // The build directory (an absolute path)
@@ -27,8 +24,7 @@ const app = createApp({
     manifestPath: 'static/manifest.json',
 
     // This is the value of the 'mobify' object from package.json
-    // provided by a webpack DefinePlugin
-    mobify: WEBPACK_PACKAGE_JSON_MOBIFY,
+    mobify: require(path.join(process.cwd(), "package.json")).mobify,
 
     // The port that the local dev server listens on
     port: 3000,
@@ -45,8 +41,7 @@ app.get('/callback?*', (req, res) => {
     res.send()
 })
 app.get('/robots.txt', serveStaticFile('static/robots.txt'))
-app.get('/*', render)
 
 // SSR requires that we export a single handler function called 'get', that
 // supports AWS use of the server that we created above.
-export const get = createHandler(app)
+exports.get = createHandler(app)

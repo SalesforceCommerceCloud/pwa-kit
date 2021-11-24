@@ -35,6 +35,8 @@ const replacements = [
     }
 ]
 
+const allReplacements = []
+
 replacements.forEach(({path, newPath}) => {
     ['dist', ''].forEach((prefix) => {
         const prefixedPath = p.join('pwa-kit-react-sdk', prefix, path)
@@ -65,13 +67,13 @@ const babelLoaderCommon = {
         rf('@babel/plugin-syntax-dynamic-import'),
         rf('@loadable/babel-plugin'),
         rf('@babel/plugin-proposal-optional-chaining'),
-        [
-            rf('babel-plugin-formatjs'),
-            {
-                idInterpolationPattern: '[sha512:contenthash:base64:6]',
-                ast: true
-            }
-        ]
+        // [
+        //     rf('babel-plugin-formatjs'),
+        //     {
+        //         idInterpolationPattern: '[sha512:contenthash:base64:6]',
+        //         ast: true
+        //     }
+        // ]
     ],
     env: {
         test: {
@@ -105,10 +107,20 @@ const common = {
     resolve: {
       extensions: [".js", ".jsx", ".json", ".ts", ".tsx"],
       alias: {
-        "@babel/runtime": p.resolve(pkg, 'node_modules', '@babel', 'runtime'),
+        'babel-runtime': p.resolve(pkg, 'babel-runtime'),
+        'svg-sprite-loader': p.resolve(context, 'node_modules', 'svg-sprite-loader'),
+        bluebird: p.resolve(pkg, 'bluebird'),
         react: p.resolve(context, 'node_modules', 'react'),
+        'react-router-dom': p.resolve(context, 'node_modules', 'react-router-dom'),
         'react-dom': p.resolve(context, 'node_modules', 'react-dom'),
-      }
+        'react-helmet': p.resolve(context, 'node_modules', 'react-helmet'),
+        '@loadable/component': p.resolve(context, 'node_modules', '@loadable/component'),
+        '@loadable/server': p.resolve(context, 'node_modules', '@loadable/server'),
+        '@loadable/webpack-plugin': p.resolve(context, 'node_modules', '@loadable/webpack-plugin'),
+      },
+      fallback: {
+        crypto: false
+      },
     },
     plugins: [
         moduleReplacementPlugin,
@@ -157,6 +169,10 @@ const common = {
                         ...babelLoaderCommon
                     }
                 }
+            },
+            {
+                test: /\.svg$/,
+                loader: rf('ignore-loader')
             }
         ]
     }
@@ -207,6 +223,17 @@ module.exports = [
         output: {path: p.resolve(context, 'build'),
             filename: './server-renderer.js',
             libraryTarget: 'commonjs2'
+        },
+        module: {
+            rules: [
+                ...common.module.rules,
+                // Not convinced this is the right way around. Shouldn't it
+                // be a noop on the server?
+                {
+                    test: /\.svg$/,
+                    loader: p.resolve(context, 'node_modules', 'svg-sprite-loader')
+                }
+            ]
         },
         plugins: [
             ...common.plugins,
