@@ -235,13 +235,8 @@ const prompts = () => {
         },
         {
             name: 'siteId',
-            message:
-                "What is your site's ID (examples: RefArchGlobal, SiteGenesis) in Business Manager?",
-            validate: validSiteId,
-            default: () => {
-                const defaults = testProjectAnswers()
-                return defaults['commerce-api'].siteId
-            }
+            message: "What is your site's ID (examples: RefArch, SiteGenesis) in Business Manager?",
+            validate: validSiteId
         },
         {
             name: 'organizationId',
