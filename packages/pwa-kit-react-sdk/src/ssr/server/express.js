@@ -230,17 +230,6 @@ export const createApp = (options) => {
             )
         }
 
-        // Proxy bundle asset requests to the local
-        // build directory.
-        app.use(
-            '/mobify/bundle/development',
-            express.static(options.buildDir, {
-                dotFiles: 'deny',
-                setHeaders: setLocalAssetHeaders,
-                fallthrough: false
-            })
-        )
-
         // Flush metrics at the end of sending. We do this here to
         // keep the code paths consistent between local and remote
         // servers. For the remote server, the flushing is done
@@ -1487,6 +1476,29 @@ export const createDevServer = (app) => {
     // Custom values are supported via environment variables.
     let hostname = process.env.LISTEN_ADDRESS || process.env.EXTERNAL_DOMAIN_NAME || 'localhost'
     let port = options.port
+
+    // Do the requires here – these need to remain optional dependencies
+    // that we do not ship to Lambda.
+    const webpack = require('webpack');
+    const webpackDevMiddleware = require('webpack-dev-middleware');
+    const webpackHotServerMiddleware = require('webpack-hot-server-middleware');
+    const config = require('../../webpack/config-modern');
+    const compiler = webpack(config);
+
+    // Proxy bundle asset requests to the local
+    // build directory.
+    app.use(
+        '/mobify/bundle/development',
+        express.static(path.resolve(process.cwd(), 'src'), {
+            dotFiles: 'deny',
+            setHeaders: setLocalAssetHeaders,
+            fallthrough: true
+        })
+    )
+
+    app.use('/mobify/bundle/development', webpackDevMiddleware(compiler));
+    app.use('/', webpackHotServerMiddleware(compiler));
+
 
     app.use((req, res, next) => {
         const done = () => {
