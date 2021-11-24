@@ -156,7 +156,7 @@ export const getUrlWithLocale = (shortCode, opts = {}) => {
  * @returns {string}
  */
 export const homeUrlBuilder = (homeHref, locale) => {
-    const updatedUrl = buildPathWithUrlConfigParams(homeHref, {
+    const updatedUrl = buildPathWithUrlConfig(homeHref, {
         locale: locale !== DEFAULT_LOCALE ? locale : ''
     })
     console.log('updatedUrl', updatedUrl)
@@ -209,7 +209,7 @@ export const removeQueryParamsFromPath = (path, keys) => {
  * url {
  *    locale: "query_param"
  * }
- * buildPathWithLocaleAndSiteParams('/women/dresses', {locale: 'en-GB'})
+ * buildPathWithUrlConfig('/women/dresses', {locale: 'en-GB'})
  *
  * Returns
  *  /women/dresses?locale=en-GB
@@ -219,14 +219,15 @@ export const removeQueryParamsFromPath = (path, keys) => {
  * url {
  *    locale: "path"
  * }
- * buildPathWithLocaleAndSiteParams('/women/dresses', {locale: 'en-GB'})
+ * buildPathWithUrlConfig('/women/dresses', {locale: 'en-GB'})
  *
  * Returns
  *  /en-GB/women/dresses
  *
  */
-export const buildPathWithUrlConfigParams = (url, configValues = {}) => {
+export const buildPathWithUrlConfig = (url, configValues = {}) => {
     const urlConfig = getUrlConfig()
+    if (!urlConfig || !Object.values(urlConfig).length) return url
     if (!Object.values(configValues).length) return url
     const {locale, siteAlias} = configValues
     const queryParams = {}

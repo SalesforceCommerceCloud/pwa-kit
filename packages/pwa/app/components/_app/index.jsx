@@ -41,7 +41,7 @@ import {IntlProvider} from 'react-intl'
 
 // Others
 import {watchOnlineStatus, flatten} from '../../utils/utils'
-import {homeUrlBuilder, getUrlWithLocale, buildPathWithUrlConfigParams} from '../../utils/url'
+import {homeUrlBuilder, getUrlWithLocale, buildPathWithUrlConfig} from '../../utils/url'
 import {getLocaleConfig, getPreferredCurrency, getSupportedLocalesIds} from '../../utils/locale'
 import {DEFAULT_CURRENCY, HOME_HREF} from '../../constants'
 
@@ -110,7 +110,7 @@ const App = (props) => {
     }
 
     const onCartClick = () => {
-        const path = buildPathWithUrlConfigParams('/cart', {locale: targetLocale})
+        const path = buildPathWithUrlConfig('/cart', {locale: targetLocale})
         history.push(path)
 
         // Close the drawer.
@@ -120,7 +120,7 @@ const App = (props) => {
     const onAccountClick = () => {
         // Link to account page for registered customer, open auth modal otherwise
         if (customer.isRegistered) {
-            const path = buildPathWithUrlConfigParams('/account', {locale: targetLocale})
+            const path = buildPathWithUrlConfig('/account', {locale: targetLocale})
             history.push(path)
         } else {
             // if they already are at the login page, do not show login modal
@@ -130,7 +130,7 @@ const App = (props) => {
     }
 
     const onWishlistClick = () => {
-        const path = buildPathWithUrlConfigParams('/account/wishlist', {locale: targetLocale})
+        const path = buildPathWithUrlConfig('/account/wishlist', {locale: targetLocale})
         history.push(path)
     }
 
