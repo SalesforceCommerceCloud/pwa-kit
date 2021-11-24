@@ -1482,7 +1482,7 @@ export const createDevServer = (app) => {
     const webpack = require('webpack');
     const webpackDevMiddleware = require('webpack-dev-middleware');
     const webpackHotServerMiddleware = require('webpack-hot-server-middleware');
-    const config = require('../../webpack/config-modern');
+    const config = require('../../webpack/config');
     const compiler = webpack(config);
 
     // Proxy bundle asset requests to the local
