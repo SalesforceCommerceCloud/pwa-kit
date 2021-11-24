@@ -35,7 +35,8 @@ const {
     once,
     serveStaticFile
 } = require('./express')
-const {getHashForString} = require('../../utils/ssr-server')
+const ssrServerUtils = require('../../utils/ssr-server')
+const {getHashForString} = ssrServerUtils
 const fetch = require('node-fetch')
 const fs = require('fs')
 const https = require('https')
@@ -94,7 +95,8 @@ const opts = (overrides = {}) => {
         protocol: 'https',
         fetchAgents: {
             https: httpsAgent
-        }
+        },
+        enableLegacyRemoteProxying: false
     }
     return {
         ...defaults,
@@ -237,6 +239,7 @@ describe('SSRServer operation', () => {
     const savedEnvironment = Object.assign({}, process.env)
     const sandbox = sinon.sandbox.create()
     let server
+
     afterEach(() => {
         sandbox.restore()
         if (server) {
@@ -245,9 +248,11 @@ describe('SSRServer operation', () => {
         }
         nock.cleanAll()
     })
+
     afterAll(() => {
         process.env = savedEnvironment
     })
+
     beforeEach(() => {
         // Ensure the environment is clean
         process.env = {
@@ -538,6 +543,34 @@ describe('SSRServer operation', () => {
             .then(() => {
                 expect(route.mock.calls[0][0].query).toEqual({z: '1', y: '2', x: '3'})
             })
+    })
+
+    describe('Running remotely', () => {
+        let isRemoteMock
+        let savedEnvironment
+
+        beforeEach(() => {
+            isRemoteMock = jest.spyOn(ssrServerUtils, 'isRemote').mockImplementation(() => true)
+            savedEnvironment = Object.assign({}, process.env)
+            Object.assign(process.env, {
+                BUNDLE_ID: 1,
+                DEPLOY_TARGET: 1,
+                EXTERNAL_DOMAIN_NAME: 'http://www.example.com',
+                MOBIFY_PROPERTY_ID: 'example'
+            })
+        })
+
+        afterEach(() => {
+            isRemoteMock.mockRestore()
+            process.env = savedEnvironment
+        })
+
+        test('should not proxy', () => {
+            const app = createApp(opts())
+            return request(app)
+                .get('/mobify/proxy/base/test/path')
+                .expect(501)
+        })
     })
 
     test('SSRServer proxying handles empty path', () => {
