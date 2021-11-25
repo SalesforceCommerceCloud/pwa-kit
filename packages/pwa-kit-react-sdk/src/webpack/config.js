@@ -142,6 +142,10 @@ const stats = {
     excludeAssets: [/.*img\/.*/, /.*svg\/.*/, /.*json\/.*/, /.*static\/.*/],
 }
 
+const projectThenSDK = (pkg) => {
+    return [resolve(appDir, 'node_modules', pkg), resolve(sdkDir, 'node_modules', pkg)]
+}
+
 const common = {
     mode,
     // Reduce amount of output in terminal
@@ -159,16 +163,16 @@ const common = {
     resolve: {
         extensions: ['.js', '.jsx', '.json'],
         alias: {
-            'babel-runtime': resolve(sdkDir, 'node_modules', 'babel-runtime'),
-            '@loadable/component': resolve(sdkDir, 'node_modules', '@loadable/component'),
-            '@loadable/server': resolve(sdkDir, 'node_modules', '@loadable/server'),
-            '@loadable/webpack-plugin': resolve(sdkDir, 'node_modules', '@loadable/webpack-plugin'),
-            'svg-sprite-loader': resolve(sdkDir, 'node_modules', 'svg-sprite-loader'),
-            react: resolve(nodeModules, 'react'),
-            'react-router-dom': resolve(nodeModules, 'react-router-dom'),
-            'react-dom': resolve(nodeModules, 'react-dom'),
-            'react-helmet': resolve(nodeModules, 'react-helmet'),
-            bluebird: resolve(nodeModules, 'bluebird'),
+            'babel-runtime': projectThenSDK('babel-runtime'),
+            '@loadable/component': projectThenSDK('@loadable/component'),
+            '@loadable/server': projectThenSDK('@loadable/server'),
+            '@loadable/webpack-plugin': projectThenSDK('@loadable/webpack-plugin'),
+            'svg-sprite-loader': projectThenSDK('svg-sprite-loader'),
+            react: projectThenSDK('react'),
+            'react-router-dom': projectThenSDK('react-router-dom'),
+            'react-dom': projectThenSDK('react-dom'),
+            'react-helmet': projectThenSDK('react-helmet'),
+            bluebird: projectThenSDK('bluebird'),
         },
         fallback: {
             crypto: false,
