@@ -297,10 +297,8 @@ App.getProps = async ({api}) => {
         const message =
             rootCategory.title === 'Unsupported Locale'
                 ? `
-
-🚫 This page isn’t working.
-It looks like the locale ‘${rootCategory.locale}’ hasn’t been set up, yet.
-You can either follow this doc, https://sfdc.co/B4Z1m to enable it in business manager or define a different locale with the instructions for Localization in the README file.
+It looks like the locale “${rootCategory.locale}” isn’t set up, yet. The locale settings in your package.json must match what is enabled in your Business Manager instance.
+Learn more with our localization guide. https://sfdc.co/localization-guide
 `
                 : rootCategory.detail
         throw new Error(message)
