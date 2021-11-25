@@ -9,13 +9,11 @@
 'use strict'
 
 const fs = require('fs')
-const path = require('path')
 const uploadBundle = require('../scripts/upload.js')
 const Utils = require('../scripts/utils.js')
 
 const POTENTIAL_OPTIONS = {
     buildDirectory: 'b',
-    config: 'c',
     message: 'm',
     projectSlug: 's',
     target: 't'
@@ -44,50 +42,30 @@ const argv = require('yargs')
         describe: 'a custom target to upload a bundle to within Mobify Cloud',
         type: 'string'
     })
-    .option(POTENTIAL_OPTIONS.config, {
-        alias: 'config',
-        describe:
-            'the relative path to a configuration file, if not defined, configuration is taken from the mobify key in package.json',
-        type: 'string'
-    })
     .help('h')
     .alias('h', 'help')
     .strict().argv
 
-const getOptions = (configFilePath) => {
-    if (configFilePath) {
-        return getOptionsFromConfig(configFilePath)
+let packageJson = {}
+try {
+    // Assumption: this binary is invoked from the project root directory
+    packageJson = JSON.parse(fs.readFileSync('package.json', {encoding: 'utf8'}))
+} catch (e) {
+    let message
+    if (e.code === 'ENOENT' && e.path === 'package.json') {
+        message =
+            '[Error: package.json not found. Are you running this command in the project root directory?]' // eslint-disable-line max-len
+    } else {
+        message = e.message
     }
-    return getOptionsFromPackageJson()
-}
 
-const getOptionsFromConfig = (configFilePath) => {
-    const config = require(path.resolve(process.cwd(), configFilePath))
-    return config
-}
-
-const getOptionsFromPackageJson = () => {
-    let packageJson
-    try {
-        // Assumption: this binary is invoked from the project root directory
-        packageJson = JSON.parse(fs.readFileSync('package.json', {encoding: 'utf8'}))
-    } catch (e) {
-        let message
-        if (e.code === 'ENOENT' && e.path === 'package.json') {
-            message =
-                '[Error: package.json not found. Are you running this command in the project root directory?]' // eslint-disable-line max-len
-        } else {
-            message = e.message
-        }
-        Utils.fail(message)
-    }
-    return {...packageJson.mobify, projectSlug: packageJson.name}
+    Utils.fail(message)
 }
 
 // Read the top-level Mobify options. If the environment variable
 // SSR_ENABLED is set to a truthy string, then override the
 // ssrEnabled value.
-const mobifyOptions = getOptions(argv.config)
+const mobifyOptions = packageJson.mobify || {}
 
 if (process.env.SSR_ENABLED) {
     mobifyOptions.ssrEnabled = true
@@ -95,7 +73,7 @@ if (process.env.SSR_ENABLED) {
 
 // Take the default slug from package.json
 if (typeof argv.projectSlug === 'undefined') {
-    argv.projectSlug = mobifyOptions.projectSlug
+    argv.projectSlug = packageJson.name
 }
 
 const options = {}
