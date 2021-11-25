@@ -51,7 +51,7 @@ export default class Config {
         // and more... https://json-schema.org/draft/2020-12/json-schema-validation.html
         const validator = new JsonSchemaValidator({allErrors: true}).compile(schema)
         validator(_data)
-        console.log(validator.errors)
+
         const errorMessages = validator.errors
             ? validator.errors.map(
                   (e) =>
