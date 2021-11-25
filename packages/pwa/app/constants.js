@@ -58,7 +58,7 @@ export const DEFAULT_LOCALE = packageInfo.l10n.defaultLocale
 export const SUPPORTED_CURRENCIES = packageInfo.l10n.supportedCurrencies
 export const DEFAULT_CURRENCY = packageInfo.l10n.defaultCurrency
 
-export const urlParamTypes = {
+export const urlPartPositions = {
     PATH: 'path',
     QUERY_PARAM: 'query_param',
     NONE: 'none'

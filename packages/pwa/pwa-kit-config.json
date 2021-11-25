@@ -1,7 +1,7 @@
 {
     "app": {
         "url": {
-            "locale": "path",
+            "locale": "query_param",
             "siteAlias": "none"
         }
     }

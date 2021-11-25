@@ -21,7 +21,7 @@ import {
 } from '../../commerce-api/contexts'
 import {commerceAPIConfig} from '../../commerce-api.config'
 import {einsteinAPIConfig} from '../../einstein-api.config'
-import {DEFAULT_LOCALE, DEFAULT_CURRENCY, urlParamTypes} from '../../constants'
+import {DEFAULT_LOCALE, DEFAULT_CURRENCY, urlPartPositions} from '../../constants'
 import {getPreferredCurrency, getSupportedLocalesIds} from '../../utils/locale'
 import {getUrlConfig} from '../../utils/utils'
 import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
@@ -49,10 +49,10 @@ const getLocale = (locals = {}) => {
 
     let shortCode
     const {pathname, searchParams} = new URL(`${getAppOrigin()}${originalUrl}`)
-    if (localeType === urlParamTypes.PATH) {
+    if (localeType === urlPartPositions.PATH) {
         // Parse the pathname from the partial using the URL object and a placeholder host
         shortCode = pathname.split('/')[1]
-    } else if (localeType === urlParamTypes.QUERY_PARAM) {
+    } else if (localeType === urlPartPositions.QUERY_PARAM) {
         shortCode = searchParams.get('locale')
     }
 

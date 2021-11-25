@@ -6,7 +6,7 @@
  */
 
 import {getUrlConfig} from './utils'
-import {urlParamTypes} from '../constants'
+import {urlPartPositions} from '../constants'
 
 /**
  * Configure the routes based on url configuration from pwa-kit-config.json file
@@ -30,7 +30,7 @@ export const configureRoutes = (routes = [], {ignoredRoutes = []}) => {
 
         options.forEach((option) => {
             const position = urlConfig[option]
-            if (position === urlParamTypes.PATH) {
+            if (position === urlPartPositions.PATH) {
                 basePathSegments.push(`:${option}`)
             }
         })

@@ -7,7 +7,7 @@
 
 import {DEFAULT_LOCALE} from '../constants'
 import {getUrlConfig} from './utils'
-import {urlParamTypes} from '../constants'
+import {urlPartPositions} from '../constants'
 
 /**
  * Modifies a given url by adding/updating query parameters.
@@ -127,7 +127,7 @@ export const getUrlWithLocale = (shortCode, opts = {}) => {
 
     let paths = relativeUrl.split('/').filter((path) => path !== '')
 
-    if (localeParamType === urlParamTypes.PATH) {
+    if (localeParamType === urlPartPositions.PATH) {
         // Array of the paths without empty items
 
         // Remove the previous locale
@@ -137,7 +137,7 @@ export const getUrlWithLocale = (shortCode, opts = {}) => {
         if (shortCode !== DEFAULT_LOCALE || paths?.length > 0) {
             paths.unshift(shortCode)
         }
-    } else if (localeParamType === urlParamTypes.QUERY_PARAM) {
+    } else if (localeParamType === urlPartPositions.QUERY_PARAM) {
         params.set('locale', shortCode)
     }
 
@@ -235,12 +235,12 @@ export const buildPathWithUrlConfig = (url, configValues = {}) => {
     options.forEach((option) => {
         const position = urlConfig[option]
         switch (position) {
-            case urlParamTypes.NONE:
+            case urlPartPositions.NONE:
                 break
-            case urlParamTypes.QUERY_PARAM:
+            case urlPartPositions.QUERY_PARAM:
                 queryParams[option] = configValues[option]
                 break
-            case urlParamTypes.PATH:
+            case urlPartPositions.PATH:
                 basePathSegments.push(configValues[option])
                 break
         }
