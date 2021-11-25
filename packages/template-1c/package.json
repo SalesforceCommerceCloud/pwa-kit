@@ -1,22 +1,19 @@
 {
-  "name": "template-1c",
-  "version": "1.3.0-dev",
-  "private": true,
-  "devDependencies": {
-    "@loadable/babel-plugin": "^5.13.2",
-    "@loadable/component": "^5.15.0",
-    "@loadable/server": "^5.15.0",
-    "pwa-kit-react-sdk": "^1.3.0-dev",
-    "react": "^17.0.2",
-    "react-dom": "^17.0.2",
-    "react-router-dom": "^5.1.2",
-    "react-helmet": "^6.1.0",
-    "svg-sprite-loader": "^6.0.7"
-  },
-  "dependencies": {
-    "cross-fetch": "^3.1.4"
-  },
-  "mobify": {
+    "name": "template-1c",
+    "version": "1.3.0-dev",
+    "private": true,
+    "devDependencies": {
+        "pwa-kit-react-sdk": "^1.3.0-dev",
+        "react": "^17.0.2",
+        "react-dom": "^17.0.2",
+        "react-helmet": "^6.1.0",
+        "react-router-dom": "^5.1.2",
+        "svg-sprite-loader": "^6.0.7"
+    },
+    "dependencies": {
+        "cross-fetch": "^3.1.4"
+    },
+    "mobify": {
         "externals": [],
         "pageNotFoundURL": "/page-not-found",
         "ssrEnabled": true,
