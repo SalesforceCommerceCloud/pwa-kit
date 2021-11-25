@@ -180,7 +180,6 @@ const common = {
             'react-dom': projectThenSDKModules('react-dom'),
             'react-helmet': projectThenSDKModules('react-helmet'),
             bluebird: projectThenSDKModules('bluebird'),
-            'webpack/package.json': join(sdkModules('webpack'), 'package.json'),
         },
         fallback: {
             crypto: false,

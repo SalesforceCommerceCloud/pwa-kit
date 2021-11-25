@@ -1,7 +1,10 @@
 #!/usr/bin/env node
 const p = require('path')
+const fs = require('fs')
 const program = require('commander')
+const isEmail = require('validator/lib/isEmail')
 const {execSync} = require('child_process')
+const scriptUtils = require('../scripts/utils')
 
 // TODO: Won't work when deployed to NPM - need to resolve differently
 const webpack = require.resolve('webpack/bin/webpack')
@@ -15,9 +18,42 @@ const main = () => {
 
     program
         .command('login')
-        .description(`login to Managed Runtime and save your credentials`)
-        .action(() => {
-            console.log('Logging in...')
+        .description(`login to Managed Runtime`)
+        .requiredOption(
+            '-u, --user <email>',
+            `the e-mail address you used to register with Mobify Cloud`,
+            (val) => {
+                if (!isEmail(val)) {
+                    throw new program.InvalidArgumentError(`"${val}" is not a valid email`)
+                } else {
+                    return val
+                }
+            }
+        )
+        .requiredOption(
+            '-k --key <api-key>',
+            `find your API key at https://runtime.commercecloud.com/account/settings`,
+            (val) => {
+                if (!(typeof val === 'string') && val.length > 0) {
+                    throw new program.InvalidArgumentError(`"${val}" cannot be empty`)
+                } else {
+                    return val
+                }
+            }
+        )
+        .action(({user, key}) => {
+            try {
+                const settingsPath = scriptUtils.getSettingsPath()
+                fs.writeFileSync(
+                    settingsPath,
+                    JSON.stringify({username: user, api_key: key}, null, 4)
+                )
+                console.log(`Saved credentials to "${settingsPath}".`)
+            } catch (e) {
+                console.error('Failed to save credentials.')
+                console.error(e)
+                process.exit(1)
+            }
         })
 
     program
