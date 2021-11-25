@@ -8,16 +8,31 @@ import cardValidator from 'card-validator'
 import {useIntl, defineMessages} from 'react-intl'
 
 const messages = defineMessages({
-    required: {defaultMessage: 'Required'},
-    cardNumberInvalid: {defaultMessage: 'Please enter a valid card number'},
-    nameInvalid: {defaultMessage: 'Please enter a valid name'},
-    dateInvalid: {defaultMessage: 'Please enter a valid date'},
-    codeInvalid: {defaultMessage: 'Please enter a valid security code'},
-    cardNumber: {defaultMessage: 'Card Number'},
-    cardType: {defaultMessage: 'Card Type'},
-    cardName: {defaultMessage: 'Name on Card'},
-    expiryDate: {defaultMessage: 'Expiry Date'},
-    securityCode: {defaultMessage: 'Security Code'}
+    required: {defaultMessage: 'Required', id: 'use_credit_card_fields.error.required'},
+    cardNumberInvalid: {
+        defaultMessage: 'Please enter a valid card number',
+        id: 'use_credit_card_fields.error.valid_card_number'
+    },
+    nameInvalid: {
+        defaultMessage: 'Please enter a valid name',
+        id: 'use_credit_card_fields.error.valid_name'
+    },
+    dateInvalid: {
+        defaultMessage: 'Please enter a valid date',
+        id: 'use_credit_card_fields.error.valid_date'
+    },
+    codeInvalid: {
+        defaultMessage: 'Please enter a valid security code',
+        id: 'use_credit_card_fields.error.valid_security_code'
+    },
+    cardNumber: {defaultMessage: 'Card Number', id: 'use_credit_card_fields.label.card_number'},
+    cardType: {defaultMessage: 'Card Type', id: 'use_credit_card_fields.label.card_type'},
+    cardName: {defaultMessage: 'Name on Card', id: 'use_credit_card_fields.label.name'},
+    expiryDate: {defaultMessage: 'Expiry Date', id: 'use_credit_card_fields.label.expiry'},
+    securityCode: {
+        defaultMessage: 'Security Code',
+        id: 'use_credit_card_fields.label.security_code'
+    }
 })
 
 /**
@@ -37,7 +52,10 @@ export default function useCreditCardFields({form: {control, errors}, prefix = '
             defaultValue: '',
             type: 'text',
             rules: {
-                required: formatMessage({defaultMessage: 'Please enter your card number'}),
+                required: formatMessage({
+                    defaultMessage: 'Please enter your card number',
+                    id: 'use_credit_card_fields.error.required_card_number'
+                }),
                 validate: (value) =>
                     cardValidator.number(value).isValid || formatMessage(messages.cardNumberInvalid)
             },
@@ -62,7 +80,8 @@ export default function useCreditCardFields({form: {control, errors}, prefix = '
             type: 'text',
             rules: {
                 required: formatMessage({
-                    defaultMessage: 'Please enter your name as shown on your card'
+                    defaultMessage: 'Please enter your name as shown on your card',
+                    id: 'use_credit_card_fields.error.required_name'
                 }),
                 validate: (value) =>
                     cardValidator.cardholderName(value).isValid ||
@@ -79,7 +98,8 @@ export default function useCreditCardFields({form: {control, errors}, prefix = '
             placeholder: 'MM/YY',
             rules: {
                 required: formatMessage({
-                    defaultMessage: 'Please enter your expiry date'
+                    defaultMessage: 'Please enter your expiry date',
+                    id: 'use_credit_card_fields.error.required_expiry'
                 }),
                 validate: (value) =>
                     cardValidator.expirationDate(value).isValid ||
@@ -98,7 +118,8 @@ export default function useCreditCardFields({form: {control, errors}, prefix = '
             type: 'password',
             rules: {
                 required: formatMessage({
-                    defaultMessage: 'Please enter your security code'
+                    defaultMessage: 'Please enter your security code',
+                    id: 'use_credit_card_fields.error.required_security_code'
                 }),
                 validate: (value) =>
                     cardValidator.cvv(value).isValid || formatMessage(messages.codeInvalid)

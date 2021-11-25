@@ -72,7 +72,10 @@ const ProductItem = ({
                             <Flex align="flex-end" justify="space-between">
                                 <Stack spacing={1}>
                                     <Text fontSize="sm" color="gray.700">
-                                        <FormattedMessage defaultMessage="Quantity:" />
+                                        <FormattedMessage
+                                            defaultMessage="Quantity:"
+                                            id="product_item.label.quantity"
+                                        />
                                     </Text>
                                     <QuantityPicker
                                         step={stepQuantity}

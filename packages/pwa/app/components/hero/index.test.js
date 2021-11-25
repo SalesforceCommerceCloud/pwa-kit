@@ -12,7 +12,6 @@ import Hero from './index'
 test('Hero renders without errors', () => {
     const data = {
         title: 'title',
-        label: 'label',
         actions: undefined,
         img: {
             src: 'src',
@@ -27,7 +26,6 @@ test('Hero renders actions and event handlers', () => {
     const onClick = jest.fn()
     const data = {
         title: 'title',
-        label: 'label',
         actions: <button data-testid="button" onClick={onClick}></button>,
         img: {
             src: 'src',

@@ -78,18 +78,18 @@ const LocaleSelector = ({
                             <AccordionPanel>
                                 <Accordion allowToggle={true} {...styles.accordion}>
                                     {locales.map((locale) => (
-                                        <AccordionItem border="none" key={locale.id}>
+                                        <AccordionItem border="none" key={locale}>
                                             <AccordionButton
                                                 {...styles.optionButton}
-                                                onClick={() => onSelect(locale.id)}
+                                                onClick={() => onSelect(locale)}
                                             >
                                                 {/* Display flag icon if one exists */}
-                                                {flags[locale.id]}
+                                                {flags[locale]}
 
                                                 {/* Locale name */}
                                                 <LocaleText
                                                     {...styles.optionText}
-                                                    shortCode={locale.id}
+                                                    shortCode={locale}
                                                 />
 
                                                 {/* Selection indicator */}
@@ -115,7 +115,7 @@ LocaleSelector.propTypes = {
     /**
      * A complete list of all the locales supported. This array must have content.
      */
-    locales: PropTypes.array.isRequired,
+    locales: PropTypes.arrayOf(PropTypes.string).isRequired,
     /**
      * The current locales shortcode.
      */

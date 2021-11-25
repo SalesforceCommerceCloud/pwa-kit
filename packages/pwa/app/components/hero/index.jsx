@@ -7,49 +7,56 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import {AspectRatio, Box, Flex, Heading, Img, Text, VStack, useTheme} from '@chakra-ui/react'
+import {Box, Flex, Heading, Stack, Image} from '@chakra-ui/react'
 
-const Hero = ({title, label, img, actions, ...props}) => {
+const Hero = ({title, img, actions, ...props}) => {
     const {src, alt} = img
-    const theme = useTheme()
 
     return (
-        <Box height={{lg: 'xl'}} position={{lg: 'relative'}} {...props}>
-            <Flex
-                marginBottom="8"
-                bgGradient={theme.gradients.imageBackground}
-                justifyContent={{lg: 'flex-end'}}
-                height="full"
-                paddingRight={{lg: '16'}}
-                borderRadius="base"
+        <Box
+            marginBottom={{base: 0, md: 10}}
+            height={{lg: 'xl'}}
+            position={{lg: 'relative'}}
+            {...props}
+        >
+            <Stack
+                align={'center'}
+                spacing={{base: 8, md: 10}}
+                paddingTop={{base: 12, md: 10}}
+                paddingBottom={{base: 6, md: 10}}
+                direction={{base: 'column', lg: 'row'}}
             >
-                <AspectRatio ratio={1} width="full" maxWidth={{lg: 'lg'}}>
-                    <Img alt={alt} src={src} />
-                </AspectRatio>
-            </Flex>
-            <VStack
-                alignItems="flex-start"
-                position={{lg: 'absolute'}}
-                top={{lg: '50%'}}
-                transform={{lg: 'translateY(-50%)'}}
-                paddingLeft={{lg: '16'}}
-            >
-                <Text fontSize={{base: 'sm', lg: 'md'}} fontWeight="semibold">
-                    {label}
-                </Text>
-                <Heading
-                    as="h1"
-                    fontSize={{base: '4xl', lg: '5xl'}}
-                    maxWidth={{base: '75%', md: '50%', lg: 'md'}}
+                <Stack flex={1} spacing={{base: 5, md: 8}}>
+                    <Heading
+                        as="h1"
+                        fontSize={{base: '4xl', md: '5xl', lg: '6xl'}}
+                        maxWidth={{base: '75%', md: '50%', lg: 'md'}}
+                    >
+                        {title}
+                    </Heading>
+
+                    {actions && <Box width={{base: 'full', lg: 'inherit'}}>{actions}</Box>}
+                </Stack>
+                <Flex
+                    flex={1}
+                    justify={'center'}
+                    align={'center'}
+                    position={'relative'}
+                    width={'full'}
+                    paddingTop={{base: 4, lg: 0}}
                 >
-                    {title}
-                </Heading>
-                {actions && (
-                    <Box paddingTop="2" width={{base: 'full', lg: 'inherit'}}>
-                        {actions}
+                    <Box position={'relative'} width={{base: 'full', md: '80%', lg: 'full'}}>
+                        <Image
+                            fit={'cover'}
+                            align={'center'}
+                            width={'100%'}
+                            height={'100%'}
+                            src={src}
+                            alt={alt}
+                        />
                     </Box>
-                )}
-            </VStack>
+                </Flex>
+            </Stack>
         </Box>
     )
 }
@@ -57,10 +64,6 @@ const Hero = ({title, label, img, actions, ...props}) => {
 Hero.displayName = 'Hero'
 
 Hero.propTypes = {
-    /**
-     * Promotion label
-     */
-    label: PropTypes.string,
     /**
      * Hero component image
      */
