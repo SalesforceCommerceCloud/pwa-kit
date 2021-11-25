@@ -33,6 +33,8 @@ import {proxyConfigs} from '../../utils/ssr-shared'
 
 import sprite from 'svg-sprite-loader/runtime/sprite.build'
 
+import {AppContext} from '../universal/contexts'
+
 const CWD = process.cwd()
 const BUNDLES_PATH = path.resolve(CWD, 'build/loadable-stats.json')
 
@@ -186,11 +188,11 @@ export const render = async (req, res) => {
         App: WrappedApp,
         appState,
         error: appStateError && logAndFormatError(appStateError),
-        frozenReq,
         routes,
         req,
         res,
-        location
+        location,
+        context
     }
     try {
         renderResult = renderApp(args)
@@ -212,7 +214,7 @@ export const render = async (req, res) => {
 }
 
 const renderApp = (args) => {
-    const {req, res, location, routes, appState, error, frozenReq, App} = args
+    const {req, res, location, routes, appState, error, App, context} = args
 
     const ssrOnly = 'mobify_server_only' in req.query
     const prettyPrint = 'mobify_pretty' in req.query
@@ -223,13 +225,15 @@ const renderApp = (args) => {
     let extractor
     let bundles = []
     let appJSX = (
-        <Router location={location} context={routerContext}>
-            <DeviceContext.Provider value={{type: deviceType}}>
-                <AppConfig locals={res.locals} originalRequest={frozenReq}>
-                    <Switch error={error} appState={appState} routes={routes} App={App} />
-                </AppConfig>
-            </DeviceContext.Provider>
-        </Router>
+        <AppContext.Provider value={context}>
+            <Router location={location} context={routerContext}>
+                <DeviceContext.Provider value={{type: deviceType}}>
+                    <AppConfig locals={res.locals}>
+                        <Switch error={error} appState={appState} routes={routes} App={App} />
+                    </AppConfig>
+                </DeviceContext.Provider>
+            </Router>
+        </AppContext.Provider>
     )
 
     /* istanbul ignore next */
@@ -274,7 +278,8 @@ const renderApp = (args) => {
     const windowGlobals = {
         __DEVICE_TYPE__: deviceType,
         __PRELOADED_STATE__: appState,
-        __ORIGINAL_REQUEST__: frozenReq,
+        // TODO: Should we just freeze the context?
+        __ORIGINAL_REQUEST__: context.originalRequest,
         __ERROR__: error,
         // `window.Progressive` has a long history at Mobify and some
         // client-side code depends on it. Maintain its name out of tradition.

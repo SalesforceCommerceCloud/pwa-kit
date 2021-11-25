@@ -21,6 +21,14 @@ const isHydrating = () => !isServerSide && window.__HYDRATING__
 
 const hasPerformanceAPI = !isServerSide && window.performance && window.performance.timing
 
+const bindRouteComponentStatics = (target, context) => {
+    const routeComponentStatics = ['shouldGetProps', 'getProps', 'getTemplateName']
+
+    routeComponentStatics.forEach((fn) => {
+        target[fn] = target[fn].bind(context)
+    })
+}
+
 /* istanbul ignore next */
 const now = () => {
     return hasPerformanceAPI
@@ -113,7 +121,9 @@ export const routeComponent = (Wrapped, isPage, locals, context) => {
             }
             const component = await RouteComponent.getComponent()
 
-            return component.shouldGetProps ? component.shouldGetProps(args) : defaultImpl()
+            return component.shouldGetProps
+                ? component.shouldGetProps.bind(this)(args)
+                : defaultImpl()
         }
 
         /**
@@ -159,7 +169,9 @@ export const routeComponent = (Wrapped, isPage, locals, context) => {
         // eslint-disable-next-line
         static getProps(args) {
             RouteComponent._latestPropsPromise = RouteComponent.getComponent().then((component) =>
-                component.getProps ? component.getProps({...args, ...extraArgs}) : Promise.resolve()
+                component.getProps
+                    ? component.getProps.bind(this)({...args, ...extraArgs})
+                    : Promise.resolve()
             )
             return RouteComponent._latestPropsPromise
         }
@@ -187,7 +199,9 @@ export const routeComponent = (Wrapped, isPage, locals, context) => {
          */
         static async getTemplateName() {
             return RouteComponent.getComponent().then((c) =>
-                c.getTemplateName ? c.getTemplateName() : Promise.resolve(wrappedComponentName)
+                c.getTemplateName
+                    ? c.getTemplateName.bind(this)()
+                    : Promise.resolve(wrappedComponentName)
             )
         }
 
@@ -403,6 +417,10 @@ export const routeComponent = (Wrapped, isPage, locals, context) => {
         getTemplateName: true
     }
     hoistNonReactStatic(RouteComponent, Wrapped, excludes)
+
+    // bind new scope to route component statics
+    console.log('binding: ', Wrapped, context)
+    bindRouteComponentStatics(RouteComponent, context)
 
     return withErrorHandling(withRouter(RouteComponent))
 }

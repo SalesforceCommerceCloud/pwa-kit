@@ -53,8 +53,7 @@ class AppConfig extends React.Component {
 
     // TODO: Fix vagueness of this description.
     /**
-     * Freezes the request into the rendered HTML as `__ORIGINAL_REQUEST__`. Its value is
-     * also made available in the scope of the `getProps` et al as an object names `originalRequest`.
+     * Freezes the request into the rendered HTML as `__ORIGINAL_REQUEST__`.
      * It's important to note that this function is only called once on the server-side.
      *
      * @param req - the request object.

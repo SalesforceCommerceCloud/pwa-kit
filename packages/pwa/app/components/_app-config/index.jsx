@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React from 'react'
+import React, {useContext, useState} from 'react'
 import PropTypes from 'prop-types'
 import {ChakraProvider} from '@chakra-ui/react'
 
@@ -23,6 +23,8 @@ import {commerceAPIConfig} from '../../commerce-api.config'
 import {einsteinAPIConfig} from '../../einstein-api.config'
 import {DEFAULT_LOCALE, DEFAULT_CURRENCY} from '../../constants'
 import {getPreferredCurrency, getSupportedLocalesIds} from '../../utils/locale'
+
+import {AppContext} from 'pwa-kit-react-sdk/ssr/universal/contexts'
 
 const apiConfig = {
     ...commerceAPIConfig,
@@ -48,6 +50,8 @@ const getLocale = (originalRequest = {}) => {
     return shortCode
 }
 
+const useAppContext = () => useContext(AppContext)
+
 /**
  * Use the AppConfig component to inject extra arguments into the getProps
  * methods for all Route Components in the app – typically you'd want to do this
@@ -56,72 +60,60 @@ const getLocale = (originalRequest = {}) => {
  * You can also use the AppConfig to configure a state-management library such
  * as Redux, or Mobx, if you like.
  */
-class AppConfig extends React.Component {
-    constructor(props) {
-        super(props)
-        this.state = {
-            basket: null,
-            customer: null
+const AppConfig = ({children}) => {
+    const [basket, setBasket] = useState(null)
+    const [customer, setCustomer] = useState(null)
+    const context = useAppContext()
+
+    // TODO: DRY this up.
+    console.log('AppConfig: ', context.originalRequest)
+    const locale = getLocale(context.originalRequest) || DEFAULT_LOCALE
+    const currency = getPreferredCurrency(locale) || DEFAULT_CURRENCY
+    const api = new CommerceAPI({...apiConfig, locale, currency})
+
+    return (
+        <CommerceAPIProvider value={api}>
+            <CustomerProvider value={{customer, setCustomer}}>
+                <BasketProvider value={{basket, setBasket}}>
+                    <CustomerProductListsProvider>
+                        <ChakraProvider theme={theme}>{children}</ChakraProvider>
+                    </CustomerProductListsProvider>
+                </BasketProvider>
+            </CustomerProvider>
+        </CommerceAPIProvider>
+    )
+}
+
+// Question: Should the below 3 statics also have the `context` object set as their scope?
+// Remember that we'll have to text these function during rendering to see if they are
+// arrow functions or not and give a warning or error.
+AppConfig.restore = function() {}
+
+AppConfig.freeze = function() {
+    return undefined
+}
+
+AppConfig.freezeRequest = function(req) {
+    return {
+        url: req.url,
+        headers: {
+            'Accept-Language': req.headers['Accept-Language']
         }
     }
+}
 
-    // eslint-disable-next-line no-unused-vars
-    static restore(locals, frozen = {}) {}
+AppConfig.extraGetPropsArgs = function() {
+    const locale = getLocale(this.originalRequest) || DEFAULT_LOCALE
+    const currency = getPreferredCurrency(locale) || DEFAULT_CURRENCY
 
-    // eslint-disable-next-line no-unused-vars
-    static freeze(locals) {
-        return undefined
-    }
-
-    // eslint-disable-next-line no-unused-vars
-    static freezeRequest(req, res) {
-        return {
-            url: req.url,
-            headers: {
-                'Accept-Language': req.headers['Accept-Language']
-            }
-        }
-    }
-
-    // eslint-disable-next-line no-unused-vars
-    static extraGetPropsArgs(locals) {
-        const locale = getLocale(this.originalRequest) || DEFAULT_LOCALE
-        const currency = getPreferredCurrency(locale) || DEFAULT_CURRENCY
-
-        return {
-            api: new CommerceAPI({...apiConfig, locale, currency})
-        }
-    }
-
-    render() {
-        const {children, originalRequest} = this.props
-        const {basket, customer} = this.state
-
-        const setCustomer = (customer) => this.setState({...this.state, customer})
-        const setBasket = (basket) => this.setState({...this.state, basket})
-
-        // TODO: DRY this up.
-        const locale = getLocale(originalRequest) || DEFAULT_LOCALE
-        const currency = getPreferredCurrency(locale) || DEFAULT_CURRENCY
-        const api = new CommerceAPI({...apiConfig, locale, currency})
-
-        return (
-            <CommerceAPIProvider value={api}>
-                <CustomerProvider value={{customer, setCustomer}}>
-                    <BasketProvider value={{basket, setBasket}}>
-                        <CustomerProductListsProvider>
-                            <ChakraProvider theme={theme}>{children}</ChakraProvider>
-                        </CustomerProductListsProvider>
-                    </BasketProvider>
-                </CustomerProvider>
-            </CommerceAPIProvider>
-        )
+    return {
+        api: new CommerceAPI({...apiConfig, locale, currency})
     }
 }
 
 AppConfig.propTypes = {
     children: PropTypes.node,
-    originalRequest: PropTypes.object
+    locals: PropTypes.object
 }
 
 export default AppConfig

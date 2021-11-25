@@ -21,6 +21,7 @@ import {UIDReset, UIDFork} from 'react-uid'
  */
 const Switch = (props) => {
     const {error, appState, routes, App} = props
+
     return (
         <UIDReset>
             <AppErrorBoundary error={error}>
@@ -46,6 +47,7 @@ const Switch = (props) => {
 }
 
 Switch.propTypes = {
+    context: PropTypes.object,
     error: PropTypes.object,
     appState: PropTypes.object,
     routes: PropTypes.array,

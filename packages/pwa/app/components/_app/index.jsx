@@ -254,7 +254,8 @@ App.shouldGetProps = () => {
     return typeof window === 'undefined'
 }
 
-App.getProps = async ({api}) => {
+App.getProps = async function({api}) {
+    console.log('App.getProps: ', this)
     const localeConfig = await getLocaleConfig({
         getUserPreferredLocales: () => {
             // CONFIG: This function should return an array of preferred locales. They can be
