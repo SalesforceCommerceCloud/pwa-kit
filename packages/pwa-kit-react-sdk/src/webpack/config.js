@@ -24,7 +24,6 @@ const sdkDir = path.resolve(path.join(__dirname, '..', '..'))
 const {resolve, join} = path
 
 const pkg = require(resolve(projectDir, 'package.json'))
-const nodeModules = resolve(projectDir, 'node_modules')
 const appDir = resolve(projectDir, 'app')
 const buildDir = resolve(projectDir, 'build')
 
