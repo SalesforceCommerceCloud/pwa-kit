@@ -36,6 +36,18 @@ const DEBUG = mode !== production && process.env.DEBUG === 'true'
 const CI = process.env.CI
 const requestProcessorPath = resolve(appDir, 'request-processor.js')
 
+const projectModules = (pkg) => {
+    return resolve(projectDir, 'node_modules', pkg)
+}
+
+const sdkModules = (pkg) => {
+    return resolve(sdkDir, 'node_modules', pkg)
+}
+
+const projectThenSDKModules = (pkg) => {
+    return fs.existsSync(projectModules(pkg)) ? projectModules(pkg) : sdkModules(pkg)
+}
+
 if (modes.indexOf(mode) < 0) {
     throw new Error(`Mode '${mode}' must be one of '${modes.toString()}'`)
 }
@@ -110,7 +122,7 @@ const defines = {
 
 const babelLoader = [
     {
-        loader: resolve(sdkDir, 'node_modules', 'babel-loader?cacheDirectory'),
+        loader: projectThenSDKModules('babel-loader'),
         options: {
             rootMode: 'upward',
         },
@@ -141,10 +153,6 @@ const stats = {
     excludeAssets: [/.*img\/.*/, /.*svg\/.*/, /.*json\/.*/, /.*static\/.*/],
 }
 
-const projectThenSDK = (pkg) => {
-    return [resolve(projectDir, 'node_modules', pkg), resolve(sdkDir, 'node_modules', pkg)]
-}
-
 const common = {
     mode,
     // Reduce amount of output in terminal
@@ -162,16 +170,16 @@ const common = {
     resolve: {
         extensions: ['.js', '.jsx', '.json'],
         alias: {
-            'babel-runtime': projectThenSDK('babel-runtime'),
-            '@loadable/component': projectThenSDK('@loadable/component'),
-            '@loadable/server': projectThenSDK('@loadable/server'),
-            '@loadable/webpack-plugin': projectThenSDK('@loadable/webpack-plugin'),
-            'svg-sprite-loader': projectThenSDK('svg-sprite-loader'),
-            react: projectThenSDK('react'),
-            'react-router-dom': projectThenSDK('react-router-dom'),
-            'react-dom': projectThenSDK('react-dom'),
-            'react-helmet': projectThenSDK('react-helmet'),
-            bluebird: projectThenSDK('bluebird'),
+            'babel-runtime': projectThenSDKModules('babel-runtime'),
+            '@loadable/component': projectThenSDKModules('@loadable/component'),
+            '@loadable/server': projectThenSDKModules('@loadable/server'),
+            '@loadable/webpack-plugin': projectThenSDKModules('@loadable/webpack-plugin'),
+            'svg-sprite-loader': projectThenSDKModules('svg-sprite-loader'),
+            react: projectThenSDKModules('react'),
+            'react-router-dom': projectThenSDKModules('react-router-dom'),
+            'react-dom': projectThenSDKModules('react-dom'),
+            'react-helmet': projectThenSDKModules('react-helmet'),
+            bluebird: projectThenSDKModules('bluebird'),
         },
         fallback: {
             crypto: false,
@@ -308,7 +316,7 @@ const ssrServerConfig = Object.assign(
                 },
                 {
                     test: /\.svg$/,
-                    loader: 'svg-sprite-loader',
+                    loader: projectThenSDKModules('svg-sprite-loader'),
                 },
             ],
         },
