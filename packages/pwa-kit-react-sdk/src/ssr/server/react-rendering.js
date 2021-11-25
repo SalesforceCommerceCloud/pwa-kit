@@ -256,6 +256,8 @@ const renderApp = (args) => {
 
     const helmet = Helmet.renderStatic()
 
+    const isProduction = process.env.DEPLOY_TARGET === 'production'
+
     // Do not include *dynamic*, executable inline scripts – these cause issues with
     // strict CSP headers that customers often want to use. Avoid inline scripts,
     // full-stop, whenever possible.
@@ -266,7 +268,11 @@ const renderApp = (args) => {
     // Do *not* add to these without a very good reason - globals are a liability.
     const windowGlobals = {
         __DEVICE_TYPE__: deviceType,
-        __PRELOADED_STATE__: appState
+        __PRELOADED_STATE__: appState,
+        __ERROR__: isProduction ? undefined : error,
+        // `window.Progressive` has a long history at Mobify and some
+        // client-side code depends on it. Maintain its name out of tradition.
+        Progressive: getWindowProgressive(req, res)
     }
 
     const scripts = [
