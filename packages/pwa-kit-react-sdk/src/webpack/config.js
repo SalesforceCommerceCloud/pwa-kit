@@ -168,7 +168,7 @@ const common = {
     },
     // Tell webpack how to find specific modules
     resolve: {
-        extensions: ['.js', '.jsx', '.json'],
+        extensions: ['.ts', '.tsx', '.js', '.jsx', '.json'],
         alias: {
             'babel-runtime': projectThenSDKModules('babel-runtime'),
             '@loadable/component': projectThenSDKModules('@loadable/component'),
@@ -215,7 +215,7 @@ const common = {
     module: {
         rules: [
             {
-                test: /\.js(x?)$/,
+                test: /(\.js(x?)|\.ts(x?))$/,
                 exclude: /node_modules/,
                 use: babelLoader,
             },
@@ -298,7 +298,7 @@ const ssrServerConfig = Object.assign(
             libraryTarget: 'commonjs2',
         },
         resolve: {
-            extensions: ['.js', '.jsx', '.json'],
+            extensions: ['.ts', '.tsx', '.js', '.jsx', '.json'],
             alias: common.resolve.alias,
         },
         plugins: [
@@ -311,7 +311,7 @@ const ssrServerConfig = Object.assign(
         module: {
             rules: [
                 {
-                    test: /\.js(x?)$/,
+                    test: /(\.js(x?)|\.ts(x?))$/,
                     exclude: /node_modules/,
                     use: babelLoader,
                 },
@@ -341,7 +341,7 @@ const requestProcessor = Object.assign(
         module: {
             rules: [
                 {
-                    test: /\.js$/,
+                    test: /(\.js(x?)|\.ts(x?))$/,
                     exclude: /node_modules/,
                     use: babelLoader,
                 },

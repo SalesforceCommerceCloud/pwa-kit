@@ -1,6 +1,6 @@
 import loadable from '@loadable/component'
 
-const Home = loadable(() => import("./pages/home"));
+const Home = loadable(() => import("./pages/home.tsx"));
 
 const routes = [
   {

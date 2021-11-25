@@ -14,6 +14,7 @@ const config = {
                 }
             }
         ],
+        require('@babel/preset-typescript'),
         require('@babel/preset-react')
     ],
     plugins: [

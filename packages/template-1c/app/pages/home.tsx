@@ -1,7 +1,14 @@
 import React, { useEffect, useState } from "react";
 import fetch from "cross-fetch";
 
-const Home = ({ dadJoke }) => {
+import HelloTS from "../components/hello-typescript";
+import HelloJS from "../components/hello-javascript"
+
+interface Props {
+  dadJoke: string,
+}
+
+const Home = ({ dadJoke }: Props) => {
   const [counter, setCounter] = useState(0);
 
   useEffect(() => {
@@ -16,6 +23,8 @@ const Home = ({ dadJoke }) => {
       <h1>This is the home page!!</h1>
       <pre>{JSON.stringify(dadJoke, null, 4)}</pre>
       <hr />
+      <HelloTS message={counter} />
+      <HelloJS message={counter} />
     </div>
   );
 };
