@@ -142,7 +142,7 @@ const stats = {
 }
 
 const projectThenSDK = (pkg) => {
-    return [resolve(appDir, 'node_modules', pkg), resolve(sdkDir, 'node_modules', pkg)]
+    return [resolve(projectDir, 'node_modules', pkg), resolve(sdkDir, 'node_modules', pkg)]
 }
 
 const common = {
