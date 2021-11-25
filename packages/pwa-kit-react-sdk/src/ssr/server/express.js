@@ -221,11 +221,12 @@ export const createApp = (options) => {
             })
         )
 
-        // Configure logging
         if (!isQuiet()) {
             app.use(
                 expressLogging(
-                    ':method :url :status :response-time ms - :res[content-length] :res[content-type]'
+                    isRemote()
+                        ? ':method :url :status :response-time ms - :res[content-length] :res[content-type]'
+                        : 'dev'
                 )
             )
         }
@@ -1480,9 +1481,10 @@ export const createDevServer = (app) => {
     // Do the requires here – these need to remain optional dependencies
     // that we do not ship to Lambda.
     const webpack = require('webpack');
-    const webpackDevMiddleware = require('webpack-dev-middleware');
+    const webpackDevMiddleware = require('webpack-dev-middleware', {serverSideRender: true});
     const webpackHotServerMiddleware = require('webpack-hot-server-middleware');
     const config = require('../../webpack/config');
+    const open = require('open');
     const compiler = webpack(config);
 
     // Proxy bundle asset requests to the local
@@ -1497,8 +1499,120 @@ export const createDevServer = (app) => {
     )
 
     app.use('/mobify/bundle/development', webpackDevMiddleware(compiler));
-    app.use('/', webpackHotServerMiddleware(compiler));
 
+    const middleware = webpackHotServerMiddleware(compiler)
+
+    app.use('/', (req, res, next) => {
+        try {
+            middleware(req, res, next)
+        } catch (e) {
+            const loadingScreen = `
+                <!doctype html>
+                <head>
+                    <meta charset="utf-8"/>
+                    <title>Managed Runtime</title>
+                    <style>
+                        body {
+                            background: linear-gradient(-45deg, #e73c7e, #23a6d5, #23d5ab, #ee7752);
+                            background-size: 400% 400%;
+                            animation: gradient 15s ease infinite;
+                            height: 100vh;
+                        }
+                        @keyframes gradient {
+                            0% {
+                                background-position: 0% 50%;
+                            }
+                            50% {
+                                background-position: 100% 50%;
+                            }
+                            100% {
+                                background-position: 0% 50%;
+                            }
+                        }
+                        @keyframes fade {
+                          0% { opacity: 0 }
+                          100% { opacity: 1 }
+                        }
+                        .fade-in {
+                            font-size: 18px;
+                            opacity: 0;
+                            animation: fade 1s ease-in-out;
+                            animation-fill-mode: forwards;
+                        }
+                        .fade-in-0 { animation-delay: 0s}
+                        .fade-in-1 { animation-delay: 4s}
+                        .fade-in-2 { animation-delay: 8s}
+                        .fade-in-3 { animation-delay: 12s}
+                        .fade-in-4 { animation-delay: 16s}
+                        .fade-in-5 { animation-delay: 20s}
+                        body {
+                            font-family: "Helvetica", sans-serif;
+                            font-weight: 300;
+                            color: rgba(255,255,255,0.8);
+                            color: chartreuse;
+                        }
+                        .loading-screen {
+                            mix-blend-mode: color-dodge;
+                            display: flex;
+                            flex-direction: row;
+                            flex-wrap: nowrap;
+                            justify-content: center;
+                            align-items: center;
+                            height: 100vh;
+                        }
+                        h1 {
+                            font-size: 10em;
+                            font-weight: 900;
+                            letter-spacing: -0.05em;
+                        }
+                        .title {
+                            text-align: right;
+                        }
+                        .divider {
+                            mix-blend-mode: lighten;
+                            width: 8px;
+                            background-color: chartreuse;
+                            height: 507px;
+                            margin-left: 5em;
+                            margin-right: 3em;
+                        }
+                    </style>
+                </head>
+                <body>
+                    <div class="loading-screen">
+                        <div class="panel title">
+                            <h1>Managed<br/>Runtime</h1>
+                        </div>
+                        <div class="panel">
+                            <div class="divider"></div>
+                        </div>
+                        <div class="panel">
+                            <p class="fade-in fade-in-0">Compiling Javascript...</p>
+                            <p class="fade-in fade-in-1">Optimizing assets...</p>
+                            <p class="fade-in fade-in-2">Establishing trust...</p>
+                            <p class="fade-in fade-in-3">Facilitating change...</p>
+                            <p class="fade-in fade-in-4">Daring to dream...</p>
+                            <p class="fade-in fade-in-5">Filing Security Assessments...</p>
+                        </div>
+                    </div>
+                    <script>
+                        setInterval(() => {
+                            Promise.resolve()
+                                .then(() => fetch('/'))
+                                .then((res) => res.text())
+                                .then((text) => {
+                                    if (!text.includes("SpecialMagicString123481231823")) {
+                                        window.location.reload();
+                                    }
+                                })
+                        }, 2000)
+                    </script>
+                </body>
+                </html>
+            `
+            res.send(loadingScreen)
+        }
+    });
 
     app.use((req, res, next) => {
         const done = () => {
@@ -1551,11 +1665,12 @@ export const createDevServer = (app) => {
     server.on('close', () => app.applicationCache.close())
 
     server.listen({hostname, port}, () => {
-        localDevLog(
-            `${options.protocol.toUpperCase()} development server listening on ` +
-                `${options.protocol}://${hostname}:${port}`
-        )
+        const url = `${options.protocol}://${hostname}:${port}`
+        localDevLog(`${options.protocol.toUpperCase()} development server listening on ${url}`)
+        // TODO: Must move this to the CLI – it'll cause us nightmares here.
+        open(url)
     })
+
     return {handler: undefined, server}
 }
 
