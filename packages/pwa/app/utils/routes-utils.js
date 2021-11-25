@@ -9,11 +9,13 @@ import {getUrlConfig} from './utils'
 import {urlParamTypes} from '../constants'
 
 /**
- * Modify the routes to url params to each route based on urls configuration
- * @param {array} routes - array of routes to be modified
- * @param {array} ignoredRoutes - list of array that do not need the modification
+ * Configure the routes based on url configuration from pwa-kit-config.json file
+ *
+ * @param {array} routes - array of routes to be configured
+ * @param {object} - a custom configured object
+ * @return {array} - list of configured route objects
  */
-export const modifyRoutesWithUrlConfig = (routes = [], ignoredRoutes = []) => {
+export const configureRoutes = (routes = [], {ignoredRoutes = []}) => {
     if (!routes.length) return []
 
     const urlConfig = getUrlConfig()
@@ -24,14 +26,14 @@ export const modifyRoutesWithUrlConfig = (routes = [], ignoredRoutes = []) => {
         if (ignoredRoutes.includes(path)) return route
         let basePathSegments = []
 
-        const localeParamType = urlConfig['locale']
-        if (localeParamType === urlParamTypes.PATH) {
-            basePathSegments.push(':locale')
-        }
-        const siteAliasParamType = urlConfig['siteAlias']
-        if (siteAliasParamType === urlParamTypes.PATH) {
-            basePathSegments.push(':siteAlias')
-        }
+        const options = ['locale', 'siteAlias']
+
+        options.forEach((option) => {
+            const position = urlConfig[option]
+            if (position === urlParamTypes.PATH) {
+                basePathSegments.push(`:${option}`)
+            }
+        })
 
         return {
             path: `${basePathSegments.length ? `/${basePathSegments.join('/')}` : ''}${path}`,

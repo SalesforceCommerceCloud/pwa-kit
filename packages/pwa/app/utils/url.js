@@ -125,8 +125,7 @@ export const getUrlWithLocale = (shortCode, opts = {}) => {
         })
     }
 
-    let paths = []
-    paths = relativeUrl.split('/').filter((path) => path !== '')
+    let paths = relativeUrl.split('/').filter((path) => path !== '')
 
     if (localeParamType === urlParamTypes.PATH) {
         // Array of the paths without empty items
@@ -159,7 +158,6 @@ export const homeUrlBuilder = (homeHref, locale) => {
     const updatedUrl = buildPathWithUrlConfig(homeHref, {
         locale: locale !== DEFAULT_LOCALE ? locale : ''
     })
-    console.log('updatedUrl', updatedUrl)
     return encodeURI(updatedUrl)
 }
 
@@ -229,27 +227,25 @@ export const buildPathWithUrlConfig = (url, configValues = {}) => {
     const urlConfig = getUrlConfig()
     if (!urlConfig || !Object.values(urlConfig).length) return url
     if (!Object.values(configValues).length) return url
-    const {locale, siteAlias} = configValues
     const queryParams = {}
     const basePathSegments = []
 
-    const localeParamType = urlConfig['locale']
-    if (localeParamType === urlParamTypes.QUERY_PARAM) {
-        queryParams.locale = locale
-    }
+    const options = ['locale', 'siteAlias']
 
-    if (localeParamType === urlParamTypes.PATH) {
-        basePathSegments.push(locale)
-    }
+    options.forEach((option) => {
+        const position = urlConfig[option]
+        switch (position) {
+            case urlParamTypes.NONE:
+                break
+            case urlParamTypes.QUERY_PARAM:
+                queryParams[option] = configValues[option]
+                break
+            case urlParamTypes.PATH:
+                basePathSegments.push(configValues[option])
+                break
+        }
+    })
 
-    const siteAliasParamType = urlConfig['siteAlias']
-    if (siteAliasParamType === urlParamTypes.QUERY_PARAM) {
-        queryParams.locale = siteAlias
-    }
-
-    if (siteAliasParamType === urlParamTypes.PATH) {
-        basePathSegments.push(siteAlias)
-    }
     // filter the array and build the pathname
     let updatedPath = `${
         basePathSegments.filter(Boolean).length ? `/${basePathSegments.join('/')}` : ''

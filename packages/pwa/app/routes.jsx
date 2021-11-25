@@ -18,7 +18,7 @@ import loadable from '@loadable/component'
 // Components
 import {Skeleton} from '@chakra-ui/react'
 import {HOME_HREF} from './constants'
-import {modifyRoutesWithUrlConfig} from './utils/routes-utils'
+import {configureRoutes} from './utils/routes-utils'
 
 const fallback = <Skeleton height="75vh" width="100%" />
 
@@ -109,6 +109,8 @@ const routes = [
     }
 ]
 
-const modifiedRoutes = modifyRoutesWithUrlConfig(routes, [HOME_HREF, '/callback', '/:locale', '*'])
+const configuredRoutes = configureRoutes(routes, {
+    ignoredRoutes: [HOME_HREF, '/callback', '/:locale', '*']
+})
 
-export default modifiedRoutes
+export default configuredRoutes

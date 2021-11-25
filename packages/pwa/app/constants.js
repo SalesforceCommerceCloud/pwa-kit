@@ -60,5 +60,6 @@ export const DEFAULT_CURRENCY = packageInfo.l10n.defaultCurrency
 
 export const urlParamTypes = {
     PATH: 'path',
-    QUERY_PARAM: 'query_param'
+    QUERY_PARAM: 'query_param',
+    NONE: 'none'
 }
