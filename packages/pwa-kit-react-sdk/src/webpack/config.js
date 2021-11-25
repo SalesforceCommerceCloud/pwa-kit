@@ -34,7 +34,6 @@ const analyzeBundle = process.env.MOBIFY_ANALYZE === 'true'
 const mode = process.env.NODE_ENV === production ? production : development
 const DEBUG = mode !== production && process.env.DEBUG === 'true'
 const CI = process.env.CI
-const requestProcessorPath = resolve(appDir, 'request-processor.js')
 
 const projectModules = (pkg) => {
     return resolve(projectDir, 'node_modules', pkg)
@@ -103,32 +102,6 @@ const replacements = [
 
 const moduleReplacementPlugin = createModuleReplacementPlugin({replacements})
 
-const defines = {
-    // This is defined as a boolean, not a string
-    MESSAGING_ENABLED: `${pkg.messagingEnabled}`,
-    WEBPACK_NON_PWA_ENABLED: `${pkg.nonPwaEnabled}`,
-    NATIVE_WEBPACK_ASTRO_VERSION: `'0.0.1'`, // TODO
-    MESSAGING_SITE_ID: `'${pkg.messagingSiteId}'`,
-    // This is for internal Mobify test use
-    MOBIFY_CONNECTOR_NAME: `'${process.env.MOBIFY_CONNECTOR_NAME}'`,
-    // These are defined as string constants
-    WEBPACK_PACKAGE_JSON_MOBIFY: `${JSON.stringify(pkg.mobify || {})}`,
-    WEBPACK_SSR_ENABLED: pkg.mobify ? `${pkg.mobify.ssrEnabled}` : 'false',
-    DEBUG,
-    WEBPACK_PAGE_NOT_FOUND_URL: `'${(pkg.mobify || {}).pageNotFoundURL || ''}' `,
-    NODE_ENV: `'${process.env.NODE_ENV}'`,
-    ['global.GENTLY']: false,
-}
-
-const babelLoader = [
-    {
-        loader: projectThenSDKModules('babel-loader'),
-        options: {
-            rootMode: 'upward',
-        },
-    },
-]
-
 // Avoid compiling server-side only libraries with webpack by setting the
 // webpack `externals` configuration. This values originates from the mobify
 // configuration object under `externals` in the projects package.json file.
@@ -141,219 +114,237 @@ const externals = ['express', ...(mobifyConfig.externals || [])].reduce(
     {}
 )
 
-const stats = {
-    all: false,
-    modules: false,
-    errors: true,
-    warnings: true,
-    moduleTrace: true,
-    errorDetails: true,
-    colors: true,
-    assets: false,
-    excludeAssets: [/.*img\/.*/, /.*svg\/.*/, /.*json\/.*/, /.*static\/.*/],
+const baseConfig = (target) => {
+    if (!['web', 'node'].includes(target)) {
+        throw Error(`The value "${target}" is not a supported webpack target`)
+    }
+
+    class Builder {
+        constructor() {
+            this.config = {
+                target,
+                mode,
+                stats: {
+                    all: false,
+                    modules: false,
+                    errors: true,
+                    warnings: true,
+                    moduleTrace: true,
+                    errorDetails: true,
+                    colors: true,
+                    assets: false,
+                    excludeAssets: [/.*img\/.*/, /.*svg\/.*/, /.*json\/.*/, /.*static\/.*/],
+                },
+                devtool: 'source-map',
+                output: {
+                    publicPath: '',
+                    path: buildDir,
+                    ...(target === 'node' ? {libraryTarget: 'commonjs2'} : {}),
+                },
+                resolve: {
+                    extensions: ['.ts', '.tsx', '.js', '.jsx', '.json'],
+                    alias: {
+                        'babel-runtime': projectThenSDKModules('babel-runtime'),
+                        '@loadable/component': projectThenSDKModules('@loadable/component'),
+                        '@loadable/server': projectThenSDKModules('@loadable/server'),
+                        '@loadable/webpack-plugin': projectThenSDKModules(
+                            '@loadable/webpack-plugin'
+                        ),
+                        'svg-sprite-loader': projectThenSDKModules('svg-sprite-loader'),
+                        react: projectThenSDKModules('react'),
+                        'react-router-dom': projectThenSDKModules('react-router-dom'),
+                        'react-dom': projectThenSDKModules('react-dom'),
+                        'react-helmet': projectThenSDKModules('react-helmet'),
+                        bluebird: projectThenSDKModules('bluebird'),
+                    },
+                    ...(target === 'web' ? {fallback: {crypto: false}} : {}),
+                },
+
+                plugins: [
+                    new webpack.DefinePlugin({
+                        // These are defined as string constants
+                        WEBPACK_PACKAGE_JSON_MOBIFY: `${JSON.stringify(pkg.mobify || {})}`,
+                        DEBUG,
+                        NODE_ENV: `'${process.env.NODE_ENV}'`,
+                        ['global.GENTLY']: false,
+                    }),
+
+                    analyzeBundle &&
+                        new BundleAnalyzerPlugin({
+                            analyzerMode: 'static',
+                            defaultSizes: 'gzip',
+                            openAnalyzer: CI !== 'true',
+                            generateStatsFile: true,
+                        }),
+                    mode === development && new webpack.NoEmitOnErrorsPlugin(),
+
+                    moduleReplacementPlugin,
+
+                    // Don't chunk if it's a node target – faster Lambda startup.
+                    target === 'node' && new webpack.optimize.LimitChunkCountPlugin({maxChunks: 1}),
+                ].filter((x) => !!x),
+
+                module: {
+                    rules: [
+                        {
+                            test: /(\.js(x?)|\.ts(x?))$/,
+                            exclude: /node_modules/,
+                            use: [
+                                {
+                                    loader: projectThenSDKModules('babel-loader'),
+                                    options: {
+                                        rootMode: 'upward',
+                                    },
+                                },
+                            ],
+                        },
+                        target === 'node' && {
+                            test: /\.svg$/,
+                            loader: projectThenSDKModules('svg-sprite-loader'),
+                        },
+                        target === 'web' && {
+                            test: /\.svg$/,
+                            loader: 'ignore-loader',
+                        },
+                        {
+                            test: /\.html$/,
+                            exclude: /node_modules/,
+                            use: {
+                                loader: 'html-loader',
+                            },
+                        },
+                    ].filter(Boolean),
+                },
+                ...(target === 'node' ? {externals} : {}),
+            }
+        }
+
+        extend(callback) {
+            this.config = callback(this.config)
+            return this
+        }
+
+        build() {
+            return this.config
+        }
+    }
+    return new Builder()
 }
 
-const common = {
-    mode,
-    // Reduce amount of output in terminal
-    stats,
-    // Create source maps for all files
-    devtool: 'source-map',
-
-    output: {
-        publicPath: '',
-        path: buildDir,
-        filename: '[name].js',
-        chunkFilename: '[name].js', // Support chunking with @loadable/components
-    },
-    // Tell webpack how to find specific modules
-    resolve: {
-        extensions: ['.ts', '.tsx', '.js', '.jsx', '.json'],
-        alias: {
-            'babel-runtime': projectThenSDKModules('babel-runtime'),
-            '@loadable/component': projectThenSDKModules('@loadable/component'),
-            '@loadable/server': projectThenSDKModules('@loadable/server'),
-            '@loadable/webpack-plugin': projectThenSDKModules('@loadable/webpack-plugin'),
-            'svg-sprite-loader': projectThenSDKModules('svg-sprite-loader'),
-            react: projectThenSDKModules('react'),
-            'react-router-dom': projectThenSDKModules('react-router-dom'),
-            'react-dom': projectThenSDKModules('react-dom'),
-            'react-helmet': projectThenSDKModules('react-helmet'),
-            bluebird: projectThenSDKModules('bluebird'),
+const withChunking = (config) => {
+    return {
+        ...config,
+        output: {
+            ...config.output,
+            filename: '[name].js',
+            chunkFilename: '[name].js', // Support chunking with @loadable/components
         },
-        fallback: {
-            crypto: false,
-        },
-    },
-
-    plugins: [
-        new webpack.DefinePlugin(defines),
-
-        new WebpackNotifierPlugin({
-            title: `Mobify Project: ${pkg.name}`,
-            excludeWarnings: true,
-            skipFirstNotification: true,
-        }),
-
-        new CopyPlugin({
-            patterns: [{from: 'app/static/', to: 'static/'}],
-        }),
-
-        analyzeBundle &&
-            new BundleAnalyzerPlugin({
-                analyzerMode: 'static',
-                defaultSizes: 'gzip',
-                openAnalyzer: CI !== 'true',
-                generateStatsFile: true,
-            }),
-        mode === development && new webpack.NoEmitOnErrorsPlugin(),
-
-        moduleReplacementPlugin,
-    ].filter((x) => !!x),
-
-    module: {
-        rules: [
-            {
-                test: /(\.js(x?)|\.ts(x?))$/,
-                exclude: /node_modules/,
-                use: babelLoader,
-            },
-            {
-                test: /\.svg$/,
-                loader: 'ignore-loader',
-            },
-            {
-                test: /\.html$/,
-                exclude: /node_modules/,
-                use: {
-                    loader: 'html-loader',
+        optimization: {
+            splitChunks: {
+                cacheGroups: {
+                    vendor: {
+                        // Anything imported from node_modules lands in
+                        // vendor.js, if we're chunking.
+                        test: /node_modules/,
+                        name: 'vendor',
+                        chunks: 'all',
+                    },
                 },
             },
-        ],
-    },
-    externals,
+        },
+        performance: {
+            maxEntrypointSize: 905000,
+            maxAssetSize: 825000,
+        },
+    }
 }
 
-// The main PWA entry point gets special treatment for chunking
-const main = Object.assign({}, common, {
-    name: 'client',
-    entry: {
-        main: './app/main.jsx',
-    },
-    optimization: {
-        splitChunks: {
-            cacheGroups: {
-                vendor: {
-                    // Anything imported from node_modules lands in vendor.js
-                    test: /node_modules/,
-                    name: 'vendor',
-                    chunks: 'all',
-                },
+const client = baseConfig('web')
+    .extend(withChunking)
+    .extend((config) => {
+        return {
+            ...config,
+            name: 'client',
+            entry: {
+                main: './app/main.jsx',
             },
-        },
-    },
-    performance: {
-        maxEntrypointSize: 905000,
-        maxAssetSize: 825000,
-    },
-    plugins: [...common.plugins, new LoadablePlugin({writeToDisk: true})],
-})
-
-const getOptionalEntries = () => {
-    const config = Object.assign({}, common, {
-        name: 'pwa-others',
-        entry: {},
-    })
-    const optionals = [
-        [resolve(projectDir, 'app', 'loader.js'), {loader: './app/loader.js'}],
-        [resolve(projectDir, 'worker', 'main.js'), {worker: './worker/main.js'}],
-        [resolve(projectDir, 'node_modules', 'core-js'), {'core-polyfill': 'core-js'}],
-        [resolve(projectDir, 'node_modules', 'whatwg-fetch'), {'fetch-polyfill': 'whatwg-fetch'}],
-    ]
-    optionals.forEach(([path, entry]) => {
-        if (fs.existsSync(path)) {
-            config.entry = {...config.entry, ...entry}
+            plugins: [...config.plugins, new LoadablePlugin({writeToDisk: true})],
         }
     })
-    return config
-}
+    .build()
 
-const others = getOptionalEntries()
+const clientOptional = baseConfig('web')
+    .extend((config) => {
+        let entry = {}
+        const optionals = [
+            [resolve(projectDir, 'app', 'loader.js'), {loader: './app/loader.js'}],
+            [resolve(projectDir, 'worker', 'main.js'), {worker: './worker/main.js'}],
+            [resolve(projectDir, 'node_modules', 'core-js'), {'core-polyfill': 'core-js'}],
+            [resolve(projectDir, 'node_modules', 'whatwg-fetch'), {'fetch-polyfill': 'whatwg-fetch'}],
+        ]
+        optionals.forEach(([path, newEntry]) => {
+            if (fs.existsSync(path)) {
+                entry = {...entry, ...newEntry}
+            }
+        })
+        return {
+            ...config,
+            name: 'pwa-others',
+            entry,
+        }
+    })
+    .build()
 
-/**
- * Configuration for the Express app which is run under Node.
- */
-const ssrServerConfig = Object.assign(
-    {},
-    {
-        name: 'server',
-        mode,
-        devtool: 'source-map', // Always use source map, makes debugging the server much easier.
-        entry: './app/server-renderer.jsx',
-        target: 'node',
-        output: {
-            path: buildDir,
-            filename: 'ssr.js',
-            libraryTarget: 'commonjs2',
-        },
-        resolve: {
-            extensions: ['.ts', '.tsx', '.js', '.jsx', '.json'],
-            alias: common.resolve.alias,
-        },
-        plugins: [
-            new webpack.DefinePlugin(defines),
-            // Output a single server file for faster Lambda startup
-            new webpack.optimize.LimitChunkCountPlugin({maxChunks: 1}),
-            moduleReplacementPlugin,
-        ],
-        externals,
-        module: {
-            rules: [
-                {
-                    test: /(\.js(x?)|\.ts(x?))$/,
-                    exclude: /node_modules/,
-                    use: babelLoader,
-                },
-                {
-                    test: /\.svg$/,
-                    loader: projectThenSDKModules('svg-sprite-loader'),
-                },
+const server = baseConfig('node')
+    .extend((config) => {
+        return {
+            ...config,
+            name: 'server',
+            entry: './app/server-renderer.jsx',
+            output: {
+                path: buildDir,
+                filename: 'server-renderer.js',
+                libraryTarget: 'commonjs2',
+            },
+            plugins: [
+                ...config.plugins,
+
+                // Keep this on the slowest-to-build item, the server-side bundle.
+                new WebpackNotifierPlugin({
+                    title: `Mobify Project: ${pkg.name}`,
+                    excludeWarnings: true,
+                    skipFirstNotification: true,
+                }),
+
+                // Must only appear on one config – this one is the only mandatory one.
+                new CopyPlugin({
+                    patterns: [{from: 'app/static/', to: 'static/'}],
+                }),
             ],
-        },
-        stats,
-    }
-)
+        }
+    })
+    .build()
 
-const requestProcessor = Object.assign(
-    {},
-    {
-        name: 'request-processor',
-        entry: './app/request-processor.js',
-        target: 'node',
-        mode,
-        output: {
-            path: resolve(process.cwd(), 'build'),
-            filename: 'request-processor.js',
-            // Output a CommonJS module for use in Node
-            libraryTarget: 'commonjs2',
-        },
-        module: {
-            rules: [
-                {
-                    test: /(\.js(x?)|\.ts(x?))$/,
-                    exclude: /node_modules/,
-                    use: babelLoader,
-                },
-            ],
-        },
-        stats,
-    }
-)
+const requestProcessor = baseConfig('node')
+    .extend((config) => {
+        let entry = {}
+        if (fs.existsSync(resolve(appDir, 'request-processor.js'))) {
+            entry = {...entry, 'request-processor': './app/request-processor.js'}
+        }
+        return {
+            ...config,
+            name: 'request-processor',
+            entry,
+        }
+    })
+    .build()
 
-const entries = [main, ssrServerConfig, others]
+module.exports = [
+    client,
+    server,
+    clientOptional,
+    requestProcessor,
+]
 
-if (fs.existsSync(requestProcessorPath)) {
-    entries.push(requestProcessor)
-}
-
-module.exports = entries
+// console.log(JSON.stringify(module.exports, null, 2))
+// process.exit(0)
