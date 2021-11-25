@@ -18,12 +18,22 @@ import {noop} from '../../../../utils/utils'
 import {API_ERROR_MESSAGE} from '../../../../constants'
 
 export const REMOVE_WISHLIST_ITEM_CONFIRMATION_DIALOG_CONFIG = {
-    dialogTitle: defineMessage({defaultMessage: 'Confirm Remove Item'}),
-    confirmationMessage: defineMessage({
-        defaultMessage: 'Are you sure you want to remove this item from your wishlist?'
+    dialogTitle: defineMessage({
+        defaultMessage: 'Confirm Remove Item',
+        id: 'global.wishlist.title.confirm_remove'
     }),
-    primaryActionLabel: defineMessage({defaultMessage: 'Yes, remove item'}),
-    alternateActionLabel: defineMessage({defaultMessage: 'No, keep item'}),
+    confirmationMessage: defineMessage({
+        defaultMessage: 'Are you sure you want to remove this item from your wishlist?',
+        id: 'global.wishlist.message.sure_to_remove'
+    }),
+    primaryActionLabel: defineMessage({
+        defaultMessage: 'Yes, remove item',
+        id: 'global.wishlist.action.yes_remove'
+    }),
+    alternateActionLabel: defineMessage({
+        defaultMessage: 'No, keep item',
+        id: 'global.wishlist.action.no_keep'
+    }),
     onPrimaryAction: noop
 }
 
@@ -47,7 +57,10 @@ const WishlistSecondaryButtonGroup = ({productListItemId, onClick = noop}) => {
         try {
             await wishlist.removeListItem(productListItemId)
             toast({
-                title: formatMessage({defaultMessage: 'Item removed from wishlist'}),
+                title: formatMessage({
+                    defaultMessage: 'Item removed from wishlist',
+                    id: 'wishlist_secondary_button_group.info.item_removed'
+                }),
                 status: 'success'
             })
         } catch {
@@ -68,7 +81,10 @@ const WishlistSecondaryButtonGroup = ({productListItemId, onClick = noop}) => {
                     onClick={showRemoveItemConfirmation}
                     data-testid={`sf-wishlist-remove-${productListItemId}`}
                 >
-                    <FormattedMessage defaultMessage="Remove" />
+                    <FormattedMessage
+                        defaultMessage="Remove"
+                        id="wishlist_secondary_button_group.action.remove"
+                    />
                 </Button>
                 {/* <Button variant="link" size="sm" onClick={onItemEdit}>
             <FormattedMessage defaultMessage="Edit" />

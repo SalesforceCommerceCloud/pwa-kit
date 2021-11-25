@@ -41,9 +41,6 @@
   "1g+gvg": {
     "defaultMessage": "French (Belgium)"
   },
-  "1yoQ91": {
-    "defaultMessage": "No Wishlist Items"
-  },
   "26gvH3": {
     "defaultMessage": "French (Canada)"
   },
@@ -71,9 +68,6 @@
   "47FYwb": {
     "defaultMessage": "Cancel"
   },
-  "4JYnp2": {
-    "defaultMessage": "Ordered: {date}"
-  },
   "4UPOXx": {
     "defaultMessage": "Confirm Remove Item"
   },
@@ -97,9 +91,6 @@
   },
   "5ryYe9": {
     "defaultMessage": "Japanese (Japan)"
-  },
-  "5sg7KC": {
-    "defaultMessage": "Password"
   },
   "68qUv0": {
     "defaultMessage": "Chinese (Hong Kong)"
@@ -134,9 +125,6 @@
   "8pvKg1": {
     "defaultMessage": "Payment Details"
   },
-  "92jEbC": {
-    "defaultMessage": "Are you sure you want to remove this item from your wishlist?"
-  },
   "9Npj92": {
     "defaultMessage": "Enter your email to receive instructions on how to reset your password"
   },
@@ -170,9 +158,6 @@
   "AwzkSM": {
     "defaultMessage": "Tax"
   },
-  "B5/YE0": {
-    "defaultMessage": "Profile updated"
-  },
   "BEqvr/": {
     "defaultMessage": "Contact Info"
   },
@@ -202,9 +187,6 @@
   },
   "DP5VOH": {
     "defaultMessage": "Shipping Address"
-  },
-  "DPrDhw": {
-    "defaultMessage": "Add New Payment Method"
   },
   "DdR2q8": {
     "defaultMessage": "{quantity} {quantity, plural, one {item} other {items}} added to wishlist"
@@ -236,14 +218,8 @@
   "Ihg+6O": {
     "defaultMessage": "Let's get started"
   },
-  "ItDqLZ": {
-    "defaultMessage": "{count} items"
-  },
   "JAcwxt": {
     "defaultMessage": "Order Number"
-  },
-  "JWbGSW": {
-    "defaultMessage": "Shipped to: {name}"
   },
   "KE5qj+": {
     "defaultMessage": "French (Switzerland)"
@@ -253,9 +229,6 @@
   },
   "KcHWA3": {
     "defaultMessage": "Shopper Login and API Access Service"
-  },
-  "Kz7I2o": {
-    "defaultMessage": "Password updated"
   },
   "L8seEc": {
     "defaultMessage": "Subtotal"
@@ -272,12 +245,6 @@
   "MQoJ1Y": {
     "defaultMessage": "Enable shoppers to easily log in with a more personalized shopping experience."
   },
-  "MnpUD7": {
-    "defaultMessage": "View details"
-  },
-  "Mv2pEb": {
-    "defaultMessage": "Continue shopping and add items to your wishlist"
-  },
   "NTgwLi": {
     "defaultMessage": "Place Order"
   },
@@ -286,9 +253,6 @@
   },
   "NmK6zy": {
     "defaultMessage": "Payment"
-  },
-  "NymXNv": {
-    "defaultMessage": "New Payment Method Saved"
   },
   "O3zHDW": {
     "defaultMessage": "{submitButtonLabel}"
@@ -299,15 +263,8 @@
   "O8s+yR": {
     "defaultMessage": "Spanish (Spain)"
   },
-  "OKPeJz": {
-    "defaultMessage": "Item removed from cart"
-  },
   "ONNUqG": {
     "defaultMessage": "By creating an account, you agree to Salesforce’s <policy>Privacy Policy</policy> and <terms>Terms & Conditions</terms>"
-  },
-  "OUPaUZ": {
-    "defaultMessage": "{count} items",
-    "description": "Number of items in order"
   },
   "OVAmhz": {
     "defaultMessage": "Back to cart"
@@ -342,9 +299,6 @@
   "PRlD0A": {
     "defaultMessage": "Shipping"
   },
-  "PlBReU": {
-    "defaultMessage": "Log out"
-  },
   "PpMdwV": {
     "defaultMessage": "We're here to help"
   },
@@ -353,9 +307,6 @@
   },
   "Qb4dDN": {
     "defaultMessage": "German (Switzerland)"
-  },
-  "Qm3TN9": {
-    "defaultMessage": "Are you sure you want to continue ?"
   },
   "SFjs9b": {
     "defaultMessage": "English (New Zealand)"
@@ -369,12 +320,6 @@
   "SXDujd": {
     "defaultMessage": "Dutch (Belgium)"
   },
-  "SeGQoh": {
-    "defaultMessage": "Address Updated"
-  },
-  "SmKUxZ": {
-    "defaultMessage": "Add a new address method for faster checkout"
-  },
   "T/K9MQ": {
     "defaultMessage": "promo applied"
   },
@@ -385,14 +330,8 @@
     "defaultMessage": "Or return to",
     "description": "Precedes link to return to sign in"
   },
-  "TSYROF": {
-    "defaultMessage": "You haven't placed an order yet"
-  },
   "TdTXXf": {
     "defaultMessage": "Learn more"
-  },
-  "TemVby": {
-    "defaultMessage": "Full Name"
   },
   "TvauRz": {
     "defaultMessage": "Bangla (Bangladesh)"
@@ -408,9 +347,6 @@
   },
   "V+9Zzz": {
     "defaultMessage": "Size & Fit"
-  },
-  "V+R4NC": {
-    "defaultMessage": "Add Payment Method"
   },
   "V/JHlm": {
     "defaultMessage": "Forgot password?"
@@ -430,17 +366,8 @@
   "X9OkqP": {
     "defaultMessage": "Built using Chakra UI, a simple, modular and accessible React component library."
   },
-  "XBfvKN": {
-    "defaultMessage": "Order History"
-  },
-  "XQPWe6": {
-    "defaultMessage": "Once you place an order the details will show up here"
-  },
   "XU21FV": {
     "defaultMessage": "Shipping & Gift Options"
-  },
-  "YDGR5k": {
-    "defaultMessage": "No Saved Payment Methods"
   },
   "YQhbMR": {
     "defaultMessage": "Norwegian (Norway)"
@@ -450,9 +377,6 @@
   },
   "Yy/yDL": {
     "defaultMessage": "Reset password"
-  },
-  "YzZa8+": {
-    "defaultMessage": "My Profile"
   },
   "ZMphaV": {
     "defaultMessage": "Promotion applied"
@@ -466,11 +390,126 @@
   "Zgc/KO": {
     "defaultMessage": "Spanish (United States)"
   },
-  "Zhsl4Z": {
+  "account.accordion.button.my_account": {
+    "defaultMessage": "My Account"
+  },
+  "account.heading.my_account": {
+    "defaultMessage": "My Account"
+  },
+  "account.logout_button.button.log_out": {
+    "defaultMessage": "Log out"
+  },
+  "account_addresses.badge.default": {
+    "defaultMessage": "Default"
+  },
+  "account_addresses.button.add_address": {
+    "defaultMessage": "Add Address"
+  },
+  "account_addresses.info.address_updated": {
+    "defaultMessage": "Address Updated"
+  },
+  "account_addresses.info.new_address_saved": {
+    "defaultMessage": "New Address Saved"
+  },
+  "account_addresses.page_action_placeholder.button.add_address": {
+    "defaultMessage": "Add Address"
+  },
+  "account_addresses.page_action_placeholder.heading.no_saved_addresses": {
+    "defaultMessage": "No Saved Addresses"
+  },
+  "account_addresses.page_action_placeholder.message.add_new_address": {
+    "defaultMessage": "Add a new address method for faster checkout"
+  },
+  "account_addresses.title.addresses": {
+    "defaultMessage": "Addresses"
+  },
+  "account_detail.title.account_details": {
+    "defaultMessage": "Account Details"
+  },
+  "account_order_detail.heading.billing_address": {
+    "defaultMessage": "Billing Address"
+  },
+  "account_order_detail.heading.num_of_items": {
+    "defaultMessage": "{count} items"
+  },
+  "account_order_detail.heading.payment_method": {
+    "defaultMessage": "Payment Method"
+  },
+  "account_order_detail.heading.shipping_address": {
+    "defaultMessage": "Shipping Address"
+  },
+  "account_order_detail.heading.shipping_method": {
+    "defaultMessage": "Shipping Method"
+  },
+  "account_order_detail.label.order_number": {
+    "defaultMessage": "Order Number: {orderNumber}"
+  },
+  "account_order_detail.label.ordered_date": {
+    "defaultMessage": "Ordered: {date}"
+  },
+  "account_order_detail.label.tracking_number": {
+    "defaultMessage": "Tracking Number"
+  },
+  "account_order_detail.link.back_to_history": {
     "defaultMessage": "Back to Order History"
   },
-  "a5msuh": {
-    "defaultMessage": "Yes"
+  "account_order_detail.title.order_details": {
+    "defaultMessage": "Order Details"
+  },
+  "account_order_history.button.continue_shopping": {
+    "defaultMessage": "Continue Shopping"
+  },
+  "account_order_history.description.once_you_place_order": {
+    "defaultMessage": "Once you place an order the details will show up here"
+  },
+  "account_order_history.heading.no_order_yet": {
+    "defaultMessage": "You haven't placed an order yet"
+  },
+  "account_order_history.label.num_of_items": {
+    "defaultMessage": "{count} items",
+    "description": "Number of items in order"
+  },
+  "account_order_history.label.order_number": {
+    "defaultMessage": "Order Number: {orderNumber}"
+  },
+  "account_order_history.label.ordered_date": {
+    "defaultMessage": "Ordered: {date}"
+  },
+  "account_order_history.label.shipped_to": {
+    "defaultMessage": "Shipped to: {name}"
+  },
+  "account_order_history.link.view_details": {
+    "defaultMessage": "View details"
+  },
+  "account_order_history.title.order_history": {
+    "defaultMessage": "Order History"
+  },
+  "account_payment_methods.button.add_method": {
+    "defaultMessage": "Add Payment Method"
+  },
+  "account_payment_methods.description.add_method_for_faster_checkout": {
+    "defaultMessage": "Add a new payment method for faster checkout"
+  },
+  "account_payment_methods.heading.no_saved_methods": {
+    "defaultMessage": "No Saved Payment Methods"
+  },
+  "account_payment_methods.info.new_method_saved": {
+    "defaultMessage": "New Payment Method Saved"
+  },
+  "account_payment_methods.title.payment_methods": {
+    "defaultMessage": "Payment Methods"
+  },
+  "account_wishlist.button.continue_shopping": {
+    "defaultMessage": "Continue Shopping"
+  },
+  "account_wishlist.description.continue_shopping": {
+    "defaultMessage": "Continue shopping and add items to your wishlist"
+  },
+  "account_wishlist.heading.no_wishlist": {
+    "defaultMessage": "No Wishlist Items"
+  },
+  "account_wishlist.title.wishlist": {
+    "defaultMessage": "Wishlist"
   },
   "action_card.action.edit": {
     "defaultMessage": "Edit"
@@ -494,9 +533,6 @@
   "bk7ZVA": {
     "defaultMessage": "Are you sure you want to remove this item ?"
   },
-  "c+bH65": {
-    "defaultMessage": "Confirm Action"
-  },
   "c0a6lZ": {
     "defaultMessage": "Please try retyping the address, going back to the previous page, or going to the home page."
   },
@@ -508,6 +544,24 @@
   },
   "cUwO+6": {
     "defaultMessage": "Add New Card"
+  },
+  "card_payment_form.heading.new_payment_method": {
+    "defaultMessage": "Add New Payment Method"
+  },
+  "cart.info.added_to_wishlist": {
+    "defaultMessage": "{quantity} {quantity, plural, one {item} other {items}} added to wishlist"
+  },
+  "cart.info.removed_from_cart": {
+    "defaultMessage": "Item removed from cart"
+  },
+  "cart.recommended_products.title.may_also_like": {
+    "defaultMessage": "You May Also Like"
+  },
+  "cart.recommended_products.title.recently_viewed": {
+    "defaultMessage": "Recently Viewed"
+  },
+  "cart_cta.link.checkout": {
+    "defaultMessage": "Proceed to Checkout"
   },
   "credit_card_fields.tool_tip.security_code": {
     "defaultMessage": "This {length}-digit code can be found on the {side} of your card.",
@@ -609,9 +663,6 @@
   "fCRlK5": {
     "defaultMessage": "We will send an email to <b>{email}</b> with your confirmation number and receipt shortly."
   },
-  "fE3ujL": {
-    "defaultMessage": "Order Details"
-  },
   "fG2sM9": {
     "defaultMessage": "Please sign in to continue!"
   },
@@ -684,8 +735,59 @@
   "gguIJ8": {
     "defaultMessage": "Hindi (India)"
   },
+  "global.account.action.keep_item": {
+    "defaultMessage": "No, keep item"
+  },
+  "global.account.action.no": {
+    "defaultMessage": "No"
+  },
+  "global.account.action.remove_item": {
+    "defaultMessage": "Yes, remove item"
+  },
+  "global.account.action.yes": {
+    "defaultMessage": "Yes"
+  },
+  "global.account.link.account_details": {
+    "defaultMessage": "Account Details"
+  },
+  "global.account.link.addresses": {
+    "defaultMessage": "Addresses"
+  },
+  "global.account.link.order_history": {
+    "defaultMessage": "Order History"
+  },
+  "global.account.link.payment_methods": {
+    "defaultMessage": "Payment Methods"
+  },
+  "global.account.link.wishlist": {
+    "defaultMessage": "Wishlist"
+  },
+  "global.account.message.you_want_to_continue": {
+    "defaultMessage": "Are you sure you want to continue ?"
+  },
+  "global.account.message.you_want_to_remove": {
+    "defaultMessage": "Are you sure you want to remove this item from your cart?"
+  },
+  "global.account.title.confirm_action": {
+    "defaultMessage": "Confirm Action"
+  },
+  "global.account.title.confirm_remove": {
+    "defaultMessage": "Confirm Remove Item"
+  },
   "global.error.something_went_wrong": {
     "defaultMessage": "Something went wrong. Try again!"
+  },
+  "global.wishlist.action.no_keep": {
+    "defaultMessage": "No, keep item"
+  },
+  "global.wishlist.action.yes_remove": {
+    "defaultMessage": "Yes, remove item"
+  },
+  "global.wishlist.message.sure_to_remove": {
+    "defaultMessage": "Are you sure you want to remove this item from your wishlist?"
+  },
+  "global.wishlist.title.confirm_remove": {
+    "defaultMessage": "Confirm Remove Item"
   },
   "gzeOf+": {
     "defaultMessage": "Chinese (Taiwan)"
@@ -754,9 +856,6 @@
   "kVzyDt": {
     "defaultMessage": "Thank you for your order!"
   },
-  "lKv8ex": {
-    "defaultMessage": "Default"
-  },
   "lc9tAq": {
     "defaultMessage": "Read docs"
   },
@@ -784,15 +883,6 @@
   "login_form.message.welcome_back": {
     "defaultMessage": "Welcome Back"
   },
-  "m/CSCf": {
-    "defaultMessage": "Add a new payment method for faster checkout"
-  },
-  "mXiD5u": {
-    "defaultMessage": "Phone Number"
-  },
-  "mYx8sv": {
-    "defaultMessage": "Account Details"
-  },
   "mfahwZ": {
     "defaultMessage": "Recently Viewed"
   },
@@ -808,17 +898,8 @@
   "nEwlut": {
     "defaultMessage": "Remove Item?"
   },
-  "nFQbxh": {
-    "defaultMessage": "Payment Method"
-  },
   "nYi7Xz": {
     "defaultMessage": "Your Cart is Empty"
-  },
-  "o1QPc9": {
-    "defaultMessage": "Tracking Number"
-  },
-  "oUWADl": {
-    "defaultMessage": "No"
   },
   "odTkf5": {
     "defaultMessage": "Back to sign in"
@@ -881,6 +962,15 @@
   "pagination.link.prev": {
     "defaultMessage": "Prev"
   },
+  "password_card.info.password_updated": {
+    "defaultMessage": "Password updated"
+  },
+  "password_card.label.password": {
+    "defaultMessage": "Password"
+  },
+  "password_card.title.password": {
+    "defaultMessage": "Password"
+  },
   "password_requirements.error.eight_letter_minimum": {
     "defaultMessage": "8 characters minimum",
     "description": "Password requirement"
@@ -938,11 +1028,26 @@
   "product_tile.assistive_msg.wishlist": {
     "defaultMessage": "wishlist"
   },
+  "profile_card.info.profile_updated": {
+    "defaultMessage": "Profile updated"
+  },
+  "profile_card.label.email": {
+    "defaultMessage": "Email"
+  },
+  "profile_card.label.full_name": {
+    "defaultMessage": "Full Name"
+  },
+  "profile_card.label.phone": {
+    "defaultMessage": "Phone Number"
+  },
+  "profile_card.message.not_provided": {
+    "defaultMessage": "Not provided"
+  },
+  "profile_card.title.my_profile": {
+    "defaultMessage": "My Profile"
+  },
   "promo_code_fields.button.apply": {
     "defaultMessage": "Apply"
-  },
-  "py3qts": {
-    "defaultMessage": "New Address Saved"
   },
   "qVGRIE": {
     "defaultMessage": "Quantity"
@@ -965,8 +1070,11 @@
   "selected_refinements.action.clear_all": {
     "defaultMessage": "Clear All"
   },
-  "sy+pv5": {
-    "defaultMessage": "Email"
+  "shipping_address_form.heading.edit_address": {
+    "defaultMessage": "Edit Address"
+  },
+  "shipping_address_form.heading.new_address": {
+    "defaultMessage": "Add New Address"
   },
   "tYBua6": {
     "defaultMessage": "Indonesian (Indonesia)"
@@ -988,12 +1096,6 @@
   },
   "uCk8r+": {
     "defaultMessage": "Already have an account?"
-  },
-  "uE6ELS": {
-    "defaultMessage": "Not provided"
-  },
-  "uSpe21": {
-    "defaultMessage": "Edit Address"
   },
   "unUv/E": {
     "defaultMessage": "You Might Also Like"
@@ -1223,9 +1325,6 @@
   "use_update_password_fields.label.new_password": {
     "defaultMessage": "New Password"
   },
-  "v898P+": {
-    "defaultMessage": "You May Also Like"
-  },
   "vMvXOp": {
     "defaultMessage": "Greek (Greece)"
   },
@@ -1241,32 +1340,26 @@
   "wEQDC6": {
     "defaultMessage": "Edit"
   },
+  "wishlist_primary_action.info.added_to_cart": {
+    "defaultMessage": "{quantity} {quantity, plural, one {item} other {items}} added to cart"
+  },
+  "wishlist_secondary_button_group.action.remove": {
+    "defaultMessage": "Remove"
+  },
+  "wishlist_secondary_button_group.info.item_removed": {
+    "defaultMessage": "Item removed from wishlist"
+  },
   "x6hxSH": {
     "defaultMessage": "Something's not right with your email or password. Try again."
-  },
-  "xBrtnx": {
-    "defaultMessage": "Addresses"
   },
   "xHP4/6": {
     "defaultMessage": "Password Reset"
   },
-  "xYH2SF": {
-    "defaultMessage": "No Saved Addresses"
-  },
-  "xg14pg": {
-    "defaultMessage": "Add Address"
-  },
   "xl27nc": {
     "defaultMessage": "Reset Password"
   },
-  "xuTqgN": {
-    "defaultMessage": "Payment Methods"
-  },
   "z3Qj9h": {
     "defaultMessage": "Proceed to Checkout"
-  },
-  "zXbRZR": {
-    "defaultMessage": "Order Number: {orderNumber}"
   },
   "zdzY+u": {
     "defaultMessage": "English (South Africa)"

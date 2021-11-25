@@ -105,12 +105,6 @@
       "value": "French (Belgium)"
     }
   ],
-  "1yoQ91": [
-    {
-      "type": 0,
-      "value": "No Wishlist Items"
-    }
-  ],
   "26gvH3": [
     {
       "type": 0,
@@ -201,16 +195,6 @@
       "value": "Cancel"
     }
   ],
-  "4JYnp2": [
-    {
-      "type": 0,
-      "value": "Ordered: "
-    },
-    {
-      "type": 1,
-      "value": "date"
-    }
-  ],
   "4UPOXx": [
     {
       "type": 0,
@@ -297,12 +281,6 @@
       "value": "Japanese (Japan)"
     }
   ],
-  "5sg7KC": [
-    {
-      "type": 0,
-      "value": "Password"
-    }
-  ],
   "68qUv0": [
     {
       "type": 0,
@@ -367,12 +345,6 @@
     {
       "type": 0,
       "value": "Payment Details"
-    }
-  ],
-  "92jEbC": [
-    {
-      "type": 0,
-      "value": "Are you sure you want to remove this item from your wishlist?"
     }
   ],
   "9Npj92": [
@@ -449,12 +421,6 @@
       "value": "Tax"
     }
   ],
-  "B5/YE0": [
-    {
-      "type": 0,
-      "value": "Profile updated"
-    }
-  ],
   "BEqvr/": [
     {
       "type": 0,
@@ -513,12 +479,6 @@
     {
       "type": 0,
       "value": "Shipping Address"
-    }
-  ],
-  "DPrDhw": [
-    {
-      "type": 0,
-      "value": "Add New Payment Method"
     }
   ],
   "DdR2q8": [
@@ -621,30 +581,10 @@
       "value": "Let's get started"
     }
   ],
-  "ItDqLZ": [
-    {
-      "type": 1,
-      "value": "count"
-    },
-    {
-      "type": 0,
-      "value": " items"
-    }
-  ],
   "JAcwxt": [
     {
       "type": 0,
       "value": "Order Number"
-    }
-  ],
-  "JWbGSW": [
-    {
-      "type": 0,
-      "value": "Shipped to: "
-    },
-    {
-      "type": 1,
-      "value": "name"
     }
   ],
   "KE5qj+": [
@@ -663,12 +603,6 @@
     {
       "type": 0,
       "value": "Shopper Login and API Access Service"
-    }
-  ],
-  "Kz7I2o": [
-    {
-      "type": 0,
-      "value": "Password updated"
     }
   ],
   "L8seEc": [
@@ -701,18 +635,6 @@
       "value": "Enable shoppers to easily log in with a more personalized shopping experience."
     }
   ],
-  "MnpUD7": [
-    {
-      "type": 0,
-      "value": "View details"
-    }
-  ],
-  "Mv2pEb": [
-    {
-      "type": 0,
-      "value": "Continue shopping and add items to your wishlist"
-    }
-  ],
   "NTgwLi": [
     {
       "type": 0,
@@ -731,12 +653,6 @@
       "value": "Payment"
     }
   ],
-  "NymXNv": [
-    {
-      "type": 0,
-      "value": "New Payment Method Saved"
-    }
-  ],
   "O3zHDW": [
     {
       "type": 1,
@@ -753,12 +669,6 @@
     {
       "type": 0,
       "value": "Spanish (Spain)"
-    }
-  ],
-  "OKPeJz": [
-    {
-      "type": 0,
-      "value": "Item removed from cart"
     }
   ],
   "ONNUqG": [
@@ -789,16 +699,6 @@
       ],
       "type": 8,
       "value": "terms"
-    }
-  ],
-  "OUPaUZ": [
-    {
-      "type": 1,
-      "value": "count"
-    },
-    {
-      "type": 0,
-      "value": " items"
     }
   ],
   "OVAmhz": [
@@ -867,12 +767,6 @@
       "value": "Shipping"
     }
   ],
-  "PlBReU": [
-    {
-      "type": 0,
-      "value": "Log out"
-    }
-  ],
   "PpMdwV": [
     {
       "type": 0,
@@ -889,12 +783,6 @@
     {
       "type": 0,
       "value": "German (Switzerland)"
-    }
-  ],
-  "Qm3TN9": [
-    {
-      "type": 0,
-      "value": "Are you sure you want to continue ?"
     }
   ],
   "SFjs9b": [
@@ -921,18 +809,6 @@
       "value": "Dutch (Belgium)"
     }
   ],
-  "SeGQoh": [
-    {
-      "type": 0,
-      "value": "Address Updated"
-    }
-  ],
-  "SmKUxZ": [
-    {
-      "type": 0,
-      "value": "Add a new address method for faster checkout"
-    }
-  ],
   "T/K9MQ": [
     {
       "type": 0,
@@ -951,22 +827,10 @@
       "value": "Or return to"
     }
   ],
-  "TSYROF": [
-    {
-      "type": 0,
-      "value": "You haven't placed an order yet"
-    }
-  ],
   "TdTXXf": [
     {
       "type": 0,
       "value": "Learn more"
-    }
-  ],
-  "TemVby": [
-    {
-      "type": 0,
-      "value": "Full Name"
     }
   ],
   "TvauRz": [
@@ -997,12 +861,6 @@
     {
       "type": 0,
       "value": "Size & Fit"
-    }
-  ],
-  "V+R4NC": [
-    {
-      "type": 0,
-      "value": "Add Payment Method"
     }
   ],
   "V/JHlm": [
@@ -1041,28 +899,10 @@
       "value": "Built using Chakra UI, a simple, modular and accessible React component library."
     }
   ],
-  "XBfvKN": [
-    {
-      "type": 0,
-      "value": "Order History"
-    }
-  ],
-  "XQPWe6": [
-    {
-      "type": 0,
-      "value": "Once you place an order the details will show up here"
-    }
-  ],
   "XU21FV": [
     {
       "type": 0,
       "value": "Shipping & Gift Options"
-    }
-  ],
-  "YDGR5k": [
-    {
-      "type": 0,
-      "value": "No Saved Payment Methods"
     }
   ],
   "YQhbMR": [
@@ -1081,12 +921,6 @@
     {
       "type": 0,
       "value": "Reset password"
-    }
-  ],
-  "YzZa8+": [
-    {
-      "type": 0,
-      "value": "My Profile"
     }
   ],
   "ZMphaV": [
@@ -1113,16 +947,272 @@
       "value": "Spanish (United States)"
     }
   ],
-  "Zhsl4Z": [
+  "account.accordion.button.my_account": [
+    {
+      "type": 0,
+      "value": "My Account"
+    }
+  ],
+  "account.heading.my_account": [
+    {
+      "type": 0,
+      "value": "My Account"
+    }
+  ],
+  "account.logout_button.button.log_out": [
+    {
+      "type": 0,
+      "value": "Log out"
+    }
+  ],
+  "account_addresses.badge.default": [
+    {
+      "type": 0,
+      "value": "Default"
+    }
+  ],
+  "account_addresses.button.add_address": [
+    {
+      "type": 0,
+      "value": "Add Address"
+    }
+  ],
+  "account_addresses.info.address_updated": [
+    {
+      "type": 0,
+      "value": "Address Updated"
+    }
+  ],
+  "account_addresses.info.new_address_saved": [
+    {
+      "type": 0,
+      "value": "New Address Saved"
+    }
+  ],
+  "account_addresses.page_action_placeholder.button.add_address": [
+    {
+      "type": 0,
+      "value": "Add Address"
+    }
+  ],
+  "account_addresses.page_action_placeholder.heading.no_saved_addresses": [
+    {
+      "type": 0,
+      "value": "No Saved Addresses"
+    }
+  ],
+  "account_addresses.page_action_placeholder.message.add_new_address": [
+    {
+      "type": 0,
+      "value": "Add a new address method for faster checkout"
+    }
+  ],
+  "account_addresses.title.addresses": [
+    {
+      "type": 0,
+      "value": "Addresses"
+    }
+  ],
+  "account_detail.title.account_details": [
+    {
+      "type": 0,
+      "value": "Account Details"
+    }
+  ],
+  "account_order_detail.heading.billing_address": [
+    {
+      "type": 0,
+      "value": "Billing Address"
+    }
+  ],
+  "account_order_detail.heading.num_of_items": [
+    {
+      "type": 1,
+      "value": "count"
+    },
+    {
+      "type": 0,
+      "value": " items"
+    }
+  ],
+  "account_order_detail.heading.payment_method": [
+    {
+      "type": 0,
+      "value": "Payment Method"
+    }
+  ],
+  "account_order_detail.heading.shipping_address": [
+    {
+      "type": 0,
+      "value": "Shipping Address"
+    }
+  ],
+  "account_order_detail.heading.shipping_method": [
+    {
+      "type": 0,
+      "value": "Shipping Method"
+    }
+  ],
+  "account_order_detail.label.order_number": [
+    {
+      "type": 0,
+      "value": "Order Number: "
+    },
+    {
+      "type": 1,
+      "value": "orderNumber"
+    }
+  ],
+  "account_order_detail.label.ordered_date": [
+    {
+      "type": 0,
+      "value": "Ordered: "
+    },
+    {
+      "type": 1,
+      "value": "date"
+    }
+  ],
+  "account_order_detail.label.tracking_number": [
+    {
+      "type": 0,
+      "value": "Tracking Number"
+    }
+  ],
+  "account_order_detail.link.back_to_history": [
     {
       "type": 0,
       "value": "Back to Order History"
     }
   ],
-  "a5msuh": [
+  "account_order_detail.title.order_details": [
     {
       "type": 0,
-      "value": "Yes"
+      "value": "Order Details"
+    }
+  ],
+  "account_order_history.button.continue_shopping": [
+    {
+      "type": 0,
+      "value": "Continue Shopping"
+    }
+  ],
+  "account_order_history.description.once_you_place_order": [
+    {
+      "type": 0,
+      "value": "Once you place an order the details will show up here"
+    }
+  ],
+  "account_order_history.heading.no_order_yet": [
+    {
+      "type": 0,
+      "value": "You haven't placed an order yet"
+    }
+  ],
+  "account_order_history.label.num_of_items": [
+    {
+      "type": 1,
+      "value": "count"
+    },
+    {
+      "type": 0,
+      "value": " items"
+    }
+  ],
+  "account_order_history.label.order_number": [
+    {
+      "type": 0,
+      "value": "Order Number: "
+    },
+    {
+      "type": 1,
+      "value": "orderNumber"
+    }
+  ],
+  "account_order_history.label.ordered_date": [
+    {
+      "type": 0,
+      "value": "Ordered: "
+    },
+    {
+      "type": 1,
+      "value": "date"
+    }
+  ],
+  "account_order_history.label.shipped_to": [
+    {
+      "type": 0,
+      "value": "Shipped to: "
+    },
+    {
+      "type": 1,
+      "value": "name"
+    }
+  ],
+  "account_order_history.link.view_details": [
+    {
+      "type": 0,
+      "value": "View details"
+    }
+  ],
+  "account_order_history.title.order_history": [
+    {
+      "type": 0,
+      "value": "Order History"
+    }
+  ],
+  "account_payment_methods.button.add_method": [
+    {
+      "type": 0,
+      "value": "Add Payment Method"
+    }
+  ],
+  "account_payment_methods.description.add_method_for_faster_checkout": [
+    {
+      "type": 0,
+      "value": "Add a new payment method for faster checkout"
+    }
+  ],
+  "account_payment_methods.heading.no_saved_methods": [
+    {
+      "type": 0,
+      "value": "No Saved Payment Methods"
+    }
+  ],
+  "account_payment_methods.info.new_method_saved": [
+    {
+      "type": 0,
+      "value": "New Payment Method Saved"
+    }
+  ],
+  "account_payment_methods.title.payment_methods": [
+    {
+      "type": 0,
+      "value": "Payment Methods"
+    }
+  ],
+  "account_wishlist.button.continue_shopping": [
+    {
+      "type": 0,
+      "value": "Continue Shopping"
+    }
+  ],
+  "account_wishlist.description.continue_shopping": [
+    {
+      "type": 0,
+      "value": "Continue shopping and add items to your wishlist"
+    }
+  ],
+  "account_wishlist.heading.no_wishlist": [
+    {
+      "type": 0,
+      "value": "No Wishlist Items"
+    }
+  ],
+  "account_wishlist.title.wishlist": [
+    {
+      "type": 0,
+      "value": "Wishlist"
     }
   ],
   "action_card.action.edit": [
@@ -1201,12 +1291,6 @@
       "value": "Are you sure you want to remove this item ?"
     }
   ],
-  "c+bH65": [
-    {
-      "type": 0,
-      "value": "Confirm Action"
-    }
-  ],
   "c0a6lZ": [
     {
       "type": 0,
@@ -1229,6 +1313,74 @@
     {
       "type": 0,
       "value": "Add New Card"
+    }
+  ],
+  "card_payment_form.heading.new_payment_method": [
+    {
+      "type": 0,
+      "value": "Add New Payment Method"
+    }
+  ],
+  "cart.info.added_to_wishlist": [
+    {
+      "type": 1,
+      "value": "quantity"
+    },
+    {
+      "type": 0,
+      "value": " "
+    },
+    {
+      "offset": 0,
+      "options": {
+        "one": {
+          "value": [
+            {
+              "type": 0,
+              "value": "item"
+            }
+          ]
+        },
+        "other": {
+          "value": [
+            {
+              "type": 0,
+              "value": "items"
+            }
+          ]
+        }
+      },
+      "pluralType": "cardinal",
+      "type": 6,
+      "value": "quantity"
+    },
+    {
+      "type": 0,
+      "value": " added to wishlist"
+    }
+  ],
+  "cart.info.removed_from_cart": [
+    {
+      "type": 0,
+      "value": "Item removed from cart"
+    }
+  ],
+  "cart.recommended_products.title.may_also_like": [
+    {
+      "type": 0,
+      "value": "You May Also Like"
+    }
+  ],
+  "cart.recommended_products.title.recently_viewed": [
+    {
+      "type": 0,
+      "value": "Recently Viewed"
+    }
+  ],
+  "cart_cta.link.checkout": [
+    {
+      "type": 0,
+      "value": "Proceed to Checkout"
     }
   ],
   "credit_card_fields.tool_tip.security_code": [
@@ -1487,12 +1639,6 @@
       "value": " with your confirmation number and receipt shortly."
     }
   ],
-  "fE3ujL": [
-    {
-      "type": 0,
-      "value": "Order Details"
-    }
-  ],
   "fG2sM9": [
     {
       "type": 0,
@@ -1637,10 +1783,112 @@
       "value": "Hindi (India)"
     }
   ],
+  "global.account.action.keep_item": [
+    {
+      "type": 0,
+      "value": "No, keep item"
+    }
+  ],
+  "global.account.action.no": [
+    {
+      "type": 0,
+      "value": "No"
+    }
+  ],
+  "global.account.action.remove_item": [
+    {
+      "type": 0,
+      "value": "Yes, remove item"
+    }
+  ],
+  "global.account.action.yes": [
+    {
+      "type": 0,
+      "value": "Yes"
+    }
+  ],
+  "global.account.link.account_details": [
+    {
+      "type": 0,
+      "value": "Account Details"
+    }
+  ],
+  "global.account.link.addresses": [
+    {
+      "type": 0,
+      "value": "Addresses"
+    }
+  ],
+  "global.account.link.order_history": [
+    {
+      "type": 0,
+      "value": "Order History"
+    }
+  ],
+  "global.account.link.payment_methods": [
+    {
+      "type": 0,
+      "value": "Payment Methods"
+    }
+  ],
+  "global.account.link.wishlist": [
+    {
+      "type": 0,
+      "value": "Wishlist"
+    }
+  ],
+  "global.account.message.you_want_to_continue": [
+    {
+      "type": 0,
+      "value": "Are you sure you want to continue ?"
+    }
+  ],
+  "global.account.message.you_want_to_remove": [
+    {
+      "type": 0,
+      "value": "Are you sure you want to remove this item from your cart?"
+    }
+  ],
+  "global.account.title.confirm_action": [
+    {
+      "type": 0,
+      "value": "Confirm Action"
+    }
+  ],
+  "global.account.title.confirm_remove": [
+    {
+      "type": 0,
+      "value": "Confirm Remove Item"
+    }
+  ],
   "global.error.something_went_wrong": [
     {
       "type": 0,
       "value": "Something went wrong. Try again!"
+    }
+  ],
+  "global.wishlist.action.no_keep": [
+    {
+      "type": 0,
+      "value": "No, keep item"
+    }
+  ],
+  "global.wishlist.action.yes_remove": [
+    {
+      "type": 0,
+      "value": "Yes, remove item"
+    }
+  ],
+  "global.wishlist.message.sure_to_remove": [
+    {
+      "type": 0,
+      "value": "Are you sure you want to remove this item from your wishlist?"
+    }
+  ],
+  "global.wishlist.title.confirm_remove": [
+    {
+      "type": 0,
+      "value": "Confirm Remove Item"
     }
   ],
   "gzeOf+": [
@@ -1779,12 +2027,6 @@
       "value": "Thank you for your order!"
     }
   ],
-  "lKv8ex": [
-    {
-      "type": 0,
-      "value": "Default"
-    }
-  ],
   "lc9tAq": [
     {
       "type": 0,
@@ -1847,24 +2089,6 @@
       "value": "Welcome Back"
     }
   ],
-  "m/CSCf": [
-    {
-      "type": 0,
-      "value": "Add a new payment method for faster checkout"
-    }
-  ],
-  "mXiD5u": [
-    {
-      "type": 0,
-      "value": "Phone Number"
-    }
-  ],
-  "mYx8sv": [
-    {
-      "type": 0,
-      "value": "Account Details"
-    }
-  ],
   "mfahwZ": [
     {
       "type": 0,
@@ -1903,28 +2127,10 @@
       "value": "Remove Item?"
     }
   ],
-  "nFQbxh": [
-    {
-      "type": 0,
-      "value": "Payment Method"
-    }
-  ],
   "nYi7Xz": [
     {
       "type": 0,
       "value": "Your Cart is Empty"
-    }
-  ],
-  "o1QPc9": [
-    {
-      "type": 0,
-      "value": "Tracking Number"
-    }
-  ],
-  "oUWADl": [
-    {
-      "type": 0,
-      "value": "No"
     }
   ],
   "odTkf5": [
@@ -2089,6 +2295,24 @@
       "value": "Prev"
     }
   ],
+  "password_card.info.password_updated": [
+    {
+      "type": 0,
+      "value": "Password updated"
+    }
+  ],
+  "password_card.label.password": [
+    {
+      "type": 0,
+      "value": "Password"
+    }
+  ],
+  "password_card.title.password": [
+    {
+      "type": 0,
+      "value": "Password"
+    }
+  ],
   "password_requirements.error.eight_letter_minimum": [
     {
       "type": 0,
@@ -2239,16 +2463,46 @@
       "value": "wishlist"
     }
   ],
+  "profile_card.info.profile_updated": [
+    {
+      "type": 0,
+      "value": "Profile updated"
+    }
+  ],
+  "profile_card.label.email": [
+    {
+      "type": 0,
+      "value": "Email"
+    }
+  ],
+  "profile_card.label.full_name": [
+    {
+      "type": 0,
+      "value": "Full Name"
+    }
+  ],
+  "profile_card.label.phone": [
+    {
+      "type": 0,
+      "value": "Phone Number"
+    }
+  ],
+  "profile_card.message.not_provided": [
+    {
+      "type": 0,
+      "value": "Not provided"
+    }
+  ],
+  "profile_card.title.my_profile": [
+    {
+      "type": 0,
+      "value": "My Profile"
+    }
+  ],
   "promo_code_fields.button.apply": [
     {
       "type": 0,
       "value": "Apply"
-    }
-  ],
-  "py3qts": [
-    {
-      "type": 0,
-      "value": "New Address Saved"
     }
   ],
   "qVGRIE": [
@@ -2307,10 +2561,16 @@
       "value": "Clear All"
     }
   ],
-  "sy+pv5": [
+  "shipping_address_form.heading.edit_address": [
     {
       "type": 0,
-      "value": "Email"
+      "value": "Edit Address"
+    }
+  ],
+  "shipping_address_form.heading.new_address": [
+    {
+      "type": 0,
+      "value": "Add New Address"
     }
   ],
   "tYBua6": [
@@ -2353,18 +2613,6 @@
     {
       "type": 0,
       "value": "Already have an account?"
-    }
-  ],
-  "uE6ELS": [
-    {
-      "type": 0,
-      "value": "Not provided"
-    }
-  ],
-  "uSpe21": [
-    {
-      "type": 0,
-      "value": "Edit Address"
     }
   ],
   "unUv/E": [
@@ -2831,12 +3079,6 @@
       "value": "New Password"
     }
   ],
-  "v898P+": [
-    {
-      "type": 0,
-      "value": "You May Also Like"
-    }
-  ],
   "vMvXOp": [
     {
       "type": 0,
@@ -2867,16 +3109,60 @@
       "value": "Edit"
     }
   ],
+  "wishlist_primary_action.info.added_to_cart": [
+    {
+      "type": 1,
+      "value": "quantity"
+    },
+    {
+      "type": 0,
+      "value": " "
+    },
+    {
+      "offset": 0,
+      "options": {
+        "one": {
+          "value": [
+            {
+              "type": 0,
+              "value": "item"
+            }
+          ]
+        },
+        "other": {
+          "value": [
+            {
+              "type": 0,
+              "value": "items"
+            }
+          ]
+        }
+      },
+      "pluralType": "cardinal",
+      "type": 6,
+      "value": "quantity"
+    },
+    {
+      "type": 0,
+      "value": " added to cart"
+    }
+  ],
+  "wishlist_secondary_button_group.action.remove": [
+    {
+      "type": 0,
+      "value": "Remove"
+    }
+  ],
+  "wishlist_secondary_button_group.info.item_removed": [
+    {
+      "type": 0,
+      "value": "Item removed from wishlist"
+    }
+  ],
   "x6hxSH": [
     {
       "type": 0,
       "value": "Something's not right with your email or password. Try again."
-    }
-  ],
-  "xBrtnx": [
-    {
-      "type": 0,
-      "value": "Addresses"
     }
   ],
   "xHP4/6": [
@@ -2885,44 +3171,16 @@
       "value": "Password Reset"
     }
   ],
-  "xYH2SF": [
-    {
-      "type": 0,
-      "value": "No Saved Addresses"
-    }
-  ],
-  "xg14pg": [
-    {
-      "type": 0,
-      "value": "Add Address"
-    }
-  ],
   "xl27nc": [
     {
       "type": 0,
       "value": "Reset Password"
     }
   ],
-  "xuTqgN": [
-    {
-      "type": 0,
-      "value": "Payment Methods"
-    }
-  ],
   "z3Qj9h": [
     {
       "type": 0,
       "value": "Proceed to Checkout"
-    }
-  ],
-  "zXbRZR": [
-    {
-      "type": 0,
-      "value": "Order Number: "
-    },
-    {
-      "type": 1,
-      "value": "orderNumber"
     }
   ],
   "zdzY+u": [
