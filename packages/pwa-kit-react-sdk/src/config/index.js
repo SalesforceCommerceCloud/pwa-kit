@@ -20,10 +20,6 @@ export default class Config {
 
     constructor(data) {
         this._data = data
-        const errorMessages = this.validate(this._data)
-        if (errorMessages.length) {
-            throw new ConfigError(errorMessages.join('. '))
-        }
         this.version = this._data.version
     }
 
@@ -36,14 +32,16 @@ export default class Config {
     }
 
     validate(data) {
-        if (!data.version || !this.SUPPORTED_VERSIONS.includes(data.version)) {
+        const _data = data || this.data
+
+        if (!_data?.version || !this.SUPPORTED_VERSIONS.includes(_data.version)) {
             throw new ConfigError('Unknown config version')
         }
-        if (!schemas[data.version]) {
+        if (!schemas[_data.version]) {
             throw new ConfigError('Missing config schema')
         }
 
-        const schema = schemas[data.version]
+        const schema = schemas[_data.version]
 
         // the Json schema validators handles basic validation:
         // Primitive data type validation (number, boolean, string, etc.)
@@ -52,34 +50,40 @@ export default class Config {
         // - String length, pattern and enum
         // and more... https://json-schema.org/draft/2020-12/json-schema-validation.html
         const validator = new JsonSchemaValidator({allErrors: true}).compile(schema)
-        validator(this._data)
+        validator(_data)
+        console.log(validator.errors)
         const errorMessages = validator.errors
             ? validator.errors.map(
-                  (e) => `${this.beautifyJsonSchemaValidatorKeyPath(e.instancePath)}: ${e.message}`
+                  (e) =>
+                      `${this.beautifyJsonSchemaValidatorKeyPath(e.instancePath, '/') ||
+                          this.beautifyJsonSchemaValidatorKeyPath(e.dataPath, '.')}: ${e.message}`
               )
             : []
 
         // the custom validators handles advanced/complex validation
         // use cases which require JavaScript logic to validate
-        const customValidators = validators[data.version]
+        const customValidators = validators[_data.version]
         Object.keys(customValidators).forEach((validatorPath) => {
             const customValidator = customValidators[validatorPath]
             try {
-                customValidator(data)
+                customValidator(_data)
             } catch (e) {
                 errorMessages.push(`${validatorPath}: ${e.message}`)
             }
         })
-        return errorMessages
+        if (errorMessages.length) {
+            throw new ConfigError(errorMessages.join('. '))
+        }
+        return true
     }
 
-    beautifyJsonSchemaValidatorKeyPath(path) {
+    beautifyJsonSchemaValidatorKeyPath(path, delimiter) {
         // Ajv json schema validators represent nested object keys
         // like this: /server/mobify/ssrParameters/proxyConfigs/
         // The slashes are confusing, we'd like to convert the format
         // to be like: server.mobify.ssrParameters.proxyConfigs
-        return path
-            .split('/')
+        return (path || '')
+            .split(delimiter)
             .filter(Boolean)
             .join('.')
     }

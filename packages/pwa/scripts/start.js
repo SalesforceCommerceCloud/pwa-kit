@@ -14,6 +14,8 @@ const process = require('process')
 const program = require('commander')
 
 const childProcess = require('@lerna/child-process')
+const Config = require('pwa-kit-react-sdk/config').default
+const configurations = require('../app/pwa-kit.config.json')
 
 const fs = Promise.promisifyAll(_fs)
 
@@ -43,6 +45,9 @@ const beforeRun = () => {
             fs.mkdirSync(buildPath)
             fs.closeSync(fs.openSync(ssrJS, 'w'))
         }
+
+        const config = new Config(configurations)
+        config.validate()
     })
 }
 
