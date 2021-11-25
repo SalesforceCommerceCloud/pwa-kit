@@ -257,7 +257,7 @@ const main = Object.assign({}, common, {
         maxEntrypointSize: 905000,
         maxAssetSize: 825000,
     },
-    plugins: [...common.plugins, new LoadablePlugin()],
+    plugins: [...common.plugins, new LoadablePlugin({writeToDisk: true})],
 })
 
 const getOptionalEntries = () => {
