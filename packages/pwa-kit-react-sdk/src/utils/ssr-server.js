@@ -34,6 +34,8 @@ export const TABLET = 'TABLET'
 let bundleBaseURL
 const bundleID = process.env.BUNDLE_ID
 
+export const verboseProxyLogging = false
+
 export const isRemote = () =>
     Object.prototype.hasOwnProperty.call(process.env, 'AWS_LAMBDA_FUNCTION_NAME')
 
@@ -534,7 +536,7 @@ export const configureProxy = ({
 
         onError: (err, req, res) => {
             /* istanbul ignore next */
-            if (!isRemote()) {
+            if (!isRemote() && verboseProxyLogging) {
                 console.log(`Proxy: error ${err} for request ${proxyPath}/${req.url}`)
             }
 
@@ -562,7 +564,7 @@ export const configureProxy = ({
         onProxyReq: (proxyRequest, incomingRequest) => {
             const url = incomingRequest.url
             /* istanbul ignore next */
-            if (!isRemote()) {
+            if (!isRemote() && verboseProxyLogging) {
                 console.log(`Proxy: request for ${proxyPath}${url} => ${targetOrigin}/${url}`)
             }
 
@@ -571,7 +573,7 @@ export const configureProxy = ({
                 caching,
                 headers: incomingRequest.headers,
                 headerFormat: 'http',
-                logging: !isRemote(),
+                logging: !isRemote() && verboseProxyLogging,
                 proxyPath,
                 targetHost,
                 targetProtocol
@@ -600,7 +602,7 @@ export const configureProxy = ({
 
         onProxyRes: (proxyResponse, req) => {
             /* istanbul ignore next */
-            if (!isRemote()) {
+            if (!isRemote() && verboseProxyLogging) {
                 console.log(
                     `Proxy: ${proxyResponse.statusCode} response from ${proxyPath}${req.url}`
                 )
@@ -625,7 +627,7 @@ export const configureProxy = ({
                 statusCode: proxyResponse.statusCode,
                 headers: proxyResponse.headers,
                 headerFormat: 'http',
-                logging: !isRemote(),
+                logging: !isRemote() && verboseProxyLogging,
                 requestUrl: matchedUrl && matchedUrl[2]
             })
 
