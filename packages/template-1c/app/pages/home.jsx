@@ -1,11 +1,7 @@
 import React, { useEffect, useState } from "react";
 import fetch from "cross-fetch";
 
-interface Props {
-  dadJoke: object;
-}
-
-const Home = ({ dadJoke }: Props) => {
+const Home = ({ dadJoke }) => {
   const [counter, setCounter] = useState(0);
 
   useEffect(() => {

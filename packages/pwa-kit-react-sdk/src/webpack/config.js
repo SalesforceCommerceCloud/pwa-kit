@@ -111,7 +111,7 @@ const defines = {
 
 const babelLoader = [
     {
-        loader: 'babel-loader?cacheDirectory',
+        loader: resolve(sdkDir, 'node_modules', 'babel-loader?cacheDirectory'),
         options: {
             rootMode: 'upward',
         },
@@ -160,10 +160,10 @@ const common = {
         extensions: ['.js', '.jsx', '.json'],
         alias: {
             'babel-runtime': resolve(sdkDir, 'node_modules', 'babel-runtime'),
-            '@loadable/component': resolve(nodeModules, '@loadable/component'),
-            '@loadable/server': resolve(nodeModules, '@loadable/server'),
-            '@loadable/webpack-plugin': resolve(nodeModules, '@loadable/webpack-plugin'),
-            'svg-sprite-loader': resolve(nodeModules, 'svg-sprite-loader'),
+            '@loadable/component': resolve(sdkDir, 'node_modules', '@loadable/component'),
+            '@loadable/server': resolve(sdkDir, 'node_modules', '@loadable/server'),
+            '@loadable/webpack-plugin': resolve(sdkDir, 'node_modules', '@loadable/webpack-plugin'),
+            'svg-sprite-loader': resolve(sdkDir, 'node_modules', 'svg-sprite-loader'),
             react: resolve(nodeModules, 'react'),
             'react-router-dom': resolve(nodeModules, 'react-router-dom'),
             'react-dom': resolve(nodeModules, 'react-dom'),
@@ -268,7 +268,6 @@ const getOptionalEntries = () => {
 }
 
 const others = getOptionalEntries()
-console.log(JSON.stringify(others, null, 4))
 
 /**
  * Configuration for the Express app which is run under Node.
@@ -317,6 +316,7 @@ const ssrServerConfig = Object.assign(
 const requestProcessor = Object.assign(
     {},
     {
+        name: 'request-processor',
         entry: './app/request-processor.js',
         target: 'node',
         mode,
