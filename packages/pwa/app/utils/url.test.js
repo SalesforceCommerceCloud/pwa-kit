@@ -13,7 +13,8 @@ import {
     getUrlWithLocale,
     homeUrlBuilder,
     rebuildPathWithParams,
-    removeQueryParamsFromPath
+    removeQueryParamsFromPath,
+    buildPathWithUrlConfig
 } from './url'
 import {getUrlConfig} from './utils'
 
@@ -206,5 +207,35 @@ describe('removeQueryParamsFromPath test', () => {
         const url = '/en/product/25501032M?color=black&size=M&something=123'
         const updatedUrl = removeQueryParamsFromPath(url, ['color', 'size'])
         expect(updatedUrl).toEqual('/en/product/25501032M?something=123')
+    })
+})
+
+describe('buildPathWithUrlConfig', () => {
+    test('return a new url with locale value as a part of path', () => {
+        getUrlConfig.mockImplementation(() => ({
+            locale: 'path'
+        }))
+
+        const url = buildPathWithUrlConfig('/women/dresses', {locale: 'en-GB'})
+        expect(url).toEqual('/en-GB/women/dresses')
+    })
+
+    test('return a new url with locale value as a query param', () => {
+        getUrlConfig.mockImplementation(() => ({
+            locale: 'query_param'
+        }))
+
+        const url = buildPathWithUrlConfig('/women/dresses', {locale: 'en-GB'})
+        expect(url).toEqual('/women/dresses?locale=en-GB')
+    })
+
+    test('return a new url with locale value as a part of path and site value as query param', () => {
+        getUrlConfig.mockImplementation(() => ({
+            locale: 'path',
+            site: 'query_param'
+        }))
+
+        const url = buildPathWithUrlConfig('/women/dresses', {locale: 'en-GB', site: 'us'})
+        expect(url).toEqual('/en-GB/women/dresses?site=us')
     })
 })

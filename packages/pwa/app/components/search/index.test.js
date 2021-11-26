@@ -13,6 +13,7 @@ import {setupServer} from 'msw/node'
 import {rest} from 'msw'
 import Suggestions from './partials/suggestions'
 import {noop} from '../../utils/utils'
+import {getUrlConfig} from '../../utils/utils'
 
 const sessionStorageMock = {
     getItem: jest.fn(),
@@ -27,6 +28,13 @@ jest.mock('../../commerce-api/utils', () => {
     return {
         ...originalModule,
         isTokenValid: jest.fn().mockReturnValue(true)
+    }
+})
+jest.mock('../../utils/utils', () => {
+    const original = jest.requireActual('../../utils/utils')
+    return {
+        ...original,
+        getUrlConfig: jest.fn()
     }
 })
 
@@ -199,6 +207,9 @@ const server = setupServer(
 
 beforeEach(() => {
     jest.resetModules()
+    getUrlConfig.mockImplementation(() => ({
+        locale: 'path'
+    }))
     server.listen({onUnhandledRequest: 'error'})
 })
 
