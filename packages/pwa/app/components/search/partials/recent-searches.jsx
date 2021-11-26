@@ -24,7 +24,10 @@ const RecentSearches = ({recentSearches, closeAndNavigate}) => {
             {recentSearches?.length > 0 && (
                 <Box>
                     <Text fontWeight="700" fontSize={'md'} data-testid="sf-suggestion-recent">
-                        <FormattedMessage defaultMessage="Recent Searches" />
+                        <FormattedMessage
+                            defaultMessage="Recent Searches"
+                            id="recent_searches.heading.recent_searches"
+                        />
                     </Text>
                     <Box mx={'-16px'}>
                         {recentSearches.map((recentSearch, idx) => (
@@ -52,7 +55,10 @@ const RecentSearches = ({recentSearches, closeAndNavigate}) => {
                             variant="menu-link"
                         >
                             <Text fontWeight="400" color="blue.600" fontSize={'md'}>
-                                <FormattedMessage defaultMessage="Clear recent searches" />
+                                <FormattedMessage
+                                    defaultMessage="Clear recent searches"
+                                    id="recent_searches.action.clear_searches"
+                                />
                             </Text>
                         </Button>
                     </Box>

@@ -2,9 +2,6 @@
   "+MBxFF": {
     "defaultMessage": "English (United States)"
   },
-  "+O5yEM": {
-    "defaultMessage": "Promotions Applied"
-  },
   "+ZbX4W": {
     "defaultMessage": "Czech (Czech Republic)"
   },
@@ -14,35 +11,14 @@
   "0n0dWe": {
     "defaultMessage": "Hebrew (Israel)"
   },
-  "1LE+iY": {
-    "defaultMessage": "See full details"
-  },
-  "1LblQ6": {
-    "defaultMessage": "Cart Subtotal ({itemAccumulatedCount} item)"
-  },
-  "1b9Q93": {
-    "defaultMessage": "You will receive an email at <b>{email}</b> with a link to reset your password shortly."
-  },
   "1g+gvg": {
     "defaultMessage": "French (Belgium)"
   },
   "26gvH3": {
     "defaultMessage": "French (Canada)"
   },
-  "2BHb6K": {
-    "defaultMessage": "Applied promotions info"
-  },
-  "2WRHXI": {
-    "defaultMessage": "{quantity} {quantity, plural, one {item} other {items}} added to cart"
-  },
   "3HK3af": {
     "defaultMessage": "Unknown {localeShortCode}"
-  },
-  "4UPOXx": {
-    "defaultMessage": "Confirm Remove Item"
-  },
-  "5BTYa0": {
-    "defaultMessage": "View Cart"
   },
   "5e/Fjo": {
     "defaultMessage": "Portuguese (Brazil)"
@@ -56,17 +32,8 @@
   "74fug6": {
     "defaultMessage": "Tamil (India)"
   },
-  "7gXPhB": {
-    "defaultMessage": "Qty"
-  },
   "8CDRAt": {
     "defaultMessage": "Spanish (Mexico)"
-  },
-  "9Npj92": {
-    "defaultMessage": "Enter your email to receive instructions on how to reset your password"
-  },
-  "9rqdrm": {
-    "defaultMessage": "Item removed from wishlist"
   },
   "A2v4cr": {
     "defaultMessage": "English (United Kingdom)"
@@ -74,38 +41,14 @@
   "ABWZu0": {
     "defaultMessage": "Spanish (Argentina)"
   },
-  "ADKef8": {
-    "defaultMessage": "Add to cart"
-  },
   "AiDBu2": {
     "defaultMessage": "Slovak (Slovakia)"
-  },
-  "BWpuKl": {
-    "defaultMessage": "Update"
-  },
-  "Cl4TrE": {
-    "defaultMessage": "Add to wishlist"
   },
   "CutQ+m": {
     "defaultMessage": "Spanish (Columbia)"
   },
-  "D8RblK": {
-    "defaultMessage": "Do you have a promo code?"
-  },
-  "DdR2q8": {
-    "defaultMessage": "{quantity} {quantity, plural, one {item} other {items}} added to wishlist"
-  },
-  "DwzDiL": {
-    "defaultMessage": "Clear recent searches"
-  },
-  "EOUB63": {
-    "defaultMessage": "Only {stockLevel} Left!"
-  },
   "ES4Hjg": {
     "defaultMessage": "Danish (Denmark)"
-  },
-  "Ihg+6O": {
-    "defaultMessage": "Let's get started"
   },
   "KE5qj+": {
     "defaultMessage": "French (Switzerland)"
@@ -113,17 +56,8 @@
   "MQHbcd": {
     "defaultMessage": "English (Canada)"
   },
-  "O8DHNx": {
-    "defaultMessage": "Check the code and try again, it may already be applied or the promo has expired"
-  },
   "O8s+yR": {
     "defaultMessage": "Spanish (Spain)"
-  },
-  "ONNUqG": {
-    "defaultMessage": "By creating an account, you agree to Salesforce’s <policy>Privacy Policy</policy> and <terms>Terms & Conditions</terms>"
-  },
-  "OVvfLK": {
-    "defaultMessage": "You're now signed in"
   },
   "OkmnSf": {
     "defaultMessage": "Hungarian (Hungary)"
@@ -146,21 +80,11 @@
   "SFjs9b": {
     "defaultMessage": "English (New Zealand)"
   },
-  "SQJto2": {
-    "defaultMessage": "Sign in"
-  },
-  "SRkOX8": {
-    "defaultMessage": "No, keep item"
-  },
   "SXDujd": {
     "defaultMessage": "Dutch (Belgium)"
   },
   "T8HBFR": {
     "defaultMessage": "German (Germany)"
-  },
-  "TR+DHM": {
-    "defaultMessage": "Or return to",
-    "description": "Precedes link to return to sign in"
   },
   "TvauRz": {
     "defaultMessage": "Bangla (Bangladesh)"
@@ -168,20 +92,8 @@
   "U8vSQS": {
     "defaultMessage": "Bangla (India)"
   },
-  "UE9zNR": {
-    "defaultMessage": "Recent Searches"
-  },
-  "WHgdsk": {
-    "defaultMessage": "Out of stock"
-  },
   "YQhbMR": {
     "defaultMessage": "Norwegian (Norway)"
-  },
-  "Yy/yDL": {
-    "defaultMessage": "Reset password"
-  },
-  "ZMphaV": {
-    "defaultMessage": "Promotion applied"
   },
   "ZWTTz6": {
     "defaultMessage": "Polish (Poland)"
@@ -319,14 +231,47 @@
   "action_card.action.remove": {
     "defaultMessage": "Remove"
   },
+  "add_to_cart_modal.info.added_to_cart": {
+    "defaultMessage": "{quantity} {quantity, plural, one {item} other {items}} added to cart"
+  },
+  "add_to_cart_modal.label.cart_subtotal": {
+    "defaultMessage": "Cart Subtotal ({itemAccumulatedCount} item)"
+  },
+  "add_to_cart_modal.label.quantity": {
+    "defaultMessage": "Qty"
+  },
+  "add_to_cart_modal.link.checkout": {
+    "defaultMessage": "Proceed to Checkout"
+  },
+  "add_to_cart_modal.link.view_cart": {
+    "defaultMessage": "View Cart"
+  },
+  "add_to_cart_modal.recommended_products.title.might_also_like": {
+    "defaultMessage": "You Might Also Like"
+  },
+  "auth_modal.description.now_signed_in": {
+    "defaultMessage": "You're now signed in"
+  },
+  "auth_modal.error.incorrect_email_password": {
+    "defaultMessage": "Something's not right with your email or password. Try again."
+  },
+  "auth_modal.info.welcome_user": {
+    "defaultMessage": "Welcome {name},"
+  },
+  "auth_modal.password_reset_success.button.back_to_sign_in": {
+    "defaultMessage": "Back to sign in"
+  },
+  "auth_modal.password_reset_success.info.will_email_shortly": {
+    "defaultMessage": "You will receive an email at <b>{email}</b> with a link to reset your password shortly."
+  },
+  "auth_modal.password_reset_success.title.password_reset": {
+    "defaultMessage": "Password Reset"
+  },
   "b24hho": {
     "defaultMessage": "Chinese (China)"
   },
   "b2zNZE": {
     "defaultMessage": "Russian (Russian Federation)"
-  },
-  "bk7ZVA": {
-    "defaultMessage": "Are you sure you want to remove this item ?"
   },
   "card_payment_form.heading.new_payment_method": {
     "defaultMessage": "Add New Payment Method"
@@ -513,9 +458,6 @@
   "d/RGdS": {
     "defaultMessage": "Portuguese (Portugal)"
   },
-  "dfEp3Z": {
-    "defaultMessage": "Yes, remove item"
-  },
   "drawer_menu.button.account_details": {
     "defaultMessage": "Account Details"
   },
@@ -611,9 +553,6 @@
   },
   "empty_search_results.recommended_products.title.top_sellers": {
     "defaultMessage": "Top Sellers"
-  },
-  "fG2sM9": {
-    "defaultMessage": "Please sign in to continue!"
   },
   "footer.column.account": {
     "defaultMessage": "Account"
@@ -843,9 +782,6 @@
   "home.title.react_starter_store": {
     "defaultMessage": "The React PWA Starter Store for Retail"
   },
-  "huqKGl": {
-    "defaultMessage": "Create account"
-  },
   "i0/00S": {
     "defaultMessage": "English (Australia)"
   },
@@ -858,9 +794,6 @@
   "item_image.label.sale": {
     "defaultMessage": "Sale",
     "description": "A sale badge placed on top of a product image"
-  },
-  "llHgJz": {
-    "defaultMessage": "Welcome {name},"
   },
   "login.error.incorrect_username_password": {
     "defaultMessage": "Incorrect username or password, please try again."
@@ -885,9 +818,6 @@
   },
   "n9j5bS": {
     "defaultMessage": "Turkish (Turkey)"
-  },
-  "odTkf5": {
-    "defaultMessage": "Back to sign in"
   },
   "offline_banner.description.browsing_offline_mode": {
     "defaultMessage": "You're currently browsing in offline mode"
@@ -928,9 +858,6 @@
   },
   "order_summary.label.tax": {
     "defaultMessage": "Tax"
-  },
-  "p2EAP0": {
-    "defaultMessage": "Promotion removed"
   },
   "page_not_found.action.go_back": {
     "defaultMessage": "Back to previous page"
@@ -1061,6 +988,21 @@
   "product_tile.assistive_msg.wishlist": {
     "defaultMessage": "wishlist"
   },
+  "product_view.button.add_to_cart": {
+    "defaultMessage": "Add to cart"
+  },
+  "product_view.button.add_to_wishlist": {
+    "defaultMessage": "Add to wishlist"
+  },
+  "product_view.button.update": {
+    "defaultMessage": "Update"
+  },
+  "product_view.label.quantity": {
+    "defaultMessage": "Quantity"
+  },
+  "product_view.link.full_details": {
+    "defaultMessage": "See full details"
+  },
   "profile_card.info.profile_updated": {
     "defaultMessage": "Profile updated"
   },
@@ -1082,11 +1024,44 @@
   "promo_code_fields.button.apply": {
     "defaultMessage": "Apply"
   },
-  "qVGRIE": {
-    "defaultMessage": "Quantity"
+  "promo_popover.heading.promo_applied": {
+    "defaultMessage": "Promotions Applied"
+  },
+  "promocode.accordion.button.have_promocode": {
+    "defaultMessage": "Do you have a promo code?"
   },
   "rU+Ph/": {
     "defaultMessage": "Dutch (The Netherlands)"
+  },
+  "recent_searches.action.clear_searches": {
+    "defaultMessage": "Clear recent searches"
+  },
+  "recent_searches.heading.recent_searches": {
+    "defaultMessage": "Recent Searches"
+  },
+  "recommended_products.info.added_to_wishlist": {
+    "defaultMessage": "{quantity} {quantity, plural, one {item} other {items}} added to wishlist"
+  },
+  "recommended_products.info.removed_from_wishlist": {
+    "defaultMessage": "Item removed from wishlist"
+  },
+  "register_form.action.sign_in": {
+    "defaultMessage": "Sign in"
+  },
+  "register_form.button.create_account": {
+    "defaultMessage": "Create account"
+  },
+  "register_form.heading.lets_get_started": {
+    "defaultMessage": "Let's get started"
+  },
+  "register_form.message.agree_to_policy_terms": {
+    "defaultMessage": "By creating an account, you agree to Salesforce’s <policy>Privacy Policy</policy> and <terms>Terms & Conditions</terms>"
+  },
+  "register_form.message.already_have_account": {
+    "defaultMessage": "Already have an account?"
+  },
+  "register_form.message.create_an_account": {
+    "defaultMessage": "Create an account and get first access to the very best products, inspiration and community."
   },
   "reset_password.button.back_to_sign_in": {
     "defaultMessage": "Back to sign in"
@@ -1096,6 +1071,22 @@
   },
   "reset_password.title.password_reset": {
     "defaultMessage": "Password Reset"
+  },
+  "reset_password_form.action.sign_in": {
+    "defaultMessage": "Sign in"
+  },
+  "reset_password_form.button.reset_password": {
+    "defaultMessage": "Reset password"
+  },
+  "reset_password_form.message.enter_your_email": {
+    "defaultMessage": "Enter your email to receive instructions on how to reset your password"
+  },
+  "reset_password_form.message.return_to_sign_in": {
+    "defaultMessage": "Or return to",
+    "description": "Precedes link to return to sign in"
+  },
+  "reset_password_form.title.reset_password": {
+    "defaultMessage": "Reset Password"
   },
   "search.action.cancel": {
     "defaultMessage": "Cancel"
@@ -1165,12 +1156,6 @@
   },
   "uCdcPZ": {
     "defaultMessage": "Romanian (Romania)"
-  },
-  "uCk8r+": {
-    "defaultMessage": "Already have an account?"
-  },
-  "unUv/E": {
-    "defaultMessage": "You Might Also Like"
   },
   "update_password_fields.button.forgot_password": {
     "defaultMessage": "Forgot password?"
@@ -1292,6 +1277,12 @@
   "use_login_fields.label.password": {
     "defaultMessage": "Password"
   },
+  "use_product.message.inventory_remaining": {
+    "defaultMessage": "Only {stockLevel} Left!"
+  },
+  "use_product.message.out_of_stock": {
+    "defaultMessage": "Out of stock"
+  },
   "use_profile_fields.error.required_email": {
     "defaultMessage": "Please enter a valid email address"
   },
@@ -1321,6 +1312,15 @@
   },
   "use_promo_code_fields.label.promo_code": {
     "defaultMessage": "Promo Code"
+  },
+  "use_promocode.error.check_the_code": {
+    "defaultMessage": "Check the code and try again, it may already be applied or the promo has expired"
+  },
+  "use_promocode.info.promo_applied": {
+    "defaultMessage": "Promotion applied"
+  },
+  "use_promocode.info.promo_removed": {
+    "defaultMessage": "Promotion removed"
   },
   "use_registration_fields.error.contain_number": {
     "defaultMessage": "Password must contain at least one number"
@@ -1403,9 +1403,6 @@
   "vSNTMO": {
     "defaultMessage": "Italian (Switzerland)"
   },
-  "vvTcAr": {
-    "defaultMessage": "Create an account and get first access to the very best products, inspiration and community."
-  },
   "wishlist_primary_action.info.added_to_cart": {
     "defaultMessage": "{quantity} {quantity, plural, one {item} other {items}} added to cart"
   },
@@ -1415,17 +1412,8 @@
   "wishlist_secondary_button_group.info.item_removed": {
     "defaultMessage": "Item removed from wishlist"
   },
-  "x6hxSH": {
-    "defaultMessage": "Something's not right with your email or password. Try again."
-  },
-  "xHP4/6": {
-    "defaultMessage": "Password Reset"
-  },
-  "xl27nc": {
-    "defaultMessage": "Reset Password"
-  },
-  "z3Qj9h": {
-    "defaultMessage": "Proceed to Checkout"
+  "with_registration.info.please_sign_in": {
+    "defaultMessage": "Please sign in to continue!"
   },
   "zdzY+u": {
     "defaultMessage": "English (South Africa)"

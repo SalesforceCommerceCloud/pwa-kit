@@ -49,9 +49,7 @@ const PromoPopover = ({header, children, ...props}) => {
                         minWidth="auto"
                         position="relative"
                         variant="unstyled"
-                    >
-                        <FormattedMessage defaultMessage="Applied promotions info" />
-                    </IconButton>
+                    />
                 </PopoverTrigger>
                 <Portal>
                     <PopoverContent border="none" borderRadius="base">
@@ -61,7 +59,10 @@ const PromoPopover = ({header, children, ...props}) => {
                             <PopoverHeader borderBottom="none">
                                 {header || (
                                     <Text fontWeight="bold" fontSize="md">
-                                        <FormattedMessage defaultMessage="Promotions Applied" />
+                                        <FormattedMessage
+                                            defaultMessage="Promotions Applied"
+                                            id="promo_popover.heading.promo_applied"
+                                        />
                                     </Text>
                                 )}
                             </PopoverHeader>

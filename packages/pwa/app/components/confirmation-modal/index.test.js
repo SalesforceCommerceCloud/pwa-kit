@@ -10,18 +10,7 @@ import {Box, useDisclosure} from '@chakra-ui/react'
 import {renderWithProviders} from '../../utils/test-utils'
 import user from '@testing-library/user-event'
 import {screen} from '@testing-library/react'
-import {noop} from '../../utils/utils'
-import {defineMessage} from 'react-intl'
-
-const CONFIRMATION_DIALOG_CONFIG = {
-    dialogTitle: defineMessage({defaultMessage: 'Confirm Remove Item'}),
-    confirmationMessage: defineMessage({
-        defaultMessage: 'Are you sure you want to remove this item ?'
-    }),
-    primaryActionLabel: defineMessage({defaultMessage: 'Yes, remove item'}),
-    alternateActionLabel: defineMessage({defaultMessage: 'No, keep item'}),
-    onPrimaryAction: noop
-}
+import {REMOVE_CART_ITEM_CONFIRMATION_DIALOG_CONFIG} from '../../pages/account/constant'
 
 const MockedComponent = (props) => {
     const modalProps = useDisclosure()
@@ -51,8 +40,8 @@ test('Renders confirmation modal with default config', async () => {
     expect(screen.getByText(/no/i)).toBeInTheDocument()
 })
 
-test('Renders confirmation modal with default config', async () => {
-    renderWithProviders(<MockedComponent {...CONFIRMATION_DIALOG_CONFIG} />)
+test('Renders confirmation modal with the given config', async () => {
+    renderWithProviders(<MockedComponent {...REMOVE_CART_ITEM_CONFIRMATION_DIALOG_CONFIG} />)
 
     // open the modal
     const trigger = screen.getByText(/open modal/i)
