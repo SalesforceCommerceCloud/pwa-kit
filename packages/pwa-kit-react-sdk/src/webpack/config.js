@@ -22,62 +22,22 @@ const projectDir = process.cwd()
 const sdkDir = path.resolve(path.join(__dirname, '..', '..'))
 
 const pkg = require(resolve(projectDir, 'package.json'))
-const appDir = resolve(projectDir, 'app')
 const buildDir = resolve(projectDir, 'build')
 
 const production = 'production'
 const development = 'development'
-const modes = [production, development]
 const analyzeBundle = process.env.MOBIFY_ANALYZE === 'true'
 const mode = process.env.NODE_ENV === production ? production : development
 const DEBUG = mode !== production && process.env.DEBUG === 'true'
 const CI = process.env.CI
 
-if (modes.indexOf(mode) < 0) {
-    throw new Error(`Mode '${mode}' must be one of '${modes.toString()}'`)
+if ([production, development].indexOf(mode) < 0) {
+    throw new Error(`Invalid mode "${mode}"`)
 }
 
 const findInProjectThenSDK = (pkg) => {
     const projectPath = resolve(projectDir, 'node_modules', pkg)
     return fs.existsSync(projectPath) ? projectPath : resolve(sdkDir, 'node_modules', pkg)
-}
-
-const moduleReplacementPlugin = () => {
-    const overridables = [
-        {
-            path: /pwa-kit-react-sdk(\/dist)?\/ssr\/universal\/components\/_app-config$/,
-            newPath: resolve(projectDir, 'app', 'components', '_app-config', 'index'),
-        },
-        {
-            path: /pwa-kit-react-sdk(\/dist)?\/ssr\/universal\/components\/_document$/,
-            newPath: resolve(projectDir, 'app', 'components', '_document', 'index'),
-        },
-        {
-            path: /pwa-kit-react-sdk(\/dist)?\/ssr\/universal\/components\/_app$/,
-            newPath: resolve(projectDir, 'app', 'components', '_app', 'index'),
-        },
-        {
-            path: /pwa-kit-react-sdk(\/dist)?\/ssr\/universal\/components\/_error$/,
-            newPath: resolve(projectDir, 'app', 'components', '_error', 'index'),
-        },
-        {
-            path: /pwa-kit-react-sdk(\/dist)?\/ssr\/universal\/routes$/,
-            newPath: resolve(projectDir, 'app', 'routes'),
-        },
-    ]
-    const extensions = ['.ts', '.tsx', '.js', '.jsx']
-
-    const replacements = []
-    overridables.forEach(({path, newPath}) => {
-        extensions.forEach((ext) => {
-            const replacement = newPath + ext
-            if (fs.existsSync(replacement)) {
-                replacements.push({path, newPath: replacement})
-            }
-        })
-    })
-
-    return createModuleReplacementPlugin({replacements})
 }
 
 const baseConfig = (target) => {
@@ -142,7 +102,7 @@ const baseConfig = (target) => {
                         }),
                     mode === development && new webpack.NoEmitOnErrorsPlugin(),
 
-                    moduleReplacementPlugin(),
+                    createModuleReplacementPlugin(projectDir),
 
                     // Don't chunk if it's a node target – faster Lambda startup.
                     target === 'node' && new webpack.optimize.LimitChunkCountPlugin({maxChunks: 1}),
@@ -236,24 +196,21 @@ const client = baseConfig('web')
     })
     .build()
 
+const optional = (name, path) => {
+    return fs.existsSync(path) ? {[name]: path} : {}
+}
+
 const clientOptional = baseConfig('web')
     .extend((config) => {
-        let entry = {}
-        const optionals = [
-            [resolve(projectDir, 'app', 'loader.js'), {loader: './app/loader.js'}],
-            [resolve(projectDir, 'worker', 'main.js'), {worker: './worker/main.js'}],
-            [resolve(projectDir, 'node_modules', 'core-js'), {'core-polyfill': 'core-js'}],
-            [resolve(projectDir, 'node_modules', 'whatwg-fetch'), {'fetch-polyfill': 'whatwg-fetch'}],
-        ]
-        optionals.forEach(([path, newEntry]) => {
-            if (fs.existsSync(path)) {
-                entry = {...entry, ...newEntry}
-            }
-        })
         return {
             ...config,
             name: 'pwa-others',
-            entry,
+            entry: {
+                ...optional('loader', './app/loader.js'),
+                ...optional('worker', './worker/main.js'),
+                ...optional('core-polyfill', resolve(projectDir, 'node_modules', 'core-js')),
+                ...optional('fetch-polyfill', resolve(projectDir, 'node_modules', 'whatwg-fetch')),
+            },
         }
     })
     .build()
@@ -290,16 +247,19 @@ const server = baseConfig('node')
 
 const requestProcessor = baseConfig('node')
     .extend((config) => {
-        let entry = {}
-        if (fs.existsSync(resolve(appDir, 'request-processor.js'))) {
-            entry = {...entry, 'request-processor': './app/request-processor.js'}
-        }
         return {
             ...config,
             name: 'request-processor',
-            entry,
+            entry: {
+                ...optional('request-processor', './app/request-processor.js'),
+            },
         }
     })
     .build()
 
-module.exports = [client, server, clientOptional, requestProcessor]
+module.exports = [
+    client,
+    server,
+    clientOptional,
+    requestProcessor
+]

@@ -6,20 +6,50 @@
  */
 
 import webpack from 'webpack'
-import path from 'path'
+import path, {resolve} from 'path'
+import fs from 'fs'
 
 /**
- * Return a NormalModuleReplacementPlugin that is used to override SDK builtins
- * with user code for special overridable components, eg. the Document.
+ * Allows users to override special SDK components by placing override
+ * files in certain magic locations in a project.
  *
- * @param {Object} options
- * @param {Array} [options.replacements] - An array of objects consisting of a match path
- * and a replacement path.
- * @returns {webpack.NormalModuleReplacementPlugin} a module replacement plugin
- * configured with the passed in file replacements array.
+ * @param {string} projectDir - absolute path to the project root.
+ * @returns {webpack.NormalModuleReplacementPlugin}
  */
-export const createModuleReplacementPlugin = (options = {}) => {
-    const replacements = options.replacements || []
+export const createModuleReplacementPlugin = (projectDir) => {
+    const overridables = [
+        {
+            path: /pwa-kit-react-sdk(\/dist)?\/ssr\/universal\/components\/_app-config$/,
+            newPath: resolve(projectDir, 'app', 'components', '_app-config', 'index'),
+        },
+        {
+            path: /pwa-kit-react-sdk(\/dist)?\/ssr\/universal\/components\/_document$/,
+            newPath: resolve(projectDir, 'app', 'components', '_document', 'index'),
+        },
+        {
+            path: /pwa-kit-react-sdk(\/dist)?\/ssr\/universal\/components\/_app$/,
+            newPath: resolve(projectDir, 'app', 'components', '_app', 'index'),
+        },
+        {
+            path: /pwa-kit-react-sdk(\/dist)?\/ssr\/universal\/components\/_error$/,
+            newPath: resolve(projectDir, 'app', 'components', '_error', 'index'),
+        },
+        {
+            path: /pwa-kit-react-sdk(\/dist)?\/ssr\/universal\/routes$/,
+            newPath: resolve(projectDir, 'app', 'routes'),
+        },
+    ]
+    const extensions = ['.ts', '.tsx', '.js', '.jsx']
+
+    const replacements = []
+    overridables.forEach(({path, newPath}) => {
+        extensions.forEach((ext) => {
+            const replacement = newPath + ext
+            if (fs.existsSync(replacement)) {
+                replacements.push({path, newPath: replacement})
+            }
+        })
+    })
 
     return new webpack.NormalModuleReplacementPlugin(/.*/, (resource) => {
         const resolved = path.resolve(resource.context, resource.request)
