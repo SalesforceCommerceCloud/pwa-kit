@@ -97,6 +97,8 @@ commands:
             # Explicitly set pipefile policy. This is the default for non-windows, but seems
             # that is needs to be set on windows to fail immediately.
             set -eo pipefail
+            
+            echo "Credentials are available: $NPM_TOKEN"
 
             cd << parameters.cwd >>
 
