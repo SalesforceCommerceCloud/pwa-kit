@@ -17,9 +17,6 @@
   "0Tjkj3": {
     "defaultMessage": "German (Austria)"
   },
-  "0g/1TG": {
-    "defaultMessage": "Continue to Payment"
-  },
   "0n0dWe": {
     "defaultMessage": "Hebrew (Israel)"
   },
@@ -131,9 +128,6 @@
   "DKTjIJ": {
     "defaultMessage": "Deploy on Managed Runtime"
   },
-  "DP5VOH": {
-    "defaultMessage": "Shipping Address"
-  },
   "DdR2q8": {
     "defaultMessage": "{quantity} {quantity, plural, one {item} other {items}} added to wishlist"
   },
@@ -148,9 +142,6 @@
   },
   "FdbYXD": {
     "defaultMessage": "Shop Products"
-  },
-  "Fmc5ut": {
-    "defaultMessage": "Continue to Shipping Method"
   },
   "Ihg+6O": {
     "defaultMessage": "Let's get started"
@@ -175,9 +166,6 @@
   },
   "NV26qx": {
     "defaultMessage": "Back to previous page"
-  },
-  "O3zHDW": {
-    "defaultMessage": "{submitButtonLabel}"
   },
   "O8DHNx": {
     "defaultMessage": "Check the code and try again, it may already be applied or the promo has expired"
@@ -260,9 +248,6 @@
   },
   "X9OkqP": {
     "defaultMessage": "Built using Chakra UI, a simple, modular and accessible React component library."
-  },
-  "XU21FV": {
-    "defaultMessage": "Shipping & Gift Options"
   },
   "YQhbMR": {
     "defaultMessage": "Norwegian (Norway)"
@@ -420,9 +405,6 @@
   },
   "b2zNZE": {
     "defaultMessage": "Russian (Russian Federation)"
-  },
-  "bhUBy4": {
-    "defaultMessage": "Save & Continue to Shipping Method"
   },
   "bk7ZVA": {
     "defaultMessage": "Are you sure you want to remove this item ?"
@@ -723,9 +705,6 @@
   "fG2sM9": {
     "defaultMessage": "Please sign in to continue!"
   },
-  "fIHFDI": {
-    "defaultMessage": "Add New Address"
-  },
   "footer.column.account": {
     "defaultMessage": "Account"
   },
@@ -989,9 +968,6 @@
   "p2EAP0": {
     "defaultMessage": "Promotion removed"
   },
-  "pQ2F3h": {
-    "defaultMessage": "Edit Shipping Address"
-  },
   "pagination.field.num_of_pages": {
     "defaultMessage": "of {numOfPages}"
   },
@@ -1124,11 +1100,41 @@
   "selected_refinements.action.clear_all": {
     "defaultMessage": "Clear All"
   },
+  "shipping_address.button.continue_to_shipping": {
+    "defaultMessage": "Continue to Shipping Method"
+  },
+  "shipping_address.title.shipping_address": {
+    "defaultMessage": "Shipping Address"
+  },
+  "shipping_address_edit_form.button.save_continue": {
+    "defaultMessage": "Save & Continue to Shipping Method"
+  },
   "shipping_address_form.heading.edit_address": {
     "defaultMessage": "Edit Address"
   },
   "shipping_address_form.heading.new_address": {
     "defaultMessage": "Add New Address"
+  },
+  "shipping_address_selection.button.add_address": {
+    "defaultMessage": "Add New Address"
+  },
+  "shipping_address_selection.button.submit": {
+    "defaultMessage": "Submit"
+  },
+  "shipping_address_selection.title.add_address": {
+    "defaultMessage": "Add New Address"
+  },
+  "shipping_address_selection.title.edit_shipping": {
+    "defaultMessage": "Edit Shipping Address"
+  },
+  "shipping_options.action.send_as_a_gift": {
+    "defaultMessage": "Do you want to send this as a gift?"
+  },
+  "shipping_options.button.continue_to_payment": {
+    "defaultMessage": "Continue to Payment"
+  },
+  "shipping_options.title.shipping_gift_options": {
+    "defaultMessage": "Shipping & Gift Options"
   },
   "signout_confirmation_dialog.button.cancel": {
     "defaultMessage": "Cancel"
@@ -1393,9 +1399,6 @@
   },
   "vSNTMO": {
     "defaultMessage": "Italian (Switzerland)"
-  },
-  "vrBTnC": {
-    "defaultMessage": "Do you want to send this as a gift?"
   },
   "vvTcAr": {
     "defaultMessage": "Create an account and get first access to the very best products, inspiration and community."

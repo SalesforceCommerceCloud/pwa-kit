@@ -35,12 +35,6 @@
       "value": "German (Austria)"
     }
   ],
-  "0g/1TG": [
-    {
-      "type": 0,
-      "value": "Continue to Payment"
-    }
-  ],
   "0n0dWe": [
     {
       "type": 0,
@@ -329,12 +323,6 @@
       "value": "Deploy on Managed Runtime"
     }
   ],
-  "DP5VOH": [
-    {
-      "type": 0,
-      "value": "Shipping Address"
-    }
-  ],
   "DdR2q8": [
     {
       "type": 1,
@@ -405,12 +393,6 @@
       "value": "Shop Products"
     }
   ],
-  "Fmc5ut": [
-    {
-      "type": 0,
-      "value": "Continue to Shipping Method"
-    }
-  ],
   "Ihg+6O": [
     {
       "type": 0,
@@ -457,12 +439,6 @@
     {
       "type": 0,
       "value": "Back to previous page"
-    }
-  ],
-  "O3zHDW": [
-    {
-      "type": 1,
-      "value": "submitButtonLabel"
     }
   ],
   "O8DHNx": [
@@ -649,12 +625,6 @@
     {
       "type": 0,
       "value": "Built using Chakra UI, a simple, modular and accessible React component library."
-    }
-  ],
-  "XU21FV": [
-    {
-      "type": 0,
-      "value": "Shipping & Gift Options"
     }
   ],
   "YQhbMR": [
@@ -995,12 +965,6 @@
     {
       "type": 0,
       "value": "Russian (Russian Federation)"
-    }
-  ],
-  "bhUBy4": [
-    {
-      "type": 0,
-      "value": "Save & Continue to Shipping Method"
     }
   ],
   "bk7ZVA": [
@@ -1763,12 +1727,6 @@
       "value": "Please sign in to continue!"
     }
   ],
-  "fIHFDI": [
-    {
-      "type": 0,
-      "value": "Add New Address"
-    }
-  ],
   "footer.column.account": [
     {
       "type": 0,
@@ -2349,12 +2307,6 @@
       "value": "Promotion removed"
     }
   ],
-  "pQ2F3h": [
-    {
-      "type": 0,
-      "value": "Edit Shipping Address"
-    }
-  ],
   "pagination.field.num_of_pages": [
     {
       "type": 0,
@@ -2673,6 +2625,24 @@
       "value": "Clear All"
     }
   ],
+  "shipping_address.button.continue_to_shipping": [
+    {
+      "type": 0,
+      "value": "Continue to Shipping Method"
+    }
+  ],
+  "shipping_address.title.shipping_address": [
+    {
+      "type": 0,
+      "value": "Shipping Address"
+    }
+  ],
+  "shipping_address_edit_form.button.save_continue": [
+    {
+      "type": 0,
+      "value": "Save & Continue to Shipping Method"
+    }
+  ],
   "shipping_address_form.heading.edit_address": [
     {
       "type": 0,
@@ -2683,6 +2653,48 @@
     {
       "type": 0,
       "value": "Add New Address"
+    }
+  ],
+  "shipping_address_selection.button.add_address": [
+    {
+      "type": 0,
+      "value": "Add New Address"
+    }
+  ],
+  "shipping_address_selection.button.submit": [
+    {
+      "type": 0,
+      "value": "Submit"
+    }
+  ],
+  "shipping_address_selection.title.add_address": [
+    {
+      "type": 0,
+      "value": "Add New Address"
+    }
+  ],
+  "shipping_address_selection.title.edit_shipping": [
+    {
+      "type": 0,
+      "value": "Edit Shipping Address"
+    }
+  ],
+  "shipping_options.action.send_as_a_gift": [
+    {
+      "type": 0,
+      "value": "Do you want to send this as a gift?"
+    }
+  ],
+  "shipping_options.button.continue_to_payment": [
+    {
+      "type": 0,
+      "value": "Continue to Payment"
+    }
+  ],
+  "shipping_options.title.shipping_gift_options": [
+    {
+      "type": 0,
+      "value": "Shipping & Gift Options"
     }
   ],
   "signout_confirmation_dialog.button.cancel": [
@@ -3219,12 +3231,6 @@
     {
       "type": 0,
       "value": "Italian (Switzerland)"
-    }
-  ],
-  "vrBTnC": [
-    {
-      "type": 0,
-      "value": "Do you want to send this as a gift?"
     }
   ],
   "vvTcAr": [

@@ -23,12 +23,16 @@ const FormActionButtons = ({
     return (
         <Stack direction={{base: 'column', lg: 'row-reverse'}} spacing={4}>
             <Button type="submit" minWidth={28} {...saveButtonProps}>
-                {saveButtonLabel || (
+                {saveButtonLabel ? (
+                    <FormattedMessage {...saveButtonLabel} />
+                ) : (
                     <FormattedMessage defaultMessage="Save" id="form_action_buttons.button.save" />
                 )}
             </Button>
             <Button variant="outline" minWidth={28} onClick={onCancel} {...cancelButtonProps}>
-                {cancelButtonLabel || (
+                {cancelButtonLabel ? (
+                    <FormattedMessage {...cancelButtonLabel} />
+                ) : (
                     <FormattedMessage
                         id="form_action_buttons.button.cancel"
                         defaultMessage="Cancel"
@@ -42,8 +46,12 @@ const FormActionButtons = ({
 FormActionButtons.propTypes = {
     saveButtonProps: PropTypes.object,
     cancelButtonProps: PropTypes.object,
-    saveButtonLabel: PropTypes.string,
-    cancelButtonLabel: PropTypes.string,
+    saveButtonLabel: PropTypes.shape({
+        defaultMessage: PropTypes.oneOfType([PropTypes.string, PropTypes.array])
+    }),
+    cancelButtonLabel: PropTypes.shape({
+        defaultMessage: PropTypes.oneOfType([PropTypes.string, PropTypes.array])
+    }),
     onCancel: PropTypes.func
 }
 

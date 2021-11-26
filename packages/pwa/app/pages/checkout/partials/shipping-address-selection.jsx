@@ -6,7 +6,7 @@
  */
 import React, {useState, useEffect} from 'react'
 import PropTypes from 'prop-types'
-import {FormattedMessage, useIntl} from 'react-intl'
+import {defineMessage, FormattedMessage, useIntl} from 'react-intl'
 import {Box, Button, Container, Heading, SimpleGrid, Stack} from '@chakra-ui/react'
 import {useForm, Controller} from 'react-hook-form'
 import {shallowEquals} from '../../../utils/utils'
@@ -17,6 +17,11 @@ import {PlusIcon} from '../../../components/icons'
 import AddressDisplay from '../../../components/address-display'
 import AddressFields from '../../../components/forms/address-fields'
 import FormActionButtons from '../../../components/forms/form-action-buttons'
+
+const saveButtonMessage = defineMessage({
+    defaultMessage: 'Save & Continue to Shipping Method',
+    id: 'shipping_address_edit_form.button.save_continue'
+})
 
 const ShippingAddressEditForm = ({
     title,
@@ -52,9 +57,7 @@ const ShippingAddressEditForm = ({
 
                     {hasSavedAddresses && !hideSubmitButton ? (
                         <FormActionButtons
-                            saveButtonLabel={formatMessage({
-                                defaultMessage: 'Save & Continue to Shipping Method'
-                            })}
+                            saveButtonLabel={saveButtonMessage}
                             onCancel={toggleAddressEdit}
                         />
                     ) : (
@@ -66,14 +69,7 @@ const ShippingAddressEditForm = ({
                                         width="full"
                                         disabled={form.formState.isSubmitting}
                                     >
-                                        {formatMessage(
-                                            {
-                                                defaultMessage: '{submitButtonLabel}'
-                                            },
-                                            {
-                                                submitButtonLabel
-                                            }
-                                        )}
+                                        {formatMessage(submitButtonLabel)}
                                     </Button>
                                 </Container>
                             </Box>
@@ -91,13 +87,20 @@ ShippingAddressEditForm.propTypes = {
     toggleAddressEdit: PropTypes.func,
     hideSubmitButton: PropTypes.bool,
     form: PropTypes.object,
-    submitButtonLabel: PropTypes.string
+    submitButtonLabel: PropTypes.shape({
+        defaultMessage: PropTypes.oneOfType([PropTypes.string, PropTypes.array])
+    })
 }
+
+const submitButtonMessage = defineMessage({
+    defaultMessage: 'Submit',
+    id: 'shipping_address_selection.button.submit'
+})
 
 const ShippingAddressSelection = ({
     form,
     selectedAddress,
-    submitButtonLabel = 'Submit',
+    submitButtonLabel = submitButtonMessage,
     hideSubmitButton = false,
     onSubmit = async () => null
 }) => {
@@ -259,7 +262,9 @@ const ShippingAddressSelection = ({
                                                 address.addressId === selectedAddressId && (
                                                     <ShippingAddressEditForm
                                                         title={formatMessage({
-                                                            defaultMessage: 'Edit Shipping Address'
+                                                            defaultMessage: 'Edit Shipping Address',
+                                                            id:
+                                                                'shipping_address_selection.title.edit_shipping'
                                                         })}
                                                         hasSavedAddresses={hasSavedAddresses}
                                                         toggleAddressEdit={toggleAddressEdit}
@@ -282,7 +287,10 @@ const ShippingAddressSelection = ({
                                         leftIcon={<PlusIcon boxSize={'15px'} />}
                                         onClick={toggleAddressEdit}
                                     >
-                                        <FormattedMessage defaultMessage="Add New Address" />
+                                        <FormattedMessage
+                                            defaultMessage="Add New Address"
+                                            id="shipping_address_selection.button.add_address"
+                                        />
                                         {/*Arrow up icon pointing to the new address that is being added*/}
                                         {isEditingAddress && !selectedAddressId && (
                                             <Box
@@ -308,7 +316,8 @@ const ShippingAddressSelection = ({
                 {isEditingAddress && !selectedAddressId && (
                     <ShippingAddressEditForm
                         title={formatMessage({
-                            defaultMessage: 'Add New Address'
+                            defaultMessage: 'Add New Address',
+                            id: 'shipping_address_selection.title.add_address'
                         })}
                         hasSavedAddresses={hasSavedAddresses}
                         toggleAddressEdit={toggleAddressEdit}
@@ -326,12 +335,7 @@ const ShippingAddressSelection = ({
                                 width="full"
                                 disabled={!form.formState.isValid || form.formState.isSubmitting}
                             >
-                                {formatMessage(
-                                    {
-                                        defaultMessage: '{submitButtonLabel}'
-                                    },
-                                    {submitButtonLabel}
-                                )}
+                                {formatMessage(submitButtonLabel)}
                             </Button>
                         </Container>
                     </Box>
@@ -349,7 +353,9 @@ ShippingAddressSelection.propTypes = {
     selectedAddress: PropTypes.object,
 
     /** Override the submit button label */
-    submitButtonLabel: PropTypes.string,
+    submitButtonLabel: PropTypes.shape({
+        defaultMessage: PropTypes.oneOfType([PropTypes.string, PropTypes.array])
+    }),
 
     /** Show or hide the submit button (for controlling the form from outside component) */
     hideSubmitButton: PropTypes.bool,

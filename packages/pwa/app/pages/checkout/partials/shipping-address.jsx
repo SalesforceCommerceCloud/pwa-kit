@@ -5,11 +5,16 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React, {useState} from 'react'
-import {useIntl} from 'react-intl'
+import {defineMessage, useIntl} from 'react-intl'
 import {useCheckout} from '../util/checkout-context'
 import {ToggleCard, ToggleCardEdit, ToggleCardSummary} from '../../../components/toggle-card'
 import ShippingAddressSelection from './shipping-address-selection'
 import AddressDisplay from '../../../components/address-display'
+
+const submitButtonMessage = defineMessage({
+    defaultMessage: 'Continue to Shipping Method',
+    id: 'shipping_address.button.continue_to_shipping'
+})
 
 export default function ShippingAddress() {
     const {formatMessage} = useIntl()
@@ -33,7 +38,10 @@ export default function ShippingAddress() {
     return (
         <ToggleCard
             id="step-1"
-            title={formatMessage({defaultMessage: 'Shipping Address'})}
+            title={formatMessage({
+                defaultMessage: 'Shipping Address',
+                id: 'shipping_address.title.shipping_address'
+            })}
             editing={step === 1}
             isLoading={isLoading}
             disabled={selectedShippingAddress == null}
@@ -42,9 +50,7 @@ export default function ShippingAddress() {
             <ToggleCardEdit>
                 <ShippingAddressSelection
                     selectedAddress={selectedShippingAddress}
-                    submitButtonLabel={formatMessage({
-                        defaultMessage: 'Continue to Shipping Method'
-                    })}
+                    submitButtonLabel={submitButtonMessage}
                     onSubmit={submitAndContinue}
                 />
             </ToggleCardEdit>
