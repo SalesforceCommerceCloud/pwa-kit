@@ -33,62 +33,52 @@ const mode = process.env.NODE_ENV === production ? production : development
 const DEBUG = mode !== production && process.env.DEBUG === 'true'
 const CI = process.env.CI
 
-const projectModules = (pkg) => {
-    return resolve(projectDir, 'node_modules', pkg)
-}
-
-const sdkModules = (pkg) => {
-    return resolve(sdkDir, 'node_modules', pkg)
-}
-
-const projectThenSDKModules = (pkg) => {
-    return fs.existsSync(projectModules(pkg)) ? projectModules(pkg) : sdkModules(pkg)
-}
-
 if (modes.indexOf(mode) < 0) {
     throw new Error(`Mode '${mode}' must be one of '${modes.toString()}'`)
 }
 
-const allowedReplacements = [
-    {
-        path: /pwa-kit-react-sdk(\/dist)?\/ssr\/universal\/components\/_app-config$/,
-        newPath: resolve(projectDir, 'app', 'components', '_app-config', 'index'),
-    },
+const findInProjectThenSDK = (pkg) => {
+    const projectPath = resolve(projectDir, 'node_modules', pkg)
+    return fs.existsSync(projectPath) ? projectPath : resolve(sdkDir, 'node_modules', pkg)
+}
 
-    {
-        path: /pwa-kit-react-sdk(\/dist)?\/ssr\/universal\/components\/_document$/,
-        newPath: resolve(projectDir, 'app', 'components', '_document', 'index'),
-    },
-
-    {
-        path: /pwa-kit-react-sdk(\/dist)?\/ssr\/universal\/components\/_app$/,
-        newPath: resolve(projectDir, 'app', 'components', '_app', 'index'),
-    },
-
-    {
-        path: /pwa-kit-react-sdk(\/dist)?\/ssr\/universal\/components\/_error$/,
-        newPath: resolve(projectDir, 'app', 'components', '_error', 'index'),
-    },
-
-    {
-        path: /pwa-kit-react-sdk(\/dist)?\/ssr\/universal\/routes$/,
-        newPath: resolve(projectDir, 'app', 'routes'),
-    },
-]
-
-const replacements = []
-
-allowedReplacements.forEach(({path, newPath}) => {
+const moduleReplacementPlugin = () => {
+    const overridables = [
+        {
+            path: /pwa-kit-react-sdk(\/dist)?\/ssr\/universal\/components\/_app-config$/,
+            newPath: resolve(projectDir, 'app', 'components', '_app-config', 'index'),
+        },
+        {
+            path: /pwa-kit-react-sdk(\/dist)?\/ssr\/universal\/components\/_document$/,
+            newPath: resolve(projectDir, 'app', 'components', '_document', 'index'),
+        },
+        {
+            path: /pwa-kit-react-sdk(\/dist)?\/ssr\/universal\/components\/_app$/,
+            newPath: resolve(projectDir, 'app', 'components', '_app', 'index'),
+        },
+        {
+            path: /pwa-kit-react-sdk(\/dist)?\/ssr\/universal\/components\/_error$/,
+            newPath: resolve(projectDir, 'app', 'components', '_error', 'index'),
+        },
+        {
+            path: /pwa-kit-react-sdk(\/dist)?\/ssr\/universal\/routes$/,
+            newPath: resolve(projectDir, 'app', 'routes'),
+        },
+    ]
     const extensions = ['.ts', '.tsx', '.js', '.jsx']
-    extensions.forEach((ext) => {
-        const replacement = newPath + ext
-        if (fs.existsSync(replacement)) {
-            replacements.push({path, newPath: replacement})
-        }
-    })
-})
 
-const moduleReplacementPlugin = createModuleReplacementPlugin({replacements})
+    const replacements = []
+    overridables.forEach(({path, newPath}) => {
+        extensions.forEach((ext) => {
+            const replacement = newPath + ext
+            if (fs.existsSync(replacement)) {
+                replacements.push({path, newPath: replacement})
+            }
+        })
+    })
+
+    return createModuleReplacementPlugin({replacements})
+}
 
 const baseConfig = (target) => {
     if (!['web', 'node'].includes(target)) {
@@ -120,26 +110,24 @@ const baseConfig = (target) => {
                 resolve: {
                     extensions: ['.ts', '.tsx', '.js', '.jsx', '.json'],
                     alias: {
-                        'babel-runtime': projectThenSDKModules('babel-runtime'),
-                        '@loadable/component': projectThenSDKModules('@loadable/component'),
-                        '@loadable/server': projectThenSDKModules('@loadable/server'),
-                        '@loadable/webpack-plugin': projectThenSDKModules(
+                        'babel-runtime': findInProjectThenSDK('babel-runtime'),
+                        '@loadable/component': findInProjectThenSDK('@loadable/component'),
+                        '@loadable/server': findInProjectThenSDK('@loadable/server'),
+                        '@loadable/webpack-plugin': findInProjectThenSDK(
                             '@loadable/webpack-plugin'
                         ),
-                        'svg-sprite-loader': projectThenSDKModules('svg-sprite-loader'),
-                        react: projectThenSDKModules('react'),
-                        'react-router-dom': projectThenSDKModules('react-router-dom'),
-                        'react-dom': projectThenSDKModules('react-dom'),
-                        'react-helmet': projectThenSDKModules('react-helmet'),
-                        bluebird: projectThenSDKModules('bluebird'),
+                        'svg-sprite-loader': findInProjectThenSDK('svg-sprite-loader'),
+                        react: findInProjectThenSDK('react'),
+                        'react-router-dom': findInProjectThenSDK('react-router-dom'),
+                        'react-dom': findInProjectThenSDK('react-dom'),
+                        'react-helmet': findInProjectThenSDK('react-helmet'),
+                        bluebird: findInProjectThenSDK('bluebird'),
                     },
                     ...(target === 'web' ? {fallback: {crypto: false}} : {}),
                 },
 
                 plugins: [
                     new webpack.DefinePlugin({
-                        // These are defined as string constants
-                        WEBPACK_PACKAGE_JSON_MOBIFY: `${JSON.stringify(pkg.mobify || {})}`,
                         DEBUG,
                         NODE_ENV: `'${process.env.NODE_ENV}'`,
                         ['global.GENTLY']: false,
@@ -154,7 +142,7 @@ const baseConfig = (target) => {
                         }),
                     mode === development && new webpack.NoEmitOnErrorsPlugin(),
 
-                    moduleReplacementPlugin,
+                    moduleReplacementPlugin(),
 
                     // Don't chunk if it's a node target – faster Lambda startup.
                     target === 'node' && new webpack.optimize.LimitChunkCountPlugin({maxChunks: 1}),
@@ -167,7 +155,7 @@ const baseConfig = (target) => {
                             exclude: /node_modules/,
                             use: [
                                 {
-                                    loader: projectThenSDKModules('babel-loader'),
+                                    loader: findInProjectThenSDK('babel-loader'),
                                     options: {
                                         rootMode: 'upward',
                                     },
@@ -176,7 +164,7 @@ const baseConfig = (target) => {
                         },
                         target === 'node' && {
                             test: /\.svg$/,
-                            loader: projectThenSDKModules('svg-sprite-loader'),
+                            loader: findInProjectThenSDK('svg-sprite-loader'),
                         },
                         target === 'web' && {
                             test: /\.svg$/,
