@@ -9,7 +9,7 @@
 
 // For more information on these settings, see https://webpack.js.org/configuration
 import fs from 'fs'
-import path from 'path'
+import path, {resolve} from 'path'
 
 import webpack from 'webpack'
 import WebpackNotifierPlugin from 'webpack-notifier'
@@ -20,8 +20,6 @@ import {createModuleReplacementPlugin} from './plugins'
 
 const projectDir = process.cwd()
 const sdkDir = path.resolve(path.join(__dirname, '..', '..'))
-
-const {resolve, join} = path
 
 const pkg = require(resolve(projectDir, 'package.json'))
 const appDir = resolve(projectDir, 'app')
@@ -91,18 +89,6 @@ allowedReplacements.forEach(({path, newPath}) => {
 })
 
 const moduleReplacementPlugin = createModuleReplacementPlugin({replacements})
-
-// Avoid compiling server-side only libraries with webpack by setting the
-// webpack `externals` configuration. This values originates from the mobify
-// configuration object under `externals` in the projects package.json file.
-const mobifyConfig = pkg.mobify || {}
-
-// Convert the externals defined in your project with the defualts into an
-// object that webpack will understand.
-const externals = ['express', ...(mobifyConfig.externals || [])].reduce(
-    (acc, lib) => ({...acc, [lib]: lib}),
-    {}
-)
 
 const baseConfig = (target) => {
     if (!['web', 'node'].includes(target)) {
@@ -205,7 +191,6 @@ const baseConfig = (target) => {
                         },
                     ].filter(Boolean),
                 },
-                ...(target === 'node' ? {externals} : {}),
             }
         }
 
