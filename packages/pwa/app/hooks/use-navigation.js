@@ -27,7 +27,6 @@ const useNavigation = () => {
          */
         (path, action = 'push', ...args) => {
             const updatedHref = buildPathWithUrlConfig(path, {locale})
-            console.log('updatedHref', updatedHref)
             history[action](path === '/' ? '/' : updatedHref, ...args)
         },
         [locale]
