@@ -256,7 +256,7 @@ const client = baseConfig('web')
             ...config,
             name: 'client',
             entry: {
-                main: './app/main.jsx',
+                main: './app/main',
             },
             plugins: [...config.plugins, new LoadablePlugin({writeToDisk: true})],
         }
