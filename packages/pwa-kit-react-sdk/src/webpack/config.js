@@ -300,7 +300,7 @@ const server = baseConfig('node')
         return {
             ...config,
             name: 'server',
-            entry: './app/server-renderer.jsx',
+            entry: 'pwa-kit-react-sdk/ssr/server/react-rendering.js',
             output: {
                 path: buildDir,
                 filename: 'server-renderer.js',

@@ -46,13 +46,13 @@ const VALID_TAG_NAMES = [
     'noscript',
     'script',
     'style',
-    'title'
+    'title',
 ]
 
 const TTI_POLYFILL_SCRIPT = [
     `!function(){if('PerformanceLongTaskTiming' in window){var g=window.__tti={e:[]};`,
     `g.o=new PerformanceObserver(function(l){g.e=g.e.concat(l.getEntries())});`,
-    `g.o.observe({entryTypes:['longtask']})}}();`
+    `g.o.observe({entryTypes:['longtask']})}}();`,
 ].join('')
 
 export const ALLOWLISTED_INLINE_SCRIPTS = [TTI_POLYFILL_SCRIPT]
@@ -82,7 +82,7 @@ const initAppState = async ({App, component, match, route, req, res, location}) 
         // Don't init if there was no match
         return {
             error: new errors.HTTPNotFound('Not found'),
-            appState: {}
+            appState: {},
         }
     }
 
@@ -95,7 +95,7 @@ const initAppState = async ({App, component, match, route, req, res, location}) 
                   req,
                   res,
                   params,
-                  location
+                  location,
               })
             : Promise.resolve({})
     )
@@ -106,17 +106,17 @@ const initAppState = async ({App, component, match, route, req, res, location}) 
         const appState = {
             appProps,
             pageProps,
-            __STATE_MANAGEMENT_LIBRARY: AppConfig.freeze(res.locals)
+            __STATE_MANAGEMENT_LIBRARY: AppConfig.freeze(res.locals),
         }
 
         returnVal = {
             error: undefined,
-            appState: appState
+            appState: appState,
         }
     } catch (error) {
         returnVal = {
             error: error || new Error(),
-            appState: {}
+            appState: {},
         }
     }
 
@@ -144,7 +144,7 @@ export const render = async (req, res) => {
     const [pathname, search] = req.originalUrl.split('?')
     const location = {
         pathname,
-        search: search ? `?${search}` : ''
+        search: search ? `?${search}` : '',
     }
 
     // Step 1 - Find the match.
@@ -171,7 +171,7 @@ export const render = async (req, res) => {
         route,
         req,
         res,
-        location
+        location,
     })
 
     // Step 4 - Render the App
@@ -183,7 +183,7 @@ export const render = async (req, res) => {
         routes,
         req,
         res,
-        location
+        location,
     }
     try {
         renderResult = renderApp(args)
@@ -249,7 +249,7 @@ const renderApp = (args) => {
             React.cloneElement(el, {
                 ...el.props,
                 ...scriptProps,
-                src: el.props.src && getAssetUrl(el.props.src.slice(1))
+                src: el.props.src && getAssetUrl(el.props.src.slice(1)),
             })
         )
     }
@@ -270,7 +270,7 @@ const renderApp = (args) => {
         __ERROR__: error,
         // `window.Progressive` has a long history at Mobify and some
         // client-side code depends on it. Maintain its name out of tradition.
-        Progressive: getWindowProgressive(req, res)
+        Progressive: getWindowProgressive(req, res),
     }
 
     const scripts = [
@@ -279,10 +279,10 @@ const renderApp = (args) => {
             key="mobify-data"
             type="application/json" // Not executable
             dangerouslySetInnerHTML={{
-                __html: serialize(windowGlobals, {isJSON: true, space: indent})
+                __html: serialize(windowGlobals, {isJSON: true, space: indent}),
             }}
         />,
-        ...bundles
+        ...bundles,
     ]
 
     const svgs = [<div key="svg_sprite" dangerouslySetInnerHTML={{__html: sprite.stringify()}} />]
@@ -297,11 +297,11 @@ const renderApp = (args) => {
                     id="performance-metrics"
                     key="performance-metrics"
                     dangerouslySetInnerHTML={{
-                        __html: TTI_POLYFILL_SCRIPT
+                        __html: TTI_POLYFILL_SCRIPT,
                     }}
                     {...scriptProps}
                 />,
-                ...helmetHeadTags
+                ...helmetHeadTags,
             ]}
             html={appHtml}
             afterBodyStart={svgs}
@@ -335,7 +335,14 @@ const getWindowProgressive = (req, res) => {
             deployTarget: process.env.DEPLOY_TARGET || 'local',
             proxyConfigs,
             // The request class (undefined by default)
-            requestClass: res.locals.requestClass
-        }
+            requestClass: res.locals.requestClass,
+        },
     }
 }
+
+const serverRenderer =
+    ({clientStats, serverStats}) =>
+    (req, res, next) =>
+        render(req, res)
+
+export default serverRenderer
