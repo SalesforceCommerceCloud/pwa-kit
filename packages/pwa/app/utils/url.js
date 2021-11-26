@@ -34,7 +34,8 @@ export const rebuildPathWithParams = (url, extraParams) => {
     Object.keys(extraParams).forEach((key) => {
         const value = extraParams[key]
 
-        if (!value) {
+        // 0 is a valid value as for a param
+        if (!value && value !== 0) {
             params.delete(key)
         } else {
             params.set(key, value)
