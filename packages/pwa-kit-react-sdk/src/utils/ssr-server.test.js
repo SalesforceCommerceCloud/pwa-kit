@@ -49,7 +49,6 @@ import {
 } from '../ssr/server/constants'
 
 const baseMobify = {
-    pageNotFoundURL: '/page-not-found',
     ssrEnabled: true,
     ssrOnly: ['main.js.map', 'ssr.js', 'ssr.js.map', 'vendor.js.map'],
     ssrShared: ['main.{js,css}', '!**/no-op.*', 'ssr-loader.js', 'vendor.js*', 'worker.js'],

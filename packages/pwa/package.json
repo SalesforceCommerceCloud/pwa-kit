@@ -4,7 +4,6 @@
     "license": "See license in LICENSE",
     "private": true,
     "mobify": {
-        "pageNotFoundURL": "/page-not-found",
         "ssrEnabled": true,
         "ssrOnly": [
             "ssr.js",
