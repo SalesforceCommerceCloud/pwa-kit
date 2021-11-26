@@ -53,9 +53,8 @@ commands:
 
             # Install Snyk CLI
             sudo npm install -g snyk
-
-            # Run snyk auth - authenticate snyk using environment variables to add the token
-            snyk auth $SNYK_TOKEN
+            
+            echo "Credentials are available: $SNYK_TOKEN"
 
             # Install Lighthouse CI CLI
             sudo npm install -g @lhci/cli
@@ -97,8 +96,6 @@ commands:
             # Explicitly set pipefile policy. This is the default for non-windows, but seems
             # that is needs to be set on windows to fail immediately.
             set -eo pipefail
-            
-            echo "Credentials are available: $NPM_TOKEN"
 
             cd << parameters.cwd >>
 
@@ -264,25 +261,6 @@ jobs:
           command: |
             node packages/pwa-kit-create-app/scripts/create-mobify-app-dev.js --outputDir /tmp/hello-world
       - run:
-          name: Audit Generated Project
-          environment:
-          command: |
-            # This is the *most* important audit step, much more than the
-            # "whole monorepo" one above - bear in mind that SDK users probably
-            # don't care if eg. our docs site uses a vulnerable dependency.
-            #
-            # Treat failures here seriously and try to fix them before just bumping
-            # thresholds. These vulnerabilities create a really bad impression with our
-            # users during sales or in the early stages of a project.
-            #
-            # REMINDER: Have you bumped up our alpha versions? If you recently fixed some
-            # vulnerabilities, you will need to increment the alpha versions (so that
-            # publishing them to the local npm repo would be successful).
-
-            if [[ "${CIRCLE_BRANCH}" == "develop" ]]; then
-              snyk monitor --ignore-policy --remote-repo-url='https://github.com/SalesforceCommerceCloud/pwa-kit.git' --project-name='generated-scaffold-pwa'
-            fi
-      - run:
           name: Count Generated Project Dependencies
           environment:
           command: |
@@ -299,10 +277,33 @@ jobs:
           cwd: /tmp/project
       - smoketestscripts:
           dir: /tmp/project
+      - early_return_for_forked_pull_requests
       - slack/status:
           fail_only: true
           only_for_branches: develop
-      - early_return_for_forked_pull_requests
+      - run:
+          name: Audit Generated Project
+          environment:
+          command: |
+            # This is the *most* important audit step, much more than the
+            # "whole monorepo" one above - bear in mind that SDK users probably
+            # don't care if eg. our docs site uses a vulnerable dependency.
+            #
+            # Treat failures here seriously and try to fix them before just bumping
+            # thresholds. These vulnerabilities create a really bad impression with our
+            # users during sales or in the early stages of a project.
+            #
+            # REMINDER: Have you bumped up our alpha versions? If you recently fixed some
+            # vulnerabilities, you will need to increment the alpha versions (so that
+            # publishing them to the local npm repo would be successful).
+
+            if [[ "${CIRCLE_BRANCH}" == "develop" ]]; then
+              # Run snyk auth - authenticate snyk using environment variables to add the token
+              snyk auth $SNYK_TOKEN
+              
+              snyk monitor --ignore-policy --remote-repo-url='https://github.com/SalesforceCommerceCloud/pwa-kit.git' --project-name='generated-scaffold-pwa'
+            fi
+      
       - run:
           name: Push Bundle
           command: |
