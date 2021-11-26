@@ -15,7 +15,15 @@ import {
     rebuildPathWithParams,
     removeQueryParamsFromPath
 } from './url'
+import {getUrlConfig} from './utils'
 
+jest.mock('./utils', () => {
+    const original = jest.requireActual('./utils')
+    return {
+        ...original,
+        getUrlConfig: jest.fn()
+    }
+})
 import {DEFAULT_LOCALE} from '../constants'
 
 describe('buildUrlSet returns the expected set of urls', () => {
@@ -98,10 +106,13 @@ describe('url builder test', () => {
 
     test('categoryUrlBuilder returns expect', () => {
         const url = categoryUrlBuilder({id: 'men'})
-        expect(url).toEqual(`/en-GB/category/men`)
+        expect(url).toEqual(`/category/men`)
     })
 
     test('homeUrlBuilder returns expect', () => {
+        getUrlConfig.mockImplementation(() => ({
+            locale: 'path'
+        }))
         const url = homeUrlBuilder('/', 'fr-FR')
         expect(url).toEqual(`/fr-FR/`)
 
@@ -110,6 +121,9 @@ describe('url builder test', () => {
     })
 
     test('getUrlWithLocale returns expected for PLP', () => {
+        getUrlConfig.mockImplementation(() => ({
+            locale: 'path'
+        }))
         const location = new URL('http://localhost:3000/it-IT/category/newarrivals-womens')
 
         window.location = location
@@ -119,6 +133,9 @@ describe('url builder test', () => {
     })
 
     test('getUrlWithLocale returns expected for PLP without refine param', () => {
+        getUrlConfig.mockImplementation(() => ({
+            locale: 'path'
+        }))
         const location = new URL(
             'http://localhost:3000/it-IT/category/newarrivals-womens?limit=25&refine=c_refinementColor%3DBianco&sort=best-matches&offset=25'
         )
@@ -134,6 +151,9 @@ describe('url builder test', () => {
     })
 
     test('getUrlWithLocale returns expected for PLP', () => {
+        getUrlConfig.mockImplementation(() => ({
+            locale: 'path'
+        }))
         const location = new URL('http://localhost:3000/it-IT/category/newarrivals-womens')
 
         window.location = location
@@ -143,6 +163,9 @@ describe('url builder test', () => {
     })
 
     test('getUrlWithLocale returns expected for Homepage', () => {
+        getUrlConfig.mockImplementation(() => ({
+            locale: 'path'
+        }))
         const location = new URL('http://localhost:3000/it-IT/')
 
         window.location = location
