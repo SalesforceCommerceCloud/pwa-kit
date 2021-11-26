@@ -23,7 +23,8 @@ export const createModuleReplacementPlugin = (options = {}) => {
 
     return new webpack.NormalModuleReplacementPlugin(/.*/, (resource) => {
         const resolved = path.resolve(resource.context, resource.request)
-        const replacement = replacements.find(({path}) => resolved.includes(path))
+
+        const replacement = replacements.find(({path}) => resolved.match(path))
 
         const sdkPaths = [
             path.join('packages', 'pwa-kit-react-sdk'),

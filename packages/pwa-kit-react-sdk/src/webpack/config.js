@@ -51,54 +51,44 @@ if (modes.indexOf(mode) < 0) {
     throw new Error(`Mode '${mode}' must be one of '${modes.toString()}'`)
 }
 
-const replacements = [
+const allowedReplacements = [
     {
-        path: join('pwa-kit-react-sdk', 'ssr', 'universal', 'components', '_app-config'),
-        newPath: resolve('.', 'app', 'components', '_app-config', 'index.jsx'),
-    },
-    {
-        path: join('pwa-kit-react-sdk', 'ssr', 'universal', 'components', '_document'),
-        newPath: resolve('.', 'app', 'components', '_document', 'index.jsx'),
-    },
-    {
-        path: join('pwa-kit-react-sdk', 'ssr', 'universal', 'components', '_app'),
-        newPath: resolve('.', 'app', 'components', '_app', 'index.jsx'),
-    },
-    {
-        path: join('pwa-kit-react-sdk', 'ssr', 'universal', 'components', '_error'),
-        newPath: resolve('.', 'app', 'components', '_error', 'index.jsx'),
-    },
-    {
-        path: join('pwa-kit-react-sdk', 'ssr', 'universal', 'routes'),
-        newPath: resolve('.', 'app', 'routes.jsx'),
+        path: /pwa-kit-react-sdk(\/dist)?\/ssr\/universal\/components\/_app-config$/,
+        newPath: resolve(projectDir, 'app', 'components', '_app-config', 'index'),
     },
 
-    // The 'pwa-kit-react-sdk' is developed in a lerna monorepo and the final resovled paths
-    // are different (they include a `dist` foler) when developing. Because of this we have
-    // and similar yet slightly different set of replacement paths to account for this
-    // scenario. NOTE: There is no reliable/clean way to determine if we are developing within
-    // the monorepo so this solution, although not optimal, works.
     {
-        path: join('pwa-kit-react-sdk', 'dist', 'ssr', 'universal', 'components', '_app-config'),
-        newPath: resolve('.', 'app', 'components', '_app-config', 'index.jsx'),
+        path: /pwa-kit-react-sdk(\/dist)?\/ssr\/universal\/components\/_document$/,
+        newPath: resolve(projectDir, 'app', 'components', '_document', 'index'),
     },
+
     {
-        path: join('pwa-kit-react-sdk', 'dist', 'ssr', 'universal', 'components', '_document'),
-        newPath: resolve('.', 'app', 'components', '_document', 'index.jsx'),
+        path: /pwa-kit-react-sdk(\/dist)?\/ssr\/universal\/components\/_app$/,
+        newPath: resolve(projectDir, 'app', 'components', '_app', 'index'),
     },
+
     {
-        path: join('pwa-kit-react-sdk', 'dist', 'ssr', 'universal', 'components', '_app'),
-        newPath: resolve('.', 'app', 'components', '_app', 'index.jsx'),
+        path: /pwa-kit-react-sdk(\/dist)?\/ssr\/universal\/components\/_error$/,
+        newPath: resolve(projectDir, 'app', 'components', '_error', 'index'),
     },
+
     {
-        path: join('pwa-kit-react-sdk', 'dist', 'ssr', 'universal', 'components', '_error'),
-        newPath: resolve('.', 'app', 'components', '_error', 'index.jsx'),
+        path: /pwa-kit-react-sdk(\/dist)?\/ssr\/universal\/routes$/,
+        newPath: resolve(projectDir, 'app', 'routes'),
     },
-    {
-        path: join('pwa-kit-react-sdk', 'dist', 'ssr', 'universal', 'routes'),
-        newPath: resolve('.', 'app', 'routes.jsx'),
-    },
-].filter(({newPath}) => fs.existsSync(newPath))
+]
+
+const replacements = []
+
+allowedReplacements.forEach(({path, newPath}) => {
+    const extensions = ['.ts', '.tsx', '.js', '.jsx']
+    extensions.forEach((ext) => {
+        const replacement = newPath + ext
+        if (fs.existsSync(replacement)) {
+            replacements.push({path, newPath: replacement})
+        }
+    })
+})
 
 const moduleReplacementPlugin = createModuleReplacementPlugin({replacements})
 
