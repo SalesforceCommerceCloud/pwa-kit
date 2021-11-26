@@ -147,6 +147,19 @@ commands:
               # that would prevent Lerna from publishing (Lerna gets this right).
               git diff --exit-code
 
+  early_return_for_forked_pull_requests:
+    description: >-
+      If this build is from a fork, stop executing the current job and return success.
+      This is useful to avoid steps that will fail due to missing credentials.
+    steps:
+      - run:
+          name: Early return if this build is from a forked PR
+          command: |
+            if [ -n "$CIRCLE_PR_NUMBER" ]; then
+              echo "Nothing else to do for forked PRs, so marking this step successful"
+              circleci step halt
+            fi
+
 jobs:
   testNode12:
     docker:
@@ -186,6 +199,7 @@ jobs:
       - runtests
       - lighthouse-ci
       - smoketestscripts
+      - early_return_for_forked_pull_requests
       - run:
           name: Push Bundle
           command: |
@@ -286,6 +300,7 @@ jobs:
       - slack/status:
           fail_only: true
           only_for_branches: develop
+      - early_return_for_forked_pull_requests
       - run:
           name: Push Bundle
           command: |
