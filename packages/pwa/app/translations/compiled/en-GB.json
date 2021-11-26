@@ -1,212 +1,4 @@
 {
-  "+MBxFF": [
-    {
-      "type": 0,
-      "value": "English (United States)"
-    }
-  ],
-  "+ZbX4W": [
-    {
-      "type": 0,
-      "value": "Czech (Czech Republic)"
-    }
-  ],
-  "0Tjkj3": [
-    {
-      "type": 0,
-      "value": "German (Austria)"
-    }
-  ],
-  "0n0dWe": [
-    {
-      "type": 0,
-      "value": "Hebrew (Israel)"
-    }
-  ],
-  "1g+gvg": [
-    {
-      "type": 0,
-      "value": "French (Belgium)"
-    }
-  ],
-  "26gvH3": [
-    {
-      "type": 0,
-      "value": "French (Canada)"
-    }
-  ],
-  "3HK3af": [
-    {
-      "type": 0,
-      "value": "Unknown "
-    },
-    {
-      "type": 1,
-      "value": "localeShortCode"
-    }
-  ],
-  "5e/Fjo": [
-    {
-      "type": 0,
-      "value": "Portuguese (Brazil)"
-    }
-  ],
-  "5ryYe9": [
-    {
-      "type": 0,
-      "value": "Japanese (Japan)"
-    }
-  ],
-  "68qUv0": [
-    {
-      "type": 0,
-      "value": "Chinese (Hong Kong)"
-    }
-  ],
-  "74fug6": [
-    {
-      "type": 0,
-      "value": "Tamil (India)"
-    }
-  ],
-  "8CDRAt": [
-    {
-      "type": 0,
-      "value": "Spanish (Mexico)"
-    }
-  ],
-  "A2v4cr": [
-    {
-      "type": 0,
-      "value": "English (United Kingdom)"
-    }
-  ],
-  "ABWZu0": [
-    {
-      "type": 0,
-      "value": "Spanish (Argentina)"
-    }
-  ],
-  "AiDBu2": [
-    {
-      "type": 0,
-      "value": "Slovak (Slovakia)"
-    }
-  ],
-  "CutQ+m": [
-    {
-      "type": 0,
-      "value": "Spanish (Columbia)"
-    }
-  ],
-  "ES4Hjg": [
-    {
-      "type": 0,
-      "value": "Danish (Denmark)"
-    }
-  ],
-  "KE5qj+": [
-    {
-      "type": 0,
-      "value": "French (Switzerland)"
-    }
-  ],
-  "MQHbcd": [
-    {
-      "type": 0,
-      "value": "English (Canada)"
-    }
-  ],
-  "O8s+yR": [
-    {
-      "type": 0,
-      "value": "Spanish (Spain)"
-    }
-  ],
-  "OkmnSf": [
-    {
-      "type": 0,
-      "value": "Hungarian (Hungary)"
-    }
-  ],
-  "P87iMu": [
-    {
-      "type": 0,
-      "value": "Tamil (Sri Lanka)"
-    }
-  ],
-  "PEVXku": [
-    {
-      "type": 0,
-      "value": "Thai (Thailand)"
-    }
-  ],
-  "PO4nBj": [
-    {
-      "type": 0,
-      "value": "French (France)"
-    }
-  ],
-  "QEUh37": [
-    {
-      "type": 0,
-      "value": "English (Ireland)"
-    }
-  ],
-  "Qb4dDN": [
-    {
-      "type": 0,
-      "value": "German (Switzerland)"
-    }
-  ],
-  "SFjs9b": [
-    {
-      "type": 0,
-      "value": "English (New Zealand)"
-    }
-  ],
-  "SXDujd": [
-    {
-      "type": 0,
-      "value": "Dutch (Belgium)"
-    }
-  ],
-  "T8HBFR": [
-    {
-      "type": 0,
-      "value": "German (Germany)"
-    }
-  ],
-  "TvauRz": [
-    {
-      "type": 0,
-      "value": "Bangla (Bangladesh)"
-    }
-  ],
-  "U8vSQS": [
-    {
-      "type": 0,
-      "value": "Bangla (India)"
-    }
-  ],
-  "YQhbMR": [
-    {
-      "type": 0,
-      "value": "Norwegian (Norway)"
-    }
-  ],
-  "ZWTTz6": [
-    {
-      "type": 0,
-      "value": "Polish (Poland)"
-    }
-  ],
-  "Zgc/KO": [
-    {
-      "type": 0,
-      "value": "Spanish (United States)"
-    }
-  ],
   "account.accordion.button.my_account": [
     {
       "type": 0,
@@ -625,18 +417,6 @@
     {
       "type": 0,
       "value": "Password Reset"
-    }
-  ],
-  "b24hho": [
-    {
-      "type": 0,
-      "value": "Chinese (China)"
-    }
-  ],
-  "b2zNZE": [
-    {
-      "type": 0,
-      "value": "Russian (Russian Federation)"
     }
   ],
   "card_payment_form.heading.new_payment_method": [
@@ -1137,12 +917,6 @@
       "value": " of your card."
     }
   ],
-  "d/RGdS": [
-    {
-      "type": 0,
-      "value": "Portuguese (Portugal)"
-    }
-  ],
   "drawer_menu.button.account_details": [
     {
       "type": 0,
@@ -1249,24 +1023,6 @@
     {
       "type": 0,
       "value": "Terms & Conditions"
-    }
-  ],
-  "e//rzS": [
-    {
-      "type": 0,
-      "value": "Italian (Italy)"
-    }
-  ],
-  "eSl9Vh": [
-    {
-      "type": 0,
-      "value": "Finnish (Finland)"
-    }
-  ],
-  "eYVKts": [
-    {
-      "type": 0,
-      "value": "English (India)"
     }
   ],
   "empty_cart.description.empty_cart": [
@@ -1471,18 +1227,6 @@
       "value": "Save"
     }
   ],
-  "g3uXY2": [
-    {
-      "type": 0,
-      "value": "Swedish (Sweden)"
-    }
-  ],
-  "gguIJ8": [
-    {
-      "type": 0,
-      "value": "Hindi (India)"
-    }
-  ],
   "global.account.action.keep_item": [
     {
       "type": 0,
@@ -1613,12 +1357,6 @@
     {
       "type": 0,
       "value": "Confirm Remove Item"
-    }
-  ],
-  "gzeOf+": [
-    {
-      "type": 0,
-      "value": "Chinese (Taiwan)"
     }
   ],
   "header.button.assistive_msg.logo": [
@@ -1835,12 +1573,6 @@
       "value": "The React PWA Starter Store for Retail"
     }
   ],
-  "i0/00S": [
-    {
-      "type": 0,
-      "value": "English (Australia)"
-    }
-  ],
   "item_attributes.label.promotions": [
     {
       "type": 0,
@@ -1861,6 +1593,324 @@
     {
       "type": 0,
       "value": "Sale"
+    }
+  ],
+  "locale_text.message.ar-SA": [
+    {
+      "type": 0,
+      "value": "Arabic (Saudi Arabia)"
+    }
+  ],
+  "locale_text.message.bn-BD": [
+    {
+      "type": 0,
+      "value": "Bangla (Bangladesh)"
+    }
+  ],
+  "locale_text.message.bn-IN": [
+    {
+      "type": 0,
+      "value": "Bangla (India)"
+    }
+  ],
+  "locale_text.message.cs-CZ": [
+    {
+      "type": 0,
+      "value": "Czech (Czech Republic)"
+    }
+  ],
+  "locale_text.message.da-DK": [
+    {
+      "type": 0,
+      "value": "Danish (Denmark)"
+    }
+  ],
+  "locale_text.message.de-AT": [
+    {
+      "type": 0,
+      "value": "German (Austria)"
+    }
+  ],
+  "locale_text.message.de-CH": [
+    {
+      "type": 0,
+      "value": "German (Switzerland)"
+    }
+  ],
+  "locale_text.message.de-DE": [
+    {
+      "type": 0,
+      "value": "German (Germany)"
+    }
+  ],
+  "locale_text.message.el-GR": [
+    {
+      "type": 0,
+      "value": "Greek (Greece)"
+    }
+  ],
+  "locale_text.message.en-AU": [
+    {
+      "type": 0,
+      "value": "English (Australia)"
+    }
+  ],
+  "locale_text.message.en-CA": [
+    {
+      "type": 0,
+      "value": "English (Canada)"
+    }
+  ],
+  "locale_text.message.en-GB": [
+    {
+      "type": 0,
+      "value": "English (United Kingdom)"
+    }
+  ],
+  "locale_text.message.en-IE": [
+    {
+      "type": 0,
+      "value": "English (Ireland)"
+    }
+  ],
+  "locale_text.message.en-IN": [
+    {
+      "type": 0,
+      "value": "English (India)"
+    }
+  ],
+  "locale_text.message.en-NZ": [
+    {
+      "type": 0,
+      "value": "English (New Zealand)"
+    }
+  ],
+  "locale_text.message.en-US": [
+    {
+      "type": 0,
+      "value": "English (United States)"
+    }
+  ],
+  "locale_text.message.en-ZA": [
+    {
+      "type": 0,
+      "value": "English (South Africa)"
+    }
+  ],
+  "locale_text.message.es-AR": [
+    {
+      "type": 0,
+      "value": "Spanish (Argentina)"
+    }
+  ],
+  "locale_text.message.es-CL": [
+    {
+      "type": 0,
+      "value": "Spanish (Chile)"
+    }
+  ],
+  "locale_text.message.es-CO": [
+    {
+      "type": 0,
+      "value": "Spanish (Columbia)"
+    }
+  ],
+  "locale_text.message.es-ES": [
+    {
+      "type": 0,
+      "value": "Spanish (Spain)"
+    }
+  ],
+  "locale_text.message.es-MX": [
+    {
+      "type": 0,
+      "value": "Spanish (Mexico)"
+    }
+  ],
+  "locale_text.message.es-US": [
+    {
+      "type": 0,
+      "value": "Spanish (United States)"
+    }
+  ],
+  "locale_text.message.fi-FI": [
+    {
+      "type": 0,
+      "value": "Finnish (Finland)"
+    }
+  ],
+  "locale_text.message.fr-BE": [
+    {
+      "type": 0,
+      "value": "French (Belgium)"
+    }
+  ],
+  "locale_text.message.fr-CA": [
+    {
+      "type": 0,
+      "value": "French (Canada)"
+    }
+  ],
+  "locale_text.message.fr-CH": [
+    {
+      "type": 0,
+      "value": "French (Switzerland)"
+    }
+  ],
+  "locale_text.message.fr-FR": [
+    {
+      "type": 0,
+      "value": "French (France)"
+    }
+  ],
+  "locale_text.message.he-IL": [
+    {
+      "type": 0,
+      "value": "Hebrew (Israel)"
+    }
+  ],
+  "locale_text.message.hi-IN": [
+    {
+      "type": 0,
+      "value": "Hindi (India)"
+    }
+  ],
+  "locale_text.message.hu-HU": [
+    {
+      "type": 0,
+      "value": "Hungarian (Hungary)"
+    }
+  ],
+  "locale_text.message.id-ID": [
+    {
+      "type": 0,
+      "value": "Indonesian (Indonesia)"
+    }
+  ],
+  "locale_text.message.it-CH": [
+    {
+      "type": 0,
+      "value": "Italian (Switzerland)"
+    }
+  ],
+  "locale_text.message.it-IT": [
+    {
+      "type": 0,
+      "value": "Italian (Italy)"
+    }
+  ],
+  "locale_text.message.ja-JP": [
+    {
+      "type": 0,
+      "value": "Japanese (Japan)"
+    }
+  ],
+  "locale_text.message.ko-KR": [
+    {
+      "type": 0,
+      "value": "Korean (Republic of Korea)"
+    }
+  ],
+  "locale_text.message.nl-BE": [
+    {
+      "type": 0,
+      "value": "Dutch (Belgium)"
+    }
+  ],
+  "locale_text.message.nl-NL": [
+    {
+      "type": 0,
+      "value": "Dutch (The Netherlands)"
+    }
+  ],
+  "locale_text.message.no-NO": [
+    {
+      "type": 0,
+      "value": "Norwegian (Norway)"
+    }
+  ],
+  "locale_text.message.pl-PL": [
+    {
+      "type": 0,
+      "value": "Polish (Poland)"
+    }
+  ],
+  "locale_text.message.pt-BR": [
+    {
+      "type": 0,
+      "value": "Portuguese (Brazil)"
+    }
+  ],
+  "locale_text.message.pt-PT": [
+    {
+      "type": 0,
+      "value": "Portuguese (Portugal)"
+    }
+  ],
+  "locale_text.message.ro-RO": [
+    {
+      "type": 0,
+      "value": "Romanian (Romania)"
+    }
+  ],
+  "locale_text.message.ru-RU": [
+    {
+      "type": 0,
+      "value": "Russian (Russian Federation)"
+    }
+  ],
+  "locale_text.message.sk-SK": [
+    {
+      "type": 0,
+      "value": "Slovak (Slovakia)"
+    }
+  ],
+  "locale_text.message.sv-SE": [
+    {
+      "type": 0,
+      "value": "Swedish (Sweden)"
+    }
+  ],
+  "locale_text.message.ta-IN": [
+    {
+      "type": 0,
+      "value": "Tamil (India)"
+    }
+  ],
+  "locale_text.message.ta-LK": [
+    {
+      "type": 0,
+      "value": "Tamil (Sri Lanka)"
+    }
+  ],
+  "locale_text.message.th-TH": [
+    {
+      "type": 0,
+      "value": "Thai (Thailand)"
+    }
+  ],
+  "locale_text.message.tr-TR": [
+    {
+      "type": 0,
+      "value": "Turkish (Turkey)"
+    }
+  ],
+  "locale_text.message.zh-CN": [
+    {
+      "type": 0,
+      "value": "Chinese (China)"
+    }
+  ],
+  "locale_text.message.zh-HK": [
+    {
+      "type": 0,
+      "value": "Chinese (Hong Kong)"
+    }
+  ],
+  "locale_text.message.zh-TW": [
+    {
+      "type": 0,
+      "value": "Chinese (Taiwan)"
     }
   ],
   "login.error.incorrect_username_password": [
@@ -1897,18 +1947,6 @@
     {
       "type": 0,
       "value": "Welcome Back"
-    }
-  ],
-  "n/iZlE": [
-    {
-      "type": 0,
-      "value": "Spanish (Chile)"
-    }
-  ],
-  "n9j5bS": [
-    {
-      "type": 0,
-      "value": "Turkish (Turkey)"
     }
   ],
   "offline_banner.description.browsing_offline_mode": [
@@ -2441,12 +2479,6 @@
       "value": "Do you have a promo code?"
     }
   ],
-  "rU+Ph/": [
-    {
-      "type": 0,
-      "value": "Dutch (The Netherlands)"
-    }
-  ],
   "recent_searches.action.clear_searches": [
     {
       "type": 0,
@@ -2733,34 +2765,10 @@
       "value": "Are you sure you want to sign out? You will need to sign back in to proceed with your current order."
     }
   ],
-  "tYBua6": [
-    {
-      "type": 0,
-      "value": "Indonesian (Indonesia)"
-    }
-  ],
-  "tclGo+": [
-    {
-      "type": 0,
-      "value": "Arabic (Saudi Arabia)"
-    }
-  ],
-  "tnSBvt": [
-    {
-      "type": 0,
-      "value": "Korean (Republic of Korea)"
-    }
-  ],
   "toggle_card.action.edit": [
     {
       "type": 0,
       "value": "Edit"
-    }
-  ],
-  "uCdcPZ": [
-    {
-      "type": 0,
-      "value": "Romanian (Romania)"
     }
   ],
   "update_password_fields.button.forgot_password": [
@@ -3259,18 +3267,6 @@
       "value": "New Password"
     }
   ],
-  "vMvXOp": [
-    {
-      "type": 0,
-      "value": "Greek (Greece)"
-    }
-  ],
-  "vSNTMO": [
-    {
-      "type": 0,
-      "value": "Italian (Switzerland)"
-    }
-  ],
   "wishlist_primary_action.info.added_to_cart": [
     {
       "type": 1,
@@ -3325,12 +3321,6 @@
     {
       "type": 0,
       "value": "Please sign in to continue!"
-    }
-  ],
-  "zdzY+u": [
-    {
-      "type": 0,
-      "value": "English (South Africa)"
     }
   ]
 }

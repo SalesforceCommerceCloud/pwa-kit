@@ -1,106 +1,4 @@
 {
-  "+MBxFF": {
-    "defaultMessage": "English (United States)"
-  },
-  "+ZbX4W": {
-    "defaultMessage": "Czech (Czech Republic)"
-  },
-  "0Tjkj3": {
-    "defaultMessage": "German (Austria)"
-  },
-  "0n0dWe": {
-    "defaultMessage": "Hebrew (Israel)"
-  },
-  "1g+gvg": {
-    "defaultMessage": "French (Belgium)"
-  },
-  "26gvH3": {
-    "defaultMessage": "French (Canada)"
-  },
-  "3HK3af": {
-    "defaultMessage": "Unknown {localeShortCode}"
-  },
-  "5e/Fjo": {
-    "defaultMessage": "Portuguese (Brazil)"
-  },
-  "5ryYe9": {
-    "defaultMessage": "Japanese (Japan)"
-  },
-  "68qUv0": {
-    "defaultMessage": "Chinese (Hong Kong)"
-  },
-  "74fug6": {
-    "defaultMessage": "Tamil (India)"
-  },
-  "8CDRAt": {
-    "defaultMessage": "Spanish (Mexico)"
-  },
-  "A2v4cr": {
-    "defaultMessage": "English (United Kingdom)"
-  },
-  "ABWZu0": {
-    "defaultMessage": "Spanish (Argentina)"
-  },
-  "AiDBu2": {
-    "defaultMessage": "Slovak (Slovakia)"
-  },
-  "CutQ+m": {
-    "defaultMessage": "Spanish (Columbia)"
-  },
-  "ES4Hjg": {
-    "defaultMessage": "Danish (Denmark)"
-  },
-  "KE5qj+": {
-    "defaultMessage": "French (Switzerland)"
-  },
-  "MQHbcd": {
-    "defaultMessage": "English (Canada)"
-  },
-  "O8s+yR": {
-    "defaultMessage": "Spanish (Spain)"
-  },
-  "OkmnSf": {
-    "defaultMessage": "Hungarian (Hungary)"
-  },
-  "P87iMu": {
-    "defaultMessage": "Tamil (Sri Lanka)"
-  },
-  "PEVXku": {
-    "defaultMessage": "Thai (Thailand)"
-  },
-  "PO4nBj": {
-    "defaultMessage": "French (France)"
-  },
-  "QEUh37": {
-    "defaultMessage": "English (Ireland)"
-  },
-  "Qb4dDN": {
-    "defaultMessage": "German (Switzerland)"
-  },
-  "SFjs9b": {
-    "defaultMessage": "English (New Zealand)"
-  },
-  "SXDujd": {
-    "defaultMessage": "Dutch (Belgium)"
-  },
-  "T8HBFR": {
-    "defaultMessage": "German (Germany)"
-  },
-  "TvauRz": {
-    "defaultMessage": "Bangla (Bangladesh)"
-  },
-  "U8vSQS": {
-    "defaultMessage": "Bangla (India)"
-  },
-  "YQhbMR": {
-    "defaultMessage": "Norwegian (Norway)"
-  },
-  "ZWTTz6": {
-    "defaultMessage": "Polish (Poland)"
-  },
-  "Zgc/KO": {
-    "defaultMessage": "Spanish (United States)"
-  },
   "account.accordion.button.my_account": {
     "defaultMessage": "My Account"
   },
@@ -266,12 +164,6 @@
   },
   "auth_modal.password_reset_success.title.password_reset": {
     "defaultMessage": "Password Reset"
-  },
-  "b24hho": {
-    "defaultMessage": "Chinese (China)"
-  },
-  "b2zNZE": {
-    "defaultMessage": "Russian (Russian Federation)"
   },
   "card_payment_form.heading.new_payment_method": {
     "defaultMessage": "Add New Payment Method"
@@ -455,9 +347,6 @@
     "defaultMessage": "This {length}-digit code can be found on the {side} of your card.",
     "description": "Credit card security code help text"
   },
-  "d/RGdS": {
-    "defaultMessage": "Portuguese (Portugal)"
-  },
   "drawer_menu.button.account_details": {
     "defaultMessage": "Account Details"
   },
@@ -511,15 +400,6 @@
   },
   "drawer_menu.link.terms_and_conditions": {
     "defaultMessage": "Terms & Conditions"
-  },
-  "e//rzS": {
-    "defaultMessage": "Italian (Italy)"
-  },
-  "eSl9Vh": {
-    "defaultMessage": "Finnish (Finland)"
-  },
-  "eYVKts": {
-    "defaultMessage": "English (India)"
   },
   "empty_cart.description.empty_cart": {
     "defaultMessage": "Your Cart is Empty"
@@ -608,12 +488,6 @@
   "form_action_buttons.button.save": {
     "defaultMessage": "Save"
   },
-  "g3uXY2": {
-    "defaultMessage": "Swedish (Sweden)"
-  },
-  "gguIJ8": {
-    "defaultMessage": "Hindi (India)"
-  },
   "global.account.action.keep_item": {
     "defaultMessage": "No, keep item"
   },
@@ -679,9 +553,6 @@
   },
   "global.wishlist.title.confirm_remove": {
     "defaultMessage": "Confirm Remove Item"
-  },
-  "gzeOf+": {
-    "defaultMessage": "Chinese (Taiwan)"
   },
   "header.button.assistive_msg.logo": {
     "defaultMessage": "Logo"
@@ -782,9 +653,6 @@
   "home.title.react_starter_store": {
     "defaultMessage": "The React PWA Starter Store for Retail"
   },
-  "i0/00S": {
-    "defaultMessage": "English (Australia)"
-  },
   "item_attributes.label.promotions": {
     "defaultMessage": "Promotions"
   },
@@ -794,6 +662,165 @@
   "item_image.label.sale": {
     "defaultMessage": "Sale",
     "description": "A sale badge placed on top of a product image"
+  },
+  "locale_text.message.ar-SA": {
+    "defaultMessage": "Arabic (Saudi Arabia)"
+  },
+  "locale_text.message.bn-BD": {
+    "defaultMessage": "Bangla (Bangladesh)"
+  },
+  "locale_text.message.bn-IN": {
+    "defaultMessage": "Bangla (India)"
+  },
+  "locale_text.message.cs-CZ": {
+    "defaultMessage": "Czech (Czech Republic)"
+  },
+  "locale_text.message.da-DK": {
+    "defaultMessage": "Danish (Denmark)"
+  },
+  "locale_text.message.de-AT": {
+    "defaultMessage": "German (Austria)"
+  },
+  "locale_text.message.de-CH": {
+    "defaultMessage": "German (Switzerland)"
+  },
+  "locale_text.message.de-DE": {
+    "defaultMessage": "German (Germany)"
+  },
+  "locale_text.message.el-GR": {
+    "defaultMessage": "Greek (Greece)"
+  },
+  "locale_text.message.en-AU": {
+    "defaultMessage": "English (Australia)"
+  },
+  "locale_text.message.en-CA": {
+    "defaultMessage": "English (Canada)"
+  },
+  "locale_text.message.en-GB": {
+    "defaultMessage": "English (United Kingdom)"
+  },
+  "locale_text.message.en-IE": {
+    "defaultMessage": "English (Ireland)"
+  },
+  "locale_text.message.en-IN": {
+    "defaultMessage": "English (India)"
+  },
+  "locale_text.message.en-NZ": {
+    "defaultMessage": "English (New Zealand)"
+  },
+  "locale_text.message.en-US": {
+    "defaultMessage": "English (United States)"
+  },
+  "locale_text.message.en-ZA": {
+    "defaultMessage": "English (South Africa)"
+  },
+  "locale_text.message.es-AR": {
+    "defaultMessage": "Spanish (Argentina)"
+  },
+  "locale_text.message.es-CL": {
+    "defaultMessage": "Spanish (Chile)"
+  },
+  "locale_text.message.es-CO": {
+    "defaultMessage": "Spanish (Columbia)"
+  },
+  "locale_text.message.es-ES": {
+    "defaultMessage": "Spanish (Spain)"
+  },
+  "locale_text.message.es-MX": {
+    "defaultMessage": "Spanish (Mexico)"
+  },
+  "locale_text.message.es-US": {
+    "defaultMessage": "Spanish (United States)"
+  },
+  "locale_text.message.fi-FI": {
+    "defaultMessage": "Finnish (Finland)"
+  },
+  "locale_text.message.fr-BE": {
+    "defaultMessage": "French (Belgium)"
+  },
+  "locale_text.message.fr-CA": {
+    "defaultMessage": "French (Canada)"
+  },
+  "locale_text.message.fr-CH": {
+    "defaultMessage": "French (Switzerland)"
+  },
+  "locale_text.message.fr-FR": {
+    "defaultMessage": "French (France)"
+  },
+  "locale_text.message.he-IL": {
+    "defaultMessage": "Hebrew (Israel)"
+  },
+  "locale_text.message.hi-IN": {
+    "defaultMessage": "Hindi (India)"
+  },
+  "locale_text.message.hu-HU": {
+    "defaultMessage": "Hungarian (Hungary)"
+  },
+  "locale_text.message.id-ID": {
+    "defaultMessage": "Indonesian (Indonesia)"
+  },
+  "locale_text.message.it-CH": {
+    "defaultMessage": "Italian (Switzerland)"
+  },
+  "locale_text.message.it-IT": {
+    "defaultMessage": "Italian (Italy)"
+  },
+  "locale_text.message.ja-JP": {
+    "defaultMessage": "Japanese (Japan)"
+  },
+  "locale_text.message.ko-KR": {
+    "defaultMessage": "Korean (Republic of Korea)"
+  },
+  "locale_text.message.nl-BE": {
+    "defaultMessage": "Dutch (Belgium)"
+  },
+  "locale_text.message.nl-NL": {
+    "defaultMessage": "Dutch (The Netherlands)"
+  },
+  "locale_text.message.no-NO": {
+    "defaultMessage": "Norwegian (Norway)"
+  },
+  "locale_text.message.pl-PL": {
+    "defaultMessage": "Polish (Poland)"
+  },
+  "locale_text.message.pt-BR": {
+    "defaultMessage": "Portuguese (Brazil)"
+  },
+  "locale_text.message.pt-PT": {
+    "defaultMessage": "Portuguese (Portugal)"
+  },
+  "locale_text.message.ro-RO": {
+    "defaultMessage": "Romanian (Romania)"
+  },
+  "locale_text.message.ru-RU": {
+    "defaultMessage": "Russian (Russian Federation)"
+  },
+  "locale_text.message.sk-SK": {
+    "defaultMessage": "Slovak (Slovakia)"
+  },
+  "locale_text.message.sv-SE": {
+    "defaultMessage": "Swedish (Sweden)"
+  },
+  "locale_text.message.ta-IN": {
+    "defaultMessage": "Tamil (India)"
+  },
+  "locale_text.message.ta-LK": {
+    "defaultMessage": "Tamil (Sri Lanka)"
+  },
+  "locale_text.message.th-TH": {
+    "defaultMessage": "Thai (Thailand)"
+  },
+  "locale_text.message.tr-TR": {
+    "defaultMessage": "Turkish (Turkey)"
+  },
+  "locale_text.message.zh-CN": {
+    "defaultMessage": "Chinese (China)"
+  },
+  "locale_text.message.zh-HK": {
+    "defaultMessage": "Chinese (Hong Kong)"
+  },
+  "locale_text.message.zh-TW": {
+    "defaultMessage": "Chinese (Taiwan)"
   },
   "login.error.incorrect_username_password": {
     "defaultMessage": "Incorrect username or password, please try again."
@@ -812,12 +839,6 @@
   },
   "login_form.message.welcome_back": {
     "defaultMessage": "Welcome Back"
-  },
-  "n/iZlE": {
-    "defaultMessage": "Spanish (Chile)"
-  },
-  "n9j5bS": {
-    "defaultMessage": "Turkish (Turkey)"
   },
   "offline_banner.description.browsing_offline_mode": {
     "defaultMessage": "You're currently browsing in offline mode"
@@ -1030,9 +1051,6 @@
   "promocode.accordion.button.have_promocode": {
     "defaultMessage": "Do you have a promo code?"
   },
-  "rU+Ph/": {
-    "defaultMessage": "Dutch (The Netherlands)"
-  },
   "recent_searches.action.clear_searches": {
     "defaultMessage": "Clear recent searches"
   },
@@ -1142,20 +1160,8 @@
   "signout_confirmation_dialog.message.sure_to_sign_out": {
     "defaultMessage": "Are you sure you want to sign out? You will need to sign back in to proceed with your current order."
   },
-  "tYBua6": {
-    "defaultMessage": "Indonesian (Indonesia)"
-  },
-  "tclGo+": {
-    "defaultMessage": "Arabic (Saudi Arabia)"
-  },
-  "tnSBvt": {
-    "defaultMessage": "Korean (Republic of Korea)"
-  },
   "toggle_card.action.edit": {
     "defaultMessage": "Edit"
-  },
-  "uCdcPZ": {
-    "defaultMessage": "Romanian (Romania)"
   },
   "update_password_fields.button.forgot_password": {
     "defaultMessage": "Forgot password?"
@@ -1397,12 +1403,6 @@
   "use_update_password_fields.label.new_password": {
     "defaultMessage": "New Password"
   },
-  "vMvXOp": {
-    "defaultMessage": "Greek (Greece)"
-  },
-  "vSNTMO": {
-    "defaultMessage": "Italian (Switzerland)"
-  },
   "wishlist_primary_action.info.added_to_cart": {
     "defaultMessage": "{quantity} {quantity, plural, one {item} other {items}} added to cart"
   },
@@ -1414,8 +1414,5 @@
   },
   "with_registration.info.please_sign_in": {
     "defaultMessage": "Please sign in to continue!"
-  },
-  "zdzY+u": {
-    "defaultMessage": "English (South Africa)"
   }
 }

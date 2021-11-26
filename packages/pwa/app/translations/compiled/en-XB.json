@@ -1,504 +1,4 @@
 {
-  "+MBxFF": [
-    {
-      "type": 0,
-      "value": "[!! Ḕńĝĝĝĺíśśśḫ (Ũńíííṭèḋḋḋ Ṡṭṭṭâṭèèèś) !!]"
-    }
-  ],
-  "+O5yEM": [
-    {
-      "type": 0,
-      "value": "[!! Ṕŕŏŏŏṁŏṭṭṭíŏńńńś ḀḀḀṗṗĺĺĺíèḋḋḋ !!]"
-    }
-  ],
-  "+ZbX4W": [
-    {
-      "type": 0,
-      "value": "[!! Ḉẓèèèćḫ (Ḉẓẓẓèćḫḫḫ Ŕèèèṗůḃḃḃĺíććć) !!]"
-    }
-  ],
-  "0Tjkj3": [
-    {
-      "type": 0,
-      "value": "[!! Ḡèŕŕŕṁâńńń (ḀḀḀůśṭṭṭŕíâââ) !!]"
-    }
-  ],
-  "0n0dWe": [
-    {
-      "type": 0,
-      "value": "[!! Ḣèḃḃḃŕèẘẘẘ (ḬḬḬśŕâââèĺ) !!]"
-    }
-  ],
-  "1LE+iY": [
-    {
-      "type": 0,
-      "value": "[!! Ṡèèèè ḟůůůĺĺ ḋèṭṭṭâíĺĺĺś !!]"
-    }
-  ],
-  "1LblQ6": [
-    {
-      "type": 0,
-      "value": "[!! Ḉâŕŕŕṭ ṠṠṠůḃṭṭṭŏṭâââĺ ( !!]"
-    },
-    {
-      "type": 1,
-      "value": "itemAccumulatedCount"
-    },
-    {
-      "type": 0,
-      "value": "[!!  íṭṭṭèṁ) !!]"
-    }
-  ],
-  "1b9Q93": [
-    {
-      "type": 0,
-      "value": "[!! Ÿŏůůů ẘíííĺĺ ŕèćććèíṿṿṿè âââń èèèṁâíííĺ âââṭ  !!]"
-    },
-    {
-      "children": [
-        {
-          "type": 1,
-          "value": "email"
-        }
-      ],
-      "type": 8,
-      "value": "b"
-    },
-    {
-      "type": 0,
-      "value": "[!!  ẘíííṭḫ â ĺĺĺíńǩǩǩ ṭŏŏŏ ŕèèèśèṭṭṭ ẏŏŏŏůŕ ṗâśśśśẘŏŏŏŕḋ śḫŏŏŏŕṭĺĺĺẏ. !!]"
-    }
-  ],
-  "1g+gvg": [
-    {
-      "type": 0,
-      "value": "[!! Ḟŕèèèńćḫḫḫ (ḂḂḂèĺĝĝĝíůṁṁṁ) !!]"
-    }
-  ],
-  "26gvH3": [
-    {
-      "type": 0,
-      "value": "[!! Ḟŕèèèńćḫḫḫ (ḈḈḈâńâââḋâ) !!]"
-    }
-  ],
-  "2BHb6K": [
-    {
-      "type": 0,
-      "value": "[!! Ḁṗṗṗṗĺíèèèḋ ṗṗṗŕŏṁṁṁŏṭíííŏńśśś íńńńḟŏ !!]"
-    }
-  ],
-  "2WRHXI": [
-    {
-      "type": 1,
-      "value": "quantity"
-    },
-    {
-      "type": 0,
-      "value": "[!!   !!]"
-    },
-    {
-      "offset": 0,
-      "options": {
-        "one": {
-          "value": [
-            {
-              "type": 0,
-              "value": "[!! íṭèèèṁ !!]"
-            }
-          ]
-        },
-        "other": {
-          "value": [
-            {
-              "type": 0,
-              "value": "[!! íṭèèèṁś !!]"
-            }
-          ]
-        }
-      },
-      "pluralType": "cardinal",
-      "type": 6,
-      "value": "quantity"
-    },
-    {
-      "type": 0,
-      "value": "[!!  âḋḋḋḋèḋḋḋ ṭŏŏŏ ćâââŕṭ !!]"
-    }
-  ],
-  "3HK3af": [
-    {
-      "type": 0,
-      "value": "[!! Ũńǩǩǩńŏẘẘẘń  !!]"
-    },
-    {
-      "type": 1,
-      "value": "localeShortCode"
-    }
-  ],
-  "4UPOXx": [
-    {
-      "type": 0,
-      "value": "[!! Ḉŏńńńḟíŕŕŕṁ ŔŔŔèṁŏŏŏṿè Ḭṭèèèṁ !!]"
-    }
-  ],
-  "5BTYa0": [
-    {
-      "type": 0,
-      "value": "[!! Ṽíèèèẘ ḈḈḈâŕṭṭṭ !!]"
-    }
-  ],
-  "5e/Fjo": [
-    {
-      "type": 0,
-      "value": "[!! Ṕŏŕŕŕṭůĝĝĝůèśśśè (Ḃŕâââẓíĺĺĺ) !!]"
-    }
-  ],
-  "5ryYe9": [
-    {
-      "type": 0,
-      "value": "[!! Ĵâṗṗṗâńèèèśè (Ĵâââṗâńńń) !!]"
-    }
-  ],
-  "68qUv0": [
-    {
-      "type": 0,
-      "value": "[!! Ḉḫíííńèśśśè (Ḣŏńńńĝ ḴḴḴŏńĝĝĝ) !!]"
-    }
-  ],
-  "74fug6": [
-    {
-      "type": 0,
-      "value": "[!! Ṯâṁṁṁíĺ (Ḭńńńḋíâââ) !!]"
-    }
-  ],
-  "7gXPhB": [
-    {
-      "type": 0,
-      "value": "[!! Ɋṭẏẏẏ !!]"
-    }
-  ],
-  "8CDRAt": [
-    {
-      "type": 0,
-      "value": "[!! Ṡṗâââńíśśśḫ (Ḿèẋẋẋíćŏŏŏ) !!]"
-    }
-  ],
-  "9Npj92": [
-    {
-      "type": 0,
-      "value": "[!! Ḕńṭṭṭèŕ ẏŏůůůŕ èèèṁâíííĺ ṭṭṭŏ ŕŕŕèćèèèíṿèèè íńńńśṭŕŕŕůćṭṭṭíŏńńńś ŏŏŏń ḫḫḫŏẘ ṭŏ ŕèśśśèṭ ẏŏůůůŕ ṗṗṗâśśśśẘŏŕŕŕḋ !!]"
-    }
-  ],
-  "9rqdrm": [
-    {
-      "type": 0,
-      "value": "[!! Ḭṭèèèṁ ŕŕŕèṁŏŏŏṿèḋḋḋ ḟŕŕŕŏṁ ẘíśśśḫĺíííśṭ !!]"
-    }
-  ],
-  "A2v4cr": [
-    {
-      "type": 0,
-      "value": "[!! Ḕńĝĝĝĺíśśśḫ (Ũńíííṭèḋḋḋ Ḵíííńĝḋḋḋŏṁ) !!]"
-    }
-  ],
-  "ABWZu0": [
-    {
-      "type": 0,
-      "value": "[!! Ṡṗâââńíśśśḫ (Ḁŕĝĝĝèńṭṭṭíńâââ) !!]"
-    }
-  ],
-  "ADKef8": [
-    {
-      "type": 0,
-      "value": "[!! Ḁḋḋḋḋ ṭŏŏŏ ćâââŕṭ !!]"
-    }
-  ],
-  "AiDBu2": [
-    {
-      "type": 0,
-      "value": "[!! Ṡĺŏŏŏṿâǩǩǩ (ṠṠṠĺŏṿṿṿâǩíííâ) !!]"
-    }
-  ],
-  "BWpuKl": [
-    {
-      "type": 0,
-      "value": "[!! Ũṗḋḋḋâṭèèè !!]"
-    }
-  ],
-  "Cl4TrE": [
-    {
-      "type": 0,
-      "value": "[!! Ḁḋḋḋḋ ṭŏŏŏ ẘíííśḫĺĺĺíśṭṭṭ !!]"
-    }
-  ],
-  "CutQ+m": [
-    {
-      "type": 0,
-      "value": "[!! Ṡṗâââńíśśśḫ (Ḉŏĺĺĺůṁḃḃḃíâ) !!]"
-    }
-  ],
-  "D8RblK": [
-    {
-      "type": 0,
-      "value": "[!! Ḋŏ ẏŏůůů ḫâââṿè â ṗṗṗŕŏṁṁṁŏ ćććŏḋèèè? !!]"
-    }
-  ],
-  "DdR2q8": [
-    {
-      "type": 1,
-      "value": "quantity"
-    },
-    {
-      "type": 0,
-      "value": "[!!   !!]"
-    },
-    {
-      "offset": 0,
-      "options": {
-        "one": {
-          "value": [
-            {
-              "type": 0,
-              "value": "[!! íṭèèèṁ !!]"
-            }
-          ]
-        },
-        "other": {
-          "value": [
-            {
-              "type": 0,
-              "value": "[!! íṭèèèṁś !!]"
-            }
-          ]
-        }
-      },
-      "pluralType": "cardinal",
-      "type": 6,
-      "value": "quantity"
-    },
-    {
-      "type": 0,
-      "value": "[!!  âḋḋḋḋèḋḋḋ ṭŏŏŏ ẘíííśḫĺĺĺíśṭṭṭ !!]"
-    }
-  ],
-  "DwzDiL": [
-    {
-      "type": 0,
-      "value": "[!! Ḉĺèèèâŕ ŕèćććèńṭṭṭ śèèèâŕćććḫèśśś !!]"
-    }
-  ],
-  "EOUB63": [
-    {
-      "type": 0,
-      "value": "[!! Õńĺĺĺẏ  !!]"
-    },
-    {
-      "type": 1,
-      "value": "stockLevel"
-    },
-    {
-      "type": 0,
-      "value": "[!!  Ļèèèḟṭ! !!]"
-    }
-  ],
-  "ES4Hjg": [
-    {
-      "type": 0,
-      "value": "[!! Ḋâńńńíśḫḫḫ (ḊḊḊèńṁṁṁâŕǩǩǩ) !!]"
-    }
-  ],
-  "Ihg+6O": [
-    {
-      "type": 0,
-      "value": "[!! Ļèṭṭṭ'ś ĝèṭṭṭ śṭṭṭâŕṭṭṭèḋ !!]"
-    }
-  ],
-  "KE5qj+": [
-    {
-      "type": 0,
-      "value": "[!! Ḟŕèèèńćḫḫḫ (ṠṠṠẘíṭṭṭẓèŕŕŕĺâńńńḋ) !!]"
-    }
-  ],
-  "MQHbcd": [
-    {
-      "type": 0,
-      "value": "[!! Ḕńĝĝĝĺíśśśḫ (Ḉâńńńâḋâââ) !!]"
-    }
-  ],
-  "O8DHNx": [
-    {
-      "type": 0,
-      "value": "[!! Ḉḫèèèćǩ ṭḫèèè ćŏŏŏḋè âńḋḋḋ ṭŕŕŕẏ âââĝâíííń, íṭ ṁâẏẏẏ âĺĺĺŕèâââḋẏ ḃè âṗṗṗṗĺíèèèḋ ŏŏŏŕ ṭṭṭḫè ṗŕŏŏŏṁŏ ḫâśśś èẋẋẋṗíŕŕŕèḋ !!]"
-    }
-  ],
-  "O8s+yR": [
-    {
-      "type": 0,
-      "value": "[!! Ṡṗâââńíśśśḫ (Ṡṗâââíń) !!]"
-    }
-  ],
-  "ONNUqG": [
-    {
-      "type": 0,
-      "value": "[!! Ḃẏ ćŕèèèâṭíííńĝ âń âććććŏůńńńṭ, ẏŏůůů âĝĝĝŕèèèè ṭŏŏŏ Ṡâââĺèśśśḟŏŕŕŕćè’ś  !!]"
-    },
-    {
-      "children": [
-        {
-          "type": 0,
-          "value": "[!! Ṕŕíííṿâćććẏ ṔṔṔŏĺíííćẏ !!]"
-        }
-      ],
-      "type": 8,
-      "value": "policy"
-    },
-    {
-      "type": 0,
-      "value": "[!!  âńńńḋ  !!]"
-    },
-    {
-      "children": [
-        {
-          "type": 0,
-          "value": "[!! Ṯèŕŕŕṁś & ḈḈḈŏńḋḋḋíṭíííŏńśśś !!]"
-        }
-      ],
-      "type": 8,
-      "value": "terms"
-    }
-  ],
-  "OVvfLK": [
-    {
-      "type": 0,
-      "value": "[!! Ÿŏůůů'ŕèèè ńŏŏŏẘ śśśíĝńńńèḋ íń !!]"
-    }
-  ],
-  "OkmnSf": [
-    {
-      "type": 0,
-      "value": "[!! Ḣůńńńĝâŕŕŕíâńńń (ḢḢḢůńĝĝĝâŕẏẏẏ) !!]"
-    }
-  ],
-  "P87iMu": [
-    {
-      "type": 0,
-      "value": "[!! Ṯâṁṁṁíĺ (Ṡŕŕŕí ĻĻĻâńǩǩǩâ) !!]"
-    }
-  ],
-  "PEVXku": [
-    {
-      "type": 0,
-      "value": "[!! Ṯḫâââí (Ṯḫâââíĺâââńḋ) !!]"
-    }
-  ],
-  "PO4nBj": [
-    {
-      "type": 0,
-      "value": "[!! Ḟŕèèèńćḫḫḫ (ḞḞḞŕâńńńćè) !!]"
-    }
-  ],
-  "QEUh37": [
-    {
-      "type": 0,
-      "value": "[!! Ḕńĝĝĝĺíśśśḫ (Ḭŕèèèĺâńńńḋ) !!]"
-    }
-  ],
-  "Qb4dDN": [
-    {
-      "type": 0,
-      "value": "[!! Ḡèŕŕŕṁâńńń (ṠṠṠẘíṭṭṭẓèŕŕŕĺâńńńḋ) !!]"
-    }
-  ],
-  "SFjs9b": [
-    {
-      "type": 0,
-      "value": "[!! Ḕńĝĝĝĺíśśśḫ (Ŋèẘẘẘ Ƶèèèâĺâââńḋ) !!]"
-    }
-  ],
-  "SQJto2": [
-    {
-      "type": 0,
-      "value": "[!! Ṡíĝĝĝń íííń !!]"
-    }
-  ],
-  "SRkOX8": [
-    {
-      "type": 0,
-      "value": "[!! Ŋŏ, ǩèèèèṗ íṭèèèṁ !!]"
-    }
-  ],
-  "SXDujd": [
-    {
-      "type": 0,
-      "value": "[!! Ḋůṭṭṭćḫ (Ḃèèèĺĝíííůṁ) !!]"
-    }
-  ],
-  "T8HBFR": [
-    {
-      "type": 0,
-      "value": "[!! Ḡèŕŕŕṁâńńń (ḠḠḠèŕṁṁṁâńẏẏẏ) !!]"
-    }
-  ],
-  "TR+DHM": [
-    {
-      "type": 0,
-      "value": "[!! Õŕ ŕèṭṭṭůŕńńń ṭŏŏŏ !!]"
-    }
-  ],
-  "TvauRz": [
-    {
-      "type": 0,
-      "value": "[!! Ḃâńńńĝĺâââ (ḂḂḂâńĝĝĝĺâḋḋḋèśḫḫḫ) !!]"
-    }
-  ],
-  "U8vSQS": [
-    {
-      "type": 0,
-      "value": "[!! Ḃâńńńĝĺâââ (ḬḬḬńḋíííâ) !!]"
-    }
-  ],
-  "UE9zNR": [
-    {
-      "type": 0,
-      "value": "[!! Ŕèćććèńṭṭṭ Ṡèèèâŕćććḫèśśś !!]"
-    }
-  ],
-  "WHgdsk": [
-    {
-      "type": 0,
-      "value": "[!! Õůṭṭṭ ŏḟḟḟ śṭṭṭŏćǩǩǩ !!]"
-    }
-  ],
-  "YQhbMR": [
-    {
-      "type": 0,
-      "value": "[!! Ŋŏŕŕŕẘèĝĝĝíâńńń (ŊŊŊŏŕẘẘẘâẏ) !!]"
-    }
-  ],
-  "Yy/yDL": [
-    {
-      "type": 0,
-      "value": "[!! Ŕèśśśèṭ ṗâśśśśẘŏŏŏŕḋ !!]"
-    }
-  ],
-  "ZMphaV": [
-    {
-      "type": 0,
-      "value": "[!! Ṕŕŏŏŏṁŏṭṭṭíŏńńń âṗṗṗṗĺíííèḋ !!]"
-    }
-  ],
-  "ZWTTz6": [
-    {
-      "type": 0,
-      "value": "[!! Ṕŏĺĺĺíśḫḫḫ (ṔṔṔŏĺâââńḋ) !!]"
-    }
-  ],
-  "Zgc/KO": [
-    {
-      "type": 0,
-      "value": "[!! Ṡṗâââńíśśśḫ (Ũńíííṭèḋḋḋ Ṡṭṭṭâṭèèèś) !!]"
-    }
-  ],
   "account.accordion.button.my_account": [
     {
       "type": 0,
@@ -785,22 +285,138 @@
       "value": "[!! Ŕèṁṁṁŏṿèèè !!]"
     }
   ],
-  "b24hho": [
+  "add_to_cart_modal.info.added_to_cart": [
+    {
+      "type": 1,
+      "value": "quantity"
+    },
     {
       "type": 0,
-      "value": "[!! Ḉḫíííńèśśśè (Ḉḫíííńâ) !!]"
+      "value": "[!!   !!]"
+    },
+    {
+      "offset": 0,
+      "options": {
+        "one": {
+          "value": [
+            {
+              "type": 0,
+              "value": "[!! íṭèèèṁ !!]"
+            }
+          ]
+        },
+        "other": {
+          "value": [
+            {
+              "type": 0,
+              "value": "[!! íṭèèèṁś !!]"
+            }
+          ]
+        }
+      },
+      "pluralType": "cardinal",
+      "type": 6,
+      "value": "quantity"
+    },
+    {
+      "type": 0,
+      "value": "[!!  âḋḋḋḋèḋḋḋ ṭŏŏŏ ćâââŕṭ !!]"
     }
   ],
-  "b2zNZE": [
+  "add_to_cart_modal.label.cart_subtotal": [
     {
       "type": 0,
-      "value": "[!! Ŕůśśśśíâââń (Ŕůśśśśíâââń ḞḞḞèḋèèèŕâṭṭṭíŏńńń) !!]"
+      "value": "[!! Ḉâŕŕŕṭ ṠṠṠůḃṭṭṭŏṭâââĺ ( !!]"
+    },
+    {
+      "type": 1,
+      "value": "itemAccumulatedCount"
+    },
+    {
+      "type": 0,
+      "value": "[!!  íṭṭṭèṁ) !!]"
     }
   ],
-  "bk7ZVA": [
+  "add_to_cart_modal.label.quantity": [
     {
       "type": 0,
-      "value": "[!! Ḁŕèèè ẏŏŏŏů śśśůŕèèè ẏŏŏŏů ẘẘẘâńṭṭṭ ṭŏŏŏ ŕèèèṁŏṿṿṿè ṭṭṭḫíśśś íṭṭṭèṁ ? !!]"
+      "value": "[!! Ɋṭẏẏẏ !!]"
+    }
+  ],
+  "add_to_cart_modal.link.checkout": [
+    {
+      "type": 0,
+      "value": "[!! Ṕŕŏŏŏćèèèèḋ ṭṭṭŏ ḈḈḈḫèćććǩŏůůůṭ !!]"
+    }
+  ],
+  "add_to_cart_modal.link.view_cart": [
+    {
+      "type": 0,
+      "value": "[!! Ṽíèèèẘ ḈḈḈâŕṭṭṭ !!]"
+    }
+  ],
+  "add_to_cart_modal.recommended_products.title.might_also_like": [
+    {
+      "type": 0,
+      "value": "[!! Ÿŏůůů Ḿíííĝḫṭṭṭ Ḁĺĺĺśŏ Ļíǩǩǩè !!]"
+    }
+  ],
+  "auth_modal.description.now_signed_in": [
+    {
+      "type": 0,
+      "value": "[!! Ÿŏůůů'ŕèèè ńŏŏŏẘ śśśíĝńńńèḋ íń !!]"
+    }
+  ],
+  "auth_modal.error.incorrect_email_password": [
+    {
+      "type": 0,
+      "value": "[!! Ṡŏṁṁṁèṭḫḫḫíńĝĝĝ'ś ńŏṭṭṭ ŕíííĝḫṭṭṭ ẘíííṭḫ ẏŏůůůŕ èèèṁâíííĺ ŏŏŏŕ ṗṗṗâśśśśẘŏŕŕŕḋ. Ṯŕẏẏẏ âĝĝĝâíńńń. !!]"
+    }
+  ],
+  "auth_modal.info.welcome_user": [
+    {
+      "type": 0,
+      "value": "[!! Ẅèĺĺĺćŏṁṁṁè  !!]"
+    },
+    {
+      "type": 1,
+      "value": "name"
+    },
+    {
+      "type": 0,
+      "value": "[!! , !!]"
+    }
+  ],
+  "auth_modal.password_reset_success.button.back_to_sign_in": [
+    {
+      "type": 0,
+      "value": "[!! Ḃâćććǩ ṭṭṭŏ śśśíĝńńń íńńń !!]"
+    }
+  ],
+  "auth_modal.password_reset_success.info.will_email_shortly": [
+    {
+      "type": 0,
+      "value": "[!! Ÿŏůůů ẘíííĺĺ ŕèćććèíṿṿṿè âââń èèèṁâíííĺ âââṭ  !!]"
+    },
+    {
+      "children": [
+        {
+          "type": 1,
+          "value": "email"
+        }
+      ],
+      "type": 8,
+      "value": "b"
+    },
+    {
+      "type": 0,
+      "value": "[!!  ẘíííṭḫ â ĺĺĺíńǩǩǩ ṭŏŏŏ ŕèèèśèṭṭṭ ẏŏŏŏůŕ ṗâśśśśẘŏŏŏŕḋ śḫŏŏŏŕṭĺĺĺẏ. !!]"
+    }
+  ],
+  "auth_modal.password_reset_success.title.password_reset": [
+    {
+      "type": 0,
+      "value": "[!! Ṕâśśśśẘŏŏŏŕḋ Ŕèśśśèṭ !!]"
     }
   ],
   "card_payment_form.heading.new_payment_method": [
@@ -1301,18 +917,6 @@
       "value": "[!!  ŏḟḟḟ ẏŏŏŏůŕ ćâŕŕŕḋ. !!]"
     }
   ],
-  "d/RGdS": [
-    {
-      "type": 0,
-      "value": "[!! Ṕŏŕŕŕṭůĝĝĝůèśśśè (Ṕŏŕŕŕṭůĝĝĝâĺ) !!]"
-    }
-  ],
-  "dfEp3Z": [
-    {
-      "type": 0,
-      "value": "[!! Ÿèśśś, ŕŕŕèṁŏŏŏṿè íṭèèèṁ !!]"
-    }
-  ],
   "drawer_menu.button.account_details": [
     {
       "type": 0,
@@ -1421,24 +1025,6 @@
       "value": "[!! Ṯèŕŕŕṁś & ḈḈḈŏńḋḋḋíṭíííŏńśśś !!]"
     }
   ],
-  "e//rzS": [
-    {
-      "type": 0,
-      "value": "[!! Ḭṭâââĺíâââń (Ḭṭâââĺẏ) !!]"
-    }
-  ],
-  "eSl9Vh": [
-    {
-      "type": 0,
-      "value": "[!! Ḟíńńńńíśśśḫ (Ḟíńńńĺâńńńḋ) !!]"
-    }
-  ],
-  "eYVKts": [
-    {
-      "type": 0,
-      "value": "[!! Ḕńĝĝĝĺíśśśḫ (Ḭńḋḋḋíâ) !!]"
-    }
-  ],
   "empty_cart.description.empty_cart": [
     {
       "type": 0,
@@ -1531,12 +1117,6 @@
     {
       "type": 0,
       "value": "[!! Ṯŏṗṗṗ Ṡèèèĺĺèèèŕś !!]"
-    }
-  ],
-  "fG2sM9": [
-    {
-      "type": 0,
-      "value": "[!! Ṕĺèèèâśèèè śíííĝń íń ṭŏ ćŏńńńṭíńńńůè! !!]"
     }
   ],
   "footer.column.account": [
@@ -1645,18 +1225,6 @@
     {
       "type": 0,
       "value": "[!! Ṡâṿṿṿè !!]"
-    }
-  ],
-  "g3uXY2": [
-    {
-      "type": 0,
-      "value": "[!! Ṡẘèèèḋíśśśḫ (Ṡẘèèèḋèńńń) !!]"
-    }
-  ],
-  "gguIJ8": [
-    {
-      "type": 0,
-      "value": "[!! Ḣíńńńḋí (Ḭńńńḋíâââ) !!]"
     }
   ],
   "global.account.action.keep_item": [
@@ -1789,12 +1357,6 @@
     {
       "type": 0,
       "value": "[!! Ḉŏńńńḟíŕŕŕṁ ŔŔŔèṁŏŏŏṿè Ḭṭèèèṁ !!]"
-    }
-  ],
-  "gzeOf+": [
-    {
-      "type": 0,
-      "value": "[!! Ḉḫíííńèśśśè (Ṯâíííẘâńńń) !!]"
     }
   ],
   "header.button.assistive_msg.logo": [
@@ -2011,18 +1573,6 @@
       "value": "[!! Ṯḫèèè Ŕèèèâćṭṭṭ ṔẄẄẄḀ ṠṠṠṭâŕŕŕṭèŕŕŕ Ṡṭṭṭŏŕèèè ḟŏŏŏŕ ŔŔŔèṭâââíĺ !!]"
     }
   ],
-  "huqKGl": [
-    {
-      "type": 0,
-      "value": "[!! Ḉŕèèèâṭèèè âććććŏůůůńṭ !!]"
-    }
-  ],
-  "i0/00S": [
-    {
-      "type": 0,
-      "value": "[!! Ḕńĝĝĝĺíśśśḫ (Ḁůśśśṭŕâââĺíâââ) !!]"
-    }
-  ],
   "item_attributes.label.promotions": [
     {
       "type": 0,
@@ -2045,18 +1595,322 @@
       "value": "[!! Ṡâĺĺĺè !!]"
     }
   ],
-  "llHgJz": [
+  "locale_text.message.ar-SA": [
     {
       "type": 0,
-      "value": "[!! Ẅèĺĺĺćŏṁṁṁè  !!]"
-    },
-    {
-      "type": 1,
-      "value": "name"
-    },
+      "value": "[!! Ḁŕâââḃíććć (ṠṠṠâůḋḋḋí ḀḀḀŕâḃḃḃíâ) !!]"
+    }
+  ],
+  "locale_text.message.bn-BD": [
     {
       "type": 0,
-      "value": "[!! , !!]"
+      "value": "[!! Ḃâńńńĝĺâââ (ḂḂḂâńĝĝĝĺâḋḋḋèśḫḫḫ) !!]"
+    }
+  ],
+  "locale_text.message.bn-IN": [
+    {
+      "type": 0,
+      "value": "[!! Ḃâńńńĝĺâââ (ḬḬḬńḋíííâ) !!]"
+    }
+  ],
+  "locale_text.message.cs-CZ": [
+    {
+      "type": 0,
+      "value": "[!! Ḉẓèèèćḫ (Ḉẓẓẓèćḫḫḫ Ŕèèèṗůḃḃḃĺíććć) !!]"
+    }
+  ],
+  "locale_text.message.da-DK": [
+    {
+      "type": 0,
+      "value": "[!! Ḋâńńńíśḫḫḫ (ḊḊḊèńṁṁṁâŕǩǩǩ) !!]"
+    }
+  ],
+  "locale_text.message.de-AT": [
+    {
+      "type": 0,
+      "value": "[!! Ḡèŕŕŕṁâńńń (ḀḀḀůśṭṭṭŕíâââ) !!]"
+    }
+  ],
+  "locale_text.message.de-CH": [
+    {
+      "type": 0,
+      "value": "[!! Ḡèŕŕŕṁâńńń (ṠṠṠẘíṭṭṭẓèŕŕŕĺâńńńḋ) !!]"
+    }
+  ],
+  "locale_text.message.de-DE": [
+    {
+      "type": 0,
+      "value": "[!! Ḡèŕŕŕṁâńńń (ḠḠḠèŕṁṁṁâńẏẏẏ) !!]"
+    }
+  ],
+  "locale_text.message.el-GR": [
+    {
+      "type": 0,
+      "value": "[!! Ḡŕèèèèǩ (Ḡŕŕŕèèćććè) !!]"
+    }
+  ],
+  "locale_text.message.en-AU": [
+    {
+      "type": 0,
+      "value": "[!! Ḕńĝĝĝĺíśśśḫ (Ḁůśśśṭŕâââĺíâââ) !!]"
+    }
+  ],
+  "locale_text.message.en-CA": [
+    {
+      "type": 0,
+      "value": "[!! Ḕńĝĝĝĺíśśśḫ (Ḉâńńńâḋâââ) !!]"
+    }
+  ],
+  "locale_text.message.en-GB": [
+    {
+      "type": 0,
+      "value": "[!! Ḕńĝĝĝĺíśśśḫ (Ũńíííṭèḋḋḋ Ḵíííńĝḋḋḋŏṁ) !!]"
+    }
+  ],
+  "locale_text.message.en-IE": [
+    {
+      "type": 0,
+      "value": "[!! Ḕńĝĝĝĺíśśśḫ (Ḭŕèèèĺâńńńḋ) !!]"
+    }
+  ],
+  "locale_text.message.en-IN": [
+    {
+      "type": 0,
+      "value": "[!! Ḕńĝĝĝĺíśśśḫ (Ḭńḋḋḋíâ) !!]"
+    }
+  ],
+  "locale_text.message.en-NZ": [
+    {
+      "type": 0,
+      "value": "[!! Ḕńĝĝĝĺíśśśḫ (Ŋèẘẘẘ Ƶèèèâĺâââńḋ) !!]"
+    }
+  ],
+  "locale_text.message.en-US": [
+    {
+      "type": 0,
+      "value": "[!! Ḕńĝĝĝĺíśśśḫ (Ũńíííṭèḋḋḋ Ṡṭṭṭâṭèèèś) !!]"
+    }
+  ],
+  "locale_text.message.en-ZA": [
+    {
+      "type": 0,
+      "value": "[!! Ḕńĝĝĝĺíśśśḫ (Ṡŏůůůṭḫ Ḁḟŕŕŕíćâââ) !!]"
+    }
+  ],
+  "locale_text.message.es-AR": [
+    {
+      "type": 0,
+      "value": "[!! Ṡṗâââńíśśśḫ (Ḁŕĝĝĝèńṭṭṭíńâââ) !!]"
+    }
+  ],
+  "locale_text.message.es-CL": [
+    {
+      "type": 0,
+      "value": "[!! Ṡṗâââńíśśśḫ (Ḉḫíííĺè) !!]"
+    }
+  ],
+  "locale_text.message.es-CO": [
+    {
+      "type": 0,
+      "value": "[!! Ṡṗâââńíśśśḫ (Ḉŏĺĺĺůṁḃḃḃíâ) !!]"
+    }
+  ],
+  "locale_text.message.es-ES": [
+    {
+      "type": 0,
+      "value": "[!! Ṡṗâââńíśśśḫ (Ṡṗâââíń) !!]"
+    }
+  ],
+  "locale_text.message.es-MX": [
+    {
+      "type": 0,
+      "value": "[!! Ṡṗâââńíśśśḫ (Ḿèẋẋẋíćŏŏŏ) !!]"
+    }
+  ],
+  "locale_text.message.es-US": [
+    {
+      "type": 0,
+      "value": "[!! Ṡṗâââńíśśśḫ (Ũńíííṭèḋḋḋ Ṡṭṭṭâṭèèèś) !!]"
+    }
+  ],
+  "locale_text.message.fi-FI": [
+    {
+      "type": 0,
+      "value": "[!! Ḟíńńńńíśśśḫ (Ḟíńńńĺâńńńḋ) !!]"
+    }
+  ],
+  "locale_text.message.fr-BE": [
+    {
+      "type": 0,
+      "value": "[!! Ḟŕèèèńćḫḫḫ (ḂḂḂèĺĝĝĝíůṁṁṁ) !!]"
+    }
+  ],
+  "locale_text.message.fr-CA": [
+    {
+      "type": 0,
+      "value": "[!! Ḟŕèèèńćḫḫḫ (ḈḈḈâńâââḋâ) !!]"
+    }
+  ],
+  "locale_text.message.fr-CH": [
+    {
+      "type": 0,
+      "value": "[!! Ḟŕèèèńćḫḫḫ (ṠṠṠẘíṭṭṭẓèŕŕŕĺâńńńḋ) !!]"
+    }
+  ],
+  "locale_text.message.fr-FR": [
+    {
+      "type": 0,
+      "value": "[!! Ḟŕèèèńćḫḫḫ (ḞḞḞŕâńńńćè) !!]"
+    }
+  ],
+  "locale_text.message.he-IL": [
+    {
+      "type": 0,
+      "value": "[!! Ḣèḃḃḃŕèẘẘẘ (ḬḬḬśŕâââèĺ) !!]"
+    }
+  ],
+  "locale_text.message.hi-IN": [
+    {
+      "type": 0,
+      "value": "[!! Ḣíńńńḋí (Ḭńńńḋíâââ) !!]"
+    }
+  ],
+  "locale_text.message.hu-HU": [
+    {
+      "type": 0,
+      "value": "[!! Ḣůńńńĝâŕŕŕíâńńń (ḢḢḢůńĝĝĝâŕẏẏẏ) !!]"
+    }
+  ],
+  "locale_text.message.id-ID": [
+    {
+      "type": 0,
+      "value": "[!! Ḭńḋḋḋŏńèèèśíâââń (Ḭńḋḋḋŏńèèèśíâââ) !!]"
+    }
+  ],
+  "locale_text.message.it-CH": [
+    {
+      "type": 0,
+      "value": "[!! Ḭṭâââĺíâââń (Ṡẘíííṭẓèèèŕĺâââńḋ) !!]"
+    }
+  ],
+  "locale_text.message.it-IT": [
+    {
+      "type": 0,
+      "value": "[!! Ḭṭâââĺíâââń (Ḭṭâââĺẏ) !!]"
+    }
+  ],
+  "locale_text.message.ja-JP": [
+    {
+      "type": 0,
+      "value": "[!! Ĵâṗṗṗâńèèèśè (Ĵâââṗâńńń) !!]"
+    }
+  ],
+  "locale_text.message.ko-KR": [
+    {
+      "type": 0,
+      "value": "[!! Ḵŏŕŕŕèâńńń (ŔŔŔèṗůůůḃĺíííć ŏŏŏḟ ḴḴḴŏŕèèèâ) !!]"
+    }
+  ],
+  "locale_text.message.nl-BE": [
+    {
+      "type": 0,
+      "value": "[!! Ḋůṭṭṭćḫ (Ḃèèèĺĝíííůṁ) !!]"
+    }
+  ],
+  "locale_text.message.nl-NL": [
+    {
+      "type": 0,
+      "value": "[!! Ḋůṭṭṭćḫ (Ṯḫḫḫè ŊŊŊèṭḫḫḫèŕĺĺĺâńḋḋḋś) !!]"
+    }
+  ],
+  "locale_text.message.no-NO": [
+    {
+      "type": 0,
+      "value": "[!! Ŋŏŕŕŕẘèĝĝĝíâńńń (ŊŊŊŏŕẘẘẘâẏ) !!]"
+    }
+  ],
+  "locale_text.message.pl-PL": [
+    {
+      "type": 0,
+      "value": "[!! Ṕŏĺĺĺíśḫḫḫ (ṔṔṔŏĺâââńḋ) !!]"
+    }
+  ],
+  "locale_text.message.pt-BR": [
+    {
+      "type": 0,
+      "value": "[!! Ṕŏŕŕŕṭůĝĝĝůèśśśè (Ḃŕâââẓíĺĺĺ) !!]"
+    }
+  ],
+  "locale_text.message.pt-PT": [
+    {
+      "type": 0,
+      "value": "[!! Ṕŏŕŕŕṭůĝĝĝůèśśśè (Ṕŏŕŕŕṭůĝĝĝâĺ) !!]"
+    }
+  ],
+  "locale_text.message.ro-RO": [
+    {
+      "type": 0,
+      "value": "[!! Ŕŏṁṁṁâńíííâń (Ŕŏŏŏṁâńńńíâ) !!]"
+    }
+  ],
+  "locale_text.message.ru-RU": [
+    {
+      "type": 0,
+      "value": "[!! Ŕůśśśśíâââń (Ŕůśśśśíâââń ḞḞḞèḋèèèŕâṭṭṭíŏńńń) !!]"
+    }
+  ],
+  "locale_text.message.sk-SK": [
+    {
+      "type": 0,
+      "value": "[!! Ṡĺŏŏŏṿâǩǩǩ (ṠṠṠĺŏṿṿṿâǩíííâ) !!]"
+    }
+  ],
+  "locale_text.message.sv-SE": [
+    {
+      "type": 0,
+      "value": "[!! Ṡẘèèèḋíśśśḫ (Ṡẘèèèḋèńńń) !!]"
+    }
+  ],
+  "locale_text.message.ta-IN": [
+    {
+      "type": 0,
+      "value": "[!! Ṯâṁṁṁíĺ (Ḭńńńḋíâââ) !!]"
+    }
+  ],
+  "locale_text.message.ta-LK": [
+    {
+      "type": 0,
+      "value": "[!! Ṯâṁṁṁíĺ (Ṡŕŕŕí ĻĻĻâńǩǩǩâ) !!]"
+    }
+  ],
+  "locale_text.message.th-TH": [
+    {
+      "type": 0,
+      "value": "[!! Ṯḫâââí (Ṯḫâââíĺâââńḋ) !!]"
+    }
+  ],
+  "locale_text.message.tr-TR": [
+    {
+      "type": 0,
+      "value": "[!! Ṯůŕŕŕǩíśśśḫ (Ṯůŕŕŕǩèẏẏẏ) !!]"
+    }
+  ],
+  "locale_text.message.zh-CN": [
+    {
+      "type": 0,
+      "value": "[!! Ḉḫíííńèśśśè (Ḉḫíííńâ) !!]"
+    }
+  ],
+  "locale_text.message.zh-HK": [
+    {
+      "type": 0,
+      "value": "[!! Ḉḫíííńèśśśè (Ḣŏńńńĝ ḴḴḴŏńĝĝĝ) !!]"
+    }
+  ],
+  "locale_text.message.zh-TW": [
+    {
+      "type": 0,
+      "value": "[!! Ḉḫíííńèśśśè (Ṯâíííẘâńńń) !!]"
     }
   ],
   "login.error.incorrect_username_password": [
@@ -2093,24 +1947,6 @@
     {
       "type": 0,
       "value": "[!! Ẅèĺĺĺćŏṁṁṁè ḂḂḂâćǩǩǩ !!]"
-    }
-  ],
-  "n/iZlE": [
-    {
-      "type": 0,
-      "value": "[!! Ṡṗâââńíśśśḫ (Ḉḫíííĺè) !!]"
-    }
-  ],
-  "n9j5bS": [
-    {
-      "type": 0,
-      "value": "[!! Ṯůŕŕŕǩíśśśḫ (Ṯůŕŕŕǩèẏẏẏ) !!]"
-    }
-  ],
-  "odTkf5": [
-    {
-      "type": 0,
-      "value": "[!! Ḃâćććǩ ṭṭṭŏ śśśíĝńńń íńńń !!]"
     }
   ],
   "offline_banner.description.browsing_offline_mode": [
@@ -2227,12 +2063,6 @@
     {
       "type": 0,
       "value": "[!! Ṯâẋẋẋ !!]"
-    }
-  ],
-  "p2EAP0": [
-    {
-      "type": 0,
-      "value": "[!! Ṕŕŏŏŏṁŏṭṭṭíŏńńń ŕèèèṁŏṿṿṿèḋ !!]"
     }
   ],
   "page_not_found.action.go_back": [
@@ -2565,6 +2395,36 @@
       "value": "[!! ẘíśśśḫĺíííśṭ !!]"
     }
   ],
+  "product_view.button.add_to_cart": [
+    {
+      "type": 0,
+      "value": "[!! Ḁḋḋḋḋ ṭŏŏŏ ćâââŕṭ !!]"
+    }
+  ],
+  "product_view.button.add_to_wishlist": [
+    {
+      "type": 0,
+      "value": "[!! Ḁḋḋḋḋ ṭŏŏŏ ẘíííśḫĺĺĺíśṭṭṭ !!]"
+    }
+  ],
+  "product_view.button.update": [
+    {
+      "type": 0,
+      "value": "[!! Ũṗḋḋḋâṭèèè !!]"
+    }
+  ],
+  "product_view.label.quantity": [
+    {
+      "type": 0,
+      "value": "[!! Ɋůâââńṭíííṭẏ !!]"
+    }
+  ],
+  "product_view.link.full_details": [
+    {
+      "type": 0,
+      "value": "[!! Ṡèèèè ḟůůůĺĺ ḋèṭṭṭâíĺĺĺś !!]"
+    }
+  ],
   "profile_card.info.profile_updated": [
     {
       "type": 0,
@@ -2607,16 +2467,132 @@
       "value": "[!! Ḁṗṗṗṗĺẏ !!]"
     }
   ],
-  "qVGRIE": [
+  "promo_popover.heading.promo_applied": [
     {
       "type": 0,
-      "value": "[!! Ɋůâââńṭíííṭẏ !!]"
+      "value": "[!! Ṕŕŏŏŏṁŏṭṭṭíŏńńńś ḀḀḀṗṗĺĺĺíèḋḋḋ !!]"
     }
   ],
-  "rU+Ph/": [
+  "promocode.accordion.button.have_promocode": [
     {
       "type": 0,
-      "value": "[!! Ḋůṭṭṭćḫ (Ṯḫḫḫè ŊŊŊèṭḫḫḫèŕĺĺĺâńḋḋḋś) !!]"
+      "value": "[!! Ḋŏ ẏŏůůů ḫâââṿè â ṗṗṗŕŏṁṁṁŏ ćććŏḋèèè? !!]"
+    }
+  ],
+  "recent_searches.action.clear_searches": [
+    {
+      "type": 0,
+      "value": "[!! Ḉĺèèèâŕ ŕèćććèńṭṭṭ śèèèâŕćććḫèśśś !!]"
+    }
+  ],
+  "recent_searches.heading.recent_searches": [
+    {
+      "type": 0,
+      "value": "[!! Ŕèćććèńṭṭṭ Ṡèèèâŕćććḫèśśś !!]"
+    }
+  ],
+  "recommended_products.info.added_to_wishlist": [
+    {
+      "type": 1,
+      "value": "quantity"
+    },
+    {
+      "type": 0,
+      "value": "[!!   !!]"
+    },
+    {
+      "offset": 0,
+      "options": {
+        "one": {
+          "value": [
+            {
+              "type": 0,
+              "value": "[!! íṭèèèṁ !!]"
+            }
+          ]
+        },
+        "other": {
+          "value": [
+            {
+              "type": 0,
+              "value": "[!! íṭèèèṁś !!]"
+            }
+          ]
+        }
+      },
+      "pluralType": "cardinal",
+      "type": 6,
+      "value": "quantity"
+    },
+    {
+      "type": 0,
+      "value": "[!!  âḋḋḋḋèḋḋḋ ṭŏŏŏ ẘíííśḫĺĺĺíśṭṭṭ !!]"
+    }
+  ],
+  "recommended_products.info.removed_from_wishlist": [
+    {
+      "type": 0,
+      "value": "[!! Ḭṭèèèṁ ŕŕŕèṁŏŏŏṿèḋḋḋ ḟŕŕŕŏṁ ẘíśśśḫĺíííśṭ !!]"
+    }
+  ],
+  "register_form.action.sign_in": [
+    {
+      "type": 0,
+      "value": "[!! Ṡíĝĝĝń íííń !!]"
+    }
+  ],
+  "register_form.button.create_account": [
+    {
+      "type": 0,
+      "value": "[!! Ḉŕèèèâṭèèè âććććŏůůůńṭ !!]"
+    }
+  ],
+  "register_form.heading.lets_get_started": [
+    {
+      "type": 0,
+      "value": "[!! Ļèṭṭṭ'ś ĝèṭṭṭ śṭṭṭâŕṭṭṭèḋ !!]"
+    }
+  ],
+  "register_form.message.agree_to_policy_terms": [
+    {
+      "type": 0,
+      "value": "[!! Ḃẏ ćŕèèèâṭíííńĝ âń âććććŏůńńńṭ, ẏŏůůů âĝĝĝŕèèèè ṭŏŏŏ Ṡâââĺèśśśḟŏŕŕŕćè’ś  !!]"
+    },
+    {
+      "children": [
+        {
+          "type": 0,
+          "value": "[!! Ṕŕíííṿâćććẏ ṔṔṔŏĺíííćẏ !!]"
+        }
+      ],
+      "type": 8,
+      "value": "policy"
+    },
+    {
+      "type": 0,
+      "value": "[!!  âńńńḋ  !!]"
+    },
+    {
+      "children": [
+        {
+          "type": 0,
+          "value": "[!! Ṯèŕŕŕṁś & ḈḈḈŏńḋḋḋíṭíííŏńśśś !!]"
+        }
+      ],
+      "type": 8,
+      "value": "terms"
+    }
+  ],
+  "register_form.message.already_have_account": [
+    {
+      "type": 0,
+      "value": "[!! Ḁĺŕŕŕèâḋḋḋẏ ḫḫḫâṿèèè âńńń âććććŏůůůńṭ? !!]"
+    }
+  ],
+  "register_form.message.create_an_account": [
+    {
+      "type": 0,
+      "value": "[!! Ḉŕèèèâṭèèè âńńń âććććŏůůůńṭ âńḋḋḋ ĝèèèṭ ḟḟḟíŕśśśṭ âââććèèèśś ṭŏ ṭḫèèè ṿèèèŕẏ ḃèśśśṭ ṗṗṗŕŏḋḋḋůćṭṭṭś, íńśśśṗíŕŕŕâṭíííŏń âńḋḋḋ ćŏŏŏṁṁůůůńíṭṭṭẏ. !!]"
     }
   ],
   "reset_password.button.back_to_sign_in": [
@@ -2649,6 +2625,36 @@
     {
       "type": 0,
       "value": "[!! Ṕâśśśśẘŏŏŏŕḋ Ŕèśśśèṭ !!]"
+    }
+  ],
+  "reset_password_form.action.sign_in": [
+    {
+      "type": 0,
+      "value": "[!! Ṡíĝĝĝń íííń !!]"
+    }
+  ],
+  "reset_password_form.button.reset_password": [
+    {
+      "type": 0,
+      "value": "[!! Ŕèśśśèṭ ṗâśśśśẘŏŏŏŕḋ !!]"
+    }
+  ],
+  "reset_password_form.message.enter_your_email": [
+    {
+      "type": 0,
+      "value": "[!! Ḕńṭṭṭèŕ ẏŏůůůŕ èèèṁâíííĺ ṭṭṭŏ ŕŕŕèćèèèíṿèèè íńńńśṭŕŕŕůćṭṭṭíŏńńńś ŏŏŏń ḫḫḫŏẘ ṭŏ ŕèśśśèṭ ẏŏůůůŕ ṗṗṗâśśśśẘŏŕŕŕḋ !!]"
+    }
+  ],
+  "reset_password_form.message.return_to_sign_in": [
+    {
+      "type": 0,
+      "value": "[!! Õŕ ŕèṭṭṭůŕńńń ṭŏŏŏ !!]"
+    }
+  ],
+  "reset_password_form.title.reset_password": [
+    {
+      "type": 0,
+      "value": "[!! Ŕèśśśèṭ Ṕâśśśśẘŏŏŏŕḋ !!]"
     }
   ],
   "search.action.cancel": [
@@ -2759,46 +2765,10 @@
       "value": "[!! Ḁŕèèè ẏŏŏŏů śśśůŕèèè ẏŏŏŏů ẘẘẘâńṭṭṭ ṭŏŏŏ śíííĝń ŏůṭṭṭ? ŸŸŸŏů ẘíĺĺĺĺ ńńńèèḋḋḋ ṭŏŏŏ śíííĝń ḃâćććǩ íííń ṭṭṭŏ ṗṗṗŕŏćććèèḋḋḋ ẘíííṭḫ ẏŏůůůŕ ćććůŕŕŕŕèńṭṭṭ ŏŕŕŕḋèŕŕŕ. !!]"
     }
   ],
-  "tYBua6": [
-    {
-      "type": 0,
-      "value": "[!! Ḭńḋḋḋŏńèèèśíâââń (Ḭńḋḋḋŏńèèèśíâââ) !!]"
-    }
-  ],
-  "tclGo+": [
-    {
-      "type": 0,
-      "value": "[!! Ḁŕâââḃíććć (ṠṠṠâůḋḋḋí ḀḀḀŕâḃḃḃíâ) !!]"
-    }
-  ],
-  "tnSBvt": [
-    {
-      "type": 0,
-      "value": "[!! Ḵŏŕŕŕèâńńń (ŔŔŔèṗůůůḃĺíííć ŏŏŏḟ ḴḴḴŏŕèèèâ) !!]"
-    }
-  ],
   "toggle_card.action.edit": [
     {
       "type": 0,
       "value": "[!! Ḕḋíííṭ !!]"
-    }
-  ],
-  "uCdcPZ": [
-    {
-      "type": 0,
-      "value": "[!! Ŕŏṁṁṁâńíííâń (Ŕŏŏŏṁâńńńíâ) !!]"
-    }
-  ],
-  "uCk8r+": [
-    {
-      "type": 0,
-      "value": "[!! Ḁĺŕŕŕèâḋḋḋẏ ḫḫḫâṿèèè âńńń âććććŏůůůńṭ? !!]"
-    }
-  ],
-  "unUv/E": [
-    {
-      "type": 0,
-      "value": "[!! Ÿŏůůů Ḿíííĝḫṭṭṭ Ḁĺĺĺśŏ Ļíǩǩǩè !!]"
     }
   ],
   "update_password_fields.button.forgot_password": [
@@ -3049,6 +3019,26 @@
       "value": "[!! Ṕâśśśśẘŏŏŏŕḋ !!]"
     }
   ],
+  "use_product.message.inventory_remaining": [
+    {
+      "type": 0,
+      "value": "[!! Õńĺĺĺẏ  !!]"
+    },
+    {
+      "type": 1,
+      "value": "stockLevel"
+    },
+    {
+      "type": 0,
+      "value": "[!!  Ļèèèḟṭ! !!]"
+    }
+  ],
+  "use_product.message.out_of_stock": [
+    {
+      "type": 0,
+      "value": "[!! Õůṭṭṭ ŏḟḟḟ śṭṭṭŏćǩǩǩ !!]"
+    }
+  ],
   "use_profile_fields.error.required_email": [
     {
       "type": 0,
@@ -3107,6 +3097,24 @@
     {
       "type": 0,
       "value": "[!! Ṕŕŏŏŏṁŏ Ḉŏḋḋḋè !!]"
+    }
+  ],
+  "use_promocode.error.check_the_code": [
+    {
+      "type": 0,
+      "value": "[!! Ḉḫèèèćǩ ṭḫèèè ćŏŏŏḋè âńḋḋḋ ṭŕŕŕẏ âââĝâíííń, íṭ ṁâẏẏẏ âĺĺĺŕèâââḋẏ ḃè âṗṗṗṗĺíèèèḋ ŏŏŏŕ ṭṭṭḫè ṗŕŏŏŏṁŏ ḫâśśś èẋẋẋṗíŕŕŕèḋ !!]"
+    }
+  ],
+  "use_promocode.info.promo_applied": [
+    {
+      "type": 0,
+      "value": "[!! Ṕŕŏŏŏṁŏṭṭṭíŏńńń âṗṗṗṗĺíííèḋ !!]"
+    }
+  ],
+  "use_promocode.info.promo_removed": [
+    {
+      "type": 0,
+      "value": "[!! Ṕŕŏŏŏṁŏṭṭṭíŏńńń ŕèèèṁŏṿṿṿèḋ !!]"
     }
   ],
   "use_registration_fields.error.contain_number": [
@@ -3259,24 +3267,6 @@
       "value": "[!! Ŋèẘẘẘ Ṕâââśśẘẘẘŏŕḋḋḋ !!]"
     }
   ],
-  "vMvXOp": [
-    {
-      "type": 0,
-      "value": "[!! Ḡŕèèèèǩ (Ḡŕŕŕèèćććè) !!]"
-    }
-  ],
-  "vSNTMO": [
-    {
-      "type": 0,
-      "value": "[!! Ḭṭâââĺíâââń (Ṡẘíííṭẓèèèŕĺâââńḋ) !!]"
-    }
-  ],
-  "vvTcAr": [
-    {
-      "type": 0,
-      "value": "[!! Ḉŕèèèâṭèèè âńńń âććććŏůůůńṭ âńḋḋḋ ĝèèèṭ ḟḟḟíŕśśśṭ âââććèèèśś ṭŏ ṭḫèèè ṿèèèŕẏ ḃèśśśṭ ṗṗṗŕŏḋḋḋůćṭṭṭś, íńśśśṗíŕŕŕâṭíííŏń âńḋḋḋ ćŏŏŏṁṁůůůńíṭṭṭẏ. !!]"
-    }
-  ],
   "wishlist_primary_action.info.added_to_cart": [
     {
       "type": 1,
@@ -3327,34 +3317,10 @@
       "value": "[!! Ḭṭèèèṁ ŕŕŕèṁŏŏŏṿèḋḋḋ ḟŕŕŕŏṁ ẘíśśśḫĺíííśṭ !!]"
     }
   ],
-  "x6hxSH": [
+  "with_registration.info.please_sign_in": [
     {
       "type": 0,
-      "value": "[!! Ṡŏṁṁṁèṭḫḫḫíńĝĝĝ'ś ńŏṭṭṭ ŕíííĝḫṭṭṭ ẘíííṭḫ ẏŏůůůŕ èèèṁâíííĺ ŏŏŏŕ ṗṗṗâśśśśẘŏŕŕŕḋ. Ṯŕẏẏẏ âĝĝĝâíńńń. !!]"
-    }
-  ],
-  "xHP4/6": [
-    {
-      "type": 0,
-      "value": "[!! Ṕâśśśśẘŏŏŏŕḋ Ŕèśśśèṭ !!]"
-    }
-  ],
-  "xl27nc": [
-    {
-      "type": 0,
-      "value": "[!! Ŕèśśśèṭ Ṕâśśśśẘŏŏŏŕḋ !!]"
-    }
-  ],
-  "z3Qj9h": [
-    {
-      "type": 0,
-      "value": "[!! Ṕŕŏŏŏćèèèèḋ ṭṭṭŏ ḈḈḈḫèćććǩŏůůůṭ !!]"
-    }
-  ],
-  "zdzY+u": [
-    {
-      "type": 0,
-      "value": "[!! Ḕńĝĝĝĺíśśśḫ (Ṡŏůůůṭḫ Ḁḟŕŕŕíćâââ) !!]"
+      "value": "[!! Ṕĺèèèâśèèè śíííĝń íń ṭŏ ćŏńńńṭíńńńůè! !!]"
     }
   ]
 }
