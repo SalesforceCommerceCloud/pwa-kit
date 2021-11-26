@@ -33,9 +33,6 @@ commands:
             sudo pip install awscli==1.18.85 datadog==0.40.1
             sudo npm install -g npm@6.14.4
 
-            # Add a dogrc so we can submit metrics to datadog
-            printf "[Connection]\napikey = $DATADOG_API_KEY\nappkey =\n" > ~/.dogrc
-
             # Install node dependencies
             node ./scripts/gtime.js monorepo_install npm ci
 
@@ -260,19 +257,6 @@ jobs:
             GENERATOR_PRESET: 'hello-world-test-project'
           command: |
             node packages/pwa-kit-create-app/scripts/create-mobify-app-dev.js --outputDir /tmp/hello-world
-      - run:
-          name: Count Generated Project Dependencies
-          environment:
-          command: |
-            MAX_PACKAGES="3050"
-            total=$(./scripts/count-dependencies.js /tmp/project)
-              if [ "$total" -gt "$MAX_PACKAGES" ]; then
-                  echo "Error: Found $total installed packages (max $MAX_PACKAGES).";
-                  exit 1;
-              else
-                  echo "Error: Found $total installed packages (max $MAX_PACKAGES).";
-              fi
-            dog metric post mobify_platform_sdks.generated_project_total_packages $total
       - runtests:
           cwd: /tmp/project
       - smoketestscripts:
@@ -303,7 +287,23 @@ jobs:
               
               snyk monitor --ignore-policy --remote-repo-url='https://github.com/SalesforceCommerceCloud/pwa-kit.git' --project-name='generated-scaffold-pwa'
             fi
-      
+      - run:
+          name: Count Generated Project Dependencies
+          environment:
+          command: |
+            MAX_PACKAGES="3050"
+            total=$(./scripts/count-dependencies.js /tmp/project)
+              if [ "$total" -gt "$MAX_PACKAGES" ]; then
+                  echo "Error: Found $total installed packages (max $MAX_PACKAGES).";
+                  exit 1;
+              else
+                  echo "Error: Found $total installed packages (max $MAX_PACKAGES).";
+              fi
+              
+            # Add a dogrc so we can submit metrics to datadog
+            printf "[Connection]\napikey = $DATADOG_API_KEY\nappkey =\n" > ~/.dogrc  
+            
+            dog metric post mobify_platform_sdks.generated_project_total_packages $total
       - run:
           name: Push Bundle
           command: |
