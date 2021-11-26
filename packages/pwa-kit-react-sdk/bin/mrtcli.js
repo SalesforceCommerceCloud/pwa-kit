@@ -68,6 +68,14 @@ const main = () => {
         .command('build')
         .description(`build your app for production`)
         .action(() => {
+            // TODO: For the build dir size to be manageable, we need
+            // to split out packages for sdk-runtime and sdk-build, where
+            // build contains all the build tools and runtime contains
+            // express and the small number of prod dependencies we have.
+            // As is, we pull in all the dev tools (weback and co.) to the
+            // shipped bundle. Splitting the package is the *only* solution
+            // here – prune will do the right thing, if we get our
+            // dependencies right.
             const original = sh.config.silent
             sh.config.silent = true
             try {
