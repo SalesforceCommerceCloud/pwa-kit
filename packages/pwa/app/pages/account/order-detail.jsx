@@ -166,15 +166,26 @@ const AccountOrderDetail = () => {
                                         </Text>
                                         <Text fontSize="sm">{shippingMethod.name}</Text>
                                         <Text fontSize="sm">
-                                            <FormattedMessage defaultMessage="Tracking Number" id="account_order_detail.label.tracking_number" />:{' '}
+                                            <FormattedMessage
+                                                defaultMessage="Tracking Number"
+                                                id="account_order_detail.label.tracking_number"
+                                            />
+                                            :{' '}
                                             {trackingNumber ||
-                                                formatMessage({defaultMessage: 'Pending', id="account_order_detail.label.pending_tracking_number"})}
+                                                formatMessage({
+                                                    defaultMessage: 'Pending',
+                                                    id:
+                                                        'account_order_detail.label.pending_tracking_number'
+                                                })}
                                         </Text>
                                     </Box>
                                 </Stack>
                                 <Stack spacing={1}>
                                     <Text fontWeight="bold" fontSize="sm">
-                                        <FormattedMessage defaultMessage="Payment Method" id="account_order_detail.heading.payment_method" />
+                                        <FormattedMessage
+                                            defaultMessage="Payment Method"
+                                            id="account_order_detail.heading.payment_method"
+                                        />
                                     </Text>
                                     <Stack direction="row">
                                         {CardIcon && <CardIcon layerStyle="ccIcon" />}
@@ -195,7 +206,10 @@ const AccountOrderDetail = () => {
                                 </Stack>
                                 <Stack spacing={1}>
                                     <Text fontWeight="bold" fontSize="sm">
-                                        <FormattedMessage defaultMessage="Shipping Address" id="account_order_detail.heading.shipping_address" />
+                                        <FormattedMessage
+                                            defaultMessage="Shipping Address"
+                                            id="account_order_detail.heading.shipping_address"
+                                        />
                                     </Text>
                                     <Box>
                                         <Text fontSize="sm">
@@ -210,7 +224,10 @@ const AccountOrderDetail = () => {
                                 </Stack>
                                 <Stack spacing={1}>
                                     <Text fontWeight="bold" fontSize="sm">
-                                        <FormattedMessage defaultMessage="Billing Address" id="account_order_detail.heading.billing_address" />
+                                        <FormattedMessage
+                                            defaultMessage="Billing Address"
+                                            id="account_order_detail.heading.billing_address"
+                                        />
                                     </Text>
                                     <Box>
                                         <Text fontSize="sm">
