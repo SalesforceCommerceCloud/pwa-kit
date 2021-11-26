@@ -309,7 +309,7 @@ const server = baseConfig('node')
             plugins: [
                 ...config.plugins,
 
-                // Keep this on the slowest-to-build item, the server-side bundle.
+                // Keep this on the slowest-to-build item - the server-side bundle.
                 new WebpackNotifierPlugin({
                     title: `Mobify Project: ${pkg.name}`,
                     excludeWarnings: true,
@@ -339,12 +339,4 @@ const requestProcessor = baseConfig('node')
     })
     .build()
 
-module.exports = [
-    client,
-    server,
-    clientOptional,
-    requestProcessor,
-]
-
-// console.log(JSON.stringify(module.exports, null, 2))
-// process.exit(0)
+module.exports = [client, server, clientOptional, requestProcessor]
