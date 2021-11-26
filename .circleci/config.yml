@@ -155,10 +155,10 @@ commands:
       - run:
           name: Early return if this build is from a forked PR
           command: |
-            if [ -n "$CIRCLE_PR_NUMBER" ]; then
+              echo "Forked PR number: $CIRCLE_PR_NUMBER"
               echo "Nothing else to do for forked PRs, so marking this step successful"
               circleci step halt
-            fi
+
 
 jobs:
   testNode12:
