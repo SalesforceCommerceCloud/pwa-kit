@@ -38,11 +38,13 @@ export const useProduct = (product) => {
     const unfulfillable = stockLevel < quantity
     const inventoryMessages = {
         [OUT_OF_STOCK]: intl.formatMessage({
-            defaultMessage: 'Out of stock'
+            defaultMessage: 'Out of stock',
+            id: 'use_product.message.out_of_stock'
         }),
         [UNFULFILLABLE]: intl.formatMessage(
             {
-                defaultMessage: 'Only {stockLevel} Left!'
+                defaultMessage: 'Only {stockLevel} Left!',
+                id: 'use_product.message.inventory_remaining'
             },
             {stockLevel}
         )
