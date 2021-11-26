@@ -8,20 +8,11 @@
   "+ZbX4W": {
     "defaultMessage": "Czech (Czech Republic)"
   },
-  "/aBLH2": {
-    "defaultMessage": "Get started"
-  },
-  "0LrnyG": {
-    "defaultMessage": "Components & Design kit"
-  },
   "0Tjkj3": {
     "defaultMessage": "German (Austria)"
   },
   "0n0dWe": {
     "defaultMessage": "Hebrew (Israel)"
-  },
-  "0nWAOY": {
-    "defaultMessage": "Go to home page"
   },
   "1LE+iY": {
     "defaultMessage": "See full details"
@@ -44,9 +35,6 @@
   "2WRHXI": {
     "defaultMessage": "{quantity} {quantity, plural, one {item} other {items}} added to cart"
   },
-  "2bGejb": {
-    "defaultMessage": "My Account"
-  },
   "3HK3af": {
     "defaultMessage": "Unknown {localeShortCode}"
   },
@@ -55,12 +43,6 @@
   },
   "5BTYa0": {
     "defaultMessage": "View Cart"
-  },
-  "5S2I6Q": {
-    "defaultMessage": "Incorrect username or password, please try again."
-  },
-  "5UVtyp": {
-    "defaultMessage": "The React PWA Starter Store for Retail"
   },
   "5e/Fjo": {
     "defaultMessage": "Portuguese (Brazil)"
@@ -71,20 +53,11 @@
   "68qUv0": {
     "defaultMessage": "Chinese (Hong Kong)"
   },
-  "6ful6x": {
-    "defaultMessage": "Shoppers can manage account information such as their profile, addresses, payments and orders."
-  },
   "74fug6": {
     "defaultMessage": "Tamil (India)"
   },
-  "7Z41IR": {
-    "defaultMessage": "Einstein Recommendations"
-  },
   "7gXPhB": {
     "defaultMessage": "Qty"
-  },
-  "8+0PQZ": {
-    "defaultMessage": "The page you're looking for can't be found"
   },
   "8CDRAt": {
     "defaultMessage": "Spanish (Mexico)"
@@ -104,9 +77,6 @@
   "ADKef8": {
     "defaultMessage": "Add to cart"
   },
-  "AJlIwK": {
-    "defaultMessage": "This section contains content from the catalog. {link} on how to replace it."
-  },
   "AiDBu2": {
     "defaultMessage": "Slovak (Slovakia)"
   },
@@ -116,17 +86,11 @@
   "Cl4TrE": {
     "defaultMessage": "Add to wishlist"
   },
-  "Cm91xY": {
-    "defaultMessage": "Complete The Set"
-  },
   "CutQ+m": {
     "defaultMessage": "Spanish (Columbia)"
   },
   "D8RblK": {
     "defaultMessage": "Do you have a promo code?"
-  },
-  "DKTjIJ": {
-    "defaultMessage": "Deploy on Managed Runtime"
   },
   "DdR2q8": {
     "defaultMessage": "{quantity} {quantity, plural, one {item} other {items}} added to wishlist"
@@ -140,32 +104,14 @@
   "ES4Hjg": {
     "defaultMessage": "Danish (Denmark)"
   },
-  "FdbYXD": {
-    "defaultMessage": "Shop Products"
-  },
   "Ihg+6O": {
     "defaultMessage": "Let's get started"
   },
   "KE5qj+": {
     "defaultMessage": "French (Switzerland)"
   },
-  "KV/9Hv": {
-    "defaultMessage": "Questions"
-  },
-  "KcHWA3": {
-    "defaultMessage": "Shopper Login and API Access Service"
-  },
-  "LiHQih": {
-    "defaultMessage": "Coming Soon"
-  },
   "MQHbcd": {
     "defaultMessage": "English (Canada)"
-  },
-  "MQoJ1Y": {
-    "defaultMessage": "Enable shoppers to easily log in with a more personalized shopping experience."
-  },
-  "NV26qx": {
-    "defaultMessage": "Back to previous page"
   },
   "O8DHNx": {
     "defaultMessage": "Check the code and try again, it may already be applied or the promo has expired"
@@ -182,12 +128,6 @@
   "OkmnSf": {
     "defaultMessage": "Hungarian (Hungary)"
   },
-  "OlItur": {
-    "defaultMessage": "Create with the Figma PWA Design Kit"
-  },
-  "OrvEHn": {
-    "defaultMessage": "Product Detail"
-  },
   "P87iMu": {
     "defaultMessage": "Tamil (Sri Lanka)"
   },
@@ -196,9 +136,6 @@
   },
   "PO4nBj": {
     "defaultMessage": "French (France)"
-  },
-  "PpMdwV": {
-    "defaultMessage": "We're here to help"
   },
   "QEUh37": {
     "defaultMessage": "English (Ireland)"
@@ -234,26 +171,11 @@
   "UE9zNR": {
     "defaultMessage": "Recent Searches"
   },
-  "V+9Zzz": {
-    "defaultMessage": "Size & Fit"
-  },
-  "VALef7": {
-    "defaultMessage": "Ecommerce best practice for a shopper's cart and checkout experience."
-  },
-  "VB8cgA": {
-    "defaultMessage": "Deliver the next best product or offer to every shopper through product recommendations."
-  },
   "WHgdsk": {
     "defaultMessage": "Out of stock"
   },
-  "X9OkqP": {
-    "defaultMessage": "Built using Chakra UI, a simple, modular and accessible React component library."
-  },
   "YQhbMR": {
     "defaultMessage": "Norwegian (Norway)"
-  },
-  "YwT8JW": {
-    "defaultMessage": "Registered shoppers can add product items to their wishlist from purchasing later."
   },
   "Yy/yDL": {
     "defaultMessage": "Reset password"
@@ -263,9 +185,6 @@
   },
   "ZWTTz6": {
     "defaultMessage": "Polish (Poland)"
-  },
-  "ZXp0z1": {
-    "defaultMessage": "Features"
   },
   "Zgc/KO": {
     "defaultMessage": "Spanish (United States)"
@@ -408,12 +327,6 @@
   },
   "bk7ZVA": {
     "defaultMessage": "Are you sure you want to remove this item ?"
-  },
-  "c0a6lZ": {
-    "defaultMessage": "Please try retyping the address, going back to the previous page, or going to the home page."
-  },
-  "cLJrsY": {
-    "defaultMessage": "Cart & Checkout"
   },
   "card_payment_form.heading.new_payment_method": {
     "defaultMessage": "Add New Payment Method"
@@ -599,9 +512,6 @@
   },
   "d/RGdS": {
     "defaultMessage": "Portuguese (Portugal)"
-  },
-  "dUxyza": {
-    "defaultMessage": "Reviews"
   },
   "dfEp3Z": {
     "defaultMessage": "Yes, remove item"
@@ -834,9 +744,6 @@
   "gzeOf+": {
     "defaultMessage": "Chinese (Taiwan)"
   },
-  "hZOGLS": {
-    "defaultMessage": "Contact Us"
-  },
   "header.button.assistive_msg.logo": {
     "defaultMessage": "Logo"
   },
@@ -861,8 +768,80 @@
   "header.popover.title.my_account": {
     "defaultMessage": "My Account"
   },
-  "hp3uqR": {
+  "home.description.features": {
+    "defaultMessage": "Out-of-the-box features so that you focus only on adding enhancements."
+  },
+  "home.description.here_to_help": {
+    "defaultMessage": "Contact our support staff and they’ll get {br} you to the right place."
+  },
+  "home.description.shop_products": {
+    "defaultMessage": "This section contains content from the catalog. {link} on how to replace it."
+  },
+  "home.features.description.cart_checkout": {
+    "defaultMessage": "Ecommerce best practice for a shopper's cart and checkout experience."
+  },
+  "home.features.description.components": {
+    "defaultMessage": "Built using Chakra UI, a simple, modular and accessible React component library."
+  },
+  "home.features.description.einstein_recommendations": {
+    "defaultMessage": "Deliver the next best product or offer to every shopper through product recommendations."
+  },
+  "home.features.description.my_account": {
+    "defaultMessage": "Shoppers can manage account information such as their profile, addresses, payments and orders."
+  },
+  "home.features.description.shopper_login": {
+    "defaultMessage": "Enable shoppers to easily log in with a more personalized shopping experience."
+  },
+  "home.features.description.wishlist": {
+    "defaultMessage": "Registered shoppers can add product items to their wishlist from purchasing later."
+  },
+  "home.features.heading.cart_checkout": {
+    "defaultMessage": "Cart & Checkout"
+  },
+  "home.features.heading.components": {
+    "defaultMessage": "Components & Design kit"
+  },
+  "home.features.heading.einstein_recommendations": {
+    "defaultMessage": "Einstein Recommendations"
+  },
+  "home.features.heading.my_account": {
+    "defaultMessage": "My Account"
+  },
+  "home.features.heading.shopper_login": {
+    "defaultMessage": "Shopper Login and API Access Service"
+  },
+  "home.features.heading.wishlist": {
     "defaultMessage": "Wishlist"
+  },
+  "home.heading.features": {
+    "defaultMessage": "Features"
+  },
+  "home.heading.here_to_help": {
+    "defaultMessage": "We're here to help"
+  },
+  "home.heading.shop_products": {
+    "defaultMessage": "Shop Products"
+  },
+  "home.hero_features.link.design_kit": {
+    "defaultMessage": "Create with the Figma PWA Design Kit"
+  },
+  "home.hero_features.link.on_github": {
+    "defaultMessage": "Download on Github"
+  },
+  "home.hero_features.link.on_managed_runtime": {
+    "defaultMessage": "Deploy on Managed Runtime"
+  },
+  "home.link.contact_us": {
+    "defaultMessage": "Contact Us"
+  },
+  "home.link.get_started": {
+    "defaultMessage": "Get started"
+  },
+  "home.link.read_docs": {
+    "defaultMessage": "Read docs"
+  },
+  "home.title.react_starter_store": {
+    "defaultMessage": "The React PWA Starter Store for Retail"
   },
   "huqKGl": {
     "defaultMessage": "Create account"
@@ -880,20 +859,11 @@
     "defaultMessage": "Sale",
     "description": "A sale badge placed on top of a product image"
   },
-  "kBAj4C": {
-    "defaultMessage": "Download on Github"
-  },
-  "lc9tAq": {
-    "defaultMessage": "Read docs"
-  },
   "llHgJz": {
     "defaultMessage": "Welcome {name},"
   },
-  "lmhMZ6": {
-    "defaultMessage": "Out-of-the-box features so that you focus only on adding enhancements."
-  },
-  "login-redirect.message.welcome": {
-    "defaultMessage": "Login Redirect"
+  "login.error.incorrect_username_password": {
+    "defaultMessage": "Incorrect username or password, please try again."
   },
   "login_form.action.create_account": {
     "defaultMessage": "Create account"
@@ -910,17 +880,11 @@
   "login_form.message.welcome_back": {
     "defaultMessage": "Welcome Back"
   },
-  "mfahwZ": {
-    "defaultMessage": "Recently Viewed"
-  },
   "n/iZlE": {
     "defaultMessage": "Spanish (Chile)"
   },
   "n9j5bS": {
     "defaultMessage": "Turkish (Turkey)"
-  },
-  "nEtDrF": {
-    "defaultMessage": "Contact our support staff and they’ll get {br} you to the right place."
   },
   "odTkf5": {
     "defaultMessage": "Back to sign in"
@@ -967,6 +931,18 @@
   },
   "p2EAP0": {
     "defaultMessage": "Promotion removed"
+  },
+  "page_not_found.action.go_back": {
+    "defaultMessage": "Back to previous page"
+  },
+  "page_not_found.link.homepage": {
+    "defaultMessage": "Go to home page"
+  },
+  "page_not_found.message.suggestion_to_try": {
+    "defaultMessage": "Please try retyping the address, going back to the previous page, or going to the home page."
+  },
+  "page_not_found.title.page_cant_be_found": {
+    "defaultMessage": "The page you're looking for can't be found"
   },
   "pagination.field.num_of_pages": {
     "defaultMessage": "of {numOfPages}"
@@ -1024,6 +1000,33 @@
   "price_per_item.label.each": {
     "defaultMessage": "ea",
     "description": "Abbreviated 'each', follows price per item, like $10/ea"
+  },
+  "product_detail.accordion.button.product_detail": {
+    "defaultMessage": "Product Detail"
+  },
+  "product_detail.accordion.button.questions": {
+    "defaultMessage": "Questions"
+  },
+  "product_detail.accordion.button.reviews": {
+    "defaultMessage": "Reviews"
+  },
+  "product_detail.accordion.button.size_fit": {
+    "defaultMessage": "Size & Fit"
+  },
+  "product_detail.accordion.message.coming_soon": {
+    "defaultMessage": "Coming Soon"
+  },
+  "product_detail.info.added_to_wishlist": {
+    "defaultMessage": "{quantity} {quantity, plural, one {item} other {items}} added to wishlist"
+  },
+  "product_detail.recommended_products.title.complete_set": {
+    "defaultMessage": "Complete The Set"
+  },
+  "product_detail.recommended_products.title.might_also_like": {
+    "defaultMessage": "You Might Also Like"
+  },
+  "product_detail.recommended_products.title.recently_viewed": {
+    "defaultMessage": "Recently Viewed"
   },
   "product_item.label.quantity": {
     "defaultMessage": "Quantity:"

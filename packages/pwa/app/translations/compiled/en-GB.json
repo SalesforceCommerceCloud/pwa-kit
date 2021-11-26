@@ -17,18 +17,6 @@
       "value": "Czech (Czech Republic)"
     }
   ],
-  "/aBLH2": [
-    {
-      "type": 0,
-      "value": "Get started"
-    }
-  ],
-  "0LrnyG": [
-    {
-      "type": 0,
-      "value": "Components & Design kit"
-    }
-  ],
   "0Tjkj3": [
     {
       "type": 0,
@@ -39,12 +27,6 @@
     {
       "type": 0,
       "value": "Hebrew (Israel)"
-    }
-  ],
-  "0nWAOY": [
-    {
-      "type": 0,
-      "value": "Go to home page"
     }
   ],
   "1LE+iY": [
@@ -143,12 +125,6 @@
       "value": " added to cart"
     }
   ],
-  "2bGejb": [
-    {
-      "type": 0,
-      "value": "My Account"
-    }
-  ],
   "3HK3af": [
     {
       "type": 0,
@@ -171,18 +147,6 @@
       "value": "View Cart"
     }
   ],
-  "5S2I6Q": [
-    {
-      "type": 0,
-      "value": "Incorrect username or password, please try again."
-    }
-  ],
-  "5UVtyp": [
-    {
-      "type": 0,
-      "value": "The React PWA Starter Store for Retail"
-    }
-  ],
   "5e/Fjo": [
     {
       "type": 0,
@@ -201,34 +165,16 @@
       "value": "Chinese (Hong Kong)"
     }
   ],
-  "6ful6x": [
-    {
-      "type": 0,
-      "value": "Shoppers can manage account information such as their profile, addresses, payments and orders."
-    }
-  ],
   "74fug6": [
     {
       "type": 0,
       "value": "Tamil (India)"
     }
   ],
-  "7Z41IR": [
-    {
-      "type": 0,
-      "value": "Einstein Recommendations"
-    }
-  ],
   "7gXPhB": [
     {
       "type": 0,
       "value": "Qty"
-    }
-  ],
-  "8+0PQZ": [
-    {
-      "type": 0,
-      "value": "The page you're looking for can't be found"
     }
   ],
   "8CDRAt": [
@@ -267,20 +213,6 @@
       "value": "Add to cart"
     }
   ],
-  "AJlIwK": [
-    {
-      "type": 0,
-      "value": "This section contains content from the catalog. "
-    },
-    {
-      "type": 1,
-      "value": "link"
-    },
-    {
-      "type": 0,
-      "value": " on how to replace it."
-    }
-  ],
   "AiDBu2": [
     {
       "type": 0,
@@ -299,12 +231,6 @@
       "value": "Add to wishlist"
     }
   ],
-  "Cm91xY": [
-    {
-      "type": 0,
-      "value": "Complete The Set"
-    }
-  ],
   "CutQ+m": [
     {
       "type": 0,
@@ -315,12 +241,6 @@
     {
       "type": 0,
       "value": "Do you have a promo code?"
-    }
-  ],
-  "DKTjIJ": [
-    {
-      "type": 0,
-      "value": "Deploy on Managed Runtime"
     }
   ],
   "DdR2q8": [
@@ -387,12 +307,6 @@
       "value": "Danish (Denmark)"
     }
   ],
-  "FdbYXD": [
-    {
-      "type": 0,
-      "value": "Shop Products"
-    }
-  ],
   "Ihg+6O": [
     {
       "type": 0,
@@ -405,40 +319,10 @@
       "value": "French (Switzerland)"
     }
   ],
-  "KV/9Hv": [
-    {
-      "type": 0,
-      "value": "Questions"
-    }
-  ],
-  "KcHWA3": [
-    {
-      "type": 0,
-      "value": "Shopper Login and API Access Service"
-    }
-  ],
-  "LiHQih": [
-    {
-      "type": 0,
-      "value": "Coming Soon"
-    }
-  ],
   "MQHbcd": [
     {
       "type": 0,
       "value": "English (Canada)"
-    }
-  ],
-  "MQoJ1Y": [
-    {
-      "type": 0,
-      "value": "Enable shoppers to easily log in with a more personalized shopping experience."
-    }
-  ],
-  "NV26qx": [
-    {
-      "type": 0,
-      "value": "Back to previous page"
     }
   ],
   "O8DHNx": [
@@ -495,18 +379,6 @@
       "value": "Hungarian (Hungary)"
     }
   ],
-  "OlItur": [
-    {
-      "type": 0,
-      "value": "Create with the Figma PWA Design Kit"
-    }
-  ],
-  "OrvEHn": [
-    {
-      "type": 0,
-      "value": "Product Detail"
-    }
-  ],
   "P87iMu": [
     {
       "type": 0,
@@ -523,12 +395,6 @@
     {
       "type": 0,
       "value": "French (France)"
-    }
-  ],
-  "PpMdwV": [
-    {
-      "type": 0,
-      "value": "We're here to help"
     }
   ],
   "QEUh37": [
@@ -597,46 +463,16 @@
       "value": "Recent Searches"
     }
   ],
-  "V+9Zzz": [
-    {
-      "type": 0,
-      "value": "Size & Fit"
-    }
-  ],
-  "VALef7": [
-    {
-      "type": 0,
-      "value": "Ecommerce best practice for a shopper's cart and checkout experience."
-    }
-  ],
-  "VB8cgA": [
-    {
-      "type": 0,
-      "value": "Deliver the next best product or offer to every shopper through product recommendations."
-    }
-  ],
   "WHgdsk": [
     {
       "type": 0,
       "value": "Out of stock"
     }
   ],
-  "X9OkqP": [
-    {
-      "type": 0,
-      "value": "Built using Chakra UI, a simple, modular and accessible React component library."
-    }
-  ],
   "YQhbMR": [
     {
       "type": 0,
       "value": "Norwegian (Norway)"
-    }
-  ],
-  "YwT8JW": [
-    {
-      "type": 0,
-      "value": "Registered shoppers can add product items to their wishlist from purchasing later."
     }
   ],
   "Yy/yDL": [
@@ -655,12 +491,6 @@
     {
       "type": 0,
       "value": "Polish (Poland)"
-    }
-  ],
-  "ZXp0z1": [
-    {
-      "type": 0,
-      "value": "Features"
     }
   ],
   "Zgc/KO": [
@@ -971,18 +801,6 @@
     {
       "type": 0,
       "value": "Are you sure you want to remove this item ?"
-    }
-  ],
-  "c0a6lZ": [
-    {
-      "type": 0,
-      "value": "Please try retyping the address, going back to the previous page, or going to the home page."
-    }
-  ],
-  "cLJrsY": [
-    {
-      "type": 0,
-      "value": "Cart & Checkout"
     }
   ],
   "card_payment_form.heading.new_payment_method": [
@@ -1489,12 +1307,6 @@
       "value": "Portuguese (Portugal)"
     }
   ],
-  "dUxyza": [
-    {
-      "type": 0,
-      "value": "Reviews"
-    }
-  ],
   "dfEp3Z": [
     {
       "type": 0,
@@ -1985,12 +1797,6 @@
       "value": "Chinese (Taiwan)"
     }
   ],
-  "hZOGLS": [
-    {
-      "type": 0,
-      "value": "Contact Us"
-    }
-  ],
   "header.button.assistive_msg.logo": [
     {
       "type": 0,
@@ -2039,10 +1845,170 @@
       "value": "My Account"
     }
   ],
-  "hp3uqR": [
+  "home.description.features": [
+    {
+      "type": 0,
+      "value": "Out-of-the-box features so that you focus only on adding enhancements."
+    }
+  ],
+  "home.description.here_to_help": [
+    {
+      "type": 0,
+      "value": "Contact our support staff and they’ll get "
+    },
+    {
+      "type": 1,
+      "value": "br"
+    },
+    {
+      "type": 0,
+      "value": " you to the right place."
+    }
+  ],
+  "home.description.shop_products": [
+    {
+      "type": 0,
+      "value": "This section contains content from the catalog. "
+    },
+    {
+      "type": 1,
+      "value": "link"
+    },
+    {
+      "type": 0,
+      "value": " on how to replace it."
+    }
+  ],
+  "home.features.description.cart_checkout": [
+    {
+      "type": 0,
+      "value": "Ecommerce best practice for a shopper's cart and checkout experience."
+    }
+  ],
+  "home.features.description.components": [
+    {
+      "type": 0,
+      "value": "Built using Chakra UI, a simple, modular and accessible React component library."
+    }
+  ],
+  "home.features.description.einstein_recommendations": [
+    {
+      "type": 0,
+      "value": "Deliver the next best product or offer to every shopper through product recommendations."
+    }
+  ],
+  "home.features.description.my_account": [
+    {
+      "type": 0,
+      "value": "Shoppers can manage account information such as their profile, addresses, payments and orders."
+    }
+  ],
+  "home.features.description.shopper_login": [
+    {
+      "type": 0,
+      "value": "Enable shoppers to easily log in with a more personalized shopping experience."
+    }
+  ],
+  "home.features.description.wishlist": [
+    {
+      "type": 0,
+      "value": "Registered shoppers can add product items to their wishlist from purchasing later."
+    }
+  ],
+  "home.features.heading.cart_checkout": [
+    {
+      "type": 0,
+      "value": "Cart & Checkout"
+    }
+  ],
+  "home.features.heading.components": [
+    {
+      "type": 0,
+      "value": "Components & Design kit"
+    }
+  ],
+  "home.features.heading.einstein_recommendations": [
+    {
+      "type": 0,
+      "value": "Einstein Recommendations"
+    }
+  ],
+  "home.features.heading.my_account": [
+    {
+      "type": 0,
+      "value": "My Account"
+    }
+  ],
+  "home.features.heading.shopper_login": [
+    {
+      "type": 0,
+      "value": "Shopper Login and API Access Service"
+    }
+  ],
+  "home.features.heading.wishlist": [
     {
       "type": 0,
       "value": "Wishlist"
+    }
+  ],
+  "home.heading.features": [
+    {
+      "type": 0,
+      "value": "Features"
+    }
+  ],
+  "home.heading.here_to_help": [
+    {
+      "type": 0,
+      "value": "We're here to help"
+    }
+  ],
+  "home.heading.shop_products": [
+    {
+      "type": 0,
+      "value": "Shop Products"
+    }
+  ],
+  "home.hero_features.link.design_kit": [
+    {
+      "type": 0,
+      "value": "Create with the Figma PWA Design Kit"
+    }
+  ],
+  "home.hero_features.link.on_github": [
+    {
+      "type": 0,
+      "value": "Download on Github"
+    }
+  ],
+  "home.hero_features.link.on_managed_runtime": [
+    {
+      "type": 0,
+      "value": "Deploy on Managed Runtime"
+    }
+  ],
+  "home.link.contact_us": [
+    {
+      "type": 0,
+      "value": "Contact Us"
+    }
+  ],
+  "home.link.get_started": [
+    {
+      "type": 0,
+      "value": "Get started"
+    }
+  ],
+  "home.link.read_docs": [
+    {
+      "type": 0,
+      "value": "Read docs"
+    }
+  ],
+  "home.title.react_starter_store": [
+    {
+      "type": 0,
+      "value": "The React PWA Starter Store for Retail"
     }
   ],
   "huqKGl": [
@@ -2079,18 +2045,6 @@
       "value": "Sale"
     }
   ],
-  "kBAj4C": [
-    {
-      "type": 0,
-      "value": "Download on Github"
-    }
-  ],
-  "lc9tAq": [
-    {
-      "type": 0,
-      "value": "Read docs"
-    }
-  ],
   "llHgJz": [
     {
       "type": 0,
@@ -2105,16 +2059,10 @@
       "value": ","
     }
   ],
-  "lmhMZ6": [
+  "login.error.incorrect_username_password": [
     {
       "type": 0,
-      "value": "Out-of-the-box features so that you focus only on adding enhancements."
-    }
-  ],
-  "login-redirect.message.welcome": [
-    {
-      "type": 0,
-      "value": "Login Redirect"
+      "value": "Incorrect username or password, please try again."
     }
   ],
   "login_form.action.create_account": [
@@ -2147,12 +2095,6 @@
       "value": "Welcome Back"
     }
   ],
-  "mfahwZ": [
-    {
-      "type": 0,
-      "value": "Recently Viewed"
-    }
-  ],
   "n/iZlE": [
     {
       "type": 0,
@@ -2163,20 +2105,6 @@
     {
       "type": 0,
       "value": "Turkish (Turkey)"
-    }
-  ],
-  "nEtDrF": [
-    {
-      "type": 0,
-      "value": "Contact our support staff and they’ll get "
-    },
-    {
-      "type": 1,
-      "value": "br"
-    },
-    {
-      "type": 0,
-      "value": " you to the right place."
     }
   ],
   "odTkf5": [
@@ -2307,6 +2235,30 @@
       "value": "Promotion removed"
     }
   ],
+  "page_not_found.action.go_back": [
+    {
+      "type": 0,
+      "value": "Back to previous page"
+    }
+  ],
+  "page_not_found.link.homepage": [
+    {
+      "type": 0,
+      "value": "Go to home page"
+    }
+  ],
+  "page_not_found.message.suggestion_to_try": [
+    {
+      "type": 0,
+      "value": "Please try retyping the address, going back to the previous page, or going to the home page."
+    }
+  ],
+  "page_not_found.title.page_cant_be_found": [
+    {
+      "type": 0,
+      "value": "The page you're looking for can't be found"
+    }
+  ],
   "pagination.field.num_of_pages": [
     {
       "type": 0,
@@ -2411,6 +2363,92 @@
     {
       "type": 0,
       "value": "ea"
+    }
+  ],
+  "product_detail.accordion.button.product_detail": [
+    {
+      "type": 0,
+      "value": "Product Detail"
+    }
+  ],
+  "product_detail.accordion.button.questions": [
+    {
+      "type": 0,
+      "value": "Questions"
+    }
+  ],
+  "product_detail.accordion.button.reviews": [
+    {
+      "type": 0,
+      "value": "Reviews"
+    }
+  ],
+  "product_detail.accordion.button.size_fit": [
+    {
+      "type": 0,
+      "value": "Size & Fit"
+    }
+  ],
+  "product_detail.accordion.message.coming_soon": [
+    {
+      "type": 0,
+      "value": "Coming Soon"
+    }
+  ],
+  "product_detail.info.added_to_wishlist": [
+    {
+      "type": 1,
+      "value": "quantity"
+    },
+    {
+      "type": 0,
+      "value": " "
+    },
+    {
+      "offset": 0,
+      "options": {
+        "one": {
+          "value": [
+            {
+              "type": 0,
+              "value": "item"
+            }
+          ]
+        },
+        "other": {
+          "value": [
+            {
+              "type": 0,
+              "value": "items"
+            }
+          ]
+        }
+      },
+      "pluralType": "cardinal",
+      "type": 6,
+      "value": "quantity"
+    },
+    {
+      "type": 0,
+      "value": " added to wishlist"
+    }
+  ],
+  "product_detail.recommended_products.title.complete_set": [
+    {
+      "type": 0,
+      "value": "Complete The Set"
+    }
+  ],
+  "product_detail.recommended_products.title.might_also_like": [
+    {
+      "type": 0,
+      "value": "You Might Also Like"
+    }
+  ],
+  "product_detail.recommended_products.title.recently_viewed": [
+    {
+      "type": 0,
+      "value": "Recently Viewed"
     }
   ],
   "product_item.label.quantity": [
