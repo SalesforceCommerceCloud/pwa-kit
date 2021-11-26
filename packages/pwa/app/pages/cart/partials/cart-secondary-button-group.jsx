@@ -23,12 +23,22 @@ import {noop} from '../../../utils/utils'
 import useCustomer from '../../../commerce-api/hooks/useCustomer'
 
 export const REMOVE_CART_ITEM_CONFIRMATION_DIALOG_CONFIG = {
-    dialogTitle: defineMessage({defaultMessage: 'Remove Item?'}),
-    confirmationMessage: defineMessage({
-        defaultMessage: 'Are you sure you want to remove this item from your cart?'
+    dialogTitle: defineMessage({
+        defaultMessage: 'Remove Item?',
+        id: 'global.cart.title.remove_item'
     }),
-    primaryActionLabel: defineMessage({defaultMessage: 'Yes, remove item'}),
-    alternateActionLabel: defineMessage({defaultMessage: 'No, keep item'}),
+    confirmationMessage: defineMessage({
+        defaultMessage: 'Are you sure you want to remove this item from your cart?',
+        id: 'global.cart.message.sure_to_remove_item'
+    }),
+    primaryActionLabel: defineMessage({
+        defaultMessage: 'Yes, remove item',
+        id: 'global.cart.action.yes_remove'
+    }),
+    alternateActionLabel: defineMessage({
+        defaultMessage: 'No, keep item',
+        id: 'global.cart.action.no_keep'
+    }),
     onPrimaryAction: noop
 }
 
@@ -65,7 +75,10 @@ const CartSecondaryButtonGroup = ({
             >
                 <ButtonGroup spacing="6">
                     <Button variant="link" size="sm" onClick={showRemoveItemConfirmation}>
-                        <FormattedMessage defaultMessage="Remove" />
+                        <FormattedMessage
+                            defaultMessage="Remove"
+                            id="cart_secondary_button_group.action.remove"
+                        />
                     </Button>
                     {customer.isRegistered && (
                         <Button
@@ -73,20 +86,32 @@ const CartSecondaryButtonGroup = ({
                             size="sm"
                             onClick={() => onAddToWishlistClick(variant)}
                         >
-                            <FormattedMessage defaultMessage="Add to wishlist" />
+                            <FormattedMessage
+                                defaultMessage="Add to wishlist"
+                                id="cart_secondary_button_group.action.added_to_wishlist"
+                            />
                         </Button>
                     )}
                     <Button variant="link" size="sm" onClick={() => onEditClick(variant)}>
-                        <FormattedMessage defaultMessage="Edit" />
+                        <FormattedMessage
+                            defaultMessage="Edit"
+                            id="cart_secondary_button_group.action.edit"
+                        />
                     </Button>
                 </ButtonGroup>
                 <Flex alignItems="center">
                     <Checkbox spacing={2} isReadOnly={true}>
-                        <FormattedMessage defaultMessage="This is a gift." />
+                        <FormattedMessage
+                            defaultMessage="This is a gift."
+                            id="cart_secondary_button_group.label.this_is_gift"
+                        />
                     </Checkbox>
                     <Box marginLeft={1}>
                         <Button marginLeft={1} variant="link" size="sm">
-                            <FormattedMessage defaultMessage="Learn more" />
+                            <FormattedMessage
+                                defaultMessage="Learn more"
+                                id="cart_secondary_button_group.link_learn_more"
+                            />
                         </Button>
                     </Box>
                 </Flex>

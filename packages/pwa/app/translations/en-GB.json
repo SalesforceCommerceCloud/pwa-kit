@@ -11,9 +11,6 @@
   "/aBLH2": {
     "defaultMessage": "Get started"
   },
-  "/kLqfV": {
-    "defaultMessage": "This is a gift."
-  },
   "0LrnyG": {
     "defaultMessage": "Components & Design kit"
   },
@@ -47,38 +44,20 @@
   "2BHb6K": {
     "defaultMessage": "Applied promotions info"
   },
-  "2SvpuI": {
-    "defaultMessage": "Log in here"
-  },
   "2WRHXI": {
     "defaultMessage": "{quantity} {quantity, plural, one {item} other {items}} added to cart"
   },
   "2bGejb": {
     "defaultMessage": "My Account"
   },
-  "2tqQFl": {
-    "defaultMessage": "Cart"
-  },
   "3HK3af": {
     "defaultMessage": "Unknown {localeShortCode}"
-  },
-  "3gXwAV": {
-    "defaultMessage": "Sign in to retrieve your saved items or continue shopping"
-  },
-  "47FYwb": {
-    "defaultMessage": "Cancel"
   },
   "4UPOXx": {
     "defaultMessage": "Confirm Remove Item"
   },
   "5BTYa0": {
     "defaultMessage": "View Cart"
-  },
-  "5H7Fzu": {
-    "defaultMessage": "{itemCount, plural, =0 {0 items} one {# item} other {# items}})"
-  },
-  "5JcXdV": {
-    "defaultMessage": "Create Account"
   },
   "5S2I6Q": {
     "defaultMessage": "Incorrect username or password, please try again."
@@ -101,29 +80,17 @@
   "74fug6": {
     "defaultMessage": "Tamil (India)"
   },
-  "7PMLfK": {
-    "defaultMessage": "Order Total"
-  },
   "7Z41IR": {
     "defaultMessage": "Einstein Recommendations"
   },
   "7gXPhB": {
     "defaultMessage": "Qty"
   },
-  "7xscgD": {
-    "defaultMessage": "Delivery Details"
-  },
   "8+0PQZ": {
     "defaultMessage": "The page you're looking for can't be found"
   },
   "8CDRAt": {
     "defaultMessage": "Spanish (Mexico)"
-  },
-  "8iXlvA": {
-    "defaultMessage": "Save & Continue"
-  },
-  "8pvKg1": {
-    "defaultMessage": "Payment Details"
   },
   "9Npj92": {
     "defaultMessage": "Enter your email to receive instructions on how to reset your password"
@@ -134,9 +101,6 @@
   "A2v4cr": {
     "defaultMessage": "English (United Kingdom)"
   },
-  "A8Tnga": {
-    "defaultMessage": "Credit Card"
-  },
   "ABWZu0": {
     "defaultMessage": "Spanish (Argentina)"
   },
@@ -146,26 +110,11 @@
   "AJlIwK": {
     "defaultMessage": "This section contains content from the catalog. {link} on how to replace it."
   },
-  "AYIKp4": {
-    "defaultMessage": "Already have an account? Log in"
-  },
   "AiDBu2": {
     "defaultMessage": "Slovak (Slovakia)"
   },
-  "Au/ysp": {
-    "defaultMessage": "This is a secure SSL encrypted payment."
-  },
-  "AwzkSM": {
-    "defaultMessage": "Tax"
-  },
-  "BEqvr/": {
-    "defaultMessage": "Contact Info"
-  },
   "BWpuKl": {
     "defaultMessage": "Update"
-  },
-  "BlJFo9": {
-    "defaultMessage": "This email already has an account."
   },
   "Cl4TrE": {
     "defaultMessage": "Add to wishlist"
@@ -175,9 +124,6 @@
   },
   "CutQ+m": {
     "defaultMessage": "Spanish (Columbia)"
-  },
-  "D+bY29": {
-    "defaultMessage": "Shipping Method"
   },
   "D8RblK": {
     "defaultMessage": "Do you have a promo code?"
@@ -200,26 +146,14 @@
   "ES4Hjg": {
     "defaultMessage": "Danish (Denmark)"
   },
-  "F62y+K": {
-    "defaultMessage": "Sign Out"
-  },
   "FdbYXD": {
     "defaultMessage": "Shop Products"
   },
   "Fmc5ut": {
     "defaultMessage": "Continue to Shipping Method"
   },
-  "G/yZLu": {
-    "defaultMessage": "Remove"
-  },
-  "IUXVjJ": {
-    "defaultMessage": "Continue Shopping"
-  },
   "Ihg+6O": {
     "defaultMessage": "Let's get started"
-  },
-  "JAcwxt": {
-    "defaultMessage": "Order Number"
   },
   "KE5qj+": {
     "defaultMessage": "French (Switzerland)"
@@ -230,14 +164,8 @@
   "KcHWA3": {
     "defaultMessage": "Shopper Login and API Access Service"
   },
-  "L8seEc": {
-    "defaultMessage": "Subtotal"
-  },
   "LiHQih": {
     "defaultMessage": "Coming Soon"
-  },
-  "MPcjO/": {
-    "defaultMessage": "Are you sure you want to sign out? You will need to sign back in to proceed with your current order."
   },
   "MQHbcd": {
     "defaultMessage": "English (Canada)"
@@ -245,14 +173,8 @@
   "MQoJ1Y": {
     "defaultMessage": "Enable shoppers to easily log in with a more personalized shopping experience."
   },
-  "NTgwLi": {
-    "defaultMessage": "Place Order"
-  },
   "NV26qx": {
     "defaultMessage": "Back to previous page"
-  },
-  "NmK6zy": {
-    "defaultMessage": "Payment"
   },
   "O3zHDW": {
     "defaultMessage": "{submitButtonLabel}"
@@ -266,9 +188,6 @@
   "ONNUqG": {
     "defaultMessage": "By creating an account, you agree to Salesforce’s <policy>Privacy Policy</policy> and <terms>Terms & Conditions</terms>"
   },
-  "OVAmhz": {
-    "defaultMessage": "Back to cart"
-  },
   "OVvfLK": {
     "defaultMessage": "You're now signed in"
   },
@@ -277,9 +196,6 @@
   },
   "OlItur": {
     "defaultMessage": "Create with the Figma PWA Design Kit"
-  },
-  "Olgsm/": {
-    "defaultMessage": "Create an account for faster checkout"
   },
   "OrvEHn": {
     "defaultMessage": "Product Detail"
@@ -290,14 +206,8 @@
   "PEVXku": {
     "defaultMessage": "Thai (Thailand)"
   },
-  "PNj3WE": {
-    "defaultMessage": "Review Order"
-  },
   "PO4nBj": {
     "defaultMessage": "French (France)"
-  },
-  "PRlD0A": {
-    "defaultMessage": "Shipping"
   },
   "PpMdwV": {
     "defaultMessage": "We're here to help"
@@ -320,18 +230,12 @@
   "SXDujd": {
     "defaultMessage": "Dutch (Belgium)"
   },
-  "T/K9MQ": {
-    "defaultMessage": "promo applied"
-  },
   "T8HBFR": {
     "defaultMessage": "German (Germany)"
   },
   "TR+DHM": {
     "defaultMessage": "Or return to",
     "description": "Precedes link to return to sign in"
-  },
-  "TdTXXf": {
-    "defaultMessage": "Learn more"
   },
   "TvauRz": {
     "defaultMessage": "Bangla (Bangladesh)"
@@ -342,17 +246,8 @@
   "UE9zNR": {
     "defaultMessage": "Recent Searches"
   },
-  "Ub+AGc": {
-    "defaultMessage": "Sign In"
-  },
   "V+9Zzz": {
     "defaultMessage": "Size & Fit"
-  },
-  "V/JHlm": {
-    "defaultMessage": "Forgot password?"
-  },
-  "V8WZRT": {
-    "defaultMessage": "Continue shopping to add items to your cart"
   },
   "VALef7": {
     "defaultMessage": "Ecommerce best practice for a shopper's cart and checkout experience."
@@ -447,6 +342,9 @@
   "account_order_detail.label.ordered_date": {
     "defaultMessage": "Ordered: {date}"
   },
+  "account_order_detail.label.pending_tracking_number": {
+    "defaultMessage": "Pending"
+  },
   "account_order_detail.label.tracking_number": {
     "defaultMessage": "Tracking Number"
   },
@@ -517,10 +415,6 @@
   "action_card.action.remove": {
     "defaultMessage": "Remove"
   },
-  "au3Vns": {
-    "defaultMessage": "{itemCount, plural, =0 {0 items} one {# item} other {# items}}",
-    "description": "# item(s) in order"
-  },
   "b24hho": {
     "defaultMessage": "Chinese (China)"
   },
@@ -536,14 +430,8 @@
   "c0a6lZ": {
     "defaultMessage": "Please try retyping the address, going back to the previous page, or going to the home page."
   },
-  "c7/79+": {
-    "defaultMessage": "Billing Address"
-  },
   "cLJrsY": {
     "defaultMessage": "Cart & Checkout"
-  },
-  "cUwO+6": {
-    "defaultMessage": "Add New Card"
   },
   "card_payment_form.heading.new_payment_method": {
     "defaultMessage": "Add New Payment Method"
@@ -562,6 +450,166 @@
   },
   "cart_cta.link.checkout": {
     "defaultMessage": "Proceed to Checkout"
+  },
+  "cart_secondary_button_group.action.added_to_wishlist": {
+    "defaultMessage": "Add to wishlist"
+  },
+  "cart_secondary_button_group.action.edit": {
+    "defaultMessage": "Edit"
+  },
+  "cart_secondary_button_group.action.remove": {
+    "defaultMessage": "Remove"
+  },
+  "cart_secondary_button_group.label.this_is_gift": {
+    "defaultMessage": "This is a gift."
+  },
+  "cart_secondary_button_group.link_learn_more": {
+    "defaultMessage": "Learn more"
+  },
+  "cart_skeleton.heading.order_summary": {
+    "defaultMessage": "Order Summary"
+  },
+  "cart_skeleton.title.cart": {
+    "defaultMessage": "Cart"
+  },
+  "cart_title.title.cart_num_of_items": {
+    "defaultMessage": "Cart ({itemCount, plural, =0 {0 items} one {# item} other {# items}})"
+  },
+  "cc_radio_group.action.remove": {
+    "defaultMessage": "Remove"
+  },
+  "cc_radio_group.button.add_new_card": {
+    "defaultMessage": "Add New Card"
+  },
+  "checkout.button.place_order": {
+    "defaultMessage": "Place Order"
+  },
+  "checkout_confirmation.button.create_account": {
+    "defaultMessage": "Create Account"
+  },
+  "checkout_confirmation.heading.billing_address": {
+    "defaultMessage": "Billing Address"
+  },
+  "checkout_confirmation.heading.create_account": {
+    "defaultMessage": "Create an account for faster checkout"
+  },
+  "checkout_confirmation.heading.credit_card": {
+    "defaultMessage": "Credit Card"
+  },
+  "checkout_confirmation.heading.delivery_details": {
+    "defaultMessage": "Delivery Details"
+  },
+  "checkout_confirmation.heading.order_summary": {
+    "defaultMessage": "Order Summary"
+  },
+  "checkout_confirmation.heading.payment_details": {
+    "defaultMessage": "Payment Details"
+  },
+  "checkout_confirmation.heading.shipping_address": {
+    "defaultMessage": "Shipping Address"
+  },
+  "checkout_confirmation.heading.shipping_method": {
+    "defaultMessage": "Shipping Method"
+  },
+  "checkout_confirmation.heading.thank_you_for_order": {
+    "defaultMessage": "Thank you for your order!"
+  },
+  "checkout_confirmation.label.free": {
+    "defaultMessage": "Free"
+  },
+  "checkout_confirmation.label.order_number": {
+    "defaultMessage": "Order Number"
+  },
+  "checkout_confirmation.label.order_total": {
+    "defaultMessage": "Order Total"
+  },
+  "checkout_confirmation.label.promo_applied": {
+    "defaultMessage": "promo applied"
+  },
+  "checkout_confirmation.label.shipping": {
+    "defaultMessage": "Shipping"
+  },
+  "checkout_confirmation.label.subtotal": {
+    "defaultMessage": "Subtotal"
+  },
+  "checkout_confirmation.label.tax": {
+    "defaultMessage": "Tax"
+  },
+  "checkout_confirmation.link.continue_shopping": {
+    "defaultMessage": "Continue Shopping"
+  },
+  "checkout_confirmation.link_login": {
+    "defaultMessage": "Log in here"
+  },
+  "checkout_confirmation.message.already_has_account": {
+    "defaultMessage": "This email already has an account."
+  },
+  "checkout_confirmation.message.num_of_items_in_order": {
+    "defaultMessage": "{itemCount, plural, =0 {0 items} one {# item} other {# items}}",
+    "description": "# item(s) in order"
+  },
+  "checkout_confirmation.message.will_email_shortly": {
+    "defaultMessage": "We will send an email to <b>{email}</b> with your confirmation number and receipt shortly."
+  },
+  "checkout_footer.link.privacy_policy": {
+    "defaultMessage": "Privacy Policy"
+  },
+  "checkout_footer.link.returns_exchanges": {
+    "defaultMessage": "Returns & Exchanges"
+  },
+  "checkout_footer.link.shipping": {
+    "defaultMessage": "Shipping"
+  },
+  "checkout_footer.link.site_map": {
+    "defaultMessage": "Site Map"
+  },
+  "checkout_footer.link.terms_conditions": {
+    "defaultMessage": "Terms & Conditions"
+  },
+  "checkout_footer.message.copyright": {
+    "defaultMessage": "2021 Salesforce or its affiliates. All rights reserved. This is a demo store only. Orders made WILL NOT be processed."
+  },
+  "checkout_header.link.cart": {
+    "defaultMessage": "Back to cart"
+  },
+  "checkout_payment.action.remove": {
+    "defaultMessage": "Remove"
+  },
+  "checkout_payment.button.review_order": {
+    "defaultMessage": "Review Order"
+  },
+  "checkout_payment.heading.billing_address": {
+    "defaultMessage": "Billing Address"
+  },
+  "checkout_payment.heading.credit_card": {
+    "defaultMessage": "Credit Card"
+  },
+  "checkout_payment.label.same_as_shipping": {
+    "defaultMessage": "Same as shipping address"
+  },
+  "checkout_payment.title.payment": {
+    "defaultMessage": "Payment"
+  },
+  "contact_info.action.sign_out": {
+    "defaultMessage": "Sign Out"
+  },
+  "contact_info.button.already_have_account": {
+    "defaultMessage": "Already have an account? Log in"
+  },
+  "contact_info.button.checkout_as_guest": {
+    "defaultMessage": "Checkout as guest"
+  },
+  "contact_info.button.login": {
+    "defaultMessage": "Log in"
+  },
+  "contact_info.error.incorrect_username_password": {
+    "defaultMessage": "Incorrect username or password, please try again."
+  },
+  "contact_info.link.forgot_password": {
+    "defaultMessage": "Forgot password?"
+  },
+  "contact_info.title.contact_info": {
+    "defaultMessage": "Contact Info"
   },
   "credit_card_fields.tool_tip.security_code": {
     "defaultMessage": "This {length}-digit code can be found on the {side} of your card.",
@@ -633,14 +681,26 @@
   "e//rzS": {
     "defaultMessage": "Italian (Italy)"
   },
-  "eKEL/g": {
-    "defaultMessage": "Pending"
-  },
   "eSl9Vh": {
     "defaultMessage": "Finnish (Finland)"
   },
   "eYVKts": {
     "defaultMessage": "English (India)"
+  },
+  "empty_cart.description.empty_cart": {
+    "defaultMessage": "Your Cart is Empty"
+  },
+  "empty_cart.link.continue_shopping": {
+    "defaultMessage": "Continue Shopping"
+  },
+  "empty_cart.link.sign_in": {
+    "defaultMessage": "Sign In"
+  },
+  "empty_cart.message.continue_shopping": {
+    "defaultMessage": "Continue shopping to add items to your cart"
+  },
+  "empty_cart.message.sign_in_or_continue_shopping": {
+    "defaultMessage": "Sign in to retrieve your saved items or continue shopping"
   },
   "empty_search_results.info.cant_find_anything_for_category": {
     "defaultMessage": "We couldn’t find anything for {category}. Try searching for a product or {link}."
@@ -659,9 +719,6 @@
   },
   "empty_search_results.recommended_products.title.top_sellers": {
     "defaultMessage": "Top Sellers"
-  },
-  "fCRlK5": {
-    "defaultMessage": "We will send an email to <b>{email}</b> with your confirmation number and receipt shortly."
   },
   "fG2sM9": {
     "defaultMessage": "Please sign in to continue!"
@@ -689,9 +746,6 @@
   },
   "footer.link.privacy_policy": {
     "defaultMessage": "Privacy Policy"
-  },
-  "footer.link.returns_exchanges": {
-    "defaultMessage": "Returns & Exchanges"
   },
   "footer.link.shipping": {
     "defaultMessage": "Shipping"
@@ -725,9 +779,6 @@
   },
   "form_action_buttons.button.save": {
     "defaultMessage": "Save"
-  },
-  "fuzq0p": {
-    "defaultMessage": "Checkout as guest"
   },
   "g3uXY2": {
     "defaultMessage": "Swedish (Sweden)"
@@ -773,6 +824,18 @@
   },
   "global.account.title.confirm_remove": {
     "defaultMessage": "Confirm Remove Item"
+  },
+  "global.cart.action.no_keep": {
+    "defaultMessage": "No, keep item"
+  },
+  "global.cart.action.yes_remove": {
+    "defaultMessage": "Yes, remove item"
+  },
+  "global.cart.message.sure_to_remove_item": {
+    "defaultMessage": "Are you sure you want to remove this item from your cart?"
+  },
+  "global.cart.title.remove_item": {
+    "defaultMessage": "Remove Item?"
   },
   "global.error.something_went_wrong": {
     "defaultMessage": "Something went wrong. Try again!"
@@ -828,12 +891,6 @@
   "i0/00S": {
     "defaultMessage": "English (Australia)"
   },
-  "iPMbLb": {
-    "defaultMessage": "Please select a payment method."
-  },
-  "ipwTkh": {
-    "defaultMessage": "Same as shipping address"
-  },
   "item_attributes.label.promotions": {
     "defaultMessage": "Promotions"
   },
@@ -844,17 +901,8 @@
     "defaultMessage": "Sale",
     "description": "A sale badge placed on top of a product image"
   },
-  "ivNR8s": {
-    "defaultMessage": "Order Summary"
-  },
-  "jAOn1A": {
-    "defaultMessage": "Are you sure you want to remove this item from your cart?"
-  },
   "kBAj4C": {
     "defaultMessage": "Download on Github"
-  },
-  "kVzyDt": {
-    "defaultMessage": "Thank you for your order!"
   },
   "lc9tAq": {
     "defaultMessage": "Read docs"
@@ -895,17 +943,8 @@
   "nEtDrF": {
     "defaultMessage": "Contact our support staff and they’ll get {br} you to the right place."
   },
-  "nEwlut": {
-    "defaultMessage": "Remove Item?"
-  },
-  "nYi7Xz": {
-    "defaultMessage": "Your Cart is Empty"
-  },
   "odTkf5": {
     "defaultMessage": "Back to sign in"
-  },
-  "odXlk8": {
-    "defaultMessage": "Log in"
   },
   "offline_banner.description.browsing_offline_mode": {
     "defaultMessage": "You're currently browsing in offline mode"
@@ -990,6 +1029,21 @@
   "password_requirements.error.one_uppercase_letter": {
     "defaultMessage": "1 uppercase letter",
     "description": "Password requirement"
+  },
+  "payment_selection.button.save_continue": {
+    "defaultMessage": "Save & Continue"
+  },
+  "payment_selection.heading.add_new_card": {
+    "defaultMessage": "Add New Card"
+  },
+  "payment_selection.heading.credit_card": {
+    "defaultMessage": "Credit Card"
+  },
+  "payment_selection.message.select_payment_method": {
+    "defaultMessage": "Please select a payment method."
+  },
+  "payment_selection.tooltip.secure_payment": {
+    "defaultMessage": "This is a secure SSL encrypted payment."
   },
   "price_per_item.label.each": {
     "defaultMessage": "ea",
@@ -1076,14 +1130,23 @@
   "shipping_address_form.heading.new_address": {
     "defaultMessage": "Add New Address"
   },
+  "signout_confirmation_dialog.button.cancel": {
+    "defaultMessage": "Cancel"
+  },
+  "signout_confirmation_dialog.button.sign_out": {
+    "defaultMessage": "Sign Out"
+  },
+  "signout_confirmation_dialog.heading.sign_out": {
+    "defaultMessage": "Sign Out"
+  },
+  "signout_confirmation_dialog.message.sure_to_sign_out": {
+    "defaultMessage": "Are you sure you want to sign out? You will need to sign back in to proceed with your current order."
+  },
   "tYBua6": {
     "defaultMessage": "Indonesian (Indonesia)"
   },
   "tclGo+": {
     "defaultMessage": "Arabic (Saudi Arabia)"
-  },
-  "tf1lIh": {
-    "defaultMessage": "Free"
   },
   "tnSBvt": {
     "defaultMessage": "Korean (Republic of Korea)"
@@ -1336,9 +1399,6 @@
   },
   "vvTcAr": {
     "defaultMessage": "Create an account and get first access to the very best products, inspiration and community."
-  },
-  "wEQDC6": {
-    "defaultMessage": "Edit"
   },
   "wishlist_primary_action.info.added_to_cart": {
     "defaultMessage": "{quantity} {quantity, plural, one {item} other {items}} added to cart"

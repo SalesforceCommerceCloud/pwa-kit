@@ -53,7 +53,10 @@ const CartSkeleton = () => {
                     <GridItem>
                         <Stack paddingTop={4} spacing={4}>
                             <Text fontWeight="bold" fontSize={['xl', 'xl', 'xl', '2xl']}>
-                                <FormattedMessage defaultMessage="Cart" />
+                                <FormattedMessage
+                                    defaultMessage="Cart"
+                                    id="cart_skeleton.title.cart"
+                                />
                             </Text>
                             <CartItemSkeleton />
                             <CartItemSkeleton />
@@ -62,7 +65,10 @@ const CartSkeleton = () => {
                     <GridItem py={7}>
                         <Stack paddingTop={{base: 0, lg: 8}} spacing={3} px={[6, 6, 6, 0]}>
                             <Heading fontSize="lg" pt={1}>
-                                <FormattedMessage defaultMessage="Order Summary" />
+                                <FormattedMessage
+                                    defaultMessage="Order Summary"
+                                    id="cart_skeleton.heading.order_summary"
+                                />
                             </Heading>
                             <Stack spacing={3} align="flex-start">
                                 <Skeleton

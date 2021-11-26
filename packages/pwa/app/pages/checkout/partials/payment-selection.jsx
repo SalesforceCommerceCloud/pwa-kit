@@ -73,14 +73,18 @@ const PaymentSelection = ({form, hideSubmitButton, onSubmit = () => null}) => {
                                     <Flex justify="space-between">
                                         <Stack direction="row" align="center">
                                             <Text fontWeight="bold">
-                                                <FormattedMessage defaultMessage="Credit Card" />
+                                                <FormattedMessage
+                                                    defaultMessage="Credit Card"
+                                                    id="payment_selection.heading.credit_card"
+                                                />
                                             </Text>
                                             <Tooltip
                                                 hasArrow
                                                 placement="top"
                                                 label={formatMessage({
                                                     defaultMessage:
-                                                        'This is a secure SSL encrypted payment.'
+                                                        'This is a secure SSL encrypted payment.',
+                                                    id: 'payment_selection.tooltip.secure_payment'
                                                 })}
                                             >
                                                 <LockIcon color="gray.700" boxSize={5} />
@@ -108,7 +112,9 @@ const PaymentSelection = ({form, hideSubmitButton, onSubmit = () => null}) => {
                                                 required: !isEditingPayment
                                                     ? formatMessage({
                                                           defaultMessage:
-                                                              'Please select a payment method.'
+                                                              'Please select a payment method.',
+                                                          id:
+                                                              'payment_selection.message.select_payment_method'
                                                       })
                                                     : false
                                             }}
@@ -137,7 +143,10 @@ const PaymentSelection = ({form, hideSubmitButton, onSubmit = () => null}) => {
                                             <Stack spacing={6}>
                                                 {hasSavedCards && (
                                                     <Heading as="h3" size="sm">
-                                                        <FormattedMessage defaultMessage="Add New Card" />
+                                                        <FormattedMessage
+                                                            defaultMessage="Add New Card"
+                                                            id="payment_selection.heading.add_new_card"
+                                                        />
                                                     </Heading>
                                                 )}
 
@@ -153,7 +162,10 @@ const PaymentSelection = ({form, hideSubmitButton, onSubmit = () => null}) => {
                                                                 type="submit"
                                                                 w="full"
                                                             >
-                                                                <FormattedMessage defaultMessage="Save & Continue" />
+                                                                <FormattedMessage
+                                                                    defaultMessage="Save & Continue"
+                                                                    id="payment_selection.button.save_continue"
+                                                                />
                                                             </Button>
                                                         </Container>
                                                     </Box>
