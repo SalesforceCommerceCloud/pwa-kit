@@ -50,8 +50,6 @@ commands:
 
             # Install Snyk CLI
             sudo npm install -g snyk
-            
-            echo "Credentials are available: $SNYK_TOKEN"
 
             # Install Lighthouse CI CLI
             sudo npm install -g @lhci/cli
@@ -168,6 +166,7 @@ jobs:
       - lighthouse-ci
       - smoketestscripts
       - checkclean
+      - early_return_for_forked_pull_requests
       - store_test_results:
           path: packages/pwa/tests/reports
           when: always
@@ -284,7 +283,7 @@ jobs:
             if [[ "${CIRCLE_BRANCH}" == "develop" ]]; then
               # Run snyk auth - authenticate snyk using environment variables to add the token
               snyk auth $SNYK_TOKEN
-              
+
               snyk monitor --ignore-policy --remote-repo-url='https://github.com/SalesforceCommerceCloud/pwa-kit.git' --project-name='generated-scaffold-pwa'
             fi
       - run:
@@ -299,10 +298,10 @@ jobs:
               else
                   echo "Error: Found $total installed packages (max $MAX_PACKAGES).";
               fi
-              
+
             # Add a dogrc so we can submit metrics to datadog
-            printf "[Connection]\napikey = $DATADOG_API_KEY\nappkey =\n" > ~/.dogrc  
-            
+            printf "[Connection]\napikey = $DATADOG_API_KEY\nappkey =\n" > ~/.dogrc
+
             dog metric post mobify_platform_sdks.generated_project_total_packages $total
       - run:
           name: Push Bundle
