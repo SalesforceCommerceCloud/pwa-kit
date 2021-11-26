@@ -5,6 +5,7 @@ const program = require('commander')
 const isEmail = require('validator/lib/isEmail')
 const {execSync} = require('child_process')
 const scriptUtils = require('../scripts/utils')
+const sh = require('shelljs')
 
 // TODO: Won't work when deployed to NPM - need to resolve differently
 const webpack = require.resolve('webpack/bin/webpack')
@@ -67,7 +68,20 @@ const main = () => {
         .command('build')
         .description(`build your app for production`)
         .action(() => {
-            execSync(`${webpack} --config ${webpackConf}`, {stdio: 'inherit'})
+            const original = sh.config.silent
+            sh.config.silent = true
+            try {
+                sh.rm('-rf', './build')
+                sh.mkdir('-p', './build/node_modules')
+                sh.exec(`${webpack} --config ${webpackConf}`)
+                sh.cp('-RL', './node_modules/*', './build/node_modules')
+                sh.cp('./app/ssr.js', './package.json', './package-lock.json', './build/')
+                sh.pushd('./build')
+                sh.exec('npm prune --production')
+                sh.popd()
+            } finally {
+                sh.config.silent = original
+            }
         })
 
     program
