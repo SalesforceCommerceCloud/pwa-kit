@@ -11,6 +11,7 @@
   "author": "dev@mobify.com",
   "main": "dist/index.js",
   "bin": {
+    "internal-lib-build": "./bin/internal-lib-build.js"
   },
   "files": [
     "bin",
@@ -21,9 +22,6 @@
     "utils",
     "webpack"
   ],
-  "scripts": {
-    "internal-lib-build": "./bin/internal-lib-build.js"
-  },
   "dependencies": {
     "@babel/cli": "^7.4.4",
     "@babel/core": "^7.4.5",
