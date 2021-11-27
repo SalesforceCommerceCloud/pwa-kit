@@ -838,7 +838,6 @@ class BaseServerFactory {
         this.setupMetricsFlushing(app)
         this.setupHealthcheck(app)
         this.setupProxying(app, options)
-        this.serveCompiledAssets(app)
 
         // Beyond this point, we know that this is not a proxy request
         // and not a bundle request, so we can apply specific
@@ -1985,4 +1984,7 @@ export const createApp = (options) => factory.createApp(options)
  * @param app {Express} - an Express App
  * @return {Function|undefined} - return a Lambda handler if running remotely, else undefined.
  */
-export const createHandler = (app) => factory.createHandler(app).handler
+export const createHandler = (app) => {
+    factory.serveCompiledAssets(app)
+    factory.createHandler(app).handler
+}
