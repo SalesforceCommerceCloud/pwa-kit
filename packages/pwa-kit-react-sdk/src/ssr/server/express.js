@@ -104,6 +104,20 @@ export const REMOTE_REQUIRED_ENV_VARS = [
     'MOBIFY_PROPERTY_ID'
 ]
 
+const projectPkg = () => {
+    const searchPaths = [
+        path.resolve(process.cwd(), './package.json'),
+        path.resolve(process.cwd(), '..', './package.json'),
+    ]
+    for (let i = 0; i < searchPaths.length; i++) {
+        const searchPath = searchPaths[i]
+        if (fs.existsSync(searchPath)) {
+            return require(searchPath)
+        }
+    }
+    throw new Error(`Cannot find package.json in ${searchPaths}`)
+}
+
 /**
  * Create an SSR (Server-Side Rendering) Server.
  *
@@ -158,7 +172,9 @@ export const createApp = (options) => {
         // be no use-case for SDK users to set this.
         strictSSL: true,
 
-        enableLegacyRemoteProxying: true
+        enableLegacyRemoteProxying: true,
+
+        mobify: projectPkg().mobify,
     }
 
     options = Object.assign({}, defaults, options)

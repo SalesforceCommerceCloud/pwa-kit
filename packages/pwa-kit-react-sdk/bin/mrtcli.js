@@ -83,9 +83,18 @@ const main = () => {
                 sh.mkdir('-p', './build/node_modules')
                 sh.exec(`${webpack} --config ${webpackConf}`)
                 sh.cp('-RL', './node_modules/*', './build/node_modules')
-                sh.cp('./app/ssr.js', './package.json', './package-lock.json', './build/')
+                sh.cp('./app/ssr.js', './package.json', './build/')
                 sh.pushd('./build')
+                // TODO: We need to prune deps. How can we do that inside a Lerna monorepo?
                 sh.exec('npm prune --production')
+                // TODO: Can't ship this – workaround for our monorepo package setup.
+                if (sh.test('-d', './node_modules/pwa-kit-react-sdk')) {
+                    sh.cp(
+                        '-RL',
+                        '../../pwa-kit-react-sdk/node_modules',
+                        './node_modules/pwa-kit-react-sdk/'
+                    )
+                }
                 sh.popd()
             } finally {
                 sh.config.silent = original

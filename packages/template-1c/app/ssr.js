@@ -14,13 +14,10 @@ const app = createApp({
 
   // The path to the favicon. This must also appear in
   // the mobify.ssrShared section of package.json.
-  faviconPath: path.resolve(process.cwd(), "build/static/ico/favicon.ico"),
+  faviconPath: path.resolve("static/ico/favicon.ico"),
 
   // The location of the apps manifest file relative to the build directory
   manifestPath: "static/manifest.json",
-
-  // This is the value of the 'mobify' object from package.json
-  mobify: require(path.join(process.cwd(), "package.json")).mobify,
 
   // The port that the local dev server listens on
   port: 3000,
