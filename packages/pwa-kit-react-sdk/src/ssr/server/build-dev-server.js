@@ -12,9 +12,11 @@ import fs from 'fs'
 import https from 'https'
 import http from 'http'
 import mimeTypes from 'mime-types'
-import {parseHost} from '../../utils/ssr-proxying'
-import {CONTENT_ENCODING, CONTENT_TYPE, NO_CACHE} from './constants'
 import {BaseServerFactory} from './build-base-server'
+
+const CONTENT_TYPE = 'content-type'
+const CONTENT_ENCODING = 'content-encoding'
+const NO_CACHE = 'max-age=0, nocache, nostore, must-revalidate'
 
 /**
  * @private
@@ -246,35 +248,14 @@ export class DevServerFactory extends BaseServerFactory {
 
     createHandler(app) {
         const options = app.options
-        // Configure hostname and port.
-        // Custom values are supported via environment variables.
-        let hostname = process.env.LISTEN_ADDRESS || process.env.EXTERNAL_DOMAIN_NAME || 'localhost'
-        let port = options.port
-        const parsedHost = parseHost(hostname)
-        /* istanbul ignore next */
-        if (parsedHost.port) {
-            // hostname has a port in it. Rewrite hostname so it does not
-            // include the port, and override the options.port with this
-            // new port value
-            hostname = parsedHost.hostname
-            port = parsedHost.port
-        }
-
+        const hostname = process.env.LISTEN_ADDRESS || 'localhost'
+        const port = options.port
         let server
 
         if (options.protocol === 'https') {
             const sslFile = fs.readFileSync(options.sslFilePath)
-            server = https.createServer(
-                {
-                    // See https://nodejs.org/api/tls.html#tls_tls_createsecurecontext_options
-                    // for information about these options.
-                    key: sslFile,
-                    cert: sslFile,
-                },
-                app
-            )
+            server = https.createServer({key: sslFile, cert: sslFile}, app)
         } else {
-            // Create a local dev server listening on HTTP, as to not use a self-signed certificate
             server = http.createServer(app)
         }
 
