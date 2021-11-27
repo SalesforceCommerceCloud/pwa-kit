@@ -6,7 +6,8 @@
         "cross-fetch": "^3.1.4",
         "react": "^17.0.2",
         "react-dom": "^17.0.2",
-        "react-router-dom": "^5.1.2"
+        "react-router-dom": "^5.1.2",
+        "pwa-kit-build": "^1.3.0-dev"
     },
     "dependencies": {
         "pwa-kit-react-sdk": "^1.3.0-dev"
