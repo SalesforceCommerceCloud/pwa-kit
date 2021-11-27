@@ -28,7 +28,7 @@ import AppConfig from '../universal/components/_app-config'
 import Switch from '../universal/components/switch'
 import {getRoutes, routeComponent} from '../universal/components/route-component'
 import * as errors from '../universal/errors'
-import {detectDeviceType} from '../../utils/ssr-server'
+import {detectDeviceType, isRemote} from '../../utils/ssr-server'
 import {proxyConfigs} from '../../utils/ssr-shared'
 
 import sprite from 'svg-sprite-loader/runtime/sprite.build'
@@ -256,8 +256,6 @@ const renderApp = (args) => {
 
     const helmet = Helmet.renderStatic()
 
-    const isProduction = process.env.DEPLOY_TARGET === 'production'
-
     // Do not include *dynamic*, executable inline scripts – these cause issues with
     // strict CSP headers that customers often want to use. Avoid inline scripts,
     // full-stop, whenever possible.
@@ -269,7 +267,7 @@ const renderApp = (args) => {
     const windowGlobals = {
         __DEVICE_TYPE__: deviceType,
         __PRELOADED_STATE__: appState,
-        __ERROR__: isProduction ? undefined : error,
+        __ERROR__: isRemote() ? undefined : error,
         // `window.Progressive` has a long history at Mobify and some
         // client-side code depends on it. Maintain its name out of tradition.
         Progressive: getWindowProgressive(req, res)

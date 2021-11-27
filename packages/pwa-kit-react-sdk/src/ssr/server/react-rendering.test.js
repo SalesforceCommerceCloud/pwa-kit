@@ -13,6 +13,7 @@ import {createApp} from './express'
 import request from 'supertest'
 import {parse} from 'node-html-parser'
 import path from 'path'
+import {isRemote} from '../../utils/ssr-server'
 
 const opts = (overrides = {}) => {
     const fixtures = path.join(__dirname, '..', '..', 'ssr', 'server', 'test_fixtures')
@@ -285,6 +286,14 @@ jest.mock('../universal/routes', () => {
     }
 })
 
+jest.mock('../../utils/ssr-server', () => {
+    const actual = jest.requireActual('../../utils/ssr-server')
+    return {
+        ...actual,
+        isRemote: jest.fn().mockReturnValue(false)
+    }
+})
+
 describe('The Node SSR Environment', () => {
     /**
      * Scripts are "safe" if they are external, not executable or on our allow list of
@@ -526,5 +535,34 @@ describe('The Node SSR Environment', () => {
                 .query(query || {})
                 .then((res) => assertions(res))
         })
+    })
+
+    test(`Error is not visible in remote environment`, () => {
+        isRemote.mockReturnValue(true)
+
+        const originalEnv = process.env
+        process.env = {
+            ...originalEnv,
+            BUNDLE_ID: '1',
+            DEPLOY_TARGET: 'test',
+            EXTERNAL_DOMAIN_NAME: 'example.com',
+            MOBIFY_PROPERTY_ID: '1'
+        }
+
+        const assertions = (res) => {
+            const html = res.text
+            const doc = parse(html)
+            const data = dataFromHTML(doc)
+
+            expect(data.__ERROR__).toEqual(undefined)
+            expect(res.statusCode).toBe(500)
+        }
+
+        const url = '/render-throws-error/'
+        const app = createApp(opts())
+        app.get('/*', render)
+        return request(app)
+            .get(url)
+            .then((res) => assertions(res))
     })
 })
