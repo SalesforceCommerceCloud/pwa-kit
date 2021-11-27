@@ -826,31 +826,6 @@ export const parseEndParameters = (params) => {
 }
 
 /**
- * Filter function for compression module.
- *
- * @private
- * @param req {IncomingMessage} ExpressJS Request
- * @param res {ServerResponse} ExpressJS Response
- * @returns {Boolean}
- */
-export const shouldCompress = (req, res) => {
-    // If there is already a CONTENT_ENCODING header, then we
-    // do not apply any compression. This allows project code
-    // to handle encoding, if required.
-    if (res.getHeader(CONTENT_ENCODING)) {
-        // Set a flag on the response so that the persistent cache logic
-        // can tell there was already a content-encoding header.
-        res.locals.contentEncodingSet = true
-        return false
-    }
-
-    // Let the compression module make the decision about compressing.
-    // Even if we return true here, the module may still choose
-    // not to compress the data.
-    return compression.filter(req, res)
-}
-
-/**
  * A class that represents an ExpressJS response stored in
  * the persistent cache. An instance of this class should
  * be considered read-only.
