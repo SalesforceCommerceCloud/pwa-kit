@@ -46,6 +46,7 @@ import {
     shouldCompress,
     wrapResponseWrite,
     detectDeviceType,
+    configureProxyConfigs,
 } from '../../utils/ssr-server'
 
 import {
@@ -62,7 +63,7 @@ import {
     X_HEADERS_TO_REMOVE,
     X_MOBIFY_REQUEST_CLASS,
 } from '../../utils/ssr-proxying'
-import {proxyConfigs} from '../../utils/ssr-shared'
+import {proxyConfigs, updatePackageMobify} from '../../utils/ssr-shared'
 
 const SET_COOKIE = 'set-cookie'
 const CACHE_CONTROL = 'cache-control'
@@ -101,37 +102,6 @@ export const REMOTE_REQUIRED_ENV_VARS = [
     'EXTERNAL_DOMAIN_NAME',
     'MOBIFY_PROPERTY_ID',
 ]
-
-const factory = isRemote() ? new RemoteServerFactory() : new DevServerFactory()
-
-/**
- * Create an SSR (Server-Side Rendering) Server.
- *
- * @constructor
- * @param {Object} options
- * @param {String} [options.buildDir] - The build directory path, either as an
- * absolute path, or relative to the current working directory. Defaults
- * to 'build'.
- * @param {Number} [options.defaultCacheTimeSeconds=600] - The cache time
- * for rendered pages and assets (not used in local development mode).
- * @param {String} options.faviconPath - The path to the favicon.ico file,
- * either as an absolute path, or relative to the build directory. If this
- * value is not supplied, requests for a favicon will return a 404 and
- * log a warning to the console.
- * @param {Object} options.mobify - The 'mobify' object from the project's
- * package.json file, containing the SSR parameters.
- * @param {Number} [options.port=3443] - the localhost port on which the local
- * development Express app listens.
- * @param {String} [options.protocol='https'] - the protocol on which the development
- * Express app listens.
- * @param {String} options.sslFilePath - the absolute path to a PEM format
- * certificate file to be used by the local development server. This should
- * contain both the certificate and the private key.
- * @param {Boolean} [options.enableLegacyRemoteProxying=true] - When running remotely (as
- * oppsed to locally), enables legacy proxying behaviour, allowing "proxy" requests to route through
- * the express server. In the future, this behaviour and setting will be removed.
- */
-export const createApp = (options) => factory.createApp(options)
 
 /**
  * Use properties of the request, such as URL and querystring, to generate
@@ -671,20 +641,6 @@ export const respondFromBundle = ({req, res, path, redirect = 301}) => {
 }
 
 /**
- * Create a Lambda handler OR start the local dev server, as appropriate for the
- * current environment. You should use this to export a Lambda handler in ssr.js,
- * eg.
- *
- *   const app = appServer()
- *
- *   export const get = createHandler(app)
- *
- * @param app {Express} - an Express App
- * @return {Function|undefined} - return a Lambda handler if running remotely, else undefined.
- */
-export const createHandler = (app) => factory.createHandler(app).handler
-
-/**
  * Wrap the function fn in such a way that it will be called at most once. Subsequent
  * calls will always return the same value.
  *
@@ -850,6 +806,7 @@ class BaseServerFactory {
         // This is the ORIGIN under which we are serving the page.
         // because it's an origin, it does not end with a slash.
         options.appOrigin = process.env.APP_ORIGIN = `${options.protocol}://${options.appHostname}`
+        return options
     }
 
     updatePackageMobify(options) {
@@ -1212,7 +1169,7 @@ class BaseServerFactory {
         applyPatches(options)
     }
 
-    validateConfiguration = (options) => {
+    validateConfiguration(options) {
         // Check that we are running under a compatible version of node
         /* istanbul ignore next */
         const requiredNode = new semver.Range(pkg.engines.node)
@@ -1365,7 +1322,7 @@ export class RemoteServerFactory extends BaseServerFactory {
         return super.setupCommonMiddleware(app, options)
     }
 
-    validateConfiguration = (options) => {
+    validateConfiguration(options) {
         return super.validateConfiguration(options)
     }
 
@@ -1517,7 +1474,7 @@ export class DevServerFactory extends BaseServerFactory {
         return super.setupCommonMiddleware(app, options)
     }
 
-    validateConfiguration = (options) => {
+    validateConfiguration(options) {
         return super.validateConfiguration(options)
     }
 
@@ -1984,3 +1941,48 @@ const setDefaultHeaders = (req, res) => {
         res.set(X_MOBIFY_REQUEST_CLASS, requestClass)
     }
 }
+
+const factory = isRemote() ? new RemoteServerFactory() : new DevServerFactory()
+
+/**
+ * Create an SSR (Server-Side Rendering) Server.
+ *
+ * @constructor
+ * @param {Object} options
+ * @param {String} [options.buildDir] - The build directory path, either as an
+ * absolute path, or relative to the current working directory. Defaults
+ * to 'build'.
+ * @param {Number} [options.defaultCacheTimeSeconds=600] - The cache time
+ * for rendered pages and assets (not used in local development mode).
+ * @param {String} options.faviconPath - The path to the favicon.ico file,
+ * either as an absolute path, or relative to the build directory. If this
+ * value is not supplied, requests for a favicon will return a 404 and
+ * log a warning to the console.
+ * @param {Object} options.mobify - The 'mobify' object from the project's
+ * package.json file, containing the SSR parameters.
+ * @param {Number} [options.port=3443] - the localhost port on which the local
+ * development Express app listens.
+ * @param {String} [options.protocol='https'] - the protocol on which the development
+ * Express app listens.
+ * @param {String} options.sslFilePath - the absolute path to a PEM format
+ * certificate file to be used by the local development server. This should
+ * contain both the certificate and the private key.
+ * @param {Boolean} [options.enableLegacyRemoteProxying=true] - When running remotely (as
+ * oppsed to locally), enables legacy proxying behaviour, allowing "proxy" requests to route through
+ * the express server. In the future, this behaviour and setting will be removed.
+ */
+export const createApp = (options) => factory.createApp(options)
+
+/**
+ * Create a Lambda handler OR start the local dev server, as appropriate for the
+ * current environment. You should use this to export a Lambda handler in ssr.js,
+ * eg.
+ *
+ *   const app = appServer()
+ *
+ *   export const get = createHandler(app)
+ *
+ * @param app {Express} - an Express App
+ * @return {Function|undefined} - return a Lambda handler if running remotely, else undefined.
+ */
+export const createHandler = (app) => factory.createHandler(app).handler
