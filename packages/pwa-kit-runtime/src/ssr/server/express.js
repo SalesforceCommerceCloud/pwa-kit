@@ -31,11 +31,11 @@ import {RemoteServerFactory} from './build-remote-server'
 //       If we do not manage to do that, we will ship webpack to Lambda, which will always fail.
 const serverFactory = () => {
     if (isRemote()) {
-        return new RemoteServerFactory()
+        return RemoteServerFactory
     } else {
         try {
-            const {DevServerFactory} = require('pwa-kit-build/ssr/server/build-dev-server')
-            return new DevServerFactory()
+            const {DevServerFactory} = require.main.require('pwa-kit-build/ssr/server/build-dev-server')
+            return Object.assign({}, RemoteServerFactory, DevServerFactory)
         } catch (e) {
             throw e
             // throw new Error(

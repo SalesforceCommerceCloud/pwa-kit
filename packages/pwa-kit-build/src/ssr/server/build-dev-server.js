@@ -12,7 +12,6 @@ import fs from 'fs'
 import https from 'https'
 import http from 'http'
 import mimeTypes from 'mime-types'
-import {BaseServerFactory} from 'pwa-kit-runtime/ssr/server/build-base-server'
 import webpack from 'webpack'
 import webpackDevMiddleware from 'webpack-dev-middleware'
 import webpackHotServerMiddleware from 'webpack-hot-server-middleware'
@@ -25,22 +24,18 @@ const NO_CACHE = 'max-age=0, nocache, nostore, must-revalidate'
 /**
  * @private
  */
-export class DevServerFactory extends BaseServerFactory {
-    setupSSRRequestProcessorMiddleware(app) {
-        return super.setupSSRRequestProcessorMiddleware(app)
-    }
-
+export const DevServerFactory = {
     getProtocol(options) {
         return process.env.DEV_SERVER_PROTOCOL || options.protocol
-    }
+    },
 
     getDefaultCacheControl(options) {
         return NO_CACHE
-    }
+    },
 
     strictSSL(options) {
         return options.strictSSL
-    }
+    },
 
     setCompression(app) {
         app.use(
@@ -49,11 +44,11 @@ export class DevServerFactory extends BaseServerFactory {
                 filter: shouldCompress,
             })
         )
-    }
+    },
 
     setupLogging(app) {
         app.use(expressLogging('dev'))
-    }
+    },
 
     setupMetricsFlushing(app) {
         // Flush metrics at the end of sending. We do this here to
@@ -64,23 +59,12 @@ export class DevServerFactory extends BaseServerFactory {
             res.on('finish', () => app.metrics.flush())
             next()
         })
-    }
-
-    setupHealthcheck(app) {
-        return super.setupHealthcheck(app)
-    }
+    },
 
     setupProxying(app, options) {
-        return super.setupProxying(app, options)
-    }
-
-    setupCommonMiddleware(app, options) {
-        return super.setupCommonMiddleware(app, options)
-    }
-
-    validateConfiguration(options) {
-        return super.validateConfiguration(options)
-    }
+        // See the remote server implementation
+        return this._setupProxying(app, options)
+    },
 
     serveCompiledAssets(app) {
         // Proxy bundle asset requests to the local
@@ -241,7 +225,7 @@ export class DevServerFactory extends BaseServerFactory {
             res.on('close', done)
             next()
         })
-    }
+    },
 
     createHandler(app) {
         const options = app.options
@@ -269,7 +253,7 @@ export class DevServerFactory extends BaseServerFactory {
         })
 
         return {handler: undefined, server}
-    }
+    },
 }
 
 /**

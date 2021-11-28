@@ -21,8 +21,6 @@ import {createModuleReplacementPlugin} from './plugins'
 const projectDir = process.cwd()
 const sdkDir = path.resolve(path.join(__dirname, '..', '..'))
 
-const babelConfig = path.resolve(path.join(__dirname, '..', '..'))
-
 const pkg = require(resolve(projectDir, 'package.json'))
 const buildDir = resolve(projectDir, 'build')
 
@@ -130,13 +128,13 @@ const baseConfig = (target) => {
                         },
                         target === 'web' && {
                             test: /\.svg$/,
-                            loader: 'ignore-loader',
+                            loader: findInProjectThenSDK('ignore-loader'),
                         },
                         {
                             test: /\.html$/,
                             exclude: /node_modules/,
                             use: {
-                                loader: 'html-loader',
+                                loader: findInProjectThenSDK('html-loader'),
                             },
                         },
                     ].filter(Boolean),
