@@ -37,10 +37,11 @@ const serverFactory = () => {
             const {DevServerFactory} = require('pwa-kit-build/ssr/server/build-dev-server')
             return new DevServerFactory()
         } catch (e) {
-            throw new Error(
-                'Cannot start the DevServer. The optional "pwa-kit-build" ' +
-                'dependency is not installed'
-            )
+            throw e
+            // throw new Error(
+            //     'Cannot start the DevServer. The optional "pwa-kit-build" ' +
+            //     'dependency is not installed'
+            // )
         }
     }
 }

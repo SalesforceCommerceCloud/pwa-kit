@@ -9,7 +9,7 @@
  */
 
 import * as utils from './utils'
-import {proxyConfigs} from '../../utils/ssr-shared'
+import {proxyConfigs} from 'pwa-kit-runtime/utils/ssr-shared'
 
 describe('getProxyConfigs (server-side)', () => {
     test('should return the currently used proxy configs', () => {

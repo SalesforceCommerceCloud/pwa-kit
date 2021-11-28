@@ -7,7 +7,7 @@
 'use strict'
 
 const path = require('path')
-const {createApp, createHandler, serveStaticFile} = require('pwa-kit-react-sdk/ssr/server/express')
+const {createApp, createHandler, serveStaticFile} = require('pwa-kit-runtime/ssr/server/express')
 
 const app = createApp({
     // The build directory (an absolute path)

@@ -3,7 +3,7 @@ const {
   createApp,
   createHandler,
   serveStaticFile,
-} = require("pwa-kit-react-sdk/ssr/server/express");
+} = require("pwa-kit-runtime/ssr/server/express");
 
 const app = createApp({
   // The build directory (an absolute path)

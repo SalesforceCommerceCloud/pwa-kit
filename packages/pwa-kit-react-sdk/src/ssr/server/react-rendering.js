@@ -28,8 +28,8 @@ import AppConfig from '../universal/components/_app-config'
 import Switch from '../universal/components/switch'
 import {getRoutes, routeComponent} from '../universal/components/route-component'
 import * as errors from '../universal/errors'
-import {detectDeviceType} from '../../utils/ssr-server'
-import {proxyConfigs} from '../../utils/ssr-shared'
+import {detectDeviceType} from 'pwa-kit-runtime/utils/ssr-server'
+import {proxyConfigs} from 'pwa-kit-runtime/utils/ssr-shared'
 
 import sprite from 'svg-sprite-loader/runtime/sprite.build'
 

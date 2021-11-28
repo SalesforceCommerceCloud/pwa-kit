@@ -7,7 +7,7 @@
 /**
  * @module progressive-web-sdk/ssr/universal/utils
  */
-import {proxyConfigs} from '../../utils/ssr-shared'
+import {proxyConfigs} from 'pwa-kit-runtime/utils/ssr-shared'
 
 const onClient = typeof window !== 'undefined'
 

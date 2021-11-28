@@ -1,0 +1,13 @@
+coverage
+dist
+docs
+generator-assets
+vendor
+temp
+temp_static
+src/static
+src/ssr/server/test_fixtures
+# The following two files require a jest-environment comment at the top that
+# conflicts with the copyright header check so we need to exclude them
+src/ssr/server/react-rendering.test.js
+src/ssr/universal/utils.server.test.js

@@ -36,7 +36,8 @@
         }
     },
     "dependencies": {
-        "pwa-kit-react-sdk": "^1.3.0-dev"
+        "pwa-kit-react-sdk": "^1.3.0-dev",
+        "pwa-kit-runtime": "^1.3.0-dev"
     },
     "devDependencies": {
         "@chakra-ui/icons": "^1.0.6",
