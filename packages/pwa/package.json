@@ -36,7 +36,6 @@
         }
     },
     "dependencies": {
-        "pwa-kit-react-sdk": "^1.3.0-dev",
         "pwa-kit-runtime": "^1.3.0-dev"
     },
     "devDependencies": {
@@ -60,6 +59,7 @@
         "node-fetch": "^2.3.0",
         "prop-types": "^15.6.0",
         "pwa-kit-build": "^1.3.0-dev",
+        "pwa-kit-react-sdk": "^1.3.0-dev",
         "query-string": "^7.0.1",
         "randomstring": "^1.2.1",
         "react": "16.14.0",
