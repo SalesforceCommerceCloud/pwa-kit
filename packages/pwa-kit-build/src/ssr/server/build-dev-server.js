@@ -13,6 +13,10 @@ import https from 'https'
 import http from 'http'
 import mimeTypes from 'mime-types'
 import {BaseServerFactory} from 'pwa-kit-runtime/ssr/server/build-base-server'
+import webpack from 'webpack'
+import webpackDevMiddleware from 'webpack-dev-middleware'
+import webpackHotServerMiddleware from 'webpack-hot-server-middleware'
+import config from '../../webpack/config'
 
 const CONTENT_TYPE = 'content-type'
 const CONTENT_ENCODING = 'content-encoding'
@@ -79,14 +83,6 @@ export class DevServerFactory extends BaseServerFactory {
     }
 
     serveCompiledAssets(app) {
-        // Do the requires here – these need to remain optional dependencies
-        // that we do not ship to Lambda.
-        const webpack = require('webpack')
-        const webpackDevMiddleware = require('webpack-dev-middleware', {serverSideRender: true})
-        const webpackHotServerMiddleware = require('webpack-hot-server-middleware')
-        const config = require('../../webpack/config')
-        const compiler = webpack(config)
-
         // Proxy bundle asset requests to the local
         // build directory.
         app.use(
@@ -98,7 +94,8 @@ export class DevServerFactory extends BaseServerFactory {
             })
         )
 
-        const devMiddleware = webpackDevMiddleware(compiler)
+        const compiler = webpack(config)
+        const devMiddleware = webpackDevMiddleware(compiler, {serverSideRender: true})
 
         app.use('/mobify/bundle/development', devMiddleware)
 
