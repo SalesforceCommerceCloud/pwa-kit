@@ -59,7 +59,7 @@ The PWA Kit is licensed under a BSD 3-Clause license. See the [license](./LICENS
 
 ## ➕ Contribute
 
-Contributors are welcome! Refer to the [CONTRIBUTING](https://github.com/SalesforceCommerceCloud/pwa-kit/blob/develop/CONTRIBUTING.md) guide to get started. If you liked pwa-kit, add a ⭐ on [GitHub Repo](https://github.com/SalesforceCommerceCloud/pwa-kit/)!
+Contributors are welcome! Refer to the [CONTRIBUTING](./CONTRIBUTING.md) guide to get started. If you liked pwa-kit, add a ⭐ on [GitHub Repo](https://github.com/SalesforceCommerceCloud/pwa-kit/)!
 
 ## 📖 Documentation
 
