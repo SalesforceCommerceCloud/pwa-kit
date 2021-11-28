@@ -21,6 +21,8 @@ import {createModuleReplacementPlugin} from './plugins'
 const projectDir = process.cwd()
 const sdkDir = path.resolve(path.join(__dirname, '..', '..'))
 
+const babelConfig = path.resolve(path.join(__dirname, '..', '..'))
+
 const pkg = require(resolve(projectDir, 'package.json'))
 const buildDir = resolve(projectDir, 'build')
 

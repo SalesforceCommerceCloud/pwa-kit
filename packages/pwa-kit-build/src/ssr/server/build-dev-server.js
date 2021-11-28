@@ -12,7 +12,7 @@ import fs from 'fs'
 import https from 'https'
 import http from 'http'
 import mimeTypes from 'mime-types'
-import {BaseServerFactory} from './build-base-server'
+import {BaseServerFactory} from 'pwa-kit-react-sdk/ssr/server/build-base-server'
 
 const CONTENT_TYPE = 'content-type'
 const CONTENT_ENCODING = 'content-encoding'

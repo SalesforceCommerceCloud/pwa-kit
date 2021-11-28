@@ -22,10 +22,29 @@ import {
     wrapResponseWrite,
     detectDeviceType,
 } from '../../utils/ssr-server'
-import {CACHE_CONTROL, CONTENT_ENCODING, X_MOBIFY_FROM_CACHE} from '../../ssr/server/constants'
+import {CACHE_CONTROL, CONTENT_ENCODING, X_MOBIFY_FROM_CACHE} from './constants'
 import {X_MOBIFY_REQUEST_CLASS} from '../../utils/ssr-proxying'
-import {DevServerFactory} from './build-dev-server'
 import {RemoteServerFactory} from './build-remote-server'
+
+
+// TODO: Priority 1 – haven't been able to make the dependency optional in package.json.
+//       If we do not manage to do that, we will ship webpack to Lambda, which will always fail.
+const serverFactory = () => {
+    if (isRemote()) {
+        return new RemoteServerFactory()
+    } else {
+        try {
+            const {DevServerFactory} = require('pwa-kit-build/ssr/server/build-dev-server')
+            return new DevServerFactory()
+        } catch (e) {
+            throw new Error(
+                'Cannot start the DevServer. The optional "pwa-kit-build" ' +
+                'dependency is not installed'
+            )
+        }
+    }
+}
+
 
 export const RESOLVED_PROMISE = Promise.resolve()
 
@@ -486,7 +505,7 @@ export const respondFromBundle = ({req, res, path, redirect = 301}) => {
     res.redirect(workingRedirect, location)
 }
 
-const factory = isRemote() ? new RemoteServerFactory() : new DevServerFactory()
+const factory = serverFactory()
 
 /**
  * Create an SSR (Server-Side Rendering) Server.
