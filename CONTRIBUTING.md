@@ -2,11 +2,64 @@
 
 We welcome contributions to PWA Kit! To ensure that your contributions are addressed in a timely manner, keep the following guidelines in mind.
 
+> **Contributor License Agreement (CLA)**:
+>
+> All external contributors must sign the [Contributor License Agreement](https://cla.salesforce.com/sign-cla) (CLA). A prompt to sign the agreement appears whenever a pull request is submitted.
+
+This repository is a [monorepo](https://en.wikipedia.org/wiki/Monorepo) that includes the code that powers the PWA Kit. The code is divided into the following packages:
+
+- `pwa`: A set of sample code and tooling for PWA Kit projects called the Retail React App
+- `pwa-kit-create-app`: A tool that generates PWA Kit projects based on the Retail React App
+- `pwa-kit-react-sdk`: A set of components and utilities for PWA Kit projects
+
+## 📦 Dependencies
+
+Behind the scenes, we use [Lerna](https://lerna.js.org/) to manage the monorepo. Lerna lets
+us install all dependencies and link all packages together with one command:
+
+```bash
+npm ci
+```
+
+Dependencies that are added to the `package.json` at the root of the
+repo are shared between packages. Dependencies listed in the
+`package.json` files within each individual package directory work as normal.
+
+## 🏗️ Cleaning & Rebuilding
+
+When you pull changes that include modifications to any package's dependencies, run `npm ci` from the top-level directory (`pwa-kit`). This command cleans and reinstalls all packages. Run this command frequently during development to ensure that you're using the same package versions as everyone else.
+
+For more information, see the [Lerna docs](https://lerna.js.org/).
+
+## 👓 Linting
+
+```bash
+  npm run lint
+```
+
+## 🧪 Testing
+
+Run tests for all packages with:
+
+```bash
+  cd [repo root]
+  npm test
+```
+
+Run integration tests against live APIs for all packages with:
+
+```bash
+  cd [repo root]
+  npm run test:integration
+```
+
 ## Issues
 
-If you’re experiencing an issue, check the open issues first. If someone hasn’t already raised the same issue, file a new issue with a description of the problem and describe the steps to reproduce it. If you require an urgent resolution to your issue, file a support ticket with [Salesforce Commerce Cloud](https://help.salesforce.com/).
+If you’re experiencing an issue, check the open issues first. If someone hasn’t already raised the same issue, file a new issue with a description of the problem and describe the steps to reproduce it. If you require an urgent resolution to your issue, file a support ticket with [Salesforce Commerce Cloud](https://help.salesforce.com/). You can also create an issue to request for a new feature.
 
 ## Submit a Pull Request
+
+> **Note**: All your commits must be verfied. See [GitHub Help](https://docs.github.com/articles/generating-a-gpg-key/) to setup GPG signing for your commits.
 
 1. Create an issue.
 2. Create a fork of this repository.
@@ -30,7 +83,3 @@ If you’re experiencing an issue, check the open issues first. If someone hasn�
 After submitting a pull request, the PWA Kit team will review it and consider it for merging.
 
 The team periodically closes any abandoned pull requests that they find.
-
-## Contributor License Agreement (CLA)
-
-All external contributors must sign the [Contributor License Agreement](https://cla.salesforce.com/sign-cla) (CLA). A prompt to sign the agreement appears whenever a pull request is submitted.
