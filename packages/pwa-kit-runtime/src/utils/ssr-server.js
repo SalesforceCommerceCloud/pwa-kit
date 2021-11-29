@@ -21,8 +21,6 @@ import {
 import {proxyConfigs} from './ssr-shared'
 import {rewriteProxyRequestHeaders, rewriteProxyResponseHeaders} from './ssr-proxying'
 
-const compression = require('compression')
-
 import {PerformanceObserver, performance} from 'perf_hooks'
 
 const MOBIFY_DEVICETYPE = 'mobify_devicetype'
