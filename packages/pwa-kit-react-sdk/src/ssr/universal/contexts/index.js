@@ -6,16 +6,9 @@
  */
 import React from 'react'
 
+/**
+ * This React context is used to provide global application data to its
+ * children. Currently the context value consists of the object returned
+ * from the AppConfig components `freezeRequest` static method.
+ */
 export const AppContext = React.createContext({})
-
-// THINK: Should we have a state for context so it can be manipulated in the future? If we want to do this,
-// it will determine how we should setup the contexts value object structure.
-// export const AppContextProvider = ({children}) => {
-//     const [context, setContext] = useState({})
-
-//     return (
-//         <AppContext.Provider value={{context, setContext}}>
-//             {children}
-//         </AppContext.Provider>
-//     )
-// }

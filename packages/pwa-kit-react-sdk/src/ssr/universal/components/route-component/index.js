@@ -21,11 +21,14 @@ const isHydrating = () => !isServerSide && window.__HYDRATING__
 
 const hasPerformanceAPI = !isServerSide && window.performance && window.performance.timing
 
-const bindRouteComponentStatics = (target, context) => {
-    const routeComponentStatics = ['shouldGetProps', 'getProps', 'getTemplateName']
+const ROUTE_COMPONENT_STATICS = ['shouldGetProps', 'getProps', 'getTemplateName']
 
-    routeComponentStatics.forEach((fn) => {
-        target[fn] = target[fn].bind(context)
+/**
+ * @private
+ */
+const bindRouteComponentStatics = (targetClass, context) => {
+    ROUTE_COMPONENT_STATICS.forEach((fn) => {
+        targetClass[fn] = targetClass[fn].bind(context)
     })
 }
 
@@ -418,8 +421,7 @@ export const routeComponent = (Wrapped, isPage, locals, context) => {
     }
     hoistNonReactStatic(RouteComponent, Wrapped, excludes)
 
-    // bind new scope to route component statics
-    console.log('binding: ', Wrapped, context)
+    // Bind the `context` to the routeComponent's static methods.
     bindRouteComponentStatics(RouteComponent, context)
 
     return withErrorHandling(withRouter(RouteComponent))

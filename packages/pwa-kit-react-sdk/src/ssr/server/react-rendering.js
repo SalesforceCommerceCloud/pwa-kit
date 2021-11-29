@@ -108,7 +108,7 @@ const initAppState = async ({App, component, match, route, req, res, location}) 
         const appState = {
             appProps,
             pageProps,
-            __STATE_MANAGEMENT_LIBRARY: AppConfig.freeze(res.locals)
+            __STATE_MANAGEMENT_LIBRARY: AppConfig.freeze ? AppConfig.freeze(res.locals) : {}
         }
 
         returnVal = {
@@ -138,7 +138,7 @@ const initAppState = async ({App, component, match, route, req, res, location}) 
 export const render = async (req, res) => {
     // AppConfig.restore *must* come before using getRoutes() or routeComponent()
     // to inject arguments into the wrapped component's getProps methods.
-    AppConfig.restore(res.locals)
+    AppConfig.restore && AppConfig.restore(res.locals)
 
     const frozenReq = AppConfig.freezeRequest(req, res)
     const context = {

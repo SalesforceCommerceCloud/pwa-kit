@@ -50,8 +50,6 @@ const getLocale = (originalRequest = {}) => {
     return shortCode
 }
 
-const useAppContext = () => useContext(AppContext)
-
 /**
  * Use the AppConfig component to inject extra arguments into the getProps
  * methods for all Route Components in the app – typically you'd want to do this
@@ -63,11 +61,10 @@ const useAppContext = () => useContext(AppContext)
 const AppConfig = ({children}) => {
     const [basket, setBasket] = useState(null)
     const [customer, setCustomer] = useState(null)
-    const context = useAppContext()
+    const {originalRequest} = useContext(AppContext)
 
     // TODO: DRY this up.
-    console.log('AppConfig: ', context.originalRequest)
-    const locale = getLocale(context.originalRequest) || DEFAULT_LOCALE
+    const locale = getLocale(originalRequest) || DEFAULT_LOCALE
     const currency = getPreferredCurrency(locale) || DEFAULT_CURRENCY
     const api = new CommerceAPI({...apiConfig, locale, currency})
 
@@ -84,15 +81,6 @@ const AppConfig = ({children}) => {
     )
 }
 
-// Question: Should the below 3 statics also have the `context` object set as their scope?
-// Remember that we'll have to text these function during rendering to see if they are
-// arrow functions or not and give a warning or error.
-AppConfig.restore = function() {}
-
-AppConfig.freeze = function() {
-    return undefined
-}
-
 AppConfig.freezeRequest = function(req) {
     return {
         url: req.url,
@@ -103,6 +91,8 @@ AppConfig.freezeRequest = function(req) {
 }
 
 AppConfig.extraGetPropsArgs = function() {
+    // NOTE: How many times is this function supposed to be called? Right now it gets called
+    // once for each route component, I'm not sure if that is what we intended on doing.
     const locale = getLocale(this.originalRequest) || DEFAULT_LOCALE
     const currency = getPreferredCurrency(locale) || DEFAULT_CURRENCY
 
