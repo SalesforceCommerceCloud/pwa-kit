@@ -260,6 +260,20 @@ jobs:
           cwd: /tmp/project
       - smoketestscripts:
           dir: /tmp/project
+      - run:
+          name: Count Generated Project Dependencies
+          environment:
+          command: |
+            MAX_PACKAGES="3050"
+            total=$(./scripts/count-dependencies.js /tmp/project)
+            echo "export TOTAL_PACKAGES=${total}" >> $BASH_ENV;
+
+            if [ "$total" -gt "$MAX_PACKAGES" ]; then
+                echo "Error: Found $TOTAL_PACKAGES installed packages (max $MAX_PACKAGES).";
+                exit 1;
+            else
+                echo "Error: Found $TOTAL_PACKAGES installed packages (max $MAX_PACKAGES).";
+            fi
       - early_return_for_forked_pull_requests
       - slack/status:
           fail_only: true
@@ -287,22 +301,13 @@ jobs:
               snyk monitor --ignore-policy --remote-repo-url='https://github.com/SalesforceCommerceCloud/pwa-kit.git' --project-name='generated-scaffold-pwa'
             fi
       - run:
-          name: Count Generated Project Dependencies
+          name: Send metrics to Datadog
           environment:
           command: |
-            MAX_PACKAGES="3050"
-            total=$(./scripts/count-dependencies.js /tmp/project)
-              if [ "$total" -gt "$MAX_PACKAGES" ]; then
-                  echo "Error: Found $total installed packages (max $MAX_PACKAGES).";
-                  exit 1;
-              else
-                  echo "Error: Found $total installed packages (max $MAX_PACKAGES).";
-              fi
-
             # Add a dogrc so we can submit metrics to datadog
             printf "[Connection]\napikey = $DATADOG_API_KEY\nappkey =\n" > ~/.dogrc
 
-            dog metric post mobify_platform_sdks.generated_project_total_packages $total
+            dog metric post mobify_platform_sdks.generated_project_total_packages $TOTAL_PACKAGES
       - run:
           name: Push Bundle
           command: |
