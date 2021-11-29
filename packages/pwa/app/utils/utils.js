@@ -6,6 +6,8 @@
  */
 
 import pwaKitConfig from '../../pwa-kit-config.json'
+import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
+import {HOME_HREF, urlPartPositions} from '../constants'
 
 /**
  * Call requestIdleCallback in supported browsers.
@@ -162,3 +164,70 @@ export const capitalize = (text) => {
  * @returns {object} - url object from the pwa-kit-config.json file
  */
 export const getUrlConfig = () => pwaKitConfig?.app?.url
+
+const getSitesConfig = () => pwaKitConfig?.app?.sites
+const getDefaultSiteId = () => pwaKitConfig?.app?.defaultSiteId
+
+export const getSiteId = (url) => {
+    let path = url
+    if (!path) {
+        console.log('window.location.pathname', window.location)
+        path = `${window?.location.pathname}${window?.location.search}`
+    }
+
+    const {hostname, pathname} = new URL(`${getAppOrigin()}${path}`)
+    let siteId = getSiteIdByHostname(hostname)
+    if (siteId) {
+        console.log('found by hostname===========================')
+        return siteId
+    }
+    console.log('found by alias===========================')
+
+    siteId = getSiteIdByAlias(path)
+    return siteId
+}
+
+const getSiteIdByHostname = (hostname) => {
+    const sitesConfig = getSitesConfig()
+    if (!sitesConfig.length) throw new Error('No site config found. Please check you configuration')
+    if (!hostname) return undefined
+    const site = sitesConfig.filter((site) => site.hostname.includes(hostname))
+    return site.length === 1 ? site.id : undefined
+}
+
+const getSiteIdByAlias = (path) => {
+    const defaultSiteId = getDefaultSiteId()
+    const sitesConfig = getSitesConfig()
+    const urlConfig = getUrlConfig()
+    if (path === HOME_HREF) {
+        const siteIdList = sitesConfig.map((site) => site.id)
+        // check if the default value is in the sites array config
+        if (!siteIdList.includes(defaultSiteId)) {
+            throw new Error(
+                'The default SiteId does not match any values from the site configuration. Please check your configuration'
+            )
+        }
+        console.log('homepage default siteId', defaultSiteId)
+        return defaultSiteId
+    }
+
+    let currentSite
+    const sitePosition = urlConfig['site']
+    switch (sitePosition) {
+        case urlPartPositions.NONE:
+            return undefined
+        case urlPartPositions.PATH:
+            currentSite = path.split('/')[1]
+            break
+        case urlPartPositions.QUERY_PARAM: {
+            const [, search] = path.split('?')
+            const params = new URLSearchParams(search)
+            currentSite = params.get('site')
+            break
+        }
+    }
+
+    const siteId = sitesConfig.find((site) => site.alias === currentSite)?.id
+
+    return siteId
+}

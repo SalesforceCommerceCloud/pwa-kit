@@ -14,16 +14,16 @@ import 'focus-visible/dist/focus-visible'
 import theme from '../../theme'
 import CommerceAPI from '../../commerce-api'
 import {
-    CommerceAPIProvider,
-    CustomerProvider,
     BasketProvider,
-    CustomerProductListsProvider
+    CommerceAPIProvider,
+    CustomerProductListsProvider,
+    CustomerProvider
 } from '../../commerce-api/contexts'
 import {commerceAPIConfig} from '../../commerce-api.config'
 import {einsteinAPIConfig} from '../../einstein-api.config'
-import {DEFAULT_LOCALE, DEFAULT_CURRENCY, urlPartPositions} from '../../constants'
+import {DEFAULT_CURRENCY, DEFAULT_LOCALE, DEFAULT_SITE_ID, urlPartPositions} from '../../constants'
 import {getPreferredCurrency, getSupportedLocalesIds} from '../../utils/locale'
-import {getUrlConfig} from '../../utils/utils'
+import {getSiteId, getUrlConfig} from '../../utils/utils'
 import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
 
 const apiConfig = {
@@ -89,6 +89,10 @@ const AppConfig = ({children, locals = {}}) => {
 
 AppConfig.restore = (locals = {}) => {
     // Parse the locale from the page url.
+    const originalUrl = locals.originalUrl
+    console.log('originalUrl', originalUrl)
+    apiConfig.parameters.siteId = getSiteId(originalUrl) || DEFAULT_SITE_ID
+
     const locale = getLocale(locals) || DEFAULT_LOCALE
     const currency = getPreferredCurrency(locale) || DEFAULT_CURRENCY
 

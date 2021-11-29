@@ -1,8 +1,21 @@
 {
     "app": {
+        "defaultSiteId": "RefArchGlobal",
         "url": {
             "locale": "query_param",
-            "site": "none"
-        }
+            "site": "query_param"
+        },
+        "sites": [
+            {
+                "id": "RefArch",
+                "alias": "us",
+                "hostname": ["localhost"]
+            },
+            {
+                "id": "RefArchGlobal",
+                "alias": "global",
+                "hostname": ["localhost"]
+            }
+        ]
     }
 }
