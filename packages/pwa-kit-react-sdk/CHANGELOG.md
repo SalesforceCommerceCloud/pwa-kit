@@ -1,4 +1,7 @@
 ## v1.3.0-dev (Nov 18, 2021)
+
+-   Do not show stack trace in remote environment windowGlobals [#230](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/230/files)
+
 ## v1.2.0 (Nov 18, 2021)
 
 -   Security package updates
