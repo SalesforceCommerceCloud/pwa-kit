@@ -266,7 +266,7 @@ jobs:
           command: |
             MAX_PACKAGES="3050"
             total=$(./scripts/count-dependencies.js /tmp/project)
-            echo 'export TOTAL_PACKAGES=$total' >> $BASH_ENV;
+            echo "export TOTAL_PACKAGES=${total}" >> $BASH_ENV;
 
             if [ "$total" -gt "$MAX_PACKAGES" ]; then
                 echo "Error: Found $TOTAL_PACKAGES installed packages (max $MAX_PACKAGES).";
