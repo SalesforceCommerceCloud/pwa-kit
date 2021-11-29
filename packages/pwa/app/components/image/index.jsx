@@ -7,22 +7,31 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {Image as ChakraImage, Img as ChakraImg} from '@chakra-ui/react'
+import theme from '@chakra-ui/theme'
+
+const propTypes = {
+    src: PropTypes.string,
+    vwSizes: PropTypes.arrayOf(PropTypes.number),
+    sizes: PropTypes.oneOfType([
+        PropTypes.arrayOf(PropTypes.string),
+        PropTypes.object,
+        PropTypes.string
+    ]),
+    srcSet: PropTypes.oneOfType([PropTypes.arrayOf(PropTypes.number), PropTypes.string])
+}
 
 export const Image = ({src, vwSizes, sizes, srcSet, ...otherProps}) => {
     return <ChakraImage {...getImageProps({src, vwSizes, sizes, srcSet, ...otherProps})} />
-
-    // TODO:
-    // - strip out src optional parameters
-    // - map vwSizes into {sizes as string[], srcSet as number[]}
-    // - convert sizes into string literal version
-    // - convert srcSet into string literal version <- use src optional param
 }
-Image.propTypes = {}
+Image.propTypes = propTypes
 
 export const Img = ({src, vwSizes, sizes, srcSet, ...otherProps}) => {
     return <ChakraImg {...getImageProps({src, vwSizes, sizes, srcSet, ...otherProps})} />
 }
-Img.propTypes = {}
+Img.propTypes = propTypes
+
+// TODO: move these functions into util
+// TODO: try the above components (and see if there's any error)
 
 /**
  * @param {Object} props
@@ -62,30 +71,75 @@ const getImageProps = ({src, vwSizes, sizes: _sizes, srcSet: _srcSet, ...otherPr
  * @param {(string[]|object|string)} sizes
  */
 const convertSizesToHTMLAttribute = (sizes) => {
-    return ''
+    if (typeof sizes === 'string') {
+        return sizes
+    }
+
+    // Convert to object first if needed
+    let _sizes = {}
+    if (Array.isArray(sizes)) {
+        sizes.forEach((size, i) => {
+            const key = breakpointLabels[i]
+            _sizes[key] = size
+        })
+    } else {
+        _sizes = sizes
+    }
+
+    // Then convert all sizes into string
+    const bp = theme.breakpoints
+    const s = []
+    _sizes['2xl'] && s.push(`(min-width: ${bp['2xl']}) ${_sizes['2xl']}`)
+    _sizes.xl && s.push(`(min-width: ${bp.xl}) ${_sizes.xl}`)
+    _sizes.lg && s.push(`(min-width: ${bp.lg}) ${_sizes.lg}`)
+    _sizes.md && s.push(`(min-width: ${bp.md}) ${_sizes.md}`)
+    _sizes.sm && s.push(`(min-width: ${bp.sm}) ${_sizes.sm}`)
+    _sizes.base && s.push(_sizes.base)
+
+    return s.join(', ')
 }
+
+const breakpointLabels = ['base', 'sm', 'md', 'lg', 'xl', '2xl']
 
 /**
  * @param {(number[]|string)} srcSet
  * @param {string} srcFormat
  */
 const convertSrcSetToHTMLAttribute = (srcSet, srcFormat) => {
-    return ''
+    if (typeof srcSet === 'string') {
+        return srcSet
+    }
+
+    const s = srcSet.map((imageWidth) => `${getSrc(srcFormat, imageWidth)} ${imageWidth}w`)
+    return s.join(', ')
 }
 
 /**
  * @param {number[]} vwSizes
  */
 const mapVwSizesToSizesAndSrcSet = (vwSizes) => {
+    // TODO
     return {
-        sizes: [],
-        srcSet: []
+        sizes: ['100vw', '100vw', '50vw', '350px'],
+        srcSet: [300, 720, 1000, 1500]
     }
+}
+
+// TODO: https://example.com/image[_{width}].jpg => https://example.com/image_720.jpg
+/**
+ * @param {string} srcFormat
+ * @param {number} imageWidth
+ */
+const getSrc = (srcFormat, imageWidth) => {
+    // TODO: remove the surrounding []
+    // TODO: replace {} with imageWidth
+    return `https://example.com/image_${imageWidth}.jpg`
 }
 
 /**
  * @param {string} srcFormat
  */
 const getSrcWithoutOptionalParams = (srcFormat) => {
-    return ''
+    const optionalParams = /\[[^[\]]+\]/g
+    return srcFormat.replace(optionalParams, '')
 }
