@@ -1,16 +1,13 @@
 import React from "react";
 
 interface Props {
-    message: number
+    message: string
 }
 
 const HelloTS = ({ message }: Props) => {
   return (
-    <div>
-        <h1>This is a hello from TS</h1>
-        <p>Message: "{message}"</p>
-    </div>
+    <span>And this is a TS component (it takes a prop: "{message}").</span>
   );
-};
+}
 
 export default HelloTS;

@@ -1,11 +1,8 @@
 import React from "react";
 
-const HelloJS = ({ message }) => {
+const HelloJS = () => {
   return (
-    <div>
-        <h1>This is a hello from JS</h1>
-        <p>Message: "{message}"</p>
-    </div>
+    <span>This is a JS component.</span>
   );
 };
 
