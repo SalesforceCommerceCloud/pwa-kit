@@ -266,12 +266,14 @@ jobs:
           command: |
             MAX_PACKAGES="3050"
             total=$(./scripts/count-dependencies.js /tmp/project)
-              if [ "$total" -gt "$MAX_PACKAGES" ]; then
-                  echo "Error: Found $total installed packages (max $MAX_PACKAGES).";
-                  exit 1;
-              else
-                  echo "Error: Found $total installed packages (max $MAX_PACKAGES).";
-              fi
+            echo 'export TOTAL_PACKAGES=$total' >> $BASH_ENV;
+
+            if [ "$total" -gt "$MAX_PACKAGES" ]; then
+                echo "Error: Found $TOTAL_PACKAGES installed packages (max $MAX_PACKAGES).";
+                exit 1;
+            else
+                echo "Error: Found $TOTAL_PACKAGES installed packages (max $MAX_PACKAGES).";
+            fi
       - early_return_for_forked_pull_requests
       - slack/status:
           fail_only: true
@@ -305,7 +307,7 @@ jobs:
             # Add a dogrc so we can submit metrics to datadog
             printf "[Connection]\napikey = $DATADOG_API_KEY\nappkey =\n" > ~/.dogrc
 
-            dog metric post mobify_platform_sdks.generated_project_total_packages $total
+            dog metric post mobify_platform_sdks.generated_project_total_packages $TOTAL_PACKAGES
       - run:
           name: Push Bundle
           command: |
