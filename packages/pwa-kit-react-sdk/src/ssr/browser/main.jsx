@@ -58,7 +58,7 @@ export const start = () => {
     }
     // AppConfig.restore *must* come before getRoutes()
     AppConfig.restore &&
-        AppConfig.restore(locals, window.__PRELOADED_STATE__.__STATE_MANAGEMENT_LIBRARY, context)
+        AppConfig.restore(locals, window.__PRELOADED_STATE__.__STATE_MANAGEMENT_LIBRARY)
     const routes = getRoutes(locals, context)
 
     // We need to tell the routeComponent HOC when the app is hydrating in order to
