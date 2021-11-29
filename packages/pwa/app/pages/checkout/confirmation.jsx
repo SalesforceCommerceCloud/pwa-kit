@@ -82,7 +82,7 @@ const CheckoutConfirmation = () => {
                     <Link to="/login" color="blue.600">
                         <FormattedMessage
                             defaultMessage="Log in here"
-                            id="checkout_confirmation.link_login"
+                            id="checkout_confirmation.link.login"
                         />
                     </Link>
                 </Fragment>
