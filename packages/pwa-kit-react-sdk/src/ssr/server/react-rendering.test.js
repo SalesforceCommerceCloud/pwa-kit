@@ -290,7 +290,7 @@ jest.mock('../../utils/ssr-server', () => {
     const actual = jest.requireActual('../../utils/ssr-server')
     return {
         ...actual,
-        isRemote: jest.fn().mockReturnValue(false)
+        isRemote: jest.fn()
     }
 })
 
@@ -463,7 +463,7 @@ describe('The Node SSR Environment', () => {
                 const data = dataFromHTML(doc)
 
                 expect(data.__ERROR__.message).toEqual('Internal Server Error')
-                expect(typeof data.__ERROR__.stack).toEqual('string')
+                expect(typeof data.__ERROR__.stack).toEqual(isRemote() ? 'undefined' : 'string')
                 expect(data.__ERROR__.status).toEqual(500)
                 expect(res.statusCode).toBe(500)
             }
@@ -524,45 +524,23 @@ describe('The Node SSR Environment', () => {
         }
     ]
 
-    cases.forEach(({description, req, assertions}) => {
-        test(`renders PWA pages properly (${description})`, () => {
-            const {url, headers, query} = req
-            const app = createApp(opts())
-            app.get('/*', render)
-            return request(app)
-                .get(url)
-                .set(headers || {})
-                .query(query || {})
-                .then((res) => assertions(res))
+    const isRemoteValues = [true, false]
+
+    isRemoteValues.forEach((value) => {
+        isRemote.mockReturnValue(value)
+
+        // Run test cases
+        cases.forEach(({description, req, assertions}) => {
+            test(`renders PWA pages properly (${description})`, () => {
+                const {url, headers, query} = req
+                const app = createApp(opts())
+                app.get('/*', render)
+                return request(app)
+                    .get(url)
+                    .set(headers || {})
+                    .query(query || {})
+                    .then((res) => assertions(res))
+            })
         })
-    })
-
-    test(`Error is not visible in remote environment`, () => {
-        isRemote.mockReturnValue(true)
-
-        const originalEnv = process.env
-        process.env = {
-            ...originalEnv,
-            BUNDLE_ID: '1',
-            DEPLOY_TARGET: 'test',
-            EXTERNAL_DOMAIN_NAME: 'example.com',
-            MOBIFY_PROPERTY_ID: '1'
-        }
-
-        const assertions = (res) => {
-            const html = res.text
-            const doc = parse(html)
-            const data = dataFromHTML(doc)
-
-            expect(data.__ERROR__).toEqual(undefined)
-            expect(res.statusCode).toBe(500)
-        }
-
-        const url = '/render-throws-error/'
-        const app = createApp(opts())
-        app.get('/*', render)
-        return request(app)
-            .get(url)
-            .then((res) => assertions(res))
     })
 })
