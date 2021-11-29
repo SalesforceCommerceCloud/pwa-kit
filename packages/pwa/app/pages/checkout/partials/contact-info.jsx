@@ -64,7 +64,7 @@ const ContactInfo = () => {
                 setError(
                     formatMessage({
                         defaultMessage: 'Incorrect username or password, please try again.',
-                        id: 'contact_info.error.incorrect_username_password'
+                        id: 'contact_info.error.incorrect_username_or_password'
                     })
                 )
             } else {
