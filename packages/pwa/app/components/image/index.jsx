@@ -31,7 +31,6 @@ export const Img = ({src, vwSizes, sizes, srcSet, ...otherProps}) => {
 Img.propTypes = propTypes
 
 // TODO: move these functions into util
-// TODO: try the above components (and see if there's any error)
 
 /**
  * @param {Object} props
@@ -125,21 +124,23 @@ const mapVwSizesToSizesAndSrcSet = (vwSizes) => {
     }
 }
 
-// TODO: https://example.com/image[_{width}].jpg => https://example.com/image_720.jpg
 /**
  * @param {string} srcFormat
  * @param {number} imageWidth
+ * @example
+ * // returns https://example.com/image_720.jpg
+ * getSrc('https://example.com/image[_{width}].jpg', 720)
  */
 const getSrc = (srcFormat, imageWidth) => {
-    // TODO: remove the surrounding []
-    // TODO: replace {} with imageWidth
-    return `https://example.com/image_${imageWidth}.jpg`
+    // 1. remove the surrounding []
+    // 2. replace {...} with imageWidth
+    return srcFormat.replace(/\[([^\]]+)\]/g, '$1').replace(/\{[^}]+\}/g, imageWidth)
 }
 
 /**
  * @param {string} srcFormat
  */
 const getSrcWithoutOptionalParams = (srcFormat) => {
-    const optionalParams = /\[[^[\]]+\]/g
+    const optionalParams = /\[[^\]]+\]/g
     return srcFormat.replace(optionalParams, '')
 }
