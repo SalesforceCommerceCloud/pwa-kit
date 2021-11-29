@@ -164,7 +164,7 @@ const PaymentSelection = ({form, hideSubmitButton, onSubmit = () => null}) => {
                                                             >
                                                                 <FormattedMessage
                                                                     defaultMessage="Save & Continue"
-                                                                    id="payment_selection.button.save_continue"
+                                                                    id="payment_selection.button.save_and_continue"
                                                                 />
                                                             </Button>
                                                         </Container>
