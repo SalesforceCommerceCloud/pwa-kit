@@ -20,7 +20,7 @@ import FormActionButtons from '../../../components/forms/form-action-buttons'
 
 const saveButtonMessage = defineMessage({
     defaultMessage: 'Save & Continue to Shipping Method',
-    id: 'shipping_address_edit_form.button.save_continue'
+    id: 'shipping_address_edit_form.button.save_and_continue'
 })
 
 const ShippingAddressEditForm = ({
