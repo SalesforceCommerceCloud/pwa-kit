@@ -137,19 +137,22 @@ export const RemoteServerFactory = {
 
         // Ensure this is a boolean, and is always true for a remote server.
         options.strictSSL = this.strictSSL(options)
-        if (!options.strictSSL) {
-            console.warn('The SSR Server has strictSSL turned off for https requests')
-        }
 
         // This is the external HOSTNAME under which we are serving the page.
         // The EXTERNAL_DOMAIN_NAME value technically only applies to remote
         // operation, but we allow it to be used for a local dev server also.
         options.appHostname = process.env.EXTERNAL_DOMAIN_NAME || `localhost:${options.port}`
 
+        options.devServerHostName = process.env.LISTEN_ADDRESS || `localhost:${options.port}`
+
         // This is the ORIGIN under which we are serving the page.
         // because it's an origin, it does not end with a slash.
         options.appOrigin = process.env.APP_ORIGIN = `${options.protocol}://${options.appHostname}`
         return options
+    },
+
+    logStartupMessage(options) {
+        // Hook for the DevServer
     },
 
     getProtocol(options) {
@@ -186,6 +189,7 @@ export const RemoteServerFactory = {
 
     createApp(options) {
         options = this.configure(options)
+        this.logStartupMessage(options)
 
         // To gain a small speed increase in the event that this
         // server needs to make a proxy request back to itself,
@@ -639,6 +643,10 @@ export const RemoteServerFactory = {
                     'This behaviour is deprecated and will be removed in the future.' +
                     'To disable it, pass `createApp({ enableLegacyRemoteProxying: false` })'
             )
+        }
+
+        if (!options.strictSSL) {
+            console.warn('The SSR Server has strictSSL turned off for https requests')
         }
     },
 

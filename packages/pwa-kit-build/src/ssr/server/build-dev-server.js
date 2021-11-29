@@ -15,7 +15,10 @@ import mimeTypes from 'mime-types'
 import webpack from 'webpack'
 import webpackDevMiddleware from 'webpack-dev-middleware'
 import webpackHotServerMiddleware from 'webpack-hot-server-middleware'
+import open from 'open'
 import config from '../../webpack/config'
+
+const chalk = require('chalk')
 
 const CONTENT_TYPE = 'content-type'
 const CONTENT_ENCODING = 'content-encoding'
@@ -25,6 +28,10 @@ const NO_CACHE = 'max-age=0, nocache, nostore, must-revalidate'
  * @private
  */
 export const DevServerFactory = {
+    logStartupMessage(options) {
+        console.log(`Starting the DevServer on ${chalk.cyan(this._getDevServerURL(options))}\n`)
+    },
+
     getProtocol(options) {
         return process.env.DEV_SERVER_PROTOCOL || options.protocol
     },
@@ -227,14 +234,31 @@ export const DevServerFactory = {
         })
     },
 
+    _getDevServerHostAndPort(options) {
+        const split = options.devServerHostName.split(':')
+        const hostname = split.length === 2 ? split[0] : options.devServerHostName
+        const port = split.length === 2 ? split[1] : options.port
+        return {hostname, port}
+    },
+
+    _getDevServerURL(options) {
+        const {protocol} = options
+        const {hostname, port} = this._getDevServerHostAndPort(options)
+        return `${protocol}://${hostname}:${port}`
+    },
+
     createHandler(app) {
-        const options = app.options
-        const hostname = process.env.LISTEN_ADDRESS || 'localhost'
-        const port = options.port
+        const {protocol, sslFilePath} = app.options
+        const {hostname, port} = this._getDevServerHostAndPort(app.options)
+
+        // Log an empty line between server startup messages and HTTP
+        // request logging.
+        console.log('')
+
         let server
 
-        if (options.protocol === 'https') {
-            const sslFile = fs.readFileSync(options.sslFilePath)
+        if (protocol === 'https') {
+            const sslFile = fs.readFileSync(sslFilePath)
             server = https.createServer({key: sslFile, cert: sslFile}, app)
         } else {
             server = http.createServer(app)
@@ -245,11 +269,7 @@ export const DevServerFactory = {
         server.on('close', () => app.applicationCache.close())
 
         server.listen({hostname, port}, () => {
-            const url = `${options.protocol}://${hostname}:${port}`
-            console.log(`${options.protocol.toUpperCase()} development server listening on ${url}`)
-            // TODO: Must move this to the CLI – it'll cause us nightmares here.
-            const open = require('open')
-            open(`${url}/__mrt?loading=1`)
+            open(`${this._getDevServerURL(app.options)}/__mrt?loading=1`)
         })
 
         return {handler: undefined, server}
