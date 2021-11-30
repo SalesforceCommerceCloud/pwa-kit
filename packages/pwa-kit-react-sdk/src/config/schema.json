@@ -1,0 +1,17 @@
+{
+    "definitions": {},
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "pwa-kit-schema",
+    "title": "Root",
+    "type": "object",
+    "required": ["app"],
+    "properties": {
+        "app": {
+            "$id": "#root/app",
+            "title": "App",
+            "type": "object",
+            "required": [],
+            "properties": {}
+        }
+    }
+}
