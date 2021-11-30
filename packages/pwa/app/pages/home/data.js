@@ -75,7 +75,7 @@ export const features = [
             title: {defaultMessage: 'My Account'},
             text: {
                 defaultMessage:
-                    "Shopper's can manage account information such as their profile, addresses, payments and orders."
+                    'Shoppers can manage account information such as their profile, addresses, payments and orders.'
             }
         }),
         icon: <AccountIcon />
@@ -105,7 +105,7 @@ export const features = [
             title: {defaultMessage: 'Wishlist'},
             text: {
                 defaultMessage:
-                    "Registered shopper's can add product items to their wishlist from purchasing later. "
+                    'Registered shoppers can add product items to their wishlist from purchasing later. '
             }
         }),
         icon: <HeartIcon />

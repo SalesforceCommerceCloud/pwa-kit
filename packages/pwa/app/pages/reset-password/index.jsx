@@ -55,12 +55,16 @@ const ResetPassword = () => {
                     <Stack justify="center" align="center" spacing={6}>
                         <BrandLogo width="60px" height="auto" />
                         <Text align="center" fontSize="md">
-                            <FormattedMessage defaultMessage={'Password Reset'} />
+                            <FormattedMessage
+                                defaultMessage={'Password Reset'}
+                                id="reset_password.title.password_reset"
+                            />
                         </Text>
                         <Stack spacing={6} pt={4}>
                             <Text align="center" fontSize="sm">
                                 <FormattedMessage
                                     defaultMessage="You will receive an email at <b>{email}</b> with a link to reset your password shortly."
+                                    id="reset_password.info.receive_email_shortly"
                                     values={{
                                         email: submittedEmail,
                                         // eslint-disable-next-line react/display-name
@@ -69,7 +73,10 @@ const ResetPassword = () => {
                                 />
                             </Text>
                             <Button onClick={() => navigate('/login')}>
-                                <FormattedMessage defaultMessage="Back to sign in" />
+                                <FormattedMessage
+                                    defaultMessage="Back to sign in"
+                                    id="reset_password.button.back_to_sign_in"
+                                />
                             </Button>
                         </Stack>
                     </Stack>

@@ -67,10 +67,7 @@ export const AuthModal = ({
                       defaultMessage:
                           "Something's not right with your email or password. Try again."
                   })
-                : formatMessage(
-                      {defaultMessage: '{errorMessage}'},
-                      {errorMessage: API_ERROR_MESSAGE}
-                  )
+                : formatMessage(API_ERROR_MESSAGE)
             form.setError('global', {type: 'manual', message})
         }
     }
