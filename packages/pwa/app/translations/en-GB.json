@@ -810,9 +810,6 @@
   "locale_text.message.zh-TW": {
     "defaultMessage": "Chinese (Taiwan)"
   },
-  "login.error.incorrect_username_password": {
-    "defaultMessage": "Incorrect username or password, please try again."
-  },
   "login_form.action.create_account": {
     "defaultMessage": "Create account"
   },
@@ -827,6 +824,9 @@
   },
   "login_form.message.welcome_back": {
     "defaultMessage": "Welcome Back"
+  },
+  "login_page.error.incorrect_username_password": {
+    "defaultMessage": "Incorrect username or password, please try again."
   },
   "offline_banner.description.browsing_offline_mode": {
     "defaultMessage": "You're currently browsing in offline mode"

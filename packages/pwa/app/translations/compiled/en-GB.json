@@ -1889,12 +1889,6 @@
       "value": "Chinese (Taiwan)"
     }
   ],
-  "login.error.incorrect_username_password": [
-    {
-      "type": 0,
-      "value": "Incorrect username or password, please try again."
-    }
-  ],
   "login_form.action.create_account": [
     {
       "type": 0,
@@ -1923,6 +1917,12 @@
     {
       "type": 0,
       "value": "Welcome Back"
+    }
+  ],
+  "login_page.error.incorrect_username_password": [
+    {
+      "type": 0,
+      "value": "Incorrect username or password, please try again."
     }
   ],
   "offline_banner.description.browsing_offline_mode": [
