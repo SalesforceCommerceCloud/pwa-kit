@@ -15,11 +15,17 @@ export class ConfigError extends Error {
 }
 
 export default class Config {
+    /**
+     * Instantiate a Config instance.
+     * @param {object} data config value
+     * @param {object} customProperties custom property schema map
+     */
     constructor(data, customProperties = {}) {
         this.data = data
         this.schema = Object.assign({}, schema)
 
-        // insert custom properties
+        // Insert custom properties into the schema.
+        // This only works with top level properties!
         Object.keys(customProperties).forEach((property) => {
             this.schema.properties[property] = customProperties[property]
         })
@@ -27,6 +33,11 @@ export default class Config {
         this.validator = new JsonSchemaValidator({allErrors: true}).compile(this.schema)
     }
 
+    /**
+     * Validate config value based on the JSON Schema.
+     * This function throws a ConfigError when the value
+     * is invalid, otherwise return true.
+     */
     validate() {
         // the Json schema validators handles basic validation:
         // Primitive data type validation (number, boolean, string, etc.)
@@ -50,11 +61,13 @@ export default class Config {
         return true
     }
 
+    /**
+     * Ajv json schema validators represent nested object keys
+     * like this: /server/mobify/ssrParameters/proxyConfigs/
+     * The slashes are confusing, we'd like to convert the format
+     * to be like: server.mobify.ssrParameters.proxyConfigs
+     */
     _beautifyPropertyPath(path, delimiter) {
-        // Ajv json schema validators represent nested object keys
-        // like this: /server/mobify/ssrParameters/proxyConfigs/
-        // The slashes are confusing, we'd like to convert the format
-        // to be like: server.mobify.ssrParameters.proxyConfigs
         return (path || '')
             .split(delimiter || '/')
             .filter(Boolean)
