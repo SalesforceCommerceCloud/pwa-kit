@@ -142,7 +142,7 @@ const Header = ({
                     <Box {...styles.searchContainer}>
                         <Search
                             placeholder={intl.formatMessage({
-                                id: 'header.search.field.value.placeholder',
+                                id: 'header.field.placeholder.search_for_products',
                                 defaultMessage: 'Search for products...'
                             })}
                             {...styles.search}
@@ -198,7 +198,8 @@ const Header = ({
                                 <PopoverHeader>
                                     <Text>
                                         {intl.formatMessage({
-                                            defaultMessage: 'My Account'
+                                            defaultMessage: 'My Account',
+                                            id: 'header.popover.title.my_account'
                                         })}
                                     </Text>
                                 </PopoverHeader>
@@ -228,7 +229,8 @@ const Header = ({
                                             <SignoutIcon boxSize={5} {...styles.signoutIcon} />
                                             <Text as="span" {...styles.signoutText}>
                                                 {intl.formatMessage({
-                                                    defaultMessage: 'Log out'
+                                                    defaultMessage: 'Log out',
+                                                    id: 'header.popover.action.log_out'
                                                 })}
                                             </Text>
                                         </Flex>
@@ -239,7 +241,8 @@ const Header = ({
                     )}
                     <IconButtonWithRegistration
                         aria-label={intl.formatMessage({
-                            defaultMessage: 'Wishlist'
+                            defaultMessage: 'Wishlist',
+                            id: 'header.button.assistive_msg.wishlist'
                         })}
                         icon={<HeartIcon />}
                         variant="unstyled"
