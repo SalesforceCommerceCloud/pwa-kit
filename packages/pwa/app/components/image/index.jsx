@@ -147,12 +147,15 @@ const mapVwSizesToSrcSet = (vwSizes) => {
         const px = emToPx(em)
 
         srcSet.push(px)
+        srcSet.push(px * 2) // for devices with higher pixel density
     })
 
-    // TODO: consider pixel density of the device
     return srcSet
 }
 
+/**
+ * @param {Object} prop
+ */
 const responsivePropAsArray = (prop) => {
     let mostRecent
     return breakpointLabels.map((bp) => {
@@ -165,7 +168,10 @@ const responsivePropAsArray = (prop) => {
     })
 }
 
-// const vwToEm = (vw, nextBreakpointInEm) => (vw / 100) * nextBreakpointInEm
+/**
+ * @param {number} em
+ * @param {number} browserDefaultFontSize
+ */
 const emToPx = (em, browserDefaultFontSize = 16) => Math.round(em * browserDefaultFontSize)
 
 /**
