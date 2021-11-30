@@ -52,31 +52,14 @@ export const navLinks = [
 ]
 
 export const CONFIRMATION_DIALOG_DEFAULT_CONFIG = defineMessages({
-    dialogTitle: {defaultMessage: 'Confirm Action', id: 'global.account.title.confirm_action'},
+    dialogTitle: {
+        defaultMessage: 'Confirm Action',
+        id: 'confirmation_modal.default.title.confirm_action'
+    },
     confirmationMessage: {
         defaultMessage: 'Are you sure you want to continue ?',
-        id: 'global.account.message.you_want_to_continue'
+        id: 'confirmation_modal.default.message.you_want_to_continue'
     },
-    primaryActionLabel: {defaultMessage: 'Yes', id: 'global.account.action.yes'},
-    alternateActionLabel: {defaultMessage: 'No', id: 'global.account.action.no'}
+    primaryActionLabel: {defaultMessage: 'Yes', id: 'confirmation_modal.default.action.yes'},
+    alternateActionLabel: {defaultMessage: 'No', id: 'confirmation_modal.default.action.no'}
 })
-
-export const REMOVE_CART_ITEM_CONFIRMATION_DIALOG_CONFIG = {
-    dialogTitle: defineMessage({
-        defaultMessage: 'Confirm Remove Item',
-        id: 'global.account.title.confirm_remove'
-    }),
-    confirmationMessage: defineMessage({
-        defaultMessage: 'Are you sure you want to remove this item from your cart?',
-        id: 'global.account.message.you_want_to_remove'
-    }),
-    primaryActionLabel: defineMessage({
-        defaultMessage: 'Yes, remove item',
-        id: 'global.account.action.remove_item'
-    }),
-    alternateActionLabel: defineMessage({
-        defaultMessage: 'No, keep item',
-        id: 'global.account.action.keep_item'
-    }),
-    onPrimaryAction: noop
-}

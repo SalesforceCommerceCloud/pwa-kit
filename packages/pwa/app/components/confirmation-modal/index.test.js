@@ -10,7 +10,7 @@ import {Box, useDisclosure} from '@chakra-ui/react'
 import {renderWithProviders} from '../../utils/test-utils'
 import user from '@testing-library/user-event'
 import {screen} from '@testing-library/react'
-import {REMOVE_CART_ITEM_CONFIRMATION_DIALOG_CONFIG} from '../../pages/account/constant'
+import {REMOVE_CART_ITEM_CONFIRMATION_DIALOG_CONFIG} from '../../pages/cart/partials/cart-secondary-button-group'
 
 const MockedComponent = (props) => {
     const modalProps = useDisclosure()

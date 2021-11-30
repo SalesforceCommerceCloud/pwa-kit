@@ -24,20 +24,20 @@ import useCustomer from '../../../commerce-api/hooks/useCustomer'
 
 export const REMOVE_CART_ITEM_CONFIRMATION_DIALOG_CONFIG = {
     dialogTitle: defineMessage({
-        defaultMessage: 'Remove Item?',
-        id: 'global.cart.title.remove_item'
+        defaultMessage: 'Confirm Remove Item',
+        id: 'confirmation_modal.remove_cart_item.title.confirm_remove'
     }),
     confirmationMessage: defineMessage({
         defaultMessage: 'Are you sure you want to remove this item from your cart?',
-        id: 'global.cart.message.sure_to_remove_item'
+        id: 'confirmation_modal.remove_cart_item.message.sure_to_remove'
     }),
     primaryActionLabel: defineMessage({
         defaultMessage: 'Yes, remove item',
-        id: 'global.cart.action.yes_remove'
+        id: 'confirmation_modal.remove_cart_item.action.yes'
     }),
     alternateActionLabel: defineMessage({
         defaultMessage: 'No, keep item',
-        id: 'global.cart.action.no_keep'
+        id: 'confirmation_modal.remove_cart_item.action.no'
     }),
     onPrimaryAction: noop
 }
