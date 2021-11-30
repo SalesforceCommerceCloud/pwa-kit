@@ -32,7 +32,7 @@ const Login = () => {
             const message = /invalid credentials/i.test(error.message)
                 ? formatMessage({
                       defaultMessage: 'Incorrect username or password, please try again.',
-                      id: 'login_page.error.incorrect_username_password'
+                      id: 'login_page.error.incorrect_username_or_password'
                   })
                 : error.message
             form.setError('global', {type: 'manual', message})
