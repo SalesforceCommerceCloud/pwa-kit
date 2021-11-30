@@ -853,6 +853,78 @@
       "value": "Payment"
     }
   ],
+  "confirmation_modal.default.action.no": [
+    {
+      "type": 0,
+      "value": "No"
+    }
+  ],
+  "confirmation_modal.default.action.yes": [
+    {
+      "type": 0,
+      "value": "Yes"
+    }
+  ],
+  "confirmation_modal.default.message.you_want_to_continue": [
+    {
+      "type": 0,
+      "value": "Are you sure you want to continue ?"
+    }
+  ],
+  "confirmation_modal.default.title.confirm_action": [
+    {
+      "type": 0,
+      "value": "Confirm Action"
+    }
+  ],
+  "confirmation_modal.remove_cart_item.action.no": [
+    {
+      "type": 0,
+      "value": "No, keep item"
+    }
+  ],
+  "confirmation_modal.remove_cart_item.action.yes": [
+    {
+      "type": 0,
+      "value": "Yes, remove item"
+    }
+  ],
+  "confirmation_modal.remove_cart_item.message.sure_to_remove": [
+    {
+      "type": 0,
+      "value": "Are you sure you want to remove this item from your cart?"
+    }
+  ],
+  "confirmation_modal.remove_cart_item.title.confirm_remove": [
+    {
+      "type": 0,
+      "value": "Confirm Remove Item"
+    }
+  ],
+  "confirmation_modal.remove_wishlist_item.action.no": [
+    {
+      "type": 0,
+      "value": "No, keep item"
+    }
+  ],
+  "confirmation_modal.remove_wishlist_item.action.yes": [
+    {
+      "type": 0,
+      "value": "Yes, remove item"
+    }
+  ],
+  "confirmation_modal.remove_wishlist_item.message.sure_to_remove": [
+    {
+      "type": 0,
+      "value": "Are you sure you want to remove this item from your wishlist?"
+    }
+  ],
+  "confirmation_modal.remove_wishlist_item.title.confirm_remove": [
+    {
+      "type": 0,
+      "value": "Confirm Remove Item"
+    }
+  ],
   "contact_info.action.sign_out": [
     {
       "type": 0,
@@ -1227,30 +1299,6 @@
       "value": "Save"
     }
   ],
-  "global.account.action.keep_item": [
-    {
-      "type": 0,
-      "value": "No, keep item"
-    }
-  ],
-  "global.account.action.no": [
-    {
-      "type": 0,
-      "value": "No"
-    }
-  ],
-  "global.account.action.remove_item": [
-    {
-      "type": 0,
-      "value": "Yes, remove item"
-    }
-  ],
-  "global.account.action.yes": [
-    {
-      "type": 0,
-      "value": "Yes"
-    }
-  ],
   "global.account.link.account_details": [
     {
       "type": 0,
@@ -1281,82 +1329,10 @@
       "value": "Wishlist"
     }
   ],
-  "global.account.message.you_want_to_continue": [
-    {
-      "type": 0,
-      "value": "Are you sure you want to continue ?"
-    }
-  ],
-  "global.account.message.you_want_to_remove": [
-    {
-      "type": 0,
-      "value": "Are you sure you want to remove this item from your cart?"
-    }
-  ],
-  "global.account.title.confirm_action": [
-    {
-      "type": 0,
-      "value": "Confirm Action"
-    }
-  ],
-  "global.account.title.confirm_remove": [
-    {
-      "type": 0,
-      "value": "Confirm Remove Item"
-    }
-  ],
-  "global.cart.action.no_keep": [
-    {
-      "type": 0,
-      "value": "No, keep item"
-    }
-  ],
-  "global.cart.action.yes_remove": [
-    {
-      "type": 0,
-      "value": "Yes, remove item"
-    }
-  ],
-  "global.cart.message.sure_to_remove_item": [
-    {
-      "type": 0,
-      "value": "Are you sure you want to remove this item from your cart?"
-    }
-  ],
-  "global.cart.title.remove_item": [
-    {
-      "type": 0,
-      "value": "Remove Item?"
-    }
-  ],
   "global.error.something_went_wrong": [
     {
       "type": 0,
       "value": "Something went wrong. Try again!"
-    }
-  ],
-  "global.wishlist.action.no_keep": [
-    {
-      "type": 0,
-      "value": "No, keep item"
-    }
-  ],
-  "global.wishlist.action.yes_remove": [
-    {
-      "type": 0,
-      "value": "Yes, remove item"
-    }
-  ],
-  "global.wishlist.message.sure_to_remove": [
-    {
-      "type": 0,
-      "value": "Are you sure you want to remove this item from your wishlist?"
-    }
-  ],
-  "global.wishlist.title.confirm_remove": [
-    {
-      "type": 0,
-      "value": "Confirm Remove Item"
     }
   ],
   "header.button.assistive_msg.logo": [
