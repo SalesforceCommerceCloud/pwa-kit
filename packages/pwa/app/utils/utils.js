@@ -165,25 +165,22 @@ export const capitalize = (text) => {
  */
 export const getUrlConfig = () => pwaKitConfig?.app?.url
 
-const getSitesConfig = () => pwaKitConfig?.app?.sites
-const getDefaultSiteId = () => pwaKitConfig?.app?.defaultSiteId
+export const getSitesConfig = () => pwaKitConfig?.app?.sites
+export const getDefaultSiteId = () => pwaKitConfig?.app?.defaultSiteId
 
 export const getSiteId = (url) => {
     let path = url
     if (!path) {
-        console.log('window.location.pathname', window.location)
         path = `${window?.location.pathname}${window?.location.search}`
     }
 
-    const {hostname, pathname} = new URL(`${getAppOrigin()}${path}`)
+    const {hostname, pathname, search} = new URL(`${getAppOrigin()}${path}`)
     let siteId = getSiteIdByHostname(hostname)
     if (siteId) {
-        console.log('found by hostname===========================')
         return siteId
     }
-    console.log('found by alias===========================')
 
-    siteId = getSiteIdByAlias(path)
+    siteId = getSiteIdByAlias(`${pathname}${search}`)
     return siteId
 }
 
@@ -195,11 +192,13 @@ const getSiteIdByHostname = (hostname) => {
     return site.length === 1 ? site.id : undefined
 }
 
-const getSiteIdByAlias = (path) => {
+const getSiteIdByAlias = (url) => {
+    const [pathname, search] = url.split('?')
+
     const defaultSiteId = getDefaultSiteId()
     const sitesConfig = getSitesConfig()
     const urlConfig = getUrlConfig()
-    if (path === HOME_HREF) {
+    if (pathname === HOME_HREF) {
         const siteIdList = sitesConfig.map((site) => site.id)
         // check if the default value is in the sites array config
         if (!siteIdList.includes(defaultSiteId)) {
@@ -217,10 +216,9 @@ const getSiteIdByAlias = (path) => {
         case urlPartPositions.NONE:
             return undefined
         case urlPartPositions.PATH:
-            currentSite = path.split('/')[1]
+            currentSite = pathname.split('/')[1]
             break
         case urlPartPositions.QUERY_PARAM: {
-            const [, search] = path.split('?')
             const params = new URLSearchParams(search)
             currentSite = params.get('site')
             break

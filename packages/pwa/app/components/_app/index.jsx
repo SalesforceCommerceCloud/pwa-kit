@@ -47,6 +47,7 @@ import {DEFAULT_CURRENCY, HOME_HREF} from '../../constants'
 
 import Seo from '../seo'
 import useWishlist from '../../hooks/use-wishlist'
+import useSite from '../../hooks/use-site'
 
 const DEFAULT_NAV_DEPTH = 3
 const DEFAULT_ROOT_CATEGORY = 'root'
@@ -60,6 +61,7 @@ const App = (props) => {
     const location = useLocation()
     const authModal = useAuthModal()
     const customer = useCustomer()
+    const site = useSite()
     const [isOnline, setIsOnline] = useState(true)
     const styles = useStyleConfig('App')
 
@@ -110,7 +112,7 @@ const App = (props) => {
     }
 
     const onCartClick = () => {
-        const path = buildPathWithUrlConfig('/cart', {locale: targetLocale})
+        const path = buildPathWithUrlConfig('/cart', {locale: targetLocale, site: site.alias})
         history.push(path)
 
         // Close the drawer.
@@ -120,7 +122,10 @@ const App = (props) => {
     const onAccountClick = () => {
         // Link to account page for registered customer, open auth modal otherwise
         if (customer.isRegistered) {
-            const path = buildPathWithUrlConfig('/account', {locale: targetLocale})
+            const path = buildPathWithUrlConfig('/account', {
+                locale: targetLocale,
+                site: site.alias
+            })
             history.push(path)
         } else {
             // if they already are at the login page, do not show login modal
@@ -130,7 +135,10 @@ const App = (props) => {
     }
 
     const onWishlistClick = () => {
-        const path = buildPathWithUrlConfig('/account/wishlist', {locale: targetLocale})
+        const path = buildPathWithUrlConfig('/account/wishlist', {
+            locale: targetLocale,
+            site: site.alias
+        })
         history.push(path)
     }
 
