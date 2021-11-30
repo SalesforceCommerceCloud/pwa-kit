@@ -136,26 +136,32 @@ const initAppState = async ({App, component, match, route, req, res, location}) 
  * @return {Promise}
  */
 export const render = async (req, res) => {
-    // AppConfig.restore *must* come before using getRoutes() or routeComponent()
-    // to inject arguments into the wrapped component's getProps methods.
-    AppConfig.restore && AppConfig.restore(res.locals)
-
-    const frozenReq = AppConfig.freezeRequest(req, res)
-    const context = {
-        originalRequest: frozenReq
-    }
-
-    const routes = getRoutes(res.locals, context)
-
-    const WrappedApp = routeComponent(App, false, res.locals, context)
-
     const [pathname, search] = req.originalUrl.split('?')
     const location = {
         pathname,
         search: search ? `?${search}` : ''
     }
 
-    // Step 1 - Find the match.
+    // Step 0 - Envoke the AppConfig restore.
+    // NOTE: AppConfig.restore *must* come before using getRoutes() or routeComponent()
+    // to inject arguments into the wrapped component's getProps methods.
+    AppConfig.restore && AppConfig.restore(res.locals)
+
+    // Step 1 - Prepare the context
+    const frozenReq = AppConfig.freezeRequest(req, res)
+    const context = {
+        originalRequest: frozenReq
+    }
+
+    // Step 2 - Get the extra args to be used for the `getProps` functions.
+    const extraArgs = AppConfig.extraGetPropsArgs.apply(context, res.locals)
+
+    // Step 2 - Get enhanced components (app and pages)
+    const routes = getRoutes(res.locals, extraArgs, context)
+
+    const WrappedApp = routeComponent(App, false, res.locals, extraArgs, context)
+
+    // Step 3 - Find the match.
     let route
     let match
 
@@ -168,10 +174,10 @@ export const render = async (req, res) => {
         return !!match
     })
 
-    // Step 2 - Get the component
+    // Step 4 - Get the component
     const component = await route.component.getComponent()
 
-    // Step 3 - Init the app state
+    // Step 5 - Init the app state
     const {appState, error: appStateError} = await initAppState({
         App: WrappedApp,
         component,
@@ -182,7 +188,7 @@ export const render = async (req, res) => {
         location
     })
 
-    // Step 4 - Render the App
+    // Step 6 - Render the App
     let renderResult
     const args = {
         App: WrappedApp,
@@ -200,7 +206,7 @@ export const render = async (req, res) => {
         renderResult = renderApp({...args, error: logAndFormatError(error)})
     }
 
-    // Step 5 - Determine what is going to happen, redirect, or send html with
+    // Step 7 - Determine what is going to happen, redirect, or send html with
     // the correct status code.
     const {html, routerContext, error} = renderResult
     const redirectUrl = routerContext.url

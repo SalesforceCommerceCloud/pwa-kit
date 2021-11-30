@@ -10,7 +10,6 @@ import {withRouter} from 'react-router-dom'
 import hoistNonReactStatic from 'hoist-non-react-statics'
 import {AppErrorContext} from '../../components/app-error-boundary'
 import Throw404 from '../../components/throw-404'
-import AppConfig from '../../components/_app-config'
 import routes from '../../routes'
 import {pages as pageEvents} from '../../events'
 
@@ -64,14 +63,7 @@ const withErrorHandling = (Wrapped) => {
  * route-config. It provides an interface, via static methods on React components,
  * that can be used to fetch data on the server and on the client, seamlessly.
  */
-export const routeComponent = (Wrapped, isPage, locals, context) => {
-    const {extraGetPropsArgs} = AppConfig
-
-    // bind new scope
-    const boundExtraGetPropsArgs = extraGetPropsArgs.bind(context)
-
-    const extraArgs = boundExtraGetPropsArgs(locals)
-
+export const routeComponent = (Wrapped, isPage, locals, extraArgs, context) => {
     /* istanbul ignore next */
     const wrappedComponentName = Wrapped.displayName || Wrapped.name
 
@@ -434,11 +426,13 @@ export const routeComponent = (Wrapped, isPage, locals, context) => {
  *
  * @private
  */
-export const getRoutes = (locals, context) => {
+export const getRoutes = (locals, extraArgs, context) => {
     const allRoutes = [...routes, {path: '*', component: Throw404}]
     return allRoutes.map(({component, ...rest}) => {
         return {
-            component: component ? routeComponent(component, true, locals, context) : component,
+            component: component
+                ? routeComponent(component, true, locals, extraArgs, context)
+                : component,
             ...rest
         }
     })

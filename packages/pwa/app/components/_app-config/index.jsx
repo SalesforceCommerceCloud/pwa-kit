@@ -63,7 +63,6 @@ const AppConfig = ({children}) => {
     const [customer, setCustomer] = useState(null)
     const {originalRequest} = useContext(AppContext)
 
-    // TODO: DRY this up.
     const locale = getLocale(originalRequest) || DEFAULT_LOCALE
     const currency = getPreferredCurrency(locale) || DEFAULT_CURRENCY
     const api = new CommerceAPI({...apiConfig, locale, currency})
@@ -91,8 +90,6 @@ AppConfig.freezeRequest = function(req) {
 }
 
 AppConfig.extraGetPropsArgs = function() {
-    // NOTE: How many times is this function supposed to be called? Right now it gets called
-    // once for each route component, I'm not sure if that is what we intended on doing.
     const locale = getLocale(this.originalRequest) || DEFAULT_LOCALE
     const currency = getPreferredCurrency(locale) || DEFAULT_CURRENCY
 
