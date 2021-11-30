@@ -7,7 +7,7 @@
 import JsonSchemaValidator from 'ajv'
 import schema from './schema.json'
 
-class ConfigError extends Error {
+export class ConfigError extends Error {
     constructor(message) {
         super(message)
         this.name = 'ConfigError'
@@ -39,8 +39,8 @@ export default class Config {
         const errorMessages = this.validator.errors
             ? this.validator.errors.map(
                   (e) =>
-                      `${this.beautifyJsonSchemaValidatorKeyPath(e.instancePath, '/') ||
-                          this.beautifyJsonSchemaValidatorKeyPath(e.dataPath, '.')} - ${e.message}`
+                      `${this._beautifyPropertyPath(e.instancePath) ||
+                          this._beautifyPropertyPath(e.dataPath, '.')} - ${e.message}`
               )
             : []
 
@@ -50,13 +50,13 @@ export default class Config {
         return true
     }
 
-    beautifyJsonSchemaValidatorKeyPath(path, delimiter) {
+    _beautifyPropertyPath(path, delimiter) {
         // Ajv json schema validators represent nested object keys
         // like this: /server/mobify/ssrParameters/proxyConfigs/
         // The slashes are confusing, we'd like to convert the format
         // to be like: server.mobify.ssrParameters.proxyConfigs
         return (path || '')
-            .split(delimiter)
+            .split(delimiter || '/')
             .filter(Boolean)
             .join('.')
     }
