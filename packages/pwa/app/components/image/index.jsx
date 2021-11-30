@@ -36,7 +36,7 @@ Img.propTypes = propTypes
  * @param {Object} props
  * @param {string} props.src
  * @param {number[]} props.vwSizes
- * @param {(string[]|object|string)} props.sizes
+ * @param {(string[]|Object|string)} props.sizes
  * @param {(number[]|string)} props.srcSet
  * @return {Object} props for Chakra image component
  */
@@ -44,7 +44,8 @@ const getImageProps = ({src, vwSizes, sizes: _sizes, srcSet: _srcSet, ...otherPr
     const imageProps = {src: getSrcWithoutOptionalParams(src)}
 
     if (vwSizes) {
-        const {sizes, srcSet} = mapVwSizesToSizesAndSrcSet(vwSizes)
+        const sizes = mapVwSizesToSizes(vwSizes)
+        const srcSet = mapVwSizesToSrcSet(vwSizes)
         imageProps.sizes = convertSizesToHTMLAttribute(sizes)
         imageProps.srcSet = convertSrcSetToHTMLAttribute(srcSet, src)
 
@@ -67,7 +68,7 @@ const getImageProps = ({src, vwSizes, sizes: _sizes, srcSet: _srcSet, ...otherPr
 }
 
 /**
- * @param {(string[]|object|string)} sizes
+ * @param {(string[]|Object|string)} sizes
  */
 const convertSizesToHTMLAttribute = (sizes) => {
     if (typeof sizes === 'string') {
@@ -114,15 +115,58 @@ const convertSrcSetToHTMLAttribute = (srcSet, srcFormat) => {
 }
 
 /**
- * @param {number[]} vwSizes
+ * @param {(number[]|Object)} vwSizes
  */
-const mapVwSizesToSizesAndSrcSet = (vwSizes) => {
-    // TODO
-    return {
-        sizes: ['100vw', '100vw', '50vw', '350px'],
-        srcSet: [300, 720, 1000, 1500]
-    }
+const mapVwSizesToSizes = (vwSizes) => {
+    return Array.isArray(vwSizes)
+        ? vwSizes.map((size) => `${size}vw`)
+        : responsivePropAsArray(vwSizes)
 }
+
+/**
+ * @param {(number[]|Object)} vwSizes
+ */
+const mapVwSizesToSrcSet = (vwSizes) => {
+    let sizes = Array.isArray(vwSizes) ? vwSizes.slice() : responsivePropAsArray(vwSizes)
+
+    if (sizes.length < breakpointLabels.length) {
+        const lastSize = sizes[sizes.length - 1]
+        const amountToPad = breakpointLabels.length - sizes.length
+
+        sizes = [...sizes, ...Array(amountToPad).fill(lastSize)]
+    }
+
+    const srcSet = []
+    sizes.forEach((size, i) => {
+        if (i === sizes.length - 1) {
+            return
+        }
+
+        const nextBp = breakpointLabels[i + 1]
+        const em = (size / 100) * parseFloat(theme.breakpoints[nextBp])
+        const px = emToPx(em)
+
+        srcSet.push(px)
+    })
+
+    // TODO: consider pixel density of the device
+    return srcSet
+}
+
+const responsivePropAsArray = (prop) => {
+    let mostRecent
+    return breakpointLabels.map((bp) => {
+        if (prop[bp]) {
+            mostRecent = prop[bp]
+            return prop[bp]
+        } else {
+            return mostRecent
+        }
+    })
+}
+
+// const vwToEm = (vw, nextBreakpointInEm) => (vw / 100) * nextBreakpointInEm
+const emToPx = (em, browserDefaultFontSize = 16) => Math.round(em * browserDefaultFontSize)
 
 /**
  * @param {string} srcFormat
