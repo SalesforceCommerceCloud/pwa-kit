@@ -98,7 +98,7 @@ const convertSizesToHTMLAttribute = (sizes) => {
     return s.join(', ')
 }
 
-const breakpointLabels = Object.keys(theme.breakpoints)
+const breakpointLabels = ['base', 'sm', 'md', 'lg', 'xl', '2xl']
 
 /**
  * @param {(number[]|string)} srcSet
