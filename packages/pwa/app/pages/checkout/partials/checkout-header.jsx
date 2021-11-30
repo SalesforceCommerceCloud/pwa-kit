@@ -38,7 +38,10 @@ const CheckoutHeader = () => {
                             </Center>
                         }
                     >
-                        <FormattedMessage defaultMessage="Back to cart" />
+                        <FormattedMessage
+                            defaultMessage="Back to cart"
+                            id="checkout_header.link.cart"
+                        />
                     </Button>
                 </Flex>
             </Box>
