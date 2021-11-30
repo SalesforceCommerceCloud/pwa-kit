@@ -367,7 +367,7 @@
       "value": "You're now signed in"
     }
   ],
-  "auth_modal.error.incorrect_email_password": [
+  "auth_modal.error.incorrect_email_or_password": [
     {
       "type": 0,
       "value": "Something's not right with your email or password. Try again."
@@ -703,7 +703,7 @@
       "value": "Continue Shopping"
     }
   ],
-  "checkout_confirmation.link_login": [
+  "checkout_confirmation.link.login": [
     {
       "type": 0,
       "value": "Log in here"
@@ -877,7 +877,7 @@
       "value": "Log in"
     }
   ],
-  "contact_info.error.incorrect_username_password": [
+  "contact_info.error.incorrect_username_or_password": [
     {
       "type": 0,
       "value": "Incorrect username or password, please try again."
@@ -2159,7 +2159,7 @@
       "value": "1 uppercase letter"
     }
   ],
-  "payment_selection.button.save_continue": [
+  "payment_selection.button.save_and_continue": [
     {
       "type": 0,
       "value": "Save & Continue"
@@ -2681,7 +2681,7 @@
       "value": "Shipping Address"
     }
   ],
-  "shipping_address_edit_form.button.save_continue": [
+  "shipping_address_edit_form.button.save_and_continue": [
     {
       "type": 0,
       "value": "Save & Continue to Shipping Method"

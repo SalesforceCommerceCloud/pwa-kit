@@ -8,6 +8,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import {FormattedMessage} from 'react-intl'
 import {Button, Stack} from '@chakra-ui/react'
+import {MESSAGE_PROPTYPE} from '../../utils/locale.js'
 
 /**
  * Renders a form submit button and a cancel button with configurable labels and callbacks
@@ -46,12 +47,8 @@ const FormActionButtons = ({
 FormActionButtons.propTypes = {
     saveButtonProps: PropTypes.object,
     cancelButtonProps: PropTypes.object,
-    saveButtonLabel: PropTypes.shape({
-        defaultMessage: PropTypes.oneOfType([PropTypes.string, PropTypes.array])
-    }),
-    cancelButtonLabel: PropTypes.shape({
-        defaultMessage: PropTypes.oneOfType([PropTypes.string, PropTypes.array])
-    }),
+    saveButtonLabel: MESSAGE_PROPTYPE,
+    cancelButtonLabel: MESSAGE_PROPTYPE,
     onCancel: PropTypes.func
 }
 

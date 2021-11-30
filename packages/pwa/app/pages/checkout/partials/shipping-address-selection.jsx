@@ -17,6 +17,7 @@ import {PlusIcon} from '../../../components/icons'
 import AddressDisplay from '../../../components/address-display'
 import AddressFields from '../../../components/forms/address-fields'
 import FormActionButtons from '../../../components/forms/form-action-buttons'
+import {MESSAGE_PROPTYPE} from '../../../utils/locale'
 
 const saveButtonMessage = defineMessage({
     defaultMessage: 'Save & Continue to Shipping Method',
@@ -87,9 +88,7 @@ ShippingAddressEditForm.propTypes = {
     toggleAddressEdit: PropTypes.func,
     hideSubmitButton: PropTypes.bool,
     form: PropTypes.object,
-    submitButtonLabel: PropTypes.shape({
-        defaultMessage: PropTypes.oneOfType([PropTypes.string, PropTypes.array])
-    })
+    submitButtonLabel: MESSAGE_PROPTYPE
 }
 
 const submitButtonMessage = defineMessage({
@@ -353,9 +352,7 @@ ShippingAddressSelection.propTypes = {
     selectedAddress: PropTypes.object,
 
     /** Override the submit button label */
-    submitButtonLabel: PropTypes.shape({
-        defaultMessage: PropTypes.oneOfType([PropTypes.string, PropTypes.array])
-    }),
+    submitButtonLabel: MESSAGE_PROPTYPE,
 
     /** Show or hide the submit button (for controlling the form from outside component) */
     hideSubmitButton: PropTypes.bool,

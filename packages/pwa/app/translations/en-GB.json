@@ -150,7 +150,7 @@
   "auth_modal.description.now_signed_in": {
     "defaultMessage": "You're now signed in"
   },
-  "auth_modal.error.incorrect_email_password": {
+  "auth_modal.error.incorrect_email_or_password": {
     "defaultMessage": "Something's not right with your email or password. Try again."
   },
   "auth_modal.info.welcome_user": {
@@ -270,7 +270,7 @@
   "checkout_confirmation.link.continue_shopping": {
     "defaultMessage": "Continue Shopping"
   },
-  "checkout_confirmation.link_login": {
+  "checkout_confirmation.link.login": {
     "defaultMessage": "Log in here"
   },
   "checkout_confirmation.message.already_has_account": {
@@ -334,7 +334,7 @@
   "contact_info.button.login": {
     "defaultMessage": "Log in"
   },
-  "contact_info.error.incorrect_username_password": {
+  "contact_info.error.incorrect_username_or_password": {
     "defaultMessage": "Incorrect username or password, please try again."
   },
   "contact_info.link.forgot_password": {
@@ -930,7 +930,7 @@
     "defaultMessage": "1 uppercase letter",
     "description": "Password requirement"
   },
-  "payment_selection.button.save_continue": {
+  "payment_selection.button.save_and_continue": {
     "defaultMessage": "Save & Continue"
   },
   "payment_selection.heading.add_new_card": {
@@ -1118,7 +1118,7 @@
   "shipping_address.title.shipping_address": {
     "defaultMessage": "Shipping Address"
   },
-  "shipping_address_edit_form.button.save_continue": {
+  "shipping_address_edit_form.button.save_and_continue": {
     "defaultMessage": "Save & Continue to Shipping Method"
   },
   "shipping_address_form.heading.edit_address": {

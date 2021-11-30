@@ -5,6 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
+import PropTypes from 'prop-types'
 import {SUPPORTED_LOCALES, DEFAULT_LOCALE} from '../constants'
 
 const supportedLocales = SUPPORTED_LOCALES.map((locale) => locale.id)
@@ -101,3 +102,9 @@ export const getPreferredCurrency = (locale) => {
     return SUPPORTED_LOCALES.find((supportedLocale) => supportedLocale.id === locale)
         ?.preferredCurrency
 }
+
+export const MESSAGE_PROPTYPE = PropTypes.shape({
+    // NOTE: defaultMessage is typically written as a string
+    // but its value can be an array when it comes from the compiled AST version
+    defaultMessage: PropTypes.oneOfType([PropTypes.string, PropTypes.array])
+})
