@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {defineMessage, defineMessages} from 'react-intl'
+import {defineMessages} from 'react-intl'
 import {
     AccountIcon,
     LocationIcon,
@@ -13,7 +13,6 @@ import {
     ReceiptIcon,
     HeartIcon
 } from '../../components/icons'
-import {noop} from '../../utils/utils'
 
 export const messages = defineMessages({
     profile: {defaultMessage: 'Account Details', id: 'global.account.link.account_details'},
