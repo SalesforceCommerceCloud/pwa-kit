@@ -825,7 +825,7 @@
   "login_form.message.welcome_back": {
     "defaultMessage": "Welcome Back"
   },
-  "login_page.error.incorrect_username_password": {
+  "login_page.error.incorrect_username_or_password": {
     "defaultMessage": "Incorrect username or password, please try again."
   },
   "offline_banner.description.browsing_offline_mode": {
