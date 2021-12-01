@@ -183,7 +183,6 @@ const ProductList = (props) => {
     /**************** Filters ****************/
     const [searchParams, {stringify: stringifySearchParams}] = useSearchParams()
     const [filtersLoading, setFiltersLoading] = useState(false)
-    const filtersContainerWidth = '280px'
 
     // Toggles filter on and off
     const toggleFilter = (value, attributeId, selected, allowMultiple = true) => {
@@ -353,10 +352,7 @@ const ProductList = (props) => {
                     </HideOnDesktop>
 
                     {/* Body  */}
-                    <Grid
-                        templateColumns={{base: '1fr', md: `${filtersContainerWidth} 1fr`}}
-                        columnGap={6}
-                    >
+                    <Grid templateColumns={{base: '1fr', md: '280px 1fr'}} columnGap={6}>
                         <Stack display={{base: 'none', md: 'flex'}}>
                             <Refinements
                                 isLoading={filtersLoading}

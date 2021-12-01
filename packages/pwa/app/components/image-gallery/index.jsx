@@ -117,7 +117,7 @@ const ImageGallery = ({imageGroups = [], selectedVariationAttributes = {}, size}
                                 786,
                                 1179,
                                 parseInt(heroImageMaxWidth),
-                                parseInt(styles.heroImage.maxWidth[3]) * 2
+                                parseInt(heroImageMaxWidth) * 2
                             ]}
                         />
                     </AspectRatio>
