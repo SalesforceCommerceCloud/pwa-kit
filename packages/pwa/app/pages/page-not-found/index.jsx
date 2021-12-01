@@ -26,7 +26,8 @@ const PageNotFound = () => {
             <Helmet>
                 <title>
                     {intl.formatMessage({
-                        defaultMessage: "The page you're looking for can't be found"
+                        defaultMessage: "The page you're looking for can't be found",
+                        id: 'page_not_found.title.page_cant_be_found'
                     })}
                 </title>
             </Helmet>
@@ -42,14 +43,16 @@ const PageNotFound = () => {
                 <SearchIcon boxSize={['30px', '32px']} mb={8} />
                 <Heading as="h2" fontSize={['xl', '2xl', '2xl', '3xl']} mb={2} align="center">
                     {intl.formatMessage({
-                        defaultMessage: "The page you're looking for can't be found"
+                        defaultMessage: "The page you're looking for can't be found",
+                        id: 'page_not_found.title.page_cant_be_found'
                     })}
                 </Heading>
                 <Box mb={12}>
                     <Text textAlign="center">
                         {intl.formatMessage({
                             defaultMessage:
-                                'Please try retyping the address, going back to the previous page, or going to the home page.'
+                                'Please try retyping the address, going back to the previous page, or going to the home page.',
+                            id: 'page_not_found.message.suggestion_to_try'
                         })}
                     </Text>
                 </Box>
@@ -61,12 +64,14 @@ const PageNotFound = () => {
                         borderColor={'gray.200'}
                     >
                         {intl.formatMessage({
-                            defaultMessage: 'Back to previous page'
+                            defaultMessage: 'Back to previous page',
+                            id: 'page_not_found.action.go_back'
                         })}
                     </Button>
                     <Button as={Link} to={'/'}>
                         {intl.formatMessage({
-                            defaultMessage: 'Go to home page'
+                            defaultMessage: 'Go to home page',
+                            id: 'page_not_found.link.homepage'
                         })}
                     </Button>
                 </Stack>
