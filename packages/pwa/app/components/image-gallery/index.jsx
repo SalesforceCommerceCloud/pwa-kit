@@ -23,7 +23,7 @@ import {
     useMultiStyleConfig
 } from '@chakra-ui/react'
 import {findImageGroupBy} from '../../utils/image-groups-utils'
-import {getImageProps} from '../../utils/responsive-image'
+import {Img as MyImg} from '../image'
 
 const EnterKeyNumber = 13
 
@@ -105,22 +105,20 @@ const ImageGallery = ({imageGroups = [], selectedVariationAttributes = {}, size}
             {heroImage && (
                 <Box {...styles.heroImageGroup}>
                     <AspectRatio {...styles.heroImage} ratio={1}>
-                        <Img
-                            {...getImageProps({
-                                alt: heroImage.alt,
-                                src: heroImage.disBaseLink || heroImage.link,
-                                sizes: {
-                                    base: '100vw',
-                                    lg: heroImageMaxWidth
-                                },
-                                widths: [
-                                    393,
-                                    786,
-                                    1179,
-                                    parseInt(heroImageMaxWidth),
-                                    parseInt(styles.heroImage.maxWidth[3]) * 2
-                                ]
-                            })}
+                        <MyImg
+                            alt={heroImage.alt}
+                            src={`${heroImage.disBaseLink || heroImage.link}[?sw={width}&q=60]`}
+                            sizes={{
+                                base: '100vw',
+                                lg: heroImageMaxWidth
+                            }}
+                            srcSet={[
+                                393,
+                                786,
+                                1179,
+                                parseInt(heroImageMaxWidth),
+                                parseInt(styles.heroImage.maxWidth[3]) * 2
+                            ]}
                         />
                     </AspectRatio>
                 </Box>

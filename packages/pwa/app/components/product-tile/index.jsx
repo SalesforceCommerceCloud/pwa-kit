@@ -13,7 +13,6 @@ import {HeartIcon, HeartSolidIcon} from '../icons'
 import {
     AspectRatio,
     Box,
-    Img,
     Skeleton as ChakraSkeleton,
     Text,
     Stack,
@@ -21,6 +20,7 @@ import {
     IconButton,
     useBreakpoint
 } from '@chakra-ui/react'
+import {Img as MyImg} from '../image'
 
 // Hooks
 import {useIntl} from 'react-intl'
@@ -29,7 +29,6 @@ import {useIntl} from 'react-intl'
 import {productUrlBuilder} from '../../utils/url'
 import Link from '../link'
 import withRegistration from '../../hoc/with-registration'
-import {getImageProps} from '../../utils/responsive-image'
 
 const IconButtonWithRegistration = withRegistration(IconButton)
 
@@ -82,12 +81,10 @@ const ProductTile = (props) => {
         >
             <Box {...styles.imageWrapper}>
                 <AspectRatio {...styles.image}>
-                    <Img
-                        {...getImageProps({
-                            alt: image.alt,
-                            src: image.disBaseLink || image.link,
-                            ...imageProps
-                        })}
+                    <MyImg
+                        alt={image.alt}
+                        src={`${image.disBaseLink || image.link}[?sw={width}&q=60]`}
+                        {...imageProps}
                     />
                 </AspectRatio>
 

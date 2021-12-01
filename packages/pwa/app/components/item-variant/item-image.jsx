@@ -6,10 +6,11 @@
  */
 import React from 'react'
 import PropTypes from 'prop-types'
-import {AspectRatio, Box, Badge, Image} from '@chakra-ui/react'
+import {AspectRatio, Box, Badge} from '@chakra-ui/react'
 import {useItemVariant} from '.'
 import {FormattedMessage} from 'react-intl'
 import {findImageGroupBy} from '../../utils/image-groups-utils'
+import {Image as MyImage} from '../image'
 
 /**
  * In the context of a cart product item variant, this component renders the item's
@@ -48,9 +49,9 @@ const ItemImage = ({imageProps, ratio = 1, ...props}) => {
                     )}
 
                     {image && (
-                        <Image
+                        <MyImage
                             alt={image.alt}
-                            src={image.disBaseLink || image.link}
+                            src={`${image.disBaseLink || image.link}[?sw={width}&q=60]`}
                             ignoreFallback={true}
                             {...imageProps}
                         />

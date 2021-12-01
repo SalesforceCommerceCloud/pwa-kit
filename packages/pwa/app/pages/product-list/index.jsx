@@ -397,12 +397,7 @@ const ProductList = (props) => {
                                                       return action(productSearchItem)
                                                   }}
                                                   imageProps={{
-                                                      sizes: {
-                                                          base: 'calc(100vw / 2)',
-                                                          md: `calc((100vw - ${filtersContainerWidth}) / 3)`,
-                                                          '2xl': '387px'
-                                                      },
-                                                      widths: [189, 567, 387, 774]
+                                                      vwSizes: [50, 50, 20, 20, 25]
                                                   }}
                                               />
                                           )
