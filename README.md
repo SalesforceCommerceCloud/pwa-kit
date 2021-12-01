@@ -1,77 +1,74 @@
-# The Progressive Web App (PWA) Kit
+<div align="center">
 
+  <h1>The Progressive Web App (PWA) Kit</h1>
+
+[![npm](https://img.shields.io/npm/v/pwa-kit-react-sdk.svg)](https://www.npmjs.com/package/pwa-kit-react-sdk)
+[![License](https://img.shields.io/github/license/SalesforceCommerceCloud/pwa-kit.svg)](https://github.com/SalesforceCommerceCloud/pwa-kit/blob/master/LICENSE)
+[![Checks](https://img.shields.io/github/checks-status/SalesforceCommerceCloud/pwa-kit/develop.svg)](https://github.com/SalesforceCommerceCloud/pwa-kit)
+[![npm](https://img.shields.io/npm/dm/pwa-kit-react-sdk.svg)](https://www.npmjs.com/package/pwa-kit-react-sdk)
+
+</div>
+
+<div align="center">
+
+📖 [Read Docs](https://sfdc.co/pwa-kit) |
+🏖️ [View Demo](https://pwa-kit.mobify-storefront.com/) |
+🚀 [Deploy in Seconds](https://runtime.commercecloud.com/) |
+➕ [Contribute](https://github.com/SalesforceCommerceCloud/pwa-kit/blob/develop/CONTRIBUTING.md)
+<br/><br/>
 The PWA Kit is a storefront technology for headless commerce using Salesforce Commerce APIs and React. It provides front-end developers with a more flexible and agile approach to build and maintain modern shopping experiences.
+<br/><br/>
+<img alt="pwa-kit banner" src="https://pwa-kit.mobify-storefront.com/mobify/bundle/62/static/img/hero.png" style="width: 700px; height:auto;">
 
-This repository is a [monorepo](https://en.wikipedia.org/wiki/Monorepo) that includes the code that powers the PWA Kit. The code is divided into the following packages:
+</div>
 
--   `pwa`: A set of sample code and tooling for PWA Kit projects called the Retail React App
--   `pwa-kit-create-app`: A tool that generates PWA Kit projects based on the Retail React App
--   `pwa-kit-react-sdk`: A set of components and utilities for PWA Kit projects
+---
 
-## Requirements
+## 🏄 Getting Started
 
-```
-  Node ^12.x or ^14.x
-  npm ^6.14.4
-```
+### ℹ️ Requirements
 
-## Installing Dependencies
+- Node `^12.x` or `^14.x`
+- npm `^6.14.4`
 
-Behind the scenes, we're using [Lerna](https://lerna.js.org/) to manage the monorepo. Lerna lets
-us install all dependencies and link all packages together with one command:
+### Create Your First Project
 
 ```bash
-npm ci
+npx pwa-kit-create-app
 ```
 
-Dependencies that are added to the `package.json` at the root of the
-repo are shared between packages. Dependencies listed in the
-`package.json` files within each individual package directory work as normal.
+Enter your [sandbox configuration](https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/getting-started.html#new-project).
 
-## Cleaning and Rebuilding
-
-When you pull changes that include modifications to any package's dependencies, run `npm ci` from the top-level directory (`pwa-kit`). This command cleans and reinstalls all packages. Run this command frequently during development to ensure that you're using the same package versions as everyone else.
-
-For more information, see the [Lerna docs](https://lerna.js.org/).
-
-## Linting
+### Run The Project Locally
 
 ```bash
-  npm run lint
+npm start
 ```
 
-## Localization
+### Deploy to Managed Runtime
+
+Once your Runtime Admin is setup, run `npm run push -- -m "Message to help you recognize this bundle"` to deploy your project in as low as 60 seconds! Read the [docs](https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/pushing-and-deploying-bundles.html) to learn more.
+
+## 🌍 Localization
 
 See the [Localization README.md](./packages/pwa/app/translations/README.md) for important setup instructions for localization.
 
-## Testing
-
-Run tests for all packages with:
-
-```bash
-  cd [repo root]
-  npm test
-```
-
-Run integration tests against live APIs for all packages with:
-
-```bash
-  cd [repo root]
-  npm run test:integration
-```
-
-## License Information
+## ⚠️ License Information
 
 The PWA Kit is licensed under a BSD 3-Clause license. See the [license](./LICENSE) for details.
 
-## Documentation
+## ➕ Contribute
+
+Contributors are welcome! Refer to the [CONTRIBUTING](./CONTRIBUTING.md) guide to get started. If you liked pwa-kit, add a ⭐ on [GitHub Repo](https://github.com/SalesforceCommerceCloud/pwa-kit/)!
+
+## 📖 Documentation
 
 The full documentation for PWA Kit is hosted on the [Commerce Cloud Developer Center](https://developer.commercecloud.com/s/article/PWA-Kit).
 
-### Useful Links:
+### 🔖 Useful Links:
 
--   [Getting Started](https://developer.commercecloud.com/s/article/Getting-Started-with-PWA-Kit)
--   [Pushing and Deploying Bundles](https://developer.commercecloud.com/s/article/Pushing-and-Deploying-Bundles)
--   [The Retail React App](https://developer.commercecloud.com/s/article/The-Retail-React-App)
--   [Rendering and Routing](https://developer.commercecloud.com/s/article/Rendering-and-Routing)
--   [Managed Runtime Infrastructure](https://developer.commercecloud.com/s/article/Managed-Runtime-Infrastructure)
+- [Getting Started](https://developer.commercecloud.com/s/article/Getting-Started-with-PWA-Kit)
+- [Pushing and Deploying Bundles](https://developer.commercecloud.com/s/article/Pushing-and-Deploying-Bundles)
+- [The Retail React App](https://developer.commercecloud.com/s/article/The-Retail-React-App)
+- [Rendering and Routing](https://developer.commercecloud.com/s/article/Rendering-and-Routing)
+- [Managed Runtime Infrastructure](https://developer.commercecloud.com/s/article/Managed-Runtime-Infrastructure)

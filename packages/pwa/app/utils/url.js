@@ -6,6 +6,8 @@
  */
 
 import {DEFAULT_LOCALE} from '../constants'
+import {getUrlConfig} from './utils'
+import {urlPartPositions} from '../constants'
 
 /**
  * Modifies a given url by adding/updating query parameters.
@@ -32,10 +34,11 @@ export const rebuildPathWithParams = (url, extraParams) => {
     Object.keys(extraParams).forEach((key) => {
         const value = extraParams[key]
 
-        if (value !== undefined) {
-            params.set(key, value)
-        } else {
+        // 0 is a valid value as for a param
+        if (!value && value !== 0) {
             params.delete(key)
+        } else {
+            params.set(key, value)
         }
     })
 
@@ -46,7 +49,7 @@ export const rebuildPathWithParams = (url, extraParams) => {
         .replace(/=$/, '')
 
     // Generate the newly updated url.
-    return `${pathname}?${paramStr}`
+    return `${pathname}${Array.from(paramStr).length > 0 ? `?${paramStr}` : ''}`
 }
 
 /**
@@ -78,17 +81,14 @@ export const buildUrlSet = (url = '', key = '', values = [], extraParams = {}) =
  * Given a category and the current locale returns an href to the product list page.
  *
  * @param {Object} category
- * @param {string} locale
  * @returns {string}
  */
-export const categoryUrlBuilder = (category, locale = DEFAULT_LOCALE) =>
-    encodeURI(`/${locale}/category/${category.id}`)
+export const categoryUrlBuilder = (category) => encodeURI(`/category/${category.id}`)
 
 /**
  * Given a product and the current locale returns an href to the product detail page.
  *
  * @param {Object} product
- * @param {string} locale
  * @returns {string}
  */
 export const productUrlBuilder = (product) => encodeURI(`/product/${product.id}`)
@@ -111,6 +111,7 @@ export const searchUrlBuilder = (searchTerm) => `/search?q=${searchTerm}`
  * @returns {string} - The relative URL for the specific locale.
  */
 export const getUrlWithLocale = (shortCode, opts = {}) => {
+    const {locale: localeParamType} = getUrlConfig()
     const location = opts.location ? opts.location : window.location
 
     const {disallowParams = []} = opts
@@ -125,15 +126,20 @@ export const getUrlWithLocale = (shortCode, opts = {}) => {
         })
     }
 
-    // Array of the paths without empty items
-    const paths = relativeUrl.split('/').filter((path) => path !== '')
+    let paths = relativeUrl.split('/').filter((path) => path !== '')
 
-    // Remove the previous locale
-    paths.shift()
+    if (localeParamType === urlPartPositions.PATH) {
+        // Array of the paths without empty items
 
-    // Add the new locale
-    if (shortCode !== DEFAULT_LOCALE || paths?.length > 0) {
-        paths.unshift(shortCode)
+        // Remove the previous locale
+        paths.shift()
+
+        // Add the new locale
+        if (shortCode !== DEFAULT_LOCALE || paths?.length > 0) {
+            paths.unshift(shortCode)
+        }
+    } else if (localeParamType === urlPartPositions.QUERY_PARAM) {
+        params.set('locale', shortCode)
     }
 
     relativeUrl = `/${paths.join('/')}${Array.from(params).length > 0 ? `?${params}` : ''}`
@@ -149,8 +155,12 @@ export const getUrlWithLocale = (shortCode, opts = {}) => {
  * @param locale
  * @returns {string}
  */
-export const homeUrlBuilder = (homeHref, locale) =>
-    encodeURI(`${homeHref}${locale !== DEFAULT_LOCALE ? locale + '/' : ''}`)
+export const homeUrlBuilder = (homeHref, locale) => {
+    const updatedUrl = buildPathWithUrlConfig(homeHref, {
+        locale: locale !== DEFAULT_LOCALE ? locale : ''
+    })
+    return encodeURI(updatedUrl)
+}
 
 /*
  * Remove query params from a give url path based on a given list of keys
@@ -184,4 +194,67 @@ export const removeQueryParamsFromPath = (path, keys) => {
         .replace(/=$/, '')
 
     return `${pathname}${paramStr && '?'}${paramStr}`
+}
+
+/**
+ * Rebuild the path with locale/site value to the path as url path or url query param
+ * based on url config
+ * @param {string} url - based url of the output url
+ * @param {object} configValues - object that contains values of url param config
+ * @return {string} - an output url
+ *
+ * @example
+ * //pwa-kit-config.json
+ * url {
+ *    locale: "query_param"
+ * }
+ * buildPathWithUrlConfig('/women/dresses', {locale: 'en-GB'})
+ *
+ * Returns
+ *  /women/dresses?locale=en-GB
+ *
+ *  @example
+ * //pwa-kit-config.json
+ * url {
+ *    locale: "path"
+ * }
+ * buildPathWithUrlConfig('/women/dresses', {locale: 'en-GB'})
+ *
+ * Returns
+ *  /en-GB/women/dresses
+ *
+ */
+export const buildPathWithUrlConfig = (url, configValues = {}) => {
+    const urlConfig = getUrlConfig()
+    if (!urlConfig || !Object.values(urlConfig).length) return url
+    if (!Object.values(configValues).length) return url
+    const queryParams = {}
+    const basePathSegments = []
+
+    const options = ['locale']
+
+    options.forEach((option) => {
+        const position = urlConfig[option]
+        switch (position) {
+            case urlPartPositions.NONE:
+                break
+            case urlPartPositions.QUERY_PARAM:
+                queryParams[option] = configValues[option]
+                break
+            case urlPartPositions.PATH:
+                basePathSegments.push(configValues[option])
+                break
+        }
+    })
+
+    // filter the array and build the pathname
+    let updatedPath = `${
+        basePathSegments.filter(Boolean).length ? `/${basePathSegments.join('/')}` : ''
+    }${url}`
+    // append the query param to pathname
+    if (Object.keys(queryParams).length) {
+        updatedPath = rebuildPathWithParams(updatedPath, queryParams)
+    }
+
+    return updatedPath
 }

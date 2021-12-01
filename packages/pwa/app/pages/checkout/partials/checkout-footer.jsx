@@ -35,14 +35,14 @@ const CheckoutFooter = ({...otherProps}) => {
                             {
                                 href: '/',
                                 text: intl.formatMessage({
-                                    id: 'footer.link.shipping',
+                                    id: 'checkout_footer.link.shipping',
                                     defaultMessage: 'Shipping'
                                 })
                             },
                             {
                                 href: '/',
                                 text: intl.formatMessage({
-                                    id: 'footer.link.returns_exchanges',
+                                    id: 'checkout_footer.link.returns_exchanges',
                                     defaultMessage: 'Returns & Exchanges'
                                 })
                             }
@@ -60,7 +60,7 @@ const CheckoutFooter = ({...otherProps}) => {
                         <Text {...styles.copyright}>
                             &copy;{' '}
                             {intl.formatMessage({
-                                id: 'footer.message.copyright',
+                                id: 'checkout_footer.message.copyright',
                                 defaultMessage:
                                     '2021 Salesforce or its affiliates. All rights reserved. This is a demo store only. Orders made WILL NOT be processed.'
                             })}
@@ -94,21 +94,21 @@ const LegalLinks = ({variant}) => {
                 {
                     href: '/',
                     text: intl.formatMessage({
-                        id: 'footer.link.terms_conditions',
+                        id: 'checkout_footer.link.terms_conditions',
                         defaultMessage: 'Terms & Conditions'
                     })
                 },
                 {
                     href: '/',
                     text: intl.formatMessage({
-                        id: 'footer.link.privacy_policy',
+                        id: 'checkout_footer.link.privacy_policy',
                         defaultMessage: 'Privacy Policy'
                     })
                 },
                 {
                     href: '/',
                     text: intl.formatMessage({
-                        id: 'footer.link.site_map',
+                        id: 'checkout_footer.link.site_map',
                         defaultMessage: 'Site Map'
                     })
                 }

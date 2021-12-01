@@ -41,7 +41,8 @@ const WishlistPrimaryAction = () => {
                 title: formatMessage(
                     {
                         defaultMessage:
-                            '{quantity} {quantity, plural, one {item} other {items}} added to cart'
+                            '{quantity} {quantity, plural, one {item} other {items}} added to cart',
+                        id: 'wishlist_primary_action.info.added_to_cart'
                     },
                     {quantity: quantity}
                 ),

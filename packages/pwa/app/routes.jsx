@@ -17,6 +17,8 @@ import loadable from '@loadable/component'
 
 // Components
 import {Skeleton} from '@chakra-ui/react'
+import {HOME_HREF} from './constants'
+import {configureRoutes} from './utils/routes-utils'
 
 const fallback = <Skeleton height="75vh" width="100%" />
 
@@ -42,36 +44,31 @@ const routes = [
         exact: true
     },
     {
-        path: '/:locale',
-        component: Home,
-        exact: true
-    },
-    {
-        path: '/:locale/login',
+        path: '/login',
         component: Login,
         exact: true
     },
     {
-        path: '/:locale/registration',
+        path: '/registration',
         component: Registration,
         exact: true
     },
     {
-        path: '/:locale/reset-password',
+        path: '/reset-password',
         component: ResetPassword,
         exact: true
     },
     {
-        path: '/:locale/account',
+        path: '/account',
         component: Account
     },
     {
-        path: '/:locale/checkout',
+        path: '/checkout',
         component: Checkout,
         exact: true
     },
     {
-        path: '/:locale/checkout/confirmation',
+        path: '/checkout/confirmation',
         component: CheckoutConfirmation,
         exact: true
     },
@@ -81,25 +78,30 @@ const routes = [
         exact: true
     },
     {
-        path: '/:locale/cart',
+        path: '/cart',
         component: Cart,
         exact: true
     },
     {
-        path: '/:locale/product/:productId',
+        path: '/product/:productId',
         component: ProductDetail
     },
     {
-        path: '/:locale/search',
+        path: '/search',
         component: ProductList
     },
     {
-        path: '/:locale/category/:categoryId',
+        path: '/category/:categoryId',
         component: ProductList
     },
     {
-        path: '/:locale/account/wishlist',
+        path: '/account/wishlist',
         component: Wishlist
+    },
+    {
+        path: '/:locale',
+        component: Home,
+        exact: true
     },
     {
         path: '*',
@@ -107,4 +109,8 @@ const routes = [
     }
 ]
 
-export default routes
+const configuredRoutes = configureRoutes(routes, {
+    ignoredRoutes: [HOME_HREF, '/callback', '/:locale', '*']
+})
+
+export default configuredRoutes

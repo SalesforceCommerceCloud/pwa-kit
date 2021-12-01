@@ -75,9 +75,15 @@ const ShippingAddressForm = ({form, hasAddresses, selectedAddressId, toggleEdit,
             <Stack spacing={6} padding={6}>
                 <Heading as="h3" size="sm">
                     {selectedAddressId ? (
-                        <FormattedMessage defaultMessage="Edit Address" />
+                        <FormattedMessage
+                            defaultMessage="Edit Address"
+                            id="shipping_address_form.heading.edit_address"
+                        />
                     ) : (
-                        <FormattedMessage defaultMessage="Add New Address" />
+                        <FormattedMessage
+                            defaultMessage="Add New Address"
+                            id="shipping_address_form.heading.new_address"
+                        />
                     )}
                 </Heading>
                 <Box>
@@ -138,8 +144,14 @@ const AccountAddresses = () => {
             toggleEdit()
             toast({
                 title: selectedAddressId
-                    ? formatMessage({defaultMessage: 'Address Updated'})
-                    : formatMessage({defaultMessage: 'New Address Saved'}),
+                    ? formatMessage({
+                          defaultMessage: 'Address Updated',
+                          id: 'account_addresses.info.address_updated'
+                      })
+                    : formatMessage({
+                          defaultMessage: 'New Address Saved',
+                          id: 'account_addresses.info.new_address_saved'
+                      }),
                 status: 'success',
                 isClosable: true
             })
@@ -176,7 +188,10 @@ const AccountAddresses = () => {
     return (
         <Stack spacing={4} data-testid="account-addresses-page">
             <Heading as="h1" fontSize="2xl">
-                <FormattedMessage defaultMessage="Addresses" />
+                <FormattedMessage
+                    defaultMessage="Addresses"
+                    id="account_addresses.title.addresses"
+                />
             </Heading>
 
             {!isRegistered && (
@@ -212,7 +227,10 @@ const AccountAddresses = () => {
                             leftIcon={<PlusIcon display="block" boxSize={'15px'} />}
                             onClick={toggleEdit}
                         >
-                            <FormattedMessage defaultMessage="Add Address" />
+                            <FormattedMessage
+                                defaultMessage="Add Address"
+                                id="account_addresses.button.add_address"
+                            />
                             {isEditing && !selectedAddressId && <BoxArrow />}
                         </Button>
                     }
@@ -244,7 +262,10 @@ const AccountAddresses = () => {
                                         bg="gray.100"
                                         color="gray.900"
                                     >
-                                        <FormattedMessage defaultMessage="Default" />
+                                        <FormattedMessage
+                                            defaultMessage="Default"
+                                            id="account_addresses.badge.default"
+                                        />
                                     </Badge>
                                 )}
                                 <AddressDisplay address={address} />
@@ -272,12 +293,19 @@ const AccountAddresses = () => {
                     {!isEditing && isRegistered && (
                         <PageActionPlaceHolder
                             icon={<LocationIcon boxSize={8} />}
-                            heading={formatMessage({defaultMessage: 'No Saved Addresses'})}
+                            heading={formatMessage({
+                                defaultMessage: 'No Saved Addresses',
+                                id:
+                                    'account_addresses.page_action_placeholder.heading.no_saved_addresses'
+                            })}
                             text={formatMessage({
-                                defaultMessage: 'Add a new address method for faster checkout'
+                                defaultMessage: 'Add a new address method for faster checkout',
+                                id:
+                                    'account_addresses.page_action_placeholder.message.add_new_address'
                             })}
                             buttonText={formatMessage({
-                                defaultMessage: 'Add Address'
+                                defaultMessage: 'Add Address',
+                                id: 'account_addresses.page_action_placeholder.button.add_address'
                             })}
                             onButtonClick={toggleEdit}
                         />
