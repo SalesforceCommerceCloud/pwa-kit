@@ -98,10 +98,7 @@ const ProductDetail = ({category, product, isLoading}) => {
             })
         } catch {
             toast({
-                title: formatMessage(
-                    {defaultMessage: '{errorMessage}'},
-                    {errorMessage: API_ERROR_MESSAGE}
-                ),
+                title: formatMessage(API_ERROR_MESSAGE),
                 status: 'error'
             })
         }
@@ -111,10 +108,7 @@ const ProductDetail = ({category, product, isLoading}) => {
     const showToast = useToast()
     const showError = () => {
         showToast({
-            title: formatMessage(
-                {defaultMessage: '{errorMessage}'},
-                {errorMessage: API_ERROR_MESSAGE}
-            ),
+            title: formatMessage(API_ERROR_MESSAGE),
             status: 'error'
         })
     }

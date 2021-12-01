@@ -84,7 +84,10 @@ const SelectedRefinements = ({toggleFilter, selectedFilterValues, filters}) => {
                             size="sm"
                             onClick={resetFilters}
                         >
-                            <FormattedMessage defaultMessage="Clear All" />
+                            <FormattedMessage
+                                defaultMessage="Clear All"
+                                id="selected_refinements.action.clear_all"
+                            />
                         </Button>
                     </Box>
                 </WrapItem>
