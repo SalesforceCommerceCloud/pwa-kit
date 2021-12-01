@@ -99,13 +99,7 @@ const ProductScroller = forwardRef(
                                                 ? {...productTileProps(product)}
                                                 : {...productTileProps})}
                                             imageProps={{
-                                                sizes: {
-                                                    base: '70vw',
-                                                    md: '40vw',
-                                                    lg: '30vw',
-                                                    '2xl': '489px'
-                                                },
-                                                srcSet: [275, 550, 825, 489, 978]
+                                                vwSizes: [70, 70, 40, 30]
                                             }}
                                         />
                                     )}
