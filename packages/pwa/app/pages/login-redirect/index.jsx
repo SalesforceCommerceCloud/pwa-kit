@@ -9,18 +9,11 @@
 // after a user logs in using the SLAS Implementation
 
 import React, {Fragment} from 'react'
-import {useIntl} from 'react-intl'
 
 const LoginRedirect = () => {
-    const intl = useIntl()
     return (
         <Fragment>
-            <h1 data-testid="login-redirect-page-heading">
-                {intl.formatMessage({
-                    id: 'login-redirect.message.welcome',
-                    defaultMessage: 'Login Redirect'
-                })}
-            </h1>
+            <h1 data-testid="login-redirect-page-heading">Login Redirect</h1>
         </Fragment>
     )
 }

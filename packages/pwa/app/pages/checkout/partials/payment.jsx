@@ -47,7 +47,7 @@ const Payment = () => {
     return (
         <ToggleCard
             id="step-3"
-            title={formatMessage({defaultMessage: 'Payment'})}
+            title={formatMessage({defaultMessage: 'Payment', id: 'checkout_payment.title.payment'})}
             editing={step === 3}
             isLoading={
                 paymentMethodForm.formState.isSubmitting ||
@@ -67,7 +67,10 @@ const Payment = () => {
                     ) : (
                         <Stack spacing={3}>
                             <Heading as="h3" fontSize="md">
-                                <FormattedMessage defaultMessage="Credit Card" />
+                                <FormattedMessage
+                                    defaultMessage="Credit Card"
+                                    id="checkout_payment.heading.credit_card"
+                                />
                             </Heading>
                             <Stack direction="row" spacing={4}>
                                 <PaymentCardSummary payment={selectedPayment} />
@@ -77,7 +80,10 @@ const Payment = () => {
                                     colorScheme="red"
                                     onClick={removePayment}
                                 >
-                                    <FormattedMessage defaultMessage="Remove" />
+                                    <FormattedMessage
+                                        defaultMessage="Remove"
+                                        id="checkout_payment.action.remove"
+                                    />
                                 </Button>
                             </Stack>
                         </Stack>
@@ -87,7 +93,10 @@ const Payment = () => {
 
                     <Stack spacing={2}>
                         <Heading as="h3" fontSize="md">
-                            <FormattedMessage defaultMessage="Billing Address" />
+                            <FormattedMessage
+                                defaultMessage="Billing Address"
+                                id="checkout_payment.heading.billing_address"
+                            />
                         </Heading>
 
                         <Checkbox
@@ -96,7 +105,10 @@ const Payment = () => {
                             onChange={(e) => setBillingSameAsShipping(e.target.checked)}
                         >
                             <Text fontSize="sm" color="gray.700">
-                                <FormattedMessage defaultMessage="Same as shipping address" />
+                                <FormattedMessage
+                                    defaultMessage="Same as shipping address"
+                                    id="checkout_payment.label.same_as_shipping"
+                                />
                             </Text>
                         </Checkbox>
 
@@ -118,7 +130,10 @@ const Payment = () => {
                     <Box pt={3}>
                         <Container variant="form">
                             <Button w="full" onClick={reviewOrder}>
-                                <FormattedMessage defaultMessage="Review Order" />
+                                <FormattedMessage
+                                    defaultMessage="Review Order"
+                                    id="checkout_payment.button.review_order"
+                                />
                             </Button>
                         </Container>
                     </Box>
@@ -130,7 +145,10 @@ const Payment = () => {
                     {selectedPayment && (
                         <Stack spacing={3}>
                             <Heading as="h3" fontSize="md">
-                                <FormattedMessage defaultMessage="Credit Card" />
+                                <FormattedMessage
+                                    defaultMessage="Credit Card"
+                                    id="checkout_payment.heading.credit_card"
+                                />
                             </Heading>
                             <PaymentCardSummary payment={selectedPayment} />
                         </Stack>
@@ -141,7 +159,10 @@ const Payment = () => {
                     {selectedBillingAddress && (
                         <Stack spacing={2}>
                             <Heading as="h3" fontSize="md">
-                                <FormattedMessage defaultMessage="Billing Address" />
+                                <FormattedMessage
+                                    defaultMessage="Billing Address"
+                                    id="checkout_payment.heading.billing_address"
+                                />
                             </Heading>
                             <AddressDisplay address={selectedBillingAddress} />
                         </Stack>
