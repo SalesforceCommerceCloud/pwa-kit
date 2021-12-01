@@ -74,10 +74,16 @@ const CheckoutConfirmation = () => {
         } catch (error) {
             const existingAccountMessage = (
                 <Fragment>
-                    <FormattedMessage defaultMessage="This email already has an account." />
+                    <FormattedMessage
+                        defaultMessage="This email already has an account."
+                        id="checkout_confirmation.message.already_has_account"
+                    />
                     &nbsp;
                     <Link to="/login" color="blue.600">
-                        <FormattedMessage defaultMessage="Log in here" />
+                        <FormattedMessage
+                            defaultMessage="Log in here"
+                            id="checkout_confirmation.link.login"
+                        />
                     </Link>
                 </Fragment>
             )
@@ -108,14 +114,21 @@ const CheckoutConfirmation = () => {
                     <Box layerStyle="card" rounded={[0, 0, 'base']} px={[4, 4, 6]} py={[6, 6, 8]}>
                         <Stack spacing={6}>
                             <Heading align="center" fontSize={['2xl']}>
-                                <FormattedMessage defaultMessage="Thank you for your order!" />
+                                <FormattedMessage
+                                    defaultMessage="Thank you for your order!"
+                                    id="checkout_confirmation.heading.thank_you_for_order"
+                                />
                             </Heading>
 
                             <Box>
                                 <Container variant="form">
                                     <Stack spacing={3}>
                                         <Text align="center">
-                                            <FormattedMessage defaultMessage="Order Number" />:{' '}
+                                            <FormattedMessage
+                                                defaultMessage="Order Number"
+                                                id="checkout_confirmation.label.order_number"
+                                            />
+                                            :{' '}
                                             <Text as="span" fontWeight="bold">
                                                 {order.orderNo}
                                             </Text>
@@ -123,6 +136,7 @@ const CheckoutConfirmation = () => {
                                         <Text align="center">
                                             <FormattedMessage
                                                 defaultMessage="We will send an email to <b>{email}</b> with your confirmation number and receipt shortly."
+                                                id="checkout_confirmation.message.will_email_shortly"
                                                 values={{
                                                     // eslint-disable-next-line react/display-name
                                                     b: (chunks) => <b>{chunks}</b>,
@@ -134,7 +148,10 @@ const CheckoutConfirmation = () => {
                                         <Spacer />
 
                                         <Button as={Link} href="/" variant="outline">
-                                            <FormattedMessage defaultMessage="Continue Shopping" />
+                                            <FormattedMessage
+                                                defaultMessage="Continue Shopping"
+                                                id="checkout_confirmation.link.continue_shopping"
+                                            />
                                         </Button>
                                     </Stack>
                                 </Container>
@@ -151,7 +168,10 @@ const CheckoutConfirmation = () => {
                         >
                             <Container variant="form">
                                 <Heading fontSize="lg" marginBottom={6}>
-                                    <FormattedMessage defaultMessage="Create an account for faster checkout" />
+                                    <FormattedMessage
+                                        defaultMessage="Create an account for faster checkout"
+                                        id="checkout_confirmation.heading.create_account"
+                                    />
                                 </Heading>
 
                                 <form onSubmit={form.handleSubmit(submitForm)}>
@@ -171,7 +191,10 @@ const CheckoutConfirmation = () => {
                                             onClick={() => form.clearErrors('global')}
                                             isLoading={form.formState.isSubmitting}
                                         >
-                                            <FormattedMessage defaultMessage="Create Account" />
+                                            <FormattedMessage
+                                                defaultMessage="Create Account"
+                                                id="checkout_confirmation.button.create_account"
+                                            />
                                         </Button>
                                     </Stack>
                                 </form>
@@ -183,13 +206,19 @@ const CheckoutConfirmation = () => {
                         <Container variant="form">
                             <Stack spacing={6}>
                                 <Heading fontSize="lg">
-                                    <FormattedMessage defaultMessage="Delivery Details" />
+                                    <FormattedMessage
+                                        defaultMessage="Delivery Details"
+                                        id="checkout_confirmation.heading.delivery_details"
+                                    />
                                 </Heading>
 
                                 <SimpleGrid columns={[1, 1, 2]} spacing={6}>
                                     <Stack spacing={1}>
                                         <Heading as="h3" fontSize="sm">
-                                            <FormattedMessage defaultMessage="Shipping Address" />
+                                            <FormattedMessage
+                                                defaultMessage="Shipping Address"
+                                                id="checkout_confirmation.heading.shipping_address"
+                                            />
                                         </Heading>
                                         <AddressDisplay
                                             address={order.shipments[0].shippingAddress}
@@ -198,7 +227,10 @@ const CheckoutConfirmation = () => {
 
                                     <Stack spacing={1}>
                                         <Heading as="h3" fontSize="sm">
-                                            <FormattedMessage defaultMessage="Shipping Method" />
+                                            <FormattedMessage
+                                                defaultMessage="Shipping Method"
+                                                id="checkout_confirmation.heading.shipping_method"
+                                            />
                                         </Heading>
                                         <Box>
                                             <Text>{order.shipments[0].shippingMethod.name}</Text>
@@ -216,7 +248,10 @@ const CheckoutConfirmation = () => {
                         <Container variant="form">
                             <Stack spacing={6}>
                                 <Heading fontSize="lg">
-                                    <FormattedMessage defaultMessage="Order Summary" />
+                                    <FormattedMessage
+                                        defaultMessage="Order Summary"
+                                        id="checkout_confirmation.heading.order_summary"
+                                    />
                                 </Heading>
 
                                 <Stack spacing={4}>
@@ -230,6 +265,7 @@ const CheckoutConfirmation = () => {
                                                     0
                                                 )
                                             }}
+                                            id="checkout_confirmation.message.num_of_items_in_order"
                                         />
                                     </Text>
 
@@ -286,7 +322,10 @@ const CheckoutConfirmation = () => {
                                         <Stack w="full" py={4} borderY="1px" borderColor="gray.200">
                                             <Flex justify="space-between">
                                                 <Text fontWeight="bold">
-                                                    <FormattedMessage defaultMessage="Subtotal" />
+                                                    <FormattedMessage
+                                                        defaultMessage="Subtotal"
+                                                        id="checkout_confirmation.label.subtotal"
+                                                    />
                                                 </Text>
                                                 <Text fontWeight="bold">
                                                     <FormattedNumber
@@ -314,12 +353,18 @@ const CheckoutConfirmation = () => {
                                             <Flex justify="space-between">
                                                 <Flex alignItems="center">
                                                     <Text lineHeight={1}>
-                                                        <FormattedMessage defaultMessage="Shipping" />
+                                                        <FormattedMessage
+                                                            defaultMessage="Shipping"
+                                                            id="checkout_confirmation.label.shipping"
+                                                        />
                                                         {order.shippingItems[0].priceAdjustments
                                                             ?.length > 0 && (
                                                             <Text as="span" ml={1}>
                                                                 (
-                                                                <FormattedMessage defaultMessage="promo applied" />
+                                                                <FormattedMessage
+                                                                    defaultMessage="promo applied"
+                                                                    id="checkout_confirmation.label.promo_applied"
+                                                                />
                                                                 )
                                                             </Text>
                                                         )}
@@ -354,7 +399,10 @@ const CheckoutConfirmation = () => {
                                                         color="green.500"
                                                         textTransform="uppercase"
                                                     >
-                                                        <FormattedMessage defaultMessage="Free" />
+                                                        <FormattedMessage
+                                                            defaultMessage="Free"
+                                                            id="checkout_confirmation.label.free"
+                                                        />
                                                     </Text>
                                                 ) : (
                                                     <Text>
@@ -368,7 +416,10 @@ const CheckoutConfirmation = () => {
                                             </Flex>
                                             <Flex justify="space-between">
                                                 <Text>
-                                                    <FormattedMessage defaultMessage="Tax" />
+                                                    <FormattedMessage
+                                                        defaultMessage="Tax"
+                                                        id="checkout_confirmation.label.tax"
+                                                    />
                                                 </Text>
                                                 <Text>
                                                     <FormattedNumber
@@ -382,7 +433,10 @@ const CheckoutConfirmation = () => {
 
                                         <Flex w="full" justify="space-between">
                                             <Text fontWeight="bold">
-                                                <FormattedMessage defaultMessage="Order Total" />
+                                                <FormattedMessage
+                                                    defaultMessage="Order Total"
+                                                    id="checkout_confirmation.label.order_total"
+                                                />
                                             </Text>
                                             <Text fontWeight="bold">
                                                 <FormattedNumber
@@ -402,20 +456,29 @@ const CheckoutConfirmation = () => {
                         <Container variant="form">
                             <Stack spacing={6}>
                                 <Heading fontSize="lg">
-                                    <FormattedMessage defaultMessage="Payment Details" />
+                                    <FormattedMessage
+                                        defaultMessage="Payment Details"
+                                        id="checkout_confirmation.heading.payment_details"
+                                    />
                                 </Heading>
 
                                 <SimpleGrid columns={[1, 1, 2]} spacing={6}>
                                     <Stack spacing={1}>
                                         <Heading as="h3" fontSize="sm">
-                                            <FormattedMessage defaultMessage="Billing Address" />
+                                            <FormattedMessage
+                                                defaultMessage="Billing Address"
+                                                id="checkout_confirmation.heading.billing_address"
+                                            />
                                         </Heading>
                                         <AddressDisplay address={order.billingAddress} />
                                     </Stack>
 
                                     <Stack spacing={1}>
                                         <Heading as="h3" fontSize="sm">
-                                            <FormattedMessage defaultMessage="Credit Card" />
+                                            <FormattedMessage
+                                                defaultMessage="Credit Card"
+                                                id="checkout_confirmation.heading.credit_card"
+                                            />
                                         </Heading>
 
                                         <Stack direction="row">

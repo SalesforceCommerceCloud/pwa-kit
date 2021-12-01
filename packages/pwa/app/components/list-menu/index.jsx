@@ -19,7 +19,6 @@ import {
     Container,
     SimpleGrid,
     Flex,
-    Link,
     Stack,
     Popover,
     PopoverTrigger,
@@ -32,7 +31,7 @@ import {
     useTheme,
     useDisclosure
 } from '@chakra-ui/react'
-
+import Link from '../link'
 // Others
 import {categoryUrlBuilder} from '../../utils/url'
 import {ChevronDownIcon} from '../icons'
@@ -50,7 +49,6 @@ const ChevronIconTrigger = forwardRef(function ChevronIconTrigger(props, ref) {
 const ListMenuTrigger = ({item, name, isOpen, onOpen, onClose, hasItems}) => {
     const theme = useTheme()
     const {baseStyle} = theme.components.ListMenu
-    const {locale} = useIntl()
 
     const keyMap = {
         Escape: () => onClose(),
@@ -61,7 +59,7 @@ const ListMenuTrigger = ({item, name, isOpen, onOpen, onClose, hasItems}) => {
         <Box {...baseStyle.listMenuTriggerContainer}>
             <Link
                 as={RouteLink}
-                to={categoryUrlBuilder(item, locale)}
+                to={categoryUrlBuilder(item)}
                 onMouseOver={onOpen}
                 {...baseStyle.listMenuTriggerLink}
                 {...(hasItems ? {name: name + ' __'} : {name: name})}
