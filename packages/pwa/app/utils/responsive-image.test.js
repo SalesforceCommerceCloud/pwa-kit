@@ -105,13 +105,11 @@ test('manually specifying sizes and srcset', () => {
         },
         srcSet
     })
-    // TODO: fix this test
-    // expect(props).toStrictEqual({
-    //     src: staticImageURL.withoutOptionalParams,
-    //     sizes:
-    //         '(min-width: 96em) 350px, (min-width: 80em) 350px, (min-width: 62em) 350px, (min-width: 48em) 50vw, (min-width: 30em) 100vw, 100vw',
-    //     srcSet: srcSet.map((width) => `${urlWithWidth(width)} ${width}w`).join(', ')
-    // })
+    expect(props).toStrictEqual({
+        src: staticImageURL.withoutOptionalParams,
+        sizes: '(min-width: 62em) 350px, (min-width: 48em) 50vw, (min-width: 30em) 100vw, 100vw',
+        srcSet: srcSet.map((width) => `${urlWithWidth(width)} ${width}w`).join(', ')
+    })
 })
 
 test('literal values', () => {
