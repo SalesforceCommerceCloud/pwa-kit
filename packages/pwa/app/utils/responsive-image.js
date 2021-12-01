@@ -12,10 +12,16 @@ import theme from '@chakra-ui/theme'
 /**
  * @param {Object} props
  * @param {string} props.src
- * @param {number[]} props.vwSizes
+ * @param {number[]} props.vwSizes - Sizes in vw unit, which will be mapped to sizes and srcSet attributes
  * @param {(string[]|Object|string)} props.sizes
  * @param {(number[]|string)} props.srcSet
- * @return {Object} props for Chakra image component
+ * @return {Object} src, sizes, and srcSet props for Chakra image component
+ *
+ * @example
+ * // All of these are equivalent (similar to Chakra's responsive styles)
+ * getResponsiveImageAttributes({vwSizes: [100, 100, 50]})
+ * getResponsiveImageAttributes({vwSizes: {base: 100, md: 50}})
+ * getResponsiveImageAttributes({sizes: {base: '100vw', md: '50vw'}, srcSet: [...]})
  */
 export const getResponsiveImageAttributes = ({src, vwSizes, sizes: _sizes, srcSet: _srcSet}) => {
     const imageProps = {src: getSrcWithoutOptionalParams(src)}
@@ -153,6 +159,7 @@ const emToPx = (em, browserDefaultFontSize = 16) => Math.round(em * browserDefau
 /**
  * @param {string} srcFormat
  * @param {number} imageWidth
+ * @return {string} Image url having the given width
  * @example
  * // returns https://example.com/image_720.jpg
  * getSrc('https://example.com/image[_{width}].jpg', 720)
