@@ -5,8 +5,6 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React from 'react'
-import {Image} from '@chakra-ui/react'
 import theme from '@chakra-ui/theme'
 
 /**
