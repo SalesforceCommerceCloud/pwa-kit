@@ -97,7 +97,7 @@ const convertSrcSetToHTMLAttribute = (srcSet, srcFormat) => {
 const mapVwSizesToSizes = (vwSizes) => {
     return Array.isArray(vwSizes)
         ? vwSizes.map((size) => `${size}vw`)
-        : responsivePropAsArray(vwSizes)
+        : responsivePropAsArray(vwSizes).map((size) => `${size}vw`)
 }
 
 /**
@@ -160,7 +160,7 @@ const emToPx = (em, browserDefaultFontSize = 16) => Math.round(em * browserDefau
  * // returns https://example.com/image_720.jpg
  * getSrc('https://example.com/image[_{width}].jpg', 720)
  */
-const getSrc = (srcFormat, imageWidth) => {
+export const getSrc = (srcFormat, imageWidth) => {
     // 1. remove the surrounding []
     // 2. replace {...} with imageWidth
     return srcFormat.replace(/\[([^\]]+)\]/g, '$1').replace(/\{[^}]+\}/g, imageWidth)
