@@ -90,7 +90,6 @@ const AppConfig = ({children, locals = {}}) => {
 AppConfig.restore = (locals = {}) => {
     // Parse the locale from the page url.
     const originalUrl = locals.originalUrl
-    console.log('originalUrl', originalUrl)
     apiConfig.parameters.siteId = getSiteId(originalUrl) || DEFAULT_SITE_ID
 
     const locale = getLocale(locals) || DEFAULT_LOCALE

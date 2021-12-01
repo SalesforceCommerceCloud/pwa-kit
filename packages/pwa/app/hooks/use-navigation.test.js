@@ -7,7 +7,8 @@
 import React from 'react'
 import user from '@testing-library/user-event'
 import useNavigation from './use-navigation'
-import {getUrlConfig} from '../utils/utils'
+import {getUrlConfig, getSitesConfig, getDefaultSiteId} from '../utils/utils'
+import {useLocation} from 'react-router-dom'
 import {render} from '@testing-library/react'
 
 const mockHistoryPush = jest.fn()
@@ -17,7 +18,9 @@ jest.mock('../utils/utils', () => {
     const original = jest.requireActual('../utils/utils')
     return {
         ...original,
-        getUrlConfig: jest.fn()
+        getUrlConfig: jest.fn(),
+        getSitesConfig: jest.fn(),
+        getDefaultSiteId: jest.fn()
     }
 })
 jest.mock('react-router', () => {
@@ -31,6 +34,14 @@ jest.mock('react-router', () => {
     }
 })
 
+jest.mock('react-router-dom', () => {
+    const original = jest.requireActual('react-router-dom')
+    return {
+        ...original,
+        useLocation: jest.fn()
+    }
+})
+
 jest.mock('react-intl', () => {
     return {
         useIntl: jest.fn().mockReturnValue({locale: 'en-GB'}),
@@ -39,9 +50,19 @@ jest.mock('react-intl', () => {
 })
 
 beforeEach(() => {
-    getUrlConfig.mockImplementation(() => ({
-        locale: 'path'
-    }))
+    getSitesConfig.mockImplementation(() => [
+        {
+            id: 'site-id-1',
+            alias: 'us',
+            hostname: ['localhost']
+        },
+        {
+            id: 'site-id-2',
+            alias: 'global',
+            hostname: ['localhost']
+        }
+    ])
+    getDefaultSiteId.mockImplementation(() => 'site-id-2')
     jest.clearAllMocks()
 })
 
@@ -52,22 +73,50 @@ const TestComponent = () => {
         <div>
             <button data-testid="page1-link" onClick={() => navigate('/page1')} />
             <button data-testid="page2-link" onClick={() => navigate('/page2', 'replace', {})} />
-            <button data-testid="page3-link" onClick={() => navigate('/en-GB/page3')} />
             <button data-testid="page4-link" onClick={() => navigate('/')} />
         </div>
     )
 }
 
-test('prepends locale and calls history.push', () => {
+test('prepends locale and site and calls history.push', () => {
+    getUrlConfig.mockImplementation(() => ({
+        locale: 'path',
+        site: 'path'
+    }))
     const {getByTestId} = render(<TestComponent />)
     user.click(getByTestId('page1-link'))
-    expect(mockHistoryPush).toHaveBeenCalledWith('/en-GB/page1')
+    expect(mockHistoryPush).toHaveBeenCalledWith('/en-GB/global/page1')
+})
+
+test('append locale as path and site as query and calls history.push', () => {
+    getUrlConfig.mockImplementation(() => ({
+        locale: 'path',
+        site: 'query_param'
+    }))
+    useLocation.mockImplementation(() => ({
+        pathname: '/en-GB/global/women/dresses'
+    }))
+    useLocation.mockImplementation(() => ({
+        pathname: '/en-GB/women/dresses',
+        search: '?site=global'
+    }))
+    const {getByTestId} = render(<TestComponent />)
+    user.click(getByTestId('page1-link'))
+    expect(mockHistoryPush).toHaveBeenCalledWith('/en-GB/page1?site=global')
 })
 
 test('works for any history method and args', () => {
+    getUrlConfig.mockImplementation(() => ({
+        locale: 'path',
+        site: 'path'
+    }))
+    useLocation.mockImplementation(() => ({
+        pathname: '/en-GB/global/women/dresses'
+    }))
     const {getByTestId} = render(<TestComponent />)
+
     user.click(getByTestId('page2-link'))
-    expect(mockHistoryReplace).toHaveBeenCalledWith('/en-GB/page2', {})
+    expect(mockHistoryReplace).toHaveBeenCalledWith('/en-GB/global/page2', {})
 })
 
 test('if given the path to root or homepage, will not prepend the locale', () => {

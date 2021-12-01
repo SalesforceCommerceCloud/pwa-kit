@@ -19,6 +19,7 @@ const useNavigation = () => {
     const history = useHistory()
     const {locale} = useIntl()
     const site = useSite()
+    console.log('site', site)
     return useCallback(
         /**
          *
@@ -27,7 +28,8 @@ const useNavigation = () => {
          * @param  {...any} args - additional args passed to `.push` or `.replace`
          */
         (path, action = 'push', ...args) => {
-            const updatedHref = buildPathWithUrlConfig(path, {locale, site: site.alias})
+            const updatedHref = buildPathWithUrlConfig(path, {locale, site: site?.alias})
+            console.log('updateHref', updatedHref)
             history[action](path === '/' ? '/' : updatedHref, ...args)
         },
         [locale]

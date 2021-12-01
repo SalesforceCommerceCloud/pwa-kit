@@ -5,21 +5,23 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {getSitesConfig, getUrlConfig} from '../utils/utils'
-import {DEFAULT_SITE_ID, HOME_HREF, urlPartPositions} from '../constants'
+import {getSitesConfig, getUrlConfig, getDefaultSiteId} from '../utils/utils'
+import {HOME_HREF, urlPartPositions} from '../constants'
 import {useLocation} from 'react-router-dom'
 
 const useSite = () => {
     const sitesConfig = getSitesConfig()
     const urlConfig = getUrlConfig()
     const {pathname, search} = useLocation()
+    const defaultSiteID = getDefaultSiteId()
     const params = new URLSearchParams(search)
     let site
     if (pathname === HOME_HREF) {
-        return sitesConfig.find((site) => site.id === DEFAULT_SITE_ID)
+        return sitesConfig.find((site) => site.id === defaultSiteID)
     }
 
     const sitePosition = urlConfig['site']
+    const localePosition = urlConfig['locale']
     switch (sitePosition) {
         case urlPartPositions.NONE:
             break
@@ -30,7 +32,12 @@ const useSite = () => {
         }
 
         case urlPartPositions.PATH: {
-            const currentSite = pathname.split('/')[1]
+            let currentSite
+            if (localePosition === urlPartPositions.PATH) {
+                currentSite = pathname.split('/')[2]
+            } else {
+                currentSite = pathname.split('/')[1]
+            }
             site = sitesConfig.find((site) => site.alias === currentSite)
             break
         }
