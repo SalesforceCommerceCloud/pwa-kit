@@ -105,7 +105,7 @@ const AccountOrderHistory = () => {
                                         <Box>
                                             <Button
                                                 as={Link}
-                                                to={`${location.pathname}/${order.orderNo}`}
+                                                to={`/account/orders/${order.orderNo}`}
                                                 variant="link"
                                                 rightIcon={
                                                     <ChevronRightIcon boxSize={5} mx={-1.5} />
