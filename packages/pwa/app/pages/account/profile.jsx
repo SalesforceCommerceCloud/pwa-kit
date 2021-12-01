@@ -79,7 +79,10 @@ const ProfileCard = () => {
             await customer.updateCustomer(values)
             setIsEditing(false)
             toast({
-                title: formatMessage({defaultMessage: 'Profile updated'}),
+                title: formatMessage({
+                    defaultMessage: 'Profile updated',
+                    id: 'profile_card.info.profile_updated'
+                }),
                 status: 'success',
                 isClosable: true
             })
@@ -95,7 +98,10 @@ const ProfileCard = () => {
             id="my-profile"
             title={
                 <Skeleton height="30px" width="120px">
-                    {formatMessage({defaultMessage: 'My Profile'})}
+                    {formatMessage({
+                        defaultMessage: 'My Profile',
+                        id: 'profile_card.title.my_profile'
+                    })}
                 </Skeleton>
             }
             editing={isEditing}
@@ -126,7 +132,10 @@ const ProfileCard = () => {
                     <Box>
                         <Skeleton height="21px" width="84px" marginBottom={2}>
                             <Text fontSize="sm" fontWeight="bold">
-                                <FormattedMessage defaultMessage="Full Name" />
+                                <FormattedMessage
+                                    defaultMessage="Full Name"
+                                    id="profile_card.label.full_name"
+                                />
                             </Text>
                         </Skeleton>
 
@@ -139,7 +148,10 @@ const ProfileCard = () => {
                     <Box>
                         <Skeleton height="21px" width="120px" marginBottom={2}>
                             <Text fontSize="sm" fontWeight="bold">
-                                <FormattedMessage defaultMessage="Email" />
+                                <FormattedMessage
+                                    defaultMessage="Email"
+                                    id="profile_card.label.email"
+                                />
                             </Text>
                         </Skeleton>
 
@@ -150,14 +162,20 @@ const ProfileCard = () => {
                     <Box>
                         <Skeleton height="21px" width="80px" marginBottom={2}>
                             <Text fontSize="sm" fontWeight="bold">
-                                <FormattedMessage defaultMessage="Phone Number" />
+                                <FormattedMessage
+                                    defaultMessage="Phone Number"
+                                    id="profile_card.label.phone"
+                                />
                             </Text>
                         </Skeleton>
 
                         <Skeleton height="21px" width="120px">
                             <Text fontSize="sm">
                                 {customer.phoneHome || (
-                                    <FormattedMessage defaultMessage="Not provided" />
+                                    <FormattedMessage
+                                        defaultMessage="Not provided"
+                                        id="profile_card.message.not_provided"
+                                    />
                                 )}
                             </Text>
                         </Skeleton>
@@ -182,7 +200,10 @@ const PasswordCard = () => {
             await customer.updatePassword(values)
             setIsEditing(false)
             toast({
-                title: formatMessage({defaultMessage: 'Password updated'}),
+                title: formatMessage({
+                    defaultMessage: 'Password updated',
+                    id: 'password_card.info.password_updated'
+                }),
                 status: 'success',
                 isClosable: true
             })
@@ -198,7 +219,10 @@ const PasswordCard = () => {
             id="password"
             title={
                 <Skeleton height="30px" width="120px">
-                    {formatMessage({defaultMessage: 'Password'})}
+                    {formatMessage({
+                        defaultMessage: 'Password',
+                        id: 'password_card.title.password'
+                    })}
                 </Skeleton>
             }
             editing={isEditing}
@@ -229,7 +253,10 @@ const PasswordCard = () => {
                     <Box>
                         <Skeleton height="21px" width="84px" marginBottom={2}>
                             <Text fontSize="sm" fontWeight="bold">
-                                <FormattedMessage defaultMessage="Password" />
+                                <FormattedMessage
+                                    defaultMessage="Password"
+                                    id="password_card.label.password"
+                                />
                             </Text>
                         </Skeleton>
 
@@ -249,7 +276,10 @@ const AccountDetail = () => {
     return (
         <Stack data-testid="account-detail-page" spacing={6}>
             <Heading as="h1" fontSize="24px">
-                <FormattedMessage defaultMessage="Account Details" />
+                <FormattedMessage
+                    defaultMessage="Account Details"
+                    id="account_detail.title.account_details"
+                />
             </Heading>
 
             <Stack spacing={4}>

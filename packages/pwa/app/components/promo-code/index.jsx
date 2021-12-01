@@ -33,7 +33,10 @@ export const usePromoCode = () => {
             await basket.applyPromoCode(code)
             form.reset({code: ''})
             toast({
-                title: formatMessage({defaultMessage: 'Promotion applied'}),
+                title: formatMessage({
+                    defaultMessage: 'Promotion applied',
+                    id: 'use_promocode.info.promo_applied'
+                }),
                 status: 'success',
                 position: 'top-right',
                 isClosable: true
@@ -43,7 +46,8 @@ export const usePromoCode = () => {
                 type: 'manual',
                 message: formatMessage({
                     defaultMessage:
-                        'Check the code and try again, it may already be applied or the promo has expired'
+                        'Check the code and try again, it may already be applied or the promo has expired',
+                    id: 'use_promocode.error.check_the_code'
                 })
             })
         }
@@ -53,17 +57,17 @@ export const usePromoCode = () => {
         try {
             await basket.removePromoCode(couponItemId)
             toast({
-                title: formatMessage({defaultMessage: 'Promotion removed'}),
+                title: formatMessage({
+                    defaultMessage: 'Promotion removed',
+                    id: 'use_promocode.info.promo_removed'
+                }),
                 status: 'success',
                 position: 'top-right',
                 isClosable: true
             })
         } catch (err) {
             toast({
-                title: formatMessage(
-                    {defaultMessage: '{errorMessage}'},
-                    {errorMessage: API_ERROR_MESSAGE}
-                ),
+                title: formatMessage(API_ERROR_MESSAGE),
                 status: 'error',
                 position: 'top-right',
                 isClosable: true
@@ -96,7 +100,10 @@ export const PromoCode = ({form, submitPromoCode, itemProps}) => {
                             rightIcon={isExpanded ? <ChevronUpIcon /> : <ChevronDownIcon />}
                             onClick={() => form.reset()}
                         >
-                            <FormattedMessage defaultMessage="Do you have a promo code?" />
+                            <FormattedMessage
+                                defaultMessage="Do you have a promo code?"
+                                id="promocode.accordion.button.have_promocode"
+                            />
                         </AccordionButton>
 
                         <AccordionPanel px={0} mb={4}>

@@ -65,12 +65,10 @@ export const AuthModal = ({
             const message = /invalid credentials/i.test(error.message)
                 ? formatMessage({
                       defaultMessage:
-                          "Something's not right with your email or password. Try again."
+                          "Something's not right with your email or password. Try again.",
+                      id: 'auth_modal.error.incorrect_email_or_password'
                   })
-                : formatMessage(
-                      {defaultMessage: '{errorMessage}'},
-                      {errorMessage: API_ERROR_MESSAGE}
-                  )
+                : formatMessage(API_ERROR_MESSAGE)
             form.setError('global', {type: 'manual', message})
         }
     }
@@ -141,14 +139,16 @@ export const AuthModal = ({
                 variant: 'subtle',
                 title: `${formatMessage(
                     {
-                        defaultMessage: 'Welcome {name},'
+                        defaultMessage: 'Welcome {name},',
+                        id: 'auth_modal.info.welcome_user'
                     },
                     {
                         name: customer?.firstName
                     }
                 )}`,
                 description: `${formatMessage({
-                    defaultMessage: "You're now signed in"
+                    defaultMessage: "You're now signed in",
+                    id: 'auth_modal.description.now_signed_in'
                 })}`,
                 status: 'success',
                 position: 'top-right',
@@ -169,12 +169,16 @@ export const AuthModal = ({
         <Stack justify="center" align="center" spacing={6}>
             <BrandLogo width="60px" height="auto" />
             <Text align="center" fontSize="md">
-                <FormattedMessage defaultMessage={'Password Reset'} />
+                <FormattedMessage
+                    defaultMessage={'Password Reset'}
+                    id="auth_modal.password_reset_success.title.password_reset"
+                />
             </Text>
             <Stack spacing={6} pt={4}>
                 <Text align="center" fontSize="sm">
                     <FormattedMessage
                         defaultMessage="You will receive an email at <b>{email}</b> with a link to reset your password shortly."
+                        id="auth_modal.password_reset_success.info.will_email_shortly"
                         values={{
                             email: submittedEmail.current,
                             // eslint-disable-next-line react/display-name
@@ -184,7 +188,10 @@ export const AuthModal = ({
                 </Text>
 
                 <Button onClick={() => setCurrentView(LOGIN_VIEW)}>
-                    <FormattedMessage defaultMessage="Back to sign in" />
+                    <FormattedMessage
+                        defaultMessage="Back to sign in"
+                        id="auth_modal.password_reset_success.button.back_to_sign_in"
+                    />
                 </Button>
             </Stack>
         </Stack>

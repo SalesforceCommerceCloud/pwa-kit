@@ -74,7 +74,8 @@ const Account = () => {
                     <SignoutIcon boxSize={5} mr={2} />
                     <Text as="span" fontSize={['md', 'md', 'md', 'sm']} fontWeight="normal">
                         {formatMessage({
-                            defaultMessage: 'Log out'
+                            defaultMessage: 'Log out',
+                            id: 'account.logout_button.button.log_out'
                         })}
                     </Text>
                 </Flex>
@@ -122,7 +123,10 @@ const Account = () => {
                                 >
                                     <Flex align="center" justify="center">
                                         <Text as="span" mr={2}>
-                                            <FormattedMessage defaultMessage="My Account" />
+                                            <FormattedMessage
+                                                defaultMessage="My Account"
+                                                id="account.accordion.button.my_account"
+                                            />
                                         </Text>
                                         {isExpanded ? <ChevronUpIcon /> : <ChevronDownIcon />}
                                     </Flex>
@@ -158,7 +162,10 @@ const Account = () => {
                     {showLoading && <LoadingSpinner wrapperStyles={{height: '100vh'}} />}
 
                     <Heading as="h6" fontSize="18px">
-                        <FormattedMessage defaultMessage="My Account" />
+                        <FormattedMessage
+                            defaultMessage="My Account"
+                            id="account.heading.my_account"
+                        />
                     </Heading>
 
                     <Flex spacing={0} as="nav" data-testid="account-detail-nav" direction="column">

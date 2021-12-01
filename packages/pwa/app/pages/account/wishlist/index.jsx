@@ -52,10 +52,7 @@ const AccountWishlist = () => {
             })
         } catch {
             toast({
-                title: formatMessage(
-                    {defaultMessage: '{errorMessage}'},
-                    {errorMessage: API_ERROR_MESSAGE}
-                ),
+                title: formatMessage(API_ERROR_MESSAGE),
                 status: 'error'
             })
         }
@@ -84,7 +81,7 @@ const AccountWishlist = () => {
     return (
         <Stack spacing={4} data-testid="account-wishlist-page">
             <Heading as="h1" fontSize="2xl">
-                <FormattedMessage defaultMessage="Wishlist" />
+                <FormattedMessage defaultMessage="Wishlist" id="account_wishlist.title.wishlist" />
             </Heading>
             {!wishlist.hasDetail && (
                 <Box data-testid="sf-wishlist-skeleton">
@@ -115,12 +112,17 @@ const AccountWishlist = () => {
                 <PageActionPlaceHolder
                     data-testid="empty-wishlist"
                     icon={<HeartIcon boxSize={8} />}
-                    heading={formatMessage({defaultMessage: 'No Wishlist Items'})}
+                    heading={formatMessage({
+                        defaultMessage: 'No Wishlist Items',
+                        id: 'account_wishlist.heading.no_wishlist'
+                    })}
                     text={formatMessage({
-                        defaultMessage: 'Continue shopping and add items to your wishlist'
+                        defaultMessage: 'Continue shopping and add items to your wishlist',
+                        id: 'account_wishlist.description.continue_shopping'
                     })}
                     buttonText={formatMessage({
-                        defaultMessage: 'Continue Shopping'
+                        defaultMessage: 'Continue Shopping',
+                        id: 'account_wishlist.button.continue_shopping'
                     })}
                     buttonProps={{leftIcon: undefined}}
                     onButtonClick={() => navigate('/')}

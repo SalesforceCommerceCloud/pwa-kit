@@ -41,7 +41,8 @@ const WishlistPrimaryAction = () => {
                 title: formatMessage(
                     {
                         defaultMessage:
-                            '{quantity} {quantity, plural, one {item} other {items}} added to cart'
+                            '{quantity} {quantity, plural, one {item} other {items}} added to cart',
+                        id: 'wishlist_primary_action.info.added_to_cart'
                     },
                     {quantity: quantity}
                 ),
@@ -50,10 +51,7 @@ const WishlistPrimaryAction = () => {
             onClose()
         } catch (error) {
             showToast({
-                title: formatMessage(
-                    {defaultMessage: '{errorMessage}'},
-                    {errorMessage: API_ERROR_MESSAGE}
-                ),
+                title: formatMessage(API_ERROR_MESSAGE),
                 status: 'error'
             })
         }

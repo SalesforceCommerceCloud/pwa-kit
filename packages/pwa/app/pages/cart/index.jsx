@@ -50,10 +50,7 @@ const Cart = () => {
     const modalProps = useDisclosure()
     const showError = () => {
         toast({
-            title: formatMessage(
-                {defaultMessage: '{errorMessage}'},
-                {errorMessage: API_ERROR_MESSAGE}
-            ),
+            title: formatMessage(API_ERROR_MESSAGE),
             status: 'error'
         })
     }
@@ -70,7 +67,8 @@ const Cart = () => {
                 title: formatMessage(
                     {
                         defaultMessage:
-                            '{quantity} {quantity, plural, one {item} other {items}} added to wishlist'
+                            '{quantity} {quantity, plural, one {item} other {items}} added to wishlist',
+                        id: 'cart.info.added_to_wishlist'
                     },
                     {quantity: 1}
                 ),
@@ -200,7 +198,10 @@ const Cart = () => {
         try {
             await basket.removeItemFromBasket(product.itemId)
             toast({
-                title: formatMessage({defaultMessage: 'Item removed from cart'}),
+                title: formatMessage({
+                    defaultMessage: 'Item removed from cart',
+                    id: 'cart.info.removed_from_cart'
+                }),
                 status: 'success'
             })
         } catch {
@@ -292,13 +293,23 @@ const Cart = () => {
                         {/* Product Recommendations */}
                         <Stack spacing={16}>
                             <RecommendedProducts
-                                title={<FormattedMessage defaultMessage="Recently Viewed" />}
+                                title={
+                                    <FormattedMessage
+                                        defaultMessage="Recently Viewed"
+                                        id="cart.recommended_products.title.recently_viewed"
+                                    />
+                                }
                                 recommender={'viewed-recently-einstein'}
                                 mx={{base: -4, sm: -6, lg: 0}}
                             />
 
                             <RecommendedProducts
-                                title={<FormattedMessage defaultMessage="You May Also Like" />}
+                                title={
+                                    <FormattedMessage
+                                        defaultMessage="You May Also Like"
+                                        id="cart.recommended_products.title.may_also_like"
+                                    />
+                                }
                                 recommender={'product-to-product-einstein'}
                                 products={basket?.productItems?.map((item) => item.productId)}
                                 shouldFetch={() =>

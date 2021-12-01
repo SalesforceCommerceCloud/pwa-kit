@@ -44,7 +44,11 @@ const ItemImage = ({imageProps, ratio = 1, ...props}) => {
                             variant="solid"
                             colorScheme="blue"
                         >
-                            <FormattedMessage defaultMessage="Sale" />
+                            <FormattedMessage
+                                defaultMessage="Sale"
+                                id="item_image.label.sale"
+                                description="A sale badge placed on top of a product image"
+                            />
                         </Badge>
                     )}
 

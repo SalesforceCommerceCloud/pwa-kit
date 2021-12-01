@@ -28,6 +28,7 @@ const usidStorageKey = 'usid'
 const encUserIdStorageKey = 'enc-user-id'
 const tokenStorageKey = 'token'
 const refreshTokenStorageKey = 'refresh-token'
+const oidStorageKey = 'oid'
 
 /**
  * A  class that provides auth functionality for pwa.
@@ -40,14 +41,26 @@ class Auth {
         this._onClient = typeof window !== 'undefined'
         this._pendingAuth = undefined
         this._customerId = undefined
-        this._authToken = this._onClient ? window.localStorage.getItem(tokenStorageKey) : undefined
-        this._refreshToken = this._onClient
-            ? window.localStorage.getItem(refreshTokenStorageKey)
-            : undefined
-        this._usid = this._onClient ? window.localStorage.getItem(usidStorageKey) : undefined
-        this._encUserId = this._onClient
-            ? window.localStorage.getItem(encUserIdStorageKey)
-            : undefined
+
+        this._oid = this._onClient ? window.localStorage.getItem(oidStorageKey) : undefined
+
+        const configOid = api._config.parameters.organizationId
+        if (this._oid !== configOid) {
+            this._clearAuth()
+            this._saveOid(configOid)
+        } else {
+            this._authToken = this._onClient
+                ? window.localStorage.getItem(tokenStorageKey)
+                : undefined
+            this._refreshToken = this._onClient
+                ? window.localStorage.getItem(refreshTokenStorageKey)
+                : undefined
+            this._usid = this._onClient ? window.localStorage.getItem(usidStorageKey) : undefined
+            this._encUserId = this._onClient
+                ? window.localStorage.getItem(encUserIdStorageKey)
+                : undefined
+        }
+
         this.login = this.login.bind(this)
         this.logout = this.logout.bind(this)
     }
@@ -74,6 +87,10 @@ class Auth {
 
     get encUserId() {
         return this._encUserId
+    }
+
+    get oid() {
+        return this._oid
     }
 
     /**
@@ -261,10 +278,16 @@ class Auth {
         }
 
         const response = await this._api.shopperLogin.authorizeCustomer(options, true)
-
         if (response.status >= 400) {
-            const json = await response.json()
-            throw new HTTPError(response.status, json.message)
+            let text = await response.text()
+            let errorMessage = text
+            try {
+                const data = JSON.parse(text)
+                if (data.message) {
+                    errorMessage = data.message
+                }
+            } catch {} // eslint-disable-line no-empty
+            throw new HTTPError(response.status, errorMessage)
         }
 
         const tokenBody = createGetTokenBody(
@@ -369,6 +392,18 @@ class Auth {
         this._encUserId = encUserId
         if (this._onClient) {
             window.localStorage.setItem(encUserIdStorageKey, encUserId)
+        }
+    }
+
+    /**
+     * Stores the given oid token.
+     * @private
+     * @param {string} oid - Unique organization Id.
+     */
+    _saveOid(oid) {
+        this._oid = oid
+        if (this._onClient) {
+            window.localStorage.setItem(oidStorageKey, oid)
         }
     }
 
