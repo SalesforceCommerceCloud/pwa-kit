@@ -83,6 +83,9 @@ test('prepends locale and site and calls history.push', () => {
         locale: 'path',
         site: 'path'
     }))
+    useLocation.mockImplementation(() => ({
+        pathname: '/en-GB/global/women/dresses'
+    }))
     const {getByTestId} = render(<TestComponent />)
     user.click(getByTestId('page1-link'))
     expect(mockHistoryPush).toHaveBeenCalledWith('/en-GB/global/page1')
