@@ -9,17 +9,17 @@ import theme from '@chakra-ui/theme'
 
 /**
  * @param {Object} props
- * @param {string} props.src
+ * @param {string} props.src - If responsive image, src needs to have optional param like this: `image[_{width}].jpg` or `image.jpg[?sw={width}&q=60]`
  * @param {number[]} props.vwSizes - Sizes in vw unit, which will be mapped to sizes and srcSet attributes
- * @param {(string[]|Object|string)} props.sizes
- * @param {(number[]|string)} props.srcSet
+ * @param {(string[]|Object|string)} props.sizes - Rules for browser to pick the appropriate size, according to Chakra's breakpoints
+ * @param {(number[]|string)} props.srcSet - A set of image widths that are available for browser to download
  * @return {Object} src, sizes, and srcSet props for Chakra image component
  *
  * @example
- * // All of these are equivalent (similar to Chakra's responsive styles)
- * getResponsiveImageAttributes({vwSizes: [100, 100, 50]})
- * getResponsiveImageAttributes({vwSizes: {base: 100, md: 50}})
- * getResponsiveImageAttributes({sizes: {base: '100vw', md: '50vw'}, srcSet: [...]})
+ * // All of these arguments are equivalent (similar to Chakra's responsive styles)
+ * ({src: 'http://a.com/image[_{width}].jpg', vwSizes: [100, 100, 50]})
+ * ({src: 'http://a.com/image[_{width}].jpg', vwSizes: {base: 100, md: 50}})
+ * ({src: 'http://a.com/image[_{width}].jpg', sizes: {base: '100vw', md: '50vw'}, srcSet: [...]})
  */
 export const getResponsiveImageAttributes = ({src, vwSizes, sizes: _sizes, srcSet: _srcSet}) => {
     const imageProps = {src: getSrcWithoutOptionalParams(src)}
