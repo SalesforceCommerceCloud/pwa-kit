@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {getImageProps, getSrc} from './responsive-image'
+import {getResponsiveImageAttributes, getSrc} from './responsive-image'
 
 const disImageURL = {
     withOptionalParams:
@@ -20,7 +20,7 @@ const staticImageURL = {
 }
 
 test('vwSizes', () => {
-    let props = getImageProps({
+    let props = getResponsiveImageAttributes({
         src: disImageURL.withOptionalParams,
         vwSizes: [100, 100, 50]
     })
@@ -54,7 +54,7 @@ test('vwSizes', () => {
     })
 
     // This time with vwSizes as _object_
-    props = getImageProps({
+    props = getResponsiveImageAttributes({
         src: disImageURL.withOptionalParams,
         vwSizes: {
             base: 100,
@@ -73,7 +73,7 @@ test('vwSizes', () => {
 test('manually specifying sizes and srcset', () => {
     const srcSet = [300, 720, 1000, 1500]
 
-    let props = getImageProps({
+    let props = getResponsiveImageAttributes({
         src: staticImageURL.withOptionalParams,
         sizes: ['100vw', '100vw', '50vw', '350px'],
         srcSet
@@ -95,7 +95,7 @@ test('manually specifying sizes and srcset', () => {
     })
 
     // This time sizes is an _object_
-    props = getImageProps({
+    props = getResponsiveImageAttributes({
         src: staticImageURL.withOptionalParams,
         sizes: {
             base: '100vw',
@@ -113,7 +113,7 @@ test('manually specifying sizes and srcset', () => {
 })
 
 test('literal values', () => {
-    const props = getImageProps({
+    const props = getResponsiveImageAttributes({
         src: staticImageURL.withoutOptionalParams,
         sizes: '(min-width: 1200px) 800px, (min-width: 720px) 50vw, 100vw',
         srcSet: 'https://example.com/image_800.jpg 800w, https://example.com/image_1600.jpg 1600w'
@@ -128,7 +128,7 @@ test('literal values', () => {
 })
 
 test('only src', () => {
-    let props = getImageProps({
+    let props = getResponsiveImageAttributes({
         src: staticImageURL.withoutOptionalParams
     })
     expect(props).toStrictEqual({
@@ -136,7 +136,7 @@ test('only src', () => {
     })
 
     // This time _with_ the optional params
-    props = getImageProps({
+    props = getResponsiveImageAttributes({
         src: staticImageURL.withOptionalParams
     })
     expect(props).toStrictEqual({

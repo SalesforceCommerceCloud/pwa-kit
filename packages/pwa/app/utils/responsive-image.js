@@ -17,7 +17,7 @@ import theme from '@chakra-ui/theme'
  * @param {(number[]|string)} props.srcSet
  * @return {Object} props for Chakra image component
  */
-export const getImageProps = ({src, vwSizes, sizes: _sizes, srcSet: _srcSet, ...otherProps}) => {
+export const getResponsiveImageAttributes = ({src, vwSizes, sizes: _sizes, srcSet: _srcSet}) => {
     const imageProps = {src: getSrcWithoutOptionalParams(src)}
 
     if (vwSizes) {
@@ -38,10 +38,7 @@ export const getImageProps = ({src, vwSizes, sizes: _sizes, srcSet: _srcSet, ...
         imageProps.srcSet = convertSrcSetToHTMLAttribute(_srcSet, src)
     }
 
-    return {
-        ...imageProps,
-        ...otherProps
-    }
+    return imageProps
 }
 
 /**

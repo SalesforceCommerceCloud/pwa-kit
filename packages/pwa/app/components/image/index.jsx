@@ -7,7 +7,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {Image as ChakraImage, Img as ChakraImg} from '@chakra-ui/react'
-import {getImageProps} from '../../utils/responsive-image'
+import {getResponsiveImageAttributes} from '../../utils/responsive-image'
 
 const propTypes = {
     src: PropTypes.string,
@@ -20,12 +20,14 @@ const propTypes = {
     srcSet: PropTypes.oneOfType([PropTypes.arrayOf(PropTypes.number), PropTypes.string])
 }
 
-export const Image = ({src, vwSizes, sizes, srcSet, ...otherProps}) => {
-    return <ChakraImage {...getImageProps({src, vwSizes, sizes, srcSet, ...otherProps})} />
+export const Image = ({src, vwSizes, sizes, srcSet, ...rest}) => {
+    return (
+        <ChakraImage {...rest} {...getResponsiveImageAttributes({src, vwSizes, sizes, srcSet})} />
+    )
 }
 Image.propTypes = propTypes
 
-export const Img = ({src, vwSizes, sizes, srcSet, ...otherProps}) => {
-    return <ChakraImg {...getImageProps({src, vwSizes, sizes, srcSet, ...otherProps})} />
+export const Img = ({src, vwSizes, sizes, srcSet, ...rest}) => {
+    return <ChakraImg {...rest} {...getResponsiveImageAttributes({src, vwSizes, sizes, srcSet})} />
 }
 Img.propTypes = propTypes
