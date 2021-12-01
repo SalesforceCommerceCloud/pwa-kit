@@ -69,6 +69,7 @@ const ProductTile = (props) => {
     const [isFavouriteLoading, setFavouriteLoading] = useState(false)
     const styles = useMultiStyleConfig('ProductTile')
 
+    // TODO: remove this
     const breakpoint = useBreakpoint()
     console.log('--- current breakpoint', breakpoint)
 

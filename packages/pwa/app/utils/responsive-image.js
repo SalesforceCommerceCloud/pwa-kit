@@ -119,6 +119,8 @@ const mapVwSizesToSrcSet = (vwSizes) => {
             return
         }
 
+        // We imagine the biggest image for the current breakpoint
+        // to be when the viewport is closely approaching the _next breakpoint_.
         const nextBp = breakpointLabels[i + 1]
         const em = (size / 100) * parseFloat(theme.breakpoints[nextBp])
         const px = emToPx(em)
@@ -147,7 +149,7 @@ const responsivePropAsArray = (prop) => {
 
 /**
  * @param {number} em
- * @param {number} browserDefaultFontSize
+ * @param {number} [browserDefaultFontSize]
  */
 const emToPx = (em, browserDefaultFontSize = 16) => Math.round(em * browserDefaultFontSize)
 
