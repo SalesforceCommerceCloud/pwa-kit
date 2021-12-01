@@ -107,7 +107,15 @@ export default function ShippingOptions() {
                                                                 />
                                                             </Text>
                                                         </Flex>
-                                                        <Text width={{base: '70%', md: '65%', lg: '60%'}} fontSize="sm" color="gray.600">
+                                                        <Text
+                                                            width={{
+                                                                base: '70%',
+                                                                md: '65%',
+                                                                lg: '60%'
+                                                            }}
+                                                            fontSize="sm"
+                                                            color="gray.600"
+                                                        >
                                                             {opt.description}
                                                         </Text>
                                                         {opt.shippingPromotions?.map((promo) => {
