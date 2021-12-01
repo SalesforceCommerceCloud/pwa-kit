@@ -40,7 +40,7 @@ import LoadingSpinner from '../../components/loading-spinner'
 import {buildPathWithUrlConfig} from '../../utils/url'
 
 const Account = () => {
-    const {path, url} = useRouteMatch()
+    const {path} = useRouteMatch()
     const {formatMessage} = useIntl()
     const customer = useCustomer()
     const {locale} = useIntl()
