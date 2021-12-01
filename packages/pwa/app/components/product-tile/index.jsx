@@ -17,8 +17,7 @@ import {
     Text,
     Stack,
     useMultiStyleConfig,
-    IconButton,
-    useBreakpoint
+    IconButton
 } from '@chakra-ui/react'
 import {Img as MyImg} from '../image'
 
@@ -68,10 +67,6 @@ const ProductTile = (props) => {
     const {currency, image, price, productName, productId} = product
     const [isFavouriteLoading, setFavouriteLoading] = useState(false)
     const styles = useMultiStyleConfig('ProductTile')
-
-    // TODO: remove this
-    const breakpoint = useBreakpoint()
-    console.log('--- current breakpoint', breakpoint)
 
     return (
         <Link
