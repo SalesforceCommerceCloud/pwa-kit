@@ -1419,6 +1419,9 @@ const createExpressApp = (options) => {
     const app = express()
     app.disable('x-powered-by')
 
+    // Disable the keep-alive timeout behavior on incoming connections.
+    app.keepAliveTimeout = 0
+
     const mixin = {
         options,
 
