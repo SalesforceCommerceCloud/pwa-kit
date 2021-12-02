@@ -13,10 +13,10 @@ const CartTitle = () => {
     const basket = useBasket()
     return (
         <Text fontWeight="bold" fontSize={['xl', 'xl', 'xl', '2xl']}>
-            <FormattedMessage defaultMessage="Cart" /> (
             <FormattedMessage
-                defaultMessage="{itemCount, plural, =0 {0 items} one {# item} other {# items}})"
+                defaultMessage="Cart ({itemCount, plural, =0 {0 items} one {# item} other {# items}})"
                 values={{itemCount: basket.itemAccumulatedCount}}
+                id="cart_title.title.cart_num_of_items"
             />
         </Text>
     )

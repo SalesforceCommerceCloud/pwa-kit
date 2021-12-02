@@ -85,7 +85,8 @@ const ProductDetail = ({category, product, isLoading}) => {
                 title: formatMessage(
                     {
                         defaultMessage:
-                            '{quantity} {quantity, plural, one {item} other {items}} added to wishlist'
+                            '{quantity} {quantity, plural, one {item} other {items}} added to wishlist',
+                        id: 'product_detail.info.added_to_wishlist'
                     },
                     {quantity: 1}
                 ),
@@ -98,10 +99,7 @@ const ProductDetail = ({category, product, isLoading}) => {
             })
         } catch {
             toast({
-                title: formatMessage(
-                    {defaultMessage: '{errorMessage}'},
-                    {errorMessage: API_ERROR_MESSAGE}
-                ),
+                title: formatMessage(API_ERROR_MESSAGE),
                 status: 'error'
             })
         }
@@ -111,10 +109,7 @@ const ProductDetail = ({category, product, isLoading}) => {
     const showToast = useToast()
     const showError = () => {
         showToast({
-            title: formatMessage(
-                {defaultMessage: '{errorMessage}'},
-                {errorMessage: API_ERROR_MESSAGE}
-            ),
+            title: formatMessage(API_ERROR_MESSAGE),
             status: 'error'
         })
     }
@@ -174,7 +169,8 @@ const ProductDetail = ({category, product, isLoading}) => {
                                 <AccordionButton height="64px">
                                     <Box flex="1" textAlign="left" fontWeight="bold" fontSize="lg">
                                         {formatMessage({
-                                            defaultMessage: 'Product Detail'
+                                            defaultMessage: 'Product Detail',
+                                            id: 'product_detail.accordion.button.product_detail'
                                         })}
                                     </Box>
                                     <AccordionIcon />
@@ -195,14 +191,18 @@ const ProductDetail = ({category, product, isLoading}) => {
                                 <AccordionButton height="64px">
                                     <Box flex="1" textAlign="left" fontWeight="bold" fontSize="lg">
                                         {formatMessage({
-                                            defaultMessage: 'Size & Fit'
+                                            defaultMessage: 'Size & Fit',
+                                            id: 'product_detail.accordion.button.size_fit'
                                         })}
                                     </Box>
                                     <AccordionIcon />
                                 </AccordionButton>
                             </h2>
                             <AccordionPanel mb={6} mt={4}>
-                                {formatMessage({defaultMessage: 'Coming Soon'})}
+                                {formatMessage({
+                                    defaultMessage: 'Coming Soon',
+                                    id: 'product_detail.accordion.message.coming_soon'
+                                })}
                             </AccordionPanel>
                         </AccordionItem>
 
@@ -212,7 +212,8 @@ const ProductDetail = ({category, product, isLoading}) => {
                                 <AccordionButton height="64px">
                                     <Box flex="1" textAlign="left" fontWeight="bold" fontSize="lg">
                                         {formatMessage({
-                                            defaultMessage: 'Reviews'
+                                            defaultMessage: 'Reviews',
+                                            id: 'product_detail.accordion.button.reviews'
                                         })}
                                     </Box>
                                     <AccordionIcon />
@@ -229,7 +230,8 @@ const ProductDetail = ({category, product, isLoading}) => {
                                 <AccordionButton height="64px">
                                     <Box flex="1" textAlign="left" fontWeight="bold" fontSize="lg">
                                         {formatMessage({
-                                            defaultMessage: 'Questions'
+                                            defaultMessage: 'Questions',
+                                            id: 'product_detail.accordion.button.questions'
                                         })}
                                     </Box>
                                     <AccordionIcon />
@@ -246,7 +248,12 @@ const ProductDetail = ({category, product, isLoading}) => {
                 {/* Product Recommendations */}
                 <Stack spacing={16}>
                     <RecommendedProducts
-                        title={<FormattedMessage defaultMessage="Complete The Set" />}
+                        title={
+                            <FormattedMessage
+                                defaultMessage="Complete The Set"
+                                id="product_detail.recommended_products.title.complete_set"
+                            />
+                        }
                         recommender={'complete-the-set'}
                         products={product && [product.id]}
                         mx={{base: -4, md: -8, lg: 0}}
@@ -254,7 +261,12 @@ const ProductDetail = ({category, product, isLoading}) => {
                     />
 
                     <RecommendedProducts
-                        title={<FormattedMessage defaultMessage="You Might Also Like" />}
+                        title={
+                            <FormattedMessage
+                                defaultMessage="You Might Also Like"
+                                id="product_detail.recommended_products.title.might_also_like"
+                            />
+                        }
                         recommender={'pdp-similar-items'}
                         products={product && [product.id]}
                         mx={{base: -4, md: -8, lg: 0}}
@@ -262,7 +274,12 @@ const ProductDetail = ({category, product, isLoading}) => {
                     />
 
                     <RecommendedProducts
-                        title={<FormattedMessage defaultMessage="Recently Viewed" />}
+                        title={
+                            <FormattedMessage
+                                defaultMessage="Recently Viewed"
+                                id="product_detail.recommended_products.title.recently_viewed"
+                            />
+                        }
                         recommender={'viewed-recently-einstein'}
                         mx={{base: -4, md: -8, lg: 0}}
                     />

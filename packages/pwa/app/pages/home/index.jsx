@@ -8,6 +8,8 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {useIntl, FormattedMessage} from 'react-intl'
+
+// Components
 import {
     Box,
     Button,
@@ -20,11 +22,19 @@ import {
     Container,
     Link
 } from '@chakra-ui/react'
-import {getAssetUrl} from 'pwa-kit-react-sdk/ssr/universal/utils'
+
+// Project Components
 import Hero from '../../components/hero'
 import Seo from '../../components/seo'
 import Section from '../../components/section'
+import ProductScroller from '../../components/product-scroller'
+
+// Others
+import {getAssetUrl} from 'pwa-kit-react-sdk/ssr/universal/utils'
 import {heroFeatures, features} from './data'
+
+// Constants
+import {HOME_SHOP_PRODUCTS_CATEGORY_ID, HOME_SHOP_PRODUCTS_LIMIT} from '../../constants'
 
 /**
  * This is the home page for Retail React App.
@@ -32,7 +42,7 @@ import {heroFeatures, features} from './data'
  * The page renders SEO metadata and a few promotion
  * categories and products, data is from local file.
  */
-const Home = () => {
+const Home = ({productSearchResult, isLoading}) => {
     const intl = useIntl()
 
     return (
@@ -45,7 +55,8 @@ const Home = () => {
 
             <Hero
                 title={intl.formatMessage({
-                    defaultMessage: 'The React PWA Starter Store for Retail'
+                    defaultMessage: 'The React PWA Starter Store for Retail',
+                    id: 'home.title.react_starter_store'
                 })}
                 img={{
                     src: getAssetUrl('static/img/hero.png'),
@@ -61,7 +72,10 @@ const Home = () => {
                             paddingX={7}
                             _hover={{textDecoration: 'none'}}
                         >
-                            <FormattedMessage defaultMessage="Get started" />
+                            <FormattedMessage
+                                defaultMessage="Get started"
+                                id="home.link.get_started"
+                            />
                         </Button>
                     </Stack>
                 }
@@ -115,15 +129,68 @@ const Home = () => {
                 </SimpleGrid>
             </Section>
 
+            {productSearchResult && (
+                <Section
+                    padding={4}
+                    paddingTop={16}
+                    title={intl.formatMessage({
+                        defaultMessage: 'Shop Products',
+                        id: 'home.heading.shop_products'
+                    })}
+                    subtitle={intl.formatMessage(
+                        {
+                            defaultMessage:
+                                'This section contains content from the catalog. {link} on how to replace it.',
+                            id: 'home.description.shop_products'
+                        },
+                        {
+                            link: (
+                                <Link
+                                    target="_blank"
+                                    href={'https://sfdc.co/business-manager-manage-catalgos'}
+                                    textDecoration={'none'}
+                                    position={'relative'}
+                                    _after={{
+                                        position: 'absolute',
+                                        content: `""`,
+                                        height: '2px',
+                                        bottom: '-2px',
+                                        margin: '0 auto',
+                                        left: 0,
+                                        right: 0,
+                                        background: 'gray.700'
+                                    }}
+                                    _hover={{textDecoration: 'none'}}
+                                >
+                                    {intl.formatMessage({
+                                        defaultMessage: 'Read docs',
+                                        id: 'home.link.read_docs'
+                                    })}
+                                </Link>
+                            )
+                        }
+                    )}
+                >
+                    <Stack pt={8} spacing={16}>
+                        <ProductScroller
+                            products={productSearchResult?.hits}
+                            isLoading={isLoading}
+                        />
+                    </Stack>
+                </Section>
+            )}
+
             <Section
                 padding={4}
                 paddingTop={32}
                 title={intl.formatMessage({
-                    defaultMessage: 'Features'
+                    defaultMessage: 'Features',
+                    id: 'home.heading.features'
                 })}
                 subtitle={intl.formatMessage({
                     defaultMessage:
-                        'Out-of-the-box features so that you focus only on adding enhancements.'
+                        'Out-of-the-box features so that you focus only on adding enhancements.',
+                    id: 'home.description.features'
                 })}
             >
                 <Container maxW={'6xl'} marginTop={10}>
@@ -161,12 +228,14 @@ const Home = () => {
                 padding={4}
                 paddingTop={32}
                 title={intl.formatMessage({
-                    defaultMessage: "We're here to help"
+                    defaultMessage: "We're here to help",
+                    id: 'home.heading.here_to_help'
                 })}
                 subtitle={intl.formatMessage(
                     {
                         defaultMessage:
-                            'Contact our support staff and they’ll get {br} you to the right place.'
+                            'Contact our support staff and they’ll get {br} you to the right place.',
+                        id: 'home.description.here_to_help'
                     },
                     {
                         br: <br />
@@ -181,7 +250,7 @@ const Home = () => {
                         paddingX={7}
                         _hover={{textDecoration: 'none'}}
                     >
-                        <FormattedMessage defaultMessage="Contact Us" />
+                        <FormattedMessage defaultMessage="Contact Us" id="home.link.contact_us" />
                     </Button>
                 }
                 maxWidth={'xl'}
@@ -191,17 +260,38 @@ const Home = () => {
 }
 
 Home.getTemplateName = () => 'home'
-Home.propTypes = {
-    recommendations: PropTypes.array,
-    isLoading: PropTypes.bool
-}
 
-Home.getProps = async ({res}) => {
+Home.shouldGetProps = ({previousLocation, location}) =>
+    !previousLocation || previousLocation.pathname !== location.pathname
+
+Home.getProps = async ({res, api}) => {
     // Since the home page is static, it is safe to set max age to a high value
     // we set it to a year here, but you can set the value that is suitable for your project
     if (res) {
         res.set('Cache-Control', 'max-age=31536000')
     }
+
+    const productSearchResult = await api.shopperSearch.productSearch({
+        parameters: {
+            refine: [`cgid=${HOME_SHOP_PRODUCTS_CATEGORY_ID}`, 'htype=master'],
+            limit: HOME_SHOP_PRODUCTS_LIMIT
+        }
+    })
+
+    return {productSearchResult}
+}
+
+Home.propTypes = {
+    /**
+     * The search result object showing all the product hits, that belong
+     * in the supplied category.
+     */
+    productSearchResult: PropTypes.object,
+    /**
+     * The current state of `getProps` when running this value is `true`, otherwise it's
+     * `false`. (Provided internally)
+     */
+    isLoading: PropTypes.bool
 }
 
 export default Home

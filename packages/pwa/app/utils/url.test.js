@@ -13,9 +13,18 @@ import {
     getUrlWithLocale,
     homeUrlBuilder,
     rebuildPathWithParams,
-    removeQueryParamsFromPath
+    removeQueryParamsFromPath,
+    buildPathWithUrlConfig
 } from './url'
+import {getUrlConfig} from './utils'
 
+jest.mock('./utils', () => {
+    const original = jest.requireActual('./utils')
+    return {
+        ...original,
+        getUrlConfig: jest.fn()
+    }
+})
 import {DEFAULT_LOCALE} from '../constants'
 
 describe('buildUrlSet returns the expected set of urls', () => {
@@ -98,10 +107,13 @@ describe('url builder test', () => {
 
     test('categoryUrlBuilder returns expect', () => {
         const url = categoryUrlBuilder({id: 'men'})
-        expect(url).toEqual(`/en-GB/category/men`)
+        expect(url).toEqual(`/category/men`)
     })
 
     test('homeUrlBuilder returns expect', () => {
+        getUrlConfig.mockImplementation(() => ({
+            locale: 'path'
+        }))
         const url = homeUrlBuilder('/', 'fr-FR')
         expect(url).toEqual(`/fr-FR/`)
 
@@ -110,6 +122,9 @@ describe('url builder test', () => {
     })
 
     test('getUrlWithLocale returns expected for PLP', () => {
+        getUrlConfig.mockImplementation(() => ({
+            locale: 'path'
+        }))
         const location = new URL('http://localhost:3000/it-IT/category/newarrivals-womens')
 
         window.location = location
@@ -119,6 +134,9 @@ describe('url builder test', () => {
     })
 
     test('getUrlWithLocale returns expected for PLP without refine param', () => {
+        getUrlConfig.mockImplementation(() => ({
+            locale: 'path'
+        }))
         const location = new URL(
             'http://localhost:3000/it-IT/category/newarrivals-womens?limit=25&refine=c_refinementColor%3DBianco&sort=best-matches&offset=25'
         )
@@ -134,6 +152,9 @@ describe('url builder test', () => {
     })
 
     test('getUrlWithLocale returns expected for PLP', () => {
+        getUrlConfig.mockImplementation(() => ({
+            locale: 'path'
+        }))
         const location = new URL('http://localhost:3000/it-IT/category/newarrivals-womens')
 
         window.location = location
@@ -143,6 +164,9 @@ describe('url builder test', () => {
     })
 
     test('getUrlWithLocale returns expected for Homepage', () => {
+        getUrlConfig.mockImplementation(() => ({
+            locale: 'path'
+        }))
         const location = new URL('http://localhost:3000/it-IT/')
 
         window.location = location
@@ -183,5 +207,25 @@ describe('removeQueryParamsFromPath test', () => {
         const url = '/en/product/25501032M?color=black&size=M&something=123'
         const updatedUrl = removeQueryParamsFromPath(url, ['color', 'size'])
         expect(updatedUrl).toEqual('/en/product/25501032M?something=123')
+    })
+})
+
+describe('buildPathWithUrlConfig', () => {
+    test('return a new url with locale value as a part of path', () => {
+        getUrlConfig.mockImplementation(() => ({
+            locale: 'path'
+        }))
+
+        const url = buildPathWithUrlConfig('/women/dresses', {locale: 'en-GB'})
+        expect(url).toEqual('/en-GB/women/dresses')
+    })
+
+    test('return a new url with locale value as a query param', () => {
+        getUrlConfig.mockImplementation(() => ({
+            locale: 'query_param'
+        }))
+
+        const url = buildPathWithUrlConfig('/women/dresses', {locale: 'en-GB'})
+        expect(url).toEqual('/women/dresses?locale=en-GB')
     })
 })

@@ -64,7 +64,10 @@ const CCRadioGroup = ({
 
                                             <Box>
                                                 <Button variant="link" size="sm" colorScheme="red">
-                                                    <FormattedMessage defaultMessage="Remove" />
+                                                    <FormattedMessage
+                                                        defaultMessage="Remove"
+                                                        id="cc_radio_group.action.remove"
+                                                    />
                                                 </Button>
                                             </Box>
                                         </Stack>
@@ -86,7 +89,10 @@ const CCRadioGroup = ({
                                 leftIcon={<PlusIcon boxSize={'15px'} />}
                                 onClick={togglePaymentEdit}
                             >
-                                <FormattedMessage defaultMessage="Add New Card" />
+                                <FormattedMessage
+                                    defaultMessage="Add New Card"
+                                    id="cc_radio_group.button.add_new_card"
+                                />
                             </Button>
                         )}
                     </SimpleGrid>

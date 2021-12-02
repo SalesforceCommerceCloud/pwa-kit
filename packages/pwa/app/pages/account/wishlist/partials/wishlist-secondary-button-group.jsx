@@ -18,12 +18,22 @@ import {noop} from '../../../../utils/utils'
 import {API_ERROR_MESSAGE} from '../../../../constants'
 
 export const REMOVE_WISHLIST_ITEM_CONFIRMATION_DIALOG_CONFIG = {
-    dialogTitle: defineMessage({defaultMessage: 'Confirm Remove Item'}),
-    confirmationMessage: defineMessage({
-        defaultMessage: 'Are you sure you want to remove this item from your wishlist?'
+    dialogTitle: defineMessage({
+        defaultMessage: 'Confirm Remove Item',
+        id: 'confirmation_modal.remove_wishlist_item.title.confirm_remove'
     }),
-    primaryActionLabel: defineMessage({defaultMessage: 'Yes, remove item'}),
-    alternateActionLabel: defineMessage({defaultMessage: 'No, keep item'}),
+    confirmationMessage: defineMessage({
+        defaultMessage: 'Are you sure you want to remove this item from your wishlist?',
+        id: 'confirmation_modal.remove_wishlist_item.message.sure_to_remove'
+    }),
+    primaryActionLabel: defineMessage({
+        defaultMessage: 'Yes, remove item',
+        id: 'confirmation_modal.remove_wishlist_item.action.yes'
+    }),
+    alternateActionLabel: defineMessage({
+        defaultMessage: 'No, keep item',
+        id: 'confirmation_modal.remove_wishlist_item.action.no'
+    }),
     onPrimaryAction: noop
 }
 
@@ -47,15 +57,15 @@ const WishlistSecondaryButtonGroup = ({productListItemId, onClick = noop}) => {
         try {
             await wishlist.removeListItem(productListItemId)
             toast({
-                title: formatMessage({defaultMessage: 'Item removed from wishlist'}),
+                title: formatMessage({
+                    defaultMessage: 'Item removed from wishlist',
+                    id: 'wishlist_secondary_button_group.info.item_removed'
+                }),
                 status: 'success'
             })
         } catch {
             toast({
-                title: formatMessage(
-                    {defaultMessage: '{errorMessage}'},
-                    {errorMessage: API_ERROR_MESSAGE}
-                ),
+                title: formatMessage(API_ERROR_MESSAGE),
                 status: 'error'
             })
         }
@@ -71,7 +81,10 @@ const WishlistSecondaryButtonGroup = ({productListItemId, onClick = noop}) => {
                     onClick={showRemoveItemConfirmation}
                     data-testid={`sf-wishlist-remove-${productListItemId}`}
                 >
-                    <FormattedMessage defaultMessage="Remove" />
+                    <FormattedMessage
+                        defaultMessage="Remove"
+                        id="wishlist_secondary_button_group.action.remove"
+                    />
                 </Button>
                 {/* <Button variant="link" size="sm" onClick={onItemEdit}>
             <FormattedMessage defaultMessage="Edit" />

@@ -20,10 +20,16 @@ const ResetPasswordForm = ({submitForm, clickSignIn = noop, form}) => {
                 <BrandLogo width="60px" height="auto" />
                 <Stack spacing={2}>
                     <Text align="center" fontSize="xl" fontWeight="semibold">
-                        <FormattedMessage defaultMessage="Reset Password" />
+                        <FormattedMessage
+                            defaultMessage="Reset Password"
+                            id="reset_password_form.title.reset_password"
+                        />
                     </Text>
                     <Text fontSize="sm" align="center" color="gray.700">
-                        <FormattedMessage defaultMessage="Enter your email to receive instructions on how to reset your password" />
+                        <FormattedMessage
+                            defaultMessage="Enter your email to receive instructions on how to reset your password"
+                            id="reset_password_form.message.enter_your_email"
+                        />
                     </Text>
                 </Stack>
             </Stack>
@@ -44,18 +50,25 @@ const ResetPasswordForm = ({submitForm, clickSignIn = noop, form}) => {
                             onClick={() => form.clearErrors('global')}
                             isLoading={form.formState.isSubmitting}
                         >
-                            <FormattedMessage defaultMessage="Reset password" />
+                            <FormattedMessage
+                                defaultMessage="Reset password"
+                                id="reset_password_form.button.reset_password"
+                            />
                         </Button>
 
                         <Stack direction="row" spacing={1} justify="center">
                             <Text fontSize="sm">
                                 <FormattedMessage
                                     defaultMessage="Or return to"
+                                    id="reset_password_form.message.return_to_sign_in"
                                     description="Precedes link to return to sign in"
                                 />
                             </Text>
                             <Button variant="link" size="sm" onClick={clickSignIn}>
-                                <FormattedMessage defaultMessage="Sign in" />
+                                <FormattedMessage
+                                    defaultMessage="Sign in"
+                                    id="reset_password_form.action.sign_in"
+                                />
                             </Button>
                         </Stack>
                     </Stack>

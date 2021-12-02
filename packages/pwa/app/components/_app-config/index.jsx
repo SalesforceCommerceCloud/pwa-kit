@@ -21,8 +21,10 @@ import {
 } from '../../commerce-api/contexts'
 import {commerceAPIConfig} from '../../commerce-api.config'
 import {einsteinAPIConfig} from '../../einstein-api.config'
-import {DEFAULT_LOCALE, DEFAULT_CURRENCY} from '../../constants'
+import {DEFAULT_LOCALE, DEFAULT_CURRENCY, urlPartPositions} from '../../constants'
 import {getPreferredCurrency, getSupportedLocalesIds} from '../../utils/locale'
+import {getUrlConfig} from '../../utils/utils'
+import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
 
 const apiConfig = {
     ...commerceAPIConfig,
@@ -37,6 +39,7 @@ const apiConfig = {
  */
 const getLocale = (locals = {}) => {
     let {originalUrl} = locals
+    const {locale: localeType} = getUrlConfig()
 
     // If there is no originalUrl value in the locals, create it from the window location.
     // This happens when executing on the client.
@@ -44,9 +47,14 @@ const getLocale = (locals = {}) => {
         originalUrl = window?.location.href.replace(window.location.origin, '')
     }
 
-    // Parse the pathname from the partial using the URL object and a placeholder host
-    const {pathname} = new URL(`http://hostname${originalUrl}`)
-    let shortCode = pathname.split('/')[1]
+    let shortCode
+    const {pathname, searchParams} = new URL(`${getAppOrigin()}${originalUrl}`)
+    if (localeType === urlPartPositions.PATH) {
+        // Parse the pathname from the partial using the URL object and a placeholder host
+        shortCode = pathname.split('/')[1]
+    } else if (localeType === urlPartPositions.QUERY_PARAM) {
+        shortCode = searchParams.get('locale')
+    }
 
     // Ensure that the locale is in the supported list, otherwise return the default.
     shortCode = getSupportedLocalesIds().includes(shortCode) ? shortCode : DEFAULT_LOCALE

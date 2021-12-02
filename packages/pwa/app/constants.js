@@ -5,6 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
+import {defineMessage} from 'react-intl'
 import packageInfo from '../package.json'
 
 // Constants used in the used for product searching.
@@ -12,10 +13,13 @@ export const DEFAULT_SEARCH_PARAMS = {limit: 25, offset: 0, sort: 'best-matches'
 export const DEFAULT_LIMIT_VALUES = [25, 50, 100] // Page sizes
 
 // Constants for Search Component
-
 export const RECENT_SEARCH_LIMIT = 5
 export const RECENT_SEARCH_KEY = 'recent-search-key'
 export const RECENT_SEARCH_MIN_LENGTH = 3
+
+// Constants for the Homepage's Shop Products section.
+export const HOME_SHOP_PRODUCTS_CATEGORY_ID = 'newarrivals'
+export const HOME_SHOP_PRODUCTS_LIMIT = 10
 
 export const cssColorGroups = {
     beige: '#d3bca9',
@@ -39,7 +43,10 @@ export const cssColorGroups = {
 
 export const FILTER_ACCORDION_SATE = 'filters-expanded-index'
 
-export const API_ERROR_MESSAGE = 'Something went wrong. Try again!'
+export const API_ERROR_MESSAGE = defineMessage({
+    id: 'global.error.something_went_wrong',
+    defaultMessage: 'Something went wrong. Try again!'
+})
 
 export const HOME_HREF = '/'
 
@@ -50,3 +57,9 @@ export const SUPPORTED_LOCALES = packageInfo.l10n.supportedLocales
 export const DEFAULT_LOCALE = packageInfo.l10n.defaultLocale
 export const SUPPORTED_CURRENCIES = packageInfo.l10n.supportedCurrencies
 export const DEFAULT_CURRENCY = packageInfo.l10n.defaultCurrency
+
+export const urlPartPositions = {
+    PATH: 'path',
+    QUERY_PARAM: 'query_param',
+    NONE: 'none'
+}

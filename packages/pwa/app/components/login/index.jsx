@@ -19,7 +19,10 @@ const LoginForm = ({submitForm, clickForgotPassword = noop, clickCreateAccount =
             <Stack justify="center" align="center" spacing={8} marginBottom={8}>
                 <BrandLogo width="60px" height="auto" />
                 <Text align="center" fontSize="xl" fontWeight="semibold">
-                    <FormattedMessage defaultMessage="Welcome Back" />
+                    <FormattedMessage
+                        defaultMessage="Welcome Back"
+                        id="login_form.message.welcome_back"
+                    />
                 </Text>
             </Stack>
             <form
@@ -41,7 +44,10 @@ const LoginForm = ({submitForm, clickForgotPassword = noop, clickCreateAccount =
 
                         <Box>
                             <Button variant="link" size="sm" onClick={clickForgotPassword}>
-                                <FormattedMessage defaultMessage="Forgot password?" />
+                                <FormattedMessage
+                                    defaultMessage="Forgot password?"
+                                    id="login_form.link.forgot_password"
+                                />
                             </Button>
                         </Box>
                     </Stack>
@@ -51,15 +57,24 @@ const LoginForm = ({submitForm, clickForgotPassword = noop, clickCreateAccount =
                             onClick={() => form.clearErrors('global')}
                             isLoading={form.formState.isSubmitting}
                         >
-                            <FormattedMessage defaultMessage="Sign in" />
+                            <FormattedMessage
+                                defaultMessage="Sign in"
+                                id="login_form.button.sign_in"
+                            />
                         </Button>
 
                         <Stack direction="row" spacing={1} justify="center">
                             <Text fontSize="sm">
-                                <FormattedMessage defaultMessage="Don't have an account?" />
+                                <FormattedMessage
+                                    defaultMessage="Don't have an account?"
+                                    id="login_form.message.dont_have_account"
+                                />
                             </Text>
                             <Button variant="link" size="sm" onClick={clickCreateAccount}>
-                                <FormattedMessage defaultMessage="Create account" />
+                                <FormattedMessage
+                                    defaultMessage="Create account"
+                                    id="login_form.action.create_account"
+                                />
                             </Button>
                         </Stack>
                     </Stack>
