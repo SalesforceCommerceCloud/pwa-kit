@@ -66,13 +66,19 @@ const AccountOrderDetail = () => {
                             }
                         }}
                     >
-                        <FormattedMessage defaultMessage="Back to Order History" />
+                        <FormattedMessage
+                            defaultMessage="Back to Order History"
+                            id="account_order_detail.link.back_to_history"
+                        />
                     </Button>
                 </Box>
 
                 <Stack spacing={[1, 2]}>
                     <Heading as="h1" fontSize={['lg', '2xl']}>
-                        <FormattedMessage defaultMessage="Order Details" />
+                        <FormattedMessage
+                            defaultMessage="Order Details"
+                            id="account_order_detail.title.order_details"
+                        />
                     </Heading>
 
                     {!isLoading ? (
@@ -91,6 +97,7 @@ const AccountOrderDetail = () => {
                             <Text fontSize={['sm', 'md']}>
                                 <FormattedMessage
                                     defaultMessage="Ordered: {date}"
+                                    id="account_order_detail.label.ordered_date"
                                     values={{
                                         date: formatDate(new Date(order.creationDate), {
                                             year: 'numeric',
@@ -104,6 +111,7 @@ const AccountOrderDetail = () => {
                                 <Text fontSize={['sm', 'md']}>
                                     <FormattedMessage
                                         defaultMessage="Order Number: {orderNumber}"
+                                        id="account_order_detail.label.order_number"
                                         values={{orderNumber: order.orderNo}}
                                     />
                                 </Text>
@@ -147,7 +155,10 @@ const AccountOrderDetail = () => {
                             <>
                                 <Stack spacing={1}>
                                     <Text fontWeight="bold" fontSize="sm">
-                                        <FormattedMessage defaultMessage="Shipping Method" />
+                                        <FormattedMessage
+                                            defaultMessage="Shipping Method"
+                                            id="account_order_detail.heading.shipping_method"
+                                        />
                                     </Text>
                                     <Box>
                                         <Text fontSize="sm" textTransform="titlecase">
@@ -155,15 +166,26 @@ const AccountOrderDetail = () => {
                                         </Text>
                                         <Text fontSize="sm">{shippingMethod.name}</Text>
                                         <Text fontSize="sm">
-                                            <FormattedMessage defaultMessage="Tracking Number" />:{' '}
+                                            <FormattedMessage
+                                                defaultMessage="Tracking Number"
+                                                id="account_order_detail.label.tracking_number"
+                                            />
+                                            :{' '}
                                             {trackingNumber ||
-                                                formatMessage({defaultMessage: 'Pending'})}
+                                                formatMessage({
+                                                    defaultMessage: 'Pending',
+                                                    id:
+                                                        'account_order_detail.label.pending_tracking_number'
+                                                })}
                                         </Text>
                                     </Box>
                                 </Stack>
                                 <Stack spacing={1}>
                                     <Text fontWeight="bold" fontSize="sm">
-                                        <FormattedMessage defaultMessage="Payment Method" />
+                                        <FormattedMessage
+                                            defaultMessage="Payment Method"
+                                            id="account_order_detail.heading.payment_method"
+                                        />
                                     </Text>
                                     <Stack direction="row">
                                         {CardIcon && <CardIcon layerStyle="ccIcon" />}
@@ -184,7 +206,10 @@ const AccountOrderDetail = () => {
                                 </Stack>
                                 <Stack spacing={1}>
                                     <Text fontWeight="bold" fontSize="sm">
-                                        <FormattedMessage defaultMessage="Shipping Address" />
+                                        <FormattedMessage
+                                            defaultMessage="Shipping Address"
+                                            id="account_order_detail.heading.shipping_address"
+                                        />
                                     </Text>
                                     <Box>
                                         <Text fontSize="sm">
@@ -199,7 +224,10 @@ const AccountOrderDetail = () => {
                                 </Stack>
                                 <Stack spacing={1}>
                                     <Text fontWeight="bold" fontSize="sm">
-                                        <FormattedMessage defaultMessage="Billing Address" />
+                                        <FormattedMessage
+                                            defaultMessage="Billing Address"
+                                            id="account_order_detail.heading.billing_address"
+                                        />
                                     </Text>
                                     <Box>
                                         <Text fontSize="sm">
@@ -239,6 +267,7 @@ const AccountOrderDetail = () => {
                         <FormattedMessage
                             defaultMessage="{count} items"
                             values={{count: itemCount}}
+                            id="account_order_detail.heading.num_of_items"
                         />
                     </Text>
                 )}

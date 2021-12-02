@@ -195,11 +195,8 @@ describe('SSRServer Lambda integration', () => {
             name: 'proxied text response',
             path: '/mobify/proxy/base/test1',
             validate: (response) => {
-                expect(response.statusCode).toBe(200)
-                expect(response.isBase64Encoded).toBe(false)
-                expect(response.headers['content-type']).toEqual('text/plain')
-                expect(response.headers['content-encoding']).toBeFalsy()
-                expect(response.body).toEqual('success1')
+                // Proxying is disabled for remote execution.
+                expect(response.statusCode).toBe(501)
             },
             route: () => {
                 throw new Error('Should never hit this line')
@@ -244,7 +241,8 @@ describe('SSRServer Lambda integration', () => {
                 port: TEST_PORT,
                 fetchAgents: {
                     https: httpsAgent
-                }
+                },
+                enableLegacyRemoteProxying: false
             })
             app.get('/*', testCase.route)
 
