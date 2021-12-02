@@ -13,7 +13,6 @@ import {createApp} from './express'
 import request from 'supertest'
 import {parse} from 'node-html-parser'
 import path from 'path'
-import {isRemote} from '../../utils/ssr-server'
 
 const opts = (overrides = {}) => {
     const fixtures = path.join(__dirname, '..', '..', 'ssr', 'server', 'test_fixtures')
@@ -286,14 +285,6 @@ jest.mock('../universal/routes', () => {
     }
 })
 
-jest.mock('../../utils/ssr-server', () => {
-    const actual = jest.requireActual('../../utils/ssr-server')
-    return {
-        ...actual,
-        isRemote: jest.fn()
-    }
-})
-
 describe('The Node SSR Environment', () => {
     /**
      * Scripts are "safe" if they are external, not executable or on our allow list of
@@ -463,7 +454,7 @@ describe('The Node SSR Environment', () => {
                 const data = dataFromHTML(doc)
 
                 expect(data.__ERROR__.message).toEqual('Internal Server Error')
-                expect(typeof data.__ERROR__.stack).toEqual(isRemote() ? 'undefined' : 'string')
+                expect(typeof data.__ERROR__.stack).toEqual('string')
                 expect(data.__ERROR__.status).toEqual(500)
                 expect(res.statusCode).toBe(500)
             }
@@ -524,23 +515,16 @@ describe('The Node SSR Environment', () => {
         }
     ]
 
-    const isRemoteValues = [true, false]
-
-    isRemoteValues.forEach((value) => {
-        isRemote.mockReturnValue(value)
-
-        // Run test cases
-        cases.forEach(({description, req, assertions}) => {
-            test(`renders PWA pages properly (${description})`, () => {
-                const {url, headers, query} = req
-                const app = createApp(opts())
-                app.get('/*', render)
-                return request(app)
-                    .get(url)
-                    .set(headers || {})
-                    .query(query || {})
-                    .then((res) => assertions(res))
-            })
+    cases.forEach(({description, req, assertions}) => {
+        test(`renders PWA pages properly (${description})`, () => {
+            const {url, headers, query} = req
+            const app = createApp(opts())
+            app.get('/*', render)
+            return request(app)
+                .get(url)
+                .set(headers || {})
+                .query(query || {})
+                .then((res) => assertions(res))
         })
     })
 })
