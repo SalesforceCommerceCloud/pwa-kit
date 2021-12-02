@@ -47,7 +47,8 @@ class EinsteinAPI {
 
         const headers = {
             'Content-Type': 'application/json',
-            'x-cq-client-id': einsteinId
+            'x-cq-client-id': einsteinId,
+            Connection: 'keep-alive'
         }
 
         // Include `userId` and `cookieId` parameters.
@@ -63,6 +64,9 @@ class EinsteinAPI {
                 body: JSON.stringify(body)
             })
         })
+
+        // TODO: Remove this console.log
+        console.log('einstein response HEADERS: ' + JSON.stringify(response.headers))
 
         const responseJson = await response.json()
 

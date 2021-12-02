@@ -614,6 +614,9 @@ export const configureProxy = ({
             // query parameters.
             const matchedUrl = generalProxyPathRE.exec(req.originalUrl)
 
+            // TODO: Remove this console.log
+            console.log('proxyResponse.headers.connection', proxyResponse.headers.connection)
+
             // Rewrite key headers
             proxyResponse.headers = rewriteProxyResponseHeaders({
                 appHostname,

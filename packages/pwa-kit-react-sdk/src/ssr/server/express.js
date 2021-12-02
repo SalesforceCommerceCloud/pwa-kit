@@ -202,6 +202,14 @@ export const createApp = (options) => {
 
     configureProxyConfigs(options.appHostname, options.protocol)
 
+    // Create custom http and https Agent instances that support keepAlive.
+    if (options.keepAlive) {
+        const httpAgent = new http.Agent({keepAlive: true})
+        const httpsAgent = new https.Agent({keepAlive: true})
+
+        options.agent = options.protocol === 'http' ? httpAgent : httpsAgent
+    }
+
     const app = createExpressApp(options)
 
     // Attach built in routes and middleware
@@ -1418,11 +1426,6 @@ const errorHandlerMiddleware = (err, req, res, next) => {
 const createExpressApp = (options) => {
     const app = express()
     app.disable('x-powered-by')
-
-    // Disable the keep-alive timeout behavior on incoming connections.
-    if (options.keepAlive) {
-        app.keepAliveTimeout = 0
-    }
 
     const mixin = {
         options,
