@@ -47,8 +47,7 @@ class EinsteinAPI {
 
         const headers = {
             'Content-Type': 'application/json',
-            'x-cq-client-id': einsteinId,
-            Connection: 'keep-alive'
+            'x-cq-client-id': einsteinId
         }
 
         // Include `userId` and `cookieId` parameters.
