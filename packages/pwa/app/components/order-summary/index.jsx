@@ -57,11 +57,11 @@ const CartItems = ({basket}) => {
                             >
                                 <Flex width="full" alignItems="flex-start">
                                     <CartItemVariantImage width="80px" mr={2} />
-                                    <Box flex="1" spacing={1} marginTop="-3px">
+                                    <Stack width="full" spacing={1} marginTop="-3px">
                                         <CartItemVariantName />
                                         <CartItemVariantAttributes includeQuantity />
                                         <CartItemVariantPrice baseDirection="row" />
-                                    </Box>
+                                    </Stack>
                                 </Flex>
                             </ItemVariantProvider>
                         )
