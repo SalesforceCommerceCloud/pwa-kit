@@ -231,7 +231,7 @@ export const buildPathWithUrlConfig = (url, configValues = {}) => {
     const queryParams = {}
     const basePathSegments = []
 
-    const options = ['locale', 'site']
+    const options = ['site', 'locale']
 
     options.forEach((option) => {
         const position = urlConfig[option]

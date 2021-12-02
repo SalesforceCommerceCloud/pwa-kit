@@ -228,14 +228,4 @@ describe('buildPathWithUrlConfig', () => {
         const url = buildPathWithUrlConfig('/women/dresses', {locale: 'en-GB'})
         expect(url).toEqual('/women/dresses?locale=en-GB')
     })
-
-    test('return a new url with locale value as a part of path and site value as query param', () => {
-        getUrlConfig.mockImplementation(() => ({
-            locale: 'path',
-            site: 'query_param'
-        }))
-
-        const url = buildPathWithUrlConfig('/women/dresses', {locale: 'en-GB', site: 'us'})
-        expect(url).toEqual('/en-GB/women/dresses?site=us')
-    })
 })

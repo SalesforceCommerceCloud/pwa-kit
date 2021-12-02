@@ -22,7 +22,10 @@ const CartCta = () => {
                 rightIcon={<LockIcon />}
                 variant="solid"
             >
-                <FormattedMessage defaultMessage="Proceed to Checkout" />
+                <FormattedMessage
+                    defaultMessage="Proceed to Checkout"
+                    id="cart_cta.link.checkout"
+                />
             </Button>
             <Flex justify={'center'}>
                 <VisaIcon height={8} width={10} mr={2} />
