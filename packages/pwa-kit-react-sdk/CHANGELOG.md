@@ -1,5 +1,6 @@
 ## v1.3.0-dev (Nov 18, 2021)
 
+-   Do not show stack trace in remote environment windowGlobals [#230](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/230/files)
 -   `createApp` takes a new option `enableLegacyRemoteProxying` which defaults to `true`. When set to `false`, local development proxying is disabled when running remotely. In future, local development proxying will *always* be disabled when running remotely. [#205](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/205)
 
 ## v1.2.0 (Nov 18, 2021)

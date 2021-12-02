@@ -27,14 +27,23 @@ const EmptyCart = ({isRegistered}) => {
                                 fontSize={['18px', '2xl']}
                                 fontWeight="bold"
                             >
-                                <FormattedMessage defaultMessage="Your Cart is Empty" />
+                                <FormattedMessage
+                                    defaultMessage="Your Cart is Empty"
+                                    id="empty_cart.description.empty_cart"
+                                />
                             </Text>
 
                             <Text align="center" fontSize="md" color="gray.700">
                                 {isRegistered ? (
-                                    <FormattedMessage defaultMessage="Continue shopping to add items to your cart" />
+                                    <FormattedMessage
+                                        defaultMessage="Continue shopping to add items to your cart"
+                                        id="empty_cart.message.continue_shopping"
+                                    />
                                 ) : (
-                                    <FormattedMessage defaultMessage="Sign in to retrieve your saved items or continue shopping" />
+                                    <FormattedMessage
+                                        defaultMessage="Sign in to retrieve your saved items or continue shopping"
+                                        id="empty_cart.message.sign_in_or_continue_shopping"
+                                    />
                                 )}
                             </Text>
                         </Stack>
@@ -46,7 +55,10 @@ const EmptyCart = ({isRegistered}) => {
                                 variant={isRegistered ? 'solid' : 'outline'}
                                 color={isRegistered ? 'white' : 'blue.600'}
                             >
-                                <FormattedMessage defaultMessage="Continue Shopping" />
+                                <FormattedMessage
+                                    defaultMessage="Continue Shopping"
+                                    id="empty_cart.link.continue_shopping"
+                                />
                             </Button>
                             {!isRegistered && (
                                 <Button
@@ -56,7 +68,10 @@ const EmptyCart = ({isRegistered}) => {
                                     rightIcon={<AccountIcon />}
                                     variant="solid"
                                 >
-                                    <FormattedMessage defaultMessage="Sign In" />
+                                    <FormattedMessage
+                                        defaultMessage="Sign In"
+                                        id="empty_cart.link.sign_in"
+                                    />
                                 </Button>
                             )}
                         </Stack>

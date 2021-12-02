@@ -70,7 +70,10 @@ export default function ShippingOptions() {
     return (
         <ToggleCard
             id="step-2"
-            title={formatMessage({defaultMessage: 'Shipping & Gift Options'})}
+            title={formatMessage({
+                defaultMessage: 'Shipping & Gift Options',
+                id: 'shipping_options.title.shipping_gift_options'
+            })}
             editing={step === 2}
             isLoading={form.formState.isSubmitting}
             disabled={selectedShippingMethod == null || !selectedShippingAddress}
@@ -140,13 +143,19 @@ export default function ShippingOptions() {
 
                         <Box>
                             <Button variant="link" size="sm" rightIcon={<ChevronDownIcon />}>
-                                <FormattedMessage defaultMessage="Do you want to send this as a gift?" />
+                                <FormattedMessage
+                                    defaultMessage="Do you want to send this as a gift?"
+                                    id="shipping_options.action.send_as_a_gift"
+                                />
                             </Button>
                         </Box>
                         <Box>
                             <Container variant="form">
                                 <Button w="full" type="submit">
-                                    <FormattedMessage defaultMessage="Continue to Payment" />
+                                    <FormattedMessage
+                                        defaultMessage="Continue to Payment"
+                                        id="shipping_options.button.continue_to_payment"
+                                    />
                                 </Button>
                             </Container>
                         </Box>

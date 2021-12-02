@@ -21,7 +21,7 @@ const nonSupportedLocale = 'nl-NL'
 // Otherwise, our code would fall back to default and incorrectly pass the tests
 const supportedLocale = supportedLocales[1]
 
-const testId1 = 'login-redirect.message.welcome'
+const testId1 = 'footer.link.privacy_policy'
 const testId2 = 'homepage.message.welcome'
 
 test('our assumptions before further testing', () => {
@@ -44,7 +44,7 @@ describe('whichLocaleToLoad', () => {
 describe('loadLocaleData', () => {
     test('default to English as the fallback locale', async () => {
         const messages = await loadLocaleData(nonSupportedLocale)
-        expect(messages[testId1][0].value).toMatch(/login redirect/i)
+        expect(messages[testId1][0].value).toMatch(/Privacy Policy/i)
     })
     test('loading one of the supported locales', async () => {
         const messages = await loadLocaleData(supportedLocale)
@@ -52,7 +52,7 @@ describe('loadLocaleData', () => {
     })
     test('loading the pseudo locale', async () => {
         const messages = await loadLocaleData('en-XB')
-        expect(messages[testId1][0].value).toMatch(/^\[!! Ļŏĝĝĝíń Ŕèḋḋḋíŕèèèćṭ !!]$/)
+        expect(messages[testId1][0].value).toMatch(/^\[!! Ṕŕíííṿâćććẏ ṔṔṔŏĺíííćẏ !!]$/)
     })
     test('handling a not-found translation file', async () => {
         expect(supportedLocale).not.toBe(DEFAULT_LOCALE)
@@ -111,7 +111,7 @@ describe('getLocaleConfig', () => {
         // The app should still think its target locale is the default one
         expect(config.app.targetLocale).toBe(DEFAULT_LOCALE)
         // But the actual translation should be using the pseudo locale
-        expect(config.messages[testId1][0].value).toMatch(/^\[!! Ļŏĝĝĝíń Ŕèḋḋḋíŕèèèćṭ !!]$/)
+        expect(config.messages[testId1][0].value).toMatch(/^\[!! Ṕŕíííṿâćććẏ ṔṔṔŏĺíííćẏ !!]$/)
     })
 })
 

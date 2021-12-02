@@ -28,7 +28,10 @@ const withRegistration = (Component) => {
                 // Do not show auth modal if users is already on the login page
                 if (isLoginPage) {
                     showToast({
-                        title: formatMessage({defaultMessage: 'Please sign in to continue!'}),
+                        title: formatMessage({
+                            defaultMessage: 'Please sign in to continue!',
+                            id: 'with_registration.info.please_sign_in'
+                        }),
                         status: 'info'
                     })
                 } else {
