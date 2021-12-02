@@ -13,26 +13,11 @@ import Suggestions from './partials/suggestions'
 import {noop} from '../../utils/utils'
 import mockSearchResults from '../../commerce-api/mocks/searchResults'
 
-const sessionStorageMock = {
-    getItem: jest.fn(),
-    setItem: jest.fn(),
-    clear: jest.fn()
-}
-
-global.sessionStorage = sessionStorageMock
-
 jest.mock('../../commerce-api/utils', () => {
     const originalModule = jest.requireActual('../../commerce-api/utils')
     return {
         ...originalModule,
         isTokenValid: jest.fn().mockReturnValue(true)
-    }
-})
-jest.mock('../../utils/utils', () => {
-    const original = jest.requireActual('../../utils/utils')
-    return {
-        ...original,
-        getUrlConfig: jest.fn()
     }
 })
 
