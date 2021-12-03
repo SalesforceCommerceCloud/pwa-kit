@@ -9,10 +9,10 @@ import theme from '@chakra-ui/theme'
 
 /**
  * @param {Object} props
- * @param {string} props.src - If responsive image, src needs to have optional param like this: `image[_{width}].jpg` or `image.jpg[?sw={width}&q=60]`
- * @param {number[]} props.vwSizes - Sizes in vw unit, which will be mapped to sizes and srcSet attributes
- * @param {(string[]|Object|string)} props.sizes - Rules for browser to pick the appropriate size, according to Chakra's breakpoints
- * @param {(number[]|string)} props.srcSet - A set of image widths that are available for browser to download
+ * @param {string} props.src - A responsive image's src needs to have optional param like this: `image[_{width}].jpg` or `image.jpg[?sw={width}&q=60]`
+ * @param {(number[]|Object)} props.vwSizes - Sizes in vw unit (relative to Chakra's breakpoints), which will be mapped to sizes and srcSet attributes
+ * @param {(string[]|Object|string)} props.sizes - Rules for browser to pick the appropriate size. If it's an array or object, its value will be relative to Chakra's breakpoints.
+ * @param {(number[]|string)} props.srcSet - A set of images that are available for browser to download
  * @return {Object} src, sizes, and srcSet props for Chakra image component
  *
  * @example

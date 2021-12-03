@@ -11,7 +11,7 @@ import {getResponsiveImageAttributes} from '../../utils/responsive-image'
 
 const propTypes = {
     src: PropTypes.string,
-    vwSizes: PropTypes.arrayOf(PropTypes.number),
+    vwSizes: PropTypes.oneOfType([PropTypes.arrayOf(PropTypes.number), PropTypes.object]),
     sizes: PropTypes.oneOfType([
         PropTypes.arrayOf(PropTypes.string),
         PropTypes.object,
