@@ -33,7 +33,8 @@ const CartItems = ({basket}) => {
                     onClick={() => setCartItemsExpanded(!cartItemsExpanded)}
                 >
                     <FormattedMessage
-                        description="# item(s) in cart"
+                        id="order_summary.cart_items.action.num_of_items_in_cart"
+                        description="clicking it would expand/show the items in cart"
                         defaultMessage="{itemCount, plural, =0 {0 items} one {# item} other {# items}} in cart"
                         values={{itemCount: basket.itemAccumulatedCount}}
                     />
@@ -57,7 +58,7 @@ const CartItems = ({basket}) => {
                             >
                                 <Flex width="full" alignItems="flex-start">
                                     <CartItemVariantImage width="80px" mr={2} />
-                                    <Stack spacing={1} marginTop="-3px">
+                                    <Stack width="full" spacing={1} marginTop="-3px">
                                         <CartItemVariantName />
                                         <CartItemVariantAttributes includeQuantity />
                                         <CartItemVariantPrice baseDirection="row" />
@@ -68,7 +69,10 @@ const CartItems = ({basket}) => {
                     })}
 
                     <Button as={Link} to="/cart" variant="link" width="full">
-                        <FormattedMessage defaultMessage="Edit cart" />
+                        <FormattedMessage
+                            defaultMessage="Edit cart"
+                            id="order_summary.cart_items.link.edit_cart"
+                        />
                     </Button>
                 </Stack>
             )}
@@ -100,7 +104,10 @@ const OrderSummary = ({
     return (
         <Stack data-testid="sf-order-summary" spacing={5}>
             <Heading fontSize={fontSize} pt={1}>
-                <FormattedMessage defaultMessage="Order Summary" />
+                <FormattedMessage
+                    defaultMessage="Order Summary"
+                    id="order_summary.heading.order_summary"
+                />
             </Heading>
 
             <Stack spacing={4} align="flex-start">
@@ -109,7 +116,10 @@ const OrderSummary = ({
                 <Stack w="full">
                     <Flex justify="space-between">
                         <Text fontWeight="bold" fontSize={fontSize}>
-                            <FormattedMessage defaultMessage="Subtotal" />
+                            <FormattedMessage
+                                defaultMessage="Subtotal"
+                                id="order_summary.label.subtotal"
+                            />
                         </Text>
                         <Text fontWeight="bold" fontSize={fontSize}>
                             <FormattedNumber
@@ -136,10 +146,18 @@ const OrderSummary = ({
                     <Flex justify="space-between">
                         <Flex alignItems="center">
                             <Text lineHeight={1} fontSize={fontSize}>
-                                <FormattedMessage defaultMessage="Shipping" />
+                                <FormattedMessage
+                                    defaultMessage="Shipping"
+                                    id="order_summary.label.shipping"
+                                />
                                 {hasShippingPromos && (
                                     <Text as="span" ml={1}>
-                                        (<FormattedMessage defaultMessage="promo applied" />)
+                                        (
+                                        <FormattedMessage
+                                            defaultMessage="promo applied"
+                                            id="order_summary.label.promo_applied"
+                                        />
+                                        )
                                     </Text>
                                 )}
                             </Text>
@@ -165,7 +183,10 @@ const OrderSummary = ({
                                 textTransform="uppercase"
                                 fontSize={fontSize}
                             >
-                                <FormattedMessage defaultMessage="Free" />
+                                <FormattedMessage
+                                    defaultMessage="Free"
+                                    id="order_summary.label.free"
+                                />
                             </Text>
                         ) : (
                             <Text fontSize={fontSize}>
@@ -180,7 +201,7 @@ const OrderSummary = ({
 
                     <Flex justify="space-between">
                         <Text fontSize={fontSize}>
-                            <FormattedMessage defaultMessage="Tax" />
+                            <FormattedMessage defaultMessage="Tax" id="order_summary.label.tax" />
                         </Text>
                         {basket.taxTotal != null ? (
                             <Text fontSize={fontSize}>
@@ -210,11 +231,17 @@ const OrderSummary = ({
                     <Flex w="full" justify="space-between">
                         {isEstimate ? (
                             <Text fontWeight="bold" fontSize={fontSize}>
-                                <FormattedMessage defaultMessage="Estimated Total" />
+                                <FormattedMessage
+                                    defaultMessage="Estimated Total"
+                                    id="order_summary.label.estimated_total"
+                                />
                             </Text>
                         ) : (
                             <Text fontWeight="bold" fontSize={fontSize}>
-                                <FormattedMessage defaultMessage="Order Total" />
+                                <FormattedMessage
+                                    defaultMessage="Order Total"
+                                    id="order_summary.label.order_total"
+                                />
                             </Text>
                         )}
                         <Text fontWeight="bold" fontSize={fontSize}>
@@ -235,7 +262,11 @@ const OrderSummary = ({
                             bg="white"
                         >
                             <Text fontWeight="medium" fontSize={fontSize}>
-                                <FormattedMessage defaultMessage="Promotions applied" />:
+                                <FormattedMessage
+                                    defaultMessage="Promotions applied"
+                                    id="order_summary.label.promotions_applied"
+                                />
+                                :
                             </Text>
                             <Stack>
                                 {basket.couponItems.map((item) => (
@@ -255,7 +286,10 @@ const OrderSummary = ({
                                                 colorScheme="red"
                                                 onClick={() => removePromoCode(item.couponItemId)}
                                             >
-                                                <FormattedMessage defaultMessage="Remove" />
+                                                <FormattedMessage
+                                                    defaultMessage="Remove"
+                                                    id="order_summary.action.remove_promo"
+                                                />
                                             </Button>
                                         )}
                                     </Flex>

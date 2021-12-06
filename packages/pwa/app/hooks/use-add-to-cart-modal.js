@@ -85,7 +85,8 @@ export const AddToCartModal = () => {
                     {intl.formatMessage(
                         {
                             defaultMessage:
-                                '{quantity} {quantity, plural, one {item} other {items}} added to cart'
+                                '{quantity} {quantity, plural, one {item} other {items}} added to cart',
+                            id: 'add_to_cart_modal.info.added_to_cart'
                         },
                         {quantity}
                     )}
@@ -125,7 +126,8 @@ export const AddToCartModal = () => {
                                             })}
                                             <Text>
                                                 {intl.formatMessage({
-                                                    defaultMessage: 'Qty'
+                                                    defaultMessage: 'Qty',
+                                                    id: 'add_to_cart_modal.label.quantity'
                                                 })}
                                                 : {quantity}
                                             </Text>
@@ -153,7 +155,8 @@ export const AddToCartModal = () => {
                                     {intl.formatMessage(
                                         {
                                             defaultMessage:
-                                                'Cart Subtotal ({itemAccumulatedCount} item)'
+                                                'Cart Subtotal ({itemAccumulatedCount} item)',
+                                            id: 'add_to_cart_modal.label.cart_subtotal'
                                         },
                                         {itemAccumulatedCount}
                                     )}
@@ -169,7 +172,8 @@ export const AddToCartModal = () => {
                             <Stack spacing="4">
                                 <Button as={Link} to="/cart" width="100%" variant="solid">
                                     {intl.formatMessage({
-                                        defaultMessage: 'View Cart'
+                                        defaultMessage: 'View Cart',
+                                        id: 'add_to_cart_modal.link.view_cart'
                                     })}
                                 </Button>
 
@@ -181,7 +185,8 @@ export const AddToCartModal = () => {
                                     rightIcon={<LockIcon />}
                                 >
                                     {intl.formatMessage({
-                                        defaultMessage: 'Proceed to Checkout'
+                                        defaultMessage: 'Proceed to Checkout',
+                                        id: 'add_to_cart_modal.link.checkout'
                                     })}
                                 </Button>
                             </Stack>
@@ -190,7 +195,12 @@ export const AddToCartModal = () => {
                 </ModalBody>
                 <Box padding="8">
                     <RecommendedProducts
-                        title={<FormattedMessage defaultMessage="You Might Also Like" />}
+                        title={
+                            <FormattedMessage
+                                defaultMessage="You Might Also Like"
+                                id="add_to_cart_modal.recommended_products.title.might_also_like"
+                            />
+                        }
                         recommender={'pdp-similar-items'}
                         products={product && [product.id]}
                         mx={{base: -4, md: -8, lg: 0}}

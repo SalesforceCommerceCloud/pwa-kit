@@ -122,7 +122,8 @@ const RecommendedProducts = ({zone, recommender, products, title, shouldFetch, .
                 title: formatMessage(
                     {
                         defaultMessage:
-                            '{quantity} {quantity, plural, one {item} other {items}} added to wishlist'
+                            '{quantity} {quantity, plural, one {item} other {items}} added to wishlist',
+                        id: 'recommended_products.info.added_to_wishlist'
                     },
                     {quantity: 1}
                 ),
@@ -140,10 +141,7 @@ const RecommendedProducts = ({zone, recommender, products, title, shouldFetch, .
             })
         } catch {
             toast({
-                title: formatMessage(
-                    {defaultMessage: '{errorMessage}'},
-                    {errorMessage: API_ERROR_MESSAGE}
-                ),
+                title: formatMessage(API_ERROR_MESSAGE),
                 status: 'error'
             })
         }
@@ -152,16 +150,16 @@ const RecommendedProducts = ({zone, recommender, products, title, shouldFetch, .
         try {
             await wishlist.removeListItemByProductId(product.productId)
             toast({
-                title: formatMessage({defaultMessage: 'Item removed from wishlist'}),
+                title: formatMessage({
+                    defaultMessage: 'Item removed from wishlist',
+                    id: 'recommended_products.info.removed_from_wishlist'
+                }),
                 status: 'success',
                 id: product.productId
             })
         } catch {
             toast({
-                title: formatMessage(
-                    {defaultMessage: '{errorMessage}'},
-                    {errorMessage: API_ERROR_MESSAGE}
-                ),
+                title: formatMessage(API_ERROR_MESSAGE),
                 status: 'error'
             })
         }

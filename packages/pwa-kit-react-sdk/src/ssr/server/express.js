@@ -127,6 +127,9 @@ export const REMOTE_REQUIRED_ENV_VARS = [
  * @param {String} options.sslFilePath - the absolute path to a PEM format
  * certificate file to be used by the local development server. This should
  * contain both the certificate and the private key.
+ * @param {Boolean} [options.enableLegacyRemoteProxying=true] - When running remotely (as
+ * oppsed to locally), enables legacy proxying behaviour, allowing "proxy" requests to route through
+ * the express server. In the future, this behaviour and setting will be removed.
  */
 
 export const createApp = (options) => {
@@ -153,10 +156,11 @@ export const createApp = (options) => {
         // Suppress SSL checks - can be used for local dev server
         // test code. Undocumented at present because there should
         // be no use-case for SDK users to set this.
-        strictSSL: true
+        strictSSL: true,
+
+        enableLegacyRemoteProxying: true
     }
 
-    // Build the options, filling in default values
     options = Object.assign({}, defaults, options)
 
     setQuiet(options.quiet || process.env.SSR_QUIET)
@@ -196,7 +200,6 @@ export const createApp = (options) => {
     // Configure the server with the basic options
     updatePackageMobify(options.mobify)
 
-    // Set up the proxies
     configureProxyConfigs(options.appHostname, options.protocol)
 
     const app = createExpressApp(options)
@@ -248,14 +251,29 @@ export const createApp = (options) => {
         })
     }
 
-    // The /mobify/ping path provides a very fast and lightweight
-    // healthcheck response.
-    app.get('/mobify/ping', (req, res) =>
+    // Healthcheck
+    app.get('/mobify/ping', (_, res) =>
         res
             .set('cache-control', NO_CACHE)
             .sendStatus(200)
             .end()
     )
+
+    // Proxying
+    const shouldProxy = !isRemote() || options.enableLegacyRemoteProxying
+    if (shouldProxy) {
+        proxyConfigs.forEach((config) => {
+            app.use(config.proxyPath, config.proxy)
+            app.use(config.cachingPath, config.cachingProxy)
+        })
+    } else {
+        app.all('/mobify/proxy/*', (_, res) => {
+            return res.status(501).json({
+                message:
+                    'Environment proxies are not set: https://sfdc.co/managed-runtime-setup-proxies'
+            })
+        })
+    }
 
     // Both local and remote modes can perform proxying. A remote
     // server usually only does proxying for development deployments
@@ -391,6 +409,14 @@ const validateConfiguration = (options) => {
                 'in PEM format, whose name ends with ".pem". ' +
                 'See the "cert" and "key" options on ' +
                 'https://nodejs.org/api/tls.html#tls_tls_createsecurecontext_options'
+        )
+    }
+
+    if (options.enableLegacyRemoteProxying) {
+        console.warn(
+            'Legacy proxying behaviour is enabled. ' +
+                'This behaviour is deprecated and will be removed in the future.' +
+                'To disable it, pass `createApp({ enableLegacyRemoteProxying: false` })'
         )
     }
 }
@@ -1656,9 +1682,6 @@ const applyPatches = once((options) => {
     // Patch the http.request/get and https.request/get
     // functions to allow us to intercept them (since
     // there are multiple ways to make requests in Node).
-    // We patch once and once only, because otherwise
-    // it's challenging to test the server under different
-    // conditions.
     const getAppHost = () => options.appHostname
     http.request = outgoingRequestHook(http.request, getAppHost)
     http.get = outgoingRequestHook(http.get, getAppHost)
