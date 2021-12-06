@@ -256,6 +256,12 @@ const renderApp = (args) => {
 
     const helmet = Helmet.renderStatic()
 
+    // Remove the stacktrace when executing remotely as to not leak any important
+    // information to users about our system.
+    if (error && isRemote()) {
+        delete error.stack
+    }
+
     // Do not include *dynamic*, executable inline scripts – these cause issues with
     // strict CSP headers that customers often want to use. Avoid inline scripts,
     // full-stop, whenever possible.
@@ -267,7 +273,7 @@ const renderApp = (args) => {
     const windowGlobals = {
         __DEVICE_TYPE__: deviceType,
         __PRELOADED_STATE__: appState,
-        __ERROR__: error && isRemote() ? {...error, stack: undefined} : error,
+        __ERROR__: error,
         // `window.Progressive` has a long history at Mobify and some
         // client-side code depends on it. Maintain its name out of tradition.
         Progressive: getWindowProgressive(req, res)
