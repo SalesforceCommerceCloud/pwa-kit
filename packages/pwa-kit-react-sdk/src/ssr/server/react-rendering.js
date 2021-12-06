@@ -28,7 +28,7 @@ import AppConfig from '../universal/components/_app-config'
 import Switch from '../universal/components/switch'
 import {getRoutes, routeComponent} from '../universal/components/route-component'
 import * as errors from '../universal/errors'
-import {detectDeviceType} from '../../utils/ssr-server'
+import {detectDeviceType, isRemote} from '../../utils/ssr-server'
 import {proxyConfigs} from '../../utils/ssr-shared'
 
 import sprite from 'svg-sprite-loader/runtime/sprite.build'
@@ -255,6 +255,12 @@ const renderApp = (args) => {
     }
 
     const helmet = Helmet.renderStatic()
+
+    // Remove the stacktrace when executing remotely as to not leak any important
+    // information to users about our system.
+    if (error && isRemote()) {
+        delete error.stack
+    }
 
     // Do not include *dynamic*, executable inline scripts – these cause issues with
     // strict CSP headers that customers often want to use. Avoid inline scripts,
