@@ -207,8 +207,8 @@ export const render = async (req, res) => {
 const renderApp = (args) => {
     const {req, res, location, routes, appState, error, App} = args
 
-    const ssrOnly = 'mobify_server_only' in req.query
-    const prettyPrint = 'mobify_pretty' in req.query
+    const ssrOnly = 'mobify_server_only' in req.query || 'server_only' in req.query
+    const prettyPrint = 'mobify_pretty' in req.query || 'pretty_print' in req.query
     const indent = prettyPrint ? 8 : 0
     const deviceType = detectDeviceType(req)
     const routerContext = {}
