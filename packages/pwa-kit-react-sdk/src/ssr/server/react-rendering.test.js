@@ -439,20 +439,6 @@ describe('The Node SSR Environment', () => {
             }
         },
         {
-            description: `rendering PWA's in server-only mode should not execute scripts on the client`,
-            req: {url: '/pwa/', query: {__server_only: '1'}},
-            assertions: (res) => {
-                const html = res.text
-                const doc = parse(html)
-                const include = ['<div>This is a PWA</div>']
-                include.forEach((s) => expect(html).toEqual(expect.stringContaining(s)))
-                doc.querySelectorAll('script').forEach((script) => {
-                    // application/json prevents execution!
-                    expect(script.getAttribute('type')).toBe('application/json')
-                })
-            }
-        },
-        {
             description: `404 when no route matches`,
             req: {url: '/this-should-404/'},
             assertions: (res) => {
