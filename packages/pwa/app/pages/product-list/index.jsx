@@ -231,7 +231,7 @@ const ProductList = (props) => {
 
     // API does not always return a selected sorting order
     if (!selectedSortingOptionLabel) {
-        selectedSortingOptionLabel = productSearchResult?.sortingOptions[0]
+        selectedSortingOptionLabel = productSearchResult?.sortingOptions?.[0]
     }
 
     return (

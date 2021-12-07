@@ -104,7 +104,7 @@ const App = (props) => {
 
     const onLogoClick = () => {
         // Goto the home page.
-        const path = homeUrlBuilder(HOME_HREF, targetLocale)
+        const path = homeUrlBuilder(HOME_HREF, {locale: targetLocale, site})
         history.push(path)
 
         // Close the drawer.
@@ -112,7 +112,7 @@ const App = (props) => {
     }
 
     const onCartClick = () => {
-        const path = buildPathWithUrlConfig('/cart', {locale: targetLocale, site: site.alias})
+        const path = buildPathWithUrlConfig('/cart', {locale: targetLocale, site: site?.alias})
         history.push(path)
 
         // Close the drawer.
@@ -124,7 +124,7 @@ const App = (props) => {
         if (customer.isRegistered) {
             const path = buildPathWithUrlConfig('/account', {
                 locale: targetLocale,
-                site: site.alias
+                site: site?.alias
             })
             history.push(path)
         } else {
@@ -137,7 +137,7 @@ const App = (props) => {
     const onWishlistClick = () => {
         const path = buildPathWithUrlConfig('/account/wishlist', {
             locale: targetLocale,
-            site: site.alias
+            site: site?.alias
         })
         history.push(path)
     }
@@ -178,7 +178,10 @@ const App = (props) => {
                                 <link
                                     rel="alternate"
                                     hrefLang={locale.toLowerCase()}
-                                    href={`${appOrigin}${getUrlWithLocale(locale, {location})}`}
+                                    href={`${appOrigin}${getUrlWithLocale(locale, {
+                                        location,
+                                        site
+                                    })}`}
                                     key={locale}
                                 />
                             ))}
@@ -186,7 +189,10 @@ const App = (props) => {
                             <link
                                 rel="alternate"
                                 hrefLang={defaultLocale.slice(0, 2)}
-                                href={`${appOrigin}${getUrlWithLocale(defaultLocale, {location})}`}
+                                href={`${appOrigin}${getUrlWithLocale(defaultLocale, {
+                                    location,
+                                    site
+                                })}`}
                             />
                             {/* A wider fallback for user locales that the app does not support */}
                             <link rel="alternate" hrefLang="x-default" href={`${appOrigin}/`} />

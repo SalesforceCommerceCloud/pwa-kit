@@ -34,7 +34,12 @@ import {getAssetUrl} from 'pwa-kit-react-sdk/ssr/universal/utils'
 import {heroFeatures, features} from './data'
 
 // Constants
-import {HOME_SHOP_PRODUCTS_CATEGORY_ID, HOME_SHOP_PRODUCTS_LIMIT} from '../../constants'
+import {
+    HOME_SHOP_PRODUCTS_CATEGORY_ID,
+    HOME_SHOP_PRODUCTS_LIMIT,
+    urlPartPositions
+} from '../../constants'
+import {getUrlConfig} from '../../utils/utils'
 
 /**
  * This is the home page for Retail React App.
@@ -44,6 +49,7 @@ import {HOME_SHOP_PRODUCTS_CATEGORY_ID, HOME_SHOP_PRODUCTS_LIMIT} from '../../co
  */
 const Home = ({productSearchResult, isLoading}) => {
     const intl = useIntl()
+    const urlConfig = getUrlConfig()
 
     return (
         <Box data-testid="home-page" layerStyle="page">
@@ -52,6 +58,26 @@ const Home = ({productSearchResult, isLoading}) => {
                 description="Commerce Cloud Retail React App"
                 keywords="Commerce Cloud, Retail React App, React Storefront"
             />
+
+            <Section>
+                <Button
+                    mr={4}
+                    onClick={() => {
+                        window.location =
+                            urlConfig['site'] === urlPartPositions.PATH ? '/us' : '/?site=us'
+                    }}
+                >
+                    to US Site
+                </Button>
+
+                <Button
+                    onClick={() => {
+                        window.location = '/'
+                    }}
+                >
+                    to Default Site
+                </Button>
+            </Section>
 
             <Hero
                 title={intl.formatMessage({

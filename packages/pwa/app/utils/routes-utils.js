@@ -26,7 +26,7 @@ export const configureRoutes = (routes = [], {ignoredRoutes = []}) => {
         if (ignoredRoutes.includes(path)) return route
         let basePathSegments = []
 
-        const options = ['locale', 'site']
+        const options = ['site', 'locale']
 
         options.forEach((option) => {
             const position = urlConfig[option]

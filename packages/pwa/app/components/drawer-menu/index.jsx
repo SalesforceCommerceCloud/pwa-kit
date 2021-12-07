@@ -53,6 +53,7 @@ import LoadingSpinner from '../loading-spinner'
 
 import useNavigation from '../../hooks/use-navigation'
 import {getSupportedLocalesIds} from '../../utils/locale'
+import useSite from '../../hooks/use-site'
 
 // The FONT_SIZES and FONT_WEIGHTS constants are used to control the styling for
 // the accordion buttons as their current depth. In the below definition we assign
@@ -84,7 +85,7 @@ const DrawerMenu = ({isOpen, onClose = noop, onLogoClick = noop, root}) => {
     const styles = useMultiStyleConfig('DrawerMenu')
     const drawerSize = useBreakpointValue({sm: PHONE_DRAWER_SIZE, md: TABLET_DRAWER_SIZE})
     const socialIconVariant = useBreakpointValue({base: 'flex', md: 'flex-start'})
-
+    const site = useSite()
     const [showLoading, setShowLoading] = useState(false)
     const onSignoutClick = async () => {
         setShowLoading(true)
@@ -268,7 +269,8 @@ const DrawerMenu = ({isOpen, onClose = noop, onLogoClick = noop, root}) => {
                                     onSelect={(newLocale) => {
                                         // Update the `locale` in the URL.
                                         const newUrl = getUrlWithLocale(newLocale, {
-                                            disallowParams: ['refine']
+                                            disallowParams: ['refine'],
+                                            site
                                         })
                                         window.location = newUrl
                                     }}

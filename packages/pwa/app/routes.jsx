@@ -99,7 +99,12 @@ const routes = [
         component: Wishlist
     },
     {
-        path: '/:locale',
+        path: '/:site',
+        component: Home,
+        exact: true
+    },
+    {
+        path: '/:site/:locale',
         component: Home,
         exact: true
     },
@@ -110,7 +115,7 @@ const routes = [
 ]
 
 const configuredRoutes = configureRoutes(routes, {
-    ignoredRoutes: [HOME_HREF, '/callback', '/:locale', '*']
+    ignoredRoutes: [HOME_HREF, '/callback', '/:site', '/:site/:locale', '*']
 })
 
 export default configuredRoutes

@@ -30,12 +30,14 @@ import {HideOnDesktop, HideOnMobile} from '../responsive'
 import {getUrlWithLocale} from '../../utils/url'
 import LocaleText from '../locale-text'
 import {getSupportedLocalesIds} from '../../utils/locale'
+import useSite from '../../hooks/use-site'
 
 const Footer = ({...otherProps}) => {
     const styles = useMultiStyleConfig('Footer')
+
     const intl = useIntl()
     const [locale, setLocale] = useState(intl.locale)
-
+    const site = useSite()
     return (
         <Box as="footer" {...styles.container} {...otherProps}>
             <Box {...styles.content}>
@@ -132,7 +134,8 @@ const Footer = ({...otherProps}) => {
 
                                     // Update the `locale` in the URL.
                                     const newUrl = getUrlWithLocale(target.value, {
-                                        disallowParams: ['refine']
+                                        disallowParams: ['refine'],
+                                        site
                                     })
 
                                     window.location = newUrl

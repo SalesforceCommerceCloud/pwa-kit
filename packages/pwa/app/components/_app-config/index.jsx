@@ -39,26 +39,29 @@ const apiConfig = {
  */
 const getLocale = (locals = {}) => {
     let {originalUrl} = locals
-    const {locale: localeType} = getUrlConfig()
+    const {locale: localePosition, site: sitePosition} = getUrlConfig()
 
     // If there is no originalUrl value in the locals, create it from the window location.
     // This happens when executing on the client.
     if (!originalUrl) {
         originalUrl = window?.location.href.replace(window.location.origin, '')
     }
-
     let shortCode
     const {pathname, searchParams} = new URL(`${getAppOrigin()}${originalUrl}`)
-    if (localeType === urlPartPositions.PATH) {
+    if (localePosition === urlPartPositions.PATH) {
         // Parse the pathname from the partial using the URL object and a placeholder host
-        shortCode = pathname.split('/')[1]
-    } else if (localeType === urlPartPositions.QUERY_PARAM) {
+        // locale can be in a different position depending on the site position
+        if (sitePosition === urlPartPositions.PATH) {
+            shortCode = pathname.split('/')[2]
+        } else {
+            shortCode = pathname.split('/')[1]
+        }
+    } else if (localePosition === urlPartPositions.QUERY_PARAM) {
         shortCode = searchParams.get('locale')
     }
 
     // Ensure that the locale is in the supported list, otherwise return the default.
     shortCode = getSupportedLocalesIds().includes(shortCode) ? shortCode : DEFAULT_LOCALE
-
     return shortCode
 }
 

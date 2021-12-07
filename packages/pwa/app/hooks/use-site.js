@@ -16,12 +16,11 @@ const useSite = () => {
     const defaultSiteID = getDefaultSiteId()
     const params = new URLSearchParams(search)
     let site
-    if (pathname === HOME_HREF) {
+    if (pathname === HOME_HREF && !params.get('site')) {
         return sitesConfig.find((site) => site.id === defaultSiteID)
     }
 
     const sitePosition = urlConfig['site']
-    const localePosition = urlConfig['locale']
     switch (sitePosition) {
         case urlPartPositions.NONE:
             break
@@ -30,14 +29,8 @@ const useSite = () => {
             site = sitesConfig.find((site) => site.alias === currentSite)
             break
         }
-
         case urlPartPositions.PATH: {
-            let currentSite
-            if (localePosition === urlPartPositions.PATH) {
-                currentSite = pathname.split('/')[2]
-            } else {
-                currentSite = pathname.split('/')[1]
-            }
+            let currentSite = pathname.split('/')[1]
             site = sitesConfig.find((site) => site.alias === currentSite)
             break
         }
