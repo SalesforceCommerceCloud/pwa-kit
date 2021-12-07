@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {DEFAULT_LOCALE} from '../constants'
+import {DEFAULT_LOCALE, DEFAULT_SITE_ID, HOME_HREF} from '../constants'
 import {getUrlConfig} from './utils'
 import {urlPartPositions} from '../constants'
 
@@ -111,10 +111,10 @@ export const searchUrlBuilder = (searchTerm) => `/search?q=${searchTerm}`
  * @returns {string} - The relative URL for the specific locale.
  */
 export const getUrlWithLocale = (shortCode, opts = {}) => {
-    const {locale: localeParamType} = getUrlConfig()
+    const {locale: localePosition, site: sitePosition} = getUrlConfig()
     const location = opts.location ? opts.location : window.location
 
-    const {disallowParams = []} = opts
+    const {disallowParams = [], site} = opts
     let relativeUrl = location.pathname
 
     const params = new URLSearchParams(location.search)
@@ -125,39 +125,44 @@ export const getUrlWithLocale = (shortCode, opts = {}) => {
             params.delete(param)
         })
     }
-
-    let paths = relativeUrl.split('/').filter((path) => path !== '')
-
-    if (localeParamType === urlPartPositions.PATH) {
-        // Array of the paths without empty items
-
-        // Remove the previous locale
-        paths.shift()
-
-        // Add the new locale
-        if (shortCode !== DEFAULT_LOCALE || paths?.length > 0) {
-            paths.unshift(shortCode)
+    if (relativeUrl === HOME_HREF) {
+        relativeUrl = buildPathWithUrlConfig(relativeUrl, {site: site.alias, locale: shortCode})
+    } else {
+        let paths = relativeUrl.split('/').filter((path) => path !== '')
+        // chop out the locale and site params in the url for rebuild
+        if (localePosition === urlPartPositions.PATH && sitePosition === urlPartPositions.PATH) {
+            paths.splice(0, 2)
+        } else {
+            paths.shift()
         }
-    } else if (localeParamType === urlPartPositions.QUERY_PARAM) {
-        params.set('locale', shortCode)
-    }
 
-    relativeUrl = `/${paths.join('/')}${Array.from(params).length > 0 ? `?${params}` : ''}`
+        const urlWithoutBasePath = `/${paths.join('/')}`
+        relativeUrl = buildPathWithUrlConfig(urlWithoutBasePath, {
+            locale: shortCode !== DEFAULT_LOCALE || paths?.length > 0 ? shortCode : '',
+            site: site.id !== DEFAULT_SITE_ID || paths?.length > 0 ? site?.alias : ''
+        })
+    }
 
     return relativeUrl
 }
 
 /**
- * Builds the Home page URL for a given locale.
+ * Builds the Home page URL for a given locale and site.
  * We don't add the locale to the URL for the default locale.
- *
+ * '/' default locale & site
+ * '/global/it-IT', '/?locale=it-IT&site=global' non-default locale, default site
+ * '/us', '/?site=us  default locale, non-default site
+ * '/us/it-IT' '/?locale=it-IT&site=us' non-default locale, non-default site
  * @param homeHref
- * @param locale
+ * @param options
  * @returns {string}
  */
-export const homeUrlBuilder = (homeHref, locale) => {
+export const homeUrlBuilder = (homeHref, options = {}) => {
+    const {locale, site} = options
+    console.log('site', site)
     const updatedUrl = buildPathWithUrlConfig(homeHref, {
-        locale: locale !== DEFAULT_LOCALE ? locale : ''
+        locale: locale !== DEFAULT_LOCALE ? locale : '',
+        site: site?.id === DEFAULT_SITE_ID && locale === DEFAULT_LOCALE ? '' : site?.alias
     })
     return encodeURI(updatedUrl)
 }
@@ -229,7 +234,7 @@ export const buildPathWithUrlConfig = (url, configValues = {}) => {
     if (!urlConfig || !Object.values(urlConfig).length) return url
     if (!Object.values(configValues).length) return url
     const queryParams = {}
-    const basePathSegments = []
+    let basePathSegments = []
 
     const options = ['site', 'locale']
 
@@ -246,11 +251,9 @@ export const buildPathWithUrlConfig = (url, configValues = {}) => {
                 break
         }
     })
-
-    // filter the array and build the pathname
-    let updatedPath = `${
-        basePathSegments.filter(Boolean).length ? `/${basePathSegments.join('/')}` : ''
-    }${url}`
+    // filter out falsy value in the array
+    basePathSegments = basePathSegments.filter(Boolean)
+    let updatedPath = `${basePathSegments.length ? `/${basePathSegments.join('/')}` : ''}${url}`
     // append the query param to pathname
     if (Object.keys(queryParams).length) {
         updatedPath = rebuildPathWithParams(updatedPath, queryParams)
