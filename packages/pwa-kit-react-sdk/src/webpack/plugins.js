@@ -107,7 +107,8 @@ export class PwaKitConfigPlugin {
      * custom property schemas, you want to use this when you extend the schema.
      * @param {String} [options.customSchemas.key] - The key of the property.
      * @param {Boolean} [options.customSchemas.required] - Required.
-     * @param {Object} [options.customSchemas.schema] - The JSON schema.
+     * @param {Object} [options.customSchemas.schema] - The JSON schema for the
+     * custom property.
      */
     constructor(options = {}) {
         this.path = options.path || './pwa-kit.config.json'
@@ -120,8 +121,14 @@ export class PwaKitConfigPlugin {
      * @param compiler {Object} the webpack compiler
      */
     apply(compiler) {
-        const config = this.getConfig(compiler)
-        this.validate(config)
+        compiler.hooks.compilation.tap('PwaKitConfigPlugin', (compilation) => {
+            const config = this.getConfig(compiler)
+            try {
+                this.validate(config)
+            } catch (e) {
+                compilation.errors.push(e)
+            }
+        })
     }
 
     getConfig(compiler) {
