@@ -97,7 +97,9 @@ export class BuildMarkerPlugin {
 }
 
 /**
- * Validate configurations
+ * This webpack plugin takes pwa kit configuration from the project,
+ * and validate the config object against the schema. It also supports
+ * schema extension which allow users to add custom schemas.
  */
 export class PwaKitConfigPlugin {
     /**
@@ -131,6 +133,12 @@ export class PwaKitConfigPlugin {
         })
     }
 
+    /**
+     * Find the config file from project and return the value.
+     *
+     * @param compiler {Object} the webpack compiler
+     * @returns {object} - The configuration object
+     */
     getConfig(compiler) {
         const {fileSystem} = compiler.inputFileSystem
         const absolutePath = path.resolve(this.path)
@@ -145,8 +153,9 @@ export class PwaKitConfigPlugin {
 
     /**
      * Validate configurations based on pwa-kit-react-sdk schema
-     * and custom properties added here. Errors will be thrown when
-     * validation fails.
+     * and custom schema. Errors will be thrown when validation fails.
+     *
+     * @param config {Object} - the configuration object
      */
     validate(config) {
         const ajv = new Ajv()
