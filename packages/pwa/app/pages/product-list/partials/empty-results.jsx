@@ -15,7 +15,7 @@ import RecommendedProducts from '../../../components/recommended-products'
 
 const contactUsMessage = defineMessage({
     id: 'empty_search_results.link.contact_us',
-    defaultMessage: 'contact us'
+    defaultMessage: 'Contact Us'
 })
 
 const EmptySearchResults = ({searchQuery, category}) => {
@@ -57,7 +57,7 @@ const EmptySearchResults = ({searchQuery, category}) => {
                         {intl.formatMessage(
                             {
                                 id: 'empty_search_results.info.cant_find_anything_for_query',
-                                defaultMessage: 'We couldn’t find anything for "{searchQuery}"'
+                                defaultMessage: 'We couldn’t find anything for "{searchQuery}".'
                             },
                             {
                                 searchQuery: searchQuery
@@ -68,7 +68,7 @@ const EmptySearchResults = ({searchQuery, category}) => {
                         {intl.formatMessage(
                             {
                                 id: 'empty_search_results.info.double_check_spelling',
-                                defaultMessage: 'Double-check your spelling and try again or {link}'
+                                defaultMessage: 'Double-check your spelling and try again or {link}.'
                             },
                             {
                                 link: (

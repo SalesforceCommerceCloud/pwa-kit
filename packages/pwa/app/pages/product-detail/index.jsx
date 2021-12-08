@@ -250,7 +250,7 @@ const ProductDetail = ({category, product, isLoading}) => {
                     <RecommendedProducts
                         title={
                             <FormattedMessage
-                                defaultMessage="Complete The Set"
+                                defaultMessage="Complete the Set"
                                 id="product_detail.recommended_products.title.complete_set"
                             />
                         }

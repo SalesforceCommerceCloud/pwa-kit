@@ -81,7 +81,7 @@ const Footer = ({...otherProps}) => {
                                         href: '/',
                                         text: intl.formatMessage({
                                             id: 'footer.link.signin_create_account',
-                                            defaultMessage: 'Sign in or Create Account'
+                                            defaultMessage: 'Sign in or create account'
                                         })
                                     }
                                 ]}
@@ -188,7 +188,7 @@ const Subscribe = ({...otherProps}) => {
             <Heading {...styles.subscribeHeading}>
                 {intl.formatMessage({
                     id: 'footer.subscribe.heading.first_to_know',
-                    defaultMessage: 'Be the first to know'
+                    defaultMessage: 'Be the First to Know'
                 })}
             </Heading>
             <Text {...styles.subscribeMessage}>

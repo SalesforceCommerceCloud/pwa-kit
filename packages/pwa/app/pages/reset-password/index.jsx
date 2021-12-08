@@ -74,7 +74,7 @@ const ResetPassword = () => {
                             </Text>
                             <Button onClick={() => navigate('/login')}>
                                 <FormattedMessage
-                                    defaultMessage="Back to sign in"
+                                    defaultMessage="Back to Sign In"
                                     id="reset_password.button.back_to_sign_in"
                                 />
                             </Button>
