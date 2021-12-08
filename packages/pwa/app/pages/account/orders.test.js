@@ -18,6 +18,15 @@ import {
 } from '../../commerce-api/mock-data'
 import useCustomer from '../../commerce-api/hooks/useCustomer'
 import Orders from './orders'
+import {getUrlConfig} from '../../utils/utils'
+
+jest.mock('../../utils/utils', () => {
+    const original = jest.requireActual('../../utils/utils')
+    return {
+        ...original,
+        getUrlConfig: jest.fn()
+    }
+})
 
 jest.mock('../../commerce-api/utils', () => {
     const originalModule = jest.requireActual('../../commerce-api/utils')
@@ -42,7 +51,7 @@ const MockedComponent = () => {
 
     return (
         <Switch>
-            <Route path="/en-GB/orders">
+            <Route path="/en-GB/account/orders">
                 <Orders />
             </Route>
         </Switch>
@@ -96,9 +105,12 @@ const server = setupServer(
 // Set up and clean up
 beforeEach(() => {
     jest.resetModules()
+    getUrlConfig.mockImplementation(() => ({
+        locale: 'path'
+    }))
     server.listen({onUnhandledRequest: 'error'})
 
-    window.history.pushState({}, 'Account', '/en-GB/orders')
+    window.history.pushState({}, 'Account', '/en-GB/account/orders')
 })
 afterEach(() => {
     localStorage.clear()
@@ -107,7 +119,7 @@ afterEach(() => {
 afterAll(() => server.close())
 
 test('Renders order history and details', async () => {
-    renderWithProviders(<MockedComponent />)
+    renderWithProviders(<MockedComponent history={history} />)
     expect(await screen.findByTestId('account-order-history-page')).toBeInTheDocument()
     expect(await screen.findAllByText(/Ordered: /i)).toHaveLength(3)
     expect(

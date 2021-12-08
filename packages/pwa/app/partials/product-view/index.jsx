@@ -143,8 +143,14 @@ const ProductView = ({
                     marginBottom={4}
                 >
                     {updateCart
-                        ? intl.formatMessage({defaultMessage: 'Update'})
-                        : intl.formatMessage({defaultMessage: 'Add to cart'})}
+                        ? intl.formatMessage({
+                              defaultMessage: 'Update',
+                              id: 'product_view.button.update'
+                          })
+                        : intl.formatMessage({
+                              defaultMessage: 'Add to cart',
+                              id: 'product_view.button.add_to_cart'
+                          })}
                 </Button>
             )
         }
@@ -161,8 +167,14 @@ const ProductView = ({
                     marginBottom={4}
                 >
                     {updateWishlist
-                        ? intl.formatMessage({defaultMessage: 'Update'})
-                        : intl.formatMessage({defaultMessage: 'Add to wishlist'})}
+                        ? intl.formatMessage({
+                              defaultMessage: 'Update',
+                              id: 'product_view.button.update'
+                          })
+                        : intl.formatMessage({
+                              defaultMessage: 'Add to wishlist',
+                              id: 'product_view.button.add_to_wishlist'
+                          })}
                 </ButtonWithRegistration>
             )
         }
@@ -201,7 +213,8 @@ const ProductView = ({
                                     <Link to={`/product/${product.master.masterId}`}>
                                         <Text color="blue.600">
                                             {intl.formatMessage({
-                                                defaultMessage: 'See full details'
+                                                defaultMessage: 'See full details',
+                                                id: 'product_view.link.full_details'
                                             })}
                                         </Text>
                                     </Link>
@@ -299,7 +312,8 @@ const ProductView = ({
                             <Box fontWeight="bold">
                                 <label htmlFor="quantity">
                                     {intl.formatMessage({
-                                        defaultMessage: 'Quantity'
+                                        defaultMessage: 'Quantity',
+                                        id: 'product_view.label.quantity'
                                     })}
                                     :
                                 </label>
@@ -340,7 +354,8 @@ const ProductView = ({
                                 <Link to={`/product/${product.master.masterId}`}>
                                     <Text color="blue.600">
                                         {intl.formatMessage({
-                                            defaultMessage: 'See full details'
+                                            defaultMessage: 'See full details',
+                                            id: 'product_view.link.full_details'
                                         })}
                                     </Text>
                                 </Link>
@@ -348,7 +363,7 @@ const ProductView = ({
                         </HideOnDesktop>
                     </VStack>
 
-                    <Box display={['none', 'none', 'none', 'block']}>
+                    <Box>
                         {!showLoading && showInventoryMessage && (
                             <Fade in={true}>
                                 <Text color="orange.600" fontWeight={600} marginBottom={8}>
@@ -356,7 +371,9 @@ const ProductView = ({
                                 </Text>
                             </Fade>
                         )}
-                        {renderActionButtons()}
+                        <Box display={['none', 'none', 'none', 'block']}>
+                            {renderActionButtons()}
+                        </Box>
                     </Box>
                 </VStack>
             </Flex>
