@@ -8,6 +8,7 @@
 import {getSitesConfig, getUrlConfig, getDefaultSiteId} from '../utils/utils'
 import {HOME_HREF, urlPartPositions} from '../constants'
 import {useLocation} from 'react-router-dom'
+import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
 
 const useSite = () => {
     const sitesConfig = getSitesConfig()
@@ -16,6 +17,18 @@ const useSite = () => {
     const defaultSiteID = getDefaultSiteId()
     const params = new URLSearchParams(search)
     let site
+
+    const appOrigin = getAppOrigin()
+    const {hostname} = new URL(appOrigin)
+
+    // search site by hostname first
+    site = sitesConfig.filter((site) => {
+        return site?.hostname?.some((i) => i.includes(hostname))
+    })
+    if (site) {
+        return site
+    }
+
     if (pathname === HOME_HREF && !params.get('site')) {
         return sitesConfig.find((site) => site.id === defaultSiteID)
     }

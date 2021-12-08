@@ -188,6 +188,7 @@ export const getSiteId = (url) => {
 
     const {hostname, pathname, search} = new URL(`${getAppOrigin()}${path}`)
     let siteId = getSiteIdByHostname(hostname)
+
     if (siteId) {
         return siteId
     }
@@ -205,12 +206,16 @@ const getSiteIdByHostname = (hostname) => {
     const sitesConfig = getSitesConfig()
     if (!sitesConfig.length) throw new Error('No site config found. Please check you configuration')
     if (!hostname) return undefined
-    const site = sitesConfig.filter((site) => site?.hostname?.includes(hostname))
-    return site?.length === 1 ? site.id : undefined
+
+    const site = sitesConfig.filter((site) => {
+        return site?.hostname?.some((i) => i.includes(hostname))
+    })
+
+    return site?.length === 1 ? site[0].id : undefined
 }
 
 /**
- * return the site id based on the site alias in the given url
+ * get the site id based on the site alias in the given url
  * @param {string} url - input url
  * @returns {string} siteId
  */
@@ -257,7 +262,6 @@ const getSiteIdByAlias = (url) => {
  * @returns {object}
  */
 export const getL10nConfig = (url) => {
-    console.log('url', url)
     const sitesConfig = getSitesConfig()
     if (!sitesConfig.length) throw new Error('No site config found. Please check you configuration')
     const siteId = getSiteId(url)
