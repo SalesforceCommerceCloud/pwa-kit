@@ -13,6 +13,7 @@ import OcapiShopperOrders from './ocapi-shopper-orders'
 import {getTenantId, isError, isTokenValid} from './utils'
 import Auth from './auth'
 import EinsteinAPI from './einstein'
+import {createAgent} from './utils'
 
 /**
  * The configuration details for the connecting to the API.
@@ -201,11 +202,16 @@ class CommerceAPI {
             await this.auth.login()
         }
 
+        const url = new URL(getAppOrigin())
+
         // Apply the appropriate auth headers and return new options
         const [fetchOptions, ...restParams] = params
         const newFetchOptions = {
             ...fetchOptions,
-            headers: {...fetchOptions.headers, Authorization: this.auth.authToken}
+            headers: {...fetchOptions.headers, Authorization: this.auth.authToken},
+            fetchOptions: {
+                agent: await createAgent(url.protocol)
+            }
         }
         return [newFetchOptions, ...restParams]
     }

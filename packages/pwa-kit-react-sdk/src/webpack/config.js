@@ -173,7 +173,9 @@ const common = {
             bluebird: resolve(nodeModules, 'bluebird')
         },
         fallback: {
-            crypto: false
+            crypto: false,
+            http: false,
+            https: false
         }
     },
 

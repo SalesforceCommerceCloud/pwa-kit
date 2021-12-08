@@ -6,12 +6,10 @@
  */
 import {nanoid} from 'nanoid'
 import {encode as base64encode} from 'base64-arraybuffer'
+import {isServer} from './utils'
 
 // Server Side
 const randomstring = require('randomstring')
-
-// Globals
-const isServer = typeof window === 'undefined'
 
 /**
  * Creates Code Verifier use for PKCE auth flow.

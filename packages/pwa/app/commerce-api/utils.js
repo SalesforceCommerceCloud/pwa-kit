@@ -9,6 +9,13 @@ import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
 import {HTTPError} from 'pwa-kit-react-sdk/ssr/universal/errors'
 
 /**
+ * Check the current execution environment
+ * is client side or server side
+ * @returns Boolean
+ */
+export const isServer = typeof window === 'undefined'
+
+/**
  * Compares the token age against the issued and expiry times. If the token's age is
  * within 60 seconds of its valid time (or exceeds it), we consider the token invalid.
  * @function
@@ -278,3 +285,34 @@ export const convertSnakeCaseToSentenceCase = (text) => {
  * Usually used as default for event handlers.
  */
 export const noop = () => {}
+
+/**
+ * Creates a http/https Node.js Agent
+ * @param protocol
+ * @returns {Promise<*>}
+ */
+export const createAgent = async (protocol) => {
+    let agent
+    if (isServer) {
+        if (protocol === 'http:') {
+            await import('http').then((module) => {
+                const http = module.default
+
+                agent = new http.Agent({
+                    // a custom http agent
+                    keepAlive: true
+                })
+            })
+        } else if (protocol === 'https:') {
+            await import('https').then((module) => {
+                const https = module.default
+
+                agent = new https.Agent({
+                    // a custom https agent
+                    keepAlive: true
+                })
+            })
+        }
+    }
+    return agent
+}
