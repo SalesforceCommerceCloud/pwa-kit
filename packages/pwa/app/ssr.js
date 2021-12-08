@@ -30,10 +30,6 @@ const app = createApp({
     // provided by a webpack DefinePlugin
     mobify: WEBPACK_PACKAGE_JSON_MOBIFY,
 
-    // Keep sockets open even when there are no outstanding requests,
-    // so they can be used for future requests without having to reestablish a TCP connection.
-    keepAlive: true,
-
     // The port that the local dev server listens on
     port: 3000,
 
