@@ -5,8 +5,8 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {DEFAULT_LOCALE, DEFAULT_SITE_ID, HOME_HREF} from '../constants'
-import {getUrlConfig} from './utils'
+import {DEFAULT_SITE_ID, HOME_HREF} from '../constants'
+import {getL10nConfig, getUrlConfig} from './utils'
 import {urlPartPositions} from '../constants'
 
 /**
@@ -125,6 +125,7 @@ export const getUrlWithLocale = (shortCode, opts = {}) => {
             params.delete(param)
         })
     }
+    const l10nConfig = getL10nConfig(location.pathname)
     if (relativeUrl === HOME_HREF) {
         relativeUrl = buildPathWithUrlConfig(relativeUrl, {site: site.alias, locale: shortCode})
     } else {
@@ -138,7 +139,7 @@ export const getUrlWithLocale = (shortCode, opts = {}) => {
 
         const urlWithoutBasePath = `/${paths.join('/')}`
         relativeUrl = buildPathWithUrlConfig(urlWithoutBasePath, {
-            locale: shortCode !== DEFAULT_LOCALE || paths?.length > 0 ? shortCode : '',
+            locale: shortCode !== l10nConfig.defaultLocale || paths?.length > 0 ? shortCode : '',
             site: site.id !== DEFAULT_SITE_ID || paths?.length > 0 ? site?.alias : ''
         })
     }
@@ -160,9 +161,11 @@ export const getUrlWithLocale = (shortCode, opts = {}) => {
 export const homeUrlBuilder = (homeHref, options = {}) => {
     const {locale, site} = options
     console.log('site', site)
+    const l10nConfig = getL10nConfig(homeHref)
+    const defaultLocale = l10nConfig.defaultLocale
     const updatedUrl = buildPathWithUrlConfig(homeHref, {
-        locale: locale !== DEFAULT_LOCALE ? locale : '',
-        site: site?.id === DEFAULT_SITE_ID && locale === DEFAULT_LOCALE ? '' : site?.alias
+        locale: locale !== defaultLocale ? locale : '',
+        site: site?.id === DEFAULT_SITE_ID && locale === defaultLocale ? '' : site?.alias
     })
     return encodeURI(updatedUrl)
 }

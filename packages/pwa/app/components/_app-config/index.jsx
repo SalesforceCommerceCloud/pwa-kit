@@ -21,9 +21,9 @@ import {
 } from '../../commerce-api/contexts'
 import {commerceAPIConfig} from '../../commerce-api.config'
 import {einsteinAPIConfig} from '../../einstein-api.config'
-import {DEFAULT_CURRENCY, DEFAULT_LOCALE, DEFAULT_SITE_ID, urlPartPositions} from '../../constants'
-import {getPreferredCurrency, getSupportedLocalesIds} from '../../utils/locale'
-import {getSiteId, getUrlConfig} from '../../utils/utils'
+import {DEFAULT_SITE_ID, urlPartPositions} from '../../constants'
+import {getPreferredCurrency} from '../../utils/locale'
+import {getL10nConfig, getSiteId, getUrlConfig} from '../../utils/utils'
 import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
 
 const apiConfig = {
@@ -61,7 +61,7 @@ const getLocale = (locals = {}) => {
     }
 
     // Ensure that the locale is in the supported list, otherwise return the default.
-    shortCode = getSupportedLocalesIds().includes(shortCode) ? shortCode : DEFAULT_LOCALE
+    // shortCode = getSupportedLocalesIds().includes(shortCode) ? shortCode : undefined
     return shortCode
 }
 
@@ -95,8 +95,11 @@ AppConfig.restore = (locals = {}) => {
     const originalUrl = locals.originalUrl
     apiConfig.parameters.siteId = getSiteId(originalUrl) || DEFAULT_SITE_ID
 
-    const locale = getLocale(locals) || DEFAULT_LOCALE
-    const currency = getPreferredCurrency(locale) || DEFAULT_CURRENCY
+    const l10nConfig = getL10nConfig(originalUrl)
+
+    const locale = getLocale(locals) || l10nConfig.defaultLocale
+    const currency =
+        getPreferredCurrency(locale, l10nConfig.supportedLocales) || l10nConfig.defaultCurrency
 
     locals.api = new CommerceAPI({...apiConfig, locale, currency})
 }

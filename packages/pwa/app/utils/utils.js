@@ -164,10 +164,22 @@ export const capitalize = (text) => {
  * @returns {object} - url object from the pwa-kit-config.json file
  */
 export const getUrlConfig = () => pwaKitConfig?.app?.url
-
+/**
+ * A util to return current multi site configuration
+ * @returns {object} - a list of site objects from the pwa-kit-config.json file
+ */
 export const getSitesConfig = () => pwaKitConfig?.app?.sites
+/**
+ * A util to return current defaultSiteId
+ * @returns {string} - default site Id string from pwa-kit-config file
+ */
 export const getDefaultSiteId = () => pwaKitConfig?.app?.defaultSiteId
 
+/**
+ * A util to get the siteId
+ * @param url
+ * @returns {string}
+ */
 export const getSiteId = (url) => {
     let path = url
     if (!path) {
@@ -184,6 +196,11 @@ export const getSiteId = (url) => {
     return siteId
 }
 
+/**
+ * Get the site Id based on the given hostname
+ * @param {string} hostname
+ * @returns {string} siteId
+ */
 const getSiteIdByHostname = (hostname) => {
     const sitesConfig = getSitesConfig()
     if (!sitesConfig.length) throw new Error('No site config found. Please check you configuration')
@@ -192,6 +209,11 @@ const getSiteIdByHostname = (hostname) => {
     return site.length === 1 ? site.id : undefined
 }
 
+/**
+ * return the site id based on the site alias in the given url
+ * @param {string} url - input url
+ * @returns {string} siteId
+ */
 const getSiteIdByAlias = (url) => {
     const [pathname, search] = url.split('?')
 
@@ -206,7 +228,6 @@ const getSiteIdByAlias = (url) => {
                 'The default SiteId does not match any values from the site configuration. Please check your configuration'
             )
         }
-        console.log('homepage default siteId', defaultSiteId)
         return defaultSiteId
     }
 
@@ -228,4 +249,18 @@ const getSiteIdByAlias = (url) => {
     const siteId = sitesConfig.find((site) => site.alias === currentSite)?.id
 
     return siteId
+}
+
+/**
+ * return l10n config for current site
+ * @param url
+ * @returns {object}
+ */
+export const getL10nConfig = (url) => {
+    console.log('url', url)
+    const sitesConfig = getSitesConfig()
+    if (!sitesConfig.length) throw new Error('No site config found. Please check you configuration')
+    const siteId = getSiteId(url)
+    const l10nConfig = sitesConfig.find((site) => site.id === siteId).l10n
+    return l10nConfig
 }

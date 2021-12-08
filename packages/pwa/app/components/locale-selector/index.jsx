@@ -30,10 +30,12 @@ import {
     FlagITIcon,
     FlagCNIcon,
     FlagJPIcon
-} from '../../components/icons'
+} from '../icons'
 
 import {DEFAULT_LOCALE} from '../../constants'
 import LocaleText from '../locale-text'
+import {useLocation} from 'react-router-dom'
+import {getL10nConfig} from '../../utils/utils'
 
 // NOTE: If you want to have flags shown next to a selectable locale, update this
 // mapping object with the short code as the key for the desired icon.
@@ -57,7 +59,9 @@ const LocaleSelector = ({
     ...props
 }) => {
     const styles = useStyleConfig('LocaleSelector')
-
+    const {pathname} = useLocation()
+    const defaultLocale = getL10nConfig(pathname)
+    console.log('defaultLocale', defaultLocale)
     return (
         <Box className="sf-locale-selector">
             <Accordion allowToggle={true} {...props}>

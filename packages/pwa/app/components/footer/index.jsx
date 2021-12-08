@@ -31,13 +31,17 @@ import {getUrlWithLocale} from '../../utils/url'
 import LocaleText from '../locale-text'
 import {getSupportedLocalesIds} from '../../utils/locale'
 import useSite from '../../hooks/use-site'
+import {getL10nConfig} from '../../utils/utils'
+import {useLocation} from 'react-router-dom'
 
 const Footer = ({...otherProps}) => {
     const styles = useMultiStyleConfig('Footer')
-
+    const {pathname} = useLocation()
+    const l10nConfig = getL10nConfig(pathname)
     const intl = useIntl()
     const [locale, setLocale] = useState(intl.locale)
     const site = useSite()
+
     return (
         <Box as="footer" {...styles.container} {...otherProps}>
             <Box {...styles.content}>
@@ -143,14 +147,16 @@ const Footer = ({...otherProps}) => {
                                 variant="filled"
                                 {...styles.localeDropdown}
                             >
-                                {getSupportedLocalesIds().map((locale) => (
-                                    <LocaleText
-                                        as="option"
-                                        value={locale}
-                                        shortCode={locale}
-                                        key={locale}
-                                    />
-                                ))}
+                                {getSupportedLocalesIds(l10nConfig.supportedLocales).map(
+                                    (locale) => (
+                                        <LocaleText
+                                            as="option"
+                                            value={locale}
+                                            shortCode={locale}
+                                            key={locale}
+                                        />
+                                    )
+                                )}
                             </Select>
                         </FormControl>
                     </Box>

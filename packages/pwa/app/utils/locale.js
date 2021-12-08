@@ -6,22 +6,22 @@
  */
 
 import PropTypes from 'prop-types'
-import {SUPPORTED_LOCALES, DEFAULT_LOCALE} from '../constants'
-
-const supportedLocales = SUPPORTED_LOCALES.map((locale) => locale.id)
 
 /**
  * @returns {string[]} short codes of all the app's supported locales
  */
-export const getSupportedLocalesIds = () => supportedLocales
+export const getSupportedLocalesIds = (supportedLocales = []) =>
+    supportedLocales.map((locale) => locale.id)
 
 /**
  * Dynamically import the translations/messages for a given locale
  * @private
  * @param {string} locale - The locale code
+ * @param {object} defaultLocale
+ * @param {object} supportedLocales - supporte locales list
  * @returns {Promise<Object>} The messages (compiled in AST format) in the given locale. If locale is not found, returns the default locale's messages.
  */
-export const loadLocaleData = async (locale) => {
+export const loadLocaleData = async (locale, defaultLocale, supportedLocales) => {
     // NOTE: the pseudo locale in this case is actually `en-XB` from react-intl. For more details:
     // - see our npm script `compile-translations:pseudo`
     // - and this react-intl PR: https://github.com/formatjs/formatjs/pull/2708
@@ -32,9 +32,9 @@ export const loadLocaleData = async (locale) => {
         localeToLoad = locale
     } else {
         console.warn(
-            `Not expecting to see locale '${locale}'. Loading the default locale '${DEFAULT_LOCALE}' instead.`
+            `Not expecting to see locale '${locale}'. Loading the default locale '${defaultLocale}' instead.`
         )
-        localeToLoad = DEFAULT_LOCALE
+        localeToLoad = defaultLocale
     }
 
     let module
@@ -42,8 +42,8 @@ export const loadLocaleData = async (locale) => {
         module = await import(`../translations/compiled/${localeToLoad}.json`)
     } catch (err) {
         console.error(err)
-        console.log(`Loading the default locale '${DEFAULT_LOCALE}' instead`)
-        module = await import(`../translations/compiled/${DEFAULT_LOCALE}.json`)
+        console.log(`Loading the default locale '${defaultLocale}' instead`)
+        module = await import(`../translations/compiled/${defaultLocale}.json`)
     }
 
     return module.default
@@ -53,24 +53,32 @@ export const loadLocaleData = async (locale) => {
  * Get all of the locale-related configuration data
  * @param {Object} options
  * @param {function} [options.getUserPreferredLocales] - Identify what set of locales the user prefers
+ * @param {object} [options.l10nConfig] - l10n configuration object
  * @returns {Promise<Object>} The configuration data
  */
-export const getLocaleConfig = async ({getUserPreferredLocales} = {}) => {
-    const preferredLocales = getUserPreferredLocales ? getUserPreferredLocales() : [DEFAULT_LOCALE]
-    const targetLocale = whichLocaleToLoad(preferredLocales, supportedLocales, DEFAULT_LOCALE)
+
+export const getLocaleConfig = async ({getUserPreferredLocales, l10nConfig = {}} = {}) => {
+    const defaultLocale = l10nConfig.defaultLocale
+    const preferredLocales = getUserPreferredLocales ? getUserPreferredLocales() : [defaultLocale]
+
+    const supportedLocales = getSupportedLocalesIds(l10nConfig.supportedLocales)
+
+    const targetLocale = whichLocaleToLoad(preferredLocales, supportedLocales, defaultLocale)
 
     const messages = await loadLocaleData(
         typeof window === 'undefined'
             ? process.env.USE_PSEUDOLOCALE === 'true'
                 ? 'en-XB'
                 : targetLocale
-            : targetLocale
+            : targetLocale,
+        defaultLocale,
+        supportedLocales
     )
 
     return {
         app: {
             supportedLocales,
-            defaultLocale: DEFAULT_LOCALE,
+            defaultLocale,
             targetLocale
         },
         user: {
@@ -96,10 +104,11 @@ export const whichLocaleToLoad = (preferredLocales, supportedLocales, fallbackLo
 /**
  * Get the preferred currency for a given locale
  * @param locale The locale that we want the currency
+ * @param supportedLocales The supported locales array that has preferredCurrency
  * @returns {string} The specific currency for the locale
  */
-export const getPreferredCurrency = (locale) => {
-    return SUPPORTED_LOCALES.find((supportedLocale) => supportedLocale.id === locale)
+export const getPreferredCurrency = (locale, supportedLocales) => {
+    return supportedLocales.find((supportedLocale) => supportedLocale.id === locale)
         ?.preferredCurrency
 }
 

@@ -40,10 +40,10 @@ import {AddToCartModalProvider} from '../../hooks/use-add-to-cart-modal'
 import {IntlProvider} from 'react-intl'
 
 // Others
-import {watchOnlineStatus, flatten} from '../../utils/utils'
+import {watchOnlineStatus, flatten, getL10nConfig} from '../../utils/utils'
 import {homeUrlBuilder, getUrlWithLocale, buildPathWithUrlConfig} from '../../utils/url'
 import {getLocaleConfig, getPreferredCurrency, getSupportedLocalesIds} from '../../utils/locale'
-import {DEFAULT_CURRENCY, HOME_HREF} from '../../constants'
+import {HOME_HREF} from '../../constants'
 
 import Seo from '../seo'
 import useWishlist from '../../hooks/use-wishlist'
@@ -70,8 +70,11 @@ const App = (props) => {
     // Used to conditionally render header/footer for checkout page
     const isCheckout = /\/checkout$/.test(location?.pathname)
 
+    const l10nConfig = getL10nConfig(location?.pathname)
+
     // Get the current currency to be used throught the app
-    const currency = getPreferredCurrency(targetLocale) || DEFAULT_CURRENCY
+    const currency =
+        getPreferredCurrency(targetLocale, l10nConfig.supportedLocales) || l10nConfig.defaultLocale
 
     // Set up customer and basket
     useShopper({currency})
@@ -271,7 +274,8 @@ App.shouldGetProps = () => {
     return typeof window === 'undefined'
 }
 
-App.getProps = async ({api}) => {
+App.getProps = async ({api, res}) => {
+    const l10nConfig = getL10nConfig(res.locals.originalUrl)
     const localeConfig = await getLocaleConfig({
         getUserPreferredLocales: () => {
             // CONFIG: This function should return an array of preferred locales. They can be
@@ -284,7 +288,7 @@ App.getProps = async ({api}) => {
             // If this function returns an empty array (e.g. there isn't locale in the page url),
             // then the app would use the default locale as the fallback.
 
-            // NOTE: Your implementation may differ, this is jsut what we did.
+            // NOTE: Your implementation may differ, this is just what we did.
             //
             // Since the CommerceAPI client already has the current `locale` set,
             // we can use it's value to load the correct messages for the application.
@@ -293,7 +297,8 @@ App.getProps = async ({api}) => {
             const {locale} = api.getConfig()
 
             return [locale]
-        }
+        },
+        l10nConfig
     })
 
     // Login as `guest` to get session.

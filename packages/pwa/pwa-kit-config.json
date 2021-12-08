@@ -9,12 +9,54 @@
             {
                 "id": "RefArch",
                 "alias": "us",
-                "hostname": ["localhost"]
+                "hostname": ["localhost"],
+                "l10n": {
+                    "supportedCurrencies": ["USD"],
+                    "defaultCurrency": "USD",
+                    "supportedLocales": [
+                        {
+                            "id": "en-US",
+                            "preferredCurrency": "USD"
+                        },
+                        {
+                            "id": "en-CA",
+                            "preferredCurrency": "USD"
+                        }
+                    ],
+                    "defaultLocale": "en-US"
+                }
             },
             {
                 "id": "RefArchGlobal",
                 "alias": "global",
-                "hostname": ["localhost"]
+                "hostname": ["localhost"],
+                "l10n": {
+                    "supportedCurrencies": ["GBP", "EUR", "CNY", "JPY"],
+                    "defaultCurrency": "GBP",
+                    "supportedLocales": [
+                        {
+                            "id": "en-GB",
+                            "preferredCurrency": "GBP"
+                        },
+                        {
+                            "id": "fr-FR",
+                            "preferredCurrency": "EUR"
+                        },
+                        {
+                            "id": "it-IT",
+                            "preferredCurrency": "EUR"
+                        },
+                        {
+                            "id": "zh-CN",
+                            "preferredCurrency": "CNY"
+                        },
+                        {
+                            "id": "ja-JP",
+                            "preferredCurrency": "JPY"
+                        }
+                    ],
+                    "defaultLocale": "en-GB"
+                }
             }
         ]
     }
