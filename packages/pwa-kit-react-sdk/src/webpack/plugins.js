@@ -124,8 +124,8 @@ export class PwaKitConfigPlugin {
      */
     apply(compiler) {
         compiler.hooks.compilation.tap('PwaKitConfigPlugin', (compilation) => {
-            const config = this.getConfig(compiler)
             try {
+                const config = this.getConfig(compiler)
                 this.validate(config)
             } catch (e) {
                 compilation.errors.push(e)
