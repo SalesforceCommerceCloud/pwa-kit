@@ -339,6 +339,8 @@ describe('The Node SSR Environment', () => {
                 const doc = parse(html)
                 const include = ['<div>This is a PWA</div>']
                 const data = dataFromHTML(doc)
+                const dataScript = doc.querySelectorAll('script[id=mobify-data]')[0]
+                expect(dataScript.innerHTML.split(/\r\n|\r|\n/).length).toBe(1)
                 expect(data.__DEVICE_TYPE__).toEqual('DESKTOP')
                 include.forEach((s) => expect(html).toEqual(expect.stringContaining(s)))
                 expect(scriptsAreSafe(doc)).toBe(true)
@@ -383,7 +385,7 @@ describe('The Node SSR Environment', () => {
             }
         },
         {
-            description: `rendering PWA's in mobify-server-only mode should not execute scripts on the client`,
+            description: `rendering PWA's in "mobify-server-only" mode should not execute scripts on the client`,
             req: {url: '/pwa/', query: {mobify_server_only: '1'}},
             assertions: (res) => {
                 const html = res.text
@@ -394,6 +396,46 @@ describe('The Node SSR Environment', () => {
                     // application/json prevents execution!
                     expect(script.getAttribute('type')).toBe('application/json')
                 })
+            }
+        },
+        {
+            description: `rendering PWA's in "__server-only" mode should not execute scripts on the client`,
+            req: {url: '/pwa/', query: {__server_only: '1'}},
+            assertions: (res) => {
+                const html = res.text
+                const doc = parse(html)
+                const include = ['<div>This is a PWA</div>']
+                include.forEach((s) => expect(html).toEqual(expect.stringContaining(s)))
+                doc.querySelectorAll('script').forEach((script) => {
+                    // application/json prevents execution!
+                    expect(script.getAttribute('type')).toBe('application/json')
+                })
+            }
+        },
+        {
+            description: `rendering PWA's with legacy "mobify_pretty" mode should print stylized global state`,
+            req: {url: '/pwa/', query: {mobify_pretty: '1'}},
+            assertions: (res) => {
+                const html = res.text
+                const doc = parse(html)
+                const include = ['<div>This is a PWA</div>']
+                include.forEach((s) => expect(html).toEqual(expect.stringContaining(s)))
+                const script = doc.querySelectorAll('script[id=mobify-data]')[0]
+
+                expect(script.innerHTML.split(/\r\n|\r|\n/).length).toBeGreaterThan(1)
+            }
+        },
+        {
+            description: `rendering PWA's with  "__pretty_print" mode should print stylized global state`,
+            req: {url: '/pwa/', query: {__pretty_print: '1'}},
+            assertions: (res) => {
+                const html = res.text
+                const doc = parse(html)
+                const include = ['<div>This is a PWA</div>']
+                include.forEach((s) => expect(html).toEqual(expect.stringContaining(s)))
+                const script = doc.querySelectorAll('script[id=mobify-data]')[0]
+
+                expect(script.innerHTML.split(/\r\n|\r|\n/).length).toBeGreaterThan(1)
             }
         },
         {
