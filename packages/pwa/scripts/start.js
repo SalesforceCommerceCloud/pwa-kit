@@ -12,12 +12,8 @@ const _fs = require('fs')
 const path = require('path')
 const process = require('process')
 const program = require('commander')
-const childProcess = require('@lerna/child-process')
-const Ajv = require('ajv')
-const AjvMergePlugin = require('ajv-merge-patch/keywords/merge')
-const configSchema = require('pwa-kit-react-sdk/config/schema.json')
 
-const config = require('../app/pwa-kit.config.json')
+const childProcess = require('@lerna/child-process')
 
 const fs = Promise.promisifyAll(_fs)
 
@@ -37,106 +33,6 @@ const spawnStreaming = ({command, args, opts, name}) => {
 }
 
 /**
- * Validate configurations based on pwa-kit-react-sdk schema
- * and custom properties added here. Errors will be thrown when
- * validation fails.
- */
-const validateConfig = (config) => {
-    const ajv = new Ajv()
-    AjvMergePlugin(ajv)
-
-    const customProperties = {
-        commerceApi: {
-            $id: 'commerceApi',
-            title: 'Commerceapi',
-            type: 'object',
-            required: ['clientId', 'organizationId', 'shortCode', 'siteId'],
-            properties: {
-                clientId: {
-                    $id: 'commerceApi/clientId',
-                    title: 'Clientid',
-                    type: 'string',
-                    default: '',
-                    examples: ['11111111-1111-1111-1111-111111111111'],
-                    pattern: '^.*$'
-                },
-                organizationId: {
-                    $id: 'commerceApi/organizationId',
-                    title: 'Organizationid',
-                    type: 'string',
-                    default: '',
-                    examples: ['f_ecom_zzrf_001'],
-                    pattern: '^.*$'
-                },
-                shortCode: {
-                    $id: 'commerceApi/shortCode',
-                    title: 'Shortcode',
-                    type: 'string',
-                    default: '',
-                    examples: ['9o7m175y'],
-                    pattern: '^.*$'
-                },
-                siteId: {
-                    $id: 'commerceApi/siteId',
-                    title: 'Siteid',
-                    type: 'string',
-                    default: '',
-                    examples: ['RefArchGlobal'],
-                    pattern: '^.*$'
-                }
-            }
-        },
-        einsteinApi: {
-            $id: 'einsteinApi',
-            title: 'Einsteinapi',
-            type: 'object',
-            required: ['clientId', 'siteId'],
-            properties: {
-                clientId: {
-                    $id: 'einsteinApi/clientId',
-                    title: 'Clientid',
-                    type: 'string',
-                    default: '',
-                    examples: ['11111111-1111-1111-1111-111111111111'],
-                    pattern: '^.*$'
-                },
-                siteId: {
-                    $id: 'einsteinApi/siteId',
-                    title: 'Siteid',
-                    type: 'string',
-                    default: '',
-                    examples: ['aaij-MobileFirst'],
-                    pattern: '^.*$'
-                }
-            }
-        }
-    }
-
-    ajv.addSchema(configSchema)
-
-    const valid = ajv.validate(
-        {
-            $merge: {
-                source: {$ref: configSchema.$id},
-                with: {
-                    required: [...configSchema.required, 'commerceApi', 'einsteinApi'],
-                    properties: customProperties
-                }
-            }
-        },
-        config
-    )
-
-    if (!valid) {
-        const message = ajv.errorsText(ajv.errors.filter((e) => e.schemaPath !== '#/$merge'), {
-            separator: ', ',
-            dataVar: 'config'
-        })
-        throw new Error(message)
-    }
-}
-
-/**
  * Generate hash manifest that is expected to be in place before starting
  * the app.
  */
@@ -147,7 +43,6 @@ const beforeRun = () => {
             fs.mkdirSync(buildPath)
             fs.closeSync(fs.openSync(ssrJS, 'w'))
         }
-        validateConfig(config)
     })
 }
 

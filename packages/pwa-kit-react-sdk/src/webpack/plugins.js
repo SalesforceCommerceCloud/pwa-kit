@@ -8,6 +8,10 @@
 import webpack from 'webpack'
 import path from 'path'
 import fs from 'fs'
+import Ajv from 'ajv'
+import AjvMergePlugin from 'ajv-merge-patch/keywords/merge'
+
+import schema from '../config/schema.json'
 
 /**
  * Return a NormalModuleReplacementPlugin that is used to override SDK builtins
@@ -88,6 +92,91 @@ export class BuildMarkerPlugin {
         this.inProgress -= 1
         if (!this.inProgress) {
             fs.closeSync(fs.openSync(this.fileName, 'w'))
+        }
+    }
+}
+
+/**
+ * Validate configurations
+ */
+export class PwaKitConfigPlugin {
+    /**
+     * @constructor
+     * @param {String} [options.path] - The relative path of the config file
+     * @param {Object[]} [options.customSchemas] - The object that include
+     * custom property schemas, you want to use this when you extend the schema.
+     * @param {String} [options.customSchemas.key] - The key of the property.
+     * @param {Boolean} [options.customSchemas.required] - Required.
+     * @param {Object} [options.customSchemas.schema] - The JSON schema.
+     */
+    constructor(options = {}) {
+        this.path = options.path || './pwa-kit.config.json'
+        this.customSchemas = options.customSchemas || []
+    }
+
+    /**
+     * Called by webpack when this plugin is attached.
+     *
+     * @param compiler {Object} the webpack compiler
+     */
+    apply(compiler) {
+        const config = this.getConfig(compiler)
+        this.validate(config)
+    }
+
+    getConfig(compiler) {
+        const {fileSystem} = compiler.inputFileSystem
+        const absolutePath = path.resolve(this.path)
+        let configFile
+        try {
+            configFile = fileSystem.readFileSync(absolutePath)
+        } catch (e) {
+            throw new Error(`Missing PWA Kit config file, the file is required: ${absolutePath}`)
+        }
+        return JSON.parse(configFile)
+    }
+
+    /**
+     * Validate configurations based on pwa-kit-react-sdk schema
+     * and custom properties added here. Errors will be thrown when
+     * validation fails.
+     */
+    validate(config) {
+        const ajv = new Ajv()
+        AjvMergePlugin(ajv)
+        ajv.addSchema(schema)
+        let valid
+
+        if (this.customSchemas.length) {
+            const required = [...schema.required]
+            const properties = this.customSchemas.reduce((prev, curr) => {
+                if (curr.required) {
+                    required.push(curr.key)
+                }
+                return {...prev, [curr['key']]: curr.schema}
+            }, {})
+            valid = ajv.validate(
+                {
+                    $merge: {
+                        source: {$ref: schema.$id},
+                        with: {
+                            required,
+                            properties
+                        }
+                    }
+                },
+                config
+            )
+        } else {
+            valid = ajv.validate(schema, config)
+        }
+
+        if (!valid) {
+            const message = ajv.errorsText(ajv.errors.filter((e) => e.schemaPath !== '#/$merge'), {
+                separator: ', ',
+                dataVar: 'config'
+            })
+            throw new Error(message)
         }
     }
 }
