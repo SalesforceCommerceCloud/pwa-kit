@@ -6,7 +6,7 @@
  */
 import fetch from 'cross-fetch'
 import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
-import {keysToCamel} from './utils'
+import {keysToCamel, createAgent} from './utils'
 
 class EinsteinAPI {
     constructor(commerceAPI) {
@@ -55,17 +55,17 @@ class EinsteinAPI {
             body = this._buildBody(body)
         }
 
+        const url = new URL(getAppOrigin())
+
         let response
         response = await fetch(`${host}/v3${endpoint}`, {
             method: method,
             headers: headers,
+            agent: await createAgent(url.protocol),
             ...(body && {
                 body: JSON.stringify(body)
             })
         })
-
-        // TODO: Remove this console.log
-        console.log('einstein response HEADERS: ' + JSON.stringify(response.headers))
 
         const responseJson = await response.json()
 
