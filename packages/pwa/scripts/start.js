@@ -129,7 +129,8 @@ const validateConfig = (config) => {
 
     if (!valid) {
         const message = ajv.errorsText(ajv.errors.filter((e) => e.schemaPath !== '#/$merge'), {
-            separator: ', '
+            separator: ', ',
+            dataVar: 'config'
         })
         throw new Error(message)
     }
