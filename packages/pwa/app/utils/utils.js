@@ -205,8 +205,8 @@ const getSiteIdByHostname = (hostname) => {
     const sitesConfig = getSitesConfig()
     if (!sitesConfig.length) throw new Error('No site config found. Please check you configuration')
     if (!hostname) return undefined
-    const site = sitesConfig.filter((site) => site.hostname.includes(hostname))
-    return site.length === 1 ? site.id : undefined
+    const site = sitesConfig.filter((site) => site?.hostname?.includes(hostname))
+    return site?.length === 1 ? site.id : undefined
 }
 
 /**
