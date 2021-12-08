@@ -130,6 +130,7 @@ const ProductList = (props) => {
             toast({
                 title: formatMessage(
                     {
+                        id: 'product_list.info.added_to_wishlist',
                         defaultMessage:
                             '{quantity} {quantity, plural, one {item} other {items}} added to wishlist'
                     },
@@ -149,10 +150,7 @@ const ProductList = (props) => {
             })
         } catch {
             toast({
-                title: formatMessage(
-                    {defaultMessage: '{errorMessage}'},
-                    {errorMessage: API_ERROR_MESSAGE}
-                ),
+                title: formatMessage(API_ERROR_MESSAGE),
                 status: 'error'
             })
         } finally {
@@ -164,15 +162,15 @@ const ProductList = (props) => {
             setWishlistLoading([...wishlistLoading, product.productId])
             await wishlist.removeListItemByProductId(product.productId)
             toast({
-                title: formatMessage({defaultMessage: 'Item removed from wishlist'}),
+                title: formatMessage({
+                    id: 'product_list.info.removed_from_wishlist',
+                    defaultMessage: 'Item removed from wishlist'
+                }),
                 status: 'success'
             })
         } catch {
             toast({
-                title: formatMessage(
-                    {defaultMessage: '{errorMessage}'},
-                    {errorMessage: API_ERROR_MESSAGE}
-                ),
+                title: formatMessage(API_ERROR_MESSAGE),
                 status: 'error'
             })
         } finally {
@@ -219,7 +217,7 @@ const ProductList = (props) => {
             }
         }
 
-        navigate(`${location.pathname}?${stringifySearchParams(searchParamsCopy)}`)
+        navigate(`/category/${params.categoryId}?${stringifySearchParams(searchParamsCopy)}`)
     }
 
     // Clears all filters
@@ -315,7 +313,10 @@ const ProductList = (props) => {
                                         leftIcon={<FilterIcon boxSize={5} />}
                                         onClick={onOpen}
                                     >
-                                        <FormattedMessage defaultMessage="Filter" />
+                                        <FormattedMessage
+                                            defaultMessage="Filter"
+                                            id="product_list.button.filter"
+                                        />
                                     </Button>
                                 </Flex>
                                 <Flex align="center">
@@ -331,6 +332,7 @@ const ProductList = (props) => {
                                     >
                                         {formatMessage(
                                             {
+                                                id: 'product_list.button.sort_by',
                                                 defaultMessage: 'Sort By: {sortOption}'
                                             },
                                             {
@@ -434,7 +436,10 @@ const ProductList = (props) => {
                 <ModalContent top={0} marginTop={0}>
                     <ModalHeader>
                         <Text fontWeight="bold" fontSize="2xl">
-                            <FormattedMessage defaultMessage="Filter" />
+                            <FormattedMessage
+                                defaultMessage="Filter"
+                                id="product_list.modal.title.filter"
+                            />
                         </Text>
                     </ModalHeader>
                     <ModalCloseButton />
@@ -459,6 +464,7 @@ const ProductList = (props) => {
                             <Button width="full" onClick={onClose}>
                                 {formatMessage(
                                     {
+                                        id: 'product_list.modal.button.view_items',
                                         defaultMessage: 'View {prroductCount} items'
                                     },
                                     {
@@ -467,7 +473,10 @@ const ProductList = (props) => {
                                 )}
                             </Button>
                             <Button width="full" variant="outline" onClick={() => resetFilters()}>
-                                <FormattedMessage defaultMessage="Clear Filters" />
+                                <FormattedMessage
+                                    defaultMessage="Clear Filters"
+                                    id="product_list.modal.button.clear_filters"
+                                />
                             </Button>
                         </Stack>
                     </ModalFooter>
@@ -487,7 +496,10 @@ const ProductList = (props) => {
                 <DrawerContent marginTop={0}>
                     <DrawerHeader boxShadow="none">
                         <Text fontWeight="bold" fontSize="2xl">
-                            <FormattedMessage defaultMessage="Sort By" />
+                            <FormattedMessage
+                                defaultMessage="Sort By"
+                                id="product_list.drawer.title.sort_by"
+                            />
                         </Text>
                     </DrawerHeader>
                     <DrawerCloseButton />
@@ -626,6 +638,7 @@ const Sort = ({sortUrls, productSearchResult, basePath, ...otherProps}) => {
                     <option key={href} value={href}>
                         {intl.formatMessage(
                             {
+                                id: 'product_list.select.sort_by',
                                 defaultMessage: 'Sort By: {sortOption}'
                             },
                             {

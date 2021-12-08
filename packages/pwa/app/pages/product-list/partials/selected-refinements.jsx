@@ -12,13 +12,15 @@ import useNavigation from '../../../hooks/use-navigation'
 import {CloseIcon} from '../../../components/icons'
 
 import {FormattedMessage} from 'react-intl'
+import {useParams} from 'react-router-dom'
 
 const SelectedRefinements = ({toggleFilter, selectedFilterValues, filters}) => {
     const priceFilterValues = filters?.find((filter) => filter.attributeId === 'price')
     const navigate = useNavigation()
+    const params = useParams()
     const resetFilters = () => {
         selectedFilters = []
-        navigate(window.location.pathname)
+        navigate(`/category/${params.categoryId}`)
     }
 
     let selectedFilters = []
@@ -84,7 +86,10 @@ const SelectedRefinements = ({toggleFilter, selectedFilterValues, filters}) => {
                             size="sm"
                             onClick={resetFilters}
                         >
-                            <FormattedMessage defaultMessage="Clear All" />
+                            <FormattedMessage
+                                defaultMessage="Clear All"
+                                id="selected_refinements.action.clear_all"
+                            />
                         </Button>
                     </Box>
                 </WrapItem>

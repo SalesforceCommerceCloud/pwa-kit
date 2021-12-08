@@ -29,7 +29,7 @@ const OfflineBanner = () => {
             <AlertIcon {...style.icon} />
             <Text {...style.message}>
                 {intl.formatMessage({
-                    id: 'offline_banner.message',
+                    id: 'offline_banner.description.browsing_offline_mode',
                     defaultMessage: "You're currently browsing in offline mode"
                 })}
             </Text>

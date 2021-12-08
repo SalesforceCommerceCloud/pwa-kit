@@ -35,7 +35,9 @@ const app = createApp({
 
     // The protocol on which the development Express app listens.
     // Note that http://localhost is treated as a secure context for development.
-    protocol: 'http'
+    protocol: 'http',
+
+    enableLegacyRemoteProxying: false
 })
 
 // Handle the redirect from SLAS as to avoid error

@@ -64,7 +64,7 @@ const Pagination = (props) => {
                 <ChevronLeftIcon />
                 <Text>
                     {intl.formatMessage({
-                        id: 'pagination.actions.prev',
+                        id: 'pagination.link.prev',
                         defaultMessage: 'Prev'
                     })}
                 </Text>
@@ -88,11 +88,13 @@ const Pagination = (props) => {
                 </Select>
 
                 <Text {...styles.text}>
-                    {intl.formatMessage({
-                        id: 'pagination.actions.current_page_verb',
-                        defaultMessage: 'of'
-                    })}{' '}
-                    {urls.length}
+                    {intl.formatMessage(
+                        {
+                            id: 'pagination.field.num_of_pages',
+                            defaultMessage: 'of {numOfPages}'
+                        },
+                        {numOfPages: urls.length}
+                    )}
                 </Text>
             </Flex>
 
@@ -110,7 +112,7 @@ const Pagination = (props) => {
             >
                 <Text>
                     {intl.formatMessage({
-                        id: 'pagination.actions.next',
+                        id: 'pagination.link.next',
                         defaultMessage: 'Next'
                     })}
                 </Text>
