@@ -9,7 +9,6 @@
             {
                 "id": "RefArch",
                 "alias": "us",
-                "hostname": ["localhost"],
                 "l10n": {
                     "supportedCurrencies": ["USD"],
                     "defaultCurrency": "USD",
@@ -29,7 +28,6 @@
             {
                 "id": "RefArchGlobal",
                 "alias": "global",
-                "hostname": ["localhost"],
                 "l10n": {
                     "supportedCurrencies": ["GBP", "EUR", "CNY", "JPY"],
                     "defaultCurrency": "GBP",
