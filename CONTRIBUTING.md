@@ -8,9 +8,9 @@ We welcome contributions to PWA Kit! To ensure that your contributions are addre
 
 This repository is a [monorepo](https://en.wikipedia.org/wiki/Monorepo) that includes the code that powers the PWA Kit. The code is divided into the following packages:
 
-- `pwa`: A set of sample code and tooling for PWA Kit projects called the Retail React App
-- `pwa-kit-create-app`: A tool that generates PWA Kit projects based on the Retail React App
-- `pwa-kit-react-sdk`: A set of components and utilities for PWA Kit projects
+-   `pwa`: A set of sample code and tooling for PWA Kit projects called the Retail React App
+-   `pwa-kit-create-app`: A tool that generates PWA Kit projects based on the Retail React App
+-   `pwa-kit-react-sdk`: A set of components and utilities for PWA Kit projects
 
 ## 📦 Dependencies
 
@@ -21,13 +21,13 @@ us install all dependencies and link all packages together with one command:
 npm ci
 ```
 
-Dependencies that are added to the `package.json` at the root of the
+Dependencies that are added to the `package.json` file at the root of the
 repo are shared between packages. Dependencies listed in the
 `package.json` files within each individual package directory work as normal.
 
 ## 🏗️ Cleaning & Rebuilding
 
-When you pull changes that include modifications to any package's dependencies, run `npm ci` from the top-level directory (`pwa-kit`). This command cleans and reinstalls all packages. Run this command frequently during development to ensure that you're using the same package versions as everyone else.
+When you pull changes that include modifications to any package’s dependencies, run `npm ci` from the top-level directory (`pwa-kit`). This command cleans and reinstalls all packages. Run this command frequently during development to ensure that you’re using the same package versions as everyone else.
 
 For more information, see the [Lerna docs](https://lerna.js.org/).
 
@@ -55,11 +55,11 @@ Run integration tests against live APIs for all packages with:
 
 ## Issues
 
-If you’re experiencing an issue, check the open issues first. If someone hasn’t already raised the same issue, file a new issue with a description of the problem and describe the steps to reproduce it. If you require an urgent resolution to your issue, file a support ticket with [Salesforce Commerce Cloud](https://help.salesforce.com/). You can also create an issue to request for a new feature.
+If you’re experiencing an issue, check the open issues first. If someone hasn’t already raised the same issue, file a new issue with a description of the problem and describe the steps to reproduce it. If you require an urgent response to your issue, file a support ticket with [Salesforce Commerce Cloud](https://help.salesforce.com/). You can also create an issue to request a new feature.
 
 ## Submit a Pull Request
 
-> **Note**: All your commits must be verfied. See [GitHub Help](https://docs.github.com/articles/generating-a-gpg-key/) to setup GPG signing for your commits.
+> **Note**: All your commits must be signed. To learn how to set up commit signing, see this help doc from GitHub: [Managing Commit Signature Verification](https://docs.github.com/en/authentication/managing-commit-signature-verification).
 
 1. Create an issue.
 2. Create a fork of this repository.
@@ -69,14 +69,14 @@ If you’re experiencing an issue, check the open issues first. If someone hasn�
 
 ## Best Practices
 
-- To reduce merge conflicts, squash and rebase your branch before submitting your pull request.
-- In your pull request, include:
-  - A brief description of the problem and your solution
-  - Steps to reproduce
-  - Screenshots
-  - Error logs (if applicable)
-- Make sure that your code builds and passes the unit tests. Refer to the README for steps on how to run tests.
-- Monitor your pull requests. Respond in a timely manner to any comments, questions for changes requested.
+-   To reduce merge conflicts, squash and rebase your branch before submitting your pull request.
+-   In your pull request, include:
+    -   A brief description of the problem and your solution
+    -   Steps to reproduce
+    -   Screenshots
+    -   Error logs (if applicable)
+-   Make sure that your code builds successfully and passes the unit tests. Refer to the README for steps on how to run tests.
+-   Monitor your pull requests. Respond in a timely manner to any comments, questions, and change requests.
 
 ## What to Expect
 

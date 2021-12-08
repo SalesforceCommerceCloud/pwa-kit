@@ -76,7 +76,4 @@ The full documentation for PWA Kit is hosted on the [Salesforce Developers](http
 -   [Configuration Options](https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/configuration-options.html)
 -   [Pushing and Deploying Bundles](https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/pushing-and-deploying-bundles.html)
 -   [The Retail React App](https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/retail-react-app.html)
--   [Rendering and Routing](https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/rendering-and-routing.html)
--   [Managed Runtime Infrastructure](https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/managed-runtime-infrastructure.html)
--   [Using the Managed Runtime API](https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/using-the-managed-runtime-api.html)
 -   [Proxying Requests](https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/proxying-requests.html)
