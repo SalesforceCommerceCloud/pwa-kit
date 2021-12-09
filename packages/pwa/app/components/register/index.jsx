@@ -22,7 +22,7 @@ const RegisterForm = ({submitForm, clickSignIn = noop, form}) => {
                 <Stack spacing={2}>
                     <Text align="center" fontSize="xl" fontWeight="semibold">
                         <FormattedMessage
-                            defaultMessage="Let's get started"
+                            defaultMessage="Let's get started!"
                             id="register_form.heading.lets_get_started"
                         />
                     </Text>
@@ -52,7 +52,7 @@ const RegisterForm = ({submitForm, clickSignIn = noop, form}) => {
                             isLoading={form.formState.isSubmitting}
                         >
                             <FormattedMessage
-                                defaultMessage="Create account"
+                                defaultMessage="Create Account"
                                 id="register_form.button.create_account"
                             />
                         </Button>
@@ -75,7 +75,7 @@ const RegisterForm = ({submitForm, clickSignIn = noop, form}) => {
                         <Text fontSize="sm" align="center">
                             <FormattedMessage
                                 id="register_form.message.agree_to_policy_terms"
-                                defaultMessage="By creating an account, you agree to Salesforce’s <policy>Privacy Policy</policy> and <terms>Terms & Conditions</terms>"
+                                defaultMessage="By creating an account, you agree to Salesforce <policy>Privacy Policy</policy> and <terms>Terms & Conditions</terms>"
                                 values={{
                                     // eslint-disable-next-line react/display-name
                                     policy: (chunks) => (

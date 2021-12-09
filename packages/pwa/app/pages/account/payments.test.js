@@ -153,7 +153,7 @@ test('Allows customer to add and remove payment methods', async () => {
     user.click(screen.getByText(/add payment method/i))
     user.type(screen.getByLabelText(/card number/i), '4111111111111111')
     user.type(screen.getByLabelText(/name on card/i), 'Test Customer')
-    user.type(screen.getByLabelText(/expiry date/i), '1222')
+    user.type(screen.getByLabelText(/expiration date/i), '1222')
     user.type(screen.getByLabelText(/security code/i), '555')
     user.click(screen.getByText('Save'))
     expect(await screen.findByText('Visa')).toBeInTheDocument()
