@@ -2576,7 +2576,7 @@
   "reset_password.button.back_to_sign_in": [
     {
       "type": 0,
-      "value": "Back to Sign In"
+      "value": "Back to sign in"
     }
   ],
   "reset_password.info.receive_email_shortly": [

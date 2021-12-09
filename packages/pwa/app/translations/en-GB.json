@@ -1074,7 +1074,7 @@
     "defaultMessage": "Create an account and get first access to the very best products, inspiration and community."
   },
   "reset_password.button.back_to_sign_in": {
-    "defaultMessage": "Back to Sign In"
+    "defaultMessage": "Back to sign in"
   },
   "reset_password.info.receive_email_shortly": {
     "defaultMessage": "You will receive an email at <b>{email}</b> with a link to reset your password shortly."
