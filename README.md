@@ -69,7 +69,7 @@ Your contributions are welcome! Refer to the [CONTRIBUTING](./CONTRIBUTING.md) g
 
 The full documentation for PWA Kit is hosted on the [Salesforce Developers](https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/overview) portal.
 
-### 🔖 Useful Links:
+### Useful Links:
 
 -   [Getting Started](https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/getting-started.html)
 -   [Setting Up API Access](https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/setting-up-api-access.html)
