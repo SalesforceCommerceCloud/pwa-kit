@@ -106,6 +106,6 @@ test('should render product details page', async () => {
     expect(await screen.findByTestId('product-details-page')).toBeInTheDocument()
     expect(screen.getAllByText(/Long Sleeve Crew Neck/).length).toEqual(2)
     expect(screen.getAllByText(/14.99/).length).toEqual(2)
-    expect(screen.getAllByText(/Add to cart/).length).toEqual(2)
-    expect(screen.getAllByText(/Add to wishlist/).length).toEqual(2)
+    expect(screen.getAllByText(/Add to Cart/).length).toEqual(2)
+    expect(screen.getAllByText(/Add to Wishlist/).length).toEqual(2)
 })

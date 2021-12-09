@@ -87,7 +87,7 @@ const CartSecondaryButtonGroup = ({
                             onClick={() => onAddToWishlistClick(variant)}
                         >
                             <FormattedMessage
-                                defaultMessage="Add to wishlist"
+                                defaultMessage="Add to Wishlist"
                                 id="cart_secondary_button_group.action.added_to_wishlist"
                             />
                         </Button>
