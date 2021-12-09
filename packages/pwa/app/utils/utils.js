@@ -202,7 +202,7 @@ export const getSiteId = (url) => {
  * @param {string} hostname
  * @returns {string} siteId
  */
-const getSiteIdByHostname = (hostname) => {
+export const getSiteIdByHostname = (hostname) => {
     const sitesConfig = getSitesConfig()
     if (!sitesConfig.length) throw new Error('No site config found. Please check you configuration')
     if (!hostname) return undefined
@@ -219,7 +219,7 @@ const getSiteIdByHostname = (hostname) => {
  * @param {string} url - input url
  * @returns {string} siteId
  */
-const getSiteIdByAlias = (url) => {
+export const getSiteIdByAlias = (url) => {
     const [pathname, search] = url.split('?')
 
     const defaultSiteId = getDefaultSiteId()
@@ -265,6 +265,6 @@ export const getL10nConfig = (url) => {
     const sitesConfig = getSitesConfig()
     if (!sitesConfig.length) throw new Error('No site config found. Please check you configuration')
     const siteId = getSiteId(url)
-    const l10nConfig = sitesConfig.find((site) => site.id === siteId).l10n
+    const l10nConfig = sitesConfig.find((site) => site.id === siteId)?.l10n
     return l10nConfig
 }
