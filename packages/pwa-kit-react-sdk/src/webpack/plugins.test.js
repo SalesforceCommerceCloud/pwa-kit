@@ -12,7 +12,7 @@ describe('PwaKitConfigPlugin', () => {
         new PwaKitConfigPlugin()
     })
 
-    test('have default config path', () => {
+    test('has a default config path', () => {
         const plugin = new PwaKitConfigPlugin()
         expect(plugin.CONFIG_PATH).toBe('./pwa-kit.config.json')
     })
@@ -43,7 +43,7 @@ describe('PwaKitConfigPlugin', () => {
         expect(plugin.getFile).toHaveBeenCalledWith(compiler, plugin.CONFIG_PATH)
     })
 
-    test('getConfig not throw if file not found', () => {
+    test('does not throw an error if the config file is not found', () => {
         const plugin = new PwaKitConfigPlugin()
 
         const compiler = {}
@@ -55,7 +55,7 @@ describe('PwaKitConfigPlugin', () => {
         expect(plugin.getConfig(compiler, 'path')).toBeUndefined()
     })
 
-    test('getConfig throws if data is invalid', () => {
+    test('throws an error if the config file is not valid json', () => {
         const plugin = new PwaKitConfigPlugin()
 
         const compiler = {}
