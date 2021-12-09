@@ -101,7 +101,15 @@ export default function ShippingOptions() {
                                                 (opt) => (
                                                     <Radio value={opt.id} key={opt.id}>
                                                         <Flex justify="space-between" w="full">
-                                                            <Text>{opt.name}</Text>
+                                                            <Box>
+                                                                <Text>{opt.name}</Text>
+                                                                <Text
+                                                                    fontSize="sm"
+                                                                    color="gray.600"
+                                                                >
+                                                                    {opt.description}
+                                                                </Text>
+                                                            </Box>
                                                             <Text fontWeight="bold">
                                                                 <FormattedNumber
                                                                     value={opt.price}
@@ -110,17 +118,7 @@ export default function ShippingOptions() {
                                                                 />
                                                             </Text>
                                                         </Flex>
-                                                        <Text
-                                                            width={{
-                                                                base: '70%',
-                                                                md: '65%',
-                                                                lg: '60%'
-                                                            }}
-                                                            fontSize="sm"
-                                                            color="gray.600"
-                                                        >
-                                                            {opt.description}
-                                                        </Text>
+
                                                         {opt.shippingPromotions?.map((promo) => {
                                                             return (
                                                                 <Text
