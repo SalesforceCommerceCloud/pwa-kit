@@ -33,7 +33,7 @@ DynamicImage.propTypes = {
      */
     src: PropTypes.string,
     /**
-     * Image widths in either array or object form, whose units can either be px or vw or unit-less. They will be mapped to the corresponding `sizes` and `srcSet`.
+     * Image widths relative to the breakpoints, whose units can either be px or vw or unit-less. They will be mapped to the corresponding `sizes` and `srcSet`.
      */
     widths: PropTypes.oneOfType([PropTypes.array, PropTypes.object]),
     /**

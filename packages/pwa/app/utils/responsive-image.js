@@ -10,7 +10,7 @@ import theme from '@chakra-ui/theme'
 /**
  * @param {Object} props
  * @param {string} props.src - Dynamic src having an optional param that can vary with widths. For example: `image[_{width}].jpg` or `image.jpg[?sw={width}&q=60]`
- * @param {(number[]|string[]|Object)} [props.widths] - Image widths in either array or object form, whose units can either be px or vw or unit-less. They will be mapped to the corresponding `sizes` and `srcSet`.
+ * @param {(number[]|string[]|Object)} [props.widths] - Image widths relative to the breakpoints, whose units can either be px or vw or unit-less. They will be mapped to the corresponding `sizes` and `srcSet`.
  * @return {Object} src, sizes, and srcSet props for your image component
  */
 export const getResponsiveImageAttributes = ({src, widths}) => {
