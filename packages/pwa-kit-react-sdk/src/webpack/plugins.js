@@ -150,7 +150,9 @@ export class PwaKitConfigPlugin {
         try {
             file = this.getFile(compiler, this.CONFIG_PATH)
         } catch (e) {
-            console.warn(`Warning: PWA Kit config file (pwa-kit.config.json) is not found.`)
+            // Config file is optional
+            // so we swallow the error
+            return
         }
         try {
             return file ? JSON.parse(file) : undefined
