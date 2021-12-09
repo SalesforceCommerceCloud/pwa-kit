@@ -43,7 +43,7 @@ describe('PwaKitConfigPlugin', () => {
         expect(plugin.getFile).toHaveBeenCalledWith(compiler, plugin.CONFIG_PATH)
     })
 
-    test('getConfig not throw if file not found', () => {
+    test('does not throw an error if the config file is not found', () => {
         const plugin = new PwaKitConfigPlugin()
 
         const compiler = {}
