@@ -19,9 +19,10 @@ import {
     CustomerProductListsProvider
 } from '../commerce-api/contexts'
 import {AddToCartModalContext} from '../hooks/use-add-to-cart-modal'
-import {commerceAPIConfig, einsteinAPIConfig} from '../api.config'
+import {commerceAPIConfig} from '../commerce-api.config'
 import {IntlProvider} from 'react-intl'
 import {DEFAULT_LOCALE, DEFAULT_CURRENCY} from '../constants'
+import {einsteinAPIConfig} from '../einstein-api.config'
 import {mockCategories as initialMockCategories} from '../commerce-api/mock-data'
 
 // Contexts
