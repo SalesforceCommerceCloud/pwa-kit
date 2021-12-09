@@ -8,12 +8,34 @@ import React from 'react'
 import {renderWithProviders} from '../../utils/test-utils'
 import Link from './index'
 
+import {getUrlConfig} from '../../utils/utils'
+jest.mock('../../utils/utils', () => {
+    const original = jest.requireActual('../../utils/utils')
+    return {
+        ...original,
+        getUrlConfig: jest.fn()
+    }
+})
 test('renders a link with locale prepended', () => {
+    getUrlConfig.mockImplementation(() => ({
+        locale: 'path'
+    }))
     const {getByText} = renderWithProviders(<Link href="/mypage">My Page</Link>)
     expect(getByText(/My Page/i)).toHaveAttribute('href', '/en-GB/mypage')
 })
 
+test('renders a link with locale as query param', () => {
+    getUrlConfig.mockImplementation(() => ({
+        locale: 'query_param'
+    }))
+    const {getByText} = renderWithProviders(<Link href="/mypage">My Page</Link>)
+    expect(getByText(/My Page/i)).toHaveAttribute('href', '/mypage?locale=en-GB')
+})
+
 test('accepts `to` prop as well', () => {
+    getUrlConfig.mockImplementation(() => ({
+        locale: 'path'
+    }))
     const {getByText} = renderWithProviders(<Link to="/mypage">My Page</Link>)
     expect(getByText(/My Page/i)).toHaveAttribute('href', '/en-GB/mypage')
 })
@@ -21,9 +43,4 @@ test('accepts `to` prop as well', () => {
 test('does not modify root url', () => {
     const {getByText} = renderWithProviders(<Link href="/">My Page</Link>)
     expect(getByText(/My Page/i)).toHaveAttribute('href', '/')
-})
-
-test('does not modify href if correct locale is included in passed prop', () => {
-    const {getByText} = renderWithProviders(<Link href="/en-GB/mypage">My Page</Link>)
-    expect(getByText(/My Page/i)).toHaveAttribute('href', '/en-GB/mypage')
 })

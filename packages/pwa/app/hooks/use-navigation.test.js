@@ -5,13 +5,21 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import {render} from '@testing-library/react'
 import user from '@testing-library/user-event'
 import useNavigation from './use-navigation'
+import {getUrlConfig} from '../utils/utils'
+import {render} from '@testing-library/react'
 
 const mockHistoryPush = jest.fn()
 const mockHistoryReplace = jest.fn()
 
+jest.mock('../utils/utils', () => {
+    const original = jest.requireActual('../utils/utils')
+    return {
+        ...original,
+        getUrlConfig: jest.fn()
+    }
+})
 jest.mock('react-router', () => {
     return {
         useHistory: jest.fn().mockImplementation(() => {
@@ -24,10 +32,16 @@ jest.mock('react-router', () => {
 })
 
 jest.mock('react-intl', () => {
-    return {useIntl: jest.fn().mockReturnValue({locale: 'en-GB'})}
+    return {
+        useIntl: jest.fn().mockReturnValue({locale: 'en-GB'}),
+        defineMessage: jest.fn((message) => message)
+    }
 })
 
 beforeEach(() => {
+    getUrlConfig.mockImplementation(() => ({
+        locale: 'path'
+    }))
     jest.clearAllMocks()
 })
 
@@ -54,12 +68,6 @@ test('works for any history method and args', () => {
     const {getByTestId} = render(<TestComponent />)
     user.click(getByTestId('page2-link'))
     expect(mockHistoryReplace).toHaveBeenCalledWith('/en-GB/page2', {})
-})
-
-test('wont prepend locale if already given', () => {
-    const {getByTestId} = render(<TestComponent />)
-    user.click(getByTestId('page3-link'))
-    expect(mockHistoryPush).toHaveBeenCalledWith('/en-GB/page3')
 })
 
 test('if given the path to root or homepage, will not prepend the locale', () => {

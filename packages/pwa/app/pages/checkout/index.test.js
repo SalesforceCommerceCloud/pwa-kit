@@ -24,6 +24,7 @@ import {
     mockedCustomerProductLists,
     productsResponse
 } from '../../commerce-api/mock-data'
+import {getUrlConfig} from '../../utils/utils'
 
 jest.setTimeout(60000)
 
@@ -44,6 +45,14 @@ jest.mock('../../commerce-api/utils', () => {
             codeVerifier: 'test',
             redirectUri: 'http://localhost/test'
         })
+    }
+})
+
+jest.mock('../../utils/utils', () => {
+    const original = jest.requireActual('../../utils/utils')
+    return {
+        ...original,
+        getUrlConfig: jest.fn()
     }
 })
 
@@ -160,6 +169,9 @@ const server = setupServer(
 
 // Set up and clean up
 beforeAll(() => {
+    getUrlConfig.mockImplementation(() => ({
+        locale: 'path'
+    }))
     jest.resetModules()
     server.listen({onUnhandledRequest: 'error'})
 })

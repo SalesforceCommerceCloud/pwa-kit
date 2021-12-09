@@ -218,7 +218,7 @@ const ProductList = (props) => {
             }
         }
 
-        navigate(`${location.pathname}?${stringifySearchParams(searchParamsCopy)}`)
+        navigate(`/category/${params.categoryId}?${stringifySearchParams(searchParamsCopy)}`)
     }
 
     // Clears all filters

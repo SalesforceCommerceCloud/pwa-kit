@@ -7,7 +7,6 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import {useIntl} from 'react-intl'
 
 // Components
 import {
@@ -20,8 +19,7 @@ import {
     // Hooks
     useStyleConfig
 } from '@chakra-ui/react'
-import {Link as RouteLink} from 'react-router-dom'
-
+import Link from '../link'
 // Icons
 import {ChevronDownIcon, ChevronRightIcon} from '../icons'
 
@@ -31,7 +29,6 @@ import {ChevronDownIcon, ChevronRightIcon} from '../icons'
  * be indented to further enhance the hierary view.
  */
 const NestedAccordion = (props) => {
-    const intl = useIntl()
     const styles = useStyleConfig('NestedAccordion')
     const {
         item,
@@ -88,8 +85,8 @@ const NestedAccordion = (props) => {
                                     ) : (
                                         <AccordionButton
                                             {...styles.leafButton}
-                                            as={RouteLink}
-                                            to={urlBuilder(item, intl.locale)}
+                                            as={Link}
+                                            to={urlBuilder(item)}
                                         >
                                             <Text
                                                 fontSize={fontSizes[depth]}
