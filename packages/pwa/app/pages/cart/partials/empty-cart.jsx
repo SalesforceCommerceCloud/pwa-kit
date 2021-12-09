@@ -69,7 +69,7 @@ const EmptyCart = ({isRegistered}) => {
                                     variant="solid"
                                 >
                                     <FormattedMessage
-                                        defaultMessage="Sign in"
+                                        defaultMessage="Sign In"
                                         id="empty_cart.link.sign_in"
                                     />
                                 </Button>

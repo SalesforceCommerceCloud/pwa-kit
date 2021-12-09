@@ -154,7 +154,7 @@ const OrderSummary = ({
                                     <Text as="span" ml={1}>
                                         (
                                         <FormattedMessage
-                                            defaultMessage="Promotion Applied"
+                                            defaultMessage="Promotion applied"
                                             id="order_summary.label.promo_applied"
                                         />
                                         )

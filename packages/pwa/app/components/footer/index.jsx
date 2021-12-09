@@ -188,7 +188,7 @@ const Subscribe = ({...otherProps}) => {
             <Heading {...styles.subscribeHeading}>
                 {intl.formatMessage({
                     id: 'footer.subscribe.heading.first_to_know',
-                    defaultMessage: 'Be the First to Know'
+                    defaultMessage: 'Be the first to know'
                 })}
             </Heading>
             <Text {...styles.subscribeMessage}>

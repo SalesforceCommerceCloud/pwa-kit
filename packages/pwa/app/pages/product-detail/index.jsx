@@ -263,7 +263,7 @@ const ProductDetail = ({category, product, isLoading}) => {
                     <RecommendedProducts
                         title={
                             <FormattedMessage
-                                defaultMessage="You Might Also Like"
+                                defaultMessage="You might also like"
                                 id="product_detail.recommended_products.title.might_also_like"
                             />
                         }

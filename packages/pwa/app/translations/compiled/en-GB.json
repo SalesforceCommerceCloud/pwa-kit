@@ -14,7 +14,7 @@
   "account.logout_button.button.log_out": [
     {
       "type": 0,
-      "value": "Log out"
+      "value": "Log Out"
     }
   ],
   "account_addresses.badge.default": [
@@ -32,13 +32,13 @@
   "account_addresses.info.address_updated": [
     {
       "type": 0,
-      "value": "Address Updated"
+      "value": "Address updated"
     }
   ],
   "account_addresses.info.new_address_saved": [
     {
       "type": 0,
-      "value": "New Address Saved"
+      "value": "New address saved"
     }
   ],
   "account_addresses.page_action_placeholder.button.add_address": [
@@ -56,7 +56,7 @@
   "account_addresses.page_action_placeholder.message.add_new_address": [
     {
       "type": 0,
-      "value": "Add a new address method for faster checkout"
+      "value": "Add a new address method for faster checkout."
     }
   ],
   "account_addresses.title.addresses": [
@@ -158,13 +158,13 @@
   "account_order_history.description.once_you_place_order": [
     {
       "type": 0,
-      "value": "Once you place an order the details will show up here"
+      "value": "Once you place an order the details will show up here."
     }
   ],
   "account_order_history.heading.no_order_yet": [
     {
       "type": 0,
-      "value": "You haven't placed an order yet"
+      "value": "You haven't placed an order yet."
     }
   ],
   "account_order_history.label.num_of_items": [
@@ -228,7 +228,7 @@
   "account_payment_methods.description.add_method_for_faster_checkout": [
     {
       "type": 0,
-      "value": "Add a new payment method for faster checkout"
+      "value": "Add a new payment method for faster checkout."
     }
   ],
   "account_payment_methods.heading.no_saved_methods": [
@@ -258,7 +258,7 @@
   "account_wishlist.description.continue_shopping": [
     {
       "type": 0,
-      "value": "Continue shopping and add items to your wishlist"
+      "value": "Continue shopping and add items to your wishlist."
     }
   ],
   "account_wishlist.heading.no_wishlist": [
@@ -364,7 +364,7 @@
   "auth_modal.description.now_signed_in": [
     {
       "type": 0,
-      "value": "You're now signed in"
+      "value": "You're now signed in."
     }
   ],
   "auth_modal.error.incorrect_email_or_password": [
@@ -390,7 +390,7 @@
   "auth_modal.password_reset_success.button.back_to_sign_in": [
     {
       "type": 0,
-      "value": "Back to sign in"
+      "value": "Back to Sign In"
     }
   ],
   "auth_modal.password_reset_success.info.will_email_shortly": [
@@ -490,7 +490,7 @@
   "cart_secondary_button_group.action.added_to_wishlist": [
     {
       "type": 0,
-      "value": "Add to wishlist"
+      "value": "Add to Wishlist"
     }
   ],
   "cart_secondary_button_group.action.edit": [
@@ -676,7 +676,7 @@
   "checkout_confirmation.label.promo_applied": [
     {
       "type": 0,
-      "value": "promo applied"
+      "value": "Promotion applied"
     }
   ],
   "checkout_confirmation.label.shipping": [
@@ -868,7 +868,7 @@
   "confirmation_modal.default.message.you_want_to_continue": [
     {
       "type": 0,
-      "value": "Are you sure you want to continue ?"
+      "value": "Are you sure you want to continue?"
     }
   ],
   "confirmation_modal.default.title.confirm_action": [
@@ -946,7 +946,7 @@
   "contact_info.button.login": [
     {
       "type": 0,
-      "value": "Log in"
+      "value": "Log In"
     }
   ],
   "contact_info.error.incorrect_username_or_password": [
@@ -1004,7 +1004,7 @@
   "drawer_menu.button.log_out": [
     {
       "type": 0,
-      "value": "Log out"
+      "value": "Log Out"
     }
   ],
   "drawer_menu.button.my_account": [
@@ -1100,7 +1100,7 @@
   "empty_cart.description.empty_cart": [
     {
       "type": 0,
-      "value": "Your Cart is Empty"
+      "value": "Your cart is empty."
     }
   ],
   "empty_cart.link.continue_shopping": [
@@ -1118,13 +1118,13 @@
   "empty_cart.message.continue_shopping": [
     {
       "type": 0,
-      "value": "Continue shopping to add items to your cart"
+      "value": "Continue shopping to add items to your cart."
     }
   ],
   "empty_cart.message.sign_in_or_continue_shopping": [
     {
       "type": 0,
-      "value": "Sign in to retrieve your saved items or continue shopping"
+      "value": "Sign in to retrieve your saved items or continue shopping."
     }
   ],
   "empty_search_results.info.cant_find_anything_for_category": [
@@ -1160,7 +1160,7 @@
     },
     {
       "type": 0,
-      "value": "\""
+      "value": "\"."
     }
   ],
   "empty_search_results.info.double_check_spelling": [
@@ -1171,12 +1171,16 @@
     {
       "type": 1,
       "value": "link"
+    },
+    {
+      "type": 0,
+      "value": "."
     }
   ],
   "empty_search_results.link.contact_us": [
     {
       "type": 0,
-      "value": "contact us"
+      "value": "Contact Us"
     }
   ],
   "empty_search_results.recommended_products.title.most_viewed": [
@@ -1242,7 +1246,7 @@
   "footer.link.signin_create_account": [
     {
       "type": 0,
-      "value": "Sign in or Create Account"
+      "value": "Sign in or create account"
     }
   ],
   "footer.link.site_map": [
@@ -1392,15 +1396,13 @@
   "home.description.here_to_help": [
     {
       "type": 0,
-      "value": "Contact our support staff and they’ll get "
-    },
-    {
-      "type": 1,
-      "value": "br"
-    },
+      "value": "Contact our support staff and, they’ll get you"
+    }
+  ],
+  "home.description.here_to_help_line_2": [
     {
       "type": 0,
-      "value": " you to the right place."
+      "value": "to the right place."
     }
   ],
   "home.description.shop_products": [
@@ -1410,7 +1412,7 @@
     },
     {
       "type": 1,
-      "value": "link"
+      "value": "docLink"
     },
     {
       "type": 0,
@@ -1462,7 +1464,7 @@
   "home.features.heading.components": [
     {
       "type": 0,
-      "value": "Components & Design kit"
+      "value": "Components & Design Kit"
     }
   ],
   "home.features.heading.einstein_recommendations": [
@@ -2014,7 +2016,7 @@
   "order_summary.label.promo_applied": [
     {
       "type": 0,
-      "value": "promo applied"
+      "value": "Promotion applied"
     }
   ],
   "order_summary.label.promotions_applied": [
@@ -2062,7 +2064,7 @@
   "page_not_found.title.page_cant_be_found": [
     {
       "type": 0,
-      "value": "The page you're looking for can't be found"
+      "value": "The page you're looking for can't be found."
     }
   ],
   "pagination.field.num_of_pages": [
@@ -2242,13 +2244,13 @@
   "product_detail.recommended_products.title.complete_set": [
     {
       "type": 0,
-      "value": "Complete The Set"
+      "value": "Complete the Set"
     }
   ],
   "product_detail.recommended_products.title.might_also_like": [
     {
       "type": 0,
-      "value": "You Might Also Like"
+      "value": "You might also like"
     }
   ],
   "product_detail.recommended_products.title.recently_viewed": [
@@ -2368,19 +2370,19 @@
   "product_tile.assistive_msg.wishlist": [
     {
       "type": 0,
-      "value": "wishlist"
+      "value": "Wishlist"
     }
   ],
   "product_view.button.add_to_cart": [
     {
       "type": 0,
-      "value": "Add to cart"
+      "value": "Add to Cart"
     }
   ],
   "product_view.button.add_to_wishlist": [
     {
       "type": 0,
-      "value": "Add to wishlist"
+      "value": "Add to Wishlist"
     }
   ],
   "product_view.button.update": [
@@ -2520,19 +2522,19 @@
   "register_form.button.create_account": [
     {
       "type": 0,
-      "value": "Create account"
+      "value": "Create Account"
     }
   ],
   "register_form.heading.lets_get_started": [
     {
       "type": 0,
-      "value": "Let's get started"
+      "value": "Let's get started!"
     }
   ],
   "register_form.message.agree_to_policy_terms": [
     {
       "type": 0,
-      "value": "By creating an account, you agree to Salesforce’s "
+      "value": "By creating an account, you agree to Salesforce "
     },
     {
       "children": [
@@ -2574,7 +2576,7 @@
   "reset_password.button.back_to_sign_in": [
     {
       "type": 0,
-      "value": "Back to sign in"
+      "value": "Back to Sign In"
     }
   ],
   "reset_password.info.receive_email_shortly": [
@@ -2612,7 +2614,7 @@
   "reset_password_form.button.reset_password": [
     {
       "type": 0,
-      "value": "Reset password"
+      "value": "Reset Password"
     }
   ],
   "reset_password_form.message.enter_your_email": [
@@ -2750,25 +2752,25 @@
   "update_password_fields.button.forgot_password": [
     {
       "type": 0,
-      "value": "Forgot password?"
+      "value": "Forgot Password?"
     }
   ],
   "use_address_fields.error.please_enter_first_name": [
     {
       "type": 0,
-      "value": "Please enter your first name"
+      "value": "Please enter your first name."
     }
   ],
   "use_address_fields.error.please_enter_last_name": [
     {
       "type": 0,
-      "value": "Please enter your last name"
+      "value": "Please enter your last name."
     }
   ],
   "use_address_fields.error.please_enter_phone_number": [
     {
       "type": 0,
-      "value": "Please enter your phone number"
+      "value": "Please enter your phone number."
     }
   ],
   "use_address_fields.error.please_enter_your_postal_or_zip": [
@@ -2779,24 +2781,28 @@
     {
       "type": 1,
       "value": "postalOrZip"
+    },
+    {
+      "type": 0,
+      "value": "."
     }
   ],
   "use_address_fields.error.please_select_your_address": [
     {
       "type": 0,
-      "value": "Please enter your address"
+      "value": "Please enter your address."
     }
   ],
   "use_address_fields.error.please_select_your_city": [
     {
       "type": 0,
-      "value": "Please enter your city"
+      "value": "Please enter your city."
     }
   ],
   "use_address_fields.error.please_select_your_country": [
     {
       "type": 0,
-      "value": "Please select your country"
+      "value": "Please select your country."
     }
   ],
   "use_address_fields.error.please_select_your_state_or_province": [
@@ -2807,6 +2813,10 @@
     {
       "type": 1,
       "value": "stateOrProvince"
+    },
+    {
+      "type": 0,
+      "value": "."
     }
   ],
   "use_address_fields.error.required": [
@@ -2818,7 +2828,7 @@
   "use_address_fields.error.state_code_invalid": [
     {
       "type": 0,
-      "value": "Please enter 2-letter state/province"
+      "value": "Please enter 2-letter state/province."
     }
   ],
   "use_address_fields.label.address": [
@@ -2896,49 +2906,49 @@
   "use_credit_card_fields.error.required_card_number": [
     {
       "type": 0,
-      "value": "Please enter your card number"
+      "value": "Please enter your card number."
     }
   ],
   "use_credit_card_fields.error.required_expiry": [
     {
       "type": 0,
-      "value": "Please enter your expiry date"
+      "value": "Please enter your expiration date."
     }
   ],
   "use_credit_card_fields.error.required_name": [
     {
       "type": 0,
-      "value": "Please enter your name as shown on your card"
+      "value": "Please enter your name as shown on your card."
     }
   ],
   "use_credit_card_fields.error.required_security_code": [
     {
       "type": 0,
-      "value": "Please enter your security code"
+      "value": "Please enter your security code."
     }
   ],
   "use_credit_card_fields.error.valid_card_number": [
     {
       "type": 0,
-      "value": "Please enter a valid card number"
+      "value": "Please enter a valid card number."
     }
   ],
   "use_credit_card_fields.error.valid_date": [
     {
       "type": 0,
-      "value": "Please enter a valid date"
+      "value": "Please enter a valid date."
     }
   ],
   "use_credit_card_fields.error.valid_name": [
     {
       "type": 0,
-      "value": "Please enter a valid name"
+      "value": "Please enter a valid name."
     }
   ],
   "use_credit_card_fields.error.valid_security_code": [
     {
       "type": 0,
-      "value": "Please enter a valid security code"
+      "value": "Please enter a valid security code."
     }
   ],
   "use_credit_card_fields.label.card_number": [
@@ -2956,7 +2966,7 @@
   "use_credit_card_fields.label.expiry": [
     {
       "type": 0,
-      "value": "Expiry Date"
+      "value": "Expiration Date"
     }
   ],
   "use_credit_card_fields.label.name": [
@@ -2974,13 +2984,13 @@
   "use_login_fields.error.required_email": [
     {
       "type": 0,
-      "value": "Please enter your email address"
+      "value": "Please enter your email address."
     }
   ],
   "use_login_fields.error.required_password": [
     {
       "type": 0,
-      "value": "Please enter your password"
+      "value": "Please enter your password."
     }
   ],
   "use_login_fields.label.email": [
@@ -3006,7 +3016,7 @@
     },
     {
       "type": 0,
-      "value": " Left!"
+      "value": " left!"
     }
   ],
   "use_product.message.out_of_stock": [
@@ -3018,25 +3028,25 @@
   "use_profile_fields.error.required_email": [
     {
       "type": 0,
-      "value": "Please enter a valid email address"
+      "value": "Please enter a valid email address."
     }
   ],
   "use_profile_fields.error.required_first_name": [
     {
       "type": 0,
-      "value": "Please enter your first name"
+      "value": "Please enter your first name."
     }
   ],
   "use_profile_fields.error.required_last_name": [
     {
       "type": 0,
-      "value": "Please enter your last name"
+      "value": "Please enter your last name."
     }
   ],
   "use_profile_fields.error.required_phone": [
     {
       "type": 0,
-      "value": "Please enter your phone number"
+      "value": "Please enter your phone number."
     }
   ],
   "use_profile_fields.label.email": [
@@ -3066,7 +3076,7 @@
   "use_promo_code_fields.error.required_promo_code": [
     {
       "type": 0,
-      "value": "Please provide a valid promo code"
+      "value": "Please provide a valid promo code."
     }
   ],
   "use_promo_code_fields.label.promo_code": [
@@ -3078,7 +3088,7 @@
   "use_promocode.error.check_the_code": [
     {
       "type": 0,
-      "value": "Check the code and try again, it may already be applied or the promo has expired"
+      "value": "Check the code and try again, it may already be applied or the promo has expired."
     }
   ],
   "use_promocode.info.promo_applied": [
@@ -3096,55 +3106,55 @@
   "use_registration_fields.error.contain_number": [
     {
       "type": 0,
-      "value": "Password must contain at least one number"
+      "value": "Password must contain at least one number."
     }
   ],
   "use_registration_fields.error.lowercase_letter": [
     {
       "type": 0,
-      "value": "Password must contain at least one lowercase letter"
+      "value": "Password must contain at least one lowercase letter."
     }
   ],
   "use_registration_fields.error.minimum_characters": [
     {
       "type": 0,
-      "value": "Password must contain at least 8 characters"
+      "value": "Password must contain at least 8 characters."
     }
   ],
   "use_registration_fields.error.required_email": [
     {
       "type": 0,
-      "value": "Please enter a valid email address"
+      "value": "Please enter a valid email address."
     }
   ],
   "use_registration_fields.error.required_first_name": [
     {
       "type": 0,
-      "value": "Please enter your first name"
+      "value": "Please enter your first name."
     }
   ],
   "use_registration_fields.error.required_last_name": [
     {
       "type": 0,
-      "value": "Please enter your last name"
+      "value": "Please enter your last name."
     }
   ],
   "use_registration_fields.error.required_password": [
     {
       "type": 0,
-      "value": "Please create a password"
+      "value": "Please create a password."
     }
   ],
   "use_registration_fields.error.special_character": [
     {
       "type": 0,
-      "value": "Password must contain at least one special character"
+      "value": "Password must contain at least one special character."
     }
   ],
   "use_registration_fields.error.uppercase_letter": [
     {
       "type": 0,
-      "value": "Password must contain at least one uppercase letter"
+      "value": "Password must contain at least one uppercase letter."
     }
   ],
   "use_registration_fields.label.email": [
@@ -3180,7 +3190,7 @@
   "use_reset_password_fields.error.required_email": [
     {
       "type": 0,
-      "value": "Please enter a valid email address"
+      "value": "Please enter a valid email address."
     }
   ],
   "use_reset_password_fields.label.email": [
@@ -3192,43 +3202,43 @@
   "use_update_password_fields.error.contain_number": [
     {
       "type": 0,
-      "value": "Password must contain at least one number"
+      "value": "Password must contain at least one number."
     }
   ],
   "use_update_password_fields.error.lowercase_letter": [
     {
       "type": 0,
-      "value": "Password must contain at least one lowercase letter"
+      "value": "Password must contain at least one lowercase letter."
     }
   ],
   "use_update_password_fields.error.minimum_characters": [
     {
       "type": 0,
-      "value": "Password must contain at least 8 characters"
+      "value": "Password must contain at least 8 characters."
     }
   ],
   "use_update_password_fields.error.required_new_password": [
     {
       "type": 0,
-      "value": "Please provide a new password"
+      "value": "Please provide a new password."
     }
   ],
   "use_update_password_fields.error.required_password": [
     {
       "type": 0,
-      "value": "Please enter your password"
+      "value": "Please enter your password."
     }
   ],
   "use_update_password_fields.error.special_character": [
     {
       "type": 0,
-      "value": "Password must contain at least one special character"
+      "value": "Password must contain at least one special character."
     }
   ],
   "use_update_password_fields.error.uppercase_letter": [
     {
       "type": 0,
-      "value": "Password must contain at least one uppercase letter"
+      "value": "Password must contain at least one uppercase letter."
     }
   ],
   "use_update_password_fields.label.current_password": [

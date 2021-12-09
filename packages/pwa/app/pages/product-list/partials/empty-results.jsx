@@ -68,7 +68,8 @@ const EmptySearchResults = ({searchQuery, category}) => {
                         {intl.formatMessage(
                             {
                                 id: 'empty_search_results.info.double_check_spelling',
-                                defaultMessage: 'Double-check your spelling and try again or {link}.'
+                                defaultMessage:
+                                    'Double-check your spelling and try again or {link}.'
                             },
                             {
                                 link: (
