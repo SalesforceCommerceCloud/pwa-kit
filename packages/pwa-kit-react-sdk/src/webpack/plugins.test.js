@@ -55,7 +55,7 @@ describe('PwaKitConfigPlugin', () => {
         expect(plugin.getConfig(compiler, 'path')).toBeUndefined()
     })
 
-    test('getConfig throws if data is invalid', () => {
+    test('throws an error if the config file is not valid json', () => {
         const plugin = new PwaKitConfigPlugin()
 
         const compiler = {}
