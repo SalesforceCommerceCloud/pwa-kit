@@ -11,7 +11,7 @@ import fs from 'fs'
 import Ajv from 'ajv'
 import AjvMergePlugin from 'ajv-merge-patch/keywords/merge'
 
-import schema from '../config/schema.json'
+import schema from '../schemas/sdk-config.json'
 
 /**
  * Return a NormalModuleReplacementPlugin that is used to override SDK builtins
@@ -153,7 +153,7 @@ export class PwaKitConfigPlugin {
         try {
             file = this.getFile(compiler, this.CONFIG_PATH)
         } catch (e) {
-            console.warn(`1Warning: PWA Kit config file (pwa-kit.config.json) is not found.`)
+            console.warn(`Warning: PWA Kit config file (pwa-kit.config.json) is not found.`)
         }
         try {
             return file ? JSON.parse(file) : undefined
@@ -180,7 +180,7 @@ export class PwaKitConfigPlugin {
             return file ? JSON.parse(file) : undefined
         } catch {
             throw new Error(
-                'PWA Kit config file (pwa-kit.config.schema.json) must include valid JSON data.'
+                'PWA Kit custom config schema file (pwa-kit.config.schema.json) must include valid JSON data.'
             )
         }
     }

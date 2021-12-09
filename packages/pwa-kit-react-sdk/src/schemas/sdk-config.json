@@ -4,11 +4,11 @@
     "$id": "pwa-kit-config-schema",
     "title": "PWA Kit Config Schema",
     "type": "object",
-    "required": ["app"],
+    "required": ["pwa-kit-react-sdk"],
     "properties": {
-        "app": {
-            "$id": "#pwa-kit-config-schema/app",
-            "title": "App",
+        "pwa-kit-react-sdk": {
+            "$id": "#pwa-kit-config-schema/pwa-kit-react-sdk",
+            "title": "pwa-kit-react-sdk",
             "type": "object",
             "required": [],
             "properties": {}
