@@ -180,7 +180,7 @@ export class PwaKitConfigPlugin {
             return file ? JSON.parse(file) : undefined
         } catch {
             throw new Error(
-                'PWA Kit custom config schema file (pwa-kit.config.schema.json) must include valid JSON data.'
+                'PWA Kit custom config schema file (pwa-kit.config.schema.json) contains invalid JSON data.'
             )
         }
     }
