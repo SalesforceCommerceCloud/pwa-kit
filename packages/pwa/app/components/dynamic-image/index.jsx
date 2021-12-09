@@ -6,23 +6,44 @@
  */
 import React from 'react'
 import PropTypes from 'prop-types'
-import {Img as ChakraImg, Box} from '@chakra-ui/react'
+import {Img, Box} from '@chakra-ui/react'
 import {getResponsiveImageAttributes} from '../../utils/responsive-image'
 
-// TODO: `as` prop
-// TODO: example on how to use the component
-const DynamicImage = ({src, widths, imageProps, ...rest}) => {
+/**
+ * Quickly create a responsive image using your dynamic image service
+ * @example
+ *  // Widths without a unit are interpreted as px values
+ * <DynamicImage src="http://example.com/image.jpg[?sw={width}&q=60]" widths={[100, 360, 720]} />
+ * <DynamicImage src="http://example.com/image.jpg[?sw={width}&q=60]" widths={{base: 100, sm: 360, md: 720}} />
+ * // You can also use units of px or vw
+ * <DynamicImage src="http://example.com/image.jpg[?sw={width}&q=60]" widths={['50vw', '100vw', '500px']} />
+ */
+const DynamicImage = ({src, widths, imageProps, as, ...rest}) => {
+    const Component = as ? as : Img
     return (
         <Box {...rest}>
-            <ChakraImg {...getResponsiveImageAttributes({src, widths})} {...imageProps} />
+            <Component {...getResponsiveImageAttributes({src, widths})} {...imageProps} />
         </Box>
     )
 }
 
 DynamicImage.propTypes = {
+    /**
+     * Dynamic src having an optional param that can vary with widths. For example: `image[_{width}].jpg` or `image.jpg[?sw={width}&q=60]`
+     */
     src: PropTypes.string,
+    /**
+     * Image widths in either array or object form, whose units can either be px or vw or unit-less. They will be mapped to the corresponding `sizes` and `srcSet`.
+     */
     widths: PropTypes.oneOfType([PropTypes.array, PropTypes.object]),
-    imageProps: PropTypes.object
+    /**
+     * Props to pass to the inner image component
+     */
+    imageProps: PropTypes.object,
+    /**
+     * Override with your chosen image component
+     */
+    as: PropTypes.elementType
 }
 
 export default DynamicImage
