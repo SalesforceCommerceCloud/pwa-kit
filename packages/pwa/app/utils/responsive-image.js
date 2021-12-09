@@ -71,7 +71,7 @@ export const getResponsiveImageAttributes = ({src, widths}) => {
  */
 const mapWidthsToSizes = (widths) => {
     // By default, unit-less number is a px value
-    const _widths = withUnit(Array.isArray(widths) ? widths : responsivePropAsArray(widths))
+    const _widths = withUnit(Array.isArray(widths) ? widths : widthsAsArray(widths))
 
     return breakpointLabels
         .slice(0, _widths.length)
@@ -86,10 +86,16 @@ const mapWidthsToSizes = (widths) => {
  * @param {(number[]|string[]|Object)} widths
  */
 const mapWidthsToSrcSet = (widths, dynamicSrc) => {
-    let _widths = isObject(widths) ? responsivePropAsArray(widths) : widths.slice(0)
-    if (typeof _widths[0] === 'string') {
-        _widths = convertToPxNumbers(_widths)
+    let _widths = isObject(widths) ? widthsAsArray(widths) : widths.slice(0)
+
+    if (_widths.length < breakpointLabels.length) {
+        const lastWidth = _widths[_widths.length - 1]
+        const amountToPad = breakpointLabels.length - _widths.length
+
+        _widths = [..._widths, ...Array(amountToPad).fill(lastWidth)]
     }
+
+    _widths = uniqueArray(convertToPxNumbers(_widths)).sort()
 
     const srcSet = []
     _widths.forEach((width) => {
@@ -101,29 +107,42 @@ const mapWidthsToSrcSet = (widths, dynamicSrc) => {
 }
 
 /**
- * @param {string[]} widths
+ * @param {string[]|number[]} widths
  */
 const convertToPxNumbers = (widths) => {
     const vwValue = /^\d+vw$/
     const pxValue = /^\d+px$/
 
-    return widths.map((width, i) => {
-        if (vwValue.test(width)) {
-            const vw = parseFloat(width)
-            // We imagine the biggest image for the current breakpoint
-            // to be when the viewport is closely approaching the _next breakpoint_.
-            // (If you're already at the last breakpoint, we'll use that instead)
-            const nextBp = breakpointLabels[i + 1] || breakpointLabels[i]
-            const em = (vw / 100) * parseFloat(theme.breakpoints[nextBp])
-            return emToPx(em)
-        } else if (pxValue.test(width)) {
-            return parseInt(width)
-        } else {
-            console.error('Expecting to see values with vw or px unit only')
-            return 0
-        }
-    })
+    return widths
+        .map((width, i) => {
+            if (typeof width === 'number') {
+                return width
+            }
+
+            if (vwValue.test(width)) {
+                const vw = parseFloat(width)
+                const currentBp = breakpointLabels[i]
+                // We imagine the biggest image for the current breakpoint
+                // to be when the viewport is closely approaching the _next breakpoint_.
+                const nextBp = breakpointLabels[i + 1]
+
+                if (nextBp) {
+                    return vwToPx(vw, nextBp)
+                } else {
+                    // We're already at the last breakpoint
+                    return widths[i] !== widths[i - 1] ? vwToPx(vw, currentBp) : undefined
+                }
+            } else if (pxValue.test(width)) {
+                return parseInt(width)
+            } else {
+                console.error('Expecting to see values with vw or px unit only')
+                return 0
+            }
+        })
+        .filter((width) => width !== undefined)
 }
+
+const uniqueArray = (array) => [...new Set(array)]
 
 /**
  * @param {(number[]|string[])} widths
@@ -136,18 +155,32 @@ const isObject = (o) => o?.constructor === Object
 const breakpointLabels = ['base', 'sm', 'md', 'lg', 'xl', '2xl']
 
 /**
- * @param {Object} prop
+ * @param {Object} widths
+ * @example
+ * // returns the array [10, 10, 10, 50]
+ * widthsAsArray({base: 10, lg: 50})
  */
-const responsivePropAsArray = (prop) => {
+const widthsAsArray = (widths) => {
+    const biggestBreakpoint = breakpointLabels.filter((bp) => Boolean(widths[bp])).pop()
+
     let mostRecent
-    return breakpointLabels.map((bp) => {
-        if (prop[bp]) {
-            mostRecent = prop[bp]
-            return prop[bp]
+    return breakpointLabels.slice(0, breakpointLabels.indexOf(biggestBreakpoint) + 1).map((bp) => {
+        if (widths[bp]) {
+            mostRecent = widths[bp]
+            return widths[bp]
         } else {
             return mostRecent
         }
     })
+}
+
+/**
+ * @param {number} vw
+ * @param {string} breakpoint
+ */
+const vwToPx = (vw, breakpoint) => {
+    const em = (vw / 100) * parseFloat(theme.breakpoints[breakpoint])
+    return emToPx(em)
 }
 
 /**

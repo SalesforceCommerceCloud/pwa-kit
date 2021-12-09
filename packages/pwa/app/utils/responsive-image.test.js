@@ -14,25 +14,23 @@ const disImageURL = {
         'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw1e4fcb17/images/large/PG.10212867.JJ3XYXX.PZ.jpg'
 }
 
-const staticImageURL = {
-    withOptionalParams: 'https://example.com/image[_{width}].jpg',
-    withoutOptionalParams: 'https://example.com/image.jpg'
-}
+const buildSrcSet = (pxWidths) => {
+    const uniqueArray = [...new Set(pxWidths)]
+    const widths = uniqueArray.sort()
 
-test('vwSizes', () => {
+    return widths
+        .map((width) => {
+            return `${urlWithWidth(width)} ${width}w, ${urlWithWidth(width * 2)} ${width * 2}w`
+        })
+        .join(', ')
+}
+const urlWithWidth = (width) => getSrc(disImageURL.withOptionalParams, width)
+
+test('vw widths', () => {
     let props = getResponsiveImageAttributes({
         src: disImageURL.withOptionalParams,
-        vwSizes: [100, 100, 50]
+        widths: ['100vw', '100vw', '50vw']
     })
-
-    const urlWithWidth = (width) => getSrc(disImageURL.withOptionalParams, width)
-    const buildSrcSet = (pxWidths) => {
-        return pxWidths
-            .map((width) => {
-                return `${urlWithWidth(width)} ${width}w, ${urlWithWidth(width * 2)} ${width * 2}w`
-            })
-            .join(', ')
-    }
 
     // Breakpoints
     // sm: "30em",
@@ -53,93 +51,98 @@ test('vwSizes', () => {
         srcSet: buildSrcSet([480, 768, 496, 640, 768])
     })
 
-    // This time with vwSizes as _object_
+    // This time as _object_
     props = getResponsiveImageAttributes({
         src: disImageURL.withOptionalParams,
-        vwSizes: {
-            base: 100,
-            sm: 100,
-            md: 50
+        widths: {
+            base: '100vw',
+            sm: '100vw',
+            md: '50vw'
         }
     })
     expect(props).toStrictEqual({
         src: disImageURL.withoutOptionalParams,
-        sizes:
-            '(min-width: 96em) 50vw, (min-width: 80em) 50vw, (min-width: 62em) 50vw, (min-width: 48em) 50vw, (min-width: 30em) 100vw, 100vw',
+        sizes: '(min-width: 48em) 50vw, (min-width: 30em) 100vw, 100vw',
         srcSet: buildSrcSet([480, 768, 496, 640, 768])
     })
-})
 
-test('manually specifying sizes and srcset', () => {
-    const srcSet = [300, 720, 1000, 1500]
-
-    let props = getResponsiveImageAttributes({
-        src: staticImageURL.withOptionalParams,
-        sizes: ['100vw', '100vw', '50vw', '350px'],
-        srcSet
-    })
-
-    // Breakpoints
-    // sm: "30em",
-    // md: "48em",
-    // lg: "62em",
-    // xl: "80em",
-    // "2xl": "96em",
-
-    const urlWithWidth = (width) => getSrc(staticImageURL.withOptionalParams, width)
-
-    expect(props).toStrictEqual({
-        src: staticImageURL.withoutOptionalParams,
-        sizes: '(min-width: 62em) 350px, (min-width: 48em) 50vw, (min-width: 30em) 100vw, 100vw',
-        srcSet: srcSet.map((width) => `${urlWithWidth(width)} ${width}w`).join(', ')
-    })
-
-    // This time sizes is an _object_
+    // Edge case: testing changing width at the very last breakpoint (2xl)
     props = getResponsiveImageAttributes({
-        src: staticImageURL.withOptionalParams,
-        sizes: {
+        src: disImageURL.withOptionalParams,
+        widths: {
             base: '100vw',
-            sm: '100vw',
-            md: '50vw',
-            lg: '350px'
-        },
-        srcSet
+            '2xl': '50vw'
+        }
     })
+    // 100vw of sm => 30em => 30 * 16 = 480px
+    // 100vw of md => 48em => 768px
+    // 100vw of lg => 62em => 992px
+    // 100vw of xl => 80em => 1280px
+    // 100vw of 2xl => 96em => 1536px
+    // 50vw of 2xl => 48em => 768px
     expect(props).toStrictEqual({
-        src: staticImageURL.withoutOptionalParams,
-        sizes: '(min-width: 62em) 350px, (min-width: 48em) 50vw, (min-width: 30em) 100vw, 100vw',
-        srcSet: srcSet.map((width) => `${urlWithWidth(width)} ${width}w`).join(', ')
+        src: disImageURL.withoutOptionalParams,
+        sizes:
+            '(min-width: 96em) 50vw, (min-width: 80em) 100vw, (min-width: 62em) 100vw, (min-width: 48em) 100vw, (min-width: 30em) 100vw, 100vw',
+        srcSet: buildSrcSet([480, 768, 992, 1280, 1536, 768])
     })
 })
 
-test('literal values', () => {
-    const props = getResponsiveImageAttributes({
-        src: staticImageURL.withoutOptionalParams,
-        sizes: '(min-width: 1200px) 800px, (min-width: 720px) 50vw, 100vw',
-        srcSet: 'https://example.com/image_800.jpg 800w, https://example.com/image_1600.jpg 1600w'
+test('px values', () => {
+    // widths in array format
+    let props = getResponsiveImageAttributes({
+        src: disImageURL.withOptionalParams,
+        widths: [100, 500, 1000]
+    })
+    expect(props).toStrictEqual({
+        src: disImageURL.withoutOptionalParams,
+        sizes: '(min-width: 48em) 1000px, (min-width: 30em) 500px, 100px',
+        srcSet: buildSrcSet([100, 500, 1000])
     })
 
-    // Expecting the output to be the same as input
+    // widths in object format
+    props = getResponsiveImageAttributes({
+        src: disImageURL.withOptionalParams,
+        widths: {
+            base: 100,
+            sm: 500,
+            md: 1000
+        }
+    })
     expect(props).toStrictEqual({
-        src: staticImageURL.withoutOptionalParams,
-        sizes: '(min-width: 1200px) 800px, (min-width: 720px) 50vw, 100vw',
-        srcSet: 'https://example.com/image_800.jpg 800w, https://example.com/image_1600.jpg 1600w'
+        src: disImageURL.withoutOptionalParams,
+        sizes: '(min-width: 48em) 1000px, (min-width: 30em) 500px, 100px',
+        srcSet: buildSrcSet([100, 500, 1000])
+    })
+})
+
+test('mixture of px and vw values', () => {
+    let props = getResponsiveImageAttributes({
+        src: disImageURL.withOptionalParams,
+        widths: ['100vw', '720px', 500]
+    })
+    // 100vw of sm => 30em => 30 * 16 = 480px
+
+    expect(props).toStrictEqual({
+        src: disImageURL.withoutOptionalParams,
+        sizes: '(min-width: 48em) 500px, (min-width: 30em) 720px, 100vw',
+        srcSet: buildSrcSet([480, 500, 720])
     })
 })
 
 test('only src', () => {
     let props = getResponsiveImageAttributes({
-        src: staticImageURL.withoutOptionalParams
+        src: disImageURL.withoutOptionalParams
     })
     expect(props).toStrictEqual({
-        src: staticImageURL.withoutOptionalParams
+        src: disImageURL.withoutOptionalParams
     })
 
     // This time _with_ the optional params
     props = getResponsiveImageAttributes({
-        src: staticImageURL.withOptionalParams
+        src: disImageURL.withOptionalParams
     })
     expect(props).toStrictEqual({
-        src: staticImageURL.withoutOptionalParams
+        src: disImageURL.withoutOptionalParams
     })
 })
