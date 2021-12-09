@@ -340,12 +340,12 @@ describe('CommerceAPI', () => {
             slasCallbackEndpoint,
             examplePKCEVerifier
         )
-        const {grantType, code, usid, codeVerifier, redirectUri} = tokenBody
-        expect(grantType).toBeDefined()
+        const {grant_type, code, usid, code_verifier, redirect_uri} = tokenBody
+        expect(grant_type).toBeDefined()
         expect(code).toBeDefined()
         expect(usid).toBeDefined()
-        expect(codeVerifier).toBeDefined()
-        expect(redirectUri).toBeDefined()
+        expect(code_verifier).toBeDefined()
+        expect(redirect_uri).toBeDefined()
     })
     test('should return a code verifier of 128 chracters', () => {
         const codeVerifier = createCodeVerifier()
