@@ -9,8 +9,7 @@ import CommerceAPI from '.'
 // NOTE: this will need to be a fixed or known config for testing against
 // It will probably end up living in pwa-kit later on so we may want to
 // deal with it there.
-import {commerceAPIConfig} from '../commerce-api.config'
-import {einsteinAPIConfig} from '../einstein-api.config'
+import {commerceAPIConfig, einsteinAPIConfig} from '../api.config'
 import {createGetTokenBody} from './utils'
 import {generateCodeChallenge, createCodeVerifier} from './pkce'
 import {
