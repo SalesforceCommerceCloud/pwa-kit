@@ -12,7 +12,7 @@ describe('PwaKitConfigPlugin', () => {
         new PwaKitConfigPlugin()
     })
 
-    test('have default config path', () => {
+    test('has a default config path', () => {
         const plugin = new PwaKitConfigPlugin()
         expect(plugin.CONFIG_PATH).toBe('./pwa-kit.config.json')
     })
