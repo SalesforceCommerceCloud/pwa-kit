@@ -19,15 +19,16 @@ import {
     BasketProvider,
     CustomerProductListsProvider
 } from '../../commerce-api/contexts'
-import config from '../../../pwa-kit.config.json'
+import {commerceAPIConfig} from '../../commerce-api.config'
+import {einsteinAPIConfig} from '../../einstein-api.config'
 import {DEFAULT_LOCALE, DEFAULT_CURRENCY, urlPartPositions} from '../../constants'
 import {getPreferredCurrency, getSupportedLocalesIds} from '../../utils/locale'
 import {getUrlConfig} from '../../utils/utils'
 import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
 
 const apiConfig = {
-    ...config.commerceApi,
-    einsteinConfig: config.einsteinApi
+    ...commerceAPIConfig,
+    einsteinConfig: einsteinAPIConfig
 }
 
 /**
