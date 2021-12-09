@@ -7,50 +7,11 @@
 
 import theme from '@chakra-ui/theme'
 
-// TODO: remove this
 /**
  * @param {Object} props
- * @param {string} props.src - A responsive image's src needs to have optional param like this: `image[_{width}].jpg` or `image.jpg[?sw={width}&q=60]`
- * @param {(number[]|Object)} props.vwSizes - Sizes in vw unit (relative to Chakra's breakpoints), which will be mapped to sizes and srcSet attributes
- * @param {(string[]|Object|string)} props.sizes - Rules for browser to pick the appropriate size. If it's an array or object, its value will be relative to Chakra's breakpoints.
- * @param {(number[]|string)} props.srcSet - A set of images that are available for browser to download
- * @return {Object} src, sizes, and srcSet props for Chakra image component
- *
- * @example
- * // All of these arguments are equivalent (similar to Chakra's responsive styles)
- * ({src: 'http://a.com/image[_{width}].jpg', vwSizes: [100, 100, 50]})
- * ({src: 'http://a.com/image[_{width}].jpg', vwSizes: {base: 100, md: 50}})
- * ({src: 'http://a.com/image[_{width}].jpg', sizes: {base: '100vw', md: '50vw'}, srcSet: [...]})
- */
-/*
-export const getResponsiveImageAttributes = ({src, vwSizes, sizes: _sizes, srcSet: _srcSet}) => {
-    const imageProps = {src: getSrcWithoutOptionalParams(src)}
-
-    if (vwSizes) {
-        const sizes = mapVwSizesToSizes(vwSizes)
-        const srcSet = mapVwSizesToSrcSet(vwSizes)
-        imageProps.sizes = convertSizesToHTMLAttribute(sizes)
-        imageProps.srcSet = convertSrcSetToHTMLAttribute(srcSet, src)
-
-        if (vwSizes && _sizes && _srcSet) {
-            console.error('Cannot pass in sizes and srcSet when you already have specified vwSizes')
-        }
-    }
-
-    if (_sizes) {
-        imageProps.sizes = convertSizesToHTMLAttribute(_sizes)
-    }
-    if (_srcSet) {
-        imageProps.srcSet = convertSrcSetToHTMLAttribute(_srcSet, src)
-    }
-
-    return imageProps
-}
-*/
-
-/**
- * @param {string} src
- * @param {(number[]|string[]|Object)} [widths]
+ * @param {string} props.src - Dynamic src having an optional param that can vary with widths. For example: `image[_{width}].jpg` or `image.jpg[?sw={width}&q=60]`
+ * @param {(number[]|string[]|Object)} [props.widths] - Image widths in either array or object form, whose units can either be px or vw or unit-less. They will be mapped to the corresponding `sizes` and `srcSet`.
+ * @return {Object} src, sizes, and srcSet props for your image component
  */
 export const getResponsiveImageAttributes = ({src, widths}) => {
     if (!widths) {
@@ -68,9 +29,9 @@ export const getResponsiveImageAttributes = ({src, widths}) => {
 
 /**
  * @param {(number[]|string[]|Object)} widths
+ * @return {string}
  */
 const mapWidthsToSizes = (widths) => {
-    // By default, unit-less number is a px value
     const _widths = withUnit(Array.isArray(widths) ? widths : widthsAsArray(widths))
 
     return breakpointLabels
@@ -84,6 +45,7 @@ const mapWidthsToSizes = (widths) => {
 
 /**
  * @param {(number[]|string[]|Object)} widths
+ * @return {string}
  */
 const mapWidthsToSrcSet = (widths, dynamicSrc) => {
     let _widths = isObject(widths) ? widthsAsArray(widths) : widths.slice(0)
@@ -108,6 +70,7 @@ const mapWidthsToSrcSet = (widths, dynamicSrc) => {
 
 /**
  * @param {string[]|number[]} widths
+ * @return {number[]}
  */
 const convertToPxNumbers = (widths) => {
     const vwValue = /^\d+vw$/
@@ -148,6 +111,7 @@ const uniqueArray = (array) => [...new Set(array)]
  * @param {(number[]|string[])} widths
  */
 const withUnit = (widths) =>
+    // By default, unitless value is interpreted as px
     widths.map((width) => (typeof width === 'number' ? `${width}px` : width))
 
 const isObject = (o) => o?.constructor === Object
@@ -205,6 +169,9 @@ export const getSrc = (dynamicSrc, imageWidth) => {
 
 /**
  * @param {string} dynamicSrc
+ * @example
+ * // Returns 'https://example.com/image.jpg'
+ * getSrcWithoutOptionalParams('https://example.com/image.jpg[?sw={width}]')
  */
 const getSrcWithoutOptionalParams = (dynamicSrc) => {
     const optionalParams = /\[[^\]]+\]/g
