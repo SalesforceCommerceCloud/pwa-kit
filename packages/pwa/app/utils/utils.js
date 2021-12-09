@@ -161,10 +161,10 @@ export const capitalize = (text) => {
  * Get the pwa configuration object from pwa-kit.config.json
  * @returns {object} - the configuration object
  */
-export const getConfig = () => console.log('TODO')
+export const getConfig = () => pwaKitConfig
 
 /**
  * A util to return current url configuration
  * @returns {object} - url object from the pwa-kit.config.json file
  */
-export const getUrlConfig = () => pwaKitConfig?.url
+export const getUrlConfig = () => getConfig().url
