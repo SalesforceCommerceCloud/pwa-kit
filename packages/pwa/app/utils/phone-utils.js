@@ -24,9 +24,18 @@ export const formatPhoneNumber = (value) => {
  * Validates given Phone Number
  * @param {string} - Phone number to be validated
  * @returns {boolean}  - Result of Validation
+Allows valid international prefixes, followed by 9 or 10 digits, with any type or placing of delimeters (except between the last two digits)
+Examples:-
++1-234-567-8901
++61-234-567-89-01
++46-234 5678901
++1 (234) 56 89 901
++1 (234) 56-89 901
++46.234.567.8901
++1/234/567/8901
  */
 export const validatePhone = (value) => {
-    const regex = /^(?:(?:\+?1\s*(?:[.-]\s*)?)?(?:\(\s*([2-9]1[02-9]|[2-9][02-8]1|[2-9][02-8][02-9])\s*\)|([2-9]1[02-9]|[2-9][02-8]1|[2-9][02-8][02-9]))\s*(?:[.-]\s*)?)?([2-9]1[02-9]|[2-9][02-9]1|[2-9][02-9]{2})\s*(?:[.-]\s*)?([0-9]{4})(?:\s*(?:#|x\.?|ext\.?|extension)\s*(\d+))?$/
+    const regex = /\+(9[976]\d|8[987530]\d|6[987]\d|5[90]\d|42\d|3[875]\d|2[98654321]\d|9[8543210]|8[6421]|6[6543210]|5[87654321]|4[987654310]|3[9643210]|2[70]|7|1)\W*\d\W*\d\W*\d\W*\d\W*\d\W*\d\W*\d\W*\d\W*(\d{1,2})$/
     return {
         isPhoneNumberValid: value && regex.test(value) ? true : false
     }
