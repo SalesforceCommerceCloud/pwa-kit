@@ -63,8 +63,7 @@ class CommerceAPI {
             this.einstein = new EinsteinAPI(this)
         }
 
-        // A mapping of property names to the SDK class constructors we'll be
-        // providing instances for.
+        // Mapping of property names to the SDK class constructors we provide instances of.
         //
         // NOTE: `sendLocale` and `sendCurrency` for sending locale and currency info to the API:
         // - boolean, if you want to affect _all_ methods for a given API
@@ -82,7 +81,9 @@ class CommerceAPI {
             shopperGiftCertificates: {
                 api: sdk.ShopperGiftCertificates
             },
-            shopperLogin: {api: sdk.ShopperLogin, sendLocale: false},
+            shopperLogin: {api: sdk.ShopperLogin, sendLocale: false, fetchOptions: {
+                redirect: 'manual'
+            }},
             shopperOrders: {api: OcapiShopperOrders},
             shopperProducts: {
                 api: sdk.ShopperProducts,
@@ -97,66 +98,80 @@ class CommerceAPI {
             }
         }
 
-        // Instantiate the SDK class proxies and create getters from our api mapping.
+        // Create SDK class proxies and create getters from our api mapping.
         // The proxy handlers are called when accessing any of the mapped SDK class
-        // proxies, executing various pre-defined hooks for tapping into or modifying
+        // proxies, executing hooks to tap into or modify 
         // the outgoing method parameters and/or incoming SDK responses
         const self = this
+
+        self._sdkInstances = {}
+
         Object.keys(apiConfigs).forEach((key) => {
-            const SdkClass = apiConfigs[key].api
-            self._sdkInstances = {
-                ...self._sdkInstances,
-                [key]: new Proxy(new SdkClass(this._config), {
-                    get: function(obj, prop) {
-                        if (typeof obj[prop] === 'function') {
-                            return (...args) => {
-                                const fetchOptions = args[0]
-                                const {locale, currency} = self._config
+            const SDKClass = apiConfigs[key].api
 
-                                if (fetchOptions.ignoreHooks) {
-                                    return obj[prop](...args)
-                                }
+            let config = this._config
+            if (apiConfigs[key].fetchOptions) {
+               config = {
+                   ...{
+                       fetchOptions: apiConfigs[key].fetchOptions
+                   }, 
+                   ...config
+                } 
+            }
 
-                                // Inject the locale and currency to the API call via its parameters.
-                                //
-                                // NOTE: The commerce sdk isomorphic will complain if you pass parameters to
-                                // it that it doesn't expect, this is why we only add the locale and currency
-                                // to some of the API calls.
-
-                                // By default we send the locale param and don't send the currency param.
-                                const {sendLocale = true, sendCurrency = false} = apiConfigs[key]
-
-                                const includeGlobalLocale = Array.isArray(sendLocale)
-                                    ? sendLocale.includes(prop)
-                                    : !!sendLocale
-
-                                const includeGlobalCurrency = Array.isArray(sendCurrency)
-                                    ? sendCurrency.includes(prop)
-                                    : !!sendCurrency
-
-                                fetchOptions.parameters = {
-                                    ...(includeGlobalLocale ? {locale} : {}),
-                                    ...(includeGlobalCurrency ? {currency} : {}),
-                                    // Allowing individual API calls to override the global locale/currency
-                                    ...fetchOptions.parameters
-                                }
-
-                                return self.willSendRequest(prop, ...args).then((newArgs) => {
-                                    return obj[prop](...newArgs).then((res) =>
-                                        self.didReceiveResponse(res, newArgs)
-                                    )
-                                })
-                            }
-                        }
+            const proxy = new Proxy(new SDKClass(config), {
+                get: function(obj, prop) {
+                    if (typeof obj[prop] != 'function') {
                         return obj[prop]
                     }
-                })
-            }
+
+                    return (...args) => {
+                        const fetchOptions = args[0]
+                        if (fetchOptions.ignoreHooks) {
+                            return obj[prop](...args)
+                        }
+
+                        // Inject the locale and currency to the API call via its parameters.
+                        //
+                        // NOTE: The commerce sdk isomorphic will complain if you pass parameters to
+                        // it that it doesn't expect, this is why we only add the locale and currency
+                        // to some of the API calls.
+
+                        // By default we send the locale param and don't send the currency param.
+                        const {sendLocale = true, sendCurrency = false} = apiConfigs[key]
+
+                        const includeGlobalLocale = Array.isArray(sendLocale)
+                            ? sendLocale.includes(prop)
+                            : !!sendLocale
+                        
+                        const includeGlobalCurrency = Array.isArray(sendCurrency)
+                            ? sendCurrency.includes(prop)
+                            : !!sendCurrency
+
+                        const {locale, currency} = self._config
+                        fetchOptions.parameters = {
+                            ...(includeGlobalLocale ? {locale} : {}),
+                            ...(includeGlobalCurrency ? {currency} : {}),
+                            // Individual API calls may override global locale/currency
+                            ...fetchOptions.parameters
+                        }
+
+                        return self.willSendRequest(prop, ...args).then((newArgs) => {
+                            return obj[prop](...newArgs).then((res) =>
+                                self.didReceiveResponse(res, newArgs)
+                            )
+                        })
+                    }
+                }
+            })
+
             Object.defineProperty(self, key, {
                 get() {
                     return self._sdkInstances[key]
                 }
             })
+
+            self._sdkInstances[key] = proxy
         })
         this.getConfig = this.getConfig.bind(this)
     }

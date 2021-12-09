@@ -94,29 +94,21 @@ class Auth {
     }
 
     /**
-     * Called with the details from the redirect page that _loginWithCredentials returns
-     * I think it's best we leave it to developers on how and where to call from
-     * @param {{grantType, code, usid, codeVerifier, redirectUri}} requestDetails - The cutomerId of customer to get.
+     * Called with info from the `ShopperLogin.authenticateCustomer()`.
+     * @param {{code, code_verifier, grant_type, redirect_uri, usid}} requestBody - Access code details.
      */
-    async getLoggedInToken(requestDetails) {
-        const data = new URLSearchParams()
-        const {grantType, code, usid, codeVerifier, redirectUri} = requestDetails
-        data.append('code', code)
-        data.append('grant_type', grantType)
-        data.append('usid', usid)
-        data.append('code_verifier', codeVerifier)
-        data.append('client_id', this._config.parameters.clientId)
-        data.append('redirect_uri', redirectUri)
-
+    async getLoggedInToken(requestBody) {
         const options = {
             headers: {
-                'Content-Type': `application/x-www-form-urlencoded`
+                'Content-Type': 'application/x-www-form-urlencoded'
             },
-            body: data
+            body: new URLSearchParams({
+                client_id: this._config.parameters.clientId,
+                ...requestBody
+            })
         }
-
         const response = await this._api.shopperLogin.getAccessToken(options)
-        // Check for error response before handling the token
+        // If `status_code` is present in the response, it indicates an error.
         if (response.status_code) {
             throw new HTTPError(response.status_code, response.message)
         }
@@ -195,7 +187,7 @@ class Auth {
         this._saveAccessToken(`Bearer ${access_token}`)
         this._saveRefreshToken(refresh_token)
         this._saveUsid(usid)
-        // Non registered users recieve an empty string for the encoded user id value
+        // Guest shoppers get an empty string for the encoded user id value.
         if (enc_user_id.length > 0) {
             this._saveEncUserId(enc_user_id)
         }
@@ -212,21 +204,22 @@ class Auth {
      */
     async _loginWithCredentials(credentials) {
         const codeVerifier = createCodeVerifier()
-        const codeChallenge = await generateCodeChallenge(codeVerifier)
+        const code_challenge = await generateCodeChallenge(codeVerifier)
 
         sessionStorage.setItem('codeVerifier', codeVerifier)
 
         const authorization = `Basic ${btoa(`${credentials.email}:${credentials.password}`)}`
+        const redirect_uri = `${getAppOrigin()}${slasCallbackEndpoint}`
         const options = {
             headers: {
                 Authorization: authorization,
-                'Content-Type': `application/x-www-form-urlencoded`
+                'Content-Type': 'application/x-www-form-urlencoded'
             },
             parameters: {
-                redirect_uri: `${getAppOrigin()}${slasCallbackEndpoint}`,
+                channel_id: this._config.parameters.siteId,
                 client_id: this._config.parameters.clientId,
-                code_challenge: codeChallenge,
-                channel_id: this._config.parameters.siteId
+                code_challenge,
+                redirect_uri,
             }
         }
 
@@ -236,10 +229,15 @@ class Auth {
             throw new HTTPError(response.status, json.message)
         }
 
+        let tokenURL = response.url
+        if (!this._onClient) {
+            tokenURL = response.headers.get("location")
+        }
+
         const tokenBody = createGetTokenBody(
-            response.url,
-            `${getAppOrigin()}${slasCallbackEndpoint}`,
-            window.sessionStorage.getItem('codeVerifier')
+            tokenURL,
+            redirect_uri,
+            codeVerifier
         )
 
         const {customer_id} = await this.getLoggedInToken(tokenBody)
@@ -247,7 +245,6 @@ class Auth {
             customerId: customer_id,
             authType: 'registered'
         }
-
         return customer
     }
 
@@ -257,24 +254,23 @@ class Auth {
      */
     async _loginAsGuest() {
         const codeVerifier = createCodeVerifier()
-        const codeChallenge = await generateCodeChallenge(codeVerifier)
-
+        const code_challenge = await generateCodeChallenge(codeVerifier)
         if (this._onClient) {
             sessionStorage.setItem('codeVerifier', codeVerifier)
         }
 
+        const redirect_uri = `${getAppOrigin()}${slasCallbackEndpoint}`
         const options = {
             headers: {
-                Authorization: '',
-                'Content-Type': `application/x-www-form-urlencoded`
+                'Content-Type': 'application/x-www-form-urlencoded'
             },
             parameters: {
-                redirect_uri: `${getAppOrigin()}${slasCallbackEndpoint}`,
                 client_id: this._config.parameters.clientId,
-                code_challenge: codeChallenge,
+                code_challenge,
+                hint: 'guest',
+                redirect_uri,
                 response_type: 'code',
-                hint: 'guest'
-            }
+            },
         }
 
         const response = await this._api.shopperLogin.authorizeCustomer(options, true)
@@ -290,20 +286,24 @@ class Auth {
             throw new HTTPError(response.status, errorMessage)
         }
 
-        const tokenBody = createGetTokenBody(
-            response.url,
-            `${getAppOrigin()}${slasCallbackEndpoint}`,
-            this._onClient ? window.sessionStorage.getItem('codeVerifier') : codeVerifier
+        // TODO: Client side, the redirect is followed.
+        // I believe this is b/c Commerce SDK doesn't respect `fetchOptions` in browser.
+        let tokenURL = response.url
+        if (!this._onClient) {
+            tokenURL = response.headers.get("location")
+        }
+
+        const tokenRequestBody = createGetTokenBody(
+            tokenURL,
+            redirect_uri,
+            codeVerifier
         )
 
-        const {customer_id} = await this.getLoggedInToken(tokenBody)
-
-        // A guest customerId will never return a customer from the customer endpoint
+        const {customer_id} = await this.getLoggedInToken(tokenRequestBody)
         const customer = {
             authType: 'guest',
             customerId: customer_id
         }
-
         return customer
     }
 

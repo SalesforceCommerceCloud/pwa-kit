@@ -29,18 +29,15 @@ export function isTokenValid(token) {
     return false
 }
 
-// Returns fomrulated body for SopperLogin getToken endpoint
-export function createGetTokenBody(urlString, slasCallbackEndpoint, codeVerifier) {
-    const url = new URL(urlString)
-    const urlParams = new URLSearchParams(url.search)
-    const usid = urlParams.get('usid')
-    const code = urlParams.get('code')
-    return {
-        grantType: 'authorization_code_pkce',
+// Returns request body for use with ShopperLogin.getToken
+export function createGetTokenBody(urlString, redirect_uri, code_verifier) {
+    const {usid, code} = Object.fromEntries(new URL(urlString).searchParams)
+    return {        
         code,
+        code_verifier,
+        grant_type: 'authorization_code_pkce',
+        redirect_uri,
         usid,
-        codeVerifier: codeVerifier,
-        redirectUri: slasCallbackEndpoint
     }
 }
 
