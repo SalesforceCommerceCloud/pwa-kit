@@ -54,7 +54,7 @@ const ItemImage = ({imageProps, ratio = 1, ...props}) => {
                     {image && (
                         <Image
                             alt={image.alt}
-                            src={`${image.disBaseLink || image.link}[?sw={width}&q=60]`}
+                            src={`${image.disBaseLink || image.link}`}
                             ignoreFallback={true}
                             {...imageProps}
                         />
