@@ -13,6 +13,7 @@ import {createApp} from './express'
 import request from 'supertest'
 import {parse} from 'node-html-parser'
 import path from 'path'
+import {isRemote} from '../../utils/ssr-server'
 
 const opts = (overrides = {}) => {
     const fixtures = path.join(__dirname, '..', '..', 'ssr', 'server', 'test_fixtures')
@@ -285,7 +286,29 @@ jest.mock('../universal/routes', () => {
     }
 })
 
+jest.mock('../../utils/ssr-server', () => {
+    const actual = jest.requireActual('../../utils/ssr-server')
+    return {
+        ...actual,
+        isRemote: jest.fn()
+    }
+})
+
 describe('The Node SSR Environment', () => {
+    const OLD_ENV = process.env
+
+    beforeAll(() => {
+        // These values are not allowed to be `undefined` when `isRemote` returns true. So we mock them.
+        process.env.BUNDLE_ID = '1'
+        process.env.DEPLOY_TARGET = 'production'
+        process.env.EXTERNAL_DOMAIN_NAME = 'test.com'
+        process.env.MOBIFY_PROPERTY_ID = 'test'
+    })
+
+    afterAll(() => {
+        process.env = OLD_ENV // Restore old environment
+    })
+
     /**
      * Scripts are "safe" if they are external, not executable or on our allow list of
      * static, inline scripts.
@@ -316,6 +339,8 @@ describe('The Node SSR Environment', () => {
                 const doc = parse(html)
                 const include = ['<div>This is a PWA</div>']
                 const data = dataFromHTML(doc)
+                const dataScript = doc.querySelectorAll('script[id=mobify-data]')[0]
+                expect(dataScript.innerHTML.split(/\r\n|\r|\n/).length).toBe(1)
                 expect(data.__DEVICE_TYPE__).toEqual('DESKTOP')
                 include.forEach((s) => expect(html).toEqual(expect.stringContaining(s)))
                 expect(scriptsAreSafe(doc)).toBe(true)
@@ -360,7 +385,7 @@ describe('The Node SSR Environment', () => {
             }
         },
         {
-            description: `rendering PWA's in mobify-server-only mode should not execute scripts on the client`,
+            description: `rendering PWA's in "mobify-server-only" mode should not execute scripts on the client`,
             req: {url: '/pwa/', query: {mobify_server_only: '1'}},
             assertions: (res) => {
                 const html = res.text
@@ -371,6 +396,46 @@ describe('The Node SSR Environment', () => {
                     // application/json prevents execution!
                     expect(script.getAttribute('type')).toBe('application/json')
                 })
+            }
+        },
+        {
+            description: `rendering PWA's in "__server-only" mode should not execute scripts on the client`,
+            req: {url: '/pwa/', query: {__server_only: '1'}},
+            assertions: (res) => {
+                const html = res.text
+                const doc = parse(html)
+                const include = ['<div>This is a PWA</div>']
+                include.forEach((s) => expect(html).toEqual(expect.stringContaining(s)))
+                doc.querySelectorAll('script').forEach((script) => {
+                    // application/json prevents execution!
+                    expect(script.getAttribute('type')).toBe('application/json')
+                })
+            }
+        },
+        {
+            description: `rendering PWA's with legacy "mobify_pretty" mode should print stylized global state`,
+            req: {url: '/pwa/', query: {mobify_pretty: '1'}},
+            assertions: (res) => {
+                const html = res.text
+                const doc = parse(html)
+                const include = ['<div>This is a PWA</div>']
+                include.forEach((s) => expect(html).toEqual(expect.stringContaining(s)))
+                const script = doc.querySelectorAll('script[id=mobify-data]')[0]
+
+                expect(script.innerHTML.split(/\r\n|\r|\n/).length).toBeGreaterThan(1)
+            }
+        },
+        {
+            description: `rendering PWA's with  "__pretty_print" mode should print stylized global state`,
+            req: {url: '/pwa/', query: {__pretty_print: '1'}},
+            assertions: (res) => {
+                const html = res.text
+                const doc = parse(html)
+                const include = ['<div>This is a PWA</div>']
+                include.forEach((s) => expect(html).toEqual(expect.stringContaining(s)))
+                const script = doc.querySelectorAll('script[id=mobify-data]')[0]
+
+                expect(script.innerHTML.split(/\r\n|\r|\n/).length).toBeGreaterThan(1)
             }
         },
         {
@@ -441,7 +506,8 @@ describe('The Node SSR Environment', () => {
                 const data = dataFromHTML(doc)
 
                 expect(data.__ERROR__.message).toEqual('Internal Server Error')
-                expect(typeof data.__ERROR__.stack).toEqual('string')
+                expect(typeof data.__ERROR__.stack).toEqual(isRemote() ? 'undefined' : 'string')
+
                 expect(data.__ERROR__.status).toEqual(500)
             }
         },
@@ -454,7 +520,7 @@ describe('The Node SSR Environment', () => {
                 const data = dataFromHTML(doc)
 
                 expect(data.__ERROR__.message).toEqual('Internal Server Error')
-                expect(typeof data.__ERROR__.stack).toEqual('string')
+                expect(typeof data.__ERROR__.stack).toEqual(isRemote() ? 'undefined' : 'string')
                 expect(data.__ERROR__.status).toEqual(500)
                 expect(res.statusCode).toBe(500)
             }
@@ -515,16 +581,26 @@ describe('The Node SSR Environment', () => {
         }
     ]
 
-    cases.forEach(({description, req, assertions}) => {
-        test(`renders PWA pages properly (${description})`, () => {
-            const {url, headers, query} = req
-            const app = createApp(opts())
-            app.get('/*', render)
-            return request(app)
-                .get(url)
-                .set(headers || {})
-                .query(query || {})
-                .then((res) => assertions(res))
+    const isRemoteValues = [true, false]
+
+    isRemoteValues.forEach((isRemoteValue) => {
+        // Run test cases
+        cases.forEach(({description, req, assertions}) => {
+            test(`renders PWA pages properly when ${
+                isRemoteValue ? 'remote' : 'local'
+            } (${description})`, () => {
+                // Mock `isRemote` per test execution.
+                isRemote.mockReturnValue(isRemoteValue)
+
+                const {url, headers, query} = req
+                const app = createApp(opts())
+                app.get('/*', render)
+                return request(app)
+                    .get(url)
+                    .set(headers || {})
+                    .query(query || {})
+                    .then((res) => assertions(res))
+            })
         })
     })
 })
