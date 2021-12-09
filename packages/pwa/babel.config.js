@@ -35,8 +35,7 @@ module.exports = {
                 idInterpolationPattern: '[sha512:contenthash:base64:6]',
                 ast: true
             }
-        ],
-        ['inline-json-import', {}]
+        ]
     ],
     env: {
         test: {
