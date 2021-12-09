@@ -394,8 +394,14 @@ const ProductList = (props) => {
                                                           : removeItemFromWishlist
                                                       return action(productSearchItem)
                                                   }}
-                                                  imageProps={{
-                                                      vwSizes: [50, 50, 20, 20, 25]
+                                                  dynamicImageProps={{
+                                                      widths: [
+                                                          '50vw',
+                                                          '50vw',
+                                                          '20vw',
+                                                          '20vw',
+                                                          '25vw'
+                                                      ]
                                                   }}
                                               />
                                           )

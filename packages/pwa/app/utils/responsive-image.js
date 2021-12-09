@@ -7,6 +7,7 @@
 
 import theme from '@chakra-ui/theme'
 
+// TODO: remove this
 /**
  * @param {Object} props
  * @param {string} props.src - A responsive image's src needs to have optional param like this: `image[_{width}].jpg` or `image.jpg[?sw={width}&q=60]`
@@ -21,6 +22,7 @@ import theme from '@chakra-ui/theme'
  * ({src: 'http://a.com/image[_{width}].jpg', vwSizes: {base: 100, md: 50}})
  * ({src: 'http://a.com/image[_{width}].jpg', sizes: {base: '100vw', md: '50vw'}, srcSet: [...]})
  */
+/*
 export const getResponsiveImageAttributes = ({src, vwSizes, sizes: _sizes, srcSet: _srcSet}) => {
     const imageProps = {src: getSrcWithoutOptionalParams(src)}
 
@@ -44,94 +46,94 @@ export const getResponsiveImageAttributes = ({src, vwSizes, sizes: _sizes, srcSe
 
     return imageProps
 }
+*/
 
 /**
- * @param {(string[]|Object|string)} sizes
+ * @param {string} src
+ * @param {(number[]|string[]|Object)} [widths]
  */
-const convertSizesToHTMLAttribute = (sizes) => {
-    if (typeof sizes === 'string') {
-        return sizes
+export const getResponsiveImageAttributes = ({src, widths}) => {
+    if (!widths) {
+        return {
+            src: getSrcWithoutOptionalParams(src)
+        }
     }
 
-    // Convert to object first if needed
-    let _sizes = {}
-    if (Array.isArray(sizes)) {
-        sizes.forEach((size, i) => {
-            const key = breakpointLabels[i]
-            _sizes[key] = size
+    return {
+        src: getSrcWithoutOptionalParams(src),
+        sizes: mapWidthsToSizes(widths),
+        srcSet: mapWidthsToSrcSet(widths, src)
+    }
+}
+
+/**
+ * @param {(number[]|string[]|Object)} widths
+ */
+const mapWidthsToSizes = (widths) => {
+    // By default, unit-less number is a px value
+    const _widths = withUnit(Array.isArray(widths) ? widths : responsivePropAsArray(widths))
+
+    return breakpointLabels
+        .slice(0, _widths.length)
+        .map((bp, i) => {
+            return i === 0 ? _widths[i] : `(min-width: ${theme.breakpoints[bp]}) ${_widths[i]}`
         })
-    } else {
-        _sizes = sizes
-    }
-
-    // Then convert all sizes into string
-    const bp = theme.breakpoints
-    const s = []
-    _sizes['2xl'] && s.push(`(min-width: ${bp['2xl']}) ${_sizes['2xl']}`)
-    _sizes.xl && s.push(`(min-width: ${bp.xl}) ${_sizes.xl}`)
-    _sizes.lg && s.push(`(min-width: ${bp.lg}) ${_sizes.lg}`)
-    _sizes.md && s.push(`(min-width: ${bp.md}) ${_sizes.md}`)
-    _sizes.sm && s.push(`(min-width: ${bp.sm}) ${_sizes.sm}`)
-    _sizes.base && s.push(_sizes.base)
-
-    return s.join(', ')
-}
-
-const breakpointLabels = ['base', 'sm', 'md', 'lg', 'xl', '2xl']
-
-/**
- * @param {(number[]|string)} srcSet
- * @param {string} srcFormat
- */
-const convertSrcSetToHTMLAttribute = (srcSet, srcFormat) => {
-    if (typeof srcSet === 'string') {
-        return srcSet
-    }
-
-    const s = srcSet.map((imageWidth) => `${getSrc(srcFormat, imageWidth)} ${imageWidth}w`)
-    return s.join(', ')
+        .reverse()
+        .join(', ')
 }
 
 /**
- * @param {(number[]|Object)} vwSizes
+ * @param {(number[]|string[]|Object)} widths
  */
-const mapVwSizesToSizes = (vwSizes) => {
-    return Array.isArray(vwSizes)
-        ? vwSizes.map((size) => `${size}vw`)
-        : responsivePropAsArray(vwSizes).map((size) => `${size}vw`)
-}
-
-/**
- * @param {(number[]|Object)} vwSizes
- */
-const mapVwSizesToSrcSet = (vwSizes) => {
-    let sizes = Array.isArray(vwSizes) ? vwSizes.slice() : responsivePropAsArray(vwSizes)
-
-    if (sizes.length < breakpointLabels.length) {
-        const lastSize = sizes[sizes.length - 1]
-        const amountToPad = breakpointLabels.length - sizes.length
-
-        sizes = [...sizes, ...Array(amountToPad).fill(lastSize)]
+const mapWidthsToSrcSet = (widths, dynamicSrc) => {
+    let _widths = isObject(widths) ? responsivePropAsArray(widths) : widths.slice(0)
+    if (typeof _widths[0] === 'string') {
+        _widths = convertToPxNumbers(_widths)
     }
 
     const srcSet = []
-    sizes.forEach((size, i) => {
-        if (i === sizes.length - 1) {
-            return
-        }
-
-        // We imagine the biggest image for the current breakpoint
-        // to be when the viewport is closely approaching the _next breakpoint_.
-        const nextBp = breakpointLabels[i + 1]
-        const em = (size / 100) * parseFloat(theme.breakpoints[nextBp])
-        const px = emToPx(em)
-
-        srcSet.push(px)
-        srcSet.push(px * 2) // for devices with higher pixel density
+    _widths.forEach((width) => {
+        srcSet.push(width)
+        srcSet.push(width * 2) // for devices with higher pixel density
     })
 
-    return srcSet
+    return srcSet.map((imageWidth) => `${getSrc(dynamicSrc, imageWidth)} ${imageWidth}w`).join(', ')
 }
+
+/**
+ * @param {string[]} widths
+ */
+const convertToPxNumbers = (widths) => {
+    const vwValue = /^\d+vw$/
+    const pxValue = /^\d+px$/
+
+    return widths.map((width, i) => {
+        if (vwValue.test(width)) {
+            const vw = parseFloat(width)
+            // We imagine the biggest image for the current breakpoint
+            // to be when the viewport is closely approaching the _next breakpoint_.
+            // (If you're already at the last breakpoint, we'll use that instead)
+            const nextBp = breakpointLabels[i + 1] || breakpointLabels[i]
+            const em = (vw / 100) * parseFloat(theme.breakpoints[nextBp])
+            return emToPx(em)
+        } else if (pxValue.test(width)) {
+            return parseInt(width)
+        } else {
+            console.error('Expecting to see values with vw or px unit only')
+            return 0
+        }
+    })
+}
+
+/**
+ * @param {(number[]|string[])} widths
+ */
+const withUnit = (widths) =>
+    widths.map((width) => (typeof width === 'number' ? `${width}px` : width))
+
+const isObject = (o) => o?.constructor === Object
+
+const breakpointLabels = ['base', 'sm', 'md', 'lg', 'xl', '2xl']
 
 /**
  * @param {Object} prop
@@ -155,23 +157,23 @@ const responsivePropAsArray = (prop) => {
 const emToPx = (em, browserDefaultFontSize = 16) => Math.round(em * browserDefaultFontSize)
 
 /**
- * @param {string} srcFormat
+ * @param {string} dynamicSrc
  * @param {number} imageWidth
  * @return {string} Image url having the given width
  * @example
  * // returns https://example.com/image_720.jpg
  * getSrc('https://example.com/image[_{width}].jpg', 720)
  */
-export const getSrc = (srcFormat, imageWidth) => {
+export const getSrc = (dynamicSrc, imageWidth) => {
     // 1. remove the surrounding []
     // 2. replace {...} with imageWidth
-    return srcFormat.replace(/\[([^\]]+)\]/g, '$1').replace(/\{[^}]+\}/g, imageWidth)
+    return dynamicSrc.replace(/\[([^\]]+)\]/g, '$1').replace(/\{[^}]+\}/g, imageWidth)
 }
 
 /**
- * @param {string} srcFormat
+ * @param {string} dynamicSrc
  */
-const getSrcWithoutOptionalParams = (srcFormat) => {
+const getSrcWithoutOptionalParams = (dynamicSrc) => {
     const optionalParams = /\[[^\]]+\]/g
-    return srcFormat.replace(optionalParams, '')
+    return dynamicSrc.replace(optionalParams, '')
 }

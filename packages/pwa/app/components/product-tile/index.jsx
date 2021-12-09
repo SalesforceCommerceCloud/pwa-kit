@@ -19,7 +19,7 @@ import {
     useMultiStyleConfig,
     IconButton
 } from '@chakra-ui/react'
-import {Img as MyImg} from '../image'
+import {DynamicImage} from '../image'
 
 // Hooks
 import {useIntl} from 'react-intl'
@@ -61,7 +61,7 @@ const ProductTile = (props) => {
         enableFavourite = false,
         isFavourite,
         onFavouriteToggle,
-        imageProps,
+        dynamicImageProps,
         ...rest
     } = props
     const {currency, image, price, productName, productId} = product
@@ -77,10 +77,13 @@ const ProductTile = (props) => {
         >
             <Box {...styles.imageWrapper}>
                 <AspectRatio {...styles.image}>
-                    <MyImg
-                        alt={image.alt}
+                    <DynamicImage
                         src={`${image.disBaseLink || image.link}[?sw={width}&q=60]`}
-                        {...imageProps}
+                        widths={dynamicImageProps?.widths}
+                        imageProps={{
+                            alt: image.alt,
+                            ...dynamicImageProps?.imageProps
+                        }}
                     />
                 </AspectRatio>
 
@@ -152,10 +155,7 @@ ProductTile.propTypes = {
      * interacts with favourite icon/button.
      */
     onFavouriteToggle: PropTypes.func,
-    /**
-     * Props for the image component within this product tile
-     */
-    imageProps: PropTypes.object
+    dynamicImageProps: PropTypes.object
 }
 
 export default ProductTile
