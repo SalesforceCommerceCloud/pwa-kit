@@ -102,20 +102,9 @@ export class BuildMarkerPlugin {
  * schema extension which allow users to add custom schemas.
  */
 export class PwaKitConfigPlugin {
-    /**
-     * @constructor
-     * @param {String} [options.path] - The relative path of the config file
-     * @param {Object[]} [options.customSchemas] - The object that include
-     * custom property schemas, you want to use this when you extend the schema.
-     * @param {String} [options.customSchemas.key] - The key of the property.
-     * @param {Boolean} [options.customSchemas.required] - Required.
-     * @param {Object} [options.customSchemas.schema] - The JSON schema for the
-     * custom property.
-     */
-    constructor(options = {}) {
-        this.path = options.path || './pwa-kit.config.json'
-        this.customSchemas = options.customSchemas || []
-    }
+    // the path is relative to project directory
+    CONFIG_PATH = './pwa-kit.config.json'
+    SCHEMA_PATH = './pwa-kit.config.schema.json'
 
     /**
      * Called by webpack when this plugin is attached.
@@ -126,11 +115,31 @@ export class PwaKitConfigPlugin {
         compiler.hooks.compilation.tap('PwaKitConfigPlugin', (compilation) => {
             try {
                 const config = this.getConfig(compiler)
-                this.validate(config)
+                if (!config) {
+                    // Project is on older version that
+                    // doesn't have the config file
+                    return
+                }
+                const customSchema = this.getCustomSchema(compiler)
+                this.validate(config, customSchema)
             } catch (e) {
                 compilation.errors.push(e)
             }
         })
+    }
+
+    /**
+     * Find the file from project based on its relative path.
+     *
+     * @param compiler {Object} the webpack compiler
+     * @param path {String} the relative path from the project directory
+     * @returns {String} - The file content
+     */
+    getFile(compiler, relativePath) {
+        const {fileSystem} = compiler.inputFileSystem
+        const absolutePath = path.resolve(relativePath)
+        const file = fileSystem.readFileSync(absolutePath)
+        return file
     }
 
     /**
@@ -140,15 +149,40 @@ export class PwaKitConfigPlugin {
      * @returns {object} - The configuration object
      */
     getConfig(compiler) {
-        const {fileSystem} = compiler.inputFileSystem
-        const absolutePath = path.resolve(this.path)
-        let configFile
+        let file
         try {
-            configFile = fileSystem.readFileSync(absolutePath)
+            file = this.getFile(compiler, this.CONFIG_PATH)
         } catch (e) {
-            throw new Error(`Missing PWA Kit config file, the file is required: ${absolutePath}`)
+            console.warn(`1Warning: PWA Kit config file (pwa-kit.config.json) is not found.`)
         }
-        return JSON.parse(configFile)
+        try {
+            return file ? JSON.parse(file) : undefined
+        } catch {
+            throw new Error('PWA Kit config file (pwa-kit.config.json) contains invalid JSON data.')
+        }
+    }
+
+    /**
+     * Find the custom schema file from project and return the value.
+     *
+     * @param compiler {Object} the webpack compiler
+     * @returns {object} - The custom JSON schema object
+     */
+    getCustomSchema(compiler) {
+        let file
+        try {
+            file = this.getFile(compiler, this.SCHEMA_PATH)
+        } catch (e) {
+            // No need to throw error
+            // because custom schema is optional
+        }
+        try {
+            return file ? JSON.parse(file) : undefined
+        } catch {
+            throw new Error(
+                'PWA Kit config file (pwa-kit.config.schema.json) must include valid JSON data.'
+            )
+        }
     }
 
     /**
@@ -156,28 +190,21 @@ export class PwaKitConfigPlugin {
      * and custom schema. Errors will be thrown when validation fails.
      *
      * @param config {Object} - the configuration object
+     * @param customSchema {Object} - The custom JSON schema object
      */
-    validate(config) {
+    validate(config, customSchema) {
         const ajv = new Ajv()
         AjvMergePlugin(ajv)
         ajv.addSchema(schema)
         let valid
 
-        if (this.customSchemas.length) {
-            const required = [...schema.required]
-            const properties = this.customSchemas.reduce((prev, curr) => {
-                if (curr.required) {
-                    required.push(curr.key)
-                }
-                return {...prev, [curr['key']]: curr.schema}
-            }, {})
+        if (customSchema) {
             valid = ajv.validate(
                 {
                     $merge: {
                         source: {$ref: schema.$id},
                         with: {
-                            required,
-                            properties
+                            properties: customSchema
                         }
                     }
                 },
@@ -188,6 +215,9 @@ export class PwaKitConfigPlugin {
         }
 
         if (!valid) {
+            // when we use the ajv merge functionality
+            // ajv will always append an extra duplicated error
+            // we don't want that, so we filter that out
             const message = ajv.errorsText(ajv.errors.filter((e) => e.schemaPath !== '#/$merge'), {
                 separator: ', ',
                 dataVar: 'config'
