@@ -1,6 +1,6 @@
 <div align="center">
 
-  <h1>The Progressive Web App (PWA) Kit</h1>
+<h1>The Progressive Web App (PWA) Kit</h1>
 
 [![npm](https://img.shields.io/npm/v/pwa-kit-react-sdk.svg)](https://www.npmjs.com/package/pwa-kit-react-sdk)
 [![License](https://img.shields.io/github/license/SalesforceCommerceCloud/pwa-kit.svg)](https://github.com/SalesforceCommerceCloud/pwa-kit/blob/master/LICENSE)
@@ -13,12 +13,12 @@
 
 📖 [Read Docs](https://sfdc.co/pwa-kit) |
 🏖️ [View Demo](https://pwa-kit.mobify-storefront.com/) |
-🚀 [Deploy in Seconds](https://runtime.commercecloud.com/) |
+🚀 [Deploy](https://runtime.commercecloud.com/) |
 ➕ [Contribute](https://github.com/SalesforceCommerceCloud/pwa-kit/blob/develop/CONTRIBUTING.md)
-<br/><br/>
+<br /><br />
 The PWA Kit is a storefront technology for headless commerce using Salesforce Commerce APIs and React. It provides front-end developers with a more flexible and agile approach to build and maintain modern shopping experiences.
 <br/><br/>
-<img alt="pwa-kit banner" src="https://pwa-kit.mobify-storefront.com/mobify/bundle/62/static/img/hero.png" style="width: 700px; height:auto;">
+<img alt="pwa-kit banner" src="https://raw.githubusercontent.com/SalesforceCommerceCloud/pwa-kit/develop/packages/pwa/app/static/img/hero.png" style="width: 700px; height:auto;">
 
 </div>
 
@@ -26,10 +26,10 @@ The PWA Kit is a storefront technology for headless commerce using Salesforce Co
 
 ## 🏄 Getting Started
 
-### ℹ️ Requirements
+### Requirements
 
-- Node `^12.x` or `^14.x`
-- npm `^6.14.4`
+-   Node `^12.x` or `^14.x`
+-   npm `^6.14.4`
 
 ### Create Your First Project
 
@@ -39,7 +39,7 @@ npx pwa-kit-create-app
 
 Enter your [sandbox configuration](https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/getting-started.html#new-project).
 
-### Run The Project Locally
+### Run the Project Locally
 
 ```bash
 npm start
@@ -47,7 +47,11 @@ npm start
 
 ### Deploy to Managed Runtime
 
-Once your Runtime Admin is setup, run `npm run push -- -m "Message to help you recognize this bundle"` to deploy your project in as low as 60 seconds! Read the [docs](https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/pushing-and-deploying-bundles.html) to learn more.
+```
+npm run push -- -m "Message to help you recognize this bundle"
+```
+
+**Important**: Access to the [Runtime Admin](https://runtime.commercecloud.com/) application is required to deploy bundles. To learn more, read our guide to [Pushing and Deploying Bundles](https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/pushing-and-deploying-bundles.html).
 
 ## 🌍 Localization
 
@@ -59,16 +63,17 @@ The PWA Kit is licensed under a BSD 3-Clause license. See the [license](./LICENS
 
 ## ➕ Contribute
 
-Contributors are welcome! Refer to the [CONTRIBUTING](./CONTRIBUTING.md) guide to get started. If you liked pwa-kit, add a ⭐ on [GitHub Repo](https://github.com/SalesforceCommerceCloud/pwa-kit/)!
+Your contributions are welcome! Refer to the [CONTRIBUTING](./CONTRIBUTING.md) guide to get started. If you like `pwa-kit`, consider adding a ⭐ on the [GitHub Repo](https://github.com/SalesforceCommerceCloud/pwa-kit/). It helps other people discover PWA Kit!
 
 ## 📖 Documentation
 
-The full documentation for PWA Kit is hosted on the [Commerce Cloud Developer Center](https://developer.commercecloud.com/s/article/PWA-Kit).
+The full documentation for PWA Kit is hosted on the [Salesforce Developers](https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/overview) portal.
 
-### 🔖 Useful Links:
+### Useful Links:
 
-- [Getting Started](https://developer.commercecloud.com/s/article/Getting-Started-with-PWA-Kit)
-- [Pushing and Deploying Bundles](https://developer.commercecloud.com/s/article/Pushing-and-Deploying-Bundles)
-- [The Retail React App](https://developer.commercecloud.com/s/article/The-Retail-React-App)
-- [Rendering and Routing](https://developer.commercecloud.com/s/article/Rendering-and-Routing)
-- [Managed Runtime Infrastructure](https://developer.commercecloud.com/s/article/Managed-Runtime-Infrastructure)
+-   [Getting Started](https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/getting-started.html)
+-   [Setting Up API Access](https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/setting-up-api-access.html)
+-   [Configuration Options](https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/configuration-options.html)
+-   [Pushing and Deploying Bundles](https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/pushing-and-deploying-bundles.html)
+-   [The Retail React App](https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/retail-react-app.html)
+-   [Proxying Requests](https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/proxying-requests.html)

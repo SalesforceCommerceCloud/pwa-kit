@@ -87,7 +87,7 @@ const Footer = ({...otherProps}) => {
                                         href: '/',
                                         text: intl.formatMessage({
                                             id: 'footer.link.signin_create_account',
-                                            defaultMessage: 'Sign in or Create Account'
+                                            defaultMessage: 'Sign in or create account'
                                         })
                                     }
                                 ]}

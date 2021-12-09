@@ -21,7 +21,7 @@ export default function useProfileFields({form: {control, errors}, prefix = ''})
             defaultValue: '',
             rules: {
                 required: formatMessage({
-                    defaultMessage: 'Please enter your first name',
+                    defaultMessage: 'Please enter your first name.',
                     id: 'use_profile_fields.error.required_first_name'
                 })
             },
@@ -38,7 +38,7 @@ export default function useProfileFields({form: {control, errors}, prefix = ''})
             defaultValue: '',
             rules: {
                 required: formatMessage({
-                    defaultMessage: 'Please enter your last name',
+                    defaultMessage: 'Please enter your last name.',
                     id: 'use_profile_fields.error.required_last_name'
                 })
             },
@@ -53,7 +53,7 @@ export default function useProfileFields({form: {control, errors}, prefix = ''})
             defaultValue: '',
             rules: {
                 required: formatMessage({
-                    defaultMessage: 'Please enter a valid email address',
+                    defaultMessage: 'Please enter a valid email address.',
                     id: 'use_profile_fields.error.required_email'
                 })
             },
@@ -70,7 +70,7 @@ export default function useProfileFields({form: {control, errors}, prefix = ''})
             type: 'text',
             rules: {
                 required: formatMessage({
-                    defaultMessage: 'Please enter your phone number',
+                    defaultMessage: 'Please enter your phone number.',
                     id: 'use_profile_fields.error.required_phone'
                 })
             },

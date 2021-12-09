@@ -26,7 +26,7 @@ const PageNotFound = () => {
             <Helmet>
                 <title>
                     {intl.formatMessage({
-                        defaultMessage: "The page you're looking for can't be found",
+                        defaultMessage: "The page you're looking for can't be found.",
                         id: 'page_not_found.title.page_cant_be_found'
                     })}
                 </title>
@@ -43,7 +43,7 @@ const PageNotFound = () => {
                 <SearchIcon boxSize={['30px', '32px']} mb={8} />
                 <Heading as="h2" fontSize={['xl', '2xl', '2xl', '3xl']} mb={2} align="center">
                     {intl.formatMessage({
-                        defaultMessage: "The page you're looking for can't be found",
+                        defaultMessage: "The page you're looking for can't be found.",
                         id: 'page_not_found.title.page_cant_be_found'
                     })}
                 </Heading>

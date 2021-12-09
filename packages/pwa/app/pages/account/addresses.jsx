@@ -145,11 +145,11 @@ const AccountAddresses = () => {
             toast({
                 title: selectedAddressId
                     ? formatMessage({
-                          defaultMessage: 'Address Updated',
+                          defaultMessage: 'Address updated',
                           id: 'account_addresses.info.address_updated'
                       })
                     : formatMessage({
-                          defaultMessage: 'New Address Saved',
+                          defaultMessage: 'New address saved',
                           id: 'account_addresses.info.new_address_saved'
                       }),
                 status: 'success',
@@ -299,7 +299,7 @@ const AccountAddresses = () => {
                                     'account_addresses.page_action_placeholder.heading.no_saved_addresses'
                             })}
                             text={formatMessage({
-                                defaultMessage: 'Add a new address method for faster checkout',
+                                defaultMessage: 'Add a new address method for faster checkout.',
                                 id:
                                     'account_addresses.page_action_placeholder.message.add_new_address'
                             })}

@@ -177,7 +177,7 @@ const DrawerMenu = ({isOpen, onClose = noop, onLogoClick = noop, root}) => {
                                                         <Text {...styles.signoutText} as="span">
                                                             {intl.formatMessage({
                                                                 id: 'drawer_menu.button.log_out',
-                                                                defaultMessage: 'Log out'
+                                                                defaultMessage: 'Log Out'
                                                             })}
                                                         </Text>
                                                     </Flex>
