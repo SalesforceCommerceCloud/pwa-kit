@@ -19,7 +19,7 @@ import {
     useMultiStyleConfig,
     IconButton
 } from '@chakra-ui/react'
-import {DynamicImage} from '../image'
+import DynamicImage from '../dynamic-image'
 
 // Hooks
 import {useIntl} from 'react-intl'
