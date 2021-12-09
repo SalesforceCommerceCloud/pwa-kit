@@ -351,7 +351,7 @@ test('Can proceed through checkout steps as guest', async () => {
     // Fill out credit card payment form
     user.type(screen.getByLabelText(/card number/i), '4111111111111111')
     user.type(screen.getByLabelText(/name on card/i), 'Testy McTester')
-    user.type(screen.getByLabelText(/expiry date/i), '1224')
+    user.type(screen.getByLabelText(/expiration date/i), '1224')
     user.type(screen.getByLabelText(/security code/i), '123')
 
     // Same as shipping checkbox selected by default

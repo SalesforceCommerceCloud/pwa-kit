@@ -211,7 +211,7 @@ test('should display Selected refinements as there are some in the response', as
 
 test('show login modal when an unauthenticated user tries to add an item to wishlist', async () => {
     renderWithProviders(<MockedComponent />)
-    const wishlistButton = screen.getAllByLabelText('wishlist')
+    const wishlistButton = screen.getAllByLabelText('Wishlist')
     expect(wishlistButton.length).toBe(25)
     user.click(wishlistButton[0])
     expect(await screen.findByText(/Email/)).toBeInTheDocument()
