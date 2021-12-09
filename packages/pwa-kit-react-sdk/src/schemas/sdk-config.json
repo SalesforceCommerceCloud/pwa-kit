@@ -4,14 +4,19 @@
     "$id": "pwa-kit-config-schema",
     "title": "PWA Kit Config Schema",
     "type": "object",
-    "required": ["pwa-kit-react-sdk"],
+    "required": ["url"],
     "properties": {
-        "pwa-kit-react-sdk": {
-            "$id": "#pwa-kit-config-schema/pwa-kit-react-sdk",
-            "title": "pwa-kit-react-sdk",
+        "url": {
+            "$id": "#pwa-kit-config-schema/url",
+            "title": "url",
             "type": "object",
-            "required": [],
-            "properties": {}
+            "required": ["locale"],
+            "properties": {
+                "locale": {
+                    "type": "string",
+                    "enum": ["path", "query_param", "none"]
+                }
+            }
         }
     }
 }

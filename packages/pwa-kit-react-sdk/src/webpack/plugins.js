@@ -9,7 +9,6 @@ import webpack from 'webpack'
 import path from 'path'
 import fs from 'fs'
 import Ajv from 'ajv'
-import AjvMergePlugin from 'ajv-merge-patch/keywords/merge'
 
 import schema from '../schemas/sdk-config.json'
 
@@ -104,7 +103,6 @@ export class BuildMarkerPlugin {
 export class PwaKitConfigPlugin {
     // the path is relative to project directory
     CONFIG_PATH = './pwa-kit.config.json'
-    SCHEMA_PATH = './pwa-kit.config.schema.json'
 
     /**
      * Called by webpack when this plugin is attached.
@@ -120,8 +118,7 @@ export class PwaKitConfigPlugin {
                     // doesn't have the config file
                     return
                 }
-                const customSchema = this.getCustomSchema(compiler)
-                this.validate(config, customSchema)
+                this.validate(config)
             } catch (e) {
                 compilation.errors.push(e)
             }
@@ -163,62 +160,20 @@ export class PwaKitConfigPlugin {
     }
 
     /**
-     * Find the custom schema file from project and return the value.
-     *
-     * @param compiler {Object} the webpack compiler
-     * @returns {object} - The custom JSON schema object
-     */
-    getCustomSchema(compiler) {
-        let file
-        try {
-            file = this.getFile(compiler, this.SCHEMA_PATH)
-        } catch (e) {
-            // No need to throw error
-            // because custom schema is optional
-        }
-        try {
-            return file ? JSON.parse(file) : undefined
-        } catch {
-            throw new Error(
-                'PWA Kit custom config schema file (pwa-kit.config.schema.json) contains invalid JSON data.'
-            )
-        }
-    }
-
-    /**
      * Validate configurations based on pwa-kit-react-sdk schema
      * and custom schema. Errors will be thrown when validation fails.
      *
      * @param config {Object} - the configuration object
-     * @param customSchema {Object} - The custom JSON schema object
      */
-    validate(config, customSchema) {
+    validate(config) {
         const ajv = new Ajv()
-        AjvMergePlugin(ajv)
-        ajv.addSchema(schema)
-        let valid
-
-        if (customSchema) {
-            valid = ajv.validate(
-                {
-                    $merge: {
-                        source: {$ref: schema.$id},
-                        with: {
-                            properties: customSchema
-                        }
-                    }
-                },
-                config
-            )
-        } else {
-            valid = ajv.validate(schema, config)
-        }
+        const valid = ajv.validate(schema, config)
 
         if (!valid) {
             // when we use the ajv merge functionality
             // ajv will always append an extra duplicated error
             // we don't want that, so we filter that out
-            const message = ajv.errorsText(ajv.errors.filter((e) => e.schemaPath !== '#/$merge'), {
+            const message = ajv.errorsText(ajv.errors, {
                 separator: ', ',
                 dataVar: 'config'
             })
