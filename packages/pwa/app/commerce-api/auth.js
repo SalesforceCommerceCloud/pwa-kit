@@ -219,7 +219,7 @@ class Auth {
                 channel_id: this._config.parameters.siteId,
                 client_id: this._config.parameters.clientId,
                 code_challenge,
-                redirect_uri,
+                redirect_uri
             }
         }
 
@@ -231,14 +231,10 @@ class Auth {
 
         let tokenURL = response.url
         if (!this._onClient) {
-            tokenURL = response.headers.get("location")
+            tokenURL = response.headers.get('location')
         }
 
-        const tokenBody = createGetTokenBody(
-            tokenURL,
-            redirect_uri,
-            codeVerifier
-        )
+        const tokenBody = createGetTokenBody(tokenURL, redirect_uri, codeVerifier)
 
         const {customer_id} = await this.getLoggedInToken(tokenBody)
         const customer = {
@@ -269,8 +265,8 @@ class Auth {
                 code_challenge,
                 hint: 'guest',
                 redirect_uri,
-                response_type: 'code',
-            },
+                response_type: 'code'
+            }
         }
 
         const response = await this._api.shopperLogin.authorizeCustomer(options, true)
@@ -290,14 +286,10 @@ class Auth {
         // I believe this is b/c Commerce SDK doesn't respect `fetchOptions` in browser.
         let tokenURL = response.url
         if (!this._onClient) {
-            tokenURL = response.headers.get("location")
+            tokenURL = response.headers.get('location')
         }
 
-        const tokenRequestBody = createGetTokenBody(
-            tokenURL,
-            redirect_uri,
-            codeVerifier
-        )
+        const tokenRequestBody = createGetTokenBody(tokenURL, redirect_uri, codeVerifier)
 
         const {customer_id} = await this.getLoggedInToken(tokenRequestBody)
         const customer = {

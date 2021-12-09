@@ -32,12 +32,12 @@ export function isTokenValid(token) {
 // Returns request body for use with ShopperLogin.getToken
 export function createGetTokenBody(urlString, redirect_uri, code_verifier) {
     const {usid, code} = Object.fromEntries(new URL(urlString).searchParams)
-    return {        
+    return {
         code,
         code_verifier,
         grant_type: 'authorization_code_pkce',
         redirect_uri,
-        usid,
+        usid
     }
 }
 

@@ -81,9 +81,13 @@ class CommerceAPI {
             shopperGiftCertificates: {
                 api: sdk.ShopperGiftCertificates
             },
-            shopperLogin: {api: sdk.ShopperLogin, sendLocale: false, fetchOptions: {
-                redirect: 'manual'
-            }},
+            shopperLogin: {
+                api: sdk.ShopperLogin,
+                sendLocale: false,
+                fetchOptions: {
+                    redirect: 'manual'
+                }
+            },
             shopperOrders: {api: OcapiShopperOrders},
             shopperProducts: {
                 api: sdk.ShopperProducts,
@@ -100,7 +104,7 @@ class CommerceAPI {
 
         // Create SDK class proxies and create getters from our api mapping.
         // The proxy handlers are called when accessing any of the mapped SDK class
-        // proxies, executing hooks to tap into or modify 
+        // proxies, executing hooks to tap into or modify
         // the outgoing method parameters and/or incoming SDK responses
         const self = this
 
@@ -111,12 +115,12 @@ class CommerceAPI {
 
             let config = this._config
             if (apiConfigs[key].fetchOptions) {
-               config = {
-                   ...{
-                       fetchOptions: apiConfigs[key].fetchOptions
-                   }, 
-                   ...config
-                } 
+                config = {
+                    ...{
+                        fetchOptions: apiConfigs[key].fetchOptions
+                    },
+                    ...config
+                }
             }
 
             const proxy = new Proxy(new SDKClass(config), {
@@ -143,7 +147,7 @@ class CommerceAPI {
                         const includeGlobalLocale = Array.isArray(sendLocale)
                             ? sendLocale.includes(prop)
                             : !!sendLocale
-                        
+
                         const includeGlobalCurrency = Array.isArray(sendCurrency)
                             ? sendCurrency.includes(prop)
                             : !!sendCurrency
