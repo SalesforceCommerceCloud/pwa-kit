@@ -172,9 +172,6 @@ export class PwaKitConfigPlugin {
         const valid = ajv.validate(schema, config)
 
         if (!valid) {
-            // when we use the ajv merge functionality
-            // ajv will always append an extra duplicated error
-            // we don't want that, so we filter that out
             const message = ajv.errorsText(ajv.errors, {
                 separator: ', ',
                 dataVar: 'config'
