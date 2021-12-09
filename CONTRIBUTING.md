@@ -53,11 +53,11 @@ Run integration tests against live APIs for all packages with:
   npm run test:integration
 ```
 
-## Issues
+## 🐛 Issues
 
 If you’re experiencing an issue, check the open issues first. If someone hasn’t already raised the same issue, file a new issue with a description of the problem and describe the steps to reproduce it. If you require an urgent response to your issue, file a support ticket with [Salesforce Commerce Cloud](https://help.salesforce.com/). You can also create an issue to request a new feature.
 
-## Submit a Pull Request
+## 🎁 Submit a Pull Request
 
 > **Note**: All your commits must be signed. To learn how to set up commit signing, see this help doc from GitHub: [Managing Commit Signature Verification](https://docs.github.com/en/authentication/managing-commit-signature-verification).
 
@@ -67,7 +67,7 @@ If you’re experiencing an issue, check the open issues first. If someone hasn�
 4. Add your changes to your branch.
 5. Create a pull request against the develop branch.
 
-## Best Practices
+## 🏅 Best Practices
 
 -   To reduce merge conflicts, squash and rebase your branch before submitting your pull request.
 -   In your pull request, include:
@@ -78,7 +78,7 @@ If you’re experiencing an issue, check the open issues first. If someone hasn�
 -   Make sure that your code builds successfully and passes the unit tests. Refer to the README for steps on how to run tests.
 -   Monitor your pull requests. Respond in a timely manner to any comments, questions, and change requests.
 
-## What to Expect
+## 👀 Review Process
 
 After submitting a pull request, the PWA Kit team will review it and consider it for merging.
 
