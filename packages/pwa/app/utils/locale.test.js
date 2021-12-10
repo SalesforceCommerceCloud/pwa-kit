@@ -13,9 +13,37 @@ import {
     getSupportedLocalesIds
 } from './locale'
 
-import {SUPPORTED_LOCALES, DEFAULT_LOCALE} from '../constants'
+// import {SUPPORTED_LOCALES, DEFAULT_LOCALE} from '../constants'
 
-const supportedLocales = getSupportedLocalesIds()
+const l10nConfig = {
+    supportedCurrencies: ['GBP', 'EUR', 'CNY', 'JPY'],
+    defaultCurrency: 'GBP',
+    supportedLocales: [
+        {
+            id: 'en-GB',
+            preferredCurrency: 'GBP'
+        },
+        {
+            id: 'fr-FR',
+            preferredCurrency: 'EUR'
+        },
+        {
+            id: 'it-IT',
+            preferredCurrency: 'EUR'
+        },
+        {
+            id: 'zh-CN',
+            preferredCurrency: 'CNY'
+        },
+        {
+            id: 'ja-JP',
+            preferredCurrency: 'JPY'
+        }
+    ],
+    defaultLocale: 'en-GB'
+}
+
+const supportedLocales = getSupportedLocalesIds(l10nConfig.supportedLocales)
 const nonSupportedLocale = 'nl-NL'
 // Make sure this supported locale is not the default locale.
 // Otherwise, our code would fall back to default and incorrectly pass the tests
@@ -26,52 +54,68 @@ const testId2 = 'homepage.message.welcome'
 
 test('our assumptions before further testing', () => {
     expect(supportedLocales.includes(nonSupportedLocale)).toBe(false)
-    expect(DEFAULT_LOCALE).toBe('en-GB')
-    expect(supportedLocale).not.toBe(DEFAULT_LOCALE)
+    expect(l10nConfig.defaultLocale).toBe('en-GB')
+    expect().not.toBe(l10nConfig.defaultLocale)
 })
 
 describe('whichLocaleToLoad', () => {
     test('default to fallback locale', () => {
-        const locale = whichLocaleToLoad([nonSupportedLocale], supportedLocales, DEFAULT_LOCALE)
-        expect(locale).toBe(DEFAULT_LOCALE)
+        const locale = whichLocaleToLoad(
+            [nonSupportedLocale],
+            supportedLocales,
+            l10nConfig.defaultLocale
+        )
+        expect(locale).toBe(l10nConfig.defaultLocale)
     })
     test('matches one of the supported locales', () => {
-        const locale = whichLocaleToLoad([supportedLocale], supportedLocales, DEFAULT_LOCALE)
+        const locale = whichLocaleToLoad(
+            [supportedLocale],
+            supportedLocales,
+            l10nConfig.defaultLocale
+        )
         expect(locale).toBe(supportedLocale)
     })
 })
 
 describe('loadLocaleData', () => {
     test('default to English as the fallback locale', async () => {
-        const messages = await loadLocaleData(nonSupportedLocale)
+        const messages = await loadLocaleData(
+            nonSupportedLocale,
+            l10nConfig.defaultLocale,
+            supportedLocales
+        )
         expect(messages[testId1][0].value).toMatch(/Privacy Policy/i)
     })
     test('loading one of the supported locales', async () => {
-        const messages = await loadLocaleData(supportedLocale)
+        const messages = await loadLocaleData(
+            supportedLocale,
+            l10nConfig.defaultLocale,
+            supportedLocales
+        )
         expect(messages[testId2]).toBeDefined()
     })
     test('loading the pseudo locale', async () => {
-        const messages = await loadLocaleData('en-XB')
+        const messages = await loadLocaleData('en-XB', l10nConfig.defaultLocale, supportedLocales)
         expect(messages[testId1][0].value).toMatch(/^\[!! Ṕŕíííṿâćććẏ ṔṔṔŏĺíííćẏ !!]$/)
     })
     test('handling a not-found translation file', async () => {
-        expect(supportedLocale).not.toBe(DEFAULT_LOCALE)
+        expect(supportedLocale).not.toBe(l10nConfig.defaultLocale)
 
         jest.mock(`../translations/compiled/${supportedLocale}.json`, () => {
             throw new Error()
         })
 
         let importDefaultLocale = false
-        jest.mock(`../translations/compiled/${DEFAULT_LOCALE}.json`, () => {
+        jest.mock(`../translations/compiled/${l10nConfig.defaultLocale}.json`, () => {
             importDefaultLocale = true
         })
 
-        await loadLocaleData(supportedLocale)
+        await loadLocaleData(supportedLocale, l10nConfig.defaultLocale, supportedLocales)
         expect(importDefaultLocale).toBe(true)
 
         // Reset
         jest.unmock(`../translations/compiled/${supportedLocale}.json`)
-        jest.unmock(`../translations/compiled/${DEFAULT_LOCALE}.json`)
+        jest.unmock(`../translations/compiled/${l10nConfig.defaultLocale}.json`)
     })
 })
 
@@ -89,15 +133,18 @@ describe('getLocaleConfig', () => {
     })
 
     test('without parameter', async () => {
-        const config = await getLocaleConfig()
-        expect(config.app.targetLocale).toBe(DEFAULT_LOCALE)
+        const config = await getLocaleConfig({l10nConfig})
+        console.log('config', config)
+        const expectedResult = `en-GB`
+        expect(config.app.targetLocale).toBe(expectedResult)
     })
     test('with getUserPreferredLocales parameter', async () => {
         const locale = supportedLocale
-        expect(locale).not.toBe(DEFAULT_LOCALE)
+        expect(locale).not.toBe(l10nConfig.defaultLocale)
 
         const config = await getLocaleConfig({
-            getUserPreferredLocales: () => [locale]
+            getUserPreferredLocales: () => [locale],
+            l10nConfig
         })
         expect(config.app.targetLocale).toBe(locale)
     })
@@ -106,10 +153,10 @@ describe('getLocaleConfig', () => {
         // Simulate server side
         windowSpy.mockImplementation(() => undefined)
 
-        const config = await getLocaleConfig()
+        const config = await getLocaleConfig({l10nConfig})
 
         // The app should still think its target locale is the default one
-        expect(config.app.targetLocale).toBe(DEFAULT_LOCALE)
+        expect(config.app.targetLocale).toBe(l10nConfig.defaultLocale)
         // But the actual translation should be using the pseudo locale
         expect(config.messages[testId1][0].value).toMatch(/^\[!! Ṕŕíííṿâćććẏ ṔṔṔŏĺíííćẏ !!]$/)
     })
@@ -117,12 +164,15 @@ describe('getLocaleConfig', () => {
 
 describe('getCurrency', () => {
     test('returns the preferred currency for a supported locale', () => {
-        const currency = getPreferredCurrency(SUPPORTED_LOCALES[0].id)
-        expect(currency).toBe(SUPPORTED_LOCALES[0].preferredCurrency)
+        const currency = getPreferredCurrency(
+            l10nConfig.supportedLocales[0].id,
+            l10nConfig.supportedLocales
+        )
+        expect(currency).toBe(l10nConfig.supportedLocales[0].preferredCurrency)
     })
 
     test('returns undefined for a unsupported locale', () => {
-        const currency = getPreferredCurrency(nonSupportedLocale)
+        const currency = getPreferredCurrency(nonSupportedLocale, l10nConfig.supportedLocales)
         expect(currency).toBeFalsy()
     })
 })

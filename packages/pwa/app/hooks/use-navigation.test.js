@@ -10,6 +10,7 @@ import useNavigation from './use-navigation'
 import {getUrlConfig, getSitesConfig, getDefaultSiteId} from '../utils/utils'
 import {useLocation} from 'react-router-dom'
 import {render} from '@testing-library/react'
+import useSite from './use-site'
 
 const mockHistoryPush = jest.fn()
 const mockHistoryReplace = jest.fn()
@@ -23,6 +24,8 @@ jest.mock('../utils/utils', () => {
         getDefaultSiteId: jest.fn()
     }
 })
+
+jest.mock('./use-site')
 jest.mock('react-router', () => {
     return {
         useHistory: jest.fn().mockImplementation(() => {
@@ -50,6 +53,11 @@ jest.mock('react-intl', () => {
 })
 
 beforeEach(() => {
+    useSite.mockImplementation(() => ({
+        id: 'site-id-2',
+        alias: 'global',
+        hostname: ['localhost']
+    }))
     getSitesConfig.mockImplementation(() => [
         {
             id: 'site-id-1',
@@ -88,7 +96,7 @@ test('prepends locale and site and calls history.push', () => {
     }))
     const {getByTestId} = render(<TestComponent />)
     user.click(getByTestId('page1-link'))
-    expect(mockHistoryPush).toHaveBeenCalledWith('/en-GB/global/page1')
+    expect(mockHistoryPush).toHaveBeenCalledWith('/global/en-GB/page1')
 })
 
 test('append locale as path and site as query and calls history.push', () => {
@@ -119,7 +127,7 @@ test('works for any history method and args', () => {
     const {getByTestId} = render(<TestComponent />)
 
     user.click(getByTestId('page2-link'))
-    expect(mockHistoryReplace).toHaveBeenCalledWith('/en-GB/global/page2', {})
+    expect(mockHistoryReplace).toHaveBeenCalledWith('/global/en-GB/page2', {})
 })
 
 test('if given the path to root or homepage, will not prepend the locale', () => {
