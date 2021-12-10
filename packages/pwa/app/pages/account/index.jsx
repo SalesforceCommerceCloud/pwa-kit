@@ -75,7 +75,7 @@ const Account = () => {
                     <SignoutIcon boxSize={5} mr={2} />
                     <Text as="span" fontSize={['md', 'md', 'md', 'sm']} fontWeight="normal">
                         {formatMessage({
-                            defaultMessage: 'Log out',
+                            defaultMessage: 'Log Out',
                             id: 'account.logout_button.button.log_out'
                         })}
                     </Text>

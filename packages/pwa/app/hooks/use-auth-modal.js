@@ -147,7 +147,7 @@ export const AuthModal = ({
                     }
                 )}`,
                 description: `${formatMessage({
-                    defaultMessage: "You're now signed in",
+                    defaultMessage: "You're now signed in.",
                     id: 'auth_modal.description.now_signed_in'
                 })}`,
                 status: 'success',
@@ -189,7 +189,7 @@ export const AuthModal = ({
 
                 <Button onClick={() => setCurrentView(LOGIN_VIEW)}>
                     <FormattedMessage
-                        defaultMessage="Back to sign in"
+                        defaultMessage="Back to Sign In"
                         id="auth_modal.password_reset_success.button.back_to_sign_in"
                     />
                 </Button>

@@ -51,7 +51,7 @@ const ResetPasswordForm = ({submitForm, clickSignIn = noop, form}) => {
                             isLoading={form.formState.isSubmitting}
                         >
                             <FormattedMessage
-                                defaultMessage="Reset password"
+                                defaultMessage="Reset Password"
                                 id="reset_password_form.button.reset_password"
                             />
                         </Button>
