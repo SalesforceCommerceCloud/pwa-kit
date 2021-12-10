@@ -19,7 +19,8 @@
     "ssr",
     "TERMS_OF_USE.md",
     "utils",
-    "webpack"
+    "webpack",
+    "schemas"
   ],
   "publishConfig": {
     "directory": "dist"
