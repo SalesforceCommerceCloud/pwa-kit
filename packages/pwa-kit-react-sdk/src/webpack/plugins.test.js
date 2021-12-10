@@ -63,27 +63,4 @@ describe('PwaKitConfigPlugin', () => {
 
         expect(() => plugin.getConfig(compiler, 'path')).toThrow()
     })
-
-    const validateFailingCases = [
-        [{}, "config must have required property 'url'"],
-        [{url: 1}, 'config/url must be object'],
-        [{url: {locale: 'test'}}, 'config/url/locale must be equal to one of the allowed values']
-    ]
-    describe('validate', () => {
-        test.each(validateFailingCases)('validation errors', (config, message) => {
-            const plugin = new PwaKitConfigPlugin()
-            expect(() => plugin.validate(config)).toThrow(message)
-        })
-    })
-
-    const validateSuccessCases = [
-        [{url: {locale: 'path'}}],
-        [{url: {locale: 'path'}, otherkeys: 1}]
-    ]
-    describe('validate', () => {
-        test.each(validateSuccessCases)('validation success', (config) => {
-            const plugin = new PwaKitConfigPlugin()
-            expect(() => plugin.validate(config)).not.toThrow()
-        })
-    })
 })

@@ -4,19 +4,6 @@
     "$id": "pwa-kit-config-schema",
     "title": "PWA Kit Config Schema",
     "type": "object",
-    "required": ["url"],
-    "properties": {
-        "url": {
-            "$id": "#pwa-kit-config-schema/url",
-            "title": "url",
-            "type": "object",
-            "required": ["locale"],
-            "properties": {
-                "locale": {
-                    "type": "string",
-                    "enum": ["path", "query_param", "none"]
-                }
-            }
-        }
-    }
+    "required": [],
+    "properties": {}
 }
