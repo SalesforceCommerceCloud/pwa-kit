@@ -189,13 +189,13 @@ const check = () => {
                 }
             })
 
-        // commonConfigs.forEach((name) => {
-        //     const src = path.join(assetsDir, name)
-        //     const dest = path.join(pkgDir, name)
-        //     if (!fs.readFileSync(src).equals(fs.readFileSync(dest))) {
-        //         errors.push(`The config file at "${dest}" does not match the template in "${src}"`)
-        //     }
-        // })
+        commonConfigs.forEach((name) => {
+            const src = path.join(assetsDir, name)
+            const dest = path.join(pkgDir, name)
+            if (!fs.readFileSync(src).equals(fs.readFileSync(dest))) {
+                errors.push(`The config file at "${dest}" does not match the template in "${src}"`)
+            }
+        })
 
         // If the current package, X, depends on a monorepo local package, Y, then
         // ensure that X installs all of Y's peerDependencies.
