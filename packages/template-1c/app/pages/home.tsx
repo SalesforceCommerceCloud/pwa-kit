@@ -75,7 +75,6 @@ h1 {
 }
 `
 
-
 const Home = ({ dadJoke }: Props) => {
   const [counter, setCounter] = useState(0);
 

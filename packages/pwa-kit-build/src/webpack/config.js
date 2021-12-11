@@ -16,6 +16,7 @@ import WebpackNotifierPlugin from 'webpack-notifier'
 import CopyPlugin from 'copy-webpack-plugin'
 import {BundleAnalyzerPlugin} from 'webpack-bundle-analyzer'
 import LoadablePlugin from '@loadable/webpack-plugin'
+import SpeedMeasurePlugin from 'speed-measure-webpack-plugin'
 import {createModuleReplacementPlugin} from './plugins'
 
 const projectDir = process.cwd()
@@ -61,7 +62,7 @@ const baseConfig = (target) => {
                     assets: false,
                     excludeAssets: [/.*img\/.*/, /.*svg\/.*/, /.*json\/.*/, /.*static\/.*/],
                 },
-                devtool: 'source-map',
+                devtool: mode === production ? 'source-map' : 'eval-source-map',
                 output: {
                     publicPath: '',
                     path: buildDir,
@@ -118,6 +119,7 @@ const baseConfig = (target) => {
                                     loader: findInProjectThenSDK('babel-loader'),
                                     options: {
                                         rootMode: 'upward',
+                                        cacheDirectory: true,
                                     },
                                 },
                             ],
@@ -262,4 +264,6 @@ module.exports = [
     server,
     clientOptional,
     requestProcessor
-]
+].map((config) => {
+    return new SpeedMeasurePlugin({disable: !process.env.MEASURE}).wrap(config)
+})
