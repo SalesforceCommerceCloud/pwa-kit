@@ -11,13 +11,19 @@ import theme from '@chakra-ui/theme'
  * @param {Object} props
  * @param {string} props.src - Dynamic src having an optional param that can vary with widths. For example: `image[_{width}].jpg` or `image.jpg[?sw={width}&q=60]`
  * @param {(number[]|string[]|Object)} [props.widths] - Image widths relative to the breakpoints, whose units can either be px or vw or unit-less. They will be mapped to the corresponding `sizes` and `srcSet`.
+ * @param {Object} [props.breakpoints] - The current theme's breakpoints. If not given, Chakra's default breakpoints will be used.
  * @return {Object} src, sizes, and srcSet props for your image component
  */
-export const getResponsiveImageAttributes = ({src, widths}) => {
+export const getResponsiveImageAttributes = ({src, widths, breakpoints}) => {
     if (!widths) {
         return {
             src: getSrcWithoutOptionalParams(src)
         }
+    }
+
+    if (breakpoints) {
+        themeBreakpoints = breakpoints
+        breakpointLabels = getBreakpointLabels(themeBreakpoints)
     }
 
     return {
@@ -37,7 +43,7 @@ const mapWidthsToSizes = (widths) => {
     return breakpointLabels
         .slice(0, _widths.length)
         .map((bp, i) => {
-            return i === 0 ? _widths[i] : `(min-width: ${theme.breakpoints[bp]}) ${_widths[i]}`
+            return i === 0 ? _widths[i] : `(min-width: ${themeBreakpoints[bp]}) ${_widths[i]}`
         })
         .reverse()
         .join(', ')
@@ -68,14 +74,14 @@ const mapWidthsToSrcSet = (widths, dynamicSrc) => {
     return srcSet.map((imageWidth) => `${getSrc(dynamicSrc, imageWidth)} ${imageWidth}w`).join(', ')
 }
 
+const vwValue = /^\d+vw$/
+const pxValue = /^\d+px$/
+
 /**
  * @param {string[]|number[]} widths
  * @return {number[]}
  */
 const convertToPxNumbers = (widths) => {
-    const vwValue = /^\d+vw$/
-    const pxValue = /^\d+px$/
-
     return widths
         .map((width, i) => {
             if (typeof width === 'number') {
@@ -116,8 +122,6 @@ const withUnit = (widths) =>
 
 const isObject = (o) => o?.constructor === Object
 
-const breakpointLabels = ['base', 'sm', 'md', 'lg', 'xl', '2xl']
-
 /**
  * @param {Object} widths
  * @example
@@ -143,8 +147,12 @@ const widthsAsArray = (widths) => {
  * @param {string} breakpoint
  */
 const vwToPx = (vw, breakpoint) => {
-    const em = (vw / 100) * parseFloat(theme.breakpoints[breakpoint])
-    return emToPx(em)
+    let result = (vw / 100) * parseFloat(themeBreakpoints[breakpoint])
+    const breakpointsDefinedInPx = Object.values(themeBreakpoints).some((val) => pxValue.test(val))
+
+    // Assumes theme's breakpoints are defined in either em or px
+    // See https://chakra-ui.com/docs/features/responsive-styles#customizing-breakpoints
+    return breakpointsDefinedInPx ? result : emToPx(result)
 }
 
 /**
@@ -177,3 +185,16 @@ const getSrcWithoutOptionalParams = (dynamicSrc) => {
     const optionalParams = /\[[^\]]+\]/g
     return dynamicSrc.replace(optionalParams, '')
 }
+
+/**
+ * @param {Object} breakpoints
+ * @return {string[]} breakpoint labels such as ['base', 'sm', 'md', 'lg', 'xl', '2xl']
+ */
+const getBreakpointLabels = (breakpoints) =>
+    Object.entries(breakpoints)
+        .sort((a, b) => parseFloat(a[1]) - parseFloat(b[1]))
+        .map(([key]) => key)
+
+const {breakpoints: defaultBreakpoints} = theme
+let themeBreakpoints = defaultBreakpoints
+let breakpointLabels = getBreakpointLabels(themeBreakpoints)
