@@ -14,17 +14,15 @@ import theme from '@chakra-ui/theme'
  * @param {Object} [props.breakpoints] - The current theme's breakpoints. If not given, Chakra's default breakpoints will be used.
  * @return {Object} src, sizes, and srcSet props for your image component
  */
-export const getResponsiveImageAttributes = ({src, widths, breakpoints}) => {
+export const getResponsiveImageAttributes = ({src, widths, breakpoints = defaultBreakpoints}) => {
     if (!widths) {
         return {
             src: getSrcWithoutOptionalParams(src)
         }
     }
 
-    if (breakpoints) {
-        themeBreakpoints = breakpoints
-        breakpointLabels = getBreakpointLabels(themeBreakpoints)
-    }
+    themeBreakpoints = breakpoints
+    breakpointLabels = getBreakpointLabels(themeBreakpoints)
 
     return {
         src: getSrcWithoutOptionalParams(src),
