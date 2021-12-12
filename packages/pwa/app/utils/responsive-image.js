@@ -186,7 +186,7 @@ const getSrcWithoutOptionalParams = (dynamicSrc) => {
 
 /**
  * @param {Object} breakpoints
- * @return {string[]} breakpoint labels such as ['base', 'sm', 'md', 'lg', 'xl', '2xl']
+ * @return {string[]} Breakpoint labels ordered from smallest. For example: ['base', 'sm', 'md', 'lg', 'xl', '2xl']
  */
 const getBreakpointLabels = (breakpoints) =>
     Object.entries(breakpoints)
