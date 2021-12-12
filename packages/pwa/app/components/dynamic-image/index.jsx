@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React from 'react'
+import React, {useMemo} from 'react'
 import PropTypes from 'prop-types'
 import {Img, Box, useTheme} from '@chakra-ui/react'
 import {getResponsiveImageAttributes} from '../../utils/responsive-image'
@@ -22,12 +22,14 @@ const DynamicImage = ({src, widths, imageProps, as, ...rest}) => {
     const Component = as ? as : Img
     const theme = useTheme()
 
+    const responsiveImageProps = useMemo(
+        () => getResponsiveImageAttributes({src, widths, breakpoints: theme.breakpoints}),
+        [src, widths, theme.breakpoints]
+    )
+
     return (
         <Box {...rest}>
-            <Component
-                {...getResponsiveImageAttributes({src, widths, breakpoints: theme.breakpoints})}
-                {...imageProps}
-            />
+            <Component {...responsiveImageProps} {...imageProps} />
         </Box>
     )
 }
