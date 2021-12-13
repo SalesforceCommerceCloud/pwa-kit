@@ -245,7 +245,7 @@ const Home = ({productSearchResult, isLoading}) => {
                         <>
                             {intl.formatMessage({
                                 defaultMessage: 'They will get you to the right place.',
-                                id: 'home.description.here_to_help_line_2'
+                                id: 'home.description.get_you_to_the_right_place'
                             })}
                         </>
                     </>
