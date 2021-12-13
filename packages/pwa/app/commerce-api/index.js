@@ -16,7 +16,6 @@ import EinsteinAPI from './einstein'
 import http from 'http'
 import https from 'https'
 
-// Node.js http/https Agents with keepAlive to re-use server-side connections
 const HTTP_AGENT = isServer
     ? new http.Agent({
           keepAlive: true,
@@ -30,6 +29,12 @@ const HTTPS_AGENT = isServer
       })
     : undefined
 
+/**
+ * Node.js http or https Agent with keepAlive support to re-use Commerce API
+ * connections server-side.
+ * @param url
+ * @returns {module:http.Agent|module:https.Agent}
+ */
 function getAgent(url) {
     return url.protocol === 'http:' ? HTTP_AGENT : HTTPS_AGENT
 }
@@ -76,7 +81,7 @@ class CommerceAPI {
         const proxy = `${getAppOrigin()}${proxyPath}`
 
         this._config = {
-            //proxy,
+            proxy,
             fetchOptions: {
                 agent: getAgent
             },
