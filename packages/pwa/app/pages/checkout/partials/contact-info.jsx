@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useRef, useState} from 'react'
+import React, { useRef, useState } from 'react'
 import PropTypes from 'prop-types'
 import {
     Alert,
@@ -21,17 +21,19 @@ import {
     Stack,
     Text
 } from '@chakra-ui/react'
-import {useHistory} from 'react-router-dom'
-import {useForm} from 'react-hook-form'
-import {FormattedMessage, useIntl} from 'react-intl'
-import {useCheckout} from '../util/checkout-context'
+import { useHistory } from 'react-router-dom'
+import { useForm } from 'react-hook-form'
+import { FormattedMessage, useIntl } from 'react-intl'
+import { useCheckout } from '../util/checkout-context'
 import useLoginFields from '../../../components/forms/useLoginFields'
-import {ToggleCard, ToggleCardEdit, ToggleCardSummary} from '../../../components/toggle-card'
+import { ToggleCard, ToggleCardEdit, ToggleCardSummary } from '../../../components/toggle-card'
 import Field from '../../../components/field'
+import { AuthModal, useAuthModal } from '../../../hooks/use-auth-modal'
 
 const ContactInfo = () => {
-    const {formatMessage} = useIntl()
+    const { formatMessage } = useIntl()
     const history = useHistory()
+    const authModal = useAuthModal('password')
 
     const {
         customer,
@@ -45,10 +47,10 @@ const ContactInfo = () => {
     } = useCheckout()
 
     const form = useForm({
-        defaultValues: {email: customer?.email || basket.customerInfo?.email || '', password: ''}
+        defaultValues: { email: customer?.email || basket.customerInfo?.email || '', password: '' }
     })
 
-    const fields = useLoginFields({form})
+    const fields = useLoginFields({ form })
 
     const [error, setError] = useState(null)
     const [showPasswordField, setShowPasswordField] = useState(false)
@@ -80,6 +82,11 @@ const ContactInfo = () => {
         setShowPasswordField(!showPasswordField)
         setIsGuestCheckout(!isGuestCheckout)
     }
+
+    const onForgotPasswordClick = () => {
+        authModal.onOpen()
+    }
+
     return (
         <ToggleCard
             id="step-0"
@@ -121,7 +128,11 @@ const ContactInfo = () => {
                                     <Stack>
                                         <Field {...fields.password} />
                                         <Box>
-                                            <Button variant="link" size="sm">
+                                            <Button
+                                                variant="link"
+                                                size="sm"
+                                                onClick={onForgotPasswordClick}
+                                            >
                                                 <FormattedMessage
                                                     defaultMessage="Forgot password?"
                                                     id="contact_info.link.forgot_password"
@@ -163,6 +174,7 @@ const ContactInfo = () => {
                         </Stack>
                     </form>
                 </Container>
+                <AuthModal {...authModal} />
             </ToggleCardEdit>
             <ToggleCardSummary>
                 <Text>{basket?.customerInfo?.email || customer?.email}</Text>
@@ -182,7 +194,7 @@ const ContactInfo = () => {
     )
 }
 
-const SignOutConfirmationDialog = ({isOpen, onConfirm, onClose}) => {
+const SignOutConfirmationDialog = ({ isOpen, onConfirm, onClose }) => {
     const cancelRef = useRef()
 
     return (
