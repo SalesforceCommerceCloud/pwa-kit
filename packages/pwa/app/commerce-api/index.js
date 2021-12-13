@@ -227,8 +227,6 @@ class CommerceAPI {
             await this.auth.login()
         }
 
-        const url = new URL(getAppOrigin())
-
         // Apply the appropriate auth headers and return new options
         const [fetchOptions, ...restParams] = params
         const newFetchOptions = {
