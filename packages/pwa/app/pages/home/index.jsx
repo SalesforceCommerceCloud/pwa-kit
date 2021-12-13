@@ -237,14 +237,14 @@ const Home = ({productSearchResult, isLoading}) => {
                     <>
                         <>
                             {intl.formatMessage({
-                                defaultMessage: 'Contact our support staff and, they’ll get you',
+                                defaultMessage: 'Contact our support staff.',
                                 id: 'home.description.here_to_help'
                             })}
                         </>
                         <br />
                         <>
                             {intl.formatMessage({
-                                defaultMessage: 'to the right place.',
+                                defaultMessage: 'They will get you to the right place.',
                                 id: 'home.description.here_to_help_line_2'
                             })}
                         </>
