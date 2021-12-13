@@ -10,25 +10,25 @@ import {useIntl, defineMessages} from 'react-intl'
 const messages = defineMessages({
     required: {defaultMessage: 'Required', id: 'use_credit_card_fields.error.required'},
     cardNumberInvalid: {
-        defaultMessage: 'Please enter a valid card number',
+        defaultMessage: 'Please enter a valid card number.',
         id: 'use_credit_card_fields.error.valid_card_number'
     },
     nameInvalid: {
-        defaultMessage: 'Please enter a valid name',
+        defaultMessage: 'Please enter a valid name.',
         id: 'use_credit_card_fields.error.valid_name'
     },
     dateInvalid: {
-        defaultMessage: 'Please enter a valid date',
+        defaultMessage: 'Please enter a valid date.',
         id: 'use_credit_card_fields.error.valid_date'
     },
     codeInvalid: {
-        defaultMessage: 'Please enter a valid security code',
+        defaultMessage: 'Please enter a valid security code.',
         id: 'use_credit_card_fields.error.valid_security_code'
     },
     cardNumber: {defaultMessage: 'Card Number', id: 'use_credit_card_fields.label.card_number'},
     cardType: {defaultMessage: 'Card Type', id: 'use_credit_card_fields.label.card_type'},
     cardName: {defaultMessage: 'Name on Card', id: 'use_credit_card_fields.label.name'},
-    expiryDate: {defaultMessage: 'Expiry Date', id: 'use_credit_card_fields.label.expiry'},
+    expiryDate: {defaultMessage: 'Expiration Date', id: 'use_credit_card_fields.label.expiry'},
     securityCode: {
         defaultMessage: 'Security Code',
         id: 'use_credit_card_fields.label.security_code'
@@ -53,7 +53,7 @@ export default function useCreditCardFields({form: {control, errors}, prefix = '
             type: 'text',
             rules: {
                 required: formatMessage({
-                    defaultMessage: 'Please enter your card number',
+                    defaultMessage: 'Please enter your card number.',
                     id: 'use_credit_card_fields.error.required_card_number'
                 }),
                 validate: (value) =>
@@ -80,7 +80,7 @@ export default function useCreditCardFields({form: {control, errors}, prefix = '
             type: 'text',
             rules: {
                 required: formatMessage({
-                    defaultMessage: 'Please enter your name as shown on your card',
+                    defaultMessage: 'Please enter your name as shown on your card.',
                     id: 'use_credit_card_fields.error.required_name'
                 }),
                 validate: (value) =>
@@ -98,7 +98,7 @@ export default function useCreditCardFields({form: {control, errors}, prefix = '
             placeholder: 'MM/YY',
             rules: {
                 required: formatMessage({
-                    defaultMessage: 'Please enter your expiry date',
+                    defaultMessage: 'Please enter your expiration date.',
                     id: 'use_credit_card_fields.error.required_expiry'
                 }),
                 validate: (value) =>
@@ -118,7 +118,7 @@ export default function useCreditCardFields({form: {control, errors}, prefix = '
             type: 'password',
             rules: {
                 required: formatMessage({
-                    defaultMessage: 'Please enter your security code',
+                    defaultMessage: 'Please enter your security code.',
                     id: 'use_credit_card_fields.error.required_security_code'
                 }),
                 validate: (value) =>

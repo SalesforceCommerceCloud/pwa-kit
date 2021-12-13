@@ -105,7 +105,7 @@ const AccountOrderHistory = () => {
                                         <Box>
                                             <Button
                                                 as={Link}
-                                                to={`${location.pathname}/${order.orderNo}`}
+                                                to={`/account/orders/${order.orderNo}`}
                                                 variant="link"
                                                 rightIcon={
                                                     <ChevronRightIcon boxSize={5} mx={-1.5} />
@@ -215,11 +215,11 @@ const AccountOrderHistory = () => {
                 <PageActionPlaceHolder
                     icon={<ReceiptIcon boxSize={8} />}
                     heading={formatMessage({
-                        defaultMessage: "You haven't placed an order yet",
+                        defaultMessage: "You haven't placed an order yet.",
                         id: 'account_order_history.heading.no_order_yet'
                     })}
                     text={formatMessage({
-                        defaultMessage: 'Once you place an order the details will show up here',
+                        defaultMessage: 'Once you place an order the details will show up here.',
                         id: 'account_order_history.description.once_you_place_order'
                     })}
                     buttonText={formatMessage({

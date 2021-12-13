@@ -251,7 +251,7 @@ const AccountPaymentMethods = () => {
                         id: 'account_payment_methods.heading.no_saved_methods'
                     })}
                     text={formatMessage({
-                        defaultMessage: 'Add a new payment method for faster checkout',
+                        defaultMessage: 'Add a new payment method for faster checkout.',
                         id: 'account_payment_methods.description.add_method_for_faster_checkout'
                     })}
                     buttonText={formatMessage({
