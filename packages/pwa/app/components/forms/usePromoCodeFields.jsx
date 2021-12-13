@@ -20,7 +20,7 @@ export default function usePromoCodeFields({form: {control, errors}, prefix = ''
             defaultValue: '',
             rules: {
                 required: formatMessage({
-                    defaultMessage: 'Please provide a valid promo code',
+                    defaultMessage: 'Please provide a valid promo code.',
                     id: 'use_promo_code_fields.error.required_promo_code'
                 })
             },

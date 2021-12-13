@@ -140,11 +140,13 @@ const Home = ({productSearchResult, isLoading}) => {
                     subtitle={intl.formatMessage(
                         {
                             defaultMessage:
-                                'This section contains content from the catalog. {link} on how to replace it.',
-                            id: 'home.description.shop_products'
+                                'This section contains content from the catalog. {docLink} on how to replace it.',
+                            id: 'home.description.shop_products',
+                            description:
+                                '{docLink} is a html button that links the user to https://sfdc.co/business-manager-manage-catalgos'
                         },
                         {
-                            link: (
+                            docLink: (
                                 <Link
                                     target="_blank"
                                     href={'https://sfdc.co/business-manager-manage-catalgos'}
@@ -231,16 +233,23 @@ const Home = ({productSearchResult, isLoading}) => {
                     defaultMessage: "We're here to help",
                     id: 'home.heading.here_to_help'
                 })}
-                subtitle={intl.formatMessage(
-                    {
-                        defaultMessage:
-                            'Contact our support staff and they’ll get {br} you to the right place.',
-                        id: 'home.description.here_to_help'
-                    },
-                    {
-                        br: <br />
-                    }
-                )}
+                subtitle={
+                    <>
+                        <>
+                            {intl.formatMessage({
+                                defaultMessage: 'Contact our support staff and, they’ll get you',
+                                id: 'home.description.here_to_help'
+                            })}
+                        </>
+                        <br />
+                        <>
+                            {intl.formatMessage({
+                                defaultMessage: 'to the right place.',
+                                id: 'home.description.here_to_help_line_2'
+                            })}
+                        </>
+                    </>
+                }
                 actions={
                     <Button
                         as={Link}

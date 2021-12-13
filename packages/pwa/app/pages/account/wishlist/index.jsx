@@ -117,7 +117,7 @@ const AccountWishlist = () => {
                         id: 'account_wishlist.heading.no_wishlist'
                     })}
                     text={formatMessage({
-                        defaultMessage: 'Continue shopping and add items to your wishlist',
+                        defaultMessage: 'Continue shopping and add items to your wishlist.',
                         id: 'account_wishlist.description.continue_shopping'
                     })}
                     buttonText={formatMessage({

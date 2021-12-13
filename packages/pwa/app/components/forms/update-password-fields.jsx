@@ -23,7 +23,7 @@ const UpdatePasswordFields = ({form, prefix = ''}) => {
                 <Box>
                     <Button variant="link" size="sm" onClick={() => null}>
                         <FormattedMessage
-                            defaultMessage="Forgot password?"
+                            defaultMessage="Forgot Password?"
                             id="update_password_fields.button.forgot_password"
                         />
                     </Button>

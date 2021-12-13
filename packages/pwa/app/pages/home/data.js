@@ -109,7 +109,7 @@ export const features = [
     {
         message: defineMessages({
             title: {
-                defaultMessage: 'Components & Design kit',
+                defaultMessage: 'Components & Design Kit',
                 id: 'home.features.heading.components'
             },
             text: {
