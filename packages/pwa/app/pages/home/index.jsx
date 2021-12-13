@@ -235,19 +235,15 @@ const Home = ({productSearchResult, isLoading}) => {
                 })}
                 subtitle={
                     <>
-                        <>
-                            {intl.formatMessage({
-                                defaultMessage: 'Contact our support staff and, they’ll get you',
-                                id: 'home.description.here_to_help'
-                            })}
-                        </>
+                        {intl.formatMessage({
+                            defaultMessage: 'Contact our support staff and, they’ll get you',
+                            id: 'home.description.here_to_help'
+                        })}
                         <br />
-                        <>
-                            {intl.formatMessage({
-                                defaultMessage: 'to the right place.',
-                                id: 'home.description.here_to_help_line_2'
-                            })}
-                        </>
+                        {intl.formatMessage({
+                            defaultMessage: 'to the right place.',
+                            id: 'home.description.here_to_help_line_2'
+                        })}
                     </>
                 }
                 actions={

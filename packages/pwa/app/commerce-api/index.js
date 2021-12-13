@@ -10,10 +10,29 @@ import * as sdk from 'commerce-sdk-isomorphic'
 import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
 import OcapiShopperBaskets from './ocapi-shopper-baskets'
 import OcapiShopperOrders from './ocapi-shopper-orders'
-import {getTenantId, isError, isTokenValid} from './utils'
+import {getTenantId, isServer, isError, isTokenValid} from './utils'
 import Auth from './auth'
 import EinsteinAPI from './einstein'
-import {createAgent} from './utils'
+import http from 'http'
+import https from 'https'
+
+// Node.js http/https Agents with keepAlive to re-use server-side connections
+const HTTP_AGENT = isServer
+    ? new http.Agent({
+          keepAlive: true,
+          keepAliveMsecs: 60000
+      })
+    : undefined
+const HTTPS_AGENT = isServer
+    ? new https.Agent({
+          keepAlive: true,
+          keepAliveMsecs: 60000
+      })
+    : undefined
+
+function getAgent(url) {
+    return url.protocol === 'http:' ? HTTP_AGENT : HTTPS_AGENT
+}
 
 /**
  * The configuration details for the connecting to the API.
@@ -56,7 +75,13 @@ class CommerceAPI {
         // Client-side requests should be proxied via the configured path.
         const proxy = `${getAppOrigin()}${proxyPath}`
 
-        this._config = {proxy, ...restConfig}
+        this._config = {
+            //proxy,
+            fetchOptions: {
+                agent: getAgent
+            },
+            ...restConfig
+        }
 
         this.auth = new Auth(this)
 
@@ -208,10 +233,7 @@ class CommerceAPI {
         const [fetchOptions, ...restParams] = params
         const newFetchOptions = {
             ...fetchOptions,
-            headers: {...fetchOptions.headers, Authorization: this.auth.authToken},
-            fetchOptions: {
-                agent: await createAgent(url.protocol)
-            }
+            headers: {...fetchOptions.headers, Authorization: this.auth.authToken}
         }
         return [newFetchOptions, ...restParams]
     }

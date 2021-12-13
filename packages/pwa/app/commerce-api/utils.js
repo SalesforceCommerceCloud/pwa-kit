@@ -285,34 +285,3 @@ export const convertSnakeCaseToSentenceCase = (text) => {
  * Usually used as default for event handlers.
  */
 export const noop = () => {}
-
-/**
- * Creates a http/https Node.js Agent
- * @param protocol
- * @returns {Promise<*>}
- */
-export const createAgent = async (protocol) => {
-    let agent
-    if (isServer) {
-        if (protocol === 'http:') {
-            await import('http').then((module) => {
-                const http = module.default
-
-                agent = new http.Agent({
-                    // a custom http agent
-                    keepAlive: true
-                })
-            })
-        } else if (protocol === 'https:') {
-            await import('https').then((module) => {
-                const https = module.default
-
-                agent = new https.Agent({
-                    // a custom https agent
-                    keepAlive: true
-                })
-            })
-        }
-    }
-    return agent
-}
