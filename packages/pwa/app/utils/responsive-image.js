@@ -8,6 +8,19 @@
 import theme from '@chakra-ui/theme'
 
 /**
+ * @param {Object} breakpoints
+ * @return {string[]} Breakpoint labels ordered from smallest. For example: ['base', 'sm', 'md', 'lg', 'xl', '2xl']
+ */
+const getBreakpointLabels = (breakpoints) =>
+    Object.entries(breakpoints)
+        .sort((a, b) => parseFloat(a[1]) - parseFloat(b[1]))
+        .map(([key]) => key)
+
+const {breakpoints: defaultBreakpoints} = theme
+let themeBreakpoints = defaultBreakpoints
+let breakpointLabels = getBreakpointLabels(themeBreakpoints)
+
+/**
  * @param {Object} props
  * @param {string} props.src - Dynamic src having an optional param that can vary with widths. For example: `image[_{width}].jpg` or `image.jpg[?sw={width}&q=60]`
  * @param {(number[]|string[]|Object)} [props.widths] - Image widths relative to the breakpoints, whose units can either be px or vw or unit-less. They will be mapped to the corresponding `sizes` and `srcSet`.
@@ -183,16 +196,3 @@ const getSrcWithoutOptionalParams = (dynamicSrc) => {
     const optionalParams = /\[[^\]]+\]/g
     return dynamicSrc.replace(optionalParams, '')
 }
-
-/**
- * @param {Object} breakpoints
- * @return {string[]} Breakpoint labels ordered from smallest. For example: ['base', 'sm', 'md', 'lg', 'xl', '2xl']
- */
-const getBreakpointLabels = (breakpoints) =>
-    Object.entries(breakpoints)
-        .sort((a, b) => parseFloat(a[1]) - parseFloat(b[1]))
-        .map(([key]) => key)
-
-const {breakpoints: defaultBreakpoints} = theme
-let themeBreakpoints = defaultBreakpoints
-let breakpointLabels = getBreakpointLabels(themeBreakpoints)
