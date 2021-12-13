@@ -146,3 +146,23 @@ test('only src', () => {
         src: disImageURL.withoutOptionalParams
     })
 })
+
+test('passing in theme breakpoints', () => {
+    const props = getResponsiveImageAttributes({
+        src: disImageURL.withOptionalParams,
+        widths: ['100vw', 360],
+        breakpoints: {
+            base: '0px',
+            sm: '320px',
+            md: '768px',
+            lg: '960px',
+            xl: '1200px',
+            '2xl': '1536px'
+        }
+    })
+    expect(props).toStrictEqual({
+        src: disImageURL.withoutOptionalParams,
+        sizes: '(min-width: 320px) 360px, 100vw',
+        srcSet: buildSrcSet([320, 360])
+    })
+})
