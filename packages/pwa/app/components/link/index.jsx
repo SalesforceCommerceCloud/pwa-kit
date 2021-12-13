@@ -16,6 +16,7 @@ const Link = React.forwardRef(({href, to, useNavLink = false, ...props}, ref) =>
     const _href = to || href
     const {locale} = useIntl()
     const site = useSite()
+
     const updatedHref = buildPathWithUrlConfig(_href, {locale, site: site?.alias})
 
     return (

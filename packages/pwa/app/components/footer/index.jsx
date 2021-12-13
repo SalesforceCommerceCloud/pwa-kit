@@ -36,8 +36,8 @@ import {useLocation} from 'react-router-dom'
 
 const Footer = ({...otherProps}) => {
     const styles = useMultiStyleConfig('Footer')
-    const {pathname} = useLocation()
-    const l10nConfig = getL10nConfig(pathname)
+    const {pathname, search} = useLocation()
+    const l10nConfig = getL10nConfig(`${pathname}${search}`)
     const intl = useIntl()
     const [locale, setLocale] = useState(intl.locale)
     const site = useSite()

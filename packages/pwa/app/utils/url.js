@@ -125,7 +125,7 @@ export const getUrlWithLocale = (shortCode, opts = {}) => {
             params.delete(param)
         })
     }
-    const l10nConfig = getL10nConfig(location.pathname)
+    const l10nConfig = getL10nConfig(`${location.pathname}${location.search}`)
     if (relativeUrl === HOME_HREF) {
         relativeUrl = buildPathWithUrlConfig(relativeUrl, {site: site.alias, locale: shortCode})
     } else {

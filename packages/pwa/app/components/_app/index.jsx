@@ -70,7 +70,7 @@ const App = (props) => {
     // Used to conditionally render header/footer for checkout page
     const isCheckout = /\/checkout$/.test(location?.pathname)
 
-    const l10nConfig = getL10nConfig(location?.pathname)
+    const l10nConfig = getL10nConfig(`${location?.pathname}${location.search}`)
 
     // Get the current currency to be used throught the app
     const currency =

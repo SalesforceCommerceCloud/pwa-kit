@@ -23,7 +23,7 @@ import {commerceAPIConfig} from '../../commerce-api.config'
 import {einsteinAPIConfig} from '../../einstein-api.config'
 import {DEFAULT_SITE_ID, urlPartPositions} from '../../constants'
 import {getPreferredCurrency} from '../../utils/locale'
-import {getL10nConfig, getSiteId, getUrlConfig} from '../../utils/utils'
+import {getL10nConfig, getSite, getUrlConfig} from '../../utils/utils'
 import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
 
 const apiConfig = {
@@ -93,8 +93,8 @@ const AppConfig = ({children, locals = {}}) => {
 AppConfig.restore = (locals = {}) => {
     // Parse the locale from the page url.
     const originalUrl = locals.originalUrl
-    apiConfig.parameters.siteId = getSiteId(originalUrl) || DEFAULT_SITE_ID
-
+    const site = getSite(originalUrl)
+    apiConfig.parameters.siteId = site?.id || DEFAULT_SITE_ID
     const l10nConfig = getL10nConfig(originalUrl)
 
     const locale = getLocale(locals) || l10nConfig.defaultLocale

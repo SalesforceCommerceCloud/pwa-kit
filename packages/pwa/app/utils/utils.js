@@ -7,7 +7,6 @@
 
 import pwaKitConfig from '../../pwa-kit-config.json'
 import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
-import {HOME_HREF, urlPartPositions} from '../constants'
 
 /**
  * Call requestIdleCallback in supported browsers.
@@ -176,25 +175,37 @@ export const getSitesConfig = () => pwaKitConfig?.app?.sites
 export const getDefaultSiteId = () => pwaKitConfig?.app?.defaultSiteId
 
 /**
- * A util to get the siteId
- * @param url
- * @returns {string}
+ * Return a the configuration of the given key from pwa-kit-config
+ * By default, returns app configuration
+ * @param keys {array} - array of keys
+ * @returns {object}
  */
-export const getSiteId = (url) => {
+export const getConfig = () => pwaKitConfig
+
+export const getSite = (url) => {
+    const {
+        app: {defaultSiteId, sites: sitesConfig}
+    } = getConfig()
     let path = url
     if (!path) {
         path = `${window?.location.pathname}${window?.location.search}`
     }
-
-    const {hostname, pathname, search} = new URL(`${getAppOrigin()}${path}`)
-    let siteId = getSiteIdByHostname(hostname)
-
-    if (siteId) {
-        return siteId
+    let site
+    site = getSiteByUrl(path)
+    if (site) {
+        return site
     }
 
-    siteId = getSiteIdByAlias(`${pathname}${search}`)
-    return siteId
+    const {hostname} = new URL(`${getAppOrigin()}${path}`)
+    site = getSiteByHostname(hostname)
+
+    if (site) {
+        return site
+    }
+
+    site = sitesConfig.find((site) => site.id === defaultSiteId)
+
+    return site
 }
 
 /**
@@ -202,58 +213,18 @@ export const getSiteId = (url) => {
  * @param {string} hostname
  * @returns {string} siteId
  */
-export const getSiteIdByHostname = (hostname) => {
-    const sitesConfig = getSitesConfig()
+export const getSiteByHostname = (hostname) => {
+    const {
+        app: {sites: sitesConfig}
+    } = getConfig()
     if (!sitesConfig.length) throw new Error('No site config found. Please check you configuration')
     if (!hostname) return undefined
 
     const site = sitesConfig.filter((site) => {
-        return site?.hostname?.some((i) => i.includes(hostname))
+        return site?.hostnames?.some((i) => i.includes(hostname))
     })
 
-    return site?.length === 1 ? site[0].id : undefined
-}
-
-/**
- * get the site id based on the site alias in the given url
- * @param {string} url - input url
- * @returns {string} siteId
- */
-export const getSiteIdByAlias = (url) => {
-    const [pathname, search] = url.split('?')
-
-    const defaultSiteId = getDefaultSiteId()
-    const sitesConfig = getSitesConfig()
-    const urlConfig = getUrlConfig()
-    if (pathname === HOME_HREF) {
-        const siteIdList = sitesConfig.map((site) => site.id)
-        // check if the default value is in the sites array config
-        if (!siteIdList.includes(defaultSiteId)) {
-            throw new Error(
-                'The default SiteId does not match any values from the site configuration. Please check your configuration'
-            )
-        }
-        return defaultSiteId
-    }
-
-    let currentSite
-    const sitePosition = urlConfig['site']
-    switch (sitePosition) {
-        case urlPartPositions.NONE:
-            return undefined
-        case urlPartPositions.PATH:
-            currentSite = pathname.split('/')[1]
-            break
-        case urlPartPositions.QUERY_PARAM: {
-            const params = new URLSearchParams(search)
-            currentSite = params.get('site')
-            break
-        }
-    }
-
-    const siteId = sitesConfig.find((site) => site.alias === currentSite)?.id
-
-    return siteId
+    return site?.length === 1 ? site[0] : undefined
 }
 
 /**
@@ -264,7 +235,81 @@ export const getSiteIdByAlias = (url) => {
 export const getL10nConfig = (url) => {
     const sitesConfig = getSitesConfig()
     if (!sitesConfig.length) throw new Error('No site config found. Please check you configuration')
-    const siteId = getSiteId(url)
+    const siteId = getSite(url)?.id
     const l10nConfig = sitesConfig.find((site) => site.id === siteId)?.l10n
     return l10nConfig
+}
+
+export const getSiteByUrl = (url) => {
+    let path = url
+    if (!path) {
+        path = `${window?.location.pathname}${window?.location.search}`
+    }
+    const {siteIdsRegExp, siteAliasesRegExp} = getSitesRegExp()
+    let site
+    const aliasMatch = path.match(siteAliasesRegExp)
+    const idMatch = path.match(siteIdsRegExp)
+    if (aliasMatch) {
+        // clean up any non-character
+        const siteAlias = aliasMatch[0].replace(/\W/g, '')
+        site = getSiteByAlias(siteAlias)
+    } else if (idMatch) {
+        const siteId = idMatch[0].replace(/\W/g, '')
+        site = getSiteById(siteId)
+    }
+    return site
+}
+
+const getSiteById = (id) => {
+    const {
+        app: {sites}
+    } = getConfig()
+    if (!sites.length) return undefined
+    if (!id) throw new Error('id is required')
+
+    return sites.find((site) => site.id === id)
+}
+
+const getSiteByAlias = (alias) => {
+    const {
+        app: {sites}
+    } = getConfig()
+    if (!sites.length) return undefined
+    if (!alias) throw new Error('alias is required')
+
+    return sites.find((site) => site.alias === alias)
+}
+/**
+ * A util to create RegExp for siteId and siteAlias based on site configuration from pwa-kit-config.json
+ *
+ * @example
+ * sites: [{id: 'RefArchGlobal', alias: 'global'}]
+ *
+ * getSitesRegExp()
+ * // returns {
+ *     siteIdsRegExp: /=RefArchGlobal\b|/RefArch/gi
+ *     siteAliasRegExp: /=global\b|/global/gi
+ * }
+ *
+ * @returns {object}
+ */
+export const getSitesRegExp = () => {
+    const {
+        app: {sites}
+    } = getConfig()
+    let idsRegExpPattern = []
+    let aliasRegExpPattern = []
+
+    sites.forEach((site) => {
+        idsRegExpPattern.push(`(/${site.id}/)`)
+        idsRegExpPattern.push(`(=${site.id}\\b)`)
+        aliasRegExpPattern.push(`(/${site.alias}/)`)
+        aliasRegExpPattern.push(`(=${site.alias}\\b)`)
+    })
+    const siteIdsRegExp = new RegExp(idsRegExpPattern.join('|'), 'g')
+    const siteAliasesRegExp = new RegExp(aliasRegExpPattern.join('|'), 'g')
+    return {
+        siteIdsRegExp,
+        siteAliasesRegExp
+    }
 }
