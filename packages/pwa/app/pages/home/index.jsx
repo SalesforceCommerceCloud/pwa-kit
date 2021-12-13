@@ -238,7 +238,7 @@ const Home = ({productSearchResult, isLoading}) => {
                         <>
                             {intl.formatMessage({
                                 defaultMessage: 'Contact our support staff.',
-                                id: 'home.description.here_to_help'
+                                id: 'home.description.contact_our_staff'
                             })}
                         </>
                         <br />
