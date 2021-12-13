@@ -362,7 +362,7 @@ const CheckoutConfirmation = () => {
                                                             <Text as="span" ml={1}>
                                                                 (
                                                                 <FormattedMessage
-                                                                    defaultMessage="promo applied"
+                                                                    defaultMessage="Promotion applied"
                                                                     id="checkout_confirmation.label.promo_applied"
                                                                 />
                                                                 )

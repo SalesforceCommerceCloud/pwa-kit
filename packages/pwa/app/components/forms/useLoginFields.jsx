@@ -18,7 +18,7 @@ export default function useLoginFields({form: {control, errors}, prefix = ''}) {
             type: 'email',
             rules: {
                 required: formatMessage({
-                    defaultMessage: 'Please enter your email address',
+                    defaultMessage: 'Please enter your email address.',
                     id: 'use_login_fields.error.required_email'
                 })
             },
@@ -35,7 +35,7 @@ export default function useLoginFields({form: {control, errors}, prefix = ''}) {
             type: 'password',
             rules: {
                 required: formatMessage({
-                    defaultMessage: 'Please enter your password',
+                    defaultMessage: 'Please enter your password.',
                     id: 'use_login_fields.error.required_password'
                 })
             },

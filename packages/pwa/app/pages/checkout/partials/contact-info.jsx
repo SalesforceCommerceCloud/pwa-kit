@@ -141,7 +141,7 @@ const ContactInfo = () => {
                                         />
                                     ) : (
                                         <FormattedMessage
-                                            defaultMessage="Log in"
+                                            defaultMessage="Log In"
                                             id="contact_info.button.login"
                                         />
                                     )}
