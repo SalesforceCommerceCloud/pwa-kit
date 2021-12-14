@@ -16,16 +16,18 @@ import EinsteinAPI from './einstein'
 import http from 'http'
 import https from 'https'
 
+const KEEP_ALIVE_MS = 8000
+
 const HTTP_AGENT = isServer
     ? new http.Agent({
           keepAlive: true,
-          keepAliveMsecs: 60000
+          keepAliveMsecs: KEEP_ALIVE_MS
       })
     : undefined
 const HTTPS_AGENT = isServer
     ? new https.Agent({
           keepAlive: true,
-          keepAliveMsecs: 60000
+          keepAliveMsecs: KEEP_ALIVE_MS
       })
     : undefined
 
