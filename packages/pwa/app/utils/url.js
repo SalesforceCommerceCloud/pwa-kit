@@ -160,7 +160,6 @@ export const getUrlWithLocale = (shortCode, opts = {}) => {
  */
 export const homeUrlBuilder = (homeHref, options = {}) => {
     const {locale, site} = options
-    console.log('site', site)
     const l10nConfig = getL10nConfig(homeHref)
     const defaultLocale = l10nConfig.defaultLocale
     const updatedUrl = buildPathWithUrlConfig(homeHref, {

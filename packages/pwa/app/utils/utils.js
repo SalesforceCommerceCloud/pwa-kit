@@ -175,13 +175,20 @@ export const getSitesConfig = () => pwaKitConfig?.app?.sites
 export const getDefaultSiteId = () => pwaKitConfig?.app?.defaultSiteId
 
 /**
- * Return a the configuration of the given key from pwa-kit-config
- * By default, returns app configuration
- * @param keys {array} - array of keys
+ * Return a the configuration from pwa-kit-config
  * @returns {object}
  */
 export const getConfig = () => pwaKitConfig
 
+/**
+ * a util function that looks for site info through some various ways
+ * First priority: from the url
+ * Second priority: from the hostnames
+ * Third, use the default if none of above works
+ * Lastly, throw an error if site can't be found by any of the medthods above
+ * @param url
+ * @returns {string|*}
+ */
 export const getSite = (url) => {
     const {
         app: {defaultSiteId, sites: sitesConfig}
@@ -204,7 +211,9 @@ export const getSite = (url) => {
     }
 
     site = sitesConfig.find((site) => site.id === defaultSiteId)
-
+    if (!site) {
+        throw new Error("Can't find any site. Please check you sites configuration.")
+    }
     return site
 }
 
@@ -217,6 +226,7 @@ export const getSiteByHostname = (hostname) => {
     const {
         app: {sites: sitesConfig}
     } = getConfig()
+
     if (!sitesConfig.length) throw new Error('No site config found. Please check you configuration')
     if (!hostname) return undefined
 
@@ -240,6 +250,11 @@ export const getL10nConfig = (url) => {
     return l10nConfig
 }
 
+/**
+ * get the site by looking for the site value (either site id or alias) from the url
+ * @param url
+ * @returns {object|undefined}
+ */
 export const getSiteByUrl = (url) => {
     let path = url
     if (!path) {
@@ -254,12 +269,18 @@ export const getSiteByUrl = (url) => {
         const siteAlias = aliasMatch[0].replace(/\W/g, '')
         site = getSiteByAlias(siteAlias)
     } else if (idMatch) {
+        // clean up any non-character
         const siteId = idMatch[0].replace(/\W/g, '')
         site = getSiteById(siteId)
     }
     return site
 }
 
+/**
+ * return site by looking through site configuration array by site id
+ * @param id - site Id
+ * @returns {object|undefined}
+ */
 const getSiteById = (id) => {
     const {
         app: {sites}
@@ -270,6 +291,11 @@ const getSiteById = (id) => {
     return sites.find((site) => site.id === id)
 }
 
+/**
+ * return site by looking through site configuration array by the alias
+ * @param alias - site alias
+ * @returns {undefined|object}
+ */
 const getSiteByAlias = (alias) => {
     const {
         app: {sites}
@@ -279,16 +305,17 @@ const getSiteByAlias = (alias) => {
 
     return sites.find((site) => site.alias === alias)
 }
+
 /**
  * A util to create RegExp for siteId and siteAlias based on site configuration from pwa-kit-config.json
  *
  * @example
- * sites: [{id: 'RefArchGlobal', alias: 'global'}]
+ * sites: [{id: 'RefArchGlobal', alias: 'global', l10n: {...}}]
  *
  * getSitesRegExp()
  * // returns {
- *     siteIdsRegExp: /=RefArchGlobal\b|/RefArch/gi
- *     siteAliasRegExp: /=global\b|/global/gi
+ *     siteIdsRegExp: /=RefArchGlobal\b|/RefArchGlobal/?/gi
+ *     siteAliasRegExp: /=global\b|/global/?/gi
  * }
  *
  * @returns {object}
@@ -301,9 +328,9 @@ export const getSitesRegExp = () => {
     let aliasRegExpPattern = []
 
     sites.forEach((site) => {
-        idsRegExpPattern.push(`(/${site.id}/)`)
+        idsRegExpPattern.push(`(/${site.id}/?)`)
         idsRegExpPattern.push(`(=${site.id}\\b)`)
-        aliasRegExpPattern.push(`(/${site.alias}/)`)
+        aliasRegExpPattern.push(`(/${site.alias}/?)`)
         aliasRegExpPattern.push(`(=${site.alias}\\b)`)
     })
     const siteIdsRegExp = new RegExp(idsRegExpPattern.join('|'), 'g')
