@@ -6,7 +6,11 @@
   "license": "See license in LICENSE",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/mobify/mobify-platform-sdks.git"
+    "url": "git+https://github.com/SalesforceCommerceCloud/pwa-kit.git"
+  },
+  "homepage": "https://github.com/SalesforceCommerceCloud/pwa-kit/tree/develop/packages/pwa-kit-create-app#readme",
+  "bugs": {
+    "url": "https://github.com/SalesforceCommerceCloud/pwa-kit/issues"
   },
   "bin": "scripts/create-mobify-app.js",
   "files": [
