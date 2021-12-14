@@ -7,7 +7,7 @@
 
 import {defineMessage} from 'react-intl'
 import packageInfo from '../package.json'
-import pwaKitConfig from '../pwa-kit-config.json'
+import pwaKitConfig from '../pwa-kit.config.json'
 // Constants used in the used for product searching.
 export const DEFAULT_SEARCH_PARAMS = {limit: 25, offset: 0, sort: 'best-matches', refine: []}
 export const DEFAULT_LIMIT_VALUES = [25, 50, 100] // Page sizes

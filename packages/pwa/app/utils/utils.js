@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import pwaKitConfig from '../../pwa-kit-config.json'
+import pwaKitConfig from '../../pwa-kit.config.json'
 import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
 
 /**
@@ -159,7 +159,7 @@ export const capitalize = (text) => {
 }
 
 /**
- * Return a the configuration from pwa-kit-config
+ * Return a the configuration from pwa-kit.config.json
  * @returns {object}
  */
 export const getConfig = () => pwaKitConfig
@@ -298,7 +298,7 @@ const getSiteByAlias = (alias) => {
 }
 
 /**
- * A util to create RegExp for siteId and siteAlias based on site configuration from pwa-kit-config.json
+ * A util to create RegExp for siteId and siteAlias based on site configuration from pwa-kit.config.json
  *
  * @example
  * sites: [{id: 'RefArchGlobal', alias: 'global', l10n: {...}}]

@@ -23,7 +23,7 @@ import {commerceAPIConfig} from '../../commerce-api.config'
 import {einsteinAPIConfig} from '../../einstein-api.config'
 import {urlPartPositions} from '../../constants'
 import {getPreferredCurrency} from '../../utils/locale'
-import {getL10nConfig, getSite, getUrlConfig} from '../../utils/utils'
+import {getL10nConfig, getSite, getConfig} from '../../utils/utils'
 import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
 
 const apiConfig = {
@@ -39,8 +39,11 @@ const apiConfig = {
  */
 const getLocale = (locals = {}) => {
     let {originalUrl} = locals
-    const {locale: localePosition, site: sitePosition} = getUrlConfig()
-
+    const {
+        app: {
+            url: {locale: localePosition, site: sitePosition}
+        }
+    } = getConfig()
     // If there is no originalUrl value in the locals, create it from the window location.
     // This happens when executing on the client.
     if (!originalUrl) {

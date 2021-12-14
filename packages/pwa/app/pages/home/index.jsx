@@ -39,7 +39,7 @@ import {
     HOME_SHOP_PRODUCTS_LIMIT,
     urlPartPositions
 } from '../../constants'
-import {getUrlConfig} from '../../utils/utils'
+import {getConfig} from '../../utils/utils'
 
 /**
  * This is the home page for Retail React App.
@@ -49,8 +49,9 @@ import {getUrlConfig} from '../../utils/utils'
  */
 const Home = ({productSearchResult, isLoading}) => {
     const intl = useIntl()
-    const urlConfig = getUrlConfig()
-
+    const {
+        app: {url: urlConfig}
+    } = getConfig()
     return (
         <Box data-testid="home-page" layerStyle="page">
             <Seo

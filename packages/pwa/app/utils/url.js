@@ -6,7 +6,7 @@
  */
 
 import {DEFAULT_SITE_ID, HOME_HREF} from '../constants'
-import {getL10nConfig, getUrlConfig} from './utils'
+import {getL10nConfig, getConfig} from './utils'
 import {urlPartPositions} from '../constants'
 
 /**
@@ -111,7 +111,11 @@ export const searchUrlBuilder = (searchTerm) => `/search?q=${searchTerm}`
  * @returns {string} - The relative URL for the specific locale.
  */
 export const getUrlWithLocale = (shortCode, opts = {}) => {
-    const {locale: localePosition, site: sitePosition} = getUrlConfig()
+    const {
+        app: {
+            url: {locale: localePosition, site: sitePosition}
+        }
+    } = getConfig()
     const location = opts.location ? opts.location : window.location
 
     const {disallowParams = [], site} = opts
@@ -211,7 +215,7 @@ export const removeQueryParamsFromPath = (path, keys) => {
  * @return {string} - an output url
  *
  * @example
- * //pwa-kit-config.json
+ * //pwa-kit.config.json
  * url {
  *    locale: "query_param"
  * }
@@ -221,7 +225,7 @@ export const removeQueryParamsFromPath = (path, keys) => {
  *  /women/dresses?locale=en-GB
  *
  *  @example
- * //pwa-kit-config.json
+ * //pwa-kit.config.json
  * url {
  *    locale: "path"
  * }
@@ -232,7 +236,9 @@ export const removeQueryParamsFromPath = (path, keys) => {
  *
  */
 export const buildPathWithUrlConfig = (url, configValues = {}) => {
-    const urlConfig = getUrlConfig()
+    const {
+        app: {url: urlConfig}
+    } = getConfig()
     if (!urlConfig || !Object.values(urlConfig).length) return url
     if (!Object.values(configValues).length) return url
     const queryParams = {}
