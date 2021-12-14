@@ -159,22 +159,6 @@ export const capitalize = (text) => {
 }
 
 /**
- * A util to return current url configuration
- * @returns {object} - url object from the pwa-kit-config.json file
- */
-export const getUrlConfig = () => pwaKitConfig?.app?.url
-/**
- * A util to return current multi site configuration
- * @returns {object} - a list of site objects from the pwa-kit-config.json file
- */
-export const getSitesConfig = () => pwaKitConfig?.app?.sites
-/**
- * A util to return current defaultSiteId
- * @returns {string} - default site Id string from pwa-kit-config file
- */
-export const getDefaultSiteId = () => pwaKitConfig?.app?.defaultSiteId
-
-/**
  * Return a the configuration from pwa-kit-config
  * @returns {object}
  */
@@ -186,8 +170,8 @@ export const getConfig = () => pwaKitConfig
  * Second priority: from the hostnames
  * Third, use the default if none of above works
  * Lastly, throw an error if site can't be found by any of the medthods above
- * @param url
- * @returns {string|*}
+ * @param {string} url
+ * @returns {object}
  */
 export const getSite = (url) => {
     const {
@@ -198,11 +182,13 @@ export const getSite = (url) => {
         path = `${window?.location.pathname}${window?.location.search}`
     }
     let site
+    // determine the site from the given path
     site = getSiteByUrl(path)
     if (site) {
         return site
     }
 
+    // determine the site by hostname if using path does not work out
     const {hostname} = new URL(`${getAppOrigin()}${path}`)
     site = getSiteByHostname(hostname)
 
@@ -210,7 +196,10 @@ export const getSite = (url) => {
         return site
     }
 
+    // using the default value when site info can't be determined either by given path or hostname
     site = sitesConfig.find((site) => site.id === defaultSiteId)
+
+    // throw an error if none if none of these methods above works
     if (!site) {
         throw new Error("Can't find any site. Please check you sites configuration.")
     }
@@ -243,7 +232,9 @@ export const getSiteByHostname = (hostname) => {
  * @returns {object}
  */
 export const getL10nConfig = (url) => {
-    const sitesConfig = getSitesConfig()
+    const {
+        app: {sites: sitesConfig}
+    } = getConfig()
     if (!sitesConfig.length) throw new Error('No site config found. Please check you configuration')
     const siteId = getSite(url)?.id
     const l10nConfig = sitesConfig.find((site) => site.id === siteId)?.l10n
@@ -314,8 +305,8 @@ const getSiteByAlias = (alias) => {
  *
  * getSitesRegExp()
  * // returns {
- *     siteIdsRegExp: /=RefArchGlobal\b|/RefArchGlobal/?/gi
- *     siteAliasRegExp: /=global\b|/global/?/gi
+ *     siteIdsRegExp: /(=RefArchGlobal\b)|/(RefArchGlobal)/?/gi
+ *     siteAliasRegExp: /(=global\b)|(/global/)?/gi
  * }
  *
  * @returns {object}

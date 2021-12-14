@@ -11,7 +11,6 @@ import {useLocation} from 'react-router-dom'
 const useSite = () => {
     const {pathname, search} = useLocation()
     const url = `${pathname}${search}`
-    console.log('useSite', url)
     const site = getSite(url)
     return site
 }
