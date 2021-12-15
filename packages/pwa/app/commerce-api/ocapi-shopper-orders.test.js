@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {commerceAPIConfig} from '../commerce-api.config'
+import {commerceAPIConfig} from '../api.config'
 import OcapiShopperOrders from './ocapi-shopper-orders'
 import {ocapiOrderResponse} from './mock-data'
 
