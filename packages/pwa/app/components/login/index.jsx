@@ -58,7 +58,7 @@ const LoginForm = ({submitForm, clickForgotPassword = noop, clickCreateAccount =
                             isLoading={form.formState.isSubmitting}
                         >
                             <FormattedMessage
-                                defaultMessage="Sign in"
+                                defaultMessage="Sign In"
                                 id="login_form.button.sign_in"
                             />
                         </Button>
