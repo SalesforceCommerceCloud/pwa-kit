@@ -159,8 +159,8 @@ export const capitalize = (text) => {
 }
 
 /**
- * Return a the configuration from pwa-kit.config.json
- * @returns {object}
+ * Get the pwa configuration object from pwa-kit.config.json
+ * @returns {object} - the configuration object
  */
 export const getConfig = () => pwaKitConfig
 
