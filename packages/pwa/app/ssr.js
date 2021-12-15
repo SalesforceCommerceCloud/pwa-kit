@@ -41,13 +41,15 @@ const app = createApp({
     enableLegacyRemoteProxying: false
 })
 app.use(helmet())
-app.use(helmet.contentSecurityPolicy({
-    useDefaults: true,
-    directives: {
-        'img-src': ["'self'", '*.commercecloud.salesforce.com', 'data:'],
-        "script-src": ["'unsafe-inline'", "'self'"]
-    },
-}))
+app.use(
+    helmet.contentSecurityPolicy({
+        useDefaults: true,
+        directives: {
+            'img-src': ["'self'", '*.commercecloud.salesforce.com', 'data:'],
+            'script-src': ["'unsafe-inline'", "'self'"]
+        }
+    })
+)
 
 // Handle the redirect from SLAS as to avoid error
 app.get('/callback?*', (req, res) => {
