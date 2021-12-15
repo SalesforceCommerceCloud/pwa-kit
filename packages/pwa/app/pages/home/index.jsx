@@ -236,13 +236,13 @@ const Home = ({productSearchResult, isLoading}) => {
                 subtitle={
                     <>
                         {intl.formatMessage({
-                            defaultMessage: 'Contact our support staff and, they’ll get you',
-                            id: 'home.description.here_to_help'
+                            defaultMessage: 'Contact our support staff.',
+                            id: 'home.description.contact_our_staff'
                         })}
                         <br />
                         {intl.formatMessage({
-                            defaultMessage: 'to the right place.',
-                            id: 'home.description.here_to_help_line_2'
+                            defaultMessage: 'They will get you to the right place.',
+                            id: 'home.description.get_you_to_the_right_place'
                         })}
                     </>
                 }

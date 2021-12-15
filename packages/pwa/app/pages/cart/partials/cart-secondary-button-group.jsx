@@ -109,7 +109,7 @@ const CartSecondaryButtonGroup = ({
                     <Box marginLeft={1}>
                         <Button marginLeft={1} variant="link" size="sm">
                             <FormattedMessage
-                                defaultMessage="Learn more"
+                                defaultMessage="Learn More"
                                 id="cart_secondary_button_group.link_learn_more"
                             />
                         </Button>

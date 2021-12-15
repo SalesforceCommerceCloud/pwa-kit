@@ -150,27 +150,22 @@ const runGenerator = (answers, {outputDir}) => {
         ]
     })
 
-    const commerceAPIConfigTemplate = require(`../assets/pwa/commerce-api.config`).template
-    const commerceData = {
+    const APIConfigTemplate = require(`../assets/pwa/api.config`).template
+    const commerceApi = {
         proxyPath: answers['scaffold-pwa'].mobify.ssrParameters.proxyConfigs[0].path,
         clientId: answers['commerce-api'].clientId,
         organizationId: answers['commerce-api'].organizationId,
         shortCode: answers['commerce-api'].shortCode,
         siteId: answers['commerce-api'].siteId
     }
-
-    new sh.ShellString(commerceAPIConfigTemplate(commerceData)).to(
-        p.resolve(outputDir, 'app', 'commerce-api.config.js')
-    )
-
-    const einsteinAPIConfigTemplate = require(`../assets/pwa/einstein-api.config`).template
-    const einsteinData = {
+    const einsteinApi = {
         proxyPath: answers['scaffold-pwa'].mobify.ssrParameters.proxyConfigs[2].path,
         einsteinId: answers['einstein-api'].einsteinId,
         siteId: answers['commerce-api'].siteId
     }
-    new sh.ShellString(einsteinAPIConfigTemplate(einsteinData)).to(
-        p.resolve(outputDir, 'app', 'einstein-api.config.js')
+
+    new sh.ShellString(APIConfigTemplate({commerceApi, einsteinApi})).to(
+        p.resolve(outputDir, 'app', 'api.config.js')
     )
 
     console.log('Installing dependencies for the generated project (this can take a while)')
