@@ -149,7 +149,7 @@ const AccountOrderHistory = () => {
                                             >
                                                 <Img
                                                     alt={image?.alt}
-                                                    src={image?.disBaseLink}
+                                                    src={image?.disBaseLink || image?.link}
                                                     fallback={
                                                         <Box background="gray.100" boxSize="full" />
                                                     }
