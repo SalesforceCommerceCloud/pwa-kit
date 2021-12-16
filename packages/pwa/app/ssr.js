@@ -48,11 +48,7 @@ app.use(
         useDefaults: true,
         directives: {
             'img-src': ["'self'", '*.commercecloud.salesforce.com', 'data:'],
-            'script-src': [
-                "'self'",
-                "'sha256-q5pc1rl7kKnxe4CS+vO5fkR9OfTNM07CnIHd1amTyE0='",
-                "'unsafe-eval'"
-            ]
+            'script-src': ["'self'", "'unsafe-eval'"]
         }
     })
 )

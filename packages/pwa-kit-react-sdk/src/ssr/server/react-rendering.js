@@ -49,13 +49,7 @@ const VALID_TAG_NAMES = [
     'title'
 ]
 
-const TTI_POLYFILL_SCRIPT = [
-    `!function(){if('PerformanceLongTaskTiming' in window){var g=window.__tti={e:[]};`,
-    `g.o=new PerformanceObserver(function(l){g.e=g.e.concat(l.getEntries())});`,
-    `g.o.observe({entryTypes:['longtask']})}}();`
-].join('')
-
-export const ALLOWLISTED_INLINE_SCRIPTS = [TTI_POLYFILL_SCRIPT]
+export const ALLOWLISTED_INLINE_SCRIPTS = []
 
 /**
  * Convert from thrown Error or String to {message, status} that we need for
@@ -298,17 +292,7 @@ const renderApp = (args) => {
 
     const html = ReactDOMServer.renderToString(
         <Document
-            head={[
-                <script
-                    id="performance-metrics"
-                    key="performance-metrics"
-                    dangerouslySetInnerHTML={{
-                        __html: TTI_POLYFILL_SCRIPT
-                    }}
-                    {...scriptProps}
-                />,
-                ...helmetHeadTags
-            ]}
+            head={[...helmetHeadTags]}
             html={appHtml}
             afterBodyStart={svgs}
             beforeBodyEnd={scripts}
