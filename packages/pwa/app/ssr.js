@@ -40,13 +40,15 @@ const app = createApp({
 
     enableLegacyRemoteProxying: false
 })
+
+// Set security headers
 app.use(helmet())
 app.use(
     helmet.contentSecurityPolicy({
         useDefaults: true,
         directives: {
             'img-src': ["'self'", '*.commercecloud.salesforce.com', 'data:'],
-            'script-src': ["'unsafe-inline'", "'self'"]
+            'script-src': ["'self'", "'unsafe-inline'", "'unsafe-eval'"]
         }
     })
 )
