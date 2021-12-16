@@ -5,12 +5,12 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {resolveSiteFromUrl} from '../utils/utils'
+import {convertToFullyQualifiedUrl, resolveSiteFromUrl} from '../utils/utils'
 import {useLocation} from 'react-router-dom'
 
 const useSite = () => {
     const {pathname, search} = useLocation()
-    const url = `${pathname}${search}`
+    const url = convertToFullyQualifiedUrl(`${pathname}${search}`)
     const site = resolveSiteFromUrl(url)
     return site
 }

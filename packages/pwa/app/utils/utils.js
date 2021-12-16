@@ -144,7 +144,21 @@ export const clearSessionJSONItem = (key) => {
 export const boldString = (str, substr) => {
     return str.replace(RegExp(substr, 'g'), `<b>${substr}</b>`)
 }
-
+/**
+ * A function that takes a partial url into a fully url.
+ * It takes into account whether it is on client/server side
+ *
+ * @example
+ * convertToFullyQualifiedUrl(/women/dresses?color=black)
+ *
+ * // returns //http(s)://www.site.com/women/dresses?color=black
+ * @param path
+ * @returns {string|*}
+ */
+export const convertToFullyQualifiedUrl = (path) => {
+    const url = typeof window === 'undefined' ? `${getAppOrigin()}${path}` : window.location.href
+    return url
+}
 /**
  * Capitalizes the words in a string
  * @param {string} text
@@ -165,27 +179,28 @@ export const capitalize = (text) => {
 export const getConfig = () => pwaKitConfig
 
 /**
- * Determine the site from the url
+ * This functions takes an url and returns a site object,
+ * an error will be thrown if not url is passed in or no site is found
  * @param {string} url
  * @returns {object}
  */
 export const resolveSiteFromUrl = (url) => {
+    if (!url) {
+        throw new Error('url is required to find a site object.')
+    }
+    const {hostname} = new URL(url)
+
     const {
         app: {defaultSiteId, sites: sitesConfig}
     } = getConfig()
-    let path = url
-    if (!path) {
-        path = `${window?.location.pathname}${window?.location.search}`
-    }
     let site
     // Step 1: look for the site from the url, if found, return the site
-    site = getSiteByUrl(path)
+    site = getSiteByUrl(url)
     if (site) {
         return site
     }
 
     // Step 2: look for the site from the hostname, if found, return it
-    const {hostname} = new URL(`${getAppOrigin()}${path}`)
     site = getSiteByHostname(hostname)
 
     if (site) {
@@ -232,7 +247,8 @@ export const getL10nConfig = (url) => {
         app: {sites: sitesConfig}
     } = getConfig()
     if (!sitesConfig.length) throw new Error('No site config found. Please check you configuration')
-    const siteId = resolveSiteFromUrl(url)?.id
+
+    const siteId = resolveSiteFromUrl(convertToFullyQualifiedUrl(url))?.id
     const l10nConfig = sitesConfig.find((site) => site.id === siteId)?.l10n
     return l10nConfig
 }
