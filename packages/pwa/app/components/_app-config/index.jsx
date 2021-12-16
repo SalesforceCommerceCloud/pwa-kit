@@ -19,11 +19,10 @@ import {
     CustomerProductListsProvider,
     CustomerProvider
 } from '../../commerce-api/contexts'
-import {commerceAPIConfig} from '../../commerce-api.config'
-import {einsteinAPIConfig} from '../../einstein-api.config'
+import {commerceAPIConfig, einsteinAPIConfig} from '../../api.config'
 import {urlPartPositions} from '../../constants'
 import {getPreferredCurrency} from '../../utils/locale'
-import {getL10nConfig, getSite, getConfig} from '../../utils/utils'
+import {getL10nConfig, resolveSiteFromUrl, getConfig} from '../../utils/utils'
 import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
 
 const apiConfig = {
@@ -96,7 +95,7 @@ const AppConfig = ({children, locals = {}}) => {
 AppConfig.restore = (locals = {}) => {
     // Parse the locale from the page url.
     const originalUrl = locals.originalUrl
-    const site = getSite(originalUrl)
+    const site = resolveSiteFromUrl(originalUrl)
 
     apiConfig.parameters.siteId = site?.id
     const l10nConfig = getL10nConfig(originalUrl)

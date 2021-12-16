@@ -5,13 +5,13 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {getSite} from '../utils/utils'
+import {resolveSiteFromUrl} from '../utils/utils'
 import {useLocation} from 'react-router-dom'
 
 const useSite = () => {
     const {pathname, search} = useLocation()
     const url = `${pathname}${search}`
-    const site = getSite(url)
+    const site = resolveSiteFromUrl(url)
     return site
 }
 export default useSite
