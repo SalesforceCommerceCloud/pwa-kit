@@ -22,12 +22,8 @@ import {
 import {commerceAPIConfig, einsteinAPIConfig} from '../../api.config'
 import {urlPartPositions} from '../../constants'
 import {getPreferredCurrency} from '../../utils/locale'
-import {
-    getL10nConfig,
-    resolveSiteFromUrl,
-    getConfig,
-    convertToFullyQualifiedUrl
-} from '../../utils/utils'
+import {getL10nConfig, getConfig, convertToFullyQualifiedUrl} from '../../utils/utils'
+import {resolveSiteFromUrl} from '../../utils/site-utils'
 
 const apiConfig = {
     ...commerceAPIConfig,
