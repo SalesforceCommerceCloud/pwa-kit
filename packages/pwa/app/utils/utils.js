@@ -6,10 +6,11 @@
  */
 
 import pwaKitConfig from '../../pwa-kit.config.json'
-import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
 import {resolveSiteFromUrl} from './site-utils'
 import {JSONPath} from 'jsonpath-plus'
 import {urlPartPositions} from '../constants'
+import {pathToUrl} from './url'
+
 /**
  * Call requestIdleCallback in supported browsers.
  *
@@ -146,21 +147,7 @@ export const clearSessionJSONItem = (key) => {
 export const boldString = (str, substr) => {
     return str.replace(RegExp(substr, 'g'), `<b>${substr}</b>`)
 }
-/**
- * A function that takes a partial url into a fully url.
- * It takes into account whether it is on client/server side
- *
- * @example
- * pathToUrl(/women/dresses?color=black)
- *
- * // returns //http(s)://www.site.com/women/dresses?color=black
- * @param path
- * @returns {string|*}
- */
-export const pathToUrl = (path) => {
-    const url = typeof window === 'undefined' ? `${getAppOrigin()}${path}` : window.location.href
-    return url
-}
+
 /**
  * Capitalizes the words in a string
  * @param {string} text
