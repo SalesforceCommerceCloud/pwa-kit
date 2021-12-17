@@ -8,7 +8,7 @@
 import pwaKitConfig from '../../pwa-kit.config.json'
 import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
 import {resolveSiteFromUrl} from './site-utils'
-
+import {JSONPath} from 'jsonpath-plus'
 /**
  * Call requestIdleCallback in supported browsers.
  *
@@ -175,9 +175,16 @@ export const capitalize = (text) => {
 
 /**
  * Get the pwa configuration object from pwa-kit.config.json
+ * @param path - path to your object inside pwaKitConfig separated by a dot
+ *
+ * @example getConfig('app.url') => {locale: 'path', site: 'path'}
  * @returns {object} - the configuration object
  */
-export const getConfig = () => pwaKitConfig
+export const getConfig = (path) => {
+    if (!path) return pwaKitConfig
+    const result = JSONPath(`$.${path}`, pwaKitConfig)
+    return result
+}
 
 /**
  * return l10n config for current site
@@ -185,12 +192,10 @@ export const getConfig = () => pwaKitConfig
  * @returns {object}
  */
 export const getL10nConfig = (url) => {
-    const {
-        app: {sites: sitesConfig}
-    } = getConfig()
-    if (!sitesConfig.length) throw new Error('No site config found. Please check you configuration')
+    const sites = getConfig('app.sites.*')
+    if (!sites.length) throw new Error('No site config found. Please check you configuration')
 
     const siteId = resolveSiteFromUrl(convertToFullyQualifiedUrl(url))?.id
-    const l10nConfig = sitesConfig.find((site) => site.id === siteId)?.l10n
+    const l10nConfig = sites.find((site) => site.id === siteId)?.l10n
     return l10nConfig
 }

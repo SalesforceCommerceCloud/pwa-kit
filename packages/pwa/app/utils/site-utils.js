@@ -6,7 +6,7 @@
  */
 
 import {getConfig} from './utils'
-
+import {JSONPath} from 'jsonpath-plus'
 /**
  * This functions takes an url and returns a site object,
  * an error will be thrown if not url is passed in or no site is found
@@ -52,16 +52,12 @@ export const resolveSiteFromUrl = (url) => {
  * @returns {string} siteId
  */
 export const getSiteByHostname = (hostname) => {
-    const {
-        app: {sites: sitesConfig}
-    } = getConfig()
+    const sites = getConfig('app.sites.*')
 
-    if (!sitesConfig.length) throw new Error('No site config found. Please check you configuration')
+    if (!sites.length) throw new Error('No site config found. Please check you configuration')
     if (!hostname) return undefined
 
-    const site = sitesConfig.filter((site) => {
-        return site?.hostnames?.some((i) => i.includes(hostname))
-    })
+    const site = JSONPath(`$[?(@.hostnames && @.hostnames.includes('${hostname}'))]`, sites)
 
     return site?.length === 1 ? site[0] : undefined
 }
@@ -95,9 +91,8 @@ export const getSiteByUrl = (url) => {
  * @returns {object|undefined}
  */
 const getSiteById = (id) => {
-    const {
-        app: {sites}
-    } = getConfig()
+    const sites = getConfig('app.sites.*')
+
     if (!sites.length) return undefined
     if (!id) throw new Error('id is required')
 
@@ -110,9 +105,8 @@ const getSiteById = (id) => {
  * @returns {undefined|object}
  */
 const getSiteByAlias = (alias) => {
-    const {
-        app: {sites}
-    } = getConfig()
+    const sites = getConfig('app.sites.*')
+
     if (!sites.length) return undefined
     if (!alias) throw new Error('alias is required')
 
