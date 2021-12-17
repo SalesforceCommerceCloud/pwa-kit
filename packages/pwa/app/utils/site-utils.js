@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {getConfig} from './utils'
+import {getConfig, getParamsFromUrl} from './utils'
 import {JSONPath} from 'jsonpath-plus'
 /**
  * This functions takes an url and returns a site object,
@@ -54,7 +54,7 @@ export const getSiteByHostname = (hostname) => {
     const sites = getSites()
 
     if (!sites.length) throw new Error('No site config found. Please check you configuration')
-    if (!hostname) return undefined
+    if (!hostname) return
 
     const site = JSONPath(`$[?(@.hostnames && @.hostnames.includes('${hostname}'))]`, sites)
 
@@ -67,88 +67,13 @@ export const getSiteByHostname = (hostname) => {
  * @returns {object|undefined}
  */
 export const getSiteByUrl = (url) => {
-    const {siteIdsRegExp, siteAliasesRegExp} = getSitesRegExp()
-
-    // const {site: currentSite, locale} = getUrlParamsFromUrl(url)
-    // console.log('currentSite', test)
-    // console.log('currentLocale', test)
-
-    let site
-    const aliasMatch = url.match(siteAliasesRegExp)
-    const idMatch = url.match(siteIdsRegExp)
-    if (aliasMatch) {
-        // clean up any non-character
-        const siteAlias = aliasMatch[0].replace(/\W/g, '')
-        site = getSiteByAlias(siteAlias)
-    } else if (idMatch) {
-        // clean up any non-character
-        const siteId = idMatch[0].replace(/\W/g, '')
-        site = getSiteById(siteId)
-    }
-    return site
-}
-
-/**
- * return site by looking through site configuration array by site id
- * @param id - site Id
- * @returns {object|undefined}
- */
-const getSiteById = (id) => {
+    const {site: currentSite} = getParamsFromUrl(url)
+    if (!currentSite) return
     const sites = getSites()
+    if (!sites.length) throw new Error('No site config found. Please check you configuration')
 
-    if (!sites.length) return undefined
-    if (!id) throw new Error('id is required')
-
-    return sites.find((site) => site.id === id)
-}
-
-/**
- * return site by looking through site configuration array by the alias
- * @param alias - site alias
- * @returns {undefined|object}
- */
-const getSiteByAlias = (alias) => {
-    const sites = getConfig('app.sites.*')
-
-    if (!sites.length) return undefined
-    if (!alias) throw new Error('alias is required')
-
-    return sites.find((site) => site.alias === alias)
-}
-
-/**
- * A util to create RegExp for siteId and siteAlias based on site configuration from pwa-kit.config.json
- *
- * @example
- * sites: [{id: 'RefArchGlobal', alias: 'global', l10n: {...}}]
- *
- * getSitesRegExp()
- * // returns {
- *     siteIdsRegExp: /(=RefArchGlobal\b)|/(RefArchGlobal)/?/gi
- *     siteAliasRegExp: /(=global\b)|(/global/)?/gi
- * }
- *
- * @returns {object}
- */
-export const getSitesRegExp = () => {
-    const {
-        app: {sites}
-    } = getConfig()
-    let idsRegExpPattern = []
-    let aliasRegExpPattern = []
-
-    sites.forEach((site) => {
-        idsRegExpPattern.push(`(/${site.id}/?)`)
-        idsRegExpPattern.push(`(=${site.id}\\b)`)
-        aliasRegExpPattern.push(`(/${site.alias}/?)`)
-        aliasRegExpPattern.push(`(=${site.alias}\\b)`)
-    })
-    const siteIdsRegExp = new RegExp(idsRegExpPattern.join('|'), 'g')
-    const siteAliasesRegExp = new RegExp(aliasRegExpPattern.join('|'), 'g')
-    return {
-        siteIdsRegExp,
-        siteAliasesRegExp
-    }
+    const site = sites.find((site) => site.id === currentSite || site.alias === currentSite)
+    return site
 }
 
 export const getSites = () => getConfig('app.sites.*')

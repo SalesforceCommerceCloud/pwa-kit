@@ -3,13 +3,13 @@
         "defaultSiteId": "RefArchGlobal",
         "url": {
             "locale": "path",
-            "site": "none"
+            "site": "path"
         },
         "sites": [
             {
                 "id": "RefArch",
                 "alias": "us",
-                "hostnames": ["localhost"],
+                "hostnames": [],
                 "l10n": {
                     "supportedCurrencies": ["USD"],
                     "defaultCurrency": "USD",

@@ -190,20 +190,26 @@ export const getConfig = (path, opts) => {
 }
 
 /**
- * return l10n config for current site
- * @param url
+ * This function takes the url to determine the site, and then return its l10n configuration
+ * @param path
  * @returns {object}
  */
-export const getL10nConfig = (url) => {
+export const getL10nConfig = (path) => {
     const sites = getConfig('app.sites.*')
     if (!sites.length) throw new Error('No site config found. Please check you configuration')
 
-    const siteId = resolveSiteFromUrl(pathToUrl(url))?.id
+    const siteId = resolveSiteFromUrl(pathToUrl(path))?.id
     const l10nConfig = sites.find((site) => site.id === siteId)?.l10n
     return l10nConfig
 }
 
-export const getUrlParamsFromUrl = (url) => {
+/**
+ * This functions return the param (e.g site and locale) from the given url
+ * The site will show up before locale if both of them are presented in the pathname
+ * @param url
+ * @returns {object}
+ */
+export const getParamsFromUrl = (url) => {
     const {locale: localePosition, site: sitePosition} = getConfig('app.url')
 
     const {pathname, search} = new URL(url)
@@ -238,6 +244,5 @@ export const getUrlParamsFromUrl = (url) => {
         }
     }
 
-    console.log('result', result)
     return result
 }

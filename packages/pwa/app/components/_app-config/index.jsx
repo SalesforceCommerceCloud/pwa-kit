@@ -20,9 +20,8 @@ import {
     CustomerProvider
 } from '../../commerce-api/contexts'
 import {commerceAPIConfig, einsteinAPIConfig} from '../../api.config'
-import {urlPartPositions} from '../../constants'
-import {getPreferredCurrency} from '../../utils/locale'
-import {getL10nConfig, getConfig, pathToUrl} from '../../utils/utils'
+import {getPreferredCurrency, getSupportedLocalesIds} from '../../utils/locale'
+import {getL10nConfig, pathToUrl, getParamsFromUrl} from '../../utils/utils'
 import {resolveSiteFromUrl} from '../../utils/site-utils'
 
 const apiConfig = {
@@ -38,28 +37,15 @@ const apiConfig = {
  */
 const getLocale = (locals = {}) => {
     let {originalUrl} = locals
-    const {locale: localePosition, site: sitePosition} = getConfig('app.url')
-    // If there is no originalUrl value in the locals, create it from the window location.
-    // This happens when executing on the client.
-
     const url = pathToUrl(originalUrl)
-
     let shortCode
-    const {pathname, searchParams} = new URL(url)
-    if (localePosition === urlPartPositions.PATH) {
-        // Parse the pathname from the partial using the URL object and a placeholder host
-        // locale can be in a different position depending on the site position
-        if (sitePosition === urlPartPositions.PATH) {
-            shortCode = pathname.split('/')[2]
-        } else {
-            shortCode = pathname.split('/')[1]
-        }
-    } else if (localePosition === urlPartPositions.QUERY_PARAM) {
-        shortCode = searchParams.get('locale')
-    }
+    const {locale} = getParamsFromUrl(url)
+    const l10Config = getL10nConfig(originalUrl)
 
     // Ensure that the locale is in the supported list, otherwise return the default.
-    // shortCode = getSupportedLocalesIds().includes(shortCode) ? shortCode : undefined
+    shortCode = getSupportedLocalesIds(l10Config.supportedLocales).includes(locale)
+        ? locale
+        : l10Config.defaultLocale
     return shortCode
 }
 
