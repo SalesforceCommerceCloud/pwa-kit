@@ -250,9 +250,7 @@ export const removeQueryParamsFromPath = (path, keys) => {
  *
  */
 export const buildPathWithUrlConfig = (url, configValues = {}) => {
-    const {
-        app: {url: urlConfig}
-    } = getConfig()
+    const urlConfig = getConfig('app.url')
     if (!urlConfig || !Object.values(urlConfig).length) return url
     if (!Object.values(configValues).length) return url
     const queryParams = {}

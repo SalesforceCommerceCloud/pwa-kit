@@ -49,9 +49,8 @@ import {getConfig} from '../../utils/utils'
  */
 const Home = ({productSearchResult, isLoading}) => {
     const intl = useIntl()
-    const {
-        app: {url: urlConfig}
-    } = getConfig()
+    const urlConfig = getConfig('app.url')
+
     return (
         <Box data-testid="home-page" layerStyle="page">
             <Seo

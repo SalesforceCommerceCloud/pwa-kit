@@ -18,9 +18,8 @@ import {urlPartPositions} from '../constants'
 export const configureRoutes = (routes = [], {ignoredRoutes = []}) => {
     if (!routes.length) return []
 
-    const {
-        app: {url: urlConfig}
-    } = getConfig()
+    const urlConfig = getConfig('app.url')
+
     if (!urlConfig) return routes
 
     return routes.map((route) => {
