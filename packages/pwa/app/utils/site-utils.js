@@ -76,4 +76,8 @@ export const getSiteByUrl = (url) => {
     return site
 }
 
+/**
+ * Get the sites config from pwa-kit.config.json
+ * @returns {array} - list of site objects
+ */
 export const getSites = () => getConfig('app.sites.*')
