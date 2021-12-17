@@ -24,10 +24,34 @@ import {DEFAULT_LOCALE, DEFAULT_CURRENCY, urlPartPositions} from '../../constant
 import {getPreferredCurrency, getSupportedLocalesIds} from '../../utils/locale'
 import {getUrlConfig} from '../../utils/utils'
 import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
+import http from 'http'
+import https from 'https'
+
+const KEEP_ALIVE_MS = 8000
+
+const HTTP_AGENT = new http.Agent({
+    keepAlive: true,
+    keepAliveMsecs: KEEP_ALIVE_MS
+})
+
+const HTTPS_AGENT = new https.Agent({
+    keepAlive: true,
+    keepAliveMsecs: KEEP_ALIVE_MS
+})
 
 const apiConfig = {
     ...commerceAPIConfig,
     einsteinConfig: einsteinAPIConfig
+}
+
+/**
+ * Returns Node.js http or https Agent with keepAlive support to re-use Commerce API
+ * connections server-side.
+ * @param url
+ * @returns {module:http.Agent|module:https.Agent}
+ */
+function getAgent(url) {
+    return url.protocol === 'http:' ? HTTP_AGENT : HTTPS_AGENT
 }
 
 /**
@@ -90,8 +114,16 @@ AppConfig.restore = (locals = {}) => {
     // Parse the locale from the page url.
     const locale = getLocale(locals) || DEFAULT_LOCALE
     const currency = getPreferredCurrency(locale) || DEFAULT_CURRENCY
+    const agent = getAgent
 
-    locals.api = new CommerceAPI({...apiConfig, locale, currency})
+    locals.api = new CommerceAPI({
+        ...apiConfig,
+        locale,
+        currency,
+        fetchOptions: {
+            agent
+        }
+    })
 }
 
 AppConfig.freeze = () => undefined
