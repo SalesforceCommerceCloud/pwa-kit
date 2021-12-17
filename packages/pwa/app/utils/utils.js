@@ -145,21 +145,7 @@ export const clearSessionJSONItem = (key) => {
 export const boldString = (str, substr) => {
     return str.replace(RegExp(substr, 'g'), `<b>${substr}</b>`)
 }
-/**
- * A function that takes a partial url into a fully url.
- * It takes into account whether it is on client/server side
- *
- * @example
- * convertToFullyQualifiedUrl(/women/dresses?color=black)
- *
- * // returns //http(s)://www.site.com/women/dresses?color=black
- * @param path
- * @returns {string|*}
- */
-export const convertToFullyQualifiedUrl = (path) => {
-    const url = typeof window === 'undefined' ? `${getAppOrigin()}${path}` : window.location.href
-    return url
-}
+
 /**
  * Capitalizes the words in a string
  * @param {string} text
@@ -190,7 +176,7 @@ export const getL10nConfig = (url) => {
     } = getConfig()
     if (!sitesConfig.length) throw new Error('No site config found. Please check you configuration')
 
-    const siteId = resolveSiteFromUrl(convertToFullyQualifiedUrl(url))?.id
+    const siteId = resolveSiteFromUrl(urlToPath(url))?.id
     const l10nConfig = sitesConfig.find((site) => site.id === siteId)?.l10n
     return l10nConfig
 }

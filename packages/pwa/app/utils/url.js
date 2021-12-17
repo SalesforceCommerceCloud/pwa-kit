@@ -10,6 +10,22 @@ import {getL10nConfig, getConfig} from './utils'
 import {urlPartPositions} from '../constants'
 
 /**
+ * A function that takes a path and qualifies it with the current host and protocol.
+ * This function works on the client and on the server.
+ *
+ * @example
+ * urlToPath(/women/dresses?color=black)
+ *
+ * // returns //http(s)://www.site.com/women/dresses?color=black
+ * @param path
+ * @returns {string|*}
+ */
+export const urlToPath = (path) => {
+    const url = typeof window === 'undefined' ? `${getAppOrigin()}${path}` : window.location.href
+    return url
+}
+
+/**
  * Modifies a given url by adding/updating query parameters.
  *
  * @param {string} url - The base url of the output url set.

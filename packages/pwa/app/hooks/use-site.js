@@ -5,14 +5,27 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {convertToFullyQualifiedUrl} from '../utils/utils'
+import {useMemo} from 'react'
 import {useLocation} from 'react-router-dom'
+import {urlToPath} from '../utils/url'
 import {resolveSiteFromUrl} from '../utils/site-utils'
 
+/**
+ * This hook returns the site configuration object using the site identifier
+ * (id or alias) in the current url.
+ *
+ * @returns {Object} The site configuration object
+ */
 const useSite = () => {
     const {pathname, search} = useLocation()
-    const url = convertToFullyQualifiedUrl(`${pathname}${search}`)
-    const site = resolveSiteFromUrl(url)
+    let site
+
+    useMemo(() => {
+        const url = urlToPath(`${pathname}${search}`)
+        site = resolveSiteFromUrl(url)
+    }, [pathname, search])
+
     return site
 }
+
 export default useSite
