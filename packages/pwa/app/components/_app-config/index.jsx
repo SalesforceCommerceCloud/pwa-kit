@@ -22,7 +22,8 @@ import {
 import {commerceAPIConfig, einsteinAPIConfig} from '../../api.config'
 import {urlPartPositions} from '../../constants'
 import {getPreferredCurrency} from '../../utils/locale'
-import {getL10nConfig, getConfig, urlToPath} from '../../utils/utils'
+import {getL10nConfig, getConfig} from '../../utils/utils'
+import {pathToUrl} from '../../utils/url'
 import {resolveSiteFromUrl} from '../../utils/site-utils'
 
 const apiConfig = {
@@ -38,16 +39,11 @@ const apiConfig = {
  */
 const getLocale = (locals = {}) => {
     let {originalUrl} = locals
-
-    const {
-        app: {
-            url: {locale: localePosition, site: sitePosition}
-        }
-    } = getConfig()
+    const {locale: localePosition, site: sitePosition} = getConfig('app.url')
     // If there is no originalUrl value in the locals, create it from the window location.
     // This happens when executing on the client.
 
-    const url = urlToPath(originalUrl)
+    const url = pathToUrl(originalUrl)
 
     let shortCode
     const {pathname, searchParams} = new URL(url)
@@ -96,7 +92,7 @@ const AppConfig = ({children, locals = {}}) => {
 AppConfig.restore = (locals = {}) => {
     // Parse the locale from the page url.
     const originalUrl = locals.originalUrl
-    const url = urlToPath(originalUrl)
+    const url = pathToUrl(originalUrl)
     const site = resolveSiteFromUrl(url)
 
     apiConfig.parameters.siteId = site?.id

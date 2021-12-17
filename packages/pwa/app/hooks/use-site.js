@@ -5,10 +5,10 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {useMemo} from 'react'
+import {pathToUrl} from '../utils/url'
 import {useLocation} from 'react-router-dom'
-import {urlToPath} from '../utils/url'
 import {resolveSiteFromUrl} from '../utils/site-utils'
+import {useMemo} from 'react'
 
 /**
  * This hook returns the site configuration object using the site identifier
@@ -18,13 +18,9 @@ import {resolveSiteFromUrl} from '../utils/site-utils'
  */
 const useSite = () => {
     const {pathname, search} = useLocation()
-    let site
-
-    useMemo(() => {
-        const url = urlToPath(`${pathname}${search}`)
-        site = resolveSiteFromUrl(url)
+    const site = useMemo(() => {
+        return resolveSiteFromUrl(pathToUrl(`${pathname}${search}`))
     }, [pathname, search])
-
     return site
 }
 

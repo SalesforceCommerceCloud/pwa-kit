@@ -6,8 +6,10 @@
  */
 
 import pwaKitConfig from '../../pwa-kit.config.json'
-import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
 import {resolveSiteFromUrl} from './site-utils'
+import {JSONPath} from 'jsonpath-plus'
+import {urlPartPositions} from '../constants'
+import {pathToUrl} from './url'
 
 /**
  * Call requestIdleCallback in supported browsers.
@@ -161,9 +163,18 @@ export const capitalize = (text) => {
 
 /**
  * Get the pwa configuration object from pwa-kit.config.json
+ * @param path - path to your object inside pwaKitConfig using jsonPath expression
+ *
+ * To read more https://github.com/JSONPath-Plus/JSONPath
+ *
+ * @example getConfig('app.url') => {locale: 'path', site: 'path'}
  * @returns {object} - the configuration object
  */
-export const getConfig = () => pwaKitConfig
+export const getConfig = (path, opts) => {
+    if (!path) return pwaKitConfig
+    const result = JSONPath({path: `$.${path}`, json: pwaKitConfig, wrap: false, ...opts})
+    return result
+}
 
 /**
  * return l10n config for current site
@@ -171,12 +182,49 @@ export const getConfig = () => pwaKitConfig
  * @returns {object}
  */
 export const getL10nConfig = (url) => {
-    const {
-        app: {sites: sitesConfig}
-    } = getConfig()
-    if (!sitesConfig.length) throw new Error('No site config found. Please check you configuration')
+    const sites = getConfig('app.sites.*')
+    if (!sites.length) throw new Error('No site config found. Please check you configuration')
 
-    const siteId = resolveSiteFromUrl(urlToPath(url))?.id
-    const l10nConfig = sitesConfig.find((site) => site.id === siteId)?.l10n
+    const siteId = resolveSiteFromUrl(pathToUrl(url))?.id
+    const l10nConfig = sites.find((site) => site.id === siteId)?.l10n
     return l10nConfig
+}
+
+export const getUrlParamsFromUrl = (url) => {
+    const {locale: localePosition, site: sitePosition} = getConfig('app.url')
+
+    const {pathname, search} = new URL(url)
+    const params = new URLSearchParams(search)
+    const result = {}
+    switch (sitePosition) {
+        case urlPartPositions.NONE:
+            break
+        case urlPartPositions.PATH:
+            result.site = pathname.split('/')[1]
+            break
+        case urlPartPositions.QUERY_PARAM: {
+            result.site = params.get('site')
+            break
+        }
+    }
+
+    switch (localePosition) {
+        case urlPartPositions.NONE:
+            break
+        case urlPartPositions.PATH: {
+            if (sitePosition === urlPartPositions.PATH) {
+                result.locale = pathname.split('/')[2]
+            } else {
+                result.locale = pathname.split('/')[1]
+            }
+            break
+        }
+        case urlPartPositions.QUERY_PARAM: {
+            result.locale = params.get('locale')
+            break
+        }
+    }
+
+    console.log('result', result)
+    return result
 }

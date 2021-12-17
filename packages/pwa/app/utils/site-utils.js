@@ -6,7 +6,7 @@
  */
 
 import {getConfig} from './utils'
-
+import {JSONPath} from 'jsonpath-plus'
 /**
  * This functions takes an url and returns a site object,
  * an error will be thrown if not url is passed in or no site is found
@@ -19,9 +19,8 @@ export const resolveSiteFromUrl = (url) => {
     }
     const {hostname} = new URL(url)
 
-    const {
-        app: {defaultSiteId, sites: sitesConfig}
-    } = getConfig()
+    const sites = getSites()
+    const defaultSiteId = getConfig('app.defaultSiteId')
     let site
     // Step 1: look for the site from the url, if found, return the site
     site = getSiteByUrl(url)
@@ -37,7 +36,7 @@ export const resolveSiteFromUrl = (url) => {
     }
 
     // Step 3: use the default if none of above works
-    site = sitesConfig.find((site) => site.id === defaultSiteId)
+    site = sites.find((site) => site.id === defaultSiteId)
 
     // Step 4: throw an error if site can't be found by any of the above steps
     if (!site) {
@@ -52,16 +51,12 @@ export const resolveSiteFromUrl = (url) => {
  * @returns {string} siteId
  */
 export const getSiteByHostname = (hostname) => {
-    const {
-        app: {sites: sitesConfig}
-    } = getConfig()
+    const sites = getSites()
 
-    if (!sitesConfig.length) throw new Error('No site config found. Please check you configuration')
+    if (!sites.length) throw new Error('No site config found. Please check you configuration')
     if (!hostname) return undefined
 
-    const site = sitesConfig.filter((site) => {
-        return site?.hostnames?.some((i) => i.includes(hostname))
-    })
+    const site = JSONPath(`$[?(@.hostnames && @.hostnames.includes('${hostname}'))]`, sites)
 
     return site?.length === 1 ? site[0] : undefined
 }
@@ -73,6 +68,10 @@ export const getSiteByHostname = (hostname) => {
  */
 export const getSiteByUrl = (url) => {
     const {siteIdsRegExp, siteAliasesRegExp} = getSitesRegExp()
+
+    // const {site: currentSite, locale} = getUrlParamsFromUrl(url)
+    // console.log('currentSite', test)
+    // console.log('currentLocale', test)
 
     let site
     const aliasMatch = url.match(siteAliasesRegExp)
@@ -95,9 +94,8 @@ export const getSiteByUrl = (url) => {
  * @returns {object|undefined}
  */
 const getSiteById = (id) => {
-    const {
-        app: {sites}
-    } = getConfig()
+    const sites = getSites()
+
     if (!sites.length) return undefined
     if (!id) throw new Error('id is required')
 
@@ -110,9 +108,8 @@ const getSiteById = (id) => {
  * @returns {undefined|object}
  */
 const getSiteByAlias = (alias) => {
-    const {
-        app: {sites}
-    } = getConfig()
+    const sites = getConfig('app.sites.*')
+
     if (!sites.length) return undefined
     if (!alias) throw new Error('alias is required')
 
@@ -153,3 +150,5 @@ export const getSitesRegExp = () => {
         siteAliasesRegExp
     }
 }
+
+export const getSites = () => getConfig('app.sites.*')
