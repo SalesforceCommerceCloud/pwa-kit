@@ -22,22 +22,26 @@ import {
 import {commerceAPIConfig, einsteinAPIConfig} from '../../api.config'
 import {DEFAULT_LOCALE, DEFAULT_CURRENCY, urlPartPositions} from '../../constants'
 import {getPreferredCurrency, getSupportedLocalesIds} from '../../utils/locale'
-import {getUrlConfig} from '../../utils/utils'
+import {getUrlConfig, isServer} from '../../utils/utils'
 import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
 import http from 'http'
 import https from 'https'
 
 const KEEP_ALIVE_MS = 8000
 
-const HTTP_AGENT = new http.Agent({
-    keepAlive: true,
-    keepAliveMsecs: KEEP_ALIVE_MS
-})
+const HTTP_AGENT = isServer
+    ? new http.Agent({
+          keepAlive: true,
+          keepAliveMsecs: KEEP_ALIVE_MS
+      })
+    : undefined
 
-const HTTPS_AGENT = new https.Agent({
-    keepAlive: true,
-    keepAliveMsecs: KEEP_ALIVE_MS
-})
+const HTTPS_AGENT = isServer
+    ? new https.Agent({
+          keepAlive: true,
+          keepAliveMsecs: KEEP_ALIVE_MS
+      })
+    : undefined
 
 const apiConfig = {
     ...commerceAPIConfig,
