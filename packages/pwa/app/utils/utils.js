@@ -9,6 +9,7 @@ import pwaKitConfig from '../../pwa-kit.config.json'
 import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
 import {resolveSiteFromUrl} from './site-utils'
 import {JSONPath} from 'jsonpath-plus'
+import {urlPartPositions} from '../constants'
 /**
  * Call requestIdleCallback in supported browsers.
  *
@@ -150,13 +151,13 @@ export const boldString = (str, substr) => {
  * It takes into account whether it is on client/server side
  *
  * @example
- * convertToFullyQualifiedUrl(/women/dresses?color=black)
+ * pathToUrl(/women/dresses?color=black)
  *
  * // returns //http(s)://www.site.com/women/dresses?color=black
  * @param path
  * @returns {string|*}
  */
-export const convertToFullyQualifiedUrl = (path) => {
+export const pathToUrl = (path) => {
     const url = typeof window === 'undefined' ? `${getAppOrigin()}${path}` : window.location.href
     return url
 }
@@ -175,14 +176,16 @@ export const capitalize = (text) => {
 
 /**
  * Get the pwa configuration object from pwa-kit.config.json
- * @param path - path to your object inside pwaKitConfig separated by a dot
+ * @param path - path to your object inside pwaKitConfig using jsonPath expression
+ *
+ * To read more https://github.com/JSONPath-Plus/JSONPath
  *
  * @example getConfig('app.url') => {locale: 'path', site: 'path'}
  * @returns {object} - the configuration object
  */
-export const getConfig = (path) => {
+export const getConfig = (path, opts) => {
     if (!path) return pwaKitConfig
-    const result = JSONPath(`$.${path}`, pwaKitConfig)
+    const result = JSONPath({path: `$.${path}`, json: pwaKitConfig, wrap: false, ...opts})
     return result
 }
 
@@ -195,7 +198,46 @@ export const getL10nConfig = (url) => {
     const sites = getConfig('app.sites.*')
     if (!sites.length) throw new Error('No site config found. Please check you configuration')
 
-    const siteId = resolveSiteFromUrl(convertToFullyQualifiedUrl(url))?.id
+    const siteId = resolveSiteFromUrl(pathToUrl(url))?.id
     const l10nConfig = sites.find((site) => site.id === siteId)?.l10n
     return l10nConfig
+}
+
+export const getUrlParamsFromUrl = (url) => {
+    const {locale: localePosition, site: sitePosition} = getConfig('app.url')
+
+    const {pathname, search} = new URL(url)
+    const params = new URLSearchParams(search)
+    const result = {}
+    switch (sitePosition) {
+        case urlPartPositions.NONE:
+            break
+        case urlPartPositions.PATH:
+            result.site = pathname.split('/')[1]
+            break
+        case urlPartPositions.QUERY_PARAM: {
+            result.site = params.get('site')
+            break
+        }
+    }
+
+    switch (localePosition) {
+        case urlPartPositions.NONE:
+            break
+        case urlPartPositions.PATH: {
+            if (sitePosition === urlPartPositions.PATH) {
+                result.locale = pathname.split('/')[2]
+            } else {
+                result.locale = pathname.split('/')[1]
+            }
+            break
+        }
+        case urlPartPositions.QUERY_PARAM: {
+            result.locale = params.get('locale')
+            break
+        }
+    }
+
+    console.log('result', result)
+    return result
 }

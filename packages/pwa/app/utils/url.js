@@ -111,11 +111,7 @@ export const searchUrlBuilder = (searchTerm) => `/search?q=${searchTerm}`
  * @returns {string} - The relative URL for the specific locale.
  */
 export const getUrlWithLocale = (shortCode, opts = {}) => {
-    const {
-        app: {
-            url: {locale: localePosition, site: sitePosition}
-        }
-    } = getConfig()
+    const {locale: localePosition, site: sitePosition} = getConfig('app.url')
     const location = opts.location ? opts.location : window.location
 
     const {disallowParams = [], site} = opts
@@ -131,7 +127,7 @@ export const getUrlWithLocale = (shortCode, opts = {}) => {
     }
     const l10nConfig = getL10nConfig(`${location.pathname}${location.search}`)
     if (relativeUrl === HOME_HREF) {
-        relativeUrl = buildPathWithUrlConfig(relativeUrl, {site: site.alias, locale: shortCode})
+        relativeUrl = buildPathWithUrlConfig(relativeUrl, {site: site?.alias, locale: shortCode})
     } else {
         let paths = relativeUrl.split('/').filter((path) => path !== '')
         // chop out the locale and site params in the url for rebuild
@@ -144,7 +140,7 @@ export const getUrlWithLocale = (shortCode, opts = {}) => {
         const urlWithoutBasePath = `/${paths.join('/')}`
         relativeUrl = buildPathWithUrlConfig(urlWithoutBasePath, {
             locale: shortCode !== l10nConfig.defaultLocale || paths?.length > 0 ? shortCode : '',
-            site: site.id !== DEFAULT_SITE_ID || paths?.length > 0 ? site?.alias : ''
+            site: site?.id !== DEFAULT_SITE_ID || paths?.length > 0 ? site?.alias : ''
         })
     }
 
