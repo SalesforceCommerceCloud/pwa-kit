@@ -21,7 +21,7 @@ import {
 } from '../../commerce-api/contexts'
 import {commerceAPIConfig, einsteinAPIConfig} from '../../api.config'
 import {getPreferredCurrency, getSupportedLocalesIds} from '../../utils/locale'
-import {getL10nConfig, getConfig, getParamsFromUrl} from '../../utils/utils'
+import {getL10nConfig, getParamsFromUrl} from '../../utils/utils'
 import {pathToUrl} from '../../utils/url'
 import {resolveSiteFromUrl} from '../../utils/site-utils'
 
