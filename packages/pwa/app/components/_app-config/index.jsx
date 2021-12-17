@@ -38,12 +38,7 @@ const apiConfig = {
  */
 const getLocale = (locals = {}) => {
     let {originalUrl} = locals
-
-    const {
-        app: {
-            url: {locale: localePosition, site: sitePosition}
-        }
-    } = getConfig()
+    const {locale: localePosition, site: sitePosition} = getConfig('app.url')
     // If there is no originalUrl value in the locals, create it from the window location.
     // This happens when executing on the client.
 
