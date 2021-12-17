@@ -166,7 +166,8 @@ export const getUrlWithLocale = (shortCode, opts = {}) => {
 
 /**
  * Builds the Home page URL for a given locale and site.
- * We don't add the locale to the URL for the default locale.
+ * locale and site wil be shown at all times except when both of them are default values
+ *
  * '/' default locale & site
  * '/global/it-IT', '/?locale=it-IT&site=global' non-default locale, default site
  * '/us', '/?site=us  default locale, non-default site
@@ -180,7 +181,7 @@ export const homeUrlBuilder = (homeHref, options = {}) => {
     const l10nConfig = getL10nConfig(homeHref)
     const defaultLocale = l10nConfig.defaultLocale
     const updatedUrl = buildPathWithUrlConfig(homeHref, {
-        locale: locale !== defaultLocale ? locale : '',
+        locale: site?.id === DEFAULT_SITE_ID && locale === defaultLocale ? '' : locale,
         site: site?.id === DEFAULT_SITE_ID && locale === defaultLocale ? '' : site?.alias
     })
     return encodeURI(updatedUrl)
