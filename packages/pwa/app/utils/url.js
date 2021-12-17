@@ -8,6 +8,7 @@
 import {DEFAULT_SITE_ID, HOME_HREF} from '../constants'
 import {getL10nConfig, getConfig} from './utils'
 import {urlPartPositions} from '../constants'
+import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
 
 /**
  * A function that takes a path and qualifies it with the current host and protocol.
@@ -20,7 +21,7 @@ import {urlPartPositions} from '../constants'
  * @param path
  * @returns {string|*}
  */
-export const urlToPath = (path) => {
+export const pathToUrl = (path) => {
     const url = typeof window === 'undefined' ? `${getAppOrigin()}${path}` : window.location.href
     return url
 }
