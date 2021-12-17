@@ -23,13 +23,20 @@ import {
     ocapiBasketResponse,
     ocapiFaultResponse
 } from './mock-data'
+import http from 'http'
 
 const apiConfig = {
     ...commerceAPIConfig,
     einsteinConfig: einsteinAPIConfig,
     proxy: undefined,
     locale: 'en-GB',
-    currency: 'GBP'
+    currency: 'GBP',
+    fetchOptions: {
+        agent: new http.Agent({
+            keepAlive: true,
+            keepAliveMsecs: 8000
+        })
+    }
 }
 const getAPI = () => new CommerceAPI(apiConfig)
 
@@ -125,6 +132,20 @@ describe('CommerceAPI', () => {
     test('returns api config', () => {
         const config = getAPI().getConfig()
         expect(config.parameters).toEqual(apiConfig.parameters)
+    })
+    test('same agent used across all SCAPI instantiated via commerce sdk isomorphic', () => {
+        const api = getAPI()
+        const scapiNames = [
+            'shopperCustomers',
+            'shopperGiftCertificates',
+            'shopperProducts',
+            'shopperPromotions',
+            'shopperSearch'
+        ]
+
+        scapiNames.forEach((name) => {
+            expect(api[name].clientConfig.fetchOptions.agent).toBe(apiConfig.fetchOptions.agent)
+        })
     })
     test('calls willSendResponse with request name and options (including auto-injected locale and currency)', () => {
         const api = getAPI()
