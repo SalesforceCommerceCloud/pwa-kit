@@ -81,12 +81,14 @@ AppConfig.restore = (locals = {}) => {
     const url = pathToUrl(originalUrl)
     const site = resolveSiteFromUrl(url)
 
-    apiConfig.parameters.siteId = site?.id
-    const l10nConfig = getL10nConfig(originalUrl)
+    if (site) {
+        apiConfig.parameters.siteId = site?.id
+    }
 
-    const locale = getLocale(locals) || l10nConfig.defaultLocale
-    const currency =
-        getPreferredCurrency(locale, l10nConfig.supportedLocales) || l10nConfig.defaultCurrency
+    const {l10n} = site
+
+    const locale = getLocale(locals) || l10n.defaultLocale
+    const currency = getPreferredCurrency(locale, l10n.supportedLocales) || l10n.defaultCurrency
 
     locals.api = new CommerceAPI({...apiConfig, locale, currency})
 }
