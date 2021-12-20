@@ -18,13 +18,15 @@ import {
 } from '../../commerce-api/mock-data'
 import useCustomer from '../../commerce-api/hooks/useCustomer'
 import Orders from './orders'
-import {getUrlConfig} from '../../utils/utils'
+import {getConfig} from '../../utils/utils'
+
+jest.mock('../../hooks/use-site')
 
 jest.mock('../../utils/utils', () => {
     const original = jest.requireActual('../../utils/utils')
     return {
         ...original,
-        getUrlConfig: jest.fn()
+        getConfig: jest.fn()
     }
 })
 
@@ -57,7 +59,9 @@ const MockedComponent = () => {
         </Switch>
     )
 }
-
+beforeEach(() => {
+    jest.clearAllMocks()
+})
 const server = setupServer(
     rest.post('*/customers/actions/login', (req, res, ctx) =>
         res(
@@ -105,7 +109,7 @@ const server = setupServer(
 // Set up and clean up
 beforeEach(() => {
     jest.resetModules()
-    getUrlConfig.mockImplementation(() => ({
+    getConfig.mockImplementation(() => ({
         locale: 'path'
     }))
     server.listen({onUnhandledRequest: 'error'})

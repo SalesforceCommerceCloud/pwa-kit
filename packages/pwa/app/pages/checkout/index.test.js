@@ -24,7 +24,7 @@ import {
     mockedCustomerProductLists,
     productsResponse
 } from '../../commerce-api/mock-data'
-import {getUrlConfig} from '../../utils/utils'
+import {getConfig} from '../../utils/utils'
 
 jest.setTimeout(60000)
 
@@ -32,7 +32,7 @@ jest.setTimeout(60000)
 Object.defineProperty(window, 'fetch', {
     value: require('node-fetch')
 })
-
+jest.mock('../../hooks/use-site')
 jest.mock('../../commerce-api/utils', () => {
     const originalModule = jest.requireActual('../../commerce-api/utils')
     return {
@@ -52,7 +52,7 @@ jest.mock('../../utils/utils', () => {
     const original = jest.requireActual('../../utils/utils')
     return {
         ...original,
-        getUrlConfig: jest.fn()
+        getConfig: jest.fn()
     }
 })
 
@@ -169,7 +169,7 @@ const server = setupServer(
 
 // Set up and clean up
 beforeAll(() => {
-    getUrlConfig.mockImplementation(() => ({
+    getConfig.mockImplementation(() => ({
         locale: 'path'
     }))
     jest.resetModules()

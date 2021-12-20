@@ -10,7 +10,7 @@ import user from '@testing-library/user-event'
 import {renderWithProviders} from '../../utils/test-utils'
 import Registration from '.'
 import {BrowserRouter as Router, Route} from 'react-router-dom'
-import {getUrlConfig} from '../../utils/utils'
+import {getConfig} from '../../utils/utils'
 import Account from '../account'
 
 jest.setTimeout(60000)
@@ -44,7 +44,7 @@ jest.mock('../../utils/utils', () => {
     const original = jest.requireActual('../../utils/utils')
     return {
         ...original,
-        getUrlConfig: jest.fn()
+        getConfig: jest.fn()
     }
 })
 
@@ -116,6 +116,7 @@ jest.mock('../../commerce-api/utils', () => {
         })
     }
 })
+jest.mock('../../hooks/use-site')
 
 jest.mock('../../commerce-api/pkce', () => {
     return {
@@ -141,7 +142,7 @@ const MockedComponent = () => {
 // Set up and clean up
 // Set up and clean up
 beforeEach(() => {
-    getUrlConfig.mockImplementation(() => ({
+    getConfig.mockImplementation(() => ({
         locale: 'path'
     }))
     jest.useFakeTimers()

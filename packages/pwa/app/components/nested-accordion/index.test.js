@@ -7,12 +7,15 @@
 import React from 'react'
 import NestedAccordion from './index'
 import {renderWithProviders} from '../../utils/test-utils'
-import {getUrlConfig} from '../../utils/utils'
+import {getConfig} from '../../utils/utils'
+
+jest.mock('../../hooks/use-site')
+
 jest.mock('../../utils/utils', () => {
     const original = jest.requireActual('../../utils/utils')
     return {
         ...original,
-        getUrlConfig: jest.fn()
+        getConfig: jest.fn()
     }
 })
 const mockItem = {
@@ -98,7 +101,7 @@ test('Renders NestedAccordion with items functions before and after', () => {
 
 test('Renders NestedAccordion with custom url builder', () => {
     const mockPath = '/mock-path'
-    getUrlConfig.mockImplementation(() => ({
+    getConfig.mockImplementation(() => ({
         locale: 'path'
     }))
     renderWithProviders(<NestedAccordion item={mockItem} urlBuilder={() => mockPath} />)

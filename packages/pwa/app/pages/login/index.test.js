@@ -15,7 +15,7 @@ import {BrowserRouter as Router, Route} from 'react-router-dom'
 import Account from '../account'
 import Registration from '../registration'
 import ResetPassword from '../reset-password'
-import {getUrlConfig} from '../../utils/utils'
+import {getConfig} from '../../utils/utils'
 
 jest.setTimeout(60000)
 
@@ -29,11 +29,12 @@ const mockRegisteredCustomer = {
     login: 'darek@test.com'
 }
 
+jest.mock('../../hooks/use-site')
 jest.mock('../../utils/utils', () => {
     const original = jest.requireActual('../../utils/utils')
     return {
         ...original,
-        getUrlConfig: jest.fn()
+        getConfig: jest.fn()
     }
 })
 
@@ -119,7 +120,7 @@ const server = setupServer()
 
 // Set up and clean up
 beforeEach(() => {
-    getUrlConfig.mockImplementation(() => ({
+    getConfig.mockImplementation(() => ({
         locale: 'path'
     }))
     jest.resetModules()

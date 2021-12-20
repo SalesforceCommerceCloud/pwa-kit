@@ -8,24 +8,26 @@ import React from 'react'
 import {renderWithProviders} from '../../utils/test-utils'
 import Link from './index'
 
-import {getUrlConfig} from '../../utils/utils'
+import {getConfig} from '../../utils/utils'
+jest.mock('../../hooks/use-site')
 jest.mock('../../utils/utils', () => {
     const original = jest.requireActual('../../utils/utils')
     return {
         ...original,
-        getUrlConfig: jest.fn()
+        getConfig: jest.fn()
     }
 })
 test('renders a link with locale prepended', () => {
-    getUrlConfig.mockImplementation(() => ({
-        locale: 'path'
+    getConfig.mockImplementation(() => ({
+        locale: 'path',
+        site: 'path'
     }))
     const {getByText} = renderWithProviders(<Link href="/mypage">My Page</Link>)
-    expect(getByText(/My Page/i)).toHaveAttribute('href', '/en-GB/mypage')
+    expect(getByText(/My Page/i)).toHaveAttribute('href', '/site-alias-2/en-GB/mypage')
 })
 
 test('renders a link with locale as query param', () => {
-    getUrlConfig.mockImplementation(() => ({
+    getConfig.mockImplementation(() => ({
         locale: 'query_param'
     }))
     const {getByText} = renderWithProviders(<Link href="/mypage">My Page</Link>)
@@ -33,7 +35,7 @@ test('renders a link with locale as query param', () => {
 })
 
 test('accepts `to` prop as well', () => {
-    getUrlConfig.mockImplementation(() => ({
+    getConfig.mockImplementation(() => ({
         locale: 'path'
     }))
     const {getByText} = renderWithProviders(<Link to="/mypage">My Page</Link>)

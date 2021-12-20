@@ -12,6 +12,15 @@ import SearchInput from './index'
 import Suggestions from './partials/suggestions'
 import {noop} from '../../utils/utils'
 import mockSearchResults from '../../commerce-api/mocks/searchResults'
+import {getConfig} from '../../utils/utils'
+
+jest.mock('../../utils/utils', () => {
+    const original = jest.requireActual('../../utils/utils')
+    return {
+        ...original,
+        getConfig: jest.fn()
+    }
+})
 
 jest.mock('../../commerce-api/utils', () => {
     const originalModule = jest.requireActual('../../commerce-api/utils')
@@ -32,8 +41,13 @@ jest.mock('commerce-sdk-isomorphic', () => {
         }
     }
 })
+jest.mock('../../hooks/use-site')
 
 beforeEach(() => {
+    getConfig.mockImplementation(() => ({
+        locale: 'path',
+        site: 'path'
+    }))
     jest.resetModules()
 })
 
@@ -56,7 +70,7 @@ test('changes url when enter is pressed', async () => {
     renderWithProviders(<SearchInput />)
     const searchInput = document.querySelector('input[type="search"]')
     await user.type(searchInput, 'Dresses{enter}')
-    await waitFor(() => expect(window.location.pathname).toEqual('/en-GB/search'))
+    await waitFor(() => expect(window.location.pathname).toEqual('/site-alias-2/en-GB/search'))
     await waitFor(() => expect(window.location.search).toEqual('?q=Dresses'))
 })
 
