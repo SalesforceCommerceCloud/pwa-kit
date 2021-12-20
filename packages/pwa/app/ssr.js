@@ -41,7 +41,7 @@ const app = createApp({
     enableLegacyRemoteProxying: false
 })
 
-// Set security headers
+// Set HTTP security headers
 app.use(helmet())
 app.use(
     helmet.contentSecurityPolicy({
