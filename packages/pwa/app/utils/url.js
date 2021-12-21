@@ -6,7 +6,7 @@
  */
 
 import {DEFAULT_SITE_ID, HOME_HREF} from '../constants'
-import {getL10nConfig, getConfig} from './utils'
+import {getConfig} from './utils'
 import {urlPartPositions} from '../constants'
 import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
 
@@ -142,25 +142,20 @@ export const getUrlWithLocale = (shortCode, opts = {}) => {
             params.delete(param)
         })
     }
-    const l10nConfig = getL10nConfig(`${location.pathname}${location.search}`)
     if (relativeUrl === HOME_HREF) {
         relativeUrl = buildPathWithUrlConfig(relativeUrl, {site: site?.alias, locale: shortCode})
     } else {
         let paths = relativeUrl.split('/').filter((path) => path !== '')
-        // chop out the locale and site params in the url for rebuild
+        // remove the old locale and replace with new shortCode
         if (localePosition === urlPartPositions.PATH && sitePosition === urlPartPositions.PATH) {
-            paths.splice(0, 2)
+            paths.splice(1, 1, shortCode)
+            console.log('paths', paths)
         } else {
-            paths.shift()
+            paths.splice(0, 1, shortCode)
         }
 
-        const urlWithoutBasePath = `/${paths.join('/')}`
-        relativeUrl = buildPathWithUrlConfig(urlWithoutBasePath, {
-            locale: shortCode !== l10nConfig.defaultLocale || paths?.length > 0 ? shortCode : '',
-            site: site?.id !== DEFAULT_SITE_ID || paths?.length > 0 ? site?.alias : ''
-        })
+        relativeUrl = `/${paths.join('/')}${Array.from(params).length > 0 ? `?${params}` : ''}`
     }
-
     return relativeUrl
 }
 
