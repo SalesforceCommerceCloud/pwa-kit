@@ -125,15 +125,15 @@ export const searchUrlBuilder = (searchTerm) => `/search?q=${searchTerm}`
  * Returns a relative URL for a locale short code.
  *
  * @param {string} shortCode - The locale short code.
- * @param {Object} [opts] - Options, if there's any.
+ * @param {{site: {l10n: {defaultLocale: string}, alias: string, id: string}, location: URL}} [opts] - Options, if there's any.
  * @param {string[]} opts.disallowParams - URL parameters to remove
  * @param {Object} opts.location - location object to replace the default `window.location`
  * @returns {string} - The relative URL for the specific locale.
  */
 export const getUrlWithLocale = (shortCode, opts = {}) => {
     const {locale: localePosition, site: sitePosition} = getConfig('app.url')
+    const defaultSiteId = getConfig('app.defaultSiteId')
     const location = opts.location ? opts.location : window.location
-
     const {disallowParams = [], site} = opts
     let relativeUrl = location.pathname
 
@@ -145,17 +145,28 @@ export const getUrlWithLocale = (shortCode, opts = {}) => {
             params.delete(param)
         })
     }
+
     if (relativeUrl === HOME_HREF) {
         relativeUrl = buildPathWithUrlConfig(relativeUrl, {site: site?.alias, locale: shortCode})
     } else {
         let paths = relativeUrl.split('/').filter((path) => path !== '')
-        // remove the old locale and replace with new shortCode
+        // remove old locale and site, rebuild the url with new locale and site
         if (localePosition === urlPartPositions.PATH && sitePosition === urlPartPositions.PATH) {
-            paths.splice(1, 1, shortCode)
+            // remove first two elements which is the site and locale
+            paths.splice(0, 2)
+            const pathWithoutBaseSegments = `/${paths.join('/')}`
+            const isDefaultSite = site.id === defaultSiteId
+            const isDefaultLocale = shortCode === site?.l10n?.defaultLocale
+            // we don't want to show  site and locale when they are the home page and they are both default values
+            const updatedPath = `${buildPathWithUrlConfig(pathWithoutBaseSegments, {
+                locale: isDefaultLocale && isDefaultSite && paths.length === 0 ? '' : shortCode,
+                site: isDefaultLocale && isDefaultSite && paths.length === 0 ? '' : site?.alias
+            })}`
+            relativeUrl = `${updatedPath}${Array.from(params).length > 0 ? `?${params}` : ''}`
         } else {
             paths.splice(0, 1, shortCode)
+            relativeUrl = `/${paths.join('/')}${Array.from(params).length > 0 ? `?${params}` : ''}`
         }
-        relativeUrl = `/${paths.join('/')}${Array.from(params).length > 0 ? `?${params}` : ''}`
     }
     return relativeUrl
 }
@@ -275,6 +286,5 @@ export const buildPathWithUrlConfig = (url, configValues = {}) => {
     if (Object.keys(queryParams).length) {
         updatedPath = rebuildPathWithParams(updatedPath, queryParams)
     }
-
     return updatedPath
 }
