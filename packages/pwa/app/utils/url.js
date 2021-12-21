@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {DEFAULT_SITE_ID, HOME_HREF} from '../constants'
+import {HOME_HREF} from '../constants'
 import {getConfig} from './utils'
 import {urlPartPositions} from '../constants'
 import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
@@ -22,7 +22,10 @@ import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
  * @returns {string|*}
  */
 export const pathToUrl = (path) => {
-    const url = typeof window === 'undefined' ? `${getAppOrigin()}${path}` : window.location.href
+    const url =
+        typeof window === 'undefined'
+            ? `${getAppOrigin()}${path}`
+            : `${window.location.origin}${path ? path : window.location.pathname}`
     return url
 }
 
@@ -149,11 +152,9 @@ export const getUrlWithLocale = (shortCode, opts = {}) => {
         // remove the old locale and replace with new shortCode
         if (localePosition === urlPartPositions.PATH && sitePosition === urlPartPositions.PATH) {
             paths.splice(1, 1, shortCode)
-            console.log('paths', paths)
         } else {
             paths.splice(0, 1, shortCode)
         }
-
         relativeUrl = `/${paths.join('/')}${Array.from(params).length > 0 ? `?${params}` : ''}`
     }
     return relativeUrl
@@ -173,11 +174,12 @@ export const getUrlWithLocale = (shortCode, opts = {}) => {
  */
 export const homeUrlBuilder = (homeHref, options = {}) => {
     const {locale, site} = options
+    const defaultSiteId = getConfig('app.defaultSiteId')
     const {l10n} = site
     const defaultLocale = l10n.defaultLocale
     const updatedUrl = buildPathWithUrlConfig(homeHref, {
-        locale: site?.id === DEFAULT_SITE_ID && locale === defaultLocale ? '' : locale,
-        site: site?.id === DEFAULT_SITE_ID && locale === defaultLocale ? '' : site?.alias
+        locale: site?.id === defaultSiteId && locale === defaultLocale ? '' : locale,
+        site: site?.id === defaultSiteId && locale === defaultLocale ? '' : site?.alias
     })
     return encodeURI(updatedUrl)
 }

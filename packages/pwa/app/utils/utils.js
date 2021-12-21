@@ -6,7 +6,6 @@
  */
 
 import pwaKitConfig from '../../pwa-kit.config.json'
-import {resolveSiteFromUrl} from './site-utils'
 import {JSONPath} from 'jsonpath-plus'
 import {urlPartPositions} from '../constants'
 import {pathToUrl} from './url'
@@ -177,29 +176,14 @@ export const getConfig = (path, opts) => {
 }
 
 /**
- * This function takes the url to determine the site, and then return its l10n configuration
+ * This functions return the param (e.g site and locale) from the given url
+ * The site will show up before locale if both of them are presented in the pathname
  * @param path
  * @returns {object}
  */
-export const getL10nConfig = (path) => {
-    const sites = getConfig('app.sites.*')
-    if (!sites.length) throw new Error('No site config found. Please check you configuration')
-
-    const siteId = resolveSiteFromUrl(pathToUrl(path))?.id
-    const l10nConfig = sites.find((site) => site.id === siteId)?.l10n
-    return l10nConfig
-}
-
-/**
- * This functions return the param (e.g site and locale) from the given url
- * The site will show up before locale if both of them are presented in the pathname
- * @param url
- * @returns {object}
- */
-export const getParamsFromUrl = (url) => {
+export const getParamsFromPath = (path) => {
     const {locale: localePosition, site: sitePosition} = getConfig('app.url')
-
-    const {pathname, search} = new URL(url)
+    const {pathname, search} = new URL(pathToUrl(path))
     const params = new URLSearchParams(search)
     const result = {}
     switch (sitePosition) {

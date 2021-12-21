@@ -5,11 +5,12 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {getConfig, getParamsFromUrl} from './utils'
+import {getConfig, getParamsFromPath} from './utils'
 import {JSONPath} from 'jsonpath-plus'
+
 /**
  * This functions takes an url and returns a site object,
- * an error will be thrown if not url is passed in or no site is found
+ * an error will be thrown if no url is passed in or no site is found
  * @param {string} url
  * @returns {object}
  */
@@ -17,13 +18,14 @@ export const resolveSiteFromUrl = (url) => {
     if (!url) {
         throw new Error('url is required to find a site object.')
     }
-    const {hostname} = new URL(url)
+    const {hostname, pathname, search} = new URL(url)
+    const path = `${pathname}${search}`
 
     const sites = getSites()
     const defaultSiteId = getConfig('app.defaultSiteId')
     let site
     // Step 1: look for the site from the url, if found, return the site
-    site = getSiteByUrl(url)
+    site = getSiteByPath(path)
     if (site) {
         return site
     }
@@ -64,11 +66,11 @@ export const getSiteByHostname = (hostname) => {
 
 /**
  * get the site by looking for the site value (either site id or alias) from the url
- * @param url
+ * @param path
  * @returns {object|undefined}
  */
-export const getSiteByUrl = (url) => {
-    const {site: currentSite} = getParamsFromUrl(url)
+export const getSiteByPath = (path) => {
+    const {site: currentSite} = getParamsFromPath(path)
     if (!currentSite) return
     const sites = getSites()
 

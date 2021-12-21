@@ -40,14 +40,15 @@ import {AddToCartModalProvider} from '../../hooks/use-add-to-cart-modal'
 import {IntlProvider} from 'react-intl'
 
 // Others
-import {watchOnlineStatus, flatten, getL10nConfig} from '../../utils/utils'
-import {homeUrlBuilder, getUrlWithLocale, buildPathWithUrlConfig} from '../../utils/url'
+import {watchOnlineStatus, flatten} from '../../utils/utils'
+import {homeUrlBuilder, getUrlWithLocale, buildPathWithUrlConfig, pathToUrl} from '../../utils/url'
 import {getLocaleConfig, getPreferredCurrency, getSupportedLocalesIds} from '../../utils/locale'
 import {HOME_HREF} from '../../constants'
 
 import Seo from '../seo'
 import useWishlist from '../../hooks/use-wishlist'
 import useSite from '../../hooks/use-site'
+import {resolveSiteFromUrl} from '../../utils/site-utils'
 
 const DEFAULT_NAV_DEPTH = 3
 const DEFAULT_ROOT_CATEGORY = 'root'
@@ -273,7 +274,7 @@ App.shouldGetProps = () => {
 }
 
 App.getProps = async ({api, res}) => {
-    const l10nConfig = getL10nConfig(res.locals.originalUrl)
+    const l10nConfig = resolveSiteFromUrl(pathToUrl(res.locals.originalUrl))?.l10n
     const localeConfig = await getLocaleConfig({
         getUserPreferredLocales: () => {
             // CONFIG: This function should return an array of preferred locales. They can be

@@ -21,7 +21,7 @@ import {
 } from '../../commerce-api/contexts'
 import {commerceAPIConfig, einsteinAPIConfig} from '../../api.config'
 import {getPreferredCurrency, getSupportedLocalesIds} from '../../utils/locale'
-import {getL10nConfig, getParamsFromUrl} from '../../utils/utils'
+import {getParamsFromPath} from '../../utils/utils'
 import {pathToUrl} from '../../utils/url'
 import {resolveSiteFromUrl} from '../../utils/site-utils'
 
@@ -38,15 +38,14 @@ const apiConfig = {
  */
 const getLocale = (locals = {}) => {
     let {originalUrl} = locals
-    const url = pathToUrl(originalUrl)
     let shortCode
-    const {locale} = getParamsFromUrl(url)
-    const l10Config = getL10nConfig(originalUrl)
+    const {locale} = getParamsFromPath(originalUrl)
+    const l10n = resolveSiteFromUrl(pathToUrl(originalUrl))?.l10n
 
     // Ensure that the locale is in the supported list, otherwise return the default.
-    shortCode = getSupportedLocalesIds(l10Config.supportedLocales).includes(locale)
+    shortCode = getSupportedLocalesIds(l10n.supportedLocales).includes(locale)
         ? locale
-        : l10Config.defaultLocale
+        : l10n.defaultLocale
     return shortCode
 }
 
