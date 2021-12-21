@@ -53,7 +53,8 @@ export const resolveSiteFromUrl = (url) => {
 export const getSiteByHostname = (hostname) => {
     const sites = getSites()
 
-    if (!sites.length) throw new Error('No site config found. Please check you configuration')
+    if (!sites || !sites.length)
+        throw new Error('No site config found. Please check you configuration')
     if (!hostname) return
 
     const site = JSONPath(`$[?(@.hostnames && @.hostnames.includes('${hostname}'))]`, sites)
@@ -70,7 +71,9 @@ export const getSiteByUrl = (url) => {
     const {site: currentSite} = getParamsFromUrl(url)
     if (!currentSite) return
     const sites = getSites()
-    if (!sites.length) throw new Error('No site config found. Please check you configuration')
+
+    if (!sites || !sites.length)
+        throw new Error('No site config found. Please check you configuration')
 
     const site = sites.find((site) => site.id === currentSite || site.alias === currentSite)
     return site

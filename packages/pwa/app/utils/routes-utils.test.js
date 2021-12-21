@@ -7,19 +7,19 @@
 import React from 'react'
 
 import {configureRoutes} from './routes-utils'
-import {getUrlConfig} from './utils'
+import {getConfig} from './utils'
 
 jest.mock('./utils', () => {
     const original = jest.requireActual('./utils')
     return {
         ...original,
-        getUrlConfig: jest.fn()
+        getConfig: jest.fn()
     }
 })
 
 describe('configureRoutes', function() {
     test('should only configured the routes with :locale as part of the path', () => {
-        getUrlConfig.mockImplementation(() => ({
+        getConfig.mockImplementation(() => ({
             locale: 'path'
         }))
         const CompA = () => <div>This is component A</div>
