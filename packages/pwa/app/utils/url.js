@@ -22,11 +22,7 @@ import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
  * @returns {string|*}
  */
 export const pathToUrl = (path) => {
-    const url =
-        typeof window === 'undefined'
-            ? `${getAppOrigin()}${path}`
-            : `${window.location.origin}${path ? path : window.location.pathname}`
-    return url
+    return `${getAppOrigin()}${path}`
 }
 
 /**

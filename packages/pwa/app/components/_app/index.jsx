@@ -274,7 +274,8 @@ App.shouldGetProps = () => {
 }
 
 App.getProps = async ({api, res}) => {
-    const l10nConfig = resolveSiteFromUrl(pathToUrl(res.locals.originalUrl))?.l10n
+    const site = resolveSiteFromUrl(pathToUrl(res.locals.originalUrl))
+    const l10nConfig = site?.l10n
     const localeConfig = await getLocaleConfig({
         getUserPreferredLocales: () => {
             // CONFIG: This function should return an array of preferred locales. They can be

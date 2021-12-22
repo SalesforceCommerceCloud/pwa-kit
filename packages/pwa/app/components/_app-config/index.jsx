@@ -37,10 +37,14 @@ const apiConfig = {
  * @returns {String} the locale short code
  */
 const getLocale = (locals = {}) => {
-    let {originalUrl} = locals
+    const path =
+        typeof window === 'undefined'
+            ? locals.originalUrl
+            : `${window.location.pathname}${window.location.search}`
     let shortCode
-    const {locale} = getParamsFromPath(originalUrl)
-    const l10n = resolveSiteFromUrl(pathToUrl(originalUrl))?.l10n
+    const {locale} = getParamsFromPath(path)
+    const site = resolveSiteFromUrl(pathToUrl(path))
+    const l10n = site?.l10n
 
     // Ensure that the locale is in the supported list, otherwise return the default.
     shortCode = getSupportedLocalesIds(l10n.supportedLocales).includes(locale)
@@ -75,9 +79,11 @@ const AppConfig = ({children, locals = {}}) => {
 }
 
 AppConfig.restore = (locals = {}) => {
-    // Parse the locale from the page url.
-    const originalUrl = locals.originalUrl
-    const url = pathToUrl(originalUrl)
+    const path =
+        typeof window === 'undefined'
+            ? locals.originalUrl
+            : `${window.location.pathname}${window.location.search}`
+    const url = pathToUrl(path)
     const site = resolveSiteFromUrl(url)
 
     if (site) {
