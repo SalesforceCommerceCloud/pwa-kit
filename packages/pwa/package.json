@@ -154,7 +154,7 @@
         "build-translations": "npm run extract-default-translations && npm run compile-translations",
         "compile-translations": "formatjs compile-folder --ast app/translations app/translations/compiled",
         "compile-translations:pseudo": "formatjs compile --ast app/translations/$npm_package_l10n_defaultLocale.json --out-file app/translations/compiled/en-XB.json --pseudo-locale en-XB",
-        "extract-default-translations": "formatjs extract 'app/**/*.{js,jsx}' --out-file app/translations/$npm_package_l10n_defaultLocale.json --id-interpolation-pattern [sha512:contenthash:base64:6]",
+        "extract-default-translations": "node ./scripts/messages --extract-messages",
         "format": "prettier --write \"**/*.{js,jsx}\"",
         "lint": "eslint \"**/*.{js,jsx}\"",
         "lint:fix": "npm run lint -- --fix",
@@ -185,37 +185,5 @@
         "iOS >= 9.0",
         "Android >= 4.4.4",
         "last 4 ChromeAndroid versions"
-    ],
-    "l10n": {
-        "supportedCurrencies": [
-            "GBP",
-            "EUR",
-            "CNY",
-            "JPY"
-        ],
-        "defaultCurrency": "GBP",
-        "supportedLocales": [
-            {
-                "id": "en-GB",
-                "preferredCurrency": "GBP"
-            },
-            {
-                "id": "fr-FR",
-                "preferredCurrency": "EUR"
-            },
-            {
-                "id": "it-IT",
-                "preferredCurrency": "EUR"
-            },
-            {
-                "id": "zh-CN",
-                "preferredCurrency": "CNY"
-            },
-            {
-                "id": "ja-JP",
-                "preferredCurrency": "JPY"
-            }
-        ],
-        "defaultLocale": "en-GB"
-    }
+    ]
 }
