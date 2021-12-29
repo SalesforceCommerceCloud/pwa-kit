@@ -10,6 +10,7 @@
 
 import path from 'path'
 import {createApp, createHandler, serveStaticFile} from 'pwa-kit-react-sdk/ssr/server/express'
+import {isRemote} from 'pwa-kit-react-sdk/utils/ssr-server'
 import {render} from 'pwa-kit-react-sdk/ssr/server/react-rendering'
 import helmet from 'helmet'
 
@@ -42,13 +43,17 @@ const app = createApp({
 })
 
 // Set HTTP security headers
-app.use(helmet())
 app.use(
-    helmet.contentSecurityPolicy({
-        useDefaults: true,
-        directives: {
-            'img-src': ["'self'", '*.commercecloud.salesforce.com', 'data:'],
-            'script-src': ["'self'", "'unsafe-eval'"]
+    helmet({
+        contentSecurityPolicy: {
+            useDefaults: true,
+            directives: {
+                'img-src': ["'self'", '*.commercecloud.salesforce.com', 'data:'],
+                'script-src': ["'self'", "'unsafe-eval'"],
+
+                // Do not upgrade insecure requests for local development
+                'upgrade-insecure-requests': isRemote() ? [] : null
+            }
         }
     })
 )
