@@ -37,6 +37,13 @@ const prepare = (opts) => {
     }))
 }
 
+// add more action for messages when things arises
+const getAction = (opts) => {
+    if (opts.extractMessages) {
+        return extractMessages
+    }
+}
+
 const extractMessages = async ({formatjs, defaultLocales}) => {
     const resultPromises = defaultLocales.map(async (locale) => {
         const [process, , stderr] = await spawnPromise(formatjs, [
@@ -71,7 +78,8 @@ const extractMessages = async ({formatjs, defaultLocales}) => {
 const main = async (opts) => {
     try {
         const preparedOpts = await prepare(opts)
-        await extractMessages(preparedOpts)
+        const action = getAction(opts)
+        await action(preparedOpts)
     } catch (err) {
         console.error('err', err)
     }
