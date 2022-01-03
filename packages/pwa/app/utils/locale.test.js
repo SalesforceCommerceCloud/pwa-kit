@@ -134,7 +134,6 @@ describe('getLocaleConfig', () => {
 
     test('without parameter', async () => {
         const config = await getLocaleConfig({l10nConfig})
-        console.log('config', config)
         const expectedResult = `en-GB`
         expect(config.app.targetLocale).toBe(expectedResult)
     })
