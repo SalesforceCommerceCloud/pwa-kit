@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-const Promise = require('bluebird')
+// const Promise = require('bluebird')
 const program = require('commander')
 const childProc = require('child_process')
 const path = require('path')
@@ -36,52 +36,45 @@ const prepare = (opts) => {
         opts
     }))
 }
-const extractMessages = ({formatjs, defaultLocales}) => {
-    return Promise.resolve()
-        .then(() => {
-            return Promise.map(defaultLocales, (locale) =>
-                spawnPromise(formatjs, [
-                    'extract',
-                    'app/**/*.{js,jsx}',
-                    '--out-file',
-                    `app/translations/${locale}.json`,
-                    '--id-interpolation-pattern',
-                    '[sha512:contenthash:base64:6]'
-                ]).then((result) => {
-                    const [process, , stderr] = result
-                    if (result.stderr) {
-                        console.error(stderr)
-                    }
-                    return {
-                        exitCode: process.exitCode,
-                        stderr: process.stderr
-                    }
-                })
-            )
+
+const extractMessages = async ({formatjs, defaultLocales}) => {
+    const resultPromises = defaultLocales.map(async (locale) => {
+        const [process, , stderr] = await spawnPromise(formatjs, [
+            'extract',
+            'app/**/*.{js,jsx}',
+            '--out-file',
+            `app/translations/${locale}.json`,
+            '--id-interpolation-pattern',
+            '[sha512:contenthash:base64:6]'
+        ])
+        if (stderr) {
+            console.error(stderr)
+        }
+
+        return {
+            exitCode: process.exitCode,
+            stderr
+        }
+    })
+    const results = []
+    for (const spawnPromise of resultPromises) {
+        const result = await spawnPromise
+        results.push({
+            exitCode: result.exitCode,
+            stderr: result.stderr
         })
-        .then((results) => {
-            const fail = results.some((result) => result.exitCode !== 0)
-            return fail ? 1 : 0
-        })
+    }
+
+    return results
 }
 
-const main = (opts) => {
-    let exitCode = 0
-    let args
-    return Promise.resolve()
-        .then(() => prepare(opts))
-        .then((_args) => {
-            args = _args
-        })
-        .then(() => extractMessages(args))
-        .then((_exitCode) => {
-            exitCode = _exitCode
-        })
-        .catch((err) => {
-            exitCode = 1
-            console.error(err)
-        })
-        .then(() => process.exit(exitCode))
+const main = async (opts) => {
+    try {
+        const preparedOpts = await prepare(opts)
+        await extractMessages(preparedOpts)
+    } catch (err) {
+        console.error('err', err)
+    }
 }
 
 program.description(`extract and compile default messages into the default locale`)
