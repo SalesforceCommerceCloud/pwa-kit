@@ -28,7 +28,7 @@ if (!fs.existsSync(path.join('node_modules', 'semver'))) {
         '--no-save',
         '--no-package-lock',
         '--ignore-scripts',
-        '--no-audit'
+        '--no-audit',
     ])
 }
 
@@ -36,9 +36,7 @@ const semver = require('semver')
 const requiredNode = new semver.Range(pkg.engines.node)
 const foundNode = process.version
 const requiredNpm = new semver.Range(pkg.engines.npm)
-const foundNpm = spawnSync(npm, ['-v'])
-    .stdout.toString()
-    .trim()
+const foundNpm = spawnSync(npm, ['-v']).stdout.toString().trim()
 
 const warnings = []
 
@@ -56,7 +54,7 @@ const blue = (s) => `\x1b[36m${s}\u001b[0m`
 if (warnings.length) {
     const rl = readline.createInterface({
         input: process.stdin,
-        output: process.stdout
+        output: process.stdout,
     })
     console.log(red('Pausing installation...'))
     console.log(

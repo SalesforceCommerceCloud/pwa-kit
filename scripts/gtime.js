@@ -13,7 +13,7 @@ const main = () => {
     const format = '{"max_memory_kb": "%M", "max_cpu_percent": "%P", "wall_time_seconds": "%e"}'
 
     const {status, stderr} = childProc.spawnSync('/usr/bin/time', ['-f', format, cmd, ...args], {
-        stdio: ['inherit', 'inherit', 'pipe']
+        stdio: ['inherit', 'inherit', 'pipe'],
     })
 
     const err = stderr.toString().trim()
@@ -26,15 +26,8 @@ const main = () => {
     Object.keys(data).forEach((k) => {
         const metric = `mobify_platform_sdks.${metricName}_${k}`
         const value = parseFloat(data[k])
-        childProc.spawnSync('dog', [
-            'metric',
-            'post',
-            metric,
-            value
-        ])
-        console.log(
-            `dog metric post ${metric} ${value}`
-        )
+        childProc.spawnSync('dog', ['metric', 'post', metric, value])
+        console.log(`dog metric post ${metric} ${value}`)
     })
     process.exit(status)
 }

@@ -9,9 +9,10 @@ sh.set('-e')
 
 const defaultDir = process.cwd()
 
-program.description([
-    `Smoke-tests uncommonly-run NPM scripts that get shipped with Mobify projects `,
-    `by simply checking that those scripts exit without errors.`
+program.description(
+    [
+        `Smoke-tests uncommonly-run NPM scripts that get shipped with Mobify projects `,
+        `by simply checking that those scripts exit without errors.`,
     ].join('\n')
 )
 program.option('--dir <dir>', `Path to a Mobify project`, defaultDir)
@@ -33,10 +34,12 @@ const main = (opts) => {
         /^prod:build$/,
         /^start.*$/,
         /^compile-translations.*$/,
-        /^extract-default-translations.*$/
+        /^extract-default-translations.*$/,
     ]
 
-    const scripts = Object.keys(pkg.scripts).filter((script) => !exclude.some((re) => script.match(re)))
+    const scripts = Object.keys(pkg.scripts).filter(
+        (script) => !exclude.some((re) => script.match(re))
+    )
 
     scripts.forEach((script) => {
         const cmd = `npm run ${script}`

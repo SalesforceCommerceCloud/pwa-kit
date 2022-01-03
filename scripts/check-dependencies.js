@@ -31,8 +31,8 @@ const semver = require('semver')
 
 program.description(
     `Check that all packages are using the same versions of crucial libraries (eg.` +
-    `compilers, linters etc) and their config files\n` +
-    `Exits with a non-zero status if there is a problem with package dependencies.`
+        `compilers, linters etc) and their config files\n` +
+        `Exits with a non-zero status if there is a problem with package dependencies.`
 )
 
 program.option('--fix', 'try to fix errors by copying the right dependencies and configs packages')
@@ -46,16 +46,12 @@ const assetsDir = path.join(__dirname, 'assets')
 const excludedPackages = [
     // The 'hello-world' app is explicitly designed to show what
     // you can do without our whole toolchain!
-    'hello-world'
+    'hello-world',
 ]
 
 // We are going to copy these files into each package from this script, in order to
 // standardize them.
-const commonConfigs = [
-    'babel.config.js',
-    '.eslintrc.js',
-    '.prettierrc.yaml'
-]
+const commonConfigs = ['babel.config.js', '.eslintrc.js', '.prettierrc.yaml']
 
 // We are going to copy these devDependencies into each package from this script,
 // in order to standardize them.
@@ -99,13 +95,12 @@ const commonDevDeps = {
     prettier: '1.18.2',
     'regenerator-runtime': '^0.11.1',
     semver: '^7.3.2',
-    shelljs: '^0.8.4'
+    shelljs: '^0.8.4',
 }
 
 const readJSON = (path) => JSON.parse(fs.readFileSync(path))
 
 const writeJSON = (path, content) => fs.writeFileSync(path, JSON.stringify(content, null, 2))
-
 
 const listPackages = () => {
     return fs
@@ -125,7 +120,7 @@ const fix = () => {
         const pkg = readJSON(pkgFile)
         const all = {
             ...(pkg.devDependencies || {}),
-            ...commonDevDeps
+            ...commonDevDeps,
         }
         const final = {}
         Object.keys(all)
@@ -135,10 +130,9 @@ const fix = () => {
             })
         pkg.devDependencies = final
         writeJSON(pkgFile, pkg)
-        commonConfigs.forEach((name) => fs.copyFileSync(
-            path.join(assetsDir, name),
-            path.join(pkgDir, name)
-        ))
+        commonConfigs.forEach((name) =>
+            fs.copyFileSync(path.join(assetsDir, name), path.join(pkgDir, name))
+        )
     })
 }
 
@@ -157,15 +151,14 @@ const check = () => {
     // shared devDependencies - this is to prevent packages accidentally depending
     // on something not included in their own package.json. The only exception here
     // is lerna, that we never want installed in a package.
-    Object.entries(rootPkg.devDependencies)
-        .forEach(([name, version]) => {
-            if(name !== 'lerna' && commonDevDeps[name] !== version) {
-                errors.push(
-                    `The root package.json has "${name}@${version}" as a devDependency ` +
+    Object.entries(rootPkg.devDependencies).forEach(([name, version]) => {
+        if (name !== 'lerna' && commonDevDeps[name] !== version) {
+            errors.push(
+                `The root package.json has "${name}@${version}" as a devDependency ` +
                     `that is not an explictly allowed development package. See the check-dependencies script.`
-                )
-            }
-        })
+            )
+        }
+    })
 
     // Maps package-name -> the peerDependencies section for each monorepo-local
     // package, used for sense-checking dependencies later on.
@@ -179,15 +172,15 @@ const check = () => {
     listPackages().forEach((pkgDir) => {
         const pkgFile = path.join(pkgDir, 'package.json')
         const pkg = readJSON(pkgFile)
-        Object.entries(commonDevDeps)
-            .forEach(([name, requiredVersion]) => {
-                const foundVersion = pkg.devDependencies[name] || pkg.dependencies[name]
-                if (foundVersion && foundVersion !== requiredVersion) {
-                    errors.push(
-                        `Package "${pkg.name}" requires "${name}@${foundVersion}" but we've standardized on ` +
-                        `"${name}@${requiredVersion}" in the monorepo. To fix this, change the version in ${pkg.name} to match "${name}@${requiredVersion}."`)
-                }
-            })
+        Object.entries(commonDevDeps).forEach(([name, requiredVersion]) => {
+            const foundVersion = pkg.devDependencies[name] || pkg.dependencies[name]
+            if (foundVersion && foundVersion !== requiredVersion) {
+                errors.push(
+                    `Package "${pkg.name}" requires "${name}@${foundVersion}" but we've standardized on ` +
+                        `"${name}@${requiredVersion}" in the monorepo. To fix this, change the version in ${pkg.name} to match "${name}@${requiredVersion}."`
+                )
+            }
+        })
 
         commonConfigs.forEach((name) => {
             const src = path.join(assetsDir, name)
@@ -200,15 +193,18 @@ const check = () => {
         // If the current package, X, depends on a monorepo local package, Y, then
         // ensure that X installs all of Y's peerDependencies.
         Object.entries(peerDependenciesByPackage).forEach(([localPackageName, localPeerDeps]) => {
-            const dependsOnLocalPackage = !!(pkg.dependencies[localPackageName] || pkg.devDependencies[localPackageName])
+            const dependsOnLocalPackage = !!(
+                pkg.dependencies[localPackageName] || pkg.devDependencies[localPackageName]
+            )
             if (dependsOnLocalPackage) {
                 Object.entries(localPeerDeps).forEach(([requiredPackage, requiredRange]) => {
-                    const foundRange = pkg.dependencies[requiredPackage] || pkg.devDependencies[requiredPackage]
+                    const foundRange =
+                        pkg.dependencies[requiredPackage] || pkg.devDependencies[requiredPackage]
                     const satisfied = semver.subset(foundRange, requiredRange)
                     if (!satisfied) {
                         errors.push(
                             `Package "${pkg.name}" depends on package "${localPackageName}", but is missing one of` +
-                            ` its peerDependencies "${requiredPackage}@${requiredRange}"`
+                                ` its peerDependencies "${requiredPackage}@${requiredRange}"`
                         )
                     }
                 })
@@ -243,7 +239,7 @@ const check = () => {
         if (mistakenlySuppliedPeers.size > 0) {
             errors.push(
                 `Package "${pkg.name}" has peerDependencies that also appear in its own dependencies: ` +
-                `${Array.from(mistakenlySuppliedPeers).join(", ").toString()}`
+                    `${Array.from(mistakenlySuppliedPeers).join(', ').toString()}`
             )
         }
 
@@ -253,16 +249,22 @@ const check = () => {
         if (peersNotInstalledForDev.size > 0) {
             errors.push(
                 `Package "${pkg.name}" has peerDependencies that are not installed as devDependencies: ` +
-                `${Array.from(peersNotInstalledForDev).join(", ").toString()}`
+                    `${Array.from(peersNotInstalledForDev).join(', ').toString()}`
             )
         }
 
         // The current package must not have the same library listed in both
         // dependencies and devDependencies – this triggers warnings on NPM install.
-        const duplicates = intersection(dependencies, devDependencies);
+        const duplicates = intersection(dependencies, devDependencies)
         if (duplicates.size > 0) {
             errors.push(
-                `Package "${pkg.name}" has libraries that appear in both dependencies and devDependencies: "${Array.from(duplicates).join(", ").toString()}"`
+                `Package "${
+                    pkg.name
+                }" has libraries that appear in both dependencies and devDependencies: "${Array.from(
+                    duplicates
+                )
+                    .join(', ')
+                    .toString()}"`
             )
         }
     })
@@ -272,7 +274,6 @@ const check = () => {
         process.exit(1)
     }
 }
-
 
 const main = (opts) => {
     const action = opts.fix ? fix : check
