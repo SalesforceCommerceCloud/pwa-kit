@@ -153,7 +153,7 @@
         "analyze-build": "cross-env MOBIFY_ANALYZE=true npm run prod:build",
         "build-translations": "npm run extract-default-translations && npm run compile-translations",
         "compile-translations": "formatjs compile-folder --ast app/translations app/translations/compiled",
-        "compile-translations:pseudo": "formatjs compile --ast app/translations/$npm_package_l10n_defaultLocale.json --out-file app/translations/compiled/en-XB.json --pseudo-locale en-XB",
+        "compile-translations:pseudo": "node scripts/messages.js --compile-pseudo-messages",
         "extract-default-translations": "node ./scripts/messages --extract-messages",
         "format": "prettier --write \"**/*.{js,jsx}\"",
         "lint": "eslint \"**/*.{js,jsx}\"",
