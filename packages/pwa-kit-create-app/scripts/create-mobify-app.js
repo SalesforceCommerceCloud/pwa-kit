@@ -43,6 +43,8 @@ const deepmerge = require('deepmerge')
 const sh = require('shelljs')
 const tar = require('tar')
 const generatorPkg = require('../package.json')
+const APIConfigTemplate = require(`../assets/pwa/api.config`).template
+const PwaKitConfigTemplate = require(`../assets/pwa/pwa-kit.config`).template
 
 sh.set('-e')
 
@@ -150,7 +152,6 @@ const runGenerator = (answers, {outputDir}) => {
         ]
     })
 
-    const APIConfigTemplate = require(`../assets/pwa/api.config`).template
     const commerceApi = {
         proxyPath: answers['scaffold-pwa'].mobify.ssrParameters.proxyConfigs[0].path,
         clientId: answers['commerce-api'].clientId,
@@ -167,6 +168,7 @@ const runGenerator = (answers, {outputDir}) => {
     new sh.ShellString(APIConfigTemplate({commerceApi, einsteinApi})).to(
         p.resolve(outputDir, 'app', 'api.config.js')
     )
+    new sh.ShellString(PwaKitConfigTemplate()).to(p.resolve(outputDir, 'pwa-kit.config.json'))
 
     console.log('Installing dependencies for the generated project (this can take a while)')
     sh.exec(`npm install --no-progress`, {
