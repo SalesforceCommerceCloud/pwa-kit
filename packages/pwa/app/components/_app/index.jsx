@@ -73,7 +73,8 @@ const App = (props) => {
 
     const {l10n} = site
     // Get the current currency to be used through out the app
-    const currency = getPreferredCurrency(targetLocale, l10n.supportedLocales) || l10n.defaultLocale
+    const currency =
+        getPreferredCurrency(targetLocale, l10n.supportedLocales) || l10n.defaultCurrency
 
     // Set up customer and basket
     useShopper({currency})
