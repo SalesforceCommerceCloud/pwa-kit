@@ -1,11 +1,10 @@
 {
     "app": {
-        "defaultSiteId": "RefArchGlobal",
+        "defaultSiteId": "RefArch",
         "url": {
             "locale": "path",
             "site": "path"
         },
-        "localesToExtractMessages": ["en-GB", "en-US"],
         "sites": [
             {
                 "id": "RefArch",

@@ -23,8 +23,8 @@ import {commerceAPIConfig, einsteinAPIConfig} from '../api.config'
 import {IntlProvider} from 'react-intl'
 import {mockCategories as initialMockCategories} from '../commerce-api/mock-data'
 
-export const DEFAULT_LOCALE = 'en-GB'
-export const DEFAULT_CURRENCY = 'GBP'
+export const DEFAULT_LOCALE = 'en-US'
+export const DEFAULT_CURRENCY = 'USD'
 // Contexts
 import {CategoriesProvider, CurrencyProvider} from '../contexts'
 

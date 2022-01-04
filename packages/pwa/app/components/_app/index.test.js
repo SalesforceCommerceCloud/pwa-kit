@@ -11,8 +11,8 @@ import {Helmet} from 'react-helmet'
 import App from './index.jsx'
 import {renderWithProviders} from '../../utils/test-utils'
 import {getSupportedLocalesIds} from '../../utils/locale.js'
+import {DEFAULT_LOCALE} from '../../utils/test-utils'
 
-const DEFAULT_LOCALE = 'en-GB'
 let windowSpy
 
 beforeAll(() => {
