@@ -7,9 +7,8 @@
 
 /* eslint-disable no-unused-vars */
 import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
-import {HTTPError} from 'pwa-kit-react-sdk/ssr/universal/errors'
-import {createCodeVerifier, generateCodeChallenge} from './pkce'
-import {createGetTokenBody} from './utils'
+
+import {helpers} from 'commerce-sdk-isomorphic'
 
 /**
  * An object containing the customer's login credentials.
@@ -94,37 +93,6 @@ class Auth {
     }
 
     /**
-     * Called with the details from the redirect page that _loginWithCredentials returns
-     * I think it's best we leave it to developers on how and where to call from
-     * @param {{grantType, code, usid, codeVerifier, redirectUri}} requestDetails - The cutomerId of customer to get.
-     */
-    async getLoggedInToken(requestDetails) {
-        const data = new URLSearchParams()
-        const {grantType, code, usid, codeVerifier, redirectUri} = requestDetails
-        data.append('code', code)
-        data.append('grant_type', grantType)
-        data.append('usid', usid)
-        data.append('code_verifier', codeVerifier)
-        data.append('client_id', this._config.parameters.clientId)
-        data.append('redirect_uri', redirectUri)
-
-        const options = {
-            headers: {
-                'Content-Type': `application/x-www-form-urlencoded`
-            },
-            body: data
-        }
-
-        const response = await this._api.shopperLogin.getAccessToken(options)
-        // Check for error response before handling the token
-        if (response.status_code) {
-            throw new HTTPError(response.status_code, response.message)
-        }
-        this._handleShopperLoginTokenResponse(response)
-        return response
-    }
-
-    /**
      * Authorizes the customer as a registered or guest user.
      * @param {CustomerCredentials} [credentials]
      * @returns {Promise}
@@ -135,6 +103,8 @@ class Auth {
         if (this._pendingLogin) {
             return this._pendingLogin
         }
+
+        this._api.shopperLogin.clientConfig.throwOnBadResponse = true
 
         let retries = 0
         const startLoginFlow = () => {
@@ -170,14 +140,7 @@ class Auth {
      * @returns {(Promise<Customer>|undefined)}
      */
     async logout(shouldLoginAsGuest = true) {
-        const options = {
-            parameters: {
-                refresh_token: this.refreshToken,
-                client_id: this._config.parameters.clientId,
-                channel_id: this._config.parameters.siteId
-            }
-        }
-        await this._api.shopperLogin.logoutCustomer(options, true)
+        await helpers.logout(this._api.shopperLogin, {refreshToken: this._refreshToken})
         await this._clearAuth()
         if (shouldLoginAsGuest) {
             return this.login()
@@ -196,12 +159,8 @@ class Auth {
         this._saveRefreshToken(refresh_token)
         this._saveUsid(usid)
         // Non registered users recieve an empty string for the encoded user id value
-        if (enc_user_id.length > 0) {
+        if (enc_user_id?.length > 0) {
             this._saveEncUserId(enc_user_id)
-        }
-
-        if (this._onClient) {
-            sessionStorage.removeItem('codeVerifier')
         }
     }
 
@@ -211,44 +170,17 @@ class Auth {
      * @returns {object} - a skeleton registered customer object that can be used to retrieve a complete customer object
      */
     async _loginWithCredentials(credentials) {
-        const codeVerifier = createCodeVerifier()
-        const codeChallenge = await generateCodeChallenge(codeVerifier)
+        const response = await helpers.loginRegisteredUserB2C(this._api.shopperLogin, {
+            redirectURI: `${getAppOrigin()}${slasCallbackEndpoint}`,
+            shopperUserId: credentials.email,
+            shopperPassword: credentials.password
+        })
+        this._handleShopperLoginTokenResponse(response)
 
-        sessionStorage.setItem('codeVerifier', codeVerifier)
-
-        const authorization = `Basic ${btoa(`${credentials.email}:${credentials.password}`)}`
-        const options = {
-            headers: {
-                Authorization: authorization,
-                'Content-Type': `application/x-www-form-urlencoded`
-            },
-            parameters: {
-                redirect_uri: `${getAppOrigin()}${slasCallbackEndpoint}`,
-                client_id: this._config.parameters.clientId,
-                code_challenge: codeChallenge,
-                channel_id: this._config.parameters.siteId
-            }
-        }
-
-        const response = await this._api.shopperLogin.authenticateCustomer(options, true)
-        if (response.status >= 400) {
-            const json = await response.json()
-            throw new HTTPError(response.status, json.message)
-        }
-
-        const tokenBody = createGetTokenBody(
-            response.url,
-            `${getAppOrigin()}${slasCallbackEndpoint}`,
-            window.sessionStorage.getItem('codeVerifier')
-        )
-
-        const {customer_id} = await this.getLoggedInToken(tokenBody)
-        const customer = {
-            customerId: customer_id,
+        return {
+            customerId: response.customer_id,
             authType: 'registered'
         }
-
-        return customer
     }
 
     /**
@@ -256,72 +188,16 @@ class Auth {
      * @returns {object} - a guest customer object
      */
     async _loginAsGuest() {
-        const codeVerifier = createCodeVerifier()
-        const codeChallenge = await generateCodeChallenge(codeVerifier)
-
-        if (this._onClient) {
-            sessionStorage.setItem('codeVerifier', codeVerifier)
-        }
-
-        const options = {
-            headers: {
-                Authorization: '',
-                'Content-Type': `application/x-www-form-urlencoded`
-            },
-            parameters: {
-                redirect_uri: `${getAppOrigin()}${slasCallbackEndpoint}`,
-                client_id: this._config.parameters.clientId,
-                code_challenge: codeChallenge,
-                response_type: 'code',
-                hint: 'guest'
-            }
-        }
-
-        const response = await this._api.shopperLogin.authorizeCustomer(options, true)
-        if (response.status >= 400) {
-            let text = await response.text()
-            let errorMessage = text
-            try {
-                const data = JSON.parse(text)
-                if (data.message) {
-                    errorMessage = data.message
-                }
-            } catch {} // eslint-disable-line no-empty
-            throw new HTTPError(response.status, errorMessage)
-        }
-
-        const tokenBody = createGetTokenBody(
-            response.url,
-            `${getAppOrigin()}${slasCallbackEndpoint}`,
-            this._onClient ? window.sessionStorage.getItem('codeVerifier') : codeVerifier
-        )
-
-        const {customer_id} = await this.getLoggedInToken(tokenBody)
+        const response = await helpers.loginGuestUser(this._api.shopperLogin, {
+            redirectURI: `${getAppOrigin()}${slasCallbackEndpoint}`
+        })
+        this._handleShopperLoginTokenResponse(response)
 
         // A guest customerId will never return a customer from the customer endpoint
-        const customer = {
+        return {
             authType: 'guest',
-            customerId: customer_id
+            customerId: response.customer_id
         }
-
-        return customer
-    }
-
-    /**
-     * Creates a guest session
-     * @private
-     * @returns {*} - The response to be passed back to original caller.
-     */
-    async _createGuestSession() {
-        const loginType = 'guest'
-        const options = {
-            body: {
-                type: loginType
-            }
-        }
-
-        const rawResponse = await this._api.shopperCustomers.authorizeCustomer(options, true)
-        return rawResponse
     }
 
     /**
@@ -330,35 +206,20 @@ class Auth {
      * @returns {<Promise>} - Handle Shopper Login Promise
      */
     async _refreshAccessToken() {
-        const data = new URLSearchParams()
-        data.append('grant_type', 'refresh_token')
-        data.append('refresh_token', this._refreshToken)
-        data.append('client_id', this._config.parameters.clientId)
-
-        const options = {
-            headers: {
-                'Content-Type': `application/x-www-form-urlencoded`
-            },
-            body: data
-        }
-        const response = await this._api.shopperLogin.getAccessToken(options)
-        // Check for error response before handling the token
-        if (response.status_code) {
-            throw new HTTPError(response.status_code, response.message)
-        }
+        const response = await helpers.refreshToken(this._api.shopperLogin, {
+            refreshToken: this._refreshToken
+        })
         this._handleShopperLoginTokenResponse(response)
 
         const {id_token, enc_user_id, customer_id} = response
-        let customer = {
-            authType: 'guest',
+        const authType = id_token.length > 0 && enc_user_id.length > 0 ? 'registered' : 'guest'
+
+        return {
+            authType,
             customerId: customer_id
         }
-        // Determining if registered customer or guest
-        if (id_token.length > 0 && enc_user_id.length > 0) {
-            customer.authType = 'registered'
-        }
-        return customer
     }
+
     /**
      * Stores the given auth token.
      * @private

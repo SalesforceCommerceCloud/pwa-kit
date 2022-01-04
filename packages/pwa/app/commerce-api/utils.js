@@ -29,21 +29,6 @@ export function isTokenValid(token) {
     return false
 }
 
-// Returns fomrulated body for SopperLogin getToken endpoint
-export function createGetTokenBody(urlString, slasCallbackEndpoint, codeVerifier) {
-    const url = new URL(urlString)
-    const urlParams = new URLSearchParams(url.search)
-    const usid = urlParams.get('usid')
-    const code = urlParams.get('code')
-    return {
-        grantType: 'authorization_code_pkce',
-        code,
-        usid,
-        codeVerifier: codeVerifier,
-        redirectUri: slasCallbackEndpoint
-    }
-}
-
 // Ocapi related utilities
 
 const toCamel = (str) => {
