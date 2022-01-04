@@ -328,8 +328,8 @@ Learn more with our localization guide. https://sfdc.co/localization-guide
     const categories = flatten(rootCategory, 'categories')
 
     return {
-        targetLocale: localeConfig.app.targetLocale,
-        defaultLocale: localeConfig.app.defaultLocale,
+        targetLocale: localeConfig.targetLocale,
+        defaultLocale: localeConfig.defaultLocale,
         messages: localeConfig.messages,
         categories: categories
     }

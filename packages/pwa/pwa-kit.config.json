@@ -5,6 +5,7 @@
             "locale": "path",
             "site": "path"
         },
+        "localeOfDefaultMessages": "en-GB",
         "sites": [
             {
                 "id": "RefArch",

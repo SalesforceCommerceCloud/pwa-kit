@@ -6,6 +6,7 @@
  */
 
 import PropTypes from 'prop-types'
+import {getConfig} from './utils'
 
 /**
  * @returns {string[]} short codes of all the app's supported locales
@@ -16,23 +17,23 @@ export const getSupportedLocalesIds = (supportedLocales = []) =>
 /**
  * Dynamically import the translations/messages for a given locale
  * @private
- * @param {string} locale - The locale code
- * @param {object} defaultLocale
- * @param {object} supportedLocales - supporte locales list
- * @returns {Promise<Object>} The messages (compiled in AST format) in the given locale. If locale is not found, returns the default locale's messages.
+ * @param {string} targetLocale
+ * @param {string} defaultLocale
+ * @param {string[]} supportedLocales
+ * @returns {Promise<Object>} The messages (compiled in AST format) in the given locale. If locale is not found, returns the default locale's messages. If the translation file is not found, return the default messages instead.
  */
-export const loadLocaleData = async (locale, defaultLocale, supportedLocales) => {
+export const loadLocaleData = async (targetLocale, defaultLocale, supportedLocales) => {
     // NOTE: the pseudo locale in this case is actually `en-XB` from react-intl. For more details:
     // - see our npm script `compile-translations:pseudo`
     // - and this react-intl PR: https://github.com/formatjs/formatjs/pull/2708
     const locales = [...supportedLocales, 'en-XB']
     let localeToLoad
 
-    if (locales.includes(locale)) {
-        localeToLoad = locale
+    if (locales.includes(targetLocale)) {
+        localeToLoad = targetLocale
     } else {
         console.warn(
-            `Not expecting to see locale '${locale}'. Loading the default locale '${defaultLocale}' instead.`
+            `Not expecting to see locale '${targetLocale}'. Loading the default locale '${defaultLocale}' instead.`
         )
         localeToLoad = defaultLocale
     }
@@ -42,8 +43,11 @@ export const loadLocaleData = async (locale, defaultLocale, supportedLocales) =>
         module = await import(`../translations/compiled/${localeToLoad}.json`)
     } catch (err) {
         console.error(err)
-        console.log(`Loading the default locale '${defaultLocale}' instead`)
-        module = await import(`../translations/compiled/${defaultLocale}.json`)
+        console.log(`Loading the default messages instead`)
+
+        // The compiled version of the default messages should exist already
+        const localeOfDefaultMessages = getConfig('app.localeOfDefaultMessages')
+        module = await import(`../translations/compiled/${localeOfDefaultMessages}.json`)
     }
 
     return module.default
@@ -56,14 +60,13 @@ export const loadLocaleData = async (locale, defaultLocale, supportedLocales) =>
  * @param {object} [options.l10nConfig] - l10n configuration object
  * @returns {Promise<Object>} The configuration data
  */
-
 export const getLocaleConfig = async ({getUserPreferredLocales, l10nConfig = {}} = {}) => {
     const defaultLocale = l10nConfig.defaultLocale
-    const preferredLocales = getUserPreferredLocales ? getUserPreferredLocales() : [defaultLocale]
+    const userPreferredLocales = getUserPreferredLocales ? getUserPreferredLocales() : []
 
     const supportedLocales = getSupportedLocalesIds(l10nConfig.supportedLocales)
 
-    const targetLocale = whichLocaleToLoad(preferredLocales, supportedLocales, defaultLocale)
+    const targetLocale = whichLocaleToLoad(userPreferredLocales, supportedLocales, defaultLocale)
 
     const messages = await loadLocaleData(
         typeof window === 'undefined'
@@ -76,14 +79,10 @@ export const getLocaleConfig = async ({getUserPreferredLocales, l10nConfig = {}}
     )
 
     return {
-        app: {
-            supportedLocales,
-            defaultLocale,
-            targetLocale
-        },
-        user: {
-            preferredLocales
-        },
+        supportedLocales,
+        defaultLocale,
+        targetLocale,
+        userPreferredLocales,
         messages
     }
 }
