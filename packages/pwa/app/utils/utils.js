@@ -181,7 +181,7 @@ export const isObject = (o) => o?.constructor === Object
 
 /**
  * Get an object property by a string path separated by dot
- *
+ * https://stackoverflow.com/questions/6491463/accessing-nested-javascript-objects-and-arrays-by-string-path
  * @param {object} obj - source object to get data from
  * @param {string} path - a string path separated each hierarchy by a dot
  *
@@ -196,7 +196,8 @@ export const isObject = (o) => o?.constructor === Object
  */
 export const getObjectProperty = (obj, path) => {
     if (!path) return obj
-    path = path.replace(/^\./, '') // remove any leading dot
+    // remove any leading dot
+    path = path.replace(/^\./, '')
     // convert indexes to properties. eg obj[0] => obj.0
     path = path.replace(/\[(\w+)\]/g, '.$1')
     const paths = path.split('.')
