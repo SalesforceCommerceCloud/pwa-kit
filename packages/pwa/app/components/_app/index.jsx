@@ -40,10 +40,10 @@ import {AddToCartModalProvider} from '../../hooks/use-add-to-cart-modal'
 import {IntlProvider} from 'react-intl'
 
 // Others
-import {watchOnlineStatus, flatten, getConfig} from '../../utils/utils'
+import {watchOnlineStatus, flatten} from '../../utils/utils'
 import {homeUrlBuilder, getUrlWithLocale, buildPathWithUrlConfig, pathToUrl} from '../../utils/url'
 import {getLocaleConfig, getPreferredCurrency, getSupportedLocalesIds} from '../../utils/locale'
-import {HOME_HREF} from '../../constants'
+import {DEFAULT_MESSAGES_LOCALE, HOME_HREF} from '../../constants'
 
 import Seo from '../seo'
 import useWishlist from '../../hooks/use-wishlist'
@@ -145,8 +145,6 @@ const App = (props) => {
         history.push(path)
     }
 
-    const localeOfDefaultMessages = getConfig('app.localeOfDefaultMessages')
-
     return (
         <Box className="sf-app" {...styles.container}>
             <IntlProvider
@@ -163,7 +161,7 @@ const App = (props) => {
                 messages={messages}
                 // For react-intl, the default locale means: which locale are the inline `defaultMessage`s written in?
                 // This locale will be the same for the entire lifecycle of the app.
-                defaultLocale={localeOfDefaultMessages}
+                defaultLocale={DEFAULT_MESSAGES_LOCALE}
             >
                 <CategoriesProvider categories={allCategories}>
                     <CurrencyProvider currency={currency}>

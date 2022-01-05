@@ -12,7 +12,6 @@ import {
     getPreferredCurrency,
     getSupportedLocalesIds
 } from './locale'
-import {getConfig} from './utils'
 
 // import {SUPPORTED_LOCALES, DEFAULT_LOCALE} from '../constants'
 
@@ -79,8 +78,6 @@ describe('whichLocaleToLoad', () => {
 })
 
 describe('loadLocaleData', () => {
-    const localeOfDefaultMessages = getConfig('app.localeOfDefaultMessages')
-
     test('default to English as the fallback locale', async () => {
         const messages = await loadLocaleData(
             nonSupportedLocale,

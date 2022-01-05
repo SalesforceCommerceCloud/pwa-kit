@@ -55,6 +55,9 @@ export const MAX_ORDER_QUANTITY = 10
 export const DEFAULT_LOCALE = packageInfo.l10n.defaultLocale
 export const DEFAULT_CURRENCY = packageInfo.l10n.defaultCurrency
 
+// This is the locale that the inline `defaultMessage`s are written for
+export const DEFAULT_MESSAGES_LOCALE = 'en-US'
+
 export const urlPartPositions = {
     PATH: 'path',
     QUERY_PARAM: 'query_param',
