@@ -43,11 +43,10 @@ export const loadLocaleData = async (targetLocale, defaultLocale, supportedLocal
         module = await import(`../translations/compiled/${localeToLoad}.json`)
     } catch (err) {
         console.error(err)
-        console.log(`Loading the default messages instead`)
-
-        // The compiled version of the default messages should exist already
-        const localeOfDefaultMessages = getConfig('app.localeOfDefaultMessages')
-        module = await import(`../translations/compiled/${localeOfDefaultMessages}.json`)
+        console.log(
+            'Loading empty messages, so that react-intl would fall back to the inline default messages'
+        )
+        return {}
     }
 
     return module.default
