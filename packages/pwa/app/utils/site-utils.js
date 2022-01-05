@@ -6,7 +6,6 @@
  */
 
 import {getConfig, getParamsFromPath} from './utils'
-import {JSONPath} from 'jsonpath-plus'
 
 /**
  * This functions takes an url and returns a site object,
@@ -59,7 +58,7 @@ export const getSiteByHostname = (hostname) => {
         throw new Error('No site config found. Please check you configuration')
     if (!hostname) return
 
-    const site = JSONPath(`$[?(@.hostnames && @.hostnames.includes('${hostname}'))]`, sites)
+    const site = sites.filter((site) => site.hostnames.includes(hostname))
 
     return site?.length === 1 ? site[0] : undefined
 }
@@ -85,4 +84,4 @@ export const getSiteByPath = (path) => {
  * Get the sites config from pwa-kit.config.json
  * @returns {array} - list of site objects
  */
-export const getSites = () => getConfig('app.sites.*')
+export const getSites = () => getConfig('app.sites')

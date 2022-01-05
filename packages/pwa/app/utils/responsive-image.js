@@ -6,6 +6,7 @@
  */
 
 import theme from '@chakra-ui/theme'
+import {isObject} from './utils'
 
 /**
  * @param {Object} breakpoints
@@ -130,8 +131,6 @@ const uniqueArray = (array) => [...new Set(array)]
 const withUnit = (widths) =>
     // By default, unitless value is interpreted as px
     widths.map((width) => (typeof width === 'number' ? `${width}px` : width))
-
-const isObject = (o) => o?.constructor === Object
 
 /**
  * @param {Object} widths
