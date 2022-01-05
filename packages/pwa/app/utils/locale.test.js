@@ -38,7 +38,7 @@ const l10nConfig = {
             preferredCurrency: 'JPY'
         }
     ],
-    defaultLocale: 'en-GB'
+    defaultLocale: 'en-US'
 }
 
 const supportedLocales = getSupportedLocalesIds(l10nConfig.supportedLocales)
