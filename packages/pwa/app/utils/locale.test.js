@@ -105,17 +105,15 @@ describe('loadLocaleData', () => {
             throw new Error()
         })
 
-        let importDefaultLocale = false
-        jest.mock(`../translations/compiled/${l10nConfig.defaultLocale}.json`, () => {
-            importDefaultLocale = true
-        })
-
-        await loadLocaleData(supportedLocale, l10nConfig.defaultLocale, supportedLocales)
-        expect(importDefaultLocale).toBe(true)
+        const result = await loadLocaleData(
+            supportedLocale,
+            l10nConfig.defaultLocale,
+            supportedLocales
+        )
+        expect(result).toStrictEqual({})
 
         // Reset
         jest.unmock(`../translations/compiled/${supportedLocale}.json`)
-        jest.unmock(`../translations/compiled/${l10nConfig.defaultLocale}.json`)
     })
 })
 
@@ -135,7 +133,7 @@ describe('getLocaleConfig', () => {
     test('without parameter', async () => {
         const config = await getLocaleConfig({l10nConfig})
         const expectedResult = `en-GB`
-        expect(config.app.targetLocale).toBe(expectedResult)
+        expect(config.targetLocale).toBe(expectedResult)
     })
     test('with getUserPreferredLocales parameter', async () => {
         const locale = supportedLocale
@@ -145,7 +143,7 @@ describe('getLocaleConfig', () => {
             getUserPreferredLocales: () => [locale],
             l10nConfig
         })
-        expect(config.app.targetLocale).toBe(locale)
+        expect(config.targetLocale).toBe(locale)
     })
     test('with pseudo locale', async () => {
         process.env.USE_PSEUDOLOCALE = 'true'
@@ -155,7 +153,7 @@ describe('getLocaleConfig', () => {
         const config = await getLocaleConfig({l10nConfig})
 
         // The app should still think its target locale is the default one
-        expect(config.app.targetLocale).toBe(l10nConfig.defaultLocale)
+        expect(config.targetLocale).toBe(l10nConfig.defaultLocale)
         // But the actual translation should be using the pseudo locale
         expect(config.messages[testId1][0].value).toMatch(/^\[!! Ṕŕíííṿâćććẏ ṔṔṔŏĺíííćẏ !!]$/)
     })
