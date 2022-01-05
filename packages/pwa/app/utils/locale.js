@@ -6,7 +6,6 @@
  */
 
 import PropTypes from 'prop-types'
-import {getConfig} from './utils'
 
 /**
  * @returns {string[]} short codes of all the app's supported locales
