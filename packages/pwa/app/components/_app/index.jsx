@@ -43,7 +43,7 @@ import {IntlProvider} from 'react-intl'
 import {watchOnlineStatus, flatten} from '../../utils/utils'
 import {homeUrlBuilder, getUrlWithLocale, buildPathWithUrlConfig, pathToUrl} from '../../utils/url'
 import {getLocaleConfig, getPreferredCurrency, getSupportedLocalesIds} from '../../utils/locale'
-import {DEFAULT_MESSAGES_LOCALE, HOME_HREF} from '../../constants'
+import {HOME_HREF} from '../../constants'
 
 import Seo from '../seo'
 import useWishlist from '../../hooks/use-wishlist'
@@ -159,9 +159,11 @@ const App = (props) => {
                 }}
                 locale={targetLocale}
                 messages={messages}
-                // For react-intl, the default locale means: which locale are the inline `defaultMessage`s written in?
-                // This locale will be the same for the entire lifecycle of the app.
-                defaultLocale={DEFAULT_MESSAGES_LOCALE}
+                // For react-intl, the _default locale_ refers to the locale that the inline `defaultMessage`s are written for.
+                // NOTE: if you update this value, please also update the following npm scripts in `pwa/package.json`:
+                // - "extract-default-translations"
+                // - "compile-translations:pseudo"
+                defaultLocale="en-US"
             >
                 <CategoriesProvider categories={allCategories}>
                     <CurrencyProvider currency={currency}>
