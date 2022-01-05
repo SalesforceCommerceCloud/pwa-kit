@@ -60,17 +60,22 @@ const Home = ({productSearchResult, isLoading}) => {
             />
 
             <Section>
+                <h3>These buttons are for demo purposes, it will NOT get merged into develop</h3>
                 <Button
+                    mt={4}
                     mr={4}
                     onClick={() => {
                         window.location =
-                            urlConfig['site'] === urlPartPositions.PATH ? '/us' : '/?site=us'
+                            urlConfig['site'] === urlPartPositions.PATH
+                                ? '/global'
+                                : '/?site=global'
                     }}
                 >
-                    to US Site
+                    to Global Site
                 </Button>
 
                 <Button
+                    mt={4}
                     onClick={() => {
                         window.location = '/'
                     }}
