@@ -44,7 +44,7 @@ const sh = require('shelljs')
 const tar = require('tar')
 const generatorPkg = require('../package.json')
 const APIConfigTemplate = require(`../assets/pwa/api.config`).template
-const PwaKitConfigTemplate = require(`../assets/pwa/pwa-kit.config`).template
+const PwaKitDefaultConfig = require(`../assets/pwa/pwa-kit.config`)
 
 sh.set('-e')
 
@@ -168,7 +168,9 @@ const runGenerator = (answers, {outputDir}) => {
     new sh.ShellString(APIConfigTemplate({commerceApi, einsteinApi})).to(
         p.resolve(outputDir, 'app', 'api.config.js')
     )
-    new sh.ShellString(PwaKitConfigTemplate()).to(p.resolve(outputDir, 'pwa-kit.config.json'))
+    new sh.ShellString(JSON.stringify(PwaKitDefaultConfig)).to(
+        p.resolve(outputDir, 'pwa-kit.config.json')
+    )
 
     console.log('Installing dependencies for the generated project (this can take a while)')
     sh.exec(`npm install --no-progress`, {
