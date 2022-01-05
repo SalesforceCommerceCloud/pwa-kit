@@ -16,12 +16,12 @@ import {
 // import {SUPPORTED_LOCALES, DEFAULT_LOCALE} from '../constants'
 
 const l10nConfig = {
-    supportedCurrencies: ['GBP', 'EUR', 'CNY', 'JPY'],
-    defaultCurrency: 'GBP',
+    supportedCurrencies: ['USD', 'EUR', 'CNY', 'JPY'],
+    defaultCurrency: 'USD',
     supportedLocales: [
         {
-            id: 'en-GB',
-            preferredCurrency: 'GBP'
+            id: 'en-US',
+            preferredCurrency: 'USD'
         },
         {
             id: 'fr-FR',
