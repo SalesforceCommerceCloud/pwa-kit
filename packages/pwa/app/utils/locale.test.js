@@ -52,7 +52,7 @@ const testId2 = 'homepage.message.welcome'
 
 test('our assumptions before further testing', () => {
     expect(supportedLocales.includes(nonSupportedLocale)).toBe(false)
-    expect(l10nConfig.defaultLocale).toBe('en-GB')
+    expect(l10nConfig.defaultLocale).toBe('en-US')
     expect().not.toBe(l10nConfig.defaultLocale)
 })
 
@@ -130,7 +130,7 @@ describe('getLocaleConfig', () => {
 
     test('without parameter', async () => {
         const config = await getLocaleConfig({l10nConfig})
-        const expectedResult = `en-GB`
+        const expectedResult = `en-US`
         expect(config.targetLocale).toBe(expectedResult)
     })
     test('with getUserPreferredLocales parameter', async () => {
