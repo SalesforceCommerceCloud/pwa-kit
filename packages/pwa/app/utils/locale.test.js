@@ -13,8 +13,6 @@ import {
     getSupportedLocalesIds
 } from './locale'
 
-// import {SUPPORTED_LOCALES, DEFAULT_LOCALE} from '../constants'
-
 const l10nConfig = {
     supportedCurrencies: ['USD', 'EUR', 'CNY', 'JPY'],
     defaultCurrency: 'USD',
