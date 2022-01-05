@@ -58,7 +58,7 @@ export const getSiteByHostname = (hostname) => {
         throw new Error('No site config found. Please check you configuration')
     if (!hostname) return
 
-    const site = sites.filter((site) => site?.hostnames?.includes(hostname))
+    const site = sites.filter((site) => site.hostnames && site.hostnames.includes(hostname))
 
     return site?.length === 1 ? site[0] : undefined
 }
