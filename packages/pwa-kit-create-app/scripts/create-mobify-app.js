@@ -168,7 +168,7 @@ const runGenerator = (answers, {outputDir}) => {
     new sh.ShellString(APIConfigTemplate({commerceApi, einsteinApi})).to(
         p.resolve(outputDir, 'app', 'api.config.js')
     )
-    new sh.ShellString(JSON.stringify(PwaKitDefaultConfig)).to(
+    new sh.ShellString(JSON.stringify(PwaKitDefaultConfig, null, 4)).to(
         p.resolve(outputDir, 'pwa-kit.config.json')
     )
 
