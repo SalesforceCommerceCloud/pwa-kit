@@ -73,7 +73,8 @@ const App = (props) => {
 
     const {l10n} = site
     // Get the current currency to be used through out the app
-    const currency = getPreferredCurrency(targetLocale, l10n.supportedLocales) || l10n.defaultLocale
+    const currency =
+        getPreferredCurrency(targetLocale, l10n.supportedLocales) || l10n.defaultCurrency
 
     // Set up customer and basket
     useShopper({currency})
@@ -157,8 +158,12 @@ const App = (props) => {
                     throw err
                 }}
                 locale={targetLocale}
-                defaultLocale={defaultLocale}
                 messages={messages}
+                // For react-intl, the _default locale_ refers to the locale that the inline `defaultMessage`s are written for.
+                // NOTE: if you update this value, please also update the following npm scripts in `pwa/package.json`:
+                // - "extract-default-translations"
+                // - "compile-translations:pseudo"
+                defaultLocale="en-US"
             >
                 <CategoriesProvider categories={allCategories}>
                     <CurrencyProvider currency={currency}>
@@ -328,8 +333,8 @@ Learn more with our localization guide. https://sfdc.co/localization-guide
     const categories = flatten(rootCategory, 'categories')
 
     return {
-        targetLocale: localeConfig.app.targetLocale,
-        defaultLocale: localeConfig.app.defaultLocale,
+        targetLocale: localeConfig.targetLocale,
+        defaultLocale: localeConfig.defaultLocale,
         messages: localeConfig.messages,
         categories: categories
     }
