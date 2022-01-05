@@ -108,17 +108,15 @@ describe('loadLocaleData', () => {
             throw new Error()
         })
 
-        let importDefaultMessages = false
-        jest.mock(`../translations/compiled/${localeOfDefaultMessages}.json`, () => {
-            importDefaultMessages = true
-        })
-
-        await loadLocaleData(supportedLocale, l10nConfig.defaultLocale, supportedLocales)
-        expect(importDefaultMessages).toBe(true)
+        const result = await loadLocaleData(
+            supportedLocale,
+            l10nConfig.defaultLocale,
+            supportedLocales
+        )
+        expect(result).toStrictEqual({})
 
         // Reset
         jest.unmock(`../translations/compiled/${supportedLocale}.json`)
-        jest.unmock(`../translations/compiled/${l10nConfig.defaultLocale}.json`)
     })
 })
 
