@@ -118,16 +118,20 @@ AppConfig.restore = (locals = {}) => {
     // Parse the locale from the page url.
     const locale = getLocale(locals) || DEFAULT_LOCALE
     const currency = getPreferredCurrency(locale) || DEFAULT_CURRENCY
-    const agent = getAgent
-
-    locals.api = new CommerceAPI({
+    const config = {
         ...apiConfig,
         locale,
-        currency,
-        fetchOptions: {
-            agent
+        currency
+    }
+
+    // Set server specific `fetchOptions` for connection reuse.
+    if (isServer) {
+        config.fetchOptions = {
+            agent: getAgent
         }
-    })
+    }
+
+    locals.api = new CommerceAPI(config)
 }
 
 AppConfig.freeze = () => undefined
