@@ -9,3 +9,4 @@ packages/*/out
 packages/*/docs/www
 lerna-debug.log
 .idea/
+verdaccio-storage

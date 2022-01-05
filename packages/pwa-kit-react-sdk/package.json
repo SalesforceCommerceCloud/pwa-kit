@@ -12,7 +12,6 @@
   "bin": {
     "sdk-create-hash-manifest": "bin/create-hash-manifest.js",
     "sdk-pwa-build": "bin/pwa-build.js",
-    "sdk-save-credentials": "bin/save-credentials.js",
     "sdk-upload": "bin/upload.js"
   },
   "files": [
