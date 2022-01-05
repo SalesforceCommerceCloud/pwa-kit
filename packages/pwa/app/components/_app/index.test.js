@@ -10,8 +10,8 @@ import {Helmet} from 'react-helmet'
 
 import App from './index.jsx'
 import {renderWithProviders} from '../../utils/test-utils'
-import {DEFAULT_LOCALE} from '../../constants'
 import {getSupportedLocalesIds} from '../../utils/locale.js'
+import {DEFAULT_LOCALE} from '../../utils/test-utils'
 
 let windowSpy
 

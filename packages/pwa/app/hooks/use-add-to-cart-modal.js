@@ -27,9 +27,9 @@ import useBasket from '../commerce-api/hooks/useBasket'
 import Link from '../components/link'
 import RecommendedProducts from '../components/recommended-products'
 import {LockIcon} from '../components/icons'
-import {DEFAULT_CURRENCY} from '../constants'
 import {useVariationAttributes} from './'
 import {findImageGroupBy} from '../utils/image-groups-utils'
+import useSite from './use-site'
 
 /**
  * This is the context for managing the AddToCartModal.
@@ -58,6 +58,8 @@ export const AddToCartModal = () => {
     const {product, quantity} = data || {}
     const intl = useIntl()
     const basket = useBasket()
+    const site = useSite()
+    const {l10n} = site
     const size = useBreakpointValue({base: 'full', lg: '2xl', xl: '4xl'})
     const variationAttributes = useVariationAttributes(product)
     if (!isOpen) {
@@ -139,7 +141,7 @@ export const AddToCartModal = () => {
                                         {!!lineItemPrice &&
                                             intl.formatNumber(lineItemPrice, {
                                                 style: 'currency',
-                                                currency: currency || DEFAULT_CURRENCY
+                                                currency: currency || l10n.defaultCurrency
                                             })}
                                     </Text>
                                 </Box>
@@ -165,7 +167,7 @@ export const AddToCartModal = () => {
                                     {productSubTotal &&
                                         intl.formatNumber(productSubTotal, {
                                             style: 'currency',
-                                            currency: currency || DEFAULT_CURRENCY
+                                            currency: currency || l10n.defaultCurrency
                                         })}
                                 </Text>
                             </Flex>

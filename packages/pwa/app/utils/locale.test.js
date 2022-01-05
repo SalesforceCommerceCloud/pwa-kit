@@ -13,15 +13,13 @@ import {
     getSupportedLocalesIds
 } from './locale'
 
-// import {SUPPORTED_LOCALES, DEFAULT_LOCALE} from '../constants'
-
 const l10nConfig = {
-    supportedCurrencies: ['GBP', 'EUR', 'CNY', 'JPY'],
-    defaultCurrency: 'GBP',
+    supportedCurrencies: ['USD', 'EUR', 'CNY', 'JPY'],
+    defaultCurrency: 'USD',
     supportedLocales: [
         {
-            id: 'en-GB',
-            preferredCurrency: 'GBP'
+            id: 'en-US',
+            preferredCurrency: 'USD'
         },
         {
             id: 'fr-FR',
@@ -40,7 +38,7 @@ const l10nConfig = {
             preferredCurrency: 'JPY'
         }
     ],
-    defaultLocale: 'en-GB'
+    defaultLocale: 'en-US'
 }
 
 const supportedLocales = getSupportedLocalesIds(l10nConfig.supportedLocales)
@@ -54,7 +52,7 @@ const testId2 = 'homepage.message.welcome'
 
 test('our assumptions before further testing', () => {
     expect(supportedLocales.includes(nonSupportedLocale)).toBe(false)
-    expect(l10nConfig.defaultLocale).toBe('en-GB')
+    expect(l10nConfig.defaultLocale).toBe('en-US')
     expect().not.toBe(l10nConfig.defaultLocale)
 })
 
@@ -132,7 +130,7 @@ describe('getLocaleConfig', () => {
 
     test('without parameter', async () => {
         const config = await getLocaleConfig({l10nConfig})
-        const expectedResult = `en-GB`
+        const expectedResult = `en-US`
         expect(config.targetLocale).toBe(expectedResult)
     })
     test('with getUserPreferredLocales parameter', async () => {
