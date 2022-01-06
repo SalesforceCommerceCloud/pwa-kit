@@ -24,7 +24,7 @@ test('uploadBundle fails with no options, no project slug, or empty project slug
             // Ignore
         }
         expect(Utils.fail).toBeCalledWith(
-            '[Error: You must provide a Managed Runtime project slug to upload a bundle.]'
+            '[Error: You must provide a Runtime Admin project slug to upload a bundle.]'
         )
     })
 })
