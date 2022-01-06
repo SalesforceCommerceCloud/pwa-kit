@@ -89,7 +89,7 @@ const ProductView = ({
         onClose: onAddToCartModalClose
     } = useAddToCartModalContext()
     const theme = useTheme()
-    const [optionsMessage, toggleOptionsMessage] = useState(false)
+    const [showOptionsMessage, toggleShowOptionsMessage] = useState(false)
     const {
         showLoading,
         showInventoryMessage,
@@ -115,7 +115,7 @@ const ProductView = ({
 
         const handleCartItem = async () => {
             if (!canOrder) {
-                toggleOptionsMessage(true)
+                toggleShowOptionsMessage(true)
                 return null
             }
             if (!addToCart && !updateCart) return null
@@ -194,9 +194,9 @@ const ProductView = ({
 
     useEffect(() => {
         if (canOrder) {
-            toggleOptionsMessage(false)
+            toggleShowOptionsMessage(false)
         }
-    })
+    },[variant?.productId])
 
     return (
         <Flex direction={'column'} data-testid="product-view">
@@ -360,7 +360,7 @@ const ProductView = ({
                             />
                         </VStack>
                         <Box>
-                            {!showLoading && optionsMessage && (
+                            {!showLoading && showOptionsMessage && (
                                 <Fade in={true}>
                                     <Text color="orange.600" fontWeight={600} marginBottom={8}>
                                         {intl.formatMessage({
