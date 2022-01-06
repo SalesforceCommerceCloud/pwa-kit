@@ -9,7 +9,7 @@ import {getUrlConfig} from './utils'
 import {urlPartPositions} from '../constants'
 
 /**
- * Configure the routes based on url configuration from pwa-kit.config.json file
+ * Configure the routes based on url configuration
  *
  * @param {array} routes - array of routes to be configured
  * @param {object} - a custom configured object
