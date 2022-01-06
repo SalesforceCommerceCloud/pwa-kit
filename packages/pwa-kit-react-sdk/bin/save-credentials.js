@@ -13,13 +13,13 @@ const argv = require('yargs')
     .option('u', {
         alias: 'user',
         demand: true,
-        describe: 'the e-mail address you used to register with Mobify Cloud',
+        describe: 'the e-mail address you used to register with Managed Runtime',
         type: 'string'
     })
     .option('k', {
         alias: 'key',
         demand: true,
-        describe: 'find your API key at https://cloud.mobify.com/account/',
+        describe: 'find your API key at https://runtime.commercecloud.com/account/settings',
         type: 'string'
     })
     .help('h')
@@ -34,7 +34,7 @@ const settingsPath = require('../scripts/utils').getSettingsPath()
 
 try {
     fs.writeFileSync(settingsPath, JSON.stringify({username: argv.u, api_key: argv.k}, null, 4))
-    console.log(`Saved Mobify Cloud credentials to "${settingsPath}".`)
+    console.log(`Saved Managed Runtime credentials to "${settingsPath}".`)
 } catch (e) {
     console.error('Failed to save credentials.')
     console.error(e)

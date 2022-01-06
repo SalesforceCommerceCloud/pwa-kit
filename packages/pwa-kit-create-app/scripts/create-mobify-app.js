@@ -7,7 +7,7 @@
  */
 
 /**
- * This is a generator for projects that run on the Managed Rutime.
+ * This is a generator for PWA Kit projects that run on the Managed Runtime.
  *
  * The output of this script is a copy of the pwa package with the following changes:
  *
