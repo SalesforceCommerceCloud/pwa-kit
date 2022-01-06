@@ -29,6 +29,27 @@ Now that the development server is running, you can open a browser and preview y
 
 See the [Localization README.md](./app/translations/README.md) for important setup instructions for localization.
 
+## Url Customisation
+
+The Retail React App allows you to customize certain aspects of the url. Currently, you can choose where the current 
+locale is displayed, whether it is in the urls path, query parameters, or not displayed. 
+Below are the details of the possible configuration values.
+
+-   `path`: the locale will be a part of url path. e.g /en-US/women/dress
+-   `query_param`: the locale will be a url query param. e.g /women/dress?locale=en-US
+-   `none`: the locale won't be showing in the url at all. e.g /women/dress
+
+By default, we set up the locale to be an url path.
+
+```json
+// pwa-kit.config.json
+{
+    "url": {
+        "locale": "path|query_param|none"
+    }
+}
+```
+
 ## Documentation
 
 The full documentation for PWA Kit is hosted on the [Commerce Cloud Developer Center](https://developer.commercecloud.com/s/article/PWA-Kit).
