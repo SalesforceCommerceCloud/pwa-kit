@@ -63,3 +63,5 @@ export const urlPartPositions = {
     QUERY_PARAM: 'query_param',
     NONE: 'none'
 }
+
+export const DEFAULT_SITE_TITLE = 'Retail React App'
