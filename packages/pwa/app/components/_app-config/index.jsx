@@ -27,7 +27,7 @@ import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
 import http from 'http'
 import https from 'https'
 
-const KEEP_ALIVE_MS = 8000
+const KEEP_ALIVE_MS = 60 * 1000
 
 const HTTP_AGENT = isServer
     ? new http.Agent({
