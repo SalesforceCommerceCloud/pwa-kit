@@ -6,7 +6,7 @@
  */
 import * as utils from './utils'
 import EventEmitter from 'events'
-import {flatten, shallowEquals} from './utils'
+import {flatten, getObjectProperty, shallowEquals} from './utils'
 
 describe('requestIdleCallback should be a working shim', () => {
     test('without a working implementation built in', () => {
@@ -86,5 +86,75 @@ describe('shallow', function() {
         const b = {a: '123', b: '456'}
         const result = shallowEquals(a, b)
         expect(result).toBeFalsy()
+    })
+})
+
+describe('getObjectProperty', () => {
+    const data = {
+        a: 'item 1',
+        b: [
+            {
+                id: 'abc',
+                name: 'name 1',
+                children: ['child 1', 'child 2']
+            },
+            {
+                id: 'def',
+                name: 'name 2',
+                children: ['child 3', 'child 4']
+            }
+        ],
+        c: {
+            name: 'Name c',
+            child: {
+                id: '1'
+            }
+        }
+    }
+    test('should return source object when path is not defined', () => {
+        const result = getObjectProperty(data)
+        expect(result).toEqual(data)
+    })
+
+    test('should return a nested object', () => {
+        const result = getObjectProperty(data, 'c.child')
+        expect(result).toEqual({
+            id: '1'
+        })
+    })
+
+    test('should return b array', () => {
+        const result = getObjectProperty(data, 'b')
+        expect(result).toEqual([
+            {
+                id: 'abc',
+                name: 'name 1',
+                children: ['child 1', 'child 2']
+            },
+            {
+                id: 'def',
+                name: 'name 2',
+                children: ['child 3', 'child 4']
+            }
+        ])
+    })
+
+    test('should return first child of b array', () => {
+        const result = getObjectProperty(data, 'b[0]')
+        expect(result).toEqual({
+            id: 'abc',
+            name: 'name 1',
+            children: ['child 1', 'child 2']
+        })
+    })
+
+    test('should return output as a string', () => {
+        const result = getObjectProperty(data, 'b[0].name')
+        expect(result).toEqual('name 1')
+    })
+
+    test('should return undefined', () => {
+        const result = getObjectProperty(data, 'b[0].name.a')
+        expect(result).toEqual(undefined)
     })
 })

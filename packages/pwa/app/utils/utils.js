@@ -6,7 +6,6 @@
  */
 
 import pwaKitConfig from '../../pwa-kit.config.json'
-import {JSONPath} from 'jsonpath-plus'
 import {urlPartPositions} from '../constants'
 import {pathToUrl} from './url'
 
@@ -162,16 +161,56 @@ export const capitalize = (text) => {
 
 /**
  * Get the pwa configuration object from pwa-kit.config.json
- * @param path - path to your object inside pwaKitConfig using jsonPath expression
+ * @param path - path to your target item from pwaKitConfig
  *
- * To read more https://github.com/JSONPath-Plus/JSONPath
- *
- * @example getConfig('app.url') => {locale: 'path', site: 'path'}
- * @returns {object} - the configuration object
+ * @example
+ * getConfig('app.url') => {locale: 'path', site: 'path'}
+ * getConfig('app.sites[0]') => {
+                "id": "RefArch",
+                "alias": "us",
+                "hostnames": [],
+                "l10n": {...}
+            }
+ * @returns {object} - the targeted config value
  */
-export const getConfig = (path, opts) => {
-    if (!path) return pwaKitConfig
-    const result = JSONPath({path: `$.${path}`, json: pwaKitConfig, wrap: false, ...opts})
+export const getConfig = (path) => {
+    return getObjectProperty(pwaKitConfig, path)
+}
+
+export const isObject = (o) => o?.constructor === Object
+
+/**
+ * Get an object property by a string path separated by dot
+ * https://stackoverflow.com/questions/6491463/accessing-nested-javascript-objects-and-arrays-by-string-path
+ * @param {object} obj - source object to get data from
+ * @param {string} path - a string path separated each hierarchy by a dot
+ *
+ * @example
+ * const data = {a: 'string 1', b: [{name: 'name 1'}], c: {id: 'abc', child: {id: 1}}}
+ *
+ * getObjectProperty(data, 'a') // return 'string 1'
+ * getObjectProperty(data, 'c.child') // return [{name: 'name 1'}]
+ * getObjectProperty(data, 'b[0].name') // return 'name 1'
+ *
+ * @returns {array|object|string|undefined}
+ */
+export const getObjectProperty = (obj, path) => {
+    if (!path) return obj
+    // remove any leading dot
+    path = path.replace(/^\./, '')
+    // convert indexes to properties. eg obj[0] => obj.0
+    path = path.replace(/\[(\w+)\]/g, '.$1')
+    const paths = path.split('.')
+    if (!paths.length) return obj
+    let result = Object.assign({}, obj)
+    for (let i = 0; i < paths.length; i++) {
+        const prop = paths[i]
+        if ((isObject(result) || Array.isArray(result)) && prop in result) {
+            result = result[prop]
+        } else {
+            return
+        }
+    }
     return result
 }
 
