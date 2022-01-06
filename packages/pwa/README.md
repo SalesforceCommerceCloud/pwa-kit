@@ -31,8 +31,9 @@ See the [Localization README.md](./app/translations/README.md) for important set
 
 ## Url Customisation
 
-The Retail React App allows you to customise your locale for your app urls.
-It can be either set as `path` or `query_param` or `none`.
+The Retail React App allows you to customize certain aspects of the url. Currently, you can choose where the current 
+locale is displayed, whether it is in the urls path, query parameters, or not displayed. 
+Below are the details of the possible configuration values.
 
 -   `path`: the locale will be a part of url path. e.g /en-US/women/dress
 -   `query_param`: the locale will be a url query param. e.g /women/dress?locale=en-US
