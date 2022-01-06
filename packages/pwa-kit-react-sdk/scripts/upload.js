@@ -9,7 +9,7 @@ const Utils = require('./utils')
 const buildRequest = require('./build-request')
 
 const ARCHIVE = 'build.tar'
-const DEFAULT_ORIGIN = process.env.CLOUD_API_BASE || 'https://cloud.mobify.com/'
+const DEFAULT_ORIGIN = process.env.CLOUD_API_BASE || 'https://cloud.mobify.com'
 
 const OPTION_DEFAULTS = {
     buildDirectory: 'build',
