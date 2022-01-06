@@ -35,7 +35,7 @@ The Retail React App allows you to customise your locale for your app urls.
 It can be either set as `path` or `query_param` or `none`.
 
 -   `path`: the locale will be a part of url path. e.g /en-US/women/dress
--   `query_param`: the locale will be in url query param. e.g /women/dress?locale=en-US
+-   `query_param`: the locale will be a url query param. e.g /women/dress?locale=en-US
 -   `none`: the locale won't be showing in the url at all. e.g /women/dress
 
 By default, we set up the locale to be an url path.
