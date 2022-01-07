@@ -41,7 +41,8 @@ export const heroFeatures = [
             }
         }),
         icon: <BrandLogo width={12} height={8} />,
-        href: 'https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/pushing-and-deploying-bundles.html'
+        href:
+            'https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/pushing-and-deploying-bundles.html'
     },
     {
         message: defineMessages({
