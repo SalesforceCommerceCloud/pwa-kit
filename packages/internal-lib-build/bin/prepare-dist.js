@@ -99,14 +99,16 @@ const main = async () => {
             ignore: ['dist/scripts/**/*', 'dist/bin/**/*', 'dist/template/**/*'],
             files: ['dist/**/*.js'],
             from: /..\/package.json/,
-            to: 'package.json'
+            to: 'package.json',
         })
 
         // Update script to remove `dist` folder in imports.
         await replace({
             files: ['dist/scripts/**/!(prepare-dist.js)'],
             from: /dist\//,
-            to: ''
+            to: '',
+            // Scripts are optional, don't fail if nothing matches the glob.
+            allowEmptyPaths: true,
         })
     } catch (e) {
         catcher('Error replacing file references')(e)

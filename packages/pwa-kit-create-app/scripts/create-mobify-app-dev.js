@@ -41,59 +41,23 @@
  * devDependency won't actually be installed for the end-user!
  */
 
-const p = require('path')
 const sh = require('shelljs')
 const cp = require('child_process')
+const {withLocalNPMRepo} = require('internal-lib-build/verdaccio-server.js')
 
 sh.set('-e')
 
-/**
- * Run the provided function with a local NPM repository running in the background.
- */
-const withLocalNPMRepo = (func) => {
-    const monorepoRoot = p.resolve(__dirname, '..', '..', '..')
-
-    let child
-
-    const cleanup = () => {
+const runGenerator = (repoUrl) => {
+    try {
+        process.env['npm_config_registry'] = repoUrl
+        // Shelljs can't run interactive programs, so we have to switch to child_process.
+        // See https://github.com/shelljs/shelljs/wiki/FAQ#running-interactive-programs-with-exec
+        const cmd = 'npx'
+        const args = ['pwa-kit-create-app', ...process.argv.slice(2)]
+        cp.execFileSync(cmd, args, {stdio: 'inherit'})
+    } finally {
         delete process.env['npm_config_registry']
-        child && child.kill()
     }
-
-    return Promise.resolve()
-        .then(
-            () =>
-                new Promise((resolve) => {
-                    child = sh.exec(`npm run verdaccio-server`, {
-                        cwd: monorepoRoot,
-                        async: true,
-                        fatal: true,
-                        silent: true
-                    })
-
-                    child.stdout.on('data', (data) => {
-                        if (data.includes('Local NPM repository is ready')) {
-                            // Configure NPM to use the local repo, through env vars.
-                            process.env['npm_config_registry'] = 'http://localhost:4873/'
-                            resolve()
-                        }
-                    })
-                })
-        )
-        .then(() => func())
-        .then(() => cleanup())
-        .catch((err) => {
-            cleanup()
-            throw err
-        })
-}
-
-const runGenerator = () => {
-    // Shelljs can't run interactive programs, so we have to switch to child_process.
-    // See https://github.com/shelljs/shelljs/wiki/FAQ#running-interactive-programs-with-exec
-    const cmd = 'npx'
-    const args = ['pwa-kit-create-app', ...process.argv.slice(2)]
-    cp.execFileSync(cmd, args, {stdio: 'inherit'})
 }
 
 const main = () => {
