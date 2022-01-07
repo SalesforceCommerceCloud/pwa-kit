@@ -31,7 +31,7 @@ See the [Localization README.md](./app/translations/README.md) for important set
 
 ## URL Customization
 
-You can customize certain aspects of storefront URLs in the `pwa-kit-config.json` file.
+You can customize how storefront URLs are formatted in the `pwa-kit-config.json` file.
 
 ```json
 // pwa-kit.config.json
