@@ -6,8 +6,7 @@
   "bin": {
     "sdk-pwa-build": "bin/pwa-build.js",
     "sdk-upload": "bin/upload.js",
-    "sdk-save-credentials": "bin/save-credentials.js",
-    "sdk-create-hash-manifest": "bin/create-hash-manifest.js"
+    "sdk-save-credentials": "bin/save-credentials.js"
   },
   "engines": {
     "node": "^12.0.0 || ^14.0.0"
