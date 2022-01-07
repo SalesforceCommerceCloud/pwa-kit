@@ -1,3 +1,7 @@
+## v1.4.0-dev
+
+-   Add constants for `<meta>` tags `theme-color` and `apple-mobile-web-app-title` [#287](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/287)
+
 ## v1.3.0-dev (Nov 18, 2021)
 
 -   Set common HTTP security headers [#263](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/263)
