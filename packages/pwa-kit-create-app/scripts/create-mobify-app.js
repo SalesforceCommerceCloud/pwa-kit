@@ -363,7 +363,9 @@ const main = (opts) => {
         case TEST_PROJECT:
             return runGenerator(testProjectAnswers(), opts)
         case PROMPT:
-            console.log('See https://developer.salesforce.com/docs/commerce/commerce-api/guide/commerce-api-configuration-values.html for details on configuration values\n')
+            console.log(
+                'See https://developer.salesforce.com/docs/commerce/commerce-api/guide/commerce-api-configuration-values.html for details on configuration values\n'
+            )
             return prompts(opts).then((answers) => runGenerator(answers, opts))
         default:
             console.error(
