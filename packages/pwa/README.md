@@ -29,17 +29,9 @@ Now that the development server is running, you can open a browser and preview y
 
 See the [Localization README.md](./app/translations/README.md) for important setup instructions for localization.
 
-## Url Customisation
+## URL Customization
 
-The Retail React App allows you to customize certain aspects of the url. Currently, you can choose where the current 
-locale is displayed, whether it is in the urls path, query parameters, or not displayed. 
-Below are the details of the possible configuration values.
-
--   `path`: the locale will be a part of url path. e.g /en-US/women/dress
--   `query_param`: the locale will be a url query param. e.g /women/dress?locale=en-US
--   `none`: the locale won't be showing in the url at all. e.g /women/dress
-
-By default, we set up the locale to be an url path.
+The Retail React App allows you to customize certain aspects of storefront URLs in the `pwa-kit-config.json` file.
 
 ```json
 // pwa-kit.config.json
@@ -49,6 +41,14 @@ By default, we set up the locale to be an url path.
     }
 }
 ```
+
+You can choose how the current locale appears (or doesn’t appear) in the URL by setting `url.locale` in `pwa-kit-config.json` to one of the following values:
+
+-   `path`: Locale is included in the URL path. Example: `/en-US/women/dress`
+-   `query_param`: Locale is included as a query parameter. Example: `/women/dress?locale=en-US`
+-   `none`: Locale isn’t included in the URL. Example: `/women/dress`
+
+By default, a new project is configured to include the locale in the URL path.
 
 ## Documentation
 
