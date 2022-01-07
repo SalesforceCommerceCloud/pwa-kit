@@ -161,7 +161,7 @@ const runGenerator = (answers, {outputDir}) => {
     const einsteinApi = {
         proxyPath: answers['scaffold-pwa'].mobify.ssrParameters.proxyConfigs[2].path,
         einsteinId: answers['einstein-api'].einsteinId,
-        siteId: answers['commerce-api'].siteId
+        siteId: answers['einstein-api'].siteId || answers['commerce-api'].siteId
     }
 
     new sh.ShellString(APIConfigTemplate({commerceApi, einsteinApi})).to(
@@ -248,6 +248,7 @@ const prompts = () => {
             message: 'What is your API Client ID in the Einstein Configurator? (optional)',
             validate: validEinsteinId
         }
+        // NOTE: there's no question about Einstein's _site_ id because we currently assume that the site id will be the same for both Commerce API and Einstein
     ]
 
     return inquirer.prompt(questions).then((answers) => buildAnswers(answers))
@@ -260,7 +261,8 @@ const buildAnswers = ({
     siteId,
     organizationId,
     shortCode,
-    einsteinId
+    einsteinId,
+    einsteinSiteId
 }) => {
     return {
         globals: {projectId},
@@ -288,7 +290,7 @@ const buildAnswers = ({
         },
 
         'commerce-api': {clientId, siteId, organizationId, shortCode},
-        'einstein-api': {einsteinId}
+        'einstein-api': {einsteinId, siteId: einsteinSiteId || siteId}
     }
 }
 
@@ -300,7 +302,8 @@ const testProjectAnswers = () => {
         siteId: 'RefArchGlobal',
         organizationId: 'f_ecom_zzrf_001',
         shortCode: 'kv7kzm78',
-        einsteinId: '1ea06c6e-c936-4324-bcf0-fada93f83bb1'
+        einsteinId: '1ea06c6e-c936-4324-bcf0-fada93f83bb1',
+        einsteinSiteId: 'aaij-MobileFirst'
     }
 
     return buildAnswers(config)
