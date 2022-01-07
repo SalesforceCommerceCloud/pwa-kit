@@ -43,7 +43,7 @@
 
 const sh = require('shelljs')
 const cp = require('child_process')
-const {withLocalNPMRepo} = require('internal-lib-build/verdaccio-server.js')
+const {withLocalNPMRepo} = require('internal-lib-build/verdaccio-server')
 
 sh.set('-e')
 

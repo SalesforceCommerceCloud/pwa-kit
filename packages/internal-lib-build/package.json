@@ -61,5 +61,8 @@
   "scripts": {
     "prepare": "npm run prod:build",
     "prod:build": "cross-env NODE_ENV=production ./bin/internal-lib-build.js build"
+  },
+  "publishConfig": {
+    "directory": "dist"
   }
 }

@@ -11,7 +11,7 @@ const sh = require('shelljs')
 
 sh.set('-e')
 
-const babel = p.resolve(p.join(__dirname, '..', 'node_modules', '.bin', 'babel'))
+const babel = p.join(require.resolve('@babel/cli'), '..', '..', '..', '.bin', 'babel')
 const babelConfig = p.resolve(p.join(__dirname, 'babel.config.js'))
 const prepareDist = p.resolve(p.join(__dirname, 'prepare-dist.js'))
 
