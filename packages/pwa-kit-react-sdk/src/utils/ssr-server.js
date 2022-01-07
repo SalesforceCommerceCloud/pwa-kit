@@ -8,6 +8,8 @@
  * @module progressive-web-sdk/utils/ssr-server
  */
 import crypto from 'crypto'
+import http from 'http'
+import https from 'https'
 import proxy from 'http-proxy-middleware'
 import UserAgentParser from 'ua-parser-js'
 import {
@@ -40,6 +42,18 @@ export const isRemote = () =>
 export const getBundleBaseUrl = () => {
     return `/mobify/bundle/${isRemote() ? bundleID : 'development'}/`
 }
+
+const KEEP_ALIVE_MS = 3 * 60 * 1000 // 3 minutes
+
+const HTTP_AGENT = new http.Agent({
+    keepAlive: true,
+    keepAliveMsecs: KEEP_ALIVE_MS
+})
+
+const HTTPS_AGENT = new https.Agent({
+    keepAlive: true,
+    keepAliveMsecs: KEEP_ALIVE_MS
+})
 
 /**
  * Get the URL that should be used to load an asset from the bundle.
@@ -255,6 +269,14 @@ export const outgoingRequestHook = (wrapped, getAppHost) => {
             (workingUrl && workingUrl.includes(`//${appHost}`))
 
         if (!isLoopback) {
+            arguments[0].agent =
+                workingUrl.startsWith('http:') || workingOptions.protocol === 'http:'
+                    ? HTTP_AGENT
+                    : HTTPS_AGENT
+
+            delete arguments[0].headers.connection
+            delete arguments[0].headers.Connection
+
             return wrapped.apply(this, arguments) // eslint-disable-line prefer-rest-params
         }
 
@@ -265,8 +287,16 @@ export const outgoingRequestHook = (wrapped, getAppHost) => {
         // Inject the access key.
         workingOptions.headers['x-mobify-access-key'] = accessKey
 
+        workingOptions.agent =
+            workingUrl.startsWith('http:') || workingOptions.protocol === 'http:'
+                ? HTTP_AGENT
+                : HTTPS_AGENT
+
         // Build the args, omitting any undefined values
         const workingArgs = [workingUrl, workingOptions, workingCallback].filter((arg) => !!arg)
+
+        delete workingOptions.headers.connection
+        delete workingOptions.headers.Connection
 
         return wrapped.apply(this, workingArgs)
     }
