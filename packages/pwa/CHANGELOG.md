@@ -1,9 +1,25 @@
-## v1.3.0-dev (Nov 18, 2021)
+## v1.3.0 (Jan 06, 2022)
 
+-   Remove EinStein from home page [#208](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/208)
+-   Add git2Gus config to allow git2Gus integration [210](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/210)    
 -   Set common HTTP security headers [#263](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/263)
 -   Add message ids to all the translated text, so they provide context for the translators [#239](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/239) [#207](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/207) [#195](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/195)
+-   Minor translation fixed [260](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/260) [#252](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/252)
 -   Provide Url Customization for the Retail React App [#228](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/228/files)
 -   Add an image component to allow for easier-implementation of responsive images [#186](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/186)
+-   Add Shop Products section with Products from the Catalog [#216](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/216)
+-   Remove `upgrade-insecure-requests` for local development [#270](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/270)
+-   Fix Out of stock message not appearing for mobile screens [#231](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/231)
+-   Fix Order summary prices on check out page misaligned on mobile [#233](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/233)
+-   Skip irrelevant jobs on CI on forked PR [#237](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/237) [#240](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/240)
+-   Add webpack plugin [#255](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/255)
+-   Combine config files [#256](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/256)
+-   Improve unsupported locale error message [#225](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/225)
+-   Add github template [#226](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/226)
+-   Fix Shipping method description overflows the price section [#232](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/232)
+-   Fix Show applied promotion codes case sensitive issue [#224](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/224)
+-   Fix section subtitle incorrect prop warning [#282](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/282)
+
 
 ## v1.2.0 (Nov 18, 2021)
 

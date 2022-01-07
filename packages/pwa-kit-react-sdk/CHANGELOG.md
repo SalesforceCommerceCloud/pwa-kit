@@ -1,5 +1,4 @@
-## v1.3.0-alpha.0 (Jan 06, 2022)
-## v1.3.0-dev (Nov 18, 2021)
+## v1.3.0 (Jan 06, 2022)
 
 -   Add `__server_only` and `__pretty_print` server rendering flags aliases. [#250](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/250)
 -   Do not show stack trace in remote environment windowGlobals [#230](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/230/files)
