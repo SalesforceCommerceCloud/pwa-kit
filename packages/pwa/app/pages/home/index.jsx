@@ -143,13 +143,13 @@ const Home = ({productSearchResult, isLoading}) => {
                                 'This section contains content from the catalog. {docLink} on how to replace it.',
                             id: 'home.description.shop_products',
                             description:
-                                '{docLink} is a html button that links the user to https://sfdc.co/business-manager-manage-catalgos'
+                                '{docLink} is a html button that links the user to https://sfdc.co/business-manager-manage-catalogs'
                         },
                         {
                             docLink: (
                                 <Link
                                     target="_blank"
-                                    href={'https://sfdc.co/business-manager-manage-catalgos'}
+                                    href={'https://sfdc.co/business-manager-manage-catalogs'}
                                     textDecoration={'none'}
                                     position={'relative'}
                                     _after={{
