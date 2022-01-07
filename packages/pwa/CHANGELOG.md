@@ -1,3 +1,7 @@
+## Next
+
+-  Do not send HSTS header during local development [#288](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/288)
+
 ## v1.3.0-dev (Nov 18, 2021)
 
 -   Set common HTTP security headers [#263](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/263)
