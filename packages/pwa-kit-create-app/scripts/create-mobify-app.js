@@ -194,11 +194,11 @@ const prompts = () => {
         /^[a-z0-9_-]+$/i.test(s) || 'Valid characters are alphanumeric, hyphen, or underscore'
 
     // To see definitions for Commerce API configuration values, refer to these
-    // doc --> https://developer.commercecloud.com/s/article/CommerceAPI-ConfigurationValues.
+    // doc --> https://developer.salesforce.com/docs/commerce/commerce-api/guide/commerce-api-configuration-values.html.
     const defaultCommerceAPIError =
-        'Invalid format. Use docs to find more information about valid configurations: https://sfdc.co/pwa-kit-config'
+        'Invalid format. Use docs to find more information about valid configurations: https://developer.salesforce.com/docs/commerce/commerce-api/guide/commerce-api-configuration-values.html'
     const defaultEinsteinAPIError =
-        'Invalid format. Use docs to find more information about valid configurations: https://developer.commercecloud.com/s/api-details/a003k00000UI4hPAAT/commerce-cloud-developer-centereinsteinrecommendations'
+        'Invalid format. Use docs to find more information about valid configurations: https://developer.salesforce.com/docs/commerce/einstein-api/references#einstein-recommendations:Summary'
     const validShortCode = (s) => /(^[0-9A-Z]{8}$)/i.test(s) || defaultCommerceAPIError
     const validClientId = (s) =>
         /(^[0-9A-Z]{8}-[0-9A-Z]{4}-[0-9A-Z]{4}-[0-9A-Z]{4}-[0-9A-Z]{12}$)/i.test(s) ||
@@ -363,7 +363,7 @@ const main = (opts) => {
         case TEST_PROJECT:
             return runGenerator(testProjectAnswers(), opts)
         case PROMPT:
-            console.log('See https://sfdc.co/pwa-kit-config for details on configuration values\n')
+            console.log('See https://developer.salesforce.com/docs/commerce/commerce-api/guide/commerce-api-configuration-values.html for details on configuration values\n')
             return prompts(opts).then((answers) => runGenerator(answers, opts))
         default:
             console.error(

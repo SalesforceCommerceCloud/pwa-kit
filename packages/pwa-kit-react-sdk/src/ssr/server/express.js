@@ -270,7 +270,7 @@ export const createApp = (options) => {
         app.all('/mobify/proxy/*', (_, res) => {
             return res.status(501).json({
                 message:
-                    'Environment proxies are not set: https://sfdc.co/managed-runtime-setup-proxies'
+                    'Environment proxies are not set: https://sfdc.chttps://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/proxying-requests.html'
             })
         })
     }
