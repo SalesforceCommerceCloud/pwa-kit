@@ -28,7 +28,7 @@ let server
 
 const defaultOpts = {
     fatal: true,
-    silent: false,
+    silent: true,
 }
 
 const startServer = async () => {
