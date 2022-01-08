@@ -73,3 +73,6 @@ export const withLocalNPMRepo = async (fn) => {
     }
 }
 
+['exit', 'SIGINT', 'SIGUSR1', 'SIGUSR2', 'uncaughtException', 'SIGTERM'].forEach((eventType) => {
+    process.on(eventType, cleanup)
+})
