@@ -12,18 +12,31 @@ const sh = require('shelljs')
 
 sh.set('-e')
 
+const monorepoRoot = p.resolve(__dirname, '..', '..', '..')
 const pkgRoot = p.resolve(__dirname, '..')
+const verdaccio = p.join(
+    require.resolve('verdaccio/bin/verdaccio'),
+    '..',
+    '..',
+    '..',
+    '.bin',
+    'verdaccio'
+)
+console.log(verdaccio)
 
 let server
 
 const defaultOpts = {
-    cwd: pkgRoot,
     fatal: true,
-    silent: true,
+    silent: false,
 }
 
 const startServer = async () => {
-    const server = sh.exec('verdaccio --config verdaccio.yaml', {...defaultOpts, async: true})
+    const server = sh.exec(`${verdaccio} --config verdaccio.yaml`, {
+        ...defaultOpts,
+        cwd: pkgRoot,
+        async: true,
+    })
     await new Promise((resolve) => {
         server.stdout.on('data', (data) => {
             if (data.includes('http address')) {
@@ -48,7 +61,10 @@ export const withLocalNPMRepo = async (fn) => {
         console.log('Starting up local NPM repository')
         server = await startServer()
         const url = 'http://localhost:4873/'
-        sh.exec(`npm run lerna -- publish from-package --yes --concurrency 1 --loglevel warn --registry ${url}`, defaultOpts)
+        sh.exec(
+            `npm run lerna -- publish from-package --yes --concurrency 1 --loglevel warn --registry ${url}`,
+            {...defaultOpts, cwd: monorepoRoot}
+        )
         console.log('Local NPM repository is ready')
         console.log(`Serving on ${url}`)
         await fn(url)

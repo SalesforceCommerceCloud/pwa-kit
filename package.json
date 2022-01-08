@@ -9,8 +9,7 @@
     "commander": "^2.20.0",
     "lerna": "^3.20.2",
     "semver": "^7.3.2",
-    "shelljs": "^0.8.4",
-    "verdaccio": "^5.4.0"
+    "shelljs": "^0.8.4"
   },
   "scripts": {
     "preinstall": "node ./scripts/check-version.js",
@@ -24,7 +23,6 @@
     "lint": "lerna run --parallel --stream lint -- --silent",
     "lint:fix": "lerna run lint:fix",
     "format": "lerna run --parallel --stream format",
-    "bump-version": "node ./scripts/bump-version.js",
-    "verdaccio-server": "node ./scripts/verdaccio-server.js"
+    "bump-version": "node ./scripts/bump-version.js"
   }
 }
