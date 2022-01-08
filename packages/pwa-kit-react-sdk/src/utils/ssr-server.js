@@ -43,18 +43,6 @@ export const getBundleBaseUrl = () => {
     return `/mobify/bundle/${isRemote() ? bundleID : 'development'}/`
 }
 
-const KEEP_ALIVE_MS = 3 * 60 * 1000 // 3 minutes
-
-const HTTP_AGENT = new http.Agent({
-    keepAlive: true,
-    keepAliveMsecs: KEEP_ALIVE_MS
-})
-
-const HTTPS_AGENT = new https.Agent({
-    keepAlive: true,
-    keepAliveMsecs: KEEP_ALIVE_MS
-})
-
 /**
  * Get the URL that should be used to load an asset from the bundle.
  *
@@ -181,6 +169,27 @@ export const getFullRequestURL = (url) => {
     )
 }
 
+let HTTP_AGENT, HTTPS_AGENT
+/**
+ * Returns the http and https agent singletons configured with the
+ * provided options
+ *
+ * @private
+ * @param {*} options
+ * @returns {object} -
+ */
+const getAgents = (options) => {
+    if (!HTTP_AGENT || !HTTPS_AGENT) {
+        HTTP_AGENT = new http.Agent(options)
+        HTTPS_AGENT = new https.Agent(options)
+    }
+
+    return {
+        httpAgent: HTTP_AGENT,
+        httpsAgent: HTTPS_AGENT
+    }
+}
+
 /**
  * This function can be used to wrap http.request, http.get
  * (and the https module equivalents) in the Express app node
@@ -205,24 +214,15 @@ export const getFullRequestURL = (url) => {
  * @returns {Function} a function that wraps 'wrapped'
  */
 
-export const outgoingRequestHook = (wrapped, getAppHost) => {
+export const outgoingRequestHook = (wrapped, options) => {
     return function() {
-        // Get the app hostname. If we can't, then just pass
-        // the call through to the wrapped function. We'll also
-        // do that if there's no access key.
-        const accessKey = process.env.X_MOBIFY_ACCESS_KEY
-        const appHost = getAppHost && getAppHost()
-
-        if (!(appHost && accessKey)) {
-            return wrapped.apply(this, arguments) // eslint-disable-line prefer-rest-params
-        }
-
         // request and get can be called with (options[, callback])
         // or (url[, options][, callback]).
         let workingUrl = ''
         let workingOptions
         let workingCallback
         const args = arguments // eslint-disable-line prefer-rest-params
+        const {appHostname, agentOptions} = options || {}
 
         // The options will be in the first 'object' argument
         for (let i = 0; i < args.length; i++) {
@@ -253,6 +253,33 @@ export const outgoingRequestHook = (wrapped, getAppHost) => {
             workingOptions = {headers: {}}
         }
 
+        if (agentOptions) {
+            const {httpAgent, httpsAgent} = getAgents(agentOptions)
+
+            // Add default agent to global connection reuse.
+            workingOptions.agent =
+                workingUrl.startsWith('http:') || workingOptions.protocol === 'http:'
+                    ? httpAgent
+                    : httpsAgent
+
+            // node-fetch and potentially other libraries add connection: close heaaders
+            // remove them to keep the connection alive. NOTE: There are variations in
+            // whether or not the connection header is upper or lower case, so handle both.
+            delete workingOptions?.headers?.connection
+            delete workingOptions?.headers?.Connection
+        }
+
+        // Get the app hostname. If we can't, then just pass
+        // the call through to the wrapped function. We'll also
+        // do that if there's no access key.
+        const accessKey = process.env.X_MOBIFY_ACCESS_KEY
+
+        let workingArgs = [workingUrl, workingOptions, workingCallback].filter((arg) => !!arg)
+
+        if (!(appHostname && accessKey)) {
+            return wrapped.apply(this, workingArgs) // eslint-disable-line prefer-rest-params
+        }
+
         // We need to identify loopback requests: requests that are
         // to the appHost (irrespective of protocol).
         // The workingUrl value may be partial (the docs are very
@@ -264,20 +291,12 @@ export const outgoingRequestHook = (wrapped, getAppHost) => {
             // say that 'hostname' is an alias for 'host', but that's not
             // exactly true - host can include a port but hostname doesn't
             // always. So we need to compare both.
-            workingOptions.host === appHost ||
-            workingOptions.hostname === appHost ||
-            (workingUrl && workingUrl.includes(`//${appHost}`))
+            workingOptions.host === appHostname ||
+            workingOptions.hostname === appHostname ||
+            (workingUrl && workingUrl.includes(`//${appHostname}`))
 
         if (!isLoopback) {
-            arguments[0].agent =
-                workingUrl.startsWith('http:') || workingOptions.protocol === 'http:'
-                    ? HTTP_AGENT
-                    : HTTPS_AGENT
-
-            delete arguments[0].headers.connection
-            delete arguments[0].headers.Connection
-
-            return wrapped.apply(this, arguments) // eslint-disable-line prefer-rest-params
+            return wrapped.apply(this, workingArgs) // eslint-disable-line prefer-rest-params
         }
 
         // We must inject the 'x-mobify-access-key' header into the
@@ -287,16 +306,8 @@ export const outgoingRequestHook = (wrapped, getAppHost) => {
         // Inject the access key.
         workingOptions.headers['x-mobify-access-key'] = accessKey
 
-        workingOptions.agent =
-            workingUrl.startsWith('http:') || workingOptions.protocol === 'http:'
-                ? HTTP_AGENT
-                : HTTPS_AGENT
-
-        // Build the args, omitting any undefined values
-        const workingArgs = [workingUrl, workingOptions, workingCallback].filter((arg) => !!arg)
-
-        delete workingOptions.headers.connection
-        delete workingOptions.headers.Connection
+        // Re-build the args, omitting any undefined values, after making modifications above.
+        workingArgs = [workingUrl, workingOptions, workingCallback].filter((arg) => !!arg)
 
         return wrapped.apply(this, workingArgs)
     }

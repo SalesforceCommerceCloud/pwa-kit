@@ -158,7 +158,10 @@ export const createApp = (options) => {
         // be no use-case for SDK users to set this.
         strictSSL: true,
 
-        enableLegacyRemoteProxying: true
+        enableLegacyRemoteProxying: true,
+
+        // Custom agent options, if falsey, the node global agent will be used.
+        agentOptions: false
     }
 
     options = Object.assign({}, defaults, options)
@@ -1682,11 +1685,13 @@ const applyPatches = once((options) => {
     // Patch the http.request/get and https.request/get
     // functions to allow us to intercept them (since
     // there are multiple ways to make requests in Node).
-    const getAppHost = () => options.appHostname
-    http.request = outgoingRequestHook(http.request, getAppHost)
-    http.get = outgoingRequestHook(http.get, getAppHost)
-    https.request = outgoingRequestHook(https.request, getAppHost)
-    https.get = outgoingRequestHook(https.get, getAppHost)
+
+    // TODO: Figure out what the significance of making this a function.
+    // const getAppHost = () => options.appHostname
+    http.request = outgoingRequestHook(http.request, options)
+    http.get = outgoingRequestHook(http.get, options)
+    https.request = outgoingRequestHook(https.request, options)
+    https.get = outgoingRequestHook(https.get, options)
 
     // Patch the ExpressJS Response class's redirect function to suppress
     // the creation of a body (DESKTOP-485). Including the body may

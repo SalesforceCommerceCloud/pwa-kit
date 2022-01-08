@@ -39,7 +39,13 @@ const app = createApp({
     // Note that http://localhost is treated as a secure context for development.
     protocol: 'http',
 
-    enableLegacyRemoteProxying: false
+    enableLegacyRemoteProxying: false,
+
+    // Use a global agent for all connections with these options.
+    agentOptions: {
+        keepAlive: true,
+        keepAliveMsecs: 3 * 60 * 1000 // 3 minutes
+    }
 })
 
 // Set HTTP security headers
