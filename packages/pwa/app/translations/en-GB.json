@@ -577,7 +577,7 @@
   },
   "home.description.shop_products": {
     "defaultMessage": "This section contains content from the catalog. {docLink} on how to replace it.",
-    "description": "{docLink} is a html button that links the user to https://sfdc.co/business-manager-manage-catalgos"
+    "description": "{docLink} is a html button that links the user to https://sfdc.co/business-manager-manage-catalogs"
   },
   "home.features.description.cart_checkout": {
     "defaultMessage": "Ecommerce best practice for a shopper's cart and checkout experience."
