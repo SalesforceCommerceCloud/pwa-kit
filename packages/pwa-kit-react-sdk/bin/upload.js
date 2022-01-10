@@ -28,7 +28,7 @@ const argv = require('yargs')
     .option(POTENTIAL_OPTIONS.message, {
         alias: 'message',
         describe:
-            'a message to include along with the uploaded bundle in Mobify Cloud. default: <git branch>: <git commit hash>',
+            'a message to include along with the uploaded bundle in Managed Runtime. default: <git branch>: <git commit hash>',
         type: 'string'
     })
     .option(POTENTIAL_OPTIONS.projectSlug, {
@@ -39,7 +39,7 @@ const argv = require('yargs')
     })
     .option(POTENTIAL_OPTIONS.target, {
         alias: 'target',
-        describe: 'a custom target to upload a bundle to within Mobify Cloud',
+        describe: 'a custom target to upload a bundle to within Managed Runtime',
         type: 'string'
     })
     .help('h')

@@ -66,7 +66,7 @@ const Home = ({productSearchResult, isLoading}) => {
                     <Stack spacing={{base: 4, sm: 6}} direction={{base: 'column', sm: 'row'}}>
                         <Button
                             as={Link}
-                            href="http://sfdc.co/pwa-kit-developer-center"
+                            href="https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/getting-started.html"
                             target="_blank"
                             width={{base: 'full', md: 'inherit'}}
                             paddingX={7}
@@ -140,14 +140,16 @@ const Home = ({productSearchResult, isLoading}) => {
                     subtitle={intl.formatMessage(
                         {
                             defaultMessage:
-                                'This section contains content from the catalog. {link} on how to replace it.',
-                            id: 'home.description.shop_products'
+                                'This section contains content from the catalog. {docLink} on how to replace it.',
+                            id: 'home.description.shop_products',
+                            description:
+                                '{docLink} is a html button that links the user to https://sfdc.co/business-manager-manage-catalogs'
                         },
                         {
-                            link: (
+                            docLink: (
                                 <Link
                                     target="_blank"
-                                    href={'https://sfdc.co/business-manager-manage-catalgos'}
+                                    href={'https://sfdc.co/business-manager-manage-catalogs'}
                                     textDecoration={'none'}
                                     position={'relative'}
                                     _after={{
@@ -231,16 +233,23 @@ const Home = ({productSearchResult, isLoading}) => {
                     defaultMessage: "We're here to help",
                     id: 'home.heading.here_to_help'
                 })}
-                subtitle={intl.formatMessage(
-                    {
-                        defaultMessage:
-                            'Contact our support staff and they’ll get {br} you to the right place.',
-                        id: 'home.description.here_to_help'
-                    },
-                    {
-                        br: <br />
-                    }
-                )}
+                subtitle={
+                    <>
+                        <>
+                            {intl.formatMessage({
+                                defaultMessage: 'Contact our support staff.',
+                                id: 'home.description.contact_our_staff'
+                            })}
+                        </>
+                        <br />
+                        <>
+                            {intl.formatMessage({
+                                defaultMessage: 'They will get you to the right place.',
+                                id: 'home.description.get_you_to_the_right_place'
+                            })}
+                        </>
+                    </>
+                }
                 actions={
                     <Button
                         as={Link}

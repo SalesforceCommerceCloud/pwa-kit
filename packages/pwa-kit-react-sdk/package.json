@@ -1,6 +1,6 @@
 {
   "name": "pwa-kit-react-sdk",
-  "version": "1.3.0-dev",
+  "version": "1.4.0-dev",
   "description": "A library that supports the isomorphic React rendering pipeline for Commerce Cloud Managed Runtime apps",
   "main": "dist/index.js",
   "bin": {
@@ -19,7 +19,8 @@
     "ssr",
     "TERMS_OF_USE.md",
     "utils",
-    "webpack"
+    "webpack",
+    "schemas"
   ],
   "publishConfig": {
     "directory": "dist"
@@ -40,11 +41,16 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/mobify/mobify-platform-sdks.git"
+    "url": "git+https://github.com/SalesforceCommerceCloud/pwa-kit.git"
+  },
+  "homepage": "https://github.com/SalesforceCommerceCloud/pwa-kit/tree/develop/packages/pwa-kit-react-sdk#readme",
+  "bugs": {
+    "url": "https://github.com/SalesforceCommerceCloud/pwa-kit/issues"
   },
   "author": "dev@mobify.com",
   "license": "SEE LICENSE IN LICENSE",
   "dependencies": {
+    "ajv": "^8.8.2",
     "archiver": "1.3.0",
     "aws-sdk": "^2.984.0",
     "aws-serverless-express": "3.3.5",

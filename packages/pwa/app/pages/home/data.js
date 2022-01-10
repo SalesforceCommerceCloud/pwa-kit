@@ -41,7 +41,8 @@ export const heroFeatures = [
             }
         }),
         icon: <BrandLogo width={12} height={8} />,
-        href: 'https://sfdc.co/deploy-on-managed-runtime'
+        href:
+            'https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/pushing-and-deploying-bundles.html'
     },
     {
         message: defineMessages({
@@ -109,7 +110,7 @@ export const features = [
     {
         message: defineMessages({
             title: {
-                defaultMessage: 'Components & Design kit',
+                defaultMessage: 'Components & Design Kit',
                 id: 'home.features.heading.components'
             },
             text: {

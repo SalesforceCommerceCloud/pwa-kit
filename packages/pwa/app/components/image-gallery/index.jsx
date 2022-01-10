@@ -23,6 +23,7 @@ import {
     useMultiStyleConfig
 } from '@chakra-ui/react'
 import {findImageGroupBy} from '../../utils/image-groups-utils'
+import DynamicImage from '../dynamic-image'
 
 const EnterKeyNumber = 13
 
@@ -96,12 +97,24 @@ const ImageGallery = ({imageGroups = [], selectedVariationAttributes = {}, size}
 
     const heroImage = heroImageGroup?.images?.[selectedIndex]
     const thumbnailImages = thumbnailImageGroup?.images || []
+
+    const heroImageMaxWidth = styles.heroImage.maxWidth[3] // in px
+
     return (
         <Flex direction="column">
             {heroImage && (
                 <Box {...styles.heroImageGroup}>
                     <AspectRatio {...styles.heroImage} ratio={1}>
-                        <Img alt={heroImage.alt} src={heroImage.disBaseLink} />
+                        <DynamicImage
+                            src={`${heroImage.disBaseLink || heroImage.link}[?sw={width}&q=60]`}
+                            widths={{
+                                base: '100vw',
+                                lg: heroImageMaxWidth
+                            }}
+                            imageProps={{
+                                alt: heroImage.alt
+                            }}
+                        />
                     </AspectRatio>
                 </Box>
             )}

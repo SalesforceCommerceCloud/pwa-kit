@@ -56,7 +56,7 @@ export const CONFIRMATION_DIALOG_DEFAULT_CONFIG = defineMessages({
         id: 'confirmation_modal.default.title.confirm_action'
     },
     confirmationMessage: {
-        defaultMessage: 'Are you sure you want to continue ?',
+        defaultMessage: 'Are you sure you want to continue?',
         id: 'confirmation_modal.default.message.you_want_to_continue'
     },
     primaryActionLabel: {defaultMessage: 'Yes', id: 'confirmation_modal.default.action.yes'},

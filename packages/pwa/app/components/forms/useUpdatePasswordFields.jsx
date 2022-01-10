@@ -21,7 +21,7 @@ export default function useUpdatePasswordFields({form: {control, errors}, prefix
             type: 'password',
             rules: {
                 required: formatMessage({
-                    defaultMessage: 'Please enter your password',
+                    defaultMessage: 'Please enter your password.',
                     id: 'use_update_password_fields.error.required_password'
                 })
             },
@@ -38,38 +38,38 @@ export default function useUpdatePasswordFields({form: {control, errors}, prefix
             defaultValue: '',
             rules: {
                 required: formatMessage({
-                    defaultMessage: 'Please provide a new password',
+                    defaultMessage: 'Please provide a new password.',
                     id: 'use_update_password_fields.error.required_new_password'
                 }),
                 validate: {
                     hasMinChars: (val) =>
                         validatePassword(val).hasMinChars ||
                         formatMessage({
-                            defaultMessage: 'Password must contain at least 8 characters',
+                            defaultMessage: 'Password must contain at least 8 characters.',
                             id: 'use_update_password_fields.error.minimum_characters'
                         }),
                     hasUppercase: (val) =>
                         validatePassword(val).hasUppercase ||
                         formatMessage({
-                            defaultMessage: 'Password must contain at least one uppercase letter',
+                            defaultMessage: 'Password must contain at least one uppercase letter.',
                             id: 'use_update_password_fields.error.uppercase_letter'
                         }),
                     hasLowercase: (val) =>
                         validatePassword(val).hasLowercase ||
                         formatMessage({
-                            defaultMessage: 'Password must contain at least one lowercase letter',
+                            defaultMessage: 'Password must contain at least one lowercase letter.',
                             id: 'use_update_password_fields.error.lowercase_letter'
                         }),
                     hasNumber: (val) =>
                         validatePassword(val).hasNumber ||
                         formatMessage({
-                            defaultMessage: 'Password must contain at least one number',
+                            defaultMessage: 'Password must contain at least one number.',
                             id: 'use_update_password_fields.error.contain_number'
                         }),
                     hasSpecialChar: (val) =>
                         validatePassword(val).hasSpecialChar ||
                         formatMessage({
-                            defaultMessage: 'Password must contain at least one special character',
+                            defaultMessage: 'Password must contain at least one special character.',
                             id: 'use_update_password_fields.error.special_character'
                         })
                 }

@@ -181,6 +181,7 @@ const ProductList = (props) => {
     /**************** Filters ****************/
     const [searchParams, {stringify: stringifySearchParams}] = useSearchParams()
     const [filtersLoading, setFiltersLoading] = useState(false)
+
     // Toggles filter on and off
     const toggleFilter = (value, attributeId, selected, allowMultiple = true) => {
         const searchParamsCopy = {...searchParams}
@@ -379,6 +380,7 @@ const ProductList = (props) => {
                                           const isInWishlist = !!wishlist.findItemByProductId(
                                               productId
                                           )
+
                                           return (
                                               <ProductTile
                                                   data-testid={`sf-product-tile-${productSearchItem.productId}`}
@@ -391,6 +393,15 @@ const ProductList = (props) => {
                                                           ? addItemToWishlist
                                                           : removeItemFromWishlist
                                                       return action(productSearchItem)
+                                                  }}
+                                                  dynamicImageProps={{
+                                                      widths: [
+                                                          '50vw',
+                                                          '50vw',
+                                                          '20vw',
+                                                          '20vw',
+                                                          '25vw'
+                                                      ]
                                                   }}
                                               />
                                           )

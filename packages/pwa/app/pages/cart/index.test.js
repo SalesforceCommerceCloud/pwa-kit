@@ -142,7 +142,7 @@ test('Applies default shipping method to basket and renders estimated pricing', 
     expect(await screen.findByTestId('sf-cart-container')).toBeInTheDocument()
 
     const summary = screen.getByTestId('sf-order-summary')
-    expect(await within(summary).findByText(/promo applied/i)).toBeInTheDocument()
+    expect(await within(summary).findByText(/promotion applied/i)).toBeInTheDocument()
     expect(within(summary).getByText(/free/i)).toBeInTheDocument()
     expect(within(summary).getByText(/\$30.00/i)).toBeInTheDocument()
 })

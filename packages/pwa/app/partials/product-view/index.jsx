@@ -152,7 +152,7 @@ const ProductView = ({
                               id: 'product_view.button.update'
                           })
                         : intl.formatMessage({
-                              defaultMessage: 'Add to cart',
+                              defaultMessage: 'Add to Cart',
                               id: 'product_view.button.add_to_cart'
                           })}
                 </Button>
@@ -176,7 +176,7 @@ const ProductView = ({
                               id: 'product_view.button.update'
                           })
                         : intl.formatMessage({
-                              defaultMessage: 'Add to wishlist',
+                              defaultMessage: 'Add to Wishlist',
                               id: 'product_view.button.add_to_wishlist'
                           })}
                 </ButtonWithRegistration>
@@ -302,7 +302,8 @@ const ProductView = ({
                                                             backgroundColor={name.toLowerCase()}
                                                             backgroundImage={
                                                                 image
-                                                                    ? `url(${image.disBaseLink})`
+                                                                    ? `url(${image.disBaseLink ||
+                                                                          image.link})`
                                                                     : ''
                                                             }
                                                         />

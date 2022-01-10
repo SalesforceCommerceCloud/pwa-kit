@@ -136,12 +136,12 @@ const ContactInfo = () => {
                                 <Button type="submit">
                                     {!showPasswordField ? (
                                         <FormattedMessage
-                                            defaultMessage="Checkout as guest"
+                                            defaultMessage="Checkout as Guest"
                                             id="contact_info.button.checkout_as_guest"
                                         />
                                     ) : (
                                         <FormattedMessage
-                                            defaultMessage="Log in"
+                                            defaultMessage="Log In"
                                             id="contact_info.button.login"
                                         />
                                     )}
@@ -154,7 +154,7 @@ const ContactInfo = () => {
                                         />
                                     ) : (
                                         <FormattedMessage
-                                            defaultMessage="Checkout as guest"
+                                            defaultMessage="Checkout as Guest"
                                             id="contact_info.button.checkout_as_guest"
                                         />
                                     )}

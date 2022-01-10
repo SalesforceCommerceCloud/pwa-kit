@@ -43,7 +43,7 @@ export const useProduct = (product) => {
         }),
         [UNFULFILLABLE]: intl.formatMessage(
             {
-                defaultMessage: 'Only {stockLevel} Left!',
+                defaultMessage: 'Only {stockLevel} left!',
                 id: 'use_product.message.inventory_remaining'
             },
             {stockLevel}
