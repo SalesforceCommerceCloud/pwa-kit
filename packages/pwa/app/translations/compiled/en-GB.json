@@ -1573,6 +1573,12 @@
       "value": "Sale"
     }
   ],
+  "lCPCxk": [
+    {
+      "type": 0,
+      "value": "Please select all your options above"
+    }
+  ],
   "locale_text.message.ar-SA": [
     {
       "type": 0,
