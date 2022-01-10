@@ -17,7 +17,6 @@
     "lerna": "lerna",
     "pretest": "npm run lint",
     "test": "lerna run --stream --concurrency=1 test",
-    "test:integration": "lerna run --stream --concurrency=1 test:integration",
     "test:max-file-size": "lerna run --stream test:max-file-size",
     "lint": "lerna run --parallel --stream lint -- --silent",
     "lint:fix": "lerna run lint:fix",

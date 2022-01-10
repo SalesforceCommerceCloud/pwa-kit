@@ -75,10 +75,6 @@ commands:
   runtests:
     description: 'Run tests'
     parameters:
-      enableIntegrationTests:
-          description: 'Enable expensive integration tests'
-          default: true
-          type: boolean
       cwd:
         description: 'The directory to execute the tests from'
         default: ${PWD}
@@ -98,11 +94,6 @@ commands:
 
             # Always run fast unit tests
             npm run test
-
-            # Only run expensive integration tests on these branches
-            if [[ (<< parameters.enableIntegrationTests >> == "true") && ( $DEVELOP || $RELEASE ) ]]; then
-              npm run test:integration
-            fi
   smoketestscripts:
     description: 'Smoke test scripts'
     parameters:
@@ -155,8 +146,7 @@ jobs:
     steps:
       - checkout
       - setup
-      - runtests:
-          enableIntegrationTests: false
+      - runtests
       - lighthouse-ci
       - smoketestscripts
       - checkclean

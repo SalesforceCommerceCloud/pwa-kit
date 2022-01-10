@@ -161,7 +161,6 @@
         "start:inspect": "npm run start -- --inspect",
         "start:pseudolocale": "npm run extract-default-translations && npm run compile-translations:pseudo && cross-env USE_PSEUDOLOCALE=true npm run start",
         "test": "jest --maxWorkers=2",
-        "test:integration": "cross-env TEST_TYPE=integration npm run test",
         "test:lighthouse": "lhci autorun --config=tests/lighthouserc.js",
         "test:max-file-size": "bundlesize"
     },
