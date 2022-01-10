@@ -100,11 +100,6 @@ commands:
             # Always run fast unit tests
             npm run test
 
-            # End to end tests on nightly builds only
-            if [[ $NIGHTLY ]]; then
-              npm run test:e2e-ci
-            fi
-
             # Only run expensive integration tests on these branches
             if [[ (<< parameters.enableIntegrationTests >> == "true") && ( $DEVELOP || $RELEASE ) ]]; then
               npm run test:integration

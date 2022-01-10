@@ -53,9 +53,6 @@ test_script:
   # Run fast unit tests
   - npm run test
 
-  # Run e2e tests on nightly builds only
-  - if "%APPVEYOR_SCHEDULED_BUILD%" == "True" (npm run test:e2e-ci)
-
   # Run the slow integration tests and end-to-end tests if the branch
   # being merged to is the master branch
   - if %APPVEYOR_REPO_BRANCH% == master (npm run test:integration)
