@@ -36,7 +36,6 @@ describe('Home Page', () => {
                     expect(res.headers['expect-ct']).to.equal('max-age=0')
                     expect(res.headers).to.have.property('referrer-policy')
                     expect(res.headers['referrer-policy']).to.equal('no-referrer')
-                    expect(res.headers).to.have.property('strict-transport-security')
                     expect(res.headers).to.have.property('x-content-type-options')
                     expect(res.headers['x-content-type-options']).to.equal('nosniff')
                     expect(res.headers).to.have.property('x-dns-prefetch-control')
