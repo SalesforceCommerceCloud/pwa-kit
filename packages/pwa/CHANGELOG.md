@@ -1,4 +1,7 @@
-## v1.4.0-dev (Jan 06, 2022)
+## Next
+
+-  Do not send HSTS header during local development [#288](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/288)
+
 ## v1.3.0 (Jan 06, 2022)
 
 -   Remove Einstein from home page [#208](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/208)
