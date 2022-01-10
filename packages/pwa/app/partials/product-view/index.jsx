@@ -196,7 +196,7 @@ const ProductView = ({
         if (canOrder) {
             toggleShowOptionsMessage(false)
         }
-    },[variant?.productId])
+    }, [variant?.productId])
 
     return (
         <Flex direction={'column'} data-testid="product-view">
