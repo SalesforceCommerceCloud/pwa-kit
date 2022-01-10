@@ -8,6 +8,7 @@
 
 const path = require('path')
 const {createApp, createHandler, serveStaticFile} = require('pwa-kit-runtime/ssr/server/express')
+const pkg = require("../package.json")
 
 const app = createApp({
     // The build directory (an absolute path)
@@ -24,7 +25,7 @@ const app = createApp({
     manifestPath: 'static/manifest.json',
 
     // This is the value of the 'mobify' object from package.json
-    mobify: require(path.join(process.cwd(), 'package.json')).mobify,
+    mobify: pkg.mobify,
 
     // The port that the local dev server listens on
     port: 3000,

@@ -4,6 +4,7 @@ const {
   createHandler,
   serveStaticFile,
 } = require("pwa-kit-runtime/ssr/server/express");
+const pkg = require("../package.json")
 
 const app = createApp({
   // The build directory (an absolute path)
@@ -27,6 +28,8 @@ const app = createApp({
   protocol: "http",
 
   enableLegacyRemoteProxying: false,
+
+  mobify: pkg.mobify,
 });
 
 // Handle the redirect from SLAS as to avoid error

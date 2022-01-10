@@ -62,11 +62,11 @@ const baseConfig = (target) => {
                     assets: false,
                     excludeAssets: [/.*img\/.*/, /.*svg\/.*/, /.*json\/.*/, /.*static\/.*/],
                 },
-                devtool: mode === production ? 'source-map' : 'eval-source-map',
+                // Perf/quality trade-off - see https://webpack.js.org/configuration/devtool/#devtool
+                devtool: mode === production ? 'source-map' : 'eval',
                 output: {
                     publicPath: '',
                     path: buildDir,
-                    ...(target === 'node' ? {libraryTarget: 'commonjs2'} : {}),
                 },
                 resolve: {
                     extensions: ['.ts', '.tsx', '.js', '.jsx', '.json'],
@@ -165,6 +165,7 @@ const withChunking = (config) => {
             chunkFilename: '[name].js', // Support chunking with @loadable/components
         },
         optimization: {
+            minimize: false,
             splitChunks: {
                 cacheGroups: {
                     vendor: {
@@ -189,6 +190,7 @@ const client = baseConfig('web')
     .extend((config) => {
         return {
             ...config,
+            // Must be named "client". See - https://www.npmjs.com/package/webpack-hot-server-middleware#usage
             name: 'client',
             entry: {
                 main: './app/main',
@@ -217,10 +219,11 @@ const clientOptional = baseConfig('web')
     })
     .build()
 
-const server = baseConfig('node')
+const renderer = baseConfig('node')
     .extend((config) => {
         return {
             ...config,
+            // Must be named "server". See - https://www.npmjs.com/package/webpack-hot-server-middleware#usage
             name: 'server',
             entry: 'pwa-kit-react-sdk/ssr/server/react-rendering.js',
             output: {
@@ -247,23 +250,46 @@ const server = baseConfig('node')
     })
     .build()
 
+const ssr = (() => {
+    // Only compile the ssr file when we're building for prod.
+    if (mode === production) {
+        return baseConfig('node')
+            .extend((config) => {
+                return {
+                    ...config,
+                    // Must *not* be named "server". See - https://www.npmjs.com/package/webpack-hot-server-middleware#usage
+                    name: 'ssr',
+                    entry: './app/ssr.js',
+                    output: {
+                        path: buildDir,
+                        filename: 'ssr.js',
+                        libraryTarget: 'commonjs2',
+                    },
+                }
+            })
+            .build()
+    } else {
+        return undefined
+    }
+})()
+
 const requestProcessor = baseConfig('node')
     .extend((config) => {
         return {
             ...config,
             name: 'request-processor',
-            entry: {
-                ...optional('request-processor', './app/request-processor.js'),
+            entry: './app/request-processor.js',
+            output: {
+                path: buildDir,
+                filename: 'request-processor.js',
+                libraryTarget: 'commonjs2',
             },
         }
     })
     .build()
 
-module.exports = [
-    client,
-    server,
-    clientOptional,
-    requestProcessor
-].map((config) => {
-    return new SpeedMeasurePlugin({disable: !process.env.MEASURE}).wrap(config)
-})
+module.exports = [client, ssr, renderer, clientOptional, requestProcessor]
+    .filter(Boolean)
+    .map((config) => {
+        return new SpeedMeasurePlugin({disable: !process.env.MEASURE}).wrap(config)
+    })

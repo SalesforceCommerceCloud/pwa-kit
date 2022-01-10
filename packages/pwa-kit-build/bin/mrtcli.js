@@ -6,6 +6,7 @@ const isEmail = require('validator/lib/isEmail')
 const {execSync} = require('child_process')
 const scriptUtils = require('../scripts/utils')
 const sh = require('shelljs')
+const uploadBundle = require('../scripts/upload.js')
 
 // TODO: Won't work when deployed to NPM - need to resolve differently
 const webpack = require.resolve('webpack/bin/webpack')
@@ -68,34 +69,16 @@ const main = () => {
         .command('build')
         .description(`build your app for production`)
         .action(() => {
-            // TODO: For the build dir size to be manageable, we need
-            // to split out packages for sdk-runtime and sdk-build, where
-            // build contains all the build tools and runtime contains
-            // express and the small number of prod dependencies we have.
-            // As is, we pull in all the dev tools (weback and co.) to the
-            // shipped bundle. Splitting the package is the *only* solution
-            // here – prune will do the right thing, if we get our
-            // dependencies right.
             const original = sh.config.silent
-            sh.config.silent = true
+            sh.config.silent = false
             try {
                 sh.rm('-rf', './build')
-                sh.mkdir('-p', './build/node_modules')
-                sh.exec(`${webpack} --config ${webpackConf}`)
-                sh.cp('-RL', './node_modules/*', './build/node_modules')
-                sh.cp('./app/ssr.js', './package.json', './build/')
-                sh.pushd('./build')
-                // TODO: We need to prune deps. How can we do that inside a Lerna monorepo?
-                sh.exec('npm prune --production')
-                // TODO: Can't ship this – workaround for our monorepo package setup.
-                if (sh.test('-d', './node_modules/pwa-kit-react-sdk')) {
-                    sh.cp(
-                        '-RL',
-                        '../../pwa-kit-react-sdk/node_modules',
-                        './node_modules/pwa-kit-react-sdk/'
-                    )
-                }
-                sh.popd()
+                sh.exec(`${webpack} --config ${webpackConf}`, {
+                    env: {
+                        NODE_ENV: 'production',
+                        ...process.env,
+                    },
+                })
             } finally {
                 sh.config.silent = original
             }
@@ -104,8 +87,57 @@ const main = () => {
     program
         .command('push')
         .description(`push a bundle to managed runtime`)
-        .action(() => {
-            console.log('Pushing...')
+        .addOption(
+            new program.Option(
+                '-b --buildDirectory <buildDirectory>',
+                'a custom project directory where your build is located'
+            ).default(p.join(process.cwd(), 'build'), './build')
+        )
+        .addOption(
+            new program.Option(
+                '-m --message <message>',
+                "a message to include along with the uploaded bundle in Mobify Cloud (default: '<git branch>:<git commit hash>')"
+            )
+        )
+        .addOption(
+            new program.Option(
+                '-s --projectSlug <projectSlug>',
+                "a project slug that differs from the name property in your project's package.json (default: the 'name' key from the package.json)"
+            )
+        )
+        .addOption(
+            new program.Option(
+                '-t --target <target>',
+                'a custom target to upload a bundle to within Mobify Cloud'
+            )
+        )
+        .action(({buildDirectory, message, projectSlug, target}) => {
+            const pkg = require(p.join(process.cwd(), 'package.json'))
+            const mobify = pkg.mobify || {}
+
+            const options = {
+                buildDirectory,
+                message,
+                projectSlug,
+                target,
+                // Note: Cloud expects snake_case, but package.json uses camelCase.
+                ssr_parameters: mobify.ssrParameters,
+                ssr_only: mobify.ssrOnly,
+                ssr_shared: mobify.ssrShared,
+                set_ssr_values: true,
+            }
+
+            if (
+                !Array.isArray(options.ssr_only) ||
+                options.ssr_only.length === 0 ||
+                !Array.isArray(options.ssr_shared) ||
+                options.ssr_shared.length === 0
+            ) {
+                scriptUtils.fail('ssrEnabled is set, but no ssrOnly or ssrShared files are defined')
+            }
+            uploadBundle(options).catch((err) => {
+                console.error(err.message || err)
+            })
         })
 
     program

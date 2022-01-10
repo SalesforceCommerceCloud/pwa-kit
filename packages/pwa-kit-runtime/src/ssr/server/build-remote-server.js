@@ -76,20 +76,6 @@ const METRIC_DIMENSIONS = {
 
 let _nextRequestId = 1
 
-const projectPkg = () => {
-    const searchPaths = [
-        path.resolve(process.cwd(), './package.json'),
-        path.resolve(process.cwd(), '..', './package.json'),
-    ]
-    for (let i = 0; i < searchPaths.length; i++) {
-        const searchPath = searchPaths[i]
-        if (fs.existsSync(searchPath)) {
-            return require(searchPath)
-        }
-    }
-    throw new Error(`Cannot find package.json in ${searchPaths}`)
-}
-
 /**
  * @private
  */
@@ -122,7 +108,7 @@ export const RemoteServerFactory = {
 
             enableLegacyRemoteProxying: true,
 
-            mobify: projectPkg().mobify,
+            mobify: undefined,
         }
 
         options = Object.assign({}, defaults, options)
@@ -651,7 +637,12 @@ export const RemoteServerFactory = {
     },
 
     serveCompiledAssets(app) {
-        throw new Error('Not implemented')
+        // See - https://www.npmjs.com/package/webpack-hot-server-middleware#usage
+        const {buildDir} = app.options;
+        const _require = eval('require')
+        const serverRenderer = _require(path.join(buildDir, 'server-renderer.js')).default;
+        const stats = _require(path.join(buildDir, 'loadable-stats.json'));
+        app.use(serverRenderer(stats));
     },
 
 /**
