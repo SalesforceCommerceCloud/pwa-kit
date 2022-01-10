@@ -248,11 +248,6 @@ export const outgoingRequestHook = (wrapped, options) => {
             }
         }
 
-        if (!workingOptions) {
-            // No options were supplied, so we add them
-            workingOptions = {headers: {}}
-        }
-
         if (agentOptions) {
             const {httpAgent, httpsAgent} = getAgents(agentOptions)
 
@@ -278,6 +273,11 @@ export const outgoingRequestHook = (wrapped, options) => {
 
         if (!(appHostname && accessKey)) {
             return wrapped.apply(this, workingArgs) // eslint-disable-line prefer-rest-params
+        }
+
+        if (!workingOptions) {
+            // No options were supplied, so we add them
+            workingOptions = {headers: {}}
         }
 
         // We need to identify loopback requests: requests that are
