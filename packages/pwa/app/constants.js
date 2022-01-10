@@ -43,8 +43,6 @@ export const cssColorGroups = {
 
 // Color to use for the UI surrounding the page in browsers.
 export const THEME_COLOR = '#0176D3'
-// On iOS, the title for the launch icon.
-export const APPLE_MOBILE_WEB_APP_TITLE = 'PWA Kit | Retail React App'
 
 export const FILTER_ACCORDION_SATE = 'filters-expanded-index'
 
