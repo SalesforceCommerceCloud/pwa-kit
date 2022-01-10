@@ -19,8 +19,7 @@ import {
     BasketProvider,
     CustomerProductListsProvider
 } from '../../commerce-api/contexts'
-import {commerceAPIConfig} from '../../commerce-api.config'
-import {einsteinAPIConfig} from '../../einstein-api.config'
+import {commerceAPIConfig, einsteinAPIConfig} from '../../api.config'
 import {DEFAULT_LOCALE, DEFAULT_CURRENCY, urlPartPositions} from '../../constants'
 import {getPreferredCurrency, getSupportedLocalesIds} from '../../utils/locale'
 import {getUrlConfig} from '../../utils/utils'

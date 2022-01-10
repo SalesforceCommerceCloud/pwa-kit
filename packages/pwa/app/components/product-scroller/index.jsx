@@ -98,6 +98,9 @@ const ProductScroller = forwardRef(
                                             {...(typeof productTileProps === 'function'
                                                 ? {...productTileProps(product)}
                                                 : {...productTileProps})}
+                                            dynamicImageProps={{
+                                                widths: ['70vw', '70vw', '40vw', '30vw']
+                                            }}
                                         />
                                     )}
                                 </Box>
