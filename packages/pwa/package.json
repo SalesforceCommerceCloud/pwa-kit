@@ -213,26 +213,6 @@
             {
                 "id": "ja-JP",
                 "preferredCurrency": "JPY"
-            },
-            {
-                "id": "de-DE",
-                "preferredCurrency": "EUR"
-            },
-            {
-                "id": "es-MX",
-                "preferredCurrency": "MXN"
-            },
-            {
-                "id": "ko-KR",
-                "preferredCurrency": "KRW"
-            },
-            {
-                "id": "pt-BR",
-                "preferredCurrency": "BRL"
-            },
-            {
-                "id": "zt-TW",
-                "preferredCurrency": "TWD"
             }
         ],
         "defaultLocale": "en-GB"
