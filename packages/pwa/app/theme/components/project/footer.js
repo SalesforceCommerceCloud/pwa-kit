@@ -54,8 +54,7 @@ export default {
         },
         localeSelector: {
             display: 'inline-block',
-            marginTop: 8,
-            marginBottom: 5
+            marginTop: 8
         },
         localeDropdown: {
             background: 'gray.800',
@@ -67,6 +66,7 @@ export default {
             maxWidth: {base: '34.5rem', lg: '100%'}
         },
         horizontalRule: {
+            marginTop: 4,
             marginBottom: 4
         },
         copyright: {
