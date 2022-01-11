@@ -18,8 +18,9 @@ import {urlPartPositions} from '../constants'
 export const configureRoutes = (routes = [], {ignoredRoutes = []}) => {
     if (!routes.length) return []
 
+    // how to use getConfigMix here????
     const urlConfig = getConfig('app.url')
-
+    console.log('route util urlConfig', urlConfig)
     if (!urlConfig) return routes
 
     return routes.map((route) => {

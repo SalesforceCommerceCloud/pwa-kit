@@ -23,16 +23,28 @@ export const resolveSiteFromUrl = (url) => {
     const sites = getSites()
     const defaultSiteId = getConfig('app.defaultSiteId')
     let site
-    // Step 1: look for the site from the url, if found, return the site
-    site = getSiteByPath(path)
+
+    // Step 1: look for the site from the hostname, if found, return it
+    site = getSiteByHostname(hostname)
+
     if (site) {
         return site
     }
 
-    // Step 2: look for the site from the hostname, if found, return it
-    site = getSiteByHostname(hostname)
+    // Step 2: look for the site from the url, if found, return the site
+    site = getSiteByPath(path)
+    if (site) {
+        console.log('site by path', site)
+
+        return site
+    }
+
+    // handle an edge case when hostname is used multiple times, but there is no alias
+    site = sites.find((site) => site.hostnames && site.hostnames.includes(hostname) && !site.alias)
 
     if (site) {
+        console.log('site', site)
+
         return site
     }
 
@@ -58,6 +70,7 @@ export const getSiteByHostname = (hostname) => {
         throw new Error('No site config found. Please check you configuration')
     if (!hostname) return
 
+    // return the site that only uses hostnames, but does not have alias
     const site = sites.filter((site) => site.hostnames && site.hostnames.includes(hostname))
 
     return site?.length === 1 ? site[0] : undefined
@@ -69,12 +82,12 @@ export const getSiteByHostname = (hostname) => {
  * @returns {object|undefined}
  */
 export const getSiteByPath = (path) => {
-    const {site: currentSite} = getParamsFromPath(path)
-    if (!currentSite) return
     const sites = getSites()
-
     if (!sites || !sites.length)
         throw new Error('No site config found. Please check you configuration')
+    const {site: currentSite} = getParamsFromPath(path)
+
+    if (!currentSite) return
 
     const site = sites.find((site) => site.id === currentSite || site.alias === currentSite)
     return site

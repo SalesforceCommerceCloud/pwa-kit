@@ -6,7 +6,7 @@
  */
 
 import {HOME_HREF} from '../constants'
-import {getConfig} from './utils'
+import {getConfig, getConfigMix} from './utils'
 import {urlPartPositions} from '../constants'
 import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
 
@@ -127,9 +127,9 @@ export const searchUrlBuilder = (searchTerm) => `/search?q=${searchTerm}`
  * @returns {string} - The relative URL for the specific locale.
  */
 export const getUrlWithLocale = (shortCode, opts = {}) => {
-    const {locale: localePosition, site: sitePosition} = getConfig('app.url')
-    const defaultSiteId = getConfig('app.defaultSiteId')
     const location = opts.location ? opts.location : window.location
+    const {locale: localePosition, site: sitePosition} = getConfigMix(location.pathname)
+    const defaultSiteId = getConfig('app.defaultSiteId')
     const {disallowParams = [], site} = opts
     let relativeUrl = location.pathname
 
@@ -254,7 +254,8 @@ export const removeQueryParamsFromPath = (path, keys) => {
  *
  */
 export const buildPathWithUrlConfig = (url, configValues = {}) => {
-    const urlConfig = getConfig('app.url')
+    const urlConfig = getConfigMix(url)
+    console.log('urlConfig', urlConfig)
     if (!urlConfig || !Object.values(urlConfig).length) return url
     if (!Object.values(configValues).length) return url
     const queryParams = {}
@@ -282,5 +283,7 @@ export const buildPathWithUrlConfig = (url, configValues = {}) => {
     if (Object.keys(queryParams).length) {
         updatedPath = rebuildPathWithParams(updatedPath, queryParams)
     }
+    console.log('updatedPath', updatedPath)
+
     return updatedPath
 }

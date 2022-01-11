@@ -2,14 +2,53 @@
     "app": {
         "defaultSiteId": "RefArch",
         "url": {
-            "locale": "path",
-            "site": "path"
+            "locale": "none",
+            "site": "none"
         },
         "sites": [
             {
                 "id": "RefArch",
-                "alias": "us",
-                "hostnames": [],
+                "hostnames": ["localhost"],
+                "l10n": {
+                    "supportedCurrencies": ["USD"],
+                    "defaultCurrency": "USD",
+                    "supportedLocales": [
+                        {
+                            "id": "en-US",
+                            "preferredCurrency": "USD"
+                        },
+                        {
+                            "id": "en-CA",
+                            "preferredCurrency": "USD"
+                        }
+                    ],
+                    "defaultLocale": "en-US"
+                }
+            },
+            {
+                "id": "RefArch",
+                "alias": "eu",
+                "hostnames": ["localhost"],
+                "l10n": {
+                    "supportedCurrencies": ["USD"],
+                    "defaultCurrency": "USD",
+                    "supportedLocales": [
+                        {
+                            "id": "en-US",
+                            "preferredCurrency": "USD"
+                        },
+                        {
+                            "id": "en-CA",
+                            "preferredCurrency": "USD"
+                        }
+                    ],
+                    "defaultLocale": "en-US"
+                }
+            },
+            {
+                "id": "RefArch",
+                "alias": "en_XX",
+                "hostnames": ["localhost"],
                 "l10n": {
                     "supportedCurrencies": ["USD"],
                     "defaultCurrency": "USD",
@@ -29,7 +68,6 @@
             {
                 "id": "RefArchGlobal",
                 "alias": "global",
-                "hostnames": [],
                 "l10n": {
                     "supportedCurrencies": ["GBP", "EUR", "CNY", "JPY"],
                     "defaultCurrency": "GBP",
@@ -58,6 +96,7 @@
                     "defaultLocale": "en-GB"
                 }
             }
+
         ]
     }
 }

@@ -39,7 +39,8 @@ import {
     HOME_SHOP_PRODUCTS_LIMIT,
     urlPartPositions
 } from '../../constants'
-import {getConfig} from '../../utils/utils'
+import {getConfigMix} from '../../utils/utils'
+import {useLocation} from 'react-router-dom'
 
 /**
  * This is the home page for Retail React App.
@@ -49,7 +50,8 @@ import {getConfig} from '../../utils/utils'
  */
 const Home = ({productSearchResult, isLoading}) => {
     const intl = useIntl()
-    const urlConfig = getConfig('app.url')
+    const location = useLocation()
+    const urlConfig = getConfigMix(location.pathname)
 
     return (
         <Box data-testid="home-page" layerStyle="page">

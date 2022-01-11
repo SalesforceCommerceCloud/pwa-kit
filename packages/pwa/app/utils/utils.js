@@ -221,7 +221,8 @@ export const getObjectProperty = (obj, path) => {
  * @returns {object}
  */
 export const getParamsFromPath = (path) => {
-    const {locale: localePosition, site: sitePosition} = getConfig('app.url')
+    const {locale: localePosition, site: sitePosition} = getConfigMix(path)
+    console.log('sitePosition', sitePosition)
     const {pathname, search} = new URL(pathToUrl(path))
     const params = new URLSearchParams(search)
     const result = {}
@@ -253,6 +254,25 @@ export const getParamsFromPath = (path) => {
             break
         }
     }
+    console.log('result', result)
 
     return result
+}
+
+// a function to return a custom url config depending on some special cases
+// e.g elfcosmetics.com/eu and elfcosmetics.com/en_XX has site in the url as path which is different from the config values
+export const getConfigMix = (path) => {
+    console.log('getConfigMix', path)
+    const paths = path.split('/')
+    // if the path includes /en_XX/ or /eu
+    const regex = /^\/en_\w\w|eu/g
+
+    if (regex.test(paths[1])) {
+        return {
+            site: 'path',
+            locale: 'none'
+        }
+    } else {
+        return getConfig('app.url')
+    }
 }
