@@ -1,4 +1,6 @@
 ## v1.4.0-dev (Jan 06, 2022)
+-   Generate `test-project` with the correct Einstein's site id [#285](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/285)
+
 ## v1.3.0 (Jan 06, 2022)
 
 ## v1.1.0 (Sep 27, 2021)
