@@ -120,11 +120,11 @@ commands:
       - run:
           name: Check Repository Clean
           command: |
-              # Print status for debugging on CircleCI.
-              git status
-              # Fail the build if any step leaves uncommitted changes in the repo
-              # that would prevent Lerna from publishing (Lerna gets this right).
-              git diff --exit-code
+            # Print status for debugging on CircleCI.
+            git status
+            # Fail the build if any step leaves uncommitted changes in the repo
+            # that would prevent Lerna from publishing (Lerna gets this right).
+            git diff --exit-code
 
   early_return_for_forked_pull_requests:
     description: >-
@@ -163,7 +163,7 @@ jobs:
   testNode14Windows:
     executor:
       name: win/default
-      size: "large"
+      size: 'large'
       shell: bash.exe
     steps:
       - checkout
@@ -182,33 +182,33 @@ jobs:
       - run:
           name: Push Bundle
           command: |
-              if [[ $DEVELOP || $RELEASE ]]; then
-                target=staging
-              elif [[ $RELEASE ]]; then
-                target=production
-              else
-                target=""
-              fi
+            if [[ $DEVELOP || $RELEASE ]]; then
+              target=staging
+            elif [[ $RELEASE ]]; then
+              target=production
+            else
+              target=""
+            fi
 
-              if [[ $target ]]; then
-                npm run push --prefix packages/pwa -- --message "build ${CIRCLE_BUILD_NUM} on ${CIRCLE_BRANCH} (${CIRCLE_SHA1})" --target $target
-              fi
+            if [[ $target ]]; then
+              npm run push --prefix packages/pwa -- --message "build ${CIRCLE_BUILD_NUM} on ${CIRCLE_BRANCH} (${CIRCLE_SHA1})" --target $target
+            fi
       - checkclean
       - run:
           name: Publish to NPM
           command: |
-              # Add NPM token to allow publishing from Circle
-              echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > ~/.npmrc
+            # Add NPM token to allow publishing from Circle
+            echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > ~/.npmrc
 
-              if [[ $RELEASE ]]; then
-                # Publish all changed packages. The "from-package" arg means "look
-                # at the version numbers in each package.json file and if that doesn't
-                # exist on NPM, publish"
-                npm run lerna -- publish from-package --yes --no-verify-access
-              fi
+            if [[ $RELEASE ]]; then
+              # Publish all changed packages. The "from-package" arg means "look
+              # at the version numbers in each package.json file and if that doesn't
+              # exist on NPM, publish"
+              npm run lerna -- publish from-package --yes --no-verify-access
+            fi
 
-              # Cleanup
-              rm ~/.npmrc
+            # Cleanup
+            rm ~/.npmrc
       - store_test_results:
           path: packages/pwa/tests/reports
           when: always
@@ -316,7 +316,7 @@ workflows:
   nightly-build:
     triggers:
       - schedule:
-          cron: "0 8 * * *"
+          cron: '0 8 * * *'
           filters:
             branches:
               only:

@@ -1,8 +1,6 @@
 {
-    "files": [
-        "app/static/**/*"
-    ],
-    "baseDir": "app",
-    "hashLength": 8,
-    "destinationFolder": "app"
+  "files": ["app/static/**/*"],
+  "baseDir": "app",
+  "hashLength": 8,
+  "destinationFolder": "app"
 }
