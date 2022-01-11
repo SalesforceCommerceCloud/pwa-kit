@@ -17,6 +17,10 @@ const currentDate = Date.now()
 const APP_MANIFEST_NAME = 'cache-hash-manifest.json'
 const LOADER_MANIFEST_NAME = 'loader-cache-hash-manifest.json'
 
+console.warn(
+    'Deprecated. The create-hash-manifest script will be removed in our next major version.'
+)
+
 const getHash = (filePath, options) =>
     fileUtils
         .readFile(filePath)
