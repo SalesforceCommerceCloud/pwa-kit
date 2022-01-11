@@ -46,13 +46,6 @@ Run tests for all packages with:
   npm test
 ```
 
-Run integration tests against live APIs for all packages with:
-
-```bash
-  cd [repo root]
-  npm run test:integration
-```
-
 ## 🐛 Issues
 
 If you’re experiencing an issue, check the open issues first. If someone hasn’t already raised the same issue, file a new issue with a description of the problem and describe the steps to reproduce it. If you require an urgent response to your issue, file a support ticket with [Salesforce Commerce Cloud](https://help.salesforce.com/). You can also create an issue to request a new feature.
