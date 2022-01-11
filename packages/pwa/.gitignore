@@ -6,8 +6,6 @@ tests/reports
 tests/screenshots
 tests/lighthouse-reports/
 lighthouse/audit*
-cypress/screenshots
-cypress/videos
 .lighthouseci
 
 .tern-port
