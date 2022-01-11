@@ -16,7 +16,6 @@ commands:
             touch $BASH_ENV
             if [[ "${CIRCLE_BRANCH}" == "develop" ]]; then echo 'export DEVELOP=true' >> $BASH_ENV; fi
             if [[ "${CIRCLE_BRANCH}" =~ ^release- ]]; then echo 'export RELEASE=true' >> $BASH_ENV; fi
-            echo 'export DETECT_CHROMEDRIVER_VERSION=true' >> $BASH_ENV;
             source $BASH_ENV
       - run:
           name: 'Install Dependencies'
@@ -76,10 +75,6 @@ commands:
   runtests:
     description: 'Run tests'
     parameters:
-      enableIntegrationTests:
-          description: 'Enable expensive integration tests'
-          default: true
-          type: boolean
       cwd:
         description: 'The directory to execute the tests from'
         default: ${PWD}
@@ -99,16 +94,6 @@ commands:
 
             # Always run fast unit tests
             npm run test
-
-            # End to end tests on nightly builds only
-            if [[ $NIGHTLY ]]; then
-              npm run test:e2e-ci
-            fi
-
-            # Only run expensive integration tests on these branches
-            if [[ (<< parameters.enableIntegrationTests >> == "true") && ( $DEVELOP || $RELEASE ) ]]; then
-              npm run test:integration
-            fi
   smoketestscripts:
     description: 'Smoke test scripts'
     parameters:
@@ -161,8 +146,7 @@ jobs:
     steps:
       - checkout
       - setup
-      - runtests:
-          enableIntegrationTests: false
+      - runtests
       - lighthouse-ci
       - smoketestscripts
       - checkclean
