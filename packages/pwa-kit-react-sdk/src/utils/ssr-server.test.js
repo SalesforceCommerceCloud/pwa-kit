@@ -845,7 +845,15 @@ describe('outgoingRequestHook tests', () => {
 
     testCases.forEach((testCase) =>
         test(testCase.name, () => {
-            const hook = outgoingRequestHook(mockRequest, {appHostname})
+            const patchOptions = {appHostname}
+
+            if (testCase.addAgent) {
+                patchOptions.agentOptions = {
+                    keepAlive: true
+                }
+            }
+
+            const hook = outgoingRequestHook(mockRequest, patchOptions)
 
             const args = []
             const hookOptions = {}
@@ -884,8 +892,6 @@ describe('outgoingRequestHook tests', () => {
                 args.push(fakeCallback)
             }
 
-            // TODO: Add test for checking if the agent was applied or not below:
-
             process.env.X_MOBIFY_ACCESS_KEY = accessKey
             hook(...args)
             expect(mockRequest.calledOnce).toBe(true)
@@ -916,7 +922,7 @@ describe('outgoingRequestHook tests', () => {
                 }
             }
 
-            if (testCase.addCallback) {
+            if (testCase.addCallback && !testCase.addAgent) {
                 expect(called[0]).toBe(fakeCallback)
             }
         })

@@ -252,10 +252,14 @@ export const outgoingRequestHook = (wrapped, options) => {
             const {httpAgent, httpsAgent} = getAgents(agentOptions)
 
             // Add default agent to global connection reuse.
-            workingOptions.agent =
-                workingUrl.startsWith('http:') || workingOptions.protocol === 'http:'
-                    ? httpAgent
-                    : httpsAgent
+
+            workingOptions = {
+                ...workingOptions,
+                agent:
+                    workingUrl.startsWith('http:') || workingOptions?.protocol === 'http:'
+                        ? httpAgent
+                        : httpsAgent
+            }
 
             // node-fetch and potentially other libraries add connection: close heaaders
             // remove them to keep the connection alive. NOTE: There are variations in
