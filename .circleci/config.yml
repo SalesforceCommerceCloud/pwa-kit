@@ -103,6 +103,7 @@ commands:
       - save_cache:
           key: npm-cache
           paths:
+            - /root/.npm
   runtests:
     description: 'Run tests'
     parameters:
