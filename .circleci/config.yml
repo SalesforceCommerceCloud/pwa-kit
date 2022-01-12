@@ -74,7 +74,7 @@ commands:
             - /root/.npm
   setup_npm_7:
     description: 'Setup Machine with npm 7'
-        steps:
+    steps:
       - restore_cache:
           keys:
             - npm-cache
@@ -90,7 +90,7 @@ commands:
             - /root/.npm
   setup_npm_8:
     description: 'Setup Machine with npm 8'
-        steps:
+    steps:
       - restore_cache:
           keys:
             - npm-cache
