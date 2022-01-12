@@ -1,0 +1,58 @@
+/*
+ * Copyright (c) 2021, salesforce.com, inc.
+ * All rights reserved.
+ * SPDX-License-Identifier: BSD-3-Clause
+ * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
+ */
+"use strict";
+
+/* global WEBPACK_PACKAGE_JSON_MOBIFY */
+
+import path from "path";
+import {
+  createApp,
+  createHandler
+} from "pwa-kit-react-sdk/ssr/server/express";
+import { render } from "pwa-kit-react-sdk/ssr/server/react-rendering";
+
+const MOBIFY = {
+  ssrEnabled: true,
+  ssrOnly: ["ssr.js", "ssr.js.map", "node_modules/**/*.*"],
+  ssrShared: ["**/*.js", "**/*.js.map", "**/*.json"],
+  ssrParameters: {
+    ssrFunctionNodeVersion: "14.x",
+    proxyConfigs: [],
+  },
+};
+
+const app = createApp({
+  // The build directory (an absolute path)
+  buildDir: path.resolve(process.cwd(), "build"),
+
+  // The cache time for SSR'd pages (defaults to 600 seconds)
+  defaultCacheTimeSeconds: 600,
+
+  // The path to the favicon. This must also appear in
+  // the mobify.ssrShared section of package.json.
+  faviconPath: path.resolve(process.cwd(), "build/static/ico/favicon.ico"),
+
+  // The location of the apps manifest file relative to the build directory
+  manifestPath: "static/manifest.json",
+
+  mobify: MOBIFY,
+
+  // The port that the local dev server listens on
+  port: 3000,
+
+  // The protocol on which the development Express app listens.
+  // Note that http://localhost is treated as a secure context for development.
+  protocol: "http",
+
+  enableLegacyRemoteProxying: false,
+});
+
+app.get("/*", render);
+
+// SSR requires that we export a single handler function called 'get', that
+// supports AWS use of the server that we created above.
+export const get = createHandler(app);
