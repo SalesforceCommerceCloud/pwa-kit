@@ -25,6 +25,9 @@ const app = createApp({
     // the mobify.ssrShared section of package.json.
     faviconPath: path.resolve(process.cwd(), 'build/static/ico/favicon.ico'),
 
+    // Whether or not to use a keep-alive agent for loop-back connections.
+    loopbackAgent: true,
+
     // The location of the apps manifest file relative to the build directory
     manifestPath: 'static/manifest.json',
 

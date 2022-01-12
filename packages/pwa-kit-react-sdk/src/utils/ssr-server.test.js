@@ -775,7 +775,7 @@ describe('outgoingRequestHook tests', () => {
         mockRequest.reset()
     })
 
-    const appHost = 'localhost:3444'
+    const appHostname = 'localhost:3444'
     const otherHost = 'somewhere.com'
     const accessKey = 'abcdefghijklm'
     const fakeCallback = () => false
@@ -788,14 +788,14 @@ describe('outgoingRequestHook tests', () => {
     })
 
     test('fall-though when empty appHost', () => {
-        const hook = outgoingRequestHook(mockRequest, () => null)
+        const hook = outgoingRequestHook(mockRequest, {})
         const args = ['a', {a: 123}, () => false]
         hook(...args)
         expect(mockRequest.calledWith(...args)).toBe(true)
     })
 
     test('fall-though when no access key', () => {
-        const hook = outgoingRequestHook(mockRequest, () => appHost)
+        const hook = outgoingRequestHook(mockRequest, {appHostname})
         const args = ['a', {a: 123}, () => false]
         process.env.X_MOBIFY_ACCESS_KEY = undefined
         hook(...args)
@@ -810,7 +810,7 @@ describe('outgoingRequestHook tests', () => {
         },
         {
             name: 'loopback',
-            hostname: appHost,
+            hostname: appHostname,
             expectHeader: true
         }
     ]
@@ -819,21 +819,25 @@ describe('outgoingRequestHook tests', () => {
 
     const withHeaders = [true, false]
     const withCallback = withHeaders
+    const withLoopbackAgent = withCallback
 
     const testCases = []
     baseTestCases.forEach((baseTestCase) =>
         testMethods.forEach((testMethod) =>
             withHeaders.forEach((addHeaders) =>
                 withCallback.forEach((addCallback) => {
-                    const testCase = {...baseTestCase}
-                    testCase.name =
-                        `${testCase.name} via ${testMethod} ` +
-                        `${addHeaders ? 'with' : 'without'} headers, ` +
-                        `${addCallback ? 'with' : 'without'} callback`
-                    testCase.testMethod = testMethod
-                    testCase.addHeaders = addHeaders
-                    testCase.addCallback = addCallback
-                    testCases.push(testCase)
+                    withLoopbackAgent.forEach((addLoopbackAgent) => {
+                        const testCase = {...baseTestCase}
+                        testCase.name =
+                            `${testCase.name} via ${testMethod} ` +
+                            `${addHeaders ? 'with' : 'without'} headers, ` +
+                            `${addCallback ? 'with' : 'without'} callback`
+                        testCase.testMethod = testMethod
+                        testCase.addHeaders = addHeaders
+                        testCase.addCallback = addCallback
+                        testCase.addLoopbackAgent = addLoopbackAgent
+                        testCases.push(testCase)
+                    })
                 })
             )
         )
@@ -841,7 +845,15 @@ describe('outgoingRequestHook tests', () => {
 
     testCases.forEach((testCase) =>
         test(testCase.name, () => {
-            const hook = outgoingRequestHook(mockRequest, () => appHost)
+            const createAppOptions = {appHostname}
+
+            if (testCase.addAgent) {
+                createAppOptions.agentOptions = {
+                    keepAlive: true
+                }
+            }
+
+            const hook = outgoingRequestHook(mockRequest, createAppOptions)
 
             const args = []
             const hookOptions = {}
