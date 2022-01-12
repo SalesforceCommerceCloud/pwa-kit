@@ -72,6 +72,37 @@ commands:
           key: npm-cache
           paths:
             - /root/.npm
+  setup_npm_7:
+    description: 'Setup Machine with npm 7'
+        steps:
+      - restore_cache:
+          keys:
+            - npm-cache
+      - run:
+          name: 'Install Dependencies'
+          command: |
+
+            sudo npm install -g npm@7
+            npm ci
+      - save_cache:
+          key: npm-cache
+          paths:
+            - /root/.npm
+  setup_npm_8:
+    description: 'Setup Machine with npm 8'
+        steps:
+      - restore_cache:
+          keys:
+            - npm-cache
+      - run:
+          name: 'Install Dependencies'
+          command: |
+
+            sudo npm install -g npm@8
+            npm ci
+      - save_cache:
+          key: npm-cache
+          paths:
   runtests:
     description: 'Run tests'
     parameters:
@@ -168,6 +199,20 @@ jobs:
     steps:
       - checkout
       - setup_windows
+      - runtests
+  testNode14npm7:
+    docker:
+      - image: circleci/node:14-stretch-browsers
+    steps:
+      - checkout
+      - setup_npm_7
+      - runtests
+  testNode14npm8:
+    docker:
+      - image: circleci/node:14-stretch-browsers
+    steps:
+      - checkout
+      - setup_npm_8
       - runtests
   testNode14:
     docker:
@@ -312,6 +357,8 @@ workflows:
       - testNode12
       - testNode14
       - testNode14Windows
+      - testNode14npm7
+      - testNode14npm8
       - generatedSFCCProjectTest
   nightly-build:
     triggers:
@@ -327,6 +374,10 @@ workflows:
       - testNode14:
           context: nightly-build
       - testNode14Windows:
+          context: nightly-build
+      - testNode14npm7:
+          context: nightly-build
+      - testNode14npm8:
           context: nightly-build
       - generatedSFCCProjectTest:
           context: nightly-build
