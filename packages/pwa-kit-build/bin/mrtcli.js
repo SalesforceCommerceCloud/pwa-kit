@@ -12,8 +12,6 @@ const uploadBundle = require('../scripts/upload.js')
 const webpack = require.resolve('webpack/bin/webpack')
 const webpackConf = p.resolve(p.join(__dirname, '..', 'webpack', 'config.js'))
 
-const prettier = p.resolve(p.join(__dirname, '..', 'node_modules', '.bin', 'prettier'))
-
 const main = () => {
     process.env.CONTEXT = process.cwd()
     program.description(`The Managed Runtime CLI`)
@@ -144,21 +142,8 @@ const main = () => {
         .command('format')
         .description(`automatically re-format all source files`)
         .action(() => {
-            execSync(`${prettier} --write ${p.join(process.cwd(), 'app')}`, {stdio: 'inherit'})
-        })
-
-    program
-        .command('generate')
-        .description(`generate a new project, based on a template`)
-        .action(() => {
-            console.log('Generating a new project')
-        })
-
-    program
-        .command('test')
-        .description(`run your project's tests`)
-        .action(() => {
-            console.log('Running tests')
+            const prettier = p.join(require.resolve('prettier'), '../../.bin/prettier')
+            sh.exec(`${prettier} --write 'app'`)
         })
 
     program.parse(process.argv)
