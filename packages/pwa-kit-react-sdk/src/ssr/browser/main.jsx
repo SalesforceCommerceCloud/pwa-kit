@@ -12,6 +12,7 @@ import DeviceContext from '../universal/device-context'
 import App from '../universal/components/_app'
 import AppConfig from '../universal/components/_app-config'
 import Switch from '../universal/components/switch'
+import AppErrorBoundary from '../universal/components/app-error-boundary'
 import {getRoutes, routeComponent} from '../universal/components/route-component'
 import {loadableReady} from '@loadable/component'
 
@@ -74,16 +75,17 @@ export const start = () => {
         .then(() => {
             ReactDOM.hydrate(
                 <Router>
-                    <DeviceContext.Provider value={{type: window.__DEVICE_TYPE__}}>
-                        <AppConfig locals={locals}>
-                            <Switch
-                                error={error}
-                                appState={window.__PRELOADED_STATE__}
-                                routes={routes}
-                                App={WrappedApp}
-                            />
-                        </AppConfig>
-                    </DeviceContext.Provider>
+                    <AppErrorBoundary error={error}>
+                        <DeviceContext.Provider value={{type: window.__DEVICE_TYPE__}}>
+                            <AppConfig locals={locals}>
+                                <Switch
+                                    appState={window.__PRELOADED_STATE__}
+                                    routes={routes}
+                                    App={WrappedApp}
+                                />
+                            </AppConfig>
+                        </DeviceContext.Provider>
+                    </AppErrorBoundary>
                 </Router>,
                 rootEl,
                 () => {

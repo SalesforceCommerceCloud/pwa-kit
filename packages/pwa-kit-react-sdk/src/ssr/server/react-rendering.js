@@ -26,6 +26,7 @@ import Throw404 from '../universal/components/throw-404'
 
 import AppConfig from '../universal/components/_app-config'
 import Switch from '../universal/components/switch'
+import AppErrorBoundary from '../universal/components/app-error-boundary'
 import {getRoutes, routeComponent} from '../universal/components/route-component'
 import * as errors from '../universal/errors'
 import {detectDeviceType, isRemote} from '../../utils/ssr-server'
@@ -211,11 +212,13 @@ const renderApp = (args) => {
     let bundles = []
     let appJSX = (
         <Router location={location} context={routerContext}>
-            <DeviceContext.Provider value={{type: deviceType}}>
-                <AppConfig locals={res.locals}>
-                    <Switch error={error} appState={appState} routes={routes} App={App} />
-                </AppConfig>
-            </DeviceContext.Provider>
+            <AppErrorBoundary error={error}>
+                <DeviceContext.Provider value={{type: deviceType}}>
+                    <AppConfig locals={res.locals}>
+                        <Switch appState={appState} routes={routes} App={App} />
+                    </AppConfig>
+                </DeviceContext.Provider>
+            </AppErrorBoundary>
         </Router>
     )
 

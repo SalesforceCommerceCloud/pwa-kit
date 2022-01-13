@@ -72,7 +72,7 @@ const getLocale = (locals = {}) => {
 const AppConfig = ({children, locals = {}}) => {
     const [basket, setBasket] = useState(null)
     const [customer, setCustomer] = useState(null)
-
+    throw new Error('this is an error!!!!')
     return (
         <CommerceAPIProvider value={locals.api}>
             <CustomerProvider value={{customer, setCustomer}}>

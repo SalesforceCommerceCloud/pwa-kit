@@ -7,7 +7,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {Switch as RouterSwitch, Route} from 'react-router-dom'
-import AppErrorBoundary from '../app-error-boundary'
 import {UIDReset, UIDFork} from 'react-uid'
 
 /**
@@ -20,33 +19,28 @@ import {UIDReset, UIDFork} from 'react-uid'
  * @private
  */
 const Switch = (props) => {
-    const {error, appState, routes, App} = props
+    const {appState, routes, App} = props
     return (
         <UIDReset>
-            <AppErrorBoundary error={error}>
-                {!error && (
-                    <App preloadedProps={appState.appProps}>
-                        <RouterSwitch>
-                            {routes.map((route, i) => {
-                                const {component: Component, ...routeProps} = route
-                                return (
-                                    <Route key={i} {...routeProps}>
-                                        <UIDFork>
-                                            <Component preloadedProps={appState.pageProps} />
-                                        </UIDFork>
-                                    </Route>
-                                )
-                            })}
-                        </RouterSwitch>
-                    </App>
-                )}
-            </AppErrorBoundary>
+            <App preloadedProps={appState.appProps}>
+                <RouterSwitch>
+                    {routes.map((route, i) => {
+                        const {component: Component, ...routeProps} = route
+                        return (
+                            <Route key={i} {...routeProps}>
+                                <UIDFork>
+                                    <Component preloadedProps={appState.pageProps} />
+                                </UIDFork>
+                            </Route>
+                        )
+                    })}
+                </RouterSwitch>
+            </App>
         </UIDReset>
     )
 }
 
 Switch.propTypes = {
-    error: PropTypes.object,
     appState: PropTypes.object,
     routes: PropTypes.array,
     App: PropTypes.func,
