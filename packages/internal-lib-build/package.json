@@ -9,18 +9,11 @@
   },
   "license": "SEE LICENSE IN LICENSE",
   "author": "dev@mobify.com",
-  "main": "dist/index.js",
   "bin": {
     "internal-lib-build": "./bin/internal-lib-build.js"
   },
   "files": [
-    "bin",
-    "LICENSE",
-    "scripts",
-    "ssr",
-    "TERMS_OF_USE.md",
-    "utils",
-    "webpack"
+    "bin"
   ],
   "dependencies": {
     "@babel/cli": "^7.4.4",
@@ -56,14 +49,6 @@
     "prettier": "^2.4.1",
     "replace-in-file": "^6.2.0",
     "rimraf": "2.6.1",
-    "shelljs": "^0.8.4",
-    "verdaccio": "^5.4.0"
-  },
-  "scripts": {
-    "prepare": "npm run prod:build",
-    "prod:build": "cross-env NODE_ENV=production ./bin/internal-lib-build.js build"
-  },
-  "publishConfig": {
-    "directory": "dist"
+    "shelljs": "^0.8.4"
   }
 }

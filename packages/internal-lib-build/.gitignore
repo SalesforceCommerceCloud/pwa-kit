@@ -17,4 +17,3 @@ temp/
 temp_static/
 src/static/browser-detection.min.js
 progressive-web-sdk-*.tgz
-verdaccio-storage
