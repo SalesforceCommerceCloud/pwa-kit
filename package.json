@@ -9,7 +9,7 @@
     "commander": "^2.20.0",
     "lerna": "^3.20.2",
     "semver": "^7.3.2",
-    "shelljs": "^0.8.4"
+    "shelljs": "^0.8.5"
   },
   "scripts": {
     "preinstall": "node ./scripts/check-version.js",
