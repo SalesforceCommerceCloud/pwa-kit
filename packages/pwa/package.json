@@ -55,7 +55,7 @@
         "helmet": "^4.6.0",
         "hoist-non-react-statics": "^3.3.0",
         "jwt-decode": "^3.1.2",
-        "nanoid": "^3.1.22",
+        "nanoid": "^3.1.31",
         "node-fetch": "^2.3.0",
         "prop-types": "^15.6.0",
         "query-string": "^7.0.1",
