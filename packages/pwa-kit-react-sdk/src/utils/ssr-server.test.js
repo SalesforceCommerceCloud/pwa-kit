@@ -819,14 +819,14 @@ describe('outgoingRequestHook tests', () => {
 
     const withHeaders = [true, false]
     const withCallback = withHeaders
-    const withLoopbackAgent = withCallback
+    const withProxyAgent = withCallback
 
     const testCases = []
     baseTestCases.forEach((baseTestCase) =>
         testMethods.forEach((testMethod) =>
             withHeaders.forEach((addHeaders) =>
                 withCallback.forEach((addCallback) => {
-                    withLoopbackAgent.forEach((addLoopbackAgent) => {
+                    withProxyAgent.forEach((addProxyAgent) => {
                         const testCase = {...baseTestCase}
                         testCase.name =
                             `${testCase.name} via ${testMethod} ` +
@@ -835,7 +835,7 @@ describe('outgoingRequestHook tests', () => {
                         testCase.testMethod = testMethod
                         testCase.addHeaders = addHeaders
                         testCase.addCallback = addCallback
-                        testCase.addLoopbackAgent = addLoopbackAgent
+                        testCase.addProxyAgent = addProxyAgent
                         testCases.push(testCase)
                     })
                 })
@@ -847,8 +847,8 @@ describe('outgoingRequestHook tests', () => {
         test(testCase.name, () => {
             const createAppOptions = {appHostname}
 
-            if (testCase.addLoopbackAgent) {
-                createAppOptions.loopbackAgent = {
+            if (testCase.addProxyAgent) {
+                createAppOptions.proxyAgent = {
                     keepAlive: true
                 }
             }
@@ -926,7 +926,7 @@ describe('outgoingRequestHook tests', () => {
                 expect(called[0]).toBe(fakeCallback)
             }
 
-            if (testCase.addLoopbackAgent && testCase.name.startsWith('loopback')) {
+            if (testCase.addProxyAgent && testCase.name.startsWith('loopback')) {
                 expect(calledOptions.agent).toBeDefined()
                 expect(calledOptions.agent.keepAlive).toBe(true)
             }

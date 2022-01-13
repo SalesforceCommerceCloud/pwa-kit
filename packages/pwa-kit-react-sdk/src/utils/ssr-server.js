@@ -224,7 +224,7 @@ export const outgoingRequestHook = (wrapped, options) => {
         // the call through to the wrapped function. We'll also
         // do that if there's no access key.
         const accessKey = process.env.X_MOBIFY_ACCESS_KEY
-        const {appHostname, loopbackAgent} = options || {}
+        const {appHostname, proxyAgent} = options || {}
 
         if (!(appHostname && accessKey)) {
             return wrapped.apply(this, arguments) // eslint-disable-line prefer-rest-params
@@ -292,7 +292,7 @@ export const outgoingRequestHook = (wrapped, options) => {
         // Inject the access key.
         workingOptions.headers['x-mobify-access-key'] = accessKey
 
-        if (loopbackAgent) {
+        if (proxyAgent) {
             const {httpAgent, httpsAgent} = getAgents()
 
             // Add default agent to global connection reuse.
