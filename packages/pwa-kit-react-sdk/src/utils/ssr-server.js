@@ -27,6 +27,11 @@ const compression = require('compression')
 
 import {PerformanceObserver, performance} from 'perf_hooks'
 
+let HTTP_AGENT, HTTPS_AGENT
+const KEEPALIVE_AGENT_OPTIONS = {
+    keepAlive: true
+}
+
 const MOBIFY_DEVICETYPE = 'mobify_devicetype'
 
 export const DESKTOP = 'DESKTOP'
@@ -169,7 +174,6 @@ export const getFullRequestURL = (url) => {
     )
 }
 
-let HTTP_AGENT, HTTPS_AGENT
 /**
  * Returns the http and https agent singletons configured with defualt
  * options.
@@ -178,14 +182,9 @@ let HTTP_AGENT, HTTPS_AGENT
  * @returns {object} -
  */
 const getAgents = () => {
-    const options = {
-        keepAlive: true,
-        keepAliveMsecs: 60 * 1000 // 1 minutes
-    }
-
     if (!HTTP_AGENT || !HTTPS_AGENT) {
-        HTTP_AGENT = new http.Agent(options)
-        HTTPS_AGENT = new https.Agent(options)
+        HTTP_AGENT = new http.Agent(KEEPALIVE_AGENT_OPTIONS)
+        HTTPS_AGENT = new https.Agent(KEEPALIVE_AGENT_OPTIONS)
     }
 
     return {

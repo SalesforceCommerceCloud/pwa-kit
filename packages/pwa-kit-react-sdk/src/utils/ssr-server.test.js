@@ -847,8 +847,8 @@ describe('outgoingRequestHook tests', () => {
         test(testCase.name, () => {
             const createAppOptions = {appHostname}
 
-            if (testCase.addAgent) {
-                createAppOptions.agentOptions = {
+            if (testCase.addLoopbackAgent) {
+                createAppOptions.loopbackAgent = {
                     keepAlive: true
                 }
             }
@@ -924,6 +924,11 @@ describe('outgoingRequestHook tests', () => {
 
             if (testCase.addCallback) {
                 expect(called[0]).toBe(fakeCallback)
+            }
+
+            if (testCase.addLoopbackAgent && testCase.name.startsWith('loopback')) {
+                expect(calledOptions.agent).toBeDefined()
+                expect(calledOptions.agent.keepAlive).toBe(true)
             }
         })
     )

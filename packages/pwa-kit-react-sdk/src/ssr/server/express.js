@@ -118,8 +118,8 @@ export const REMOTE_REQUIRED_ENV_VARS = [
  * either as an absolute path, or relative to the build directory. If this
  * value is not supplied, requests for a favicon will return a 404 and
  * log a warning to the console.
- * @param {Boolean} [options.loopbackAgent] - When set to true, loopback connections
- * will be reused by means of a keep alive agent. Defaults to 'false'.
+ * @param {Boolean} [options.loopbackAgent] - When set to true, all loopback connections
+ * made will be reused via a keep alive agent. Defaults to 'false'.
  * @param {Object} options.mobify - The 'mobify' object from the project's
  * package.json file, containing the SSR parameters.
  * @param {Number} [options.port=3443] - the localhost port on which the local
