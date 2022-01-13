@@ -41,23 +41,88 @@
  * devDependency won't actually be installed for the end-user!
  */
 
+const p = require('path')
 const sh = require('shelljs')
+const fs = require('fs')
 const cp = require('child_process')
-const {withLocalNPMRepo} = require('internal-lib-build/verdaccio-server')
 
 sh.set('-e')
 
-const runGenerator = (repoUrl) => {
-    try {
-        process.env['npm_config_registry'] = repoUrl
-        // Shelljs can't run interactive programs, so we have to switch to child_process.
-        // See https://github.com/shelljs/shelljs/wiki/FAQ#running-interactive-programs-with-exec
-        const cmd = 'npx'
-        const args = ['pwa-kit-create-app', ...process.argv.slice(2)]
-        cp.execFileSync(cmd, args, {stdio: 'inherit'})
-    } finally {
+const logFileName = p.join(__dirname, '..', 'verdaccio.log')
+
+/**
+ * Run the provided function with a local NPM repository running in the background.
+ */
+const withLocalNPMRepo = (func) => {
+    const monorepoRoot = p.resolve(__dirname, '..', '..', '..')
+    const verdaccio = p.join(__dirname, '..', 'node_modules', '.bin', 'verdaccio')
+    const verdaccioConfigDir = p.join(__dirname, '..', 'local-npm-repo')
+
+    // Clear any cached packages from a previous run.
+    sh.rm('-rf', p.join(verdaccioConfigDir, 'storage'))
+    sh.mkdir(p.join(verdaccioConfigDir, 'storage'))
+
+    let child
+
+    const cleanup = () => {
+        console.log('Shutting down local NPM repository')
         delete process.env['npm_config_registry']
+        child.kill()
     }
+
+    return Promise.resolve()
+        .then(
+            () =>
+                new Promise((resolve) => {
+                    const logStream = fs.createWriteStream(logFileName, {flags: 'a'})
+                    console.log('Starting up local NPM repository')
+
+                    child = sh.exec(`${verdaccio} --config config.yaml`, {
+                        cwd: verdaccioConfigDir,
+                        async: true,
+                        fatal: true,
+                        silent: true
+                    })
+
+                    child.stdout.on('data', (data) => {
+                        if (data.includes('http address')) {
+                            // Verdaccio is running once it logs the HTTP address. Configure
+                            // NPM to use the local repo, through env vars.
+                            process.env['npm_config_registry'] = 'http://localhost:4873/'
+                            resolve()
+                        }
+                    })
+
+                    child.stdout.pipe(logStream)
+                    child.stderr.pipe(logStream)
+                })
+        )
+        .then(() => {
+            // Now that we're set up to use the local NPM repo, publish the monorepo
+            // packages to it. This is safe to do – Verdaccio does not forward these
+            // the public NPM repo.
+            console.log('Publishing packages to the local NPM repository')
+            sh.exec('npm run lerna -- publish from-package --yes --concurrency 1 --loglevel warn', {
+                cwd: monorepoRoot,
+                fatal: true,
+                silent: false
+            }).toEnd(logFileName)
+            console.log('Published successfully')
+        })
+        .then(() => func())
+        .then(() => cleanup())
+        .catch((err) => {
+            cleanup()
+            throw err
+        })
+}
+
+const runGenerator = () => {
+    // Shelljs can't run interactive programs, so we have to switch to child_process.
+    // See https://github.com/shelljs/shelljs/wiki/FAQ#running-interactive-programs-with-exec
+    const cmd = 'npx'
+    const args = ['pwa-kit-create-app', ...process.argv.slice(2)]
+    cp.execFileSync(cmd, args, {stdio: 'inherit'})
 }
 
 const main = () => {
