@@ -118,7 +118,7 @@ export const REMOTE_REQUIRED_ENV_VARS = [
  * either as an absolute path, or relative to the build directory. If this
  * value is not supplied, requests for a favicon will return a 404 and
  * log a warning to the console.
- * @param {Boolean} [options.proxyAgent] - When set to true, all loopback connections
+ * @param {Boolean} [options.proxyKeepAliveTimeout] - When set to true, all loopback connections
  * made will be reused via a keep alive agent. Defaults to 'false'.
  * @param {Object} options.mobify - The 'mobify' object from the project's
  * package.json file, containing the SSR parameters.
@@ -146,14 +146,14 @@ export const createApp = (options) => {
         // The cache time for SSR'd pages (defaults to 600 seconds)
         defaultCacheTimeSeconds: 600,
 
-        // Use a keep-alive agent for loop-back connections.
-        proxyAgent: false,
-
         // The port that the local dev server listens on
         port: 3443,
 
         // The protocol that the local dev server listens on
         protocol: 'https',
+
+        // The timeout value used for the proxys keep-alive agent.
+        proxyKeepAliveTimeout: Infinity,
 
         // Quiet flag (suppresses output if true)
         quiet: false,

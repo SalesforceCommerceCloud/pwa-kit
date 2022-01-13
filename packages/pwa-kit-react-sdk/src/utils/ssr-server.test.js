@@ -819,14 +819,14 @@ describe('outgoingRequestHook tests', () => {
 
     const withHeaders = [true, false]
     const withCallback = withHeaders
-    const withProxyAgent = withCallback
+    const withProxyKeepAliveTimeout = withCallback
 
     const testCases = []
     baseTestCases.forEach((baseTestCase) =>
         testMethods.forEach((testMethod) =>
             withHeaders.forEach((addHeaders) =>
                 withCallback.forEach((addCallback) => {
-                    withProxyAgent.forEach((addProxyAgent) => {
+                    withProxyKeepAliveTimeout.forEach((addProxyKeepAliveTimeout) => {
                         const testCase = {...baseTestCase}
                         testCase.name =
                             `${testCase.name} via ${testMethod} ` +
@@ -835,7 +835,7 @@ describe('outgoingRequestHook tests', () => {
                         testCase.testMethod = testMethod
                         testCase.addHeaders = addHeaders
                         testCase.addCallback = addCallback
-                        testCase.addProxyAgent = addProxyAgent
+                        testCase.addProxyKeepAliveTimeout = addProxyKeepAliveTimeout
                         testCases.push(testCase)
                     })
                 })
@@ -847,9 +847,10 @@ describe('outgoingRequestHook tests', () => {
         test(testCase.name, () => {
             const createAppOptions = {appHostname}
 
-            if (testCase.addProxyAgent) {
-                createAppOptions.proxyAgent = {
-                    keepAlive: true
+            if (testCase.addProxyKeepAliveTimeout) {
+                createAppOptions.proxyKeepAliveTimeout = {
+                    keepAlive: true,
+                    proxyKeepAliveTimeout: Infinity
                 }
             }
 
@@ -926,7 +927,7 @@ describe('outgoingRequestHook tests', () => {
                 expect(called[0]).toBe(fakeCallback)
             }
 
-            if (testCase.addProxyAgent && testCase.name.startsWith('loopback')) {
+            if (testCase.addProxyKeepAliveTimeout && testCase.name.startsWith('loopback')) {
                 expect(calledOptions.agent).toBeDefined()
                 expect(calledOptions.agent.keepAlive).toBe(true)
             }

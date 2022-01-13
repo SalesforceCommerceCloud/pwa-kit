@@ -1,6 +1,6 @@
 ## v1.4.0-dev (Jan 06, 2022)
 
--   Add `proxyAgent` ssr-server option. [#306](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/306)
+-   Add `proxyKeepAliveTimeout` ssr-server option. [#306](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/306)
 
 ## v1.3.0 (Jan 06, 2022)
 
