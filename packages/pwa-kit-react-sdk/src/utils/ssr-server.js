@@ -30,7 +30,7 @@ import {PerformanceObserver, performance} from 'perf_hooks'
 let HTTP_AGENT, HTTPS_AGENT
 const KEEPALIVE_AGENT_OPTIONS = {
     keepAlive: true,
-    keepAliveMsecs: 10 * 60 * 1000 // 10 minutes
+    keepAliveMsecs: Infinity
 }
 
 const MOBIFY_DEVICETYPE = 'mobify_devicetype'
