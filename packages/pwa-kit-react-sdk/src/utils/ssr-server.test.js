@@ -848,10 +848,7 @@ describe('outgoingRequestHook tests', () => {
             const createAppOptions = {appHostname}
 
             if (testCase.addProxyKeepAliveTimeout) {
-                createAppOptions.proxyKeepAliveTimeout = {
-                    keepAlive: true,
-                    proxyKeepAliveTimeout: Infinity
-                }
+                createAppOptions.proxyKeepAliveTimeout = Infinity
             }
 
             const hook = outgoingRequestHook(mockRequest, createAppOptions)
@@ -930,6 +927,7 @@ describe('outgoingRequestHook tests', () => {
             if (testCase.addProxyKeepAliveTimeout && testCase.name.startsWith('loopback')) {
                 expect(calledOptions.agent).toBeDefined()
                 expect(calledOptions.agent.keepAlive).toBe(true)
+                expect(calledOptions.agent.keepAliveMsecs).toBe(Infinity)
             }
         })
     )

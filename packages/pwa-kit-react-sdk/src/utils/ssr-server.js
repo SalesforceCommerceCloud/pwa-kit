@@ -29,8 +29,7 @@ import {PerformanceObserver, performance} from 'perf_hooks'
 
 let HTTP_AGENT, HTTPS_AGENT
 const KEEPALIVE_AGENT_OPTIONS = {
-    keepAlive: true,
-    keepAliveMsecs: Infinity
+    keepAlive: true
 }
 
 const MOBIFY_DEVICETYPE = 'mobify_devicetype'
@@ -176,16 +175,17 @@ export const getFullRequestURL = (url) => {
 }
 
 /**
- * Returns the http and https agent singletons configured with defualt
- * options.
+ * Returns the http and https agent singletons configured the provided
+ * options. NOTE: the `keepAlive` option is always set to `true`.
  *
  * @private
+ * @param options {Object} options to be used for the agent.
  * @returns {object} -
  */
-const getAgents = () => {
+const getKeepAliveAgents = (options) => {
     if (!HTTP_AGENT || !HTTPS_AGENT) {
-        HTTP_AGENT = new http.Agent(KEEPALIVE_AGENT_OPTIONS)
-        HTTPS_AGENT = new https.Agent(KEEPALIVE_AGENT_OPTIONS)
+        HTTP_AGENT = new http.Agent({...options, keepAlive: true})
+        HTTPS_AGENT = new https.Agent({...options, keepAlive: true})
     }
 
     return {
@@ -293,7 +293,9 @@ export const outgoingRequestHook = (wrapped, options) => {
         workingOptions.headers['x-mobify-access-key'] = accessKey
 
         if (proxyKeepAliveTimeout) {
-            const {httpAgent, httpsAgent} = getAgents()
+            const {httpAgent, httpsAgent} = getKeepAliveAgents({
+                keepAliveMsecs: options.proxyKeepAliveTimeout
+            })
 
             // Add default agent to global connection reuse.
             workingOptions.agent =
