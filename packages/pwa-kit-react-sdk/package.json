@@ -136,7 +136,7 @@
     "replace-in-file": "^6.2.0",
     "s3rver": "^3.1.0",
     "semver": "^7.3.2",
-    "shelljs": "^0.8.4",
+    "shelljs": "^0.8.5",
     "sinon": "2.3.2",
     "superagent": "^6.1.0",
     "supertest": "^4.0.2",

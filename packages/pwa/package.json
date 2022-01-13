@@ -137,7 +137,7 @@
         "regenerator-runtime": "^0.11.1",
         "rimraf": "2.6.1",
         "semver": "^7.3.2",
-        "shelljs": "^0.8.4",
+        "shelljs": "^0.8.5",
         "svg-sprite-loader": "^6.0.7",
         "text-loader": "0.0.1",
         "tree-kill": "^1.2.1",
