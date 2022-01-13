@@ -26,23 +26,14 @@ import {CACHE_CONTROL, CONTENT_ENCODING, X_MOBIFY_FROM_CACHE} from './constants'
 import {X_MOBIFY_REQUEST_CLASS} from '../../utils/ssr-proxying'
 import {RemoteServerFactory} from './build-remote-server'
 
-
-// TODO: Priority 1 – haven't been able to make the dependency optional in package.json.
-//       If we do not manage to do that, we will ship webpack to Lambda, which will always fail.
 const serverFactory = () => {
     if (isRemote()) {
         return RemoteServerFactory
     } else {
-        try {
-            const {DevServerFactory} = require.main.require('pwa-kit-build/ssr/server/build-dev-server')
-            return Object.assign({}, RemoteServerFactory, DevServerFactory)
-        } catch (e) {
-            throw e
-            // throw new Error(
-            //     'Cannot start the DevServer. The optional "pwa-kit-build" ' +
-            //     'dependency is not installed'
-            // )
-        }
+        // Import the dev-server as an optional, peer dependency in a way
+        // that avoids it being bundled for prod by Webpack.
+        const {DevServerFactory} = eval('require').main.require('pwa-kit-build/ssr/server/build-dev-server')
+        return Object.assign({}, RemoteServerFactory, DevServerFactory)
     }
 }
 
