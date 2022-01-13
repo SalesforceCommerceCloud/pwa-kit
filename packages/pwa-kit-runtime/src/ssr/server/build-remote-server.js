@@ -56,7 +56,6 @@ import awsServerlessExpress from 'aws-serverless-express'
  */
 const binaryMimeTypes = ['application/*', 'audio/*', 'font/*', 'image/*', 'video/*']
 
-
 /**
  * Environment variables that must be set for the Express app to run remotely.
  *
@@ -189,7 +188,12 @@ export const RemoteServerFactory = {
         this.configureProxyConfigs(options)
 
         const app = this.createExpressApp(options)
+
+        // Ordering of the next two calls are vital - we don't
+        // want request-processors applied to development views.
+        this.addSDKInternalHandlers(app)
         this.setupSSRRequestProcessorMiddleware(app)
+
         this.setCompression(app)
         this.setupLogging(app)
         this.setupMetricsFlushing(app)
@@ -269,7 +273,11 @@ export const RemoteServerFactory = {
         return app
     },
 
+    addSDKInternalHandlers(app) {},
+
     setupSSRRequestProcessorMiddleware(app) {
+        const that = this
+
         // Attach this middleware as early as possible. It does timing
         // and applies some early processing that must occur before
         // anything else.
@@ -310,7 +318,7 @@ export const RemoteServerFactory = {
             }
 
             // Apply the request processor
-            const requestProcessor = !isRemote() && getRequestProcessor(req)
+            const requestProcessor = that.getRequestProcessor(req)
             const parsed = URL.parse(req.url)
             const originalQuerystring = parsed.query
             let updatedQuerystring = originalQuerystring
@@ -636,16 +644,16 @@ export const RemoteServerFactory = {
         }
     },
 
-    serveCompiledAssets(app) {
+    addSSRRenderer(app) {
         // See - https://www.npmjs.com/package/webpack-hot-server-middleware#usage
-        const {buildDir} = app.options;
+        const {buildDir} = app.options
         const _require = eval('require')
-        const serverRenderer = _require(path.join(buildDir, 'server-renderer.js')).default;
-        const stats = _require(path.join(buildDir, 'loadable-stats.json'));
-        app.use(serverRenderer(stats));
+        const serverRenderer = _require(path.join(buildDir, 'server-renderer.js')).default
+        const stats = _require(path.join(buildDir, 'loadable-stats.json'))
+        app.use(serverRenderer(stats))
     },
 
-/**
+    /**
      * Builds a Lambda handler function from an Express app.
      *
      * See: https://docs.aws.amazon.com/lambda/latest/dg/nodejs-prog-model-handler.html
@@ -731,7 +739,11 @@ export const RemoteServerFactory = {
             )
         }
         return {server, handler}
-    }
+    },
+
+    getRequestProcessor(req) {
+        return null
+    },
 }
 
 /**
@@ -1068,36 +1080,5 @@ class RequestMonitor {
                 pending.resolve = pending.promise = null
             }
         }
-    }
-}
-
-/**
- * Load any request processor code if running locally in order to emulate in the
- * dev server the code that would run on a Lambda Edge function.
- *
- * @private
- */
-export const getRequestProcessor = (req) => {
-    const options = req.app.options
-    const requestProcessorPath = path.join(options.buildDir, 'request-processor.js')
-    if (!isRemote() && fs.existsSync(requestProcessorPath)) {
-        // At this point, buildDir will always be absolute
-        // Dynamically require() in the script, which gives us a module.
-        // We can't just use require, since this code is webpack'd, which
-        // replaces require with a webpack-module-loading function.
-        // We use the actual node require via this interesting hack
-        const nodeRequire = eval('require') // eslint-disable-line no-eval
-        const requestProcessor = nodeRequire(requestProcessorPath)
-        // Verify that the module has a processRequest export
-        /* istanbul ignore next */
-        if (!requestProcessor.processRequest) {
-            throw new Error(
-                `Request processor module ${requestProcessorPath} ` +
-                    `does not export processRequest`
-            )
-        }
-        return requestProcessor
-    } else {
-        return null
     }
 }

@@ -32,11 +32,12 @@ const serverFactory = () => {
     } else {
         // Import the dev-server as an optional, peer dependency in a way
         // that avoids it being bundled for prod by Webpack.
-        const {DevServerFactory} = eval('require').main.require('pwa-kit-build/ssr/server/build-dev-server')
+        const {DevServerFactory} = eval('require').main.require(
+            'pwa-kit-build/ssr/server/build-dev-server'
+        )
         return Object.assign({}, RemoteServerFactory, DevServerFactory)
     }
 }
-
 
 export const RESOLVED_PROMISE = Promise.resolve()
 
@@ -544,6 +545,6 @@ export const createHandler = (app) => {
     // Configure the global last-chance error handler
     process.on('unhandledRejection', catchAndLog)
 
-    factory.serveCompiledAssets(app)
+    factory.addSSRRenderer(app)
     return factory.createHandler(app).handler
 }
