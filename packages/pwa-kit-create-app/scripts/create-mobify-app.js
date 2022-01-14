@@ -211,60 +211,63 @@ const prompts = () => {
         s === '' ||
         defaultEinsteinAPIError
 
+    const demoChoice = 'Yes'
+    const customChoice = 'No, use custom settings'
+
     const questions = [
         {
             name: 'useDemoSettings',
-            message: "Which settings do you want to use for your storefront's B2C Commerce instance?",
-            choices: ['Demo', 'Custom'],
+            message: "Do you want to try out PWA Kit with the demo storefront?",
+            choices: [demoChoice, customChoice],
             type: 'list'
         },
         {
             name: 'projectId',
             validate: validProjectId,
             message: 'What is your project ID (example-project) in Managed Runtime Admin?',
-            when: (answers) => answers.useDemoSettings == 'Custom' ? true : false
+            when: (answers) => answers.useDemoSettings == customChoice
         },
         {
             name: 'instanceUrl',
             message:
                 'What is the URL (https://example_instance_id.sandbox.us01.dx.commercecloud.salesforce.com) for your B2C Commerce instance?',
             validate: validUrl,
-            when: (answers) => answers.useDemoSettings == 'Custom' ? true : false
+            when: (answers) => answers.useDemoSettings == customChoice
         },
         {
             name: 'clientId',
             message: 'What is your API client ID?',
             validate: validClientId,
-            when: (answers) => answers.useDemoSettings == 'Custom' ? true : false
+            when: (answers) => answers.useDemoSettings == customChoice
         },
         {
             name: 'siteId',
             message: "What is your site's ID (examples: RefArch, RefArchGlobal) in Business Manager?",
             validate: validSiteId,
-            when: (answers) => answers.useDemoSettings == 'Custom' ? true : false
+            when: (answers) => answers.useDemoSettings == customChoice
         },
         {
             name: 'organizationId',
             message: 'What is your Commerce API organization ID in Business Manager?',
             validate: validOrganizationId,
-            when: (answers) => answers.useDemoSettings == 'Custom' ? true : false
+            when: (answers) => answers.useDemoSettings == customChoice
         },
         {
             name: 'shortCode',
             message: 'What is your Commerce API short code in Business Manager?',
             validate: validShortCode,
-            when: (answers) => answers.useDemoSettings == 'Custom' ? true : false
+            when: (answers) => answers.useDemoSettings == customChoice
         },
         {
             name: 'einsteinId',
             message: 'What is your API Client ID in the Einstein Configurator? (optional)',
             validate: validEinsteinId,
-            when: (answers) => answers.useDemoSettings == 'Custom' ? true : false
+            when: (answers) => answers.useDemoSettings == customChoice
         }
         // NOTE: there's no question about Einstein's _site_ id because we currently assume that the site id will be the same for both Commerce API and Einstein
     ]
 
-    return inquirer.prompt(questions).then((answers) => answers.useDemoSettings == 'Demo' ? demoProjectAnswers() : buildAnswers(answers))
+    return inquirer.prompt(questions).then((answers) => answers.useDemoSettings == demoChoice ? demoProjectAnswers() : buildAnswers(answers))
 }
 
 const buildAnswers = ({
