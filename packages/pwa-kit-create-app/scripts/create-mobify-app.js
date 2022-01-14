@@ -329,9 +329,7 @@ const demoProjectAnswers = () => {
         clientId: '1d763261-6522-4913-9d52-5d947d3b94c4',
         siteId: 'RefArchGlobal',
         organizationId: 'f_ecom_zzte_053',
-        shortCode: 'kv7kzm78',
-        einsteinId: '1ea06c6e-c936-4324-bcf0-fada93f83bb1',
-        einsteinSiteId: 'aaij-MobileFirst'
+        shortCode: 'kv7kzm78'
     }
 
     return buildAnswers(config)
