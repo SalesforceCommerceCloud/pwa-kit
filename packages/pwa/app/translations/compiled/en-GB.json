@@ -514,7 +514,7 @@
   "cart_secondary_button_group.link_learn_more": [
     {
       "type": 0,
-      "value": "Learn more"
+      "value": "Learn More"
     }
   ],
   "cart_skeleton.heading.order_summary": [
@@ -940,7 +940,7 @@
   "contact_info.button.checkout_as_guest": [
     {
       "type": 0,
-      "value": "Checkout as guest"
+      "value": "Checkout as Guest"
     }
   ],
   "contact_info.button.login": [
@@ -1387,22 +1387,22 @@
       "value": "My Account"
     }
   ],
+  "home.description.contact_our_staff": [
+    {
+      "type": 0,
+      "value": "Contact our support staff."
+    }
+  ],
   "home.description.features": [
     {
       "type": 0,
       "value": "Out-of-the-box features so that you focus only on adding enhancements."
     }
   ],
-  "home.description.here_to_help": [
+  "home.description.get_you_to_the_right_place": [
     {
       "type": 0,
-      "value": "Contact our support staff and, they’ll get you"
-    }
-  ],
-  "home.description.here_to_help_line_2": [
-    {
-      "type": 0,
-      "value": "to the right place."
+      "value": "They will get you to the right place."
     }
   ],
   "home.description.shop_products": [
@@ -1571,6 +1571,12 @@
     {
       "type": 0,
       "value": "Sale"
+    }
+  ],
+  "lCPCxk": [
+    {
+      "type": 0,
+      "value": "Please select all your options above"
     }
   ],
   "locale_text.message.ar-SA": [
@@ -1900,7 +1906,7 @@
   "login_form.button.sign_in": [
     {
       "type": 0,
-      "value": "Sign in"
+      "value": "Sign In"
     }
   ],
   "login_form.link.forgot_password": [
@@ -2576,7 +2582,7 @@
   "reset_password.button.back_to_sign_in": [
     {
       "type": 0,
-      "value": "Back to sign in"
+      "value": "Back to Sign In"
     }
   ],
   "reset_password.info.receive_email_shortly": [

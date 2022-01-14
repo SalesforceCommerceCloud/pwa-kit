@@ -16,7 +16,7 @@ import WebpackNotifierPlugin from 'webpack-notifier'
 import CopyPlugin from 'copy-webpack-plugin'
 import {BundleAnalyzerPlugin} from 'webpack-bundle-analyzer'
 import LoadablePlugin from '@loadable/webpack-plugin'
-import {createModuleReplacementPlugin, BuildMarkerPlugin} from './plugins'
+import {createModuleReplacementPlugin, BuildMarkerPlugin, PwaKitConfigPlugin} from './plugins'
 
 const root = process.cwd()
 const {resolve, join} = path
@@ -249,7 +249,7 @@ const main = Object.assign({}, common, {
         maxEntrypointSize: 905000,
         maxAssetSize: 825000
     },
-    plugins: [...common.plugins, new LoadablePlugin()]
+    plugins: [...common.plugins, new LoadablePlugin(), new PwaKitConfigPlugin()]
 })
 
 const others = Object.assign({}, common, {

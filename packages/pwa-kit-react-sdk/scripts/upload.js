@@ -60,7 +60,7 @@ const upload = (options) => {
 
 const uploadBundle = (customOptions) => {
     if (isEmptyOptions(customOptions)) {
-        Utils.fail('[Error: You must provide a Mobify Cloud project slug to upload a bundle.]')
+        Utils.fail('[Error: You must provide a Runtime Admin project slug to upload a bundle.]')
     }
 
     const options = Object.assign(OPTION_DEFAULTS, customOptions)

@@ -50,7 +50,7 @@ Section.propTypes = {
     /**
      * Section component subtitle
      */
-    subtitle: PropTypes.oneOfType([PropTypes.array, PropTypes.string]),
+    subtitle: PropTypes.oneOfType([PropTypes.array, PropTypes.string, PropTypes.node]),
     /**
      * Section children node(s)
      */

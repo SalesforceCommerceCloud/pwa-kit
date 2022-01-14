@@ -196,7 +196,7 @@
     "defaultMessage": "This is a gift."
   },
   "cart_secondary_button_group.link_learn_more": {
-    "defaultMessage": "Learn more"
+    "defaultMessage": "Learn More"
   },
   "cart_skeleton.heading.order_summary": {
     "defaultMessage": "Order Summary"
@@ -365,7 +365,7 @@
     "defaultMessage": "Already have an account? Log in"
   },
   "contact_info.button.checkout_as_guest": {
-    "defaultMessage": "Checkout as guest"
+    "defaultMessage": "Checkout as Guest"
   },
   "contact_info.button.login": {
     "defaultMessage": "Log In"
@@ -566,18 +566,18 @@
   "header.popover.title.my_account": {
     "defaultMessage": "My Account"
   },
+  "home.description.contact_our_staff": {
+    "defaultMessage": "Contact our support staff."
+  },
   "home.description.features": {
     "defaultMessage": "Out-of-the-box features so that you focus only on adding enhancements."
   },
-  "home.description.here_to_help": {
-    "defaultMessage": "Contact our support staff and, they’ll get you"
-  },
-  "home.description.here_to_help_line_2": {
-    "defaultMessage": "to the right place."
+  "home.description.get_you_to_the_right_place": {
+    "defaultMessage": "They will get you to the right place."
   },
   "home.description.shop_products": {
     "defaultMessage": "This section contains content from the catalog. {docLink} on how to replace it.",
-    "description": "{docLink} is a html button that links the user to https://sfdc.co/business-manager-manage-catalgos"
+    "description": "{docLink} is a html button that links the user to https://sfdc.co/business-manager-manage-catalogs"
   },
   "home.features.description.cart_checkout": {
     "defaultMessage": "Ecommerce best practice for a shopper's cart and checkout experience."
@@ -654,6 +654,9 @@
   "item_image.label.sale": {
     "defaultMessage": "Sale",
     "description": "A sale badge placed on top of a product image"
+  },
+  "lCPCxk": {
+    "defaultMessage": "Please select all your options above"
   },
   "locale_text.message.ar-SA": {
     "defaultMessage": "Arabic (Saudi Arabia)"
@@ -818,7 +821,7 @@
     "defaultMessage": "Create account"
   },
   "login_form.button.sign_in": {
-    "defaultMessage": "Sign in"
+    "defaultMessage": "Sign In"
   },
   "login_form.link.forgot_password": {
     "defaultMessage": "Forgot password?"
@@ -1074,7 +1077,7 @@
     "defaultMessage": "Create an account and get first access to the very best products, inspiration and community."
   },
   "reset_password.button.back_to_sign_in": {
-    "defaultMessage": "Back to sign in"
+    "defaultMessage": "Back to Sign In"
   },
   "reset_password.info.receive_email_shortly": {
     "defaultMessage": "You will receive an email at <b>{email}</b> with a link to reset your password shortly."

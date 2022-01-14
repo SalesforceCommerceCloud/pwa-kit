@@ -36,7 +36,7 @@ const transpileSrc = () => {
     console.log(`Transpiling files in src/ to dist/`)
 
     const child = exec(
-        `npx --no-install babel --root-mode upward src -x ".js",".jsx" --ignore "**/test_fixtures/*","*.test.js","test.js" --out-dir dist`
+        `npx --no-install babel --root-mode upward src -x ".js",".jsx" --ignore "**/test_fixtures/*","*.test.js","test.js" --out-dir dist --copy-files`
     )
 
     child.stderr.on('data', (data) => {

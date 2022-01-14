@@ -41,6 +41,9 @@ export const cssColorGroups = {
     miscellaneous: 'linear-gradient(to right, orange , yellow, green, cyan, blue, violet)'
 }
 
+// Color to use for the UI surrounding the page in browsers.
+export const THEME_COLOR = '#0176D3'
+
 export const FILTER_ACCORDION_SATE = 'filters-expanded-index'
 
 export const API_ERROR_MESSAGE = defineMessage({
@@ -63,3 +66,5 @@ export const urlPartPositions = {
     QUERY_PARAM: 'query_param',
     NONE: 'none'
 }
+
+export const DEFAULT_SITE_TITLE = 'Retail React App'

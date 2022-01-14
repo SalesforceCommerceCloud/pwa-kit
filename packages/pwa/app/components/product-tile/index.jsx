@@ -13,13 +13,13 @@ import {HeartIcon, HeartSolidIcon} from '../icons'
 import {
     AspectRatio,
     Box,
-    Img,
     Skeleton as ChakraSkeleton,
     Text,
     Stack,
     useMultiStyleConfig,
     IconButton
 } from '@chakra-ui/react'
+import DynamicImage from '../dynamic-image'
 
 // Hooks
 import {useIntl} from 'react-intl'
@@ -56,7 +56,14 @@ export const Skeleton = () => {
  */
 const ProductTile = (props) => {
     const intl = useIntl()
-    const {product, enableFavourite = false, isFavourite, onFavouriteToggle, ...rest} = props
+    const {
+        product,
+        enableFavourite = false,
+        isFavourite,
+        onFavouriteToggle,
+        dynamicImageProps,
+        ...rest
+    } = props
     const {currency, image, price, productName, productId} = product
     const [isFavouriteLoading, setFavouriteLoading] = useState(false)
     const styles = useMultiStyleConfig('ProductTile')
@@ -70,7 +77,14 @@ const ProductTile = (props) => {
         >
             <Box {...styles.imageWrapper}>
                 <AspectRatio {...styles.image}>
-                    <Img alt={image.alt} src={image.disBaseLink} />
+                    <DynamicImage
+                        src={`${image.disBaseLink || image.link}[?sw={width}&q=60]`}
+                        widths={dynamicImageProps?.widths}
+                        imageProps={{
+                            alt: image.alt,
+                            ...dynamicImageProps?.imageProps
+                        }}
+                    />
                 </AspectRatio>
 
                 {enableFavourite && (
@@ -120,7 +134,8 @@ ProductTile.propTypes = {
         currency: PropTypes.string,
         image: PropTypes.shape({
             alt: PropTypes.string,
-            disBaseLink: PropTypes.string
+            disBaseLink: PropTypes.string,
+            link: PropTypes.string
         }),
         price: PropTypes.number,
         productName: PropTypes.string,
@@ -139,7 +154,8 @@ ProductTile.propTypes = {
      * Callback function to be invoked when the user
      * interacts with favourite icon/button.
      */
-    onFavouriteToggle: PropTypes.func
+    onFavouriteToggle: PropTypes.func,
+    dynamicImageProps: PropTypes.object
 }
 
 export default ProductTile
