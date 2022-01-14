@@ -44,6 +44,7 @@ const getLocale = (locals = {}) => {
     let shortCode
     const {locale} = getParamsFromPath(path)
     const site = resolveSiteFromUrl(pathToUrl(path))
+    console.log('getLocale site', site)
     const l10n = site?.l10n
 
     // Ensure that the locale is in the supported list, otherwise return the default.
@@ -91,7 +92,6 @@ AppConfig.restore = (locals = {}) => {
     }
 
     const {l10n} = site
-
     const locale = getLocale(locals) || l10n.defaultLocale
     const currency = getPreferredCurrency(locale, l10n.supportedLocales) || l10n.defaultCurrency
 

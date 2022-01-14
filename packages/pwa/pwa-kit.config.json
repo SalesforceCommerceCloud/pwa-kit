@@ -1,18 +1,13 @@
 {
     "app": {
-        "defaultSite": "RefArch",
         "url": {
-            "site": "none",
-            "locale": "none"
+            "site": "path",
+            "locale": "path"
         },
         "hosts": [
             {
                 "domain": "localhost",
-                "defaultSite": "RefArch",
-                "url": {
-                    "site": "path",
-                    "locale": "path"
-                },
+                "defaultSite": "RefArchGlobal",
                 "sites": [
                     {
                         "id": "RefArch",
@@ -36,36 +31,11 @@
                         }
                     },
                     {
-                        "id": "RefArch",
-                        "defaultLocale": "en-US",
-                        "url": {
-                            "site": "none",
-                            "locale": "path"
-                        },
-                        "l10n": {
-                            "supportedCurrencies": ["USD"],
-                            "defaultCurrency": "USD",
-                            "supportedLocales": [
-                                {
-                                    "id": "en-US",
-                                    "preferredCurrency": "USD"
-                                },
-                                {
-                                    "id": "en-CA",
-                                    "preferredCurrency": "USD"
-                                }
-                            ]
-                        }
-                    },
-                    {
                         "id": "RefArchGlobal",
-                        "alias": "eu",
-                        "url": {
-                            "site": "path",
-                            "locale": "none"
-                        },
+                        "alias": "global",
                         "l10n": {
                             "supportedCurrencies": ["GBP", "EUR", "CNY", "JPY"],
+                            "defaultLocale": "en-GB",
                             "defaultCurrency": "GBP",
                             "supportedLocales": [
                                 {

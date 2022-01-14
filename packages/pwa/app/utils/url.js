@@ -6,9 +6,10 @@
  */
 
 import {HOME_HREF} from '../constants'
-import {getConfig, getUrlConfig} from './utils'
+import {getUrlConfig} from './utils'
 import {urlPartPositions} from '../constants'
 import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
+import {getDefaultSiteIdByHost} from './site-utils'
 
 /**
  * A function that takes a path and qualifies it with the current host and protocol.
@@ -127,8 +128,9 @@ export const searchUrlBuilder = (searchTerm) => `/search?q=${searchTerm}`
  * @returns {string} - The relative URL for the specific locale.
  */
 export const getUrlWithLocale = (shortCode, opts = {}) => {
-    const {locale: localePosition, site: sitePosition} = getConfig('app.url')
-    const defaultSiteId = getConfig('app.defaultSiteId')
+    const {locale: localePosition, site: sitePosition} = getUrlConfig()
+    const {hostname} = new URL(getAppOrigin())
+    const defaultSiteId = getDefaultSiteIdByHost(hostname)
     const location = opts.location ? opts.location : window.location
     const {disallowParams = [], site} = opts
     let relativeUrl = location.pathname
@@ -181,7 +183,8 @@ export const getUrlWithLocale = (shortCode, opts = {}) => {
  */
 export const homeUrlBuilder = (homeHref, options = {}) => {
     const {locale, site} = options
-    const defaultSiteId = getConfig('app.defaultSiteId')
+    const {hostname} = new URL(getAppOrigin())
+    const defaultSiteId = getDefaultSiteIdByHost(hostname)
     const {l10n} = site
     const defaultLocale = l10n.defaultLocale
     const updatedUrl = buildPathWithUrlConfig(homeHref, {

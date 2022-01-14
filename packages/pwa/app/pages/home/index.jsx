@@ -39,7 +39,7 @@ import {
     HOME_SHOP_PRODUCTS_LIMIT,
     urlPartPositions
 } from '../../constants'
-import {getConfig} from '../../utils/utils'
+import {getUrlConfig} from '../../utils/utils'
 
 /**
  * This is the home page for Retail React App.
@@ -49,7 +49,7 @@ import {getConfig} from '../../utils/utils'
  */
 const Home = ({productSearchResult, isLoading}) => {
     const intl = useIntl()
-    const urlConfig = getConfig('app.url')
+    const urlConfig = getUrlConfig()
 
     return (
         <Box data-testid="home-page" layerStyle="page">
@@ -65,10 +65,7 @@ const Home = ({productSearchResult, isLoading}) => {
                     mt={4}
                     mr={4}
                     onClick={() => {
-                        window.location =
-                            urlConfig['site'] === urlPartPositions.PATH
-                                ? '/global'
-                                : '/?site=global'
+                        window.location = '/'
                     }}
                 >
                     to Global Site
@@ -77,7 +74,8 @@ const Home = ({productSearchResult, isLoading}) => {
                 <Button
                     mt={4}
                     onClick={() => {
-                        window.location = '/'
+                        window.location =
+                            urlConfig['site'] === urlPartPositions.PATH ? '/us' : '/site=us'
                     }}
                 >
                     to Default Site

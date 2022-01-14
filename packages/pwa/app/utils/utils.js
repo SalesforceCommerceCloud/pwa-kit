@@ -190,7 +190,6 @@ export const getUrlConfig = (customizedGetter) => {
     }
     const {hostname} = new URL(getAppOrigin())
     const urlConfig = getUrlConfigByHostname(hostname)
-    console.log('urlConfig', urlConfig)
     if (urlConfig) {
         return urlConfig
     }
@@ -204,9 +203,7 @@ export const getUrlConfig = (customizedGetter) => {
  */
 export const getUrlConfigByHostname = (hostname) => {
     const hosts = getConfig('app.hosts')
-    console.log('hostname', hostname)
     const host = hosts.find((host) => host.domain === hostname)
-    console.log('host', host)
     return host?.url
 }
 
@@ -255,8 +252,6 @@ export const getObjectProperty = (obj, path) => {
  */
 export const getParamsFromPath = (path) => {
     const {locale: localePosition, site: sitePosition} = getUrlConfig()
-    console.log('localePosition', localePosition)
-    console.log('sitePosition', sitePosition)
     const {pathname, search} = new URL(pathToUrl(path))
     const params = new URLSearchParams(search)
     const result = {}
@@ -288,6 +283,5 @@ export const getParamsFromPath = (path) => {
             break
         }
     }
-
     return result
 }

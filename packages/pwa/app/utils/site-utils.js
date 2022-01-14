@@ -19,9 +19,8 @@ export const resolveSiteFromUrl = (url) => {
     }
     const {hostname, pathname, search} = new URL(url)
     const path = `${pathname}${search}`
-
+    // get all the sites from a specific hostname
     const sites = getSitesByHost(hostname)
-    const defaultSite = getConfig('app.defaultSite')
     let site
 
     // Step 1: look for the site based on a hostname, if that host only contains one site, use it
@@ -39,14 +38,20 @@ export const resolveSiteFromUrl = (url) => {
         return site
     }
 
-    // Step 3: use the default if none of above works
-    site = sites.find((site) => site.id === defaultSite)
-
+    // Step 3: use the default for the current host as none of the above works
+    const defaultSiteId = getDefaultSiteIdByHost(hostname)
+    site = sites.find((site) => site.id === defaultSiteId)
     // Step 4: throw an error if site can't be found by any of the above steps
     if (!site) {
         throw new Error("Can't find any site. Please check you sites configuration.")
     }
     return site
+}
+
+export const getDefaultSiteIdByHost = (hostname) => {
+    const hosts = getHosts()
+    const host = hosts.find((host) => host.domain === hostname)
+    return host?.defaultSite
 }
 
 /**
