@@ -164,6 +164,18 @@ const runGenerator = (answers, {outputDir}) => {
         siteId: answers['einstein-api'].siteId || answers['commerce-api'].siteId
     }
 
+    const l10n = {
+        supportedCurrencies: ['USD'],
+        defaultCurrency: 'USD',
+        supportedLocales: [
+            {
+                id: 'en-US',
+                preferredCurrency: 'USD'
+            }
+        ],
+        defaultLocale: 'en-US'
+    }
+
     new sh.ShellString(APIConfigTemplate({commerceApi, einsteinApi})).to(
         p.resolve(outputDir, 'app', 'api.config.js')
     )
