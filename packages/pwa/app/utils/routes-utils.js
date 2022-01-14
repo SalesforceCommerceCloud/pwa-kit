@@ -7,7 +7,7 @@
 
 import {getConfig} from './utils'
 /**
- * Configure the routes based on url configuration from pwa-kit.config.json file
+ * Return all the permutations of routes with site id/alias and locale id/alias
  *
  * @param {array} routes - array of routes to be configured
  * @param {object} - a custom configured object
@@ -15,15 +15,6 @@ import {getConfig} from './utils'
  */
 export const configureRoutes = (routes = [], {ignoredRoutes = []}) => {
     if (!routes.length) return []
-    // const urlConfig = getConfig('app.url')
-    // if (!urlConfig) return routes
-
-    // console.log('getAppOrigin()', getAppOrigin())
-    // const hostsConfig = getConfig('app.hosts')
-    // const {hostname} = new URL(getAppOrigin())
-
-    // const urlConfig = hostsConfig.filter((host) => host.domain === hostname)
-    // console.log('urlConfig', urlConfig)
 
     const hosts = getConfig('app.hosts')
 
@@ -72,20 +63,7 @@ export const configureRoutes = (routes = [], {ignoredRoutes = []}) => {
                     })
                 })
             })
-        }
-    }
 
-    // reconstruct the routes that either has site or locale
-    // these routes has to go after the above routes to be able to respect the matching logic of react router dom
-    for (let i = 0; i < routes.length; i++) {
-        const {path, ...rest} = routes[i]
-
-        if (ignoredRoutes.includes(path)) {
-            const isRouteExisted = outputRoutes.map((route) => route.path).includes(path)
-            if (!isRouteExisted) {
-                outputRoutes.push(routes[i])
-            }
-        } else {
             sites.forEach((site) => {
                 outputRoutes.push({
                     path: `/${site}${path}`,
@@ -102,25 +80,5 @@ export const configureRoutes = (routes = [], {ignoredRoutes = []}) => {
             outputRoutes.push(routes[i])
         }
     }
-    console.log('test', outputRoutes.length, outputRoutes.map((i) => i.path))
     return outputRoutes
-    // return routes.map((route) => {
-    //     const {path, ...rest} = route
-    //     if (ignoredRoutes.includes(path)) return route
-    //     let basePathSegments = []
-    //
-    //     const options = ['site', 'locale']
-    //
-    //     options.forEach((option) => {
-    //         const position = urlConfig[option]
-    //         if (position === urlPartPositions.PATH) {
-    //             basePathSegments.push(`:${option}`)
-    //         }
-    //     })
-    //
-    //     return {
-    //         path: `${basePathSegments.length ? `/${basePathSegments.join('/')}` : ''}${path}`,
-    //         ...rest
-    //     }
-    // })
 }
