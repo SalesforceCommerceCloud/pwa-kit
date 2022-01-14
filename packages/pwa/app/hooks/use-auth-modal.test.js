@@ -226,7 +226,7 @@ test('Allows customer to generate password token', async () => {
     expect(screen.getByText(/foo@test.com/i)).toBeInTheDocument()
 })
 
-test('Allows customer to open generate password token modal from everywhere', async () => {
+test('Allows customer to open generate password token modal from everywhere', () => {
     // render our test component
     renderWithProviders(<MockedComponent initialView="password" />)
 

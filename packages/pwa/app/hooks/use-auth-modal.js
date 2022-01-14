@@ -218,7 +218,7 @@ export const AuthModal = ({
                         <RegisterForm
                             form={form}
                             submitForm={submitForm}
-                            clickSignIn={() => setCurrentView(LOGIN_VIEW)}
+                            clickSignIn={onBackToSignInClick}
                         />
                     )}
                     {!form.formState.isSubmitSuccessful && currentView === PASSWORD_VIEW && (

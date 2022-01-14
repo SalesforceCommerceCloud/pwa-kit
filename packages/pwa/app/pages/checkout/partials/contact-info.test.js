@@ -26,8 +26,6 @@ jest.mock('../util/checkout-context', () => {
     }
 })
 
-jest.mock('../../../commerce-api/hooks/useCustomer')
-
 test('renders component', () => {
     renderWithProviders(<ContactInfo />)
 
