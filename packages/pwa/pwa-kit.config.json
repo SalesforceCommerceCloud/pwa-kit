@@ -1,63 +1,110 @@
 {
     "app": {
-        "defaultSiteId": "RefArch",
+        "defaultSite": "RefArch",
         "url": {
-            "locale": "path",
-            "site": "path"
+            "site": "none",
+            "locale": "none"
         },
-        "sites": [
+        "hosts": [
             {
-                "id": "RefArch",
-                "alias": "us",
-                "hostnames": [],
-                "l10n": {
-                    "supportedCurrencies": ["USD"],
-                    "defaultCurrency": "USD",
-                    "supportedLocales": [
-                        {
-                            "id": "en-US",
-                            "preferredCurrency": "USD"
-                        },
-                        {
-                            "id": "en-CA",
-                            "preferredCurrency": "USD"
+                "domain": "localhost",
+                "defaultSite": "RefArch",
+                "sites": [
+                    {
+                        "id": "RefArch",
+                        "alias": "us",
+                        "l10n": {
+                            "supportedCurrencies": ["USD"],
+                            "defaultCurrency": "USD",
+                            "defaultLocale": "en-US",
+                            "supportedLocales": [
+                                {
+                                    "id": "en-US",
+                                    "alias": "en",
+                                    "preferredCurrency": "USD"
+                                },
+                                {
+                                    "id": "en-CA",
+                                    "alias": "ca",
+                                    "preferredCurrency": "YEN"
+                                }
+                            ]
                         }
-                    ],
-                    "defaultLocale": "en-US"
-                }
-            },
-            {
-                "id": "RefArchGlobal",
-                "alias": "global",
-                "hostnames": [],
-                "l10n": {
-                    "supportedCurrencies": ["GBP", "EUR", "CNY", "JPY"],
-                    "defaultCurrency": "GBP",
-                    "supportedLocales": [
-                        {
-                            "id": "en-GB",
-                            "preferredCurrency": "GBP"
-                        },
-                        {
-                            "id": "fr-FR",
-                            "preferredCurrency": "EUR"
-                        },
-                        {
-                            "id": "it-IT",
-                            "preferredCurrency": "EUR"
-                        },
-                        {
-                            "id": "zh-CN",
-                            "preferredCurrency": "CNY"
-                        },
-                        {
-                            "id": "ja-JP",
-                            "preferredCurrency": "JPY"
+                    },
+                    {
+                        "id": "RefArch",
+                        "alias": "eu",
+                        "l10n": {
+                            "supportedCurrencies": ["USD"],
+                            "defaultCurrency": "USD",
+                            "supportedLocales": [
+                                {
+                                    "id": "fr-FR",
+                                    "alias": "fr",
+                                    "preferredCurrency": "USD"
+                                },
+                                {
+                                    "id": "it-IT",
+                                    "alias": "it",
+                                    "preferredCurrency": "USD"
+                                }
+                            ]
                         }
-                    ],
-                    "defaultLocale": "en-GB"
-                }
+                    },
+                    {
+                        "id": "RefArch",
+                        "defaultLocale": "en-US",
+                        "l10n": {
+                            "supportedCurrencies": ["USD"],
+                            "defaultCurrency": "USD",
+                            "supportedLocales": [
+                                {
+                                    "id": "en-US",
+                                    "preferredCurrency": "USD"
+                                },
+                                {
+                                    "id": "en-CA",
+                                    "preferredCurrency": "USD"
+                                }
+                            ],
+                            "defaultLocale": "en-US"
+                        }
+                    },
+                    {
+                        "id": "RefArchGlobal",
+                        "alias": "global",
+                        "l10n": {
+                            "supportedCurrencies": ["GBP", "EUR", "CNY", "JPY"],
+                            "defaultCurrency": "GBP",
+                            "supportedLocales": [
+                                {
+                                    "id": "en-GB",
+                                    "alias": "uk",
+                                    "preferredCurrency": "GBP"
+                                },
+                                {
+                                    "id": "fr-FR",
+                                    "alias": "fr",
+                                    "preferredCurrency": "EUR"
+                                },
+                                {
+                                    "id": "it-IT",
+                                    "preferredCurrency": "EUR"
+                                },
+                                {
+                                    "id": "zh-CN",
+                                    "preferredCurrency": "CNY"
+                                },
+                                {
+                                    "id": "ja-JP",
+                                    "preferredCurrency": "JPY"
+                                }
+                            ]
+                        }
+                    }
+                ]
             }
+
         ]
     }
 }
