@@ -6,7 +6,7 @@
  */
 
 import {HOME_HREF} from '../constants'
-import {getConfig} from './utils'
+import {getConfig, getUrlConfig} from './utils'
 import {urlPartPositions} from '../constants'
 import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
 
@@ -254,7 +254,7 @@ export const removeQueryParamsFromPath = (path, keys) => {
  *
  */
 export const buildPathWithUrlConfig = (url, configValues = {}) => {
-    const urlConfig = getConfig('app.url')
+    const urlConfig = getUrlConfig()
     if (!urlConfig || !Object.values(urlConfig).length) return url
     if (!Object.values(configValues).length) return url
     const queryParams = {}

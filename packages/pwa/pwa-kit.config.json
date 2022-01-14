@@ -9,6 +9,10 @@
             {
                 "domain": "localhost",
                 "defaultSite": "RefArch",
+                "url": {
+                    "site": "path",
+                    "locale": "path"
+                },
                 "sites": [
                     {
                         "id": "RefArch",
@@ -33,27 +37,11 @@
                     },
                     {
                         "id": "RefArch",
-                        "alias": "eu",
-                        "l10n": {
-                            "supportedCurrencies": ["USD"],
-                            "defaultCurrency": "USD",
-                            "supportedLocales": [
-                                {
-                                    "id": "fr-FR",
-                                    "alias": "fr",
-                                    "preferredCurrency": "USD"
-                                },
-                                {
-                                    "id": "it-IT",
-                                    "alias": "it",
-                                    "preferredCurrency": "USD"
-                                }
-                            ]
-                        }
-                    },
-                    {
-                        "id": "RefArch",
                         "defaultLocale": "en-US",
+                        "url": {
+                            "site": "none",
+                            "locale": "path"
+                        },
                         "l10n": {
                             "supportedCurrencies": ["USD"],
                             "defaultCurrency": "USD",
@@ -66,13 +54,16 @@
                                     "id": "en-CA",
                                     "preferredCurrency": "USD"
                                 }
-                            ],
-                            "defaultLocale": "en-US"
+                            ]
                         }
                     },
                     {
                         "id": "RefArchGlobal",
-                        "alias": "global",
+                        "alias": "eu",
+                        "url": {
+                            "site": "path",
+                            "locale": "none"
+                        },
                         "l10n": {
                             "supportedCurrencies": ["GBP", "EUR", "CNY", "JPY"],
                             "defaultCurrency": "GBP",
@@ -104,7 +95,6 @@
                     }
                 ]
             }
-
         ]
     }
 }

@@ -8,7 +8,7 @@
 import pwaKitConfig from '../../pwa-kit.config.json'
 import {urlPartPositions} from '../constants'
 import {pathToUrl} from './url'
-
+import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
 /**
  * Call requestIdleCallback in supported browsers.
  *
@@ -177,6 +177,39 @@ export const getConfig = (path) => {
     return getObjectProperty(pwaKitConfig, path)
 }
 
+/**
+ * a function to return url config from pwa config file
+ * If a customise funtion is passed, it will use that function.
+ * Otherwise, it will look for the url config based on the current host
+ * If none is found, it will return the default url config at the top level of the config file
+ * @param customizedGetter - a customised function to get url config differently than the default behavior
+ */
+export const getUrlConfig = (customizedGetter) => {
+    if (customizedGetter && typeof customizedGetter === 'function') {
+        return customizedGetter()
+    }
+    const {hostname} = new URL(getAppOrigin())
+    const urlConfig = getUrlConfigByHostname(hostname)
+    console.log('urlConfig', urlConfig)
+    if (urlConfig) {
+        return urlConfig
+    }
+    return getConfig('app.url')
+}
+
+/**
+ * Get the url config base on hostname
+ * @param {string} hostname
+ * @returns {object|undefined} - url config from the input host
+ */
+export const getUrlConfigByHostname = (hostname) => {
+    const hosts = getConfig('app.hosts')
+    console.log('hostname', hostname)
+    const host = hosts.find((host) => host.domain === hostname)
+    console.log('host', host)
+    return host?.url
+}
+
 export const isObject = (o) => o?.constructor === Object
 
 /**
@@ -221,7 +254,9 @@ export const getObjectProperty = (obj, path) => {
  * @returns {object}
  */
 export const getParamsFromPath = (path) => {
-    const {locale: localePosition, site: sitePosition} = getConfig('app.url')
+    const {locale: localePosition, site: sitePosition} = getUrlConfig()
+    console.log('localePosition', localePosition)
+    console.log('sitePosition', sitePosition)
     const {pathname, search} = new URL(pathToUrl(path))
     const params = new URLSearchParams(search)
     const result = {}
