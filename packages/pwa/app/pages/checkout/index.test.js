@@ -30,7 +30,7 @@ jest.setTimeout(60000)
 
 // Make sure fetch is defined in test env
 Object.defineProperty(window, 'fetch', {
-    value: require('node-fetch')
+    value: require('cross-fetch')
 })
 
 jest.mock('../../commerce-api/utils', () => {
