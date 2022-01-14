@@ -193,10 +193,10 @@ const prompts = () => {
     const validSiteId = (s) =>
         /^[a-z0-9_-]+$/i.test(s) || 'Valid characters are alphanumeric, hyphen, or underscore'
 
-    // To see definitions for Commerce API configuration values, refer to these
-    // doc --> https://developer.salesforce.com/docs/commerce/commerce-api/guide/commerce-api-configuration-values.html.
+    // To see definitions for Commerce API configuration values, go to
+    // https://developer.salesforce.com/docs/commerce/commerce-api/guide/commerce-api-configuration-values.
     const defaultCommerceAPIError =
-        'Invalid format. Use docs to find more information about valid configurations: https://developer.salesforce.com/docs/commerce/commerce-api/guide/commerce-api-configuration-values.html'
+        'Invalid format. Use docs to find more information about valid configurations: https://developer.salesforce.com/docs/commerce/commerce-api/guide/commerce-api-configuration-values'
     const defaultEinsteinAPIError =
         'Invalid format. Use docs to find more information about valid configurations: https://developer.salesforce.com/docs/commerce/einstein-api/references#einstein-recommendations:Summary'
     const validShortCode = (s) => /(^[0-9A-Z]{8}$)/i.test(s) || defaultCommerceAPIError
@@ -213,45 +213,58 @@ const prompts = () => {
 
     const questions = [
         {
+            name: 'useDemoSettings',
+            message: "Which settings do you want to use for your storefront's B2C Commerce instance?",
+            choices: ['Demo', 'Custom'],
+            type: 'list'
+        },
+        {
             name: 'projectId',
             validate: validProjectId,
-            message: 'What is your project ID (example-project) in Managed Runtime Admin?'
+            message: 'What is your project ID (example-project) in Managed Runtime Admin?',
+            when: (answers) => answers.useDemoSettings == 'Custom' ? true : false
         },
         {
             name: 'instanceUrl',
             message:
-                'What is the URL (https://example_instance_id.sandbox.us01.dx.commercecloud.salesforce.com) for your Commerce Cloud instance?',
-            validate: validUrl
+                'What is the URL (https://example_instance_id.sandbox.us01.dx.commercecloud.salesforce.com) for your B2C Commerce instance?',
+            validate: validUrl,
+            when: (answers) => answers.useDemoSettings == 'Custom' ? true : false
         },
         {
             name: 'clientId',
-            message: 'What is your Commerce API client ID in Account Manager?',
-            validate: validClientId
+            message: 'What is your API client ID?',
+            validate: validClientId,
+            when: (answers) => answers.useDemoSettings == 'Custom' ? true : false
         },
         {
             name: 'siteId',
-            message: "What is your site's ID (examples: RefArch, SiteGenesis) in Business Manager?",
-            validate: validSiteId
+            message: "What is your site's ID (examples: RefArch, RefArchGlobal) in Business Manager?",
+            validate: validSiteId,
+            when: (answers) => answers.useDemoSettings == 'Custom' ? true : false
         },
         {
             name: 'organizationId',
             message: 'What is your Commerce API organization ID in Business Manager?',
-            validate: validOrganizationId
+            validate: validOrganizationId,
+            when: (answers) => answers.useDemoSettings == 'Custom' ? true : false
         },
         {
             name: 'shortCode',
             message: 'What is your Commerce API short code in Business Manager?',
-            validate: validShortCode
+            validate: validShortCode,
+            when: (answers) => answers.useDemoSettings == 'Custom' ? true : false
         },
         {
             name: 'einsteinId',
             message: 'What is your API Client ID in the Einstein Configurator? (optional)',
-            validate: validEinsteinId
+            validate: validEinsteinId,
+            when: (answers) => answers.useDemoSettings == 'Custom' ? true : false
         }
         // NOTE: there's no question about Einstein's _site_ id because we currently assume that the site id will be the same for both Commerce API and Einstein
     ]
 
-    return inquirer.prompt(questions).then((answers) => buildAnswers(answers))
+    return inquirer.prompt(questions).then((answers) => answers.useDemoSettings == 'Demo' ? demoProjectAnswers() : buildAnswers(answers))
 }
 
 const buildAnswers = ({
@@ -301,6 +314,21 @@ const testProjectAnswers = () => {
         clientId: 'c9c45bfd-0ed3-4aa2-9971-40f88962b836',
         siteId: 'RefArchGlobal',
         organizationId: 'f_ecom_zzrf_001',
+        shortCode: 'kv7kzm78',
+        einsteinId: '1ea06c6e-c936-4324-bcf0-fada93f83bb1',
+        einsteinSiteId: 'aaij-MobileFirst'
+    }
+
+    return buildAnswers(config)
+}
+
+const demoProjectAnswers = () => {
+    const config = {
+        projectId: 'demo-storefront',
+        instanceUrl: 'https://zzte-053.sandbox.us02.dx.commercecloud.salesforce.com/',
+        clientId: '1d763261-6522-4913-9d52-5d947d3b94c4',
+        siteId: 'RefArchGlobal',
+        organizationId: 'f_ecom_zzte_053',
         shortCode: 'kv7kzm78',
         einsteinId: '1ea06c6e-c936-4324-bcf0-fada93f83bb1',
         einsteinSiteId: 'aaij-MobileFirst'
@@ -367,7 +395,7 @@ const main = (opts) => {
             return runGenerator(testProjectAnswers(), opts)
         case PROMPT:
             console.log(
-                'See https://developer.salesforce.com/docs/commerce/commerce-api/guide/commerce-api-configuration-values.html for details on configuration values\n'
+                'For details on configuration values, see https://developer.salesforce.com/docs/commerce/commerce-api/guide/commerce-api-configuration-values\n'
             )
             return prompts(opts).then((answers) => runGenerator(answers, opts))
         default:
