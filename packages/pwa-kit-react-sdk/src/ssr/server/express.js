@@ -118,14 +118,15 @@ export const REMOTE_REQUIRED_ENV_VARS = [
  * either as an absolute path, or relative to the build directory. If this
  * value is not supplied, requests for a favicon will return a 404 and
  * log a warning to the console.
- * @param {Number} [options.proxyKeepAliveTimeout] - The timeout value
- * for the keep-alive agent used when proxying connections. Defaults to 'Infinity'.
  * @param {Object} options.mobify - The 'mobify' object from the project's
  * package.json file, containing the SSR parameters.
  * @param {Number} [options.port=3443] - the localhost port on which the local
  * development Express app listens.
  * @param {String} [options.protocol='https'] - the protocol on which the development
  * Express app listens.
+ * @param {Boolean} [options.proxyKeepAliveAgent] - This boolean value indicates
+ * whether or not we are using a keep alive agent for proxy connections. Defaults
+ * to 'true'.
  * @param {String} options.sslFilePath - the absolute path to a PEM format
  * certificate file to be used by the local development server. This should
  * contain both the certificate and the private key.
@@ -152,8 +153,8 @@ export const createApp = (options) => {
         // The protocol that the local dev server listens on
         protocol: 'https',
 
-        // The timeout value used for the proxys keep-alive agent.
-        proxyKeepAliveTimeout: Infinity,
+        // Whether or not to use a keep alive agent for proxy connections.
+        proxyKeepAliveAgent: true,
 
         // Quiet flag (suppresses output if true)
         quiet: false,
