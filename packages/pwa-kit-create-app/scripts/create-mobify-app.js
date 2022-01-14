@@ -217,7 +217,7 @@ const prompts = () => {
     const questions = [
         {
             name: 'useDemoSettings',
-            message: "Do you want to try out PWA Kit with the demo storefront?",
+            message: 'Do·you·want·to·try·out·PWA·Kit·with·the·demo·storefront?',
             choices: [demoChoice, customChoice],
             type: 'list'
         },
@@ -242,7 +242,8 @@ const prompts = () => {
         },
         {
             name: 'siteId',
-            message: "What is your site's ID (examples: RefArch, RefArchGlobal) in Business Manager?",
+            message:
+                "What is your site's ID (examples: RefArch, RefArchGlobal) in Business Manager?",
             validate: validSiteId,
             when: (answers) => answers.useDemoSettings == customChoice
         },
@@ -267,7 +268,11 @@ const prompts = () => {
         // NOTE: there's no question about Einstein's _site_ id because we currently assume that the site id will be the same for both Commerce API and Einstein
     ]
 
-    return inquirer.prompt(questions).then((answers) => answers.useDemoSettings == demoChoice ? demoProjectAnswers() : buildAnswers(answers))
+    return inquirer
+        .prompt(questions)
+        .then((answers) =>
+            answers.useDemoSettings == demoChoice ? demoProjectAnswers() : buildAnswers(answers)
+        )
 }
 
 const buildAnswers = ({
