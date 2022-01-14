@@ -28,9 +28,6 @@ const compression = require('compression')
 import {PerformanceObserver, performance} from 'perf_hooks'
 
 let HTTP_AGENT, HTTPS_AGENT
-const KEEPALIVE_AGENT_OPTIONS = {
-    keepAlive: true
-}
 
 const MOBIFY_DEVICETYPE = 'mobify_devicetype'
 
@@ -292,23 +289,22 @@ export const outgoingRequestHook = (wrapped, options) => {
         // Inject the access key.
         workingOptions.headers['x-mobify-access-key'] = accessKey
 
-        if (proxyKeepAliveTimeout) {
-            const {httpAgent, httpsAgent} = getKeepAliveAgents({
-                keepAliveMsecs: options.proxyKeepAliveTimeout
-            })
+        // Create and add keep-alive agent to options for loop-back connection.
+        const {httpAgent, httpsAgent} = getKeepAliveAgents({
+            keepAliveMsecs: options.proxyKeepAliveTimeout
+        })
 
-            // Add default agent to global connection reuse.
-            workingOptions.agent =
-                workingUrl.startsWith('http:') || workingOptions?.protocol === 'http:'
-                    ? httpAgent
-                    : httpsAgent
+        // Add default agent to global connection reuse.
+        workingOptions.agent =
+            workingUrl.startsWith('http:') || workingOptions?.protocol === 'http:'
+                ? httpAgent
+                : httpsAgent
 
-            // node-fetch and potentially other libraries add connection: close heaaders
-            // remove them to keep the connection alive. NOTE: There are variations in
-            // whether or not the connection header is upper or lower case, so handle both.
-            delete workingOptions?.headers?.connection
-            delete workingOptions?.headers?.Connection
-        }
+        // `node-fetch` and potentially other libraries add connection: close heaaders
+        // remove them to keep the connection alive. NOTE: There are variations in
+        // whether or not the connection header is upper or lower case, so handle both.
+        delete workingOptions?.headers?.connection
+        delete workingOptions?.headers?.Connection
 
         // Build the args, omitting any undefined values
         const workingArgs = [workingUrl, workingOptions, workingCallback].filter((arg) => !!arg)

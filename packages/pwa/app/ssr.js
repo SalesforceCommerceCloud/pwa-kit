@@ -28,7 +28,6 @@ const app = createApp({
     // The location of the apps manifest file relative to the build directory
     manifestPath: 'static/manifest.json',
 
-    proxyKeepAliveTimeout: 0,
     // This is the value of the 'mobify' object from package.json
     // provided by a webpack DefinePlugin
     mobify: WEBPACK_PACKAGE_JSON_MOBIFY,
