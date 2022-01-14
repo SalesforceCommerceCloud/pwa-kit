@@ -28,9 +28,6 @@ const compression = require('compression')
 import {PerformanceObserver, performance} from 'perf_hooks'
 
 let HTTP_AGENT, HTTPS_AGENT
-const KEEPALIVE_AGENT_OPTIONS = {
-    keepAlive: true
-}
 
 const MOBIFY_DEVICETYPE = 'mobify_devicetype'
 
@@ -175,16 +172,17 @@ export const getFullRequestURL = (url) => {
 }
 
 /**
- * Returns the http and https agent singletons configured with defualt
- * options.
+ * Returns the http and https agent singletons configured the provided
+ * options. NOTE: the `keepAlive` option is always set to `true`.
  *
  * @private
+ * @param options {Object} options to be used for the agent.
  * @returns {object} -
  */
-const getAgents = () => {
+const getKeepAliveAgents = (options) => {
     if (!HTTP_AGENT || !HTTPS_AGENT) {
-        HTTP_AGENT = new http.Agent(KEEPALIVE_AGENT_OPTIONS)
-        HTTPS_AGENT = new https.Agent(KEEPALIVE_AGENT_OPTIONS)
+        HTTP_AGENT = new http.Agent({...options, keepAlive: true})
+        HTTPS_AGENT = new https.Agent({...options, keepAlive: true})
     }
 
     return {
@@ -223,7 +221,7 @@ export const outgoingRequestHook = (wrapped, options) => {
         // the call through to the wrapped function. We'll also
         // do that if there's no access key.
         const accessKey = process.env.X_MOBIFY_ACCESS_KEY
-        const {appHostname, loopbackAgent} = options || {}
+        const {appHostname, proxyKeepAliveTimeout} = options || {}
 
         if (!(appHostname && accessKey)) {
             return wrapped.apply(this, arguments) // eslint-disable-line prefer-rest-params
@@ -291,21 +289,22 @@ export const outgoingRequestHook = (wrapped, options) => {
         // Inject the access key.
         workingOptions.headers['x-mobify-access-key'] = accessKey
 
-        if (loopbackAgent) {
-            const {httpAgent, httpsAgent} = getAgents()
+        // Create and add keep-alive agent to options for loop-back connection.
+        const {httpAgent, httpsAgent} = getKeepAliveAgents({
+            keepAliveMsecs: options.proxyKeepAliveTimeout
+        })
 
-            // Add default agent to global connection reuse.
-            workingOptions.agent =
-                workingUrl.startsWith('http:') || workingOptions?.protocol === 'http:'
-                    ? httpAgent
-                    : httpsAgent
+        // Add default agent to global connection reuse.
+        workingOptions.agent =
+            workingUrl.startsWith('http:') || workingOptions?.protocol === 'http:'
+                ? httpAgent
+                : httpsAgent
 
-            // node-fetch and potentially other libraries add connection: close heaaders
-            // remove them to keep the connection alive. NOTE: There are variations in
-            // whether or not the connection header is upper or lower case, so handle both.
-            delete workingOptions?.headers?.connection
-            delete workingOptions?.headers?.Connection
-        }
+        // `node-fetch` and potentially other libraries add connection: close heaaders
+        // remove them to keep the connection alive. NOTE: There are variations in
+        // whether or not the connection header is upper or lower case, so handle both.
+        delete workingOptions?.headers?.connection
+        delete workingOptions?.headers?.Connection
 
         // Build the args, omitting any undefined values
         const workingArgs = [workingUrl, workingOptions, workingCallback].filter((arg) => !!arg)

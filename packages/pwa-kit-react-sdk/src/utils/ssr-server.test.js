@@ -819,14 +819,14 @@ describe('outgoingRequestHook tests', () => {
 
     const withHeaders = [true, false]
     const withCallback = withHeaders
-    const withLoopbackAgent = withCallback
+    const withProxyKeepAliveTimeout = withCallback
 
     const testCases = []
     baseTestCases.forEach((baseTestCase) =>
         testMethods.forEach((testMethod) =>
             withHeaders.forEach((addHeaders) =>
                 withCallback.forEach((addCallback) => {
-                    withLoopbackAgent.forEach((addLoopbackAgent) => {
+                    withProxyKeepAliveTimeout.forEach((addProxyKeepAliveTimeout) => {
                         const testCase = {...baseTestCase}
                         testCase.name =
                             `${testCase.name} via ${testMethod} ` +
@@ -835,7 +835,7 @@ describe('outgoingRequestHook tests', () => {
                         testCase.testMethod = testMethod
                         testCase.addHeaders = addHeaders
                         testCase.addCallback = addCallback
-                        testCase.addLoopbackAgent = addLoopbackAgent
+                        testCase.addProxyKeepAliveTimeout = addProxyKeepAliveTimeout
                         testCases.push(testCase)
                     })
                 })
@@ -847,10 +847,8 @@ describe('outgoingRequestHook tests', () => {
         test(testCase.name, () => {
             const createAppOptions = {appHostname}
 
-            if (testCase.addLoopbackAgent) {
-                createAppOptions.loopbackAgent = {
-                    keepAlive: true
-                }
+            if (testCase.addProxyKeepAliveTimeout) {
+                createAppOptions.proxyKeepAliveTimeout = Infinity
             }
 
             const hook = outgoingRequestHook(mockRequest, createAppOptions)
@@ -926,9 +924,10 @@ describe('outgoingRequestHook tests', () => {
                 expect(called[0]).toBe(fakeCallback)
             }
 
-            if (testCase.addLoopbackAgent && testCase.name.startsWith('loopback')) {
+            if (testCase.addProxyKeepAliveTimeout && testCase.name.startsWith('loopback')) {
                 expect(calledOptions.agent).toBeDefined()
                 expect(calledOptions.agent.keepAlive).toBe(true)
+                expect(calledOptions.agent.keepAliveMsecs).toBe(Infinity)
             }
         })
     )
