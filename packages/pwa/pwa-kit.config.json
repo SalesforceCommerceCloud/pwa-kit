@@ -1,17 +1,36 @@
 {
     "app": {
         "url": {
-            "site": "path",
-            "locale": "path"
+            "site": "none",
+            "locale": "none"
         },
         "hosts": [
             {
                 "domain": "localhost",
-                "defaultSite": "RefArchGlobal",
+                "defaultSite": "RefArch",
                 "sites": [
                     {
                         "id": "RefArch",
-                        "alias": "us",
+                        "l10n": {
+                            "supportedCurrencies": ["USD"],
+                            "defaultCurrency": "USD",
+                            "defaultLocale": "en-US",
+                            "supportedLocales": [
+                                {
+                                    "id": "en-US",
+                                    "alias": "en",
+                                    "preferredCurrency": "USD"
+                                },
+                                {
+                                    "id": "en-CA",
+                                    "alias": "ca",
+                                    "preferredCurrency": "YEN"
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        "id": "RefArch",
                         "l10n": {
                             "supportedCurrencies": ["USD"],
                             "defaultCurrency": "USD",
@@ -32,7 +51,7 @@
                     },
                     {
                         "id": "RefArchGlobal",
-                        "alias": "global",
+                        "alias": "eu",
                         "l10n": {
                             "supportedCurrencies": ["GBP", "EUR", "CNY", "JPY"],
                             "defaultLocale": "en-GB",
@@ -59,6 +78,33 @@
                                 {
                                     "id": "ja-JP",
                                     "preferredCurrency": "JPY"
+                                }
+                            ]
+                        }
+                    }
+                ]
+            },
+            {
+                "domain": "www.domain-1.com",
+                "defaultSite": "RefArch",
+                "sites": [
+                    {
+                        "id": "RefArch",
+                        "alias": "us",
+                        "l10n": {
+                            "supportedCurrencies": ["USD"],
+                            "defaultCurrency": "USD",
+                            "defaultLocale": "en-US",
+                            "supportedLocales": [
+                                {
+                                    "id": "en-US",
+                                    "alias": "en",
+                                    "preferredCurrency": "USD"
+                                },
+                                {
+                                    "id": "en-CA",
+                                    "alias": "ca",
+                                    "preferredCurrency": "YEN"
                                 }
                             ]
                         }

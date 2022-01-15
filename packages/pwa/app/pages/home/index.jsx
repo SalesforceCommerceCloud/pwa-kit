@@ -34,12 +34,10 @@ import {getAssetUrl} from 'pwa-kit-react-sdk/ssr/universal/utils'
 import {heroFeatures, features} from './data'
 
 // Constants
-import {
-    HOME_SHOP_PRODUCTS_CATEGORY_ID,
-    HOME_SHOP_PRODUCTS_LIMIT,
-    urlPartPositions
-} from '../../constants'
-import {getUrlConfig} from '../../utils/utils'
+import {HOME_SHOP_PRODUCTS_CATEGORY_ID, HOME_SHOP_PRODUCTS_LIMIT} from '../../constants'
+// import {getUrlConfig} from '../../utils/utils'
+import useSite from '../../hooks/use-site'
+// import {useLocation} from 'react-router-dom'
 
 /**
  * This is the home page for Retail React App.
@@ -49,7 +47,10 @@ import {getUrlConfig} from '../../utils/utils'
  */
 const Home = ({productSearchResult, isLoading}) => {
     const intl = useIntl()
-    const urlConfig = getUrlConfig()
+    const site = useSite()
+    console.log('site', site)
+    // const location = useLocation()
+    // const urlConfig = getUrlConfig(location.pathname)
 
     return (
         <Box data-testid="home-page" layerStyle="page">
@@ -58,6 +59,9 @@ const Home = ({productSearchResult, isLoading}) => {
                 description="Commerce Cloud Retail React App"
                 keywords="Commerce Cloud, Retail React App, React Storefront"
             />
+            <Box as="pre" bg="#ccc">
+                {JSON.stringify(site, null, 2)}
+            </Box>
 
             <Section>
                 <h3>These buttons are for demo purposes, it will NOT get merged into develop</h3>
@@ -65,20 +69,19 @@ const Home = ({productSearchResult, isLoading}) => {
                     mt={4}
                     mr={4}
                     onClick={() => {
-                        window.location = '/'
+                        window.location = '/eu'
                     }}
                 >
-                    to Global Site
+                    EU Site
                 </Button>
 
                 <Button
                     mt={4}
                     onClick={() => {
-                        window.location =
-                            urlConfig['site'] === urlPartPositions.PATH ? '/us' : '/site=us'
+                        window.location = '/en-US'
                     }}
                 >
-                    to Default Site
+                    International site
                 </Button>
             </Section>
 

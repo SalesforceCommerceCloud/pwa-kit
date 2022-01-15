@@ -128,10 +128,10 @@ export const searchUrlBuilder = (searchTerm) => `/search?q=${searchTerm}`
  * @returns {string} - The relative URL for the specific locale.
  */
 export const getUrlWithLocale = (shortCode, opts = {}) => {
-    const {locale: localePosition, site: sitePosition} = getUrlConfig()
     const {hostname} = new URL(getAppOrigin())
     const defaultSiteId = getDefaultSiteIdByHost(hostname)
     const location = opts.location ? opts.location : window.location
+    const {locale: localePosition, site: sitePosition} = getUrlConfig(location.pathname)
     const {disallowParams = [], site} = opts
     let relativeUrl = location.pathname
 
@@ -257,7 +257,7 @@ export const removeQueryParamsFromPath = (path, keys) => {
  *
  */
 export const buildPathWithUrlConfig = (url, configValues = {}) => {
-    const urlConfig = getUrlConfig()
+    const urlConfig = getUrlConfig(url)
     if (!urlConfig || !Object.values(urlConfig).length) return url
     if (!Object.values(configValues).length) return url
     const queryParams = {}

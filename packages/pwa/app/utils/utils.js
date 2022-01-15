@@ -8,7 +8,6 @@
 import pwaKitConfig from '../../pwa-kit.config.json'
 import {urlPartPositions} from '../constants'
 import {pathToUrl} from './url'
-import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
 /**
  * Call requestIdleCallback in supported browsers.
  *
@@ -182,17 +181,29 @@ export const getConfig = (path) => {
  * If a customise funtion is passed, it will use that function.
  * Otherwise, it will look for the url config based on the current host
  * If none is found, it will return the default url config at the top level of the config file
- * @param customizedGetter - a customised function to get url config differently than the default behavior
+ *
  */
-export const getUrlConfig = (customizedGetter) => {
-    if (customizedGetter && typeof customizedGetter === 'function') {
-        return customizedGetter()
+export const getUrlConfig = (path) => {
+    const paths = path.split('/')
+    // the first part of the paths is eu, I want to url config to have site as in path, none for  locale
+    if (paths[1] === 'eu') {
+        return {
+            site: 'path',
+            locale: 'none'
+        }
     }
-    const {hostname} = new URL(getAppOrigin())
-    const urlConfig = getUrlConfigByHostname(hostname)
-    if (urlConfig) {
-        return urlConfig
+    // a pattern of locale in pathname
+    const regExp = /en-\w\w/g
+    // if the first part fit the reg ex pattern, it is the locale,
+    // I want to url config to set locale as path, none for site
+    if (regExp.test(paths[1])) {
+        return {
+            site: 'none',
+            locale: 'path'
+        }
     }
+
+    // otherwise, use the default config from the file
     return getConfig('app.url')
 }
 
@@ -251,7 +262,7 @@ export const getObjectProperty = (obj, path) => {
  * @returns {object}
  */
 export const getParamsFromPath = (path) => {
-    const {locale: localePosition, site: sitePosition} = getUrlConfig()
+    const {locale: localePosition, site: sitePosition} = getUrlConfig(path)
     const {pathname, search} = new URL(pathToUrl(path))
     const params = new URLSearchParams(search)
     const result = {}

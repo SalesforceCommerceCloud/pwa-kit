@@ -54,6 +54,7 @@ export const configureRoutes = (routes = [], {ignoredRoutes = []}) => {
         if (ignoredRoutes.includes(path)) {
             outputRoutes.push(routes[i])
         } else {
+            // construct the routes that has  both site and locale
             sites.forEach((site) => {
                 locales.forEach((locale) => {
                     const newRoute = `/${site}/${locale}${path}`
@@ -64,12 +65,15 @@ export const configureRoutes = (routes = [], {ignoredRoutes = []}) => {
                 })
             })
 
+            // construct the routes that only has site
             sites.forEach((site) => {
                 outputRoutes.push({
                     path: `/${site}${path}`,
                     ...rest
                 })
             })
+
+            // construct the routes that only has locale
             locales.forEach((locale) => {
                 outputRoutes.push({
                     path: `/${locale}${path}`,
