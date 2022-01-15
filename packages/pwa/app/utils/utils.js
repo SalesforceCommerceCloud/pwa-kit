@@ -183,6 +183,7 @@ export const getConfig = (path) => {
  * If none is found, it will return the default url config at the top level of the config file
  */
 export const getUrlConfig = (path) => {
+    if (!path) return getConfig('app.url')
     const paths = path.split('/')
     // the first part of the paths is eu, I want to url config to have site as in path, none for  locale
     if (paths[1] === 'eu') {
