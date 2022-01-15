@@ -144,7 +144,10 @@ export const getUrlWithLocale = (shortCode, opts = {}) => {
         })
     }
 
+    console.log('getUrlWithLocale ====================')
+
     if (relativeUrl === HOME_HREF) {
+        console.log(' -------------------------relativeUrl', relativeUrl)
         relativeUrl = buildPathWithUrlConfig(relativeUrl, {site: site?.alias, locale: shortCode})
     } else {
         let paths = relativeUrl.split('/').filter((path) => path !== '')
@@ -182,6 +185,7 @@ export const getUrlWithLocale = (shortCode, opts = {}) => {
  * @returns {string}
  */
 export const homeUrlBuilder = (homeHref, options = {}) => {
+    console.log('homeUrlBuilder')
     const {locale, site} = options
     const {hostname} = new URL(getAppOrigin())
     const defaultSiteId = getDefaultSiteIdByHost(hostname)
@@ -233,6 +237,7 @@ export const removeQueryParamsFromPath = (path, keys) => {
  * based on url config
  * @param {string} url - based url of the output url
  * @param {object} configValues - object that contains values of url param config
+ * @param {object} opts - options
  * @return {string} - an output url
  *
  * @example
@@ -256,8 +261,8 @@ export const removeQueryParamsFromPath = (path, keys) => {
  *  /en-GB/women/dresses
  *
  */
-export const buildPathWithUrlConfig = (url, configValues = {}) => {
-    const urlConfig = getUrlConfig(url)
+export const buildPathWithUrlConfig = (url, configValues = {}, opts = {}) => {
+    const urlConfig = getUrlConfig(opts.pathname)
     if (!urlConfig || !Object.values(urlConfig).length) return url
     if (!Object.values(configValues).length) return url
     const queryParams = {}

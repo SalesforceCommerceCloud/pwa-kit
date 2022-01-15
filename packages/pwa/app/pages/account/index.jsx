@@ -41,6 +41,7 @@ import {buildPathWithUrlConfig} from '../../utils/url'
 import useSite from '../../hooks/use-site'
 
 const Account = () => {
+    console.log('account page >>>>>>>')
     const {path} = useRouteMatch()
     const {formatMessage} = useIntl()
     const customer = useCustomer()
