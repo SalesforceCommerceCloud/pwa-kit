@@ -182,12 +182,8 @@ export const getConfig = (path) => {
  * If a customise funtion is passed, it will use that function.
  * Otherwise, it will look for the url config based on the current host
  * If none is found, it will return the default url config at the top level of the config file
- * @param customizedGetter - a customised function to get url config differently than the default behavior
  */
-export const getUrlConfig = (customizedGetter) => {
-    if (customizedGetter && typeof customizedGetter === 'function') {
-        return customizedGetter()
-    }
+export const getUrlConfig = () => {
     const {hostname} = new URL(getAppOrigin())
     const urlConfig = getUrlConfigByHostname(hostname)
     if (urlConfig) {
