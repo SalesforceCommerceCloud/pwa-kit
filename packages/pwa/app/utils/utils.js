@@ -181,7 +181,6 @@ export const getConfig = (path) => {
  * If a customise funtion is passed, it will use that function.
  * Otherwise, it will look for the url config based on the current host
  * If none is found, it will return the default url config at the top level of the config file
- *
  */
 export const getUrlConfig = (path) => {
     const paths = path.split('/')
