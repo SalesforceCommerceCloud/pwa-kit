@@ -1,4 +1,5 @@
 ## v1.4.0-dev (Jan 06, 2022)
+-   Add a demo project option that produces a project with our demo sandbox presets [#322](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/322)
 -   Generate `test-project` with the correct Einstein's site id [#285](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/285)
 
 ## v1.3.0 (Jan 06, 2022)
