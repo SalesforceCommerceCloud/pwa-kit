@@ -104,33 +104,3 @@ export const getSitesByHost = (hostname) => {
  * @returns {array} - list of site objects
  */
 export const getHosts = () => getConfig('app.hosts')
-
-/**
- * This custom url config function only works for elf scenario
- * @param path
- */
-export const customGetUrlConfig = (path) => {
-    if (!path) return getConfig('app.url')
-    const paths = path.split('/')
-    console.log('paths', paths)
-    // the first part of the paths is eu, I want to url config to have site as in path, none for  locale
-    if (paths[1] === 'eu') {
-        return {
-            site: 'path',
-            locale: 'none'
-        }
-    }
-    // a pattern of locale in pathname
-    const regExp = /en-\w\w/g
-    // if the first part fit the reg ex pattern, it is the locale,
-    // I want to url config to set locale as path, none for site
-    if (regExp.test(paths[1])) {
-        return {
-            site: 'none',
-            locale: 'path'
-        }
-    }
-
-    // otherwise, use the default config from the file
-    return getConfig('app.url')
-}
