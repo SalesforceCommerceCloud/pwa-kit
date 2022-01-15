@@ -37,9 +37,10 @@ import {useLocation} from 'react-router-dom'
 import {messages, navLinks} from './constant'
 import useNavigation from '../../hooks/use-navigation'
 import LoadingSpinner from '../../components/loading-spinner'
+import {buildPathWithUrlConfig} from '../../utils/url'
 
 const Account = () => {
-    const {path, url} = useRouteMatch()
+    const {path} = useRouteMatch()
     const {formatMessage} = useIntl()
     const customer = useCustomer()
     const {locale} = useIntl()
@@ -74,7 +75,8 @@ const Account = () => {
                     <SignoutIcon boxSize={5} mr={2} />
                     <Text as="span" fontSize={['md', 'md', 'md', 'sm']} fontWeight="normal">
                         {formatMessage({
-                            defaultMessage: 'Log out'
+                            defaultMessage: 'Log Out',
+                            id: 'account.logout_button.button.log_out'
                         })}
                     </Text>
                 </Flex>
@@ -86,11 +88,8 @@ const Account = () => {
     // Using Redirect allows us to store the directed page to location
     // so we can direct users back after they are successfully log in
     if (customer.authType != null && !customer.isRegistered) {
-        return (
-            <Redirect
-                to={{pathname: `/${locale}/login`, state: {directedFrom: location.pathname}}}
-            />
-        )
+        const path = buildPathWithUrlConfig('/login', {locale})
+        return <Redirect to={{pathname: path, state: {directedFrom: location.pathname}}} />
     }
 
     return (
@@ -122,7 +121,10 @@ const Account = () => {
                                 >
                                     <Flex align="center" justify="center">
                                         <Text as="span" mr={2}>
-                                            <FormattedMessage defaultMessage="My Account" />
+                                            <FormattedMessage
+                                                defaultMessage="My Account"
+                                                id="account.accordion.button.my_account"
+                                            />
                                         </Text>
                                         {isExpanded ? <ChevronUpIcon /> : <ChevronDownIcon />}
                                     </Flex>
@@ -133,7 +135,7 @@ const Account = () => {
                                             <Button
                                                 key={link.name}
                                                 as={Link}
-                                                to={`${url}${link.path}`}
+                                                to={`/account${link.path}`}
                                                 useNavLink={true}
                                                 variant="menu-link-mobile"
                                                 justifyContent="center"
@@ -158,7 +160,10 @@ const Account = () => {
                     {showLoading && <LoadingSpinner wrapperStyles={{height: '100vh'}} />}
 
                     <Heading as="h6" fontSize="18px">
-                        <FormattedMessage defaultMessage="My Account" />
+                        <FormattedMessage
+                            defaultMessage="My Account"
+                            id="account.heading.my_account"
+                        />
                     </Heading>
 
                     <Flex spacing={0} as="nav" data-testid="account-detail-nav" direction="column">
@@ -168,7 +173,7 @@ const Account = () => {
                                 <Button
                                     key={link.name}
                                     as={Link}
-                                    to={`${url}${link.path}`}
+                                    to={`/account${link.path}`}
                                     useNavLink={true}
                                     variant="menu-link"
                                     leftIcon={<LinkIcon boxSize={5} />}

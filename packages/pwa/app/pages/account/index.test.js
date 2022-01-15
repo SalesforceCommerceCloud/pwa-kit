@@ -20,12 +20,21 @@ import {
 } from '../../commerce-api/mock-data'
 import useCustomer from '../../commerce-api/hooks/useCustomer'
 import Account from './index'
+import {getUrlConfig} from '../../utils/utils'
 
 jest.mock('../../commerce-api/utils', () => {
     const originalModule = jest.requireActual('../../commerce-api/utils')
     return {
         ...originalModule,
         isTokenValid: jest.fn().mockReturnValue(true)
+    }
+})
+
+jest.mock('../../utils/utils', () => {
+    const original = jest.requireActual('../../utils/utils')
+    return {
+        ...original,
+        getUrlConfig: jest.fn()
     }
 })
 
@@ -89,6 +98,9 @@ const server = setupServer(
 beforeEach(() => {
     jest.resetModules()
     server.listen({onUnhandledRequest: 'error'})
+    getUrlConfig.mockImplementation(() => ({
+        locale: 'path'
+    }))
 
     // Since we're testing some navigation logic, we are using a simple Router
     // around our component. We need to initialize the default route/path here.
@@ -135,7 +147,7 @@ test('Renders account detail page by default for logged-in customer', async () =
 test('Allows customer to sign out', async () => {
     renderWithProviders(<MockedComponent />)
     expect(await screen.findByTestId('account-detail-page')).toBeInTheDocument()
-    user.click(screen.getAllByText('Log out')[0])
+    user.click(screen.getAllByText(/Log Out/)[0])
     await waitFor(() => {
         expect(window.location.pathname).toEqual('/en-GB/login')
     })

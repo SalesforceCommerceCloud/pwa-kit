@@ -16,7 +16,6 @@ commands:
             touch $BASH_ENV
             if [[ "${CIRCLE_BRANCH}" == "develop" ]]; then echo 'export DEVELOP=true' >> $BASH_ENV; fi
             if [[ "${CIRCLE_BRANCH}" =~ ^release- ]]; then echo 'export RELEASE=true' >> $BASH_ENV; fi
-            echo 'export DETECT_CHROMEDRIVER_VERSION=true' >> $BASH_ENV;
             source $BASH_ENV
       - run:
           name: 'Install Dependencies'
@@ -32,9 +31,6 @@ commands:
             sudo pip install -U pip setuptools
             sudo pip install awscli==1.18.85 datadog==0.40.1
             sudo npm install -g npm@6.14.4
-
-            # Add a dogrc so we can submit metrics to datadog
-            printf "[Connection]\napikey = $DATADOG_API_KEY\nappkey =\n" > ~/.dogrc
 
             # Install node dependencies
             node ./scripts/gtime.js monorepo_install npm ci
@@ -53,9 +49,6 @@ commands:
 
             # Install Snyk CLI
             sudo npm install -g snyk
-
-            # Run snyk auth - authenticate snyk using environment variables to add the token
-            snyk auth $SNYK_TOKEN
 
             # Install Lighthouse CI CLI
             sudo npm install -g @lhci/cli
@@ -82,10 +75,6 @@ commands:
   runtests:
     description: 'Run tests'
     parameters:
-      enableIntegrationTests:
-          description: 'Enable expensive integration tests'
-          default: true
-          type: boolean
       cwd:
         description: 'The directory to execute the tests from'
         default: ${PWD}
@@ -105,16 +94,6 @@ commands:
 
             # Always run fast unit tests
             npm run test
-
-            # End to end tests on nightly builds only
-            if [[ $NIGHTLY ]]; then
-              npm run test:e2e-ci
-            fi
-
-            # Only run expensive integration tests on these branches
-            if [[ (<< parameters.enableIntegrationTests >> == "true") && ( $DEVELOP || $RELEASE ) ]]; then
-              npm run test:integration
-            fi
   smoketestscripts:
     description: 'Smoke test scripts'
     parameters:
@@ -147,6 +126,19 @@ commands:
               # that would prevent Lerna from publishing (Lerna gets this right).
               git diff --exit-code
 
+  early_return_for_forked_pull_requests:
+    description: >-
+      If this build is from a fork, stop executing the current job and return success.
+      This is useful to avoid steps that will fail due to missing credentials.
+    steps:
+      - run:
+          name: Early return if this build is from a forked PR
+          command: |
+            if [ -n "$CIRCLE_PR_NUMBER" ]; then
+              echo "Nothing else to do for forked PRs, so marking this step successful"
+              circleci step halt
+            fi
+
 jobs:
   testNode12:
     docker:
@@ -154,11 +146,11 @@ jobs:
     steps:
       - checkout
       - setup
-      - runtests:
-          enableIntegrationTests: false
+      - runtests
       - lighthouse-ci
       - smoketestscripts
       - checkclean
+      - early_return_for_forked_pull_requests
       - store_test_results:
           path: packages/pwa/tests/reports
           when: always
@@ -186,6 +178,7 @@ jobs:
       - runtests
       - lighthouse-ci
       - smoketestscripts
+      - early_return_for_forked_pull_requests
       - run:
           name: Push Bundle
           command: |
@@ -247,6 +240,28 @@ jobs:
             GENERATOR_PRESET: 'hello-world-test-project'
           command: |
             node packages/pwa-kit-create-app/scripts/create-mobify-app-dev.js --outputDir /tmp/hello-world
+      - runtests:
+          cwd: /tmp/project
+      - smoketestscripts:
+          dir: /tmp/project
+      - run:
+          name: Count Generated Project Dependencies
+          environment:
+          command: |
+            MAX_PACKAGES="3050"
+            total=$(./scripts/count-dependencies.js /tmp/project)
+            echo "export TOTAL_PACKAGES=${total}" >> $BASH_ENV;
+
+            if [ "$total" -gt "$MAX_PACKAGES" ]; then
+                echo "Error: Found $TOTAL_PACKAGES installed packages (max $MAX_PACKAGES).";
+                exit 1;
+            else
+                echo "Error: Found $TOTAL_PACKAGES installed packages (max $MAX_PACKAGES).";
+            fi
+      - early_return_for_forked_pull_requests
+      - slack/status:
+          fail_only: true
+          only_for_branches: develop
       - run:
           name: Audit Generated Project
           environment:
@@ -264,28 +279,19 @@ jobs:
             # publishing them to the local npm repo would be successful).
 
             if [[ "${CIRCLE_BRANCH}" == "develop" ]]; then
+              # Run snyk auth - authenticate snyk using environment variables to add the token
+              snyk auth $SNYK_TOKEN
+
               snyk monitor --ignore-policy --remote-repo-url='https://github.com/SalesforceCommerceCloud/pwa-kit.git' --project-name='generated-scaffold-pwa'
             fi
       - run:
-          name: Count Generated Project Dependencies
+          name: Send metrics to Datadog
           environment:
           command: |
-            MAX_PACKAGES="3050"
-            total=$(./scripts/count-dependencies.js /tmp/project)
-              if [ "$total" -gt "$MAX_PACKAGES" ]; then
-                  echo "Error: Found $total installed packages (max $MAX_PACKAGES).";
-                  exit 1;
-              else
-                  echo "Error: Found $total installed packages (max $MAX_PACKAGES).";
-              fi
-            dog metric post mobify_platform_sdks.generated_project_total_packages $total
-      - runtests:
-          cwd: /tmp/project
-      - smoketestscripts:
-          dir: /tmp/project
-      - slack/status:
-          fail_only: true
-          only_for_branches: develop
+            # Add a dogrc so we can submit metrics to datadog
+            printf "[Connection]\napikey = $DATADOG_API_KEY\nappkey =\n" > ~/.dogrc
+
+            dog metric post mobify_platform_sdks.generated_project_total_packages $TOTAL_PACKAGES
       - run:
           name: Push Bundle
           command: |

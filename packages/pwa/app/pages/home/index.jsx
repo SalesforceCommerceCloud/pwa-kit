@@ -55,7 +55,8 @@ const Home = ({productSearchResult, isLoading}) => {
 
             <Hero
                 title={intl.formatMessage({
-                    defaultMessage: 'The React PWA Starter Store for Retail'
+                    defaultMessage: 'The React PWA Starter Store for Retail',
+                    id: 'home.title.react_starter_store'
                 })}
                 img={{
                     src: getAssetUrl('static/img/hero.png'),
@@ -65,13 +66,16 @@ const Home = ({productSearchResult, isLoading}) => {
                     <Stack spacing={{base: 4, sm: 6}} direction={{base: 'column', sm: 'row'}}>
                         <Button
                             as={Link}
-                            href="http://sfdc.co/pwa-kit-developer-center"
+                            href="https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/getting-started.html"
                             target="_blank"
                             width={{base: 'full', md: 'inherit'}}
                             paddingX={7}
                             _hover={{textDecoration: 'none'}}
                         >
-                            <FormattedMessage defaultMessage="Get started" />
+                            <FormattedMessage
+                                defaultMessage="Get started"
+                                id="home.link.get_started"
+                            />
                         </Button>
                     </Stack>
                 }
@@ -130,18 +134,22 @@ const Home = ({productSearchResult, isLoading}) => {
                     padding={4}
                     paddingTop={16}
                     title={intl.formatMessage({
-                        defaultMessage: 'Shop Products'
+                        defaultMessage: 'Shop Products',
+                        id: 'home.heading.shop_products'
                     })}
                     subtitle={intl.formatMessage(
                         {
                             defaultMessage:
-                                'This section contains content from the catalog. {link} on how to replace it.'
+                                'This section contains content from the catalog. {docLink} on how to replace it.',
+                            id: 'home.description.shop_products',
+                            description:
+                                '{docLink} is a html button that links the user to https://sfdc.co/business-manager-manage-catalogs'
                         },
                         {
-                            link: (
+                            docLink: (
                                 <Link
                                     target="_blank"
-                                    href={'https://sfdc.co/business-manager-manage-catalgos'}
+                                    href={'https://sfdc.co/business-manager-manage-catalogs'}
                                     textDecoration={'none'}
                                     position={'relative'}
                                     _after={{
@@ -157,7 +165,8 @@ const Home = ({productSearchResult, isLoading}) => {
                                     _hover={{textDecoration: 'none'}}
                                 >
                                     {intl.formatMessage({
-                                        defaultMessage: 'Read docs'
+                                        defaultMessage: 'Read docs',
+                                        id: 'home.link.read_docs'
                                     })}
                                 </Link>
                             )
@@ -177,11 +186,13 @@ const Home = ({productSearchResult, isLoading}) => {
                 padding={4}
                 paddingTop={32}
                 title={intl.formatMessage({
-                    defaultMessage: 'Features'
+                    defaultMessage: 'Features',
+                    id: 'home.heading.features'
                 })}
                 subtitle={intl.formatMessage({
                     defaultMessage:
-                        'Out-of-the-box features so that you focus only on adding enhancements.'
+                        'Out-of-the-box features so that you focus only on adding enhancements.',
+                    id: 'home.description.features'
                 })}
             >
                 <Container maxW={'6xl'} marginTop={10}>
@@ -219,17 +230,26 @@ const Home = ({productSearchResult, isLoading}) => {
                 padding={4}
                 paddingTop={32}
                 title={intl.formatMessage({
-                    defaultMessage: "We're here to help"
+                    defaultMessage: "We're here to help",
+                    id: 'home.heading.here_to_help'
                 })}
-                subtitle={intl.formatMessage(
-                    {
-                        defaultMessage:
-                            'Contact our support staff and they’ll get {br} you to the right place.'
-                    },
-                    {
-                        br: <br />
-                    }
-                )}
+                subtitle={
+                    <>
+                        <>
+                            {intl.formatMessage({
+                                defaultMessage: 'Contact our support staff.',
+                                id: 'home.description.contact_our_staff'
+                            })}
+                        </>
+                        <br />
+                        <>
+                            {intl.formatMessage({
+                                defaultMessage: 'They will get you to the right place.',
+                                id: 'home.description.get_you_to_the_right_place'
+                            })}
+                        </>
+                    </>
+                }
                 actions={
                     <Button
                         as={Link}
@@ -239,7 +259,7 @@ const Home = ({productSearchResult, isLoading}) => {
                         paddingX={7}
                         _hover={{textDecoration: 'none'}}
                     >
-                        <FormattedMessage defaultMessage="Contact Us" />
+                        <FormattedMessage defaultMessage="Contact Us" id="home.link.contact_us" />
                     </Button>
                 }
                 maxWidth={'xl'}

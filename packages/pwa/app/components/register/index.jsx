@@ -21,10 +21,16 @@ const RegisterForm = ({submitForm, clickSignIn = noop, form}) => {
                 <BrandLogo width="60px" height="auto" />
                 <Stack spacing={2}>
                     <Text align="center" fontSize="xl" fontWeight="semibold">
-                        <FormattedMessage defaultMessage="Let's get started" />
+                        <FormattedMessage
+                            defaultMessage="Let's get started!"
+                            id="register_form.heading.lets_get_started"
+                        />
                     </Text>
                     <Text fontSize="sm" align="center" color="gray.700">
-                        <FormattedMessage defaultMessage="Create an account and get first access to the very best products, inspiration and community." />
+                        <FormattedMessage
+                            defaultMessage="Create an account and get first access to the very best products, inspiration and community."
+                            id="register_form.message.create_an_account"
+                        />
                     </Text>
                 </Stack>
             </Stack>
@@ -45,21 +51,31 @@ const RegisterForm = ({submitForm, clickSignIn = noop, form}) => {
                             onClick={() => form.clearErrors('global')}
                             isLoading={form.formState.isSubmitting}
                         >
-                            <FormattedMessage defaultMessage="Create account" />
+                            <FormattedMessage
+                                defaultMessage="Create Account"
+                                id="register_form.button.create_account"
+                            />
                         </Button>
 
                         <Stack direction="row" spacing={1} justify="center">
                             <Text fontSize="sm">
-                                <FormattedMessage defaultMessage="Already have an account?" />
+                                <FormattedMessage
+                                    defaultMessage="Already have an account?"
+                                    id="register_form.message.already_have_account"
+                                />
                             </Text>
                             <Button variant="link" size="sm" onClick={clickSignIn}>
-                                <FormattedMessage defaultMessage="Sign in" />
+                                <FormattedMessage
+                                    defaultMessage="Sign in"
+                                    id="register_form.action.sign_in"
+                                />
                             </Button>
                         </Stack>
 
                         <Text fontSize="sm" align="center">
                             <FormattedMessage
-                                defaultMessage="By creating an account, you agree to Salesforce’s <policy>Privacy Policy</policy> and <terms>Terms & Conditions</terms>"
+                                id="register_form.message.agree_to_policy_terms"
+                                defaultMessage="By creating an account, you agree to Salesforce <policy>Privacy Policy</policy> and <terms>Terms & Conditions</terms>"
                                 values={{
                                     // eslint-disable-next-line react/display-name
                                     policy: (chunks) => (

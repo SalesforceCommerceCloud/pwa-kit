@@ -63,7 +63,8 @@ const ContactInfo = () => {
             if (/invalid credentials/i.test(error.message)) {
                 setError(
                     formatMessage({
-                        defaultMessage: 'Incorrect username or password, please try again.'
+                        defaultMessage: 'Incorrect username or password, please try again.',
+                        id: 'contact_info.error.incorrect_username_or_password'
                     })
                 )
             } else {
@@ -82,7 +83,10 @@ const ContactInfo = () => {
     return (
         <ToggleCard
             id="step-0"
-            title={formatMessage({defaultMessage: 'Contact Info'})}
+            title={formatMessage({
+                defaultMessage: 'Contact Info',
+                id: 'contact_info.title.contact_info'
+            })}
             editing={step === 0}
             isLoading={form.formState.isSubmitting}
             onEdit={() => {
@@ -93,7 +97,11 @@ const ContactInfo = () => {
                 }
             }}
             editLabel={
-                !isGuestCheckout ? <FormattedMessage defaultMessage="Sign Out" /> : undefined
+                !isGuestCheckout ? (
+                    <FormattedMessage defaultMessage="Sign Out" id="contact_info.action.sign_out" />
+                ) : (
+                    undefined
+                )
             }
         >
             <ToggleCardEdit>
@@ -114,7 +122,10 @@ const ContactInfo = () => {
                                         <Field {...fields.password} />
                                         <Box>
                                             <Button variant="link" size="sm">
-                                                <FormattedMessage defaultMessage="Forgot password?" />
+                                                <FormattedMessage
+                                                    defaultMessage="Forgot password?"
+                                                    id="contact_info.link.forgot_password"
+                                                />
                                             </Button>
                                         </Box>
                                     </Stack>
@@ -124,16 +135,28 @@ const ContactInfo = () => {
                             <Stack spacing={3}>
                                 <Button type="submit">
                                     {!showPasswordField ? (
-                                        <FormattedMessage defaultMessage="Checkout as guest" />
+                                        <FormattedMessage
+                                            defaultMessage="Checkout as Guest"
+                                            id="contact_info.button.checkout_as_guest"
+                                        />
                                     ) : (
-                                        <FormattedMessage defaultMessage="Log in" />
+                                        <FormattedMessage
+                                            defaultMessage="Log In"
+                                            id="contact_info.button.login"
+                                        />
                                     )}
                                 </Button>
                                 <Button variant="outline" onClick={toggleGuestCheckout}>
                                     {!showPasswordField ? (
-                                        <FormattedMessage defaultMessage="Already have an account? Log in" />
+                                        <FormattedMessage
+                                            defaultMessage="Already have an account? Log in"
+                                            id="contact_info.button.already_have_account"
+                                        />
                                     ) : (
-                                        <FormattedMessage defaultMessage="Checkout as guest" />
+                                        <FormattedMessage
+                                            defaultMessage="Checkout as Guest"
+                                            id="contact_info.button.checkout_as_guest"
+                                        />
                                     )}
                                 </Button>
                             </Stack>
@@ -167,22 +190,32 @@ const SignOutConfirmationDialog = ({isOpen, onConfirm, onClose}) => {
             <AlertDialogOverlay>
                 <AlertDialogContent>
                     <AlertDialogHeader fontSize="lg" fontWeight="bold">
-                        <FormattedMessage defaultMessage="Sign Out" />
+                        <FormattedMessage
+                            defaultMessage="Sign Out"
+                            id="signout_confirmation_dialog.heading.sign_out"
+                        />
                     </AlertDialogHeader>
 
                     <AlertDialogBody>
                         <FormattedMessage
                             defaultMessage="Are you sure you want to sign out? You will need to sign back in to proceed
                         with your current order."
+                            id="signout_confirmation_dialog.message.sure_to_sign_out"
                         />
                     </AlertDialogBody>
 
                     <AlertDialogFooter>
                         <Button ref={cancelRef} variant="outline" onClick={onClose}>
-                            <FormattedMessage defaultMessage="Cancel" />
+                            <FormattedMessage
+                                defaultMessage="Cancel"
+                                id="signout_confirmation_dialog.button.cancel"
+                            />
                         </Button>
                         <Button colorScheme="red" onClick={onConfirm} ml={3}>
-                            <FormattedMessage defaultMessage="Sign Out" />
+                            <FormattedMessage
+                                defaultMessage="Sign Out"
+                                id="signout_confirmation_dialog.button.sign_out"
+                            />
                         </Button>
                     </AlertDialogFooter>
                 </AlertDialogContent>

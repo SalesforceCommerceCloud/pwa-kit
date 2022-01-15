@@ -28,7 +28,7 @@ import AppConfig from '../universal/components/_app-config'
 import Switch from '../universal/components/switch'
 import {getRoutes, routeComponent} from '../universal/components/route-component'
 import * as errors from '../universal/errors'
-import {detectDeviceType} from 'pwa-kit-runtime/utils/ssr-server'
+import {detectDeviceType, isRemote} from 'pwa-kit-runtime/utils/ssr-server'
 import {proxyConfigs} from 'pwa-kit-runtime/utils/ssr-shared'
 
 import sprite from 'svg-sprite-loader/runtime/sprite.build'
@@ -49,13 +49,7 @@ const VALID_TAG_NAMES = [
     'title',
 ]
 
-const TTI_POLYFILL_SCRIPT = [
-    `!function(){if('PerformanceLongTaskTiming' in window){var g=window.__tti={e:[]};`,
-    `g.o=new PerformanceObserver(function(l){g.e=g.e.concat(l.getEntries())});`,
-    `g.o.observe({entryTypes:['longtask']})}}();`,
-].join('')
-
-export const ALLOWLISTED_INLINE_SCRIPTS = [TTI_POLYFILL_SCRIPT]
+export const ALLOWLISTED_INLINE_SCRIPTS = []
 
 /**
  * Convert from thrown Error or String to {message, status} that we need for
@@ -207,8 +201,8 @@ export const render = async (req, res) => {
 const renderApp = (args) => {
     const {req, res, location, routes, appState, error, App} = args
 
-    const ssrOnly = 'mobify_server_only' in req.query
-    const prettyPrint = 'mobify_pretty' in req.query
+    const ssrOnly = 'mobify_server_only' in req.query || '__server_only' in req.query
+    const prettyPrint = 'mobify_pretty' in req.query || '__pretty_print' in req.query
     const indent = prettyPrint ? 8 : 0
     const deviceType = detectDeviceType(req)
     const routerContext = {}
@@ -256,6 +250,12 @@ const renderApp = (args) => {
 
     const helmet = Helmet.renderStatic()
 
+    // Remove the stacktrace when executing remotely as to not leak any important
+    // information to users about our system.
+    if (error && isRemote()) {
+        delete error.stack
+    }
+
     // Do not include *dynamic*, executable inline scripts – these cause issues with
     // strict CSP headers that customers often want to use. Avoid inline scripts,
     // full-stop, whenever possible.
@@ -292,17 +292,7 @@ const renderApp = (args) => {
 
     const html = ReactDOMServer.renderToString(
         <Document
-            head={[
-                <script
-                    id="performance-metrics"
-                    key="performance-metrics"
-                    dangerouslySetInnerHTML={{
-                        __html: TTI_POLYFILL_SCRIPT,
-                    }}
-                    {...scriptProps}
-                />,
-                ...helmetHeadTags,
-            ]}
+            head={[...helmetHeadTags]}
             html={appHtml}
             afterBodyStart={svgs}
             beforeBodyEnd={scripts}

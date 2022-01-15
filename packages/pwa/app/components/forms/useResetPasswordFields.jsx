@@ -21,7 +21,7 @@ export default function useResetPasswordFields({form: {control, errors}, prefix 
             type: 'email',
             rules: {
                 required: formatMessage({
-                    defaultMessage: 'Please enter a valid email address',
+                    defaultMessage: 'Please enter a valid email address.',
                     id: 'use_reset_password_fields.error.required_email'
                 })
             },

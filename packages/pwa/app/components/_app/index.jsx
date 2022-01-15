@@ -41,9 +41,9 @@ import {IntlProvider} from 'react-intl'
 
 // Others
 import {watchOnlineStatus, flatten} from '../../utils/utils'
-import {homeUrlBuilder, getUrlWithLocale} from '../../utils/url'
+import {homeUrlBuilder, getUrlWithLocale, buildPathWithUrlConfig} from '../../utils/url'
 import {getLocaleConfig, getPreferredCurrency, getSupportedLocalesIds} from '../../utils/locale'
-import {DEFAULT_CURRENCY, HOME_HREF} from '../../constants'
+import {DEFAULT_CURRENCY, DEFAULT_SITE_TITLE, HOME_HREF, THEME_COLOR} from '../../constants'
 
 import Seo from '../seo'
 import useWishlist from '../../hooks/use-wishlist'
@@ -102,15 +102,16 @@ const App = (props) => {
 
     const onLogoClick = () => {
         // Goto the home page.
-        history.push(homeUrlBuilder(HOME_HREF, targetLocale))
+        const path = homeUrlBuilder(HOME_HREF, targetLocale)
+        history.push(path)
 
         // Close the drawer.
         onClose()
     }
 
     const onCartClick = () => {
-        // Goto the home page.
-        history.push(`/${targetLocale}/cart`)
+        const path = buildPathWithUrlConfig('/cart', {locale: targetLocale})
+        history.push(path)
 
         // Close the drawer.
         onClose()
@@ -119,16 +120,18 @@ const App = (props) => {
     const onAccountClick = () => {
         // Link to account page for registered customer, open auth modal otherwise
         if (customer.isRegistered) {
-            history.push(`/${targetLocale}/account`)
+            const path = buildPathWithUrlConfig('/account', {locale: targetLocale})
+            history.push(path)
         } else {
             // if they already are at the login page, do not show login modal
-            if (new RegExp(`^/${targetLocale}/login$`).test(location.pathname)) return
+            if (new RegExp(`^/login$`).test(location.pathname)) return
             authModal.onOpen()
         }
     }
 
     const onWishlistClick = () => {
-        history.push(`/${targetLocale}/account/wishlist`)
+        const path = buildPathWithUrlConfig('/account/wishlist', {locale: targetLocale})
+        history.push(path)
     }
 
     return (
@@ -150,11 +153,8 @@ const App = (props) => {
                 <CategoriesProvider categories={allCategories}>
                     <CurrencyProvider currency={currency}>
                         <Seo>
-                            <meta name="theme-color" content="#0288a7" />
-                            <meta
-                                name="apple-mobile-web-app-title"
-                                content="PWA-Kit-Retail-React-App"
-                            />
+                            <meta name="theme-color" content={THEME_COLOR} />
+                            <meta name="apple-mobile-web-app-title" content={DEFAULT_SITE_TITLE} />
                             <link
                                 rel="apple-touch-icon"
                                 href={getAssetUrl('static/img/global/apple-touch-icon.png')}
@@ -294,10 +294,8 @@ App.getProps = async ({api}) => {
         const message =
             rootCategory.title === 'Unsupported Locale'
                 ? `
-
-🚫 This page isn’t working.
-It looks like the locale ‘${rootCategory.locale}’ hasn’t been set up, yet.
-You can either follow this doc, https://sfdc.co/B4Z1m to enable it in business manager or define a different locale with the instructions for Localization in the README file.
+It looks like the locale “${rootCategory.locale}” isn’t set up, yet. The locale settings in your package.json must match what is enabled in your Business Manager instance.
+Learn more with our localization guide. https://sfdc.co/localization-guide
 `
                 : rootCategory.detail
         throw new Error(message)

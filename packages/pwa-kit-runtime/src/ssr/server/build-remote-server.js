@@ -500,7 +500,7 @@ export const RemoteServerFactory = {
             app.all('/mobify/proxy/*', (_, res) => {
                 return res.status(501).json({
                     message:
-                        'Environment proxies are not set: https://sfdc.co/managed-runtime-setup-proxies',
+                        'Environment proxies are not set: https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/proxying-requests.html',
                 })
             })
         }
@@ -561,8 +561,8 @@ export const RemoteServerFactory = {
             /* istanbul ignore next */
             console.warn(
                 `Warning: You are using Node ${process.versions.node}. ` +
-                    `Your app may not work as expected when deployed to Mobify's ` +
-                    `servers which are compatible with Node ${requiredNode}`
+                    `Your app may not work as expected when deployed to Managed ` +
+                    `Runtime servers which are compatible with Node ${requiredNode}`
             )
         }
 
@@ -598,9 +598,6 @@ export const RemoteServerFactory = {
 
         // Fix up the path in case we were passed a relative one
         options.buildDir = path.resolve(process.cwd(), options.buildDir)
-        // if (!fs.existsSync(options.buildDir)) {
-        //     throw new Error(`The build directory ${options.buildDir} was not found`)
-        // }
 
         if (options.faviconPath) {
             options.faviconPath = path.resolve(options.buildDir, options.faviconPath)

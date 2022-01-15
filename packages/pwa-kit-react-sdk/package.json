@@ -1,18 +1,15 @@
 {
   "name": "pwa-kit-react-sdk",
-  "version": "1.3.0-dev",
+  "version": "1.4.0-dev",
   "description": "A library that supports the isomorphic React rendering pipeline for Commerce Cloud Managed Runtime apps",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/mobify/mobify-platform-sdks.git"
-  },
-  "license": "SEE LICENSE IN LICENSE",
-  "author": "dev@mobify.com",
   "main": "dist/index.js",
   "bin": {
-    "sdk-create-hash-manifest": "bin/create-hash-manifest.js",
     "sdk-pwa-build": "bin/pwa-build.js",
-    "sdk-upload": "bin/upload.js"
+    "sdk-upload": "bin/upload.js",
+    "sdk-create-hash-manifest": "bin/create-hash-manifest.js"
+  },
+  "engines": {
+    "node": "^12.0.0 || ^14.0.0"
   },
   "files": [
     "bin",
@@ -21,100 +18,35 @@
     "ssr",
     "TERMS_OF_USE.md",
     "utils",
-    "webpack"
+    "webpack",
+    "schemas"
   ],
+  "publishConfig": {
+    "directory": "dist"
+  },
   "scripts": {
+    "prepare": "npm run prod:build",
+    "prod:build": "cross-env NODE_ENV=production internal-lib-build build",
     "dev:watch": "watch 'npm run dev:build' src/",
-    "format": "prettier --write \"**/*.{js,jsx}\"",
     "lint": "npm run lint:js",
     "lint:fix": "npm run lint:js -- --fix",
     "lint:js": "eslint \"**/*.{js,jsx}\"",
-    "prepare": "npm run prod:build",
-    "prod:build": "cross-env NODE_ENV=production internal-lib-build build",
     "test": "cross-env NODE_ENV=test jest --maxWorkers=2",
-    "test:inspect": "node --inspect-brk jest --runInBand",
-    "test:integration": "cross-env TEST_TYPE=integration npm run test",
     "test:watch": "npm test -- --watch",
-    "version": "node ./scripts/version.js"
+    "test:inspect": "node --inspect-brk jest --runInBand",
+    "version": "node ./scripts/version.js",
+    "format": "prettier --write \"**/*.{js,jsx}\""
   },
-  "jest": {
-    "cacheDirectory": "./node_modules/.cache",
-    "clearMocks": true,
-    "collectCoverage": true,
-    "collectCoverageFrom": [
-      "**/*.{js,jsx}",
-      "!**/test.{js,jsx}",
-      "!generator-assets/**/*.{js,jsx}",
-      "!coverage/**/*.js",
-      "!dist/**/*.{js,jsx}",
-      "!docs/**/*.{js,jsx}",
-      "!vendor/**/*",
-      "!*.config.js",
-      "!scripts/{setup-jsdom,console-output}.js",
-      "!src/utils/{testing,cookie-manager}.js",
-      "!src/index.js",
-      "!src/{polyfill,test-utils,load-scripts}.js",
-      "!jest-babel-transform.js",
-      "!src/integration-manager/index.js",
-      "!src/integration-manager/types.js",
-      "!src/integration-manager/results.js",
-      "!src/integration-manager/commands.js",
-      "!src/integration-manager/reducer.js",
-      "!src/integration-manager/*/{commands,results,types}.js",
-      "!bin/*.js",
-      "!src/patterns/**/*.{js,jsx}",
-      "!src/templates/**/*.{js,jsx}",
-      "!src/ssr/ssr-polyfills.js",
-      "!src/ssr/server/test_fixtures/*.{js,jsx}",
-      "!src/worker/{main,test-entrypoint}.js",
-      "!temp/**/*",
-      "!temp_static/**/*",
-      "!src/static/*",
-      "!tests/*.js",
-      "!src/webpack/**/*"
-    ],
-    "coverageThreshold": {
-      "global": {
-        "branches": 94,
-        "functions": 87,
-        "lines": 90,
-        "statements": 90
-      }
-    },
-    "moduleFileExtensions": [
-      "js",
-      "jsx",
-      "json"
-    ],
-    "moduleNameMapper": {
-      "^.+\\.svg$": "<rootDir>/tests/emptyStringMock.js"
-    },
-    "setupFiles": [
-      "<rootDir>/scripts/setup-jest.js",
-      "jest-fetch-mock"
-    ],
-    "setupFilesAfterEnv": [
-      "jest-expect-message"
-    ],
-    "testEnvironment": "jest-environment-jsdom-global",
-    "testEnvironmentOptions": {
-      "resources": "usable"
-    },
-    "testPathIgnorePatterns": [
-      "/dist/",
-      "/temp/",
-      "/generator-assets/",
-      "/node_modules/",
-      "/vendor/"
-    ],
-    "testRegex": "\\.?(test|spec)\\.jsx?$",
-    "transform": {
-      "^.+\\.(js|jsx|ts|tsx)$": "./jest-babel-transform.js"
-    },
-    "transformIgnorePatterns": [
-      "node_modules/(?!(jsdom/lib/jsdom/browser/resources/resource-loader))"
-    ]
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SalesforceCommerceCloud/pwa-kit.git"
   },
+  "homepage": "https://github.com/SalesforceCommerceCloud/pwa-kit/tree/develop/packages/pwa-kit-react-sdk#readme",
+  "bugs": {
+    "url": "https://github.com/SalesforceCommerceCloud/pwa-kit/issues"
+  },
+  "author": "dev@mobify.com",
+  "license": "SEE LICENSE IN LICENSE",
   "dependencies": {
     "@loadable/babel-plugin": "^5.13.2",
     "@loadable/component": "^5.15.0",
@@ -169,8 +101,8 @@
     "pwa-kit-build": "^1.3.0-dev",
     "pwa-kit-runtime": "^1.3.0-dev",
     "raf": "^3.4.0",
-    "react": "16.14.0",
-    "react-dom": "16.14.0",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
     "react-helmet": "5.2.0",
     "react-router-dom": "^5.1.2",
     "react-uid": "^2.2.0",
@@ -187,7 +119,6 @@
     "superagent": "^6.1.0",
     "supertest": "^4.0.2",
     "svg-sprite-loader": "^6.0.11",
-    "tti-polyfill": "0.2.2",
     "ua-parser-js": "^0.7.24",
     "url-parse": "^1.4.7",
     "validator": "^13.7.0",
@@ -195,23 +126,95 @@
     "whatwg-encoding": "^1.0.5",
     "yargs": "15.4.1"
   },
+  "devDependencies": {
+    "internal-lib-build": "^1.3.0-dev"
+  },
   "peerDependencies": {
     "@loadable/component": "^5.15.0",
     "@loadable/server": "^5.15.0",
     "@loadable/webpack-plugin": "^5.15.0",
     "express": "^4.16.4",
-    "react": ">=16.14",
-    "react-dom": ">=16.14",
+    "react": ">=16.14 || <18",
+    "react-dom": ">=16.14 || <18",
     "react-helmet": "6",
     "react-router-dom": "^5.1.2"
   },
-  "devDependencies": {
-    "internal-lib-build": "^1.3.0-dev"
-  },
-  "engines": {
-    "node": "^12.0.0 || ^14.0.0"
-  },
-  "publishConfig": {
-    "directory": "dist"
+  "jest": {
+    "transformIgnorePatterns": [
+      "node_modules/(?!(jsdom/lib/jsdom/browser/resources/resource-loader))"
+    ],
+    "transform": {
+      "^.+\\.(js|jsx|ts|tsx)$": "./jest-babel-transform.js"
+    },
+    "setupFiles": [
+      "<rootDir>/scripts/setup-jest.js",
+      "jest-fetch-mock"
+    ],
+    "setupFilesAfterEnv": [
+      "jest-expect-message"
+    ],
+    "cacheDirectory": "./node_modules/.cache",
+    "clearMocks": true,
+    "collectCoverage": true,
+    "collectCoverageFrom": [
+      "**/*.{js,jsx}",
+      "!**/test.{js,jsx}",
+      "!generator-assets/**/*.{js,jsx}",
+      "!coverage/**/*.js",
+      "!dist/**/*.{js,jsx}",
+      "!docs/**/*.{js,jsx}",
+      "!vendor/**/*",
+      "!*.config.js",
+      "!scripts/{setup-jsdom,console-output}.js",
+      "!src/utils/{testing,cookie-manager}.js",
+      "!src/index.js",
+      "!src/{polyfill,test-utils,load-scripts}.js",
+      "!jest-babel-transform.js",
+      "!src/integration-manager/index.js",
+      "!src/integration-manager/types.js",
+      "!src/integration-manager/results.js",
+      "!src/integration-manager/commands.js",
+      "!src/integration-manager/reducer.js",
+      "!src/integration-manager/*/{commands,results,types}.js",
+      "!bin/*.js",
+      "!src/patterns/**/*.{js,jsx}",
+      "!src/templates/**/*.{js,jsx}",
+      "!src/ssr/ssr-polyfills.js",
+      "!src/ssr/server/test_fixtures/*.{js,jsx}",
+      "!src/worker/{main,test-entrypoint}.js",
+      "!temp/**/*",
+      "!temp_static/**/*",
+      "!src/static/*",
+      "!tests/*.js",
+      "!src/webpack/**/*"
+    ],
+    "coverageThreshold": {
+      "global": {
+        "branches": 94,
+        "functions": 87,
+        "lines": 90,
+        "statements": 90
+      }
+    },
+    "moduleFileExtensions": [
+      "js",
+      "jsx",
+      "json"
+    ],
+    "moduleNameMapper": {
+      "^.+\\.svg$": "<rootDir>/tests/emptyStringMock.js"
+    },
+    "testPathIgnorePatterns": [
+      "/dist/",
+      "/temp/",
+      "/generator-assets/",
+      "/node_modules/",
+      "/vendor/"
+    ],
+    "testRegex": "\\.?(test|spec)\\.jsx?$",
+    "testEnvironment": "jest-environment-jsdom-global",
+    "testEnvironmentOptions": {
+      "resources": "usable"
+    }
   }
 }

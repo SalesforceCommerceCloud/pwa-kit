@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useEffect} from 'react'
+import React, {useEffect, useState} from 'react'
 import PropTypes from 'prop-types'
 import {useHistory, useLocation} from 'react-router-dom'
 import {useIntl} from 'react-intl'
@@ -89,7 +89,7 @@ const ProductView = ({
         onClose: onAddToCartModalClose
     } = useAddToCartModalContext()
     const theme = useTheme()
-
+    const [showOptionsMessage, toggleShowOptionsMessage] = useState(false)
     const {
         showLoading,
         showInventoryMessage,
@@ -114,6 +114,10 @@ const ProductView = ({
         const buttons = []
 
         const handleCartItem = async () => {
+            if (!canOrder) {
+                toggleShowOptionsMessage(true)
+                return null
+            }
             if (!addToCart && !updateCart) return null
             if (updateCart) {
                 await updateCart(variant, quantity)
@@ -137,14 +141,20 @@ const ProductView = ({
                 <Button
                     key="cart-button"
                     onClick={handleCartItem}
-                    disabled={!canOrder}
+                    disabled={showInventoryMessage}
                     width="100%"
                     variant="solid"
                     marginBottom={4}
                 >
                     {updateCart
-                        ? intl.formatMessage({defaultMessage: 'Update'})
-                        : intl.formatMessage({defaultMessage: 'Add to cart'})}
+                        ? intl.formatMessage({
+                              defaultMessage: 'Update',
+                              id: 'product_view.button.update'
+                          })
+                        : intl.formatMessage({
+                              defaultMessage: 'Add to Cart',
+                              id: 'product_view.button.add_to_cart'
+                          })}
                 </Button>
             )
         }
@@ -161,8 +171,14 @@ const ProductView = ({
                     marginBottom={4}
                 >
                     {updateWishlist
-                        ? intl.formatMessage({defaultMessage: 'Update'})
-                        : intl.formatMessage({defaultMessage: 'Add to wishlist'})}
+                        ? intl.formatMessage({
+                              defaultMessage: 'Update',
+                              id: 'product_view.button.update'
+                          })
+                        : intl.formatMessage({
+                              defaultMessage: 'Add to Wishlist',
+                              id: 'product_view.button.add_to_wishlist'
+                          })}
                 </ButtonWithRegistration>
             )
         }
@@ -175,6 +191,12 @@ const ProductView = ({
             onAddToCartModalClose()
         }
     }, [location.pathname])
+
+    useEffect(() => {
+        if (canOrder) {
+            toggleShowOptionsMessage(false)
+        }
+    }, [variant?.productId])
 
     return (
         <Flex direction={'column'} data-testid="product-view">
@@ -201,7 +223,8 @@ const ProductView = ({
                                     <Link to={`/product/${product.master.masterId}`}>
                                         <Text color="blue.600">
                                             {intl.formatMessage({
-                                                defaultMessage: 'See full details'
+                                                defaultMessage: 'See full details',
+                                                id: 'product_view.link.full_details'
                                             })}
                                         </Text>
                                     </Link>
@@ -279,7 +302,8 @@ const ProductView = ({
                                                             backgroundColor={name.toLowerCase()}
                                                             backgroundImage={
                                                                 image
-                                                                    ? `url(${image.disBaseLink})`
+                                                                    ? `url(${image.disBaseLink ||
+                                                                          image.link})`
                                                                     : ''
                                                             }
                                                         />
@@ -299,7 +323,8 @@ const ProductView = ({
                             <Box fontWeight="bold">
                                 <label htmlFor="quantity">
                                     {intl.formatMessage({
-                                        defaultMessage: 'Quantity'
+                                        defaultMessage: 'Quantity',
+                                        id: 'product_view.label.quantity'
                                     })}
                                     :
                                 </label>
@@ -335,12 +360,24 @@ const ProductView = ({
                                 }}
                             />
                         </VStack>
+                        <Box>
+                            {!showLoading && showOptionsMessage && (
+                                <Fade in={true}>
+                                    <Text color="orange.600" fontWeight={600} marginBottom={8}>
+                                        {intl.formatMessage({
+                                            defaultMessage: 'Please select all your options above'
+                                        })}
+                                    </Text>
+                                </Fade>
+                            )}
+                        </Box>
                         <HideOnDesktop>
                             {showFullLink && product && (
                                 <Link to={`/product/${product.master.masterId}`}>
                                     <Text color="blue.600">
                                         {intl.formatMessage({
-                                            defaultMessage: 'See full details'
+                                            defaultMessage: 'See full details',
+                                            id: 'product_view.link.full_details'
                                         })}
                                     </Text>
                                 </Link>
@@ -348,7 +385,7 @@ const ProductView = ({
                         </HideOnDesktop>
                     </VStack>
 
-                    <Box display={['none', 'none', 'none', 'block']}>
+                    <Box>
                         {!showLoading && showInventoryMessage && (
                             <Fade in={true}>
                                 <Text color="orange.600" fontWeight={600} marginBottom={8}>
@@ -356,7 +393,9 @@ const ProductView = ({
                                 </Text>
                             </Fade>
                         )}
-                        {renderActionButtons()}
+                        <Box display={['none', 'none', 'none', 'block']}>
+                            {renderActionButtons()}
+                        </Box>
                     </Box>
                 </VStack>
             </Flex>

@@ -23,6 +23,7 @@ import ProductList from '.'
 import EmptySearchResults from './partials/empty-results'
 import useCustomer from '../../commerce-api/hooks/useCustomer'
 import useWishlist from '../../hooks/use-wishlist'
+import {getUrlConfig} from '../../utils/utils'
 
 jest.setTimeout(60000)
 let mockCategoriesResponse = mockCategories
@@ -30,7 +31,13 @@ let mockProductListSearchResponse = mockProductSearch
 jest.useFakeTimers()
 
 jest.mock('../../hooks/use-wishlist')
-
+jest.mock('../../utils/utils', () => {
+    const original = jest.requireActual('../../utils/utils')
+    return {
+        ...original,
+        getUrlConfig: jest.fn()
+    }
+})
 jest.mock('../../commerce-api/utils', () => {
     const originalModule = jest.requireActual('../../commerce-api/utils')
     return {
@@ -145,6 +152,9 @@ beforeAll(() => {
 })
 
 beforeEach(() => {
+    getUrlConfig.mockImplementation(() => ({
+        locale: 'path'
+    }))
     jest.resetModules()
     server.listen({onUnhandledRequest: 'error'})
     useWishlist.mockReturnValue({
@@ -201,7 +211,7 @@ test('should display Selected refinements as there are some in the response', as
 
 test('show login modal when an unauthenticated user tries to add an item to wishlist', async () => {
     renderWithProviders(<MockedComponent />)
-    const wishlistButton = screen.getAllByLabelText('wishlist')
+    const wishlistButton = screen.getAllByLabelText('Wishlist')
     expect(wishlistButton.length).toBe(25)
     user.click(wishlistButton[0])
     expect(await screen.findByText(/Email/)).toBeInTheDocument()

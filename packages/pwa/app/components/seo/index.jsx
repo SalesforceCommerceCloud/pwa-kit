@@ -8,9 +8,10 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import Helmet from 'react-helmet'
 
+import {DEFAULT_SITE_TITLE} from '../../constants'
+
 const Seo = ({title, description, noIndex, children, ...props}) => {
-    const siteName = 'Retail React App'
-    const fullTitle = title ? `${title} | ${siteName}` : siteName
+    const fullTitle = title ? `${title} | ${DEFAULT_SITE_TITLE}` : DEFAULT_SITE_TITLE
 
     return (
         <Helmet {...props}>

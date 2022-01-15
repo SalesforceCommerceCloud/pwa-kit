@@ -21,7 +21,7 @@ const main = () => {
         .description(`login to Managed Runtime`)
         .requiredOption(
             '-u, --user <email>',
-            `the e-mail address you used to register with Mobify Cloud`,
+            'the e-mail address you used to register with Managed Runtime',
             (val) => {
                 if (!isEmail(val)) {
                     throw new program.InvalidArgumentError(`"${val}" is not a valid email`)
@@ -48,7 +48,7 @@ const main = () => {
                     settingsPath,
                     JSON.stringify({username: user, api_key: key}, null, 4)
                 )
-                console.log(`Saved credentials to "${settingsPath}".`)
+                console.log(`Saved Managed Runtime credentials to "${settingsPath}".`)
             } catch (e) {
                 console.error('Failed to save credentials.')
                 console.error(e)
@@ -94,7 +94,7 @@ const main = () => {
         .addOption(
             new program.Option(
                 '-m --message <message>',
-                "a message to include along with the uploaded bundle in Mobify Cloud (default: '<git branch>:<git commit hash>')"
+                "a message to include along with the uploaded bundle in Managed Runtime (default: '<git branch>:<git commit hash>')"
             )
         )
         .addOption(
@@ -106,7 +106,7 @@ const main = () => {
         .addOption(
             new program.Option(
                 '-t --target <target>',
-                'a custom target to upload a bundle to within Mobify Cloud'
+                'a custom target to upload a bundle to within Managed Runtime'
             )
         )
         .action(({buildDirectory, message, projectSlug, target}) => {

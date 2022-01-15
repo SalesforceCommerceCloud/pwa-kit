@@ -72,7 +72,10 @@ const Checkout = () => {
                                             isLoading={isLoading}
                                             data-testid="sf-checkout-place-order-btn"
                                         >
-                                            <FormattedMessage defaultMessage="Place Order" />
+                                            <FormattedMessage
+                                                defaultMessage="Place Order"
+                                                id="checkout.button.place_order"
+                                            />
                                         </Button>
                                     </Container>
                                 </Box>
@@ -86,7 +89,10 @@ const Checkout = () => {
                         {step === 4 && (
                             <Box display={{base: 'none', lg: 'block'}} pt={2}>
                                 <Button w="full" onClick={submitOrder} isLoading={isLoading}>
-                                    <FormattedMessage defaultMessage="Place Order" />
+                                    <FormattedMessage
+                                        defaultMessage="Place Order"
+                                        id="checkout.button.place_order"
+                                    />
                                 </Button>
                             </Box>
                         )}
@@ -108,7 +114,10 @@ const Checkout = () => {
                 >
                     <Container variant="form">
                         <Button w="full" onClick={submitOrder} isLoading={isLoading}>
-                            <FormattedMessage defaultMessage="Place Order" />
+                            <FormattedMessage
+                                defaultMessage="Place Order"
+                                id="checkout.button.place_order"
+                            />
                         </Button>
                     </Container>
                 </Box>

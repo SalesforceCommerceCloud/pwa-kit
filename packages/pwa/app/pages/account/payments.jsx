@@ -55,7 +55,10 @@ const CardPaymentForm = ({hasSavedPayments, form, submitForm, toggleEdit}) => {
             {form.formState.isSubmitting && <LoadingSpinner />}
             <Stack spacing={6} padding={6}>
                 <Heading as="h3" size="sm">
-                    <FormattedMessage defaultMessage="Add New Payment Method" />
+                    <FormattedMessage
+                        defaultMessage="Add New Payment Method"
+                        id="card_payment_form.heading.new_payment_method"
+                    />
                 </Heading>
                 <Box>
                     <Container variant="form">
@@ -108,7 +111,10 @@ const AccountPaymentMethods = () => {
             await addSavedPaymentInstrument(paymentInstrument)
             toggleEdit()
             toast({
-                title: formatMessage({defaultMessage: 'New Payment Method Saved'}),
+                title: formatMessage({
+                    defaultMessage: 'New Payment Method Saved',
+                    id: 'account_payment_methods.info.new_method_saved'
+                }),
                 status: 'success',
                 isClosable: true
             })
@@ -133,7 +139,10 @@ const AccountPaymentMethods = () => {
     return (
         <Stack spacing={4} data-testid="account-payment-methods-page">
             <Heading as="h1" fontSize="2xl">
-                <FormattedMessage defaultMessage="Payment Methods" />
+                <FormattedMessage
+                    defaultMessage="Payment Methods"
+                    id="account_payment_methods.title.payment_methods"
+                />
             </Heading>
 
             {/* Show the loading skeleton if the user isn't loaded yet. We determine this be checking to see
@@ -170,7 +179,10 @@ const AccountPaymentMethods = () => {
                         leftIcon={<PlusIcon display="block" boxSize={'15px'} />}
                         onClick={toggleEdit}
                     >
-                        <FormattedMessage defaultMessage="Add Payment Method" />
+                        <FormattedMessage
+                            defaultMessage="Add Payment Method"
+                            id="account_payment_methods.button.add_method"
+                        />
                         {isEditing && (
                             <Box
                                 width={3}
@@ -234,12 +246,17 @@ const AccountPaymentMethods = () => {
             {!hasSavedPayments && !isEditing && isRegistered && (
                 <PageActionPlaceHolder
                     icon={<PaymentIcon boxSize={8} />}
-                    heading={formatMessage({defaultMessage: 'No Saved Payment Methods'})}
+                    heading={formatMessage({
+                        defaultMessage: 'No Saved Payment Methods',
+                        id: 'account_payment_methods.heading.no_saved_methods'
+                    })}
                     text={formatMessage({
-                        defaultMessage: 'Add a new payment method for faster checkout'
+                        defaultMessage: 'Add a new payment method for faster checkout.',
+                        id: 'account_payment_methods.description.add_method_for_faster_checkout'
                     })}
                     buttonText={formatMessage({
-                        defaultMessage: 'Add Payment Method'
+                        defaultMessage: 'Add Payment Method',
+                        id: 'account_payment_methods.button.add_method'
                     })}
                     onButtonClick={toggleEdit}
                 />
