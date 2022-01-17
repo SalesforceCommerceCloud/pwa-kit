@@ -218,7 +218,7 @@ const prompts = () => {
     const questions = [
         {
             name: 'useDemoSettings',
-            message: 'Do·you·want·to·try·out·PWA·Kit·with·the·demo·storefront?',
+            message: 'Do you want to try out PWA Kit with the demo storefront?',
             choices: [demoChoice, customChoice],
             type: 'list'
         },
