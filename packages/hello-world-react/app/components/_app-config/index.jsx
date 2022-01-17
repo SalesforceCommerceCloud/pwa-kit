@@ -18,7 +18,7 @@ const ApplicationState = React.createContext()
  * as Redux, or Mobx, if you like.
  */
 const AppConfig = ({children, locals = {}}) => {
-    return <ApplicationState.Consumer>{children}</ApplicationState.Consumer>
+    return <ApplicationState.Provider>{children}</ApplicationState.Provider>
 }
 
 
