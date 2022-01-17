@@ -180,6 +180,18 @@ const runGenerator = (answers, {outputDir}) => {
         p.resolve(outputDir, 'app', 'api.config.js')
     )
 
+    console.log('l10n: ', l10n)
+
+    console.log('pkgJSON:', pkgJSON)
+
+    console.log('answers[\'scaffold-pwa\']:', answers['scaffold-pwa'])
+
+    console.log('finalPkgData:', finalPkgData)
+
+    // new sh.ShellString(APIConfigTemplate({commerceApi, einsteinApi})).to(
+    //     p.resolve(outputDir, 'app', 'api.config.js')
+    // )
+
     console.log('Installing dependencies for the generated project (this can take a while)')
     sh.exec(`npm install --no-progress`, {
         env: process.env,
