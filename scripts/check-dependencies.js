@@ -100,7 +100,7 @@ const commonDevDeps = {
     prettier: '1.18.2',
     'regenerator-runtime': '^0.11.1',
     semver: '^7.3.2',
-    shelljs: '^0.8.4'
+    shelljs: '^0.8.5'
 }
 
 const readJSON = (path) => JSON.parse(fs.readFileSync(path))
