@@ -1,6 +1,7 @@
 {
   "name": "hello-world-react",
   "version": "1.4.0-dev",
+  "private": true,
   "mobify": {
     "ssrEnabled": true,
     "ssrOnly": [
