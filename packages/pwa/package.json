@@ -181,15 +181,34 @@
     ],
     "l10n": {
         "supportedCurrencies": [
-            "USD"
+            "GBP",
+            "EUR",
+            "CNY",
+            "JPY"
         ],
-        "defaultCurrency": "USD",
+        "defaultCurrency": "GBP",
         "supportedLocales": [
             {
-                "id": "en-US",
-                "preferredCurrency": "USD"
+                "id": "en-GB",
+                "preferredCurrency": "GBP"
+            },
+            {
+                "id": "fr-FR",
+                "preferredCurrency": "EUR"
+            },
+            {
+                "id": "it-IT",
+                "preferredCurrency": "EUR"
+            },
+            {
+                "id": "zh-CN",
+                "preferredCurrency": "CNY"
+            },
+            {
+                "id": "ja-JP",
+                "preferredCurrency": "JPY"
             }
         ],
-        "defaultLocale": "en-US"
+        "defaultLocale": "en-GB"
     }
 }
