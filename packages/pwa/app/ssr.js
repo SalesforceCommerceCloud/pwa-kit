@@ -9,8 +9,8 @@
 /* global WEBPACK_PACKAGE_JSON_MOBIFY */
 
 const path = require('path')
-const {createApp, createHandler, serveStaticFile} = require('pwa-kit-react-sdk/ssr/server/express')
-const {isRemote} = require('pwa-kit-react-sdk/utils/ssr-server')
+const {createApp, createHandler, serveStaticFile} = require('pwa-kit-runtime/ssr/server/express')
+const {isRemote} = require('pwa-kit-runtime/utils/ssr-server')
 const helmet = require('helmet')
 const pkg = require("../package.json")
 
