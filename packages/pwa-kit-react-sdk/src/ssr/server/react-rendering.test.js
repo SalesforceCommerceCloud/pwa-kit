@@ -8,7 +8,6 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 /* eslint-disable header/header */
-import React from 'react'
 import {render, ALLOWLISTED_INLINE_SCRIPTS} from './react-rendering'
 import {createApp} from './express'
 import request from 'supertest'
@@ -312,32 +311,6 @@ jest.mock('@loadable/server', () => {
         }
     }
 })
-// const mockReact = React
-// const mockAppConfigRender = jest.fn()
-// jest.mock('../universal/components/_app-config', () => {
-//     const AppConfig = jest.requireActual('../universal/components/_app-config')
-//     // const mockRender = jest.fn().mockImplementation(() => {
-//     //     return mockReact.createElement(mockReact.Fragment, null, (void 0).props.children)
-//     // })
-//     // class MockedAppConfig extends AppConfig {
-//     //     render() {
-//     //         return mockRender()
-//     //     }
-//     // }
-//     return {__esModule: true, default: AppConfig}
-// })
-// jest.mock('../universal/components/_app-config', () => {
-//     return {
-//         __esModule: true,
-//         default: jest.fn().mockImplementation(() => {
-//             return mockReact.createElement(mockReact.Fragment, null, (void 0).props.children)
-//         })
-//     }
-// })
-// jest.mock('../universal/components/_app-config', () => {
-//     const AppConfig = jest.requireActual('../universal/components/_app-config')
-//     return AppConfig
-// })
 
 describe('The Node SSR Environment', () => {
     const OLD_ENV = process.env
