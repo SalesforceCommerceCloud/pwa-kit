@@ -11,6 +11,7 @@ import {renderWithProviders} from '../utils/test-utils'
 import {AuthModal, useAuthModal} from './use-auth-modal'
 import {BrowserRouter as Router, Route} from 'react-router-dom'
 import Account from '../pages/account'
+import {getUrlConfig} from '../utils/utils'
 
 jest.setTimeout(60000)
 
@@ -26,6 +27,14 @@ const mockRegisteredCustomer = {
 
 const mockLogin = jest.fn()
 jest.useFakeTimers()
+
+jest.mock('../utils/utils', () => {
+    const original = jest.requireActual('../utils/utils')
+    return {
+        ...original,
+        getUrlConfig: jest.fn()
+    }
+})
 
 jest.mock('../commerce-api/auth', () => {
     return jest.fn().mockImplementation(() => {
@@ -134,6 +143,9 @@ const MockedComponent = () => {
 
 // Set up and clean up
 beforeEach(() => {
+    getUrlConfig.mockImplementation(() => ({
+        locale: 'path'
+    }))
     jest.useFakeTimers()
 })
 afterEach(() => {

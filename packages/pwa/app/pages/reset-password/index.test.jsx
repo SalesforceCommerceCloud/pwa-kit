@@ -12,6 +12,7 @@ import {setupServer} from 'msw/node'
 import {renderWithProviders} from '../../utils/test-utils'
 import ResetPassword from '.'
 import {getUrlConfig} from '../../utils/utils'
+import {DEFAULT_LOCALE} from '../../constants'
 
 jest.setTimeout(60000)
 
@@ -128,7 +129,7 @@ test('Allows customer to go to sign in page', async () => {
 
     user.click(screen.getByText('Sign in'))
     await waitFor(() => {
-        expect(window.location.pathname).toEqual('/en-GB/login')
+        expect(window.location.pathname).toEqual(`/${DEFAULT_LOCALE}/login`)
     })
 })
 
@@ -161,7 +162,7 @@ test('Allows customer to generate password token', async () => {
 
     user.click(screen.getByText('Back to Sign In'))
     await waitFor(() => {
-        expect(window.location.pathname).toEqual('/en-GB/login')
+        expect(window.location.pathname).toEqual(`/${DEFAULT_LOCALE}/login`)
     })
 })
 
