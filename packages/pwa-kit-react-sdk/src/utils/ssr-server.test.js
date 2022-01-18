@@ -831,7 +831,8 @@ describe('outgoingRequestHook tests', () => {
                         testCase.name =
                             `${testCase.name} via ${testMethod} ` +
                             `${addHeaders ? 'with' : 'without'} headers, ` +
-                            `${addCallback ? 'with' : 'without'} callback`
+                            `${addCallback ? 'with' : 'without'} callback, ` +
+                            `${addProxyKeepAliveAgent ? 'with' : 'without'} KeepAliveAgent`
                         testCase.testMethod = testMethod
                         testCase.addHeaders = addHeaders
                         testCase.addCallback = addCallback
