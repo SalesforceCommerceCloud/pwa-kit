@@ -1,6 +1,6 @@
 {
     "name": "template-1c",
-    "version": "1.3.0-dev",
+    "version": "1.4.0-dev",
     "private": true,
     "devDependencies": {
         "cross-fetch": "^3.1.4",
@@ -8,11 +8,11 @@
         "react-dom": "^17.0.2",
         "react-helmet": "^6.1.0",
         "react-router-dom": "^5.1.2",
-        "pwa-kit-build": "^1.3.0-dev",
-        "pwa-kit-react-sdk": "^1.3.0-dev"
+        "pwa-kit-build": "^1.4.0-dev",
+        "pwa-kit-react-sdk": "^1.4.0-dev"
     },
     "dependencies": {
-        "pwa-kit-runtime": "^1.3.0-dev"
+        "pwa-kit-runtime": "^1.4.0-dev"
     },
     "mobify": {
         "ssrEnabled": true,
