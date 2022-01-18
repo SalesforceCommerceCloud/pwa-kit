@@ -120,7 +120,7 @@ const runGenerator = (answers, {outputDir}) => {
     const pkgJsonPath = p.resolve(outputDir, 'package.json')
     const pkgJSON = readJson(pkgJsonPath)
     const pkgDataWithAnswers = merge(pkgJSON, answers['scaffold-pwa'])
-    const finalPkgData = merge(pkgDataWithAnswers, singleLocaleData)
+    const finalPkgData = merge(pkgDataWithAnswers, pkgSingleLocaleData)
 
     npmInstallables.forEach((pkgName) => {
         const keys = ['dependencies', 'devDependencies']
@@ -150,6 +150,9 @@ const runGenerator = (answers, {outputDir}) => {
             }
         ]
     })
+
+    const PWAKitConfigJsonPath = p.resolve(outputDir, 'pwa-kit.config.js')
+    writeJson(PWAKitConfigJsonPath, PWAKitConfigSingleLocaleData)
 
     const APIConfigTemplate = require(`../assets/pwa/api.config`).template
     const commerceApi = {
@@ -295,7 +298,7 @@ const buildAnswers = ({
     }
 }
 
-const singleLocaleData = {
+const pkgSingleLocaleData = {
     l10n: {
         supportedCurrencies: ['USD'],
         defaultCurrency: 'USD',
@@ -306,6 +309,12 @@ const singleLocaleData = {
             }
         ],
         defaultLocale: 'en-US'
+    }
+}
+
+const PWAKitConfigSingleLocaleData = {
+    url: {
+        locale: 'none'
     }
 }
 
