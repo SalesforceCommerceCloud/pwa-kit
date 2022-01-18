@@ -173,7 +173,7 @@ export const render = async (req, res, next) => {
     const args = {
         App: WrappedApp,
         appState,
-        error: appStateError && logAndFormatError(appStateError),
+        appStateError: appStateError && logAndFormatError(appStateError),
         routes,
         req,
         res,
@@ -181,13 +181,13 @@ export const render = async (req, res, next) => {
     }
     try {
         renderResult = renderApp(args)
-    } catch (error) {
+    } catch (e) {
         // This is an unrecoverable error.
         // (errors handled by the AppErrorBoundary are considered recoverable)
         // Here, we use Express's convention to invoke error middleware.
         // Note, we don't have an error handling middleware yet! This is calling the
         // default error handling middleware provided by Express
-        return next(error)
+        return next(e)
     }
 
     // Step 5 - Determine what is going to happen, redirect, or send html with
@@ -216,20 +216,12 @@ const renderAppHtml = (req, res, error, appData) => {
         </Router>
     )
 
-    /* istanbul ignore next */
-    try {
-        appJSX = extractor.collectChunks(appJSX)
-    } catch (e) {
-        // Tests aren't being run through webpack, therefore no chunks or `loadable-stats.json`
-        // file is being created. This causes a file read exception. For this
-        // reason, swallow the error and carry on when in a test environment.
-    }
-
+    appJSX = extractor.collectChunks(appJSX)
     return ReactDOMServer.renderToString(appJSX)
 }
 
 const renderApp = (args) => {
-    const {req, res, error, App, appState, location, routes} = args
+    const {req, res, appStateError, App, appState, location, routes} = args
     const deviceType = detectDeviceType(req)
     const extractor = new ChunkExtractor({statsFile: BUNDLES_PATH})
     const routerContext = {}
@@ -240,14 +232,16 @@ const renderApp = (args) => {
     const indent = prettyPrint ? 8 : 0
 
     let appHtml
+    let renderError
     // It's important that we render the App before extracting the script elements,
     // otherwise it won't return the correct chunks.
     try {
-        appHtml = renderAppHtml(req, res, null, appData)
-    } catch (error) {
+        appHtml = renderAppHtml(req, res, appStateError, appData)
+    } catch (e) {
         // This will catch errors thrown from the app and pass the error
         // to the AppErrorBoundary component, and renders the error page.
-        appHtml = renderAppHtml(req, res, logAndFormatError(error), appData)
+        renderError = logAndFormatError(e)
+        appHtml = renderAppHtml(req, res, renderError, appData)
     }
 
     // Setting type: 'application/json' stops the browser from executing the code.
@@ -270,6 +264,7 @@ const renderApp = (args) => {
 
     // Remove the stacktrace when executing remotely as to not leak any important
     // information to users about our system.
+    const error = renderError || appStateError
     if (error && isRemote()) {
         delete error.stack
     }
