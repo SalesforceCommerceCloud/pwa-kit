@@ -26,7 +26,7 @@ const testId2 = 'homepage.message.welcome'
 
 test('our assumptions before further testing', () => {
     expect(supportedLocales.includes(nonSupportedLocale)).toBe(false)
-    expect(DEFAULT_LOCALE).toBe('en-GB')
+    expect(DEFAULT_LOCALE).toBe('en-GB' || 'en-US')
     expect(supportedLocale).not.toBe(DEFAULT_LOCALE)
 })
 

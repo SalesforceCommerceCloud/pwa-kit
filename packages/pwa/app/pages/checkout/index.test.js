@@ -25,6 +25,7 @@ import {
     productsResponse
 } from '../../commerce-api/mock-data'
 import {getUrlConfig} from '../../utils/utils'
+import {DEFAULT_LOCALE} from '../../constants'
 
 jest.setTimeout(60000)
 
@@ -598,7 +599,7 @@ test('Can proceed through checkout as registered customer', async () => {
     user.click(placeOrderBtn)
 
     await waitFor(() => {
-        expect(window.location.pathname).toEqual('/en-GB/checkout/confirmation')
+        expect(window.location.pathname).toEqual(`/${DEFAULT_LOCALE}/checkout/confirmation`)
     })
 })
 

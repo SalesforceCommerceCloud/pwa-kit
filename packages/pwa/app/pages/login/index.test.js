@@ -102,13 +102,13 @@ const MockedComponent = () => {
     return (
         <Router>
             <Login />
-            <Route path="/en-GB/registration">
+            <Route path="/registration">
                 <Registration />
             </Route>
-            <Route path="/en-GB/reset-password">
+            <Route path="/reset-password">
                 <ResetPassword />
             </Route>
-            <Route path="/en-GB/account">
+            <Route path="/account">
                 <Account match={match} />
             </Route>
         </Router>

@@ -12,6 +12,7 @@ import ImageGallery from './index'
 import {Skeleton as ImageGallerySkeleton} from './index'
 import {createMemoryHistory} from 'history'
 import {renderWithProviders} from '../../utils/test-utils'
+import {DEFAULT_LOCALE} from '../../constants'
 
 const MockComponent = ({imageGroups = [], selectedVariationAttributes = {}}) => {
     return !imageGroups.length ? (
@@ -30,7 +31,7 @@ MockComponent.propTypes = {
 describe('Image Gallery Component', () => {
     test('renders component with all images', () => {
         const history = createMemoryHistory()
-        history.push('/en-GB/image-gallery')
+        history.push(`/${DEFAULT_LOCALE}/image-gallery`)
 
         renderWithProviders(<MockComponent imageGroups={data} selectedVariationAttributes={{}} />)
         expect(screen.getAllByAltText(/Ruffle Front V-Neck Cardigan/).length).toEqual(3)
@@ -43,7 +44,7 @@ describe('Image Gallery Component', () => {
 
     test('can select thumbnail image with enter keyboard', async () => {
         const history = createMemoryHistory()
-        history.push('/en-GB/image-gallery')
+        history.push(`/${DEFAULT_LOCALE}/image-gallery`)
 
         renderWithProviders(
             <MockComponent imageGroups={data} selectedVariationAttributes={{}} history={history} />

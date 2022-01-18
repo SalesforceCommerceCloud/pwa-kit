@@ -21,6 +21,7 @@ import {
 import useCustomer from '../../commerce-api/hooks/useCustomer'
 import Account from './index'
 import {getUrlConfig} from '../../utils/utils'
+import {DEFAULT_LOCALE} from '../../constants'
 
 jest.mock('../../commerce-api/utils', () => {
     const originalModule = jest.requireActual('../../commerce-api/utils')
@@ -119,7 +120,7 @@ test('Redirects to login page if the customer is not logged in', async () => {
         })
     )
     renderWithProviders(<MockedComponent />)
-    await waitFor(() => expect(window.location.pathname).toEqual('/en-GB/login'))
+    await waitFor(() => expect(window.location.pathname).toEqual(`/${DEFAULT_LOCALE}/login`))
 })
 
 test('Provides navigation for subpages', async () => {
@@ -128,11 +129,17 @@ test('Provides navigation for subpages', async () => {
 
     const nav = within(screen.getByTestId('account-detail-nav'))
     user.click(nav.getByText('Addresses'))
-    await waitFor(() => expect(window.location.pathname).toEqual('/en-GB/account/addresses'))
+    await waitFor(() =>
+        expect(window.location.pathname).toEqual(`/${DEFAULT_LOCALE}/account/addresses`)
+    )
     user.click(nav.getByText('Order History'))
-    await waitFor(() => expect(window.location.pathname).toEqual('/en-GB/account/orders'))
+    await waitFor(() =>
+        expect(window.location.pathname).toEqual(`/${DEFAULT_LOCALE}/account/orders`)
+    )
     user.click(nav.getByText('Payment Methods'))
-    await waitFor(() => expect(window.location.pathname).toEqual('/en-GB/account/payments'))
+    await waitFor(() =>
+        expect(window.location.pathname).toEqual(`/${DEFAULT_LOCALE}/account/payments`)
+    )
 })
 
 test('Renders account detail page by default for logged-in customer', async () => {
@@ -149,7 +156,7 @@ test('Allows customer to sign out', async () => {
     expect(await screen.findByTestId('account-detail-page')).toBeInTheDocument()
     user.click(screen.getAllByText(/Log Out/)[0])
     await waitFor(() => {
-        expect(window.location.pathname).toEqual('/en-GB/login')
+        expect(window.location.pathname).toEqual(`/${DEFAULT_LOCALE}/login`)
     })
 })
 
