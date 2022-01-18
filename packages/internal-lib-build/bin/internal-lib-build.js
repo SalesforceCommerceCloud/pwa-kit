@@ -22,7 +22,7 @@ const main = () => {
         sh.rm('-rf', './dist')
         sh.mkdir('./dist')
         sh.exec(
-            `${babel} --config-file ${babelConfig} src -x ".js",".jsx" --ignore "**/test_fixtures/*","*.test.js","test.js" --out-dir dist`
+            `${babel} --config-file ${babelConfig} src -x ".js",".jsx" --ignore "**/test_fixtures/*","*.test.js","test.js" --out-dir dist --copy-files`
         )
         sh.exec(prepareDist)
     })
