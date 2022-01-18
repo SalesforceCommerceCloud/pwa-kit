@@ -119,7 +119,8 @@ const runGenerator = (answers, {outputDir}) => {
 
     const pkgJsonPath = p.resolve(outputDir, 'package.json')
     const pkgJSON = readJson(pkgJsonPath)
-    const finalPkgData = merge(pkgJSON, answers['scaffold-pwa'])
+    const pkgDataWithAnswers = merge(pkgJSON, answers['scaffold-pwa'])
+    const finalPkgData = merge(pkgDataWithAnswers, singleLocaleData)
 
     npmInstallables.forEach((pkgName) => {
         const keys = ['dependencies', 'devDependencies']
@@ -164,33 +165,9 @@ const runGenerator = (answers, {outputDir}) => {
         siteId: answers['einstein-api'].siteId || answers['commerce-api'].siteId
     }
 
-    const l10n = {
-        supportedCurrencies: ['USD'],
-        defaultCurrency: 'USD',
-        supportedLocales: [
-            {
-                id: 'en-US',
-                preferredCurrency: 'USD'
-            }
-        ],
-        defaultLocale: 'en-US'
-    }
-
     new sh.ShellString(APIConfigTemplate({commerceApi, einsteinApi})).to(
         p.resolve(outputDir, 'app', 'api.config.js')
     )
-
-    console.log('l10n: ', l10n)
-
-    console.log('pkgJSON:', pkgJSON)
-
-    console.log('answers[\'scaffold-pwa\']:', answers['scaffold-pwa'])
-
-    console.log('finalPkgData:', finalPkgData)
-
-    // new sh.ShellString(APIConfigTemplate({commerceApi, einsteinApi})).to(
-    //     p.resolve(outputDir, 'app', 'api.config.js')
-    // )
 
     console.log('Installing dependencies for the generated project (this can take a while)')
     sh.exec(`npm install --no-progress`, {
@@ -315,6 +292,20 @@ const buildAnswers = ({
 
         'commerce-api': {clientId, siteId, organizationId, shortCode},
         'einstein-api': {einsteinId, siteId: einsteinSiteId || siteId}
+    }
+}
+
+const singleLocaleData = {
+    l10n: {
+        supportedCurrencies: ['USD'],
+        defaultCurrency: 'USD',
+        supportedLocales: [
+            {
+                id: 'en-US',
+                preferredCurrency: 'USD'
+            }
+        ],
+        defaultLocale: 'en-US'
     }
 }
 
