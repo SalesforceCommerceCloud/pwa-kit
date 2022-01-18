@@ -8,12 +8,14 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 /* eslint-disable header/header */
+import React from 'react'
 import {render, ALLOWLISTED_INLINE_SCRIPTS} from './react-rendering'
 import {createApp} from './express'
 import request from 'supertest'
 import {parse} from 'node-html-parser'
 import path from 'path'
 import {isRemote} from '../../utils/ssr-server'
+import AppConfig from '../universal/components/_app-config'
 
 const opts = (overrides = {}) => {
     const fixtures = path.join(__dirname, '..', '..', 'ssr', 'server', 'test_fixtures')
@@ -310,6 +312,32 @@ jest.mock('@loadable/server', () => {
         }
     }
 })
+// const mockReact = React
+// const mockAppConfigRender = jest.fn()
+// jest.mock('../universal/components/_app-config', () => {
+//     const AppConfig = jest.requireActual('../universal/components/_app-config')
+//     // const mockRender = jest.fn().mockImplementation(() => {
+//     //     return mockReact.createElement(mockReact.Fragment, null, (void 0).props.children)
+//     // })
+//     // class MockedAppConfig extends AppConfig {
+//     //     render() {
+//     //         return mockRender()
+//     //     }
+//     // }
+//     return {__esModule: true, default: AppConfig}
+// })
+// jest.mock('../universal/components/_app-config', () => {
+//     return {
+//         __esModule: true,
+//         default: jest.fn().mockImplementation(() => {
+//             return mockReact.createElement(mockReact.Fragment, null, (void 0).props.children)
+//         })
+//     }
+// })
+// jest.mock('../universal/components/_app-config', () => {
+//     const AppConfig = jest.requireActual('../universal/components/_app-config')
+//     return AppConfig
+// })
 
 describe('The Node SSR Environment', () => {
     const OLD_ENV = process.env
@@ -324,6 +352,10 @@ describe('The Node SSR Environment', () => {
 
     afterAll(() => {
         process.env = OLD_ENV // Restore old environment
+    })
+
+    afterEach(() => {
+        jest.restoreAllMocks()
     })
 
     /**
@@ -595,6 +627,22 @@ describe('The Node SSR Environment', () => {
 
                 expect(scriptContent).not.toContain('<script>')
             }
+        },
+        {
+            description: `AppConfig errors are caught`,
+            req: {url: '/pwa/'},
+            mocks: () => {
+                jest
+                    .spyOn(AppConfig.prototype, 'render')
+                    .mockImplementation(() => {throw new Error()})
+            },
+            assertions: (res) => {
+                expect(res.statusCode).toBe(500)
+                const html = res.text
+
+                const shouldIncludeErrorStack = !isRemote()
+                expect(html).toContain(shouldIncludeErrorStack ? 'Error: ' : 'Internal Server Error')
+            }
         }
     ]
 
@@ -602,16 +650,20 @@ describe('The Node SSR Environment', () => {
 
     isRemoteValues.forEach((isRemoteValue) => {
         // Run test cases
-        cases.forEach(({description, req, assertions}) => {
+        cases.forEach(({description, req, assertions, mocks}) => {
             test(`renders PWA pages properly when ${
                 isRemoteValue ? 'remote' : 'local'
             } (${description})`, () => {
                 // Mock `isRemote` per test execution.
                 isRemote.mockReturnValue(isRemoteValue)
+                process.env.NODE_ENV = isRemoteValue ? 'production' : 'development'
 
                 const {url, headers, query} = req
                 const app = createApp(opts())
                 app.get('/*', render)
+                if (mocks) {
+                    mocks()
+                }
                 return request(app)
                     .get(url)
                     .set(headers || {})
