@@ -127,7 +127,7 @@ const initAppState = async ({App, component, match, route, req, res, location}) 
  *
  * @return {Promise}
  */
-export const render = async (req, res) => {
+export const render = async (req, res, next) => {
     // AppConfig.restore *must* come before using getRoutes() or routeComponent()
     // to inject arguments into the wrapped component's getProps methods.
     AppConfig.restore(res.locals)
@@ -182,7 +182,12 @@ export const render = async (req, res) => {
     try {
         renderResult = renderApp(args)
     } catch (error) {
-        renderResult = renderApp({...args, error: logAndFormatError(error)})
+        // This is an unrecoverable error.
+        // (errors handled by the AppErrorBoundary are considered recoverable)
+        // Here, we use Express's convention to invoke error middleware.
+        // Note, we don't have an error handling middleware yet! This is calling the
+        // default error handling middleware provided by Express
+        return next(error)
     }
 
     // Step 5 - Determine what is going to happen, redirect, or send html with
@@ -198,17 +203,9 @@ export const render = async (req, res) => {
     }
 }
 
-const renderApp = (args) => {
-    const {req, res, location, routes, appState, error, App} = args
+const renderAppHtml = (req, res, error, appData) => {
+    const {App, appState, routes, routerContext, location, extractor, deviceType} = appData
 
-    const ssrOnly = 'mobify_server_only' in req.query || '__server_only' in req.query
-    const prettyPrint = 'mobify_pretty' in req.query || '__pretty_print' in req.query
-    const indent = prettyPrint ? 8 : 0
-    const deviceType = detectDeviceType(req)
-    const routerContext = {}
-
-    let extractor
-    let bundles = []
     let appJSX = (
         <Router location={location} context={routerContext}>
             <DeviceContext.Provider value={{type: deviceType}}>
@@ -221,7 +218,6 @@ const renderApp = (args) => {
 
     /* istanbul ignore next */
     try {
-        extractor = new ChunkExtractor({statsFile: BUNDLES_PATH})
         appJSX = extractor.collectChunks(appJSX)
     } catch (e) {
         // Tests aren't being run through webpack, therefore no chunks or `loadable-stats.json`
@@ -231,11 +227,35 @@ const renderApp = (args) => {
 
     // It's important that we render the App before extracting the script elements,
     // otherwise it won't return the correct chunks.
-    const appHtml = ReactDOMServer.renderToString(appJSX)
+    return ReactDOMServer.renderToString(appJSX)
+}
+
+const renderApp = (args) => {
+    const {req, res, error, App, appState, location, routes} = args
+    const deviceType = detectDeviceType(req)
+    const extractor = new ChunkExtractor({statsFile: BUNDLES_PATH})
+    const routerContext = {}
+    const appData = {App, appState, location, routes, routerContext, deviceType, extractor}
+
+    const ssrOnly = 'mobify_server_only' in req.query || '__server_only' in req.query
+    const prettyPrint = 'mobify_pretty' in req.query || '__pretty_print' in req.query
+    const indent = prettyPrint ? 8 : 0
+
+    let appHtml
+    // It's important that we render the App before extracting the script elements,
+    // otherwise it won't return the correct chunks.
+    try {
+        appHtml = renderAppHtml(req, res, null, appData)
+    } catch (error) {
+        // This will catch errors thrown from the app and pass the error
+        // to the AppErrorBoundary component, and renders the error page.
+        appHtml = renderAppHtml(req, res, logAndFormatError(error), appData)
+    }
 
     // Setting type: 'application/json' stops the browser from executing the code.
     const scriptProps = ssrOnly ? {type: 'application/json'} : {}
 
+    let bundles = []
     /* istanbul ignore next */
     if (extractor) {
         // Clone elements with the correct bundle path.
