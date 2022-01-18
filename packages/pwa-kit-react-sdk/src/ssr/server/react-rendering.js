@@ -225,8 +225,6 @@ const renderAppHtml = (req, res, error, appData) => {
         // reason, swallow the error and carry on when in a test environment.
     }
 
-    // It's important that we render the App before extracting the script elements,
-    // otherwise it won't return the correct chunks.
     return ReactDOMServer.renderToString(appJSX)
 }
 
