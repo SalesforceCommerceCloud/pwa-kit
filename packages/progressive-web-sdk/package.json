@@ -94,7 +94,7 @@
     "minimatch": "3.0.4",
     "mkdirp": "^0.5.2",
     "morgan": "1.9.1",
-    "node-fetch": "^2.6.1",
+    "node-fetch": "^3.1.1",
     "postcss-loader": "^4.0.0",
     "prompt": "1.0.0",
     "prop-types": "^15.6.0",
