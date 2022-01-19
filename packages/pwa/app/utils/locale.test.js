@@ -22,7 +22,7 @@ const nonSupportedLocale = 'nl-NL'
 const supportedLocale = supportedLocales[1]
 
 const testId1 = 'footer.link.privacy_policy'
-const testId2 = 'homepage.message.welcome'
+const testId2 = 'account.accordion.button.my_account'
 
 test('our assumptions before further testing', () => {
     expect(supportedLocales.includes(nonSupportedLocale)).toBe(false)
