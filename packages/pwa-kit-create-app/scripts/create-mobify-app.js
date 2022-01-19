@@ -36,13 +36,15 @@
 const p = require('path')
 const fs = require('fs')
 const os = require('os')
-const program = require('commander')
+const {Command, Option} = require('commander')
 const inquirer = require('inquirer')
 const {URL} = require('url')
 const deepmerge = require('deepmerge')
 const sh = require('shelljs')
 const tar = require('tar')
 const generatorPkg = require('../package.json')
+
+const program = new Command()
 
 sh.set('-e')
 
@@ -55,8 +57,7 @@ const DEMO_PROJECT = 'demo-project'
 const PROMPT = 'prompt'
 
 const PRESETS = [TEST_PROJECT, PROMPT, HELLO_WORLD, HELLO_WORLD_TEST_PROJECT, DEMO_PROJECT]
-
-const GENERATOR_PRESET = process.env.GENERATOR_PRESET || PROMPT
+const PUBLIC_PRESETS = [PROMPT, DEMO_PROJECT]
 
 const DEFAULT_OUTPUT_DIR = p.join(process.cwd(), 'pwa-kit-starter-project')
 
@@ -212,10 +213,7 @@ const prompts = () => {
         s === '' ||
         defaultEinsteinAPIError
 
-    const demoChoice = 'Yes'
-    const customChoice = 'No, use custom settings'
-
-    const customChoiceQuestions = [
+    const questions = [
         {
             name: 'projectId',
             validate: validProjectId,
@@ -256,24 +254,8 @@ const prompts = () => {
         // NOTE: there's no question about Einstein's _site_ id because we currently assume that the site id will be the same for both Commerce API and Einstein
     ]
 
-    const questions = [
-        {
-            name: 'useDemoSettings',
-            message: 'Do you want to try out PWA Kit with the demo storefront?',
-            choices: [demoChoice, customChoice],
-            type: 'list'
-        },
-        ...customChoiceQuestions.map((question) => ({
-            ...question,
-            when: (answers) => answers.useDemoSettings == customChoice
-        }))
-    ]
+    return inquirer.prompt(questions).then((answers) => buildAnswers(answers))
 
-    return inquirer
-        .prompt(questions)
-        .then((answers) =>
-            answers.useDemoSettings == demoChoice ? demoProjectAnswers() : buildAnswers(answers)
-        )
 }
 
 const buildAnswers = ({
@@ -393,7 +375,7 @@ const main = (opts) => {
         process.exit(1)
     }
 
-    switch (GENERATOR_PRESET) {
+    switch (opts.preset) {
         case HELLO_WORLD_TEST_PROJECT:
             return generateHelloWorld({projectId: 'hello-world'}, opts)
         case HELLO_WORLD:
@@ -409,7 +391,7 @@ const main = (opts) => {
             return prompts(opts).then((answers) => runGenerator(answers, opts))
         default:
             console.error(
-                `The preset "${GENERATOR_PRESET}" is not valid. Valid presets are: ${PRESETS.map(
+                `The preset "${opts.preset}" is not valid. Valid presets are: ${PRESETS.map(
                     (x) => `"${x}"`
                 ).join(' ')}.`
             )
@@ -418,16 +400,43 @@ const main = (opts) => {
 }
 
 if (require.main === module) {
-    program.description(`Generate a new PWA Kit project`)
+    program.name(`create-mobify-app`)
+    program.description(`Generate a new PWA Kit project, optionally using a preset.
+    
+Examples:
+
+  ${program.name()} --preset "${PROMPT}"
+    Generate a project using custom settings for B2CCommerce, by answering 
+    questions on the CLI.
+    
+    Use this to connect to an existing instance.
+
+  ${program.name()} --preset "${DEMO_PROJECT}"
+    Generate a project using default settings for an existing demo B2CCommerce
+    backend. This preset does not ask for input.
+    
+    Use this to try out SDK features against an existing backend.
+  `)
     program.option(
         '--outputDir <path>',
         `Path to the output directory for the new project`,
         DEFAULT_OUTPUT_DIR
     )
+    program.addOption(
+        new Option(
+            '--preset <name>',
+            `The name of a project preset to use`
+        )
+            .default(PROMPT)
+            .choices(
+                Boolean(process.env.GENERATOR_PRESET) ? PRESETS : PUBLIC_PRESETS
+            )
+            .env('GENERATOR_PRESET')
+    )
     program.parse(process.argv)
 
     return Promise.resolve()
-        .then(() => main(program))
+        .then(() => main(program.opts()))
         .then(() => {
             console.log('')
             console.log(`Successfully generated project in ${program.outputDir}`)
