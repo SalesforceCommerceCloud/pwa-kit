@@ -20,7 +20,7 @@ import {
 } from '../../commerce-api/mock-data'
 import {Route, Switch} from 'react-router-dom'
 import {createMemoryHistory} from 'history'
-import {DEFAULT_LOCALE} from "../../constants"
+import {DEFAULT_LOCALE} from '../../constants'
 
 jest.mock('@chakra-ui/react', () => {
     const originalModule = jest.requireActual('@chakra-ui/react')
