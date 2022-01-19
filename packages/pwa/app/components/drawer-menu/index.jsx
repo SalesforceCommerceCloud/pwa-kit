@@ -93,6 +93,8 @@ const DrawerMenu = ({isOpen, onClose = noop, onLogoClick = noop, root}) => {
         navigate('/login')
         setShowLoading(false)
     }
+    const supportedLocaleIds = site.l10n.supportedLocales.map((locale) => locale.id)
+    const showLocaleSelector = supportedLocaleIds?.length > 1
 
     return (
         <Drawer isOpen={isOpen} onClose={onClose} placement="left" size={drawerSize}>
@@ -261,7 +263,7 @@ const DrawerMenu = ({isOpen, onClose = noop, onLogoClick = noop, root}) => {
                                     </HStack>
                                 </Link>
                             </Box>
-                            <Box>
+                            {showLocaleSelector && <Box>
                                 <LocaleSelector
                                     {...styles.localeSelector}
                                     selectedLocale={intl.locale}
@@ -275,7 +277,7 @@ const DrawerMenu = ({isOpen, onClose = noop, onLogoClick = noop, root}) => {
                                         window.location = newUrl
                                     }}
                                 />
-                            </Box>
+                            </Box>}
                         </VStack>
 
                         <DrawerSeparator />

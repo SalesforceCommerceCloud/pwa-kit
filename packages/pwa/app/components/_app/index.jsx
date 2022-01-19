@@ -43,7 +43,7 @@ import {IntlProvider} from 'react-intl'
 import {watchOnlineStatus, flatten} from '../../utils/utils'
 import {homeUrlBuilder, getUrlWithLocale, buildPathWithUrlConfig, pathToUrl} from '../../utils/url'
 import {getLocaleConfig, getPreferredCurrency, getSupportedLocalesIds} from '../../utils/locale'
-import {HOME_HREF} from '../../constants'
+import {DEFAULT_SITE_TITLE, HOME_HREF, THEME_COLOR} from '../../constants'
 
 import Seo from '../seo'
 import useWishlist from '../../hooks/use-wishlist'
@@ -168,11 +168,8 @@ const App = (props) => {
                 <CategoriesProvider categories={allCategories}>
                     <CurrencyProvider currency={currency}>
                         <Seo>
-                            <meta name="theme-color" content="#0288a7" />
-                            <meta
-                                name="apple-mobile-web-app-title"
-                                content="PWA-Kit-Retail-React-App"
-                            />
+                            <meta name="theme-color" content={THEME_COLOR} />
+                            <meta name="apple-mobile-web-app-title" content={DEFAULT_SITE_TITLE} />
                             <link
                                 rel="apple-touch-icon"
                                 href={getAssetUrl('static/img/global/apple-touch-icon.png')}

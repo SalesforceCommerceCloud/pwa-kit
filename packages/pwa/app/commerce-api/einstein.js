@@ -71,7 +71,7 @@ class EinsteinAPI {
 
     /**
      * Tells the Einstein engine when a user views a product.
-     * https://developer.commercecloud.com/s/api-details/a003k00000UI4hPAAT/commerce-cloud-developer-centereinsteinrecommendations?tabset-888ee=2
+     * https://developer.salesforce.com/docs/commerce/einstein-api/references#einstein-recommendations:Summary
      **/
     async sendViewProduct(product, args) {
         const endpoint = `/activities/${this.config.siteId}/viewProduct`
@@ -92,7 +92,7 @@ class EinsteinAPI {
 
     /**
      * Tells the Einstein engine when a user views a set of recommendations
-     * https://developer.commercecloud.com/s/api-details/a003k00000UI4hPAAT/commerce-cloud-developer-centereinsteinrecommendations?tabset-888ee=2
+     * https://developer.salesforce.com/docs/commerce/einstein-api/references#einstein-recommendations:Summary
      **/
     async sendViewReco(recommenderDetails, products, args) {
         const endpoint = `/activities/${this.config.siteId}/viewReco`
@@ -110,7 +110,7 @@ class EinsteinAPI {
 
     /**
      * Tells the Einstein engine when a user clicks on a recommendation
-     * https://developer.commercecloud.com/s/api-details/a003k00000UI4hPAAT/commerce-cloud-developer-centereinsteinrecommendations?tabset-888ee=2
+     * https://developer.salesforce.com/docs/commerce/einstein-api/references#einstein-recommendations:Summary
      **/
     async sendClickReco(recommenderDetails, product, args) {
         const endpoint = `/activities/${this.config.siteId}/clickReco`
@@ -134,7 +134,7 @@ class EinsteinAPI {
 
     /**
      * Tells the Einstein engine when a user adds an item to their cart.
-     * https://developer.commercecloud.com/s/api-details/a003k00000UI4hPAAT/commerce-cloud-developer-centereinsteinrecommendations?tabset-888ee=2
+     * https://developer.salesforce.com/docs/commerce/einstein-api/references#einstein-recommendations:Summary
      **/
     async sendAddToCart(product, args) {
         const endpoint = `/activities/${this.config.siteId}/addToCart`
@@ -149,7 +149,7 @@ class EinsteinAPI {
 
     /**
      * Get a list of recommenders that can be used in recommendation requests.
-     * https://developer.commercecloud.com/s/api-details/a003k00000UI4hPAAT/commerce-cloud-developer-centereinsteinrecommendations?tabset-888ee=2
+     * https://developer.salesforce.com/docs/commerce/einstein-api/references#einstein-recommendations:Summary
      **/
     async getRecommenders() {
         const endpoint = `/personalization/recommenders/${this.config.siteId}`
@@ -161,7 +161,7 @@ class EinsteinAPI {
 
     /**
      * Get a set of recommendations
-     * https://developer.commercecloud.com/s/api-details/a003k00000UI4hPAAT/commerce-cloud-developer-centereinsteinrecommendations?tabset-888ee=2
+     * https://developer.salesforce.com/docs/commerce/einstein-api/references#einstein-recommendations:Summary
      **/
     async getRecommendations(recommenderName, args) {
         const endpoint = `/personalization/recs/${this.config.siteId}/${recommenderName}`
@@ -178,7 +178,7 @@ class EinsteinAPI {
 
     /**
      * Get a set of recommendations for a zone
-     * https://developer.commercecloud.com/s/api-details/a003k00000UI4hPAAT/commerce-cloud-developer-centereinsteinrecommendations?tabset-888ee=2
+     * https://developer.salesforce.com/docs/commerce/einstein-api/references#einstein-recommendations:Summary
      **/
     async getZoneRecommendations(zoneName, args) {
         const endpoint = `/personalization/${this.config.siteId}/zones/${zoneName}/recs`

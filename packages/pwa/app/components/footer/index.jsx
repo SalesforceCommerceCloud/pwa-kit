@@ -38,6 +38,8 @@ const Footer = ({...otherProps}) => {
     const [locale, setLocale] = useState(intl.locale)
     const site = useSite()
     const {l10n} = site
+    const supportedLocaleIds = getSupportedLocalesIds(l10n.supportedLocales)
+    const showLocaleSelector = supportedLocaleIds?.length > 1
 
     return (
         <Box as="footer" {...styles.container} {...otherProps}>
@@ -121,7 +123,7 @@ const Footer = ({...otherProps}) => {
                         <Subscribe />
                     </HideOnDesktop>
 
-                    <Box {...styles.localeSelector}>
+                    {showLocaleSelector && <Box {...styles.localeSelector}>
                         <FormControl
                             data-testid="sf-footer-locale-selector"
                             id="locale_selector"
@@ -154,7 +156,7 @@ const Footer = ({...otherProps}) => {
                                 ))}
                             </Select>
                         </FormControl>
-                    </Box>
+                    </Box>}
 
                     <Divider {...styles.horizontalRule} />
 

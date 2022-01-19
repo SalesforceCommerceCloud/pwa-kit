@@ -6,8 +6,6 @@ tests/reports
 tests/screenshots
 tests/lighthouse-reports/
 lighthouse/audit*
-cypress/screenshots
-cypress/videos
 .lighthouseci
 
 .tern-port
@@ -27,3 +25,5 @@ node_modules
 # Generated files
 app/cache-hash-manifest.json
 app/loader-cache-hash-manifest.json
+
+.vscode
