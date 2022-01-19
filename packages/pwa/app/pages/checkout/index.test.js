@@ -25,7 +25,7 @@ import {
     productsResponse
 } from '../../commerce-api/mock-data'
 import {getUrlConfig} from '../../utils/utils'
-import {DEFAULT_LOCALE} from '../../constants'
+import {DEFAULT_LOCALE, urlPartPositions} from '../../constants'
 
 jest.setTimeout(60000)
 
@@ -49,14 +49,6 @@ jest.mock('../../commerce-api/utils', () => {
     }
 })
 
-jest.mock('../../utils/utils', () => {
-    const original = jest.requireActual('../../utils/utils')
-    return {
-        ...original,
-        getUrlConfig: jest.fn()
-    }
-})
-
 jest.mock('../../commerce-api/pkce', () => {
     return {
         createCodeVerifier: jest.fn().mockReturnValue('codeverifier'),
@@ -66,6 +58,8 @@ jest.mock('../../commerce-api/pkce', () => {
 
 const {keysToCamel} = jest.requireActual('../../commerce-api/utils')
 
+const {locale: localeType} = getUrlConfig()
+
 // This is our wrapped component for testing. It handles initialization of the customer
 // and basket the same way it would be when rendered in the real app. We also set up
 // fake routes to simulate moving from checkout to confirmation page.
@@ -73,10 +67,20 @@ const WrappedCheckout = () => {
     useShopper()
     return (
         <Switch>
-            <Route exact path="/en-GB/checkout">
+            <Route
+                exact
+                path={`${
+                    localeType === urlPartPositions.PATH ? `/${DEFAULT_LOCALE}` : ''
+                }/checkout`}
+            >
                 <Checkout />
             </Route>
-            <Route exact path="/en-GB/checkout/confirmation">
+            <Route
+                exact
+                path={`${
+                    localeType === urlPartPositions.PATH ? `/${DEFAULT_LOCALE}` : ''
+                }/checkout/confirmation`}
+            >
                 <div>success</div>
             </Route>
         </Switch>
@@ -170,9 +174,6 @@ const server = setupServer(
 
 // Set up and clean up
 beforeAll(() => {
-    getUrlConfig.mockImplementation(() => ({
-        locale: 'path'
-    }))
     jest.resetModules()
     server.listen({onUnhandledRequest: 'error'})
 })
@@ -285,7 +286,11 @@ test('Can proceed through checkout steps as guest', async () => {
     )
 
     // Set the initial browser router path and render our component tree.
-    window.history.pushState({}, 'Checkout', '/en-GB/checkout')
+    window.history.pushState(
+        {},
+        'Checkout',
+        `${localeType === urlPartPositions.PATH ? `/${DEFAULT_LOCALE}` : ''}/checkout`
+    )
     renderWithProviders(<WrappedCheckout history={history} />)
 
     // Wait for checkout to load and display first step
@@ -516,7 +521,11 @@ test('Can proceed through checkout as registered customer', async () => {
     )
 
     // Set the initial browser router path and render our component tree.
-    window.history.pushState({}, 'Checkout', '/en-GB/checkout')
+    window.history.pushState(
+        {},
+        'Checkout',
+        `${localeType === urlPartPositions.PATH ? `/${DEFAULT_LOCALE}` : ''}/checkout`
+    )
     renderWithProviders(<WrappedCheckout history={history} />)
 
     // Switch to login
@@ -599,7 +608,11 @@ test('Can proceed through checkout as registered customer', async () => {
     user.click(placeOrderBtn)
 
     await waitFor(() => {
-        expect(window.location.pathname).toEqual(`/${DEFAULT_LOCALE}/checkout/confirmation`)
+        expect(window.location.pathname).toEqual(
+            `${
+                localeType === urlPartPositions.PATH ? `/${DEFAULT_LOCALE}` : ''
+            }/checkout/confirmation`
+        )
     })
 })
 
@@ -673,7 +686,11 @@ test('Can edit address during checkout as a registered customer', async () => {
     )
 
     // Set the initial browser router path and render our component tree.
-    window.history.pushState({}, 'Checkout', '/en-GB/checkout')
+    window.history.pushState(
+        {},
+        'Checkout',
+        `${localeType === urlPartPositions.PATH ? `/${DEFAULT_LOCALE}` : ''}/checkout`
+    )
     renderWithProviders(<WrappedCheckout history={history} />)
 
     // Switch to login
@@ -800,7 +817,11 @@ test('Can add address during checkout as a registered customer', async () => {
     )
 
     // Set the initial browser router path and render our component tree.
-    window.history.pushState({}, 'Checkout', '/en-GB/checkout')
+    window.history.pushState(
+        {},
+        'Checkout',
+        `${localeType === urlPartPositions.PATH ? `/${DEFAULT_LOCALE}` : ''}/checkout`
+    )
     renderWithProviders(<WrappedCheckout history={history} />)
 
     // Switch to login

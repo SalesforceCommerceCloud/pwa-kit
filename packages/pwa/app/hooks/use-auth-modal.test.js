@@ -12,6 +12,7 @@ import {AuthModal, useAuthModal} from './use-auth-modal'
 import {BrowserRouter as Router, Route} from 'react-router-dom'
 import Account from '../pages/account'
 import {getUrlConfig} from '../utils/utils'
+import {DEFAULT_LOCALE, urlPartPositions} from '../constants'
 
 jest.setTimeout(60000)
 
@@ -27,14 +28,6 @@ const mockRegisteredCustomer = {
 
 const mockLogin = jest.fn()
 jest.useFakeTimers()
-
-jest.mock('../utils/utils', () => {
-    const original = jest.requireActual('../utils/utils')
-    return {
-        ...original,
-        getUrlConfig: jest.fn()
-    }
-})
 
 jest.mock('../commerce-api/auth', () => {
     return jest.fn().mockImplementation(() => {
@@ -125,6 +118,8 @@ jest.mock('../commerce-api/pkce', () => {
     }
 })
 
+const {locale: localeType} = getUrlConfig()
+
 const MockedComponent = () => {
     const authModal = useAuthModal()
     const match = {
@@ -134,7 +129,9 @@ const MockedComponent = () => {
         <Router>
             <button onClick={authModal.onOpen}>Open Modal</button>
             <AuthModal {...authModal} />
-            <Route path="/en-GB/account">
+            <Route
+                path={`${localeType === urlPartPositions.PATH ? `/${DEFAULT_LOCALE}` : ''}/account`}
+            >
                 <Account match={match} />
             </Route>
         </Router>
@@ -143,9 +140,6 @@ const MockedComponent = () => {
 
 // Set up and clean up
 beforeEach(() => {
-    getUrlConfig.mockImplementation(() => ({
-        locale: 'path'
-    }))
     jest.useFakeTimers()
 })
 afterEach(() => {

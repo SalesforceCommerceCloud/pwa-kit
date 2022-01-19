@@ -16,6 +16,7 @@ import Account from '../account'
 import Registration from '../registration'
 import ResetPassword from '../reset-password'
 import {getUrlConfig} from '../../utils/utils'
+import {DEFAULT_LOCALE, urlPartPositions} from '../../constants'
 
 jest.setTimeout(60000)
 
@@ -28,14 +29,6 @@ const mockRegisteredCustomer = {
     lastName: 'Testing',
     login: 'darek@test.com'
 }
-
-jest.mock('../../utils/utils', () => {
-    const original = jest.requireActual('../../utils/utils')
-    return {
-        ...original,
-        getUrlConfig: jest.fn()
-    }
-})
 
 jest.mock('commerce-sdk-isomorphic', () => {
     const sdk = jest.requireActual('commerce-sdk-isomorphic')
@@ -95,6 +88,8 @@ jest.mock('../../commerce-api/pkce', () => {
     }
 })
 
+const {locale: localeType} = getUrlConfig()
+
 const MockedComponent = () => {
     const match = {
         params: {pageName: 'profile'}
@@ -102,13 +97,23 @@ const MockedComponent = () => {
     return (
         <Router>
             <Login />
-            <Route path="/en-GB/registration">
+            <Route
+                path={`${
+                    localeType === urlPartPositions.PATH ? `/${DEFAULT_LOCALE}` : ''
+                }/registration`}
+            >
                 <Registration />
             </Route>
-            <Route path="/en-GB/reset-password">
+            <Route
+                path={`${
+                    localeType === urlPartPositions.PATH ? `/${DEFAULT_LOCALE}` : ''
+                }/reset-password`}
+            >
                 <ResetPassword />
             </Route>
-            <Route path="/en-GB/account">
+            <Route
+                path={`${localeType === urlPartPositions.PATH ? `/${DEFAULT_LOCALE}` : ''}/account`}
+            >
                 <Account match={match} />
             </Route>
         </Router>
@@ -119,9 +124,6 @@ const server = setupServer()
 
 // Set up and clean up
 beforeEach(() => {
-    getUrlConfig.mockImplementation(() => ({
-        locale: 'path'
-    }))
     jest.resetModules()
     server.listen({
         onUnhandledRequest: 'error'
