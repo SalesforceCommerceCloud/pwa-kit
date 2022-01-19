@@ -24,13 +24,15 @@
  *
  * ## Advanced usage and integration testing:
  *
- * In order to skip prompts on CircleCI, the generator supports a purposefully
- * undocumented `PRESET` environment variable, which you can use to skip the prompts
- * in a CI environment. These presets run the generator with hard-coded answers to
- * the questions we would normally ask an end-user. Supported presets are:
+ * To skip prompts on CircleCI, the generator supports an environment variable,
+ * called `GENERATOR_PRESET`. To run the generator with hard-coded answers to
+ * the questions that we normally ask the user, set `GENERATOR_PRESET` to one
+ * of the following values:
  *
- *   1. "test-project" - A test project using the demo connector.
- *   2. "test-project-sffc" - A test project using the SFCC connector.
+ *   1. "test-project" - Settings for a test instance.
+ *   2. "demo-project" - Settings for a demo instance.
+ *   3. "hello-world" - Settings for a hello world project.
+ *   4. "hello-world-test-project" - Settings for a hello world test project.
  */
 
 const p = require('path')
@@ -422,14 +424,9 @@ Examples:
         DEFAULT_OUTPUT_DIR
     )
     program.addOption(
-        new Option(
-            '--preset <name>', 
-            `The name of a project preset to use`
-        )
+        new Option('--preset <name>', `The name of a project preset to use`)
             .default(PROMPT)
-            .choices(
-                Boolean(process.env.GENERATOR_PRESET) ? PRESETS : PUBLIC_PRESETS
-            )
+            .choices(Boolean(process.env.GENERATOR_PRESET) ? PRESETS : PUBLIC_PRESETS)
             .env('GENERATOR_PRESET')
     )
     program.parse(process.argv)
