@@ -400,7 +400,7 @@ const main = (opts) => {
 }
 
 if (require.main === module) {
-    program.name(`create-mobify-app`)
+    program.name(`pwa-kit-create-app`)
     program.description(`Generate a new PWA Kit project, optionally using a preset.
     
 Examples:
