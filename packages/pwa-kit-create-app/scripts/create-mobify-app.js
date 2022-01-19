@@ -255,7 +255,6 @@ const prompts = () => {
     ]
 
     return inquirer.prompt(questions).then((answers) => buildAnswers(answers))
-
 }
 
 const buildAnswers = ({
@@ -369,7 +368,7 @@ const extractTemplate = (templateName, outputDir) => {
 const main = (opts) => {
     if (!(opts.outputDir === DEFAULT_OUTPUT_DIR) && sh.test('-e', opts.outputDir)) {
         console.error(
-            `The output directory "${opts.outputDir}" already exists. Try, eg. ` +
+            `The output directory "${opts.outputDir}" already exists. Try, for example, ` +
                 `"~/Desktop/my-project" instead of "~/Desktop"`
         )
         process.exit(1)
@@ -406,16 +405,16 @@ if (require.main === module) {
 Examples:
 
   ${program.name()} --preset "${PROMPT}"
-    Generate a project using custom settings for B2CCommerce, by answering 
-    questions on the CLI.
+    Generate a project using custom settings by answering questions about a
+    B2C Commerce instance.
     
-    Use this to connect to an existing instance.
+    Use this preset to connect to an existing instance, such as a sandbox.
 
   ${program.name()} --preset "${DEMO_PROJECT}"
-    Generate a project using default settings for an existing demo B2CCommerce
-    backend. This preset does not ask for input.
+    Generate a project using the settings for a special B2C Commerce
+    instance that is used for demo purposes. No questions are asked.
     
-    Use this to try out SDK features against an existing backend.
+    Use this preset to try out PWA Kit.
   `)
     program.option(
         '--outputDir <path>',
@@ -423,14 +422,9 @@ Examples:
         DEFAULT_OUTPUT_DIR
     )
     program.addOption(
-        new Option(
-            '--preset <name>',
-            `The name of a project preset to use`
-        )
+        new Option('--preset <name>', `The name of a project preset to use`)
             .default(PROMPT)
-            .choices(
-                Boolean(process.env.GENERATOR_PRESET) ? PRESETS : PUBLIC_PRESETS
-            )
+            .choices(Boolean(process.env.GENERATOR_PRESET) ? PRESETS : PUBLIC_PRESETS)
             .env('GENERATOR_PRESET')
     )
     program.parse(process.argv)
@@ -439,11 +433,11 @@ Examples:
         .then(() => main(program.opts()))
         .then(() => {
             console.log('')
-            console.log(`Successfully generated project in ${program.outputDir}`)
+            console.log(`Successfully generated a project in ${program.outputDir}`)
             process.exit(0)
         })
         .catch((err) => {
-            console.error('Failed to generate project')
+            console.error('Failed to generate a project')
             console.error(err)
             process.exit(1)
         })
