@@ -6,6 +6,7 @@
  */
 
 import {getConfig} from './utils'
+
 /**
  * Return all the permutations of routes with site id/alias and locale id/alias
  *
@@ -16,17 +17,14 @@ import {getConfig} from './utils'
 export const configureRoutes = (routes = [], {ignoredRoutes = []}) => {
     if (!routes.length) return []
 
-    // if process.env.EXTERNAL_DOMAIN_NAME does not exist, it means you are on localhost
-    const currentHost = process.env.EXTERNAL_DOMAIN_NAME
-        ? process.env.EXTERNAL_DOMAIN_NAME
-        : 'localhost'
     const hosts = getConfig('app.hosts')
+    const currentHost = getCurrentHost()
 
     // collect and flatten the result to get a list of site objects
     const allSites = hosts.find((host) => host.domain === currentHost)?.sites
 
-    // get a collection of all site-id and site alias from the config
-    // remove duplicates
+    // get a collection of all site-id and site alias from the config of the current host
+    // remove any duplicates
     const sites = [
         ...new Set(
             allSites
@@ -36,8 +34,8 @@ export const configureRoutes = (routes = [], {ignoredRoutes = []}) => {
                 .filter(Boolean)
         )
     ]
-    // get a collection of all locale-id and locale alias from the config
-    // remove duplicates
+    // get a collection of all locale-id and locale alias from the config of the current host
+    // remove any duplicates
     const locales = [
         ...new Set(
             allSites
@@ -52,12 +50,12 @@ export const configureRoutes = (routes = [], {ignoredRoutes = []}) => {
         )
     ]
     let outputRoutes = []
-    // reconstruct all the routes that has both site and locale
     for (let i = 0; i < routes.length; i++) {
         const {path, ...rest} = routes[i]
         if (ignoredRoutes.includes(path)) {
             outputRoutes.push(routes[i])
         } else {
+            // construct all the routes that has both site and locale
             sites.forEach((site) => {
                 locales.forEach((locale) => {
                     const newRoute = `/${site}/${locale}${path}`
@@ -68,12 +66,15 @@ export const configureRoutes = (routes = [], {ignoredRoutes = []}) => {
                 })
             })
 
+            // construct the routes that only has site id or alias
             sites.forEach((site) => {
                 outputRoutes.push({
                     path: `/${site}${path}`,
                     ...rest
                 })
             })
+
+            // construct the routes that only has locale id or alias
             locales.forEach((locale) => {
                 outputRoutes.push({
                     path: `/${locale}${path}`,
@@ -84,5 +85,19 @@ export const configureRoutes = (routes = [], {ignoredRoutes = []}) => {
             outputRoutes.push(routes[i])
         }
     }
+
     return outputRoutes
+}
+
+const getCurrentHost = () => {
+    if (typeof window !== 'undefined') {
+        return window.location.hostname
+    }
+
+    // if process.env.EXTERNAL_DOMAIN_NAME does not exist, it means you are on localhost
+    const currentHost = process.env.EXTERNAL_DOMAIN_NAME
+        ? process.env.EXTERNAL_DOMAIN_NAME
+        : 'localhost'
+
+    return currentHost
 }
