@@ -422,9 +422,14 @@ Examples:
         DEFAULT_OUTPUT_DIR
     )
     program.addOption(
-        new Option('--preset <name>', `The name of a project preset to use`)
+        new Option(
+            '--preset <name>', 
+            `The name of a project preset to use`
+        )
             .default(PROMPT)
-            .choices(Boolean(process.env.GENERATOR_PRESET) ? PRESETS : PUBLIC_PRESETS)
+            .choices(
+                Boolean(process.env.GENERATOR_PRESET) ? PRESETS : PUBLIC_PRESETS
+            )
             .env('GENERATOR_PRESET')
     )
     program.parse(process.argv)
