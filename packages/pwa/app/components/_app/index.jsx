@@ -178,7 +178,7 @@ const App = (props) => {
 
                             {/* Urls for all localized versions of this page (including current page)
                             For more details on hrefLang, see https://developers.google.com/search/docs/advanced/crawling/localized-versions */}
-                            {getSupportedLocalesIds().map((locale) => (
+                            {getSupportedLocalesIds(site?.l10n?.supportedLocales).map((locale) => (
                                 <link
                                     rel="alternate"
                                     hrefLang={locale.toLowerCase()}
