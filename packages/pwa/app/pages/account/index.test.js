@@ -40,10 +40,7 @@ const MockedComponent = () => {
 
     return (
         <Switch>
-            <Route
-                path={getPathname('/account')}
-                render={(props) => <Account {...props} />}
-            />
+            <Route path={getPathname('/account')} render={(props) => <Account {...props} />} />
         </Switch>
     )
 }
@@ -119,17 +116,11 @@ test('Provides navigation for subpages', async () => {
 
     const nav = within(screen.getByTestId('account-detail-nav'))
     user.click(nav.getByText('Addresses'))
-    await waitFor(() =>
-        expect(window.location.pathname).toEqual(getPathname('/account/addresses'))
-    )
+    await waitFor(() => expect(window.location.pathname).toEqual(getPathname('/account/addresses')))
     user.click(nav.getByText('Order History'))
-    await waitFor(() =>
-        expect(window.location.pathname).toEqual(getPathname('/account/orders'))
-    )
+    await waitFor(() => expect(window.location.pathname).toEqual(getPathname('/account/orders')))
     user.click(nav.getByText('Payment Methods'))
-    await waitFor(() =>
-        expect(window.location.pathname).toEqual(getPathname('/account/payments'))
-    )
+    await waitFor(() => expect(window.location.pathname).toEqual(getPathname('/account/payments')))
 })
 
 test('Renders account detail page by default for logged-in customer', async () => {
