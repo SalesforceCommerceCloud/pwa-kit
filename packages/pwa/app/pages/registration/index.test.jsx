@@ -7,12 +7,10 @@
 import React from 'react'
 import {screen, within, waitFor} from '@testing-library/react'
 import user from '@testing-library/user-event'
-import {renderWithProviders} from '../../utils/test-utils'
+import {renderWithProviders, getPathname} from '../../utils/test-utils'
 import Registration from '.'
 import {BrowserRouter as Router, Route} from 'react-router-dom'
-import {getUrlConfig} from '../../utils/utils'
 import Account from '../account'
-import {DEFAULT_LOCALE, urlPartPositions} from '../../constants'
 
 jest.setTimeout(60000)
 
@@ -117,8 +115,6 @@ jest.mock('../../commerce-api/pkce', () => {
     }
 })
 
-const {locale: localeType} = getUrlConfig()
-
 const MockedComponent = () => {
     const match = {
         params: {pageName: 'profile'}
@@ -126,9 +122,7 @@ const MockedComponent = () => {
     return (
         <Router>
             <Registration />
-            <Route
-                path={`${localeType === urlPartPositions.PATH ? `/${DEFAULT_LOCALE}` : ''}/account`}
-            >
+            <Route path={getPathname('/account')}>
                 <Account match={match} />
             </Route>
         </Router>

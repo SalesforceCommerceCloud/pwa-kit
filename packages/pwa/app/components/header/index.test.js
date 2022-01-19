@@ -9,7 +9,7 @@ import PropTypes from 'prop-types'
 
 import {fireEvent, screen, waitFor} from '@testing-library/react'
 import Header from './index'
-import {renderWithProviders} from '../../utils/test-utils'
+import {renderWithProviders, getPathname} from '../../utils/test-utils'
 import useCustomer from '../../commerce-api/hooks/useCustomer'
 import {setupServer} from 'msw/node'
 import {rest} from 'msw'
@@ -20,7 +20,6 @@ import {
 } from '../../commerce-api/mock-data'
 import {Route, Switch} from 'react-router-dom'
 import {createMemoryHistory} from 'history'
-import {DEFAULT_LOCALE} from '../../constants'
 
 jest.mock('@chakra-ui/react', () => {
     const originalModule = jest.requireActual('@chakra-ui/react')
@@ -48,11 +47,11 @@ const MockedComponent = ({history}) => {
     const onAccountClick = () => {
         // Link to account page for registered customer, open auth modal otherwise
         if (customer.isRegistered) {
-            history.push(`/${DEFAULT_LOCALE}/account`)
+            history.push(getPathname('/account'))
         }
     }
     const onWishlistClick = () => {
-        history.push(`/${DEFAULT_LOCALE}/account/wishlist`)
+        history.push(getPathname('/account/wishlist'))
     }
 
     return (
@@ -113,7 +112,7 @@ beforeEach(() => {
 
     // Since we're testing some navigation logic, we are using a simple Router
     // around our component. We need to initialize the default route/path here.
-    window.history.pushState({}, 'Account', `/${DEFAULT_LOCALE}/account`)
+    window.history.pushState({}, 'Account', getPathname('/account'))
 })
 afterEach(() => {
     localStorage.clear()
@@ -233,12 +232,12 @@ test('route to account page when an authenticated users click on account icon', 
     const accountIcon = document.querySelector('svg[aria-label="My account"]')
     fireEvent.click(accountIcon)
     await waitFor(() => {
-        expect(history.push).toHaveBeenCalledWith(`/${DEFAULT_LOCALE}/account`)
+        expect(history.push).toHaveBeenCalledWith(getPathname('/account'))
     })
 
     fireEvent.keyDown(accountIcon, {key: 'Enter', code: 'Enter'})
     await waitFor(() => {
-        expect(history.push).toHaveBeenCalledWith(`/${DEFAULT_LOCALE}/account`)
+        expect(history.push).toHaveBeenCalledWith(getPathname('/account'))
     })
 })
 
@@ -284,7 +283,7 @@ test('route to wishlist page when an authenticated users click on wishlist icon'
     const wishlistIcon = document.querySelector('button[aria-label="Wishlist"]')
     fireEvent.click(wishlistIcon)
     await waitFor(() => {
-        expect(history.push).toHaveBeenCalledWith(`/${DEFAULT_LOCALE}/account/wishlist`)
+        expect(history.push).toHaveBeenCalledWith(getPathname('/account/wishlist'))
     })
 })
 

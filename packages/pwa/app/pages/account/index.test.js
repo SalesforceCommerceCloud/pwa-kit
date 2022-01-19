@@ -10,7 +10,7 @@ import {screen, waitFor, within} from '@testing-library/react'
 import user from '@testing-library/user-event'
 import {rest} from 'msw'
 import {setupServer} from 'msw/node'
-import {renderWithProviders} from '../../utils/test-utils'
+import {renderWithProviders, getPathname} from '../../utils/test-utils'
 import {
     mockedGuestCustomer,
     mockedRegisteredCustomer,
@@ -20,8 +20,6 @@ import {
 } from '../../commerce-api/mock-data'
 import useCustomer from '../../commerce-api/hooks/useCustomer'
 import Account from './index'
-import {getUrlConfig} from '../../utils/utils'
-import {DEFAULT_LOCALE, urlPartPositions} from '../../constants'
 
 jest.mock('../../commerce-api/utils', () => {
     const originalModule = jest.requireActual('../../commerce-api/utils')
@@ -30,9 +28,6 @@ jest.mock('../../commerce-api/utils', () => {
         isTokenValid: jest.fn().mockReturnValue(true)
     }
 })
-
-let routePath = ''
-const {locale: localeType} = getUrlConfig()
 
 const MockedComponent = () => {
     const customer = useCustomer()
@@ -45,7 +40,10 @@ const MockedComponent = () => {
 
     return (
         <Switch>
-            <Route path={routePath} render={(props) => <Account {...props} />} />
+            <Route
+                path={getPathname('/account')}
+                render={(props) => <Account {...props} />}
+            />
         </Switch>
     )
 }
@@ -95,15 +93,9 @@ beforeEach(() => {
     jest.resetModules()
     server.listen({onUnhandledRequest: 'error'})
 
-    if (localeType === urlPartPositions.PATH) {
-        routePath = `/${DEFAULT_LOCALE}/account`
-    } else {
-        routePath = '/account'
-    }
-
     // Since we're testing some navigation logic, we are using a simple Router
     // around our component. We need to initialize the default route/path here.
-    window.history.pushState({}, 'Account', routePath)
+    window.history.pushState({}, 'Account', getPathname('/account'))
 })
 afterEach(() => {
     localStorage.clear()
@@ -118,11 +110,7 @@ test('Redirects to login page if the customer is not logged in', async () => {
         })
     )
     renderWithProviders(<MockedComponent />)
-    await waitFor(() =>
-        expect(window.location.pathname).toEqual(
-            `${localeType === urlPartPositions.PATH ? `/${DEFAULT_LOCALE}` : ''}/login`
-        )
-    )
+    await waitFor(() => expect(window.location.pathname).toEqual(getPathname('/login')))
 })
 
 test('Provides navigation for subpages', async () => {
@@ -132,21 +120,15 @@ test('Provides navigation for subpages', async () => {
     const nav = within(screen.getByTestId('account-detail-nav'))
     user.click(nav.getByText('Addresses'))
     await waitFor(() =>
-        expect(window.location.pathname).toEqual(
-            `${localeType === urlPartPositions.PATH ? `/${DEFAULT_LOCALE}` : ''}/account/addresses`
-        )
+        expect(window.location.pathname).toEqual(getPathname('/account/addresses'))
     )
     user.click(nav.getByText('Order History'))
     await waitFor(() =>
-        expect(window.location.pathname).toEqual(
-            `${localeType === urlPartPositions.PATH ? `/${DEFAULT_LOCALE}` : ''}/account/orders`
-        )
+        expect(window.location.pathname).toEqual(getPathname('/account/orders'))
     )
     user.click(nav.getByText('Payment Methods'))
     await waitFor(() =>
-        expect(window.location.pathname).toEqual(
-            `${localeType === urlPartPositions.PATH ? `/${DEFAULT_LOCALE}` : ''}/account/payments`
-        )
+        expect(window.location.pathname).toEqual(getPathname('/account/payments'))
     )
 })
 
@@ -164,9 +146,7 @@ test('Allows customer to sign out', async () => {
     expect(await screen.findByTestId('account-detail-page')).toBeInTheDocument()
     user.click(screen.getAllByText(/Log Out/)[0])
     await waitFor(() => {
-        expect(window.location.pathname).toEqual(
-            `${localeType === urlPartPositions.PATH ? `/${DEFAULT_LOCALE}` : ''}/login`
-        )
+        expect(window.location.pathname).toEqual(getPathname('/login'))
     })
 })
 

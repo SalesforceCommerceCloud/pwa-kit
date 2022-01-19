@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import {renderWithProviders} from '../../utils/test-utils'
+import {renderWithProviders, getPathname} from '../../utils/test-utils'
 import Link from './index'
 import {DEFAULT_LOCALE} from '../../constants'
 
@@ -22,7 +22,7 @@ test('renders a link with locale prepended', () => {
         locale: 'path'
     }))
     const {getByText} = renderWithProviders(<Link href="/mypage">My Page</Link>)
-    expect(getByText(/My Page/i)).toHaveAttribute('href', `/${DEFAULT_LOCALE}/mypage`)
+    expect(getByText(/My Page/i)).toHaveAttribute('href', getPathname('/mypage'))
 })
 
 test('renders a link with locale as query param', () => {
@@ -38,7 +38,7 @@ test('accepts `to` prop as well', () => {
         locale: 'path'
     }))
     const {getByText} = renderWithProviders(<Link to="/mypage">My Page</Link>)
-    expect(getByText(/My Page/i)).toHaveAttribute('href', `/${DEFAULT_LOCALE}/mypage`)
+    expect(getByText(/My Page/i)).toHaveAttribute('href', getPathname('/mypage'))
 })
 
 test('does not modify root url', () => {

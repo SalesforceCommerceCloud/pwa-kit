@@ -9,14 +9,12 @@ import {screen} from '@testing-library/react'
 import user from '@testing-library/user-event'
 import {rest} from 'msw'
 import {setupServer} from 'msw/node'
-import {renderWithProviders} from '../../utils/test-utils'
+import {renderWithProviders, getPathname} from '../../utils/test-utils'
 import Login from '.'
 import {BrowserRouter as Router, Route} from 'react-router-dom'
 import Account from '../account'
 import Registration from '../registration'
 import ResetPassword from '../reset-password'
-import {getUrlConfig} from '../../utils/utils'
-import {DEFAULT_LOCALE, urlPartPositions} from '../../constants'
 
 jest.setTimeout(60000)
 
@@ -88,8 +86,6 @@ jest.mock('../../commerce-api/pkce', () => {
     }
 })
 
-const {locale: localeType} = getUrlConfig()
-
 const MockedComponent = () => {
     const match = {
         params: {pageName: 'profile'}
@@ -97,23 +93,13 @@ const MockedComponent = () => {
     return (
         <Router>
             <Login />
-            <Route
-                path={`${
-                    localeType === urlPartPositions.PATH ? `/${DEFAULT_LOCALE}` : ''
-                }/registration`}
-            >
+            <Route path={getPathname('/registration')}>
                 <Registration />
             </Route>
-            <Route
-                path={`${
-                    localeType === urlPartPositions.PATH ? `/${DEFAULT_LOCALE}` : ''
-                }/reset-password`}
-            >
+            <Route path={getPathname('/reset-password')}>
                 <ResetPassword />
             </Route>
-            <Route
-                path={`${localeType === urlPartPositions.PATH ? `/${DEFAULT_LOCALE}` : ''}/account`}
-            >
+            <Route path={getPathname('/account')}>
                 <Account match={match} />
             </Route>
         </Router>

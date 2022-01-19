@@ -7,12 +7,10 @@
 import React from 'react'
 import {screen, within, waitFor} from '@testing-library/react'
 import user from '@testing-library/user-event'
-import {renderWithProviders} from '../utils/test-utils'
+import {renderWithProviders, getPathname} from '../utils/test-utils'
 import {AuthModal, useAuthModal} from './use-auth-modal'
 import {BrowserRouter as Router, Route} from 'react-router-dom'
 import Account from '../pages/account'
-import {getUrlConfig} from '../utils/utils'
-import {DEFAULT_LOCALE, urlPartPositions} from '../constants'
 
 jest.setTimeout(60000)
 
@@ -118,8 +116,6 @@ jest.mock('../commerce-api/pkce', () => {
     }
 })
 
-const {locale: localeType} = getUrlConfig()
-
 const MockedComponent = () => {
     const authModal = useAuthModal()
     const match = {
@@ -129,9 +125,7 @@ const MockedComponent = () => {
         <Router>
             <button onClick={authModal.onOpen}>Open Modal</button>
             <AuthModal {...authModal} />
-            <Route
-                path={`${localeType === urlPartPositions.PATH ? `/${DEFAULT_LOCALE}` : ''}/account`}
-            >
+            <Route path={getPathname('/account')}>
                 <Account match={match} />
             </Route>
         </Router>

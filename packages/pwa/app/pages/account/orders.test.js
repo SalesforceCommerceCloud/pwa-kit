@@ -10,7 +10,7 @@ import {screen} from '@testing-library/react'
 import user from '@testing-library/user-event'
 import {rest} from 'msw'
 import {setupServer} from 'msw/node'
-import {renderWithProviders} from '../../utils/test-utils'
+import {renderWithProviders, getPathname} from '../../utils/test-utils'
 import {
     mockedRegisteredCustomer,
     mockOrderHistory,
@@ -18,8 +18,6 @@ import {
 } from '../../commerce-api/mock-data'
 import useCustomer from '../../commerce-api/hooks/useCustomer'
 import Orders from './orders'
-import {getUrlConfig} from '../../utils/utils'
-import {DEFAULT_LOCALE, urlPartPositions} from '../../constants'
 
 jest.mock('../../commerce-api/utils', () => {
     const originalModule = jest.requireActual('../../commerce-api/utils')
@@ -28,8 +26,6 @@ jest.mock('../../commerce-api/utils', () => {
         isTokenValid: jest.fn().mockReturnValue(true)
     }
 })
-
-let routePath = ''
 
 const MockedComponent = () => {
     const customer = useCustomer()
@@ -46,7 +42,7 @@ const MockedComponent = () => {
 
     return (
         <Switch>
-            <Route path={routePath}>
+            <Route path={getPathname('/account/orders')}>
                 <Orders />
             </Route>
         </Switch>
@@ -103,15 +99,7 @@ beforeEach(() => {
 
     server.listen({onUnhandledRequest: 'error'})
 
-    const {locale: localeType} = getUrlConfig()
-
-    if (localeType === urlPartPositions.PATH) {
-        routePath = `/${DEFAULT_LOCALE}/account/orders`
-    } else {
-        routePath = '/account/orders'
-    }
-
-    window.history.pushState({}, 'Account', routePath)
+    window.history.pushState({}, 'Account', getPathname('/account/orders'))
 })
 afterEach(() => {
     localStorage.clear()
