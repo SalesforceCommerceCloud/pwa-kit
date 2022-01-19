@@ -95,7 +95,7 @@ const Home = ({productSearchResult, isLoading}) => {
                     <Stack spacing={{base: 4, sm: 6}} direction={{base: 'column', sm: 'row'}}>
                         <Button
                             as={Link}
-                            href="http://sfdc.co/pwa-kit-developer-center"
+                            href="https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/getting-started.html"
                             target="_blank"
                             width={{base: 'full', md: 'inherit'}}
                             paddingX={7}
@@ -172,13 +172,13 @@ const Home = ({productSearchResult, isLoading}) => {
                                 'This section contains content from the catalog. {docLink} on how to replace it.',
                             id: 'home.description.shop_products',
                             description:
-                                '{docLink} is a html button that links the user to https://sfdc.co/business-manager-manage-catalgos'
+                                '{docLink} is a html button that links the user to https://sfdc.co/business-manager-manage-catalogs'
                         },
                         {
                             docLink: (
                                 <Link
                                     target="_blank"
-                                    href={'https://sfdc.co/business-manager-manage-catalgos'}
+                                    href={'https://sfdc.co/business-manager-manage-catalogs'}
                                     textDecoration={'none'}
                                     position={'relative'}
                                     _after={{

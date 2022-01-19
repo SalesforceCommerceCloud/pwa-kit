@@ -38,6 +38,8 @@ const Footer = ({...otherProps}) => {
     const [locale, setLocale] = useState(intl.locale)
     const site = useSite()
     const {l10n} = site
+    const supportedLocaleIds = getSupportedLocalesIds(l10n.supportedLocales)
+    const showLocaleSelector = supportedLocaleIds?.length > 1
 
     return (
         <Box as="footer" {...styles.container} {...otherProps}>
@@ -121,40 +123,42 @@ const Footer = ({...otherProps}) => {
                         <Subscribe />
                     </HideOnDesktop>
 
-                    <Box {...styles.localeSelector}>
-                        <FormControl
-                            data-testid="sf-footer-locale-selector"
-                            id="locale_selector"
-                            width="auto"
-                            {...otherProps}
-                        >
-                            <Select
-                                value={locale}
-                                onChange={({target}) => {
-                                    setLocale(target.value)
-
-                                    // Update the `locale` in the URL.
-                                    const newUrl = getUrlWithLocale(target.value, {
-                                        disallowParams: ['refine'],
-                                        site
-                                    })
-
-                                    window.location = newUrl
-                                }}
-                                variant="filled"
-                                {...styles.localeDropdown}
+                    {showLocaleSelector && (
+                        <Box {...styles.localeSelector}>
+                            <FormControl
+                                data-testid="sf-footer-locale-selector"
+                                id="locale_selector"
+                                width="auto"
+                                {...otherProps}
                             >
-                                {getSupportedLocalesIds(l10n.supportedLocales).map((locale) => (
-                                    <LocaleText
-                                        as="option"
-                                        value={locale}
-                                        shortCode={locale}
-                                        key={locale}
-                                    />
-                                ))}
-                            </Select>
-                        </FormControl>
-                    </Box>
+                                <Select
+                                    value={locale}
+                                    onChange={({target}) => {
+                                        setLocale(target.value)
+
+                                        // Update the `locale` in the URL.
+                                        const newUrl = getUrlWithLocale(target.value, {
+                                            disallowParams: ['refine'],
+                                            site
+                                        })
+
+                                        window.location = newUrl
+                                    }}
+                                    variant="filled"
+                                    {...styles.localeDropdown}
+                                >
+                                    {getSupportedLocalesIds(l10n.supportedLocales).map((locale) => (
+                                        <LocaleText
+                                            as="option"
+                                            value={locale}
+                                            shortCode={locale}
+                                            key={locale}
+                                        />
+                                    ))}
+                                </Select>
+                            </FormControl>
+                        </Box>
+                    )}
 
                     <Divider {...styles.horizontalRule} />
 

@@ -8,6 +8,8 @@
  * @module progressive-web-sdk/utils/ssr-server
  */
 import crypto from 'crypto'
+import http from 'http'
+import https from 'https'
 import proxy from 'http-proxy-middleware'
 import UserAgentParser from 'ua-parser-js'
 import {
@@ -24,6 +26,11 @@ import {rewriteProxyRequestHeaders, rewriteProxyResponseHeaders} from './ssr-pro
 const compression = require('compression')
 
 import {PerformanceObserver, performance} from 'perf_hooks'
+
+let HTTP_AGENT, HTTPS_AGENT
+const KEEPALIVE_AGENT_OPTIONS = {
+    keepAlive: true
+}
 
 const MOBIFY_DEVICETYPE = 'mobify_devicetype'
 
@@ -168,13 +175,31 @@ export const getFullRequestURL = (url) => {
 }
 
 /**
+ * Returns the http and https agent singletons.
+ *
+ * @private
+ * @returns {object} -
+ */
+const getKeepAliveAgents = () => {
+    if (!HTTP_AGENT || !HTTPS_AGENT) {
+        HTTP_AGENT = new http.Agent(KEEPALIVE_AGENT_OPTIONS)
+        HTTPS_AGENT = new https.Agent(KEEPALIVE_AGENT_OPTIONS)
+    }
+
+    return {
+        httpAgent: HTTP_AGENT,
+        httpsAgent: HTTPS_AGENT
+    }
+}
+
+/**
  * This function can be used to wrap http.request, http.get
  * (and the https module equivalents) in the Express app node
  * environment, so that all outgoing requests can be intercepted.
  *
  * This function is passed the original 'wrapped' function and
- * a second function that returns the 'appHost" - the hostname
- * to which "loopback" requests are sent. If the request is
+ * the options used to create the server used to determine the app
+ * hostname and proxy keep alive settings. If the request is
  * a loopback, then an 'x-mobify-access-key' header is added.
  *
  * The complexity of this function comes from the variety of ways
@@ -186,20 +211,20 @@ export const getFullRequestURL = (url) => {
  *
  * @private
  * @param wrapped {Function} the request/get function to wrap
- * @param getAppHost {Function} a function that returns the appHostname
- * for loopback requests
+ * @param options {Object} the options passed in to the servers
+ * `createApp` function.
  * @returns {Function} a function that wraps 'wrapped'
  */
 
-export const outgoingRequestHook = (wrapped, getAppHost) => {
+export const outgoingRequestHook = (wrapped, options) => {
     return function() {
         // Get the app hostname. If we can't, then just pass
         // the call through to the wrapped function. We'll also
         // do that if there's no access key.
         const accessKey = process.env.X_MOBIFY_ACCESS_KEY
-        const appHost = getAppHost && getAppHost()
+        const {appHostname, proxyKeepAliveAgent} = options || {}
 
-        if (!(appHost && accessKey)) {
+        if (!(appHostname && accessKey)) {
             return wrapped.apply(this, arguments) // eslint-disable-line prefer-rest-params
         }
 
@@ -250,9 +275,9 @@ export const outgoingRequestHook = (wrapped, getAppHost) => {
             // say that 'hostname' is an alias for 'host', but that's not
             // exactly true - host can include a port but hostname doesn't
             // always. So we need to compare both.
-            workingOptions.host === appHost ||
-            workingOptions.hostname === appHost ||
-            (workingUrl && workingUrl.includes(`//${appHost}`))
+            workingOptions.host === appHostname ||
+            workingOptions.hostname === appHostname ||
+            (workingUrl && workingUrl.includes(`//${appHostname}`))
 
         if (!isLoopback) {
             return wrapped.apply(this, arguments) // eslint-disable-line prefer-rest-params
@@ -264,6 +289,23 @@ export const outgoingRequestHook = (wrapped, getAppHost) => {
 
         // Inject the access key.
         workingOptions.headers['x-mobify-access-key'] = accessKey
+
+        // Create and add keep-alive agent to options for loop-back connection.
+        if (proxyKeepAliveAgent) {
+            const {httpAgent, httpsAgent} = getKeepAliveAgents()
+
+            // Add default agent to global connection reuse.
+            workingOptions.agent =
+                workingUrl.startsWith('http:') || workingOptions?.protocol === 'http:'
+                    ? httpAgent
+                    : httpsAgent
+
+            // `node-fetch` and potentially other libraries add connection: close heaaders
+            // remove them to keep the connection alive. NOTE: There are variations in
+            // whether or not the connection header is upper or lower case, so handle both.
+            delete workingOptions?.headers?.connection
+            delete workingOptions?.headers?.Connection
+        }
 
         // Build the args, omitting any undefined values
         const workingArgs = [workingUrl, workingOptions, workingCallback].filter((arg) => !!arg)

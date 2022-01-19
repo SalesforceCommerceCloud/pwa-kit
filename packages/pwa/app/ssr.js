@@ -54,7 +54,8 @@ app.use(
                 // Do not upgrade insecure requests for local development
                 'upgrade-insecure-requests': isRemote() ? [] : null
             }
-        }
+        },
+        hsts: isRemote()
     })
 )
 

@@ -93,6 +93,8 @@ const DrawerMenu = ({isOpen, onClose = noop, onLogoClick = noop, root}) => {
         navigate('/login')
         setShowLoading(false)
     }
+    const supportedLocaleIds = getSupportedLocalesIds(site?.l10n?.supportedLocales)
+    const showLocaleSelector = supportedLocaleIds?.length > 1
 
     return (
         <Drawer isOpen={isOpen} onClose={onClose} placement="left" size={drawerSize}>
@@ -261,21 +263,25 @@ const DrawerMenu = ({isOpen, onClose = noop, onLogoClick = noop, root}) => {
                                     </HStack>
                                 </Link>
                             </Box>
-                            <Box>
-                                <LocaleSelector
-                                    {...styles.localeSelector}
-                                    selectedLocale={intl.locale}
-                                    locales={getSupportedLocalesIds()}
-                                    onSelect={(newLocale) => {
-                                        // Update the `locale` in the URL.
-                                        const newUrl = getUrlWithLocale(newLocale, {
-                                            disallowParams: ['refine'],
-                                            site
-                                        })
-                                        window.location = newUrl
-                                    }}
-                                />
-                            </Box>
+                            {showLocaleSelector && (
+                                <Box>
+                                    <LocaleSelector
+                                        {...styles.localeSelector}
+                                        selectedLocale={intl.locale}
+                                        locales={getSupportedLocalesIds(
+                                            site?.l10n?.supportedLocales
+                                        )}
+                                        onSelect={(newLocale) => {
+                                            // Update the `locale` in the URL.
+                                            const newUrl = getUrlWithLocale(newLocale, {
+                                                disallowParams: ['refine'],
+                                                site
+                                            })
+                                            window.location = newUrl
+                                        }}
+                                    />
+                                </Box>
+                            )}
                         </VStack>
 
                         <DrawerSeparator />
