@@ -19,14 +19,7 @@ import {
 import useCustomer from '../../commerce-api/hooks/useCustomer'
 import Orders from './orders'
 import {getUrlConfig} from '../../utils/utils'
-
-jest.mock('../../utils/utils', () => {
-    const original = jest.requireActual('../../utils/utils')
-    return {
-        ...original,
-        getUrlConfig: jest.fn()
-    }
-})
+import {DEFAULT_LOCALE, urlPartPositions} from '../../constants'
 
 jest.mock('../../commerce-api/utils', () => {
     const originalModule = jest.requireActual('../../commerce-api/utils')
@@ -35,6 +28,8 @@ jest.mock('../../commerce-api/utils', () => {
         isTokenValid: jest.fn().mockReturnValue(true)
     }
 })
+
+let routePath = ''
 
 const MockedComponent = () => {
     const customer = useCustomer()
@@ -51,7 +46,7 @@ const MockedComponent = () => {
 
     return (
         <Switch>
-            <Route path="/en-GB/account/orders">
+            <Route path={routePath}>
                 <Orders />
             </Route>
         </Switch>
@@ -105,12 +100,18 @@ const server = setupServer(
 // Set up and clean up
 beforeEach(() => {
     jest.resetModules()
-    getUrlConfig.mockImplementation(() => ({
-        locale: 'path'
-    }))
+
     server.listen({onUnhandledRequest: 'error'})
 
-    window.history.pushState({}, 'Account', '/en-GB/account/orders')
+    const {locale: localeType} = getUrlConfig()
+
+    if (localeType === urlPartPositions.PATH) {
+        routePath = `/${DEFAULT_LOCALE}/account/orders`
+    } else {
+        routePath = '/account/orders'
+    }
+
+    window.history.pushState({}, 'Account', routePath)
 })
 afterEach(() => {
     localStorage.clear()
