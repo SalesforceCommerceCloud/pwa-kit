@@ -7,7 +7,11 @@
 
 import 'raf/polyfill' // fix requestAnimationFrame issue with polyfill
 import Enzyme from 'enzyme'
-import Adapter from 'enzyme-adapter-react-16'
+
+// DANGEROUS: this enzyme React 17 adapter is unofficial
+// because the official adaptor is still in development
+// see https://github.com/enzymejs/enzyme/issues/2429
+import Adapter from '@wojtekmaj/enzyme-adapter-react-17'
 import fetch from 'jest-fetch-mock'
 
 Enzyme.configure({adapter: new Adapter()})

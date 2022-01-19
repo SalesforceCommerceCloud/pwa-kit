@@ -124,6 +124,9 @@ export const REMOTE_REQUIRED_ENV_VARS = [
  * development Express app listens.
  * @param {String} [options.protocol='https'] - the protocol on which the development
  * Express app listens.
+ * @param {Boolean} [options.proxyKeepAliveAgent] - This boolean value indicates
+ * whether or not we are using a keep alive agent for proxy connections. Defaults
+ * to 'true'. NOTE: This keep alive agent will only be used on remote.
  * @param {String} options.sslFilePath - the absolute path to a PEM format
  * certificate file to be used by the local development server. This should
  * contain both the certificate and the private key.
@@ -149,6 +152,9 @@ export const createApp = (options) => {
 
         // The protocol that the local dev server listens on
         protocol: 'https',
+
+        // Whether or not to use a keep alive agent for proxy connections.
+        proxyKeepAliveAgent: true,
 
         // Quiet flag (suppresses output if true)
         quiet: false,
@@ -270,7 +276,7 @@ export const createApp = (options) => {
         app.all('/mobify/proxy/*', (_, res) => {
             return res.status(501).json({
                 message:
-                    'Environment proxies are not set: https://sfdc.chttps://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/proxying-requests.html'
+                    'Environment proxies are not set: https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/proxying-requests.html'
             })
         })
     }
@@ -1682,11 +1688,10 @@ const applyPatches = once((options) => {
     // Patch the http.request/get and https.request/get
     // functions to allow us to intercept them (since
     // there are multiple ways to make requests in Node).
-    const getAppHost = () => options.appHostname
-    http.request = outgoingRequestHook(http.request, getAppHost)
-    http.get = outgoingRequestHook(http.get, getAppHost)
-    https.request = outgoingRequestHook(https.request, getAppHost)
-    https.get = outgoingRequestHook(https.get, getAppHost)
+    http.request = outgoingRequestHook(http.request, options)
+    http.get = outgoingRequestHook(http.get, options)
+    https.request = outgoingRequestHook(https.request, options)
+    https.get = outgoingRequestHook(https.get, options)
 
     // Patch the ExpressJS Response class's redirect function to suppress
     // the creation of a body (DESKTOP-485). Including the body may
