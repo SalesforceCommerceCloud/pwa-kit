@@ -59,6 +59,22 @@ app.use(
     })
 )
 
+
+
+import HTTPSProxyAgent from 'https-proxy-agent'
+
+const agent = new HttpsProxyAgent('http://ip-of-my-proxy');
+ 
+const shouldUseCorporateHTTPProxy = !isRemote()
+if (shouldUseCorporateHTTPProxy) {
+    app.all('/proxy/*', (req, res) => {
+        // Make HTTPS requets to SCAPI / OCAPI
+        // You _may_ be able to use the `http-proxy` package, passing in `agent` from above.
+        // https://github.com/http-party/node-http-proxy#options
+    })
+}
+
+
 // Handle the redirect from SLAS as to avoid error
 app.get('/callback?*', (req, res) => {
     res.send()

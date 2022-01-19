@@ -5,6 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 export const commerceAPIConfig = {
+    // If running locally, alter this pass to use your locally proxy.
     proxyPath: `/mobify/proxy/api`,
     parameters: {
         clientId: 'c9c45bfd-0ed3-4aa2-9971-40f88962b836',
