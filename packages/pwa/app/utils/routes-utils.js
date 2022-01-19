@@ -16,10 +16,14 @@ import {getConfig} from './utils'
 export const configureRoutes = (routes = [], {ignoredRoutes = []}) => {
     if (!routes.length) return []
 
+    // if process.env.EXTERNAL_DOMAIN_NAME does not exist, it means you are on localhost
+    const currentHost = process.env.EXTERNAL_DOMAIN_NAME
+        ? process.env.EXTERNAL_DOMAIN_NAME
+        : 'localhost'
     const hosts = getConfig('app.hosts')
 
-    // collect and flatten the result so we can have a list of site objects
-    const allSites = [].concat(...hosts.map((host) => host.sites))
+    // collect and flatten the result to get a list of site objects
+    const allSites = hosts.find((host) => host.domain === currentHost)?.sites
 
     // get a collection of all site-id and site alias from the config
     // remove duplicates

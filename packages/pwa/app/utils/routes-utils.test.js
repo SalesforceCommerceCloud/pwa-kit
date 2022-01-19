@@ -18,10 +18,22 @@ jest.mock('./utils', () => {
 })
 
 describe('configureRoutes', function() {
+    const env = process.env
+    beforeEach(() => {
+        jest.resetModules()
+        process.env = {...env}
+    })
+
+    afterEach(() => {
+        process.env = env
+    })
     test('should return all permutation of path including site and locales ', () => {
         getConfig.mockImplementation(() => mockConfig.app.hosts)
         const CompA = () => <div>This is component A</div>
         const CompC = () => <div>This is component C</div>
+
+        // mock current domain/host
+        process.env.EXTERNAL_DOMAIN_NAME = 'www.domain-1.com'
 
         const routes = [
             {
@@ -37,7 +49,7 @@ describe('configureRoutes', function() {
         ]
         const configuredRoutes = configureRoutes(routes, {ignoredRoutes: '/'})
         expect(configuredRoutes[configuredRoutes.length - 1].path).toEqual('/category/:categoryId')
-        expect(configuredRoutes.length).toEqual(85)
+        expect(configuredRoutes.length).toEqual(61)
         const paths = configuredRoutes.map((route) => route.path)
         expect(paths).toEqual(expectedPathsResult)
     })
@@ -54,8 +66,6 @@ const expectedPathsResult = [
     '/RefArch/en-HK/category/:categoryId',
     '/RefArch/en-GB/category/:categoryId',
     '/RefArch/uk/category/:categoryId',
-    '/RefArch/de-DE/category/:categoryId',
-    '/RefArch/de/category/:categoryId',
     '/us/en-US/category/:categoryId',
     '/us/en/category/:categoryId',
     '/us/fr-FR/category/:categoryId',
@@ -65,8 +75,6 @@ const expectedPathsResult = [
     '/us/en-HK/category/:categoryId',
     '/us/en-GB/category/:categoryId',
     '/us/uk/category/:categoryId',
-    '/us/de-DE/category/:categoryId',
-    '/us/de/category/:categoryId',
     '/eu/en-US/category/:categoryId',
     '/eu/en/category/:categoryId',
     '/eu/fr-FR/category/:categoryId',
@@ -76,8 +84,6 @@ const expectedPathsResult = [
     '/eu/en-HK/category/:categoryId',
     '/eu/en-GB/category/:categoryId',
     '/eu/uk/category/:categoryId',
-    '/eu/de-DE/category/:categoryId',
-    '/eu/de/category/:categoryId',
     '/RefArchGlobal/en-US/category/:categoryId',
     '/RefArchGlobal/en/category/:categoryId',
     '/RefArchGlobal/fr-FR/category/:categoryId',
@@ -87,8 +93,6 @@ const expectedPathsResult = [
     '/RefArchGlobal/en-HK/category/:categoryId',
     '/RefArchGlobal/en-GB/category/:categoryId',
     '/RefArchGlobal/uk/category/:categoryId',
-    '/RefArchGlobal/de-DE/category/:categoryId',
-    '/RefArchGlobal/de/category/:categoryId',
     '/global/en-US/category/:categoryId',
     '/global/en/category/:categoryId',
     '/global/fr-FR/category/:categoryId',
@@ -98,25 +102,11 @@ const expectedPathsResult = [
     '/global/en-HK/category/:categoryId',
     '/global/en-GB/category/:categoryId',
     '/global/uk/category/:categoryId',
-    '/global/de-DE/category/:categoryId',
-    '/global/de/category/:categoryId',
-    '/site-de/en-US/category/:categoryId',
-    '/site-de/en/category/:categoryId',
-    '/site-de/fr-FR/category/:categoryId',
-    '/site-de/fr/category/:categoryId',
-    '/site-de/it-IT/category/:categoryId',
-    '/site-de/it/category/:categoryId',
-    '/site-de/en-HK/category/:categoryId',
-    '/site-de/en-GB/category/:categoryId',
-    '/site-de/uk/category/:categoryId',
-    '/site-de/de-DE/category/:categoryId',
-    '/site-de/de/category/:categoryId',
     '/RefArch/category/:categoryId',
     '/us/category/:categoryId',
     '/eu/category/:categoryId',
     '/RefArchGlobal/category/:categoryId',
     '/global/category/:categoryId',
-    '/site-de/category/:categoryId',
     '/en-US/category/:categoryId',
     '/en/category/:categoryId',
     '/fr-FR/category/:categoryId',
@@ -126,8 +116,6 @@ const expectedPathsResult = [
     '/en-HK/category/:categoryId',
     '/en-GB/category/:categoryId',
     '/uk/category/:categoryId',
-    '/de-DE/category/:categoryId',
-    '/de/category/:categoryId',
     '/category/:categoryId'
 ]
 const mockConfig = {
