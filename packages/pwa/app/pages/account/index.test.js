@@ -21,7 +21,7 @@ import {
 import useCustomer from '../../commerce-api/hooks/useCustomer'
 import Account from './index'
 import {getUrlConfig} from '../../utils/utils'
-import {DEFAULT_LOCALE} from '../../constants'
+import {DEFAULT_LOCALE, urlPartPositions} from '../../constants'
 
 jest.mock('../../commerce-api/utils', () => {
     const originalModule = jest.requireActual('../../commerce-api/utils')
@@ -31,13 +31,8 @@ jest.mock('../../commerce-api/utils', () => {
     }
 })
 
-jest.mock('../../utils/utils', () => {
-    const original = jest.requireActual('../../utils/utils')
-    return {
-        ...original,
-        getUrlConfig: jest.fn()
-    }
-})
+let routePath = ''
+const {locale: localeType} = getUrlConfig()
 
 const MockedComponent = () => {
     const customer = useCustomer()
@@ -50,7 +45,7 @@ const MockedComponent = () => {
 
     return (
         <Switch>
-            <Route path="/en-GB/account" render={(props) => <Account {...props} />} />
+            <Route path={routePath} render={(props) => <Account {...props} />} />
         </Switch>
     )
 }
@@ -99,13 +94,16 @@ const server = setupServer(
 beforeEach(() => {
     jest.resetModules()
     server.listen({onUnhandledRequest: 'error'})
-    getUrlConfig.mockImplementation(() => ({
-        locale: 'path'
-    }))
+
+    if (localeType === urlPartPositions.PATH) {
+        routePath = `/${DEFAULT_LOCALE}/account`
+    } else {
+        routePath = '/account'
+    }
 
     // Since we're testing some navigation logic, we are using a simple Router
     // around our component. We need to initialize the default route/path here.
-    window.history.pushState({}, 'Account', '/en-GB/account')
+    window.history.pushState({}, 'Account', routePath)
 })
 afterEach(() => {
     localStorage.clear()
@@ -120,7 +118,11 @@ test('Redirects to login page if the customer is not logged in', async () => {
         })
     )
     renderWithProviders(<MockedComponent />)
-    await waitFor(() => expect(window.location.pathname).toEqual(`/${DEFAULT_LOCALE}/login`))
+    await waitFor(() =>
+        expect(window.location.pathname).toEqual(
+            `${localeType === urlPartPositions.PATH ? `/${DEFAULT_LOCALE}` : ''}/login`
+        )
+    )
 })
 
 test('Provides navigation for subpages', async () => {
@@ -130,15 +132,21 @@ test('Provides navigation for subpages', async () => {
     const nav = within(screen.getByTestId('account-detail-nav'))
     user.click(nav.getByText('Addresses'))
     await waitFor(() =>
-        expect(window.location.pathname).toEqual(`/${DEFAULT_LOCALE}/account/addresses`)
+        expect(window.location.pathname).toEqual(
+            `${localeType === urlPartPositions.PATH ? `/${DEFAULT_LOCALE}` : ''}/account/addresses`
+        )
     )
     user.click(nav.getByText('Order History'))
     await waitFor(() =>
-        expect(window.location.pathname).toEqual(`/${DEFAULT_LOCALE}/account/orders`)
+        expect(window.location.pathname).toEqual(
+            `${localeType === urlPartPositions.PATH ? `/${DEFAULT_LOCALE}` : ''}/account/orders`
+        )
     )
     user.click(nav.getByText('Payment Methods'))
     await waitFor(() =>
-        expect(window.location.pathname).toEqual(`/${DEFAULT_LOCALE}/account/payments`)
+        expect(window.location.pathname).toEqual(
+            `${localeType === urlPartPositions.PATH ? `/${DEFAULT_LOCALE}` : ''}/account/payments`
+        )
     )
 })
 
@@ -156,7 +164,9 @@ test('Allows customer to sign out', async () => {
     expect(await screen.findByTestId('account-detail-page')).toBeInTheDocument()
     user.click(screen.getAllByText(/Log Out/)[0])
     await waitFor(() => {
-        expect(window.location.pathname).toEqual(`/${DEFAULT_LOCALE}/login`)
+        expect(window.location.pathname).toEqual(
+            `${localeType === urlPartPositions.PATH ? `/${DEFAULT_LOCALE}` : ''}/login`
+        )
     })
 })
 
