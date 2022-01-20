@@ -4,6 +4,8 @@ import fetch from 'cross-fetch'
 import ApolloClient from 'apollo-boost'
 import gql from 'graphql-tag'
 
+const IS_REMOTE = typeof process !== 'undefined' 
+
 const Search = ({category, searchResults}) => {
     const [searchVal, setSearchVal] = useState('')
 
@@ -44,7 +46,7 @@ const Search = ({category, searchResults}) => {
       }
 
       {!searchResults && 
-        <div>Loading serach results...</div>
+        <div>Loading search results...</div>
       }
     </div>
 }
@@ -54,13 +56,17 @@ Search.shouldGetProps = ({location, previousLocation}) => {
 }
 
 Search.getProps = async ({location}) => {
-  
+
+    const uri = IS_REMOTE ? 
+      'https://b2c-graphql-server-production.mobify-storefront.com/graphql' : 
+      'http://localhost:4000/graphql'
+
     const params = new URLSearchParams(location.search)
     let q = params.get('q') || ''
 
     const client = new ApolloClient({
       shouldBatch: true,
-      uri: 'http://localhost:4000/graphql',
+      uri: uri,
       fetch: fetch
     })
 

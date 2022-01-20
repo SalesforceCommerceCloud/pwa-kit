@@ -10,6 +10,7 @@ const { graphqlHTTP } = require("express-graphql");
 const { buildSchema } = require("graphql");
 const cors = require("cors");
 const CommerceSdk = require("commerce-sdk");
+const awsServerlessExpress = require('aws-serverless-express')
 
 const { helpers, Product, Search } = CommerceSdk;
 const IS_LOCAL = process.env["AWS_LAMBDA_FUNCTION_NAME"] === undefined;
@@ -177,7 +178,7 @@ app.use(
 
 if (IS_LOCAL) {
   app.listen(PORT, () =>
-    console.log(`Running GraphQL server @ http://127.0.0.1:${PORT}`)
+    console.log(`Running GraphQL server @ http://localhost:${PORT}/graphql`)
   );
   exports.get = () => {};
 } else {

@@ -1,8 +1,8 @@
 import React from 'react'
 import {Link} from 'react-router-dom'
 import fetch from 'cross-fetch'
-import ApolloClient from 'apollo-boost'
-import gql from 'graphql-tag'
+
+const IS_REMOTE = typeof process !== 'undefined' 
 
 const Home = ({product}) => {
 
@@ -26,7 +26,11 @@ const Home = ({product}) => {
 }
 
 Home.getProps = async () => {
-    const {data} = await fetch('http://localhost:4000/graphql', {
+    const uri = IS_REMOTE ? 
+      'https://b2c-graphql-server-production.mobify-storefront.com/graphql' : 
+      'http://localhost:4000/graphql'
+
+    const {data} = await fetch(uri, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
