@@ -60,13 +60,13 @@ const baseConfig = (target) => {
                     errorDetails: true,
                     colors: true,
                     assets: false,
-                    excludeAssets: [/.*img\/.*/, /.*svg\/.*/, /.*json\/.*/, /.*static\/.*/],
+                    excludeAssets: [/.*img\/.*/, /.*svg\/.*/, /.*json\/.*/, /.*static\/.*/]
                 },
                 // Perf/quality trade-off - see https://webpack.js.org/configuration/devtool/#devtool
                 devtool: mode === production ? 'source-map' : 'eval',
                 output: {
                     publicPath: '',
-                    path: buildDir,
+                    path: buildDir
                 },
                 resolve: {
                     extensions: ['.ts', '.tsx', '.js', '.jsx', '.json'],
@@ -82,16 +82,16 @@ const baseConfig = (target) => {
                         'react-router-dom': findInProjectThenSDK('react-router-dom'),
                         'react-dom': findInProjectThenSDK('react-dom'),
                         'react-helmet': findInProjectThenSDK('react-helmet'),
-                        bluebird: findInProjectThenSDK('bluebird'),
+                        bluebird: findInProjectThenSDK('bluebird')
                     },
-                    ...(target === 'web' ? {fallback: {crypto: false}} : {}),
+                    ...(target === 'web' ? {fallback: {crypto: false}} : {})
                 },
 
                 plugins: [
                     new webpack.DefinePlugin({
                         DEBUG,
                         NODE_ENV: `'${process.env.NODE_ENV}'`,
-                        ['global.GENTLY']: false,
+                        ['global.GENTLY']: false
                     }),
 
                     analyzeBundle &&
@@ -99,14 +99,14 @@ const baseConfig = (target) => {
                             analyzerMode: 'static',
                             defaultSizes: 'gzip',
                             openAnalyzer: CI !== 'true',
-                            generateStatsFile: true,
+                            generateStatsFile: true
                         }),
                     mode === development && new webpack.NoEmitOnErrorsPlugin(),
 
                     createModuleReplacementPlugin(projectDir),
 
                     // Don't chunk if it's a node target – faster Lambda startup.
-                    target === 'node' && new webpack.optimize.LimitChunkCountPlugin({maxChunks: 1}),
+                    target === 'node' && new webpack.optimize.LimitChunkCountPlugin({maxChunks: 1})
                 ].filter((x) => !!x),
 
                 module: {
@@ -119,28 +119,28 @@ const baseConfig = (target) => {
                                     loader: findInProjectThenSDK('babel-loader'),
                                     options: {
                                         rootMode: 'upward',
-                                        cacheDirectory: true,
-                                    },
-                                },
-                            ],
+                                        cacheDirectory: true
+                                    }
+                                }
+                            ]
                         },
                         target === 'node' && {
                             test: /\.svg$/,
-                            loader: findInProjectThenSDK('svg-sprite-loader'),
+                            loader: findInProjectThenSDK('svg-sprite-loader')
                         },
                         target === 'web' && {
                             test: /\.svg$/,
-                            loader: findInProjectThenSDK('ignore-loader'),
+                            loader: findInProjectThenSDK('ignore-loader')
                         },
                         {
                             test: /\.html$/,
                             exclude: /node_modules/,
                             use: {
-                                loader: findInProjectThenSDK('html-loader'),
-                            },
-                        },
-                    ].filter(Boolean),
-                },
+                                loader: findInProjectThenSDK('html-loader')
+                            }
+                        }
+                    ].filter(Boolean)
+                }
             }
         }
 
@@ -162,7 +162,7 @@ const withChunking = (config) => {
         output: {
             ...config.output,
             filename: '[name].js',
-            chunkFilename: '[name].js', // Support chunking with @loadable/components
+            chunkFilename: '[name].js' // Support chunking with @loadable/components
         },
         optimization: {
             minimize: false,
@@ -173,15 +173,15 @@ const withChunking = (config) => {
                         // vendor.js, if we're chunking.
                         test: /node_modules/,
                         name: 'vendor',
-                        chunks: 'all',
-                    },
-                },
-            },
+                        chunks: 'all'
+                    }
+                }
+            }
         },
         performance: {
             maxEntrypointSize: 905000,
-            maxAssetSize: 825000,
-        },
+            maxAssetSize: 825000
+        }
     }
 }
 
@@ -193,9 +193,13 @@ const client = baseConfig('web')
             // Must be named "client". See - https://www.npmjs.com/package/webpack-hot-server-middleware#usage
             name: 'client',
             entry: {
-                main: './app/main',
+                main: './app/main'
             },
-            plugins: [...config.plugins, new LoadablePlugin({writeToDisk: true}), new PwaKitConfigPlugin()],
+            plugins: [
+                ...config.plugins,
+                new LoadablePlugin({writeToDisk: true}),
+                new PwaKitConfigPlugin()
+            ]
         }
     })
     .build()
@@ -213,8 +217,8 @@ const clientOptional = baseConfig('web')
                 ...optional('loader', './app/loader.js'),
                 ...optional('worker', './worker/main.js'),
                 ...optional('core-polyfill', resolve(projectDir, 'node_modules', 'core-js')),
-                ...optional('fetch-polyfill', resolve(projectDir, 'node_modules', 'whatwg-fetch')),
-            },
+                ...optional('fetch-polyfill', resolve(projectDir, 'node_modules', 'whatwg-fetch'))
+            }
         }
     })
     .build()
@@ -229,7 +233,7 @@ const renderer = baseConfig('node')
             output: {
                 path: buildDir,
                 filename: 'server-renderer.js',
-                libraryTarget: 'commonjs2',
+                libraryTarget: 'commonjs2'
             },
             plugins: [
                 ...config.plugins,
@@ -238,14 +242,14 @@ const renderer = baseConfig('node')
                 new WebpackNotifierPlugin({
                     title: `Mobify Project: ${pkg.name}`,
                     excludeWarnings: true,
-                    skipFirstNotification: true,
+                    skipFirstNotification: true
                 }),
 
                 // Must only appear on one config – this one is the only mandatory one.
                 new CopyPlugin({
-                    patterns: [{from: 'app/static/', to: 'static/'}],
-                }),
-            ],
+                    patterns: [{from: 'app/static/', to: 'static/'}]
+                })
+            ]
         }
     })
     .build()
@@ -263,8 +267,8 @@ const ssr = (() => {
                     output: {
                         path: buildDir,
                         filename: 'ssr.js',
-                        libraryTarget: 'commonjs2',
-                    },
+                        libraryTarget: 'commonjs2'
+                    }
                 }
             })
             .build()
@@ -282,8 +286,8 @@ const requestProcessor = baseConfig('node')
             output: {
                 path: buildDir,
                 filename: 'request-processor.js',
-                libraryTarget: 'commonjs2',
-            },
+                libraryTarget: 'commonjs2'
+            }
         }
     })
     .build()

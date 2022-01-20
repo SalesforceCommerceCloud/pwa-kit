@@ -23,24 +23,24 @@ export const createModuleReplacementPlugin = (projectDir) => {
     const overridables = [
         {
             path: /pwa-kit-react-sdk(\/dist)?\/ssr\/universal\/components\/_app-config$/,
-            newPath: resolve(projectDir, 'app', 'components', '_app-config', 'index'),
+            newPath: resolve(projectDir, 'app', 'components', '_app-config', 'index')
         },
         {
             path: /pwa-kit-react-sdk(\/dist)?\/ssr\/universal\/components\/_document$/,
-            newPath: resolve(projectDir, 'app', 'components', '_document', 'index'),
+            newPath: resolve(projectDir, 'app', 'components', '_document', 'index')
         },
         {
             path: /pwa-kit-react-sdk(\/dist)?\/ssr\/universal\/components\/_app$/,
-            newPath: resolve(projectDir, 'app', 'components', '_app', 'index'),
+            newPath: resolve(projectDir, 'app', 'components', '_app', 'index')
         },
         {
             path: /pwa-kit-react-sdk(\/dist)?\/ssr\/universal\/components\/_error$/,
-            newPath: resolve(projectDir, 'app', 'components', '_error', 'index'),
+            newPath: resolve(projectDir, 'app', 'components', '_error', 'index')
         },
         {
             path: /pwa-kit-react-sdk(\/dist)?\/ssr\/universal\/routes$/,
-            newPath: resolve(projectDir, 'app', 'routes'),
-        },
+            newPath: resolve(projectDir, 'app', 'routes')
+        }
     ]
     const extensions = ['.ts', '.tsx', '.js', '.jsx']
 
@@ -61,7 +61,7 @@ export const createModuleReplacementPlugin = (projectDir) => {
 
         const sdkPaths = [
             path.join('packages', 'pwa-kit-react-sdk'),
-            path.join('node_modules', 'pwa-kit-react-sdk'),
+            path.join('node_modules', 'pwa-kit-react-sdk')
         ]
 
         const requestedFromSDK = sdkPaths.some((p) => resource.context.includes(p))

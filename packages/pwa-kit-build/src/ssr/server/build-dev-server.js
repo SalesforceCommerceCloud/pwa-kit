@@ -38,6 +38,7 @@ export const DevServerFactory = {
         return process.env.DEV_SERVER_PROTOCOL || options.protocol
     },
 
+    // eslint-disable-next-line no-unused-vars
     getDefaultCacheControl(options) {
         return NO_CACHE
     },
@@ -50,7 +51,7 @@ export const DevServerFactory = {
         app.use(
             compression({
                 level: 9,
-                filter: shouldCompress,
+                filter: shouldCompress
             })
         )
     },
@@ -99,7 +100,7 @@ export const DevServerFactory = {
             express.static(path.resolve(process.cwd(), 'src'), {
                 dotFiles: 'deny',
                 setHeaders: setLocalAssetHeaders,
-                fallthrough: true,
+                fallthrough: true
             })
         )
 
@@ -198,7 +199,7 @@ export const DevServerFactory = {
         } else {
             return null
         }
-    },
+    }
 }
 
 /**

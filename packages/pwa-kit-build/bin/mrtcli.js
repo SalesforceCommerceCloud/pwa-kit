@@ -1,4 +1,10 @@
 #!/usr/bin/env node
+/*
+ * Copyright (c) 2021, salesforce.com, inc.
+ * All rights reserved.
+ * SPDX-License-Identifier: BSD-3-Clause
+ * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
+ */
 const p = require('path')
 const fs = require('fs')
 const program = require('commander')
@@ -74,8 +80,8 @@ const main = () => {
                 sh.exec(`${webpack} --config ${webpackConf}`, {
                     env: {
                         NODE_ENV: 'production',
-                        ...process.env,
-                    },
+                        ...process.env
+                    }
                 })
             } finally {
                 sh.config.silent = original
@@ -122,7 +128,7 @@ const main = () => {
                 ssr_parameters: mobify.ssrParameters,
                 ssr_only: mobify.ssrOnly,
                 ssr_shared: mobify.ssrShared,
-                set_ssr_values: true,
+                set_ssr_values: true
             }
 
             if (
