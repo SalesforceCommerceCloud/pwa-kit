@@ -13,7 +13,8 @@ import {getDefaultSite} from './site-utils'
 
 /**
  * Rebuild the path with locale/site value to the path as url path or url query param
- * based on url config
+ * based on url config.
+ * If the showDefault flag is set to false, the default value won't show up in the url
  * @param {string} url - based url of the output url
  * @param {object} configValues - object that contains values of url param config
  * @return {string} - an output url
@@ -21,22 +22,22 @@ import {getDefaultSite} from './site-utils'
  * @example
  * //pwa-kit.config.json
  * url {
- *    locale: "query_param"
+ *    locale: {
+ *        position: 'query_param',
+ *        showDefault: true
+ *    },
+ *    site: {
+ *        position: 'path',
+ *        showDefault: false
+ *    }
  * }
- * buildPathWithUrlConfig('/women/dresses', {locale: 'en-GB'})
  *
- * Returns
- *  /women/dresses?locale=en-GB
- *
- *  @example
- * //pwa-kit.config.json
- * url {
- *    locale: "path"
- * }
- * buildPathWithUrlConfig('/women/dresses', {locale: 'en-GB'})
- *
- * Returns
- *  /en-GB/women/dresses
+ * // default locale: en-GB
+ * // default site RefArch, alias us
+ * buildPathWithUrlConfig('/women/dresses', {locale: 'en-GB', site: 'us', defaultLocale: 'en-GB'})
+ * => /women/dresses?locale=en-GB
+ * buildPathWithUrlConfig('/women/dresses', {locale: 'en-GB', site: 'global', defaultLocale: 'en-GB'})
+ * => /global/women/dresses?locale=en-GB
  *
  */
 export const buildPathWithUrlConfig = (url, configValues = {}) => {
@@ -45,10 +46,12 @@ export const buildPathWithUrlConfig = (url, configValues = {}) => {
     if (!Object.values(configValues).length) return url
     const queryParams = {}
     let basePathSegments = []
-    const {defaultLocale} = configValues
     const defaultSite = getDefaultSite()
     // gather all default values for site and locale, id and aliases
-    const defaultValues = [defaultSite.id, defaultSite.alias, defaultLocale]
+    // filter out falsy value
+    const defaultValues = [defaultSite.id, defaultSite.alias, configValues.defaultLocale].filter(
+        Boolean
+    )
     const options = ['site', 'locale']
 
     options.forEach((option) => {
@@ -82,8 +85,7 @@ export const buildPathWithUrlConfig = (url, configValues = {}) => {
 
 /**
  * a function to return url config from pwa config file
- * If a customise funtion is passed, it will use that function.
- * Otherwise, it will look for the url config based on the current host
+ * First, it will look for the url config based on the current host
  * If none is found, it will return the default url config at the top level of the config file
  */
 export const getUrlConfig = () => {
@@ -96,7 +98,7 @@ export const getUrlConfig = () => {
 }
 
 /**
- * Get the url config base on hostname
+ * Get the url config from pwa-kit.config.json based on a given hostname
  * @param {string} hostname
  * @returns {object|undefined} - url config from the input host
  */
