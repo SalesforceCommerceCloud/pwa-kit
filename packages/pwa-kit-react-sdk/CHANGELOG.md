@@ -1,4 +1,6 @@
 ## v1.4.0-dev (Jan 06, 2022)
+
+-   Add `proxyKeepAliveAgent` ssr-server option. [#306](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/306)
 -   Add React 17 support [#278](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/278)
 -   Add support for npm 7 and npm 8 [#302](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/302)
 
