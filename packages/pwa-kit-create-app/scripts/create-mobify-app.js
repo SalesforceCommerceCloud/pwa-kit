@@ -28,15 +28,15 @@
  * the interactive prompts on the CLI. To support these cases, we have
  * a few presets that are "private" and only usable through the GENERATOR_PRESET
  * env var – this keeps them out of the --help docs.
- * 
- * If both the GENERATOR_PRESET env var and --preset arguments are passed, the 
+ *
+ * If both the GENERATOR_PRESET env var and --preset arguments are passed, the
  * option set in GENERATOR_PRESET is used.
  */
 
 const p = require('path')
 const fs = require('fs')
 const os = require('os')
-const {Command, Option} = require('commander')
+const {Command} = require('commander')
 const inquirer = require('inquirer')
 const {URL} = require('url')
 const deepmerge = require('deepmerge')
@@ -394,13 +394,9 @@ const main = (opts) => {
         default:
             console.error(
                 `The preset "${selectedOption}" is not valid. Valid presets are: ${
-                    Boolean(process.env.GENERATOR_PRESET) ? 
-                        PRESETS.map(
-                            (x) => `"${x}"`
-                        ).join(' ') :
-                        PUBLIC_PRESETS.map(
-                            (x) => `"${x}"`
-                        ).join(' ')
+                    process.env.GENERATOR_PRESET
+                        ? PRESETS.map((x) => `"${x}"`).join(' ')
+                        : PUBLIC_PRESETS.map((x) => `"${x}"`).join(' ')
                 }.`
             )
             process.exit(1)
@@ -430,7 +426,9 @@ Examples:
             '--outputDir <path>',
             `Path to the output directory for the new project`,
             DEFAULT_OUTPUT_DIR
-        ).option('--preset <name>',
+        )
+        .option(
+            '--preset <name>',
             `The name of a project preset to use (choices: "retail-react-app" "retail-react-app-demo")`,
             RETAIL_REACT_APP
         )
