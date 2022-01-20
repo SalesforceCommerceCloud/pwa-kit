@@ -9,11 +9,11 @@
 /**
  * This is a generator for PWA Kit projects that run on the Managed Runtime.
  *
- * The output of this script is a copy of the pwa package with the following changes:
+ * The output of this script is a copy of a project template with the following changes:
  *
  * 1) We update any monorepo-local dependencies to be installed through NPM.
  *
- * 2) We rename the PWA and configure the generated project based on answers to
+ * 2) We rename the template and configure the generated project based on answers to
  *    questions that we ask the user on the CLI.
  *
  * ## Basic usage
@@ -24,15 +24,10 @@
  *
  * ## Advanced usage and integration testing:
  *
- * To skip prompts on CircleCI, the generator supports an environment variable,
- * called `GENERATOR_PRESET`. To run the generator with hard-coded answers to
- * the questions that we normally ask the user, set `GENERATOR_PRESET` to one
- * of the following values:
- *
- *   1. "test-project" - Settings for a test instance.
- *   2. "demo-project" - Settings for a demo instance.
- *   3. "hello-world" - Settings for a hello world project.
- *   4. "hello-world-test-project" - Settings for a hello world test project.
+ * For testing on CI we need to be able to generate projects without running
+ * the interactive prompts on the CLI. To support these cases, we have
+ * a few presets that are "private" and only usable through the GENERATOR_PRESET
+ * env var – this keeps them out of the --help docs.
  */
 
 const p = require('path')
@@ -55,11 +50,12 @@ const GENERATED_PROJECT_VERSION = '0.0.1'
 const HELLO_WORLD_TEST_PROJECT = 'hello-world-test-project'
 const HELLO_WORLD = 'hello-world'
 const TEST_PROJECT = 'test-project' // TODO: This will be replaced with the `isomorphic-client` config.
-const DEMO_PROJECT = 'demo-project'
-const PROMPT = 'prompt'
+const RETAIL_REACT_APP_DEMO = 'retail-react-app-demo'
+const RETAIL_REACT_APP = 'retail-react-app'
 
-const PRESETS = [TEST_PROJECT, PROMPT, HELLO_WORLD, HELLO_WORLD_TEST_PROJECT, DEMO_PROJECT]
-const PUBLIC_PRESETS = [PROMPT, DEMO_PROJECT]
+const PRIVATE_PRESETS = [TEST_PROJECT, HELLO_WORLD, HELLO_WORLD_TEST_PROJECT]
+const PUBLIC_PRESETS = [RETAIL_REACT_APP, RETAIL_REACT_APP_DEMO]
+const PRESETS = PRIVATE_PRESETS.concat(PUBLIC_PRESETS)
 
 const DEFAULT_OUTPUT_DIR = p.join(process.cwd(), 'pwa-kit-starter-project')
 
@@ -383,9 +379,9 @@ const main = (opts) => {
             return helloWorldPrompts(opts).then((answers) => generateHelloWorld(answers, opts))
         case TEST_PROJECT:
             return runGenerator(testProjectAnswers(), opts)
-        case DEMO_PROJECT:
+        case RETAIL_REACT_APP_DEMO:
             return runGenerator(demoProjectAnswers(), opts)
-        case PROMPT:
+        case RETAIL_REACT_APP:
             console.log(
                 'For details on configuration values, see https://developer.salesforce.com/docs/commerce/commerce-api/guide/commerce-api-configuration-values\n'
             )
@@ -406,13 +402,13 @@ if (require.main === module) {
     
 Examples:
 
-  ${program.name()} --preset "${PROMPT}"
+  ${program.name()} --preset "${RETAIL_REACT_APP}"
     Generate a project using custom settings by answering questions about a
     B2C Commerce instance.
     
     Use this preset to connect to an existing instance, such as a sandbox.
 
-  ${program.name()} --preset "${DEMO_PROJECT}"
+  ${program.name()} --preset "${RETAIL_REACT_APP_DEMO}"
     Generate a project using the settings for a special B2C Commerce
     instance that is used for demo purposes. No questions are asked.
     
@@ -425,7 +421,7 @@ Examples:
     )
     program.addOption(
         new Option('--preset <name>', `The name of a project preset to use`)
-            .default(PROMPT)
+            .default(RETAIL_REACT_APP)
             .choices(Boolean(process.env.GENERATOR_PRESET) ? PRESETS : PUBLIC_PRESETS)
             .env('GENERATOR_PRESET')
     )
