@@ -12,8 +12,6 @@ const fs = require('fs')
 const uploadBundle = require('../scripts/upload.js')
 const Utils = require('../scripts/utils.js')
 
-
-
 uploadBundle(options).catch((err) => {
     console.error(err.message || err)
 })

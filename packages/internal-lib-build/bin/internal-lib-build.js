@@ -15,6 +15,8 @@ const pkgRoot = p.join(__dirname, '..')
 
 const binDir = p.join(require.resolve('@babel/cli'), '..', '..', '..', '.bin')
 
+const prettier = p.join(binDir, 'prettier')
+
 const babel = p.join(binDir, 'babel')
 const babelConfig = p.resolve(p.join(__dirname, 'babel.config.js'))
 
@@ -40,6 +42,12 @@ const main = () => {
         .option('--fix', 'Try and fix errors (default: false)')
         .action((path, {fix}) => {
             sh.exec(`${eslint} --config ${eslintConfig} --resolve-plugins-relative-to ${pkgRoot}${fix ? ' --fix' : ''} ${path}`)
+        })
+
+    program.command('format')
+        .argument('<path>', 'path or glob to lint')
+        .action((path) => {
+            sh.exec(`${prettier} --write ${path}`)
         })
 
     program.parse(process.argv)
