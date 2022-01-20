@@ -11,8 +11,16 @@ const sh = require('shelljs')
 
 sh.set('-e')
 
-const babel = p.join(require.resolve('@babel/cli'), '..', '..', '..', '.bin', 'babel')
+const pkgRoot = p.join(__dirname, '..')
+
+const binDir = p.join(require.resolve('@babel/cli'), '..', '..', '..', '.bin')
+
+const babel = p.join(binDir, 'babel')
 const babelConfig = p.resolve(p.join(__dirname, 'babel.config.js'))
+
+const eslint = p.join(binDir, 'eslint')
+const eslintConfig = p.resolve(p.join(__dirname, '.eslintrc.js'))
+
 const prepareDist = p.resolve(p.join(__dirname, 'prepare-dist.js'))
 
 const main = () => {
@@ -26,6 +34,12 @@ const main = () => {
         )
         sh.exec(prepareDist)
     })
+
+    program.command('eslint')
+        .option('--fix', 'Try and fix errors (default: false)')
+        .action(({fix}) => {
+            sh.exec(`${eslint} --config ${eslintConfig} --resolve-plugins-relative-to ${pkgRoot}${fix ? ' --fix' : ''} .`)
+        })
 
     program.parse(process.argv)
 }
