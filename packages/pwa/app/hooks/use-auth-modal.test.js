@@ -245,6 +245,5 @@ test('Allows customer to create an account', async () => {
     user.click(withinForm.getByText(/create account/i))
 
     // wait for redirecting to account page
-    expect(await screen.findByText(/customer@test.com/i, {}, {timeout: 30000})).toBeInTheDocument()
-    expect(await screen.queryAllByText(/Log out/i, {}, {timeout: 30000}).length).toEqual(2)
+    expect(await screen.findByText(/welcome tester/i, {}, {timeout: 30000})).toBeInTheDocument()
 })
