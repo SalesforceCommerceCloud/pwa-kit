@@ -28,6 +28,9 @@
  * the interactive prompts on the CLI. To support these cases, we have
  * a few presets that are "private" and only usable through the GENERATOR_PRESET
  * env var – this keeps them out of the --help docs.
+ * 
+ * If both the GENERATOR_PRESET env var and --preset arguments are passed, the 
+ * option set in GENERATOR_PRESET is used.
  */
 
 const p = require('path')
@@ -372,7 +375,9 @@ const main = (opts) => {
         process.exit(1)
     }
 
-    switch (opts.preset) {
+    const selectedOption = process.env.GENERATOR_PRESET || opts.preset
+
+    switch (selectedOption) {
         case HELLO_WORLD_TEST_PROJECT:
             return generateHelloWorld({projectId: 'hello-world'}, opts)
         case HELLO_WORLD:
@@ -388,9 +393,15 @@ const main = (opts) => {
             return prompts(opts).then((answers) => runGenerator(answers, opts))
         default:
             console.error(
-                `The preset "${opts.preset}" is not valid. Valid presets are: ${PRESETS.map(
-                    (x) => `"${x}"`
-                ).join(' ')}.`
+                `The preset "${selectedOption}" is not valid. Valid presets are: ${
+                    Boolean(process.env.GENERATOR_PRESET) ? 
+                        PRESETS.map(
+                            (x) => `"${x}"`
+                        ).join(' ') :
+                        PUBLIC_PRESETS.map(
+                            (x) => `"${x}"`
+                        ).join(' ')
+                }.`
             )
             process.exit(1)
     }
@@ -414,17 +425,16 @@ Examples:
     
     Use this preset to try out PWA Kit.
   `)
-    program.option(
-        '--outputDir <path>',
-        `Path to the output directory for the new project`,
-        DEFAULT_OUTPUT_DIR
-    )
-    program.addOption(
-        new Option('--preset <name>', `The name of a project preset to use`)
-            .default(RETAIL_REACT_APP)
-            .choices(Boolean(process.env.GENERATOR_PRESET) ? PRESETS : PUBLIC_PRESETS)
-            .env('GENERATOR_PRESET')
-    )
+    program
+        .option(
+            '--outputDir <path>',
+            `Path to the output directory for the new project`,
+            DEFAULT_OUTPUT_DIR
+        ).option('--preset <name>',
+            `The name of a project preset to use (choices: "retail-react-app" "retail-react-app-demo")`,
+            RETAIL_REACT_APP
+        )
+
     program.parse(process.argv)
 
     return Promise.resolve()
