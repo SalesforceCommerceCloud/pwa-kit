@@ -2,7 +2,7 @@ import React from 'react'
 import {Link} from 'react-router-dom'
 import fetch from 'cross-fetch'
 
-const IS_REMOTE = typeof process !== 'undefined' 
+const IS_REMOTE = typeof process !== 'undefined'
 
 const Home = ({product}) => {
 

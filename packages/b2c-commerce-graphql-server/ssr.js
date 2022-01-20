@@ -11,7 +11,7 @@ const { buildSchema } = require("graphql");
 const cors = require("cors");
 const CommerceSdk = require("commerce-sdk");
 const awsServerlessExpress = require('aws-serverless-express')
-
+const { makeExecutableSchema } = require('graphql-tools')
 const { helpers, Product, Search } = CommerceSdk;
 const IS_LOCAL = process.env["AWS_LAMBDA_FUNCTION_NAME"] === undefined;
 const PORT = process.env.PORT || 4000;
@@ -37,7 +37,7 @@ const withGuestAuth = async (fn, config) => {
 };
 
 // Construct a schema, using GraphQL schema language
-var schema = buildSchema(`
+var typeDefs = `
   input Header {
     key: String,
     value: String
@@ -102,9 +102,20 @@ var schema = buildSchema(`
     thumbnail: String
   }
 
+  type Variant {
+    productId: String
+  }
+
   type Product {
     id: String,
-    name: String
+    name: String,
+    variants: [Variant]
+  }
+
+  type ProductResult {
+    limit: Int,
+    data: [Product],
+    total: Int
   }
 
   type ProductSearchHit {
@@ -115,6 +126,7 @@ var schema = buildSchema(`
   type ProductSearchResult {
     limit: Int,
     hits: [ProductSearchHit],
+    products: [Product],
     query: String,
     selectedSortingOption: String,
     offset: Int,
@@ -124,46 +136,68 @@ var schema = buildSchema(`
   type Query {
     getCategory(options: CategoryQuery): Category,
     getProduct(options: ProductQuery): Product,
-    productSearch(options: SearchQuery): ProductSearchResult
+    productSearch(options: SearchQuery, includeProducts: Boolean): ProductSearchResult
   }
-`);
+`
 
-// The root provides a resolver function for each API endpoint
-const root = {
-  getProduct: async ({ options }) => {
-    const product = await withGuestAuth(async () => {
-      // Create a new ShopperSearch API client
-      const productClient = new Product.ShopperProducts(config);
+const resolvers = {
+  Query: {
+    getProduct: async (_, { options }) => {
+      const product = await withGuestAuth(async () => {
+        // Create a new ShopperSearch API client
+        const productClient = new Product.ShopperProducts(config)
+  
+        return await productClient.getProduct(options)
+      }, config)
+  
+      return product
+    },
+    getCategory: async (_, { options }) => {
+      const category = await withGuestAuth(async () => {
+        // Create a new ShopperSearch API client
+        const productClient = new Product.ShopperProducts(config)
 
-      // Get a known product
-      return await productClient.getProduct(options);
-    }, config);
+        return await productClient.getCategory(options)
+      }, config)
 
-    return product;
-  },
-  getCategory: async ({ options }) => {
-    const category = await withGuestAuth(async () => {
-      // Create a new ShopperSearch API client
-      const productClient = new Product.ShopperProducts(config);
+      return category
+    },
+    productSearch: async (_, { options, includeProducts}) => {
+      const productSearchResult = await withGuestAuth(async () => {
+        // Create a new ShopperSearch API client
+        const searchClient = new Search.ShopperSearch(config)
 
-      // Get a known product
-      return await productClient.getCategory(options);
-    }, config);
+        let searchResult = await searchClient.productSearch(options)
+        console.log('includeProducts: ', includeProducts)
+        if (includeProducts) {
+          const productClient = new Product.ShopperProducts(config)
 
-    return category;
-  },
-  productSearch: async ({ options }) => {
-    const productSearchResult = await withGuestAuth(async () => {
-      // Create a new ShopperSearch API client
-      const searchClient = new Search.ShopperSearch(config);
+          const productIds = searchResult.hits.map(({productId}) => productId)
+          console.log('productIds: ', productIds.length)
+          const productResult = await productClient.getProducts({
+            parameters: {
+              ids: productIds.join(',')
+            }
+          })
+          
+          searchResult = {
+            ...searchResult,
+            products: productResult.data
+          }
+        }
 
-      // Get a known product
-      return await searchClient.productSearch(options);
-    }, config);
+        return searchResult
+      }, config)
 
-    return productSearchResult;
+      return productSearchResult
+    }
   }
-};
+}
+
+const schema = makeExecutableSchema({
+  typeDefs,
+  resolvers
+})
 
 const app = express();
 app.use(cors());
@@ -171,7 +205,7 @@ app.use(
   "/graphql",
   graphqlHTTP({
     schema: schema,
-    rootValue: root,
+    // rootValue: root,
     graphiql: true
   })
 );

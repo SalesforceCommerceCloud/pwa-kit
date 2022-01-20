@@ -4,12 +4,13 @@ import fetch from 'cross-fetch'
 import ApolloClient from 'apollo-boost'
 import gql from 'graphql-tag'
 
-const IS_REMOTE = typeof process !== 'undefined' 
+const IS_REMOTE = typeof process !== 'undefined'
 
 const Search = ({category, searchResults}) => {
     const [searchVal, setSearchVal] = useState('')
     const [categoryVal, setCategoryVal] = useState('root')
-
+    const [fullProductInfo, setFullProductInfo] = useState(false)
+    
     return <div>
       Navigation: <Link to="/">Home</Link>
 
@@ -31,9 +32,11 @@ const Search = ({category, searchResults}) => {
       </select>
       
       <br />
+      Include Full Products: <input type="checkbox" value={fullProductInfo} onClick={(e) => {setFullProductInfo(e.target.checked)}}/>
+      <br />
 
       <Link 
-        to={`/search?q=${searchVal}&refine=${encodeURIComponent(`cgid=${categoryVal}`)}&cachebreaker=${Date.now()}`}
+        to={`/search?q=${searchVal}&refine=${encodeURIComponent(`cgid=${categoryVal}`)}&includeProducts=${fullProductInfo}&cachebreaker=${Date.now()}`}
       >
         <button type="button">
           GO!
@@ -47,8 +50,8 @@ const Search = ({category, searchResults}) => {
         <div>
           Found {searchResults.total} Results Showing {searchResults.hits.length}:
           <ul>
-            {searchResults.hits.map(({productId, productName}) => {
-              return <li key={productId}>{productName}</li>
+            {searchResults.hits.map(({productId, productName}, index) => {
+              return <li key={productId}>{productName} {fullProductInfo && searchResults?.products?.[index]?.variants && `has ${searchResults?.products?.[index]?.variants?.length || '0'} variants`}</li>
             })}
           </ul>
         </div> :
@@ -68,18 +71,20 @@ Search.shouldGetProps = ({location, previousLocation}) => {
 }
 
 Search.getProps = async ({location}) => {
-
+    
     const uri = IS_REMOTE ? 
       'https://b2c-graphql-server-production.mobify-storefront.com/graphql' : 
       'http://localhost:4000/graphql'
 
+      console.log('IS_REMOTE: ', IS_REMOTE)
     const params = new URLSearchParams(location.search)
     let q = params.get('q') || ''
+    let includeProducts = params.get('includeProducts') === 'true'
+    console.log('includeProducts:', includeProducts)
     let refine = params.get('refine') || 'cgid=root'
     let cgid = refine.split('=')[1]
     console.log('getProps', cgid)
     const client = new ApolloClient({
-      shouldBatch: true,
       uri: uri,
       fetch: fetch
     })
@@ -104,10 +109,16 @@ Search.getProps = async ({location}) => {
             name
           }
         }
-        productSearch(options: {parameters: {q: "${q}", refine: "cgid=${cgid}"}}) {
+        productSearch(options: {parameters: {limit: 10, q: "${q}", refine: "cgid=${cgid}"}}, includeProducts: ${includeProducts}) {
           hits {
             productId
             productName
+          },
+          products {
+            id,
+            variants {
+              productId
+            }
           }
           total
         }
