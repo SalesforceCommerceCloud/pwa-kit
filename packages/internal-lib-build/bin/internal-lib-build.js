@@ -37,14 +37,20 @@ const main = () => {
         sh.exec(prepareDist)
     })
 
-    program.command('lint')
+    program
+        .command('lint')
         .argument('<path>', 'path or glob to lint')
         .option('--fix', 'Try and fix errors (default: false)')
         .action((path, {fix}) => {
-            sh.exec(`${eslint} --config ${eslintConfig} --resolve-plugins-relative-to ${pkgRoot}${fix ? ' --fix' : ''} ${path}`)
+            sh.exec(
+                `${eslint} --config ${eslintConfig} --resolve-plugins-relative-to ${pkgRoot}${
+                    fix ? ' --fix' : ''
+                } ${path}`
+            )
         })
 
-    program.command('format')
+    program
+        .command('format')
         .argument('<path>', 'path or glob to lint')
         .action((path) => {
             sh.exec(`${prettier} --write ${path}`)
