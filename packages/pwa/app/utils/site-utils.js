@@ -6,6 +6,7 @@
  */
 
 import {getConfig, getParamsFromPath} from './utils'
+import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
 
 /**
  * This functions takes an url and returns a site object,
@@ -23,8 +24,9 @@ export const resolveSiteFromUrl = (url) => {
     const sites = getSitesByHost(hostname)
     let site
 
-    // Step 1: look for the site based on a hostname, if that host only contains one site, use it
-    // otherwise, we need to use a different way to determine the site
+    // Step 1: look for the site based on a hostname,
+    // if that host only contains one site, use it
+    // otherwise, we need to use another way to determine the site
     site = getSiteByHostname(hostname)
     if (site) {
         return site
@@ -52,6 +54,14 @@ export const getDefaultSiteIdByHost = (hostname) => {
     const hosts = getHosts()
     const host = hosts.find((host) => host.domain === hostname)
     return host?.defaultSite
+}
+
+export const getDefaultSite = () => {
+    const {hostname} = new URL(getAppOrigin())
+    const sites = getSitesByHost(hostname)
+    const defaultSiteId = getDefaultSiteIdByHost(hostname)
+
+    return sites.find((site) => site.id === defaultSiteId)
 }
 
 /**

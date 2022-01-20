@@ -7,7 +7,7 @@
 import {useCallback} from 'react'
 import {useHistory} from 'react-router'
 import {useIntl} from 'react-intl'
-import {buildPathWithUrlConfig} from '../utils/url'
+import {buildPathWithUrlConfig} from '../utils/url-config'
 import useSite from './use-site'
 
 /**
@@ -27,7 +27,11 @@ const useNavigation = () => {
          * @param  {...any} args - additional args passed to `.push` or `.replace`
          */
         (path, action = 'push', ...args) => {
-            const updatedHref = buildPathWithUrlConfig(path, {locale, site: site?.alias})
+            const updatedHref = buildPathWithUrlConfig(path, {
+                locale,
+                site: site.alias || site.id,
+                defaultLocale: site.l10n.defaultLocale
+            })
             history[action](path === '/' ? '/' : updatedHref, ...args)
         },
         [locale]

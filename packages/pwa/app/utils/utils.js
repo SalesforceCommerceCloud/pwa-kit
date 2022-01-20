@@ -8,7 +8,7 @@
 import pwaKitConfig from '../../pwa-kit.config.json'
 import {urlPartPositions} from '../constants'
 import {pathToUrl} from './url'
-import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
+import {getUrlConfig} from './url-config'
 /**
  * Call requestIdleCallback in supported browsers.
  *
@@ -177,32 +177,6 @@ export const getConfig = (path) => {
     return getObjectProperty(pwaKitConfig, path)
 }
 
-/**
- * a function to return url config from pwa config file
- * If a customise funtion is passed, it will use that function.
- * Otherwise, it will look for the url config based on the current host
- * If none is found, it will return the default url config at the top level of the config file
- */
-export const getUrlConfig = () => {
-    const {hostname} = new URL(getAppOrigin())
-    const urlConfig = getUrlConfigByHostname(hostname)
-    if (urlConfig) {
-        return urlConfig
-    }
-    return getConfig('app.url')
-}
-
-/**
- * Get the url config base on hostname
- * @param {string} hostname
- * @returns {object|undefined} - url config from the input host
- */
-export const getUrlConfigByHostname = (hostname) => {
-    const hosts = getConfig('app.hosts')
-    const host = hosts.find((host) => host.domain === hostname)
-    return host?.url
-}
-
 export const isObject = (o) => o?.constructor === Object
 
 /**
@@ -247,37 +221,27 @@ export const getObjectProperty = (obj, path) => {
  * @returns {object}
  */
 export const getParamsFromPath = (path) => {
-    const {locale: localePosition, site: sitePosition} = getUrlConfig()
+    const urlConfig = getUrlConfig()
+
     const {pathname, search} = new URL(pathToUrl(path))
     const params = new URLSearchParams(search)
     const result = {}
-    switch (sitePosition) {
-        case urlPartPositions.NONE:
-            break
-        case urlPartPositions.PATH:
-            result.site = pathname.split('/')[1]
-            break
-        case urlPartPositions.QUERY_PARAM: {
-            result.site = params.get('site')
-            break
-        }
+    const sitePosition = urlConfig.site.position
+    if (sitePosition === urlPartPositions.PATH) {
+        result.site = pathname.split('/')[1]
+    } else if (sitePosition === urlPartPositions.QUERY_PARAM) {
+        result.site = params.get('site')
     }
 
-    switch (localePosition) {
-        case urlPartPositions.NONE:
-            break
-        case urlPartPositions.PATH: {
-            if (sitePosition === urlPartPositions.PATH) {
-                result.locale = pathname.split('/')[2]
-            } else {
-                result.locale = pathname.split('/')[1]
-            }
-            break
+    const localePosition = urlConfig.locale.position
+    if (localePosition === urlPartPositions.PATH) {
+        if (sitePosition === urlPartPositions.PATH) {
+            result.locale = pathname.split('/')[2]
+        } else {
+            result.locale = pathname.split('/')[1]
         }
-        case urlPartPositions.QUERY_PARAM: {
-            result.locale = params.get('locale')
-            break
-        }
+    } else if (localePosition === urlPartPositions.QUERY_PARAM) {
+        result.locale = params.get('locale')
     }
     return result
 }

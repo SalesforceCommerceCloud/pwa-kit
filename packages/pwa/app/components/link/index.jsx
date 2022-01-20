@@ -9,15 +9,19 @@ import PropTypes from 'prop-types'
 import {Link as ChakraLink} from '@chakra-ui/react'
 import {Link as SPALink, NavLink as NavSPALink} from 'react-router-dom'
 import {useIntl} from 'react-intl'
-import {buildPathWithUrlConfig} from '../../utils/url'
 import useSite from '../../hooks/use-site'
+import {buildPathWithUrlConfig} from '../../utils/url-config'
 
 const Link = React.forwardRef(({href, to, useNavLink = false, ...props}, ref) => {
     const _href = to || href
     const {locale} = useIntl()
     const site = useSite()
 
-    const updatedHref = buildPathWithUrlConfig(_href, {locale, site: site?.alias})
+    const updatedHref = buildPathWithUrlConfig(_href, {
+        locale,
+        site: site.alias || site.id,
+        defaultLocale: site.l10n.defaultLocale
+    })
 
     return (
         <ChakraLink

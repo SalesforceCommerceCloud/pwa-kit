@@ -6,10 +6,11 @@
  */
 
 import {HOME_HREF} from '../constants'
-import {getUrlConfig} from './utils'
+import {getUrlConfig} from './url-config'
 import {urlPartPositions} from '../constants'
 import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
 import {getDefaultSiteIdByHost} from './site-utils'
+import {buildPathWithUrlConfig} from './url-config'
 
 /**
  * A function that takes a path and qualifies it with the current host and protocol.
@@ -145,7 +146,11 @@ export const getUrlWithLocale = (shortCode, opts = {}) => {
     }
 
     if (relativeUrl === HOME_HREF) {
-        relativeUrl = buildPathWithUrlConfig(relativeUrl, {site: site?.alias, locale: shortCode})
+        relativeUrl = buildPathWithUrlConfig(relativeUrl, {
+            locale: shortCode,
+            site: site.alias || site.id,
+            defaultLocale: site.l10n.defaultLocale
+        })
     } else {
         let paths = relativeUrl.split('/').filter((path) => path !== '')
         // remove old locale and site, rebuild the url with new locale and site
@@ -226,64 +231,4 @@ export const removeQueryParamsFromPath = (path, keys) => {
         .replace(/=$/, '')
 
     return `${pathname}${paramStr && '?'}${paramStr}`
-}
-
-/**
- * Rebuild the path with locale/site value to the path as url path or url query param
- * based on url config
- * @param {string} url - based url of the output url
- * @param {object} configValues - object that contains values of url param config
- * @return {string} - an output url
- *
- * @example
- * //pwa-kit.config.json
- * url {
- *    locale: "query_param"
- * }
- * buildPathWithUrlConfig('/women/dresses', {locale: 'en-GB'})
- *
- * Returns
- *  /women/dresses?locale=en-GB
- *
- *  @example
- * //pwa-kit.config.json
- * url {
- *    locale: "path"
- * }
- * buildPathWithUrlConfig('/women/dresses', {locale: 'en-GB'})
- *
- * Returns
- *  /en-GB/women/dresses
- *
- */
-export const buildPathWithUrlConfig = (url, configValues = {}) => {
-    const urlConfig = getUrlConfig()
-    if (!urlConfig || !Object.values(urlConfig).length) return url
-    if (!Object.values(configValues).length) return url
-    const queryParams = {}
-    let basePathSegments = []
-
-    const options = ['site', 'locale']
-
-    options.forEach((option) => {
-        const position = urlConfig[option]
-        switch (position) {
-            case urlPartPositions.NONE:
-                break
-            case urlPartPositions.QUERY_PARAM:
-                queryParams[option] = configValues[option]
-                break
-            case urlPartPositions.PATH:
-                basePathSegments.push(configValues[option])
-                break
-        }
-    })
-    // filter out falsy value in the array
-    basePathSegments = basePathSegments.filter(Boolean)
-    let updatedPath = `${basePathSegments.length ? `/${basePathSegments.join('/')}` : ''}${url}`
-    // append the query param to pathname
-    if (Object.keys(queryParams).length) {
-        updatedPath = rebuildPathWithParams(updatedPath, queryParams)
-    }
-    return updatedPath
 }

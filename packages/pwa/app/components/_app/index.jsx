@@ -41,7 +41,9 @@ import {IntlProvider} from 'react-intl'
 
 // Others
 import {watchOnlineStatus, flatten} from '../../utils/utils'
-import {homeUrlBuilder, getUrlWithLocale, buildPathWithUrlConfig, pathToUrl} from '../../utils/url'
+import {homeUrlBuilder, getUrlWithLocale, pathToUrl} from '../../utils/url'
+import {buildPathWithUrlConfig} from '../../utils/url-config'
+
 import {getLocaleConfig, getPreferredCurrency, getSupportedLocalesIds} from '../../utils/locale'
 import {DEFAULT_SITE_TITLE, HOME_HREF, THEME_COLOR} from '../../constants'
 
@@ -115,7 +117,12 @@ const App = (props) => {
     }
 
     const onCartClick = () => {
-        const path = buildPathWithUrlConfig('/cart', {locale: targetLocale, site: site?.alias})
+        const path = buildPathWithUrlConfig('/cart', {
+            locale: targetLocale,
+            site: site.alias || site.id,
+            defaultSite: site.defaultSite,
+            defaultLocale: site.l10n.defaultLocale
+        })
         history.push(path)
 
         // Close the drawer.
@@ -127,7 +134,8 @@ const App = (props) => {
         if (customer.isRegistered) {
             const path = buildPathWithUrlConfig('/account', {
                 locale: targetLocale,
-                site: site?.alias
+                site: site.alias || site.id,
+                defaultLocale: site.l10n.defaultLocale
             })
             history.push(path)
         } else {
@@ -140,7 +148,8 @@ const App = (props) => {
     const onWishlistClick = () => {
         const path = buildPathWithUrlConfig('/account/wishlist', {
             locale: targetLocale,
-            site: site?.alias
+            site: site.alias || site.id,
+            defaultLocale: site.l10n.defaultLocale
         })
         history.push(path)
     }

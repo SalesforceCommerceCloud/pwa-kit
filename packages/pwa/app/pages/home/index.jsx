@@ -39,7 +39,7 @@ import {
     HOME_SHOP_PRODUCTS_LIMIT,
     urlPartPositions
 } from '../../constants'
-import {getUrlConfig} from '../../utils/utils'
+import {getUrlConfig} from '../../utils/url-config'
 
 /**
  * This is the home page for Retail React App.
@@ -75,7 +75,7 @@ const Home = ({productSearchResult, isLoading}) => {
                     mt={4}
                     onClick={() => {
                         window.location =
-                            urlConfig['site'] === urlPartPositions.PATH ? '/us' : '/site=us'
+                            urlConfig['site'] === urlPartPositions.PATH ? '/us' : '/?site=us'
                     }}
                 >
                     to Default Site

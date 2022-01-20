@@ -1,8 +1,14 @@
 {
     "app": {
         "url": {
-            "site": "path",
-            "locale": "path"
+            "site": {
+                "position": "path",
+                "showDefault": true
+            },
+            "locale": {
+                "position": "path",
+                "showDefault": true
+            }
         },
         "hosts": [
             {
