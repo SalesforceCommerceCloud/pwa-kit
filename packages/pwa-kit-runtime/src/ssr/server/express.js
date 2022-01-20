@@ -520,6 +520,9 @@ const factory = serverFactory()
  * development Express app listens.
  * @param {String} [options.protocol='https'] - the protocol on which the development
  * Express app listens.
+ * @param {Boolean} [options.proxyKeepAliveAgent] - This boolean value indicates
+ * whether or not we are using a keep alive agent for proxy connections. Defaults
+ * to 'true'. NOTE: This keep alive agent will only be used on remote.
  * @param {String} options.sslFilePath - the absolute path to a PEM format
  * certificate file to be used by the local development server. This should
  * contain both the certificate and the private key.

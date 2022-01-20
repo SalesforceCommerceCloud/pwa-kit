@@ -97,6 +97,9 @@ export const RemoteServerFactory = {
             // The protocol that the local dev server listens on
             protocol: 'https',
 
+            // Whether or not to use a keep alive agent for proxy connections.
+            proxyKeepAliveAgent: true,
+
             // Quiet flag (suppresses output if true)
             quiet: false,
 
@@ -942,11 +945,10 @@ const applyPatches = once((options) => {
     // Patch the http.request/get and https.request/get
     // functions to allow us to intercept them (since
     // there are multiple ways to make requests in Node).
-    const getAppHost = () => options.appHostname
-    http.request = outgoingRequestHook(http.request, getAppHost)
-    http.get = outgoingRequestHook(http.get, getAppHost)
-    https.request = outgoingRequestHook(https.request, getAppHost)
-    https.get = outgoingRequestHook(https.get, getAppHost)
+    http.request = outgoingRequestHook(http.request, options)
+    http.get = outgoingRequestHook(http.get, options)
+    https.request = outgoingRequestHook(https.request, options)
+    https.get = outgoingRequestHook(https.get, options)
 
     // Patch the ExpressJS Response class's redirect function to suppress
     // the creation of a body (DESKTOP-485). Including the body may
