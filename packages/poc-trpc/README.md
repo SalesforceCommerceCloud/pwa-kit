@@ -10,6 +10,9 @@ This is a POC of tRPC that can be deployed and works on Commerce Cloud Managed R
 ## What is tRPC?
 More info about tRPC at https://trpc.io/ and https://colinhacks.com/essays/painless-typesafety
 
+## Change the package name
+Edit `package.json` and set the package name to the MRT proejct name where you want to deploy this to
+
 ## How to build the code
 Run `npm run build`
 
