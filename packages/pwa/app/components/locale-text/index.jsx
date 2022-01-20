@@ -99,5 +99,5 @@ const LOCALE_MESSAGES = defineMessages({
     'tr-TR': {id: 'locale_text.message.tr-TR', defaultMessage: 'Turkish (Turkey)'},
     'zh-CN': {id: 'locale_text.message.zh-CN', defaultMessage: 'Chinese (China)'},
     'zh-HK': {id: 'locale_text.message.zh-HK', defaultMessage: 'Chinese (Hong Kong)'},
-    'zt-TW': {id: 'locale_text.message.zt-TW', defaultMessage: 'Chinese (Taiwan)'}
+    'zh-TW': {id: 'locale_text.message.zh-TW', defaultMessage: 'Chinese (Taiwan)'}
 })
