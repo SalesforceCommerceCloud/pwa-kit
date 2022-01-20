@@ -35,10 +35,11 @@ const main = () => {
         sh.exec(prepareDist)
     })
 
-    program.command('eslint')
+    program.command('lint')
+        .argument('<path>', 'path or glob to lint')
         .option('--fix', 'Try and fix errors (default: false)')
-        .action(({fix}) => {
-            sh.exec(`${eslint} --config ${eslintConfig} --resolve-plugins-relative-to ${pkgRoot}${fix ? ' --fix' : ''} .`)
+        .action((path, {fix}) => {
+            sh.exec(`${eslint} --config ${eslintConfig} --resolve-plugins-relative-to ${pkgRoot}${fix ? ' --fix' : ''} ${path}`)
         })
 
     program.parse(process.argv)
