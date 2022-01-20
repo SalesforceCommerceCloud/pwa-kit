@@ -19,7 +19,7 @@ const supportedLocales = getSupportedLocalesIds()
 const nonSupportedLocale = 'nl-NL'
 // Make sure this supported locale is not the default locale.
 // Otherwise, our code would fall back to default and incorrectly pass the tests
-const supportedLocale = supportedLocales[1]
+const supportedLocale = supportedLocales.find((locale) => locale !== DEFAULT_LOCALE)
 
 const testId1 = 'footer.link.privacy_policy'
 const testId2 = 'account.accordion.button.my_account'
