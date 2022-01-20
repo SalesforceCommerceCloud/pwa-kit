@@ -8,29 +8,41 @@ const IS_REMOTE = typeof process !== 'undefined'
 
 const Search = ({category, searchResults}) => {
     const [searchVal, setSearchVal] = useState('')
+    const [categoryVal, setCategoryVal] = useState('root')
 
     return <div>
       Navigation: <Link to="/">Home</Link>
 
       <br />
       <br />
+      Search term:&nbsp;
       <input type="text" onChange={(e) => {setSearchVal(e.target.value)}} value={searchVal} />
+      <br />
+
+      Category:&nbsp;
+      <select name="categories" id="categories" value={categoryVal} onChange={(e) => {
+        console.log('setting value to ', e.target.value)
+        setCategoryVal(e.target.value)
+      }}>
+        <option key="all" value="root">All</option>
+        {category && category.categories.map(({id, name}) => {
+          return <option key={id} value={id}>{name}</option>
+        })}
+      </select>
+      
+      <br />
+
       <Link 
-        to={`/search?q=${searchVal}&cachebreaker=${Date.now()}`}
+        to={`/search?q=${searchVal}&refine=${encodeURIComponent(`cgid=${categoryVal}`)}&cachebreaker=${Date.now()}`}
       >
-        Search
+        <button type="button">
+          GO!
+        </button>
       </Link>
 
       <br />
-      
-      {category &&
-        <div>
-          <b>Category:&nbsp;</b>{category.name}
-        </div>
-      }
-      
       <br />
-      
+
       {searchResults && searchResults.total ?
         <div>
           Found {searchResults.total} Results Showing {searchResults.hits.length}:
@@ -63,7 +75,9 @@ Search.getProps = async ({location}) => {
 
     const params = new URLSearchParams(location.search)
     let q = params.get('q') || ''
-
+    let refine = params.get('refine') || 'cgid=root'
+    let cgid = refine.split('=')[1]
+    console.log('getProps', cgid)
     const client = new ApolloClient({
       shouldBatch: true,
       uri: uri,
@@ -82,14 +96,15 @@ Search.getProps = async ({location}) => {
     // of the front-end ui.
     const GET_CATEGORY_AND_PRODUCT = gql`
       query {
-        getCategory(options: {parameters: {id: "womens"}}) {
+        getCategory(options: {parameters: {id: "root"}}) {
           id
           name
           categories {
-            id
+            id,
+            name
           }
         }
-        productSearch(options: {parameters: {q: "${q}"}}) {
+        productSearch(options: {parameters: {q: "${q}", refine: "cgid=${cgid}"}}) {
           hits {
             productId
             productName
