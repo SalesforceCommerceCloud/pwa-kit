@@ -9,11 +9,11 @@
 /**
  * This is a generator for PWA Kit projects that run on the Managed Runtime.
  *
- * The output of this script is a copy of the pwa package with the following changes:
+ * The output of this script is a copy of a project template with the following changes:
  *
  * 1) We update any monorepo-local dependencies to be installed through NPM.
  *
- * 2) We rename the PWA and configure the generated project based on answers to
+ * 2) We rename the template and configure the generated project based on answers to
  *    questions that we ask the user on the CLI.
  *
  * ## Basic usage
@@ -24,25 +24,27 @@
  *
  * ## Advanced usage and integration testing:
  *
- * In order to skip prompts on CircleCI, the generator supports a purposefully
- * undocumented `PRESET` environment variable, which you can use to skip the prompts
- * in a CI environment. These presets run the generator with hard-coded answers to
- * the questions we would normally ask an end-user. Supported presets are:
+ * For testing on CI we need to be able to generate projects without running
+ * the interactive prompts on the CLI. To support these cases, we have
+ * a few presets that are "private" and only usable through the GENERATOR_PRESET
+ * env var – this keeps them out of the --help docs.
  *
- *   1. "test-project" - A test project using the demo connector.
- *   2. "test-project-sffc" - A test project using the SFCC connector.
+ * If both the GENERATOR_PRESET env var and --preset arguments are passed, the
+ * option set in GENERATOR_PRESET is used.
  */
 
 const p = require('path')
 const fs = require('fs')
 const os = require('os')
-const program = require('commander')
+const {Command} = require('commander')
 const inquirer = require('inquirer')
 const {URL} = require('url')
 const deepmerge = require('deepmerge')
 const sh = require('shelljs')
 const tar = require('tar')
 const generatorPkg = require('../package.json')
+
+const program = new Command()
 
 sh.set('-e')
 
@@ -51,12 +53,12 @@ const GENERATED_PROJECT_VERSION = '0.0.1'
 const HELLO_WORLD_TEST_PROJECT = 'hello-world-test-project'
 const HELLO_WORLD = 'hello-world'
 const TEST_PROJECT = 'test-project' // TODO: This will be replaced with the `isomorphic-client` config.
-const DEMO_PROJECT = 'demo-project'
-const PROMPT = 'prompt'
+const RETAIL_REACT_APP_DEMO = 'retail-react-app-demo'
+const RETAIL_REACT_APP = 'retail-react-app'
 
-const PRESETS = [TEST_PROJECT, PROMPT, HELLO_WORLD, HELLO_WORLD_TEST_PROJECT, DEMO_PROJECT]
-
-const GENERATOR_PRESET = process.env.GENERATOR_PRESET || PROMPT
+const PRIVATE_PRESETS = [TEST_PROJECT, HELLO_WORLD, HELLO_WORLD_TEST_PROJECT]
+const PUBLIC_PRESETS = [RETAIL_REACT_APP, RETAIL_REACT_APP_DEMO]
+const PRESETS = PRIVATE_PRESETS.concat(PUBLIC_PRESETS)
 
 const DEFAULT_OUTPUT_DIR = p.join(process.cwd(), 'pwa-kit-starter-project')
 
@@ -212,10 +214,7 @@ const prompts = () => {
         s === '' ||
         defaultEinsteinAPIError
 
-    const demoChoice = 'Yes'
-    const customChoice = 'No, use custom settings'
-
-    const customChoiceQuestions = [
+    const questions = [
         {
             name: 'projectId',
             validate: validProjectId,
@@ -256,24 +255,7 @@ const prompts = () => {
         // NOTE: there's no question about Einstein's _site_ id because we currently assume that the site id will be the same for both Commerce API and Einstein
     ]
 
-    const questions = [
-        {
-            name: 'useDemoSettings',
-            message: 'Do you want to try out PWA Kit with the demo storefront?',
-            choices: [demoChoice, customChoice],
-            type: 'list'
-        },
-        ...customChoiceQuestions.map((question) => ({
-            ...question,
-            when: (answers) => answers.useDemoSettings == customChoice
-        }))
-    ]
-
-    return inquirer
-        .prompt(questions)
-        .then((answers) =>
-            answers.useDemoSettings == demoChoice ? demoProjectAnswers() : buildAnswers(answers)
-        )
+    return inquirer.prompt(questions).then((answers) => buildAnswers(answers))
 }
 
 const buildAnswers = ({
@@ -387,54 +369,81 @@ const extractTemplate = (templateName, outputDir) => {
 const main = (opts) => {
     if (!(opts.outputDir === DEFAULT_OUTPUT_DIR) && sh.test('-e', opts.outputDir)) {
         console.error(
-            `The output directory "${opts.outputDir}" already exists. Try, eg. ` +
+            `The output directory "${opts.outputDir}" already exists. Try, for example, ` +
                 `"~/Desktop/my-project" instead of "~/Desktop"`
         )
         process.exit(1)
     }
 
-    switch (GENERATOR_PRESET) {
+    const selectedOption = process.env.GENERATOR_PRESET || opts.preset
+
+    switch (selectedOption) {
         case HELLO_WORLD_TEST_PROJECT:
             return generateHelloWorld({projectId: 'hello-world'}, opts)
         case HELLO_WORLD:
             return helloWorldPrompts(opts).then((answers) => generateHelloWorld(answers, opts))
         case TEST_PROJECT:
             return runGenerator(testProjectAnswers(), opts)
-        case DEMO_PROJECT:
+        case RETAIL_REACT_APP_DEMO:
             return runGenerator(demoProjectAnswers(), opts)
-        case PROMPT:
+        case RETAIL_REACT_APP:
             console.log(
                 'For details on configuration values, see https://developer.salesforce.com/docs/commerce/commerce-api/guide/commerce-api-configuration-values\n'
             )
             return prompts(opts).then((answers) => runGenerator(answers, opts))
         default:
             console.error(
-                `The preset "${GENERATOR_PRESET}" is not valid. Valid presets are: ${PRESETS.map(
-                    (x) => `"${x}"`
-                ).join(' ')}.`
+                `The preset "${selectedOption}" is not valid. Valid presets are: ${
+                    process.env.GENERATOR_PRESET
+                        ? PRESETS.map((x) => `"${x}"`).join(' ')
+                        : PUBLIC_PRESETS.map((x) => `"${x}"`).join(' ')
+                }.`
             )
             process.exit(1)
     }
 }
 
 if (require.main === module) {
-    program.description(`Generate a new PWA Kit project`)
-    program.option(
-        '--outputDir <path>',
-        `Path to the output directory for the new project`,
-        DEFAULT_OUTPUT_DIR
-    )
+    program.name(`pwa-kit-create-app`)
+    program.description(`Generate a new PWA Kit project, optionally using a preset.
+    
+Examples:
+
+  ${program.name()} --preset "${RETAIL_REACT_APP}"
+    Generate a project using custom settings by answering questions about a
+    B2C Commerce instance.
+    
+    Use this preset to connect to an existing instance, such as a sandbox.
+
+  ${program.name()} --preset "${RETAIL_REACT_APP_DEMO}"
+    Generate a project using the settings for a special B2C Commerce
+    instance that is used for demo purposes. No questions are asked.
+    
+    Use this preset to try out PWA Kit.
+  `)
+    program
+        .option(
+            '--outputDir <path>',
+            `Path to the output directory for the new project`,
+            DEFAULT_OUTPUT_DIR
+        )
+        .option(
+            '--preset <name>',
+            `The name of a project preset to use (choices: "retail-react-app" "retail-react-app-demo")`,
+            RETAIL_REACT_APP
+        )
+
     program.parse(process.argv)
 
     return Promise.resolve()
-        .then(() => main(program))
+        .then(() => main(program.opts()))
         .then(() => {
             console.log('')
-            console.log(`Successfully generated project in ${program.outputDir}`)
+            console.log(`Successfully generated a project in ${program.outputDir}`)
             process.exit(0)
         })
         .catch((err) => {
-            console.error('Failed to generate project')
+            console.error('Failed to generate a project')
             console.error(err)
             process.exit(1)
         })
