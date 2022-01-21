@@ -112,13 +112,13 @@ const main = () => {
         .addOption(
             new program.Option(
                 '-o --ssrOnly <ssrOnly>',
-                'the files will not be accessible for the public. A list of file glob patterns separated by comma, i.e. --ssrOnly ssr.js,node_modules/*'
+                'the files gets uploaded to Managed Runtime and will not be accessible for the public. A list of file glob patterns separated by comma, i.e. --ssrOnly ssr.js,node_modules/*'
             )
         )
         .addOption(
             new program.Option(
                 '-s --ssrShared <ssrShared>',
-                'the files that are accessible for the public to download. A list of file glob patterns separated by comma, i.e. --ssrShared static/*,**/*.js'
+                'the files gets uploaded to Managed Runtime and will be accessible for the public to download. A list of file glob patterns separated by comma, i.e. --ssrShared static/*,**/*.js'
             )
         )
         .addOption(
