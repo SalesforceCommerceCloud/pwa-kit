@@ -7,6 +7,9 @@
 
 import {getConfig, getParamsFromPath} from './utils'
 import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
+import {resolveConfigFromUrl} from './url-config'
+
+// localhost:3000/global/en-GB/women/dresses
 
 /**
  * This functions takes an url and returns a site object,
@@ -87,13 +90,17 @@ export const getSiteByHostname = (hostname) => {
  */
 export const getSiteByPath = (path, sites) => {
     // extract the site from the url
-    const {site: currentSite} = getParamsFromPath(path)
+    const {site: currentSite} = resolveConfigFromUrl(path)
+    console.log('currentSite', currentSite)
+
     if (!currentSite) return
 
     if (!sites || !sites.length)
         throw new Error('No site config found. Please check you configuration')
     // look for the site that has the currentSite
-    const site = sites.find((site) => site.id === currentSite || site.alias === currentSite)
+    const site = sites.find(
+        (site) => site.id === currentSite.value || site.alias === currentSite.value
+    )
     return site
 }
 

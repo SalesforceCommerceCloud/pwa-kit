@@ -8,7 +8,7 @@
 import pwaKitConfig from '../../pwa-kit.config.json'
 import {urlPartPositions} from '../constants'
 import {pathToUrl} from './url'
-import {getUrlConfig} from './url-config'
+import {getUrlConfig, resolveConfigFromUrl} from './url-config'
 /**
  * Call requestIdleCallback in supported browsers.
  *
@@ -217,12 +217,11 @@ export const getObjectProperty = (obj, path) => {
 /**
  * This functions return the param (e.g site and locale) from the given url
  * The site will show up before locale if both of them are presented in the pathname
- * @param path
+ * @param path {string}
+ * @param urlConfig {object}
  * @returns {object}
  */
-export const getParamsFromPath = (path) => {
-    const urlConfig = getUrlConfig()
-
+export const getParamsFromPath = (path, urlConfig = {}) => {
     const {pathname, search} = new URL(pathToUrl(path))
     const params = new URLSearchParams(search)
     const result = {}
@@ -244,4 +243,13 @@ export const getParamsFromPath = (path) => {
         result.locale = params.get('locale')
     }
     return result
+}
+/**
+ * Return the default locale from supported locales based on a site
+ * @param site
+ * @returns {Object} - locale config
+ */
+export const getDefaultLocaleBySite = (site) => {
+    const supportedLocales = site.l10n.supportedLocales
+    return supportedLocales.find((locale) => locale.id === site.l10n.defaultLocale)
 }

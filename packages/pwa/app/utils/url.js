@@ -129,48 +129,48 @@ export const searchUrlBuilder = (searchTerm) => `/search?q=${searchTerm}`
  * @returns {string} - The relative URL for the specific locale.
  */
 export const getUrlWithLocale = (shortCode, opts = {}) => {
-    const {locale: localePosition, site: sitePosition} = getUrlConfig()
-    const {hostname} = new URL(getAppOrigin())
-    const defaultSiteId = getDefaultSiteIdByHost(hostname)
+    // const {locale: localePosition, site: sitePosition} = getUrlConfig()
+    // const {hostname} = new URL(getAppOrigin())
+    // const defaultSiteId = getDefaultSiteIdByHost(hostname)
     const location = opts.location ? opts.location : window.location
-    const {disallowParams = [], site} = opts
+    // const {disallowParams = [], site} = opts
     let relativeUrl = location.pathname
-
-    const params = new URLSearchParams(location.search)
-
-    // Remove any disallowed params.
-    if (disallowParams.length) {
-        disallowParams.forEach((param) => {
-            params.delete(param)
-        })
-    }
-
-    if (relativeUrl === HOME_HREF) {
-        relativeUrl = buildPathWithUrlConfig(relativeUrl, {
-            locale: shortCode,
-            site: site.alias || site.id,
-            defaultLocale: site.l10n.defaultLocale
-        })
-    } else {
-        let paths = relativeUrl.split('/').filter((path) => path !== '')
-        // remove old locale and site, rebuild the url with new locale and site
-        if (localePosition === urlPartPositions.PATH && sitePosition === urlPartPositions.PATH) {
-            // remove first two elements which is the site and locale
-            paths.splice(0, 2)
-            const pathWithoutBaseSegments = `/${paths.join('/')}`
-            const isDefaultSite = site.id === defaultSiteId
-            const isDefaultLocale = shortCode === site?.l10n?.defaultLocale
-            // we don't want to show  site and locale when they are the home page and they are both default values
-            const updatedPath = `${buildPathWithUrlConfig(pathWithoutBaseSegments, {
-                locale: isDefaultLocale && isDefaultSite && paths.length === 0 ? '' : shortCode,
-                site: isDefaultLocale && isDefaultSite && paths.length === 0 ? '' : site?.alias
-            })}`
-            relativeUrl = `${updatedPath}${Array.from(params).length > 0 ? `?${params}` : ''}`
-        } else {
-            paths.splice(0, 1, shortCode)
-            relativeUrl = `/${paths.join('/')}${Array.from(params).length > 0 ? `?${params}` : ''}`
-        }
-    }
+    //
+    // const params = new URLSearchParams(location.search)
+    //
+    // // Remove any disallowed params.
+    // if (disallowParams.length) {
+    //     disallowParams.forEach((param) => {
+    //         params.delete(param)
+    //     })
+    // }
+    //
+    // if (relativeUrl === HOME_HREF) {
+    //     relativeUrl = buildPathWithUrlConfig(relativeUrl, {
+    //         locale: shortCode,
+    //         site: site.alias || site.id,
+    //         defaultLocale: site.l10n.defaultLocale
+    //     })
+    // } else {
+    //     let paths = relativeUrl.split('/').filter((path) => path !== '')
+    //     // remove old locale and site, rebuild the url with new locale and site
+    //     if (localePosition === urlPartPositions.PATH && sitePosition === urlPartPositions.PATH) {
+    //         // remove first two elements which is the site and locale
+    //         paths.splice(0, 2)
+    //         const pathWithoutBaseSegments = `/${paths.join('/')}`
+    //         const isDefaultSite = site.id === defaultSiteId
+    //         const isDefaultLocale = shortCode === site?.l10n?.defaultLocale
+    //         // we don't want to show  site and locale when they are the home page and they are both default values
+    //         const updatedPath = `${buildPathWithUrlConfig(pathWithoutBaseSegments, {
+    //             locale: isDefaultLocale && isDefaultSite && paths.length === 0 ? '' : shortCode,
+    //             site: isDefaultLocale && isDefaultSite && paths.length === 0 ? '' : site?.alias
+    //         })}`
+    //         relativeUrl = `${updatedPath}${Array.from(params).length > 0 ? `?${params}` : ''}`
+    //     } else {
+    //         paths.splice(0, 1, shortCode)
+    //         relativeUrl = `/${paths.join('/')}${Array.from(params).length > 0 ? `?${params}` : ''}`
+    //     }
+    // }
     return relativeUrl
 }
 

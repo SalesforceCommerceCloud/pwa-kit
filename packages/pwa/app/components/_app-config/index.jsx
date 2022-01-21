@@ -24,6 +24,7 @@ import {getPreferredCurrency, getSupportedLocalesIds} from '../../utils/locale'
 import {getParamsFromPath} from '../../utils/utils'
 import {pathToUrl} from '../../utils/url'
 import {resolveSiteFromUrl} from '../../utils/site-utils'
+import {resolveConfigFromUrl} from '../../utils/url-config'
 
 const apiConfig = {
     ...commerceAPIConfig,
@@ -42,14 +43,14 @@ const getLocale = (locals = {}) => {
             ? locals.originalUrl
             : `${window.location.pathname}${window.location.search}`
     let shortCode
-    const {locale} = getParamsFromPath(path)
+    const {locale} = resolveConfigFromUrl(path)
     const site = resolveSiteFromUrl(pathToUrl(path))
     console.log('getLocale site', site)
     const l10n = site?.l10n
 
     // Ensure that the locale is in the supported list, otherwise return the default.
-    shortCode = getSupportedLocalesIds(l10n.supportedLocales).includes(locale)
-        ? locale
+    shortCode = getSupportedLocalesIds(l10n.supportedLocales).includes(locale.value)
+        ? locale.value
         : l10n.defaultLocale
     return shortCode
 }
@@ -86,6 +87,7 @@ AppConfig.restore = (locals = {}) => {
             : `${window.location.pathname}${window.location.search}`
     const url = pathToUrl(path)
     const site = resolveSiteFromUrl(url)
+    console.log('site', site)
 
     if (site) {
         apiConfig.parameters.siteId = site?.id

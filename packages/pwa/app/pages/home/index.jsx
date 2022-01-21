@@ -39,7 +39,7 @@ import {
     HOME_SHOP_PRODUCTS_LIMIT,
     urlPartPositions
 } from '../../constants'
-import {getUrlConfig} from '../../utils/url-config'
+// import {getUrlConfig} from '../../utils/url-config'
 
 /**
  * This is the home page for Retail React App.
@@ -49,7 +49,7 @@ import {getUrlConfig} from '../../utils/url-config'
  */
 const Home = ({productSearchResult, isLoading}) => {
     const intl = useIntl()
-    const urlConfig = getUrlConfig()
+    // const urlConfig = getUrlConfig()
 
     return (
         <Box data-testid="home-page" layerStyle="page">
@@ -61,25 +61,25 @@ const Home = ({productSearchResult, isLoading}) => {
 
             <Section>
                 <h3>These buttons are for demo purposes, it will NOT get merged into develop</h3>
-                <Button
-                    mt={4}
-                    mr={4}
-                    onClick={() => {
-                        window.location = '/'
-                    }}
-                >
-                    to Global Site
-                </Button>
+                {/*<Button*/}
+                {/*    mt={4}*/}
+                {/*    mr={4}*/}
+                {/*    onClick={() => {*/}
+                {/*        window.location = '/'*/}
+                {/*    }}*/}
+                {/*>*/}
+                {/*    to Global Site*/}
+                {/*</Button>*/}
 
-                <Button
-                    mt={4}
-                    onClick={() => {
-                        window.location =
-                            urlConfig['site'] === urlPartPositions.PATH ? '/us' : '/?site=us'
-                    }}
-                >
-                    to Default Site
-                </Button>
+                {/*<Button*/}
+                {/*    mt={4}*/}
+                {/*    onClick={() => {*/}
+                {/*        window.location =*/}
+                {/*            urlConfig['site'] === urlPartPositions.PATH ? '/us' : '/?site=us'*/}
+                {/*    }}*/}
+                {/*>*/}
+                {/*    to Default Site*/}
+                {/*</Button>*/}
             </Section>
 
             <Hero
