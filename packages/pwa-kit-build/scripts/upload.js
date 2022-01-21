@@ -34,28 +34,30 @@ const upload = (options) => {
     })
 
     const credentialsPromise = Utils.readCredentials(options.settingsFile)
+    return Promise.resolve().then(() => {
+        console.log(options)
+    })
+    // return Promise.all([dataBufferPromise, credentialsPromise])
+    //     .then((values) => {
+    //         const dataBuffer = values[0]
+    //         const credentials = values[1]
 
-    return Promise.all([dataBufferPromise, credentialsPromise])
-        .then((values) => {
-            const dataBuffer = values[0]
-            const credentials = values[1]
+    //         const requestOptions = {
+    //             username: credentials.username,
+    //             api_key: credentials.api_key,
+    //             body: dataBuffer,
+    //             dataLength: dataBuffer.length,
+    //             origin: options.origin,
+    //             projectSlug: options.projectSlug,
+    //             target: options.target
+    //         }
 
-            const requestOptions = {
-                username: credentials.username,
-                api_key: credentials.api_key,
-                body: dataBuffer,
-                dataLength: dataBuffer.length,
-                origin: options.origin,
-                projectSlug: options.projectSlug,
-                target: options.target
-            }
-
-            console.log(`Beginning upload to ${options.origin}...`)
-            return buildRequest(requestOptions, dataBuffer)
-        })
-        .then(() => {
-            console.log('Bundle Uploaded!')
-        })
+    //         console.log(`Beginning upload to ${options.origin}...`)
+    //         return buildRequest(requestOptions, dataBuffer)
+    //     })
+    //     .then(() => {
+    //         console.log('Bundle Uploaded!')
+    //     })
 }
 
 const uploadBundle = (customOptions) => {

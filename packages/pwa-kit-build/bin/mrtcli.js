@@ -99,8 +99,8 @@ const main = () => {
         )
         .addOption(
             new program.Option(
-                '-s --projectSlug <projectSlug>',
-                "a project slug that differs from the name property in your project's package.json (default: the 'name' key from the package.json)"
+                '-p --projectSlug <projectSlug>',
+                "your Managed Runtime project id"
             )
         )
         .addOption(
@@ -109,7 +109,36 @@ const main = () => {
                 'a custom target to upload a bundle to within Managed Runtime'
             )
         )
-        .action(({buildDirectory, message, projectSlug, target}) => {
+        .addOption(
+            new program.Option(
+                '-o --ssrOnly <ssrOnly>',
+                'the files will not be accessible for the public. A list of file glob patterns separated by comma, i.e. --ssrOnly ssr.js,node_modules/*'
+            )
+        )
+        .addOption(
+            new program.Option(
+                '-s --ssrShared <ssrShared>',
+                'the files that are accessible for the public to download. A list of file glob patterns separated by comma, i.e. --ssrShared static/*,**/*.js'
+            )
+        )
+        .addOption(
+            new program.Option(
+                '-f --ssrFunctionNodeVersion <ssrFunctionNodeVersion>',
+                'the Node.js version of your Managed Runtime serverless function. Availiable options are: 12.x and 14.x. Default: 14.x'
+            ).choices(['12.x', '14.x']).default('14.x')
+        )
+        .addOption(
+            new program.Option(
+                '-x --proxies <proxies>',
+                'Managed Runtime proxy server settings. Format: an array of proxy config objects in JSON wrapped by double quotes, each proxy config object contains "host" and "path", i.e. "[{"host":"my_backend.com", "path": "api"}]"'
+            )
+        )
+        .action(({buildDirectory, message, projectSlug, target, ssrOnly, ssrShared, ssrFunctionNodeVersion, proxies}) => {
+            console.log('ssrOnly' + ssrOnly)
+            console.log('ssrShared' + ssrShared)
+            console.log('ssrFunctionNodeVersion' + ssrFunctionNodeVersion)
+            console.log('proxies' + proxies)
+
             const pkg = require(p.join(process.cwd(), 'package.json'))
             const mobify = pkg.mobify || {}
 
