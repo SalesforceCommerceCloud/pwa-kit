@@ -151,8 +151,19 @@ const runGenerator = (answers, {outputDir}) => {
         ]
     })
 
+    const PWAKitConfigJsonTemplatePath = p.resolve(
+        p.join(
+            process.cwd(),
+            'packages',
+            'pwa-kit-create-app',
+            'assets',
+            'pwa',
+            'pwa-kit.config.json'
+        )
+    )
+    const PWAKitConfigJsonTemplate = readJson(PWAKitConfigJsonTemplatePath)
     const PWAKitConfigJsonPath = p.resolve(outputDir, 'pwa-kit.config.json')
-    writeJson(PWAKitConfigJsonPath, PWAKitConfigSingleLocaleData)
+    writeJson(PWAKitConfigJsonPath, PWAKitConfigJsonTemplate)
 
     const APIConfigTemplate = require(`../assets/pwa/api.config`).template
     const commerceApi = {
@@ -309,12 +320,6 @@ const pkgSingleLocaleData = {
             }
         ],
         defaultLocale: 'en-US'
-    }
-}
-
-const PWAKitConfigSingleLocaleData = {
-    url: {
-        locale: 'none'
     }
 }
 
