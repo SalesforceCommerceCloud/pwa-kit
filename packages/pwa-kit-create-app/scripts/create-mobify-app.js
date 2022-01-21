@@ -117,10 +117,11 @@ const runGenerator = (answers, {outputDir}) => {
 
     extractTemplate('pwa', outputDir)
 
+    const {pkgLocalizationConfig} = require(`../assets/pwa/l10n.config`)
     const pkgJsonPath = p.resolve(outputDir, 'package.json')
     const pkgJSON = readJson(pkgJsonPath)
     const pkgDataWithAnswers = merge(pkgJSON, answers['scaffold-pwa'])
-    const finalPkgData = merge(pkgDataWithAnswers, pkgSingleLocaleData)
+    const finalPkgData = merge(pkgDataWithAnswers, pkgLocalizationConfig)
 
     npmInstallables.forEach((pkgName) => {
         const keys = ['dependencies', 'devDependencies']
@@ -306,20 +307,6 @@ const buildAnswers = ({
 
         'commerce-api': {clientId, siteId, organizationId, shortCode},
         'einstein-api': {einsteinId, siteId: einsteinSiteId || siteId}
-    }
-}
-
-const pkgSingleLocaleData = {
-    l10n: {
-        supportedCurrencies: ['USD'],
-        defaultCurrency: 'USD',
-        supportedLocales: [
-            {
-                id: 'en-US',
-                preferredCurrency: 'USD'
-            }
-        ],
-        defaultLocale: 'en-US'
     }
 }
 
