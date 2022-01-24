@@ -11,6 +11,11 @@
         "pwa-kit-build": "^1.4.0-dev",
         "pwa-kit-react-sdk": "^1.4.0-dev"
     },
+    "scripts": {
+        "format": "mrtcli format '\"**/*.{js,jsx}\"'",
+        "lint": "mrtcli lint .",
+        "lint:fix": "npm run lint -- --fix"
+    },
     "dependencies": {
         "pwa-kit-runtime": "^1.4.0-dev"
     },

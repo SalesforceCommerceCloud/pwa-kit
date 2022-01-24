@@ -1,10 +1,16 @@
+/*
+ * Copyright (c) 2021, salesforce.com, inc.
+ * All rights reserved.
+ * SPDX-License-Identifier: BSD-3-Clause
+ * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
+ */
 const path = require("path");
 const {
   createApp,
   createHandler,
-  serveStaticFile,
+  serveStaticFile
 } = require("pwa-kit-runtime/ssr/server/express");
-const pkg = require("../package.json")
+const pkg = require("../package.json");
 
 const app = createApp({
   // The build directory (an absolute path)
@@ -29,7 +35,7 @@ const app = createApp({
 
   enableLegacyRemoteProxying: false,
 
-  mobify: pkg.mobify,
+  mobify: pkg.mobify
 });
 
 // Handle the redirect from SLAS as to avoid error
