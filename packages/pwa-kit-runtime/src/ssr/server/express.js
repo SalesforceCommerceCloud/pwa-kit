@@ -20,7 +20,7 @@ import {
     parseEndParameters,
     isRemote,
     wrapResponseWrite,
-    detectDeviceType,
+    detectDeviceType
 } from '../../utils/ssr-server'
 import {CACHE_CONTROL, CONTENT_ENCODING, X_MOBIFY_FROM_CACHE} from './constants'
 import {X_MOBIFY_REQUEST_CLASS} from '../../utils/ssr-proxying'
@@ -148,7 +148,7 @@ const storeResponseInCache = (req, res) => {
 
     const metadata = {
         status: res.statusCode,
-        headers: res.getHeaders(),
+        headers: res.getHeaders()
     }
 
     // ADN-118 When the response is created, we intercept the data
@@ -190,7 +190,7 @@ const storeResponseInCache = (req, res) => {
                 namespace: caching.cacheNamespace,
                 data: dataToCache,
                 metadata,
-                expiration: expiration * 1000, // in mS
+                expiration: expiration * 1000 // in mS
             })
             // If an error occurs,we don't want to prevent the
             // response being sent, so we just log.
@@ -245,7 +245,7 @@ export const cacheResponseWhenDone = ({
     expiration,
     key,
     namespace,
-    shouldCacheResponse,
+    shouldCacheResponse
 }) => {
     const locals = res.locals
     const caching = locals.responseCaching
@@ -423,7 +423,7 @@ export const getResponseFromCache = ({req, res, namespace, key}) => {
         return new CachedResponse({
             entry,
             req,
-            res,
+            res
         })
     })
 }
@@ -444,9 +444,9 @@ export const serveStaticFile = (filePath, opts = {}) => {
         const file = path.resolve(options.buildDir, filePath)
         res.sendFile(file, {
             headers: {
-                [CACHE_CONTROL]: options.defaultCacheControl,
+                [CACHE_CONTROL]: options.defaultCacheControl
             },
-            ...opts,
+            ...opts
         })
     }
 }
