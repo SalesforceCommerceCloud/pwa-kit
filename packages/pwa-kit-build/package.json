@@ -19,7 +19,7 @@
     "ssr",
     "TERMS_OF_USE.md",
     "utils",
-    "webpack",
+    "configs",
     "schemas"
   ],
   "scripts": {

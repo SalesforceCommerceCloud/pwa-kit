@@ -75,7 +75,7 @@ const main = () => {
             const original = sh.config.silent
             sh.config.silent = false
             const webpack = p.join(binDir, 'webpack')
-            const webpackConf = p.resolve(p.join(__dirname, '..', 'webpack', 'config.js'))
+            const webpackConf = p.resolve(p.join(__dirname, '..', 'configs', 'webpack', 'config.js'))
             try {
                 sh.rm('-rf', './build')
                 sh.exec(`${webpack} --config ${webpackConf}`, {
@@ -152,7 +152,7 @@ const main = () => {
         .option('--fix', 'Try and fix errors (default: false)')
         .action((path, {fix}) => {
             const eslint = p.join(binDir, 'eslint')
-            const eslintConfig = p.join(__dirname, '..', 'eslint-config.js')
+            const eslintConfig = p.join(__dirname, '..', 'configs', 'eslint', 'eslint-config.js')
             sh.exec(
                 `${eslint} --config ${eslintConfig} --resolve-plugins-relative-to ${pkgRoot}${
                     fix ? ' --fix' : ''
