@@ -13,15 +13,15 @@
     "mrtcli": "bin/mrtcli.js"
   },
   "files": [
+    "babel-config.js",
     "bin",
     "LICENSE",
+    "schemas",
     "scripts",
     "ssr",
     "TERMS_OF_USE.md",
     "utils",
-    "webpack",
-    "babel.config.js",
-    "schemas"
+    "webpack"
   ],
   "scripts": {
     "dev:watch": "watch 'npm run dev:build' src/",
