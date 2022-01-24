@@ -10,7 +10,7 @@ import path, {resolve} from 'path'
 import fs from 'fs'
 import Ajv from 'ajv'
 
-import schema from '../schemas/sdk-config.json'
+import schema from '../../schemas/sdk-config.json'
 
 /**
  * Allows users to override special SDK components by placing override

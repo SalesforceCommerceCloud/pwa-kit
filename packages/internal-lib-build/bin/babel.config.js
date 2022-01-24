@@ -21,12 +21,6 @@ const config = {
         require('@babel/plugin-transform-async-to-generator'),
         require('@babel/plugin-proposal-object-rest-spread'),
         require('@babel/plugin-transform-object-assign'),
-        [
-            require('@babel/plugin-transform-runtime'),
-            {
-                regenerator: true
-            }
-        ],
         require('@babel/plugin-syntax-dynamic-import'),
         require('@babel/plugin-proposal-optional-chaining'),
         [

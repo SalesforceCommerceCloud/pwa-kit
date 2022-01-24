@@ -17,7 +17,7 @@ import webpackDevMiddleware from 'webpack-dev-middleware'
 import webpackHotServerMiddleware from 'webpack-hot-server-middleware'
 import open from 'open'
 import requireFromString from 'require-from-string'
-import config from '../../webpack/config'
+import config from '../../configs/webpack/config'
 import {loadingScreen} from './loading-screen'
 
 const chalk = require('chalk')
