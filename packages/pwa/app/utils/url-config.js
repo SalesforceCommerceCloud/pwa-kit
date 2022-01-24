@@ -55,8 +55,8 @@ export const buildPathWithUrlConfig = (url, configValues = {}) => {
     const options = ['site', 'locale']
 
     options.forEach((option) => {
-        const position = urlConfig[option].position
-        const showDefault = urlConfig[option].showDefault
+        const position = urlConfig[option]
+        const showDefault = urlConfig.showDefault
         if (position === urlPartPositions.PATH) {
             // if the showDefault is set to false and current value is the default, don't do anything
             if (!showDefault && defaultValues.includes(configValues[option])) {
