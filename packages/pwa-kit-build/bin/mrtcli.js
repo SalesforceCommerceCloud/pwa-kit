@@ -75,7 +75,9 @@ const main = () => {
             const original = sh.config.silent
             sh.config.silent = false
             const webpack = p.join(binDir, 'webpack')
-            const webpackConf = p.resolve(p.join(__dirname, '..', 'configs', 'webpack', 'config.js'))
+            const webpackConf = p.resolve(
+                p.join(__dirname, '..', 'configs', 'webpack', 'config.js')
+            )
             try {
                 sh.rm('-rf', './build')
                 sh.exec(`${webpack} --config ${webpackConf}`, {
