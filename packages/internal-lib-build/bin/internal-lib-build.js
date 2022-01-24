@@ -51,7 +51,7 @@ const main = () => {
 
     program
         .command('format')
-        .argument('<path>', 'path or glob to lint')
+        .argument('<path>', 'path or glob to format')
         .action((path) => {
             sh.exec(`${prettier} --write ${path}`)
         })

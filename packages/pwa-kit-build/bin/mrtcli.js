@@ -14,9 +14,8 @@ const scriptUtils = require('../scripts/utils')
 const sh = require('shelljs')
 const uploadBundle = require('../scripts/upload.js')
 
-// TODO: Won't work when deployed to NPM - need to resolve differently
-const webpack = require.resolve('webpack/bin/webpack')
-const webpackConf = p.resolve(p.join(__dirname, '..', 'webpack', 'config.js'))
+const pkgRoot = p.join(__dirname, '..')
+const binDir = p.join(require.resolve('prettier'), '../../.bin')
 
 const main = () => {
     process.env.CONTEXT = process.cwd()
@@ -75,6 +74,8 @@ const main = () => {
         .action(() => {
             const original = sh.config.silent
             sh.config.silent = false
+            const webpack = p.join(binDir, 'webpack')
+            const webpackConf = p.resolve(p.join(__dirname, '..', 'webpack', 'config.js'))
             try {
                 sh.rm('-rf', './build')
                 sh.exec(`${webpack} --config ${webpackConf}`, {
@@ -145,11 +146,27 @@ const main = () => {
         })
 
     program
+        .command('lint')
+        .description('lint all source files')
+        .argument('<path>', 'path or glob to lint')
+        .option('--fix', 'Try and fix errors (default: false)')
+        .action((path, {fix}) => {
+            const eslint = p.join(binDir, 'eslint')
+            const eslintConfig = p.join(__dirname, '..', 'eslint-config.js')
+            sh.exec(
+                `${eslint} --config ${eslintConfig} --resolve-plugins-relative-to ${pkgRoot}${
+                    fix ? ' --fix' : ''
+                } ${path}`
+            )
+        })
+
+    program
         .command('format')
-        .description(`automatically re-format all source files`)
-        .action(() => {
-            const prettier = p.join(require.resolve('prettier'), '../../.bin/prettier')
-            sh.exec(`${prettier} --write 'app'`)
+        .description('automatically re-format all source files')
+        .argument('<path>', 'path or glob to format')
+        .action((path) => {
+            const prettier = p.join(binDir, 'prettier')
+            sh.exec(`${prettier} --write ${path}`)
         })
 
     program.parse(process.argv)
