@@ -34,7 +34,7 @@
     "test:watch": "npm test -- --watch",
     "test:inspect": "node --inspect-brk jest --runInBand",
     "version": "node ./scripts/version.js",
-    "format": "internal-lib-build format \"**/*.{js,jsx}\""
+    "format": "internal-lib-build format '\"**/*.{js,jsx}\"'"
   },
   "repository": {
     "type": "git",
