@@ -13,8 +13,7 @@ module.exports = {
     transform: {
         '^.+\\.(js|jsx|ts|tsx)$': path.join(__dirname, 'jest-babel-transform.js')
     },
-    setupFiles: [path.join(__dirname, 'setup-jest.js'), 'jest-fetch-mock'],
-    setupFilesAfterEnv: ['jest-expect-message'],
+    setupFiles: [path.join(__dirname, 'setup-jest.js')],
     cacheDirectory: './node_modules/.cache',
     clearMocks: true,
     collectCoverage: true,

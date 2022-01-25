@@ -111,7 +111,9 @@
     "yargs": "15.4.1"
   },
   "devDependencies": {
-    "internal-lib-build": "^1.4.0-dev"
+    "@wojtekmaj/enzyme-adapter-react-17": "^0.6.6",
+    "internal-lib-build": "^1.4.0-dev",
+    "regenerator-runtime": "^0.13.9"
   },
   "peerDependencies": {
     "@loadable/component": "^5.15.0",

@@ -8,8 +8,14 @@
 const p = require('path')
 const program = require('commander')
 const sh = require('shelljs')
+const {execSync: _execSync} = require('child_process');
 
 sh.set('-e')
+
+const execSync = (cmd, opts) => {
+    const defaults = {stdio: 'inherit'}
+    return _execSync(cmd, {...defaults, ...opts})
+}
 
 const pkgRoot = p.join(__dirname, '..')
 
@@ -25,10 +31,10 @@ const main = () => {
 
         sh.rm('-rf', './dist')
         sh.mkdir('./dist')
-        sh.exec(
+        execSync(
             `${babel} --config-file ${babelConfig} src -x ".js",".jsx" --ignore "**/test_fixtures/*","*.test.js","test.js" --out-dir dist --copy-files`
         )
-        sh.exec(prepareDist)
+        execSync(prepareDist)
     })
 
     program
@@ -38,7 +44,7 @@ const main = () => {
         .action((path, {fix}) => {
             const eslint = p.join(binDir, 'eslint')
             const eslintConfig = p.resolve(p.join(__dirname, '..', 'configs', '.eslintrc.js'))
-            sh.exec(
+            execSync(
                 `${eslint} --config ${eslintConfig} --resolve-plugins-relative-to ${pkgRoot}${
                     fix ? ' --fix' : ''
                 } ${path}`
@@ -50,7 +56,7 @@ const main = () => {
         .argument('<path>', 'path or glob to format')
         .action((path) => {
             const prettier = p.join(binDir, 'prettier')
-            sh.exec(`${prettier} --write ${path}`)
+            execSync(`${prettier} --write ${path}`)
         })
 
     program
@@ -59,10 +65,15 @@ const main = () => {
         .option('--jest-args <args>', 'arguments to forward to Jest')
         .action(({jestArgs}) => {
             const jest = p.join(binDir, 'jest')
-            sh.exec(`${jest} --passWithNoTests --maxWorkers=2${jestArgs ? ' ' + jestArgs : ''}`)
+            execSync(`${jest} --passWithNoTests --maxWorkers=2${jestArgs ? ' ' + jestArgs : ''}`)
         })
 
     program.parse(process.argv)
 }
 
-main()
+Promise.resolve()
+    .then(() => main())
+    .catch((err) => {
+        console.error(err.message)
+        process.exit(1)
+    })

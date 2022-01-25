@@ -1,7 +1,15 @@
+/*
+ * Copyright (c) 2021, salesforce.com, inc.
+ * All rights reserved.
+ * SPDX-License-Identifier: BSD-3-Clause
+ * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
+ */
 const base = require('internal-lib-build/configs/jest/jest.config')
+const path = require('path')
 
 module.exports = {
     ...base,
+    setupFiles: base.setupFiles.concat(path.join(__dirname, 'setup-jest.js')),
     collectCoverageFrom: [
         '**/*.{js,jsx}',
         '!**/test.{js,jsx}',
@@ -41,5 +49,5 @@ module.exports = {
             lines: 90,
             statements: 90
         }
-    },
+    }
 }

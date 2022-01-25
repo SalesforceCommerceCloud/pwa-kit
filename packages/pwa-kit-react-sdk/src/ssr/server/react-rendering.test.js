@@ -9,11 +9,11 @@
  */
 /* eslint-disable header/header */
 import {render, ALLOWLISTED_INLINE_SCRIPTS} from './react-rendering'
-import {createApp} from './express'
+import {RemoteServerFactory} from 'pwa-kit-runtime/ssr/server/build-remote-server'
 import request from 'supertest'
 import {parse} from 'node-html-parser'
 import path from 'path'
-import {isRemote} from '../../utils/ssr-server'
+import {isRemote} from 'pwa-kit-runtime/utils/ssr-server'
 
 const opts = (overrides = {}) => {
     const fixtures = path.join(__dirname, '..', '..', 'ssr', 'server', 'test_fixtures')
@@ -25,7 +25,7 @@ const opts = (overrides = {}) => {
                 proxyConfigs: []
             }
         },
-        sslFilePath: path.join(fixtures, 'localhost.pem')
+        protocol: 'http'
     }
     return {
         ...defaults,
@@ -286,8 +286,8 @@ jest.mock('../universal/routes', () => {
     }
 })
 
-jest.mock('../../utils/ssr-server', () => {
-    const actual = jest.requireActual('../../utils/ssr-server')
+jest.mock('pwa-kit-runtime/utils/ssr-server', () => {
+    const actual = jest.requireActual('pwa-kit-runtime/utils/ssr-server')
     return {
         ...actual,
         isRemote: jest.fn()
@@ -581,26 +581,20 @@ describe('The Node SSR Environment', () => {
         }
     ]
 
-    const isRemoteValues = [true, false]
-
-    isRemoteValues.forEach((isRemoteValue) => {
-        // Run test cases
-        cases.forEach(({description, req, assertions}) => {
-            test(`renders PWA pages properly when ${
-                isRemoteValue ? 'remote' : 'local'
-            } (${description})`, () => {
-                // Mock `isRemote` per test execution.
-                isRemote.mockReturnValue(isRemoteValue)
-
-                const {url, headers, query} = req
-                const app = createApp(opts())
-                app.get('/*', render)
-                return request(app)
-                    .get(url)
-                    .set(headers || {})
-                    .query(query || {})
-                    .then((res) => assertions(res))
-            })
+    cases.forEach(({description, req, assertions}) => {
+        test(`renders PWA pages properly (${description})`, () => {
+            // Test against the remote server - the dev server
+            // starts a webpack compiler and is difficult to test
+            // with. It also isn't useful for testing code-paths
+            // in the react-rendering function.
+            const {url, headers, query} = req
+            const app = RemoteServerFactory.createApp(opts())
+            app.get('/*', render)
+            return request(app)
+                .get(url)
+                .set(headers || {})
+                .query(query || {})
+                .then((res) => assertions(res))
         })
     })
 })
