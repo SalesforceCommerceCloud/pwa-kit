@@ -262,9 +262,10 @@ const renderApp = (args) => {
 
     const helmet = Helmet.renderStatic()
 
+    // Return the first error encountered during the rendering pipeline.
+    const error = appStateError || renderError
     // Remove the stacktrace when executing remotely as to not leak any important
     // information to users about our system.
-    const error = renderError || appStateError
     if (error && isRemote()) {
         delete error.stack
     }
