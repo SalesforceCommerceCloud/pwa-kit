@@ -121,6 +121,9 @@ export const searchUrlBuilder = (searchTerm) => `/search?q=${searchTerm}`
 
 /**
  * Returns a relative URL for a locale short code.
+ * This function will take based on the url config from the pwa-kit.config
+ * to look for the locale position from the path/param
+ * and replace it with new shortCode
  *
  * @param {string} shortCode - The locale short code.
  * @param {{site: {l10n: {defaultLocale: string}, alias: string, id: string}, location: URL}} [opts] - Options, if there's any.
