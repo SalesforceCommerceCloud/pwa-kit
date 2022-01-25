@@ -8,7 +8,6 @@
 import pwaKitConfig from '../../pwa-kit.config.json'
 import {urlPartPositions} from '../constants'
 import {pathToUrl} from './url'
-import {getUrlConfig} from './url-config'
 /**
  * Call requestIdleCallback in supported browsers.
  *
@@ -217,17 +216,16 @@ export const getObjectProperty = (obj, path) => {
 /**
  * This function return the param (e.g site and locale) from the given url
  * The site will show up before locale if both of them are presented in the pathname
- * @param path
+ * @param path {string}
+ * @param urlConfig {object}
  * @returns {object}
  */
-export const getParamsFromPath = (path) => {
-    const urlConfig = getUrlConfig()
-
+export const getParamsFromPath = (path, urlConfig = {}) => {
+    const result = {}
     const {pathname, search} = new URL(pathToUrl(path))
     const params = new URLSearchParams(search)
     // split the pathname into an array and remove falsy values
     const paths = pathname.split('/').filter(Boolean)
-    const result = {}
     const sitePosition = urlConfig.site
     if (sitePosition === urlPartPositions.PATH) {
         result.site = paths[0]
@@ -245,6 +243,5 @@ export const getParamsFromPath = (path) => {
     } else if (localePosition === urlPartPositions.QUERY_PARAM) {
         result.locale = params.get('locale')
     }
-    console.log('result', result)
     return result
 }

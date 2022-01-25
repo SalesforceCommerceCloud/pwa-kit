@@ -5,11 +5,40 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {getConfig} from './utils'
+import {getConfig, getParamsFromPath} from './utils'
 import {urlPartPositions} from '../constants'
 import {rebuildPathWithParams} from './url'
 import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
-import {getDefaultSiteValues} from './site-utils'
+import {getDefaultSite, getDefaultSiteValues, getSitesByHost} from './site-utils'
+
+/**
+ * This function takes an url and return the site, locale and url configuration
+ * For site, if a site is defined from the path, use the val to look for site obj from the config
+ *    if not, use default site
+ * For locale, if the locale is defined from path, use that val to find the locale object from config
+ *    if not use the default val of the current site to find the locale object
+ * @param path
+ * @returns {Object} ConfigValue object
+ */
+export const resolveConfigFromUrl = (path) => {
+    const urlConfig = getUrlConfig()
+
+    const {site: currentSite, locale: currentLocale} = getParamsFromPath(path, urlConfig)
+    const {hostname} = new URL(getAppOrigin())
+    const sites = getSitesByHost(hostname)
+    const defaultSite = getDefaultSite()
+    const site = currentSite
+        ? sites.find((site) => site.id === currentSite || site.alias === currentSite)
+        : defaultSite
+    const locale = currentLocale
+        ? site.l10n.supportedLocales.find((locale) => locale.id === currentLocale)
+        : site.l10n.supportedLocales.find((locale) => locale.id === site.l10n.defaultLocale)
+    return {
+        site: site.alias,
+        locale: locale.id,
+        url: urlConfig
+    }
+}
 
 /**
  * Rebuild the path with locale/site value to the path as url path or url query param
@@ -41,8 +70,8 @@ import {getDefaultSiteValues} from './site-utils'
  *
  */
 export const buildPathWithUrlConfig = (path, configValues = {}) => {
-    const urlConfig = getUrlConfig()
-    if (!urlConfig || !Object.values(urlConfig).length) return path
+    const urlConfig = configValues.url
+    if (!Object.values(urlConfig).length) return path
     if (!Object.values(configValues).length) return path
     const queryParams = {}
     let basePathSegments = []

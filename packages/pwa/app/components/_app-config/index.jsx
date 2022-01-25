@@ -20,10 +20,10 @@ import {
     CustomerProvider
 } from '../../commerce-api/contexts'
 import {commerceAPIConfig, einsteinAPIConfig} from '../../api.config'
-import {getPreferredCurrency, getSupportedLocalesIds} from '../../utils/locale'
-import {getParamsFromPath} from '../../utils/utils'
+import {getPreferredCurrency} from '../../utils/locale'
 import {pathToUrl} from '../../utils/url'
 import {resolveSiteFromUrl} from '../../utils/site-utils'
+import {resolveConfigFromUrl} from '../../utils/url-config'
 
 const apiConfig = {
     ...commerceAPIConfig,
@@ -41,17 +41,9 @@ const getLocale = (locals = {}) => {
         typeof window === 'undefined'
             ? locals.originalUrl
             : `${window.location.pathname}${window.location.search}`
-    let shortCode
-    const {locale} = getParamsFromPath(path)
-    const site = resolveSiteFromUrl(pathToUrl(path))
-    console.log('getLocale site', site)
-    const l10n = site?.l10n
+    const {locale} = resolveConfigFromUrl(path)
 
-    // Ensure that the locale is in the supported list, otherwise return the default.
-    shortCode = getSupportedLocalesIds(l10n.supportedLocales).includes(locale)
-        ? locale
-        : l10n.defaultLocale
-    return shortCode
+    return locale
 }
 
 /**
@@ -92,7 +84,7 @@ AppConfig.restore = (locals = {}) => {
     }
 
     const {l10n} = site
-    const locale = getLocale(locals) || l10n.defaultLocale
+    const locale = getLocale(locals)
     const currency = getPreferredCurrency(locale, l10n.supportedLocales) || l10n.defaultCurrency
 
     locals.api = new CommerceAPI({...apiConfig, locale, currency})

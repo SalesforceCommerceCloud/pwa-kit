@@ -1,14 +1,19 @@
 {
     "app": {
         "url": {
-            "site": "path",
-            "locale": "query_param",
-            "showDefault": false
+            "site": "query_param",
+            "locale": "path",
+            "showDefault": true
         },
         "hosts": [
             {
                 "domain": "localhost",
                 "defaultSite": "RefArchGlobal",
+                "url": {
+                    "site": "path",
+                    "locale": "path",
+                    "showDefault": true
+                },
                 "sites": [
                     {
                         "id": "RefArch",

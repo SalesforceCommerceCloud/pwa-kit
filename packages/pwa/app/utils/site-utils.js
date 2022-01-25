@@ -5,8 +5,9 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {getConfig, getParamsFromPath} from './utils'
+import {getConfig} from './utils'
 import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
+import {resolveConfigFromUrl} from './url-config'
 
 /**
  * This functions takes an url and returns a site object,
@@ -105,7 +106,7 @@ export const getSiteByHostname = (hostname) => {
  */
 export const getSiteByPath = (path, sites) => {
     // extract the site from the url
-    const {site: currentSite} = getParamsFromPath(path)
+    const {site: currentSite} = resolveConfigFromUrl(path)
     if (!currentSite) return
 
     if (!sites || !sites.length)
