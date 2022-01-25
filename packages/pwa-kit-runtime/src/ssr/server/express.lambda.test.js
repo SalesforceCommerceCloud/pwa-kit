@@ -14,7 +14,8 @@ jest.mock('../static/assets.json', () => mockStaticAssets, {virtual: true})
 
 // We use require() for the ssr-server since we have to mock a module
 // that it needs.
-const {createApp, createLambdaHandler} = require('./express')
+const {createHandler} = require('./express')
+const {RemoteServerFactory} = require('./build-remote-server')
 const AWSTestUtils = require('aws-lambda-test-utils')
 const crypto = require('crypto')
 const nock = require('nock')
@@ -232,7 +233,7 @@ describe('SSRServer Lambda integration', () => {
 
     lambdaTestCases.forEach((testCase) =>
         test(testCase.name, () => {
-            const app = createApp({
+            const app = RemoteServerFactory.createApp({
                 buildDir: testFixtures,
                 mainFilename: 'main-big.js',
                 mobify: testPackageMobify,
@@ -246,7 +247,7 @@ describe('SSRServer Lambda integration', () => {
             })
             app.get('/*', testCase.route)
 
-            const {handler, server: srv} = createLambdaHandler(app)
+            const {handler, server: srv} = createHandler(app)
             server = srv
 
             // Set up the mock proxy
@@ -316,7 +317,7 @@ describe('SSRServer Lambda integration', () => {
     )
 
     test('Lambda integration strips rogue headers', () => {
-        const app = createApp({
+        const app = RemoteServerFactory.createApp({
             buildDir: testFixtures,
             mobify: testPackageMobify,
             sslFilePath: path.join(testFixtures, 'localhost.pem'),
@@ -335,7 +336,7 @@ describe('SSRServer Lambda integration', () => {
         }
         app.get('/*', route)
 
-        const {handler, server: srv} = createLambdaHandler(app)
+        const {handler, server: srv} = createHandler(app)
         server = srv
 
         // Set up a fake event and a fake context for the Lambda call
@@ -372,7 +373,7 @@ describe('SSRServer Lambda integration', () => {
             res.send('<html/>')
         })
 
-        const app = createApp({
+        const app = RemoteServerFactory.createApp({
             buildDir: testFixtures,
             mobify: testPackageMobify,
             sslFilePath: path.join(testFixtures, 'localhost.pem'),
@@ -386,7 +387,7 @@ describe('SSRServer Lambda integration', () => {
 
         const collectGarbage = jest.spyOn(app, '_collectGarbage')
         const sendMetric = jest.spyOn(app, 'sendMetric')
-        const {handler, server: srv} = createLambdaHandler(app)
+        const {handler, server: srv} = createHandler(app)
         server = srv
 
         // Set up a fake event and a fake context for the Lambda call

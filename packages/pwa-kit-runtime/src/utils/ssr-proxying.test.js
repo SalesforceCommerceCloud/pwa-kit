@@ -455,10 +455,7 @@ describe('rewriteProxyResponseHeaders tests', () => {
 
             Object.entries(testCase.expected).forEach(([key, value]) => {
                 const actual = updatedHeaders[key]
-                expect(
-                    actual,
-                    `Expected "${key}" header to have value "${value}" but it has value "${actual}"`
-                ).toEqual(value)
+                expect(actual).toEqual(value)
             })
         })
     )
@@ -688,10 +685,7 @@ describe('rewriteProxyRequestHeaders tests', () => {
             expectedKeys.forEach((key) => {
                 const value = testCase.expected[key]
                 const actual = updatedHeaders[key]
-                expect(
-                    actual,
-                    `Expected "${key}" header to have value "${value}" but it has value "${actual}"`
-                ).toEqual(value)
+                expect(actual).toEqual(value)
             })
 
             // If we're testing the allowlist, verify that each

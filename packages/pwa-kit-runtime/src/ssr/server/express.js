@@ -26,16 +26,21 @@ import {CACHE_CONTROL, CONTENT_ENCODING, X_MOBIFY_FROM_CACHE} from './constants'
 import {X_MOBIFY_REQUEST_CLASS} from '../../utils/ssr-proxying'
 import {RemoteServerFactory} from './build-remote-server'
 
+let _devServerCache = undefined
+
 const serverFactory = () => {
     if (isRemote()) {
         return RemoteServerFactory
     } else {
-        // Import the dev-server as an optional, peer dependency in a way
-        // that avoids it being bundled for prod by Webpack.
-        const {DevServerFactory} = eval('require').main.require(
-            'pwa-kit-build/ssr/server/build-dev-server'
-        )
-        return Object.assign({}, RemoteServerFactory, DevServerFactory)
+        if (!_devServerCache) {
+            // Import the dev-server as an optional, peer dependency in a way
+            // that avoids it being bundled for prod by Webpack.
+            const {DevServerFactory} = eval('require').main.require(
+                'pwa-kit-build/ssr/server/build-dev-server'
+            )
+            _devServerCache = Object.assign({}, RemoteServerFactory, DevServerFactory)
+        }
+        return _devServerCache
     }
 }
 
@@ -498,8 +503,6 @@ export const respondFromBundle = ({req, res, path, redirect = 301}) => {
     res.redirect(workingRedirect, location)
 }
 
-const factory = serverFactory()
-
 /**
  * Create an SSR (Server-Side Rendering) Server.
  *
@@ -530,7 +533,7 @@ const factory = serverFactory()
  * oppsed to locally), enables legacy proxying behaviour, allowing "proxy" requests to route through
  * the express server. In the future, this behaviour and setting will be removed.
  */
-export const createApp = (options) => factory.createApp(options)
+export const createApp = (options) => serverFactory().createApp(options)
 
 /**
  * Create a Lambda handler OR start the local dev server, as appropriate for the
@@ -545,9 +548,13 @@ export const createApp = (options) => factory.createApp(options)
  * @return {Function|undefined} - return a Lambda handler if running remotely, else undefined.
  */
 export const createHandler = (app) => {
+    // TODO: We need to refactor this bit to make react optional. It needs
+    // to be the end users responsibility to add the SSR renderer
+    // so they can add one of their choosing (or none at all).
+
     // Configure the global last-chance error handler
     process.on('unhandledRejection', catchAndLog)
 
-    factory.addSSRRenderer(app)
-    return factory.createHandler(app).handler
+    serverFactory().addSSRRenderer(app)
+    return serverFactory().createHandler(app).handler
 }
