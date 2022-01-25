@@ -120,9 +120,11 @@ const runGenerator = (answers, {outputDir}) => {
 
     extractTemplate('pwa', outputDir)
 
+    const {pkgLocalizationConfig} = require(`../assets/pwa/l10n.config`)
     const pkgJsonPath = p.resolve(outputDir, 'package.json')
     const pkgJSON = readJson(pkgJsonPath)
-    const finalPkgData = merge(pkgJSON, answers['scaffold-pwa'])
+    const pkgDataWithAnswers = merge(pkgJSON, answers['scaffold-pwa'])
+    const finalPkgData = merge(pkgDataWithAnswers, pkgLocalizationConfig)
 
     npmInstallables.forEach((pkgName) => {
         const keys = ['dependencies', 'devDependencies']
@@ -152,6 +154,20 @@ const runGenerator = (answers, {outputDir}) => {
             }
         ]
     })
+
+    const PWAKitConfigJsonTemplatePath = p.resolve(
+        p.join(
+            process.cwd(),
+            'packages',
+            'pwa-kit-create-app',
+            'assets',
+            'pwa',
+            'pwa-kit.config.json'
+        )
+    )
+    const PWAKitConfigJsonTemplate = readJson(PWAKitConfigJsonTemplatePath)
+    const PWAKitConfigJsonPath = p.resolve(outputDir, 'pwa-kit.config.json')
+    writeJson(PWAKitConfigJsonPath, PWAKitConfigJsonTemplate)
 
     const APIConfigTemplate = require(`../assets/pwa/api.config`).template
     const commerceApi = {
@@ -303,7 +319,7 @@ const testProjectAnswers = () => {
         projectId: 'scaffold-pwa',
         instanceUrl: 'https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com',
         clientId: 'c9c45bfd-0ed3-4aa2-9971-40f88962b836',
-        siteId: 'RefArchGlobal',
+        siteId: 'RefArch',
         organizationId: 'f_ecom_zzrf_001',
         shortCode: 'kv7kzm78',
         einsteinId: '1ea06c6e-c936-4324-bcf0-fada93f83bb1',
