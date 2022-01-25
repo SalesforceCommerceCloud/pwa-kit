@@ -183,4 +183,9 @@ const main = () => {
     program.parse(process.argv)
 }
 
-main()
+Promise.resolve()
+    .then(() => main())
+    .catch((err) => {
+        console.error(err.message)
+        process.exit(1)
+    })
