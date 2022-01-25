@@ -26,21 +26,11 @@ import {CACHE_CONTROL, CONTENT_ENCODING, X_MOBIFY_FROM_CACHE} from './constants'
 import {X_MOBIFY_REQUEST_CLASS} from '../../utils/ssr-proxying'
 import {RemoteServerFactory} from './build-remote-server'
 
-let _devServerCache = undefined
-
 const serverFactory = () => {
     if (isRemote()) {
         return RemoteServerFactory
     } else {
-        if (!_devServerCache) {
-            // Import the dev-server as an optional, peer dependency in a way
-            // that avoids it being bundled for prod by Webpack.
-            const {DevServerFactory} = eval('require').main.require(
-                'pwa-kit-build/ssr/server/build-dev-server'
-            )
-            _devServerCache = Object.assign({}, RemoteServerFactory, DevServerFactory)
-        }
-        return _devServerCache
+        return eval('require').main.require('pwa-kit-build/ssr/server/build-dev-server').DevServerFactory
     }
 }
 

@@ -19,6 +19,7 @@ import open from 'open'
 import requireFromString from 'require-from-string'
 import config from '../../configs/webpack/config'
 import {loadingScreen} from './loading-screen'
+import {RemoteServerFactory} from 'pwa-kit-runtime/ssr/server/build-remote-server'
 
 const chalk = require('chalk')
 
@@ -29,7 +30,7 @@ const NO_CACHE = 'max-age=0, nocache, nostore, must-revalidate'
 /**
  * @private
  */
-export const DevServerFactory = {
+export const DevServerMixin = {
     logStartupMessage(options) {
         console.log(`Starting the DevServer on ${chalk.cyan(this._getDevServerURL(options))}\n`)
     },
@@ -272,3 +273,5 @@ export const shouldCompress = (req, res) => {
     // not to compress the data.
     return compression.filter(req, res)
 }
+
+export const DevServerFactory = Object.assign({}, RemoteServerFactory, DevServerMixin)
