@@ -297,12 +297,13 @@ jobs:
             MAX_PACKAGES="2250"
             total=$(./scripts/count-dependencies.js /tmp/project)
             echo "export TOTAL_PACKAGES=${total}" >> $BASH_ENV;
+            source $BASH_ENV
 
             if [ "$total" -gt "$MAX_PACKAGES" ]; then
                 echo "Error: Found $TOTAL_PACKAGES installed packages (max $MAX_PACKAGES).";
                 exit 1;
             else
-                echo "Error: Found $TOTAL_PACKAGES installed packages (max $MAX_PACKAGES).";
+                echo "Found $TOTAL_PACKAGES installed packages (max $MAX_PACKAGES).";
             fi
       - early_return_for_forked_pull_requests
       - slack/status:
