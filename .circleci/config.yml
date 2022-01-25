@@ -294,7 +294,7 @@ jobs:
           name: Count Generated Project Dependencies
           environment:
           command: |
-            MAX_PACKAGES="3050"
+            MAX_PACKAGES="2250"
             total=$(./scripts/count-dependencies.js /tmp/project)
             echo "export TOTAL_PACKAGES=${total}" >> $BASH_ENV;
 
