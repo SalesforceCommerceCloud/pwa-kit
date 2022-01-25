@@ -93,7 +93,7 @@
         "prod:build": "npm run build-translations && mrtcli build",
         "push": "npm run prod:build && mrtcli push",
         "save-credentials": "mrtcli save-credentials",
-        "start": "cross-env NODE_ICU_DATA=node_modules/full-icu mrtcli dev",
+        "start": "cross-env NODE_ICU_DATA=node_modules/full-icu mrtcli start",
         "start:inspect": "npm run start -- --inspect",
         "start:pseudolocale": "npm run extract-default-translations && npm run compile-translations:pseudo && cross-env USE_PSEUDOLOCALE=true npm run start",
         "test": "mrtcli test",

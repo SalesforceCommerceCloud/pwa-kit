@@ -69,7 +69,7 @@ const main = () => {
         })
 
     program
-        .command('dev')
+        .command('start')
         .description(`develop your app locally`)
         .action(() => {
             execSync(`node ${p.join(process.cwd(), 'app', 'ssr.js')}`)
