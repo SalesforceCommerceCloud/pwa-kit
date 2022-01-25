@@ -15,7 +15,11 @@
         "format": "mrtcli format '\"**/*.{js,jsx}\"'",
         "lint": "mrtcli lint .",
         "lint:fix": "npm run lint -- --fix",
-        "test": "mrtcli test"
+        "save-credentials": "mrtcli save-credentials",
+        "start": "cross-env NODE_ICU_DATA=node_modules/full-icu mrtcli start",
+        "test": "mrtcli test",
+        "prod:build": "mrtcli build",
+        "push": "npm run prod:build && mrtcli push"
     },
     "dependencies": {
         "pwa-kit-runtime": "^1.4.0-dev"
