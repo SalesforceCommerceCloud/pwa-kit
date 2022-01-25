@@ -4,18 +4,17 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-const path = require("path");
-const {
-    createApp,
-    createHandler
-} = require("pwa-kit-runtime/ssr/server/express");
-const pkg = require("../package.json");
+const path = require('path')
+const {createApp, createHandler} = require('pwa-kit-runtime/ssr/server/express')
+const pkg = require('../package.json')
 
 const app = createApp({
-    buildDir: path.resolve(process.cwd(), "build"),
+    buildDir: path.resolve(process.cwd(), 'build'),
     defaultCacheTimeSeconds: 600,
-    mobify: pkg.mobify
-});
+    mobify: pkg.mobify,
+    enableLegacyRemoteProxying: false,
+    protocol: 'http'
+})
 
 app.get('/', (req, res) => {
     return res.json({
@@ -29,4 +28,4 @@ app.get('/', (req, res) => {
     })
 })
 
-exports.get = createHandler(app);
+exports.get = createHandler(app)

@@ -6,9 +6,14 @@
     "devDependencies": {
         "pwa-kit-build": "^1.4.0-dev",
         "pwa-kit-react-sdk": "^1.4.0-dev",
-        "pwa-kit-runtime": "^1.4.0-dev"
+        "pwa-kit-runtime": "^1.4.0-dev",
+        "react": "^17.0.2",
+        "react-dom": "^17.0.2",
+        "react-helmet": "^6.1.0",
+        "react-router-dom": "^5.1.2"
     },
     "scripts": {
+        "test": "mrtcli test",
         "format": "mrtcli format '\"**/*.{js,jsx}\"'",
         "lint": "mrtcli lint '\"**/*.{js,jsx}\"'",
         "lint:fix": "npm run lint -- --fix",
