@@ -215,7 +215,7 @@ export const getObjectProperty = (obj, path) => {
 }
 
 /**
- * This functions return the param (e.g site and locale) from the given url
+ * This function return the param (e.g site and locale) from the given url
  * The site will show up before locale if both of them are presented in the pathname
  * @param path
  * @returns {object}
@@ -225,23 +225,26 @@ export const getParamsFromPath = (path) => {
 
     const {pathname, search} = new URL(pathToUrl(path))
     const params = new URLSearchParams(search)
+    // split the pathname into an array and remove falsy values
+    const paths = pathname.split('/').filter(Boolean)
     const result = {}
-    const sitePosition = urlConfig.site.position
+    const sitePosition = urlConfig.site
     if (sitePosition === urlPartPositions.PATH) {
-        result.site = pathname.split('/')[1]
+        result.site = paths[0]
     } else if (sitePosition === urlPartPositions.QUERY_PARAM) {
         result.site = params.get('site')
     }
 
-    const localePosition = urlConfig.locale.position
+    const localePosition = urlConfig.locale
     if (localePosition === urlPartPositions.PATH) {
         if (sitePosition === urlPartPositions.PATH) {
-            result.locale = pathname.split('/')[2]
+            result.locale = paths[1]
         } else {
-            result.locale = pathname.split('/')[1]
+            result.locale = paths[0]
         }
     } else if (localePosition === urlPartPositions.QUERY_PARAM) {
         result.locale = params.get('locale')
     }
+    console.log('result', result)
     return result
 }

@@ -119,9 +119,7 @@ const App = (props) => {
     const onCartClick = () => {
         const path = buildPathWithUrlConfig('/cart', {
             locale: targetLocale,
-            site: site.alias || site.id,
-            defaultSite: site.defaultSite,
-            defaultLocale: site.l10n.defaultLocale
+            site: site.alias || site.id
         })
         history.push(path)
 
@@ -134,8 +132,7 @@ const App = (props) => {
         if (customer.isRegistered) {
             const path = buildPathWithUrlConfig('/account', {
                 locale: targetLocale,
-                site: site.alias || site.id,
-                defaultLocale: site.l10n.defaultLocale
+                site: site.alias || site.id
             })
             history.push(path)
         } else {
@@ -148,8 +145,7 @@ const App = (props) => {
     const onWishlistClick = () => {
         const path = buildPathWithUrlConfig('/account/wishlist', {
             locale: targetLocale,
-            site: site.alias || site.id,
-            defaultLocale: site.l10n.defaultLocale
+            site: site.alias || site.id
         })
         history.push(path)
     }

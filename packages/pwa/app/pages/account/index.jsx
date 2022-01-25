@@ -92,8 +92,7 @@ const Account = () => {
     if (customer.authType != null && !customer.isRegistered) {
         const path = buildPathWithUrlConfig('/login', {
             locale,
-            site: site.alias || site.id,
-            defaultLocale: site.l10n.defaultLocale
+            site: site.alias || site.id
         })
         return <Redirect to={{pathname: path, state: {directedFrom: location.pathname}}} />
     }

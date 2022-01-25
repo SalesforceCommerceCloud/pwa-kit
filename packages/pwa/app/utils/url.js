@@ -129,9 +129,7 @@ export const searchUrlBuilder = (searchTerm) => `/search?q=${searchTerm}`
  * @returns {string} - The relative URL for the specific locale.
  */
 export const getUrlWithLocale = (shortCode, opts = {}) => {
-    const {locale: localePosition, site: sitePosition} = getUrlConfig()
-    const {hostname} = new URL(getAppOrigin())
-    const defaultSiteId = getDefaultSiteIdByHost(hostname)
+    const urlConfig = getUrlConfig()
     const location = opts.location ? opts.location : window.location
     const {disallowParams = [], site} = opts
     let relativeUrl = location.pathname
@@ -144,33 +142,64 @@ export const getUrlWithLocale = (shortCode, opts = {}) => {
             params.delete(param)
         })
     }
-
+    let paths = relativeUrl.split('/').filter((path) => path !== '')
+    const siteValue = site.alias || site.id
+    const localePosition = urlConfig.locale
+    const sitePosition = urlConfig.site
     if (relativeUrl === HOME_HREF) {
         relativeUrl = buildPathWithUrlConfig(relativeUrl, {
             locale: shortCode,
-            site: site.alias || site.id,
-            defaultLocale: site.l10n.defaultLocale
+            site: siteValue
         })
-    } else {
-        let paths = relativeUrl.split('/').filter((path) => path !== '')
-        // remove old locale and site, rebuild the url with new locale and site
-        if (localePosition === urlPartPositions.PATH && sitePosition === urlPartPositions.PATH) {
-            // remove first two elements which is the site and locale
-            paths.splice(0, 2)
-            const pathWithoutBaseSegments = `/${paths.join('/')}`
-            const isDefaultSite = site.id === defaultSiteId
-            const isDefaultLocale = shortCode === site?.l10n?.defaultLocale
-            // we don't want to show  site and locale when they are the home page and they are both default values
-            const updatedPath = `${buildPathWithUrlConfig(pathWithoutBaseSegments, {
-                locale: isDefaultLocale && isDefaultSite && paths.length === 0 ? '' : shortCode,
-                site: isDefaultLocale && isDefaultSite && paths.length === 0 ? '' : site?.alias
-            })}`
-            relativeUrl = `${updatedPath}${Array.from(params).length > 0 ? `?${params}` : ''}`
-        } else {
-            paths.splice(0, 1, shortCode)
-            relativeUrl = `/${paths.join('/')}${Array.from(params).length > 0 ? `?${params}` : ''}`
-        }
+        return relativeUrl
     }
+
+    if (urlConfig.showDefault) {
+        if (localePosition === urlPartPositions.PATH && sitePosition === urlPartPositions.PATH) {
+            paths.splice(1, 1, shortCode)
+        } else if (localePosition === urlPartPositions.PATH) {
+            paths.splice(0, 1, shortCode)
+        } else if (localePosition === urlPartPositions.QUERY_PARAM) {
+            params.set('locale', shortCode)
+        }
+
+        relativeUrl = `/${paths.join('/')}${Array.from(params).length > 0 ? `?${params}` : ''}`
+    } else if (!urlConfig.showDefault) {
+        if (localePosition === urlPartPositions.PATH && sitePosition === urlPartPositions.PATH) {
+            // when the site is not shown, it means default site and locale are being used
+            // now we switch to a non-default locale, we need to append both site and locale to the url
+            if (!paths.includes(siteValue)) {
+                paths.unshift(siteValue, shortCode)
+            } else {
+                paths.splice(1, 1, shortCode)
+            }
+        } else if (
+            localePosition === urlPartPositions.PATH &&
+            sitePosition === urlPartPositions.QUERY_PARAM
+        ) {
+            // when the site is not shown on the url, it means default one is being used
+            // we need to set it up again for non-default locale
+            if (!params.get('site')) {
+                params.set('site', siteValue)
+            }
+            paths.unshift(shortCode)
+        } else if (localePosition === urlPartPositions.QUERY_PARAM) {
+            // when the site is not shown on the url, it means default one is being used
+            // we need to set it up again for non-default locale
+            if (sitePosition === urlPartPositions.QUERY_PARAM) {
+                if (!params.get('site')) {
+                    params.set('site', siteValue)
+                }
+            } else if (sitePosition === urlPartPositions.PATH) {
+                if (!paths.includes(siteValue)) {
+                    paths.unshift(siteValue)
+                }
+            }
+            params.set('locale', shortCode)
+        }
+        relativeUrl = `/${paths.join('/')}${Array.from(params).length > 0 ? `?${params}` : ''}`
+    }
+
     return relativeUrl
 }
 

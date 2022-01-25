@@ -64,6 +64,24 @@ export const getDefaultSite = () => {
     return sites.find((site) => site.id === defaultSiteId)
 }
 
+export const getDefaultLocale = () => {
+    const defaultSite = getDefaultSite()
+    return defaultSite.l10n.supportedLocales.find(
+        (locale) => locale.id === defaultSite.l10n.defaultLocale
+    )
+}
+
+/**
+ * This function goes over the default site and group id and alias of site and locale into their own value list
+ */
+export const getDefaultSiteValues = () => {
+    const defaultSite = getDefaultSite()
+    const defaultLocale = getDefaultLocale()
+    return {
+        defaultLocaleVal: [defaultLocale.id, defaultLocale.alias],
+        defaultSiteVal: [defaultSite.id, defaultSite.alias]
+    }
+}
 /**
  * Get the site based on the given hostname
  * If there is only one site in that host, use that

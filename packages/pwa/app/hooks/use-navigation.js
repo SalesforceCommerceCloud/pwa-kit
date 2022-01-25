@@ -29,8 +29,7 @@ const useNavigation = () => {
         (path, action = 'push', ...args) => {
             const updatedHref = buildPathWithUrlConfig(path, {
                 locale,
-                site: site.alias || site.id,
-                defaultLocale: site.l10n.defaultLocale
+                site: site.alias || site.id
             })
             history[action](path === '/' ? '/' : updatedHref, ...args)
         },

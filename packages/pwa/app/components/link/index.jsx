@@ -19,8 +19,7 @@ const Link = React.forwardRef(({href, to, useNavLink = false, ...props}, ref) =>
 
     const updatedHref = buildPathWithUrlConfig(_href, {
         locale,
-        site: site.alias || site.id,
-        defaultLocale: site.l10n.defaultLocale
+        site: site.alias || site.id
     })
 
     return (

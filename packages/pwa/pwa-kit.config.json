@@ -2,8 +2,8 @@
     "app": {
         "url": {
             "site": "path",
-            "locale": "path",
-            "showDefault": true
+            "locale": "query_param",
+            "showDefault": false
         },
         "hosts": [
             {
@@ -26,7 +26,7 @@
                                 {
                                     "id": "en-CA",
                                     "alias": "ca",
-                                    "preferredCurrency": "YEN"
+                                    "preferredCurrency": "USD"
                                 }
                             ]
                         }

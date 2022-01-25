@@ -9,15 +9,15 @@ import {getConfig} from './utils'
 import {urlPartPositions} from '../constants'
 import {rebuildPathWithParams} from './url'
 import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
-import {getDefaultSite} from './site-utils'
+import {getDefaultSiteValues} from './site-utils'
 
 /**
  * Rebuild the path with locale/site value to the path as url path or url query param
  * based on url config.
  * If the showDefault flag is set to false, the default value won't show up in the url
- * @param {string} url - based url of the output url
+ * @param {string} path - the input path
  * @param {object} configValues - object that contains values of url param config
- * @return {string} - an output url
+ * @return {string} - an output path
  *
  * @example
  * //pwa-kit.config.json
@@ -40,42 +40,37 @@ import {getDefaultSite} from './site-utils'
  * => /global/women/dresses?locale=en-GB
  *
  */
-export const buildPathWithUrlConfig = (url, configValues = {}) => {
+export const buildPathWithUrlConfig = (path, configValues = {}) => {
     const urlConfig = getUrlConfig()
-    if (!urlConfig || !Object.values(urlConfig).length) return url
-    if (!Object.values(configValues).length) return url
+    if (!urlConfig || !Object.values(urlConfig).length) return path
+    if (!Object.values(configValues).length) return path
     const queryParams = {}
     let basePathSegments = []
-    const defaultSite = getDefaultSite()
-    // gather all default values for site and locale, id and aliases
-    // filter out falsy value
-    const defaultValues = [defaultSite.id, defaultSite.alias, configValues.defaultLocale].filter(
-        Boolean
-    )
+    const showDefault = urlConfig.showDefault
+    const {defaultLocaleVal, defaultSiteVal} = getDefaultSiteValues()
     const options = ['site', 'locale']
-
+    // if the showDefault is set to false, and when both locale and site are default values
+    // then do not include them into the url
+    if (
+        defaultLocaleVal.includes(configValues.locale) &&
+        defaultSiteVal.includes(configValues.site) &&
+        !showDefault
+    ) {
+        return path
+    }
     options.forEach((option) => {
         const position = urlConfig[option]
-        const showDefault = urlConfig.showDefault
         if (position === urlPartPositions.PATH) {
-            // if the showDefault is set to false and current value is the default, don't do anything
-            if (!showDefault && defaultValues.includes(configValues[option])) {
-                return
-            }
             // otherwise, append to the array to construct url later
             basePathSegments.push(configValues[option])
         } else if (position === urlPartPositions.QUERY_PARAM) {
-            // if the showDefault is set to false and current value is the default, don't do anything
-            if (!showDefault && defaultValues.includes(configValues[option])) {
-                return
-            }
             // otherwise, append to the query to construct url later
             queryParams[option] = configValues[option]
         }
     })
-    // filter out falsy value in the array
+    // filter out falsy values in the array
     basePathSegments = basePathSegments.filter(Boolean)
-    let updatedPath = `${basePathSegments.length ? `/${basePathSegments.join('/')}` : ''}${url}`
+    let updatedPath = `${basePathSegments.length ? `/${basePathSegments.join('/')}` : ''}${path}`
     // append the query param to pathname
     if (Object.keys(queryParams).length) {
         updatedPath = rebuildPathWithParams(updatedPath, queryParams)
