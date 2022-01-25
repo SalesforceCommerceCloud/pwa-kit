@@ -78,7 +78,6 @@
         "@testing-library/react": "^11.2.5",
         "@testing-library/react-hooks": "^7.0.2",
         "@testing-library/user-event": "^12.8.1",
-        "tree-kill": "^1.2.1",
         "whatwg-fetch": "1.0.0"
     },
     "scripts": {
