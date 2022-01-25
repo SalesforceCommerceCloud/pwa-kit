@@ -17,6 +17,8 @@ const uploadBundle = require('../scripts/upload.js')
 const pkgRoot = p.join(__dirname, '..')
 const binDir = p.join(require.resolve('prettier'), '../../.bin')
 
+const projectPkg = require(p.join(process.cwd(), 'package.json'))
+
 const execSync = (cmd, opts) => {
     const defaults = {stdio: 'inherit'}
     return _execSync(cmd, {...defaults, ...opts})
@@ -115,7 +117,7 @@ const main = () => {
             new program.Option(
                 '-s --projectSlug <projectSlug>',
                 "a project slug that differs from the name property in your project's package.json (default: the 'name' key from the package.json)"
-            )
+            ).default(projectPkg.name)
         )
         .addOption(
             new program.Option(
@@ -124,12 +126,11 @@ const main = () => {
             )
         )
         .action(({buildDirectory, message, projectSlug, target}) => {
-            const pkg = require(p.join(process.cwd(), 'package.json'))
-            const mobify = pkg.mobify || {}
+            const mobify = projectPkg.mobify || {}
 
             const options = {
                 buildDirectory,
-                message,
+                ...(message ? {message} : undefined),
                 projectSlug,
                 target,
                 // Note: Cloud expects snake_case, but package.json uses camelCase.
