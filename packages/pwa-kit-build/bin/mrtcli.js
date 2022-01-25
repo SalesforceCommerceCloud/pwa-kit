@@ -79,23 +79,17 @@ const main = () => {
         .command('build')
         .description(`build your app for production`)
         .action(() => {
-            const original = sh.config.silent
-            sh.config.silent = false
             const webpack = p.join(binDir, 'webpack')
             const webpackConf = p.resolve(
                 p.join(__dirname, '..', 'configs', 'webpack', 'config.js')
             )
-            try {
-                sh.rm('-rf', './build')
-                sh.exec(`${webpack} --config ${webpackConf}`, {
-                    env: {
-                        NODE_ENV: 'production',
-                        ...process.env
-                    }
-                })
-            } finally {
-                sh.config.silent = original
-            }
+            sh.rm('-rf', './build')
+            execSync(`${webpack} --config ${webpackConf}`, {
+                env: {
+                    NODE_ENV: 'production',
+                    ...process.env
+                }
+            })
         })
 
     program
@@ -161,7 +155,7 @@ const main = () => {
         .action((path, {fix}) => {
             const eslint = p.join(binDir, 'eslint')
             const eslintConfig = p.join(__dirname, '..', 'configs', 'eslint', 'eslint-config.js')
-            sh.exec(
+            execSync(
                 `${eslint} --config ${eslintConfig} --resolve-plugins-relative-to ${pkgRoot}${
                     fix ? ' --fix' : ''
                 } ${path}`

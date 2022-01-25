@@ -6,8 +6,6 @@
  */
 'use strict'
 
-/* global WEBPACK_PACKAGE_JSON_MOBIFY */
-
 const path = require('path')
 const {createApp, createHandler, serveStaticFile} = require('pwa-kit-runtime/ssr/server/express')
 const {isRemote} = require('pwa-kit-runtime/utils/ssr-server')
