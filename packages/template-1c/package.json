@@ -13,7 +13,7 @@
     },
     "scripts": {
         "format": "mrtcli format '\"**/*.{js,jsx}\"'",
-        "lint": "mrtcli lint .",
+        "lint": "mrtcli lint '\"**/*.{js,jsx}\"'",
         "lint:fix": "npm run lint -- --fix",
         "save-credentials": "mrtcli save-credentials",
         "start": "cross-env NODE_ICU_DATA=node_modules/full-icu mrtcli start",

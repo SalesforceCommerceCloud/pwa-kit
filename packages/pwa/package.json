@@ -87,7 +87,7 @@
         "compile-translations:pseudo": "formatjs compile --ast app/translations/$npm_package_l10n_defaultLocale.json --out-file app/translations/compiled/en-XB.json --pseudo-locale en-XB",
         "extract-default-translations": "formatjs extract 'app/**/*.{js,jsx}' --out-file app/translations/$npm_package_l10n_defaultLocale.json --id-interpolation-pattern [sha512:contenthash:base64:6]",
         "format": "mrtcli format '\"**/*.{js,jsx}\"'",
-        "lint": "mrtcli lint .",
+        "lint": "mrtcli lint '\"**/*.{js,jsx}\"'",
         "lint:fix": "npm run lint -- --fix",
         "prod:build": "npm run build-translations && mrtcli build",
         "push": "npm run prod:build && mrtcli push",
