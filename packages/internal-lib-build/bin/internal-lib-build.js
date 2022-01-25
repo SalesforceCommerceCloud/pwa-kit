@@ -65,7 +65,7 @@ const main = () => {
         .option('--jest-args <args>', 'arguments to forward to Jest')
         .action(({jestArgs}) => {
             const jest = p.join(binDir, 'jest')
-            execSync(`${jest} --passWithNoTests --maxWorkers=2${jestArgs ? ' ' + jestArgs : ''}`)
+            execSync(`${jest} --passWithNoTests --maxWorkers=2${jestArgs ? ' ' + jestArgs : ''}`, {env: {...process.env, NODE_ENV: 'test'}})
         })
 
     program.parse(process.argv)
