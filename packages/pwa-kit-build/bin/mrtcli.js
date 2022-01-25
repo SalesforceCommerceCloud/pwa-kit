@@ -29,8 +29,8 @@ const main = () => {
     program.description(`The Managed Runtime CLI`)
 
     program
-        .command('login')
-        .description(`login to Managed Runtime`)
+        .command('save-credentials')
+        .description(`save API credentials for Managed Runtime`)
         .requiredOption(
             '-u, --user <email>',
             'the e-mail address you used to register with Managed Runtime',
