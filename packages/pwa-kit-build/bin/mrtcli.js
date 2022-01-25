@@ -9,13 +9,18 @@ const p = require('path')
 const fs = require('fs')
 const program = require('commander')
 const isEmail = require('validator/lib/isEmail')
-const {execSync} = require('child_process')
+const {execSync: _execSync} = require('child_process')
 const scriptUtils = require('../scripts/utils')
 const sh = require('shelljs')
 const uploadBundle = require('../scripts/upload.js')
 
 const pkgRoot = p.join(__dirname, '..')
 const binDir = p.join(require.resolve('prettier'), '../../.bin')
+
+const execSync = (cmd, opts) => {
+    const defaults = {stdio: 'inherit'}
+    return _execSync(cmd, {...defaults, ...opts})
+}
 
 const main = () => {
     process.env.CONTEXT = process.cwd()
@@ -65,7 +70,7 @@ const main = () => {
         .command('dev')
         .description(`develop your app locally`)
         .action(() => {
-            execSync(`node ${p.join(process.cwd(), 'app', 'ssr.js')}`, {stdio: 'inherit'})
+            execSync(`node ${p.join(process.cwd(), 'app', 'ssr.js')}`)
         })
 
     program
@@ -168,7 +173,16 @@ const main = () => {
         .argument('<path>', 'path or glob to format')
         .action((path) => {
             const prettier = p.join(binDir, 'prettier')
-            sh.exec(`${prettier} --write ${path}`)
+            execSync(`${prettier} --write ${path}`)
+        })
+
+    program
+        .command('test')
+        .description('test the project')
+        .option('--jest-args <args>', 'arguments to forward to Jest')
+        .action(({jestArgs}) => {
+            const jest = p.join(binDir, 'jest')
+            execSync(`${jest} --passWithNoTests --maxWorkers=2${jestArgs ? ' ' + jestArgs : ''}`)
         })
 
     program.parse(process.argv)

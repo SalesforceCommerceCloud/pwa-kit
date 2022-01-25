@@ -14,7 +14,8 @@
     "scripts": {
         "format": "mrtcli format '\"**/*.{js,jsx}\"'",
         "lint": "mrtcli lint .",
-        "lint:fix": "npm run lint -- --fix"
+        "lint:fix": "npm run lint -- --fix",
+        "test": "mrtcli test"
     },
     "dependencies": {
         "pwa-kit-runtime": "^1.4.0-dev"

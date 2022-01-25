@@ -1,14 +1,9 @@
+const base = require('pwa-kit-build/configs/jest/jest.config.js')
+
 module.exports = {
-    testURL: 'http://localhost/',
-    verbose: true,
-    collectCoverage: true,
-    testEnvironment: 'jsdom',
-    testPathIgnorePatterns: ['node_modules', 'build'],
+    ...base,
     moduleNameMapper: {
-        '\\.(jpg|jpeg|png|gif|eot|otf|webp|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$':
-            '<rootDir>/__mocks__/fileMock.js',
-        '\\.(svg)$': '<rootDir>/__mocks__/svgMock.js',
-        '\\.(css|less)$': '<rootDir>/__mocks__/styleMock.js',
+        ...base.moduleNameMapper,
         '^react-router-dom(.*)$': '<rootDir>/node_modules/react-router-dom/index.js'
     },
     collectCoverageFrom: [
@@ -33,16 +28,5 @@ module.exports = {
             functions: 78,
             lines: 83
         }
-    },
-    setupFilesAfterEnv: ['./jest-setup.js'],
-    globals: {
-        DEBUG: true,
-        NODE_ENV: 'test',
-        Progressive: {
-            buildOrigin: '/mobify/bundle/development/'
-        }
-    },
-    transform: {
-        '^.+\\.(js|jsx|ts|tsx)$': './jest-babel-transform.js'
     }
 }
