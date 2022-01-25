@@ -30,10 +30,7 @@
     "lint:js": "internal-lib-build lint .",
     "prepare": "npm run prod:build",
     "prod:build": "cross-env NODE_ENV=production internal-lib-build build",
-    "test": "cross-env NODE_ENV=test jest --maxWorkers=2",
-    "test:inspect": "node --inspect-brk jest --runInBand",
-    "test:integration": "cross-env TEST_TYPE=integration npm run test",
-    "test:watch": "npm test -- --watch",
+    "test": "internal-lib-build test",
     "version": "node ./scripts/version.js"
   },
   "dependencies": {
