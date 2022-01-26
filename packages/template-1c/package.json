@@ -17,7 +17,7 @@
         "lint": "mrtcli lint '\"**/*.{js,jsx}\"'",
         "lint:fix": "npm run lint -- --fix",
         "save-credentials": "mrtcli save-credentials",
-        "start": "cross-env NODE_ICU_DATA=node_modules/full-icu mrtcli start",
+        "start": "mrtcli start",
         "test": "mrtcli test",
         "prod:build": "mrtcli build",
         "push": "npm run prod:build && mrtcli push"

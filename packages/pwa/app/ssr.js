@@ -7,12 +7,12 @@
 'use strict'
 
 const path = require('path')
-const {createApp, createHandler, serveStaticFile} = require('pwa-kit-runtime/ssr/server/express')
+const {createHandler, serveStaticFile} = require('pwa-kit-runtime/ssr/server/express')
 const {isRemote} = require('pwa-kit-runtime/utils/ssr-server')
 const helmet = require('helmet')
 const pkg = require('../package.json')
 
-const app = createApp({
+const options = {
     // The build directory (an absolute path)
     buildDir: path.resolve(process.cwd(), 'build'),
 
@@ -37,31 +37,33 @@ const app = createApp({
     protocol: 'http',
 
     enableLegacyRemoteProxying: false
-})
+}
 
-// Set HTTP security headers
-app.use(
-    helmet({
-        contentSecurityPolicy: {
-            useDefaults: true,
-            directives: {
-                'img-src': ["'self'", '*.commercecloud.salesforce.com', 'data:'],
-                'script-src': ["'self'", "'unsafe-eval'"],
+const {handler} = createHandler(options, (app) => {
+    // Set HTTP security headers
+    app.use(
+        helmet({
+            contentSecurityPolicy: {
+                useDefaults: true,
+                directives: {
+                    'img-src': ["'self'", '*.commercecloud.salesforce.com', 'data:'],
+                    'script-src': ["'self'", "'unsafe-eval'"],
 
-                // Do not upgrade insecure requests for local development
-                'upgrade-insecure-requests': isRemote() ? [] : null
-            }
-        },
-        hsts: isRemote()
+                    // Do not upgrade insecure requests for local development
+                    'upgrade-insecure-requests': isRemote() ? [] : null
+                }
+            },
+            hsts: isRemote()
+        })
+    )
+
+    // Handle the redirect from SLAS as to avoid error
+    app.get('/callback?*', (req, res) => {
+        res.send()
     })
-)
-
-// Handle the redirect from SLAS as to avoid error
-app.get('/callback?*', (req, res) => {
-    res.send()
+    app.get('/robots.txt', serveStaticFile('static/robots.txt'))
 })
-app.get('/robots.txt', serveStaticFile('static/robots.txt'))
 
 // SSR requires that we export a single handler function called 'get', that
 // supports AWS use of the server that we created above.
-exports.get = createHandler(app)
+exports.get = handler

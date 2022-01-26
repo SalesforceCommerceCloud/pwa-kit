@@ -26,14 +26,6 @@ import {CACHE_CONTROL, CONTENT_ENCODING, X_MOBIFY_FROM_CACHE} from './constants'
 import {X_MOBIFY_REQUEST_CLASS} from '../../utils/ssr-proxying'
 import {RemoteServerFactory} from './build-remote-server'
 
-const serverFactory = () => {
-    if (isRemote()) {
-        return RemoteServerFactory
-    } else {
-        return eval('require').main.require('pwa-kit-build/ssr/server/build-dev-server').DevServerFactory
-    }
-}
-
 export const RESOLVED_PROMISE = Promise.resolve()
 
 /**
@@ -493,6 +485,15 @@ export const respondFromBundle = ({req, res, path, redirect = 301}) => {
     res.redirect(workingRedirect, location)
 }
 
+
+const serverFactory = () => {
+    if (isRemote()) {
+        return RemoteServerFactory
+    } else {
+        return eval('require').main.require('pwa-kit-build/ssr/server/build-dev-server').DevServerFactory
+    }
+}
+
 /**
  * Create an SSR (Server-Side Rendering) Server.
  *
@@ -520,31 +521,9 @@ export const respondFromBundle = ({req, res, path, redirect = 301}) => {
  * certificate file to be used by the local development server. This should
  * contain both the certificate and the private key.
  * @param {Boolean} [options.enableLegacyRemoteProxying=true] - When running remotely (as
- * oppsed to locally), enables legacy proxying behaviour, allowing "proxy" requests to route through
+ * opposed to locally), enables legacy proxying behaviour, allowing "proxy" requests to route through
  * the express server. In the future, this behaviour and setting will be removed.
+ * @param {function} customizeApp - a callback that takes an express app
+ * as an argument. Use this to customize the server.
  */
-export const createApp = (options) => serverFactory().createApp(options)
-
-/**
- * Create a Lambda handler OR start the local dev server, as appropriate for the
- * current environment. You should use this to export a Lambda handler in ssr.js,
- * eg.
- *
- *   const app = appServer()
- *
- *   export const get = createHandler(app)
- *
- * @param app {Express} - an Express App
- * @return {Function|undefined} - return a Lambda handler if running remotely, else undefined.
- */
-export const createHandler = (app) => {
-    // TODO: We need to refactor this bit to make react optional. It needs
-    // to be the end users responsibility to add the SSR renderer
-    // so they can add one of their choosing (or none at all).
-
-    // Configure the global last-chance error handler
-    process.on('unhandledRejection', catchAndLog)
-
-    serverFactory().addSSRRenderer(app)
-    return serverFactory().createHandler(app).handler
-}
+export const createHandler = (options, customizeApp) => serverFactory().createHandler(options, customizeApp)

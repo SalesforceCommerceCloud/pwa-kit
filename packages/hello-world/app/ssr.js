@@ -5,27 +5,29 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 const path = require('path')
-const {createApp, createHandler} = require('pwa-kit-runtime/ssr/server/express')
+const {createHandler} = require('pwa-kit-runtime/ssr/server/express')
 const pkg = require('../package.json')
 
-const app = createApp({
+const options = {
     buildDir: path.resolve(process.cwd(), 'build'),
     defaultCacheTimeSeconds: 600,
     mobify: pkg.mobify,
     enableLegacyRemoteProxying: false,
     protocol: 'http'
-})
+}
 
-app.get('/', (req, res) => {
-    return res.json({
-        protocol: req.protocol,
-        method: req.method,
-        path: req.path,
-        query: req.query,
-        body: req.body,
-        headers: req.headers,
-        ip: req.ip
+const {handler} = createHandler(options, (app) => {
+    app.get('/', (req, res) => {
+        return res.json({
+            protocol: req.protocol,
+            method: req.method,
+            path: req.path,
+            query: req.query,
+            body: req.body,
+            headers: req.headers,
+            ip: req.ip
+        })
     })
 })
 
-exports.get = createHandler(app)
+exports.get = handler

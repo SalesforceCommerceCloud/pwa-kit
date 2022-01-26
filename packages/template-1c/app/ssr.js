@@ -6,13 +6,12 @@
  */
 const path = require("path");
 const {
-  createApp,
   createHandler,
   serveStaticFile
 } = require("pwa-kit-runtime/ssr/server/express");
 const pkg = require("../package.json");
 
-const app = createApp({
+const options = {
   // The build directory (an absolute path)
   buildDir: path.resolve(process.cwd(), "build"),
 
@@ -36,14 +35,15 @@ const app = createApp({
   enableLegacyRemoteProxying: false,
 
   mobify: pkg.mobify
+}
+
+const {handler} = createHandler(options, (app) => {
+  // Handle the redirect from SLAS as to avoid error
+  app.get("/callback?*", (req, res) => {
+    res.send();
+  });
+
+  app.get("/robots.txt", serveStaticFile("static/robots.txt"));
 });
 
-// Handle the redirect from SLAS as to avoid error
-app.get("/callback?*", (req, res) => {
-  res.send();
-});
-app.get("/robots.txt", serveStaticFile("static/robots.txt"));
-
-// SSR requires that we export a single handler function called 'get', that
-// supports AWS use of the server that we created above.
-exports.get = createHandler(app);
+exports.get = handler

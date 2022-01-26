@@ -672,7 +672,7 @@ export const RemoteServerFactory = {
      * @param app {Express} - an Express App
      * @private
      */
-    createHandler(app) {
+    _createHandler(app) {
         // This flag is initially false, and is set true on the first request
         // handled by a Lambda. If it is true on entry to the handler function,
         // it indicates that the Lambda container has been reused.
@@ -749,7 +749,15 @@ export const RemoteServerFactory = {
                 }
             )
         }
-        return {server, handler}
+        return {handler, server, app}
+    },
+
+    createHandler(options, customizeApp) {
+        process.on('unhandledRejection', catchAndLog)
+        const app = this.createApp(options)
+        customizeApp(app)
+        this.addSSRRenderer(app)
+        return this._createHandler(app)
     },
 
     // eslint-disable-next-line no-unused-vars

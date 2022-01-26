@@ -146,7 +146,7 @@ export const DevServerMixin = {
         return `${protocol}://${hostname}:${port}`
     },
 
-    createHandler(app) {
+    _createHandler(app) {
         const {protocol, sslFilePath} = app.options
         const {hostname, port} = this._getDevServerHostAndPort(app.options)
 
@@ -171,7 +171,7 @@ export const DevServerMixin = {
             open(`${this._getDevServerURL(app.options)}/__mrt?loading=1`)
         })
 
-        return {handler: undefined, server}
+        return {handler: undefined, server, app}
     },
 
     /**
