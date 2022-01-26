@@ -231,10 +231,7 @@ describe('utils/ssr-server tests', () => {
                 },
                 validate: () => {
                     expect(proxyConfigs.length).toBe(3)
-                    expect(
-                        proxyConfigs.every((config) => config.protocol === 'http'),
-                        'Expected all configs to be http'
-                    ).toBe(true)
+                    expect(proxyConfigs.every((config) => config.protocol === 'http')).toBe(true)
                     expect(proxyConfigs[0].host).toEqual('somewhere.else')
                     expect(proxyConfigs[1].host).toEqual('another.place')
                     expect(proxyConfigs[2].host).toEqual('far.away')
