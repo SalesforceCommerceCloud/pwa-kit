@@ -141,10 +141,6 @@ describe('createApp validates the options object', () => {
         {
             name: 'buildDir invalid',
             options: opts({buildDir: 'nosuchpath'})
-        },
-        {
-            name: 'server protocol is ssl',
-            options: opts({protocol: 'ssl'})
         }
     ]
 

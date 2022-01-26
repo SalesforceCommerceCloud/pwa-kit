@@ -84,6 +84,18 @@ export const DevServerMixin = {
         app.__compiler = webpack(config)
         app.__devMiddleware = webpackDevMiddleware(app.__compiler, {serverSideRender: true})
         app.__webpackReady = () => Boolean(app.__devMiddleware.context.state)
+        app.__waitForWebpackReady = () => {
+            return new Promise((resolve) => {
+                const inner = () => {
+                    if(app.__webpackReady()) {
+                        resolve()
+                    } else {
+                        setTimeout(inner, 75)
+                    }
+                }
+                inner()
+            })
+        }
 
         app.use('/mobify/bundle/development', app.__devMiddleware)
 
