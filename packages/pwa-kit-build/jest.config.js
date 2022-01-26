@@ -16,10 +16,5 @@ module.exports = {
             statements: 80
         }
     },
-    testPathIgnorePatterns: [
-        'bin/*',
-        'dist/*',
-        'node_modules/*',
-        'coverage/*',
-    ],
+    testPathIgnorePatterns: ['bin/*', 'dist/*', 'node_modules/*', 'coverage/*']
 }

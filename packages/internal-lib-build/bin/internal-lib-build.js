@@ -8,7 +8,7 @@
 const p = require('path')
 const program = require('commander')
 const sh = require('shelljs')
-const {execSync: _execSync} = require('child_process');
+const {execSync: _execSync} = require('child_process')
 
 sh.set('-e')
 
@@ -65,7 +65,9 @@ const main = () => {
         .option('--jest-args <args>', 'arguments to forward to Jest')
         .action(({jestArgs}) => {
             const jest = p.join(binDir, 'jest')
-            execSync(`${jest} --passWithNoTests --maxWorkers=2${jestArgs ? ' ' + jestArgs : ''}`, {env: {...process.env, NODE_ENV: 'test'}})
+            execSync(`${jest} --passWithNoTests --maxWorkers=2${jestArgs ? ' ' + jestArgs : ''}`, {
+                env: {...process.env, NODE_ENV: 'test'}
+            })
         })
 
     program.parse(process.argv)

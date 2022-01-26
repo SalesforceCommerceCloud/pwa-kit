@@ -35,9 +35,9 @@ const options = {
   enableLegacyRemoteProxying: false,
 
   mobify: pkg.mobify
-}
+};
 
-const {handler} = createHandler(options, (app) => {
+const { handler } = createHandler(options, app => {
   // Handle the redirect from SLAS as to avoid error
   app.get("/callback?*", (req, res) => {
     res.send();
@@ -46,4 +46,4 @@ const {handler} = createHandler(options, (app) => {
   app.get("/robots.txt", serveStaticFile("static/robots.txt"));
 });
 
-exports.get = handler
+exports.get = handler;

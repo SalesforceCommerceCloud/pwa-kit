@@ -12,7 +12,6 @@ import path from 'path'
 import URL from 'url'
 import {
     CachedResponse,
-    catchAndLog,
     getHashForString,
     getBundleBaseUrl,
     localDevLog,
@@ -485,15 +484,6 @@ export const respondFromBundle = ({req, res, path, redirect = 301}) => {
     res.redirect(workingRedirect, location)
 }
 
-const serverFactory = () => {
-    if (isRemote()) {
-        return RemoteServerFactory
-    } else {
-        return eval('require').main.require('pwa-kit-build/ssr/server/build-dev-server')
-            .DevServerFactory
-    }
-}
-
 /**
  * Create an SSR (Server-Side Rendering) Server.
  *
@@ -526,5 +516,10 @@ const serverFactory = () => {
  * @param {function} customizeApp - a callback that takes an express app
  * as an argument. Use this to customize the server.
  */
-export const createHandler = (options, customizeApp) =>
-    serverFactory().createHandler(options, customizeApp)
+export const createHandler = (options, customizeApp) => {
+    const factory = isRemote() ?
+        RemoteServerFactory :
+        eval('require').main.require('pwa-kit-build/ssr/server/build-dev-server').DevServerFactory
+
+    return factory.createHandler(options, customizeApp)
+}
