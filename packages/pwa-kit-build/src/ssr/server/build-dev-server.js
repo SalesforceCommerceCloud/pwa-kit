@@ -78,14 +78,17 @@ export const DevServerMixin = {
     },
 
     addSDKInternalHandlers(app) {
-        this.compiler = webpack(config)
-        this.devMiddleware = webpackDevMiddleware(this.compiler, {serverSideRender: true})
-        app.use('/mobify/bundle/development', this.devMiddleware)
-        const devMiddleware = this.devMiddleware
+        // This is separated out from addSSRRenderer because these
+        // routes must not have our SSR middleware applied to them.
+        // But the SSR render function must!
+        app.__compiler = webpack(config)
+        app.__devMiddleware = webpackDevMiddleware(app.__compiler, {serverSideRender: true})
+        app.__webpackReady = () => Boolean(app.__devMiddleware.context.state)
+
+        app.use('/mobify/bundle/development', app.__devMiddleware)
 
         app.use('/__mrt/status', (req, res) => {
-            const ready = Boolean(devMiddleware.context.state)
-            return res.json({ready})
+            return res.json({ready: app.__webpackReady()})
         })
 
         app.use('/__mrt', (req, res) => {
@@ -105,12 +108,10 @@ export const DevServerMixin = {
             })
         )
 
-        const middleware = webpackHotServerMiddleware(this.compiler)
-        const devMiddleware = this.devMiddleware
+        const middleware = webpackHotServerMiddleware(app.__compiler)
 
         app.use('/', (req, res, next) => {
-            const ready = Boolean(devMiddleware.context.state)
-            if (ready) {
+            if (app.__webpackReady()) {
                 middleware(req, res, next)
             } else {
                 res.redirect(301, '/__mrt?loading=1')
@@ -180,12 +181,10 @@ export const DevServerMixin = {
      *
      * @private
      */
-    getRequestProcessor() {
-        const devMiddleware = this.devMiddleware
-        const ready = Boolean(devMiddleware.context.state)
-        if (ready) {
-            const outputFileSystem = devMiddleware.context.outputFileSystem
-            const jsonWebpackStats = devMiddleware.context.stats.toJson()
+    getRequestProcessor(req) {
+        if (req.app.__webpackReady()) {
+            const outputFileSystem = req.app.__devMiddleware.context.outputFileSystem
+            const jsonWebpackStats = req.app.__devMiddleware.context.stats.toJson()
             const rp = jsonWebpackStats.children.find((child) => child.name === 'request-processor')
             const requestProcessorPath = path.join(rp.outputPath, 'request-processor.js')
             const compiled = outputFileSystem.readFileSync(requestProcessorPath, 'utf-8')
