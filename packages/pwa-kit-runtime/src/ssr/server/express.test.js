@@ -692,10 +692,8 @@ describe('SSRServer operation', () => {
         return request(app)
             .put(path)
             .then((response) => {
-                expect(
-                    nockResponse.isDone(),
-                    'Expected that proxy request would not be fetched'
-                ).toBe(false)
+                // Expected that proxy request would not be fetched
+                expect(nockResponse.isDone()).toBe(false)
                 expect(response.status).toEqual(405)
             })
     })
