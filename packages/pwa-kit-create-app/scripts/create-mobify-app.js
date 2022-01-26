@@ -58,7 +58,7 @@ const RETAIL_REACT_APP = 'retail-react-app'
 const NO_SELECTION = 'no-selection' // This is used as a default if neither --preset arg nor GENERATOR_PRESET is used. It is not a preset that can be selected
 
 const PRIVATE_PRESETS = [TEST_PROJECT, HELLO_WORLD, HELLO_WORLD_TEST_PROJECT]
-const PUBLIC_PRESETS = [RETAIL_REACT_APP, RETAIL_REACT_APP_DEMO]
+const PUBLIC_PRESETS = [RETAIL_REACT_APP_DEMO, RETAIL_REACT_APP]
 const PRESETS = PRIVATE_PRESETS.concat(PUBLIC_PRESETS)
 
 const DEFAULT_OUTPUT_DIR = p.join(process.cwd(), 'pwa-kit-starter-project')
@@ -367,7 +367,7 @@ const selectorPrompt = (opts) => {
     const questions = [
         {
             name: 'selection',
-            message: 'Which project do you want to generate?',
+            message: 'Choose a project to get started:',
             type: 'list',
             choices: PUBLIC_PRESETS
         }
