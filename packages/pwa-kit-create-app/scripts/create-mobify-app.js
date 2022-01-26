@@ -30,7 +30,7 @@
  * env var – this keeps them out of the --help docs.
  *
  * If both the GENERATOR_PRESET env var and --preset arguments are passed, the
- * option set in GENERATOR_PRESET is used.
+ * option set in --preset is used.
  */
 
 const p = require('path')
@@ -55,6 +55,7 @@ const HELLO_WORLD = 'hello-world'
 const TEST_PROJECT = 'test-project' // TODO: This will be replaced with the `isomorphic-client` config.
 const RETAIL_REACT_APP_DEMO = 'retail-react-app-demo'
 const RETAIL_REACT_APP = 'retail-react-app'
+const NO_SELECTION = 'no-selection' // This is used as a default if neither --preset arg nor GENERATOR_PRESET is used. It is not a preset that can be selected
 
 const PRIVATE_PRESETS = [TEST_PROJECT, HELLO_WORLD, HELLO_WORLD_TEST_PROJECT]
 const PUBLIC_PRESETS = [RETAIL_REACT_APP, RETAIL_REACT_APP_DEMO]
@@ -195,7 +196,7 @@ const runGenerator = (answers, {outputDir}) => {
     })
 }
 
-const prompts = () => {
+const retailReactAppPrompts = () => {
     const validProjectId = (s) =>
         /^[a-z0-9-]{1,20}$/.test(s) ||
         'Value can only contain lowercase letters, numbers, and hyphens.'
@@ -371,6 +372,18 @@ const generateHelloWorld = ({projectId}, {outputDir}) => {
     })
 }
 
+const selectorPrompt = (opts) => {
+    const questions = [
+        {
+            name: 'selection',
+            message: "Which project do you want to generate?",
+            type: 'list',
+            choices: PUBLIC_PRESETS
+        }
+    ]
+    return inquirer.prompt(questions).then((answer) => selectGenerator(answer['selection'], opts))
+}
+
 const extractTemplate = (templateName, outputDir) => {
     const tmp = fs.mkdtempSync(p.resolve(os.tmpdir(), 'extract-template'))
     tar.x({
@@ -382,17 +395,8 @@ const extractTemplate = (templateName, outputDir) => {
     sh.rm('-rf', tmp)
 }
 
-const main = (opts) => {
-    if (!(opts.outputDir === DEFAULT_OUTPUT_DIR) && sh.test('-e', opts.outputDir)) {
-        console.error(
-            `The output directory "${opts.outputDir}" already exists. Try, for example, ` +
-                `"~/Desktop/my-project" instead of "~/Desktop"`
-        )
-        process.exit(1)
-    }
-
-    const selectedOption = process.env.GENERATOR_PRESET || opts.preset
-
+const selectGenerator = (selectedOption, opts) => {
+    console.log("Output dir 2: " + opts.outputDir)
     switch (selectedOption) {
         case HELLO_WORLD_TEST_PROJECT:
             return generateHelloWorld({projectId: 'hello-world'}, opts)
@@ -406,7 +410,9 @@ const main = (opts) => {
             console.log(
                 'For details on configuration values, see https://developer.salesforce.com/docs/commerce/commerce-api/guide/commerce-api-configuration-values\n'
             )
-            return prompts(opts).then((answers) => runGenerator(answers, opts))
+            return retailReactAppPrompts(opts).then((answers) => runGenerator(answers, opts))
+        case NO_SELECTION:
+            return selectorPrompt(opts)
         default:
             console.error(
                 `The preset "${selectedOption}" is not valid. Valid presets are: ${
@@ -417,6 +423,22 @@ const main = (opts) => {
             )
             process.exit(1)
     }
+}
+
+const main = (opts) => {
+    if (!(opts.outputDir === DEFAULT_OUTPUT_DIR) && sh.test('-e', opts.outputDir)) {
+        console.error(
+            `The output directory "${opts.outputDir}" already exists. Try, for example, ` +
+                `"~/Desktop/my-project" instead of "~/Desktop"`
+        )
+        process.exit(1)
+    }
+
+    console.log("Output dir 1: " + opts.outputDir)
+
+    const selectedOption = opts.preset || process.env.GENERATOR_PRESET || NO_SELECTION
+
+    return selectGenerator(selectedOption, opts)
 }
 
 if (require.main === module) {
@@ -445,8 +467,7 @@ Examples:
         )
         .option(
             '--preset <name>',
-            `The name of a project preset to use (choices: "retail-react-app" "retail-react-app-demo")`,
-            RETAIL_REACT_APP
+            `The name of a project preset to use (choices: "retail-react-app" "retail-react-app-demo")`
         )
 
     program.parse(process.argv)
