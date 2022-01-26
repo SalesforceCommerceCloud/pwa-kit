@@ -38,12 +38,10 @@ test('Renders DrawerMenu with root', () => {
 
     const drawer = document.querySelector('.chakra-portal')
     const accordion = document.querySelector('.chakra-accordion')
-    const localeSelector = document.querySelector('.sf-locale-selector')
     const socialIcons = document.querySelector('.sf-social-icons')
 
     expect(drawer).toBeInTheDocument()
     expect(accordion).toBeInTheDocument()
-    expect(localeSelector).toBeInTheDocument()
     expect(socialIcons).toBeInTheDocument()
 })
 
