@@ -1,3 +1,4 @@
+## v1.4.0-alpha.0 (Jan 26, 2022)
 ## v1.4.0-dev (Jan 06, 2022)
 
 -   Add `proxyKeepAliveAgent` ssr-server option. [#306](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/306)
