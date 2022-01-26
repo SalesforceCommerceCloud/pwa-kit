@@ -156,17 +156,7 @@ const runGenerator = (answers, {outputDir}) => {
         ]
     })
 
-    const PWAKitConfigJsonTemplatePath = p.resolve(
-        p.join(
-            process.cwd(),
-            'packages',
-            'pwa-kit-create-app',
-            'assets',
-            'pwa',
-            'pwa-kit.config.json'
-        )
-    )
-    const PWAKitConfigJsonTemplate = readJson(PWAKitConfigJsonTemplatePath)
+    const PWAKitConfigJsonTemplate = require(`../assets/pwa/pwa-kit.config`).pwaKitConfigJsonTemplate
     const PWAKitConfigJsonPath = p.resolve(outputDir, 'pwa-kit.config.json')
     writeJson(PWAKitConfigJsonPath, PWAKitConfigJsonTemplate)
 
@@ -396,7 +386,6 @@ const extractTemplate = (templateName, outputDir) => {
 }
 
 const selectGenerator = (selectedOption, opts) => {
-    console.log("Output dir 2: " + opts.outputDir)
     switch (selectedOption) {
         case HELLO_WORLD_TEST_PROJECT:
             return generateHelloWorld({projectId: 'hello-world'}, opts)
@@ -433,8 +422,6 @@ const main = (opts) => {
         )
         process.exit(1)
     }
-
-    console.log("Output dir 1: " + opts.outputDir)
 
     const selectedOption = opts.preset || process.env.GENERATOR_PRESET || NO_SELECTION
 
