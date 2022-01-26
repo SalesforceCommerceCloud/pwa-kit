@@ -28,7 +28,7 @@ const {
     respondFromBundle,
     serveStaticFile
 } = require('./express')
-const {RemoteServerFactory} = require('./build-remote-server')
+const {RemoteServerFactory, REMOTE_REQUIRED_ENV_VARS} = require('./build-remote-server')
 const ssrServerUtils = require('../../utils/ssr-server')
 const {getHashForString} = ssrServerUtils
 const fetch = require('node-fetch')
@@ -191,29 +191,6 @@ describe('createApp validates environment variables', () => {
             process.env = Object.assign({}, savedEnvironment, ...vars)
             expect(() => RemoteServerFactory.createApp(opts())).toThrow(envVar)
         })
-    })
-})
-
-describe('Error handlers returned from makeErrorHandler', () => {
-    const testServerErrorHandler = (error, times) => {
-        const exit = jest.fn()
-        const proc = {exit}
-        const close = jest.fn()
-        const devserver = {close}
-        const log = jest.fn()
-        const handler = makeErrorHandler(proc, devserver, log)
-        const e = {code: error}
-
-        handler(e)
-        expect(close).toHaveBeenCalledTimes(times)
-    }
-
-    test('should exit the current process if the requested port is in use', () => {
-        testServerErrorHandler('EADDRINUSE', 1)
-    })
-
-    test('should ignore errors other than EADDRINUSE', () => {
-        testServerErrorHandler('EACCES', 0)
     })
 })
 
