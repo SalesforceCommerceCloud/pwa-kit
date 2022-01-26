@@ -395,13 +395,15 @@ const main = (opts) => {
     }
 
     return Promise.resolve()
-        .then( () => opts.preset || process.env.GENERATOR_PRESET || presetPrompt())
-        .then( (preset) => {
+        .then(() => opts.preset || process.env.GENERATOR_PRESET || presetPrompt())
+        .then((preset) => {
             switch (preset) {
                 case HELLO_WORLD_TEST_PROJECT:
                     return generateHelloWorld({projectId: 'hello-world'}, opts)
                 case HELLO_WORLD:
-                    return helloWorldPrompts(opts).then((answers) => generateHelloWorld(answers, opts))
+                    return helloWorldPrompts(opts).then((answers) =>
+                        generateHelloWorld(answers, opts)
+                    )
                 case TEST_PROJECT:
                     return runGenerator(testProjectAnswers(), opts)
                 case RETAIL_REACT_APP_DEMO:
@@ -410,10 +412,12 @@ const main = (opts) => {
                     console.log(
                         'For details on configuration values, see https://developer.salesforce.com/docs/commerce/commerce-api/guide/commerce-api-configuration-values\n'
                     )
-                    return retailReactAppPrompts(opts).then((answers) => runGenerator(answers, opts))
+                    return retailReactAppPrompts(opts).then((answers) =>
+                        runGenerator(answers, opts)
+                    )
                 default:
                     console.error(
-                        `The preset "${selectedOption}" is not valid. Valid presets are: ${
+                        `The preset "${preset}" is not valid. Valid presets are: ${
                             process.env.GENERATOR_PRESET
                                 ? PRESETS.map((x) => `"${x}"`).join(' ')
                                 : PUBLIC_PRESETS.map((x) => `"${x}"`).join(' ')
