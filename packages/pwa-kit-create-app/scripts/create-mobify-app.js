@@ -366,7 +366,7 @@ const presetPrompt = () => {
     const questions = [
         {
             name: 'preset',
-            message: 'Choose a project to get started:',
+            message: 'Choose a project preset to get started:',
             type: 'list',
             choices: PUBLIC_PRESETS
         }
