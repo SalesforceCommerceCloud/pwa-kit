@@ -110,7 +110,7 @@ beforeAll(() => {
 
 afterAll(() => {})
 
-describe.only('createApp validates the options object', () => {
+describe('createApp validates the options object', () => {
     let savedEnvironment
 
     beforeEach(() => {
