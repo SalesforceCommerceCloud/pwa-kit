@@ -152,17 +152,7 @@ const runGenerator = (answers, {outputDir}) => {
         ]
     })
 
-    const PWAKitConfigJsonTemplatePath = p.resolve(
-        p.join(
-            process.cwd(),
-            'packages',
-            'pwa-kit-create-app',
-            'assets',
-            'pwa',
-            'pwa-kit.config.json'
-        )
-    )
-    const PWAKitConfigJsonTemplate = readJson(PWAKitConfigJsonTemplatePath)
+    const PWAKitConfigJsonTemplate = require(`../assets/pwa/pwa-kit.config`)
     const PWAKitConfigJsonPath = p.resolve(outputDir, 'pwa-kit.config.json')
     writeJson(PWAKitConfigJsonPath, PWAKitConfigJsonTemplate)
 
