@@ -11,7 +11,7 @@
 import {PersistentCache} from '../../utils/ssr-cache'
 import {CachedResponse} from '../../utils/ssr-server'
 import {X_PROXY_REQUEST_URL, X_MOBIFY_REQUEST_CLASS} from '../../utils/ssr-proxying'
-import {X_MOBIFY_QUERYSTRING} from './constants'
+import {X_MOBIFY_QUERYSTRING, NO_CACHE} from './constants'
 
 // Mock static assets (require path is relative to the 'ssr' directory)
 const mockStaticAssets = {}
