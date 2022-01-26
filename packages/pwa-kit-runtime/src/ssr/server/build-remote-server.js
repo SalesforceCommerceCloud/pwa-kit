@@ -606,12 +606,19 @@ export const RemoteServerFactory = {
 
         if (!options.buildDir) {
             throw new Error(
-                'The buildDir option passed to the SSR server ' + 'must be a non-empty string'
+                'The buildDir option passed to the SSR server must be a non-empty string'
             )
         }
 
+
         // Fix up the path in case we were passed a relative one
         options.buildDir = path.resolve(process.cwd(), options.buildDir)
+
+        if (!fs.existsSync(options.buildDir)) {
+            throw new Error(
+                'The buildDir option passed to the SSR server must exist'
+            )
+        }
 
         if (options.faviconPath) {
             options.faviconPath = path.resolve(options.buildDir, options.faviconPath)
@@ -623,7 +630,7 @@ export const RemoteServerFactory = {
 
         if (!(options.mobify instanceof Object)) {
             throw new Error(
-                'The mobify option passed to the SSR server must be an object (from package.json)'
+                'The mobify option passed to the SSR server must be an object'
             )
         }
 
