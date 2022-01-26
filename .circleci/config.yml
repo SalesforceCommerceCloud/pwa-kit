@@ -72,6 +72,38 @@ commands:
           key: npm-cache
           paths:
             - /root/.npm
+  setup_npm_7:
+    description: 'Setup Machine with npm 7'
+    steps:
+      - restore_cache:
+          keys:
+            - npm-cache
+      - run:
+          name: 'Install Dependencies'
+          command: |
+
+            sudo npm install -g npm@7
+            npm ci
+      - save_cache:
+          key: npm-cache
+          paths:
+            - /root/.npm
+  setup_npm_8:
+    description: 'Setup Machine with npm 8'
+    steps:
+      - restore_cache:
+          keys:
+            - npm-cache
+      - run:
+          name: 'Install Dependencies'
+          command: |
+
+            sudo npm install -g npm@8
+            npm ci
+      - save_cache:
+          key: npm-cache
+          paths:
+            - /root/.npm
   runtests:
     description: 'Run tests'
     parameters:
@@ -169,6 +201,20 @@ jobs:
       - checkout
       - setup_windows
       - runtests
+  testNode14npm7:
+    docker:
+      - image: circleci/node:14-stretch-browsers
+    steps:
+      - checkout
+      - setup_npm_7
+      - runtests
+  testNode14npm8:
+    docker:
+      - image: circleci/node:14-stretch-browsers
+    steps:
+      - checkout
+      - setup_npm_8
+      - runtests
   testNode14:
     docker:
       - image: circleci/node:14-stretch-browsers
@@ -248,15 +294,16 @@ jobs:
           name: Count Generated Project Dependencies
           environment:
           command: |
-            MAX_PACKAGES="3050"
+            MAX_PACKAGES="2250"
             total=$(./scripts/count-dependencies.js /tmp/project)
             echo "export TOTAL_PACKAGES=${total}" >> $BASH_ENV;
+            source $BASH_ENV
 
             if [ "$total" -gt "$MAX_PACKAGES" ]; then
                 echo "Error: Found $TOTAL_PACKAGES installed packages (max $MAX_PACKAGES).";
                 exit 1;
             else
-                echo "Error: Found $TOTAL_PACKAGES installed packages (max $MAX_PACKAGES).";
+                echo "Found $TOTAL_PACKAGES installed packages (max $MAX_PACKAGES).";
             fi
       - early_return_for_forked_pull_requests
       - slack/status:
@@ -312,6 +359,8 @@ workflows:
       - testNode12
       - testNode14
       - testNode14Windows
+      - testNode14npm7
+      - testNode14npm8
       - generatedSFCCProjectTest
   nightly-build:
     triggers:
@@ -327,6 +376,10 @@ workflows:
       - testNode14:
           context: nightly-build
       - testNode14Windows:
+          context: nightly-build
+      - testNode14npm7:
+          context: nightly-build
+      - testNode14npm8:
           context: nightly-build
       - generatedSFCCProjectTest:
           context: nightly-build

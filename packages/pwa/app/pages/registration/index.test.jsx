@@ -7,10 +7,9 @@
 import React from 'react'
 import {screen, within, waitFor} from '@testing-library/react'
 import user from '@testing-library/user-event'
-import {renderWithProviders} from '../../utils/test-utils'
+import {renderWithProviders, getPathname} from '../../utils/test-utils'
 import Registration from '.'
 import {BrowserRouter as Router, Route} from 'react-router-dom'
-import {getUrlConfig} from '../../utils/utils'
 import Account from '../account'
 
 jest.setTimeout(60000)
@@ -38,14 +37,6 @@ jest.mock('../../commerce-api/auth', () => {
             })
         }
     })
-})
-
-jest.mock('../../utils/utils', () => {
-    const original = jest.requireActual('../../utils/utils')
-    return {
-        ...original,
-        getUrlConfig: jest.fn()
-    }
 })
 
 jest.mock('commerce-sdk-isomorphic', () => {
@@ -131,7 +122,7 @@ const MockedComponent = () => {
     return (
         <Router>
             <Registration />
-            <Route path="/en-GB/account">
+            <Route path={getPathname('/account')}>
                 <Account match={match} />
             </Route>
         </Router>
@@ -141,9 +132,6 @@ const MockedComponent = () => {
 // Set up and clean up
 // Set up and clean up
 beforeEach(() => {
-    getUrlConfig.mockImplementation(() => ({
-        locale: 'path'
-    }))
     jest.useFakeTimers()
 })
 afterEach(() => {
