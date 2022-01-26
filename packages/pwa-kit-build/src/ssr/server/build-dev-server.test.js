@@ -1,5 +1,6 @@
+import {NO_CACHE} from 'pwa-kit-runtime/ssr/server/constants'
 import {makeErrorHandler, DevServerFactory} from './build-dev-server'
-import path from "path";
+import path from 'path';
 
 const TEST_PORT = 3444
 const testFixtures = path.resolve(__dirname, 'test_fixtures')
@@ -33,10 +34,9 @@ const opts = (overrides = {}) => {
                 ]
             }
         },
-        sslFilePath: './src/ssr/server/test_fixtures/localhost.pem',
         quiet: true,
         port: TEST_PORT,
-        protocol: 'https',
+        protocol: 'http',
         enableLegacyRemoteProxying: false
     }
     return {
@@ -79,6 +79,11 @@ describe('The DevServer', () => {
         addSDKInternalHandlers() {},
         getRequestProcessor() {}
     }}
+
+    test('createApp creates an express app', () => {
+        const app = NoWebpackDevServerFactory.createApp(opts())
+        expect(app.options.defaultCacheControl).toEqual(NO_CACHE)
+    })
 
     test(`createApp validates missing or invalid field "protocol"`, () => {
         expect(() => NoWebpackDevServerFactory.createApp(opts({protocol: 'ssl'}))).toThrow()

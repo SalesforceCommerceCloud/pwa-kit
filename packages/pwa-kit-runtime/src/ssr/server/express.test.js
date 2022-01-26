@@ -90,7 +90,8 @@ const opts = (overrides = {}) => {
         fetchAgents: {
             https: httpsAgent
         },
-        enableLegacyRemoteProxying: false
+        enableLegacyRemoteProxying: false,
+        defaultCacheTimeSeconds: 123,
     }
     return {
         ...defaults,
@@ -229,8 +230,10 @@ describe('SSRServer operation', () => {
     })
 
     test('createApp creates an express app', () => {
-        const app = RemoteServerFactory.createApp(opts())
-        expect(app.options.defaultCacheControl).toEqual(NO_CACHE)
+        const options = opts()
+        const app = RemoteServerFactory.createApp(options)
+        const expected = `max-age=${options.defaultCacheTimeSeconds}, s-maxage=${options.defaultCacheTimeSeconds}`
+        expect(app.options.defaultCacheControl).toEqual(expected)
     })
 
     describe('SSRServer startup', () => {
