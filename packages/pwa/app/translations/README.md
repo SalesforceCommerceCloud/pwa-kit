@@ -72,15 +72,16 @@ Loading the site in your browser, you can quickly see that those messages that h
 
 The process for adding a new locale is as follows:
 
-1. Enable the new locale in Business Manager of your B2C Commerce instance
-2. Add the new locale to `pwa/package.json`
-3. If the new locale is your new default locale:
+1. Create/enable the new locale in Business Manager of your B2C Commerce instance
+2. Enable the locale's currency too in Business Manager
+3. Add the new locale and its currency to `pwa/package.json`
+4. If the new locale is your new default locale:
     - Update your React components' default messages to the new default locale's language
     - In `pwa/package.json`, set the new default locale
     - Run `npm run extract-default-translations` to extract the new default locale's translations into `pwa/app/translations/[defaultLocale].json`
     - Send the extracted translations to your translation team
-4. Place the files you receive from your translation team into the `pwa/app/translations/` folder
-5. Run `npm run compile-translations`
+5. Place the files you receive from your translation team into the `pwa/app/translations/` folder
+6. Run `npm run compile-translations`
 
 ## Tips
 
