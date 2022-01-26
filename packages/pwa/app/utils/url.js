@@ -152,7 +152,8 @@ export const getUrlWithLocale = (shortCode, opts = {}) => {
     if (relativeUrl === HOME_HREF) {
         relativeUrl = buildPathWithUrlConfig(relativeUrl, {
             locale: shortCode,
-            site: siteValue
+            site: siteValue,
+            url: urlConfig
         })
         return relativeUrl
     }

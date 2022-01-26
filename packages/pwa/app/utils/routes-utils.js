@@ -21,7 +21,7 @@ export const configureRoutes = (routes = [], {ignoredRoutes = []}) => {
     const currentHost = getCurrentHost()
 
     // collect and flatten the result to get a list of site objects
-    const allSites = hosts.find((host) => host.domain === currentHost)?.sites
+    const allSites = hosts.find((host) => host.domain.includes(currentHost))?.sites
 
     // get a collection of all site-id and site alias from the config of the current host
     // remove any duplicates
@@ -89,12 +89,16 @@ export const configureRoutes = (routes = [], {ignoredRoutes = []}) => {
     return outputRoutes
 }
 
+/**
+ * This function return the current host by looking in the EXTERNAL_DOMAIN_NAME env variable
+ * if it is undefined, it means you are on localhost
+ * @returns {string}
+ */
 const getCurrentHost = () => {
     if (typeof window !== 'undefined') {
         return window.location.hostname
     }
 
-    // if process.env.EXTERNAL_DOMAIN_NAME does not exist, it means you are on localhost
     const currentHost = process.env.EXTERNAL_DOMAIN_NAME
         ? process.env.EXTERNAL_DOMAIN_NAME
         : 'localhost'

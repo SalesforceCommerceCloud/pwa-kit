@@ -128,6 +128,6 @@ export const getUrlConfig = () => {
  */
 export const getUrlConfigByHostname = (hostname) => {
     const hosts = getConfig('app.hosts')
-    const host = hosts.find((host) => host.domain === hostname)
+    const host = hosts.find((host) => host.domain.includes(hostname))
     return host?.url
 }

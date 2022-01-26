@@ -7,7 +7,7 @@
         },
         "hosts": [
             {
-                "domain": "localhost",
+                "domain": ["localhost"],
                 "defaultSite": "RefArchGlobal",
                 "url": {
                     "site": "path",

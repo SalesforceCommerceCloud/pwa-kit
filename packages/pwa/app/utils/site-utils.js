@@ -53,7 +53,7 @@ export const resolveSiteFromUrl = (url) => {
 
 export const getDefaultSiteIdByHost = (hostname) => {
     const hosts = getHosts()
-    const host = hosts.find((host) => host.domain === hostname)
+    const host = hosts.find((host) => host.domain.includes(hostname))
     return host?.defaultSite
 }
 
@@ -124,7 +124,7 @@ export const getSiteByPath = (path, sites) => {
 export const getSitesByHost = (hostname) => {
     if (!hostname) return
     const hosts = getHosts()
-    const sites = hosts.find((host) => host.domain === hostname)?.sites
+    const sites = hosts.find((host) => host.domain.includes(hostname))?.sites
     return sites
 }
 
