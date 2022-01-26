@@ -180,8 +180,16 @@
         "defaultCurrency": "GBP",
         "supportedLocales": [
             {
+                "id": "de-DE",
+                "preferredCurrency": "EUR"
+            },
+            {
                 "id": "en-GB",
                 "preferredCurrency": "GBP"
+            },
+            {
+                "id": "es-MX",
+                "preferredCurrency": "MXN"
             },
             {
                 "id": "fr-FR",
@@ -192,12 +200,24 @@
                 "preferredCurrency": "EUR"
             },
             {
+                "id": "ja-JP",
+                "preferredCurrency": "JPY"
+            },
+            {
+                "id": "ko-KR",
+                "preferredCurrency": "KRW"
+            },
+            {
+                "id": "pt-BR",
+                "preferredCurrency": "BRL"
+            },
+            {
                 "id": "zh-CN",
                 "preferredCurrency": "CNY"
             },
             {
-                "id": "ja-JP",
-                "preferredCurrency": "JPY"
+                "id": "zh-TW",
+                "preferredCurrency": "TWD"
             }
         ],
         "defaultLocale": "en-GB"

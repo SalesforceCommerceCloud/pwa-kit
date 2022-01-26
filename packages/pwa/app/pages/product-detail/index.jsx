@@ -220,7 +220,10 @@ const ProductDetail = ({category, product, isLoading}) => {
                                 </AccordionButton>
                             </h2>
                             <AccordionPanel mb={6} mt={4}>
-                                Coming Soon
+                                {formatMessage({
+                                    defaultMessage: 'Coming Soon',
+                                    id: 'product_detail.accordion.message.coming_soon'
+                                })}
                             </AccordionPanel>
                         </AccordionItem>
 
@@ -238,7 +241,10 @@ const ProductDetail = ({category, product, isLoading}) => {
                                 </AccordionButton>
                             </h2>
                             <AccordionPanel mb={6} mt={4}>
-                                Coming Soon
+                                {formatMessage({
+                                    defaultMessage: 'Coming Soon',
+                                    id: 'product_detail.accordion.message.coming_soon'
+                                })}
                             </AccordionPanel>
                         </AccordionItem>
                     </Accordion>
