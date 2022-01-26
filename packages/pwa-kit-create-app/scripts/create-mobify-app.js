@@ -156,7 +156,8 @@ const runGenerator = (answers, {outputDir}) => {
         ]
     })
 
-    const PWAKitConfigJsonTemplate = require(`../assets/pwa/pwa-kit.config`).pwaKitConfigJsonTemplate
+    const PWAKitConfigJsonTemplate = require(`../assets/pwa/pwa-kit.config`)
+        .pwaKitConfigJsonTemplate
     const PWAKitConfigJsonPath = p.resolve(outputDir, 'pwa-kit.config.json')
     writeJson(PWAKitConfigJsonPath, PWAKitConfigJsonTemplate)
 
@@ -366,7 +367,7 @@ const selectorPrompt = (opts) => {
     const questions = [
         {
             name: 'selection',
-            message: "Which project do you want to generate?",
+            message: 'Which project do you want to generate?',
             type: 'list',
             choices: PUBLIC_PRESETS
         }

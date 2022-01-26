@@ -1,4 +1,3 @@
-
 /*
  * Copyright (c) 2021, salesforce.com, inc.
  * All rights reserved.
@@ -6,13 +5,12 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
- const pwaKitConfigJsonTemplate = {
-    "url": {
-        "locale": "none"
+const pwaKitConfigJsonTemplate = {
+    url: {
+        locale: 'none'
     }
 }
 
 module.exports = {
     pwaKitConfigJsonTemplate
 }
-
