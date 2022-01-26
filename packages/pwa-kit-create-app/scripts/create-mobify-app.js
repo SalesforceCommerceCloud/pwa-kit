@@ -55,7 +55,6 @@ const HELLO_WORLD = 'hello-world'
 const TEST_PROJECT = 'test-project' // TODO: This will be replaced with the `isomorphic-client` config.
 const RETAIL_REACT_APP_DEMO = 'retail-react-app-demo'
 const RETAIL_REACT_APP = 'retail-react-app'
-const NO_SELECTION = 'no-selection' // This is used as a default if neither --preset arg nor GENERATOR_PRESET is used. It is not a preset that can be selected
 
 const PRIVATE_PRESETS = [TEST_PROJECT, HELLO_WORLD, HELLO_WORLD_TEST_PROJECT]
 const PUBLIC_PRESETS = [RETAIL_REACT_APP_DEMO, RETAIL_REACT_APP]
@@ -363,16 +362,16 @@ const generateHelloWorld = ({projectId}, {outputDir}) => {
     })
 }
 
-const selectorPrompt = (opts) => {
+const presetPrompt = () => {
     const questions = [
         {
-            name: 'selection',
+            name: 'preset',
             message: 'Choose a project to get started:',
             type: 'list',
             choices: PUBLIC_PRESETS
         }
     ]
-    return inquirer.prompt(questions).then((answer) => selectGenerator(answer['selection'], opts))
+    return inquirer.prompt(questions).then((answers) => answers['preset'])
 }
 
 const extractTemplate = (templateName, outputDir) => {
@@ -386,35 +385,6 @@ const extractTemplate = (templateName, outputDir) => {
     sh.rm('-rf', tmp)
 }
 
-const selectGenerator = (selectedOption, opts) => {
-    switch (selectedOption) {
-        case HELLO_WORLD_TEST_PROJECT:
-            return generateHelloWorld({projectId: 'hello-world'}, opts)
-        case HELLO_WORLD:
-            return helloWorldPrompts(opts).then((answers) => generateHelloWorld(answers, opts))
-        case TEST_PROJECT:
-            return runGenerator(testProjectAnswers(), opts)
-        case RETAIL_REACT_APP_DEMO:
-            return runGenerator(demoProjectAnswers(), opts)
-        case RETAIL_REACT_APP:
-            console.log(
-                'For details on configuration values, see https://developer.salesforce.com/docs/commerce/commerce-api/guide/commerce-api-configuration-values\n'
-            )
-            return retailReactAppPrompts(opts).then((answers) => runGenerator(answers, opts))
-        case NO_SELECTION:
-            return selectorPrompt(opts)
-        default:
-            console.error(
-                `The preset "${selectedOption}" is not valid. Valid presets are: ${
-                    process.env.GENERATOR_PRESET
-                        ? PRESETS.map((x) => `"${x}"`).join(' ')
-                        : PUBLIC_PRESETS.map((x) => `"${x}"`).join(' ')
-                }.`
-            )
-            process.exit(1)
-    }
-}
-
 const main = (opts) => {
     if (!(opts.outputDir === DEFAULT_OUTPUT_DIR) && sh.test('-e', opts.outputDir)) {
         console.error(
@@ -424,9 +394,34 @@ const main = (opts) => {
         process.exit(1)
     }
 
-    const selectedOption = opts.preset || process.env.GENERATOR_PRESET || NO_SELECTION
-
-    return selectGenerator(selectedOption, opts)
+    return Promise.resolve()
+        .then( () => opts.preset || process.env.GENERATOR_PRESET || presetPrompt())
+        .then( (preset) => {
+            switch (preset) {
+                case HELLO_WORLD_TEST_PROJECT:
+                    return generateHelloWorld({projectId: 'hello-world'}, opts)
+                case HELLO_WORLD:
+                    return helloWorldPrompts(opts).then((answers) => generateHelloWorld(answers, opts))
+                case TEST_PROJECT:
+                    return runGenerator(testProjectAnswers(), opts)
+                case RETAIL_REACT_APP_DEMO:
+                    return runGenerator(demoProjectAnswers(), opts)
+                case RETAIL_REACT_APP:
+                    console.log(
+                        'For details on configuration values, see https://developer.salesforce.com/docs/commerce/commerce-api/guide/commerce-api-configuration-values\n'
+                    )
+                    return retailReactAppPrompts(opts).then((answers) => runGenerator(answers, opts))
+                default:
+                    console.error(
+                        `The preset "${selectedOption}" is not valid. Valid presets are: ${
+                            process.env.GENERATOR_PRESET
+                                ? PRESETS.map((x) => `"${x}"`).join(' ')
+                                : PUBLIC_PRESETS.map((x) => `"${x}"`).join(' ')
+                        }.`
+                    )
+                    process.exit(1)
+            }
+        })
 }
 
 if (require.main === module) {
