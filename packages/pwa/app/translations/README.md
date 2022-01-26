@@ -66,7 +66,7 @@ At the minimum, only defaultMessage is the required parameter. The message id is
 
 To check whether you’ve wrapped all of the hardcoded strings with either `intl.formatMessage()` or `<FormattedMessage />` , there’s a quick way to test that by running `npm run start:pseudolocale`. It runs your local dev server with the locale forced to the pseudo locale.
 
-Loading the site in your browser, you can quickly see that those messages that have been formatted have a long `SSS` appended to them.
+Loading the site in your browser, you can quickly see that those messages that have been formatted would look like this: `[!! Ṕŕíííṿâćććẏ ṔṔṔŏĺíííćẏ !!]`
 
 ## How to Add a New Locale
 
