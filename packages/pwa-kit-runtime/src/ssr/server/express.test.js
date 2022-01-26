@@ -582,12 +582,14 @@ describe('SSRServer operation', () => {
         const rewritten = `${options.protocol}://localhost:${options.port}/mobify/proxy/base${location}`
 
         const app = RemoteServerFactory.createApp(options)
-        return request(app)
-            .get('/mobify/proxy/base/')
-            .expect(301)
-            .expect('Location', rewritten)
-            // Expected to hit the backend
-            .then(() => expect(nockRedirect.isDone()).toBe(true))
+        return (
+            request(app)
+                .get('/mobify/proxy/base/')
+                .expect(301)
+                .expect('Location', rewritten)
+                // Expected to hit the backend
+                .then(() => expect(nockRedirect.isDone()).toBe(true))
+        )
     })
 
     test('the SSRServer proxying rewrites redirects', () => {
@@ -609,12 +611,14 @@ describe('SSRServer operation', () => {
 
         const app = RemoteServerFactory.createApp(options)
 
-        return request(app)
-            .get('/mobify/proxy/base/test/path')
-            .expect(301)
-            .expect('Location', rewritten)
-            // Expected to hit the backend
-            .then(() => expect(nockRedirect.isDone()).toBe(true))
+        return (
+            request(app)
+                .get('/mobify/proxy/base/test/path')
+                .expect(301)
+                .expect('Location', rewritten)
+                // Expected to hit the backend
+                .then(() => expect(nockRedirect.isDone()).toBe(true))
+        )
     })
 
     test('SSRServer proxying rewrites headers', () => {
