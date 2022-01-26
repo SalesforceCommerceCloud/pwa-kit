@@ -9,11 +9,11 @@
 /**
  * This is a generator for PWA Kit projects that run on the Managed Runtime.
  *
- * The output of this script is a copy of the pwa package with the following changes:
+ * The output of this script is a copy of a project template with the following changes:
  *
  * 1) We update any monorepo-local dependencies to be installed through NPM.
  *
- * 2) We rename the PWA and configure the generated project based on answers to
+ * 2) We rename the template and configure the generated project based on answers to
  *    questions that we ask the user on the CLI.
  *
  * ## Basic usage
@@ -24,25 +24,27 @@
  *
  * ## Advanced usage and integration testing:
  *
- * In order to skip prompts on CircleCI, the generator supports a purposefully
- * undocumented `PRESET` environment variable, which you can use to skip the prompts
- * in a CI environment. These presets run the generator with hard-coded answers to
- * the questions we would normally ask an end-user. Supported presets are:
+ * For testing on CI we need to be able to generate projects without running
+ * the interactive prompts on the CLI. To support these cases, we have
+ * a few presets that are "private" and only usable through the GENERATOR_PRESET
+ * env var – this keeps them out of the --help docs.
  *
- *   1. "test-project" - A test project using the demo connector.
- *   2. "test-project-sffc" - A test project using the SFCC connector.
+ * If both the GENERATOR_PRESET env var and --preset arguments are passed, the
+ * option set in --preset is used.
  */
 
 const p = require('path')
 const fs = require('fs')
 const os = require('os')
-const program = require('commander')
+const {Command} = require('commander')
 const inquirer = require('inquirer')
 const {URL} = require('url')
 const deepmerge = require('deepmerge')
 const sh = require('shelljs')
 const tar = require('tar')
 const generatorPkg = require('../package.json')
+
+const program = new Command()
 
 sh.set('-e')
 
@@ -51,11 +53,12 @@ const GENERATED_PROJECT_VERSION = '0.0.1'
 const HELLO_WORLD_TEST_PROJECT = 'hello-world-test-project'
 const HELLO_WORLD = 'hello-world'
 const TEST_PROJECT = 'test-project' // TODO: This will be replaced with the `isomorphic-client` config.
-const PROMPT = 'prompt'
+const RETAIL_REACT_APP_DEMO = 'retail-react-app-demo'
+const RETAIL_REACT_APP = 'retail-react-app'
 
-const PRESETS = [TEST_PROJECT, PROMPT, HELLO_WORLD, HELLO_WORLD_TEST_PROJECT]
-
-const GENERATOR_PRESET = process.env.GENERATOR_PRESET || PROMPT
+const PRIVATE_PRESETS = [TEST_PROJECT, HELLO_WORLD, HELLO_WORLD_TEST_PROJECT]
+const PUBLIC_PRESETS = [RETAIL_REACT_APP_DEMO, RETAIL_REACT_APP]
+const PRESETS = PRIVATE_PRESETS.concat(PUBLIC_PRESETS)
 
 const DEFAULT_OUTPUT_DIR = p.join(process.cwd(), 'pwa-kit-starter-project')
 
@@ -182,7 +185,7 @@ const runGenerator = (answers, {outputDir}) => {
     })
 }
 
-const prompts = () => {
+const retailReactAppPrompts = () => {
     const validProjectId = (s) =>
         /^[a-z0-9-]{1,20}$/.test(s) ||
         'Value can only contain lowercase letters, numbers, and hyphens.'
@@ -199,10 +202,10 @@ const prompts = () => {
     const validSiteId = (s) =>
         /^[a-z0-9_-]+$/i.test(s) || 'Valid characters are alphanumeric, hyphen, or underscore'
 
-    // To see definitions for Commerce API configuration values, refer to these
-    // doc --> https://developer.salesforce.com/docs/commerce/commerce-api/guide/commerce-api-configuration-values.html.
+    // To see definitions for Commerce API configuration values, go to
+    // https://developer.salesforce.com/docs/commerce/commerce-api/guide/commerce-api-configuration-values.
     const defaultCommerceAPIError =
-        'Invalid format. Use docs to find more information about valid configurations: https://developer.salesforce.com/docs/commerce/commerce-api/guide/commerce-api-configuration-values.html'
+        'Invalid format. Use docs to find more information about valid configurations: https://developer.salesforce.com/docs/commerce/commerce-api/guide/commerce-api-configuration-values'
     const defaultEinsteinAPIError =
         'Invalid format. Use docs to find more information about valid configurations: https://developer.salesforce.com/docs/commerce/einstein-api/references#einstein-recommendations:Summary'
     const validShortCode = (s) => /(^[0-9A-Z]{8}$)/i.test(s) || defaultCommerceAPIError
@@ -226,17 +229,18 @@ const prompts = () => {
         {
             name: 'instanceUrl',
             message:
-                'What is the URL (https://example_instance_id.sandbox.us01.dx.commercecloud.salesforce.com) for your Commerce Cloud instance?',
+                'What is the URL (https://example_instance_id.sandbox.us01.dx.commercecloud.salesforce.com) for your B2C Commerce instance?',
             validate: validUrl
         },
         {
             name: 'clientId',
-            message: 'What is your Commerce API client ID in Account Manager?',
+            message: 'What is your API client ID?',
             validate: validClientId
         },
         {
             name: 'siteId',
-            message: "What is your site's ID (examples: RefArch, SiteGenesis) in Business Manager?",
+            message:
+                "What is your site's ID (examples: RefArch, RefArchGlobal) in Business Manager?",
             validate: validSiteId
         },
         {
@@ -315,6 +319,19 @@ const testProjectAnswers = () => {
     return buildAnswers(config)
 }
 
+const demoProjectAnswers = () => {
+    const config = {
+        projectId: 'demo-storefront',
+        instanceUrl: 'https://zzte-053.sandbox.us02.dx.commercecloud.salesforce.com/',
+        clientId: '1d763261-6522-4913-9d52-5d947d3b94c4',
+        siteId: 'RefArchGlobal',
+        organizationId: 'f_ecom_zzte_053',
+        shortCode: 'kv7kzm78'
+    }
+
+    return buildAnswers(config)
+}
+
 const helloWorldPrompts = () => {
     const validProjectId = (s) =>
         /^[a-z0-9-]{1,20}$/.test(s) ||
@@ -344,6 +361,18 @@ const generateHelloWorld = ({projectId}, {outputDir}) => {
     })
 }
 
+const presetPrompt = () => {
+    const questions = [
+        {
+            name: 'preset',
+            message: 'Choose a project preset to get started:',
+            type: 'list',
+            choices: PUBLIC_PRESETS
+        }
+    ]
+    return inquirer.prompt(questions).then((answers) => answers['preset'])
+}
+
 const extractTemplate = (templateName, outputDir) => {
     const tmp = fs.mkdtempSync(p.resolve(os.tmpdir(), 'extract-template'))
     tar.x({
@@ -358,52 +387,86 @@ const extractTemplate = (templateName, outputDir) => {
 const main = (opts) => {
     if (!(opts.outputDir === DEFAULT_OUTPUT_DIR) && sh.test('-e', opts.outputDir)) {
         console.error(
-            `The output directory "${opts.outputDir}" already exists. Try, eg. ` +
+            `The output directory "${opts.outputDir}" already exists. Try, for example, ` +
                 `"~/Desktop/my-project" instead of "~/Desktop"`
         )
         process.exit(1)
     }
 
-    switch (GENERATOR_PRESET) {
-        case HELLO_WORLD_TEST_PROJECT:
-            return generateHelloWorld({projectId: 'hello-world'}, opts)
-        case HELLO_WORLD:
-            return helloWorldPrompts(opts).then((answers) => generateHelloWorld(answers, opts))
-        case TEST_PROJECT:
-            return runGenerator(testProjectAnswers(), opts)
-        case PROMPT:
-            console.log(
-                'See https://developer.salesforce.com/docs/commerce/commerce-api/guide/commerce-api-configuration-values.html for details on configuration values\n'
-            )
-            return prompts(opts).then((answers) => runGenerator(answers, opts))
-        default:
-            console.error(
-                `The preset "${GENERATOR_PRESET}" is not valid. Valid presets are: ${PRESETS.map(
-                    (x) => `"${x}"`
-                ).join(' ')}.`
-            )
-            process.exit(1)
-    }
+    return Promise.resolve()
+        .then(() => opts.preset || process.env.GENERATOR_PRESET || presetPrompt())
+        .then((preset) => {
+            switch (preset) {
+                case HELLO_WORLD_TEST_PROJECT:
+                    return generateHelloWorld({projectId: 'hello-world'}, opts)
+                case HELLO_WORLD:
+                    return helloWorldPrompts(opts).then((answers) =>
+                        generateHelloWorld(answers, opts)
+                    )
+                case TEST_PROJECT:
+                    return runGenerator(testProjectAnswers(), opts)
+                case RETAIL_REACT_APP_DEMO:
+                    return runGenerator(demoProjectAnswers(), opts)
+                case RETAIL_REACT_APP:
+                    console.log(
+                        'For details on configuration values, see https://developer.salesforce.com/docs/commerce/commerce-api/guide/commerce-api-configuration-values\n'
+                    )
+                    return retailReactAppPrompts(opts).then((answers) =>
+                        runGenerator(answers, opts)
+                    )
+                default:
+                    console.error(
+                        `The preset "${preset}" is not valid. Valid presets are: ${
+                            process.env.GENERATOR_PRESET
+                                ? PRESETS.map((x) => `"${x}"`).join(' ')
+                                : PUBLIC_PRESETS.map((x) => `"${x}"`).join(' ')
+                        }.`
+                    )
+                    process.exit(1)
+            }
+        })
 }
 
 if (require.main === module) {
-    program.description(`Generate a new PWA Kit project`)
-    program.option(
-        '--outputDir <path>',
-        `Path to the output directory for the new project`,
-        DEFAULT_OUTPUT_DIR
-    )
+    program.name(`pwa-kit-create-app`)
+    program.description(`Generate a new PWA Kit project, optionally using a preset.
+    
+Examples:
+
+  ${program.name()} --preset "${RETAIL_REACT_APP}"
+    Generate a project using custom settings by answering questions about a
+    B2C Commerce instance.
+    
+    Use this preset to connect to an existing instance, such as a sandbox.
+
+  ${program.name()} --preset "${RETAIL_REACT_APP_DEMO}"
+    Generate a project using the settings for a special B2C Commerce
+    instance that is used for demo purposes. No questions are asked.
+    
+    Use this preset to try out PWA Kit.
+  `)
+    program
+        .option(
+            '--outputDir <path>',
+            `Path to the output directory for the new project`,
+            DEFAULT_OUTPUT_DIR
+        )
+        .option(
+            '--preset <name>',
+            `The name of a project preset to use (choices: "retail-react-app" "retail-react-app-demo")`
+        )
+
     program.parse(process.argv)
 
     return Promise.resolve()
-        .then(() => main(program))
+        .then(() => main(program.opts()))
         .then(() => {
             console.log('')
-            console.log(`Successfully generated project in ${program.outputDir}`)
+            console.log(`Successfully generated a project in ${program.outputDir}`)
             process.exit(0)
         })
         .catch((err) => {
-            console.error('Failed to generate project')
+            console.error('Failed to generate a project')
             console.error(err)
             process.exit(1)
         })
