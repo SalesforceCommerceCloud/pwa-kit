@@ -324,7 +324,7 @@ const demoProjectAnswers = () => {
         projectId: 'demo-storefront',
         instanceUrl: 'https://zzte-053.sandbox.us02.dx.commercecloud.salesforce.com/',
         clientId: '1d763261-6522-4913-9d52-5d947d3b94c4',
-        siteId: 'RefArchGlobal',
+        siteId: 'RefArch',
         organizationId: 'f_ecom_zzte_053',
         shortCode: 'kv7kzm78'
     }
