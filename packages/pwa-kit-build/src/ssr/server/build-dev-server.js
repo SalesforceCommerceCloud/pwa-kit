@@ -87,7 +87,7 @@ export const DevServerMixin = {
         app.__waitForWebpackReady = () => {
             return new Promise((resolve) => {
                 const inner = () => {
-                    if(app.__webpackReady()) {
+                    if (app.__webpackReady()) {
                         resolve()
                     } else {
                         setTimeout(inner, 75)
@@ -181,7 +181,9 @@ export const DevServerMixin = {
         server.on('close', () => app.applicationCache.close())
 
         server.listen({hostname, port}, () => {
-            open(`${this._getDevServerURL(app.options)}/__mrt?loading=1`)
+            if (process.env.NODE_ENV !== 'test') {
+                open(`${this._getDevServerURL(app.options)}/__mrt?loading=1`)
+            }
         })
 
         return {handler: undefined, server, app}

@@ -1,13 +1,51 @@
 import {NO_CACHE} from 'pwa-kit-runtime/ssr/server/constants'
+import fetch from 'node-fetch'
 import {makeErrorHandler, DevServerFactory} from './build-dev-server'
-import path from 'path';
+import path from 'path'
+import http from 'http'
+import https from 'https'
 
 const TEST_PORT = 3444
 const testFixtures = path.resolve(__dirname, 'test_fixtures')
 
+// Mocks methods on the DevServerFactory to skip setting
+// up Webpack's dev middleware – a massive simplification
+// for testing.
+const NoWebpackDevServerFactory = {
+    ...DevServerFactory,
+    ...{
+        addSSRRenderer() {},
+        addSDKInternalHandlers() {},
+        getRequestProcessor() {}
+    }
+}
+
+const httpAgent = new http.Agent({})
+
+/**
+ * An HTTPS.Agent that allows self-signed certificates
+ * @type {module:https.Agent}
+ */
+export const httpsAgent = new https.Agent({
+    rejectUnauthorized: false
+})
+
+/**
+ * Fetch and ignore self-signed certificate errors.
+ */
+const insecureFetch = (url, opts) => {
+    return fetch(
+        url,
+        {
+            ...opts,
+            agent: (_parsedURL) => _parsedURL.protocol === 'https:' ? httpsAgent : httpAgent
+        }
+    )
+}
+
 const opts = (overrides = {}) => {
     const defaults = {
-        buildDir: testFixtures,
+        buildDir: path.join(testFixtures, 'build'),
         mobify: {
             ssrEnabled: true,
             ssrOnly: ['main.js.map', 'ssr.js', 'ssr.js.map'],
@@ -37,14 +75,14 @@ const opts = (overrides = {}) => {
         quiet: true,
         port: TEST_PORT,
         protocol: 'http',
-        enableLegacyRemoteProxying: false
+        enableLegacyRemoteProxying: false,
+        sslFilePath: path.join(testFixtures, 'localhost.pem'),
     }
     return {
         ...defaults,
         ...overrides
     }
 }
-
 
 describe('Error handlers returned from makeErrorHandler', () => {
     const testServerErrorHandler = (error, times) => {
@@ -69,17 +107,7 @@ describe('Error handlers returned from makeErrorHandler', () => {
     })
 })
 
-describe('The DevServer', () => {
-
-    // Mock methods on the DevServerFactory to skip setting
-    // up Webpack's dev middleware – a massive simplification
-    // for testing.
-    const NoWebpackDevServerFactory = {...DevServerFactory, ...{
-        addSSRRenderer() {},
-        addSDKInternalHandlers() {},
-        getRequestProcessor() {}
-    }}
-
+describe('DevServer', () => {
     test('createApp creates an express app', () => {
         const app = NoWebpackDevServerFactory.createApp(opts())
         expect(app.options.defaultCacheControl).toEqual(NO_CACHE)
@@ -87,5 +115,50 @@ describe('The DevServer', () => {
 
     test(`createApp validates missing or invalid field "protocol"`, () => {
         expect(() => NoWebpackDevServerFactory.createApp(opts({protocol: 'ssl'}))).toThrow()
+    })
+})
+
+describe('DevServer (full startup tests)', () => {
+    let server
+    let originalEnv
+
+    beforeEach(() => {
+        originalEnv = Object.assign({}, process.env)
+    })
+
+    afterEach(() => {
+        if (server) {
+            server.close()
+        }
+        process.env = originalEnv
+    })
+
+    const cases = [
+        {options: {protocol: 'http'}, env: {}, name: 'listens on http (set in options)'},
+        {options: {protocol: 'https'}, env: {}, name: 'listens on https (set in options)'},
+        {options: {}, env: {DEV_SERVER_PROTOCOL: 'http'}, name: 'listens on http (set in env var)'},
+        {options: {}, env: {DEV_SERVER_PROTOCOL: 'https'}, name: 'listens on https (set in env var)'}
+    ]
+
+    cases.forEach(({options, env, name}) => {
+        const protocol = options.protocol || env.DEV_SERVER_PROTOCOL
+        test(name, () => {
+            process.env = {...process.env, ...env}
+            const {server: _server} = NoWebpackDevServerFactory.createHandler(
+                opts(options),
+                (app) => {
+                    app.get('/*', (req, res) => {
+                        res.send('<div>hello world</div>')
+                    })
+                }
+            )
+            server = _server
+            return insecureFetch(`${protocol}://localhost:${TEST_PORT}`).then(
+                (response) => {
+                    expect(response.ok).toBe(true)
+                    return Promise.resolve()
+                }
+            )
+        })
     })
 })

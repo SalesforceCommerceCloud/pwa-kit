@@ -31,7 +31,6 @@ const {
 const {RemoteServerFactory, REMOTE_REQUIRED_ENV_VARS} = require('./build-remote-server')
 const ssrServerUtils = require('../../utils/ssr-server')
 const {getHashForString} = ssrServerUtils
-const fetch = require('node-fetch')
 const fs = require('fs')
 const https = require('https')
 const nock = require('nock')
@@ -191,18 +190,6 @@ describe('createApp validates environment variables', () => {
     })
 })
 
-/**
- * Fetch and ignore self-signed certificate errors.
- */
-const insecureFetch = (url, init) => {
-    return fetch(
-        url,
-        Object.assign({}, init || {}, {
-            agent: httpsAgent
-        })
-    )
-}
-
 describe('SSRServer operation', () => {
     const savedEnvironment = Object.assign({}, process.env)
     const sandbox = sinon.sandbox.create()
@@ -234,56 +221,6 @@ describe('SSRServer operation', () => {
         const app = RemoteServerFactory.createApp(options)
         const expected = `max-age=${options.defaultCacheTimeSeconds}, s-maxage=${options.defaultCacheTimeSeconds}`
         expect(app.options.defaultCacheControl).toEqual(expected)
-    })
-
-    describe('SSRServer startup', () => {
-        let server
-        let originalEnv
-
-        beforeEach(() => {
-            originalEnv = Object.assign({}, process.env)
-        })
-
-        afterEach(() => {
-            if (server) {
-                server.close()
-            }
-            process.env = originalEnv
-        })
-
-        const cases = [{fetch: fetch, protocol: 'http'}, {fetch: insecureFetch, protocol: 'https'}]
-
-        cases.forEach(({fetch, protocol}) => {
-            test(`SSRServer listens on ${protocol}`, () => {
-                const app = RemoteServerFactory.createApp(opts({protocol}))
-                app.get('/*', (req, res) => {
-                    res.send('<div>hello world</div>')
-                })
-
-                const {server: _server} = createDevServer(app)
-                server = _server
-                return fetch(`${protocol}://localhost:${TEST_PORT}`).then((response) => {
-                    expect(response.ok).toBe(true)
-                    return Promise.resolve()
-                })
-            })
-        })
-
-        cases.forEach(({fetch, protocol}) => {
-            test(`SSRServer can get a protocol from an environment variable (${protocol})`, () => {
-                process.env.DEV_SERVER_PROTOCOL = protocol
-                const app = RemoteServerFactory.createApp(opts({}))
-                app.get('/*', (req, res) => {
-                    res.send('<div>hello world</div>')
-                })
-                const {server: _server} = createDevServer(app)
-                server = _server
-                return fetch(`${protocol}://localhost:${TEST_PORT}`).then((response) => {
-                    expect(response.ok).toBe(true)
-                    return Promise.resolve()
-                })
-            })
-        })
     })
 
     test('SSRServer tracks responses', () => {

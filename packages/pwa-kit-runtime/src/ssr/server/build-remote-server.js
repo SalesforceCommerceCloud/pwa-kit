@@ -614,12 +614,6 @@ export const RemoteServerFactory = {
         // Fix up the path in case we were passed a relative one
         options.buildDir = path.resolve(process.cwd(), options.buildDir)
 
-        if (!fs.existsSync(options.buildDir)) {
-            throw new Error(
-                'The buildDir option passed to the SSR server must exist'
-            )
-        }
-
         if (options.faviconPath) {
             options.faviconPath = path.resolve(options.buildDir, options.faviconPath)
             if (!fs.existsSync(options.faviconPath)) {
