@@ -137,10 +137,6 @@ describe('createApp validates the options object', () => {
         {
             name: 'buildDir empty',
             options: opts({buildDir: ''})
-        },
-        {
-            name: 'buildDir invalid',
-            options: opts({buildDir: 'nosuchpath'})
         }
     ]
 
