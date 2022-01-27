@@ -13,14 +13,14 @@
         "pwa-kit-react-sdk": "^1.4.0-dev"
     },
     "scripts": {
-        "format": "mrtcli format '\"**/*.{js,jsx}\"'",
-        "lint": "mrtcli lint '\"**/*.{js,jsx}\"'",
+        "format": "mrt format '\"**/*.{js,jsx}\"'",
+        "lint": "mrt lint '\"**/*.{js,jsx}\"'",
         "lint:fix": "npm run lint -- --fix",
-        "save-credentials": "mrtcli save-credentials",
-        "start": "mrtcli start",
-        "test": "mrtcli test",
-        "prod:build": "mrtcli build",
-        "push": "npm run prod:build && mrtcli push"
+        "save-credentials": "mrt save-credentials",
+        "start": "mrt start",
+        "test": "mrt test",
+        "prod:build": "mrt build",
+        "push": "npm run prod:build && mrt push"
     },
     "dependencies": {
         "pwa-kit-runtime": "^1.4.0-dev"

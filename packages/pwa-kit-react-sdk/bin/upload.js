@@ -8,5 +8,5 @@
 'use strict'
 
 // TODO: Finalize command name and message before publishing to NPM
-console.error('The sdk-upload script has been moved. Try "mrtcli push" instead.')
+console.error('The sdk-upload script has been moved. Try "mrt push" instead.')
 process.exit(1)

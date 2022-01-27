@@ -8,8 +8,8 @@ that all webpack/babel/loadable config is baked into the runtime.
 Here's how you use it:
 
 ```
-➜  template-1c git:(revert-to-babel) ✗ npx mrtcli --help
-Usage: mrtcli [options] [command]
+➜  template-1c git:(revert-to-babel) ✗ npx mrt --help
+Usage: mrt [options] [command]
 
 The Managed Runtime CLI
 

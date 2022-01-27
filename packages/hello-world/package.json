@@ -13,14 +13,14 @@
         "react-router-dom": "^5.1.2"
     },
     "scripts": {
-        "test": "mrtcli test",
-        "format": "mrtcli format '\"**/*.{js,jsx}\"'",
-        "lint": "mrtcli lint '\"**/*.{js,jsx}\"'",
+        "test": "mrt test",
+        "format": "mrt format '\"**/*.{js,jsx}\"'",
+        "lint": "mrt lint '\"**/*.{js,jsx}\"'",
         "lint:fix": "npm run lint -- --fix",
-        "start": "mrtcli start",
-        "prod:build": "mrtcli build",
-        "push": "mrtcli push",
-        "save-credentials": "mrtcli save-credentials"
+        "start": "mrt start",
+        "prod:build": "mrt build",
+        "push": "mrt push",
+        "save-credentials": "mrt save-credentials"
     },
     "mobify": {
         "ssrEnabled": true,

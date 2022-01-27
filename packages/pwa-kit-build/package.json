@@ -10,7 +10,7 @@
   "author": "dev@mobify.com",
   "main": "dist/index.js",
   "bin": {
-    "mrtcli": "bin/mrtcli.js"
+    "mrt": "bin/mrt.js"
   },
   "files": [
     "bin",

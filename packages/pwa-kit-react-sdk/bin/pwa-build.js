@@ -8,5 +8,5 @@
 'use strict'
 
 // TODO: Finalize command name and message before publishing to NPM
-console.error('The sdk-pwa-build script has been moved. Try "mrtcli build" instead.')
+console.error('The sdk-pwa-build script has been moved. Try "mrt build" instead.')
 process.exit(1)
