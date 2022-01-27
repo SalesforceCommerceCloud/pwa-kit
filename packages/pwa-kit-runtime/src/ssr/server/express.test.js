@@ -10,8 +10,8 @@
 
 import {PersistentCache} from '../../utils/ssr-cache'
 import {CachedResponse} from '../../utils/ssr-server'
-import {X_PROXY_REQUEST_URL, X_MOBIFY_REQUEST_CLASS} from '../../utils/ssr-proxying'
-import {X_MOBIFY_QUERYSTRING, NO_CACHE} from './constants'
+import {X_PROXY_REQUEST_URL} from '../../utils/ssr-proxying'
+import {X_MOBIFY_QUERYSTRING} from './constants'
 
 // Mock static assets (require path is relative to the 'ssr' directory)
 const mockStaticAssets = {}
@@ -1287,6 +1287,8 @@ describe('generateCacheKey', () => {
         expect(generateCacheKey(mockRequest(), {extras: ['123']})).not.toEqual(result1)
     })
 })
+
+const once = 'TODO'
 
 describe('the once function', () => {
     test('should prevent a function being called more than once', () => {
