@@ -102,6 +102,7 @@ const merge = (a, b) => deepmerge(a, b, {arrayMerge: (orignal, replacement) => r
  * generated project, all others are excluded.
  */
 const runGenerator = (answers, {outputDir}) => {
+    debugger
     // These are the public, mobify-owned packages that can be installed through NPM.
     const npmInstallables = ['pwa-kit-react-sdk']
 
