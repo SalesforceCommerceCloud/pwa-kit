@@ -273,15 +273,10 @@ describe('SSRServer operation', () => {
         return promise2
     })
 
-    test('SSRServer throws on incorrect dev server protocol', () => {
-        expect(() => RemoteServerFactory.createApp(opts({protocol: 'ssl'}))).toThrow()
-    })
-
-    test(`createApp doesn't overwrite the protocol when remote`, () => {
+    test(`The Remote SSRServer always uses https`, () => {
         REMOTE_REQUIRED_ENV_VARS.forEach((envVar) => {
             process.env[envVar] = 'value'
         })
-        process.env['AWS_LAMBDA_FUNCTION_NAME'] = 'pretend-to-be-remote'
         const app = RemoteServerFactory.createApp(opts({protocol: 'http'}))
         expect(app.options.protocol).toEqual('https')
         process.env = savedEnvironment
