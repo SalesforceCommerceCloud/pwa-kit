@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2021, salesforce.com, inc.
+ * All rights reserved.
+ * SPDX-License-Identifier: BSD-3-Clause
+ * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
+ */
 import {NO_CACHE} from 'pwa-kit-runtime/ssr/server/constants'
 import {X_MOBIFY_REQUEST_CLASS} from 'pwa-kit-runtime/utils/ssr-proxying'
 import fetch from 'node-fetch'
@@ -6,7 +12,6 @@ import {makeErrorHandler, DevServerFactory} from './build-dev-server'
 import path from 'path'
 import http from 'http'
 import https from 'https'
-import fs from 'fs'
 
 const TEST_PORT = 3444
 const testFixtures = path.resolve(__dirname, 'test_fixtures')
