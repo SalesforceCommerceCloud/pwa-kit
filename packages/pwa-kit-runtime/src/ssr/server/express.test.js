@@ -90,7 +90,7 @@ const opts = (overrides = {}) => {
             https: httpsAgent
         },
         enableLegacyRemoteProxying: false,
-        defaultCacheTimeSeconds: 123,
+        defaultCacheTimeSeconds: 123
     }
     return {
         ...defaults,

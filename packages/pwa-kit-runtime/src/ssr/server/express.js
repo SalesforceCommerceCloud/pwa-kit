@@ -517,9 +517,9 @@ export const respondFromBundle = ({req, res, path, redirect = 301}) => {
  * as an argument. Use this to customize the server.
  */
 export const createHandler = (options, customizeApp) => {
-    const factory = isRemote() ?
-        RemoteServerFactory :
-        eval('require').main.require('pwa-kit-build/ssr/server/build-dev-server').DevServerFactory
+    const factory = isRemote()
+        ? RemoteServerFactory
+        : eval('require').main.require('pwa-kit-build/ssr/server/build-dev-server').DevServerFactory
 
     return factory.createHandler(options, customizeApp)
 }

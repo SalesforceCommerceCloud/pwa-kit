@@ -610,7 +610,6 @@ export const RemoteServerFactory = {
             )
         }
 
-
         // Fix up the path in case we were passed a relative one
         options.buildDir = path.resolve(process.cwd(), options.buildDir)
 
@@ -623,9 +622,7 @@ export const RemoteServerFactory = {
         }
 
         if (!(options.mobify instanceof Object)) {
-            throw new Error(
-                'The mobify option passed to the SSR server must be an object'
-            )
+            throw new Error('The mobify option passed to the SSR server must be an object')
         }
 
         const {sslFilePath} = options
