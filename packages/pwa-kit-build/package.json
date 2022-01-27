@@ -112,7 +112,9 @@
   },
   "devDependencies": {
     "internal-lib-build": "^1.4.0-dev",
-    "pwa-kit-runtime": "^1.4.0-dev"
+    "pwa-kit-runtime": "^1.4.0-dev",
+    "superagent": "^6.1.0",
+    "supertest": "^4.0.2"
   },
   "peerDependencies": {
     "@loadable/component": "^5.15.0",

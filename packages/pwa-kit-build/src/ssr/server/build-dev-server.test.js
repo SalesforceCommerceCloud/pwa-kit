@@ -1,9 +1,12 @@
 import {NO_CACHE} from 'pwa-kit-runtime/ssr/server/constants'
+import {X_MOBIFY_REQUEST_CLASS} from 'pwa-kit-runtime/utils/ssr-proxying'
 import fetch from 'node-fetch'
+import request from 'supertest'
 import {makeErrorHandler, DevServerFactory} from './build-dev-server'
 import path from 'path'
 import http from 'http'
 import https from 'https'
+import fs from 'fs'
 
 const TEST_PORT = 3444
 const testFixtures = path.resolve(__dirname, 'test_fixtures')
@@ -34,13 +37,10 @@ export const httpsAgent = new https.Agent({
  * Fetch and ignore self-signed certificate errors.
  */
 const insecureFetch = (url, opts) => {
-    return fetch(
-        url,
-        {
-            ...opts,
-            agent: (_parsedURL) => _parsedURL.protocol === 'https:' ? httpsAgent : httpAgent
-        }
-    )
+    return fetch(url, {
+        ...opts,
+        agent: (_parsedURL) => (_parsedURL.protocol === 'https:' ? httpsAgent : httpAgent)
+    })
 }
 
 const opts = (overrides = {}) => {
@@ -76,7 +76,7 @@ const opts = (overrides = {}) => {
         port: TEST_PORT,
         protocol: 'http',
         enableLegacyRemoteProxying: false,
-        sslFilePath: path.join(testFixtures, 'localhost.pem'),
+        sslFilePath: path.join(testFixtures, 'localhost.pem')
     }
     return {
         ...defaults,
@@ -118,7 +118,107 @@ describe('DevServer', () => {
     })
 })
 
-describe('DevServer (full startup tests)', () => {
+describe('Request processor support', () => {
+    const helloWorld = '<div>hello world</div>'
+
+    let route
+
+    beforeEach(() => {
+        route = jest.fn().mockImplementation((req, res) => {
+            res.send(helloWorld)
+        })
+    })
+
+    afterEach(() => {
+        route = undefined
+    })
+
+    test('SSRServer supports the request-processor and request class', () => {
+        const ServerFactory = {
+            ...NoWebpackDevServerFactory,
+            ...{
+                getRequestProcessor() {
+                    return {
+                        processRequest: ({getRequestClass, setRequestClass}) => {
+                            console.log(`getRequestClass returns ${getRequestClass()}`)
+                            setRequestClass('bot')
+                            return {
+                                path: '/altered',
+                                querystring: 'foo=bar'
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        const app = ServerFactory.createApp(opts())
+        app.get('/*', route)
+
+        return request(app)
+            .get('/')
+            .expect(200)
+            .then((response) => {
+                const requestClass = response.headers[X_MOBIFY_REQUEST_CLASS]
+                expect(requestClass).toEqual('bot')
+                expect(route).toHaveBeenCalled()
+            })
+    })
+
+    test('SSRServer handles no request processor', () => {
+        const ServerFactory = {
+            ...NoWebpackDevServerFactory,
+            ...{
+                getRequestProcessor() {
+                    return null
+                }
+            }
+        }
+
+        const options = opts()
+        const app = ServerFactory.createApp(options)
+        app.get('/*', route)
+
+        return request(app)
+            .get('/')
+            .expect(200)
+            .then((response) => {
+                expect(response.headers[X_MOBIFY_REQUEST_CLASS]).toBe(undefined)
+                expect(route).toHaveBeenCalled()
+                expect(response.text).toEqual(helloWorld)
+            })
+    })
+
+    test('SSRServer handles a broken request processor', () => {
+        // This is a broken because processRequest is required to return
+        // {path, querystring}, but returns undefined
+
+        const ServerFactory = {
+            ...NoWebpackDevServerFactory,
+            ...{
+                getRequestProcessor() {
+                    return {
+                        processRequest: () => {
+                            return
+                        }
+                    }
+                }
+            }
+        }
+
+        const app = ServerFactory.createApp(opts())
+        app.get('/*', route)
+
+        return request(app)
+            .get('/')
+            .expect(500)
+            .then(() => {
+                expect(route).not.toHaveBeenCalled()
+            })
+    })
+})
+
+describe('DevServer startup', () => {
     let server
     let originalEnv
 
@@ -137,7 +237,11 @@ describe('DevServer (full startup tests)', () => {
         {options: {protocol: 'http'}, env: {}, name: 'listens on http (set in options)'},
         {options: {protocol: 'https'}, env: {}, name: 'listens on https (set in options)'},
         {options: {}, env: {DEV_SERVER_PROTOCOL: 'http'}, name: 'listens on http (set in env var)'},
-        {options: {}, env: {DEV_SERVER_PROTOCOL: 'https'}, name: 'listens on https (set in env var)'}
+        {
+            options: {},
+            env: {DEV_SERVER_PROTOCOL: 'https'},
+            name: 'listens on https (set in env var)'
+        }
     ]
 
     cases.forEach(({options, env, name}) => {
@@ -153,12 +257,10 @@ describe('DevServer (full startup tests)', () => {
                 }
             )
             server = _server
-            return insecureFetch(`${protocol}://localhost:${TEST_PORT}`).then(
-                (response) => {
-                    expect(response.ok).toBe(true)
-                    return Promise.resolve()
-                }
-            )
+            return insecureFetch(`${protocol}://localhost:${TEST_PORT}`).then((response) => {
+                expect(response.ok).toBe(true)
+                return Promise.resolve()
+            })
         })
     })
 })

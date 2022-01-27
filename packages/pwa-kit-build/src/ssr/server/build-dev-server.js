@@ -199,14 +199,22 @@ export const DevServerMixin = {
         if (req.app.__webpackReady()) {
             const outputFileSystem = req.app.__devMiddleware.context.outputFileSystem
             const jsonWebpackStats = req.app.__devMiddleware.context.stats.toJson()
-            const rp = jsonWebpackStats.children.find((child) => child.name === 'request-processor')
-            const requestProcessorPath = path.join(rp.outputPath, 'request-processor.js')
-            const compiled = outputFileSystem.readFileSync(requestProcessorPath, 'utf-8')
+
+            let compiled
+            try {
+                const rp = jsonWebpackStats.children.find(
+                    (child) => child.name === 'request-processor'
+                )
+                const requestProcessorPath = path.join(rp.outputPath, 'request-processor.js')
+                compiled = outputFileSystem.readFileSync(requestProcessorPath, 'utf-8')
+            } catch (e) {
+                // The user hasn't added a request processor
+                return null
+            }
             const requestProcessor = requireFromString(compiled)
             if (!requestProcessor.processRequest) {
                 throw new Error(
-                    `Request processor module ${requestProcessorPath} ` +
-                        `does not export processRequest`
+                    `Request processor module "request-processor.js" does not export processRequest`
                 )
             }
             return requestProcessor
