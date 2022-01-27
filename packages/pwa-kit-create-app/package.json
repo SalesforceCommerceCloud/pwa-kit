@@ -1,6 +1,6 @@
 {
   "name": "pwa-kit-create-app",
-  "version": "1.4.0-alpha.3",
+  "version": "1.4.0",
   "description": "Salesforce's project generator tool",
   "author": "dev@mobify.com",
   "license": "See license in LICENSE",
