@@ -6,7 +6,8 @@
  */
 export const commerceAPIConfig = {
     // If running locally, alter this pass to use your locally proxy.
-    proxyPath: `/mobify/proxy/api`,
+    // proxyPath: `/mobify/proxy/api`,
+    proxyPath: `/proxy/scapi`,
     parameters: {
         clientId: 'c9c45bfd-0ed3-4aa2-9971-40f88962b836',
         organizationId: 'f_ecom_zzrf_001',

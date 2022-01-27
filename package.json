@@ -22,8 +22,5 @@
     "lint:fix": "lerna run lint:fix",
     "format": "lerna run --parallel --stream format",
     "bump-version": "node ./scripts/bump-version.js"
-  },
-  "dependencies": {
-    "https-proxy-agent": "^5.0.0"
   }
 }

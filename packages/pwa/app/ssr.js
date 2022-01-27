@@ -8,11 +8,15 @@
 
 /* global WEBPACK_PACKAGE_JSON_MOBIFY */
 
+import fs from 'fs'
 import path from 'path'
 import {createApp, createHandler, serveStaticFile} from 'pwa-kit-react-sdk/ssr/server/express'
 import {isRemote} from 'pwa-kit-react-sdk/utils/ssr-server'
 import {render} from 'pwa-kit-react-sdk/ssr/server/react-rendering'
 import helmet from 'helmet'
+import {createProxyMiddleware, fixRequestBody} from 'http-proxy-middleware'
+import {Agent as HTTPSProxyAgent} from 'better-https-proxy-agent'
+
 
 const app = createApp({
     // The build directory (an absolute path)
@@ -60,20 +64,64 @@ app.use(
 )
 
 
+const HTTPS_AGENT_OPTIONS = {}
 
-import HTTPSProxyAgent from 'https-proxy-agent'
-
-const agent = new HttpsProxyAgent('http://ip-of-my-proxy');
- 
-const shouldUseCorporateHTTPProxy = !isRemote()
-if (shouldUseCorporateHTTPProxy) {
-    app.all('/proxy/*', (req, res) => {
-        // Make HTTPS requets to SCAPI / OCAPI
-        // You _may_ be able to use the `http-proxy` package, passing in `agent` from above.
-        // https://github.com/http-party/node-http-proxy#options
-    })
+const PROXY_REQUEST_OPTIONS = {
+    protocol: 'https:',
+    host: '127.0.0.1',
+    port: 8080,
+    cert: fs.readFileSync('mitmproxy-ca-cert.pem')
 }
 
+const shouldUseCorporateHTTPProxy = !isRemote()
+if (shouldUseCorporateHTTPProxy) {
+    app.all(
+        '/proxy/test/*',
+        createProxyMiddleware({
+            agent: new HTTPSProxyAgent(HTTPS_AGENT_OPTIONS, PROXY_REQUEST_OPTIONS),
+            target: 'https://httpbin.org/anything',
+            secure: true,
+            changeOrigin: true,
+            onProxyReq: fixRequestBody,
+            pathRewrite: {
+                '.*': ''
+            }
+        })
+    )
+
+    app.all(
+        '/proxy/scapi/*',
+        createProxyMiddleware({
+            agent: new HTTPSProxyAgent(HTTPS_AGENT_OPTIONS, PROXY_REQUEST_OPTIONS),
+            target: 'https://kv7kzm78.api.commercecloud.salesforce.com',
+            secure: true,
+            changeOrigin: true,
+            onProxyReq: fixRequestBody,
+            pathRewrite: {
+                '^/proxy/scapi/': '/'
+            }
+        })
+    )
+
+    app.all(
+        '/proxy/ocapi/*',
+        createProxyMiddleware({
+            agent: new HTTPSProxyAgent(HTTPS_AGENT_OPTIONS, PROXY_REQUEST_OPTIONS),
+            target: 'https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com',
+            secure: true,
+            changeOrigin: true,
+            onProxyReq: (proxyReq, req, res) => {
+                // Don't forward the Origin header to OCAPI to prevent CORS errors.
+                proxyReq.removeHeader('origin')
+                
+                return fixRequestBody(proxyReq, req, res)
+            },
+            pathRewrite: {
+                '^/proxy/ocapi/': '/'
+            }
+        })
+    )
+}
 
 // Handle the redirect from SLAS as to avoid error
 app.get('/callback?*', (req, res) => {
