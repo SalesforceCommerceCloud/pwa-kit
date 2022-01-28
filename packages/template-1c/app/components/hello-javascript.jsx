@@ -4,10 +4,10 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React from "react";
+import React from 'react'
 
 const HelloJS = () => {
-  return <span>This is a JS component.</span>;
-};
+    return <span>This is a JS component.</span>
+}
 
-export default HelloJS;
+export default HelloJS
