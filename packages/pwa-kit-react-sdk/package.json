@@ -117,8 +117,6 @@
   },
   "peerDependencies": {
     "@loadable/component": "^5.15.0",
-    "@loadable/server": "^5.15.0",
-    "@loadable/webpack-plugin": "^5.15.0",
     "react": ">=16.14 || <18",
     "react-dom": ">=16.14 || <18",
     "react-helmet": "6",

@@ -119,8 +119,6 @@
   },
   "peerDependencies": {
     "@loadable/component": "^5.15.0",
-    "@loadable/server": "^5.15.0",
-    "@loadable/webpack-plugin": "^5.15.0",
     "pwa-kit-runtime": "^1.4.0-dev"
   },
   "engines": {
