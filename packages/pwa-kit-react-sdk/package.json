@@ -1,6 +1,6 @@
 {
   "name": "pwa-kit-react-sdk",
-  "version": "1.4.0-dev",
+  "version": "2.0.0-dev",
   "description": "A library that supports the isomorphic React rendering pipeline for Commerce Cloud Managed Runtime apps",
   "main": "dist/index.js",
   "bin": {
@@ -13,6 +13,7 @@
   },
   "files": [
     "bin",
+    "CHANGELOG.md",
     "LICENSE",
     "scripts",
     "ssr",
@@ -64,7 +65,7 @@
     "enzyme-adapter-react-16": "1.15.2",
     "event-emitter": "^0.3.5",
     "express": "^4.17.1",
-    "git-rev-sync": "^3.0.1",
+    "git-rev-sync": "^3.0.2",
     "glob": "7.1.1",
     "header-case": "1.0.1",
     "hoist-non-react-statics": "^3.3.1",
@@ -81,8 +82,8 @@
     "node-html-parser": "^3.3.4",
     "open": "^8.4.0",
     "prop-types": "^15.6.0",
-    "pwa-kit-build": "^1.4.0-dev",
-    "pwa-kit-runtime": "^1.4.0-dev",
+    "pwa-kit-build": "^2.0.0-dev",
+    "pwa-kit-runtime": "^2.0.0-dev",
     "raf": "^3.4.0",
     "react-uid": "^2.2.0",
     "replace-in-file": "^6.2.0",
@@ -108,12 +109,12 @@
   "devDependencies": {
     "@loadable/component": "^5.15.0",
     "@wojtekmaj/enzyme-adapter-react-17": "^0.6.6",
-    "internal-lib-build": "^1.4.0-dev",
-    "regenerator-runtime": "^0.13.9",
+    "internal-lib-build": "^2.0.0-dev",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-helmet": "5.2.0",
-    "react-router-dom": "^5.1.2"
+    "react-router-dom": "^5.1.2",
+    "regenerator-runtime": "^0.13.9"
   },
   "peerDependencies": {
     "@loadable/component": "^5.15.0",

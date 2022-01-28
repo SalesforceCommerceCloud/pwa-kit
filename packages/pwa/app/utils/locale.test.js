@@ -16,18 +16,23 @@ import {
 import {SUPPORTED_LOCALES, DEFAULT_LOCALE} from '../constants'
 
 const supportedLocales = getSupportedLocalesIds()
+const isMultiLocales = supportedLocales.length > 1
 const nonSupportedLocale = 'nl-NL'
 // Make sure this supported locale is not the default locale.
 // Otherwise, our code would fall back to default and incorrectly pass the tests
-const supportedLocale = supportedLocales[1]
+const supportedLocale = isMultiLocales
+    ? supportedLocales.find((locale) => locale !== DEFAULT_LOCALE)
+    : supportedLocales[0]
 
 const testId1 = 'footer.link.privacy_policy'
-const testId2 = 'homepage.message.welcome'
+const testId2 = 'account.accordion.button.my_account'
 
 test('our assumptions before further testing', () => {
     expect(supportedLocales.includes(nonSupportedLocale)).toBe(false)
-    expect(DEFAULT_LOCALE).toBe('en-GB')
-    expect(supportedLocale).not.toBe(DEFAULT_LOCALE)
+    if (isMultiLocales) {
+        expect(DEFAULT_LOCALE).toBe('en-GB')
+        expect(supportedLocale).not.toBe(DEFAULT_LOCALE)
+    }
 })
 
 describe('whichLocaleToLoad', () => {
@@ -55,7 +60,9 @@ describe('loadLocaleData', () => {
         expect(messages[testId1][0].value).toMatch(/^\[!! Ṕŕíííṿâćććẏ ṔṔṔŏĺíííćẏ !!]$/)
     })
     test('handling a not-found translation file', async () => {
-        expect(supportedLocale).not.toBe(DEFAULT_LOCALE)
+        if (isMultiLocales) {
+            expect(supportedLocale).not.toBe(DEFAULT_LOCALE)
+        }
 
         jest.mock(`../translations/compiled/${supportedLocale}.json`, () => {
             throw new Error()
@@ -94,8 +101,9 @@ describe('getLocaleConfig', () => {
     })
     test('with getUserPreferredLocales parameter', async () => {
         const locale = supportedLocale
-        expect(locale).not.toBe(DEFAULT_LOCALE)
-
+        if (isMultiLocales) {
+            expect(locale).not.toBe(DEFAULT_LOCALE)
+        }
         const config = await getLocaleConfig({
             getUserPreferredLocales: () => [locale]
         })
