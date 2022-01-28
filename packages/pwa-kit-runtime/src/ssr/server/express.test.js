@@ -433,19 +433,6 @@ describe('SSRServer operation', () => {
         })
     })
 
-    test('SSRServer serves bundle assets', () => {
-        const app = RemoteServerFactory.createApp(opts())
-        expect.assertions(1)
-
-        return request(app)
-            .get('/mobify/bundle/development/main.js')
-            .expect(200)
-            .then((res) => {
-                const source = fs.readFileSync(path.resolve(testFixtures, 'main.js'), 'utf8')
-                expect(res.text).toEqual(source)
-            })
-    })
-
     test('SSRServer serves favicon', () => {
         const faviconPath = path.resolve(testFixtures, 'favicon.ico')
         const app = RemoteServerFactory.createApp(opts({faviconPath}))
