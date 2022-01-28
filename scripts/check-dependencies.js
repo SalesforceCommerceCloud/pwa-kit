@@ -59,9 +59,6 @@ const commonConfigs = [
 // in order to standardize them.
 const commonDevDeps = {
     'cross-env': '^5.2.0',
-    nock: '^13.1.1',
-    semver: '^7.3.2',
-    shelljs: '^0.8.5'
 }
 
 const readJSON = (path) => JSON.parse(fs.readFileSync(path))
@@ -143,7 +140,7 @@ const check = () => {
         const pkg = readJSON(pkgFile)
         Object.entries(commonDevDeps)
             .forEach(([name, requiredVersion]) => {
-                const foundVersion = pkg.devDependencies[name] || pkg.dependencies[name]
+                const foundVersion = (pkg.devDependencies || {})[name] || (pkg.dependencies || {})[name]
                 if (foundVersion && foundVersion !== requiredVersion) {
                     errors.push(
                         `Package "${pkg.name}" requires "${name}@${foundVersion}" but we've standardized on ` +
@@ -162,11 +159,11 @@ const check = () => {
         // If the current package, X, depends on a monorepo local package, Y, then
         // ensure that X installs all of Y's peerDependencies.
         Object.entries(peerDependenciesByPackage).forEach(([localPackageName, localPeerDeps]) => {
-            const dependsOnLocalPackage = !!(pkg.dependencies[localPackageName] || pkg.devDependencies[localPackageName])
+            const dependsOnLocalPackage = !!((pkg.dependencies || {})[localPackageName] || (pkg.devDependencies || {})[localPackageName])
             if (dependsOnLocalPackage) {
                 Object.entries(localPeerDeps).forEach(([requiredPackage, requiredRange]) => {
-                    const foundRange = pkg.dependencies[requiredPackage] || pkg.devDependencies[requiredPackage]
-                    const satisfied = semver.subset(foundRange, requiredRange)
+                    const foundRange = (pkg.dependencies || {})[requiredPackage] || (pkg.devDependencies || {})[requiredPackage]
+                    const satisfied = foundRange && semver.subset(foundRange, requiredRange)
                     if (!satisfied) {
                         errors.push(
                             `Package "${pkg.name}" depends on package "${localPackageName}", but is missing one of` +
