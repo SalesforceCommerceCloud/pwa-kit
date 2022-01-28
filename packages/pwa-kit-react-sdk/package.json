@@ -48,7 +48,6 @@
   "license": "SEE LICENSE IN LICENSE",
   "dependencies": {
     "@loadable/babel-plugin": "^5.13.2",
-    "@loadable/component": "^5.15.0",
     "@loadable/server": "^5.15.0",
     "@loadable/webpack-plugin": "^5.15.0",
     "archiver": "1.3.0",
@@ -85,10 +84,6 @@
     "pwa-kit-build": "^1.4.0-dev",
     "pwa-kit-runtime": "^1.4.0-dev",
     "raf": "^3.4.0",
-    "react": "^17.0.2",
-    "react-dom": "^17.0.2",
-    "react-helmet": "5.2.0",
-    "react-router-dom": "^5.1.2",
     "react-uid": "^2.2.0",
     "replace-in-file": "^6.2.0",
     "request": "^2.88.0",
@@ -111,9 +106,14 @@
     "yargs": "15.4.1"
   },
   "devDependencies": {
+    "@loadable/component": "^5.15.0",
     "@wojtekmaj/enzyme-adapter-react-17": "^0.6.6",
     "internal-lib-build": "^1.4.0-dev",
-    "regenerator-runtime": "^0.13.9"
+    "regenerator-runtime": "^0.13.9",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
+    "react-helmet": "5.2.0",
+    "react-router-dom": "^5.1.2"
   },
   "peerDependencies": {
     "@loadable/component": "^5.15.0",
