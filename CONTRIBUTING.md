@@ -62,7 +62,7 @@ If you’re experiencing an issue, check the open issues first. If someone hasn�
 
 ## 🏅 Best Practices
 
--   When logging issues or creating pull requests for the first time, tell us a bit about yourself. Do you belong to a Salesforce customer or partner organization? What PWA Kit projects are you actively working on?
+-   When logging an issue or creating a pull request for the first time, tell us a bit about yourself. Do you work for a Salesforce customer or partner organization? What PWA Kit projects are you actively working on?
 -   To reduce merge conflicts, squash and rebase your branch before submitting your pull request.
 -   In your pull request, include:
     -   A brief description of the problem and your solution
