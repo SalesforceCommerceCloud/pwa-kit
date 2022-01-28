@@ -115,10 +115,16 @@ const check = () => {
     // Maps package-name -> the peerDependencies section for each monorepo-local
     // package, used for sense-checking dependencies later on.
     const peerDependenciesByPackage = {}
+
+    // Maps package-name -> the peerDependenciesMeta section for each monorepo-local
+    // package, used for sense-checking dependencies later on.
+    const peerDependenciesMetaByPackage = {}
+
     listPackages().forEach((pkgDir) => {
         const pkgFile = path.join(pkgDir, 'package.json')
         const pkg = readJSON(pkgFile)
         peerDependenciesByPackage[pkg.name] = pkg.peerDependencies || {}
+        peerDependenciesMetaByPackage[pkg.name] = pkg.peerDependenciesMeta || {}
     })
 
     listPackages().forEach((pkgDir) => {
@@ -150,7 +156,8 @@ const check = () => {
                 Object.entries(localPeerDeps).forEach(([requiredPackage, requiredRange]) => {
                     const foundRange = (pkg.dependencies || {})[requiredPackage] || (pkg.devDependencies || {})[requiredPackage]
                     const satisfied = foundRange && semver.subset(foundRange, requiredRange)
-                    if (!satisfied) {
+                    const peerIsOptional = Boolean((peerDependenciesMetaByPackage[localPackageName][requiredPackage] || {})['optional'])
+                    if (!peerIsOptional && !satisfied) {
                         errors.push(
                             `Package "${pkg.name}" depends on package "${localPackageName}", but is missing one of` +
                             ` its peerDependencies "${requiredPackage}@${requiredRange}"`
@@ -192,10 +199,17 @@ const check = () => {
             )
         }
 
-        // If the current package lists peerDependencies then it must include them
-        // in its own devDependencies for development.
+        // If the current package lists required – not optional! – peerDependencies then it
+        // must include them in its own devDependencies for development.
         const peersNotInstalledForDev = difference(peerDependencies, devDependencies)
-        if (peersNotInstalledForDev.size > 0) {
+
+        const optionalPeers = Object.entries(pkg.peerDependenciesMeta || {})
+            .map(([peer, data]) => Boolean((data || {})['optional']) ? peer : undefined)
+            .filter(Boolean)
+
+        const peersNotInstalledForDevAndRequired = difference(peersNotInstalledForDev, optionalPeers)
+
+        if (peersNotInstalledForDevAndRequired.size > 0) {
             errors.push(
                 `Package "${pkg.name}" has peerDependencies that are not installed as devDependencies: ` +
                 `${Array.from(peersNotInstalledForDev).join(", ").toString()}`
