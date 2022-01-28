@@ -185,7 +185,8 @@ const withChunking = (config) => {
     }
 }
 
-const client = baseConfig('web')
+const client = fs.existsSync(path.resolve(projectDir, 'app', 'main.js')) &&
+    baseConfig('web')
     .extend(withChunking)
     .extend((config) => {
         return {
