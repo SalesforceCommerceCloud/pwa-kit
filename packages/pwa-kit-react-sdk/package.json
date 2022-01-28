@@ -4,8 +4,6 @@
   "description": "A library that supports the isomorphic React rendering pipeline for Commerce Cloud Managed Runtime apps",
   "main": "dist/index.js",
   "bin": {
-    "sdk-pwa-build": "bin/pwa-build.js",
-    "sdk-upload": "bin/upload.js",
     "sdk-create-hash-manifest": "bin/create-hash-manifest.js"
   },
   "engines": {
