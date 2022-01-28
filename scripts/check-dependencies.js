@@ -112,20 +112,6 @@ const check = () => {
         errors.push(`The root package.json must not have any dependencies (only devDependencies)`)
     }
 
-    // The root can have devDependencies, but only if those are also included in the
-    // shared devDependencies - this is to prevent packages accidentally depending
-    // on something not included in their own package.json. The only exception here
-    // is lerna, that we never want installed in a package.
-    Object.entries(rootPkg.devDependencies)
-        .forEach(([name, version]) => {
-            if(name !== 'lerna' && commonDevDeps[name] !== version) {
-                errors.push(
-                    `The root package.json has "${name}@${version}" as a devDependency ` +
-                    `that is not an explictly allowed development package. See the check-dependencies script.`
-                )
-            }
-        })
-
     // Maps package-name -> the peerDependencies section for each monorepo-local
     // package, used for sense-checking dependencies later on.
     const peerDependenciesByPackage = {}
