@@ -1,6 +1,6 @@
 {
   "name": "internal-lib-build",
-  "version": "1.4.0-dev",
+  "version": "2.0.0-dev",
   "private": true,
   "description": "Build tools for *libraries* in the monorepo",
   "repository": {

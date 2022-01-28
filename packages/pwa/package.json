@@ -1,6 +1,6 @@
 {
     "name": "scaffold-pwa",
-    "version": "1.4.0-dev",
+    "version": "2.0.0-dev",
     "license": "See license in LICENSE",
     "private": true,
     "mobify": {
@@ -45,6 +45,9 @@
         "@lerna/child-process": "^3.3.0",
         "@lhci/cli": "^0.7.0",
         "@loadable/component": "^5.15.0",
+        "@testing-library/react": "^11.2.5",
+        "@testing-library/react-hooks": "^7.0.2",
+        "@testing-library/user-event": "^12.8.1",
         "base64-arraybuffer": "^0.2.0",
         "bundlesize2": "^0.0.30",
         "card-validator": "^8.1.0",
@@ -65,7 +68,7 @@
         "node-fetch": "^2.3.0",
         "prop-types": "^15.6.0",
         "pwa-kit-build": "^1.4.0-dev",
-        "pwa-kit-react-sdk": "^1.4.0-dev",
+        "pwa-kit-react-sdk": "^2.0.0-dev",
         "pwa-kit-runtime": "^1.4.0-dev",
         "query-string": "^7.0.1",
         "raf": "^3.4.0",
@@ -76,9 +79,6 @@
         "react-hook-form": "^6.15.5",
         "react-intl": "^5.13.1",
         "react-router-dom": "^5.1.2",
-        "@testing-library/react": "^11.2.5",
-        "@testing-library/react-hooks": "^7.0.2",
-        "@testing-library/user-event": "^12.8.1",
         "whatwg-fetch": "1.0.0"
     },
     "scripts": {

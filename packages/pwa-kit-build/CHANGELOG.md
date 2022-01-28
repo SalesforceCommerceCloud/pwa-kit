@@ -1,3 +1,4 @@
+## v2.0.0-dev (Jan 27, 2022)
 ## v1.3.0-dev (Nov 18, 2021)
 
 -   `createApp` takes a new option `enableLegacyRemoteProxying` which defaults to `true`. When set to `false`, local development proxying is disabled when running remotely. In future, local development proxying will *always* be disabled when running remotely. [#205](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/205)
