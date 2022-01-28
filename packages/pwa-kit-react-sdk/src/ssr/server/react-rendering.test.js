@@ -14,6 +14,7 @@ import request from 'supertest'
 import {parse} from 'node-html-parser'
 import path from 'path'
 import {isRemote} from 'pwa-kit-runtime/utils/ssr-server'
+import AppConfig from '../universal/components/_app-config'
 
 const opts = (overrides = {}) => {
     const fixtures = path.join(__dirname, '..', '..', 'ssr', 'server', 'test_fixtures')
@@ -294,6 +295,23 @@ jest.mock('pwa-kit-runtime/utils/ssr-server', () => {
     }
 })
 
+jest.mock('@loadable/server', () => {
+    const lodableServer = jest.requireActual('@loadable/server')
+    return {
+        ...lodableServer,
+
+        // Tests aren't being run through webpack, therefore no chunks or `loadable-stats.json`
+        // file is being created. ChunkExtractor causes a file read exception. For this
+        // reason, we mock the implementation to do nothing.
+        ChunkExtractor: function() {
+            return {
+                collectChunks: jest.fn().mockImplementation((x) => x),
+                getScriptElements: jest.fn().mockReturnValue([])
+            }
+        }
+    }
+})
+
 describe('The Node SSR Environment', () => {
     const OLD_ENV = process.env
 
@@ -307,6 +325,10 @@ describe('The Node SSR Environment', () => {
 
     afterAll(() => {
         process.env = OLD_ENV // Restore old environment
+    })
+
+    afterEach(() => {
+        jest.restoreAllMocks()
     })
 
     /**
@@ -578,23 +600,49 @@ describe('The Node SSR Environment', () => {
 
                 expect(scriptContent).not.toContain('<script>')
             }
+        },
+        {
+            description: `AppConfig errors are caught`,
+            req: {url: '/pwa/'},
+            mocks: () => {
+                jest
+                    .spyOn(AppConfig.prototype, 'render')
+                    .mockImplementation(() => {throw new Error()})
+            },
+            assertions: (res) => {
+                expect(res.statusCode).toBe(500)
+                const html = res.text
+
+                const shouldIncludeErrorStack = !isRemote()
+                expect(html).toContain(shouldIncludeErrorStack ? 'Error: ' : 'Internal Server Error')
+            }
         }
     ]
 
-    cases.forEach(({description, req, assertions}) => {
-        test(`renders PWA pages properly (${description})`, () => {
-            // Test against the remote server - the dev server
-            // starts a webpack compiler and is difficult to test
-            // with. It also isn't useful for testing code-paths
-            // in the react-rendering function.
-            const {url, headers, query} = req
-            const app = RemoteServerFactory.createApp(opts())
-            app.get('/*', render)
-            return request(app)
-                .get(url)
-                .set(headers || {})
-                .query(query || {})
-                .then((res) => assertions(res))
+    const isRemoteValues = [true, false]
+
+    isRemoteValues.forEach((isRemoteValue) => {
+        // Run test cases
+        cases.forEach(({description, req, assertions, mocks}) => {
+            test(`renders PWA pages properly when ${
+                isRemoteValue ? 'remote' : 'local'
+            } (${description})`, () => {
+                // Mock `isRemote` per test execution.
+                isRemote.mockReturnValue(isRemoteValue)
+                process.env.NODE_ENV = isRemoteValue ? 'production' : 'development'
+
+                const {url, headers, query} = req
+                const app = RemoteServerFactory.createApp(opts())
+                app.get('/*', render)
+                if (mocks) {
+                    mocks()
+                }
+                return request(app)
+                    .get(url)
+                    .set(headers || {})
+                    .query(query || {})
+                    .then((res) => assertions(res))
+            })
         })
     })
 })
