@@ -90,6 +90,8 @@ const main = () => {
                     ...process.env
                 }
             })
+            // This file is required by MRT, for historical reasons.
+            sh.touch('./build/loader.js')
         })
 
     program
