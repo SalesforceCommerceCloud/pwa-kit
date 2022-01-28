@@ -36,6 +36,15 @@ if ([production, development].indexOf(mode) < 0) {
     throw new Error(`Invalid mode "${mode}"`)
 }
 
+const entryPointExists = (segments) => {
+    for (let ext of ['js', 'jsx', 'ts', 'tsx']) {
+        if (fs.existsSync(path.resolve(projectDir, ...[segments].concat([ext])))) {
+            return true
+        }
+    }
+    return false
+}
+
 const findInProjectThenSDK = (pkg) => {
     const projectPath = resolve(projectDir, 'node_modules', pkg)
     return fs.existsSync(projectPath) ? projectPath : resolve(sdkDir, 'node_modules', pkg)
@@ -185,25 +194,26 @@ const withChunking = (config) => {
     }
 }
 
-const client = fs.existsSync(path.resolve(projectDir, 'app', 'main.js')) &&
+const client =
+    entryPointExists('app', 'main') &&
     baseConfig('web')
-    .extend(withChunking)
-    .extend((config) => {
-        return {
-            ...config,
-            // Must be named "client". See - https://www.npmjs.com/package/webpack-hot-server-middleware#usage
-            name: 'client',
-            entry: {
-                main: './app/main'
-            },
-            plugins: [
-                ...config.plugins,
-                new LoadablePlugin({writeToDisk: true}),
-                new PwaKitConfigPlugin()
-            ]
-        }
-    })
-    .build()
+        .extend(withChunking)
+        .extend((config) => {
+            return {
+                ...config,
+                // Must be named "client". See - https://www.npmjs.com/package/webpack-hot-server-middleware#usage
+                name: 'client',
+                entry: {
+                    main: './app/main'
+                },
+                plugins: [
+                    ...config.plugins,
+                    new LoadablePlugin({writeToDisk: true}),
+                    new PwaKitConfigPlugin()
+                ]
+            }
+        })
+        .build()
 
 const optional = (name, path) => {
     return fs.existsSync(path) ? {[name]: path} : {}
@@ -224,36 +234,38 @@ const clientOptional = baseConfig('web')
     })
     .build()
 
-const renderer = baseConfig('node')
-    .extend((config) => {
-        return {
-            ...config,
-            // Must be named "server". See - https://www.npmjs.com/package/webpack-hot-server-middleware#usage
-            name: 'server',
-            entry: 'pwa-kit-react-sdk/ssr/server/react-rendering.js',
-            output: {
-                path: buildDir,
-                filename: 'server-renderer.js',
-                libraryTarget: 'commonjs2'
-            },
-            plugins: [
-                ...config.plugins,
+const renderer =
+    fs.existsSync(path.resolve(projectDir, 'node_modules', 'pwa-kit-react-sdk')) &&
+    baseConfig('node')
+        .extend((config) => {
+            return {
+                ...config,
+                // Must be named "server". See - https://www.npmjs.com/package/webpack-hot-server-middleware#usage
+                name: 'server',
+                entry: 'pwa-kit-react-sdk/ssr/server/react-rendering.js',
+                output: {
+                    path: buildDir,
+                    filename: 'server-renderer.js',
+                    libraryTarget: 'commonjs2'
+                },
+                plugins: [
+                    ...config.plugins,
 
-                // Keep this on the slowest-to-build item - the server-side bundle.
-                new WebpackNotifierPlugin({
-                    title: `Mobify Project: ${pkg.name}`,
-                    excludeWarnings: true,
-                    skipFirstNotification: true
-                }),
+                    // Keep this on the slowest-to-build item - the server-side bundle.
+                    new WebpackNotifierPlugin({
+                        title: `Mobify Project: ${pkg.name}`,
+                        excludeWarnings: true,
+                        skipFirstNotification: true
+                    }),
 
-                // Must only appear on one config – this one is the only mandatory one.
-                new CopyPlugin({
-                    patterns: [{from: 'app/static/', to: 'static/'}]
-                })
-            ]
-        }
-    })
-    .build()
+                    // Must only appear on one config – this one is the only mandatory one.
+                    new CopyPlugin({
+                        patterns: [{from: 'app/static/', to: 'static/'}]
+                    })
+                ]
+            }
+        })
+        .build()
 
 const ssr = (() => {
     // Only compile the ssr file when we're building for prod.
@@ -278,22 +290,22 @@ const ssr = (() => {
     }
 })()
 
-
-const requestProcessor = fs.existsSync(path.resolve(projectDir, 'app', 'request-processor.js')) &&
+const requestProcessor =
+    entryPointExists('app', 'request-processor') &&
     baseConfig('node')
-    .extend((config) => {
-        return {
-            ...config,
-            name: 'request-processor',
-            entry: './app/request-processor.js',
-            output: {
-                path: buildDir,
-                filename: 'request-processor.js',
-                libraryTarget: 'commonjs2'
+        .extend((config) => {
+            return {
+                ...config,
+                name: 'request-processor',
+                entry: './app/request-processor.js',
+                output: {
+                    path: buildDir,
+                    filename: 'request-processor.js',
+                    libraryTarget: 'commonjs2'
+                }
             }
-        }
-    })
-    .build()
+        })
+        .build()
 
 module.exports = [client, ssr, renderer, clientOptional, requestProcessor]
     .filter(Boolean)

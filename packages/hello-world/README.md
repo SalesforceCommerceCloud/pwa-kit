@@ -20,12 +20,3 @@ npm ci
 npm start
 npm run push
 ```
-
-## TODO: Make react optional
-
-1. As part of the BFH work, we need to validate that the React side of things is
-   genuinely optional.
-2. We're using this app to do that.
-3. The interface is *not* generically useful until we can drop react and main.js
-   from hello-world, along with the pwa-kit-react-sdk.
-4. The interface needs to become "an express app", only!

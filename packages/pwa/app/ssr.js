@@ -7,7 +7,7 @@
 'use strict'
 
 const path = require('path')
-const {createHandler, serveStaticFile} = require('pwa-kit-runtime/ssr/server/express')
+const {getRuntime, serveStaticFile} = require('pwa-kit-runtime/ssr/server/express')
 const {isRemote} = require('pwa-kit-runtime/utils/ssr-server')
 const helmet = require('helmet')
 const pkg = require('../package.json')
@@ -39,7 +39,9 @@ const options = {
     enableLegacyRemoteProxying: false
 }
 
-const {handler} = createHandler(options, (app) => {
+const runtime = getRuntime()
+
+const {handler} = runtime.createHandler(options, (app) => {
     // Set HTTP security headers
     app.use(
         helmet({
@@ -62,6 +64,8 @@ const {handler} = createHandler(options, (app) => {
         res.send()
     })
     app.get('/robots.txt', serveStaticFile('static/robots.txt'))
+
+    runtime.addSSRRenderer(app)
 })
 
 // SSR requires that we export a single handler function called 'get', that

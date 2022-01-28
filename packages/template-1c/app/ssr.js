@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 const path = require('path')
-const {createHandler, serveStaticFile} = require('pwa-kit-runtime/ssr/server/express')
+const {getRuntime, serveStaticFile} = require('pwa-kit-runtime/ssr/server/express')
 const pkg = require('../package.json')
 
 const options = {
@@ -17,7 +17,7 @@ const options = {
 
     // The path to the favicon. This must also appear in
     // the mobify.ssrShared section of package.json.
-    faviconPath: path.resolve('static/ico/favicon.ico'),
+    faviconPath: path.resolve(__dirname, 'static', 'favicon.ico'),
 
     // The location of the apps manifest file relative to the build directory
     manifestPath: 'static/manifest.json',
@@ -34,13 +34,17 @@ const options = {
     mobify: pkg.mobify
 }
 
-const {handler} = createHandler(options, (app) => {
+const runtime = getRuntime()
+
+const {handler} = runtime.createHandler(options, (app) => {
     // Handle the redirect from SLAS as to avoid error
     app.get('/callback?*', (req, res) => {
         res.send()
     })
 
     app.get('/robots.txt', serveStaticFile('static/robots.txt'))
+
+    runtime.addSSRRenderer(app)
 })
 
 exports.get = handler

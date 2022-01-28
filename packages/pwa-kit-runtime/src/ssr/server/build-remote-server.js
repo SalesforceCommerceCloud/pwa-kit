@@ -750,11 +750,42 @@ export const RemoteServerFactory = {
         return {handler, server, app}
     },
 
+    /**
+     * Create an SSR (Server-Side Rendering) Server.
+     *
+     * @constructor
+     * @param {Object} options
+     * @param {String} [options.buildDir] - The build directory path, either as an
+     * absolute path, or relative to the current working directory. Defaults
+     * to 'build'.
+     * @param {Number} [options.defaultCacheTimeSeconds=600] - The cache time
+     * for rendered pages and assets (not used in local development mode).
+     * @param {String} options.faviconPath - The path to the favicon.ico file,
+     * either as an absolute path, or relative to the build directory. If this
+     * value is not supplied, requests for a favicon will return a 404 and
+     * log a warning to the console.
+     * @param {Object} options.mobify - The 'mobify' object from the project's
+     * package.json file, containing the SSR parameters.
+     * @param {Number} [options.port=3443] - the localhost port on which the local
+     * development Express app listens.
+     * @param {String} [options.protocol='https'] - the protocol on which the development
+     * Express app listens.
+     * @param {Boolean} [options.proxyKeepAliveAgent] - This boolean value indicates
+     * whether or not we are using a keep alive agent for proxy connections. Defaults
+     * to 'true'. NOTE: This keep alive agent will only be used on remote.
+     * @param {String} options.sslFilePath - the absolute path to a PEM format
+     * certificate file to be used by the local development server. This should
+     * contain both the certificate and the private key.
+     * @param {Boolean} [options.enableLegacyRemoteProxying=true] - When running remotely (as
+     * opposed to locally), enables legacy proxying behaviour, allowing "proxy" requests to route through
+     * the express server. In the future, this behaviour and setting will be removed.
+     * @param {function} customizeApp - a callback that takes an express app
+     * as an argument. Use this to customize the server.
+     */
     createHandler(options, customizeApp) {
         process.on('unhandledRejection', catchAndLog)
         const app = this.createApp(options)
         customizeApp(app)
-        this.addSSRRenderer(app)
         return this._createHandler(app)
     },
 

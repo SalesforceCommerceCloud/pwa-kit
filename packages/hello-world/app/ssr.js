@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 const path = require('path')
-const {createHandler} = require('pwa-kit-runtime/ssr/server/express')
+const {getRuntime} = require('pwa-kit-runtime/ssr/server/express')
 const pkg = require('../package.json')
 
 const options = {
@@ -17,7 +17,9 @@ const options = {
     protocol: 'http'
 }
 
-const {handler} = createHandler(options, (app) => {
+const runtime = getRuntime()
+
+const {handler} = runtime.createHandler(options, (app) => {
     app.get('/', (req, res) => {
         return res.json({
             protocol: req.protocol,
