@@ -60,6 +60,17 @@ const baseConfig = (target) => {
             this.config = {
                 target,
                 mode,
+                ...(target === 'node'
+                    ? {
+                          ignoreWarnings: [
+                              // These can be ignored fairly safely for node targets, where
+                              // bundle size is not super critical. Express generates this warning,
+                              // because it uses dynamic require() calls, which cause Webpack to
+                              // bundle the whole library.
+                              /Critical dependency: the request of a dependency is an expression/
+                          ]
+                      }
+                    : {}),
                 stats: {
                     all: false,
                     modules: false,
