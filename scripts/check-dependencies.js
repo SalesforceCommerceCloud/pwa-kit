@@ -52,8 +52,6 @@ const excludedPackages = [
 // We are going to copy these files into each package from this script, in order to
 // standardize them.
 const commonConfigs = [
-    'babel.config.js',
-    '.eslintrc.js',
     '.prettierrc.yaml'
 ]
 
