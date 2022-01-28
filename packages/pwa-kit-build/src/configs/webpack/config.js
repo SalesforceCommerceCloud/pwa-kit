@@ -277,7 +277,9 @@ const ssr = (() => {
     }
 })()
 
-const requestProcessor = baseConfig('node')
+
+const requestProcessor = fs.existsSync(path.resolve(projectDir, 'app', 'request-processor.js')) &&
+    baseConfig('node')
     .extend((config) => {
         return {
             ...config,
