@@ -6,6 +6,11 @@
  */
 import {NO_CACHE} from 'pwa-kit-runtime/ssr/server/constants'
 import {X_MOBIFY_REQUEST_CLASS, X_PROXY_REQUEST_URL} from 'pwa-kit-runtime/utils/ssr-proxying'
+const {
+    getResponseFromCache,
+    sendCachedResponse,
+    cacheResponseWhenDone
+} = require('pwa-kit-runtime/ssr/server/express')
 import fetch from 'node-fetch'
 import request from 'supertest'
 import {makeErrorHandler, DevServerFactory} from './build-dev-server'
@@ -13,6 +18,8 @@ import path from 'path'
 import http from 'http'
 import https from 'https'
 import nock from 'nock'
+import zlib from 'zlib'
+import fs from 'fs'
 
 const TEST_PORT = 3444
 const testFixtures = path.resolve(__dirname, 'test_fixtures')
@@ -457,5 +464,146 @@ describe('DevServer proxying', () => {
         return request(app)
             .get('/mobify/proxy/base2/test/path')
             .expect(500)
+    })
+})
+
+describe('DevServer persistent caching support', () => {
+    const namespace = 'test'
+
+    const keyFromURL = (url) => encodeURIComponent(url)
+
+    /**
+     * A cache decorator for a route function that uses the percent-encoded req.url
+     * as keys for all cache entries (this makes testing easier).
+     */
+    const cachedRoute = (route) => (req, res) => {
+        const shouldCache = !req.query.noCache
+        const cacheArgs = {
+            req,
+            res,
+            namespace,
+            key: keyFromURL(req.url)
+        }
+
+        const shouldCacheResponse = (req, res) => res.statusCode >= 200 && res.statusCode < 300
+
+        return Promise.resolve()
+            .then(() => getResponseFromCache(cacheArgs))
+            .then((entry) => {
+                if (entry.found) {
+                    sendCachedResponse(entry)
+                } else {
+                    if (shouldCache) {
+                        cacheResponseWhenDone({
+                            shouldCacheResponse,
+                            ...cacheArgs
+                        })
+                    }
+                    return route(req, res)
+                }
+            })
+    }
+
+    /**
+     * A test route that returns different content types based on query params.
+     */
+    const routeImplementation = (req, res) => {
+        const status = parseInt(req.query.status || 200)
+
+        switch (req.query.type) {
+            case 'precompressed':
+                res.status(status)
+                res.setHeader('content-type', 'application/javascript')
+                res.setHeader('content-encoding', 'gzip')
+                res.send(zlib.gzipSync(fs.readFileSync(path.join(testFixtures, 'app', 'main.js'))))
+                break
+
+            case 'compressed-responses-test':
+                // The "compression" middleware only compresses responses that are
+                // "compressable". So we must set the `content-type` to a known
+                // "compressible" type.
+                res.setHeader('content-type', 'text/html')
+                res.write('<div>Hello Compression</div>')
+                res.end()
+                break
+
+            default:
+                throw new Error('Unhandled case')
+        }
+    }
+
+    let app, route
+
+    beforeEach(() => {
+        route = jest.fn().mockImplementation(routeImplementation)
+        const withCaching = cachedRoute(route)
+        app = NoWebpackDevServerFactory.createApp(opts())
+        app.get('/*', withCaching)
+    })
+
+    afterEach(() => {
+        app.applicationCache.close()
+        app = null
+        route = null
+    })
+
+    test('Caching of compressed responses', () => {
+        // ADN-118 reported that a cached response was correctly sent
+        // the first time, but was corrupted the second time. This
+        // test is specific to that issue.
+        const url = '/?type=compressed-responses-test'
+        const expected = '<div>Hello Compression</div>'
+
+        return Promise.resolve()
+            .then(() => request(app).get(url))
+            .then((res) => app._requestMonitor._waitForResponses().then(() => res))
+            .then((res) => {
+                expect(res.status).toEqual(200)
+                expect(res.headers['x-mobify-from-cache']).toEqual('false')
+                expect(res.headers['content-encoding']).toEqual('gzip')
+                expect(res.text).toEqual(expected)
+            })
+            .then(() =>
+                app.applicationCache.get({
+                    key: keyFromURL(url),
+                    namespace
+                })
+            )
+            .then((entry) => expect(entry.found).toBe(true))
+            .then(() => request(app).get(url))
+            .then((res) => app._requestMonitor._waitForResponses().then(() => res))
+            .then((res) => {
+                expect(res.status).toEqual(200)
+                expect(res.headers['x-mobify-from-cache']).toEqual('true')
+                expect(res.headers['content-encoding']).toEqual('gzip')
+                expect(res.text).toEqual(expected)
+            })
+    })
+
+    test('Compressed responses are not re-compressed', () => {
+        const url = '/?type=precompressed'
+
+        return request(app)
+            .get(url)
+            .then((res) => app._requestMonitor._waitForResponses().then(() => res))
+            .then((res) => {
+                expect(res.status).toEqual(200)
+                expect(res.headers['x-mobify-from-cache']).toEqual('false')
+                expect(res.headers['content-encoding']).toEqual('gzip')
+                return res
+            })
+            .then((res) =>
+                app.applicationCache
+                    .get({
+                        key: keyFromURL(url),
+                        namespace
+                    })
+                    .then((entry) => ({res, entry}))
+            )
+            .then(({res, entry}) => {
+                expect(entry.found).toBe(true)
+                const uncompressed = zlib.gunzipSync(entry.data)
+                expect(uncompressed.toString()).toEqual(res.text)
+            })
     })
 })

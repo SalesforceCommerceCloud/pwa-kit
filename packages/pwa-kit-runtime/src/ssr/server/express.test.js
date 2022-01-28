@@ -36,7 +36,6 @@ const nock = require('nock')
 const sinon = require('sinon')
 const path = require('path')
 const os = require('os')
-const zlib = require('zlib')
 const rimraf = require('rimraf')
 const request = require('supertest')
 const superagent = require('superagent')
@@ -687,13 +686,6 @@ describe('SSRServer persistent caching', () => {
         const status = parseInt(req.query.status || 200)
 
         switch (req.query.type) {
-            case 'precompressed':
-                res.status(status)
-                res.setHeader('content-type', 'application/javascript')
-                res.setHeader('content-encoding', 'gzip')
-                res.send(zlib.gzipSync(fs.readFileSync(path.join(testFixtures, 'main.js'))))
-                break
-
             case 'image':
                 res.status(status)
                 res.setHeader('content-type', 'image/png')
@@ -713,15 +705,6 @@ describe('SSRServer persistent caching', () => {
 
             case '400':
                 res.sendStatus(400)
-                break
-
-            case 'compressed-responses-test':
-                // The "compression" middleware only compresses responses that are
-                // "compressable". So we must set the `content-type` to a known
-                // "compressible" type.
-                res.setHeader('content-type', 'text/html')
-                res.write('<div>Hello Compression</div>')
-                res.end()
                 break
 
             default:
@@ -945,66 +928,6 @@ describe('SSRServer persistent caching', () => {
                 )
                 .then((entry) => expect(entry.found).toBe(false))
         })
-    })
-
-    test('Caching of compressed responses', () => {
-        // ADN-118 reported that a cached response was correctly sent
-        // the first time, but was corrupted the second time. This
-        // test is specific to that issue.
-        const url = '/?type=compressed-responses-test'
-        const expected = '<div>Hello Compression</div>'
-
-        return Promise.resolve()
-            .then(() => request(app).get(url))
-            .then((res) => app._requestMonitor._waitForResponses().then(() => res))
-            .then((res) => {
-                expect(res.status).toEqual(200)
-                expect(res.headers['x-mobify-from-cache']).toEqual('false')
-                expect(res.headers['content-encoding']).toEqual('gzip')
-                expect(res.text).toEqual(expected)
-            })
-            .then(() =>
-                app.applicationCache.get({
-                    key: keyFromURL(url),
-                    namespace
-                })
-            )
-            .then((entry) => expect(entry.found).toBe(true))
-            .then(() => request(app).get(url))
-            .then((res) => app._requestMonitor._waitForResponses().then(() => res))
-            .then((res) => {
-                expect(res.status).toEqual(200)
-                expect(res.headers['x-mobify-from-cache']).toEqual('true')
-                expect(res.headers['content-encoding']).toEqual('gzip')
-                expect(res.text).toEqual(expected)
-            })
-    })
-
-    test('Compressed responses are not re-compressed', () => {
-        const url = '/?type=precompressed'
-
-        return request(app)
-            .get(url)
-            .then((res) => app._requestMonitor._waitForResponses().then(() => res))
-            .then((res) => {
-                expect(res.status).toEqual(200)
-                expect(res.headers['x-mobify-from-cache']).toEqual('false')
-                expect(res.headers['content-encoding']).toEqual('gzip')
-                return res
-            })
-            .then((res) =>
-                app.applicationCache
-                    .get({
-                        key: keyFromURL(url),
-                        namespace
-                    })
-                    .then((entry) => ({res, entry}))
-            )
-            .then(({res, entry}) => {
-                expect(entry.found).toBe(true)
-                const uncompressed = zlib.gunzipSync(entry.data)
-                expect(uncompressed.toString()).toEqual(res.text)
-            })
     })
 
     test('Try to send non-cached response', () => {
