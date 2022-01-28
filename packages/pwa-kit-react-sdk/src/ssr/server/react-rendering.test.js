@@ -605,16 +605,18 @@ describe('The Node SSR Environment', () => {
             description: `AppConfig errors are caught`,
             req: {url: '/pwa/'},
             mocks: () => {
-                jest
-                    .spyOn(AppConfig.prototype, 'render')
-                    .mockImplementation(() => {throw new Error()})
+                jest.spyOn(AppConfig.prototype, 'render').mockImplementation(() => {
+                    throw new Error()
+                })
             },
             assertions: (res) => {
                 expect(res.statusCode).toBe(500)
                 const html = res.text
 
                 const shouldIncludeErrorStack = !isRemote()
-                expect(html).toContain(shouldIncludeErrorStack ? 'Error: ' : 'Internal Server Error')
+                expect(html).toContain(
+                    shouldIncludeErrorStack ? 'Error: ' : 'Internal Server Error'
+                )
             }
         }
     ]
