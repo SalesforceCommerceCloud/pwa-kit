@@ -8,6 +8,7 @@
         "cross-fetch": "^3.1.4",
         "pwa-kit-build": "^2.0.0-dev",
         "pwa-kit-react-sdk": "^2.0.0-dev",
+        "pwa-kit-runtime": "^2.0.0-dev",
         "react": "^17.0.2",
         "react-dom": "^17.0.2",
         "react-helmet": "^6.1.0",
@@ -22,9 +23,6 @@
         "test": "mrt test",
         "prod:build": "mrt build",
         "push": "npm run prod:build && mrt push"
-    },
-    "dependencies": {
-        "pwa-kit-runtime": "^2.0.0-dev"
     },
     "mobify": {
         "ssrEnabled": true,
