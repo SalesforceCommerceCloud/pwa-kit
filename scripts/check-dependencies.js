@@ -58,10 +58,8 @@ const commonConfigs = [
 // We are going to copy these devDependencies into each package from this script,
 // in order to standardize them.
 const commonDevDeps = {
-    commander: '^2.20.0',
     'cross-env': '^5.2.0',
     nock: '^13.1.1',
-    'regenerator-runtime': '^0.11.1',
     semver: '^7.3.2',
     shelljs: '^0.8.5'
 }
