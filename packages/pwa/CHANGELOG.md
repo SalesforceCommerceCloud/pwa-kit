@@ -5,7 +5,7 @@
 -   Upgrade to React 17 [#278](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/278)
 -   Import preliminary translations [#324](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/324)
 -   Remove old dependencies that are no longer used [#317](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/317)
--   Multi-site implementation for Retail React App [#242](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/242)
+-   Multi-site implementation for Retail React App [#318](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/318)
 
 ## v1.3.0 (Jan 06, 2022)
 
