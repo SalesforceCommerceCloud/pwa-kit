@@ -9,7 +9,7 @@ import {getConfig, getParamsFromPath} from './utils'
 import {urlPartPositions} from '../constants'
 import {rebuildPathWithParams} from './url'
 import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
-import {getDefaultSite, getDefaultSiteValues, getSitesByHost} from './site-utils'
+import {getDefaultSite, getDefaultSiteValues, getSiteById, getSiteMapsByHost} from './site-utils'
 
 /**
  * This function takes an url and return the site, locale and url configuration
@@ -25,11 +25,9 @@ export const resolveConfigFromUrl = (path) => {
 
     const {site: currentSite, locale: currentLocale} = getParamsFromPath(path, urlConfig)
     const {hostname} = new URL(getAppOrigin())
-    const sites = getSitesByHost(hostname)
-    const defaultSite = getDefaultSite()
-    const site = currentSite
-        ? sites.find((site) => site.id === currentSite || site.alias === currentSite)
-        : defaultSite
+    const siteMaps = getSiteMapsByHost(hostname)
+    const siteMap = siteMaps.find((site) => site.id === currentSite || site.alias === currentSite)
+    const site = siteMap ? getSiteById(siteMap.id) : getDefaultSite()
     const locale = currentLocale
         ? site.l10n.supportedLocales.find((locale) => locale.id === currentLocale)
         : site.l10n.supportedLocales.find((locale) => locale.id === site.l10n.defaultLocale)
@@ -118,7 +116,7 @@ export const getUrlConfig = () => {
     if (urlConfig) {
         return urlConfig
     }
-    return getConfig('app.url')
+    return getConfig('app.routing.url')
 }
 
 /**
@@ -127,7 +125,7 @@ export const getUrlConfig = () => {
  * @returns {object|undefined} - url config from the input host
  */
 export const getUrlConfigByHostname = (hostname) => {
-    const hosts = getConfig('app.hosts')
+    const hosts = getConfig('app.routing.hosts')
     const host = hosts.find((host) => host.domain.includes(hostname))
     return host?.url
 }

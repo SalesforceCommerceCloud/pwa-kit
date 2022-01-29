@@ -22,7 +22,7 @@ export const resolveSiteFromUrl = (url) => {
     const {hostname, pathname, search} = new URL(url)
     const path = `${pathname}${search}`
     // get all the sites from a specific hostname
-    const sites = getSitesByHost(hostname)
+    const siteMaps = getSiteMapsByHost(hostname)
     let site
 
     // Step 1: look for the site based on a hostname,
@@ -35,15 +35,14 @@ export const resolveSiteFromUrl = (url) => {
 
     // Step 2: As using hostname is not unique enough to determine the site
     // we will use the pathname to look further into the sites of current hostname
-    site = getSiteByPath(path, sites)
+    site = getSiteByPath(path, siteMaps)
 
     if (site) {
         return site
     }
 
     // Step 3: use the default for the current host as none of the above works
-    const defaultSiteId = getDefaultSiteIdByHost(hostname)
-    site = sites.find((site) => site.id === defaultSiteId)
+    site = getDefaultSite()
     // Step 4: throw an error if site can't be found by any of the above steps
     if (!site) {
         throw new Error("Can't find any site. Please check you sites configuration.")
@@ -59,10 +58,9 @@ export const getDefaultSiteIdByHost = (hostname) => {
 
 export const getDefaultSite = () => {
     const {hostname} = new URL(getAppOrigin())
-    const sites = getSitesByHost(hostname)
     const defaultSiteId = getDefaultSiteIdByHost(hostname)
 
-    return sites.find((site) => site.id === defaultSiteId)
+    return getSiteById(defaultSiteId)
 }
 
 export const getDefaultLocale = () => {
@@ -91,11 +89,11 @@ export const getDefaultSiteValues = () => {
  * @returns {string} site
  */
 export const getSiteByHostname = (hostname) => {
-    const sites = getSitesByHost(hostname)
-    if (!sites || !sites.length)
+    const siteMaps = getSiteMapsByHost(hostname)
+    if (!siteMaps || !siteMaps.length)
         throw new Error('No site config found. Please check you configuration')
 
-    return sites?.length === 1 ? sites[0] : undefined
+    return siteMaps?.length === 1 ? getSiteById(siteMaps[0].id) : undefined
 }
 
 /**
@@ -112,16 +110,18 @@ export const getSiteByPath = (path, sites) => {
     if (!sites || !sites.length)
         throw new Error('No site config found. Please check you configuration')
     // look for the site that has the currentSite
-    const site = sites.find((site) => site.id === currentSite || site.alias === currentSite)
-    return site
+    const siteMap = sites.find((site) => site.id === currentSite || site.alias === currentSite)
+    if (siteMap) {
+        return getSiteById(siteMap.id)
+    }
 }
 
 /**
- * Return all the sites based on a hostname from config
+ * Return all the siteMaps based on a hostname
  * @param hostname - input hostname to look for the sites
  * @returns {object|undefined}
  */
-export const getSitesByHost = (hostname) => {
+export const getSiteMapsByHost = (hostname) => {
     if (!hostname) return
     const hosts = getHosts()
     const sites = hosts.find((host) => host.domain.includes(hostname))?.siteMaps
@@ -133,3 +133,42 @@ export const getSitesByHost = (hostname) => {
  * @returns {array} - list of hosts
  */
 export const getHosts = () => getConfig('app.routing.hosts')
+
+/**
+ * this function takes an id,
+ * and use it to look up a site data (from multiple places) (id, alias, locales etc)
+ * and return site as a single object
+ * @param id - site id to look from
+ * @return {object} - a site object
+ * @example getSiteById('RefArch')
+ *
+ * //returns
+ * {
+ *   id: 'RefArch',
+ *   alias: 'us'
+ *   l10n: {
+ *      "supportedCurrencies": ["USD"],
+ *      "defaultCurrency": "USD",
+ *      "defaultLocale": "en-US",
+ *      "supportedLocales": [
+ *          {
+ *               "id": "en-US",
+ *               "alias": "en",
+ *               "preferredCurrency": "USD"
+ *            },
+ *           {
+ *               "id": "en-CA",
+ *               "alias": "ca",
+ *               "preferredCurrency": "USD"
+ *          }
+ *      ]
+ *   }
+ * }
+ */
+export const getSiteById = (id) => {
+    const {hostname} = new URL(getAppOrigin())
+    const siteMaps = getSiteMapsByHost(hostname)
+    const siteMap = siteMaps.find((site) => site.id === id)
+    const site = {...siteMap, l10n: {...getConfig(`app.sites.${id}`)}}
+    return site
+}
