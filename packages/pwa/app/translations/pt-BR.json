@@ -1,1297 +1,1297 @@
 {
   "account.accordion.button.my_account": {
-    "defaultMessage": "Il mio account"
+    "defaultMessage": "Minha conta"
   },
   "account.heading.my_account": {
-    "defaultMessage": "Il mio account"
+    "defaultMessage": "Minha conta"
   },
   "account.logout_button.button.log_out": {
-    "defaultMessage": "Esci"
+    "defaultMessage": "Sair"
   },
   "account_addresses.badge.default": {
-    "defaultMessage": "Predefinito"
+    "defaultMessage": "Padrão"
   },
   "account_addresses.button.add_address": {
-    "defaultMessage": "Aggiungi indirizzo"
+    "defaultMessage": "Adicionar endereço"
   },
   "account_addresses.info.address_updated": {
-    "defaultMessage": "Indirizzo aggiornato"
+    "defaultMessage": "Endereço atualizado"
   },
   "account_addresses.info.new_address_saved": {
-    "defaultMessage": "Nuovo indirizzo salvato"
+    "defaultMessage": "Novo endereço salvo"
   },
   "account_addresses.page_action_placeholder.button.add_address": {
-    "defaultMessage": "Aggiungi indirizzo"
+    "defaultMessage": "Adicionar endereço"
   },
   "account_addresses.page_action_placeholder.heading.no_saved_addresses": {
-    "defaultMessage": "Nessun indirizzo salvato"
+    "defaultMessage": "Não há endereços salvos"
   },
   "account_addresses.page_action_placeholder.message.add_new_address": {
-    "defaultMessage": "Aggiungi un nuovo indirizzo per un checkout più veloce."
+    "defaultMessage": "Adicione um novo método de endereço para agilizar o checkout."
   },
   "account_addresses.title.addresses": {
-    "defaultMessage": "Indirizzi"
+    "defaultMessage": "Endereços"
   },
   "account_detail.title.account_details": {
-    "defaultMessage": "Dettagli account"
+    "defaultMessage": "Detalhes da conta"
   },
   "account_order_detail.heading.billing_address": {
-    "defaultMessage": "Indirizzo di fatturazione"
+    "defaultMessage": "Endereço de cobrança"
   },
   "account_order_detail.heading.num_of_items": {
-    "defaultMessage": "{count} articoli"
+    "defaultMessage": "{count} itens"
   },
   "account_order_detail.heading.payment_method": {
-    "defaultMessage": "Metodo di pagamento"
+    "defaultMessage": "Método de pagamento"
   },
   "account_order_detail.heading.shipping_address": {
-    "defaultMessage": "Indirizzo di spedizione"
+    "defaultMessage": "Endereço de entrega"
   },
   "account_order_detail.heading.shipping_method": {
-    "defaultMessage": "Metodo di spedizione"
+    "defaultMessage": "Método de entrega"
   },
   "account_order_detail.label.order_number": {
-    "defaultMessage": "Numero ordine: {orderNumber}"
+    "defaultMessage": "Número do pedido: {orderNumber}"
   },
   "account_order_detail.label.ordered_date": {
-    "defaultMessage": "Data ordine: {date}"
+    "defaultMessage": "Pedido: {date}"
   },
   "account_order_detail.label.pending_tracking_number": {
-    "defaultMessage": "In sospeso"
+    "defaultMessage": "Pendente"
   },
   "account_order_detail.label.tracking_number": {
-    "defaultMessage": "Numero di tracking"
+    "defaultMessage": "Número de controle"
   },
   "account_order_detail.link.back_to_history": {
-    "defaultMessage": "Torna alla cronologia degli ordini"
+    "defaultMessage": "Voltar a Histórico de pedidos"
   },
   "account_order_detail.title.order_details": {
-    "defaultMessage": "Dettagli ordine"
+    "defaultMessage": "Detalhes do pedido"
   },
   "account_order_history.button.continue_shopping": {
-    "defaultMessage": "Continua lo shopping"
+    "defaultMessage": "Continuar comprando"
   },
   "account_order_history.description.once_you_place_order": {
-    "defaultMessage": "Una volta effettuato un ordine, i dettagli verranno visualizzati qui."
+    "defaultMessage": "Quando você faz um pedido, os detalhes aparecem aqui."
   },
   "account_order_history.heading.no_order_yet": {
-    "defaultMessage": "Non hai ancora effettuato un ordine."
+    "defaultMessage": "Você ainda não fez um pedido."
   },
   "account_order_history.label.num_of_items": {
-    "defaultMessage": "{count} articoli",
+    "defaultMessage": "{count} itens",
     "description": "Number of items in order"
   },
   "account_order_history.label.order_number": {
-    "defaultMessage": "Numero ordine: {orderNumber}"
+    "defaultMessage": "Número do pedido: {orderNumber}"
   },
   "account_order_history.label.ordered_date": {
-    "defaultMessage": "Data ordine: {date}"
+    "defaultMessage": "Pedido: {date}"
   },
   "account_order_history.label.shipped_to": {
-    "defaultMessage": "Destinatario spedizione: {name}"
+    "defaultMessage": "Enviado para: {name}"
   },
   "account_order_history.link.view_details": {
-    "defaultMessage": "Visualizza dettagli"
+    "defaultMessage": "Ver detalhes"
   },
   "account_order_history.title.order_history": {
-    "defaultMessage": "Cronologia ordini"
+    "defaultMessage": "Histórico de pedidos"
   },
   "account_payment_methods.button.add_method": {
-    "defaultMessage": "Aggiungi metodo di pagamento"
+    "defaultMessage": "Adicionar método de pagamento"
   },
   "account_payment_methods.description.add_method_for_faster_checkout": {
-    "defaultMessage": "Aggiungi un nuovo metodo di pagamento per un checkout più veloce."
+    "defaultMessage": "Adicione um novo método de pagamento para agilizar o checkout."
   },
   "account_payment_methods.heading.no_saved_methods": {
-    "defaultMessage": "Nessun metodo di pagamento salvato"
+    "defaultMessage": "Não há métodos de pagamento salvos"
   },
   "account_payment_methods.info.new_method_saved": {
-    "defaultMessage": "Nuovo metodo di pagamento salvato"
+    "defaultMessage": "Novo método de pagamento salvo"
   },
   "account_payment_methods.title.payment_methods": {
-    "defaultMessage": "Metodi di pagamento"
+    "defaultMessage": "Métodos de pagamento"
   },
   "account_wishlist.button.continue_shopping": {
-    "defaultMessage": "Continua lo shopping"
+    "defaultMessage": "Continuar comprando"
   },
   "account_wishlist.description.continue_shopping": {
-    "defaultMessage": "Continua con lo shopping e aggiungi articoli alla lista desideri."
+    "defaultMessage": "Continue comprando e adicione itens a sua wishlist."
   },
   "account_wishlist.heading.no_wishlist": {
-    "defaultMessage": "Nessun articolo nella lista desideri"
+    "defaultMessage": "Não há itens na wishlist"
   },
   "account_wishlist.title.wishlist": {
-    "defaultMessage": "Lista desideri"
+    "defaultMessage": "Wishlist/Lista de desejos"
   },
   "action_card.action.edit": {
-    "defaultMessage": "Modifica"
+    "defaultMessage": "Editar"
   },
   "action_card.action.remove": {
-    "defaultMessage": "Rimuovi"
+    "defaultMessage": "Remover"
   },
   "add_to_cart_modal.info.added_to_cart": {
-    "defaultMessage": "{quantity} {quantity, plural, one {articolo aggiunto} other {articoli aggiunti}} al carrello"
+    "defaultMessage": "{quantity} {quantity, plural, one {item} other {itens}} adicionado(s) ao carrinho"
   },
   "add_to_cart_modal.label.cart_subtotal": {
-    "defaultMessage": "Subtotale carrello ({itemAccumulatedCount} articolo)"
+    "defaultMessage": "Subtotal do carrinho ({itemAccumulatedCount} item/itens)"
   },
   "add_to_cart_modal.label.quantity": {
-    "defaultMessage": "Qtà"
+    "defaultMessage": "Qtd."
   },
   "add_to_cart_modal.link.checkout": {
-    "defaultMessage": "Passa al checkout"
+    "defaultMessage": "Pagar"
   },
   "add_to_cart_modal.link.view_cart": {
-    "defaultMessage": "Mostra carrello"
+    "defaultMessage": "Ver carrinho"
   },
   "add_to_cart_modal.recommended_products.title.might_also_like": {
-    "defaultMessage": "Potrebbe interessarti anche"
+    "defaultMessage": "Talvez você também queira"
   },
   "auth_modal.description.now_signed_in": {
-    "defaultMessage": "Hai eseguito l'accesso."
+    "defaultMessage": "Agora você fez login na sua conta."
   },
   "auth_modal.error.incorrect_email_or_password": {
-    "defaultMessage": "Qualcosa non va nell'indirizzo email o nella password. Riprova."
+    "defaultMessage": "Há algo errado com seu e-mail ou senha. Tente novamente."
   },
   "auth_modal.info.welcome_user": {
-    "defaultMessage": "Ti diamo il benvenuto {name},"
+    "defaultMessage": "Olá {name},"
   },
   "auth_modal.password_reset_success.button.back_to_sign_in": {
-    "defaultMessage": "Torna all'accesso"
+    "defaultMessage": "Fazer login novamente"
   },
   "auth_modal.password_reset_success.info.will_email_shortly": {
-    "defaultMessage": "A breve riceverai un'email all'indirizzo <b>{email}</b> con un link per la reimpostazione della password."
+    "defaultMessage": "Em breve, você receberá um e-mail em <b>{email}</b> com um link para redefinir a senha."
   },
   "auth_modal.password_reset_success.title.password_reset": {
-    "defaultMessage": "Reimpostazione password"
+    "defaultMessage": "Redefinição de senha"
   },
   "card_payment_form.heading.new_payment_method": {
-    "defaultMessage": "Aggiungi nuovo metodo di pagamento"
+    "defaultMessage": "Adicionar novo método de pagamento"
   },
   "cart.info.added_to_wishlist": {
-    "defaultMessage": "{quantity} {quantity, plural, one {articolo aggiunto} other {articoli aggiunti}} alla lista desideri"
+    "defaultMessage": "{quantity} {quantity, plural, one {item} other {itens}} adicionado(s) à wishlist"
   },
   "cart.info.removed_from_cart": {
-    "defaultMessage": "Articolo rimosso dal carrello"
+    "defaultMessage": "Item removido do carrinho"
   },
   "cart.recommended_products.title.may_also_like": {
-    "defaultMessage": "Potrebbe interessarti anche"
+    "defaultMessage": "Talvez você também queira"
   },
   "cart.recommended_products.title.recently_viewed": {
-    "defaultMessage": "Visualizzati di recente"
+    "defaultMessage": "Recentemente visualizados"
   },
   "cart_cta.link.checkout": {
-    "defaultMessage": "Passa al checkout"
+    "defaultMessage": "Pagar"
   },
   "cart_secondary_button_group.action.added_to_wishlist": {
-    "defaultMessage": "Aggiungi alla lista dei desideri"
+    "defaultMessage": "Adicionar à wishlist"
   },
   "cart_secondary_button_group.action.edit": {
-    "defaultMessage": "Modifica"
+    "defaultMessage": "Editar"
   },
   "cart_secondary_button_group.action.remove": {
-    "defaultMessage": "Rimuovi"
+    "defaultMessage": "Remover"
   },
   "cart_secondary_button_group.label.this_is_gift": {
-    "defaultMessage": "Questo è un regalo."
+    "defaultMessage": "É um presente."
   },
   "cart_secondary_button_group.link_learn_more": {
-    "defaultMessage": "Scopri di più"
+    "defaultMessage": "Saiba mais"
   },
   "cart_skeleton.heading.order_summary": {
-    "defaultMessage": "Riepilogo ordine"
+    "defaultMessage": "Resumo do pedido"
   },
   "cart_skeleton.title.cart": {
-    "defaultMessage": "Carrello"
+    "defaultMessage": "Carrinho"
   },
   "cart_title.title.cart_num_of_items": {
-    "defaultMessage": "Carrello ({itemCount, plural, =0 {0 articoli} one {# articolo} other {# articoli}})"
+    "defaultMessage": "Carrinho ({itemCount, plural, =0 {0 itens} one {# item} other {# itens}})"
   },
   "cc_radio_group.action.remove": {
-    "defaultMessage": "Rimuovi"
+    "defaultMessage": "Remover"
   },
   "cc_radio_group.button.add_new_card": {
-    "defaultMessage": "Aggiungi nuova carta"
+    "defaultMessage": "Adicionar novo cartão"
   },
   "checkout.button.place_order": {
-    "defaultMessage": "Invia ordine"
+    "defaultMessage": "Fazer pedido"
   },
   "checkout_confirmation.button.create_account": {
-    "defaultMessage": "Crea account"
+    "defaultMessage": "Criar conta"
   },
   "checkout_confirmation.heading.billing_address": {
-    "defaultMessage": "Indirizzo fatturazione"
+    "defaultMessage": "Endereço de cobrança"
   },
   "checkout_confirmation.heading.create_account": {
-    "defaultMessage": "Crea un account per un checkout più veloce"
+    "defaultMessage": "Criar uma conta para agilizar o checkout"
   },
   "checkout_confirmation.heading.credit_card": {
-    "defaultMessage": "Carta di credito"
+    "defaultMessage": "Cartão de crédito"
   },
   "checkout_confirmation.heading.delivery_details": {
-    "defaultMessage": "Dettagli di consegna"
+    "defaultMessage": "Detalhes da entrega"
   },
   "checkout_confirmation.heading.order_summary": {
-    "defaultMessage": "Riepilogo ordine"
+    "defaultMessage": "Resumo do pedido"
   },
   "checkout_confirmation.heading.payment_details": {
-    "defaultMessage": "Dettagli di pagamento"
+    "defaultMessage": "Detalhes do pagamento"
   },
   "checkout_confirmation.heading.shipping_address": {
-    "defaultMessage": "Indirizzo di spedizione"
+    "defaultMessage": "Endereço de entrega"
   },
   "checkout_confirmation.heading.shipping_method": {
-    "defaultMessage": "Metodo di spedizione"
+    "defaultMessage": "Método de entrega"
   },
   "checkout_confirmation.heading.thank_you_for_order": {
-    "defaultMessage": "Grazie per il tuo ordine!"
+    "defaultMessage": "Agradecemos o seu pedido!"
   },
   "checkout_confirmation.label.free": {
-    "defaultMessage": "Gratis"
+    "defaultMessage": "Gratuito"
   },
   "checkout_confirmation.label.order_number": {
-    "defaultMessage": "Numero ordine"
+    "defaultMessage": "Número do pedido"
   },
   "checkout_confirmation.label.order_total": {
-    "defaultMessage": "Totale ordine"
+    "defaultMessage": "Total do pedido"
   },
   "checkout_confirmation.label.promo_applied": {
-    "defaultMessage": "Promozione applicata"
+    "defaultMessage": "Promoção aplicada"
   },
   "checkout_confirmation.label.shipping": {
-    "defaultMessage": "Spedizione"
+    "defaultMessage": "Frete"
   },
   "checkout_confirmation.label.subtotal": {
-    "defaultMessage": "Subtotale"
+    "defaultMessage": "Subtotal"
   },
   "checkout_confirmation.label.tax": {
-    "defaultMessage": "Imposta"
+    "defaultMessage": "Imposto"
   },
   "checkout_confirmation.link.continue_shopping": {
-    "defaultMessage": "Continua lo shopping"
+    "defaultMessage": "Continuar comprando"
   },
   "checkout_confirmation.link.login": {
-    "defaultMessage": "Accedi qui"
+    "defaultMessage": "Fazer logon aqui"
   },
   "checkout_confirmation.message.already_has_account": {
-    "defaultMessage": "Questo indirizzo email è già associato a un account."
+    "defaultMessage": "Já há uma conta com este mesmo endereço de e-mail."
   },
   "checkout_confirmation.message.num_of_items_in_order": {
-    "defaultMessage": "{itemCount, plural, =0 {0 articoli} one {# articolo} other {# articoli}}",
+    "defaultMessage": "{itemCount, plural, =0 {0 itens} one {# item} other {# itens}})",
     "description": "# item(s) in order"
   },
   "checkout_confirmation.message.will_email_shortly": {
-    "defaultMessage": "A breve invieremo un'email all'indirizzo <b>{email}</b> con il numero di conferma e la ricevuta."
+    "defaultMessage": "Em breve, enviaremos um e-mail para <b>{email}</b> com seu número de confirmação e recibo."
   },
   "checkout_footer.link.privacy_policy": {
-    "defaultMessage": "Informativa sulla privacy"
+    "defaultMessage": "Política de privacidade"
   },
   "checkout_footer.link.returns_exchanges": {
-    "defaultMessage": "Resi e cambi"
+    "defaultMessage": "Devoluções e trocas"
   },
   "checkout_footer.link.shipping": {
-    "defaultMessage": "Spedizione"
+    "defaultMessage": "Frete"
   },
   "checkout_footer.link.site_map": {
-    "defaultMessage": "Mappa del sito"
+    "defaultMessage": "Mapa do site"
   },
   "checkout_footer.link.terms_conditions": {
-    "defaultMessage": "Termini e condizioni"
+    "defaultMessage": "Termos e condições"
   },
   "checkout_footer.message.copyright": {
-    "defaultMessage": "2021 Salesforce o società affiliate. Tutti i diritti riservati. Questo è un negozio fittizio a scopo dimostrativo. Gli ordini effettuati NON VERRANNO evasi."
+    "defaultMessage": "2021 Salesforce ou suas afiliadas. Todos os direitos reservados. Está é somente uma loja de demonstração. Os pedidos feitos NÃO SERÃO processados."
   },
   "checkout_header.link.cart": {
-    "defaultMessage": "Torna al carrello"
+    "defaultMessage": "Voltar ao carrinho"
   },
   "checkout_payment.action.remove": {
-    "defaultMessage": "Rimuovi"
+    "defaultMessage": "Remover"
   },
   "checkout_payment.button.review_order": {
-    "defaultMessage": "Rivedi ordine"
+    "defaultMessage": "Rever pedido"
   },
   "checkout_payment.heading.billing_address": {
-    "defaultMessage": "Indirizzo di fatturazione"
+    "defaultMessage": "Endereço de cobrança"
   },
   "checkout_payment.heading.credit_card": {
-    "defaultMessage": "Carta di credito"
+    "defaultMessage": "Cartão de crédito"
   },
   "checkout_payment.label.same_as_shipping": {
-    "defaultMessage": "Uguale all'indirizzo di spedizione"
+    "defaultMessage": "Igual ao endereço de entrega"
   },
   "checkout_payment.title.payment": {
     "defaultMessage": "Pagamento"
   },
   "confirmation_modal.default.action.no": {
-    "defaultMessage": "No"
+    "defaultMessage": "Não"
   },
   "confirmation_modal.default.action.yes": {
-    "defaultMessage": "Sì"
+    "defaultMessage": "Sim"
   },
   "confirmation_modal.default.message.you_want_to_continue": {
-    "defaultMessage": "Continuare?"
+    "defaultMessage": "Tem certeza de que deseja continuar?"
   },
   "confirmation_modal.default.title.confirm_action": {
-    "defaultMessage": "Conferma azione"
+    "defaultMessage": "Confirmar ação"
   },
   "confirmation_modal.remove_cart_item.action.no": {
-    "defaultMessage": "No, conserva articolo"
+    "defaultMessage": "Não, manter o item"
   },
   "confirmation_modal.remove_cart_item.action.yes": {
-    "defaultMessage": "Sì, rimuovi articolo"
+    "defaultMessage": "Sim, remover item"
   },
   "confirmation_modal.remove_cart_item.message.sure_to_remove": {
-    "defaultMessage": "Rimuovere questo articolo dal carrello?"
+    "defaultMessage": "Tem certeza de que deseja remover este item do carrinho?"
   },
   "confirmation_modal.remove_cart_item.title.confirm_remove": {
-    "defaultMessage": "Conferma rimozione articolo"
+    "defaultMessage": "Confirmar remoção do item"
   },
   "confirmation_modal.remove_wishlist_item.action.no": {
-    "defaultMessage": "No, conserva articolo"
+    "defaultMessage": "Não, manter o item"
   },
   "confirmation_modal.remove_wishlist_item.action.yes": {
-    "defaultMessage": "Sì, rimuovi articolo"
+    "defaultMessage": "Sim, remover item"
   },
   "confirmation_modal.remove_wishlist_item.message.sure_to_remove": {
-    "defaultMessage": "Rimuovere questo articolo dalla lista desideri?"
+    "defaultMessage": "Tem certeza de que deseja remover este item da wishlist?"
   },
   "confirmation_modal.remove_wishlist_item.title.confirm_remove": {
-    "defaultMessage": "Conferma rimozione articolo"
+    "defaultMessage": "Confirmar remoção do item"
   },
   "contact_info.action.sign_out": {
-    "defaultMessage": "Esci"
+    "defaultMessage": "Fazer logoff"
   },
   "contact_info.button.already_have_account": {
-    "defaultMessage": "Hai già un account? Accedi"
+    "defaultMessage": "Já tem uma conta? Fazer logon"
   },
   "contact_info.button.checkout_as_guest": {
-    "defaultMessage": "Checkout come ospite"
+    "defaultMessage": "Checkout como convidado"
   },
   "contact_info.button.login": {
-    "defaultMessage": "Accedi"
+    "defaultMessage": "Fazer logon"
   },
   "contact_info.error.incorrect_username_or_password": {
-    "defaultMessage": "Nome utente o password errati. Riprova."
+    "defaultMessage": "Nome de usuário ou senha incorreta. Tente novamente."
   },
   "contact_info.link.forgot_password": {
-    "defaultMessage": "Password dimenticata?"
+    "defaultMessage": "Esqueceu a senha?"
   },
   "contact_info.title.contact_info": {
-    "defaultMessage": "Informazioni di contatto"
+    "defaultMessage": "Informações de contato"
   },
   "credit_card_fields.tool_tip.security_code": {
-    "defaultMessage": "Questo codice a {length} cifre è presente sul {side} della carta.",
+    "defaultMessage": "Este código de {length} dígitos pode ser encontrado no {side} de seu cartão.",
     "description": "Credit card security code help text"
   },
   "drawer_menu.button.account_details": {
-    "defaultMessage": "Dettagli account"
+    "defaultMessage": "Detalhes da conta"
   },
   "drawer_menu.button.addresses": {
-    "defaultMessage": "Indirizzi"
+    "defaultMessage": "Endereços"
   },
   "drawer_menu.button.log_out": {
-    "defaultMessage": "Esci"
+    "defaultMessage": "Sair"
   },
   "drawer_menu.button.my_account": {
-    "defaultMessage": "Il mio account"
+    "defaultMessage": "Minha conta"
   },
   "drawer_menu.button.order_history": {
-    "defaultMessage": "Cronologia ordini"
+    "defaultMessage": "Histórico de pedidos"
   },
   "drawer_menu.button.payment_methods": {
-    "defaultMessage": "Metodi di pagamento"
+    "defaultMessage": "Métodos de pagamento"
   },
   "drawer_menu.link.about_us": {
-    "defaultMessage": "Chi siamo"
+    "defaultMessage": "Sobre nós"
   },
   "drawer_menu.link.customer_support": {
-    "defaultMessage": "Supporto clienti"
+    "defaultMessage": "Suporte ao cliente"
   },
   "drawer_menu.link.customer_support.contact_us": {
-    "defaultMessage": "Contattaci"
+    "defaultMessage": "Entrar em contato"
   },
   "drawer_menu.link.customer_support.shipping_and_returns": {
-    "defaultMessage": "Spedizione e resi"
+    "defaultMessage": "Frete e devoluções"
   },
   "drawer_menu.link.our_company": {
-    "defaultMessage": "La nostra azienda"
+    "defaultMessage": "Nossa empresa"
   },
   "drawer_menu.link.privacy_and_security": {
-    "defaultMessage": "Privacy e sicurezza"
+    "defaultMessage": "Privacidade e segurança"
   },
   "drawer_menu.link.privacy_policy": {
-    "defaultMessage": "Informativa sulla privacy"
+    "defaultMessage": "Política de privacidade"
   },
   "drawer_menu.link.shop_all": {
-    "defaultMessage": "Acquista tutto"
+    "defaultMessage": "Ver tudo"
   },
   "drawer_menu.link.sign_in": {
-    "defaultMessage": "Accedi"
+    "defaultMessage": "Fazer logon"
   },
   "drawer_menu.link.site_map": {
-    "defaultMessage": "Mappa del sito"
+    "defaultMessage": "Mapa do site"
   },
   "drawer_menu.link.store_locator": {
-    "defaultMessage": "Store locator"
+    "defaultMessage": "Localizador de lojas"
   },
   "drawer_menu.link.terms_and_conditions": {
-    "defaultMessage": "Termini e condizioni"
+    "defaultMessage": "Termos e condições"
   },
   "empty_cart.description.empty_cart": {
-    "defaultMessage": "Il tuo carrello è vuoto."
+    "defaultMessage": "Seu carrinho está vazio."
   },
   "empty_cart.link.continue_shopping": {
-    "defaultMessage": "Continua lo shopping"
+    "defaultMessage": "Continuar comprando"
   },
   "empty_cart.link.sign_in": {
-    "defaultMessage": "Accedi"
+    "defaultMessage": "Fazer logon"
   },
   "empty_cart.message.continue_shopping": {
-    "defaultMessage": "Continua con lo shopping per aggiungere articoli al carrello."
+    "defaultMessage": "Continue comprando e adicione itens ao seu carrinho."
   },
   "empty_cart.message.sign_in_or_continue_shopping": {
-    "defaultMessage": "Accedi per recuperare gli articoli salvati o continuare con lo shopping."
+    "defaultMessage": "Faça logon para recuperar seus itens salvos ou continuar a compra."
   },
   "empty_search_results.info.cant_find_anything_for_category": {
-    "defaultMessage": "Non è stato trovato nulla per {category}. Prova a cercare un prodotto o {link}."
+    "defaultMessage": "Não encontramos resultados para \"{category}\". Tente pesquisar um produto ou {link}."
   },
   "empty_search_results.info.cant_find_anything_for_query": {
-    "defaultMessage": "Non è stato trovato nulla per \"{searchQuery}\"."
+    "defaultMessage": "Não encontramos resultados para \"{searchQuery}\"."
   },
   "empty_search_results.info.double_check_spelling": {
-    "defaultMessage": "Ricontrolla l'ortografia e riprova o {link}."
+    "defaultMessage": "Confira a ortografia e tente novamente ou {link}."
   },
   "empty_search_results.link.contact_us": {
-    "defaultMessage": "Contattaci"
+    "defaultMessage": "Entrar em contato"
   },
   "empty_search_results.recommended_products.title.most_viewed": {
-    "defaultMessage": "I più visualizzati"
+    "defaultMessage": "Mais visto"
   },
   "empty_search_results.recommended_products.title.top_sellers": {
-    "defaultMessage": "I più venduti"
+    "defaultMessage": "Mais vendidos"
   },
   "footer.column.account": {
-    "defaultMessage": "Account"
+    "defaultMessage": "Conta"
   },
   "footer.column.customer_support": {
-    "defaultMessage": "Supporto clienti"
+    "defaultMessage": "Suporte ao cliente"
   },
   "footer.column.our_company": {
-    "defaultMessage": "La nostra azienda"
+    "defaultMessage": "Nossa empresa"
   },
   "footer.link.about_us": {
-    "defaultMessage": "Chi siamo"
+    "defaultMessage": "Sobre nós"
   },
   "footer.link.contact_us": {
-    "defaultMessage": "Contattaci"
+    "defaultMessage": "Entrar em contato"
   },
   "footer.link.order_status": {
-    "defaultMessage": "Stato ordine"
+    "defaultMessage": "Estado do pedido"
   },
   "footer.link.privacy_policy": {
-    "defaultMessage": "Informativa sulla privacy"
+    "defaultMessage": "Política de privacidade"
   },
   "footer.link.shipping": {
-    "defaultMessage": "Spedizione"
+    "defaultMessage": "Frete"
   },
   "footer.link.signin_create_account": {
-    "defaultMessage": "Accedi o crea account"
+    "defaultMessage": "Fazer logon ou criar conta"
   },
   "footer.link.site_map": {
-    "defaultMessage": "Mappa del sito"
+    "defaultMessage": "Mapa do site"
   },
   "footer.link.store_locator": {
-    "defaultMessage": "Store locator"
+    "defaultMessage": "Localizador de lojas"
   },
   "footer.link.terms_conditions": {
-    "defaultMessage": "Termini e condizioni"
+    "defaultMessage": "Termos e condições"
   },
   "footer.message.copyright": {
-    "defaultMessage": "2021 Salesforce o società affiliate. Tutti i diritti riservati. Questo è un negozio fittizio a scopo dimostrativo. Gli ordini effettuati NON VERRANNO evasi."
+    "defaultMessage": "2021 Salesforce ou suas afiliadas. Todos os direitos reservados. Está é somente uma loja de demonstração. Os pedidos feitos NÃO SERÃO processados."
   },
   "footer.subscribe.button.sign_up": {
-    "defaultMessage": "Registrati"
+    "defaultMessage": "Cadastro"
   },
   "footer.subscribe.description.sign_up": {
-    "defaultMessage": "Registrati per gli ultimi aggiornamenti sulle migliori offerte"
+    "defaultMessage": "Registre-se para ficar por dentro de todas as ofertas"
   },
   "footer.subscribe.heading.first_to_know": {
-    "defaultMessage": "Ricevi le novità in anteprima"
+    "defaultMessage": "Seja o primeiro a saber"
   },
   "form_action_buttons.button.cancel": {
-    "defaultMessage": "Annulla"
+    "defaultMessage": "Cancelar"
   },
   "form_action_buttons.button.save": {
-    "defaultMessage": "Salva"
+    "defaultMessage": "Salvar"
   },
   "global.account.link.account_details": {
-    "defaultMessage": "Dettagli account"
+    "defaultMessage": "Detalhes da conta"
   },
   "global.account.link.addresses": {
-    "defaultMessage": "Indirizzi"
+    "defaultMessage": "Endereços"
   },
   "global.account.link.order_history": {
-    "defaultMessage": "Cronologia ordini"
+    "defaultMessage": "Histórico de pedidos"
   },
   "global.account.link.payment_methods": {
-    "defaultMessage": "Metodi di pagamento"
+    "defaultMessage": "Métodos de pagamento"
   },
   "global.account.link.wishlist": {
-    "defaultMessage": "Lista desideri"
+    "defaultMessage": "Wishlist/Lista de desejos"
   },
   "global.error.something_went_wrong": {
-    "defaultMessage": "Si è verificato un problema. Riprova!"
+    "defaultMessage": "Ocorreu um erro. Tente novamente."
   },
   "header.button.assistive_msg.logo": {
-    "defaultMessage": "Logo"
+    "defaultMessage": "Logotipo"
   },
   "header.button.assistive_msg.menu": {
     "defaultMessage": "Menu"
   },
   "header.button.assistive_msg.my_account": {
-    "defaultMessage": "Il  mio account"
+    "defaultMessage": "Minha conta"
   },
   "header.button.assistive_msg.my_cart": {
-    "defaultMessage": "Il mio carrello"
+    "defaultMessage": "Meu carrinho"
   },
   "header.button.assistive_msg.wishlist": {
-    "defaultMessage": "Lista desideri"
+    "defaultMessage": "Wishlist/Lista de desejos"
   },
   "header.field.placeholder.search_for_products": {
-    "defaultMessage": "Cerca prodotti..."
+    "defaultMessage": "Pesquisar produtos..."
   },
   "header.popover.action.log_out": {
-    "defaultMessage": "Esci"
+    "defaultMessage": "Sair"
   },
   "header.popover.title.my_account": {
-    "defaultMessage": "Il mio account"
+    "defaultMessage": "Minha conta"
   },
   "home.description.features": {
-    "defaultMessage": "Funzionalità pronte all'uso, così potrai concentrare il tuo tempo sull'aggiunta di miglioramenti."
+    "defaultMessage": "Recursos prontos para uso, para que você só precise adicionar melhorias."
   },
   "home.description.here_to_help": {
-    "defaultMessage": "Contatta il nostro personale di assistenza, che ti fornirà"
+    "defaultMessage": "Entre em contato com nossa equipe de suporte, e ela levará você"
   },
   "home.description.here_to_help_line_2": {
-    "defaultMessage": "le indicazioni giuste."
+    "defaultMessage": "ao lugar correto."
   },
   "home.description.shop_products": {
-    "defaultMessage": "Questa sezione presenta contenuti del catalogo. {docLink} su come sostituirli.",
+    "defaultMessage": "Esta seção tem conteúdo do catálogo. {docLink} sobre como substitui-lo.",
     "description": "{docLink} is a html button that links the user to https://sfdc.co/business-manager-manage-catalgos"
   },
   "home.features.description.cart_checkout": {
-    "defaultMessage": "Best practice di e-commerce per l'esperienza di carrello e checkout di un acquirente."
+    "defaultMessage": "Práticas recomendadas de comércio eletrônico para a experiência de carrinho e checkout do comprador."
   },
   "home.features.description.components": {
-    "defaultMessage": "Realizzato utilizzando l'interfaccia utente Chakra, una libreria di componenti React semplice, modulare e accessibile."
+    "defaultMessage": "Criado com Chakra UI, uma biblioteca de componentes de React simples, modulares e acessíveis."
   },
   "home.features.description.einstein_recommendations": {
-    "defaultMessage": "Garantisci a ogni acquirente il miglior prodotto o la migliore offerta con i suggerimenti di prodotto."
+    "defaultMessage": "Entregue o próximo melhor produto ou oferta a cada comprador por meio de recomendações de produto."
   },
   "home.features.description.my_account": {
-    "defaultMessage": "Gli acquirenti possono gestire le informazioni relative all'account come profilo, indirizzi, pagamenti e ordini."
+    "defaultMessage": "Os compradores podem gerenciar as informações da conta, como perfil, endereços, pagamentos e pedidos."
   },
   "home.features.description.shopper_login": {
-    "defaultMessage": "Consenti agli acquirenti di accedere facilmente grazie a un'esperienza di acquisto più personalizzata."
+    "defaultMessage": "Permite que os compradores façam logon com uma experiência de compra mais personalizada."
   },
   "home.features.description.wishlist": {
-    "defaultMessage": "Gli acquirenti registrati possono aggiungere voci di prodotto alla lista desideri per acquisti futuri."
+    "defaultMessage": "Os compradores registrados podem adicionar itens de produtos às wishlists para comprá-los mais tarde."
   },
   "home.features.heading.cart_checkout": {
-    "defaultMessage": "Carrello e checkout"
+    "defaultMessage": "Carrinho e Checkout"
   },
   "home.features.heading.components": {
-    "defaultMessage": "Componenti e Design Kit"
+    "defaultMessage": "Kit de componentes e design"
   },
   "home.features.heading.einstein_recommendations": {
     "defaultMessage": "Einstein Recommendations"
   },
   "home.features.heading.my_account": {
-    "defaultMessage": "Il mio account"
+    "defaultMessage": "Minha conta"
   },
   "home.features.heading.shopper_login": {
-    "defaultMessage": "Shopper Login and API Access Service"
+    "defaultMessage": "Logon do comprador e API Access Service"
   },
   "home.features.heading.wishlist": {
-    "defaultMessage": "Lista desideri"
+    "defaultMessage": "Wishlist/Lista de desejos"
   },
   "home.heading.features": {
-    "defaultMessage": "Funzionalità"
+    "defaultMessage": "Recursos"
   },
   "home.heading.here_to_help": {
-    "defaultMessage": "Siamo qui per aiutarti"
+    "defaultMessage": "Estamos aqui para ajudar você"
   },
   "home.heading.shop_products": {
-    "defaultMessage": "Acquista prodotti"
+    "defaultMessage": "Ver produtos"
   },
   "home.hero_features.link.design_kit": {
-    "defaultMessage": "Crea con il Figma PWA Design Kit"
+    "defaultMessage": "Criar com o Figma PWA Design Kit"
   },
   "home.hero_features.link.on_github": {
-    "defaultMessage": "Scarica su GitHub"
+    "defaultMessage": "Baixar no Github"
   },
   "home.hero_features.link.on_managed_runtime": {
-    "defaultMessage": "Distribuisci su Managed Runtime"
+    "defaultMessage": "Implantar no Managed Runtime"
   },
   "home.link.contact_us": {
-    "defaultMessage": "Contattaci"
+    "defaultMessage": "Entrar em contato"
   },
   "home.link.get_started": {
-    "defaultMessage": "Inizia"
+    "defaultMessage": "Começar"
   },
   "home.link.read_docs": {
-    "defaultMessage": "Leggi la documentazione"
+    "defaultMessage": "Ler documentos"
   },
   "home.title.react_starter_store": {
-    "defaultMessage": "Lo starter store React PWA per il retail"
+    "defaultMessage": "O React PWA Starter Store for Retail"
   },
   "item_attributes.label.promotions": {
-    "defaultMessage": "Promozioni"
+    "defaultMessage": "Promoções"
   },
   "item_attributes.label.quantity": {
-    "defaultMessage": "Quantità: {quantity}"
+    "defaultMessage": "Quantidade: {quantity}"
   },
   "item_image.label.sale": {
-    "defaultMessage": "Saldi",
+    "defaultMessage": "Promoção",
     "description": "A sale badge placed on top of a product image"
   },
   "locale_text.message.ar-SA": {
-    "defaultMessage": "Arabo (Arabia Saudita)"
+    "defaultMessage": "Árabe (Arábia Saudita)"
   },
   "locale_text.message.bn-BD": {
-    "defaultMessage": "Bengalese (Bangladesh)"
+    "defaultMessage": "Bengali (Bangladesh)"
   },
   "locale_text.message.bn-IN": {
-    "defaultMessage": "Bengalese (India)"
+    "defaultMessage": "Bengali (Índia)"
   },
   "locale_text.message.cs-CZ": {
-    "defaultMessage": "Ceco (Repubblica Ceca)"
+    "defaultMessage": "Tcheco (República Tcheca)"
   },
   "locale_text.message.da-DK": {
-    "defaultMessage": "Danese (Danimarca)"
+    "defaultMessage": "Dinamarquês (Dinamarca)"
   },
   "locale_text.message.de-AT": {
-    "defaultMessage": "Tedesco (Austria)"
+    "defaultMessage": "Alemão (Áustria)"
   },
   "locale_text.message.de-CH": {
-    "defaultMessage": "Tedesco (Svizzera)"
+    "defaultMessage": "Alemão (Suíça)"
   },
   "locale_text.message.de-DE": {
-    "defaultMessage": "Tedesco (Germania)"
+    "defaultMessage": "Alemão (Alemanha)"
   },
   "locale_text.message.el-GR": {
-    "defaultMessage": "Greco (Grecia)"
+    "defaultMessage": "Grego (Grécia)"
   },
   "locale_text.message.en-AU": {
-    "defaultMessage": "Inglese (Australia)"
+    "defaultMessage": "Inglês (Austrália)"
   },
   "locale_text.message.en-CA": {
-    "defaultMessage": "Inglese (Canada)"
+    "defaultMessage": "Inglês (Canadá)"
   },
   "locale_text.message.en-GB": {
-    "defaultMessage": "Inglese (Regno Unito)"
+    "defaultMessage": "Inglês (Reino Unido)"
   },
   "locale_text.message.en-IE": {
-    "defaultMessage": "Inglese (Irlanda)"
+    "defaultMessage": "Inglês (Irlanda)"
   },
   "locale_text.message.en-IN": {
-    "defaultMessage": "Inglese (India)"
+    "defaultMessage": "Inglês (Índia)"
   },
   "locale_text.message.en-NZ": {
-    "defaultMessage": "Inglese (Nuova Zelanda)"
+    "defaultMessage": "Inglês (Nova Zelândia)"
   },
   "locale_text.message.en-US": {
-    "defaultMessage": "Inglese (Stati Uniti)"
+    "defaultMessage": "Inglês (Estados Unidos)"
   },
   "locale_text.message.en-ZA": {
-    "defaultMessage": "Inglese (Sudafrica)"
+    "defaultMessage": "Inglês (África do Sul)"
   },
   "locale_text.message.es-AR": {
-    "defaultMessage": "Spagnolo (Argentina)"
+    "defaultMessage": "Espanhol (Argentina)"
   },
   "locale_text.message.es-CL": {
-    "defaultMessage": "Spagnolo (Cile)"
+    "defaultMessage": "Espanhol (Chile)"
   },
   "locale_text.message.es-CO": {
-    "defaultMessage": "Spagnolo (Colombia)"
+    "defaultMessage": "Espanhol (Colômbia)"
   },
   "locale_text.message.es-ES": {
-    "defaultMessage": "Spagnolo (Spagna)"
+    "defaultMessage": "Espanhol (Espanha)"
   },
   "locale_text.message.es-MX": {
-    "defaultMessage": "Spagnolo (Messico)"
+    "defaultMessage": "Espanhol (México)"
   },
   "locale_text.message.es-US": {
-    "defaultMessage": "Spagnolo (Stati Uniti)"
+    "defaultMessage": "Espanhol (Estados Unidos)"
   },
   "locale_text.message.fi-FI": {
-    "defaultMessage": "Finlandese (Finlandia)"
+    "defaultMessage": "Finlandês (Finlândia)"
   },
   "locale_text.message.fr-BE": {
-    "defaultMessage": "Francese (Belgio)"
+    "defaultMessage": "Francês (Bélgica)"
   },
   "locale_text.message.fr-CA": {
-    "defaultMessage": "Francese (Canada)"
+    "defaultMessage": "Francês (Canadá)"
   },
   "locale_text.message.fr-CH": {
-    "defaultMessage": "Francese (Svizzera)"
+    "defaultMessage": "Francês (Suíça)"
   },
   "locale_text.message.fr-FR": {
-    "defaultMessage": "Francese (Francia)"
+    "defaultMessage": "Francês (França)"
   },
   "locale_text.message.he-IL": {
-    "defaultMessage": "Ebraico (Israele)"
+    "defaultMessage": "Hebreu (Israel)"
   },
   "locale_text.message.hi-IN": {
-    "defaultMessage": "Hindi (India)"
+    "defaultMessage": "Hindi (Índia)"
   },
   "locale_text.message.hu-HU": {
-    "defaultMessage": "Ungherese (Ungheria)"
+    "defaultMessage": "Húngaro (Hungria)"
   },
   "locale_text.message.id-ID": {
-    "defaultMessage": "Indonesiano (Indonesia)"
+    "defaultMessage": "Indonésio (Indonésia)"
   },
   "locale_text.message.it-CH": {
-    "defaultMessage": "Italiano (Svizzera)"
+    "defaultMessage": "Italiano (Suíça)"
   },
   "locale_text.message.it-IT": {
-    "defaultMessage": "Italiano (Italia)"
+    "defaultMessage": "Italiano (Itália)"
   },
   "locale_text.message.ja-JP": {
-    "defaultMessage": "Giapponese (Giappone)"
+    "defaultMessage": "Japonês (Japão)"
   },
   "locale_text.message.ko-KR": {
-    "defaultMessage": "Coreano (Repubblica di Corea)"
+    "defaultMessage": "Coreano (Coreia do Sul)"
   },
   "locale_text.message.nl-BE": {
-    "defaultMessage": "Olandese (Belgio)"
+    "defaultMessage": "Holandês (Bélgica)"
   },
   "locale_text.message.nl-NL": {
-    "defaultMessage": "Olandese (Paesi Bassi)"
+    "defaultMessage": "Holandês (Países Baixos)"
   },
   "locale_text.message.no-NO": {
-    "defaultMessage": "Norvegese (Norvegia)"
+    "defaultMessage": "Norueguês (Noruega)"
   },
   "locale_text.message.pl-PL": {
-    "defaultMessage": "Polacco (Polonia)"
+    "defaultMessage": "Polonês (Polônia)"
   },
   "locale_text.message.pt-BR": {
-    "defaultMessage": "Portoghese (Brasile)"
+    "defaultMessage": "Português (Brasil)"
   },
   "locale_text.message.pt-PT": {
-    "defaultMessage": "Portoghese (Portogallo)"
+    "defaultMessage": "Português (Portugal)"
   },
   "locale_text.message.ro-RO": {
-    "defaultMessage": "Rumeno (Romania)"
+    "defaultMessage": "Romeno (Romênia)"
   },
   "locale_text.message.ru-RU": {
-    "defaultMessage": "Russo (Federazione Russa)"
+    "defaultMessage": "Russo (Rússia)"
   },
   "locale_text.message.sk-SK": {
-    "defaultMessage": "Slovacco (Slovacchia)"
+    "defaultMessage": "Eslovaco (Eslováquia)"
   },
   "locale_text.message.sv-SE": {
-    "defaultMessage": "Svedese (Svezia)"
+    "defaultMessage": "Sueco (Suécia)"
   },
   "locale_text.message.ta-IN": {
-    "defaultMessage": "Tamil (India)"
+    "defaultMessage": "Tâmil (Índia)"
   },
   "locale_text.message.ta-LK": {
-    "defaultMessage": "Tamil (Sri Lanka)"
+    "defaultMessage": "Tâmil (Sri Lanka)"
   },
   "locale_text.message.th-TH": {
-    "defaultMessage": "Tailandese (Tailandia)"
+    "defaultMessage": "Tailandês (Tailândia)"
   },
   "locale_text.message.tr-TR": {
-    "defaultMessage": "Turco (Turchia)"
+    "defaultMessage": "Turco (Turquia)"
   },
   "locale_text.message.zh-CN": {
-    "defaultMessage": "Cinese (Cina)"
+    "defaultMessage": "Chinês (China)"
   },
   "locale_text.message.zh-HK": {
-    "defaultMessage": "Cinese (Hong Kong)"
+    "defaultMessage": "Chinês (Hong Kong)"
   },
   "locale_text.message.zh-TW": {
-    "defaultMessage": "Cinese (Taiwan)"
+    "defaultMessage": "Chinês (Taiwan)"
   },
   "login_form.action.create_account": {
-    "defaultMessage": "Crea account"
+    "defaultMessage": "Criar conta"
   },
   "login_form.button.sign_in": {
-    "defaultMessage": "Accedi"
+    "defaultMessage": "Fazer logon"
   },
   "login_form.link.forgot_password": {
-    "defaultMessage": "Password dimenticata?"
+    "defaultMessage": "Esqueceu a senha?"
   },
   "login_form.message.dont_have_account": {
-    "defaultMessage": "Non hai un account?"
+    "defaultMessage": "Não tem uma conta?"
   },
   "login_form.message.welcome_back": {
-    "defaultMessage": "Piacere di rivederti"
+    "defaultMessage": "Olá novamente"
   },
   "login_page.error.incorrect_username_or_password": {
-    "defaultMessage": "Nome utente o password errati. Riprova."
+    "defaultMessage": "Nome de usuário ou senha incorreta. Tente novamente."
   },
   "offline_banner.description.browsing_offline_mode": {
-    "defaultMessage": "Stai navigando in modalità offline"
+    "defaultMessage": "Você está navegando no modo offline"
   },
   "order_summary.action.remove_promo": {
-    "defaultMessage": "Rimuovi"
+    "defaultMessage": "Remover"
   },
   "order_summary.cart_items.action.num_of_items_in_cart": {
-    "defaultMessage": "{itemCount, plural, =0 {0 articoli} one {# articolo} other {# articoli}} nel carrello",
+    "defaultMessage": "{itemCount, plural, =0 {0 itens} one {# item} other {# itens}}) no carrinho",
     "description": "clicking it would expand/show the items in cart"
   },
   "order_summary.cart_items.link.edit_cart": {
-    "defaultMessage": "Modifica carrello"
+    "defaultMessage": "Editar carrinho"
   },
   "order_summary.heading.order_summary": {
-    "defaultMessage": "Riepilogo ordine"
+    "defaultMessage": "Resumo do pedido"
   },
   "order_summary.label.estimated_total": {
-    "defaultMessage": "Totale stimato"
+    "defaultMessage": "Total estimado"
   },
   "order_summary.label.free": {
-    "defaultMessage": "Gratis"
+    "defaultMessage": "Gratuito"
   },
   "order_summary.label.order_total": {
-    "defaultMessage": "Totale ordine"
+    "defaultMessage": "Total do pedido"
   },
   "order_summary.label.promo_applied": {
-    "defaultMessage": "Promozione applicata"
+    "defaultMessage": "Promoção aplicada"
   },
   "order_summary.label.promotions_applied": {
-    "defaultMessage": "Promozioni applicate"
+    "defaultMessage": "Promoções aplicadas"
   },
   "order_summary.label.shipping": {
-    "defaultMessage": "Spedizione"
+    "defaultMessage": "Frete"
   },
   "order_summary.label.subtotal": {
-    "defaultMessage": "Subtotale"
+    "defaultMessage": "Subtotal"
   },
   "order_summary.label.tax": {
-    "defaultMessage": "Imposta"
+    "defaultMessage": "Imposto"
   },
   "page_not_found.action.go_back": {
-    "defaultMessage": "Torna alla pagina precedente"
+    "defaultMessage": "Voltar à página anterior"
   },
   "page_not_found.link.homepage": {
-    "defaultMessage": "Vai alla pagina principale"
+    "defaultMessage": "Ir à página inicial"
   },
   "page_not_found.message.suggestion_to_try": {
-    "defaultMessage": "Prova a inserire di nuovo l'indirizzo tornando alla pagina precedente o passando alla pagina principale."
+    "defaultMessage": "Tente digitar o endereço novamente, voltar à página anterior ou à página inicial."
   },
   "page_not_found.title.page_cant_be_found": {
-    "defaultMessage": "Impossibile trovare la pagina che stai cercando."
+    "defaultMessage": "A página buscada não pôde ser encontrada."
   },
   "pagination.field.num_of_pages": {
-    "defaultMessage": "di {numOfPages}"
+    "defaultMessage": "de {numOfPages}"
   },
   "pagination.link.next": {
-    "defaultMessage": "Avanti"
+    "defaultMessage": "Próximo"
   },
   "pagination.link.prev": {
-    "defaultMessage": "Indietro"
+    "defaultMessage": "Ant"
   },
   "password_card.info.password_updated": {
-    "defaultMessage": "Password aggiornata"
+    "defaultMessage": "Senha atualizada"
   },
   "password_card.label.password": {
-    "defaultMessage": "Password"
+    "defaultMessage": "Senha"
   },
   "password_card.title.password": {
-    "defaultMessage": "Password"
+    "defaultMessage": "Senha"
   },
   "password_requirements.error.eight_letter_minimum": {
-    "defaultMessage": "Minimo 8 caratteri",
+    "defaultMessage": "8 caracteres, no mínimo",
     "description": "Password requirement"
   },
   "password_requirements.error.one_lowercase_letter": {
-    "defaultMessage": "1 lettera minuscola",
+    "defaultMessage": "1 letra minúscula",
     "description": "Password requirement"
   },
   "password_requirements.error.one_number": {
-    "defaultMessage": "1 numero",
+    "defaultMessage": "1 número",
     "description": "Password requirement"
   },
   "password_requirements.error.one_special_character": {
-    "defaultMessage": "1 carattere speciale (esempio: , S ! % #)",
+    "defaultMessage": "1 caractere especial (exemplo: , S ! % #)",
     "description": "Password requirement"
   },
   "password_requirements.error.one_uppercase_letter": {
-    "defaultMessage": "1 lettera maiuscola",
+    "defaultMessage": "1 letra maiúscula",
     "description": "Password requirement"
   },
   "payment_selection.button.save_and_continue": {
-    "defaultMessage": "Salva e continua"
+    "defaultMessage": "Salvar e continuar"
   },
   "payment_selection.heading.add_new_card": {
-    "defaultMessage": "Aggiungi nuova carta"
+    "defaultMessage": "Adicionar novo cartão"
   },
   "payment_selection.heading.credit_card": {
-    "defaultMessage": "Carta di credito"
+    "defaultMessage": "Cartão de crédito"
   },
   "payment_selection.message.select_payment_method": {
-    "defaultMessage": "Seleziona un metodo di pagamento."
+    "defaultMessage": "Selecione um método de pagamento."
   },
   "payment_selection.tooltip.secure_payment": {
-    "defaultMessage": "Questo è un pagamento crittografato con SSL sicuro."
+    "defaultMessage": "Este é um pagamento protegido com criptografia SSL."
   },
   "price_per_item.label.each": {
-    "defaultMessage": "cad.",
+    "defaultMessage": "ea",
     "description": "Abbreviated 'each', follows price per item, like $10/ea"
   },
   "product_detail.accordion.button.product_detail": {
-    "defaultMessage": "Dettagli prodotto"
+    "defaultMessage": "Detalhe do produto"
   },
   "product_detail.accordion.button.questions": {
-    "defaultMessage": "Domande"
+    "defaultMessage": "Perguntas"
   },
   "product_detail.accordion.button.reviews": {
-    "defaultMessage": "Revisioni"
+    "defaultMessage": "Avaliações"
   },
   "product_detail.accordion.button.size_fit": {
-    "defaultMessage": "Taglie e vestibilità"
+    "defaultMessage": "Tamanho"
   },
   "product_detail.accordion.message.coming_soon": {
-    "defaultMessage": "In arrivo"
+    "defaultMessage": "Em breve"
   },
   "product_detail.info.added_to_wishlist": {
-    "defaultMessage": "{quantity} {quantity, plural, one {articolo aggiunto} other {articoli aggiunti}} alla lista desideri"
+    "defaultMessage": "{quantity} {quantity, plural, one {item} other {itens}} adicionado(s) à wishlist"
   },
   "product_detail.recommended_products.title.complete_set": {
-    "defaultMessage": "Completamento del set"
+    "defaultMessage": "Completar o conjunto"
   },
   "product_detail.recommended_products.title.might_also_like": {
-    "defaultMessage": "Potrebbe interessarti anche"
+    "defaultMessage": "Talvez você também queira"
   },
   "product_detail.recommended_products.title.recently_viewed": {
-    "defaultMessage": "Visualizzati di recente"
+    "defaultMessage": "Recentemente visualizados"
   },
   "product_item.label.quantity": {
-    "defaultMessage": "Quantità:"
+    "defaultMessage": "Quantidade:"
   },
   "product_list.button.filter": {
-    "defaultMessage": "Filtro"
+    "defaultMessage": "Filtrar"
   },
   "product_list.button.sort_by": {
-    "defaultMessage": "Ordina per: {sortOption}"
+    "defaultMessage": "Ordenar por: {sortOption}"
   },
   "product_list.drawer.title.sort_by": {
-    "defaultMessage": "Ordina per"
+    "defaultMessage": "Ordenar por"
   },
   "product_list.info.added_to_wishlist": {
-    "defaultMessage": "{quantity} {quantity, plural, one {articolo aggiunto} other {articoli aggiunti}} alla lista desideri"
+    "defaultMessage": "{quantity} {quantity, plural, one {item} other {itens}} adicionado(s) à wishlist"
   },
   "product_list.info.removed_from_wishlist": {
-    "defaultMessage": "Articolo rimosso dalla lista desideri"
+    "defaultMessage": "Item removido da wishlist"
   },
   "product_list.modal.button.clear_filters": {
-    "defaultMessage": "Cancella filtri"
+    "defaultMessage": "Limpar filtros"
   },
   "product_list.modal.button.view_items": {
-    "defaultMessage": "Visualizza {prroductCount} articoli"
+    "defaultMessage": "Ver {prroductCount} itens"
   },
   "product_list.modal.title.filter": {
-    "defaultMessage": "Filtro"
+    "defaultMessage": "Filtrar"
   },
   "product_list.select.sort_by": {
-    "defaultMessage": "Ordina per: {sortOption}"
+    "defaultMessage": "Ordenar por: {sortOption}"
   },
   "product_tile.assistive_msg.wishlist": {
-    "defaultMessage": "Lista desideri"
+    "defaultMessage": "Wishlist/Lista de desejos"
   },
   "product_view.button.add_to_cart": {
-    "defaultMessage": "Aggiungi al carrello"
+    "defaultMessage": "Adicionar ao carrinho"
   },
   "product_view.button.add_to_wishlist": {
-    "defaultMessage": "Aggiungi alla lista dei desideri"
+    "defaultMessage": "Adicionar à wishlist"
   },
   "product_view.button.update": {
-    "defaultMessage": "Aggiornati"
+    "defaultMessage": "Atualizar"
   },
   "product_view.label.quantity": {
-    "defaultMessage": "Quantità"
+    "defaultMessage": "Quantidade"
   },
   "product_view.link.full_details": {
-    "defaultMessage": "Vedi tutti i dettagli"
+    "defaultMessage": "Ver detalhes completos"
   },
   "profile_card.info.profile_updated": {
-    "defaultMessage": "Profilo aggiornato"
+    "defaultMessage": "Perfil atualizado"
   },
   "profile_card.label.email": {
     "defaultMessage": "E-mail"
   },
   "profile_card.label.full_name": {
-    "defaultMessage": "Nome completo"
+    "defaultMessage": "Nome"
   },
   "profile_card.label.phone": {
-    "defaultMessage": "Numero di telefono"
+    "defaultMessage": "Número de telefone"
   },
   "profile_card.message.not_provided": {
-    "defaultMessage": "Non specificato"
+    "defaultMessage": "Não fornecido"
   },
   "profile_card.title.my_profile": {
-    "defaultMessage": "Il mio profilo"
+    "defaultMessage": "Meu perfil"
   },
   "promo_code_fields.button.apply": {
-    "defaultMessage": "Applica"
+    "defaultMessage": "Aplicar"
   },
   "promo_popover.heading.promo_applied": {
-    "defaultMessage": "Promozioni applicate"
+    "defaultMessage": "Promoções aplicadas"
   },
   "promocode.accordion.button.have_promocode": {
-    "defaultMessage": "Hai un codice promozionale?"
+    "defaultMessage": "Você tem um código promocional?"
   },
   "recent_searches.action.clear_searches": {
-    "defaultMessage": "Cancella ricerche recenti"
+    "defaultMessage": "Apagar pesquisas recentes"
   },
   "recent_searches.heading.recent_searches": {
-    "defaultMessage": "Ricerche recenti"
+    "defaultMessage": "Pesquisas recentes"
   },
   "recommended_products.info.added_to_wishlist": {
-    "defaultMessage": "{quantity} {quantity, plural, one {articolo aggiunto} other {articoli aggiunti}} alla lista desideri"
+    "defaultMessage": "{quantity} {quantity, plural, one {item} other {itens}} adicionado(s) à wishlist"
   },
   "recommended_products.info.removed_from_wishlist": {
-    "defaultMessage": "Articolo rimosso dalla lista desideri"
+    "defaultMessage": "Item removido da wishlist"
   },
   "register_form.action.sign_in": {
-    "defaultMessage": "Accedi"
+    "defaultMessage": "Fazer logon"
   },
   "register_form.button.create_account": {
-    "defaultMessage": "Crea account"
+    "defaultMessage": "Criar conta"
   },
   "register_form.heading.lets_get_started": {
-    "defaultMessage": "Iniziamo!"
+    "defaultMessage": "Vamos começar!"
   },
   "register_form.message.agree_to_policy_terms": {
-    "defaultMessage": "Creando un account, accetti l'<policy>Informativa sulla privacy</policy> e i <terms>Termini e condizioni</terms> di Salesforce"
+    "defaultMessage": "Ao criar uma conta, você concorda com a <policy>Política de privacidade</policy> e os <terms>Termos e condições</terms> da Salesforce"
   },
   "register_form.message.already_have_account": {
-    "defaultMessage": "Hai già un account?"
+    "defaultMessage": "Já tem uma conta?"
   },
   "register_form.message.create_an_account": {
-    "defaultMessage": "Crea un account e accedi in esclusiva ai prodotti, alle idee e alle community migliori."
+    "defaultMessage": "Crie uma conta e tenha acesso aos melhores produtos, ideias e comunidade."
   },
   "reset_password.button.back_to_sign_in": {
-    "defaultMessage": "Torna all'accesso"
+    "defaultMessage": "Fazer login novamente"
   },
   "reset_password.info.receive_email_shortly": {
-    "defaultMessage": "A breve riceverai un'email all'indirizzo <b>{email}</b> con un link per la reimpostazione della password."
+    "defaultMessage": "Em breve, você receberá um e-mail em <b>{email}</b> com um link para redefinir a senha."
   },
   "reset_password.title.password_reset": {
-    "defaultMessage": "Reimpostazione password"
+    "defaultMessage": "Redefinição de senha"
   },
   "reset_password_form.action.sign_in": {
-    "defaultMessage": "Accedi"
+    "defaultMessage": "Fazer logon"
   },
   "reset_password_form.button.reset_password": {
-    "defaultMessage": "Reimposta password"
+    "defaultMessage": "Redefinir senha"
   },
   "reset_password_form.message.enter_your_email": {
-    "defaultMessage": "Inserisci il tuo indirizzo email per ricevere istruzioni su come reimpostare la password"
+    "defaultMessage": "Digite seu e-mail para receber instruções sobre como redefinir sua senha"
   },
   "reset_password_form.message.return_to_sign_in": {
-    "defaultMessage": "Oppure torna a",
+    "defaultMessage": "Ou voltar para",
     "description": "Precedes link to return to sign in"
   },
   "reset_password_form.title.reset_password": {
-    "defaultMessage": "Reimposta password"
+    "defaultMessage": "Redefinir senha"
   },
   "search.action.cancel": {
-    "defaultMessage": "Annulla"
+    "defaultMessage": "Cancelar"
   },
   "selected_refinements.action.clear_all": {
-    "defaultMessage": "Deseleziona tutto"
+    "defaultMessage": "Apagar tudo"
   },
   "shipping_address.button.continue_to_shipping": {
-    "defaultMessage": "Passa al metodo di spedizione"
+    "defaultMessage": "Ir ao Método de entrega"
   },
   "shipping_address.title.shipping_address": {
-    "defaultMessage": "Indirizzo di spedizione"
+    "defaultMessage": "Endereço de entrega"
   },
   "shipping_address_edit_form.button.save_and_continue": {
-    "defaultMessage": "Salva e passa al metodo di spedizione"
+    "defaultMessage": "Salvar e ir ao Método de entrega"
   },
   "shipping_address_form.heading.edit_address": {
-    "defaultMessage": "Modifica indirizzo"
+    "defaultMessage": "Editar endereço"
   },
   "shipping_address_form.heading.new_address": {
-    "defaultMessage": "Aggiungi nuovo indirizzo"
+    "defaultMessage": "Adicionar novo endereço"
   },
   "shipping_address_selection.button.add_address": {
-    "defaultMessage": "Aggiungi nuovo indirizzo"
+    "defaultMessage": "Adicionar novo endereço"
   },
   "shipping_address_selection.button.submit": {
-    "defaultMessage": "Invia"
+    "defaultMessage": "Enviar"
   },
   "shipping_address_selection.title.add_address": {
-    "defaultMessage": "Aggiungi nuovo indirizzo"
+    "defaultMessage": "Adicionar novo endereço"
   },
   "shipping_address_selection.title.edit_shipping": {
-    "defaultMessage": "Modifica indirizzo di spedizione"
+    "defaultMessage": "Editar endereço de entrega"
   },
   "shipping_options.action.send_as_a_gift": {
-    "defaultMessage": "Inviare come regalo?"
+    "defaultMessage": "Deseja enviar esse item como presente?"
   },
   "shipping_options.button.continue_to_payment": {
-    "defaultMessage": "Passa al pagamento"
+    "defaultMessage": "Ir ao Pagamento"
   },
   "shipping_options.title.shipping_gift_options": {
-    "defaultMessage": "Opzioni di spedizione e regalo"
+    "defaultMessage": "Opções de frete e presente"
   },
   "signout_confirmation_dialog.button.cancel": {
-    "defaultMessage": "Annulla"
+    "defaultMessage": "Cancelar"
   },
   "signout_confirmation_dialog.button.sign_out": {
-    "defaultMessage": "Esci"
+    "defaultMessage": "Fazer logoff"
   },
   "signout_confirmation_dialog.heading.sign_out": {
-    "defaultMessage": "Esci"
+    "defaultMessage": "Fazer logoff"
   },
   "signout_confirmation_dialog.message.sure_to_sign_out": {
-    "defaultMessage": "Uscire? Per procedere con l'ordine corrente devi eseguire di nuovo l'accesso."
+    "defaultMessage": "Tem certeza de que deseja fazer logout? Será preciso fazer logon novamente para dar continuidade ao seu pedido atual."
   },
   "toggle_card.action.edit": {
-    "defaultMessage": "Modifica"
+    "defaultMessage": "Editar"
   },
   "update_password_fields.button.forgot_password": {
-    "defaultMessage": "Password dimenticata?"
+    "defaultMessage": "Esqueceu a senha?"
   },
   "use_address_fields.error.please_enter_first_name": {
-    "defaultMessage": "Inserisci il nome."
+    "defaultMessage": "Insira seu nome."
   },
   "use_address_fields.error.please_enter_last_name": {
-    "defaultMessage": "Inserisci il cognome."
+    "defaultMessage": "Insira seu sobrenome."
   },
   "use_address_fields.error.please_enter_phone_number": {
-    "defaultMessage": "Inserisci il numero di telefono."
+    "defaultMessage": "Insira seu telefone."
   },
   "use_address_fields.error.please_enter_your_postal_or_zip": {
-    "defaultMessage": "Inserisci il {postalOrZip}."
+    "defaultMessage": "Insira seu {postalOrZip}."
   },
   "use_address_fields.error.please_select_your_address": {
-    "defaultMessage": "Inserisci l'indirizzo."
+    "defaultMessage": "Insira seu endereço."
   },
   "use_address_fields.error.please_select_your_city": {
-    "defaultMessage": "Inserisci la città."
+    "defaultMessage": "Insira sua cidade."
   },
   "use_address_fields.error.please_select_your_country": {
-    "defaultMessage": "Seleziona il Paese."
+    "defaultMessage": "Selecione o país."
   },
   "use_address_fields.error.please_select_your_state_or_province": {
-    "defaultMessage": "Seleziona {stateOrProvince}."
+    "defaultMessage": "Selecione o {stateOrProvince}."
   },
   "use_address_fields.error.required": {
-    "defaultMessage": "Obbligatorio"
+    "defaultMessage": "Requerido"
   },
   "use_address_fields.error.state_code_invalid": {
-    "defaultMessage": "Inserisci la provincia di 2 lettere."
+    "defaultMessage": "Insira 2 letras para estado/município."
   },
   "use_address_fields.label.address": {
-    "defaultMessage": "Indirizzo"
+    "defaultMessage": "Endereço"
   },
   "use_address_fields.label.city": {
-    "defaultMessage": "Città"
+    "defaultMessage": "Cidade"
   },
   "use_address_fields.label.country": {
-    "defaultMessage": "Paese"
+    "defaultMessage": "País"
   },
   "use_address_fields.label.first_name": {
     "defaultMessage": "Nome"
   },
   "use_address_fields.label.last_name": {
-    "defaultMessage": "Cognome"
+    "defaultMessage": "Sobrenome"
   },
   "use_address_fields.label.phone": {
-    "defaultMessage": "Telefono"
+    "defaultMessage": "Telefone"
   },
   "use_address_fields.label.postal_code": {
-    "defaultMessage": "Codice postale"
+    "defaultMessage": "Código postal"
   },
   "use_address_fields.label.preferred": {
-    "defaultMessage": "Imposta come predefinito"
+    "defaultMessage": "Definir como padrão"
   },
   "use_address_fields.label.province": {
-    "defaultMessage": "Provincia"
+    "defaultMessage": "Município"
   },
   "use_address_fields.label.state": {
-    "defaultMessage": "Stato"
+    "defaultMessage": "Estado"
   },
   "use_address_fields.label.zipCode": {
-    "defaultMessage": "CAP"
+    "defaultMessage": "Código postal"
   },
   "use_credit_card_fields.error.required": {
-    "defaultMessage": "Obbligatorio"
+    "defaultMessage": "Requerido"
   },
   "use_credit_card_fields.error.required_card_number": {
-    "defaultMessage": "Inserisci il numero di carta."
+    "defaultMessage": "Insira o número de seu cartão."
   },
   "use_credit_card_fields.error.required_expiry": {
-    "defaultMessage": "Inserisci la data di scadenza."
+    "defaultMessage": "Insira a data de expiração."
   },
   "use_credit_card_fields.error.required_name": {
-    "defaultMessage": "Inserisci il tuo nome come compare sulla carta."
+    "defaultMessage": "Insira seu nome exatamente como aparece no cartão."
   },
   "use_credit_card_fields.error.required_security_code": {
-    "defaultMessage": "Inserisci il codice di sicurezza."
+    "defaultMessage": "Insira seu código de segurança."
   },
   "use_credit_card_fields.error.valid_card_number": {
-    "defaultMessage": "Inserisci un numero di carta valido."
+    "defaultMessage": "Insira um número de cartão válido."
   },
   "use_credit_card_fields.error.valid_date": {
-    "defaultMessage": "Inserisci una data valida."
+    "defaultMessage": "Insira uma data válida."
   },
   "use_credit_card_fields.error.valid_name": {
-    "defaultMessage": "Inserisci un nome valido."
+    "defaultMessage": "Insira um nome válido."
   },
   "use_credit_card_fields.error.valid_security_code": {
-    "defaultMessage": "Inserisci un codice di sicurezza valido."
+    "defaultMessage": "Insira um código de segurança válido."
   },
   "use_credit_card_fields.label.card_number": {
-    "defaultMessage": "Numero carta"
+    "defaultMessage": "Número de cartão"
   },
   "use_credit_card_fields.label.card_type": {
-    "defaultMessage": "Tipo di carta"
+    "defaultMessage": "Tipo de cartão"
   },
   "use_credit_card_fields.label.expiry": {
-    "defaultMessage": "Data di scadenza"
+    "defaultMessage": "Data de expiração"
   },
   "use_credit_card_fields.label.name": {
-    "defaultMessage": "Nome sulla carta"
+    "defaultMessage": "Nome no carrinho"
   },
   "use_credit_card_fields.label.security_code": {
-    "defaultMessage": "Codice di sicurezza"
+    "defaultMessage": "Código de segurança"
   },
   "use_login_fields.error.required_email": {
-    "defaultMessage": "Inserisci l'indirizzo email."
+    "defaultMessage": "Insira seu endereço de e-mail."
   },
   "use_login_fields.error.required_password": {
-    "defaultMessage": "Inserisci la password."
+    "defaultMessage": "Insira sua senha."
   },
   "use_login_fields.label.email": {
     "defaultMessage": "E-mail"
   },
   "use_login_fields.label.password": {
-    "defaultMessage": "Password"
+    "defaultMessage": "Senha"
   },
   "use_product.message.inventory_remaining": {
-    "defaultMessage": "Solo {stockLevel} rimasti!"
+    "defaultMessage": "Somente {stockLevel} restante(s)!"
   },
   "use_product.message.out_of_stock": {
-    "defaultMessage": "Esaurito"
+    "defaultMessage": "Fora de estoque"
   },
   "use_profile_fields.error.required_email": {
-    "defaultMessage": "Inserisci un indirizzo e-mail valido."
+    "defaultMessage": "Insira um endereço de e-mail válido."
   },
   "use_profile_fields.error.required_first_name": {
-    "defaultMessage": "Inserisci il nome."
+    "defaultMessage": "Insira seu nome."
   },
   "use_profile_fields.error.required_last_name": {
-    "defaultMessage": "Inserisci il cognome."
+    "defaultMessage": "Insira seu sobrenome."
   },
   "use_profile_fields.error.required_phone": {
-    "defaultMessage": "Inserisci il numero di telefono."
+    "defaultMessage": "Insira seu telefone."
   },
   "use_profile_fields.label.email": {
     "defaultMessage": "E-mail"
@@ -1300,52 +1300,52 @@
     "defaultMessage": "Nome"
   },
   "use_profile_fields.label.last_name": {
-    "defaultMessage": "Cognome"
+    "defaultMessage": "Sobrenome"
   },
   "use_profile_fields.label.phone": {
-    "defaultMessage": "Numero di telefono"
+    "defaultMessage": "Número de telefone"
   },
   "use_promo_code_fields.error.required_promo_code": {
-    "defaultMessage": "Specifica un codice promozionale valido."
+    "defaultMessage": "Forneça um código promocional válido."
   },
   "use_promo_code_fields.label.promo_code": {
-    "defaultMessage": "Codice promozionale"
+    "defaultMessage": "Código promocional"
   },
   "use_promocode.error.check_the_code": {
-    "defaultMessage": "Controlla il codice e riprova. È possibile che sia già stato applicato o che la promozione sia scaduta."
+    "defaultMessage": "Verifique o código e tente novamente. Talvez ele já tenha sido utilizado ou a promoção já não é mais válida."
   },
   "use_promocode.info.promo_applied": {
-    "defaultMessage": "Promozione applicata"
+    "defaultMessage": "Promoção aplicada"
   },
   "use_promocode.info.promo_removed": {
-    "defaultMessage": "Promozione eliminata"
+    "defaultMessage": "Promoção removida"
   },
   "use_registration_fields.error.contain_number": {
-    "defaultMessage": "La password deve contenere almeno un numero."
+    "defaultMessage": "A senha deve conter pelo menos 1 número."
   },
   "use_registration_fields.error.lowercase_letter": {
-    "defaultMessage": "La password deve contenere almeno una lettera minuscola."
+    "defaultMessage": "A senha deve conter pelo menos 1 letra minúscula."
   },
   "use_registration_fields.error.minimum_characters": {
-    "defaultMessage": "La password deve contenere almeno 8 caratteri."
+    "defaultMessage": "A senha deve conter pelo menos 8 caracteres."
   },
   "use_registration_fields.error.required_email": {
-    "defaultMessage": "Inserisci un indirizzo e-mail valido."
+    "defaultMessage": "Insira um endereço de e-mail válido."
   },
   "use_registration_fields.error.required_first_name": {
-    "defaultMessage": "Inserisci il nome."
+    "defaultMessage": "Insira seu nome."
   },
   "use_registration_fields.error.required_last_name": {
-    "defaultMessage": "Inserisci il cognome."
+    "defaultMessage": "Insira seu sobrenome."
   },
   "use_registration_fields.error.required_password": {
-    "defaultMessage": "Creare una password."
+    "defaultMessage": "Crie uma senha."
   },
   "use_registration_fields.error.special_character": {
-    "defaultMessage": "La password deve contenere almeno un carattere speciale."
+    "defaultMessage": "A senha deve conter pelo menos 1 caractere especial."
   },
   "use_registration_fields.error.uppercase_letter": {
-    "defaultMessage": "La password deve contenere almeno una lettera maiuscola."
+    "defaultMessage": "A senha deve conter pelo menos 1 letra maiúscula."
   },
   "use_registration_fields.label.email": {
     "defaultMessage": "E-mail"
@@ -1354,57 +1354,57 @@
     "defaultMessage": "Nome"
   },
   "use_registration_fields.label.last_name": {
-    "defaultMessage": "Cognome"
+    "defaultMessage": "Sobrenome"
   },
   "use_registration_fields.label.password": {
-    "defaultMessage": "Password"
+    "defaultMessage": "Senha"
   },
   "use_registration_fields.label.sign_up_to_emails": {
-    "defaultMessage": "Iscrivimi alle email di Salesforce (puoi annullare l'iscrizione in qualsiasi momento)"
+    "defaultMessage": "Fazer o meu registro para receber e-mails da Salesforce (você pode cancelar sua inscrição quando quiser)"
   },
   "use_reset_password_fields.error.required_email": {
-    "defaultMessage": "Inserisci un indirizzo e-mail valido."
+    "defaultMessage": "Insira um endereço de e-mail válido."
   },
   "use_reset_password_fields.label.email": {
     "defaultMessage": "E-mail"
   },
   "use_update_password_fields.error.contain_number": {
-    "defaultMessage": "La password deve contenere almeno un numero."
+    "defaultMessage": "A senha deve conter pelo menos 1 número."
   },
   "use_update_password_fields.error.lowercase_letter": {
-    "defaultMessage": "La password deve contenere almeno una lettera minuscola."
+    "defaultMessage": "A senha deve conter pelo menos 1 letra minúscula."
   },
   "use_update_password_fields.error.minimum_characters": {
-    "defaultMessage": "La password deve contenere almeno 8 caratteri."
+    "defaultMessage": "A senha deve conter pelo menos 8 caracteres."
   },
   "use_update_password_fields.error.required_new_password": {
-    "defaultMessage": "Specifica una nuova password."
+    "defaultMessage": "Forneça uma nova senha."
   },
   "use_update_password_fields.error.required_password": {
-    "defaultMessage": "Inserisci la password."
+    "defaultMessage": "Insira sua senha."
   },
   "use_update_password_fields.error.special_character": {
-    "defaultMessage": "La password deve contenere almeno un carattere speciale."
+    "defaultMessage": "A senha deve conter pelo menos 1 caractere especial."
   },
   "use_update_password_fields.error.uppercase_letter": {
-    "defaultMessage": "La password deve contenere almeno una lettera maiuscola."
+    "defaultMessage": "A senha deve conter pelo menos 1 letra maiúscula."
   },
   "use_update_password_fields.label.current_password": {
-    "defaultMessage": "Password corrente"
+    "defaultMessage": "Senha atual"
   },
   "use_update_password_fields.label.new_password": {
-    "defaultMessage": "Nuova password"
+    "defaultMessage": "Nova senha"
   },
   "wishlist_primary_action.info.added_to_cart": {
-    "defaultMessage": "{quantity} {quantity, plural, one {articolo aggiunto} other {articoli aggiunti}} al carrello"
+    "defaultMessage": "{quantity} {quantity, plural, one {item} other {itens}} adicionado(s) ao carrinho"
   },
   "wishlist_secondary_button_group.action.remove": {
-    "defaultMessage": "Rimuovi"
+    "defaultMessage": "Remover"
   },
   "wishlist_secondary_button_group.info.item_removed": {
-    "defaultMessage": "Articolo rimosso dalla lista desideri"
+    "defaultMessage": "Item removido da wishlist"
   },
   "with_registration.info.please_sign_in": {
-    "defaultMessage": "Accedi per continuare!"
+    "defaultMessage": "Faça logon para continuar!"
   }
 }

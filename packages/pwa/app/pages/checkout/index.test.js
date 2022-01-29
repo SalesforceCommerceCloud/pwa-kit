@@ -11,7 +11,7 @@ import {screen, waitFor, waitForElementToBeRemoved, within} from '@testing-libra
 import user from '@testing-library/user-event'
 import {rest} from 'msw'
 import {setupServer} from 'msw/node'
-import {renderWithProviders} from '../../utils/test-utils'
+import {renderWithProviders, getPathname} from '../../utils/test-utils'
 import useShopper from '../../commerce-api/hooks/useShopper'
 import {
     ocapiBasketWithItem,
@@ -24,15 +24,14 @@ import {
     mockedCustomerProductLists,
     productsResponse
 } from '../../commerce-api/mock-data'
-import {getConfig} from '../../utils/utils'
 
 jest.setTimeout(60000)
 
 // Make sure fetch is defined in test env
 Object.defineProperty(window, 'fetch', {
-    value: require('node-fetch')
+    value: require('cross-fetch')
 })
-jest.mock('../../hooks/use-site')
+
 jest.mock('../../commerce-api/utils', () => {
     const originalModule = jest.requireActual('../../commerce-api/utils')
     return {
@@ -45,14 +44,6 @@ jest.mock('../../commerce-api/utils', () => {
             codeVerifier: 'test',
             redirectUri: 'http://localhost/test'
         })
-    }
-})
-
-jest.mock('../../utils/utils', () => {
-    const original = jest.requireActual('../../utils/utils')
-    return {
-        ...original,
-        getConfig: jest.fn()
     }
 })
 
@@ -72,10 +63,10 @@ const WrappedCheckout = () => {
     useShopper()
     return (
         <Switch>
-            <Route exact path="/en-GB/checkout">
+            <Route exact path={getPathname('/checkout')}>
                 <Checkout />
             </Route>
-            <Route exact path="/en-GB/checkout/confirmation">
+            <Route exact path={getPathname('/checkout/confirmation')}>
                 <div>success</div>
             </Route>
         </Switch>
@@ -169,9 +160,6 @@ const server = setupServer(
 
 // Set up and clean up
 beforeAll(() => {
-    getConfig.mockImplementation(() => ({
-        locale: 'path'
-    }))
     jest.resetModules()
     server.listen({onUnhandledRequest: 'error'})
 })
@@ -284,7 +272,7 @@ test('Can proceed through checkout steps as guest', async () => {
     )
 
     // Set the initial browser router path and render our component tree.
-    window.history.pushState({}, 'Checkout', '/en-GB/checkout')
+    window.history.pushState({}, 'Checkout', getPathname('/checkout'))
     renderWithProviders(<WrappedCheckout history={history} />)
 
     // Wait for checkout to load and display first step
@@ -515,7 +503,7 @@ test('Can proceed through checkout as registered customer', async () => {
     )
 
     // Set the initial browser router path and render our component tree.
-    window.history.pushState({}, 'Checkout', '/en-GB/checkout')
+    window.history.pushState({}, 'Checkout', getPathname('/checkout'))
     renderWithProviders(<WrappedCheckout history={history} />)
 
     // Switch to login
@@ -598,7 +586,7 @@ test('Can proceed through checkout as registered customer', async () => {
     user.click(placeOrderBtn)
 
     await waitFor(() => {
-        expect(window.location.pathname).toEqual('/en-GB/checkout/confirmation')
+        expect(window.location.pathname).toEqual(getPathname('/checkout/confirmation'))
     })
 })
 
@@ -672,7 +660,7 @@ test('Can edit address during checkout as a registered customer', async () => {
     )
 
     // Set the initial browser router path and render our component tree.
-    window.history.pushState({}, 'Checkout', '/en-GB/checkout')
+    window.history.pushState({}, 'Checkout', getPathname('/checkout'))
     renderWithProviders(<WrappedCheckout history={history} />)
 
     // Switch to login
@@ -799,7 +787,7 @@ test('Can add address during checkout as a registered customer', async () => {
     )
 
     // Set the initial browser router path and render our component tree.
-    window.history.pushState({}, 'Checkout', '/en-GB/checkout')
+    window.history.pushState({}, 'Checkout', getPathname('/checkout'))
     renderWithProviders(<WrappedCheckout history={history} />)
 
     // Switch to login

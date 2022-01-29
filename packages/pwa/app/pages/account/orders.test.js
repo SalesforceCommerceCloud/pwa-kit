@@ -10,7 +10,7 @@ import {screen} from '@testing-library/react'
 import user from '@testing-library/user-event'
 import {rest} from 'msw'
 import {setupServer} from 'msw/node'
-import {renderWithProviders} from '../../utils/test-utils'
+import {renderWithProviders, getPathname} from '../../utils/test-utils'
 import {
     mockedRegisteredCustomer,
     mockOrderHistory,
@@ -18,17 +18,6 @@ import {
 } from '../../commerce-api/mock-data'
 import useCustomer from '../../commerce-api/hooks/useCustomer'
 import Orders from './orders'
-import {getConfig} from '../../utils/utils'
-
-jest.mock('../../hooks/use-site')
-
-jest.mock('../../utils/utils', () => {
-    const original = jest.requireActual('../../utils/utils')
-    return {
-        ...original,
-        getConfig: jest.fn()
-    }
-})
 
 jest.mock('../../commerce-api/utils', () => {
     const originalModule = jest.requireActual('../../commerce-api/utils')
@@ -53,15 +42,13 @@ const MockedComponent = () => {
 
     return (
         <Switch>
-            <Route path="/en-GB/account/orders">
+            <Route path={getPathname('/account/orders')}>
                 <Orders />
             </Route>
         </Switch>
     )
 }
-beforeEach(() => {
-    jest.clearAllMocks()
-})
+
 const server = setupServer(
     rest.post('*/customers/actions/login', (req, res, ctx) =>
         res(
@@ -109,12 +96,10 @@ const server = setupServer(
 // Set up and clean up
 beforeEach(() => {
     jest.resetModules()
-    getConfig.mockImplementation(() => ({
-        locale: 'path'
-    }))
+
     server.listen({onUnhandledRequest: 'error'})
 
-    window.history.pushState({}, 'Account', '/en-GB/account/orders')
+    window.history.pushState({}, 'Account', getPathname('/account/orders'))
 })
 afterEach(() => {
     localStorage.clear()

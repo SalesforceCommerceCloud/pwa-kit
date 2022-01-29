@@ -28,6 +28,7 @@ import RegisterForm from '../components/register'
 import {useHistory} from 'react-router-dom'
 import {noop} from '../utils/utils'
 import {API_ERROR_MESSAGE} from '../constants'
+import {buildPathWithUrlConfig} from '../utils/url'
 
 const LOGIN_VIEW = 'login'
 const REGISTER_VIEW = 'register'
@@ -76,7 +77,8 @@ export const AuthModal = ({
     const handleRegister = async (data) => {
         try {
             await customer.registerCustomer(data)
-            history.push(`/${locale}/account`)
+            const path = buildPathWithUrlConfig('/account', {locale})
+            history.push(path)
         } catch (error) {
             form.setError('global', {type: 'manual', message: error.message})
         }
