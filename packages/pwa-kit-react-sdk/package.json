@@ -75,7 +75,7 @@
     "raf": "^3.4.0",
     "react-uid": "^2.2.0",
     "request": "^2.88.0",
-    "rimraf": "2.6.1",
+    "rimraf": "2.7.1",
     "serialize-javascript": "^6.0.0",
     "set-cookie-parser": "^2.2.1",
     "tti-polyfill": "0.2.2",
