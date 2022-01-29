@@ -39,7 +39,7 @@
     },
     "dependencies": {
         "@chakra-ui/react": "^1.7.1",
-        "@chakra-ui/skip-nav": "^1.1.4",
+        "@chakra-ui/skip-nav": "^1.2.1",
         "@emotion/react": "^11.1.5",
         "@emotion/styled": "^11.1.5",
         "base64-arraybuffer": "^0.2.0",
