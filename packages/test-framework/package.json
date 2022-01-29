@@ -24,7 +24,7 @@
     "chromedriver": "latest",
     "commander": "2.9.0",
     "lighthouse": "^6.0.0",
-    "nightwatch": "^1.7.11",
+    "nightwatch": "^2.0.1",
     "rimraf": "2.6.2"
   },
   "harp": {
