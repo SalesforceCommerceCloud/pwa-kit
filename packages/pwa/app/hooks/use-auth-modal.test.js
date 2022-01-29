@@ -7,7 +7,7 @@
 import React from 'react'
 import {screen, within, waitFor} from '@testing-library/react'
 import user from '@testing-library/user-event'
-import {renderWithProviders} from '../utils/test-utils'
+import {renderWithProviders, getPathname} from '../utils/test-utils'
 import {AuthModal, useAuthModal} from './use-auth-modal'
 import {BrowserRouter as Router, Route} from 'react-router-dom'
 import Account from '../pages/account'
@@ -125,7 +125,7 @@ const MockedComponent = () => {
         <Router>
             <button onClick={authModal.onOpen}>Open Modal</button>
             <AuthModal {...authModal} />
-            <Route path="/en-GB/account">
+            <Route path={getPathname('/account')}>
                 <Account match={match} />
             </Route>
         </Router>
@@ -245,6 +245,5 @@ test('Allows customer to create an account', async () => {
     user.click(withinForm.getByText(/create account/i))
 
     // wait for redirecting to account page
-    expect(await screen.findByText(/customer@test.com/i, {}, {timeout: 30000})).toBeInTheDocument()
-    expect(await screen.queryAllByText(/Log out/i, {}, {timeout: 30000}).length).toEqual(2)
+    expect(await screen.findByText(/welcome tester/i, {}, {timeout: 30000})).toBeInTheDocument()
 })

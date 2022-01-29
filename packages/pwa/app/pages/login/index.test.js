@@ -9,13 +9,12 @@ import {screen} from '@testing-library/react'
 import user from '@testing-library/user-event'
 import {rest} from 'msw'
 import {setupServer} from 'msw/node'
-import {renderWithProviders} from '../../utils/test-utils'
+import {renderWithProviders, getPathname} from '../../utils/test-utils'
 import Login from '.'
 import {BrowserRouter as Router, Route} from 'react-router-dom'
 import Account from '../account'
 import Registration from '../registration'
 import ResetPassword from '../reset-password'
-import {getConfig} from '../../utils/utils'
 
 jest.setTimeout(60000)
 
@@ -28,15 +27,6 @@ const mockRegisteredCustomer = {
     lastName: 'Testing',
     login: 'darek@test.com'
 }
-
-jest.mock('../../hooks/use-site')
-jest.mock('../../utils/utils', () => {
-    const original = jest.requireActual('../../utils/utils')
-    return {
-        ...original,
-        getConfig: jest.fn()
-    }
-})
 
 jest.mock('commerce-sdk-isomorphic', () => {
     const sdk = jest.requireActual('commerce-sdk-isomorphic')
@@ -103,13 +93,13 @@ const MockedComponent = () => {
     return (
         <Router>
             <Login />
-            <Route path="/en-GB/registration">
+            <Route path={getPathname('/registration')}>
                 <Registration />
             </Route>
-            <Route path="/en-GB/reset-password">
+            <Route path={getPathname('/reset-password')}>
                 <ResetPassword />
             </Route>
-            <Route path="/en-GB/account">
+            <Route path={getPathname('/account')}>
                 <Account match={match} />
             </Route>
         </Router>
@@ -120,9 +110,6 @@ const server = setupServer()
 
 // Set up and clean up
 beforeEach(() => {
-    getConfig.mockImplementation(() => ({
-        locale: 'path'
-    }))
     jest.resetModules()
     server.listen({
         onUnhandledRequest: 'error'

@@ -21,12 +21,14 @@ import {
 import {AddToCartModalContext} from '../hooks/use-add-to-cart-modal'
 import {commerceAPIConfig, einsteinAPIConfig} from '../api.config'
 import {IntlProvider} from 'react-intl'
+import {urlPartPositions} from '../constants'
 import {mockCategories as initialMockCategories} from '../commerce-api/mock-data'
 
 export const DEFAULT_LOCALE = 'en-GB'
 export const DEFAULT_CURRENCY = 'GBP'
 // Contexts
 import {CategoriesProvider, CurrencyProvider} from '../contexts'
+import {getUrlConfig} from './utils'
 
 export const renderWithReactIntl = (node, locale = DEFAULT_LOCALE) => {
     return render(
@@ -147,3 +149,16 @@ export const renderWithProviders = (children, options) =>
         wrapper: () => <TestProviders {...options?.wrapperProps}>{children}</TestProviders>,
         ...options
     })
+
+/**
+ * This is used to obtain the URL pathname that would include
+ * or not include the locale shortcode in the URL according to
+ * the locale type configuration set in the pwa-kit.config.json
+ * file.
+ * @param path The pathname that we want to use
+ * @returns {`${string|string}${string}`} URL pathname for the given path
+ */
+export const getPathname = (path) => {
+    const {locale: localeType} = getUrlConfig()
+    return `${localeType === urlPartPositions.PATH ? `/${DEFAULT_LOCALE}` : ''}${path}`
+}
