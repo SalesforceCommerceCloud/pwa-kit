@@ -38,7 +38,7 @@
         }
     },
     "dependencies": {
-        "@chakra-ui/react": "^1.7.1",
+        "@chakra-ui/react": "^1.7.4",
         "@chakra-ui/skip-nav": "^1.1.4",
         "@emotion/react": "^11.1.5",
         "@emotion/styled": "^11.1.5",
