@@ -17,11 +17,11 @@ import {getConfig} from './utils'
 export const configureRoutes = (routes = [], {ignoredRoutes = []}) => {
     if (!routes.length) return []
 
-    const hosts = getConfig('app.hosts')
+    const hosts = getConfig('app.routing.hosts')
     const currentHost = getCurrentHost()
 
     // collect and flatten the result to get a list of site objects
-    const allSites = hosts.find((host) => host.domain.includes(currentHost))?.sites
+    const allSites = hosts.find((host) => host.domain.includes(currentHost))?.siteMaps
 
     // get a collection of all site-id and site alias from the config of the current host
     // remove any duplicates
@@ -35,12 +35,12 @@ export const configureRoutes = (routes = [], {ignoredRoutes = []}) => {
         )
     ]
     // get a collection of all locale-id and locale alias from the config of the current host
-    // remove any duplicates
+    // remove any duplicates by using [...new Set([])]
     const locales = [
         ...new Set(
             allSites
-                ?.reduce((res, site) => {
-                    const {supportedLocales} = site.l10n
+                .reduce((res, {id}) => {
+                    const supportedLocales = getConfig(`app.sites.${id}.supportedLocales`)
                     supportedLocales.forEach((locale) => {
                         res = [...res, locale.id, locale.alias]
                     })
@@ -49,6 +49,7 @@ export const configureRoutes = (routes = [], {ignoredRoutes = []}) => {
                 .filter(Boolean)
         )
     ]
+
     let outputRoutes = []
     for (let i = 0; i < routes.length; i++) {
         const {path, ...rest} = routes[i]

@@ -124,12 +124,12 @@ export const getSiteByPath = (path, sites) => {
 export const getSitesByHost = (hostname) => {
     if (!hostname) return
     const hosts = getHosts()
-    const sites = hosts.find((host) => host.domain.includes(hostname))?.sites
+    const sites = hosts.find((host) => host.domain.includes(hostname))?.siteMaps
     return sites
 }
 
 /**
- * Get the sites config from pwa-kit.config.json
- * @returns {array} - list of site objects
+ * Get the hosts config from pwa-kit.config.json
+ * @returns {array} - list of hosts
  */
-export const getHosts = () => getConfig('app.hosts')
+export const getHosts = () => getConfig('app.routing.hosts')
