@@ -6,7 +6,7 @@
  */
 
 import {HOME_HREF} from '../constants'
-import {getUrlConfig} from './url-config'
+import {getUrlConfig, resolveConfigFromUrl} from './url-config'
 import {urlPartPositions} from '../constants'
 import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
 import {getDefaultSiteIdByHost} from './site-utils'
@@ -209,25 +209,18 @@ export const getUrlWithLocale = (shortCode, opts = {}) => {
 
 /**
  * Builds the Home page URL for a given locale and site.
- * locale and site wil be shown at all times except when both of them are default values
  *
- * '/' default locale & site
- * '/global/it-IT', '/?locale=it-IT&site=global' non-default locale, default site
- * '/us', '/?site=us  default locale, non-default site
- * '/us/it-IT' '/?locale=it-IT&site=us' non-default locale, non-default site
  * @param homeHref
  * @param options
  * @returns {string}
  */
 export const homeUrlBuilder = (homeHref, options = {}) => {
     const {locale, site} = options
-    const {hostname} = new URL(getAppOrigin())
-    const defaultSiteId = getDefaultSiteIdByHost(hostname)
-    const {l10n} = site
-    const defaultLocale = l10n.defaultLocale
+    const {url} = resolveConfigFromUrl(homeHref)
     const updatedUrl = buildPathWithUrlConfig(homeHref, {
-        locale: site?.id === defaultSiteId && locale === defaultLocale ? '' : locale,
-        site: site?.id === defaultSiteId && locale === defaultLocale ? '' : site?.alias
+        locale,
+        site: site.alias || site.id,
+        url
     })
     return encodeURI(updatedUrl)
 }

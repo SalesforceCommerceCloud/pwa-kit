@@ -136,8 +136,8 @@ export const getHosts = () => getConfig('app.routing.hosts')
 
 /**
  * this function takes an id,
- * and use it to look up a site data (from multiple places) (id, alias, locales etc)
- * and return site as a single object
+ * and use it to look up a site data at multiple places (id, alias, locales etc)
+ * from the config and return site as a single object
  * @param id - site id to look from
  * @return {object} - a site object
  * @example getSiteById('RefArch')

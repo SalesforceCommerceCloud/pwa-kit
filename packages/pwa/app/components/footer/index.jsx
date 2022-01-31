@@ -37,7 +37,7 @@ const Footer = ({...otherProps}) => {
     const intl = useIntl()
     const [locale, setLocale] = useState(intl.locale)
     const site = useSite()
-    const supportedLocaleIds = getSupportedLocalesIds(site.supportedLocales)
+    const supportedLocaleIds = getSupportedLocalesIds(site.l10n.supportedLocales)
     const showLocaleSelector = supportedLocaleIds?.length > 1
 
     return (
@@ -146,14 +146,16 @@ const Footer = ({...otherProps}) => {
                                     variant="filled"
                                     {...styles.localeDropdown}
                                 >
-                                    {getSupportedLocalesIds(site.supportedLocales).map((locale) => (
-                                        <LocaleText
-                                            as="option"
-                                            value={locale}
-                                            shortCode={locale}
-                                            key={locale}
-                                        />
-                                    ))}
+                                    {getSupportedLocalesIds(site.l10n.supportedLocales).map(
+                                        (locale) => (
+                                            <LocaleText
+                                                as="option"
+                                                value={locale}
+                                                shortCode={locale}
+                                                key={locale}
+                                            />
+                                        )
+                                    )}
                                 </Select>
                             </FormControl>
                         </Box>

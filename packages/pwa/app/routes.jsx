@@ -105,7 +105,7 @@ const routes = [
 ]
 
 const configuredRoutes = configureRoutes(routes, {
-    ignoredRoutes: [HOME_HREF, '/callback', '*']
+    ignoredRoutes: ['/callback', '*']
 })
 
 export default configuredRoutes

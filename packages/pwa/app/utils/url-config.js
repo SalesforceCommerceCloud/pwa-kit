@@ -26,14 +26,20 @@ export const resolveConfigFromUrl = (path) => {
     const {site: currentSite, locale: currentLocale} = getParamsFromPath(path, urlConfig)
     const {hostname} = new URL(getAppOrigin())
     const siteMaps = getSiteMapsByHost(hostname)
+    // get the current siteMap
     const siteMap = siteMaps.find((site) => site.id === currentSite || site.alias === currentSite)
+    // use the id to get the site
     const site = siteMap ? getSiteById(siteMap.id) : getDefaultSite()
-    const locale = currentLocale
-        ? site.l10n.supportedLocales.find((locale) => locale.id === currentLocale)
-        : site.l10n.supportedLocales.find((locale) => locale.id === site.l10n.defaultLocale)
+    // get the default locale from supportedLocale
+    const defaultLocale = site.l10n.supportedLocales.find(
+        (locale) => locale.id === site.l10n.defaultLocale
+    )
+    // if a locale is found from supported locales based on currentLocale, use it, otherwise, use default
+    const supportedLocale = site.l10n.supportedLocales.find((locale) => locale.id === currentLocale)
+    const locale = supportedLocale ? supportedLocale : defaultLocale
     return {
-        site: site.alias,
-        locale: locale.id,
+        site: site.alias || site.id,
+        locale: locale?.id,
         url: urlConfig
     }
 }
