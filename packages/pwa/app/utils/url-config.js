@@ -50,6 +50,7 @@ export const resolveConfigFromUrl = (path) => {
  * If the showDefault flag is set to false, the default value won't show up in the url
  * @param {string} relativeUrl - the base relative Url to be reconstructed on
  * @param {object} configValues - object that contains values of url param config
+ * @param {object} opts - options
  * @return {string} - an output path that has locale and site
  *
  * @example

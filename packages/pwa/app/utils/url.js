@@ -135,7 +135,10 @@ export const getUrlWithLocale = (shortCode, opts = {}) => {
 
     // sanitize the locale/site from the current Url
     pathname = pathname.replace(`/${site}`, '').replace(`/${locale}`, '')
-    search = search.replace(`locale=${locale}`, '').replace(`site=${site}`, '')
+    search = search
+        .replace(`locale=${locale}`, '')
+        .replace(`site=${site}`, '')
+        .replace(/&$/, '')
     // rebuild the url with new locale
     const newUrl = buildPathWithUrlConfig(
         `${pathname}${search}`,
