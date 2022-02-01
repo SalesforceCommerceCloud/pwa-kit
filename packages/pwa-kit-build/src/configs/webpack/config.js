@@ -37,8 +37,9 @@ if ([production, development].indexOf(mode) < 0) {
 }
 
 const entryPointExists = (segments) => {
-    for (let ext of ['js', 'jsx', 'ts', 'tsx']) {
-        if (fs.existsSync(path.resolve(projectDir, ...[segments].concat([ext])))) {
+    for (let ext of ['.js', '.jsx', '.ts', '.tsx']) {
+        const p = path.resolve(projectDir, ...segments) + ext
+        if (fs.existsSync(p)) {
             return true
         }
     }
@@ -206,7 +207,7 @@ const withChunking = (config) => {
 }
 
 const client =
-    entryPointExists('app', 'main') &&
+    entryPointExists(['app', 'main']) &&
     baseConfig('web')
         .extend(withChunking)
         .extend((config) => {
@@ -302,7 +303,7 @@ const ssr = (() => {
 })()
 
 const requestProcessor =
-    entryPointExists('app', 'request-processor') &&
+    entryPointExists(['app', 'request-processor']) &&
     baseConfig('node')
         .extend((config) => {
             return {
