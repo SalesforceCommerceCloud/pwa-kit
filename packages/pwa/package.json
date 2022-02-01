@@ -83,7 +83,7 @@
         "whatwg-fetch": "1.0.0"
     },
     "scripts": {
-        "analyze-build": "cross-env MOBIFY_ANALYZE=true npm run prod:build",
+        "analyze-build": "cross-env MOBIFY_ANALYZE=true npm run build",
         "build-translations": "npm run extract-default-translations && npm run compile-translations",
         "compile-translations": "formatjs compile-folder --ast app/translations app/translations/compiled",
         "compile-translations:pseudo": "formatjs compile --ast app/translations/$npm_package_l10n_defaultLocale.json --out-file app/translations/compiled/en-XB.json --pseudo-locale en-XB",
@@ -91,8 +91,8 @@
         "format": "mrt format '\"**/*.{js,jsx}\"'",
         "lint": "mrt lint '\"**/*.{js,jsx}\"'",
         "lint:fix": "npm run lint -- --fix",
-        "prod:build": "npm run build-translations && mrt build",
-        "push": "npm run prod:build && mrt push",
+        "build": "npm run build-translations && mrt build",
+        "push": "npm run build && mrt push",
         "save-credentials": "mrt save-credentials",
         "start": "cross-env NODE_ICU_DATA=node_modules/full-icu mrt start",
         "start:inspect": "npm run start -- --inspect",

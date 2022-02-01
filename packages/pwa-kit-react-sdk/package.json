@@ -23,8 +23,8 @@
     "directory": "dist"
   },
   "scripts": {
-    "prepare": "npm run prod:build",
-    "prod:build": "cross-env NODE_ENV=production internal-lib-build build",
+    "prepare": "npm run build",
+    "build": "cross-env NODE_ENV=production internal-lib-build build",
     "dev:watch": "watch 'npm run dev:build' src/",
     "lint": "npm run lint:js",
     "lint:fix": "npm run lint:js -- --fix",

@@ -31,7 +31,7 @@ const main = (opts) => {
         /^push$/,
         /^save-credentials$/,
         /^format$/,
-        /^prod:build$/,
+        /^build$/,
         /^start.*$/,
         /^compile-translations.*$/,
         /^extract-default-translations.*$/,

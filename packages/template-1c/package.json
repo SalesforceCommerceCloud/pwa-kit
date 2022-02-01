@@ -21,8 +21,8 @@
         "save-credentials": "mrt save-credentials",
         "start": "mrt start",
         "test": "mrt test",
-        "prod:build": "mrt build",
-        "push": "npm run prod:build && mrt push"
+        "build": "mrt build",
+        "push": "npm run build && mrt push"
     },
     "mobify": {
         "ssrEnabled": true,

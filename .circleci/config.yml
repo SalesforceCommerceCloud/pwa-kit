@@ -279,7 +279,7 @@ jobs:
                 node packages/pwa-kit-create-app/scripts/create-mobify-app-dev.js --outputDir /tmp/project
 
             cd /tmp/project
-            npm run prod:build
+            npm run build
       - run:
           name: Generate hello-world project
           environment:

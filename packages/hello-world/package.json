@@ -13,7 +13,7 @@
         "lint": "mrt lint '\"**/*.{js,jsx}\"'",
         "lint:fix": "npm run lint -- --fix",
         "start": "mrt start",
-        "prod:build": "mrt build",
+        "build": "mrt build",
         "push": "mrt push",
         "save-credentials": "mrt save-credentials"
     },
