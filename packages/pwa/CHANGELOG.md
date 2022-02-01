@@ -1,4 +1,5 @@
-## v1.4.0-dev (Jan 06, 2022)
+## v1.5.0-dev (Jan 28, 2022)
+## v1.4.0 (Jan 27, 2022)
 
 -  Do not send HSTS header during local development [#288](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/288)
 -   Add constants for `<meta>` tags `theme-color` and `apple-mobile-web-app-title` [#287](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/287)
