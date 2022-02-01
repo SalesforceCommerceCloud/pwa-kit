@@ -5,11 +5,8 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {HOME_HREF} from '../constants'
-import {getUrlConfig, resolveConfigFromUrl} from './url-config'
-import {urlPartPositions} from '../constants'
+import {resolveConfigFromUrl} from './url-config'
 import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
-import {getDefaultSiteIdByHost} from './site-utils'
 import {buildPathWithUrlConfig} from './url-config'
 
 /**
@@ -132,79 +129,20 @@ export const searchUrlBuilder = (searchTerm) => `/search?q=${searchTerm}`
  * @returns {string} - The relative URL for the specific locale.
  */
 export const getUrlWithLocale = (shortCode, opts = {}) => {
-    const urlConfig = getUrlConfig()
     const location = opts.location ? opts.location : window.location
-    const {disallowParams = [], site} = opts
-    let relativeUrl = location.pathname
+    const {site, locale, url} = resolveConfigFromUrl(`${location.pathname}${location.search}`)
+    let {pathname, search} = location
 
-    const params = new URLSearchParams(location.search)
-
-    // Remove any disallowed params.
-    if (disallowParams.length) {
-        disallowParams.forEach((param) => {
-            params.delete(param)
-        })
-    }
-    let paths = relativeUrl.split('/').filter((path) => path !== '')
-    const siteValue = site.alias || site.id
-    const localePosition = urlConfig.locale
-    const sitePosition = urlConfig.site
-    if (relativeUrl === HOME_HREF) {
-        relativeUrl = buildPathWithUrlConfig(relativeUrl, {
-            locale: shortCode,
-            site: siteValue,
-            url: urlConfig
-        })
-        return relativeUrl
-    }
-
-    if (urlConfig.showDefault) {
-        if (localePosition === urlPartPositions.PATH && sitePosition === urlPartPositions.PATH) {
-            paths.splice(1, 1, shortCode)
-        } else if (localePosition === urlPartPositions.PATH) {
-            paths.splice(0, 1, shortCode)
-        } else if (localePosition === urlPartPositions.QUERY_PARAM) {
-            params.set('locale', shortCode)
-        }
-
-        relativeUrl = `/${paths.join('/')}${Array.from(params).length > 0 ? `?${params}` : ''}`
-    } else if (!urlConfig.showDefault) {
-        if (localePosition === urlPartPositions.PATH && sitePosition === urlPartPositions.PATH) {
-            // when the site is not shown, it means default site and locale are being used
-            // now we switch to a non-default locale, we need to append both site and locale to the url
-            if (!paths.includes(siteValue)) {
-                paths.unshift(siteValue, shortCode)
-            } else {
-                paths.splice(1, 1, shortCode)
-            }
-        } else if (
-            localePosition === urlPartPositions.PATH &&
-            sitePosition === urlPartPositions.QUERY_PARAM
-        ) {
-            // when the site is not shown on the url, it means default one is being used
-            // we need to set it up again for non-default locale
-            if (!params.get('site')) {
-                params.set('site', siteValue)
-            }
-            paths.unshift(shortCode)
-        } else if (localePosition === urlPartPositions.QUERY_PARAM) {
-            // when the site is not shown on the url, it means default one is being used
-            // we need to set it up again for non-default locale
-            if (sitePosition === urlPartPositions.QUERY_PARAM) {
-                if (!params.get('site')) {
-                    params.set('site', siteValue)
-                }
-            } else if (sitePosition === urlPartPositions.PATH) {
-                if (!paths.includes(siteValue)) {
-                    paths.unshift(siteValue)
-                }
-            }
-            params.set('locale', shortCode)
-        }
-        relativeUrl = `/${paths.join('/')}${Array.from(params).length > 0 ? `?${params}` : ''}`
-    }
-
-    return relativeUrl
+    // sanitize the locale/site from the current Url
+    pathname = pathname.replace(`/${site}`, '').replace(`/${locale}`, '')
+    search = search.replace(`locale=${locale}`, '').replace(`site=${site}`, '')
+    // rebuild the url with new locale
+    const newUrl = buildPathWithUrlConfig(
+        `${pathname}${search}`,
+        {site, url, locale: shortCode},
+        opts
+    )
+    return newUrl
 }
 
 /**

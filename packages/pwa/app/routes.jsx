@@ -17,7 +17,6 @@ import loadable from '@loadable/component'
 
 // Components
 import {Skeleton} from '@chakra-ui/react'
-import {HOME_HREF} from './constants'
 import {configureRoutes} from './utils/routes-utils'
 
 const fallback = <Skeleton height="75vh" width="100%" />

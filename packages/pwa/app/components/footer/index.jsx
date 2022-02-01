@@ -133,14 +133,9 @@ const Footer = ({...otherProps}) => {
                                 <Select
                                     value={locale}
                                     onChange={({target}) => {
-                                        setLocale(target.value)
-
-                                        // Update the `locale` in the URL.
-                                        const newUrl = getUrlWithLocale(target.value, {
-                                            disallowParams: ['refine'],
-                                            site
-                                        })
-
+                                        const newLocale = target.value
+                                        setLocale(newLocale)
+                                        const newUrl = getUrlWithLocale(newLocale)
                                         window.location = newUrl
                                     }}
                                     variant="filled"

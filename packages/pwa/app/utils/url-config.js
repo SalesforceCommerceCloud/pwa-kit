@@ -48,9 +48,9 @@ export const resolveConfigFromUrl = (path) => {
  * Rebuild the path with locale/site value to the path as url path or url query param
  * based on url config.
  * If the showDefault flag is set to false, the default value won't show up in the url
- * @param {string} path - the input path
+ * @param {string} relativeUrl - the base relative Url to be reconstructed on
  * @param {object} configValues - object that contains values of url param config
- * @return {string} - an output path
+ * @return {string} - an output path that has locale and site
  *
  * @example
  * //pwa-kit.config.json
@@ -73,11 +73,22 @@ export const resolveConfigFromUrl = (path) => {
  * => /global/women/dresses?locale=en-GB
  *
  */
-export const buildPathWithUrlConfig = (path, configValues = {}) => {
+export const buildPathWithUrlConfig = (relativeUrl, configValues = {}, opts = {}) => {
     const urlConfig = configValues.url
-    if (!Object.values(urlConfig).length) return path
-    if (!Object.values(configValues).length) return path
-    const queryParams = {}
+    const {disallowParams = []} = opts
+    if (!Object.values(urlConfig).length) return relativeUrl
+    if (!Object.values(configValues).length) return relativeUrl
+    const [pathname, search] = relativeUrl.split('?')
+
+    const params = new URLSearchParams(search)
+    // Remove any disallowed params.
+    if (disallowParams.length) {
+        disallowParams.forEach((param) => {
+            params.delete(param)
+        })
+    }
+
+    const queryParams = {...Object.fromEntries(params)}
     let basePathSegments = []
     const showDefault = urlConfig.showDefault
     const {defaultLocaleVal, defaultSiteVal} = getDefaultSiteValues()
@@ -89,7 +100,7 @@ export const buildPathWithUrlConfig = (path, configValues = {}) => {
         defaultSiteVal.includes(configValues.site) &&
         !showDefault
     ) {
-        return path
+        return relativeUrl
     }
     options.forEach((option) => {
         const position = urlConfig[option]
@@ -103,7 +114,9 @@ export const buildPathWithUrlConfig = (path, configValues = {}) => {
     })
     // filter out falsy values in the array
     basePathSegments = basePathSegments.filter(Boolean)
-    let updatedPath = `${basePathSegments.length ? `/${basePathSegments.join('/')}` : ''}${path}`
+    let updatedPath = `${
+        basePathSegments.length ? `/${basePathSegments.join('/')}` : ''
+    }${pathname}`
     // append the query param to pathname
     if (Object.keys(queryParams).length) {
         updatedPath = rebuildPathWithParams(updatedPath, queryParams)
