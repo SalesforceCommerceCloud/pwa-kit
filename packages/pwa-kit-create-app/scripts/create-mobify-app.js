@@ -177,7 +177,7 @@ const runGenerator = (answers, {outputDir}) => {
         p.resolve(outputDir, 'app', 'api.config.js')
     )
 
-    console.log('Installing dependencies for the generated project (this can take a while)')
+    console.log('Installing dependencies for the generated project...')
     sh.exec(`npm install --no-progress`, {
         env: process.env,
         cwd: outputDir,
@@ -224,23 +224,21 @@ const retailReactAppPrompts = () => {
         {
             name: 'projectId',
             validate: validProjectId,
-            message: 'What is your project ID (example-project) in Managed Runtime Admin?'
+            message: 'What is the name of your Project?'
         },
         {
             name: 'instanceUrl',
-            message:
-                'What is the URL (https://example_instance_id.sandbox.us01.dx.commercecloud.salesforce.com) for your B2C Commerce instance?',
+            message: 'What is the URL for your Commerce Cloud instance?',
             validate: validUrl
         },
         {
             name: 'clientId',
-            message: 'What is your API client ID?',
+            message: 'What is your Commerce API client ID in Account Manager?',
             validate: validClientId
         },
         {
             name: 'siteId',
-            message:
-                "What is your site's ID (examples: RefArch, RefArchGlobal) in Business Manager?",
+            message: "What is your site's ID in Business Manager?",
             validate: validSiteId
         },
         {
@@ -355,7 +353,7 @@ const generateHelloWorld = ({projectId}, {outputDir}) => {
     const finalPkgData = merge(pkgJSON, {name: projectId})
     writeJson(pkgJsonPath, finalPkgData)
 
-    console.log('Installing dependencies for the generated project (this can take a while)')
+    console.log('Installing dependencies for the generated project...')
     sh.exec(`npm install --no-progress`, {
         env: process.env,
         cwd: outputDir,
@@ -367,9 +365,18 @@ const presetPrompt = () => {
     const questions = [
         {
             name: 'preset',
-            message: 'Choose a project preset to get started:',
+            message: 'Choose a project to get started:',
             type: 'list',
-            choices: PUBLIC_PRESETS
+            choices: [
+                {
+                    name: 'The Retail app with demo Commerce Cloud sandbox',
+                    value: RETAIL_REACT_APP_DEMO
+                },
+                {
+                    name: 'The Retail app using your own Commerce Cloud sandbox',
+                    value: RETAIL_REACT_APP
+                }
+            ]
         }
     ]
     return inquirer.prompt(questions).then((answers) => answers['preset'])
