@@ -42,6 +42,7 @@ const {URL} = require('url')
 const deepmerge = require('deepmerge')
 const sh = require('shelljs')
 const tar = require('tar')
+const slugify = require('slugify')
 const generatorPkg = require('../package.json')
 
 const program = new Command()
@@ -49,6 +50,7 @@ const program = new Command()
 sh.set('-e')
 
 const GENERATED_PROJECT_VERSION = '0.0.1'
+const PROJECT_ID_MAX_LENGTH = 20
 
 const HELLO_WORLD_TEST_PROJECT = 'hello-world-test-project'
 const HELLO_WORLD = 'hello-world'
@@ -186,9 +188,9 @@ const runGenerator = (answers, {outputDir}) => {
 }
 
 const retailReactAppPrompts = () => {
-    const validProjectId = (s) =>
-        /^[a-z0-9-]{1,20}$/.test(s) ||
-        'Value can only contain lowercase letters, numbers, and hyphens.'
+    const validProjectName = (s) =>
+        /^[a-zA-Z0-9-\s]{1,20}$/.test(s) ||
+        'Value can only contain letters, numbers, space and hyphens.'
 
     const validUrl = (s) => {
         try {
@@ -222,8 +224,8 @@ const retailReactAppPrompts = () => {
 
     const questions = [
         {
-            name: 'projectId',
-            validate: validProjectId,
+            name: 'projectName',
+            validate: validProjectName,
             message: 'What is the name of your Project?'
         },
         {
@@ -262,8 +264,15 @@ const retailReactAppPrompts = () => {
     return inquirer.prompt(questions).then((answers) => buildAnswers(answers))
 }
 
+const slugifyName = (projectName) => {
+    return slugify(projectName, {
+        lower: true,
+        strict: true
+    }).slice(0, PROJECT_ID_MAX_LENGTH)
+}
+
 const buildAnswers = ({
-    projectId,
+    projectName,
     instanceUrl,
     clientId,
     siteId,
@@ -272,6 +281,8 @@ const buildAnswers = ({
     einsteinId,
     einsteinSiteId
 }) => {
+    const projectId = slugifyName(projectName)
+
     return {
         globals: {projectId},
         'scaffold-pwa': {
@@ -304,7 +315,7 @@ const buildAnswers = ({
 
 const testProjectAnswers = () => {
     const config = {
-        projectId: 'scaffold-pwa',
+        projectName: 'scaffold-pwa',
         instanceUrl: 'https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com',
         clientId: 'c9c45bfd-0ed3-4aa2-9971-40f88962b836',
         siteId: 'RefArch',
@@ -319,7 +330,7 @@ const testProjectAnswers = () => {
 
 const demoProjectAnswers = () => {
     const config = {
-        projectId: 'demo-storefront',
+        projectName: 'demo-storefront',
         instanceUrl: 'https://zzte-053.sandbox.us02.dx.commercecloud.salesforce.com/',
         clientId: '1d763261-6522-4913-9d52-5d947d3b94c4',
         siteId: 'RefArch',
@@ -333,20 +344,20 @@ const demoProjectAnswers = () => {
 }
 
 const helloWorldPrompts = () => {
-    const validProjectId = (s) =>
-        /^[a-z0-9-]{1,20}$/.test(s) ||
-        'Value can only contain lowercase letters, numbers, and hyphens.'
+    const validProjectName = (s) =>
+        /^[a-zA-Z0-9-\s]{1,20}$/.test(s) ||
+        'Value can only contain letters, numbers, space and hyphens.'
     const questions = [
         {
-            name: 'projectId',
-            validate: validProjectId,
-            message: 'What is your project ID (example-project) in Managed Runtime Admin?'
+            name: 'projectName',
+            validate: validProjectName,
+            message: 'What is the name of your Project?'
         }
     ]
     return inquirer.prompt(questions)
 }
 
-const generateHelloWorld = ({projectId}, {outputDir}) => {
+const generateHelloWorld = (projectId, {outputDir}) => {
     extractTemplate('hello-world', outputDir)
     const pkgJsonPath = p.resolve(outputDir, 'package.json')
     const pkgJSON = readJson(pkgJsonPath)
@@ -409,9 +420,10 @@ const main = (opts) => {
                 case HELLO_WORLD_TEST_PROJECT:
                     return generateHelloWorld({projectId: 'hello-world'}, opts)
                 case HELLO_WORLD:
-                    return helloWorldPrompts(opts).then((answers) =>
-                        generateHelloWorld(answers, opts)
-                    )
+                    return helloWorldPrompts(opts).then((answers) => {
+                        const projectId = slugifyName(answers.projectName)
+                        generateHelloWorld(projectId, opts)
+                    })
                 case TEST_PROJECT:
                     return runGenerator(testProjectAnswers(), opts)
                 case RETAIL_REACT_APP_DEMO:
