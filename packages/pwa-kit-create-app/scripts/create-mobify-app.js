@@ -235,12 +235,12 @@ const retailReactAppPrompts = () => {
         },
         {
             name: 'clientId',
-            message: 'What is your Commerce API client ID in Account Manager?',
+            message: 'What is your SLAS API Client ID in Account Manager?',
             validate: validClientId
         },
         {
             name: 'siteId',
-            message: "What is your site's ID in Business Manager?",
+            message: 'What is your Site ID in Business Manager?',
             validate: validSiteId
         },
         {
