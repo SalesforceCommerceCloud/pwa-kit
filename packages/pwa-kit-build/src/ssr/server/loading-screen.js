@@ -88,10 +88,6 @@ export const loadingScreen = () => {
                 <div class="panel">
                     <p class="fade-in fade-in-0">Compiling Javascript...</p>
                     <p class="fade-in fade-in-1">Optimizing assets...</p>
-                    <p class="fade-in fade-in-2">Establishing trust...</p>
-                    <p class="fade-in fade-in-3">Facilitating change...</p>
-                    <p class="fade-in fade-in-4">Daring to dream...</p>
-                    <p class="fade-in fade-in-5">Filing Security Assessments...</p>
                 </div>
             </div>
             <script>
