@@ -384,7 +384,7 @@ const presetPrompt = () => {
                     value: RETAIL_REACT_APP_DEMO
                 },
                 {
-                   name: 'The Retail app using your own Commerce Cloud instance',
+                    name: 'The Retail app using your own Commerce Cloud instance',
                     value: RETAIL_REACT_APP
                 }
             ]
