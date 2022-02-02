@@ -59,12 +59,35 @@ app.use(
     })
 )
 
+/**
+ *
+ * @param {*} instance - the config instance indicator.
+ * @returns object - the configuration
+ */
+const getConfig = async (instance) => {
+    if (instance) {
+        process.env.NODE_APP_INSTANCE = instance
+    }
+
+    const {default: config} = await import('config')
+
+    return config
+}
+
 // Handle the redirect from SLAS as to avoid error
 app.get('/callback?*', (req, res) => {
     res.send()
 })
 app.get('/robots.txt', serveStaticFile('static/robots.txt'))
-app.get('/*', render)
+app.get('/*', async (req, res, next) => {
+    // Add the config to the locals which we will write to the html later.
+    // If you have multiple instances that share the same configuration file you
+    // can customize the code below. There is a lot of information here.
+    // https://github.com/lorenwest/node-config/wiki/Configuration-Files
+    res.locals.config = await getConfig('eu')
+
+    return render(req, res, next)
+})
 
 // SSR requires that we export a single handler function called 'get', that
 // supports AWS use of the server that we created above.

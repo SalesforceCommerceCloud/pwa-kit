@@ -4,7 +4,7 @@
     "license": "See license in LICENSE",
     "private": true,
     "mobify": {
-        "externals": [],
+        "externals": ["config"],
         "pageNotFoundURL": "/page-not-found",
         "ssrEnabled": true,
         "ssrOnly": [
@@ -99,6 +99,7 @@
         "babel-plugin-formatjs": "^10.2.3",
         "bundlesize2": "^0.0.30",
         "commander": "^2.20.0",
+        "config": "^3.3.7",
         "cross-env": "^5.2.0",
         "cross-spawn": "^6.0.5",
         "eslint": "7.31.0",
