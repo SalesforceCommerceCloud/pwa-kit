@@ -50,6 +50,7 @@ const program = new Command()
 sh.set('-e')
 
 const GENERATED_PROJECT_VERSION = '0.0.1'
+
 const PROJECT_ID_MAX_LENGTH = 20
 
 const HELLO_WORLD_TEST_PROJECT = 'hello-world-test-project'
@@ -187,10 +188,19 @@ const runGenerator = (answers, {outputDir}) => {
     })
 }
 
+const slugifyName = (projectName) => {
+    return slugify(projectName, {
+        lower: true,
+        strict: true
+    }).slice(0, PROJECT_ID_MAX_LENGTH)
+}
+
+const validProjectName = (s) => {
+    const regex = new RegExp(`^[a-zA-Z0-9-\\s]{1,${PROJECT_ID_MAX_LENGTH}}$`)
+    return regex.test(s) || 'Value can only contain letters, numbers, space and hyphens.'
+}
+
 const retailReactAppPrompts = () => {
-    const validProjectName = (s) =>
-        /^[a-zA-Z0-9-\s]{1,20}$/.test(s) ||
-        'Value can only contain letters, numbers, space and hyphens.'
 
     const validUrl = (s) => {
         try {
@@ -250,13 +260,6 @@ const retailReactAppPrompts = () => {
     ]
 
     return inquirer.prompt(questions).then((answers) => buildAnswers(answers))
-}
-
-const slugifyName = (projectName) => {
-    return slugify(projectName, {
-        lower: true,
-        strict: true
-    }).slice(0, PROJECT_ID_MAX_LENGTH)
 }
 
 const buildAnswers = ({
@@ -332,9 +335,6 @@ const demoProjectAnswers = () => {
 }
 
 const helloWorldPrompts = () => {
-    const validProjectName = (s) =>
-        /^[a-zA-Z0-9-\s]{1,20}$/.test(s) ||
-        'Value can only contain letters, numbers, space and hyphens.'
     const questions = [
         {
             name: 'projectName',
