@@ -208,8 +208,6 @@ const retailReactAppPrompts = () => {
     // https://developer.salesforce.com/docs/commerce/commerce-api/guide/commerce-api-configuration-values.
     const defaultCommerceAPIError =
         'Invalid format. Use docs to find more information about valid configurations: https://developer.salesforce.com/docs/commerce/commerce-api/guide/commerce-api-configuration-values'
-    const defaultEinsteinAPIError =
-        'Invalid format. Use docs to find more information about valid configurations: https://developer.salesforce.com/docs/commerce/einstein-api/references#einstein-recommendations:Summary'
     const validShortCode = (s) => /(^[0-9A-Z]{8}$)/i.test(s) || defaultCommerceAPIError
     const validClientId = (s) =>
         /(^[0-9A-Z]{8}-[0-9A-Z]{4}-[0-9A-Z]{4}-[0-9A-Z]{4}-[0-9A-Z]{12}$)/i.test(s) ||
@@ -217,10 +215,6 @@ const retailReactAppPrompts = () => {
         defaultCommerceAPIError
     const validOrganizationId = (s) =>
         /^(f_ecom)_([A-Z]{4})_(prd|stg|dev|[0-9]{3}|s[0-9]{2})$/i.test(s) || defaultCommerceAPIError
-    const validEinsteinId = (s) =>
-        /(^[0-9A-Z]{8}-[0-9A-Z]{4}-[0-9A-Z]{4}-[0-9A-Z]{4}-[0-9A-Z]{12}$)/i.test(s) ||
-        s === '' ||
-        defaultEinsteinAPIError
 
     const questions = [
         {
@@ -252,13 +246,7 @@ const retailReactAppPrompts = () => {
             name: 'shortCode',
             message: 'What is your Commerce API short code in Business Manager?',
             validate: validShortCode
-        },
-        {
-            name: 'einsteinId',
-            message: 'What is your API Client ID in the Einstein Configurator? (optional)',
-            validate: validEinsteinId
         }
-        // NOTE: there's no question about Einstein's _site_ id because we currently assume that the site id will be the same for both Commerce API and Einstein
     ]
 
     return inquirer.prompt(questions).then((answers) => buildAnswers(answers))
