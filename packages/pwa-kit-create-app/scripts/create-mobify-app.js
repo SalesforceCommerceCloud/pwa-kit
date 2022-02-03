@@ -188,6 +188,11 @@ const runGenerator = (answers, {outputDir}) => {
     })
 }
 
+const validProjectName = (s) => {
+    const regex = new RegExp(`^[a-zA-Z0-9-\\s]{1,${PROJECT_ID_MAX_LENGTH}}$`)
+    return regex.test(s) || 'Value can only contain letters, numbers, space and hyphens.'
+}
+
 const slugifyName = (projectName) => {
     return slugify(projectName, {
         lower: true,
@@ -195,13 +200,7 @@ const slugifyName = (projectName) => {
     }).slice(0, PROJECT_ID_MAX_LENGTH)
 }
 
-const validProjectName = (s) => {
-    const regex = new RegExp(`^[a-zA-Z0-9-\\s]{1,${PROJECT_ID_MAX_LENGTH}}$`)
-    return regex.test(s) || 'Value can only contain letters, numbers, space and hyphens.'
-}
-
 const retailReactAppPrompts = () => {
-
     const validUrl = (s) => {
         try {
             new URL(s)
@@ -368,7 +367,7 @@ const presetPrompt = () => {
             type: 'list',
             choices: [
                 {
-                    name: 'The Retail app with demo Commerce Cloud sandbox',
+                    name: 'The Retail app with demo Commerce Cloud instance',
                     value: RETAIL_REACT_APP_DEMO
                 },
                 {
@@ -393,7 +392,8 @@ const extractTemplate = (templateName, outputDir) => {
 }
 
 const main = (opts) => {
-    if (!(opts.outputDir === DEFAULT_OUTPUT_DIR) && sh.test('-e', opts.outputDir)) {
+    const OUTPUT_DIR_FLAG_ACTIVE = !(opts.outputDir === DEFAULT_OUTPUT_DIR)
+    if (OUTPUT_DIR_FLAG_ACTIVE && sh.test('-e', opts.outputDir)) {
         console.error(
             `The output directory "${opts.outputDir}" already exists. Try, for example, ` +
                 `"~/Desktop/my-project" instead of "~/Desktop"`
@@ -410,19 +410,38 @@ const main = (opts) => {
                 case HELLO_WORLD:
                     return helloWorldPrompts(opts).then((answers) => {
                         const projectId = slugifyName(answers.projectName)
+                        if (!OUTPUT_DIR_FLAG_ACTIVE) {
+                            opts.outputDir = p.join(process.cwd(), projectId)
+                        }
                         generateHelloWorld(projectId, opts)
+                        return opts.outputDir
                     })
                 case TEST_PROJECT:
                     return runGenerator(testProjectAnswers(), opts)
                 case RETAIL_REACT_APP_DEMO:
-                    return runGenerator(demoProjectAnswers(), opts)
+                    return Promise.resolve()
+                        .then(() => runGenerator(demoProjectAnswers(), opts))
+                        .then((result) => {
+                            console.log(
+                                '\nTo change your ecommerce back end you will need to update your storefront configuration. More information: https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/configuration-options'
+                            )
+                            return result
+                        })
                 case RETAIL_REACT_APP:
                     console.log(
-                        'For details on configuration values, see https://developer.salesforce.com/docs/commerce/commerce-api/guide/commerce-api-configuration-values\n'
+                        'For details on configuration options, see https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/configuration-options\n'
                     )
-                    return retailReactAppPrompts(opts).then((answers) =>
+                    return retailReactAppPrompts(opts).then((answers) => {
+                        if (!OUTPUT_DIR_FLAG_ACTIVE) {
+                            opts.outputDir = p.join(
+                                process.cwd(),
+                                slugifyName(answers.globals.projectId)
+                            )
+                        }
+
                         runGenerator(answers, opts)
-                    )
+                        return opts.outputDir
+                    })
                 default:
                     console.error(
                         `The preset "${preset}" is not valid. Valid presets are: ${
@@ -469,9 +488,11 @@ Examples:
 
     return Promise.resolve()
         .then(() => main(program.opts()))
-        .then(() => {
+        .then((outputDir) => {
             console.log('')
-            console.log(`Successfully generated a project in ${program.outputDir}`)
+            console.log(
+                `Successfully generated a project in ${outputDir ? outputDir : program.outputDir}`
+            )
             process.exit(0)
         })
         .catch((err) => {
