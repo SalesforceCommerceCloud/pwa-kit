@@ -32,6 +32,9 @@ const mode = process.env.NODE_ENV === production ? production : development
 const DEBUG = mode !== production && process.env.DEBUG === 'true'
 const CI = process.env.CI
 
+
+console.log("in original webpack config")
+
 if ([production, development].indexOf(mode) < 0) {
     throw new Error(`Invalid mode "${mode}"`)
 }
