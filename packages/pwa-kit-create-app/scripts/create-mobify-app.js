@@ -51,8 +51,6 @@ sh.set('-e')
 
 const GENERATED_PROJECT_VERSION = '0.0.1'
 
-const PROJECT_ID_MAX_LENGTH = 20
-
 const HELLO_WORLD_TEST_PROJECT = 'hello-world-test-project'
 const HELLO_WORLD = 'hello-world'
 const TEST_PROJECT = 'test-project' // TODO: This will be replaced with the `isomorphic-client` config.
@@ -65,6 +63,8 @@ const PRESETS = PRIVATE_PRESETS.concat(PUBLIC_PRESETS)
 
 const DEFAULT_OUTPUT_DIR = p.join(process.cwd(), 'pwa-kit-starter-project')
 
+const PROJECT_ID_MAX_LENGTH = 20
+
 const SDK_VERSION = generatorPkg.version
 
 const readJson = (path) => JSON.parse(sh.cat(path))
@@ -73,6 +73,13 @@ const writeJson = (path, data) => new sh.ShellString(JSON.stringify(data, null, 
 
 const replaceJSON = (path, replacements) =>
     writeJson(path, Object.assign(readJson(path), replacements))
+
+const slugifyName = (name) => {
+    return slugify(name, {
+        lower: true,
+        strict: true
+    }).slice(0, PROJECT_ID_MAX_LENGTH)
+}
 
 /**
  * Deeply merge two objects in such a way that all array entries in b replace array
@@ -188,43 +195,37 @@ const runGenerator = (answers, {outputDir}) => {
     })
 }
 
+// Validations
 const validProjectName = (s) => {
     const regex = new RegExp(`^[a-zA-Z0-9-\\s]{1,${PROJECT_ID_MAX_LENGTH}}$`)
     return regex.test(s) || 'Value can only contain letters, numbers, space and hyphens.'
 }
 
-const slugifyName = (projectName) => {
-    return slugify(projectName, {
-        lower: true,
-        strict: true
-    }).slice(0, PROJECT_ID_MAX_LENGTH)
+const validUrl = (s) => {
+    try {
+        new URL(s)
+        return true
+    } catch (err) {
+        return 'Value must be an absolute URL'
+    }
 }
 
+const validSiteId = (s) =>
+    /^[a-z0-9_-]+$/i.test(s) || 'Valid characters are alphanumeric, hyphen, or underscore'
+
+// To see definitions for Commerce API configuration values, go to
+// https://developer.salesforce.com/docs/commerce/commerce-api/guide/commerce-api-configuration-values.
+const defaultCommerceAPIError =
+    'Invalid format. Use docs to find more information about valid configurations: https://developer.salesforce.com/docs/commerce/commerce-api/guide/commerce-api-configuration-values'
+const validShortCode = (s) => /(^[0-9A-Z]{8}$)/i.test(s) || defaultCommerceAPIError
+const validClientId = (s) =>
+    /(^[0-9A-Z]{8}-[0-9A-Z]{4}-[0-9A-Z]{4}-[0-9A-Z]{4}-[0-9A-Z]{12}$)/i.test(s) ||
+    s === 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa' ||
+    defaultCommerceAPIError
+const validOrganizationId = (s) =>
+    /^(f_ecom)_([A-Z]{4})_(prd|stg|dev|[0-9]{3}|s[0-9]{2})$/i.test(s) || defaultCommerceAPIError
+
 const retailReactAppPrompts = () => {
-    const validUrl = (s) => {
-        try {
-            new URL(s)
-            return true
-        } catch (err) {
-            return 'Value must be an absolute URL'
-        }
-    }
-
-    const validSiteId = (s) =>
-        /^[a-z0-9_-]+$/i.test(s) || 'Valid characters are alphanumeric, hyphen, or underscore'
-
-    // To see definitions for Commerce API configuration values, go to
-    // https://developer.salesforce.com/docs/commerce/commerce-api/guide/commerce-api-configuration-values.
-    const defaultCommerceAPIError =
-        'Invalid format. Use docs to find more information about valid configurations: https://developer.salesforce.com/docs/commerce/commerce-api/guide/commerce-api-configuration-values'
-    const validShortCode = (s) => /(^[0-9A-Z]{8}$)/i.test(s) || defaultCommerceAPIError
-    const validClientId = (s) =>
-        /(^[0-9A-Z]{8}-[0-9A-Z]{4}-[0-9A-Z]{4}-[0-9A-Z]{4}-[0-9A-Z]{12}$)/i.test(s) ||
-        s === 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa' ||
-        defaultCommerceAPIError
-    const validOrganizationId = (s) =>
-        /^(f_ecom)_([A-Z]{4})_(prd|stg|dev|[0-9]{3}|s[0-9]{2})$/i.test(s) || defaultCommerceAPIError
-
     const questions = [
         {
             name: 'projectName',
