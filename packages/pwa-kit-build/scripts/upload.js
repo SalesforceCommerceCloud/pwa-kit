@@ -50,7 +50,7 @@ const upload = (options) => {
                 target: options.target
             }
 
-            console.log(`Beginning upload to ${options.origin}...`)
+            console.log(`Beginning upload to ${options.origin}`)
             return buildRequest(requestOptions, dataBuffer)
         })
         .then(() => {
