@@ -83,6 +83,9 @@ const baseConfig = (target) => {
                     assets: false,
                     excludeAssets: [/.*img\/.*/, /.*svg\/.*/, /.*json\/.*/, /.*static\/.*/]
                 },
+                optimization: {
+                    minimize: mode === production,
+                },
                 // Perf/quality trade-off - see https://webpack.js.org/configuration/devtool/#devtool
                 devtool: mode === production ? 'source-map' : 'eval',
                 output: {
@@ -186,7 +189,7 @@ const withChunking = (config) => {
             chunkFilename: '[name].js' // Support chunking with @loadable/components
         },
         optimization: {
-            minimize: false,
+            minimize: mode === production,
             splitChunks: {
                 cacheGroups: {
                     vendor: {
