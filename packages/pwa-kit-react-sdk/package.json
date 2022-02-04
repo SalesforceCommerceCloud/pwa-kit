@@ -1,6 +1,6 @@
 {
   "name": "pwa-kit-react-sdk",
-  "version": "2.0.0-dev",
+  "version": "2.0.0-dev.1",
   "description": "A library that supports the isomorphic React rendering pipeline for Commerce Cloud Managed Runtime apps",
   "main": "dist/index.js",
   "bin": {
@@ -80,8 +80,8 @@
     "node-html-parser": "^3.3.4",
     "open": "^8.4.0",
     "prop-types": "^15.6.0",
-    "pwa-kit-build": "^2.0.0-dev",
-    "pwa-kit-runtime": "^2.0.0-dev",
+    "pwa-kit-build": "^2.0.0-dev.1",
+    "pwa-kit-runtime": "^2.0.0-dev.1",
     "raf": "^3.4.0",
     "react-uid": "^2.2.0",
     "replace-in-file": "^6.2.0",
@@ -107,7 +107,7 @@
   "devDependencies": {
     "@loadable/component": "^5.15.0",
     "@wojtekmaj/enzyme-adapter-react-17": "^0.6.6",
-    "internal-lib-build": "^2.0.0-dev",
+    "internal-lib-build": "^2.0.0-dev.1",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-helmet": "5.2.0",
