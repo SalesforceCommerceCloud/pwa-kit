@@ -104,7 +104,8 @@ const baseConfig = (target) => {
                         'react-router-dom': findInProjectThenSDK('react-router-dom'),
                         'react-dom': findInProjectThenSDK('react-dom'),
                         'react-helmet': findInProjectThenSDK('react-helmet'),
-                        bluebird: findInProjectThenSDK('bluebird')
+                        bluebird: findInProjectThenSDK('bluebird'),
+                        'webpack-hot-middleware': findInProjectThenSDK('webpack-hot-middleware'),
                     },
                     ...(target === 'web' ? {fallback: {crypto: false}} : {})
                 },
