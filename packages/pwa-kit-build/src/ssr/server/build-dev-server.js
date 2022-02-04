@@ -89,7 +89,7 @@ export const DevServerMixin = {
         app.__clientHotReloadMiddleware = webpackHotClientMiddleware(
             app.__compiler.compilers.find((compiler) => compiler.name === 'client'),
             {
-                path: '/__mrt/hmr'
+                path: '/'
             }
         )
         app.__webpackReady = () => Boolean(app.__devMiddleware.context.state)
@@ -107,7 +107,7 @@ export const DevServerMixin = {
         }
 
         app.use('/mobify/bundle/development', app.__devMiddleware)
-        app.use(app.__clientHotReloadMiddleware)
+        app.use('/__mrt/hmr', app.__clientHotReloadMiddleware)
 
         app.use('/__mrt/status', (req, res) => {
             return res.json({ready: app.__webpackReady()})
