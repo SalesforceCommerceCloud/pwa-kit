@@ -94,16 +94,26 @@ export const loadingScreen = () => {
                 const url = new URL(window.location)
                 const loading = url.searchParams.get('loading')
                 if(loading === '1') {
-                    setInterval(() => {
-                        Promise.resolve()
-                            .then(() => fetch('/__mrt/status'))
-                            .then((res) => res.json())
-                            .then((data) => {
-                                if (data.ready) {
-                                    window.location = url.origin;
-                                }
-                            })
-                    }, 2000)
+                    const waitForReady = () => {
+                        return new Promise((resolve) => {
+                            const inner = () => {
+                                Promise.resolve()
+                                    .then(() => fetch('/__mrt/status'))
+                                    .then((res) => res.json())
+                                    .then((data) => {
+                                        if (data.ready) {
+                                            resolve()
+                                        } else {
+                                            setTimeout(inner, 1000)
+                                        }
+                                    })
+                            }
+                            inner()
+                        })
+                    }
+                    waitForReady().then(() => {
+                        window.location = url.origin
+                    })
                 }
             </script>
         </body>
