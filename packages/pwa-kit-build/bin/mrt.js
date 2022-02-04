@@ -15,7 +15,6 @@ const sh = require('shelljs')
 const uploadBundle = require('../scripts/upload.js')
 
 const pkgRoot = p.join(__dirname, '..')
-const binDir = p.join(require.resolve('prettier'), '../../.bin')
 
 const projectPkg = require(p.join(process.cwd(), 'package.json'))
 
@@ -79,7 +78,7 @@ const main = () => {
         .command('build')
         .description(`build your app for production`)
         .action(() => {
-            const webpack = p.join(binDir, 'webpack')
+            const webpack = p.join(require.resolve('webpack'), '..', '..', '..', '.bin', 'webpack')
             const webpackConf = p.resolve(
                 p.join(__dirname, '..', 'configs', 'webpack', 'config.js')
             )
@@ -155,7 +154,7 @@ const main = () => {
         .argument('<path>', 'path or glob to lint')
         .option('--fix', 'Try and fix errors (default: false)')
         .action((path, {fix}) => {
-            const eslint = p.join(binDir, 'eslint')
+            const eslint = p.join(require.resolve('eslint'), '..', '..', '..', '.bin', 'eslint')
             const eslintConfig = p.join(__dirname, '..', 'configs', 'eslint', 'eslint-config.js')
             execSync(
                 `${eslint} --config ${eslintConfig} --resolve-plugins-relative-to ${pkgRoot}${
@@ -169,7 +168,7 @@ const main = () => {
         .description('automatically re-format all source files')
         .argument('<path>', 'path or glob to format')
         .action((path) => {
-            const prettier = p.join(binDir, 'prettier')
+            const prettier = p.join(require.resolve('prettier'), '..', '..', '.bin', 'prettier')
             execSync(`${prettier} --write ${path}`)
         })
 
@@ -178,7 +177,7 @@ const main = () => {
         .description('test the project')
         .option('--jest-args <args>', 'arguments to forward to Jest')
         .action(({jestArgs}) => {
-            const jest = p.join(binDir, 'jest')
+            const jest = p.join(require.resolve('jest'), '..', '..', '..', '.bin', 'jest')
             execSync(`${jest} --passWithNoTests --maxWorkers=2${jestArgs ? ' ' + jestArgs : ''}`)
         })
 
