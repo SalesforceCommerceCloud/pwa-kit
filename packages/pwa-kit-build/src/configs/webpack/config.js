@@ -18,6 +18,7 @@ import {BundleAnalyzerPlugin} from 'webpack-bundle-analyzer'
 import LoadablePlugin from '@loadable/webpack-plugin'
 import SpeedMeasurePlugin from 'speed-measure-webpack-plugin'
 import {createModuleReplacementPlugin, PwaKitConfigPlugin} from './plugins'
+import ReactRefreshWebpackPlugin from '@pmmmwh/react-refresh-webpack-plugin'
 
 const projectDir = process.cwd()
 const sdkDir = path.resolve(path.join(__dirname, '..', '..', '..'))
@@ -86,7 +87,7 @@ const baseConfig = (target) => {
                 // Perf/quality trade-off - see https://webpack.js.org/configuration/devtool/#devtool
                 devtool: mode === production ? 'source-map' : 'eval',
                 output: {
-                    publicPath: '',
+                    publicPath: '/mobify/bundle/development/',
                     path: buildDir
                 },
                 resolve: {
@@ -123,6 +124,8 @@ const baseConfig = (target) => {
                             generateStatsFile: true
                         }),
                     mode === development && new webpack.NoEmitOnErrorsPlugin(),
+                    mode === development && new webpack.HotModuleReplacementPlugin(),
+                    mode === development && new ReactRefreshWebpackPlugin(),
 
                     createModuleReplacementPlugin(projectDir),
 
@@ -215,9 +218,7 @@ const client =
                 ...config,
                 // Must be named "client". See - https://www.npmjs.com/package/webpack-hot-server-middleware#usage
                 name: 'client',
-                entry: {
-                    main: './app/main'
-                },
+                entry: ['./app/main', 'webpack-hot-middleware/client?path=/__mrt/hmr'],
                 plugins: [
                     ...config.plugins,
                     new LoadablePlugin({writeToDisk: true}),

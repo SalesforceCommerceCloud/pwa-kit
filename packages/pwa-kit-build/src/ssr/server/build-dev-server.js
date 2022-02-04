@@ -15,6 +15,7 @@ import mimeTypes from 'mime-types'
 import webpack from 'webpack'
 import webpackDevMiddleware from 'webpack-dev-middleware'
 import webpackHotServerMiddleware from 'webpack-hot-server-middleware'
+import webpackHotClientMiddleware from 'webpack-hot-middleware'
 import open from 'open'
 import requireFromString from 'require-from-string'
 import config from '../../configs/webpack/config'
@@ -82,7 +83,15 @@ export const DevServerMixin = {
         // routes must not have our SSR middleware applied to them.
         // But the SSR render function must!
         app.__compiler = webpack(config)
-        app.__devMiddleware = webpackDevMiddleware(app.__compiler, {serverSideRender: true})
+        app.__devMiddleware = webpackDevMiddleware(app.__compiler, {
+            serverSideRender: true
+        })
+        app.__clientHotReloadMiddleware = webpackHotClientMiddleware(
+            app.__compiler.compilers.find((compiler) => compiler.name === 'client'),
+            {
+                path: '/__mrt/hmr'
+            }
+        )
         app.__webpackReady = () => Boolean(app.__devMiddleware.context.state)
         app.__waitForWebpackReady = () => {
             return new Promise((resolve) => {
@@ -98,6 +107,7 @@ export const DevServerMixin = {
         }
 
         app.use('/mobify/bundle/development', app.__devMiddleware)
+        app.use(app.__clientHotReloadMiddleware)
 
         app.use('/__mrt/status', (req, res) => {
             return res.json({ready: app.__webpackReady()})
