@@ -17,8 +17,8 @@ module.exports = {
                 'http://localhost:3000/en-GB/product/25493613M',
                 'http://localhost:3000/en-GB/search?q=suit'
             ],
-            startServerReadyPattern: 'HTTP development server listening on',
-            startServerReadyTimeout: 15000
+            startServerReadyPattern: 'bundle is in a valid state',
+            startServerReadyTimeout: 90000
         },
         upload: {
             target: 'temporary-public-storage'

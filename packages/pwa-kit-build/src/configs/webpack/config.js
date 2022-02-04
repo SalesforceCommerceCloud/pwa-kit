@@ -84,7 +84,7 @@ const baseConfig = (target) => {
                     excludeAssets: [/.*img\/.*/, /.*svg\/.*/, /.*json\/.*/, /.*static\/.*/]
                 },
                 optimization: {
-                    minimize: mode === production,
+                    minimize: mode === production
                 },
                 // Perf/quality trade-off - see https://webpack.js.org/configuration/devtool/#devtool
                 devtool: mode === production ? 'source-map' : 'eval',

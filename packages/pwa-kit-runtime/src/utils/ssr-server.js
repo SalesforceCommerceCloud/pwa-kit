@@ -721,6 +721,7 @@ export const configureProxy = ({
  * @private
  */
 export const configureProxyConfigs = (appHostname, appProtocol) => {
+    localDevLog('')
     proxyConfigs.forEach((config) => {
         localDevLog(
             `Proxying ${config.proxyPath} and ${config.cachingPath} to ${config.protocol}://${config.host}`
@@ -742,6 +743,7 @@ export const configureProxyConfigs = (appHostname, appProtocol) => {
             caching: true
         })
     })
+    localDevLog('')
 }
 
 /**

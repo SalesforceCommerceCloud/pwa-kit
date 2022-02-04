@@ -197,13 +197,15 @@ export const RemoteServerFactory = {
         this.configureProxyConfigs(options)
 
         const app = this.createExpressApp(options)
+        // Do this first – we want compression applied to
+        // everything when it's enabled at all.
+        this.setCompression(app)
 
         // Ordering of the next two calls are vital - we don't
         // want request-processors applied to development views.
         this.addSDKInternalHandlers(app)
         this.setupSSRRequestProcessorMiddleware(app)
 
-        this.setCompression(app)
         this.setupLogging(app)
         this.setupMetricsFlushing(app)
         this.setupHealthcheck(app)

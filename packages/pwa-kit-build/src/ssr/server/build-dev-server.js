@@ -32,7 +32,7 @@ const NO_CACHE = 'max-age=0, nocache, nostore, must-revalidate'
  */
 export const DevServerMixin = {
     logStartupMessage(options) {
-        console.log(`Starting the DevServer on ${chalk.cyan(this._getDevServerURL(options))}\n`)
+        console.log(`Starting the DevServer on ${chalk.cyan(this._getDevServerURL(options))}`)
     },
 
     getProtocol(options) {
@@ -84,18 +84,13 @@ export const DevServerMixin = {
         app.__compiler = webpack(config)
         app.__devMiddleware = webpackDevMiddleware(app.__compiler, {serverSideRender: true})
         app.__webpackReady = () => Boolean(app.__devMiddleware.context.state)
-        app.__waitForWebpackReady = () => {
-            return new Promise((resolve) => {
-                const inner = () => {
-                    if (app.__webpackReady()) {
-                        resolve()
-                    } else {
-                        setTimeout(inner, 75)
-                    }
-                }
-                inner()
-            })
-        }
+        app.__devMiddleware.waitUntilValid(() => {
+            // Be just a little more generous before letting eg. Lighthouse hit it!
+            setTimeout(() => {
+                const logger = app.__compiler.getInfrastructureLogger('webpack-dev-middleware')
+                logger.info('bundle is in a valid state')
+            }, 75)
+        })
 
         app.use('/mobify/bundle/development', app.__devMiddleware)
 
@@ -162,10 +157,6 @@ export const DevServerMixin = {
     _createHandler(app) {
         const {protocol, sslFilePath} = app.options
         const {hostname, port} = this._getDevServerHostAndPort(app.options)
-
-        // Log an empty line between server startup messages and HTTP
-        // request logging.
-        console.log('')
 
         let server
 
