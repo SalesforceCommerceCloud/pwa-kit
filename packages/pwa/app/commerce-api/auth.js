@@ -33,6 +33,7 @@ const oidStorageKey = 'oid'
 /**
  * A  class that provides auth functionality for pwa.
  */
+// const slasCallbackEndpoint = '/slas/callback'
 const slasCallbackEndpoint = '/callback'
 class Auth {
     constructor(api) {

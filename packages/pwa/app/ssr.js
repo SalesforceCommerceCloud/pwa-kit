@@ -60,6 +60,7 @@ app.use(
 )
 
 // Handle the redirect from SLAS as to avoid error
+// app.get('/slas/callback?*', (req, res) => {
 app.get('/callback?*', (req, res) => {
     res.send()
 })
