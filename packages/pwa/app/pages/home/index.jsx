@@ -66,7 +66,7 @@ const Home = ({productSearchResult, isLoading}) => {
                     <Stack spacing={{base: 4, sm: 6}} direction={{base: 'column', sm: 'row'}}>
                         <Button
                             as={Link}
-                            href="https://zzrf-002.sandbox.us01.dx.commercecloud.salesforce.com/s/RefArch/cart?lang=en_US"
+                            href="http://localhost:8000/sfra/s/RefArch"
                             width={{base: 'full', md: 'inherit'}}
                             paddingX={7}
                             _hover={{textDecoration: 'none'}}

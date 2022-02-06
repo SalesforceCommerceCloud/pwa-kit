@@ -41,26 +41,35 @@ const options = {
     },
 
     selfHandleResponse: true,
-    onProxyRes: responseInterceptor(async (responseBuffer, proxyRes, req, res) => {
-        const response = responseBuffer.toString()
+    onProxyRes: (proxyRes, req, res) => {
+        // Remove HttpOnly flag from cookies
+        if (proxyRes.headers['set-cookie']) {
+            proxyRes.headers['set-cookie'] = proxyRes.headers['set-cookie'].map((cookie) =>
+                cookie.replace(/; HttpOnly/gi, '')
+            )
+        }
 
-        return (
-            response
-                // SFRA login/cart page links are absolute URLs
-                // replace them so they go through the proxy
-                .replace(
-                    new RegExp(`${SFRA_INSTANCE_ORIGIN}/s/RefArch/cart`, 'g'),
-                    `http://localhost:${PORT}/s/RefArch/cart`
-                )
-                .replace(
-                    new RegExp(
-                        `${SFRA_INSTANCE_ORIGIN}/on/demandware.store/Sites-RefArch-Site/en_US/Login-Show`,
-                        'g'
-                    ),
-                    `http://localhost${PORT}/on/demandware.store/Sites-RefArch-Site/en_US/Login-Show`
-                )
-        )
-    })
+        return responseInterceptor(async (responseBuffer) => {
+            const response = responseBuffer.toString()
+
+            return (
+                response
+                    // SFRA login/cart page links are absolute URLs
+                    // replace them so they go through the proxy
+                    .replace(
+                        new RegExp(`${SFRA_INSTANCE_ORIGIN}/s/RefArch/cart`, 'g'),
+                        `http://localhost:${PORT}/s/RefArch/cart`
+                    )
+                    .replace(
+                        new RegExp(
+                            `${SFRA_INSTANCE_ORIGIN}/on/demandware.store/Sites-RefArch-Site/en_US/Login-Show`,
+                            'g'
+                        ),
+                        `http://localhost:${PORT}/on/demandware.store/Sites-RefArch-Site/en_US/Login-Show`
+                    )
+            )
+        })(proxyRes, req, res)
+    }
 }
 
 const app = express()
