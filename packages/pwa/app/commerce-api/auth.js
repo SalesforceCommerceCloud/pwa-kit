@@ -27,8 +27,12 @@ import {createGetTokenBody} from './utils'
 const usidStorageKey = 'usid'
 const encUserIdStorageKey = 'enc-user-id'
 const tokenStorageKey = 'token'
-const refreshTokenStorageKey = 'cc-nx-g'
+const refreshTokenStorageKey = 'cc-nx'
+const refreshTokenGuestStorageKey = 'cc-nx-g'
 const oidStorageKey = 'oid'
+
+// log out SFRA session
+const dwSessionIdKey = 'dwsid'
 
 /**
  * A  class that provides auth functionality for pwa.
@@ -52,7 +56,9 @@ class Auth {
         //     this._saveOid(configOid)
         // } else {
         this._authToken = this._storage.get(tokenStorageKey)
-        this._refreshToken = this._storage.get(refreshTokenStorageKey)
+        this._refreshToken =
+            this._storage.get(refreshTokenStorageKey) ||
+            this._storage.get(refreshTokenGuestStorageKey)
         this._usid = this._storage.get(usidStorageKey)
         this._encUserId = this._storage.get(encUserIdStorageKey)
         // }
@@ -416,8 +422,10 @@ class Auth {
         if (this._onClient) {
             this._storage.remove(tokenStorageKey)
             this._storage.remove(refreshTokenStorageKey)
+            this._storage.remove(refreshTokenGuestStorageKey)
             this._storage.remove(usidStorageKey)
             this._storage.remove(encUserIdStorageKey)
+            this._storage.remove(dwSessionIdKey)
         }
     }
 
@@ -430,6 +438,7 @@ class Auth {
         this._refreshToken = refreshToken
         if (this._onClient) {
             this._storage.set(refreshTokenStorageKey, refreshToken)
+            this._storage.set(refreshTokenGuestStorageKey, refreshToken)
         }
     }
 }
@@ -452,7 +461,8 @@ class CookieStorage extends Storage {
         this._avaliable = true
     }
     set(name, value, attributes) {
-        this._avaliable && (document.cookie = `${name}=${value};expires=Tue, 08 Mar 2022 09:06:52 GMT;`)
+        this._avaliable &&
+            (document.cookie = `${name}=${value};expires=Tue, 08 Mar 2022 09:06:52 GMT;`)
     }
     get(name) {
         if (!this._avaliable) return undefined
