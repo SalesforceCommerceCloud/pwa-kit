@@ -27,7 +27,7 @@ import {createGetTokenBody} from './utils'
 const usidStorageKey = 'usid'
 const encUserIdStorageKey = 'enc-user-id'
 const tokenStorageKey = 'token'
-const refreshTokenStorageKey = 'refresh-token'
+const refreshTokenStorageKey = 'cc-nx-g'
 const oidStorageKey = 'oid'
 
 /**
@@ -42,25 +42,20 @@ class Auth {
         this._onClient = typeof window !== 'undefined'
         this._pendingAuth = undefined
         this._customerId = undefined
+        this._storage = new CookieStorage()
 
-        this._oid = this._onClient ? window.localStorage.getItem(oidStorageKey) : undefined
+        this._oid = this._storage.get(oidStorageKey)
 
         const configOid = api._config.parameters.organizationId
-        if (this._oid !== configOid) {
-            this._clearAuth()
-            this._saveOid(configOid)
-        } else {
-            this._authToken = this._onClient
-                ? window.localStorage.getItem(tokenStorageKey)
-                : undefined
-            this._refreshToken = this._onClient
-                ? window.localStorage.getItem(refreshTokenStorageKey)
-                : undefined
-            this._usid = this._onClient ? window.localStorage.getItem(usidStorageKey) : undefined
-            this._encUserId = this._onClient
-                ? window.localStorage.getItem(encUserIdStorageKey)
-                : undefined
-        }
+        // if (this._oid !== configOid) {
+        //     this._clearAuth()
+        //     this._saveOid(configOid)
+        // } else {
+        this._authToken = this._storage.get(tokenStorageKey)
+        this._refreshToken = this._storage.get(refreshTokenStorageKey)
+        this._usid = this._storage.get(usidStorageKey)
+        this._encUserId = this._storage.get(encUserIdStorageKey)
+        // }
 
         this.login = this.login.bind(this)
         this.logout = this.logout.bind(this)
@@ -142,10 +137,10 @@ class Auth {
             let authorizationMethod = '_loginAsGuest'
             if (credentials) {
                 authorizationMethod = '_loginWithCredentials'
-            } else if (this._authToken && this._refreshToken) {
+            } else if (this._refreshToken) {
                 authorizationMethod = '_refreshAccessToken'
             }
-
+            debugger
             return this[authorizationMethod](credentials).catch((error) => {
                 if (retries === 0 && error.message === 'EXPIRED_TOKEN') {
                     retries = 1 // we only retry once
@@ -368,7 +363,7 @@ class Auth {
     _saveAccessToken(token) {
         this._authToken = token
         if (this._onClient) {
-            window.localStorage.setItem(tokenStorageKey, token)
+            this._storage.set(tokenStorageKey, token)
         }
     }
 
@@ -380,7 +375,7 @@ class Auth {
     _saveUsid(usid) {
         this._usid = usid
         if (this._onClient) {
-            window.localStorage.setItem(usidStorageKey, usid)
+            this._storage.set(usidStorageKey, usid)
         }
     }
 
@@ -392,7 +387,7 @@ class Auth {
     _saveEncUserId(encUserId) {
         this._encUserId = encUserId
         if (this._onClient) {
-            window.localStorage.setItem(encUserIdStorageKey, encUserId)
+            this._storage.set(encUserIdStorageKey, encUserId)
         }
     }
 
@@ -404,7 +399,7 @@ class Auth {
     _saveOid(oid) {
         this._oid = oid
         if (this._onClient) {
-            window.localStorage.setItem(oidStorageKey, oid)
+            this._storage.set(oidStorageKey, oid)
         }
     }
 
@@ -419,10 +414,10 @@ class Auth {
         this._usid = undefined
         this._encUserId = undefined
         if (this._onClient) {
-            window.localStorage.removeItem(tokenStorageKey)
-            window.localStorage.removeItem(refreshTokenStorageKey)
-            window.localStorage.removeItem(usidStorageKey)
-            window.localStorage.removeItem(encUserIdStorageKey)
+            this._storage.remove(tokenStorageKey)
+            this._storage.remove(refreshTokenStorageKey)
+            this._storage.remove(usidStorageKey)
+            this._storage.remove(encUserIdStorageKey)
         }
     }
 
@@ -434,8 +429,67 @@ class Auth {
     _saveRefreshToken(refreshToken) {
         this._refreshToken = refreshToken
         if (this._onClient) {
-            window.localStorage.setItem(refreshTokenStorageKey, refreshToken)
+            this._storage.set(refreshTokenStorageKey, refreshToken)
         }
+    }
+}
+
+class Storage {
+    set(name, value) {}
+    get(name) {}
+    remove(name) {}
+}
+
+// this is not production ready!
+class CookieStorage extends Storage {
+    constructor(...args) {
+        super(args)
+        this._avaliable = false
+        if (typeof document === 'undefined') {
+            console.warn('CookieStorage is not avaliable on the current environment.')
+            return
+        }
+        this._avaliable = true
+    }
+    set(name, value, attributes) {
+        this._avaliable && (document.cookie = `${name}=${value};expires=Tue, 08 Mar 2022 09:06:52 GMT;`)
+    }
+    get(name) {
+        if (!this._avaliable) return undefined
+        let decodedCookie = decodeURIComponent(document.cookie)
+        let ca = decodedCookie.split(';')
+        for (let i = 0; i < ca.length; i++) {
+            let c = ca[i]
+            while (c.charAt(0) == ' ') {
+                c = c.substring(1)
+            }
+            if (c.indexOf(`${name}=`) == 0) {
+                return c.substring(`${name}=`.length, c.length)
+            }
+        }
+        return ''
+    }
+    remove(name) {}
+}
+
+class LocalStorage extends Storage {
+    constructor(...args) {
+        super(args)
+        this._avaliable = false
+        if (typeof window === 'undefined') {
+            console.warn('LocalStorage is not avaliable on the current environment.')
+            return
+        }
+        this._avaliable = true
+    }
+    set(name, value) {
+        this._avaliable && window.localStorage.setItem(name, value)
+    }
+    get(name) {
+        return this._avaliable ? window.localStorage.getItem(name) : undefined
+    }
+    remove(name) {
+        this._avaliable && window.localStorage.removeItem(name)
     }
 }
 

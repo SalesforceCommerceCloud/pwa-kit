@@ -10,7 +10,7 @@ export const commerceAPIConfig = {
         clientId: '987fc116-d30c-4537-93cb-c2bd433c3b5a',
         organizationId: 'f_ecom_zzrf_002',
         shortCode: 'kv7kzm78',
-        siteId: 'RefArchGlobal'
+        siteId: 'RefArch'
     }
 }
 export const einsteinAPIConfig = {

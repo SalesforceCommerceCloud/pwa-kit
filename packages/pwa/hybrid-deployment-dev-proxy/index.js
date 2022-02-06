@@ -54,19 +54,9 @@ const options = {
 
             return (
                 response
-                    // SFRA login/cart page links are absolute URLs
+                    // some SFRA links are absolute URLs
                     // replace them so they go through the proxy
-                    .replace(
-                        new RegExp(`${SFRA_INSTANCE_ORIGIN}/s/RefArch/cart`, 'g'),
-                        `http://localhost:${PORT}/s/RefArch/cart`
-                    )
-                    .replace(
-                        new RegExp(
-                            `${SFRA_INSTANCE_ORIGIN}/on/demandware.store/Sites-RefArch-Site/en_US/Login-Show`,
-                            'g'
-                        ),
-                        `http://localhost:${PORT}/on/demandware.store/Sites-RefArch-Site/en_US/Login-Show`
-                    )
+                    .replace(new RegExp(`${SFRA_INSTANCE_ORIGIN}`, 'g'), `http://localhost:${PORT}`)
             )
         })(proxyRes, req, res)
     }
