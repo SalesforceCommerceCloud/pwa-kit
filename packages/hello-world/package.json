@@ -14,7 +14,7 @@
         "lint:fix": "npm run lint -- --fix",
         "start": "mrt start",
         "build": "mrt build",
-        "push": "mrt push",
+        "push": "npm run build && mrt push",
         "save-credentials": "mrt save-credentials"
     },
     "mobify": {
