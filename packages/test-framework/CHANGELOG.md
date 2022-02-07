@@ -1,4 +1,5 @@
-## v1.13.1 (September 30, 2019)
+## v1.20.7 (Feb 07, 2022)
+- Upgrade `nightwatch` to consume security update for `ansi-regex` package.
 ## 1.13.0 (September 26, 2019)
 - Use `latest` version of Chromedriver [#708](https://github.com/mobify/mobify-platform-sdks/pull/708)
 
