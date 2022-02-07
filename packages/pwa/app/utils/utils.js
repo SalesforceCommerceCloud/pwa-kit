@@ -7,6 +7,22 @@
 
 import pwaKitConfig from '../../pwa-kit.config.json'
 
+let _config
+/**
+ * Dynamically load the applications config object.
+ * 
+ * @returns the application config object.
+ */
+export const getConfig = async () => {
+    // Assign the global config for reuse. This isn't required, but it will be
+    // faster since you aren't loading the config on each request.
+    if (!_config) {
+        _config = (await import('config')).default
+    }
+
+    return _config
+}
+
 /**
  * Call requestIdleCallback in supported browsers.
  *
