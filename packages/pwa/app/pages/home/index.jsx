@@ -66,12 +66,16 @@ const Home = ({productSearchResult, isLoading}) => {
                     <Stack spacing={{base: 4, sm: 6}} direction={{base: 'column', sm: 'row'}}>
                         <Button
                             as={Link}
-                            href="http://localhost:8000/sfra/s/RefArch"
+                            href="https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/getting-started.html"
+                            target="_blank"
                             width={{base: 'full', md: 'inherit'}}
                             paddingX={7}
                             _hover={{textDecoration: 'none'}}
                         >
-                            Go to SFRA
+                            <FormattedMessage
+                                defaultMessage="Get started"
+                                id="home.link.get_started"
+                            />
                         </Button>
                     </Stack>
                 }

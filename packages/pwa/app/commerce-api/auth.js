@@ -195,11 +195,13 @@ class Auth {
         const {access_token, refresh_token, customer_id, usid, enc_user_id} = tokenResponse
         this._customerId = customer_id
         this._saveAccessToken(`Bearer ${access_token}`)
-        this._saveRefreshToken(refresh_token)
         this._saveUsid(usid)
         // Non registered users recieve an empty string for the encoded user id value
         if (enc_user_id.length > 0) {
             this._saveEncUserId(enc_user_id)
+            this._saveRefreshToken(refresh_token, 'registered')
+        } else {
+            this._saveRefreshToken(refresh_token, 'guest')
         }
 
         if (this._onClient) {
@@ -434,11 +436,12 @@ class Auth {
      * @private
      * @param {string} refreshToken - A JWT refresh token.
      */
-    _saveRefreshToken(refreshToken) {
+    _saveRefreshToken(refreshToken, type) {
         this._refreshToken = refreshToken
+        const storeageKey =
+            type === 'registered' ? refreshTokenStorageKey : refreshTokenGuestStorageKey
         if (this._onClient) {
-            this._storage.set(refreshTokenStorageKey, refreshToken)
-            this._storage.set(refreshTokenGuestStorageKey, refreshToken)
+            this._storage.set(storeageKey, refreshToken)
         }
     }
 }
