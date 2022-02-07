@@ -1,3 +1,4 @@
+## v1.20.7 (Feb 07, 2022)
 ## v1.20.6 (Oct 04, 2021)
 - Bump `commercecloud-ocapi-client` to latest version.
 
