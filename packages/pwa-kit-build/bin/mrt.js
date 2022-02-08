@@ -70,8 +70,14 @@ const main = () => {
     program
         .command('start')
         .description(`develop your app locally`)
-        .action(() => {
-            execSync(`node ${p.join(process.cwd(), 'app', 'ssr.js')}`)
+        .addOption(
+            new program.Option(
+                '--inspect',
+                'enable debugging with --inspect on the node process'
+            )
+        )
+        .action(({inspect}) => {
+            execSync(`node${inspect ? ' --inspect' : ''} ${p.join(process.cwd(), 'app', 'ssr.js')}`)
         })
 
     program
