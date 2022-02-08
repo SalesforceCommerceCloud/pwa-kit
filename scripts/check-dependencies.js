@@ -171,6 +171,7 @@ const check = () => {
     // package, used for sense-checking dependencies later on.
     const peerDependenciesByPackage = {}
     const engines = {}
+    let pkgVersion
 
     listPackages().forEach((pkgDir) => {
         const pkgFile = path.join(pkgDir, 'package.json')
@@ -184,11 +185,19 @@ const check = () => {
         if (!engines.npm && pkg.engines) {
             engines.npm = pkg.engines.npm
         }
+
+        if (!pkgVersion) {
+            pkgVersion = pkg.version
+        }
     })
 
     listPackages().forEach((pkgDir) => {
         const pkgFile = path.join(pkgDir, 'package.json')
         const pkg = readJSON(pkgFile)
+
+        if (pkg.version !== pkgVersion) {
+            errors.push(`Package "${pkg.name}" does not have a consistent package version as other packages`)
+        }
 
         if (pkg.engines) {
             if (pkg.engines.node !== engines.node || pkg.engines.npm !== engines.npm) {
