@@ -393,6 +393,7 @@ const isUsingCompatibleNode = semver.satisfies(userNode, requiredNode)
 
 const main = (opts) => {
     if (!isUsingCompatibleNode) {
+        console.log('')
         console.warn(
             `Warning: You are using Node ${userNode}. ` +
                 `Your app may not work as expected when deployed to Managed ` +
