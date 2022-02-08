@@ -1,3 +1,6 @@
 {
-    "greeting": "Hello from the production config"
+    "target": "production",
+    "url": {
+        "locale": "path"
+    }
 }

@@ -1,3 +1,6 @@
 {
-    "greeting": "Hello from the development config"
+    "target": "development",
+    "url": {
+        "locale": "path"
+    }
 }

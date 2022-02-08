@@ -5,24 +5,6 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import pwaKitConfig from '../../pwa-kit.config.json'
-
-let _config
-/**
- * Dynamically load the applications config object.
- * 
- * @returns the application config object.
- */
-export const getConfig = async () => {
-    // Assign the global config for reuse. This isn't required, but it will be
-    // faster since you aren't loading the config on each request.
-    if (!_config) {
-        _config = (await import('config')).default
-    }
-
-    return _config
-}
-
 /**
  * Call requestIdleCallback in supported browsers.
  *
@@ -177,7 +159,30 @@ export const capitalize = (text) => {
  * Get the pwa configuration object from pwa-kit.config.json
  * @returns {object} - the configuration object
  */
-export const getConfig = () => pwaKitConfig
+// export const getConfig = () => pwaKitConfig
+let _config
+export const getConfig = () => {
+    if (_config) {
+        return _config
+    }
+
+    if (typeof window !== 'undefined') {
+        _config = JSON.parse(document.getElementById('app-config').innerHTML)
+        return _config
+    }
+
+    const _require = eval('require')
+    const {cosmiconfigSync} = _require('cosmiconfig')
+
+    // Load the config synchronously using a custom "searchPlaces".
+    const moduleName = process.env.DEPLOY_TARGET
+    const explorerSync = cosmiconfigSync(moduleName, {
+        searchPlaces: [`config/${moduleName}.json`, `config/local.json`, `config/default.json`]
+    })
+    const {config} = explorerSync.search()
+
+    return config
+}
 
 /**
  * A util to return current url configuration

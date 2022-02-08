@@ -1,3 +1,6 @@
 {
-    "greeting": "Hello from the development eu config"
+    "target": "development-eu",
+    "url": {
+        "locale": "path"
+    }
 }

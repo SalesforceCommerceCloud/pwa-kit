@@ -15,6 +15,8 @@ import {render} from 'pwa-kit-react-sdk/ssr/server/react-rendering'
 import helmet from 'helmet'
 import {getConfig} from './utils/utils'
 
+const config = getConfig()
+
 const app = createApp({
     // The build directory (an absolute path)
     buildDir: path.resolve(process.cwd(), 'build'),
@@ -60,30 +62,10 @@ app.use(
     })
 )
 
-/**
- *
- * @param {*} instance - the config instance indicator.
- * @returns object - the configuration
- */
-const getIntanceConfig = async () => {
-    // This is where you can customize which config will be loaded. By default
-    // the config will load as described [here](https://github.com/lorenwest/node-config/wiki/Configuration-Files#file-load-order)
-    // If you wish to have a per-instance configuration, do so by setting the 
-    // `NODE_APP_INSTANCE` node environment variable before loading the config.
-    // Example:
-    // const {host} = arguments[0].location
-    // if (host.indexOf('example.eu')) {
-    //     process.env.NODE_APP_INSTANCE = 'eu'
-    // }
-    
-    return getConfig()
-}
-
+console.log('config======> ', config)
 const renderWithConfig = async (req, res, next) => {
     // Add the config to the locals which we will write to the html later.
-    res.locals.config = await getIntanceConfig({
-        location: req.location
-    })
+    res.locals.config = config
 
     return render(req, res, next)
 }

@@ -1,3 +1,6 @@
 {
-    "greeting": "Hello from the default config!"
+    "target": "default",
+    "url": {
+        "locale": "path"
+    }
 }
