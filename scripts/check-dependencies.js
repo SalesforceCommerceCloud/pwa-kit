@@ -170,15 +170,34 @@ const check = () => {
     // Maps package-name -> the peerDependencies section for each monorepo-local
     // package, used for sense-checking dependencies later on.
     const peerDependenciesByPackage = {}
+    const engines = {}
+
     listPackages().forEach((pkgDir) => {
         const pkgFile = path.join(pkgDir, 'package.json')
         const pkg = readJSON(pkgFile)
+
         peerDependenciesByPackage[pkg.name] = pkg.peerDependencies || {}
+
+        if (!engines.node && pkg.engines) {
+            engines.node = pkg.engines.node
+        }
+        if (!engines.npm && pkg.engines) {
+            engines.npm = pkg.engines.npm
+        }
     })
 
     listPackages().forEach((pkgDir) => {
         const pkgFile = path.join(pkgDir, 'package.json')
         const pkg = readJSON(pkgFile)
+
+        if (pkg.engines) {
+            if (pkg.engines.node !== engines.node || pkg.engines.npm !== engines.npm) {
+                errors.push(`Package "${pkg.name}" does not have a consistent 'engines' value as other packages`)
+            }
+        } else {
+            errors.push(`Package "${pkg.name}" needs to have its 'engines' field defined`)
+        }
+
         Object.entries(commonDevDeps)
             .forEach(([name, requiredVersion]) => {
                 const foundVersion = pkg.devDependencies[name] || pkg.dependencies[name]
