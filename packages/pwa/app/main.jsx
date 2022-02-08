@@ -7,6 +7,7 @@
 import {start, registerServiceWorker} from 'pwa-kit-react-sdk/ssr/browser/main'
 
 const main = () => {
+    window.__CONFIG__ = JSON.parse(document.getElementById('app-config').innerHTML)
     return Promise.all([start(), registerServiceWorker('/worker.js')])
 }
 

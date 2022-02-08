@@ -158,23 +158,23 @@ export const capitalize = (text) => {
         .join(' ')
 }
 
-/**
- * Get the pwa configuration object from pwa-kit.config.json
- * @param path - path to your target item from pwaKitConfig
- *
- * @example
- * getConfig('app.url') => {locale: 'path', site: 'path'}
- * getConfig('app.sites[0]') => {
-                "id": "RefArch",
-                "alias": "us",
-                "hostnames": [],
-                "l10n": {...}
-            }
- * @returns {object} - the targeted config value
- */
-export const getConfig = (path) => {
-    return getObjectProperty(pwaKitConfig, path)
-}
+// /**
+//  * Get the pwa configuration object from pwa-kit.config.json
+//  * @param path - path to your target item from pwaKitConfig
+//  *
+//  * @example
+//  * getConfig('app.url') => {locale: 'path', site: 'path'}
+//  * getConfig('app.sites[0]') => {
+//                 "id": "RefArch",
+//                 "alias": "us",
+//                 "hostnames": [],
+//                 "l10n": {...}
+//             }
+//  * @returns {object} - the targeted config value
+//  */
+// export const getConfig = (path) => {
+//     return getObjectProperty(pwaKitConfig, path)
+// }
 
 export const isObject = (o) => o?.constructor === Object
 
@@ -244,4 +244,100 @@ export const getParamsFromPath = (path, urlConfig = {}) => {
         result.locale = params.get('locale')
     }
     return result
+}
+
+let _config
+/**
+ * Dynamically load the applications config object.
+ *
+ * @returns the application config object.
+ */
+export const getConfig = async () => {
+    if (_config) {
+        return _config
+    }
+
+    if (typeof window !== 'undefined') {
+        _config = window.__CONFIG__
+    } else {
+        _config = (await import('config')).default
+        const sitesObject = await import('../../config/sites.json')
+        const updatedSites = mapSiteObjectToList(_config.sites, sitesObject)
+        _config = {..._config, sites: updatedSites}
+    }
+
+    return _config
+}
+
+/**
+ * Loop over the array, and use the site id to get the connected object from sitesObject (that has extra info about a site)
+ * append those properties into the array's object
+ *
+ * @param siteList
+ * @param sitesObj
+ * @return {array} site list - list of site configuration including id, alias, l10n, etc
+ *
+ * @example
+ * const config = {
+ *      defaultSite: 'site-1'
+ *      sites: [
+ *          id: 'site-1',
+ *          alias: 'us'
+ *      ]
+ * }
+ * const sitesObject = {
+ *     site-1: {
+ *         defaultLocale: 'en-US',
+ *         defaultCurrency: 'US',
+ *         supportedLocales: [
+ *             {
+ *                 id: 'en-US',
+ *                 preferredCurrency: 'USD'
+ *             }
+ *         ],
+ *         anotherProps: 'value-1'
+ *     }
+ * }
+ *
+ * mapSiteObjectToList(config.sites, sitesObject)
+ * return [
+ *      {
+ *          id: 'site-1',
+ *          alias: 'us',
+ *          anotherProps: 'value-1'
+ *          l10n: {
+ *              defaultLocale: 'en-US',
+ *              defaultCurrency: 'US',
+ *              supportedLocales: [
+ *              {
+ *                  id: 'en-US',
+ *                  preferredCurrency: 'USD'
+ *               }
+ *            ]
+ *          }
+ *      }
+ * ]
+ */
+export const mapSiteObjectToList = (siteList, sitesObj) => {
+    // if the siteList is a string, it is interpreted as a site id
+    if (typeof siteList === 'string') {
+        const id = siteList
+        return {
+            id,
+            ...sitesObj[id]
+        }
+    }
+    return siteList.map((site) => {
+        const siteObj = sitesObj[site.id]
+        const {supportedCurrencies, defaultCurrency, defaultLocale, supportedLocales} = siteObj
+        return {
+            ...site,
+            l10n: {
+                supportedCurrencies,
+                defaultCurrency,
+                defaultLocale,
+                supportedLocales
+            }
+        }
+    })
 }

@@ -14,14 +14,14 @@ import {getConfig} from './utils'
  * @param {object} - a custom configured object
  * @return {array} - list of configured route objects
  */
-export const configureRoutes = (routes = [], {ignoredRoutes = []}) => {
+export const configureRoutes = async (routes = [], {ignoredRoutes = []}) => {
     if (!routes.length) return []
 
-    const hosts = getConfig('app.routing.hosts')
-    const currentHost = getCurrentHost()
+    const config = await getConfig()
+    console.log('configureRoutes config', config)
 
     // collect and flatten the result to get a list of site objects
-    const allSites = hosts.find((host) => host.domain.includes(currentHost))?.siteMaps
+    const allSites = config.sites
 
     // get a collection of all site-id and site alias from the config of the current host
     // remove any duplicates
@@ -39,9 +39,8 @@ export const configureRoutes = (routes = [], {ignoredRoutes = []}) => {
     const locales = [
         ...new Set(
             allSites
-                .reduce((res, {id}) => {
-                    const supportedLocales = getConfig(`app.sites.${id}.supportedLocales`)
-                    supportedLocales.forEach((locale) => {
+                .reduce((res, {l10n}) => {
+                    l10n.supportedLocales.forEach((locale) => {
                         res = [...res, locale.id, locale.alias]
                     })
                     return res
@@ -88,21 +87,4 @@ export const configureRoutes = (routes = [], {ignoredRoutes = []}) => {
     }
 
     return outputRoutes
-}
-
-/**
- * This function return the current host by looking in the EXTERNAL_DOMAIN_NAME env variable
- * if it is undefined, it means you are on localhost
- * @returns {string}
- */
-const getCurrentHost = () => {
-    if (typeof window !== 'undefined') {
-        return window.location.hostname
-    }
-
-    const currentHost = process.env.EXTERNAL_DOMAIN_NAME
-        ? process.env.EXTERNAL_DOMAIN_NAME
-        : 'localhost'
-
-    return currentHost
 }

@@ -8,38 +8,37 @@
 import {getConfig, getParamsFromPath} from './utils'
 import {urlPartPositions} from '../constants'
 import {rebuildPathWithParams} from './url'
-import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
-import {getDefaultSite, getDefaultSiteValues, getSiteById, getSiteMapsByHost} from './site-utils'
-
+import {getDefaultIdentifiers, getDefaultSite} from './site-utils'
 /**
  * This function takes an url and return the site, locale and url configuration
  * For site, if a site is defined from the path, use the val to look for site obj from the config
  *    if not, use default site
  * For locale, if the locale is defined from path, use that val to find the locale object from config
  *    if not use the default val of the current site to find the locale object
- * @param path
+ *
+ * Adjust the logic here to fit your app scenario
+ * @param {string} path - input path
  * @returns {Object} ConfigValue object
  */
-export const resolveConfigFromUrl = (path) => {
-    const urlConfig = getUrlConfig()
+export const resolveConfigFromUrl = async (path) => {
+    const {url: urlConfig, sites} = await getConfig()
 
     const {site: currentSite, locale: currentLocale} = getParamsFromPath(path, urlConfig)
-    const {hostname} = new URL(getAppOrigin())
-    const siteMaps = getSiteMapsByHost(hostname)
-    // get the current siteMap
-    const siteMap = siteMaps.find((site) => site.id === currentSite || site.alias === currentSite)
-    // use the id to get the site
-    const site = siteMap ? getSiteById(siteMap.id) : getDefaultSite()
-    // get the default locale from supportedLocale
+    // get the current site based on the site identifier (id or alias)
+    // if it is undefined, use the default site
+    const site =
+        sites.find((site) => site.id === currentSite || site.alias === currentSite) ||
+        (await getDefaultSite())
     const defaultLocale = site.l10n.supportedLocales.find(
         (locale) => locale.id === site.l10n.defaultLocale
     )
-    // if a locale is found from supported locales based on currentLocale, use it, otherwise, use default
+    // if a locale is found from supported locales based on currentLocale, use it,
+    // otherwise, use default locale to identify the locale
     const supportedLocale = site.l10n.supportedLocales.find((locale) => locale.id === currentLocale)
     const locale = supportedLocale ? supportedLocale : defaultLocale
     return {
         site: site.alias || site.id,
-        locale: locale?.id,
+        locale: locale.id,
         url: urlConfig
     }
 }
@@ -92,7 +91,7 @@ export const buildPathWithUrlConfig = (relativeUrl, configValues = {}, opts = {}
     const queryParams = {...Object.fromEntries(params)}
     let basePathSegments = []
     const showDefault = urlConfig.showDefault
-    const {defaultLocaleVal, defaultSiteVal} = getDefaultSiteValues()
+    const {defaultLocaleVal, defaultSiteVal} = getDefaultIdentifiers()
     const options = ['site', 'locale']
     // if the showDefault is set to false, and when both locale and site are default values
     // then do not include them into the url

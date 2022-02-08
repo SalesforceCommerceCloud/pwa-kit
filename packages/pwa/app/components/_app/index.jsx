@@ -56,7 +56,16 @@ const DEFAULT_NAV_DEPTH = 3
 const DEFAULT_ROOT_CATEGORY = 'root'
 
 const App = (props) => {
-    const {children, targetLocale, defaultLocale, messages, categories: allCategories = {}} = props
+    const {
+        children,
+        targetLocale,
+        defaultLocale,
+        messages,
+        categories: allCategories = {},
+        config
+    } = props
+
+    console.log('App ===================', config)
 
     const appOrigin = getAppOrigin()
 
@@ -198,7 +207,13 @@ const App = (props) => {
                         </Seo>
 
                         <ScrollToTop />
-
+                        <script
+                            id="app-config"
+                            type="application/json" // Not executable
+                            dangerouslySetInnerHTML={{
+                                __html: JSON.stringify(config)
+                            }}
+                        />
                         <Box id="app" display="flex" flexDirection="column" flex={1}>
                             <SkipNavLink zIndex="skipLink">Skip to Content</SkipNavLink>
 
@@ -271,7 +286,8 @@ App.shouldGetProps = () => {
 }
 
 App.getProps = async ({api, res}) => {
-    const site = resolveSiteFromUrl(pathToUrl(res.locals.originalUrl))
+    console.log('apppppp.getProps==============', res)
+    const site = await resolveSiteFromUrl(pathToUrl(res.locals.originalUrl))
     const l10nConfig = site?.l10n
     const localeConfig = await getLocaleConfig({
         getUserPreferredLocales: () => {
@@ -328,7 +344,8 @@ Learn more with our localization guide. https://sfdc.co/localization-guide
         targetLocale: localeConfig.targetLocale,
         defaultLocale: localeConfig.defaultLocale,
         messages: localeConfig.messages,
-        categories: categories
+        categories: categories,
+        config: res?.locals?.config
     }
 }
 
@@ -337,7 +354,8 @@ App.propTypes = {
     targetLocale: PropTypes.string,
     defaultLocale: PropTypes.string,
     messages: PropTypes.object,
-    categories: PropTypes.object
+    categories: PropTypes.object,
+    config: PropTypes.object
 }
 
 export default App

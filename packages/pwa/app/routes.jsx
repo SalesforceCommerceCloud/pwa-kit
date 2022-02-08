@@ -102,9 +102,9 @@ const routes = [
         component: PageNotFound
     }
 ]
-
-const configuredRoutes = configureRoutes(routes, {
+let configuredRoutes = []
+configureRoutes(routes, {
     ignoredRoutes: ['/callback', '*']
-})
-
+}).then((routes) => (configuredRoutes = routes))
+console.log('configuredRoutes', configuredRoutes)
 export default configuredRoutes

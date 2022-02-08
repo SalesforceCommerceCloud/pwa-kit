@@ -1,0 +1,18 @@
+{
+  "url": {
+    "site": "path",
+    "locale": "path",
+    "showDefault": true
+  },
+  "defaultSite": "RefArchGlobal",
+  "sites": [
+    {
+      "id": "RefArch",
+      "alias": "us"
+    },
+    {
+      "id": "RefArchGlobal",
+      "alias": "global"
+    }
+  ]
+}

@@ -71,17 +71,19 @@ const AppConfig = ({children, locals = {}}) => {
     )
 }
 
-AppConfig.restore = (locals = {}) => {
+AppConfig.restore = async (locals = {}) => {
     const path =
         typeof window === 'undefined'
             ? locals.originalUrl
             : `${window.location.pathname}${window.location.search}`
     const url = pathToUrl(path)
-    const site = resolveSiteFromUrl(url)
+    const site = await resolveSiteFromUrl(url)
 
     if (site) {
         apiConfig.parameters.siteId = site?.id
     }
+
+    console.log('App config site', site)
 
     const {l10n} = site
     const locale = getLocale(locals)
