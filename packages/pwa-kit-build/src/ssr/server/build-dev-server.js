@@ -117,6 +117,26 @@ export const DevServerMixin = {
 
         const middleware = webpackHotServerMiddleware(app.__compiler)
 
+        app.get('/worker.js', (req, res) => {
+            const compiled = DevServerFactory._getWebpackAsset(req, 'pwa-others', 'worker.js')
+            if (compiled) {
+                res.type('.js')
+                res.send(compiled)
+            } else {
+                res.status(404).send('Not found')
+            }
+        })
+
+        app.get('/worker.js.map', (req, res) => {
+            const compiled = DevServerFactory._getWebpackAsset(req, 'pwa-others', 'worker.js.map')
+            if (compiled) {
+                res.type('.js.map')
+                res.send(compiled)
+            } else {
+                res.status(404).send('Not found')
+            }
+        })
+
         app.use('/', (req, res, next) => {
             if (app.__webpackReady()) {
                 middleware(req, res, next)
@@ -187,29 +207,44 @@ export const DevServerMixin = {
      * @private
      */
     getRequestProcessor(req) {
-        if (req.app.__webpackReady()) {
-            const outputFileSystem = req.app.__devMiddleware.context.outputFileSystem
-            const jsonWebpackStats = req.app.__devMiddleware.context.stats.toJson()
-
-            let compiled
-            try {
-                const rp = jsonWebpackStats.children.find(
-                    (child) => child.name === 'request-processor'
-                )
-                const requestProcessorPath = path.join(rp.outputPath, 'request-processor.js')
-                compiled = outputFileSystem.readFileSync(requestProcessorPath, 'utf-8')
-            } catch (e) {
-                // The user hasn't added a request processor
-                return null
-            }
-            const requestProcessor = requireFromString(compiled)
-            if (!requestProcessor.processRequest) {
+        const compiled = this._getWebpackAsset(req, 'request-processor', 'request-processor.js')
+        if (compiled) {
+            const module = requireFromString(compiled)
+            if (!module.processRequest) {
                 throw new Error(
                     `Request processor module "request-processor.js" does not export processRequest`
                 )
             }
-            return requestProcessor
+            return module
         } else {
+            return null
+        }
+    },
+
+    /**
+     * Return the compiled source for a webpack asset as a string.
+     *
+     * @param req
+     * @param compilerName
+     * @param fileName
+     * @returns {null|String}
+     * @private
+     */
+    _getWebpackAsset(req, compilerName, fileName) {
+        if (req.app.__webpackReady()) {
+            const outputFileSystem = req.app.__devMiddleware.context.outputFileSystem
+            const jsonWebpackStats = req.app.__devMiddleware.context.stats.toJson()
+
+            try {
+                const rp = jsonWebpackStats.children.find((child) => child.name === compilerName)
+                const assetPath = path.join(rp.outputPath, fileName)
+                return outputFileSystem.readFileSync(assetPath, 'utf-8')
+            } catch (e) {
+                // The file doesn't exist – this is fine, many are optional
+                return null
+            }
+        } else {
+            // The file isn't compiled yet
             return null
         }
     }

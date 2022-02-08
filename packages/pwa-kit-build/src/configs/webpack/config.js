@@ -86,8 +86,8 @@ const baseConfig = (target) => {
                 optimization: {
                     minimize: mode === production
                 },
-                // Perf/quality trade-off - see https://webpack.js.org/configuration/devtool/#devtool
-                devtool: mode === production ? 'source-map' : 'eval',
+                // Always use source map, makes debugging the server much easier.
+                devtool: 'source-map',
                 output: {
                     publicPath: '',
                     path: buildDir

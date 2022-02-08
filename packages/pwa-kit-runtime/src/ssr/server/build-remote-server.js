@@ -531,9 +531,6 @@ export const RemoteServerFactory = {
     setupCommonMiddleware(app, options) {
         app.use(prepNonProxyRequest)
 
-        // Serve this asset directly (in both remote and local modes)
-        app.get('/worker.js*', serveServiceWorker)
-
         // Any path
         const rootWildcard = '/*'
 
@@ -662,6 +659,10 @@ export const RemoteServerFactory = {
         const serverRenderer = _require(path.join(buildDir, 'server-renderer.js')).default
         const stats = _require(path.join(buildDir, 'loadable-stats.json'))
         app.use(serverRenderer(stats))
+
+        // Only serve worker.js if the user is setting up a server-side
+        // rendered project (assumed to be a PWA).
+        app.get('/worker.js*', serveServiceWorker)
     },
 
     /**
