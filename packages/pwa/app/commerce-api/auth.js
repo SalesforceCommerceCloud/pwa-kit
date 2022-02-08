@@ -192,12 +192,14 @@ class Auth {
      * @param {object} tokenResponse - access_token,id_token,refresh_token, expires_in,token_type, usid, customer_id, enc_user_id, idp_access_token
      */
     _handleShopperLoginTokenResponse(tokenResponse) {
-        const {access_token, refresh_token, customer_id, usid, enc_user_id} = tokenResponse
+        const {access_token, refresh_token, customer_id, usid, enc_user_id, id_token} = tokenResponse
         this._customerId = customer_id
         this._saveAccessToken(`Bearer ${access_token}`)
         this._saveUsid(usid)
-        // Non registered users recieve an empty string for the encoded user id value
-        if (enc_user_id.length > 0) {
+        // (Non registered users recieve an empty string for the encoded user id value)
+        // ^ incorrect assumption! Guest session from SFRA does have enc_user_id
+        // we use id_token to identify guest v.s. registered
+        if (id_token.length > 0) {
             this._saveEncUserId(enc_user_id)
             this._saveRefreshToken(refresh_token, 'registered')
         } else {

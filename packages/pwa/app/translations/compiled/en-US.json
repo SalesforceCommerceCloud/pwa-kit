@@ -1533,6 +1533,12 @@
       "value": "Contact Us"
     }
   ],
+  "home.link.get_started": [
+    {
+      "type": 0,
+      "value": "Get started"
+    }
+  ],
   "home.link.read_docs": [
     {
       "type": 0,
