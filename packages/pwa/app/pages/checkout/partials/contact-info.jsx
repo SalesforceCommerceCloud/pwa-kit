@@ -28,10 +28,12 @@ import {useCheckout} from '../util/checkout-context'
 import useLoginFields from '../../../components/forms/useLoginFields'
 import {ToggleCard, ToggleCardEdit, ToggleCardSummary} from '../../../components/toggle-card'
 import Field from '../../../components/field'
+import {AuthModal, useAuthModal} from '../../../hooks/use-auth-modal'
 
 const ContactInfo = () => {
     const {formatMessage} = useIntl()
     const history = useHistory()
+    const authModal = useAuthModal('password')
 
     const {
         customer,
@@ -80,6 +82,11 @@ const ContactInfo = () => {
         setShowPasswordField(!showPasswordField)
         setIsGuestCheckout(!isGuestCheckout)
     }
+
+    const onForgotPasswordClick = () => {
+        authModal.onOpen()
+    }
+
     return (
         <ToggleCard
             id="step-0"
@@ -121,7 +128,11 @@ const ContactInfo = () => {
                                     <Stack>
                                         <Field {...fields.password} />
                                         <Box>
-                                            <Button variant="link" size="sm">
+                                            <Button
+                                                variant="link"
+                                                size="sm"
+                                                onClick={onForgotPasswordClick}
+                                            >
                                                 <FormattedMessage
                                                     defaultMessage="Forgot password?"
                                                     id="contact_info.link.forgot_password"
@@ -163,6 +174,7 @@ const ContactInfo = () => {
                         </Stack>
                     </form>
                 </Container>
+                <AuthModal {...authModal} />
             </ToggleCardEdit>
             <ToggleCardSummary>
                 <Text>{basket?.customerInfo?.email || customer?.email}</Text>
