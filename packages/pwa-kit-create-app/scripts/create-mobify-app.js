@@ -42,6 +42,7 @@ const {URL} = require('url')
 const deepmerge = require('deepmerge')
 const sh = require('shelljs')
 const tar = require('tar')
+const slugify = require('slugify')
 const generatorPkg = require('../package.json')
 
 const program = new Command()
@@ -62,6 +63,8 @@ const PRESETS = PRIVATE_PRESETS.concat(PUBLIC_PRESETS)
 
 const DEFAULT_OUTPUT_DIR = p.join(process.cwd(), 'pwa-kit-starter-project')
 
+const PROJECT_ID_MAX_LENGTH = 20
+
 const SDK_VERSION = generatorPkg.version
 
 const readJson = (path) => JSON.parse(sh.cat(path))
@@ -70,6 +73,13 @@ const writeJson = (path, data) => new sh.ShellString(JSON.stringify(data, null, 
 
 const replaceJSON = (path, replacements) =>
     writeJson(path, Object.assign(readJson(path), replacements))
+
+const slugifyName = (name) => {
+    return slugify(name, {
+        lower: true,
+        strict: true
+    }).slice(0, PROJECT_ID_MAX_LENGTH)
+}
 
 /**
  * Deeply merge two objects in such a way that all array entries in b replace array
@@ -177,7 +187,7 @@ const runGenerator = (answers, {outputDir}) => {
         p.resolve(outputDir, 'app', 'api.config.js')
     )
 
-    console.log('Installing dependencies for the generated project (this can take a while)')
+    console.log('Installing dependencies for the generated project...')
     sh.exec(`npm install --no-progress`, {
         env: process.env,
         cwd: outputDir,
@@ -185,62 +195,56 @@ const runGenerator = (answers, {outputDir}) => {
     })
 }
 
-const retailReactAppPrompts = () => {
-    const validProjectId = (s) =>
-        /^[a-z0-9-]{1,20}$/.test(s) ||
-        'Value can only contain lowercase letters, numbers, and hyphens.'
+// Validations
+const validProjectName = (s) => {
+    const regex = new RegExp(`^[a-zA-Z0-9-\\s]{1,${PROJECT_ID_MAX_LENGTH}}$`)
+    return regex.test(s) || 'Value can only contain letters, numbers, space and hyphens.'
+}
 
-    const validUrl = (s) => {
-        try {
-            new URL(s)
-            return true
-        } catch (err) {
-            return 'Value must be an absolute URL'
-        }
+const validUrl = (s) => {
+    try {
+        new URL(s)
+        return true
+    } catch (err) {
+        return 'Value must be an absolute URL'
     }
+}
 
-    const validSiteId = (s) =>
-        /^[a-z0-9_-]+$/i.test(s) || 'Valid characters are alphanumeric, hyphen, or underscore'
+const validSiteId = (s) =>
+    /^[a-z0-9_-]+$/i.test(s) || 'Valid characters are alphanumeric, hyphen, or underscore'
 
-    // To see definitions for Commerce API configuration values, go to
-    // https://developer.salesforce.com/docs/commerce/commerce-api/guide/commerce-api-configuration-values.
-    const defaultCommerceAPIError =
-        'Invalid format. Use docs to find more information about valid configurations: https://developer.salesforce.com/docs/commerce/commerce-api/guide/commerce-api-configuration-values'
-    const defaultEinsteinAPIError =
-        'Invalid format. Use docs to find more information about valid configurations: https://developer.salesforce.com/docs/commerce/einstein-api/references#einstein-recommendations:Summary'
-    const validShortCode = (s) => /(^[0-9A-Z]{8}$)/i.test(s) || defaultCommerceAPIError
-    const validClientId = (s) =>
-        /(^[0-9A-Z]{8}-[0-9A-Z]{4}-[0-9A-Z]{4}-[0-9A-Z]{4}-[0-9A-Z]{12}$)/i.test(s) ||
-        s === 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa' ||
-        defaultCommerceAPIError
-    const validOrganizationId = (s) =>
-        /^(f_ecom)_([A-Z]{4})_(prd|stg|dev|[0-9]{3}|s[0-9]{2})$/i.test(s) || defaultCommerceAPIError
-    const validEinsteinId = (s) =>
-        /(^[0-9A-Z]{8}-[0-9A-Z]{4}-[0-9A-Z]{4}-[0-9A-Z]{4}-[0-9A-Z]{12}$)/i.test(s) ||
-        s === '' ||
-        defaultEinsteinAPIError
+// To see definitions for Commerce API configuration values, go to
+// https://developer.salesforce.com/docs/commerce/commerce-api/guide/commerce-api-configuration-values.
+const defaultCommerceAPIError =
+    'Invalid format. Use docs to find more information about valid configurations: https://developer.salesforce.com/docs/commerce/commerce-api/guide/commerce-api-configuration-values'
+const validShortCode = (s) => /(^[0-9A-Z]{8}$)/i.test(s) || defaultCommerceAPIError
+const validClientId = (s) =>
+    /(^[0-9A-Z]{8}-[0-9A-Z]{4}-[0-9A-Z]{4}-[0-9A-Z]{4}-[0-9A-Z]{12}$)/i.test(s) ||
+    s === 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa' ||
+    defaultCommerceAPIError
+const validOrganizationId = (s) =>
+    /^(f_ecom)_([A-Z]{4})_(prd|stg|dev|[0-9]{3}|s[0-9]{2})$/i.test(s) || defaultCommerceAPIError
 
+const retailReactAppPrompts = () => {
     const questions = [
         {
-            name: 'projectId',
-            validate: validProjectId,
-            message: 'What is your project ID (example-project) in Managed Runtime Admin?'
+            name: 'projectName',
+            validate: validProjectName,
+            message: 'What is the name of your Project?'
         },
         {
             name: 'instanceUrl',
-            message:
-                'What is the URL (https://example_instance_id.sandbox.us01.dx.commercecloud.salesforce.com) for your B2C Commerce instance?',
+            message: 'What is the URL for your Commerce Cloud instance?',
             validate: validUrl
         },
         {
             name: 'clientId',
-            message: 'What is your API client ID?',
+            message: 'What is your SLAS API Client ID in Account Manager?',
             validate: validClientId
         },
         {
             name: 'siteId',
-            message:
-                "What is your site's ID (examples: RefArch, RefArchGlobal) in Business Manager?",
+            message: 'What is your Site ID in Business Manager?',
             validate: validSiteId
         },
         {
@@ -252,20 +256,14 @@ const retailReactAppPrompts = () => {
             name: 'shortCode',
             message: 'What is your Commerce API short code in Business Manager?',
             validate: validShortCode
-        },
-        {
-            name: 'einsteinId',
-            message: 'What is your API Client ID in the Einstein Configurator? (optional)',
-            validate: validEinsteinId
         }
-        // NOTE: there's no question about Einstein's _site_ id because we currently assume that the site id will be the same for both Commerce API and Einstein
     ]
 
     return inquirer.prompt(questions).then((answers) => buildAnswers(answers))
 }
 
 const buildAnswers = ({
-    projectId,
+    projectName,
     instanceUrl,
     clientId,
     siteId,
@@ -274,6 +272,8 @@ const buildAnswers = ({
     einsteinId,
     einsteinSiteId
 }) => {
+    const projectId = slugifyName(projectName)
+
     return {
         globals: {projectId},
         'scaffold-pwa': {
@@ -306,7 +306,7 @@ const buildAnswers = ({
 
 const testProjectAnswers = () => {
     const config = {
-        projectId: 'scaffold-pwa',
+        projectName: 'scaffold-pwa',
         instanceUrl: 'https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com',
         clientId: 'c9c45bfd-0ed3-4aa2-9971-40f88962b836',
         siteId: 'RefArch',
@@ -321,7 +321,7 @@ const testProjectAnswers = () => {
 
 const demoProjectAnswers = () => {
     const config = {
-        projectId: 'demo-storefront',
+        projectName: 'demo-storefront',
         instanceUrl: 'https://zzte-053.sandbox.us02.dx.commercecloud.salesforce.com/',
         clientId: '1d763261-6522-4913-9d52-5d947d3b94c4',
         siteId: 'RefArch',
@@ -335,27 +335,24 @@ const demoProjectAnswers = () => {
 }
 
 const helloWorldPrompts = () => {
-    const validProjectId = (s) =>
-        /^[a-z0-9-]{1,20}$/.test(s) ||
-        'Value can only contain lowercase letters, numbers, and hyphens.'
     const questions = [
         {
-            name: 'projectId',
-            validate: validProjectId,
-            message: 'What is your project ID (example-project) in Managed Runtime Admin?'
+            name: 'projectName',
+            validate: validProjectName,
+            message: 'What is the name of your Project?'
         }
     ]
     return inquirer.prompt(questions)
 }
 
-const generateHelloWorld = ({projectId}, {outputDir}) => {
+const generateHelloWorld = (projectId, {outputDir}) => {
     extractTemplate('hello-world', outputDir)
     const pkgJsonPath = p.resolve(outputDir, 'package.json')
     const pkgJSON = readJson(pkgJsonPath)
     const finalPkgData = merge(pkgJSON, {name: projectId})
     writeJson(pkgJsonPath, finalPkgData)
 
-    console.log('Installing dependencies for the generated project (this can take a while)')
+    console.log('Installing dependencies for the generated project...')
     sh.exec(`npm install --no-progress`, {
         env: process.env,
         cwd: outputDir,
@@ -367,9 +364,18 @@ const presetPrompt = () => {
     const questions = [
         {
             name: 'preset',
-            message: 'Choose a project preset to get started:',
+            message: 'Choose a project to get started:',
             type: 'list',
-            choices: PUBLIC_PRESETS
+            choices: [
+                {
+                    name: 'The Retail app with demo Commerce Cloud instance',
+                    value: RETAIL_REACT_APP_DEMO
+                },
+                {
+                    name: 'The Retail app using your own Commerce Cloud instance',
+                    value: RETAIL_REACT_APP
+                }
+            ]
         }
     ]
     return inquirer.prompt(questions).then((answers) => answers['preset'])
@@ -387,7 +393,8 @@ const extractTemplate = (templateName, outputDir) => {
 }
 
 const main = (opts) => {
-    if (!(opts.outputDir === DEFAULT_OUTPUT_DIR) && sh.test('-e', opts.outputDir)) {
+    const OUTPUT_DIR_FLAG_ACTIVE = !(opts.outputDir === DEFAULT_OUTPUT_DIR)
+    if (OUTPUT_DIR_FLAG_ACTIVE && sh.test('-e', opts.outputDir)) {
         console.error(
             `The output directory "${opts.outputDir}" already exists. Try, for example, ` +
                 `"~/Desktop/my-project" instead of "~/Desktop"`
@@ -402,20 +409,40 @@ const main = (opts) => {
                 case HELLO_WORLD_TEST_PROJECT:
                     return generateHelloWorld({projectId: 'hello-world'}, opts)
                 case HELLO_WORLD:
-                    return helloWorldPrompts(opts).then((answers) =>
-                        generateHelloWorld(answers, opts)
-                    )
+                    return helloWorldPrompts(opts).then((answers) => {
+                        const projectId = slugifyName(answers.projectName)
+                        if (!OUTPUT_DIR_FLAG_ACTIVE) {
+                            opts.outputDir = p.join(process.cwd(), projectId)
+                        }
+                        generateHelloWorld(projectId, opts)
+                        return opts.outputDir
+                    })
                 case TEST_PROJECT:
                     return runGenerator(testProjectAnswers(), opts)
                 case RETAIL_REACT_APP_DEMO:
-                    return runGenerator(demoProjectAnswers(), opts)
+                    return Promise.resolve()
+                        .then(() => runGenerator(demoProjectAnswers(), opts))
+                        .then((result) => {
+                            console.log(
+                                '\nTo change your ecommerce back end you will need to update your storefront configuration. More information: https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/configuration-options'
+                            )
+                            return result
+                        })
                 case RETAIL_REACT_APP:
                     console.log(
-                        'For details on configuration values, see https://developer.salesforce.com/docs/commerce/commerce-api/guide/commerce-api-configuration-values\n'
+                        'For details on configuration options, see https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/configuration-options\n'
                     )
-                    return retailReactAppPrompts(opts).then((answers) =>
+                    return retailReactAppPrompts(opts).then((answers) => {
+                        if (!OUTPUT_DIR_FLAG_ACTIVE) {
+                            opts.outputDir = p.join(
+                                process.cwd(),
+                                slugifyName(answers.globals.projectId)
+                            )
+                        }
+
                         runGenerator(answers, opts)
-                    )
+                        return opts.outputDir
+                    })
                 default:
                     console.error(
                         `The preset "${preset}" is not valid. Valid presets are: ${
@@ -462,9 +489,11 @@ Examples:
 
     return Promise.resolve()
         .then(() => main(program.opts()))
-        .then(() => {
+        .then((outputDir) => {
             console.log('')
-            console.log(`Successfully generated a project in ${program.outputDir}`)
+            console.log(
+                `Successfully generated a project in ${outputDir ? outputDir : program.outputDir}`
+            )
             process.exit(0)
         })
         .catch((err) => {
