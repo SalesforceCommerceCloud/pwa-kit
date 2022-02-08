@@ -5,6 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import CommerceAPI from '.'
+import fetch from 'jest-fetch-mock'
 
 // NOTE: this will need to be a fixed or known config for testing against
 // It will probably end up living in pwa-kit later on so we may want to
@@ -393,28 +394,14 @@ describe('CommerceAPI', () => {
     })
     test('calling createBasket returns basket object in camelCase', async () => {
         const api = getAPI()
-        global.fetch = jest.fn().mockImplementation(() => {
-            return {
-                status: 200,
-                json: async () => {
-                    return ocapiBasketResponse
-                }
-            }
-        })
+        fetch.mockResponseOnce(JSON.stringify(ocapiBasketResponse))
         const basket = await api.shopperBaskets.createBasket({})
         expect(basket).toBeDefined()
         expect(basket.customerInfo.customerId).toBeDefined()
     })
     test('calling getBasket with basketId returns basket object in camelCase', async () => {
         const api = getAPI()
-        global.fetch = jest.fn().mockImplementation(() => {
-            return {
-                status: 200,
-                json: async () => {
-                    return ocapiBasketResponse
-                }
-            }
-        })
+        fetch.mockResponseOnce(JSON.stringify(ocapiBasketResponse))
         const basketId = 'bczFTaOjgEqUkaaadkvHwbgrP5'
         const response = await api.shopperBaskets.getBasket({
             parameters: {basketId: basketId}
@@ -433,14 +420,7 @@ describe('CommerceAPI', () => {
     test('calling addItemToBasket with basketId & body returns basket object in camelCase', async () => {
         const _CommerceAPI = require('./index').default
         const api = new _CommerceAPI(apiConfig)
-        global.fetch = jest.fn().mockImplementation(() => {
-            return {
-                status: 200,
-                json: async () => {
-                    return ocapiBasketResponse
-                }
-            }
-        })
+        fetch.mockResponseOnce(JSON.stringify(ocapiBasketResponse))
         const basketId = 'bczFTaOjgEqUkaaadkvHwbgrP5'
         const response = await api.shopperBaskets.addItemToBasket({
             parameters: {
@@ -457,15 +437,7 @@ describe('CommerceAPI', () => {
     test('calling addItemToBasket without body returns descriptive error', async () => {
         const _CommerceAPI = require('./index').default
         const api = new _CommerceAPI(apiConfig)
-        // const api = getAPI()
-        global.fetch = jest.fn().mockImplementation(() => {
-            return {
-                status: 200,
-                json: async () => {
-                    return ocapiBasketResponse
-                }
-            }
-        })
+        fetch.mockResponseOnce(JSON.stringify(ocapiBasketResponse))
         const basketId = 'bczFTaOjgEqUkaaadkvHwbgrP5'
         const response = await api.shopperBaskets.addItemToBasket({
             parameters: {
@@ -477,14 +449,7 @@ describe('CommerceAPI', () => {
     })
     test('calling updateItemInBasket with basketId & body returns basket object in camelCase', async () => {
         const api = getAPI()
-        global.fetch = jest.fn().mockImplementation(() => {
-            return {
-                status: 200,
-                json: async () => {
-                    return ocapiBasketResponse
-                }
-            }
-        })
+        fetch.mockResponseOnce(JSON.stringify(ocapiBasketResponse))
         const basketId = 'bczFTaOjgEqUkaaadkvHwbgrP5'
         const response = await api.shopperBaskets.updateItemInBasket({
             parameters: {
@@ -500,14 +465,7 @@ describe('CommerceAPI', () => {
     })
     test('calling updateItemInBasket without body returns descriptive error', async () => {
         const api = getAPI()
-        global.fetch = jest.fn().mockImplementation(() => {
-            return {
-                status: 200,
-                json: async () => {
-                    return ocapiBasketResponse
-                }
-            }
-        })
+        fetch.mockResponseOnce(JSON.stringify(ocapiBasketResponse))
         const basketId = 'bczFTaOjgEqUkaaadkvHwbgrP5'
         const response = await api.shopperBaskets.updateItemInBasket({
             parameters: {
@@ -519,14 +477,7 @@ describe('CommerceAPI', () => {
     })
     test('calling removeItemFromBasket returns basket object in camelCase', async () => {
         const api = getAPI()
-        global.fetch = jest.fn().mockImplementation(() => {
-            return {
-                status: 200,
-                json: async () => {
-                    return ocapiBasketResponse
-                }
-            }
-        })
+        fetch.mockResponseOnce(JSON.stringify(ocapiBasketResponse))
         const basketId = 'bczFTaOjgEqUkaaadkvHwbgrP5'
         const basket = await api.shopperBaskets.removeItemFromBasket({
             parameters: {
@@ -539,14 +490,7 @@ describe('CommerceAPI', () => {
     })
     test('calling removeItemFromBasket without basket returns descriptive error', async () => {
         const api = getAPI()
-        global.fetch = jest.fn().mockImplementation(() => {
-            return {
-                status: 200,
-                json: async () => {
-                    return ocapiBasketResponse
-                }
-            }
-        })
+        fetch.mockResponseOnce(JSON.stringify(ocapiBasketResponse))
         const response = await api.shopperBaskets.removeItemFromBasket({
             parameters: {
                 itemId: 'fake-product-id'
@@ -559,14 +503,7 @@ describe('CommerceAPI', () => {
     })
     test('calling addPaymentInstrumentToBasket returns basketId object in camelCase', async () => {
         const api = getAPI()
-        global.fetch = jest.fn().mockImplementation(() => {
-            return {
-                status: 200,
-                json: async () => {
-                    return ocapiBasketResponse
-                }
-            }
-        })
+        fetch.mockResponseOnce(JSON.stringify(ocapiBasketResponse))
         const basketId = 'bczFTaOjgEqUkaaadkvHwbgrP5'
         const basket = await api.shopperBaskets.addPaymentInstrumentToBasket({
             parameters: {
@@ -579,14 +516,7 @@ describe('CommerceAPI', () => {
     })
     test('calling addPaymentInstrumentToBasket without basketId & body returns descriptive error', async () => {
         const api = getAPI()
-        global.fetch = jest.fn().mockImplementation(() => {
-            return {
-                status: 200,
-                json: async () => {
-                    return ocapiBasketResponse
-                }
-            }
-        })
+        fetch.mockResponseOnce(JSON.stringify(ocapiBasketResponse))
         const response = await api.shopperBaskets.addPaymentInstrumentToBasket({
             parameters: {}
         })
@@ -595,14 +525,7 @@ describe('CommerceAPI', () => {
     })
     test('calling removePaymentInstrumentFromBasket returns basketId object in camelCase', async () => {
         const api = getAPI()
-        global.fetch = jest.fn().mockImplementation(() => {
-            return {
-                status: 200,
-                json: async () => {
-                    return ocapiBasketResponse
-                }
-            }
-        })
+        fetch.mockResponseOnce(JSON.stringify(ocapiBasketResponse))
         const basketId = 'bczFTaOjgEqUkaaadkvHwbgrP5'
         const basket = await api.shopperBaskets.removePaymentInstrumentFromBasket({
             parameters: {
@@ -627,14 +550,7 @@ describe('CommerceAPI', () => {
     })
     test('calling removePaymentInstrumentFromBasket without basketId & paymentInstrumentId returns descriptive error', async () => {
         const api = getAPI()
-        global.fetch = jest.fn().mockImplementation(() => {
-            return {
-                status: 200,
-                json: async () => {
-                    return ocapiBasketResponse
-                }
-            }
-        })
+        fetch.mockResponseOnce(JSON.stringify(ocapiBasketResponse))
         const response = await api.shopperBaskets.removePaymentInstrumentFromBasket({
             parameters: {body: {}}
         })
@@ -645,14 +561,7 @@ describe('CommerceAPI', () => {
     })
     test('calling getShippingMethodsForShipment returns basketId object in camelCase', async () => {
         const api = getAPI()
-        global.fetch = jest.fn().mockImplementation(() => {
-            return {
-                status: 200,
-                json: async () => {
-                    return ocapiBasketResponse
-                }
-            }
-        })
+        fetch.mockResponseOnce(JSON.stringify(ocapiBasketResponse))
         const basketId = 'bczFTaOjgEqUkaaadkvHwbgrP5'
         const basket = await api.shopperBaskets.getShippingMethodsForShipment({
             parameters: {
@@ -665,14 +574,7 @@ describe('CommerceAPI', () => {
     })
     test('calling getShippingMethodsForShipment without shipmentId returns descriptive error', async () => {
         const api = getAPI()
-        global.fetch = jest.fn().mockImplementation(() => {
-            return {
-                status: 200,
-                json: async () => {
-                    return ocapiBasketResponse
-                }
-            }
-        })
+        fetch.mockResponseOnce(JSON.stringify(ocapiBasketResponse))
         const basketId = 'bczFTaOjgEqUkaaadkvHwbgrP5'
         const response = await api.shopperBaskets.getShippingMethodsForShipment({
             parameters: {
@@ -686,14 +588,7 @@ describe('CommerceAPI', () => {
     })
     test('calling updateBillingAddressForBasket returns basket object in camelCase', async () => {
         const api = getAPI()
-        global.fetch = jest.fn().mockImplementation(() => {
-            return {
-                status: 200,
-                json: async () => {
-                    return ocapiBasketResponse
-                }
-            }
-        })
+        fetch.mockResponseOnce(JSON.stringify(ocapiBasketResponse))
         const basketId = 'bczFTaOjgEqUkaaadkvHwbgrP5'
         const basket = await api.shopperBaskets.updateBillingAddressForBasket({
             parameters: {
@@ -706,14 +601,7 @@ describe('CommerceAPI', () => {
     })
     test('calling updateBillingAddressForBasket without body returns descriptive error', async () => {
         const api = getAPI()
-        global.fetch = jest.fn().mockImplementation(() => {
-            return {
-                status: 200,
-                json: async () => {
-                    return ocapiBasketResponse
-                }
-            }
-        })
+        fetch.mockResponseOnce(JSON.stringify(ocapiBasketResponse))
         const basketId = 'bczFTaOjgEqUkaaadkvHwbgrP5'
         const response = await api.shopperBaskets.updateBillingAddressForBasket({
             parameters: {
@@ -725,14 +613,7 @@ describe('CommerceAPI', () => {
     })
     test('calling updateShippingAddressForShipment returns basket object in camelCase', async () => {
         const api = getAPI()
-        global.fetch = jest.fn().mockImplementation(() => {
-            return {
-                status: 200,
-                json: async () => {
-                    return ocapiBasketResponse
-                }
-            }
-        })
+        fetch.mockResponseOnce(JSON.stringify(ocapiBasketResponse))
         const basketId = 'bczFTaOjgEqUkaaadkvHwbgrP5'
         const basket = await api.shopperBaskets.updateShippingAddressForShipment({
             parameters: {
@@ -746,14 +627,7 @@ describe('CommerceAPI', () => {
     })
     test('calling updateShippingAddressForShipment without shipmentId returns descriptive error', async () => {
         const api = getAPI()
-        global.fetch = jest.fn().mockImplementation(() => {
-            return {
-                status: 200,
-                json: async () => {
-                    return ocapiBasketResponse
-                }
-            }
-        })
+        fetch.mockResponseOnce(JSON.stringify(ocapiBasketResponse))
         const basketId = 'bczFTaOjgEqUkaaadkvHwbgrP5'
         const response = await api.shopperBaskets.updateShippingAddressForShipment({
             parameters: {
@@ -768,14 +642,7 @@ describe('CommerceAPI', () => {
     })
     test('calling updateShippingMethodForShipment returns basket object in camelCase', async () => {
         const api = getAPI()
-        global.fetch = jest.fn().mockImplementation(() => {
-            return {
-                status: 200,
-                json: async () => {
-                    return ocapiBasketResponse
-                }
-            }
-        })
+        fetch.mockResponseOnce(JSON.stringify(ocapiBasketResponse))
         const basketId = 'bczFTaOjgEqUkaaadkvHwbgrP5'
         const basket = await api.shopperBaskets.updateShippingMethodForShipment({
             parameters: {
@@ -789,14 +656,7 @@ describe('CommerceAPI', () => {
     })
     test('calling updateShippingMethodForShipment without shipmentId returns descriptive error', async () => {
         const api = getAPI()
-        global.fetch = jest.fn().mockImplementation(() => {
-            return {
-                status: 200,
-                json: async () => {
-                    return ocapiBasketResponse
-                }
-            }
-        })
+        fetch.mockResponseOnce(JSON.stringify(ocapiBasketResponse))
         const basketId = 'bczFTaOjgEqUkaaadkvHwbgrP5'
         const response = await api.shopperBaskets.updateShippingMethodForShipment({
             parameters: {
@@ -811,14 +671,7 @@ describe('CommerceAPI', () => {
     })
     test('calling updateCustomerForBasket returns basket object in camelCase', async () => {
         const api = getAPI()
-        global.fetch = jest.fn().mockImplementation(() => {
-            return {
-                status: 200,
-                json: async () => {
-                    return ocapiBasketResponse
-                }
-            }
-        })
+        fetch.mockResponseOnce(JSON.stringify(ocapiBasketResponse))
         const basketId = 'bczFTaOjgEqUkaaadkvHwbgrP5'
         const basket = await api.shopperBaskets.updateCustomerForBasket({
             parameters: {
@@ -831,14 +684,7 @@ describe('CommerceAPI', () => {
     })
     test('calling updateCustomerForBasket without body returns descriptive error', async () => {
         const api = getAPI()
-        global.fetch = jest.fn().mockImplementation(() => {
-            return {
-                status: 200,
-                json: async () => {
-                    return ocapiBasketResponse
-                }
-            }
-        })
+        fetch.mockResponseOnce(JSON.stringify(ocapiBasketResponse))
         const basketId = 'bczFTaOjgEqUkaaadkvHwbgrP5'
         const response = await api.shopperBaskets.updateCustomerForBasket({
             parameters: {
@@ -867,14 +713,7 @@ describe('CommerceAPI', () => {
     })
     test('calling deleteBasket without basketId returns descriptive error', async () => {
         const api = getAPI()
-        global.fetch = jest.fn().mockImplementation(() => {
-            return {
-                status: 200,
-                json: async () => {
-                    return ocapiBasketResponse
-                }
-            }
-        })
+        fetch.mockResponseOnce(JSON.stringify(ocapiBasketResponse))
         const response = await api.shopperBaskets.deleteBasket({
             parameters: {}
         })
@@ -901,14 +740,7 @@ describe('CommerceAPI', () => {
     })
     test('calling createOrder returns basket object', async () => {
         const api = getAPI()
-        global.fetch = jest.fn().mockImplementation(() => {
-            return {
-                status: 200,
-                json: async () => {
-                    return ocapiBasketResponse
-                }
-            }
-        })
+        fetch.mockResponseOnce(JSON.stringify(ocapiBasketResponse))
         const response = await api.shopperOrders.createOrder({
             parameters: {},
             body: {basketId: ''}
@@ -918,14 +750,7 @@ describe('CommerceAPI', () => {
     })
     test('calling createOrder without body returns descriptive error', async () => {
         const api = getAPI()
-        global.fetch = jest.fn().mockImplementation(() => {
-            return {
-                status: 200,
-                json: async () => {
-                    return ocapiBasketResponse
-                }
-            }
-        })
+        fetch.mockResponseOnce(JSON.stringify(ocapiBasketResponse))
         const response = await api.shopperOrders.createOrder({
             parameters: {}
         })
@@ -934,14 +759,7 @@ describe('CommerceAPI', () => {
     })
     test('calling getOrder returns basket object', async () => {
         const api = getAPI()
-        global.fetch = jest.fn().mockImplementation(() => {
-            return {
-                status: 200,
-                json: async () => {
-                    return ocapiBasketResponse
-                }
-            }
-        })
+        fetch.mockResponseOnce(JSON.stringify(ocapiBasketResponse))
         const response = await api.shopperOrders.getOrder({
             parameters: {orderNo: ''}
         })
@@ -950,14 +768,7 @@ describe('CommerceAPI', () => {
     })
     test('calling createOrder without orderNo returns descriptive error', async () => {
         const api = getAPI()
-        global.fetch = jest.fn().mockImplementation(() => {
-            return {
-                status: 200,
-                json: async () => {
-                    return ocapiBasketResponse
-                }
-            }
-        })
+        fetch.mockResponseOnce(JSON.stringify(ocapiBasketResponse))
         const response = await api.shopperOrders.getOrder({
             parameters: {}
         })

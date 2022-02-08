@@ -7,6 +7,9 @@
 import 'raf/polyfill' // fix requestAnimationFrame issue with polyfill
 import '@testing-library/jest-dom/extend-expect'
 import {Crypto} from '@peculiar/webcrypto'
+import fetchMock from 'jest-fetch-mock'
+
+jest.setMock('cross-fetch', fetchMock)
 
 // TextEncoder is a web API, need to import it
 // from nodejs util in testing environment.
