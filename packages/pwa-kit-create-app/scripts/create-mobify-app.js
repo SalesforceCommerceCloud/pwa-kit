@@ -42,6 +42,7 @@ const {URL} = require('url')
 const deepmerge = require('deepmerge')
 const sh = require('shelljs')
 const tar = require('tar')
+const semver = require('semver')
 const generatorPkg = require('../package.json')
 
 const program = new Command()
@@ -386,7 +387,20 @@ const extractTemplate = (templateName, outputDir) => {
     sh.rm('-rf', tmp)
 }
 
+const userNode = process.versions.node
+const requiredNode = new semver.Range(generatorPkg.engines.node)
+const isUsingCompatibleNode = semver.satisfies(userNode, requiredNode)
+
 const main = (opts) => {
+    if (!isUsingCompatibleNode) {
+        console.warn(
+            `Warning: You are using Node ${userNode}. ` +
+                `Your app may not work as expected when deployed to Managed ` +
+                `Runtime servers which are compatible with Node ${requiredNode}`
+        )
+        console.log('')
+    }
+
     if (!(opts.outputDir === DEFAULT_OUTPUT_DIR) && sh.test('-e', opts.outputDir)) {
         console.error(
             `The output directory "${opts.outputDir}" already exists. Try, for example, ` +
@@ -432,19 +446,19 @@ const main = (opts) => {
 if (require.main === module) {
     program.name(`pwa-kit-create-app`)
     program.description(`Generate a new PWA Kit project, optionally using a preset.
-    
+
 Examples:
 
   ${program.name()} --preset "${RETAIL_REACT_APP}"
     Generate a project using custom settings by answering questions about a
     B2C Commerce instance.
-    
+
     Use this preset to connect to an existing instance, such as a sandbox.
 
   ${program.name()} --preset "${RETAIL_REACT_APP_DEMO}"
     Generate a project using the settings for a special B2C Commerce
     instance that is used for demo purposes. No questions are asked.
-    
+
     Use this preset to try out PWA Kit.
   `)
     program
