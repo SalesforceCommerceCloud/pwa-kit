@@ -160,8 +160,10 @@ export const capitalize = (text) => {
  * @returns {object} - the configuration object
  */
 // export const getConfig = () => pwaKitConfig
+export const DEFAULT_CONFIG_MODULE_NAME = process?.env?.DEPLOY_TARGET || 'DEFAULT'
+
 let _config
-export const getConfig = ({req, moduleNameResolver}) => {
+export const getConfig = ({moduleNameResolver}) => {
     if (_config) {
         return _config
     }
@@ -180,7 +182,7 @@ export const getConfig = ({req, moduleNameResolver}) => {
     // configuration file. This means that on a "Production" names target, you'll load
     // your `config/production.json` file. You can customize how you determine your
     // {moduleName}.
-    let moduleName = moduleNameResolver(req, moduleName) || process.env.DEPLOY_TARGET
+    let moduleName = moduleNameResolver() || process.env.DEPLOY_TARGET
 
     const explorerSync = cosmiconfigSync(moduleName, {
         packageProp: 'mobify',
