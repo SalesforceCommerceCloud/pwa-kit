@@ -167,6 +167,9 @@ export const AuthModal = ({
         }
     }, [customer])
 
+    const onBackToSignInClick = () =>
+        initialView === PASSWORD_VIEW ? props.onClose() : setCurrentView(LOGIN_VIEW)
+
     const PasswordResetSuccess = () => (
         <Stack justify="center" align="center" spacing={6}>
             <BrandLogo width="60px" height="auto" />
@@ -189,7 +192,7 @@ export const AuthModal = ({
                     />
                 </Text>
 
-                <Button onClick={() => setCurrentView(LOGIN_VIEW)}>
+                <Button onClick={onBackToSignInClick}>
                     <FormattedMessage
                         defaultMessage="Back to Sign In"
                         id="auth_modal.password_reset_success.button.back_to_sign_in"
@@ -217,14 +220,14 @@ export const AuthModal = ({
                         <RegisterForm
                             form={form}
                             submitForm={submitForm}
-                            clickSignIn={() => setCurrentView(LOGIN_VIEW)}
+                            clickSignIn={onBackToSignInClick}
                         />
                     )}
                     {!form.formState.isSubmitSuccessful && currentView === PASSWORD_VIEW && (
                         <ResetPasswordForm
                             form={form}
                             submitForm={submitForm}
-                            clickSignIn={() => setCurrentView(LOGIN_VIEW)}
+                            clickSignIn={onBackToSignInClick}
                         />
                     )}
                     {form.formState.isSubmitSuccessful && currentView === PASSWORD_VIEW && (
