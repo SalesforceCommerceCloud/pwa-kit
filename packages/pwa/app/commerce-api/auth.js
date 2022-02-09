@@ -10,6 +10,7 @@ import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
 import {HTTPError} from 'pwa-kit-react-sdk/ssr/universal/errors'
 import {createCodeVerifier, generateCodeChallenge} from './pkce'
 import {createGetTokenBody} from './utils'
+import fetch from 'cross-fetch'
 
 /**
  * An object containing the customer's login credentials.
@@ -126,6 +127,15 @@ class Auth {
         return response
     }
 
+    async createOCAPISession() {
+        return fetch('/mobify/proxy/ocapi/s/RefArch/dw/shop/v21_3/sessions', {
+            method: 'POST',
+            headers: {
+                Authorization: this._authToken
+            }
+        })
+    }
+
     /**
      * Authorizes the customer as a registered or guest user.
      * @param {CustomerCredentials} [credentials]
@@ -146,15 +156,19 @@ class Auth {
             } else if (this._refreshToken) {
                 authorizationMethod = '_refreshAccessToken'
             }
-            debugger
-            return this[authorizationMethod](credentials).catch((error) => {
-                if (retries === 0 && error.message === 'EXPIRED_TOKEN') {
-                    retries = 1 // we only retry once
-                    this._clearAuth()
-                    return startLoginFlow()
-                }
-                throw error
-            })
+            return this[authorizationMethod](credentials)
+                .catch((error) => {
+                    if (retries === 0 && error.message === 'EXPIRED_TOKEN') {
+                        retries = 1 // we only retry once
+                        this._clearAuth()
+                        return startLoginFlow()
+                    }
+                    throw error
+                })
+                .then((result) => {
+                    this.createOCAPISession()
+                    return result
+                })
         }
 
         this._pendingLogin = startLoginFlow().finally(() => {
@@ -192,7 +206,14 @@ class Auth {
      * @param {object} tokenResponse - access_token,id_token,refresh_token, expires_in,token_type, usid, customer_id, enc_user_id, idp_access_token
      */
     _handleShopperLoginTokenResponse(tokenResponse) {
-        const {access_token, refresh_token, customer_id, usid, enc_user_id, id_token} = tokenResponse
+        const {
+            access_token,
+            refresh_token,
+            customer_id,
+            usid,
+            enc_user_id,
+            id_token
+        } = tokenResponse
         this._customerId = customer_id
         this._saveAccessToken(`Bearer ${access_token}`)
         this._saveUsid(usid)
@@ -484,7 +505,9 @@ class CookieStorage extends Storage {
         }
         return ''
     }
-    remove(name) {}
+    remove(name) {
+        document.cookie = name + '=' + ';expires=Thu, 01 Jan 1970 00:00:01 GMT'
+    }
 }
 
 class LocalStorage extends Storage {
