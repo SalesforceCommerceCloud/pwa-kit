@@ -8,16 +8,24 @@
 const express = require('express')
 const {createProxyMiddleware, responseInterceptor} = require('http-proxy-middleware')
 
-const PORT = 8000
+const isRemote = () => !!process.env.HEROKU
 
+const PORT = process.env.PORT || 8000
+
+const PROXY_ORIGIN = isRemote()
+    ? 'https://pwa-hybrid-deployment.herokuapp.com'
+    : `http://localhost:${PORT}`
 const SFRA_INSTANCE_ORIGIN = 'https://zzrf-002.sandbox.us01.dx.commercecloud.salesforce.com'
-const LOCAL_PWA_ORIGIN = 'http://localhost:3000'
+const PWA_ORIGIN = isRemote()
+    ? 'https://scaffold-pwa-hybrid-deployment.mobify-storefront.com'
+    : 'http://localhost:3000'
 
 const options = {
     target: SFRA_INSTANCE_ORIGIN,
     secure: false,
     changeOrigin: true,
     autoRewrite: true,
+    hostRewrite: true,
     cookieDomainRewrite: {
         SFRA_INSTANCE_DOMAIN: 'localhost'
     },
@@ -29,15 +37,15 @@ const options = {
 
     router: {
         '/sfra': SFRA_INSTANCE_ORIGIN,
-        '/pwa': LOCAL_PWA_ORIGIN,
+        '/pwa': PWA_ORIGIN,
 
         // handles
         // a. ssr proxy: /mobify/proxy
         // b. dev assets: /mobify/development/bundle
-        '/mobify': LOCAL_PWA_ORIGIN,
+        '/mobify': PWA_ORIGIN,
 
         // slas
-        '/callback': LOCAL_PWA_ORIGIN
+        '/callback': PWA_ORIGIN
     },
 
     selfHandleResponse: true,
@@ -49,6 +57,15 @@ const options = {
             )
         }
 
+        // For some reason the redirect 'location' header is not re-written
+        // under certain cases. Manually rewrite redirect location.
+        if (proxyRes.headers['location']) {
+            proxyRes.headers['location'] = proxyRes.headers['location'].replace(
+                new RegExp(`${SFRA_INSTANCE_ORIGIN}`, 'g'),
+                PROXY_ORIGIN
+            )
+        }
+
         return responseInterceptor(async (responseBuffer) => {
             const response = responseBuffer.toString()
 
@@ -56,7 +73,7 @@ const options = {
                 response
                     // some SFRA links are absolute URLs
                     // replace them so they go through the proxy
-                    .replace(new RegExp(`${SFRA_INSTANCE_ORIGIN}`, 'g'), `http://localhost:${PORT}`)
+                    .replace(new RegExp(`${SFRA_INSTANCE_ORIGIN}`, 'g'), PROXY_ORIGIN)
             )
         })(proxyRes, req, res)
     }
@@ -64,10 +81,15 @@ const options = {
 
 const app = express()
 
+app.get('/', (req, res) => {
+    res.send(
+        `<a href="${PROXY_ORIGIN}/sfra/s/RefArch">Go to SFRA</a><br/><a href="${PROXY_ORIGIN}/pwa">Go to PWA</a>`
+    )
+})
 app.use(createProxyMiddleware(options))
 
 app.listen(PORT, () => {
     console.log(`===================================================`)
-    console.log(`===> SFRA: http://localhost:${PORT}/sfra/s/RefArch`)
-    console.log(`===> PWA: http://localhost:${PORT}/pwa`)
+    console.log(`===> SFRA: ${PROXY_ORIGIN}/sfra/s/RefArch`)
+    console.log(`===> PWA: ${PROXY_ORIGIN}/pwa`)
 })
