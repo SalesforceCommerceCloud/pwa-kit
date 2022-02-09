@@ -24,6 +24,7 @@ import {DEFAULT_LOCALE, DEFAULT_CURRENCY, urlPartPositions} from '../../constant
 import {getPreferredCurrency, getSupportedLocalesIds} from '../../utils/locale'
 import {getUrlConfig} from '../../utils/utils'
 import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
+import {DEFAULT_CONFIG_MODULE_NAME} from 'pwa-kit-react-sdk/ssr/universal/utils'
 
 const apiConfig = {
     ...commerceAPIConfig,
@@ -106,5 +107,28 @@ AppConfig.propTypes = {
     children: PropTypes.node,
     locals: PropTypes.object
 }
+
+// CUSTOMIZATION:
+// Use the `fileNameResolver` to determine custom config files to be loaded. If for
+// example we want to use `production-eu-config.json` when the top level domain is `eu`
+// we would do the following. This is important for those deployments where it's a single
+// code base that handles multiple sites.
+// AppConfig.fileNameResolver = (req) => {
+//     const {host} = req.location
+//     let returnVal
+
+//     switch (host) {
+//         case 'example.eu':
+//             returnVal = `${DEFAULT_CONFIG_MODULE_NAME}-eu`
+//             break
+//         case 'example.com/it':
+//             returnVal = `${DEFAULT_CONFIG_MODULE_NAME}-it`
+//             break
+//         default:
+//             returnVal = DEFAULT_CONFIG_MODULE_NAME
+//     }
+
+//     return returnVal
+// }
 
 export default AppConfig

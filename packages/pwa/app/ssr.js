@@ -13,7 +13,6 @@ import {createApp, createHandler, serveStaticFile} from 'pwa-kit-react-sdk/ssr/s
 import {isRemote} from 'pwa-kit-react-sdk/utils/ssr-server'
 import {render} from 'pwa-kit-react-sdk/ssr/server/react-rendering'
 import helmet from 'helmet'
-import {getConfig, DEFAULT_CONFIG_MODULE_NAME} from './utils/utils'
 
 // const config = getConfig()
 
@@ -62,37 +61,12 @@ app.use(
     })
 )
 
-// NOTE: This is a good candidate to move into the SDK. At first thought we could,
-// move this into the react-rendering pipeline. `moduleNameResolver` could dangle as
-// a static off the AppConfig component.
-const renderWithConfig = async (req, res, next) => {
-    // Add the config to the locals which we will write to the html later.
-    res.locals.config = getConfig({
-        // CUSTOMIZATION:
-        // Use the `moduleNameResolver` to determine custom config files to be loaded. If for
-        // example we want to use `production-eu-config.json` when the top level domain is `eu`
-        // we would do the following. This is important for those deployments where it's a single
-        // code base that handles multiple sites.
-        moduleNameResolver: () => {
-            // This means that the file `config/production-en.config` will be used.
-            // NOTE: There will be a question on controlling the case of the config file.
-            if (req.location.host.endsWith('.eu')) {
-                return `${DEFAULT_CONFIG_MODULE_NAME}-eu`
-            }
-
-            return DEFAULT_CONFIG_MODULE_NAME
-        }
-    })
-
-    return render(req, res, next)
-}
-
 // Handle the redirect from SLAS as to avoid error
 app.get('/callback?*', (req, res) => {
     res.send()
 })
 app.get('/robots.txt', serveStaticFile('static/robots.txt'))
-app.get('/*', renderWithConfig)
+app.get('/*', render)
 
 // SSR requires that we export a single handler function called 'get', that
 // supports AWS use of the server that we created above.

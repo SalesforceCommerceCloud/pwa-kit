@@ -5,6 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
+import {getConfig} from 'pwa-kit-react-sdk/ssr/universal/utils'
 /**
  * Call requestIdleCallback in supported browsers.
  *
@@ -153,59 +154,6 @@ export const capitalize = (text) => {
         .split(' ')
         .map((s) => s.charAt(0).toUpperCase() + s.substring(1))
         .join(' ')
-}
-
-/**
- * Get the pwa configuration object from pwa-kit.config.json
- * @returns {object} - the configuration object
- */
-// export const getConfig = () => pwaKitConfig
-export const DEFAULT_CONFIG_MODULE_NAME = process?.env?.DEPLOY_TARGET || 'DEFAULT'
-
-let _config
-export const getConfig = ({moduleNameResolver}) => {
-    if (_config) {
-        return _config
-    }
-
-    if (typeof window !== 'undefined') {
-        _config = JSON.parse(document.getElementById('app-config').innerHTML)
-        return _config
-    }
-
-    const _require = eval('require')
-    const {cosmiconfigSync} = _require('cosmiconfig')
-
-    // Load the config synchronously using a custom "searchPlaces".
-
-    // By default use the deplayment target as the {moduleName} for your
-    // configuration file. This means that on a "Production" names target, you'll load
-    // your `config/production.json` file. You can customize how you determine your
-    // {moduleName}.
-    let moduleName = moduleNameResolver() || process.env.DEPLOY_TARGET
-
-    const explorerSync = cosmiconfigSync(moduleName, {
-        packageProp: 'mobify',
-        searchPlaces: [
-            `config/${moduleName}.json`,
-            `config/local.json`,
-            `config/default.json`,
-            'package.json'
-        ]
-    })
-
-    // NOTE: Below is how @Oliver Brook invisioned us using the library for backwards compatibility.
-    // It's probably not the way the library was meant to be used, but it would work, be we would be limited
-    // to not have per instance configurations.
-    //
-    // let moduleName = 'mobify'
-    // const explorerSync = cosmiconfigSync(moduleName, {
-    //     searchPlaces: [`pwa-kit.json`, 'package.json']
-    // })
-
-    const {config} = explorerSync.search()
-
-    return config
 }
 
 /**

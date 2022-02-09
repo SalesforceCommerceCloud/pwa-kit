@@ -28,7 +28,7 @@ const allDependencies = {
     ...(pkg.dependencies || {})
 }
 
-const deps = ['express', ...(mobifyConfig.externals || [])]
+const deps = ['express', 'cosmiconfig', ...(mobifyConfig.externals || [])]
     .map((lib) => ({
         lib: lib,
         version: allDependencies[lib]

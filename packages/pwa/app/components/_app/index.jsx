@@ -52,14 +52,7 @@ const DEFAULT_NAV_DEPTH = 3
 const DEFAULT_ROOT_CATEGORY = 'root'
 
 const App = (props) => {
-    const {
-        children,
-        targetLocale,
-        defaultLocale,
-        messages,
-        categories: allCategories = {},
-        config
-    } = props
+    const {children, targetLocale, defaultLocale, messages, categories: allCategories = {}} = props
 
     const appOrigin = getAppOrigin()
 
@@ -188,14 +181,6 @@ const App = (props) => {
                             <link rel="alternate" hrefLang="x-default" href={`${appOrigin}/`} />
                         </Seo>
 
-                        <script
-                            id="app-config"
-                            type="application/json" // Not executable
-                            dangerouslySetInnerHTML={{
-                                __html: JSON.stringify(config)
-                            }}
-                        />
-
                         <ScrollToTop />
 
                         <Box id="app" display="flex" flexDirection="column" flex={1}>
@@ -269,7 +254,7 @@ App.shouldGetProps = () => {
     return typeof window === 'undefined'
 }
 
-App.getProps = async ({api, res}) => {
+App.getProps = async ({api}) => {
     const localeConfig = await getLocaleConfig({
         getUserPreferredLocales: () => {
             // CONFIG: This function should return an array of preferred locales. They can be
@@ -324,8 +309,7 @@ Learn more with our localization guide. https://sfdc.co/localization-guide
         targetLocale: localeConfig.app.targetLocale,
         defaultLocale: localeConfig.app.defaultLocale,
         messages: localeConfig.messages,
-        categories: categories,
-        config: res?.locals?.config
+        categories: categories
     }
 }
 

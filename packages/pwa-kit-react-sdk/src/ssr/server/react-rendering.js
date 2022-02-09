@@ -17,7 +17,7 @@ import {ChunkExtractor} from '@loadable/server'
 import {StaticRouter as Router, matchPath} from 'react-router-dom'
 import serialize from 'serialize-javascript'
 
-import {getAssetUrl} from '../universal/utils'
+import {getAssetUrl, getConfig, DEFAULT_CONFIG_MODULE_NAME} from '../universal/utils'
 import DeviceContext from '../universal/device-context'
 
 import Document from '../universal/components/_document'
@@ -32,6 +32,7 @@ import {detectDeviceType, isRemote} from '../../utils/ssr-server'
 import {proxyConfigs} from '../../utils/ssr-shared'
 
 import sprite from 'svg-sprite-loader/runtime/sprite.build'
+import {config} from 'process'
 
 const CWD = process.cwd()
 const BUNDLES_PATH = path.resolve(CWD, 'build/loadable-stats.json')
@@ -132,6 +133,9 @@ export const render = async (req, res, next) => {
     // to inject arguments into the wrapped component's getProps methods.
     AppConfig.restore(res.locals)
 
+    const appConfig = getConfig({
+        fileNameResolver: () => AppConfig.fileNameResolver || DEFAULT_CONFIG_MODULE_NAME
+    })
     const routes = getRoutes(res.locals)
     const WrappedApp = routeComponent(App, false, res.locals)
 
@@ -177,7 +181,8 @@ export const render = async (req, res, next) => {
         routes,
         req,
         res,
-        location
+        location,
+        appConfig
     }
     try {
         renderResult = renderApp(args)
@@ -221,7 +226,7 @@ const renderAppHtml = (req, res, error, appData) => {
 }
 
 const renderApp = (args) => {
-    const {req, res, appStateError, App, appState, location, routes} = args
+    const {req, res, appStateError, App, appState, location, routes, appConfig} = args
     const deviceType = detectDeviceType(req)
     const extractor = new ChunkExtractor({statsFile: BUNDLES_PATH})
     const routerContext = {}
@@ -279,6 +284,7 @@ const renderApp = (args) => {
     //
     // Do *not* add to these without a very good reason - globals are a liability.
     const windowGlobals = {
+        __APPCONFIG__: appConfig,
         __DEVICE_TYPE__: deviceType,
         __PRELOADED_STATE__: appState,
         __ERROR__: error,

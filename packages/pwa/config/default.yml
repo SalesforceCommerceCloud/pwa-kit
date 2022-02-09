@@ -1,0 +1,6 @@
+---
+# A pwa-kit application config (now with comments!)
+target: Default (in yaml)
+url: 
+  site: path
+  locale: path
