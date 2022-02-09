@@ -166,7 +166,7 @@ class Auth {
                     throw error
                 })
                 .then((result) => {
-                    this.createOCAPISession()
+                    this._onClient && this.createOCAPISession()
                     return result
                 })
         }
