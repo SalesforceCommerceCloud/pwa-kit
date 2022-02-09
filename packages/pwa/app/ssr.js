@@ -15,7 +15,7 @@ import {render} from 'pwa-kit-react-sdk/ssr/server/react-rendering'
 import helmet from 'helmet'
 import {getConfig} from './utils/utils'
 
-const config = getConfig()
+// const config = getConfig()
 
 const app = createApp({
     // The build directory (an absolute path)
@@ -62,10 +62,19 @@ app.use(
     })
 )
 
-console.log('config======> ', config)
 const renderWithConfig = async (req, res, next) => {
     // Add the config to the locals which we will write to the html later.
-    res.locals.config = config
+    res.locals.config = getConfig({
+        req,
+        moduleNameResolver: (req, defaultModuleName) => {
+            // Example customization.
+            if (req.location.host.endsWith('.eu')) {
+                return `${defaultModuleName}-eu` // This means that the file `config/production-en.config` will be used.
+            }
+
+            return defaultModuleName
+        }
+    })
 
     return render(req, res, next)
 }

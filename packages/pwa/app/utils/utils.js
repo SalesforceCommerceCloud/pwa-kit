@@ -161,7 +161,7 @@ export const capitalize = (text) => {
  */
 // export const getConfig = () => pwaKitConfig
 let _config
-export const getConfig = () => {
+export const getConfig = ({req, moduleNameResolver}) => {
     if (_config) {
         return _config
     }
@@ -175,7 +175,13 @@ export const getConfig = () => {
     const {cosmiconfigSync} = _require('cosmiconfig')
 
     // Load the config synchronously using a custom "searchPlaces".
-    const moduleName = process.env.DEPLOY_TARGET
+
+    // By default use the deplayment target as the {moduleName} for your
+    // configuration file. This means that on a "Production" names target, you'll load
+    // your `config/production.json` file. You can customize how you determine your
+    // {moduleName}.
+    let moduleName = moduleNameResolver(req, moduleName) || process.env.DEPLOY_TARGET
+
     const explorerSync = cosmiconfigSync(moduleName, {
         packageProp: 'mobify',
         searchPlaces: [
@@ -185,6 +191,7 @@ export const getConfig = () => {
             'package.json'
         ]
     })
+
     // NOTE: Below is how @Oliver Brook invisioned us using the library for backwards compatibility.
     // It's probably not the way the library was meant to be used, but it would work, be we would be limited
     // to not have per instance configurations.
