@@ -63,7 +63,8 @@ app.use(
 )
 
 // NOTE: This is a good candidate to move into the SDK. At first thought we could,
-// move this into the react-rendering pipeline.
+// move this into the react-rendering pipeline. `moduleNameResolver` could dangle as
+// a static off the AppConfig component.
 const renderWithConfig = async (req, res, next) => {
     // Add the config to the locals which we will write to the html later.
     res.locals.config = getConfig({
