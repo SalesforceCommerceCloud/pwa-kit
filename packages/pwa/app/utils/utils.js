@@ -177,8 +177,21 @@ export const getConfig = () => {
     // Load the config synchronously using a custom "searchPlaces".
     const moduleName = process.env.DEPLOY_TARGET
     const explorerSync = cosmiconfigSync(moduleName, {
-        searchPlaces: [`config/${moduleName}.json`, `config/local.json`, `config/default.json`]
+        searchPlaces: [
+            `config/${moduleName}.json`,
+            `config/local.json`,
+            `config/default.json`,
+            'package.json'
+        ]
     })
+    // NOTE: Below is how @Oliver Brook invisioned us using the library for backwards compatibility.
+    // It's probably not the way the library was meant to be used, but it would work, be we would be limited
+    // to not have per instance configurations.
+    //
+    // let moduleName = 'mobify'
+    // const explorerSync = cosmiconfigSync(moduleName, {
+    //     searchPlaces: [`pwa-kit.json`, 'package.json']
+    // })
     const {config} = explorerSync.search()
 
     return config
