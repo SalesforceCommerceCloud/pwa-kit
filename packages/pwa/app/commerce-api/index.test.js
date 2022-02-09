@@ -104,6 +104,7 @@ beforeEach(() => {
     // Clearing out mocked local storage before each test so tokens don't get mixed
     const api = getAPI()
     api.auth._clearAuth()
+    fetch.resetMocks()
 })
 
 describe('CommerceAPI', () => {
@@ -694,13 +695,10 @@ describe('CommerceAPI', () => {
         expect(response.title).toEqual('Body is required for this request')
         expect(response.type).toEqual('MissingBody')
     })
-    test('calling deleteBasket returns staus of 204e', async () => {
+    test('calling deleteBasket returns status of 204', async () => {
         const api = getAPI()
-        global.fetch = jest.fn().mockImplementation(() => {
-            return {
-                status: 204
-            }
-        })
+        fetch.mockResponseOnce(JSON.stringify({status: 204}))
+
         const basketId = 'bczFTaOjgEqUkaaadkvHwbgrP5'
         const respsonse = await api.shopperBaskets.deleteBasket({
             parameters: {
@@ -725,14 +723,7 @@ describe('CommerceAPI', () => {
 
     test('ocapiFetch ShopperBaskets throws an error when it receives error from OCAPI', async () => {
         const api = getAPI()
-        global.fetch = jest.fn().mockImplementation(() => {
-            return {
-                status: 200,
-                json: async () => {
-                    return ocapiFaultResponse
-                }
-            }
-        })
+        fetch.mockResponseOnce(JSON.stringify(ocapiFaultResponse))
 
         await expect(api.shopperBaskets.createBasket({})).rejects.toThrow(
             ocapiFaultResponse.fault.message
@@ -780,14 +771,7 @@ describe('CommerceAPI', () => {
 
     test('ocapiFetch ShopperOrders throws an error when it receives error from OCAPI', async () => {
         const api = getAPI()
-        global.fetch = jest.fn().mockImplementation(() => {
-            return {
-                status: 200,
-                json: async () => {
-                    return ocapiFaultResponse
-                }
-            }
-        })
+        fetch.mockResponseOnce(JSON.stringify(ocapiFaultResponse))
 
         await expect(
             api.shopperOrders.createOrder({

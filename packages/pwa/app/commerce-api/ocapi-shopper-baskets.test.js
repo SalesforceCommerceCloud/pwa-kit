@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
+import fetch from 'jest-fetch-mock'
 import {commerceAPIConfig} from '../api.config'
 import OcapiShopperBaskets from './ocapi-shopper-baskets'
 import {
@@ -17,34 +18,21 @@ const apiConfig = {...commerceAPIConfig, proxy: undefined}
 const getOcapiShopperBaskets = () => new OcapiShopperBaskets(apiConfig)
 beforeEach(() => {
     jest.resetModules()
+    fetch.resetMocks()
 })
 
 describe('test OcapiShopperBaskets class', () => {
     test('createBasket returns a basket object in camelCase', async () => {
         const ocapiShopperBaskets = getOcapiShopperBaskets()
-        global.fetch = jest.fn().mockImplementation(() => {
-            return {
-                status: 200,
-                json: async () => {
-                    return ocapiBasketResponse
-                }
-            }
-        })
+        fetch.mockResponseOnce(JSON.stringify(ocapiBasketResponse))
         const basket = await ocapiShopperBaskets.createBasket({})
         expect(basket).toBeDefined()
         expect(basket.customerInfo.customerId).toBeDefined()
         expect(basket.shipments[0].shipmentId).toBeDefined()
     })
-    test.only('updateBasket returns a basket object in camelCase', async () => {
+    test('updateBasket returns a basket object in camelCase', async () => {
         const ocapiShopperBaskets = getOcapiShopperBaskets()
-        global.fetch = jest.fn().mockImplementation(() => {
-            return {
-                status: 200,
-                json: async () => {
-                    return ocapiBasketResponse
-                }
-            }
-        })
+        fetch.mockResponseOnce(JSON.stringify(ocapiBasketResponse))
         const basket = await ocapiShopperBaskets.updateBasket({
             parameters: {basketId: 'testBasketId'},
             body: {}
@@ -53,44 +41,23 @@ describe('test OcapiShopperBaskets class', () => {
         expect(basket.customerInfo.customerId).toBeDefined()
         expect(basket.shipments[0].shipmentId).toBeDefined()
     })
-    test.only('updateBasket returns error object when no params are passed', async () => {
+    test('updateBasket returns error object when no params are passed', async () => {
         const ocapiShopperBaskets = getOcapiShopperBaskets()
-        global.fetch = jest.fn().mockImplementation(() => {
-            return {
-                status: 200,
-                json: async () => {
-                    return ocapiBasketResponse
-                }
-            }
-        })
+        fetch.mockResponseOnce(JSON.stringify(ocapiBasketResponse))
         const response = await ocapiShopperBaskets.updateBasket({})
         expect(response).toBeDefined()
         expect(response.title).toEqual('Parameters are required for this request')
     })
     test('getBasket returns error object when no params are passed', async () => {
         const ocapiShopperBaskets = getOcapiShopperBaskets()
-        global.fetch = jest.fn().mockImplementation(() => {
-            return {
-                status: 200,
-                json: async () => {
-                    return ocapiBasketResponse
-                }
-            }
-        })
+        fetch.mockResponseOnce(JSON.stringify(ocapiBasketResponse))
         const response = await ocapiShopperBaskets.getBasket({})
         expect(response).toBeDefined()
         expect(response.title).toEqual('Parameters are required for this request')
     })
     test('getBasket returns a basket object in camelCase when params are passed', async () => {
         const ocapiShopperBaskets = getOcapiShopperBaskets()
-        global.fetch = jest.fn().mockImplementation(() => {
-            return {
-                status: 200,
-                json: async () => {
-                    return ocapiBasketResponse
-                }
-            }
-        })
+        fetch.mockResponseOnce(JSON.stringify(ocapiBasketResponse))
         const basket = await ocapiShopperBaskets.getBasket({
             parameters: {basketId: 'testBasketId'}
         })
@@ -100,14 +67,7 @@ describe('test OcapiShopperBaskets class', () => {
     })
     test('addItemToBasket returns error object when no params are passed', async () => {
         const ocapiShopperBaskets = getOcapiShopperBaskets()
-        global.fetch = jest.fn().mockImplementation(() => {
-            return {
-                status: 200,
-                json: async () => {
-                    return ocapiBasketResponse
-                }
-            }
-        })
+        fetch.mockResponseOnce(JSON.stringify(ocapiBasketResponse))
         const response = await ocapiShopperBaskets.addItemToBasket({})
         expect(response).toBeDefined()
         expect(response.title).toEqual('Parameters are required for this request')
@@ -115,14 +75,7 @@ describe('test OcapiShopperBaskets class', () => {
 
     test('addItemToBasket returns a basket object in camelCase when params are passed', async () => {
         const ocapiShopperBaskets = getOcapiShopperBaskets()
-        global.fetch = jest.fn().mockImplementation(() => {
-            return {
-                status: 200,
-                json: async () => {
-                    return ocapiBasketWithItem
-                }
-            }
-        })
+        fetch.mockResponseOnce(JSON.stringify(ocapiBasketWithItem))
         const basket = await ocapiShopperBaskets.addItemToBasket({
             parameters: {basketId: 'testBasketId'},
             body: {}
@@ -133,28 +86,14 @@ describe('test OcapiShopperBaskets class', () => {
     })
     test('updateItemInBasket returns error object when no params are passed', async () => {
         const ocapiShopperBaskets = getOcapiShopperBaskets()
-        global.fetch = jest.fn().mockImplementation(() => {
-            return {
-                status: 200,
-                json: async () => {
-                    return ocapiBasketResponse
-                }
-            }
-        })
+        fetch.mockResponseOnce(JSON.stringify(ocapiBasketResponse))
         const response = await ocapiShopperBaskets.updateItemInBasket({})
         expect(response).toBeDefined()
         expect(response.title).toEqual('Parameters are required for this request')
     })
     test('updateItemInBasket returns a basket object in camelCase when params are passed', async () => {
         const ocapiShopperBaskets = getOcapiShopperBaskets()
-        global.fetch = jest.fn().mockImplementation(() => {
-            return {
-                status: 200,
-                json: async () => {
-                    return ocapiBasketWithItem
-                }
-            }
-        })
+        fetch.mockResponseOnce(JSON.stringify(ocapiBasketWithItem))
         const basket = await ocapiShopperBaskets.updateItemInBasket({
             parameters: {basketId: 'testBasketId'},
             body: {}
@@ -165,28 +104,14 @@ describe('test OcapiShopperBaskets class', () => {
     })
     test('removeItemFromBasket returns error object when no params are passed', async () => {
         const ocapiShopperBaskets = getOcapiShopperBaskets()
-        global.fetch = jest.fn().mockImplementation(() => {
-            return {
-                status: 200,
-                json: async () => {
-                    return ocapiBasketResponse
-                }
-            }
-        })
+        fetch.mockResponseOnce(JSON.stringify(ocapiBasketResponse))
         const response = await ocapiShopperBaskets.removeItemFromBasket({})
         expect(response).toBeDefined()
         expect(response.title).toEqual('Parameters are required for this request')
     })
     test('removeItemFromBasket returns a basket object in camelCase when params are passed', async () => {
         const ocapiShopperBaskets = getOcapiShopperBaskets()
-        global.fetch = jest.fn().mockImplementation(() => {
-            return {
-                status: 200,
-                json: async () => {
-                    return ocapiBasketWithItem
-                }
-            }
-        })
+        fetch.mockResponseOnce(JSON.stringify(ocapiBasketWithItem))
         const basket = await ocapiShopperBaskets.removeItemFromBasket({
             parameters: {basketId: 'testBasketId', itemId: 'fakeItemId'}
         })
@@ -196,28 +121,14 @@ describe('test OcapiShopperBaskets class', () => {
     })
     test('addPaymentInstrumentToBasket returns error object when no params are passed', async () => {
         const ocapiShopperBaskets = getOcapiShopperBaskets()
-        global.fetch = jest.fn().mockImplementation(() => {
-            return {
-                status: 200,
-                json: async () => {
-                    return ocapiBasketResponse
-                }
-            }
-        })
+        fetch.mockResponseOnce(JSON.stringify(ocapiBasketResponse))
         const response = await ocapiShopperBaskets.addPaymentInstrumentToBasket({})
         expect(response).toBeDefined()
         expect(response.title).toEqual('Parameters are required for this request')
     })
     test('addPaymentInstrumentToBasket returns a basket object in camelCase when params are passed', async () => {
         const ocapiShopperBaskets = getOcapiShopperBaskets()
-        global.fetch = jest.fn().mockImplementation(() => {
-            return {
-                status: 200,
-                json: async () => {
-                    return ocapiBasketWithPaymentInstrumentAndBillingAddress
-                }
-            }
-        })
+        fetch.mockResponseOnce(JSON.stringify(ocapiBasketWithPaymentInstrumentAndBillingAddress))
         const basket = await ocapiShopperBaskets.addPaymentInstrumentToBasket({
             parameters: {basketId: 'testBasketId'},
             body: {}
@@ -228,28 +139,14 @@ describe('test OcapiShopperBaskets class', () => {
     })
     test('removePaymentInstrumentFromBasket returns error object when no params are passed', async () => {
         const ocapiShopperBaskets = getOcapiShopperBaskets()
-        global.fetch = jest.fn().mockImplementation(() => {
-            return {
-                status: 200,
-                json: async () => {
-                    return ocapiBasketResponse
-                }
-            }
-        })
+        fetch.mockResponseOnce(JSON.stringify(ocapiBasketResponse))
         const response = await ocapiShopperBaskets.removePaymentInstrumentFromBasket({})
         expect(response).toBeDefined()
         expect(response.title).toEqual('Parameters are required for this request')
     })
     test('removePaymentInstrumentFromBasket returns a basket object in camelCase when params are passed', async () => {
         const ocapiShopperBaskets = getOcapiShopperBaskets()
-        global.fetch = jest.fn().mockImplementation(() => {
-            return {
-                status: 200,
-                json: async () => {
-                    return ocapiBasketResponse
-                }
-            }
-        })
+        fetch.mockResponseOnce(JSON.stringify(ocapiBasketResponse))
         const basket = await ocapiShopperBaskets.removePaymentInstrumentFromBasket({
             parameters: {basketId: 'testBasketId', paymentInstrumentId: 'paymentInstrumentId'}
         })
@@ -258,28 +155,14 @@ describe('test OcapiShopperBaskets class', () => {
     })
     test('getPaymentMethodsForBasket returns error object when no params are passed', async () => {
         const ocapiShopperBaskets = getOcapiShopperBaskets()
-        global.fetch = jest.fn().mockImplementation(() => {
-            return {
-                status: 200,
-                json: async () => {
-                    return ocapiBasketWithPaymentInstrumentAndBillingAddress
-                }
-            }
-        })
+        fetch.mockResponseOnce(JSON.stringify(ocapiBasketWithPaymentInstrumentAndBillingAddress))
         const response = await ocapiShopperBaskets.getPaymentMethodsForBasket({})
         expect(response).toBeDefined()
         expect(response.title).toEqual('Parameters are required for this request')
     })
     test('getPaymentMethodsForBasket returns a basket object in camelCase when params are passed', async () => {
         const ocapiShopperBaskets = getOcapiShopperBaskets()
-        global.fetch = jest.fn().mockImplementation(() => {
-            return {
-                status: 200,
-                json: async () => {
-                    return ocapiBasketWithPaymentInstrumentAndBillingAddress
-                }
-            }
-        })
+        fetch.mockResponseOnce(JSON.stringify(ocapiBasketWithPaymentInstrumentAndBillingAddress))
         const basket = await ocapiShopperBaskets.getPaymentMethodsForBasket({
             parameters: {basketId: 'testBasketId'}
         })
@@ -289,28 +172,14 @@ describe('test OcapiShopperBaskets class', () => {
     })
     test('getShippingMethodsForShipment returns error object when no params are passed', async () => {
         const ocapiShopperBaskets = getOcapiShopperBaskets()
-        global.fetch = jest.fn().mockImplementation(() => {
-            return {
-                status: 200,
-                json: async () => {
-                    return ocapiBasketWithPaymentInstrumentAndBillingAddress
-                }
-            }
-        })
+        fetch.mockResponseOnce(JSON.stringify(ocapiBasketWithPaymentInstrumentAndBillingAddress))
         const response = await ocapiShopperBaskets.getShippingMethodsForShipment({})
         expect(response).toBeDefined()
         expect(response.title).toEqual('Parameters are required for this request')
     })
     test('getShippingMethodsForShipment returns a basket object in camelCase when params are passed', async () => {
         const ocapiShopperBaskets = getOcapiShopperBaskets()
-        global.fetch = jest.fn().mockImplementation(() => {
-            return {
-                status: 200,
-                json: async () => {
-                    return mockShippingMethods
-                }
-            }
-        })
+        fetch.mockResponseOnce(JSON.stringify(mockShippingMethods))
         const methods = await ocapiShopperBaskets.getShippingMethodsForShipment({
             parameters: {basketId: 'testBasketId', shipmentId: 'fakeShipmentId'}
         })
@@ -319,28 +188,14 @@ describe('test OcapiShopperBaskets class', () => {
     })
     test('updateBillingAddressForBasket returns error object when no params are passed', async () => {
         const ocapiShopperBaskets = getOcapiShopperBaskets()
-        global.fetch = jest.fn().mockImplementation(() => {
-            return {
-                status: 200,
-                json: async () => {
-                    return ocapiBasketWithPaymentInstrumentAndBillingAddress
-                }
-            }
-        })
+        fetch.mockResponseOnce(JSON.stringify(ocapiBasketWithPaymentInstrumentAndBillingAddress))
         const response = await ocapiShopperBaskets.updateBillingAddressForBasket({})
         expect(response).toBeDefined()
         expect(response.title).toEqual('Parameters are required for this request')
     })
     test('updateBillingAddressForBasket returns a basket object in camelCase when params are passed', async () => {
         const ocapiShopperBaskets = getOcapiShopperBaskets()
-        global.fetch = jest.fn().mockImplementation(() => {
-            return {
-                status: 200,
-                json: async () => {
-                    return ocapiBasketWithPaymentInstrumentAndBillingAddress
-                }
-            }
-        })
+        fetch.mockResponseOnce(JSON.stringify(ocapiBasketWithPaymentInstrumentAndBillingAddress))
         const basket = await ocapiShopperBaskets.updateBillingAddressForBasket({
             parameters: {basketId: 'testBasketId'},
             body: {}
@@ -351,28 +206,14 @@ describe('test OcapiShopperBaskets class', () => {
     })
     test('updateShippingAddressForShipment returns error object when no params are passed', async () => {
         const ocapiShopperBaskets = getOcapiShopperBaskets()
-        global.fetch = jest.fn().mockImplementation(() => {
-            return {
-                status: 200,
-                json: async () => {
-                    return ocapiBasketWithPaymentInstrumentAndBillingAddress
-                }
-            }
-        })
+        fetch.mockResponseOnce(JSON.stringify(ocapiBasketWithPaymentInstrumentAndBillingAddress))
         const response = await ocapiShopperBaskets.updateShippingAddressForShipment({})
         expect(response).toBeDefined()
         expect(response.title).toEqual('Parameters are required for this request')
     })
     test('updateShippingAddressForShipment returns a basket object in camelCase when params are passed', async () => {
         const ocapiShopperBaskets = getOcapiShopperBaskets()
-        global.fetch = jest.fn().mockImplementation(() => {
-            return {
-                status: 200,
-                json: async () => {
-                    return ocapiBasketWithPaymentInstrumentAndBillingAddress
-                }
-            }
-        })
+        fetch.mockResponseOnce(JSON.stringify(ocapiBasketWithPaymentInstrumentAndBillingAddress))
         const basket = await ocapiShopperBaskets.updateShippingAddressForShipment({
             parameters: {basketId: 'testBasketId', shipmentId: 'fakeShippingId'},
             body: {}
@@ -383,28 +224,14 @@ describe('test OcapiShopperBaskets class', () => {
     })
     test('updateShippingMethodForShipment returns error object when no params are passed', async () => {
         const ocapiShopperBaskets = getOcapiShopperBaskets()
-        global.fetch = jest.fn().mockImplementation(() => {
-            return {
-                status: 200,
-                json: async () => {
-                    return ocapiBasketWithPaymentInstrumentAndBillingAddress
-                }
-            }
-        })
+        fetch.mockResponseOnce(JSON.stringify(ocapiBasketWithPaymentInstrumentAndBillingAddress))
         const response = await ocapiShopperBaskets.updateShippingMethodForShipment({})
         expect(response).toBeDefined()
         expect(response.title).toEqual('Parameters are required for this request')
     })
     test('updateShippingMethodForShipment returns a basket object in camelCase when params are passed', async () => {
         const ocapiShopperBaskets = getOcapiShopperBaskets()
-        global.fetch = jest.fn().mockImplementation(() => {
-            return {
-                status: 200,
-                json: async () => {
-                    return ocapiBasketWithPaymentInstrumentAndBillingAddress
-                }
-            }
-        })
+        fetch.mockResponseOnce(JSON.stringify(ocapiBasketWithPaymentInstrumentAndBillingAddress))
         const basket = await ocapiShopperBaskets.updateShippingMethodForShipment({
             parameters: {basketId: 'testBasketId', shipmentId: 'fakeShippingId'},
             body: {}
@@ -415,28 +242,14 @@ describe('test OcapiShopperBaskets class', () => {
     })
     test('updateCustomerForBasket returns error object when no params are passed', async () => {
         const ocapiShopperBaskets = getOcapiShopperBaskets()
-        global.fetch = jest.fn().mockImplementation(() => {
-            return {
-                status: 200,
-                json: async () => {
-                    return ocapiBasketResponse
-                }
-            }
-        })
+        fetch.mockResponseOnce(JSON.stringify(ocapiBasketResponse))
         const response = await ocapiShopperBaskets.updateCustomerForBasket({})
         expect(response).toBeDefined()
         expect(response.title).toEqual('Parameters are required for this request')
     })
     test('updateCustomerForBasket returns a basket object in camelCase when params are passed', async () => {
         const ocapiShopperBaskets = getOcapiShopperBaskets()
-        global.fetch = jest.fn().mockImplementation(() => {
-            return {
-                status: 200,
-                json: async () => {
-                    return ocapiBasketResponse
-                }
-            }
-        })
+        fetch.mockResponseOnce(JSON.stringify(ocapiBasketResponse))
         const basket = await ocapiShopperBaskets.updateCustomerForBasket({
             parameters: {basketId: 'testBasketId'},
             body: {}
@@ -447,25 +260,14 @@ describe('test OcapiShopperBaskets class', () => {
     })
     test('deleteBasket returns error object when no params are passed', async () => {
         const ocapiShopperBaskets = getOcapiShopperBaskets()
-        global.fetch = jest.fn().mockImplementation(() => {
-            return {
-                status: 200,
-                json: async () => {
-                    return ocapiBasketResponse
-                }
-            }
-        })
+        fetch.mockResponseOnce(JSON.stringify(ocapiBasketResponse))
         const response = await ocapiShopperBaskets.deleteBasket({})
         expect(response).toBeDefined()
         expect(response.title).toEqual('Parameters are required for this request')
     })
     test('deleteBasket returns 204 when paramters are passed', async () => {
         const ocapiShopperBaskets = getOcapiShopperBaskets()
-        global.fetch = jest.fn().mockImplementation(() => {
-            return {
-                status: 204
-            }
-        })
+        fetch.mockResponseOnce(JSON.stringify({status: 204}))
         const response = await ocapiShopperBaskets.deleteBasket({
             parameters: {basketId: 'testBasketId'}
         })
