@@ -177,6 +177,7 @@ export const getConfig = () => {
     // Load the config synchronously using a custom "searchPlaces".
     const moduleName = process.env.DEPLOY_TARGET
     const explorerSync = cosmiconfigSync(moduleName, {
+        packageProp: 'mobify',
         searchPlaces: [
             `config/${moduleName}.json`,
             `config/local.json`,
@@ -192,6 +193,7 @@ export const getConfig = () => {
     // const explorerSync = cosmiconfigSync(moduleName, {
     //     searchPlaces: [`pwa-kit.json`, 'package.json']
     // })
+
     const {config} = explorerSync.search()
 
     return config
