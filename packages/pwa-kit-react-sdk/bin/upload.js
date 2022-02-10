@@ -62,10 +62,13 @@ try {
     Utils.fail(message)
 }
 
+const config = Utils.getConfig(argv.t)
+
+console.log('config: ', config)
 // Read the top-level Mobify options. If the environment variable
 // SSR_ENABLED is set to a truthy string, then override the
 // ssrEnabled value.
-const mobifyOptions = packageJson.mobify || {}
+const mobifyOptions = config || {}
 
 if (process.env.SSR_ENABLED) {
     mobifyOptions.ssrEnabled = true
@@ -109,6 +112,6 @@ if (mobifyOptions.ssrEnabled) {
     }
 }
 
-uploadBundle(options).catch((err) => {
-    console.error(err.message || err)
-})
+// uploadBundle(options).catch((err) => {
+//     console.error(err.message || err)
+// })

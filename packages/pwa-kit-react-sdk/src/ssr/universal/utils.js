@@ -61,13 +61,15 @@ export const DEFAULT_CONFIG_MODULE_NAME = 'DEFAULT'
  * @param {*} param0
  * @returns
  */
-export const getConfig = (moduleName = DEFAULT_CONFIG_MODULE_NAME) => {
+export const getConfig = () => {
     if (typeof window !== 'undefined') {
         return (
             window.__APPCONFIG__ ||
             JSON.parse(document.getElementById('mobify-data').innerHTML).__APPCONFIG__
         )
     }
+
+    let moduleName = process?.env?.DEPLOY_TARGET || DEFAULT_CONFIG_MODULE_NAME
 
     // Synchronously load the `cosmiconfig` so we don't get errors from webpack in the
     // browser bundle.
@@ -81,12 +83,12 @@ export const getConfig = (moduleName = DEFAULT_CONFIG_MODULE_NAME) => {
             `config/${moduleName}.yml`,
             `config/${moduleName}.yaml`,
             `config/${moduleName}.json`,
-            `config/local.yml`,
-            `config/local.yaml`,
-            `config/local.json`,
-            `config/default.yml`,
-            `config/default.yaml`,
-            `config/default.json`,
+            'config/local.yml',
+            'config/local.yaml',
+            'config/local.json',
+            'config/default.yml',
+            'config/default.yaml',
+            'config/default.json',
             'package.json'
         ]
     })

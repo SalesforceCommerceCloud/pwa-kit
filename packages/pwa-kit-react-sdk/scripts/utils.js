@@ -17,6 +17,8 @@ const fileUtils = require('./file-utils')
 
 const Matcher = require('../dist/utils/glob').Matcher
 
+const {cosmiconfigSync} = require('cosmiconfig')
+
 const SDK_VERSION = require('../package.json').version
 const DEFAULT_DOCS_URL = 'http://sfdc.co/pwa-kit'
 
@@ -241,6 +243,32 @@ Utils.requestErrorMessage = {
     code404:
         'Resource not found.\nPlease double check your command to make sure the option values are correct.', // wrong target name
     code500: 'Internal Server Error. Please report this to Salesforce support team.'
+}
+
+Utils.getConfig = (target) => {
+    let moduleName = target || process?.env?.DEPLOY_TARGET || 'default'
+
+    // Mack config files based on the matching below from most specific to most general.
+    const explorerSync = cosmiconfigSync(moduleName, {
+        packageProp: 'mobify',
+        searchPlaces: [
+            `config/${moduleName}.yml`,
+            `config/${moduleName}.yaml`,
+            `config/${moduleName}.json`,
+            'config/local.yml',
+            'config/local.yaml',
+            'config/local.json',
+            'config/default.yml',
+            'config/default.yaml',
+            'config/default.json',
+            'package.json'
+        ]
+    })
+
+    // Load the config synchronously using a custom "searchPlaces".
+    const {config} = explorerSync.search()
+
+    return config
 }
 
 module.exports = Utils

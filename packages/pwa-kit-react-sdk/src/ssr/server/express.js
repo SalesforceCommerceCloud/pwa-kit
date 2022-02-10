@@ -49,7 +49,7 @@ import {
     detectDeviceType
 } from '../../utils/ssr-server'
 import {proxyConfigs, updatePackageMobify} from '../../utils/ssr-shared'
-import {getConfig, DEFAULT_CONFIG_MODULE_NAME} from '../universal/utils'
+import {getConfig} from '../universal/utils'
 
 import {
     BUILD,
@@ -165,15 +165,6 @@ export const createApp = (options) => {
         // be no use-case for SDK users to set this.
         strictSSL: true,
 
-        // The app config file name, defaults to `default`. If a function is provided,
-        // it will be passed the `request` object, you can inturn use that to return
-        // a filename based on the information within it.
-        // By default use the deplayment target as the {moduleName} for your
-        // configuration file. This means that on a "Production" names target, you'll load
-        // your `config/production.json` file. You can customize how you determine your
-        // {moduleName}.
-        configFileName: process?.env?.DEPLOY_TARGET || DEFAULT_CONFIG_MODULE_NAME,
-
         enableLegacyRemoteProxying: true
     }
 
@@ -223,11 +214,7 @@ export const createApp = (options) => {
     // Attach built in routes and middleware
 
     // Attach the application configuration to the request object.
-    app.use(
-        appConfigMiddleware({
-            configFileName: options.configFileName
-        })
-    )
+    app.use(appConfigMiddleware)
 
     // Attach this middleware as early as possible. It does timing
     // and applies some early processing that must occur before
@@ -1420,20 +1407,10 @@ const serveServiceWorker = (req, res) => {
  *
  * @private
  */
-const appConfigMiddleware = (opts = {}) => {
-    let {configFileName} = opts
+const appConfigMiddleware = (req, _, next) => {
+    req.appConfig = getConfig()
 
-    return (req, _, next) => {
-        // If the `configFileName` option is a function, invoke it with the
-        // current request object as its parameter.
-        if (typeof configFileName === 'function') {
-            configFileName = configFileName(req)
-        }
-
-        req.appConfig = getConfig(configFileName)
-
-        next()
-    }
+    next()
 }
 
 /**
