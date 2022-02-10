@@ -1,6 +1,0 @@
-{
-    "target": "production-eu",
-    "url": {
-        "locale": "path"
-    }
-}

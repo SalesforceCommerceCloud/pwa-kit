@@ -282,6 +282,13 @@ export const createApp = (options) => {
             .end()
     )
 
+    app.get('/pwa-kit/app-config', (req, res) =>
+        res
+            .set('cache-control', NO_CACHE)
+            .json(req.appConfig)
+            .end()
+    )
+
     // Proxying
     const shouldProxy = !isRemote() || options.enableLegacyRemoteProxying
     if (shouldProxy) {
@@ -1414,9 +1421,9 @@ const serveServiceWorker = (req, res) => {
  * @private
  */
 const appConfigMiddleware = (opts = {}) => {
-    return (req, res, next) => {
-        let {configFileName} = opts
+    let {configFileName} = opts
 
+    return (req, _, next) => {
         // If the `configFileName` option is a function, invoke it with the
         // current request object as its parameter.
         if (typeof configFileName === 'function') {
