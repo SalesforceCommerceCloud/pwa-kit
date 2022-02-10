@@ -284,7 +284,6 @@ export const getConfig = (opts = {}) => {
     const {config: sitesConfig} = sitesExplorer.search()
     // we want to unite all the sites information into one single place to make it easier to use across the app
     const res = {...config, sites: mapSiteObjectToList(config.sites, sitesConfig)}
-    console.log('res', res)
     return res
 }
 

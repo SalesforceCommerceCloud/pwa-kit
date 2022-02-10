@@ -24,7 +24,6 @@ import {getPreferredCurrency} from '../../utils/locale'
 import {pathToUrl} from '../../utils/url'
 import {resolveSiteFromUrl} from '../../utils/site-utils'
 import {resolveConfigFromUrl} from '../../utils/url-config'
-import {extractL10nFromSite} from '../../utils/utils'
 
 const apiConfig = {
     ...commerceAPIConfig,
