@@ -4,7 +4,7 @@
     "license": "See license in LICENSE",
     "private": true,
     "mobify": {
-        "externals": ["config"],
+        "externals": ["cosmiconfig"],
         "pageNotFoundURL": "/page-not-found",
         "ssrEnabled": true,
         "ssrOnly": [

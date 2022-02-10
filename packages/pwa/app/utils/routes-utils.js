@@ -14,10 +14,10 @@ import {getConfig} from './utils'
  * @param {object} - a custom configured object
  * @return {array} - list of configured route objects
  */
-export const configureRoutes = async (routes = [], {ignoredRoutes = []}) => {
+export const configureRoutes = (routes = [], {ignoredRoutes = []}) => {
     if (!routes.length) return []
 
-    const config = await getConfig()
+    const config = getConfig()
     console.log('configureRoutes config', config)
 
     // collect and flatten the result to get a list of site objects
@@ -39,8 +39,8 @@ export const configureRoutes = async (routes = [], {ignoredRoutes = []}) => {
     const locales = [
         ...new Set(
             allSites
-                .reduce((res, {l10n}) => {
-                    l10n.supportedLocales.forEach((locale) => {
+                .reduce((res, {supportedLocales}) => {
+                    supportedLocales.forEach((locale) => {
                         res = [...res, locale.id, locale.alias]
                     })
                     return res

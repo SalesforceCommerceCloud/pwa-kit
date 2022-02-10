@@ -59,7 +59,6 @@ export const AddToCartModal = () => {
     const intl = useIntl()
     const basket = useBasket()
     const site = useSite()
-    const {l10n} = site
     const size = useBreakpointValue({base: 'full', lg: '2xl', xl: '4xl'})
     const variationAttributes = useVariationAttributes(product)
     if (!isOpen) {
@@ -141,7 +140,7 @@ export const AddToCartModal = () => {
                                         {!!lineItemPrice &&
                                             intl.formatNumber(lineItemPrice, {
                                                 style: 'currency',
-                                                currency: currency || l10n.defaultCurrency
+                                                currency: currency || site.defaultCurrency
                                             })}
                                     </Text>
                                 </Box>
@@ -167,7 +166,7 @@ export const AddToCartModal = () => {
                                     {productSubTotal &&
                                         intl.formatNumber(productSubTotal, {
                                             style: 'currency',
-                                            currency: currency || l10n.defaultCurrency
+                                            currency: currency || site.defaultCurrency
                                         })}
                                 </Text>
                             </Flex>

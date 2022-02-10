@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {getConfig, getParamsFromPath} from './utils'
+import {extractL10nFromSite, getConfig, getParamsFromPath} from './utils'
 import {urlPartPositions} from '../constants'
 import {rebuildPathWithParams} from './url'
 import {getDefaultIdentifiers, getDefaultSite} from './site-utils'
@@ -29,12 +29,11 @@ export const resolveConfigFromUrl = async (path) => {
     const site =
         sites.find((site) => site.id === currentSite || site.alias === currentSite) ||
         (await getDefaultSite())
-    const defaultLocale = site.l10n.supportedLocales.find(
-        (locale) => locale.id === site.l10n.defaultLocale
-    )
+    const l10n = extractL10nFromSite(site)
+    const defaultLocale = l10n.supportedLocales.find((locale) => locale.id === l10n.defaultLocale)
     // if a locale is found from supported locales based on currentLocale, use it,
     // otherwise, use default locale to identify the locale
-    const supportedLocale = site.l10n.supportedLocales.find((locale) => locale.id === currentLocale)
+    const supportedLocale = l10n.supportedLocales.find((locale) => locale.id === currentLocale)
     const locale = supportedLocale ? supportedLocale : defaultLocale
     return {
         site: site.alias || site.id,

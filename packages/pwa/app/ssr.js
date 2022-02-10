@@ -60,30 +60,9 @@ app.use(
     })
 )
 
-/**
- *
- * @param {*} instance - the config instance indicator.
- * @returns object - the configuration
- */
-const getInstanceConfig = async () => {
-    // This is where you can customize which config will be loaded. By default
-    // the config will load as described [here](https://github.com/lorenwest/node-config/wiki/Configuration-Files#file-load-order)
-    // If you wish to have a per-instance configuration, do so by setting the
-    // `NODE_APP_INSTANCE` node environment variable before loading the config.
-    // Example:
-    // const {host} = arguments[0].location
-    // if (host.indexOf('example.eu')) {
-    //     process.env.NODE_APP_INSTANCE = 'eu'
-    // }
-
-    return await getConfig()
-}
-
-const renderWithConfig = async (req, res, next) => {
+const renderWithConfig = (req, res, next) => {
     // Add the config to the locals which we will write to the html later.
-    res.locals.config = await getInstanceConfig({
-        hostname: req.hostname
-    })
+    res.locals.config = getConfig()
 
     return render(req, res, next)
 }

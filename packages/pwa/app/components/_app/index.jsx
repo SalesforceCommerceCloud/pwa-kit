@@ -40,7 +40,7 @@ import {AddToCartModalProvider} from '../../hooks/use-add-to-cart-modal'
 import {IntlProvider} from 'react-intl'
 
 // Others
-import {watchOnlineStatus, flatten} from '../../utils/utils'
+import {watchOnlineStatus, flatten, extractL10nFromSite} from '../../utils/utils'
 import {homeUrlBuilder, getUrlWithLocale, pathToUrl} from '../../utils/url'
 import {buildPathWithUrlConfig, resolveConfigFromUrl} from '../../utils/url-config'
 
@@ -83,7 +83,7 @@ const App = (props) => {
     // Used to conditionally render header/footer for checkout page
     const isCheckout = /\/checkout$/.test(location?.pathname)
 
-    const {l10n} = site
+    const l10n = extractL10nFromSite(site)
     // Get the current currency to be used through out the app
     const currency =
         getPreferredCurrency(targetLocale, l10n.supportedLocales) || l10n.defaultCurrency

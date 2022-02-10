@@ -5,7 +5,6 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import pwaKitConfig from '../../pwa-kit.config.json'
 import {urlPartPositions} from '../constants'
 import {pathToUrl} from './url'
 /**
@@ -158,24 +157,6 @@ export const capitalize = (text) => {
         .join(' ')
 }
 
-// /**
-//  * Get the pwa configuration object from pwa-kit.config.json
-//  * @param path - path to your target item from pwaKitConfig
-//  *
-//  * @example
-//  * getConfig('app.url') => {locale: 'path', site: 'path'}
-//  * getConfig('app.sites[0]') => {
-//                 "id": "RefArch",
-//                 "alias": "us",
-//                 "hostnames": [],
-//                 "l10n": {...}
-//             }
-//  * @returns {object} - the targeted config value
-//  */
-// export const getConfig = (path) => {
-//     return getObjectProperty(pwaKitConfig, path)
-// }
-
 export const isObject = (o) => o?.constructor === Object
 
 /**
@@ -246,27 +227,65 @@ export const getParamsFromPath = (path, urlConfig = {}) => {
     return result
 }
 
-let _config
 /**
  * Dynamically load the applications config object.
  *
  * @returns the application config object.
  */
-export const getConfig = async () => {
+export const DEFAULT_CONFIG_MODULE_NAME = 'default'
+let _config
+export const getConfig = (opts = {}) => {
     if (_config) {
         return _config
     }
 
     if (typeof window !== 'undefined') {
-        _config = window.__CONFIG__
-    } else {
-        _config = (await import('config')).default
-        const sitesObject = await import('../../config/sites.json')
-        const updatedSites = mapSiteObjectToList(_config.sites, sitesObject)
-        _config = {..._config, sites: updatedSites}
+        _config = JSON.parse(document.getElementById('app-config').innerHTML)
+        return _config
     }
 
-    return _config
+    // doing this to force Webpack to ignore a
+    // `require()` call that is not meant for the browser
+    const _require = eval('require')
+    const {cosmiconfigSync} = _require('cosmiconfig')
+
+    // Load the config synchronously using a custom "searchPlaces".
+
+    // By default, use the deployment target as the {moduleName} for your
+    // configuration file. This means that on a "Production" names target, you'll load
+    // your `config/production.json` file. You can customize how you determine your
+    // {moduleName}.
+    const {moduleNameResolver} = opts
+    const moduleName = (moduleNameResolver && moduleNameResolver()) || process.env.DEPLOY_TARGET
+
+    console.log(' process.env.DEPLOY_TARGET', process.env.DEPLOY_TARGET)
+
+    const explorerSync = cosmiconfigSync(moduleName, {
+        packageProp: 'mobify',
+        searchPlaces: [
+            `config/${moduleName}.json`,
+            `config/local.json`,
+            `config/default.json`,
+            'package.json'
+        ]
+    })
+    const {config, filepath} = explorerSync.search()
+    console.info('================loading the config from===============', filepath)
+
+    // this file store the information about a demandware sites like site id, locales, currencies etc
+    const sitesExplorer = cosmiconfigSync(moduleName, {
+        searchPlaces: [
+            `config/${moduleName}-sites.json`,
+            `config/local-sites.json`,
+            `config/default-sites.json`
+        ]
+    })
+
+    const {config: sitesConfig} = sitesExplorer.search()
+    // we want to unite all the sites information into one single place to make it easier to use across the app
+    const res = {...config, sites: mapSiteObjectToList(config.sites, sitesConfig)}
+    console.log('res', res)
+    return res
 }
 
 /**
@@ -305,16 +324,14 @@ export const getConfig = async () => {
  *          id: 'site-1',
  *          alias: 'us',
  *          anotherProps: 'value-1'
- *          l10n: {
- *              defaultLocale: 'en-US',
- *              defaultCurrency: 'US',
- *              supportedLocales: [
- *              {
- *                  id: 'en-US',
- *                  preferredCurrency: 'USD'
- *               }
- *            ]
- *          }
+ *          defaultLocale: 'en-US',
+ *          defaultCurrency: 'US',
+ *          supportedLocales: [
+ *            {
+ *               id: 'en-US',
+ *               preferredCurrency: 'USD'
+ *            }
+ *          ]
  *      }
  * ]
  */
@@ -322,22 +339,28 @@ export const mapSiteObjectToList = (siteList, sitesObj) => {
     // if the siteList is a string, it is interpreted as a site id
     if (typeof siteList === 'string') {
         const id = siteList
+        const site = sitesObj[id]
+
         return {
             id,
-            ...sitesObj[id]
+            ...site
         }
     }
     return siteList.map((site) => {
         const siteObj = sitesObj[site.id]
-        const {supportedCurrencies, defaultCurrency, defaultLocale, supportedLocales} = siteObj
         return {
             ...site,
-            l10n: {
-                supportedCurrencies,
-                defaultCurrency,
-                defaultLocale,
-                supportedLocales
-            }
+            ...siteObj
         }
     })
+}
+
+export const extractL10nFromSite = (site) => {
+    const {supportedCurrencies, defaultCurrency, defaultLocale, supportedLocales} = site
+    return {
+        supportedCurrencies,
+        defaultCurrency,
+        defaultLocale,
+        supportedLocales
+    }
 }

@@ -24,6 +24,7 @@ import {getPreferredCurrency} from '../../utils/locale'
 import {pathToUrl} from '../../utils/url'
 import {resolveSiteFromUrl} from '../../utils/site-utils'
 import {resolveConfigFromUrl} from '../../utils/url-config'
+import {extractL10nFromSite} from '../../utils/utils'
 
 const apiConfig = {
     ...commerceAPIConfig,
@@ -85,9 +86,8 @@ AppConfig.restore = async (locals = {}) => {
 
     console.log('App config site', site)
 
-    const {l10n} = site
     const locale = getLocale(locals)
-    const currency = getPreferredCurrency(locale, l10n.supportedLocales) || l10n.defaultCurrency
+    const currency = getPreferredCurrency(locale, site.supportedLocales) || site.defaultCurrency
 
     locals.api = new CommerceAPI({...apiConfig, locale, currency})
 }
