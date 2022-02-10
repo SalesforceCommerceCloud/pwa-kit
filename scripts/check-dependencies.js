@@ -181,15 +181,18 @@ const check = () => {
         const pkg = readJSON(pkgFile)
 
         if (pkg.version !== rootPkg.version) {
-            errors.push(`Package "${pkg.name}" does not have a consistent package version as what's in the root package`)
+            errors.push(`Package "${pkg.name}" is at version "${pkg.version}" but it needs to match the root package version at "${rootPkg.version}"`)
         }
-
-        if (pkg.engines) {
-            if (pkg.engines.node !== rootPkg.engines.node || pkg.engines.npm !== rootPkg.engines.npm) {
-                errors.push(`Package "${pkg.name}" does not have a consistent 'engines' value as what's in the root package`)
-            }
-        } else {
-            errors.push(`Package "${pkg.name}" needs to have its 'engines' field defined`)
+        
+        const nodeVersion = (pkg.engines || {}).node
+        const npmVersion = (pkg.engines || {}).npm
+        
+        if (nodeVersion !== rootPkg.engines.node) {
+            errors.push(`Package "${pkg.name}" has engines.node set to "${nodeVersion}", but it must match the root package engines.node at "${rootPkg.engines.node}"`)
+        }
+        
+        if (npmVersion !== rootPkg.engines.npm) {
+            errors.push(`Package "${pkg.name}" has engines.npm set to "${npmVersion}", but it must match the root package engines.npm at "${rootPkg.engines.npm}"`)
         }
 
         Object.entries(commonDevDeps)
