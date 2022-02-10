@@ -66,16 +66,12 @@ const Home = ({productSearchResult, isLoading}) => {
                     <Stack spacing={{base: 4, sm: 6}} direction={{base: 'column', sm: 'row'}}>
                         <Button
                             as={Link}
-                            href="https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/getting-started.html"
-                            target="_blank"
+                            href="https://pwa-hybrid-deployment.herokuapp.com/on/demandware.store/Sites-RefArch-Site/en_US/Checkout-Begin"
                             width={{base: 'full', md: 'inherit'}}
                             paddingX={7}
                             _hover={{textDecoration: 'none'}}
                         >
-                            <FormattedMessage
-                                defaultMessage="Get started"
-                                id="home.link.get_started"
-                            />
+                            Checkout in SFRA
                         </Button>
                     </Stack>
                 }
