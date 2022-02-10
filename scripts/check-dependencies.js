@@ -170,38 +170,25 @@ const check = () => {
     // Maps package-name -> the peerDependencies section for each monorepo-local
     // package, used for sense-checking dependencies later on.
     const peerDependenciesByPackage = {}
-    const engines = {}
-    let pkgVersion
 
     listPackages().forEach((pkgDir) => {
         const pkgFile = path.join(pkgDir, 'package.json')
         const pkg = readJSON(pkgFile)
 
         peerDependenciesByPackage[pkg.name] = pkg.peerDependencies || {}
-
-        if (!engines.node && pkg.engines) {
-            engines.node = pkg.engines.node
-        }
-        if (!engines.npm && pkg.engines) {
-            engines.npm = pkg.engines.npm
-        }
-
-        if (!pkgVersion) {
-            pkgVersion = pkg.version
-        }
     })
 
     listPackages().forEach((pkgDir) => {
         const pkgFile = path.join(pkgDir, 'package.json')
         const pkg = readJSON(pkgFile)
 
-        if (pkg.version !== pkgVersion) {
-            errors.push(`Package "${pkg.name}" does not have a consistent package version as other packages`)
+        if (pkg.version !== rootPkg.version) {
+            errors.push(`Package "${pkg.name}" does not have a consistent package version as what's in the root package`)
         }
 
         if (pkg.engines) {
-            if (pkg.engines.node !== engines.node || pkg.engines.npm !== engines.npm) {
-                errors.push(`Package "${pkg.name}" does not have a consistent 'engines' value as other packages`)
+            if (pkg.engines.node !== rootPkg.engines.node || pkg.engines.npm !== rootPkg.engines.npm) {
+                errors.push(`Package "${pkg.name}" does not have a consistent 'engines' value as what's in the root package`)
             }
         } else {
             errors.push(`Package "${pkg.name}" needs to have its 'engines' field defined`)
