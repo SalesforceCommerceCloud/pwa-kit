@@ -65,18 +65,6 @@ class AppConfig extends React.Component {
     }
 
     /**
-     * Return a string that represents the filename of the configuration to be loaded.
-     *
-     * @param req - an Express HTTP Request object on the server,
-     *   undefined on the client.
-     * @return {String} - the filename
-     */
-    // eslint-disable-next-line no-unused-vars
-    static fileNameResolver(req) {
-        return undefined
-    }
-
-    /**
      * This class is a React Component in order to provide this hook, which lets
      * you set up context Providers for a state-management library such as Redux.
      */

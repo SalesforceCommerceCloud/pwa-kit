@@ -17,7 +17,7 @@ import {ChunkExtractor} from '@loadable/server'
 import {StaticRouter as Router, matchPath} from 'react-router-dom'
 import serialize from 'serialize-javascript'
 
-import {getAssetUrl, getConfig, DEFAULT_CONFIG_MODULE_NAME} from '../universal/utils'
+import {getAssetUrl} from '../universal/utils'
 import DeviceContext from '../universal/device-context'
 
 import Document from '../universal/components/_document'
@@ -32,7 +32,6 @@ import {detectDeviceType, isRemote} from '../../utils/ssr-server'
 import {proxyConfigs} from '../../utils/ssr-shared'
 
 import sprite from 'svg-sprite-loader/runtime/sprite.build'
-import {config} from 'process'
 
 const CWD = process.cwd()
 const BUNDLES_PATH = path.resolve(CWD, 'build/loadable-stats.json')
@@ -133,9 +132,7 @@ export const render = async (req, res, next) => {
     // to inject arguments into the wrapped component's getProps methods.
     AppConfig.restore(res.locals)
 
-    const appConfig = getConfig({
-        fileNameResolver: () => AppConfig.fileNameResolver || DEFAULT_CONFIG_MODULE_NAME
-    })
+    const appConfig = req.appConfig
     const routes = getRoutes(res.locals)
     const WrappedApp = routeComponent(App, false, res.locals)
 
