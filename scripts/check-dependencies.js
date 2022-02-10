@@ -170,11 +170,9 @@ const check = () => {
     // Maps package-name -> the peerDependencies section for each monorepo-local
     // package, used for sense-checking dependencies later on.
     const peerDependenciesByPackage = {}
-
     listPackages().forEach((pkgDir) => {
         const pkgFile = path.join(pkgDir, 'package.json')
         const pkg = readJSON(pkgFile)
-
         peerDependenciesByPackage[pkg.name] = pkg.peerDependencies || {}
     })
 
