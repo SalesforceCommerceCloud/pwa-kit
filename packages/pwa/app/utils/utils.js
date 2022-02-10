@@ -160,43 +160,8 @@ export const capitalize = (text) => {
 export const isObject = (o) => o?.constructor === Object
 
 /**
- * Get an object property by a string path separated by dot
- * https://stackoverflow.com/questions/6491463/accessing-nested-javascript-objects-and-arrays-by-string-path
- * @param {object} obj - source object to get data from
- * @param {string} path - a string path separated each hierarchy by a dot
- *
- * @example
- * const data = {a: 'string 1', b: [{name: 'name 1'}], c: {id: 'abc', child: {id: 1}}}
- *
- * getObjectProperty(data, 'a') // return 'string 1'
- * getObjectProperty(data, 'c.child') // return [{name: 'name 1'}]
- * getObjectProperty(data, 'b[0].name') // return 'name 1'
- *
- * @returns {array|object|string|undefined}
- */
-export const getObjectProperty = (obj, path) => {
-    if (!path) return obj
-    // remove any leading dot
-    path = path.replace(/^\./, '')
-    // convert indexes to properties. eg obj[0] => obj.0
-    path = path.replace(/\[(\w+)\]/g, '.$1')
-    const paths = path.split('.')
-    if (!paths.length) return obj
-    let result = Object.assign({}, obj)
-    for (let i = 0; i < paths.length; i++) {
-        const prop = paths[i]
-        if ((isObject(result) || Array.isArray(result)) && prop in result) {
-            result = result[prop]
-        } else {
-            return
-        }
-    }
-    return result
-}
-
-/**
- * This function return the param (e.g site and locale) from the given url
- * The site will show up before locale if both of them are presented in the pathname
+ * This function return the identifiers (site and locale) from the given url
+ * The site will always go before locale if both of them are presented in the pathname
  * @param path {string}
  * @param urlConfig {object}
  * @returns {object}
@@ -232,12 +197,9 @@ export const getParamsFromPath = (path, urlConfig = {}) => {
  *
  * @returns the application config object.
  */
-export const DEFAULT_CONFIG_MODULE_NAME = 'default'
-let _config
+//TODO: Remove this when the work from SDK is merged
 export const getConfig = (opts = {}) => {
-    if (_config) {
-        return _config
-    }
+    let _config
 
     if (typeof window !== 'undefined') {
         _config = JSON.parse(document.getElementById('app-config').innerHTML)
@@ -270,96 +232,7 @@ export const getConfig = (opts = {}) => {
         ]
     })
     const {config, filepath} = explorerSync.search()
-    console.info('================loading the config from===============', filepath)
+    console.info('=========loading the config from=====', filepath)
 
-    // this file store the information about a demandware sites like site id, locales, currencies etc
-    const sitesExplorer = cosmiconfigSync(moduleName, {
-        searchPlaces: [
-            `config/${moduleName}-sites.json`,
-            `config/local-sites.json`,
-            `config/default-sites.json`
-        ]
-    })
-
-    const {config: sitesConfig} = sitesExplorer.search()
-    // we want to unite all the sites information into one single place to make it easier to use across the app
-    const res = {...config, sites: mapSiteObjectToList(config.sites, sitesConfig)}
-    return res
-}
-
-/**
- * Loop over the array, and use the site id to get the connected object from sitesObject (that has extra info about a site)
- * append those properties into the array's object
- *
- * @param siteList
- * @param sitesObj
- * @return {array} site list - list of site configuration including id, alias, l10n, etc
- *
- * @example
- * const config = {
- *      defaultSite: 'site-1'
- *      sites: [
- *          id: 'site-1',
- *          alias: 'us'
- *      ]
- * }
- * const sitesObject = {
- *     site-1: {
- *         defaultLocale: 'en-US',
- *         defaultCurrency: 'US',
- *         supportedLocales: [
- *             {
- *                 id: 'en-US',
- *                 preferredCurrency: 'USD'
- *             }
- *         ],
- *         anotherProps: 'value-1'
- *     }
- * }
- *
- * mapSiteObjectToList(config.sites, sitesObject)
- * return [
- *      {
- *          id: 'site-1',
- *          alias: 'us',
- *          anotherProps: 'value-1'
- *          defaultLocale: 'en-US',
- *          defaultCurrency: 'US',
- *          supportedLocales: [
- *            {
- *               id: 'en-US',
- *               preferredCurrency: 'USD'
- *            }
- *          ]
- *      }
- * ]
- */
-export const mapSiteObjectToList = (siteList, sitesObj) => {
-    // if the siteList is a string, it is interpreted as a site id
-    if (typeof siteList === 'string') {
-        const id = siteList
-        const site = sitesObj[id]
-
-        return {
-            id,
-            ...site
-        }
-    }
-    return siteList.map((site) => {
-        const siteObj = sitesObj[site.id]
-        return {
-            ...site,
-            ...siteObj
-        }
-    })
-}
-
-export const extractL10nFromSite = (site) => {
-    const {supportedCurrencies, defaultCurrency, defaultLocale, supportedLocales} = site
-    return {
-        supportedCurrencies,
-        defaultCurrency,
-        defaultLocale,
-        supportedLocales
-    }
+    return config
 }

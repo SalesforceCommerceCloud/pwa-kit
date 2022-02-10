@@ -40,9 +40,9 @@ import {AddToCartModalProvider} from '../../hooks/use-add-to-cart-modal'
 import {IntlProvider} from 'react-intl'
 
 // Others
-import {watchOnlineStatus, flatten, extractL10nFromSite} from '../../utils/utils'
+import {watchOnlineStatus, flatten} from '../../utils/utils'
 import {homeUrlBuilder, getUrlWithLocale, pathToUrl} from '../../utils/url'
-import {buildPathWithUrlConfig, resolveConfigFromUrl} from '../../utils/url-config'
+import {buildPathWithUrlConfig} from '../../utils/url-config'
 
 import {getLocaleConfig, getPreferredCurrency, getSupportedLocalesIds} from '../../utils/locale'
 import {DEFAULT_SITE_TITLE, HOME_HREF, THEME_COLOR} from '../../constants'
@@ -51,6 +51,7 @@ import Seo from '../seo'
 import useWishlist from '../../hooks/use-wishlist'
 import useSite from '../../hooks/use-site'
 import {resolveSiteFromUrl} from '../../utils/site-utils'
+import useConfigValues from '../../hooks/use-config-values'
 
 const DEFAULT_NAV_DEPTH = 3
 const DEFAULT_ROOT_CATEGORY = 'root'
@@ -65,8 +66,6 @@ const App = (props) => {
         config
     } = props
 
-    console.log('App ===================', config)
-
     const appOrigin = getAppOrigin()
 
     const history = useHistory()
@@ -76,14 +75,14 @@ const App = (props) => {
     const site = useSite()
     const [isOnline, setIsOnline] = useState(true)
     const styles = useStyleConfig('App')
-    const configValues = resolveConfigFromUrl(`${location.pathname}${location.search}`)
+    const configValues = useConfigValues()
 
     const {isOpen, onOpen, onClose} = useDisclosure()
 
     // Used to conditionally render header/footer for checkout page
     const isCheckout = /\/checkout$/.test(location?.pathname)
 
-    const l10n = extractL10nFromSite(site)
+    const {l10n} = site
     // Get the current currency to be used through out the app
     const currency =
         getPreferredCurrency(targetLocale, l10n.supportedLocales) || l10n.defaultCurrency
@@ -286,8 +285,8 @@ App.shouldGetProps = () => {
 }
 
 App.getProps = async ({api, res}) => {
-    console.log('apppppp.getProps==============', res)
-    const site = await resolveSiteFromUrl(pathToUrl(res.locals.originalUrl))
+    const site = resolveSiteFromUrl(pathToUrl(res.locals.originalUrl))
+    console.log('site', site)
     const l10nConfig = site?.l10n
     const localeConfig = await getLocaleConfig({
         getUserPreferredLocales: () => {

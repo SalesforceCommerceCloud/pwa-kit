@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {extractL10nFromSite, getConfig, getParamsFromPath} from './utils'
+import {getConfig, getParamsFromPath} from './utils'
 import {urlPartPositions} from '../constants'
 import {rebuildPathWithParams} from './url'
 import {getDefaultIdentifiers, getDefaultSite} from './site-utils'
@@ -20,16 +20,16 @@ import {getDefaultIdentifiers, getDefaultSite} from './site-utils'
  * @param {string} path - input path
  * @returns {Object} ConfigValue object
  */
-export const resolveConfigFromUrl = async (path) => {
-    const {url: urlConfig, sites} = await getConfig()
+export const resolveConfigFromPath = (path) => {
+    const {url: urlConfig, sites} = getConfig()
 
     const {site: currentSite, locale: currentLocale} = getParamsFromPath(path, urlConfig)
     // get the current site based on the site identifier (id or alias)
     // if it is undefined, use the default site
     const site =
         sites.find((site) => site.id === currentSite || site.alias === currentSite) ||
-        (await getDefaultSite())
-    const l10n = extractL10nFromSite(site)
+        getDefaultSite()
+    const {l10n} = site
     const defaultLocale = l10n.supportedLocales.find((locale) => locale.id === l10n.defaultLocale)
     // if a locale is found from supported locales based on currentLocale, use it,
     // otherwise, use default locale to identify the locale
@@ -90,13 +90,13 @@ export const buildPathWithUrlConfig = (relativeUrl, configValues = {}, opts = {}
     const queryParams = {...Object.fromEntries(params)}
     let basePathSegments = []
     const showDefault = urlConfig.showDefault
-    const {defaultLocaleVal, defaultSiteVal} = getDefaultIdentifiers()
+    const {defaultLocales, defaultSites} = getDefaultIdentifiers()
     const options = ['site', 'locale']
     // if the showDefault is set to false, and when both locale and site are default values
     // then do not include them into the url
     if (
-        defaultLocaleVal.includes(configValues.locale) &&
-        defaultSiteVal.includes(configValues.site) &&
+        defaultLocales.includes(configValues.locale) &&
+        defaultSites.includes(configValues.site) &&
         !showDefault
     ) {
         return relativeUrl
@@ -121,29 +121,4 @@ export const buildPathWithUrlConfig = (relativeUrl, configValues = {}, opts = {}
         updatedPath = rebuildPathWithParams(updatedPath, queryParams)
     }
     return updatedPath
-}
-
-/**
- * a function to return url config from pwa config file
- * First, it will look for the url config based on the current host
- * If none is found, it will return the default url config at the top level of the config file
- */
-export const getUrlConfig = () => {
-    const {hostname} = new URL(getAppOrigin())
-    const urlConfig = getUrlConfigByHostname(hostname)
-    if (urlConfig) {
-        return urlConfig
-    }
-    return getConfig('app.routing.url')
-}
-
-/**
- * Get the url config from pwa-kit.config.json based on a given hostname
- * @param {string} hostname
- * @returns {object|undefined} - url config from the input host
- */
-export const getUrlConfigByHostname = (hostname) => {
-    const hosts = getConfig('app.routing.hosts')
-    const host = hosts.find((host) => host.domain.includes(hostname))
-    return host?.url
 }

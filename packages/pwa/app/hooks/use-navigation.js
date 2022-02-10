@@ -7,8 +7,8 @@
 import {useCallback} from 'react'
 import {useHistory} from 'react-router'
 import {useIntl} from 'react-intl'
-import {buildPathWithUrlConfig, resolveConfigFromUrl} from '../utils/url-config'
-import {useLocation} from 'react-router-dom'
+import {buildPathWithUrlConfig} from '../utils/url-config'
+import useConfigValues from './use-config-values'
 
 /**
  * A convenience hook for programmatic navigation uses history's `push` or `replace`. The proper locale
@@ -18,8 +18,7 @@ import {useLocation} from 'react-router-dom'
 const useNavigation = () => {
     const history = useHistory()
     const {locale} = useIntl()
-    const location = useLocation()
-    const configValues = resolveConfigFromUrl(`${location.pathname}${location.search}`)
+    const configValues = useConfigValues()
     return useCallback(
         /**
          *

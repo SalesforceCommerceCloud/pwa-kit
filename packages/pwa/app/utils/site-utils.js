@@ -19,8 +19,8 @@ import {getParamsFromPath} from './utils'
  * @param {string} url
  * @returns {object}
  */
-export const resolveSiteFromUrl = async (url) => {
-    const config = await getConfig()
+export const resolveSiteFromUrl = (url) => {
+    const config = getConfig()
     console.log('resolveSiteFromUrl', config)
     if (!url) {
         throw new Error('url is required to find a site object.')
@@ -33,13 +33,15 @@ export const resolveSiteFromUrl = async (url) => {
     const {site: currentSite} = getParamsFromPath(path, config.url)
 
     // step 1: look for the site based on the site identifier (id or alias) from the url
-    site = config?.sites.find((site) => site.id === currentSite || site.alias === currentSite)
+    site =
+        config.sites &&
+        config.sites.find((site) => site.id === currentSite || site.alias === currentSite)
     if (site) {
         return site
     }
 
     //if step 1 does not work, use the default value to get the default site
-    site = await getDefaultSite()
+    site = getDefaultSite()
     console.log('default site', site)
     // Step 4: throw an error if site can't be found by any of the above steps
     if (!site) {
@@ -52,21 +54,25 @@ export const resolveSiteFromUrl = async (url) => {
  * get the default site
  * @returns {object} - default site object
  */
-export const getDefaultSite = async () => {
-    const config = await getConfig()
-    return config.sites.find((site) => site.id === config.defaultSite)
+export const getDefaultSite = () => {
+    const config = getConfig()
+    return config.sites && config.sites.find((site) => site.id === config.defaultSite)
 }
 
 /**
  * This function returns all the identifiers
  * for locale and site from a given config
- *
+ * @return {object} - default identifiers (id and alias) of site and locale
  */
 export const getDefaultIdentifiers = () => {
     const defaultSite = getDefaultSite()
-    const defaultLocale = defaultSite.l10n.defaultLocale
+    const defaultLocale =
+        defaultSite.l10n &&
+        defaultSite.l10n.supportedLocales.find(
+            (locale) => locale.id === defaultSite.l10n.defaultLocale
+        )
     return {
-        defaultLocaleVal: [defaultLocale],
-        defaultSiteVal: [defaultSite.id, defaultSite.alias]
+        defaultLocales: [defaultLocale.id, defaultLocale?.alias],
+        defaultSites: [defaultSite.id, defaultSite?.alias]
     }
 }

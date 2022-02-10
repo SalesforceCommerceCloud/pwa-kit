@@ -93,7 +93,7 @@ const DrawerMenu = ({isOpen, onClose = noop, onLogoClick = noop, root}) => {
         navigate('/login')
         setShowLoading(false)
     }
-    const supportedLocaleIds = getSupportedLocalesIds(site?.l10n?.supportedLocales)
+    const supportedLocaleIds = getSupportedLocalesIds(site.l10n.supportedLocales)
     const showLocaleSelector = supportedLocaleIds?.length > 1
 
     return (
@@ -268,9 +268,7 @@ const DrawerMenu = ({isOpen, onClose = noop, onLogoClick = noop, root}) => {
                                     <LocaleSelector
                                         {...styles.localeSelector}
                                         selectedLocale={intl.locale}
-                                        locales={getSupportedLocalesIds(
-                                            site?.l10n?.supportedLocales
-                                        )}
+                                        locales={getSupportedLocalesIds(site.l10n.supportedLocales)}
                                         onSelect={(newLocale) => {
                                             // Update the `locale` in the URL.
                                             const newUrl = getUrlWithLocale(newLocale, {

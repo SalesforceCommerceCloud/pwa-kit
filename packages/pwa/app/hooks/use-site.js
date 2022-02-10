@@ -11,10 +11,9 @@ import {resolveSiteFromUrl} from '../utils/site-utils'
 import {useMemo} from 'react'
 
 /**
- * This hook returns the site configuration object using the site identifier
- * (id or alias) in the current url.
+ * This hook returns the current site based on current location
  *
- * @returns {Object} The site configuration object
+ * @returns {Object} - current site
  */
 const useSite = () => {
     const {pathname, search} = useLocation()

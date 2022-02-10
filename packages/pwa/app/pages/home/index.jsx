@@ -39,7 +39,7 @@ import {
     HOME_SHOP_PRODUCTS_LIMIT,
     urlPartPositions
 } from '../../constants'
-import {resolveConfigFromUrl} from '../../utils/url-config'
+import {resolveConfigFromPath} from '../../utils/url-config'
 import {useLocation} from 'react-router-dom'
 
 /**
@@ -51,7 +51,7 @@ import {useLocation} from 'react-router-dom'
 const Home = ({productSearchResult, isLoading}) => {
     const intl = useIntl()
     const location = useLocation()
-    const {url: urlConfig} = resolveConfigFromUrl(`${location.pathname}${location.search}`)
+    const {url: urlConfig} = resolveConfigFromPath(`${location.pathname}${location.search}`)
 
     return (
         <Box data-testid="home-page" layerStyle="page">

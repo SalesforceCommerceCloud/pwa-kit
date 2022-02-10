@@ -7,13 +7,13 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {Link as ChakraLink} from '@chakra-ui/react'
-import {Link as SPALink, NavLink as NavSPALink, useLocation} from 'react-router-dom'
-import {buildPathWithUrlConfig, resolveConfigFromUrl} from '../../utils/url-config'
+import {Link as SPALink, NavLink as NavSPALink} from 'react-router-dom'
+import {buildPathWithUrlConfig} from '../../utils/url-config'
+import useConfigValues from '../../hooks/use-config-values'
 
 const Link = React.forwardRef(({href, to, useNavLink = false, ...props}, ref) => {
     const _href = to || href
-    const location = useLocation()
-    const configValues = resolveConfigFromUrl(`${location.pathname}${location.search}`)
+    const configValues = useConfigValues()
     const updatedHref = buildPathWithUrlConfig(_href, configValues)
 
     return (

@@ -18,16 +18,15 @@ export const configureRoutes = (routes = [], {ignoredRoutes = []}) => {
     if (!routes.length) return []
 
     const config = getConfig()
-    console.log('configureRoutes config', config)
-
-    // collect and flatten the result to get a list of site objects
-    const allSites = config.sites
+    if (!config.sites) {
+        throw new Error('Cannot find any sites from config. Please check your configuration')
+    }
 
     // get a collection of all site-id and site alias from the config of the current host
-    // remove any duplicates
+    // remove any duplicates by using [...new Set([])]
     const sites = [
         ...new Set(
-            allSites
+            config.sites
                 ?.reduce((res, site) => {
                     return [...res, site.id, site.alias]
                 }, [])
@@ -38,9 +37,9 @@ export const configureRoutes = (routes = [], {ignoredRoutes = []}) => {
     // remove any duplicates by using [...new Set([])]
     const locales = [
         ...new Set(
-            allSites
-                .reduce((res, {supportedLocales}) => {
-                    supportedLocales.forEach((locale) => {
+            config.sites
+                .reduce((res, {l10n}) => {
+                    l10n.supportedLocales.forEach((locale) => {
                         res = [...res, locale.id, locale.alias]
                     })
                     return res

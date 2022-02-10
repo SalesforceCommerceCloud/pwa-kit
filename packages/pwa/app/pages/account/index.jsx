@@ -37,7 +37,7 @@ import {useLocation} from 'react-router-dom'
 import {messages, navLinks} from './constant'
 import useNavigation from '../../hooks/use-navigation'
 import LoadingSpinner from '../../components/loading-spinner'
-import {buildPathWithUrlConfig, resolveConfigFromUrl} from '../../utils/url-config'
+import {buildPathWithUrlConfig, resolveConfigFromPath} from '../../utils/url-config'
 
 const Account = () => {
     const {path} = useRouteMatch()
@@ -45,7 +45,7 @@ const Account = () => {
     const customer = useCustomer()
     const location = useLocation()
     const navigate = useNavigation()
-    const configValues = resolveConfigFromUrl(`${location.pathname}${location.search}`)
+    const configValues = resolveConfigFromPath(`${location.pathname}${location.search}`)
 
     const [mobileNavIndex, setMobileNavIndex] = useState(-1)
     const [showLoading, setShowLoading] = useState(false)

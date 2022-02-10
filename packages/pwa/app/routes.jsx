@@ -105,5 +105,4 @@ const routes = [
 let configuredRoutes = configureRoutes(routes, {
     ignoredRoutes: ['/callback', '*']
 })
-console.log('configuredRoutes', configuredRoutes.length)
 export default configuredRoutes

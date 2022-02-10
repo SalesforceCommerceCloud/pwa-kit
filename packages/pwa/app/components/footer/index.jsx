@@ -37,7 +37,8 @@ const Footer = ({...otherProps}) => {
     const intl = useIntl()
     const [locale, setLocale] = useState(intl.locale)
     const site = useSite()
-    const supportedLocaleIds = getSupportedLocalesIds(site.supportedLocales)
+    const {l10n} = site
+    const supportedLocaleIds = getSupportedLocalesIds(l10n.supportedLocales)
     const showLocaleSelector = supportedLocaleIds?.length > 1
 
     return (
@@ -141,7 +142,7 @@ const Footer = ({...otherProps}) => {
                                     variant="filled"
                                     {...styles.localeDropdown}
                                 >
-                                    {getSupportedLocalesIds(site.supportedLocales).map((locale) => (
+                                    {getSupportedLocalesIds(l10n.supportedLocales).map((locale) => (
                                         <LocaleText
                                             as="option"
                                             value={locale}

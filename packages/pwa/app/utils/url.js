@@ -5,9 +5,10 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {resolveConfigFromUrl} from './url-config'
+import {resolveConfigFromPath} from './url-config'
 import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
 import {buildPathWithUrlConfig} from './url-config'
+import {getConfig} from './utils'
 
 /**
  * A function that takes a path and qualifies it with the current host and protocol.
@@ -123,14 +124,13 @@ export const searchUrlBuilder = (searchTerm) => `/search?q=${searchTerm}`
  * and replace it with new shortCode
  *
  * @param {string} shortCode - The locale short code.
- * @param {{site: {l10n: {defaultLocale: string}, alias: string, id: string}, location: URL}} [opts] - Options, if there's any.
- * @param {string[]} opts.disallowParams - URL parameters to remove
+ * @param {object} [opts] - Options, if there's any.
  * @param {Object} opts.location - location object to replace the default `window.location`
  * @returns {string} - The relative URL for the specific locale.
  */
 export const getUrlWithLocale = (shortCode, opts = {}) => {
     const location = opts.location ? opts.location : window.location
-    const {site, locale, url} = resolveConfigFromUrl(`${location.pathname}${location.search}`)
+    const {site, locale, url} = resolveConfigFromPath(`${location.pathname}${location.search}`)
     let {pathname, search} = location
 
     // sanitize the locale/site from the current Url
@@ -157,7 +157,7 @@ export const getUrlWithLocale = (shortCode, opts = {}) => {
  */
 export const homeUrlBuilder = (homeHref, options = {}) => {
     const {locale, site} = options
-    const {url} = resolveConfigFromUrl(homeHref)
+    const {url} = getConfig()
     const updatedUrl = buildPathWithUrlConfig(homeHref, {
         locale,
         site: site.alias || site.id,
