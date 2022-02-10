@@ -25,6 +25,8 @@ import {
     ocapiFaultResponse
 } from './mock-data'
 
+jest.mock('cross-fetch', () => global.fetch)
+
 const apiConfig = {
     ...commerceAPIConfig,
     einsteinConfig: einsteinAPIConfig,
