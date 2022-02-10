@@ -1,6 +1,6 @@
 {
   "name": "pwa-kit-create-app",
-  "version": "1.4.0",
+  "version": "1.5.0-dev",
   "description": "Salesforce's project generator tool",
   "author": "dev@mobify.com",
   "license": "See license in LICENSE",
@@ -23,11 +23,16 @@
     "lint": "eslint \"**/*.{js,jsx}\"",
     "lint:fix": "npm run lint -- --fix"
   },
+  "engines": {
+    "node": "^12.0.0 || ^14.0.0",
+    "npm": "^6.14.4 || ^7.0.0 || ^8.0.0"
+  },
   "dependencies": {
     "commander": "^2.20.0",
     "deepmerge": "2.2.1",
     "fs-extra": "7.0.1",
     "inquirer": "7.0.5",
+    "semver": "^7.3.2",
     "shelljs": "^0.8.5",
     "slugify": "^1.6.5",
     "tar": "^6.1.11"
@@ -74,7 +79,6 @@
     "nock": "^13.1.1",
     "prettier": "1.18.2",
     "regenerator-runtime": "^0.11.1",
-    "semver": "^7.3.2",
     "verdaccio": "^4.5.1"
   }
 }
