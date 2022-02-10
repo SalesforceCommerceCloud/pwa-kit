@@ -9,11 +9,10 @@ import '@testing-library/jest-dom/extend-expect'
 import {Crypto} from '@peculiar/webcrypto'
 import fetchMock from 'jest-fetch-mock'
 
-// Initializes jest-fetch-mock and sets global.fetch to a mock
-// Since we use cross-fetch and not global.fetch directly, we still need
-// to add jest.mock('cross-fetch', () => global.fetch) in the classes where
-// we want to actually use a mock of cross-fetch.
-fetchMock.enableMocks()
+// Set global.fetch to a mock
+// In places where we want to mock cross-fetch, we still need to add
+// jest.mock('cross-fetch', () => global.fetch)
+global.fetch = fetchMock
 
 // TextEncoder is a web API, need to import it
 // from nodejs util in testing environment.
