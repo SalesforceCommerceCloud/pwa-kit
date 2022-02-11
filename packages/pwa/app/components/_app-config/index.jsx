@@ -23,7 +23,7 @@ import {commerceAPIConfig, einsteinAPIConfig} from '../../api.config'
 import {getPreferredCurrency} from '../../utils/locale'
 import {pathToUrl} from '../../utils/url'
 import {resolveSiteFromUrl} from '../../utils/site-utils'
-import {resolveConfigFromPath} from '../../utils/url-config'
+import {getConfig, getParamsFromPath} from '../../utils/utils'
 
 const apiConfig = {
     ...commerceAPIConfig,
@@ -37,13 +37,12 @@ const apiConfig = {
  * @returns {String} the locale short code
  */
 const getLocale = (locals = {}) => {
+    const {url} = getConfig()
     const path =
         typeof window === 'undefined'
             ? locals.originalUrl
             : `${window.location.pathname}${window.location.search}`
-    const {locale} = resolveConfigFromPath(path)
-
-    console.log('getLocale', locale)
+    const {locale} = getParamsFromPath(path, url)
 
     return locale
 }
@@ -87,7 +86,7 @@ AppConfig.restore = (locals = {}) => {
 
     console.log('App config site', site)
 
-    const locale = getLocale(locals)
+    const locale = getLocale(locals) || site.l10n.defaultLocale
     const currency =
         getPreferredCurrency(locale, site.l10n.supportedLocales) || site.defaultCurrency
 

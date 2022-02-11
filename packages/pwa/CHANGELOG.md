@@ -1,4 +1,6 @@
 ## v1.5.0-dev (Jan 28, 2022)
+-   Multi-site implementation for Retail React App [#319](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/319)
+
 ## v1.4.0 (Jan 27, 2022)
 
 -  Do not send HSTS header during local development [#288](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/288)
@@ -6,7 +8,6 @@
 -   Upgrade to React 17 [#278](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/278)
 -   Import preliminary translations [#324](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/324)
 -   Remove old dependencies that are no longer used [#317](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/317)
--   Multi-site implementation for Retail React App [#318](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/318)
 
 ## v1.3.0 (Jan 06, 2022)
 

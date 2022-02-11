@@ -42,7 +42,7 @@ import {IntlProvider} from 'react-intl'
 // Others
 import {watchOnlineStatus, flatten} from '../../utils/utils'
 import {homeUrlBuilder, getUrlWithLocale, pathToUrl} from '../../utils/url'
-import {buildPathWithUrlConfig} from '../../utils/url-config'
+import {buildPathWithUrlConfig} from '../../utils/url'
 
 import {getLocaleConfig, getPreferredCurrency, getSupportedLocalesIds} from '../../utils/locale'
 import {DEFAULT_SITE_TITLE, HOME_HREF, THEME_COLOR} from '../../constants'
@@ -51,7 +51,6 @@ import Seo from '../seo'
 import useWishlist from '../../hooks/use-wishlist'
 import useSite from '../../hooks/use-site'
 import {resolveSiteFromUrl} from '../../utils/site-utils'
-import useConfigValues from '../../hooks/use-config-values'
 
 const DEFAULT_NAV_DEPTH = 3
 const DEFAULT_ROOT_CATEGORY = 'root'
@@ -75,7 +74,6 @@ const App = (props) => {
     const site = useSite()
     const [isOnline, setIsOnline] = useState(true)
     const styles = useStyleConfig('App')
-    const configValues = useConfigValues()
 
     const {isOpen, onOpen, onClose} = useDisclosure()
 
@@ -126,7 +124,10 @@ const App = (props) => {
     }
 
     const onCartClick = () => {
-        const path = buildPathWithUrlConfig('/cart', configValues)
+        const path = buildPathWithUrlConfig('/cart', {
+            locale: targetLocale,
+            site: site.alias || site.id
+        })
         history.push(path)
 
         // Close the drawer.
@@ -136,7 +137,10 @@ const App = (props) => {
     const onAccountClick = () => {
         // Link to account page for registered customer, open auth modal otherwise
         if (customer.isRegistered) {
-            const path = buildPathWithUrlConfig('/account', configValues)
+            const path = buildPathWithUrlConfig('/account', {
+                locale: targetLocale,
+                site: site.alias || site.id
+            })
             history.push(path)
         } else {
             // if they already are at the login page, do not show login modal
@@ -146,7 +150,10 @@ const App = (props) => {
     }
 
     const onWishlistClick = () => {
-        const path = buildPathWithUrlConfig('/account/wishlist', configValues)
+        const path = buildPathWithUrlConfig('/account/wishlist', {
+            locale: targetLocale,
+            site: site.alias || site.id
+        })
         history.push(path)
     }
 
@@ -286,7 +293,6 @@ App.shouldGetProps = () => {
 
 App.getProps = async ({api, res}) => {
     const site = resolveSiteFromUrl(pathToUrl(res.locals.originalUrl))
-    console.log('site', site)
     const l10nConfig = site?.l10n
     const localeConfig = await getLocaleConfig({
         getUserPreferredLocales: () => {

@@ -21,9 +21,12 @@ import {getParamsFromPath} from './utils'
  */
 export const resolveSiteFromUrl = (url) => {
     const config = getConfig()
-    console.log('resolveSiteFromUrl', config)
     if (!url) {
         throw new Error('url is required to find a site object.')
+    }
+
+    if (!config.sites) {
+        throw new Error("Can't find any sites in the config. Please check your configuration")
     }
     const {pathname, search} = new URL(url)
     const path = `${pathname}${search}`
@@ -31,18 +34,14 @@ export const resolveSiteFromUrl = (url) => {
 
     // get the site identifier from the url
     const {site: currentSite} = getParamsFromPath(path, config.url)
-
     // step 1: look for the site based on the site identifier (id or alias) from the url
-    site =
-        config.sites &&
-        config.sites.find((site) => site.id === currentSite || site.alias === currentSite)
+    site = config.sites.find((site) => site.id === currentSite || site.alias === currentSite)
     if (site) {
         return site
     }
 
     //if step 1 does not work, use the default value to get the default site
     site = getDefaultSite()
-    console.log('default site', site)
     // Step 4: throw an error if site can't be found by any of the above steps
     if (!site) {
         throw new Error("Can't find any site. Please check you sites configuration.")
@@ -56,7 +55,10 @@ export const resolveSiteFromUrl = (url) => {
  */
 export const getDefaultSite = () => {
     const config = getConfig()
-    return config.sites && config.sites.find((site) => site.id === config.defaultSite)
+    if (!config.sites) {
+        throw new Error("Can't find any sites in the config. Please check your configuration")
+    }
+    return config.sites.find((site) => site.id === config.defaultSite)
 }
 
 /**

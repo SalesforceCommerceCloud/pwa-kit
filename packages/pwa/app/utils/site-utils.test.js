@@ -28,63 +28,66 @@ describe('resolveSiteFromUrl', function() {
         }).toThrow()
     })
 
-    test('return site object from the url', () => {
-        getConfig.mockImplementation(() => mockConfig.app.sites)
+    test('return site based on the site alias in the url', () => {
+        getConfig.mockImplementation(() => mockConfig)
         const result = resolveSiteFromUrl('https://www.example-site.com/us/en-US/women/dress')
-        expect(result.id).toEqual('site-1')
+        expect(result.id).toEqual('site-2')
     })
 
-    test('return site object based on hostname', () => {
-        getConfig.mockImplementation(() => [
-            {
-                id: 'site-1',
-                hostnames: ['www.example-site-1.com']
-            },
-            {
-                id: 'site-2',
-                hostnames: ['www.example-site-2.com']
-            }
-        ])
+    test('return site based on using default value', () => {
+        getConfig.mockImplementation(() => mockConfig)
 
-        const site1 = resolveSiteFromUrl('https://www.example-site-1.com/women/dress')
-        expect(site1.id).toEqual('site-1')
-
-        const site2 = resolveSiteFromUrl('https://www.example-site-2.com/women/dress')
-        expect(site2.id).toEqual('site-2')
-    })
-
-    test('return site object based using default value', () => {
-        getConfig
-            .mockImplementationOnce(() => mockConfig.app.sites)
-            .mockImplementationOnce(() => 'site-1') // return default site on second call
-            .mockImplementationOnce(() => mockConfig.app.sites)
-            .mockImplementationOnce(() => mockConfig.app.sites)
-
-        const site1 = resolveSiteFromUrl('https://www.example-site.com/')
+        const site1 = resolveSiteFromUrl('https://www.example-site.com/unknown-site/women')
         expect(site1.id).toEqual('site-1')
     })
 
     test('throw an error when no site can be found', () => {
-        getConfig.mockImplementation(() => mockConfig.app.sites)
+        getConfig.mockImplementation(() => ({
+            ...mockConfig,
+            defaultSite: 'site-3'
+        }))
 
         expect(() => {
-            resolveSiteFromUrl('https://www.example-site.com/')
-        }).toThrow
+            resolveSiteFromUrl('https://www.example-site.com/site-3')
+        }).toThrow()
     })
 })
 
 const mockConfig = {
-    app: {
-        defaultSiteId: 'site-1',
-        sites: [
-            {
-                id: 'site-1',
-                alias: 'us'
-            },
-            {
-                id: 'site-2',
-                alias: 'uk'
+    url: {
+        locale: 'path',
+        site: 'path',
+        showDefault: true
+    },
+    defaultSite: 'site-1',
+    sites: [
+        {
+            id: 'site-1',
+            alias: 'uk',
+            l10n: {
+                defaultLocale: 'en-GB',
+                supportedLocales: [
+                    {
+                        id: 'en-GB',
+                        alias: 'uk',
+                        preferredCurrency: 'GBP'
+                    }
+                ]
             }
-        ]
-    }
+        },
+        {
+            id: 'site-2',
+            alias: 'us',
+            l10n: {
+                defaultLocale: 'en-US',
+                supportedLocales: [
+                    {
+                        id: 'en-US',
+                        alias: 'us',
+                        preferredCurrency: 'USD'
+                    }
+                ]
+            }
+        }
+    ]
 }

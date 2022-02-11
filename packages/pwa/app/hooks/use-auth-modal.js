@@ -28,7 +28,7 @@ import RegisterForm from '../components/register'
 import {useHistory} from 'react-router-dom'
 import {noop} from '../utils/utils'
 import {API_ERROR_MESSAGE} from '../constants'
-import {buildPathWithUrlConfig} from '../utils/url-config'
+import {buildPathWithUrlConfig} from '../utils/url'
 
 const LOGIN_VIEW = 'login'
 const REGISTER_VIEW = 'register'

@@ -7,8 +7,8 @@
 import {useCallback} from 'react'
 import {useHistory} from 'react-router'
 import {useIntl} from 'react-intl'
-import {buildPathWithUrlConfig} from '../utils/url-config'
-import useConfigValues from './use-config-values'
+import {buildPathWithUrlConfig} from '../utils/url'
+import useSite from './use-site'
 
 /**
  * A convenience hook for programmatic navigation uses history's `push` or `replace`. The proper locale
@@ -18,7 +18,7 @@ import useConfigValues from './use-config-values'
 const useNavigation = () => {
     const history = useHistory()
     const {locale} = useIntl()
-    const configValues = useConfigValues()
+    const {alias, id} = useSite()
     return useCallback(
         /**
          *
@@ -27,7 +27,18 @@ const useNavigation = () => {
          * @param  {...any} args - additional args passed to `.push` or `.replace`
          */
         (path, action = 'push', ...args) => {
-            const updatedHref = buildPathWithUrlConfig(path, configValues)
+            // sanitize the locale/site from the current relative url
+            let [pathname, search] = path.split('?')
+            pathname = pathname.replace(`/${alias || id}`, '').replace(`/${locale}`, '')
+            search = search
+                ?.replace(`locale=${locale}`, '')
+                ?.replace(`site=${alias || id}`, '')
+                ?.replace(/&$/, '')
+            const _path = `${pathname}${search ? search : ''}`
+            const updatedHref = buildPathWithUrlConfig(_path, {
+                locale,
+                site: alias || id
+            })
             history[action](path === '/' ? '/' : updatedHref, ...args)
         },
         [locale]

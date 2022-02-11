@@ -8,7 +8,7 @@
 import React, {useState} from 'react'
 import PropTypes from 'prop-types'
 import {FormattedMessage, useIntl} from 'react-intl'
-import {Route, Switch, useRouteMatch, Redirect} from 'react-router'
+import {Route, Switch, useRouteMatch} from 'react-router'
 import {
     Accordion,
     AccordionButton,
@@ -37,7 +37,6 @@ import {useLocation} from 'react-router-dom'
 import {messages, navLinks} from './constant'
 import useNavigation from '../../hooks/use-navigation'
 import LoadingSpinner from '../../components/loading-spinner'
-import {buildPathWithUrlConfig, resolveConfigFromPath} from '../../utils/url-config'
 
 const Account = () => {
     const {path} = useRouteMatch()
@@ -45,7 +44,6 @@ const Account = () => {
     const customer = useCustomer()
     const location = useLocation()
     const navigate = useNavigation()
-    const configValues = resolveConfigFromPath(`${location.pathname}${location.search}`)
 
     const [mobileNavIndex, setMobileNavIndex] = useState(-1)
     const [showLoading, setShowLoading] = useState(false)
@@ -88,8 +86,9 @@ const Account = () => {
     // Using Redirect allows us to store the directed page to location
     // so we can direct users back after they are successfully log in
     if (customer.authType != null && !customer.isRegistered) {
-        const path = buildPathWithUrlConfig('/login', configValues)
-        return <Redirect to={{pathname: path, state: {directedFrom: location.pathname}}} />
+        console.log('redirect>>>>>>>>>>>>>>>>>>>>>>')
+        console.log('location.pathname', location.pathname)
+        navigate('/login', 'push', {directedFrom: location.pathname})
     }
 
     return (

@@ -189,6 +189,8 @@ export const getParamsFromPath = (path, urlConfig = {}) => {
     } else if (localePosition === urlPartPositions.QUERY_PARAM) {
         result.locale = params.get('locale')
     }
+
+    console.log('result', result)
     return result
 }
 
@@ -219,8 +221,6 @@ export const getConfig = (opts = {}) => {
     // {moduleName}.
     const {moduleNameResolver} = opts
     const moduleName = (moduleNameResolver && moduleNameResolver()) || process.env.DEPLOY_TARGET
-
-    console.log(' process.env.DEPLOY_TARGET', process.env.DEPLOY_TARGET)
 
     const explorerSync = cosmiconfigSync(moduleName, {
         packageProp: 'mobify',

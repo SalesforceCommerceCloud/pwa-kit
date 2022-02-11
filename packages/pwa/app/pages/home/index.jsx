@@ -39,8 +39,7 @@ import {
     HOME_SHOP_PRODUCTS_LIMIT,
     urlPartPositions
 } from '../../constants'
-import {resolveConfigFromPath} from '../../utils/url-config'
-import {useLocation} from 'react-router-dom'
+import {getConfig} from '../../utils/utils'
 
 /**
  * This is the home page for Retail React App.
@@ -50,8 +49,7 @@ import {useLocation} from 'react-router-dom'
  */
 const Home = ({productSearchResult, isLoading}) => {
     const intl = useIntl()
-    const location = useLocation()
-    const {url: urlConfig} = resolveConfigFromPath(`${location.pathname}${location.search}`)
+    const {url: urlConfig} = getConfig()
 
     return (
         <Box data-testid="home-page" layerStyle="page">
@@ -70,17 +68,21 @@ const Home = ({productSearchResult, isLoading}) => {
                         window.location = '/'
                     }}
                 >
-                    to Global Site
+                    to default Site
                 </Button>
 
                 <Button
                     mt={4}
                     onClick={() => {
                         window.location =
-                            urlConfig['site'] === urlPartPositions.PATH ? '/us' : '/?site=us'
+                            urlConfig['site'] === urlPartPositions.PATH
+                                ? '/us'
+                                : urlConfig['site'] === urlPartPositions.QUERY_PARAM
+                                ? '/?site=us'
+                                : '/'
                     }}
                 >
-                    to Default Site
+                    to us Site
                 </Button>
             </Section>
 
