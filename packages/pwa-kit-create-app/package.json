@@ -1,6 +1,6 @@
 {
   "name": "pwa-kit-create-app",
-  "version": "2.0.0-dev.1",
+  "version": "2.0.0-dev.2",
   "description": "Salesforce's project generator tool",
   "author": "dev@mobify.com",
   "license": "See license in LICENSE",
@@ -35,7 +35,7 @@
     "tar": "^6.1.11"
   },
   "devDependencies": {
-    "internal-lib-build": "^2.0.0-dev.1",
+    "internal-lib-build": "^2.0.0-dev.2",
     "verdaccio": "^4.5.1"
   }
 }

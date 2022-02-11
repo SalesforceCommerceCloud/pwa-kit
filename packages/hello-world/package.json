@@ -1,11 +1,11 @@
 {
     "name": "hello-world",
-    "version": "2.0.0-dev.1",
+    "version": "2.0.0-dev.2",
     "license": "See license in LICENSE",
     "private": true,
     "devDependencies": {
-        "pwa-kit-build": "^2.0.0-dev.1",
-        "pwa-kit-runtime": "^2.0.0-dev.1"
+        "pwa-kit-build": "^2.0.0-dev.2",
+        "pwa-kit-runtime": "^2.0.0-dev.2"
     },
     "scripts": {
         "test": "mrt test",

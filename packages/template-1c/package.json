@@ -1,14 +1,14 @@
 {
     "name": "template-1c",
-    "version": "2.0.0-dev.1",
+    "version": "2.0.0-dev.2",
     "private": true,
     "devDependencies": {
         "@loadable/component": "^5.15.0",
         "cross-env": "^5.2.0",
         "cross-fetch": "^3.1.4",
-        "pwa-kit-build": "^2.0.0-dev.1",
-        "pwa-kit-react-sdk": "^2.0.0-dev.1",
-        "pwa-kit-runtime": "^2.0.0-dev.1",
+        "pwa-kit-build": "^2.0.0-dev.2",
+        "pwa-kit-react-sdk": "^2.0.0-dev.2",
+        "pwa-kit-runtime": "^2.0.0-dev.2",
         "react": "^17.0.2",
         "react-dom": "^17.0.2",
         "react-helmet": "^6.1.0",

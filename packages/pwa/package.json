@@ -1,6 +1,6 @@
 {
     "name": "scaffold-pwa",
-    "version": "2.0.0-dev.1",
+    "version": "2.0.0-dev.2",
     "license": "See license in LICENSE",
     "private": true,
     "mobify": {
@@ -68,9 +68,9 @@
         "njwt": "^1.0.0",
         "node-fetch": "^2.3.0",
         "prop-types": "^15.6.0",
-        "pwa-kit-build": "^2.0.0-dev.1",
-        "pwa-kit-react-sdk": "^2.0.0-dev.1",
-        "pwa-kit-runtime": "^2.0.0-dev.1",
+        "pwa-kit-build": "^2.0.0-dev.2",
+        "pwa-kit-react-sdk": "^2.0.0-dev.2",
+        "pwa-kit-runtime": "^2.0.0-dev.2",
         "query-string": "^7.0.1",
         "raf": "^3.4.0",
         "randomstring": "^1.2.1",
