@@ -421,8 +421,7 @@ describe('CommerceAPI', () => {
         expect(response.type).toEqual('MissingParameters')
     })
     test('calling addItemToBasket with basketId & body returns basket object in camelCase', async () => {
-        const _CommerceAPI = require('./index').default
-        const api = new _CommerceAPI(apiConfig)
+        const api = getAPI()
         fetch.mockResponseOnce(JSON.stringify(ocapiBasketResponse))
         const basketId = 'bczFTaOjgEqUkaaadkvHwbgrP5'
         const response = await api.shopperBaskets.addItemToBasket({
@@ -438,8 +437,7 @@ describe('CommerceAPI', () => {
         expect(response.customerInfo.customerId).toBeDefined()
     })
     test('calling addItemToBasket without body returns descriptive error', async () => {
-        const _CommerceAPI = require('./index').default
-        const api = new _CommerceAPI(apiConfig)
+        const api = getAPI()
         fetch.mockResponseOnce(JSON.stringify(ocapiBasketResponse))
         const basketId = 'bczFTaOjgEqUkaaadkvHwbgrP5'
         const response = await api.shopperBaskets.addItemToBasket({
