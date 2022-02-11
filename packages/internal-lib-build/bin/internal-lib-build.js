@@ -34,7 +34,7 @@ const main = () => {
         execSync(
             `${babel} --config-file ${babelConfig} src -x ".js",".jsx" --ignore "**/test_fixtures/*","*.test.js","test.js" --out-dir dist --copy-files`
         )
-        execSync(prepareDist)
+        execSync(`node ${prepareDist}`)
     })
 
     program
