@@ -20,25 +20,33 @@ import schema from '../../schemas/sdk-config.json'
  * @returns {webpack.NormalModuleReplacementPlugin}
  */
 export const createModuleReplacementPlugin = (projectDir) => {
+
+    const makeRegExp = (str, sep=path.sep) => {
+        // Replace unix paths with windows if needed and build a RegExp
+        if(sep === "\\") {
+            str = str.replace(/\//g, '\\\\')
+        }
+        return new RegExp(str)
+    }
     const overridables = [
         {
-            path: /pwa-kit-react-sdk(\/dist)?\/ssr\/universal\/components\/_app-config$/,
+            path: makeRegExp("pwa-kit-react-sdk(\/dist)?\/ssr\/universal\/components\/_app-config$"),
             newPath: resolve(projectDir, 'app', 'components', '_app-config', 'index')
         },
         {
-            path: /pwa-kit-react-sdk(\/dist)?\/ssr\/universal\/components\/_document$/,
+            path: makeRegExp("pwa-kit-react-sdk(\/dist)?\/ssr\/universal\/components\/_document$"),
             newPath: resolve(projectDir, 'app', 'components', '_document', 'index')
         },
         {
-            path: /pwa-kit-react-sdk(\/dist)?\/ssr\/universal\/components\/_app$/,
+            path: makeRegExp("pwa-kit-react-sdk(\/dist)?\/ssr\/universal\/components\/_app$"),
             newPath: resolve(projectDir, 'app', 'components', '_app', 'index')
         },
         {
-            path: /pwa-kit-react-sdk(\/dist)?\/ssr\/universal\/components\/_error$/,
+            path: makeRegExp("pwa-kit-react-sdk(\/dist)?\/ssr\/universal\/components\/_error$"),
             newPath: resolve(projectDir, 'app', 'components', '_error', 'index')
         },
         {
-            path: /pwa-kit-react-sdk(\/dist)?\/ssr\/universal\/routes$/,
+            path: makeRegExp("pwa-kit-react-sdk(\/dist)?\/ssr\/universal\/routes$"),
             newPath: resolve(projectDir, 'app', 'routes')
         }
     ]
