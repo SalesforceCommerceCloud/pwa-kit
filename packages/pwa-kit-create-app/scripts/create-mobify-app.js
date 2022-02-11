@@ -192,10 +192,16 @@ const runGenerator = (answers, {outputDir}) => {
 }
 
 const npmInstall = (outputDir) => {
-    console.log('Installing dependencies for the generated project. This may take a few minutes.')
-    child_proc.execSync('npm install', {
+    console.log('Installing dependencies for the generated project. This may take a few minutes.\n')
+    child_proc.execSync('npm install --quiet', {
         cwd: outputDir,
         stdio: 'inherit',
+        env: {
+            ...process.env,
+            OPENCOLLECTIVE_HIDE: 'true',
+            DISABLE_OPENCOLLECTIVE: 'true',
+            OPEN_SOURCE_CONTRIBUTOR: 'true'
+        }
     })
 }
 
