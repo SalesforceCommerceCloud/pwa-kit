@@ -14,7 +14,7 @@ import {
     mockShippingMethods
 } from './mock-data'
 
-jest.mock('cross-fetch', () => global.fetch)
+jest.mock('cross-fetch', () => jest.requireActual('jest-fetch-mock'))
 
 const apiConfig = {...commerceAPIConfig, proxy: undefined}
 const getOcapiShopperBaskets = () => new OcapiShopperBaskets(apiConfig)

@@ -25,7 +25,7 @@ import {
     ocapiFaultResponse
 } from './mock-data'
 
-jest.mock('cross-fetch', () => global.fetch)
+jest.mock('cross-fetch', () => jest.requireActual('jest-fetch-mock'))
 
 const apiConfig = {
     ...commerceAPIConfig,
