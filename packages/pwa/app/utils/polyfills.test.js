@@ -7,6 +7,7 @@
 import * as polyfills from './polyfills'
 
 test('getNeededPolyfills should return a filtered array of required polyfills', () => {
+    global.fetch = undefined
     const required = polyfills.getNeededPolyfills()
     expect(required).toBeInstanceOf(Array)
     expect(required.length).toBeGreaterThan(0)
