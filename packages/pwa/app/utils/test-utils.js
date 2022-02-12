@@ -28,7 +28,7 @@ export const DEFAULT_LOCALE = 'en-GB'
 export const DEFAULT_CURRENCY = 'GBP'
 // Contexts
 import {CategoriesProvider, CurrencyProvider} from '../contexts'
-import {getUrlConfig} from './utils'
+import {mockConfig} from './mocks/mockConfigData'
 
 export const renderWithReactIntl = (node, locale = DEFAULT_LOCALE) => {
     return render(
@@ -160,6 +160,6 @@ export const renderWithProviders = (children, options) =>
  * @returns {`${string|string}${string}`} URL pathname for the given path
  */
 export const getPathname = (path) => {
-    const {locale: localeType} = getUrlConfig()
+    const {locale: localeType} = mockConfig.url
     return `${localeType === urlPartPositions.PATH ? `/${DEFAULT_LOCALE}` : ''}${path}`
 }
