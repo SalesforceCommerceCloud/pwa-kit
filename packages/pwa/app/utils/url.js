@@ -249,7 +249,6 @@ export const buildPathWithUrlConfig = (relativeUrl, configValues = {}, opts = {}
 
     const queryParams = {...Object.fromEntries(params)}
     let basePathSegments = []
-    console.log('urlConfig.showDefault', urlConfig.showDefault)
     const showDefault = urlConfig.showDefault
     const {defaultLocales, defaultSites} = getDefaultIdentifiers()
 

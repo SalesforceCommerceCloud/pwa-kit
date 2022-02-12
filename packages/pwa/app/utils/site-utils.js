@@ -13,12 +13,6 @@ import {getParamsFromPath} from './utils'
  * @param {string} url
  * @returns {object}
  */
-/**
- * This functions takes an url and returns a site object,
- * an error will be thrown if no url is passed in or no site is found
- * @param {string} url
- * @returns {object}
- */
 export const resolveSiteFromUrl = (url) => {
     const config = getConfig()
     if (!url) {

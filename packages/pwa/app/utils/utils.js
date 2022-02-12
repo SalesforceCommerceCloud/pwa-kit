@@ -190,7 +190,6 @@ export const getParamsFromPath = (path, urlConfig = {}) => {
         result.locale = params.get('locale')
     }
 
-    console.log('result', result)
     return result
 }
 

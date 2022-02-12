@@ -62,7 +62,8 @@ export const TestProviders = ({
     children,
     initialBasket = null,
     initialCustomer = null,
-    initialCategories = initialMockCategories
+    initialCategories = initialMockCategories,
+    locale = DEFAULT_LOCALE
 }) => {
     const mounted = useRef()
     // We use this to track mounted state.
@@ -101,9 +102,8 @@ export const TestProviders = ({
         onOpen: () => {},
         onClose: () => {}
     }
-
     return (
-        <IntlProvider locale={DEFAULT_LOCALE} defaultLocale={DEFAULT_LOCALE}>
+        <IntlProvider locale={locale} defaultLocale={DEFAULT_LOCALE}>
             <CommerceAPIProvider value={api}>
                 <CategoriesProvider categories={initialCategories}>
                     <CurrencyProvider currency={DEFAULT_CURRENCY}>
@@ -132,7 +132,8 @@ TestProviders.propTypes = {
     initialBasket: PropTypes.object,
     initialCustomer: PropTypes.object,
     initialCategories: PropTypes.element,
-    initialProductLists: PropTypes.object
+    initialProductLists: PropTypes.object,
+    locale: PropTypes.string
 }
 
 /**
