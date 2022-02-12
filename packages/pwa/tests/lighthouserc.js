@@ -17,7 +17,7 @@ module.exports = {
                 'http://localhost:3000/en-GB/product/25493613M',
                 'http://localhost:3000/en-GB/search?q=suit'
             ],
-            startServerReadyPattern: 'bundle is in a valid state',
+            startServerReadyPattern: 'First build complete',
             startServerReadyTimeout: 90000
         },
         upload: {

@@ -72,6 +72,9 @@ const baseConfig = (target) => {
                           ]
                       }
                     : {}),
+                infrastructureLogging: {
+                    level: 'error'
+                },
                 stats: {
                     all: false,
                     modules: false,

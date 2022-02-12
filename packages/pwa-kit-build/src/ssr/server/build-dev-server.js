@@ -87,8 +87,7 @@ export const DevServerMixin = {
         app.__devMiddleware.waitUntilValid(() => {
             // Be just a little more generous before letting eg. Lighthouse hit it!
             setTimeout(() => {
-                const logger = app.__compiler.getInfrastructureLogger('webpack-dev-middleware')
-                logger.info('bundle is in a valid state')
+                console.log(chalk.cyan('First build complete'))
             }, 75)
         })
 
