@@ -166,8 +166,7 @@ commands:
           environment:
             GENERATOR_PRESET: 'test-project'
           command: |
-            node ./scripts/gtime.js generated_project_install \
-                node packages/pwa-kit-create-app/scripts/create-mobify-app-dev.js --outputDir /tmp/project
+            node packages/pwa-kit-create-app/scripts/create-mobify-app-dev.js --outputDir /tmp/project
             
             cd /tmp/project
             npm run prod:build
