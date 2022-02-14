@@ -15,7 +15,9 @@ const archiver = require('archiver')
 
 const fileUtils = require('./file-utils')
 
-const Matcher = require('../dist/utils/glob').Matcher
+const {Matcher} = require('../dist/utils/glob')
+
+const {getConfig} = require('../ssr/universal/utils')
 
 const {cosmiconfigSync} = require('cosmiconfig')
 
@@ -245,30 +247,6 @@ Utils.requestErrorMessage = {
     code500: 'Internal Server Error. Please report this to Salesforce support team.'
 }
 
-Utils.getConfig = (target) => {
-    let moduleName = target || process?.env?.DEPLOY_TARGET || 'default'
-
-    // Mack config files based on the matching below from most specific to most general.
-    const explorerSync = cosmiconfigSync(moduleName, {
-        packageProp: 'mobify',
-        searchPlaces: [
-            `config/${moduleName}.yml`,
-            `config/${moduleName}.yaml`,
-            `config/${moduleName}.json`,
-            'config/local.yml',
-            'config/local.yaml',
-            'config/local.json',
-            'config/default.yml',
-            'config/default.yaml',
-            'config/default.json',
-            'package.json'
-        ]
-    })
-
-    // Load the config synchronously using a custom "searchPlaces".
-    const {config} = explorerSync.search()
-
-    return config
-}
+Utils.getConfig = getConfig
 
 module.exports = Utils

@@ -1,7 +1,9 @@
 {
-    "target": "production",
-    "url": {
-        "locale": "path"
+    "storefront": {
+        "target": "production",
+        "url": {
+            "locale": "path"
+        }
     },
     "externals": ["cosmiconfig"],
     "pageNotFoundURL": "/page-not-found",

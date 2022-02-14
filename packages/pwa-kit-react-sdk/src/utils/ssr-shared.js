@@ -76,9 +76,6 @@ const proxyOverrideRE = /^(http(s)?):\/\/([^/]+)(\/)?([^/]+)?(\/caching)?/
  * @param newValue {Object} the new value of the Mobify object
  */
 export const updatePackageMobify = (newValue) => {
-    console.log('UpdatePackageMobify: ')
-    console.log('newValue: ', newValue)
-    console.log('oldValue: ', _packageMobify)
     _packageMobify = newValue || _packageMobify || {}
 
     // Clear and update the proxyConfigs array

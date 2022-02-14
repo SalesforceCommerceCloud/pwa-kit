@@ -29,7 +29,7 @@ const app = createApp({
     // The location of the apps manifest file relative to the build directory
     manifestPath: 'static/manifest.json',
 
-    // This is you app config. For more information on how the config value is resolved,
+    // This is your app config. For more information on how the config value is resolved,
     // look at this doc TODO: Add doc.
     mobify: getConfig(),
 

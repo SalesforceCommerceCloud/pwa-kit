@@ -1,7 +1,8 @@
 ---
-target: default
-url:
-  locale: path
+storefront:
+  target: default
+  url:
+    locale: path
 externals:
 - cosmiconfig
 pageNotFoundURL: "/page-not-found"
