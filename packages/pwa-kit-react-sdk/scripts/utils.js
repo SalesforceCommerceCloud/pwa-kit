@@ -19,8 +19,6 @@ const {Matcher} = require('../dist/utils/glob')
 
 const {getConfig} = require('../ssr/universal/utils')
 
-const {cosmiconfigSync} = require('cosmiconfig')
-
 const SDK_VERSION = require('../package.json').version
 const DEFAULT_DOCS_URL = 'http://sfdc.co/pwa-kit'
 

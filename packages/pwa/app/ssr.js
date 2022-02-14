@@ -6,8 +6,6 @@
  */
 'use strict'
 
-/* global WEBPACK_PACKAGE_JSON_MOBIFY */
-
 import path from 'path'
 import {createApp, createHandler, serveStaticFile} from 'pwa-kit-react-sdk/ssr/server/express'
 import {isRemote} from 'pwa-kit-react-sdk/utils/ssr-server'

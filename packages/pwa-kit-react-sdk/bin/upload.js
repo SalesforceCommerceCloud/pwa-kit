@@ -112,6 +112,6 @@ if (mobifyOptions.ssrEnabled) {
     }
 }
 
-// uploadBundle(options).catch((err) => {
-//     console.error(err.message || err)
-// })
+uploadBundle(options).catch((err) => {
+    console.error(err.message || err)
+})
