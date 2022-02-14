@@ -376,6 +376,7 @@ workflows:
       - testNode14npm7
       - testNode14npm8
       - generatedSFCCProjectTest
+      - generatedSFCCProjectTestWindows
   nightly-build:
     triggers:
       - schedule:
