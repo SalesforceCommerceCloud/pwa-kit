@@ -86,8 +86,6 @@ const Account = () => {
     // Using Redirect allows us to store the directed page to location
     // so we can direct users back after they are successfully log in
     if (customer.authType != null && !customer.isRegistered) {
-        console.log('redirect>>>>>>>>>>>>>>>>>>>>>>')
-        console.log('location.pathname', location.pathname)
         navigate('/login', 'push', {directedFrom: location.pathname})
     }
 
