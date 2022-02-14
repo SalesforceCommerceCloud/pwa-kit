@@ -17,12 +17,16 @@ import {keysToCamel} from '../../commerce-api/utils'
 import useBasket from '../../commerce-api/hooks/useBasket'
 import useShopper from '../../commerce-api/hooks/useShopper'
 import {mockedRegisteredCustomer, ocapiOrderResponse} from '../../commerce-api/mock-data'
-import {
-    mockedGuestCustomer,
-    expiredAuthToken,
-    exampleTokenReponse
-} from '../../commerce-api/mock-data'
+import {mockedGuestCustomer, exampleTokenReponse} from '../../commerce-api/mock-data'
+import {mockConfig} from '../../utils/mocks/mockConfigData'
 
+jest.mock('../../utils/utils', () => {
+    const original = jest.requireActual('../../utils/utils')
+    return {
+        ...original,
+        getConfig: jest.fn(() => mockConfig)
+    }
+})
 jest.mock('../../commerce-api/hooks/useCustomer', () => {
     const originalModule = jest.requireActual('../../commerce-api/hooks/useCustomer')
     const useCustomer = originalModule.default
@@ -240,6 +244,7 @@ const server = setupServer(
     )
 )
 
+const basePath = '/uk/en-GB'
 // Set up and clean up
 beforeAll(() => {
     jest.resetModules()
@@ -247,13 +252,13 @@ beforeAll(() => {
 
     // Since we're testing some navigation logic, we are using a simple Router
     // around our component. We need to initialize the default route/path here.
-    window.history.pushState({}, 'Account', '/en-GB/account')
+    window.history.pushState({}, 'Account', `${basePath}/account`)
 })
 afterEach(() => {
     localStorage.clear()
     sessionStorage.clear()
     server.resetHandlers()
-    window.history.pushState({}, 'Account', '/en-GB/account')
+    window.history.pushState({}, 'Account', `${basePath}/account`)
 })
 afterAll(() => server.close())
 
@@ -326,6 +331,6 @@ test('Create Account form - successful submission results in redirect to the Acc
     user.click(createAccountButton)
 
     await waitFor(() => {
-        expect(window.location.pathname).toEqual('/en-GB/account')
+        expect(window.location.pathname).toEqual(`${basePath}/account`)
     })
 })

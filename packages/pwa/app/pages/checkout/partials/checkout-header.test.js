@@ -9,7 +9,14 @@ import {screen} from '@testing-library/react'
 
 import CheckoutHeader from './checkout-header'
 import {renderWithProviders} from '../../../utils/test-utils'
-
+import {mockConfig} from '../../../utils/mocks/mockConfigData'
+jest.mock('../../../utils/utils', () => {
+    const original = jest.requireActual('../../../utils/utils')
+    return {
+        ...original,
+        getConfig: jest.fn(() => mockConfig)
+    }
+})
 test('renders component', () => {
     renderWithProviders(<CheckoutHeader />)
     expect(screen.getByTitle(/back to homepage/i)).toBeInTheDocument()

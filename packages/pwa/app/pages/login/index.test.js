@@ -9,13 +9,21 @@ import {screen} from '@testing-library/react'
 import user from '@testing-library/user-event'
 import {rest} from 'msw'
 import {setupServer} from 'msw/node'
-import {renderWithProviders, getPathname} from '../../utils/test-utils'
+import {renderWithProviders} from '../../utils/test-utils'
 import Login from '.'
 import {BrowserRouter as Router, Route} from 'react-router-dom'
 import Account from '../account'
 import Registration from '../registration'
 import ResetPassword from '../reset-password'
+import {mockConfig} from '../../utils/mocks/mockConfigData'
 
+jest.mock('../../utils/utils', () => {
+    const original = jest.requireActual('../../utils/utils')
+    return {
+        ...original,
+        getConfig: jest.fn(() => mockConfig)
+    }
+})
 jest.setTimeout(60000)
 
 const mockRegisteredCustomer = {
@@ -85,7 +93,7 @@ jest.mock('../../commerce-api/pkce', () => {
         generateCodeChallenge: jest.fn().mockReturnValue('codechallenge')
     }
 })
-
+const basePath = '/uk/en-GB'
 const MockedComponent = () => {
     const match = {
         params: {pageName: 'profile'}
@@ -93,13 +101,13 @@ const MockedComponent = () => {
     return (
         <Router>
             <Login />
-            <Route path={getPathname('/registration')}>
+            <Route path={`${basePath}/registration`}>
                 <Registration />
             </Route>
-            <Route path={getPathname('/reset-password')}>
+            <Route path={`${basePath}/reset-password`}>
                 <ResetPassword />
             </Route>
-            <Route path={getPathname('/account')}>
+            <Route path={`${basePath}/account`}>
                 <Account match={match} />
             </Route>
         </Router>

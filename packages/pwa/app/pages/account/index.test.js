@@ -10,7 +10,7 @@ import {screen, waitFor, within} from '@testing-library/react'
 import user from '@testing-library/user-event'
 import {rest} from 'msw'
 import {setupServer} from 'msw/node'
-import {renderWithProviders, getPathname} from '../../utils/test-utils'
+import {renderWithProviders} from '../../utils/test-utils'
 import {
     mockedGuestCustomer,
     mockedRegisteredCustomer,
@@ -20,6 +20,7 @@ import {
 } from '../../commerce-api/mock-data'
 import useCustomer from '../../commerce-api/hooks/useCustomer'
 import Account from './index'
+import {mockConfig} from '../../utils/mocks/mockConfigData'
 
 jest.mock('../../commerce-api/utils', () => {
     const originalModule = jest.requireActual('../../commerce-api/utils')
@@ -28,6 +29,15 @@ jest.mock('../../commerce-api/utils', () => {
         isTokenValid: jest.fn().mockReturnValue(true)
     }
 })
+
+jest.mock('../../utils/utils', () => {
+    const original = jest.requireActual('../../utils/utils')
+    return {
+        ...original,
+        getConfig: jest.fn(() => mockConfig)
+    }
+})
+const expectedBasePath = `/uk/en-GB`
 
 const MockedComponent = () => {
     const customer = useCustomer()
@@ -40,7 +50,10 @@ const MockedComponent = () => {
 
     return (
         <Switch>
-            <Route path={getPathname('/account')} render={(props) => <Account {...props} />} />
+            <Route
+                path={`${expectedBasePath}/account`}
+                render={(props) => <Account {...props} />}
+            />
         </Switch>
     )
 }
@@ -92,7 +105,7 @@ beforeEach(() => {
 
     // Since we're testing some navigation logic, we are using a simple Router
     // around our component. We need to initialize the default route/path here.
-    window.history.pushState({}, 'Account', getPathname('/account'))
+    window.history.pushState({}, 'Account', `${expectedBasePath}/account`)
 })
 afterEach(() => {
     localStorage.clear()
@@ -107,7 +120,7 @@ test('Redirects to login page if the customer is not logged in', async () => {
         })
     )
     renderWithProviders(<MockedComponent />)
-    await waitFor(() => expect(window.location.pathname).toEqual(getPathname('/login')))
+    await waitFor(() => expect(window.location.pathname).toEqual('/uk/en-GB/login'))
 })
 
 test('Provides navigation for subpages', async () => {
@@ -116,11 +129,17 @@ test('Provides navigation for subpages', async () => {
 
     const nav = within(screen.getByTestId('account-detail-nav'))
     user.click(nav.getByText('Addresses'))
-    await waitFor(() => expect(window.location.pathname).toEqual(getPathname('/account/addresses')))
+    await waitFor(() =>
+        expect(window.location.pathname).toEqual(`${expectedBasePath}/account/addresses`)
+    )
     user.click(nav.getByText('Order History'))
-    await waitFor(() => expect(window.location.pathname).toEqual(getPathname('/account/orders')))
+    await waitFor(() =>
+        expect(window.location.pathname).toEqual(`${expectedBasePath}/account/orders`)
+    )
     user.click(nav.getByText('Payment Methods'))
-    await waitFor(() => expect(window.location.pathname).toEqual(getPathname('/account/payments')))
+    await waitFor(() =>
+        expect(window.location.pathname).toEqual(`${expectedBasePath}/account/payments`)
+    )
 })
 
 test('Renders account detail page by default for logged-in customer', async () => {
@@ -137,7 +156,7 @@ test('Allows customer to sign out', async () => {
     expect(await screen.findByTestId('account-detail-page')).toBeInTheDocument()
     user.click(screen.getAllByText(/Log Out/)[0])
     await waitFor(() => {
-        expect(window.location.pathname).toEqual(getPathname('/login'))
+        expect(window.location.pathname).toEqual(`${expectedBasePath}/login`)
     })
 })
 

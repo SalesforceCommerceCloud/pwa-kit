@@ -21,7 +21,14 @@ import {
 import LinksList from '../../../components/links-list'
 import {VisaIcon, MastercardIcon, AmexIcon, DiscoverIcon} from '../../../components/icons'
 import {HideOnDesktop, HideOnMobile} from '../../../components/responsive'
-
+import {mockConfig} from '../../../utils/mocks/mockConfigData'
+jest.mock('../../../utils/utils', () => {
+    const original = jest.requireActual('../../../utils/utils')
+    return {
+        ...original,
+        getConfig: jest.fn(() => mockConfig)
+    }
+})
 const CheckoutFooter = ({...otherProps}) => {
     const styles = useMultiStyleConfig('CheckoutFooter')
     const intl = useIntl()
