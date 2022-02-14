@@ -119,6 +119,7 @@
         "ignore-styles": "5.0.1",
         "jest": "^26.6.3",
         "jest-cli": "^26.6.3",
+        "jest-fetch-mock": "^2.1.2",
         "msw": "^0.28.1",
         "njwt": "^1.0.0",
         "nock": "^13.1.1",
