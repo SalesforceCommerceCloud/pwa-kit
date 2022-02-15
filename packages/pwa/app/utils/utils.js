@@ -157,8 +157,6 @@ export const capitalize = (text) => {
         .join(' ')
 }
 
-export const isObject = (o) => o?.constructor === Object
-
 /**
  * This function return the identifiers (site and locale) from the given url
  * The site will always go before locale if both of them are presented in the pathname
@@ -234,4 +232,16 @@ export const getConfig = (opts = {}) => {
     console.info('=========loading the config from=====', filepath)
 
     return config
+}
+
+/**
+ * This function returns the url config from the current configuration
+ * @return {object} - url config
+ */
+export const getUrlConfig = () => {
+    const {app} = getConfig()
+    if (!app.url) {
+        throw new Error("Can't find any valid url config. Please check your configuration file.")
+    }
+    return app.url
 }

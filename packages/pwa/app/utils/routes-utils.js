@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {getConfig} from './utils'
+import {getSites} from './site-utils'
 
 /**
  * Return all the permutations of routes with site id/alias and locale id/alias
@@ -17,16 +17,13 @@ import {getConfig} from './utils'
 export const configureRoutes = (routes = [], {ignoredRoutes = []}) => {
     if (!routes.length) return []
 
-    const config = getConfig()
-    if (!config.sites) {
-        throw new Error('Cannot find any sites from config. Please check your configuration')
-    }
+    const allSites = getSites()
 
     // get a collection of all site-id and site alias from the config of the current host
     // remove any duplicates by using [...new Set([])]
     const sites = [
         ...new Set(
-            config.sites
+            allSites
                 ?.reduce((res, site) => {
                     return [...res, site.id, site.alias]
                 }, [])
@@ -37,7 +34,7 @@ export const configureRoutes = (routes = [], {ignoredRoutes = []}) => {
     // remove any duplicates by using [...new Set([])]
     const locales = [
         ...new Set(
-            config.sites
+            allSites
                 .reduce((res, {l10n}) => {
                     l10n.supportedLocales.forEach((locale) => {
                         res = [...res, locale.id, locale.alias]
