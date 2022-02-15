@@ -52,12 +52,19 @@ export const getProxyConfigs = () => {
     return configs.map((config) => ({...config}))
 }
 
-// TODO: Might have to split this universal function into client/server utils since
-// its kind of hard to explain with all the conditions.
 /**
+ * Returns the express app configuration file in object form. The object resolution will
+ * be as follows (from highest to lowest priority):
  *
- * @param {*} param0
- * @returns
+ * > {target_name}.ext
+ * > local.ext
+ * > default.ext
+ * > package.json (mobify.key)
+ *
+ * Each file marked with `ext` ban optionally be terminated with `yml`, `yaml` or
+ * `json` in that priority.
+ *
+ * @returns - the application configuration object.
  */
 /* istanbul ignore next */
 export const getConfig = () => {
