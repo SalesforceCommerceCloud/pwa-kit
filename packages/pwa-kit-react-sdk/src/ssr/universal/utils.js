@@ -52,8 +52,6 @@ export const getProxyConfigs = () => {
     return configs.map((config) => ({...config}))
 }
 
-export const DEFAULT_CONFIG_MODULE_NAME = 'DEFAULT'
-
 // TODO: Might have to split this universal function into client/server utils since
 // its kind of hard to explain with all the conditions.
 /**
@@ -70,7 +68,7 @@ export const getConfig = () => {
         )
     }
 
-    let moduleName = process?.env?.DEPLOY_TARGET || DEFAULT_CONFIG_MODULE_NAME
+    let moduleName = process?.env?.DEPLOY_TARGET || ''
 
     // Synchronously load the `cosmiconfig` so we don't get errors from webpack in the
     // browser bundle.

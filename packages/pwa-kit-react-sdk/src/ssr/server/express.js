@@ -265,14 +265,15 @@ export const createApp = (options) => {
     }
 
     // Healthcheck
-    app.get('/mobify/ping', (_, res) =>
+    app.get(/^\/(pwa-kit|mobify)\/ping$/, (_, res) =>
         res
             .set('cache-control', NO_CACHE)
             .sendStatus(200)
             .end()
     )
 
-    app.get('/pwa-kit/app-config', (req, res) =>
+    // Configuration endpoint
+    app.get(/^\/(pwa-kit|mobify)\/config$/, (req, res) =>
         res
             .set('cache-control', NO_CACHE)
             .json(req.appConfig)
