@@ -245,21 +245,3 @@ export const getUrlConfig = () => {
     }
     return config.app.url
 }
-
-/**
- * Loop over each site and add the alias key/value to it
- * the key is alias
- * the value is mapped from the aliases
- *
- * @param {array} sites - site list
- * @param {object} aliases - site id/alias map
- * @return {array} - site list that has alias added
- */
-export const updateSitesWithAliases = (sites, aliases) => {
-    return sites.map((site) => {
-        return {
-            ...site,
-            alias: aliases[site.id] || ''
-        }
-    })
-}
