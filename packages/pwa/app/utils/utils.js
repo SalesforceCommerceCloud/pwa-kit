@@ -157,8 +157,6 @@ export const capitalize = (text) => {
         .join(' ')
 }
 
-export const isObject = (o) => o?.constructor === Object
-
 /**
  * This function return the identifiers (site and locale) from the given url
  * The site will always go before locale if both of them are presented in the pathname
@@ -234,4 +232,34 @@ export const getConfig = (opts = {}) => {
     console.info('=========loading the config from=====', filepath)
 
     return config
+}
+
+/**
+ * This function returns the url config from the current configuration
+ * @return {object} - url config
+ */
+export const getUrlConfig = () => {
+    const config = getConfig()
+    if (!config) {
+        throw new Error("Can't find any valid config. Please check your configuration file.")
+    }
+    return config.app.url
+}
+
+/**
+ * Loop over each site and add the alias key/value to it
+ * the key is alias
+ * the value is mapped from the aliases
+ *
+ * @param {array} sites - site list
+ * @param {object} aliases - site id/alias map
+ * @return {array} - site list that has alias added
+ */
+export const updateSitesWithAliases = (sites, aliases) => {
+    return sites.map((site) => {
+        return {
+            ...site,
+            alias: aliases[site.id] || ''
+        }
+    })
 }

@@ -56,8 +56,7 @@ describe('resolveSiteFromUrl', function() {
 const mockConfig = {
     url: {
         locale: 'path',
-        site: 'path',
-        showDefault: true
+        site: 'path'
     },
     defaultSite: 'site-1',
     sites: [

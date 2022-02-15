@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {getConfig} from './utils'
+import {getConfig, updateSitesWithAliases} from './utils'
 import {getParamsFromPath} from './utils'
 /**
  * This functions takes an url and returns a site object,
@@ -14,12 +14,14 @@ import {getParamsFromPath} from './utils'
  * @returns {object}
  */
 export const resolveSiteFromUrl = (url) => {
-    const config = getConfig()
+    const {app} = getConfig()
+    const sites = updateSitesWithAliases(app.sites, app.siteAliases)
+
     if (!url) {
         throw new Error('url is required to find a site object.')
     }
 
-    if (!config.sites) {
+    if (!sites) {
         throw new Error("Can't find any sites in the config. Please check your configuration")
     }
     const {pathname, search} = new URL(url)
@@ -27,9 +29,9 @@ export const resolveSiteFromUrl = (url) => {
     let site
 
     // get the site identifier from the url
-    const {site: currentSite} = getParamsFromPath(path, config.url)
+    const {site: currentSite} = getParamsFromPath(path, app.url)
     // step 1: look for the site based on the site identifier (id or alias) from the url
-    site = config.sites.find((site) => site.id === currentSite || site.alias === currentSite)
+    site = sites.find((site) => site.id === currentSite || site.alias === currentSite)
     if (site) {
         return site
     }
@@ -48,27 +50,20 @@ export const resolveSiteFromUrl = (url) => {
  * @returns {object} - default site object
  */
 export const getDefaultSite = () => {
-    const config = getConfig()
-    if (!config.sites) {
+    const {app} = getConfig()
+    const sites = updateSitesWithAliases(app.sites, app.siteAliases)
+    if (!sites) {
         throw new Error("Can't find any sites in the config. Please check your configuration")
     }
-    return config.sites.find((site) => site.id === config.defaultSite)
-}
 
-/**
- * This function returns all the identifiers
- * for locale and site from a given config
- * @return {object} - default identifiers (id and alias) of site and locale
- */
-export const getDefaultIdentifiers = () => {
-    const defaultSite = getDefaultSite()
-    const defaultLocale =
-        defaultSite.l10n &&
-        defaultSite.l10n.supportedLocales.find(
-            (locale) => locale.id === defaultSite.l10n.defaultLocale
-        )
-    return {
-        defaultLocales: [defaultLocale.id, defaultLocale?.alias],
-        defaultSites: [defaultSite.id, defaultSite?.alias]
+    if (sites.length === 1) {
+        return sites[0]
     }
+
+    if (!app.defaultSite) {
+        throw new Error(
+            "Can't find defaultSite in the config. Please check your configuration file"
+        )
+    }
+    return sites.find((site) => site.id === app.defaultSite)
 }

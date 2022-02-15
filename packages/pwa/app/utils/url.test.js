@@ -145,22 +145,6 @@ describe('getUrlWithLocale', () => {
         const relativeUrl = getUrlWithLocale('fr-FR', {location, site: mockConfig.sites[0]})
         expect(relativeUrl).toEqual(`/uk/fr-FR/`)
     })
-
-    test('getUrlWithLocale returns expected for Homepage with default locale and default site', () => {
-        getConfig.mockImplementation(() => ({
-            ...mockConfig,
-            url: {
-                ...mockConfig.url,
-                showDefault: false
-            }
-        }))
-
-        const location = new URL('http://localhost:3000/uk/it-IT/')
-
-        const defaultLocale = 'en-GB'
-        const relativeUrl = getUrlWithLocale(defaultLocale, {location, site: mockConfig.sites[0]})
-        expect(relativeUrl).toEqual(`/`)
-    })
 })
 
 describe('homeUrlBuilder', () => {
@@ -168,8 +152,7 @@ describe('homeUrlBuilder', () => {
         getConfig.mockImplementation(() => ({
             ...mockConfig,
             url: {
-                ...mockConfig.url,
-                showDefault: false
+                ...mockConfig.url
             }
         }))
 
@@ -220,27 +203,12 @@ describe('buildPathWithUrlConfig', () => {
             ...mockConfig,
             url: {
                 locale: 'query_param',
-                site: 'path',
-                showDefault: true
+                site: 'path'
             }
         }))
 
         const url = buildPathWithUrlConfig('/women/dresses', {locale: 'en-GB', site: 'uk'})
         expect(url).toEqual('/uk/women/dresses?locale=en-GB')
-    })
-
-    test('return a new url without default locale and site', () => {
-        getConfig.mockImplementation(() => ({
-            ...mockConfig,
-            url: {
-                locale: 'query_param',
-                site: 'path',
-                showDefault: false
-            }
-        }))
-
-        const url = buildPathWithUrlConfig('/women/dresses', {locale: 'en-GB', site: 'uk'})
-        expect(url).toEqual('/women/dresses')
     })
 
     test('throw an error when url config is not defined', () => {
