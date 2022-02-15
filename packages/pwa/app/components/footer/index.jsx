@@ -148,6 +148,7 @@ const Footer = ({...otherProps}) => {
                                             value={locale}
                                             shortCode={locale}
                                             key={locale}
+                                            {...styles.localeDropdownOption}
                                         />
                                     ))}
                                 </Select>
