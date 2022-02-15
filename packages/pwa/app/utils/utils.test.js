@@ -6,7 +6,7 @@
  */
 import * as utils from './utils'
 import EventEmitter from 'events'
-import {flatten, getObjectProperty, shallowEquals} from './utils'
+import {flatten, shallowEquals} from './utils'
 
 describe('requestIdleCallback should be a working shim', () => {
     test('without a working implementation built in', () => {
