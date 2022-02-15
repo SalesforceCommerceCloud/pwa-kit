@@ -8,12 +8,13 @@
 import {resolveSiteFromUrl} from './site-utils'
 
 import {getConfig} from './utils'
-
+import {mockConfig} from './mocks/mockConfigData'
 jest.mock('./utils', () => {
     const original = jest.requireActual('./utils')
     return {
         ...original,
-        getConfig: jest.fn()
+        getConfig: jest.fn(),
+        getUrlConfig: jest.fn(() => mockConfig.app.url)
     }
 })
 
@@ -34,17 +35,19 @@ describe('resolveSiteFromUrl', function() {
         expect(result.id).toEqual('site-2')
     })
 
-    test('return site based on using default value', () => {
+    test('return default site for home page', () => {
         getConfig.mockImplementation(() => mockConfig)
-
-        const site1 = resolveSiteFromUrl('https://www.example-site.com/unknown-site/women')
-        expect(site1.id).toEqual('site-1')
+        const result = resolveSiteFromUrl('https://www.example-site.com/')
+        expect(result.id).toEqual('site-1')
     })
 
     test('throw an error when no site can be found', () => {
         getConfig.mockImplementation(() => ({
             ...mockConfig,
-            defaultSite: 'site-3'
+            app: {
+                ...mockConfig.app,
+                defaultSite: 'site-3'
+            }
         }))
 
         expect(() => {
@@ -52,41 +55,3 @@ describe('resolveSiteFromUrl', function() {
         }).toThrow()
     })
 })
-
-const mockConfig = {
-    url: {
-        locale: 'path',
-        site: 'path'
-    },
-    defaultSite: 'site-1',
-    sites: [
-        {
-            id: 'site-1',
-            alias: 'uk',
-            l10n: {
-                defaultLocale: 'en-GB',
-                supportedLocales: [
-                    {
-                        id: 'en-GB',
-                        alias: 'uk',
-                        preferredCurrency: 'GBP'
-                    }
-                ]
-            }
-        },
-        {
-            id: 'site-2',
-            alias: 'us',
-            l10n: {
-                defaultLocale: 'en-US',
-                supportedLocales: [
-                    {
-                        id: 'en-US',
-                        alias: 'us',
-                        preferredCurrency: 'USD'
-                    }
-                ]
-            }
-        }
-    ]
-}

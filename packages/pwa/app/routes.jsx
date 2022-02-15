@@ -102,6 +102,7 @@ const routes = [
         component: PageNotFound
     }
 ]
+
 let configuredRoutes = configureRoutes(routes, {
     ignoredRoutes: ['/callback', '*']
 })

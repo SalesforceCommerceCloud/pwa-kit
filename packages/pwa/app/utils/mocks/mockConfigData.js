@@ -5,44 +5,48 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 const mockConfig = {
-    url: {
-        locale: 'path',
-        site: 'path'
-    },
-    defaultSite: 'site-1',
-    sites: [
-        {
-            id: 'site-1',
-            alias: 'uk',
-            l10n: {
-                defaultLocale: 'en-GB',
-                supportedLocales: [
-                    {
-                        id: 'en-GB',
-                        alias: 'en-uk',
-                        preferredCurrency: 'GBP'
-                    },
-                    {
-                        id: 'fr-FR',
-                        alias: 'fr',
-                        preferredCurrency: 'EUR'
-                    }
-                ]
-            }
+    app: {
+        url: {
+            locale: 'path',
+            site: 'path'
         },
-        {
-            id: 'site-2',
-            alias: 'us',
-            l10n: {
-                defaultLocale: 'en-US',
-                supportedLocales: [
-                    {
-                        id: 'en-US',
-                        preferredCurrency: 'USD'
-                    }
-                ]
+        siteAliases: {
+            'site-1': 'uk',
+            'site-2': 'us'
+        },
+        defaultSite: 'site-1',
+        sites: [
+            {
+                id: 'site-1',
+                l10n: {
+                    defaultLocale: 'en-GB',
+                    supportedLocales: [
+                        {
+                            id: 'en-GB',
+                            alias: 'en-uk',
+                            preferredCurrency: 'GBP'
+                        },
+                        {
+                            id: 'fr-FR',
+                            alias: 'fr',
+                            preferredCurrency: 'EUR'
+                        }
+                    ]
+                }
+            },
+            {
+                id: 'site-2',
+                l10n: {
+                    defaultLocale: 'en-US',
+                    supportedLocales: [
+                        {
+                            id: 'en-US',
+                            preferredCurrency: 'USD'
+                        }
+                    ]
+                }
             }
-        }
-    ]
+        ]
+    }
 }
 export {mockConfig}

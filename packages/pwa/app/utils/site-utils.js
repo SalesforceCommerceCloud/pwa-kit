@@ -55,7 +55,6 @@ export const getDefaultSite = () => {
     if (sites.length === 1) {
         return sites[0]
     }
-
     if (!app.defaultSite) {
         throw new Error(
             "Can't find defaultSite in the config. Please check your configuration file"

@@ -132,8 +132,8 @@ export const getUrlWithLocale = (shortCode, opts = {}) => {
     const urlConfig = getUrlConfig()
     const location = opts.location ? opts.location : window.location
     let {site, locale} = getParamsFromPath(`${location.pathname}${location.search}`, urlConfig)
+    const defaultSite = getDefaultSite()
     if (!site) {
-        const defaultSite = getDefaultSite()
         site = defaultSite.alias || defaultSite.id
     }
     let {pathname, search} = location
@@ -144,8 +144,18 @@ export const getUrlWithLocale = (shortCode, opts = {}) => {
         .replace(`locale=${locale}`, '')
         .replace(`site=${site}`, '')
         .replace(/&$/, '')
+
+    const isDefaultLocale = shortCode === defaultSite.l10n.defaultLocale
+    const isDefaultSite = site.alias === defaultSite.alias || site.id === defaultSite.id
     // rebuild the url with new locale
-    const newUrl = buildPathWithUrlConfig(`${pathname}${search}`, {site, locale: shortCode}, opts)
+    const newUrl = buildPathWithUrlConfig(
+        `${pathname}${search}`,
+        {
+            site: isDefaultLocale && isDefaultSite ? '' : site,
+            locale: isDefaultLocale && isDefaultSite ? '' : shortCode
+        },
+        opts
+    )
     return newUrl
 }
 
@@ -158,9 +168,13 @@ export const getUrlWithLocale = (shortCode, opts = {}) => {
  */
 export const homeUrlBuilder = (homeHref, options = {}) => {
     const {locale, site} = options
+    const defaultSite = getDefaultSite()
+    const isDefaultLocale = locale === defaultSite.l10n.defaultLocale
+    const isDefaultSite = site.id === defaultSite.id || site.alias === defaultSite.alias
+
     const updatedUrl = buildPathWithUrlConfig(homeHref, {
-        locale,
-        site: site.alias || site.id
+        locale: isDefaultLocale && isDefaultSite ? '' : locale,
+        site: isDefaultLocale && isDefaultSite ? '' : site.alias || site.id
     })
     return encodeURI(updatedUrl)
 }
@@ -220,9 +234,11 @@ export const removeQueryParamsFromPath = (path, keys) => {
  *
  */
 export const buildPathWithUrlConfig = (relativeUrl, configValues = {}, opts = {}) => {
-    const urlConfig = getUrlConfig() || {}
+    const urlConfig = getUrlConfig()
     if (!urlConfig) {
-        throw new Error('url config is required for buildPathWithUrlConfig')
+        throw new Error(
+            'url config is required for buildPathWithUrlConfig. Please check your configuration.'
+        )
     }
     const {disallowParams = []} = opts
     if (!Object.values(urlConfig).length) return relativeUrl

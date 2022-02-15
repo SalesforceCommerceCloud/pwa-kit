@@ -239,9 +239,9 @@ export const getConfig = (opts = {}) => {
  * @return {object} - url config
  */
 export const getUrlConfig = () => {
-    const config = getConfig()
-    if (!config) {
-        throw new Error("Can't find any valid config. Please check your configuration file.")
+    const {app} = getConfig()
+    if (!app.url) {
+        throw new Error("Can't find any valid url config. Please check your configuration file.")
     }
-    return config.app.url
+    return app.url
 }
