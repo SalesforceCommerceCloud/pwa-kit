@@ -7,7 +7,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-
+/* eslint-disable header/header */
 import * as utils from './utils'
 import {proxyConfigs} from '../../utils/ssr-shared'
 

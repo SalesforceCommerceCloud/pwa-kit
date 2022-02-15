@@ -64,7 +64,6 @@ try {
 
 const config = Utils.getConfig(argv.t)
 
-console.log('config: ', config)
 // Read the top-level Mobify options. If the environment variable
 // SSR_ENABLED is set to a truthy string, then override the
 // ssrEnabled value.

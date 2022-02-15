@@ -49,7 +49,6 @@ import {
     detectDeviceType
 } from '../../utils/ssr-server'
 import {proxyConfigs, updatePackageMobify} from '../../utils/ssr-shared'
-import {getConfig} from '../universal/utils'
 
 import {
     BUILD,
@@ -214,7 +213,11 @@ export const createApp = (options) => {
     // Attach built in routes and middleware
 
     // Attach the application configuration to the request object.
-    app.use(appConfigMiddleware)
+    app.use((req, _, next) => {
+        req.appConfig = options.mobify
+
+        next()
+    })
 
     // Attach this middleware as early as possible. It does timing
     // and applies some early processing that must occur before
@@ -1400,17 +1403,6 @@ const serveServiceWorker = (req, res) => {
     res.set('etag', getHashForString(content))
     res.set(CONTENT_TYPE, 'application/javascript')
     res.send(content)
-}
-
-/**
- * Express Middleware applied to requests that require rendering of a response.
- *
- * @private
- */
-const appConfigMiddleware = (req, _, next) => {
-    req.appConfig = getConfig()
-
-    next()
 }
 
 /**

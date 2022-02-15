@@ -46,6 +46,16 @@ Object.defineProperty(window, 'scrollTo', {
     value: () => null
 })
 
+Object.defineProperty(window, '__APPCONFIG__', {
+    value: {
+        storefront: {
+            url: {
+                locale: 'path'
+            }
+        }
+    }
+})
+
 Object.defineProperty(window, 'matchMedia', {
     writable: true,
     value: jest.fn().mockImplementation((query) => ({

@@ -17,7 +17,7 @@ const fileUtils = require('./file-utils')
 
 const {Matcher} = require('../dist/utils/glob')
 
-const {getConfig} = require('../ssr/universal/utils')
+const {getConfig} = require('../dist/ssr/universal/utils')
 
 const SDK_VERSION = require('../package.json').version
 const DEFAULT_DOCS_URL = 'http://sfdc.co/pwa-kit'

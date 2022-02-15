@@ -18,3 +18,16 @@ describe('getProxyConfigs (client-side)', () => {
         expect(utils.getProxyConfigs()).toEqual(configs)
     })
 })
+
+describe('getConfig (client-side)', () => {
+    const config = {app: {}}
+    beforeEach(() => {
+        global.__APPCONFIG__ = config
+    })
+    afterEach(() => {
+        delete global.__APPCONFIG__
+    })
+    test('should return the config set on window.__APPCONFIG__', () => {
+        expect(utils.getConfig()).toEqual(config)
+    })
+})

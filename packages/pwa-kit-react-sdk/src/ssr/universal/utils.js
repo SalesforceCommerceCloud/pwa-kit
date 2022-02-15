@@ -61,8 +61,9 @@ export const DEFAULT_CONFIG_MODULE_NAME = 'DEFAULT'
  * @param {*} param0
  * @returns
  */
+/* istanbul ignore next */
 export const getConfig = () => {
-    if (typeof window !== 'undefined') {
+    if (onClient) {
         return (
             window.__APPCONFIG__ ||
             JSON.parse(document.getElementById('mobify-data').innerHTML).__APPCONFIG__

@@ -13,6 +13,10 @@ import {render} from 'pwa-kit-react-sdk/ssr/server/react-rendering'
 import helmet from 'helmet'
 import {getConfig} from 'pwa-kit-react-sdk/ssr/universal/utils'
 
+// Load the app configuration, if one is found the `mobify` key from the package.json
+// will be used.
+const appConfig = getConfig()
+
 const app = createApp({
     // The build directory (an absolute path)
     buildDir: path.resolve(process.cwd(), 'build'),
@@ -29,7 +33,7 @@ const app = createApp({
 
     // This is your app config. For more information on how the config value is resolved,
     // look at this doc TODO: Add doc.
-    mobify: getConfig(),
+    mobify: appConfig,
 
     // The port that the local dev server listens on
     port: 3000,
