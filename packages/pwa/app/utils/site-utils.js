@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {getConfig, updateSitesWithAliases} from './utils'
+import {getConfig, getUrlConfig} from './utils'
 import {getParamsFromPath} from './utils'
 /**
  * This functions takes an url and returns a site object,
@@ -14,22 +14,18 @@ import {getParamsFromPath} from './utils'
  * @returns {object}
  */
 export const resolveSiteFromUrl = (url) => {
-    const {app} = getConfig()
-    const sites = updateSitesWithAliases(app.sites, app.siteAliases)
+    const urlConfig = getUrlConfig()
 
     if (!url) {
         throw new Error('url is required to find a site object.')
     }
-
-    if (!sites) {
-        throw new Error("Can't find any sites in the config. Please check your configuration")
-    }
+    const sites = getSites()
     const {pathname, search} = new URL(url)
     const path = `${pathname}${search}`
     let site
 
     // get the site identifier from the url
-    const {site: currentSite} = getParamsFromPath(path, app.url)
+    const {site: currentSite} = getParamsFromPath(path, urlConfig)
     // step 1: look for the site based on the site identifier (id or alias) from the url
     site = sites.find((site) => site.id === currentSite || site.alias === currentSite)
     if (site) {
@@ -51,7 +47,7 @@ export const resolveSiteFromUrl = (url) => {
  */
 export const getDefaultSite = () => {
     const {app} = getConfig()
-    const sites = updateSitesWithAliases(app.sites, app.siteAliases)
+    const sites = getSites()
     if (!sites) {
         throw new Error("Can't find any sites in the config. Please check your configuration")
     }
@@ -66,4 +62,21 @@ export const getDefaultSite = () => {
         )
     }
     return sites.find((site) => site.id === app.defaultSite)
+}
+
+/**
+ * Ret
+ * @return {array} - site list including their aliases
+ */
+export const getSites = () => {
+    const {app} = getConfig()
+    if (!app.sites) {
+        throw new Error("Can't find any sites from the config. Please check your configuration")
+    }
+    return app.sites.map((site) => {
+        return {
+            ...site,
+            alias: app.siteAliases[site.id]
+        }
+    })
 }

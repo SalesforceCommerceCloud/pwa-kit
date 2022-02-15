@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {getConfig, updateSitesWithAliases} from './utils'
+import {getSites} from './site-utils'
 
 /**
  * Return all the permutations of routes with site id/alias and locale id/alias
@@ -17,11 +17,7 @@ import {getConfig, updateSitesWithAliases} from './utils'
 export const configureRoutes = (routes = [], {ignoredRoutes = []}) => {
     if (!routes.length) return []
 
-    const {app} = getConfig()
-    const allSites = updateSitesWithAliases(app.sites, app.siteAliases)
-    if (!app.sites) {
-        throw new Error('Cannot find any sites from config. Please check your configuration')
-    }
+    const allSites = getSites()
 
     // get a collection of all site-id and site alias from the config of the current host
     // remove any duplicates by using [...new Set([])]
