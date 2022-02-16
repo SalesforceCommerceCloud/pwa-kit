@@ -80,7 +80,7 @@
     "set-cookie-parser": "^2.2.1",
     "tti-polyfill": "0.2.2",
     "ua-parser-js": "^0.7.24",
-    "url-parse": "^1.4.7",
+    "url-parse": "^1.5.6",
     "validator": "^13.7.0",
     "webpack-bundle-analyzer": "^4.4.0",
     "webpack-notifier": "^1.12.0",
