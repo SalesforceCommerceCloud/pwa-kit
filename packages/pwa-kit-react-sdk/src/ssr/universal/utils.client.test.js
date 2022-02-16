@@ -22,12 +22,12 @@ describe('getProxyConfigs (client-side)', () => {
 describe('getConfig (client-side)', () => {
     const config = {app: {}}
     beforeEach(() => {
-        global.__APPCONFIG__ = config
+        global.__APP_CONFIG__ = config
     })
     afterEach(() => {
-        delete global.__APPCONFIG__
+        delete global.__APP_CONFIG__
     })
-    test('should return the config set on window.__APPCONFIG__', () => {
+    test('should return the config set on window.__APP_CONFIG__', () => {
         expect(utils.getConfig()).toEqual(config)
     })
 })
