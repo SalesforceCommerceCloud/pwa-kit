@@ -11,7 +11,16 @@ import {rest} from 'msw'
 import {setupServer} from 'msw/node'
 import {getPathname, renderWithProviders} from '../../utils/test-utils'
 import ResetPassword from '.'
+import {mockConfig} from '../../utils/mocks/mockConfigData'
 
+jest.mock('../../utils/utils', () => {
+    const original = jest.requireActual('../../utils/utils')
+    return {
+        ...original,
+        getConfig: jest.fn(() => mockConfig),
+        getUrlConfig: jest.fn(() => mockConfig.app.url)
+    }
+})
 jest.setTimeout(60000)
 
 const mockRegisteredCustomer = {
@@ -117,7 +126,7 @@ test('Allows customer to go to sign in page', async () => {
 
     user.click(screen.getByText('Sign in'))
     await waitFor(() => {
-        expect(window.location.pathname).toEqual(getPathname('/login'))
+        expect(window.location.pathname).toEqual('/uk/en-GB/login')
     })
 })
 
@@ -150,7 +159,7 @@ test('Allows customer to generate password token', async () => {
 
     user.click(screen.getByText('Back to Sign In'))
     await waitFor(() => {
-        expect(window.location.pathname).toEqual(getPathname('/login'))
+        expect(window.location.pathname).toEqual('/uk/en-GB/login')
     })
 })
 

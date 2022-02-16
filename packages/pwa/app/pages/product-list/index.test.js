@@ -149,14 +149,9 @@ const server = setupServer(
     )
 )
 
-// Set up and clean up
-beforeAll(() => {
-    // Since we're testing some navigation logic, we are using a simple Router
-    // around our component. We need to initialize the default route/path here.
-    window.history.pushState({}, 'ProductList', 'uk/en-GB/category/mens-clothing-jackets')
-})
-
 beforeEach(() => {
+    window.history.pushState({}, 'ProductList', '/uk/en-GB/category/mens-clothing-jackets')
+
     jest.resetModules()
     server.listen({onUnhandledRequest: 'error'})
     useWishlist.mockReturnValue({
@@ -194,13 +189,8 @@ test('should render empty list page', async () => {
     expect(await screen.findByTestId('sf-product-empty-list-page')).toBeInTheDocument()
 })
 
-test('should display Search Results for when searching ', async () => {
-    renderWithProviders(<MockedComponent />)
-    window.history.pushState({}, 'ProductList', 'en-GB/search?q=test')
-    expect(await screen.findByTestId('sf-product-list-page')).toBeInTheDocument()
-})
-
 test('pagination is rendered', async () => {
+    console.log('window.location.pathname', window.location.pathname)
     renderWithProviders(<MockedComponent />)
     expect(await screen.findByTestId('sf-pagination')).toBeInTheDocument()
 })
@@ -225,14 +215,25 @@ test('clicking a filter will change url', async () => {
     user.click(screen.getByText(/Beige/i))
     await waitFor(() =>
         expect(window.location.search).toEqual(
-            '?limit=25&q=test&refine=c_refinementColor%3DBeige&sort=best-matches'
+            '?limit=25&refine=c_refinementColor%3DBeige&sort=best-matches'
         )
     )
 })
 
-test('clicking a filter will change url', async () => {
+test('click on filter All should clear out all the filter in search params', async () => {
+    window.history.pushState(
+        {},
+        'ProductList',
+        'uk/en-GB/category/mens-clothing-jackets?limit=25&refine=c_refinementColor%3DBeige&sort=best-matches'
+    )
     renderWithProviders(<MockedComponent />)
-    const clearAllButton = screen.queryAllByText(/Clear All/i)
+    const clearAllButton = await screen.findAllByText(/Clear All/i)
     user.click(clearAllButton[0])
     await waitFor(() => expect(window.location.search).toEqual(''))
+})
+
+test('should display Search Results for when searching ', async () => {
+    renderWithProviders(<MockedComponent />)
+    window.history.pushState({}, 'ProductList', 'uk/en-GB/search?q=test')
+    expect(await screen.findByTestId('sf-product-list-page')).toBeInTheDocument()
 })
