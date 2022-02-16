@@ -5,7 +5,7 @@
             "locale": "path"
         }
     },
-    "externals": ["cosmiconfig"],
+    "externals": [],
     "pageNotFoundURL": "/page-not-found",
     "ssrEnabled": true,
     "ssrOnly": [
