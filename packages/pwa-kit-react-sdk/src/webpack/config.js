@@ -125,9 +125,9 @@ const babelLoader = [
 // configuration object under `externals` in the projects package.json file.
 const mobifyConfig = pkg.mobify || {}
 
-// Convert the externals defined in your project with the defualts into an
+// Convert the externals defined in your project with the defaults into an
 // object that webpack will understand.
-const externals = ['express', ...(mobifyConfig.externals || [])].reduce(
+const externals = ['express', 'cosmiconfig', ...(mobifyConfig.externals || [])].reduce(
     (acc, lib) => ({...acc, [lib]: lib}),
     {}
 )

@@ -11,6 +11,7 @@
 const sh = require('shelljs')
 const common = require('shelljs/src/common')
 const path = require('path')
+const Utils = require('../scripts/utils.js')
 
 const ShellString = common.ShellString
 
@@ -19,16 +20,17 @@ const webpack = path.join('node_modules', '.bin', 'webpack')
 sh.set('-e')
 sh.config.silent = true
 
+const config = Utils.getConfig() || {}
 const pkg = JSON.parse(sh.cat('package.json'))
 
 // These are the libs that don't get compiled into ssr.js using webpack.
-const mobifyConfig = pkg.mobify || {}
 const allDependencies = {
     ...(pkg.devDependencies || {}),
     ...(pkg.dependencies || {})
 }
 
-const deps = ['express', 'cosmiconfig', ...(mobifyConfig.externals || [])]
+// NOTE: We need to update this to include the values from the config file.
+const deps = ['express', ...(config.externals || [])]
     .map((lib) => ({
         lib: lib,
         version: allDependencies[lib]
