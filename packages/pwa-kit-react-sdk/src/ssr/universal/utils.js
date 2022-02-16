@@ -73,8 +73,8 @@ export const getProxyConfigs = () => {
 export const getConfig = () => {
     if (onClient) {
         return (
-            window.__APP_CONFIG__ ||
-            JSON.parse(document.getElementById('mobify-data').innerHTML).__APP_CONFIG__
+            window.__CONFIG__ ||
+            JSON.parse(document.getElementById('mobify-data').innerHTML).__CONFIG__
         )
     }
 

@@ -15,7 +15,7 @@ import {getConfig} from 'pwa-kit-react-sdk/ssr/universal/utils'
 
 // Load the app configuration, if one is found the `mobify` key from the package.json
 // will be used.
-const appConfig = getConfig()
+const config = getConfig()
 
 const app = createApp({
     // The build directory (an absolute path)
@@ -34,7 +34,7 @@ const app = createApp({
     // This is the value of the 'mobify' object from package.json
     // provided by a webpack DefinePlugin. Alternatively the object can be defined
     // in a configuration file in the `config` folder.
-    mobify: appConfig,
+    mobify: config,
 
     // The port that the local dev server listens on
     port: 3000,

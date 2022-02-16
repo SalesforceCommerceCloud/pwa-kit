@@ -48,7 +48,7 @@ Object.defineProperty(window, 'scrollTo', {
 })
 
 // Mock the the `default` cofig to the window global
-Object.defineProperty(window, '__APP_CONFIG__', {
+Object.defineProperty(window, '__CONFIG__', {
     value: config
 })
 

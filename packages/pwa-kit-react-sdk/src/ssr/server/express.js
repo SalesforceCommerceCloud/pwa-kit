@@ -214,7 +214,7 @@ export const createApp = (options) => {
 
     // Attach the application configuration to the request object.
     app.use((req, _, next) => {
-        req.appConfig = options.mobify
+        req.config = options.mobify
 
         next()
     })
@@ -276,7 +276,7 @@ export const createApp = (options) => {
     app.get(/^\/(pwa-kit|mobify)\/config$/, (req, res) =>
         res
             .set('cache-control', NO_CACHE)
-            .json(req.appConfig)
+            .json(req.config)
             .end()
     )
 

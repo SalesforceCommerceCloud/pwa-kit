@@ -132,7 +132,7 @@ export const render = async (req, res, next) => {
     // to inject arguments into the wrapped component's getProps methods.
     AppConfig.restore(res.locals)
 
-    const appConfig = req.appConfig
+    const config = req.config
     const routes = getRoutes(res.locals)
     const WrappedApp = routeComponent(App, false, res.locals)
 
@@ -175,11 +175,11 @@ export const render = async (req, res, next) => {
         App: WrappedApp,
         appState,
         appStateError: appStateError && logAndFormatError(appStateError),
+        config,
         routes,
         req,
         res,
-        location,
-        appConfig
+        location
     }
     try {
         renderResult = renderApp(args)
@@ -223,7 +223,7 @@ const renderAppHtml = (req, res, error, appData) => {
 }
 
 const renderApp = (args) => {
-    const {req, res, appStateError, App, appState, location, routes, appConfig} = args
+    const {req, res, appStateError, App, appState, config, location, routes} = args
     const deviceType = detectDeviceType(req)
     const extractor = new ChunkExtractor({statsFile: BUNDLES_PATH})
     const routerContext = {}
@@ -281,7 +281,7 @@ const renderApp = (args) => {
     //
     // Do *not* add to these without a very good reason - globals are a liability.
     const windowGlobals = {
-        __APP_CONFIG__: appConfig,
+        __CONFIG__: config,
         __DEVICE_TYPE__: deviceType,
         __PRELOADED_STATE__: appState,
         __ERROR__: error,
