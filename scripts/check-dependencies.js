@@ -179,6 +179,22 @@ const check = () => {
     listPackages().forEach((pkgDir) => {
         const pkgFile = path.join(pkgDir, 'package.json')
         const pkg = readJSON(pkgFile)
+
+        if (pkg.version !== rootPkg.version) {
+            errors.push(`Package "${pkg.name}" is at version "${pkg.version}" but it needs to match the root package version at "${rootPkg.version}"`)
+        }
+        
+        const nodeVersion = (pkg.engines || {}).node
+        const npmVersion = (pkg.engines || {}).npm
+        
+        if (nodeVersion !== rootPkg.engines.node) {
+            errors.push(`Package "${pkg.name}" has engines.node set to "${nodeVersion}", but it must match the root package engines.node at "${rootPkg.engines.node}"`)
+        }
+        
+        if (npmVersion !== rootPkg.engines.npm) {
+            errors.push(`Package "${pkg.name}" has engines.npm set to "${npmVersion}", but it must match the root package engines.npm at "${rootPkg.engines.npm}"`)
+        }
+
         Object.entries(commonDevDeps)
             .forEach(([name, requiredVersion]) => {
                 const foundVersion = pkg.devDependencies[name] || pkg.dependencies[name]
