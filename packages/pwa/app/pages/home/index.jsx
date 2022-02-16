@@ -36,6 +36,9 @@ import {heroFeatures, features} from './data'
 // Constants
 import {HOME_SHOP_PRODUCTS_CATEGORY_ID, HOME_SHOP_PRODUCTS_LIMIT} from '../../constants'
 
+
+import css from "./style.css"
+
 /**
  * This is the home page for Retail React App.
  * The page is created for demonstration purposes.
@@ -52,6 +55,8 @@ const Home = ({productSearchResult, isLoading}) => {
                 description="Commerce Cloud Retail React App"
                 keywords="Commerce Cloud, Retail React App, React Storefront"
             />
+
+<h1 className="test">THIS IS A TEST</h1>
 
             <Hero
                 title={intl.formatMessage({
