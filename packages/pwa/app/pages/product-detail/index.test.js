@@ -16,7 +16,16 @@ import {screen} from '@testing-library/react'
 import {Route, Switch} from 'react-router-dom'
 import ProductDetail from '.'
 import {renderWithProviders} from '../../utils/test-utils'
+import {mockConfig} from '../../utils/mocks/mockConfigData'
 
+jest.mock('../../utils/utils', () => {
+    const original = jest.requireActual('../../utils/utils')
+    return {
+        ...original,
+        getConfig: jest.fn(() => mockConfig),
+        getUrlConfig: jest.fn(() => mockConfig.app.url)
+    }
+})
 jest.setTimeout(60000)
 
 jest.useFakeTimers()

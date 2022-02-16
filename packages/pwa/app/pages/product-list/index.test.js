@@ -23,21 +23,22 @@ import ProductList from '.'
 import EmptySearchResults from './partials/empty-results'
 import useCustomer from '../../commerce-api/hooks/useCustomer'
 import useWishlist from '../../hooks/use-wishlist'
-import {getConfig} from '../../utils/utils'
+import {mockConfig} from '../../utils/mocks/mockConfigData'
 
+jest.mock('../../utils/utils', () => {
+    const original = jest.requireActual('../../utils/utils')
+    return {
+        ...original,
+        getConfig: jest.fn(() => mockConfig),
+        getUrlConfig: jest.fn(() => mockConfig.app.url)
+    }
+})
 jest.setTimeout(60000)
 let mockCategoriesResponse = mockCategories
 let mockProductListSearchResponse = mockProductSearch
 jest.useFakeTimers()
 
 jest.mock('../../hooks/use-wishlist')
-jest.mock('../../utils/utils', () => {
-    const original = jest.requireActual('../../utils/utils')
-    return {
-        ...original,
-        getConfig: jest.fn()
-    }
-})
 jest.mock('../../hooks/use-site')
 
 jest.mock('../../commerce-api/utils', () => {
@@ -68,6 +69,8 @@ jest.mock('commerce-sdk-isomorphic', () => {
     }
 })
 
+const basePath = '/uk/en-GB'
+
 const MockedComponent = ({isLoading, isLoggedIn = false, searchQuery}) => {
     const customer = useCustomer()
     useEffect(() => {
@@ -78,7 +81,7 @@ const MockedComponent = ({isLoading, isLoggedIn = false, searchQuery}) => {
     return (
         <Switch>
             <Route
-                path="/:locale/category/:categoryId"
+                path={`${basePath}/category/:categoryId`}
                 render={(props) => (
                     <div>
                         <div>{customer.customerId}</div>
@@ -150,13 +153,10 @@ const server = setupServer(
 beforeAll(() => {
     // Since we're testing some navigation logic, we are using a simple Router
     // around our component. We need to initialize the default route/path here.
-    window.history.pushState({}, 'ProductList', 'en/category/mens-clothing-jackets')
+    window.history.pushState({}, 'ProductList', 'uk/en-GB/category/mens-clothing-jackets')
 })
 
 beforeEach(() => {
-    getConfig.mockImplementation(() => ({
-        locale: 'path'
-    }))
     jest.resetModules()
     server.listen({onUnhandledRequest: 'error'})
     useWishlist.mockReturnValue({

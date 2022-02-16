@@ -35,7 +35,8 @@ jest.mock('../../utils/utils', () => {
     const original = jest.requireActual('../../utils/utils')
     return {
         ...original,
-        getConfig: jest.fn(() => mockConfig)
+        getConfig: jest.fn(() => mockConfig),
+        getUrlConfig: jest.fn(() => mockConfig.app.url)
     }
 })
 jest.mock('../../commerce-api/einstein')

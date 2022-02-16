@@ -7,9 +7,17 @@
 import React from 'react'
 import {renderWithProviders} from '../../utils/test-utils'
 import HomePage from './index'
+import {mockConfig} from '../../utils/mocks/mockConfigData'
 
 jest.mock('../../commerce-api/einstein')
-
+jest.mock('../../utils/utils', () => {
+    const original = jest.requireActual('../../utils/utils')
+    return {
+        ...original,
+        getConfig: jest.fn(() => mockConfig),
+        getUrlConfig: jest.fn(() => mockConfig.app.url)
+    }
+})
 test('Home Page renders without errors', async () => {
     const {getByTestId} = renderWithProviders(<HomePage />)
 

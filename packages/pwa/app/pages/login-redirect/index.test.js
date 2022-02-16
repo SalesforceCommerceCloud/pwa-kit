@@ -7,7 +7,14 @@
 import React from 'react'
 import {renderWithReactIntl} from '../../utils/test-utils'
 import LoginRedirect from './index'
-
+jest.mock('../../utils/utils', () => {
+    const original = jest.requireActual('../../utils/utils')
+    return {
+        ...original,
+        getConfig: jest.fn(() => mockConfig),
+        getUrlConfig: jest.fn(() => mockConfig.app.url)
+    }
+})
 test('Login Redirect renders without errors', () => {
     const {getByRole} = renderWithReactIntl(<LoginRedirect />)
 
