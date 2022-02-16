@@ -102,11 +102,14 @@ const withLocalNPMRepo = (func) => {
             // packages to it. This is safe to do – Verdaccio does not forward these
             // the public NPM repo.
             console.log('Publishing packages to the local NPM repository')
-            sh.exec('npm run lerna -- publish from-package --yes --concurrency 1 --loglevel verbose', {
-                cwd: monorepoRoot,
-                fatal: true,
-                silent: false
-            }).toEnd(logFileName)
+            sh.exec(
+                'npm run lerna -- publish from-package --yes --concurrency 1 --loglevel verbose',
+                {
+                    cwd: monorepoRoot,
+                    fatal: true,
+                    silent: false
+                }
+            ).toEnd(logFileName)
             console.log('Published successfully')
         })
         .then(() => func())
