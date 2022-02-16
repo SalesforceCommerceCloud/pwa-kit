@@ -28,7 +28,7 @@ publish:
   allow_offline: true
 
 logs:
-  - {type: stdout, format: pretty, level: http}
+  - {type: stdout, format: pretty, level: debug}
 
 server:
   keepAliveTimeout: 0
