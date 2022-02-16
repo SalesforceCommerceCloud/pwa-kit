@@ -34,7 +34,7 @@ const useNavigation = () => {
                 ?.replace(`locale=${locale}`, '')
                 ?.replace(`site=${alias || id}`, '')
                 ?.replace(/&$/, '')
-            const _path = `${pathname}${search ? search : ''}`
+            const _path = `${pathname}?${search ? search : ''}`
             const updatedHref = buildPathWithUrlConfig(_path, {
                 locale,
                 site: alias || id
