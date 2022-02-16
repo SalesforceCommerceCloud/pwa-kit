@@ -61,8 +61,11 @@ export const getProxyConfigs = () => {
  * > default.ext
  * > package.json (mobify.key)
  *
- * Each file marked with `ext` ban optionally be terminated with `yml`, `yaml` or
+ * Each file marked with `ext` can optionally be terminated with `yml`, `yaml` or
  * `json` in that priority.
+ *
+ * NOTE: This is an isomorphic function, when run on the browser the config returned will
+ * be the value serialized in the html.
  *
  * @returns - the application configuration object.
  */

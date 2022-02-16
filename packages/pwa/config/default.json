@@ -1,5 +1,5 @@
 {
-    "storefront": {
+    "app": {
         "target": "default",
         "url": {
             "locale": "path"

@@ -31,8 +31,9 @@ const app = createApp({
     // The location of the apps manifest file relative to the build directory
     manifestPath: 'static/manifest.json',
 
-    // This is your app config. For more information on how the config value is resolved,
-    // look at this doc TODO: Add doc.
+    // This is the value of the 'mobify' object from package.json
+    // provided by a webpack DefinePlugin. Alternatively the object can be defined
+    // in a configuration file in the `config` folder.
     mobify: appConfig,
 
     // The port that the local dev server listens on

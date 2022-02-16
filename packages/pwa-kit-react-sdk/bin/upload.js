@@ -62,7 +62,14 @@ try {
     Utils.fail(message)
 }
 
-const config = Utils.getConfig(argv.t)
+// Set the deployment target env var, this is required to ensure we
+// get the correct configuration oject.
+process.env.DEPLOY_TARGET = argv.t
+
+// Get the config object for the current target, if no target was set
+// it will return the defualt configuration and that one will be
+// validated.
+const config = Utils.getConfig()
 
 // Read the top-level Mobify options. If the environment variable
 // SSR_ENABLED is set to a truthy string, then override the
