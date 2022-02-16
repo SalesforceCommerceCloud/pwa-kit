@@ -98,14 +98,14 @@ const main = async () => {
         await replace({
             ignore: ['dist/scripts/**/*', 'dist/bin/**/*', 'dist/template/**/*'],
             files: ['dist/**/*.js'],
-            from: /..\/package.json/,
+            from: /..\/package.json/g,
             to: 'package.json'
         })
 
         // Update script to remove `dist` folder in imports.
         await replace({
             files: ['dist/scripts/**/!(prepare-dist.js)'],
-            from: /dist\//,
+            from: /dist\//g,
             to: ''
         })
     } catch (e) {
