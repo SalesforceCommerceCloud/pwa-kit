@@ -1,6 +1,5 @@
 {
     "app": {
-        "target": "default",
         "url": {
             "locale": "path"
         }
