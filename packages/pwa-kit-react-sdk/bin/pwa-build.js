@@ -30,7 +30,7 @@ const allDependencies = {
 }
 
 // NOTE: We need to update this to include the values from the config file.
-const deps = ['express', ...(config.externals || [])]
+const deps = ['express', 'cosmiconfig', ...(config.externals || [])]
     .map((lib) => ({
         lib: lib,
         version: allDependencies[lib]
