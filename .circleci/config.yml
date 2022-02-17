@@ -166,26 +166,26 @@ commands:
           environment:
             GENERATOR_PRESET: 'test-project'
           command: |
-            node packages/pwa-kit-create-app/scripts/create-mobify-app-dev.js --outputDir /tmp/project
+            node packages/pwa-kit-create-app/scripts/create-mobify-app-dev.js --outputDir generated-project
             
-            cd /tmp/project
+            cd generated-project
             npm run prod:build
       - run:
           name: Generate hello-world project
           environment:
             GENERATOR_PRESET: 'hello-world-test-project'
           command: |
-            node packages/pwa-kit-create-app/scripts/create-mobify-app-dev.js --outputDir /tmp/hello-world
+            node packages/pwa-kit-create-app/scripts/create-mobify-app-dev.js --outputDir generated-project-hello-world
       - runtests:
-          cwd: /tmp/project
+          cwd: generated-project
       - smoketestscripts:
-          dir: /tmp/project
+          dir: generated-project
       - run:
           name: Count Generated Project Dependencies
           environment:
           command: |
             MAX_PACKAGES="2250"
-            total=$(./scripts/count-dependencies.js /tmp/project)
+            total=$(./scripts/count-dependencies.js generated-project)
             echo "export TOTAL_PACKAGES=${total}" >> $BASH_ENV;
             source $BASH_ENV
 
@@ -352,7 +352,7 @@ jobs:
               target=""
             fi
             if [[ $target ]]; then
-              cd /tmp/project
+              cd generated-project
               npm run push -- --message "Generated PWA build ${CIRCLE_BUILD_NUM} on ${CIRCLE_BRANCH} (${CIRCLE_SHA1})" --target $target
             fi
   generatedSFCCProjectTestWindows:
