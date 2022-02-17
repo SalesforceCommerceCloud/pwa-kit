@@ -14,7 +14,7 @@ import {getSupportedLocalesIds} from '../../utils/locale.js'
 import {DEFAULT_LOCALE} from '../../utils/test-utils'
 import {mockConfig} from '../../utils/mocks/mockConfigData'
 import {SUPPORTED_LOCALES} from '../../utils/test-utils'
-
+import messages from '../../translations/compiled/en-GB.json'
 let windowSpy
 jest.mock('../../utils/utils', () => {
     const original = jest.requireActual('../../utils/utils')
@@ -46,10 +46,11 @@ afterEach(() => {
 describe('App', () => {
     test('App component is rendered appropriately', () => {
         renderWithProviders(
-            <App targetLocale={DEFAULT_LOCALE} defaultLocale={DEFAULT_LOCALE}>
+            <App targetLocale={DEFAULT_LOCALE} defaultLocale={DEFAULT_LOCALE} messages={messages}>
                 <p>Any children here</p>
             </App>
         )
+        screen.debug()
         expect(screen.getByRole('main')).toBeInTheDocument()
         expect(screen.getByText('Any children here')).toBeInTheDocument()
     })
@@ -68,7 +69,9 @@ describe('App', () => {
     })
 
     test('The localized hreflang links exist in the html head', () => {
-        renderWithProviders(<App targetLocale={DEFAULT_LOCALE} defaultLocale={DEFAULT_LOCALE} />)
+        renderWithProviders(
+            <App targetLocale={DEFAULT_LOCALE} defaultLocale={DEFAULT_LOCALE} messages={messages} />
+        )
 
         const helmet = Helmet.peek()
         const hreflangLinks = helmet.linkTags.filter((link) => link.rel === 'alternate')
