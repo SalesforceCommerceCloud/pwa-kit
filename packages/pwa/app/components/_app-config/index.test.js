@@ -7,7 +7,15 @@
 import React from 'react'
 import {render} from '@testing-library/react'
 import AppConfig from './index.jsx'
-
+import {mockConfig} from '../../utils/mocks/mockConfigData'
+jest.mock('../../utils/utils', () => {
+    const original = jest.requireActual('../../utils/utils')
+    return {
+        ...original,
+        getConfig: jest.fn(() => mockConfig),
+        getUrlConfig: jest.fn(() => mockConfig.app.url)
+    }
+})
 describe('AppConfig', () => {
     test('renders', () => {
         const {container} = render(<AppConfig />)

@@ -84,8 +84,6 @@ AppConfig.restore = (locals = {}) => {
         apiConfig.parameters.siteId = site?.id
     }
 
-    console.log('App config site', site)
-
     const locale = getLocale(locals) || site.l10n.defaultLocale
     const currency =
         getPreferredCurrency(locale, site.l10n.supportedLocales) || site.defaultCurrency

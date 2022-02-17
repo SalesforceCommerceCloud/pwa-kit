@@ -12,7 +12,15 @@ import {renderWithProviders} from '../../utils/test-utils'
 import {fireEvent, screen} from '@testing-library/react'
 import {useDisclosure} from '@chakra-ui/react'
 import mockProductDetail from '../../commerce-api/mocks/variant-750518699578M'
-
+import {mockConfig} from '../../utils/mocks/mockConfigData'
+jest.mock('../../utils/utils', () => {
+    const original = jest.requireActual('../../utils/utils')
+    return {
+        ...original,
+        getConfig: jest.fn(() => mockConfig),
+        getUrlConfig: jest.fn(() => mockConfig.app.url)
+    }
+})
 const MockComponent = ({updateCart}) => {
     const {isOpen, onOpen, onClose} = useDisclosure()
 

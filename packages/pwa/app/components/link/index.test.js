@@ -7,14 +7,15 @@
 import React from 'react'
 import {renderWithProviders} from '../../utils/test-utils'
 import Link from './index'
-import {getConfig} from '../../utils/utils'
+import {getConfig, getUrlConfig} from '../../utils/utils'
 import {mockConfig} from '../../utils/mocks/mockConfigData'
 
 jest.mock('../../utils/utils', () => {
     const original = jest.requireActual('../../utils/utils')
     return {
         ...original,
-        getConfig: jest.fn()
+        getUrlConfig: jest.fn(),
+        getConfig: jest.fn(() => mockConfig)
     }
 })
 const originalLocation = window.location
@@ -22,10 +23,11 @@ const originalLocation = window.location
 afterEach(() => {
     // Restore `window.location` to the `jsdom` `Location` object
     window.location = originalLocation
+    jest.resetModules()
 })
 
 test('renders a link with locale prepended', () => {
-    getConfig.mockImplementation(() => mockConfig)
+    getUrlConfig.mockImplementation(() => mockConfig.app.url)
     delete window.location
     window.location = new URL('us/en-US', 'https://www.example.com')
     const {getByText} = renderWithProviders(<Link href="/mypage">My Page</Link>, {
@@ -35,12 +37,9 @@ test('renders a link with locale prepended', () => {
 })
 
 test('renders a link with locale and site as query param', () => {
-    getConfig.mockImplementation(() => ({
-        ...mockConfig,
-        url: {
-            site: 'query_param',
-            locale: 'query_param'
-        }
+    getUrlConfig.mockImplementation(() => ({
+        site: 'query_param',
+        locale: 'query_param'
     }))
     delete window.location
     window.location = new URL('https://www.example.com/women/dresses?site=us&locale=en-US')
@@ -52,7 +51,7 @@ test('renders a link with locale and site as query param', () => {
 })
 
 test('accepts `to` prop as well', () => {
-    getConfig.mockImplementation(() => mockConfig)
+    getUrlConfig.mockImplementation(() => mockConfig.app.url)
     delete window.location
     window.location = new URL('us/en-US', 'https://www.example.com')
     const {getByText} = renderWithProviders(<Link to="/mypage">My Page</Link>, {
@@ -62,7 +61,6 @@ test('accepts `to` prop as well', () => {
 })
 
 test('does not modify root url', () => {
-    getConfig.mockImplementation(() => mockConfig)
     const {getByText} = renderWithProviders(<Link href="/">My Page</Link>)
     expect(getByText(/My Page/i)).toHaveAttribute('href', '/')
 })

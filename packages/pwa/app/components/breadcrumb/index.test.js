@@ -7,7 +7,14 @@
 import React from 'react'
 import Breadcrumb from './index'
 import {renderWithProviders} from '../../utils/test-utils'
-
+import {mockConfig} from '../../utils/mocks/mockConfigData'
+jest.mock('../../utils/utils', () => {
+    const original = jest.requireActual('../../utils/utils')
+    return {
+        ...original,
+        getConfig: jest.fn(() => mockConfig)
+    }
+})
 const mockCategories = [
     {
         id: 1,

@@ -12,9 +12,18 @@ import App from './index.jsx'
 import {renderWithProviders} from '../../utils/test-utils'
 import {getSupportedLocalesIds} from '../../utils/locale.js'
 import {DEFAULT_LOCALE} from '../../utils/test-utils'
+import {mockConfig} from '../../utils/mocks/mockConfigData'
+import {SUPPORTED_LOCALES} from '../../utils/test-utils'
 
 let windowSpy
-
+jest.mock('../../utils/utils', () => {
+    const original = jest.requireActual('../../utils/utils')
+    return {
+        ...original,
+        getConfig: jest.fn(() => mockConfig),
+        getUrlConfig: jest.fn(() => mockConfig.app.url)
+    }
+})
 beforeAll(() => {
     jest.spyOn(console, 'log').mockImplementation(jest.fn())
     jest.spyOn(console, 'groupCollapsed').mockImplementation(jest.fn())
@@ -67,7 +76,7 @@ describe('App', () => {
         const hasGeneralLocale = ({hrefLang}) => hrefLang === DEFAULT_LOCALE.slice(0, 2)
 
         // `length + 2` because one for a general locale and the other with x-default value
-        expect(hreflangLinks.length).toBe(getSupportedLocalesIds().length + 2)
+        expect(hreflangLinks.length).toBe(getSupportedLocalesIds(SUPPORTED_LOCALES).length + 2)
 
         expect(hreflangLinks.some((link) => hasGeneralLocale(link))).toBe(true)
         expect(hreflangLinks.some((link) => link.hrefLang === 'x-default')).toBe(true)

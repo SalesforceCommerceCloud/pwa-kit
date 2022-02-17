@@ -8,16 +8,17 @@ import React from 'react'
 import NestedAccordion from './index'
 import {renderWithProviders} from '../../utils/test-utils'
 import {getConfig} from '../../utils/utils'
-
-jest.mock('../../hooks/use-site')
-
+import {mockConfig} from '../../utils/mocks/mockConfigData'
 jest.mock('../../utils/utils', () => {
     const original = jest.requireActual('../../utils/utils')
     return {
         ...original,
-        getConfig: jest.fn()
+        getConfig: jest.fn(() => mockConfig),
+        getUrlConfig: jest.fn(() => mockConfig.app.url)
     }
 })
+jest.mock('../../hooks/use-site')
+
 const mockItem = {
     id: 't1',
     name: 'Test One',

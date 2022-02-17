@@ -13,18 +13,8 @@ import {
     getSupportedLocalesIds
 } from './locale'
 
-import {DEFAULT_LOCALE} from './test-utils'
+import {DEFAULT_LOCALE, SUPPORTED_LOCALES} from './test-utils'
 
-const SUPPORTED_LOCALES = [
-    {
-        id: 'en-GB',
-        preferredCurrency: 'GBP'
-    },
-    {
-        id: 'de-DE',
-        preferredCurrency: 'EUR'
-    }
-]
 const supportedLocales = getSupportedLocalesIds(SUPPORTED_LOCALES)
 const isMultiLocales = supportedLocales.length > 1
 const nonSupportedLocale = 'nl-NL'

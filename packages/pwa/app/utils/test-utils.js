@@ -23,9 +23,19 @@ import {commerceAPIConfig, einsteinAPIConfig} from '../api.config'
 import {IntlProvider} from 'react-intl'
 import {urlPartPositions} from '../constants'
 import {mockCategories as initialMockCategories} from '../commerce-api/mock-data'
-
+import fallbackMessages from '../translations/compiled/en-GB.json'
 export const DEFAULT_LOCALE = 'en-GB'
 export const DEFAULT_CURRENCY = 'GBP'
+export const SUPPORTED_LOCALES = [
+    {
+        id: 'en-GB',
+        preferredCurrency: 'GBP'
+    },
+    {
+        id: 'de-DE',
+        preferredCurrency: 'EUR'
+    }
+]
 // Contexts
 import {CategoriesProvider, CurrencyProvider} from '../contexts'
 import {mockConfig} from './mocks/mockConfigData'
@@ -63,7 +73,8 @@ export const TestProviders = ({
     initialBasket = null,
     initialCustomer = null,
     initialCategories = initialMockCategories,
-    locale = DEFAULT_LOCALE
+    locale = DEFAULT_LOCALE,
+    messages = fallbackMessages
 }) => {
     const mounted = useRef()
     // We use this to track mounted state.
@@ -103,7 +114,7 @@ export const TestProviders = ({
         onClose: () => {}
     }
     return (
-        <IntlProvider locale={locale} defaultLocale={DEFAULT_LOCALE}>
+        <IntlProvider locale={locale} defaultLocale={DEFAULT_LOCALE} messages={messages}>
             <CommerceAPIProvider value={api}>
                 <CategoriesProvider categories={initialCategories}>
                     <CurrencyProvider currency={DEFAULT_CURRENCY}>
@@ -133,6 +144,7 @@ TestProviders.propTypes = {
     initialCustomer: PropTypes.object,
     initialCategories: PropTypes.element,
     initialProductLists: PropTypes.object,
+    messages: PropTypes.object,
     locale: PropTypes.string
 }
 
