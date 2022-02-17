@@ -7,7 +7,7 @@
 import React from 'react'
 import {renderWithProviders} from '../../utils/test-utils'
 import Link from './index'
-import {getConfig, getUrlConfig} from '../../utils/utils'
+import {getUrlConfig} from '../../utils/utils'
 import {mockConfig} from '../../utils/mocks/mockConfigData'
 
 jest.mock('../../utils/utils', () => {

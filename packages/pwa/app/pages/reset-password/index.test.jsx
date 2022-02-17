@@ -9,7 +9,7 @@ import {screen, waitFor, within} from '@testing-library/react'
 import user from '@testing-library/user-event'
 import {rest} from 'msw'
 import {setupServer} from 'msw/node'
-import {getPathname, renderWithProviders} from '../../utils/test-utils'
+import {renderWithProviders} from '../../utils/test-utils'
 import ResetPassword from '.'
 import {mockConfig} from '../../utils/mocks/mockConfigData'
 

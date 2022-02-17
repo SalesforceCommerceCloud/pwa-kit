@@ -7,6 +7,8 @@
 import React from 'react'
 import {renderWithReactIntl} from '../../utils/test-utils'
 import LoginRedirect from './index'
+import {mockConfig} from '../../utils/mocks/mockConfigData'
+
 jest.mock('../../utils/utils', () => {
     const original = jest.requireActual('../../utils/utils')
     return {

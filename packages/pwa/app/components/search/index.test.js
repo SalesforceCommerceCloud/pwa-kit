@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import {renderWithProviders, getPathname} from '../../utils/test-utils'
+import {renderWithProviders} from '../../utils/test-utils'
 import user from '@testing-library/user-event'
 import {screen, waitFor} from '@testing-library/react'
 import SearchInput from './index'
