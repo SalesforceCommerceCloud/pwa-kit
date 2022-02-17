@@ -58,7 +58,7 @@
     "watch": "1.0.1"
   },
   "peerDependencies": {
-    "pwa-kit-build": "^2.0.0-dev.1"
+    "pwa-kit-build": "^2.0.0-dev.2"
   },
   "peerDependenciesMeta": {
     "pwa-kit-build": {
