@@ -173,7 +173,7 @@ test('Can update item quantity in the cart', async () => {
     const incrementButton = await within(cartItem).findByTestId('quantity-increment')
 
     // update item quantity
-    fireEvent.mouseDown(incrementButton)
+    fireEvent.pointerDown(incrementButton)
 
     await waitFor(() => {
         expect(within(cartItem).getByDisplayValue('3'))
@@ -191,7 +191,8 @@ test('Can update item quantity from product view modal', async () => {
             {
                 ...mockedBasketResponse.productItems[0],
                 quantity: 3,
-                id: mockedBasketResponse.productItems[0].item_id
+                id: mockedBasketResponse.productItems[0].item_id,
+                stepQuantity: 1
             }
         ]
     }
@@ -210,7 +211,7 @@ test('Can update item quantity from product view modal', async () => {
     const incrementButton = await within(cartItem).findByTestId('quantity-increment')
 
     // update item quantity
-    fireEvent.mouseDown(incrementButton)
+    fireEvent.pointerDown(incrementButton)
 
     await waitFor(() => {
         expect(within(cartItem).getByDisplayValue('3'))
