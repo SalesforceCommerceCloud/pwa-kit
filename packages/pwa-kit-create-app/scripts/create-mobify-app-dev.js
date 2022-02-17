@@ -125,7 +125,7 @@ const runGenerator = () => {
     // See https://github.com/shelljs/shelljs/wiki/FAQ#running-interactive-programs-with-exec
     const cmd = 'npx'
     const args = ['pwa-kit-create-app', ...process.argv.slice(2)]
-    cp.execFileSync(cmd, args, {stdio: 'inherit'})
+    cp.execSync(cmd, args, {stdio: 'inherit'})
 }
 
 const main = () => {
