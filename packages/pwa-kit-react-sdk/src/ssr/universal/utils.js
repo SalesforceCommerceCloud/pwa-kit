@@ -78,6 +78,7 @@ export const getConfig = () => {
         )
     }
 
+    const isRemote = Object.prototype.hasOwnProperty.call(process.env, 'AWS_LAMBDA_FUNCTION_NAME')
     let moduleName = process?.env?.DEPLOY_TARGET || ''
 
     // Synchronously load the `cosmiconfig` so we don't get errors from webpack in the
@@ -85,25 +86,29 @@ export const getConfig = () => {
     const _require = eval('require')
     const {cosmiconfigSync} = _require('cosmiconfig')
 
-    // Mack config files based on the matching below from most specific to most general.
+    // Match config files based on the specificity from most to most general.
     const explorerSync = cosmiconfigSync(moduleName, {
         packageProp: 'mobify',
         searchPlaces: [
             `config/${moduleName}.yml`,
             `config/${moduleName}.yaml`,
             `config/${moduleName}.json`,
-            'config/local.yml',
-            'config/local.yaml',
-            'config/local.json',
-            'config/default.yml',
-            'config/default.yaml',
-            'config/default.json',
-            'package.json'
-        ]
+            `config/local.yml`,
+            `config/local.yaml`,
+            `config/local.json`,
+            `config/default.yml`,
+            `config/default.yaml`,
+            `config/default.json`,
+            `package.json`
+        ].map((path) => (isRemote ? `build/${path}` : path))
     })
 
     // Load the config synchronously using a custom "searchPlaces".
-    const {config} = explorerSync.search()
+    const {config} = explorerSync.search() || {}
+
+    if (!config) {
+        throw new Error('Application configuration not found!')
+    }
 
     return config
 }
