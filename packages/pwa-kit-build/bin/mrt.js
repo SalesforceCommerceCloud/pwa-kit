@@ -27,6 +27,28 @@ const main = () => {
     process.env.CONTEXT = process.cwd()
     program.description(`The Managed Runtime CLI`)
 
+    program.addHelpText('after', [
+        ``,
+        `Usage inside NPM scripts:`,
+        ``,
+        `  The mrt CLI is used in NPM scripts for projects so that`,
+        `  you can conveniently run eg. 'npm run push' to push a bundle.`,
+        ``,
+        `  If you want to pass args to mrt when it is wrapped in an NPM`,
+        `  script, you need to separate them with a '--' so that the args`,
+        `  aren't parsed by NPM itself. So, for example:`,
+        ``,
+        `    $ mrt push --target production`,
+        ``,
+        `  Would become this, when used in an NPM script:`,
+        ``,
+        `    $ npm run push -- --target production`,
+        ``,
+        `  See - https://docs.npmjs.com/cli/v8/commands/npm-run-script`,
+        `  for more information.`,
+        ``,
+    ].join('\n'))
+
     program
         .command('save-credentials')
         .description(`save API credentials for Managed Runtime`)
