@@ -17,7 +17,6 @@ jest.mock('../../utils/utils', () => {
         getUrlConfig: jest.fn(() => mockConfig.app.url)
     }
 })
-jest.mock('../../hooks/use-site')
 
 const mockItem = {
     id: 't1',
@@ -102,9 +101,6 @@ test('Renders NestedAccordion with items functions before and after', () => {
 
 test('Renders NestedAccordion with custom url builder', () => {
     const mockPath = '/mock-path'
-    getConfig.mockImplementation(() => ({
-        locale: 'path'
-    }))
     renderWithProviders(<NestedAccordion item={mockItem} urlBuilder={() => mockPath} />)
 
     const firstLeafLink = document.querySelector('.sf-nested-accordion a')

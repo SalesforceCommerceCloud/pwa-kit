@@ -39,7 +39,6 @@ let mockProductListSearchResponse = mockProductSearch
 jest.useFakeTimers()
 
 jest.mock('../../hooks/use-wishlist')
-jest.mock('../../hooks/use-site')
 
 jest.mock('../../commerce-api/utils', () => {
     const originalModule = jest.requireActual('../../commerce-api/utils')
