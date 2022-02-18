@@ -1,4 +1,4 @@
-const webpackConfig = require('pwa-kit-build/configs/webpack/config')
+const webpackConfig = require('pwa-kit-build/configs/webpack/base-config')
 
 const fs = require ('fs')
 const path = require('path')
@@ -18,6 +18,20 @@ const [client, ssr, renderer, clientOptional, requestProcessor] = webpackConfig
 client.resolve.extensions.push(".css")
 
 client.module.rules.push({
+    test: /\.css$/i,
+    use: [findInProjectThenSDK('style-loader'), findInProjectThenSDK('css-loader')]
+})
+
+clientOptional.resolve.extensions.push(".css")
+
+clientOptional.module.rules.push({
+    test: /\.css$/i,
+    use: [findInProjectThenSDK('style-loader'), findInProjectThenSDK('css-loader')]
+})
+
+ssr.resolve.extensions.push(".css")
+
+ssr.module.rules.push({
     test: /\.css$/i,
     use: [findInProjectThenSDK('style-loader'), findInProjectThenSDK('css-loader')]
 })
@@ -42,4 +56,5 @@ renderer.module.rules.push({
 // }
 
 
-module.exports = [client, ssr, renderer, clientOptional, requestProcessor]
+//note: request processor import is failing the build
+module.exports = [client, ssr, renderer, clientOptional]

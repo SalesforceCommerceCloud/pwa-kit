@@ -82,8 +82,13 @@ export const DevServerMixin = {
         // routes must not have our SSR middleware applied to them.
         // But the SSR render function must!
 
-        const webpackConfig = fetchWebpackConfig()
-        app.__compiler = webpack(webpackConfig)
+        //const [client, ssr, renderer, clientOptional, requestProcessor] = config
+
+        //console.log(config)
+
+        //console.log(client.module.rules)
+
+        app.__compiler = webpack(config)
         app.__devMiddleware = webpackDevMiddleware(app.__compiler, {serverSideRender: true})
         app.__webpackReady = () => Boolean(app.__devMiddleware.context.state)
         app.__devMiddleware.waitUntilValid(() => {
@@ -249,16 +254,6 @@ export const DevServerMixin = {
             return null
         }
     }
-}
-
-const fetchWebpackConfig = () => {
-    const projectWebpackPath = path.resolve(path.join(process.cwd(), 'webpack.config.js'))
-
-    if (fs.existsSync(projectWebpack)) {
-//        return await import(projectWebpackPath)
-    }
-
-    return config
 }
 
 /**
