@@ -10,77 +10,6 @@ import {renderWithProviders} from '../../../utils/test-utils'
 import {screen} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import useWishlist from '../../../hooks/use-wishlist'
-import {mockConfig} from '../../../utils/mocks/mockConfigData'
-
-jest.mock('../../../hooks/use-wishlist')
-jest.mock('../../../utils/utils', () => {
-    const original = jest.requireActual('../../../utils/utils')
-    return {
-        ...original,
-        getConfig: jest.fn(() => mockConfig),
-        getUrlConfig: jest.fn(() => mockConfig.app.url)
-    }
-})
-
-beforeEach(() => {
-    jest.resetModules()
-    jest.clearAllMocks()
-})
-
-test('Renders wishlist page', () => {
-    useWishlist.mockReturnValue({
-        isInitialized: true,
-        isEmpty: false,
-        hasDetail: true,
-        items: mockData.customerProductListItems
-    })
-
-    renderWithProviders(<AccountWishlist />)
-    expect(screen.getByTestId('account-wishlist-page')).toBeInTheDocument()
-    expect(screen.getByText(mockData.customerProductListItems[0].product.name)).toBeInTheDocument()
-})
-
-test('Can remove item from the wishlist', async () => {
-    const removeItemMock = jest.fn()
-    useWishlist.mockReturnValue({
-        isInitialized: true,
-        isEmpty: false,
-        hasDetail: true,
-        items: mockData.customerProductListItems,
-        removeListItem: removeItemMock
-    })
-
-    renderWithProviders(<AccountWishlist />)
-
-    const wishlistRemoveButton = await screen.findByTestId(
-        'sf-wishlist-remove-98ca9a3a9c8ee803543dc45cdc'
-    )
-    userEvent.click(wishlistRemoveButton)
-    userEvent.click(screen.getByRole('button', {name: /yes, remove item/i}))
-    expect(removeItemMock).toBeCalled()
-})
-
-test('renders no wishlist items for empty wishlist', () => {
-    useWishlist.mockReturnValue({
-        isInitialized: true,
-        isEmpty: true,
-        hasDetail: true
-    })
-    renderWithProviders(<AccountWishlist />)
-
-    expect(screen.getByText(/no wishlist items/i)).toBeInTheDocument()
-    expect(screen.getByRole('button', {name: /continue shopping/i})).toBeInTheDocument()
-})
-
-test('renders skeleton when product list is loading', () => {
-    useWishlist.mockReturnValue({
-        isInitialized: false,
-        isEmpty: true
-    })
-
-    renderWithProviders(<AccountWishlist />)
-    expect(screen.getByTestId('sf-wishlist-skeleton')).toBeInTheDocument()
-})
 
 const mockData = {
     creationDate: '2021-09-13T23:29:23.396Z',
@@ -415,3 +344,64 @@ const mockData = {
     public: false,
     type: 'wish_list'
 }
+
+jest.mock('../../../hooks/use-wishlist')
+
+beforeEach(() => {
+    jest.resetModules()
+})
+
+test('Renders wishlist page', () => {
+    useWishlist.mockReturnValue({
+        isInitialized: true,
+        isEmpty: false,
+        hasDetail: true,
+        items: mockData.customerProductListItems
+    })
+
+    renderWithProviders(<AccountWishlist />)
+    expect(screen.getByTestId('account-wishlist-page')).toBeInTheDocument()
+    expect(screen.getByText(mockData.customerProductListItems[0].product.name)).toBeInTheDocument()
+})
+
+test('Can remove item from the wishlist', async () => {
+    const removeItemMock = jest.fn()
+    useWishlist.mockReturnValue({
+        isInitialized: true,
+        isEmpty: false,
+        hasDetail: true,
+        items: mockData.customerProductListItems,
+        removeListItem: removeItemMock
+    })
+
+    renderWithProviders(<AccountWishlist />)
+
+    const wishlistRemoveButton = await screen.findByTestId(
+        'sf-wishlist-remove-98ca9a3a9c8ee803543dc45cdc'
+    )
+    userEvent.click(wishlistRemoveButton)
+    userEvent.click(screen.getByRole('button', {name: /yes, remove item/i}))
+    expect(removeItemMock).toBeCalled()
+})
+
+test('renders no wishlist items for empty wishlist', () => {
+    useWishlist.mockReturnValue({
+        isInitialized: true,
+        isEmpty: true,
+        hasDetail: true
+    })
+    renderWithProviders(<AccountWishlist />)
+
+    expect(screen.getByText(/no wishlist items/i)).toBeInTheDocument()
+    expect(screen.getByRole('button', {name: /continue shopping/i})).toBeInTheDocument()
+})
+
+test('renders skeleton when product list is loading', () => {
+    useWishlist.mockReturnValue({
+        isInitialized: false,
+        isEmpty: true
+    })
+
+    renderWithProviders(<AccountWishlist />)
+    expect(screen.getByTestId('sf-wishlist-skeleton')).toBeInTheDocument()
+})

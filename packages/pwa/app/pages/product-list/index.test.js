@@ -23,16 +23,7 @@ import ProductList from '.'
 import EmptySearchResults from './partials/empty-results'
 import useCustomer from '../../commerce-api/hooks/useCustomer'
 import useWishlist from '../../hooks/use-wishlist'
-import {mockConfig} from '../../utils/mocks/mockConfigData'
 
-jest.mock('../../utils/utils', () => {
-    const original = jest.requireActual('../../utils/utils')
-    return {
-        ...original,
-        getConfig: jest.fn(() => mockConfig),
-        getUrlConfig: jest.fn(() => mockConfig.app.url)
-    }
-})
 jest.setTimeout(60000)
 let mockCategoriesResponse = mockCategories
 let mockProductListSearchResponse = mockProductSearch

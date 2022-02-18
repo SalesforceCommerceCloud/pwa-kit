@@ -198,11 +198,11 @@ export const getParamsFromPath = (path, urlConfig = {}) => {
  */
 //TODO: Remove this when the work from SDK is merged
 export const getConfig = (opts = {}) => {
-    let _config
-
     if (typeof window !== 'undefined') {
-        _config = JSON.parse(document.getElementById('app-config').innerHTML)
-        return _config
+        return (
+            window.__CONFIG__ ||
+            JSON.parse(document.getElementById('mobify-data').innerHTML).__CONFIG__
+        )
     }
 
     // doing this to force Webpack to ignore a

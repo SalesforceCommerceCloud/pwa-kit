@@ -17,7 +17,7 @@ import {
     buildPathWithUrlConfig
 } from './url'
 import {getUrlConfig} from './utils'
-import {mockConfig} from './mocks/mockConfigData'
+import mockConfig from '../../config/default.json'
 
 jest.mock('./utils', () => {
     const original = jest.requireActual('./utils')

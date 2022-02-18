@@ -12,7 +12,7 @@ import {renderWithProviders} from '../utils/test-utils'
 import {AuthModal, useAuthModal} from './use-auth-modal'
 import {BrowserRouter as Router, Route} from 'react-router-dom'
 import Account from '../pages/account'
-import {mockConfig} from '../utils/mocks/mockConfigData'
+import mockConfig from '../../config/default.json'
 
 jest.mock('../utils/utils', () => {
     const original = jest.requireActual('../utils/utils')

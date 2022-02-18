@@ -18,7 +18,7 @@ import useBasket from '../../commerce-api/hooks/useBasket'
 import useShopper from '../../commerce-api/hooks/useShopper'
 import {mockedRegisteredCustomer, ocapiOrderResponse} from '../../commerce-api/mock-data'
 import {mockedGuestCustomer, exampleTokenReponse} from '../../commerce-api/mock-data'
-import {mockConfig} from '../../utils/mocks/mockConfigData'
+import {mockConfig} from '../../../config/mocks/mockConfigData'
 
 jest.mock('../../utils/utils', () => {
     const original = jest.requireActual('../../utils/utils')

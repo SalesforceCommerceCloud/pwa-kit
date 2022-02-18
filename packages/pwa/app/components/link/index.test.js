@@ -7,27 +7,26 @@
 import React from 'react'
 import {renderWithProviders} from '../../utils/test-utils'
 import Link from './index'
-import {getUrlConfig} from '../../utils/utils'
-import {mockConfig} from '../../utils/mocks/mockConfigData'
-
-jest.mock('../../utils/utils', () => {
-    const original = jest.requireActual('../../utils/utils')
-    return {
-        ...original,
-        getUrlConfig: jest.fn(),
-        getConfig: jest.fn(() => mockConfig)
-    }
-})
+import mockConfig from '../../../config/mocks/default.json'
 const originalLocation = window.location
+const originalConfig = window.__CONFIG__
+
+beforeEach(() => {
+    // Restore window.__CONFIG
+    Object.defineProperty(window, '__CONFIG__', {
+        value: originalConfig,
+        configurable: true
+    })
+})
 
 afterEach(() => {
     // Restore `window.location` to the `jsdom` `Location` object
     window.location = originalLocation
+
     jest.resetModules()
 })
 
 test('renders a link with locale prepended', () => {
-    getUrlConfig.mockImplementation(() => mockConfig.app.url)
     delete window.location
     window.location = new URL('us/en-US', 'https://www.example.com')
     const {getByText} = renderWithProviders(<Link href="/mypage">My Page</Link>, {
@@ -37,10 +36,17 @@ test('renders a link with locale prepended', () => {
 })
 
 test('renders a link with locale and site as query param', () => {
-    getUrlConfig.mockImplementation(() => ({
-        site: 'query_param',
-        locale: 'query_param'
-    }))
+    delete window.__CONFIG__
+    window.__CONFIG__ = {
+        ...mockConfig,
+        app: {
+            ...mockConfig.app,
+            url: {
+                site: 'query_param',
+                locale: 'query_param'
+            }
+        }
+    }
     delete window.location
     window.location = new URL('https://www.example.com/women/dresses?site=us&locale=en-US')
     const {getByText} = renderWithProviders(<Link href="/mypage">My Page</Link>, {
@@ -51,12 +57,12 @@ test('renders a link with locale and site as query param', () => {
 })
 
 test('accepts `to` prop as well', () => {
-    getUrlConfig.mockImplementation(() => mockConfig.app.url)
     delete window.location
     window.location = new URL('us/en-US', 'https://www.example.com')
     const {getByText} = renderWithProviders(<Link to="/mypage">My Page</Link>, {
         wrapperProps: {locale: 'en-US'}
     })
+    console.log('window.__CONFIG__', window.__CONFIG__)
     expect(getByText(/My Page/i)).toHaveAttribute('href', '/us/en-US/mypage')
 })
 

@@ -15,15 +15,7 @@ import {BrowserRouter as Router, Route} from 'react-router-dom'
 import Account from '../account'
 import Registration from '../registration'
 import ResetPassword from '../reset-password'
-import {mockConfig} from '../../utils/mocks/mockConfigData'
-jest.mock('../../utils/utils', () => {
-    const original = jest.requireActual('../../utils/utils')
-    return {
-        ...original,
-        getConfig: jest.fn(() => mockConfig),
-        getUrlConfig: jest.fn(() => mockConfig.app.url)
-    }
-})
+
 jest.setTimeout(60000)
 
 const mockRegisteredCustomer = {

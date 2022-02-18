@@ -10,7 +10,7 @@ import {screen} from '@testing-library/react'
 import CheckoutFooter from './checkout-footer'
 import {renderWithProviders} from '../../../utils/test-utils'
 
-import {mockConfig} from '../../../utils/mocks/mockConfigData'
+import {mockConfig} from '../../../../config/mocks/mockConfigData'
 jest.mock('../../../utils/utils', () => {
     const original = jest.requireActual('../../../utils/utils')
     return {

@@ -7,15 +7,6 @@
 import React from 'react'
 
 import {configureRoutes} from './routes-utils'
-import {mockConfig} from './mocks/mockConfigData'
-
-jest.mock('./utils', () => {
-    const original = jest.requireActual('./utils')
-    return {
-        ...original,
-        getConfig: jest.fn(() => mockConfig)
-    }
-})
 
 describe('configureRoutes', function() {
     const env = process.env

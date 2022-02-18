@@ -12,18 +12,9 @@ import App from './index.jsx'
 import {renderWithProviders} from '../../utils/test-utils'
 import {getSupportedLocalesIds} from '../../utils/locale.js'
 import {DEFAULT_LOCALE} from '../../utils/test-utils'
-import {mockConfig} from '../../utils/mocks/mockConfigData'
 import {SUPPORTED_LOCALES} from '../../utils/test-utils'
 import messages from '../../translations/compiled/en-GB.json'
 let windowSpy
-jest.mock('../../utils/utils', () => {
-    const original = jest.requireActual('../../utils/utils')
-    return {
-        ...original,
-        getConfig: jest.fn(() => mockConfig),
-        getUrlConfig: jest.fn(() => mockConfig.app.url)
-    }
-})
 beforeAll(() => {
     jest.spyOn(console, 'log').mockImplementation(jest.fn())
     jest.spyOn(console, 'groupCollapsed').mockImplementation(jest.fn())

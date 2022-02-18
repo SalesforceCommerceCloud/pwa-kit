@@ -20,7 +20,6 @@ import {
 } from '../../commerce-api/mock-data'
 import useCustomer from '../../commerce-api/hooks/useCustomer'
 import Account from './index'
-import {mockConfig} from '../../utils/mocks/mockConfigData'
 
 jest.mock('../../commerce-api/utils', () => {
     const originalModule = jest.requireActual('../../commerce-api/utils')
@@ -30,14 +29,6 @@ jest.mock('../../commerce-api/utils', () => {
     }
 })
 
-jest.mock('../../utils/utils', () => {
-    const original = jest.requireActual('../../utils/utils')
-    return {
-        ...original,
-        getConfig: jest.fn(() => mockConfig),
-        getUrlConfig: jest.fn(() => mockConfig.app.url)
-    }
-})
 const expectedBasePath = `/uk/en-GB`
 
 const MockedComponent = () => {

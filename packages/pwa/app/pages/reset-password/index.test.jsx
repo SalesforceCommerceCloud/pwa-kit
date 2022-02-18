@@ -11,16 +11,7 @@ import {rest} from 'msw'
 import {setupServer} from 'msw/node'
 import {renderWithProviders} from '../../utils/test-utils'
 import ResetPassword from '.'
-import {mockConfig} from '../../utils/mocks/mockConfigData'
 
-jest.mock('../../utils/utils', () => {
-    const original = jest.requireActual('../../utils/utils')
-    return {
-        ...original,
-        getConfig: jest.fn(() => mockConfig),
-        getUrlConfig: jest.fn(() => mockConfig.app.url)
-    }
-})
 jest.setTimeout(60000)
 
 const mockRegisteredCustomer = {

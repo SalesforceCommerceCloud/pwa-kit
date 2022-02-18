@@ -18,7 +18,7 @@ import {
 } from '../../commerce-api/mock-data'
 import useCustomer from '../../commerce-api/hooks/useCustomer'
 import Orders from './orders'
-import {mockConfig} from '../../utils/mocks/mockConfigData'
+import {mockConfig} from '../../../config/mocks/mockConfigData'
 
 jest.mock('../../commerce-api/utils', () => {
     const originalModule = jest.requireActual('../../commerce-api/utils')

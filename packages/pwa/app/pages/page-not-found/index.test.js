@@ -8,16 +8,7 @@ import React from 'react'
 import PageNotFound from './index'
 import {renderWithProviders} from '../../utils/test-utils'
 import {screen} from '@testing-library/react'
-import {mockConfig} from '../../utils/mocks/mockConfigData'
 
-jest.mock('../../utils/utils', () => {
-    const original = jest.requireActual('../../utils/utils')
-    return {
-        ...original,
-        getConfig: jest.fn(() => mockConfig),
-        getUrlConfig: jest.fn(() => mockConfig.app.url)
-    }
-})
 // Set up and clean up
 beforeEach(() => {
     jest.resetModules()

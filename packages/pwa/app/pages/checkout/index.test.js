@@ -24,7 +24,6 @@ import {
     mockedCustomerProductLists,
     productsResponse
 } from '../../commerce-api/mock-data'
-import {mockConfig} from '../../utils/mocks/mockConfigData'
 
 jest.setTimeout(60000)
 
@@ -33,14 +32,6 @@ Object.defineProperty(window, 'fetch', {
     value: require('cross-fetch')
 })
 
-jest.mock('../../utils/utils', () => {
-    const original = jest.requireActual('../../utils/utils')
-    return {
-        ...original,
-        getConfig: jest.fn(() => mockConfig),
-        getUrlConfig: jest.fn(() => mockConfig.app.url)
-    }
-})
 jest.mock('../../commerce-api/utils', () => {
     const originalModule = jest.requireActual('../../commerce-api/utils')
     return {

@@ -17,7 +17,6 @@ import mockBasketWithSuit from '../../commerce-api/mocks/basket-with-suit'
 import mockVariant from '../../commerce-api/mocks/variant-750518699578M'
 import mockEmptyBasket from '../../commerce-api/mocks/empty-basket'
 import {keysToCamel} from '../../commerce-api/utils'
-import {mockConfig} from '../../utils/mocks/mockConfigData'
 
 jest.setTimeout(60000)
 
@@ -31,14 +30,7 @@ jest.mock('../../commerce-api/auth', () => {
         }
     }
 })
-jest.mock('../../utils/utils', () => {
-    const original = jest.requireActual('../../utils/utils')
-    return {
-        ...original,
-        getConfig: jest.fn(() => mockConfig),
-        getUrlConfig: jest.fn(() => mockConfig.app.url)
-    }
-})
+
 jest.mock('../../commerce-api/einstein')
 
 jest.mock('../../commerce-api/ocapi-shopper-baskets', () => {
