@@ -7,7 +7,6 @@
 import React from 'react'
 import NestedAccordion from './index'
 import {renderWithProviders} from '../../utils/test-utils'
-import {getConfig} from '../../utils/utils'
 import {mockConfig} from '../../utils/mocks/mockConfigData'
 jest.mock('../../utils/utils', () => {
     const original = jest.requireActual('../../utils/utils')
