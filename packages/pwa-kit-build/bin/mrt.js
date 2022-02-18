@@ -13,6 +13,7 @@ const {execSync: _execSync} = require('child_process')
 const scriptUtils = require('../scripts/utils')
 const sh = require('shelljs')
 const uploadBundle = require('../scripts/upload.js')
+const pkg = require('../package.json')
 
 const pkgRoot = p.join(__dirname, '..')
 
@@ -25,29 +26,38 @@ const execSync = (cmd, opts) => {
 
 const main = () => {
     process.env.CONTEXT = process.cwd()
-    program.description(`The Managed Runtime CLI`)
+    program.description(
+        [
+            `The Managed Runtime CLI`,
+            ``,
+            `For more information run a command with the --help flag, eg.`,
+            ``,
+            `  $ mrt push --help`
+        ].join('\n')
+    )
 
-    program.addHelpText('after', [
-        ``,
-        `Usage inside NPM scripts:`,
-        ``,
-        `  The mrt CLI is used in NPM scripts for projects so that`,
-        `  you can conveniently run eg. 'npm run push' to push a bundle.`,
-        ``,
-        `  If you want to pass args to mrt when it is wrapped in an NPM`,
-        `  script, you need to separate them with a '--' so that the args`,
-        `  aren't parsed by NPM itself. So, for example:`,
-        ``,
-        `    $ mrt push --target production`,
-        ``,
-        `  Would become this, when used in an NPM script:`,
-        ``,
-        `    $ npm run push -- --target production`,
-        ``,
-        `  See - https://docs.npmjs.com/cli/v8/commands/npm-run-script`,
-        `  for more information.`,
-        ``,
-    ].join('\n'))
+    program.addHelpText(
+        'after',
+        [
+            ``,
+            `Usage inside NPM scripts:`,
+            ``,
+            `  The mrt CLI is used in NPM scripts so you can conveniently`,
+            `  run eg. 'npm run push' to push a bundle from a project.`,
+            ``,
+            `  To pass args to mrt when wrapped in an NPM script, separate them`,
+            `  with '--' so they aren't parsed by NPM itself, eg:`,
+            ``,
+            `    $ mrt push --target production`,
+            ``,
+            `  Would become this, when used in an NPM script:`,
+            ``,
+            `    $ npm run push -- --target production`,
+            ``,
+            `  See https://docs.npmjs.com/cli/v8/commands/npm-run-script`,
+            ``
+        ].join('\n')
+    )
 
     program
         .command('save-credentials')
@@ -120,7 +130,7 @@ const main = () => {
 
     program
         .command('push')
-        .description(`push a bundle to managed runtime`)
+        .description(`push a bundle to Managed Runtime`)
         .addOption(
             new program.Option(
                 '-b --buildDirectory <buildDirectory>',
@@ -142,7 +152,7 @@ const main = () => {
         .addOption(
             new program.Option(
                 '-t --target <target>',
-                'a custom target to upload a bundle to within Managed Runtime'
+                'immediately deploy the bundle to this target once it is pushed'
             )
         )
         .action(({buildDirectory, message, projectSlug, target}) => {
@@ -205,6 +215,14 @@ const main = () => {
             const jest = p.join(require.resolve('jest'), '..', '..', '..', '.bin', 'jest')
             execSync(`${jest} --passWithNoTests --maxWorkers=2${jestArgs ? ' ' + jestArgs : ''}`)
         })
+
+    program.option('-v --version', 'show version number').action(({version}) => {
+        if (version) {
+            console.log(pkg.version)
+        } else {
+            program.help({error: true})
+        }
+    })
 
     program.parse(process.argv)
 }
