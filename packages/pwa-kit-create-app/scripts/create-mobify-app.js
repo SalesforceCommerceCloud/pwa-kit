@@ -189,10 +189,10 @@ const runGenerator = (answers, {outputDir}) => {
     )
 
     console.log('Installing dependencies for the generated project...')
-    sh.exec(`npm install --no-progress`, {
+    sh.exec(`npm install`, {
         env: process.env,
         cwd: outputDir,
-        silent: true
+        silent: false
     })
 }
 
