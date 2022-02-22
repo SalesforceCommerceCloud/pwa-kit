@@ -36,7 +36,6 @@ import {heroFeatures, features} from './data'
 // Constants
 import {HOME_SHOP_PRODUCTS_CATEGORY_ID, HOME_SHOP_PRODUCTS_LIMIT} from '../../constants'
 
-
 import css from "./style.css"
 
 /**

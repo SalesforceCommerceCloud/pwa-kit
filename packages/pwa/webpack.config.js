@@ -49,7 +49,7 @@ renderer.module.rules.push({
 //     console.log(rule)
 // }
 
-// console.log(ssr)
+// // console.log(ssr)
 
 // for (rule of ssr.module.rules) {
 //     console.log(rule)
@@ -57,4 +57,5 @@ renderer.module.rules.push({
 
 
 //note: request processor import is failing the build
-module.exports = [client, ssr, renderer, clientOptional]
+module.exports = [client, ssr, renderer, clientOptional, requestProcessor]
+    .filter(Boolean)
