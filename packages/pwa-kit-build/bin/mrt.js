@@ -74,7 +74,7 @@ const main = () => {
             }
         )
         .requiredOption(
-            '-k --key <api-key>',
+            '-k, --key <api-key>',
             `find your API key at https://runtime.commercecloud.com/account/settings`,
             (val) => {
                 if (!(typeof val === 'string') && val.length > 0) {
@@ -133,25 +133,25 @@ const main = () => {
         .description(`push a bundle to Managed Runtime`)
         .addOption(
             new program.Option(
-                '-b --buildDirectory <buildDirectory>',
+                '-b, --buildDirectory <buildDirectory>',
                 'a custom project directory where your build is located'
             ).default(p.join(process.cwd(), 'build'), './build')
         )
         .addOption(
             new program.Option(
-                '-m --message <message>',
+                '-m, --message <message>',
                 "a message to include along with the uploaded bundle in Managed Runtime (default: '<git branch>:<git commit hash>')"
             )
         )
         .addOption(
             new program.Option(
-                '-s --projectSlug <projectSlug>',
+                '-s, --projectSlug <projectSlug>',
                 "a project slug that differs from the name property in your project's package.json (default: the 'name' key from the package.json)"
             ).default(projectPkg.name)
         )
         .addOption(
             new program.Option(
-                '-t --target <target>',
+                '-t, --target <target>',
                 'immediately deploy the bundle to this target once it is pushed'
             )
         )
@@ -216,7 +216,7 @@ const main = () => {
             execSync(`${jest} --passWithNoTests --maxWorkers=2${jestArgs ? ' ' + jestArgs : ''}`)
         })
 
-    program.option('-v --version', 'show version number').action(({version}) => {
+    program.option('-v, --version', 'show version number').action(({version}) => {
         if (version) {
             console.log(pkg.version)
         } else {
