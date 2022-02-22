@@ -756,14 +756,6 @@ describe('SSRServer operation', () => {
             .expect(500)
     })
 
-    test('SSRServer handles /mobify/ping', () => {
-        const app = createApp(opts())
-
-        return request(app)
-            .get('/mobify/ping')
-            .expect(200)
-    })
-
     describe('SSRServer worker.js handling', () => {
         let buildDir
         beforeEach(() => {
