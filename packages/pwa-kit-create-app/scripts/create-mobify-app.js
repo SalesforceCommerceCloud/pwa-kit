@@ -36,6 +36,7 @@
 const p = require('path')
 const fs = require('fs')
 const os = require('os')
+const child_proc = require('child_process')
 const {Command} = require('commander')
 const inquirer = require('inquirer')
 const {URL} = require('url')
@@ -188,11 +189,20 @@ const runGenerator = (answers, {outputDir}) => {
         p.resolve(outputDir, 'app', 'api.config.js')
     )
 
-    console.log('Installing dependencies for the generated project...')
-    sh.exec(`npm install`, {
-        env: process.env,
+    npmInstall(outputDir)
+}
+
+const npmInstall = (outputDir) => {
+    console.log('Installing dependencies for the generated project. This may take a few minutes.\n')
+    child_proc.execSync('npm install --quiet', {
         cwd: outputDir,
-        silent: false
+        stdio: 'inherit',
+        env: {
+            ...process.env,
+            OPENCOLLECTIVE_HIDE: 'true',
+            DISABLE_OPENCOLLECTIVE: 'true',
+            OPEN_SOURCE_CONTRIBUTOR: 'true'
+        }
     })
 }
 
@@ -353,12 +363,7 @@ const generateHelloWorld = (projectId, {outputDir}) => {
     const finalPkgData = merge(pkgJSON, {name: projectId})
     writeJson(pkgJsonPath, finalPkgData)
 
-    console.log('Installing dependencies for the generated project...')
-    sh.exec(`npm install --no-progress`, {
-        env: process.env,
-        cwd: outputDir,
-        silent: true
-    })
+    npmInstall(outputDir)
 }
 
 const presetPrompt = () => {
