@@ -210,14 +210,10 @@ export const createApp = (options) => {
 
     const app = createExpressApp(options)
 
+    // Attch the application configuration making it available app-wide.
+    app.config = options.mobify
+
     // Attach built in routes and middleware
-
-    // Attach the application configuration to the request object.
-    app.use((req, _, next) => {
-        req.config = options.mobify
-
-        next()
-    })
 
     // Attach this middleware as early as possible. It does timing
     // and applies some early processing that must occur before
