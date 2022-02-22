@@ -81,7 +81,7 @@ const withLocalNPMRepo = (func) => {
                         cwd: verdaccioConfigDir,
                         async: true,
                         fatal: true,
-                        silent: true
+                        stdio: 'inherit'
                     })
 
                     child.stdout.on('data', (data) => {
