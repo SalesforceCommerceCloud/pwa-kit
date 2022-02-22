@@ -264,22 +264,6 @@ export const createApp = (options) => {
         })
     }
 
-    // Healthcheck
-    app.get(/^\/(pwa-kit|mobify)\/ping$/, (_, res) =>
-        res
-            .set('cache-control', NO_CACHE)
-            .sendStatus(200)
-            .end()
-    )
-
-    // Configuration endpoint
-    app.get(/^\/(pwa-kit|mobify)\/config$/, (req, res) =>
-        res
-            .set('cache-control', NO_CACHE)
-            .json(req.config)
-            .end()
-    )
-
     // Proxying
     const shouldProxy = !isRemote() || options.enableLegacyRemoteProxying
     if (shouldProxy) {
