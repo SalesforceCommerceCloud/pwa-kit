@@ -77,11 +77,15 @@ const withLocalNPMRepo = (func) => {
                     const logStream = fs.createWriteStream(logFileName, {flags: 'a'})
                     console.log('Starting up local NPM repository')
 
-                    child = sh.exec(`${verdaccio} --config config.yaml`, {
+                    child = cp.exec(`${verdaccio} --config config.yaml`, {
                         cwd: verdaccioConfigDir,
-                        async: true,
-                        fatal: true,
-                        stdio: 'inherit'
+                        stdio: 'inherit',
+                        env: {
+                            ...process.env,
+                            OPENCOLLECTIVE_HIDE: 'true',
+                            DISABLE_OPENCOLLECTIVE: 'true',
+                            OPEN_SOURCE_CONTRIBUTOR: 'true'
+                        }
                     })
 
                     child.stdout.on('data', (data) => {
@@ -93,8 +97,8 @@ const withLocalNPMRepo = (func) => {
                         }
                     })
 
-                    child.stdout.pipe(logStream)
-                    child.stderr.pipe(logStream)
+                    child.stdout.pipe(process.stdout)
+                    child.stderr.pipe(process.stderr)
                 })
         )
         .then(() => {
