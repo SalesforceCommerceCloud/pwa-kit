@@ -7,8 +7,6 @@
 
 const Utils = require('./utils')
 
-const pkg = require('../package.json')
-
 let realFail
 beforeEach(() => {
     realFail = Utils.fail
@@ -17,24 +15,5 @@ beforeEach(() => {
 
 afterEach(() => {
     Utils.fail = realFail
-})
-
-test('getRequestHeaders sets the User-Agent header', () => {
-    const result = Utils.getRequestHeaders()
-    expect(result['User-Agent']).toBe(`progressive-web-sdk#${pkg.version}`)
-})
-
-test('getRequestHeaders copies over headers from the passed object', () => {
-    const additionalHeaders = {
-        Cryptography: 'none',
-        Context: 'testing',
-        Connections: 'mocked out'
-    }
-
-    const result = Utils.getRequestHeaders(additionalHeaders)
-
-    Object.keys(additionalHeaders).forEach((key) => {
-        expect(result[key]).toBe(additionalHeaders[key])
-    })
 })
 
