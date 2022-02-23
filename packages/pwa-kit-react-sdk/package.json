@@ -10,7 +10,8 @@
     "sdk-create-hash-manifest": "bin/create-hash-manifest.js"
   },
   "engines": {
-    "node": "^12.0.0 || ^14.0.0"
+    "node": "^12.0.0 || ^14.0.0",
+    "npm": "^6.14.4 || ^7.0.0 || ^8.0.0"
   },
   "files": [
     "bin",
@@ -80,7 +81,6 @@
     "set-cookie-parser": "^2.2.1",
     "tti-polyfill": "0.2.2",
     "ua-parser-js": "^0.7.24",
-    "url-parse": "^1.4.7",
     "validator": "^13.7.0",
     "webpack-bundle-analyzer": "^4.4.0",
     "webpack-notifier": "^1.12.0",

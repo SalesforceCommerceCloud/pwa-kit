@@ -37,6 +37,10 @@
             ]
         }
     },
+    "engines": {
+        "node": "^12.0.0 || ^14.0.0",
+        "npm": "^6.14.4 || ^7.0.0 || ^8.0.0"
+    },
     "dependencies": {
         "@chakra-ui/react": "^1.7.1",
         "@chakra-ui/skip-nav": "^1.1.4",
@@ -115,6 +119,7 @@
         "ignore-styles": "5.0.1",
         "jest": "^26.6.3",
         "jest-cli": "^26.6.3",
+        "jest-fetch-mock": "^2.1.2",
         "msw": "^0.28.1",
         "njwt": "^1.0.0",
         "nock": "^13.1.1",
