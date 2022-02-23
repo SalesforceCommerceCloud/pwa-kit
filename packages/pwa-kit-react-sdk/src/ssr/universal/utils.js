@@ -72,6 +72,8 @@ export const getProxyConfigs = () => {
 /* istanbul ignore next */
 export const getConfig = () => {
     if (onClient) {
+        // NOTE: If this function is used before the application's start the `__CONFIG__` will
+        // have not been set yet. In this occasion we'll based the content directly from html.
         return (
             window.__CONFIG__ ||
             JSON.parse(document.getElementById('mobify-data').innerHTML).__CONFIG__
