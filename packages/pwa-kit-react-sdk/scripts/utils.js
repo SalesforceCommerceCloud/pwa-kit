@@ -16,32 +16,6 @@ const DEFAULT_DOCS_URL = 'http://sfdc.co/pwa-kit'
 const Utils = {}
 
 
-Utils.errorForStatus = (response) => {
-    const status = response.statusCode
-
-    if (status < 400) {
-        return false
-    }
-
-    let error
-    try {
-        error = JSON.parse(response.body)
-    } catch (err) {
-        // We set this to an empty object to resolve issues where response.body
-        // is not a JSON or properly-formatted JSON object
-        // e.g. response.body === 'Unauthorized'
-        error = {}
-    }
-
-    return new Error(
-        [
-            `HTTP ${status}`,
-            error.message || response.body,
-            `For more information visit ${error.docs_url || DEFAULT_DOCS_URL}$`
-        ].join('\n')
-    )
-}
-
 Utils.exists = fileUtils.statAsync
 
 /* istanbul ignore next */

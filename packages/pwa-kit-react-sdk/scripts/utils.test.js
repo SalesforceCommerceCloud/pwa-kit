@@ -38,15 +38,3 @@ test('getRequestHeaders copies over headers from the passed object', () => {
     })
 })
 
-test('errorForStatus returns false for 2xx and 3xx statuses', () => {
-    ;[200, 201, 302, 303, 304].forEach((statusCode) => {
-        expect(Utils.errorForStatus({statusCode})).toBe(false)
-    })
-})
-
-test('errorForStatus returns an Error for 4xx and 5xx statuses', () => {
-    ;[400, 401, 403, 404, 500, 503].forEach((statusCode) => {
-        expect(Utils.errorForStatus({statusCode})).toBeInstanceOf(Error)
-    })
-})
-
