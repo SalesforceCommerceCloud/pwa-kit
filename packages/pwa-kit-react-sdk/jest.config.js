@@ -19,7 +19,7 @@ module.exports = {
         '!docs/**/*.{js,jsx}',
         '!vendor/**/*',
         '!*.config.js',
-        '!scripts/{setup-jsdom,console-output}.js',
+        '!scripts/{setup-jsdom}.js',
         '!src/utils/{testing,cookie-manager}.js',
         '!src/index.js',
         '!src/{polyfill,test-utils,load-scripts}.js',
