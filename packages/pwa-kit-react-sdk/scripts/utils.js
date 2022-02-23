@@ -41,13 +41,4 @@ Utils.handleRequestError = (error) => {
     throw new Error(error.message)
 }
 
-Utils.requestErrorMessage = {
-    code401: 'Invalid api_key.',
-    code403:
-        'You do not have permission to perform this actions.\nPlease double check your command to make sure the option values are correct.', //  wrong project name.
-    code404:
-        'Resource not found.\nPlease double check your command to make sure the option values are correct.', // wrong target name
-    code500: 'Internal Server Error. Please report this to Salesforce support team.'
-}
-
 module.exports = Utils
