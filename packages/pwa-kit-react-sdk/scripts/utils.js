@@ -8,8 +8,6 @@
 /* eslint-disable strict */
 'use strict'
 
-const git = require('git-rev-sync')
-
 const fileUtils = require('./file-utils')
 
 const SDK_VERSION = require('../package.json').version
@@ -82,17 +80,6 @@ Utils.readCredentials = (filepath) => {
             /* istanbul ignore next */ (e) =>
                 Utils.fail(`Error parsing "${filepath}".\n` + `[${e}]`)
         )
-}
-
-Utils.setDefaultMessage = () => {
-    try {
-        return `${git.branch()}: ${git.short()}`
-    } catch (err) {
-        if (err.code === 'ENOENT') {
-            console.log('Please run "git init" to initialize a new Git repository.')
-        }
-        return 'Mobify Bundle'
-    }
 }
 
 Utils.delayedPromise = (value, delay) => {

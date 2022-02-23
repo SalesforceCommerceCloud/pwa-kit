@@ -7,15 +7,7 @@
 
 const Utils = require('./utils')
 
-const fs = require('fs')
-const path = require('path')
-const os = require('os')
-const rimraf = require('rimraf')
-const Promise = require('bluebird')
 const pkg = require('../package.json')
-
-jest.mock('git-rev-sync')
-const git = require('git-rev-sync')
 
 let realFail
 beforeEach(() => {
@@ -55,51 +47,6 @@ test('errorForStatus returns false for 2xx and 3xx statuses', () => {
 test('errorForStatus returns an Error for 4xx and 5xx statuses', () => {
     ;[400, 401, 403, 404, 500, 503].forEach((statusCode) => {
         expect(Utils.errorForStatus({statusCode})).toBeInstanceOf(Error)
-    })
-})
-
-describe('setDefaultMessage', () => {
-    test('Bundle message is set to branch and commit hash', () => {
-        git.branch.mockClear()
-        git.short.mockClear()
-        git.branch.mockReturnValueOnce('develop')
-        git.short.mockReturnValueOnce('4cd54ec')
-
-        expect(Utils.setDefaultMessage()).toBe('develop: 4cd54ec')
-    })
-
-    test('Bundle message defaults properly if git branch fails', () => {
-        git.branch.mockImplementationOnce(() => {
-            throw new Error('Failwhale')
-        })
-
-        expect(Utils.setDefaultMessage()).toBe('Mobify Bundle')
-    })
-
-    test('Bundle message defaults properly if git short fails', () => {
-        git.short.mockImplementationOnce(() => {
-            throw new Error('Failwhale')
-        })
-
-        expect(Utils.setDefaultMessage()).toBe('Mobify Bundle')
-    })
-
-    test('Test message is printed if we have an ENOENT', () => {
-        git.branch.mockImplementationOnce(() => {
-            throw {code: 'ENOENT'}
-        })
-        const consoleLog = console.log
-        const mockConsoleLog = jest.fn()
-        console.log = mockConsoleLog
-
-        try {
-            Utils.setDefaultMessage()
-        } finally {
-            console.log = consoleLog
-        }
-
-        expect(mockConsoleLog).toBeCalled()
-        expect(mockConsoleLog.mock.calls[0][0].includes('git init')).toBe(true)
     })
 })
 
