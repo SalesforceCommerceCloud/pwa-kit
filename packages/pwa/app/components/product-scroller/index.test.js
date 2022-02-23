@@ -9,15 +9,7 @@ import {screen} from '@testing-library/react'
 import user from '@testing-library/user-event'
 import ProductScroller from './index'
 import {renderWithProviders} from '../../utils/test-utils'
-import {mockConfig} from '../../utils/mocks/mockConfigData'
-jest.mock('../../utils/utils', () => {
-    const original = jest.requireActual('../../utils/utils')
-    return {
-        ...original,
-        getConfig: jest.fn(() => mockConfig),
-        getUrlConfig: jest.fn(() => mockConfig.app.url)
-    }
-})
+
 // Our component uses `scrollBy` on an html element, which we need
 // to create ourselves as its not in jsdom by default. Here we make
 // it a spy so we can assert it was called when we expect.

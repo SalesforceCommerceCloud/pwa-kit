@@ -12,15 +12,7 @@ import SearchInput from './index'
 import Suggestions from './partials/suggestions'
 import {noop} from '../../utils/utils'
 import mockSearchResults from '../../commerce-api/mocks/searchResults'
-import {mockConfig} from '../../utils/mocks/mockConfigData'
-jest.mock('../../utils/utils', () => {
-    const original = jest.requireActual('../../utils/utils')
-    return {
-        ...original,
-        getConfig: jest.fn(() => mockConfig),
-        getUrlConfig: jest.fn(() => mockConfig.app.url)
-    }
-})
+
 jest.mock('../../commerce-api/utils', () => {
     const originalModule = jest.requireActual('../../commerce-api/utils')
     return {
