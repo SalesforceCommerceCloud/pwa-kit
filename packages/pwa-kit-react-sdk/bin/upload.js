@@ -67,7 +67,7 @@ try {
 process.env.DEPLOY_TARGET = argv.t
 
 // Get the config object for the current target, if no target was set
-// it will return the defualt configuration and that one will be
+// it will return the default configuration and that one will be
 // validated.
 const config = Utils.getConfig()
 
