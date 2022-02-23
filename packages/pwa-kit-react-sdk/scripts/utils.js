@@ -31,31 +31,6 @@ Utils.getRequestHeaders = (additionalHeaders) =>
 Utils.getSettingsPath = () =>
     `${process.platform === 'win32' ? process.env.USERPROFILE : process.env.HOME}/.mobify`
 
-Utils.readCredentials = (filepath) => {
-    return Utils.exists(filepath)
-        .catch(
-            /* istanbul ignore next */ () =>
-                Utils.fail(
-                    `Credentials file "${filepath}" not found.\n` +
-                        'Visit https://runtime.commercecloud.com/account/settings for ' +
-                        'steps on authorizing your computer to push bundles.'
-                )
-        )
-        .then(() => fileUtils.readFileAsync(filepath))
-        .then((creds) => {
-            creds = JSON.parse(creds)
-
-            return {
-                username: creds.username,
-                api_key: creds.api_key
-            }
-        })
-        .catch(
-            /* istanbul ignore next */ (e) =>
-                Utils.fail(`Error parsing "${filepath}".\n` + `[${e}]`)
-        )
-}
-
 Utils.delayedPromise = (value, delay) => {
     return new Promise((resolve) => {
         setTimeout(() => resolve(value), delay)
