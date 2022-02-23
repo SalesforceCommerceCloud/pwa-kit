@@ -7,7 +7,8 @@
     "sdk-create-hash-manifest": "bin/create-hash-manifest.js"
   },
   "engines": {
-    "node": "^12.0.0 || ^14.0.0"
+    "node": "^12.0.0 || ^14.0.0",
+    "npm": "^6.14.4 || ^7.0.0 || ^8.0.0"
   },
   "files": [
     "bin",
@@ -98,7 +99,6 @@
     "supertest": "^4.0.2",
     "svg-sprite-loader": "^6.0.11",
     "ua-parser-js": "^0.7.24",
-    "url-parse": "^1.4.7",
     "validator": "^13.7.0",
     "watch": "1.0.1",
     "whatwg-encoding": "^1.0.5",
