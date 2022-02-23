@@ -658,11 +658,12 @@ export const RemoteServerFactory = {
         const _require = eval('require')
         const serverRenderer = _require(path.join(buildDir, 'server-renderer.js')).default
         const stats = _require(path.join(buildDir, 'loadable-stats.json'))
-        app.use(serverRenderer(stats))
 
         // Only serve worker.js if the user is setting up a server-side
         // rendered project (assumed to be a PWA).
         app.get('/worker.js*', serveServiceWorker)
+
+        app.use(serverRenderer(stats))
     },
 
     /**

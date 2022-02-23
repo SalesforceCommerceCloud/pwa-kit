@@ -11,10 +11,18 @@ module.exports = {
     coverageThreshold: {
         global: {
             branches: 62,
-            functions: 66.5,
-            lines: 69,
-            statements: 69
+            functions: 65.5,
+            lines: 65,
+            statements: 67
         }
     },
-    testPathIgnorePatterns: ['bin/*', 'dist/*', 'node_modules/*', 'coverage/*']
+    testPathIgnorePatterns: ['bin/*', 'dist/*', 'node_modules/*', 'coverage/*'],
+    collectCoverageFrom: [
+        'src/**',
+        'scripts/**',
+        '!src/configs/**',
+        '!scripts/version.js',
+        '!src/ssr/server/test_fixtures/**',
+        '!src/schemas/**'
+    ]
 }

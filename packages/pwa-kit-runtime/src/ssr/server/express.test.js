@@ -8,9 +8,11 @@
 /* eslint-env jest */
 /* eslint max-nested-callbacks:0 */
 
+import fse from 'fs-extra'
 import {PersistentCache} from '../../utils/ssr-cache'
 import {CachedResponse} from '../../utils/ssr-server'
 import {X_MOBIFY_QUERYSTRING} from './constants'
+import {DevServerFactory} from 'pwa-kit-build/ssr/server/build-dev-server'
 
 // Mock static assets (require path is relative to the 'ssr' directory)
 const mockStaticAssets = {}
@@ -25,7 +27,8 @@ const {
     sendCachedResponse,
     cacheResponseWhenDone,
     respondFromBundle,
-    serveStaticFile
+    serveStaticFile,
+    getRuntime
 } = require('./express')
 const {RemoteServerFactory, REMOTE_REQUIRED_ENV_VARS} = require('./build-remote-server')
 const ssrServerUtils = require('../../utils/ssr-server')
@@ -387,13 +390,13 @@ describe('SSRServer operation', () => {
     })
 
     describe('SSRServer worker.js handling', () => {
-        let buildDir
+        let tmpDir
         beforeEach(() => {
-            buildDir = mkdtempSync()
+            tmpDir = mkdtempSync()
         })
 
         afterEach(() => {
-            rimraf.sync(buildDir)
+            rimraf.sync(tmpDir)
         })
 
         const cases = [
@@ -413,9 +416,14 @@ describe('SSRServer operation', () => {
 
         cases.forEach(({file, content, name, requestPath}) => {
             test(name, () => {
-                fs.writeFileSync(path.resolve(buildDir, file), content)
+                const fixture = path.join(__dirname, 'test_fixtures')
+                const buildDir = path.join(tmpDir, 'build')
+                fse.copySync(fixture, buildDir)
+                const updatedFile = path.resolve(buildDir, file)
+                fse.writeFileSync(updatedFile, content)
 
                 const app = RemoteServerFactory.createApp(opts({buildDir}))
+                RemoteServerFactory.addSSRRenderer(app)
 
                 return request(app)
                     .get(requestPath)
@@ -424,7 +432,7 @@ describe('SSRServer operation', () => {
             })
 
             test(`${name} (and handle 404s correctly)`, () => {
-                const app = RemoteServerFactory.createApp(opts({buildDir}))
+                const app = RemoteServerFactory.createApp(opts({buildDir: tmpDir}))
 
                 return request(app)
                     .get(requestPath)
@@ -1011,4 +1019,35 @@ describe('generateCacheKey', () => {
         const result1 = generateCacheKey(mockRequest())
         expect(generateCacheKey(mockRequest(), {extras: ['123']})).not.toEqual(result1)
     })
+})
+
+describe('getRuntime', () => {
+    const cases = [
+        {
+            env: {},
+            expectedRuntime: DevServerFactory,
+            msg: 'when running locally'
+        },
+        {
+            env: {AWS_LAMBDA_FUNCTION_NAME: 'this-makes-it-remote'},
+            expectedRuntime: RemoteServerFactory,
+            msg: 'when running remotely'
+        }
+    ]
+    let originalEnv
+    beforeEach(() => {
+        originalEnv = process.env
+    })
+
+    afterEach(() => {
+        process.env = originalEnv
+    })
+
+    test.each(cases)(
+        'should return a remote/development runtime $msg',
+        ({env, expectedRuntime}) => {
+            process.env = {...process.env, ...env}
+            expect(getRuntime()).toBe(expectedRuntime)
+        }
+    )
 })
