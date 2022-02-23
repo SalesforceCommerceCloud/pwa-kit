@@ -16,4 +16,3 @@ beforeEach(() => {
 afterEach(() => {
     Utils.fail = realFail
 })
-

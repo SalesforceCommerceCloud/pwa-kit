@@ -11,7 +11,6 @@
 const fileUtils = require('./file-utils')
 const Utils = {}
 
-
 Utils.exists = fileUtils.statAsync
 
 /* istanbul ignore next */
