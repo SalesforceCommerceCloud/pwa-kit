@@ -86,28 +86,35 @@ export const getConfig = () => {
     const _require = eval('require')
     const {cosmiconfigSync} = _require('cosmiconfig')
 
+    // Search options.
+    const searchPlaces = [
+        `config/${moduleName}.yml`,
+        `config/${moduleName}.yaml`,
+        `config/${moduleName}.json`,
+        `config/local.yml`,
+        `config/local.yaml`,
+        `config/local.json`,
+        `config/default.yml`,
+        `config/default.yaml`,
+        `config/default.json`,
+        `package.json`
+    ]
+
     // Match config files based on the specificity from most to most general.
     const explorerSync = cosmiconfigSync(moduleName, {
-        packageProp: 'mobify',
-        searchPlaces: [
-            `config/${moduleName}.yml`,
-            `config/${moduleName}.yaml`,
-            `config/${moduleName}.json`,
-            `config/local.yml`,
-            `config/local.yaml`,
-            `config/local.json`,
-            `config/default.yml`,
-            `config/default.yaml`,
-            `config/default.json`,
-            `package.json`
-        ].map((path) => (isRemote ? `build/${path}` : path))
+        packageProp: 'mobify2',
+        searchPlaces: searchPlaces.map((path) => (isRemote ? `build/${path}` : path))
     })
 
     // Load the config synchronously using a custom "searchPlaces".
     const {config} = explorerSync.search() || {}
 
     if (!config) {
-        throw new Error('Application configuration not found!')
+        throw new Error(
+            `Application configuration not found!\nPossible configuration file locations:\n${searchPlaces.join(
+                '\n'
+            )}`
+        )
     }
 
     return config
