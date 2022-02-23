@@ -8,144 +8,15 @@
 /* eslint-disable strict */
 'use strict'
 
-const path = require('path')
 const git = require('git-rev-sync')
 
-const archiver = require('archiver')
-
 const fileUtils = require('./file-utils')
-
-const Matcher = require('../dist/utils/glob').Matcher
 
 const SDK_VERSION = require('../package.json').version
 const DEFAULT_DOCS_URL = 'http://sfdc.co/pwa-kit'
 
 const Utils = {}
 
-// Returns a bundle object ready to upload to the Release Console.
-Utils.buildObject = (archivePath, options) => {
-    options = options || {}
-    return fileUtils
-        .readFileAsync(archivePath)
-        .catch((err) => Utils.fail(err))
-        .then((data) => {
-            // Encode data and assemble object to upload
-            const base64data = data.toString('base64')
-
-            const bundleMetadata = {
-                message: options.message || '',
-                encoding: 'base64',
-                data: base64data
-            }
-
-            // Copy any defined SSR parameters from the
-            // options.
-            if (options.set_ssr_values) {
-                for (const key of Object.keys(options).filter((key) => key.startsWith('ssr_'))) {
-                    const value = options[key]
-                    if (value !== undefined) {
-                        bundleMetadata[key] = value
-                    }
-                }
-            }
-
-            return bundleMetadata
-        })
-}
-
-/**
- * @param options
- *   {
- *       buildDirectory,
- *       projectSlug,
- *       set_ssr_values,
- *       ssr_only,
- *       ssr_shared
- *   }
- * @param destination
- * @returns {*}
- */
-Utils.createBundle = (options, destination) => {
-    return Utils.exists(options.buildDirectory)
-        .catch(() =>
-            Utils.fail(
-                /* eslint-disable max-len */
-                `[Error: Build directory at path "${path.join(
-                    process.cwd(),
-                    options.buildDirectory
-                )}" not found.]\n` +
-                    'You must first run the PWA Kit build process before uploading a bundle.'
-                /* eslint-disable max-len */
-            )
-        )
-        .then(() => {
-            // Clone the options so that we can return a modified object
-            const returnedOptions = Object.assign({}, options)
-
-            // Build a list of files in the archive
-            const filesInArchive = []
-
-            const output = fileUtils.createWriteStream(destination)
-            const archive = archiver('tar')
-
-            archive.on('error', Utils.fail)
-
-            archive.pipe(output)
-
-            // The new root directory of files, that will replace
-            // the buildPrefix. Must be of form: <project_slug>/bld/
-            const newRoot = path.join(options.projectSlug, 'bld', '')
-
-            // archive.bulk is deprecated, so we use archive.directory to
-            // walk the tree and add files (under the newRoot path), adding
-            // files to filesInArchive as we go.
-            archive.directory(
-                // We archive the build directory and everything underneath it.
-                options.buildDirectory,
-                // We pass an empty destPath because we fix the entry prefix
-                // in the function.
-                '',
-                // This function is called for every file in the tree.
-                (entry) => {
-                    // entry is a TarEntryData object.
-                    // https://archiverjs.com/docs/global.html#TarEntryData
-                    // The entry.name field is the file path relative to the
-                    // buildDirectory.
-                    if (entry.stats.isFile()) {
-                        filesInArchive.push(entry.name)
-                    }
-
-                    // Add a prefix so that the entry in the tar file
-                    // is relative and starts with newRoot
-                    entry.prefix = newRoot
-
-                    return entry
-                }
-            )
-
-            return new Promise((resolve) => {
-                output.on('finish', () => {
-                    // If we're doing an SSR build, we now need
-                    // to update the ssr_only and ssr_shared lists,
-                    // which are supplied to use as minimatch-style
-                    // glob patterns, but must be uploaded as lists
-                    // of actual file paths relative to the build
-                    // directory.
-                    if (options.set_ssr_values) {
-                        const ssrOnlyMatcher = new Matcher(options.ssr_only)
-                        returnedOptions.ssr_only = filesInArchive.filter(ssrOnlyMatcher.filter)
-                        const ssrSharedMatcher = new Matcher(options.ssr_shared)
-                        returnedOptions.ssr_shared = filesInArchive.filter(ssrSharedMatcher.filter)
-                    }
-
-                    resolve(returnedOptions)
-                })
-
-                // Finalize now that we have set up all the event handlers
-                archive.finalize()
-            })
-        })
-}
 
 Utils.errorForStatus = (response) => {
     const status = response.statusCode
