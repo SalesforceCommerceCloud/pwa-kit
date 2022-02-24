@@ -1,0 +1,45 @@
+{
+    "app": {
+        "url": {
+            "locale": "path",
+            "site": "path"
+        },
+        "siteAliases": {
+            "site-1": "uk",
+            "site-2": "us"
+        },
+        "defaultSite": "site-1",
+        "sites": [
+            {
+                "id": "site-1",
+                "l10n": {
+                    "defaultLocale": "en-GB",
+                    "supportedLocales": [
+                        {
+                            "id": "en-GB",
+                            "alias": "en-uk",
+                            "preferredCurrency": "GBP"
+                        },
+                        {
+                            "id": "fr-FR",
+                            "alias": "fr",
+                            "preferredCurrency": "EUR"
+                        }
+                    ]
+                }
+            },
+            {
+                "id": "site-2",
+                "l10n": {
+                    "defaultLocale": "en-US",
+                    "supportedLocales": [
+                        {
+                            "id": "en-US",
+                            "preferredCurrency": "USD"
+                        }
+                    ]
+                }
+            }
+        ]
+    }
+}
