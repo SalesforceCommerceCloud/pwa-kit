@@ -205,14 +205,8 @@ export const createApp = (options) => {
     // because it's an origin, it does not end with a slash.
     options.appOrigin = process.env.APP_ORIGIN = `${options.protocol}://${options.appHostname}`
 
-    // Attch the application configuration making it available app-wide.
-    let config
-    if (options.mobify) {
-        config = options.mobify
-    } else {
-        config = loadConfig()
-    }
-
+    // Assign the config, prioritizing the `mobify` object over loading the configuration file.
+    const config = options.mobify || loadConfig()
     setConfig(config)
 
     // Configure the server with the basic options
@@ -222,6 +216,7 @@ export const createApp = (options) => {
 
     const app = createExpressApp(options)
 
+    // Assign the config to the app for easy access.
     app.config = config
 
     // Attach built in routes and middleware

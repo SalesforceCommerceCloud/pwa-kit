@@ -54,10 +54,9 @@ export const getProxyConfigs = () => {
 }
 
 /**
- * Returns the express app configuration file in object form. The object resolution will
- * be as follows (from highest to lowest priority):
+ * Returns the configuration object previous set. 
  *
- * @returns - the application configuration object.
+ * @returns {object} - the configuration object.
  */
 /* istanbul ignore next */
 export const getConfig = () => {
@@ -69,8 +68,11 @@ export const getConfig = () => {
 }
 
 /**
+ * Set the configuration object. This is done when the express
+ * application is created on the server, and when the react app 
+ * is started on the client.
  * 
- * @param {*} config 
+ * @param {object} config 
  */
 export const setConfig = (config) => {
     _config = config
