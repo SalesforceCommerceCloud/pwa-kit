@@ -28,7 +28,7 @@ export const DEFAULT_LOCALE = 'en-GB'
 export const DEFAULT_CURRENCY = 'GBP'
 // Contexts
 import {CategoriesProvider, CurrencyProvider} from '../contexts'
-import {mockConfig} from './mocks/mockConfigData'
+import mockConfig from '../../config/mocks/default.json'
 
 export const renderWithReactIntl = (node, locale = DEFAULT_LOCALE) => {
     return render(
