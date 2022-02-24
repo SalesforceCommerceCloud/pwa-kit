@@ -9,7 +9,7 @@ import {screen} from '@testing-library/react'
 import user from '@testing-library/user-event'
 import {rest} from 'msw'
 import {setupServer} from 'msw/node'
-import {renderWithProviders} from '../../utils/test-utils'
+import {getDefaultPathname, renderWithProviders} from '../../utils/test-utils'
 import Login from '.'
 import {BrowserRouter as Router, Route} from 'react-router-dom'
 import Account from '../account'
@@ -85,7 +85,7 @@ jest.mock('../../commerce-api/pkce', () => {
         generateCodeChallenge: jest.fn().mockReturnValue('codechallenge')
     }
 })
-const basePath = '/uk/en-GB'
+
 const MockedComponent = () => {
     const match = {
         params: {pageName: 'profile'}
@@ -93,13 +93,13 @@ const MockedComponent = () => {
     return (
         <Router>
             <Login />
-            <Route path={`${basePath}/registration`}>
+            <Route path={getDefaultPathname('/registration')}>
                 <Registration />
             </Route>
-            <Route path={`${basePath}/reset-password`}>
+            <Route path={getDefaultPathname('/reset-password')}>
                 <ResetPassword />
             </Route>
-            <Route path={`${basePath}/account`}>
+            <Route path={getDefaultPathname('/account')}>
                 <Account match={match} />
             </Route>
         </Router>

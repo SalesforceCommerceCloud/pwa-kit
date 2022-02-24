@@ -47,32 +47,13 @@ describe('whichLocaleToLoad', () => {
 })
 
 describe('loadLocaleData', () => {
-    test('default to English as the fallback locale', async () => {
-        const messages = await loadLocaleData('it-IT', DEFAULT_LOCALE, [nonSupportedLocale])
-        expect(messages[testId1][0].value).toMatch(/Privacy Policy/i)
-    })
-    test('loading one of the supported locales', async () => {
-        const messages = await loadLocaleData(supportedLocale, DEFAULT_LOCALE, supportedLocales)
+    test('loading the target locale', async () => {
+        const messages = await loadLocaleData(supportedLocale)
         expect(messages[testId2]).toBeDefined()
     })
     test('loading the pseudo locale', async () => {
-        const messages = await loadLocaleData('en-XB', DEFAULT_LOCALE, supportedLocales)
+        const messages = await loadLocaleData('en-XB')
         expect(messages[testId1][0].value).toMatch(/^\[!! Ṕŕíííṿâćććẏ ṔṔṔŏĺíííćẏ !!]$/)
-    })
-    test('handling a not-found translation file', async () => {
-        if (isMultiLocales) {
-            expect(supportedLocale).not.toBe(DEFAULT_LOCALE)
-        }
-
-        jest.mock(`../translations/compiled/${supportedLocale}.json`, () => {
-            throw new Error("Can't find the translation file!")
-        })
-        const res = await loadLocaleData(supportedLocale, DEFAULT_LOCALE, supportedLocales)
-
-        expect(res).toEqual({})
-
-        // Reset
-        jest.unmock(`../translations/compiled/${supportedLocale}.json`)
     })
 })
 

@@ -161,6 +161,7 @@ export const getUrlWithLocale = (shortCode, opts = {}) => {
 
 /**
  * Builds the Home page URL for a given locale and site.
+ * Do not show site and locale when both of them are default
  *
  * @param homeHref
  * @param options

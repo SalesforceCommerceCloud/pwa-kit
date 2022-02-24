@@ -10,7 +10,7 @@ import {screen} from '@testing-library/react'
 import user from '@testing-library/user-event'
 import {rest} from 'msw'
 import {setupServer} from 'msw/node'
-import {renderWithProviders} from '../../utils/test-utils'
+import {getDefaultPathname, renderWithProviders} from '../../utils/test-utils'
 import {
     mockedRegisteredCustomer,
     mockOrderHistory,
@@ -18,7 +18,6 @@ import {
 } from '../../commerce-api/mock-data'
 import useCustomer from '../../commerce-api/hooks/useCustomer'
 import Orders from './orders'
-import {mockConfig} from '../../../config/mocks/mockConfigData'
 
 jest.mock('../../commerce-api/utils', () => {
     const originalModule = jest.requireActual('../../commerce-api/utils')
@@ -28,16 +27,6 @@ jest.mock('../../commerce-api/utils', () => {
     }
 })
 
-jest.mock('../../utils/utils', () => {
-    const original = jest.requireActual('../../utils/utils')
-    return {
-        ...original,
-        getConfig: jest.fn(() => mockConfig),
-        getUrlConfig: jest.fn(() => mockConfig.app.url)
-    }
-})
-
-const basePath = `/uk/en-GB`
 const MockedComponent = () => {
     const customer = useCustomer()
 
@@ -53,7 +42,7 @@ const MockedComponent = () => {
 
     return (
         <Switch>
-            <Route path={`${basePath}/account/orders`}>
+            <Route path={getDefaultPathname('/account/orders')}>
                 <Orders />
             </Route>
         </Switch>
@@ -110,7 +99,7 @@ beforeEach(() => {
 
     server.listen({onUnhandledRequest: 'error'})
 
-    window.history.pushState({}, 'Account', `${basePath}/account/orders`)
+    window.history.pushState({}, 'Account', getDefaultPathname('/account/orders'))
 })
 afterEach(() => {
     localStorage.clear()

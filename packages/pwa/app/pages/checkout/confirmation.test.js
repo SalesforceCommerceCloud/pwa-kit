@@ -11,23 +11,14 @@ import {screen, waitFor} from '@testing-library/react'
 import user from '@testing-library/user-event'
 import {rest} from 'msw'
 import {setupServer} from 'msw/node'
-import {renderWithProviders} from '../../utils/test-utils'
+import {getDefaultPathname, renderWithProviders} from '../../utils/test-utils'
 import Confirmation from './confirmation'
 import {keysToCamel} from '../../commerce-api/utils'
 import useBasket from '../../commerce-api/hooks/useBasket'
 import useShopper from '../../commerce-api/hooks/useShopper'
 import {mockedRegisteredCustomer, ocapiOrderResponse} from '../../commerce-api/mock-data'
 import {mockedGuestCustomer, exampleTokenReponse} from '../../commerce-api/mock-data'
-import {mockConfig} from '../../../config/mocks/mockConfigData'
 
-jest.mock('../../utils/utils', () => {
-    const original = jest.requireActual('../../utils/utils')
-    return {
-        ...original,
-        getConfig: jest.fn(() => mockConfig),
-        getUrlConfig: jest.fn(() => mockConfig.app.url)
-    }
-})
 jest.mock('../../commerce-api/hooks/useCustomer', () => {
     const originalModule = jest.requireActual('../../commerce-api/hooks/useCustomer')
     const useCustomer = originalModule.default
@@ -245,7 +236,6 @@ const server = setupServer(
     )
 )
 
-const basePath = '/uk/en-GB'
 // Set up and clean up
 beforeAll(() => {
     jest.resetModules()
@@ -253,13 +243,15 @@ beforeAll(() => {
 
     // Since we're testing some navigation logic, we are using a simple Router
     // around our component. We need to initialize the default route/path here.
-    window.history.pushState({}, 'Account', `${basePath}/account`)
+    const t = getDefaultPathname('/account')
+    console.log('t', t)
+    window.history.pushState({}, 'Account', getDefaultPathname('/account'))
 })
 afterEach(() => {
     localStorage.clear()
     sessionStorage.clear()
     server.resetHandlers()
-    window.history.pushState({}, 'Account', `${basePath}/account`)
+    window.history.pushState({}, 'Account', getDefaultPathname('/account'))
 })
 afterAll(() => server.close())
 
@@ -332,6 +324,6 @@ test('Create Account form - successful submission results in redirect to the Acc
     user.click(createAccountButton)
 
     await waitFor(() => {
-        expect(window.location.pathname).toEqual(`${basePath}/account`)
+        expect(window.location.pathname).toEqual(getDefaultPathname('/account'))
     })
 })

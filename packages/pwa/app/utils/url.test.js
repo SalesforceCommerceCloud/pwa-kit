@@ -17,7 +17,7 @@ import {
     buildPathWithUrlConfig
 } from './url'
 import {getUrlConfig} from './utils'
-import mockConfig from '../../config/default.json'
+import mockConfig from '../../config/mocks/default.json'
 
 jest.mock('./utils', () => {
     const original = jest.requireActual('./utils')
@@ -193,7 +193,6 @@ describe('homeUrlBuilder', () => {
             locale: 'path',
             site: 'path'
         }))
-        // getDefaultSite.mockImplementation(() => mockConfig.app.sites[0])
         const site = mockConfig.app.sites[1]
         const alias = mockConfig.app.siteAliases[site.id]
         const homeUrlDefaultLocale = homeUrlBuilder('/', {

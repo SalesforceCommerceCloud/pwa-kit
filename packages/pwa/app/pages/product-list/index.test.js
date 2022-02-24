@@ -18,7 +18,7 @@ import {
 import {screen, waitFor} from '@testing-library/react'
 import user from '@testing-library/user-event'
 import {Route, Switch} from 'react-router-dom'
-import {renderWithProviders} from '../../utils/test-utils'
+import {getDefaultPathname, renderWithProviders} from '../../utils/test-utils'
 import ProductList from '.'
 import EmptySearchResults from './partials/empty-results'
 import useCustomer from '../../commerce-api/hooks/useCustomer'
@@ -59,8 +59,6 @@ jest.mock('commerce-sdk-isomorphic', () => {
     }
 })
 
-const basePath = '/uk/en-GB'
-
 const MockedComponent = ({isLoading, isLoggedIn = false, searchQuery}) => {
     const customer = useCustomer()
     useEffect(() => {
@@ -71,7 +69,7 @@ const MockedComponent = ({isLoading, isLoggedIn = false, searchQuery}) => {
     return (
         <Switch>
             <Route
-                path={`${basePath}/category/:categoryId`}
+                path={getDefaultPathname('/category/:categoryId')}
                 render={(props) => (
                     <div>
                         <div>{customer.customerId}</div>

@@ -23,6 +23,8 @@ import {commerceAPIConfig, einsteinAPIConfig} from '../api.config'
 import {IntlProvider} from 'react-intl'
 import {mockCategories as initialMockCategories} from '../commerce-api/mock-data'
 import fallbackMessages from '../translations/compiled/en-GB.json'
+import mockConfig from '../../config/mocks/default.json'
+
 export const DEFAULT_LOCALE = 'en-GB'
 export const DEFAULT_CURRENCY = 'GBP'
 export const SUPPORTED_LOCALES = [
@@ -37,6 +39,7 @@ export const SUPPORTED_LOCALES = [
 ]
 // Contexts
 import {CategoriesProvider, CurrencyProvider} from '../contexts'
+import {buildPathWithUrlConfig} from './url'
 
 export const renderWithReactIntl = (node, locale = DEFAULT_LOCALE) => {
     return render(
@@ -111,6 +114,7 @@ export const TestProviders = ({
         onOpen: () => {},
         onClose: () => {}
     }
+
     return (
         <IntlProvider locale={locale} defaultLocale={DEFAULT_LOCALE} messages={messages}>
             <CommerceAPIProvider value={api}>
@@ -160,3 +164,23 @@ export const renderWithProviders = (children, options) =>
         wrapper: () => <TestProviders {...options?.wrapperProps}>{children}</TestProviders>,
         ...options
     })
+
+/**
+ * This is used to construct the URL pathname that would include
+ * or not include the default locale and site identifiers in the URL according to
+ * their configuration set in config/mocks/default.json file.
+ *
+ * @param path The pathname that we want to use
+ * @returns {string} URL pathname for the given path
+ */
+export const getDefaultPathname = (path) => {
+    const {app} = mockConfig
+    const defaultSite = app.sites.find((site) => site.id === app.defaultSite)
+    const siteAlias = app.siteAliases[defaultSite.id]
+    const defaultLocale = defaultSite.l10n.defaultLocale
+    const updatedPath = buildPathWithUrlConfig(path, {
+        site: siteAlias || defaultSite.id,
+        locale: defaultLocale
+    })
+    return updatedPath
+}
