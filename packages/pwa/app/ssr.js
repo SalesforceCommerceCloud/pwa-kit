@@ -30,7 +30,7 @@ const app = createApp({
 
     // This is the value of the 'mobify' object from package.json
     // provided by a webpack DefinePlugin
-    mobify: WEBPACK_PACKAGE_JSON_MOBIFY,
+    // mobify: WEBPACK_PACKAGE_JSON_MOBIFY,
 
     // The port that the local dev server listens on
     port: 3000,

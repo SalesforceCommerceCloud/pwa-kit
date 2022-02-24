@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {getUrlConfig} from './utils'
+// import {getUrlConfig} from './utils'
 import {urlPartPositions} from '../constants'
 
 /**
@@ -15,11 +15,11 @@ import {urlPartPositions} from '../constants'
  * @param {object} - a custom configured object
  * @return {array} - list of configured route objects
  */
-export const configureRoutes = (routes = [], {ignoredRoutes = []}) => {
+export const configureRoutes = (routes = [], config, {ignoredRoutes = []}) => {
     if (!routes.length) return []
+    if (!config) return routes
 
-    const urlConfig = getUrlConfig()
-    if (!urlConfig) return routes
+    const {url: urlConfig} = config?.app
 
     return routes.map((route) => {
         const {path, ...rest} = route

@@ -132,7 +132,7 @@ export const render = async (req, res, next) => {
     // to inject arguments into the wrapped component's getProps methods.
     AppConfig.restore(res.locals)
 
-    const routes = getRoutes(res.locals)
+    const routes = getRoutes(res.locals, req.app.config)
     const WrappedApp = routeComponent(App, false, res.locals)
 
     const [pathname, search] = req.originalUrl.split('?')
@@ -279,6 +279,7 @@ const renderApp = (args) => {
     //
     // Do *not* add to these without a very good reason - globals are a liability.
     const windowGlobals = {
+        __CONFIG__: req.app.config,
         __DEVICE_TYPE__: deviceType,
         __PRELOADED_STATE__: appState,
         __ERROR__: error,

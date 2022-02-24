@@ -10,6 +10,7 @@
 import {proxyConfigs} from '../../utils/ssr-shared'
 
 const onClient = typeof window !== 'undefined'
+let _config
 
 /**
  * Get the URL that should be used to load an asset from the bundle.
@@ -50,4 +51,27 @@ export const getProxyConfigs = () => {
 
     // Clone to avoid accidental mutation of important configuration variables.
     return configs.map((config) => ({...config}))
+}
+
+/**
+ * Returns the express app configuration file in object form. The object resolution will
+ * be as follows (from highest to lowest priority):
+ *
+ * @returns - the application configuration object.
+ */
+/* istanbul ignore next */
+export const getConfig = () => {
+    if (!_config) {
+        throw new Error('Ensure that you have set the configuration before getting it.')
+    }
+
+    return _config
+}
+
+/**
+ * 
+ * @param {*} config 
+ */
+export const setConfig = (config) => {
+    _config = config
 }

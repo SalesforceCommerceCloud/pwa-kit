@@ -26,6 +26,8 @@ import semver from 'semver'
 import URL from 'url'
 import merge from 'merge-descriptors'
 import {PersistentCache} from '../../utils/ssr-cache'
+import {cosmiconfigSync} from 'cosmiconfig'
+import {setConfig} from '../universal/utils'
 
 import {
     CachedResponse,
@@ -203,12 +205,24 @@ export const createApp = (options) => {
     // because it's an origin, it does not end with a slash.
     options.appOrigin = process.env.APP_ORIGIN = `${options.protocol}://${options.appHostname}`
 
+    // Attch the application configuration making it available app-wide.
+    let config
+    if (options.mobify) {
+        config = options.mobify
+    } else {
+        config = loadConfig()
+    }
+
+    setConfig(config)
+
     // Configure the server with the basic options
-    updatePackageMobify(options.mobify)
+    updatePackageMobify(config)
 
     configureProxyConfigs(options.appHostname, options.protocol)
 
     const app = createExpressApp(options)
+
+    app.config = config
 
     // Attach built in routes and middleware
 
@@ -333,6 +347,62 @@ export const createApp = (options) => {
 }
 
 /**
+ * Returns the express app configuration file in object form. The object resolution will
+ * be as follows (from highest to lowest priority):
+ *
+ * > {target_name}.ext
+ * > local.ext
+ * > default.ext
+ * > package.json (mobify.key)
+ *
+ * Each file marked with `ext` can optionally be terminated with `yml`, `yaml` or
+ * `json` in that priority.
+ *
+ * NOTE: This is an isomorphic function, when run on the browser the config returned will
+ * be the value serialized in the html.
+ *
+ * @returns - the application configuration object.
+ */
+/* istanbul ignore next */
+const loadConfig = () => {
+    const isRemote = Object.prototype.hasOwnProperty.call(process.env, 'AWS_LAMBDA_FUNCTION_NAME')
+    let moduleName = process?.env?.DEPLOY_TARGET || ''
+
+    // Search options.
+    const searchPlaces = [
+        `config/${moduleName}.yml`,
+        `config/${moduleName}.yaml`,
+        `config/${moduleName}.json`,
+        `config/local.yml`,
+        `config/local.yaml`,
+        `config/local.json`,
+        `config/default.yml`,
+        `config/default.yaml`,
+        `config/default.json`,
+        `package.json`
+    ]
+
+    // Match config files based on the specificity from most to most general.
+    const explorerSync = cosmiconfigSync(moduleName, {
+        packageProp: 'mobify',
+        searchPlaces: searchPlaces.map((path) => (isRemote ? `build/${path}` : path))
+    })
+
+    // Load the config synchronously using a custom "searchPlaces".
+    const {config} = explorerSync.search() || {}
+
+    if (!config) {
+        throw new Error(
+            `Application configuration not found!\nPossible configuration file locations:\n${searchPlaces.join(
+                '\n'
+            )}`
+        )
+    }
+
+    return config
+}
+
+/**
  * Validate options and environment variables.
  *
  * @private
@@ -398,7 +468,7 @@ const validateConfiguration = (options) => {
         }
     }
 
-    if (!(options.mobify instanceof Object)) {
+    if (options.mobify && !(options.mobify instanceof Object)) {
         throw new Error(
             'The mobify option passed to the SSR server must be an object (from package.json)'
         )

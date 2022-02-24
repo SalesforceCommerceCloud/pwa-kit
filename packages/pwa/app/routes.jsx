@@ -109,8 +109,8 @@ const routes = [
     }
 ]
 
-const configuredRoutes = configureRoutes(routes, {
-    ignoredRoutes: [HOME_HREF, '/callback', '/:locale', '*']
-})
-
-export default configuredRoutes
+export default (config) => {
+    return configureRoutes(routes, config, {
+        ignoredRoutes: [HOME_HREF, '/callback', '/:locale', '*']
+    }) 
+}

@@ -53,4 +53,6 @@ sh.exec(`npm install --prefix build --no-save ${deps.join(' ')}`)
 
 sh.rm(`build/package.json`)
 
+sh.cp('package.json', 'build/')
+
 sh.echo('Built successfully')

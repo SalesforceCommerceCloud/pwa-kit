@@ -98,7 +98,7 @@ const main = async () => {
         await replace({
             ignore: ['dist/scripts/**/*', 'dist/bin/**/*', 'dist/template/**/*'],
             files: ['dist/**/*.js'],
-            from: /..\/package.json/,
+            from: /..\/package.json/g,
             to: 'package.json'
         })
 

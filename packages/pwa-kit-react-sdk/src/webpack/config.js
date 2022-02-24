@@ -187,7 +187,16 @@ const common = {
         }),
 
         new CopyPlugin({
-            patterns: [{from: 'app/static/', to: 'static/'}]
+            patterns: [
+                {from: 'app/static/', to: 'static/'},
+                {
+                    from: 'config/',
+                    to: 'config/',
+                    globOptions: {
+                        gitignore: true
+                    }
+                }
+            ]
         }),
 
         analyzeBundle &&
