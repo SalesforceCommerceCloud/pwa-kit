@@ -1,6 +1,6 @@
 {
   "name": "progressive-web-sdk",
-  "version": "2.4.9",
+  "version": "2.4.10",
   "description": "A set of libraries and components which make up the SDK for Progressive Web",
   "main": "dist/index.js",
   "bin": {
@@ -104,7 +104,7 @@
     "time-fix-plugin": "2.0.5",
     "tti-polyfill": "0.2.2",
     "ua-parser-js": "^0.7.23",
-    "url-parse": "^1.4.7",
+    "url-parse": "^1.5.9",
     "utf-8-validate": "5.0.1",
     "validator": "10.11.0",
     "webpack-bundle-analyzer": "^4.0.0",
