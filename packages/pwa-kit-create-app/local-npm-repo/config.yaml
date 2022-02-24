@@ -11,7 +11,7 @@ auth:
 uplinks:
   npmjs:
     url: https://registry.npmjs.org/
-    max_fails: 300
+    max_fails: 100
     cache: true
 
 # Allow anybody to publish any package, with no auth.
@@ -30,4 +30,4 @@ publish:
   allow_offline: true
 
 logs:
-  - {type: stdout, format: pretty, level: http}
+  - {type: file, path: ./debugverdaccio.log, level: debug}

@@ -49,6 +49,7 @@ const cp = require('child_process')
 sh.set('-e')
 
 const logFileName = p.join(__dirname, '..', 'verdaccio.log')
+const readFileName = p.join(__dirname, '..', 'local-npm-repo', 'debugverdaccio.log')
 
 /**
  * Run the provided function with a local NPM repository running in the background.
@@ -88,14 +89,31 @@ const withLocalNPMRepo = (func) => {
                         }
                     })
 
-                    child.stdout.on('data', (data) => {
-                        if (data.includes('http address')) {
-                            // Verdaccio is running once it logs the HTTP address. Configure
-                            // NPM to use the local repo, through env vars.
-                            process.env['npm_config_registry'] = 'http://localhost:4873/'
-                            resolve()
-                        }
-                    })
+                    const checkTime = 1000
+
+                    function check() {
+                        setTimeout(() => {
+                            fs.readFile(readFileName, function(err) {
+                                if (err) {
+                                    check()
+                                } else {
+                                    const readStream = fs.createReadStream(readFileName)
+
+                                    readStream.on('data', (data) => {
+                                        if (data.includes('http address')) {
+                                            // Verdaccio is running once it logs the HTTP address. Configure
+                                            // NPM to use the local repo, through env vars.
+                                            process.env['npm_config_registry'] =
+                                                'http://localhost:4873/'
+                                            resolve()
+                                        }
+                                    })
+                                }
+                            })
+                        }, checkTime)
+                    }
+
+                    check()
 
                     child.stdout.pipe(logStream)
                     child.stderr.pipe(logStream)
