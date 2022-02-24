@@ -44,7 +44,7 @@ import {watchOnlineStatus, flatten} from '../../utils/utils'
 import {homeUrlBuilder, getUrlWithLocale, pathToUrl} from '../../utils/url'
 import {buildPathWithUrlConfig} from '../../utils/url'
 
-import {getLocaleConfig, getPreferredCurrency, getSupportedLocalesIds} from '../../utils/locale'
+import {getLocaleConfig, getPreferredCurrency} from '../../utils/locale'
 import {DEFAULT_SITE_TITLE, HOME_HREF, THEME_COLOR} from '../../constants'
 
 import Seo from '../seo'
@@ -186,14 +186,14 @@ const App = (props) => {
 
                             {/* Urls for all localized versions of this page (including current page)
                             For more details on hrefLang, see https://developers.google.com/search/docs/advanced/crawling/localized-versions */}
-                            {getSupportedLocalesIds(site?.l10n?.supportedLocales).map((locale) => (
+                            {site.l10n?.supportedLocales.map((locale) => (
                                 <link
                                     rel="alternate"
-                                    hrefLang={locale.toLowerCase()}
-                                    href={`${appOrigin}${getUrlWithLocale(locale, {
+                                    hrefLang={locale.id.toLowerCase()}
+                                    href={`${appOrigin}${getUrlWithLocale(locale.id, {
                                         location
                                     })}`}
-                                    key={locale}
+                                    key={locale.id}
                                 />
                             ))}
                             {/* A general locale as fallback. For example: "en" if default locale is "en-GB" */}

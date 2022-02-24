@@ -8,12 +8,6 @@
 import PropTypes from 'prop-types'
 
 /**
- * @returns {string[]} short codes of all the app's supported locales
- */
-export const getSupportedLocalesIds = (supportedLocales = []) =>
-    supportedLocales.map((locale) => locale.id)
-
-/**
  * Dynamically import the translations/messages for a given locale
  * @private
  * @param {string} targetLocale
@@ -47,7 +41,7 @@ export const getLocaleConfig = async ({getUserPreferredLocales, l10nConfig = {}}
     const defaultLocale = l10nConfig.defaultLocale
     const userPreferredLocales = getUserPreferredLocales ? getUserPreferredLocales() : []
 
-    const supportedLocales = getSupportedLocalesIds(l10nConfig.supportedLocales)
+    const supportedLocales = l10nConfig.supportedLocales.map((locale) => locale.id)
 
     const targetLocale = whichLocaleToLoad(userPreferredLocales, supportedLocales, defaultLocale)
 
