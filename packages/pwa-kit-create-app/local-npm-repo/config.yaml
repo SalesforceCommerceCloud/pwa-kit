@@ -11,14 +11,8 @@ auth:
 uplinks:
   npmjs:
     url: https://registry.npmjs.org/
-    cache: false
-    maxage: 20m
-    max_fails: 32
-    timeout: 60s
-    agent_options:
-      keepAlive: true
-      maxSockets: 32
-      maxFreeSockets: 8
+    max_fails: 100
+    cache: true
 
 # Allow anybody to publish any package, with no auth.
 packages:
@@ -35,7 +29,7 @@ publish:
   allow_offline: true
 
 logs:
-  - {type: stdout, format: pretty, level: debug}
+  - {type: stdout, format: pretty, level: http}
 
 server:
   keepAliveTimeout: 0
