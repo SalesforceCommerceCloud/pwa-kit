@@ -11,7 +11,7 @@ import {screen, waitFor, waitForElementToBeRemoved, within} from '@testing-libra
 import user from '@testing-library/user-event'
 import {rest} from 'msw'
 import {setupServer} from 'msw/node'
-import {renderWithProviders} from '../../utils/test-utils'
+import {renderWithProviders, getDefaultPathname} from '../../utils/test-utils'
 import useShopper from '../../commerce-api/hooks/useShopper'
 import {
     ocapiBasketWithItem,
@@ -56,8 +56,6 @@ jest.mock('../../commerce-api/pkce', () => {
 
 const {keysToCamel} = jest.requireActual('../../commerce-api/utils')
 
-const bastPath = '/uk/en-GB'
-
 // This is our wrapped component for testing. It handles initialization of the customer
 // and basket the same way it would be when rendered in the real app. We also set up
 // fake routes to simulate moving from checkout to confirmation page.
@@ -65,10 +63,10 @@ const WrappedCheckout = () => {
     useShopper()
     return (
         <Switch>
-            <Route exact path={`${bastPath}/checkout`}>
+            <Route exact path={getDefaultPathname('/checkout')}>
                 <Checkout />
             </Route>
-            <Route exact path={`${bastPath}/checkout/confirmation`}>
+            <Route exact path={getDefaultPathname('/checkout/confirmation')}>
                 <div>success</div>
             </Route>
         </Switch>
@@ -274,7 +272,7 @@ test('Can proceed through checkout steps as guest', async () => {
     )
 
     // Set the initial browser router path and render our component tree.
-    window.history.pushState({}, 'Checkout', `${bastPath}/checkout`)
+    window.history.pushState({}, 'Checkout', getDefaultPathname('/checkout'))
     renderWithProviders(<WrappedCheckout history={history} />)
 
     // Wait for checkout to load and display first step
@@ -505,7 +503,7 @@ test('Can proceed through checkout as registered customer', async () => {
     )
 
     // Set the initial browser router path and render our component tree.
-    window.history.pushState({}, 'Checkout', `${bastPath}/checkout`)
+    window.history.pushState({}, 'Checkout', getDefaultPathname('/checkout'))
     renderWithProviders(<WrappedCheckout history={history} />)
 
     // Switch to login
@@ -588,7 +586,7 @@ test('Can proceed through checkout as registered customer', async () => {
     user.click(placeOrderBtn)
 
     await waitFor(() => {
-        expect(window.location.pathname).toEqual(`${bastPath}/checkout/confirmation`)
+        expect(window.location.pathname).toEqual(getDefaultPathname('/checkout/confirmation'))
     })
 })
 
@@ -662,7 +660,7 @@ test('Can edit address during checkout as a registered customer', async () => {
     )
 
     // Set the initial browser router path and render our component tree.
-    window.history.pushState({}, 'Checkout', `${bastPath}/checkout`)
+    window.history.pushState({}, 'Checkout', getDefaultPathname('/checkout'))
     renderWithProviders(<WrappedCheckout history={history} />)
 
     // Switch to login
@@ -789,7 +787,7 @@ test('Can add address during checkout as a registered customer', async () => {
     )
 
     // Set the initial browser router path and render our component tree.
-    window.history.pushState({}, 'Checkout', `${bastPath}/checkout`)
+    window.history.pushState({}, 'Checkout', getDefaultPathname('/checkout'))
     renderWithProviders(<WrappedCheckout history={history} />)
 
     // Switch to login

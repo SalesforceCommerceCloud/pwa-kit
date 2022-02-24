@@ -49,7 +49,6 @@ export const resolveSiteFromUrl = (url) => {
 export const getDefaultSite = () => {
     const {app} = getConfig()
     const sites = getSites()
-    console.log('sites', sites)
     if (!sites) {
         throw new Error("Can't find any sites in the config. Please check your configuration")
     }

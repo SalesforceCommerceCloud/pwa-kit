@@ -201,7 +201,7 @@ export const getConfig = (opts = {}) => {
     let _config
 
     if (typeof window !== 'undefined') {
-        _config = JSON.parse(document.getElementById('app-config').innerHTML)
+        _config = window.__CONFIG__ || JSON.parse(document.getElementById('app-config').innerHTML)
         return _config
     }
 

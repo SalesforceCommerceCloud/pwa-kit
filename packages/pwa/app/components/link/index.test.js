@@ -62,7 +62,6 @@ test('accepts `to` prop as well', () => {
     const {getByText} = renderWithProviders(<Link to="/mypage">My Page</Link>, {
         wrapperProps: {locale: 'en-US'}
     })
-    console.log('window.__CONFIG__', window.__CONFIG__)
     expect(getByText(/My Page/i)).toHaveAttribute('href', '/us/en-US/mypage')
 })
 

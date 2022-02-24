@@ -5,17 +5,11 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {
-    whichLocaleToLoad,
-    loadLocaleData,
-    getLocaleConfig,
-    getPreferredCurrency,
-    getSupportedLocalesIds
-} from './locale'
+import {whichLocaleToLoad, loadLocaleData, getLocaleConfig, getPreferredCurrency} from './locale'
 
 import {DEFAULT_LOCALE, SUPPORTED_LOCALES} from './test-utils'
 
-const supportedLocales = getSupportedLocalesIds(SUPPORTED_LOCALES)
+export const supportedLocales = SUPPORTED_LOCALES.map((locale) => locale.id)
 const isMultiLocales = supportedLocales.length > 1
 const nonSupportedLocale = 'nl-NL'
 // Make sure this supported locale is not the default locale.

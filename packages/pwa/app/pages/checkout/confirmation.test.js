@@ -243,8 +243,6 @@ beforeAll(() => {
 
     // Since we're testing some navigation logic, we are using a simple Router
     // around our component. We need to initialize the default route/path here.
-    const t = getDefaultPathname('/account')
-    console.log('t', t)
     window.history.pushState({}, 'Account', getDefaultPathname('/account'))
 })
 afterEach(() => {
