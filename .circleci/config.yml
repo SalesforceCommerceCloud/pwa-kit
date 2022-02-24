@@ -166,6 +166,7 @@ commands:
           environment:
             GENERATOR_PRESET: 'test-project'
           command: |
+            set GENERATOR_PRESET=test-project
             node packages/pwa-kit-create-app/scripts/create-mobify-app-dev.js --outputDir generated-project
             
             cd generated-project
@@ -175,6 +176,7 @@ commands:
           environment:
             GENERATOR_PRESET: 'hello-world-test-project'
           command: |
+            set GENERATOR_PRESET=hello-world-test-project
             node packages/pwa-kit-create-app/scripts/create-mobify-app-dev.js --outputDir generated-project-hello-world
       - runtests:
           cwd: generated-project

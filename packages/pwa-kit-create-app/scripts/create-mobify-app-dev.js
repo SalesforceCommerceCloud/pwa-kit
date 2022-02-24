@@ -97,8 +97,8 @@ const withLocalNPMRepo = (func) => {
                         }
                     })
 
-                    child.stdout.pipe(process.stdout)
-                    child.stderr.pipe(process.stderr)
+                    child.stdout.pipe(logStream)
+                    child.stderr.pipe(logStream)
                 })
         )
         .then(() => {
