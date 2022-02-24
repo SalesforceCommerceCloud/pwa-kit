@@ -7,6 +7,7 @@
 
 import {getConfig, getUrlConfig} from './utils'
 import {getParamsFromPath} from './utils'
+import {commerceAPIConfig} from '../api.config'
 /**
  * This functions takes an url and returns a site object,
  * an error will be thrown if no url is passed in or no site is found
@@ -32,9 +33,9 @@ export const resolveSiteFromUrl = (url) => {
         return site
     }
 
-    //if step 1 does not work, use the default value to get the default site
+    //Step 2: if step 1 does not work, use the default value to get the default site
     site = getDefaultSite()
-    // Step 4: throw an error if site can't be found by any of the above steps
+    // Step 3: throw an error if site can't be found by any of the above steps
     if (!site) {
         throw new Error("Can't find any site. Please check you sites configuration.")
     }
@@ -55,12 +56,11 @@ export const getDefaultSite = () => {
     if (sites.length === 1) {
         return sites[0]
     }
-    if (!app.defaultSite) {
-        throw new Error(
-            "Can't find defaultSite in the config. Please check your configuration file"
-        )
-    }
-    return sites.find((site) => site.id === app.defaultSite)
+
+    // use the commerceAPIConfig.parameters.siteId as a fallback value if default site is not defined or set upt correctly
+    return sites.find(
+        (site) => site.id === app.defaultSite || site.id === commerceAPIConfig.parameters.siteId
+    )
 }
 
 /**

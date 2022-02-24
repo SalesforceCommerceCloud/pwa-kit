@@ -25,7 +25,7 @@ export const configureRoutes = (routes = [], {ignoredRoutes = []}) => {
         ...new Set(
             allSites
                 ?.reduce((res, site) => {
-                    return [...res, site.id, site.alias]
+                    return [...res, site.alias, site.id]
                 }, [])
                 .filter(Boolean)
         )
@@ -37,7 +37,7 @@ export const configureRoutes = (routes = [], {ignoredRoutes = []}) => {
             allSites
                 .reduce((res, {l10n}) => {
                     l10n.supportedLocales.forEach((locale) => {
-                        res = [...res, locale.id, locale.alias]
+                        res = [...res, locale.alias, locale.id]
                     })
                     return res
                 }, [])

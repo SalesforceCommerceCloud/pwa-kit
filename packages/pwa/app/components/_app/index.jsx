@@ -75,6 +75,11 @@ const App = (props) => {
     const [isOnline, setIsOnline] = useState(true)
     const styles = useStyleConfig('App')
 
+    const configValues = {
+        locale: targetLocale,
+        site: site.alias || site.id
+    }
+
     const {isOpen, onOpen, onClose} = useDisclosure()
 
     // Used to conditionally render header/footer for checkout page
@@ -124,10 +129,7 @@ const App = (props) => {
     }
 
     const onCartClick = () => {
-        const path = buildPathWithUrlConfig('/cart', {
-            locale: targetLocale,
-            site: site.alias || site.id
-        })
+        const path = buildPathWithUrlConfig('/cart', configValues)
         history.push(path)
 
         // Close the drawer.
@@ -137,10 +139,7 @@ const App = (props) => {
     const onAccountClick = () => {
         // Link to account page for registered customer, open auth modal otherwise
         if (customer.isRegistered) {
-            const path = buildPathWithUrlConfig('/account', {
-                locale: targetLocale,
-                site: site.alias || site.id
-            })
+            const path = buildPathWithUrlConfig('/account', configValues)
             history.push(path)
         } else {
             // if they already are at the login page, do not show login modal
@@ -150,10 +149,7 @@ const App = (props) => {
     }
 
     const onWishlistClick = () => {
-        const path = buildPathWithUrlConfig('/account/wishlist', {
-            locale: targetLocale,
-            site: site.alias || site.id
-        })
+        const path = buildPathWithUrlConfig('/account/wishlist', configValues)
         history.push(path)
     }
 

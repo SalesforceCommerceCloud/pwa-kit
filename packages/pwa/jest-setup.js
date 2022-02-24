@@ -35,12 +35,6 @@ class LocalStorageMock {
 
 const localStorageMock = new LocalStorageMock()
 
-// Mock the the `default` cofig to the window global
-Object.defineProperty(window, '__CONFIG__', {
-    value: mockConfig,
-    configurable: true
-})
-
 Object.defineProperty(window, 'crypto', {
     value: new Crypto()
 })
@@ -51,6 +45,12 @@ Object.defineProperty(window, 'localStorage', {
 
 Object.defineProperty(window, 'scrollTo', {
     value: () => null
+})
+
+// Mock the `default` cofig to the window global
+Object.defineProperty(window, '__CONFIG__', {
+    value: mockConfig,
+    configurable: true
 })
 
 Object.defineProperty(window, 'matchMedia', {

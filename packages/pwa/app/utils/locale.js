@@ -17,29 +17,14 @@ export const getSupportedLocalesIds = (supportedLocales = []) =>
  * Dynamically import the translations/messages for a given locale
  * @private
  * @param {string} targetLocale
- * @param {string} defaultLocale
- * @param {string[]} supportedLocales
- * @returns {Promise<Object>} The messages (compiled in AST format) in the given locale. If locale is not found, returns the default locale's messages. If the translation file is not found, return the default messages instead.
+ * @returns {Promise<Object>} The messages (compiled in AST format) in the given locale.
+ *      If locale is not found, returns the default locale's messages.
+ *      If the translation file is not found, return the default messages instead.
  */
-export const loadLocaleData = async (targetLocale, defaultLocale, supportedLocales) => {
-    // NOTE: the pseudo locale in this case is actually `en-XB` from react-intl. For more details:
-    // - see our npm script `compile-translations:pseudo`
-    // - and this react-intl PR: https://github.com/formatjs/formatjs/pull/2708
-    const locales = [...supportedLocales, 'en-XB']
-    let localeToLoad
-
-    if (locales.includes(targetLocale)) {
-        localeToLoad = targetLocale
-    } else {
-        console.warn(
-            `Not expecting to see locale '${targetLocale}'. Loading the default locale '${defaultLocale}' instead.`
-        )
-        localeToLoad = defaultLocale
-    }
-
+export const loadLocaleData = async (targetLocale) => {
     let module
     try {
-        module = await import(`../translations/compiled/${localeToLoad}.json`)
+        module = await import(`../translations/compiled/${targetLocale}.json`)
     } catch (err) {
         console.error(err)
         console.log(
@@ -71,9 +56,7 @@ export const getLocaleConfig = async ({getUserPreferredLocales, l10nConfig = {}}
             ? process.env.USE_PSEUDOLOCALE === 'true'
                 ? 'en-XB'
                 : targetLocale
-            : targetLocale,
-        defaultLocale,
-        supportedLocales
+            : targetLocale
     )
 
     return {

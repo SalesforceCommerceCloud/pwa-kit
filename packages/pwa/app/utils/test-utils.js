@@ -37,6 +37,7 @@ export const SUPPORTED_LOCALES = [
 ]
 // Contexts
 import {CategoriesProvider, CurrencyProvider} from '../contexts'
+import mockConfig from '../../config/mocks/default.json'
 
 export const renderWithReactIntl = (node, locale = DEFAULT_LOCALE) => {
     return render(
