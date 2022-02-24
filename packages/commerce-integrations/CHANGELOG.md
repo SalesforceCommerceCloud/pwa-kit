@@ -1,3 +1,5 @@
+## v2.4.10 (Feb 24, 2022)
+- Security package updates
 ## v2.4.9 (Aug 13, 2021)
 ## v2.4.8 (Aug 09, 2021)
 ## v2.4.7 (Jul 15, 2021)
