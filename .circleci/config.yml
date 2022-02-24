@@ -133,12 +133,16 @@ commands:
         description: 'The path to a project to test'
         default: './packages/pwa'
         type: string
+      scripts_path:
+        description: 'The smoke test scripts path'
+        default: '/home/circleci/project/scripts'
+        type: string
     steps:
       - run:
           name: 'Smoke test scripts'
           command: |
             # Basic smoke-tests for uncommonly run scripts in a project
-            node /home/circleci/project/scripts/smoke-test-npm-scripts.js --dir << parameters.dir >>
+            node << parameters.scripts_path >>/smoke-test-npm-scripts.js --dir << parameters.dir >>
   lighthouse-ci:
     description: 'Run Lighthouse CI on the PWA'
     steps:
@@ -180,8 +184,6 @@ commands:
             node packages/pwa-kit-create-app/scripts/create-mobify-app-dev.js --outputDir generated-project-hello-world
       - runtests:
           cwd: generated-project
-      - smoketestscripts:
-          dir: generated-project
       - run:
           name: Count Generated Project Dependencies
           environment:
@@ -311,6 +313,8 @@ jobs:
       - checkout
       - setup
       - generate_and_test_project
+      - smoketestscripts:
+          dir: generated-project
       - early_return_for_forked_pull_requests
       - slack/status:
           fail_only: true
@@ -366,6 +370,9 @@ jobs:
       - checkout
       - setup_windows
       - generate_and_test_project
+      - smoketestscripts:
+          dir: /users/circleci/project/generated-project
+          scripts_path: /users/circleci/project/scripts
 
 workflows:
   version: 2
