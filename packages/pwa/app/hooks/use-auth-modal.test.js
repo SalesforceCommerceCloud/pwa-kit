@@ -8,20 +8,11 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import {screen, within, waitFor} from '@testing-library/react'
 import user from '@testing-library/user-event'
-import {renderWithProviders} from '../utils/test-utils'
+import {renderWithProviders, getDefaultPathname} from '../utils/test-utils'
 import {AuthModal, useAuthModal} from './use-auth-modal'
 import {BrowserRouter as Router, Route} from 'react-router-dom'
 import Account from '../pages/account'
-import mockConfig from '../../config/default.json'
 
-jest.mock('../utils/utils', () => {
-    const original = jest.requireActual('../utils/utils')
-    return {
-        ...original,
-        getConfig: jest.fn(() => mockConfig),
-        getUrlConfig: jest.fn(() => mockConfig.app.url)
-    }
-})
 jest.setTimeout(60000)
 
 const mockRegisteredCustomer = {
@@ -137,7 +128,7 @@ const MockedComponent = (props) => {
         <Router>
             <button onClick={authModal.onOpen}>Open Modal</button>
             <AuthModal {...authModal} />
-            <Route path={'/uk/en-GB/account'}>
+            <Route path={getDefaultPathname('/account')}>
                 <Account match={match} />
             </Route>
         </Router>

@@ -9,7 +9,7 @@ import {screen, waitFor, within} from '@testing-library/react'
 import user from '@testing-library/user-event'
 import {rest} from 'msw'
 import {setupServer} from 'msw/node'
-import {renderWithProviders} from '../../utils/test-utils'
+import {getDefaultPathname, renderWithProviders} from '../../utils/test-utils'
 import ResetPassword from '.'
 
 jest.setTimeout(60000)
@@ -117,7 +117,7 @@ test('Allows customer to go to sign in page', async () => {
 
     user.click(screen.getByText('Sign in'))
     await waitFor(() => {
-        expect(window.location.pathname).toEqual('/uk/en-GB/login')
+        expect(window.location.pathname).toEqual(getDefaultPathname('/login'))
     })
 })
 
@@ -150,7 +150,7 @@ test('Allows customer to generate password token', async () => {
 
     user.click(screen.getByText('Back to Sign In'))
     await waitFor(() => {
-        expect(window.location.pathname).toEqual('/uk/en-GB/login')
+        expect(window.location.pathname).toEqual(getDefaultPathname('/login'))
     })
 })
 
