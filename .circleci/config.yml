@@ -372,7 +372,7 @@ jobs:
       - generate_and_test_project
       - smoketestscripts:
           dir: /users/circleci/project/generated-project
-          scripts_path: /users/circleci/project/scripts
+          scripts_path: C:\users\circleci\project\scripts
 
 workflows:
   version: 2
