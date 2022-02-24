@@ -178,7 +178,6 @@ test('should render empty list page', async () => {
 })
 
 test('pagination is rendered', async () => {
-    console.log('window.location.pathname', window.location.pathname)
     renderWithProviders(<MockedComponent />)
     expect(await screen.findByTestId('sf-pagination')).toBeInTheDocument()
 })
