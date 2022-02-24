@@ -20,6 +20,7 @@ packages:
     access: $all
     publish: $all
     proxy: npmjs
+
   '**':
     access: $all
     publish: $all
@@ -30,6 +31,3 @@ publish:
 
 logs:
   - {type: stdout, format: pretty, level: http}
-
-server:
-  keepAliveTimeout: 0
