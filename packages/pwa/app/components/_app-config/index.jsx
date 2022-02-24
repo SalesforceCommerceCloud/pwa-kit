@@ -79,12 +79,7 @@ AppConfig.restore = (locals = {}) => {
             : `${window.location.pathname}${window.location.search}`
     const url = pathToUrl(path)
     const site = resolveSiteFromUrl(url)
-
-    if (site) {
-        apiConfig.parameters.siteId = site?.id
-    }
-
-    console.log('App config site', site)
+    apiConfig.parameters.siteId = site.id
 
     const locale = getLocale(locals) || site.l10n.defaultLocale
     const currency =

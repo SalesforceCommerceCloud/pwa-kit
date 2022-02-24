@@ -142,7 +142,7 @@ const Footer = ({...otherProps}) => {
                                     variant="filled"
                                     {...styles.localeDropdown}
                                 >
-                                    {getSupportedLocalesIds(l10n.supportedLocales).map((locale) => (
+                                    {supportedLocaleIds.map((locale) => (
                                         <LocaleText
                                             as="option"
                                             value={locale}
