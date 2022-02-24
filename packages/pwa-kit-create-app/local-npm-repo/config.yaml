@@ -11,7 +11,7 @@ auth:
 uplinks:
   npmjs:
     url: https://registry.npmjs.org/
-    max_fails: 100
+    max_fails: 300
     cache: true
 
 # Allow anybody to publish any package, with no auth.
