@@ -38,7 +38,6 @@ describe('configureRoutes', function() {
         expect(configuredRoutes[configuredRoutes.length - 1].path).toEqual('/category/:categoryId')
         expect(configuredRoutes.length).toEqual(31)
         const paths = configuredRoutes.map((route) => route.path)
-        console.log('paths', paths)
         expect(paths).toEqual(expectedPathsResult)
     })
 
