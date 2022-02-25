@@ -14,8 +14,8 @@ const CartCta = () => {
     return (
         <Fragment>
             <Button
-                as="a"
-                href="https://pwa-hybrid-deployment.herokuapp.com/on/demandware.store/Sites-RefArch-Site/en_US/Checkout-Begin?stage=shipping#shipping"
+                as={Link}
+                to="/checkout"
                 width={['95%', '95%', '95%', '100%']}
                 marginTop={[6, 6, 2, 2]}
                 mb={4}

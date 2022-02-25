@@ -178,8 +178,8 @@ export const AddToCartModal = () => {
                                 </Button>
 
                                 <Button
-                                    as="a"
-                                    href="https://pwa-hybrid-deployment.herokuapp.com/on/demandware.store/Sites-RefArch-Site/en_US/Checkout-Begin?stage=shipping#shipping"
+                                    as={Link}
+                                    to="/checkout"
                                     width="100%"
                                     variant="outline"
                                     rightIcon={<LockIcon />}
