@@ -7,12 +7,12 @@
 
 import {getConfig, getUrlConfig} from './utils'
 import {getParamsFromPath} from './utils'
-import {commerceAPIConfig} from '../api.config'
+
 /**
  * This functions takes an url and returns a site object,
  * an error will be thrown if no url is passed in or no site is found
  * @param {string} url
- * @returns {object}
+ * @returns {object} site - a site object
  */
 export const resolveSiteFromUrl = (url) => {
     const urlConfig = getUrlConfig()
@@ -33,7 +33,7 @@ export const resolveSiteFromUrl = (url) => {
         return site
     }
 
-    //Step 2: if step 1 does not work, use the default value to get the default site
+    //Step 2: if step 1 does not work, use the defaultSite value to get the default site
     site = getDefaultSite()
     // Step 3: throw an error if site can't be found by any of the above steps
     if (!site) {
@@ -43,8 +43,8 @@ export const resolveSiteFromUrl = (url) => {
 }
 
 /**
- * get the default site
- * @returns {object} - default site object
+ * Returns the default site based on the defaultSite value in the config
+ * @returns {object} site - a site object
  */
 export const getDefaultSite = () => {
     const {app} = getConfig()
@@ -58,14 +58,12 @@ export const getDefaultSite = () => {
     }
 
     // use the commerceAPIConfig.parameters.siteId as a fallback value if default site is not defined or set upt correctly
-    return sites.find(
-        (site) => site.id === app.defaultSite || site.id === commerceAPIConfig.parameters.siteId
-    )
+    return sites.find((site) => site.id === app.defaultSite)
 }
 
 /**
- * Ret
- * @return {array} - site list including their aliases
+ * Return the list of sites that has included with aliases
+ * @return {array} sites - site list including their aliases
  */
 export const getSites = () => {
     const {app} = getConfig()
