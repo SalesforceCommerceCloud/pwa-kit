@@ -89,11 +89,11 @@ const withLocalNPMRepo = (func) => {
 
                     const checkTime = 1000
 
-                    function check() {
+                    const waitForLogFileExists = () => {
                         setTimeout(() => {
-                            fs.readFile(logFileName, function(err) {
+                            fs.readFile(logFileName, (err) => {
                                 if (err) {
-                                    check()
+                                    waitForLogFileExists()
                                 } else {
                                     const readStream = fs.createReadStream(logFileName)
 
@@ -111,7 +111,7 @@ const withLocalNPMRepo = (func) => {
                         }, checkTime)
                     }
 
-                    check()
+                    waitForLogFileExists()
                 })
         )
         .then(() => {
