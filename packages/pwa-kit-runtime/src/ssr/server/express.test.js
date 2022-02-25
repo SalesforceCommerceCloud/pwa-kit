@@ -90,7 +90,6 @@ const opts = (overrides = {}) => {
         fetchAgents: {
             https: httpsAgent
         },
-        enableLegacyRemoteProxying: false,
         defaultCacheTimeSeconds: 123
     }
     return {

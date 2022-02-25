@@ -29,8 +29,6 @@ const options = {
     // Note that http://localhost is treated as a secure context for development.
     protocol: 'http',
 
-    enableLegacyRemoteProxying: false,
-
     mobify: pkg.mobify
 }
 

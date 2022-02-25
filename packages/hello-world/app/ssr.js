@@ -13,7 +13,6 @@ const options = {
     faviconPath: path.resolve(__dirname, 'static', 'favicon.ico'),
     defaultCacheTimeSeconds: 600,
     mobify: pkg.mobify,
-    enableLegacyRemoteProxying: false,
     protocol: 'http'
 }
 
