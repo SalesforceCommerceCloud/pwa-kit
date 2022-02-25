@@ -73,6 +73,7 @@ export const DevServerMixin = {
         })
     },
 
+    // eslint-disable-next-line no-unused-vars
     setupProxying(app, options) {
         proxyConfigs.forEach((config) => {
             app.use(config.proxyPath, config.proxy)
