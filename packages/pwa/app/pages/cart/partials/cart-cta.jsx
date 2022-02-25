@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
+import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
 import React, {Fragment} from 'react'
 import {FormattedMessage} from 'react-intl'
 import {Flex, Button} from '@chakra-ui/react'
@@ -15,7 +16,7 @@ const CartCta = () => {
         <Fragment>
             <Button
                 as="a"
-                href="https://pwa-hybrid-deployment.herokuapp.com/on/demandware.store/Sites-RefArch-Site/en_US/Checkout-Begin?stage=shipping#shipping"
+                href={`${getAppOrigin()}/on/demandware.store/Sites-RefArch-Site/en_US/Checkout-Begin`}
                 width={['95%', '95%', '95%', '100%']}
                 marginTop={[6, 6, 2, 2]}
                 mb={4}

@@ -44,35 +44,6 @@ const routes = [
         exact: true
     },
     {
-        path: '/login',
-        component: Login,
-        exact: true
-    },
-    {
-        path: '/registration',
-        component: Registration,
-        exact: true
-    },
-    {
-        path: '/reset-password',
-        component: ResetPassword,
-        exact: true
-    },
-    {
-        path: '/account',
-        component: Account
-    },
-    {
-        path: '/checkout',
-        component: Checkout,
-        exact: true
-    },
-    {
-        path: '/checkout/confirmation',
-        component: CheckoutConfirmation,
-        exact: true
-    },
-    {
         path: '/callback',
         component: LoginRedirect,
         exact: true
@@ -93,10 +64,6 @@ const routes = [
     {
         path: '/category/:categoryId',
         component: ProductList
-    },
-    {
-        path: '/account/wishlist',
-        component: Wishlist
     },
     {
         path: '/:locale',

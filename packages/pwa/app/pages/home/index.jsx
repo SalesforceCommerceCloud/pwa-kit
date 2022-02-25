@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-
+import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
 import React from 'react'
 import PropTypes from 'prop-types'
 import {useIntl, FormattedMessage} from 'react-intl'
@@ -66,7 +66,7 @@ const Home = ({productSearchResult, isLoading}) => {
                     <Stack spacing={{base: 4, sm: 6}} direction={{base: 'column', sm: 'row'}}>
                         <Button
                             as={Link}
-                            href="https://pwa-hybrid-deployment.herokuapp.com/on/demandware.store/Sites-RefArch-Site/en_US/Checkout-Begin"
+                            href={`${getAppOrigin()}/on/demandware.store/Sites-RefArch-Site/en_US/Checkout-Begin`}
                             width={{base: 'full', md: 'inherit'}}
                             paddingX={7}
                             _hover={{textDecoration: 'none'}}

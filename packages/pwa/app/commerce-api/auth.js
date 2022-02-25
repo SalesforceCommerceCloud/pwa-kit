@@ -47,7 +47,7 @@ class Auth {
         this._onClient = typeof window !== 'undefined'
         this._pendingAuth = undefined
         this._customerId = undefined
-        this._oid = Cookies.get('oidStorageKey')
+        this._oid = Cookies.get(oidStorageKey)
 
         const configOid = api._config.parameters.organizationId
         if (this._oid !== configOid) {
@@ -392,7 +392,7 @@ class Auth {
     _saveAccessToken(token) {
         this._authToken = token
         if (this._onClient) {
-            Cookies.set(tokenStorageKey, token, {secure: true})
+            Cookies.set(tokenStorageKey, token, {secure: true, expires: 1})
         }
     }
 
@@ -404,7 +404,7 @@ class Auth {
     _saveUsid(usid) {
         this._usid = usid
         if (this._onClient) {
-            Cookies.set(usidStorageKey, usid, {secure: true})
+            Cookies.set(usidStorageKey, usid, {secure: true, expires: 1})
         }
     }
 
@@ -416,7 +416,7 @@ class Auth {
     _saveEncUserId(encUserId) {
         this._encUserId = encUserId
         if (this._onClient) {
-            Cookies.set(encUserIdStorageKey, encUserId, {secure: true})
+            Cookies.set(encUserIdStorageKey, encUserId, {secure: true, expires: 1})
         }
     }
 
@@ -428,7 +428,7 @@ class Auth {
     _saveOid(oid) {
         this._oid = oid
         if (this._onClient) {
-            Cookies.set(oidStorageKey, oid, {secure: true})
+            Cookies.set(oidStorageKey, oid, {secure: true, expires: 1})
         }
     }
 
@@ -462,7 +462,7 @@ class Auth {
         const storeageKey =
             type === 'registered' ? refreshTokenStorageKey : refreshTokenGuestStorageKey
         if (this._onClient) {
-            Cookies.set(storeageKey, refreshToken, {secure: true})
+            Cookies.set(storeageKey, refreshToken, {secure: true, expires: 1})
         }
     }
 }
