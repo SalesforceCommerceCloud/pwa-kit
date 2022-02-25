@@ -365,9 +365,9 @@ jobs:
     steps:
       - checkout
       - setup_windows
-      - smoketestscripts:
-          dir: pwa
       - generate_and_test_project
+      - smoketestscripts:
+            dir: generated-project
 
 
 workflows:
