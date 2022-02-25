@@ -367,7 +367,7 @@ jobs:
       - setup_windows
       - generate_and_test_project
       - smoketestscripts:
-            dir: generated-project
+          dir: generated-project
 
 
 workflows:
