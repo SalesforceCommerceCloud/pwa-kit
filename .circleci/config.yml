@@ -370,9 +370,6 @@ jobs:
       - checkout
       - setup_windows
       - generate_and_test_project
-      - smoketestscripts:
-          dir: C:\users\circleci\project\generated-project
-          scripts_path: C:\users\circleci\project\scripts\
 
 workflows:
   version: 2
