@@ -135,14 +135,14 @@ commands:
         type: string
       scripts_path:
         description: 'The smoke test scripts path'
-        default: '/home/circleci/project/scripts'
+        default: '/home/circleci/project/scripts/'
         type: string
     steps:
       - run:
           name: 'Smoke test scripts'
           command: |
             # Basic smoke-tests for uncommonly run scripts in a project
-            node << parameters.scripts_path >>/smoke-test-npm-scripts.js --dir << parameters.dir >>
+            node << parameters.scripts_path >>smoke-test-npm-scripts.js --dir << parameters.dir >>
   lighthouse-ci:
     description: 'Run Lighthouse CI on the PWA'
     steps:
@@ -371,8 +371,8 @@ jobs:
       - setup_windows
       - generate_and_test_project
       - smoketestscripts:
-          dir: /users/circleci/project/generated-project
-          scripts_path: C:\users\circleci\project\scripts
+          dir: C:\users\circleci\project\generated-project
+          scripts_path: C:\users\circleci\project\scripts\
 
 workflows:
   version: 2
