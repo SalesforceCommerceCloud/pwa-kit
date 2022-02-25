@@ -194,7 +194,7 @@ const runGenerator = (answers, {outputDir}) => {
 
 const npmInstall = (outputDir) => {
     console.log('Installing dependencies for the generated project. This may take a few minutes.\n')
-    child_proc.execSync('npm install --verbose', {
+    child_proc.execSync('npm install --quiet', {
         cwd: outputDir,
         stdio: 'inherit'
     })

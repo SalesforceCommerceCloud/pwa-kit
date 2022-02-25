@@ -48,8 +48,7 @@ const cp = require('child_process')
 
 sh.set('-e')
 
-const logFileName = p.join(__dirname, '..', 'verdaccio.log')
-const readFileName = p.join(__dirname, '..', 'local-npm-repo', 'debugverdaccio.log')
+const logFileName = p.join(__dirname, '..', 'local-npm-repo', 'verdaccio.log')
 
 /**
  * Run the provided function with a local NPM repository running in the background.
@@ -75,7 +74,6 @@ const withLocalNPMRepo = (func) => {
         .then(
             () =>
                 new Promise((resolve) => {
-                    const logStream = fs.createWriteStream(logFileName, {flags: 'a'})
                     console.log('Starting up local NPM repository')
 
                     child = cp.exec(`${verdaccio} --config config.yaml`, {
@@ -93,11 +91,11 @@ const withLocalNPMRepo = (func) => {
 
                     function check() {
                         setTimeout(() => {
-                            fs.readFile(readFileName, function(err) {
+                            fs.readFile(logFileName, function(err) {
                                 if (err) {
                                     check()
                                 } else {
-                                    const readStream = fs.createReadStream(readFileName)
+                                    const readStream = fs.createReadStream(logFileName)
 
                                     readStream.on('data', (data) => {
                                         if (data.includes('http address')) {
@@ -114,9 +112,6 @@ const withLocalNPMRepo = (func) => {
                     }
 
                     check()
-
-                    child.stdout.pipe(logStream)
-                    child.stderr.pipe(logStream)
                 })
         )
         .then(() => {
@@ -124,14 +119,11 @@ const withLocalNPMRepo = (func) => {
             // packages to it. This is safe to do – Verdaccio does not forward these
             // the public NPM repo.
             console.log('Publishing packages to the local NPM repository')
-            sh.exec(
-                'npm run lerna -- publish from-package --yes --concurrency 1 --loglevel verbose',
-                {
-                    cwd: monorepoRoot,
-                    fatal: true,
-                    silent: false
-                }
-            ).toEnd(logFileName)
+            sh.exec('npm run lerna -- publish from-package --yes --concurrency 1 --loglevel warn', {
+                cwd: monorepoRoot,
+                fatal: true,
+                silent: false
+            }).toEnd(logFileName)
             console.log('Published successfully')
         })
         .then(() => func())
@@ -145,13 +137,10 @@ const withLocalNPMRepo = (func) => {
 const runGenerator = () => {
     // Shelljs can't run interactive programs, so we have to switch to child_process.
     // See https://github.com/shelljs/shelljs/wiki/FAQ#running-interactive-programs-with-exec
-    try {
-        cp.execSync(`npx pwa-kit-create-app --outputDir ${process.argv.slice(3)}`, {
-            stdio: 'inherit'
-        })
-    } catch (error) {
-        console.log(`Error status: ${error.status} with '${error.message}'`)
-    }
+
+    cp.execSync(`npx pwa-kit-create-app --outputDir ${process.argv.slice(3)}`, {
+        stdio: 'inherit'
+    })
 }
 
 const main = () => {
