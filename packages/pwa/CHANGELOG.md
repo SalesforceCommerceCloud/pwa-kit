@@ -1,4 +1,5 @@
 ## v1.5.0-dev (Jan 28, 2022)
+-   Store authentication tokens in cookies instead of localstorage [#429](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/429)
 -   Make sure the forgot-password modal also shows up in the checkout flow [#373](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/373)
 -   On Windows, the locale selector dropdown in the footer now showing all of the options properly [#381](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/381)
 
