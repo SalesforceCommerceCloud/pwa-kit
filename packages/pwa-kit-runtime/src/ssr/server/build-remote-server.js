@@ -495,6 +495,7 @@ export const RemoteServerFactory = {
         app.use(ssrRequestProcessorMiddleware)
     },
 
+    // eslint-disable-next-line no-unused-vars
     setupProxying(app, options) {
         app.all('/mobify/proxy/*', (_, res) => {
             return res.status(501).json({
