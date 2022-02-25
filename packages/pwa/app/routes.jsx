@@ -19,6 +19,7 @@ import loadable from '@loadable/component'
 import {Skeleton} from '@chakra-ui/react'
 import {HOME_HREF} from './constants'
 import {configureRoutes} from './utils/routes-utils'
+import {getConfig} from 'pwa-kit-react-sdk/ssr/universal/utils'
 
 const fallback = <Skeleton height="75vh" width="100%" />
 
@@ -109,8 +110,10 @@ const routes = [
     }
 ]
 
-export default (config) => {
-    return configureRoutes(routes, config, {
+export default () => {
+    const config = getConfig()
+    return configureRoutes(routes, {
+        urlConfig: config.app.url,
         ignoredRoutes: [HOME_HREF, '/callback', '/:locale', '*']
-    }) 
+    })
 }

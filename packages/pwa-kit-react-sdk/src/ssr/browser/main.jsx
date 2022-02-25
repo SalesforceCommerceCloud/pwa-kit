@@ -56,7 +56,7 @@ export const start = () => {
     if (window.__CONFIG__) {
         setConfig(window.__CONFIG__)
     }
-    
+
     // AppConfig.restore *must* come before getRoutes()
     AppConfig.restore(locals, window.__PRELOADED_STATE__.__STATE_MANAGEMENT_LIBRARY)
     const routes = getRoutes(locals, window.__CONFIG__)

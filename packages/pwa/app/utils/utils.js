@@ -5,7 +5,6 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-// import pwaKitConfig from '../../pwa-kit.config.json'
 import {getConfig} from 'pwa-kit-react-sdk/ssr/universal/utils'
 
 /**
@@ -158,10 +157,8 @@ export const capitalize = (text) => {
         .join(' ')
 }
 
-export const getAppConfig = () => getConfig().app
-
 /**
  * A util to return current url configuration
  * @returns {object} - url object from the pwa-kit.config.json file
  */
-export const getUrlConfig = () => getAppConfig().url
+export const getUrlConfig = () => getConfig().app.url

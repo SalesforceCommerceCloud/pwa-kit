@@ -105,7 +105,7 @@ const main = async () => {
         // Update script to remove `dist` folder in imports.
         await replace({
             files: ['dist/scripts/**/!(prepare-dist.js)'],
-            from: /dist\//,
+            from: /dist\//g,
             to: ''
         })
     } catch (e) {

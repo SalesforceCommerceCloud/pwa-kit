@@ -15,11 +15,9 @@ import {urlPartPositions} from '../constants'
  * @param {object} - a custom configured object
  * @return {array} - list of configured route objects
  */
-export const configureRoutes = (routes = [], config, {ignoredRoutes = []}) => {
+export const configureRoutes = (routes = [], {urlConfig, ignoredRoutes = []}) => {
     if (!routes.length) return []
-    if (!config) return routes
-
-    const {url: urlConfig} = config?.app
+    if (!urlConfig) return routes
 
     return routes.map((route) => {
         const {path, ...rest} = route

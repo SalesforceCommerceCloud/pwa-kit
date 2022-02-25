@@ -54,7 +54,7 @@ export const getProxyConfigs = () => {
 }
 
 /**
- * Returns the configuration object previous set. 
+ * Returns the configuration object previous set.
  *
  * @returns {object} - the configuration object.
  */
@@ -69,10 +69,10 @@ export const getConfig = () => {
 
 /**
  * Set the configuration object. This is done when the express
- * application is created on the server, and when the react app 
+ * application is created on the server, and when the react app
  * is started on the client.
- * 
- * @param {object} config 
+ *
+ * @param {object} config
  */
 export const setConfig = (config) => {
     _config = config
