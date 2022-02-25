@@ -11,6 +11,7 @@ import {HTTPError} from 'pwa-kit-react-sdk/ssr/universal/errors'
 import {createCodeVerifier, generateCodeChallenge} from './pkce'
 import {createGetTokenBody} from './utils'
 import fetch from 'cross-fetch'
+import Cookies from 'js-cookie'
 
 /**
  * An object containing the customer's login credentials.
@@ -38,7 +39,6 @@ const dwSessionIdKey = 'dwsid'
 /**
  * A  class that provides auth functionality for pwa.
  */
-// const slasCallbackEndpoint = '/slas/callback'
 const slasCallbackEndpoint = '/callback'
 class Auth {
     constructor(api) {
@@ -47,22 +47,19 @@ class Auth {
         this._onClient = typeof window !== 'undefined'
         this._pendingAuth = undefined
         this._customerId = undefined
-        this._storage = new CookieStorage()
-
-        this._oid = this._storage.get(oidStorageKey)
+        this._oid = Cookies.get('oidStorageKey')
 
         const configOid = api._config.parameters.organizationId
-        // if (this._oid !== configOid) {
-        //     this._clearAuth()
-        //     this._saveOid(configOid)
-        // } else {
-        this._authToken = this._storage.get(tokenStorageKey)
-        this._refreshToken =
-            this._storage.get(refreshTokenStorageKey) ||
-            this._storage.get(refreshTokenGuestStorageKey)
-        this._usid = this._storage.get(usidStorageKey)
-        this._encUserId = this._storage.get(encUserIdStorageKey)
-        // }
+        if (this._oid !== configOid) {
+            this._clearAuth()
+            this._saveOid(configOid)
+        } else {
+            this._authToken = Cookies.get(tokenStorageKey)
+            this._refreshToken =
+                Cookies.get(refreshTokenStorageKey) || Cookies.get(refreshTokenGuestStorageKey)
+            this._usid = Cookies.get(usidStorageKey)
+            this._encUserId = Cookies.get(encUserIdStorageKey)
+        }
 
         this.login = this.login.bind(this)
         this.logout = this.logout.bind(this)
@@ -127,13 +124,16 @@ class Auth {
         return response
     }
 
-    async createOCAPISession() {
-        return fetch('/mobify/proxy/ocapi/s/RefArch/dw/shop/v21_3/sessions', {
-            method: 'POST',
-            headers: {
-                Authorization: this._authToken
+    createOCAPISession() {
+        return fetch(
+            `/mobify/proxy/ocapi/s/${this._config.parameters.siteId}/dw/shop/v21_3/sessions`,
+            {
+                method: 'POST',
+                headers: {
+                    Authorization: this._authToken
+                }
             }
-        })
+        )
     }
 
     /**
@@ -217,9 +217,7 @@ class Auth {
         this._customerId = customer_id
         this._saveAccessToken(`Bearer ${access_token}`)
         this._saveUsid(usid)
-        // (Non registered users recieve an empty string for the encoded user id value)
-        // ^ incorrect assumption! Guest session from SFRA does have enc_user_id
-        // we use id_token to identify guest v.s. registered
+        // we use id_token to distinguish guest and registered users
         if (id_token.length > 0) {
             this._saveEncUserId(enc_user_id)
             this._saveRefreshToken(refresh_token, 'registered')
@@ -394,7 +392,7 @@ class Auth {
     _saveAccessToken(token) {
         this._authToken = token
         if (this._onClient) {
-            this._storage.set(tokenStorageKey, token)
+            Cookies.set(tokenStorageKey, token, {secure: true})
         }
     }
 
@@ -406,7 +404,7 @@ class Auth {
     _saveUsid(usid) {
         this._usid = usid
         if (this._onClient) {
-            this._storage.set(usidStorageKey, usid)
+            Cookies.set(usidStorageKey, usid, {secure: true})
         }
     }
 
@@ -418,7 +416,7 @@ class Auth {
     _saveEncUserId(encUserId) {
         this._encUserId = encUserId
         if (this._onClient) {
-            this._storage.set(encUserIdStorageKey, encUserId)
+            Cookies.set(encUserIdStorageKey, encUserId, {secure: true})
         }
     }
 
@@ -430,7 +428,7 @@ class Auth {
     _saveOid(oid) {
         this._oid = oid
         if (this._onClient) {
-            this._storage.set(oidStorageKey, oid)
+            Cookies.set(oidStorageKey, oid, {secure: true})
         }
     }
 
@@ -445,12 +443,12 @@ class Auth {
         this._usid = undefined
         this._encUserId = undefined
         if (this._onClient) {
-            this._storage.remove(tokenStorageKey)
-            this._storage.remove(refreshTokenStorageKey)
-            this._storage.remove(refreshTokenGuestStorageKey)
-            this._storage.remove(usidStorageKey)
-            this._storage.remove(encUserIdStorageKey)
-            this._storage.remove(dwSessionIdKey)
+            Cookies.remove(tokenStorageKey)
+            Cookies.remove(refreshTokenStorageKey)
+            Cookies.remove(refreshTokenGuestStorageKey)
+            Cookies.remove(usidStorageKey)
+            Cookies.remove(encUserIdStorageKey)
+            Cookies.remove(dwSessionIdKey)
         }
     }
 
@@ -464,70 +462,8 @@ class Auth {
         const storeageKey =
             type === 'registered' ? refreshTokenStorageKey : refreshTokenGuestStorageKey
         if (this._onClient) {
-            this._storage.set(storeageKey, refreshToken)
+            Cookies.set(storeageKey, refreshToken, {secure: true})
         }
-    }
-}
-
-class Storage {
-    set(name, value) {}
-    get(name) {}
-    remove(name) {}
-}
-
-// this is not production ready!
-class CookieStorage extends Storage {
-    constructor(...args) {
-        super(args)
-        this._avaliable = false
-        if (typeof document === 'undefined') {
-            console.warn('CookieStorage is not avaliable on the current environment.')
-            return
-        }
-        this._avaliable = true
-    }
-    set(name, value, attributes) {
-        this._avaliable &&
-            (document.cookie = `${name}=${value};expires=Tue, 08 Mar 2022 09:06:52 GMT;`)
-    }
-    get(name) {
-        if (!this._avaliable) return undefined
-        let decodedCookie = decodeURIComponent(document.cookie)
-        let ca = decodedCookie.split(';')
-        for (let i = 0; i < ca.length; i++) {
-            let c = ca[i]
-            while (c.charAt(0) == ' ') {
-                c = c.substring(1)
-            }
-            if (c.indexOf(`${name}=`) == 0) {
-                return c.substring(`${name}=`.length, c.length)
-            }
-        }
-        return ''
-    }
-    remove(name) {
-        document.cookie = name + '=' + ';expires=Thu, 01 Jan 1970 00:00:01 GMT'
-    }
-}
-
-class LocalStorage extends Storage {
-    constructor(...args) {
-        super(args)
-        this._avaliable = false
-        if (typeof window === 'undefined') {
-            console.warn('LocalStorage is not avaliable on the current environment.')
-            return
-        }
-        this._avaliable = true
-    }
-    set(name, value) {
-        this._avaliable && window.localStorage.setItem(name, value)
-    }
-    get(name) {
-        return this._avaliable ? window.localStorage.getItem(name) : undefined
-    }
-    remove(name) {
-        this._avaliable && window.localStorage.removeItem(name)
     }
 }
 
