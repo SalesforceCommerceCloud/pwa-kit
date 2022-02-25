@@ -364,12 +364,16 @@ jobs:
   generatedSFCCProjectTestWindows:
     executor:
       name: win/default
-      size: "xlarge"
+      size: "large"
       shell: bash.exe
     steps:
       - checkout
       - setup_windows
+      - smoketestscripts:
+          dir: pwa
+          scripts_path: .\scripts
       - generate_and_test_project
+
 
 workflows:
   version: 2
