@@ -32,8 +32,6 @@ const tokenStorageKey = 'token'
 const refreshTokenStorageKey = 'cc-nx'
 const refreshTokenGuestStorageKey = 'cc-nx-g'
 const oidStorageKey = 'oid'
-
-// log out SFRA session
 const dwSessionIdKey = 'dwsid'
 
 /**
@@ -124,6 +122,17 @@ class Auth {
         return response
     }
 
+    /**
+     * Make a post request to the OCAPI /session endpoint to bridge the session.
+     *
+     * The HTTP response contains a set-cookie header which sets the dwsid session cookie.
+     * This cookie is used on SFRA site and it shoppers to navigate between SFRA site and
+     * this PWA site seamlessly, this is often used to enable hybrid deployment.
+     *
+     * (Note: this method is client side only, b/c MRT doesn't support set-cookie header right now)
+     *
+     * @returns {Promise}
+     */
     createOCAPISession() {
         return fetch(
             `/mobify/proxy/ocapi/s/${this._config.parameters.siteId}/dw/shop/v21_3/sessions`,
