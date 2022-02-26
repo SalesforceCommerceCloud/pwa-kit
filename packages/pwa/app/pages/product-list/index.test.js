@@ -18,7 +18,7 @@ import {
 import {screen, waitFor} from '@testing-library/react'
 import user from '@testing-library/user-event'
 import {Route, Switch} from 'react-router-dom'
-import {getDefaultPathname, renderWithProviders} from '../../utils/test-utils'
+import {createPathWithDefaults, renderWithProviders} from '../../utils/test-utils'
 import ProductList from '.'
 import EmptySearchResults from './partials/empty-results'
 import useCustomer from '../../commerce-api/hooks/useCustomer'
@@ -69,7 +69,7 @@ const MockedComponent = ({isLoading, isLoggedIn = false, searchQuery}) => {
     return (
         <Switch>
             <Route
-                path={getDefaultPathname('/category/:categoryId')}
+                path={createPathWithDefaults('/category/:categoryId')}
                 render={(props) => (
                     <div>
                         <div>{customer.customerId}</div>

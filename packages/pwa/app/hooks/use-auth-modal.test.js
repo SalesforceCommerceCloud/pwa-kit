@@ -8,7 +8,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import {screen, within, waitFor} from '@testing-library/react'
 import user from '@testing-library/user-event'
-import {renderWithProviders, getDefaultPathname} from '../utils/test-utils'
+import {renderWithProviders, createPathWithDefaults} from '../utils/test-utils'
 import {AuthModal, useAuthModal} from './use-auth-modal'
 import {BrowserRouter as Router, Route} from 'react-router-dom'
 import Account from '../pages/account'
@@ -128,7 +128,7 @@ const MockedComponent = (props) => {
         <Router>
             <button onClick={authModal.onOpen}>Open Modal</button>
             <AuthModal {...authModal} />
-            <Route path={getDefaultPathname('/account')}>
+            <Route path={createPathWithDefaults('/account')}>
                 <Account match={match} />
             </Route>
         </Router>

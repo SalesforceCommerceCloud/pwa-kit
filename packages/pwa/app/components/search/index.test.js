@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import {renderWithProviders, getDefaultPathname} from '../../utils/test-utils'
+import {renderWithProviders, createPathWithDefaults} from '../../utils/test-utils'
 import user from '@testing-library/user-event'
 import {screen, waitFor} from '@testing-library/react'
 import SearchInput from './index'
@@ -56,7 +56,7 @@ test('changes url when enter is pressed', async () => {
     renderWithProviders(<SearchInput />)
     const searchInput = document.querySelector('input[type="search"]')
     await user.type(searchInput, 'Dresses{enter}')
-    await waitFor(() => expect(window.location.pathname).toEqual(getDefaultPathname('/search')))
+    await waitFor(() => expect(window.location.pathname).toEqual(createPathWithDefaults('/search')))
     await waitFor(() => expect(window.location.search).toEqual('?q=Dresses'))
 })
 

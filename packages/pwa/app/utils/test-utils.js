@@ -173,7 +173,7 @@ export const renderWithProviders = (children, options) =>
  * @param path The pathname that we want to use
  * @returns {string} URL pathname for the given path
  */
-export const getDefaultPathname = (path) => {
+export const createPathWithDefaults = (path) => {
     const {app} = mockConfig
     const defaultSite = app.sites.find((site) => site.id === app.defaultSite)
     const siteAlias = app.siteAliases[defaultSite.id]
