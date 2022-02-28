@@ -193,7 +193,7 @@ const common = {
                     from: 'config/',
                     to: 'config/',
                     globOptions: {
-                        gitignore: true
+                        ignore: ['**/local.*']
                     }
                 }
             ]
