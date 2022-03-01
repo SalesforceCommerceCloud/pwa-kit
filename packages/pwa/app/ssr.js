@@ -42,6 +42,31 @@ const app = createApp({
     enableLegacyRemoteProxying: false
 })
 
+// @@@ Require Basic Auth
+const AUTH = {
+    username: 'storefront',
+    password: 'password'
+}
+
+app.use((req, res, next) => {
+    // Don't require basic auth on "loopback" URLs. This prevents the need to
+    // forward basic auth 
+    if (req.path.startsWith('/mobify') || req.path.startsWith('/callback')) {
+        return next()
+    }
+    const authorization = (req.get('authorization') || '').split(' ')[1] || ''
+    const [username, password] = Buffer.from(authorization, 'base64')
+        .toString()
+        .split(':')
+
+    if (username == AUTH.username && password == AUTH.password) {
+        return next()
+    }
+
+    res.set('WWW-Authenticate', 'Basic realm="Storefront"')
+    res.status(401).send('Auth Required! :woman-gesturing-no:')
+})
+
 // Set HTTP security headers
 app.use(
     helmet({

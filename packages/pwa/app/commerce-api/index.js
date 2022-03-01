@@ -179,12 +179,22 @@ class CommerceAPI {
      */
     async willSendRequest(methodName, ...params) {
         // We never need to modify auth request headers for these methods
-        if (
-            methodName === 'authenticateCustomer' ||
-            methodName === 'authorizeCustomer' ||
-            methodName === 'getAccessToken'
-        ) {
+        if (methodName === 'authenticateCustomer' || methodName === 'authorizeCustomer') {
             return params
+        }
+
+        const [fetchOptions, ...restParams] = params
+        if (methodName === 'getAccessToken') {
+            // @@@ In the absence of a `Authorization` header, browsers automatically
+            //     append the Basic Auth header which this endpoint (oauth2/token) doesn't like.
+            //     Setting an empty `Authorization` header prevents this behaviour!
+            return [
+                {
+                    ...fetchOptions,
+                    headers: {...fetchOptions.headers, Authorization: ''}
+                },
+                ...restParams
+            ]
         }
 
         // If a login promise exists, we don't proceed unless it is resolved.
@@ -202,7 +212,6 @@ class CommerceAPI {
         }
 
         // Apply the appropriate auth headers and return new options
-        const [fetchOptions, ...restParams] = params
         const newFetchOptions = {
             ...fetchOptions,
             headers: {...fetchOptions.headers, Authorization: this.auth.authToken}
