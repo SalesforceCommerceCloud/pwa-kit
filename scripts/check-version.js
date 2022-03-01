@@ -33,18 +33,18 @@ if (!fs.existsSync(path.join('node_modules', 'semver'))) {
 }
 
 const semver = require('semver')
-const requiredNode = new semver.Range(pkg.engines.node)
+const requiredNode = pkg.engines.node
 const foundNode = process.version
-const requiredNpm = new semver.Range(pkg.engines.npm)
+const requiredNpm = pkg.engines.npm
 const foundNpm = spawnSync(npm, ['-v']).stdout.toString().trim()
 
 const warnings = []
 
-if (!semver.satisfies(foundNode, requiredNode)) {
+if (!semver.satisfies(foundNode, new semver.Range(requiredNode))) {
     warnings.push(`- Node: ${foundNode} is installed, but we require ${requiredNode}`)
 }
 
-if (!semver.satisfies(foundNpm, requiredNpm)) {
+if (!semver.satisfies(foundNpm, new semver.Range(requiredNpm))) {
     warnings.push(`- NPM: ${foundNpm} is installed, but we require ${requiredNpm}`)
 }
 
