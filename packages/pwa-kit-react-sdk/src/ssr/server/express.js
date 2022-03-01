@@ -403,7 +403,7 @@ const validateConfiguration = (options) => {
         }
     }
 
-    if (options.mobify && !(options.mobify instanceof Object)) {
+    if (!(options.mobify instanceof Object)) {
         throw new Error(
             'The mobify option passed to the SSR server must be an object (from package.json)'
         )

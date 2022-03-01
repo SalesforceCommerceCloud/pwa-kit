@@ -9,13 +9,14 @@
 import {urlPartPositions} from '../constants'
 
 /**
- * Configure the routes based on url configuration from pwa-kit.config.json file
+ * Configure the routes based on url configuration provided.
  *
  * @param {array} routes - array of routes to be configured
+ * @param {object} urlConfig - the url configuration object
  * @param {object} - a custom configured object
  * @return {array} - list of configured route objects
  */
-export const configureRoutes = (routes = [], {urlConfig, ignoredRoutes = []}) => {
+export const configureRoutes = (routes = [], urlConfig, {ignoredRoutes = []}) => {
     if (!routes.length) return []
     if (!urlConfig) return routes
 

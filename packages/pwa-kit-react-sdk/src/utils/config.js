@@ -8,19 +8,18 @@
 import {cosmiconfigSync} from 'cosmiconfig'
 
 /**
- * Returns the express app configuration file in object form. The object resolution will
- * be as follows (from highest to lowest priority):
+ * Returns the express app configuration file in object form. The file will be resolved in the
+ * the following order (from highest to lowest priority):
  *
  * > {target_name}.ext
  * > local.ext
  * > default.ext
- * > package.json (mobify.key)
+ * > package.json (mobify key)
  *
  * Each file marked with `ext` can optionally be terminated with `yml`, `yaml` or
  * `json` in that priority.
  *
- * NOTE: This is an isomorphic function, when run on the browser the config returned will
- * be the value serialized in the html.
+ * When developing locally and you'd like to use a configuration
  *
  * @returns - the application configuration object.
  */

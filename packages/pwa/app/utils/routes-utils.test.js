@@ -37,8 +37,7 @@ describe('configureRoutes', function() {
                 exact: true
             }
         ]
-        const configuredRoutes = configureRoutes(routes, {
-            urlConfig: getUrlConfig(),
+        const configuredRoutes = configureRoutes(routes, getUrlConfig(), {
             ignoredRoutes: '/'
         })
         expect(configuredRoutes[0].path).toEqual('/')

@@ -112,8 +112,7 @@ const routes = [
 
 export default () => {
     const config = getConfig()
-    return configureRoutes(routes, {
-        urlConfig: config.app.url,
+    return configureRoutes(routes, config?.app?.url, {
         ignoredRoutes: [HOME_HREF, '/callback', '/:locale', '*']
     })
 }
