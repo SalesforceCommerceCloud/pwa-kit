@@ -27,7 +27,6 @@ import URL from 'url'
 import merge from 'merge-descriptors'
 import {PersistentCache} from '../../utils/ssr-cache'
 import {setConfig} from '../universal/utils'
-import {loadConfig} from '../../utils/config'
 
 import {
     CachedResponse,
@@ -204,9 +203,6 @@ export const createApp = (options) => {
     // This is the ORIGIN under which we are serving the page.
     // because it's an origin, it does not end with a slash.
     options.appOrigin = process.env.APP_ORIGIN = `${options.protocol}://${options.appHostname}`
-
-    // Assign the config, prioritizing the `mobify` object over loading the configuration file.
-    options.mobify = options.mobify || loadConfig()
 
     // Make the config available in a isomorphic scope. We'll having to use webpack magic for
     // to handle issues with bundling the `cosmiconfig` library.

@@ -11,6 +11,7 @@ import {createApp, createHandler, serveStaticFile} from 'pwa-kit-react-sdk/ssr/s
 import {isRemote} from 'pwa-kit-react-sdk/utils/ssr-server'
 import {render} from 'pwa-kit-react-sdk/ssr/server/react-rendering'
 import helmet from 'helmet'
+import {loadConfig} from 'pwa-kit-react-sdk/utils/config'
 
 const app = createApp({
     // The build directory (an absolute path)
@@ -28,6 +29,9 @@ const app = createApp({
 
     // The port that the local dev server listens on
     port: 3000,
+
+    // This is the `mobify` object defined in your config folder or package.json file.
+    mobify: loadConfig(),
 
     // The protocol on which the development Express app listens.
     // Note that http://localhost is treated as a secure context for development.
