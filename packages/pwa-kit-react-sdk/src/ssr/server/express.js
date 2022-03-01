@@ -204,8 +204,8 @@ export const createApp = (options) => {
     // because it's an origin, it does not end with a slash.
     options.appOrigin = process.env.APP_ORIGIN = `${options.protocol}://${options.appHostname}`
 
-    // Make the config available in a isomorphic scope. We'll having to use webpack magic for
-    // to handle issues with bundling the `cosmiconfig` library.
+    // Make the config available in a isomorphic scope. Preventing us from
+    // having to use webpack externals when bundling the `cosmiconfig` library.
     setConfig(options.mobify)
 
     // Configure the server with the basic options
