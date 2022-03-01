@@ -9,17 +9,24 @@ import {cosmiconfigSync} from 'cosmiconfig'
 
 /**
  * Returns the express app configuration file in object form. The file will be resolved in the
- * the following order (from highest to lowest priority):
+ * the following order:
  *
- * > {target_name}.ext
- * > local.ext
- * > default.ext
- * > package.json (mobify key)
+ * {deploy_target}.ext - When the DEPLOY_TARGET environment is set (predomenantly on remote environments)
+ * a file aptly named after the environment will be loaded first. Examples of this are `production.json`, or
+ * `development.json`.
  *
+ * local.ext - Only loaded on local development environments, this file is used if you want a custom
+ * configuration that will not be used on deployed remote environments.
+ *
+ * default.ext - If you have no requirement for environment specific configurations the `default`
+ * config file will be used.
+ *
+ * package.json - If none of the files after have been found the `mobify` object defined in the 
+ * projects `package.json` file.
+ * 
+
  * Each file marked with `ext` can optionally be terminated with `yml`, `yaml` or
  * `json` in that priority.
- *
- * When developing locally and you'd like to use a configuration
  *
  * @returns - the application configuration object.
  */
@@ -33,13 +40,11 @@ export const loadConfig = () => {
         `config/${moduleName}.yml`,
         `config/${moduleName}.yaml`,
         `config/${moduleName}.json`,
-        `config/local.yml`,
-        `config/local.yaml`,
-        `config/local.json`,
-        `config/default.yml`,
-        `config/default.yaml`,
-        `config/default.json`,
-        `package.json`
+        ...(isRemote ? [] : ['config/local.yml', 'config/local.yaml', 'config/local.json']),
+        'config/default.yml',
+        'config/default.yaml',
+        'config/default.json',
+        'package.json'
     ]
 
     // Match config files based on the specificity from most to most general.
