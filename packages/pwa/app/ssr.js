@@ -48,7 +48,12 @@ app.use(
         contentSecurityPolicy: {
             useDefaults: true,
             directives: {
-                'img-src': ["'self'", '*.commercecloud.salesforce.com', 'data:'],
+                'img-src': [
+                    "'self'",
+                    '*.commercecloud.salesforce.com',
+                    '*.demandware.net',
+                    'data:'
+                ],
                 'script-src': ["'self'", "'unsafe-eval'"],
 
                 // Do not upgrade insecure requests for local development

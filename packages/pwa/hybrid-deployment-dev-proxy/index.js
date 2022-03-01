@@ -15,7 +15,7 @@ const PORT = process.env.PORT || 8000
 const PROXY_ORIGIN = isRemote()
     ? 'https://pwa-hybrid-deployment.herokuapp.com'
     : `http://localhost:${PORT}`
-const SFRA_INSTANCE_ORIGIN = 'https://zzrf-002.sandbox.us01.dx.commercecloud.salesforce.com'
+const SFRA_INSTANCE_ORIGIN = 'https://development-internal-ccdemo.demandware.net'
 const PWA_ORIGIN = isRemote()
     ? 'https://scaffold-pwa-hybrid-deployment.mobify-storefront.com'
     : 'http://localhost:3000'

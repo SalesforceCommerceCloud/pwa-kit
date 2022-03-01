@@ -23,11 +23,11 @@
             "ssrFunctionNodeVersion": "14.x",
             "proxyConfigs": [
                 {
-                    "host": "kv7kzm78.api.commercecloud.salesforce.com",
+                    "host": "xitgmcd3.api.commercecloud.salesforce.com",
                     "path": "api"
                 },
                 {
-                    "host": "zzrf-002.sandbox.us01.dx.commercecloud.salesforce.com",
+                    "host": "development-internal-ccdemo.demandware.net",
                     "path": "ocapi"
                 },
                 {
@@ -36,6 +36,10 @@
                 }
             ]
         }
+    },
+    "engines": {
+        "node": "^12.0.0 || ^14.0.0",
+        "npm": "^6.14.4 || ^7.0.0 || ^8.0.0"
     },
     "dependencies": {
         "@chakra-ui/react": "^1.7.1",
