@@ -392,15 +392,15 @@ const extractTemplate = (templateName, outputDir) => {
     sh.rm('-rf', tmp)
 }
 
-const userNode = process.versions.node
-const requiredNode = new semver.Range(generatorPkg.engines.node)
-const isUsingCompatibleNode = semver.satisfies(userNode, requiredNode)
+const foundNode = process.versions.node
+const requiredNode = generatorPkg.engines.node
+const isUsingCompatibleNode = semver.satisfies(foundNode, new semver.Range(requiredNode))
 
 const main = (opts) => {
     if (!isUsingCompatibleNode) {
         console.log('')
         console.warn(
-            `Warning: You are using Node ${userNode}. ` +
+            `Warning: You are using Node ${foundNode}. ` +
                 `Your app may not work as expected when deployed to Managed ` +
                 `Runtime servers which are compatible with Node ${requiredNode}`
         )
