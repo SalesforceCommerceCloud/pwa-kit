@@ -63,7 +63,7 @@ const uploadBundle = (customOptions) => {
         Utils.fail('[Error: You must provide a Runtime Admin project slug to upload a bundle.]')
     }
 
-    const options = Object.assign(OPTION_DEFAULTS, customOptions)
+    const options = Object.assign({}, OPTION_DEFAULTS, customOptions)
 
     // Create bundle will generate the archive file and return an updated
     // options object
