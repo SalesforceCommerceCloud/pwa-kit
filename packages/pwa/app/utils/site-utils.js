@@ -5,8 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {getConfig, getUrlConfig} from './utils'
-import {getParamsFromPath} from './utils'
+import {getConfig, getConfigMatcher} from './utils'
 
 /**
  * This functions takes an url and returns a site object,
@@ -15,20 +14,31 @@ import {getParamsFromPath} from './utils'
  * @returns {object} site - a site object
  */
 export const resolveSiteFromUrl = (url) => {
-    const urlConfig = getUrlConfig()
-
     if (!url) {
         throw new Error('url is required to find a site object.')
     }
-    const sites = getSites()
+    const config = getConfig()
     const {pathname, search} = new URL(url)
-    const path = `${pathname}${search}`
     let site
 
+    const {pathMatcher, searchMatcherForSite} = getConfigMatcher(config)
+    const pathMatch = pathname.match(pathMatcher)
+    const searchMatch = search.match(searchMatcherForSite)
+
+    // the value can only either in the path or search query param, there will be no overridden
+    const siteIdentifierFromUrl =
+        pathMatch?.groups.siteAlias ||
+        pathMatch?.groups.siteId ||
+        searchMatch?.groups.siteAlias ||
+        searchMatch?.groups.siteId
+
+    const sites = getSites()
+
     // get the site identifier from the url
-    const {site: currentSite} = getParamsFromPath(path, urlConfig)
     // step 1: look for the site based on the site identifier (id or alias) from the url
-    site = sites.find((site) => site.id === currentSite || site.alias === currentSite)
+    site = sites.find(
+        (site) => site.id === siteIdentifierFromUrl || site.alias === siteIdentifierFromUrl
+    )
     if (site) {
         return site
     }

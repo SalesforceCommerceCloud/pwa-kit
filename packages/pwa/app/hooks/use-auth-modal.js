@@ -25,10 +25,9 @@ import {BrandLogo} from '../components/icons'
 import LoginForm from '../components/login'
 import ResetPasswordForm from '../components/reset-password'
 import RegisterForm from '../components/register'
-import {useHistory} from 'react-router-dom'
 import {noop} from '../utils/utils'
 import {API_ERROR_MESSAGE} from '../constants'
-import {buildPathWithUrlConfig} from '../utils/url'
+import useNavigation from './use-navigation'
 
 const LOGIN_VIEW = 'login'
 const REGISTER_VIEW = 'register'
@@ -41,12 +40,12 @@ export const AuthModal = ({
     onPasswordResetSuccess = noop,
     ...props
 }) => {
-    const {formatMessage, locale} = useIntl()
+    const {formatMessage} = useIntl()
     const customer = useCustomer()
+    const navigate = useNavigation()
     const [currentView, setCurrentView] = useState(initialView)
     const form = useForm()
     const submittedEmail = useRef()
-    const history = useHistory()
     const toast = useToast()
 
     const submitForm = async (data) => {
@@ -77,8 +76,9 @@ export const AuthModal = ({
     const handleRegister = async (data) => {
         try {
             await customer.registerCustomer(data)
-            const path = buildPathWithUrlConfig('/account', {locale})
-            history.push(path)
+            navigate('/account')
+            // const path = buildPathWithUrlConfig('/account', {locale})
+            // history.push(path)
         } catch (error) {
             form.setError('global', {type: 'manual', message: error.message})
         }

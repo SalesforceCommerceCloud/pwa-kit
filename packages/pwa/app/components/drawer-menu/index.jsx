@@ -84,7 +84,8 @@ const DrawerMenu = ({isOpen, onClose = noop, onLogoClick = noop, root}) => {
     const styles = useMultiStyleConfig('DrawerMenu')
     const drawerSize = useBreakpointValue({sm: PHONE_DRAWER_SIZE, md: TABLET_DRAWER_SIZE})
     const socialIconVariant = useBreakpointValue({base: 'flex', md: 'flex-start'})
-    const {l10n} = useSite()
+    const site = useSite()
+    const {l10n} = site
     const [showLoading, setShowLoading] = useState(false)
     const onSignoutClick = async () => {
         setShowLoading(true)
@@ -271,7 +272,8 @@ const DrawerMenu = ({isOpen, onClose = noop, onLogoClick = noop, root}) => {
                                         onSelect={(newLocale) => {
                                             // Update the `locale` in the URL.
                                             const newUrl = getUrlWithLocale(newLocale, {
-                                                disallowParams: ['refine']
+                                                disallowParams: ['refine'],
+                                                site
                                             })
                                             window.location = newUrl
                                         }}

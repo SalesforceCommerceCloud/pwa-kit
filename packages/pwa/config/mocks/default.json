@@ -2,7 +2,8 @@
     "app": {
         "url": {
             "locale": "path",
-            "site": "path"
+            "site": "path",
+            "showDefaults": true
         },
         "siteAliases": {
             "site-1": "uk",

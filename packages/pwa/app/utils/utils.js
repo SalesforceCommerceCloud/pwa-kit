@@ -7,6 +7,7 @@
 
 import {urlPartPositions} from '../constants'
 import {pathToUrl} from './url'
+import {getSites} from './site-utils'
 /**
  * Call requestIdleCallback in supported browsers.
  *
@@ -244,4 +245,50 @@ export const getUrlConfig = () => {
         throw new Error("Can't find any valid url config. Please check your configuration file.")
     }
     return app.url
+}
+
+export const getConfigMatcher = (config) => {
+    if (!config) {
+        throw new Error('Config is not defined.')
+    }
+
+    const allSites = getSites()
+
+    // get a collection of all site-id and site alias from the config of the current host
+    // remove any duplicates by using [...new Set([])]
+    const siteIds = allSites.map((site) => site.id)
+    const siteAliases = allSites.map((site) => site.alias).filter(Boolean)
+    // get a collection of all locale-id and locale alias from the config of the current host
+    // remove any duplicates by using [...new Set([])]
+
+    let localeIds = []
+    let localeAliases = []
+    allSites.forEach((site) => {
+        const {l10n} = site
+        l10n.supportedLocales.forEach((locale) => {
+            localeIds.push(locale.id)
+            localeAliases.push(locale.alias)
+        })
+    })
+
+    localeAliases = localeAliases.filter(Boolean)
+    localeIds = localeIds.filter(Boolean)
+    // prettier-ignore
+    // eslint-disable-next-line
+    const pathPattern = `\/*(?<siteId>${siteIds.join('|')})*\/*(?<siteAlias>${siteAliases.join('|')})*\/*(?<localeId>${localeIds.join('|')})*\/*(?<localeAlias>${localeAliases.join('|')})*`
+    // prettier-ignore
+    // eslint-disable-next-line
+    const searchPatternForSite = `site=(?<siteAlias>${siteAliases.join('|')})|site=(?<siteId>${siteIds.join("|")})`
+
+    // prettier-ignore
+    // eslint-disable-next-line
+    const searchPatternForLocale = `locale=(?<localeAlias>${localeAliases.join('|')})|locale=(?<localeId>${localeIds.join("|")})`
+    const pathMatcher = new RegExp(pathPattern)
+    const searchMatcherForSite = new RegExp(searchPatternForSite)
+    const searchMatcherForLocale = new RegExp(searchPatternForLocale)
+    return {
+        pathMatcher,
+        searchMatcherForSite,
+        searchMatcherForLocale
+    }
 }
