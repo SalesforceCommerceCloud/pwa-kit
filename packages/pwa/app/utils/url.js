@@ -8,7 +8,7 @@
 import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
 import {getParamsFromPath, getUrlConfig} from './utils'
 import {getDefaultSite} from './site-utils'
-import {urlPartPositions} from '../constants'
+import {HOME_HREF, urlPartPositions} from '../constants'
 
 /**
  * A function that takes a path and qualifies it with the current host and protocol.
@@ -129,9 +129,8 @@ export const searchUrlBuilder = (searchTerm) => `/search?q=${searchTerm}`
  * @returns {string} - The relative URL for the specific locale.
  */
 export const getUrlWithLocale = (shortCode, opts = {}) => {
-    const urlConfig = getUrlConfig()
     const location = opts.location ? opts.location : window.location
-    let {site, locale} = getParamsFromPath(`${location.pathname}${location.search}`, urlConfig)
+    let {site, locale} = getParamsFromPath(`${location.pathname}${location.search}`)
     const defaultSite = getDefaultSite()
     if (!site) {
         site = defaultSite.alias || defaultSite.id
@@ -144,15 +143,17 @@ export const getUrlWithLocale = (shortCode, opts = {}) => {
         .replace(`locale=${locale}`, '')
         .replace(`site=${site}`, '')
         .replace(/&$/, '')
+    const isHomeRef = pathname === HOME_HREF
 
     const isDefaultLocale = shortCode === defaultSite.l10n.defaultLocale
-    const isDefaultSite = site.alias === defaultSite.alias || site.id === defaultSite.id
-    // rebuild the url with new locale
+    const isDefaultSite = site === defaultSite.alias || site === defaultSite.id
+    // rebuild the url with new locale,
+    // if the path is the homepage, and both the site and its default locale, don't show them in the url
     const newUrl = buildPathWithUrlConfig(
         `${pathname}${search}`,
         {
-            site: isDefaultLocale && isDefaultSite ? '' : site,
-            locale: isDefaultLocale && isDefaultSite ? '' : shortCode
+            site: isDefaultLocale && isDefaultSite && isHomeRef ? '' : site,
+            locale: isDefaultLocale && isDefaultSite && isHomeRef ? '' : shortCode
         },
         opts
     )
@@ -168,12 +169,15 @@ export const getUrlWithLocale = (shortCode, opts = {}) => {
  */
 export const homeUrlBuilder = (homeHref, options = {}) => {
     const {locale, site} = options
+    const defaultSite = getDefaultSite()
+    const isDefaultLocale = locale === defaultSite.l10n.defaultLocale
+    const isDefaultSite = site.id === defaultSite.id || site.alias === defaultSite.alias
 
     const updatedUrl = buildPathWithUrlConfig(
         homeHref,
         {
-            locale,
-            site: site.alias || site.id
+            locale: isDefaultLocale && isDefaultSite ? '' : locale,
+            site: isDefaultLocale && isDefaultSite ? '' : site.alias || site.id
         },
         {site}
     )

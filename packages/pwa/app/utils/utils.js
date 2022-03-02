@@ -161,7 +161,6 @@ export const capitalize = (text) => {
  * This function return the identifiers (site and locale) from the given url
  * The site will always go before locale if both of them are presented in the pathname
  * @param path {string}
- * @param urlConfig {object}
  * @returns {object}
  */
 export const getParamsFromPath = (path) => {
