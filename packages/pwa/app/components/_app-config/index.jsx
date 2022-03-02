@@ -23,7 +23,7 @@ import {commerceAPIConfig, einsteinAPIConfig} from '../../api.config'
 import {getPreferredCurrency} from '../../utils/locale'
 import {pathToUrl} from '../../utils/url'
 import {resolveSiteFromUrl} from '../../utils/site-utils'
-import {getConfig, getConfigMatcher} from '../../utils/utils'
+import {getParamsFromPath} from '../../utils/utils'
 
 const apiConfig = {
     ...commerceAPIConfig,
@@ -41,18 +41,7 @@ const getLocale = (locals = {}) => {
         typeof window === 'undefined'
             ? locals.originalUrl
             : `${window.location.pathname}${window.location.search}`
-
-    const config = getConfig()
-    const {pathname, search} = new URL(pathToUrl(path))
-
-    const {pathMatcher, searchMatcherForLocale} = getConfigMatcher(config)
-    const pathMatch = pathname.match(pathMatcher)
-    const searchMatch = search.match(searchMatcherForLocale)
-    const locale =
-        pathMatch?.groups.localeAlias ||
-        pathMatch?.groups.localeId ||
-        searchMatch?.groups.localeAlias ||
-        searchMatch?.groups.localeId
+    const {locale} = getParamsFromPath(path)
 
     return locale
 }

@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {getConfig, getConfigMatcher} from './utils'
+import {getConfig, getParamsFromPath} from './utils'
 
 /**
  * This functions takes an url and returns a site object,
@@ -17,21 +17,11 @@ export const resolveSiteFromUrl = (url) => {
     if (!url) {
         throw new Error('url is required to find a site object.')
     }
-    const config = getConfig()
     const {pathname, search} = new URL(url)
+    const path = `${pathname}${search}`
     let site
 
-    const {pathMatcher, searchMatcherForSite} = getConfigMatcher(config)
-    const pathMatch = pathname.match(pathMatcher)
-    const searchMatch = search.match(searchMatcherForSite)
-
-    // the value can only either in the path or search query param, there will be no overridden
-    const siteIdentifierFromUrl =
-        pathMatch?.groups.siteAlias ||
-        pathMatch?.groups.siteId ||
-        searchMatch?.groups.siteAlias ||
-        searchMatch?.groups.siteId
-
+    const {site: siteIdentifierFromUrl} = getParamsFromPath(path)
     const sites = getSites()
 
     // get the site identifier from the url

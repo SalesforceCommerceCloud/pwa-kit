@@ -5,7 +5,6 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {urlPartPositions} from '../constants'
 import {pathToUrl} from './url'
 import {getSites} from './site-utils'
 /**
@@ -165,31 +164,30 @@ export const capitalize = (text) => {
  * @param urlConfig {object}
  * @returns {object}
  */
-export const getParamsFromPath = (path, urlConfig = {}) => {
-    const result = {}
+export const getParamsFromPath = (path) => {
     const {pathname, search} = new URL(pathToUrl(path))
-    const params = new URLSearchParams(search)
-    // split the pathname into an array and remove falsy values
-    const paths = pathname.split('/').filter(Boolean)
-    const sitePosition = urlConfig.site
-    if (sitePosition === urlPartPositions.PATH) {
-        result.site = paths[0]
-    } else if (sitePosition === urlPartPositions.QUERY_PARAM) {
-        result.site = params.get('site')
-    }
 
-    const localePosition = urlConfig.locale
-    if (localePosition === urlPartPositions.PATH) {
-        if (sitePosition === urlPartPositions.PATH) {
-            result.locale = paths[1]
-        } else {
-            result.locale = paths[0]
-        }
-    } else if (localePosition === urlPartPositions.QUERY_PARAM) {
-        result.locale = params.get('locale')
-    }
+    const config = getConfig()
+    const {pathMatcher, searchMatcherForSite, searchMatcherForLocale} = getConfigMatcher(config)
 
-    return result
+    const pathMatch = pathname.match(pathMatcher)
+    const searchMatchForSite = search.match(searchMatcherForSite)
+    const searchMatchForLocale = search.match(searchMatcherForLocale)
+
+    // the value can only either in the path or search query param, there will be no overridden
+    const site =
+        pathMatch?.groups.siteAlias ||
+        pathMatch?.groups.siteId ||
+        searchMatchForSite?.groups.siteAlias ||
+        searchMatchForSite?.groups.siteId
+
+    const locale =
+        pathMatch?.groups.localeAlias ||
+        pathMatch?.groups.localeId ||
+        searchMatchForLocale?.groups.localeAlias ||
+        searchMatchForLocale?.groups.localeId
+
+    return {site, locale}
 }
 
 /**
@@ -247,6 +245,11 @@ export const getUrlConfig = () => {
     return app.url
 }
 
+/**
+ * This function return the regex for matching site and locale
+ * @param config
+ * @return {{searchMatcherForSite: RegExp, searchMatcherForLocale: RegExp, pathMatcher: RegExp}}
+ */
 export const getConfigMatcher = (config) => {
     if (!config) {
         throw new Error('Config is not defined.')
