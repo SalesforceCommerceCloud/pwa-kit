@@ -169,14 +169,15 @@ export const getUrlWithLocale = (shortCode, opts = {}) => {
  */
 export const homeUrlBuilder = (homeHref, options = {}) => {
     const {locale, site} = options
-    const defaultSite = getDefaultSite()
-    const isDefaultLocale = locale === defaultSite.l10n.defaultLocale
-    const isDefaultSite = site.id === defaultSite.id || site.alias === defaultSite.alias
 
-    const updatedUrl = buildPathWithUrlConfig(homeHref, {
-        locale: isDefaultLocale && isDefaultSite ? '' : locale,
-        site: isDefaultLocale && isDefaultSite ? '' : site.alias || site.id
-    })
+    const updatedUrl = buildPathWithUrlConfig(
+        homeHref,
+        {
+            locale,
+            site: site.alias || site.id
+        },
+        {site}
+    )
     return encodeURI(updatedUrl)
 }
 
@@ -257,13 +258,32 @@ export const buildPathWithUrlConfig = (relativeUrl, configValues = {}, opts = {}
     const queryParams = {...Object.fromEntries(params)}
     let basePathSegments = []
 
+    // get the default values for site and locale
+    // the default locale values will depend on current site
+    const showDefaults = urlConfig.showDefaults
+    const defaultSites = [getDefaultSite().id, getDefaultSite().alias]
+    const defaultLocaleId = opts.site?.l10n.defaultLocale
+    const defaultLocaleAlias = opts.site?.l10n.supportedLocales.find(
+        (locale) => locale.alias === defaultLocaleId
+    )
+    const defaultValues = [...defaultSites, defaultLocaleId, defaultLocaleAlias]
+
     const options = ['site', 'locale']
     options.forEach((option) => {
         const position = urlConfig[option]
+        const val = configValues[option]
         if (position === urlPartPositions.PATH) {
-            basePathSegments.push(configValues[option])
+            // if showDefaults is false, the default value will not be show in the url
+            if (!showDefaults && defaultValues.includes(val)) {
+                return
+            }
+            basePathSegments.push(val)
         } else if (position === urlPartPositions.QUERY_PARAM) {
-            queryParams[option] = configValues[option]
+            // if showDefaults is false, the default value will not be show in the url
+            if (!showDefaults && defaultValues.includes(val)) {
+                return
+            }
+            queryParams[option] = val
         }
     })
     // filter out falsy (empty string, undefined, null, etc) values in the array

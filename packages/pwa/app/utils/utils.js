@@ -5,8 +5,8 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {urlPartPositions} from '../constants'
 import {pathToUrl} from './url'
+import {getSites} from './site-utils'
 /**
  * Call requestIdleCallback in supported browsers.
  *
@@ -164,31 +164,30 @@ export const capitalize = (text) => {
  * @param urlConfig {object}
  * @returns {object}
  */
-export const getParamsFromPath = (path, urlConfig = {}) => {
-    const result = {}
+export const getParamsFromPath = (path) => {
     const {pathname, search} = new URL(pathToUrl(path))
-    const params = new URLSearchParams(search)
-    // split the pathname into an array and remove falsy values
-    const paths = pathname.split('/').filter(Boolean)
-    const sitePosition = urlConfig.site
-    if (sitePosition === urlPartPositions.PATH) {
-        result.site = paths[0]
-    } else if (sitePosition === urlPartPositions.QUERY_PARAM) {
-        result.site = params.get('site')
-    }
 
-    const localePosition = urlConfig.locale
-    if (localePosition === urlPartPositions.PATH) {
-        if (sitePosition === urlPartPositions.PATH) {
-            result.locale = paths[1]
-        } else {
-            result.locale = paths[0]
-        }
-    } else if (localePosition === urlPartPositions.QUERY_PARAM) {
-        result.locale = params.get('locale')
-    }
+    const config = getConfig()
+    const {pathMatcher, searchMatcherForSite, searchMatcherForLocale} = getConfigMatcher(config)
 
-    return result
+    const pathMatch = pathname.match(pathMatcher)
+    const searchMatchForSite = search.match(searchMatcherForSite)
+    const searchMatchForLocale = search.match(searchMatcherForLocale)
+
+    // the value can only either in the path or search query param, there will be no overridden
+    const site =
+        pathMatch?.groups.siteAlias ||
+        pathMatch?.groups.siteId ||
+        searchMatchForSite?.groups.siteAlias ||
+        searchMatchForSite?.groups.siteId
+
+    const locale =
+        pathMatch?.groups.localeAlias ||
+        pathMatch?.groups.localeId ||
+        searchMatchForLocale?.groups.localeAlias ||
+        searchMatchForLocale?.groups.localeId
+
+    return {site, locale}
 }
 
 /**
@@ -244,4 +243,55 @@ export const getUrlConfig = () => {
         throw new Error("Can't find any valid url config. Please check your configuration file.")
     }
     return app.url
+}
+
+/**
+ * This function return the regex for matching site and locale
+ * @param config
+ * @return {{searchMatcherForSite: RegExp, searchMatcherForLocale: RegExp, pathMatcher: RegExp}}
+ */
+export const getConfigMatcher = (config) => {
+    if (!config) {
+        throw new Error('Config is not defined.')
+    }
+
+    const allSites = getSites()
+
+    // get a collection of all site-id and site alias from the config of the current host
+    // remove any duplicates by using [...new Set([])]
+    const siteIds = allSites.map((site) => site.id)
+    const siteAliases = allSites.map((site) => site.alias).filter(Boolean)
+    // get a collection of all locale-id and locale alias from the config of the current host
+    // remove any duplicates by using [...new Set([])]
+
+    let localeIds = []
+    let localeAliases = []
+    allSites.forEach((site) => {
+        const {l10n} = site
+        l10n.supportedLocales.forEach((locale) => {
+            localeIds.push(locale.id)
+            localeAliases.push(locale.alias)
+        })
+    })
+
+    localeAliases = localeAliases.filter(Boolean)
+    localeIds = localeIds.filter(Boolean)
+    // prettier-ignore
+    // eslint-disable-next-line
+    const pathPattern = `\/*(?<siteId>${siteIds.join('|')})*\/*(?<siteAlias>${siteAliases.join('|')})*\/*(?<localeId>${localeIds.join('|')})*\/*(?<localeAlias>${localeAliases.join('|')})*`
+    // prettier-ignore
+    // eslint-disable-next-line
+    const searchPatternForSite = `site=(?<siteAlias>${siteAliases.join('|')})|site=(?<siteId>${siteIds.join("|")})`
+
+    // prettier-ignore
+    // eslint-disable-next-line
+    const searchPatternForLocale = `locale=(?<localeAlias>${localeAliases.join('|')})|locale=(?<localeId>${localeIds.join("|")})`
+    const pathMatcher = new RegExp(pathPattern)
+    const searchMatcherForSite = new RegExp(searchPatternForSite)
+    const searchMatcherForLocale = new RegExp(searchPatternForLocale)
+    return {
+        pathMatcher,
+        searchMatcherForSite,
+        searchMatcherForLocale
+    }
 }

@@ -1,7 +1,7 @@
 ## v1.5.0-dev (Jan 28, 2022)
 -   Make sure the forgot-password modal also shows up in the checkout flow [#373](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/373)
 -   On Windows, the locale selector dropdown in the footer now showing all of the options properly [#381](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/381)
--   Multi-site implementation for Retail React App [#319](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/319)
+-   Multi-site implementation for Retail React App [#391](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/391)
 
 ## v1.4.0 (Jan 27, 2022)
 

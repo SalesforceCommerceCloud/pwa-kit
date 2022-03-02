@@ -121,7 +121,7 @@ const App = (props) => {
 
     const onLogoClick = () => {
         // Goto the home page.
-        const path = homeUrlBuilder(HOME_HREF, {locale: targetLocale, site})
+        const path = homeUrlBuilder(HOME_HREF, {locale: targetLocale, site}, {site})
         history.push(path)
 
         // Close the drawer.
@@ -129,7 +129,7 @@ const App = (props) => {
     }
 
     const onCartClick = () => {
-        const path = buildPathWithUrlConfig('/cart', configValues)
+        const path = buildPathWithUrlConfig('/cart', configValues, {site})
         history.push(path)
 
         // Close the drawer.
@@ -139,7 +139,7 @@ const App = (props) => {
     const onAccountClick = () => {
         // Link to account page for registered customer, open auth modal otherwise
         if (customer.isRegistered) {
-            const path = buildPathWithUrlConfig('/account', configValues)
+            const path = buildPathWithUrlConfig('/account', configValues, {site})
             history.push(path)
         } else {
             // if they already are at the login page, do not show login modal
@@ -149,7 +149,7 @@ const App = (props) => {
     }
 
     const onWishlistClick = () => {
-        const path = buildPathWithUrlConfig('/account/wishlist', configValues)
+        const path = buildPathWithUrlConfig('/account/wishlist', configValues, {site})
         history.push(path)
     }
 
@@ -191,7 +191,8 @@ const App = (props) => {
                                     rel="alternate"
                                     hrefLang={locale.id.toLowerCase()}
                                     href={`${appOrigin}${getUrlWithLocale(locale.id, {
-                                        location
+                                        location,
+                                        site
                                     })}`}
                                     key={locale.id}
                                 />
@@ -201,7 +202,8 @@ const App = (props) => {
                                 rel="alternate"
                                 hrefLang={defaultLocale.slice(0, 2)}
                                 href={`${appOrigin}${getUrlWithLocale(defaultLocale, {
-                                    location
+                                    location,
+                                    site
                                 })}`}
                             />
                             {/* A wider fallback for user locales that the app does not support */}

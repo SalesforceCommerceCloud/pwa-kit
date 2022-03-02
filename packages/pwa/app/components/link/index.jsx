@@ -17,7 +17,7 @@ const Link = React.forwardRef(({href, to, useNavLink = false, ...props}, ref) =>
     const {locale} = useIntl()
     const site = useSite()
     // if alias is not defined, use site id
-    const updatedHref = buildPathWithUrlConfig(_href, {locale, site: site.alias || site.id})
+    const updatedHref = buildPathWithUrlConfig(_href, {locale, site: site.alias || site.id}, {site})
 
     return (
         <ChakraLink

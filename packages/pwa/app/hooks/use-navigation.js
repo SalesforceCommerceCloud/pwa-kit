@@ -18,7 +18,7 @@ import useSite from './use-site'
 const useNavigation = () => {
     const history = useHistory()
     const {locale} = useIntl()
-    const {alias, id} = useSite()
+    const site = useSite()
     return useCallback(
         /**
          *
@@ -29,16 +29,20 @@ const useNavigation = () => {
         (path, action = 'push', ...args) => {
             // sanitize the locale/site from the current relative url
             let [pathname, search] = path.split('?')
-            pathname = pathname.replace(`/${alias || id}`, '').replace(`/${locale}`, '')
+            pathname = pathname.replace(`/${site.alias || site.id}`, '').replace(`/${locale}`, '')
             search = search
                 ?.replace(`locale=${locale}`, '')
-                ?.replace(`site=${alias || id}`, '')
+                ?.replace(`site=${site.alias || site.id}`, '')
                 ?.replace(/&$/, '')
             const _path = `${pathname}?${search ? search : ''}`
-            const updatedHref = buildPathWithUrlConfig(_path, {
-                locale,
-                site: alias || id
-            })
+            const updatedHref = buildPathWithUrlConfig(
+                _path,
+                {
+                    locale,
+                    site: site.alias || site.id
+                },
+                {site}
+            )
             history[action](path === '/' ? '/' : updatedHref, ...args)
         },
         [locale]

@@ -35,7 +35,8 @@ const Footer = ({...otherProps}) => {
     const styles = useMultiStyleConfig('Footer')
     const intl = useIntl()
     const [locale, setLocale] = useState(intl.locale)
-    const {l10n} = useSite()
+    const site = useSite()
+    const {l10n} = site
     const supportedLocaleIds = l10n?.supportedLocales.map((locale) => locale.id)
     const showLocaleSelector = supportedLocaleIds?.length > 1
 
@@ -134,7 +135,7 @@ const Footer = ({...otherProps}) => {
                                     onChange={({target}) => {
                                         const newLocale = target.value
                                         setLocale(newLocale)
-                                        const newUrl = getUrlWithLocale(newLocale)
+                                        const newUrl = getUrlWithLocale(newLocale, {site})
                                         window.location = newUrl
                                     }}
                                     variant="filled"
