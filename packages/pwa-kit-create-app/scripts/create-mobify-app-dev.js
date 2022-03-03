@@ -48,7 +48,7 @@ const cp = require('child_process')
 
 sh.set('-e')
 
-const logFileName = p.join(__dirname, '..', 'verdaccio.log')
+const logFileName = p.join(__dirname, '..', 'local-npm-repo', 'verdaccio.log')
 
 /**
  * Run the provided function with a local NPM repository running in the background.
@@ -74,27 +74,44 @@ const withLocalNPMRepo = (func) => {
         .then(
             () =>
                 new Promise((resolve) => {
-                    const logStream = fs.createWriteStream(logFileName, {flags: 'a'})
                     console.log('Starting up local NPM repository')
 
-                    child = sh.exec(`${verdaccio} --config config.yaml`, {
+                    child = cp.exec(`${verdaccio} --config config.yaml`, {
                         cwd: verdaccioConfigDir,
-                        async: true,
-                        fatal: true,
-                        silent: true
-                    })
-
-                    child.stdout.on('data', (data) => {
-                        if (data.includes('http address')) {
-                            // Verdaccio is running once it logs the HTTP address. Configure
-                            // NPM to use the local repo, through env vars.
-                            process.env['npm_config_registry'] = 'http://localhost:4873/'
-                            resolve()
+                        stdio: 'inherit',
+                        env: {
+                            ...process.env,
+                            OPENCOLLECTIVE_HIDE: 'true',
+                            DISABLE_OPENCOLLECTIVE: 'true',
+                            OPEN_SOURCE_CONTRIBUTOR: 'true'
                         }
                     })
 
-                    child.stdout.pipe(logStream)
-                    child.stderr.pipe(logStream)
+                    const checkTime = 1000
+
+                    const waitForLogFileExists = () => {
+                        setTimeout(() => {
+                            fs.readFile(logFileName, (err) => {
+                                if (err) {
+                                    waitForLogFileExists()
+                                } else {
+                                    const readStream = fs.createReadStream(logFileName)
+
+                                    readStream.on('data', (data) => {
+                                        if (data.includes('http address')) {
+                                            // Verdaccio is running once it logs the HTTP address. Configure
+                                            // NPM to use the local repo, through env vars.
+                                            process.env['npm_config_registry'] =
+                                                'http://localhost:4873/'
+                                            resolve()
+                                        }
+                                    })
+                                }
+                            })
+                        }, checkTime)
+                    }
+
+                    waitForLogFileExists()
                 })
         )
         .then(() => {
@@ -120,9 +137,10 @@ const withLocalNPMRepo = (func) => {
 const runGenerator = () => {
     // Shelljs can't run interactive programs, so we have to switch to child_process.
     // See https://github.com/shelljs/shelljs/wiki/FAQ#running-interactive-programs-with-exec
-    const cmd = 'npx'
-    const args = ['pwa-kit-create-app', ...process.argv.slice(2)]
-    cp.execFileSync(cmd, args, {stdio: 'inherit'})
+
+    cp.execSync(`npx pwa-kit-create-app --outputDir ${process.argv.slice(3)}`, {
+        stdio: 'inherit'
+    })
 }
 
 const main = () => {

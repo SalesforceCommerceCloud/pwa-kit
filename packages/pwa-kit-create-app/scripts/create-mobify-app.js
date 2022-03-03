@@ -36,6 +36,7 @@
 const p = require('path')
 const fs = require('fs')
 const os = require('os')
+const child_proc = require('child_process')
 const {Command} = require('commander')
 const inquirer = require('inquirer')
 const {URL} = require('url')
@@ -188,11 +189,14 @@ const runGenerator = (answers, {outputDir}) => {
         p.resolve(outputDir, 'app', 'api.config.js')
     )
 
-    console.log('Installing dependencies for the generated project...')
-    sh.exec(`npm install --no-progress`, {
-        env: process.env,
+    npmInstall(outputDir)
+}
+
+const npmInstall = (outputDir) => {
+    console.log('Installing dependencies for the generated project. This may take a few minutes.\n')
+    child_proc.execSync('npm install --quiet', {
         cwd: outputDir,
-        silent: true
+        stdio: 'inherit'
     })
 }
 
@@ -353,12 +357,7 @@ const generateHelloWorld = (projectId, {outputDir}) => {
     const finalPkgData = merge(pkgJSON, {name: projectId})
     writeJson(pkgJsonPath, finalPkgData)
 
-    console.log('Installing dependencies for the generated project...')
-    sh.exec(`npm install --no-progress`, {
-        env: process.env,
-        cwd: outputDir,
-        silent: true
-    })
+    npmInstall(outputDir)
 }
 
 const presetPrompt = () => {
@@ -393,15 +392,15 @@ const extractTemplate = (templateName, outputDir) => {
     sh.rm('-rf', tmp)
 }
 
-const userNode = process.versions.node
-const requiredNode = new semver.Range(generatorPkg.engines.node)
-const isUsingCompatibleNode = semver.satisfies(userNode, requiredNode)
+const foundNode = process.versions.node
+const requiredNode = generatorPkg.engines.node
+const isUsingCompatibleNode = semver.satisfies(foundNode, new semver.Range(requiredNode))
 
 const main = (opts) => {
     if (!isUsingCompatibleNode) {
         console.log('')
         console.warn(
-            `Warning: You are using Node ${userNode}. ` +
+            `Warning: You are using Node ${foundNode}. ` +
                 `Your app may not work as expected when deployed to Managed ` +
                 `Runtime servers which are compatible with Node ${requiredNode}`
         )
