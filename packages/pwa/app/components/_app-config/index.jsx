@@ -48,7 +48,7 @@ const getLocale = (locals = {}, site) => {
         (locale) => locale.id === localeIdentifier || locale.alias === localeIdentifier
     )
 
-    return locale
+    return locale?.id
 }
 
 /**
