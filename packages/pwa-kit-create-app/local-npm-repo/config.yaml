@@ -11,6 +11,7 @@ auth:
 uplinks:
   npmjs:
     url: https://registry.npmjs.org/
+    max_fails: 100
     cache: false
 
 # Allow anybody to publish any package, with no auth.
@@ -19,6 +20,7 @@ packages:
     access: $all
     publish: $all
     proxy: npmjs
+
   '**':
     access: $all
     publish: $all
@@ -28,7 +30,4 @@ publish:
   allow_offline: true
 
 logs:
-  - {type: stdout, format: pretty, level: http}
-
-server:
-  keepAliveTimeout: 0
+  - {type: file, path: ./verdaccio.log, level: warn}
