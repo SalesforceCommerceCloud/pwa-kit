@@ -7,6 +7,10 @@
 
 import {cosmiconfigSync} from 'cosmiconfig'
 
+// These are the supported types of configuration files. File types at the beginning of this list
+// have higher priority over those after.
+const SUPPORTED_FILE_TYPES = ['js', 'yml', 'yaml', 'json']
+
 /**
  * Returns the express app configuration file in object form. The file will be resolved in the
  * the following order:
@@ -25,32 +29,43 @@ import {cosmiconfigSync} from 'cosmiconfig'
  * projects `package.json` file.
  * 
 
- * Each file marked with `ext` can optionally be terminated with `yml`, `yaml` or
- * `json` in that priority.
+ * Each file marked with `ext` can optionally be terminated with `js`, `yml|yaml` or
+ * `json`. The file loaded is also determined based on that precidence of file extension. 
  *
  * @returns - the application configuration object.
  */
 /* istanbul ignore next */
 export const loadConfig = () => {
     const isRemote = Object.prototype.hasOwnProperty.call(process.env, 'AWS_LAMBDA_FUNCTION_NAME')
-    let moduleName = process?.env?.DEPLOY_TARGET || ''
+    let targetName = process?.env?.DEPLOY_TARGET || ''
 
-    // Search options.
+    const targetSearchPlaces = SUPPORTED_FILE_TYPES.map((ext) => `config/${targetName}.${ext}`)
+    const localeSearchPlaces = SUPPORTED_FILE_TYPES.map((ext) => `config/local.${ext}`)
+    const defaultSearchPlaces = SUPPORTED_FILE_TYPES.map((ext) => `config/default.${ext}`)
+
+    // Combined search places.
     const searchPlaces = [
-        `config/${moduleName}.yml`,
-        `config/${moduleName}.yaml`,
-        `config/${moduleName}.json`,
-        ...(isRemote ? [] : ['config/local.yml', 'config/local.yaml', 'config/local.json']),
-        'config/default.yml',
-        'config/default.yaml',
-        'config/default.json',
+        ...(isRemote ? targetSearchPlaces : []),
+        ...(!isRemote ? localeSearchPlaces : []),
+        ...defaultSearchPlaces,
         'package.json'
     ]
 
     // Match config files based on the specificity from most to most general.
-    const explorerSync = cosmiconfigSync(moduleName, {
+    const explorerSync = cosmiconfigSync(targetName, {
         packageProp: 'mobify',
-        searchPlaces: searchPlaces.map((path) => (isRemote ? `build/${path}` : path))
+        searchPlaces: searchPlaces.map((path) => `build/${path}`),
+        loaders: {
+            '.js': (filepath) => {
+                // Because `require` is boot straped by webpack the builtin
+                // loaded for `.js` files doesn't work. We have to ensure we use
+                // the right `require`.
+                const _require = eval('require')
+                const result = _require(filepath)
+
+                return result
+            }
+        }
     })
 
     // Load the config synchronously using a custom "searchPlaces".
