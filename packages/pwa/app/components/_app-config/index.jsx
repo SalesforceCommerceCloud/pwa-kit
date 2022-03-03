@@ -33,15 +33,20 @@ const apiConfig = {
 /**
  * Returns the validated locale short code parsed from the url.
  * @private
- * @param locals the request locals (only defined when executing on the server.)
+ * @param {object} locals the request locals (only defined when executing on the server.)
+ * @param {object} site - the site to look for locale id
  * @returns {String} the locale short code
  */
-const getLocale = (locals = {}) => {
+const getLocale = (locals = {}, site) => {
     const path =
         typeof window === 'undefined'
             ? locals.originalUrl
             : `${window.location.pathname}${window.location.search}`
-    const {locale} = getParamsFromPath(path)
+    const {locale: localeIdentifier} = getParamsFromPath(path)
+
+    const locale = site.l10n.supportedLocales.find(
+        (locale) => locale.id === localeIdentifier || locale.alias === localeIdentifier
+    )
 
     return locale
 }
@@ -80,7 +85,7 @@ AppConfig.restore = (locals = {}) => {
     const site = resolveSiteFromUrl(url)
     apiConfig.parameters.siteId = site.id
 
-    const locale = getLocale(locals) || site.l10n.defaultLocale
+    const locale = getLocale(locals, site) || site.l10n.defaultLocale
     const currency =
         getPreferredCurrency(locale, site.l10n.supportedLocales) || site.defaultCurrency
 
