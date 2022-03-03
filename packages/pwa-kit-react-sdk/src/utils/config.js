@@ -54,7 +54,7 @@ export const loadConfig = () => {
     // Match config files based on the specificity from most to most general.
     const explorerSync = cosmiconfigSync(targetName, {
         packageProp: 'mobify',
-        searchPlaces: searchPlaces.map((path) => `build/${path}`),
+        searchPlaces: searchPlaces.map((path) => (isRemote ? `build/${path}` : path)),
         loaders: {
             '.js': (filepath) => {
                 // Because `require` is bootstrapped by webpack, the builtin
