@@ -25,6 +25,11 @@
                             "id": "fr-FR",
                             "alias": "fr",
                             "preferredCurrency": "EUR"
+                        },
+                        {
+                            "id": "it-IT",
+                            "alias": "it",
+                            "preferredCurrency": "EUR"
                         }
                     ]
                 }

@@ -70,7 +70,8 @@ test('append locale as path and site as query and calls history.push', () => {
             ...mockConfig.app,
             url: {
                 locale: 'path',
-                site: 'query_param'
+                site: 'query_param',
+                showDefaults: true
             }
         }
     }

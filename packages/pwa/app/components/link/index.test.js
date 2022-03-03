@@ -43,7 +43,8 @@ test('renders a link with locale and site as query param', () => {
             ...mockConfig.app,
             url: {
                 site: 'query_param',
-                locale: 'query_param'
+                locale: 'query_param',
+                showDefaults: true
             }
         }
     }
