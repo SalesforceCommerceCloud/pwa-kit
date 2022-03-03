@@ -2,7 +2,8 @@
     "app": {
         "url": {
             "site": "path",
-            "locale": "path"
+            "locale": "path",
+            "showDefaults": true
         },
         "defaultSite": "RefArchGlobal",
         "siteAliases": {
