@@ -41,6 +41,6 @@
   },
   "devDependencies": {
     "internal-lib-build": "^2.0.0-dev.2",
-    "verdaccio": "^4.5.1"
+    "verdaccio": "^4.12.2"
   }
 }
