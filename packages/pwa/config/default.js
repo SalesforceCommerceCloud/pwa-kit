@@ -5,14 +5,11 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-const sites = require('./sites.json')
-
 module.exports = {
     app: {
         url: {
             locale: 'path'
-        },
-        sites: sites
+        }
     },
     externals: [],
     pageNotFoundURL: '/page-not-found',
