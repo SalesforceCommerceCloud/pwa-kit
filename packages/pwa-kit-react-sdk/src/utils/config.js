@@ -57,8 +57,8 @@ export const loadConfig = () => {
         searchPlaces: searchPlaces.map((path) => `build/${path}`),
         loaders: {
             '.js': (filepath) => {
-                // Because `require` is boot straped by webpack the builtin
-                // loaded for `.js` files doesn't work. We have to ensure we use
+                // Because `require` is bootstrapped by webpack, the builtin
+                // loader for `.js` files doesn't work. We have to ensure we use
                 // the right `require`.
                 const _require = eval('require')
                 const result = _require(filepath)
