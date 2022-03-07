@@ -1,0 +1,29 @@
+{
+    "app": {
+        "url": {
+            "site": "none",
+            "locale": "none",
+            "showDefaults": false
+        },
+        "defaultSite": "RefArch",
+        "siteAliases": {
+            "RefArch": "us"
+        },
+        "sites": [
+            {
+                "id": "RefArch",
+                "l10n": {
+                    "supportedCurrencies": ["USD"],
+                    "defaultCurrency": "USD",
+                    "defaultLocale": "en-US",
+                    "supportedLocales": [
+                        {
+                            "id": "en-US",
+                            "preferredCurrency": "USD"
+                        }
+                    ]
+                }
+            }
+        ]
+    }
+}
