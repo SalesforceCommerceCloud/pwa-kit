@@ -340,17 +340,18 @@ export const createApp = (options) => {
 const validateConfiguration = (options) => {
     // Check that we are running under a compatible version of node
     /* istanbul ignore next */
-    const requiredNode = new semver.Range(pkg.engines.node)
+    const requiredNode = pkg.engines.node
+    const foundNode = process.versions.node
     /* istanbul ignore next */
     if (
         !semver.satisfies(
-            process.versions.node, // A string like '8.10.0'
-            requiredNode
+            foundNode, // A string like '8.10.0'
+            new semver.Range(requiredNode)
         )
     ) {
         /* istanbul ignore next */
         console.warn(
-            `Warning: You are using Node ${process.versions.node}. ` +
+            `Warning: You are using Node ${foundNode}. ` +
                 `Your app may not work as expected when deployed to Managed ` +
                 `Runtime servers which are compatible with Node ${requiredNode}`
         )

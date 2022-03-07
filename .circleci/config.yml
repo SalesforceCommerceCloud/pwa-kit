@@ -138,7 +138,7 @@ commands:
           name: 'Smoke test scripts'
           command: |
             # Basic smoke-tests for uncommonly run scripts in a project
-            node /home/circleci/project/scripts/smoke-test-npm-scripts.js --dir << parameters.dir >>
+            node ./scripts/smoke-test-npm-scripts.js --dir << parameters.dir >>
   lighthouse-ci:
     description: 'Run Lighthouse CI on the PWA'
     steps:
@@ -157,6 +157,46 @@ commands:
               # Fail the build if any step leaves uncommitted changes in the repo
               # that would prevent Lerna from publishing (Lerna gets this right).
               git diff --exit-code
+
+  generate_and_test_project:
+    description: 'Generate project'
+    steps:
+      - run:
+          name: Generate project
+          environment:
+            GENERATOR_PRESET: 'test-project'
+          command: |
+            set GENERATOR_PRESET=test-project
+            node packages/pwa-kit-create-app/scripts/create-mobify-app-dev.js --outputDir generated-project
+            
+            cd generated-project
+            npm run prod:build
+      - run:
+          name: Generate hello-world project
+          environment:
+            GENERATOR_PRESET: 'hello-world-test-project'
+          command: |
+            set GENERATOR_PRESET=hello-world-test-project
+            node packages/pwa-kit-create-app/scripts/create-mobify-app-dev.js --outputDir generated-project-hello-world
+      - runtests:
+          cwd: generated-project
+      - smoketestscripts:
+          dir: generated-project
+      - run:
+          name: Count Generated Project Dependencies
+          environment:
+          command: |
+            MAX_PACKAGES="2250"
+            total=$(./scripts/count-dependencies.js generated-project)
+            echo "export TOTAL_PACKAGES=${total}" >> $BASH_ENV;
+            source $BASH_ENV
+
+            if [ "$total" -gt "$MAX_PACKAGES" ]; then
+                echo "Error: Found $TOTAL_PACKAGES installed packages (max $MAX_PACKAGES).";
+                exit 1;
+            else
+                echo "Found $TOTAL_PACKAGES installed packages (max $MAX_PACKAGES).";
+            fi
 
   early_return_for_forked_pull_requests:
     description: >-
@@ -270,41 +310,8 @@ jobs:
     steps:
       - checkout
       - setup
-      - run:
-          name: Generate project
-          environment:
-            GENERATOR_PRESET: 'test-project'
-          command: |
-            node ./scripts/gtime.js generated_project_install \
-                node packages/pwa-kit-create-app/scripts/create-mobify-app-dev.js --outputDir /tmp/project
+      - generate_and_test_project
 
-            cd /tmp/project
-            npm run prod:build
-      - run:
-          name: Generate hello-world project
-          environment:
-            GENERATOR_PRESET: 'hello-world-test-project'
-          command: |
-            node packages/pwa-kit-create-app/scripts/create-mobify-app-dev.js --outputDir /tmp/hello-world
-      - runtests:
-          cwd: /tmp/project
-      - smoketestscripts:
-          dir: /tmp/project
-      - run:
-          name: Count Generated Project Dependencies
-          environment:
-          command: |
-            MAX_PACKAGES="2250"
-            total=$(./scripts/count-dependencies.js /tmp/project)
-            echo "export TOTAL_PACKAGES=${total}" >> $BASH_ENV;
-            source $BASH_ENV
-
-            if [ "$total" -gt "$MAX_PACKAGES" ]; then
-                echo "Error: Found $TOTAL_PACKAGES installed packages (max $MAX_PACKAGES).";
-                exit 1;
-            else
-                echo "Found $TOTAL_PACKAGES installed packages (max $MAX_PACKAGES).";
-            fi
       - early_return_for_forked_pull_requests
       - slack/status:
           fail_only: true
@@ -348,9 +355,18 @@ jobs:
               target=""
             fi
             if [[ $target ]]; then
-              cd /tmp/project
+              cd generated-project
               npm run push -- --message "Generated PWA build ${CIRCLE_BUILD_NUM} on ${CIRCLE_BRANCH} (${CIRCLE_SHA1})" --target $target
             fi
+  generatedSFCCProjectTestWindows:
+    executor:
+      name: win/default
+      size: "large"
+      shell: bash.exe
+    steps:
+      - checkout
+      - setup_windows
+      - generate_and_test_project
 
 workflows:
   version: 2
@@ -362,6 +378,7 @@ workflows:
       - testNode14npm7
       - testNode14npm8
       - generatedSFCCProjectTest
+      - generatedSFCCProjectTestWindows
   nightly-build:
     triggers:
       - schedule:
