@@ -132,13 +132,9 @@ const runGenerator = (answers, {outputDir}) => {
 
     extractTemplate('pwa', outputDir)
 
-    // const {pkgLocalizationConfig} = require(`../assets/pwa/l10n.config`)
     const pkgJsonPath = p.resolve(outputDir, 'package.json')
     const pkgJSON = readJson(pkgJsonPath)
-    console.log("answers['scaffold-pwa']", answers['scaffold-pwa'])
     const pkgDataWithAnswers = merge(pkgJSON, answers['scaffold-pwa'])
-    console.log('pkgDataWithAnswers', pkgDataWithAnswers)
-    // const finalPkgData = merge(pkgDataWithAnswers, pkgLocalizationConfig)
 
     npmInstallables.forEach((pkgName) => {
         const keys = ['dependencies', 'devDependencies']
