@@ -204,12 +204,12 @@ export const createApp = (options) => {
     // because it's an origin, it does not end with a slash.
     options.appOrigin = process.env.APP_ORIGIN = `${options.protocol}://${options.appHostname}`
 
+    // Configure the server with the basic options
+    updatePackageMobify(options.mobify)
+
     // Make the config available in a isomorphic scope. Preventing us from
     // having to use webpack externals when bundling the `cosmiconfig` library.
     setConfig(options.mobify)
-
-    // Configure the server with the basic options
-    updatePackageMobify(options.mobify)
 
     configureProxyConfigs(options.appHostname, options.protocol)
 
