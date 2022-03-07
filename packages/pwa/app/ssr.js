@@ -69,6 +69,9 @@ app.use(
 app.get('/callback?*', (req, res) => {
     res.send()
 })
+app.get('/mobify/callback?*', (req, res) => {
+    res.send()
+})
 app.get('/robots.txt', serveStaticFile('static/robots.txt'))
 app.get('/*', render)
 
