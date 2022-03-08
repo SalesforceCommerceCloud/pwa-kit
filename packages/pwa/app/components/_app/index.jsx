@@ -110,11 +110,12 @@ const App = (props) => {
     }
 
     const onCartClick = () => {
-        const path = buildPathWithUrlConfig('/cart', {locale: targetLocale})
-        history.push(path)
+        const url = `${appOrigin}/s/RefArch/cart?lang=en_US`
 
         // Close the drawer.
         onClose()
+
+        window.location.replace(url)
     }
 
     const onAccountClick = () => {

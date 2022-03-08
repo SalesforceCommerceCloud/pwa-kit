@@ -54,11 +54,6 @@ const routes = [
         exact: true
     },
     {
-        path: '/cart',
-        component: Cart,
-        exact: true
-    },
-    {
         path: '/product/:productId',
         component: ProductDetail
     },
@@ -74,10 +69,6 @@ const routes = [
         path: '/:locale',
         component: Home,
         exact: true
-    },
-    {
-        path: '*',
-        component: PageNotFound
     }
 ]
 
