@@ -137,7 +137,9 @@ class Auth {
      */
     createOCAPISession() {
         return fetch(
-            `/mobify/proxy/ocapi/s/${this._config.parameters.siteId}/dw/shop/v21_3/sessions`,
+            `${getAppOrigin()}/mobify/proxy/ocapi/s/${
+                this._config.parameters.siteId
+            }/dw/shop/v21_3/sessions`,
             {
                 method: 'POST',
                 headers: {
