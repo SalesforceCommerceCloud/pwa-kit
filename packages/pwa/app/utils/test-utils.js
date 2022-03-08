@@ -24,7 +24,11 @@ import {AddToCartModalContext} from '../hooks/use-add-to-cart-modal'
 import {app as appConfig} from '../../config/default'
 import {IntlProvider} from 'react-intl'
 import {DEFAULT_LOCALE, DEFAULT_CURRENCY, urlPartPositions} from '../constants'
-import {mockCategories as initialMockCategories} from '../commerce-api/mock-data'
+import {
+    mockCategories as initialMockCategories,
+    mockedRegisteredCustomer,
+    exampleTokenReponse
+} from '../commerce-api/mock-data'
 
 // Contexts
 import {CategoriesProvider, CurrencyProvider} from '../contexts'
@@ -165,8 +169,9 @@ export const getPathname = (path) => {
 
 /**
  * Set up an API mocking server for testing purposes.
+ * This mock server includes the basic oauth flow endpoints.
  */
-export const setupMockServer = () => {
+export const setupMockServer = (...handlers) => {
     return setupServer(
         rest.post('*/oauth2/authorize', (req, res, ctx) =>
             res(ctx.delay(0), ctx.status(303), ctx.set('location', `/testcallback`))
@@ -179,6 +184,9 @@ export const setupMockServer = () => {
         }),
         rest.post('*/oauth2/login', (req, res, ctx) =>
             res(ctx.delay(0), ctx.status(200), ctx.json(mockedRegisteredCustomer))
+        ),
+        rest.get('*/oauth2/logout', (req, res, ctx) =>
+            res(ctx.delay(0), ctx.status(200), ctx.json(exampleTokenReponse))
         ),
         rest.get('*/customers/:customerId', (req, res, ctx) =>
             res(ctx.delay(0), ctx.status(200), ctx.json(mockedRegisteredCustomer))
@@ -195,8 +203,6 @@ export const setupMockServer = () => {
                 })
             )
         ),
-        rest.get('*/oauth2/logout', (req, res, ctx) =>
-            res(ctx.delay(0), ctx.status(200), ctx.json(exampleTokenReponse))
-        )
+        ...handlers
     )
 }

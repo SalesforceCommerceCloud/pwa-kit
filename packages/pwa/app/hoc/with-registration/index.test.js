@@ -9,11 +9,9 @@ import {Button} from '@chakra-ui/react'
 import {screen, waitFor} from '@testing-library/react'
 import React from 'react'
 import withRegistration from './index'
-import {renderWithProviders} from '../../utils/test-utils'
+import {renderWithProviders, setupMockServer} from '../../utils/test-utils'
 import user from '@testing-library/user-event'
 import {rest} from 'msw'
-import {setupServer} from 'msw/node'
-import {mockedRegisteredCustomer, mockedGuestCustomer} from '../../commerce-api/mock-data'
 import useCustomer from '../../commerce-api/hooks/useCustomer'
 
 jest.setTimeout(60000)
@@ -48,35 +46,7 @@ const MockedComponent = (props) => {
 
 // Set up the msw server to intercept fetch requests and returned mocked results. Additional
 // interceptors can be defined in each test for specific requests.
-const server = setupServer(
-    rest.post('*/oauth2/authorize', (req, res, ctx) =>
-        res(ctx.delay(0), ctx.status(303), ctx.set('location', `/testcallback`))
-    ),
-    rest.get('*/oauth2/authorize', (req, res, ctx) =>
-        res(ctx.delay(0), ctx.status(303), ctx.set('location', `/testcallback`))
-    ),
-    rest.get('*/testcallback', (req, res, ctx) => {
-        return res(ctx.delay(0), ctx.status(200))
-    }),
-    rest.post('*/oauth2/login', (req, res, ctx) =>
-        res(ctx.delay(0), ctx.status(200), ctx.json(mockedRegisteredCustomer))
-    ),
-    rest.get('*/customers/:customerId', (req, res, ctx) =>
-        res(ctx.delay(0), ctx.status(200), ctx.json(mockedRegisteredCustomer))
-    ),
-    rest.post('*/oauth2/token', (req, res, ctx) =>
-        res(
-            ctx.delay(0),
-            ctx.json({
-                customer_id: 'test',
-                access_token: 'testtoken',
-                refresh_token: 'testrefeshtoken',
-                usid: 'testusid',
-                enc_user_id: 'testEncUserId'
-            })
-        )
-    )
-)
+const server = setupMockServer()
 
 // Set up and clean up
 beforeAll(() => {
