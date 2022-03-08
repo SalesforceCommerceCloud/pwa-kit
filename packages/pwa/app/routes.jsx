@@ -49,11 +49,6 @@ const routes = [
         exact: true
     },
     {
-        path: '/mobify/callback',
-        component: LoginRedirect,
-        exact: true
-    },
-    {
         path: '/product/:productId',
         component: ProductDetail
     },
@@ -73,7 +68,7 @@ const routes = [
 ]
 
 const configuredRoutes = configureRoutes(routes, {
-    ignoredRoutes: [HOME_HREF, '/callback', '/mobify/callback', '/:locale', '*']
+    ignoredRoutes: [HOME_HREF, '/callback', '/:locale', '*']
 })
 
 export default configuredRoutes

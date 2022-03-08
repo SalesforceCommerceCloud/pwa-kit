@@ -39,7 +39,7 @@ const dwSessionIdKey = 'dwsid'
 /**
  * A  class that provides auth functionality for pwa.
  */
-const slasCallbackEndpoint = '/mobify/callback'
+const slasCallbackEndpoint = '/callback'
 class Auth {
     constructor(api) {
         this._api = api
