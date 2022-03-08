@@ -486,7 +486,6 @@ class Storage {
     remove(key) {}
 }
 
-// this is not production ready!
 class CookieStorage extends Storage {
     constructor(...args) {
         super(args)
