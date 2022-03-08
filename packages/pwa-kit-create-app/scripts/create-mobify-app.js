@@ -165,8 +165,8 @@ const runGenerator = (answers, {outputDir}) => {
         ]
     })
 
-    const PWAKitConfigJsonTemplate = require(`../assets/pwa/default.json`)
-    const PWAKitConfigJsonPath = p.resolve(outputDir, 'config', 'default.json')
+    const PWAKitConfigJsonTemplate = require(`../assets/pwa/default.js`)
+    const PWAKitConfigJsonPath = p.resolve(outputDir, 'config', 'default.js')
     writeJson(PWAKitConfigJsonPath, PWAKitConfigJsonTemplate)
 
     const APIConfigTemplate = require(`../assets/pwa/api.config`).template
