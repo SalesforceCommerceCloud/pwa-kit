@@ -5,20 +5,19 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {getUrlConfig} from './utils'
+// import {getUrlConfig} from './utils'
 import {urlPartPositions} from '../constants'
 
 /**
- * Configure the routes based on url configuration from pwa-kit.config.json file
+ * Configure the routes based on url configuration provided.
  *
  * @param {array} routes - array of routes to be configured
+ * @param {object} urlConfig - the url configuration object
  * @param {object} - a custom configured object
  * @return {array} - list of configured route objects
  */
-export const configureRoutes = (routes = [], {ignoredRoutes = []}) => {
+export const configureRoutes = (routes = [], urlConfig, {ignoredRoutes = []}) => {
     if (!routes.length) return []
-
-    const urlConfig = getUrlConfig()
     if (!urlConfig) return routes
 
     return routes.map((route) => {

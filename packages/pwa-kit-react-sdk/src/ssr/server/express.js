@@ -26,6 +26,7 @@ import semver from 'semver'
 import URL from 'url'
 import merge from 'merge-descriptors'
 import {PersistentCache} from '../../utils/ssr-cache'
+import {setConfig} from '../universal/utils'
 
 import {
     CachedResponse,
@@ -205,6 +206,10 @@ export const createApp = (options) => {
 
     // Configure the server with the basic options
     updatePackageMobify(options.mobify)
+
+    // Make the config available in a isomorphic scope. Preventing us from
+    // having to use webpack externals when bundling the `cosmiconfig` library.
+    setConfig(options.mobify)
 
     configureProxyConfigs(options.appHostname, options.protocol)
 
