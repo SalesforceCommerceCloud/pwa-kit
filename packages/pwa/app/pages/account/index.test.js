@@ -11,6 +11,7 @@ import user from '@testing-library/user-event'
 import {rest} from 'msw'
 import {renderWithProviders, getPathname, setupMockServer} from '../../utils/test-utils'
 import {
+    mockOrderHistory,
     mockedGuestCustomer,
     mockedRegisteredCustomer,
     mockOrderProducts
@@ -43,7 +44,10 @@ const MockedComponent = () => {
 }
 
 const server = setupMockServer(
-    rest.get('*/products', (req, res, ctx) => res(ctx.delay(0), ctx.json(mockOrderProducts)))
+    rest.get('*/products', (req, res, ctx) => res(ctx.delay(0), ctx.json(mockOrderProducts))),
+    rest.get('*/customers/:customerId/orders', (req, res, ctx) =>
+        res(ctx.delay(0), ctx.json(mockOrderHistory))
+    )
 )
 
 // Set up and clean up
