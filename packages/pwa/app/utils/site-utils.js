@@ -67,14 +67,17 @@ export const getDefaultSite = () => {
  * @return {array} sites - site list including their aliases
  */
 export const getSites = () => {
-    const {app} = getConfig()
-    if (!app.sites) {
+    const {sites = [], siteAliases = {}} = getConfig().app || {}
+
+    if (!sites) {
         throw new Error("Can't find any sites from the config. Please check your configuration")
     }
-    return app.sites.map((site) => {
+
+    return sites.map((site) => {
+        const alias = siteAliases[site.id]
         return {
             ...site,
-            alias: app.siteAliases[site.id]
+            ...(alias ? {alias} : {})
         }
     })
 }
