@@ -19,16 +19,11 @@ import {
     BasketProvider,
     CustomerProductListsProvider
 } from '../../commerce-api/contexts'
-import {commerceAPIConfig, einsteinAPIConfig} from '../../api.config'
 import {DEFAULT_LOCALE, DEFAULT_CURRENCY, urlPartPositions} from '../../constants'
 import {getPreferredCurrency, getSupportedLocalesIds} from '../../utils/locale'
 import {getUrlConfig} from '../../utils/utils'
 import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
-
-const apiConfig = {
-    ...commerceAPIConfig,
-    einsteinConfig: einsteinAPIConfig
-}
+import {getConfig} from 'pwa-kit-react-sdk/ssr/universal/utils'
 
 /**
  * Returns the validated locale short code parsed from the url.
@@ -90,6 +85,12 @@ AppConfig.restore = (locals = {}) => {
     // Parse the locale from the page url.
     const locale = getLocale(locals) || DEFAULT_LOCALE
     const currency = getPreferredCurrency(locale) || DEFAULT_CURRENCY
+
+    const {app: appConfig} = getConfig()
+    const apiConfig = {
+        ...appConfig.commerceAPI,
+        einsteinConfig: appConfig.einsteinAPI
+    }
 
     locals.api = new CommerceAPI({...apiConfig, locale, currency})
 }

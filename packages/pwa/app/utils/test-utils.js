@@ -19,7 +19,7 @@ import {
     CustomerProductListsProvider
 } from '../commerce-api/contexts'
 import {AddToCartModalContext} from '../hooks/use-add-to-cart-modal'
-import {commerceAPIConfig, einsteinAPIConfig} from '../api.config'
+import {app as appConfig} from '../../config/default'
 import {IntlProvider} from 'react-intl'
 import {DEFAULT_LOCALE, DEFAULT_CURRENCY, urlPartPositions} from '../constants'
 import {mockCategories as initialMockCategories} from '../commerce-api/mock-data'
@@ -40,8 +40,8 @@ export const renderWithRouter = (node) => renderWithReactIntl(<Router>{node}</Ro
 
 export const renderWithRouterAndCommerceAPI = (node) => {
     const api = new CommerceAPI({
-        ...commerceAPIConfig,
-        einsteinConfig: einsteinAPIConfig,
+        ...appConfig.commerceAPI,
+        einsteinConfig: appConfig.einsteinAPI,
         proxy: undefined
     })
     return renderWithReactIntl(
@@ -78,8 +78,8 @@ export const TestProviders = ({
     const ocapiHost = 'zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com'
 
     const api = new CommerceAPI({
-        ...commerceAPIConfig,
-        einsteinConfig: einsteinAPIConfig,
+        ...appConfig.commerceAPI,
+        einsteinConfig: appConfig.einsteinAPI,
         proxy,
         ocapiHost
     })
