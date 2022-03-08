@@ -201,7 +201,8 @@ export const setupMockServer = (...handlers) => {
                     access_token: 'testtoken',
                     refresh_token: 'testrefeshtoken',
                     usid: 'testusid',
-                    enc_user_id: 'testEncUserId'
+                    enc_user_id: 'testEncUserId',
+                    id_token: 'testIdToken'
                 })
             )
         )
