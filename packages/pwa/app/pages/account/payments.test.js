@@ -8,11 +8,9 @@ import React, {useEffect} from 'react'
 import {screen, waitFor} from '@testing-library/react'
 import user from '@testing-library/user-event'
 import {rest} from 'msw'
-import {setupServer} from 'msw/node'
-import {renderWithProviders} from '../../utils/test-utils'
+import {renderWithProviders, setupMockServer} from '../../utils/test-utils'
 import useCustomer from '../../commerce-api/hooks/useCustomer'
 import PaymentMethods from './payments'
-import {mockedRegisteredCustomer} from '../../commerce-api/mock-data'
 
 let mockCustomer = {}
 
@@ -84,39 +82,9 @@ const MockedComponent = () => {
     )
 }
 
-const server = setupServer(
+const server = setupMockServer(
     rest.get('*/customers/:customerId', (req, res, ctx) =>
         res(ctx.delay(0), ctx.json(mockCustomer))
-    ),
-    rest.get('*/customers/:customerId', (req, res, ctx) =>
-        res(ctx.delay(0), ctx.json(mockCustomer))
-    ),
-    rest.post('*/oauth2/authorize', (req, res, ctx) =>
-        res(ctx.delay(0), ctx.status(303), ctx.set('location', `/testcallback`))
-    ),
-
-    rest.get('*/oauth2/authorize', (req, res, ctx) =>
-        res(ctx.delay(0), ctx.status(303), ctx.set('location', `/testcallback`))
-    ),
-
-    rest.post('*/oauth2/login', (req, res, ctx) =>
-        res(ctx.delay(0), ctx.status(200), ctx.json(mockedRegisteredCustomer))
-    ),
-    rest.get('*/testcallback', (req, res, ctx) => {
-        return res(ctx.delay(0), ctx.status(200))
-    }),
-
-    rest.post('*/oauth2/token', (req, res, ctx) =>
-        res(
-            ctx.delay(0),
-            ctx.json({
-                customer_id: 'test',
-                access_token: 'testtoken',
-                refresh_token: 'testrefeshtoken',
-                usid: 'testusid',
-                enc_user_id: 'testEncUserId'
-            })
-        )
     )
 )
 

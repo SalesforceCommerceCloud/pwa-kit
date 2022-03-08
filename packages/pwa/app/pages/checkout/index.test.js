@@ -10,13 +10,11 @@ import {Route, Switch} from 'react-router-dom'
 import {screen, waitFor, waitForElementToBeRemoved, within} from '@testing-library/react'
 import user from '@testing-library/user-event'
 import {rest} from 'msw'
-import {setupServer} from 'msw/node'
-import {renderWithProviders, getPathname} from '../../utils/test-utils'
+import {renderWithProviders, getPathname, setupMockServer} from '../../utils/test-utils'
 import useShopper from '../../commerce-api/hooks/useShopper'
 import {
     ocapiBasketWithItem,
     ocapiOrderResponse,
-    exampleTokenReponse,
     mockShippingMethods,
     mockPaymentMethods,
     mockedRegisteredCustomer,
@@ -75,7 +73,7 @@ const WrappedCheckout = () => {
 
 // Set up the msw server to intercept fetch requests and returned mocked results. Additional
 // interceptors can be defined in each test for specific requests.
-const server = setupServer(
+const server = setupMockServer(
     // mock empty guest basket
     rest.get('*/customers/:customerId/baskets', (req, res, ctx) => {
         return res(
@@ -105,14 +103,6 @@ const server = setupServer(
         return res(ctx.json({data: [{id: '701642811398M'}]}))
     }),
 
-    rest.get('*/oauth2/authorize', (req, res, ctx) =>
-        res(ctx.delay(0), ctx.status(303), ctx.set('location', `/testcallback`))
-    ),
-
-    rest.get('*/testcallback', (req, res, ctx) => {
-        return res(ctx.delay(0), ctx.status(200))
-    }),
-
     rest.get('*/customers/:customerId', (req, res, ctx) => {
         return res(
             ctx.delay(0),
@@ -125,19 +115,6 @@ const server = setupServer(
                 // it would with real usage, otherwise, the useShopper hook will detect
                 // the mismatch and attempt to refetch a new basket for the customer.
                 customerId: ocapiBasketWithItem.customer_info.customer_id
-            })
-        )
-    }),
-
-    rest.post('*/oauth2/token', (req, res, ctx) => {
-        return res(
-            ctx.delay(0),
-            ctx.json({
-                customer_id: ocapiBasketWithItem.customer_info.customer_id,
-                access_token: 'testtoken',
-                refresh_token: 'testrefeshtoken',
-                usid: 'testusid',
-                enc_user_id: 'testEncUserId'
             })
         )
     })

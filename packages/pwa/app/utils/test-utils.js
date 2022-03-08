@@ -173,6 +173,8 @@ export const getPathname = (path) => {
  */
 export const setupMockServer = (...handlers) => {
     return setupServer(
+        // customer handlers have higher priority
+        ...handlers,
         rest.post('*/oauth2/authorize', (req, res, ctx) =>
             res(ctx.delay(0), ctx.status(303), ctx.set('location', `/testcallback`))
         ),
@@ -202,7 +204,6 @@ export const setupMockServer = (...handlers) => {
                     enc_user_id: 'testEncUserId'
                 })
             )
-        ),
-        ...handlers
+        )
     )
 }
