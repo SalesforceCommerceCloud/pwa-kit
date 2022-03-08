@@ -171,7 +171,12 @@ export const AddToCartModal = () => {
                                 </Text>
                             </Flex>
                             <Stack spacing="4">
-                                <Button as={Link} to="/cart" width="100%" variant="solid">
+                                <Button
+                                    as={Link}
+                                    href={`${getAppOrigin()}/s/RefArch/cart?lang=en_US`}
+                                    width="100%"
+                                    variant="solid"
+                                >
                                     {intl.formatMessage({
                                         defaultMessage: 'View Cart',
                                         id: 'add_to_cart_modal.link.view_cart'
