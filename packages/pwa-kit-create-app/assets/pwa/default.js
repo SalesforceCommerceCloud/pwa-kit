@@ -9,6 +9,29 @@ exports.template = ({commerceApi, einsteinApi}) => `module.exports = {
         url: {
             locale: 'none'
         },
+        defaultSite: 'RefArch',
+        sites: [
+            {
+                id: 'RefArch',
+                l10n: {
+                    supportedCurrencies: ['USD'],
+                    defaultCurrency: 'USD',
+                    defaultLocale: 'en-US',
+                    supportedLocales: [
+                        {
+                            id: 'en-US',
+                            alias: 'en',
+                            preferredCurrency: 'USD'
+                        },
+                        {
+                            id: 'en-CA',
+                            alias: 'ca',
+                            preferredCurrency: 'USD'
+                        }
+                    ]
+                }
+            }
+        ],
         commerceAPI: {
             proxyPath: \`/mobify/proxy/${commerceApi.proxyPath}\`,
             parameters: {
