@@ -45,18 +45,20 @@ class Auth {
         this._onClient = typeof window !== 'undefined'
         this._pendingAuth = undefined
         this._customerId = undefined
-        this._oid = Cookies.get(oidStorageKey)
+        this._storage = new LocalStorage()
+        this._oid = this._storage.get(oidStorageKey)
 
         const configOid = api._config.parameters.organizationId
         if (this._oid !== configOid) {
             this._clearAuth()
             this._saveOid(configOid)
         } else {
-            this._authToken = Cookies.get(tokenStorageKey)
+            this._authToken = this._storage.get(tokenStorageKey)
             this._refreshToken =
-                Cookies.get(refreshTokenStorageKey) || Cookies.get(refreshTokenGuestStorageKey)
-            this._usid = Cookies.get(usidStorageKey)
-            this._encUserId = Cookies.get(encUserIdStorageKey)
+                this._storage.get(refreshTokenStorageKey) ||
+                this._storage.get(refreshTokenGuestStorageKey)
+            this._usid = this._storage.get(usidStorageKey)
+            this._encUserId = this._storage.get(encUserIdStorageKey)
         }
 
         this.login = this.login.bind(this)
@@ -401,7 +403,7 @@ class Auth {
     _saveAccessToken(token) {
         this._authToken = token
         if (this._onClient) {
-            Cookies.set(tokenStorageKey, token, {secure: true})
+            this._storage.set(tokenStorageKey, token, {secure: true})
         }
     }
 
@@ -413,7 +415,7 @@ class Auth {
     _saveUsid(usid) {
         this._usid = usid
         if (this._onClient) {
-            Cookies.set(usidStorageKey, usid, {secure: true})
+            this._storage.set(usidStorageKey, usid, {secure: true})
         }
     }
 
@@ -425,7 +427,7 @@ class Auth {
     _saveEncUserId(encUserId) {
         this._encUserId = encUserId
         if (this._onClient) {
-            Cookies.set(encUserIdStorageKey, encUserId, {secure: true})
+            this._storage.set(encUserIdStorageKey, encUserId, {secure: true})
         }
     }
 
@@ -437,7 +439,7 @@ class Auth {
     _saveOid(oid) {
         this._oid = oid
         if (this._onClient) {
-            Cookies.set(oidStorageKey, oid, {secure: true})
+            this._storage.set(oidStorageKey, oid, {secure: true})
         }
     }
 
@@ -452,12 +454,12 @@ class Auth {
         this._usid = undefined
         this._encUserId = undefined
         if (this._onClient) {
-            Cookies.remove(tokenStorageKey)
-            Cookies.remove(refreshTokenStorageKey)
-            Cookies.remove(refreshTokenGuestStorageKey)
-            Cookies.remove(usidStorageKey)
-            Cookies.remove(encUserIdStorageKey)
-            Cookies.remove(dwSessionIdKey)
+            this._storage.remove(tokenStorageKey)
+            this._storage.remove(refreshTokenStorageKey)
+            this._storage.remove(refreshTokenGuestStorageKey)
+            this._storage.remove(usidStorageKey)
+            this._storage.remove(encUserIdStorageKey)
+            this._storage.remove(dwSessionIdKey)
         }
     }
 
@@ -471,9 +473,58 @@ class Auth {
         const storeageKey =
             type === 'registered' ? refreshTokenStorageKey : refreshTokenGuestStorageKey
         if (this._onClient) {
-            Cookies.set(storeageKey, refreshToken, {secure: true})
+            this._storage.set(storeageKey, refreshToken, {secure: true})
         }
     }
 }
 
 export default Auth
+
+class Storage {
+    set(key, value) {}
+    get(key) {}
+    remove(key) {}
+}
+
+// this is not production ready!
+class CookieStorage extends Storage {
+    constructor(...args) {
+        super(args)
+        this._avaliable = false
+        if (typeof document === 'undefined') {
+            console.warn('CookieStorage is not avaliable on the current environment.')
+            return
+        }
+        this._avaliable = true
+    }
+    set(key, value) {
+        this._avaliable && Cookies.set(key, value, {secure: true})
+    }
+    get(key) {
+        return this._avaliable ? Cookies.get(key) : undefined
+    }
+    remove(key) {
+        this._avaliable && Cookies.remove(key)
+    }
+}
+
+class LocalStorage extends Storage {
+    constructor(...args) {
+        super(args)
+        this._avaliable = false
+        if (typeof window === 'undefined') {
+            console.warn('LocalStorage is not avaliable on the current environment.')
+            return
+        }
+        this._avaliable = true
+    }
+    set(key, value) {
+        this._avaliable && window.localStorage.setItem(key, value)
+    }
+    get(key) {
+        return this._avaliable ? window.localStorage.getItem(key) : undefined
+    }
+    remove(key) {
+        this._avaliable && window.localStorage.removeItem(key)
+    }
+}
