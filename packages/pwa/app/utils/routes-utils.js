@@ -14,8 +14,9 @@ import {getSites} from './site-utils'
  * @param {object} - a custom configured object
  * @return {array} - list of configured route objects
  */
-export const configureRoutes = (routes = [], {ignoredRoutes = []}) => {
+export const configureRoutes = (routes = [], urlConfig, {ignoredRoutes = []}) => {
     if (!routes.length) return []
+    if (!urlConfig) return routes
 
     const allSites = getSites()
     if (!allSites) return routes

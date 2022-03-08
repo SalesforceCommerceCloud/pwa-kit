@@ -7,6 +7,7 @@
 import React from 'react'
 
 import {configureRoutes} from './routes-utils'
+import {getUrlConfig} from './utils'
 
 describe('configureRoutes', function() {
     const env = process.env
@@ -34,7 +35,7 @@ describe('configureRoutes', function() {
         }
     ]
     test('should return all permutation of path including site and locales ', () => {
-        const configuredRoutes = configureRoutes(routes, {ignoredRoutes: ['/']})
+        const configuredRoutes = configureRoutes(routes, getUrlConfig(), {ignoredRoutes: ['/']})
         expect(configuredRoutes[configuredRoutes.length - 1].path).toEqual('/category/:categoryId')
         expect(configuredRoutes.length).toEqual(31)
         const paths = configuredRoutes.map((route) => route.path)
@@ -42,7 +43,7 @@ describe('configureRoutes', function() {
     })
 
     test('should return the origin routes', () => {
-        const configuredRoutes = configureRoutes(routes, {
+        const configuredRoutes = configureRoutes(routes, getUrlConfig(), {
             ignoredRoutes: ['/', '/category/:categoryId']
         })
         expect(configuredRoutes.length).toEqual(2)

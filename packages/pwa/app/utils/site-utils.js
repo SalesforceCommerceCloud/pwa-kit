@@ -5,7 +5,8 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {getConfig, getParamsFromPath} from './utils'
+import {getConfig} from 'pwa-kit-react-sdk/ssr/universal/utils'
+import {getParamsFromPath} from './utils'
 
 /**
  * This functions takes an url and returns a site object,
