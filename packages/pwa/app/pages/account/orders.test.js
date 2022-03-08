@@ -50,13 +50,6 @@ const MockedComponent = () => {
 }
 
 const server = setupServer(
-    rest.post('*/customers/actions/login', (req, res, ctx) =>
-        res(
-            ctx.delay(0),
-            ctx.set('authorization', `Bearer guesttoken`),
-            ctx.json(mockedRegisteredCustomer)
-        )
-    ),
     rest.get('*/customers/:customerId/orders', (req, res, ctx) =>
         res(ctx.delay(0), ctx.json(mockOrderHistory))
     ),

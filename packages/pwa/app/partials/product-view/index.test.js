@@ -55,9 +55,6 @@ MockComponent.propTypes = {
 }
 
 const server = setupServer(
-    rest.post('*/customers/actions/login', (req, res, ctx) =>
-        res(ctx.set('authorization', `Bearer guesttoken`), ctx.json(mockedRegisteredCustomer))
-    ),
     rest.post('*/oauth2/authorize', (req, res, ctx) =>
         res(ctx.delay(0), ctx.status(303), ctx.set('location', `/testcallback`))
     ),

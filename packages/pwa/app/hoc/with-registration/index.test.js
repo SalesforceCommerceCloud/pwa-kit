@@ -96,11 +96,6 @@ afterEach(() => {
 afterAll(() => server.close())
 
 test('should execute onClick for registered users', async () => {
-    server.use(
-        rest.post('*/customers/actions/login', (req, res, ctx) =>
-            res(ctx.set('authorization', `Bearer testtoken`), ctx.json(mockedRegisteredCustomer))
-        )
-    )
     const onClick = jest.fn()
 
     renderWithProviders(<MockedComponent onClick={onClick} />)

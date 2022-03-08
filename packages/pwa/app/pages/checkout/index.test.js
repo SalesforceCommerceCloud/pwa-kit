@@ -76,21 +76,6 @@ const WrappedCheckout = () => {
 // Set up the msw server to intercept fetch requests and returned mocked results. Additional
 // interceptors can be defined in each test for specific requests.
 const server = setupServer(
-    // mock guest login
-    rest.post('*/customers/actions/login', (req, res, ctx) => {
-        return res(
-            ctx.set('authorization', `Bearer ${exampleTokenReponse.access_token}`),
-            ctx.json({
-                authType: 'guest',
-                preferredLocale: 'en_US',
-                // Mocked customer ID should match the mocked basket's customer ID as
-                // it would with real usage, otherwise, the useShopper hook will detect
-                // the mismatch and attempt to refetch a new basket for the customer.
-                customerId: ocapiBasketWithItem.customer_info.customer_id
-            })
-        )
-    }),
-
     // mock empty guest basket
     rest.get('*/customers/:customerId/baskets', (req, res, ctx) => {
         return res(
