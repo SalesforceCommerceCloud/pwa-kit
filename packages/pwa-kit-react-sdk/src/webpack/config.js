@@ -187,7 +187,16 @@ const common = {
         }),
 
         new CopyPlugin({
-            patterns: [{from: 'app/static/', to: 'static/'}]
+            patterns: [
+                {from: 'app/static/', to: 'static/'},
+                {
+                    from: 'config/',
+                    to: 'config/',
+                    globOptions: {
+                        ignore: ['**/local.*']
+                    }
+                }
+            ]
         }),
 
         analyzeBundle &&
@@ -303,7 +312,14 @@ const ssrServerConfig = Object.assign(
                 }
             ]
         },
-        stats
+        stats,
+        ignoreWarnings: [
+            // These can be ignored fairly safely for node targets, where
+            // bundle size is not super critical. Express generates this warning,
+            // because it uses dynamic require() calls, which cause Webpack to
+            // bundle the whole library.
+            /Critical dependency: the request of a dependency is an expression/
+        ]
     }
 )
 

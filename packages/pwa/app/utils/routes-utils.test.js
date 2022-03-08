@@ -37,7 +37,9 @@ describe('configureRoutes', function() {
                 exact: true
             }
         ]
-        const configuredRoutes = configureRoutes(routes, {ignoredRoutes: '/'})
+        const configuredRoutes = configureRoutes(routes, getUrlConfig(), {
+            ignoredRoutes: '/'
+        })
         expect(configuredRoutes[0].path).toEqual('/')
         expect(configuredRoutes[1].path).toEqual('/:locale/category/:categoryId')
     })
