@@ -44,6 +44,25 @@ const routes = [
         exact: true
     },
     {
+        path: '/login',
+        component: Login,
+        exact: true
+    },
+    {
+        path: '/registration',
+        component: Registration,
+        exact: true
+    },
+    {
+        path: '/reset-password',
+        component: ResetPassword,
+        exact: true
+    },
+    {
+        path: '/account',
+        component: Account
+    },
+    {
         path: '/callback',
         component: LoginRedirect,
         exact: true
@@ -61,6 +80,10 @@ const routes = [
         component: ProductList
     },
     {
+        path: '/account/wishlist',
+        component: Wishlist
+    },
+    {
         path: '/:locale',
         component: Home,
         exact: true
@@ -71,4 +94,5 @@ const configuredRoutes = configureRoutes(routes, {
     ignoredRoutes: [HOME_HREF, '/callback', '/:locale', '*']
 })
 
+console.log('configuredRoutes:', configuredRoutes)
 export default configuredRoutes
