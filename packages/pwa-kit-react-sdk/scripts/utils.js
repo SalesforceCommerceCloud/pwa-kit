@@ -17,6 +17,8 @@ const fileUtils = require('./file-utils')
 
 const Matcher = require('../dist/utils/glob').Matcher
 
+const loadConfig = require('../dist/utils/config').loadConfig
+
 const SDK_VERSION = require('../package.json').version
 const DEFAULT_DOCS_URL = 'http://sfdc.co/pwa-kit'
 
@@ -242,5 +244,7 @@ Utils.requestErrorMessage = {
         'Resource not found.\nPlease double check your command to make sure the option values are correct.', // wrong target name
     code500: 'Internal Server Error. Please report this to Salesforce support team.'
 }
+
+Utils.loadConfig = loadConfig
 
 module.exports = Utils
