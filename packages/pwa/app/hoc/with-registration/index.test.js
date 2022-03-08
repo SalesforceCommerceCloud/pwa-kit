@@ -12,6 +12,7 @@ import withRegistration from './index'
 import {renderWithProviders, setupMockServer} from '../../utils/test-utils'
 import user from '@testing-library/user-event'
 import {rest} from 'msw'
+import {mockedGuestCustomer} from '../../commerce-api/mock-data'
 import useCustomer from '../../commerce-api/hooks/useCustomer'
 
 jest.setTimeout(60000)
