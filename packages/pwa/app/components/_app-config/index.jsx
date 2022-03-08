@@ -30,7 +30,7 @@ import {getConfig} from 'pwa-kit-react-sdk/ssr/universal/utils'
  * @private
  * @param {object} locals the request locals (only defined when executing on the server.)
  * @param {object} site - the site to look for locale id
- * @returns {String} the locale short code
+ * @returns {string|undefined} the locale short code
  */
 const getLocale = (locals = {}, site) => {
     const path =
@@ -38,10 +38,12 @@ const getLocale = (locals = {}, site) => {
             ? locals.originalUrl
             : `${window.location.pathname}${window.location.search}`
     const {locale: localeIdentifier} = getParamsFromPath(path)
+    if (!localeIdentifier) return
 
-    const locale = site.l10n.supportedLocales.find(
-        (locale) => locale.id === localeIdentifier || locale.alias === localeIdentifier
-    )
+    const locale = site.l10n.supportedLocales.find((locale) => {
+        return locale.id === localeIdentifier || locale.alias === localeIdentifier
+    })
+    console.log('locale', locale)
 
     return locale?.id
 }
