@@ -10,17 +10,14 @@ import {Route, Switch} from 'react-router-dom'
 import {screen, waitFor, waitForElementToBeRemoved, within} from '@testing-library/react'
 import user from '@testing-library/user-event'
 import {rest} from 'msw'
-import {setupServer} from 'msw/node'
-import {renderWithProviders, createPathWithDefaults} from '../../utils/test-utils'
+import {renderWithProviders, createPathWithDefaults, setupMockServer} from '../../utils/test-utils'
 import useShopper from '../../commerce-api/hooks/useShopper'
 import {
     ocapiBasketWithItem,
     ocapiOrderResponse,
-    exampleTokenReponse,
     mockShippingMethods,
     mockPaymentMethods,
     mockedRegisteredCustomer,
-    mockedRegisteredCustomerWithTwoAddresses,
     mockedCustomerProductLists,
     productsResponse
 } from '../../commerce-api/mock-data'
@@ -75,22 +72,7 @@ const WrappedCheckout = () => {
 
 // Set up the msw server to intercept fetch requests and returned mocked results. Additional
 // interceptors can be defined in each test for specific requests.
-const server = setupServer(
-    // mock guest login
-    rest.post('*/customers/actions/login', (req, res, ctx) => {
-        return res(
-            ctx.set('authorization', `Bearer ${exampleTokenReponse.access_token}`),
-            ctx.json({
-                authType: 'guest',
-                preferredLocale: 'en_US',
-                // Mocked customer ID should match the mocked basket's customer ID as
-                // it would with real usage, otherwise, the useShopper hook will detect
-                // the mismatch and attempt to refetch a new basket for the customer.
-                customerId: ocapiBasketWithItem.customer_info.customer_id
-            })
-        )
-    }),
-
+const server = setupMockServer(
     // mock empty guest basket
     rest.get('*/customers/:customerId/baskets', (req, res, ctx) => {
         return res(
@@ -120,14 +102,6 @@ const server = setupServer(
         return res(ctx.json({data: [{id: '701642811398M'}]}))
     }),
 
-    rest.get('*/oauth2/authorize', (req, res, ctx) =>
-        res(ctx.delay(0), ctx.status(303), ctx.set('location', `/testcallback`))
-    ),
-
-    rest.get('*/testcallback', (req, res, ctx) => {
-        return res(ctx.delay(0), ctx.status(200))
-    }),
-
     rest.get('*/customers/:customerId', (req, res, ctx) => {
         return res(
             ctx.delay(0),
@@ -140,19 +114,6 @@ const server = setupServer(
                 // it would with real usage, otherwise, the useShopper hook will detect
                 // the mismatch and attempt to refetch a new basket for the customer.
                 customerId: ocapiBasketWithItem.customer_info.customer_id
-            })
-        )
-    }),
-
-    rest.post('*/oauth2/token', (req, res, ctx) => {
-        return res(
-            ctx.delay(0),
-            ctx.json({
-                customer_id: ocapiBasketWithItem.customer_info.customer_id,
-                access_token: 'testtoken',
-                refresh_token: 'testrefeshtoken',
-                usid: 'testusid',
-                enc_user_id: 'testEncUserId'
             })
         )
     })
@@ -380,31 +341,6 @@ test('Can proceed through checkout as registered customer', async () => {
 
     // Set up additional requests for intercepting/mocking for just this test.
     server.use(
-        // Mock oauth login callback request
-        rest.post('*/oauth2/login', (req, res, ctx) => {
-            return res(ctx.status(303), ctx.set('location', `/callback`))
-        }),
-
-        rest.get('*/callback', (req, res, ctx) => {
-            return res(ctx.status(200))
-        }),
-
-        rest.post('*/oauth2/token', (req, res, ctx) => {
-            return res(
-                ctx.json({
-                    customer_id: 'test',
-                    access_token: 'testtoken',
-                    refresh_token: 'testrefeshtoken',
-                    usid: 'testusid',
-                    enc_user_id: 'testEncUserId'
-                })
-            )
-        }),
-
-        rest.get('*/customers/:customerId', (req, res, ctx) => {
-            return res(ctx.json(mockedRegisteredCustomer))
-        }),
-
         // mock adding guest email to basket
         rest.put('*/baskets/:basketId/customer', (req, res, ctx) => {
             currentBasket.customer_info.email = 'customer@test.com'
@@ -597,31 +533,6 @@ test('Can edit address during checkout as a registered customer', async () => {
 
     // Set up additional requests for intercepting/mocking for just this test.
     server.use(
-        // Mock oauth login callback request
-        rest.post('*/oauth2/login', (req, res, ctx) => {
-            return res(ctx.status(303), ctx.set('location', `/callback`))
-        }),
-
-        rest.get('*/callback', (req, res, ctx) => {
-            return res(ctx.status(200))
-        }),
-
-        rest.post('*/oauth2/token', (req, res, ctx) => {
-            return res(
-                ctx.json({
-                    customer_id: 'test',
-                    access_token: 'testtoken',
-                    refresh_token: 'testrefeshtoken',
-                    usid: 'testusid',
-                    enc_user_id: 'testEncUserId'
-                })
-            )
-        }),
-
-        rest.get('*/customers/:customerId', (req, res, ctx) => {
-            return res(ctx.json(mockedRegisteredCustomer))
-        }),
-
         // mock fetch product lists
         rest.get('*/customers/:customerId/product-lists', (req, res, ctx) => {
             return res(ctx.json(mockedCustomerProductLists))
@@ -711,31 +622,6 @@ test('Can add address during checkout as a registered customer', async () => {
     let currentBasket = JSON.parse(JSON.stringify(ocapiBasketWithItem))
     // Set up additional requests for intercepting/mocking for just this test.
     server.use(
-        // Mock oauth login callback request
-        rest.post('*/oauth2/login', (req, res, ctx) => {
-            return res(ctx.status(303), ctx.set('location', `/callback`))
-        }),
-
-        rest.get('*/callback', (req, res, ctx) => {
-            return res(ctx.status(200))
-        }),
-
-        rest.post('*/oauth2/token', (req, res, ctx) => {
-            return res(
-                ctx.json({
-                    customer_id: 'test',
-                    access_token: 'testtoken',
-                    refresh_token: 'testrefeshtoken',
-                    usid: 'testusid',
-                    enc_user_id: 'testEncUserId'
-                })
-            )
-        }),
-
-        rest.get('*/customers/:customerId', (req, res, ctx) => {
-            return res.once(ctx.json(mockedRegisteredCustomerWithTwoAddresses))
-        }),
-
         // mock adding guest email to basket
         rest.put('*/baskets/:basketId/customer', (req, res, ctx) => {
             currentBasket.customer_info.email = 'customer@test.com'
