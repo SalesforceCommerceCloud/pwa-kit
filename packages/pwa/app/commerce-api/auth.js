@@ -33,6 +33,7 @@ const refreshTokenStorageKey = 'cc-nx'
 const refreshTokenGuestStorageKey = 'cc-nx-g'
 const oidStorageKey = 'oid'
 const dwSessionIdKey = 'dwsid'
+const REFRESH_TOKEN_COOKIE_AGE = 90 // 90 days. This value matches SLAS cartridge.
 
 /**
  * A  class that provides auth functionality for pwa.
@@ -45,7 +46,7 @@ class Auth {
         this._onClient = typeof window !== 'undefined'
         this._pendingAuth = undefined
         this._customerId = undefined
-        this._storage = new LocalStorage()
+        this._storage = new CookieStorage()
         this._oid = this._storage.get(oidStorageKey)
 
         const configOid = api._config.parameters.organizationId
@@ -405,7 +406,7 @@ class Auth {
     _saveAccessToken(token) {
         this._authToken = token
         if (this._onClient) {
-            this._storage.set(tokenStorageKey, token, {secure: true})
+            this._storage.set(tokenStorageKey, token)
         }
     }
 
@@ -417,7 +418,7 @@ class Auth {
     _saveUsid(usid) {
         this._usid = usid
         if (this._onClient) {
-            this._storage.set(usidStorageKey, usid, {secure: true})
+            this._storage.set(usidStorageKey, usid)
         }
     }
 
@@ -429,7 +430,7 @@ class Auth {
     _saveEncUserId(encUserId) {
         this._encUserId = encUserId
         if (this._onClient) {
-            this._storage.set(encUserIdStorageKey, encUserId, {secure: true})
+            this._storage.set(encUserIdStorageKey, encUserId)
         }
     }
 
@@ -441,7 +442,7 @@ class Auth {
     _saveOid(oid) {
         this._oid = oid
         if (this._onClient) {
-            this._storage.set(oidStorageKey, oid, {secure: true})
+            this._storage.set(oidStorageKey, oid)
         }
     }
 
@@ -475,7 +476,7 @@ class Auth {
         const storeageKey =
             type === 'registered' ? refreshTokenStorageKey : refreshTokenGuestStorageKey
         if (this._onClient) {
-            this._storage.set(storeageKey, refreshToken, {secure: true})
+            this._storage.set(storeageKey, refreshToken, {expires: REFRESH_TOKEN_COOKIE_AGE})
         }
     }
 }
@@ -483,7 +484,7 @@ class Auth {
 export default Auth
 
 class Storage {
-    set(key, value) {}
+    set(key, value, options) {}
     get(key) {}
     remove(key) {}
 }
@@ -498,8 +499,8 @@ class CookieStorage extends Storage {
         }
         this._avaliable = true
     }
-    set(key, value) {
-        this._avaliable && Cookies.set(key, value, {secure: true})
+    set(key, value, options) {
+        this._avaliable && Cookies.set(key, value, {secure: true, ...options})
     }
     get(key) {
         return this._avaliable ? Cookies.get(key) : undefined
