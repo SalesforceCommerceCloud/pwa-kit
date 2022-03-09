@@ -46,6 +46,10 @@ class Auth {
         this._onClient = typeof window !== 'undefined'
         this._pendingAuth = undefined
         this._customerId = undefined
+
+        // To store tokens as cookies
+        // change the next line to
+        // this._storage = new CookieStorage()
         this._storage = new LocalStorage()
         this._oid = this._storage.get(oidStorageKey)
 
