@@ -20,12 +20,10 @@ exports.template = ({commerceApi, einsteinApi}) => `module.exports = {
                     supportedLocales: [
                         {
                             id: 'en-US',
-                            alias: 'en',
                             preferredCurrency: 'USD'
                         },
                         {
                             id: 'en-CA',
-                            alias: 'ca',
                             preferredCurrency: 'USD'
                         }
                     ]

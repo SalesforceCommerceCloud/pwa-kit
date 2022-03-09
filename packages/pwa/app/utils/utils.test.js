@@ -163,7 +163,17 @@ describe('getParamsFromPath', function() {
         {path: '/en', expectedRes: {site: undefined, locale: 'en'}},
         {path: '/ca/', expectedRes: {site: undefined, locale: 'ca'}},
         {path: '/ca', expectedRes: {site: undefined, locale: 'ca'}},
-        {path: '/', expectedRes: {site: undefined, locale: undefined}}
+        {path: '/', expectedRes: {site: undefined, locale: undefined}},
+        {path: '/?site=us', expectedRes: {site: 'us', locale: undefined}},
+        {path: '/?site=us&locale=en', expectedRes: {site: 'us', locale: 'en'}},
+        {path: '/en-US/category/womens?site=us', expectedRes: {site: 'us', locale: 'en-US'}},
+        {path: '/us/category/womens?locale=en-US', expectedRes: {site: 'us', locale: 'en-US'}},
+        {path: '/us/category/womens?locale=en', expectedRes: {site: 'us', locale: 'en'}},
+        {path: '/category/womens?site=us&locale=en-US', expectedRes: {site: 'us', locale: 'en-US'}},
+        {
+            path: '/category/womens?site=RefArch&locale=en-US',
+            expectedRes: {site: 'RefArch', locale: 'en-US'}
+        }
     ]
     cases.forEach(({path, expectedRes}) => {
         test(`return expected values when path is ${path}`, () => {
