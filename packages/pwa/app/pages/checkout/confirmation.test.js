@@ -10,18 +10,13 @@ import React from 'react'
 import {screen, waitFor} from '@testing-library/react'
 import user from '@testing-library/user-event'
 import {rest} from 'msw'
-import {setupServer} from 'msw/node'
-import {renderWithProviders} from '../../utils/test-utils'
+import {renderWithProviders, setupMockServer} from '../../utils/test-utils'
 import Confirmation from './confirmation'
 import {keysToCamel} from '../../commerce-api/utils'
 import useBasket from '../../commerce-api/hooks/useBasket'
 import useShopper from '../../commerce-api/hooks/useShopper'
-import {mockedRegisteredCustomer, ocapiOrderResponse} from '../../commerce-api/mock-data'
-import {
-    mockedGuestCustomer,
-    expiredAuthToken,
-    exampleTokenReponse
-} from '../../commerce-api/mock-data'
+import {ocapiOrderResponse} from '../../commerce-api/mock-data'
+import {mockedGuestCustomer, exampleTokenReponse} from '../../commerce-api/mock-data'
 
 jest.mock('../../commerce-api/hooks/useCustomer', () => {
     const originalModule = jest.requireActual('../../commerce-api/hooks/useCustomer')
@@ -179,7 +174,7 @@ const WrappedConfirmation = () => {
     return <Confirmation />
 }
 
-const server = setupServer(
+const server = setupMockServer(
     rest.get('*/baskets*', (_, res, ctx) => {
         return res(ctx.json(keysToCamel(mockBasketOrder)))
     }),
@@ -205,39 +200,7 @@ const server = setupServer(
             login: 'test3@foo.com'
         }
         return res(ctx.json(successfulAccountCreation))
-    }),
-    rest.post('*/oauth2/authorize', (req, res, ctx) =>
-        res(ctx.delay(0), ctx.status(303), ctx.set('location', `/testcallback`))
-    ),
-
-    rest.get('*/oauth2/authorize', (req, res, ctx) =>
-        res(ctx.delay(0), ctx.status(303), ctx.set('location', `/testcallback`))
-    ),
-
-    rest.get('*/testcallback', (req, res, ctx) => {
-        return res(ctx.delay(0), ctx.status(200))
-    }),
-
-    rest.post('*/oauth2/login', (req, res, ctx) =>
-        res(ctx.delay(0), ctx.status(200), ctx.json(mockedRegisteredCustomer))
-    ),
-
-    rest.get('*/customers/:customerId', (req, res, ctx) => {
-        return res(ctx.delay(0), ctx.status(200), ctx.json(mockedRegisteredCustomer))
-    }),
-
-    rest.post('*/oauth2/token', (req, res, ctx) =>
-        res(
-            ctx.delay(0),
-            ctx.json({
-                customer_id: 'customerid',
-                access_token: 'testtoken',
-                refresh_token: 'testrefeshtoken',
-                usid: 'testusid',
-                enc_user_id: 'testEncUserId'
-            })
-        )
-    )
+    })
 )
 
 // Set up and clean up
