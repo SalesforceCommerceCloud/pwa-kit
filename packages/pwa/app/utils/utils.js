@@ -183,8 +183,8 @@ export const getParamsFromPath = (path) => {
         searchMatchForSite?.groups.siteId
 
     const locale =
-        pathMatch?.groups.localeAlias ||
         pathMatch?.groups.localeId ||
+        pathMatch?.groups.localeAlias ||
         searchMatchForLocale?.groups.localeAlias ||
         searchMatchForLocale?.groups.localeId
 

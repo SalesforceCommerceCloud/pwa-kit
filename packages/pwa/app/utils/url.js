@@ -262,9 +262,9 @@ export const buildPathWithUrlConfig = (relativeUrl, configValues = {}, opts = {}
     let basePathSegments = []
 
     // get the default values for site and locale
-    // the default locale values will depend on current site
     const showDefaults = urlConfig.showDefaults
     const defaultSites = [getDefaultSite().id, getDefaultSite().alias]
+    // the default locale values will depend on current site
     const defaultLocaleId = opts.site?.l10n.defaultLocale
     const defaultLocaleAlias = opts.site?.l10n.supportedLocales.find(
         (locale) => locale.alias === defaultLocaleId

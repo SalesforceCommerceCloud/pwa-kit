@@ -43,7 +43,6 @@ const getLocale = (locals = {}, site) => {
     const locale = site.l10n.supportedLocales.find((locale) => {
         return locale.id === localeIdentifier || locale.alias === localeIdentifier
     })
-    console.log('locale', locale)
 
     return locale?.id
 }

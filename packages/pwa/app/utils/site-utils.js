@@ -69,7 +69,7 @@ export const getDefaultSite = () => {
 export const getSites = () => {
     const {sites = [], siteAliases = {}} = getConfig().app || {}
 
-    if (!sites) {
+    if (!sites.length) {
         throw new Error("Can't find any sites from the config. Please check your configuration")
     }
 
