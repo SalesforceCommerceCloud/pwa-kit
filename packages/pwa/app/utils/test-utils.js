@@ -24,8 +24,11 @@ import {AddToCartModalContext} from '../hooks/use-add-to-cart-modal'
 import {app as appConfig} from '../../config/default'
 import {IntlProvider} from 'react-intl'
 import {urlPartPositions} from '../constants'
-import {mockCategories as initialMockCategories, mockedRegisteredCustomer,
-    exampleTokenReponse} from '../commerce-api/mock-data'
+import {
+    mockCategories as initialMockCategories,
+    mockedRegisteredCustomer,
+    exampleTokenReponse
+} from '../commerce-api/mock-data'
 
 export const DEFAULT_LOCALE = 'en-GB'
 export const DEFAULT_CURRENCY = 'GBP'
