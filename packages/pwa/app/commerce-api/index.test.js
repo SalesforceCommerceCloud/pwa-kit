@@ -10,7 +10,7 @@ import fetch from 'jest-fetch-mock'
 // NOTE: this will need to be a fixed or known config for testing against
 // It will probably end up living in pwa-kit later on so we may want to
 // deal with it there.
-import {commerceAPIConfig, einsteinAPIConfig} from '../api.config'
+import {app as appConfig} from '../../config/default'
 import {createGetTokenBody} from './utils'
 import {generateCodeChallenge, createCodeVerifier} from './pkce'
 import {
@@ -28,8 +28,8 @@ import {
 jest.mock('cross-fetch', () => jest.requireActual('jest-fetch-mock'))
 
 const apiConfig = {
-    ...commerceAPIConfig,
-    einsteinConfig: einsteinAPIConfig,
+    ...appConfig.commerceAPI,
+    einsteinConfig: appConfig.einsteinAPI,
     proxy: undefined,
     locale: 'en-GB',
     currency: 'GBP'
