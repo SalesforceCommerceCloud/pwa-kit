@@ -46,7 +46,7 @@ class Auth {
         this._onClient = typeof window !== 'undefined'
         this._pendingAuth = undefined
         this._customerId = undefined
-        this._storage = new CookieStorage()
+        this._storage = new LocalStorage()
         this._oid = this._storage.get(oidStorageKey)
 
         const configOid = api._config.parameters.organizationId
