@@ -51,9 +51,9 @@ class Auth {
         // change the next line to
         // this._storage = new CookieStorage()
         this._storage = new CookieStorage()
-        this._oid = this._storage.get(oidStorageKey)
-
         const configOid = api._config.parameters.organizationId
+        this._oid = this._storage.get(oidStorageKey) || configOid
+
         if (this._oid !== configOid) {
             this._clearAuth()
             this._saveOid(configOid)
