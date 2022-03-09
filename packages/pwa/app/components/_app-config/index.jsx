@@ -19,23 +19,18 @@ import {
     CustomerProductListsProvider,
     CustomerProvider
 } from '../../commerce-api/contexts'
-import {commerceAPIConfig, einsteinAPIConfig} from '../../api.config'
 import {getPreferredCurrency} from '../../utils/locale'
 import {pathToUrl} from '../../utils/url'
 import {resolveSiteFromUrl} from '../../utils/site-utils'
 import {getParamsFromPath} from '../../utils/utils'
-
-const apiConfig = {
-    ...commerceAPIConfig,
-    einsteinConfig: einsteinAPIConfig
-}
+import {getConfig} from 'pwa-kit-react-sdk/ssr/universal/utils'
 
 /**
  * Returns the validated locale short code parsed from the url.
  * @private
  * @param {object} locals the request locals (only defined when executing on the server.)
  * @param {object} site - the site to look for locale id
- * @returns {String} the locale short code
+ * @returns {string|undefined} the locale short code
  */
 const getLocale = (locals = {}, site) => {
     const path =
@@ -43,10 +38,11 @@ const getLocale = (locals = {}, site) => {
             ? locals.originalUrl
             : `${window.location.pathname}${window.location.search}`
     const {locale: localeIdentifier} = getParamsFromPath(path)
+    if (!localeIdentifier) return
 
-    const locale = site.l10n.supportedLocales.find(
-        (locale) => locale.id === localeIdentifier || locale.alias === localeIdentifier
-    )
+    const locale = site.l10n.supportedLocales.find((locale) => {
+        return locale.id === localeIdentifier || locale.alias === localeIdentifier
+    })
 
     return locale?.id
 }
@@ -83,11 +79,18 @@ AppConfig.restore = (locals = {}) => {
             : `${window.location.pathname}${window.location.search}`
     const url = pathToUrl(path)
     const site = resolveSiteFromUrl(url)
-    apiConfig.parameters.siteId = site.id
 
     const locale = getLocale(locals, site) || site.l10n.defaultLocale
     const currency =
         getPreferredCurrency(locale, site.l10n.supportedLocales) || site.defaultCurrency
+
+    const {app: appConfig} = getConfig()
+    const apiConfig = {
+        ...appConfig.commerceAPI,
+        einsteinConfig: appConfig.einsteinAPI
+    }
+
+    apiConfig.parameters.siteId = site.id
 
     locals.api = new CommerceAPI({...apiConfig, locale, currency})
 }

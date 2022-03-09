@@ -7,6 +7,8 @@
 
 import {pathToUrl} from './url'
 import {getSites} from './site-utils'
+import {getConfig} from 'pwa-kit-react-sdk/ssr/universal/utils'
+
 /**
  * Call requestIdleCallback in supported browsers.
  *
@@ -181,55 +183,12 @@ export const getParamsFromPath = (path) => {
         searchMatchForSite?.groups.siteId
 
     const locale =
-        pathMatch?.groups.localeAlias ||
         pathMatch?.groups.localeId ||
+        pathMatch?.groups.localeAlias ||
         searchMatchForLocale?.groups.localeAlias ||
         searchMatchForLocale?.groups.localeId
 
     return {site, locale}
-}
-
-/**
- * Dynamically load the applications config object.
- *
- * @returns the application config object.
- */
-//TODO: Remove this when the work from SDK is merged
-export const getConfig = (opts = {}) => {
-    let _config
-
-    if (typeof window !== 'undefined') {
-        _config = window.__CONFIG__ || JSON.parse(document.getElementById('app-config').innerHTML)
-        return _config
-    }
-
-    // doing this to force Webpack to ignore a
-    // `require()` call that is not meant for the browser
-    const _require = eval('require')
-    const {cosmiconfigSync} = _require('cosmiconfig')
-
-    // Load the config synchronously using a custom "searchPlaces".
-
-    // By default, use the deployment target as the {moduleName} for your
-    // configuration file. This means that on a "Production" names target, you'll load
-    // your `config/production.json` file. You can customize how you determine your
-    // {moduleName}.
-    const {moduleNameResolver} = opts
-    const moduleName = (moduleNameResolver && moduleNameResolver()) || process.env.DEPLOY_TARGET
-
-    const explorerSync = cosmiconfigSync(moduleName, {
-        packageProp: 'mobify',
-        searchPlaces: [
-            `config/${moduleName}.json`,
-            `config/local.json`,
-            `config/default.json`,
-            'package.json'
-        ]
-    })
-    const {config, filepath} = explorerSync.search()
-    console.info('=========loading the config from=====', filepath)
-
-    return config
 }
 
 /**
