@@ -8,8 +8,7 @@ import React from 'react'
 import {screen, waitFor, within} from '@testing-library/react'
 import user from '@testing-library/user-event'
 import {rest} from 'msw'
-import {setupServer} from 'msw/node'
-import {getPathname, renderWithProviders} from '../../utils/test-utils'
+import {getPathname, renderWithProviders, setupMockServer} from '../../utils/test-utils'
 import ResetPassword from '.'
 
 jest.setTimeout(60000)
@@ -68,32 +67,7 @@ const MockedComponent = () => {
     )
 }
 
-const server = setupServer(
-    rest.post('*/oauth2/authorize', (req, res, ctx) =>
-        res(ctx.delay(0), ctx.status(303), ctx.set('location', `/testcallback`))
-    ),
-
-    rest.get('*/oauth2/authorize', (req, res, ctx) =>
-        res(ctx.delay(0), ctx.status(303), ctx.set('location', `/testcallback`))
-    ),
-
-    rest.get('*/testcallback', (req, res, ctx) => {
-        return res(ctx.delay(0), ctx.status(200))
-    }),
-
-    rest.post('*/oauth2/token', (req, res, ctx) =>
-        res(
-            ctx.delay(0),
-            ctx.json({
-                customer_id: 'test',
-                access_token: 'testtoken',
-                refresh_token: 'testrefeshtoken',
-                usid: 'testusid',
-                enc_user_id: 'testEncUserId'
-            })
-        )
-    )
-)
+const server = setupMockServer()
 
 // Set up and clean up
 beforeEach(() => {
