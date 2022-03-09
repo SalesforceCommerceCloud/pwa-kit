@@ -8,22 +8,17 @@ import React from 'react'
 import {renderWithProviders} from '../../utils/test-utils'
 import Link from './index'
 import mockConfig from '../../../config/mocks/default.json'
+import {setConfig} from 'pwa-kit-react-sdk/ssr/universal/utils'
 const originalLocation = window.location
 const originalConfig = window.__CONFIG__
-
-beforeEach(() => {
-    // Restore window.__CONFIG
-    Object.defineProperty(window, '__CONFIG__', {
-        value: originalConfig,
-        configurable: true
-    })
-})
 
 afterEach(() => {
     // Restore `window.location` to the `jsdom` `Location` object
     window.location = originalLocation
 
     jest.resetModules()
+    // Restore window.__CONFIG
+    setConfig(originalConfig)
 })
 
 test('renders a link with locale prepended', () => {
@@ -36,8 +31,8 @@ test('renders a link with locale prepended', () => {
 })
 
 test('renders a link with locale and site as query param', () => {
-    delete window.__CONFIG__
-    window.__CONFIG__ = {
+    // delete window.__CONFIG__
+    const newConfig = {
         ...mockConfig,
         app: {
             ...mockConfig.app,
@@ -48,6 +43,7 @@ test('renders a link with locale and site as query param', () => {
             }
         }
     }
+    setConfig(newConfig)
     delete window.location
     window.location = new URL('https://www.example.com/women/dresses?site=us&locale=en-US')
     const {getByText} = renderWithProviders(<Link href="/mypage">My Page</Link>, {
