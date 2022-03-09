@@ -12,7 +12,7 @@ import Header from './index'
 import {renderWithProviders, getPathname, setupMockServer} from '../../utils/test-utils'
 import useCustomer from '../../commerce-api/hooks/useCustomer'
 import {rest} from 'msw'
-import {mockedCustomerProductLists, mockedRegisteredCustomer} from '../../commerce-api/mock-data'
+import {mockedCustomerProductLists} from '../../commerce-api/mock-data'
 import {Route, Switch} from 'react-router-dom'
 import {createMemoryHistory} from 'history'
 

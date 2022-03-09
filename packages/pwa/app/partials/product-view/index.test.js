@@ -12,8 +12,6 @@ import mockProductDetail from '../../commerce-api/mocks/variant-750518699578M'
 import ProductView from './index'
 import {renderWithProviders, setupMockServer} from '../../utils/test-utils'
 import useCustomer from '../../commerce-api/hooks/useCustomer'
-import {rest} from 'msw'
-import {mockedRegisteredCustomer} from '../../commerce-api/mock-data'
 import userEvent from '@testing-library/user-event'
 
 jest.mock('../../commerce-api/utils', () => {

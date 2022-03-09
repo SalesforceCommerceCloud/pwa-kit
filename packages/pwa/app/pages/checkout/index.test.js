@@ -18,7 +18,6 @@ import {
     mockShippingMethods,
     mockPaymentMethods,
     mockedRegisteredCustomer,
-    mockedRegisteredCustomerWithTwoAddresses,
     mockedCustomerProductLists,
     productsResponse
 } from '../../commerce-api/mock-data'
