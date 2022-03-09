@@ -29,7 +29,6 @@ import RecommendedProducts from '../components/recommended-products'
 import {LockIcon} from '../components/icons'
 import {useVariationAttributes} from './'
 import {findImageGroupBy} from '../utils/image-groups-utils'
-import useSite from './use-site'
 
 /**
  * This is the context for managing the AddToCartModal.
@@ -58,7 +57,6 @@ export const AddToCartModal = () => {
     const {product, quantity} = data || {}
     const intl = useIntl()
     const basket = useBasket()
-    const site = useSite()
     const size = useBreakpointValue({base: 'full', lg: '2xl', xl: '4xl'})
     const variationAttributes = useVariationAttributes(product)
     if (!isOpen) {
@@ -140,7 +138,7 @@ export const AddToCartModal = () => {
                                         {!!lineItemPrice &&
                                             intl.formatNumber(lineItemPrice, {
                                                 style: 'currency',
-                                                currency: currency || site.defaultCurrency
+                                                currency: currency
                                             })}
                                     </Text>
                                 </Box>
@@ -166,7 +164,7 @@ export const AddToCartModal = () => {
                                     {productSubTotal &&
                                         intl.formatNumber(productSubTotal, {
                                             style: 'currency',
-                                            currency: currency || site.defaultCurrency
+                                            currency: currency
                                         })}
                                 </Text>
                             </Flex>

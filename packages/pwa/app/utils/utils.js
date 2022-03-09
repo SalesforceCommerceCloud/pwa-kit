@@ -204,27 +204,22 @@ export const getConfigMatcher = (config) => {
     }
 
     const allSites = getSites()
-    let sites = []
-    let locales = []
+    const siteIds = []
+    const siteAliases = []
+    const localesIds = []
+    const localeAliases = []
     allSites.forEach((site) => {
-        sites.push(site.alias)
+        siteAliases.push(site.alias)
+        siteIds.push(site.id)
         const {l10n} = site
         l10n.supportedLocales.forEach((locale) => {
-            locales.push(locale.id)
+            localesIds.push(locale.id)
+            localeAliases.push(locale.alias)
         })
     })
+    const sites = [...siteIds, ...siteAliases].filter(Boolean)
+    const locales = [...localesIds, ...localeAliases].filter(Boolean)
 
-    allSites.forEach((site) => {
-        sites.push(site.id)
-        const {l10n} = site
-        l10n.supportedLocales.forEach((locale) => {
-            locales.push(locale.alias)
-        })
-    })
-
-    // filter out falsy values
-    locales = locales.filter(Boolean)
-    sites = sites.filter(Boolean)
     // prettier-ignore
     // eslint-disable-next-line
     const searchPatternForSite = `site=(?<site>${sites.join('|')})`
