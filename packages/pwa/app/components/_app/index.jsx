@@ -56,14 +56,7 @@ const DEFAULT_NAV_DEPTH = 3
 const DEFAULT_ROOT_CATEGORY = 'root'
 
 const App = (props) => {
-    const {
-        children,
-        targetLocale,
-        defaultLocale,
-        messages,
-        categories: allCategories = {},
-        config
-    } = props
+    const {children, targetLocale, defaultLocale, messages, categories: allCategories = {}} = props
 
     const appOrigin = getAppOrigin()
 
@@ -211,13 +204,7 @@ const App = (props) => {
                         </Seo>
 
                         <ScrollToTop />
-                        <script
-                            id="app-config"
-                            type="application/json" // Not executable
-                            dangerouslySetInnerHTML={{
-                                __html: JSON.stringify(config)
-                            }}
-                        />
+
                         <Box id="app" display="flex" flexDirection="column" flex={1}>
                             <SkipNavLink zIndex="skipLink">Skip to Content</SkipNavLink>
 
