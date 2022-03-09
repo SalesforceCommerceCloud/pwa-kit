@@ -8,9 +8,7 @@ import React, {useEffect} from 'react'
 import PropTypes from 'prop-types'
 
 import {rest} from 'msw'
-import {setupServer} from 'msw/node'
 import {
-    mockedRegisteredCustomer,
     mockProductSearch,
     mockCategories,
     mockedEmptyCustomerProductList
@@ -18,7 +16,7 @@ import {
 import {screen, waitFor} from '@testing-library/react'
 import user from '@testing-library/user-event'
 import {Route, Switch} from 'react-router-dom'
-import {renderWithProviders} from '../../utils/test-utils'
+import {renderWithProviders, setupMockServer} from '../../utils/test-utils'
 import ProductList from '.'
 import EmptySearchResults from './partials/empty-results'
 import useCustomer from '../../commerce-api/hooks/useCustomer'
@@ -105,42 +103,12 @@ const MockedEmptyPage = () => {
 
 // Set up the msw server to intercept fetch requests and returned mocked results. Additional
 // interceptors can be defined in each test for specific requests.
-const server = setupServer(
-    rest.post('*/oauth2/authorize', (req, res, ctx) =>
-        res(ctx.delay(0), ctx.status(303), ctx.set('location', `/testcallback`))
-    ),
-    rest.get('*/oauth2/authorize', (req, res, ctx) =>
-        res(ctx.delay(0), ctx.status(303), ctx.set('location', `/testcallback`))
-    ),
-    rest.get('*/testcallback', (req, res, ctx) => {
-        return res(ctx.delay(0), ctx.status(200))
-    }),
-    rest.post('*/oauth2/login', (req, res, ctx) =>
-        res(ctx.delay(0), ctx.status(200), ctx.json(mockedRegisteredCustomer))
-    ),
-    rest.get('*/customers/:customerId', (req, res, ctx) =>
-        res(ctx.delay(0), ctx.status(200), ctx.json(mockedRegisteredCustomer))
-    ),
+const server = setupMockServer(
     rest.get('*/product-search', (req, res, ctx) =>
         res(ctx.delay(0), ctx.status(200), ctx.json(mockProductListSearchResponse))
     ),
-    // rest.get('*/product-search', (req, res, ctx) =>
-    //     res(ctx.delay(0), ctx.status(200), ctx.json(mockedProductSearchList))
-    // ),
     rest.post('*/einstein/v3/personalization/*', (req, res, ctx) =>
         res(ctx.delay(0), ctx.status(200), ctx.json(mockProductListSearchResponse))
-    ),
-    rest.post('*/oauth2/token', (req, res, ctx) =>
-        res(
-            ctx.delay(0),
-            ctx.json({
-                customer_id: 'test',
-                access_token: 'testtoken',
-                refresh_token: 'testrefeshtoken',
-                usid: 'testusid',
-                enc_user_id: 'testEncUserId'
-            })
-        )
     )
 )
 
