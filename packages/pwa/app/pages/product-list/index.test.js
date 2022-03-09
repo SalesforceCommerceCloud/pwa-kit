@@ -16,12 +16,11 @@ import {
 import {screen, waitFor} from '@testing-library/react'
 import user from '@testing-library/user-event'
 import {Route, Switch} from 'react-router-dom'
-import {renderWithProviders, setupMockServer} from '../../utils/test-utils'
+import {createPathWithDefaults, renderWithProviders, setupMockServer} from '../../utils/test-utils'
 import ProductList from '.'
 import EmptySearchResults from './partials/empty-results'
 import useCustomer from '../../commerce-api/hooks/useCustomer'
 import useWishlist from '../../hooks/use-wishlist'
-import {getUrlConfig} from '../../utils/utils'
 
 jest.setTimeout(60000)
 let mockCategoriesResponse = mockCategories
@@ -29,13 +28,7 @@ let mockProductListSearchResponse = mockProductSearch
 jest.useFakeTimers()
 
 jest.mock('../../hooks/use-wishlist')
-jest.mock('../../utils/utils', () => {
-    const original = jest.requireActual('../../utils/utils')
-    return {
-        ...original,
-        getUrlConfig: jest.fn()
-    }
-})
+
 jest.mock('../../commerce-api/utils', () => {
     const originalModule = jest.requireActual('../../commerce-api/utils')
     return {
@@ -74,7 +67,7 @@ const MockedComponent = ({isLoading, isLoggedIn = false, searchQuery}) => {
     return (
         <Switch>
             <Route
-                path="/:locale/category/:categoryId"
+                path={createPathWithDefaults('/category/:categoryId')}
                 render={(props) => (
                     <div>
                         <div>{customer.customerId}</div>
@@ -112,17 +105,9 @@ const server = setupMockServer(
     )
 )
 
-// Set up and clean up
-beforeAll(() => {
-    // Since we're testing some navigation logic, we are using a simple Router
-    // around our component. We need to initialize the default route/path here.
-    window.history.pushState({}, 'ProductList', 'en/category/mens-clothing-jackets')
-})
-
 beforeEach(() => {
-    getUrlConfig.mockImplementation(() => ({
-        locale: 'path'
-    }))
+    window.history.pushState({}, 'ProductList', '/uk/en-GB/category/mens-clothing-jackets')
+
     jest.resetModules()
     server.listen({onUnhandledRequest: 'error'})
     useWishlist.mockReturnValue({
@@ -160,12 +145,6 @@ test('should render empty list page', async () => {
     expect(await screen.findByTestId('sf-product-empty-list-page')).toBeInTheDocument()
 })
 
-test('should display Search Results for when searching ', async () => {
-    renderWithProviders(<MockedComponent />)
-    window.history.pushState({}, 'ProductList', 'en-GB/search?q=test')
-    expect(await screen.findByTestId('sf-product-list-page')).toBeInTheDocument()
-})
-
 test('pagination is rendered', async () => {
     renderWithProviders(<MockedComponent />)
     expect(await screen.findByTestId('sf-pagination')).toBeInTheDocument()
@@ -191,14 +170,25 @@ test('clicking a filter will change url', async () => {
     user.click(screen.getByText(/Beige/i))
     await waitFor(() =>
         expect(window.location.search).toEqual(
-            '?limit=25&q=test&refine=c_refinementColor%3DBeige&sort=best-matches'
+            '?limit=25&refine=c_refinementColor%3DBeige&sort=best-matches'
         )
     )
 })
 
-test('clicking a filter will change url', async () => {
+test('click on filter All should clear out all the filter in search params', async () => {
+    window.history.pushState(
+        {},
+        'ProductList',
+        'uk/en-GB/category/mens-clothing-jackets?limit=25&refine=c_refinementColor%3DBeige&sort=best-matches'
+    )
     renderWithProviders(<MockedComponent />)
-    const clearAllButton = screen.queryAllByText(/Clear All/i)
+    const clearAllButton = await screen.findAllByText(/Clear All/i)
     user.click(clearAllButton[0])
     await waitFor(() => expect(window.location.search).toEqual(''))
+})
+
+test('should display Search Results for when searching ', async () => {
+    renderWithProviders(<MockedComponent />)
+    window.history.pushState({}, 'ProductList', 'uk/en-GB/search?q=test')
+    expect(await screen.findByTestId('sf-product-list-page')).toBeInTheDocument()
 })

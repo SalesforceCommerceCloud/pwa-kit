@@ -13,9 +13,9 @@ module.exports = {
             //NOTE: Adjust the key pages URLs that you find important to your website.
             url: [
                 'http://localhost:3000/',
-                'http://localhost:3000/en-GB/category/womens',
-                'http://localhost:3000/en-GB/product/25493613M',
-                'http://localhost:3000/en-GB/search?q=suit'
+                'http://localhost:3000/global/en-GB/category/womens',
+                'http://localhost:3000/global/en-GB/product/25493613M',
+                'http://localhost:3000/global/en-GB/search?q=suit'
             ],
             startServerReadyPattern: 'HTTP development server listening on',
             startServerReadyTimeout: 15000
