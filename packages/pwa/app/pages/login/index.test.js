@@ -8,8 +8,7 @@ import React from 'react'
 import {screen} from '@testing-library/react'
 import user from '@testing-library/user-event'
 import {rest} from 'msw'
-import {setupServer} from 'msw/node'
-import {renderWithProviders, getPathname} from '../../utils/test-utils'
+import {renderWithProviders, getPathname, setupMockServer} from '../../utils/test-utils'
 import Login from '.'
 import {BrowserRouter as Router, Route} from 'react-router-dom'
 import Account from '../account'
@@ -106,7 +105,7 @@ const MockedComponent = () => {
     )
 }
 
-const server = setupServer()
+const server = setupMockServer()
 
 // Set up and clean up
 beforeEach(() => {
@@ -122,34 +121,11 @@ afterEach(() => {
 afterAll(() => server.close())
 
 test('Allows customer to sign in to their account', async () => {
-    // mock auth flow requests
     server.use(
-        rest.post('*/oauth2/login', (req, res, ctx) =>
-            res(ctx.delay(0), ctx.status(303), ctx.set('location', `/testcallback`))
-        ),
-
-        rest.get('*/testcallback', (req, res, ctx) => {
-            return res(ctx.delay(0), ctx.status(200))
-        }),
-
-        rest.post('*/oauth2/token', (req, res, ctx) =>
-            res(
-                ctx.delay(0),
-                ctx.json({
-                    customer_id: 'test',
-                    access_token: 'testtoken',
-                    refresh_token: 'testrefeshtoken',
-                    usid: 'testusid',
-                    enc_user_id: 'testEncUserId'
-                })
-            )
-        ),
-
         rest.get('*/customers/:customerId', (req, res, ctx) =>
             res(ctx.delay(0), ctx.json({authType: 'registered', email: 'darek@test.com'}))
         )
     )
-
     // render our test component
     renderWithProviders(<MockedComponent />)
 
