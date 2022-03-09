@@ -9,7 +9,7 @@ import {Route, Switch} from 'react-router-dom'
 import {screen, waitFor, within} from '@testing-library/react'
 import user from '@testing-library/user-event'
 import {rest} from 'msw'
-import {renderWithProviders, getPathname, setupMockServer} from '../../utils/test-utils'
+import {renderWithProviders, createPathWithDefaults, setupMockServer} from '../../utils/test-utils'
 import {
     mockOrderHistory,
     mockedGuestCustomer,
@@ -38,7 +38,10 @@ const MockedComponent = () => {
 
     return (
         <Switch>
-            <Route path={getPathname('/account')} render={(props) => <Account {...props} />} />
+            <Route
+                path={createPathWithDefaults('/account')}
+                render={(props) => <Account {...props} />}
+            />
         </Switch>
     )
 }
@@ -57,7 +60,7 @@ beforeEach(() => {
 
     // Since we're testing some navigation logic, we are using a simple Router
     // around our component. We need to initialize the default route/path here.
-    window.history.pushState({}, 'Account', getPathname('/account'))
+    window.history.pushState({}, 'Account', createPathWithDefaults('/account'))
 })
 afterEach(() => {
     localStorage.clear()
@@ -65,6 +68,7 @@ afterEach(() => {
 })
 afterAll(() => server.close())
 
+const expectedBasePath = '/uk/en-GB'
 test('Redirects to login page if the customer is not logged in', async () => {
     server.use(
         rest.get('*/customers/:customerId', (req, res, ctx) => {
@@ -72,7 +76,7 @@ test('Redirects to login page if the customer is not logged in', async () => {
         })
     )
     renderWithProviders(<MockedComponent />)
-    await waitFor(() => expect(window.location.pathname).toEqual(getPathname('/login')))
+    await waitFor(() => expect(window.location.pathname).toEqual(`${expectedBasePath}/login`))
 })
 
 test('Provides navigation for subpages', async () => {
@@ -81,11 +85,17 @@ test('Provides navigation for subpages', async () => {
 
     const nav = within(screen.getByTestId('account-detail-nav'))
     user.click(nav.getByText('Addresses'))
-    await waitFor(() => expect(window.location.pathname).toEqual(getPathname('/account/addresses')))
+    await waitFor(() =>
+        expect(window.location.pathname).toEqual(`${expectedBasePath}/account/addresses`)
+    )
     user.click(nav.getByText('Order History'))
-    await waitFor(() => expect(window.location.pathname).toEqual(getPathname('/account/orders')))
+    await waitFor(() =>
+        expect(window.location.pathname).toEqual(`${expectedBasePath}/account/orders`)
+    )
     user.click(nav.getByText('Payment Methods'))
-    await waitFor(() => expect(window.location.pathname).toEqual(getPathname('/account/payments')))
+    await waitFor(() =>
+        expect(window.location.pathname).toEqual(`${expectedBasePath}/account/payments`)
+    )
 })
 
 test('Renders account detail page by default for logged-in customer', async () => {
@@ -102,7 +112,7 @@ test('Allows customer to sign out', async () => {
     expect(await screen.findByTestId('account-detail-page')).toBeInTheDocument()
     user.click(screen.getAllByText(/Log Out/)[0])
     await waitFor(() => {
-        expect(window.location.pathname).toEqual(getPathname('/login'))
+        expect(window.location.pathname).toEqual(`${expectedBasePath}/login`)
     })
 })
 

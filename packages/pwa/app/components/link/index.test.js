@@ -5,40 +5,61 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import {renderWithProviders, getPathname} from '../../utils/test-utils'
+import {renderWithProviders} from '../../utils/test-utils'
 import Link from './index'
-import {DEFAULT_LOCALE} from '../../constants'
+import mockConfig from '../../../config/mocks/default'
+import {setConfig} from 'pwa-kit-react-sdk/ssr/universal/utils'
+const originalLocation = window.location
+const originalConfig = window.__CONFIG__
 
-import {getUrlConfig} from '../../utils/utils'
-jest.mock('../../utils/utils', () => {
-    const original = jest.requireActual('../../utils/utils')
-    return {
-        ...original,
-        getUrlConfig: jest.fn()
-    }
+afterEach(() => {
+    // Restore `window.location` to the `jsdom` `Location` object
+    window.location = originalLocation
+
+    jest.resetModules()
+    // Restore window.__CONFIG
+    setConfig(originalConfig)
 })
+
 test('renders a link with locale prepended', () => {
-    getUrlConfig.mockImplementation(() => ({
-        locale: 'path'
-    }))
-    const {getByText} = renderWithProviders(<Link href="/mypage">My Page</Link>)
-    expect(getByText(/My Page/i)).toHaveAttribute('href', getPathname('/mypage'))
+    delete window.location
+    window.location = new URL('us/en-US', 'https://www.example.com')
+    const {getByText} = renderWithProviders(<Link href="/mypage">My Page</Link>, {
+        wrapperProps: {locale: 'en-US'}
+    })
+    expect(getByText(/My Page/i)).toHaveAttribute('href', '/us/en-US/mypage')
 })
 
-test('renders a link with locale as query param', () => {
-    getUrlConfig.mockImplementation(() => ({
-        locale: 'query_param'
-    }))
-    const {getByText} = renderWithProviders(<Link href="/mypage">My Page</Link>)
-    expect(getByText(/My Page/i)).toHaveAttribute('href', `/mypage?locale=${DEFAULT_LOCALE}`)
+test('renders a link with locale and site as query param', () => {
+    // delete window.__CONFIG__
+    const newConfig = {
+        ...mockConfig,
+        app: {
+            ...mockConfig.app,
+            url: {
+                site: 'query_param',
+                locale: 'query_param',
+                showDefaults: true
+            }
+        }
+    }
+    setConfig(newConfig)
+    delete window.location
+    window.location = new URL('https://www.example.com/women/dresses?site=us&locale=en-US')
+    const {getByText} = renderWithProviders(<Link href="/mypage">My Page</Link>, {
+        wrapperProps: {locale: 'en-US'}
+    })
+
+    expect(getByText(/My Page/i)).toHaveAttribute('href', `/mypage?site=us&locale=en-US`)
 })
 
 test('accepts `to` prop as well', () => {
-    getUrlConfig.mockImplementation(() => ({
-        locale: 'path'
-    }))
-    const {getByText} = renderWithProviders(<Link to="/mypage">My Page</Link>)
-    expect(getByText(/My Page/i)).toHaveAttribute('href', getPathname('/mypage'))
+    delete window.location
+    window.location = new URL('us/en-US', 'https://www.example.com')
+    const {getByText} = renderWithProviders(<Link to="/mypage">My Page</Link>, {
+        wrapperProps: {locale: 'en-US'}
+    })
+    expect(getByText(/My Page/i)).toHaveAttribute('href', '/us/en-US/mypage')
 })
 
 test('does not modify root url', () => {
