@@ -1,9 +1,0 @@
-{
-    "definitions": {},
-    "$schema": "http://json-schema.org/draft-07/schema#",
-    "$id": "pwa-kit-config-schema",
-    "title": "PWA Kit Config Schema",
-    "type": "object",
-    "required": [],
-    "properties": {}
-}
