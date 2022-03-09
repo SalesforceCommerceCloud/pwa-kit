@@ -116,7 +116,6 @@
     "babel-plugin-formatjs": "10.2.20",
     "cross-env": "^5.2.0",
     "enzyme": "^3.8.0",
-    "enzyme-adapter-react-16": "1.15.2",
     "eslint": "7.31.0",
     "eslint-config-prettier": "4.0.0",
     "eslint-import-resolver-webpack": "0.10.0",

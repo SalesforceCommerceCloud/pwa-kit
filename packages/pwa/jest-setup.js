@@ -7,7 +7,7 @@
 import 'raf/polyfill' // fix requestAnimationFrame issue with polyfill
 import '@testing-library/jest-dom/extend-expect'
 import {Crypto} from '@peculiar/webcrypto'
-import config from './config/default.json'
+import config from './config/default'
 import {setConfig} from 'pwa-kit-react-sdk/ssr/universal/utils'
 
 // TextEncoder is a web API, need to import it
