@@ -107,6 +107,12 @@ export const configureRoutes = (routes = [], urlConfig, {ignoredRoutes = []}) =>
             outputRoutes.push(routes[i])
         }
     }
-
+    // Remove any duplicate routes
+    outputRoutes = outputRoutes.reduce((res, route) => {
+        if (!res.some(({path}) => path === route.path)) {
+            res.push(route)
+        }
+        return res
+    }, [])
     return outputRoutes
 }

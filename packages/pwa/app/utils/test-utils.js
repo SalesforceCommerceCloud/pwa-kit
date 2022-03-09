@@ -29,7 +29,7 @@ import {
     exampleTokenReponse
 } from '../commerce-api/mock-data'
 import fallbackMessages from '../translations/compiled/en-GB.json'
-import mockConfig from '../../config/mocks/default.json'
+import mockConfig from '../../config/mocks/default'
 
 export const DEFAULT_LOCALE = 'en-GB'
 export const DEFAULT_CURRENCY = 'GBP'
@@ -174,7 +174,7 @@ export const renderWithProviders = (children, options) =>
 /**
  * This is used to construct the URL pathname that would include
  * or not include the default locale and site identifiers in the URL according to
- * their configuration set in config/mocks/default.json file.
+ * their configuration set in config/mocks/default.js file.
  *
  * @param path The pathname that we want to use
  * @returns {string} URL pathname for the given path
