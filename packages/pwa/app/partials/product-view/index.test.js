@@ -91,34 +91,6 @@ test('ProductView Component renders with addToCart event handler', () => {
 })
 
 test('ProductView Component renders with addToWishList event handler', async () => {
-    server.use(
-        rest.post('*/oauth2/login', (req, res, ctx) =>
-            res(ctx.delay(0), ctx.status(303), ctx.set('location', `/testcallback`))
-        ),
-        rest.get('*/testcallback', (req, res, ctx) => {
-            return res(ctx.delay(0), ctx.status(200))
-        }),
-
-        rest.post('*/oauth2/token', (req, res, ctx) =>
-            res(
-                ctx.delay(0),
-                ctx.json({
-                    customer_id: 'test',
-                    access_token: 'testtoken',
-                    refresh_token: 'testrefeshtoken',
-                    usid: 'testusid',
-                    enc_user_id: 'testEncUserId'
-                })
-            )
-        ),
-        rest.get('*/customers/:customerId', (req, res, ctx) =>
-            res(
-                ctx.json({
-                    ...mockedRegisteredCustomer
-                })
-            )
-        )
-    )
     const addToWishlist = jest.fn()
 
     renderWithProviders(<MockComponent product={mockProductDetail} addToWishlist={addToWishlist} />)
@@ -136,34 +108,6 @@ test('ProductView Component renders with addToWishList event handler', async () 
 })
 
 test('ProductView Component renders with updateWishlist event handler', async () => {
-    server.use(
-        rest.post('*/oauth2/login', (req, res, ctx) =>
-            res(ctx.delay(0), ctx.status(303), ctx.set('location', `/testcallback`))
-        ),
-        rest.get('*/testcallback', (req, res, ctx) => {
-            return res(ctx.delay(0), ctx.status(200))
-        }),
-
-        rest.post('*/oauth2/token', (req, res, ctx) =>
-            res(
-                ctx.delay(0),
-                ctx.json({
-                    customer_id: 'test',
-                    access_token: 'testtoken',
-                    refresh_token: 'testrefeshtoken',
-                    usid: 'testusid',
-                    enc_user_id: 'testEncUserId'
-                })
-            )
-        ),
-        rest.get('*/customers/:customerId', (req, res, ctx) =>
-            res(
-                ctx.json({
-                    ...mockedRegisteredCustomer
-                })
-            )
-        )
-    )
     const updateWishlist = jest.fn()
 
     renderWithProviders(

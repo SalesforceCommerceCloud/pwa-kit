@@ -122,34 +122,6 @@ afterEach(() => {
 afterAll(() => server.close())
 
 test('Allows customer to sign in to their account', async () => {
-    // mock auth flow requests
-    server.use(
-        rest.post('*/oauth2/login', (req, res, ctx) =>
-            res(ctx.delay(0), ctx.status(303), ctx.set('location', `/testcallback`))
-        ),
-
-        rest.get('*/testcallback', (req, res, ctx) => {
-            return res(ctx.delay(0), ctx.status(200))
-        }),
-
-        rest.post('*/oauth2/token', (req, res, ctx) =>
-            res(
-                ctx.delay(0),
-                ctx.json({
-                    customer_id: 'test',
-                    access_token: 'testtoken',
-                    refresh_token: 'testrefeshtoken',
-                    usid: 'testusid',
-                    enc_user_id: 'testEncUserId'
-                })
-            )
-        ),
-
-        rest.get('*/customers/:customerId', (req, res, ctx) =>
-            res(ctx.delay(0), ctx.json({authType: 'registered', email: 'darek@test.com'}))
-        )
-    )
-
     // render our test component
     renderWithProviders(<MockedComponent />)
 

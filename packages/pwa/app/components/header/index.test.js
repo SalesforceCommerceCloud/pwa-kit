@@ -152,34 +152,6 @@ test('renders cart badge when basket is loaded', () => {
 })
 
 test('route to account page when an authenticated users click on account icon', async () => {
-    server.use(
-        rest.post('*/oauth2/login', (req, res, ctx) =>
-            res(ctx.delay(0), ctx.status(303), ctx.set('location', `/testcallback`))
-        ),
-        rest.get('*/testcallback', (req, res, ctx) => {
-            return res(ctx.delay(0), ctx.status(200))
-        }),
-
-        rest.post('*/oauth2/token', (req, res, ctx) =>
-            res(
-                ctx.delay(0),
-                ctx.json({
-                    customer_id: 'test',
-                    access_token: 'testtoken',
-                    refresh_token: 'testrefeshtoken',
-                    usid: 'testusid',
-                    enc_user_id: 'testEncUserId'
-                })
-            )
-        ),
-        rest.get('*/customers/:customerId', (req, res, ctx) =>
-            res(
-                ctx.json({
-                    ...mockedRegisteredCustomer
-                })
-            )
-        )
-    )
     const history = createMemoryHistory()
     // mock push function
     history.push = jest.fn()
@@ -203,34 +175,6 @@ test('route to account page when an authenticated users click on account icon', 
 })
 
 test('route to wishlist page when an authenticated users click on wishlist icon', async () => {
-    server.use(
-        rest.post('*/oauth2/login', (req, res, ctx) =>
-            res(ctx.delay(0), ctx.status(303), ctx.set('location', `/testcallback`))
-        ),
-        rest.get('*/testcallback', (req, res, ctx) => {
-            return res(ctx.delay(0), ctx.status(200))
-        }),
-
-        rest.post('*/oauth2/token', (req, res, ctx) =>
-            res(
-                ctx.delay(0),
-                ctx.json({
-                    customer_id: 'test',
-                    access_token: 'testtoken',
-                    refresh_token: 'testrefeshtoken',
-                    usid: 'testusid',
-                    enc_user_id: 'testEncUserId'
-                })
-            )
-        ),
-        rest.get('*/customers/:customerId', (req, res, ctx) =>
-            res(
-                ctx.json({
-                    ...mockedRegisteredCustomer
-                })
-            )
-        )
-    )
     const history = createMemoryHistory()
     // mock push function
     history.push = jest.fn()
@@ -250,32 +194,6 @@ test('route to wishlist page when an authenticated users click on wishlist icon'
 
 test('shows dropdown menu when an authenticated users hover on the account icon', async () => {
     server.use(
-        rest.post('*/oauth2/login', (req, res, ctx) =>
-            res(ctx.delay(0), ctx.status(303), ctx.set('location', `/testcallback`))
-        ),
-        rest.get('*/testcallback', (req, res, ctx) => {
-            return res(ctx.delay(0), ctx.status(200))
-        }),
-
-        rest.post('*/oauth2/token', (req, res, ctx) =>
-            res(
-                ctx.delay(0),
-                ctx.json({
-                    customer_id: 'test',
-                    access_token: 'testtoken',
-                    refresh_token: 'testrefeshtoken',
-                    usid: 'testusid',
-                    enc_user_id: 'testEncUserId'
-                })
-            )
-        ),
-        rest.get('*/customers/:customerId', (req, res, ctx) =>
-            res(
-                ctx.json({
-                    ...mockedRegisteredCustomer
-                })
-            )
-        ),
         // mock fetch product lists
         rest.get('*/customers/:customerId/product-lists', (req, res, ctx) => {
             return res(ctx.json(mockedCustomerProductLists))
