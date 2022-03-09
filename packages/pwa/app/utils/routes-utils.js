@@ -75,7 +75,7 @@ export const configureRoutes = (routes = [], urlConfig, {ignoredRoutes = []}) =>
                 }
 
                 if (
-                    localePosition === urlPartPositions.QUERY_PARAM &&
+                    localePosition !== urlPartPositions.PATH &&
                     sitePosition === urlPartPositions.PATH
                 ) {
                     // construct the routes that only has site id or alias
@@ -90,7 +90,7 @@ export const configureRoutes = (routes = [], urlConfig, {ignoredRoutes = []}) =>
                 }
                 if (
                     localePosition === urlPartPositions.PATH &&
-                    sitePosition === urlPartPositions.QUERY_PARAM
+                    sitePosition !== urlPartPositions.PATH
                 ) {
                     // construct the routes that only has locale id or alias
                     locales.forEach((locale) => {

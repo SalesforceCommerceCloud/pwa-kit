@@ -170,24 +170,14 @@ export const getParamsFromPath = (path) => {
 
     const config = getConfig()
     const {pathMatcher, searchMatcherForSite, searchMatcherForLocale} = getConfigMatcher(config)
-
     const pathMatch = pathname.match(pathMatcher)
     const searchMatchForSite = search.match(searchMatcherForSite)
     const searchMatchForLocale = search.match(searchMatcherForLocale)
 
     // the value can only either in the path or search query param, there will be no overridden
-    const site =
-        pathMatch?.groups.siteAlias ||
-        pathMatch?.groups.siteId ||
-        searchMatchForSite?.groups.siteAlias ||
-        searchMatchForSite?.groups.siteId
+    const site = pathMatch?.groups.site || searchMatchForSite?.groups.site
 
-    const locale =
-        pathMatch?.groups.localeId ||
-        pathMatch?.groups.localeAlias ||
-        searchMatchForLocale?.groups.localeAlias ||
-        searchMatchForLocale?.groups.localeId
-
+    const locale = pathMatch?.groups.locale || searchMatchForLocale?.groups.locale
     return {site, locale}
 }
 
@@ -214,36 +204,37 @@ export const getConfigMatcher = (config) => {
     }
 
     const allSites = getSites()
-
-    // get a collection of all site-id and site alias from the config of the current host
-    // remove any duplicates by using [...new Set([])]
-    const siteIds = allSites.map((site) => site.id)
-    const siteAliases = allSites.map((site) => site.alias).filter(Boolean)
-    // get a collection of all locale-id and locale alias from the config of the current host
-    // remove any duplicates by using [...new Set([])]
-
-    let localeIds = []
-    let localeAliases = []
+    let sites = []
+    let locales = []
     allSites.forEach((site) => {
+        sites.push(site.alias)
         const {l10n} = site
         l10n.supportedLocales.forEach((locale) => {
-            localeIds.push(locale.id)
-            localeAliases.push(locale.alias)
+            locales.push(locale.id)
         })
     })
 
-    localeAliases = localeAliases.filter(Boolean)
-    localeIds = localeIds.filter(Boolean)
+    allSites.forEach((site) => {
+        sites.push(site.id)
+        const {l10n} = site
+        l10n.supportedLocales.forEach((locale) => {
+            locales.push(locale.alias)
+        })
+    })
+
+    // filter out falsy values
+    locales = locales.filter(Boolean)
+    sites = sites.filter(Boolean)
     // prettier-ignore
     // eslint-disable-next-line
-    const pathPattern = `\/*(?<siteId>${siteIds.join('|')})*\/*(?<siteAlias>${siteAliases.join('|')})*\/*(?<localeId>${localeIds.join('|')})*\/*(?<localeAlias>${localeAliases.join('|')})*`
+    const pathPattern = `\/*(?<site>${sites.join("|")})*\/*(?<locale>${locales.join("|")})*\\b`
     // prettier-ignore
     // eslint-disable-next-line
-    const searchPatternForSite = `site=(?<siteAlias>${siteAliases.join('|')})|site=(?<siteId>${siteIds.join("|")})`
+    const searchPatternForSite = `site=(?<site>${sites.join('|')})`
 
     // prettier-ignore
     // eslint-disable-next-line
-    const searchPatternForLocale = `locale=(?<localeAlias>${localeAliases.join('|')})|locale=(?<localeId>${localeIds.join("|")})`
+    const searchPatternForLocale = `locale=(?<locale>${locales.join('|')})`
     const pathMatcher = new RegExp(pathPattern)
     const searchMatcherForSite = new RegExp(searchPatternForSite)
     const searchMatcherForLocale = new RegExp(searchPatternForLocale)
