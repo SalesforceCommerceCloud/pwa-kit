@@ -39,7 +39,6 @@ const getLocale = (locals = {}, site) => {
             : `${window.location.pathname}${window.location.search}`
     const {locale: localeIdentifier} = getParamsFromPath(path)
     if (!localeIdentifier) return
-
     const locale = site.l10n.supportedLocales.find((locale) => {
         return locale.id === localeIdentifier || locale.alias === localeIdentifier
     })
