@@ -4,18 +4,18 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
+import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
 import React, {Fragment} from 'react'
 import {FormattedMessage} from 'react-intl'
 import {Flex, Button} from '@chakra-ui/react'
 import {AmexIcon, DiscoverIcon, LockIcon, MastercardIcon, VisaIcon} from '../../../components/icons'
-import Link from '../../../components/link'
 
 const CartCta = () => {
     return (
         <Fragment>
             <Button
-                as={Link}
-                to="/checkout"
+                as="a"
+                href={`${getAppOrigin()}/on/demandware.store/Sites-RefArch-Site/en_US/Checkout-Begin`}
                 width={['95%', '95%', '95%', '100%']}
                 marginTop={[6, 6, 2, 2]}
                 mb={4}

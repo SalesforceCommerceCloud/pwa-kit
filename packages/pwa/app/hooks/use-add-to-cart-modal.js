@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
+import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
 import React, {useContext, useState, useEffect} from 'react'
 import {useLocation} from 'react-router-dom'
 import PropTypes from 'prop-types'
@@ -170,7 +171,12 @@ export const AddToCartModal = () => {
                                 </Text>
                             </Flex>
                             <Stack spacing="4">
-                                <Button as={Link} to="/cart" width="100%" variant="solid">
+                                <Button
+                                    as={Link}
+                                    href={`${getAppOrigin()}/s/RefArch/cart?lang=en_US`}
+                                    width="100%"
+                                    variant="solid"
+                                >
                                     {intl.formatMessage({
                                         defaultMessage: 'View Cart',
                                         id: 'add_to_cart_modal.link.view_cart'
@@ -178,8 +184,8 @@ export const AddToCartModal = () => {
                                 </Button>
 
                                 <Button
-                                    as={Link}
-                                    to="/checkout"
+                                    as="a"
+                                    href={`${getAppOrigin()}/on/demandware.store/Sites-RefArch-Site/en_US/Checkout-Begin`}
                                     width="100%"
                                     variant="outline"
                                     rightIcon={<LockIcon />}

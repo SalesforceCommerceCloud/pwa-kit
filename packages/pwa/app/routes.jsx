@@ -64,23 +64,8 @@ const routes = [
         component: Account
     },
     {
-        path: '/checkout',
-        component: Checkout,
-        exact: true
-    },
-    {
-        path: '/checkout/confirmation',
-        component: CheckoutConfirmation,
-        exact: true
-    },
-    {
         path: '/callback',
         component: LoginRedirect,
-        exact: true
-    },
-    {
-        path: '/cart',
-        component: Cart,
         exact: true
     },
     {
@@ -103,10 +88,6 @@ const routes = [
         path: '/:locale',
         component: Home,
         exact: true
-    },
-    {
-        path: '*',
-        component: PageNotFound
     }
 ]
 

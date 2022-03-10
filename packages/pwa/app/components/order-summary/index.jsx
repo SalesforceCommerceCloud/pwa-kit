@@ -18,6 +18,7 @@ import CartItemVariantName from '../item-variant/item-name'
 import CartItemVariantAttributes from '../item-variant/item-attributes'
 import CartItemVariantPrice from '../item-variant/item-price'
 import PromoPopover from '../promo-popover'
+import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
 
 const CartItems = ({basket}) => {
     basket = basket || useBasket()
@@ -68,7 +69,12 @@ const CartItems = ({basket}) => {
                         )
                     })}
 
-                    <Button as={Link} to="/cart" variant="link" width="full">
+                    <Button
+                        as={Link}
+                        href={`${getAppOrigin()}/s/RefArch/cart?lang=en_US`}
+                        variant="link"
+                        width="full"
+                    >
                         <FormattedMessage
                             defaultMessage="Edit cart"
                             id="order_summary.cart_items.link.edit_cart"
