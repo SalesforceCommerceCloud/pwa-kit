@@ -132,28 +132,26 @@ const runGenerator = (answers, {outputDir}) => {
 
     extractTemplate('pwa', outputDir)
 
-    const {pkgLocalizationConfig} = require(`../assets/pwa/l10n.config`)
     const pkgJsonPath = p.resolve(outputDir, 'package.json')
     const pkgJSON = readJson(pkgJsonPath)
     const pkgDataWithAnswers = merge(pkgJSON, answers['scaffold-pwa'])
-    const finalPkgData = merge(pkgDataWithAnswers, pkgLocalizationConfig)
 
     npmInstallables.forEach((pkgName) => {
         const keys = ['dependencies', 'devDependencies']
         keys.forEach((key) => {
-            const deps = finalPkgData[key]
+            const deps = pkgDataWithAnswers[key]
             if (deps && deps[pkgName]) {
                 deps[pkgName] = SDK_VERSION
             }
         })
     })
 
-    writeJson(pkgJsonPath, finalPkgData)
+    writeJson(pkgJsonPath, pkgDataWithAnswers)
 
     const manifest = p.resolve(outputDir, 'app', 'static', 'manifest.json')
     replaceJSON(manifest, {
-        name: finalPkgData.siteName,
-        short_name: finalPkgData.siteName,
+        name: pkgDataWithAnswers.siteName,
+        short_name: pkgDataWithAnswers.siteName,
         start_url: '/?homescreen=1',
         icons: [
             {

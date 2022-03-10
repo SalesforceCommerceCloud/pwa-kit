@@ -6,25 +6,26 @@
  */
 exports.template = ({commerceApi, einsteinApi}) => `module.exports = {
     app: {
-        url: {
-            locale: 'none'
+        "url": {
+            "site": "none",
+            "locale": "none",
+            "showDefaults": false
         },
-        defaultSite: 'RefArch',
-        sites: [
+        "defaultSite": "RefArch",
+        "siteAliases": {
+            "RefArch": "us"
+        },
+        "sites": [
             {
-                id: 'RefArch',
-                l10n: {
-                    supportedCurrencies: ['USD'],
-                    defaultCurrency: 'USD',
-                    defaultLocale: 'en-US',
-                    supportedLocales: [
+                "id": "RefArch",
+                "l10n": {
+                    "supportedCurrencies": ["USD"],
+                    "defaultCurrency": "USD",
+                    "defaultLocale": "en-US",
+                    "supportedLocales": [
                         {
-                            id: 'en-US',
-                            preferredCurrency: 'USD'
-                        },
-                        {
-                            id: 'en-CA',
-                            preferredCurrency: 'USD'
+                            "id": "en-US",
+                            "preferredCurrency": "USD"
                         }
                     ]
                 }
