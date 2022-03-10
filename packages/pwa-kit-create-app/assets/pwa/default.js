@@ -7,14 +7,17 @@
 exports.template = ({commerceApi, einsteinApi}) => `module.exports = {
     app: {
         "url": {
-            "site": "none",
+            // "site": "none",
             "locale": "none",
-            "showDefaults": false
+            // a flag to toggle display default values (either site and locale) to display in the url
+            // if they are set to be in path or query_param 
+            // "showDefaults": false 
         },
         "defaultSite": "RefArch",
-        "siteAliases": {
-            "RefArch": "us"
-        },
+        // "siteAliases": {
+        // adding alias to your site if it is displayed in the url
+        //     "RefArch": "us" 
+        // },
         "sites": [
             {
                 "id": "RefArch",
