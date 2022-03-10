@@ -81,7 +81,7 @@ AppConfig.restore = (locals = {}) => {
 
     const locale = getLocale(locals, site) || site.l10n.defaultLocale
     const currency =
-        getPreferredCurrency(locale, site.l10n.supportedLocales) || site.defaultCurrency
+        getPreferredCurrency(locale, site.l10n.supportedLocales) || site.l10n.defaultCurrency
 
     const {app: appConfig} = getConfig()
     const apiConfig = {

@@ -114,7 +114,7 @@ const App = (props) => {
 
     const onLogoClick = () => {
         // Goto the home page.
-        const path = homeUrlBuilder(HOME_HREF, {locale: targetLocale, site}, {site})
+        const path = homeUrlBuilder(HOME_HREF, {locale: targetLocale, site})
         history.push(path)
 
         // Close the drawer.
@@ -278,7 +278,7 @@ App.shouldGetProps = () => {
 
 App.getProps = async ({api, res}) => {
     const site = resolveSiteFromUrl(pathToUrl(res.locals.originalUrl))
-    const l10nConfig = site?.l10n
+    const l10nConfig = site.l10n
     const localeConfig = await getLocaleConfig({
         getUserPreferredLocales: () => {
             // CONFIG: This function should return an array of preferred locales. They can be
