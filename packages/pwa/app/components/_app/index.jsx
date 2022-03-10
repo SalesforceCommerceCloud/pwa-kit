@@ -44,7 +44,7 @@ import {watchOnlineStatus, flatten} from '../../utils/utils'
 import {homeUrlBuilder, getUrlWithLocale, pathToUrl} from '../../utils/url'
 import {buildPathWithUrlConfig} from '../../utils/url'
 
-import {getLocaleConfig, getPreferredCurrency} from '../../utils/locale'
+import {getTargetLocale, fetchTranslations, getPreferredCurrency} from '../../utils/locale'
 import {DEFAULT_SITE_TITLE, HOME_HREF, THEME_COLOR} from '../../constants'
 
 import Seo from '../seo'
@@ -56,7 +56,7 @@ const DEFAULT_NAV_DEPTH = 3
 const DEFAULT_ROOT_CATEGORY = 'root'
 
 const App = (props) => {
-    const {children, targetLocale, defaultLocale, messages, categories: allCategories = {}} = props
+    const {children, targetLocale, messages, categories: allCategories = {}} = props
 
     const appOrigin = getAppOrigin()
 
@@ -193,8 +193,8 @@ const App = (props) => {
                             {/* A general locale as fallback. For example: "en" if default locale is "en-GB" */}
                             <link
                                 rel="alternate"
-                                hrefLang={defaultLocale.slice(0, 2)}
-                                href={`${appOrigin}${getUrlWithLocale(defaultLocale, {
+                                hrefLang={site.l10n.defaultLocale.slice(0, 2)}
+                                href={`${appOrigin}${getUrlWithLocale(site.l10n.defaultLocale, {
                                     location,
                                     site
                                 })}`}
@@ -279,7 +279,8 @@ App.shouldGetProps = () => {
 App.getProps = async ({api, res}) => {
     const site = resolveSiteFromUrl(pathToUrl(res.locals.originalUrl))
     const l10nConfig = site.l10n
-    const localeConfig = await getLocaleConfig({
+
+    const targetLocale = getTargetLocale({
         getUserPreferredLocales: () => {
             // CONFIG: This function should return an array of preferred locales. They can be
             // derived from various sources. Below are some examples of those:
@@ -303,6 +304,7 @@ App.getProps = async ({api, res}) => {
         },
         l10nConfig
     })
+    const messages = await fetchTranslations(targetLocale)
 
     // Login as `guest` to get session.
     await api.auth.login()
@@ -331,10 +333,9 @@ Learn more with our localization guide. https://sfdc.co/localization-guide
     const categories = flatten(rootCategory, 'categories')
 
     return {
-        targetLocale: localeConfig.targetLocale,
-        defaultLocale: localeConfig.defaultLocale,
-        messages: localeConfig.messages,
-        categories: categories,
+        targetLocale,
+        messages,
+        categories,
         config: res?.locals?.config
     }
 }
@@ -342,7 +343,6 @@ Learn more with our localization guide. https://sfdc.co/localization-guide
 App.propTypes = {
     children: PropTypes.node,
     targetLocale: PropTypes.string,
-    defaultLocale: PropTypes.string,
     messages: PropTypes.object,
     categories: PropTypes.object,
     config: PropTypes.object
