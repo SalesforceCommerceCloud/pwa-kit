@@ -7,7 +7,9 @@
 import 'raf/polyfill' // fix requestAnimationFrame issue with polyfill
 import '@testing-library/jest-dom/extend-expect'
 import {Crypto} from '@peculiar/webcrypto'
-import mockConfig from './config/mocks/default.json'
+import mockConfig from './config/mocks/default'
+import {setConfig} from 'pwa-kit-react-sdk/ssr/universal/utils'
+
 // TextEncoder is a web API, need to import it
 // from nodejs util in testing environment.
 // This is used in commerce-api/pkce.js
@@ -46,11 +48,13 @@ Object.defineProperty(window, 'scrollTo', {
     value: () => null
 })
 
-// Mock the `default` cofig to the window global
+// Mock the `default` config to the window global
 Object.defineProperty(window, '__CONFIG__', {
     value: mockConfig,
     configurable: true
 })
+
+setConfig(mockConfig)
 
 Object.defineProperty(window, 'matchMedia', {
     writable: true,

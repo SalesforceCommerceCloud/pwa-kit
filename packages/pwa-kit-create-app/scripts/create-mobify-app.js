@@ -165,11 +165,8 @@ const runGenerator = (answers, {outputDir}) => {
         ]
     })
 
-    const PWAKitConfigJsonTemplate = require(`../assets/pwa/default.js`)
-    const PWAKitConfigJsonPath = p.resolve(outputDir, 'config', 'default.js')
-    writeJson(PWAKitConfigJsonPath, PWAKitConfigJsonTemplate)
+    const PWAKitConfigJsonTemplate = require(`../assets/pwa/default`).template
 
-    const APIConfigTemplate = require(`../assets/pwa/api.config`).template
     const commerceApi = {
         proxyPath: answers['scaffold-pwa'].mobify.ssrParameters.proxyConfigs[0].path,
         clientId: answers['commerce-api'].clientId,
@@ -183,8 +180,8 @@ const runGenerator = (answers, {outputDir}) => {
         siteId: answers['einstein-api'].siteId || answers['commerce-api'].siteId
     }
 
-    new sh.ShellString(APIConfigTemplate({commerceApi, einsteinApi})).to(
-        p.resolve(outputDir, 'app', 'api.config.js')
+    new sh.ShellString(PWAKitConfigJsonTemplate({commerceApi, einsteinApi})).to(
+        p.resolve(outputDir, 'config', 'default.js')
     )
 
     npmInstall(outputDir)

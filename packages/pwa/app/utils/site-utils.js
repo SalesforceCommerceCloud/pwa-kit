@@ -5,7 +5,8 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {getConfig, getParamsFromPath} from './utils'
+import {getConfig} from 'pwa-kit-react-sdk/ssr/universal/utils'
+import {getParamsFromPath} from './utils'
 
 /**
  * This functions takes an url and returns a site object,
@@ -66,14 +67,17 @@ export const getDefaultSite = () => {
  * @return {array} sites - site list including their aliases
  */
 export const getSites = () => {
-    const {app} = getConfig()
-    if (!app.sites) {
+    const {sites = [], siteAliases = {}} = getConfig().app || {}
+
+    if (!sites.length) {
         throw new Error("Can't find any sites from the config. Please check your configuration")
     }
-    return app.sites.map((site) => {
+
+    return sites.map((site) => {
+        const alias = siteAliases[site.id]
         return {
             ...site,
-            alias: app.siteAliases[site.id]
+            ...(alias ? {alias} : {})
         }
     })
 }

@@ -6,7 +6,16 @@
  */
 import * as utils from './utils'
 import EventEmitter from 'events'
-import {flatten, shallowEquals} from './utils'
+import {flatten, getParamsFromPath, shallowEquals} from './utils'
+import {getSites} from './site-utils'
+
+jest.mock('./site-utils', () => {
+    const origin = jest.requireActual('./site-utils')
+    return {
+        ...origin,
+        getSites: jest.fn()
+    }
+})
 
 describe('requestIdleCallback should be a working shim', () => {
     test('without a working implementation built in', () => {
@@ -86,5 +95,89 @@ describe('shallow', function() {
         const b = {a: '123', b: '456'}
         const result = shallowEquals(a, b)
         expect(result).toBeFalsy()
+    })
+})
+
+describe('getParamsFromPath', function() {
+    getSites.mockImplementation(() => {
+        return [
+            {
+                id: 'RefArch',
+                alias: 'us',
+                l10n: {
+                    supportedCurrencies: ['USD'],
+                    defaultCurrency: 'USD',
+                    defaultLocale: 'en-US',
+                    supportedLocales: [
+                        {
+                            id: 'en-US',
+                            alias: 'en',
+                            preferredCurrency: 'USD'
+                        },
+                        {
+                            id: 'en-CA',
+                            alias: 'ca',
+                            preferredCurrency: 'USD'
+                        }
+                    ]
+                }
+            },
+            {
+                id: 'RefArchGlobal',
+                alias: 'global',
+                l10n: {
+                    supportedCurrencies: ['GBP', 'EUR', 'CNY', 'JPY'],
+                    defaultCurrency: 'GBP',
+                    supportedLocales: [
+                        {
+                            id: 'de-DE',
+                            preferredCurrency: 'EUR'
+                        },
+                        {
+                            id: 'en-GB',
+                            alias: 'uk',
+                            preferredCurrency: 'GBP'
+                        }
+                    ],
+                    defaultLocale: 'en-GB'
+                }
+            }
+        ]
+    })
+    const cases = [
+        {path: '/us/en-US/', expectedRes: {site: 'us', locale: 'en-US'}},
+        {path: '/us/en-US', expectedRes: {site: 'us', locale: 'en-US'}},
+        {path: '/us/en', expectedRes: {site: 'us', locale: 'en'}},
+        {path: '/us/en/', expectedRes: {site: 'us', locale: 'en'}},
+        {path: '/RefArch/en-US/', expectedRes: {site: 'RefArch', locale: 'en-US'}},
+        {path: '/RefArch/en/', expectedRes: {site: 'RefArch', locale: 'en'}},
+        {path: '/us/en-US/category/womens', expectedRes: {site: 'us', locale: 'en-US'}},
+        {
+            path: '/RefArch/en-US/category/womens',
+            expectedRes: {site: 'RefArch', locale: 'en-US'}
+        },
+        {path: '/en-US/category/womens', expectedRes: {site: undefined, locale: 'en-US'}},
+        {path: '/en/category/womens', expectedRes: {site: undefined, locale: 'en'}},
+        {path: '/category/womens', expectedRes: {site: undefined, locale: undefined}},
+        {path: '/en/', expectedRes: {site: undefined, locale: 'en'}},
+        {path: '/en', expectedRes: {site: undefined, locale: 'en'}},
+        {path: '/ca/', expectedRes: {site: undefined, locale: 'ca'}},
+        {path: '/ca', expectedRes: {site: undefined, locale: 'ca'}},
+        {path: '/', expectedRes: {site: undefined, locale: undefined}},
+        {path: '/?site=us', expectedRes: {site: 'us', locale: undefined}},
+        {path: '/?site=us&locale=en', expectedRes: {site: 'us', locale: 'en'}},
+        {path: '/en-US/category/womens?site=us', expectedRes: {site: 'us', locale: 'en-US'}},
+        {path: '/us/category/womens?locale=en-US', expectedRes: {site: 'us', locale: 'en-US'}},
+        {path: '/us/category/womens?locale=en', expectedRes: {site: 'us', locale: 'en'}},
+        {path: '/category/womens?site=us&locale=en-US', expectedRes: {site: 'us', locale: 'en-US'}},
+        {
+            path: '/category/womens?site=RefArch&locale=en-US',
+            expectedRes: {site: 'RefArch', locale: 'en-US'}
+        }
+    ]
+    cases.forEach(({path, expectedRes}) => {
+        test(`return expected values when path is ${path}`, () => {
+            expect(getParamsFromPath(path)).toEqual(expectedRes)
+        })
     })
 })

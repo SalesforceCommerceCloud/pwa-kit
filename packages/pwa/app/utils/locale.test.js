@@ -9,7 +9,7 @@ import {whichLocaleToLoad, loadLocaleData, getLocaleConfig, getPreferredCurrency
 
 import {DEFAULT_LOCALE, SUPPORTED_LOCALES} from './test-utils'
 
-export const supportedLocales = SUPPORTED_LOCALES.map((locale) => locale.id)
+const supportedLocales = SUPPORTED_LOCALES.map((locale) => locale.id)
 const isMultiLocales = supportedLocales.length > 1
 const nonSupportedLocale = 'nl-NL'
 // Make sure this supported locale is not the default locale.
@@ -48,6 +48,11 @@ describe('loadLocaleData', () => {
     test('loading the pseudo locale', async () => {
         const messages = await loadLocaleData('en-XB')
         expect(messages[testId1][0].value).toMatch(/^\[!! Ṕŕíííṿâćććẏ ṔṔṔŏĺíííćẏ !!]$/)
+    })
+    test('handling a not-found translation file', async () => {
+        const messages = await loadLocaleData('xx-XX')
+        const emptyMessages = {}
+        expect(messages).toEqual(emptyMessages)
     })
 })
 

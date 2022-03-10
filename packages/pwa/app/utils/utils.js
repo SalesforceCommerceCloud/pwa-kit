@@ -7,6 +7,8 @@
 
 import {pathToUrl} from './url'
 import {getSites} from './site-utils'
+import {getConfig} from 'pwa-kit-react-sdk/ssr/universal/utils'
+
 /**
  * Call requestIdleCallback in supported browsers.
  *
@@ -168,68 +170,15 @@ export const getParamsFromPath = (path) => {
 
     const config = getConfig()
     const {pathMatcher, searchMatcherForSite, searchMatcherForLocale} = getConfigMatcher(config)
-
     const pathMatch = pathname.match(pathMatcher)
     const searchMatchForSite = search.match(searchMatcherForSite)
     const searchMatchForLocale = search.match(searchMatcherForLocale)
 
     // the value can only either in the path or search query param, there will be no overridden
-    const site =
-        pathMatch?.groups.siteAlias ||
-        pathMatch?.groups.siteId ||
-        searchMatchForSite?.groups.siteAlias ||
-        searchMatchForSite?.groups.siteId
+    const site = pathMatch?.groups.site || searchMatchForSite?.groups.site
 
-    const locale =
-        pathMatch?.groups.localeAlias ||
-        pathMatch?.groups.localeId ||
-        searchMatchForLocale?.groups.localeAlias ||
-        searchMatchForLocale?.groups.localeId
-
+    const locale = pathMatch?.groups.locale || searchMatchForLocale?.groups.locale
     return {site, locale}
-}
-
-/**
- * Dynamically load the applications config object.
- *
- * @returns the application config object.
- */
-//TODO: Remove this when the work from SDK is merged
-export const getConfig = (opts = {}) => {
-    let _config
-
-    if (typeof window !== 'undefined') {
-        _config = window.__CONFIG__ || JSON.parse(document.getElementById('app-config').innerHTML)
-        return _config
-    }
-
-    // doing this to force Webpack to ignore a
-    // `require()` call that is not meant for the browser
-    const _require = eval('require')
-    const {cosmiconfigSync} = _require('cosmiconfig')
-
-    // Load the config synchronously using a custom "searchPlaces".
-
-    // By default, use the deployment target as the {moduleName} for your
-    // configuration file. This means that on a "Production" names target, you'll load
-    // your `config/production.json` file. You can customize how you determine your
-    // {moduleName}.
-    const {moduleNameResolver} = opts
-    const moduleName = (moduleNameResolver && moduleNameResolver()) || process.env.DEPLOY_TARGET
-
-    const explorerSync = cosmiconfigSync(moduleName, {
-        packageProp: 'mobify',
-        searchPlaces: [
-            `config/${moduleName}.json`,
-            `config/local.json`,
-            `config/default.json`,
-            'package.json'
-        ]
-    })
-    const {config, filepath} = explorerSync.search()
-    console.info('=========loading the config from=====', filepath)
-
-    return config
 }
 
 /**
@@ -255,36 +204,31 @@ export const getConfigMatcher = (config) => {
     }
 
     const allSites = getSites()
-
-    // get a collection of all site-id and site alias from the config of the current host
-    // remove any duplicates by using [...new Set([])]
-    const siteIds = allSites.map((site) => site.id)
-    const siteAliases = allSites.map((site) => site.alias).filter(Boolean)
-    // get a collection of all locale-id and locale alias from the config of the current host
-    // remove any duplicates by using [...new Set([])]
-
-    let localeIds = []
-    let localeAliases = []
+    const siteIds = []
+    const siteAliases = []
+    const localesIds = []
+    const localeAliases = []
     allSites.forEach((site) => {
+        siteAliases.push(site.alias)
+        siteIds.push(site.id)
         const {l10n} = site
         l10n.supportedLocales.forEach((locale) => {
-            localeIds.push(locale.id)
+            localesIds.push(locale.id)
             localeAliases.push(locale.alias)
         })
     })
-
-    localeAliases = localeAliases.filter(Boolean)
-    localeIds = localeIds.filter(Boolean)
-    // prettier-ignore
-    // eslint-disable-next-line
-    const pathPattern = `\/*(?<siteId>${siteIds.join('|')})*\/*(?<siteAlias>${siteAliases.join('|')})*\/*(?<localeId>${localeIds.join('|')})*\/*(?<localeAlias>${localeAliases.join('|')})*`
-    // prettier-ignore
-    // eslint-disable-next-line
-    const searchPatternForSite = `site=(?<siteAlias>${siteAliases.join('|')})|site=(?<siteId>${siteIds.join("|")})`
+    const sites = [...siteIds, ...siteAliases].filter(Boolean)
+    const locales = [...localesIds, ...localeAliases].filter(Boolean)
 
     // prettier-ignore
     // eslint-disable-next-line
-    const searchPatternForLocale = `locale=(?<localeAlias>${localeAliases.join('|')})|locale=(?<localeId>${localeIds.join("|")})`
+    const searchPatternForSite = `site=(?<site>${sites.join('|')})`
+    // prettier-ignore
+    // eslint-disable-next-line
+    const pathPattern = `(?:\/(?<site>${sites.join('|')}))*(?:\/(?<locale>${locales.join("|")}))*(?!\\w)`
+    // prettier-ignore
+    // eslint-disable-next-line
+    const searchPatternForLocale = `locale=(?<locale>${locales.join('|')})`
     const pathMatcher = new RegExp(pathPattern)
     const searchMatcherForSite = new RegExp(searchPatternForSite)
     const searchMatcherForLocale = new RegExp(searchPatternForLocale)

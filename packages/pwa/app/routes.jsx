@@ -18,6 +18,7 @@ import loadable from '@loadable/component'
 // Components
 import {Skeleton} from '@chakra-ui/react'
 import {configureRoutes} from './utils/routes-utils'
+import {getConfig} from 'pwa-kit-react-sdk/ssr/universal/utils'
 
 const fallback = <Skeleton height="75vh" width="100%" />
 
@@ -103,7 +104,9 @@ const routes = [
     }
 ]
 
-let configuredRoutes = configureRoutes(routes, {
-    ignoredRoutes: ['/callback', '*']
-})
-export default configuredRoutes
+export default () => {
+    const {app: appConfig} = getConfig()
+    return configureRoutes(routes, appConfig.url, {
+        ignoredRoutes: ['/callback', '*']
+    })
+}

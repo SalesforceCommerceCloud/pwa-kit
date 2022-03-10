@@ -7,19 +7,14 @@
 import React from 'react'
 import user from '@testing-library/user-event'
 import useNavigation from './use-navigation'
-import mockConfig from '../../config/mocks/default.json'
+import mockConfig from '../../config/mocks/default'
 import {renderWithProviders} from '../utils/test-utils'
+import {setConfig} from 'pwa-kit-react-sdk/ssr/universal/utils'
+
 const originalConfig = window.__CONFIG__
 
 const mockHistoryPush = jest.fn()
 const mockHistoryReplace = jest.fn()
-beforeEach(() => {
-    // Restore window.__CONFIG
-    Object.defineProperty(window, '__CONFIG__', {
-        value: originalConfig,
-        configurable: true
-    })
-})
 
 jest.mock('react-router', () => {
     const original = jest.requireActual('react-router')
@@ -35,13 +30,14 @@ jest.mock('react-router', () => {
     }
 })
 
-beforeEach(() => {
+afterEach(() => {
     jest.clearAllMocks()
     const originalLocation = window.location
-    afterEach(() => {
-        // Restore `window.location` to the `jsdom` `Location` object
-        window.location = originalLocation
-    })
+
+    // Restore `window.location` to the `jsdom` `Location` object
+    window.location = originalLocation
+    // Restore window.__CONFIG
+    setConfig(originalConfig)
 })
 
 const TestComponent = () => {
@@ -63,8 +59,7 @@ test('prepends locale and site and calls history.push', () => {
 })
 
 test('append locale as path and site as query and calls history.push', () => {
-    delete window.__CONFIG__
-    window.__CONFIG__ = {
+    const newConfig = {
         ...mockConfig,
         app: {
             ...mockConfig.app,
@@ -75,6 +70,7 @@ test('append locale as path and site as query and calls history.push', () => {
             }
         }
     }
+    setConfig(newConfig)
     const {getByTestId} = renderWithProviders(<TestComponent />)
     user.click(getByTestId('page1-link'))
     expect(mockHistoryPush).toHaveBeenCalledWith('/en-GB/page1?site=uk')

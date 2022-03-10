@@ -9,6 +9,8 @@ import {render} from '@testing-library/react'
 import {BrowserRouter as Router} from 'react-router-dom'
 import {ChakraProvider} from '@chakra-ui/react'
 import PropTypes from 'prop-types'
+import {setupServer} from 'msw/node'
+import {rest} from 'msw'
 
 import theme from '../theme'
 import CommerceAPI from '../commerce-api'
@@ -19,11 +21,15 @@ import {
     CustomerProductListsProvider
 } from '../commerce-api/contexts'
 import {AddToCartModalContext} from '../hooks/use-add-to-cart-modal'
-import {commerceAPIConfig, einsteinAPIConfig} from '../api.config'
+import {app as appConfig} from '../../config/default'
 import {IntlProvider} from 'react-intl'
-import {mockCategories as initialMockCategories} from '../commerce-api/mock-data'
+import {
+    mockCategories as initialMockCategories,
+    mockedRegisteredCustomer,
+    exampleTokenReponse
+} from '../commerce-api/mock-data'
 import fallbackMessages from '../translations/compiled/en-GB.json'
-import mockConfig from '../../config/mocks/default.json'
+import mockConfig from '../../config/mocks/default'
 
 export const DEFAULT_LOCALE = 'en-GB'
 export const DEFAULT_CURRENCY = 'GBP'
@@ -53,8 +59,8 @@ export const renderWithRouter = (node) => renderWithReactIntl(<Router>{node}</Ro
 
 export const renderWithRouterAndCommerceAPI = (node) => {
     const api = new CommerceAPI({
-        ...commerceAPIConfig,
-        einsteinConfig: einsteinAPIConfig,
+        ...appConfig.commerceAPI,
+        einsteinConfig: appConfig.einsteinAPI,
         proxy: undefined
     })
     return renderWithReactIntl(
@@ -93,8 +99,8 @@ export const TestProviders = ({
     const ocapiHost = 'zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com'
 
     const api = new CommerceAPI({
-        ...commerceAPIConfig,
-        einsteinConfig: einsteinAPIConfig,
+        ...appConfig.commerceAPI,
+        einsteinConfig: appConfig.einsteinAPI,
         proxy,
         ocapiHost
     })
@@ -168,7 +174,7 @@ export const renderWithProviders = (children, options) =>
 /**
  * This is used to construct the URL pathname that would include
  * or not include the default locale and site identifiers in the URL according to
- * their configuration set in config/mocks/default.json file.
+ * their configuration set in config/mocks/default.js file.
  *
  * @param path The pathname that we want to use
  * @returns {string} URL pathname for the given path
@@ -183,4 +189,47 @@ export const createPathWithDefaults = (path) => {
         locale: defaultLocale
     })
     return updatedPath
+}
+
+/**
+ * Set up an API mocking server for testing purposes.
+ * This mock server includes the basic oauth flow endpoints.
+ */
+export const setupMockServer = (...handlers) => {
+    return setupServer(
+        // customer handlers have higher priority
+        ...handlers,
+        rest.post('*/oauth2/authorize', (req, res, ctx) =>
+            res(ctx.delay(0), ctx.status(303), ctx.set('location', `/testcallback`))
+        ),
+        rest.get('*/oauth2/authorize', (req, res, ctx) =>
+            res(ctx.delay(0), ctx.status(303), ctx.set('location', `/testcallback`))
+        ),
+        rest.get('*/testcallback', (req, res, ctx) => {
+            return res(ctx.delay(0), ctx.status(200))
+        }),
+        rest.post('*/oauth2/login', (req, res, ctx) =>
+            res(ctx.delay(0), ctx.status(200), ctx.json(mockedRegisteredCustomer))
+        ),
+        rest.get('*/oauth2/logout', (req, res, ctx) =>
+            res(ctx.delay(0), ctx.status(200), ctx.json(exampleTokenReponse))
+        ),
+        rest.get('*/customers/:customerId', (req, res, ctx) =>
+            res(ctx.delay(0), ctx.status(200), ctx.json(mockedRegisteredCustomer))
+        ),
+        rest.post('*/sessions', (req, res, ctx) => res(ctx.delay(0), ctx.status(200))),
+        rest.post('*/oauth2/token', (req, res, ctx) =>
+            res(
+                ctx.delay(0),
+                ctx.json({
+                    customer_id: 'test',
+                    access_token: 'testtoken',
+                    refresh_token: 'testrefeshtoken',
+                    usid: 'testusid',
+                    enc_user_id: 'testEncUserId',
+                    id_token: 'testIdToken'
+                })
+            )
+        )
+    )
 }
