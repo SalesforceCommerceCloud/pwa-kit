@@ -5,7 +5,12 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {whichLocaleToLoad, loadLocaleData, getLocaleConfig, getPreferredCurrency} from './locale'
+import {
+    determineTargetLocale,
+    fetchTranslations,
+    getTargetLocale,
+    getPreferredCurrency
+} from './locale'
 
 import {DEFAULT_LOCALE, SUPPORTED_LOCALES} from './test-utils'
 
@@ -29,34 +34,34 @@ test('our assumptions before further testing', () => {
     }
 })
 
-describe('whichLocaleToLoad', () => {
+describe('determineTargetLocale', () => {
     test('default to fallback locale', () => {
-        const locale = whichLocaleToLoad([nonSupportedLocale], supportedLocales, DEFAULT_LOCALE)
+        const locale = determineTargetLocale([nonSupportedLocale], supportedLocales, DEFAULT_LOCALE)
         expect(locale).toBe(DEFAULT_LOCALE)
     })
     test('matches one of the supported locales', () => {
-        const locale = whichLocaleToLoad([supportedLocale], supportedLocales, DEFAULT_LOCALE)
+        const locale = determineTargetLocale([supportedLocale], supportedLocales, DEFAULT_LOCALE)
         expect(locale).toBe(supportedLocale)
     })
 })
 
-describe('loadLocaleData', () => {
+describe('fetchTranslations', () => {
     test('loading the target locale', async () => {
-        const messages = await loadLocaleData(supportedLocale)
+        const messages = await fetchTranslations(supportedLocale)
         expect(messages[testId2]).toBeDefined()
     })
     test('loading the pseudo locale', async () => {
-        const messages = await loadLocaleData('en-XB')
+        const messages = await fetchTranslations('en-XB')
         expect(messages[testId1][0].value).toMatch(/^\[!! Ṕŕíííṿâćććẏ ṔṔṔŏĺíííćẏ !!]$/)
     })
     test('handling a not-found translation file', async () => {
-        const messages = await loadLocaleData('xx-XX')
+        const messages = await fetchTranslations('xx-XX')
         const emptyMessages = {}
         expect(messages).toEqual(emptyMessages)
     })
 })
 
-describe('getLocaleConfig', () => {
+describe('getTargetLocale', () => {
     const originalEnv = {...process.env}
     let windowSpy
 
@@ -73,32 +78,33 @@ describe('getLocaleConfig', () => {
         windowSpy.mockRestore()
     })
 
-    test('without getUserPreferredLocales parameter', async () => {
-        const config = await getLocaleConfig({l10nConfig})
-        expect(config.targetLocale).toBe(DEFAULT_LOCALE)
+    test('without getUserPreferredLocales parameter', () => {
+        const targetLocale = getTargetLocale({l10nConfig})
+        expect(targetLocale).toBe(DEFAULT_LOCALE)
     })
-    test('with getUserPreferredLocales parameter', async () => {
+    test('with getUserPreferredLocales parameter', () => {
         const locale = supportedLocale
         if (isMultiLocales) {
             expect(locale).not.toBe(DEFAULT_LOCALE)
         }
-        const config = await getLocaleConfig({
+        const targetLocale = getTargetLocale({
             getUserPreferredLocales: () => [locale],
             l10nConfig
         })
-        expect(config.targetLocale).toBe(locale)
+        expect(targetLocale).toBe(locale)
     })
     test('with pseudo locale', async () => {
         process.env.USE_PSEUDOLOCALE = 'true'
         // Simulate server side
         windowSpy.mockImplementation(() => undefined)
 
-        const config = await getLocaleConfig({l10nConfig})
+        const targetLocale = getTargetLocale({l10nConfig})
+        const messages = await fetchTranslations(targetLocale)
 
         // The app should still think its target locale is the default one
-        expect(config.targetLocale).toBe(DEFAULT_LOCALE)
+        expect(targetLocale).toBe(DEFAULT_LOCALE)
         // But the actual translation should be using the pseudo locale
-        expect(config.messages[testId1][0].value).toMatch(/^\[!! Ṕŕíííṿâćććẏ ṔṔṔŏĺíííćẏ !!]$/)
+        expect(messages[testId1][0].value).toMatch(/^\[!! Ṕŕíííṿâćććẏ ṔṔṔŏĺíííćẏ !!]$/)
     })
 })
 

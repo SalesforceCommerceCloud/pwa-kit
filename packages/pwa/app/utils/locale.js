@@ -9,13 +9,19 @@ import PropTypes from 'prop-types'
 
 /**
  * Dynamically import the translations/messages for a given locale
- * @private
- * @param {string} targetLocale
+ * @param {string} locale
  * @returns {Promise<Object>} The messages (compiled in AST format) in the given locale.
  *      If locale is not found, returns the default locale's messages.
  *      If the translation file is not found, return the default messages instead.
  */
-export const loadLocaleData = async (targetLocale) => {
+export const fetchTranslations = async (locale) => {
+    const targetLocale =
+        typeof window === 'undefined'
+            ? process.env.USE_PSEUDOLOCALE === 'true'
+                ? 'en-XB'
+                : locale
+            : locale
+
     let module
     try {
         module = await import(`../translations/compiled/${targetLocale}.json`)
@@ -31,35 +37,23 @@ export const loadLocaleData = async (targetLocale) => {
 }
 
 /**
- * Get all of the locale-related configuration data
+ * Get the target locale, given the locales user prefer to see and the current site's l10n configuration
  * @param {Object} options
  * @param {function} [options.getUserPreferredLocales] - Identify what set of locales the user prefers
  * @param {object} [options.l10nConfig] - l10n configuration object
- * @returns {Promise<Object>} The configuration data
+ * @returns {string} The target locale
  */
-export const getLocaleConfig = async ({getUserPreferredLocales, l10nConfig = {}} = {}) => {
-    const defaultLocale = l10nConfig.defaultLocale
+export const getTargetLocale = ({getUserPreferredLocales, l10nConfig = {}} = {}) => {
     const userPreferredLocales = getUserPreferredLocales ? getUserPreferredLocales() : []
-
     const supportedLocales = l10nConfig.supportedLocales.map((locale) => locale.id)
+    const defaultLocale = l10nConfig.defaultLocale
 
-    const targetLocale = whichLocaleToLoad(userPreferredLocales, supportedLocales, defaultLocale)
-
-    const messages = await loadLocaleData(
-        typeof window === 'undefined'
-            ? process.env.USE_PSEUDOLOCALE === 'true'
-                ? 'en-XB'
-                : targetLocale
-            : targetLocale
-    )
-
-    return {
-        supportedLocales,
-        defaultLocale,
-        targetLocale,
+    const targetLocale = determineTargetLocale(
         userPreferredLocales,
-        messages
-    }
+        supportedLocales,
+        defaultLocale
+    )
+    return targetLocale
 }
 
 /**
@@ -70,7 +64,7 @@ export const getLocaleConfig = async ({getUserPreferredLocales, l10nConfig = {}}
  * @param {string} fallbackLocale - App's default locale
  * @returns {string} The target locale if there's a match. Otherwise, returns `fallbackLocale`.
  */
-export const whichLocaleToLoad = (preferredLocales, supportedLocales, fallbackLocale) => {
+export const determineTargetLocale = (preferredLocales, supportedLocales, fallbackLocale) => {
     const targetLocale = preferredLocales.filter((locale) => supportedLocales.includes(locale))[0]
     return targetLocale || fallbackLocale
 }
