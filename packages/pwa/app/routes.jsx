@@ -69,6 +69,11 @@ const routes = [
         exact: true
     },
     {
+        path: '/mobify/callback',
+        component: LoginRedirect,
+        exact: true
+    },
+    {
         path: '/product/:productId',
         component: ProductDetail
     },
@@ -94,6 +99,6 @@ const routes = [
 export default () => {
     const config = getConfig()
     return configureRoutes(routes, config?.app?.url, {
-        ignoredRoutes: [HOME_HREF, '/callback', '/:locale', '*']
+        ignoredRoutes: [HOME_HREF, '/callback', 'mobify/callback', '/:locale', '*']
     })
 }

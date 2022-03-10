@@ -38,7 +38,7 @@ const REFRESH_TOKEN_COOKIE_AGE = 90 // 90 days. This value matches SLAS cartridg
 /**
  * A  class that provides auth functionality for pwa.
  */
-const slasCallbackEndpoint = '/callback'
+const slasCallbackEndpoint = 'mobify/callback'
 class Auth {
     constructor(api) {
         this._api = api
