@@ -185,14 +185,10 @@ export const createPathWithDefaults = (path) => {
     const siteAlias = app.siteAliases[defaultSite.id]
     const defaultLocale = defaultSite.l10n.defaultLocale
 
-    const updatedPath = buildPathWithUrlConfig(
-        path,
-        {
-            site: siteAlias || defaultSite.id,
-            locale: defaultLocale
-        },
-        {defaultLocaleRefs: [defaultLocale.id, defaultLocale.alias]}
-    )
+    const updatedPath = buildPathWithUrlConfig(path, {
+        site: siteAlias || defaultSite.id,
+        locale: defaultLocale
+    })
     return updatedPath
 }
 

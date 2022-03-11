@@ -19,7 +19,7 @@ const useLocale = () => {
     const site = useSite()
     const locale = useMemo(() => {
         return getLocaleFromSite(site, localeShortCode)
-    }, [localeShortCode])
+    }, [localeShortCode, site])
 
     return locale
 }

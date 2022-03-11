@@ -40,12 +40,7 @@ import {AddToCartModalProvider} from '../../hooks/use-add-to-cart-modal'
 import {IntlProvider} from 'react-intl'
 
 // Others
-import {
-    watchOnlineStatus,
-    flatten,
-    getLocaleRefsFromSite,
-    getLocaleFromSite
-} from '../../utils/utils'
+import {watchOnlineStatus, flatten, getLocaleFromSite} from '../../utils/utils'
 import {homeUrlBuilder, getPathWithLocale, absoluteUrl} from '../../utils/url'
 import {buildPathWithUrlConfig} from '../../utils/url'
 
@@ -72,13 +67,12 @@ const App = (props) => {
 
     const site = useSite()
     const locale = getLocaleFromSite(site, targetLocale)
-    const defaultLocaleRefs = getLocaleRefsFromSite(site, site.l10n.defaultLocale)
 
     const [isOnline, setIsOnline] = useState(true)
     const styles = useStyleConfig('App')
 
     const configValues = {
-        locale: locale.id || locale.alias,
+        locale: locale.alias || locale.id,
         site: site.alias || site.id
     }
 
@@ -131,7 +125,7 @@ const App = (props) => {
     }
 
     const onCartClick = () => {
-        const path = buildPathWithUrlConfig('/cart', configValues, {defaultLocaleRefs})
+        const path = buildPathWithUrlConfig('/cart', configValues)
         history.push(path)
 
         // Close the drawer.
@@ -141,7 +135,7 @@ const App = (props) => {
     const onAccountClick = () => {
         // Link to account page for registered customer, open auth modal otherwise
         if (customer.isRegistered) {
-            const path = buildPathWithUrlConfig('/account', configValues, {defaultLocaleRefs})
+            const path = buildPathWithUrlConfig('/account', configValues)
             history.push(path)
         } else {
             // if they already are at the login page, do not show login modal
@@ -151,7 +145,7 @@ const App = (props) => {
     }
 
     const onWishlistClick = () => {
-        const path = buildPathWithUrlConfig('/account/wishlist', configValues, {defaultLocaleRefs})
+        const path = buildPathWithUrlConfig('/account/wishlist', configValues)
         history.push(path)
     }
 

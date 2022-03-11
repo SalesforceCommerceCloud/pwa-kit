@@ -77,8 +77,6 @@ export const AuthModal = ({
         try {
             await customer.registerCustomer(data)
             navigate('/account')
-            // const path = buildPathWithUrlConfig('/account', {locale})
-            // history.push(path)
         } catch (error) {
             form.setError('global', {type: 'manual', message: error.message})
         }

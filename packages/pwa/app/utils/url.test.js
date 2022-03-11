@@ -322,12 +322,7 @@ describe('buildPathWithUrlConfig', () => {
             site: 'path',
             showDefaults: true
         }))
-        const defaultLocaleRefs = ['en-GB', 'uk']
-        const url = buildPathWithUrlConfig(
-            '/women/dresses',
-            {locale: 'en-GB', site: 'uk'},
-            {defaultLocaleRefs}
-        )
+        const url = buildPathWithUrlConfig('/women/dresses', {locale: 'en-GB', site: 'uk'})
         expect(url).toEqual('/uk/en-GB/women/dresses')
     })
 
@@ -337,12 +332,7 @@ describe('buildPathWithUrlConfig', () => {
             site: 'path',
             showDefaults: false
         }))
-        const defaultLocaleRefs = ['en-GB', 'uk']
-        const url = buildPathWithUrlConfig(
-            '/women/dresses',
-            {locale: 'en-GB', site: 'uk'},
-            {defaultLocaleRefs}
-        )
+        const url = buildPathWithUrlConfig('/women/dresses', {locale: 'en-GB', site: 'uk'})
         expect(url).toEqual('/women/dresses')
     })
 
@@ -352,12 +342,7 @@ describe('buildPathWithUrlConfig', () => {
             site: 'path',
             showDefaults: true
         }))
-        const defaultLocaleRefs = ['en-GB', 'uk']
-        const url = buildPathWithUrlConfig(
-            '/women/dresses',
-            {locale: 'en-GB', site: 'uk'},
-            {defaultLocaleRefs}
-        )
+        const url = buildPathWithUrlConfig('/women/dresses', {locale: 'en-GB', site: 'uk'})
         expect(url).toEqual('/uk/women/dresses?locale=en-GB')
     })
 
@@ -367,12 +352,7 @@ describe('buildPathWithUrlConfig', () => {
             site: 'query_param',
             showDefaults: true
         }))
-        const defaultLocaleRefs = ['en-GB', 'uk']
-        const url = buildPathWithUrlConfig(
-            '/women/dresses',
-            {locale: 'en-GB', site: 'uk'},
-            {defaultLocaleRefs}
-        )
+        const url = buildPathWithUrlConfig('/women/dresses', {locale: 'en-GB', site: 'uk'})
         expect(url).toEqual('/en-GB/women/dresses?site=uk')
     })
 
@@ -382,12 +362,7 @@ describe('buildPathWithUrlConfig', () => {
             site: 'query_param',
             showDefaults: false
         }))
-        const defaultLocaleRefs = ['en-GB', 'uk']
-        const url = buildPathWithUrlConfig(
-            '/women/dresses',
-            {locale: 'en-GB', site: 'uk'},
-            {defaultLocaleRefs}
-        )
+        const url = buildPathWithUrlConfig('/women/dresses', {locale: 'en-GB', site: 'uk'})
         expect(url).toEqual('/women/dresses')
     })
 
@@ -397,11 +372,9 @@ describe('buildPathWithUrlConfig', () => {
             site: 'path',
             showDefaults: true
         }))
-        const defaultLocaleRefs = ['en-GB', 'uk']
         const url = buildPathWithUrlConfig(
             '/women/dresses?something=else&refine=c_color',
             {locale: 'en-GB', site: 'uk'},
-            {defaultLocaleRefs},
             {disallowParams: ['refine']}
         )
         expect(url).toEqual('/uk/women/dresses?something=else&locale=en-GB')
@@ -413,14 +386,12 @@ describe('buildPathWithUrlConfig', () => {
             site: 'path',
             showDefaults: false
         }))
-        const defaultLocaleRefs = ['en-GB', 'uk']
         const url = buildPathWithUrlConfig(
             '/women/dresses?something=else&refine=c_color',
-            {locale: 'de-DE', site: 'de'},
-            {defaultLocaleRefs},
+            {locale: 'en-CA', site: 'us'},
             {disallowParams: ['refine']}
         )
-        expect(url).toEqual('/de/women/dresses?something=else&locale=de-DE')
+        expect(url).toEqual('/us/women/dresses?something=else&locale=en-CA')
     })
 
     test('throw an error when url config is not defined', () => {

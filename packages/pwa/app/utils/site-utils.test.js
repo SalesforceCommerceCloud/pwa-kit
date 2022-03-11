@@ -14,6 +14,11 @@ beforeEach(() => {
     jest.resetModules()
 })
 
+afterEach(() => {
+    const originalConfig = window.__CONFIG__
+    setConfig(originalConfig)
+})
+
 describe('resolveSiteFromUrl', function() {
     test('throw an error without an arg', () => {
         expect(() => {

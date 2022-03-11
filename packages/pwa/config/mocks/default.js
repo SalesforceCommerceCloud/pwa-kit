@@ -56,6 +56,10 @@ module.exports = {
                         {
                             id: 'en-US',
                             preferredCurrency: 'USD'
+                        },
+                        {
+                            id: 'en-CA',
+                            preferredCurrency: 'USD'
                         }
                     ]
                 }

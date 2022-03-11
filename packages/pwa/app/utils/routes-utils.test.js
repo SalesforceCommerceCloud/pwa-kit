@@ -197,15 +197,10 @@ describe('configureRoutes', function() {
             ignoredRoutes: ['/']
         }
     ]
-    const env = process.env
     beforeEach(() => {
         jest.resetModules()
-        process.env = {...env}
     })
 
-    afterEach(() => {
-        process.env = env
-    })
     const CompA = () => <div>This is component A</div>
     const CompC = () => <div>This is component C</div>
 

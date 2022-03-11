@@ -7,7 +7,7 @@
 
 import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
 import {getLocaleRefsFromSite, getParamsFromPath, getUrlConfig} from './utils'
-import {getDefaultSite} from './site-utils'
+import {getDefaultSite, getSites} from './site-utils'
 import {HOME_HREF, urlPartPositions} from '../constants'
 
 /**
@@ -22,7 +22,7 @@ import {HOME_HREF, urlPartPositions} from '../constants'
  * @returns {string|*}
  */
 export const absoluteUrl = (path) => {
-    return `${getAppOrigin()}${path}`
+    return new URL(path, getAppOrigin()).toString()
 }
 
 /**
@@ -147,9 +147,6 @@ export const getPathWithLocale = (shortCode, opts = {}) => {
     search = search.replace(/&$/, '')
 
     const defaultSite = getDefaultSite()
-    // this is the default locale values for current used site
-    const defaultLocaleRefs = getLocaleRefsFromSite(site, site.l10n.defaultLocale)
-
     const isHomeRef = pathname === HOME_HREF
 
     const isDefaultLocaleOfDefaultSite = shortCode === defaultSite.l10n.defaultLocale
@@ -166,7 +163,6 @@ export const getPathWithLocale = (shortCode, opts = {}) => {
                     : siteRef || site.alias || site.id,
             locale: isDefaultLocaleOfDefaultSite && isDefaultSite && isHomeRef ? '' : shortCode
         },
-        {defaultLocaleRefs},
         opts
     )
     return newUrl
@@ -188,17 +184,11 @@ export const homeUrlBuilder = (homeHref, options = {}) => {
     const defaultSite = getDefaultSite()
     const isDefaultLocaleOfDefaultSite = locale === defaultSite.l10n.defaultLocale
     const isDefaultSite = site.id === defaultSite.id || site.alias === defaultSite.alias
-    // this is the default locale values for current used site
-    const defaultLocaleRefs = getLocaleRefsFromSite(site, site.l10n.defaultLocale)
 
-    const updatedUrl = buildPathWithUrlConfig(
-        homeHref,
-        {
-            locale: isDefaultLocaleOfDefaultSite && isDefaultSite ? '' : locale.id || locale.alias,
-            site: isDefaultLocaleOfDefaultSite && isDefaultSite ? '' : site.alias || site.id
-        },
-        {defaultLocaleRefs}
-    )
+    const updatedUrl = buildPathWithUrlConfig(homeHref, {
+        locale: isDefaultLocaleOfDefaultSite && isDefaultSite ? '' : locale.alias || locale.id,
+        site: isDefaultLocaleOfDefaultSite && isDefaultSite ? '' : site.alias || site.id
+    })
     return encodeURI(updatedUrl)
 }
 
@@ -244,8 +234,6 @@ export const removeQueryParamsFromPath = (path, keys) => {
  * @param {object} configValues - object that contains values of url config
  * @param {Object} [opts] - Options, if there's any.
  * @param {string[]} opts.disallowParams - URL parameters to remove
- * @param {object} defaults - place to store default values
- * @param {object} defaults.defaultLocaleRefs - a list of locale refs of a  site
  * @return {string} - an output path that has locale and site
  *
  * @example
@@ -268,17 +256,20 @@ export const removeQueryParamsFromPath = (path, keys) => {
  *     // other props
  *   }
  * }
- * buildPathWithUrlConfig('/women/dresses', {locale: 'en-GB', site: 'global'}, {site})
+ * buildPathWithUrlConfig('/women/dresses', {locale: 'en-GB', site: 'global'})
  * => /global/women/dresses?locale=en-GB
  *
  */
-export const buildPathWithUrlConfig = (
-    relativeUrl,
-    configValues = {},
-    defaults = {},
-    opts = {}
-) => {
+export const buildPathWithUrlConfig = (relativeUrl, configValues = {}, opts = {}) => {
     const urlConfig = getUrlConfig()
+    const sites = getSites()
+    const defaultSite = getDefaultSite()
+    const site =
+        sites.find((site) => {
+            return site.alias === configValues['site'] || site.id === configValues['site']
+        }) || defaultSite
+
+    const defaultLocaleRefs = getLocaleRefsFromSite(site, site.l10n.defaultLocale)
     const {disallowParams = []} = opts
     if (!Object.values(configValues).length) return relativeUrl
     const [pathname, search] = relativeUrl.split('?')
@@ -291,14 +282,12 @@ export const buildPathWithUrlConfig = (
         })
     }
 
-    const {defaultLocaleRefs = []} = defaults
-
     const queryParams = {...Object.fromEntries(params)}
     let basePathSegments = []
 
     // get the default values for site and locale
     const showDefaults = urlConfig.showDefaults
-    const defaultSite = getDefaultSite()
+
     const defaultSiteRefs = [defaultSite.id, defaultSite.alias]
     const defaultValues = [...defaultSiteRefs, ...defaultLocaleRefs]
 

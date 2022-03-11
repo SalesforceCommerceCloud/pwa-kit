@@ -40,7 +40,6 @@ import LoadingSpinner from '../../components/loading-spinner'
 import {buildPathWithUrlConfig} from '../../utils/url'
 import useLocale from '../../hooks/use-locale'
 import useSite from '../../hooks/use-site'
-import {getLocaleRefsFromSite} from '../../utils/utils'
 
 const Account = () => {
     const {path} = useRouteMatch()
@@ -92,12 +91,10 @@ const Account = () => {
     // Using Redirect allows us to store the directed page to location
     // so we can direct users back after they are successfully log in
     if (customer.authType != null && !customer.isRegistered) {
-        const defaultLocaleRefs = getLocaleRefsFromSite(site, site.l10n.defaultLocale)
-        const path = buildPathWithUrlConfig(
-            '/login',
-            {locale: locale.id || locale.alias, site: site.alias || site.id},
-            {defaultLocaleRefs}
-        )
+        const path = buildPathWithUrlConfig('/login', {
+            locale: locale.alias || locale.id,
+            site: site.alias || site.id
+        })
         return <Redirect to={{pathname: path, state: {directedFrom: location.pathname}}} />
     }
 

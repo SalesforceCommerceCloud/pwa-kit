@@ -36,14 +36,14 @@ export const configureRoutes = (routes = [], urlConfig, {ignoredRoutes = []}) =>
             const defaultSites = [defaultSite.id, defaultSite.alias]
             allSites.forEach((site) => {
                 // append site ids and aliases to an array
-                const sites = [site.alias, site.id].filter(Boolean)
-                let locales = []
+                const siteRefs = [site.alias, site.id].filter(Boolean)
+                let localeRefs = []
                 // append locale ids and aliases to an array
                 site.l10n.supportedLocales.forEach((locale) => {
-                    locales.push(locale.alias)
-                    locales.push(locale.id)
+                    localeRefs.push(locale.alias)
+                    localeRefs.push(locale.id)
                 })
-                locales = locales.filter(Boolean)
+                localeRefs = localeRefs.filter(Boolean)
                 const defaultLocaleId = site.l10n.defaultLocale
                 const defaultLocaleAlias = site.l10n.supportedLocales.find(
                     (locale) => locale.alias === defaultLocaleId
@@ -53,14 +53,13 @@ export const configureRoutes = (routes = [], urlConfig, {ignoredRoutes = []}) =>
                 )
                 const {locale: localePosition, site: sitePosition} = urlConfig
 
-                // In most cases, those routes are only needed when both of the settings are set to PATH
                 if (
                     localePosition === urlPartPositions.PATH &&
                     sitePosition === urlPartPositions.PATH
                 ) {
                     // construct all the routes that has both site and locale
-                    sites.forEach((site) => {
-                        locales.forEach((locale) => {
+                    siteRefs.forEach((site) => {
+                        localeRefs.forEach((locale) => {
                             const siteIdentifier =
                                 !showDefaults && allDefaults.includes(site) ? '' : `/${site}`
                             const localeIdentifier =
@@ -79,7 +78,7 @@ export const configureRoutes = (routes = [], urlConfig, {ignoredRoutes = []}) =>
                     sitePosition === urlPartPositions.PATH
                 ) {
                     // construct the routes that only has site id or alias
-                    sites.forEach((site) => {
+                    siteRefs.forEach((site) => {
                         const siteIdentifier =
                             !showDefaults && allDefaults.includes(site) ? '' : `/${site}`
                         outputRoutes.push({
@@ -93,7 +92,7 @@ export const configureRoutes = (routes = [], urlConfig, {ignoredRoutes = []}) =>
                     sitePosition !== urlPartPositions.PATH
                 ) {
                     // construct the routes that only has locale id or alias
-                    locales.forEach((locale) => {
+                    localeRefs.forEach((locale) => {
                         const localeIdentifier =
                             !showDefaults && allDefaults.includes(locale) ? '' : `/${locale}`
                         outputRoutes.push({

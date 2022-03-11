@@ -8,6 +8,7 @@ exports.template = ({commerceApi, einsteinApi}) => `module.exports = {
     app: {
         "url": {
             // "site": "none",
+            // you can set how you want your locale to display in the url as one of "path|query_param|none"
             "locale": "none",
             // a flag to display default values (either site and locale) to display in the url
             // if they are set to be in path or query_param. In most cases, you might want to 
@@ -16,7 +17,7 @@ exports.template = ({commerceApi, einsteinApi}) => `module.exports = {
         },
         "defaultSite": "RefArch",
         // "siteAliases": {
-        // adding alias to your site if it is displayed in the url
+        // you can add alias to your site id
         //     "RefArch": "us" 
         // },
         "sites": [
@@ -29,6 +30,8 @@ exports.template = ({commerceApi, einsteinApi}) => `module.exports = {
                     "supportedLocales": [
                         {
                             "id": "en-US",
+                            // you can add alias for you locale
+                            "alias": "us", 
                             "preferredCurrency": "USD"
                         }
                     ]

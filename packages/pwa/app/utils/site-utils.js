@@ -7,6 +7,7 @@
 
 import {getConfig} from 'pwa-kit-react-sdk/ssr/universal/utils'
 import {getParamsFromPath} from './utils'
+import {absoluteUrl} from './url'
 
 /**
  * This functions takes an url and returns a site object,
@@ -18,7 +19,7 @@ export const resolveSiteFromUrl = (url) => {
     if (!url) {
         throw new Error('url is required to find a site object.')
     }
-    const {pathname, search} = new URL(url)
+    const {pathname, search} = absoluteUrl(url)
     const path = `${pathname}${search}`
     let site
 
@@ -36,7 +37,9 @@ export const resolveSiteFromUrl = (url) => {
     site = getDefaultSite()
     // Step 3: throw an error if site can't be found by any of the above steps
     if (!site) {
-        throw new Error("Can't find any site. Please check you sites configuration.")
+        throw new Error(
+            "Can't find a matching default site. Please check your sites configuration."
+        )
     }
     return site
 }
