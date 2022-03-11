@@ -134,6 +134,8 @@ export const REMOTE_REQUIRED_ENV_VARS = [
  * @param {Boolean} [options.enableLegacyRemoteProxying=true] - When running remotely (as
  * oppsed to locally), enables legacy proxying behaviour, allowing "proxy" requests to route through
  * the express server. In the future, this behaviour and setting will be removed.
+ * @param {Boolean} [options.enableBodyParser=true] - This boolean value indicates
+ * whether or not the express server uses body-parser middleware for POST requests.
  */
 
 export const createApp = (options) => {
@@ -165,7 +167,11 @@ export const createApp = (options) => {
         // be no use-case for SDK users to set this.
         strictSSL: true,
 
-        enableLegacyRemoteProxying: true
+        enableLegacyRemoteProxying: true,
+
+        // This boolean value indicates whether or not the express
+        // server uses body-parser middleware for POST requests.
+        enableBodyParser: true
     }
 
     options = Object.assign({}, defaults, options)
@@ -306,21 +312,23 @@ export const createApp = (options) => {
     // Serve this asset directly (in both remote and local modes)
     app.get('/worker.js*', serveServiceWorker)
 
-    // Any path
-    const rootWildcard = '/*'
+    if (options.enableBodyParser) {
+        // Any path
+        const rootWildcard = '/*'
 
-    // Because the app can accept POST requests, we need to include body-parser middleware.
-    app.post(rootWildcard, [
-        // application/json
-        bodyParser.json(),
-        // text/plain (defaults to utf-8)
-        bodyParser.text(),
-        // */x-www-form-urlencoded
-        bodyParser.urlencoded({
-            extended: true,
-            type: '*/x-www-form-urlencoded'
-        })
-    ])
+        // Because the app can accept POST requests, we need to include body-parser middleware.
+        app.post(rootWildcard, [
+            // application/json
+            bodyParser.json(),
+            // text/plain (defaults to utf-8)
+            bodyParser.text(),
+            // */x-www-form-urlencoded
+            bodyParser.urlencoded({
+                extended: true,
+                type: '*/x-www-form-urlencoded'
+            })
+        ])
+    }
 
     // Map favicon requests to the configured path. We always map
     // this route, because if there's no favicon configured we want
