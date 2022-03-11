@@ -14,11 +14,19 @@ import {
     homeUrlBuilder,
     rebuildPathWithParams,
     removeQueryParamsFromPath,
-    buildPathWithUrlConfig
+    buildPathWithUrlConfig,
+    absoluteUrl
 } from './url'
 import {getUrlConfig} from './utils'
 import mockConfig from '../../config/mocks/default'
-
+// import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
+jest.mock('pwa-kit-react-sdk/utils/url', () => {
+    const original = jest.requireActual('pwa-kit-react-sdk/utils/url')
+    return {
+        ...original,
+        getAppOrigin: jest.fn(() => 'https://www.example.com')
+    }
+})
 jest.mock('./utils', () => {
     const original = jest.requireActual('./utils')
     return {
@@ -400,5 +408,17 @@ describe('buildPathWithUrlConfig', () => {
         expect(() => {
             buildPathWithUrlConfig('/women/dresses', {locale: 'en-GB', site: 'uk'})
         }).toThrow()
+    })
+})
+
+describe('absoluteUrl', function() {
+    test('return expected when path is an relative path', () => {
+        const url = absoluteUrl('/uk/en/women/dresses')
+        expect(url).toEqual('https://www.example.com/uk/en/women/dresses')
+    })
+
+    test('return expected when path is an relative path', () => {
+        const url = absoluteUrl('https://www.example.com/uk/en/women/dresses')
+        expect(url).toEqual('https://www.example.com/uk/en/women/dresses')
     })
 })

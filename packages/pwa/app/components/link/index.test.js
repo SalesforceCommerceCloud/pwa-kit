@@ -23,7 +23,7 @@ afterEach(() => {
 
 test('renders a link with locale prepended', () => {
     delete window.location
-    window.location = new URL('us/en-US', 'https://www.example.com')
+    window.location = new URL('/us/en-US', 'https://www.example.com')
     const {getByText} = renderWithProviders(<Link href="/mypage">My Page</Link>, {
         wrapperProps: {locale: 'en-US'}
     })

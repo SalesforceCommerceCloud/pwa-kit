@@ -17,35 +17,31 @@ describe('configureRoutes', function() {
                 showDefaults: true
             },
             expectedRes: [
-                '/uk/en-uk/',
                 '/uk/en-GB/',
                 '/uk/fr/',
                 '/uk/fr-FR/',
-                '/uk/it/',
                 '/uk/it-IT/',
-                '/site-1/en-uk/',
                 '/site-1/en-GB/',
                 '/site-1/fr/',
                 '/site-1/fr-FR/',
-                '/site-1/it/',
                 '/site-1/it-IT/',
                 '/us/en-US/',
+                '/us/en-CA/',
                 '/site-2/en-US/',
+                '/site-2/en-CA/',
                 '/',
-                '/uk/en-uk/category/:categoryId',
                 '/uk/en-GB/category/:categoryId',
                 '/uk/fr/category/:categoryId',
                 '/uk/fr-FR/category/:categoryId',
-                '/uk/it/category/:categoryId',
                 '/uk/it-IT/category/:categoryId',
-                '/site-1/en-uk/category/:categoryId',
                 '/site-1/en-GB/category/:categoryId',
                 '/site-1/fr/category/:categoryId',
                 '/site-1/fr-FR/category/:categoryId',
-                '/site-1/it/category/:categoryId',
                 '/site-1/it-IT/category/:categoryId',
                 '/us/en-US/category/:categoryId',
+                '/us/en-CA/category/:categoryId',
                 '/site-2/en-US/category/:categoryId',
+                '/site-2/en-CA/category/:categoryId',
                 '/category/:categoryId'
             ]
         },
@@ -56,22 +52,22 @@ describe('configureRoutes', function() {
                 showDefaults: false
             },
             expectedRes: [
-                '/en-uk/',
                 '/',
                 '/fr/',
                 '/fr-FR/',
-                '/it/',
                 '/it-IT/',
                 '/us/',
+                '/us/en-CA/',
                 '/site-2/',
-                '/en-uk/category/:categoryId',
+                '/site-2/en-CA/',
                 '/category/:categoryId',
                 '/fr/category/:categoryId',
                 '/fr-FR/category/:categoryId',
-                '/it/category/:categoryId',
                 '/it-IT/category/:categoryId',
                 '/us/category/:categoryId',
-                '/site-2/category/:categoryId'
+                '/us/en-CA/category/:categoryId',
+                '/site-2/category/:categoryId',
+                '/site-2/en-CA/category/:categoryId'
             ]
         },
         {
@@ -81,21 +77,19 @@ describe('configureRoutes', function() {
                 showDefaults: true
             },
             expectedRes: [
-                '/en-uk/',
                 '/en-GB/',
                 '/fr/',
                 '/fr-FR/',
-                '/it/',
                 '/it-IT/',
                 '/en-US/',
+                '/en-CA/',
                 '/',
-                '/en-uk/category/:categoryId',
                 '/en-GB/category/:categoryId',
                 '/fr/category/:categoryId',
                 '/fr-FR/category/:categoryId',
-                '/it/category/:categoryId',
                 '/it-IT/category/:categoryId',
                 '/en-US/category/:categoryId',
+                '/en-CA/category/:categoryId',
                 '/category/:categoryId'
             ]
         },
@@ -106,18 +100,16 @@ describe('configureRoutes', function() {
                 showDefaults: false
             },
             expectedRes: [
-                '/en-uk/',
                 '/',
                 '/fr/',
                 '/fr-FR/',
-                '/it/',
                 '/it-IT/',
-                '/en-uk/category/:categoryId',
+                '/en-CA/',
                 '/category/:categoryId',
                 '/fr/category/:categoryId',
                 '/fr-FR/category/:categoryId',
-                '/it/category/:categoryId',
-                '/it-IT/category/:categoryId'
+                '/it-IT/category/:categoryId',
+                '/en-CA/category/:categoryId'
             ]
         },
         {
@@ -178,20 +170,18 @@ describe('configureRoutes', function() {
             },
             expectedRes: [
                 '/',
-                '/uk/en-uk/category/:categoryId',
                 '/uk/en-GB/category/:categoryId',
                 '/uk/fr/category/:categoryId',
                 '/uk/fr-FR/category/:categoryId',
-                '/uk/it/category/:categoryId',
                 '/uk/it-IT/category/:categoryId',
-                '/site-1/en-uk/category/:categoryId',
                 '/site-1/en-GB/category/:categoryId',
                 '/site-1/fr/category/:categoryId',
                 '/site-1/fr-FR/category/:categoryId',
-                '/site-1/it/category/:categoryId',
                 '/site-1/it-IT/category/:categoryId',
                 '/us/en-US/category/:categoryId',
+                '/us/en-CA/category/:categoryId',
                 '/site-2/en-US/category/:categoryId',
+                '/site-2/en-CA/category/:categoryId',
                 '/category/:categoryId'
             ],
             ignoredRoutes: ['/']

@@ -32,7 +32,6 @@ module.exports = {
                     supportedLocales: [
                         {
                             id: 'en-GB',
-                            alias: 'en-uk',
                             preferredCurrency: 'GBP'
                         },
                         {
@@ -42,7 +41,6 @@ module.exports = {
                         },
                         {
                             id: 'it-IT',
-                            alias: 'it',
                             preferredCurrency: 'EUR'
                         }
                     ]

@@ -15,6 +15,7 @@ beforeEach(() => {
 })
 
 afterEach(() => {
+    jest.resetAllMocks()
     const originalConfig = window.__CONFIG__
     setConfig(originalConfig)
 })
