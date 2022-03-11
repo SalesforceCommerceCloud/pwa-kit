@@ -126,7 +126,7 @@ module.exports = {
                 path: 'ocapi'
             },
             {
-                host: 'api.cquotien.com',
+                host: 'api.cquotient.com',
                 path: 'einstein'
             }
         ]
