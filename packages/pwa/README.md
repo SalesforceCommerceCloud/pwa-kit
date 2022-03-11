@@ -31,10 +31,10 @@ See the [Localization README.md](./app/translations/README.md) for important set
 
 ## URL Customization
 
-You can customize how storefront URLs are formatted in the `pwa-kit-config.json` file.
+You can customize how storefront URLs are formatted in the you applications configuration file.
 
 ```json
-// pwa-kit.config.json
+// config/default.js
 {
     "url": {
         "locale": "path|query_param|none"
@@ -42,7 +42,7 @@ You can customize how storefront URLs are formatted in the `pwa-kit-config.json`
 }
 ```
 
-You can choose how the current locale appears (or doesn’t appear) in the URL by setting `url.locale` in `pwa-kit-config.json` to one of the following values:
+You can choose how the current locale appears (or doesn’t appear) in the URL by setting `url.locale` to one of the following values:
 
 -   `path`: Locale is included in the URL path. Example: `/en-US/women/dress`
 -   `query_param`: Locale is included as a query parameter. Example: `/women/dress?locale=en-US`

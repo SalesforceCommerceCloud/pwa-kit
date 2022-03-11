@@ -159,6 +159,6 @@ export const capitalize = (text) => {
 
 /**
  * A util to return current url configuration
- * @returns {object} - url object from the pwa-kit.config.json file
+ * @returns {object} - url object from the application configuration file
  */
 export const getUrlConfig = () => getConfig().app.url
