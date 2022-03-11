@@ -157,7 +157,7 @@ export const renderWithProviders = (children, options) =>
 /**
  * This is used to obtain the URL pathname that would include
  * or not include the locale shortcode in the URL according to
- * the locale type configuration set in the pwa-kit.config.json
+ * the locale type configuration set in the application configuration
  * file.
  * @param path The pathname that we want to use
  * @returns {`${string|string}${string}`} URL pathname for the given path
