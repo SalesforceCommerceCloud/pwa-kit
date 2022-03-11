@@ -113,10 +113,13 @@ describe('url builder test', () => {
 })
 
 describe('getPathWithLocale', () => {
+    const site = mockConfig.app.sites[0]
+    const alias = mockConfig.app.siteAliases[site.id]
+    const mockSite = {...site, alias}
     test('getPathWithLocale returns expected for PLP', () => {
         const location = new URL('http://localhost:3000/uk/it-IT/category/newarrivals-womens')
 
-        const relativeUrl = getPathWithLocale('fr-FR', {location, site: mockConfig.app.sites[0]})
+        const relativeUrl = getPathWithLocale('fr-FR', {location, site: mockSite})
         expect(relativeUrl).toEqual(`/uk/fr-FR/category/newarrivals-womens`)
     })
 
@@ -128,7 +131,7 @@ describe('getPathWithLocale', () => {
         const relativeUrl = getPathWithLocale('fr-FR', {
             disallowParams: ['refine'],
             location,
-            site: mockConfig.app.sites[0]
+            site: mockSite
         })
         expect(relativeUrl).toEqual(
             `/uk/fr-FR/category/newarrivals-womens?limit=25&sort=best-matches&offset=25`
@@ -138,40 +141,160 @@ describe('getPathWithLocale', () => {
     test('getPathWithLocale returns expected for Homepage', () => {
         const location = new URL('http://localhost:3000/uk/it-IT/')
 
-        const relativeUrl = getPathWithLocale('fr-FR', {location, site: mockConfig.app.sites[0]})
+        const relativeUrl = getPathWithLocale('fr-FR', {location, site: mockSite})
         expect(relativeUrl).toEqual(`/uk/fr-FR/`)
     })
 
     test('getPathWithLocale returns / when both site and locale are default', () => {
         const location = new URL('http://localhost:3000/uk/it-IT/')
 
-        const relativeUrl = getPathWithLocale('en-GB', {location, site: mockConfig.app.sites[0]})
+        const relativeUrl = getPathWithLocale('en-GB', {location, site: mockSite})
         expect(relativeUrl).toEqual(`/`)
     })
 })
 
 describe('homeUrlBuilder', () => {
-    getUrlConfig.mockImplementation(() => ({
-        locale: 'path',
-        site: 'path',
-        showDefaults: true
-    }))
-    test('homeUrlBuilder returns expected url without any locale and site', () => {
-        const homeUrlDefaultLocale = homeUrlBuilder('/', {
-            locale: 'en-GB',
-            site: mockConfig.app.sites[0]
-        })
-        expect(homeUrlDefaultLocale).toEqual(`/`)
-    })
+    const defaultSite = mockConfig.app.sites[0]
+    const defaultAlias = mockConfig.app.siteAliases[defaultSite.id]
+    const defaultSiteMock = {...defaultSite, alias: defaultAlias}
 
-    test('homeUrlBuilder returns expected url locale and site', () => {
-        const site = mockConfig.app.sites[1]
-        const alias = mockConfig.app.siteAliases[site.id]
-        const homeUrlDefaultLocale = homeUrlBuilder('/', {
-            locale: 'fr-FR',
-            site: {...mockConfig.app.sites[1], alias}
+    const nonDefaultSite = mockConfig.app.sites[1]
+    const nonDefaultAlias = mockConfig.app.siteAliases[nonDefaultSite.id]
+    const nonDefaultSiteMock = {...nonDefaultSite, alias: nonDefaultAlias}
+    const cases = [
+        {
+            urlConfig: {
+                locale: 'path',
+                site: 'path',
+                showDefaults: true
+            },
+            site: defaultSiteMock,
+            locale: {id: 'en-GB'},
+            expectedRes: '/uk/en-GB/'
+        },
+        {
+            urlConfig: {
+                locale: 'query_param',
+                site: 'query_param',
+                showDefaults: true
+            },
+            site: defaultSiteMock,
+            locale: {id: 'en-GB'},
+            expectedRes: '/?site=uk&locale=en-GB'
+        },
+        {
+            urlConfig: {
+                locale: 'path',
+                site: 'path',
+                showDefaults: false
+            },
+            site: defaultSiteMock,
+            locale: {id: 'en-GB'},
+            expectedRes: '/'
+        },
+        {
+            urlConfig: {
+                locale: 'query_param',
+                site: 'query_param',
+                showDefaults: false
+            },
+            site: defaultSiteMock,
+            locale: {id: 'en-GB'},
+            expectedRes: '/'
+        },
+        {
+            urlConfig: {
+                locale: 'path',
+                site: 'path',
+                showDefaults: true
+            },
+            site: defaultSiteMock,
+            locale: {id: 'fr-FR'},
+            expectedRes: '/uk/fr-FR/'
+        },
+        {
+            urlConfig: {
+                locale: 'path',
+                site: 'path',
+                showDefaults: false
+            },
+            site: defaultSiteMock,
+            locale: {id: 'fr-FR'},
+            expectedRes: '/fr-FR/'
+        },
+        {
+            urlConfig: {
+                locale: 'query_param',
+                site: 'query_param',
+                showDefaults: true
+            },
+            site: defaultSiteMock,
+            locale: {id: 'fr-FR'},
+            expectedRes: '/?site=uk&locale=fr-FR'
+        },
+        {
+            urlConfig: {
+                locale: 'path',
+                site: 'path',
+                showDefaults: true
+            },
+            site: nonDefaultSiteMock,
+            locale: {id: 'en-US'},
+            expectedRes: '/us/en-US/'
+        },
+        {
+            urlConfig: {
+                locale: 'query_param',
+                site: 'path',
+                showDefaults: true
+            },
+            site: nonDefaultSiteMock,
+            locale: {id: 'en-US'},
+            expectedRes: '/us/?locale=en-US'
+        },
+        {
+            urlConfig: {
+                locale: 'path',
+                site: 'path',
+                showDefaults: false
+            },
+            site: nonDefaultSiteMock,
+            locale: {id: 'en-US'}, // default locale of the nonDefault Site
+            expectedRes: '/us/'
+        },
+        {
+            urlConfig: {
+                locale: 'query_param',
+                site: 'path',
+                showDefaults: false
+            },
+            site: nonDefaultSiteMock,
+            locale: {id: 'en-US'}, // default locale of the nonDefault Site
+            expectedRes: '/us/'
+        },
+        {
+            urlConfig: {
+                locale: 'query_param',
+                site: 'query_param',
+                showDefaults: true
+            },
+            site: nonDefaultSiteMock,
+            locale: {id: 'en-US'}, // default locale of the nonDefault Site
+            expectedRes: '/?site=us&locale=en-US'
+        }
+    ]
+
+    cases.forEach(({urlConfig, site, locale, expectedRes}) => {
+        test(`return expected URL with site ${site.alias}, locale ${
+            locale.id
+        } and urlConfig as ${JSON.stringify(urlConfig)}`, () => {
+            getUrlConfig.mockImplementation(() => urlConfig)
+            const homeUrl = homeUrlBuilder('/', {
+                site,
+                locale
+            })
+            expect(homeUrl).toEqual(expectedRes)
         })
-        expect(homeUrlDefaultLocale).toEqual(`/us/fr-FR/`)
     })
 })
 

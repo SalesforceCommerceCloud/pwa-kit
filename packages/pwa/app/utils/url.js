@@ -154,7 +154,6 @@ export const getPathWithLocale = (shortCode, opts = {}) => {
 
     const isDefaultLocaleOfDefaultSite = shortCode === defaultSite.l10n.defaultLocale
     const isDefaultSite = siteRef === defaultSite.alias || siteRef === defaultSite.id
-
     // rebuild the url with new locale,
     const newUrl = buildPathWithUrlConfig(
         `${pathname}${search}`,
@@ -164,7 +163,7 @@ export const getPathWithLocale = (shortCode, opts = {}) => {
             site:
                 isDefaultLocaleOfDefaultSite && isDefaultSite && isHomeRef
                     ? ''
-                    : site.alias || site.id,
+                    : siteRef || site.alias || site.id,
             locale: isDefaultLocaleOfDefaultSite && isDefaultSite && isHomeRef ? '' : shortCode
         },
         {defaultLocaleRefs},
