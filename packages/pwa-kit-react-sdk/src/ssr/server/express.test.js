@@ -96,7 +96,8 @@ const opts = (overrides = {}) => {
         fetchAgents: {
             https: httpsAgent
         },
-        enableLegacyRemoteProxying: false
+        enableLegacyRemoteProxying: false,
+        enableBodyParser: true
     }
     return {
         ...defaults,
@@ -1017,6 +1018,23 @@ describe('SSRServer operation', () => {
         return request(app)
             .get('/thing')
             .expect(404)
+    })
+
+    const enableBodyParserFlags = [true, false]
+
+    enableBodyParserFlags.forEach((flag) => {
+        test(`Flag enableBodyParser, should enable body parser: ${flag}`, () => {
+            const app = createApp(opts({enableBodyParser: flag}))
+            const route = (req, res) => {
+                expect(req.body).toBeDefined(flag)
+                res.end()
+            }
+            app.post('/*', route)
+            return request(app)
+                .post('/some-url')
+                .type('application/json')
+                .send({test: 'data json'})
+        })
     })
 })
 
