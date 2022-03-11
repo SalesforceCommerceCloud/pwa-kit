@@ -31,7 +31,6 @@ import merge from 'merge-descriptors'
 import URL from 'url'
 import {Headers, X_HEADERS_TO_REMOVE, X_MOBIFY_REQUEST_CLASS} from '../../utils/ssr-proxying'
 import assert from 'assert'
-import bodyParser from 'body-parser'
 import semver from 'semver'
 import pkg from '../../../package.json'
 import fs from 'fs'
@@ -530,22 +529,6 @@ export const RemoteServerFactory = {
 
     setupCommonMiddleware(app, options) {
         app.use(prepNonProxyRequest)
-
-        // Any path
-        const rootWildcard = '/*'
-
-        // Because the app can accept POST requests, we need to include body-parser middleware.
-        app.post(rootWildcard, [
-            // application/json
-            bodyParser.json(),
-            // text/plain (defaults to utf-8)
-            bodyParser.text(),
-            // */x-www-form-urlencoded
-            bodyParser.urlencoded({
-                extended: true,
-                type: '*/x-www-form-urlencoded'
-            })
-        ])
 
         // Map favicon requests to the configured path. We always map
         // this route, because if there's no favicon configured we want
