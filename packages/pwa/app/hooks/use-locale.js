@@ -8,16 +8,17 @@
 import {useIntl} from 'react-intl'
 import useSite from './use-site'
 import {useMemo} from 'react'
+import {getLocaleFromSite} from '../utils/utils'
 
 /**
- * This hook returns the locale object  based on current locale shortCode and current site
+ * This hook returns the locale object based on current locale shortCode and current site
  * @return {object} locale
  */
 const useLocale = () => {
     const {locale: localeShortCode} = useIntl()
     const site = useSite()
     const locale = useMemo(() => {
-        return site.l10n.supportedLocales.find((locale) => locale.id === localeShortCode)
+        return getLocaleFromSite(site, localeShortCode)
     }, [localeShortCode])
 
     return locale

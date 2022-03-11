@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {pathToUrl} from './url'
+import {absoluteUrl} from './url'
 import {getSites} from './site-utils'
 import {getConfig} from 'pwa-kit-react-sdk/ssr/universal/utils'
 
@@ -163,10 +163,10 @@ export const capitalize = (text) => {
  * This function return the identifiers (site and locale) from the given url
  * The site will always go before locale if both of them are presented in the pathname
  * @param path {string}
- * @returns {object}
+ * @returns {{siteRef: string, localeRef: string}} - site and locale reference (it could either be id or alias)
  */
 export const getParamsFromPath = (path) => {
-    const {pathname, search} = new URL(pathToUrl(path))
+    const {pathname, search} = new URL(absoluteUrl(path))
 
     const config = getConfig()
     const {pathMatcher, searchMatcherForSite, searchMatcherForLocale} = getConfigMatcher(config)
@@ -175,10 +175,10 @@ export const getParamsFromPath = (path) => {
     const searchMatchForLocale = search.match(searchMatcherForLocale)
 
     // the value can only either in the path or search query param, there will be no overridden
-    const site = pathMatch?.groups.site || searchMatchForSite?.groups.site
+    const siteRef = pathMatch?.groups.site || searchMatchForSite?.groups.site
 
-    const locale = pathMatch?.groups.locale || searchMatchForLocale?.groups.locale
-    return {site, locale}
+    const localeRef = pathMatch?.groups.locale || searchMatchForLocale?.groups.locale
+    return {siteRef, localeRef}
 }
 
 /**
@@ -237,4 +237,35 @@ export const getConfigMatcher = (config) => {
         searchMatcherForSite,
         searchMatcherForLocale
     }
+}
+
+/**
+ * Return the target locale object from a site supported locales
+ * @param site - site to look for the locale
+ * @param localeRef - the locale ref to look for in site supported locales
+ * @return {object|undefined}
+ */
+export const getLocaleFromSite = (site, localeRef) => {
+    if (!site) {
+        throw new Error('site is not defined')
+    }
+    return site.l10n.supportedLocales.find(
+        (locale) => locale.id === localeRef || locale.alias === localeRef
+    )
+}
+
+/**
+ * Return all possible locale ref of a site based on o ref.
+ * A ref could either be id or alias,
+ * we want to know all of them if available
+ * @param site
+ * @param localeRef
+ * @return {array} - list of possible refs of a locale (id and alias)
+ */
+export const getLocaleRefsFromSite = (site, localeRef) => {
+    const locale = getLocaleFromSite(site, localeRef)
+    if (!locale) {
+        throw new Error("Can't find any locale base on that localeRef")
+    }
+    return [locale?.id, locale?.alias].filter(Boolean)
 }

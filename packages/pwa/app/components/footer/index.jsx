@@ -27,7 +27,7 @@ import {useIntl} from 'react-intl'
 import LinksList from '../links-list'
 import SocialIcons from '../social-icons'
 import {HideOnDesktop, HideOnMobile} from '../responsive'
-import {getUrlWithLocale} from '../../utils/url'
+import {getPathWithLocale} from '../../utils/url'
 import LocaleText from '../locale-text'
 import useSite from '../../hooks/use-site'
 
@@ -135,7 +135,7 @@ const Footer = ({...otherProps}) => {
                                     onChange={({target}) => {
                                         const newLocale = target.value
                                         setLocale(newLocale)
-                                        const newUrl = getUrlWithLocale(newLocale, {site})
+                                        const newUrl = getPathWithLocale(newLocale, {site})
                                         window.location = newUrl
                                     }}
                                     variant="filled"

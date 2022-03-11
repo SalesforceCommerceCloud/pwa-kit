@@ -10,7 +10,7 @@ import {
     categoryUrlBuilder,
     productUrlBuilder,
     searchUrlBuilder,
-    getUrlWithLocale,
+    getPathWithLocale,
     homeUrlBuilder,
     rebuildPathWithParams,
     removeQueryParamsFromPath,
@@ -112,20 +112,20 @@ describe('url builder test', () => {
     })
 })
 
-describe('getUrlWithLocale', () => {
-    test('getUrlWithLocale returns expected for PLP', () => {
+describe('getPathWithLocale', () => {
+    test('getPathWithLocale returns expected for PLP', () => {
         const location = new URL('http://localhost:3000/uk/it-IT/category/newarrivals-womens')
 
-        const relativeUrl = getUrlWithLocale('fr-FR', {location, site: mockConfig.app.sites[0]})
+        const relativeUrl = getPathWithLocale('fr-FR', {location, site: mockConfig.app.sites[0]})
         expect(relativeUrl).toEqual(`/uk/fr-FR/category/newarrivals-womens`)
     })
 
-    test('getUrlWithLocale returns expected for PLP without refine param', () => {
+    test('getPathWithLocale returns expected for PLP without refine param', () => {
         const location = new URL(
             'http://localhost:3000/uk/it-IT/category/newarrivals-womens?limit=25&refine=c_refinementColor%3DBianco&sort=best-matches&offset=25'
         )
 
-        const relativeUrl = getUrlWithLocale('fr-FR', {
+        const relativeUrl = getPathWithLocale('fr-FR', {
             disallowParams: ['refine'],
             location,
             site: mockConfig.app.sites[0]
@@ -135,17 +135,17 @@ describe('getUrlWithLocale', () => {
         )
     })
 
-    test('getUrlWithLocale returns expected for Homepage', () => {
+    test('getPathWithLocale returns expected for Homepage', () => {
         const location = new URL('http://localhost:3000/uk/it-IT/')
 
-        const relativeUrl = getUrlWithLocale('fr-FR', {location, site: mockConfig.app.sites[0]})
+        const relativeUrl = getPathWithLocale('fr-FR', {location, site: mockConfig.app.sites[0]})
         expect(relativeUrl).toEqual(`/uk/fr-FR/`)
     })
 
-    test('getUrlWithLocale returns / when both site and locale are default', () => {
+    test('getPathWithLocale returns / when both site and locale are default', () => {
         const location = new URL('http://localhost:3000/uk/it-IT/')
 
-        const relativeUrl = getUrlWithLocale('en-GB', {location, site: mockConfig.app.sites[0]})
+        const relativeUrl = getPathWithLocale('en-GB', {location, site: mockConfig.app.sites[0]})
         expect(relativeUrl).toEqual(`/`)
     })
 })
@@ -198,8 +198,12 @@ describe('buildPathWithUrlConfig', () => {
             site: 'path',
             showDefaults: true
         }))
-
-        const url = buildPathWithUrlConfig('/women/dresses', {locale: 'en-GB', site: 'uk'})
+        const defaultLocaleRefs = ['en-GB', 'uk']
+        const url = buildPathWithUrlConfig(
+            '/women/dresses',
+            {locale: 'en-GB', site: 'uk'},
+            {defaultLocaleRefs}
+        )
         expect(url).toEqual('/uk/en-GB/women/dresses')
     })
 
@@ -209,20 +213,90 @@ describe('buildPathWithUrlConfig', () => {
             site: 'path',
             showDefaults: false
         }))
-
-        const url = buildPathWithUrlConfig('/women/dresses', {locale: 'en-GB', site: 'uk'})
-        expect(url).toEqual('/en-GB/women/dresses')
+        const defaultLocaleRefs = ['en-GB', 'uk']
+        const url = buildPathWithUrlConfig(
+            '/women/dresses',
+            {locale: 'en-GB', site: 'uk'},
+            {defaultLocaleRefs}
+        )
+        expect(url).toEqual('/women/dresses')
     })
 
-    test('return a new url with locale value as a query param', () => {
+    test('return a new url with locale value as a query param and site in the path', () => {
         getUrlConfig.mockImplementation(() => ({
             locale: 'query_param',
             site: 'path',
             showDefaults: true
         }))
-
-        const url = buildPathWithUrlConfig('/women/dresses', {locale: 'en-GB', site: 'uk'})
+        const defaultLocaleRefs = ['en-GB', 'uk']
+        const url = buildPathWithUrlConfig(
+            '/women/dresses',
+            {locale: 'en-GB', site: 'uk'},
+            {defaultLocaleRefs}
+        )
         expect(url).toEqual('/uk/women/dresses?locale=en-GB')
+    })
+
+    test('return a new url with locale value as a path, site as query_param', () => {
+        getUrlConfig.mockImplementation(() => ({
+            locale: 'path',
+            site: 'query_param',
+            showDefaults: true
+        }))
+        const defaultLocaleRefs = ['en-GB', 'uk']
+        const url = buildPathWithUrlConfig(
+            '/women/dresses',
+            {locale: 'en-GB', site: 'uk'},
+            {defaultLocaleRefs}
+        )
+        expect(url).toEqual('/en-GB/women/dresses?site=uk')
+    })
+
+    test('return a new url with locale value as a path, site as query_param when showDefault is off', () => {
+        getUrlConfig.mockImplementation(() => ({
+            locale: 'path',
+            site: 'query_param',
+            showDefaults: false
+        }))
+        const defaultLocaleRefs = ['en-GB', 'uk']
+        const url = buildPathWithUrlConfig(
+            '/women/dresses',
+            {locale: 'en-GB', site: 'uk'},
+            {defaultLocaleRefs}
+        )
+        expect(url).toEqual('/women/dresses')
+    })
+
+    test('return a new url without a disallow param but respect other params', () => {
+        getUrlConfig.mockImplementation(() => ({
+            locale: 'query_param',
+            site: 'path',
+            showDefaults: true
+        }))
+        const defaultLocaleRefs = ['en-GB', 'uk']
+        const url = buildPathWithUrlConfig(
+            '/women/dresses?something=else&refine=c_color',
+            {locale: 'en-GB', site: 'uk'},
+            {defaultLocaleRefs},
+            {disallowParams: ['refine']}
+        )
+        expect(url).toEqual('/uk/women/dresses?something=else&locale=en-GB')
+    })
+
+    test('return a new url as configured when the values are not defaults and showDefault is off', () => {
+        getUrlConfig.mockImplementation(() => ({
+            locale: 'query_param',
+            site: 'path',
+            showDefaults: false
+        }))
+        const defaultLocaleRefs = ['en-GB', 'uk']
+        const url = buildPathWithUrlConfig(
+            '/women/dresses?something=else&refine=c_color',
+            {locale: 'de-DE', site: 'de'},
+            {defaultLocaleRefs},
+            {disallowParams: ['refine']}
+        )
+        expect(url).toEqual('/de/women/dresses?something=else&locale=de-DE')
     })
 
     test('throw an error when url config is not defined', () => {

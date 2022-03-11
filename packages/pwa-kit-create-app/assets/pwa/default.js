@@ -9,9 +9,10 @@ exports.template = ({commerceApi, einsteinApi}) => `module.exports = {
         "url": {
             // "site": "none",
             "locale": "none",
-            // a flag to toggle display default values (either site and locale) to display in the url
-            // if they are set to be in path or query_param 
-            // "showDefaults": false 
+            // a flag to display default values (either site and locale) to display in the url
+            // if they are set to be in path or query_param. In most cases, you might want to 
+            // set it to true.
+            // "showDefaults": true 
         },
         "defaultSite": "RefArch",
         // "siteAliases": {

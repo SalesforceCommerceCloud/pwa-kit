@@ -156,6 +156,22 @@ describe('configureRoutes', function() {
         },
         {
             urlConfig: {
+                site: 'query_param',
+                locale: 'query_param',
+                showDefaults: true
+            },
+            expectedRes: ['/', '/category/:categoryId']
+        },
+        {
+            urlConfig: {
+                site: 'query_param',
+                locale: 'query_param',
+                showDefaults: false
+            },
+            expectedRes: ['/', '/category/:categoryId']
+        },
+        {
+            urlConfig: {
                 site: 'path',
                 locale: 'path',
                 showDefaults: true

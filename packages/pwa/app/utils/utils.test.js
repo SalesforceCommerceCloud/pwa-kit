@@ -145,34 +145,40 @@ describe('getParamsFromPath', function() {
         ]
     })
     const cases = [
-        {path: '/us/en-US/', expectedRes: {site: 'us', locale: 'en-US'}},
-        {path: '/us/en-US', expectedRes: {site: 'us', locale: 'en-US'}},
-        {path: '/us/en', expectedRes: {site: 'us', locale: 'en'}},
-        {path: '/us/en/', expectedRes: {site: 'us', locale: 'en'}},
-        {path: '/RefArch/en-US/', expectedRes: {site: 'RefArch', locale: 'en-US'}},
-        {path: '/RefArch/en/', expectedRes: {site: 'RefArch', locale: 'en'}},
-        {path: '/us/en-US/category/womens', expectedRes: {site: 'us', locale: 'en-US'}},
+        {path: '/us/en-US/', expectedRes: {siteRef: 'us', localeRef: 'en-US'}},
+        {path: '/us/en-US', expectedRes: {siteRef: 'us', localeRef: 'en-US'}},
+        {path: '/us/en', expectedRes: {siteRef: 'us', localeRef: 'en'}},
+        {path: '/us/en/', expectedRes: {siteRef: 'us', localeRef: 'en'}},
+        {path: '/RefArch/en-US/', expectedRes: {siteRef: 'RefArch', localeRef: 'en-US'}},
+        {path: '/RefArch/en/', expectedRes: {siteRef: 'RefArch', localeRef: 'en'}},
+        {path: '/us/en-US/category/womens', expectedRes: {siteRef: 'us', localeRef: 'en-US'}},
         {
             path: '/RefArch/en-US/category/womens',
-            expectedRes: {site: 'RefArch', locale: 'en-US'}
+            expectedRes: {siteRef: 'RefArch', localeRef: 'en-US'}
         },
-        {path: '/en-US/category/womens', expectedRes: {site: undefined, locale: 'en-US'}},
-        {path: '/en/category/womens', expectedRes: {site: undefined, locale: 'en'}},
-        {path: '/category/womens', expectedRes: {site: undefined, locale: undefined}},
-        {path: '/en/', expectedRes: {site: undefined, locale: 'en'}},
-        {path: '/en', expectedRes: {site: undefined, locale: 'en'}},
-        {path: '/ca/', expectedRes: {site: undefined, locale: 'ca'}},
-        {path: '/ca', expectedRes: {site: undefined, locale: 'ca'}},
-        {path: '/', expectedRes: {site: undefined, locale: undefined}},
-        {path: '/?site=us', expectedRes: {site: 'us', locale: undefined}},
-        {path: '/?site=us&locale=en', expectedRes: {site: 'us', locale: 'en'}},
-        {path: '/en-US/category/womens?site=us', expectedRes: {site: 'us', locale: 'en-US'}},
-        {path: '/us/category/womens?locale=en-US', expectedRes: {site: 'us', locale: 'en-US'}},
-        {path: '/us/category/womens?locale=en', expectedRes: {site: 'us', locale: 'en'}},
-        {path: '/category/womens?site=us&locale=en-US', expectedRes: {site: 'us', locale: 'en-US'}},
+        {path: '/en-US/category/womens', expectedRes: {siteRef: undefined, localeRef: 'en-US'}},
+        {path: '/en/category/womens', expectedRes: {siteRef: undefined, localeRef: 'en'}},
+        {path: '/category/womens', expectedRes: {siteRef: undefined, localeRef: undefined}},
+        {path: '/en/', expectedRes: {siteRef: undefined, localeRef: 'en'}},
+        {path: '/en', expectedRes: {siteRef: undefined, localeRef: 'en'}},
+        {path: '/ca/', expectedRes: {siteRef: undefined, localeRef: 'ca'}},
+        {path: '/ca', expectedRes: {siteRef: undefined, localeRef: 'ca'}},
+        {path: '/', expectedRes: {site: undefined, localeRef: undefined}},
+        {path: '/?site=us', expectedRes: {siteRef: 'us', localeRef: undefined}},
+        {path: '/?site=us&locale=en', expectedRes: {siteRef: 'us', localeRef: 'en'}},
+        {path: '/en-US/category/womens?site=us', expectedRes: {siteRef: 'us', localeRef: 'en-US'}},
+        {
+            path: '/us/category/womens?locale=en-US',
+            expectedRes: {siteRef: 'us', localeRef: 'en-US'}
+        },
+        {path: '/us/category/womens?locale=en', expectedRes: {siteRef: 'us', localeRef: 'en'}},
+        {
+            path: '/category/womens?site=us&locale=en-US',
+            expectedRes: {siteRef: 'us', localeRef: 'en-US'}
+        },
         {
             path: '/category/womens?site=RefArch&locale=en-US',
-            expectedRes: {site: 'RefArch', locale: 'en-US'}
+            expectedRes: {siteRef: 'RefArch', localeRef: 'en-US'}
         }
     ]
     cases.forEach(({path, expectedRes}) => {

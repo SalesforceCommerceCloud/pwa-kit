@@ -47,7 +47,7 @@ import {BrandLogo, LocationIcon, SignoutIcon, UserIcon} from '../icons'
 
 // Others
 import {noop} from '../../utils/utils'
-import {getUrlWithLocale, categoryUrlBuilder} from '../../utils/url'
+import {getPathWithLocale, categoryUrlBuilder} from '../../utils/url'
 import useCustomer from '../../commerce-api/hooks/useCustomer'
 import LoadingSpinner from '../loading-spinner'
 
@@ -271,7 +271,7 @@ const DrawerMenu = ({isOpen, onClose = noop, onLogoClick = noop, root}) => {
                                         locales={supportedLocaleIds}
                                         onSelect={(newLocale) => {
                                             // Update the `locale` in the URL.
-                                            const newUrl = getUrlWithLocale(newLocale, {
+                                            const newUrl = getPathWithLocale(newLocale, {
                                                 disallowParams: ['refine'],
                                                 site
                                             })

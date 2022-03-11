@@ -20,13 +20,13 @@ import {
     CustomerProvider
 } from '../../commerce-api/contexts'
 import {getPreferredCurrency} from '../../utils/locale'
-import {pathToUrl} from '../../utils/url'
+import {absoluteUrl} from '../../utils/url'
 import {resolveSiteFromUrl} from '../../utils/site-utils'
-import {getParamsFromPath} from '../../utils/utils'
+import {getLocaleFromSite, getParamsFromPath} from '../../utils/utils'
 import {getConfig} from 'pwa-kit-react-sdk/ssr/universal/utils'
 
 /**
- * Returns the validated locale short code parsed from the url.
+ * Returns the validated locale ref parsed from the url.
  * @private
  * @param {object} locals the request locals (only defined when executing on the server.)
  * @param {object} site - the site to look for locale id
@@ -37,11 +37,9 @@ const getLocale = (locals = {}, site) => {
         typeof window === 'undefined'
             ? locals.originalUrl
             : `${window.location.pathname}${window.location.search}`
-    const {locale: localeIdentifier} = getParamsFromPath(path)
-    if (!localeIdentifier) return
-    const locale = site.l10n.supportedLocales.find((locale) => {
-        return locale.id === localeIdentifier || locale.alias === localeIdentifier
-    })
+    const {localeRef} = getParamsFromPath(path)
+    if (!localeRef) return
+    const locale = getLocaleFromSite(site, localeRef)
 
     return locale?.id
 }
@@ -76,7 +74,7 @@ AppConfig.restore = (locals = {}) => {
         typeof window === 'undefined'
             ? locals.originalUrl
             : `${window.location.pathname}${window.location.search}`
-    const url = pathToUrl(path)
+    const url = absoluteUrl(path)
     const site = resolveSiteFromUrl(url)
 
     const locale = getLocale(locals, site) || site.l10n.defaultLocale

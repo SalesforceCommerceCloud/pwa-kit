@@ -4,7 +4,14 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-
+/**
+ * This is a mock config to be used for all unit tests across the app
+ *
+ * By default, a generated project is single site and single locale
+ * However, it does come with multi-site, multi-locale feature.
+ * To ensure that feature quality, we created this mock config with multi-site config that will be fetched to some unit tests
+ * to make sure that the generated project could be easily extensible to multi-site
+ */
 module.exports = {
     app: {
         url: {

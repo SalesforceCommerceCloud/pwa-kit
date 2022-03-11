@@ -11,17 +11,19 @@ import {Link as SPALink, NavLink as NavSPALink} from 'react-router-dom'
 import {buildPathWithUrlConfig} from '../../utils/url'
 import useSite from '../../hooks/use-site'
 import useLocale from '../../hooks/use-locale'
+import {getLocaleRefsFromSite} from '../../utils/utils'
 
 const Link = React.forwardRef(({href, to, useNavLink = false, ...props}, ref) => {
     const _href = to || href
     const site = useSite()
     const locale = useLocale()
+    const defaultLocaleRefs = getLocaleRefsFromSite(site, site.l10n.defaultLocale)
 
     // if alias is not defined, use site id
     const updatedHref = buildPathWithUrlConfig(
         _href,
         {locale: locale.id || locale.alias, site: site.alias || site.id},
-        {site}
+        {defaultLocaleRefs}
     )
     return (
         <ChakraLink

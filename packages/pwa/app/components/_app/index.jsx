@@ -40,8 +40,13 @@ import {AddToCartModalProvider} from '../../hooks/use-add-to-cart-modal'
 import {IntlProvider} from 'react-intl'
 
 // Others
-import {watchOnlineStatus, flatten} from '../../utils/utils'
-import {homeUrlBuilder, getUrlWithLocale, pathToUrl} from '../../utils/url'
+import {
+    watchOnlineStatus,
+    flatten,
+    getLocaleRefsFromSite,
+    getLocaleFromSite
+} from '../../utils/utils'
+import {homeUrlBuilder, getPathWithLocale, absoluteUrl} from '../../utils/url'
 import {buildPathWithUrlConfig} from '../../utils/url'
 
 import {getTargetLocale, fetchTranslations, getPreferredCurrency} from '../../utils/locale'
@@ -64,12 +69,16 @@ const App = (props) => {
     const location = useLocation()
     const authModal = useAuthModal()
     const customer = useCustomer()
+
     const site = useSite()
+    const locale = getLocaleFromSite(site, targetLocale)
+    const defaultLocaleRefs = getLocaleRefsFromSite(site, site.l10n.defaultLocale)
+
     const [isOnline, setIsOnline] = useState(true)
     const styles = useStyleConfig('App')
 
     const configValues = {
-        locale: targetLocale,
+        locale: locale.id || locale.alias,
         site: site.alias || site.id
     }
 
@@ -114,7 +123,7 @@ const App = (props) => {
 
     const onLogoClick = () => {
         // Goto the home page.
-        const path = homeUrlBuilder(HOME_HREF, {locale: targetLocale, site})
+        const path = homeUrlBuilder(HOME_HREF, {locale, site})
         history.push(path)
 
         // Close the drawer.
@@ -122,7 +131,7 @@ const App = (props) => {
     }
 
     const onCartClick = () => {
-        const path = buildPathWithUrlConfig('/cart', configValues, {site})
+        const path = buildPathWithUrlConfig('/cart', configValues, {defaultLocaleRefs})
         history.push(path)
 
         // Close the drawer.
@@ -132,7 +141,7 @@ const App = (props) => {
     const onAccountClick = () => {
         // Link to account page for registered customer, open auth modal otherwise
         if (customer.isRegistered) {
-            const path = buildPathWithUrlConfig('/account', configValues, {site})
+            const path = buildPathWithUrlConfig('/account', configValues, {defaultLocaleRefs})
             history.push(path)
         } else {
             // if they already are at the login page, do not show login modal
@@ -142,7 +151,7 @@ const App = (props) => {
     }
 
     const onWishlistClick = () => {
-        const path = buildPathWithUrlConfig('/account/wishlist', configValues, {site})
+        const path = buildPathWithUrlConfig('/account/wishlist', configValues, {defaultLocaleRefs})
         history.push(path)
     }
 
@@ -183,7 +192,7 @@ const App = (props) => {
                                 <link
                                     rel="alternate"
                                     hrefLang={locale.id.toLowerCase()}
-                                    href={`${appOrigin}${getUrlWithLocale(locale.id, {
+                                    href={`${appOrigin}${getPathWithLocale(locale.id, {
                                         location,
                                         site
                                     })}`}
@@ -194,7 +203,7 @@ const App = (props) => {
                             <link
                                 rel="alternate"
                                 hrefLang={site.l10n.defaultLocale.slice(0, 2)}
-                                href={`${appOrigin}${getUrlWithLocale(site.l10n.defaultLocale, {
+                                href={`${appOrigin}${getPathWithLocale(site.l10n.defaultLocale, {
                                     location,
                                     site
                                 })}`}
@@ -277,7 +286,7 @@ App.shouldGetProps = () => {
 }
 
 App.getProps = async ({api, res}) => {
-    const site = resolveSiteFromUrl(pathToUrl(res.locals.originalUrl))
+    const site = resolveSiteFromUrl(absoluteUrl(res.locals.originalUrl))
     const l10nConfig = site.l10n
 
     const targetLocale = getTargetLocale({

@@ -22,14 +22,12 @@ export const resolveSiteFromUrl = (url) => {
     const path = `${pathname}${search}`
     let site
 
-    const {site: siteIdentifierFromUrl} = getParamsFromPath(path)
+    const {siteRef} = getParamsFromPath(path)
     const sites = getSites()
 
     // get the site identifier from the url
     // step 1: look for the site based on the site identifier (id or alias) from the url
-    site = sites.find(
-        (site) => site.id === siteIdentifierFromUrl || site.alias === siteIdentifierFromUrl
-    )
+    site = sites.find((site) => site.id === siteRef || site.alias === siteRef)
     if (site) {
         return site
     }
@@ -44,26 +42,22 @@ export const resolveSiteFromUrl = (url) => {
 }
 
 /**
- * Returns the default site based on the defaultSite value in the config
- * @returns {object} site - a site object
+ * Returns the default site based on the defaultSite value from the app config
+ * @returns {object} site - a site object from app config
  */
 export const getDefaultSite = () => {
     const {app} = getConfig()
     const sites = getSites()
-    if (!sites) {
-        throw new Error("Can't find any sites in the config. Please check your configuration")
-    }
 
     if (sites.length === 1) {
         return sites[0]
     }
 
-    // use the commerceAPIConfig.parameters.siteId as a fallback value if default site is not defined or set upt correctly
     return sites.find((site) => site.id === app.defaultSite)
 }
 
 /**
- * Return the list of sites that has included with aliases
+ * Return the list of sites that has included their respective aliases
  * @return {array} sites - site list including their aliases
  */
 export const getSites = () => {

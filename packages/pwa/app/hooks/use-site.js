@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {pathToUrl} from '../utils/url'
+import {absoluteUrl} from '../utils/url'
 import {useLocation} from 'react-router-dom'
 import {resolveSiteFromUrl} from '../utils/site-utils'
 import {useMemo} from 'react'
@@ -18,7 +18,7 @@ import {useMemo} from 'react'
 const useSite = () => {
     const {pathname, search} = useLocation()
     const site = useMemo(() => {
-        return resolveSiteFromUrl(pathToUrl(`${pathname}${search}`))
+        return resolveSiteFromUrl(absoluteUrl(`${pathname}${search}`))
     }, [pathname, search])
     return site
 }
