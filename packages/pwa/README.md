@@ -31,7 +31,7 @@ See the [Localization README.md](./app/translations/README.md) for important set
 
 ## URL Customization
 
-You can customize how storefront URLs are formatted in the you applications configuration file.
+You can customize how storefront URLs are formatted in your application's configuration file.
 
 ```json
 // config/default.js
