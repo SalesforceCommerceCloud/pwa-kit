@@ -5,12 +5,12 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 /**
- * This is a mock config to be used for all unit tests across the app
+ * This is a mock config to be used for unit tests
  *
- * By default, a generated project is single site and single locale
- * However, it does come with multi-site, multi-locale feature.
- * To ensure that feature quality, we created this mock config with multi-site config that will be fetched to some unit tests
- * to make sure that the generated project could be easily extensible to multi-site
+ * By default, a generated project is a single-site and single-locale app
+ * However, it can be extended to multi-site with multi-locale easily.
+ * To ensure that feature work correctly, we test our code with multi-site config in mind, so we created this mock config.
+ * A single-site, single-locale config is a special case of multi-site case.
  */
 module.exports = {
     app: {
