@@ -280,7 +280,6 @@ export const buildPathWithUrlConfig = (
 ) => {
     const urlConfig = getUrlConfig()
     const {disallowParams = []} = opts
-    if (!Object.values(urlConfig).length) return relativeUrl
     if (!Object.values(configValues).length) return relativeUrl
     const [pathname, search] = relativeUrl.split('?')
 

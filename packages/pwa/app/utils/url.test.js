@@ -116,6 +116,7 @@ describe('getPathWithLocale', () => {
     const site = mockConfig.app.sites[0]
     const alias = mockConfig.app.siteAliases[site.id]
     const mockSite = {...site, alias}
+    getUrlConfig.mockImplementation(() => mockConfig.app.url)
     test('getPathWithLocale returns expected for PLP', () => {
         const location = new URL('http://localhost:3000/uk/it-IT/category/newarrivals-womens')
 
