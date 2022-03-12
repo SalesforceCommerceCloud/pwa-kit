@@ -412,12 +412,12 @@ describe('buildPathWithUrlConfig', () => {
 })
 
 describe('absoluteUrl', function() {
-    test('return expected when path is an relative path', () => {
+    test('return expected when path is a relative url', () => {
         const url = absoluteUrl('/uk/en/women/dresses')
         expect(url).toEqual('https://www.example.com/uk/en/women/dresses')
     })
 
-    test('return expected when path is an relative path', () => {
+    test('return expected when path is an absolute url', () => {
         const url = absoluteUrl('https://www.example.com/uk/en/women/dresses')
         expect(url).toEqual('https://www.example.com/uk/en/women/dresses')
     })
