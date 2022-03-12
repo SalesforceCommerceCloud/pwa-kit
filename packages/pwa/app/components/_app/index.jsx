@@ -41,7 +41,7 @@ import {IntlProvider} from 'react-intl'
 
 // Others
 import {watchOnlineStatus, flatten, getLocaleFromSite} from '../../utils/utils'
-import {homeUrlBuilder, getPathWithLocale, absoluteUrl} from '../../utils/url'
+import {homeUrlBuilder, getPathWithLocale} from '../../utils/url'
 import {buildPathWithUrlConfig} from '../../utils/url'
 
 import {getTargetLocale, fetchTranslations, getPreferredCurrency} from '../../utils/locale'
@@ -280,7 +280,7 @@ App.shouldGetProps = () => {
 }
 
 App.getProps = async ({api, res}) => {
-    const site = resolveSiteFromUrl(absoluteUrl(res.locals.originalUrl))
+    const site = resolveSiteFromUrl(res.locals.originalUrl)
     const l10nConfig = site.l10n
 
     const targetLocale = getTargetLocale({

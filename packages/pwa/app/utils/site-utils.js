@@ -7,6 +7,7 @@
 
 import {getConfig} from 'pwa-kit-react-sdk/ssr/universal/utils'
 import {getParamsFromPath} from './utils'
+import {absoluteUrl} from './url'
 
 /**
  * This functions takes an url and returns a site object,
@@ -18,7 +19,7 @@ export const resolveSiteFromUrl = (url) => {
     if (!url) {
         throw new Error('url is required to find a site object.')
     }
-    const {pathname, search} = new URL(url)
+    const {pathname, search} = new URL(absoluteUrl(url))
     const path = `${pathname}${search}`
     let site
 

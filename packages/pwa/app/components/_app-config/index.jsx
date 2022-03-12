@@ -20,7 +20,6 @@ import {
     CustomerProvider
 } from '../../commerce-api/contexts'
 import {getPreferredCurrency} from '../../utils/locale'
-import {absoluteUrl} from '../../utils/url'
 import {resolveSiteFromUrl} from '../../utils/site-utils'
 import {getLocaleFromSite, getParamsFromPath} from '../../utils/utils'
 import {getConfig} from 'pwa-kit-react-sdk/ssr/universal/utils'
@@ -74,8 +73,7 @@ AppConfig.restore = (locals = {}) => {
         typeof window === 'undefined'
             ? locals.originalUrl
             : `${window.location.pathname}${window.location.search}`
-    const url = absoluteUrl(path)
-    const site = resolveSiteFromUrl(url)
+    const site = resolveSiteFromUrl(path)
 
     const locale = getLocale(locals, site) || site.l10n.defaultLocale
     const currency =

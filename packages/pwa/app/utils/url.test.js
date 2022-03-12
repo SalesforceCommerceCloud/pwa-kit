@@ -179,7 +179,7 @@ describe('homeUrlBuilder', () => {
             },
             site: defaultSiteMock,
             locale: {id: 'en-GB'},
-            expectedRes: '/uk/en-GB/'
+            expectedRes: '/'
         },
         {
             urlConfig: {
@@ -189,7 +189,7 @@ describe('homeUrlBuilder', () => {
             },
             site: defaultSiteMock,
             locale: {id: 'en-GB'},
-            expectedRes: '/?site=uk&locale=en-GB'
+            expectedRes: '/'
         },
         {
             urlConfig: {
