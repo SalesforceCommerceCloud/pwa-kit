@@ -225,7 +225,7 @@ export const getConfigMatcher = (config) => {
     const searchPatternForSite = `site=(?<site>${sites.join('|')})`
     // prettier-ignore
     // eslint-disable-next-line
-    const pathPattern = `(?:\/(?<site>${sites.join('|')}))*(?:\/(?<locale>${locales.join("|")}))*(?!\\w)`
+    const pathPattern = `(?:\/(?<site>${sites.join('|')}))?(?:\/(?<locale>${locales.join("|")}))?(?!\\w)`
     // prettier-ignore
     // eslint-disable-next-line
     const searchPatternForLocale = `locale=(?<locale>${locales.join('|')})`
