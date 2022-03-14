@@ -19,7 +19,11 @@ import {
 } from './url'
 import {getUrlConfig} from './utils'
 import mockConfig from '../../config/mocks/default'
-// import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
+
+afterEach(() => {
+    jest.clearAllMocks()
+})
+
 jest.mock('pwa-kit-react-sdk/utils/url', () => {
     const original = jest.requireActual('pwa-kit-react-sdk/utils/url')
     return {
