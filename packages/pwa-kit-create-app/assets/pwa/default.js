@@ -6,38 +6,41 @@
  */
 exports.template = ({commerceApi, einsteinApi}) => `module.exports = {
     app: {
-        "url": {
-            // "site": "none",
-            // you can set how you want your locale to display in the url as one of "path|query_param|none"
-            "locale": "none",
-            // a flag to display default values (either site and locale) to display in the url
-            // if they are set to be in path or query_param. In most cases, you might want to
-            // set it to true.
-            // "showDefaults": true
+        // Customize how your 'site' and 'locale' are displayed in the url.
+        url: {
+            // Determine where the siteRef is located. Valid values include 'path|query_param|none'. Defaults to: 'none'
+            // site: 'none',
+            // Determine where the localeRef is located. Valid values include 'path|query_param|none'. Defaults to: 'none'
+            locale: 'none',
+            // This boolean value dictates whether or not default site or locale values are shown in the url. Defaults to: false
+            // showDefaults: true
         },
-        "defaultSite": "RefArch",
-        // "siteAliases": {
-        // you can add alias to your site id
-        //     "RefArch": "us"
+        // The default site for your app. This value will be used when a siteRef could not be determined from the url
+        defaultSite: 'RefArch',
+        // Provide alias's for your sites. These will be used in place of your site id when generating paths throughout the application.
+        // siteAliases: {
+        //     RefArch: 'us'
         // },
-        "sites": [
+        // Provide the sites for your app. Each site includes site id, and its localization configuration.
+        // You can also provide alias for your locale. They will be used in place of your locale id when generating paths across the app
+        sites: [
             {
-                "id": "RefArch",
-                "l10n": {
-                    "supportedCurrencies": ["USD"],
-                    "defaultCurrency": "USD",
-                    "defaultLocale": "en-US",
-                    "supportedLocales": [
+                id: 'RefArch',
+                l10n: {
+                    supportedCurrencies: ['USD'],
+                    defaultCurrency: 'USD',
+                    defaultLocale: 'en-US',
+                    supportedLocales: [
                         {
-                            "id": "en-US",
-                            // you can add alias for your locale
-                            // "alias": "us",
-                            "preferredCurrency": "USD"
+                            id: 'en-US',
+                            // alias: 'us',
+                            preferredCurrency: 'USD'
                         }
                     ]
                 }
             }
         ],
+        // Commerce api config
         commerceAPI: {
             proxyPath: \`/mobify/proxy/${commerceApi.proxyPath}\`,
             parameters: {
@@ -47,16 +50,23 @@ exports.template = ({commerceApi, einsteinApi}) => `module.exports = {
                 siteId: '${commerceApi.siteId}'
             }
         },
+        // Einstein api config
         einsteinAPI: {
             proxyPath: \`/mobify/proxy/${einsteinApi.proxyPath}\`,
             einsteinId: '${einsteinApi.einsteinId}',
             siteId: '${einsteinApi.siteId}'
         }
     },
+    // This list contains server-side only libraries that you don't want to be compiled by webpack
     externals: [],
+    // Page not found url for your app
     pageNotFoundURL: '/page-not-found',
+    // A flag to enable server-side rendering
     ssrEnabled: true,
+    // This list defines which files are only part of the Express app
     ssrOnly: ['ssr.js', 'ssr.js.map', 'node_modules/**/*.*'],
+    // This list defines which files are made available to the Express app 
+    // and are also available available under the /mobify/bundle/ path.
     ssrShared: [
         'static/ico/favicon.ico',
         'static/robots.txt',
@@ -64,6 +74,7 @@ exports.template = ({commerceApi, einsteinApi}) => `module.exports = {
         '**/*.js.map',
         '**/*.json'
     ],
+    // Additional parameters that configure Express app behavior.
     ssrParameters: {
         ssrFunctionNodeVersion: '14.x',
         proxyConfigs: [

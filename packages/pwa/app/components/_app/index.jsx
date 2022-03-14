@@ -187,8 +187,7 @@ const App = (props) => {
                                     rel="alternate"
                                     hrefLang={locale.id.toLowerCase()}
                                     href={`${appOrigin}${getPathWithLocale(locale.id, {
-                                        location,
-                                        site
+                                        location
                                     })}`}
                                     key={locale.id}
                                 />
@@ -198,8 +197,7 @@ const App = (props) => {
                                 rel="alternate"
                                 hrefLang={site.l10n.defaultLocale.slice(0, 2)}
                                 href={`${appOrigin}${getPathWithLocale(site.l10n.defaultLocale, {
-                                    location,
-                                    site
+                                    location
                                 })}`}
                             />
                             {/* A wider fallback for user locales that the app does not support */}

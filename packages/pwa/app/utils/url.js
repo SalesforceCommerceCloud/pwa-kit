@@ -121,15 +121,13 @@ export const searchUrlBuilder = (searchTerm) => `/search?q=${searchTerm}`
  * Returns a relative URL for a locale short code.
  * Based on your app configuration, this function will replace your current locale shortCode with a new one
  *
- * @param {string} shortCode - The locale short code.
- * @param {object} [opts] - Options, if there's any.
+ * @param {String} shortCode - The locale short code.
+ * @param {Object} [opts] - Options, if there's any.
  * @param {Object} opts.location - location object to replace the default `window.location`
- * @param {Object} opts.site - a site object
- * @returns {string} - The relative URL for the specific locale.
+ * @returns {String} url - The relative URL for the specific locale.
  */
 export const getPathWithLocale = (shortCode, opts = {}) => {
     const location = opts.location ? opts.location : window.location
-    const {site} = opts
     let {siteRef, localeRef} = getParamsFromPath(`${location.pathname}${location.search}`)
     let {pathname, search} = location
 
@@ -160,7 +158,7 @@ export const getPathWithLocale = (shortCode, opts = {}) => {
             site:
                 isDefaultLocaleOfDefaultSite && isDefaultSite && isHomeRef
                     ? ''
-                    : siteRef || site.alias || site.id,
+                    : siteRef || defaultSite.alias || defaultSite.id,
             locale: isDefaultLocaleOfDefaultSite && isDefaultSite && isHomeRef ? '' : shortCode
         },
         opts
@@ -294,7 +292,7 @@ export const buildPathWithUrlConfig = (relativeUrl, configValues = {}, opts = {}
 
     const options = ['site', 'locale']
     options.forEach((option) => {
-        const position = urlConfig[option]
+        const position = urlConfig[option] || urlPartPositions.NONE
         const val = configValues[option]
         if (position === urlPartPositions.PATH) {
             // if showDefaults is false, the default value will not be show in the url

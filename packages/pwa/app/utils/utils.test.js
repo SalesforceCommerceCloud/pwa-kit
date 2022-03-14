@@ -9,6 +9,10 @@ import EventEmitter from 'events'
 import {flatten, getParamsFromPath, shallowEquals} from './utils'
 import {getSites} from './site-utils'
 
+afterEach(() => {
+    jest.resetAllMocks()
+})
+
 jest.mock('./site-utils', () => {
     const origin = jest.requireActual('./site-utils')
     return {

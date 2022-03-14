@@ -135,7 +135,7 @@ const Footer = ({...otherProps}) => {
                                     onChange={({target}) => {
                                         const newLocale = target.value
                                         setLocale(newLocale)
-                                        const newUrl = getPathWithLocale(newLocale, {site})
+                                        const newUrl = getPathWithLocale(newLocale)
                                         window.location = newUrl
                                     }}
                                     variant="filled"
