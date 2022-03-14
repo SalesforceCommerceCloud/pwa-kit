@@ -341,7 +341,7 @@ describe('buildPathWithUrlConfig', () => {
         expect(url).toEqual('/uk/en-GB/women/dresses')
     })
 
-    test('return an expected url with only locale since the showDefaults is off', () => {
+    test('return an expected url with no site, no locale for default values when the showDefaults is off', () => {
         getUrlConfig.mockImplementation(() => ({
             locale: 'path',
             site: 'path',

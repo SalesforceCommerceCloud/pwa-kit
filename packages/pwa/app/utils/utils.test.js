@@ -103,51 +103,6 @@ describe('shallow', function() {
 })
 
 describe('getParamsFromPath', function() {
-    getSites.mockImplementation(() => {
-        return [
-            {
-                id: 'RefArch',
-                alias: 'us',
-                l10n: {
-                    supportedCurrencies: ['USD'],
-                    defaultCurrency: 'USD',
-                    defaultLocale: 'en-US',
-                    supportedLocales: [
-                        {
-                            id: 'en-US',
-                            alias: 'en',
-                            preferredCurrency: 'USD'
-                        },
-                        {
-                            id: 'en-CA',
-                            alias: 'ca',
-                            preferredCurrency: 'USD'
-                        }
-                    ]
-                }
-            },
-            {
-                id: 'RefArchGlobal',
-                alias: 'global',
-                l10n: {
-                    supportedCurrencies: ['GBP', 'EUR', 'CNY', 'JPY'],
-                    defaultCurrency: 'GBP',
-                    supportedLocales: [
-                        {
-                            id: 'de-DE',
-                            preferredCurrency: 'EUR'
-                        },
-                        {
-                            id: 'en-GB',
-                            alias: 'uk',
-                            preferredCurrency: 'GBP'
-                        }
-                    ],
-                    defaultLocale: 'en-GB'
-                }
-            }
-        ]
-    })
     const cases = [
         {path: '/us/en-US/', expectedRes: {siteRef: 'us', localeRef: 'en-US'}},
         {path: '/us/en-US', expectedRes: {siteRef: 'us', localeRef: 'en-US'}},
@@ -187,55 +142,57 @@ describe('getParamsFromPath', function() {
     ]
     cases.forEach(({path, expectedRes}) => {
         test(`return expected values when path is ${path}`, () => {
+            getSites.mockImplementation(() => {
+                return [
+                    {
+                        id: 'RefArch',
+                        alias: 'us',
+                        l10n: {
+                            supportedCurrencies: ['USD'],
+                            defaultCurrency: 'USD',
+                            defaultLocale: 'en-US',
+                            supportedLocales: [
+                                {
+                                    id: 'en-US',
+                                    alias: 'en',
+                                    preferredCurrency: 'USD'
+                                },
+                                {
+                                    id: 'en-CA',
+                                    alias: 'ca',
+                                    preferredCurrency: 'USD'
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        id: 'RefArchGlobal',
+                        alias: 'global',
+                        l10n: {
+                            supportedCurrencies: ['GBP', 'EUR', 'CNY', 'JPY'],
+                            defaultCurrency: 'GBP',
+                            supportedLocales: [
+                                {
+                                    id: 'de-DE',
+                                    preferredCurrency: 'EUR'
+                                },
+                                {
+                                    id: 'en-GB',
+                                    alias: 'uk',
+                                    preferredCurrency: 'GBP'
+                                }
+                            ],
+                            defaultLocale: 'en-GB'
+                        }
+                    }
+                ]
+            })
             expect(getParamsFromPath(path)).toEqual(expectedRes)
         })
     })
 })
 
 describe('resolveLocaleFromUrl', function() {
-    getSites.mockImplementation(() => {
-        return [
-            {
-                id: 'site-1',
-                alias: 'uk',
-                l10n: {
-                    defaultLocale: 'en-GB',
-                    supportedLocales: [
-                        {
-                            id: 'en-GB',
-                            preferredCurrency: 'GBP'
-                        },
-                        {
-                            id: 'fr-FR',
-                            alias: 'fr',
-                            preferredCurrency: 'EUR'
-                        },
-                        {
-                            id: 'it-IT',
-                            preferredCurrency: 'EUR'
-                        }
-                    ]
-                }
-            },
-            {
-                id: 'site-2',
-                alias: 'us',
-                l10n: {
-                    defaultLocale: 'en-US',
-                    supportedLocales: [
-                        {
-                            id: 'en-US',
-                            preferredCurrency: 'USD'
-                        },
-                        {
-                            id: 'en-CA',
-                            preferredCurrency: 'USD'
-                        }
-                    ]
-                }
-            }
-        ]
-    })
     const cases = [
         {
             path: '/',
@@ -291,6 +248,49 @@ describe('resolveLocaleFromUrl', function() {
     ]
     cases.forEach(({path, expectedRes}) => {
         test(`returns expected locale with given path ${path}`, () => {
+            getSites.mockImplementation(() => {
+                return [
+                    {
+                        id: 'site-1',
+                        alias: 'uk',
+                        l10n: {
+                            defaultLocale: 'en-GB',
+                            supportedLocales: [
+                                {
+                                    id: 'en-GB',
+                                    preferredCurrency: 'GBP'
+                                },
+                                {
+                                    id: 'fr-FR',
+                                    alias: 'fr',
+                                    preferredCurrency: 'EUR'
+                                },
+                                {
+                                    id: 'it-IT',
+                                    preferredCurrency: 'EUR'
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        id: 'site-2',
+                        alias: 'us',
+                        l10n: {
+                            defaultLocale: 'en-US',
+                            supportedLocales: [
+                                {
+                                    id: 'en-US',
+                                    preferredCurrency: 'USD'
+                                },
+                                {
+                                    id: 'en-CA',
+                                    preferredCurrency: 'USD'
+                                }
+                            ]
+                        }
+                    }
+                ]
+            })
             const locale = resolveLocaleFromUrl(path)
             expect(locale).toEqual(expectedRes)
         })

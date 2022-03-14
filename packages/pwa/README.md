@@ -33,22 +33,88 @@ See the [Localization README.md](./app/translations/README.md) for important set
 
 You can customize how storefront URLs are formatted in your application's configuration file.
 
-```json
+```js
 // config/default.js
-{
-    "url": {
-        "locale": "path|query_param|none"
+module.exports = {
+    url: {
+        locale: 'path|query_param|none',
+        site: 'path|query_param|none',
+        showDefaults: false|true
     }
 }
 ```
-
 You can choose how the current locale appears (or doesn’t appear) in the URL by setting `url.locale` to one of the following values:
 
--   `path`: Locale is included in the URL path. Example: `/en-US/women/dress`
--   `query_param`: Locale is included as a query parameter. Example: `/women/dress?locale=en-US`
--   `none`: Locale isn’t included in the URL. Example: `/women/dress`
+- `path`: Locale is included in the URL path. Example: `/en-US/women/dress`
+- `query_param`: Locale is included as a query parameter. Example: `/women/dress?locale=en-US`
+- `none`: Locale isn’t included in the URL. Example: `/women/dress`
 
-By default, a new project is configured to include the locale in the URL path.
+`url.showDefaults`: This boolean value dictates whether the default site or locale values are shown in the url. Defaults to: false
+
+By default, a new project is configured to not include the locale and site in the URL path.
+
+## Multi-site Config
+
+By default, the Retail React App is configured to a single locale, single site project.
+However, it can be extended to run multiple sites in one single code base. 
+
+Follow these steps to set up your project to support multi-site, multi-locale 
+1. Set your url config
+- Customise your site and locale in the url 
+- Set your url showDefault to true if you want to keep your default values in the url
+2. Provide alias's for your sites. These will be used in place of your site id when generating paths throughout the application.
+3. Provide the sites for your app. Each site includes site id, and its localization configuration.
+   You can also provide alias for your locale. They will be used in place of your locale id when generating paths across the app
+
+```js
+module.exports = {
+    url: {
+        locale: 'path',
+        site: 'path',
+        showDefaults: true
+    },
+    siteAliases: {
+        'site-1': 'uk',
+        'site-2': 'us'
+    },
+    defaultSite: 'site-1',
+    sites: [
+        {
+            id: 'site-1',
+            l10n: {
+                defaultLocale: 'en-GB',
+                supportedLocales: [
+                    {
+                        id: 'en-GB',
+                        preferredCurrency: 'GBP'
+                    },
+                    {
+                        id: 'fr-FR',
+                        alias: 'fr',
+                        preferredCurrency: 'EUR'
+                    }
+                ]
+            }
+        },
+        {
+            id: 'site-2',
+            l10n: {
+                defaultLocale: 'en-US',
+                supportedLocales: [
+                    {
+                        id: 'en-US',
+                        preferredCurrency: 'USD'
+                    },
+                    {
+                        id: 'en-CA',
+                        preferredCurrency: 'USD'
+                    }
+                ]
+            }
+        }
+    ]
+}
+```
 
 ## Documentation
 
