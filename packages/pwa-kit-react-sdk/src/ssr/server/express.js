@@ -134,7 +134,7 @@ export const REMOTE_REQUIRED_ENV_VARS = [
  * @param {Boolean} [options.enableLegacyRemoteProxying=true] - When running remotely (as
  * oppsed to locally), enables legacy proxying behaviour, allowing "proxy" requests to route through
  * the express server. In the future, this behaviour and setting will be removed.
- * @param {Boolean} [options.enableBodyParser=true] - This boolean value indicates
+ * @param {Boolean} [options.enableLegacyBodyParser=true] - This boolean value indicates
  * whether or not the express server uses body-parser middleware for POST requests.
  */
 
@@ -171,7 +171,7 @@ export const createApp = (options) => {
 
         // This boolean value indicates whether or not the express
         // server uses body-parser middleware for POST requests.
-        enableBodyParser: true
+        enableLegacyBodyParser: true
     }
 
     options = Object.assign({}, defaults, options)
@@ -312,7 +312,7 @@ export const createApp = (options) => {
     // Serve this asset directly (in both remote and local modes)
     app.get('/worker.js*', serveServiceWorker)
 
-    if (options.enableBodyParser) {
+    if (options.enableLegacyBodyParser) {
         // Any path
         const rootWildcard = '/*'
 
@@ -437,6 +437,15 @@ const validateConfiguration = (options) => {
             'Legacy proxying behaviour is enabled. ' +
                 'This behaviour is deprecated and will be removed in the future.' +
                 'To disable it, pass `createApp({ enableLegacyRemoteProxying: false` })'
+        )
+    }
+
+    if (options.enableLegacyBodyParser) {
+        console.warn(
+            'The express middleware body-parser is enabled. ' +
+                'In the next major version, body-parser is no longer included in the express server. ' +
+                'You can add body-parser to your express routes manually in your project. ' +
+                'To disable it, pass `createApp({ enableLegacyBodyParser: false` })'
         )
     }
 }
