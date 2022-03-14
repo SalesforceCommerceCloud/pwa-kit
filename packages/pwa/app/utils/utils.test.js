@@ -6,7 +6,7 @@
  */
 import * as utils from './utils'
 import EventEmitter from 'events'
-import {flatten, getParamsFromPath, shallowEquals} from './utils'
+import {flatten, getParamsFromPath, resolveLocaleFromUrl, shallowEquals} from './utils'
 import {getSites} from './site-utils'
 
 afterEach(() => {
@@ -188,6 +188,111 @@ describe('getParamsFromPath', function() {
     cases.forEach(({path, expectedRes}) => {
         test(`return expected values when path is ${path}`, () => {
             expect(getParamsFromPath(path)).toEqual(expectedRes)
+        })
+    })
+})
+
+describe('resolveLocaleFromUrl', function() {
+    getSites.mockImplementation(() => {
+        return [
+            {
+                id: 'site-1',
+                alias: 'uk',
+                l10n: {
+                    defaultLocale: 'en-GB',
+                    supportedLocales: [
+                        {
+                            id: 'en-GB',
+                            preferredCurrency: 'GBP'
+                        },
+                        {
+                            id: 'fr-FR',
+                            alias: 'fr',
+                            preferredCurrency: 'EUR'
+                        },
+                        {
+                            id: 'it-IT',
+                            preferredCurrency: 'EUR'
+                        }
+                    ]
+                }
+            },
+            {
+                id: 'site-2',
+                alias: 'us',
+                l10n: {
+                    defaultLocale: 'en-US',
+                    supportedLocales: [
+                        {
+                            id: 'en-US',
+                            preferredCurrency: 'USD'
+                        },
+                        {
+                            id: 'en-CA',
+                            preferredCurrency: 'USD'
+                        }
+                    ]
+                }
+            }
+        ]
+    })
+    const cases = [
+        {
+            path: '/',
+            expectedRes: {
+                id: 'en-GB',
+                preferredCurrency: 'GBP'
+            }
+        },
+        {
+            path: '/uk/en-GB/women/dresses',
+            expectedRes: {
+                id: 'en-GB',
+                preferredCurrency: 'GBP'
+            }
+        },
+        {
+            path: '/women/dresses/?site=uk&locale=en-GB',
+            expectedRes: {
+                id: 'en-GB',
+                preferredCurrency: 'GBP'
+            }
+        },
+        {
+            path: '/uk/fr/women/dresses',
+            expectedRes: {
+                id: 'fr-FR',
+                alias: 'fr',
+                preferredCurrency: 'EUR'
+            }
+        },
+        {
+            path: '/women/dresses/?site=uk&locale=fr',
+            expectedRes: {
+                id: 'fr-FR',
+                alias: 'fr',
+                preferredCurrency: 'EUR'
+            }
+        },
+        {
+            path: '/us/en-US/women/dresses',
+            expectedRes: {
+                id: 'en-US',
+                preferredCurrency: 'USD'
+            }
+        },
+        {
+            path: '/women/dresses/?site=us&locale=en-US',
+            expectedRes: {
+                id: 'en-US',
+                preferredCurrency: 'USD'
+            }
+        }
+    ]
+    cases.forEach(({path, expectedRes}) => {
+        test(`returns expected locale with given path ${path}`, () => {
+            const locale = resolveLocaleFromUrl(path)
+            expect(locale).toEqual(expectedRes)
         })
     })
 })

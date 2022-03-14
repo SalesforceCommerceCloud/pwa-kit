@@ -6,7 +6,7 @@
  */
 
 import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
-import {getLocaleRefsFromSite, getParamsFromPath, getUrlConfig} from './utils'
+import {getLocaleByReference, getParamsFromPath, getUrlConfig} from './utils'
 import {getDefaultSite, getSites} from './site-utils'
 import {HOME_HREF, urlPartPositions} from '../constants'
 
@@ -150,19 +150,15 @@ export const getPathWithLocale = (shortCode, opts = {}) => {
     const isDefaultLocaleOfDefaultSite = shortCode === defaultSite.l10n.defaultLocale
     const isDefaultSite = siteRef === defaultSite.alias || siteRef === defaultSite.id
     // rebuild the url with new locale,
-    const newUrl = buildPathWithUrlConfig(
-        `${pathname}${search}`,
-        {
-            // By default, as for home page, when the values of site and locale belongs to the default site,
-            // they will be not shown in the url just
-            site:
-                isDefaultLocaleOfDefaultSite && isDefaultSite && isHomeRef
-                    ? ''
-                    : siteRef || defaultSite.alias || defaultSite.id,
-            locale: isDefaultLocaleOfDefaultSite && isDefaultSite && isHomeRef ? '' : shortCode
-        },
-        opts
-    )
+    const newUrl = buildPathWithUrlConfig(`${pathname}${search}`, {
+        // By default, as for home page, when the values of site and locale belongs to the default site,
+        // they will be not shown in the url just
+        site:
+            isDefaultLocaleOfDefaultSite && isDefaultSite && isHomeRef
+                ? ''
+                : siteRef || defaultSite.alias || defaultSite.id,
+        locale: isDefaultLocaleOfDefaultSite && isDefaultSite && isHomeRef ? '' : shortCode
+    })
     return newUrl
 }
 
@@ -267,8 +263,8 @@ export const buildPathWithUrlConfig = (relativeUrl, configValues = {}, opts = {}
         sites.find((site) => {
             return site.alias === configValues['site'] || site.id === configValues['site']
         }) || defaultSite
-
-    const defaultLocaleRefs = getLocaleRefsFromSite(site, site.l10n.defaultLocale)
+    const defaultLocale = getLocaleByReference(site, site.l10n.defaultLocale)
+    const defaultLocaleRefs = [defaultLocale.alias, defaultLocale.id].filter(Boolean)
     const {disallowParams = []} = opts
     if (!Object.values(configValues).length) return relativeUrl
     const [pathname, search] = relativeUrl.split('?')

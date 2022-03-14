@@ -19,29 +19,9 @@ import {
     CustomerProductListsProvider,
     CustomerProvider
 } from '../../commerce-api/contexts'
-import {getPreferredCurrency} from '../../utils/locale'
 import {resolveSiteFromUrl} from '../../utils/site-utils'
-import {getLocaleFromSite, getParamsFromPath} from '../../utils/utils'
+import {resolveLocaleFromUrl} from '../../utils/utils'
 import {getConfig} from 'pwa-kit-react-sdk/ssr/universal/utils'
-
-/**
- * Returns the validated locale ref parsed from the url.
- * @private
- * @param {object} locals the request locals (only defined when executing on the server.)
- * @param {object} site - the site to look for locale id
- * @returns {string|undefined} the locale short code
- */
-const getLocale = (locals = {}, site) => {
-    const path =
-        typeof window === 'undefined'
-            ? locals.originalUrl
-            : `${window.location.pathname}${window.location.search}`
-    const {localeRef} = getParamsFromPath(path)
-    if (!localeRef) return
-    const locale = getLocaleFromSite(site, localeRef)
-
-    return locale?.id
-}
 
 /**
  * Use the AppConfig component to inject extra arguments into the getProps
@@ -75,9 +55,8 @@ AppConfig.restore = (locals = {}) => {
             : `${window.location.pathname}${window.location.search}`
     const site = resolveSiteFromUrl(path)
 
-    const locale = getLocale(locals, site) || site.l10n.defaultLocale
-    const currency =
-        getPreferredCurrency(locale, site.l10n.supportedLocales) || site.l10n.defaultCurrency
+    const locale = resolveLocaleFromUrl(path)
+    const currency = locale.preferredCurrency || site.l10n.defaultCurrency
 
     const {app: appConfig} = getConfig()
     const apiConfig = {
@@ -87,7 +66,7 @@ AppConfig.restore = (locals = {}) => {
 
     apiConfig.parameters.siteId = site.id
 
-    locals.api = new CommerceAPI({...apiConfig, locale, currency})
+    locals.api = new CommerceAPI({...apiConfig, locale: locale.id, currency})
 }
 
 AppConfig.freeze = () => undefined

@@ -6,7 +6,7 @@
  */
 
 import {absoluteUrl} from './url'
-import {getSites} from './site-utils'
+import {getSites, resolveSiteFromUrl} from './site-utils'
 import {getConfig} from 'pwa-kit-react-sdk/ssr/universal/utils'
 
 /**
@@ -188,13 +188,14 @@ export const getParamsFromPath = (path) => {
 export const getUrlConfig = () => {
     const {app} = getConfig()
     if (!app.url) {
-        throw new Error("Can't find any valid url config. Please check your configuration file.")
+        throw new Error('Cannot find `url` key. Please check your configuration file.')
     }
     return app.url
 }
 
 /**
- * This function return the regex for matching site and locale
+ * Given your application's configuration this function returns a set of regular expressions used to match the site
+ * and locale references from an url.
  * @param config
  * @return {{searchMatcherForSite: RegExp, searchMatcherForLocale: RegExp, pathMatcher: RegExp}}
  */
@@ -240,14 +241,14 @@ export const getConfigMatcher = (config) => {
 }
 
 /**
- * Return the target locale object from a site supported locales
+ * Given a site and a locale reference, return the locale object
  * @param site - site to look for the locale
  * @param localeRef - the locale ref to look for in site supported locales
  * @return {object|undefined}
  */
-export const getLocaleFromSite = (site, localeRef) => {
+export const getLocaleByReference = (site, localeRef) => {
     if (!site) {
-        throw new Error('site is not defined')
+        throw new Error('Site is not defined. It is required to look for locale object')
     }
     return site.l10n.supportedLocales.find(
         (locale) => locale.id === localeRef || locale.alias === localeRef
@@ -255,17 +256,22 @@ export const getLocaleFromSite = (site, localeRef) => {
 }
 
 /**
- * Return all possible locale ref of a site based on o ref.
- * A ref could either be id or alias,
- * we want to know all of them if available
- * @param site
- * @param localeRef
- * @return {array} - list of possible refs of a locale (id and alias)
+ * Determine the locale object from an url
+ * If the localeRef is not found from the url, set it to default locale of the current site
+ * and use it to find the locale object
+ *
+ * @param url
+ * @return {Object} locale object
  */
-export const getLocaleRefsFromSite = (site, localeRef) => {
-    const locale = getLocaleFromSite(site, localeRef)
-    if (!locale) {
-        throw new Error("Can't find any locale base on that localeRef")
+export const resolveLocaleFromUrl = (url) => {
+    if (!url) {
+        throw new Error('Url is required to')
     }
-    return [locale?.id, locale?.alias].filter(Boolean)
+    let {localeRef} = getParamsFromPath(url)
+    const site = resolveSiteFromUrl(url)
+    if (!localeRef) {
+        localeRef = site.l10n.defaultLocale
+    }
+    const {supportedLocales} = site.l10n
+    return supportedLocales.find((locale) => locale.alias === localeRef || locale.id === localeRef)
 }

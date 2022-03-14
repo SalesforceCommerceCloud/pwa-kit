@@ -40,17 +40,18 @@ import {AddToCartModalProvider} from '../../hooks/use-add-to-cart-modal'
 import {IntlProvider} from 'react-intl'
 
 // Others
-import {watchOnlineStatus, flatten, getLocaleFromSite} from '../../utils/utils'
+import {watchOnlineStatus, flatten} from '../../utils/utils'
 import {homeUrlBuilder, getPathWithLocale} from '../../utils/url'
 import {buildPathWithUrlConfig} from '../../utils/url'
 
-import {getTargetLocale, fetchTranslations, getPreferredCurrency} from '../../utils/locale'
+import {getTargetLocale, fetchTranslations} from '../../utils/locale'
 import {DEFAULT_SITE_TITLE, HOME_HREF, THEME_COLOR} from '../../constants'
 
 import Seo from '../seo'
 import useWishlist from '../../hooks/use-wishlist'
 import useSite from '../../hooks/use-site'
 import {resolveSiteFromUrl} from '../../utils/site-utils'
+import useLocale from '../../hooks/use-locale'
 
 const DEFAULT_NAV_DEPTH = 3
 const DEFAULT_ROOT_CATEGORY = 'root'
@@ -66,7 +67,7 @@ const App = (props) => {
     const customer = useCustomer()
 
     const site = useSite()
-    const locale = getLocaleFromSite(site, targetLocale)
+    const locale = useLocale()
 
     const [isOnline, setIsOnline] = useState(true)
     const styles = useStyleConfig('App')
@@ -83,8 +84,7 @@ const App = (props) => {
 
     const {l10n} = site
     // Get the current currency to be used through out the app
-    const currency =
-        getPreferredCurrency(targetLocale, l10n.supportedLocales) || l10n.defaultCurrency
+    const currency = locale.preferredCurrency || l10n.defaultCurrency
 
     // Set up customer and basket
     useShopper({currency})

@@ -5,12 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {
-    determineTargetLocale,
-    fetchTranslations,
-    getTargetLocale,
-    getPreferredCurrency
-} from './locale'
+import {determineTargetLocale, fetchTranslations, getTargetLocale} from './locale'
 
 import {DEFAULT_LOCALE, SUPPORTED_LOCALES} from './test-utils'
 
@@ -105,17 +100,5 @@ describe('getTargetLocale', () => {
         expect(targetLocale).toBe(DEFAULT_LOCALE)
         // But the actual translation should be using the pseudo locale
         expect(messages[testId1][0].value).toMatch(/^\[!! Ṕŕíííṿâćććẏ ṔṔṔŏĺíííćẏ !!]$/)
-    })
-})
-
-describe('getCurrency', () => {
-    test('returns the preferred currency for a supported locale', () => {
-        const currency = getPreferredCurrency(SUPPORTED_LOCALES[0].id, SUPPORTED_LOCALES)
-        expect(currency).toBe(SUPPORTED_LOCALES[0].preferredCurrency)
-    })
-
-    test('returns undefined for a unsupported locale', () => {
-        const currency = getPreferredCurrency(nonSupportedLocale, SUPPORTED_LOCALES)
-        expect(currency).toBeFalsy()
     })
 })

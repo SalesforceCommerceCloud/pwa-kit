@@ -27,7 +27,6 @@ describe('useLocale', function() {
                 <MockComponent />
             </Router>
         )
-        screen.debug()
         expect(screen.getByTestId('locale')).toHaveTextContent(
             '{"id":"en-GB","preferredCurrency":"GBP"}'
         )

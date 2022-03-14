@@ -69,17 +69,6 @@ export const determineTargetLocale = (preferredLocales, supportedLocales, fallba
     return targetLocale || fallbackLocale
 }
 
-/**
- * Get the preferred currency for a given locale
- * @param locale The locale that we want the currency
- * @param supportedLocales The supported locales array that has preferredCurrency
- * @returns {string} The specific currency for the locale
- */
-export const getPreferredCurrency = (locale, supportedLocales) => {
-    return supportedLocales.find((supportedLocale) => supportedLocale.id === locale)
-        ?.preferredCurrency
-}
-
 export const MESSAGE_PROPTYPE = PropTypes.shape({
     // NOTE: defaultMessage is typically written as a string
     // but its value can be an array when it comes from the compiled AST version
