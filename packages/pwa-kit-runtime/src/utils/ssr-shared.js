@@ -14,6 +14,8 @@
  to the size of vendor.js
  */
 
+let _config
+
 /**
  * Set of valid HTTP protocols for proxying
  * @private
@@ -181,4 +183,29 @@ export const reset = () => {
     _packageMobify = undefined
     proxyConfigs = []
     ssrFiles = []
+}
+
+/**
+ * Returns the configuration object previous set. 
+ *
+ * @returns {object} - the configuration object.
+ */
+/* istanbul ignore next */
+export const getConfig = () => {
+    if (!_config) {
+        throw new Error('Ensure that you have set the configuration before getting it.')
+    }
+
+    return _config
+}
+
+/**
+ * Set the configuration object. This is done when the express
+ * application is created on the server, and when the react app 
+ * is started on the client.
+ * 
+ * @param {object} config 
+ */
+export const setConfig = (config) => {
+    _config = config
 }

@@ -8,7 +8,7 @@
 
 const path = require('path')
 const {getRuntime, serveStaticFile} = require('pwa-kit-runtime/ssr/server/express')
-const {isRemote} = require('pwa-kit-runtime/utils/ssr-server')
+const {isRemote, loadConfig} = require('pwa-kit-runtime/utils/ssr-server')
 const helmet = require('helmet')
 const pkg = require('../package.json')
 
@@ -27,7 +27,7 @@ const options = {
     manifestPath: 'static/manifest.json',
 
     // This is the value of the 'mobify' object from package.json
-    mobify: pkg.mobify,
+    mobify: loadConfig(),
 
     // The port that the local dev server listens on
     port: 3000,

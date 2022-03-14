@@ -17,7 +17,7 @@ import {ChunkExtractor} from '@loadable/server'
 import {StaticRouter as Router, matchPath} from 'react-router-dom'
 import serialize from 'serialize-javascript'
 
-import {getAssetUrl} from '../universal/utils'
+import {getAssetUrl, getConfig} from '../universal/utils'
 import DeviceContext from '../universal/device-context'
 
 import Document from '../universal/components/_document'
@@ -29,7 +29,7 @@ import Switch from '../universal/components/switch'
 import {getRoutes, routeComponent} from '../universal/components/route-component'
 import * as errors from '../universal/errors'
 import {detectDeviceType, isRemote} from 'pwa-kit-runtime/utils/ssr-server'
-import {proxyConfigs} from 'pwa-kit-runtime/utils/ssr-shared'
+import {proxyConfigs, setConfig} from 'pwa-kit-runtime/utils/ssr-shared'
 
 import sprite from 'svg-sprite-loader/runtime/sprite.build'
 
@@ -128,6 +128,15 @@ const initAppState = async ({App, component, match, route, req, res, location}) 
  * @return {Promise}
  */
 export const render = async (req, res, next) => {
+    // Get the application config which should have been stored at this point.
+    const config = getConfig()
+
+    // NOTE: We didn't have to set the config here in V1, but because the SDK is now
+    // scoped in a difference project we have to set the config value in its new scope (SDK)
+    // even though it was set in the Runtime scope. Ideally there is a better way to
+    // do this.
+    setConfig(req.app.config)
+
     // AppConfig.restore *must* come before using getRoutes() or routeComponent()
     // to inject arguments into the wrapped component's getProps methods.
     AppConfig.restore(res.locals)
@@ -165,7 +174,8 @@ export const render = async (req, res, next) => {
         route,
         req,
         res,
-        location
+        location,
+        config
     })
 
     // Step 4 - Render the App
@@ -221,7 +231,7 @@ const renderAppHtml = (req, res, error, appData) => {
 }
 
 const renderApp = (args) => {
-    const {req, res, appStateError, App, appState, location, routes} = args
+    const {req, res, appStateError, App, appState, location, routes, config} = args
     const deviceType = detectDeviceType(req)
     const extractor = new ChunkExtractor({statsFile: BUNDLES_PATH})
     const routerContext = {}
@@ -279,6 +289,7 @@ const renderApp = (args) => {
     //
     // Do *not* add to these without a very good reason - globals are a liability.
     const windowGlobals = {
+        __CONFIG__: config,
         __DEVICE_TYPE__: deviceType,
         __PRELOADED_STATE__: appState,
         __ERROR__: error,
