@@ -53,7 +53,7 @@ You can choose how the current locale appears (or doesn’t appear) in the URL b
 
 By default, a new project is configured to not include the locale and site in the URL path.
 
-## Multi-site Config
+## Multi-site configuration
 
 By default, the Retail React App is configured to a single locale, single site project.
 However, it can be extended to run multiple sites in one single code base. 
