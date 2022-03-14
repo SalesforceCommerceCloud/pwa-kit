@@ -66,7 +66,7 @@ describe('resolveSiteFromUrl', function() {
 describe('getDefaultSite', function() {
     test('returns expected default site when there is only one site in the site list', () => {
         const siteMock = {
-            site: 'site-a',
+            id: 'site-a',
             l10n: {
                 defaultLocale: 'en-GB',
                 supportedLocales: [
@@ -89,9 +89,6 @@ describe('getDefaultSite', function() {
         getConfig.mockImplementation(() => ({
             app: {
                 ...mockConfig.app,
-                siteAliases: {
-                    'site-a': 'a'
-                },
                 sites: [siteMock]
             }
         }))
