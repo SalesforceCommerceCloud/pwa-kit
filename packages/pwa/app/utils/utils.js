@@ -265,7 +265,7 @@ export const getLocaleByReference = (site, localeRef) => {
  */
 export const resolveLocaleFromUrl = (url) => {
     if (!url) {
-        throw new Error('Url is required to')
+        throw new Error('URL is required to look for the locale object')
     }
     let {localeRef} = getParamsFromPath(url)
     const site = resolveSiteFromUrl(url)

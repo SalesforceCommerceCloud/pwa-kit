@@ -17,7 +17,7 @@ import {absoluteUrl} from './url'
  */
 export const resolveSiteFromUrl = (url) => {
     if (!url) {
-        throw new Error('url is required to find a site object.')
+        throw new Error('URL is required to find a site object.')
     }
     const {pathname, search} = new URL(absoluteUrl(url))
     const path = `${pathname}${search}`
