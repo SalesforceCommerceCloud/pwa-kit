@@ -171,7 +171,7 @@ describe('createApp validates the options object', () => {
         const warn = sandbox.spy(console, 'warn')
 
         createApp(options)
-        expect(warn.calledOnce).toBe(true)
+        expect(warn.calledWith(`Favicon file ${options.faviconPath} not found`))
         sandbox.restore()
     })
 })
