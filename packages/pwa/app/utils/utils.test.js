@@ -10,7 +10,7 @@ import {flatten, getParamsFromPath, shallowEquals} from './utils'
 import {getSites} from './site-utils'
 
 afterEach(() => {
-    jest.resetAllMocks()
+    jest.clearAllMocks()
 })
 
 jest.mock('./site-utils', () => {
