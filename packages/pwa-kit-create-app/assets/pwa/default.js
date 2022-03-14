@@ -61,12 +61,13 @@ exports.template = ({commerceApi, einsteinApi}) => `module.exports = {
     externals: [],
     // Page not found url for your app
     pageNotFoundURL: '/page-not-found',
-    // A flag to enable server-side rendering
+    // Enables or disables building the files necessary for server-side rendering.
     ssrEnabled: true,
-    // This list defines which files are only part of the Express app
+    // This list determines which files are available exclusively to the server-side rendering system 
+    // and are not available through the /mobify/bundle/ path.
     ssrOnly: ['ssr.js', 'ssr.js.map', 'node_modules/**/*.*'],
-    // This list defines which files are made available to the Express app 
-    // and are also available available under the /mobify/bundle/ path.
+    // This list determines which files are available to the server-side rendering system 
+    // and available through the /mobify/bundle/ path.
     ssrShared: [
         'static/ico/favicon.ico',
         'static/robots.txt',
