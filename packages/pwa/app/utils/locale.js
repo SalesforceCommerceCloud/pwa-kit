@@ -11,8 +11,7 @@ import PropTypes from 'prop-types'
  * Dynamically import the translations/messages for a given locale
  * @param {string} locale
  * @returns {Promise<Object>} The messages (compiled in AST format) in the given locale.
- *      If locale is not found, returns the default locale's messages.
- *      If the translation file is not found, return the default messages instead.
+ *      If the translation file is not found, return an empty object (so react-intl would fall back to the inline messages)
  */
 export const fetchTranslations = async (locale) => {
     const targetLocale =
@@ -37,11 +36,11 @@ export const fetchTranslations = async (locale) => {
 }
 
 /**
- * Get the target locale, given the locales user prefer to see and the current site's l10n configuration
+ * Determine the target locale by comparing the users' preferred locales with the app's supported locales
  * @param {Object} options
  * @param {function} [options.getUserPreferredLocales] - Identify what set of locales the user prefers
- * @param {object} [options.l10nConfig] - l10n configuration object
- * @returns {string} The target locale
+ * @param {object} [options.l10nConfig] - The current site's l10n configuration object
+ * @returns {string} The target locale's short code
  */
 export const getTargetLocale = ({getUserPreferredLocales, l10nConfig = {}} = {}) => {
     const userPreferredLocales = getUserPreferredLocales ? getUserPreferredLocales() : []
