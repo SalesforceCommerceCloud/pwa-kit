@@ -134,6 +134,8 @@ export const REMOTE_REQUIRED_ENV_VARS = [
  * @param {Boolean} [options.enableLegacyRemoteProxying=true] - When running remotely (as
  * oppsed to locally), enables legacy proxying behaviour, allowing "proxy" requests to route through
  * the express server. In the future, this behaviour and setting will be removed.
+ * @param {Boolean} [options.enableLegacyBodyParser=true] - This boolean value indicates
+ * whether or not the express server uses body-parser middleware for POST requests.
  */
 
 export const createApp = (options) => {
@@ -165,7 +167,11 @@ export const createApp = (options) => {
         // be no use-case for SDK users to set this.
         strictSSL: true,
 
-        enableLegacyRemoteProxying: true
+        enableLegacyRemoteProxying: true,
+
+        // This boolean value indicates whether or not the express
+        // server uses body-parser middleware for POST requests.
+        enableLegacyBodyParser: true
     }
 
     options = Object.assign({}, defaults, options)
@@ -306,21 +312,23 @@ export const createApp = (options) => {
     // Serve this asset directly (in both remote and local modes)
     app.get('/worker.js*', serveServiceWorker)
 
-    // Any path
-    const rootWildcard = '/*'
+    if (options.enableLegacyBodyParser) {
+        // Any path
+        const rootWildcard = '/*'
 
-    // Because the app can accept POST requests, we need to include body-parser middleware.
-    app.post(rootWildcard, [
-        // application/json
-        bodyParser.json(),
-        // text/plain (defaults to utf-8)
-        bodyParser.text(),
-        // */x-www-form-urlencoded
-        bodyParser.urlencoded({
-            extended: true,
-            type: '*/x-www-form-urlencoded'
-        })
-    ])
+        // Because the app can accept POST requests, we need to include body-parser middleware.
+        app.post(rootWildcard, [
+            // application/json
+            bodyParser.json(),
+            // text/plain (defaults to utf-8)
+            bodyParser.text(),
+            // */x-www-form-urlencoded
+            bodyParser.urlencoded({
+                extended: true,
+                type: '*/x-www-form-urlencoded'
+            })
+        ])
+    }
 
     // Map favicon requests to the configured path. We always map
     // this route, because if there's no favicon configured we want
@@ -429,6 +437,15 @@ const validateConfiguration = (options) => {
             'Legacy proxying behaviour is enabled. ' +
                 'This behaviour is deprecated and will be removed in the future.' +
                 'To disable it, pass `createApp({ enableLegacyRemoteProxying: false` })'
+        )
+    }
+
+    if (options.enableLegacyBodyParser) {
+        console.warn(
+            'The express middleware body-parser is enabled. ' +
+                'In the next major version, body-parser is no longer included in the express server. ' +
+                'You can add body-parser to your express routes manually in your project. ' +
+                'To disable it, pass `createApp({ enableLegacyBodyParser: false` })'
         )
     }
 }
