@@ -60,17 +60,14 @@ However, it can be extended to run multiple sites in one single code base.
 
 Follow these steps to set up your project to support multi-site, multi-locale 
 1. Set your url config
-- Customise your site and locale in the url 
-- Set your url showDefault to true if you want to keep your default values in the url
+- Customize your site and locale in the url 
+- Set your url `showDefault` to true if you want to keep your default values in the url
 2. Provide the sites for your app. Each site includes site id, and its localization configuration.
-   You can also provide alias for your locale. They will be used in place of your locale id when generating paths across the app
-3. [Optional] Provide alias's for your sites. These will be used in place of your site id when generating paths throughout the application.
+   You can also provide an alias for your locale that will be used in place of your locale id when generating paths across the app.
+3. [Optional] Provide aliases for your sites. These will be used in place of your site id when generating paths throughout the application.
 If no alias is defined for a site, the id will be used to generate paths across application. 
 
-   *Note*:  Even if alias is defined, the URL that has id instead of the alias would still work as a mean to determine the site and locale for the app, 
-but be mindful that the generated paths will use alias. 
-   This is helpful in some cases. For example: At some time, your application URLs have id, but then you switch to use alias.
-If a user bookmarks a link that has id in the path before you deploy your change, the old bookmark link still works when you use it to your site.   
+   *Note*: URLs constructed using canonical site and locale ids are still valid URLs even when aliases are used.   
 
 ```js
 module.exports = {

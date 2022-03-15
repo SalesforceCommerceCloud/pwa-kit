@@ -37,7 +37,7 @@ export const fetchTranslations = async (locale) => {
 }
 
 /**
- * Get the target locale, given the locales user prefer to see and the current site's l10n configuration
+ * Get the target locale, given the locales the user prefers to see and the current site's l10n configuration
  * @param {Object} options
  * @param {function} [options.getUserPreferredLocales] - Identify what set of locales the user prefers
  * @param {object} [options.l10nConfig] - l10n configuration object

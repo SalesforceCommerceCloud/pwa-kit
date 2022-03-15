@@ -1,10 +1,6 @@
-/*
- * Copyright (c) 2021, salesforce.com, inc.
- * All rights reserved.
- * SPDX-License-Identifier: BSD-3-Clause
- * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
- */
-exports.template = ({commerceApi, einsteinApi}) => `module.exports = {
+// eslint-disable-next-line
+exports.template = ({commerceApi, einsteinApi}) => `const sites = require('./sites.js')
+module.exports = {
     app: {
         // Customize how your 'site' and 'locale' are displayed in the url.
         url: {
@@ -17,29 +13,12 @@ exports.template = ({commerceApi, einsteinApi}) => `module.exports = {
         },
         // The default site for your app. This value will be used when a siteRef could not be determined from the url
         defaultSite: 'RefArch',
-        // Provide alias's for your sites. These will be used in place of your site id when generating paths throughout the application.
+        // Provide aliases for your sites. These will be used in place of your site id when generating paths throughout the application.
         // siteAliases: {
         //     RefArch: 'us'
         // },
-        // Provide the sites for your app. Each site includes site id, and its localization configuration.
-        // You can also provide alias for your locale. They will be used in place of your locale id when generating paths across the app
-        sites: [
-            {
-                id: 'RefArch',
-                l10n: {
-                    supportedCurrencies: ['USD'],
-                    defaultCurrency: 'USD',
-                    defaultLocale: 'en-US',
-                    supportedLocales: [
-                        {
-                            id: 'en-US',
-                            // alias: 'us',
-                            preferredCurrency: 'USD'
-                        }
-                    ]
-                }
-            }
-        ],
+        // The sites for your app, which is imported from sites.js
+        sites,
         // Commerce api config
         commerceAPI: {
             proxyPath: \`/mobify/proxy/${commerceApi.proxyPath}\`,
