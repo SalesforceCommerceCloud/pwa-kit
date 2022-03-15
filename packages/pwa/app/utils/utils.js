@@ -170,7 +170,6 @@ export const getParamsFromPath = (path) => {
 
     const config = getConfig()
     const {pathMatcher, searchMatcherForSite, searchMatcherForLocale} = getConfigMatcher(config)
-    console.log('pathMatcher', pathMatcher)
     const pathMatch = pathname.match(pathMatcher)
     const searchMatchForSite = search.match(searchMatcherForSite)
     const searchMatchForLocale = search.match(searchMatcherForLocale)
