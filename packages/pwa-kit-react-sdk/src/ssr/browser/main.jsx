@@ -14,7 +14,7 @@ import AppConfig from '../universal/components/_app-config'
 import Switch from '../universal/components/switch'
 import {getRoutes, routeComponent} from '../universal/components/route-component'
 import {loadableReady} from '@loadable/component'
-import {setConfig} from '../universal/utils'
+import {setConfig} from 'pwa-kit-runtime/utils/ssr-shared'
 
 /* istanbul ignore next */
 export const registerServiceWorker = (url) => {

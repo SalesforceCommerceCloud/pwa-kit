@@ -20,6 +20,7 @@ import requireFromString from 'require-from-string'
 import config from '../../configs/webpack/config'
 import {loadingScreen} from './loading-screen'
 import {RemoteServerFactory} from 'pwa-kit-runtime/ssr/server/build-remote-server'
+import {setConfig} from 'pwa-kit-runtime/utils/ssr-shared'
 
 const chalk = require('chalk')
 
@@ -174,10 +175,12 @@ export const DevServerMixin = {
     },
 
     _createHandler(app) {
-        const {protocol, sslFilePath} = app.options
+        const {protocol, sslFilePath, mobify} = app.options
         const {hostname, port} = this._getDevServerHostAndPort(app.options)
 
         let server
+
+        setConfig(mobify)
 
         if (protocol === 'https') {
             const sslFile = fs.readFileSync(sslFilePath)

@@ -17,7 +17,7 @@ import {ChunkExtractor} from '@loadable/server'
 import {StaticRouter as Router, matchPath} from 'react-router-dom'
 import serialize from 'serialize-javascript'
 
-import {getAssetUrl, getConfig} from '../universal/utils'
+import {getAssetUrl} from '../universal/utils'
 import DeviceContext from '../universal/device-context'
 
 import Document from '../universal/components/_document'
@@ -29,7 +29,7 @@ import Switch from '../universal/components/switch'
 import {getRoutes, routeComponent} from '../universal/components/route-component'
 import * as errors from '../universal/errors'
 import {detectDeviceType, isRemote} from 'pwa-kit-runtime/utils/ssr-server'
-import {proxyConfigs, setConfig} from 'pwa-kit-runtime/utils/ssr-shared'
+import {proxyConfigs, getConfig, setConfig} from 'pwa-kit-runtime/utils/ssr-shared'
 
 import sprite from 'svg-sprite-loader/runtime/sprite.build'
 

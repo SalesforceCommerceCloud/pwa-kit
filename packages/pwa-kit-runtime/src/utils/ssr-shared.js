@@ -195,6 +195,7 @@ export const getConfig = () => {
     if (!_config) {
         throw new Error('Ensure that you have set the configuration before getting it.')
     }
+    console.log('getConfig: ', _config)
 
     return _config
 }
@@ -207,5 +208,6 @@ export const getConfig = () => {
  * @param {object} config 
  */
 export const setConfig = (config) => {
+    console.log('setConfig: ', config)
     _config = config
 }
