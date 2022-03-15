@@ -172,7 +172,7 @@ export const AddToCartModal = () => {
                             </Flex>
                             <Stack spacing="4">
                                 <Button
-                                    as={Link}
+                                    as="a"
                                     href={`${getAppOrigin()}/s/RefArch/cart?lang=en_US`}
                                     width="100%"
                                     variant="solid"

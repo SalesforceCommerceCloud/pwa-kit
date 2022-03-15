@@ -70,7 +70,7 @@ const CartItems = ({basket}) => {
                     })}
 
                     <Button
-                        as={Link}
+                        as="a"
                         href={`${getAppOrigin()}/s/RefArch/cart?lang=en_US`}
                         variant="link"
                         width="full"
