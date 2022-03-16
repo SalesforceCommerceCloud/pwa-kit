@@ -16,15 +16,16 @@ module.exports = {
         defaultSite: 'RefArchGlobal',
         siteAliases: {
             RefArch: 'us',
-            RefArchGlobal: 'global'
+            RefArchGlobal: 'global',
+            NTOManaged: 'nto'
         },
         sites,
         commerceAPI: {
             proxyPath: `/mobify/proxy/api`,
             parameters: {
-                clientId: 'c9c45bfd-0ed3-4aa2-9971-40f88962b836',
-                organizationId: 'f_ecom_zzrf_001',
-                shortCode: '8o7m175y',
+                clientId: '23d9e215-ec93-49ab-b03f-5aefa937fb31',
+                organizationId: 'f_ecom_zzpq_035',
+                shortCode: 'kv7kzm78',
                 siteId: 'RefArchGlobal'
             }
         },
@@ -54,7 +55,7 @@ module.exports = {
                 path: 'api'
             },
             {
-                host: 'zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com',
+                host: 'zzpq-035.sandbox.us02.dx.commercecloud.salesforce.com',
                 path: 'ocapi'
             },
             {

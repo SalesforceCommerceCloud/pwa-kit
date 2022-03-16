@@ -64,7 +64,6 @@ const Home = ({productSearchResult, isLoading}) => {
                     </h3>
                     <Button
                         mt={4}
-                        mr={4}
                         onClick={() => {
                             window.location = '/'
                         }}
@@ -74,6 +73,7 @@ const Home = ({productSearchResult, isLoading}) => {
 
                     <Button
                         mt={4}
+                        ml={4}
                         onClick={() => {
                             const link = buildPathWithUrlConfig('/', {
                                 site: 'us',
@@ -83,6 +83,19 @@ const Home = ({productSearchResult, isLoading}) => {
                         }}
                     >
                         US Site
+                    </Button>
+                    <Button
+                        mt={4}
+                        ml={4}
+                        onClick={() => {
+                            const link = buildPathWithUrlConfig('/', {
+                                site: 'nto',
+                                locale: 'en-US'
+                            })
+                            window.location = link
+                        }}
+                    >
+                        NTO Site
                     </Button>
                 </Section>
             )}

@@ -26,6 +26,36 @@ module.exports = [
         }
     },
     {
+        id: 'NTOManaged',
+        l10n: {
+            supportedCurrencies: ['USD'],
+            defaultCurrency: 'USD',
+            defaultLocale: 'en-US',
+            supportedLocales: [
+                {
+                    id: 'en-US',
+                    preferredCurrency: 'USD'
+                },
+                {
+                    id: 'zh-CN',
+                    preferredCurrency: 'USD'
+                },
+                {
+                    id: 'fr-FR',
+                    preferredCurrency: 'USD'
+                },
+                {
+                    id: 'it-IT',
+                    preferredCurrency: 'USD'
+                },
+                {
+                    id: 'ja-JP',
+                    preferredCurrency: 'USD'
+                }
+            ]
+        }
+    },
+    {
         id: 'RefArchGlobal',
         l10n: {
             supportedCurrencies: ['GBP', 'EUR', 'CNY', 'JPY'],
