@@ -8,7 +8,7 @@ import React from 'react'
 import {screen} from '@testing-library/react'
 import user from '@testing-library/user-event'
 import {rest} from 'msw'
-import {renderWithProviders, getPathname, setupMockServer} from '../../utils/test-utils'
+import {renderWithProviders, createPathWithDefaults, setupMockServer} from '../../utils/test-utils'
 import Login from '.'
 import {BrowserRouter as Router, Route} from 'react-router-dom'
 import Account from '../account'
@@ -92,13 +92,13 @@ const MockedComponent = () => {
     return (
         <Router>
             <Login />
-            <Route path={getPathname('/registration')}>
+            <Route path={createPathWithDefaults('/registration')}>
                 <Registration />
             </Route>
-            <Route path={getPathname('/reset-password')}>
+            <Route path={createPathWithDefaults('/reset-password')}>
                 <ResetPassword />
             </Route>
-            <Route path={getPathname('/account')}>
+            <Route path={createPathWithDefaults('/account')}>
                 <Account match={match} />
             </Route>
         </Router>
