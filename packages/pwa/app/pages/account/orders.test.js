@@ -9,7 +9,7 @@ import {Route, Switch} from 'react-router-dom'
 import {screen} from '@testing-library/react'
 import user from '@testing-library/user-event'
 import {rest} from 'msw'
-import {renderWithProviders, getPathname, setupMockServer} from '../../utils/test-utils'
+import {renderWithProviders, createPathWithDefaults, setupMockServer} from '../../utils/test-utils'
 import {mockOrderHistory, mockOrderProducts} from '../../commerce-api/mock-data'
 import useCustomer from '../../commerce-api/hooks/useCustomer'
 import Orders from './orders'
@@ -37,7 +37,7 @@ const MockedComponent = () => {
 
     return (
         <Switch>
-            <Route path={getPathname('/account/orders')}>
+            <Route path={createPathWithDefaults('/account/orders')}>
                 <Orders />
             </Route>
         </Switch>
@@ -57,7 +57,7 @@ beforeEach(() => {
 
     server.listen({onUnhandledRequest: 'error'})
 
-    window.history.pushState({}, 'Account', getPathname('/account/orders'))
+    window.history.pushState({}, 'Account', createPathWithDefaults('/account/orders'))
 })
 afterEach(() => {
     localStorage.clear()

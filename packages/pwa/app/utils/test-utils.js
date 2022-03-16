@@ -23,16 +23,29 @@ import {
 import {AddToCartModalContext} from '../hooks/use-add-to-cart-modal'
 import {app as appConfig} from '../../config/default'
 import {IntlProvider} from 'react-intl'
-import {DEFAULT_LOCALE, DEFAULT_CURRENCY, urlPartPositions} from '../constants'
 import {
     mockCategories as initialMockCategories,
     mockedRegisteredCustomer,
     exampleTokenReponse
 } from '../commerce-api/mock-data'
+import fallbackMessages from '../translations/compiled/en-GB.json'
+import mockConfig from '../../config/mocks/default'
 
+export const DEFAULT_LOCALE = 'en-GB'
+export const DEFAULT_CURRENCY = 'GBP'
+export const SUPPORTED_LOCALES = [
+    {
+        id: 'en-GB',
+        preferredCurrency: 'GBP'
+    },
+    {
+        id: 'de-DE',
+        preferredCurrency: 'EUR'
+    }
+]
 // Contexts
 import {CategoriesProvider, CurrencyProvider} from '../contexts'
-import {getUrlConfig} from './utils'
+import {buildPathWithUrlConfig} from './url'
 
 export const renderWithReactIntl = (node, locale = DEFAULT_LOCALE) => {
     return render(
@@ -66,7 +79,9 @@ export const TestProviders = ({
     children,
     initialBasket = null,
     initialCustomer = null,
-    initialCategories = initialMockCategories
+    initialCategories = initialMockCategories,
+    locale = DEFAULT_LOCALE,
+    messages = fallbackMessages
 }) => {
     const mounted = useRef()
     // We use this to track mounted state.
@@ -107,7 +122,7 @@ export const TestProviders = ({
     }
 
     return (
-        <IntlProvider locale={DEFAULT_LOCALE} defaultLocale={DEFAULT_LOCALE}>
+        <IntlProvider locale={locale} defaultLocale={DEFAULT_LOCALE} messages={messages}>
             <CommerceAPIProvider value={api}>
                 <CategoriesProvider categories={initialCategories}>
                     <CurrencyProvider currency={DEFAULT_CURRENCY}>
@@ -136,7 +151,9 @@ TestProviders.propTypes = {
     initialBasket: PropTypes.object,
     initialCustomer: PropTypes.object,
     initialCategories: PropTypes.element,
-    initialProductLists: PropTypes.object
+    initialProductLists: PropTypes.object,
+    messages: PropTypes.object,
+    locale: PropTypes.string
 }
 
 /**
@@ -155,16 +172,24 @@ export const renderWithProviders = (children, options) =>
     })
 
 /**
- * This is used to obtain the URL pathname that would include
- * or not include the locale shortcode in the URL according to
- * the locale type configuration set in the application configuration
- * file.
+ * This is used to construct the URL pathname that would include
+ * or not include the default locale and site identifiers in the URL according to
+ * their configuration set in config/mocks/default.js file.
+ *
  * @param path The pathname that we want to use
- * @returns {`${string|string}${string}`} URL pathname for the given path
+ * @returns {string} URL pathname for the given path
  */
-export const getPathname = (path) => {
-    const {locale: localeType} = getUrlConfig()
-    return `${localeType === urlPartPositions.PATH ? `/${DEFAULT_LOCALE}` : ''}${path}`
+export const createPathWithDefaults = (path) => {
+    const {app} = mockConfig
+    const defaultSite = app.sites.find((site) => site.id === app.defaultSite)
+    const siteAlias = app.siteAliases[defaultSite.id]
+    const defaultLocale = defaultSite.l10n.defaultLocale
+
+    const updatedPath = buildPathWithUrlConfig(path, {
+        site: siteAlias || defaultSite.id,
+        locale: defaultLocale
+    })
+    return updatedPath
 }
 
 /**

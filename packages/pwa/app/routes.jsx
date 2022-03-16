@@ -17,7 +17,6 @@ import loadable from '@loadable/component'
 
 // Components
 import {Skeleton} from '@chakra-ui/react'
-import {HOME_HREF} from './constants'
 import {configureRoutes} from './utils/routes-utils'
 import {getConfig} from 'pwa-kit-react-sdk/ssr/universal/utils'
 
@@ -100,19 +99,14 @@ const routes = [
         component: Wishlist
     },
     {
-        path: '/:locale',
-        component: Home,
-        exact: true
-    },
-    {
         path: '*',
         component: PageNotFound
     }
 ]
 
 export default () => {
-    const config = getConfig()
-    return configureRoutes(routes, config?.app?.url, {
-        ignoredRoutes: [HOME_HREF, '/callback', '/:locale', '*']
+    const {app: appConfig} = getConfig()
+    return configureRoutes(routes, appConfig.url, {
+        ignoredRoutes: ['/callback', '*']
     })
 }

@@ -10,7 +10,7 @@ import React from 'react'
 import {screen, waitFor} from '@testing-library/react'
 import user from '@testing-library/user-event'
 import {rest} from 'msw'
-import {renderWithProviders, setupMockServer} from '../../utils/test-utils'
+import {renderWithProviders, setupMockServer, createPathWithDefaults} from '../../utils/test-utils'
 import Confirmation from './confirmation'
 import {keysToCamel} from '../../commerce-api/utils'
 import useBasket from '../../commerce-api/hooks/useBasket'
@@ -210,13 +210,13 @@ beforeAll(() => {
 
     // Since we're testing some navigation logic, we are using a simple Router
     // around our component. We need to initialize the default route/path here.
-    window.history.pushState({}, 'Account', '/en-GB/account')
+    window.history.pushState({}, 'Account', createPathWithDefaults('/account'))
 })
 afterEach(() => {
     localStorage.clear()
     sessionStorage.clear()
     server.resetHandlers()
-    window.history.pushState({}, 'Account', '/en-GB/account')
+    window.history.pushState({}, 'Account', createPathWithDefaults('/account'))
 })
 afterAll(() => server.close())
 
@@ -289,6 +289,6 @@ test('Create Account form - successful submission results in redirect to the Acc
     user.click(createAccountButton)
 
     await waitFor(() => {
-        expect(window.location.pathname).toEqual('/en-GB/account')
+        expect(window.location.pathname).toEqual('/uk/en-GB/account')
     })
 })

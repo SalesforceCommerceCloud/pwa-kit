@@ -27,15 +27,17 @@ import {useIntl} from 'react-intl'
 import LinksList from '../links-list'
 import SocialIcons from '../social-icons'
 import {HideOnDesktop, HideOnMobile} from '../responsive'
-import {getUrlWithLocale} from '../../utils/url'
+import {getPathWithLocale} from '../../utils/url'
 import LocaleText from '../locale-text'
-import {getSupportedLocalesIds} from '../../utils/locale'
+import useSite from '../../hooks/use-site'
 
 const Footer = ({...otherProps}) => {
     const styles = useMultiStyleConfig('Footer')
     const intl = useIntl()
     const [locale, setLocale] = useState(intl.locale)
-    const supportedLocaleIds = getSupportedLocalesIds()
+    const site = useSite()
+    const {l10n} = site
+    const supportedLocaleIds = l10n?.supportedLocales.map((locale) => locale.id)
     const showLocaleSelector = supportedLocaleIds?.length > 1
 
     return (
@@ -119,6 +121,7 @@ const Footer = ({...otherProps}) => {
                     <HideOnDesktop>
                         <Subscribe />
                     </HideOnDesktop>
+
                     {showLocaleSelector && (
                         <Box {...styles.localeSelector}>
                             <FormControl
@@ -130,13 +133,9 @@ const Footer = ({...otherProps}) => {
                                 <Select
                                     value={locale}
                                     onChange={({target}) => {
-                                        setLocale(target.value)
-
-                                        // Update the `locale` in the URL.
-                                        const newUrl = getUrlWithLocale(target.value, {
-                                            disallowParams: ['refine']
-                                        })
-
+                                        const newLocale = target.value
+                                        setLocale(newLocale)
+                                        const newUrl = getPathWithLocale(newLocale)
                                         window.location = newUrl
                                     }}
                                     variant="filled"
@@ -155,6 +154,7 @@ const Footer = ({...otherProps}) => {
                             </FormControl>
                         </Box>
                     )}
+
                     <Divider {...styles.horizontalRule} />
 
                     <Box {...styles.bottomHalf}>

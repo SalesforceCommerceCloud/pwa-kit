@@ -27,7 +27,6 @@ import useBasket from '../commerce-api/hooks/useBasket'
 import Link from '../components/link'
 import RecommendedProducts from '../components/recommended-products'
 import {LockIcon} from '../components/icons'
-import {DEFAULT_CURRENCY} from '../constants'
 import {useVariationAttributes} from './'
 import {findImageGroupBy} from '../utils/image-groups-utils'
 
@@ -139,7 +138,7 @@ export const AddToCartModal = () => {
                                         {!!lineItemPrice &&
                                             intl.formatNumber(lineItemPrice, {
                                                 style: 'currency',
-                                                currency: currency || DEFAULT_CURRENCY
+                                                currency: currency
                                             })}
                                     </Text>
                                 </Box>
@@ -165,7 +164,7 @@ export const AddToCartModal = () => {
                                     {productSubTotal &&
                                         intl.formatNumber(productSubTotal, {
                                             style: 'currency',
-                                            currency: currency || DEFAULT_CURRENCY
+                                            currency: currency
                                         })}
                                 </Text>
                             </Flex>
