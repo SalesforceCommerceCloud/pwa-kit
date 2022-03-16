@@ -180,6 +180,7 @@ export const DevServerMixin = {
 
         let server
 
+        console.log('setConfig: (DevServerMixin) ', mobify)
         setConfig(mobify)
 
         if (protocol === 'https') {

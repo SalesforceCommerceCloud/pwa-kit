@@ -201,6 +201,7 @@ export const RemoteServerFactory = {
         const {mobify} = options
 
         // Set `config` globals
+        console.log('setConfig: (RemoteServerFactory) ', mobify)
         setConfig(mobify)
 
         // Do this first – we want compression applied to

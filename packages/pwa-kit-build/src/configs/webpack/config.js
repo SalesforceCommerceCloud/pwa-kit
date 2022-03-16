@@ -110,7 +110,8 @@ const baseConfig = (target) => {
                         'react-dom': findInProjectThenSDK('react-dom'),
                         'react-helmet': findInProjectThenSDK('react-helmet'),
                         bluebird: findInProjectThenSDK('bluebird'),
-                        'pwa-kit-runtime': findInProjectThenSDK('pwa-kit-runtime')
+                        'pwa-kit-runtime/utils/ssr-shared': findInProjectThenSDK('pwa-kit-runtime/utils/ssr-shared')
+                        // 'pwa-kit-runtime': resolve(projectDir, 'node_modules', 'pwa-kit-runtime')
                     },
                     ...(target === 'web' ? {fallback: {crypto: false}} : {})
                 },

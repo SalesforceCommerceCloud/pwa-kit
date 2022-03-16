@@ -54,6 +54,7 @@ export const start = () => {
     const locals = {}
 
     if (window.__CONFIG__) {
+        console.log('setConfig: (Browser) ', window.__CONFIG__)
         setConfig(window.__CONFIG__)
     }
 

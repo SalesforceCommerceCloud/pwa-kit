@@ -208,6 +208,5 @@ export const getConfig = () => {
  * @param {object} config 
  */
 export const setConfig = (config) => {
-    console.log('setConfig: ', config)
     _config = config
 }
