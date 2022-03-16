@@ -267,16 +267,19 @@ export const resolveLocaleFromUrl = (url) => {
     if (!url) {
         throw new Error('URL is required to look for the locale object')
     }
-    const {localeRef} = getParamsFromPath(url)
+    let {localeRef} = getParamsFromPath(url)
     const site = resolveSiteFromUrl(url)
     const {supportedLocales} = site.l10n
+    // if no localeRef is found, use the default value of the current site
+    if (!localeRef) {
+        localeRef = site.l10n.defaultLocale
+    }
     const locale = supportedLocales.find(
         (locale) => locale.alias === localeRef || locale.id === localeRef
     )
     if (locale) {
         return locale
     }
-
     // if locale is not defined, use default locale as fallback value
     const defaultLocale = site.l10n.defaultLocale
     return supportedLocales.find(
