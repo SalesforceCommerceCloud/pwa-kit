@@ -267,7 +267,6 @@ const retailReactAppPrompts = () => {
 
 const buildAnswers = ({
     projectName,
-    instanceUrl,
     clientId,
     siteId,
     organizationId,
