@@ -8,8 +8,11 @@
 const p = require('path')
 const fse = require('fs-extra')
 const program = require('commander')
+const { CloudWatchLogsClient, FilterLogEventsCommand } = require("@aws-sdk/client-cloudwatch-logs");
+const {fromCognitoIdentity} =  require("@aws-sdk/credential-providers")
 const isEmail = require('validator/lib/isEmail')
 const {execSync: _execSync} = require('child_process')
+const request = require('request')
 const scriptUtils = require('../scripts/utils')
 const uploadBundle = require('../scripts/upload.js')
 const pkg = require('../package.json')
@@ -273,6 +276,90 @@ const main = () => {
             execSync(
                 `${jest} --passWithNoTests --maxWorkers=2${args.length ? ' ' + args.join(' ') : ''}`
             )
+        })
+
+    program
+        .command('logs')
+        .description(`display logs for an environment`)
+        .requiredOption(
+            '-p, --project <project_slug>',
+            'the project slug',
+            (val) => {
+                if (!(typeof val === 'string') && val.length > 0) {
+                    throw new program.InvalidArgumentError(`"${val}" cannot be empty`)
+                } else {
+                    return val
+                }
+            }
+        )
+        .requiredOption(
+            '-e, --environment <environment_slug>',
+            'the environment slug',
+            (val) => {
+                if (!(typeof val === 'string') && val.length > 0) {
+                    throw new program.InvalidArgumentError(`"${val}" cannot be empty`)
+                } else {
+                    return val
+                }
+            }
+        )
+        .action(({project, environment}) => {
+            try {
+                const settingsPath = scriptUtils.getSettingsPath()
+                const auth = JSON.parse(fs.readFileSync(
+                    settingsPath
+                ))
+                const options = {
+                    url: `https://cloud-mahdi.mobify-staging.com/api/projects/${project}/target/${environment}/log/`,
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Authorization': `Bearer ${auth.api_key}`
+                    }
+                };
+
+                request(options, function(err, res, body) {
+                    let json = JSON.parse(body);
+                    logGroupName = json.log_group;
+                    region = json.region
+                    identityId = json.identity_id;
+                    const cloudwatch = new CloudWatchLogsClient({
+                        region,
+                        credentials: fromCognitoIdentity({
+                            identityId,
+                            logins: {
+                                "cognito-identity.amazonaws.com": json.token
+                            }
+                        })
+                    });
+                    next_token = null
+                    function loop_display_logs(){
+                        const command = new FilterLogEventsCommand({
+                            logGroupName, //: "/aws/lambda/ssr-JLVNKC4YCFG4FDSBLXREHVS3Y5CJQ6WZXGUOME5A",
+                            nextToken: next_token
+                        })
+                        cloudwatch.send(command).then(
+                            (data) => {
+                                // display logs.
+                                if(data.events.length > 0){
+                                    console.log(data.events);
+                                    next_token = data.nextToken;
+                                }
+                                setTimeout(loop_display_logs, 2000);
+                            },
+                            (error) => {
+                                // error handling.
+                                console.log('error', error)
+                            }
+                        );
+                    }
+                    loop_display_logs()
+                });
+            } catch (e) {
+                console.error('Failed to read credentials.')
+                console.error(e)
+                process.exit(1)
+            }
         })
 
     program.option('-v, --version', 'show version number').action(({version}) => {
