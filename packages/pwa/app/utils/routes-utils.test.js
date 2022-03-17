@@ -259,8 +259,6 @@ describe('configureRoutes', function() {
         jest.resetModules()
     })
 
-    console.log('test')
-
     const CompA = () => <div>This is component A</div>
     const CompC = () => <div>This is component C</div>
 
