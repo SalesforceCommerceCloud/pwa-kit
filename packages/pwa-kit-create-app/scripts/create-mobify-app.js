@@ -170,6 +170,7 @@ const runGenerator = (answers, {outputDir}) => {
 
     const commerceApi = {
         proxyPath: 'api',
+        instanceUrl: answers['commerce-api'].instanceUrl,
         clientId: answers['commerce-api'].clientId,
         organizationId: answers['commerce-api'].organizationId,
         shortCode: answers['commerce-api'].shortCode,
@@ -267,6 +268,7 @@ const retailReactAppPrompts = () => {
 
 const buildAnswers = ({
     projectName,
+    instanceUrl,
     clientId,
     siteId,
     organizationId,
@@ -283,7 +285,7 @@ const buildAnswers = ({
             version: GENERATED_PROJECT_VERSION
         },
 
-        'commerce-api': {clientId, siteId, organizationId, shortCode},
+        'commerce-api': {clientId, siteId, organizationId, shortCode, instanceUrl},
         'einstein-api': {einsteinId, siteId: einsteinSiteId || siteId}
     }
 }

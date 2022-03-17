@@ -68,7 +68,7 @@ module.exports = {
                 path: 'api'
             },
             {
-                host: 'zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com',
+                host: '${new URL(commerceApi.instanceUrl).hostname}',
                 path: 'ocapi'
             },
             {
