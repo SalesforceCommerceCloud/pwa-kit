@@ -10,7 +10,6 @@ const path = require('path')
 const {getRuntime, serveStaticFile} = require('pwa-kit-runtime/ssr/server/express')
 const {isRemote, loadConfig} = require('pwa-kit-runtime/utils/ssr-server')
 const helmet = require('helmet')
-const pkg = require('../package.json')
 
 const options = {
     // The build directory (an absolute path)

@@ -29,7 +29,7 @@ import Switch from '../universal/components/switch'
 import {getRoutes, routeComponent} from '../universal/components/route-component'
 import * as errors from '../universal/errors'
 import {detectDeviceType, isRemote} from 'pwa-kit-runtime/utils/ssr-server'
-import {proxyConfigs, getConfig} from 'pwa-kit-runtime/utils/ssr-shared'
+import {proxyConfigs, getConfig, setConfig} from 'pwa-kit-runtime/utils/ssr-shared'
 
 import sprite from 'svg-sprite-loader/runtime/sprite.build'
 
@@ -350,7 +350,15 @@ const getWindowProgressive = (req, res) => {
     }
 }
 
+// TODO: setConfig here something like this
+// const serverRenderer = ({clientStats, serverStats, mobify}) => () => {
+//     setConfig(mobify)
+//     return (req, res, next) => render(req, res, next)
+// }
+// Alternatively you can look at doing something like this:
+// https://github.com/facebook/react/blob/cae635054e17a6f107a39d328649137b83f25972/packages/react-dom/npm/index.js#L31
+
 // eslint-disable-next-line no-unused-vars
-const serverRenderer = ({clientStats, serverStats}) => (req, res, next) => render(req, res, next)
+const serverRenderer = ({clientStats, serverStats, mobify}) => (req, res, next) => render(req, res, next)
 
 export default serverRenderer

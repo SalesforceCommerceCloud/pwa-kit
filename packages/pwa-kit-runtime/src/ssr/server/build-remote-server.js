@@ -173,6 +173,7 @@ export const RemoteServerFactory = {
         // Hook for the dev-server
     },
 
+    // eslint-disable-next-line no-unused-vars
     updatePackageMobify(options) {
         updatePackageMobify(loadConfig())
     },

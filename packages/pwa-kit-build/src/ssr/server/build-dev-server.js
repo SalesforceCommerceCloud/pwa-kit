@@ -21,6 +21,7 @@ import config from '../../configs/webpack/config'
 import {loadingScreen} from './loading-screen'
 import {RemoteServerFactory} from 'pwa-kit-runtime/ssr/server/build-remote-server'
 import {setConfig} from 'pwa-kit-runtime/utils/ssr-shared'
+import { option } from 'commander'
 
 const chalk = require('chalk')
 
@@ -115,7 +116,7 @@ export const DevServerMixin = {
             })
         )
 
-        const middleware = webpackHotServerMiddleware(app.__compiler)
+        const middleware = webpackHotServerMiddleware(app.__compiler, {mobify: option.mobify})
 
         app.get('/worker.js', (req, res) => {
             const compiled = DevServerFactory._getWebpackAsset(req, 'pwa-others', 'worker.js')
@@ -179,9 +180,6 @@ export const DevServerMixin = {
         const {hostname, port} = this._getDevServerHostAndPort(app.options)
 
         let server
-
-        console.log('setConfig: (DevServerMixin) ', mobify)
-        setConfig(mobify)
 
         if (protocol === 'https') {
             const sslFile = fs.readFileSync(sslFilePath)
