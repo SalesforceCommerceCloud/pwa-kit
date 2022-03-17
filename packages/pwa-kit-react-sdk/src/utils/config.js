@@ -45,7 +45,7 @@ export const loadConfig = () => {
 
     // Combined search places.
     const searchPlaces = [
-        ...(isRemote ? targetSearchPlaces : []),
+        targetSearchPlaces,
         ...(!isRemote ? localeSearchPlaces : []),
         ...defaultSearchPlaces,
         'package.json'
