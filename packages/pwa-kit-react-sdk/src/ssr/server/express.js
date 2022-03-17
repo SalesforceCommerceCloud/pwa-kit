@@ -445,7 +445,7 @@ const validateConfiguration = (options) => {
             'The express middleware body-parser is enabled. ' +
                 'In the next major version, body-parser is no longer included in the express server. ' +
                 'You can add body-parser to your express routes manually in your project. ' +
-                'To disable it, pass `createApp({ enableLegacyBodyParser: false` })'
+                'To disable it, pass `createApp({ enableLegacyBodyParser: false })`'
         )
     }
 }
