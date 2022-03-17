@@ -47,17 +47,19 @@ export const configureRoutes = (routes = [], urlConfig, {ignoredRoutes = []}) =>
                     localePosition === urlPartPositions.PATH &&
                     sitePosition === urlPartPositions.PATH
                 ) {
-                    // construct all the routes that has both site and locale
                     siteRefs.forEach((site) => {
+                        // append the route that only has site
                         outputRoutes.push({
                             path: `/${site}${path}`,
                             ...rest
                         })
                         localeRefs.forEach((locale) => {
+                            // app the route that has both site and locale
                             outputRoutes.push({
                                 path: `/${site}/${locale}${path}`,
                                 ...rest
                             })
+                            // append the route that only has locale
                             outputRoutes.push({
                                 path: `/${locale}${path}`,
                                 ...rest
