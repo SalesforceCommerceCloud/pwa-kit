@@ -276,7 +276,7 @@ const main = () => {
                     next_token = null
                     function loop_display_logs(){
                         const command = new FilterLogEventsCommand({
-                            logGroupName, //: "/aws/lambda/ssr-JLVNKC4YCFG4FDSBLXREHVS3Y5CJQ6WZXGUOME5A",
+                            logGroupName,
                             nextToken: next_token
                         })
                         cloudwatch.send(command).then(
