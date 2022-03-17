@@ -169,14 +169,14 @@ const runGenerator = (answers, {outputDir}) => {
     const PWAKitSitesTemplate = require(`../assets/pwa/sites`).template
 
     const commerceApi = {
-        proxyPath: answers['scaffold-pwa'].mobify.ssrParameters.proxyConfigs[0].path,
+        proxyPath: 'api',
         clientId: answers['commerce-api'].clientId,
         organizationId: answers['commerce-api'].organizationId,
         shortCode: answers['commerce-api'].shortCode,
         siteId: answers['commerce-api'].siteId
     }
     const einsteinApi = {
-        proxyPath: answers['scaffold-pwa'].mobify.ssrParameters.proxyConfigs[2].path,
+        proxyPath: 'einstein',
         einsteinId: answers['einstein-api'].einsteinId,
         siteId: answers['einstein-api'].siteId || answers['commerce-api'].siteId
     }
@@ -267,7 +267,6 @@ const retailReactAppPrompts = () => {
 
 const buildAnswers = ({
     projectName,
-    instanceUrl,
     clientId,
     siteId,
     organizationId,
@@ -281,25 +280,7 @@ const buildAnswers = ({
         globals: {projectId},
         'scaffold-pwa': {
             name: projectId,
-            version: GENERATED_PROJECT_VERSION,
-            mobify: {
-                ssrParameters: {
-                    proxyConfigs: [
-                        {
-                            path: 'api',
-                            host: `${shortCode}.api.commercecloud.salesforce.com`
-                        },
-                        {
-                            path: 'ocapi',
-                            host: new URL(instanceUrl).hostname
-                        },
-                        {
-                            path: 'einstein',
-                            host: 'api.cquotient.com'
-                        }
-                    ]
-                }
-            }
+            version: GENERATED_PROJECT_VERSION
         },
 
         'commerce-api': {clientId, siteId, organizationId, shortCode},
