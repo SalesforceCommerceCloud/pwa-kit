@@ -31,7 +31,13 @@ See the [Localization README.md](./app/translations/README.md) for important set
 
 The Retail app project configurations are available in `/config` folder. The `/config/default.js` contains all default configurations related to URLs, site aliases, CommerceAPI, Einstein API, page-not-found URL, and other SSR configurations used by Managed Runtime. The `/config/sites.js` file contains configurations related the sites you have configured in Business Manager and related locale and currencies. The `sites.js` is referenced inside `default.js` using `const sites = require('./sites.js')` in the beginning.
 
-You can also use `.yml`, `.yaml`, or `.json` format to manage your configuration files. 
+The extensive configuration options allow you to,
+
+1. Use `.yml`, `.yaml`, or `.json` format to manage your configuration files. 
+3. Chose whether locale and site options available in the URL query parameters, sub-path, or not appear at all.
+4. Optionally assign aliases to locale ID and site ID. 
+5. Manage multiple business manager sites that are hosted in the same domain.
+6. Manage multiple business manager sites based on multiple domains that can be deployed to different Managed Runtime environment.
 
 ### Customize URLs
 
