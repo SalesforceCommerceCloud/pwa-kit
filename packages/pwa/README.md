@@ -1,5 +1,3 @@
-<img alt="logo" src="react-retail-app.png" />
-
 # The Retail React App
 
 The Retail React App is an isomorphic JavaScript storefront and [Progressive Web App](https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps) built using [React](https://reactjs.org/) and [Express](https://expressjs.com/). It uses a modern headless architecture that enables developers to decouple front-end code from back-end systems. It leverages popular open-source libraries in the React ecosystem, such as [Chakra UI](https://chakra-ui.com/) components, [Emotion](https://emotion.sh/docs/introduction) (CSS-in-JS), [Webpack](https://webpack.js.org/), and many more.
@@ -29,9 +27,15 @@ Now that the development server is running, you can open a browser and preview y
 
 See the [Localization README.md](./app/translations/README.md) for important setup instructions for localization.
 
-## URL Customization
+## Retail Project Configurations
 
-You can customize how storefront URLs are formatted in your application's configuration file.
+The Retail app project configurations are available in `/config` folder. The `/config/default.js` contains all default configurations related to URLs, site aliases, CommerceAPI, Einstein API, page-not-found URL, and other SSR configurations used by Managed Runtime. The `/config/sites.js` file contains configurations related the sites you have configured in Business Manager and related locale and currencies. The `sites.js` is referenced inside `default.js` using `const sites = require('./sites.js')` in the beginning.
+
+You can also use `.yml`, `.yaml`, or `.json` format to manage your configuration files. 
+
+### Customize URLs
+
+You can customize how storefront URLs are formatted in `config/default.js`. Retail application allows you to configure site alias or locale to be in path or querty parameter. You can also not have them in URL altogether. 
 
 ```js
 // config/default.js
@@ -49,75 +53,89 @@ You can choose how the current locale appears (or doesn’t appear) in the URL b
 - `query_param`: Locale is included as a query parameter. Example: `/women/dress?locale=en-US`
 - `none`: Locale isn’t included in the URL. Example: `/women/dress`
 
-`url.showDefaults`: This boolean value dictates whether the default site or locale values are shown in the url. Defaults to: false
+`url.showDefaults`: This boolean value dictates whether the default site or locale values are shown in the url. Defaults to: false. 
 
 By default, a new project is configured to not include the locale and site in the URL path.
 
-## Multi-site configuration
+### Manage Multiple B2C Commerce Sites with Same Domain
 
-By default, the Retail React App is configured to a single locale, single site project.
-However, it can be extended to run multiple sites in one single code base. 
+By default, the Retail App is configured to a single locale, single site project. However, it can be extended to run multiple sites in one single code base. 
 
-Follow these steps to set up your project to support multi-site, multi-locale 
-1. Set your url config
-- Customize your site and locale in the url 
-- Set your url `showDefault` to true if you want to keep your default values in the url
-2. Provide the sites for your app. Each site includes site id, and its localization configuration.
-   You can also provide an alias for your locale that will be used in place of your locale id when generating paths across the app.
-3. [Optional] Provide aliases for your sites. These will be used in place of your site id when generating paths throughout the application.
-If no alias is defined for a site, the id will be used to generate paths across application. 
-
-   *Note*: URLs constructed using canonical site and locale ids are still valid URLs even when aliases are used.   
+The `sites.js` file contains definition of the sites that you have configured in Business Manager. The following example shows configuration for `RefArch` and `RefArchGlobal` sites:
 
 ```js
-module.exports = {
-    url: {
-        locale: 'path',
-        site: 'path',
-        showDefaults: true
-    },
-    siteAliases: {
-        'site-1': 'uk',
-        'site-2': 'us'
-    },
-    defaultSite: 'site-1',
-    sites: [
-        {
-            id: 'site-1',
-            l10n: {
-                defaultLocale: 'en-GB',
-                supportedLocales: [
-                    {
-                        id: 'en-GB',
-                        preferredCurrency: 'GBP'
-                    },
-                    {
-                        id: 'fr-FR',
-                        alias: 'fr',
-                        preferredCurrency: 'EUR'
-                    }
-                ]
-            }
-        },
-        {
-            id: 'site-2',
-            l10n: {
-                defaultLocale: 'en-US',
-                supportedLocales: [
-                    {
-                        id: 'en-US',
-                        preferredCurrency: 'USD'
-                    },
-                    {
-                        id: 'en-CA',
-                        preferredCurrency: 'USD'
-                    }
-                ]
-            }
+\\ /config/sites.js
+
+module.exports = [
+    {
+        id: 'RefArch',
+        l10n: {
+            supportedCurrencies: ['USD'],
+            defaultCurrency: 'USD',
+            defaultLocale: 'en-US',
+            supportedLocales: [
+                {
+                    id: 'en-US',
+                    alias: 'us',
+                    preferredCurrency: 'USD'
+                },
+                {
+                    id: 'en-CA',
+                    preferredCurrency: 'USD'
+                }
+            ]
         }
-    ]
-}
+    },
+    {
+        id: 'RefArchGlobal',
+        l10n: {
+            supportedCurrencies: ['GBP', 'EUR', 'JPY'],
+            defaultCurrency: 'GBP',
+            supportedLocales: [
+                {
+                    id: 'de-DE',
+                    alias: 'de',
+                    preferredCurrency: 'EUR'
+                },
+                {
+                    id: 'en-GB',
+                    preferredCurrency: 'GBP'
+                },
+                {
+                    id: 'ja-JP',
+                    preferredCurrency: 'JPY'
+                }
+            ],
+            defaultLocale: 'en-GB'
+        }
+    }
+]
 ```
+
+Optionally, You can then map the site IDs with aliases in `/config/default.js` file and also set default site. If no alias is defined for the site, then IDs are used in URLs. 
+
+```
+\\ /config/default.js
+   
+   defaultSite: 'RefArchGlobal',
+   siteAliases: {
+       RefArch: 'us',
+       RefArchGlobal: 'global',
+       NTOManaged: 'nto'
+   },
+```
+
+If you set `url.showDefault` to `true` in `/config/default.js` file, then default locale and site are set in the URL of your Retail app. In addition to site alias, you can also configure aliases for your locale in `sites.js` file. If you configured alias, URL will reflect that instead of your locale ID. 
+
+> *Note*: URLs constructed using canonical site and locale ids are still valid URLs even when aliases are used.   
+
+### Manage Multiple B2C Site with Different Domains
+
+It is possible to manage mutliple B2C sites defined in Business Manager and deploy them over different domains using multiple Managed Runtime environments. This is done using a dedicated config file for each environment. For example, your site can be `customer.ca` and `customer.uk`, or `customer-a.com` and `customer-b.ca`. You can also customize the URL patterns further. t is possible to have `customer-1.com/us` and `customer-2.com/?locale=en_US`.
+
+You can deploy bundles to work with multiple domains using different Managed Runtime envioronment, each configured for a separate domain. The configuration mapping is done by means of unique configuration file for each Managed Runtime environment. 
+
+For example, to deploy `customer-1.com` is deployed to envioronment `env-customer-1`, and `customer-2.com` to environment `env-customer-2`, you need to create files `config/env-customer-1.js` and `config/env-customer-2.js` respectively, in place of `config/default.js`. 
 
 ## Documentation
 
