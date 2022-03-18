@@ -18,7 +18,7 @@ import webpackHotServerMiddleware from 'webpack-hot-server-middleware'
 import open from 'open'
 import requireFromString from 'require-from-string'
 import config from '../../configs/webpack/config'
-import {loadingScreen} from './loading-screen'
+import {loadingScreenHTML} from './loading-screen/index.html'
 import {RemoteServerFactory} from 'pwa-kit-runtime/ssr/server/build-remote-server'
 
 const chalk = require('chalk')
@@ -98,7 +98,7 @@ export const DevServerMixin = {
         })
 
         app.use('/__mrt', (req, res) => {
-            res.send(loadingScreen())
+            res.send(loadingScreenHTML)
         })
     },
 
