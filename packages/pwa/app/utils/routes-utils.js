@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {getDefaultSite, getSites} from './site-utils'
+import {getSites} from './site-utils'
 import {urlPartPositions} from '../constants'
 
 /**
@@ -22,7 +22,6 @@ export const configureRoutes = (routes = [], urlConfig, {ignoredRoutes = []}) =>
     if (!routes.length) return []
 
     const allSites = getSites()
-    const defaultSite = getDefaultSite()
     if (!allSites) return routes
 
     let outputRoutes = []
@@ -32,8 +31,6 @@ export const configureRoutes = (routes = [], urlConfig, {ignoredRoutes = []}) =>
         if (ignoredRoutes.includes(path)) {
             outputRoutes.push(routes[i])
         } else {
-            const showDefaults = urlConfig.showDefaults
-            const defaultSites = [defaultSite.id, defaultSite.alias]
             allSites.forEach((site) => {
                 // append site ids and aliases to an array
                 const siteRefs = [site.alias, site.id].filter(Boolean)
@@ -44,29 +41,27 @@ export const configureRoutes = (routes = [], urlConfig, {ignoredRoutes = []}) =>
                     localeRefs.push(locale.id)
                 })
                 localeRefs = localeRefs.filter(Boolean)
-                const defaultLocaleId = site.l10n.defaultLocale
-                const defaultLocaleAlias = site.l10n.supportedLocales.find(
-                    (locale) => locale.alias === defaultLocaleId
-                )
-                const allDefaults = [...defaultSites, defaultLocaleAlias, defaultLocaleId].filter(
-                    Boolean
-                )
                 const {locale: localePosition, site: sitePosition} = urlConfig
 
                 if (
                     localePosition === urlPartPositions.PATH &&
                     sitePosition === urlPartPositions.PATH
                 ) {
-                    // construct all the routes that has both site and locale
                     siteRefs.forEach((site) => {
+                        // append the route that only has site
+                        outputRoutes.push({
+                            path: `/${site}${path}`,
+                            ...rest
+                        })
                         localeRefs.forEach((locale) => {
-                            const siteIdentifier =
-                                !showDefaults && allDefaults.includes(site) ? '' : `/${site}`
-                            const localeIdentifier =
-                                !showDefaults && allDefaults.includes(locale) ? '' : `/${locale}`
-                            const newRoute = `${siteIdentifier}${localeIdentifier}${path}`
+                            // app the route that has both site and locale
                             outputRoutes.push({
-                                path: newRoute,
+                                path: `/${site}/${locale}${path}`,
+                                ...rest
+                            })
+                            // append the route that only has locale
+                            outputRoutes.push({
+                                path: `/${locale}${path}`,
                                 ...rest
                             })
                         })
@@ -79,10 +74,8 @@ export const configureRoutes = (routes = [], urlConfig, {ignoredRoutes = []}) =>
                 ) {
                     // construct the routes that only has site id or alias
                     siteRefs.forEach((site) => {
-                        const siteIdentifier =
-                            !showDefaults && allDefaults.includes(site) ? '' : `/${site}`
                         outputRoutes.push({
-                            path: `${siteIdentifier}${path}`,
+                            path: `/${site}${path}`,
                             ...rest
                         })
                     })
@@ -93,10 +86,8 @@ export const configureRoutes = (routes = [], urlConfig, {ignoredRoutes = []}) =>
                 ) {
                     // construct the routes that only has locale id or alias
                     localeRefs.forEach((locale) => {
-                        const localeIdentifier =
-                            !showDefaults && allDefaults.includes(locale) ? '' : `/${locale}`
                         outputRoutes.push({
-                            path: `${localeIdentifier}${path}`,
+                            path: `/${locale}${path}`,
                             ...rest
                         })
                     })

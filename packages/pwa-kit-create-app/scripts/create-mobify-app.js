@@ -169,14 +169,15 @@ const runGenerator = (answers, {outputDir}) => {
     const PWAKitSitesTemplate = require(`../assets/pwa/sites`).template
 
     const commerceApi = {
-        proxyPath: answers['scaffold-pwa'].mobify.ssrParameters.proxyConfigs[0].path,
+        proxyPath: 'api',
+        instanceUrl: answers['commerce-api'].instanceUrl,
         clientId: answers['commerce-api'].clientId,
         organizationId: answers['commerce-api'].organizationId,
         shortCode: answers['commerce-api'].shortCode,
         siteId: answers['commerce-api'].siteId
     }
     const einsteinApi = {
-        proxyPath: answers['scaffold-pwa'].mobify.ssrParameters.proxyConfigs[2].path,
+        proxyPath: 'einstein',
         einsteinId: answers['einstein-api'].einsteinId,
         siteId: answers['einstein-api'].siteId || answers['commerce-api'].siteId
     }
@@ -281,28 +282,10 @@ const buildAnswers = ({
         globals: {projectId},
         'scaffold-pwa': {
             name: projectId,
-            version: GENERATED_PROJECT_VERSION,
-            mobify: {
-                ssrParameters: {
-                    proxyConfigs: [
-                        {
-                            path: 'api',
-                            host: `${shortCode}.api.commercecloud.salesforce.com`
-                        },
-                        {
-                            path: 'ocapi',
-                            host: new URL(instanceUrl).hostname
-                        },
-                        {
-                            path: 'einstein',
-                            host: 'api.cquotient.com'
-                        }
-                    ]
-                }
-            }
+            version: GENERATED_PROJECT_VERSION
         },
 
-        'commerce-api': {clientId, siteId, organizationId, shortCode},
+        'commerce-api': {clientId, siteId, organizationId, shortCode, instanceUrl},
         'einstein-api': {einsteinId, siteId: einsteinSiteId || siteId}
     }
 }
