@@ -17,7 +17,7 @@ import CopyPlugin from 'copy-webpack-plugin'
 import {BundleAnalyzerPlugin} from 'webpack-bundle-analyzer'
 import LoadablePlugin from '@loadable/webpack-plugin'
 import SpeedMeasurePlugin from 'speed-measure-webpack-plugin'
-import {createModuleReplacementPlugin, PwaKitConfigPlugin} from './plugins'
+import {createModuleReplacementPlugin} from './plugins'
 
 const projectDir = process.cwd()
 const sdkDir = path.resolve(path.join(__dirname, '..', '..', '..'))
@@ -226,8 +226,7 @@ const client =
                 },
                 plugins: [
                     ...config.plugins,
-                    new LoadablePlugin({writeToDisk: true}),
-                    new PwaKitConfigPlugin()
+                    new LoadablePlugin({writeToDisk: true})
                 ]
             }
         })
