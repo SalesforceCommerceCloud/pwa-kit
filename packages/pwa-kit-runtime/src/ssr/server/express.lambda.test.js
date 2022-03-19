@@ -241,8 +241,7 @@ describe('SSRServer Lambda integration', () => {
                 port: TEST_PORT,
                 fetchAgents: {
                     https: httpsAgent
-                },
-                enableLegacyRemoteProxying: false
+                }
             }
 
             const {handler, app, server: srv} = RemoteServerFactory.createHandler(

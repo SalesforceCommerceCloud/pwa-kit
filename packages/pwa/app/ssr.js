@@ -34,9 +34,7 @@ const options = {
 
     // The protocol on which the development Express app listens.
     // Note that http://localhost is treated as a secure context for development.
-    protocol: 'http',
-
-    enableLegacyRemoteProxying: false
+    protocol: 'http'
 }
 
 const runtime = getRuntime()

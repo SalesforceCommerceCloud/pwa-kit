@@ -20,6 +20,7 @@ import requireFromString from 'require-from-string'
 import config from '../../configs/webpack/config'
 import {loadingScreen} from './loading-screen'
 import {RemoteServerFactory} from 'pwa-kit-runtime/ssr/server/build-remote-server'
+import {proxyConfigs} from 'pwa-kit-runtime/utils/ssr-shared'
 
 const chalk = require('chalk')
 
@@ -72,9 +73,12 @@ export const DevServerMixin = {
         })
     },
 
+    // eslint-disable-next-line no-unused-vars
     setupProxying(app, options) {
-        // See the remote server implementation
-        return this._setupProxying(app, options)
+        proxyConfigs.forEach((config) => {
+            app.use(config.proxyPath, config.proxy)
+            app.use(config.cachingPath, config.cachingProxy)
+        })
     },
 
     addSDKInternalHandlers(app) {

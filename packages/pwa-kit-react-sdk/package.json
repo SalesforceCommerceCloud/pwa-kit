@@ -3,9 +3,6 @@
   "version": "2.0.0-dev.2",
   "description": "A library that supports the isomorphic React rendering pipeline for Commerce Cloud Managed Runtime apps",
   "main": "dist/index.js",
-  "bin": {
-    "sdk-create-hash-manifest": "bin/create-hash-manifest.js"
-  },
   "engines": {
     "node": "^12.0.0 || ^14.0.0",
     "npm": "^6.14.4 || ^7.0.0 || ^8.0.0"

@@ -88,7 +88,6 @@ const opts = (overrides = {}) => {
         quiet: true,
         port: TEST_PORT,
         protocol: 'http',
-        enableLegacyRemoteProxying: false,
         sslFilePath: path.join(testFixtures, 'localhost.pem')
     }
     return {
