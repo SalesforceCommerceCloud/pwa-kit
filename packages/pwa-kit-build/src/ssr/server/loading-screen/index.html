@@ -1,8 +1,13 @@
 <!doctype html>
 <head>
     <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>Building Your App...</title>
     <style>
+        body {
+            padding: 0;
+            margin: 0;
+        }
         main {
             margin: 0 auto 56px auto;
             padding: 40px 20px;
@@ -50,6 +55,36 @@
             list-style: none;
             display: flex;
         }
+
+        /* tablet */
+        @media (max-width: 1024px) {
+            .gutter {
+                max-width: 32px;
+                min-width: 32px;
+            }
+        }
+
+        /* mobile, small tablet */
+        @media (max-width: 600px) {
+
+            .gutter {
+                display: none;
+            }
+            main {
+                flex-direction: column-reverse;
+                justify-content: center;
+                align-items: normal;
+                padding: 40px;
+                position: static;
+            }
+            .message, .codey {
+                flex-basis: auto;
+            }
+            .message {
+                text-align: center;
+            }
+        }
+
     </style>
 </head>
 <body>
