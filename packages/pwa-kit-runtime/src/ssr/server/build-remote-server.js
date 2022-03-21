@@ -39,7 +39,7 @@ import {RESOLVED_PROMISE} from './express'
 import http from 'http'
 import https from 'https'
 import {proxyConfigs, updatePackageMobify, setConfig} from '../../utils/ssr-shared'
-import {configureProxyConfigs, loadConfig} from '../../utils/ssr-server'
+import {configureProxyConfigs} from '../../utils/ssr-server'
 import awsServerlessExpress from 'aws-serverless-express'
 
 /**
@@ -175,7 +175,7 @@ export const RemoteServerFactory = {
 
     // eslint-disable-next-line no-unused-vars
     updatePackageMobify(options) {
-        updatePackageMobify(loadConfig())
+        updatePackageMobify(options.mobify)
     },
 
     configureProxyConfigs(options) {
@@ -198,12 +198,6 @@ export const RemoteServerFactory = {
         this.configureProxyConfigs(options)
 
         const app = this.createExpressApp(options)
-
-        const {mobify} = options
-
-        // Set `config` globals
-        console.log('setConfig: (RemoteServerFactory) ', mobify)
-        setConfig(mobify)
 
         // Do this first – we want compression applied to
         // everything when it's enabled at all.

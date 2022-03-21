@@ -29,7 +29,8 @@ import Switch from '../universal/components/switch'
 import {getRoutes, routeComponent} from '../universal/components/route-component'
 import * as errors from '../universal/errors'
 import {detectDeviceType, isRemote} from 'pwa-kit-runtime/utils/ssr-server'
-import {proxyConfigs, getConfig, setConfig} from 'pwa-kit-runtime/utils/ssr-shared'
+import {proxyConfigs} from 'pwa-kit-runtime/utils/ssr-shared'
+import {getConfig} from 'pwa-kit-runtime/utils/ssr-config'
 
 import sprite from 'svg-sprite-loader/runtime/sprite.build'
 
@@ -131,6 +132,7 @@ export const render = async (req, res, next) => {
     // Get the application config which should have been stored at this point.
     console.log('getConfig: (ReactRendering) ')
     const config = getConfig()
+    console.log('getConfig: ', config)
 
     // AppConfig.restore *must* come before using getRoutes() or routeComponent()
     // to inject arguments into the wrapped component's getProps methods.
@@ -169,8 +171,7 @@ export const render = async (req, res, next) => {
         route,
         req,
         res,
-        location,
-        config
+        location
     })
 
     // Step 4 - Render the App
@@ -182,7 +183,8 @@ export const render = async (req, res, next) => {
         routes,
         req,
         res,
-        location
+        location,
+        config
     }
     try {
         renderResult = renderApp(args)
@@ -292,7 +294,7 @@ const renderApp = (args) => {
         // client-side code depends on it. Maintain its name out of tradition.
         Progressive: getWindowProgressive(req, res)
     }
-
+    console.log('__CONFIG__: ', config)
     const scripts = [
         <script
             id="mobify-data"

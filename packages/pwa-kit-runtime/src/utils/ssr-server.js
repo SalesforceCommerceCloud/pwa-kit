@@ -7,7 +7,6 @@
 /**
  * @module progressive-web-sdk/utils/ssr-server
  */
-import {cosmiconfigSync} from 'cosmiconfig'
 import crypto from 'crypto'
 import http from 'http'
 import https from 'https'
@@ -1373,36 +1372,4 @@ export class PerformanceTimer {
         /* istanbul ignore next */
         return performance
     }
-}
-
-export const loadConfig = () => {
-
-    const isRemote = Object.prototype.hasOwnProperty.call(process.env, 'AWS_LAMBDA_FUNCTION_NAME')
-    let moduleName = process?.env?.DEPLOY_TARGET || ''
-
-    // Match config files based on the specificity from most to most general.
-    const explorerSync = cosmiconfigSync(moduleName, {
-        packageProp: 'mobify',
-        searchPlaces: [
-            `config/${moduleName}.yml`,
-            `config/${moduleName}.yaml`,
-            `config/${moduleName}.json`,
-            `config/local.yml`,
-            `config/local.yaml`,
-            `config/local.json`,
-            `config/default.yml`,
-            `config/default.yaml`,
-            `config/default.json`,
-            `package.json`
-        ].map((path) => (isRemote ? `build/${path}` : path))
-    })
-
-    // Load the config synchronously using a custom "searchPlaces".
-    const {config} = explorerSync.search() || {}
-
-    if (!config) {
-        throw new Error('Application configuration not found!')
-    }
-
-    return config
 }

@@ -111,7 +111,6 @@ const baseConfig = (target) => {
                         'react-helmet': findInProjectThenSDK('react-helmet'),
                         bluebird: findInProjectThenSDK('bluebird'),
                         'pwa-kit-runtime/utils/ssr-shared': findInProjectThenSDK('pwa-kit-runtime/utils/ssr-shared')
-                        // 'pwa-kit-runtime': resolve(projectDir, 'node_modules', 'pwa-kit-runtime')
                     },
                     ...(target === 'web' ? {fallback: {crypto: false}} : {})
                 },
@@ -120,6 +119,7 @@ const baseConfig = (target) => {
                     new webpack.DefinePlugin({
                         DEBUG,
                         NODE_ENV: `'${process.env.NODE_ENV}'`,
+                        TARGET: `'${target}'`,
                         ['global.GENTLY']: false
                     }),
 
@@ -200,7 +200,7 @@ const withChunking = (config) => {
                     vendor: {
                         // Anything imported from node_modules lands in
                         // vendor.js, if we're chunking.
-                        test: /node_modules/,
+                        test: /node_modules\/(?!cosmiconfig)/,
                         name: 'vendor',
                         chunks: 'all'
                     }
@@ -229,7 +229,10 @@ const client =
                 plugins: [
                     ...config.plugins,
                     new LoadablePlugin({writeToDisk: true})
-                ]
+                ],
+                externals: {
+                    cosmiconfig: 'cosmiconfig'
+                }
             }
         })
         .build()
