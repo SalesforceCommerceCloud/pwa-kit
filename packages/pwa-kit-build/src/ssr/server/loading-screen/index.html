@@ -123,7 +123,7 @@
     <main>
         <div class="gutter"></div>
         <div class="message">
-            <div class="js-rotating-headings">
+            <div class="js-rotating-headings" data-interval-in-seconds="5">
                 <h1>Building your app...</h1>
                 <h1>Work, work, work</h1>
                 <h1>Build, build, build</h1>
@@ -178,37 +178,62 @@
 
 
     <script>
-        // Fisher–Yates shuffle
-        const shuffle = (array) => {
-            const a = [...array]
-            for (let i = a.length - 1; i >= 1; i--) {
-               let j = Math.floor(Math.random() * (i + 1)); // 0 <= j <= i
-               let temp = a[j];
-               a[j] = a[i];
-               a[i] = temp;
+        (function() {
+            // Fisher–Yates shuffle
+            const shuffle = (array) => {
+                const a = [...array]
+                for (let i = a.length - 1; i >= 1; i--) {
+                   let j = Math.floor(Math.random() * (i + 1)); // 0 <= j <= i
+                   let temp = a[j];
+                   a[j] = a[i];
+                   a[i] = temp;
+                }
+                return a
             }
-            return a
-        }
 
-        const hideAll = ($facts) => $facts.forEach(($fact) => $fact.setAttribute('hidden', 'hidden'))
-        const show = ($fact) => $fact.removeAttribute('hidden')
+            const hideAll = ($facts) => $facts.forEach(($fact) => $fact.setAttribute('hidden', 'hidden'))
+            const show = ($fact) => $fact.removeAttribute('hidden')
 
-        const $container = document.querySelector('.js-random-fun-facts')
-        const $funFacts = shuffle(Array(...document.querySelectorAll('.js-random-fun-facts > *')))
+            const $container = document.querySelector('.js-random-fun-facts')
+            const $funFacts = shuffle(Array(...document.querySelectorAll('.js-random-fun-facts > *')))
 
-        let i = 0
-        hideAll($funFacts)
-        show($funFacts[i])
-
-        const interval = parseInt($container.dataset.intervalInSeconds) || 30
-        setInterval(() => {
+            let i = 0
             hideAll($funFacts)
-
-            // increment if hasn't reached the end
-            i = (i + 1 !== $funFacts.length) ? i + 1 : 0
             show($funFacts[i])
 
-        }, interval * 1000)
+            const interval = parseInt($container.dataset.intervalInSeconds) || 30
+            setInterval(() => {
+                hideAll($funFacts)
+
+                // increment if hasn't reached the end
+                i = (i + 1 !== $funFacts.length) ? i + 1 : 0
+                show($funFacts[i])
+
+            }, interval * 1000)
+        })()
+    </script>
+
+    <script>
+        (function() {
+            const $container = document.querySelector('.js-rotating-headings')
+            const $headings = Array(...$container.children)
+
+            const hideAll = ($headings) => $headings.forEach(($heading) => $heading.setAttribute('hidden', 'hidden'))
+            const show = ($heading) => $heading.removeAttribute('hidden')
+
+            hideAll($headings)
+            let i = 0
+            show($headings[i])
+
+            const interval = parseInt($container.dataset.intervalInSeconds) || 5
+            setInterval(() => {
+                hideAll($headings)
+
+                // increment if hasn't reached the end
+                i = (i + 1 !== $headings.length) ? i + 1 : 0
+                show($headings[i])
+            }, interval * 1000)
+        })()
     </script>
 
     <script>
