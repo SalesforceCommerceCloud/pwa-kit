@@ -31,7 +31,7 @@ See the [Localization README.md](./app/translations/README.md) for important set
 
 By default the Retail React App's configuration is located within the `app/config` folder, and more specifically the `default.js` file. Within this file you can make changes to how your application runs on the Managed Runtime via your SSR options like `ssrParameters`, `pageNotFoundURL`, etc. Similarly you can make changes to how your Retail React App works by changing the configuration options under the `app` key. Some of those options are your Commerce API and Einstein API connection strings, your URL settings, and site and site alias configurations.
 
-We have taken it upon ourselves to extract the sites configured for you application into its own file called `config/sites.js`. This will allow you to more easily synchronize the sites supported by your Retail React App and those defined in your Business Manager backend. But you can define your sites directly in the main configuration file is you so choose. 
+We extract the sites configured for you application into its own file called `config/sites.js`. This allows you to more easily synchronize the sites supported by your Retail App and those defined in your Business Manager backend. But you can define your sites directly in the main configuration file is you so choose. 
 
 The extensive configuration options allow you to,
 
@@ -40,6 +40,19 @@ The extensive configuration options allow you to,
 4. Optionally assign aliases to locale ID and site ID. 
 5. Manage multiple business manager sites that are hosted in the same domain.
 6. Manage multiple business manager sites based on multiple domains that can be deployed to different Managed Runtime environment.
+
+### Dedicated Configuration Files
+
+At project generation a single `default` configuration is created. For most cases a single configuration file will get the job done. But there are times where you want to have a different configuration for a different environment. These environments for example could be, a developers local machine, a remote `production` environment, or a remote `staging` environment. In all these cases you want to use a different configuration for each. 
+
+To achieve this the way in which we resolve what configuration file to use is done in the following way. First, we check to see if there is a config file named after your remote Managed Runtime environment, if none it found we'll then look for a `local` configuration (only if we are running on a developers machine), finally if we still don't find a configuration, we'll load the `default` config file `config/default.js`.
+
+This allows you do these but not limited to things:
+
+- Each developer can have their own configuration, connection to their own Commerce API sandboxes.
+- Deploy a single codebase application to multiple environments with their own specific configurations (Multiple B2C Site with Different Domains).
+
+Furthermore, your configurations can be written in any of the following languages, `.js`, `.yml`, `.yaml`, or `.json`. And will be marched based on that priority.  
 
 ### Customize URLs
 
