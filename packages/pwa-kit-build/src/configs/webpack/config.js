@@ -179,6 +179,7 @@ const baseConfig = (target) => {
         }
 
         build() {
+            console.log('BUILD: ', this.config.name, JSON.stringify(this.config))
             return this.config
         }
     }
@@ -229,10 +230,7 @@ const client =
                 plugins: [
                     ...config.plugins,
                     new LoadablePlugin({writeToDisk: true})
-                ],
-                externals: {
-                    cosmiconfig: 'cosmiconfig'
-                }
+                ]
             }
         })
         .build()
