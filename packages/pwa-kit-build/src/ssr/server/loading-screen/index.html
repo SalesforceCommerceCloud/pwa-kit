@@ -176,9 +176,25 @@
         </ul>
     </footer>
 
-
     <script>
         (function() {
+            const hideAll = ($els) => $els.forEach(($el) => $el.setAttribute('hidden', 'hidden'))
+            const show = ($el) => $el.removeAttribute('hidden')
+
+            const showInRotation = ($els, interval) => {
+                hideAll($els)
+                let i = 0
+                show($els[i])
+
+                setInterval(() => {
+                    hideAll($els)
+
+                    // increment if hasn't reached the end
+                    i = (i + 1 !== $els.length) ? i + 1 : 0
+                    show($els[i])
+                }, interval * 1000)
+            }
+
             // Fisher–Yates shuffle
             const shuffle = (array) => {
                 const a = [...array]
@@ -191,48 +207,16 @@
                 return a
             }
 
-            const hideAll = ($facts) => $facts.forEach(($fact) => $fact.setAttribute('hidden', 'hidden'))
-            const show = ($fact) => $fact.removeAttribute('hidden')
+            const $container1 = document.querySelector('.js-random-fun-facts')
+            const $funFacts = shuffle(Array(...$container1.children))
+            const interval1 = parseInt($container1.dataset.intervalInSeconds) || 30
 
-            const $container = document.querySelector('.js-random-fun-facts')
-            const $funFacts = shuffle(Array(...document.querySelectorAll('.js-random-fun-facts > *')))
+            const $container2 = document.querySelector('.js-rotating-headings')
+            const $headings = Array(...$container2.children)
+            const interval2 = parseInt($container2.dataset.intervalInSeconds) || 5
 
-            let i = 0
-            hideAll($funFacts)
-            show($funFacts[i])
-
-            const interval = parseInt($container.dataset.intervalInSeconds) || 30
-            setInterval(() => {
-                hideAll($funFacts)
-
-                // increment if hasn't reached the end
-                i = (i + 1 !== $funFacts.length) ? i + 1 : 0
-                show($funFacts[i])
-
-            }, interval * 1000)
-        })()
-    </script>
-
-    <script>
-        (function() {
-            const $container = document.querySelector('.js-rotating-headings')
-            const $headings = Array(...$container.children)
-
-            const hideAll = ($headings) => $headings.forEach(($heading) => $heading.setAttribute('hidden', 'hidden'))
-            const show = ($heading) => $heading.removeAttribute('hidden')
-
-            hideAll($headings)
-            let i = 0
-            show($headings[i])
-
-            const interval = parseInt($container.dataset.intervalInSeconds) || 5
-            setInterval(() => {
-                hideAll($headings)
-
-                // increment if hasn't reached the end
-                i = (i + 1 !== $headings.length) ? i + 1 : 0
-                show($headings[i])
-            }, interval * 1000)
+            showInRotation($funFacts, interval1)
+            showInRotation($headings, interval2)
         })()
     </script>
 
