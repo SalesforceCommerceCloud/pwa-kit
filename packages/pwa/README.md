@@ -39,7 +39,7 @@ The extensive configuration options allow you to,
 3. Chose whether locale and site options available in the URL query parameters, sub-path, or not appear at all.
 4. Optionally assign aliases to locale ID and site ID. 
 5. Manage multiple business manager sites that are hosted in the same domain.
-6. Manage multiple business manager sites based on multiple domains that can be deployed to different Managed Runtime environment.
+6. Manage multiple business manager sites based on multiple domains that can be deployed to different Managed Runtime environments.
 
 ### Dedicated Configuration Files
 
