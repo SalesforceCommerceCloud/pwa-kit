@@ -6,6 +6,5 @@
  */
 
 export const getConfig = () => {
-    console.log('EXECUTING CLIENT IMPLEMENTATION')
     return window.__CONFIG__
 }

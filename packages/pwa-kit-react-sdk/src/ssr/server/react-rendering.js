@@ -130,9 +130,7 @@ const initAppState = async ({App, component, match, route, req, res, location}) 
  */
 export const render = async (req, res, next) => {
     // Get the application config which should have been stored at this point.
-    console.log('getConfig: (ReactRendering) ')
     const config = getConfig()
-    console.log('getConfig: ', config)
 
     // AppConfig.restore *must* come before using getRoutes() or routeComponent()
     // to inject arguments into the wrapped component's getProps methods.
@@ -294,7 +292,7 @@ const renderApp = (args) => {
         // client-side code depends on it. Maintain its name out of tradition.
         Progressive: getWindowProgressive(req, res)
     }
-    console.log('__CONFIG__: ', config)
+
     const scripts = [
         <script
             id="mobify-data"

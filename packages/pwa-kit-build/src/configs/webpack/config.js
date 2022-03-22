@@ -119,7 +119,7 @@ const baseConfig = (target) => {
                     new webpack.DefinePlugin({
                         DEBUG,
                         NODE_ENV: `'${process.env.NODE_ENV}'`,
-                        TARGET: `'${target}'`,
+                        WEBPACK_TARGET: `'${target}'`,
                         ['global.GENTLY']: false
                     }),
 
@@ -179,7 +179,6 @@ const baseConfig = (target) => {
         }
 
         build() {
-            console.log('BUILD: ', this.config.name, JSON.stringify(this.config))
             return this.config
         }
     }
