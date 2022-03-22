@@ -37,7 +37,7 @@ import fs from 'fs'
 import {RESOLVED_PROMISE} from './express'
 import http from 'http'
 import https from 'https'
-import {proxyConfigs, updatePackageMobify, setConfig} from '../../utils/ssr-shared'
+import {proxyConfigs, updatePackageMobify} from '../../utils/ssr-shared'
 import {configureProxyConfigs} from '../../utils/ssr-server'
 import awsServerlessExpress from 'aws-serverless-express'
 

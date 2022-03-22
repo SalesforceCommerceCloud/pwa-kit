@@ -109,8 +109,7 @@ const baseConfig = (target) => {
                         'react-router-dom': findInProjectThenSDK('react-router-dom'),
                         'react-dom': findInProjectThenSDK('react-dom'),
                         'react-helmet': findInProjectThenSDK('react-helmet'),
-                        bluebird: findInProjectThenSDK('bluebird'),
-                        'pwa-kit-runtime/utils/ssr-shared': findInProjectThenSDK('pwa-kit-runtime/utils/ssr-shared')
+                        bluebird: findInProjectThenSDK('bluebird')
                     },
                     ...(target === 'web' ? {fallback: {crypto: false}} : {})
                 },
@@ -200,7 +199,7 @@ const withChunking = (config) => {
                     vendor: {
                         // Anything imported from node_modules lands in
                         // vendor.js, if we're chunking.
-                        test: /node_modules\/(?!cosmiconfig)/,
+                        test: /node_modules/,
                         name: 'vendor',
                         chunks: 'all'
                     }
@@ -226,10 +225,7 @@ const client =
                 entry: {
                     main: './app/main'
                 },
-                plugins: [
-                    ...config.plugins,
-                    new LoadablePlugin({writeToDisk: true})
-                ]
+                plugins: [...config.plugins, new LoadablePlugin({writeToDisk: true})]
             }
         })
         .build()

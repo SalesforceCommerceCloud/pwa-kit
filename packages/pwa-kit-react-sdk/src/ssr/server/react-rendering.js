@@ -351,6 +351,6 @@ const getWindowProgressive = (req, res) => {
 }
 
 // eslint-disable-next-line no-unused-vars
-const serverRenderer = ({clientStats, serverStats, mobify}) => (req, res, next) => render(req, res, next)
+const serverRenderer = ({clientStats, serverStats}) => (req, res, next) => render(req, res, next)
 
 export default serverRenderer

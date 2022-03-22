@@ -20,11 +20,11 @@ const SUPPORTED_FILE_TYPES = ['js', 'yml', 'yaml', 'json']
  * default.ext - If you have no requirement for environment specific configurations the `default`
  * config file will be used.
  *
- * package.json - If none of the files after have been found the `mobify` object defined in the 
+ * package.json - If none of the files after have been found the `mobify` object defined in the
  * projects `package.json` file.
- * 
+ *
  * Each file marked with `ext` can optionally be terminated with `js`, `yml|yaml` or
- * `json`. The file loaded is also determined based on that precidence of file extension. 
+ * `json`. The file loaded is also determined based on that precidence of file extension.
  *
  * @returns - the application configuration object.
  */

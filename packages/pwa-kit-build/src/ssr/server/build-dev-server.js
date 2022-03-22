@@ -118,7 +118,7 @@ export const DevServerMixin = {
             })
         )
 
-        const middleware = webpackHotServerMiddleware(app.__compiler, {mobify: option.mobify})
+        const middleware = webpackHotServerMiddleware(app.__compiler)
 
         app.get('/worker.js', (req, res) => {
             const compiled = DevServerFactory._getWebpackAsset(req, 'pwa-others', 'worker.js')
@@ -178,7 +178,7 @@ export const DevServerMixin = {
     },
 
     _createHandler(app) {
-        const {protocol, sslFilePath, mobify} = app.options
+        const {protocol, sslFilePath} = app.options
         const {hostname, port} = this._getDevServerHostAndPort(app.options)
 
         let server
