@@ -8,10 +8,10 @@
 import {urlPartPositions} from '../constants'
 
 /**
- * Configure the routes based on url the configuration from provided.
+ * Creates routes based on the provided application configuration.
  *
  * @param {array} routes - array of routes to be configured
- * @param {object} - a custom configured object
+ * @param {object} - the application configuration object
  * @return {array} - list of configured route objects
  */
 export const configureRoutes = (routes = [], config, {ignoredRoutes = []}) => {

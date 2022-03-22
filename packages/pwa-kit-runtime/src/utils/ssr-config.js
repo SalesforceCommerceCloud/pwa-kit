@@ -5,8 +5,10 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-// NOTE: This export defaults to the `server` implementation unless explicitly set.
-// We do this to ensure the code doesn't break when executed without webpack.
+// NOTE: This conditional export by default exports the named export `getConfig`
+// for use in node environments. If specified by the `WEBPACK_TARGET` global
+// this module will export a browser safe version.
+
 // eslint-disable-next-line no-undef
 if (typeof WEBPACK_TARGET !== 'undefined' && WEBPACK_TARGET === 'web') {
     module.exports = require('./ssr-config.client.js')

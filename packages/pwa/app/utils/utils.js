@@ -165,6 +165,6 @@ export const getAppConfig = () => getConfig().app
 
 /**
  * A util to return current url configuration
- * @returns {object} - url object from the pwa-kit.config.json file
+ * @returns {object} - url object from the application configuration file
  */
 export const getUrlConfig = () => getAppConfig().url
