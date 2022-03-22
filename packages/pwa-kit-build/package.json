@@ -120,6 +120,11 @@
     "@loadable/component": "^5.15.0",
     "pwa-kit-runtime": "^2.0.0-dev.2"
   },
+  "peerDependenciesMeta": {
+    "pwa-kit-runtime": {
+      "optional": true
+    }
+  },
   "engines": {
     "node": "^12.0.0 || ^14.0.0",
     "npm": "^6.14.4 || ^7.0.0 || ^8.0.0"

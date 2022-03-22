@@ -31,6 +31,7 @@
   },
   "dependencies": {
     "@loadable/babel-plugin": "^5.13.2",
+    "@loadable/component": "^5.15.0",
     "aws-sdk": "^2.984.0",
     "aws-serverless-express": "3.3.5",
     "cross-env": "^5.2.0",
