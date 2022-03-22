@@ -31,7 +31,6 @@ import merge from 'merge-descriptors'
 import URL from 'url'
 import {Headers, X_HEADERS_TO_REMOVE, X_MOBIFY_REQUEST_CLASS} from '../../utils/ssr-proxying'
 import assert from 'assert'
-import bodyParser from 'body-parser'
 import semver from 'semver'
 import pkg from '../../../package.json'
 import fs from 'fs'
@@ -107,8 +106,6 @@ export const RemoteServerFactory = {
             // test code. Undocumented at present because there should
             // be no use-case for SDK users to set this.
             strictSSL: true,
-
-            enableLegacyRemoteProxying: true,
 
             mobify: undefined
         }
@@ -500,25 +497,13 @@ export const RemoteServerFactory = {
     },
 
     // eslint-disable-next-line no-unused-vars
-    _setupProxying(app, options) {
-        proxyConfigs.forEach((config) => {
-            app.use(config.proxyPath, config.proxy)
-            app.use(config.cachingPath, config.cachingProxy)
-        })
-    },
-
     setupProxying(app, options) {
-        // This was a mistake we made that is set for deprecation.
-        if (options.enableLegacyRemoteProxying) {
-            this._setupProxying(app, options)
-        } else {
-            app.all('/mobify/proxy/*', (_, res) => {
-                return res.status(501).json({
-                    message:
-                        'Environment proxies are not set: https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/proxying-requests.html'
-                })
+        app.all('/mobify/proxy/*', (_, res) => {
+            return res.status(501).json({
+                message:
+                    'Environment proxies are not set: https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/proxying-requests.html'
             })
-        }
+        })
     },
 
     setupHealthcheck(app) {
@@ -532,22 +517,6 @@ export const RemoteServerFactory = {
 
     setupCommonMiddleware(app, options) {
         app.use(prepNonProxyRequest)
-
-        // Any path
-        const rootWildcard = '/*'
-
-        // Because the app can accept POST requests, we need to include body-parser middleware.
-        app.post(rootWildcard, [
-            // application/json
-            bodyParser.json(),
-            // text/plain (defaults to utf-8)
-            bodyParser.text(),
-            // */x-www-form-urlencoded
-            bodyParser.urlencoded({
-                extended: true,
-                type: '*/x-www-form-urlencoded'
-            })
-        ])
 
         // Map favicon requests to the configured path. We always map
         // this route, because if there's no favicon configured we want
@@ -638,14 +607,6 @@ export const RemoteServerFactory = {
                     'in PEM format, whose name ends with ".pem". ' +
                     'See the "cert" and "key" options on ' +
                     'https://nodejs.org/api/tls.html#tls_tls_createsecurecontext_options'
-            )
-        }
-
-        if (options.enableLegacyRemoteProxying) {
-            console.warn(
-                'Legacy proxying behaviour is enabled. ' +
-                    'This behaviour is deprecated and will be removed in the future.' +
-                    'To disable it, pass `createApp({ enableLegacyRemoteProxying: false` })'
             )
         }
 
@@ -782,9 +743,6 @@ export const RemoteServerFactory = {
      * @param {String} options.sslFilePath - the absolute path to a PEM format
      * certificate file to be used by the local development server. This should
      * contain both the certificate and the private key.
-     * @param {Boolean} [options.enableLegacyRemoteProxying=true] - When running remotely (as
-     * opposed to locally), enables legacy proxying behaviour, allowing "proxy" requests to route through
-     * the express server. In the future, this behaviour and setting will be removed.
      * @param {function} customizeApp - a callback that takes an express app
      * as an argument. Use this to customize the server.
      */
