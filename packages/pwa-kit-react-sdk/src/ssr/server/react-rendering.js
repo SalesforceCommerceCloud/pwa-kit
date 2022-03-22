@@ -350,14 +350,6 @@ const getWindowProgressive = (req, res) => {
     }
 }
 
-// TODO: setConfig here something like this
-// const serverRenderer = ({clientStats, serverStats, mobify}) => () => {
-//     setConfig(mobify)
-//     return (req, res, next) => render(req, res, next)
-// }
-// Alternatively you can look at doing something like this:
-// https://github.com/facebook/react/blob/cae635054e17a6f107a39d328649137b83f25972/packages/react-dom/npm/index.js#L31
-
 // eslint-disable-next-line no-unused-vars
 const serverRenderer = ({clientStats, serverStats, mobify}) => (req, res, next) => render(req, res, next)
 
