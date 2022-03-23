@@ -286,25 +286,7 @@ const buildAnswers = ({
         globals: {projectId},
         'scaffold-pwa': {
             name: projectId,
-            version: GENERATED_PROJECT_VERSION,
-            mobify: {
-                ssrParameters: {
-                    proxyConfigs: [
-                        {
-                            path: 'api',
-                            host: `${shortCode}.api.commercecloud.salesforce.com`
-                        },
-                        {
-                            path: 'ocapi',
-                            host: new URL(instanceUrl).hostname
-                        },
-                        {
-                            path: 'einstein',
-                            host: 'api.cquotient.com'
-                        }
-                    ]
-                }
-            }
+            version: GENERATED_PROJECT_VERSION
         },
 
         'commerce-api': {clientId, siteId, organizationId, shortCode},
