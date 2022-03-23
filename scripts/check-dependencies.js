@@ -168,16 +168,44 @@ const check = () => {
         // ensure that X installs all of Y's peerDependencies.
         Object.entries(peerDependenciesByPackage).forEach(([localPackageName, localPeerDeps]) => {
             const dependsOnLocalPackage = !!((pkg.dependencies || {})[localPackageName] || (pkg.devDependencies || {})[localPackageName])
+            const dependencyIsOptional = Boolean((peerDependenciesMetaByPackage[pkg.name][localPackageName] || {})['optional'])
+
             if (dependsOnLocalPackage) {
                 Object.entries(localPeerDeps).forEach(([requiredPackage, requiredRange]) => {
-                    const foundRange = (pkg.dependencies || {})[requiredPackage] || (pkg.devDependencies || {})[requiredPackage]
-                    const satisfied = foundRange && semver.subset(foundRange, requiredRange)
                     const peerIsOptional = Boolean((peerDependenciesMetaByPackage[localPackageName][requiredPackage] || {})['optional'])
-                    if (!peerIsOptional && !satisfied) {
-                        errors.push(
-                            `Package "${pkg.name}" depends on package "${localPackageName}", but is missing one of` +
-                            ` its peerDependencies "${requiredPackage}@${requiredRange}"`
-                        )
+
+                    const isCircular = pkg.name === requiredPackage
+
+                    if (isCircular) {
+                        if (!dependencyIsOptional && !peerIsOptional) {
+                            errors.push([
+                                `Forbidden circular dependency found:`,
+                                ``,
+                                `  "${pkg.name}" => (${dependencyIsOptional ? 'optional' : 'required'}) "${localPackageName}" => (${peerIsOptional ? 'optional' : 'required'}) "${requiredPackage}".`,
+                                ``,
+                                `  If "${pkg.name}" and "${localPackageName}" have required dependencies on each other,`,
+                                `  they are better combined into one package – one can't work without the other.`,
+                                ``,
+                            ].join('\n'))
+                        } else {
+                            // Optional circular dependencies are okay – eg. the runtime is usable without having
+                            // build tools installed, but build tools might depend on the runtime.
+                            const circularSatisfied = semver.satisfies(pkg.version, requiredRange)
+                            if(!circularSatisfied) {
+                                errors.push(
+                                    `Circular dependency not satisfied "${pkg.name}@${pkg.version}" -> "${localPackageName}" -> "${requiredPackage}@${requiredRange}"`
+                                )
+                            }
+                        }
+                    } else {
+                        const foundRange = (pkg.dependencies || {})[requiredPackage] || (pkg.devDependencies || {})[requiredPackage]
+                        const satisfied = foundRange && semver.subset(foundRange, requiredRange)
+                        if (!peerIsOptional && !satisfied) {
+                            errors.push(
+                                `Package "${pkg.name}" depends on package "${localPackageName}", but is missing one of` +
+                                ` its peerDependencies "${requiredPackage}@${requiredRange}"`
+                            )
+                        }
                     }
                 })
             }
