@@ -14,6 +14,7 @@
 
 import React from 'react'
 import loadable from '@loadable/component'
+import {getConfig} from 'pwa-kit-runtime/utils/ssr-config'
 
 // Components
 import {Skeleton} from '@chakra-ui/react'
@@ -109,8 +110,9 @@ const routes = [
     }
 ]
 
-const configuredRoutes = configureRoutes(routes, {
-    ignoredRoutes: [HOME_HREF, '/callback', '/:locale', '*']
-})
-
-export default configuredRoutes
+export default () => {
+    const config = getConfig()
+    return configureRoutes(routes, config, {
+        ignoredRoutes: [HOME_HREF, '/callback', '/:locale', '*']
+    })
+}

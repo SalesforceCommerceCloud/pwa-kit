@@ -118,6 +118,7 @@ const baseConfig = (target) => {
                     new webpack.DefinePlugin({
                         DEBUG,
                         NODE_ENV: `'${process.env.NODE_ENV}'`,
+                        WEBPACK_TARGET: `'${target}'`,
                         ['global.GENTLY']: false
                     }),
 
@@ -224,10 +225,7 @@ const client =
                 entry: {
                     main: './app/main'
                 },
-                plugins: [
-                    ...config.plugins,
-                    new LoadablePlugin({writeToDisk: true})
-                ]
+                plugins: [...config.plugins, new LoadablePlugin({writeToDisk: true})]
             }
         })
         .build()
@@ -277,7 +275,16 @@ const renderer =
 
                     // Must only appear on one config – this one is the only mandatory one.
                     new CopyPlugin({
-                        patterns: [{from: 'app/static/', to: 'static/'}]
+                        patterns: [
+                            {from: 'app/static/', to: 'static/'},
+                            {
+                                from: 'config/',
+                                to: 'config/',
+                                globOptions: {
+                                    ignore: ['**/local.*']
+                                }
+                            }
+                        ]
                     })
                 ]
             }

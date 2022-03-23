@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import pwaKitConfig from '../../pwa-kit.config.json'
+import {getConfig} from 'pwa-kit-runtime/utils/ssr-config'
 
 /**
  * Call requestIdleCallback in supported browsers.
@@ -161,10 +161,10 @@ export const capitalize = (text) => {
  * Get the pwa configuration object from pwa-kit.config.json
  * @returns {object} - the configuration object
  */
-export const getConfig = () => pwaKitConfig
+export const getAppConfig = () => getConfig().app
 
 /**
  * A util to return current url configuration
- * @returns {object} - url object from the pwa-kit.config.json file
+ * @returns {object} - url object from the application configuration file
  */
-export const getUrlConfig = () => getConfig().url
+export const getUrlConfig = () => getAppConfig().url

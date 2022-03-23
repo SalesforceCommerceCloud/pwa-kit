@@ -14,6 +14,7 @@ const scriptUtils = require('../scripts/utils')
 const sh = require('shelljs')
 const uploadBundle = require('../scripts/upload.js')
 const pkg = require('../package.json')
+const {getConfig} = require('pwa-kit-runtime/utils/ssr-config')
 
 const pkgRoot = p.join(__dirname, '..')
 
@@ -156,7 +157,11 @@ const main = () => {
             )
         )
         .action(({buildDirectory, message, projectSlug, target}) => {
-            const mobify = projectPkg.mobify || {}
+            // Set the deployment target env var, this is required to ensure we
+            // get the correct configuration object.
+            process.env.DEPLOY_TARGET = target
+
+            const mobify = getConfig() || {}
 
             const options = {
                 buildDirectory,
