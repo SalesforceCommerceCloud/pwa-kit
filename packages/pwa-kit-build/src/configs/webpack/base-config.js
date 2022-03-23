@@ -17,15 +17,38 @@ import CopyPlugin from 'copy-webpack-plugin'
 import {BundleAnalyzerPlugin} from 'webpack-bundle-analyzer'
 import LoadablePlugin from '@loadable/webpack-plugin'
 import SpeedMeasurePlugin from 'speed-measure-webpack-plugin'
-import {createModuleReplacementPlugin} from './plugins'
+import {createModuleReplacementPlugin, PwaKitConfigPlugin} from './plugins'
 
 const projectDir = process.cwd()
-const projectWebpackPath = path.resolve(projectDir, 'webpack.config.js')
+const sdkDir = path.resolve(path.join(__dirname, '..', '..', '..'))
 
-if (fs.existsSync(projectWebpackPath)) {
-    module.exports = require(projectWebpackPath)
-} else {
-    module.exports = require('./base-config.js')
+const pkg = require(resolve(projectDir, 'package.json'))
+const buildDir = resolve(projectDir, 'build')
+
+const production = 'production'
+const development = 'development'
+const analyzeBundle = process.env.MOBIFY_ANALYZE === 'true'
+const mode = process.env.NODE_ENV === production ? production : development
+const DEBUG = mode !== production && process.env.DEBUG === 'true'
+const CI = process.env.CI
+
+if ([production, development].indexOf(mode) < 0) {
+    throw new Error(`Invalid mode "${mode}"`)
+}
+
+const entryPointExists = (segments) => {
+    for (let ext of ['.js', '.jsx', '.ts', '.tsx']) {
+        const p = path.resolve(projectDir, ...segments) + ext
+        if (fs.existsSync(p)) {
+            return true
+        }
+    }
+    return false
+}
+
+const findInProjectThenSDK = (pkg) => {
+    const projectPath = resolve(projectDir, 'node_modules', pkg)
+    return fs.existsSync(projectPath) ? projectPath : resolve(sdkDir, 'node_modules', pkg)
 }
 
 const baseConfig = (target) => {
@@ -95,7 +118,6 @@ const baseConfig = (target) => {
                     new webpack.DefinePlugin({
                         DEBUG,
                         NODE_ENV: `'${process.env.NODE_ENV}'`,
-                        WEBPACK_TARGET: `'${target}'`,
                         ['global.GENTLY']: false
                     }),
 
@@ -202,7 +224,11 @@ const client =
                 entry: {
                     main: './app/main'
                 },
-                plugins: [...config.plugins, new LoadablePlugin({writeToDisk: true})]
+                plugins: [
+                    ...config.plugins,
+                    new LoadablePlugin({writeToDisk: true}),
+                    new PwaKitConfigPlugin()
+                ]
             }
         })
         .build()
@@ -252,16 +278,7 @@ const renderer =
 
                     // Must only appear on one config – this one is the only mandatory one.
                     new CopyPlugin({
-                        patterns: [
-                            {from: 'app/static/', to: 'static/'},
-                            {
-                                from: 'config/',
-                                to: 'config/',
-                                globOptions: {
-                                    ignore: ['**/local.*']
-                                }
-                            }
-                        ]
+                        patterns: [{from: 'app/static/', to: 'static/'}]
                     })
                 ]
             }
