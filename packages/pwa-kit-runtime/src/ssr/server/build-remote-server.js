@@ -170,6 +170,7 @@ export const RemoteServerFactory = {
         // Hook for the dev-server
     },
 
+    // eslint-disable-next-line no-unused-vars
     updatePackageMobify(options) {
         updatePackageMobify(options.mobify)
     },
@@ -194,6 +195,7 @@ export const RemoteServerFactory = {
         this.configureProxyConfigs(options)
 
         const app = this.createExpressApp(options)
+
         // Do this first – we want compression applied to
         // everything when it's enabled at all.
         this.setCompression(app)

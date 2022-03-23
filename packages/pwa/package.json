@@ -3,38 +3,6 @@
     "version": "2.0.0-dev.2",
     "license": "See license in LICENSE",
     "private": true,
-    "mobify": {
-        "ssrEnabled": true,
-        "ssrOnly": [
-            "ssr.js",
-            "ssr.js.map",
-            "node_modules/**/*.*"
-        ],
-        "ssrShared": [
-            "static/ico/favicon.ico",
-            "static/robots.txt",
-            "**/*.js",
-            "**/*.js.map",
-            "**/*.json"
-        ],
-        "ssrParameters": {
-            "ssrFunctionNodeVersion": "14.x",
-            "proxyConfigs": [
-                {
-                    "host": "kv7kzm78.api.commercecloud.salesforce.com",
-                    "path": "api"
-                },
-                {
-                    "host": "zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com",
-                    "path": "ocapi"
-                },
-                {
-                    "host": "api.cquotient.com",
-                    "path": "einstein"
-                }
-            ]
-        }
-    },
     "engines": {
         "node": "^12.0.0 || ^14.0.0",
         "npm": "^6.14.4 || ^7.0.0 || ^8.0.0"

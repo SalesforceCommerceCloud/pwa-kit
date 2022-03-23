@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import fetch from 'jest-fetch-mock'
-import {commerceAPIConfig} from '../api.config'
+import {app as appConfig} from '../../config/default'
 import OcapiShopperBaskets from './ocapi-shopper-baskets'
 import {
     ocapiBasketResponse,
@@ -16,7 +16,7 @@ import {
 
 jest.mock('cross-fetch', () => jest.requireActual('jest-fetch-mock'))
 
-const apiConfig = {...commerceAPIConfig, proxy: undefined}
+const apiConfig = {...appConfig.commerceAPI, proxy: undefined}
 const getOcapiShopperBaskets = () => new OcapiShopperBaskets(apiConfig)
 beforeEach(() => {
     jest.resetModules()

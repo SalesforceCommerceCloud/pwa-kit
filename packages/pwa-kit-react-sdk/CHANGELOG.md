@@ -1,5 +1,7 @@
 ## v2.0.0-dev.2 (Feb 10, 2022)
 
+-   Support functions as default exports in the applications `routes.jsx` file. [#447](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/447)
+-   Serialize application configuration in the HTML during rendering process. [#447](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/447)
 -   Remove `create-hash-manifest.js` [#425](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/425)
 
 ## v2.0.0-dev.2 (Feb 10, 2022)
