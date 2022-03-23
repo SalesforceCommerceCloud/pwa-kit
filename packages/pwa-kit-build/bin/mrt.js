@@ -115,9 +115,10 @@ const main = () => {
         .description(`build your app for production`)
         .action(() => {
             const webpack = p.join(require.resolve('webpack'), '..', '..', '..', '.bin', 'webpack')
-            const webpackConf = p.resolve(
-                p.join(__dirname, '..', 'configs', 'webpack', 'config.js')
-            )
+            const projectWebpack = p.resolve(p.join(process.cwd(), 'webpack.config.js'))
+            const webpackConf = fs.existsSync(projectWebpack)
+                ? projectWebpack
+                : p.resolve(p.join(__dirname, '..', 'configs', 'webpack', 'config.js'))
             sh.rm('-rf', './build')
             execSync(`${webpack} --config ${webpackConf}`, {
                 env: {

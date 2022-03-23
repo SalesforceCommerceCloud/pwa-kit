@@ -20,12 +20,35 @@ import SpeedMeasurePlugin from 'speed-measure-webpack-plugin'
 import {createModuleReplacementPlugin} from './plugins'
 
 const projectDir = process.cwd()
-const projectWebpackPath = path.resolve(projectDir, 'webpack.config.js')
+const sdkDir = path.resolve(path.join(__dirname, '..', '..', '..'))
 
-if (fs.existsSync(projectWebpackPath)) {
-    module.exports = require(projectWebpackPath)
-} else {
-    module.exports = require('./base-config.js')
+const pkg = require(resolve(projectDir, 'package.json'))
+const buildDir = resolve(projectDir, 'build')
+
+const production = 'production'
+const development = 'development'
+const analyzeBundle = process.env.MOBIFY_ANALYZE === 'true'
+const mode = process.env.NODE_ENV === production ? production : development
+const DEBUG = mode !== production && process.env.DEBUG === 'true'
+const CI = process.env.CI
+
+if ([production, development].indexOf(mode) < 0) {
+    throw new Error(`Invalid mode "${mode}"`)
+}
+
+const entryPointExists = (segments) => {
+    for (let ext of ['.js', '.jsx', '.ts', '.tsx']) {
+        const p = path.resolve(projectDir, ...segments) + ext
+        if (fs.existsSync(p)) {
+            return true
+        }
+    }
+    return false
+}
+
+const findInProjectThenSDK = (pkg) => {
+    const projectPath = resolve(projectDir, 'node_modules', pkg)
+    return fs.existsSync(projectPath) ? projectPath : resolve(sdkDir, 'node_modules', pkg)
 }
 
 const baseConfig = (target) => {
