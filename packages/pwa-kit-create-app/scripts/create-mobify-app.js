@@ -113,7 +113,7 @@ const merge = (a, b) => deepmerge(a, b, {arrayMerge: (orignal, replacement) => r
  * Each package name included in the object's keys will be copied into the
  * generated project, all others are excluded.
  */
-const runGenerator = (answers, {outputDir}) => {
+const runGenerator = (answers, {outputDir, verbose}) => {
     // These are the public, mobify-owned packages that can be installed through NPM.
     const npmInstallables = ['pwa-kit-react-sdk']
 
@@ -189,14 +189,16 @@ const runGenerator = (answers, {outputDir}) => {
         p.resolve(outputDir, 'app', 'api.config.js')
     )
 
-    npmInstall(outputDir)
+    npmInstall(outputDir, {verbose})
 }
 
-const npmInstall = (outputDir) => {
+const npmInstall = (outputDir, {verbose}) => {
+    console.log(verbose)
     console.log('Installing dependencies for the generated project. This may take a few minutes.\n')
-    child_proc.execSync('npm install --quiet', {
+    const npmLogLevel = verbose ? 'notice' : 'error'
+    child_proc.execSync(`npm install --color always --loglevel ${npmLogLevel}`, {
         cwd: outputDir,
-        stdio: 'inherit',
+        stdio: verbose ? 'inherit' : ['inherit', 'ignore', 'inherit'],
         env: {
             ...process.env,
             OPENCOLLECTIVE_HIDE: 'true',
@@ -356,14 +358,14 @@ const helloWorldPrompts = () => {
     return inquirer.prompt(questions)
 }
 
-const generateHelloWorld = (projectId, {outputDir}) => {
+const generateHelloWorld = (projectId, {outputDir, verbose}) => {
     extractTemplate('hello-world', outputDir)
     const pkgJsonPath = p.resolve(outputDir, 'package.json')
     const pkgJSON = readJson(pkgJsonPath)
     const finalPkgData = merge(pkgJSON, {name: projectId})
     writeJson(pkgJsonPath, finalPkgData)
 
-    npmInstall(outputDir)
+    npmInstall(outputDir, {verbose})
 }
 
 const presetPrompt = () => {
@@ -504,10 +506,11 @@ Examples:
             '--preset <name>',
             `The name of a project preset to use (choices: "retail-react-app" "retail-react-app-demo")`
         )
+        .option('--verbose', `Print additional logging information to the console.`, false)
 
     program.parse(process.argv)
 
-    return Promise.resolve()
+    Promise.resolve()
         .then(() => main(program.opts()))
         .then((outputDir) => {
             console.log('')
@@ -515,10 +518,5 @@ Examples:
                 `Successfully generated a project in ${outputDir ? outputDir : program.outputDir}`
             )
             process.exit(0)
-        })
-        .catch((err) => {
-            console.error('Failed to generate a project')
-            console.error(err)
-            process.exit(1)
         })
 }
