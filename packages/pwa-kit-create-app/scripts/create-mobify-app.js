@@ -195,16 +195,22 @@ const runGenerator = (answers, {outputDir, verbose}) => {
 const npmInstall = (outputDir, {verbose}) => {
     console.log('Installing dependencies for the generated project. This may take a few minutes.\n')
     const npmLogLevel = verbose ? 'notice' : 'error'
-    child_proc.execSync(`npm install --color always --loglevel ${npmLogLevel}`, {
-        cwd: outputDir,
-        stdio: verbose ? 'inherit' : ['inherit', 'ignore', 'inherit'],
-        env: {
-            ...process.env,
-            OPENCOLLECTIVE_HIDE: 'true',
-            DISABLE_OPENCOLLECTIVE: 'true',
-            OPEN_SOURCE_CONTRIBUTOR: 'true',
-        },
-    })
+    try {
+        child_proc.execSync(`npm install --color always --loglevel ${npmLogLevel}`, {
+            cwd: outputDir,
+            stdio: verbose ? 'inherit' : ['inherit', 'ignore', 'inherit'],
+            env: {
+                ...process.env,
+                OPENCOLLECTIVE_HIDE: 'true',
+                DISABLE_OPENCOLLECTIVE: 'true',
+                OPEN_SOURCE_CONTRIBUTOR: 'true',
+            },
+        })
+    } catch {
+        // error is already displayed on the console by child process.
+        // exit the program
+        process.exit(1)
+    }
 }
 
 // Validations
