@@ -125,8 +125,6 @@ export const DevServerMixin = {
             if (compiled) {
                 res.type('.js')
                 res.send(compiled)
-            } else {
-                res.status(404).send('Not found')
             }
         })
 
@@ -135,8 +133,6 @@ export const DevServerMixin = {
             if (compiled) {
                 res.type('.js.map')
                 res.send(compiled)
-            } else {
-                res.status(404).send('Not found')
             }
         })
 
