@@ -140,5 +140,8 @@
             }
         ],
         "defaultLocale": "en-GB"
+    },
+    "dependencies": {
+        "progress-webpack-plugin": "^1.0.12"
     }
 }
