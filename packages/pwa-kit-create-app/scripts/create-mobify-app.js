@@ -79,7 +79,7 @@ const replaceJSON = (path, replacements) =>
 const slugifyName = (name) => {
     return slugify(name, {
         lower: true,
-        strict: true,
+        strict: true
     }).slice(0, PROJECT_ID_MAX_LENGTH)
 }
 
@@ -158,13 +158,13 @@ const runGenerator = (answers, {outputDir, verbose}) => {
         icons: [
             {
                 src: './img/global/app-icon-192.png',
-                sizes: '192x192',
+                sizes: '192x192'
             },
             {
                 src: './img/global/app-icon-512.png',
-                sizes: '512x512',
-            },
-        ],
+                sizes: '512x512'
+            }
+        ]
     })
 
     const PWAKitConfigJsonTemplate = require(`../assets/pwa/pwa-kit.config`)
@@ -177,12 +177,12 @@ const runGenerator = (answers, {outputDir, verbose}) => {
         clientId: answers['commerce-api'].clientId,
         organizationId: answers['commerce-api'].organizationId,
         shortCode: answers['commerce-api'].shortCode,
-        siteId: answers['commerce-api'].siteId,
+        siteId: answers['commerce-api'].siteId
     }
     const einsteinApi = {
         proxyPath: answers['scaffold-pwa'].mobify.ssrParameters.proxyConfigs[2].path,
         einsteinId: answers['einstein-api'].einsteinId,
-        siteId: answers['einstein-api'].siteId || answers['commerce-api'].siteId,
+        siteId: answers['einstein-api'].siteId || answers['commerce-api'].siteId
     }
 
     new sh.ShellString(APIConfigTemplate({commerceApi, einsteinApi})).to(
@@ -205,8 +205,8 @@ const npmInstall = (outputDir, {verbose}) => {
                 ...process.env,
                 OPENCOLLECTIVE_HIDE: 'true',
                 DISABLE_OPENCOLLECTIVE: 'true',
-                OPEN_SOURCE_CONTRIBUTOR: 'true',
-            },
+                OPEN_SOURCE_CONTRIBUTOR: 'true'
+            }
         })
     } catch {
         // error is already displayed on the console by child process.
@@ -250,33 +250,33 @@ const retailReactAppPrompts = () => {
         {
             name: 'projectName',
             validate: validProjectName,
-            message: 'What is the name of your Project?',
+            message: 'What is the name of your Project?'
         },
         {
             name: 'instanceUrl',
             message: 'What is the URL for your Commerce Cloud instance?',
-            validate: validUrl,
+            validate: validUrl
         },
         {
             name: 'clientId',
             message: 'What is your SLAS API Client ID in Account Manager?',
-            validate: validClientId,
+            validate: validClientId
         },
         {
             name: 'siteId',
             message: 'What is your Site ID in Business Manager?',
-            validate: validSiteId,
+            validate: validSiteId
         },
         {
             name: 'organizationId',
             message: 'What is your Commerce API organization ID in Business Manager?',
-            validate: validOrganizationId,
+            validate: validOrganizationId
         },
         {
             name: 'shortCode',
             message: 'What is your Commerce API short code in Business Manager?',
-            validate: validShortCode,
-        },
+            validate: validShortCode
+        }
     ]
 
     return inquirer.prompt(questions).then((answers) => buildAnswers(answers))
@@ -290,7 +290,7 @@ const buildAnswers = ({
     organizationId,
     shortCode,
     einsteinId,
-    einsteinSiteId,
+    einsteinSiteId
 }) => {
     const projectId = slugifyName(projectName)
 
@@ -304,23 +304,23 @@ const buildAnswers = ({
                     proxyConfigs: [
                         {
                             path: 'api',
-                            host: `${shortCode}.api.commercecloud.salesforce.com`,
+                            host: `${shortCode}.api.commercecloud.salesforce.com`
                         },
                         {
                             path: 'ocapi',
-                            host: new URL(instanceUrl).hostname,
+                            host: new URL(instanceUrl).hostname
                         },
                         {
                             path: 'einstein',
-                            host: 'api.cquotient.com',
-                        },
-                    ],
-                },
-            },
+                            host: 'api.cquotient.com'
+                        }
+                    ]
+                }
+            }
         },
 
         'commerce-api': {clientId, siteId, organizationId, shortCode},
-        'einstein-api': {einsteinId, siteId: einsteinSiteId || siteId},
+        'einstein-api': {einsteinId, siteId: einsteinSiteId || siteId}
     }
 }
 
@@ -333,7 +333,7 @@ const testProjectAnswers = () => {
         organizationId: 'f_ecom_zzrf_001',
         shortCode: 'kv7kzm78',
         einsteinId: '1ea06c6e-c936-4324-bcf0-fada93f83bb1',
-        einsteinSiteId: 'aaij-MobileFirst',
+        einsteinSiteId: 'aaij-MobileFirst'
     }
 
     return buildAnswers(config)
@@ -348,7 +348,7 @@ const demoProjectAnswers = () => {
         organizationId: 'f_ecom_zzte_053',
         shortCode: 'kv7kzm78',
         einsteinId: '1ea06c6e-c936-4324-bcf0-fada93f83bb1',
-        einsteinSiteId: 'aaij-MobileFirst',
+        einsteinSiteId: 'aaij-MobileFirst'
     }
 
     return buildAnswers(config)
@@ -359,8 +359,8 @@ const helloWorldPrompts = () => {
         {
             name: 'projectName',
             validate: validProjectName,
-            message: 'What is the name of your Project?',
-        },
+            message: 'What is the name of your Project?'
+        }
     ]
     return inquirer.prompt(questions)
 }
@@ -384,14 +384,14 @@ const presetPrompt = () => {
             choices: [
                 {
                     name: 'The Retail app with demo Commerce Cloud instance',
-                    value: RETAIL_REACT_APP_DEMO,
+                    value: RETAIL_REACT_APP_DEMO
                 },
                 {
                     name: 'The Retail app using your own Commerce Cloud instance',
-                    value: RETAIL_REACT_APP,
-                },
-            ],
-        },
+                    value: RETAIL_REACT_APP
+                }
+            ]
+        }
     ]
     return inquirer.prompt(questions).then((answers) => answers['preset'])
 }
@@ -401,7 +401,7 @@ const extractTemplate = (templateName, outputDir) => {
     tar.x({
         file: p.join(__dirname, '..', 'templates', `${templateName}.tar.gz`),
         cwd: p.join(tmp),
-        sync: true,
+        sync: true
     })
     sh.mv(p.join(tmp, templateName), outputDir)
     sh.rm('-rf', tmp)
