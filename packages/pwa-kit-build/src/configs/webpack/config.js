@@ -51,6 +51,15 @@ const findInProjectThenSDK = (pkg) => {
     return fs.existsSync(projectPath) ? projectPath : resolve(sdkDir, 'node_modules', pkg)
 }
 
+const getBundleAnalyzerPlugin = (pluginOptions) => new BundleAnalyzerPlugin({
+    // analyzerMode: 'static',
+    analyzerMode: 'json',
+    defaultSizes: 'gzip',
+    openAnalyzer: CI !== 'true',
+    generateStatsFile: true,
+    ...pluginOptions
+})
+
 const baseConfig = (target) => {
     if (!['web', 'node'].includes(target)) {
         throw Error(`The value "${target}" is not a supported webpack target`)
@@ -122,13 +131,6 @@ const baseConfig = (target) => {
                         ['global.GENTLY']: false
                     }),
 
-                    analyzeBundle &&
-                        new BundleAnalyzerPlugin({
-                            analyzerMode: 'static',
-                            defaultSizes: 'gzip',
-                            openAnalyzer: CI !== 'true',
-                            generateStatsFile: true
-                        }),
                     mode === development && new webpack.NoEmitOnErrorsPlugin(),
 
                     createModuleReplacementPlugin(projectDir),
@@ -225,7 +227,14 @@ const client =
                 entry: {
                     main: './app/main'
                 },
-                plugins: [...config.plugins, new LoadablePlugin({writeToDisk: true})]
+                plugins: [
+                    ...config.plugins,
+                    new LoadablePlugin({writeToDisk: true}),
+                    analyzeBundle && getBundleAnalyzerPlugin({
+                        reportFilename: 'client-report.json',
+                        statsFilename: 'client-stats.json',
+                    })
+                ]
             }
         })
         .build()
@@ -244,7 +253,14 @@ const clientOptional = baseConfig('web')
                 ...optional('worker', './worker/main.js'),
                 ...optional('core-polyfill', resolve(projectDir, 'node_modules', 'core-js')),
                 ...optional('fetch-polyfill', resolve(projectDir, 'node_modules', 'whatwg-fetch'))
-            }
+            },
+            plugins: [
+                ...config.plugins,
+                analyzeBundle && getBundleAnalyzerPlugin({
+                    reportFilename: 'pwa-others-report.json',
+                    statsFilename: 'pwa-others-stats.json',
+                })
+            ]
         }
     })
     .build()
@@ -285,6 +301,11 @@ const renderer =
                                 }
                             }
                         ]
+                    }),
+
+                    analyzeBundle && getBundleAnalyzerPlugin({
+                        reportFilename: 'server-report.json',
+                        statsFilename: 'server-stats.json',
                     })
                 ]
             }
@@ -305,7 +326,14 @@ const ssr = (() => {
                         path: buildDir,
                         filename: 'ssr.js',
                         libraryTarget: 'commonjs2'
-                    }
+                    },
+                    plugins: [
+                        ...config.plugins,
+                        analyzeBundle && getBundleAnalyzerPlugin({
+                            reportFilename: 'ssr-report.json',
+                            statsFilename: 'ssr-stats.json',
+                        })
+                    ]
                 }
             })
             .build()
@@ -326,7 +354,14 @@ const requestProcessor =
                     path: buildDir,
                     filename: 'request-processor.js',
                     libraryTarget: 'commonjs2'
-                }
+                },
+                plugins: [
+                    ...config.plugins,
+                    analyzeBundle && getBundleAnalyzerPlugin({
+                        reportFilename: 'request-processor-report.json',
+                        statsFilename: 'request-processor-stats.json',
+                    })
+                ]
             }
         })
         .build()
