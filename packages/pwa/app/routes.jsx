@@ -35,7 +35,8 @@ const LoginRedirect = loadable(() => import('./pages/login-redirect'), {fallback
 const ProductDetail = loadable(() => import('./pages/product-detail'), {fallback})
 const ProductList = loadable(() => import('./pages/product-list'), {fallback})
 const Wishlist = loadable(() => import('./pages/account/wishlist'), {fallback})
-const PageNotFound = loadable(() => import('./pages/page-not-found'))
+//TODO: Change for testing purposes.
+// const PageNotFound = loadable(() => import('./pages/page-not-found'))
 const RedirectToSFRA = loadable(() => import('./components/redirect-to-sfra'))
 
 const routes = [
@@ -99,6 +100,8 @@ const routes = [
         path: '/account/wishlist',
         component: Wishlist
     },
+    //TODO: Change for testing purposes. Route not matching the PWA routes
+    // are redirected to SFRA site.
     {
         path: '*',
         component: RedirectToSFRA

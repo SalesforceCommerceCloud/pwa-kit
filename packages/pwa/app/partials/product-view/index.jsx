@@ -219,7 +219,8 @@ const ProductView = ({
                                 selectedVariationAttributes={variationParams}
                             />
                             <HideOnMobile>
-                                {product && (
+                                {//TODO: Change for testing purposes. Link with external path pointing to SFRA site.
+                                product && (
                                     <Link
                                         to={`/path-not-matching-routes/${product.master.masterId}`}
                                     >
