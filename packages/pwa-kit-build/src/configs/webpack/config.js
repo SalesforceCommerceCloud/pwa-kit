@@ -234,7 +234,7 @@ const client =
                         reportFilename: 'client-report.json',
                         statsFilename: 'client-stats.json',
                     })
-                ]
+                ].filter(Boolean)
             }
         })
         .build()
@@ -260,7 +260,7 @@ const clientOptional = baseConfig('web')
                     reportFilename: 'pwa-others-report.json',
                     statsFilename: 'pwa-others-stats.json',
                 })
-            ]
+            ].filter(Boolean)
         }
     })
     .build()
@@ -307,7 +307,7 @@ const renderer =
                         reportFilename: 'server-report.json',
                         statsFilename: 'server-stats.json',
                     })
-                ]
+                ].filter(Boolean)
             }
         })
         .build()
@@ -333,7 +333,7 @@ const ssr = (() => {
                             reportFilename: 'ssr-report.json',
                             statsFilename: 'ssr-stats.json',
                         })
-                    ]
+                    ].filter(Boolean)
                 }
             })
             .build()
@@ -361,7 +361,7 @@ const requestProcessor =
                         reportFilename: 'request-processor-report.json',
                         statsFilename: 'request-processor-stats.json',
                     })
-                ]
+                ].filter(Boolean)
             }
         })
         .build()
