@@ -7,6 +7,27 @@
 
 import {getSites} from './site-utils'
 import {urlPartPositions} from '../constants'
+import {matchPath} from 'react-router-dom'
+
+/**
+ * Check if a path matches an array of routes.
+ * @param path path that
+ * @param routes
+ * @returns {*}
+ */
+export const matchRoute = (path, routes) => {
+    let match
+
+    const isMatch = routes.some((_route) => {
+        const _match = matchPath(path, _route)
+        if (_match) {
+            match = _match
+        }
+        return !!match
+    })
+
+    return isMatch
+}
 
 /**
  * Construct literal routes based on url config

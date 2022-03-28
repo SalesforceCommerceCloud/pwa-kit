@@ -9,22 +9,22 @@ import React from 'react'
 import {Redirect} from 'react-router-dom'
 import PropTypes from 'prop-types'
 
-const RedirectToSFRA = ({urlPathname}) => {
-    //TODO: Add configuration value to define the SFRA hostname
+const RedirectToSFRA = ({urlLocation}) => {
+    //TODO: Add configuration value to the default.js config defining the SFRA hostname
     const urlHostname = 'sfra-site.com'
-    return <Redirect to={`${urlHostname}${urlPathname}`} />
+    return <Redirect to={`${urlHostname}${urlLocation}`} />
 }
 
 RedirectToSFRA.getProps = async ({location}) => {
-    const urlPathname = `${location.pathname}${location.search}`
-    return {urlPathname}
+    const urlLocation = `${location.pathname}${location.search}`
+    return {urlLocation}
 }
 
 RedirectToSFRA.propTypes = {
     /**
      * SFRA URL pathname
      */
-    urlPathname: PropTypes.string
+    urlLocation: PropTypes.string
 }
 
 export default RedirectToSFRA

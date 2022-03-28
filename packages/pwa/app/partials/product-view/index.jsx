@@ -219,8 +219,10 @@ const ProductView = ({
                                 selectedVariationAttributes={variationParams}
                             />
                             <HideOnMobile>
-                                {showFullLink && product && (
-                                    <Link to={`/product/${product.master.masterId}`}>
+                                {product && (
+                                    <Link
+                                        to={`/path-not-matching-routes/${product.master.masterId}`}
+                                    >
                                         <Text color="blue.600">
                                             {intl.formatMessage({
                                                 defaultMessage: 'See full details',
