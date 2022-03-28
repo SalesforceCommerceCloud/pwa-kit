@@ -7,8 +7,10 @@
     <style>
         @font-face {
             font-family: "Salesforce Sans";
+            /* If you've already installed it locally in your computer, then it's the one that gets loaded */
             src: local("Salesforce Sans"),
                  local("SalesforceSans-Regular"),
+                 /* Thankfully we have the Salesforce font hosted in npm/unpkg */
                  url("https://unpkg.com/@salesforce-ux/design-system@2.14.3/assets/fonts/webfonts/SalesforceSans-Regular.woff2") format("woff2"),
                  url("https://unpkg.com/@salesforce-ux/design-system@2.14.3/assets/fonts/webfonts/SalesforceSans-Regular.woff") format("woff");
             font-display: swap;
@@ -31,6 +33,7 @@
         body {
             padding: 0;
             margin: 0;
+            /* As a fallback font, we prefer the system font that's available in the users OS */
             font-family: "Salesforce Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
         }
         main {
