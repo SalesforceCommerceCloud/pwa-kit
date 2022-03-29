@@ -222,7 +222,7 @@ const ProductView = ({
                                 {//TODO: Change for testing purposes. Link with external path pointing to SFRA site.
                                 product && (
                                     <Link
-                                        to={`/path-not-matching-routes/${product.master.masterId}`}
+                                        to={`/path-not-matching-pwa-routes/${product.master.masterId}`}
                                     >
                                         <Text color="blue.600">
                                             {intl.formatMessage({
