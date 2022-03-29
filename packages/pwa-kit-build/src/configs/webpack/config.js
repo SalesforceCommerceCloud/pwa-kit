@@ -225,7 +225,11 @@ const client =
                 entry: {
                     main: './app/main'
                 },
-                plugins: [...config.plugins, new LoadablePlugin({writeToDisk: true})]
+                plugins: [...config.plugins, new LoadablePlugin({writeToDisk: true})],
+                // Hide the performance hints, since we already have a similar `bundlesize` check elsewhere
+                performance: {
+                    hints: false
+                }
             }
         })
         .build()
