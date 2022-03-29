@@ -10,13 +10,28 @@ import {
     categoryUrlBuilder,
     productUrlBuilder,
     searchUrlBuilder,
-    getUrlWithLocale,
+    getPathWithLocale,
     homeUrlBuilder,
     rebuildPathWithParams,
     removeQueryParamsFromPath,
-    buildPathWithUrlConfig
+    buildPathWithUrlConfig,
+    absoluteUrl
 } from './url'
 import {getUrlConfig} from './utils'
+
+// import mockConfig from '../../config/mocks/default'
+
+afterEach(() => {
+    jest.clearAllMocks()
+})
+
+jest.mock('pwa-kit-react-sdk/utils/url', () => {
+    const original = jest.requireActual('pwa-kit-react-sdk/utils/url')
+    return {
+        ...original,
+        getAppOrigin: jest.fn(() => 'https://www.example.com')
+    }
+})
 
 jest.mock('./utils', () => {
     const original = jest.requireActual('./utils')
@@ -121,7 +136,7 @@ describe('url builder test', () => {
         expect(homeUrlDefaultLocale).toEqual(`/`)
     })
 
-    test('getUrlWithLocale returns expected for PLP', () => {
+    test('getPathWithLocale returns expected for PLP', () => {
         getUrlConfig.mockImplementation(() => ({
             locale: 'path'
         }))
@@ -129,11 +144,11 @@ describe('url builder test', () => {
 
         window.location = location
 
-        const relativeUrl = getUrlWithLocale('fr-FR')
+        const relativeUrl = getPathWithLocale('fr-FR')
         expect(relativeUrl).toEqual(`/fr-FR/category/newarrivals-womens`)
     })
 
-    test('getUrlWithLocale returns expected for PLP without refine param', () => {
+    test('getPathWithLocale returns expected for PLP without refine param', () => {
         getUrlConfig.mockImplementation(() => ({
             locale: 'path'
         }))
@@ -143,7 +158,7 @@ describe('url builder test', () => {
 
         window.location = location
 
-        const relativeUrl = getUrlWithLocale('fr-FR', {
+        const relativeUrl = getPathWithLocale('fr-FR', {
             disallowParams: ['refine']
         })
         expect(relativeUrl).toEqual(
@@ -151,7 +166,7 @@ describe('url builder test', () => {
         )
     })
 
-    test('getUrlWithLocale returns expected for PLP', () => {
+    test('getPathWithLocale returns expected for PLP', () => {
         getUrlConfig.mockImplementation(() => ({
             locale: 'path'
         }))
@@ -159,11 +174,11 @@ describe('url builder test', () => {
 
         window.location = location
 
-        const relativeUrl = getUrlWithLocale('fr-FR')
+        const relativeUrl = getPathWithLocale('fr-FR')
         expect(relativeUrl).toEqual(`/fr-FR/category/newarrivals-womens`)
     })
 
-    test('getUrlWithLocale returns expected for Homepage', () => {
+    test('getPathWithLocale returns expected for Homepage', () => {
         getUrlConfig.mockImplementation(() => ({
             locale: 'path'
         }))
@@ -171,25 +186,25 @@ describe('url builder test', () => {
 
         window.location = location
 
-        const relativeUrl = getUrlWithLocale('fr-FR')
+        const relativeUrl = getPathWithLocale('fr-FR')
         expect(relativeUrl).toEqual(`/fr-FR`)
     })
 
-    test('getUrlWithLocale returns expected for Homepage with Default locale', () => {
+    test('getPathWithLocale returns expected for Homepage with Default locale', () => {
         const location = new URL('http://localhost:3000/it-IT/')
 
         window.location = location
 
-        const relativeUrl = getUrlWithLocale(DEFAULT_LOCALE)
+        const relativeUrl = getPathWithLocale(DEFAULT_LOCALE)
         expect(relativeUrl).toEqual(`/`)
     })
 
-    test('getUrlWithLocale returns expected for Homepage without trailing slash', () => {
+    test('getPathWithLocale returns expected for Homepage without trailing slash', () => {
         const location = new URL('http://localhost:3000/it-IT')
 
         window.location = location
 
-        const relativeUrl = getUrlWithLocale(DEFAULT_LOCALE)
+        const relativeUrl = getPathWithLocale(DEFAULT_LOCALE)
         expect(relativeUrl).toEqual(`/`)
     })
 })
@@ -227,5 +242,17 @@ describe('buildPathWithUrlConfig', () => {
 
         const url = buildPathWithUrlConfig('/women/dresses', {locale: 'en-GB'})
         expect(url).toEqual('/women/dresses?locale=en-GB')
+    })
+})
+
+describe('absoluteUrl', function() {
+    test('return expected when path is a relative url', () => {
+        const url = absoluteUrl('/uk/en/women/dresses')
+        expect(url).toEqual('https://www.example.com/uk/en/women/dresses')
+    })
+
+    test('return expected when path is an absolute url', () => {
+        const url = absoluteUrl('https://www.example.com/uk/en/women/dresses')
+        expect(url).toEqual('https://www.example.com/uk/en/women/dresses')
     })
 })

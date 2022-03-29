@@ -289,7 +289,7 @@ const buildAnswers = ({
             version: GENERATED_PROJECT_VERSION
         },
 
-        'commerce-api': {clientId, siteId, organizationId, shortCode},
+        'commerce-api': {clientId, siteId, organizationId, shortCode, instanceUrl},
         'einstein-api': {einsteinId, siteId: einsteinSiteId || siteId}
     }
 }

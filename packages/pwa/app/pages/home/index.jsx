@@ -34,7 +34,12 @@ import {getAssetUrl} from 'pwa-kit-react-sdk/ssr/universal/utils'
 import {heroFeatures, features} from './data'
 
 // Constants
-import {HOME_SHOP_PRODUCTS_CATEGORY_ID, HOME_SHOP_PRODUCTS_LIMIT} from '../../constants'
+import {
+    HOME_SHOP_PRODUCTS_CATEGORY_ID,
+    HOME_SHOP_PRODUCTS_LIMIT,
+    urlPartPositions
+} from '../../constants'
+import {getConfig} from 'pwa-kit-runtime/utils/ssr-config'
 
 /**
  * This is the home page for Retail React App.
@@ -45,6 +50,7 @@ import {HOME_SHOP_PRODUCTS_CATEGORY_ID, HOME_SHOP_PRODUCTS_LIMIT} from '../../co
 const Home = ({productSearchResult, isLoading}) => {
     const intl = useIntl()
 
+    const {url: urlConfig} = getConfig()?.app
     return (
         <Box data-testid="home-page" layerStyle="page">
             <Seo
@@ -52,6 +58,33 @@ const Home = ({productSearchResult, isLoading}) => {
                 description="Commerce Cloud Retail React App"
                 keywords="Commerce Cloud, Retail React App, React Storefront"
             />
+
+            <Section>
+                <h3>These buttons are for demo purposes, it will NOT get merged into develop</h3>
+                <Button
+                    mt={4}
+                    mr={4}
+                    onClick={() => {
+                        window.location = '/'
+                    }}
+                >
+                    to default Site
+                </Button>
+
+                <Button
+                    mt={4}
+                    onClick={() => {
+                        window.location =
+                            urlConfig['site'] === urlPartPositions.PATH
+                                ? '/us'
+                                : urlConfig['site'] === urlPartPositions.QUERY_PARAM
+                                ? '/?site=us'
+                                : '/'
+                    }}
+                >
+                    to us Site
+                </Button>
+            </Section>
 
             <Hero
                 title={intl.formatMessage({

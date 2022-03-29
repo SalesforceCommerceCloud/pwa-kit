@@ -47,12 +47,12 @@ import {BrandLogo, LocationIcon, SignoutIcon, UserIcon} from '../icons'
 
 // Others
 import {noop} from '../../utils/utils'
-import {getUrlWithLocale, categoryUrlBuilder} from '../../utils/url'
+import {getPathWithLocale, categoryUrlBuilder} from '../../utils/url'
 import useCustomer from '../../commerce-api/hooks/useCustomer'
 import LoadingSpinner from '../loading-spinner'
 
 import useNavigation from '../../hooks/use-navigation'
-import {getSupportedLocalesIds} from '../../utils/locale'
+import useSite from '../../hooks/use-site'
 
 // The FONT_SIZES and FONT_WEIGHTS constants are used to control the styling for
 // the accordion buttons as their current depth. In the below definition we assign
@@ -92,7 +92,10 @@ const DrawerMenu = ({isOpen, onClose = noop, onLogoClick = noop, root}) => {
         navigate('/login')
         setShowLoading(false)
     }
-    const supportedLocaleIds = getSupportedLocalesIds()
+
+    const site = useSite()
+    const {l10n} = site
+    const supportedLocaleIds = l10n?.supportedLocales.map((locale) => locale.id)
     const showLocaleSelector = supportedLocaleIds?.length > 1
 
     return (
@@ -270,7 +273,7 @@ const DrawerMenu = ({isOpen, onClose = noop, onLogoClick = noop, root}) => {
                                         locales={supportedLocaleIds}
                                         onSelect={(newLocale) => {
                                             // Update the `locale` in the URL.
-                                            const newUrl = getUrlWithLocale(newLocale, {
+                                            const newUrl = getPathWithLocale(newLocale, {
                                                 disallowParams: ['refine']
                                             })
                                             window.location = newUrl

@@ -27,15 +27,17 @@ import {useIntl} from 'react-intl'
 import LinksList from '../links-list'
 import SocialIcons from '../social-icons'
 import {HideOnDesktop, HideOnMobile} from '../responsive'
-import {getUrlWithLocale} from '../../utils/url'
+import {getPathWithLocale} from '../../utils/url'
 import LocaleText from '../locale-text'
-import {getSupportedLocalesIds} from '../../utils/locale'
+import useSite from '../../hooks/use-site'
 
 const Footer = ({...otherProps}) => {
     const styles = useMultiStyleConfig('Footer')
     const intl = useIntl()
     const [locale, setLocale] = useState(intl.locale)
-    const supportedLocaleIds = getSupportedLocalesIds()
+    const site = useSite()
+    const {l10n} = site
+    const supportedLocaleIds = l10n?.supportedLocales.map((locale) => locale.id)
     const showLocaleSelector = supportedLocaleIds?.length > 1
 
     return (
@@ -133,7 +135,7 @@ const Footer = ({...otherProps}) => {
                                         setLocale(target.value)
 
                                         // Update the `locale` in the URL.
-                                        const newUrl = getUrlWithLocale(target.value, {
+                                        const newUrl = getPathWithLocale(target.value, {
                                             disallowParams: ['refine']
                                         })
 
