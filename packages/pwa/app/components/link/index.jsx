@@ -44,10 +44,10 @@ const Link = React.forwardRef(({href, to, useNavLink = false, ...props}, ref) =>
 
     return (
         <ChakraLink
-            as={isMatch ? linkType : 'a'}
+            {...(isMatch ? {as: linkType} : {as: linkType})}
+            {...(isMatch ? {to: updatedHref} : {href: updatedHref})}
             {...(useNavLink && {exact: true})}
             {...props}
-            href={updatedHref}
             ref={ref}
         />
     )

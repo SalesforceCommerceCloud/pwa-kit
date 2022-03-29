@@ -11,7 +11,7 @@ import PropTypes from 'prop-types'
 
 const RedirectToSFRA = ({urlLocation}) => {
     //TODO: Add configuration value to the default.js config defining the SFRA hostname
-    const urlHostname = 'sfra-site.com'
+    const urlHostname = 'https://sfra-site.com'
     return <Redirect to={`${urlHostname}${urlLocation}`} />
 }
 
