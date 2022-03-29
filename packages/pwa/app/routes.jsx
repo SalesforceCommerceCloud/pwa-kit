@@ -19,6 +19,7 @@ import loadable from '@loadable/component'
 import {Skeleton} from '@chakra-ui/react'
 import {configureRoutes} from './utils/routes-utils'
 import {getConfig} from 'pwa-kit-react-sdk/ssr/universal/utils'
+import {Redirect, withRouter} from 'react-router-dom'
 
 const fallback = <Skeleton height="75vh" width="100%" />
 
@@ -37,7 +38,6 @@ const ProductList = loadable(() => import('./pages/product-list'), {fallback})
 const Wishlist = loadable(() => import('./pages/account/wishlist'), {fallback})
 //TODO: Change for testing purposes.
 // const PageNotFound = loadable(() => import('./pages/page-not-found'))
-const RedirectToSFRA = loadable(() => import('./components/redirect-to-sfra'))
 
 const routes = [
     {
@@ -104,7 +104,9 @@ const routes = [
     // are redirected to SFRA site.
     {
         path: '*',
-        component: RedirectToSFRA
+        component: withRouter(({location}) => (
+            <Redirect to={`https://sfra-site.com${location.pathname}${location.search}`} />
+        ))
     }
 ]
 
