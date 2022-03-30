@@ -226,7 +226,7 @@ const client =
                     main: './app/main'
                 },
                 plugins: [...config.plugins, new LoadablePlugin({writeToDisk: true})],
-                // Hide the performance hints, since we already have a similar `bundlesize` check elsewhere
+                // Hide the performance hints, since we already have a similar `bundlesize` check in `pwa` package
                 performance: {
                     hints: false
                 }
