@@ -9,16 +9,19 @@ import {Route, Switch} from 'react-router-dom'
 import {screen} from '@testing-library/react'
 import user from '@testing-library/user-event'
 import {rest} from 'msw'
-import {setupServer} from 'msw/node'
-import {renderWithProviders, getPathname} from '../../utils/test-utils'
-import {
-    mockedRegisteredCustomer,
-    mockOrderHistory,
-    mockOrderProducts
-} from '../../commerce-api/mock-data'
+import {renderWithProviders, createPathWithDefaults, setupMockServer} from '../../utils/test-utils'
+import {mockOrderHistory, mockOrderProducts} from '../../commerce-api/mock-data'
 import useCustomer from '../../commerce-api/hooks/useCustomer'
 import Orders from './orders'
-
+import {getConfig} from 'pwa-kit-runtime/utils/ssr-config'
+jest.mock('pwa-kit-runtime/utils/ssr-config', () => {
+    const origin = jest.requireActual('pwa-kit-runtime/utils/ssr-config')
+    return {
+        ...origin,
+        getConfig: jest.fn()
+    }
+})
+import mockConfig from '../../../config/__mocks__/default'
 jest.mock('../../commerce-api/utils', () => {
     const originalModule = jest.requireActual('../../commerce-api/utils')
     return {
@@ -42,55 +45,18 @@ const MockedComponent = () => {
 
     return (
         <Switch>
-            <Route path={getPathname('/account/orders')}>
+            <Route path={createPathWithDefaults('/account/orders')}>
                 <Orders />
             </Route>
         </Switch>
     )
 }
 
-const server = setupServer(
-    rest.post('*/customers/actions/login', (req, res, ctx) =>
-        res(
-            ctx.delay(0),
-            ctx.set('authorization', `Bearer guesttoken`),
-            ctx.json(mockedRegisteredCustomer)
-        )
-    ),
+const server = setupMockServer(
     rest.get('*/customers/:customerId/orders', (req, res, ctx) =>
         res(ctx.delay(0), ctx.json(mockOrderHistory))
     ),
-    rest.get('*/products', (req, res, ctx) => res(ctx.delay(0), ctx.json(mockOrderProducts))),
-    rest.get('*/customers/:customerId', (req, res, ctx) =>
-        res(ctx.delay(0), ctx.json(mockedRegisteredCustomer))
-    ),
-    rest.post('*/oauth2/authorize', (req, res, ctx) =>
-        res(ctx.delay(0), ctx.status(303), ctx.set('location', `/testcallback`))
-    ),
-    rest.post('*/oauth2/login', (req, res, ctx) =>
-        res(ctx.delay(0), ctx.status(200), ctx.json(mockedRegisteredCustomer))
-    ),
-
-    rest.get('*/oauth2/authorize', (req, res, ctx) =>
-        res(ctx.delay(0), ctx.status(303), ctx.set('location', `/testcallback`))
-    ),
-
-    rest.get('*/testcallback', (req, res, ctx) => {
-        return res(ctx.delay(0), ctx.status(200))
-    }),
-
-    rest.post('*/oauth2/token', (req, res, ctx) =>
-        res(
-            ctx.delay(0),
-            ctx.json({
-                customer_id: 'test',
-                access_token: 'testtoken',
-                refresh_token: 'testrefeshtoken',
-                usid: 'testusid',
-                enc_user_id: 'testEncUserId'
-            })
-        )
-    )
+    rest.get('*/products', (req, res, ctx) => res(ctx.delay(0), ctx.json(mockOrderProducts)))
 )
 
 // Set up and clean up
@@ -98,8 +64,11 @@ beforeEach(() => {
     jest.resetModules()
 
     server.listen({onUnhandledRequest: 'error'})
+    // mock getConfig to return the mock config instead of actual one
+    getConfig.mockImplementation(() => mockConfig)
+    const ordersUrl = createPathWithDefaults('/account/orders')
 
-    window.history.pushState({}, 'Account', getPathname('/account/orders'))
+    window.history.pushState({}, 'Account', ordersUrl)
 })
 afterEach(() => {
     localStorage.clear()
@@ -120,6 +89,7 @@ test('Renders order history and details', async () => {
     ).toHaveLength(3)
 
     user.click((await screen.findAllByText(/view details/i))[0])
+    console.log('window.location', window.location.pathname)
     expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
     expect(await screen.findByText(/order number: 00028011/i)).toBeInTheDocument()
     expect(

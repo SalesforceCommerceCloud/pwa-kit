@@ -5,7 +5,6 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-const path = require('path')
 const base = require('pwa-kit-build/configs/jest/jest.config.js')
 
 module.exports = {
@@ -14,7 +13,6 @@ module.exports = {
         ...base.moduleNameMapper,
         '^react-router-dom(.*)$': '<rootDir>/node_modules/react-router-dom/index.js'
     },
-    setupFilesAfterEnv: [path.join(__dirname, 'jest-setup.js')],
     collectCoverageFrom: [
         'app/**/*.{js,jsx}',
         'non-pwa/**/*.{js,jsx}',
