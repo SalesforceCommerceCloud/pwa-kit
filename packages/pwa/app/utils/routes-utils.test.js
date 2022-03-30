@@ -5,7 +5,6 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-
 import {configureRoutes} from './routes-utils'
 
 describe('configureRoutes', function() {
@@ -274,7 +273,7 @@ describe('configureRoutes', function() {
             exact: true
         }
     ]
-
+    console.log('route-utils window.__CONFIG', window.__CONFIG__)
     cases.forEach(({urlConfig, expectedRes, ignoredRoutes = []}) => {
         test(`Should return expected routes based on ${JSON.stringify(urlConfig)} config${
             ignoredRoutes.length ? ` and ignore routes ${ignoredRoutes.join(',')}` : ' '
