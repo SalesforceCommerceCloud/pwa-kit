@@ -33,9 +33,9 @@ The Retail React App's configuration is located within the `app/config` folder, 
 
 The sites supported by your application are defined in a file called `config/sites.js`. Here, you can synchronize the sites supported by your Retail App and those defined in your Business Manager backend. 
 
-The extensive configuration options allow you to,
+The configuration features include:
 
-1. Use `.yml`, `.yaml`, or `.json` format to manage your configuration files. 
+1. Using `.js`, `.yml`, `.yaml`, or `.json` to define your configuration. 
 3. Chose whether locale and site options are available in the URL query parameters, sub-path, or not appear at all.
 4. Optionally assign aliases to locale ID and site ID. 
 5. Manage multiple business manager sites that are hosted in the same domain.
