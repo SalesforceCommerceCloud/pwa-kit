@@ -1,5 +1,5 @@
-## v1.5.1-alpha.0 (Mar 31, 2022)
-## v1.5.0-dev (Jan 28, 2022)
+## v1.5.1 (Mar 31, 2022)
+## v1.5.0 (Jan 28, 2022)
 
 -   Add boolean flag `enableLegacyBodyParser` to `createApp` options. [#446](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/446)
 -   Add environment specific configuration support. [#421](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/421)
