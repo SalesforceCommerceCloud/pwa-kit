@@ -180,7 +180,6 @@ export const getPathWithLocale = (shortCode, opts = {}) => {
 export const homeUrlBuilder = (homeHref, options = {}) => {
     const {locale, site} = options
     const defaultSite = getDefaultSite()
-    console.log('defaultSite', defaultSite)
     const isDefaultLocaleOfDefaultSite =
         locale.alias === defaultSite.l10n.defaultLocale ||
         locale.id === defaultSite.l10n.defaultLocale

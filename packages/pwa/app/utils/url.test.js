@@ -18,7 +18,7 @@ import {
     absoluteUrl
 } from './url'
 import {getUrlConfig} from './utils'
-import mockConfig from '../../config/__mocks__/default'
+import mockConfig from '../../config/mocks/default'
 
 afterEach(() => {
     jest.clearAllMocks()
@@ -35,7 +35,6 @@ jest.mock('./utils', () => {
     const original = jest.requireActual('./utils')
     return {
         ...original,
-        getConfig: jest.fn(() => mockConfig),
         getUrlConfig: jest.fn()
     }
 })

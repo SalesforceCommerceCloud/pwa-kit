@@ -9,15 +9,10 @@ import PropTypes from 'prop-types'
 
 import {fireEvent, screen, waitFor} from '@testing-library/react'
 import Header from './index'
-import {renderWithProviders, getPathname} from '../../utils/test-utils'
+import {renderWithProviders, createPathWithDefaults, setupMockServer} from '../../utils/test-utils'
 import useCustomer from '../../commerce-api/hooks/useCustomer'
-import {setupServer} from 'msw/node'
 import {rest} from 'msw'
-import {
-    exampleTokenReponse,
-    mockedCustomerProductLists,
-    mockedRegisteredCustomer
-} from '../../commerce-api/mock-data'
+import {mockedCustomerProductLists} from '../../commerce-api/mock-data'
 import {Route, Switch} from 'react-router-dom'
 import {createMemoryHistory} from 'history'
 
@@ -47,11 +42,11 @@ const MockedComponent = ({history}) => {
     const onAccountClick = () => {
         // Link to account page for registered customer, open auth modal otherwise
         if (customer.isRegistered) {
-            history.push(getPathname('/account'))
+            history.push(createPathWithDefaults('/account'))
         }
     }
     const onWishlistClick = () => {
-        history.push(getPathname('/account/wishlist'))
+        history.push(createPathWithDefaults('/account/wishlist'))
     }
 
     return (
@@ -69,41 +64,7 @@ MockedComponent.propTypes = {
     history: PropTypes.object
 }
 
-const server = setupServer(
-    rest.post('*/customers/actions/login', (req, res, ctx) =>
-        res(ctx.set('authorization', `Bearer guesttoken`), ctx.json(mockedRegisteredCustomer))
-    ),
-    rest.post('*/oauth2/authorize', (req, res, ctx) =>
-        res(ctx.delay(0), ctx.status(303), ctx.set('location', `/testcallback`))
-    ),
-    rest.get('*/oauth2/authorize', (req, res, ctx) =>
-        res(ctx.delay(0), ctx.status(303), ctx.set('location', `/testcallback`))
-    ),
-    rest.get('*/testcallback', (req, res, ctx) => {
-        return res(ctx.delay(0), ctx.status(200))
-    }),
-    rest.post('*/oauth2/login', (req, res, ctx) =>
-        res(ctx.delay(0), ctx.status(200), ctx.json(mockedRegisteredCustomer))
-    ),
-    rest.get('*/customers/:customerId', (req, res, ctx) =>
-        res(ctx.delay(0), ctx.status(200), ctx.json(mockedRegisteredCustomer))
-    ),
-    rest.post('*/oauth2/token', (req, res, ctx) =>
-        res(
-            ctx.delay(0),
-            ctx.json({
-                customer_id: 'test',
-                access_token: 'testtoken',
-                refresh_token: 'testrefeshtoken',
-                usid: 'testusid',
-                enc_user_id: 'testEncUserId'
-            })
-        )
-    ),
-    rest.get('*/oauth2/logout', (req, res, ctx) =>
-        res(ctx.delay(0), ctx.status(200), ctx.json(exampleTokenReponse))
-    )
-)
+const server = setupMockServer()
 
 // Set up and clean up
 beforeEach(() => {
@@ -112,7 +73,7 @@ beforeEach(() => {
 
     // Since we're testing some navigation logic, we are using a simple Router
     // around our component. We need to initialize the default route/path here.
-    window.history.pushState({}, 'Account', getPathname('/account'))
+    window.history.pushState({}, 'Account', createPathWithDefaults('/account'))
 })
 afterEach(() => {
     localStorage.clear()
@@ -191,34 +152,6 @@ test('renders cart badge when basket is loaded', () => {
 })
 
 test('route to account page when an authenticated users click on account icon', async () => {
-    server.use(
-        rest.post('*/oauth2/login', (req, res, ctx) =>
-            res(ctx.delay(0), ctx.status(303), ctx.set('location', `/testcallback`))
-        ),
-        rest.get('*/testcallback', (req, res, ctx) => {
-            return res(ctx.delay(0), ctx.status(200))
-        }),
-
-        rest.post('*/oauth2/token', (req, res, ctx) =>
-            res(
-                ctx.delay(0),
-                ctx.json({
-                    customer_id: 'test',
-                    access_token: 'testtoken',
-                    refresh_token: 'testrefeshtoken',
-                    usid: 'testusid',
-                    enc_user_id: 'testEncUserId'
-                })
-            )
-        ),
-        rest.get('*/customers/:customerId', (req, res, ctx) =>
-            res(
-                ctx.json({
-                    ...mockedRegisteredCustomer
-                })
-            )
-        )
-    )
     const history = createMemoryHistory()
     // mock push function
     history.push = jest.fn()
@@ -232,44 +165,16 @@ test('route to account page when an authenticated users click on account icon', 
     const accountIcon = document.querySelector('svg[aria-label="My account"]')
     fireEvent.click(accountIcon)
     await waitFor(() => {
-        expect(history.push).toHaveBeenCalledWith(getPathname('/account'))
+        expect(history.push).toHaveBeenCalledWith(createPathWithDefaults('/account'))
     })
 
     fireEvent.keyDown(accountIcon, {key: 'Enter', code: 'Enter'})
     await waitFor(() => {
-        expect(history.push).toHaveBeenCalledWith(getPathname('/account'))
+        expect(history.push).toHaveBeenCalledWith(createPathWithDefaults('/account'))
     })
 })
 
 test('route to wishlist page when an authenticated users click on wishlist icon', async () => {
-    server.use(
-        rest.post('*/oauth2/login', (req, res, ctx) =>
-            res(ctx.delay(0), ctx.status(303), ctx.set('location', `/testcallback`))
-        ),
-        rest.get('*/testcallback', (req, res, ctx) => {
-            return res(ctx.delay(0), ctx.status(200))
-        }),
-
-        rest.post('*/oauth2/token', (req, res, ctx) =>
-            res(
-                ctx.delay(0),
-                ctx.json({
-                    customer_id: 'test',
-                    access_token: 'testtoken',
-                    refresh_token: 'testrefeshtoken',
-                    usid: 'testusid',
-                    enc_user_id: 'testEncUserId'
-                })
-            )
-        ),
-        rest.get('*/customers/:customerId', (req, res, ctx) =>
-            res(
-                ctx.json({
-                    ...mockedRegisteredCustomer
-                })
-            )
-        )
-    )
     const history = createMemoryHistory()
     // mock push function
     history.push = jest.fn()
@@ -283,38 +188,12 @@ test('route to wishlist page when an authenticated users click on wishlist icon'
     const wishlistIcon = document.querySelector('button[aria-label="Wishlist"]')
     fireEvent.click(wishlistIcon)
     await waitFor(() => {
-        expect(history.push).toHaveBeenCalledWith(getPathname('/account/wishlist'))
+        expect(history.push).toHaveBeenCalledWith(createPathWithDefaults('/account/wishlist'))
     })
 })
 
 test('shows dropdown menu when an authenticated users hover on the account icon', async () => {
     server.use(
-        rest.post('*/oauth2/login', (req, res, ctx) =>
-            res(ctx.delay(0), ctx.status(303), ctx.set('location', `/testcallback`))
-        ),
-        rest.get('*/testcallback', (req, res, ctx) => {
-            return res(ctx.delay(0), ctx.status(200))
-        }),
-
-        rest.post('*/oauth2/token', (req, res, ctx) =>
-            res(
-                ctx.delay(0),
-                ctx.json({
-                    customer_id: 'test',
-                    access_token: 'testtoken',
-                    refresh_token: 'testrefeshtoken',
-                    usid: 'testusid',
-                    enc_user_id: 'testEncUserId'
-                })
-            )
-        ),
-        rest.get('*/customers/:customerId', (req, res, ctx) =>
-            res(
-                ctx.json({
-                    ...mockedRegisteredCustomer
-                })
-            )
-        ),
         // mock fetch product lists
         rest.get('*/customers/:customerId/product-lists', (req, res, ctx) => {
             return res(ctx.json(mockedCustomerProductLists))
