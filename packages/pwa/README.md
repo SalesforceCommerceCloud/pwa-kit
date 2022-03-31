@@ -45,7 +45,11 @@ The extensive configuration options allow you to,
 
 At project generation a single `default` configuration is created. For most cases a single configuration file will get the job done. But there are times where you want to have a different configuration for a different environment. These environments for example could be, a developers local machine, a remote `production` environment, or a remote `staging` environment. In all these cases you want to use a different configuration for each. 
 
-To achieve this the way in which we resolve what configuration file to use is done in the following way. First, we check to see if there is a config file named after your remote Managed Runtime environment, if none it found we'll then look for a `local` configuration (only if we are running on a developers machine), finally if we still don't find a configuration, we'll load the `default` config file `config/default.js`.
+When multiple configurations are present, which configuration file to use is resolved in the following way: 
+
+1. Check to see if there is a config file named after your remote Managed Runtime environment and use this if one is present.
+2. If we are running on a developer machine, look for a `local` configuration and use this if one is present.
+3. Load the `default` config file `config/default.js`.
 
 This allows you do these but not limited to things:
 
