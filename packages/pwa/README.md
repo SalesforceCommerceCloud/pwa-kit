@@ -56,11 +56,6 @@ This allows you do these but not limited to things:
 - Each developer can have their own configuration, connection to their own Commerce API sandboxes.
 - Deploy a single codebase application to multiple environments with their own specific configurations (Multiple B2C Site with Different Domains).
 
-This allows for the following:
-
-- Each developer can set up their own configuration file and connection to their own Commerce API sandboxes.
-- Deploy a single codebase application to multiple environments, each with their own specific configurations (Multiple B2C Site with Different Domains).
-
 Furthermore, your configurations can be written in any of the following languages, `.js`, `.yml`, `.yaml`, or `.json`. And will be marched based on that priority. 
 
 ### Customize URLs
