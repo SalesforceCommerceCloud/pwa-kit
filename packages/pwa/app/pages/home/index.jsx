@@ -8,6 +8,9 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {useIntl, FormattedMessage} from 'react-intl'
+import loadable from '@loadable/component'
+
+const SideBySide = loadable(() => import(`./sideBySide`), {})
 
 // Components
 import {
@@ -52,6 +55,8 @@ const Home = ({productSearchResult, isLoading}) => {
                 description="Commerce Cloud Retail React App"
                 keywords="Commerce Cloud, Retail React App, React Storefront"
             />
+
+            <SideBySide />
 
             <Hero
                 title={intl.formatMessage({
