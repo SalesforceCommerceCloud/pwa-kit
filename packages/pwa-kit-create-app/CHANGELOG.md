@@ -1,4 +1,7 @@
-## v1.5.0-dev (Jan 28, 2022)
+## v1.5.1-alpha.0 (Mar 31, 2022)
+-   Fix incorrect site related values when generating without use of a preset [#470](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/470)
+
+## v1.5.0 (Jan 28, 2022)
 -   Fix project generation on Windows when using WSL [#385](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/385)
 
 ## v1.4.0 (Jan 27, 2022)
