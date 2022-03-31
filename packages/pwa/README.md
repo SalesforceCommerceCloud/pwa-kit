@@ -29,7 +29,7 @@ See the [Localization README.md](./app/translations/README.md) for important set
 
 ## Retail Project Configurations
 
-By default the Retail React App's configuration is located within the `app/config` folder, and more specifically the `default.js` file. Within this file you can make changes to how your application runs on the Managed Runtime via your SSR options like `ssrParameters`, `pageNotFoundURL`, etc. Similarly you can make changes to how your Retail React App works by changing the configuration options under the `app` key. Some of those options are your Commerce API and Einstein API connection strings, your URL settings, and site and site alias configurations.
+The Retail React App's configuration is located within the `app/config` folder, and more specifically the `default.js` file. Within this file you can make changes to how your application runs on the Managed Runtime via your SSR options like `ssrParameters`, `pageNotFoundURL`, etc. Similarly you can make changes to how your Retail React App works by changing the configuration options under the `app` key. Some of those options are your Commerce API and Einstein API connection strings, your URL settings, and site and site alias configurations.
 
 We extract the sites configured for you application into its own file called `config/sites.js`. This allows you to more easily synchronize the sites supported by your Retail App and those defined in your Business Manager backend. But you can define your sites directly in the main configuration file is you so choose. 
 
