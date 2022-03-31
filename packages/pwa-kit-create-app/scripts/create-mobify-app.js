@@ -186,7 +186,7 @@ const runGenerator = (answers, {outputDir}) => {
         p.resolve(outputDir, 'config', 'default.js')
     )
 
-    new sh.ShellString(PWAKitSitesTemplate()).to(p.resolve(outputDir, 'config', 'sites.js'))
+    new sh.ShellString(PWAKitSitesTemplate(answers)).to(p.resolve(outputDir, 'config', 'sites.js'))
 
     npmInstall(outputDir)
 }
