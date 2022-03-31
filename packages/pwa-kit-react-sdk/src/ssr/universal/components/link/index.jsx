@@ -24,7 +24,10 @@ const Link = (props) => {
         _routes = routes()
     }
 
+    //TODO: Extend Link to use {Link as RouterLink} OR {NavLink as RouterNavLink} from react-router
+
     // Remove routes with * path
+    // TODO: Use a RegExp
     _routes = _routes.filter((_route) => _route.path !== '*')
 
     const isMatch = matchRoute(to, _routes).match
