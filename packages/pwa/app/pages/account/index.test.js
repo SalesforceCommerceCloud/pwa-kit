@@ -18,16 +18,7 @@ import {
 } from '../../commerce-api/mock-data'
 import useCustomer from '../../commerce-api/hooks/useCustomer'
 import Account from './index'
-import {getConfig} from 'pwa-kit-runtime/utils/ssr-config'
-import mockConfig from '../../../config/__mocks__/default'
 
-jest.mock('pwa-kit-runtime/utils/ssr-config', () => {
-    const origin = jest.requireActual('pwa-kit-runtime/utils/ssr-config')
-    return {
-        ...origin,
-        getConfig: jest.fn()
-    }
-})
 jest.mock('../../commerce-api/utils', () => {
     const originalModule = jest.requireActual('../../commerce-api/utils')
     return {
@@ -38,11 +29,13 @@ jest.mock('../../commerce-api/utils', () => {
 
 const MockedComponent = () => {
     const customer = useCustomer()
+
     useEffect(() => {
         if (!customer.isRegistered) {
             customer.login('test@test.com', 'password1')
         }
     }, [])
+
     return (
         <Switch>
             <Route
@@ -64,7 +57,6 @@ const server = setupMockServer(
 beforeEach(() => {
     jest.resetModules()
     server.listen({onUnhandledRequest: 'error'})
-    getConfig.mockImplementation(() => mockConfig)
 
     // Since we're testing some navigation logic, we are using a simple Router
     // around our component. We need to initialize the default route/path here.
@@ -83,7 +75,6 @@ test('Redirects to login page if the customer is not logged in', async () => {
             return res(ctx.delay(0), ctx.status(200), ctx.json(mockedGuestCustomer))
         })
     )
-
     renderWithProviders(<MockedComponent />)
     await waitFor(() => expect(window.location.pathname).toEqual(`${expectedBasePath}/login`))
 })

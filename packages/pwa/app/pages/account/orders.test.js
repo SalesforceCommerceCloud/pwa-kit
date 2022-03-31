@@ -13,15 +13,7 @@ import {renderWithProviders, createPathWithDefaults, setupMockServer} from '../.
 import {mockOrderHistory, mockOrderProducts} from '../../commerce-api/mock-data'
 import useCustomer from '../../commerce-api/hooks/useCustomer'
 import Orders from './orders'
-import {getConfig} from 'pwa-kit-runtime/utils/ssr-config'
-jest.mock('pwa-kit-runtime/utils/ssr-config', () => {
-    const origin = jest.requireActual('pwa-kit-runtime/utils/ssr-config')
-    return {
-        ...origin,
-        getConfig: jest.fn()
-    }
-})
-import mockConfig from '../../../config/__mocks__/default'
+
 jest.mock('../../commerce-api/utils', () => {
     const originalModule = jest.requireActual('../../commerce-api/utils')
     return {
@@ -64,11 +56,8 @@ beforeEach(() => {
     jest.resetModules()
 
     server.listen({onUnhandledRequest: 'error'})
-    // mock getConfig to return the mock config instead of actual one
-    getConfig.mockImplementation(() => mockConfig)
-    const ordersUrl = createPathWithDefaults('/account/orders')
 
-    window.history.pushState({}, 'Account', ordersUrl)
+    window.history.pushState({}, 'Account', createPathWithDefaults('/account/orders'))
 })
 afterEach(() => {
     localStorage.clear()
@@ -89,7 +78,6 @@ test('Renders order history and details', async () => {
     ).toHaveLength(3)
 
     user.click((await screen.findAllByText(/view details/i))[0])
-    console.log('window.location', window.location.pathname)
     expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
     expect(await screen.findByText(/order number: 00028011/i)).toBeInTheDocument()
     expect(

@@ -10,15 +10,7 @@ import user from '@testing-library/user-event'
 import {rest} from 'msw'
 import {createPathWithDefaults, renderWithProviders, setupMockServer} from '../../utils/test-utils'
 import ResetPassword from '.'
-import {getConfig} from 'pwa-kit-runtime/utils/ssr-config'
-jest.mock('pwa-kit-runtime/utils/ssr-config', () => {
-    const origin = jest.requireActual('pwa-kit-runtime/utils/ssr-config')
-    return {
-        ...origin,
-        getConfig: jest.fn()
-    }
-})
-import mockConfig from '../../../config/__mocks__/default'
+
 jest.setTimeout(60000)
 
 const mockRegisteredCustomer = {
@@ -83,8 +75,7 @@ beforeEach(() => {
     server.listen({
         onUnhandledRequest: 'error'
     })
-    // mock getConfig to return the mock config instead of actual one
-    getConfig.mockImplementation(() => mockConfig)
+
     window.history.pushState({}, 'Reset Password', createPathWithDefaults('/reset-password'))
 })
 afterEach(() => {

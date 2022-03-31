@@ -14,15 +14,7 @@ import {BrowserRouter as Router, Route} from 'react-router-dom'
 import Account from '../account'
 import Registration from '../registration'
 import ResetPassword from '../reset-password'
-import {getConfig} from 'pwa-kit-runtime/utils/ssr-config'
-jest.mock('pwa-kit-runtime/utils/ssr-config', () => {
-    const origin = jest.requireActual('pwa-kit-runtime/utils/ssr-config')
-    return {
-        ...origin,
-        getConfig: jest.fn()
-    }
-})
-import mockConfig from '../../../config/__mocks__/default'
+
 jest.setTimeout(60000)
 
 const mockRegisteredCustomer = {
@@ -118,8 +110,6 @@ const server = setupMockServer()
 // Set up and clean up
 beforeEach(() => {
     jest.resetModules()
-    // mock getConfig to return the mock config instead of actual one
-    getConfig.mockImplementation(() => mockConfig)
     server.listen({
         onUnhandledRequest: 'error'
     })

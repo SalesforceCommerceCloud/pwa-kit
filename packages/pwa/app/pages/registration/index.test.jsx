@@ -11,15 +11,7 @@ import {renderWithProviders} from '../../utils/test-utils'
 import Registration from '.'
 import {BrowserRouter as Router, Route} from 'react-router-dom'
 import Account from '../account'
-import {getConfig} from 'pwa-kit-runtime/utils/ssr-config'
-jest.mock('pwa-kit-runtime/utils/ssr-config', () => {
-    const origin = jest.requireActual('pwa-kit-runtime/utils/ssr-config')
-    return {
-        ...origin,
-        getConfig: jest.fn()
-    }
-})
-import mockConfig from '../../../config/__mocks__/default'
+
 jest.setTimeout(60000)
 
 const mockRegisteredCustomer = {
@@ -141,8 +133,6 @@ const MockedComponent = () => {
 // Set up and clean up
 beforeEach(() => {
     jest.useFakeTimers()
-    // mock getConfig to return the mock config instead of actual one
-    getConfig.mockImplementation(() => mockConfig)
 })
 afterEach(() => {
     localStorage.clear()
