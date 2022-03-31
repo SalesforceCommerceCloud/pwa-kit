@@ -1,0 +1,89 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Building Your App...</title>
+    <link rel="stylesheet" href="./css/normalize.css">
+    <link rel="stylesheet" href="./css/main.css">
+</head>
+<body>
+    <main>
+        <div class="main-img">
+            <img class="layer layer-2" src="./img/codey-bg.svg" />
+            <img class="layer layer-1" src="./img/codey-bear.svg" />
+            <img class="layer cloud-1" src="./img/cloud-1.svg" />
+            <img class="layer cloud-2" src="./img/cloud-2.svg" />
+            <img class="layer cloud-3" src="./img/cloud-3.svg" />
+        </div>
+        <div class="message">
+            <h1 class="loading-text">Building your app</h1>
+            <div class="fun-facts">
+                <p class="fun-fact fun-fact-1">Fun Fact: The historical uptime with PWA Kit and MRT is 99%.</p>
+                <p class="fun-fact fun-fact-2">Fun Fact: Maximizing your cache hit ratio can drastically improve storefront performance. <a href="https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/maximizing-your-cache-hit-ratio.html">Learn more.</a></p>
+                <p class="fun-fact fun-fact-3">Fun Fact: In PWA Kit 1.4, we now support React 17. <a href="https://github.com/SalesforceCommerceCloud/pwa-kit/releases">Learn more.</a></p>
+                <p class="fun-fact fun-fact-4">Fun Fact: AppConfig is one of 4 special components used to add functionality across multiple pages. <a href="https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/special-components.html">Learn more.</a></p>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="logo">
+            <img src="./img/logo.svg" />
+        </div>
+
+        <ul class="external-links">
+            <li>
+                <a href="https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/overview" target="_blank">
+                    <span>Documentation</span>
+                    <img src="./img/devDocumentation.svg" alt="Documentation"/>
+                </a>
+            </li>
+            <li>
+                <a href="https://github.com/SalesforceCommerceCloud/pwa-kit" target="_blank">
+                    <span>Github</span>
+                    <img src="./img/devGithub.svg" alt="GitHub"/>
+                </a>
+            </li>
+            <li>
+                <a href="https://trailhead.salesforce.com/en/content/learn/modules/commerce-pwa-kit-and-managed-runtime" target="_blank">
+                    <span>Trailhead</span>
+                    <img src="./img/devTrailhead.svg" alt="Trailhead"/>
+                </a>
+            </li>
+        </ul>
+    </footer>
+
+    <script>
+        (function() {
+            const url = new URL(window.location)
+            const loading = url.searchParams.get('loading')
+
+            if (loading === '1') {
+                const interval = 1000
+                const waitForReady = () => {
+                    return new Promise((resolve) => {
+                        const checkReady = () => {
+                            fetch('/__mrt/status')
+                            .then((res) => res.json())
+                            .then((data) => {
+                                if (data.ready) {
+                                    resolve()
+                                } else {
+                                    setTimeout(checkReady, interval)
+                                }
+                            })
+                        }
+                        checkReady()
+                    })
+                }
+
+                waitForReady().then(() => {
+                    // Redirect to homepage
+                    window.location = url.origin
+                })
+            }
+        })()
+    </script>
+</body>
+</html>
