@@ -17,7 +17,7 @@ module.exports = {
             // showDefaults: true
         },
         // The default site for your app. This value will be used when a siteRef could not be determined from the url
-        defaultSite: 'RefArch',
+        defaultSite: '${commerceApi.siteId}',
         // Provide aliases for your sites. These will be used in place of your site id when generating paths throughout the application.
         // siteAliases: {
         //     RefArch: 'us'
