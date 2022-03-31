@@ -273,7 +273,7 @@ describe('configureRoutes', function() {
             exact: true
         }
     ]
-    console.log('route-utils window.__CONFIG', window.__CONFIG__)
+
     cases.forEach(({urlConfig, expectedRes, ignoredRoutes = []}) => {
         test(`Should return expected routes based on ${JSON.stringify(urlConfig)} config${
             ignoredRoutes.length ? ` and ignore routes ${ignoredRoutes.join(',')}` : ' '
