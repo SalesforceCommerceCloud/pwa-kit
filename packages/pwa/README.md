@@ -159,14 +159,6 @@ If you set `url.showDefault` to `true` in `/config/default.js` file, then defaul
 
 > *Note*: URLs constructed using canonical site and locale ids are still valid URLs even when aliases are used.   
 
-### Manage Multiple B2C Site with Different Domains
-
-It is possible to manage mutliple B2C sites defined in Business Manager and deploy them over different domains using multiple Managed Runtime environments. This is done using a dedicated config file for each environment. For example, your site can be `customer.ca` and `customer.uk`, or `customer-a.com` and `customer-b.ca`. You can also customize the URL patterns further. t is possible to have `customer-1.com/us` and `customer-2.com/?locale=en_US`.
-
-You can deploy bundles to work with multiple domains using different Managed Runtime envioronment, each configured for a separate domain. The configuration mapping is done by means of unique configuration file for each Managed Runtime environment. 
-
-For example, to deploy `customer-1.com` is deployed to envioronment `env-customer-1`, and `customer-2.com` to environment `env-customer-2`, you need to create files `config/env-customer-1.js` and `config/env-customer-2.js` respectively, in place of `config/default.js`. 
-
 ## Documentation
 
 The full documentation for PWA Kit is hosted on the [Salesforce Developers](https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/overview) portal.
