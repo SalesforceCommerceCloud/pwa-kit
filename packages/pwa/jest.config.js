@@ -1,4 +1,4 @@
-const base = require('pwa-kit-build/configs/jest/jest.config.js')
+const base = require('sf-mrt/configs/jest/jest.config.js')
 
 module.exports = {
     ...base,
