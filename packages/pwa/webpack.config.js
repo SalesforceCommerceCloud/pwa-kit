@@ -6,4 +6,10 @@
  */
 const config = require('pwa-kit-react-sdk/webpack/config')
 
+config.forEach((c) => {
+    c.module.rules.push({
+        test: /swiper/,
+        use: ['style-loader', 'css-loader']
+    })
+})
 module.exports = config
