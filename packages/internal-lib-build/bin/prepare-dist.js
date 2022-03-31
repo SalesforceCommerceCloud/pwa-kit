@@ -81,38 +81,39 @@ const main = async () => {
     console.log('Preparing dist...')
     // Remove the dist/package.json so we don't end up including more files in
     // the package.
-    await rimraf(`${DEST_DIR}/package.json`)
+    // await rimraf(`${DEST_DIR}/package.json`)
+    // console.log('111')
 
-    try {
-        // Get a list of files from the `npm pack --dry-run` command.
-        const packageFiles = await getPackageFiles()
-
-        // Move the required files into the `dist` folder.
-        await copyFiles(packageFiles, DEST_DIR)
-    } catch (e) {
-        catcher('Error while copying files')(e)
-    }
-
-    try {
-        // Update package.json imports.
-        await replace({
-            ignore: ['dist/scripts/**/*', 'dist/bin/**/*', 'dist/template/**/*'],
-            files: ['dist/**/*.js'],
-            from: /..\/package.json/,
-            to: 'package.json'
-        })
-
-        // Update script to remove `dist` folder in imports.
-        await replace({
-            files: ['dist/scripts/**/!(prepare-dist.js)'],
-            from: /dist\//,
-            to: '',
-            // Scripts are optional, don't fail if nothing matches the glob.
-            allowEmptyPaths: true
-        })
-    } catch (e) {
-        catcher('Error replacing file references')(e)
-    }
+    // try {
+    //     // Get a list of files from the `npm pack --dry-run` command.
+    //     const packageFiles = await getPackageFiles()
+    //     console.log('222')
+    //     // Move the required files into the `dist` folder.
+    //     await copyFiles(packageFiles, DEST_DIR)
+    // } catch (e) {
+    //     catcher('Error while copying files')(e)
+    // }
+    // console.log('333')
+    // try {
+    //     // Update package.json imports.
+    //     await replace({
+    //         ignore: ['dist/scripts/**/*', 'dist/bin/**/*', 'dist/template/**/*'],
+    //         files: ['dist/**/*.js'],
+    //         from: /..\/package.json/,
+    //         to: 'package.json'
+    //     })
+    //     console.log('444')
+    //     // Update script to remove `dist` folder in imports.
+    //     await replace({
+    //         files: ['dist/scripts/**/!(prepare-dist.js)'],
+    //         from: /dist\//,
+    //         to: '',
+    //         // Scripts are optional, don't fail if nothing matches the glob.
+    //         allowEmptyPaths: true
+    //     })
+    // } catch (e) {
+    //     catcher('Error replacing file references')(e)
+    // }
 
     console.log('Successfully prepared!')
 }
