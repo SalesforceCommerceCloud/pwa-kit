@@ -65,7 +65,7 @@ Furthermore, your configurations can be written in any of the following language
 
 ### Customize URLs
 
-You can customize how storefront URLs are formatted in `config/default.js`. The Retail React App allows you to configure site or locale references (ids or aliases) to be in path or a query parameter. You can also not have them in URL altogether. 
+You can customize how storefront URLs are formatted in `config/default.js`. The Retail React App allows you to configure site or locale references (ids or aliases) to be in the path or a query parameter. You can also not have them in the URL altogether. 
 
 ```js
 // config/default.js
