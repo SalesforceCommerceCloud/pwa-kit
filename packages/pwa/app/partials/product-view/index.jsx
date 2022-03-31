@@ -219,8 +219,11 @@ const ProductView = ({
                                 selectedVariationAttributes={variationParams}
                             />
                             <HideOnMobile>
-                                {showFullLink && product && (
-                                    <Link to={`/product/${product.master.masterId}`}>
+                                {//TODO: Change for testing purposes. Link with external path pointing to SFRA site.
+                                product && (
+                                    <Link
+                                        to={`/path-not-matching-pwa-routes/${product.master.masterId}`}
+                                    >
                                         <Text color="blue.600">
                                             {intl.formatMessage({
                                                 defaultMessage: 'See full details',

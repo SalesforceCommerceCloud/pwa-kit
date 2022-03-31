@@ -11,23 +11,31 @@ import {Link as SPALink, NavLink as NavSPALink} from 'react-router-dom'
 import {buildPathWithUrlConfig} from '../../utils/url'
 import useSite from '../../hooks/use-site'
 import useLocale from '../../hooks/use-locale'
+import SDKLink from 'pwa-kit-react-sdk/ssr/universal/components/link'
 
 const Link = React.forwardRef(({href, to, useNavLink = false, ...props}, ref) => {
     const _href = to || href
     const site = useSite()
     const locale = useLocale()
 
+    //TODO: Add configuration value to the default.js config defining the SFRA hostname
+    const urlHostname = 'https://development-internal-ccdemo.demandware.net'
+
+    const linkType = useNavLink ? NavSPALink : SPALink
+
     // if alias is not defined, use site id
     const updatedHref = buildPathWithUrlConfig(_href, {
         locale: locale.alias || locale.id,
         site: site.alias || site.id
     })
+
     return (
         <ChakraLink
-            as={useNavLink ? NavSPALink : SPALink}
+            as={SDKLink}
+            to={updatedHref}
+            toHostname={urlHostname}
             {...(useNavLink && {exact: true})}
             {...props}
-            to={_href === '/' ? '/' : updatedHref}
             ref={ref}
         />
     )

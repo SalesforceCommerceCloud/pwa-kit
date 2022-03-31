@@ -8,6 +8,29 @@
  * @module progressive-web-sdk/ssr/universal/utils
  */
 import {proxyConfigs} from '../../utils/ssr-shared'
+import {matchPath} from 'react-router-dom'
+
+/**
+ * Checks if a URL path matches a route inside an array of routes.
+ * @param path URL pathname
+ * @param routes array of react-router route objects
+ * @returns {{route, match}} route object matching the URL pathname, match boolean
+ */
+export const matchRoute = (path, routes) => {
+    let match
+    let route
+
+    routes.some((_route) => {
+        const _match = matchPath(path, _route)
+        if (_match) {
+            match = _match
+            route = _route
+        }
+        return !!match
+    })
+
+    return {route, match}
+}
 
 const onClient = typeof window !== 'undefined'
 let _config

@@ -14,10 +14,10 @@ import React from 'react'
 import ReactDOMServer from 'react-dom/server'
 import {Helmet} from 'react-helmet'
 import {ChunkExtractor} from '@loadable/server'
-import {StaticRouter as Router, matchPath} from 'react-router-dom'
+import {StaticRouter as Router} from 'react-router-dom'
 import serialize from 'serialize-javascript'
 
-import {getAssetUrl, getConfig} from '../universal/utils'
+import {getAssetUrl, getConfig, matchRoute} from '../universal/utils'
 import DeviceContext from '../universal/device-context'
 
 import Document from '../universal/components/_document'
@@ -145,17 +145,7 @@ export const render = async (req, res, next) => {
     }
 
     // Step 1 - Find the match.
-    let route
-    let match
-
-    routes.some((_route) => {
-        const _match = matchPath(req.path, _route)
-        if (_match) {
-            match = _match
-            route = _route
-        }
-        return !!match
-    })
+    const {route, match} = matchRoute(req.path, routes)
 
     // Step 2 - Get the component
     const component = await route.component.getComponent()
