@@ -94,7 +94,7 @@
                 const transitionMs = 1000; // Cross-fade time for each fun fact
                 const facts = document.querySelectorAll('.fun-fact');
                 facts.forEach((fact) => {
-                    fact.style.setProperty('--transition-time', transitionMs);
+                    fact.style.transitionDuration = transitionMs + 'ms';
                     fact.classList.add('fun-fact--hidden');
                 });
                 let counter = 0;

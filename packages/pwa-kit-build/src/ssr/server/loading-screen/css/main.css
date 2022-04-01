@@ -212,7 +212,7 @@ footer ul {
     min-height: 2em;
     opacity: 0;
     transition: opacity;
-    transition-duration: calc(var(--transition-time) * 1ms);
+    transition-duration: 0ms;
     transition-timing-function: ease-in-out;
 }
 
