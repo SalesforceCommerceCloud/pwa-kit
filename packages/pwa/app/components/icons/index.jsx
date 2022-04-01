@@ -10,8 +10,6 @@ import {Icon, useTheme} from '@chakra-ui/react'
 // Our own SVG imports. These will be extracted to a single sprite sheet by the
 // svg-sprite-loader webpack plugin at build time and injected in the <body> tag
 // during SSR.
-// NOTE: Another solution would be to use `require-context.macro` package to accomplish
-// importing icon svg's.
 import AmexSymbol from '../../assets/svg/cc-amex.svg'
 import AlertSymbol from '../../assets/svg/alert.svg'
 import AccountSymbol from '../../assets/svg/account.svg'
@@ -91,8 +89,6 @@ const icon = (symbol) => {
 }
 
 // Export Chakra icon components that use our SVG sprite symbol internally
-// For non-square SVGs, we can use the symbol data from the import to set the
-// proper viewBox attribute on the Icon wrapper.
 export const AmexIcon = icon(AmexSymbol)
 export const AlertIcon = icon(AlertSymbol)
 export const AccountIcon = icon(AccountSymbol)
