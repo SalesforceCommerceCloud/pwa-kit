@@ -48,24 +48,24 @@ test("calls Utils.exists to check for the bundle's existence", () => {
         })
 })
 
-// test('the default options cannot be overwritten', async () => {
-//     Utils.createBundle.mockClear()
-//     Utils.createBundle.mockReturnValue(Promise.reject())
+test('the default options cannot be overwritten', async () => {
+    Utils.createBundle.mockClear()
+    Utils.createBundle.mockReturnValue(Promise.reject())
 
-//     try {
-//         await uploadBundle({target: 'dev'})
-//     } catch (err) {
-//         const outputTarget = Utils.createBundle.mock.calls[0][0].target
-//         expect(outputTarget).toBe('dev')
-//     }
+    try {
+        await uploadBundle({target: 'dev'})
+    } catch (err) {
+        const outputTarget = Utils.createBundle.mock.calls[0][0].target
+        expect(outputTarget).toBe('dev')
+    }
 
-//     try {
-//         await uploadBundle()
-//     } catch (err) {
-//         const outputTarget = Utils.createBundle.mock.calls[1][0].target
-//         const defaultTargetValue = '' // see OPTION_DEFAULTS in ./upload.js
-//         expect(outputTarget).toBe(defaultTargetValue)
-//     }
+    try {
+        await uploadBundle()
+    } catch (err) {
+        const outputTarget = Utils.createBundle.mock.calls[1][0].target
+        const defaultTargetValue = '' // see OPTION_DEFAULTS in ./upload.js
+        expect(outputTarget).toBe(defaultTargetValue)
+    }
 
-//     Utils.createBundle.mockReset()
-// })
+    Utils.createBundle.mockReset()
+})
