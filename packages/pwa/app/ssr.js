@@ -32,9 +32,6 @@ const options = {
     // The port that the local dev server listens on
     port: 3000,
 
-    // This is the `mobify` object defined in your config folder or package.json file.
-    mobify: loadConfig(),
-
     // The protocol on which the development Express app listens.
     // Note that http://localhost is treated as a secure context for development.
     protocol: 'http'

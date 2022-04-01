@@ -50,10 +50,6 @@ import {DEFAULT_SITE_TITLE, HOME_HREF, THEME_COLOR} from '../../constants'
 
 import Seo from '../seo'
 import {resolveSiteFromUrl} from '../../utils/site-utils'
-import useWishlist from '../../hooks/use-wishlist'
-import useSite from '../../hooks/use-site'
-import {resolveSiteFromUrl} from '../../utils/site-utils'
-import useLocale from '../../hooks/use-locale'
 
 const DEFAULT_NAV_DEPTH = 3
 const DEFAULT_ROOT_CATEGORY = 'root'

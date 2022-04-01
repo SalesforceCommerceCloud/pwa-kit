@@ -19,7 +19,6 @@ import {getConfig} from 'pwa-kit-runtime/utils/ssr-config'
 // Components
 import {Skeleton} from '@chakra-ui/react'
 import {configureRoutes} from './utils/routes-utils'
-import {getConfig} from 'pwa-kit-react-sdk/ssr/universal/utils'
 
 const fallback = <Skeleton height="75vh" width="100%" />
 
