@@ -101,7 +101,7 @@ main {
     font-style: normal;
     font-weight: 400;
     font-size: 14px;
-    line-height: 1.5em;
+    line-height: 1.5;
 }
 
 .message a {
@@ -129,7 +129,7 @@ footer a {
     font-style: normal;
     font-weight: 400;
     font-size: 16px;
-    line-height: 16px;
+    line-height: 1;
     text-decoration: none;
 }
 footer ul {
