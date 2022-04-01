@@ -47,13 +47,13 @@
 
 @keyframes floating {
     from {
-        transform: translate(-50%, -50%);
+        top: 50%;
     }
     65% {
-        transform: translate(-50%, -52%);
+        top: 52%;
     }
     to {
-        transform: translate(-50%, -50%);
+        top: 50%;
     }
 }
 
