@@ -28,6 +28,7 @@ import {useIntl} from 'react-intl'
 import {productUrlBuilder} from '../../utils/url'
 import Link from '../link'
 import withRegistration from '../../hoc/with-registration'
+import {useCurrency} from '../../hooks'
 
 const IconButtonWithRegistration = withRegistration(IconButton)
 
@@ -65,6 +66,8 @@ const ProductTile = (props) => {
         ...rest
     } = props
     const {currency, image, price, productName, productId} = product
+
+    const {currency: activeCurrency} = useCurrency()
     const [isFavouriteLoading, setFavouriteLoading] = useState(false)
     const styles = useMultiStyleConfig('ProductTile')
 
@@ -118,7 +121,12 @@ const ProductTile = (props) => {
             <Text {...styles.title}>{productName}</Text>
 
             {/* Price */}
-            <Text {...styles.price}>{intl.formatNumber(price, {style: 'currency', currency})}</Text>
+            <Text {...styles.price}>
+                {intl.formatNumber(price, {
+                    style: 'currency',
+                    currency: currency || activeCurrency
+                })}
+            </Text>
         </Link>
     )
 }

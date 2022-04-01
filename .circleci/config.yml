@@ -170,7 +170,7 @@ commands:
             node packages/pwa-kit-create-app/scripts/create-mobify-app-dev.js --outputDir generated-project
             
             cd generated-project
-            npm run prod:build
+            npm run build
       - run:
           name: Generate hello-world project
           environment:
@@ -374,7 +374,7 @@ workflows:
     jobs:
       - testNode12
       - testNode14
-      - testNode14Windows
+      # - testNode14Windows
       - testNode14npm7
       - testNode14npm8
       - generatedSFCCProjectTest
@@ -392,8 +392,8 @@ workflows:
           context: nightly-build
       - testNode14:
           context: nightly-build
-      - testNode14Windows:
-          context: nightly-build
+      # - testNode14Windows:
+      #     context: nightly-build
       - testNode14npm7:
           context: nightly-build
       - testNode14npm8:

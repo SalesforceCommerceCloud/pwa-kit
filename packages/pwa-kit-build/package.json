@@ -22,7 +22,7 @@
     "configs"
   ],
   "scripts": {
-    "format": "internal-lib-build format '\"**/*.{js,jsx}\"'",
+    "format": "internal-lib-build format \"**/*.{js,jsx}\"",
     "lint": "npm run lint:js",
     "lint:fix": "npm run lint:js -- --fix",
     "lint:js": "internal-lib-build lint .",
@@ -117,8 +117,7 @@
     "supertest": "^4.0.2"
   },
   "peerDependencies": {
-    "@loadable/component": "^5.15.0",
-    "pwa-kit-runtime": "^2.0.0-dev.2"
+    "@loadable/component": "^5.15.0"
   },
   "engines": {
     "node": "^12.0.0 || ^14.0.0",

@@ -10,6 +10,7 @@
  *
  * @returns - the application configuration object.
  */
+/* istanbul ignore next */
 export const getConfig = () => {
     return window.__CONFIG__
 }

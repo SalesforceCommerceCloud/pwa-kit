@@ -63,6 +63,9 @@
     "rimraf": "2.6.1",
     "shelljs": "^0.8.4"
   },
+  "devDependencies": {
+    "npm-packlist": "^4.0.0"
+  },
   "scripts": {
     "lint": "npm run lint:js",
     "lint:fix": "npm run lint:js -- --fix",
