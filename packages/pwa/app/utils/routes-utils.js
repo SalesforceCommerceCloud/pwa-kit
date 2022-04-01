@@ -10,23 +10,25 @@ import {urlPartPositions} from '../constants'
 import {matchPath} from 'react-router-dom'
 
 /**
- * Check if a path matches an array of routes.
- * @param path path that
- * @param routes
- * @returns {*}
+ * Checks if a URL path matches a route inside an array of routes.
+ * @param path URL pathname
+ * @param routes array of react-router route objects
+ * @returns {{route, match}} route object matching the URL pathname, match boolean
  */
 export const matchRoute = (path, routes) => {
     let match
+    let route
 
-    const isMatch = routes.some((_route) => {
+    routes.some((_route) => {
         const _match = matchPath(path, _route)
         if (_match) {
             match = _match
+            route = _route
         }
         return !!match
     })
 
-    return isMatch
+    return {route, match}
 }
 
 /**

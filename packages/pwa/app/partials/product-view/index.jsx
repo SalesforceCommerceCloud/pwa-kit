@@ -219,7 +219,7 @@ const ProductView = ({
                                 selectedVariationAttributes={variationParams}
                             />
                             <HideOnMobile>
-                                {//TODO: Change for testing purposes. Link with external path pointing to SFRA site.
+                                {//TODO: Change for testing purposes. Link with external path pointing to external origin.
                                 product && (
                                     <Link
                                         to={`/path-not-matching-pwa-routes/${product.master.masterId}`}

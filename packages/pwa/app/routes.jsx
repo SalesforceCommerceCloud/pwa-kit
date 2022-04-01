@@ -101,11 +101,11 @@ const routes = [
         component: Wishlist
     },
     //TODO: Change for testing purposes. Route not matching the PWA routes
-    // are redirected to SFRA site.
+    // are redirected to eCDN and thus to the external origin.
     {
         path: '*',
         component: withRouter(({location}) => (
-            <Redirect to={`https://sfra-site.com${location.pathname}${location.search}`} />
+            <Redirect to={`https://domain-example.com${location.pathname}${location.search}`} />
         ))
     }
 ]

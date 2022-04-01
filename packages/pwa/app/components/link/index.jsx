@@ -19,23 +19,24 @@ const Link = React.forwardRef(({href, to, useNavLink = false, ...props}, ref) =>
     const site = useSite()
     const locale = useLocale()
 
-    //TODO: Add configuration value to the default.js config defining the SFRA hostname
-    const urlHostname = 'https://sfra-site.com'
+    //TODO: Add configuration value to the default.js config defining the external origin
+    const urlHostname = 'https://domain-example.com'
 
     let _routes
     if (typeof routes === 'function') {
         _routes = routes()
     }
 
-    // Remove route with * path
-    _routes = _routes.filter((_route) => _route.path !== '*')
+    const routePath = matchRoute(to, _routes)
 
-    const isMatch = matchRoute(_href, _routes)
+    // Routes matching wildcard * path are consider not routables
+    // TODO: Use a RegExp to match all the wildcard combinations: '*', '/*', '/*/'.
+    const isRoutable = routePath.match && routePath.route.path !== '*'
 
     const linkType = useNavLink ? NavSPALink : SPALink
 
     // if alias is not defined, use site id
-    const updatedHref = isMatch
+    const updatedHref = isRoutable
         ? buildPathWithUrlConfig(_href, {
               locale: locale.alias || locale.id,
               site: site.alias || site.id
@@ -44,8 +45,8 @@ const Link = React.forwardRef(({href, to, useNavLink = false, ...props}, ref) =>
 
     return (
         <ChakraLink
-            {...(isMatch ? {as: linkType} : {as: 'a'})}
-            {...(isMatch ? {to: updatedHref} : {href: updatedHref})}
+            {...(isRoutable ? {as: linkType} : {as: 'a'})}
+            {...(isRoutable ? {to: updatedHref} : {href: updatedHref})}
             {...(useNavLink && {exact: true})}
             {...props}
             ref={ref}
