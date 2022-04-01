@@ -199,32 +199,6 @@ footer ul {
     }
 }
 
-@keyframes cross-fade {
-    0% {
-        opacity: 0;
-        left: 0;
-    }
-    /* TODO: play with feeling */
-    9.1% {
-        opacity: 1;
-    }
-    /* TODO: 1/9 */
-    11.1% {
-        opacity: 1;
-    }
-    13.1% {
-        opacity: 0;
-        left: 0;
-    }
-    13.2% {
-        left: -200vw;
-    }
-    100% {
-        opacity: 0;
-        left: -200vw;
-    }
-}
-
 .fun-facts {
     position: relative;
 }
@@ -237,55 +211,17 @@ footer ul {
     width: 100%;
     min-height: 2em;
     opacity: 0;
-    animation: cross-fade 90s ease-in-out infinite;
-    animation-fill-mode: forwards;
+    transition: opacity;
+    transition-duration: calc(var(--transition-time) * 1ms);
+    transition-timing-function: ease-in-out;
 }
 
-/* TODO: add more classes */
-.fun-fact-1 {
-    animation-delay: 0s;
+.fun-fact--hidden {
+    display: none;
 }
-.fun-fact-2 {
-    animation-delay: 10s;
-}
-.fun-fact-3 {
-    animation-delay: 20s;
-}
-.fun-fact-4 {
-    animation-delay: 30s;
-}
-.fun-fact-5 {
-    animation-delay: 40s;
-}
-.fun-fact-6 {
-    animation-delay: 50s;
-}
-.fun-fact-7 {
-    animation-delay: 60s;
-}
-.fun-fact-8 {
-    animation-delay: 70s;
-}
-.fun-fact-9 {
-    animation-delay: 80s;
-}
-.fun-fact-10 {
-    animation-delay: 90s;
-}
-.fun-fact-11 {
-    animation-delay: 100s;
-}
-.fun-fact-12 {
-    animation-delay: 110s;
-}
-.fun-fact-13 {
-    animation-delay: 120s;
-}
-.fun-fact-14 {
-    animation-delay: 130s;
-}
-.fun-fact-15 {
-    animation-delay: 140s;
+
+.fun-fact--show {
+    opacity: 1;
 }
 
 .external-links span {

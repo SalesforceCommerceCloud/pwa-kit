@@ -19,15 +19,15 @@
         <div class="message">
             <h1 class="loading-text">Building Your App</h1>
             <div class="fun-facts">
-                <p class="fun-fact fun-fact-1">Tip: <code>AppConfig</code> is one of four special components in PWA Kit for adding functionality across multiple pages. <a target="_blank" href="https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/special-components.html">Learn more</a>.</p>
-                <p class="fun-fact fun-fact-2">Tip: You can use the <code>getProps</code> method to inject data from API requests into your pages. <a target="_blank" href="https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/routing.html">Learn more</a>.</p>
-                <p class="fun-fact fun-fact-3">Tip: Maximizing your cache hit ratio can drastically improve storefront performance. <a target="_blank" href="https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/maximizing-your-cache-hit-ratio.html">Learn more</a>.</p>
-                <p class="fun-fact fun-fact-4">Pop quiz: What does SLAS stand for? See the <a target="_blank" href="https://developer.salesforce.com/docs/commerce/commerce-api/references?meta=shopper-login:Summary">SLAS docs</a> for the answer!</p>
-                <p class="fun-fact fun-fact-5">Fun fact: In PWA Kit 1.4, we now support React 17. <a target="_blank" href="https://github.com/SalesforceCommerceCloud/pwa-kit/releases">Learn more</a>.</p>
-                <p class="fun-fact fun-fact-6">Want to write in TypeScript? You can start now!</p>
-                <p class="fun-fact fun-fact-7">Have you seen the new <a target="_blank" href="https://developer.salesforce.com/developer-centers/commerce-cloud">Commerce Cloud</a> page on the Salesforce Developers portal?</p>
-                <p class="fun-fact fun-fact-8">Want to learn more about composable commerce? Hang out with us at <a target="_blank" href="https://www.salesforce.com/trailblazerdx/">TrailblazerDX 2022</a>!</p>
-                <p class="fun-fact fun-fact-9">The Retail React App template implements core ecommerce flows from home page to checkout. <a target="_blank" href="https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/retail-react-app.html">Learn more</a>.</p>
+                <p class="fun-fact">Tip: <code>AppConfig</code> is one of four special components in PWA Kit for adding functionality across multiple pages. <a target="_blank" href="https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/special-components.html">Learn more</a>.</p>
+                <p class="fun-fact">Tip: You can use the <code>getProps</code> method to inject data from API requests into your pages. <a target="_blank" href="https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/routing.html">Learn more</a>.</p>
+                <p class="fun-fact">Tip: Maximizing your cache hit ratio can drastically improve storefront performance. <a target="_blank" href="https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/maximizing-your-cache-hit-ratio.html">Learn more</a>.</p>
+                <p class="fun-fact">Pop quiz: What does SLAS stand for? See the <a target="_blank" href="https://developer.salesforce.com/docs/commerce/commerce-api/references?meta=shopper-login:Summary">SLAS docs</a> for the answer!</p>
+                <p class="fun-fact">Fun fact: In PWA Kit 1.4, we now support React 17. <a target="_blank" href="https://github.com/SalesforceCommerceCloud/pwa-kit/releases">Learn more</a>.</p>
+                <p class="fun-fact">Want to write in TypeScript? You can start now!</p>
+                <p class="fun-fact">Have you seen the new <a target="_blank" href="https://developer.salesforce.com/developer-centers/commerce-cloud">Commerce Cloud</a> page on the Salesforce Developers portal?</p>
+                <p class="fun-fact">Want to learn more about composable commerce? Hang out with us at <a target="_blank" href="https://www.salesforce.com/trailblazerdx/">TrailblazerDX 2022</a>!</p>
+                <p class="fun-fact">The Retail React App template implements core ecommerce flows from home page to checkout. <a target="_blank" href="https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/retail-react-app.html">Learn more</a>.</p>
             </div>
         </div>
     </main>
@@ -88,6 +88,34 @@
                     window.location = url.origin
                 })
             }
+
+            const animateFacts = () => {
+                const holdMs = 8000; // Show time for each fun fact
+                const transitionMs = 1000; // Cross-fade time for each fun fact
+                const facts = document.querySelectorAll('.fun-fact');
+                facts.forEach((fact) => {
+                    fact.style.setProperty('--transition-time', transitionMs);
+                    fact.classList.add('fun-fact--hidden');
+                });
+                let counter = 0;
+
+                const modulo = (x, y) => ((x % y) + y) % y
+
+                const update = () => {
+                    const previous = modulo(counter - 1, facts.length)
+                    const current = modulo(counter, facts.length)
+                    facts[previous].classList.remove('fun-fact--show')
+                    setTimeout(() => facts[previous].classList.add('fun-fact--hidden'), transitionMs)
+                    facts[current].classList.remove('fun-fact--hidden')
+                    setTimeout(() => facts[current].classList.add('fun-fact--show'), 50)
+                }
+                update();
+                setInterval(() => {
+                    counter += 1;
+                    update()
+                }, holdMs)
+            }
+            animateFacts()
         })()
     </script>
 </body>
