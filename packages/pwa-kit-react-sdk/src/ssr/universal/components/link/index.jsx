@@ -16,24 +16,24 @@ import routes from '../../routes'
  *  react-router component with a relative URL.
  *
  */
+//TODO: Extend Link to accept prop to use react-router {Link as RouterLink} OR {NavLink as RouterNavLink}.
 const Link = ({to, ...props}) => {
     let _routes = routes
     if (typeof routes === 'function') {
         _routes = routes()
     }
 
-    //TODO: Extend Link to accept prop to use react-router {Link as RouterLink} OR {NavLink as RouterNavLink}.
+    const routePath = matchRoute(to, _routes)
 
-    // Remove wildcard routes with * path
+    // Routes matching wildcard * path are consider not routables
     // TODO: Use a RegExp to match all the wildcard combinations: '*', '/*', '/*/'.
-    _routes = _routes.filter((_route) => _route.path !== '*')
+    const isRoutable = routePath.match && routePath.route.path !== '*'
 
-    const isMatch = matchRoute(to, _routes).match
-    return isMatch ? (
-        // This link will be resolved by the PWA react-router.
+    return isRoutable ? (
+        // The link will be resolved by the PWA react-router.
         <RouterLink to={to} {...props} />
     ) : (
-        // This link will be resolved by eCDN, thus it can be resolved by an external origin.
+        // The link will be resolved by eCDN, thus it can be resolved by an external origin.
         //TODO: The hostname is only for testing the POC locally.
         // During production the domain will be the same for the PWA and the external origin.
         // During development we'll use a reverse proxy.
