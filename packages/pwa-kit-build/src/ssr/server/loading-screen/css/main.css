@@ -79,7 +79,8 @@ main {
 .wrapper {
     display: flex;
     flex-direction: column;
-    max-height: 100%;
+    max-height: calc(100% - (2 * 1.5em));
+    padding: 1.5em;
 }
 
 .main-img {
@@ -102,7 +103,6 @@ main {
     opacity: 0;
     animation: fade-in 1.5s 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     text-align: center;
-    padding: 0em 1.5em 1.5em 1.5em;
 }
 
 .message h1 {
