@@ -9,7 +9,6 @@ import PropTypes from 'prop-types'
 import {Link as RouterLink} from 'react-router-dom'
 import {matchRoute} from '../../utils'
 import routes from '../../routes'
-import {getAppOrigin} from '../../../../utils/url'
 
 /**
  *  The Link component match the URL with the paths defined in routes.jsx
@@ -17,26 +16,33 @@ import {getAppOrigin} from '../../../../utils/url'
  *  react-router component with a relative URL.
  *
  */
-const Link = (props) => {
-    const {to, toHostname = getAppOrigin(), ...rest} = props
+const Link = ({to, ...props}) => {
     let _routes = routes
     if (typeof routes === 'function') {
         _routes = routes()
     }
 
-    //TODO: Extend Link to use {Link as RouterLink} OR {NavLink as RouterNavLink} from react-router
+    //TODO: Extend Link to accept prop to use react-router {Link as RouterLink} OR {NavLink as RouterNavLink}.
 
-    // Remove routes with * path
-    // TODO: Use a RegExp
+    // Remove wildcard routes with * path
+    // TODO: Use a RegExp to match all the wildcard combinations: '*', '/*', '/*/'.
     _routes = _routes.filter((_route) => _route.path !== '*')
 
     const isMatch = matchRoute(to, _routes).match
-    return isMatch ? <RouterLink to={to} {...rest} /> : <a href={`${toHostname}${to}`} {...rest} />
+    return isMatch ? (
+        // This link will be resolved by the PWA react-router.
+        <RouterLink to={to} {...props} />
+    ) : (
+        // This link will be resolved by eCDN, thus it can be resolved by an external origin.
+        //TODO: The hostname is only for testing the POC locally.
+        // During production the domain will be the same for the PWA and the external origin.
+        // During development we'll use a reverse proxy.
+        <a href={`https://development-internal-ccdemo.demandware.net${to}`} {...props} />
+    )
 }
 
 Link.propTypes = {
-    to: PropTypes.string,
-    toHostname: PropTypes.string
+    to: PropTypes.string
 }
 
 export default Link

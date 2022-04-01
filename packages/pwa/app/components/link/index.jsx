@@ -17,9 +17,6 @@ const Link = React.forwardRef(({href, to, useNavLink = false, ...props}, ref) =>
     const site = useSite()
     const locale = useLocale()
 
-    //TODO: Add configuration value to the default.js config defining the SFRA hostname
-    const urlHostname = 'https://development-internal-ccdemo.demandware.net'
-
     // if alias is not defined, use site id
     const updatedHref = buildPathWithUrlConfig(_href, {
         locale: locale.alias || locale.id,
@@ -30,7 +27,6 @@ const Link = React.forwardRef(({href, to, useNavLink = false, ...props}, ref) =>
         <ChakraLink
             as={SDKLink}
             to={updatedHref}
-            toHostname={urlHostname}
             {...(useNavLink && {exact: true})}
             {...props}
             ref={ref}
