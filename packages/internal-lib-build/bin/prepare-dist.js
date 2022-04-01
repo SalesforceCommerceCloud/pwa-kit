@@ -14,6 +14,7 @@ const rimraf = Promise.promisify(require('rimraf'))
 const path = require('path')
 const exec = require('child_process').exec
 const replace = require('replace-in-file')
+const packlist = require('npm-packlist')
 
 const {copyFile} = fsPromises
 
@@ -26,32 +27,6 @@ const DEST_DIR = 'dist/'
 const catcher = (message) => (error) => {
     console.log(`${message}: ${error}`)
     process.exit(1)
-}
-
-/**
- * Get an array of files that will end up in the npm package.
- * @private
- * @returns {Promise<Array>} resolves with an array of files objects
- */
-const getPackageFiles = () => {
-    let output = ''
-    const child = exec(`npm pack --dry-run --json --ignore-scripts`)
-
-    child.stderr.on('data', (data) => {
-        console.log(data)
-    })
-
-    child.stdout.on('data', (data) => {
-        output += data
-    })
-
-    return new Promise((resolve, reject) => {
-        child.addListener('error', reject)
-        child.addListener('exit', () => {
-            const files = JSON.parse(output)[0].files.map(({path}) => path)
-            resolve(files)
-        })
-    })
 }
 
 /**
@@ -81,39 +56,38 @@ const main = async () => {
     console.log('Preparing dist...')
     // Remove the dist/package.json so we don't end up including more files in
     // the package.
-    // await rimraf(`${DEST_DIR}/package.json`)
-    // console.log('111')
+    await rimraf(`${DEST_DIR}/package.json`)
 
-    // try {
-    //     // Get a list of files from the `npm pack --dry-run` command.
-    //     const packageFiles = await getPackageFiles()
-    //     console.log('222')
-    //     // Move the required files into the `dist` folder.
-    //     await copyFiles(packageFiles, DEST_DIR)
-    // } catch (e) {
-    //     catcher('Error while copying files')(e)
-    // }
-    // console.log('333')
-    // try {
-    //     // Update package.json imports.
-    //     await replace({
-    //         ignore: ['dist/scripts/**/*', 'dist/bin/**/*', 'dist/template/**/*'],
-    //         files: ['dist/**/*.js'],
-    //         from: /..\/package.json/,
-    //         to: 'package.json'
-    //     })
-    //     console.log('444')
-    //     // Update script to remove `dist` folder in imports.
-    //     await replace({
-    //         files: ['dist/scripts/**/!(prepare-dist.js)'],
-    //         from: /dist\//,
-    //         to: '',
-    //         // Scripts are optional, don't fail if nothing matches the glob.
-    //         allowEmptyPaths: true
-    //     })
-    // } catch (e) {
-    //     catcher('Error replacing file references')(e)
-    // }
+    try {
+        // Get a list of files from the `npm pack --dry-run` command.
+        const packageFiles = await packlist()
+
+        // Move the required files into the `dist` folder.
+        await copyFiles(packageFiles, DEST_DIR)
+    } catch (e) {
+        catcher('Error while copying files')(e)
+    }
+
+    try {
+        // Update package.json imports.
+        await replace({
+            ignore: ['dist/scripts/**/*', 'dist/bin/**/*', 'dist/template/**/*'],
+            files: ['dist/**/*.js'],
+            from: /..\/package.json/,
+            to: 'package.json'
+        })
+        console.log('444')
+        // Update script to remove `dist` folder in imports.
+        await replace({
+            files: ['dist/scripts/**/!(prepare-dist.js)'],
+            from: /dist\//,
+            to: '',
+            // Scripts are optional, don't fail if nothing matches the glob.
+            allowEmptyPaths: true
+        })
+    } catch (e) {
+        catcher('Error replacing file references')(e)
+    }
 
     console.log('Successfully prepared!')
 }
