@@ -12,6 +12,9 @@ lighthouse/audit*
 app/integration-manager/docs
 messaging/*.csr
 
+# Local App Configuration Files
+config/local.*
+
 # Elastic Beanstalk Files
 .elasticbeanstalk/*
 !.elasticbeanstalk/*.cfg.yml

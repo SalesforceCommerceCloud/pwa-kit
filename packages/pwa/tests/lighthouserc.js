@@ -13,9 +13,9 @@ module.exports = {
             //NOTE: Adjust the key pages URLs that you find important to your website.
             url: [
                 'http://localhost:3000/',
-                'http://localhost:3000/en-GB/category/womens',
-                'http://localhost:3000/en-GB/product/25493613M',
-                'http://localhost:3000/en-GB/search?q=suit'
+                'http://localhost:3000/global/en-GB/category/womens',
+                'http://localhost:3000/global/en-GB/product/25493613M',
+                'http://localhost:3000/global/en-GB/search?q=suit'
             ],
             startServerReadyPattern: 'First build complete',
             startServerReadyTimeout: 90000
@@ -28,8 +28,8 @@ module.exports = {
             assertions: {
                 // NOTE: Adjust the scores accordingly as the performance is improved
                 'categories:performance': ['error', {minScore: 0.3}],
-                'categories:pwa': ['error', {minScore: 0.9}],
-                'categories:seo': ['error', {minScore: 0.85}],
+                'categories:pwa': ['error', {minScore: 0.8}],
+                'categories:seo': ['error', {minScore: 0.83}],
                 'categories:accessibility': ['error', {minScore: 0.88}]
             }
         }

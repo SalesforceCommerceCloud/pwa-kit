@@ -18,7 +18,6 @@ import webpackHotServerMiddleware from 'webpack-hot-server-middleware'
 import open from 'open'
 import requireFromString from 'require-from-string'
 import config from '../../configs/webpack/config'
-import {loadingScreen} from './loading-screen'
 import {RemoteServerFactory} from 'pwa-kit-runtime/ssr/server/build-remote-server'
 import {proxyConfigs} from 'pwa-kit-runtime/utils/ssr-shared'
 
@@ -101,9 +100,12 @@ export const DevServerMixin = {
             return res.json({ready: app.__webpackReady()})
         })
 
-        app.use('/__mrt', (req, res) => {
-            res.send(loadingScreen())
-        })
+        app.use(
+            '/__mrt/loading-screen/',
+            express.static(path.resolve(__dirname, 'loading-screen'), {
+                dotFiles: 'deny'
+            })
+        )
     },
 
     addSSRRenderer(app) {
@@ -123,16 +125,20 @@ export const DevServerMixin = {
         app.get('/worker.js', (req, res) => {
             app.__devMiddleware.waitUntilValid(() => {
                 const compiled = DevServerFactory._getWebpackAsset(req, 'pwa-others', 'worker.js')
-                    res.type('.js')
-                    res.send(compiled)
+                res.type('.js')
+                res.send(compiled)
             })
         })
 
         app.get('/worker.js.map', (req, res) => {
             app.__devMiddleware.waitUntilValid(() => {
-                const compiled = DevServerFactory._getWebpackAsset(req, 'pwa-others', 'worker.js.map')
-                    res.type('.js.map')
-                    res.send(compiled)
+                const compiled = DevServerFactory._getWebpackAsset(
+                    req,
+                    'pwa-others',
+                    'worker.js.map'
+                )
+                res.type('.js.map')
+                res.send(compiled)
             })
         })
 
@@ -140,7 +146,7 @@ export const DevServerMixin = {
             if (app.__webpackReady()) {
                 middleware(req, res, next)
             } else {
-                res.redirect(301, '/__mrt?loading=1')
+                res.redirect(301, '/__mrt/loading-screen/index.html?loading=1')
             }
         })
 

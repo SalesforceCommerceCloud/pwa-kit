@@ -14,3 +14,39 @@ import 'regenerator-runtime/runtime'
 import Adapter from '@wojtekmaj/enzyme-adapter-react-17'
 
 Enzyme.configure({adapter: new Adapter()})
+
+// Mock the application configuration to be used in all tests.
+jest.mock('pwa-kit-runtime/utils/ssr-config', () => {
+    return {
+        getConfig: () => ({
+            externals: [],
+            pageNotFoundURL: '/page-not-found',
+            ssrEnabled: true,
+            ssrOnly: ['ssr.js', 'ssr.js.map', 'node_modules/**/*.*'],
+            ssrShared: [
+                'static/ico/favicon.ico',
+                'static/robots.txt',
+                '**/*.js',
+                '**/*.js.map',
+                '**/*.json'
+            ],
+            ssrParameters: {
+                ssrFunctionNodeVersion: '14.x',
+                proxyConfigs: [
+                    {
+                        host: 'kv7kzm78.api.commercecloud.salesforce.com',
+                        path: 'api'
+                    },
+                    {
+                        host: 'zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com',
+                        path: 'ocapi'
+                    },
+                    {
+                        host: 'api.cquotient.com',
+                        path: 'einstein'
+                    }
+                ]
+            }
+        })
+    }
+})
