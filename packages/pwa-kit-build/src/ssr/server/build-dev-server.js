@@ -125,16 +125,20 @@ export const DevServerMixin = {
         app.get('/worker.js', (req, res) => {
             app.__devMiddleware.waitUntilValid(() => {
                 const compiled = DevServerFactory._getWebpackAsset(req, 'pwa-others', 'worker.js')
-                    res.type('.js')
-                    res.send(compiled)
+                res.type('.js')
+                res.send(compiled)
             })
         })
 
         app.get('/worker.js.map', (req, res) => {
             app.__devMiddleware.waitUntilValid(() => {
-                const compiled = DevServerFactory._getWebpackAsset(req, 'pwa-others', 'worker.js.map')
-                    res.type('.js.map')
-                    res.send(compiled)
+                const compiled = DevServerFactory._getWebpackAsset(
+                    req,
+                    'pwa-others',
+                    'worker.js.map'
+                )
+                res.type('.js.map')
+                res.send(compiled)
             })
         })
 
