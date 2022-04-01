@@ -91,8 +91,7 @@ const opts = (overrides = {}) => {
             https: httpsAgent
         },
         defaultCacheTimeSeconds: 123,
-        enableLegacyRemoteProxying: false,
-        enableLegacyBodyParser: true
+        enableLegacyRemoteProxying: false
     }
     return {
         ...defaults,
@@ -159,8 +158,7 @@ describe('createApp validates the options object', () => {
 
         RemoteServerFactory.createApp(options)
         expect(warn.calledOnce).toBe(true)
-        // createApp(options)
-        // expect(warn.calledWith(`Favicon file ${options.faviconPath} not found`))
+
         sandbox.restore()
     })
 })
@@ -610,23 +608,6 @@ describe('SSRServer operation', () => {
         return request(app)
             .get('/thing')
             .expect(404)
-    })
-
-    const enableLegacyBodyParserFlags = [true, false]
-
-    enableLegacyBodyParserFlags.forEach((flag) => {
-        test(`Flag enableLegacyBodyParser, should enable body parser: ${flag}`, () => {
-            const app = createApp(opts({enableLegacyBodyParser: flag}))
-            const route = (req, res) => {
-                expect(req.body).toBeDefined(flag)
-                res.end()
-            }
-            app.post('/*', route)
-            return request(app)
-                .post('/some-url')
-                .type('application/json')
-                .send({test: 'data json'})
-        })
     })
 })
 

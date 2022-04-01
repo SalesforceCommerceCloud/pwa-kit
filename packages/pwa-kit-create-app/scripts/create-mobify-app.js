@@ -113,7 +113,7 @@ const merge = (a, b) => deepmerge(a, b, {arrayMerge: (orignal, replacement) => r
  * Each package name included in the object's keys will be copied into the
  * generated project, all others are excluded.
  */
-const runGenerator = (answers, {outputDir, verbose}) => {
+const runGenerator = (answers, {outputDir}) => {
     // These are the public, mobify-owned packages that can be installed through NPM.
     const npmInstallables = ['pwa-kit-react-sdk']
 
