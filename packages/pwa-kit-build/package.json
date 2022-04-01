@@ -117,8 +117,7 @@
     "supertest": "^4.0.2"
   },
   "peerDependencies": {
-    "@loadable/component": "^5.15.0",
-    "pwa-kit-runtime": "^2.0.0-dev.2"
+    "@loadable/component": "^5.15.0"
   },
   "engines": {
     "node": "^12.0.0 || ^14.0.0",

@@ -12,8 +12,8 @@ const fs = require('fs')
 const fsPromises = require('fs').promises
 const rimraf = Promise.promisify(require('rimraf'))
 const path = require('path')
-const exec = require('child_process').exec
 const replace = require('replace-in-file')
+const packlist = require('npm-packlist')
 
 const {copyFile} = fsPromises
 
@@ -26,32 +26,6 @@ const DEST_DIR = 'dist/'
 const catcher = (message) => (error) => {
     console.log(`${message}: ${error}`)
     process.exit(1)
-}
-
-/**
- * Get an array of files that will end up in the npm package.
- * @private
- * @returns {Promise<Array>} resolves with an array of files objects
- */
-const getPackageFiles = () => {
-    let output = ''
-    const child = exec(`npm pack --dry-run --json --ignore-scripts`)
-
-    child.stderr.on('data', (data) => {
-        console.log(data)
-    })
-
-    child.stdout.on('data', (data) => {
-        output += data
-    })
-
-    return new Promise((resolve, reject) => {
-        child.addListener('error', reject)
-        child.addListener('exit', () => {
-            const files = JSON.parse(output)[0].files.map(({path}) => path)
-            resolve(files)
-        })
-    })
 }
 
 /**
@@ -85,7 +59,7 @@ const main = async () => {
 
     try {
         // Get a list of files from the `npm pack --dry-run` command.
-        const packageFiles = await getPackageFiles()
+        const packageFiles = await packlist()
 
         // Move the required files into the `dist` folder.
         await copyFiles(packageFiles, DEST_DIR)
