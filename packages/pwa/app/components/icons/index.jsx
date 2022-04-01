@@ -12,90 +12,77 @@ import {Icon, useTheme} from '@chakra-ui/react'
 // during SSR.
 // NOTE: Another solution would be to use `require-context.macro` package to accomplish
 // importing icon svg's.
-import '../../assets/svg/alert.svg'
-import '../../assets/svg/account.svg'
-import '../../assets/svg/basket.svg'
-import '../../assets/svg/check.svg'
-import '../../assets/svg/check-circle.svg'
-import '../../assets/svg/chevron-up.svg'
-import '../../assets/svg/chevron-down.svg'
-import '../../assets/svg/chevron-right.svg'
-import '../../assets/svg/chevron-left.svg'
-import '../../assets/svg/chevron-right.svg'
-import '../../assets/svg/chevron-up.svg'
-import '../../assets/svg/dashboard.svg'
-import '../../assets/svg/figma-logo.svg'
-import '../../assets/svg/filter.svg'
-import '../../assets/svg/file.svg'
-import '../../assets/svg/flag-ca.svg'
-import '../../assets/svg/flag-us.svg'
-import '../../assets/svg/flag-gb.svg'
-import '../../assets/svg/flag-fr.svg'
-import '../../assets/svg/flag-it.svg'
-import '../../assets/svg/flag-cn.svg'
-import '../../assets/svg/flag-jp.svg'
-import '../../assets/svg/github-logo.svg'
-import '../../assets/svg/hamburger.svg'
-import '../../assets/svg/info.svg'
-import '../../assets/svg/social-facebook.svg'
-import '../../assets/svg/social-instagram.svg'
-import '../../assets/svg/social-twitter.svg'
-import '../../assets/svg/social-youtube.svg'
-import '../../assets/svg/like.svg'
-import '../../assets/svg/lock.svg'
-import '../../assets/svg/payment.svg'
-import '../../assets/svg/plug.svg'
-import '../../assets/svg/plus.svg'
-import '../../assets/svg/receipt.svg'
-import '../../assets/svg/search.svg'
-import '../../assets/svg/signout.svg'
-import '../../assets/svg/user.svg'
-import '../../assets/svg/visibility.svg'
-import '../../assets/svg/visibility-off.svg'
-import '../../assets/svg/heart.svg'
-import '../../assets/svg/heart-solid.svg'
-import '../../assets/svg/close.svg'
-
-// For non-square SVGs, we can use the symbol data from the import to set the
-// proper viewBox attribute on the Icon wrapper.
 import AmexSymbol from '../../assets/svg/cc-amex.svg'
+import AlertSymbol from '../../assets/svg/alert.svg'
+import AccountSymbol from '../../assets/svg/account.svg'
+import BasketSymbol from '../../assets/svg/basket.svg'
+import CheckSymbol from '../../assets/svg/check.svg'
+import CheckCircleSymbol from '../../assets/svg/check-circle.svg'
+import ChevronUpSymbol from '../../assets/svg/chevron-up.svg'
+import ChevronDownSymbol from '../../assets/svg/chevron-down.svg'
+import ChevronRightSymbol from '../../assets/svg/chevron-right.svg'
+import ChevronLeftSymbol from '../../assets/svg/chevron-left.svg'
+import DashboardSymbol from '../../assets/svg/dashboard.svg'
+import FigmaSymbol from '../../assets/svg/figma-logo.svg'
+import FilterSymbol from '../../assets/svg/filter.svg'
+import FileSymbol from '../../assets/svg/file.svg'
+import FlagCASymbol from '../../assets/svg/flag-ca.svg'
+import FlagUSSymbol from '../../assets/svg/flag-us.svg'
+import FlagGBSymbol from '../../assets/svg/flag-gb.svg'
+import FlagFRSymbol from '../../assets/svg/flag-fr.svg'
+import FlagITSymbol from '../../assets/svg/flag-it.svg'
+import FlagCNSymbol from '../../assets/svg/flag-cn.svg'
+import FlagJPSymbol from '../../assets/svg/flag-jp.svg'
+import GithubSymbol from '../../assets/svg/github-logo.svg'
+import HamburgerSymbol from '../../assets/svg/hamburger.svg'
+import InfoSymbol from '../../assets/svg/info.svg'
+import FacebookSymbol from '../../assets/svg/social-facebook.svg'
+import InstagramSymbol from '../../assets/svg/social-instagram.svg'
+import TwitterSymbol from '../../assets/svg/social-twitter.svg'
+import YoutubeSymbol from '../../assets/svg/social-youtube.svg'
+import LikeSymbol from '../../assets/svg/like.svg'
+import LockSymbol from '../../assets/svg/lock.svg'
+import PaymentSymbol from '../../assets/svg/payment.svg'
+import PlugSymbol from '../../assets/svg/plug.svg'
+import PlusSymbol from '../../assets/svg/plus.svg'
+import ReceiptSymbol from '../../assets/svg/receipt.svg'
+import SearchSymbol from '../../assets/svg/search.svg'
+import SignoutSymbol from '../../assets/svg/signout.svg'
+import UserSymbol from '../../assets/svg/user.svg'
+import VisibilitySymbol from '../../assets/svg/visibility.svg'
+import VisibilityOffSymbol from '../../assets/svg/visibility-off.svg'
+import HeartSymbol from '../../assets/svg/heart.svg'
+import HeartSolidSymbol from '../../assets/svg/heart-solid.svg'
+import CloseSymbol from '../../assets/svg/close.svg'
 import BrandLogoSymbol from '../../assets/svg/brand-logo.svg'
 import CVVSymbol from '../../assets/svg/cc-cvv.svg'
 import DiscoverSymbol from '../../assets/svg/cc-discover.svg'
 import LocationSymbol from '../../assets/svg/location.svg'
 import MastercardSymbol from '../../assets/svg/cc-mastercard.svg'
 import PaypalSymbol from '../../assets/svg/paypal.svg'
-import SocialPinterestSymbol from '../../assets/svg/social-pinterest.svg'
+import PinterestSymbol from '../../assets/svg/social-pinterest.svg'
 import VisaSymbol from '../../assets/svg/cc-visa.svg'
-
-// TODO: We're hardcoding the `viewBox` for these imported SVGs temporarily as the
-// SVG loader plugin is not properly providing us the symbol data on the client side.
-AmexSymbol.viewBox = AmexSymbol.viewBox || '0 0 38 22'
-BrandLogoSymbol.viewBox = BrandLogoSymbol.viewBox || '0 0 46 32'
-CVVSymbol.viewBox = CVVSymbol.viewBox || '0 0 41 24'
-DiscoverSymbol.viewBox = DiscoverSymbol.viewBox || '0 0 38 22'
-LocationSymbol.viewBox = LocationSymbol.viewBox || '0 0 16 21'
-MastercardSymbol.viewBox = MastercardSymbol.viewBox || '0 0 38 22'
-PaypalSymbol.viewBox = PaypalSymbol.viewBox || '0 0 80 20'
-SocialPinterestSymbol.viewBox = SocialPinterestSymbol.viewBox || '0 0 21 20'
-VisaSymbol.viewBox = VisaSymbol.viewBox || '0 0 38 22'
 
 /**
  * A helper for creating a Chakra-wrapped icon from our own SVG imports via sprite sheet.
- * @param {string} name - the filename of the imported svg (does not include extension)
+ * @param {object} symbol - SpriteSymbol imported by svg loader
+ * @param {string} symbol.id - id generated based on file name
+ * @param {string} symbol.viewBox
+ * @param {string} symbol.content
  */
 /* istanbul ignore next */
-const icon = (name, passProps) => {
-    const displayName = name
+const icon = (symbol) => {
+    const displayName = symbol.id
         .toLowerCase()
         .replace(/(?:^|[\s-/])\w/g, (match) => match.toUpperCase())
         .replace(/-/g, '')
+
     const component = forwardRef((props, ref) => {
         const theme = useTheme()
         const {baseStyle} = theme.components.Icon
         return (
-            <Icon ref={ref} {...baseStyle} {...passProps} {...props}>
-                <use role="presentation" xlinkHref={`#${name}`} />
+            <Icon ref={ref} viewBox={symbol.viewBox} {...baseStyle} {...props}>
+                <use role="presentation" xlinkHref={`#${symbol.id}`} />
             </Icon>
         )
     })
@@ -106,55 +93,53 @@ const icon = (name, passProps) => {
 // Export Chakra icon components that use our SVG sprite symbol internally
 // For non-square SVGs, we can use the symbol data from the import to set the
 // proper viewBox attribute on the Icon wrapper.
-export const AmexIcon = icon('cc-amex', {viewBox: AmexSymbol.viewBox})
-export const AlertIcon = icon('alert')
-export const AccountIcon = icon('account')
-export const BrandLogo = icon('brand-logo', {viewBox: BrandLogoSymbol.viewBox})
-export const BasketIcon = icon('basket')
-export const CheckIcon = icon('check')
-export const CheckCircleIcon = icon('check-circle')
-export const ChevronDownIcon = icon('chevron-down')
-export const ChevronLeftIcon = icon('chevron-left')
-export const ChevronRightIcon = icon('chevron-right')
-export const ChevronUpIcon = icon('chevron-up')
-export const CVVIcon = icon('cc-cvv', {viewBox: CVVSymbol.viewBox})
-export const DashboardIcon = icon('dashboard')
-export const DiscoverIcon = icon('cc-discover', {viewBox: DiscoverSymbol.viewBox})
-export const FigmaLogo = icon('figma-logo')
-export const FilterIcon = icon('filter')
-export const FileIcon = icon('file')
-export const FlagCAIcon = icon('flag-ca')
-export const FlagUSIcon = icon('flag-us')
-export const FlagGBIcon = icon('flag-gb')
-export const FlagFRIcon = icon('flag-fr')
-export const FlagITIcon = icon('flag-it')
-export const FlagCNIcon = icon('flag-cn')
-export const FlagJPIcon = icon('flag-jp')
-export const GithubLogo = icon('github-logo')
-export const HamburgerIcon = icon('hamburger')
-export const InfoIcon = icon('info')
-export const LikeIcon = icon('like')
-export const LockIcon = icon('lock')
-export const LocationIcon = icon('location')
-export const PaymentIcon = icon('payment')
-export const PaypalIcon = icon('paypal', {viewBox: PaypalSymbol.viewBox})
-export const PlugIcon = icon('plug')
-export const PlusIcon = icon('plus')
-export const MastercardIcon = icon('cc-mastercard', {viewBox: MastercardSymbol.viewBox})
-export const ReceiptIcon = icon('receipt')
-export const SearchIcon = icon('search')
-export const SocialFacebookIcon = icon('social-facebook')
-export const SocialInstagramIcon = icon('social-instagram')
-export const SocialPinterestIcon = icon('social-pinterest', {
-    viewBox: SocialPinterestSymbol.viewBox
-})
-export const SocialTwitterIcon = icon('social-twitter')
-export const SocialYoutubeIcon = icon('social-youtube')
-export const SignoutIcon = icon('signout')
-export const UserIcon = icon('user')
-export const VisaIcon = icon('cc-visa', {viewBox: VisaSymbol.viewBox})
-export const VisibilityIcon = icon('visibility')
-export const VisibilityOffIcon = icon('visibility-off')
-export const HeartIcon = icon('heart')
-export const HeartSolidIcon = icon('heart-solid')
-export const CloseIcon = icon('close')
+export const AmexIcon = icon(AmexSymbol)
+export const AlertIcon = icon(AlertSymbol)
+export const AccountIcon = icon(AccountSymbol)
+export const BrandLogo = icon(BrandLogoSymbol)
+export const BasketIcon = icon(BasketSymbol)
+export const CheckIcon = icon(CheckSymbol)
+export const CheckCircleIcon = icon(CheckCircleSymbol)
+export const ChevronDownIcon = icon(ChevronDownSymbol)
+export const ChevronLeftIcon = icon(ChevronLeftSymbol)
+export const ChevronRightIcon = icon(ChevronRightSymbol)
+export const ChevronUpIcon = icon(ChevronUpSymbol)
+export const CVVIcon = icon(CVVSymbol)
+export const DashboardIcon = icon(DashboardSymbol)
+export const DiscoverIcon = icon(DiscoverSymbol)
+export const FigmaLogo = icon(FigmaSymbol)
+export const FilterIcon = icon(FilterSymbol)
+export const FileIcon = icon(FileSymbol)
+export const FlagCAIcon = icon(FlagCASymbol)
+export const FlagUSIcon = icon(FlagUSSymbol)
+export const FlagGBIcon = icon(FlagGBSymbol)
+export const FlagFRIcon = icon(FlagFRSymbol)
+export const FlagITIcon = icon(FlagITSymbol)
+export const FlagCNIcon = icon(FlagCNSymbol)
+export const FlagJPIcon = icon(FlagJPSymbol)
+export const GithubLogo = icon(GithubSymbol)
+export const HamburgerIcon = icon(HamburgerSymbol)
+export const InfoIcon = icon(InfoSymbol)
+export const LikeIcon = icon(LikeSymbol)
+export const LockIcon = icon(LockSymbol)
+export const LocationIcon = icon(LocationSymbol)
+export const PaymentIcon = icon(PaymentSymbol)
+export const PaypalIcon = icon(PaypalSymbol)
+export const PlugIcon = icon(PlugSymbol)
+export const PlusIcon = icon(PlusSymbol)
+export const MastercardIcon = icon(MastercardSymbol)
+export const ReceiptIcon = icon(ReceiptSymbol)
+export const SearchIcon = icon(SearchSymbol)
+export const SocialFacebookIcon = icon(FacebookSymbol)
+export const SocialInstagramIcon = icon(InstagramSymbol)
+export const SocialPinterestIcon = icon(PinterestSymbol)
+export const SocialTwitterIcon = icon(TwitterSymbol)
+export const SocialYoutubeIcon = icon(YoutubeSymbol)
+export const SignoutIcon = icon(SignoutSymbol)
+export const UserIcon = icon(UserSymbol)
+export const VisaIcon = icon(VisaSymbol)
+export const VisibilityIcon = icon(VisibilitySymbol)
+export const VisibilityOffIcon = icon(VisibilityOffSymbol)
+export const HeartIcon = icon(HeartSymbol)
+export const HeartSolidIcon = icon(HeartSolidSymbol)
+export const CloseIcon = icon(CloseSymbol)
