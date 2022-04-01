@@ -25,6 +25,7 @@
         "helmet": "^4.6.0",
         "js-cookie": "^3.0.1",
         "jwt-decode": "^3.1.2",
+        "mini-css-extract-plugin": "^2.6.0",
         "nanoid": "^3.1.31",
         "prop-types": "^15.6.0",
         "query-string": "^7.0.1",
