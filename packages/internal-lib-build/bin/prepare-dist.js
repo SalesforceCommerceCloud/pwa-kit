@@ -12,7 +12,6 @@ const fs = require('fs')
 const fsPromises = require('fs').promises
 const rimraf = Promise.promisify(require('rimraf'))
 const path = require('path')
-const exec = require('child_process').exec
 const replace = require('replace-in-file')
 const packlist = require('npm-packlist')
 
