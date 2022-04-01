@@ -121,23 +121,19 @@ export const DevServerMixin = {
         const middleware = webpackHotServerMiddleware(app.__compiler)
 
         app.get('/worker.js', (req, res) => {
-            const compiled = DevServerFactory._getWebpackAsset(req, 'pwa-others', 'worker.js')
-            if (compiled) {
-                res.type('.js')
-                res.send(compiled)
-            } else {
-                res.status(404).send('Not found')
-            }
+            app.__devMiddleware.waitUntilValid(() => {
+                const compiled = DevServerFactory._getWebpackAsset(req, 'pwa-others', 'worker.js')
+                    res.type('.js')
+                    res.send(compiled)
+            })
         })
 
         app.get('/worker.js.map', (req, res) => {
-            const compiled = DevServerFactory._getWebpackAsset(req, 'pwa-others', 'worker.js.map')
-            if (compiled) {
-                res.type('.js.map')
-                res.send(compiled)
-            } else {
-                res.status(404).send('Not found')
-            }
+            app.__devMiddleware.waitUntilValid(() => {
+                const compiled = DevServerFactory._getWebpackAsset(req, 'pwa-others', 'worker.js.map')
+                    res.type('.js.map')
+                    res.send(compiled)
+            })
         })
 
         app.use('/', (req, res, next) => {
