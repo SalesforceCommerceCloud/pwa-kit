@@ -76,7 +76,7 @@ const main = async () => {
             from: /..\/package.json/,
             to: 'package.json'
         })
-        console.log('444')
+
         // Update script to remove `dist` folder in imports.
         await replace({
             files: ['dist/scripts/**/!(prepare-dist.js)'],
