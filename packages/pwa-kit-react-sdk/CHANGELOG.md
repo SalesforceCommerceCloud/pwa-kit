@@ -1,3 +1,4 @@
+## v2.0.0-dev.3 (Apr 01, 2022)
 ## v2.0.0-dev.2 (Feb 10, 2022)
 
 -   Support functions as default exports in the applications `routes.jsx` file. [#447](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/447)
