@@ -22,6 +22,9 @@ workbox.setConfig({debug: DEBUG})
 // Place your Workbox route configurations here, eg:
 // workbox.routing.registerRoute(...)
 
+// Never cache dev-server internals.
+workbox.routing.registerRoute(/^http:\/\/localhost:3000\/__mrt/, new workbox.strategies.NetworkOnly())
+
 // Minimum viable configuration to get offline mode.
 workbox.routing.registerRoute(/^http:\/\/localhost:3000/, new workbox.strategies.NetworkFirst())
 workbox.routing.registerRoute(
