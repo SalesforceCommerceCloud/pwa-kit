@@ -74,10 +74,10 @@
     "react-dom": "^17.0.2",
     "react-helmet": "5.2.0",
     "react-router-dom": "^5.1.2",
-    "replace-in-file": "^6.2.0",
     "regenerator-runtime": "^0.13.9",
+    "replace-in-file": "^6.2.0",
     "rimraf": "2.6.1",
-    "sinon": "2.3.2",
+    "sinon": "^13.0.1",
     "supertest": "^4.0.2"
   },
   "peerDependencies": {
