@@ -374,7 +374,7 @@ workflows:
     jobs:
       - testNode12
       - testNode14
-      - testNode14Windows
+      # - testNode14Windows
       - testNode14npm7
       - testNode14npm8
       - generatedSFCCProjectTest
@@ -392,8 +392,8 @@ workflows:
           context: nightly-build
       - testNode14:
           context: nightly-build
-      - testNode14Windows:
-          context: nightly-build
+      # - testNode14Windows:
+      #     context: nightly-build
       - testNode14npm7:
           context: nightly-build
       - testNode14npm8:
