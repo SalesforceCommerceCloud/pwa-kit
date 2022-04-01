@@ -4,8 +4,10 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
+
 import {getSites} from './site-utils'
 import {urlPartPositions} from '../constants'
+
 /**
  * Construct literal routes based on url config
  *      with site and locale references (ids and aliases) from each in your application config

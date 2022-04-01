@@ -121,6 +121,7 @@ const Footer = ({...otherProps}) => {
                     <HideOnDesktop>
                         <Subscribe />
                     </HideOnDesktop>
+
                     {showLocaleSelector && (
                         <Box {...styles.localeSelector}>
                             <FormControl
@@ -157,6 +158,7 @@ const Footer = ({...otherProps}) => {
                             </FormControl>
                         </Box>
                     )}
+
                     <Divider {...styles.horizontalRule} />
 
                     <Box {...styles.bottomHalf}>

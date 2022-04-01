@@ -6,16 +6,11 @@
  */
 import React from 'react'
 import {rest} from 'msw'
-import {setupServer} from 'msw/node'
-import {
-    mockedCustomerProductLists,
-    mockedRegisteredCustomer,
-    productsResponse
-} from '../../commerce-api/mock-data'
+import {mockedCustomerProductLists, productsResponse} from '../../commerce-api/mock-data'
 import {screen} from '@testing-library/react'
 import {Route, Switch} from 'react-router-dom'
 import ProductDetail from '.'
-import {renderWithProviders} from '../../utils/test-utils'
+import {renderWithProviders, setupMockServer} from '../../utils/test-utils'
 
 jest.setTimeout(60000)
 
@@ -46,34 +41,7 @@ const MockedComponent = () => {
 
 // Set up the msw server to intercept fetch requests and returned mocked results. Additional
 // interceptors can be defined in each test for specific requests.
-const server = setupServer(
-    rest.post('*/oauth2/authorize', (req, res, ctx) =>
-        res(ctx.delay(0), ctx.status(303), ctx.set('location', `/testcallback`))
-    ),
-    rest.get('*/oauth2/authorize', (req, res, ctx) =>
-        res(ctx.delay(0), ctx.status(303), ctx.set('location', `/testcallback`))
-    ),
-    rest.get('*/testcallback', (req, res, ctx) => {
-        return res(ctx.delay(0), ctx.status(200))
-    }),
-    rest.post('*/oauth2/login', (req, res, ctx) =>
-        res(ctx.delay(0), ctx.status(200), ctx.json(mockedRegisteredCustomer))
-    ),
-    rest.get('*/customers/:customerId', (req, res, ctx) =>
-        res(ctx.delay(0), ctx.status(200), ctx.json(mockedRegisteredCustomer))
-    ),
-    rest.post('*/oauth2/token', (req, res, ctx) =>
-        res(
-            ctx.delay(0),
-            ctx.json({
-                customer_id: 'test',
-                access_token: 'testtoken',
-                refresh_token: 'testrefeshtoken',
-                usid: 'testusid',
-                enc_user_id: 'testEncUserId'
-            })
-        )
-    ),
+const server = setupMockServer(
     // mock fetch product lists
     rest.get('*/customers/:customerId/product-lists', (req, res, ctx) => {
         return res(ctx.json(mockedCustomerProductLists))

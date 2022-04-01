@@ -10,6 +10,8 @@ import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
 import {HTTPError} from 'pwa-kit-react-sdk/ssr/universal/errors'
 import {createCodeVerifier, generateCodeChallenge} from './pkce'
 import {createGetTokenBody} from './utils'
+import fetch from 'cross-fetch'
+import Cookies from 'js-cookie'
 
 /**
  * An object containing the customer's login credentials.
@@ -27,8 +29,11 @@ import {createGetTokenBody} from './utils'
 const usidStorageKey = 'usid'
 const encUserIdStorageKey = 'enc-user-id'
 const tokenStorageKey = 'token'
-const refreshTokenStorageKey = 'refresh-token'
+const refreshTokenStorageKey = 'cc-nx'
+const refreshTokenGuestStorageKey = 'cc-nx-g'
 const oidStorageKey = 'oid'
+const dwSessionIdKey = 'dwsid'
+const REFRESH_TOKEN_COOKIE_AGE = 90 // 90 days. This value matches SLAS cartridge.
 
 /**
  * A  class that provides auth functionality for pwa.
@@ -42,23 +47,23 @@ class Auth {
         this._pendingAuth = undefined
         this._customerId = undefined
 
-        this._oid = this._onClient ? window.localStorage.getItem(oidStorageKey) : undefined
-
+        // To store tokens as cookies
+        // change the next line to
+        // this._storage = new CookieStorage()
+        this._storage = new LocalStorage()
         const configOid = api._config.parameters.organizationId
+        this._oid = this._storage.get(oidStorageKey) || configOid
+
         if (this._oid !== configOid) {
             this._clearAuth()
             this._saveOid(configOid)
         } else {
-            this._authToken = this._onClient
-                ? window.localStorage.getItem(tokenStorageKey)
-                : undefined
-            this._refreshToken = this._onClient
-                ? window.localStorage.getItem(refreshTokenStorageKey)
-                : undefined
-            this._usid = this._onClient ? window.localStorage.getItem(usidStorageKey) : undefined
-            this._encUserId = this._onClient
-                ? window.localStorage.getItem(encUserIdStorageKey)
-                : undefined
+            this._authToken = this._storage.get(tokenStorageKey)
+            this._refreshToken =
+                this._storage.get(refreshTokenStorageKey) ||
+                this._storage.get(refreshTokenGuestStorageKey)
+            this._usid = this._storage.get(usidStorageKey)
+            this._encUserId = this._storage.get(encUserIdStorageKey)
         }
 
         this.login = this.login.bind(this)
@@ -125,6 +130,31 @@ class Auth {
     }
 
     /**
+     * Make a post request to the OCAPI /session endpoint to bridge the session.
+     *
+     * The HTTP response contains a set-cookie header which sets the dwsid session cookie.
+     * This cookie is used on SFRA site and it shoppers to navigate between SFRA site and
+     * this PWA site seamlessly, this is often used to enable hybrid deployment.
+     *
+     * (Note: this method is client side only, b/c MRT doesn't support set-cookie header right now)
+     *
+     * @returns {Promise}
+     */
+    createOCAPISession() {
+        return fetch(
+            `${getAppOrigin()}/mobify/proxy/ocapi/s/${
+                this._config.parameters.siteId
+            }/dw/shop/v21_3/sessions`,
+            {
+                method: 'POST',
+                headers: {
+                    Authorization: this._authToken
+                }
+            }
+        )
+    }
+
+    /**
      * Authorizes the customer as a registered or guest user.
      * @param {CustomerCredentials} [credentials]
      * @returns {Promise}
@@ -141,18 +171,22 @@ class Auth {
             let authorizationMethod = '_loginAsGuest'
             if (credentials) {
                 authorizationMethod = '_loginWithCredentials'
-            } else if (this._authToken && this._refreshToken) {
+            } else if (this._refreshToken) {
                 authorizationMethod = '_refreshAccessToken'
             }
-
-            return this[authorizationMethod](credentials).catch((error) => {
-                if (retries === 0 && error.message === 'EXPIRED_TOKEN') {
-                    retries = 1 // we only retry once
-                    this._clearAuth()
-                    return startLoginFlow()
-                }
-                throw error
-            })
+            return this[authorizationMethod](credentials)
+                .catch((error) => {
+                    if (retries === 0 && error.message === 'EXPIRED_TOKEN') {
+                        retries = 1 // we only retry once
+                        this._clearAuth()
+                        return startLoginFlow()
+                    }
+                    throw error
+                })
+                .then((result) => {
+                    this._onClient && this.createOCAPISession()
+                    return result
+                })
         }
 
         this._pendingLogin = startLoginFlow().finally(() => {
@@ -190,14 +224,23 @@ class Auth {
      * @param {object} tokenResponse - access_token,id_token,refresh_token, expires_in,token_type, usid, customer_id, enc_user_id, idp_access_token
      */
     _handleShopperLoginTokenResponse(tokenResponse) {
-        const {access_token, refresh_token, customer_id, usid, enc_user_id} = tokenResponse
+        const {
+            access_token,
+            refresh_token,
+            customer_id,
+            usid,
+            enc_user_id,
+            id_token
+        } = tokenResponse
         this._customerId = customer_id
         this._saveAccessToken(`Bearer ${access_token}`)
-        this._saveRefreshToken(refresh_token)
         this._saveUsid(usid)
-        // Non registered users recieve an empty string for the encoded user id value
-        if (enc_user_id.length > 0) {
+        // we use id_token to distinguish guest and registered users
+        if (id_token.length > 0) {
             this._saveEncUserId(enc_user_id)
+            this._saveRefreshToken(refresh_token, 'registered')
+        } else {
+            this._saveRefreshToken(refresh_token, 'guest')
         }
 
         if (this._onClient) {
@@ -367,7 +410,7 @@ class Auth {
     _saveAccessToken(token) {
         this._authToken = token
         if (this._onClient) {
-            window.localStorage.setItem(tokenStorageKey, token)
+            this._storage.set(tokenStorageKey, token)
         }
     }
 
@@ -379,7 +422,7 @@ class Auth {
     _saveUsid(usid) {
         this._usid = usid
         if (this._onClient) {
-            window.localStorage.setItem(usidStorageKey, usid)
+            this._storage.set(usidStorageKey, usid)
         }
     }
 
@@ -391,7 +434,7 @@ class Auth {
     _saveEncUserId(encUserId) {
         this._encUserId = encUserId
         if (this._onClient) {
-            window.localStorage.setItem(encUserIdStorageKey, encUserId)
+            this._storage.set(encUserIdStorageKey, encUserId)
         }
     }
 
@@ -403,7 +446,7 @@ class Auth {
     _saveOid(oid) {
         this._oid = oid
         if (this._onClient) {
-            window.localStorage.setItem(oidStorageKey, oid)
+            this._storage.set(oidStorageKey, oid)
         }
     }
 
@@ -418,10 +461,12 @@ class Auth {
         this._usid = undefined
         this._encUserId = undefined
         if (this._onClient) {
-            window.localStorage.removeItem(tokenStorageKey)
-            window.localStorage.removeItem(refreshTokenStorageKey)
-            window.localStorage.removeItem(usidStorageKey)
-            window.localStorage.removeItem(encUserIdStorageKey)
+            this._storage.remove(tokenStorageKey)
+            this._storage.remove(refreshTokenStorageKey)
+            this._storage.remove(refreshTokenGuestStorageKey)
+            this._storage.remove(usidStorageKey)
+            this._storage.remove(encUserIdStorageKey)
+            this._storage.remove(dwSessionIdKey)
         }
     }
 
@@ -430,12 +475,62 @@ class Auth {
      * @private
      * @param {string} refreshToken - A JWT refresh token.
      */
-    _saveRefreshToken(refreshToken) {
+    _saveRefreshToken(refreshToken, type) {
         this._refreshToken = refreshToken
+        const storeageKey =
+            type === 'registered' ? refreshTokenStorageKey : refreshTokenGuestStorageKey
         if (this._onClient) {
-            window.localStorage.setItem(refreshTokenStorageKey, refreshToken)
+            this._storage.set(storeageKey, refreshToken, {expires: REFRESH_TOKEN_COOKIE_AGE})
         }
     }
 }
 
 export default Auth
+
+class Storage {
+    set(key, value, options) {}
+    get(key) {}
+    remove(key) {}
+}
+
+class CookieStorage extends Storage {
+    constructor(...args) {
+        super(args)
+        this._avaliable = false
+        if (typeof document === 'undefined') {
+            console.warn('CookieStorage is not avaliable on the current environment.')
+            return
+        }
+        this._avaliable = true
+    }
+    set(key, value, options) {
+        this._avaliable && Cookies.set(key, value, {secure: true, ...options})
+    }
+    get(key) {
+        return this._avaliable ? Cookies.get(key) : undefined
+    }
+    remove(key) {
+        this._avaliable && Cookies.remove(key)
+    }
+}
+
+class LocalStorage extends Storage {
+    constructor(...args) {
+        super(args)
+        this._avaliable = false
+        if (typeof window === 'undefined') {
+            console.warn('LocalStorage is not avaliable on the current environment.')
+            return
+        }
+        this._avaliable = true
+    }
+    set(key, value) {
+        this._avaliable && window.localStorage.setItem(key, value)
+    }
+    get(key) {
+        return this._avaliable ? window.localStorage.getItem(key) : undefined
+    }
+    remove(key) {
+        this._avaliable && window.localStorage.removeItem(key)
+    }
+}

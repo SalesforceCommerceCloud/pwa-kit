@@ -35,6 +35,7 @@ jest.mock('./utils', () => {
     const original = jest.requireActual('./utils')
     return {
         ...original,
+        getConfig: jest.fn(() => mockConfig),
         getUrlConfig: jest.fn()
     }
 })

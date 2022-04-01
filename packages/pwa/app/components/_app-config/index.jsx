@@ -14,14 +14,14 @@ import 'focus-visible/dist/focus-visible'
 import theme from '../../theme'
 import CommerceAPI from '../../commerce-api'
 import {
-    CommerceAPIProvider,
-    CustomerProvider,
     BasketProvider,
-    CustomerProductListsProvider
+    CommerceAPIProvider,
+    CustomerProductListsProvider,
+    CustomerProvider
 } from '../../commerce-api/contexts'
-import {getConfig} from 'pwa-kit-runtime/utils/ssr-config'
 import {resolveSiteFromUrl} from '../../utils/site-utils'
 import {resolveLocaleFromUrl} from '../../utils/utils'
+import {getConfig} from 'pwa-kit-runtime/utils/ssr-config'
 
 /**
  * Use the AppConfig component to inject extra arguments into the getProps
@@ -54,9 +54,7 @@ AppConfig.restore = (locals = {}) => {
             ? locals.originalUrl
             : `${window.location.pathname}${window.location.search}`
     const site = resolveSiteFromUrl(path)
-
     const locale = resolveLocaleFromUrl(path)
-
     const currency = locale.preferredCurrency
 
     const {app: appConfig} = getConfig()

@@ -159,18 +159,6 @@ export const capitalize = (text) => {
 }
 
 /**
- * This function returns the url config from the current app configuration
- * @return {object} - url config
- */
-export const getUrlConfig = () => {
-    const {app} = getConfig()
-    if (!app.url) {
-        throw new Error('Cannot find `url` key. Please check your configuration file.')
-    }
-    return app.url
-}
-
-/**
  * This function return the identifiers (site and locale) from the given url
  * The site will always go before locale if both of them are presented in the pathname
  * @param path {string}
@@ -190,6 +178,18 @@ export const getParamsFromPath = (path) => {
 
     const localeRef = pathMatch?.groups.locale || searchMatchForLocale?.groups.locale
     return {siteRef, localeRef}
+}
+
+/**
+ * This function returns the url config from the current configuration
+ * @return {object} - url config
+ */
+export const getUrlConfig = () => {
+    const {app} = getConfig()
+    if (!app.url) {
+        throw new Error('Cannot find `url` key. Please check your configuration file.')
+    }
+    return app.url
 }
 
 /**
