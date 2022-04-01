@@ -122,7 +122,6 @@ footer {
     background-color: #211989;
     color: white;
 }
-
 footer a {
     color: inherit;
     font-style: normal;
@@ -131,7 +130,6 @@ footer a {
     line-height: 16px;
     text-decoration: none;
 }
-
 footer ul {
     list-style: none;
     display: flex;
@@ -141,11 +139,21 @@ footer ul {
     display: flex;
     align-items: center;
 }
-
-.external-links svg {
+.external-links img {
+    margin-right: 8px;
+    width: 28px;
+    height: 28px;
+}
+.external-links li {
+    margin-right: 40px;
+}
+.external-links li:last-child {
     margin-right: 0;
-    width: 32px;
-    height: 32px;
+}
+
+.logo img {
+    /* So the logo is vertically aligned in the footer */
+    display: block;
 }
 
 .layer {
@@ -224,18 +232,19 @@ footer ul {
     opacity: 1;
 }
 
-.external-links span {
-    display: none;
-    margin-left: 0.4em;
-}
-
-.external-links img {
-    margin-left: 0.4em;
-}
-
-@media (min-width: 601px) {
+@media (max-width: 600px) {
+    .external-links img {
+        margin-right: 0;
+        width: 32px;
+        height: 32px;
+    }
+    .external-links li {
+        margin-right: 24px;
+    }
+    .external-links li:last-child {
+        margin-right: 0;
+    }
     .external-links span {
-        display: block;
+        display: none;
     }
 }
-
