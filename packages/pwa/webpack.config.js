@@ -11,8 +11,6 @@ const findInProjectThenSDK = (pkg) => {
     return fs.existsSync(projectPath) ? projectPath : path.resolve(sdkDir, 'node_modules', pkg)
 }
 
-console.log("in custom webpack")
-
 const updated = webpackConfig.map((config) => {
     config.resolve.extensions.push(".css")
     config.module.rules.push({
