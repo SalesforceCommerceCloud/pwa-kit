@@ -10,7 +10,7 @@
   "author": "dev@mobify.com",
   "main": "dist/index.js",
   "bin": {
-    "pwa-kit-cli": "bin/mrt.js"
+    "pwa-kit-cli": "bin/cli.js"
   },
   "files": [
     "bin",
