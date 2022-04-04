@@ -53,7 +53,7 @@
     "internal-lib-build": "^2.0.0-dev.2",
     "nock": "^13.1.1",
     "node-fetch": "2.6.1",
-    "sf-mrt": "^2.0.0-dev.2",
+    "pwa-kit-cli": "^2.0.0-dev.2",
     "s3rver": "^3.1.0",
     "sinon": "2.3.2",
     "superagent": "^6.1.0",
@@ -61,10 +61,10 @@
     "watch": "1.0.1"
   },
   "peerDependencies": {
-    "sf-mrt": "^2.0.0-dev.2"
+    "pwa-kit-cli": "^2.0.0-dev.2"
   },
   "peerDependenciesMeta": {
-    "sf-mrt": {
+    "pwa-kit-cli": {
       "optional": true
     }
   },

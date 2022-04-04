@@ -1,5 +1,5 @@
 {
-  "name": "sf-mrt",
+  "name": "pwa-kit-cli",
   "version": "2.0.0-dev.2",
   "description": "Build tools for pwa-kit",
   "repository": {
@@ -10,7 +10,7 @@
   "author": "dev@mobify.com",
   "main": "dist/index.js",
   "bin": {
-    "sf-mrt": "bin/mrt.js"
+    "pwa-kit-cli": "bin/mrt.js"
   },
   "files": [
     "bin",

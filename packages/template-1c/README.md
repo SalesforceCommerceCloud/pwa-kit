@@ -8,8 +8,8 @@ that all webpack/babel/loadable config is baked into the runtime.
 Here's how you use it:
 
 ```
-➜  template-1c git:(revert-to-babel) ✗ npx sf-mrt --help
-Usage: sf-mrt [options] [command]
+➜  template-1c git:(revert-to-babel) ✗ npx pwa-kit-cli --help
+Usage: pwa-kit-cli [options] [command]
 
 The Managed Runtime CLI
 
