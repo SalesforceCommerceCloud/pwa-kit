@@ -93,10 +93,7 @@ export default function useAddressFields({form: {watch, control, errors}, prefix
             label: formatMessage(messages.country),
             defaultValue: 'US',
             type: 'select',
-            options: [
-                {value: 'CA', label: 'Canada'},
-                {value: 'US', label: 'United States'}
-            ],
+            options: [{value: 'CA', label: 'Canada'}, {value: 'US', label: 'United States'}],
             rules: {
                 required: formatMessage({
                     defaultMessage: 'Please select your country.',

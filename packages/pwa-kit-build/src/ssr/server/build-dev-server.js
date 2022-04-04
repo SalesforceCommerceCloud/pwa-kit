@@ -198,7 +198,11 @@ export const DevServerMixin = {
 
         server.listen({hostname, port}, () => {
             if (process.env.NODE_ENV !== 'test') {
-                open(`${this._getDevServerURL(app.options)}/__mrt/loading-screen/index.html?loading=1`)
+                open(
+                    `${this._getDevServerURL(
+                        app.options
+                    )}/__mrt/loading-screen/index.html?loading=1`
+                )
             }
         })
 
