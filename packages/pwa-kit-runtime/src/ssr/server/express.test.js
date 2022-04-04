@@ -90,7 +90,8 @@ const opts = (overrides = {}) => {
         fetchAgents: {
             https: httpsAgent
         },
-        defaultCacheTimeSeconds: 123
+        defaultCacheTimeSeconds: 123,
+        enableLegacyRemoteProxying: false
     }
     return {
         ...defaults,
@@ -157,6 +158,7 @@ describe('createApp validates the options object', () => {
 
         RemoteServerFactory.createApp(options)
         expect(warn.calledOnce).toBe(true)
+
         sandbox.restore()
     })
 })

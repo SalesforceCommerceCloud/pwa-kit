@@ -6,8 +6,6 @@
  */
 
 import {defineMessage} from 'react-intl'
-import packageInfo from '../package.json'
-
 // Constants used in the used for product searching.
 export const DEFAULT_SEARCH_PARAMS = {limit: 25, offset: 0, sort: 'best-matches', refine: []}
 export const DEFAULT_LIMIT_VALUES = [25, 50, 100] // Page sizes
@@ -54,12 +52,6 @@ export const API_ERROR_MESSAGE = defineMessage({
 export const HOME_HREF = '/'
 
 export const MAX_ORDER_QUANTITY = 10
-
-// TODO: You can update these locales and currencies in 'pwa/package.json' file
-export const SUPPORTED_LOCALES = packageInfo.l10n.supportedLocales
-export const DEFAULT_LOCALE = packageInfo.l10n.defaultLocale
-export const SUPPORTED_CURRENCIES = packageInfo.l10n.supportedCurrencies
-export const DEFAULT_CURRENCY = packageInfo.l10n.defaultCurrency
 
 export const urlPartPositions = {
     PATH: 'path',

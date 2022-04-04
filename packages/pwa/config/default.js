@@ -4,12 +4,21 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
+const sites = require('./sites.js')
 
 module.exports = {
     app: {
         url: {
-            locale: 'path'
+            site: 'path',
+            locale: 'path',
+            showDefaults: true
         },
+        defaultSite: 'RefArchGlobal',
+        siteAliases: {
+            RefArch: 'us',
+            RefArchGlobal: 'global'
+        },
+        sites,
         commerceAPI: {
             proxyPath: `/mobify/proxy/api`,
             parameters: {
