@@ -1,5 +1,5 @@
 {
-    "name": "template-1c",
+    "name": "typescript-minimal",
     "version": "2.0.0-dev.3",
     "engines": {
         "node": "^12.0.0 || ^14.0.0",

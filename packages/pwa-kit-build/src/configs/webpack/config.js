@@ -277,12 +277,18 @@ const renderer =
                     new CopyPlugin({
                         patterns: [
                             {from: 'app/static/', to: 'static/'},
+                        ]
+                    }),
+
+                    new CopyPlugin({
+                        patterns: [
                             {
                                 from: 'config/',
                                 to: 'config/',
                                 globOptions: {
                                     ignore: ['**/local.*']
-                                }
+                                },
+                                noErrorOnMissing: true,
                             }
                         ]
                     })
