@@ -1,6 +1,6 @@
 <div align="center">
 
-<h1>The Progressive Web App (PWA) Kit</h1>
+<h1>The Progressive Web App Kit</h1>
 
 [![npm](https://img.shields.io/npm/v/pwa-kit-react-sdk.svg)](https://www.npmjs.com/package/pwa-kit-react-sdk)
 [![License](https://img.shields.io/github/license/SalesforceCommerceCloud/pwa-kit.svg)](https://github.com/SalesforceCommerceCloud/pwa-kit/blob/master/LICENSE)
