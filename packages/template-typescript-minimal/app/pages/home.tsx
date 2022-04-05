@@ -3,6 +3,7 @@ import fetch from "cross-fetch";
 
 import HelloTS from "../components/hello-typescript";
 import HelloJS from "../components/hello-javascript"
+import {thing} from "../components/hello-coffeescript.coffee"
 
 interface Props {
   dadJoke: string,
@@ -90,7 +91,7 @@ const Home = ({ dadJoke }: Props) => {
         <style dangerouslySetInnerHTML={{__html: style}} />
         <div className="loading-screen">
             <div className="panel title">
-                <h1>Typescript<br/>Support!</h1>
+                <h2>{thing.sayHello()}</h2>
             </div>
             <div className="panel">
                 <div className="divider"></div>
