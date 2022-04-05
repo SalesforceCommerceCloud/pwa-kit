@@ -18,12 +18,15 @@ import {BundleAnalyzerPlugin} from 'webpack-bundle-analyzer'
 import LoadablePlugin from '@loadable/webpack-plugin'
 import SpeedMeasurePlugin from 'speed-measure-webpack-plugin'
 import {createModuleReplacementPlugin} from './plugins'
+import { merge as _merge } from 'lodash'
 
 const projectDir = process.cwd()
 const sdkDir = path.resolve(path.join(__dirname, '..', '..', '..'))
 
 const pkg = require(resolve(projectDir, 'package.json'))
 const buildDir = resolve(projectDir, 'build')
+
+const webpackExtension = pkg.customWebpack ? require(resolve(projectDir, pkg.webpackExtension)) : {}
 
 const production = 'production'
 const development = 'development'
@@ -228,6 +231,7 @@ const client =
                 plugins: [...config.plugins, new LoadablePlugin({writeToDisk: true})]
             }
         })
+        .extend((config) => webpackExtension ? _merge(config, webpackExtension) : config)
         .build()
 
 const optional = (name, path) => {
@@ -289,6 +293,7 @@ const renderer =
                 ]
             }
         })
+        .extend((config) => webpackExtension ? _merge(config, webpackExtension) : config)
         .build()
 
 const ssr = (() => {
