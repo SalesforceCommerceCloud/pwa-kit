@@ -28,7 +28,7 @@ localRemoteTestCases.forEach((useLocalCache) => {
     const nameBase = `${useLocalCache ? 'Local' : 'Remote'} cache`
 
     describe(nameBase, () => {
-        const sandbox = sinon.sandbox.create()
+        const sandbox = sinon.createSandbox()
         const sendMetric = sandbox.stub()
         const testCache = new PersistentCache({
             useLocalCache,
@@ -361,7 +361,7 @@ localRemoteTestCases.forEach((useLocalCache) => {
 })
 
 describe('Remote cache specific tests', () => {
-    const sandbox = sinon.sandbox.create()
+    const sandbox = sinon.createSandbox()
 
     test('non-functional', () => {
         const cache = new PersistentCache({useLocalCache: false, sendMetric: sandbox.stub()})
@@ -398,7 +398,7 @@ describe('Remote cache specific tests', () => {
 })
 
 describe('Metrics Sending tests', () => {
-    const sandbox = sinon.sandbox.create()
+    const sandbox = sinon.createSandbox()
     const namespace = 'test123'
 
     afterEach(() => {
@@ -480,7 +480,7 @@ describe('Metrics Sending tests', () => {
 })
 
 describe('Local cache specific tests', () => {
-    const sandbox = sinon.sandbox.create()
+    const sandbox = sinon.createSandbox()
 
     test('Cache cleaned correctly', () => {
         // First, create a cache directory for a process that will
