@@ -205,10 +205,6 @@ const withChunking = (config) => {
                     }
                 }
             }
-        },
-        performance: {
-            maxEntrypointSize: 905000,
-            maxAssetSize: 825000
         }
     }
 }
