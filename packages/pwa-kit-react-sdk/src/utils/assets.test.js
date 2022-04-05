@@ -11,7 +11,7 @@ import {loadScript} from './assets'
 
 import sinon from 'sinon'
 
-const sandbox = sinon.sandbox.create()
+const sandbox = sinon.createSandbox()
 
 // Silence the error messages, they're on purpose here
 let consoleError
