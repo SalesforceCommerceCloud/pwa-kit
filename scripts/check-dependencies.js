@@ -44,9 +44,9 @@ const packagesDir = path.join(rootDir, 'packages')
 const assetsDir = path.join(__dirname, 'assets')
 
 const excludedPackages = [
-    // The 'hello-world' app is explicitly designed to show what
+    // The 'template-express-minimal' app is explicitly designed to show what
     // you can do without our whole toolchain!
-    'hello-world'
+    'template-express-minimal'
 ]
 
 // We are going to copy these files into each package from this script, in order to

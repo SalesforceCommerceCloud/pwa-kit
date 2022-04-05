@@ -17,7 +17,6 @@ import webpackDevMiddleware from 'webpack-dev-middleware'
 import webpackHotServerMiddleware from 'webpack-hot-server-middleware'
 import open from 'open'
 import requireFromString from 'require-from-string'
-import {loadingScreen} from './loading-screen'
 import {RemoteServerFactory} from 'pwa-kit-runtime/ssr/server/build-remote-server'
 import {proxyConfigs} from 'pwa-kit-runtime/utils/ssr-shared'
 
@@ -108,9 +107,12 @@ export const DevServerMixin = {
             return res.json({ready: app.__webpackReady()})
         })
 
-        app.use('/__mrt', (req, res) => {
-            res.send(loadingScreen())
-        })
+        app.use(
+            '/__mrt/loading-screen/',
+            express.static(path.resolve(__dirname, 'loading-screen'), {
+                dotFiles: 'deny'
+            })
+        )
     },
 
     addSSRRenderer(app) {
@@ -128,30 +130,30 @@ export const DevServerMixin = {
         const middleware = webpackHotServerMiddleware(app.__compiler)
 
         app.get('/worker.js', (req, res) => {
-            const compiled = DevServerFactory._getWebpackAsset(req, 'pwa-others', 'worker.js')
-            if (compiled) {
+            app.__devMiddleware.waitUntilValid(() => {
+                const compiled = DevServerFactory._getWebpackAsset(req, 'pwa-others', 'worker.js')
                 res.type('.js')
                 res.send(compiled)
-            } else {
-                res.status(404).send('Not found')
-            }
+            })
         })
 
         app.get('/worker.js.map', (req, res) => {
-            const compiled = DevServerFactory._getWebpackAsset(req, 'pwa-others', 'worker.js.map')
-            if (compiled) {
+            app.__devMiddleware.waitUntilValid(() => {
+                const compiled = DevServerFactory._getWebpackAsset(
+                    req,
+                    'pwa-others',
+                    'worker.js.map'
+                )
                 res.type('.js.map')
                 res.send(compiled)
-            } else {
-                res.status(404).send('Not found')
-            }
+            })
         })
 
         app.use('/', (req, res, next) => {
             if (app.__webpackReady()) {
                 middleware(req, res, next)
             } else {
-                res.redirect(301, '/__mrt?loading=1')
+                res.redirect(301, '/__mrt/loading-screen/index.html?loading=1')
             }
         })
 
@@ -203,7 +205,11 @@ export const DevServerMixin = {
 
         server.listen({hostname, port}, () => {
             if (process.env.NODE_ENV !== 'test') {
-                open(`${this._getDevServerURL(app.options)}/__mrt?loading=1`)
+                open(
+                    `${this._getDevServerURL(
+                        app.options
+                    )}/__mrt/loading-screen/index.html?loading=1`
+                )
             }
         })
 

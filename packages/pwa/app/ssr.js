@@ -47,7 +47,7 @@ const {handler} = runtime.createHandler(options, (app) => {
                 useDefaults: true,
                 directives: {
                     'img-src': ["'self'", '*.commercecloud.salesforce.com', 'data:'],
-                    'script-src': ["'self'", "'unsafe-eval'"],
+                    'script-src': ["'self'", "'unsafe-eval'", 'storage.googleapis.com'],
 
                     // Do not upgrade insecure requests for local development
                     'upgrade-insecure-requests': isRemote() ? [] : null
@@ -65,7 +65,6 @@ const {handler} = runtime.createHandler(options, (app) => {
 
     runtime.addSSRRenderer(app)
 })
-
 // SSR requires that we export a single handler function called 'get', that
 // supports AWS use of the server that we created above.
 exports.get = handler

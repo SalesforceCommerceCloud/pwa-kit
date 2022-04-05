@@ -1,6 +1,6 @@
 {
     "name": "scaffold-pwa",
-    "version": "2.0.0-dev.2",
+    "version": "2.0.0-dev.3",
     "license": "See license in LICENSE",
     "private": true,
     "engines": {
@@ -34,16 +34,16 @@
         "helmet": "^4.6.0",
         "hoist-non-react-statics": "^3.3.0",
         "jest-fetch-mock": "^2.1.2",
+        "js-cookie": "^3.0.1",
         "jwt-decode": "^3.1.2",
-        "lodash.debounce": "^4.0.8",
         "msw": "^0.28.1",
         "nanoid": "^3.1.31",
-        "njwt": "^1.0.0",
+        "njwt": "^1.2.0",
         "node-fetch": "^2.3.0",
         "prop-types": "^15.6.0",
-        "pwa-kit-build": "^2.0.0-dev.2",
-        "pwa-kit-react-sdk": "^2.0.0-dev.2",
-        "pwa-kit-runtime": "^2.0.0-dev.2",
+        "pwa-kit-build": "^2.0.0-dev.3",
+        "pwa-kit-react-sdk": "^2.0.0-dev.3",
+        "pwa-kit-runtime": "^2.0.0-dev.3",
         "query-string": "^7.0.1",
         "raf": "^3.4.0",
         "randomstring": "^1.2.1",
@@ -88,57 +88,5 @@
         "iOS >= 9.0",
         "Android >= 4.4.4",
         "last 4 ChromeAndroid versions"
-    ],
-    "l10n": {
-        "supportedCurrencies": [
-            "GBP",
-            "EUR",
-            "CNY",
-            "JPY"
-        ],
-        "defaultCurrency": "GBP",
-        "supportedLocales": [
-            {
-                "id": "de-DE",
-                "preferredCurrency": "EUR"
-            },
-            {
-                "id": "en-GB",
-                "preferredCurrency": "GBP"
-            },
-            {
-                "id": "es-MX",
-                "preferredCurrency": "MXN"
-            },
-            {
-                "id": "fr-FR",
-                "preferredCurrency": "EUR"
-            },
-            {
-                "id": "it-IT",
-                "preferredCurrency": "EUR"
-            },
-            {
-                "id": "ja-JP",
-                "preferredCurrency": "JPY"
-            },
-            {
-                "id": "ko-KR",
-                "preferredCurrency": "KRW"
-            },
-            {
-                "id": "pt-BR",
-                "preferredCurrency": "BRL"
-            },
-            {
-                "id": "zh-CN",
-                "preferredCurrency": "CNY"
-            },
-            {
-                "id": "zh-TW",
-                "preferredCurrency": "TWD"
-            }
-        ],
-        "defaultLocale": "en-GB"
-    }
+    ]
 }

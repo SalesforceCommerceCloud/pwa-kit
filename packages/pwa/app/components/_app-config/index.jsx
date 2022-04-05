@@ -14,47 +14,14 @@ import 'focus-visible/dist/focus-visible'
 import theme from '../../theme'
 import CommerceAPI from '../../commerce-api'
 import {
-    CommerceAPIProvider,
-    CustomerProvider,
     BasketProvider,
-    CustomerProductListsProvider
+    CommerceAPIProvider,
+    CustomerProductListsProvider,
+    CustomerProvider
 } from '../../commerce-api/contexts'
-import {DEFAULT_LOCALE, DEFAULT_CURRENCY, urlPartPositions} from '../../constants'
-import {getPreferredCurrency, getSupportedLocalesIds} from '../../utils/locale'
-import {getUrlConfig} from '../../utils/utils'
-import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
+import {resolveSiteFromUrl} from '../../utils/site-utils'
+import {resolveLocaleFromUrl} from '../../utils/utils'
 import {getConfig} from 'pwa-kit-runtime/utils/ssr-config'
-
-/**
- * Returns the validated locale short code parsed from the url.
- * @private
- * @param locals the request locals (only defined when executing on the server.)
- * @returns {String} the locale short code
- */
-const getLocale = (locals = {}) => {
-    let {originalUrl} = locals
-    const {locale: localeType} = getUrlConfig()
-
-    // If there is no originalUrl value in the locals, create it from the window location.
-    // This happens when executing on the client.
-    if (!originalUrl) {
-        originalUrl = window?.location.href.replace(window.location.origin, '')
-    }
-
-    let shortCode
-    const {pathname, searchParams} = new URL(`${getAppOrigin()}${originalUrl}`)
-    if (localeType === urlPartPositions.PATH) {
-        // Parse the pathname from the partial using the URL object and a placeholder host
-        shortCode = pathname.split('/')[1]
-    } else if (localeType === urlPartPositions.QUERY_PARAM) {
-        shortCode = searchParams.get('locale')
-    }
-
-    // Ensure that the locale is in the supported list, otherwise return the default.
-    shortCode = getSupportedLocalesIds().includes(shortCode) ? shortCode : DEFAULT_LOCALE
-
-    return shortCode
-}
 
 /**
  * Use the AppConfig component to inject extra arguments into the getProps
@@ -82,17 +49,23 @@ const AppConfig = ({children, locals = {}}) => {
 }
 
 AppConfig.restore = (locals = {}) => {
-    // Parse the locale from the page url.
-    const locale = getLocale(locals) || DEFAULT_LOCALE
-    const currency = getPreferredCurrency(locale) || DEFAULT_CURRENCY
+    const path =
+        typeof window === 'undefined'
+            ? locals.originalUrl
+            : `${window.location.pathname}${window.location.search}`
+    const site = resolveSiteFromUrl(path)
+    const locale = resolveLocaleFromUrl(path)
+    const currency = locale.preferredCurrency
 
-    let {app: appConfig} = getConfig()
+    const {app: appConfig} = getConfig()
     const apiConfig = {
         ...appConfig.commerceAPI,
         einsteinConfig: appConfig.einsteinAPI
     }
 
-    locals.api = new CommerceAPI({...apiConfig, locale, currency})
+    apiConfig.parameters.siteId = site.id
+
+    locals.api = new CommerceAPI({...apiConfig, locale: locale.id, currency})
 }
 
 AppConfig.freeze = () => undefined
