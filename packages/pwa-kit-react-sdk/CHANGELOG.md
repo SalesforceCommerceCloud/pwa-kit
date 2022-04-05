@@ -1,3 +1,4 @@
+## v2.0.0-dev.3 (Apr 01, 2022)
 ## v2.0.0-dev.2 (Feb 10, 2022)
 
 -   Support functions as default exports in the applications `routes.jsx` file. [#447](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/447)
@@ -6,9 +7,13 @@
 
 ## v2.0.0-dev.2 (Feb 10, 2022)
 ## v2.0.0-dev.1 (Feb 03, 2022)
-## v2.0.0-dev.1 (Feb 03, 2022)
-## v2.0.0-dev (Jan 27, 2022)
-## v1.5.0-dev (Jan 28, 2022)
+## v1.6.0-dev (Mar 17, 2022)
+## v1.5.0 (Mar 17, 2022)
+-   Add boolean flag `enableLegacyBodyParser` to `createApp` options. [#446](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/446)
+-   Add environment specific configuration support. [#421](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/421)
+-   Remove unused url-parse dependency [#411](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/411)
+-   Fix bug with extending an options object on upload.js script [#419](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/419)
+
 ## v1.4.0 (Jan 27, 2022)
 
 -   Add `proxyKeepAliveAgent` ssr-server option. [#306](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/306)

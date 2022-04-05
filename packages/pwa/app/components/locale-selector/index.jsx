@@ -30,9 +30,8 @@ import {
     FlagITIcon,
     FlagCNIcon,
     FlagJPIcon
-} from '../../components/icons'
+} from '../icons'
 
-import {DEFAULT_LOCALE} from '../../constants'
 import LocaleText from '../locale-text'
 
 // NOTE: If you want to have flags shown next to a selectable locale, update this
@@ -50,14 +49,8 @@ const flags = {
  * populated with all the supported locales for the application allowing the
  * user to change the current locale.
  */
-const LocaleSelector = ({
-    selectedLocale = DEFAULT_LOCALE,
-    locales = [],
-    onSelect = () => {},
-    ...props
-}) => {
+const LocaleSelector = ({selectedLocale = '', locales = [], onSelect = () => {}, ...props}) => {
     const styles = useStyleConfig('LocaleSelector')
-
     return (
         <Box className="sf-locale-selector">
             <Accordion allowToggle={true} {...props}>

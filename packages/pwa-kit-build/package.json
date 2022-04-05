@@ -1,6 +1,6 @@
 {
   "name": "pwa-kit-build",
-  "version": "2.0.0-dev.2",
+  "version": "2.0.0-dev.3",
   "description": "Build tools for pwa-kit",
   "repository": {
     "type": "git",
@@ -22,7 +22,7 @@
     "configs"
   ],
   "scripts": {
-    "format": "internal-lib-build format '\"**/*.{js,jsx}\"'",
+    "format": "internal-lib-build format \"**/*.{js,jsx}\"",
     "lint": "npm run lint:js",
     "lint:fix": "npm run lint:js -- --fix",
     "lint:js": "internal-lib-build lint .",
@@ -110,15 +110,14 @@
   },
   "devDependencies": {
     "@loadable/component": "^5.15.0",
-    "internal-lib-build": "^2.0.0-dev.2",
+    "internal-lib-build": "^2.0.0-dev.3",
     "nock": "^13.1.1",
-    "pwa-kit-runtime": "^2.0.0-dev.2",
+    "pwa-kit-runtime": "^2.0.0-dev.3",
     "superagent": "^6.1.0",
     "supertest": "^4.0.2"
   },
   "peerDependencies": {
-    "@loadable/component": "^5.15.0",
-    "pwa-kit-runtime": "^2.0.0-dev.2"
+    "@loadable/component": "^5.15.0"
   },
   "engines": {
     "node": "^12.0.0 || ^14.0.0",

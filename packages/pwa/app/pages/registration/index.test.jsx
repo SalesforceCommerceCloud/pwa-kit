@@ -7,7 +7,7 @@
 import React from 'react'
 import {screen, within, waitFor} from '@testing-library/react'
 import user from '@testing-library/user-event'
-import {renderWithProviders, getPathname} from '../../utils/test-utils'
+import {renderWithProviders} from '../../utils/test-utils'
 import Registration from '.'
 import {BrowserRouter as Router, Route} from 'react-router-dom'
 import Account from '../account'
@@ -122,7 +122,7 @@ const MockedComponent = () => {
     return (
         <Router>
             <Registration />
-            <Route path={getPathname('/account')}>
+            <Route path={'/uk/en-GB/account'}>
                 <Account match={match} />
             </Route>
         </Router>

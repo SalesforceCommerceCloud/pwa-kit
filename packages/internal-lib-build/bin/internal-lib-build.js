@@ -44,10 +44,12 @@ const main = () => {
         .action((path, {fix}) => {
             const eslint = p.join(binDir, 'eslint')
             const eslintConfig = p.resolve(p.join(__dirname, '..', 'configs', '.eslintrc.js'))
+
             execSync(
                 `${eslint} --config ${eslintConfig} --resolve-plugins-relative-to ${pkgRoot}${
                     fix ? ' --fix' : ''
-                } ${path}`
+                    // eslint-disable-next-line no-useless-escape
+                } \"${path}\"`
             )
         })
 
@@ -56,7 +58,8 @@ const main = () => {
         .argument('<path>', 'path or glob to format')
         .action((path) => {
             const prettier = p.join(binDir, 'prettier')
-            execSync(`${prettier} --write ${path}`)
+            // eslint-disable-next-line no-useless-escape
+            execSync(`${prettier} --write \"${path}\"`)
         })
 
     program
