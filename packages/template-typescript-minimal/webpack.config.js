@@ -6,7 +6,7 @@ const path = require('path')
 const projectDir = process.cwd()
 const sdkDir = path.resolve(path.join(__dirname, '..', '..', '..'))
 
-console.log('COFFEEE')
+console.log('Using custom webpack')
 
 const findInProjectThenSDK = (pkg) => {
     const projectPath = path.resolve(projectDir, 'node_modules', pkg)
