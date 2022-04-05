@@ -122,7 +122,7 @@ let consoleLog
 let consoleWarn
 let consoleError
 
-const sandbox = sinon.sandbox.create()
+const sandbox = sinon.createSandbox()
 const originalConsoleLog = console.log
 const originalConsoleWarn = console.warn
 const originalConsoleError = console.error
@@ -542,7 +542,7 @@ test('escapeJSText', () => {
 })
 
 describe('MetricsSender', () => {
-    const sandbox = sinon.sandbox.create()
+    const sandbox = sinon.createSandbox()
 
     afterEach(() => {
         sandbox.restore()
@@ -768,7 +768,7 @@ describe('processExpressResponse', () => {
 })
 
 describe('outgoingRequestHook tests', () => {
-    const sandbox = sinon.sandbox.create()
+    const sandbox = sinon.createSandbox()
     const mockRequest = sandbox.stub()
 
     beforeEach(() => {
