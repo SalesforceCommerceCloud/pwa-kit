@@ -14,6 +14,7 @@ import AppConfig from '../universal/components/_app-config'
 import Switch from '../universal/components/switch'
 import {getRoutes, routeComponent} from '../universal/components/route-component'
 import {loadableReady} from '@loadable/component'
+import {setConfig} from '../universal/utils'
 
 /* istanbul ignore next */
 export const registerServiceWorker = (url) => {
@@ -51,6 +52,10 @@ export const start = () => {
     // object that exists for the lifetime of the app. AppConfig components can use
     // this to set up, eg. Redux stores.
     const locals = {}
+
+    if (window.__CONFIG__) {
+        setConfig(window.__CONFIG__)
+    }
 
     // AppConfig.restore *must* come before getRoutes()
     AppConfig.restore(locals, window.__PRELOADED_STATE__.__STATE_MANAGEMENT_LIBRARY)

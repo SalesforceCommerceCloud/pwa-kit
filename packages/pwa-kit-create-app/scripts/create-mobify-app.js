@@ -53,14 +53,14 @@ sh.set('-e')
 
 const GENERATED_PROJECT_VERSION = '0.0.1'
 
-const HELLO_WORLD_TEST_PROJECT = 'hello-world-test-project'
-const HELLO_WORLD = 'hello-world'
+const EXPRESS_MINIMAL_TEST_PROJECT = 'express-minimal-test-project'
+const EXPRESS_MINIMAL = 'express-minimal'
 const TEST_PROJECT = 'test-project' // TODO: This will be replaced with the `isomorphic-client` config.
 const RETAIL_REACT_APP_DEMO = 'retail-react-app-demo'
 const RETAIL_REACT_APP = 'retail-react-app'
 
-const PRIVATE_PRESETS = [TEST_PROJECT, HELLO_WORLD, HELLO_WORLD_TEST_PROJECT]
-const PUBLIC_PRESETS = [RETAIL_REACT_APP_DEMO, RETAIL_REACT_APP]
+const PRIVATE_PRESETS = [TEST_PROJECT, EXPRESS_MINIMAL_TEST_PROJECT]
+const PUBLIC_PRESETS = [RETAIL_REACT_APP_DEMO, RETAIL_REACT_APP, EXPRESS_MINIMAL]
 const PRESETS = PRIVATE_PRESETS.concat(PUBLIC_PRESETS)
 
 const DEFAULT_OUTPUT_DIR = p.join(process.cwd(), 'pwa-kit-starter-project')
@@ -113,7 +113,7 @@ const merge = (a, b) => deepmerge(a, b, {arrayMerge: (orignal, replacement) => r
  * Each package name included in the object's keys will be copied into the
  * generated project, all others are excluded.
  */
-const runGenerator = (answers, {outputDir, verbose}) => {
+const runGenerator = (answers, {outputDir}) => {
     // These are the public, mobify-owned packages that can be installed through NPM.
     const npmInstallables = ['pwa-kit-react-sdk']
 
@@ -132,28 +132,26 @@ const runGenerator = (answers, {outputDir, verbose}) => {
 
     extractTemplate('pwa', outputDir)
 
-    const {pkgLocalizationConfig} = require(`../assets/pwa/l10n.config`)
     const pkgJsonPath = p.resolve(outputDir, 'package.json')
     const pkgJSON = readJson(pkgJsonPath)
     const pkgDataWithAnswers = merge(pkgJSON, answers['scaffold-pwa'])
-    const finalPkgData = merge(pkgDataWithAnswers, pkgLocalizationConfig)
 
     npmInstallables.forEach((pkgName) => {
         const keys = ['dependencies', 'devDependencies']
         keys.forEach((key) => {
-            const deps = finalPkgData[key]
+            const deps = pkgDataWithAnswers[key]
             if (deps && deps[pkgName]) {
                 deps[pkgName] = SDK_VERSION
             }
         })
     })
 
-    writeJson(pkgJsonPath, finalPkgData)
+    writeJson(pkgJsonPath, pkgDataWithAnswers)
 
     const manifest = p.resolve(outputDir, 'app', 'static', 'manifest.json')
     replaceJSON(manifest, {
-        name: finalPkgData.siteName,
-        short_name: finalPkgData.siteName,
+        name: pkgDataWithAnswers.siteName,
+        short_name: pkgDataWithAnswers.siteName,
         start_url: '/?homescreen=1',
         icons: [
             {
@@ -167,49 +165,38 @@ const runGenerator = (answers, {outputDir, verbose}) => {
         ]
     })
 
-    const PWAKitConfigJsonTemplate = require(`../assets/pwa/default`).template
+    const PWAKitConfigTemplate = require(`../assets/pwa/default`).template
+    const PWAKitSitesTemplate = require(`../assets/pwa/sites`).template
 
     const commerceApi = {
-        proxyPath: answers['scaffold-pwa'].mobify.ssrParameters.proxyConfigs[0].path,
+        proxyPath: 'api',
+        instanceUrl: answers['commerce-api'].instanceUrl,
         clientId: answers['commerce-api'].clientId,
         organizationId: answers['commerce-api'].organizationId,
         shortCode: answers['commerce-api'].shortCode,
         siteId: answers['commerce-api'].siteId
     }
     const einsteinApi = {
-        proxyPath: answers['scaffold-pwa'].mobify.ssrParameters.proxyConfigs[2].path,
+        proxyPath: 'einstein',
         einsteinId: answers['einstein-api'].einsteinId,
         siteId: answers['einstein-api'].siteId || answers['commerce-api'].siteId
     }
 
-    new sh.ShellString(PWAKitConfigJsonTemplate({commerceApi, einsteinApi})).to(
+    new sh.ShellString(PWAKitConfigTemplate({commerceApi, einsteinApi})).to(
         p.resolve(outputDir, 'config', 'default.js')
     )
 
-    npmInstall(outputDir, {verbose})
+    new sh.ShellString(PWAKitSitesTemplate(answers)).to(p.resolve(outputDir, 'config', 'sites.js'))
+
+    npmInstall(outputDir)
 }
 
-const npmInstall = (outputDir, {verbose}) => {
+const npmInstall = (outputDir) => {
     console.log('Installing dependencies for the generated project. This may take a few minutes.\n')
-    const npmLogLevel = verbose ? 'notice' : 'error'
-    const disableStdOut = ['inherit', 'ignore', 'inherit']
-    const stdio = verbose ? 'inherit' : disableStdOut
-    try {
-        child_proc.execSync(`npm install --color always --loglevel ${npmLogLevel}`, {
-            cwd: outputDir,
-            stdio,
-            env: {
-                ...process.env,
-                OPENCOLLECTIVE_HIDE: 'true',
-                DISABLE_OPENCOLLECTIVE: 'true',
-                OPEN_SOURCE_CONTRIBUTOR: 'true'
-            }
-        })
-    } catch {
-        // error is already displayed on the console by child process.
-        // exit the program
-        process.exit(1)
-    }
+    child_proc.execSync('npm install --quiet', {
+        cwd: outputDir,
+        stdio: 'inherit'
+    })
 }
 
 // Validations
@@ -298,7 +285,7 @@ const buildAnswers = ({
             version: GENERATED_PROJECT_VERSION
         },
 
-        'commerce-api': {clientId, siteId, organizationId, shortCode},
+        'commerce-api': {clientId, siteId, organizationId, shortCode, instanceUrl},
         'einstein-api': {einsteinId, siteId: einsteinSiteId || siteId}
     }
 }
@@ -333,7 +320,7 @@ const demoProjectAnswers = () => {
     return buildAnswers(config)
 }
 
-const helloWorldPrompts = () => {
+const expressMinimalPrompts = () => {
     const questions = [
         {
             name: 'projectName',
@@ -344,8 +331,8 @@ const helloWorldPrompts = () => {
     return inquirer.prompt(questions)
 }
 
-const generateHelloWorld = (projectId, {outputDir, verbose}) => {
-    extractTemplate('hello-world', outputDir)
+const generateExpressMinimal = (projectId, {outputDir, verbose}) => {
+    extractTemplate('template-express-minimal', outputDir)
     const pkgJsonPath = p.resolve(outputDir, 'package.json')
     const pkgJSON = readJson(pkgJsonPath)
     const finalPkgData = merge(pkgJSON, {name: projectId})
@@ -382,7 +369,7 @@ const extractTemplate = (templateName, outputDir) => {
         cwd: p.join(tmp),
         sync: true
     })
-    sh.mv(p.join(tmp, templateName), outputDir)
+    sh.cp('-R', p.join(tmp, templateName), outputDir)
     sh.rm('-rf', tmp)
 }
 
@@ -414,15 +401,15 @@ const main = (opts) => {
         .then(() => opts.preset || process.env.GENERATOR_PRESET || presetPrompt())
         .then((preset) => {
             switch (preset) {
-                case HELLO_WORLD_TEST_PROJECT:
-                    return generateHelloWorld({projectId: 'hello-world'}, opts)
-                case HELLO_WORLD:
-                    return helloWorldPrompts(opts).then((answers) => {
+                case EXPRESS_MINIMAL_TEST_PROJECT:
+                    return generateExpressMinimal('express-minimal', opts)
+                case EXPRESS_MINIMAL:
+                    return expressMinimalPrompts(opts).then((answers) => {
                         const projectId = slugifyName(answers.projectName)
                         if (!OUTPUT_DIR_FLAG_ACTIVE) {
                             opts.outputDir = p.join(process.cwd(), projectId)
                         }
-                        generateHelloWorld(projectId, opts)
+                        generateExpressMinimal(projectId, opts)
                         return opts.outputDir
                     })
                 case TEST_PROJECT:
@@ -481,6 +468,12 @@ Examples:
     instance that is used for demo purposes. No questions are asked.
 
     Use this preset to try out PWA Kit.
+
+  ${program.name()} --preset "${EXPRESS_MINIMAL}"
+    Generate a project using a bare-bones express app template.
+    
+    Use this as a starting point for APIs or as a base on top of 
+    which to build new project templates for Managed Runtime. 
   `)
     program
         .option(
@@ -490,7 +483,9 @@ Examples:
         )
         .option(
             '--preset <name>',
-            `The name of a project preset to use (choices: "retail-react-app" "retail-react-app-demo")`
+            `The name of a project preset to use (choices: ${PUBLIC_PRESETS.map(
+                (x) => `"${x}"`
+            ).join(', ')})`
         )
         .option('--verbose', `Print additional logging information to the console.`, false)
 

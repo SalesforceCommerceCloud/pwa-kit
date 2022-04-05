@@ -35,7 +35,7 @@ import {API_ERROR_MESSAGE} from '../../constants'
 import {REMOVE_CART_ITEM_CONFIRMATION_DIALOG_CONFIG} from './partials/cart-secondary-button-group'
 
 // Utilities
-import debounce from 'lodash.debounce'
+import debounce from 'lodash/debounce'
 
 const Cart = () => {
     const basket = useBasket()

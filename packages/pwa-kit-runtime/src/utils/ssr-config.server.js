@@ -4,13 +4,15 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
+
+/* istanbul ignore next */
 const SUPPORTED_FILE_TYPES = ['js', 'yml', 'yaml', 'json']
 
 /**
  * Returns the express app configuration file in object form. The file will be resolved in the
  * the following order:
  *
- * {deploy_target}.ext - When the DEPLOY_TARGET environment is set (predomenantly on remote environments)
+ * {deploy_target}.ext - When the DEPLOY_TARGET environment is set (predominantly on remote environments)
  * a file aptly named after the environment will be loaded first. Examples of this are `production.json`, or
  * `development.json`.
  *

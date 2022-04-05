@@ -90,7 +90,8 @@ const opts = (overrides = {}) => {
         fetchAgents: {
             https: httpsAgent
         },
-        defaultCacheTimeSeconds: 123
+        defaultCacheTimeSeconds: 123,
+        enableLegacyRemoteProxying: false
     }
     return {
         ...defaults,
@@ -152,11 +153,12 @@ describe('createApp validates the options object', () => {
             faviconPath: 'nosuchfile.ico'
         })
 
-        const sandbox = sinon.sandbox.create()
+        const sandbox = sinon.createSandbox()
         const warn = sandbox.spy(console, 'warn')
 
         RemoteServerFactory.createApp(options)
         expect(warn.calledOnce).toBe(true)
+
         sandbox.restore()
     })
 })
@@ -188,7 +190,7 @@ describe('createApp validates environment variables', () => {
 
 describe('SSRServer operation', () => {
     const savedEnvironment = Object.assign({}, process.env)
-    const sandbox = sinon.sandbox.create()
+    const sandbox = sinon.createSandbox()
     let server
 
     afterEach(() => {
@@ -680,7 +682,7 @@ describe('SSRServer persistent caching', () => {
         }
     }
 
-    const sandbox = sinon.sandbox.create()
+    const sandbox = sinon.createSandbox()
 
     let app, route
 

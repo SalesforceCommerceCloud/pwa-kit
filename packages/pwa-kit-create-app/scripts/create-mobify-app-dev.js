@@ -137,6 +137,7 @@ const withLocalNPMRepo = (func) => {
 const runGenerator = () => {
     // Shelljs can't run interactive programs, so we have to switch to child_process.
     // See https://github.com/shelljs/shelljs/wiki/FAQ#running-interactive-programs-with-exec
+
     cp.execSync(`npx pwa-kit-create-app ${process.argv.slice(2).join(' ')}`, {
         stdio: 'inherit'
     })
