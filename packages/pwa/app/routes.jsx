@@ -19,7 +19,8 @@ import loadable from '@loadable/component'
 import {Skeleton} from '@chakra-ui/react'
 import {configureRoutes} from './utils/routes-utils'
 import {getConfig} from 'pwa-kit-react-sdk/ssr/universal/utils'
-import {Redirect, withRouter} from 'react-router-dom'
+import {withRouter} from 'react-router-dom'
+import ExternalRedirect from './components/external-redirect'
 
 const fallback = <Skeleton height="75vh" width="100%" />
 
@@ -28,15 +29,15 @@ const Home = loadable(() => import('./pages/home'), {fallback})
 const Login = loadable(() => import('./pages/login'), {fallback})
 const Registration = loadable(() => import('./pages/registration'), {fallback})
 const ResetPassword = loadable(() => import('./pages/reset-password'), {fallback})
-const Account = loadable(() => import('./pages/account'), {fallback})
 const Cart = loadable(() => import('./pages/cart'), {fallback})
-const Checkout = loadable(() => import('./pages/checkout'), {fallback})
 const CheckoutConfirmation = loadable(() => import('./pages/checkout/confirmation'), {fallback})
 const LoginRedirect = loadable(() => import('./pages/login-redirect'), {fallback})
 const ProductDetail = loadable(() => import('./pages/product-detail'), {fallback})
 const ProductList = loadable(() => import('./pages/product-list'), {fallback})
-const Wishlist = loadable(() => import('./pages/account/wishlist'), {fallback})
 //TODO: Change for testing purposes.
+// const Account = loadable(() => import('./pages/account'), {fallback})
+// const Wishlist = loadable(() => import('./pages/account/wishlist'), {fallback})
+// const Checkout = loadable(() => import('./pages/checkout'), {fallback})
 // const PageNotFound = loadable(() => import('./pages/page-not-found'))
 
 const routes = [
@@ -60,15 +61,15 @@ const routes = [
         component: ResetPassword,
         exact: true
     },
-    {
-        path: '/account',
-        component: Account
-    },
-    {
-        path: '/checkout',
-        component: Checkout,
-        exact: true
-    },
+    // {
+    //     path: '/account',
+    //     component: Account
+    // },
+    // {
+    //     path: '/checkout',
+    //     component: Checkout,
+    //     exact: true
+    // },
     {
         path: '/checkout/confirmation',
         component: CheckoutConfirmation,
@@ -96,16 +97,18 @@ const routes = [
         path: '/category/:categoryId',
         component: ProductList
     },
-    {
-        path: '/account/wishlist',
-        component: Wishlist
-    },
+    // {
+    //     path: '/account/wishlist',
+    //     component: Wishlist
+    // },
     //TODO: Change for testing purposes. Route not matching the PWA routes
     // are redirected to eCDN and thus to the external origin.
     {
         path: '*',
         component: withRouter(({location}) => (
-            <Redirect to={`https://domain-example.com${location.pathname}${location.search}`} />
+            <ExternalRedirect
+                to={`https://domain-example.com${location.pathname}${location.search}`}
+            />
         ))
     }
 ]
