@@ -8,7 +8,7 @@ const childProc = require('child_process')
  * Send bundle size stats to Datadog
  */
 const main = () => {
-    const pwaStats = require(path.join(path.resolve(''), 'packages', 'pwa', 'build', 'stats.json'))
+    const pwaStats = require(path.join(path.resolve(''), 'packages', 'template-retail-react-app', 'build', 'stats.json'))
 
     const bundles = pwaStats.assets
     bundles.forEach((bundle) => {
