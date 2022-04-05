@@ -5,6 +5,8 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
+require('regenerator-runtime/runtime')
+
 jest.mock('./build-request')
 jest.mock('./utils')
 const Utils = require('./utils')
