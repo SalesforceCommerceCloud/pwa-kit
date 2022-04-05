@@ -15,7 +15,7 @@ const updated = webpackConfig.map((config) => {
     config.resolve.extensions.push(".css")
     config.module.rules.push({
         test: /\.css$/i,
-        use: [findInProjectThenSDK('style-loader'), findInProjectThenSDK('css-loader')]
+        use: [findInProjectThenSDK('isomorphic-style-loader'), findInProjectThenSDK('css-loader')]
     })
     return config
 })
