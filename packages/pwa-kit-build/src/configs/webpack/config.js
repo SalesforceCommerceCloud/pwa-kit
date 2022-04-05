@@ -275,9 +275,7 @@ const renderer =
 
                     // Must only appear on one config – this one is the only mandatory one.
                     new CopyPlugin({
-                        patterns: [
-                            {from: 'app/static/', to: 'static/'},
-                        ]
+                        patterns: [{from: 'app/static/', to: 'static/'}]
                     }),
 
                     new CopyPlugin({
@@ -288,7 +286,7 @@ const renderer =
                                 globOptions: {
                                     ignore: ['**/local.*']
                                 },
-                                noErrorOnMissing: true,
+                                noErrorOnMissing: true
                             }
                         ]
                     })
