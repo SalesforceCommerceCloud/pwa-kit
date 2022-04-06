@@ -17,9 +17,11 @@ import webpackDevMiddleware from 'webpack-dev-middleware'
 import webpackHotServerMiddleware from 'webpack-hot-server-middleware'
 import open from 'open'
 import requireFromString from 'require-from-string'
-import config from '../../configs/webpack/config'
 import {RemoteServerFactory} from 'pwa-kit-runtime/ssr/server/build-remote-server'
 import {proxyConfigs} from 'pwa-kit-runtime/utils/ssr-shared'
+
+const projectDir = process.cwd()
+const projectWebpackPath = path.resolve(projectDir, 'webpack.config.js')
 
 const chalk = require('chalk')
 
@@ -84,6 +86,11 @@ export const DevServerMixin = {
         // This is separated out from addSSRRenderer because these
         // routes must not have our SSR middleware applied to them.
         // But the SSR render function must!
+
+        let config = require('../../configs/webpack/config')
+        if (fs.existsSync(projectWebpackPath)) {
+            config = require(projectWebpackPath)
+        }
         app.__compiler = webpack(config)
         app.__devMiddleware = webpackDevMiddleware(app.__compiler, {serverSideRender: true})
         app.__webpackReady = () => Boolean(app.__devMiddleware.context.state)
@@ -198,7 +205,11 @@ export const DevServerMixin = {
 
         server.listen({hostname, port}, () => {
             if (process.env.NODE_ENV !== 'test') {
-                open(`${this._getDevServerURL(app.options)}/__mrt?loading=1`)
+                open(
+                    `${this._getDevServerURL(
+                        app.options
+                    )}/__mrt/loading-screen/index.html?loading=1`
+                )
             }
         })
 

@@ -172,12 +172,12 @@ commands:
             cd generated-project
             npm run build
       - run:
-          name: Generate hello-world project
+          name: Generate express-minimal project
           environment:
-            GENERATOR_PRESET: 'hello-world-test-project'
+            GENERATOR_PRESET: 'express-minimal-test-project'
           command: |
-            set GENERATOR_PRESET=hello-world-test-project
-            node packages/pwa-kit-create-app/scripts/create-mobify-app-dev.js --outputDir generated-project-hello-world
+            set GENERATOR_PRESET=express-minimal-test-project
+            node packages/pwa-kit-create-app/scripts/create-mobify-app-dev.js --outputDir generated-project-express-minimal
       - runtests:
           cwd: generated-project
       - smoketestscripts:

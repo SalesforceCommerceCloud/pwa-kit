@@ -28,8 +28,8 @@ module.exports = {
             assertions: {
                 // NOTE: Adjust the scores accordingly as the performance is improved
                 'categories:performance': ['error', {minScore: 0.3}],
-                'categories:pwa': ['error', {minScore: 0.8}],
-                'categories:seo': ['error', {minScore: 0.83}],
+                'categories:pwa': ['error', {minScore: 0.9}],
+                'categories:seo': ['error', {minScore: 0.85}],
                 'categories:accessibility': ['error', {minScore: 0.88}]
             }
         }
