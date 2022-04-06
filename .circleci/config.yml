@@ -59,9 +59,6 @@ commands:
   setup_windows:
     description: 'Setup Machine'
     steps:
-      - restore_cache:
-          keys:
-            - npm-cache
       - run:
           name: 'Install Dependencies'
           command: |
