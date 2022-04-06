@@ -59,6 +59,9 @@ commands:
   setup_windows:
     description: 'Setup Machine'
     steps:
+      - restore_cache:
+          keys:
+            - npm-cache
       - run:
           name: 'Install Dependencies'
           command: |
@@ -122,7 +125,7 @@ commands:
             # root and *also* on the PWA package. This section is run on both.
 
             # Always run fast unit tests
-            npm run test
+            npm run test --forceExit
   smoketestscripts:
     description: 'Smoke test scripts'
     parameters:
