@@ -125,7 +125,7 @@ commands:
             # root and *also* on the PWA package. This section is run on both.
 
             # Always run fast unit tests
-            npm run test --forceExit
+            npm run test
   smoketestscripts:
     description: 'Smoke test scripts'
     parameters:
