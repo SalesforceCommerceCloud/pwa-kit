@@ -11,6 +11,7 @@
         "@chakra-ui/icons": "^1.0.6",
         "@chakra-ui/react": "^1.7.1",
         "@chakra-ui/skip-nav": "^1.1.4",
+        "@emotion/babel-plugin": "^11.7.2",
         "@emotion/react": "^11.1.5",
         "@emotion/styled": "^11.1.5",
         "@formatjs/cli": "^4.2.27",

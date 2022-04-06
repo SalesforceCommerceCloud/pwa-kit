@@ -8,6 +8,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {useIntl, FormattedMessage} from 'react-intl'
+import {css} from '@emotion/react'
 
 // Components
 import {
@@ -52,6 +53,10 @@ const Home = ({productSearchResult, isLoading}) => {
                 description="Commerce Cloud Retail React App"
                 keywords="Commerce Cloud, Retail React App, React Storefront"
             />
+
+            <div css={css`color: green;`}>
+                Look! I'm green!
+            </div>
 
             <Hero
                 title={intl.formatMessage({
