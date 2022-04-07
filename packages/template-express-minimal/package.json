@@ -8,7 +8,6 @@
         "pwa-kit-runtime": "^2.0.0-dev.3"
     },
     "scripts": {
-        "test": "mrt test",
         "format": "mrt format \"**/*.{js,jsx}\"",
         "lint": "mrt lint \"**/*.{js,jsx}\"",
         "lint:fix": "npm run lint -- --fix",

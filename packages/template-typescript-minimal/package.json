@@ -24,7 +24,6 @@
         "lint:fix": "npm run lint -- --fix",
         "save-credentials": "mrt save-credentials",
         "start": "mrt start",
-        "test": "mrt test",
         "build": "mrt build",
         "push": "npm run build && mrt push"
     },
