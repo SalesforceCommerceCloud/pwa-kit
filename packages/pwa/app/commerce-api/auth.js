@@ -176,7 +176,8 @@ class Auth {
             }
             return this[authorizationMethod](credentials)
                 .catch((error) => {
-                    if (retries === 0 && error.message === 'EXPIRED_TOKEN') {
+                    const retryErrors = ['invalid refresh_token', 'EXPIRED_TOKEN']
+                    if (retries === 0 && retryErrors.includes(error.message)) {
                         retries = 1 // we only retry once
                         this._clearAuth()
                         return startLoginFlow()
