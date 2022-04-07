@@ -278,7 +278,7 @@ const renderer =
 
                     // Keep this on the slowest-to-build item - the server-side bundle.
                     new WebpackNotifierPlugin({
-                        title: `Mobify Project: ${pkg.name}`,
+                        title: `PWA Kit Project: ${pkg.name}`,
                         excludeWarnings: true,
                         skipFirstNotification: true
                     }),
