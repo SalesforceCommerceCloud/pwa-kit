@@ -19,8 +19,8 @@
         "react-router-dom": "^5.1.2"
     },
     "scripts": {
-        "format": "mrt format \"**/*.{js,jsx}\"",
-        "lint": "mrt lint \"**/*.{js,jsx}\"",
+        "format": "mrt format \"**/*.{js,jsx,tsx}\"",
+        "lint": "mrt lint \"**/*.{js,jsx,tsx}\"",
         "lint:fix": "npm run lint -- --fix",
         "save-credentials": "mrt save-credentials",
         "start": "mrt start",

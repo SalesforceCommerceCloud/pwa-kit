@@ -65,7 +65,7 @@ commands:
       - run:
           name: 'Install Dependencies'
           command: |
-            powercfg -change -standby-timeout-ac 0
+
             # Install node dependencies
             npm ci
       - save_cache:

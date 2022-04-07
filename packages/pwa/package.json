@@ -70,6 +70,7 @@
         "start": "cross-env NODE_ICU_DATA=node_modules/full-icu mrt start",
         "start:inspect": "npm run start -- --inspect",
         "start:pseudolocale": "npm run extract-default-translations && npm run compile-translations:pseudo && cross-env USE_PSEUDOLOCALE=true npm run start",
+        "test": "mrt test",
         "test:lighthouse": "cross-env NODE_ENV=production lhci autorun --config=tests/lighthouserc.js",
         "test:max-file-size": "bundlesize"
     },

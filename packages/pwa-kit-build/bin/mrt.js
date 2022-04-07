@@ -196,12 +196,6 @@ const main = () => {
         .action((path, {fix}) => {
             const eslint = p.join(require.resolve('eslint'), '..', '..', '..', '.bin', 'eslint')
             const eslintConfig = p.join(__dirname, '..', 'configs', 'eslint', 'eslint-config.js')
-            console.log(
-                'mrt lint:',
-                `${eslint} --config ${eslintConfig} --resolve-plugins-relative-to ${pkgRoot}${
-                    fix ? ' --fix' : ''
-                } "${path}"`
-            )
             execSync(
                 `${eslint} --config ${eslintConfig} --resolve-plugins-relative-to ${pkgRoot}${
                     fix ? ' --fix' : ''
@@ -224,17 +218,7 @@ const main = () => {
         .option('--jest-args <args>', 'arguments to forward to Jest')
         .action(({jestArgs}) => {
             const jest = p.join(require.resolve('jest'), '..', '..', '..', '.bin', 'jest')
-            console.log(
-                'mrt test:',
-                `${jest} --passWithNoTests --forceExit --maxWorkers=2${
-                    jestArgs ? ' ' + jestArgs : ''
-                }`
-            )
-            execSync(
-                `${jest} --passWithNoTests --forceExit --maxWorkers=2${
-                    jestArgs ? ' ' + jestArgs : ''
-                }`
-            )
+            execSync(`${jest} --passWithNoTests --maxWorkers=2${jestArgs ? ' ' + jestArgs : ''}`)
         })
 
     program.option('-v, --version', 'show version number').action(({version}) => {
