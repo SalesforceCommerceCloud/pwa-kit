@@ -15,6 +15,7 @@
     "preinstall": "node ./scripts/check-version.js",
     "postinstall": "node ./scripts/bootstrap.js",
     "lerna": "lerna",
+    "pretest": "npm run lint",
     "test": "lerna run --stream --concurrency=1 test",
     "test:max-file-size": "lerna run --stream test:max-file-size",
     "lint": "lerna run --parallel --stream lint -- --silent",
