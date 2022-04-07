@@ -36,6 +36,18 @@ if ([production, development].indexOf(mode) < 0) {
     throw new Error(`Invalid mode "${mode}"`)
 }
 
+const getBundleAnalyzerPlugin = (name = 'report', pluginOptions) =>
+    new BundleAnalyzerPlugin({
+        analyzerMode: 'static',
+        defaultSizes: 'gzip',
+        openAnalyzer: CI !== 'true',
+        generateStatsFile: true,
+        reportFilename: `${name}.html`,
+        reportTitle: `${name} bundle analysis result`,
+        statsFilename: `${name}.json`,
+        ...pluginOptions
+    })
+
 const entryPointExists = (segments) => {
     for (let ext of ['.js', '.jsx', '.ts', '.tsx']) {
         const p = path.resolve(projectDir, ...segments) + ext
@@ -122,13 +134,6 @@ const baseConfig = (target) => {
                         ['global.GENTLY']: false
                     }),
 
-                    analyzeBundle &&
-                        new BundleAnalyzerPlugin({
-                            analyzerMode: 'static',
-                            defaultSizes: 'gzip',
-                            openAnalyzer: CI !== 'true',
-                            generateStatsFile: true
-                        }),
                     mode === development && new webpack.NoEmitOnErrorsPlugin(),
 
                     createModuleReplacementPlugin(projectDir),
@@ -221,7 +226,11 @@ const client =
                 entry: {
                     main: './app/main'
                 },
-                plugins: [...config.plugins, new LoadablePlugin({writeToDisk: true})],
+                plugins: [
+                    ...config.plugins,
+                    new LoadablePlugin({writeToDisk: true}),
+                    analyzeBundle && getBundleAnalyzerPlugin('main')
+                ],
                 // Hide the performance hints, since we already have a similar `bundlesize` check in `pwa` package
                 performance: {
                     hints: false
@@ -244,7 +253,8 @@ const clientOptional = baseConfig('web')
                 ...optional('worker', './worker/main.js'),
                 ...optional('core-polyfill', resolve(projectDir, 'node_modules', 'core-js')),
                 ...optional('fetch-polyfill', resolve(projectDir, 'node_modules', 'whatwg-fetch'))
-            }
+            },
+            plugins: [analyzeBundle && getBundleAnalyzerPlugin('client-optional')]
         }
     })
     .build()
@@ -289,7 +299,8 @@ const renderer =
                                 noErrorOnMissing: true
                             }
                         ]
-                    })
+                    }),
+                    analyzeBundle && getBundleAnalyzerPlugin('server-renderer')
                 ]
             }
         })
@@ -309,7 +320,8 @@ const ssr = (() => {
                         path: buildDir,
                         filename: 'ssr.js',
                         libraryTarget: 'commonjs2'
-                    }
+                    },
+                    plugins: [analyzeBundle && getBundleAnalyzerPlugin('ssr')]
                 }
             })
             .build()
@@ -330,7 +342,8 @@ const requestProcessor =
                     path: buildDir,
                     filename: 'request-processor.js',
                     libraryTarget: 'commonjs2'
-                }
+                },
+                plugins: [analyzeBundle && getBundleAnalyzerPlugin('request-processor')]
             }
         })
         .build()
