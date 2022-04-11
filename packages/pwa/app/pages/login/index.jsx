@@ -14,8 +14,10 @@ import useNavigation from '../../hooks/use-navigation'
 import Seo from '../../components/seo'
 import {useForm} from 'react-hook-form'
 import {useLocation} from 'react-router-dom'
+import useBasket from '../../commerce-api/hooks/useBasket'
 
 import LoginForm from '../../components/login'
+
 
 const Login = () => {
     const {formatMessage} = useIntl()
@@ -24,10 +26,12 @@ const Login = () => {
     const customer = useCustomer()
     const form = useForm()
     const location = useLocation()
+    const basket = useBasket()
 
     const submitForm = async (data) => {
         try {
             await customer.login(data)
+            await basket.mergeBasket()
         } catch (error) {
             const message = /invalid credentials/i.test(error.message)
                 ? formatMessage({
