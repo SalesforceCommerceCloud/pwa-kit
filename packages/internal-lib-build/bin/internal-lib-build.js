@@ -46,10 +46,9 @@ const main = () => {
             const eslintConfig = p.resolve(p.join(__dirname, '..', 'configs', '.eslintrc.js'))
 
             execSync(
-                `${eslint} --config ${eslintConfig} --resolve-plugins-relative-to ${pkgRoot}${
+                `${eslint} --debug --config ${eslintConfig} --resolve-plugins-relative-to ${pkgRoot}${
                     fix ? ' --fix' : ''
-                    // eslint-disable-next-line no-useless-escape
-                } \"${path}\"`
+                } "${path}"`
             )
         })
 
