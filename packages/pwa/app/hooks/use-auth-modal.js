@@ -4,10 +4,10 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, { useEffect, useRef, useState } from 'react'
+import React, {useEffect, useRef, useState} from 'react'
 import PropTypes from 'prop-types'
-import { FormattedMessage, useIntl } from 'react-intl'
-import { useForm } from 'react-hook-form'
+import {FormattedMessage, useIntl} from 'react-intl'
+import {useForm} from 'react-hook-form'
 import {
     Button,
     Modal,
@@ -21,12 +21,12 @@ import {
     useToast
 } from '@chakra-ui/react'
 import useCustomer from '../commerce-api/hooks/useCustomer'
-import { BrandLogo } from '../components/icons'
+import {BrandLogo} from '../components/icons'
 import LoginForm from '../components/login'
 import ResetPasswordForm from '../components/reset-password'
 import RegisterForm from '../components/register'
-import { noop } from '../utils/utils'
-import { API_ERROR_MESSAGE } from '../constants'
+import {noop} from '../utils/utils'
+import {API_ERROR_MESSAGE} from '../constants'
 import useNavigation from './use-navigation'
 import useBasket from '../commerce-api/hooks/useBasket'
 
@@ -41,7 +41,7 @@ export const AuthModal = ({
     onPasswordResetSuccess = noop,
     ...props
 }) => {
-    const { formatMessage } = useIntl()
+    const {formatMessage} = useIntl()
     const customer = useCustomer()
     const navigate = useNavigation()
     const [currentView, setCurrentView] = useState(initialView)
@@ -67,12 +67,12 @@ export const AuthModal = ({
         } catch (error) {
             const message = /invalid credentials/i.test(error.message)
                 ? formatMessage({
-                    defaultMessage:
-                        "Something's not right with your email or password. Try again.",
-                    id: 'auth_modal.error.incorrect_email_or_password'
-                })
+                      defaultMessage:
+                          "Something's not right with your email or password. Try again.",
+                      id: 'auth_modal.error.incorrect_email_or_password'
+                  })
                 : formatMessage(API_ERROR_MESSAGE)
-            form.setError('global', { type: 'manual', message })
+            form.setError('global', {type: 'manual', message})
         }
     }
 
@@ -81,18 +81,18 @@ export const AuthModal = ({
             await customer.registerCustomer(data)
             navigate('/account')
         } catch (error) {
-            form.setError('global', { type: 'manual', message: error.message })
+            form.setError('global', {type: 'manual', message: error.message})
         }
     }
 
-    const handleResetPassword = async ({ email }) => {
+    const handleResetPassword = async ({email}) => {
         try {
             await customer.getResetPasswordToken(email)
             // Execute action to be perfromed on successful passoword reset
             await onPasswordResetSuccess()
             submittedEmail.current = email
         } catch (error) {
-            form.setError('global', { type: 'manual', message: error.message })
+            form.setError('global', {type: 'manual', message: error.message})
         }
     }
 
@@ -125,7 +125,7 @@ export const AuthModal = ({
         // Lets determine if the user has either logged in, or registed.
         const loggingIn = currentView === LOGIN_VIEW
         const registering = currentView === REGISTER_VIEW
-        const { isOpen } = props
+        const {isOpen} = props
         const isNowRegistered = isOpen && customer.isRegistered && (loggingIn || registering)
 
         // If the customer changed, but it's not because they logged in or registered. Do nothing.
@@ -256,7 +256,7 @@ AuthModal.propTypes = {
  * @returns {Object} - Object props to be spread on to the AuthModal component
  */
 export const useAuthModal = (initialView = LOGIN_VIEW) => {
-    const { isOpen, onOpen, onClose } = useDisclosure()
+    const {isOpen, onOpen, onClose} = useDisclosure()
 
     return {
         initialView,
