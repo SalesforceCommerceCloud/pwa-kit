@@ -5,9 +5,10 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
+import PropTypes from 'prop-types'
 import {screen, within, waitFor} from '@testing-library/react'
 import user from '@testing-library/user-event'
-import {renderWithProviders} from '../utils/test-utils'
+import {renderWithProviders, createPathWithDefaults} from '../utils/test-utils'
 import {AuthModal, useAuthModal} from './use-auth-modal'
 import {BrowserRouter as Router, Route} from 'react-router-dom'
 import Account from '../pages/account'
@@ -116,8 +117,10 @@ jest.mock('../commerce-api/pkce', () => {
     }
 })
 
-const MockedComponent = () => {
-    const authModal = useAuthModal()
+let authModal = undefined
+const MockedComponent = (props) => {
+    const {initialView} = props
+    authModal = initialView ? useAuthModal(initialView) : useAuthModal()
     const match = {
         params: {pageName: 'profile'}
     }
@@ -125,15 +128,19 @@ const MockedComponent = () => {
         <Router>
             <button onClick={authModal.onOpen}>Open Modal</button>
             <AuthModal {...authModal} />
-            <Route path="/en-GB/account">
+            <Route path={createPathWithDefaults('/account')}>
                 <Account match={match} />
             </Route>
         </Router>
     )
 }
+MockedComponent.propTypes = {
+    initialView: PropTypes.string
+}
 
 // Set up and clean up
 beforeEach(() => {
+    authModal = undefined
     jest.useFakeTimers()
 })
 afterEach(() => {
@@ -219,6 +226,27 @@ test('Allows customer to generate password token', async () => {
     expect(screen.getByText(/foo@test.com/i)).toBeInTheDocument()
 })
 
+test('Allows customer to open generate password token modal from everywhere', () => {
+    // render our test component
+    renderWithProviders(<MockedComponent initialView="password" />)
+
+    // open the modal
+    const trigger = screen.getByText(/open modal/i)
+    user.click(trigger)
+    expect(authModal.isOpen).toBe(true)
+
+    const withinForm = within(screen.getByTestId('sf-auth-modal-form'))
+
+    expect(withinForm.getByText(/Reset Password/i)).toBeInTheDocument()
+
+    // close the modal
+    const switchToSignIn = screen.getByText(/Sign in/i)
+    user.click(switchToSignIn)
+
+    // check that the modal is closed
+    expect(authModal.isOpen).toBe(false)
+})
+
 test('Allows customer to create an account', async () => {
     mockLogin.mockImplementationOnce(async () => {
         return {url: '/callback'}
@@ -245,6 +273,5 @@ test('Allows customer to create an account', async () => {
     user.click(withinForm.getByText(/create account/i))
 
     // wait for redirecting to account page
-    expect(await screen.findByText(/customer@test.com/i, {}, {timeout: 30000})).toBeInTheDocument()
-    expect(await screen.queryAllByText(/Log out/i, {}, {timeout: 30000}).length).toEqual(2)
+    expect(await screen.findByText(/welcome tester/i, {}, {timeout: 30000})).toBeInTheDocument()
 })

@@ -6,13 +6,12 @@
  */
 'use strict'
 
-/* global WEBPACK_PACKAGE_JSON_MOBIFY */
-
 import path from 'path'
 import {createApp, createHandler, serveStaticFile} from 'pwa-kit-react-sdk/ssr/server/express'
 import {isRemote} from 'pwa-kit-react-sdk/utils/ssr-server'
 import {render} from 'pwa-kit-react-sdk/ssr/server/react-rendering'
 import helmet from 'helmet'
+import {loadConfig} from 'pwa-kit-react-sdk/utils/config'
 
 const app = createApp({
     // The build directory (an absolute path)
@@ -28,12 +27,11 @@ const app = createApp({
     // The location of the apps manifest file relative to the build directory
     manifestPath: 'static/manifest.json',
 
-    // This is the value of the 'mobify' object from package.json
-    // provided by a webpack DefinePlugin
-    mobify: WEBPACK_PACKAGE_JSON_MOBIFY,
-
     // The port that the local dev server listens on
     port: 3000,
+
+    // This is the `mobify` object defined in your config folder or package.json file.
+    mobify: loadConfig(),
 
     // The protocol on which the development Express app listens.
     // Note that http://localhost is treated as a secure context for development.
@@ -54,7 +52,8 @@ app.use(
                 // Do not upgrade insecure requests for local development
                 'upgrade-insecure-requests': isRemote() ? [] : null
             }
-        }
+        },
+        hsts: isRemote()
     })
 )
 
@@ -64,7 +63,6 @@ app.get('/callback?*', (req, res) => {
 })
 app.get('/robots.txt', serveStaticFile('static/robots.txt'))
 app.get('/*', render)
-
 // SSR requires that we export a single handler function called 'get', that
 // supports AWS use of the server that we created above.
 export const get = createHandler(app)

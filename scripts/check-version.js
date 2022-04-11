@@ -28,25 +28,23 @@ if (!fs.existsSync(path.join('node_modules', 'semver'))) {
         '--no-save',
         '--no-package-lock',
         '--ignore-scripts',
-        '--no-audit'
+        '--no-audit',
     ])
 }
 
 const semver = require('semver')
-const requiredNode = new semver.Range(pkg.engines.node)
+const requiredNode = pkg.engines.node
 const foundNode = process.version
-const requiredNpm = new semver.Range(pkg.engines.npm)
-const foundNpm = spawnSync(npm, ['-v'])
-    .stdout.toString()
-    .trim()
+const requiredNpm = pkg.engines.npm
+const foundNpm = spawnSync(npm, ['-v']).stdout.toString().trim()
 
 const warnings = []
 
-if (!semver.satisfies(foundNode, requiredNode)) {
+if (!semver.satisfies(foundNode, new semver.Range(requiredNode))) {
     warnings.push(`- Node: ${foundNode} is installed, but we require ${requiredNode}`)
 }
 
-if (!semver.satisfies(foundNpm, requiredNpm)) {
+if (!semver.satisfies(foundNpm, new semver.Range(requiredNpm))) {
     warnings.push(`- NPM: ${foundNpm} is installed, but we require ${requiredNpm}`)
 }
 
@@ -56,21 +54,19 @@ const blue = (s) => `\x1b[36m${s}\u001b[0m`
 if (warnings.length) {
     const rl = readline.createInterface({
         input: process.stdin,
-        output: process.stdout
+        output: process.stdout,
     })
     console.log(red('Pausing installation...'))
     console.log(
-        "Warning: Some software installed locally does not meet Mobify's version requirements:\n"
+        'Warning: Some software installed locally does not meet the version requirements:\n'
     )
     warnings.forEach((warning) => console.log(warning))
     console.log('')
 
-    console.log(
-        'To fix this warning, see: https://dev.mobify.com/v2.x/get-started#installing-required-software'
-    )
+    console.log('To fix this warning, see: http://sfdc.co/pwa-kit-required-software')
     rl.question(
         blue(
-            "Your app may not work as expected when deployed to Mobify's servers. Would you like to continue installing anyway? (y/N) "
+            'Your app may not work as expected when deployed to Managed Runtime servers. Would you like to continue installing anyway? (y/N) '
         ),
         (answer) => {
             const continueAnyway = /^y|yes$/i.test(answer)

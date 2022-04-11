@@ -96,6 +96,8 @@ export class BuildMarkerPlugin {
 }
 
 /**
+ * @deprecated will be removed in v2.0.0
+ *
  * This webpack plugin takes pwa kit configuration from the project,
  * and validate the config object against the schema. It also supports
  * schema extension which allow users to add custom schemas.

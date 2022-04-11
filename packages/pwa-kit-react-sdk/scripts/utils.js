@@ -17,9 +17,10 @@ const fileUtils = require('./file-utils')
 
 const Matcher = require('../dist/utils/glob').Matcher
 
+const loadConfig = require('../dist/utils/config').loadConfig
+
 const SDK_VERSION = require('../package.json').version
-const DEFAULT_DOCS_URL =
-    'https://dev.mobify.com/v2.x/how-to-guides/categories/deployment/pushing-and-publishing-bundles'
+const DEFAULT_DOCS_URL = 'http://sfdc.co/pwa-kit'
 
 const Utils = {}
 
@@ -75,7 +76,7 @@ Utils.createBundle = (options, destination) => {
                     process.cwd(),
                     options.buildDirectory
                 )}" not found.]\n` +
-                    'You must first run the Progressive Web SDK build process before uploading a bundle.'
+                    'You must first run the PWA Kit build process before uploading a bundle.'
                 /* eslint-disable max-len */
             )
         )
@@ -241,7 +242,9 @@ Utils.requestErrorMessage = {
         'You do not have permission to perform this actions.\nPlease double check your command to make sure the option values are correct.', //  wrong project name.
     code404:
         'Resource not found.\nPlease double check your command to make sure the option values are correct.', // wrong target name
-    code500: 'Internal Server Error. Please report this to Mobify support team.'
+    code500: 'Internal Server Error. Please report this to Salesforce support team.'
 }
+
+Utils.loadConfig = loadConfig
 
 module.exports = Utils

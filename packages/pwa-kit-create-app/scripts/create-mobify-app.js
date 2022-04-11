@@ -7,13 +7,13 @@
  */
 
 /**
- * This is a generator for projects that run on the Mobify platform.
+ * This is a generator for PWA Kit projects that run on the Managed Runtime.
  *
- * The output of this script is a copy of the pwa package with the following changes:
+ * The output of this script is a copy of a project template with the following changes:
  *
  * 1) We update any monorepo-local dependencies to be installed through NPM.
  *
- * 2) We rename the PWA and configure the generated project based on answers to
+ * 2) We rename the template and configure the generated project based on answers to
  *    questions that we ask the user on the CLI.
  *
  * ## Basic usage
@@ -24,25 +24,30 @@
  *
  * ## Advanced usage and integration testing:
  *
- * In order to skip prompts on CircleCI, the generator supports a purposefully
- * undocumented `PRESET` environment variable, which you can use to skip the prompts
- * in a CI environment. These presets run the generator with hard-coded answers to
- * the questions we would normally ask an end-user. Supported presets are:
+ * For testing on CI we need to be able to generate projects without running
+ * the interactive prompts on the CLI. To support these cases, we have
+ * a few presets that are "private" and only usable through the GENERATOR_PRESET
+ * env var – this keeps them out of the --help docs.
  *
- *   1. "test-project" - A test project using the demo connector.
- *   2. "test-project-sffc" - A test project using the SFCC connector.
+ * If both the GENERATOR_PRESET env var and --preset arguments are passed, the
+ * option set in --preset is used.
  */
 
 const p = require('path')
 const fs = require('fs')
 const os = require('os')
-const program = require('commander')
+const child_proc = require('child_process')
+const {Command} = require('commander')
 const inquirer = require('inquirer')
 const {URL} = require('url')
 const deepmerge = require('deepmerge')
 const sh = require('shelljs')
 const tar = require('tar')
+const semver = require('semver')
+const slugify = require('slugify')
 const generatorPkg = require('../package.json')
+
+const program = new Command()
 
 sh.set('-e')
 
@@ -51,13 +56,16 @@ const GENERATED_PROJECT_VERSION = '0.0.1'
 const HELLO_WORLD_TEST_PROJECT = 'hello-world-test-project'
 const HELLO_WORLD = 'hello-world'
 const TEST_PROJECT = 'test-project' // TODO: This will be replaced with the `isomorphic-client` config.
-const PROMPT = 'prompt'
+const RETAIL_REACT_APP_DEMO = 'retail-react-app-demo'
+const RETAIL_REACT_APP = 'retail-react-app'
 
-const PRESETS = [TEST_PROJECT, PROMPT, HELLO_WORLD, HELLO_WORLD_TEST_PROJECT]
+const PRIVATE_PRESETS = [TEST_PROJECT, HELLO_WORLD, HELLO_WORLD_TEST_PROJECT]
+const PUBLIC_PRESETS = [RETAIL_REACT_APP_DEMO, RETAIL_REACT_APP]
+const PRESETS = PRIVATE_PRESETS.concat(PUBLIC_PRESETS)
 
-const GENERATOR_PRESET = process.env.GENERATOR_PRESET || PROMPT
+const DEFAULT_OUTPUT_DIR = p.join(process.cwd(), 'pwa-kit-starter-project')
 
-const DEFAULT_OUTPUT_DIR = p.join(process.cwd(), 'generated-project')
+const PROJECT_ID_MAX_LENGTH = 20
 
 const SDK_VERSION = generatorPkg.version
 
@@ -67,6 +75,13 @@ const writeJson = (path, data) => new sh.ShellString(JSON.stringify(data, null, 
 
 const replaceJSON = (path, replacements) =>
     writeJson(path, Object.assign(readJson(path), replacements))
+
+const slugifyName = (name) => {
+    return slugify(name, {
+        lower: true,
+        strict: true
+    }).slice(0, PROJECT_ID_MAX_LENGTH)
+}
 
 /**
  * Deeply merge two objects in such a way that all array entries in b replace array
@@ -108,7 +123,7 @@ const runGenerator = (answers, {outputDir}) => {
         if (versions.indexOf(SDK_VERSION) < 0) {
             const msg =
                 `Error: You're generating a project using version "${SDK_VERSION}" of ` +
-                `Mobify's SDKs, but "${pkgName}@${SDK_VERSION}" does not exist on NPM.\n` +
+                `PWA Kit, but "${pkgName}@${SDK_VERSION}" does not exist on NPM.\n` +
                 `The available versions are:\n${versions.map((v) => `  ${v}`).join('\n')}`
             console.error(msg)
             process.exit(1)
@@ -119,24 +134,24 @@ const runGenerator = (answers, {outputDir}) => {
 
     const pkgJsonPath = p.resolve(outputDir, 'package.json')
     const pkgJSON = readJson(pkgJsonPath)
-    const finalPkgData = merge(pkgJSON, answers['scaffold-pwa'])
+    const pkgDataWithAnswers = merge(pkgJSON, answers['scaffold-pwa'])
 
     npmInstallables.forEach((pkgName) => {
         const keys = ['dependencies', 'devDependencies']
         keys.forEach((key) => {
-            const deps = finalPkgData[key]
+            const deps = pkgDataWithAnswers[key]
             if (deps && deps[pkgName]) {
                 deps[pkgName] = SDK_VERSION
             }
         })
     })
 
-    writeJson(pkgJsonPath, finalPkgData)
+    writeJson(pkgJsonPath, pkgDataWithAnswers)
 
     const manifest = p.resolve(outputDir, 'app', 'static', 'manifest.json')
     replaceJSON(manifest, {
-        name: finalPkgData.siteName,
-        short_name: finalPkgData.siteName,
+        name: pkgDataWithAnswers.siteName,
+        short_name: pkgDataWithAnswers.siteName,
         start_url: '/?homescreen=1',
         icons: [
             {
@@ -150,87 +165,90 @@ const runGenerator = (answers, {outputDir}) => {
         ]
     })
 
-    const APIConfigTemplate = require(`../assets/pwa/api.config`).template
+    const PWAKitConfigTemplate = require(`../assets/pwa/default`).template
+    const PWAKitSitesTemplate = require(`../assets/pwa/sites`).template
+
     const commerceApi = {
-        proxyPath: answers['scaffold-pwa'].mobify.ssrParameters.proxyConfigs[0].path,
+        proxyPath: 'api',
+        instanceUrl: answers['commerce-api'].instanceUrl,
         clientId: answers['commerce-api'].clientId,
         organizationId: answers['commerce-api'].organizationId,
         shortCode: answers['commerce-api'].shortCode,
         siteId: answers['commerce-api'].siteId
     }
     const einsteinApi = {
-        proxyPath: answers['scaffold-pwa'].mobify.ssrParameters.proxyConfigs[2].path,
+        proxyPath: 'einstein',
         einsteinId: answers['einstein-api'].einsteinId,
-        siteId: answers['commerce-api'].siteId
+        siteId: answers['einstein-api'].siteId || answers['commerce-api'].siteId
     }
 
-    new sh.ShellString(APIConfigTemplate({commerceApi, einsteinApi})).to(
-        p.resolve(outputDir, 'app', 'api.config.js')
+    new sh.ShellString(PWAKitConfigTemplate({commerceApi, einsteinApi})).to(
+        p.resolve(outputDir, 'config', 'default.js')
     )
 
-    console.log('Installing dependencies for the generated project (this can take a while)')
-    sh.exec(`npm install --no-progress`, {
-        env: process.env,
+    new sh.ShellString(PWAKitSitesTemplate(answers)).to(p.resolve(outputDir, 'config', 'sites.js'))
+
+    npmInstall(outputDir)
+}
+
+const npmInstall = (outputDir) => {
+    console.log('Installing dependencies for the generated project. This may take a few minutes.\n')
+    child_proc.execSync('npm install --quiet', {
         cwd: outputDir,
-        silent: true
+        stdio: 'inherit'
     })
 }
 
-const prompts = () => {
-    const validProjectId = (s) =>
-        /^[a-z0-9-]{1,20}$/.test(s) ||
-        'Value can only contain lowercase letters, numbers, and hyphens.'
+// Validations
+const validProjectName = (s) => {
+    const regex = new RegExp(`^[a-zA-Z0-9-\\s]{1,${PROJECT_ID_MAX_LENGTH}}$`)
+    return regex.test(s) || 'Value can only contain letters, numbers, space and hyphens.'
+}
 
-    const validUrl = (s) => {
-        try {
-            new URL(s)
-            return true
-        } catch (err) {
-            return 'Value must be an absolute URL'
-        }
+const validUrl = (s) => {
+    try {
+        new URL(s)
+        return true
+    } catch (err) {
+        return 'Value must be an absolute URL'
     }
+}
 
-    const validSiteId = (s) =>
-        /^[a-z0-9_-]+$/i.test(s) || 'Valid characters are alphanumeric, hyphen, or underscore'
+const validSiteId = (s) =>
+    /^[a-z0-9_-]+$/i.test(s) || 'Valid characters are alphanumeric, hyphen, or underscore'
 
-    // To see definitions for Commerce API configuration values, refer to these
-    // doc --> https://developer.commercecloud.com/s/article/CommerceAPI-ConfigurationValues.
-    const defaultCommerceAPIError =
-        'Invalid format. Follow this link for configuration documentation https://developer.commercecloud.com/s/article/CommerceAPI-ConfigurationValues'
-    const defaultEinsteinAPIError =
-        'Invalid format. Follow this link for configuration documentation https://developer.commercecloud.com/s/api-details/a003k00000UI4hPAAT/commerce-cloud-developer-centereinsteinrecommendations'
-    const validShortCode = (s) => /(^[0-9A-Z]{8}$)/i.test(s) || defaultCommerceAPIError
-    const validClientId = (s) =>
-        /(^[0-9A-Z]{8}-[0-9A-Z]{4}-[0-9A-Z]{4}-[0-9A-Z]{4}-[0-9A-Z]{12}$)/i.test(s) ||
-        s === 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa' ||
-        defaultCommerceAPIError
-    const validOrganizationId = (s) =>
-        /^(f_ecom)_([A-Z]{4})_(prd|stg|dev|[0-9]{3}|s[0-9]{2})$/i.test(s) || defaultCommerceAPIError
-    const validEinsteinId = (s) =>
-        /(^[0-9A-Z]{8}-[0-9A-Z]{4}-[0-9A-Z]{4}-[0-9A-Z]{4}-[0-9A-Z]{12}$)/i.test(s) ||
-        s === '' ||
-        defaultEinsteinAPIError
+// To see definitions for Commerce API configuration values, go to
+// https://developer.salesforce.com/docs/commerce/commerce-api/guide/commerce-api-configuration-values.
+const defaultCommerceAPIError =
+    'Invalid format. Use docs to find more information about valid configurations: https://developer.salesforce.com/docs/commerce/commerce-api/guide/commerce-api-configuration-values'
+const validShortCode = (s) => /(^[0-9A-Z]{8}$)/i.test(s) || defaultCommerceAPIError
+const validClientId = (s) =>
+    /(^[0-9A-Z]{8}-[0-9A-Z]{4}-[0-9A-Z]{4}-[0-9A-Z]{4}-[0-9A-Z]{12}$)/i.test(s) ||
+    s === 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa' ||
+    defaultCommerceAPIError
+const validOrganizationId = (s) =>
+    /^(f_ecom)_([A-Z]{4})_(prd|stg|dev|[0-9]{3}|s[0-9]{2})$/i.test(s) || defaultCommerceAPIError
 
+const retailReactAppPrompts = () => {
     const questions = [
         {
-            name: 'projectId',
-            validate: validProjectId,
-            message: 'What is your project ID (example-project) in Managed Runtime Admin?'
+            name: 'projectName',
+            validate: validProjectName,
+            message: 'What is the name of your Project?'
         },
         {
             name: 'instanceUrl',
-            message:
-                'What is the URL (https://example_instance_id.sandbox.us01.dx.commercecloud.salesforce.com) for your Commerce Cloud instance?',
+            message: 'What is the URL for your Commerce Cloud instance?',
             validate: validUrl
         },
         {
             name: 'clientId',
-            message: 'What is your Commerce API client ID in Account Manager?',
+            message: 'What is your SLAS API Client ID in Account Manager?',
             validate: validClientId
         },
         {
             name: 'siteId',
-            message: "What is your site's ID (examples: RefArch, SiteGenesis) in Business Manager?",
+            message: 'What is your Site ID in Business Manager?',
             validate: validSiteId
         },
         {
@@ -242,11 +260,6 @@ const prompts = () => {
             name: 'shortCode',
             message: 'What is your Commerce API short code in Business Manager?',
             validate: validShortCode
-        },
-        {
-            name: 'einsteinId',
-            message: 'What is your API Client ID in the Einstein Configurator? (optional)',
-            validate: validEinsteinId
         }
     ]
 
@@ -254,85 +267,99 @@ const prompts = () => {
 }
 
 const buildAnswers = ({
-    projectId,
+    projectName,
     instanceUrl,
     clientId,
     siteId,
     organizationId,
     shortCode,
-    einsteinId
+    einsteinId,
+    einsteinSiteId
 }) => {
+    const projectId = slugifyName(projectName)
+
     return {
         globals: {projectId},
         'scaffold-pwa': {
             name: projectId,
-            version: GENERATED_PROJECT_VERSION,
-            mobify: {
-                ssrParameters: {
-                    proxyConfigs: [
-                        {
-                            path: 'api',
-                            host: `${shortCode}.api.commercecloud.salesforce.com`
-                        },
-                        {
-                            path: 'ocapi',
-                            host: new URL(instanceUrl).hostname
-                        },
-                        {
-                            path: 'einstein',
-                            host: 'api.cquotient.com'
-                        }
-                    ]
-                }
-            }
+            version: GENERATED_PROJECT_VERSION
         },
 
-        'commerce-api': {clientId, siteId, organizationId, shortCode},
-        'einstein-api': {einsteinId}
+        'commerce-api': {clientId, siteId, organizationId, shortCode, instanceUrl},
+        'einstein-api': {einsteinId, siteId: einsteinSiteId || siteId}
     }
 }
 
 const testProjectAnswers = () => {
     const config = {
-        projectId: 'scaffold-pwa',
+        projectName: 'scaffold-pwa',
         instanceUrl: 'https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com',
         clientId: 'c9c45bfd-0ed3-4aa2-9971-40f88962b836',
-        siteId: 'RefArchGlobal',
+        siteId: 'RefArch',
         organizationId: 'f_ecom_zzrf_001',
         shortCode: 'kv7kzm78',
-        einsteinId: '1ea06c6e-c936-4324-bcf0-fada93f83bb1'
+        einsteinId: '1ea06c6e-c936-4324-bcf0-fada93f83bb1',
+        einsteinSiteId: 'aaij-MobileFirst'
+    }
+
+    return buildAnswers(config)
+}
+
+const demoProjectAnswers = () => {
+    const config = {
+        projectName: 'demo-storefront',
+        instanceUrl: 'https://zzte-053.sandbox.us02.dx.commercecloud.salesforce.com/',
+        clientId: '1d763261-6522-4913-9d52-5d947d3b94c4',
+        siteId: 'RefArch',
+        organizationId: 'f_ecom_zzte_053',
+        shortCode: 'kv7kzm78',
+        einsteinId: '1ea06c6e-c936-4324-bcf0-fada93f83bb1',
+        einsteinSiteId: 'aaij-MobileFirst'
     }
 
     return buildAnswers(config)
 }
 
 const helloWorldPrompts = () => {
-    const validProjectId = (s) =>
-        /^[a-z0-9-]{1,20}$/.test(s) ||
-        'Value can only contain lowercase letters, numbers, and hyphens.'
     const questions = [
         {
-            name: 'projectId',
-            validate: validProjectId,
-            message: 'What is your project ID (example-project) in Managed Runtime Admin?'
+            name: 'projectName',
+            validate: validProjectName,
+            message: 'What is the name of your Project?'
         }
     ]
     return inquirer.prompt(questions)
 }
 
-const generateHelloWorld = ({projectId}, {outputDir}) => {
+const generateHelloWorld = (projectId, {outputDir}) => {
     extractTemplate('hello-world', outputDir)
     const pkgJsonPath = p.resolve(outputDir, 'package.json')
     const pkgJSON = readJson(pkgJsonPath)
     const finalPkgData = merge(pkgJSON, {name: projectId})
     writeJson(pkgJsonPath, finalPkgData)
 
-    console.log('Installing dependencies for the generated project (this can take a while)')
-    sh.exec(`npm install --no-progress`, {
-        env: process.env,
-        cwd: outputDir,
-        silent: true
-    })
+    npmInstall(outputDir)
+}
+
+const presetPrompt = () => {
+    const questions = [
+        {
+            name: 'preset',
+            message: 'Choose a project to get started:',
+            type: 'list',
+            choices: [
+                {
+                    name: 'The Retail app with demo Commerce Cloud instance',
+                    value: RETAIL_REACT_APP_DEMO
+                },
+                {
+                    name: 'The Retail app using your own Commerce Cloud instance',
+                    value: RETAIL_REACT_APP
+                }
+            ]
+        }
+    ]
+    return inquirer.prompt(questions).then((answers) => answers['preset'])
 }
 
 const extractTemplate = (templateName, outputDir) => {
@@ -342,59 +369,130 @@ const extractTemplate = (templateName, outputDir) => {
         cwd: p.join(tmp),
         sync: true
     })
-    sh.mv(p.join(tmp, templateName), outputDir)
+    sh.cp('-R', p.join(tmp, templateName), outputDir)
     sh.rm('-rf', tmp)
 }
 
+const foundNode = process.versions.node
+const requiredNode = generatorPkg.engines.node
+const isUsingCompatibleNode = semver.satisfies(foundNode, new semver.Range(requiredNode))
+
 const main = (opts) => {
-    if (!(opts.outputDir === DEFAULT_OUTPUT_DIR) && sh.test('-e', opts.outputDir)) {
+    if (!isUsingCompatibleNode) {
+        console.log('')
+        console.warn(
+            `Warning: You are using Node ${foundNode}. ` +
+                `Your app may not work as expected when deployed to Managed ` +
+                `Runtime servers which are compatible with Node ${requiredNode}`
+        )
+        console.log('')
+    }
+
+    const OUTPUT_DIR_FLAG_ACTIVE = !(opts.outputDir === DEFAULT_OUTPUT_DIR)
+    if (OUTPUT_DIR_FLAG_ACTIVE && sh.test('-e', opts.outputDir)) {
         console.error(
-            `The output directory "${opts.outputDir}" already exists. Try, eg. ` +
+            `The output directory "${opts.outputDir}" already exists. Try, for example, ` +
                 `"~/Desktop/my-project" instead of "~/Desktop"`
         )
         process.exit(1)
     }
 
-    switch (GENERATOR_PRESET) {
-        case HELLO_WORLD_TEST_PROJECT:
-            return generateHelloWorld({projectId: 'hello-world'}, opts)
-        case HELLO_WORLD:
-            return helloWorldPrompts(opts).then((answers) => generateHelloWorld(answers, opts))
-        case TEST_PROJECT:
-            return runGenerator(testProjectAnswers(), opts)
-        case PROMPT:
-            console.log(
-                'See https://developer.commercecloud.com/s/article/CommerceAPI-ConfigurationValues for details on configuration values\n'
-            )
-            return prompts(opts).then((answers) => runGenerator(answers, opts))
-        default:
-            console.error(
-                `The preset "${GENERATOR_PRESET}" is not valid. Valid presets are: ${PRESETS.map(
-                    (x) => `"${x}"`
-                ).join(' ')}.`
-            )
-            process.exit(1)
-    }
+    return Promise.resolve()
+        .then(() => opts.preset || process.env.GENERATOR_PRESET || presetPrompt())
+        .then((preset) => {
+            switch (preset) {
+                case HELLO_WORLD_TEST_PROJECT:
+                    return generateHelloWorld({projectId: 'hello-world'}, opts)
+                case HELLO_WORLD:
+                    return helloWorldPrompts(opts).then((answers) => {
+                        const projectId = slugifyName(answers.projectName)
+                        if (!OUTPUT_DIR_FLAG_ACTIVE) {
+                            opts.outputDir = p.join(process.cwd(), projectId)
+                        }
+                        generateHelloWorld(projectId, opts)
+                        return opts.outputDir
+                    })
+                case TEST_PROJECT:
+                    return runGenerator(testProjectAnswers(), opts)
+                case RETAIL_REACT_APP_DEMO:
+                    return Promise.resolve()
+                        .then(() => runGenerator(demoProjectAnswers(), opts))
+                        .then((result) => {
+                            console.log(
+                                '\nTo change your ecommerce back end you will need to update your storefront configuration. More information: https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/configuration-options'
+                            )
+                            return result
+                        })
+                case RETAIL_REACT_APP:
+                    console.log(
+                        'For details on configuration options, see https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/configuration-options\n'
+                    )
+                    return retailReactAppPrompts(opts).then((answers) => {
+                        if (!OUTPUT_DIR_FLAG_ACTIVE) {
+                            opts.outputDir = p.join(
+                                process.cwd(),
+                                slugifyName(answers.globals.projectId)
+                            )
+                        }
+
+                        runGenerator(answers, opts)
+                        return opts.outputDir
+                    })
+                default:
+                    console.error(
+                        `The preset "${preset}" is not valid. Valid presets are: ${
+                            process.env.GENERATOR_PRESET
+                                ? PRESETS.map((x) => `"${x}"`).join(' ')
+                                : PUBLIC_PRESETS.map((x) => `"${x}"`).join(' ')
+                        }.`
+                    )
+                    process.exit(1)
+            }
+        })
 }
 
 if (require.main === module) {
-    program.description(`Generate a new Mobify project`)
-    program.option(
-        '--outputDir <path>',
-        `Path to the output directory for the new project`,
-        DEFAULT_OUTPUT_DIR
-    )
+    program.name(`pwa-kit-create-app`)
+    program.description(`Generate a new PWA Kit project, optionally using a preset.
+
+Examples:
+
+  ${program.name()} --preset "${RETAIL_REACT_APP}"
+    Generate a project using custom settings by answering questions about a
+    B2C Commerce instance.
+
+    Use this preset to connect to an existing instance, such as a sandbox.
+
+  ${program.name()} --preset "${RETAIL_REACT_APP_DEMO}"
+    Generate a project using the settings for a special B2C Commerce
+    instance that is used for demo purposes. No questions are asked.
+
+    Use this preset to try out PWA Kit.
+  `)
+    program
+        .option(
+            '--outputDir <path>',
+            `Path to the output directory for the new project`,
+            DEFAULT_OUTPUT_DIR
+        )
+        .option(
+            '--preset <name>',
+            `The name of a project preset to use (choices: "retail-react-app" "retail-react-app-demo")`
+        )
+
     program.parse(process.argv)
 
     return Promise.resolve()
-        .then(() => main(program))
-        .then(() => {
+        .then(() => main(program.opts()))
+        .then((outputDir) => {
             console.log('')
-            console.log(`Successfully generated project in ${program.outputDir}`)
+            console.log(
+                `Successfully generated a project in ${outputDir ? outputDir : program.outputDir}`
+            )
             process.exit(0)
         })
         .catch((err) => {
-            console.error('Failed to generate project')
+            console.error('Failed to generate a project')
             console.error(err)
             process.exit(1)
         })

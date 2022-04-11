@@ -26,6 +26,7 @@ import semver from 'semver'
 import URL from 'url'
 import merge from 'merge-descriptors'
 import {PersistentCache} from '../../utils/ssr-cache'
+import {setConfig} from '../universal/utils'
 
 import {
     CachedResponse,
@@ -124,12 +125,17 @@ export const REMOTE_REQUIRED_ENV_VARS = [
  * development Express app listens.
  * @param {String} [options.protocol='https'] - the protocol on which the development
  * Express app listens.
+ * @param {Boolean} [options.proxyKeepAliveAgent] - This boolean value indicates
+ * whether or not we are using a keep alive agent for proxy connections. Defaults
+ * to 'true'. NOTE: This keep alive agent will only be used on remote.
  * @param {String} options.sslFilePath - the absolute path to a PEM format
  * certificate file to be used by the local development server. This should
  * contain both the certificate and the private key.
  * @param {Boolean} [options.enableLegacyRemoteProxying=true] - When running remotely (as
  * oppsed to locally), enables legacy proxying behaviour, allowing "proxy" requests to route through
  * the express server. In the future, this behaviour and setting will be removed.
+ * @param {Boolean} [options.enableLegacyBodyParser=true] - This boolean value indicates
+ * whether or not the express server uses body-parser middleware for POST requests.
  */
 
 export const createApp = (options) => {
@@ -150,6 +156,9 @@ export const createApp = (options) => {
         // The protocol that the local dev server listens on
         protocol: 'https',
 
+        // Whether or not to use a keep alive agent for proxy connections.
+        proxyKeepAliveAgent: true,
+
         // Quiet flag (suppresses output if true)
         quiet: false,
 
@@ -158,7 +167,11 @@ export const createApp = (options) => {
         // be no use-case for SDK users to set this.
         strictSSL: true,
 
-        enableLegacyRemoteProxying: true
+        enableLegacyRemoteProxying: true,
+
+        // This boolean value indicates whether or not the express
+        // server uses body-parser middleware for POST requests.
+        enableLegacyBodyParser: true
     }
 
     options = Object.assign({}, defaults, options)
@@ -199,6 +212,10 @@ export const createApp = (options) => {
 
     // Configure the server with the basic options
     updatePackageMobify(options.mobify)
+
+    // Make the config available in a isomorphic scope. Preventing us from
+    // having to use webpack externals when bundling the `cosmiconfig` library.
+    setConfig(options.mobify)
 
     configureProxyConfigs(options.appHostname, options.protocol)
 
@@ -270,7 +287,7 @@ export const createApp = (options) => {
         app.all('/mobify/proxy/*', (_, res) => {
             return res.status(501).json({
                 message:
-                    'Environment proxies are not set: https://sfdc.co/managed-runtime-setup-proxies'
+                    'Environment proxies are not set: https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/proxying-requests.html'
             })
         })
     }
@@ -295,21 +312,23 @@ export const createApp = (options) => {
     // Serve this asset directly (in both remote and local modes)
     app.get('/worker.js*', serveServiceWorker)
 
-    // Any path
-    const rootWildcard = '/*'
+    if (options.enableLegacyBodyParser) {
+        // Any path
+        const rootWildcard = '/*'
 
-    // Because the app can accept POST requests, we need to include body-parser middleware.
-    app.post(rootWildcard, [
-        // application/json
-        bodyParser.json(),
-        // text/plain (defaults to utf-8)
-        bodyParser.text(),
-        // */x-www-form-urlencoded
-        bodyParser.urlencoded({
-            extended: true,
-            type: '*/x-www-form-urlencoded'
-        })
-    ])
+        // Because the app can accept POST requests, we need to include body-parser middleware.
+        app.post(rootWildcard, [
+            // application/json
+            bodyParser.json(),
+            // text/plain (defaults to utf-8)
+            bodyParser.text(),
+            // */x-www-form-urlencoded
+            bodyParser.urlencoded({
+                extended: true,
+                type: '*/x-www-form-urlencoded'
+            })
+        ])
+    }
 
     // Map favicon requests to the configured path. We always map
     // this route, because if there's no favicon configured we want
@@ -334,19 +353,20 @@ export const createApp = (options) => {
 const validateConfiguration = (options) => {
     // Check that we are running under a compatible version of node
     /* istanbul ignore next */
-    const requiredNode = new semver.Range(pkg.engines.node)
+    const requiredNode = pkg.engines.node
+    const foundNode = process.versions.node
     /* istanbul ignore next */
     if (
         !semver.satisfies(
-            process.versions.node, // A string like '8.10.0'
-            requiredNode
+            foundNode, // A string like '8.10.0'
+            new semver.Range(requiredNode)
         )
     ) {
         /* istanbul ignore next */
         console.warn(
-            `Warning: You are using Node ${process.versions.node}. ` +
-                `Your app may not work as expected when deployed to Mobify's ` +
-                `servers which are compatible with Node ${requiredNode}`
+            `Warning: You are using Node ${foundNode}. ` +
+                `Your app may not work as expected when deployed to Managed ` +
+                `Runtime servers which are compatible with Node ${requiredNode}`
         )
     }
 
@@ -417,6 +437,15 @@ const validateConfiguration = (options) => {
             'Legacy proxying behaviour is enabled. ' +
                 'This behaviour is deprecated and will be removed in the future.' +
                 'To disable it, pass `createApp({ enableLegacyRemoteProxying: false` })'
+        )
+    }
+
+    if (options.enableLegacyBodyParser) {
+        console.warn(
+            'The express middleware body-parser is enabled. ' +
+                'In the next major version, body-parser is no longer included in the express server. ' +
+                'You can add body-parser to your express routes manually in your project. ' +
+                'To disable it, pass `createApp({ enableLegacyBodyParser: false })`'
         )
     }
 }
@@ -1682,11 +1711,10 @@ const applyPatches = once((options) => {
     // Patch the http.request/get and https.request/get
     // functions to allow us to intercept them (since
     // there are multiple ways to make requests in Node).
-    const getAppHost = () => options.appHostname
-    http.request = outgoingRequestHook(http.request, getAppHost)
-    http.get = outgoingRequestHook(http.get, getAppHost)
-    https.request = outgoingRequestHook(https.request, getAppHost)
-    https.get = outgoingRequestHook(https.get, getAppHost)
+    http.request = outgoingRequestHook(http.request, options)
+    http.get = outgoingRequestHook(http.get, options)
+    https.request = outgoingRequestHook(https.request, options)
+    https.get = outgoingRequestHook(https.get, options)
 
     // Patch the ExpressJS Response class's redirect function to suppress
     // the creation of a body (DESKTOP-485). Including the body may

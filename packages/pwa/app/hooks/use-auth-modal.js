@@ -25,9 +25,9 @@ import {BrandLogo} from '../components/icons'
 import LoginForm from '../components/login'
 import ResetPasswordForm from '../components/reset-password'
 import RegisterForm from '../components/register'
-import {useHistory} from 'react-router-dom'
 import {noop} from '../utils/utils'
 import {API_ERROR_MESSAGE} from '../constants'
+import useNavigation from './use-navigation'
 
 const LOGIN_VIEW = 'login'
 const REGISTER_VIEW = 'register'
@@ -40,12 +40,12 @@ export const AuthModal = ({
     onPasswordResetSuccess = noop,
     ...props
 }) => {
-    const {formatMessage, locale} = useIntl()
+    const {formatMessage} = useIntl()
     const customer = useCustomer()
+    const navigate = useNavigation()
     const [currentView, setCurrentView] = useState(initialView)
     const form = useForm()
     const submittedEmail = useRef()
-    const history = useHistory()
     const toast = useToast()
 
     const submitForm = async (data) => {
@@ -76,7 +76,7 @@ export const AuthModal = ({
     const handleRegister = async (data) => {
         try {
             await customer.registerCustomer(data)
-            history.push(`/${locale}/account`)
+            navigate('/account')
         } catch (error) {
             form.setError('global', {type: 'manual', message: error.message})
         }
@@ -165,6 +165,9 @@ export const AuthModal = ({
         }
     }, [customer])
 
+    const onBackToSignInClick = () =>
+        initialView === PASSWORD_VIEW ? props.onClose() : setCurrentView(LOGIN_VIEW)
+
     const PasswordResetSuccess = () => (
         <Stack justify="center" align="center" spacing={6}>
             <BrandLogo width="60px" height="auto" />
@@ -187,7 +190,7 @@ export const AuthModal = ({
                     />
                 </Text>
 
-                <Button onClick={() => setCurrentView(LOGIN_VIEW)}>
+                <Button onClick={onBackToSignInClick}>
                     <FormattedMessage
                         defaultMessage="Back to Sign In"
                         id="auth_modal.password_reset_success.button.back_to_sign_in"
@@ -215,14 +218,14 @@ export const AuthModal = ({
                         <RegisterForm
                             form={form}
                             submitForm={submitForm}
-                            clickSignIn={() => setCurrentView(LOGIN_VIEW)}
+                            clickSignIn={onBackToSignInClick}
                         />
                     )}
                     {!form.formState.isSubmitSuccessful && currentView === PASSWORD_VIEW && (
                         <ResetPasswordForm
                             form={form}
                             submitForm={submitForm}
-                            clickSignIn={() => setCurrentView(LOGIN_VIEW)}
+                            clickSignIn={onBackToSignInClick}
                         />
                     )}
                     {form.formState.isSubmitSuccessful && currentView === PASSWORD_VIEW && (

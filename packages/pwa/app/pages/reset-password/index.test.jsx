@@ -8,10 +8,8 @@ import React from 'react'
 import {screen, waitFor, within} from '@testing-library/react'
 import user from '@testing-library/user-event'
 import {rest} from 'msw'
-import {setupServer} from 'msw/node'
-import {renderWithProviders} from '../../utils/test-utils'
+import {createPathWithDefaults, renderWithProviders, setupMockServer} from '../../utils/test-utils'
 import ResetPassword from '.'
-import {getUrlConfig} from '../../utils/utils'
 
 jest.setTimeout(60000)
 
@@ -24,13 +22,6 @@ const mockRegisteredCustomer = {
     lastName: 'Testing',
     login: 'darek@test.com'
 }
-jest.mock('../../utils/utils', () => {
-    const original = jest.requireActual('../../utils/utils')
-    return {
-        ...original,
-        getUrlConfig: jest.fn()
-    }
-})
 
 jest.mock('commerce-sdk-isomorphic', () => {
     const sdk = jest.requireActual('commerce-sdk-isomorphic')
@@ -76,49 +67,21 @@ const MockedComponent = () => {
     )
 }
 
-const server = setupServer(
-    rest.post('*/oauth2/authorize', (req, res, ctx) =>
-        res(ctx.delay(0), ctx.status(303), ctx.set('location', `/testcallback`))
-    ),
-
-    rest.get('*/oauth2/authorize', (req, res, ctx) =>
-        res(ctx.delay(0), ctx.status(303), ctx.set('location', `/testcallback`))
-    ),
-
-    rest.get('*/testcallback', (req, res, ctx) => {
-        return res(ctx.delay(0), ctx.status(200))
-    }),
-
-    rest.post('*/oauth2/token', (req, res, ctx) =>
-        res(
-            ctx.delay(0),
-            ctx.json({
-                customer_id: 'test',
-                access_token: 'testtoken',
-                refresh_token: 'testrefeshtoken',
-                usid: 'testusid',
-                enc_user_id: 'testEncUserId'
-            })
-        )
-    )
-)
+const server = setupMockServer()
 
 // Set up and clean up
 beforeEach(() => {
-    getUrlConfig.mockImplementation(() => ({
-        locale: 'path'
-    }))
     jest.resetModules()
     server.listen({
         onUnhandledRequest: 'error'
     })
 
-    window.history.pushState({}, 'Reset Password', '/en-GB/reset-password')
+    window.history.pushState({}, 'Reset Password', createPathWithDefaults('/reset-password'))
 })
 afterEach(() => {
     localStorage.clear()
     server.resetHandlers()
-    window.history.pushState({}, 'Reset Password', '/en-GB/reset-password')
+    window.history.pushState({}, 'Reset Password', createPathWithDefaults('/reset-password'))
 })
 afterAll(() => server.close())
 
@@ -128,7 +91,7 @@ test('Allows customer to go to sign in page', async () => {
 
     user.click(screen.getByText('Sign in'))
     await waitFor(() => {
-        expect(window.location.pathname).toEqual('/en-GB/login')
+        expect(window.location.pathname).toEqual('/uk/en-GB/login')
     })
 })
 
@@ -161,7 +124,7 @@ test('Allows customer to generate password token', async () => {
 
     user.click(screen.getByText('Back to Sign In'))
     await waitFor(() => {
-        expect(window.location.pathname).toEqual('/en-GB/login')
+        expect(window.location.pathname).toEqual('/uk/en-GB/login')
     })
 })
 

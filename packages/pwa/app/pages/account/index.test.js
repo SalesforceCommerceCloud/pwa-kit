@@ -9,32 +9,21 @@ import {Route, Switch} from 'react-router-dom'
 import {screen, waitFor, within} from '@testing-library/react'
 import user from '@testing-library/user-event'
 import {rest} from 'msw'
-import {setupServer} from 'msw/node'
-import {renderWithProviders} from '../../utils/test-utils'
+import {renderWithProviders, createPathWithDefaults, setupMockServer} from '../../utils/test-utils'
 import {
+    mockOrderHistory,
     mockedGuestCustomer,
     mockedRegisteredCustomer,
-    mockOrderHistory,
-    mockOrderProducts,
-    exampleTokenReponse
+    mockOrderProducts
 } from '../../commerce-api/mock-data'
 import useCustomer from '../../commerce-api/hooks/useCustomer'
 import Account from './index'
-import {getUrlConfig} from '../../utils/utils'
 
 jest.mock('../../commerce-api/utils', () => {
     const originalModule = jest.requireActual('../../commerce-api/utils')
     return {
         ...originalModule,
         isTokenValid: jest.fn().mockReturnValue(true)
-    }
-})
-
-jest.mock('../../utils/utils', () => {
-    const original = jest.requireActual('../../utils/utils')
-    return {
-        ...original,
-        getUrlConfig: jest.fn()
     }
 })
 
@@ -49,48 +38,18 @@ const MockedComponent = () => {
 
     return (
         <Switch>
-            <Route path="/en-GB/account" render={(props) => <Account {...props} />} />
+            <Route
+                path={createPathWithDefaults('/account')}
+                render={(props) => <Account {...props} />}
+            />
         </Switch>
     )
 }
 
-const server = setupServer(
-    rest.post('*/customers/actions/login', (req, res, ctx) =>
-        res(ctx.set('authorization', `Bearer guesttoken`), ctx.json(mockedRegisteredCustomer))
-    ),
+const server = setupMockServer(
+    rest.get('*/products', (req, res, ctx) => res(ctx.delay(0), ctx.json(mockOrderProducts))),
     rest.get('*/customers/:customerId/orders', (req, res, ctx) =>
         res(ctx.delay(0), ctx.json(mockOrderHistory))
-    ),
-    rest.get('*/products', (req, res, ctx) => res(ctx.delay(0), ctx.json(mockOrderProducts))),
-    rest.post('*/oauth2/authorize', (req, res, ctx) =>
-        res(ctx.delay(0), ctx.status(303), ctx.set('location', `/testcallback`))
-    ),
-    rest.get('*/oauth2/authorize', (req, res, ctx) =>
-        res(ctx.delay(0), ctx.status(303), ctx.set('location', `/testcallback`))
-    ),
-    rest.get('*/testcallback', (req, res, ctx) => {
-        return res(ctx.delay(0), ctx.status(200))
-    }),
-    rest.post('*/oauth2/login', (req, res, ctx) =>
-        res(ctx.delay(0), ctx.status(200), ctx.json(mockedRegisteredCustomer))
-    ),
-    rest.get('*/customers/:customerId', (req, res, ctx) =>
-        res(ctx.delay(0), ctx.status(200), ctx.json(mockedRegisteredCustomer))
-    ),
-    rest.get('*/oauth2/logout', (req, res, ctx) =>
-        res(ctx.delay(0), ctx.status(200), ctx.json(exampleTokenReponse))
-    ),
-    rest.post('*/oauth2/token', (req, res, ctx) =>
-        res(
-            ctx.delay(0),
-            ctx.json({
-                customer_id: 'test',
-                access_token: 'testtoken',
-                refresh_token: 'testrefeshtoken',
-                usid: 'testusid',
-                enc_user_id: 'testEncUserId'
-            })
-        )
     )
 )
 
@@ -98,13 +57,10 @@ const server = setupServer(
 beforeEach(() => {
     jest.resetModules()
     server.listen({onUnhandledRequest: 'error'})
-    getUrlConfig.mockImplementation(() => ({
-        locale: 'path'
-    }))
 
     // Since we're testing some navigation logic, we are using a simple Router
     // around our component. We need to initialize the default route/path here.
-    window.history.pushState({}, 'Account', '/en-GB/account')
+    window.history.pushState({}, 'Account', createPathWithDefaults('/account'))
 })
 afterEach(() => {
     localStorage.clear()
@@ -112,6 +68,7 @@ afterEach(() => {
 })
 afterAll(() => server.close())
 
+const expectedBasePath = '/uk/en-GB'
 test('Redirects to login page if the customer is not logged in', async () => {
     server.use(
         rest.get('*/customers/:customerId', (req, res, ctx) => {
@@ -119,7 +76,7 @@ test('Redirects to login page if the customer is not logged in', async () => {
         })
     )
     renderWithProviders(<MockedComponent />)
-    await waitFor(() => expect(window.location.pathname).toEqual('/en-GB/login'))
+    await waitFor(() => expect(window.location.pathname).toEqual(`${expectedBasePath}/login`))
 })
 
 test('Provides navigation for subpages', async () => {
@@ -128,11 +85,17 @@ test('Provides navigation for subpages', async () => {
 
     const nav = within(screen.getByTestId('account-detail-nav'))
     user.click(nav.getByText('Addresses'))
-    await waitFor(() => expect(window.location.pathname).toEqual('/en-GB/account/addresses'))
+    await waitFor(() =>
+        expect(window.location.pathname).toEqual(`${expectedBasePath}/account/addresses`)
+    )
     user.click(nav.getByText('Order History'))
-    await waitFor(() => expect(window.location.pathname).toEqual('/en-GB/account/orders'))
+    await waitFor(() =>
+        expect(window.location.pathname).toEqual(`${expectedBasePath}/account/orders`)
+    )
     user.click(nav.getByText('Payment Methods'))
-    await waitFor(() => expect(window.location.pathname).toEqual('/en-GB/account/payments'))
+    await waitFor(() =>
+        expect(window.location.pathname).toEqual(`${expectedBasePath}/account/payments`)
+    )
 })
 
 test('Renders account detail page by default for logged-in customer', async () => {
@@ -149,7 +112,7 @@ test('Allows customer to sign out', async () => {
     expect(await screen.findByTestId('account-detail-page')).toBeInTheDocument()
     user.click(screen.getAllByText(/Log Out/)[0])
     await waitFor(() => {
-        expect(window.location.pathname).toEqual('/en-GB/login')
+        expect(window.location.pathname).toEqual(`${expectedBasePath}/login`)
     })
 })
 

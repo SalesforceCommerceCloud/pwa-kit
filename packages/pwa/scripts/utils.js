@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 const Promise = require('bluebird')
-const fetch = require('node-fetch')
+const fetch = require('cross-fetch')
 const kill = require('tree-kill')
 const spawn = require('cross-spawn')
 

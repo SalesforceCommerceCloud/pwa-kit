@@ -96,7 +96,8 @@ const opts = (overrides = {}) => {
         fetchAgents: {
             https: httpsAgent
         },
-        enableLegacyRemoteProxying: false
+        enableLegacyRemoteProxying: false,
+        enableLegacyBodyParser: true
     }
     return {
         ...defaults,
@@ -166,11 +167,11 @@ describe('createApp validates the options object', () => {
             faviconPath: 'nosuchfile.ico'
         })
 
-        const sandbox = sinon.sandbox.create()
+        const sandbox = sinon.createSandbox()
         const warn = sandbox.spy(console, 'warn')
 
         createApp(options)
-        expect(warn.calledOnce).toBe(true)
+        expect(warn.calledWith(`Favicon file ${options.faviconPath} not found`))
         sandbox.restore()
     })
 })
@@ -237,7 +238,7 @@ const insecureFetch = (url, init) => {
 
 describe('SSRServer operation', () => {
     const savedEnvironment = Object.assign({}, process.env)
-    const sandbox = sinon.sandbox.create()
+    const sandbox = sinon.createSandbox()
     let server
 
     afterEach(() => {
@@ -1018,6 +1019,23 @@ describe('SSRServer operation', () => {
             .get('/thing')
             .expect(404)
     })
+
+    const enableLegacyBodyParserFlags = [true, false]
+
+    enableLegacyBodyParserFlags.forEach((flag) => {
+        test(`Flag enableLegacyBodyParser, should enable body parser: ${flag}`, () => {
+            const app = createApp(opts({enableLegacyBodyParser: flag}))
+            const route = (req, res) => {
+                expect(req.body).toBeDefined(flag)
+                res.end()
+            }
+            app.post('/*', route)
+            return request(app)
+                .post('/some-url')
+                .type('application/json')
+                .send({test: 'data json'})
+        })
+    })
 })
 
 describe('SSRServer persistent caching', () => {
@@ -1107,7 +1125,7 @@ describe('SSRServer persistent caching', () => {
         }
     }
 
-    const sandbox = sinon.sandbox.create()
+    const sandbox = sinon.createSandbox()
 
     let app, route
 

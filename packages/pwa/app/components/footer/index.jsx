@@ -27,14 +27,18 @@ import {useIntl} from 'react-intl'
 import LinksList from '../links-list'
 import SocialIcons from '../social-icons'
 import {HideOnDesktop, HideOnMobile} from '../responsive'
-import {getUrlWithLocale} from '../../utils/url'
+import {getPathWithLocale} from '../../utils/url'
 import LocaleText from '../locale-text'
-import {getSupportedLocalesIds} from '../../utils/locale'
+import useSite from '../../hooks/use-site'
 
 const Footer = ({...otherProps}) => {
     const styles = useMultiStyleConfig('Footer')
     const intl = useIntl()
     const [locale, setLocale] = useState(intl.locale)
+    const site = useSite()
+    const {l10n} = site
+    const supportedLocaleIds = l10n?.supportedLocales.map((locale) => locale.id)
+    const showLocaleSelector = supportedLocaleIds?.length > 1
 
     return (
         <Box as="footer" {...styles.container} {...otherProps}>
@@ -118,39 +122,38 @@ const Footer = ({...otherProps}) => {
                         <Subscribe />
                     </HideOnDesktop>
 
-                    <Box {...styles.localeSelector}>
-                        <FormControl
-                            data-testid="sf-footer-locale-selector"
-                            id="locale_selector"
-                            width="auto"
-                            {...otherProps}
-                        >
-                            <Select
-                                value={locale}
-                                onChange={({target}) => {
-                                    setLocale(target.value)
-
-                                    // Update the `locale` in the URL.
-                                    const newUrl = getUrlWithLocale(target.value, {
-                                        disallowParams: ['refine']
-                                    })
-
-                                    window.location = newUrl
-                                }}
-                                variant="filled"
-                                {...styles.localeDropdown}
+                    {showLocaleSelector && (
+                        <Box {...styles.localeSelector}>
+                            <FormControl
+                                data-testid="sf-footer-locale-selector"
+                                id="locale_selector"
+                                width="auto"
+                                {...otherProps}
                             >
-                                {getSupportedLocalesIds().map((locale) => (
-                                    <LocaleText
-                                        as="option"
-                                        value={locale}
-                                        shortCode={locale}
-                                        key={locale}
-                                    />
-                                ))}
-                            </Select>
-                        </FormControl>
-                    </Box>
+                                <Select
+                                    value={locale}
+                                    onChange={({target}) => {
+                                        const newLocale = target.value
+                                        setLocale(newLocale)
+                                        const newUrl = getPathWithLocale(newLocale)
+                                        window.location = newUrl
+                                    }}
+                                    variant="filled"
+                                    {...styles.localeDropdown}
+                                >
+                                    {supportedLocaleIds.map((locale) => (
+                                        <LocaleText
+                                            as="option"
+                                            value={locale}
+                                            shortCode={locale}
+                                            key={locale}
+                                            {...styles.localeDropdownOption}
+                                        />
+                                    ))}
+                                </Select>
+                            </FormControl>
+                        </Box>
+                    )}
 
                     <Divider {...styles.horizontalRule} />
 

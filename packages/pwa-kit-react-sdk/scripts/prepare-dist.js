@@ -35,7 +35,7 @@ const catcher = (message) => (error) => {
  */
 const getPackageFiles = () => {
     let output = ''
-    const child = exec(`npm pack --dry-run --json --ignore-scripts`)
+    const child = exec(`npx npm-packlist`)
 
     child.stderr.on('data', (data) => {
         console.log(data)
@@ -48,7 +48,7 @@ const getPackageFiles = () => {
     return new Promise((resolve, reject) => {
         child.addListener('error', reject)
         child.addListener('exit', () => {
-            const files = JSON.parse(output)[0].files.map(({path}) => path)
+            const files = output.trim().split('\n')
             resolve(files)
         })
     })
@@ -98,14 +98,14 @@ const main = async () => {
         await replace({
             ignore: ['dist/scripts/**/*', 'dist/bin/**/*', 'dist/template/**/*'],
             files: ['dist/**/*.js'],
-            from: /..\/package.json/,
+            from: /..\/package.json/g,
             to: 'package.json'
         })
 
         // Update script to remove `dist` folder in imports.
         await replace({
             files: ['dist/scripts/**/!(prepare-dist.js)'],
-            from: /dist\//,
+            from: /dist\//g,
             to: ''
         })
     } catch (e) {

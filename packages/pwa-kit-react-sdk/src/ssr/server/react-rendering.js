@@ -17,7 +17,7 @@ import {ChunkExtractor} from '@loadable/server'
 import {StaticRouter as Router, matchPath} from 'react-router-dom'
 import serialize from 'serialize-javascript'
 
-import {getAssetUrl} from '../universal/utils'
+import {getAssetUrl, getConfig} from '../universal/utils'
 import DeviceContext from '../universal/device-context'
 
 import Document from '../universal/components/_document'
@@ -127,7 +127,10 @@ const initAppState = async ({App, component, match, route, req, res, location}) 
  *
  * @return {Promise}
  */
-export const render = async (req, res) => {
+export const render = async (req, res, next) => {
+    // Get the application config which should have been stored at this point.
+    const config = getConfig()
+
     // AppConfig.restore *must* come before using getRoutes() or routeComponent()
     // to inject arguments into the wrapped component's getProps methods.
     AppConfig.restore(res.locals)
@@ -173,16 +176,22 @@ export const render = async (req, res) => {
     const args = {
         App: WrappedApp,
         appState,
-        error: appStateError && logAndFormatError(appStateError),
+        appStateError: appStateError && logAndFormatError(appStateError),
         routes,
         req,
         res,
-        location
+        location,
+        config
     }
     try {
         renderResult = renderApp(args)
-    } catch (error) {
-        renderResult = renderApp({...args, error: logAndFormatError(error)})
+    } catch (e) {
+        // This is an unrecoverable error.
+        // (errors handled by the AppErrorBoundary are considered recoverable)
+        // Here, we use Express's convention to invoke error middleware.
+        // Note, we don't have an error handling middleware yet! This is calling the
+        // default error handling middleware provided by Express
+        return next(e)
     }
 
     // Step 5 - Determine what is going to happen, redirect, or send html with
@@ -198,17 +207,9 @@ export const render = async (req, res) => {
     }
 }
 
-const renderApp = (args) => {
-    const {req, res, location, routes, appState, error, App} = args
+const renderAppHtml = (req, res, error, appData) => {
+    const {App, appState, routes, routerContext, location, extractor, deviceType} = appData
 
-    const ssrOnly = 'mobify_server_only' in req.query || '__server_only' in req.query
-    const prettyPrint = 'mobify_pretty' in req.query || '__pretty_print' in req.query
-    const indent = prettyPrint ? 8 : 0
-    const deviceType = detectDeviceType(req)
-    const routerContext = {}
-
-    let extractor
-    let bundles = []
     let appJSX = (
         <Router location={location} context={routerContext}>
             <DeviceContext.Provider value={{type: deviceType}}>
@@ -219,23 +220,38 @@ const renderApp = (args) => {
         </Router>
     )
 
-    /* istanbul ignore next */
-    try {
-        extractor = new ChunkExtractor({statsFile: BUNDLES_PATH})
-        appJSX = extractor.collectChunks(appJSX)
-    } catch (e) {
-        // Tests aren't being run through webpack, therefore no chunks or `loadable-stats.json`
-        // file is being created. This causes a file read exception. For this
-        // reason, swallow the error and carry on when in a test environment.
-    }
+    appJSX = extractor.collectChunks(appJSX)
+    return ReactDOMServer.renderToString(appJSX)
+}
 
+const renderApp = (args) => {
+    const {req, res, appStateError, App, appState, location, routes, config} = args
+    const deviceType = detectDeviceType(req)
+    const extractor = new ChunkExtractor({statsFile: BUNDLES_PATH})
+    const routerContext = {}
+    const appData = {App, appState, location, routes, routerContext, deviceType, extractor}
+
+    const ssrOnly = 'mobify_server_only' in req.query || '__server_only' in req.query
+    const prettyPrint = 'mobify_pretty' in req.query || '__pretty_print' in req.query
+    const indent = prettyPrint ? 8 : 0
+
+    let appHtml
+    let renderError
     // It's important that we render the App before extracting the script elements,
     // otherwise it won't return the correct chunks.
-    const appHtml = ReactDOMServer.renderToString(appJSX)
+    try {
+        appHtml = renderAppHtml(req, res, appStateError, appData)
+    } catch (e) {
+        // This will catch errors thrown from the app and pass the error
+        // to the AppErrorBoundary component, and renders the error page.
+        renderError = logAndFormatError(e)
+        appHtml = renderAppHtml(req, res, renderError, appData)
+    }
 
     // Setting type: 'application/json' stops the browser from executing the code.
     const scriptProps = ssrOnly ? {type: 'application/json'} : {}
 
+    let bundles = []
     /* istanbul ignore next */
     if (extractor) {
         // Clone elements with the correct bundle path.
@@ -250,6 +266,8 @@ const renderApp = (args) => {
 
     const helmet = Helmet.renderStatic()
 
+    // Return the first error encountered during the rendering pipeline.
+    const error = appStateError || renderError
     // Remove the stacktrace when executing remotely as to not leak any important
     // information to users about our system.
     if (error && isRemote()) {
@@ -265,6 +283,7 @@ const renderApp = (args) => {
     //
     // Do *not* add to these without a very good reason - globals are a liability.
     const windowGlobals = {
+        __CONFIG__: config,
         __DEVICE_TYPE__: deviceType,
         __PRELOADED_STATE__: appState,
         __ERROR__: error,

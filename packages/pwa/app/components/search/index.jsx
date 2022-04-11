@@ -25,7 +25,7 @@ import {capitalize, boldString, getSessionJSONItem, setSessionJSONItem} from '..
 import useNavigation from '../../hooks/use-navigation'
 import {HideOnDesktop, HideOnMobile} from '../responsive'
 import {FormattedMessage} from 'react-intl'
-import debounce from 'lodash.debounce'
+import debounce from 'lodash/debounce'
 import {RECENT_SEARCH_KEY, RECENT_SEARCH_LIMIT, RECENT_SEARCH_MIN_LENGTH} from '../../constants'
 import {productUrlBuilder, searchUrlBuilder, categoryUrlBuilder} from '../../utils/url'
 

@@ -28,7 +28,7 @@ const argv = require('yargs')
     .option(POTENTIAL_OPTIONS.message, {
         alias: 'message',
         describe:
-            'a message to include along with the uploaded bundle in Mobify Cloud. default: <git branch>: <git commit hash>',
+            'a message to include along with the uploaded bundle in Managed Runtime. default: <git branch>: <git commit hash>',
         type: 'string'
     })
     .option(POTENTIAL_OPTIONS.projectSlug, {
@@ -39,7 +39,7 @@ const argv = require('yargs')
     })
     .option(POTENTIAL_OPTIONS.target, {
         alias: 'target',
-        describe: 'a custom target to upload a bundle to within Mobify Cloud',
+        describe: 'a custom target to upload a bundle to within Managed Runtime',
         type: 'string'
     })
     .help('h')
@@ -62,10 +62,19 @@ try {
     Utils.fail(message)
 }
 
+// Set the deployment target env var, this is required to ensure we
+// get the correct configuration oject.
+process.env.DEPLOY_TARGET = argv.t
+
+// Get the config object for the current target, if no target was set
+// it will return the default configuration and that one will be
+// validated.
+const config = Utils.loadConfig()
+
 // Read the top-level Mobify options. If the environment variable
 // SSR_ENABLED is set to a truthy string, then override the
 // ssrEnabled value.
-const mobifyOptions = packageJson.mobify || {}
+const mobifyOptions = config || {}
 
 if (process.env.SSR_ENABLED) {
     mobifyOptions.ssrEnabled = true

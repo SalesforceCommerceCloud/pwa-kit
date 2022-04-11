@@ -90,7 +90,7 @@ const ColorRefinements = ({filter, toggleFilter, selectedFilters}) => {
 ColorRefinements.propTypes = {
     filter: PropTypes.object,
     toggleFilter: PropTypes.func,
-    selectedFilters: PropTypes.array
+    selectedFilters: PropTypes.oneOfType([PropTypes.array, PropTypes.string])
 }
 
 export default ColorRefinements

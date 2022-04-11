@@ -16,7 +16,6 @@ commands:
             touch $BASH_ENV
             if [[ "${CIRCLE_BRANCH}" == "develop" ]]; then echo 'export DEVELOP=true' >> $BASH_ENV; fi
             if [[ "${CIRCLE_BRANCH}" =~ ^release- ]]; then echo 'export RELEASE=true' >> $BASH_ENV; fi
-            echo 'export DETECT_CHROMEDRIVER_VERSION=true' >> $BASH_ENV;
             source $BASH_ENV
       - run:
           name: 'Install Dependencies'
@@ -73,13 +72,41 @@ commands:
           key: npm-cache
           paths:
             - /root/.npm
+  setup_npm_7:
+    description: 'Setup Machine with npm 7'
+    steps:
+      - restore_cache:
+          keys:
+            - npm-cache
+      - run:
+          name: 'Install Dependencies'
+          command: |
+
+            sudo npm install -g npm@7
+            npm ci
+      - save_cache:
+          key: npm-cache
+          paths:
+            - /root/.npm
+  setup_npm_8:
+    description: 'Setup Machine with npm 8'
+    steps:
+      - restore_cache:
+          keys:
+            - npm-cache
+      - run:
+          name: 'Install Dependencies'
+          command: |
+
+            sudo npm install -g npm@8
+            npm ci
+      - save_cache:
+          key: npm-cache
+          paths:
+            - /root/.npm
   runtests:
     description: 'Run tests'
     parameters:
-      enableIntegrationTests:
-          description: 'Enable expensive integration tests'
-          default: true
-          type: boolean
       cwd:
         description: 'The directory to execute the tests from'
         default: ${PWD}
@@ -99,16 +126,6 @@ commands:
 
             # Always run fast unit tests
             npm run test
-
-            # End to end tests on nightly builds only
-            if [[ $NIGHTLY ]]; then
-              npm run test:e2e-ci
-            fi
-
-            # Only run expensive integration tests on these branches
-            if [[ (<< parameters.enableIntegrationTests >> == "true") && ( $DEVELOP || $RELEASE ) ]]; then
-              npm run test:integration
-            fi
   smoketestscripts:
     description: 'Smoke test scripts'
     parameters:
@@ -121,7 +138,7 @@ commands:
           name: 'Smoke test scripts'
           command: |
             # Basic smoke-tests for uncommonly run scripts in a project
-            node /home/circleci/project/scripts/smoke-test-npm-scripts.js --dir << parameters.dir >>
+            node ./scripts/smoke-test-npm-scripts.js --dir << parameters.dir >>
   lighthouse-ci:
     description: 'Run Lighthouse CI on the PWA'
     steps:
@@ -140,6 +157,46 @@ commands:
               # Fail the build if any step leaves uncommitted changes in the repo
               # that would prevent Lerna from publishing (Lerna gets this right).
               git diff --exit-code
+
+  generate_and_test_project:
+    description: 'Generate project'
+    steps:
+      - run:
+          name: Generate project
+          environment:
+            GENERATOR_PRESET: 'test-project'
+          command: |
+            set GENERATOR_PRESET=test-project
+            node packages/pwa-kit-create-app/scripts/create-mobify-app-dev.js --outputDir generated-project
+            
+            cd generated-project
+            npm run prod:build
+      - run:
+          name: Generate hello-world project
+          environment:
+            GENERATOR_PRESET: 'hello-world-test-project'
+          command: |
+            set GENERATOR_PRESET=hello-world-test-project
+            node packages/pwa-kit-create-app/scripts/create-mobify-app-dev.js --outputDir generated-project-hello-world
+      - runtests:
+          cwd: generated-project
+      - smoketestscripts:
+          dir: generated-project
+      - run:
+          name: Count Generated Project Dependencies
+          environment:
+          command: |
+            MAX_PACKAGES="2250"
+            total=$(./scripts/count-dependencies.js generated-project)
+            echo "export TOTAL_PACKAGES=${total}" >> $BASH_ENV;
+            source $BASH_ENV
+
+            if [ "$total" -gt "$MAX_PACKAGES" ]; then
+                echo "Error: Found $TOTAL_PACKAGES installed packages (max $MAX_PACKAGES).";
+                exit 1;
+            else
+                echo "Found $TOTAL_PACKAGES installed packages (max $MAX_PACKAGES).";
+            fi
 
   early_return_for_forked_pull_requests:
     description: >-
@@ -161,8 +218,7 @@ jobs:
     steps:
       - checkout
       - setup
-      - runtests:
-          enableIntegrationTests: false
+      - runtests
       - lighthouse-ci
       - smoketestscripts
       - checkclean
@@ -184,6 +240,20 @@ jobs:
     steps:
       - checkout
       - setup_windows
+      - runtests
+  testNode14npm7:
+    docker:
+      - image: circleci/node:14-stretch-browsers
+    steps:
+      - checkout
+      - setup_npm_7
+      - runtests
+  testNode14npm8:
+    docker:
+      - image: circleci/node:14-stretch-browsers
+    steps:
+      - checkout
+      - setup_npm_8
       - runtests
   testNode14:
     docker:
@@ -240,40 +310,8 @@ jobs:
     steps:
       - checkout
       - setup
-      - run:
-          name: Generate project
-          environment:
-            GENERATOR_PRESET: 'test-project'
-          command: |
-            node ./scripts/gtime.js generated_project_install \
-                node packages/pwa-kit-create-app/scripts/create-mobify-app-dev.js --outputDir /tmp/project
+      - generate_and_test_project
 
-            cd /tmp/project
-            npm run prod:build
-      - run:
-          name: Generate hello-world project
-          environment:
-            GENERATOR_PRESET: 'hello-world-test-project'
-          command: |
-            node packages/pwa-kit-create-app/scripts/create-mobify-app-dev.js --outputDir /tmp/hello-world
-      - runtests:
-          cwd: /tmp/project
-      - smoketestscripts:
-          dir: /tmp/project
-      - run:
-          name: Count Generated Project Dependencies
-          environment:
-          command: |
-            MAX_PACKAGES="3050"
-            total=$(./scripts/count-dependencies.js /tmp/project)
-            echo "export TOTAL_PACKAGES=${total}" >> $BASH_ENV;
-
-            if [ "$total" -gt "$MAX_PACKAGES" ]; then
-                echo "Error: Found $TOTAL_PACKAGES installed packages (max $MAX_PACKAGES).";
-                exit 1;
-            else
-                echo "Error: Found $TOTAL_PACKAGES installed packages (max $MAX_PACKAGES).";
-            fi
       - early_return_for_forked_pull_requests
       - slack/status:
           fail_only: true
@@ -317,9 +355,18 @@ jobs:
               target=""
             fi
             if [[ $target ]]; then
-              cd /tmp/project
+              cd generated-project
               npm run push -- --message "Generated PWA build ${CIRCLE_BUILD_NUM} on ${CIRCLE_BRANCH} (${CIRCLE_SHA1})" --target $target
             fi
+  generatedSFCCProjectTestWindows:
+    executor:
+      name: win/default
+      size: "large"
+      shell: bash.exe
+    steps:
+      - checkout
+      - setup_windows
+      - generate_and_test_project
 
 workflows:
   version: 2
@@ -328,7 +375,10 @@ workflows:
       - testNode12
       - testNode14
       - testNode14Windows
+      - testNode14npm7
+      - testNode14npm8
       - generatedSFCCProjectTest
+      - generatedSFCCProjectTestWindows
   nightly-build:
     triggers:
       - schedule:
@@ -343,6 +393,10 @@ workflows:
       - testNode14:
           context: nightly-build
       - testNode14Windows:
+          context: nightly-build
+      - testNode14npm7:
+          context: nightly-build
+      - testNode14npm8:
           context: nightly-build
       - generatedSFCCProjectTest:
           context: nightly-build

@@ -16,7 +16,7 @@ import WebpackNotifierPlugin from 'webpack-notifier'
 import CopyPlugin from 'copy-webpack-plugin'
 import {BundleAnalyzerPlugin} from 'webpack-bundle-analyzer'
 import LoadablePlugin from '@loadable/webpack-plugin'
-import {createModuleReplacementPlugin, BuildMarkerPlugin, PwaKitConfigPlugin} from './plugins'
+import {createModuleReplacementPlugin, BuildMarkerPlugin} from './plugins'
 
 const root = process.cwd()
 const {resolve, join} = path
@@ -187,7 +187,16 @@ const common = {
         }),
 
         new CopyPlugin({
-            patterns: [{from: 'app/static/', to: 'static/'}]
+            patterns: [
+                {from: 'app/static/', to: 'static/'},
+                {
+                    from: 'config/',
+                    to: 'config/',
+                    globOptions: {
+                        ignore: ['**/local.*']
+                    }
+                }
+            ]
         }),
 
         analyzeBundle &&
@@ -249,7 +258,7 @@ const main = Object.assign({}, common, {
         maxEntrypointSize: 905000,
         maxAssetSize: 825000
     },
-    plugins: [...common.plugins, new LoadablePlugin(), new PwaKitConfigPlugin()]
+    plugins: [...common.plugins, new LoadablePlugin()]
 })
 
 const others = Object.assign({}, common, {
@@ -303,7 +312,14 @@ const ssrServerConfig = Object.assign(
                 }
             ]
         },
-        stats
+        stats,
+        ignoreWarnings: [
+            // These can be ignored fairly safely for node targets, where
+            // bundle size is not super critical. Express generates this warning,
+            // because it uses dynamic require() calls, which cause Webpack to
+            // bundle the whole library.
+            /Critical dependency: the request of a dependency is an expression/
+        ]
     }
 )
 

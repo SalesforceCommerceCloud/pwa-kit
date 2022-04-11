@@ -41,18 +41,23 @@ import {IntlProvider} from 'react-intl'
 
 // Others
 import {watchOnlineStatus, flatten} from '../../utils/utils'
-import {homeUrlBuilder, getUrlWithLocale, buildPathWithUrlConfig} from '../../utils/url'
-import {getLocaleConfig, getPreferredCurrency, getSupportedLocalesIds} from '../../utils/locale'
-import {DEFAULT_CURRENCY, HOME_HREF} from '../../constants'
+import {homeUrlBuilder, getPathWithLocale} from '../../utils/url'
+import {buildPathWithUrlConfig} from '../../utils/url'
+
+import {getTargetLocale, fetchTranslations} from '../../utils/locale'
+import {DEFAULT_SITE_TITLE, HOME_HREF, THEME_COLOR} from '../../constants'
 
 import Seo from '../seo'
 import useWishlist from '../../hooks/use-wishlist'
+import useSite from '../../hooks/use-site'
+import {resolveSiteFromUrl} from '../../utils/site-utils'
+import useLocale from '../../hooks/use-locale'
 
 const DEFAULT_NAV_DEPTH = 3
 const DEFAULT_ROOT_CATEGORY = 'root'
 
 const App = (props) => {
-    const {children, targetLocale, defaultLocale, messages, categories: allCategories = {}} = props
+    const {children, targetLocale, messages, categories: allCategories = {}} = props
 
     const appOrigin = getAppOrigin()
 
@@ -60,16 +65,26 @@ const App = (props) => {
     const location = useLocation()
     const authModal = useAuthModal()
     const customer = useCustomer()
+
+    const site = useSite()
+    const locale = useLocale()
+
     const [isOnline, setIsOnline] = useState(true)
     const styles = useStyleConfig('App')
+
+    const configValues = {
+        locale: locale.alias || locale.id,
+        site: site.alias || site.id
+    }
 
     const {isOpen, onOpen, onClose} = useDisclosure()
 
     // Used to conditionally render header/footer for checkout page
     const isCheckout = /\/checkout$/.test(location?.pathname)
 
-    // Get the current currency to be used throught the app
-    const currency = getPreferredCurrency(targetLocale) || DEFAULT_CURRENCY
+    const {l10n} = site
+    // Get the current currency to be used through out the app
+    const currency = locale.preferredCurrency || l10n.defaultCurrency
 
     // Set up customer and basket
     useShopper({currency})
@@ -102,7 +117,7 @@ const App = (props) => {
 
     const onLogoClick = () => {
         // Goto the home page.
-        const path = homeUrlBuilder(HOME_HREF, targetLocale)
+        const path = homeUrlBuilder(HOME_HREF, {locale, site})
         history.push(path)
 
         // Close the drawer.
@@ -110,7 +125,7 @@ const App = (props) => {
     }
 
     const onCartClick = () => {
-        const path = buildPathWithUrlConfig('/cart', {locale: targetLocale})
+        const path = buildPathWithUrlConfig('/cart', configValues)
         history.push(path)
 
         // Close the drawer.
@@ -120,7 +135,7 @@ const App = (props) => {
     const onAccountClick = () => {
         // Link to account page for registered customer, open auth modal otherwise
         if (customer.isRegistered) {
-            const path = buildPathWithUrlConfig('/account', {locale: targetLocale})
+            const path = buildPathWithUrlConfig('/account', configValues)
             history.push(path)
         } else {
             // if they already are at the login page, do not show login modal
@@ -130,7 +145,7 @@ const App = (props) => {
     }
 
     const onWishlistClick = () => {
-        const path = buildPathWithUrlConfig('/account/wishlist', {locale: targetLocale})
+        const path = buildPathWithUrlConfig('/account/wishlist', configValues)
         history.push(path)
     }
 
@@ -147,17 +162,18 @@ const App = (props) => {
                     throw err
                 }}
                 locale={targetLocale}
-                defaultLocale={defaultLocale}
                 messages={messages}
+                // For react-intl, the _default locale_ refers to the locale that the inline `defaultMessage`s are written for.
+                // NOTE: if you update this value, please also update the following npm scripts in `pwa/package.json`:
+                // - "extract-default-translations"
+                // - "compile-translations:pseudo"
+                defaultLocale="en-US"
             >
                 <CategoriesProvider categories={allCategories}>
                     <CurrencyProvider currency={currency}>
                         <Seo>
-                            <meta name="theme-color" content="#0288a7" />
-                            <meta
-                                name="apple-mobile-web-app-title"
-                                content="PWA-Kit-Retail-React-App"
-                            />
+                            <meta name="theme-color" content={THEME_COLOR} />
+                            <meta name="apple-mobile-web-app-title" content={DEFAULT_SITE_TITLE} />
                             <link
                                 rel="apple-touch-icon"
                                 href={getAssetUrl('static/img/global/apple-touch-icon.png')}
@@ -166,19 +182,23 @@ const App = (props) => {
 
                             {/* Urls for all localized versions of this page (including current page)
                             For more details on hrefLang, see https://developers.google.com/search/docs/advanced/crawling/localized-versions */}
-                            {getSupportedLocalesIds().map((locale) => (
+                            {site.l10n?.supportedLocales.map((locale) => (
                                 <link
                                     rel="alternate"
-                                    hrefLang={locale.toLowerCase()}
-                                    href={`${appOrigin}${getUrlWithLocale(locale, {location})}`}
-                                    key={locale}
+                                    hrefLang={locale.id.toLowerCase()}
+                                    href={`${appOrigin}${getPathWithLocale(locale.id, {
+                                        location
+                                    })}`}
+                                    key={locale.id}
                                 />
                             ))}
                             {/* A general locale as fallback. For example: "en" if default locale is "en-GB" */}
                             <link
                                 rel="alternate"
-                                hrefLang={defaultLocale.slice(0, 2)}
-                                href={`${appOrigin}${getUrlWithLocale(defaultLocale, {location})}`}
+                                hrefLang={site.l10n.defaultLocale.slice(0, 2)}
+                                href={`${appOrigin}${getPathWithLocale(site.l10n.defaultLocale, {
+                                    location
+                                })}`}
                             />
                             {/* A wider fallback for user locales that the app does not support */}
                             <link rel="alternate" hrefLang="x-default" href={`${appOrigin}/`} />
@@ -257,8 +277,11 @@ App.shouldGetProps = () => {
     return typeof window === 'undefined'
 }
 
-App.getProps = async ({api}) => {
-    const localeConfig = await getLocaleConfig({
+App.getProps = async ({api, res}) => {
+    const site = resolveSiteFromUrl(res.locals.originalUrl)
+    const l10nConfig = site.l10n
+
+    const targetLocale = getTargetLocale({
         getUserPreferredLocales: () => {
             // CONFIG: This function should return an array of preferred locales. They can be
             // derived from various sources. Below are some examples of those:
@@ -270,7 +293,7 @@ App.getProps = async ({api}) => {
             // If this function returns an empty array (e.g. there isn't locale in the page url),
             // then the app would use the default locale as the fallback.
 
-            // NOTE: Your implementation may differ, this is jsut what we did.
+            // NOTE: Your implementation may differ, this is just what we did.
             //
             // Since the CommerceAPI client already has the current `locale` set,
             // we can use it's value to load the correct messages for the application.
@@ -279,8 +302,10 @@ App.getProps = async ({api}) => {
             const {locale} = api.getConfig()
 
             return [locale]
-        }
+        },
+        l10nConfig
     })
+    const messages = await fetchTranslations(targetLocale)
 
     // Login as `guest` to get session.
     await api.auth.login()
@@ -309,19 +334,19 @@ Learn more with our localization guide. https://sfdc.co/localization-guide
     const categories = flatten(rootCategory, 'categories')
 
     return {
-        targetLocale: localeConfig.app.targetLocale,
-        defaultLocale: localeConfig.app.defaultLocale,
-        messages: localeConfig.messages,
-        categories: categories
+        targetLocale,
+        messages,
+        categories,
+        config: res?.locals?.config
     }
 }
 
 App.propTypes = {
     children: PropTypes.node,
     targetLocale: PropTypes.string,
-    defaultLocale: PropTypes.string,
     messages: PropTypes.object,
-    categories: PropTypes.object
+    categories: PropTypes.object,
+    config: PropTypes.object
 }
 
 export default App

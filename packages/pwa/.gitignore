@@ -6,13 +6,14 @@ tests/reports
 tests/screenshots
 tests/lighthouse-reports/
 lighthouse/audit*
-cypress/screenshots
-cypress/videos
 .lighthouseci
 
 .tern-port
 app/integration-manager/docs
 messaging/*.csr
+
+# Local App Configuration Files
+config/local.*
 
 # Elastic Beanstalk Files
 .elasticbeanstalk/*
@@ -27,3 +28,5 @@ node_modules
 # Generated files
 app/cache-hash-manifest.json
 app/loader-cache-hash-manifest.json
+
+.vscode
