@@ -230,7 +230,7 @@ const client =
                     ...config.plugins,
                     new LoadablePlugin({writeToDisk: true}),
                     analyzeBundle && getBundleAnalyzerPlugin('main')
-                ],
+                ].filter(Boolean),
                 // Hide the performance hints, since we already have a similar `bundlesize` check in `pwa` package
                 performance: {
                     hints: false
@@ -254,7 +254,7 @@ const clientOptional = baseConfig('web')
                 ...optional('core-polyfill', resolve(projectDir, 'node_modules', 'core-js')),
                 ...optional('fetch-polyfill', resolve(projectDir, 'node_modules', 'whatwg-fetch'))
             },
-            plugins: [analyzeBundle && getBundleAnalyzerPlugin('client-optional')]
+            plugins: [analyzeBundle && getBundleAnalyzerPlugin('client-optional')].filter(Boolean)
         }
     })
     .build()
@@ -301,7 +301,7 @@ const renderer =
                         ]
                     }),
                     analyzeBundle && getBundleAnalyzerPlugin('server-renderer')
-                ]
+                ].filter(Boolean)
             }
         })
         .build()
@@ -321,7 +321,7 @@ const ssr = (() => {
                         filename: 'ssr.js',
                         libraryTarget: 'commonjs2'
                     },
-                    plugins: [analyzeBundle && getBundleAnalyzerPlugin('ssr')]
+                    plugins: [analyzeBundle && getBundleAnalyzerPlugin('ssr')].filter(Boolean)
                 }
             })
             .build()
@@ -343,7 +343,9 @@ const requestProcessor =
                     filename: 'request-processor.js',
                     libraryTarget: 'commonjs2'
                 },
-                plugins: [analyzeBundle && getBundleAnalyzerPlugin('request-processor')]
+                plugins: [analyzeBundle && getBundleAnalyzerPlugin('request-processor')].filter(
+                    Boolean
+                )
             }
         })
         .build()
