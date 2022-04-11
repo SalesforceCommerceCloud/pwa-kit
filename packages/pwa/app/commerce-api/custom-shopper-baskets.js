@@ -1,4 +1,4 @@
-import OcapiShopperBaskets from "./ocapi-shopper-baskets";
+import OcapiShopperBaskets from './ocapi-shopper-baskets'
 import * as sdk from 'commerce-sdk-isomorphic'
 
 // This class is an extension to OcapiShopperBaskets class to include basket functions implemented in SCAPI.
