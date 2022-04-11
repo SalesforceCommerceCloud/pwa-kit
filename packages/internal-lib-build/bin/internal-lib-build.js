@@ -57,8 +57,7 @@ const main = () => {
         .argument('<path>', 'path or glob to format')
         .action((path) => {
             const prettier = p.join(binDir, 'prettier')
-            // eslint-disable-next-line no-useless-escape
-            execSync(`${prettier} --write \"${path}\"`)
+            execSync(`${prettier} --write "${path}"`)
         })
 
     program
