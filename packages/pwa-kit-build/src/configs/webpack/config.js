@@ -44,7 +44,6 @@ const getBundleAnalyzerPlugin = (name = 'report', pluginOptions) =>
         generateStatsFile: true,
         reportFilename: `${name}.html`,
         reportTitle: `${name} bundle analysis result`,
-        statsFilename: `${name}.json`,
         ...pluginOptions
     })
 
