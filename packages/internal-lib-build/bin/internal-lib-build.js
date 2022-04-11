@@ -46,7 +46,7 @@ const main = () => {
             const eslintConfig = p.resolve(p.join(__dirname, '..', 'configs', '.eslintrc.js'))
 
             execSync(
-                `${eslint} --debug --config ${eslintConfig} --resolve-plugins-relative-to ${pkgRoot}${
+                `${eslint} --config ${eslintConfig} --resolve-plugins-relative-to ${pkgRoot}${
                     fix ? ' --fix' : ''
                 } "${path}"`
             )
