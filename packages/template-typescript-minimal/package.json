@@ -20,8 +20,8 @@
     },
     "scripts": {
         "test": "mrt test",
-        "format": "mrt format \"**/*.{js,jsx}\"",
-        "lint": "mrt lint \"**/*.{js,jsx}\"",
+        "format": "mrt format \"**/*.{js,jsx,tsx}\"",
+        "lint": "mrt lint \"**/*.{js,jsx,tsx}\"",
         "lint:fix": "npm run lint -- --fix",
         "start": "mrt start",
         "build": "mrt build",
