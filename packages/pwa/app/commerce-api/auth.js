@@ -9,7 +9,6 @@
 import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
 
 import {helpers} from 'commerce-sdk-isomorphic'
-import {HTTPError} from 'pwa-kit-react-sdk/ssr/universal/errors'
 import fetch from 'cross-fetch'
 import Cookies from 'js-cookie'
 
@@ -152,6 +151,7 @@ class Auth {
                         this._clearAuth()
                         return startLoginFlow()
                     }
+                    
                     throw error
                 })
                 .then((result) => {
@@ -215,10 +215,12 @@ class Auth {
      */
     async _loginWithCredentials(credentials) {
         const response = await helpers.loginRegisteredUserB2C(this._api.shopperLogin, {
-            redirectURI: `${getAppOrigin()}${slasCallbackEndpoint}`,
-            shopperUserId: credentials.email,
-            shopperPassword: credentials.password
+            username: credentials.email,
+            password: credentials.password
+        }, {
+            redirectURI: `${getAppOrigin()}${slasCallbackEndpoint}`
         })
+
         this._handleShopperLoginTokenResponse(response)
 
         return {
@@ -250,7 +252,7 @@ class Auth {
      * @returns {<Promise>} - Handle Shopper Login Promise
      */
     async _refreshAccessToken() {
-        const response = await helpers.refreshToken(this._api.shopperLogin, {
+        const response = await helpers.refreshAccessToken(this._api.shopperLogin, {
             refreshToken: this._refreshToken
         })
         this._handleShopperLoginTokenResponse(response)
