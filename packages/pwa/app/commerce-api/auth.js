@@ -101,7 +101,7 @@ class Auth {
         }
         const storeageKey =
             type === 'registered' ? refreshTokenStorageKey : refreshTokenGuestStorageKey
-        this._storage.set(storeageKey, token)
+        this._storage.set(storeageKey, token, {expires: REFRESH_TOKEN_COOKIE_AGE})
     }
 
     get usid() {
