@@ -44,7 +44,15 @@ const main = () => {
         .action((path, {fix}) => {
             const eslint = p.join(binDir, 'eslint')
             const eslintConfig = p.resolve(p.join(__dirname, '..', 'configs', '.eslintrc.js'))
-
+            console.log('internal-lib-build lint eslint:', eslint)
+            console.log('internal-lib-build lint eslintConfig:', eslintConfig)
+            console.log('internal-lib-build lint pkgRoot:', pkgRoot)
+            console.log(
+                'internal-lib-build lint execSync:',
+                `${eslint} --debug --config ${eslintConfig} --resolve-plugins-relative-to ${pkgRoot}${
+                    fix ? ' --fix' : ''
+                } "${path}"`
+            )
             execSync(
                 `${eslint} --debug --config ${eslintConfig} --resolve-plugins-relative-to ${pkgRoot}${
                     fix ? ' --fix' : ''

@@ -197,6 +197,15 @@ const main = () => {
         .action((path, {fix}) => {
             const eslint = p.join(require.resolve('eslint'), '..', '..', '..', '.bin', 'eslint')
             const eslintConfig = p.join(__dirname, '..', 'configs', 'eslint', 'eslint-config.js')
+            console.log('mrt lint eslint:', eslint)
+            console.log('mrt lint eslintConfig:', eslintConfig)
+            console.log('mrt lint pkgRoot:', pkgRoot)
+            console.log(
+                'mrt lint execSync:',
+                `${eslint} --debug --config ${eslintConfig} --resolve-plugins-relative-to ${pkgRoot}${
+                    fix ? ' --fix' : ''
+                } "${path}"`
+            )
             execSync(
                 `${eslint} --debug --config ${eslintConfig} --resolve-plugins-relative-to ${pkgRoot}${
                     fix ? ' --fix' : ''
