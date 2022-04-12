@@ -235,7 +235,7 @@ jobs:
   testNode14Windows:
     executor:
       name: win/default
-      size: "large"
+      size: "xlarge"
       shell: bash.exe
     steps:
       - checkout
