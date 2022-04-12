@@ -35,6 +35,9 @@ const oidStorageKey = 'oid'
 const dwSessionIdKey = 'dwsid'
 const REFRESH_TOKEN_COOKIE_AGE = 90 // 90 days. This value matches SLAS cartridge.
 
+const EXPIRED_TOKEN = 'EXPIRED_TOKEN'
+const INVALID_TOKEN = 'invalid refresh_token'
+
 /**
  * A  class that provides auth functionality for pwa.
  */
@@ -202,7 +205,7 @@ class Auth {
             }
             return this[authorizationMethod](credentials)
                 .catch((error) => {
-                    const retryErrors = ['invalid refresh_token', 'EXPIRED_TOKEN']
+                    const retryErrors = [INVALID_TOKEN, EXPIRED_TOKEN]
                     if (retries === 0 && retryErrors.includes(error.message)) {
                         retries = 1 // we only retry once
                         this._clearAuth()
