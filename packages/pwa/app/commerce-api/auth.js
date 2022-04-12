@@ -456,41 +456,35 @@ class Storage {
 class CookieStorage extends Storage {
     constructor(...args) {
         super(args)
-        this._avaliable = false
         if (typeof document === 'undefined') {
-            console.warn('CookieStorage is not avaliable on the current environment.')
-            return
+            throw new Error('CookieStorage is not avaliable on the current environment.')
         }
-        this._avaliable = true
     }
     set(key, value, options) {
-        this._avaliable && Cookies.set(key, value, {secure: true, ...options})
+        Cookies.set(key, value, {secure: true, ...options})
     }
     get(key) {
-        return this._avaliable ? Cookies.get(key) : undefined
+        return Cookies.get(key)
     }
     delete(key) {
-        this._avaliable && Cookies.remove(key)
+        Cookies.remove(key)
     }
 }
 
 class LocalStorage extends Storage {
     constructor(...args) {
         super(args)
-        this._avaliable = false
         if (typeof window === 'undefined') {
-            console.warn('LocalStorage is not avaliable on the current environment.')
-            return
+            throw new Error('LocalStorage is not avaliable on the current environment.')
         }
-        this._avaliable = true
     }
     set(key, value) {
-        this._avaliable && window.localStorage.setItem(key, value)
+        window.localStorage.setItem(key, value)
     }
     get(key) {
-        return this._avaliable ? window.localStorage.getItem(key) : undefined
+        return window.localStorage.getItem(key)
     }
     delete(key) {
-        this._avaliable && window.localStorage.removeItem(key)
+        window.localStorage.removeItem(key)
     }
 }
