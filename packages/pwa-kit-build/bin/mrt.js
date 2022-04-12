@@ -16,7 +16,7 @@ const uploadBundle = require('../scripts/upload.js')
 const pkg = require('../package.json')
 const {getConfig} = require('pwa-kit-runtime/utils/ssr-config')
 
-const pkgRoot = p.join(__dirname, '..')
+const pkgRoot = p.join(__dirname, '..', '..')
 
 const projectPkg = require(p.join(process.cwd(), 'package.json'))
 
