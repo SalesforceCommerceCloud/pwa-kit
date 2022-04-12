@@ -53,13 +53,13 @@ class Auth {
         this._storage = this._onClient ? new LocalStorage() : new Map()
 
         const configOid = api._config.parameters.organizationId
-        if (!this.oid) {
-            this.oid = configOid
+        if (!this._oid) {
+            this._oid = configOid
         }
 
         if (this._oid !== configOid) {
             this._clearAuth()
-            this.oid = configOid
+            this._oid = configOid
         }
 
         this.login = this.login.bind(this)
