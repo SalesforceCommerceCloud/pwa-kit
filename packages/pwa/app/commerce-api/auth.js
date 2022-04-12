@@ -53,13 +53,13 @@ class Auth {
         this._storage = this._onClient ? new LocalStorage() : new Map()
 
         const configOid = api._config.parameters.organizationId
-        if (!this._oid) {
-            this._oid = configOid
+        if (!this.oid) {
+            this.oid = configOid
         }
 
-        if (this._oid !== configOid) {
+        if (this.oid !== configOid) {
             this._clearAuth()
-            this._oid = configOid
+            this.oid = configOid
         }
 
         this.login = this.login.bind(this)
@@ -74,22 +74,22 @@ class Auth {
         return this._pendingLogin
     }
 
-    get _authToken() {
+    get authToken() {
         return this._storage.get(tokenStorageKey)
     }
 
-    set _authToken(token) {
+    set authToken(token) {
         this._storage.set(tokenStorageKey, token)
     }
 
-    get _refreshToken() {
+    get refreshToken() {
         return (
             this._storage.get(refreshTokenStorageKey) ||
             this._storage.get(refreshTokenGuestStorageKey)
         )
     }
 
-    set _refreshToken(obj = {}) {
+    set refreshToken(obj = {}) {
         const {type, token} = obj
         if (!type || !token) {
             throw new Error(
@@ -101,27 +101,27 @@ class Auth {
         this._storage.set(storeageKey, token)
     }
 
-    get _usid() {
+    get usid() {
         return this._storage.get(usidStorageKey)
     }
 
-    set _usid(usid) {
+    set usid(usid) {
         this._storage.set(usidStorageKey, usid)
     }
 
-    get _encUserId() {
+    get encUserId() {
         return this._storage.get(encUserIdStorageKey)
     }
 
-    set _encUserId(encUserId) {
+    set encUserId(encUserId) {
         this._storage.set(encUserIdStorageKey, encUserId)
     }
 
-    get _oid() {
+    get oid() {
         return this._storage.get(oidStorageKey)
     }
 
-    set _oid(oid) {
+    set oid(oid) {
         this._storage.set(oidStorageKey, oid)
     }
 
@@ -175,7 +175,7 @@ class Auth {
             {
                 method: 'POST',
                 headers: {
-                    Authorization: this._authToken
+                    Authorization: this.authToken
                 }
             }
         )
@@ -197,7 +197,7 @@ class Auth {
             let authorizationMethod = '_loginAsGuest'
             if (credentials) {
                 authorizationMethod = '_loginWithCredentials'
-            } else if (this._refreshToken) {
+            } else if (this.refreshToken) {
                 authorizationMethod = '_refreshAccessToken'
             }
             return this[authorizationMethod](credentials)
@@ -233,7 +233,7 @@ class Auth {
     async logout(shouldLoginAsGuest = true) {
         const options = {
             parameters: {
-                refresh_token: this._refreshToken,
+                refresh_token: this.refreshToken,
                 client_id: this._config.parameters.clientId,
                 channel_id: this._config.parameters.siteId
             }
@@ -260,15 +260,15 @@ class Auth {
             id_token
         } = tokenResponse
         this._customerId = customer_id
-        this._authToken = `Bearer ${access_token}`
-        this._usid = usid
+        this.authToken = `Bearer ${access_token}`
+        this.usid = usid
 
         // we use id_token to distinguish guest and registered users
         if (id_token.length > 0) {
-            this._encUserId = enc_user_id
-            this._refreshToken = {type: 'registered', token: refresh_token}
+            this.encUserId = enc_user_id
+            this.refreshToken = {type: 'registered', token: refresh_token}
         } else {
-            this._refreshToken = {type: 'guest', token: refresh_token}
+            this.refreshToken = {type: 'guest', token: refresh_token}
         }
 
         if (this._onClient) {
@@ -403,7 +403,7 @@ class Auth {
     async _refreshAccessToken() {
         const data = new URLSearchParams()
         data.append('grant_type', 'refresh_token')
-        data.append('refresh_token', this._refreshToken)
+        data.append('refresh_token', this.refreshToken)
         data.append('client_id', this._config.parameters.clientId)
 
         const options = {
