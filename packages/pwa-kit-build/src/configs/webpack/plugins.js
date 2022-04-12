@@ -5,10 +5,10 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import webpack from 'webpack'
-import path, {resolve} from 'path'
-import fs from 'fs'
-
+const webpack = require('webpack')
+const path = require('path')
+const resolve = path.resolve
+const fs = require('fs')
 /**
  * Allows users to override special SDK components by placing override
  * files in certain magic locations in a project.
@@ -16,7 +16,7 @@ import fs from 'fs'
  * @param {string} projectDir - absolute path to the project root.
  * @returns {webpack.NormalModuleReplacementPlugin}
  */
-export const createModuleReplacementPlugin = (projectDir) => {
+const createModuleReplacementPlugin = (projectDir) => {
     const makeRegExp = (str, sep = path.sep) => {
         // Replace unix paths with windows if needed and build a RegExp
         if (sep === '\\') {
@@ -74,4 +74,8 @@ export const createModuleReplacementPlugin = (projectDir) => {
             resource.request = replacement.newPath
         }
     })
+}
+
+module.exports = {
+    createModuleReplacementPlugin
 }
