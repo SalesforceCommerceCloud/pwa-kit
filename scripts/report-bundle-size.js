@@ -10,8 +10,6 @@ const bundlesNames = ['main', 'client-optional', 'server-renderer', 'ssr', 'requ
  * Send bundle size stats to Datadog
  */
 const main = () => {
-    const webpack = require(path.join(path.resolve(''), 'packages', 'pwa-kit-build', 'src', 'configs', 'webpack', 'config.js'))
-    console.log('webpack', webpack)
     bundlesNames.forEach(name => {
         const pwaStats = require(path.join(path.resolve(''), 'packages', 'pwa', 'build', `${name}.json`))
 
@@ -19,8 +17,7 @@ const main = () => {
         bundles.forEach((bundle) => {
             const metric = `mobify_platform_sdks.bundle_size_byte`
             const value = bundle.size
-            // uncomment to avoid send too much data to datadog
-            // childProc.spawnSync('dog', ['metric', 'post', metric, value, '--host', bundle.name])
+            childProc.spawnSync('dog', ['metric', 'post', metric, value, '--host', bundle.name])
             console.log(`${metric} ${value} --host ${bundle.name}`)
         })
     })

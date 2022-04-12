@@ -8,17 +8,16 @@
 /* eslint-env node */
 
 // For more information on these settings, see https://webpack.js.org/configuration
-const fs = require('fs')
-const path = require('path')
-const resolve = path.resolve
-const webpack = require('webpack')
-const WebpackNotifierPlugin = require('webpack-notifier')
-const CopyPlugin = require('copy-webpack-plugin')
-const {BundleAnalyzerPlugin} = require('webpack-bundle-analyzer')
-const LoadablePlugin = require('@loadable/webpack-plugin')
-const SpeedMeasurePlugin = require('speed-measure-webpack-plugin')
+import fs from 'fs'
+import path, {resolve} from 'path'
 
-const {createModuleReplacementPlugin} = require('./plugins')
+import webpack from 'webpack'
+import WebpackNotifierPlugin from 'webpack-notifier'
+import CopyPlugin from 'copy-webpack-plugin'
+import {BundleAnalyzerPlugin} from 'webpack-bundle-analyzer'
+import LoadablePlugin from '@loadable/webpack-plugin'
+import SpeedMeasurePlugin from 'speed-measure-webpack-plugin'
+import {createModuleReplacementPlugin} from './plugins'
 
 const projectDir = process.cwd()
 const sdkDir = path.resolve(path.join(__dirname, '..', '..', '..'))
@@ -220,18 +219,17 @@ const client =
     baseConfig('web')
         .extend(withChunking)
         .extend((config) => {
-            const name = 'client'
             return {
                 ...config,
                 // Must be named "client". See - https://www.npmjs.com/package/webpack-hot-server-middleware#usage
-                name,
+                name: 'client',
                 entry: {
                     main: './app/main'
                 },
                 plugins: [
                     ...config.plugins,
                     new LoadablePlugin({writeToDisk: true}),
-                    analyzeBundle && getBundleAnalyzerPlugin(name)
+                    analyzeBundle && getBundleAnalyzerPlugin('main')
                 ].filter(Boolean),
                 // Hide the performance hints, since we already have a similar `bundlesize` check in `pwa` package
                 performance: {
@@ -256,10 +254,7 @@ const clientOptional = baseConfig('web')
                 ...optional('core-polyfill', resolve(projectDir, 'node_modules', 'core-js')),
                 ...optional('fetch-polyfill', resolve(projectDir, 'node_modules', 'whatwg-fetch'))
             },
-            plugins: [
-                ...config.plugins,
-                analyzeBundle && getBundleAnalyzerPlugin('client-optional')
-            ].filter(Boolean)
+            plugins: [analyzeBundle && getBundleAnalyzerPlugin('client-optional')].filter(Boolean)
         }
     })
     .build()
@@ -326,10 +321,7 @@ const ssr = (() => {
                         filename: 'ssr.js',
                         libraryTarget: 'commonjs2'
                     },
-                    plugins: [
-                        ...config.plugins,
-                        analyzeBundle && getBundleAnalyzerPlugin('ssr')
-                    ].filter(Boolean)
+                    plugins: [analyzeBundle && getBundleAnalyzerPlugin('ssr')].filter(Boolean)
                 }
             })
             .build()
@@ -351,10 +343,9 @@ const requestProcessor =
                     filename: 'request-processor.js',
                     libraryTarget: 'commonjs2'
                 },
-                plugins: [
-                    ...config.plugins,
-                    analyzeBundle && getBundleAnalyzerPlugin('request-processor')
-                ].filter(Boolean)
+                plugins: [analyzeBundle && getBundleAnalyzerPlugin('request-processor')].filter(
+                    Boolean
+                )
             }
         })
         .build()
