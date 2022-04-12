@@ -49,21 +49,17 @@ class Auth {
 
         // To store tokens as cookies
         // change the next line to
-        // this._storage = new CookieStorage()
-        this._storage = new LocalStorage()
+        // this._storage = this._onClient ? new CookieStorage() : new Map()
+        this._storage = this._onClient ? new LocalStorage() : new Map()
+
         const configOid = api._config.parameters.organizationId
-        this._oid = this._storage.get(oidStorageKey) || configOid
+        if (!this.oid) {
+            this.oid = configOid
+        }
 
         if (this._oid !== configOid) {
             this._clearAuth()
-            this._saveOid(configOid)
-        } else {
-            this._authToken = this._storage.get(tokenStorageKey)
-            this._refreshToken =
-                this._storage.get(refreshTokenStorageKey) ||
-                this._storage.get(refreshTokenGuestStorageKey)
-            this._usid = this._storage.get(usidStorageKey)
-            this._encUserId = this._storage.get(encUserIdStorageKey)
+            this.oid = configOid
         }
 
         this.login = this.login.bind(this)
@@ -78,24 +74,55 @@ class Auth {
         return this._pendingLogin
     }
 
-    get authToken() {
-        return this._authToken
+    get _authToken() {
+        return this._storage.get(tokenStorageKey)
     }
 
-    get refreshToken() {
-        return this._refreshToken
+    set _authToken(token) {
+        this._storage.set(tokenStorageKey, token)
     }
 
-    get usid() {
-        return this._usid
+    get _refreshToken() {
+        return (
+            this._storage.get(refreshTokenStorageKey) ||
+            this._storage.get(refreshTokenGuestStorageKey)
+        )
     }
 
-    get encUserId() {
-        return this._encUserId
+    set _refreshToken(obj = {}) {
+        const {type, token} = obj
+        if (!type || !token) {
+            throw new Error(
+                'You must set refresh token with an object including keys: type and token.'
+            )
+        }
+        const storeageKey =
+            type === 'registered' ? refreshTokenStorageKey : refreshTokenGuestStorageKey
+        this._storage.set(storeageKey, token)
     }
 
-    get oid() {
-        return this._oid
+    get _usid() {
+        return this._storage.get(usidStorageKey)
+    }
+
+    set _usid(usid) {
+        this._storage.set(usidStorageKey, usid)
+    }
+
+    get _encUserId() {
+        return this._storage.get(encUserIdStorageKey)
+    }
+
+    set _encUserId(encUserId) {
+        this._storage.set(encUserIdStorageKey, encUserId)
+    }
+
+    get _oid() {
+        return this._storage.get(oidStorageKey)
+    }
+
+    set _oid(oid) {
+        this._storage.set(oidStorageKey, oid)
     }
 
     /**
@@ -165,7 +192,6 @@ class Auth {
         if (this._pendingLogin) {
             return this._pendingLogin
         }
-
         let retries = 0
         const startLoginFlow = () => {
             let authorizationMethod = '_loginAsGuest'
@@ -207,7 +233,7 @@ class Auth {
     async logout(shouldLoginAsGuest = true) {
         const options = {
             parameters: {
-                refresh_token: this.refreshToken,
+                refresh_token: this._refreshToken,
                 client_id: this._config.parameters.clientId,
                 channel_id: this._config.parameters.siteId
             }
@@ -234,14 +260,15 @@ class Auth {
             id_token
         } = tokenResponse
         this._customerId = customer_id
-        this._saveAccessToken(`Bearer ${access_token}`)
-        this._saveUsid(usid)
+        this._authToken = `Bearer ${access_token}`
+        this._usid = usid
+
         // we use id_token to distinguish guest and registered users
         if (id_token.length > 0) {
-            this._saveEncUserId(enc_user_id)
-            this._saveRefreshToken(refresh_token, 'registered')
+            this._encUserId = enc_user_id
+            this._refreshToken = {type: 'registered', token: refresh_token}
         } else {
-            this._saveRefreshToken(refresh_token, 'guest')
+            this._refreshToken = {type: 'guest', token: refresh_token}
         }
 
         if (this._onClient) {
@@ -403,86 +430,18 @@ class Auth {
         }
         return customer
     }
-    /**
-     * Stores the given auth token.
-     * @private
-     * @param {string} token - A JWT auth token.
-     */
-    _saveAccessToken(token) {
-        this._authToken = token
-        if (this._onClient) {
-            this._storage.set(tokenStorageKey, token)
-        }
-    }
-
-    /**
-     * Stores the given usid token.
-     * @private
-     * @param {string} usid - Unique shopper Id.
-     */
-    _saveUsid(usid) {
-        this._usid = usid
-        if (this._onClient) {
-            this._storage.set(usidStorageKey, usid)
-        }
-    }
-
-    /**
-     * Stores the given enc_user_id token. enc = encoded
-     * @private
-     * @param {string} encUserId - Logged in Shopper reference for Einstein API.
-     */
-    _saveEncUserId(encUserId) {
-        this._encUserId = encUserId
-        if (this._onClient) {
-            this._storage.set(encUserIdStorageKey, encUserId)
-        }
-    }
-
-    /**
-     * Stores the given oid token.
-     * @private
-     * @param {string} oid - Unique organization Id.
-     */
-    _saveOid(oid) {
-        this._oid = oid
-        if (this._onClient) {
-            this._storage.set(oidStorageKey, oid)
-        }
-    }
 
     /**
      * Removes the stored auth token.
      * @private
      */
     _clearAuth() {
-        this._customerId = undefined
-        this._authToken = undefined
-        this._refreshToken = undefined
-        this._usid = undefined
-        this._encUserId = undefined
-        if (this._onClient) {
-            this._storage.remove(tokenStorageKey)
-            this._storage.remove(refreshTokenStorageKey)
-            this._storage.remove(refreshTokenGuestStorageKey)
-            this._storage.remove(usidStorageKey)
-            this._storage.remove(encUserIdStorageKey)
-            this._storage.remove(dwSessionIdKey)
-        }
-    }
-
-    /**
-     * Stores the given refresh token.
-     * @private
-     * @param {string} refreshToken - A JWT refresh token.
-     */
-    _saveRefreshToken(refreshToken, type) {
-        this._refreshToken = refreshToken
-        const storeageKey =
-            type === 'registered' ? refreshTokenStorageKey : refreshTokenGuestStorageKey
-        if (this._onClient) {
-            this._storage.set(storeageKey, refreshToken, {expires: REFRESH_TOKEN_COOKIE_AGE})
-        }
+        this._storage.delete(tokenStorageKey)
+        this._storage.delete(refreshTokenStorageKey)
+        this._storage.delete(refreshTokenGuestStorageKey)
+        this._storage.delete(usidStorageKey)
+        this._storage.delete(encUserIdStorageKey)
+        this._storage.delete(dwSessionIdKey)
     }
 }
 
@@ -491,7 +450,7 @@ export default Auth
 class Storage {
     set(key, value, options) {}
     get(key) {}
-    remove(key) {}
+    delete(key) {}
 }
 
 class CookieStorage extends Storage {
@@ -510,7 +469,7 @@ class CookieStorage extends Storage {
     get(key) {
         return this._avaliable ? Cookies.get(key) : undefined
     }
-    remove(key) {
+    delete(key) {
         this._avaliable && Cookies.remove(key)
     }
 }
@@ -531,7 +490,7 @@ class LocalStorage extends Storage {
     get(key) {
         return this._avaliable ? window.localStorage.getItem(key) : undefined
     }
-    remove(key) {
+    delete(key) {
         this._avaliable && window.localStorage.removeItem(key)
     }
 }
