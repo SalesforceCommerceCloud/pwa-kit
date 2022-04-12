@@ -151,7 +151,7 @@ class Auth {
                         this._clearAuth()
                         return startLoginFlow()
                     }
-                    
+
                     throw error
                 })
                 .then((result) => {
@@ -214,12 +214,16 @@ class Auth {
      * @returns {object} - a skeleton registered customer object that can be used to retrieve a complete customer object
      */
     async _loginWithCredentials(credentials) {
-        const response = await helpers.loginRegisteredUserB2C(this._api.shopperLogin, {
-            username: credentials.email,
-            password: credentials.password
-        }, {
-            redirectURI: `${getAppOrigin()}${slasCallbackEndpoint}`
-        })
+        const response = await helpers.loginRegisteredUserB2C(
+            this._api.shopperLogin,
+            {
+                username: credentials.email,
+                password: credentials.password
+            },
+            {
+                redirectURI: `${getAppOrigin()}${slasCallbackEndpoint}`
+            }
+        )
 
         this._handleShopperLoginTokenResponse(response)
 
