@@ -248,7 +248,7 @@ const clientOptional = baseConfig('web')
     .extend((config) => {
         return {
             ...config,
-            name: 'pwa-others',
+            name: 'client-optional',
             entry: {
                 ...optional('loader', './app/loader.js'),
                 ...optional('worker', './worker/main.js'),

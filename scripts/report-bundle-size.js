@@ -8,16 +8,17 @@ const childProc = require('child_process')
  * Send bundle size stats to Datadog
  */
 const main = () => {
-    const buildDir = path.join(path.resolve(''), 'packages', 'pwa', 'build')
+    const buildDir = path.resolve('packages', 'template-retail-react-app', 'build')
     fs.readdir(buildDir, (err, files) => {
-        if (err)
-            console.log(err);
-        else {
-            files.forEach(file => {
-                // bundle report stats files are name as `*-analyzer-stats.json`
-                if (file.includes('-analyzer-stats.json')) {
+        if (err) {
+            console.error(err)
+            process.exit(1)
+        } else {
+            files
+                .filter(file => file.includes('-analyzer-stats.json'))
+                .forEach(file => {
                     console.log(`Analyzer stats json file found:`, file)
-                    const retailReactAppStats = require(path.join(path.resolve(''), 'packages', 'pwa', 'build', file))
+                    const retailReactAppStats = require(path.join(buildDir, file))
                     const bundles = retailReactAppStats.assets
                     bundles.forEach((bundle) => {
                         const metric = `mobify_platform_sdks.bundle_size_byte`
@@ -25,8 +26,7 @@ const main = () => {
                         childProc.spawnSync('dog', ['metric', 'post', metric, value, '--host', bundle.name])
                         console.log(`${metric} ${value} --host ${bundle.name}`)
                     })
-                }
-            })
+                })
         }
     })
 }
