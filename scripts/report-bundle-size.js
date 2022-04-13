@@ -8,9 +8,9 @@ const childProc = require('child_process')
  * Send bundle size stats to Datadog
  */
 const main = () => {
-    const pwaStats = require(path.join(path.resolve(''), 'packages', 'pwa', 'build', 'stats.json'))
+    const retailReactAppStats = require(path.join(path.resolve(''), 'packages', 'template-retail-react-app', 'build', 'stats.json'))
 
-    const bundles = pwaStats.assets
+    const bundles = retailReactAppStats.assets
     bundles.forEach((bundle) => {
         const metric = `mobify_platform_sdks.bundle_size_byte`
         const value = bundle.size
