@@ -17,8 +17,8 @@ const main = () => {
                 // bundle report stats files are name as `*-analyzer-stats.json`
                 if (file.includes('-analyzer-stats.json')) {
                     console.log(`Analyzer stats json file found:`, file)
-                    const pwaStats = require(path.join(path.resolve(''), 'packages', 'pwa', 'build', file))
-                    const bundles = pwaStats.assets
+                    const retailReactAppStats = require(path.join(path.resolve(''), 'packages', 'pwa', 'build', file))
+                    const bundles = retailReactAppStats.assets
                     bundles.forEach((bundle) => {
                         const metric = `mobify_platform_sdks.bundle_size_byte`
                         const value = bundle.size

@@ -230,8 +230,7 @@ const client =
                     ...config.plugins,
                     new LoadablePlugin({writeToDisk: true}),
                     analyzeBundle && getBundleAnalyzerPlugin('main')
-                ].filter(Boolean),
-                // Hide the performance hints, since we already have a similar `bundlesize` check in `pwa` package
+                ].filter(Boolean),                // Hide the performance hints, since we already have a similar `bundlesize` check in `template-retail-react-app` package
                 performance: {
                     hints: false
                 }
