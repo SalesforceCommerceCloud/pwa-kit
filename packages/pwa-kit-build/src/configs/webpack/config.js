@@ -44,7 +44,7 @@ const getBundleAnalyzerPlugin = (name = 'report', pluginOptions) =>
         generateStatsFile: true,
         reportFilename: `${name}.html`,
         reportTitle: `${name} bundle analysis result`,
-        statsFilename: `${name}.json`,
+        statsFilename: `${name}-analyzer-stats.json`,
         ...pluginOptions
     })
 
@@ -254,7 +254,10 @@ const clientOptional = baseConfig('web')
                 ...optional('core-polyfill', resolve(projectDir, 'node_modules', 'core-js')),
                 ...optional('fetch-polyfill', resolve(projectDir, 'node_modules', 'whatwg-fetch'))
             },
-            plugins: [analyzeBundle && getBundleAnalyzerPlugin('client-optional')].filter(Boolean)
+            plugins: [
+                ...config.plugins,
+                analyzeBundle && getBundleAnalyzerPlugin('client-optional')
+            ].filter(Boolean)
         }
     })
     .build()
@@ -321,7 +324,10 @@ const ssr = (() => {
                         filename: 'ssr.js',
                         libraryTarget: 'commonjs2'
                     },
-                    plugins: [analyzeBundle && getBundleAnalyzerPlugin('ssr')].filter(Boolean)
+                    plugins: [
+                        ...config.plugins,
+                        analyzeBundle && getBundleAnalyzerPlugin('ssr')
+                    ].filter(Boolean)
                 }
             })
             .build()
@@ -343,9 +349,10 @@ const requestProcessor =
                     filename: 'request-processor.js',
                     libraryTarget: 'commonjs2'
                 },
-                plugins: [analyzeBundle && getBundleAnalyzerPlugin('request-processor')].filter(
-                    Boolean
-                )
+                plugins: [
+                    ...config.plugins,
+                    analyzeBundle && getBundleAnalyzerPlugin('request-processor')
+                ].filter(Boolean)
             }
         })
         .build()
