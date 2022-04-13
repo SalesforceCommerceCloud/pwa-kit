@@ -29,7 +29,7 @@ const main = () => {
     process.env.CONTEXT = process.cwd()
     program.description(
         [
-            `The Managed Runtime CLI`,
+            `PWA Kit CLI`,
             ``,
             `For more information run a command with the --help flag, eg.`,
             ``,
@@ -43,7 +43,7 @@ const main = () => {
             ``,
             `Usage inside NPM scripts:`,
             ``,
-            `  The pwa-kit-cli CLI is used in NPM scripts so you can conveniently`,
+            `  The PWA Kit CLI is used in NPM scripts so you can conveniently`,
             `  run eg. 'npm run push' to push a bundle from a project.`,
             ``,
             `  To pass args to pwa-kit-cli when wrapped in an NPM script, separate them`,
