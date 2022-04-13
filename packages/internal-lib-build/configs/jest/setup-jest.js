@@ -7,6 +7,7 @@
 
 import 'raf/polyfill' // fix requestAnimationFrame issue with polyfill
 import fetch from 'jest-fetch-mock'
+import 'regenerator-runtime/runtime'
 
 // Mock Fetch
 global.fetch = fetch
