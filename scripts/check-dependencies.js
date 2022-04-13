@@ -17,10 +17,10 @@
  *      and moving devDependencies to the root. We could never get this to work
  *      with packages that depend on each other within the monorepo.
  *
- *   2. When we generate a project we want to be able to make a copy of the pwa
- *      package and give it to an end-user as a starting point. This is *much* easier
- *      to do if that package doesn't have "secret" dependencies on libraries installed
- *      at the root that aren't explicitly listed in the pwa's package.json.
+ *   2. When we generate a project we want to be able to make a copy of the 
+ *      template-retail-react-app package and give it to an end-user as a starting point.
+ *      This is *much* easier to do if that package doesn't have "secret" dependencies on
+ *      libraries installed at the root that aren't explicitly listed in the pwa's package.json.
  *
  * Think carefully about those choices before making a change to this setup.
  */
@@ -44,9 +44,9 @@ const packagesDir = path.join(rootDir, 'packages')
 const assetsDir = path.join(__dirname, 'assets')
 
 const excludedPackages = [
-    // The 'hello-world' app is explicitly designed to show what
+    // The 'template-express-minimal' app is explicitly designed to show what
     // you can do without our whole toolchain!
-    'hello-world'
+    'template-express-minimal'
 ]
 
 // We are going to copy these files into each package from this script, in order to

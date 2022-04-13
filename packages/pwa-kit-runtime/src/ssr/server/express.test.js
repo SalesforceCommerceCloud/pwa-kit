@@ -12,7 +12,7 @@ import fse from 'fs-extra'
 import {PersistentCache} from '../../utils/ssr-cache'
 import {CachedResponse} from '../../utils/ssr-server'
 import {X_MOBIFY_QUERYSTRING} from './constants'
-import {DevServerFactory} from 'pwa-kit-build/ssr/server/build-dev-server'
+import {DevServerFactory} from 'pwa-kit-cli/ssr/server/build-dev-server'
 
 // Mock static assets (require path is relative to the 'ssr' directory)
 const mockStaticAssets = {}
@@ -153,7 +153,7 @@ describe('createApp validates the options object', () => {
             faviconPath: 'nosuchfile.ico'
         })
 
-        const sandbox = sinon.sandbox.create()
+        const sandbox = sinon.createSandbox()
         const warn = sandbox.spy(console, 'warn')
 
         RemoteServerFactory.createApp(options)
@@ -190,7 +190,7 @@ describe('createApp validates environment variables', () => {
 
 describe('SSRServer operation', () => {
     const savedEnvironment = Object.assign({}, process.env)
-    const sandbox = sinon.sandbox.create()
+    const sandbox = sinon.createSandbox()
     let server
 
     afterEach(() => {
@@ -682,7 +682,7 @@ describe('SSRServer persistent caching', () => {
         }
     }
 
-    const sandbox = sinon.sandbox.create()
+    const sandbox = sinon.createSandbox()
 
     let app, route
 

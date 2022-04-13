@@ -53,14 +53,14 @@ sh.set('-e')
 
 const GENERATED_PROJECT_VERSION = '0.0.1'
 
-const HELLO_WORLD_TEST_PROJECT = 'hello-world-test-project'
-const HELLO_WORLD = 'hello-world'
+const EXPRESS_MINIMAL_TEST_PROJECT = 'express-minimal-test-project'
+const EXPRESS_MINIMAL = 'express-minimal'
 const TEST_PROJECT = 'test-project' // TODO: This will be replaced with the `isomorphic-client` config.
 const RETAIL_REACT_APP_DEMO = 'retail-react-app-demo'
 const RETAIL_REACT_APP = 'retail-react-app'
 
-const PRIVATE_PRESETS = [TEST_PROJECT, HELLO_WORLD, HELLO_WORLD_TEST_PROJECT]
-const PUBLIC_PRESETS = [RETAIL_REACT_APP_DEMO, RETAIL_REACT_APP]
+const PRIVATE_PRESETS = [TEST_PROJECT, EXPRESS_MINIMAL_TEST_PROJECT]
+const PUBLIC_PRESETS = [RETAIL_REACT_APP_DEMO, RETAIL_REACT_APP, EXPRESS_MINIMAL]
 const PRESETS = PRIVATE_PRESETS.concat(PUBLIC_PRESETS)
 
 const DEFAULT_OUTPUT_DIR = p.join(process.cwd(), 'pwa-kit-starter-project')
@@ -130,7 +130,7 @@ const runGenerator = (answers, {outputDir}) => {
         }
     })
 
-    extractTemplate('pwa', outputDir)
+    extractTemplate('template-retail-react-app', outputDir)
 
     const pkgJsonPath = p.resolve(outputDir, 'package.json')
     const pkgJSON = readJson(pkgJsonPath)
@@ -320,7 +320,7 @@ const demoProjectAnswers = () => {
     return buildAnswers(config)
 }
 
-const helloWorldPrompts = () => {
+const expressMinimalPrompts = () => {
     const questions = [
         {
             name: 'projectName',
@@ -331,8 +331,8 @@ const helloWorldPrompts = () => {
     return inquirer.prompt(questions)
 }
 
-const generateHelloWorld = (projectId, {outputDir, verbose}) => {
-    extractTemplate('hello-world', outputDir)
+const generateExpressMinimal = (projectId, {outputDir, verbose}) => {
+    extractTemplate('template-express-minimal', outputDir)
     const pkgJsonPath = p.resolve(outputDir, 'package.json')
     const pkgJSON = readJson(pkgJsonPath)
     const finalPkgData = merge(pkgJSON, {name: projectId})
@@ -401,15 +401,15 @@ const main = (opts) => {
         .then(() => opts.preset || process.env.GENERATOR_PRESET || presetPrompt())
         .then((preset) => {
             switch (preset) {
-                case HELLO_WORLD_TEST_PROJECT:
-                    return generateHelloWorld({projectId: 'hello-world'}, opts)
-                case HELLO_WORLD:
-                    return helloWorldPrompts(opts).then((answers) => {
+                case EXPRESS_MINIMAL_TEST_PROJECT:
+                    return generateExpressMinimal('express-minimal', opts)
+                case EXPRESS_MINIMAL:
+                    return expressMinimalPrompts(opts).then((answers) => {
                         const projectId = slugifyName(answers.projectName)
                         if (!OUTPUT_DIR_FLAG_ACTIVE) {
                             opts.outputDir = p.join(process.cwd(), projectId)
                         }
-                        generateHelloWorld(projectId, opts)
+                        generateExpressMinimal(projectId, opts)
                         return opts.outputDir
                     })
                 case TEST_PROJECT:
@@ -468,6 +468,12 @@ Examples:
     instance that is used for demo purposes. No questions are asked.
 
     Use this preset to try out PWA Kit.
+
+  ${program.name()} --preset "${EXPRESS_MINIMAL}"
+    Generate a project using a bare-bones express app template.
+    
+    Use this as a starting point for APIs or as a base on top of 
+    which to build new project templates for Managed Runtime. 
   `)
     program
         .option(
@@ -477,7 +483,9 @@ Examples:
         )
         .option(
             '--preset <name>',
-            `The name of a project preset to use (choices: "retail-react-app" "retail-react-app-demo")`
+            `The name of a project preset to use (choices: ${PUBLIC_PRESETS.map(
+                (x) => `"${x}"`
+            ).join(', ')})`
         )
         .option('--verbose', `Print additional logging information to the console.`, false)
 
