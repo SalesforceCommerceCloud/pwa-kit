@@ -36,7 +36,7 @@ const dwSessionIdKey = 'dwsid'
 const REFRESH_TOKEN_COOKIE_AGE = 90 // 90 days. This value matches SLAS cartridge.
 
 /**
- * A  class that provides auth functionality for pwa.
+ * A  class that provides auth functionality for the retail react app.
  */
 const slasCallbackEndpoint = '/callback'
 class Auth {
