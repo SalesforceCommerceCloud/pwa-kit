@@ -219,18 +219,20 @@ const client =
     baseConfig('web')
         .extend(withChunking)
         .extend((config) => {
+            const name = 'client'
             return {
                 ...config,
                 // Must be named "client". See - https://www.npmjs.com/package/webpack-hot-server-middleware#usage
-                name: 'client',
+                name,
                 entry: {
                     main: './app/main'
                 },
                 plugins: [
                     ...config.plugins,
                     new LoadablePlugin({writeToDisk: true}),
-                    analyzeBundle && getBundleAnalyzerPlugin('main')
-                ].filter(Boolean),                // Hide the performance hints, since we already have a similar `bundlesize` check in `template-retail-react-app` package
+                    analyzeBundle && getBundleAnalyzerPlugin(name)
+                ].filter(Boolean),
+                // Hide the performance hints, since we already have a similar `bundlesize` check in `template-retail-react-app` package
                 performance: {
                     hints: false
                 }
