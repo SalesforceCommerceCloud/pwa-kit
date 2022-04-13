@@ -9,11 +9,8 @@ const childProc = require('child_process')
  */
 const main = () => {
     const buildDir = path.resolve('packages', 'template-retail-react-app', 'build')
-    fs.readdir(buildDir, (err, files) => {
-        if (err) {
-            console.error(err)
-            process.exit(1)
-        } else {
+    fs.promises.readdir(buildDir)
+        .then(files => {
             files
                 .filter(file => file.includes('-analyzer-stats.json'))
                 .forEach(file => {
@@ -27,8 +24,11 @@ const main = () => {
                         console.log(`${metric} ${value} --host ${bundle.name}`)
                     })
                 })
-        }
-    })
+        })
+        .catch(err => {
+            console.error(err)
+            process.exit(1)
+        })
 }
 
 main()
