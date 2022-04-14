@@ -200,7 +200,7 @@ const main = () => {
             execSync(
                 `${eslint} --config ${eslintConfig} --resolve-plugins-relative-to ${pkgRoot}${
                     fix ? ' --fix' : ''
-                } ${path}`
+                } "${path}"`
             )
         })
 
@@ -210,7 +210,7 @@ const main = () => {
         .argument('<path>', 'path or glob to format')
         .action((path) => {
             const prettier = p.join(require.resolve('prettier'), '..', '..', '.bin', 'prettier')
-            execSync(`${prettier} --write ${path}`)
+            execSync(`${prettier} --write "${path}"`)
         })
 
     program
