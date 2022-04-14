@@ -130,7 +130,7 @@ const runGenerator = (answers, {outputDir}) => {
         }
     })
 
-    extractTemplate('pwa', outputDir)
+    extractTemplate('template-retail-react-app', outputDir)
 
     const pkgJsonPath = p.resolve(outputDir, 'package.json')
     const pkgJSON = readJson(pkgJsonPath)

@@ -1,12 +1,12 @@
 /*
- * Copyright (c) 2021, salesforce.com, inc.
+ * Copyright (c) 2022, salesforce.com, inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
 const path = require('path')
-const base = require('pwa-kit-build/configs/jest/jest.config.js')
+const base = require('pwa-kit-cli/configs/jest/jest.config.js')
 
 module.exports = {
     ...base,

@@ -1,5 +1,5 @@
 {
-  "name": "pwa-kit-build",
+  "name": "pwa-kit-cli",
   "version": "2.0.0-dev.4",
   "description": "Build tools for pwa-kit",
   "repository": {
@@ -10,7 +10,7 @@
   "author": "dev@mobify.com",
   "main": "dist/index.js",
   "bin": {
-    "mrt": "bin/mrt.js"
+    "pwa-kit-cli": "bin/cli.js"
   },
   "files": [
     "bin",

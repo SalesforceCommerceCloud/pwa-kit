@@ -21,7 +21,7 @@ const mkdtempSync = () => fs.mkdtempSync(p.resolve(os.tmpdir(), 'pwa-template-tm
 const tarPathForPkg = (pkg) => p.resolve(templatesDir, `${pkg}.tar.gz`)
 
 const main = () => {
-    const pkgNames = ['pwa', 'template-express-minimal']
+    const pkgNames = ['template-retail-react-app', 'template-express-minimal']
 
     if (!sh.test('-d', templatesDir)) {
         sh.mkdir('-p', templatesDir)

@@ -4,18 +4,18 @@
     "license": "See license in LICENSE",
     "private": true,
     "devDependencies": {
-        "pwa-kit-build": "^2.0.0-dev.4",
+        "pwa-kit-cli": "^2.0.0-dev.4",
         "pwa-kit-runtime": "^2.0.0-dev.4"
     },
     "scripts": {
-        "test": "mrt test",
-        "format": "mrt format \"**/*.{js,jsx}\"",
-        "lint": "mrt lint \"**/*.{js,jsx}\"",
+        "test": "pwa-kit-cli test",
+        "format": "pwa-kit-cli format \"**/*.{js,jsx}\"",
+        "lint": "pwa-kit-cli lint \"**/*.{js,jsx}\"",
         "lint:fix": "npm run lint -- --fix",
-        "start": "mrt start",
-        "build": "mrt build",
-        "push": "npm run build && mrt push",
-        "save-credentials": "mrt save-credentials"
+        "start": "pwa-kit-cli start",
+        "build": "pwa-kit-cli build",
+        "push": "npm run build && pwa-kit-cli push",
+        "save-credentials": "pwa-kit-cli save-credentials"
     },
     "mobify": {
         "ssrEnabled": true,

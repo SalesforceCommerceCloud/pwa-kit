@@ -36,6 +36,18 @@ if ([production, development].indexOf(mode) < 0) {
     throw new Error(`Invalid mode "${mode}"`)
 }
 
+const getBundleAnalyzerPlugin = (name = 'report', pluginOptions) =>
+    new BundleAnalyzerPlugin({
+        analyzerMode: 'static',
+        defaultSizes: 'gzip',
+        openAnalyzer: CI !== 'true',
+        generateStatsFile: true,
+        reportFilename: `${name}.html`,
+        reportTitle: `${name} bundle analysis result`,
+        statsFilename: `${name}-analyzer-stats.json`,
+        ...pluginOptions
+    })
+
 const entryPointExists = (segments) => {
     for (let ext of ['.js', '.jsx', '.ts', '.tsx']) {
         const p = path.resolve(projectDir, ...segments) + ext
@@ -122,13 +134,6 @@ const baseConfig = (target) => {
                         ['global.GENTLY']: false
                     }),
 
-                    analyzeBundle &&
-                        new BundleAnalyzerPlugin({
-                            analyzerMode: 'static',
-                            defaultSizes: 'gzip',
-                            openAnalyzer: CI !== 'true',
-                            generateStatsFile: true
-                        }),
                     mode === development && new webpack.NoEmitOnErrorsPlugin(),
 
                     createModuleReplacementPlugin(projectDir),
@@ -214,15 +219,20 @@ const client =
     baseConfig('web')
         .extend(withChunking)
         .extend((config) => {
+            const name = 'client'
             return {
                 ...config,
                 // Must be named "client". See - https://www.npmjs.com/package/webpack-hot-server-middleware#usage
-                name: 'client',
+                name,
                 entry: {
                     main: './app/main'
                 },
-                plugins: [...config.plugins, new LoadablePlugin({writeToDisk: true})],
-                // Hide the performance hints, since we already have a similar `bundlesize` check in `pwa` package
+                plugins: [
+                    ...config.plugins,
+                    new LoadablePlugin({writeToDisk: true}),
+                    analyzeBundle && getBundleAnalyzerPlugin(name)
+                ].filter(Boolean),
+                // Hide the performance hints, since we already have a similar `bundlesize` check in `template-retail-react-app` package
                 performance: {
                     hints: false
                 }
@@ -238,13 +248,17 @@ const clientOptional = baseConfig('web')
     .extend((config) => {
         return {
             ...config,
-            name: 'pwa-others',
+            name: 'client-optional',
             entry: {
                 ...optional('loader', './app/loader.js'),
                 ...optional('worker', './worker/main.js'),
                 ...optional('core-polyfill', resolve(projectDir, 'node_modules', 'core-js')),
                 ...optional('fetch-polyfill', resolve(projectDir, 'node_modules', 'whatwg-fetch'))
-            }
+            },
+            plugins: [
+                ...config.plugins,
+                analyzeBundle && getBundleAnalyzerPlugin('client-optional')
+            ].filter(Boolean)
         }
     })
     .build()
@@ -268,7 +282,7 @@ const renderer =
 
                     // Keep this on the slowest-to-build item - the server-side bundle.
                     new WebpackNotifierPlugin({
-                        title: `Mobify Project: ${pkg.name}`,
+                        title: `PWA Kit Project: ${pkg.name}`,
                         excludeWarnings: true,
                         skipFirstNotification: true
                     }),
@@ -289,8 +303,9 @@ const renderer =
                                 noErrorOnMissing: true
                             }
                         ]
-                    })
-                ]
+                    }),
+                    analyzeBundle && getBundleAnalyzerPlugin('server-renderer')
+                ].filter(Boolean)
             }
         })
         .build()
@@ -309,7 +324,11 @@ const ssr = (() => {
                         path: buildDir,
                         filename: 'ssr.js',
                         libraryTarget: 'commonjs2'
-                    }
+                    },
+                    plugins: [
+                        ...config.plugins,
+                        analyzeBundle && getBundleAnalyzerPlugin('ssr')
+                    ].filter(Boolean)
                 }
             })
             .build()
@@ -330,7 +349,11 @@ const requestProcessor =
                     path: buildDir,
                     filename: 'request-processor.js',
                     libraryTarget: 'commonjs2'
-                }
+                },
+                plugins: [
+                    ...config.plugins,
+                    analyzeBundle && getBundleAnalyzerPlugin('request-processor')
+                ].filter(Boolean)
             }
         })
         .build()
