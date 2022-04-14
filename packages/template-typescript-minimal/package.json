@@ -19,8 +19,8 @@
         "react-router-dom": "^5.1.2"
     },
     "scripts": {
-        "format": "pwa-kit-cli format \"**/*.{js,jsx}\"",
-        "lint": "pwa-kit-cli lint \"**/*.{js,jsx}\"",
+        "format": "pwa-kit-cli format \"**/*.{js,jsx,tsx}\"",
+        "lint": "pwa-kit-cli lint \"**/*.{js,jsx,tsx}\"",
         "lint:fix": "npm run lint -- --fix",
         "save-credentials": "pwa-kit-cli save-credentials",
         "start": "pwa-kit-cli start",
