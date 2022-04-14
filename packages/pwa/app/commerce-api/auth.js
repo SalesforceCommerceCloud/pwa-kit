@@ -39,6 +39,15 @@ const EXPIRED_TOKEN = 'EXPIRED_TOKEN'
 const INVALID_TOKEN = 'invalid refresh_token'
 
 /**
+ * Enum for user types
+ * @enum {string}
+ */
+const USER_TYPE = {
+    REGISTERED: 'registered',
+    GUEST: 'guest'
+}
+
+/**
  * A  class that provides auth functionality for pwa.
  */
 const slasCallbackEndpoint = '/callback'
@@ -85,23 +94,16 @@ class Auth {
         this._storage.set(tokenStorageKey, token)
     }
 
-    get refreshToken() {
-        return (
-            this._storage.get(refreshTokenStorageKey) ||
-            this._storage.get(refreshTokenGuestStorageKey)
-        )
+    get userType() {
+        return this._storage.get(refreshTokenStorageKey) ? USER_TYPE.REGISTERED : USER_TYPE.GUEST
     }
 
-    set refreshToken(obj = {}) {
-        const {type, token} = obj
-        if (!type || !token) {
-            throw new Error(
-                'You must set refresh token with an object including keys: type and token.'
-            )
-        }
-        const storeageKey =
-            type === 'registered' ? refreshTokenStorageKey : refreshTokenGuestStorageKey
-        this._storage.set(storeageKey, token, {expires: REFRESH_TOKEN_COOKIE_AGE})
+    get refreshToken() {
+        const storageKey =
+            this.userType === USER_TYPE.REGISTERED
+                ? refreshTokenStorageKey
+                : refreshTokenGuestStorageKey
+        return this._storage.get(storageKey)
     }
 
     get usid() {
@@ -126,6 +128,18 @@ class Auth {
 
     set oid(oid) {
         this._storage.set(oidStorageKey, oid)
+    }
+
+    /**
+     * Save refresh token in designated storage.
+     *
+     * @param {string} token The refresh token.
+     * @param {USER_TYPE} type Type of the user.
+     */
+    _saveRefreshToken(token, type) {
+        const storeageKey =
+            type === USER_TYPE.REGISTERED ? refreshTokenStorageKey : refreshTokenGuestStorageKey
+        this._storage.set(storeageKey, token, {expires: REFRESH_TOKEN_COOKIE_AGE})
     }
 
     /**
@@ -269,9 +283,9 @@ class Auth {
         // we use id_token to distinguish guest and registered users
         if (id_token.length > 0) {
             this.encUserId = enc_user_id
-            this.refreshToken = {type: 'registered', token: refresh_token}
+            this._saveRefreshToken(refresh_token, USER_TYPE.REGISTERED)
         } else {
-            this.refreshToken = {type: 'guest', token: refresh_token}
+            this._saveRefreshToken(refresh_token, USER_TYPE.GUEST)
         }
 
         if (this._onClient) {
