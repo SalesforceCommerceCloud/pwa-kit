@@ -53,7 +53,6 @@
     "internal-lib-build": "^2.0.0-dev.4",
     "nock": "^13.1.1",
     "node-fetch": "2.6.1",
-    "pwa-kit-cli": "^2.0.0-dev.4",
     "s3rver": "^3.1.0",
     "sinon": "^13.0.1",
     "superagent": "^6.1.0",

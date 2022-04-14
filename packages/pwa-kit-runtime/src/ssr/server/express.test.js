@@ -12,7 +12,7 @@ import fse from 'fs-extra'
 import {PersistentCache} from '../../utils/ssr-cache'
 import {CachedResponse} from '../../utils/ssr-server'
 import {X_MOBIFY_QUERYSTRING} from './constants'
-import {DevServerFactory} from 'pwa-kit-cli/ssr/server/build-dev-server'
+// import {DevServerFactory} from 'pwa-kit-cli/ssr/server/build-dev-server'
 
 // Mock static assets (require path is relative to the 'ssr' directory)
 const mockStaticAssets = {}
@@ -996,19 +996,30 @@ describe('generateCacheKey', () => {
 })
 
 describe('getRuntime', () => {
+    // We mock the DevServerFactory because if we include it as a dev dependency then
+    // lerna will detect this as a circular dependecy and display a warning.
     const cases = [
         {
             env: {},
-            expectedRuntime: DevServerFactory,
+            test: (runtime) => {
+                // Not an ideal test, but check for the distinct properties
+                // on a DevServerFactory that a RemoteServerFactory does not have.
+                expect(runtime._getDevServerHostAndPort).toBeDefined()
+                expect(runtime._getDevServerURL).toBeDefined()
+                expect(runtime._getWebpackAsset).toBeDefined()
+            },
             msg: 'when running locally'
         },
         {
             env: {AWS_LAMBDA_FUNCTION_NAME: 'this-makes-it-remote'},
-            expectedRuntime: RemoteServerFactory,
+            test: (runtime) => {
+                expect(runtime).toBe(RemoteServerFactory)
+            },
             msg: 'when running remotely'
         }
     ]
     let originalEnv
+
     beforeEach(() => {
         originalEnv = process.env
     })
@@ -1019,9 +1030,9 @@ describe('getRuntime', () => {
 
     test.each(cases)(
         'should return a remote/development runtime $msg',
-        ({env, expectedRuntime}) => {
+        ({env, test}) => {
             process.env = {...process.env, ...env}
-            expect(getRuntime()).toBe(expectedRuntime)
+            test(getRuntime())
         }
     )
 })
