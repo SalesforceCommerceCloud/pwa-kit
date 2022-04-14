@@ -996,17 +996,26 @@ describe('generateCacheKey', () => {
 })
 
 describe('getRuntime', () => {
-    // We mock the DevServerFactory because if we include it as a dev dependency then
-    // lerna will detect this as a circular dependecy and display a warning.
+    let originalEnv
+    let originalEval = global.eval
+
+    // Mock the DevSeverFactory via `eval` so we don't have to include it as a dev
+    // dependency which will cause circular dependency warnings.
+    const mockEval = () => ({
+        main: {
+            require: () => ({
+                DevServerFactory: {
+                    name: 'MockServerFactory'
+                }
+            })
+        }
+    })
+
     const cases = [
         {
             env: {},
             test: (runtime) => {
-                // Not an ideal test, but check for the distinct properties
-                // on a DevServerFactory that a RemoteServerFactory does not have.
-                expect(runtime._getDevServerHostAndPort).toBeDefined()
-                expect(runtime._getDevServerURL).toBeDefined()
-                expect(runtime._getWebpackAsset).toBeDefined()
+                expect(runtime.name).toEqual('MockServerFactory')
             },
             msg: 'when running locally'
         },
@@ -1018,7 +1027,14 @@ describe('getRuntime', () => {
             msg: 'when running remotely'
         }
     ]
-    let originalEnv
+
+    beforeAll(() => {
+        global.eval = mockEval
+    })
+
+    afterAll(() => {
+        global.eval = originalEval
+    })
 
     beforeEach(() => {
         originalEnv = process.env
