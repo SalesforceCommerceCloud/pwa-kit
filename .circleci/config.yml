@@ -68,7 +68,6 @@ commands:
 
             # Install node dependencies
             npm ci
-            npm ci
       - save_cache:
           key: npm-cache
           paths:

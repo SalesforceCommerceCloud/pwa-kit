@@ -20,5 +20,5 @@ const ciCommand = npmCmd === 'ci'
 // output for too long.
 const commandArgs = ciCommand ? '--ci' : '--no-ci'
 const environmentArgs = ciEnvironment ? '--concurrency 1 --loglevel debug' : ''
-const cmd = `npm run lerna -- bootstrap ${commandArgs} ${environmentArgs}`
+const cmd = `npm run lerna -- bootstrap ${commandArgs} ${environmentArgs} && npm run lerna link --force-local`
 childProc.execSync(cmd, {stdio: 'inherit'})
