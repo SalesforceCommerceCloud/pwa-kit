@@ -29,7 +29,7 @@ import Cookies from 'js-cookie'
 const usidStorageKey = 'usid'
 const encUserIdStorageKey = 'enc-user-id'
 const tokenStorageKey = 'token'
-const refreshTokenStorageKey = 'cc-nx'
+const refreshTokenRegisteredStorageKey = 'cc-nx'
 const refreshTokenGuestStorageKey = 'cc-nx-g'
 const oidStorageKey = 'oid'
 const dwSessionIdKey = 'dwsid'
@@ -95,7 +95,7 @@ class Auth {
     }
 
     get userType() {
-        return this._storage.get(refreshTokenStorageKey)
+        return this._storage.get(refreshTokenRegisteredStorageKey)
             ? Auth.USER_TYPE.REGISTERED
             : Auth.USER_TYPE.GUEST
     }
@@ -103,7 +103,7 @@ class Auth {
     get refreshToken() {
         const storageKey =
             this.userType === Auth.USER_TYPE.REGISTERED
-                ? refreshTokenStorageKey
+                ? refreshTokenRegisteredStorageKey
                 : refreshTokenGuestStorageKey
         return this._storage.get(storageKey)
     }
@@ -139,11 +139,16 @@ class Auth {
      * @param {USER_TYPE} type Type of the user.
      */
     _saveRefreshToken(token, type) {
-        const storageKey =
-            type === Auth.USER_TYPE.REGISTERED
-                ? refreshTokenStorageKey
-                : refreshTokenGuestStorageKey
-        this._storage.set(storageKey, token, {expires: REFRESH_TOKEN_COOKIE_AGE})
+        if (type === Auth.USER_TYPE.REGISTERED) {
+            this._storage.set(refreshTokenRegisteredStorageKey, token, {
+                expires: REFRESH_TOKEN_COOKIE_AGE
+            })
+            this._storage.delete(refreshTokenGuestStorageKey)
+            return
+        }
+
+        this._storage.set(refreshTokenGuestStorageKey, token, {expires: REFRESH_TOKEN_COOKIE_AGE})
+        this._storage.delete(refreshTokenRegisteredStorageKey)
     }
 
     /**
@@ -458,7 +463,7 @@ class Auth {
      */
     _clearAuth() {
         this._storage.delete(tokenStorageKey)
-        this._storage.delete(refreshTokenStorageKey)
+        this._storage.delete(refreshTokenRegisteredStorageKey)
         this._storage.delete(refreshTokenGuestStorageKey)
         this._storage.delete(usidStorageKey)
         this._storage.delete(encUserIdStorageKey)
