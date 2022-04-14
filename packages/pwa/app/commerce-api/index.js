@@ -13,7 +13,7 @@ import OcapiShopperOrders from './ocapi-shopper-orders'
 import {getTenantId, isError, isTokenValid} from './utils'
 import Auth from './auth'
 import EinsteinAPI from './einstein'
-import CustomShopperBaskets from './custom-shopper-baskets'
+import ShopperBaskets from './shopper-baskets'
 
 /**
  * The configuration details for the connecting to the API.
@@ -76,7 +76,7 @@ class CommerceAPI {
                 sendLocale: false
             },
             shopperBaskets: {
-                api: CustomShopperBaskets,
+                api: ShopperBaskets,
                 sendLocale: false,
                 sendCurrency: ['createBasket']
             },
