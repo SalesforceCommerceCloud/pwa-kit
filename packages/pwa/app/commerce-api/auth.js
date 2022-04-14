@@ -39,15 +39,6 @@ const EXPIRED_TOKEN = 'EXPIRED_TOKEN'
 const INVALID_TOKEN = 'invalid refresh_token'
 
 /**
- * Enum for user types
- * @enum {string}
- */
-const USER_TYPE = {
-    REGISTERED: 'registered',
-    GUEST: 'guest'
-}
-
-/**
  * A  class that provides auth functionality for pwa.
  */
 const slasCallbackEndpoint = '/callback'
@@ -79,6 +70,15 @@ class Auth {
     }
 
     /**
+     * Enum for user types
+     * @enum {string}
+     */
+    static USER_TYPE = {
+        REGISTERED: 'registered',
+        GUEST: 'guest'
+    }
+
+    /**
      * Returns the api client configuration
      * @returns {boolean}
      */
@@ -95,12 +95,14 @@ class Auth {
     }
 
     get userType() {
-        return this._storage.get(refreshTokenStorageKey) ? USER_TYPE.REGISTERED : USER_TYPE.GUEST
+        return this._storage.get(refreshTokenStorageKey)
+            ? Auth.USER_TYPE.REGISTERED
+            : Auth.USER_TYPE.GUEST
     }
 
     get refreshToken() {
         const storageKey =
-            this.userType === USER_TYPE.REGISTERED
+            this.userType === Auth.USER_TYPE.REGISTERED
                 ? refreshTokenStorageKey
                 : refreshTokenGuestStorageKey
         return this._storage.get(storageKey)
@@ -138,7 +140,9 @@ class Auth {
      */
     _saveRefreshToken(token, type) {
         const storageKey =
-            type === USER_TYPE.REGISTERED ? refreshTokenStorageKey : refreshTokenGuestStorageKey
+            type === Auth.USER_TYPE.REGISTERED
+                ? refreshTokenStorageKey
+                : refreshTokenGuestStorageKey
         this._storage.set(storageKey, token, {expires: REFRESH_TOKEN_COOKIE_AGE})
     }
 
@@ -283,9 +287,9 @@ class Auth {
         // we use id_token to distinguish guest and registered users
         if (id_token.length > 0) {
             this.encUserId = enc_user_id
-            this._saveRefreshToken(refresh_token, USER_TYPE.REGISTERED)
+            this._saveRefreshToken(refresh_token, Auth.USER_TYPE.REGISTERED)
         } else {
-            this._saveRefreshToken(refresh_token, USER_TYPE.GUEST)
+            this._saveRefreshToken(refresh_token, Auth.USER_TYPE.GUEST)
         }
 
         if (this._onClient) {
@@ -333,7 +337,7 @@ class Auth {
         const {customer_id} = await this.getLoggedInToken(tokenBody)
         const customer = {
             customerId: customer_id,
-            authType: 'registered'
+            authType: Auth.USER_TYPE.REGISTERED
         }
 
         return customer
@@ -388,7 +392,7 @@ class Auth {
 
         // A guest customerId will never return a customer from the customer endpoint
         const customer = {
-            authType: 'guest',
+            authType: Auth.USER_TYPE.GUEST,
             customerId: customer_id
         }
 
@@ -438,12 +442,12 @@ class Auth {
 
         const {id_token, enc_user_id, customer_id} = response
         let customer = {
-            authType: 'guest',
+            authType: Auth.USER_TYPE.GUEST,
             customerId: customer_id
         }
         // Determining if registered customer or guest
         if (id_token.length > 0 && enc_user_id.length > 0) {
-            customer.authType = 'registered'
+            customer.authType = Auth.USER_TYPE.REGISTERED
         }
         return customer
     }
