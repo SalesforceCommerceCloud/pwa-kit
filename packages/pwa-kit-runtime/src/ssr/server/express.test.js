@@ -1028,11 +1028,8 @@ describe('getRuntime', () => {
         process.env = originalEnv
     })
 
-    test.each(cases)(
-        'should return a remote/development runtime $msg',
-        ({env, test}) => {
-            process.env = {...process.env, ...env}
-            test(getRuntime())
-        }
-    )
+    test.each(cases)('should return a remote/development runtime $msg', ({env, test}) => {
+        process.env = {...process.env, ...env}
+        test(getRuntime())
+    })
 })
