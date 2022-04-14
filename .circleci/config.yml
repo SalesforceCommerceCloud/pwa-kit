@@ -68,6 +68,9 @@ commands:
 
             # Install node dependencies
             npm ci
+            
+            # Symlink local dependencies
+            npm run lerna link --force-local
       - save_cache:
           key: npm-cache
           paths:
