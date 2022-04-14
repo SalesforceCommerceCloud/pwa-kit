@@ -137,9 +137,9 @@ class Auth {
      * @param {USER_TYPE} type Type of the user.
      */
     _saveRefreshToken(token, type) {
-        const storeageKey =
+        const storageKey =
             type === USER_TYPE.REGISTERED ? refreshTokenStorageKey : refreshTokenGuestStorageKey
-        this._storage.set(storeageKey, token, {expires: REFRESH_TOKEN_COOKIE_AGE})
+        this._storage.set(storageKey, token, {expires: REFRESH_TOKEN_COOKIE_AGE})
     }
 
     /**
