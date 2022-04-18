@@ -9,7 +9,7 @@
   "description": "Build tools for *libraries* in the monorepo",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/mobify/mobify-platform-sdks.git"
+    "url": "git+https://github.com/SalesforceCommerceCloud/pwa-kit.git"
   },
   "license": "SEE LICENSE IN LICENSE",
   "author": "dev@mobify.com",
