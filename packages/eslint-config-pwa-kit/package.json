@@ -8,7 +8,7 @@
   },
   "license": "SEE LICENSE IN LICENSE",
   "author": "dev@mobify.com",
-  "main": "dist/index.js",
+  "main": "index.js",
   "scripts": {
     "lint": "npm run lint:js",
     "lint:fix": "npm run lint:js -- --fix",
