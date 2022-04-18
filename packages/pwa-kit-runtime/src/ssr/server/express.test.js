@@ -1000,29 +1000,22 @@ describe('getRuntime', () => {
 
     // Mock the DevSeverFactory via `eval` so we don't have to include it as a dev
     // dependency which will cause circular dependency warnings.
+    const MockDevServerFactory = {}
     const mockEval = () => ({
         main: {
-            require: () => ({
-                DevServerFactory: {
-                    name: 'MockServerFactory'
-                }
-            })
+            require: () => ({DevServerFactory: MockDevServerFactory})
         }
     })
 
     const cases = [
         {
             env: {},
-            test: (runtime) => {
-                expect(runtime.name).toEqual('MockServerFactory')
-            },
+            expectedRuntime: MockDevServerFactory,
             msg: 'when running locally'
         },
         {
             env: {AWS_LAMBDA_FUNCTION_NAME: 'this-makes-it-remote'},
-            test: (runtime) => {
-                expect(runtime).toBe(RemoteServerFactory)
-            },
+            expectedRuntime: RemoteServerFactory,
             msg: 'when running remotely'
         }
     ]
@@ -1043,8 +1036,11 @@ describe('getRuntime', () => {
         process.env = originalEnv
     })
 
-    test.each(cases)('should return a remote/development runtime $msg', ({env, test}) => {
-        process.env = {...process.env, ...env}
-        test(getRuntime())
-    })
+    test.each(cases)(
+        'should return a remote/development runtime $msg',
+        ({env, expectedRuntime}) => {
+            process.env = {...process.env, ...env}
+            expect(getRuntime()).toBe(expectedRuntime)
+        }
+    )
 })
