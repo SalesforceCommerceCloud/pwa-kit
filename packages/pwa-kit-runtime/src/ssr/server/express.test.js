@@ -12,7 +12,6 @@ import fse from 'fs-extra'
 import {PersistentCache} from '../../utils/ssr-cache'
 import {CachedResponse} from '../../utils/ssr-server'
 import {X_MOBIFY_QUERYSTRING} from './constants'
-// import {DevServerFactory} from 'pwa-kit-cli/ssr/server/build-dev-server'
 
 // Mock static assets (require path is relative to the 'ssr' directory)
 const mockStaticAssets = {}
