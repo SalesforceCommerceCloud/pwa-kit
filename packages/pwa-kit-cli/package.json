@@ -6,7 +6,7 @@
     "type": "git",
     "url": "git+https://github.com/SalesforceCommerceCloud/pwa-kit.git"
   },
-  "homepage": "https://github.com/SalesforceCommerceCloud/pwa-kit/tree/develop/packages/pwa-kit-create-app#readme",
+  "homepage": "https://github.com/SalesforceCommerceCloud/pwa-kit/tree/develop/packages/pwa-kit-cli#readme",
   "bugs": {
     "url": "https://github.com/SalesforceCommerceCloud/pwa-kit/issues"
   },
