@@ -399,11 +399,13 @@ export default function useBasket(opts = {}) {
              * and delete the previous shopper's basket.
              */
             async mergeBasket() {
+                console.log('Customer', customer.authType, customer.customerId)
                 const response = api.shopperBaskets.mergeBasket({
-                    options: {
-                        parameters: {
-                            createDestinationBasket: true // If the current shopper has an active basket, this parameter is ignored.
-                        }
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    parameters: {
+                        createDestinationBasket: true // If the current shopper has an active basket, this parameter is ignored.
                     }
                 })
 

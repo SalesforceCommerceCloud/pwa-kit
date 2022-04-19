@@ -63,7 +63,6 @@ export const AuthModal = ({
     const handleLogin = async (data) => {
         try {
             await customer.login(data)
-            await basket.mergeBasket()
         } catch (error) {
             const message = /invalid credentials/i.test(error.message)
                 ? formatMessage({
@@ -159,6 +158,7 @@ export const AuthModal = ({
             })
 
             // Execute action to be performed on successful login
+            basket.mergeBasket()
             onLoginSuccess()
         }
 
