@@ -4,8 +4,11 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
+
+require("@rushstack/eslint-patch/modern-module-resolution")
+
 module.exports = {
-    parser: 'babel-eslint',
+    parser: '@babel/eslint-parser',
     parserOptions: {
         ecmaVersion: 2017,
         sourceType: 'module',
@@ -20,7 +23,7 @@ module.exports = {
         jest: true
     },
     extends: ['eslint:recommended', 'plugin:react/recommended', 'prettier', 'prettier/react'],
-    plugins: ['header', 'react', 'prettier'],
+    plugins: ['react', 'prettier'],
     settings: {
         react: {
             version: '16.8'

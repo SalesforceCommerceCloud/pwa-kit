@@ -15,7 +15,9 @@
     "lint:js": "internal-lib-build lint ."
   },
   "dependencies": {
-    "eslint": "7.31.0",
+    "@babel/core": "^7.17.0",
+    "@babel/eslint-parser": "^7.17.0",
+    "@rushstack/eslint-patch": "^1.1.3",
     "eslint-config-prettier": "4.0.0",
     "eslint-import-resolver-webpack": "0.10.0",
     "eslint-plugin-header": "^3.1.1",
@@ -27,8 +29,5 @@
   },
   "peerDependencies": {
     "eslint": "^7.31.0"
-  },
-  "publishConfig": {
-    "directory": "dist"
   }
 }
