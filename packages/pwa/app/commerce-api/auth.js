@@ -265,7 +265,7 @@ class Auth {
                 Authorization: authorization,
                 'Content-Type': `application/x-www-form-urlencoded`
             },
-            parameters: {
+            body: {
                 redirect_uri: `${getAppOrigin()}${slasCallbackEndpoint}`,
                 client_id: this._config.parameters.clientId,
                 code_challenge: codeChallenge,
