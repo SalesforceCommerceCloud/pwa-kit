@@ -25,6 +25,7 @@ const pkg = require(resolve(root, 'package.json'))
 const nodeModules = resolve(root, 'node_modules')
 const appDir = resolve(root, 'app')
 const buildDir = resolve(root, 'build')
+const configDir = resolve(root, 'config')
 
 const production = 'production'
 const development = 'development'
@@ -189,13 +190,15 @@ const common = {
         new CopyPlugin({
             patterns: [
                 {from: 'app/static/', to: 'static/'},
-                {
-                    from: 'config/',
-                    to: 'config/',
-                    globOptions: {
-                        ignore: ['**/local.*']
+                ...[
+                    fs.existsSync(configDir) && {
+                        from: 'config/',
+                        to: 'config/',
+                        globOptions: {
+                            ignore: ['**/local.*']
+                        }
                     }
-                }
+                ].filter(Boolean)
             ]
         }),
 
