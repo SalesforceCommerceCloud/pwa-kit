@@ -18,7 +18,6 @@ import useBasket from '../../commerce-api/hooks/useBasket'
 
 import LoginForm from '../../components/login'
 
-
 const Login = () => {
     const {formatMessage} = useIntl()
 
