@@ -126,6 +126,16 @@ const main = () => {
                     ...process.env
                 }
             })
+
+            // Copy the project `package.json` into the build folder.
+            sh.cp(p.join(process.cwd(), 'package.json'), './build/package.json')
+
+            // Copy config files.
+            const config = p.join(process.cwd(), 'config')
+            if (fs.existsSync(config)) {
+                sh.cp('-R', config, './build')
+            }
+
             // This file is required by MRT, for historical reasons.
             sh.touch('./build/loader.js')
         })
