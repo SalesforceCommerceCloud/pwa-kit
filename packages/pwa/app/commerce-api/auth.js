@@ -269,7 +269,8 @@ class Auth {
                 redirect_uri: `${getAppOrigin()}${slasCallbackEndpoint}`,
                 client_id: this._config.parameters.clientId,
                 code_challenge: codeChallenge,
-                channel_id: this._config.parameters.siteId
+                channel_id: this._config.parameters.siteId,
+                usid: this._usid    // mergeBasket API requires guest usid to be sent in the authToken
             }
         }
 
