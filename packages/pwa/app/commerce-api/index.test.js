@@ -230,13 +230,13 @@ describe('CommerceAPI', () => {
         const _CommerceAPI = require('./index').default
         const api = new _CommerceAPI(apiConfig)
         await api.auth.login()
-        const existingToken = api.auth._authToken
+        const existingToken = api.auth.authToken
         expect(`Bearer ${mockExampleTokenResponse.access_token}`).toEqual(existingToken)
         api.auth._saveAccessToken(mockExampleTokenReponseForRefresh)
         const existingCustomerId = api.auth._customerId
         await api.auth.login()
-        expect(api.auth._authToken).toBeDefined()
-        expect(api.auth._authToken).not.toEqual(mockExampleTokenReponseForRefresh)
+        expect(api.auth.authToken).toBeDefined()
+        expect(api.auth.authToken).not.toEqual(mockExampleTokenReponseForRefresh)
         expect(api.auth._customerId).toEqual(existingCustomerId)
     })
     test('re-authorizes as guest when existing token is expired', async () => {
@@ -246,28 +246,28 @@ describe('CommerceAPI', () => {
         api.auth._saveAccessToken(expiredAuthToken)
         api.auth._saveRefreshToken(mockExampleTokenResponse.refresh_token)
         await api.auth.login()
-        expect(api.auth._authToken).toBeDefined()
-        expect(api.auth._authToken).not.toEqual(expiredAuthToken)
+        expect(api.auth.authToken).toBeDefined()
+        expect(api.auth.authToken).not.toEqual(expiredAuthToken)
         expect(api.auth._customerId).toEqual(existingCustomerId)
     })
 
     test('logs back in as new guest after log out', async () => {
         const api = getAPI()
         await api.auth.login()
-        const existingToken = api.auth._authToken
+        const existingToken = api.auth.authToken
         const existingCustomerId = api.auth._customerId
         expect(existingToken).toBeDefined()
         expect(existingCustomerId).toBeDefined()
         await api.auth.logout()
-        expect(api.auth._authToken).toBeDefined()
-        expect(api.auth._authToken).not.toEqual(mockExampleTokenReponseForRefresh)
+        expect(api.auth.authToken).toBeDefined()
+        expect(api.auth.authToken).not.toEqual(mockExampleTokenReponseForRefresh)
         expect(api.auth._customerId).toBeDefined()
     })
 
     test('clears all auth data upon logout and does not log back in as guest', async () => {
         const api = getAPI()
         await api.auth.login()
-        const existingToken = api.auth._authToken
+        const existingToken = api.auth.authToken
         const existingCustomerId = api.auth._customerId
         expect(existingToken).toBeDefined()
         expect(existingCustomerId).toBeDefined()
@@ -276,13 +276,11 @@ describe('CommerceAPI', () => {
     })
     test('automatically authorizes customer when calling sdk methods', async () => {
         const api = getAPI()
-        api.auth._authToken = undefined
-        api.auth._customerId = undefined
         await Promise.all([
             api.shopperProducts.getProduct({parameters: {id: '10048'}}),
             api.shopperProducts.getProduct({parameters: {id: '10048'}})
         ])
-        expect(api.auth._authToken).toBeDefined()
+        expect(api.auth.authToken).toBeDefined()
         expect(api.auth._customerId).toBeDefined()
     })
     test('calling login while its already pending returns existing promise', () => {
@@ -371,8 +369,8 @@ describe('CommerceAPI', () => {
             examplePKCEVerifier
         )
         await api.auth.getLoggedInToken(tokenBody)
-        expect(api.auth._authToken).toEqual(`Bearer ${mockExampleTokenResponse.access_token}`)
-        expect(api.auth._refreshToken).toEqual(mockExampleTokenResponse.refresh_token)
+        expect(api.auth.authToken).toEqual(`Bearer ${mockExampleTokenResponse.access_token}`)
+        expect(api.auth.refreshToken).toEqual(mockExampleTokenResponse.refresh_token)
     })
     test('saves access token in local storage if window exists', async () => {
         const api = getAPI()
