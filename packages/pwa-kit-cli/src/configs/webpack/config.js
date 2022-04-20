@@ -135,6 +135,7 @@ const baseConfig = (target) => {
                         WEBPACK_TARGET: `'${target}'`,
                         ['global.GENTLY']: false
                     }),
+
                     mode === development && new webpack.NoEmitOnErrorsPlugin(),
 
                     createModuleReplacementPlugin(projectDir),
