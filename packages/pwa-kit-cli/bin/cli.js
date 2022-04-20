@@ -196,9 +196,10 @@ const main = () => {
         .option('--fix', 'Try and fix errors (default: false)')
         .action((path, {fix}) => {
             const eslint = p.join(require.resolve('eslint'), '..', '..', '..', '.bin', 'eslint')
-            const eslintConfig = p.join(__dirname, '..', 'configs', 'eslint', 'eslint-config.js')
+            const eslintConfig = p.resolve('.eslintrc.js')
+
             execSync(
-                `${eslint} --config ${eslintConfig} --resolve-plugins-relative-to ${pkgRoot}${
+                `${eslint} --config ${eslintConfig} ${
                     fix ? ' --fix' : ''
                 } "${path}"`
             )

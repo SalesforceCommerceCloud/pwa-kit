@@ -6,5 +6,5 @@
  */
 
 module.exports = {
-    extends: require.resolve('eslint-config-pwa-kit')
+    extends: 'pwa-kit'
 }
