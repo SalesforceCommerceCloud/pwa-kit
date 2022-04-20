@@ -31,7 +31,6 @@ const Login = () => {
     const submitForm = async (data) => {
         try {
             await customer.login(data)
-            await basket.mergeBasket()
         } catch (error) {
             const message = /invalid credentials/i.test(error.message)
                 ? formatMessage({
@@ -46,6 +45,8 @@ const Login = () => {
     // If customer is registered push to account page
     useEffect(() => {
         if (customer.authType != null && customer.isRegistered) {
+            basket.mergeBasket()
+
             if (location?.state?.directedFrom) {
                 navigate(location.state.directedFrom)
             } else {

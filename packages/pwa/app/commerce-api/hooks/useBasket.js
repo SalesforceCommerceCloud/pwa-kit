@@ -399,7 +399,6 @@ export default function useBasket(opts = {}) {
              * and delete the previous shopper's basket.
              */
             async mergeBasket() {
-                console.log('Customer', customer.authType, customer.customerId)
                 const response = api.shopperBaskets.mergeBasket({
                     headers: {
                         'Content-Type': 'application/json'

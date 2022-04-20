@@ -10,7 +10,6 @@ class ShopperBaskets extends OcapiShopperBaskets {
     }
 
     mergeBasket(args) {
-        console.log("Args" ,args)
         return this.shopperBasketsClient.mergeBasket(args)
     }
 }
