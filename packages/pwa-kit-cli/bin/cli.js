@@ -131,7 +131,7 @@ const main = () => {
             sh.cp(p.resolve('package.json'), './build/package.json')
 
             // Copy config files.
-            const config = p.join(process.cwd(), 'config')
+            const config = p.resolve('config')
             if (fs.existsSync(config)) {
                 sh.cp('-R', config, './build')
             }
