@@ -190,15 +190,13 @@ const common = {
         new CopyPlugin({
             patterns: [
                 {from: 'app/static/', to: 'static/'},
-                ...[
-                    fs.existsSync(configDir) && {
-                        from: 'config/',
-                        to: 'config/',
-                        globOptions: {
-                            ignore: ['**/local.*']
-                        }
-                    }
-                ].filter(Boolean)
+                {
+                    from: 'config/**/*',
+                    globOptions: {
+                        ignore: ['**/local.*']
+                    },
+                    noErrorOnMissing: true
+                }
             ]
         }),
 
