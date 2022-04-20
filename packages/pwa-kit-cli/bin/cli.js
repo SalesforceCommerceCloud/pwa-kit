@@ -128,7 +128,7 @@ const main = () => {
             })
 
             // Copy the project `package.json` into the build folder.
-            sh.cp(p.join(process.cwd(), 'package.json'), './build/package.json')
+            sh.cp(p.resolve('package.json'), './build/package.json')
 
             // Copy config files.
             const config = p.join(process.cwd(), 'config')
