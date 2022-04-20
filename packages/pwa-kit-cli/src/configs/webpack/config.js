@@ -102,8 +102,9 @@ const baseConfig = (target) => {
                     minimize: mode === production
                 },
                 // Always use source map, makes debugging the server much easier.
-                // set to false in develop so the SourceMapDevToolPlugin could take place
-                devtool: mode === development ? false : 'source-map',
+                // Use eval-source-map for server debugging in development mode
+                devtool:
+                    mode === development && target === 'node' ? 'eval-source-map' : 'source-map',
                 output: {
                     publicPath: '',
                     path: buildDir
@@ -134,13 +135,6 @@ const baseConfig = (target) => {
                         WEBPACK_TARGET: `'${target}'`,
                         ['global.GENTLY']: false
                     }),
-
-                    mode === development &&
-                        new webpack.SourceMapDevToolPlugin({
-                            filename: '[name].js.map',
-                            publicPath: 'http://localhost:3000/mobify/bundle/development/',
-                            fileContext: 'build'
-                        }),
                     mode === development && new webpack.NoEmitOnErrorsPlugin(),
 
                     createModuleReplacementPlugin(projectDir),
