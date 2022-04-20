@@ -25,7 +25,6 @@ const pkg = require(resolve(root, 'package.json'))
 const nodeModules = resolve(root, 'node_modules')
 const appDir = resolve(root, 'app')
 const buildDir = resolve(root, 'build')
-const configDir = resolve(root, 'config')
 
 const production = 'production'
 const development = 'development'
@@ -191,6 +190,9 @@ const common = {
             patterns: [
                 {from: 'app/static/', to: 'static/'},
                 {
+                    // Please use glob syntax here. If you use 'config/', it's possible for users
+                    // to run into infinite restarts with their dev server for some reason.
+                    // For more details: https://github.com/SalesforceCommerceCloud/pwa-kit/pull/522
                     from: 'config/**/*',
                     globOptions: {
                         ignore: ['**/local.*']
