@@ -137,12 +137,12 @@ describe('DevServer loading page', () => {
         // Simulate when webpack build is not ready
         app.__webpackReady = () => false
 
-        const middleware = () => {}  // no-op
+        const middleware = () => {} // no-op
         DevServerFactory._useWebpackHotServerMiddleware(app, middleware)
 
         return request(app)
             .get('/')
-            .expect(302)  // Expecting the 302 temporary redirect (not 301)
+            .expect(302) // Expecting the 302 temporary redirect (not 301)
             .then((response) => {
                 expect(response.headers.location).toBe('/__mrt/loading-screen/index.html?loading=1')
             })
