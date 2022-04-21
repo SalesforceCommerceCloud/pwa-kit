@@ -222,7 +222,7 @@ class Auth {
             let authorizationMethod = '_loginAsGuest'
             if (credentials) {
                 authorizationMethod = '_loginWithCredentials'
-            } else if (isTokenValid(this.authToken)) { 
+            } else if (isTokenValid(this.authToken)) {
                 authorizationMethod = '_reuseCurrentLogin'
             } else if (this.refreshToken) {
                 authorizationMethod = '_refreshAccessToken'
@@ -278,7 +278,14 @@ class Auth {
      * @param {object} tokenResponse - access_token,id_token,refresh_token, expires_in,token_type, usid, customer_id, enc_user_id, idp_access_token
      */
     _handleShopperLoginTokenResponse(tokenResponse) {
-        const {access_token, refresh_token, customer_id, usid, enc_user_id, id_token} = tokenResponse
+        const {
+            access_token,
+            refresh_token,
+            customer_id,
+            usid,
+            enc_user_id,
+            id_token
+        } = tokenResponse
         this.authToken = `Bearer ${access_token}`
         this.usid = usid
         this._customerId = customer_id
