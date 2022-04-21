@@ -222,7 +222,7 @@ class Auth {
             let authorizationMethod = '_loginAsGuest'
             if (credentials) {
                 authorizationMethod = '_loginWithCredentials'
-            } else if (isTokenValid(authToken())) { 
+            } else if (isTokenValid(this.authToken)) { 
                 authorizationMethod = '_reuseCurrentLogin'
             } else if (this.refreshToken) {
                 authorizationMethod = '_refreshAccessToken'
@@ -299,7 +299,7 @@ class Auth {
     async _reuseCurrentLogin() {
         // we're reusing the same token so we just need to return the customer object already associated with the token
         const customer = {
-            authType: this.userType(),
+            authType: this.userType,
             customerId: this._customerId
         }
 
