@@ -190,11 +190,14 @@ const common = {
             patterns: [
                 {from: 'app/static/', to: 'static/'},
                 {
-                    from: 'config/',
-                    to: 'config/',
+                    // Please use glob syntax here. If you use 'config/', it's possible for users
+                    // to run into infinite restarts with their dev server for some reason.
+                    // For more details: https://github.com/SalesforceCommerceCloud/pwa-kit/pull/522
+                    from: 'config/**/*',
                     globOptions: {
                         ignore: ['**/local.*']
-                    }
+                    },
+                    noErrorOnMissing: true
                 }
             ]
         }),
