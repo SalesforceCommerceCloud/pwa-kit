@@ -1,8 +1,10 @@
-## v1.5.0-dev (Jan 28, 2022)
+## v1.6.0-dev (Mar 17, 2022)
+## v1.5.0 (Mar 17, 2022)
 
 -   Support storing authentication tokens in cookie [#429](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/429)
 -   Make sure the forgot-password modal also shows up in the checkout flow [#373](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/373)
 -   On Windows, the locale selector dropdown in the footer now showing all of the options properly [#381](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/381)
+-   Import cross-fetch to make OCAPI client isomorphic [#382](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/382)
 -   Multi-site implementation for Retail React App [#391](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/391)
 
 ## v1.4.0 (Jan 27, 2022)
