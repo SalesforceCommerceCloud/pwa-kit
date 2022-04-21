@@ -88,7 +88,7 @@ By default, the Retail App is configured to a single locale, single site project
 The `sites.js` file contains definition of the sites that you have configured in Business Manager. The following example shows configuration for `RefArch` and `RefArchGlobal` sites:
 
 ```js
-\\ /config/sites.js
+// /config/sites.js
 
 module.exports = [
     {
@@ -138,15 +138,17 @@ module.exports = [
 
 Optionally, You can then map the site IDs with aliases in `/config/default.js` file and also set default site. If no alias is defined for the site, then IDs are used in URLs. 
 
-```
-\\ /config/default.js
-   
-   defaultSite: 'RefArchGlobal',
-   siteAliases: {
-       RefArch: 'us',
-       RefArchGlobal: 'global',
-       NTOManaged: 'nto'
-   },
+```js
+// /config/default.js
+module.exports = {
+    defaultSite: 'RefArchGlobal',
+    siteAliases: {
+        RefArch: 'us',
+        RefArchGlobal: 'global',
+        NTOManaged: 'nto'
+    },
+    // the rest of the config
+}
 ```
 
 If you set `url.showDefault` to `true` in `/config/default.js` file, then default locale and site are set in the URL of your Retail app. In addition to site alias, you can also configure aliases for your locale in `sites.js` file. If you configured alias, URL will reflect that instead of your locale ID. 
