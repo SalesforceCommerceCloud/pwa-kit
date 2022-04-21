@@ -130,6 +130,25 @@ describe('DevServer startup', () => {
     })
 })
 
+describe('DevServer loading page', () => {
+    test('requesting homepage would temporarily redirect to the loading page, when build is not ready', async () => {
+        const options = opts()
+        const app = NoWebpackDevServerFactory.createApp(options)
+        // Simulate when webpack build is not ready
+        app.__webpackReady = () => false
+
+        const middleware = () => {}  // no-op
+        DevServerFactory._useWebpackHotServerMiddleware(app, middleware)
+
+        return request(app)
+            .get('/')
+            .expect(302)  // Expecting the 302 temporary redirect (not 301)
+            .then((response) => {
+                expect(response.headers.location).toBe('/__mrt/loading-screen/index.html?loading=1')
+            })
+    })
+})
+
 describe('DevServer request processor support', () => {
     const helloWorld = '<div>hello world</div>'
 
@@ -230,7 +249,7 @@ describe('DevServer request processor support', () => {
     })
 })
 
-describe('DevServer startup', () => {
+describe('DevServer listening on http/https protocol', () => {
     let server
     let originalEnv
 

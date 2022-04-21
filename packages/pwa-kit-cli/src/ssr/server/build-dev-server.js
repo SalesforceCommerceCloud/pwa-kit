@@ -127,8 +127,6 @@ export const DevServerMixin = {
             })
         )
 
-        const middleware = webpackHotServerMiddleware(app.__compiler)
-
         app.get('/worker.js', (req, res) => {
             app.__devMiddleware.waitUntilValid(() => {
                 const compiled = DevServerFactory._getWebpackAsset(req, 'pwa-others', 'worker.js')
@@ -149,13 +147,8 @@ export const DevServerMixin = {
             })
         })
 
-        app.use('/', (req, res, next) => {
-            if (app.__webpackReady()) {
-                middleware(req, res, next)
-            } else {
-                res.redirect('/__mrt/loading-screen/index.html?loading=1')
-            }
-        })
+        const middleware = webpackHotServerMiddleware(app.__compiler)
+        this._useWebpackHotServerMiddleware(app, middleware)
 
         app.use((req, res, next) => {
             const done = () => {
@@ -170,6 +163,16 @@ export const DevServerMixin = {
             res.on('finish', done)
             res.on('close', done)
             next()
+        })
+    },
+
+    _useWebpackHotServerMiddleware(app, middleware) {
+        app.use('/', (req, res, next) => {
+            if (app.__webpackReady()) {
+                middleware(req, res, next)
+            } else {
+                res.redirect('/__mrt/loading-screen/index.html?loading=1')
+            }
         })
     },
 
