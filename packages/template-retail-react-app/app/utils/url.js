@@ -240,7 +240,7 @@ export const removeQueryParamsFromPath = (path, keys) => {
  * url {
  *    locale: "query_param",
  *    site: "path",
- *    showDefault: true
+ *    showDefaults: true
  * }
  *
  *
