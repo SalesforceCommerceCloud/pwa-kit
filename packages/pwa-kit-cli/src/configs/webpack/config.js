@@ -101,10 +101,6 @@ const baseConfig = (target) => {
                 optimization: {
                     minimize: mode === production
                 },
-                // Always use source map, makes debugging the server much easier.
-                // Use eval-source-map for server debugging in development mode
-                devtool:
-                    mode === development && target === 'node' ? 'eval-source-map' : 'source-map',
                 output: {
                     publicPath: '',
                     path: buildDir
@@ -226,6 +222,8 @@ const client =
                 ...config,
                 // Must be named "client". See - https://www.npmjs.com/package/webpack-hot-server-middleware#usage
                 name,
+                // use source map to make debugging easier
+                devtool: mode === development ? 'source-map' : false,
                 entry: {
                     main: './app/main'
                 },
@@ -274,6 +272,9 @@ const renderer =
                 // Must be named "server". See - https://www.npmjs.com/package/webpack-hot-server-middleware#usage
                 name: 'server',
                 entry: 'pwa-kit-react-sdk/ssr/server/react-rendering.js',
+                // use source map to make debugging easier
+                // use eval-source-map for server-side debugging
+                devtool: mode === development ? 'eval-source-map' : false,
                 output: {
                     path: buildDir,
                     filename: 'server-renderer.js',
