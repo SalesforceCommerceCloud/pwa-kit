@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import OcapiShopperBaskets from './ocapi-shopper-baskets'
-import  * as sdk from 'commerce-sdk-isomorphic'
+import * as sdk from 'commerce-sdk-isomorphic'
 
 // This class is an extension to OcapiShopperBaskets class to include basket functions implemented in SCAPI.
 // Current implementation has ShopperBaskets interactiing with OCAPI which misses new functions implemented in newer SCAPI releases.
