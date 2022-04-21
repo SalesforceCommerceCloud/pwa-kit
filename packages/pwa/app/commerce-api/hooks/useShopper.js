@@ -59,6 +59,12 @@ const useShopper = (opts = {}) => {
     }, [customer.authType, basket.loaded])
 
     useEffect(() => {
+        if (customer.authType === 'registered') {
+            basket.mergeBasket()
+        }
+    }, [customer.authType])
+
+    useEffect(() => {
         // Fetch product details for all items in cart
         if (customer.customerId && basket?.basketId) {
             if (basket.itemCount > 0) {

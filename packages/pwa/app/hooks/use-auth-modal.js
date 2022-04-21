@@ -28,7 +28,6 @@ import RegisterForm from '../components/register'
 import {noop} from '../utils/utils'
 import {API_ERROR_MESSAGE} from '../constants'
 import useNavigation from './use-navigation'
-import useBasket from '../commerce-api/hooks/useBasket'
 
 const LOGIN_VIEW = 'login'
 const REGISTER_VIEW = 'register'
@@ -48,7 +47,6 @@ export const AuthModal = ({
     const form = useForm()
     const submittedEmail = useRef()
     const toast = useToast()
-    const basket = useBasket()
 
     const submitForm = async (data) => {
         form.clearErrors()
@@ -63,7 +61,6 @@ export const AuthModal = ({
     const handleLogin = async (data) => {
         try {
             await customer.login(data)
-            await basket.mergeBasket()
         } catch (error) {
             const message = /invalid credentials/i.test(error.message)
                 ? formatMessage({

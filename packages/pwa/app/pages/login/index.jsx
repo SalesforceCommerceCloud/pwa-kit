@@ -14,7 +14,6 @@ import useNavigation from '../../hooks/use-navigation'
 import Seo from '../../components/seo'
 import {useForm} from 'react-hook-form'
 import {useLocation} from 'react-router-dom'
-import useBasket from '../../commerce-api/hooks/useBasket'
 
 import LoginForm from '../../components/login'
 
@@ -25,7 +24,6 @@ const Login = () => {
     const customer = useCustomer()
     const form = useForm()
     const location = useLocation()
-    const basket = useBasket()
 
     const submitForm = async (data) => {
         try {
@@ -44,8 +42,6 @@ const Login = () => {
     // If customer is registered push to account page
     useEffect(() => {
         if (customer.authType != null && customer.isRegistered) {
-            basket.mergeBasket()
-
             if (location?.state?.directedFrom) {
                 navigate(location.state.directedFrom)
             } else {
