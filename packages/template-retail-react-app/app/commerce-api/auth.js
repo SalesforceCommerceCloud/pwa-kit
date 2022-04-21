@@ -39,7 +39,7 @@ const EXPIRED_TOKEN = 'EXPIRED_TOKEN'
 const INVALID_TOKEN = 'invalid refresh_token'
 
 /**
- * A  class that provides auth functionality for pwa.
+ * A  class that provides auth functionality for the retail react app.
  */
 const slasCallbackEndpoint = '/callback'
 class Auth {
