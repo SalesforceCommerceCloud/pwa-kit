@@ -9,7 +9,7 @@
 import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
 import {HTTPError} from 'pwa-kit-react-sdk/ssr/universal/errors'
 import {createCodeVerifier, generateCodeChallenge} from './pkce'
-import {createGetTokenBody} from './utils'
+import {isTokenValid, createGetTokenBody} from './utils'
 import fetch from 'cross-fetch'
 import Cookies from 'js-cookie'
 
@@ -47,6 +47,7 @@ class Auth {
         this._api = api
         this._config = api._config
         this._onClient = typeof window !== 'undefined'
+        this._customerId = undefined
 
         // To store tokens as cookies
         // change the next line to
@@ -221,6 +222,8 @@ class Auth {
             let authorizationMethod = '_loginAsGuest'
             if (credentials) {
                 authorizationMethod = '_loginWithCredentials'
+            } else if (isTokenValid(authToken())) { 
+                authorizationMethod = '_reuseCurrentLogin'
             } else if (this.refreshToken) {
                 authorizationMethod = '_refreshAccessToken'
             }
@@ -275,9 +278,10 @@ class Auth {
      * @param {object} tokenResponse - access_token,id_token,refresh_token, expires_in,token_type, usid, customer_id, enc_user_id, idp_access_token
      */
     _handleShopperLoginTokenResponse(tokenResponse) {
-        const {access_token, refresh_token, usid, enc_user_id, id_token} = tokenResponse
+        const {access_token, refresh_token, customer_id, usid, enc_user_id, id_token} = tokenResponse
         this.authToken = `Bearer ${access_token}`
         this.usid = usid
+        this._customerId = customer_id
 
         // we use id_token to distinguish guest and registered users
         if (id_token.length > 0) {
@@ -290,6 +294,16 @@ class Auth {
         if (this._onClient) {
             sessionStorage.removeItem('codeVerifier')
         }
+    }
+
+    async _reuseCurrentLogin() {
+        // we're reusing the same token so we just need to return the customer object already associated with the token
+        const customer = {
+            authType: this.userType(),
+            customerId: this._customerId
+        }
+
+        return customer
     }
 
     /**
@@ -452,6 +466,7 @@ class Auth {
      * @private
      */
     _clearAuth() {
+        this._customerId = undefined
         this._storage.delete(tokenStorageKey)
         this._storage.delete(refreshTokenRegisteredStorageKey)
         this._storage.delete(refreshTokenGuestStorageKey)
