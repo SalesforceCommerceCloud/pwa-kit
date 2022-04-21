@@ -5,5 +5,6 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 module.exports = {
-    extends: require.resolve('pwa-kit-cli/configs/eslint/eslint-config')
+    root: true,
+    extends: 'pwa-kit'
 }

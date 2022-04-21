@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-require("@rushstack/eslint-patch/modern-module-resolution")
+require('@rushstack/eslint-patch/modern-module-resolution')
 
 module.exports = {
     parser: '@babel/eslint-parser',
@@ -33,5 +33,18 @@ module.exports = {
         'prettier/prettier': ['error'],
         'no-console': 'off',
         'no-unused-vars': ['error', {ignoreRestSiblings: true}]
-    }
+    },
+    overrides: [
+        {
+            files: ['**/*.ts?(x)'],
+            parser: '@typescript-eslint/parser',
+            parserOptions: {
+                sourceType: 'module',
+                ecmaFeatures: {
+                    jsx: true
+                },
+                warnOnUnsupportedTypeScriptVersion: true
+            }
+        }
+    ]
 }
