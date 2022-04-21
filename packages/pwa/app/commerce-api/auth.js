@@ -52,8 +52,8 @@ class Auth {
 
         // To store tokens as cookies
         // change the next line to
-        // this._storage = new CookieStorage()
-        this._storage = new LocalStorage()
+        // this._storage = this._onClient ? new CookieStorage() : new Map()
+        this._storage = this._onClient ? new LocalStorage() : new Map()
         const configOid = api._config.parameters.organizationId
         this._oid = this._storage.get(oidStorageKey) || configOid
 
@@ -408,9 +408,7 @@ class Auth {
      * @param {string} token - A JWT auth token.
      */
     _saveAccessToken(token) {
-        if (this._onClient) {
-            this._storage.set(tokenStorageKey, token)
-        }
+        this._storage.set(tokenStorageKey, token)
     }
 
     /**
@@ -419,9 +417,7 @@ class Auth {
      * @param {string} usid - Unique shopper Id.
      */
     _saveUsid(usid) {
-        if (this._onClient) {
-            this._storage.set(usidStorageKey, usid)
-        }
+        this._storage.set(usidStorageKey, usid)
     }
 
     /**
@@ -430,9 +426,7 @@ class Auth {
      * @param {string} encUserId - Logged in Shopper reference for Einstein API.
      */
     _saveEncUserId(encUserId) {
-        if (this._onClient) {
-            this._storage.set(encUserIdStorageKey, encUserId)
-        }
+        this._storage.set(encUserIdStorageKey, encUserId)
     }
 
     /**
@@ -442,9 +436,7 @@ class Auth {
      */
     _saveOid(oid) {
         this._oid = oid
-        if (this._onClient) {
-            this._storage.set(oidStorageKey, oid)
-        }
+        this._storage.set(oidStorageKey, oid)
     }
 
     /**
@@ -453,14 +445,12 @@ class Auth {
      */
     _clearAuth() {
         this._customerId = undefined
-        if (this._onClient) {
-            this._storage.remove(tokenStorageKey)
-            this._storage.remove(refreshTokenStorageKey)
-            this._storage.remove(refreshTokenGuestStorageKey)
-            this._storage.remove(usidStorageKey)
-            this._storage.remove(encUserIdStorageKey)
-            this._storage.remove(dwSessionIdKey)
-        }
+        this._storage.delete(tokenStorageKey)
+        this._storage.delete(refreshTokenStorageKey)
+        this._storage.delete(refreshTokenGuestStorageKey)
+        this._storage.delete(usidStorageKey)
+        this._storage.delete(encUserIdStorageKey)
+        this._storage.delete(dwSessionIdKey)
     }
 
     /**
@@ -473,13 +463,13 @@ class Auth {
             this._storage.set(refreshTokenStorageKey, refreshToken, {
                 expires: REFRESH_TOKEN_COOKIE_AGE
             })
-            this._storage.remove(refreshTokenGuestStorageKey)
+            this._storage.delete(refreshTokenGuestStorageKey)
             return
         }
         this._storage.set(refreshTokenGuestStorageKey, refreshToken, {
             expires: REFRESH_TOKEN_COOKIE_AGE
         })
-        this._storage.remove(refreshTokenStorageKey)
+        this._storage.delete(refreshTokenStorageKey)
     }
 }
 
@@ -488,7 +478,7 @@ export default Auth
 class Storage {
     set(key, value, options) {}
     get(key) {}
-    remove(key) {}
+    delete(key) {}
 }
 
 class CookieStorage extends Storage {
@@ -507,7 +497,7 @@ class CookieStorage extends Storage {
     get(key) {
         return this._avaliable ? Cookies.get(key) : undefined
     }
-    remove(key) {
+    delete(key) {
         this._avaliable && Cookies.remove(key)
     }
 }
@@ -528,7 +518,7 @@ class LocalStorage extends Storage {
     get(key) {
         return this._avaliable ? window.localStorage.getItem(key) : undefined
     }
-    remove(key) {
+    delete(key) {
         this._avaliable && window.localStorage.removeItem(key)
     }
 }
