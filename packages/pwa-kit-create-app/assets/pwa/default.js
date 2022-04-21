@@ -17,7 +17,7 @@ module.exports = {
             // showDefaults: true
         },
         // The default site for your app. This value will be used when a siteRef could not be determined from the url
-        defaultSite: 'RefArch',
+        defaultSite: '${commerceApi.siteId}',
         // Provide aliases for your sites. These will be used in place of your site id when generating paths throughout the application.
         // siteAliases: {
         //     RefArch: 'us'
@@ -64,11 +64,11 @@ module.exports = {
         ssrFunctionNodeVersion: '14.x',
         proxyConfigs: [
             {
-                host: 'kv7kzm78.api.commercecloud.salesforce.com',
+                host: '${commerceApi.shortCode}.api.commercecloud.salesforce.com',
                 path: 'api'
             },
             {
-                host: 'zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com',
+                host: '${new URL(commerceApi.instanceUrl).hostname}',
                 path: 'ocapi'
             },
             {

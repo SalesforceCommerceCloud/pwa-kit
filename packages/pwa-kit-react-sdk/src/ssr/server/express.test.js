@@ -167,7 +167,7 @@ describe('createApp validates the options object', () => {
             faviconPath: 'nosuchfile.ico'
         })
 
-        const sandbox = sinon.sandbox.create()
+        const sandbox = sinon.createSandbox()
         const warn = sandbox.spy(console, 'warn')
 
         createApp(options)
@@ -238,7 +238,7 @@ const insecureFetch = (url, init) => {
 
 describe('SSRServer operation', () => {
     const savedEnvironment = Object.assign({}, process.env)
-    const sandbox = sinon.sandbox.create()
+    const sandbox = sinon.createSandbox()
     let server
 
     afterEach(() => {
@@ -1125,7 +1125,7 @@ describe('SSRServer persistent caching', () => {
         }
     }
 
-    const sandbox = sinon.sandbox.create()
+    const sandbox = sinon.createSandbox()
 
     let app, route
 
