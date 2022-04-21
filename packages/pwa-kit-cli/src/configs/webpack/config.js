@@ -255,6 +255,8 @@ const clientOptional = baseConfig('web')
                 ...optional('core-polyfill', resolve(projectDir, 'node_modules', 'core-js')),
                 ...optional('fetch-polyfill', resolve(projectDir, 'node_modules', 'whatwg-fetch'))
             },
+            // use source map to make debugging easier
+            devtool: mode === development ? 'source-map' : false,
             plugins: [
                 ...config.plugins,
                 analyzeBundle && getBundleAnalyzerPlugin('client-optional')
@@ -272,7 +274,6 @@ const renderer =
                 // Must be named "server". See - https://www.npmjs.com/package/webpack-hot-server-middleware#usage
                 name: 'server',
                 entry: 'pwa-kit-react-sdk/ssr/server/react-rendering.js',
-                // use source map to make debugging easier
                 // use eval-source-map for server-side debugging
                 devtool: mode === development ? 'eval-source-map' : false,
                 output: {
@@ -353,6 +354,8 @@ const requestProcessor =
                     filename: 'request-processor.js',
                     libraryTarget: 'commonjs2'
                 },
+                // use eval-source-map for server-side debugging
+                devtool: mode === development ? 'eval-source-map' : false,
                 plugins: [
                     ...config.plugins,
                     analyzeBundle && getBundleAnalyzerPlugin('request-processor')
