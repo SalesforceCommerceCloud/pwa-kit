@@ -195,7 +195,8 @@ const main = () => {
         .argument('<path>', 'path or glob to lint')
         .option('--fix', 'Try and fix errors (default: false)')
         .action((path, {fix}) => {
-            const eslint = p.join('.', 'node_modules', '.bin', 'eslint')
+            const eslint = p.join(require.resolve('eslint'), '..', '..', '..', '.bin', 'eslint')
+            console.log('Running Command: ', `${eslint} ${fix ? ' --fix' : ''} "${path}"`)
             execSync(`${eslint} ${fix ? ' --fix' : ''} "${path}"`)
         })
 

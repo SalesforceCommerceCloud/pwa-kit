@@ -7,5 +7,5 @@
 
 module.exports = {
     root: true,
-    extends: 'pwa-kit'
+    extends: ['pwa-kit']
 }
