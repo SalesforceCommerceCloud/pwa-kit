@@ -195,14 +195,8 @@ const main = () => {
         .argument('<path>', 'path or glob to lint')
         .option('--fix', 'Try and fix errors (default: false)')
         .action((path, {fix}) => {
-            const eslint = p.join(require.resolve('eslint'), '..', '..', '..', '.bin', 'eslint')
-            const eslintConfig = p.resolve('.eslintrc.js')
-
-            execSync(
-                `${eslint} --config ${eslintConfig} ${
-                    fix ? ' --fix' : ''
-                } "${path}"`
-            )
+            const eslint = p.join('.', 'node_modules', '.bin', 'eslint')
+            execSync(`${eslint} ${fix ? ' --fix' : ''} "${path}"`)
         })
 
     program
