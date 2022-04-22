@@ -1,3 +1,7 @@
+## v1.5.2 (Apr 22, 2022)
+
+-   Fixed invalid refresh token. [#527](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/527)
+
 ## v1.5.0 (Jan 28, 2022)
 
 -   Support storing authentication tokens in cookie [#429](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/429)
