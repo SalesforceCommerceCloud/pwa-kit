@@ -31,17 +31,18 @@ const existsSync = (path) => {
     }
 }
 
-const clearNulls = (items) => items.filter((item) => item !== null)
-
-const filterOnStat = (pathBuilder, statCondition) => (items) => {
-    const filterStats = (item) =>
-        statAsync(pathBuilder(item))
-            .then((stats) => (statCondition(stats) ? item : null))
-            .catch(() => null)
-    return Promise.resolve()
-        .then(() => items.map(filterStats))
-        .then(Promise.all)
-        .then(clearNulls)
+const filterOnStat = (pathBuilder, statCondition) => async (items) => {
+    const promises = items.map(async (item) => {
+        try {
+            const stats = await statAsync(pathBuilder(item))
+            return statCondition(stats) ? item : null
+        } catch (_) {
+            // Ignoring the error because we only care about valid paths
+            return null
+        }
+    })
+    const results = await Promise.all(promises)
+    return results.filter((item) => item != null)
 }
 
 const filterDirectories = (pathBuilder) => filterOnStat(pathBuilder, (stats) => stats.isDirectory())
