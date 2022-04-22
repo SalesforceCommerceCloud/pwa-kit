@@ -7,11 +7,13 @@
 
 const fs = require('fs')
 
-const readFileAsync = fs.promises.readFile
-const writeFileAsync = fs.promises.writeFile
-const statAsync = fs.promises.stat
-const mkdirAsync = fs.promises.mkdir
-const readdirAsync = fs.promises.readdir
+// TODO: Update tests so that fs.promises can be used directly
+const promisify = require('util').promisify
+const readFileAsync = promisify(fs.readFile)
+const writeFileAsync = promisify(fs.writeFile)
+const statAsync = promisify(fs.stat)
+const mkdirAsync = promisify(fs.mkdir)
+const readdirAsync = promisify(fs.readdir)
 
 const readFile = (path) => readFileAsync(path, 'utf8')
 const writeFile = (path, contents) => writeFileAsync(path, contents, 'utf8')
