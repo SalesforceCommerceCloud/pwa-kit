@@ -222,7 +222,7 @@ class Auth {
             let authorizationMethod = '_loginAsGuest'
             if (credentials) {
                 authorizationMethod = '_loginWithCredentials'
-            } else if (isTokenValid(this.authToken)) {
+            } else if (isTokenValid(this.authToken) && this._customerId) {
                 authorizationMethod = '_reuseCurrentLogin'
             } else if (this.refreshToken) {
                 authorizationMethod = '_refreshAccessToken'
