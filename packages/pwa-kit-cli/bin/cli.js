@@ -16,8 +16,6 @@ const uploadBundle = require('../scripts/upload.js')
 const pkg = require('../package.json')
 const {getConfig} = require('pwa-kit-runtime/utils/ssr-config')
 
-const pkgRoot = p.join(__dirname, '..')
-
 const projectPkg = require(p.join(process.cwd(), 'package.json'))
 
 const execSync = (cmd, opts) => {
@@ -187,17 +185,6 @@ const main = () => {
             uploadBundle(options).catch((err) => {
                 console.error(err.message || err)
             })
-        })
-
-    program
-        .command('lint')
-        .description('lint all source files')
-        .argument('<path>', 'path or glob to lint')
-        .option('--fix', 'Try and fix errors (default: false)')
-        .action((path, {fix}) => {
-            const eslint = p.join(require.resolve('eslint'), '..', '..', '..', '.bin', 'eslint')
-            console.log('Running Command: ', `${eslint} ${fix ? ' --fix' : ''} "${path}"`)
-            execSync(`${eslint} ${fix ? ' --fix' : ''} "${path}"`)
         })
 
     program

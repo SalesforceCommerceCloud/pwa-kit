@@ -11,7 +11,7 @@ import HelloTS from '../components/hello-typescript'
 import HelloJS from '../components/hello-javascript'
 
 interface Props {
-    dadJoke: string
+    dadJoke: any
 }
 
 const style = `

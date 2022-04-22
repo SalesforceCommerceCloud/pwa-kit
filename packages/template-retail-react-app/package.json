@@ -64,7 +64,7 @@
         "compile-translations:pseudo": "formatjs compile --ast app/translations/$npm_package_l10n_defaultLocale.json --out-file app/translations/compiled/en-XB.json --pseudo-locale en-XB",
         "extract-default-translations": "formatjs extract 'app/**/*.{js,jsx}' --out-file app/translations/$npm_package_l10n_defaultLocale.json --id-interpolation-pattern [sha512:contenthash:base64:6]",
         "format": "pwa-kit-cli format \"**/*.{js,jsx}\"",
-        "lint": "pwa-kit-cli lint \"**/*.{js,jsx}\"",
+        "lint": "eslint \"**/*.{js,jsx}\"",
         "lint:fix": "npm run lint -- --fix",
         "build": "npm run build-translations && pwa-kit-cli build",
         "push": "npm run build && pwa-kit-cli push",

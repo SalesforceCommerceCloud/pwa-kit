@@ -43,8 +43,6 @@
     "commander": "^8.3.0",
     "cross-env": "^5.2.0",
     "enzyme": "^3.8.0",
-    "eslint": "7.31.0",
-    "eslint-config-pwa-kit": "^2.0.0-dev.4",
     "jest": "^26.6.3",
     "jest-cli": "^26.6.3",
     "jest-environment-jsdom": "^26.6.2",
@@ -63,7 +61,7 @@
   "scripts": {
     "lint": "npm run lint:js",
     "lint:fix": "npm run lint:js -- --fix",
-    "lint:js": "node ./bin/internal-lib-build.js lint .",
+    "lint:js": "../../node_modules/.bin/eslint .",
     "format": "node ./bin/internal-lib-build.js format \"**/*.{js,jsx}\""
   }
 }
