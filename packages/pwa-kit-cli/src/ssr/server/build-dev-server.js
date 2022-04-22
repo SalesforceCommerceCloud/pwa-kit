@@ -100,6 +100,7 @@ export const DevServerMixin = {
                 console.log(chalk.cyan('First build complete'))
             }, 75)
         })
+        app.__hotServerMiddleware = webpackHotServerMiddleware(app.__compiler)
 
         app.use('/mobify/bundle/development', app.__devMiddleware)
 
@@ -115,7 +116,7 @@ export const DevServerMixin = {
         )
     },
 
-    addSSRRenderer(app) {
+    addStaticAssetServing(app) {
         // Proxy bundle asset requests to the local
         // build directory.
         app.use(
@@ -126,37 +127,9 @@ export const DevServerMixin = {
                 fallthrough: true
             })
         )
+    },
 
-        const middleware = webpackHotServerMiddleware(app.__compiler)
-
-        app.get('/worker.js', (req, res) => {
-            app.__devMiddleware.waitUntilValid(() => {
-                const compiled = DevServerFactory._getWebpackAsset(req, 'pwa-others', 'worker.js')
-                res.type('.js')
-                res.send(compiled)
-            })
-        })
-
-        app.get('/worker.js.map', (req, res) => {
-            app.__devMiddleware.waitUntilValid(() => {
-                const compiled = DevServerFactory._getWebpackAsset(
-                    req,
-                    'pwa-others',
-                    'worker.js.map'
-                )
-                res.type('.js.map')
-                res.send(compiled)
-            })
-        })
-
-        app.use('/', (req, res, next) => {
-            if (app.__webpackReady()) {
-                middleware(req, res, next)
-            } else {
-                res.redirect(301, '/__mrt/loading-screen/index.html?loading=1')
-            }
-        })
-
+    addDevServerGc(app) {
         app.use((req, res, next) => {
             const done = () => {
                 // We collect garbage because when a Lambda environment is
@@ -171,6 +144,30 @@ export const DevServerMixin = {
             res.on('close', done)
             next()
         })
+    },
+
+    serveServiceWorker(req, res) {
+        req.app.__devMiddleware.waitUntilValid(() => {
+            const sourceMap = req.path.endsWith('.map')
+            const file = sourceMap ? 'worker.js.map' : 'worker.js'
+            const type = sourceMap ? '.js.map' : '.js'
+            const content = DevServerFactory._getWebpackAsset(req, 'client-optional', file)
+            if (content === null) {
+                res.sendStatus(404)
+            } else {
+                res.type(type)
+                res.send(content)
+            }
+        })
+    },
+
+    render(req, res, next) {
+        const app = req.app
+        if (app.__webpackReady()) {
+            app.__hotServerMiddleware(req, res, next)
+        } else {
+            res.redirect(301, '/__mrt/loading-screen/index.html?loading=1')
+        }
     },
 
     _getDevServerHostAndPort(options) {

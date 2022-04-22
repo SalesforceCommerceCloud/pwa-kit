@@ -42,7 +42,8 @@ const {handler} = runtime.createHandler(options, (app) => {
 
     app.get('/robots.txt', serveStaticFile('static/robots.txt'))
 
-    runtime.addSSRRenderer(app)
+    app.get('/worker.js*', runtime.serveServiceWorker)
+    app.get('*', runtime.render)
 })
 
 exports.get = handler

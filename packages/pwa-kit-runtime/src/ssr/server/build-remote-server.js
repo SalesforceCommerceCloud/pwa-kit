@@ -214,6 +214,9 @@ export const RemoteServerFactory = {
         // and not a bundle request, so we can apply specific
         // processing.
         this.setupCommonMiddleware(app, options)
+
+        this.addStaticAssetServing(app)
+        this.addDevServerGc(app)
         return app
     },
 
@@ -615,18 +618,94 @@ export const RemoteServerFactory = {
         }
     },
 
-    addSSRRenderer(app) {
-        // See - https://www.npmjs.com/package/webpack-hot-server-middleware#usage
-        const {buildDir} = app.options
-        const _require = eval('require')
-        const serverRenderer = _require(path.join(buildDir, 'server-renderer.js')).default
-        const stats = _require(path.join(buildDir, 'loadable-stats.json'))
+    addStaticAssetServing() {
+        // Handled by the CDN on remote
+    },
 
-        // Only serve worker.js if the user is setting up a server-side
-        // rendered project (assumed to be a PWA).
-        app.get('/worker.js*', serveServiceWorker)
+    addDevServerGc() {
+        // This is a hook for the dev-server. The remote-server
+        // does GC in a way that is awkward to extract. See _createHandler.
+    },
 
-        app.use(serverRenderer(stats))
+    /**
+     * Serve the /worker.js file.
+     *
+     * Unlike other bundle assets, the worker cannot be served from a
+     * bundle path. It must be served at the root of the site, so
+     * that it can control all pages and requests. This presents some
+     * challenges in caching. If we set a long age in the cache-control
+     * header, then CloudFront and/or browsers may continue to use
+     * outdated worker code. If we set a short value, we have to serve
+     * more requests. We cannot solve this by returning a redirect to the
+     * location of the worker file under the bundle path, because redirects
+     * are not valid responses to the request to load a service worker
+     * file for registration.
+     *
+     * The solution is to set a long value for s-maxage (CDN caching), plus
+     * a strong etag (to allow CDN-only revalidation), and to set maxage
+     * to 0 to prevent browser caching.
+     *
+     * See https://developers.google.com/web/updates/2018/06/fresher-sw
+     * for useful background information about how service workers are
+     * cached and updated by browsers.
+     *
+     * The worker file is loaded on-demand, but is not cached in memory. We
+     * do not expect that we will get many requests for it (because it is
+     * cached in the CDN) and the chances of one single Lambda getting multiple
+     * requests for that file are extremely low - so we would never expect to
+     * get a hit for any in-memory caching.
+     *
+     * There is a minor risk of a race condition:
+     * 1. UPWA A starts, using bundle 1, and loads the worker for bundle 1
+     * 2. Bundle 2 is published while UPWA A is running.
+     * 3. UPWA A runs for 24 hours and thus the browser refreshes /worker.js,
+     * getting the worker for bundle 2.
+     *
+     * If the workers for bundles 1 & 2 are incompatible, the UPWA running
+     * bundle 1 might fail. Refreshing the UPWA will fix the issue (because
+     * it will then load all the code for bundle 2).
+     *
+     * This race condition has always been present in our projects.
+     *
+     * @private
+     */
+    serveServiceWorker(req, res) {
+        const options = req.app.options
+        // We apply this cache-control to all responses (200 and 404)
+        res.set(
+            CACHE_CONTROL,
+            // The CDN can cache for 24 hours. The browser may not cache
+            // the file.
+            's-maxage=86400, max-age=0'
+        )
+
+        const workerFilePath = path.join(options.buildDir, req.path)
+
+        // If there is no file, send a 404
+        if (!fs.existsSync(workerFilePath)) {
+            res.status(404).send()
+            return
+        }
+
+        const content = fs.readFileSync(workerFilePath, {encoding: 'utf8'})
+
+        // Serve the file, with a strong ETag
+        res.set('etag', getHashForString(content))
+        res.set(CONTENT_TYPE, 'application/javascript')
+        res.send(content)
+    },
+
+    render(req, res, next) {
+        const app = req.app
+        if (!app.__renderer) {
+            // See - https://www.npmjs.com/package/webpack-hot-server-middleware#usage
+            const {buildDir} = app.options
+            const _require = eval('require')
+            const serverRenderer = _require(path.join(buildDir, 'server-renderer.js')).default
+            const stats = _require(path.join(buildDir, 'loadable-stats.json'))
+            app.__renderer = serverRenderer(stats)
+        }
+        app.__renderer(req, res, next)
     },
 
     /**
@@ -805,74 +884,6 @@ const prepNonProxyRequest = (req, res, next) => {
         }
     }
     next()
-}
-
-/**
- * Serve the /worker.js file.
- *
- * Unlike other bundle assets, the worker cannot be served from a
- * bundle path. It must be served at the root of the site, so
- * that it can control all pages and requests. This presents some
- * challenges in caching. If we set a long age in the cache-control
- * header, then CloudFront and/or browsers may continue to use
- * outdated worker code. If we set a short value, we have to serve
- * more requests. We cannot solve this by returning a redirect to the
- * location of the worker file under the bundle path, because redirects
- * are not valid responses to the request to load a service worker
- * file for registration.
- *
- * The solution is to set a long value for s-maxage (CDN caching), plus
- * a strong etag (to allow CDN-only revalidation), and to set maxage
- * to 0 to prevent browser caching.
- *
- * See https://developers.google.com/web/updates/2018/06/fresher-sw
- * for useful background information about how service workers are
- * cached and updated by browsers.
- *
- * The worker file is loaded on-demand, but is not cached in memory. We
- * do not expect that we will get many requests for it (because it is
- * cached in the CDN) and the chances of one single Lambda getting multiple
- * requests for that file are extremely low - so we would never expect to
- * get a hit for any in-memory caching.
- *
- * There is a minor risk of a race condition:
- * 1. UPWA A starts, using bundle 1, and loads the worker for bundle 1
- * 2. Bundle 2 is published while UPWA A is running.
- * 3. UPWA A runs for 24 hours and thus the browser refreshes /worker.js,
- * getting the worker for bundle 2.
- *
- * If the workers for bundles 1 & 2 are incompatible, the UPWA running
- * bundle 1 might fail. Refreshing the UPWA will fix the issue (because
- * it will then load all the code for bundle 2).
- *
- * This race condition has always been present in our projects.
- *
- * @private
- */
-const serveServiceWorker = (req, res) => {
-    const options = req.app.options
-    // We apply this cache-control to all responses (200 and 404)
-    res.set(
-        CACHE_CONTROL,
-        // The CDN can cache for 24 hours. The browser may not cache
-        // the file.
-        's-maxage=86400, max-age=0'
-    )
-
-    const workerFilePath = path.join(options.buildDir, req.path)
-
-    // If there is no file, send a 404
-    if (!fs.existsSync(workerFilePath)) {
-        res.status(404).send()
-        return
-    }
-
-    const content = fs.readFileSync(workerFilePath, {encoding: 'utf8'})
-
-    // Serve the file, with a strong ETag
-    res.set('etag', getHashForString(content))
-    res.set(CONTENT_TYPE, 'application/javascript')
-    res.send(content)
 }
 
 /**
