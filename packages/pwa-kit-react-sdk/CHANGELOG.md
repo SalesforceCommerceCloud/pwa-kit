@@ -1,7 +1,6 @@
 ## v1.5.2 (Apr 22, 2022)
 
 -   Webpack config no longer assumes that within a project, the `config` directory exists. [#522](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/522)
--   Fixed minor typos in readme and jsdoc. [#531](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/531)
 
 ## v1.5.1 (Mar 31, 2022)
 ## v1.5.0 (Jan 28, 2022)

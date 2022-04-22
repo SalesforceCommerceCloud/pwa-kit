@@ -1,6 +1,7 @@
 ## v1.5.2 (Apr 22, 2022)
 
 -   Fixed invalid refresh token. [#527](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/527)
+-   Fixed minor typos in readme and jsdoc. [#531](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/531)
 
 ## v1.5.0 (Jan 28, 2022)
 
