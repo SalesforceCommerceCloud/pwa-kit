@@ -134,7 +134,7 @@ describe('DevServer loading page', () => {
     test('should redirect to the loading screen with an HTTP 302', async () => {
         const options = opts()
         const app = NoWebpackDevServerFactory.createApp(options)
-        app.use('/', DevServerFactory._onAllRequestsBeforeWebpackReady)
+        app.use('/', DevServerFactory._redirectToLoadingScreen)
 
         return request(app)
             .get('/')

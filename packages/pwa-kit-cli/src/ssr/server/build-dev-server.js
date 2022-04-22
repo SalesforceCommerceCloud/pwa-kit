@@ -153,7 +153,7 @@ export const DevServerMixin = {
             if (app.__webpackReady()) {
                 middleware(req, res, next)
             } else {
-                this._onAllRequestsBeforeWebpackReady(req, res, next)
+                this._redirectToLoadingScreen(req, res, next)
             }
         })
 
@@ -174,7 +174,7 @@ export const DevServerMixin = {
     },
 
     // eslint-disable-next-line no-unused-vars
-    _onAllRequestsBeforeWebpackReady(req, res, next) {
+    _redirectToLoadingScreen(req, res, next) {
         res.redirect('/__mrt/loading-screen/index.html?loading=1')
     },
 
