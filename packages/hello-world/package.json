@@ -1,6 +1,6 @@
 {
     "name": "hello-world",
-    "version": "1.5.1",
+    "version": "1.5.2-alpha.0",
     "license": "See license in LICENSE",
     "private": true,
     "dependencies": {
@@ -21,7 +21,7 @@
         "eslint-plugin-prettier": "3.0.1",
         "eslint-plugin-react": "7.24.0",
         "prettier": "1.18.2",
-        "pwa-kit-react-sdk": "^1.5.1"
+        "pwa-kit-react-sdk": "^1.5.2-alpha.0"
     },
     "scripts": {
         "format": "prettier --write \"**/*.{js,jsx}\"",
