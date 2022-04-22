@@ -131,7 +131,7 @@ describe('DevServer startup', () => {
 })
 
 describe('DevServer loading page', () => {
-    test('requesting homepage would temporarily redirect to the loading page, when build is not ready', async () => {
+    test('should redirect to the loading screen with an HTTP 302', async () => {
         const options = opts()
         const app = NoWebpackDevServerFactory.createApp(options)
         app.use('/', DevServerFactory._onAllRequestsBeforeWebpackReady)
