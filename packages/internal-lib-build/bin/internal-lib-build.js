@@ -38,24 +38,6 @@ const main = () => {
     })
 
     program
-        .command('lint')
-        .argument('<path>', 'path or glob to lint')
-        .option('--fix', 'Try and fix errors (default: false)')
-        .action((path, {fix}) => {
-            const eslint = p.join(binDir, 'eslint')
-            const eslintConfig = p.resolve(p.join(__dirname, '..', 'configs', '.eslintrc.js'))
-
-            console.log('DEBUG: Executing ', `${eslint} --config ${eslintConfig} --resolve-plugins-relative-to ${pkgRoot}${
-                fix ? ' --fix' : ''
-            } "${path}"`)
-            execSync(
-                `${eslint} --config ${eslintConfig} --resolve-plugins-relative-to ${pkgRoot}${
-                    fix ? ' --fix' : ''
-                } "${path}"`
-            )
-        })
-
-    program
         .command('format')
         .argument('<path>', 'path or glob to format')
         .action((path) => {
