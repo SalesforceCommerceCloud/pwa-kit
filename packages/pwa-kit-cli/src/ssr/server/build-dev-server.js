@@ -127,6 +127,8 @@ export const DevServerMixin = {
             })
         )
 
+        const middleware = webpackHotServerMiddleware(app.__compiler)
+
         app.get('/worker.js', (req, res) => {
             app.__devMiddleware.waitUntilValid(() => {
                 const compiled = DevServerFactory._getWebpackAsset(req, 'pwa-others', 'worker.js')
@@ -147,8 +149,13 @@ export const DevServerMixin = {
             })
         })
 
-        const middleware = webpackHotServerMiddleware(app.__compiler)
-        this._useWebpackHotServerMiddleware(app, middleware)
+        app.use('/', (req, res, next) => {
+            if (app.__webpackReady()) {
+                middleware(req, res, next)
+            } else {
+                this._onAllRequestsBeforeWebpackReady(req, res, next)
+            }
+        })
 
         app.use((req, res, next) => {
             const done = () => {
@@ -166,14 +173,9 @@ export const DevServerMixin = {
         })
     },
 
-    _useWebpackHotServerMiddleware(app, middleware) {
-        app.use('/', (req, res, next) => {
-            if (app.__webpackReady()) {
-                middleware(req, res, next)
-            } else {
-                res.redirect('/__mrt/loading-screen/index.html?loading=1')
-            }
-        })
+    // eslint-disable-next-line no-unused-vars
+    _onAllRequestsBeforeWebpackReady(req, res, next) {
+        res.redirect('/__mrt/loading-screen/index.html?loading=1')
     },
 
     _getDevServerHostAndPort(options) {

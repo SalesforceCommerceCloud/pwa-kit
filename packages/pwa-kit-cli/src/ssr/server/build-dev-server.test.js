@@ -134,11 +134,7 @@ describe('DevServer loading page', () => {
     test('requesting homepage would temporarily redirect to the loading page, when build is not ready', async () => {
         const options = opts()
         const app = NoWebpackDevServerFactory.createApp(options)
-        // Simulate when webpack build is not ready
-        app.__webpackReady = () => false
-
-        const middleware = () => {} // no-op
-        DevServerFactory._useWebpackHotServerMiddleware(app, middleware)
+        app.use('/', DevServerFactory._onAllRequestsBeforeWebpackReady)
 
         return request(app)
             .get('/')
