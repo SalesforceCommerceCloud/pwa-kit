@@ -1,0 +1,34 @@
+{
+    "name": "babel-preset-pwa-kit",
+    "version": "2.0.0-dev.4",
+    "description": "Babel preset used by PWA Kit",
+    "repository": {
+      "type": "git",
+      "url": "git+https://github.com/SalesforceCommerceCloud/pwa-kit.git"
+    },
+    "license": "SEE LICENSE IN LICENSE",
+    "author": "dev@mobify.com",
+    "main": "index.js",
+    "scripts": {
+      "lint": "npm run lint:js",
+      "lint:fix": "npm run lint:js -- --fix",
+      "lint:js": "../../node_modules/.bin/eslint \"**/*.{js,jsx}\""
+    },
+    "dependencies": {
+        "@babel/plugin-proposal-object-rest-spread": "^7.4.4",
+        "@babel/plugin-transform-async-to-generator": "^7.7.0",
+        "@babel/plugin-transform-modules-commonjs": "^7.4.4",
+        "@babel/plugin-transform-object-assign": "^7.2.0",
+        "@babel/plugin-transform-runtime": "^7.6.2",
+        "@babel/preset-env": "^7.4.5",
+        "@babel/preset-react": "^7.0.0",
+        "@babel/preset-typescript": "^7.16.0",
+        "@babel/register": "^7.4.4",
+        "@babel/runtime": "^7.7.2",
+        "@babel/runtime-corejs2": "^7.4.5",
+        "@babel/traverse": "^7.5.5",
+        "babel-plugin-dynamic-import-node-babel-7": "^2.0.7",
+        "babel-plugin-formatjs": "10.2.20"
+    }
+  }
+  

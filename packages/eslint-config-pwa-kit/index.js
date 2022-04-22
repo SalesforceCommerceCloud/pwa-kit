@@ -5,46 +5,54 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-require('@rushstack/eslint-patch/modern-module-resolution')
+require("@rushstack/eslint-patch/modern-module-resolution");
 
 module.exports = {
-    parser: '@babel/eslint-parser',
-    parserOptions: {
-        ecmaVersion: 2017,
-        sourceType: 'module',
+  parser: "@babel/eslint-parser",
+  parserOptions: {
+    ecmaVersion: 2017,
+    sourceType: "module",
+    ecmaFeatures: {
+      jsx: true
+    },
+    babelOptions: {
+      presets: ["pwa-kit"]
+    }
+  },
+  env: {
+    es6: true,
+    node: true,
+    browser: true,
+    jest: true
+  },
+  extends: [
+    "eslint:recommended",
+    "plugin:react/recommended",
+    "prettier",
+    "prettier/react"
+  ],
+  plugins: ["header", "react", "prettier"],
+  settings: {
+    react: {
+      version: "16.8"
+    }
+  },
+  rules: {
+    "prettier/prettier": ["error"],
+    "no-console": "off",
+    "no-unused-vars": ["error", { ignoreRestSiblings: true }]
+  },
+  overrides: [
+    {
+      files: ["**/*.ts?(x)"],
+      parser: "@typescript-eslint/parser",
+      parserOptions: {
+        sourceType: "module",
         ecmaFeatures: {
-            jsx: true
-        }
-    },
-    env: {
-        es6: true,
-        node: true,
-        browser: true,
-        jest: true
-    },
-    extends: ['eslint:recommended', 'plugin:react/recommended', 'prettier', 'prettier/react'],
-    plugins: ['header', 'react', 'prettier'],
-    settings: {
-        react: {
-            version: '16.8'
-        }
-    },
-    rules: {
-        'prettier/prettier': ['error'],
-        'no-console': 'off',
-        'no-unused-vars': ['error', {ignoreRestSiblings: true}]
-    },
-    overrides: [
-        {
-            files: ['**/*.ts?(x)'],
-            parser: '@typescript-eslint/parser',
-            parserOptions: {
-                sourceType: 'module',
-                ecmaFeatures: {
-                    jsx: true
-                },
-                warnOnUnsupportedTypeScriptVersion: true
-            }
-        }
-    ]
-}
+          jsx: true
+        },
+        warnOnUnsupportedTypeScriptVersion: true
+      }
+    }
+  ]
+};
