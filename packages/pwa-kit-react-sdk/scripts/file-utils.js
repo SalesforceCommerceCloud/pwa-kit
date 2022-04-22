@@ -32,13 +32,14 @@ const existsSync = (path) => {
 const clearNulls = (items) => items.filter((item) => item !== null)
 
 const filterOnStat = (pathBuilder, statCondition) => (items) => {
-    const filterStats = item => statAsync(pathBuilder(item))
-            .then(stats => statCondition(stats) ? item : null)
-            .catch(() => null);
+    const filterStats = (item) =>
+        statAsync(pathBuilder(item))
+            .then((stats) => (statCondition(stats) ? item : null))
+            .catch(() => null)
     return Promise.resolve()
         .then(() => items.map(filterStats))
         .then(Promise.all)
-        .then(clearNulls);
+        .then(clearNulls)
 }
 
 const filterDirectories = (pathBuilder) => filterOnStat(pathBuilder, (stats) => stats.isDirectory())
