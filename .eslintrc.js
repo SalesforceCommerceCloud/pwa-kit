@@ -5,7 +5,6 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-console.log('Mono Repo ESLint Config!', __dirname)
 module.exports = {
     root: true,
     parser: '@babel/eslint-parser',
@@ -14,6 +13,9 @@ module.exports = {
         sourceType: 'module',
         ecmaFeatures: {
             jsx: true
+        },
+        babelOptions: {
+            configFile: `${__dirname}/babel.config.js`
         }
     },
     env: {

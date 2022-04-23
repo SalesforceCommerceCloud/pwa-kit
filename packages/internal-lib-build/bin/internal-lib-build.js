@@ -17,8 +17,6 @@ const execSync = (cmd, opts) => {
     return _execSync(cmd, {...defaults, ...opts})
 }
 
-const pkgRoot = p.join(__dirname, '..')
-
 const binDir = p.join(require.resolve('@babel/cli'), '..', '..', '..', '.bin')
 
 const main = () => {

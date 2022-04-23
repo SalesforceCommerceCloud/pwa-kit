@@ -20,6 +20,7 @@
         "@testing-library/react": "^11.2.5",
         "@testing-library/react-hooks": "^7.0.2",
         "@testing-library/user-event": "^12.8.1",
+        "babel-preset-pwa-kit": "^2.0.0-dev.4",
         "base64-arraybuffer": "^0.2.0",
         "bundlesize2": "^0.0.30",
         "card-validator": "^8.1.0",

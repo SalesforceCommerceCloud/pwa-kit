@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-const config = function () {
+module.exports = function() {
     return {
         presets: [
             [
@@ -40,8 +40,4 @@ const config = function () {
             }
         }
     }
-}
-
-module.exports = {
-    default: config
 }
