@@ -219,8 +219,8 @@ describe('CommerceAPI', () => {
     test('refreshes existing logged in token', async () => {
         const _CommerceAPI = require('./index').default
         const api = new _CommerceAPI(apiConfig)
-        api.auth._saveAccessToken(mockExampleTokenResponse.access_token)
-        api.auth._saveRefreshToken(mockExampleTokenResponse.refresh_token)
+        api.auth.authToken = mockExampleTokenResponse.access_token
+        api.auth._saveRefreshToken(mockExampleTokenResponse.refresh_token, 'registered')
         const customer = await api.auth.login()
         expect(customer).toBeDefined()
         expect(customer.authType).toEqual('registered')
@@ -230,60 +230,41 @@ describe('CommerceAPI', () => {
         const _CommerceAPI = require('./index').default
         const api = new _CommerceAPI(apiConfig)
         await api.auth.login()
-        const existingToken = api.auth._authToken
+        const existingToken = api.auth.authToken
         expect(`Bearer ${mockExampleTokenResponse.access_token}`).toEqual(existingToken)
-        api.auth._saveAccessToken(mockExampleTokenReponseForRefresh)
-        const existingCustomerId = api.auth._customerId
+        api.auth.authToken = mockExampleTokenReponseForRefresh.access_token
         await api.auth.login()
-        expect(api.auth._authToken).toBeDefined()
-        expect(api.auth._authToken).not.toEqual(mockExampleTokenReponseForRefresh)
-        expect(api.auth._customerId).toEqual(existingCustomerId)
+        expect(api.auth.authToken).toBeDefined()
+        expect(api.auth.authToken).not.toEqual(mockExampleTokenReponseForRefresh)
     })
     test('re-authorizes as guest when existing token is expired', async () => {
         const api = getAPI()
         await api.auth.login()
-        const existingCustomerId = api.auth._customerId
-        api.auth._saveAccessToken(expiredAuthToken)
-        api.auth._saveRefreshToken(mockExampleTokenResponse.refresh_token)
+        api.auth.authToken = expiredAuthToken
+        api.auth._saveRefreshToken(mockExampleTokenResponse.refresh_token, 'registered')
         await api.auth.login()
-        expect(api.auth._authToken).toBeDefined()
-        expect(api.auth._authToken).not.toEqual(expiredAuthToken)
-        expect(api.auth._customerId).toEqual(existingCustomerId)
+        expect(api.auth.authToken).toBeDefined()
+        expect(api.auth.authToken).not.toEqual(expiredAuthToken)
     })
 
     test('logs back in as new guest after log out', async () => {
         const api = getAPI()
         await api.auth.login()
-        const existingToken = api.auth._authToken
-        const existingCustomerId = api.auth._customerId
+        const existingToken = api.auth.authToken
         expect(existingToken).toBeDefined()
-        expect(existingCustomerId).toBeDefined()
         await api.auth.logout()
-        expect(api.auth._authToken).toBeDefined()
-        expect(api.auth._authToken).not.toEqual(mockExampleTokenReponseForRefresh)
-        expect(api.auth._customerId).toBeDefined()
+        expect(api.auth.authToken).toBeDefined()
+        expect(api.auth.authToken).not.toEqual(mockExampleTokenReponseForRefresh)
     })
 
-    test('clears all auth data upon logout and does not log back in as guest', async () => {
-        const api = getAPI()
-        await api.auth.login()
-        const existingToken = api.auth._authToken
-        const existingCustomerId = api.auth._customerId
-        expect(existingToken).toBeDefined()
-        expect(existingCustomerId).toBeDefined()
-        await api.auth.logout()
-        expect(api.auth._customer).not.toEqual(existingCustomerId)
-    })
     test('automatically authorizes customer when calling sdk methods', async () => {
         const api = getAPI()
-        api.auth._authToken = undefined
-        api.auth._customerId = undefined
+        api.auth.authToken = undefined
         await Promise.all([
             api.shopperProducts.getProduct({parameters: {id: '10048'}}),
             api.shopperProducts.getProduct({parameters: {id: '10048'}})
         ])
-        expect(api.auth._authToken).toBeDefined()
-        expect(api.auth._customerId).toBeDefined()
+        expect(api.auth.authToken).toBeDefined()
     })
     test('calling login while its already pending returns existing promise', () => {
         const api = getAPI()
@@ -291,54 +272,6 @@ describe('CommerceAPI', () => {
         const secondPendingLogin = api.auth.login()
         expect(pendingLogin).toEqual(secondPendingLogin)
     })
-    // test('throws error for expired token', async () => {
-    //     jest.doMock('commerce-sdk-isomorphic', () => {
-    //         const sdk = jest.requireActual('commerce-sdk-isomorphic')
-    //         return {
-    //             ...sdk,
-    //             ShopperCustomers: class ShopperCustomersMock {
-    //                 async authorizeCustomer() {
-    //                     return {
-    //                         status: 401,
-    //                         headers: {
-    //                             get: () => null
-    //                         },
-    //                         json: async () => {
-    //                             return {title: 'Expired Token'}
-    //                         }
-    //                     }
-    //                 }
-    //             }
-    //         }
-    //     })
-    //     const _CommerceAPI = require('./index').default
-    //     const api = new _CommerceAPI(apiConfig)
-    //     await expect(api.auth.login()).rejects.toThrow('EXPIRED_TOKEN')
-    // })
-    // test('throws error with detail for >= 400 status', async () => {
-    //     jest.doMock('commerce-sdk-isomorphic', () => {
-    //         const sdk = jest.requireActual('commerce-sdk-isomorphic')
-    //         return {
-    //             ...sdk,
-    //             ShopperCustomers: class ShopperCustomersMock {
-    //                 async authorizeCustomer() {
-    //                     return {
-    //                         status: 401,
-    //                         headers: {
-    //                             get: () => null
-    //                         },
-    //                         json: async () => {
-    //                             return {detail: 'Something went wrong'}
-    //                         }
-    //                     }
-    //                 }
-    //             }
-    //         }
-    //     })
-    //     const _CommerceAPI = require('./index').default
-    //     const api = new _CommerceAPI(apiConfig)
-    //     await expect(api.auth.login()).rejects.toThrow('Something went wrong')
-    // })
     test('createGetTokenBody returns an object that contain the correct parameters', async () => {
         const slasCallbackEndpoint = apiConfig.parameters.slasCallbackEndpoint || '/callback'
         const tokenBody = createGetTokenBody(
@@ -371,12 +304,12 @@ describe('CommerceAPI', () => {
             examplePKCEVerifier
         )
         await api.auth.getLoggedInToken(tokenBody)
-        expect(api.auth._authToken).toEqual(`Bearer ${mockExampleTokenResponse.access_token}`)
-        expect(api.auth._refreshToken).toEqual(mockExampleTokenResponse.refresh_token)
+        expect(api.auth.authToken).toEqual(`Bearer ${mockExampleTokenResponse.access_token}`)
+        expect(api.auth.refreshToken).toEqual(mockExampleTokenResponse.refresh_token)
     })
     test('saves access token in local storage if window exists', async () => {
         const api = getAPI()
-        api.auth._saveAccessToken(mockExampleTokenResponse.access_token)
+        api.auth.authToken = mockExampleTokenResponse.access_token
         expect(api.auth.authToken).toEqual(mockExampleTokenResponse.access_token)
     })
     test('saves refresh token in local storage if window exists', async () => {
@@ -386,12 +319,12 @@ describe('CommerceAPI', () => {
     })
     test('saves encUserId in local storage if window exists', async () => {
         const api = getAPI()
-        api.auth._saveEncUserId(mockExampleTokenResponse.enc_user_id)
+        api.auth.encUserId = mockExampleTokenResponse.enc_user_id
         expect(api.auth.encUserId).toEqual(mockExampleTokenResponse.enc_user_id)
     })
     test('saves usid in local storage if window exists', async () => {
         const api = getAPI()
-        api.auth._saveUsid(mockExampleTokenResponse.usid)
+        api.auth.usid = mockExampleTokenResponse.usid
         expect(api.auth.usid).toEqual(mockExampleTokenResponse.usid)
     })
     test('test onClient is true if window exists', async () => {
