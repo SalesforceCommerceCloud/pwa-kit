@@ -11,7 +11,7 @@ import fetch from 'jest-fetch-mock'
 // It will probably end up living in pwa-kit later on so we may want to
 // deal with it there.
 import {app as appConfig} from '../../config/default'
-import {createGetTokenBody} from './utils'
+import {isTokenValid, createGetTokenBody} from './utils'
 import {generateCodeChallenge, createCodeVerifier} from './pkce'
 import {
     exampleRedirectUrl as mockExampleRedirectUrl,
@@ -27,6 +27,18 @@ import {
 import Auth from './auth'
 
 jest.mock('cross-fetch', () => jest.requireActual('jest-fetch-mock'))
+
+let mockIsTokenValid = jest.fn()
+
+jest.mock('./utils', () => {
+    const original = jest.requireActual('./utils')
+    //mockIsTokenValid = jest.fn()
+    return {
+        ...original,
+        isTokenValid: mockIsTokenValid
+        //isTokenValid: jest.fn().mockReturnValue(true)
+    }
+})
 
 const apiConfig = {
     ...appConfig.commerceAPI,
@@ -226,7 +238,20 @@ describe('CommerceAPI', () => {
         expect(customer.authType).toEqual('registered')
         expect(api.auth.encUserId.length).toBeGreaterThan(0)
     })
+    test('Use same customer if token is valid', async () => {
+        mockIsTokenValid.mockReturnValue(true)
+        //isTokenValid.mockReturnValue(true)
+        const _CommerceAPI = require('./index').default
+        const api = new _CommerceAPI(apiConfig)
+
+        api.auth.authToken = mockExampleTokenReponseForRefresh.access_token
+
+        await api.auth.login()
+        expect(api.auth.authToken).toBeDefined()
+        expect(api.auth.authToken).toEqual(mockExampleTokenReponseForRefresh.access_token)
+    })
     test('refreshes existing token', async () => {
+        mockIsTokenValid.mockReturnValue(false)
         const _CommerceAPI = require('./index').default
         const api = new _CommerceAPI(apiConfig)
         await api.auth.login()
@@ -235,9 +260,10 @@ describe('CommerceAPI', () => {
         api.auth.authToken = mockExampleTokenReponseForRefresh.access_token
         await api.auth.login()
         expect(api.auth.authToken).toBeDefined()
-        expect(api.auth.authToken).not.toEqual(mockExampleTokenReponseForRefresh)
+        expect(api.auth.authToken).not.toEqual(mockExampleTokenReponseForRefresh.access_token)
     })
     test('re-authorizes as guest when existing token is expired', async () => {
+        mockIsTokenValid.mockReturnValue(false)
         const api = getAPI()
         await api.auth.login()
         api.auth.authToken = expiredAuthToken
