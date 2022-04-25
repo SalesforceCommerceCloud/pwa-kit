@@ -66,12 +66,7 @@ const main = () => {
         .action((_, {args}) => {
             const jest = p.join(require.resolve('jest'), '..', '..', '..', '.bin', 'jest')
             execSync(
-                `${jest} --passWithNoTests --maxWorkers=2${
-                    args.length ? ' ' + args.join(' ') : ''
-                }`,
-                {
-                    env: {...process.env, NODE_ENV: 'test'}
-                }
+                `${jest} --passWithNoTests --maxWorkers=2${args.length ? ' ' + args.join(' ') : ''}`
             )
         })
 
