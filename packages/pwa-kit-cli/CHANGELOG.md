@@ -1,4 +1,7 @@
 ## v2.0.0-dev.4 (Apr 06, 2022)
+
+-   Loading page: avoid seeing infinite reloads [#532](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/532)
+
 ## v2.0.0-dev.3 (Apr 01, 2022)
 ## v2.0.0-dev.2 (Feb 10, 2022)
 

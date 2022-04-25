@@ -153,7 +153,7 @@ export const DevServerMixin = {
             if (app.__webpackReady()) {
                 middleware(req, res, next)
             } else {
-                res.redirect(301, '/__mrt/loading-screen/index.html?loading=1')
+                this._redirectToLoadingScreen(req, res, next)
             }
         })
 
@@ -171,6 +171,11 @@ export const DevServerMixin = {
             res.on('close', done)
             next()
         })
+    },
+
+    // eslint-disable-next-line no-unused-vars
+    _redirectToLoadingScreen(req, res, next) {
+        res.redirect('/__mrt/loading-screen/index.html?loading=1')
     },
 
     _getDevServerHostAndPort(options) {
