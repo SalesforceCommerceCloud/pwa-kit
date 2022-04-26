@@ -398,7 +398,7 @@ export default function useBasket(opts = {}) {
              * Merge data from the previous shopper's basket into the current shopper's active basket
              * and delete the previous shopper's basket.
              */
-             async mergeBasket() {
+            async mergeBasket() {
                 const response = api.shopperBaskets.mergeBasket({
                     headers: {
                         'Content-Type': 'application/json'

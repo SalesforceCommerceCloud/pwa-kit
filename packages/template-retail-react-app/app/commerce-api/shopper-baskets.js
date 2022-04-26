@@ -19,5 +19,4 @@ class ShopperBaskets extends OcapiShopperBaskets {
         return this.shopperBasketsClient.mergeBasket(args)
     }
 }
-
 export default ShopperBaskets
