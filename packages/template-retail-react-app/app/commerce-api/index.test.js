@@ -227,10 +227,8 @@ describe('CommerceAPI', () => {
         expect(api.auth.encUserId.length).toBeGreaterThan(0)
     })
     test('Use same customer if token is valid', async () => {
-        // mockIsTokenValid.mockReturnValue(true)
         const Utils = require('./utils')
         jest.spyOn(Utils, 'isTokenValid').mockReturnValue(true)
-        //isTokenValid.mockReturnValue(true)
         const _CommerceAPI = require('./index').default
         const api = new _CommerceAPI(apiConfig)
 
