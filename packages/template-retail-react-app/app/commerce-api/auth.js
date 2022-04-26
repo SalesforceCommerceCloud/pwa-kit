@@ -123,7 +123,6 @@ class Auth {
         this._storage.set(cidStorageKey, cid)
     }
 
-
     get encUserId() {
         return this._storage.get(encUserIdStorageKey)
     }
