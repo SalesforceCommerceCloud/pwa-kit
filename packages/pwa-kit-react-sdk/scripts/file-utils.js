@@ -1,27 +1,24 @@
 /*
- * Copyright (c) 2021, salesforce.com, inc.
+ * Copyright (c) 2022, Salesforce, Inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-const Promise = require('bluebird')
 const fs = require('fs')
-const _ = require('lodash')
 
-// Explicitly promisify for more reliable testing
-const readFileAsync = Promise.promisify(fs.readFile)
-const writeFileAsync = Promise.promisify(fs.writeFile)
-const statAsync = Promise.promisify(fs.stat)
-const mkdirAsync = Promise.promisify(fs.mkdir)
-const readdirAsync = Promise.promisify(fs.readdir)
+// TODO: Update tests so that fs.promises can be used directly
+const promisify = require('util').promisify
+const readFileAsync = promisify(fs.readFile)
+const writeFileAsync = promisify(fs.writeFile)
+const statAsync = promisify(fs.stat)
+const mkdirAsync = promisify(fs.mkdir)
+const readdirAsync = promisify(fs.readdir)
 
 const readFile = (path) => readFileAsync(path, 'utf8')
 const writeFile = (path, contents) => writeFileAsync(path, contents, 'utf8')
 
-// Equivalent to:
-// (path) => (contents) => writeFile(path, contents)
-const writeToPath = _.curry(writeFile)
+const writeToPath = (path) => (contents) => writeFile(path, contents)
 
 const mkdirIfNonexistent = (dirname) => statAsync(dirname).catch(() => mkdirAsync(dirname))
 
@@ -34,16 +31,18 @@ const existsSync = (path) => {
     }
 }
 
-const clearNulls = (items) => items.filter((item) => item !== null)
-
-const filterOnStat = (pathBuilder, statCondition) => (items) => {
-    return Promise.map(items, (item) => {
-        return statAsync(pathBuilder(item))
-            .then((stats) => {
-                return statCondition(stats) ? item : null
-            })
-            .catchReturn(null)
-    }).then(clearNulls)
+const filterOnStat = (pathBuilder, statCondition) => async (items) => {
+    const promises = items.map(async (item) => {
+        try {
+            const stats = await statAsync(pathBuilder(item))
+            return statCondition(stats) ? item : null
+        } catch (_) {
+            // Ignoring the error because we only care about valid paths
+            return null
+        }
+    })
+    const results = await Promise.all(promises)
+    return results.filter((item) => item != null)
 }
 
 const filterDirectories = (pathBuilder) => filterOnStat(pathBuilder, (stats) => stats.isDirectory())
