@@ -129,7 +129,7 @@ export const DevServerMixin = {
         )
     },
 
-    addDevServerGc(app) {
+    addDevServerGarbageCollection(app) {
         app.use((req, res, next) => {
             const done = () => {
                 // We collect garbage because when a Lambda environment is

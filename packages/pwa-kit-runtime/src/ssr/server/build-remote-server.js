@@ -216,7 +216,7 @@ export const RemoteServerFactory = {
         this.setupCommonMiddleware(app, options)
 
         this.addStaticAssetServing(app)
-        this.addDevServerGc(app)
+        this.addDevServerGarbageCollection(app)
         return app
     },
 
@@ -622,7 +622,7 @@ export const RemoteServerFactory = {
         // Handled by the CDN on remote
     },
 
-    addDevServerGc() {
+    addDevServerGarbageCollection() {
         // This is a hook for the dev-server. The remote-server
         // does GC in a way that is awkward to extract. See _createHandler.
     },
