@@ -1,17 +1,11 @@
-/*
- * Copyright (c) 2021, salesforce.com, inc.
- * All rights reserved.
- * SPDX-License-Identifier: BSD-3-Clause
- * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
- */
-import React, {useEffect, useState} from 'react'
-import fetch from 'cross-fetch'
+import React, { useEffect, useState } from "react";
+import fetch from "cross-fetch";
 
-import HelloTS from '../components/hello-typescript'
-import HelloJS from '../components/hello-javascript'
+import HelloTS from "../components/hello-typescript";
+import HelloJS from "../components/hello-javascript"
 
 interface Props {
-    dadJoke: string
+  dadJoke: string,
 }
 
 const style = `
@@ -81,62 +75,52 @@ h1 {
 }
 `
 
-const Home = ({dadJoke}: Props) => {
-    const [counter, setCounter] = useState(0)
+const Home = ({ dadJoke }: Props) => {
+  const [counter, setCounter] = useState(0);
 
-    useEffect(() => {
-        const interval = setInterval(() => {
-            setCounter(counter + 1)
-        }, 1000)
-        return () => clearInterval(interval)
-    }, [counter, setCounter])
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCounter(counter + 1);
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [counter, setCounter]);
 
-    return (
-        <div>
-            <style dangerouslySetInnerHTML={{__html: style}} />
-            <div className="loading-screen">
-                <div className="panel title">
-                    <h1>
-                        Typescript
-                        <br />
-                        Support!
-                    </h1>
-                </div>
-                <div className="panel">
-                    <div className="divider"></div>
-                </div>
-                <div className="panel">
-                    <p style={{width: '300px'}} className="fade-in fade-in-0">
-                        <b>This page is written in Typescript</b>
-                        <br />
-                        <br />
-                        Server-side getProps works if this is a joke: &quot;{dadJoke.joke}&quot;
-                        <br />
-                        <br />
-                        Client-side JS works if this counter increments: {counter}
-                        <br />
-                        <br />
-                        <b>You can mix-and-match JS and TS</b>
-                        <br />
-                        <br />
-                        <HelloJS />
-                        &nbsp;
-                        <HelloTS message="it works!" />
-                    </p>
-                </div>
+  return (
+    <div>
+        <style dangerouslySetInnerHTML={{__html: style}} />
+        <div className="loading-screen">
+            <div className="panel title">
+                <h1>Typescript<br/>Support!</h1>
+            </div>
+            <div className="panel">
+                <div className="divider"></div>
+            </div>
+            <div className="panel">
+                <p style={{'width': '300px'}} className="fade-in fade-in-0">
+                    <b>This page is written in Typescript</b><br/><br/>
+
+                    Server-side getProps works if this is a joke: "{dadJoke.joke}"<br/><br/>
+
+                    Client-side JS works if this counter increments: {counter}<br/><br/>
+
+                    <b>You can mix-and-match JS and TS</b><br/><br/>
+                    <HelloJS />&nbsp;
+                    <HelloTS message="it works!" />
+                </p>
             </div>
         </div>
-    )
-}
+    </div>
+  );
+};
 
-Home.getTemplateName = () => 'home'
+Home.getTemplateName = () => "home";
 
-Home.getProps = async () => {
-    const resp = await fetch('https://icanhazdadjoke.com/', {
-        headers: {Accept: 'application/json'}
-    })
-    const data = await resp.json()
-    return {dadJoke: data}
-}
+Home.getProps = async (req, res) => {
+  const resp = await fetch("https://icanhazdadjoke.com/", {
+    headers: { Accept: "application/json" },
+  });
+  const data = await resp.json();
+  return { dadJoke: data };
+};
 
-export default Home
+export default Home;
