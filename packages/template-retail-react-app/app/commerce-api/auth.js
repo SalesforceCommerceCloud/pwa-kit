@@ -27,6 +27,7 @@ import Cookies from 'js-cookie'
  */
 
 const usidStorageKey = 'usid'
+const cidStorageKey = 'cid'
 const encUserIdStorageKey = 'enc-user-id'
 const tokenStorageKey = 'token'
 const refreshTokenRegisteredStorageKey = 'cc-nx'
@@ -47,7 +48,6 @@ class Auth {
         this._api = api
         this._config = api._config
         this._onClient = typeof window !== 'undefined'
-        this._customerId = undefined
 
         // To store tokens as cookies
         // change the next line to
@@ -114,6 +114,15 @@ class Auth {
     set usid(usid) {
         this._storage.set(usidStorageKey, usid)
     }
+
+    get cid() {
+        return this._storage.get(cidStorageKey)
+    }
+
+    set cid(cid) {
+        this._storage.set(cidStorageKey, cid)
+    }
+
 
     get encUserId() {
         return this._storage.get(encUserIdStorageKey)
@@ -288,7 +297,7 @@ class Auth {
         } = tokenResponse
         this.authToken = `Bearer ${access_token}`
         this.usid = usid
-        this._customerId = customer_id
+        this.cid = customer_id
 
         // we use id_token to distinguish guest and registered users
         if (id_token.length > 0) {
@@ -307,7 +316,7 @@ class Auth {
         // we're reusing the same token so we just need to return the customer object already associated with the token
         const customer = {
             authType: this.userType,
-            customerId: this._customerId
+            customerId: this.cid
         }
 
         return customer
@@ -473,11 +482,11 @@ class Auth {
      * @private
      */
     _clearAuth() {
-        this._customerId = undefined
         this._storage.delete(tokenStorageKey)
         this._storage.delete(refreshTokenRegisteredStorageKey)
         this._storage.delete(refreshTokenGuestStorageKey)
         this._storage.delete(usidStorageKey)
+        this._storage.delete(cidStorageKey)
         this._storage.delete(encUserIdStorageKey)
         this._storage.delete(dwSessionIdKey)
     }
