@@ -1,4 +1,10 @@
 #!/usr/bin/env node
+/*
+ * Copyright (c) 2021, salesforce.com, inc.
+ * All rights reserved.
+ * SPDX-License-Identifier: BSD-3-Clause
+ * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
+ */
 /* eslint-env node */
 
 const readline = require('readline')
@@ -28,7 +34,7 @@ if (!fs.existsSync(path.join('node_modules', 'semver'))) {
         '--no-save',
         '--no-package-lock',
         '--ignore-scripts',
-        '--no-audit',
+        '--no-audit'
     ])
 }
 
@@ -36,7 +42,9 @@ const semver = require('semver')
 const requiredNode = pkg.engines.node
 const foundNode = process.version
 const requiredNpm = pkg.engines.npm
-const foundNpm = spawnSync(npm, ['-v']).stdout.toString().trim()
+const foundNpm = spawnSync(npm, ['-v'])
+    .stdout.toString()
+    .trim()
 
 const warnings = []
 
@@ -54,7 +62,7 @@ const blue = (s) => `\x1b[36m${s}\u001b[0m`
 if (warnings.length) {
     const rl = readline.createInterface({
         input: process.stdin,
-        output: process.stdout,
+        output: process.stdout
     })
     console.log(red('Pausing installation...'))
     console.log(

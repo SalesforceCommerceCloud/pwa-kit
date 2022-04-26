@@ -1,4 +1,10 @@
 #!/usr/bin/env node
+/*
+ * Copyright (c) 2021, salesforce.com, inc.
+ * All rights reserved.
+ * SPDX-License-Identifier: BSD-3-Clause
+ * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
+ */
 
 /**
  * Bootstrap all packages, intended to be used as a post-install hook.
@@ -12,7 +18,9 @@ const childProc = require('child_process')
 const ciEnvironment = Boolean(process.env.CI)
 
 // Did the user explicitly invoke `npm ci`?
-const npmCmd = process.env.npm_config_argv ? JSON.parse(process.env.npm_config_argv).original[0] : process.env.npm_command
+const npmCmd = process.env.npm_config_argv
+    ? JSON.parse(process.env.npm_config_argv).original[0]
+    : process.env.npm_command
 const ciCommand = npmCmd === 'ci'
 
 // Note: We reduce concurrency and increase verbosity on CI environments.

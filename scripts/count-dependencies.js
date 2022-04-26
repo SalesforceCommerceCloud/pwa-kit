@@ -1,4 +1,10 @@
 #!/usr/bin/env node
+/*
+ * Copyright (c) 2021, salesforce.com, inc.
+ * All rights reserved.
+ * SPDX-License-Identifier: BSD-3-Clause
+ * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
+ */
 /* eslint-env node */
 
 const sh = require('shelljs')
@@ -25,9 +31,7 @@ const main = (opts) => {
     process.exit(0)
 }
 
-program.description(
-    `Print the count of unique dependencies installed for the package at <path>`
-)
+program.description(`Print the count of unique dependencies installed for the package at <path>`)
 
 program.arguments('<path>')
 

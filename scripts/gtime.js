@@ -1,4 +1,10 @@
 #!/usr/bin/env node
+/*
+ * Copyright (c) 2021, salesforce.com, inc.
+ * All rights reserved.
+ * SPDX-License-Identifier: BSD-3-Clause
+ * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
+ */
 /* eslint-env node */
 
 const childProc = require('child_process')
@@ -26,15 +32,8 @@ const main = () => {
     Object.keys(data).forEach((k) => {
         const metric = `mobify_platform_sdks.${metricName}_${k}`
         const value = parseFloat(data[k])
-        childProc.spawnSync('dog', [
-            'metric',
-            'post',
-            metric,
-            value
-        ])
-        console.log(
-            `dog metric post ${metric} ${value}`
-        )
+        childProc.spawnSync('dog', ['metric', 'post', metric, value])
+        console.log(`dog metric post ${metric} ${value}`)
     })
     process.exit(status)
 }
