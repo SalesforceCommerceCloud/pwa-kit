@@ -88,5 +88,9 @@
         "iOS >= 9.0",
         "Android >= 4.4.4",
         "last 4 ChromeAndroid versions"
-    ]
+    ],
+    "dependencies": {
+        "@peculiar/webcrypto": "^1.3.3",
+        "@testing-library/jest-dom": "^5.16.4"
+    }
 }
