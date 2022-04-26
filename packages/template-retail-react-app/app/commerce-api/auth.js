@@ -314,7 +314,7 @@ class Auth {
                 client_id: this._config.parameters.clientId,
                 code_challenge: codeChallenge,
                 channel_id: this._config.parameters.siteId,
-                usid: this._usid // mergeBasket API requires guest usid to be sent in the authToken
+                usid: this.usid // mergeBasket API requires guest usid to be sent in the authToken
             }
         }
 
