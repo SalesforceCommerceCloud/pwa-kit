@@ -152,6 +152,7 @@ export const DevServerMixin = {
             const type = sourceMap ? '.js.map' : '.js'
             const content = DevServerFactory._getWebpackAsset(req, 'client-optional', file)
             if (content === null) {
+                // Service worker does not exist. Reminder that SW is optional for MRT apps.
                 res.sendStatus(404)
             } else {
                 res.type(type)
