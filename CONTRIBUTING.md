@@ -8,9 +8,14 @@ We welcome contributions to PWA Kit! To ensure that your contributions are addre
 
 This repository is a [monorepo](https://en.wikipedia.org/wiki/Monorepo) that includes the code that powers the PWA Kit. The code is divided into the following packages:
 
--   `pwa`: A set of sample code and tooling for PWA Kit projects called the Retail React App
--   `pwa-kit-create-app`: A tool that generates PWA Kit projects based on the Retail React App
--   `pwa-kit-react-sdk`: A set of components and utilities for PWA Kit projects
+- `template-retail-react-app`: A set of sample code and tooling for PWA Kit projects called the Retail React App
+- `template-express-minimal`: A set of sample code for a minimal express app
+- `template-typescript-minimal`: A set of sample code for a minimal React app that support Typescript 
+- `pwa-kit-create-app`: A tool that generates PWA Kit projects based on the Retail React App
+- `pwa-kit-react-sdk`: A set of components and utilities for PWA Kit projects
+- `pwa-kit-cli`: A set of commands to build PWA Kit projects
+- `internal-lib-build`: A package that contains internal tools for other libraries in the monorepo 
+- `pwa-kit-runtime`: A packages that contains runtime environments code for apps to run in Managed Runtime
 
 ## 📦 Dependencies
 
