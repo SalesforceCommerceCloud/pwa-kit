@@ -83,8 +83,7 @@ export const DevServerMixin = {
     },
 
     addSDKInternalHandlers(app) {
-        // This is separated out from addSSRRenderer because these
-        // routes must not have our SSR middleware applied to them.
+        // This is separated out because these routes must not have our SSR middleware applied to them.
         // But the SSR render function must!
 
         let config = require('../../configs/webpack/config')
