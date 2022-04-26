@@ -12,7 +12,6 @@ import fse from 'fs-extra'
 import {PersistentCache} from '../../utils/ssr-cache'
 import {CachedResponse} from '../../utils/ssr-server'
 import {X_MOBIFY_QUERYSTRING} from './constants'
-import {DevServerFactory} from 'pwa-kit-build/ssr/server/build-dev-server'
 
 // Mock static assets (require path is relative to the 'ssr' directory)
 const mockStaticAssets = {}
@@ -996,10 +995,22 @@ describe('generateCacheKey', () => {
 })
 
 describe('getRuntime', () => {
+    let originalEnv
+    let originalEval = global.eval
+
+    // Mock the DevSeverFactory via `eval` so we don't have to include it as a dev
+    // dependency which will cause circular dependency warnings.
+    const MockDevServerFactory = {}
+    const mockEval = () => ({
+        main: {
+            require: () => ({DevServerFactory: MockDevServerFactory})
+        }
+    })
+
     const cases = [
         {
             env: {},
-            expectedRuntime: DevServerFactory,
+            expectedRuntime: MockDevServerFactory,
             msg: 'when running locally'
         },
         {
@@ -1008,7 +1019,15 @@ describe('getRuntime', () => {
             msg: 'when running remotely'
         }
     ]
-    let originalEnv
+
+    beforeAll(() => {
+        global.eval = mockEval
+    })
+
+    afterAll(() => {
+        global.eval = originalEval
+    })
+
     beforeEach(() => {
         originalEnv = process.env
     })

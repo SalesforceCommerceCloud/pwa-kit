@@ -1,6 +1,6 @@
 {
   "name": "internal-lib-build",
-  "version": "2.0.0-dev.3",
+  "version": "2.0.0-dev.4",
   "engines": {
     "node": "^12.0.0 || ^14.0.0",
     "npm": "^6.14.4 || ^7.0.0 || ^8.0.0"
@@ -9,7 +9,10 @@
   "description": "Build tools for *libraries* in the monorepo",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/mobify/mobify-platform-sdks.git"
+    "url": "git+https://github.com/SalesforceCommerceCloud/pwa-kit.git"
+  },
+  "bugs": {
+    "url": "https://github.com/SalesforceCommerceCloud/pwa-kit/issues"
   },
   "license": "SEE LICENSE IN LICENSE",
   "author": "dev@mobify.com",
@@ -59,6 +62,7 @@
     "jest-fetch-mock": "^2.1.2",
     "prettier": "1.18.2",
     "raf": "^3.4.0",
+    "regenerator-runtime": "^0.13.9",
     "replace-in-file": "^6.2.0",
     "rimraf": "2.6.1",
     "shelljs": "^0.8.4"
