@@ -392,6 +392,27 @@ export default function useBasket(opts = {}) {
                 return api.shopperBaskets.getShippingMethodsForShipment({
                     parameters: {basketId: basket.basketId, shipmentId: 'me'}
                 })
+            },
+
+            /**
+             * Merge data from the previous shopper's basket into the current shopper's active basket
+             * and delete the previous shopper's basket.
+             */
+             async mergeBasket() {
+                const response = api.shopperBaskets.mergeBasket({
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    parameters: {
+                        createDestinationBasket: true // If the current shopper has an active basket, this parameter is ignored.
+                    }
+                })
+
+                if (response.fault) {
+                    throw new Error(response)
+                }
+
+                setBasket(response)
             }
         }
     }, [customer, basket, setBasket])
