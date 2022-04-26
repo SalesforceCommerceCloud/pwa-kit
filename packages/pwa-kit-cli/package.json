@@ -58,6 +58,7 @@
     "babel-loader": "^8.0.6",
     "babel-plugin-dynamic-import-node-babel-7": "^2.0.7",
     "babel-plugin-formatjs": "10.2.20",
+    "babel-preset-pwa-kit": "^2.0.0-dev.4",
     "bluebird": "^3.5.1",
     "chalk": "^4.1.2",
     "commander": "^8.3.0",
@@ -103,6 +104,7 @@
     "internal-lib-build": "^2.0.0-dev.4",
     "nock": "^13.1.1",
     "pwa-kit-runtime": "^2.0.0-dev.4",
+    "regenerator-runtime": "^0.13.9",
     "superagent": "^6.1.0",
     "supertest": "^4.0.2"
   },

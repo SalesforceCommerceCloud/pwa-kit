@@ -151,7 +151,7 @@ const baseConfig = (target) => {
                                 {
                                     loader: findInProjectThenSDK('babel-loader'),
                                     options: {
-                                        rootMode: 'upward',
+                                        presets: ['pwa-kit'],
                                         cacheDirectory: true
                                     }
                                 }

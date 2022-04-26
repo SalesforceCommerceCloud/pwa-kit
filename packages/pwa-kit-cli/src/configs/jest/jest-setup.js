@@ -6,6 +6,7 @@
  */
 import 'raf/polyfill' // fix requestAnimationFrame issue with polyfill
 import '@testing-library/jest-dom/extend-expect'
+import 'regenerator-runtime/runtime'
 import {Crypto} from '@peculiar/webcrypto'
 
 // TextEncoder is a web API, need to import it
