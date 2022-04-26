@@ -630,44 +630,15 @@ export const RemoteServerFactory = {
     /**
      * Serve the /worker.js file.
      *
-     * Unlike other bundle assets, the worker cannot be served from a
-     * bundle path. It must be served at the root of the site, so
-     * that it can control all pages and requests. This presents some
-     * challenges in caching. If we set a long age in the cache-control
-     * header, then CloudFront and/or browsers may continue to use
-     * outdated worker code. If we set a short value, we have to serve
-     * more requests. We cannot solve this by returning a redirect to the
-     * location of the worker file under the bundle path, because redirects
-     * are not valid responses to the request to load a service worker
-     * file for registration.
+     * The service worker must be served at the root of the site and must
+     * not be a redirect. We set a long value for s-maxage (to allow CDN
+     * caching), plus a strong etag (for CDN-only revalidation), and to set
+     * maxage to 0 to prevent browser caching.
      *
-     * The solution is to set a long value for s-maxage (CDN caching), plus
-     * a strong etag (to allow CDN-only revalidation), and to set maxage
-     * to 0 to prevent browser caching.
+     * See https://developer.chrome.com/blog/fresher-sw/ for details on
+     * efficiently serving service workers.
      *
-     * See https://developers.google.com/web/updates/2018/06/fresher-sw
-     * for useful background information about how service workers are
-     * cached and updated by browsers.
-     *
-     * The worker file is loaded on-demand, but is not cached in memory. We
-     * do not expect that we will get many requests for it (because it is
-     * cached in the CDN) and the chances of one single Lambda getting multiple
-     * requests for that file are extremely low - so we would never expect to
-     * get a hit for any in-memory caching.
-     *
-     * There is a minor risk of a race condition:
-     * 1. UPWA A starts, using bundle 1, and loads the worker for bundle 1
-     * 2. Bundle 2 is published while UPWA A is running.
-     * 3. UPWA A runs for 24 hours and thus the browser refreshes /worker.js,
-     * getting the worker for bundle 2.
-     *
-     * If the workers for bundles 1 & 2 are incompatible, the UPWA running
-     * bundle 1 might fail. Refreshing the UPWA will fix the issue (because
-     * it will then load all the code for bundle 2).
-     *
-     * This race condition has always been present in our projects.
-     *
-     * @private
+     *  @private
      */
     serveServiceWorker(req, res) {
         const options = req.app.options
