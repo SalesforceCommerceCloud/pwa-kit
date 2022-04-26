@@ -13,7 +13,7 @@ const {Crypto} = require('@peculiar/webcrypto')
 // Mock the application configuration to be used in all tests.
 jest.mock('pwa-kit-runtime/utils/ssr-config', () => {
     return {
-        getConfig: () => mockConfig,
+        getConfig: () => mockConfig
     }
 })
 
@@ -44,15 +44,15 @@ class LocalStorageMock {
 const localStorageMock = new LocalStorageMock()
 
 Object.defineProperty(window, 'crypto', {
-    value: new Crypto(),
+    value: new Crypto()
 })
 
 Object.defineProperty(window, 'localStorage', {
-    value: localStorageMock,
+    value: localStorageMock
 })
 
 Object.defineProperty(window, 'scrollTo', {
-    value: () => null,
+    value: () => null
 })
 
 Object.defineProperty(window, 'matchMedia', {
@@ -65,6 +65,6 @@ Object.defineProperty(window, 'matchMedia', {
         removeListener: jest.fn(), // deprecated
         addEventListener: jest.fn(),
         removeEventListener: jest.fn(),
-        dispatchEvent: jest.fn(),
-    })),
+        dispatchEvent: jest.fn()
+    }))
 })
