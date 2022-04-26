@@ -11,7 +11,6 @@ const fs = require('fs')
 const path = require('path')
 const os = require('os')
 const rimraf = require('rimraf')
-const Promise = require('bluebird')
 const pkg = require('../package.json')
 
 jest.mock('git-rev-sync')

@@ -41,8 +41,8 @@ module.exports = {
             [
                 '',
                 {
-                    pattern: '^ \\* Copyright \\(c\\) \\d{4}, salesforce.com, inc\\.$',
-                    template: ' * Copyright (c) 2021, salesforce.com, inc.'
+                    pattern: '^ \\* Copyright \\(c\\) \\d{4}, (salesforce.com, inc|Salesforce, Inc)\\.$',
+                    template: ' * Copyright (c) 2022, salesforce.com, inc.'
                 },
                 ' * All rights reserved.',
                 ' * SPDX-License-Identifier: BSD-3-Clause',

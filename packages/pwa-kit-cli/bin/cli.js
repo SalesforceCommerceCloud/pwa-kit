@@ -201,10 +201,11 @@ const main = () => {
     program
         .command('test')
         .description('test the project')
-        .option('--jest-args <args>', 'arguments to forward to Jest')
-        .action(({jestArgs}) => {
+        .action((_, {args}) => {
             const jest = p.join(require.resolve('jest'), '..', '..', '..', '.bin', 'jest')
-            execSync(`${jest} --passWithNoTests --maxWorkers=2${jestArgs ? ' ' + jestArgs : ''}`)
+            execSync(
+                `${jest} --passWithNoTests --maxWorkers=2${args.length ? ' ' + args.join(' ') : ''}`
+            )
         })
 
     program.option('-v, --version', 'show version number').action(({version}) => {

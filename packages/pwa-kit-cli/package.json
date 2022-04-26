@@ -4,7 +4,11 @@
   "description": "Build tools for pwa-kit",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/mobify/mobify-platform-sdks.git"
+    "url": "git+https://github.com/SalesforceCommerceCloud/pwa-kit.git"
+  },
+  "homepage": "https://github.com/SalesforceCommerceCloud/pwa-kit/tree/develop/packages/pwa-kit-cli#readme",
+  "bugs": {
+    "url": "https://github.com/SalesforceCommerceCloud/pwa-kit/issues"
   },
   "license": "SEE LICENSE IN LICENSE",
   "author": "dev@mobify.com",
@@ -59,7 +63,6 @@
     "babel-plugin-dynamic-import-node-babel-7": "^2.0.7",
     "babel-plugin-formatjs": "10.2.20",
     "babel-preset-pwa-kit": "^2.0.0-dev.4",
-    "bluebird": "^3.5.1",
     "chalk": "^4.1.2",
     "commander": "^8.3.0",
     "compression": "1.7.4",
@@ -75,7 +78,6 @@
     "jest-environment-jsdom-global": "^2.0.4",
     "jest-expect-message": "1.0.0",
     "jest-fetch-mock": "^2.1.2",
-    "lodash": "^4.17.20",
     "mime-types": "2.1.32",
     "minimatch": "3.0.4",
     "morgan": "1.9.1",
