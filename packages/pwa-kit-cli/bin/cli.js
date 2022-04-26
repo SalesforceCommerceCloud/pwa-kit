@@ -112,14 +112,13 @@ const main = () => {
         .command('build')
         .description(`build your app for production`)
         .action(() => {
-            console.log('PWAAKIT CLI BUILD PWAAKIT CLI BUILD PWAAKIT CLI BUILD PWAAKIT CLI BUILD')
             const webpack = p.join(require.resolve('webpack'), '..', '..', '..', '.bin', 'webpack')
             const projectWebpack = p.join(process.cwd(), 'webpack.config.js')
             const webpackConf = fs.existsSync(projectWebpack)
                 ? projectWebpack
                 : p.join(__dirname, '..', 'configs', 'webpack', 'config.js')
             sh.rm('-rf', './build')
-            console.log('${webpackConf}: ', webpackConf)
+
             execSync(`${webpack} --config ${webpackConf}`, {
                 env: {
                     NODE_ENV: 'production',
