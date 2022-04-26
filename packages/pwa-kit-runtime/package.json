@@ -4,7 +4,11 @@
   "description": "The PWAKit Runtime",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/mobify/mobify-platform-sdks.git"
+    "url": "git+https://github.com/SalesforceCommerceCloud/pwa-kit.git"
+  },
+  "homepage": "https://github.com/SalesforceCommerceCloud/pwa-kit/tree/develop/packages/pwa-kit-runtime#readme",
+  "bugs": {
+    "url": "https://github.com/SalesforceCommerceCloud/pwa-kit/issues"
   },
   "license": "SEE LICENSE IN LICENSE",
   "author": "dev@mobify.com",

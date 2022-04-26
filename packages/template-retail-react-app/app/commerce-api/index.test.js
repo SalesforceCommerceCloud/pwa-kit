@@ -249,7 +249,7 @@ describe('CommerceAPI', () => {
         api.auth.authToken = mockExampleTokenReponseForRefresh.access_token
         await api.auth.login()
         expect(api.auth.authToken).toBeDefined()
-        expect(api.auth.authToken).not.toEqual(mockExampleTokenReponseForRefresh.access_token)
+        expect(api.auth.authToken).not.toEqual(mockExampleTokenReponseForRefresh)
     })
     test('re-authorizes as guest when existing token is expired', async () => {
         const api = getAPI()
