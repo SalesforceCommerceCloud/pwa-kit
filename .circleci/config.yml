@@ -42,7 +42,7 @@ commands:
             node ./scripts/report-bundle-size.js
 
             # Add credentials file at ~/.mobify so we can upload to Mobify Cloud
-            npm run save-credentials --prefix packages/pwa -- --user "${MOBIFY_CLIENT_USER}" --key "${MOBIFY_CLIENT_API_KEY}"
+            npm run save-credentials --prefix packages/template-retail-react-app -- --user "${MOBIFY_CLIENT_USER}" --key "${MOBIFY_CLIENT_API_KEY}"
 
             # Check that packages are all using the same versions of compilers, etc.
             node ./scripts/check-dependencies.js
@@ -68,6 +68,12 @@ commands:
 
             # Install node dependencies
             npm ci
+            
+            # Symlink local dependencies
+            # A bug manifests itself on Windows where lerna bootsrap fails to generate the `pwa-kit-cli` bin shims
+            # in the bin file. As a result, Windows runs the `pwa-kit-cli` bin file using Windows Host Script instead
+            # of Node. We run the lerna link command to fix the shims in the `pwa-kit-cli` bin file on Windows.
+            npm run lerna link --force-local
       - save_cache:
           key: npm-cache
           paths:
@@ -131,7 +137,7 @@ commands:
     parameters:
       dir:
         description: 'The path to a project to test'
-        default: './packages/pwa'
+        default: './packages/template-retail-react-app'
         type: string
     steps:
       - run:
@@ -145,7 +151,7 @@ commands:
       - run:
           name: Run Lighthouse CI on the PWA
           command: |
-            npm run test:lighthouse --prefix packages/pwa
+            npm run test:lighthouse --prefix packages/template-retail-react-app
   checkclean:
     description: 'Check Repository Clean'
     steps:
@@ -224,10 +230,10 @@ jobs:
       - checkclean
       - early_return_for_forked_pull_requests
       - store_test_results:
-          path: packages/pwa/tests/reports
+          path: packages/template-retail-react-app/tests/reports
           when: always
       - store_artifacts:
-          path: packages/pwa/tests/screenshots
+          path: packages/template-retail-react-app/tests/screenshots
           when: always
       - slack/status:
           fail_only: true
@@ -277,7 +283,7 @@ jobs:
               fi
 
               if [[ $target ]]; then
-                npm run push --prefix packages/pwa -- --message "build ${CIRCLE_BUILD_NUM} on ${CIRCLE_BRANCH} (${CIRCLE_SHA1})" --target $target
+                npm run push --prefix packages/template-retail-react-app -- --message "build ${CIRCLE_BUILD_NUM} on ${CIRCLE_BRANCH} (${CIRCLE_SHA1})" --target $target
               fi
       - checkclean
       - run:
@@ -296,10 +302,10 @@ jobs:
               # Cleanup
               rm ~/.npmrc
       - store_test_results:
-          path: packages/pwa/tests/reports
+          path: packages/template-retail-react-app/tests/reports
           when: always
       - store_artifacts:
-          path: packages/pwa/tests/screenshots
+          path: packages/template-retail-react-app/tests/screenshots
           when: always
       - slack/status:
           fail_only: true
@@ -374,7 +380,7 @@ workflows:
     jobs:
       - testNode12
       - testNode14
-      # - testNode14Windows
+      - testNode14Windows
       - testNode14npm7
       - testNode14npm8
       - generatedSFCCProjectTest
@@ -392,8 +398,8 @@ workflows:
           context: nightly-build
       - testNode14:
           context: nightly-build
-      # - testNode14Windows:
-      #     context: nightly-build
+      - testNode14Windows:
+          context: nightly-build
       - testNode14npm7:
           context: nightly-build
       - testNode14npm8:

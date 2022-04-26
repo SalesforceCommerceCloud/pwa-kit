@@ -1,6 +1,6 @@
 {
     "name": "typescript-minimal",
-    "version": "2.0.0-dev.3",
+    "version": "2.0.0-dev.4",
     "engines": {
         "node": "^12.0.0 || ^14.0.0",
         "npm": "^6.14.4 || ^7.0.0 || ^8.0.0"
@@ -10,23 +10,23 @@
         "@loadable/component": "^5.15.0",
         "cross-env": "^5.2.0",
         "cross-fetch": "^3.1.4",
-        "pwa-kit-build": "^2.0.0-dev.3",
-        "pwa-kit-react-sdk": "^2.0.0-dev.3",
-        "pwa-kit-runtime": "^2.0.0-dev.3",
+        "pwa-kit-cli": "^2.0.0-dev.4",
+        "pwa-kit-react-sdk": "^2.0.0-dev.4",
+        "pwa-kit-runtime": "^2.0.0-dev.4",
         "react": "^17.0.2",
         "react-dom": "^17.0.2",
         "react-helmet": "^6.1.0",
         "react-router-dom": "^5.1.2"
     },
     "scripts": {
-        "format": "mrt format '\"**/*.{js,jsx}\"'",
-        "lint": "mrt lint '\"**/*.{js,jsx}\"'",
+        "format": "pwa-kit-cli format \"**/*.{js,jsx,tsx}\"",
+        "lint": "pwa-kit-cli lint \"**/*.{js,jsx,tsx}\"",
         "lint:fix": "npm run lint -- --fix",
-        "save-credentials": "mrt save-credentials",
-        "start": "mrt start",
-        "test": "mrt test",
-        "build": "mrt build",
-        "push": "npm run build && mrt push"
+        "save-credentials": "pwa-kit-cli save-credentials",
+        "start": "pwa-kit-cli start",
+        "test": "pwa-kit-cli test",
+        "build": "pwa-kit-cli build",
+        "push": "npm run build && pwa-kit-cli push"
     },
     "mobify": {
         "ssrEnabled": true,
