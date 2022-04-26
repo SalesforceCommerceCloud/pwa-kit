@@ -63,7 +63,7 @@ const {handler} = runtime.createHandler(options, (app) => {
     })
     app.get('/robots.txt', serveStaticFile('static/robots.txt'))
 
-    app.get('/worker.js*', runtime.serveServiceWorker)
+    app.get('/worker.js(.map)?', runtime.serveServiceWorker)
     app.get('*', runtime.render)
 })
 // SSR requires that we export a single handler function called 'get', that
