@@ -19,7 +19,7 @@ const options = {
 
 const runtime = getRuntime()
 
-const {handler} = runtime.createHandler(options, (app) => {
+module.exports = runtime.createHandler(options, (app) => {
     app.get('/', (req, res) => {
         res.send(`
             <html>
@@ -44,5 +44,3 @@ const {handler} = runtime.createHandler(options, (app) => {
         `)
     })
 })
-
-exports.get = handler
