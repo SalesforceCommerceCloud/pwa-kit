@@ -457,9 +457,9 @@ const main = (opts) => {
             console.log(
                 'Copying assets to project directory.',
                 outputDir,
-                p.join(__dirname, '..', 'assets')
+                p.join(__dirname, '..', 'assets', '*')
             )
-            sh.cp(p.join(__dirname, '..', 'assets'), outputDir)
+            sh.cp(p.join(__dirname, '..', 'assets', '*'), outputDir)
         })
 }
 
