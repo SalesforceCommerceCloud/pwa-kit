@@ -99,7 +99,9 @@ export const DevServerMixin = {
                 console.log(chalk.cyan('First build complete'))
             }, 75)
         })
-        app.__hotServerMiddleware = webpackHotServerMiddleware(app.__compiler)
+        if (config.some((cnf) => cnf.name === 'server')) {
+            app.__hotServerMiddleware = webpackHotServerMiddleware(app.__compiler)
+        }
 
         app.use('/mobify/bundle/development', app.__devMiddleware)
 
