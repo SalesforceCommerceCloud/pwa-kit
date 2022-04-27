@@ -459,7 +459,7 @@ const main = (opts) => {
                 outputDir,
                 p.join(__dirname, '..', 'assets', '*')
             )
-            sh.cp(p.join(__dirname, '..', 'assets', '*'), outputDir)
+            sh.cp(p.join(__dirname, '..', 'assets', '.eslintrc.js'), outputDir)
         })
 }
 
