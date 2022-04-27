@@ -423,7 +423,7 @@ describe('SSRServer operation', () => {
                 fse.writeFileSync(updatedFile, content)
 
                 const app = RemoteServerFactory.createApp(opts({buildDir}))
-                app.get('/worker.js*', RemoteServerFactory.serveServiceWorker)
+                app.get('/worker.js(.map)?', RemoteServerFactory.serveServiceWorker)
 
                 return request(app)
                     .get(requestPath)
