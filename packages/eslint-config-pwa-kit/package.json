@@ -34,7 +34,6 @@
     "prettier": "^1.18.2"
   },
   "devDependencies": {
-    "babel-preset-pwa-kit": "^2.0.0-dev.5",
     "eslint": "^7.31.0",
     "typescript": ">=4.6.3"
   },
@@ -45,6 +44,9 @@
   },
   "peerDependenciesMeta": {
     "typescript": {
+      "optional": true
+    },
+    "babel-preset-pwa-kit": {
       "optional": true
     }
   }
