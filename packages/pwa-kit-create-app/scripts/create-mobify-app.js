@@ -449,6 +449,12 @@ const main = (opts) => {
                     process.exit(1)
             }
         })
+        .then((outputDir) => {
+            // Replace general project assets by copying all the files in the assets folder to the
+            // generated projects folder.
+            console.log('Copying assets to project directory.', outputDir)
+            sh.cp('', `../assets`, outputDir)
+        })
 }
 
 if (require.main === module) {
