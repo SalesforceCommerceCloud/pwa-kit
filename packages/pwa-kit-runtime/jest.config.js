@@ -21,8 +21,10 @@ module.exports = {
         'coverage/*',
         'dist/*',
         'node_modules/*',
-        'scripts/*',
-        'src/ssr/server/test_fixtures/*'
+        'scripts/*'
     ],
-    collectCoverageFrom: ['src/**']
+    collectCoverageFrom: [
+        'src/**',
+        '!src/ssr/server/test_fixtures/*'
+    ]
 }
