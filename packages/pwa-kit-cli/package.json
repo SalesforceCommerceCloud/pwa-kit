@@ -14,7 +14,7 @@
   "author": "dev@mobify.com",
   "main": "dist/index.js",
   "bin": {
-    "pwa-kit-cli": "bin/cli.js"
+    "pwa-kit-cli": "bin/pwa-kit-cli.js"
   },
   "files": [
     "bin",
