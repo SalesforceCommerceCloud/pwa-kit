@@ -16,15 +16,6 @@ module.exports = {
             statements: 90
         }
     },
-    testPathIgnorePatterns: [
-        'bin/*',
-        'coverage/*',
-        'dist/*',
-        'node_modules/*',
-        'scripts/*'
-    ],
-    collectCoverageFrom: [
-        'src/**',
-        '!src/ssr/server/test_fixtures/*'
-    ]
+    testPathIgnorePatterns: ['bin/*', 'coverage/*', 'dist/*', 'node_modules/*', 'scripts/*'],
+    collectCoverageFrom: ['src/**', '!src/ssr/server/test_fixtures/*']
 }
