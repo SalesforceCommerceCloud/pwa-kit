@@ -12,7 +12,7 @@ module.exports = {
             // Determine where the siteRef is located. Valid values include 'path|query_param|none'. Defaults to: 'none'
             // site: 'none',
             // Determine where the localeRef is located. Valid values include 'path|query_param|none'. Defaults to: 'none'
-            locale: 'none',
+            locale: 'none'
             // This boolean value dictates whether or not default site or locale values are shown in the url. Defaults to: false
             // showDefaults: true
         },
@@ -47,10 +47,10 @@ module.exports = {
     pageNotFoundURL: '/page-not-found',
     // Enables or disables building the files necessary for server-side rendering.
     ssrEnabled: true,
-    // This list determines which files are available exclusively to the server-side rendering system 
+    // This list determines which files are available exclusively to the server-side rendering system
     // and are not available through the /mobify/bundle/ path.
     ssrOnly: ['ssr.js', 'ssr.js.map', 'node_modules/**/*.*'],
-    // This list determines which files are available to the server-side rendering system 
+    // This list determines which files are available to the server-side rendering system
     // and available through the /mobify/bundle/ path.
     ssrShared: [
         'static/ico/favicon.ico',
@@ -77,4 +77,5 @@ module.exports = {
             }
         ]
     }
-}`
+}
+`
