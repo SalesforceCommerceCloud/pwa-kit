@@ -30,7 +30,8 @@ module.exports = function() {
                     idInterpolationPattern: '[sha512:contenthash:base64:6]',
                     ast: true
                 }
-            ]
+            ],
+            require('@loadable/babel-plugin')
         ],
         env: {
             test: {
