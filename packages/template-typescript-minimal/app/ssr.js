@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, salesforce.com, inc.
+ * Copyright (c) 2022, Salesforce, Inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
@@ -45,4 +45,6 @@ const {handler} = runtime.createHandler(options, (app) => {
     runtime.addSSRRenderer(app)
 })
 
+// SSR requires that we export a single handler function called 'get', that
+// supports AWS use of the server that we created above.
 exports.get = handler
