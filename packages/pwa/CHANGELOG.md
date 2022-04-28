@@ -1,5 +1,11 @@
 ## v1.6.0-dev (Mar 17, 2022)
-## v1.5.0 (Mar 17, 2022)
+
+## v1.5.2 (Apr 22, 2022)
+
+-   Fixed invalid refresh token. [#527](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/527)
+-   Fixed minor typos in readme and jsdoc. [#531](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/531)
+
+## v1.5.0 (Jan 28, 2022)
 
 -   Support storing authentication tokens in cookie [#429](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/429)
 -   Make sure the forgot-password modal also shows up in the checkout flow [#373](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/373)
