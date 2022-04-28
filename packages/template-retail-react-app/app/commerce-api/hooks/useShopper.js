@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, salesforce.com, inc.
+ * Copyright (c) 2022, salesforce.com, inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
@@ -57,6 +57,13 @@ const useShopper = (opts = {}) => {
             return
         }
     }, [customer.authType, basket.loaded])
+
+    // Call merge basket whenever user type changes from guest to registered
+    useEffect(() => {
+        if (customer.authType === 'registered') {
+            basket.mergeBasket()
+        }
+    }, [customer.authType])
 
     useEffect(() => {
         // Fetch product details for all items in cart
