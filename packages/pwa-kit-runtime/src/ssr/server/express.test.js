@@ -300,6 +300,20 @@ describe('SSRServer operation', () => {
             })
     })
 
+    test('SSRServer renders with the react rendering', () => {
+        const app = RemoteServerFactory.createApp(opts())
+        app.get('/*', RemoteServerFactory.render)
+        expect(app.__renderer).toBeUndefined()
+
+        return request(app)
+            .get('/')
+            .expect(200)
+            .then((res) => {
+                expect(res.text).toBe('OK')
+                expect(app.__renderer).toBeDefined()
+            })
+    })
+
     test('SSRServer rendering gets and sends no cookies', () => {
         const route = (req, res) => {
             res.setHeader('set-cookie', 'blah123')
