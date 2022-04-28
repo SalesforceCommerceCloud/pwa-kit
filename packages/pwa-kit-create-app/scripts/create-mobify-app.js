@@ -404,7 +404,8 @@ const main = (opts) => {
         .then((preset) => {
             switch (preset) {
                 case EXPRESS_MINIMAL_TEST_PROJECT:
-                    return generateExpressMinimal('express-minimal', opts)
+                    generateExpressMinimal('express-minimal', opts)
+                    return opts.outputDir
                 case EXPRESS_MINIMAL:
                     return expressMinimalPrompts(opts).then((answers) => {
                         const projectId = slugifyName(answers.projectName)
@@ -415,7 +416,8 @@ const main = (opts) => {
                         return opts.outputDir
                     })
                 case TEST_PROJECT:
-                    return runGenerator(testProjectAnswers(), opts)
+                    runGenerator(testProjectAnswers(), opts)
+                    return opts.outputDir
                 case RETAIL_REACT_APP_DEMO:
                     return Promise.resolve()
                         .then(() => runGenerator(demoProjectAnswers(), opts))
