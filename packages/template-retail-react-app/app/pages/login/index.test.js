@@ -27,6 +27,15 @@ const mockRegisteredCustomer = {
     login: 'darek@test.com'
 }
 
+const mockMergedBasket = {
+    basketId: 'a10ff320829cb0eef93ca5310a',
+    currency: 'USD',
+    customerInfo: {
+        customerId: 'registeredCustomerId',
+        email: 'darek@test.com'
+    }
+}
+
 jest.mock('commerce-sdk-isomorphic', () => {
     const sdk = jest.requireActual('commerce-sdk-isomorphic')
     return {
@@ -124,7 +133,10 @@ test('Allows customer to sign in to their account', async () => {
     server.use(
         rest.get('*/customers/:customerId', (req, res, ctx) =>
             res(ctx.delay(0), ctx.json({authType: 'registered', email: 'darek@test.com'}))
-        )
+        ),
+        rest.post('*/baskets/actions/merge', (req, res, ctx) => {
+            res(ctx.delay(0), ctx.json(mockMergedBasket))
+        })
     )
     // render our test component
     renderWithProviders(<MockedComponent />)
