@@ -282,8 +282,10 @@ jobs:
                 target=""
               fi
 
+              project="scaffold-pwa"
+
               if [[ $target ]]; then
-                npm run push --prefix packages/template-retail-react-app -- --message "build ${CIRCLE_BUILD_NUM} on ${CIRCLE_BRANCH} (${CIRCLE_SHA1})" --target $target
+                npm run push --prefix packages/template-retail-react-app -- -s $project --message "build ${CIRCLE_BUILD_NUM} on ${CIRCLE_BRANCH} (${CIRCLE_SHA1})" --target $target
               fi
       - checkclean
       - run:
@@ -360,9 +362,12 @@ jobs:
             else
               target=""
             fi
+
+            project="scaffold-pwa"
+
             if [[ $target ]]; then
               cd generated-project
-              npm run push -- --message "Generated PWA build ${CIRCLE_BUILD_NUM} on ${CIRCLE_BRANCH} (${CIRCLE_SHA1})" --target $target
+              npm run push -- -s $project $ --message "Generated PWA build ${CIRCLE_BUILD_NUM} on ${CIRCLE_BRANCH} (${CIRCLE_SHA1})" --target $target
             fi
   generatedSFCCProjectTestWindows:
     executor:
