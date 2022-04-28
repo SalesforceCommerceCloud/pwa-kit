@@ -19,7 +19,7 @@ const options = {
 
 const runtime = getRuntime()
 
-const {handler} = runtime.createHandler(options, (app) => {
+const handler = runtime.createHandler(options, (app) => {
     app.get('/', (req, res) => {
         res.send(`
             <html>
@@ -47,4 +47,5 @@ const {handler} = runtime.createHandler(options, (app) => {
 
 // SSR requires that we export a single handler function called 'get', that
 // supports AWS use of the server that we created above.
-exports.get = handler
+handler.get = handler.handler
+module.exports = handler
