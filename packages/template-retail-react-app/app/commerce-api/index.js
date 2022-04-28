@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, salesforce.com, inc.
+ * Copyright (c) 2022, salesforce.com, inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
@@ -8,7 +8,7 @@
 /* eslint-disable no-unused-vars */
 import * as sdk from 'commerce-sdk-isomorphic'
 import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
-import OcapiShopperBaskets from './ocapi-shopper-baskets'
+import ShopperBaskets from './shopper-baskets'
 import OcapiShopperOrders from './ocapi-shopper-orders'
 import {getTenantId, isError, isTokenValid} from './utils'
 import Auth from './auth'
@@ -75,7 +75,7 @@ class CommerceAPI {
                 sendLocale: false
             },
             shopperBaskets: {
-                api: OcapiShopperBaskets,
+                api: ShopperBaskets,
                 sendLocale: false,
                 sendCurrency: ['createBasket']
             },
