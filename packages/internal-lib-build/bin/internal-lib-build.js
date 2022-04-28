@@ -24,8 +24,8 @@ const main = () => {
 
     program.command('build').action(() => {
         const babel = p.join(binDir, 'babel')
-        const babelConfig = p.resolve(p.join(process.cwd(), '..', '..', 'babel.config.js'))
-        const prepareDist = p.resolve(p.join(__dirname, 'prepare-dist.js'))
+        const babelConfig = p.join('..', '..', 'babel.config.js')
+        const prepareDist = p.join(__dirname, 'prepare-dist.js')
 
         sh.rm('-rf', './dist')
         sh.mkdir('./dist')
