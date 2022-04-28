@@ -1,6 +1,6 @@
 {
   "name": "pwa-kit-cli",
-  "version": "2.0.0-dev.4",
+  "version": "2.0.0-dev.5",
   "description": "Build tools for pwa-kit",
   "repository": {
     "type": "git",
@@ -14,7 +14,7 @@
   "author": "dev@mobify.com",
   "main": "dist/index.js",
   "bin": {
-    "pwa-kit-cli": "bin/cli.js"
+    "pwa-kit-cli": "bin/pwa-kit-cli.js"
   },
   "files": [
     "bin",
@@ -109,9 +109,9 @@
   },
   "devDependencies": {
     "@loadable/component": "^5.15.0",
-    "internal-lib-build": "^2.0.0-dev.4",
+    "internal-lib-build": "^2.0.0-dev.5",
     "nock": "^13.1.1",
-    "pwa-kit-runtime": "^2.0.0-dev.4",
+    "pwa-kit-runtime": "^2.0.0-dev.5",
     "superagent": "^6.1.0",
     "supertest": "^4.0.2"
   },
