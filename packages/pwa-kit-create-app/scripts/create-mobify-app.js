@@ -452,14 +452,8 @@ const main = (opts) => {
             }
         })
         .then((outputDir) => {
-            // Replace general project assets by copying all the files in the assets folder to the
-            // generated projects folder.
-            console.log(
-                'Copying assets to project directory.',
-                outputDir,
-                p.join(__dirname, '..', 'assets', '*')
-            )
-            sh.cp(p.join(__dirname, '..', 'assets', '.eslintrc.js'), outputDir)
+            // Copy shared assets into the project folder.
+            sh.cp('-R', p.join(__dirname, '..', 'assets', 'shared', '*'), outputDir)
         })
 }
 
