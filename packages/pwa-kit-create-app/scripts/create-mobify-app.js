@@ -456,8 +456,12 @@ const main = (opts) => {
             const dir = p.join(__dirname, '..', 'assets', 'shared')
 
             fs.readdirSync(dir).map((file) => {
-                const template = require(p.join(dir, file)).template
-                new sh.ShellString(template()).to(p.resolve(outputDir, file))
+                if (file.startsWith('$')) {
+                    const template = require(p.join(dir, file)).template
+                    new sh.ShellString(template()).to(p.resolve(outputDir, file.substring(1)))
+                } else {
+                    sh.cp('-R', file, outputDir)
+                }
             })
         })
 }
