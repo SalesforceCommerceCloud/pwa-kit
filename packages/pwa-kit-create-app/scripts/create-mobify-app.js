@@ -453,7 +453,7 @@ const main = (opts) => {
         })
         .then((outputDir) => {
             // Copy shared assets into the project folder.
-            sh.cp('-R', p.join(__dirname, '..', 'assets', 'shared', '*'), outputDir)
+            sh.cp('-R', p.join(__dirname, '..', 'assets', 'shared'), outputDir)
         })
 }
 
