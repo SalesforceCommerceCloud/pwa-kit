@@ -16,7 +16,7 @@
     "scripts": {
       "lint": "npm run lint:js",
       "lint:fix": "npm run lint:js -- --fix",
-      "lint:js": "../../node_modules/.bin/eslint \"**/*.{js,jsx}\""
+      "lint:js": "cross-env ../../node_modules/.bin/eslint \"**/*.{js,jsx}\""
     },
     "dependencies": {
         "@babel/plugin-proposal-object-rest-spread": "^7.4.4",
@@ -33,7 +33,8 @@
         "@babel/traverse": "^7.5.5",
         "@loadable/babel-plugin": "^5.13.2",
         "babel-plugin-dynamic-import-node-babel-7": "^2.0.7",
-        "babel-plugin-formatjs": "10.2.20"
+        "babel-plugin-formatjs": "10.2.20",
+        "cross-env": "^5.2.0"
     }
   }
   
