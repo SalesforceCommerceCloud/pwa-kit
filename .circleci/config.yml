@@ -5,20 +5,20 @@ orbs:
 
 commands:
   setup:
-    description: 'Setup Machine'
+    description: "Setup Machine"
     steps:
       - restore_cache:
           keys:
             - npm-cache
       - run:
-          name: 'Set environment variables'
+          name: "Set environment variables"
           command: |
             touch $BASH_ENV
             if [[ "${CIRCLE_BRANCH}" == "develop" ]]; then echo 'export DEVELOP=true' >> $BASH_ENV; fi
             if [[ "${CIRCLE_BRANCH}" =~ ^release- ]]; then echo 'export RELEASE=true' >> $BASH_ENV; fi
             source $BASH_ENV
       - run:
-          name: 'Install Dependencies'
+          name: "Install Dependencies"
           command: |
 
             # Add Chrome to apt sources
@@ -36,7 +36,7 @@ commands:
             node ./scripts/gtime.js monorepo_install npm ci
 
             # Build the PWA
-            npm run lerna -- run analyze-build --scope "scaffold-pwa"
+            npm run lerna -- run analyze-build --scope "retail-react-app"
 
             # Report bundle sizes
             node ./scripts/report-bundle-size.js
@@ -57,18 +57,18 @@ commands:
           paths:
             - /root/.npm
   setup_windows:
-    description: 'Setup Machine'
+    description: "Setup Machine"
     steps:
       - restore_cache:
           keys:
             - npm-cache
       - run:
-          name: 'Install Dependencies'
+          name: "Install Dependencies"
           command: |
 
             # Install node dependencies
             npm ci
-            
+
             # Symlink local dependencies
             # A bug manifests itself on Windows where lerna bootsrap fails to generate the `pwa-kit-cli` bin shims
             # in the bin file. As a result, Windows runs the `pwa-kit-cli` bin file using Windows Host Script instead
@@ -79,13 +79,13 @@ commands:
           paths:
             - /root/.npm
   setup_npm_7:
-    description: 'Setup Machine with npm 7'
+    description: "Setup Machine with npm 7"
     steps:
       - restore_cache:
           keys:
             - npm-cache
       - run:
-          name: 'Install Dependencies'
+          name: "Install Dependencies"
           command: |
 
             sudo npm install -g npm@7
@@ -95,13 +95,13 @@ commands:
           paths:
             - /root/.npm
   setup_npm_8:
-    description: 'Setup Machine with npm 8'
+    description: "Setup Machine with npm 8"
     steps:
       - restore_cache:
           keys:
             - npm-cache
       - run:
-          name: 'Install Dependencies'
+          name: "Install Dependencies"
           command: |
 
             sudo npm install -g npm@8
@@ -111,15 +111,15 @@ commands:
           paths:
             - /root/.npm
   runtests:
-    description: 'Run tests'
+    description: "Run tests"
     parameters:
       cwd:
-        description: 'The directory to execute the tests from'
+        description: "The directory to execute the tests from"
         default: ${PWD}
         type: string
     steps:
       - run:
-          name: 'Run tests'
+          name: "Run tests"
           command: |
             # Explicitly set pipefile policy. This is the default for non-windows, but seems
             # that is needs to be set on windows to fail immediately.
@@ -133,54 +133,54 @@ commands:
             # Always run fast unit tests
             npm run test
   smoketestscripts:
-    description: 'Smoke test scripts'
+    description: "Smoke test scripts"
     parameters:
       dir:
-        description: 'The path to a project to test'
-        default: './packages/template-retail-react-app'
+        description: "The path to a project to test"
+        default: "./packages/template-retail-react-app"
         type: string
     steps:
       - run:
-          name: 'Smoke test scripts'
+          name: "Smoke test scripts"
           command: |
             # Basic smoke-tests for uncommonly run scripts in a project
             node ./scripts/smoke-test-npm-scripts.js --dir << parameters.dir >>
   lighthouse-ci:
-    description: 'Run Lighthouse CI on the PWA'
+    description: "Run Lighthouse CI on the PWA"
     steps:
       - run:
           name: Run Lighthouse CI on the PWA
           command: |
             npm run test:lighthouse --prefix packages/template-retail-react-app
   checkclean:
-    description: 'Check Repository Clean'
+    description: "Check Repository Clean"
     steps:
       - run:
           name: Check Repository Clean
           command: |
-              # Print status for debugging on CircleCI.
-              git status
-              # Fail the build if any step leaves uncommitted changes in the repo
-              # that would prevent Lerna from publishing (Lerna gets this right).
-              git diff --exit-code
+            # Print status for debugging on CircleCI.
+            git status
+            # Fail the build if any step leaves uncommitted changes in the repo
+            # that would prevent Lerna from publishing (Lerna gets this right).
+            git diff --exit-code
 
   generate_and_test_project:
-    description: 'Generate project'
+    description: "Generate project"
     steps:
       - run:
           name: Generate project
           environment:
-            GENERATOR_PRESET: 'test-project'
+            GENERATOR_PRESET: "test-project"
           command: |
             set GENERATOR_PRESET=test-project
             node packages/pwa-kit-create-app/scripts/create-mobify-app-dev.js --outputDir generated-project
-            
+
             cd generated-project
             npm run build
       - run:
           name: Generate express-minimal project
           environment:
-            GENERATOR_PRESET: 'express-minimal-test-project'
+            GENERATOR_PRESET: "express-minimal-test-project"
           command: |
             set GENERATOR_PRESET=express-minimal-test-project
             node packages/pwa-kit-create-app/scripts/create-mobify-app-dev.js --outputDir generated-project-express-minimal
@@ -274,33 +274,33 @@ jobs:
       - run:
           name: Push Bundle
           command: |
-              if [[ $DEVELOP || $RELEASE ]]; then
-                target=staging
-              elif [[ $RELEASE ]]; then
-                target=production
-              else
-                target=""
-              fi
+            if [[ $DEVELOP || $RELEASE ]]; then
+              target=staging
+            elif [[ $RELEASE ]]; then
+              target=production
+            else
+              target=""
+            fi
 
-              if [[ $target ]]; then
-                npm run push --prefix packages/template-retail-react-app -- --message "build ${CIRCLE_BUILD_NUM} on ${CIRCLE_BRANCH} (${CIRCLE_SHA1})" --target $target
-              fi
+            if [[ $target ]]; then
+              npm run push --prefix packages/template-retail-react-app -- --message "build ${CIRCLE_BUILD_NUM} on ${CIRCLE_BRANCH} (${CIRCLE_SHA1})" --target $target
+            fi
       - checkclean
       - run:
           name: Publish to NPM
           command: |
-              # Add NPM token to allow publishing from Circle
-              echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > ~/.npmrc
+            # Add NPM token to allow publishing from Circle
+            echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > ~/.npmrc
 
-              if [[ $RELEASE ]]; then
-                # Publish all changed packages. The "from-package" arg means "look
-                # at the version numbers in each package.json file and if that doesn't
-                # exist on NPM, publish"
-                npm run lerna -- publish from-package --yes --no-verify-access
-              fi
+            if [[ $RELEASE ]]; then
+              # Publish all changed packages. The "from-package" arg means "look
+              # at the version numbers in each package.json file and if that doesn't
+              # exist on NPM, publish"
+              npm run lerna -- publish from-package --yes --no-verify-access
+            fi
 
-              # Cleanup
-              rm ~/.npmrc
+            # Cleanup
+            rm ~/.npmrc
       - store_test_results:
           path: packages/template-retail-react-app/tests/reports
           when: always

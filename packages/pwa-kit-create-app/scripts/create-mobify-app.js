@@ -79,7 +79,7 @@ const replaceJSON = (path, replacements) =>
 const slugifyName = (name) => {
     return slugify(name, {
         lower: true,
-        strict: true
+        strict: true,
     }).slice(0, PROJECT_ID_MAX_LENGTH)
 }
 
@@ -104,7 +104,7 @@ const merge = (a, b) => deepmerge(a, b, {arrayMerge: (orignal, replacement) => r
  *   deep-merged with each package's original package.json data. Eg:
  *
  *   {
- *      "scaffold-pwa": {
+ *      "retail-react-app": {
  *          "name": "new-project-web",
  *          "version": "0.0.1",
  *      }
@@ -134,7 +134,7 @@ const runGenerator = (answers, {outputDir}) => {
 
     const pkgJsonPath = p.resolve(outputDir, 'package.json')
     const pkgJSON = readJson(pkgJsonPath)
-    const pkgDataWithAnswers = merge(pkgJSON, answers['scaffold-pwa'])
+    const pkgDataWithAnswers = merge(pkgJSON, answers['retail-react-app'])
 
     npmInstallables.forEach((pkgName) => {
         const keys = ['dependencies', 'devDependencies']
@@ -156,13 +156,13 @@ const runGenerator = (answers, {outputDir}) => {
         icons: [
             {
                 src: './img/global/app-icon-192.png',
-                sizes: '192x192'
+                sizes: '192x192',
             },
             {
                 src: './img/global/app-icon-512.png',
-                sizes: '512x512'
-            }
-        ]
+                sizes: '512x512',
+            },
+        ],
     })
 
     const PWAKitConfigTemplate = require(`../assets/pwa/default`).template
@@ -174,12 +174,12 @@ const runGenerator = (answers, {outputDir}) => {
         clientId: answers['commerce-api'].clientId,
         organizationId: answers['commerce-api'].organizationId,
         shortCode: answers['commerce-api'].shortCode,
-        siteId: answers['commerce-api'].siteId
+        siteId: answers['commerce-api'].siteId,
     }
     const einsteinApi = {
         proxyPath: 'einstein',
         einsteinId: answers['einstein-api'].einsteinId,
-        siteId: answers['einstein-api'].siteId || answers['commerce-api'].siteId
+        siteId: answers['einstein-api'].siteId || answers['commerce-api'].siteId,
     }
 
     new sh.ShellString(PWAKitConfigTemplate({commerceApi, einsteinApi})).to(
@@ -195,7 +195,7 @@ const npmInstall = (outputDir) => {
     console.log('Installing dependencies for the generated project. This may take a few minutes.\n')
     child_proc.execSync('npm install --quiet', {
         cwd: outputDir,
-        stdio: 'inherit'
+        stdio: 'inherit',
     })
 }
 
@@ -234,33 +234,33 @@ const retailReactAppPrompts = () => {
         {
             name: 'projectName',
             validate: validProjectName,
-            message: 'What is the name of your Project?'
+            message: 'What is the name of your Project?',
         },
         {
             name: 'instanceUrl',
             message: 'What is the URL for your Commerce Cloud instance?',
-            validate: validUrl
+            validate: validUrl,
         },
         {
             name: 'clientId',
             message: 'What is your SLAS API Client ID in Account Manager?',
-            validate: validClientId
+            validate: validClientId,
         },
         {
             name: 'siteId',
             message: 'What is your Site ID in Business Manager?',
-            validate: validSiteId
+            validate: validSiteId,
         },
         {
             name: 'organizationId',
             message: 'What is your Commerce API organization ID in Business Manager?',
-            validate: validOrganizationId
+            validate: validOrganizationId,
         },
         {
             name: 'shortCode',
             message: 'What is your Commerce API short code in Business Manager?',
-            validate: validShortCode
-        }
+            validate: validShortCode,
+        },
     ]
 
     return inquirer.prompt(questions).then((answers) => buildAnswers(answers))
@@ -274,32 +274,32 @@ const buildAnswers = ({
     organizationId,
     shortCode,
     einsteinId,
-    einsteinSiteId
+    einsteinSiteId,
 }) => {
     const projectId = slugifyName(projectName)
 
     return {
         globals: {projectId},
-        'scaffold-pwa': {
+        'retail-react-app': {
             name: projectId,
-            version: GENERATED_PROJECT_VERSION
+            version: GENERATED_PROJECT_VERSION,
         },
 
         'commerce-api': {clientId, siteId, organizationId, shortCode, instanceUrl},
-        'einstein-api': {einsteinId, siteId: einsteinSiteId || siteId}
+        'einstein-api': {einsteinId, siteId: einsteinSiteId || siteId},
     }
 }
 
 const testProjectAnswers = () => {
     const config = {
-        projectName: 'scaffold-pwa',
+        projectName: 'retail-react-app',
         instanceUrl: 'https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com',
         clientId: 'c9c45bfd-0ed3-4aa2-9971-40f88962b836',
         siteId: 'RefArch',
         organizationId: 'f_ecom_zzrf_001',
         shortCode: 'kv7kzm78',
         einsteinId: '1ea06c6e-c936-4324-bcf0-fada93f83bb1',
-        einsteinSiteId: 'aaij-MobileFirst'
+        einsteinSiteId: 'aaij-MobileFirst',
     }
 
     return buildAnswers(config)
@@ -314,7 +314,7 @@ const demoProjectAnswers = () => {
         organizationId: 'f_ecom_zzte_053',
         shortCode: 'kv7kzm78',
         einsteinId: '1ea06c6e-c936-4324-bcf0-fada93f83bb1',
-        einsteinSiteId: 'aaij-MobileFirst'
+        einsteinSiteId: 'aaij-MobileFirst',
     }
 
     return buildAnswers(config)
@@ -325,8 +325,8 @@ const expressMinimalPrompts = () => {
         {
             name: 'projectName',
             validate: validProjectName,
-            message: 'What is the name of your Project?'
-        }
+            message: 'What is the name of your Project?',
+        },
     ]
     return inquirer.prompt(questions)
 }
@@ -350,14 +350,14 @@ const presetPrompt = () => {
             choices: [
                 {
                     name: 'The Retail app with demo Commerce Cloud instance',
-                    value: RETAIL_REACT_APP_DEMO
+                    value: RETAIL_REACT_APP_DEMO,
                 },
                 {
                     name: 'The Retail app using your own Commerce Cloud instance',
-                    value: RETAIL_REACT_APP
-                }
-            ]
-        }
+                    value: RETAIL_REACT_APP,
+                },
+            ],
+        },
     ]
     return inquirer.prompt(questions).then((answers) => answers['preset'])
 }
@@ -367,7 +367,7 @@ const extractTemplate = (templateName, outputDir) => {
     tar.x({
         file: p.join(__dirname, '..', 'templates', `${templateName}.tar.gz`),
         cwd: p.join(tmp),
-        sync: true
+        sync: true,
     })
     sh.cp('-R', p.join(tmp, templateName), outputDir)
     sh.rm('-rf', tmp)
