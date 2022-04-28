@@ -367,7 +367,7 @@ jobs:
 
             if [[ $target ]]; then
               cd generated-project
-              npm run push -- -s $project $ --message "Generated PWA build ${CIRCLE_BUILD_NUM} on ${CIRCLE_BRANCH} (${CIRCLE_SHA1})" --target $target
+              npm run push -- -s $project --message "Generated PWA build ${CIRCLE_BUILD_NUM} on ${CIRCLE_BRANCH} (${CIRCLE_SHA1})" --target $target
             fi
   generatedSFCCProjectTestWindows:
     executor:
