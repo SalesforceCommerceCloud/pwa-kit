@@ -28,7 +28,7 @@ export const resolveSiteFromUrl = (url) => {
 
     // get the site identifier from the url
     // step 1: look for the site based on the site identifier (id or alias) from the url
-    site = sites.find((site) => site.id === siteRef || site.alias === siteRef)
+    site = sites.find((site) => site.id === siteRef || (site.alias && site.alias === siteRef))
     if (site) {
         return site
     }
