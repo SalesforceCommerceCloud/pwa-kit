@@ -10,6 +10,10 @@
       "type": "git",
       "url": "git+https://github.com/SalesforceCommerceCloud/pwa-kit.git"
     },
+    "homepage": "https://github.com/SalesforceCommerceCloud/pwa-kit/tree/develop/packages/babel-preset-pwa-kit#readme",
+    "bugs": {
+      "url": "https://github.com/SalesforceCommerceCloud/pwa-kit/issues"
+    },
     "license": "SEE LICENSE IN LICENSE",
     "author": "dev@mobify.com",
     "main": "index.js",
