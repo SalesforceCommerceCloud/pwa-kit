@@ -63,6 +63,11 @@ const findInProjectThenSDK = (pkg) => {
     return fs.existsSync(projectPath) ? projectPath : resolve(sdkDir, 'node_modules', pkg)
 }
 
+const hasProjectBabelConfig = () => {
+    const babelPath = resolve(projectDir, 'babel.config.js')
+    return !!fs.existsSync(babelPath)
+}
+
 const baseConfig = (target) => {
     if (!['web', 'node'].includes(target)) {
         throw Error(`The value "${target}" is not a supported webpack target`)
@@ -148,7 +153,7 @@ const baseConfig = (target) => {
                                 {
                                     loader: findInProjectThenSDK('babel-loader'),
                                     options: {
-                                        presets: ['pwa-kit'],
+                                        presets: !hasProjectBabelConfig() ? ['pwa-kit'] : [],
                                         cacheDirectory: true
                                     }
                                 }
