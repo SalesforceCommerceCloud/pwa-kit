@@ -19,6 +19,7 @@ import open from 'open'
 import requireFromString from 'require-from-string'
 import {RemoteServerFactory} from 'pwa-kit-runtime/ssr/server/build-remote-server'
 import {proxyConfigs} from 'pwa-kit-runtime/utils/ssr-shared'
+import {SERVER, CLIENT_OPTIONAL, REQUEST_PROCESSOR} from '../../configs/webpack/config-names'
 
 const projectDir = process.cwd()
 const projectWebpackPath = path.resolve(projectDir, 'webpack.config.js')
@@ -99,7 +100,7 @@ export const DevServerMixin = {
                 console.log(chalk.cyan('First build complete'))
             }, 75)
         })
-        if (config.some((cnf) => cnf.name === 'server')) {
+        if (config.some((cnf) => cnf.name === SERVER)) {
             app.__hotServerMiddleware = webpackHotServerMiddleware(app.__compiler)
         }
 
@@ -152,7 +153,7 @@ export const DevServerMixin = {
             const sourceMap = req.path.endsWith('.map')
             const file = sourceMap ? 'worker.js.map' : 'worker.js'
             const type = sourceMap ? '.js.map' : '.js'
-            const content = DevServerFactory._getWebpackAsset(req, 'client-optional', file)
+            const content = DevServerFactory._getWebpackAsset(req, CLIENT_OPTIONAL, file)
             if (content === null) {
                 // Service worker does not exist. Reminder that SW is optional for MRT apps.
                 res.sendStatus(404)
@@ -228,7 +229,7 @@ export const DevServerMixin = {
      * @private
      */
     getRequestProcessor(req) {
-        const compiled = this._getWebpackAsset(req, 'request-processor', 'request-processor.js')
+        const compiled = this._getWebpackAsset(req, REQUEST_PROCESSOR, 'request-processor.js')
         if (compiled) {
             const module = requireFromString(compiled)
             if (!module.processRequest) {
