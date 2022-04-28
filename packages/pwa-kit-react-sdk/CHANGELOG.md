@@ -1,12 +1,17 @@
+## v1.6.0-dev (Mar 17, 2022)
+
 ## v1.5.2 (Apr 22, 2022)
 
 -   Webpack config no longer assumes that within a project, the `config` directory exists. [#522](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/522)
 
 ## v1.5.1 (Mar 31, 2022)
+
 ## v1.5.0 (Jan 28, 2022)
 
 -   Add boolean flag `enableLegacyBodyParser` to `createApp` options. [#446](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/446)
 -   Add environment specific configuration support. [#421](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/421)
+-   Remove unused url-parse dependency [#411](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/411)
+-   Fix bug with extending an options object on upload.js script [#419](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/419)
 
 ## v1.4.0 (Jan 27, 2022)
 

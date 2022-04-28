@@ -1,8 +1,15 @@
+## v1.6.0-dev (Mar 17, 2022)
+
 ## v1.5.1 (Mar 31, 2022)
+
 -   Fix incorrect site related values when generating without use of a preset [#470](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/470)
 
-## v1.5.0 (Jan 28, 2022)
+## v1.5.0 (Mar 17, 2022)
+
+-   Node warnings with more readable Node versions [#410](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/410)
 -   Fix project generation on Windows when using WSL [#385](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/385)
+-   Show warning when using incompatible node version [#384](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/384)
+-   Update App Generator questions copy and slugify Project Name as the Project Id [#374](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/374)
 
 ## v1.4.0 (Jan 27, 2022)
 

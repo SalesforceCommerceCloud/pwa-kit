@@ -15,7 +15,8 @@ jest.mock('../static/assets.json', () => mockStaticAssets, {virtual: true})
 // We use require() for the ssr-server since we have to mock a module
 // that it needs.
 const {createApp, createLambdaHandler} = require('./express')
-const AWSTestUtils = require('aws-lambda-test-utils')
+const AWSMockContext = require('aws-lambda-mock-context')
+const createEvent = require('@serverless/event-mocks').default
 const crypto = require('crypto')
 const nock = require('nock')
 const https = require('https')
@@ -269,7 +270,7 @@ describe('SSRServer Lambda integration', () => {
                 )
 
             // Set up a fake event and a fake context for the Lambda call
-            const event = AWSTestUtils.mockEventCreator.createAPIGatewayEvent({
+            const event = createEvent('aws:apiGateway', {
                 path: testCase.path,
                 body: undefined
             })
@@ -281,7 +282,7 @@ describe('SSRServer Lambda integration', () => {
             // Add a fake X-Amz-Cf-Id header
             event.headers['X-Amz-Cf-Id'] = '1234567'
 
-            const context = AWSTestUtils.mockContextCreator({
+            const context = AWSMockContext({
                 functionName: 'SSRTest'
             })
 
@@ -339,7 +340,7 @@ describe('SSRServer Lambda integration', () => {
         server = srv
 
         // Set up a fake event and a fake context for the Lambda call
-        const event = AWSTestUtils.mockEventCreator.createAPIGatewayEvent({
+        const event = createEvent('aws:apiGateway', {
             path: '/headers',
             body: undefined,
             // Other x-headers are added by AWSServerlessExpress
@@ -352,7 +353,7 @@ describe('SSRServer Lambda integration', () => {
             delete event.queryStringParameters
         }
 
-        const context = AWSTestUtils.mockContextCreator({
+        const context = AWSMockContext({
             functionName: 'SSRTest'
         })
 
@@ -390,7 +391,7 @@ describe('SSRServer Lambda integration', () => {
         server = srv
 
         // Set up a fake event and a fake context for the Lambda call
-        const event = AWSTestUtils.mockEventCreator.createAPIGatewayEvent({
+        const event = createEvent('aws:apiGateway', {
             path: '/',
             body: undefined
         })
@@ -399,7 +400,7 @@ describe('SSRServer Lambda integration', () => {
             delete event.queryStringParameters
         }
 
-        const context = AWSTestUtils.mockContextCreator({
+        const context = AWSMockContext({
             functionName: 'SSRTest'
         })
 
