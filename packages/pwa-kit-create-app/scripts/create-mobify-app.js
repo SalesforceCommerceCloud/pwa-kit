@@ -453,7 +453,9 @@ const main = (opts) => {
         })
         .then((outputDir) => {
             // Copy shared assets into the project folder.
-            sh.cp('-R', p.join(__dirname, '..', 'assets', 'shared'), outputDir)
+            const dir = p.join(__dirname, '..', 'assets', 'shared')
+            const files = fs.readdirSync(dir).map((x) => p.join(dir, x))
+            sh.cp('-R', files, outputDir)
         })
 }
 
