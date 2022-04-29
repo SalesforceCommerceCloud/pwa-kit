@@ -8,7 +8,6 @@
  * @module progressive-web-sdk/ssr/server/express
  */
 
-import path from 'path'
 import URL from 'url'
 import {
     CachedResponse,
@@ -21,7 +20,7 @@ import {
     wrapResponseWrite,
     detectDeviceType
 } from '../../utils/ssr-server'
-import {CACHE_CONTROL, CONTENT_ENCODING, X_MOBIFY_FROM_CACHE} from './constants'
+import {CONTENT_ENCODING, X_MOBIFY_FROM_CACHE} from './constants'
 import {X_MOBIFY_REQUEST_CLASS} from '../../utils/ssr-proxying'
 import {RemoteServerFactory} from './build-remote-server'
 
