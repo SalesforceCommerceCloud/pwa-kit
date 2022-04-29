@@ -171,7 +171,7 @@ describe('Create Bundle', () => {
                     Utils.createBundle(
                         {
                             buildDirectory: bundlePath,
-                            projectSlug: 'scaffold-pwa',
+                            projectSlug: 'retail-react-app',
                             set_ssr_values: true,
                             ssr_only: ['**/*.js'],
                             ssr_shared: ['**/*.js']
