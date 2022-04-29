@@ -28,7 +28,7 @@ export const resolveSiteFromUrl = (url) => {
     const sites = getSites()
 
     // step 1: use the siteRef to look for the site from the sites in the app config
-    // since aliases are optional, make sure alias is defined before the equality check
+    // since alias is optional, make sure it is defined before the equality check
     site = sites.find((site) => site.id === siteRef || (site.alias && site.alias === siteRef))
     if (site) {
         return site
