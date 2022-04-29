@@ -23,11 +23,12 @@ export const resolveSiteFromUrl = (url) => {
     const path = `${pathname}${search}`
     let site
 
+    // get the site identifier from the url
     const {siteRef} = getParamsFromPath(path)
     const sites = getSites()
 
-    // get the site identifier from the url
-    // step 1: look for the site based on the site identifier (id or alias) from the url
+    // step 1: use the siteRef to look for the site from the sites in the app config
+    // since aliases are optional, make sure alias is defined before the equality check
     site = sites.find((site) => site.id === siteRef || (site.alias && site.alias === siteRef))
     if (site) {
         return site
