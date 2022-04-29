@@ -26,7 +26,6 @@ const {
     sendCachedResponse,
     cacheResponseWhenDone,
     respondFromBundle,
-    serveStaticFile,
     getRuntime
 } = require('./express')
 const {RemoteServerFactory, REMOTE_REQUIRED_ENV_VARS} = require('./build-remote-server')
@@ -600,7 +599,7 @@ describe('SSRServer operation', () => {
         const app = RemoteServerFactory.createApp(opts())
         const faviconPath = path.resolve(testFixtures, 'favicon.ico')
 
-        app.get('/thing', serveStaticFile('favicon.ico'))
+        app.get('/thing', RemoteServerFactory.serveStaticFile('favicon.ico'))
 
         return request(app)
             .get('/thing')
@@ -616,7 +615,7 @@ describe('SSRServer operation', () => {
     test('serveStaticFile returns 404 if the file does not exist', () => {
         const app = RemoteServerFactory.createApp(opts())
 
-        app.get('/thing', serveStaticFile('this-does-not-exist.ico'))
+        app.get('/thing', RemoteServerFactory.serveStaticFile('this-does-not-exist.ico'))
 
         return request(app)
             .get('/thing')

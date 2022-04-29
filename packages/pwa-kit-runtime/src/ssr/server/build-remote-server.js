@@ -666,6 +666,29 @@ export const RemoteServerFactory = {
         res.send(content)
     },
 
+    /**
+    * Serve static files from the app's build directory and set default
+    * cache-control headers.
+    * @since v2.1.0
+    *
+    * This is a wrapper around the Express `res.sendFile` method.
+    *
+    * @param {String} filePath - the location of the static file relative to the build directory
+    * @param {Object} opts - the options object to pass to the original `sendFile` method
+    */
+    serveStaticFile(filePath, opts = {}) {
+        return (req, res) => {
+            const options = req.app.options
+            const file = path.resolve(options.buildDir, filePath)
+            res.sendFile(file, {
+                headers: {
+                    [CACHE_CONTROL]: options.defaultCacheControl
+                },
+                ...opts
+            })
+        }
+    },
+
     render(req, res, next) {
         const app = req.app
         if (!app.__renderer) {

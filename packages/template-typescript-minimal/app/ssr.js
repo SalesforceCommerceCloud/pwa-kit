@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 const path = require('path')
-const {getRuntime, serveStaticFile} = require('pwa-kit-runtime/ssr/server/express')
+const {getRuntime} = require('pwa-kit-runtime/ssr/server/express')
 const pkg = require('../package.json')
 
 const options = {
@@ -40,7 +40,7 @@ const {handler} = runtime.createHandler(options, (app) => {
         res.send()
     })
 
-    app.get('/robots.txt', serveStaticFile('static/robots.txt'))
+    app.get('/robots.txt', runtime.serveStaticFile('static/robots.txt'))
 
     app.get('/worker.js(.map)?', runtime.serveServiceWorker)
     app.get('*', runtime.render)
