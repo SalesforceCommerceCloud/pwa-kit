@@ -11,7 +11,6 @@ const fs = require('fs')
 const path = require('path')
 const os = require('os')
 const rimraf = require('rimraf')
-const Promise = require('bluebird')
 const pkg = require('../package.json')
 
 jest.mock('git-rev-sync')
@@ -172,7 +171,7 @@ describe('Create Bundle', () => {
                     Utils.createBundle(
                         {
                             buildDirectory: bundlePath,
-                            projectSlug: 'scaffold-pwa',
+                            projectSlug: 'retail-react-app',
                             set_ssr_values: true,
                             ssr_only: ['**/*.js'],
                             ssr_shared: ['**/*.js']

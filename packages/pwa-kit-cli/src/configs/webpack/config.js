@@ -101,8 +101,6 @@ const baseConfig = (target) => {
                 optimization: {
                     minimize: mode === production
                 },
-                // Always use source map, makes debugging the server much easier.
-                devtool: 'source-map',
                 output: {
                     publicPath: '',
                     path: buildDir
@@ -120,8 +118,7 @@ const baseConfig = (target) => {
                         react: findInProjectThenSDK('react'),
                         'react-router-dom': findInProjectThenSDK('react-router-dom'),
                         'react-dom': findInProjectThenSDK('react-dom'),
-                        'react-helmet': findInProjectThenSDK('react-helmet'),
-                        bluebird: findInProjectThenSDK('bluebird')
+                        'react-helmet': findInProjectThenSDK('react-helmet')
                     },
                     ...(target === 'web' ? {fallback: {crypto: false}} : {})
                 },
@@ -224,6 +221,8 @@ const client =
                 ...config,
                 // Must be named "client". See - https://www.npmjs.com/package/webpack-hot-server-middleware#usage
                 name,
+                // use source map to make debugging easier
+                devtool: mode === development ? 'source-map' : false,
                 entry: {
                     main: './app/main'
                 },
@@ -255,6 +254,8 @@ const clientOptional = baseConfig('web')
                 ...optional('core-polyfill', resolve(projectDir, 'node_modules', 'core-js')),
                 ...optional('fetch-polyfill', resolve(projectDir, 'node_modules', 'whatwg-fetch'))
             },
+            // use source map to make debugging easier
+            devtool: mode === development ? 'source-map' : false,
             plugins: [
                 ...config.plugins,
                 analyzeBundle && getBundleAnalyzerPlugin('client-optional')
@@ -272,6 +273,8 @@ const renderer =
                 // Must be named "server". See - https://www.npmjs.com/package/webpack-hot-server-middleware#usage
                 name: 'server',
                 entry: 'pwa-kit-react-sdk/ssr/server/react-rendering.js',
+                // use eval-source-map for server-side debugging
+                devtool: mode === development ? 'eval-source-map' : false,
                 output: {
                     path: buildDir,
                     filename: 'server-renderer.js',
@@ -338,6 +341,8 @@ const requestProcessor =
                     filename: 'request-processor.js',
                     libraryTarget: 'commonjs2'
                 },
+                // use eval-source-map for server-side debugging
+                devtool: mode === development ? 'eval-source-map' : false,
                 plugins: [
                     ...config.plugins,
                     analyzeBundle && getBundleAnalyzerPlugin('request-processor')

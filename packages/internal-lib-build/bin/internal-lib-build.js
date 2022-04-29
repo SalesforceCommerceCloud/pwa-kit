@@ -63,12 +63,11 @@ const main = () => {
     program
         .command('test')
         .description('test the library')
-        .option('--jest-args <args>', 'arguments to forward to Jest')
-        .action(({jestArgs}) => {
-            const jest = p.join(binDir, 'jest')
-            execSync(`${jest} --passWithNoTests --maxWorkers=2${jestArgs ? ' ' + jestArgs : ''}`, {
-                env: {...process.env, NODE_ENV: 'test'}
-            })
+        .action((_, {args}) => {
+            const jest = p.join(require.resolve('jest'), '..', '..', '..', '.bin', 'jest')
+            execSync(
+                `${jest} --passWithNoTests --maxWorkers=2${args.length ? ' ' + args.join(' ') : ''}`
+            )
         })
 
     program.parse(process.argv)
