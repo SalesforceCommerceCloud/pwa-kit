@@ -134,6 +134,7 @@ const main = () => {
             const config = p.resolve('config')
             if (fs.existsSync(config)) {
                 sh.cp('-R', config, './build')
+                sh.rm('./build/config/local.*')
             }
 
             // This file is required by MRT, for historical reasons.
