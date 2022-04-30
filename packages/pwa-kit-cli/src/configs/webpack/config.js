@@ -295,18 +295,6 @@ const renderer =
                         patterns: [{from: 'app/static/', to: 'static/'}]
                     }),
 
-                    new CopyPlugin({
-                        patterns: [
-                            {
-                                from: 'config/',
-                                to: 'config/',
-                                globOptions: {
-                                    ignore: ['**/local.*']
-                                },
-                                noErrorOnMissing: true
-                            }
-                        ]
-                    }),
                     analyzeBundle && getBundleAnalyzerPlugin('server-renderer')
                 ].filter(Boolean)
             }
