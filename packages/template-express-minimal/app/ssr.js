@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
+    // Deliberate eslint rule violation for testing eslint
+
 const path = require('path')
 const {getRuntime} = require('pwa-kit-runtime/ssr/server/express')
 const pkg = require('../package.json')
