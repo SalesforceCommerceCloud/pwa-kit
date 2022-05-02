@@ -23,14 +23,14 @@ const opts = (overrides = {}) => {
         mobify: {
             ssrEnabled: true,
             ssrParameters: {
-                proxyConfigs: [],
-            },
+                proxyConfigs: []
+            }
         },
-        protocol: 'http',
+        protocol: 'http'
     }
     return {
         ...defaults,
-        ...overrides,
+        ...overrides
     }
 }
 
@@ -229,7 +229,7 @@ jest.mock('../universal/routes', () => {
     }
 
     GetPropsReturnsObject.propTypes = {
-        prop: PropTypes.node,
+        prop: PropTypes.node
     }
 
     return {
@@ -237,53 +237,53 @@ jest.mock('../universal/routes', () => {
         default: [
             {
                 path: '/pwa/',
-                component: fakeLoadable(PWAPage),
+                component: fakeLoadable(PWAPage)
             },
             {
                 path: '/unknown-error/',
-                component: UnknownErrorPage,
+                component: UnknownErrorPage
             },
             {
                 path: '/throw-string/',
-                component: ThrowStringErrorPage,
+                component: ThrowStringErrorPage
             },
             {
                 path: '/known-error/',
-                component: KnownErrorPage,
+                component: KnownErrorPage
             },
             {
                 path: '/404-in-get-props-error/',
-                component: GetProps404ErrorPage,
+                component: GetProps404ErrorPage
             },
             {
                 path: '/redirect/',
-                component: RedirectPage,
+                component: RedirectPage
             },
             {
                 path: '/init-sets-status/',
-                component: InitSetsStatusPage,
+                component: InitSetsStatusPage
             },
             {
                 path: '/get-props-returns-object/',
-                component: GetPropsReturnsObject,
+                component: GetPropsReturnsObject
             },
             {
                 path: '/get-props-rejects-with-empty-string/',
-                component: GetPropsRejectsWithEmptyString,
+                component: GetPropsRejectsWithEmptyString
             },
             {
                 path: '/render-throws-error/',
-                component: RenderThrowsError,
+                component: RenderThrowsError
             },
             {
                 path: '/render-helmet/',
-                component: fakeLoadable(HelmetPage),
+                component: fakeLoadable(HelmetPage)
             },
             {
                 path: '/xss/',
-                component: XSSPage,
-            },
-        ],
+                component: XSSPage
+            }
+        ]
     }
 })
 
@@ -291,7 +291,7 @@ jest.mock('pwa-kit-runtime/utils/ssr-server', () => {
     const actual = jest.requireActual('pwa-kit-runtime/utils/ssr-server')
     return {
         ...actual,
-        isRemote: jest.fn(),
+        isRemote: jest.fn()
     }
 })
 
@@ -303,12 +303,12 @@ jest.mock('@loadable/server', () => {
         // Tests aren't being run through webpack, therefore no chunks or `loadable-stats.json`
         // file is being created. ChunkExtractor causes a file read exception. For this
         // reason, we mock the implementation to do nothing.
-        ChunkExtractor: function () {
+        ChunkExtractor: function() {
             return {
                 collectChunks: jest.fn().mockImplementation((x) => x),
-                getScriptElements: jest.fn().mockReturnValue([]),
+                getScriptElements: jest.fn().mockReturnValue([])
             }
-        },
+        }
     }
 })
 
@@ -366,15 +366,15 @@ describe('The Node SSR Environment', () => {
                 expect(data.__DEVICE_TYPE__).toEqual('DESKTOP')
                 include.forEach((s) => expect(html).toEqual(expect.stringContaining(s)))
                 expect(scriptsAreSafe(doc)).toBe(true)
-            },
+            }
         },
         {
             description: `rendering PWA's for tablet`,
             req: {
                 url: '/pwa/',
                 headers: {
-                    'User-Agent': tablet,
-                },
+                    'User-Agent': tablet
+                }
             },
             assertions: (res) => {
                 expect(res.statusCode).toBe(200)
@@ -385,15 +385,15 @@ describe('The Node SSR Environment', () => {
                 const include = ['<div>This is a PWA</div>']
                 include.forEach((s) => expect(html).toEqual(expect.stringContaining(s)))
                 expect(scriptsAreSafe(doc)).toBe(true)
-            },
+            }
         },
         {
             description: `rendering PWA's for mobile`,
             req: {
                 url: '/pwa/',
                 headers: {
-                    'User-Agent': mobile,
-                },
+                    'User-Agent': mobile
+                }
             },
             assertions: (res) => {
                 expect(res.statusCode).toBe(200)
@@ -404,7 +404,7 @@ describe('The Node SSR Environment', () => {
                 const include = ['<div>This is a PWA</div>']
                 include.forEach((s) => expect(html).toEqual(expect.stringContaining(s)))
                 expect(scriptsAreSafe(doc)).toBe(true)
-            },
+            }
         },
         {
             description: `rendering PWA's in "mobify-server-only" mode should not execute scripts on the client`,
@@ -418,7 +418,7 @@ describe('The Node SSR Environment', () => {
                     // application/json prevents execution!
                     expect(script.getAttribute('type')).toBe('application/json')
                 })
-            },
+            }
         },
         {
             description: `rendering PWA's in "__server-only" mode should not execute scripts on the client`,
@@ -432,7 +432,7 @@ describe('The Node SSR Environment', () => {
                     // application/json prevents execution!
                     expect(script.getAttribute('type')).toBe('application/json')
                 })
-            },
+            }
         },
         {
             description: `rendering PWA's with legacy "mobify_pretty" mode should print stylized global state`,
@@ -445,7 +445,7 @@ describe('The Node SSR Environment', () => {
                 const script = doc.querySelectorAll('script[id=mobify-data]')[0]
 
                 expect(script.innerHTML.split(/\r\n|\r|\n/).length).toBeGreaterThan(1)
-            },
+            }
         },
         {
             description: `rendering PWA's with  "__pretty_print" mode should print stylized global state`,
@@ -458,56 +458,56 @@ describe('The Node SSR Environment', () => {
                 const script = doc.querySelectorAll('script[id=mobify-data]')[0]
 
                 expect(script.innerHTML.split(/\r\n|\r|\n/).length).toBeGreaterThan(1)
-            },
+            }
         },
         {
             description: `404 when no route matches`,
             req: {url: '/this-should-404/'},
             assertions: (res) => {
                 expect(res.statusCode).toBe(404)
-            },
+            }
         },
         {
             description: `404 when getProps method throws a 404`,
             req: {url: '/404-in-get-props-error/'},
             assertions: (res) => {
                 expect(res.statusCode).toBe(404)
-            },
+            }
         },
         {
             description: `supports react-routers redirect mechanism`,
             req: {url: '/redirect/'},
             assertions: (res) => {
                 expect(res.statusCode).toBe(302)
-            },
+            }
         },
         {
             description: `500 on unknown errors in getProps`,
             req: {url: '/unknown-error/'},
             assertions: (res) => {
                 expect(res.statusCode).toBe(500)
-            },
+            }
         },
         {
             description: `500 when string (not Error) thrown in getProps`,
             req: {url: '/throw-string/'},
             assertions: (res) => {
                 expect(res.statusCode).toBe(500)
-            },
+            }
         },
         {
             description: `5XX on known HTTP errors in getProps`,
             req: {url: '/known-error/'},
             assertions: (res) => {
                 expect(res.statusCode).toBe(503)
-            },
+            }
         },
         {
             description: `Respects HTTP status codes set in init() methods`,
             req: {url: '/init-sets-status/'},
             assertions: (res) => {
                 expect(res.statusCode).toBe(418)
-            },
+            }
         },
         {
             description: `Works if the user returns an Object of props, instead of a Promise`,
@@ -517,7 +517,7 @@ describe('The Node SSR Environment', () => {
                 const html = res.text
                 const include = ['<div>prop-value</div>']
                 include.forEach((s) => expect(html).toEqual(expect.stringContaining(s)))
-            },
+            }
         },
         {
             description: `Renders the error page if getProps rejects with an empty string`,
@@ -531,7 +531,7 @@ describe('The Node SSR Environment', () => {
                 expect(typeof data.__ERROR__.stack).toEqual(isRemote() ? 'undefined' : 'string')
 
                 expect(data.__ERROR__.status).toEqual(500)
-            },
+            }
         },
         {
             description: `Renders the error page instead if there is an error during component rendering`,
@@ -545,7 +545,7 @@ describe('The Node SSR Environment', () => {
                 expect(typeof data.__ERROR__.stack).toEqual(isRemote() ? 'undefined' : 'string')
                 expect(data.__ERROR__.status).toEqual(500)
                 expect(res.statusCode).toBe(500)
-            },
+            }
         },
         {
             description: `Renders react-helmet tags`,
@@ -588,7 +588,7 @@ describe('The Node SSR Environment', () => {
                         .querySelector('script[type="application/ld+json"]')
                         .innerHTML.includes(`"@context": "http://schema.org"`)
                 ).toBe(true)
-            },
+            }
         },
         {
             description: `Frozen state is escaped preventing injection attacks`,
@@ -599,7 +599,7 @@ describe('The Node SSR Environment', () => {
                 const scriptContent = doc.querySelector('#mobify-data').innerHTML
 
                 expect(scriptContent).not.toContain('<script>')
-            },
+            }
         },
         {
             description: `AppConfig errors are caught`,
@@ -617,8 +617,8 @@ describe('The Node SSR Environment', () => {
                 expect(html).toContain(
                     shouldIncludeErrorStack ? 'Error: ' : 'Internal Server Error'
                 )
-            },
-        },
+            }
+        }
     ]
 
     const isRemoteValues = [true, false]

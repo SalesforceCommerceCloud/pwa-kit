@@ -107,7 +107,7 @@ export const _updatePackageMobify = (newValue) => {
                 protocol: ssrParameters[`proxyProtocol${index1}`],
                 host: oldHost,
                 /* istanbul ignore else */
-                path: ssrParameters[`proxyPath${index1}`],
+                path: ssrParameters[`proxyPath${index1}`]
             }
         } else {
             // New format of proxy configs
@@ -125,7 +125,7 @@ export const _updatePackageMobify = (newValue) => {
                 config = {
                     protocol: match[1],
                     host: match[3],
-                    path: match[5] || (config && config.path),
+                    path: match[5] || (config && config.path)
                 }
 
                 overridden = ` (overridden by ${overrideKey}="${override}")`
