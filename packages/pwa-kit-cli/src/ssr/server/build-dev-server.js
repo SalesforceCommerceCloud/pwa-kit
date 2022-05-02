@@ -33,23 +33,38 @@ const NO_CACHE = 'max-age=0, nocache, nostore, must-revalidate'
  * @private
  */
 export const DevServerMixin = {
+    /**
+     * @private
+    */
     logStartupMessage(options) {
         console.log(`Starting the DevServer on ${chalk.cyan(this._getDevServerURL(options))}`)
     },
 
+    /**
+     * @private
+    */
     getProtocol(options) {
         return process.env.DEV_SERVER_PROTOCOL || options.protocol
     },
 
+    /**
+     * @private
+    */
     // eslint-disable-next-line no-unused-vars
     getDefaultCacheControl(options) {
         return NO_CACHE
     },
 
+    /**
+     * @private
+    */
     strictSSL(options) {
         return options.strictSSL
     },
 
+    /**
+     * @private
+    */
     setCompression(app) {
         app.use(
             compression({
@@ -59,10 +74,16 @@ export const DevServerMixin = {
         )
     },
 
+    /**
+     * @private
+    */
     setupLogging(app) {
         app.use(expressLogging('dev'))
     },
 
+    /**
+     * @private
+    */
     setupMetricsFlushing(app) {
         // Flush metrics at the end of sending. We do this here to
         // keep the code paths consistent between local and remote
@@ -74,6 +95,9 @@ export const DevServerMixin = {
         })
     },
 
+    /**
+     * @private
+    */
     // eslint-disable-next-line no-unused-vars
     setupProxying(app, options) {
         proxyConfigs.forEach((config) => {
@@ -82,6 +106,9 @@ export const DevServerMixin = {
         })
     },
 
+    /**
+     * @private
+    */
     addSDKInternalHandlers(app) {
         // This is separated out from addSSRRenderer because these
         // routes must not have our SSR middleware applied to them.
@@ -173,11 +200,17 @@ export const DevServerMixin = {
         })
     },
 
+    /**
+     * @private
+    */
     // eslint-disable-next-line no-unused-vars
     _redirectToLoadingScreen(req, res, next) {
         res.redirect('/__mrt/loading-screen/index.html?loading=1')
     },
 
+    /**
+     * @private
+    */
     _getDevServerHostAndPort(options) {
         const split = options.devServerHostName.split(':')
         const hostname = split.length === 2 ? split[0] : options.devServerHostName
@@ -185,12 +218,18 @@ export const DevServerMixin = {
         return {hostname, port}
     },
 
+    /**
+     * @private
+    */
     _getDevServerURL(options) {
         const {protocol} = options
         const {hostname, port} = this._getDevServerHostAndPort(options)
         return `${protocol}://${hostname}:${port}`
     },
 
+    /**
+     * @private
+    */
     _createHandler(app) {
         const {protocol, sslFilePath} = app.options
         const {hostname, port} = this._getDevServerHostAndPort(app.options)
@@ -343,4 +382,7 @@ export const shouldCompress = (req, res) => {
     return compression.filter(req, res)
 }
 
+/**
+ * @private
+ */
 export const DevServerFactory = Object.assign({}, RemoteServerFactory, DevServerMixin)

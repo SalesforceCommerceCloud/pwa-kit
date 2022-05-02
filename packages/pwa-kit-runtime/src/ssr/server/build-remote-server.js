@@ -78,6 +78,9 @@ let _nextRequestId = 1
  * @private
  */
 export const RemoteServerFactory = {
+    /**
+     * @private
+    */
     configure(options) {
         /**
          * Not all of these options are documented. Some exist to allow for
@@ -136,49 +139,79 @@ export const RemoteServerFactory = {
         return options
     },
 
+    /**
+     * @private
+    */
     // eslint-disable-next-line no-unused-vars
     logStartupMessage(options) {
         // Hook for the DevServer
     },
 
+    /**
+     * @private
+    */
     // eslint-disable-next-line no-unused-vars
     getProtocol(options) {
         return 'https'
     },
 
+    /**
+     * @private
+    */
     getDefaultCacheControl(options) {
         return `max-age=${options.defaultCacheTimeSeconds}, s-maxage=${options.defaultCacheTimeSeconds}`
     },
 
+    /**
+     * @private
+    */
     // eslint-disable-next-line no-unused-vars
     strictSSL(options) {
         return true
     },
 
+    /**
+     * @private
+    */
     // eslint-disable-next-line no-unused-vars
     setCompression(app) {
         // Let the CDN do it
     },
 
+    /**
+     * @private
+    */
     // eslint-disable-next-line no-unused-vars
     setupLogging(app) {
         // Hook for the dev-server
     },
 
+    /**
+     * @private
+    */
     // eslint-disable-next-line no-unused-vars
     setupMetricsFlushing(app) {
         // Hook for the dev-server
     },
 
+    /**
+     * @private
+    */
     // eslint-disable-next-line no-unused-vars
     updatePackageMobify(options) {
         updatePackageMobify(options.mobify)
     },
 
+    /**
+     * @private
+    */
     configureProxyConfigs(options) {
         configureProxyConfigs(options.appHostname, options.protocol)
     },
 
+    /**
+     * @private
+    */
     createApp(options) {
         options = this.configure(options)
         this.logStartupMessage(options)
@@ -217,6 +250,9 @@ export const RemoteServerFactory = {
         return app
     },
 
+    /**
+     * @private
+    */
     createExpressApp(options) {
         const app = express()
         app.disable('x-powered-by')
@@ -283,9 +319,15 @@ export const RemoteServerFactory = {
         return app
     },
 
+    /**
+     * @private
+    */
     // eslint-disable-next-line no-unused-vars
     addSDKInternalHandlers(app) {},
 
+    /**
+     * @private
+    */
     setupSSRRequestProcessorMiddleware(app) {
         const that = this
 
@@ -496,6 +538,9 @@ export const RemoteServerFactory = {
         app.use(ssrRequestProcessorMiddleware)
     },
 
+    /**
+     * @private
+    */
     // eslint-disable-next-line no-unused-vars
     setupProxying(app, options) {
         app.all('/mobify/proxy/*', (_, res) => {
@@ -506,6 +551,9 @@ export const RemoteServerFactory = {
         })
     },
 
+    /**
+     * @private
+    */
     setupHealthcheck(app) {
         app.get('/mobify/ping', (_, res) =>
             res
@@ -515,6 +563,9 @@ export const RemoteServerFactory = {
         )
     },
 
+    /**
+     * @private
+    */
     setupCommonMiddleware(app, options) {
         app.use(prepNonProxyRequest)
 
@@ -531,6 +582,9 @@ export const RemoteServerFactory = {
         applyPatches(options)
     },
 
+    /**
+     * @private
+    */
     validateConfiguration(options) {
         // Check that we are running under a compatible version of node
         /* istanbul ignore next */
@@ -753,6 +807,9 @@ export const RemoteServerFactory = {
         return this._createHandler(app)
     },
 
+    /**
+     * @private
+    */
     // eslint-disable-next-line no-unused-vars
     getRequestProcessor(req) {
         return null
