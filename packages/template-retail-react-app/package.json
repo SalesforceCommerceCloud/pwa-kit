@@ -58,6 +58,7 @@
         "react-hook-form": "^6.15.5",
         "react-intl": "^5.13.1",
         "react-router-dom": "^5.1.2",
+        "regenerator-runtime": "^0.13.9",
         "whatwg-fetch": "1.0.0"
     },
     "scripts": {

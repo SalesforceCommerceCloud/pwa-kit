@@ -105,7 +105,6 @@
     "internal-lib-build": "^2.0.0-dev.5",
     "nock": "^13.1.1",
     "pwa-kit-runtime": "^2.0.0-dev.5",
-    "regenerator-runtime": "^0.13.9",
     "superagent": "^6.1.0",
     "supertest": "^4.0.2"
   },
