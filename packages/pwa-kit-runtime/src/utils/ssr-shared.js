@@ -38,10 +38,10 @@ export const MAX_PROXY_CONFIGS = 8
 /**
  * An Array of objects with protocol, host, path for each configured proxy.
  * This is *only* usable server-side, where it's set when the SSRServer
- * calls _updatePackageMobify.
+ * calls updatePackageMobify.
  *
  * The objects in this array also have the following additional properties,
- * added by _configureProxyConfigs in utils/ssr-server:
+ * added by configureProxyConfigs in utils/ssr-server:
  * proxyPath is the full /mobify/proxy... path
  * proxy is an http-proxy-middleware function that can be used to proxy a
  * request to a target (it's an ExpressJS function taking req, res and next)
@@ -75,7 +75,7 @@ const proxyOverrideRE = /^(http(s)?):\/\/([^/]+)(\/)?([^/]+)?(\/caching)?/
  * @private
  * @param newValue {Object} the new value of the Mobify object
  */
-export const _updatePackageMobify = (newValue) => {
+export const updatePackageMobify = (newValue) => {
     _packageMobify = newValue || _packageMobify || {}
 
     // Clear and update the proxyConfigs array
@@ -107,7 +107,7 @@ export const _updatePackageMobify = (newValue) => {
                 protocol: ssrParameters[`proxyProtocol${index1}`],
                 host: oldHost,
                 /* istanbul ignore else */
-                path: ssrParameters[`proxyPath${index1}`]
+                path: ssrParameters[`proxyPath${index1}`],
             }
         } else {
             // New format of proxy configs
@@ -125,7 +125,7 @@ export const _updatePackageMobify = (newValue) => {
                 config = {
                     protocol: match[1],
                     host: match[3],
-                    path: match[5] || (config && config.path)
+                    path: match[5] || (config && config.path),
                 }
 
                 overridden = ` (overridden by ${overrideKey}="${override}")`

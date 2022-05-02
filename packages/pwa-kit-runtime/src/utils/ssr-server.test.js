@@ -27,7 +27,7 @@ import {
     detectDeviceType,
     DESKTOP,
     PHONE,
-    TABLET
+    TABLET,
 } from './ssr-server'
 
 import {
@@ -36,8 +36,8 @@ import {
     proxyConfigs,
     reset,
     ssrFiles,
-    _updatePackageMobify,
-    MAX_PROXY_CONFIGS
+    updatePackageMobify,
+    MAX_PROXY_CONFIGS,
 } from './ssr-shared'
 
 import {
@@ -45,7 +45,7 @@ import {
     CONTENT_TYPE,
     X_ORIGINAL_CONTENT_TYPE,
     APPLICATION_OCTET_STREAM,
-    PROXY_PATH_PREFIX
+    PROXY_PATH_PREFIX,
 } from '../ssr/server/constants'
 
 const baseMobify = {
@@ -57,16 +57,16 @@ const baseMobify = {
             {
                 protocol: 'https',
                 host: 'www.merlinspotions.com',
-                path: 'base'
+                path: 'base',
             },
             {
                 protocol: 'https',
                 host: 'api.merlinspotions.com',
                 path: 'base2',
-                caching: true
-            }
-        ]
-    }
+                caching: true,
+            },
+        ],
+    },
 }
 
 const userAgents = {
@@ -79,30 +79,24 @@ const userAgents = {
             'Mozilla/5.0 (iPhone; CPU iPhone OS 11_0 like Mac OS X) AppleWebKit/604.1.38 (KHTML, like Gecko) Version/11.0 Mobile/15A372 Safari/604.1',
         iphoneX:
             'Mozilla/5.0 (iPhone; CPU iPhone OS 11_0 like Mac OS X) AppleWebKit/604.1.38 (KHTML, like Gecko) Version/11.0 Mobile/15A372 Safari/604.1',
-        nexus4:
-            'Mozilla/5.0 (Linux; Android 4.4.2; Nexus 4 Build/KOT49H) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3598.0 Mobile Safari/537.36',
-        nexus5:
-            'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3598.0 Mobile Safari/537.36',
-        nexus6:
-            'Mozilla/5.0 (Linux; Android 7.1.1; Nexus 6 Build/N6F26U) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3598.0 Mobile Safari/537.36',
+        nexus4: 'Mozilla/5.0 (Linux; Android 4.4.2; Nexus 4 Build/KOT49H) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3598.0 Mobile Safari/537.36',
+        nexus5: 'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3598.0 Mobile Safari/537.36',
+        nexus6: 'Mozilla/5.0 (Linux; Android 7.1.1; Nexus 6 Build/N6F26U) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3598.0 Mobile Safari/537.36',
         galaxyS5:
             'Mozilla/5.0 (Linux; Android 5.0; SM-G900P Build/LRX21T) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3598.0 Mobile Safari/537.36',
-        pixel2:
-            'Mozilla/5.0 (Linux; Android 8.0; Pixel 2 Build/OPD3.170816.012) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3598.0 Mobile Safari/537.36',
+        pixel2: 'Mozilla/5.0 (Linux; Android 8.0; Pixel 2 Build/OPD3.170816.012) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3598.0 Mobile Safari/537.36',
         pixel2XL:
-            'Mozilla/5.0 (Linux; Android 8.0.0; Pixel 2 XL Build/OPD1.170816.004) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3598.0 Mobile Safari/537.36'
+            'Mozilla/5.0 (Linux; Android 8.0.0; Pixel 2 XL Build/OPD1.170816.004) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3598.0 Mobile Safari/537.36',
     },
     tablet: {
-        nexus7:
-            'Mozilla/5.0 (Linux; Android 6.0.1; Nexus 7 Build/MOB30X) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3598.0 Safari/537.36',
+        nexus7: 'Mozilla/5.0 (Linux; Android 6.0.1; Nexus 7 Build/MOB30X) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3598.0 Safari/537.36',
         nexus10:
             'Mozilla/5.0 (Linux; Android 6.0.1; Nexus 10 Build/MOB31T) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3598.0 Safari/537.36',
-        ipad:
-            'Mozilla/5.0 (iPad; CPU OS 11_0 like Mac OS X) AppleWebKit/604.1.34 (KHTML, like Gecko) Version/11.0 Mobile/15A5341f Safari/604.1',
+        ipad: 'Mozilla/5.0 (iPad; CPU OS 11_0 like Mac OS X) AppleWebKit/604.1.34 (KHTML, like Gecko) Version/11.0 Mobile/15A5341f Safari/604.1',
         ipadAir:
             'Mozilla/5.0 (iPad; CPU OS 11_4 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/11.0 Mobile/15E148 Safari/604.1',
         ipadPro:
-            'Mozilla/5.0 (iPad; CPU OS 11_0 like Mac OS X) AppleWebKit/604.1.34 (KHTML, like Gecko) Version/11.0 Mobile/15A5341f Safari/604.1'
+            'Mozilla/5.0 (iPad; CPU OS 11_0 like Mac OS X) AppleWebKit/604.1.34 (KHTML, like Gecko) Version/11.0 Mobile/15A5341f Safari/604.1',
     },
     desktop: {
         chrome72:
@@ -111,10 +105,9 @@ const userAgents = {
             'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.13; rv:63.0) Gecko/20100101 Firefox/63.0',
         safari11:
             'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/11.1.2 Safari/605.1.15',
-        edge17:
-            'Mozilla/5.0 (Windows NT 10.0; WebView/3.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.140 Safari/537.36 Edge/17.17134',
-        ie11: 'Mozilla/5.0 (Windows NT 6.3; Trident/7.0; rv:11.0) like Gecko'
-    }
+        edge17: 'Mozilla/5.0 (Windows NT 10.0; WebView/3.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.140 Safari/537.36 Edge/17.17134',
+        ie11: 'Mozilla/5.0 (Windows NT 6.3; Trident/7.0; rv:11.0) like Gecko',
+    },
 }
 
 let consoleLog
@@ -164,7 +157,7 @@ describe('utils/ssr-server tests', () => {
 
         expect(() => getFullRequestURL('/somepath')).toThrow()
 
-        _updatePackageMobify(baseMobify)
+        updatePackageMobify(baseMobify)
 
         expect(getFullRequestURL(`${PROXY_PATH_PREFIX}/base/somepath`)).toEqual(
             'https://www.merlinspotions.com/somepath'
@@ -175,7 +168,7 @@ describe('utils/ssr-server tests', () => {
         )
     })
 
-    describe('_updatePackageMobify tests', () => {
+    describe('updatePackageMobify tests', () => {
         afterEach(() => {
             // Clear environment of overrides
             for (let i = 1; i <= 9; i++) {
@@ -201,7 +194,7 @@ describe('utils/ssr-server tests', () => {
                             `/mobify/caching/${inputConfigs[i].path}`
                         )
                     }
-                }
+                },
             },
             {
                 name: 'new format proxy configs with overrides',
@@ -210,24 +203,24 @@ describe('utils/ssr-server tests', () => {
                         proxyConfigs: [
                             {
                                 protocol: 'https',
-                                host: 'www.merlinspotions.com'
+                                host: 'www.merlinspotions.com',
                             },
                             {
                                 protocol: 'https',
                                 host: 'api.merlinspotions.com',
-                                caching: true
+                                caching: true,
                             },
                             {
                                 host: 'extra.merlinspotions.com',
-                                path: 'base3'
-                            }
-                        ]
-                    }
+                                path: 'base3',
+                            },
+                        ],
+                    },
                 },
                 environment: {
                     SSR_PROXY1: 'http://somewhere.else',
                     SSR_PROXY2: 'http://another.place/base9',
-                    SSR_PROXY3: 'http://far.away/base8/caching'
+                    SSR_PROXY3: 'http://far.away/base8/caching',
                 },
                 validate: () => {
                     expect(proxyConfigs.length).toBe(3)
@@ -244,7 +237,7 @@ describe('utils/ssr-server tests', () => {
                     expect(proxyConfigs[0].cachingPath).toEqual('/mobify/caching/base')
                     expect(proxyConfigs[1].cachingPath).toEqual('/mobify/caching/base9')
                     expect(proxyConfigs[2].cachingPath).toEqual('/mobify/caching/base8')
-                }
+                },
             },
             {
                 name: 'old format proxy configs',
@@ -255,8 +248,8 @@ describe('utils/ssr-server tests', () => {
                         proxyPath1: 'base',
                         proxyProtocol2: 'https',
                         proxyHost2: 'api.merlinspotions.com',
-                        proxyPath2: 'base2'
-                    }
+                        proxyPath2: 'base2',
+                    },
                 },
                 validate: () => {
                     const inputConfigs = baseMobify.ssrParameters.proxyConfigs
@@ -266,7 +259,7 @@ describe('utils/ssr-server tests', () => {
                         expect(proxyConfigs[i].host).toEqual(inputConfigs[i].host)
                         expect(proxyConfigs[i].path).toEqual(inputConfigs[i].path)
                     }
-                }
+                },
             },
             {
                 name: 'too many proxy configs',
@@ -280,19 +273,19 @@ describe('utils/ssr-server tests', () => {
                         )
                             .map(Number.call, Number)
                             .map((index) => ({
-                                host: `www.${index}.com`
-                            }))
-                    }
-                }
+                                host: `www.${index}.com`,
+                            })),
+                    },
+                },
             },
             {
                 name: 'no proxy configs',
                 mobify: {
-                    ssrParameters: {}
+                    ssrParameters: {},
                 },
                 validate: () => {
                     expect(proxyConfigs.length).toBe(0)
-                }
+                },
             },
             {
                 name: 'conflicting proxy configs',
@@ -305,11 +298,11 @@ describe('utils/ssr-server tests', () => {
                             {
                                 protocol: 'https',
                                 host: 'www.merlinspotions.com',
-                                path: 'base'
-                            }
-                        ]
-                    }
-                }
+                                path: 'base',
+                            },
+                        ],
+                    },
+                },
             },
             {
                 name: 'bad protocol',
@@ -317,11 +310,11 @@ describe('utils/ssr-server tests', () => {
                     ssrParameters: {
                         proxyConfigs: [
                             {
-                                protocol: 'file'
-                            }
-                        ]
-                    }
-                }
+                                protocol: 'file',
+                            },
+                        ],
+                    },
+                },
             },
             {
                 name: 'missing host',
@@ -329,11 +322,11 @@ describe('utils/ssr-server tests', () => {
                     ssrParameters: {
                         proxyConfigs: [
                             {
-                                protocol: 'https'
-                            }
-                        ]
-                    }
-                }
+                                protocol: 'https',
+                            },
+                        ],
+                    },
+                },
             },
             {
                 name: 'duplicate path',
@@ -343,17 +336,17 @@ describe('utils/ssr-server tests', () => {
                             {
                                 protocol: 'https',
                                 host: '1.com',
-                                path: 'base'
+                                path: 'base',
                             },
                             {
                                 protocol: 'https',
                                 host: '2.com',
-                                path: 'base'
-                            }
-                        ]
-                    }
-                }
-            }
+                                path: 'base',
+                            },
+                        ],
+                    },
+                },
+            },
         ]
 
         testCases.forEach((testCase) =>
@@ -367,10 +360,10 @@ describe('utils/ssr-server tests', () => {
                 }
 
                 if (testCase.validate) {
-                    _updatePackageMobify(newMobify)
+                    updatePackageMobify(newMobify)
                     testCase.validate(getPackageMobify())
                 } else {
-                    expect(() => _updatePackageMobify(newMobify)).toThrow()
+                    expect(() => updatePackageMobify(newMobify)).toThrow()
                 }
             })
         )
@@ -382,51 +375,51 @@ describe('utils/ssr-server tests', () => {
             ...Object.keys(userAgents.phone).map((key) => ({
                 name: `test for user agent key ${key}`,
                 headers: {'user-agent': userAgents.phone[key]},
-                expected: PHONE
+                expected: PHONE,
             })),
 
             // Test all tablet user agents
             ...Object.keys(userAgents.tablet).map((key) => ({
                 name: `test for user agent key ${key}`,
                 headers: {'user-agent': userAgents.tablet[key]},
-                expected: TABLET
+                expected: TABLET,
             })),
 
             // Test all desktop user agents
             ...Object.keys(userAgents.desktop).map((key) => ({
                 name: `test for user agent key ${key}`,
                 headers: {'user-agent': userAgents.desktop[key]},
-                expected: DESKTOP
+                expected: DESKTOP,
             })),
             {
                 name: 'iphone CloudFront header',
                 headers: {
-                    'CloudFront-Is-Mobile-Viewer': 'true'
+                    'CloudFront-Is-Mobile-Viewer': 'true',
                 },
-                expected: PHONE
+                expected: PHONE,
             },
             {
                 name: 'ipad CloudFront header',
                 headers: {
                     'CloudFront-Is-Mobile-Viewer': 'true', // Tablets are also mobile devices
-                    'CloudFront-Is-Tablet-Viewer': 'true'
+                    'CloudFront-Is-Tablet-Viewer': 'true',
                 },
-                expected: TABLET
+                expected: TABLET,
             },
             {
                 name: 'desktop CloudFront header',
                 headers: {
-                    'CloudFront-Is-Desktop-Viewer': 'true'
+                    'CloudFront-Is-Desktop-Viewer': 'true',
                 },
-                expected: DESKTOP
-            }
+                expected: DESKTOP,
+            },
         ]
 
         tests.forEach((testConfig) => {
             test(`detectDeviceTypes (${testConfig.name})`, () => {
                 const req = {
                     get: (key) => testConfig.headers[key],
-                    query: {}
+                    query: {},
                 }
                 expect(detectDeviceType(req)).toEqual(testConfig.expected)
             })
@@ -437,8 +430,8 @@ describe('utils/ssr-server tests', () => {
             const req = {
                 get: (key) => headers[key],
                 query: {
-                    mobify_devicetype: TABLET
-                }
+                    mobify_devicetype: TABLET,
+                },
             }
             expect(detectDeviceType(req)).toEqual(TABLET)
         })
@@ -452,13 +445,13 @@ describe('utils/ssr-shared tests', () => {
         expect(getPackageMobify()).toEqual({})
         expect(getSSRParameters()).toEqual({})
 
-        _updatePackageMobify()
+        updatePackageMobify()
         expect(getPackageMobify()).toEqual({})
         expect(getSSRParameters()).toEqual({})
     })
 
     test('Mobify update works', () => {
-        _updatePackageMobify(baseMobify)
+        updatePackageMobify(baseMobify)
         expect(getPackageMobify()).toEqual(baseMobify)
         expect(getSSRParameters()).toEqual(baseMobify.ssrParameters)
     })
@@ -467,16 +460,16 @@ describe('utils/ssr-shared tests', () => {
         const mobify = Object.assign({}, baseMobify)
         mobify.ssrParameters = {}
 
-        _updatePackageMobify(mobify)
+        updatePackageMobify(mobify)
         expect(getSSRParameters()).toEqual(mobify.ssrParameters)
         expect(proxyConfigs).toEqual([])
 
         mobify.ssrParameters = {
             proxyHost1: '1.merlinspotions.com',
-            proxyHost2: '2.merlinspotions.com'
+            proxyHost2: '2.merlinspotions.com',
         }
 
-        _updatePackageMobify(mobify)
+        updatePackageMobify(mobify)
         expect(getSSRParameters()).toEqual(mobify.ssrParameters)
         expect(proxyConfigs).toEqual([
             {
@@ -484,50 +477,50 @@ describe('utils/ssr-shared tests', () => {
                 host: '1.merlinspotions.com',
                 path: 'base',
                 proxyPath: '/mobify/proxy/base',
-                cachingPath: '/mobify/caching/base'
+                cachingPath: '/mobify/caching/base',
             },
             {
                 protocol: 'https',
                 host: '2.merlinspotions.com',
                 path: 'base2',
                 proxyPath: '/mobify/proxy/base2',
-                cachingPath: '/mobify/caching/base2'
-            }
+                cachingPath: '/mobify/caching/base2',
+            },
         ])
 
         mobify.ssrParameters.proxyConfigs = [
             {
-                host: '3.merlinspotions.com'
-            }
+                host: '3.merlinspotions.com',
+            },
         ]
-        expect(() => _updatePackageMobify(mobify)).toThrow(
+        expect(() => updatePackageMobify(mobify)).toThrow(
             'Cannot use both proxyConfigs and old proxy declarations'
         )
 
         mobify.ssrParameters.proxyConfigs = [
             {
                 protocol: 'file',
-                host: '4.merlinspotions.com'
-            }
+                host: '4.merlinspotions.com',
+            },
         ]
         mobify.ssrParameters.proxyHost1 = undefined
         mobify.ssrParameters.proxyHost2 = undefined
-        expect(() => _updatePackageMobify(mobify)).toThrow('has invalid protocol')
+        expect(() => updatePackageMobify(mobify)).toThrow('has invalid protocol')
     })
 
     test('Mobify update sets ssrFiles', () => {
         const mobify = Object.assign({}, baseMobify)
         mobify.ssrShared = mobify.ssrOnly = undefined
 
-        _updatePackageMobify(mobify)
+        updatePackageMobify(mobify)
         expect(ssrFiles).toEqual([])
 
         mobify.ssrShared = ['main.js']
-        _updatePackageMobify(mobify)
+        updatePackageMobify(mobify)
         expect(ssrFiles).toEqual(['main.js'])
 
         mobify.ssrOnly = ['ssr.js']
-        _updatePackageMobify(mobify)
+        updatePackageMobify(mobify)
         expect(ssrFiles).toEqual(['ssr.js', 'main.js'])
     })
 })
@@ -552,23 +545,23 @@ describe('MetricsSender', () => {
             {
                 name: 'abc',
                 value: 123,
-                timestamp: now
+                timestamp: now,
             },
             {
                 name: 'def',
                 dimensions: {
                     project: 'whatever',
-                    xyzzy: 'plugh'
+                    xyzzy: 'plugh',
                 },
-                timestamp: now
-            }
+                timestamp: now,
+            },
         ]
         const metrics2 = [
             {
                 name: 'xyz',
                 value: 1.23,
-                timestamp: now
-            }
+                timestamp: now,
+            },
         ]
         const metrics3 = []
 
@@ -578,7 +571,7 @@ describe('MetricsSender', () => {
             metrics3.push({
                 name: 'whatever',
                 value: Date.now(),
-                timestamp: now
+                timestamp: now,
             })
         }
 
@@ -593,7 +586,7 @@ describe('MetricsSender', () => {
                 const err = calledParams.length ? null : new Error('imaginary error')
                 params.MetricData.forEach((metric) => calledParams.push(metric))
                 callback(err, null)
-            }
+            },
         }
 
         // Send the params.
@@ -638,16 +631,16 @@ describe('MetricsSender', () => {
             {
                 name: 'abc',
                 value: 123,
-                timestamp: now
+                timestamp: now,
             },
             {
                 name: 'def',
                 dimensions: {
                     project: 'whatever',
-                    xyzzy: 'plugh'
+                    xyzzy: 'plugh',
                 },
-                timestamp: now
-            }
+                timestamp: now,
+            },
         ]
 
         // Set up a fake CloudWatch client that will return a Throttling
@@ -657,7 +650,7 @@ describe('MetricsSender', () => {
                 const err = new Error('Throttled')
                 err.code = 'Throttling'
                 callback(err)
-            }
+            },
         }
 
         // Allow spying on the putMetricData calls
@@ -697,38 +690,38 @@ describe('processExpressResponse', () => {
         {
             name: 'no change',
             headers: {
-                [CONTENT_TYPE]: 'text/plain'
+                [CONTENT_TYPE]: 'text/plain',
             },
             validate: (headers) => {
                 expect(headers[CONTENT_TYPE]).toEqual('text/plain')
                 expect(headers[X_ORIGINAL_CONTENT_TYPE]).toBeFalsy()
-            }
+            },
         },
         {
             name: 'flip content-type',
             headers: {
                 [CONTENT_TYPE]: 'text/plain',
-                [CONTENT_ENCODING]: 'gzip'
+                [CONTENT_ENCODING]: 'gzip',
             },
             validate: (headers) => {
                 expect(headers[CONTENT_TYPE]).toEqual(APPLICATION_OCTET_STREAM)
                 expect(headers[CONTENT_ENCODING]).toEqual('gzip')
                 expect(headers[X_ORIGINAL_CONTENT_TYPE]).toEqual('text/plain')
-            }
+            },
         },
         {
             name: 'already flipped',
             headers: {
                 [CONTENT_TYPE]: APPLICATION_OCTET_STREAM,
                 [CONTENT_ENCODING]: 'gzip',
-                [X_ORIGINAL_CONTENT_TYPE]: 'text/plain'
+                [X_ORIGINAL_CONTENT_TYPE]: 'text/plain',
             },
             validate: (headers) => {
                 expect(headers[CONTENT_TYPE]).toEqual(APPLICATION_OCTET_STREAM)
                 expect(headers[CONTENT_ENCODING]).toEqual('gzip')
                 expect(headers[X_ORIGINAL_CONTENT_TYPE]).toEqual('text/plain')
-            }
-        }
+            },
+        },
     ]
 
     const responseTypes = [
@@ -738,13 +731,13 @@ describe('processExpressResponse', () => {
                 getHeader: (header) => headers[header],
                 setHeader: (header, value) => {
                     headers[header] = value
-                }
-            })
+                },
+            }),
         },
         {
             name: 'http.IncomingMessage',
-            create: (headers) => ({headers})
-        }
+            create: (headers) => ({headers}),
+        },
     ]
 
     responseTypes.forEach((responseType) =>
@@ -802,13 +795,13 @@ describe('outgoingRequestHook tests', () => {
         {
             name: 'non-loopback',
             hostname: otherHost,
-            expectHeader: false
+            expectHeader: false,
         },
         {
             name: 'loopback',
             hostname: appHostname,
-            expectHeader: true
-        }
+            expectHeader: true,
+        },
     ]
 
     const testMethods = ['url', 'host', 'hostname']
@@ -873,7 +866,7 @@ describe('outgoingRequestHook tests', () => {
 
             if (testCase.addHeaders) {
                 hookOptions.headers = {
-                    'x-extra': '123'
+                    'x-extra': '123',
                 }
                 if (!optionsPushed) {
                     args.push(hookOptions)
@@ -934,7 +927,7 @@ describe('outgoingRequestHook tests', () => {
 describe('updateGlobalAgentOptions', () => {
     test('no-op', () => {
         const to = {
-            options: {}
+            options: {},
         }
         updateGlobalAgentOptions(undefined, to)
         expect(to.options).toEqual({})
@@ -943,7 +936,7 @@ describe('updateGlobalAgentOptions', () => {
     test('overwrites', () => {
         const to = {}
         const from = {
-            options: {}
+            options: {},
         }
         AGENT_OPTIONS_TO_COPY.forEach((key) => {
             from.options[key] = key
@@ -955,11 +948,11 @@ describe('updateGlobalAgentOptions', () => {
     test('preserves', () => {
         const to = {
             options: {
-                xyzzy: 1
-            }
+                xyzzy: 1,
+            },
         }
         const from = {
-            options: {}
+            options: {},
         }
         AGENT_OPTIONS_TO_COPY.forEach((key) => {
             from.options[key] = key
@@ -1058,21 +1051,21 @@ describe('parseEndParameters', () => {
         expect(parseEndParameters()).toEqual({
             data: undefined,
             encoding: undefined,
-            callback: undefined
+            callback: undefined,
         })
     })
     test('data', () => {
         expect(parseEndParameters([123])).toEqual({
             data: 123,
             encoding: undefined,
-            callback: undefined
+            callback: undefined,
         })
     })
     test('data, encoding', () => {
         expect(parseEndParameters([123, 456])).toEqual({
             data: 123,
             encoding: 456,
-            callback: undefined
+            callback: undefined,
         })
     })
     test('data, callback', () => {
@@ -1080,7 +1073,7 @@ describe('parseEndParameters', () => {
         expect(parseEndParameters([123, f])).toEqual({
             data: 123,
             encoding: undefined,
-            callback: f
+            callback: f,
         })
     })
     test('data, encoding, callback', () => {
@@ -1088,7 +1081,7 @@ describe('parseEndParameters', () => {
         expect(parseEndParameters([123, 456, f])).toEqual({
             data: 123,
             encoding: 456,
-            callback: f
+            callback: f,
         })
     })
 })
@@ -1098,9 +1091,9 @@ describe('wrapResponseWrite', () => {
         const write = sinon.stub()
         const response = {
             locals: {
-                responseCaching: {}
+                responseCaching: {},
             },
-            write
+            write,
         }
         const caching = response.locals.responseCaching
         wrapResponseWrite(response)
@@ -1155,14 +1148,14 @@ describe('CachedResponse', () => {
             metadata: {
                 status: 201,
                 headers: {
-                    'x-special': '1'
-                }
-            }
+                    'x-special': '1',
+                },
+            },
         }
         const cached = new CachedResponse({
             entry,
             req,
-            res
+            res,
         })
         expect(cached.found).toBe(true)
         expect(cached.key).toEqual('key')

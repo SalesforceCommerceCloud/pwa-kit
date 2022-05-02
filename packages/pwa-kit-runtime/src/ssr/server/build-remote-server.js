@@ -11,7 +11,7 @@ import {
     X_MOBIFY_QUERYSTRING,
     SET_COOKIE,
     CACHE_CONTROL,
-    NO_CACHE
+    NO_CACHE,
 } from './constants'
 import {
     catchAndLog,
@@ -22,7 +22,7 @@ import {
     PerformanceTimer,
     processLambdaResponse,
     responseSend,
-    setQuiet
+    setQuiet,
 } from '../../utils/ssr-server'
 import dns from 'dns'
 import express from 'express'
@@ -37,8 +37,8 @@ import fs from 'fs'
 import {RESOLVED_PROMISE} from './express'
 import http from 'http'
 import https from 'https'
-import {proxyConfigs, _updatePackageMobify} from '../../utils/ssr-shared'
-import {_configureProxyConfigs} from '../../utils/ssr-server'
+import {proxyConfigs, updatePackageMobify} from '../../utils/ssr-shared'
+import {configureProxyConfigs} from '../../utils/ssr-server'
 import awsServerlessExpress from 'aws-serverless-express'
 
 /**
@@ -64,12 +64,12 @@ export const REMOTE_REQUIRED_ENV_VARS = [
     'BUNDLE_ID',
     'DEPLOY_TARGET',
     'EXTERNAL_DOMAIN_NAME',
-    'MOBIFY_PROPERTY_ID'
+    'MOBIFY_PROPERTY_ID',
 ]
 
 const METRIC_DIMENSIONS = {
     Project: process.env.MOBIFY_PROPERTY_ID,
-    Target: process.env.DEPLOY_TARGET
+    Target: process.env.DEPLOY_TARGET,
 }
 
 let _nextRequestId = 1
@@ -110,7 +110,7 @@ export const RemoteServerFactory = {
             // be no use-case for SDK users to set this.
             _strictSSL: true,
 
-            mobify: undefined
+            mobify: undefined,
         }
 
         options = Object.assign({}, defaults, options)
@@ -199,14 +199,14 @@ export const RemoteServerFactory = {
      */
     // eslint-disable-next-line no-unused-vars
     _updatePackageMobify(options) {
-        _updatePackageMobify(options.mobify)
+        updatePackageMobify(options.mobify)
     },
 
     /**
      * @private
      */
     _configureProxyConfigs(options) {
-        _configureProxyConfigs(options.appHostname, options.protocol)
+        configureProxyConfigs(options.appHostname, options.protocol)
     },
 
     /**
@@ -299,8 +299,8 @@ export const RemoteServerFactory = {
                         value,
                         timestamp: Date.now(),
                         unit,
-                        dimensions: Object.assign({}, dimensions || {}, METRIC_DIMENSIONS)
-                    }
+                        dimensions: Object.assign({}, dimensions || {}, METRIC_DIMENSIONS),
+                    },
                 ])
             },
 
@@ -312,11 +312,11 @@ export const RemoteServerFactory = {
                         useLocalCache,
                         bucket,
                         prefix: process.env.CACHE_BUCKET_PREFIX,
-                        sendMetric: app.sendMetric.bind(app)
+                        sendMetric: app.sendMetric.bind(app),
                     })
                 }
                 return this._applicationCache
-            }
+            },
         }
         merge(app, mixin)
         return app
@@ -410,8 +410,8 @@ export const RemoteServerFactory = {
                     parameters: {
                         deployTarget: `${process.env.DEPLOY_TARGET || 'local'}`,
                         appHostname: options.appHostname,
-                        proxyConfigs
-                    }
+                        proxyConfigs,
+                    },
                 })
 
                 // Aid debugging by checking the return value
@@ -549,7 +549,7 @@ export const RemoteServerFactory = {
         app.all('/mobify/proxy/*', (_, res) => {
             return res.status(501).json({
                 message:
-                    'Environment proxies are not set: https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/proxying-requests.html'
+                    'Environment proxies are not set: https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/proxying-requests.html',
             })
         })
     },
@@ -559,10 +559,7 @@ export const RemoteServerFactory = {
      */
     _setupHealthcheck(app) {
         app.get('/mobify/ping', (_, res) =>
-            res
-                .set('cache-control', NO_CACHE)
-                .sendStatus(200)
-                .end()
+            res.set('cache-control', NO_CACHE).sendStatus(200).end()
         )
     },
 
@@ -741,9 +738,9 @@ export const RemoteServerFactory = {
             const file = path.resolve(options.buildDir, filePath)
             res.sendFile(file, {
                 headers: {
-                    [CACHE_CONTROL]: options.defaultCacheControl
+                    [CACHE_CONTROL]: options.defaultCacheControl,
                 },
-                ...opts
+                ...opts,
             })
         }
     },
@@ -902,7 +899,7 @@ export const RemoteServerFactory = {
     // eslint-disable-next-line no-unused-vars
     _getRequestProcessor(req) {
         return null
-    }
+    },
 }
 
 /**
@@ -938,7 +935,7 @@ const prepNonProxyRequest = (req, res, next) => {
     // to intercept and discard cookie setting.
     const setHeader = Object.getPrototypeOf(res).setHeader
     const remote = isRemote()
-    res.setHeader = function(header, value) {
+    res.setHeader = function (header, value) {
         /* istanbul ignore else */
         if (header && header.toLowerCase() !== SET_COOKIE && value) {
             setHeader.call(this, header, value)
@@ -992,9 +989,9 @@ const serveFavicon = (req, res) => {
     } else {
         res.sendFile(options.faviconPath, {
             headers: {
-                [CACHE_CONTROL]: options.defaultCacheControl
+                [CACHE_CONTROL]: options.defaultCacheControl,
             },
-            cacheControl: false
+            cacheControl: false,
         })
     }
 }
@@ -1044,7 +1041,7 @@ const applyPatches = once((options) => {
     // Patch the ExpressJS Response class's redirect function to suppress
     // the creation of a body (DESKTOP-485). Including the body may
     // trigger a parsing error in aws-serverless-express.
-    express.response.redirect = function(status, url) {
+    express.response.redirect = function (status, url) {
         let workingStatus = status
         let workingUrl = url
 
@@ -1057,9 +1054,7 @@ const applyPatches = once((options) => {
         const address = this.location(workingUrl).get('Location')
 
         // Send a minimal response with just a status and location
-        this.status(workingStatus)
-            .location(address)
-            .end()
+        this.status(workingStatus).location(address).end()
     }
 
     // Patch the whatwg-encoding decode function so that it will accept plain
@@ -1108,7 +1103,7 @@ class RequestMonitor {
         this._pendingResponses = {
             ids: [],
             promise: null,
-            resolve: null
+            resolve: null,
         }
     }
     /**
