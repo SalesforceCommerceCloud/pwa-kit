@@ -30,6 +30,11 @@ Dependencies that are added to the `package.json` file at the root of the
 repo are shared between packages. Dependencies listed in the
 `package.json` files within each individual package directory work as normal.
 
+### For Windows users
+There is a known [bug](https://github.com/lerna/lerna/issues/385#issuecomment-948402686) of lerna that caused bin commands to fall on Windows. 
+To fix this issue, please run `npm run lerna link --force-local`
+
+
 ## 🏗️ Cleaning & Rebuilding
 
 When you pull changes that include modifications to any package’s dependencies, run `npm ci` from the top-level directory (`pwa-kit`). This command cleans and reinstalls all packages. Run this command frequently during development to ensure that you’re using the same package versions as everyone else.
