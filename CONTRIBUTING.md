@@ -35,7 +35,7 @@ There is a known [bug](https://github.com/lerna/lerna/issues/385#issuecomment-94
 in the bin file on Windows.
 As a result, some npm scripts that uses `pwa-kit-cli` commands (e.g `npm start` in `template-retail-react-app`) will run on Windows Host Script instead of Node, which will cause the script to fail
 
-To fix this issue, please run `npm run lerna link --force-local` after `npm ci` is finished
+To fix this issue, please run `npm run lerna link --force-local` after `npm ci` finishes running
 
 ## 🏗️ Cleaning & Rebuilding
 
