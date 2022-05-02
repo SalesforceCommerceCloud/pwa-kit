@@ -1,6 +1,6 @@
 {
     "name": "typescript-minimal",
-    "version": "2.0.0-dev.5",
+    "version": "2.0.0-dev.6",
     "engines": {
         "node": "^12.0.0 || ^14.0.0",
         "npm": "^6.14.4 || ^7.0.0 || ^8.0.0"
@@ -9,14 +9,14 @@
     "devDependencies": {
         "@loadable/component": "^5.15.0",
         "@types/react": "^18.0.6",
-        "babel-preset-pwa-kit": "^2.0.0-dev.5",
+        "babel-preset-pwa-kit": "^2.0.0-dev.6",
         "cross-env": "^5.2.0",
         "cross-fetch": "^3.1.4",
         "eslint": "7.31.0",
-        "eslint-config-pwa-kit": "^2.0.0-dev.5",
-        "pwa-kit-cli": "^2.0.0-dev.5",
-        "pwa-kit-react-sdk": "^2.0.0-dev.5",
-        "pwa-kit-runtime": "^2.0.0-dev.5",
+        "eslint-config-pwa-kit": "^2.0.0-dev.6",
+        "pwa-kit-cli": "^2.0.0-dev.6",
+        "pwa-kit-react-sdk": "^2.0.0-dev.6",
+        "pwa-kit-runtime": "^2.0.0-dev.6",
         "react": "^17.0.2",
         "react-dom": "^17.0.2",
         "react-helmet": "^6.1.0",
