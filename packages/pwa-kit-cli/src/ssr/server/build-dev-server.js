@@ -60,7 +60,7 @@ export const DevServerMixin = {
      * @private
      */
     _strictSSL(options) {
-        return options._strictSSL
+        return options.strictSSL
     },
 
     /**

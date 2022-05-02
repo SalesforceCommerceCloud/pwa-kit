@@ -124,7 +124,7 @@ export const RemoteServerFactory = {
         options.defaultCacheControl = this._getDefaultCacheControl(options)
 
         // Ensure this is a boolean, and is always true for a remote server.
-        options._strictSSL = this._strictSSL(options)
+        options.strictSSL = this.strictSSL(options)
 
         // This is the external HOSTNAME under which we are serving the page.
         // The EXTERNAL_DOMAIN_NAME value technically only applies to remote
@@ -667,7 +667,7 @@ export const RemoteServerFactory = {
             )
         }
 
-        if (!options._strictSSL) {
+        if (!options.strictSSL) {
             console.warn('The SSR Server has _strictSSL turned off for https requests')
         }
     },
