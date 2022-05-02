@@ -18,7 +18,7 @@ import {
     CONTENT_TYPE,
     PROXY_PATH_PREFIX,
     X_ORIGINAL_CONTENT_TYPE,
-    X_MOBIFY_FROM_CACHE,
+    X_MOBIFY_FROM_CACHE
 } from '../ssr/server/constants'
 import {proxyConfigs} from './ssr-shared'
 import {rewriteProxyRequestHeaders, rewriteProxyResponseHeaders} from './ssr-proxying'
@@ -27,7 +27,7 @@ import {PerformanceObserver, performance} from 'perf_hooks'
 
 let HTTP_AGENT, HTTPS_AGENT
 const KEEPALIVE_AGENT_OPTIONS = {
-    keepAlive: true,
+    keepAlive: true
 }
 
 const MOBIFY_DEVICETYPE = 'mobify_devicetype'
@@ -188,7 +188,7 @@ const getKeepAliveAgents = () => {
 
     return {
         httpAgent: HTTP_AGENT,
-        httpsAgent: HTTPS_AGENT,
+        httpsAgent: HTTPS_AGENT
     }
 }
 
@@ -217,7 +217,7 @@ const getKeepAliveAgents = () => {
  */
 
 export const outgoingRequestHook = (wrapped, options) => {
-    return function () {
+    return function() {
         // Get the app hostname. If we can't, then just pass
         // the call through to the wrapped function. We'll also
         // do that if there's no access key.
@@ -333,7 +333,7 @@ export const AGENT_OPTIONS_TO_COPY = [
     'secureOptions',
     'secureProtocol',
     'servername',
-    'sessionIdContext',
+    'sessionIdContext'
 ]
 
 /**
@@ -492,7 +492,7 @@ export const processLambdaResponse = (response) => {
         const result = {...response}
         result.headers = Object.assign({}, response.headers, {
             // Replace the original content type
-            [CONTENT_TYPE]: originalContentType,
+            [CONTENT_TYPE]: originalContentType
         })
         // Remove the added header
         delete result.headers[X_ORIGINAL_CONTENT_TYPE]
@@ -542,7 +542,7 @@ export const configureProxy = ({
     targetProtocol,
     targetHost,
     appProtocol = /* istanbul ignore next */ 'https',
-    caching,
+    caching
 }) => {
     // This configuration must match the behaviour of the proxying
     // in CloudFront.
@@ -561,7 +561,7 @@ export const configureProxy = ({
         // Rewrite the domain in set-cookie headers in responses, if it
         // matches the targetHost.
         cookieDomainRewrite: {
-            targetHost: appHostname,
+            targetHost: appHostname
         },
 
         // We don't do cookie *path* rewriting - it's complex.
@@ -581,7 +581,7 @@ export const configureProxy = ({
             }
 
             res.writeHead(500, {
-                'Content-Type': 'text/plain',
+                'Content-Type': 'text/plain'
             })
             res.end(`Error in proxy request to ${req.url}: ${err}`)
         },
@@ -616,7 +616,7 @@ export const configureProxy = ({
                 logging: !isRemote() && verboseProxyLogging,
                 proxyPath,
                 targetHost,
-                targetProtocol,
+                targetProtocol
             })
 
             // Copy any new and updated headers to the proxyRequest
@@ -668,7 +668,7 @@ export const configureProxy = ({
                 headers: proxyResponse.headers,
                 headerFormat: 'http',
                 logging: !isRemote() && verboseProxyLogging,
-                requestUrl: matchedUrl && matchedUrl[2],
+                requestUrl: matchedUrl && matchedUrl[2]
             })
 
             // Also handle binary responses
@@ -680,11 +680,11 @@ export const configureProxy = ({
         // Rewrite the request's path to remove the /mobify/proxy/...
         // prefix.
         pathRewrite: {
-            [`^${proxyPath}`]: '',
+            [`^${proxyPath}`]: ''
         },
 
         // The origin (protocol + host) to which we proxy
-        target: targetOrigin,
+        target: targetOrigin
     }
 
     const proxyFunc = proxy(config)
@@ -732,7 +732,7 @@ export const configureProxyConfigs = (appHostname, appProtocol) => {
             targetHost: config.host,
             appProtocol,
             appHostname,
-            caching: false,
+            caching: false
         })
         config.cachingProxy = configureProxy({
             proxyPath: config.cachingPath,
@@ -740,7 +740,7 @@ export const configureProxyConfigs = (appHostname, appProtocol) => {
             targetHost: config.host,
             appProtocol,
             appHostname,
-            caching: true,
+            caching: true
         })
     })
     localDevLog('')
@@ -1027,7 +1027,7 @@ export class MetricsSender {
                 apiVersion: '2010-08-01',
                 // The AWS_REGION variable is defined by the Lambda
                 // environment.
-                region: process.env.AWS_REGION || 'us-east-1',
+                region: process.env.AWS_REGION || 'us-east-1'
             })
         }
         return this._CW
@@ -1052,7 +1052,7 @@ export class MetricsSender {
             // The parameters for putMetricData
             const params = {
                 MetricData: metrics,
-                Namespace: 'ssr',
+                Namespace: 'ssr'
             }
 
             // Initialize the retry count
@@ -1174,7 +1174,7 @@ export class MetricsSender {
                     ? metric.timestamp
                     : now
                 ).toISOString(),
-                Unit: metric.unit || 'Count',
+                Unit: metric.unit || 'Count'
             }
 
             if (metric.dimensions) {
@@ -1183,7 +1183,7 @@ export class MetricsSender {
                     if (value) {
                         dimensions.push({
                             Name: key,
-                            Value: value,
+                            Value: value
                         })
                     }
                 })
@@ -1252,7 +1252,7 @@ export class PerformanceTimer {
                 if (en.startsWith(this._namespace)) {
                     results.push({
                         name: en.slice(nslen),
-                        duration: entry.duration,
+                        duration: entry.duration
                     })
                 }
             })
