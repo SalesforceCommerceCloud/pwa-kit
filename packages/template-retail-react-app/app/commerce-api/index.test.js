@@ -226,6 +226,18 @@ describe('CommerceAPI', () => {
         expect(customer.authType).toEqual('registered')
         expect(api.auth.encUserId.length).toBeGreaterThan(0)
     })
+    test('Use same customer if token is valid', async () => {
+        const Utils = require('./utils')
+        jest.spyOn(Utils, 'isTokenValid').mockReturnValue(true)
+        const _CommerceAPI = require('./index').default
+        const api = new _CommerceAPI(apiConfig)
+
+        api.auth.authToken = mockExampleTokenReponseForRefresh.access_token
+
+        await api.auth.login()
+        expect(api.auth.authToken).toBeDefined()
+        expect(api.auth.authToken).toEqual(mockExampleTokenReponseForRefresh.access_token)
+    })
     test('refreshes existing token', async () => {
         const _CommerceAPI = require('./index').default
         const api = new _CommerceAPI(apiConfig)
@@ -259,7 +271,7 @@ describe('CommerceAPI', () => {
 
     test('automatically authorizes customer when calling sdk methods', async () => {
         const api = getAPI()
-        api.auth.authToken = undefined
+        api.auth.authToken = ''
         await Promise.all([
             api.shopperProducts.getProduct({parameters: {id: '10048'}}),
             api.shopperProducts.getProduct({parameters: {id: '10048'}})
