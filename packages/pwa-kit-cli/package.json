@@ -108,7 +108,10 @@
     "pwa-kit-runtime": "^2.0.0-dev.5",
     "regenerator-runtime": "^0.13.9",
     "superagent": "^6.1.0",
-    "supertest": "^4.0.2"
+    "supertest": "^4.0.2",
+    "babel-preset-pwa-kit": "^2.0.0-dev.5",
+    "eslint": "7.31.0",
+    "eslint-config-pwa-kit": "^2.0.0-dev.5"
   },
   "peerDependencies": {
     "@loadable/component": "^5.15.0"

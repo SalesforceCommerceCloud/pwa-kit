@@ -7,34 +7,8 @@
 
 module.exports = {
     root: true,
-    parser: '@babel/eslint-parser',
-    parserOptions: {
-        ecmaVersion: 2017,
-        sourceType: 'module',
-        ecmaFeatures: {
-            jsx: true
-        },
-        babelOptions: {
-            configFile: `${__dirname}/babel.config.js`
-        }
-    },
-    env: {
-        es6: true,
-        node: true,
-        browser: true,
-        jest: true
-    },
-    extends: ['eslint:recommended', 'plugin:react/recommended', 'prettier', 'prettier/react'],
-    plugins: ['header', 'react', 'prettier'],
-    settings: {
-        react: {
-            version: '16.8'
-        }
-    },
+    plugins: ['header'],
     rules: {
-        'prettier/prettier': ['error'],
-        'no-console': 'off',
-        'no-unused-vars': ['error', {ignoreRestSiblings: true}],
         'header/header': [
             2,
             'block',
@@ -50,18 +24,5 @@ module.exports = {
                 ' '
             ]
         ]
-    },
-    overrides: [
-        {
-            files: ['**/*.ts?(x)'],
-            parser: '@typescript-eslint/parser',
-            parserOptions: {
-                sourceType: 'module',
-                ecmaFeatures: {
-                    jsx: true
-                },
-                warnOnUnsupportedTypeScriptVersion: true
-            }
-        }
-    ]
+    }
 }

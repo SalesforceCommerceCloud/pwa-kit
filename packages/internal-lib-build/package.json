@@ -59,7 +59,10 @@
     "shelljs": "^0.8.4"
   },
   "devDependencies": {
-    "npm-packlist": "^4.0.0"
+    "npm-packlist": "^4.0.0",
+    "babel-preset-pwa-kit": "^2.0.0-dev.5",
+    "eslint": "7.31.0",
+    "eslint-config-pwa-kit": "^2.0.0-dev.5"
   },
   "scripts": {
     "lint": "npm run lint:js",

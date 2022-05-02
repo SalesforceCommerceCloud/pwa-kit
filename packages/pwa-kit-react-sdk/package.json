@@ -75,7 +75,10 @@
     "replace-in-file": "^6.2.0",
     "rimraf": "2.6.1",
     "sinon": "^13.0.1",
-    "supertest": "^4.0.2"
+    "supertest": "^4.0.2",
+    "babel-preset-pwa-kit": "^2.0.0-dev.5",
+    "eslint": "7.31.0",
+    "eslint-config-pwa-kit": "^2.0.0-dev.5"
   },
   "peerDependencies": {
     "@loadable/component": "^5.15.0",

@@ -62,7 +62,10 @@
     "sinon": "^13.0.1",
     "superagent": "^6.1.0",
     "supertest": "^4.0.2",
-    "watch": "1.0.1"
+    "watch": "1.0.1",
+    "babel-preset-pwa-kit": "^2.0.0-dev.5",
+    "eslint": "7.31.0",
+    "eslint-config-pwa-kit": "^2.0.0-dev.5"
   },
   "peerDependencies": {
     "pwa-kit-cli": "^2.0.0-dev.5"
