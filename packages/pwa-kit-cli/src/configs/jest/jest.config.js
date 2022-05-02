@@ -21,6 +21,7 @@ module.exports = {
         '\\.(svg)$': path.join(__dirname, 'mocks', 'svgMock.js'),
         '\\.(css|less)$': path.join(__dirname, 'mocks', 'styleMock.js')
     },
+    setupFilesAfterEnv: [path.join(__dirname, 'jest-setup.js')],
     globals: {
         DEBUG: true,
         NODE_ENV: 'test',
