@@ -124,7 +124,7 @@ export const RemoteServerFactory = {
         options.defaultCacheControl = this._getDefaultCacheControl(options)
 
         // Ensure this is a boolean, and is always true for a remote server.
-        options.strictSSL = this.strictSSL(options)
+        options.strictSSL = this._strictSSL(options)
 
         // This is the external HOSTNAME under which we are serving the page.
         // The EXTERNAL_DOMAIN_NAME value technically only applies to remote
