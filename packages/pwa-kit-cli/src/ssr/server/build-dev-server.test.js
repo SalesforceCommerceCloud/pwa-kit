@@ -30,7 +30,6 @@ const testFixtures = path.resolve(__dirname, 'test_fixtures')
 const NoWebpackDevServerFactory = {
     ...DevServerFactory,
     ...{
-        addSSRRenderer() {},
         addSDKInternalHandlers() {},
         getRequestProcessor() {}
     }

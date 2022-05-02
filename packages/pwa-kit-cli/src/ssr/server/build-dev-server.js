@@ -19,6 +19,7 @@ import open from 'open'
 import requireFromString from 'require-from-string'
 import {RemoteServerFactory} from 'pwa-kit-runtime/ssr/server/build-remote-server'
 import {proxyConfigs} from 'pwa-kit-runtime/utils/ssr-shared'
+import {SERVER, CLIENT_OPTIONAL, REQUEST_PROCESSOR} from '../../configs/webpack/config-names'
 
 const projectDir = process.cwd()
 const projectWebpackPath = path.resolve(projectDir, 'webpack.config.js')
@@ -110,8 +111,7 @@ export const DevServerMixin = {
      * @private
     */
     addSDKInternalHandlers(app) {
-        // This is separated out from addSSRRenderer because these
-        // routes must not have our SSR middleware applied to them.
+        // This is separated out because these routes must not have our SSR middleware applied to them.
         // But the SSR render function must!
 
         let config = require('../../configs/webpack/config')
@@ -127,6 +127,9 @@ export const DevServerMixin = {
                 console.log(chalk.cyan('First build complete'))
             }, 75)
         })
+        if (config.some((cnf) => cnf.name === SERVER)) {
+            app.__hotServerMiddleware = webpackHotServerMiddleware(app.__compiler)
+        }
 
         app.use('/mobify/bundle/development', app.__devMiddleware)
 
@@ -142,7 +145,10 @@ export const DevServerMixin = {
         )
     },
 
-    addSSRRenderer(app) {
+    /**
+     * @private
+    */
+    addStaticAssetServing(app) {
         // Proxy bundle asset requests to the local
         // build directory.
         app.use(
@@ -153,37 +159,12 @@ export const DevServerMixin = {
                 fallthrough: true
             })
         )
+    },
 
-        const middleware = webpackHotServerMiddleware(app.__compiler)
-
-        app.get('/worker.js', (req, res) => {
-            app.__devMiddleware.waitUntilValid(() => {
-                const compiled = DevServerFactory._getWebpackAsset(req, 'pwa-others', 'worker.js')
-                res.type('.js')
-                res.send(compiled)
-            })
-        })
-
-        app.get('/worker.js.map', (req, res) => {
-            app.__devMiddleware.waitUntilValid(() => {
-                const compiled = DevServerFactory._getWebpackAsset(
-                    req,
-                    'pwa-others',
-                    'worker.js.map'
-                )
-                res.type('.js.map')
-                res.send(compiled)
-            })
-        })
-
-        app.use('/', (req, res, next) => {
-            if (app.__webpackReady()) {
-                middleware(req, res, next)
-            } else {
-                this._redirectToLoadingScreen(req, res, next)
-            }
-        })
-
+    /**
+     * @private
+    */
+    addDevServerGarbageCollection(app) {
         app.use((req, res, next) => {
             const done = () => {
                 // We collect garbage because when a Lambda environment is
@@ -198,6 +179,31 @@ export const DevServerMixin = {
             res.on('close', done)
             next()
         })
+    },
+
+    serveServiceWorker(req, res) {
+        req.app.__devMiddleware.waitUntilValid(() => {
+            const sourceMap = req.path.endsWith('.map')
+            const file = sourceMap ? 'worker.js.map' : 'worker.js'
+            const type = sourceMap ? '.js.map' : '.js'
+            const content = DevServerFactory._getWebpackAsset(req, CLIENT_OPTIONAL, file)
+            if (content === null) {
+                // Service worker does not exist. Reminder that SW is optional for MRT apps.
+                res.sendStatus(404)
+            } else {
+                res.type(type)
+                res.send(content)
+            }
+        })
+    },
+
+    render(req, res, next) {
+        const app = req.app
+        if (app.__webpackReady()) {
+            app.__hotServerMiddleware(req, res, next)
+        } else {
+            this._redirectToLoadingScreen(req, res, next)
+        }
     },
 
     /**
@@ -268,7 +274,7 @@ export const DevServerMixin = {
      * @private
      */
     getRequestProcessor(req) {
-        const compiled = this._getWebpackAsset(req, 'request-processor', 'request-processor.js')
+        const compiled = this._getWebpackAsset(req, REQUEST_PROCESSOR, 'request-processor.js')
         if (compiled) {
             const module = requireFromString(compiled)
             if (!module.processRequest) {

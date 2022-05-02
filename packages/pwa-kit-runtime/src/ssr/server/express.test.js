@@ -26,7 +26,6 @@ const {
     sendCachedResponse,
     cacheResponseWhenDone,
     respondFromBundle,
-    serveStaticFile,
     getRuntime
 } = require('./express')
 const {RemoteServerFactory, REMOTE_REQUIRED_ENV_VARS} = require('./build-remote-server')
@@ -300,6 +299,20 @@ describe('SSRServer operation', () => {
             })
     })
 
+    test('SSRServer renders with the react rendering', () => {
+        const app = RemoteServerFactory.createApp(opts())
+        app.get('/*', RemoteServerFactory.render)
+        expect(app.__renderer).toBeUndefined()
+
+        return request(app)
+            .get('/')
+            .expect(200)
+            .then((res) => {
+                expect(res.text).toBe('OK')
+                expect(app.__renderer).toBeDefined()
+            })
+    })
+
     test('SSRServer rendering gets and sends no cookies', () => {
         const route = (req, res) => {
             res.setHeader('set-cookie', 'blah123')
@@ -423,7 +436,7 @@ describe('SSRServer operation', () => {
                 fse.writeFileSync(updatedFile, content)
 
                 const app = RemoteServerFactory.createApp(opts({buildDir}))
-                RemoteServerFactory.addSSRRenderer(app)
+                app.get('/worker.js(.map)?', RemoteServerFactory.serveServiceWorker)
 
                 return request(app)
                     .get(requestPath)
@@ -586,7 +599,7 @@ describe('SSRServer operation', () => {
         const app = RemoteServerFactory.createApp(opts())
         const faviconPath = path.resolve(testFixtures, 'favicon.ico')
 
-        app.get('/thing', serveStaticFile('favicon.ico'))
+        app.get('/thing', RemoteServerFactory.serveStaticFile('favicon.ico'))
 
         return request(app)
             .get('/thing')
@@ -602,7 +615,7 @@ describe('SSRServer operation', () => {
     test('serveStaticFile returns 404 if the file does not exist', () => {
         const app = RemoteServerFactory.createApp(opts())
 
-        app.get('/thing', serveStaticFile('this-does-not-exist.ico'))
+        app.get('/thing', RemoteServerFactory.serveStaticFile('this-does-not-exist.ico'))
 
         return request(app)
             .get('/thing')
