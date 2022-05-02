@@ -31,9 +31,10 @@ repo are shared between packages. Dependencies listed in the
 `package.json` files within each individual package directory work as normal.
 
 ### For Windows users
-There is a known [bug](https://github.com/lerna/lerna/issues/385#issuecomment-948402686) of lerna that caused bin commands to fall on Windows. 
-To fix this issue, please run `npm run lerna link --force-local`
+There is a known [bug](https://github.com/lerna/lerna/issues/385#issuecomment-948402686) of lerna that caused bin commands to fall over on Windows.
+As a result, the Window Script Host is used to when you run npm scripts in the `template-*` packages instead of Node.  
 
+To fix this issue, please run `npm run lerna link --force-local` after `npm ci` is finished
 
 ## 🏗️ Cleaning & Rebuilding
 
