@@ -113,7 +113,7 @@ const merge = (a, b) => deepmerge(a, b, {arrayMerge: (orignal, replacement) => r
  * Each package name included in the object's keys will be copied into the
  * generated project, all others are excluded.
  */
-const runGenerator = (answers, {outputDir}) => {
+const runGenerator = (answers, {outputDir, verbose}) => {
     // These are the public, mobify-owned packages that can be installed through NPM.
     const npmInstallables = ['pwa-kit-react-sdk']
 
@@ -188,15 +188,30 @@ const runGenerator = (answers, {outputDir}) => {
 
     new sh.ShellString(PWAKitSitesTemplate(answers)).to(p.resolve(outputDir, 'config', 'sites.js'))
 
-    npmInstall(outputDir)
+    npmInstall(outputDir, {verbose})
 }
 
-const npmInstall = (outputDir) => {
-    console.log('Installing dependencies for the generated project. This may take a few minutes.\n')
-    child_proc.execSync('npm install --quiet', {
-        cwd: outputDir,
-        stdio: 'inherit'
-    })
+const npmInstall = (outputDir, {verbose}) => {
+    console.log('Installing dependencies... This may take a few minutes.\n')
+    const npmLogLevel = verbose ? 'notice' : 'error'
+    const disableStdOut = ['inherit', 'ignore', 'inherit']
+    const stdio = verbose ? 'inherit' : disableStdOut
+    try {
+        child_proc.execSync(`npm install --color always --loglevel ${npmLogLevel}`, {
+            cwd: outputDir,
+            stdio,
+            env: {
+                ...process.env,
+                OPENCOLLECTIVE_HIDE: 'true',
+                DISABLE_OPENCOLLECTIVE: 'true',
+                OPEN_SOURCE_CONTRIBUTOR: 'true'
+            }
+        })
+    } catch {
+        // error is already displayed on the console by child process.
+        // exit the program
+        process.exit(1)
+    }
 }
 
 // Validations
@@ -454,27 +469,27 @@ const main = (opts) => {
 if (require.main === module) {
     program.name(`pwa-kit-create-app`)
     program.description(`Generate a new PWA Kit project, optionally using a preset.
-
-Examples:
-
-  ${program.name()} --preset "${RETAIL_REACT_APP}"
-    Generate a project using custom settings by answering questions about a
-    B2C Commerce instance.
-
-    Use this preset to connect to an existing instance, such as a sandbox.
-
-  ${program.name()} --preset "${RETAIL_REACT_APP_DEMO}"
-    Generate a project using the settings for a special B2C Commerce
-    instance that is used for demo purposes. No questions are asked.
-
-    Use this preset to try out PWA Kit.
-
-  ${program.name()} --preset "${EXPRESS_MINIMAL}"
-    Generate a project using a bare-bones express app template.
-    
-    Use this as a starting point for APIs or as a base on top of 
-    which to build new project templates for Managed Runtime. 
-  `)
+ 
+ Examples:
+ 
+   ${program.name()} --preset "${RETAIL_REACT_APP}"
+     Generate a project using custom settings by answering questions about a
+     B2C Commerce instance.
+ 
+     Use this preset to connect to an existing instance, such as a sandbox.
+ 
+   ${program.name()} --preset "${RETAIL_REACT_APP_DEMO}"
+     Generate a project using the settings for a special B2C Commerce
+     instance that is used for demo purposes. No questions are asked.
+ 
+     Use this preset to try out PWA Kit.
+ 
+   ${program.name()} --preset "${EXPRESS_MINIMAL}"
+     Generate a project using a bare-bones express app template.
+     
+     Use this as a starting point for APIs or as a base on top of 
+     which to build new project templates for Managed Runtime. 
+   `)
     program
         .option(
             '--outputDir <path>',
