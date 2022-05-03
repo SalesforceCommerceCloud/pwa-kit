@@ -8,7 +8,7 @@ import React from 'react'
 import {renderWithProviders} from '../../utils/test-utils'
 import Link from './index'
 import mockConfig from '../../../config/mocks/default'
-import {getConfig} from 'pwa-kit-runtime/utils/ssr-config'
+import {getConfig} from 'pwa-kit-config/dist/config'
 const originalLocation = window.location
 jest.mock('pwa-kit-runtime/utils/ssr-config', () => {
     return {

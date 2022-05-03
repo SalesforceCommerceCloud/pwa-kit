@@ -9,7 +9,7 @@
 const path = require('path')
 const {getRuntime} = require('pwa-kit-runtime/ssr/server/express')
 const {isRemote} = require('pwa-kit-runtime/utils/ssr-server')
-const {getConfig} = require('pwa-kit-runtime/utils/ssr-config')
+const {getConfig} = require('pwa-kit-config/dist/config')
 const helmet = require('helmet')
 
 const options = {

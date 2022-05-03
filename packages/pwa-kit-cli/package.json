@@ -89,7 +89,7 @@
     "morgan": "1.9.1",
     "open": "^8.4.0",
     "prettier": "^1.18.2",
-    "pwa-kit-runtime": "^2.0.0-dev.7",
+    "pwa-kit-config": "^2.0.0-dev.7",
     "replace-in-file": "^6.2.0",
     "request": "^2.88.0",
     "require-from-string": "^2.0.2",

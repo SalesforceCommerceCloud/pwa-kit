@@ -12,7 +12,7 @@
 /* istanbul ignore next */
 // eslint-disable-next-line no-undef
 if (typeof WEBPACK_TARGET !== 'undefined' && WEBPACK_TARGET === 'web') {
-    module.exports = require('./ssr-config.client.js')
+  module.exports = require('./config.client.js')
 } else {
-    module.exports = require('./ssr-config.server.js')
+  module.exports = require('./config.server.js')
 }

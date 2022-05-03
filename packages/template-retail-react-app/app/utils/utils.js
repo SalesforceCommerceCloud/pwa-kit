@@ -6,7 +6,7 @@
  */
 import {absoluteUrl} from './url'
 import {getSites, resolveSiteFromUrl} from './site-utils'
-import {getConfig} from 'pwa-kit-runtime/utils/ssr-config'
+import {getConfig} from 'pwa-kit-config/dist/config'
 
 /**
  * Call requestIdleCallback in supported browsers.

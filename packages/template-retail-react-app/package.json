@@ -46,6 +46,7 @@
         "pwa-kit-cli": "^2.0.0-dev.7",
         "pwa-kit-react-sdk": "^2.0.0-dev.7",
         "pwa-kit-runtime": "^2.0.0-dev.7",
+        "pwa-kit-config": "^2.0.0-dev.7",
         "query-string": "^7.0.1",
         "raf": "^3.4.0",
         "randomstring": "^1.2.1",

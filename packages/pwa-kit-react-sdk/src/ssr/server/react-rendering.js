@@ -30,7 +30,7 @@ import {getRoutes, routeComponent} from '../universal/components/route-component
 import * as errors from '../universal/errors'
 import {detectDeviceType, isRemote} from 'pwa-kit-runtime/utils/ssr-server'
 import {proxyConfigs} from 'pwa-kit-runtime/utils/ssr-shared'
-import {getConfig} from 'pwa-kit-runtime/utils/ssr-config'
+import {getConfig} from 'pwa-kit-config/dist/config'
 
 import sprite from 'svg-sprite-loader/runtime/sprite.build'
 

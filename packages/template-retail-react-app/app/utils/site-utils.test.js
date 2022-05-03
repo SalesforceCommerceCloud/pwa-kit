@@ -6,7 +6,7 @@
  */
 
 import {getDefaultSite, getSites, resolveSiteFromUrl} from './site-utils'
-import {getConfig} from 'pwa-kit-runtime/utils/ssr-config'
+import {getConfig} from 'pwa-kit-config/dist/config'
 
 import mockConfig from '../../config/mocks/default'
 jest.mock('pwa-kit-runtime/utils/ssr-config', () => {

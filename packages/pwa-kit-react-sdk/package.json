@@ -55,6 +55,7 @@
     "mkdirp": "^1.0.4",
     "prop-types": "^15.6.0",
     "pwa-kit-runtime": "^2.0.0-dev.7",
+    "pwa-kit-config": "2.0.0-dev.7",
     "react-uid": "^2.2.0",
     "serialize-javascript": "^6.0.0",
     "svg-sprite-loader": "^6.0.11",

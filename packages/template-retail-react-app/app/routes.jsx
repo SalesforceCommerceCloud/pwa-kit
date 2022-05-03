@@ -14,7 +14,7 @@
 
 import React from 'react'
 import loadable from '@loadable/component'
-import {getConfig} from 'pwa-kit-runtime/utils/ssr-config'
+import {getConfig} from 'pwa-kit-config/dist/config'
 
 // Components
 import {Skeleton} from '@chakra-ui/react'

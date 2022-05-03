@@ -1,0 +1,35 @@
+{
+  "name": "pwa-kit-config",
+  "version": "2.0.0-dev.7",
+  "description": "The PWAKit Config",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SalesforceCommerceCloud/pwa-kit.git"
+  },
+  "homepage": "https://github.com/SalesforceCommerceCloud/pwa-kit/tree/develop/packages/pwa-kit-config#readme",
+  "bugs": {
+    "url": "https://github.com/SalesforceCommerceCloud/pwa-kit/issues"
+  },
+  "license": "SEE LICENSE IN LICENSE",
+  "author": "dev@mobify.com",
+  "files": [
+    "bin",
+    "LICENSE",
+    "scripts",
+    "ssr",
+    "TERMS_OF_USE.md",
+    "utils",
+    "webpack"
+  ],
+  "scripts": {
+    "prepare": "npm run build",
+    "build": "cross-env NODE_ENV=production internal-lib-build build"
+  },
+  "dependencies": {
+    "cosmiconfig": "^7.0.1"
+  },
+  "engines": {
+    "node": "^12.0.0 || ^14.0.0",
+    "npm": "^6.14.4 || ^7.0.0 || ^8.0.0"
+  }
+}

@@ -14,7 +14,7 @@ const scriptUtils = require('../scripts/utils')
 const sh = require('shelljs')
 const uploadBundle = require('../scripts/upload.js')
 const pkg = require('../package.json')
-const {getConfig} = require('pwa-kit-runtime/utils/ssr-config')
+const {getConfig} = require('pwa-kit-config/dist/config')
 
 const pkgRoot = p.join(__dirname, '..')
 
