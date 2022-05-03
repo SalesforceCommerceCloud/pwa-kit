@@ -30,8 +30,8 @@ const testFixtures = path.resolve(__dirname, 'test_fixtures')
 const NoWebpackDevServerFactory = {
     ...DevServerFactory,
     ...{
-        addSDKInternalHandlers() {},
-        getRequestProcessor() {}
+        _addSDKInternalHandlers() {},
+        _getRequestProcessor() {}
     }
 }
 
@@ -119,20 +119,20 @@ describe('DevServer error handlers', () => {
 })
 
 describe('DevServer startup', () => {
-    test('createApp creates an express app', () => {
-        const app = NoWebpackDevServerFactory.createApp(opts())
+    test('_createApp creates an express app', () => {
+        const app = NoWebpackDevServerFactory._createApp(opts())
         expect(app.options.defaultCacheControl).toEqual(NO_CACHE)
     })
 
-    test(`createApp validates missing or invalid field "protocol"`, () => {
-        expect(() => NoWebpackDevServerFactory.createApp(opts({protocol: 'ssl'}))).toThrow()
+    test(`_createApp validates missing or invalid field "protocol"`, () => {
+        expect(() => NoWebpackDevServerFactory._createApp(opts({protocol: 'ssl'}))).toThrow()
     })
 })
 
 describe('DevServer loading page', () => {
     test('should redirect to the loading screen with an HTTP 302', async () => {
         const options = opts()
-        const app = NoWebpackDevServerFactory.createApp(options)
+        const app = NoWebpackDevServerFactory._createApp(options)
         app.use('/', DevServerFactory._redirectToLoadingScreen)
 
         return request(app)
@@ -163,7 +163,7 @@ describe('DevServer request processor support', () => {
         const ServerFactory = {
             ...NoWebpackDevServerFactory,
             ...{
-                getRequestProcessor() {
+                _getRequestProcessor() {
                     return {
                         processRequest: ({getRequestClass, setRequestClass}) => {
                             console.log(`getRequestClass returns ${getRequestClass()}`)
@@ -178,7 +178,7 @@ describe('DevServer request processor support', () => {
             }
         }
 
-        const app = ServerFactory.createApp(opts())
+        const app = ServerFactory._createApp(opts())
         app.get('/*', route)
 
         return request(app)
@@ -195,14 +195,14 @@ describe('DevServer request processor support', () => {
         const ServerFactory = {
             ...NoWebpackDevServerFactory,
             ...{
-                getRequestProcessor() {
+                _getRequestProcessor() {
                     return null
                 }
             }
         }
 
         const options = opts()
-        const app = ServerFactory.createApp(options)
+        const app = ServerFactory._createApp(options)
         app.get('/*', route)
 
         return request(app)
@@ -222,7 +222,7 @@ describe('DevServer request processor support', () => {
         const ServerFactory = {
             ...NoWebpackDevServerFactory,
             ...{
-                getRequestProcessor() {
+                _getRequestProcessor() {
                     return {
                         processRequest: () => {
                             return
@@ -232,7 +232,7 @@ describe('DevServer request processor support', () => {
             }
         }
 
-        const app = ServerFactory.createApp(opts())
+        const app = ServerFactory._createApp(opts())
         app.get('/*', route)
 
         return request(app)
@@ -305,7 +305,7 @@ test('SSRServer proxying handles empty path', () => {
     // We expect the Express app to rewrite redirect responses
     const rewritten = `${options.protocol}://localhost:${options.port}/mobify/proxy/base${location}`
 
-    const app = NoWebpackDevServerFactory.createApp(options)
+    const app = NoWebpackDevServerFactory._createApp(options)
     return (
         request(app)
             .get('/mobify/proxy/base/')
@@ -337,7 +337,7 @@ describe('DevServer proxying', () => {
         // We expect the Express app to rewrite redirect responses
         const rewritten = `${options.protocol}://localhost:${options.port}/mobify/proxy/base${location}`
 
-        const app = NoWebpackDevServerFactory.createApp(options)
+        const app = NoWebpackDevServerFactory._createApp(options)
 
         return (
             request(app)
@@ -366,7 +366,7 @@ describe('DevServer proxying', () => {
                 responseHeaders
             )
 
-        const app = NoWebpackDevServerFactory.createApp(opts())
+        const app = NoWebpackDevServerFactory._createApp(opts())
         const path = `/mobify/proxy/base${targetPath}`
         const outgoingHeaders = {
             Host: 'localhost:4567',
@@ -418,7 +418,7 @@ describe('DevServer proxying', () => {
             .get('/test/path3')
             .reply(200, 'OK')
 
-        const app = NoWebpackDevServerFactory.createApp(opts())
+        const app = NoWebpackDevServerFactory._createApp(opts())
         const path = '/mobify/caching/base3/test/path3'
 
         return request(app)
@@ -450,7 +450,7 @@ describe('DevServer proxying', () => {
                 return 'Success'
             })
 
-        const app = NoWebpackDevServerFactory.createApp(opts())
+        const app = NoWebpackDevServerFactory._createApp(opts())
         const path = '/mobify/caching/base3/test/path3'
 
         return request(app)
@@ -472,7 +472,7 @@ describe('DevServer proxying', () => {
     })
 
     test('handles error', () => {
-        const app = NoWebpackDevServerFactory.createApp(opts())
+        const app = NoWebpackDevServerFactory._createApp(opts())
 
         return request(app)
             .get('/mobify/proxy/base2/test/path')
@@ -550,7 +550,7 @@ describe('DevServer persistent caching support', () => {
     beforeEach(() => {
         route = jest.fn().mockImplementation(routeImplementation)
         const withCaching = cachedRoute(route)
-        app = NoWebpackDevServerFactory.createApp(opts())
+        app = NoWebpackDevServerFactory._createApp(opts())
         app.get('/*', withCaching)
     })
 

@@ -78,7 +78,10 @@ let _nextRequestId = 1
  * @private
  */
 export const RemoteServerFactory = {
-    configure(options) {
+    /**
+     * @private
+     */
+    _configure(options) {
         /**
          * Not all of these options are documented. Some exist to allow for
          * testing, or to handle non-standard projects.
@@ -115,13 +118,13 @@ export const RemoteServerFactory = {
         setQuiet(options.quiet || process.env.SSR_QUIET)
 
         // Set the protocol for the Express app listener - defaults to https on remote
-        options.protocol = this.getProtocol(options)
+        options.protocol = this._getProtocol(options)
 
         // Local dev server doesn't cache by default
-        options.defaultCacheControl = this.getDefaultCacheControl(options)
+        options.defaultCacheControl = this._getDefaultCacheControl(options)
 
         // Ensure this is a boolean, and is always true for a remote server.
-        options.strictSSL = this.strictSSL(options)
+        options.strictSSL = this._strictSSL(options)
 
         // This is the external HOSTNAME under which we are serving the page.
         // The EXTERNAL_DOMAIN_NAME value technically only applies to remote
@@ -136,52 +139,82 @@ export const RemoteServerFactory = {
         return options
     },
 
+    /**
+     * @private
+     */
     // eslint-disable-next-line no-unused-vars
-    logStartupMessage(options) {
+    _logStartupMessage(options) {
         // Hook for the DevServer
     },
 
+    /**
+     * @private
+     */
     // eslint-disable-next-line no-unused-vars
-    getProtocol(options) {
+    _getProtocol(options) {
         return 'https'
     },
 
-    getDefaultCacheControl(options) {
+    /**
+     * @private
+     */
+    _getDefaultCacheControl(options) {
         return `max-age=${options.defaultCacheTimeSeconds}, s-maxage=${options.defaultCacheTimeSeconds}`
     },
 
+    /**
+     * @private
+     */
     // eslint-disable-next-line no-unused-vars
-    strictSSL(options) {
+    _strictSSL(options) {
         return true
     },
 
+    /**
+     * @private
+     */
     // eslint-disable-next-line no-unused-vars
-    setCompression(app) {
+    _setCompression(app) {
         // Let the CDN do it
     },
 
+    /**
+     * @private
+     */
     // eslint-disable-next-line no-unused-vars
-    setupLogging(app) {
+    _setupLogging(app) {
         // Hook for the dev-server
     },
 
+    /**
+     * @private
+     */
     // eslint-disable-next-line no-unused-vars
-    setupMetricsFlushing(app) {
+    _setupMetricsFlushing(app) {
         // Hook for the dev-server
     },
 
+    /**
+     * @private
+     */
     // eslint-disable-next-line no-unused-vars
-    updatePackageMobify(options) {
+    _updatePackageMobify(options) {
         updatePackageMobify(options.mobify)
     },
 
-    configureProxyConfigs(options) {
+    /**
+     * @private
+     */
+    _configureProxyConfigs(options) {
         configureProxyConfigs(options.appHostname, options.protocol)
     },
 
-    createApp(options) {
-        options = this.configure(options)
-        this.logStartupMessage(options)
+    /**
+     * @private
+     */
+    _createApp(options) {
+        options = this._configure(options)
+        this._logStartupMessage(options)
 
         // To gain a small speed increase in the event that this
         // server needs to make a proxy request back to itself,
@@ -190,37 +223,40 @@ export const RemoteServerFactory = {
         // callback is a no-op.
         dns.lookup(options.appHostname, () => null)
 
-        this.validateConfiguration(options)
-        this.updatePackageMobify(options)
-        this.configureProxyConfigs(options)
+        this._validateConfiguration(options)
+        this._updatePackageMobify(options)
+        this._configureProxyConfigs(options)
 
-        const app = this.createExpressApp(options)
+        const app = this._createExpressApp(options)
 
         // Do this first – we want compression applied to
         // everything when it's enabled at all.
-        this.setCompression(app)
+        this._setCompression(app)
 
         // Ordering of the next two calls are vital - we don't
         // want request-processors applied to development views.
-        this.addSDKInternalHandlers(app)
-        this.setupSSRRequestProcessorMiddleware(app)
+        this._addSDKInternalHandlers(app)
+        this._setupSSRRequestProcessorMiddleware(app)
 
-        this.setupLogging(app)
-        this.setupMetricsFlushing(app)
-        this.setupHealthcheck(app)
-        this.setupProxying(app, options)
+        this._setupLogging(app)
+        this._setupMetricsFlushing(app)
+        this._setupHealthcheck(app)
+        this._setupProxying(app, options)
 
         // Beyond this point, we know that this is not a proxy request
         // and not a bundle request, so we can apply specific
         // processing.
-        this.setupCommonMiddleware(app, options)
+        this._setupCommonMiddleware(app, options)
 
-        this.addStaticAssetServing(app)
-        this.addDevServerGarbageCollection(app)
+        this._addStaticAssetServing(app)
+        this._addDevServerGarbageCollection(app)
         return app
     },
 
-    createExpressApp(options) {
+    /**
+     * @private
+     */
+    _createExpressApp(options) {
         const app = express()
         app.disable('x-powered-by')
 
@@ -286,10 +322,16 @@ export const RemoteServerFactory = {
         return app
     },
 
+    /**
+     * @private
+     */
     // eslint-disable-next-line no-unused-vars
-    addSDKInternalHandlers(app) {},
+    _addSDKInternalHandlers(app) {},
 
-    setupSSRRequestProcessorMiddleware(app) {
+    /**
+     * @private
+     */
+    _setupSSRRequestProcessorMiddleware(app) {
         const that = this
 
         // Attach this middleware as early as possible. It does timing
@@ -332,7 +374,7 @@ export const RemoteServerFactory = {
             }
 
             // Apply the request processor
-            const requestProcessor = that.getRequestProcessor(req)
+            const requestProcessor = that._getRequestProcessor(req)
             const parsed = URL.parse(req.url)
             const originalQuerystring = parsed.query
             let updatedQuerystring = originalQuerystring
@@ -499,8 +541,11 @@ export const RemoteServerFactory = {
         app.use(ssrRequestProcessorMiddleware)
     },
 
+    /**
+     * @private
+     */
     // eslint-disable-next-line no-unused-vars
-    setupProxying(app, options) {
+    _setupProxying(app, options) {
         app.all('/mobify/proxy/*', (_, res) => {
             return res.status(501).json({
                 message:
@@ -509,7 +554,10 @@ export const RemoteServerFactory = {
         })
     },
 
-    setupHealthcheck(app) {
+    /**
+     * @private
+     */
+    _setupHealthcheck(app) {
         app.get('/mobify/ping', (_, res) =>
             res
                 .set('cache-control', NO_CACHE)
@@ -518,7 +566,10 @@ export const RemoteServerFactory = {
         )
     },
 
-    setupCommonMiddleware(app, options) {
+    /**
+     * @private
+     */
+    _setupCommonMiddleware(app, options) {
         app.use(prepNonProxyRequest)
 
         // Map favicon requests to the configured path. We always map
@@ -534,7 +585,10 @@ export const RemoteServerFactory = {
         applyPatches(options)
     },
 
-    validateConfiguration(options) {
+    /**
+     * @private
+     */
+    _validateConfiguration(options) {
         // Check that we are running under a compatible version of node
         /* istanbul ignore next */
         const requiredNode = new semver.Range(pkg.engines.node)
@@ -614,15 +668,21 @@ export const RemoteServerFactory = {
         }
 
         if (!options.strictSSL) {
-            console.warn('The SSR Server has strictSSL turned off for https requests')
+            console.warn('The SSR Server has _strictSSL turned off for https requests')
         }
     },
 
-    addStaticAssetServing() {
+    /**
+     * @private
+     */
+    _addStaticAssetServing() {
         // Handled by the CDN on remote
     },
 
-    addDevServerGarbageCollection() {
+    /**
+     * @private
+     */
+    _addDevServerGarbageCollection() {
         // This is a hook for the dev-server. The remote-server
         // does GC in a way that is awkward to extract. See _createHandler.
     },
@@ -638,7 +698,6 @@ export const RemoteServerFactory = {
      * See https://developer.chrome.com/blog/fresher-sw/ for details on
      * efficiently serving service workers.
      *
-     *  @private
      */
     serveServiceWorker(req, res) {
         const options = req.app.options
@@ -669,9 +728,7 @@ export const RemoteServerFactory = {
     /**
      * Serve static files from the app's build directory and set default
      * cache-control headers.
-     * @since v2.1.0
-     *
-     * This is a wrapper around the Express `res.sendFile` method.
+     * @since v2.0.0
      *
      * @param {String} filePath - the location of the static file relative to the build directory
      * @param {Object} opts - the options object to pass to the original `sendFile` method
@@ -689,6 +746,17 @@ export const RemoteServerFactory = {
         }
     },
 
+    /**
+     * Server side rendering entry.
+     *
+     * @since v2.0.0
+     *
+     * This is a wrapper around the Express `res.sendFile` method.
+     *
+     * @param {Object} req - the req object
+     * @param {Object} req - the res object
+     * @param {function} next - the callback function for middleware chain
+     */
     render(req, res, next) {
         const app = req.app
         if (!app.__renderer) {
@@ -821,13 +889,16 @@ export const RemoteServerFactory = {
      */
     createHandler(options, customizeApp) {
         process.on('unhandledRejection', catchAndLog)
-        const app = this.createApp(options)
+        const app = this._createApp(options)
         customizeApp(app)
         return this._createHandler(app)
     },
 
+    /**
+     * @private
+     */
     // eslint-disable-next-line no-unused-vars
-    getRequestProcessor(req) {
+    _getRequestProcessor(req) {
         return null
     }
 }

@@ -104,12 +104,12 @@ beforeAll(() => {
     // environment (Lambda or not) and we need to ensure that the non-lambda patches
     // are applied for testing. Creating and immediately discarding an app in
     // local mode here applies the correct patches for all tests.
-    RemoteServerFactory.createApp(opts())
+    RemoteServerFactory._createApp(opts())
 })
 
 afterAll(() => {})
 
-describe('createApp validates the options object', () => {
+describe('_createApp validates the options object', () => {
     let savedEnvironment
 
     beforeEach(() => {
@@ -140,12 +140,12 @@ describe('createApp validates the options object', () => {
     ]
 
     invalidOptions.forEach(({name, options}) => {
-        test(`createApp validates missing or invalid field "${name}"`, () => {
-            expect(() => RemoteServerFactory.createApp(options)).toThrow()
+        test(`_createApp validates missing or invalid field "${name}"`, () => {
+            expect(() => RemoteServerFactory._createApp(options)).toThrow()
         })
     })
 
-    test('createApp warns on missing favicon', () => {
+    test('_createApp warns on missing favicon', () => {
         const options = opts({
             buildDir: path.resolve(process.cwd(), 'src/ssr/server/test_fixtures'),
             faviconPath: 'nosuchfile.ico'
@@ -154,14 +154,14 @@ describe('createApp validates the options object', () => {
         const sandbox = sinon.createSandbox()
         const warn = sandbox.spy(console, 'warn')
 
-        RemoteServerFactory.createApp(options)
+        RemoteServerFactory._createApp(options)
         expect(warn.calledOnce).toBe(true)
 
         sandbox.restore()
     })
 })
 
-describe('createApp validates environment variables', () => {
+describe('_createApp validates environment variables', () => {
     let savedEnvironment
 
     beforeEach(() => {
@@ -181,7 +181,7 @@ describe('createApp validates environment variables', () => {
             // AWS_LAMBDA_FUNCTION_NAME indicates the server is running remotely on Lambda
             vars.push({AWS_LAMBDA_FUNCTION_NAME: 'pretend-to-be-remote'})
             process.env = Object.assign({}, savedEnvironment, ...vars)
-            expect(() => RemoteServerFactory.createApp(opts())).toThrow(envVar)
+            expect(() => RemoteServerFactory._createApp(opts())).toThrow(envVar)
         })
     })
 })
@@ -212,9 +212,9 @@ describe('SSRServer operation', () => {
         }
     })
 
-    test('createApp creates an express app', () => {
+    test('_createApp creates an express app', () => {
         const options = opts()
-        const app = RemoteServerFactory.createApp(options)
+        const app = RemoteServerFactory._createApp(options)
         const expected = `max-age=${options.defaultCacheTimeSeconds}, s-maxage=${options.defaultCacheTimeSeconds}`
         expect(app.options.defaultCacheControl).toEqual(expected)
     })
@@ -225,7 +225,7 @@ describe('SSRServer operation', () => {
             return Promise.resolve()
         })
 
-        const app = RemoteServerFactory.createApp(opts())
+        const app = RemoteServerFactory._createApp(opts())
         app.get('/*', route)
 
         const response1 = {
@@ -277,7 +277,7 @@ describe('SSRServer operation', () => {
         REMOTE_REQUIRED_ENV_VARS.forEach((envVar) => {
             process.env[envVar] = 'value'
         })
-        const app = RemoteServerFactory.createApp(opts({protocol: 'http'}))
+        const app = RemoteServerFactory._createApp(opts({protocol: 'http'}))
         expect(app.options.protocol).toEqual('https')
         process.env = savedEnvironment
     })
@@ -287,7 +287,7 @@ describe('SSRServer operation', () => {
         const route = jest.fn().mockImplementation((req, res) => {
             res.send(body)
         })
-        const app = RemoteServerFactory.createApp(opts())
+        const app = RemoteServerFactory._createApp(opts())
         app.get('/*', route)
         return request(app)
             .get('/')
@@ -300,7 +300,7 @@ describe('SSRServer operation', () => {
     })
 
     test('SSRServer renders with the react rendering', () => {
-        const app = RemoteServerFactory.createApp(opts())
+        const app = RemoteServerFactory._createApp(opts())
         app.get('/*', RemoteServerFactory.render)
         expect(app.__renderer).toBeUndefined()
 
@@ -318,7 +318,7 @@ describe('SSRServer operation', () => {
             res.setHeader('set-cookie', 'blah123')
             res.sendStatus(200)
         }
-        const app = RemoteServerFactory.createApp(opts())
+        const app = RemoteServerFactory._createApp(opts())
         app.get('/*', route)
 
         jest.spyOn(console, 'warn')
@@ -339,7 +339,7 @@ describe('SSRServer operation', () => {
             res.send('<div>hello world</div>')
         }
 
-        const app = RemoteServerFactory.createApp(opts())
+        const app = RemoteServerFactory._createApp(opts())
         app.get('*', route)
 
         return request(app)
@@ -354,7 +354,7 @@ describe('SSRServer operation', () => {
         const route = jest.fn().mockImplementation((req, res) => {
             res.send('<div> Hello world </div>')
         })
-        const app = RemoteServerFactory.createApp(opts())
+        const app = RemoteServerFactory._createApp(opts())
         app.get('/*', route)
 
         return request(app)
@@ -387,7 +387,7 @@ describe('SSRServer operation', () => {
         })
 
         test('should not proxy', () => {
-            const app = RemoteServerFactory.createApp(opts())
+            const app = RemoteServerFactory._createApp(opts())
             return request(app)
                 .get('/mobify/proxy/base/test/path')
                 .expect(501)
@@ -395,7 +395,7 @@ describe('SSRServer operation', () => {
     })
 
     test('SSRServer handles /mobify/ping', () => {
-        const app = RemoteServerFactory.createApp(opts())
+        const app = RemoteServerFactory._createApp(opts())
 
         return request(app)
             .get('/mobify/ping')
@@ -435,7 +435,7 @@ describe('SSRServer operation', () => {
                 const updatedFile = path.resolve(buildDir, file)
                 fse.writeFileSync(updatedFile, content)
 
-                const app = RemoteServerFactory.createApp(opts({buildDir}))
+                const app = RemoteServerFactory._createApp(opts({buildDir}))
                 app.get('/worker.js(.map)?', RemoteServerFactory.serveServiceWorker)
 
                 return request(app)
@@ -445,7 +445,7 @@ describe('SSRServer operation', () => {
             })
 
             test(`${name} (and handle 404s correctly)`, () => {
-                const app = RemoteServerFactory.createApp(opts({buildDir: tmpDir}))
+                const app = RemoteServerFactory._createApp(opts({buildDir: tmpDir}))
 
                 return request(app)
                     .get(requestPath)
@@ -456,7 +456,7 @@ describe('SSRServer operation', () => {
 
     test('SSRServer serves favicon', () => {
         const faviconPath = path.resolve(testFixtures, 'favicon.ico')
-        const app = RemoteServerFactory.createApp(opts({faviconPath}))
+        const app = RemoteServerFactory._createApp(opts({faviconPath}))
         expect.assertions(1)
 
         return request(app)
@@ -471,7 +471,7 @@ describe('SSRServer operation', () => {
     })
 
     test('SSRServer handles missing favicon', () => {
-        const app = RemoteServerFactory.createApp(opts({faviconPath: undefined}))
+        const app = RemoteServerFactory._createApp(opts({faviconPath: undefined}))
 
         return request(app)
             .get('/favicon.ico')
@@ -481,14 +481,14 @@ describe('SSRServer operation', () => {
     })
 
     test('SSRServer creates cache on demand', () => {
-        const app = RemoteServerFactory.createApp(opts())
+        const app = RemoteServerFactory._createApp(opts())
         expect(app._applicationCache).toBe(undefined)
         expect(app.applicationCache).toBeInstanceOf(PersistentCache)
         expect(app._applicationCache).toBe(app.applicationCache)
     })
 
     test('should support redirects to bundle assets', () => {
-        const app = RemoteServerFactory.createApp(opts())
+        const app = RemoteServerFactory._createApp(opts())
         const route = (req, res) => {
             respondFromBundle({req, res})
         }
@@ -506,7 +506,7 @@ describe('SSRServer operation', () => {
     })
 
     test('should support other redirects', () => {
-        const app = RemoteServerFactory.createApp(opts())
+        const app = RemoteServerFactory._createApp(opts())
         const route = (req, res) => {
             res.redirect(302, '/elsewhere')
         }
@@ -520,7 +520,7 @@ describe('SSRServer operation', () => {
     })
 
     test('should support other redirects', () => {
-        const app = RemoteServerFactory.createApp(opts())
+        const app = RemoteServerFactory._createApp(opts())
         const route = (req, res) => {
             res.redirect(302, '/elsewhere')
         }
@@ -534,7 +534,7 @@ describe('SSRServer operation', () => {
     })
 
     test('should support error codes', () => {
-        const app = RemoteServerFactory.createApp(opts())
+        const app = RemoteServerFactory._createApp(opts())
         const route = (request, response) => {
             response.sendStatus(500)
         }
@@ -547,7 +547,7 @@ describe('SSRServer operation', () => {
     })
 
     test('should strip cookies before passing the request to the handler', () => {
-        const app = RemoteServerFactory.createApp(opts())
+        const app = RemoteServerFactory._createApp(opts())
         const route = (req, res) => {
             expect(req.headers.cookie).toBeUndefined()
             res.sendStatus(200)
@@ -563,7 +563,7 @@ describe('SSRServer operation', () => {
     })
 
     test('should fix host and origin headers before passing the request to the handler', () => {
-        const app = RemoteServerFactory.createApp(opts())
+        const app = RemoteServerFactory._createApp(opts())
         const route = (req, res) => {
             expect(req.headers.host).toEqual(app.options.appHostname)
             expect(req.headers.origin).toEqual(app.options.appOrigin)
@@ -583,7 +583,7 @@ describe('SSRServer operation', () => {
     })
 
     test(`should reject POST requests to /`, () => {
-        const app = RemoteServerFactory.createApp(opts())
+        const app = RemoteServerFactory._createApp(opts())
         const route = (req, res) => {
             res.status(200).end()
         }
@@ -596,7 +596,7 @@ describe('SSRServer operation', () => {
     })
 
     test('serveStaticFile serves static files from the build directory', () => {
-        const app = RemoteServerFactory.createApp(opts())
+        const app = RemoteServerFactory._createApp(opts())
         const faviconPath = path.resolve(testFixtures, 'favicon.ico')
 
         app.get('/thing', RemoteServerFactory.serveStaticFile('favicon.ico'))
@@ -613,7 +613,7 @@ describe('SSRServer operation', () => {
     })
 
     test('serveStaticFile returns 404 if the file does not exist', () => {
-        const app = RemoteServerFactory.createApp(opts())
+        const app = RemoteServerFactory._createApp(opts())
 
         app.get('/thing', RemoteServerFactory.serveStaticFile('this-does-not-exist.ico'))
 
@@ -701,7 +701,7 @@ describe('SSRServer persistent caching', () => {
     beforeEach(() => {
         route = jest.fn().mockImplementation(routeImplementation)
         const withCaching = cachedRoute(route)
-        app = RemoteServerFactory.createApp(opts())
+        app = RemoteServerFactory._createApp(opts())
         app.get('/*', withCaching)
     })
 
