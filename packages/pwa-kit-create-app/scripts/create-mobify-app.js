@@ -192,7 +192,7 @@ const runGenerator = (answers, {outputDir, verbose}) => {
 }
 
 const npmInstall = (outputDir, {verbose}) => {
-    console.log('Installing dependencies for the generated project. This may take a few minutes.\n')
+    console.log('Installing dependencies... This may take a few minutes.\n')
     const npmLogLevel = verbose ? 'notice' : 'error'
     const disableStdOut = ['inherit', 'ignore', 'inherit']
     const stdio = verbose ? 'inherit' : disableStdOut
