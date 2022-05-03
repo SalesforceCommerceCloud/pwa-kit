@@ -184,6 +184,13 @@ commands:
           command: |
             set GENERATOR_PRESET=express-minimal-test-project
             node packages/pwa-kit-create-app/scripts/create-mobify-app-dev.js --outputDir generated-project-express-minimal
+      - run:
+          name: Generate typescript-minimal project
+          environment:
+            GENERATOR_PRESET: 'typescript-minimal-test-project'
+          command: |
+            set GENERATOR_PRESET=typescript-minimal-test-project
+            node packages/pwa-kit-create-app/scripts/create-mobify-app-dev.js --outputDir generated-project-typescript-minimal
       - runtests:
           cwd: generated-project
       - smoketestscripts:
