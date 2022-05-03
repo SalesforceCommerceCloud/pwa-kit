@@ -4,7 +4,7 @@
     "license": "See license in LICENSE",
     "private": true,
     "devDependencies": {
-        "pwa-kit-cli": "^2.0.0-dev.7",
+        "pwa-kit-dev": "^2.0.0-dev.7",
         "pwa-kit-runtime": "^2.0.0-dev.7"
     },
     "scripts": {

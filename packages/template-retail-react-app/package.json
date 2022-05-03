@@ -43,7 +43,7 @@
         "njwt": "^1.2.0",
         "node-fetch": "^2.3.0",
         "prop-types": "^15.6.0",
-        "pwa-kit-cli": "^2.0.0-dev.7",
+        "pwa-kit-dev": "^2.0.0-dev.7",
         "pwa-kit-react-sdk": "^2.0.0-dev.7",
         "pwa-kit-runtime": "^2.0.0-dev.7",
         "query-string": "^7.0.1",
