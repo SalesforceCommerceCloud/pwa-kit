@@ -730,8 +730,6 @@ export const RemoteServerFactory = {
      * cache-control headers.
      * @since v2.0.0
      *
-     * This is a wrapper around the Express `res.sendFile` method.
-     *
      * @param {String} filePath - the location of the static file relative to the build directory
      * @param {Object} opts - the options object to pass to the original `sendFile` method
      */
