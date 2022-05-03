@@ -2,7 +2,7 @@
 
 # Description
 
-<!--- A longer summary of your changes, including: a description of the issue that you’re addressing, a list of required dependencies (if applicable), and any other relavant context. -->
+<!--- A longer summary of your changes, including: a description of the issue that you’re addressing, a list of required dependencies (if applicable), and any other relevant context. -->
 
 # Types of Changes
 
