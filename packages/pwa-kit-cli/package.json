@@ -1,6 +1,6 @@
 {
   "name": "pwa-kit-cli",
-  "version": "2.0.0-dev.5",
+  "version": "2.0.0-dev.7",
   "description": "Build tools for pwa-kit",
   "repository": {
     "type": "git",
@@ -109,9 +109,9 @@
   },
   "devDependencies": {
     "@loadable/component": "^5.15.0",
-    "internal-lib-build": "^2.0.0-dev.5",
+    "internal-lib-build": "^2.0.0-dev.7",
     "nock": "^13.1.1",
-    "pwa-kit-runtime": "^2.0.0-dev.5",
+    "pwa-kit-runtime": "^2.0.0-dev.7",
     "superagent": "^6.1.0",
     "supertest": "^4.0.2"
   },

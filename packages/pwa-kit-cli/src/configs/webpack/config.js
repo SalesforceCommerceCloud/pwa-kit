@@ -18,6 +18,7 @@ import {BundleAnalyzerPlugin} from 'webpack-bundle-analyzer'
 import LoadablePlugin from '@loadable/webpack-plugin'
 import SpeedMeasurePlugin from 'speed-measure-webpack-plugin'
 import {createModuleReplacementPlugin} from './plugins'
+import {CLIENT, SERVER, CLIENT_OPTIONAL, SSR, REQUEST_PROCESSOR} from './config-names'
 
 const projectDir = process.cwd()
 const sdkDir = path.resolve(path.join(__dirname, '..', '..', '..'))
@@ -216,11 +217,10 @@ const client =
     baseConfig('web')
         .extend(withChunking)
         .extend((config) => {
-            const name = 'client'
             return {
                 ...config,
                 // Must be named "client". See - https://www.npmjs.com/package/webpack-hot-server-middleware#usage
-                name,
+                name: CLIENT,
                 // use source map to make debugging easier
                 devtool: mode === development ? 'source-map' : false,
                 entry: {
@@ -229,7 +229,7 @@ const client =
                 plugins: [
                     ...config.plugins,
                     new LoadablePlugin({writeToDisk: true}),
-                    analyzeBundle && getBundleAnalyzerPlugin(name)
+                    analyzeBundle && getBundleAnalyzerPlugin(CLIENT)
                 ].filter(Boolean),
                 // Hide the performance hints, since we already have a similar `bundlesize` check in `template-retail-react-app` package
                 performance: {
@@ -247,7 +247,7 @@ const clientOptional = baseConfig('web')
     .extend((config) => {
         return {
             ...config,
-            name: 'client-optional',
+            name: CLIENT_OPTIONAL,
             entry: {
                 ...optional('loader', './app/loader.js'),
                 ...optional('worker', './worker/main.js'),
@@ -258,7 +258,7 @@ const clientOptional = baseConfig('web')
             devtool: mode === development ? 'source-map' : false,
             plugins: [
                 ...config.plugins,
-                analyzeBundle && getBundleAnalyzerPlugin('client-optional')
+                analyzeBundle && getBundleAnalyzerPlugin(CLIENT_OPTIONAL)
             ].filter(Boolean)
         }
     })
@@ -271,7 +271,7 @@ const renderer =
             return {
                 ...config,
                 // Must be named "server". See - https://www.npmjs.com/package/webpack-hot-server-middleware#usage
-                name: 'server',
+                name: SERVER,
                 entry: 'pwa-kit-react-sdk/ssr/server/react-rendering.js',
                 // use eval-source-map for server-side debugging
                 devtool: mode === development ? 'eval-source-map' : false,
@@ -295,18 +295,6 @@ const renderer =
                         patterns: [{from: 'app/static/', to: 'static/'}]
                     }),
 
-                    new CopyPlugin({
-                        patterns: [
-                            {
-                                from: 'config/',
-                                to: 'config/',
-                                globOptions: {
-                                    ignore: ['**/local.*']
-                                },
-                                noErrorOnMissing: true
-                            }
-                        ]
-                    }),
                     analyzeBundle && getBundleAnalyzerPlugin('server-renderer')
                 ].filter(Boolean)
             }
@@ -321,7 +309,7 @@ const ssr = (() => {
                 return {
                     ...config,
                     // Must *not* be named "server". See - https://www.npmjs.com/package/webpack-hot-server-middleware#usage
-                    name: 'ssr',
+                    name: SSR,
                     entry: './app/ssr.js',
                     output: {
                         path: buildDir,
@@ -330,7 +318,7 @@ const ssr = (() => {
                     },
                     plugins: [
                         ...config.plugins,
-                        analyzeBundle && getBundleAnalyzerPlugin('ssr')
+                        analyzeBundle && getBundleAnalyzerPlugin(SSR)
                     ].filter(Boolean)
                 }
             })
@@ -346,7 +334,7 @@ const requestProcessor =
         .extend((config) => {
             return {
                 ...config,
-                name: 'request-processor',
+                name: REQUEST_PROCESSOR,
                 entry: './app/request-processor.js',
                 output: {
                     path: buildDir,
@@ -357,7 +345,7 @@ const requestProcessor =
                 devtool: mode === development ? 'eval-source-map' : false,
                 plugins: [
                     ...config.plugins,
-                    analyzeBundle && getBundleAnalyzerPlugin('request-processor')
+                    analyzeBundle && getBundleAnalyzerPlugin(REQUEST_PROCESSOR)
                 ].filter(Boolean)
             }
         })

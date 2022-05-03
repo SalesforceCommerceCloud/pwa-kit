@@ -59,6 +59,22 @@ describe('resolveSiteFromUrl', function() {
             resolveSiteFromUrl('https://www.example-site.com/site-3')
         }).toThrow()
     })
+
+    test('returns correct site when aliases are not declared in the config', () => {
+        getConfig.mockImplementation(() => {
+            return {
+                ...mockConfig,
+                app: {
+                    ...mockConfig.app,
+                    siteAliases: {},
+                    defaultSite: 'site-2'
+                }
+            }
+        })
+
+        const result = resolveSiteFromUrl('https://www.example-site.com/')
+        expect(result.id).toEqual('site-2')
+    })
 })
 
 describe('getDefaultSite', function() {

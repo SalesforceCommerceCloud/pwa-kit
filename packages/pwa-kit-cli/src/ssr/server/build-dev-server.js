@@ -19,6 +19,7 @@ import open from 'open'
 import requireFromString from 'require-from-string'
 import {RemoteServerFactory} from 'pwa-kit-runtime/ssr/server/build-remote-server'
 import {proxyConfigs} from 'pwa-kit-runtime/utils/ssr-shared'
+import {SERVER, CLIENT_OPTIONAL, REQUEST_PROCESSOR} from '../../configs/webpack/config-names'
 
 const projectDir = process.cwd()
 const projectWebpackPath = path.resolve(projectDir, 'webpack.config.js')
@@ -33,24 +34,39 @@ const NO_CACHE = 'max-age=0, nocache, nostore, must-revalidate'
  * @private
  */
 export const DevServerMixin = {
-    logStartupMessage(options) {
+    /**
+     * @private
+     */
+    _logStartupMessage(options) {
         console.log(`Starting the DevServer on ${chalk.cyan(this._getDevServerURL(options))}`)
     },
 
-    getProtocol(options) {
+    /**
+     * @private
+     */
+    _getProtocol(options) {
         return process.env.DEV_SERVER_PROTOCOL || options.protocol
     },
 
+    /**
+     * @private
+     */
     // eslint-disable-next-line no-unused-vars
-    getDefaultCacheControl(options) {
+    _getDefaultCacheControl(options) {
         return NO_CACHE
     },
 
-    strictSSL(options) {
+    /**
+     * @private
+     */
+    _strictSSL(options) {
         return options.strictSSL
     },
 
-    setCompression(app) {
+    /**
+     * @private
+     */
+    _setCompression(app) {
         app.use(
             compression({
                 level: 9,
@@ -59,11 +75,17 @@ export const DevServerMixin = {
         )
     },
 
-    setupLogging(app) {
+    /**
+     * @private
+     */
+    _setupLogging(app) {
         app.use(expressLogging('dev'))
     },
 
-    setupMetricsFlushing(app) {
+    /**
+     * @private
+     */
+    _setupMetricsFlushing(app) {
         // Flush metrics at the end of sending. We do this here to
         // keep the code paths consistent between local and remote
         // servers. For the remote server, the flushing is done
@@ -74,17 +96,22 @@ export const DevServerMixin = {
         })
     },
 
+    /**
+     * @private
+     */
     // eslint-disable-next-line no-unused-vars
-    setupProxying(app, options) {
+    _setupProxying(app, options) {
         proxyConfigs.forEach((config) => {
             app.use(config.proxyPath, config.proxy)
             app.use(config.cachingPath, config.cachingProxy)
         })
     },
 
-    addSDKInternalHandlers(app) {
-        // This is separated out from addSSRRenderer because these
-        // routes must not have our SSR middleware applied to them.
+    /**
+     * @private
+     */
+    _addSDKInternalHandlers(app) {
+        // This is separated out because these routes must not have our SSR middleware applied to them.
         // But the SSR render function must!
 
         let config = require('../../configs/webpack/config')
@@ -100,6 +127,9 @@ export const DevServerMixin = {
                 console.log(chalk.cyan('First build complete'))
             }, 75)
         })
+        if (config.some((cnf) => cnf.name === SERVER)) {
+            app.__hotServerMiddleware = webpackHotServerMiddleware(app.__compiler)
+        }
 
         app.use('/mobify/bundle/development', app.__devMiddleware)
 
@@ -115,7 +145,10 @@ export const DevServerMixin = {
         )
     },
 
-    addSSRRenderer(app) {
+    /**
+     * @private
+     */
+    _addStaticAssetServing(app) {
         // Proxy bundle asset requests to the local
         // build directory.
         app.use(
@@ -126,37 +159,12 @@ export const DevServerMixin = {
                 fallthrough: true
             })
         )
+    },
 
-        const middleware = webpackHotServerMiddleware(app.__compiler)
-
-        app.get('/worker.js', (req, res) => {
-            app.__devMiddleware.waitUntilValid(() => {
-                const compiled = DevServerFactory._getWebpackAsset(req, 'pwa-others', 'worker.js')
-                res.type('.js')
-                res.send(compiled)
-            })
-        })
-
-        app.get('/worker.js.map', (req, res) => {
-            app.__devMiddleware.waitUntilValid(() => {
-                const compiled = DevServerFactory._getWebpackAsset(
-                    req,
-                    'pwa-others',
-                    'worker.js.map'
-                )
-                res.type('.js.map')
-                res.send(compiled)
-            })
-        })
-
-        app.use('/', (req, res, next) => {
-            if (app.__webpackReady()) {
-                middleware(req, res, next)
-            } else {
-                this._redirectToLoadingScreen(req, res, next)
-            }
-        })
-
+    /**
+     * @private
+     */
+    _addDevServerGarbageCollection(app) {
         app.use((req, res, next) => {
             const done = () => {
                 // We collect garbage because when a Lambda environment is
@@ -173,11 +181,42 @@ export const DevServerMixin = {
         })
     },
 
+    serveServiceWorker(req, res) {
+        req.app.__devMiddleware.waitUntilValid(() => {
+            const sourceMap = req.path.endsWith('.map')
+            const file = sourceMap ? 'worker.js.map' : 'worker.js'
+            const type = sourceMap ? '.js.map' : '.js'
+            const content = DevServerFactory._getWebpackAsset(req, CLIENT_OPTIONAL, file)
+            if (content === null) {
+                // Service worker does not exist. Reminder that SW is optional for MRT apps.
+                res.sendStatus(404)
+            } else {
+                res.type(type)
+                res.send(content)
+            }
+        })
+    },
+
+    render(req, res, next) {
+        const app = req.app
+        if (app.__webpackReady()) {
+            app.__hotServerMiddleware(req, res, next)
+        } else {
+            this._redirectToLoadingScreen(req, res, next)
+        }
+    },
+
+    /**
+     * @private
+     */
     // eslint-disable-next-line no-unused-vars
     _redirectToLoadingScreen(req, res, next) {
         res.redirect('/__mrt/loading-screen/index.html?loading=1')
     },
 
+    /**
+     * @private
+     */
     _getDevServerHostAndPort(options) {
         const split = options.devServerHostName.split(':')
         const hostname = split.length === 2 ? split[0] : options.devServerHostName
@@ -185,12 +224,18 @@ export const DevServerMixin = {
         return {hostname, port}
     },
 
+    /**
+     * @private
+     */
     _getDevServerURL(options) {
         const {protocol} = options
         const {hostname, port} = this._getDevServerHostAndPort(options)
         return `${protocol}://${hostname}:${port}`
     },
 
+    /**
+     * @private
+     */
     _createHandler(app) {
         const {protocol, sslFilePath} = app.options
         const {hostname, port} = this._getDevServerHostAndPort(app.options)
@@ -228,8 +273,8 @@ export const DevServerMixin = {
      *
      * @private
      */
-    getRequestProcessor(req) {
-        const compiled = this._getWebpackAsset(req, 'request-processor', 'request-processor.js')
+    _getRequestProcessor(req) {
+        const compiled = this._getWebpackAsset(req, REQUEST_PROCESSOR, 'request-processor.js')
         if (compiled) {
             const module = requireFromString(compiled)
             if (!module.processRequest) {
@@ -343,4 +388,7 @@ export const shouldCompress = (req, res) => {
     return compression.filter(req, res)
 }
 
+/**
+ * @private
+ */
 export const DevServerFactory = Object.assign({}, RemoteServerFactory, DevServerMixin)
