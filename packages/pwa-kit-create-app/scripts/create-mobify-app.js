@@ -523,8 +523,8 @@ if (require.main === module) {
    ${program.name()} --preset "${TYPESCRIPT_MINIMAL}"
      Generate a project using a bare-bones TypeScript app template.
      
-     Use this as a starting point as base on top of which to build 
-     new project TypeScript templates for Managed Runtime. 
+     Use this as a TypeScript starting point as a base on top of which 
+     to build new TypeScript project templates for Managed Runtime. 
    `)
     program
         .option(
