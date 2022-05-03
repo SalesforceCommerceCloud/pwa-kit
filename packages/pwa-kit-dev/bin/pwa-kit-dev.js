@@ -43,7 +43,7 @@ const main = () => {
             ``,
             `Usage inside NPM scripts:`,
             ``,
-            `  The PWA Kit Dev is used in NPM scripts so you can conveniently`,
+            `  The PWA Kit Developer Tools is used in NPM scripts so you can conveniently`,
             `  run eg. 'npm run push' to push a bundle from a project.`,
             ``,
             `  To pass args to pwa-kit-dev when wrapped in an NPM script, separate them`,
