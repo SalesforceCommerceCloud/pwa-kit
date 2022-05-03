@@ -634,7 +634,7 @@ describe('The Node SSR Environment', () => {
                 process.env.NODE_ENV = isRemoteValue ? 'production' : 'development'
 
                 const {url, headers, query} = req
-                const app = RemoteServerFactory.createApp(opts())
+                const app = RemoteServerFactory._createApp(opts())
                 app.get('/*', render)
                 if (mocks) {
                     mocks()

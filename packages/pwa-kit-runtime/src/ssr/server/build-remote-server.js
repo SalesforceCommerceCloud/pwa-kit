@@ -78,7 +78,10 @@ let _nextRequestId = 1
  * @private
  */
 export const RemoteServerFactory = {
-    configure(options) {
+    /**
+     * @private
+     */
+    _configure(options) {
         /**
          * Not all of these options are documented. Some exist to allow for
          * testing, or to handle non-standard projects.
@@ -115,13 +118,13 @@ export const RemoteServerFactory = {
         setQuiet(options.quiet || process.env.SSR_QUIET)
 
         // Set the protocol for the Express app listener - defaults to https on remote
-        options.protocol = this.getProtocol(options)
+        options.protocol = this._getProtocol(options)
 
         // Local dev server doesn't cache by default
-        options.defaultCacheControl = this.getDefaultCacheControl(options)
+        options.defaultCacheControl = this._getDefaultCacheControl(options)
 
         // Ensure this is a boolean, and is always true for a remote server.
-        options.strictSSL = this.strictSSL(options)
+        options.strictSSL = this._strictSSL(options)
 
         // This is the external HOSTNAME under which we are serving the page.
         // The EXTERNAL_DOMAIN_NAME value technically only applies to remote
@@ -136,52 +139,82 @@ export const RemoteServerFactory = {
         return options
     },
 
+    /**
+     * @private
+     */
     // eslint-disable-next-line no-unused-vars
-    logStartupMessage(options) {
+    _logStartupMessage(options) {
         // Hook for the DevServer
     },
 
+    /**
+     * @private
+     */
     // eslint-disable-next-line no-unused-vars
-    getProtocol(options) {
+    _getProtocol(options) {
         return 'https'
     },
 
-    getDefaultCacheControl(options) {
+    /**
+     * @private
+     */
+    _getDefaultCacheControl(options) {
         return `max-age=${options.defaultCacheTimeSeconds}, s-maxage=${options.defaultCacheTimeSeconds}`
     },
 
+    /**
+     * @private
+     */
     // eslint-disable-next-line no-unused-vars
-    strictSSL(options) {
+    _strictSSL(options) {
         return true
     },
 
+    /**
+     * @private
+     */
     // eslint-disable-next-line no-unused-vars
-    setCompression(app) {
+    _setCompression(app) {
         // Let the CDN do it
     },
 
+    /**
+     * @private
+     */
     // eslint-disable-next-line no-unused-vars
-    setupLogging(app) {
+    _setupLogging(app) {
         // Hook for the dev-server
     },
 
+    /**
+     * @private
+     */
     // eslint-disable-next-line no-unused-vars
-    setupMetricsFlushing(app) {
+    _setupMetricsFlushing(app) {
         // Hook for the dev-server
     },
 
+    /**
+     * @private
+     */
     // eslint-disable-next-line no-unused-vars
-    updatePackageMobify(options) {
+    _updatePackageMobify(options) {
         updatePackageMobify(options.mobify)
     },
 
-    configureProxyConfigs(options) {
+    /**
+     * @private
+     */
+    _configureProxyConfigs(options) {
         configureProxyConfigs(options.appHostname, options.protocol)
     },
 
-    createApp(options) {
-        options = this.configure(options)
-        this.logStartupMessage(options)
+    /**
+     * @private
+     */
+    _createApp(options) {
+        options = this._configure(options)
+        this._logStartupMessage(options)
 
         // To gain a small speed increase in the event that this
         // server needs to make a proxy request back to itself,
@@ -190,34 +223,40 @@ export const RemoteServerFactory = {
         // callback is a no-op.
         dns.lookup(options.appHostname, () => null)
 
-        this.validateConfiguration(options)
-        this.updatePackageMobify(options)
-        this.configureProxyConfigs(options)
+        this._validateConfiguration(options)
+        this._updatePackageMobify(options)
+        this._configureProxyConfigs(options)
 
-        const app = this.createExpressApp(options)
+        const app = this._createExpressApp(options)
 
         // Do this first – we want compression applied to
         // everything when it's enabled at all.
-        this.setCompression(app)
+        this._setCompression(app)
 
         // Ordering of the next two calls are vital - we don't
         // want request-processors applied to development views.
-        this.addSDKInternalHandlers(app)
-        this.setupSSRRequestProcessorMiddleware(app)
+        this._addSDKInternalHandlers(app)
+        this._setupSSRRequestProcessorMiddleware(app)
 
-        this.setupLogging(app)
-        this.setupMetricsFlushing(app)
-        this.setupHealthcheck(app)
-        this.setupProxying(app, options)
+        this._setupLogging(app)
+        this._setupMetricsFlushing(app)
+        this._setupHealthcheck(app)
+        this._setupProxying(app, options)
 
         // Beyond this point, we know that this is not a proxy request
         // and not a bundle request, so we can apply specific
         // processing.
-        this.setupCommonMiddleware(app, options)
+        this._setupCommonMiddleware(app, options)
+
+        this._addStaticAssetServing(app)
+        this._addDevServerGarbageCollection(app)
         return app
     },
 
-    createExpressApp(options) {
+    /**
+     * @private
+     */
+    _createExpressApp(options) {
         const app = express()
         app.disable('x-powered-by')
 
@@ -283,10 +322,16 @@ export const RemoteServerFactory = {
         return app
     },
 
+    /**
+     * @private
+     */
     // eslint-disable-next-line no-unused-vars
-    addSDKInternalHandlers(app) {},
+    _addSDKInternalHandlers(app) {},
 
-    setupSSRRequestProcessorMiddleware(app) {
+    /**
+     * @private
+     */
+    _setupSSRRequestProcessorMiddleware(app) {
         const that = this
 
         // Attach this middleware as early as possible. It does timing
@@ -329,7 +374,7 @@ export const RemoteServerFactory = {
             }
 
             // Apply the request processor
-            const requestProcessor = that.getRequestProcessor(req)
+            const requestProcessor = that._getRequestProcessor(req)
             const parsed = URL.parse(req.url)
             const originalQuerystring = parsed.query
             let updatedQuerystring = originalQuerystring
@@ -496,8 +541,11 @@ export const RemoteServerFactory = {
         app.use(ssrRequestProcessorMiddleware)
     },
 
+    /**
+     * @private
+     */
     // eslint-disable-next-line no-unused-vars
-    setupProxying(app, options) {
+    _setupProxying(app, options) {
         app.all('/mobify/proxy/*', (_, res) => {
             return res.status(501).json({
                 message:
@@ -506,7 +554,10 @@ export const RemoteServerFactory = {
         })
     },
 
-    setupHealthcheck(app) {
+    /**
+     * @private
+     */
+    _setupHealthcheck(app) {
         app.get('/mobify/ping', (_, res) =>
             res
                 .set('cache-control', NO_CACHE)
@@ -515,7 +566,10 @@ export const RemoteServerFactory = {
         )
     },
 
-    setupCommonMiddleware(app, options) {
+    /**
+     * @private
+     */
+    _setupCommonMiddleware(app, options) {
         app.use(prepNonProxyRequest)
 
         // Map favicon requests to the configured path. We always map
@@ -531,7 +585,10 @@ export const RemoteServerFactory = {
         applyPatches(options)
     },
 
-    validateConfiguration(options) {
+    /**
+     * @private
+     */
+    _validateConfiguration(options) {
         // Check that we are running under a compatible version of node
         /* istanbul ignore next */
         const requiredNode = new semver.Range(pkg.engines.node)
@@ -611,22 +668,106 @@ export const RemoteServerFactory = {
         }
 
         if (!options.strictSSL) {
-            console.warn('The SSR Server has strictSSL turned off for https requests')
+            console.warn('The SSR Server has _strictSSL turned off for https requests')
         }
     },
 
-    addSSRRenderer(app) {
-        // See - https://www.npmjs.com/package/webpack-hot-server-middleware#usage
-        const {buildDir} = app.options
-        const _require = eval('require')
-        const serverRenderer = _require(path.join(buildDir, 'server-renderer.js')).default
-        const stats = _require(path.join(buildDir, 'loadable-stats.json'))
+    /**
+     * @private
+     */
+    _addStaticAssetServing() {
+        // Handled by the CDN on remote
+    },
 
-        // Only serve worker.js if the user is setting up a server-side
-        // rendered project (assumed to be a PWA).
-        app.get('/worker.js*', serveServiceWorker)
+    /**
+     * @private
+     */
+    _addDevServerGarbageCollection() {
+        // This is a hook for the dev-server. The remote-server
+        // does GC in a way that is awkward to extract. See _createHandler.
+    },
 
-        app.use(serverRenderer(stats))
+    /**
+     * Serve the /worker.js file.
+     *
+     * The service worker must be served at the root of the site and must
+     * not be a redirect. We set a long value for s-maxage (to allow CDN
+     * caching), plus a strong etag (for CDN-only revalidation), and to set
+     * maxage to 0 to prevent browser caching.
+     *
+     * See https://developer.chrome.com/blog/fresher-sw/ for details on
+     * efficiently serving service workers.
+     *
+     */
+    serveServiceWorker(req, res) {
+        const options = req.app.options
+        // We apply this cache-control to all responses (200 and 404)
+        res.set(
+            CACHE_CONTROL,
+            // The CDN can cache for 24 hours. The browser may not cache
+            // the file.
+            's-maxage=86400, max-age=0'
+        )
+
+        const workerFilePath = path.join(options.buildDir, req.path)
+
+        // If there is no file, send a 404
+        if (!fs.existsSync(workerFilePath)) {
+            res.status(404).send()
+            return
+        }
+
+        const content = fs.readFileSync(workerFilePath, {encoding: 'utf8'})
+
+        // Serve the file, with a strong ETag
+        res.set('etag', getHashForString(content))
+        res.set(CONTENT_TYPE, 'application/javascript')
+        res.send(content)
+    },
+
+    /**
+     * Serve static files from the app's build directory and set default
+     * cache-control headers.
+     * @since v2.0.0
+     *
+     * @param {String} filePath - the location of the static file relative to the build directory
+     * @param {Object} opts - the options object to pass to the original `sendFile` method
+     */
+    serveStaticFile(filePath, opts = {}) {
+        return (req, res) => {
+            const options = req.app.options
+            const file = path.resolve(options.buildDir, filePath)
+            res.sendFile(file, {
+                headers: {
+                    [CACHE_CONTROL]: options.defaultCacheControl
+                },
+                ...opts
+            })
+        }
+    },
+
+    /**
+     * Server side rendering entry.
+     *
+     * @since v2.0.0
+     *
+     * This is a wrapper around the Express `res.sendFile` method.
+     *
+     * @param {Object} req - the req object
+     * @param {Object} req - the res object
+     * @param {function} next - the callback function for middleware chain
+     */
+    render(req, res, next) {
+        const app = req.app
+        if (!app.__renderer) {
+            // See - https://www.npmjs.com/package/webpack-hot-server-middleware#usage
+            const {buildDir} = app.options
+            const _require = eval('require')
+            const serverRenderer = _require(path.join(buildDir, 'server-renderer.js')).default
+            const stats = _require(path.join(buildDir, 'loadable-stats.json'))
+            app.__renderer = serverRenderer(stats)
+        }
+        app.__renderer(req, res, next)
     },
 
     /**
@@ -748,13 +889,16 @@ export const RemoteServerFactory = {
      */
     createHandler(options, customizeApp) {
         process.on('unhandledRejection', catchAndLog)
-        const app = this.createApp(options)
+        const app = this._createApp(options)
         customizeApp(app)
         return this._createHandler(app)
     },
 
+    /**
+     * @private
+     */
     // eslint-disable-next-line no-unused-vars
-    getRequestProcessor(req) {
+    _getRequestProcessor(req) {
         return null
     }
 }
@@ -805,74 +949,6 @@ const prepNonProxyRequest = (req, res, next) => {
         }
     }
     next()
-}
-
-/**
- * Serve the /worker.js file.
- *
- * Unlike other bundle assets, the worker cannot be served from a
- * bundle path. It must be served at the root of the site, so
- * that it can control all pages and requests. This presents some
- * challenges in caching. If we set a long age in the cache-control
- * header, then CloudFront and/or browsers may continue to use
- * outdated worker code. If we set a short value, we have to serve
- * more requests. We cannot solve this by returning a redirect to the
- * location of the worker file under the bundle path, because redirects
- * are not valid responses to the request to load a service worker
- * file for registration.
- *
- * The solution is to set a long value for s-maxage (CDN caching), plus
- * a strong etag (to allow CDN-only revalidation), and to set maxage
- * to 0 to prevent browser caching.
- *
- * See https://developers.google.com/web/updates/2018/06/fresher-sw
- * for useful background information about how service workers are
- * cached and updated by browsers.
- *
- * The worker file is loaded on-demand, but is not cached in memory. We
- * do not expect that we will get many requests for it (because it is
- * cached in the CDN) and the chances of one single Lambda getting multiple
- * requests for that file are extremely low - so we would never expect to
- * get a hit for any in-memory caching.
- *
- * There is a minor risk of a race condition:
- * 1. UPWA A starts, using bundle 1, and loads the worker for bundle 1
- * 2. Bundle 2 is published while UPWA A is running.
- * 3. UPWA A runs for 24 hours and thus the browser refreshes /worker.js,
- * getting the worker for bundle 2.
- *
- * If the workers for bundles 1 & 2 are incompatible, the UPWA running
- * bundle 1 might fail. Refreshing the UPWA will fix the issue (because
- * it will then load all the code for bundle 2).
- *
- * This race condition has always been present in our projects.
- *
- * @private
- */
-const serveServiceWorker = (req, res) => {
-    const options = req.app.options
-    // We apply this cache-control to all responses (200 and 404)
-    res.set(
-        CACHE_CONTROL,
-        // The CDN can cache for 24 hours. The browser may not cache
-        // the file.
-        's-maxage=86400, max-age=0'
-    )
-
-    const workerFilePath = path.join(options.buildDir, req.path)
-
-    // If there is no file, send a 404
-    if (!fs.existsSync(workerFilePath)) {
-        res.status(404).send()
-        return
-    }
-
-    const content = fs.readFileSync(workerFilePath, {encoding: 'utf8'})
-
-    // Serve the file, with a strong ETag
-    res.set('etag', getHashForString(content))
-    res.set(CONTENT_TYPE, 'application/javascript')
-    res.send(content)
 }
 
 /**

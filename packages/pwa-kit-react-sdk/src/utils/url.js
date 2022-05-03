@@ -9,7 +9,7 @@
  * Returns the application's origin.
  *
  * NOTE: This utility can only be used server-side after your application has been
- * initialized using the `createApp` method (This happens in your /app/ssr.js file).
+ * initialized using the `_createApp` method (This happens in your /app/ssr.js file).
  *
  * @function
  * @returns {string} Returns the ORIGIN under which we are serving the page.
@@ -27,7 +27,7 @@ export const getAppOrigin = () => {
 
     if (!APP_ORIGIN) {
         throw new Error(
-            `Application is not initialized. Please ensure 'createApp' has been invoked before using this method.`
+            `Application is not initialized. Please ensure '_createApp' has been invoked before using this method.`
         )
     }
 

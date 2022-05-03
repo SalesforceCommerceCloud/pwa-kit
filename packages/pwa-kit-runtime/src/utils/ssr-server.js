@@ -212,7 +212,7 @@ const getKeepAliveAgents = () => {
  * @private
  * @param wrapped {Function} the request/get function to wrap
  * @param options {Object} the options passed in to the servers
- * `createApp` function.
+ * `_createApp` function.
  * @returns {Function} a function that wraps 'wrapped'
  */
 
