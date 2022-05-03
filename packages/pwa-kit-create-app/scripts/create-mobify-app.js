@@ -61,8 +61,17 @@ const TEST_PROJECT = 'test-project' // TODO: This will be replaced with the `iso
 const RETAIL_REACT_APP_DEMO = 'retail-react-app-demo'
 const RETAIL_REACT_APP = 'retail-react-app'
 
-const PRIVATE_PRESETS = [TEST_PROJECT, EXPRESS_MINIMAL_TEST_PROJECT, TYPESCRIPT_MINIMAL_TEST_PROJECT]
-const PUBLIC_PRESETS = [RETAIL_REACT_APP_DEMO, RETAIL_REACT_APP, EXPRESS_MINIMAL, TYPESCRIPT_MINIMAL]
+const PRIVATE_PRESETS = [
+    TEST_PROJECT,
+    EXPRESS_MINIMAL_TEST_PROJECT,
+    TYPESCRIPT_MINIMAL_TEST_PROJECT
+]
+const PUBLIC_PRESETS = [
+    RETAIL_REACT_APP_DEMO,
+    RETAIL_REACT_APP,
+    EXPRESS_MINIMAL,
+    TYPESCRIPT_MINIMAL
+]
 const PRESETS = PRIVATE_PRESETS.concat(PUBLIC_PRESETS)
 
 const DEFAULT_OUTPUT_DIR = p.join(process.cwd(), 'pwa-kit-starter-project')
@@ -419,7 +428,11 @@ const main = (opts) => {
         .then((preset) => {
             switch (preset) {
                 case TYPESCRIPT_MINIMAL_TEST_PROJECT:
-                    return generateTemplateMinimal('typescript-minimal', opts, 'template-typescript-minimal')
+                    return generateTemplateMinimal(
+                        'typescript-minimal',
+                        opts,
+                        'template-typescript-minimal'
+                    )
                 case TYPESCRIPT_MINIMAL:
                     return templateMinimalPrompts(opts).then((answers) => {
                         const projectId = slugifyName(answers.projectName)
@@ -430,7 +443,11 @@ const main = (opts) => {
                         return opts.outputDir
                     })
                 case EXPRESS_MINIMAL_TEST_PROJECT:
-                    return generateTemplateMinimal('express-minimal', opts, 'template-express-minimal')
+                    return generateTemplateMinimal(
+                        'express-minimal',
+                        opts,
+                        'template-express-minimal'
+                    )
                 case EXPRESS_MINIMAL:
                     return templateMinimalPrompts(opts).then((answers) => {
                         const projectId = slugifyName(answers.projectName)
