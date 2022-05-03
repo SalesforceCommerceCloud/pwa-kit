@@ -9,7 +9,7 @@ We welcome contributions to PWA Kit! To ensure that your contributions are addre
 This repository is a [monorepo](https://en.wikipedia.org/wiki/Monorepo) that includes the code that powers the PWA Kit. The code is divided into the following packages:
 
 - `internal-lib-build`: A package that contains internal tools used by other libraries in the monorepo 
-- `pwa-kit-cli`: A set of commands to build PWA Kit projects
+- `pwa-kit-dev`: A set of commands to build PWA Kit projects
 - `pwa-kit-create-app`: A tool that generates PWA Kit projects based on the Retail React App template
 - `pwa-kit-react-sdk`: A set of components and utilities for PWA Kit projects
 - `pwa-kit-runtime`: A package that contains runtime environments for applications to run on Managed Runtime
