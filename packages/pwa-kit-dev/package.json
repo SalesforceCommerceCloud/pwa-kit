@@ -1,12 +1,12 @@
 {
-  "name": "pwa-kit-cli",
-  "version": "2.0.0-dev.7",
+  "name": "pwa-kit-dev",
+  "version": "2.0.0-dev.8",
   "description": "Build tools for pwa-kit",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/SalesforceCommerceCloud/pwa-kit.git"
   },
-  "homepage": "https://github.com/SalesforceCommerceCloud/pwa-kit/tree/develop/packages/pwa-kit-cli#readme",
+  "homepage": "https://github.com/SalesforceCommerceCloud/pwa-kit/tree/develop/packages/pwa-kit-dev#readme",
   "bugs": {
     "url": "https://github.com/SalesforceCommerceCloud/pwa-kit/issues"
   },
@@ -14,7 +14,7 @@
   "author": "dev@mobify.com",
   "main": "dist/index.js",
   "bin": {
-    "pwa-kit-cli": "bin/pwa-kit-cli.js"
+    "pwa-kit-dev": "bin/pwa-kit-dev.js"
   },
   "files": [
     "bin",
@@ -89,7 +89,6 @@
     "morgan": "1.9.1",
     "open": "^8.4.0",
     "prettier": "^1.18.2",
-    "pwa-kit-runtime": "^2.0.0-dev.7",
     "replace-in-file": "^6.2.0",
     "request": "^2.88.0",
     "require-from-string": "^2.0.2",
@@ -110,8 +109,9 @@
   },
   "devDependencies": {
     "@loadable/component": "^5.15.0",
-    "internal-lib-build": "^2.0.0-dev.7",
+    "internal-lib-build": "^2.0.0-dev.8",
     "nock": "^13.1.1",
+    "pwa-kit-runtime": "^2.0.0-dev.8",
     "superagent": "^6.1.0",
     "supertest": "^4.0.2"
   },
