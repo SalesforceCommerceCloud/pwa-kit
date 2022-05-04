@@ -164,13 +164,6 @@ commands:
               # that would prevent Lerna from publishing (Lerna gets this right).
               git diff --exit-code
 
-  generate_and_test_projects:
-    description: 'Generate project'
-    parallelism: 3
-    steps:
-      - generate_and_test_project
-      - generate_template_minimal_projects
-
   generate_and_test_project:
     description: 'Generate project'
     steps:
@@ -204,23 +197,18 @@ commands:
                 echo "Found $TOTAL_PACKAGES installed packages (max $MAX_PACKAGES).";
             fi
 
-  generate_template_minimal_projects:
-    description: 'Generate Template Minimal Projects'
+  early_return_for_forked_pull_requests:
+    description: >-
+      If this build is from a fork, stop executing the current job and return success.
+      This is useful to avoid steps that will fail due to missing credentials.
     steps:
       - run:
-          name: Generate express-minimal project
-          environment:
-            GENERATOR_PRESET: 'express-minimal-test-project'
+          name: Early return if this build is from a forked PR
           command: |
-            set GENERATOR_PRESET=express-minimal-test-project
-            node packages/pwa-kit-create-app/scripts/create-mobify-app-dev.js --outputDir generated-project-express-minimal
-      - run:
-          name: Generate typescript-minimal project
-          environment:
-            GENERATOR_PRESET: 'typescript-minimal-test-project'
-          command: |
-            set GENERATOR_PRESET=typescript-minimal-test-project
-            node packages/pwa-kit-create-app/scripts/create-mobify-app-dev.js --outputDir generated-project-typescript-minimal
+            if [ -n "$CIRCLE_PR_NUMBER" ]; then
+              echo "Nothing else to do for forked PRs, so marking this step successful"
+              circleci step halt
+            fi
 
 jobs:
   testNode12:
@@ -317,13 +305,47 @@ jobs:
       - slack/status:
           fail_only: true
           only_for_branches: develop
+  generatedMinimalTemplates:
+    docker:
+      - image: circleci/node:14-stretch-browsers
+    parameters:
+      template:
+        type: string
+    steps:
+      - checkout
+      - setup
+      - run:
+          name: Generate << parameters.template >> project
+          environment:
+            GENERATOR_PRESET: << parameters.template >>
+          command: |
+            set GENERATOR_PRESET=<< parameters.template >>
+            node packages/pwa-kit-create-app/scripts/create-mobify-app-dev.js --outputDir generated-<< parameters.template >>
+  generatedMinimalTemplatesWindows:
+    parameters:
+      template:
+        type: string
+    executor:
+      name: win/default
+      size: "large"
+      shell: bash.exe
+    steps:
+      - checkout
+      - setup_windows
+      - run:
+          name: Generate << parameters.template >> project
+          environment:
+            GENERATOR_PRESET: << parameters.template >>
+          command: |
+            set GENERATOR_PRESET=<< parameters.template >>
+            node packages/pwa-kit-create-app/scripts/create-mobify-app-dev.js --outputDir generated-<< parameters.template >>
   generatedSFCCProjectTest:
     docker:
       - image: circleci/node:14-stretch-browsers
     steps:
       - checkout
       - setup
-      - generate_and_test_projects
+      - generate_and_test_project
 
       - early_return_for_forked_pull_requests
       - slack/status:
@@ -382,8 +404,7 @@ jobs:
     steps:
       - checkout
       - setup_windows
-      - generate_and_test_projects
-
+      - generate_and_test_project
 workflows:
   version: 2
   test:
@@ -395,6 +416,14 @@ workflows:
       - testNode14npm8
       - generatedSFCCProjectTest
       - generatedSFCCProjectTestWindows
+      - generatedMinimalTemplates:
+          matrix:
+            parameters:
+              template: [express-minimal-test-project, typescript-minimal-test-project]
+      - generatedMinimalTemplatesWindows:
+          matrix:
+            parameters:
+              template: [express-minimal-test-project, typescript-minimal-test-project]
   nightly-build:
     triggers:
       - schedule:
