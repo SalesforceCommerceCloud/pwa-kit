@@ -164,6 +164,13 @@ commands:
               # that would prevent Lerna from publishing (Lerna gets this right).
               git diff --exit-code
 
+  generate_and_test_projects:
+    description: 'Generate project'
+    parallelism: 3
+    steps:
+      - generate_and_test_project
+      - generate_template_minimal_projects
+
   generate_and_test_project:
     description: 'Generate project'
     steps:
@@ -177,20 +184,6 @@ commands:
             
             cd generated-project
             npm run build
-      - run:
-          name: Generate express-minimal project
-          environment:
-            GENERATOR_PRESET: 'express-minimal-test-project'
-          command: |
-            set GENERATOR_PRESET=express-minimal-test-project
-            node packages/pwa-kit-create-app/scripts/create-mobify-app-dev.js --outputDir generated-project-express-minimal
-      - run:
-          name: Generate typescript-minimal project
-          environment:
-            GENERATOR_PRESET: 'typescript-minimal-test-project'
-          command: |
-            set GENERATOR_PRESET=typescript-minimal-test-project
-            node packages/pwa-kit-create-app/scripts/create-mobify-app-dev.js --outputDir generated-project-typescript-minimal
       - runtests:
           cwd: generated-project
       - smoketestscripts:
@@ -211,18 +204,23 @@ commands:
                 echo "Found $TOTAL_PACKAGES installed packages (max $MAX_PACKAGES).";
             fi
 
-  early_return_for_forked_pull_requests:
-    description: >-
-      If this build is from a fork, stop executing the current job and return success.
-      This is useful to avoid steps that will fail due to missing credentials.
+  generate_template_minimal_projects:
+    description: 'Generate Template Minimal Projects'
     steps:
       - run:
-          name: Early return if this build is from a forked PR
+          name: Generate express-minimal project
+          environment:
+            GENERATOR_PRESET: 'express-minimal-test-project'
           command: |
-            if [ -n "$CIRCLE_PR_NUMBER" ]; then
-              echo "Nothing else to do for forked PRs, so marking this step successful"
-              circleci step halt
-            fi
+            set GENERATOR_PRESET=express-minimal-test-project
+            node packages/pwa-kit-create-app/scripts/create-mobify-app-dev.js --outputDir generated-project-express-minimal
+      - run:
+          name: Generate typescript-minimal project
+          environment:
+            GENERATOR_PRESET: 'typescript-minimal-test-project'
+          command: |
+            set GENERATOR_PRESET=typescript-minimal-test-project
+            node packages/pwa-kit-create-app/scripts/create-mobify-app-dev.js --outputDir generated-project-typescript-minimal
 
 jobs:
   testNode12:
@@ -325,7 +323,7 @@ jobs:
     steps:
       - checkout
       - setup
-      - generate_and_test_project
+      - generate_and_test_projects
 
       - early_return_for_forked_pull_requests
       - slack/status:
@@ -384,7 +382,7 @@ jobs:
     steps:
       - checkout
       - setup_windows
-      - generate_and_test_project
+      - generate_and_test_projects
 
 workflows:
   version: 2
