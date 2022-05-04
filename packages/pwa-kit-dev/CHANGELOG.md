@@ -1,3 +1,6 @@
+## v2.0.0-dev.8 (May 03, 2022)
+## v2.0.0-dev.7 (May 03, 2022)
+## v2.0.0-dev.6 (May 02, 2022)
 ## v2.0.0-dev.5 (Apr 26, 2022)
 
 -   Ensure we copy the `package.json` file into the build folder. Also move logic for copying config files into the build script from the webpack config [#524](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/524)
