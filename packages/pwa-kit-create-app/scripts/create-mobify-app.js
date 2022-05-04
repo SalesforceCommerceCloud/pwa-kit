@@ -104,7 +104,7 @@ const merge = (a, b) => deepmerge(a, b, {arrayMerge: (orignal, replacement) => r
  *   deep-merged with each package's original package.json data. Eg:
  *
  *   {
- *      "scaffold-pwa": {
+ *      "retail-react-app": {
  *          "name": "new-project-web",
  *          "version": "0.0.1",
  *      }
@@ -134,7 +134,7 @@ const runGenerator = (answers, {outputDir}) => {
 
     const pkgJsonPath = p.resolve(outputDir, 'package.json')
     const pkgJSON = readJson(pkgJsonPath)
-    const pkgDataWithAnswers = merge(pkgJSON, answers['scaffold-pwa'])
+    const pkgDataWithAnswers = merge(pkgJSON, answers['retail-react-app'])
 
     npmInstallables.forEach((pkgName) => {
         const keys = ['dependencies', 'devDependencies']
@@ -189,8 +189,6 @@ const runGenerator = (answers, {outputDir}) => {
     new sh.ShellString(PWAKitSitesTemplate(answers)).to(p.resolve(outputDir, 'config', 'sites.js'))
 
     npmInstall(outputDir)
-
-    return outputDir
 }
 
 const npmInstall = (outputDir) => {
@@ -282,7 +280,7 @@ const buildAnswers = ({
 
     return {
         globals: {projectId},
-        'scaffold-pwa': {
+        'retail-react-app': {
             name: projectId,
             version: GENERATED_PROJECT_VERSION
         },
@@ -294,7 +292,7 @@ const buildAnswers = ({
 
 const testProjectAnswers = () => {
     const config = {
-        projectName: 'scaffold-pwa',
+        projectName: 'retail-react-app',
         instanceUrl: 'https://zzrf-001.sandbox.us01.dx.commercecloud.salesforce.com',
         clientId: 'c9c45bfd-0ed3-4aa2-9971-40f88962b836',
         siteId: 'RefArch',
@@ -405,7 +403,10 @@ const main = (opts) => {
             switch (preset) {
                 case EXPRESS_MINIMAL_TEST_PROJECT:
                     generateExpressMinimal('express-minimal', opts)
-                    return opts.outputDir
+                    return {
+                        answers: {},
+                        outputDir: opts.outputDir
+                    }
                 case EXPRESS_MINIMAL:
                     return expressMinimalPrompts(opts).then((answers) => {
                         const projectId = slugifyName(answers.projectName)
@@ -413,19 +414,28 @@ const main = (opts) => {
                             opts.outputDir = p.join(process.cwd(), projectId)
                         }
                         generateExpressMinimal(projectId, opts)
-                        return opts.outputDir
+                        return {
+                            answers: answers,
+                            outputDir: opts.outputDir
+                        }
                     })
                 case TEST_PROJECT:
                     runGenerator(testProjectAnswers(), opts)
-                    return opts.outputDir
+                    return {
+                        answers: demoProjectAnswers(),
+                        outputDir: opts.outputDir
+                    }
                 case RETAIL_REACT_APP_DEMO:
                     return Promise.resolve()
                         .then(() => runGenerator(demoProjectAnswers(), opts))
-                        .then((result) => {
+                        .then(() => {
                             console.log(
                                 '\nTo change your ecommerce back end you will need to update your storefront configuration. More information: https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/configuration-options'
                             )
-                            return result
+                            return {
+                                answers: demoProjectAnswers(),
+                                outputDir: opts.outputDir
+                            }
                         })
                 case RETAIL_REACT_APP:
                     console.log(
@@ -440,7 +450,10 @@ const main = (opts) => {
                         }
 
                         runGenerator(answers, opts)
-                        return opts.outputDir
+                        return {
+                            answers: answers,
+                            outputDir: opts.outputDir
+                        }
                     })
                 default:
                     console.error(
@@ -453,14 +466,17 @@ const main = (opts) => {
                     process.exit(1)
             }
         })
-        .then((outputDir) => {
-            // Copy shared assets into the project folder.
+        .then(({answers, outputDir}) => {
+            // Copy shared assets into the project folder, if the file is a template as indicated by
+            // starting with a `$`, process the template.
             const dir = p.join(__dirname, '..', 'assets', 'shared')
 
             fs.readdirSync(dir).map((file) => {
                 if (file.startsWith('$')) {
                     const template = require(p.join(dir, file)).template
-                    new sh.ShellString(template()).to(p.resolve(outputDir, file.substring(1)))
+                    new sh.ShellString(template(answers)).to(
+                        p.resolve(outputDir, file.substring(1))
+                    )
                 } else {
                     sh.cp('-R', file, outputDir)
                 }

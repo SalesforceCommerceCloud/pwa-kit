@@ -1,14 +1,14 @@
 {
     "name": "template-express-minimal",
-    "version": "2.0.0-dev.5",
+    "version": "2.0.0-dev.6",
     "license": "See license in LICENSE",
     "private": true,
     "devDependencies": {
-        "babel-preset-pwa-kit": "^2.0.0-dev.5",
+        "babel-preset-pwa-kit": "^2.0.0-dev.6",
         "eslint": "7.31.0",
-        "eslint-config-pwa-kit": "^2.0.0-dev.5",
-        "pwa-kit-cli": "^2.0.0-dev.5",
-        "pwa-kit-runtime": "^2.0.0-dev.5"
+        "eslint-config-pwa-kit": "^2.0.0-dev.6",
+        "pwa-kit-cli": "^2.0.0-dev.6",
+        "pwa-kit-runtime": "^2.0.0-dev.6"
     },
     "scripts": {
         "test": "pwa-kit-cli test",

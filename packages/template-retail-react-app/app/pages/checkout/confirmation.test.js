@@ -18,21 +18,11 @@ import useShopper from '../../commerce-api/hooks/useShopper'
 import {ocapiOrderResponse} from '../../commerce-api/mock-data'
 import {mockedGuestCustomer, exampleTokenReponse} from '../../commerce-api/mock-data'
 
-jest.mock('../../commerce-api/hooks/useCustomer', () => {
-    const originalModule = jest.requireActual('../../commerce-api/hooks/useCustomer')
-    const useCustomer = originalModule.default
-
-    console.log('--- mock useCustomer to force log in as guest')
-    return () => {
-        const customer = useCustomer()
-        const _login = customer.login
-
-        customer.login = () => {
-            // Testing becomes easier if we have to deal with only guest login
-            return _login()
+jest.mock('../../commerce-api/auth', () => {
+    return class AuthMock {
+        login() {
+            return mockedGuestCustomer
         }
-
-        return customer
     }
 })
 

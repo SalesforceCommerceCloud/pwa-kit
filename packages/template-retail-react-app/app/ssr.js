@@ -9,7 +9,7 @@
 'use strict'
 
 const path = require('path')
-const {getRuntime, serveStaticFile} = require('pwa-kit-runtime/ssr/server/express')
+const {getRuntime} = require('pwa-kit-runtime/ssr/server/express')
 const {isRemote} = require('pwa-kit-runtime/utils/ssr-server')
 const {getConfig} = require('pwa-kit-runtime/utils/ssr-config')
 const helmet = require('helmet')
@@ -63,9 +63,10 @@ const {handler} = runtime.createHandler(options, (app) => {
     app.get('/callback?*', (req, res) => {
         res.send()
     })
-    app.get('/robots.txt', serveStaticFile('static/robots.txt'))
+    app.get('/robots.txt', runtime.serveStaticFile('static/robots.txt'))
 
-    runtime.addSSRRenderer(app)
+    app.get('/worker.js(.map)?', runtime.serveServiceWorker)
+    app.get('*', runtime.render)
 })
 // SSR requires that we export a single handler function called 'get', that
 // supports AWS use of the server that we created above.
