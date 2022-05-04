@@ -466,22 +466,6 @@ const main = (opts) => {
                     process.exit(1)
             }
         })
-        .then(({answers, outputDir}) => {
-            // Copy shared assets into the project folder, if the file is a template as indicated by
-            // starting with a `$`, process the template.
-            const dir = p.join(__dirname, '..', 'assets', 'shared')
-
-            fs.readdirSync(dir).map((file) => {
-                if (file.startsWith('$')) {
-                    const template = require(p.join(dir, file)).template
-                    new sh.ShellString(template(answers)).to(
-                        p.resolve(outputDir, file.substring(1))
-                    )
-                } else {
-                    sh.cp('-R', file, outputDir)
-                }
-            })
-        })
 }
 
 if (require.main === module) {
