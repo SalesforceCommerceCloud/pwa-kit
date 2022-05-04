@@ -21,7 +21,7 @@ const options = {
 
     // The path to the favicon. This must also appear in
     // the mobify.ssrShared section of package.json.
-    faviconPath: path.resolve(process.cwd(), 'app/static/ico/favicon.ico'),
+    faviconPath: path.resolve(process.cwd(), (isRemote() ? 'build/static/ico/favicon.ico' : 'app/static/ico/favicon.ico')),
 
     // The location of the apps manifest file relative to the build directory
     manifestPath: 'static/manifest.json',
