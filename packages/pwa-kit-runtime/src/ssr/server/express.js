@@ -463,5 +463,5 @@ export const respondFromBundle = ({req, res, path, redirect = 301}) => {
 export const getRuntime = () => {
     return isRemote()
         ? RemoteServerFactory
-        : eval('require').main.require('pwa-kit-cli/ssr/server/build-dev-server').DevServerFactory
+        : eval('require').main.require('pwa-kit-dev/ssr/server/build-dev-server').DevServerFactory
 }
