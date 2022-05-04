@@ -357,7 +357,7 @@ const templateMinimalPrompts = () => {
     return inquirer.prompt(questions)
 }
 
-const generateTemplateMinimal = (projectId, {outputDir, verbose}, template) => {
+const runTemplateGenerator = (projectId, {outputDir, verbose}, template) => {
     extractTemplate(template, outputDir)
     const pkgJsonPath = p.resolve(outputDir, 'package.json')
     const pkgJSON = readJson(pkgJsonPath)
@@ -428,7 +428,7 @@ const main = (opts) => {
         .then((preset) => {
             switch (preset) {
                 case TYPESCRIPT_MINIMAL_TEST_PROJECT:
-                    return generateTemplateMinimal(
+                    return runTemplateGenerator(
                         'typescript-minimal',
                         opts,
                         'template-typescript-minimal'
@@ -443,7 +443,7 @@ const main = (opts) => {
                         return opts.outputDir
                     })
                 case EXPRESS_MINIMAL_TEST_PROJECT:
-                    return generateTemplateMinimal(
+                    return runTemplateGenerator(
                         'express-minimal',
                         opts,
                         'template-express-minimal'

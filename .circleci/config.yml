@@ -305,7 +305,7 @@ jobs:
       - slack/status:
           fail_only: true
           only_for_branches: develop
-  generatedMinimalTemplates:
+  generatedTemplate:
     docker:
       - image: circleci/node:14-stretch-browsers
     parameters:
@@ -321,7 +321,7 @@ jobs:
           command: |
             set GENERATOR_PRESET=<< parameters.template >>
             node packages/pwa-kit-create-app/scripts/create-mobify-app-dev.js --outputDir generated-<< parameters.template >>
-  generatedMinimalTemplatesWindows:
+  generatedTemplateWindows:
     parameters:
       template:
         type: string
@@ -416,11 +416,11 @@ workflows:
       - testNode14npm8
       - generatedSFCCProjectTest
       - generatedSFCCProjectTestWindows
-      - generatedMinimalTemplates:
+      - generatedTemplate:
           matrix:
             parameters:
               template: [express-minimal-test-project, typescript-minimal-test-project]
-      - generatedMinimalTemplatesWindows:
+      - generatedTemplateWindows:
           matrix:
             parameters:
               template: [express-minimal-test-project, typescript-minimal-test-project]
@@ -445,3 +445,15 @@ workflows:
           context: nightly-build
       - generatedSFCCProjectTest:
           context: nightly-build
+      - generatedSFCCProjectTestWindows:
+          context: nightly-build
+      - generatedTemplate:
+          context: nightly-build
+          matrix:
+            parameters:
+              template: [ express-minimal-test-project, typescript-minimal-test-project ]
+      - generatedTemplateWindows:
+          context: nightly-build
+          matrix:
+            parameters:
+              template: [ express-minimal-test-project, typescript-minimal-test-project ]
