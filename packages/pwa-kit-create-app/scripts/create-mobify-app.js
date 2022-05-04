@@ -439,22 +439,18 @@ const main = (opts) => {
                         if (!OUTPUT_DIR_FLAG_ACTIVE) {
                             opts.outputDir = p.join(process.cwd(), projectId)
                         }
-                        generateTemplateMinimal(projectId, opts, 'template-typescript-minimal')
+                        runTemplateGenerator(projectId, opts, 'template-typescript-minimal')
                         return opts.outputDir
                     })
                 case EXPRESS_MINIMAL_TEST_PROJECT:
-                    return runTemplateGenerator(
-                        'express-minimal',
-                        opts,
-                        'template-express-minimal'
-                    )
+                    return runTemplateGenerator('express-minimal', opts, 'template-express-minimal')
                 case EXPRESS_MINIMAL:
                     return templateMinimalPrompts(opts).then((answers) => {
                         const projectId = slugifyName(answers.projectName)
                         if (!OUTPUT_DIR_FLAG_ACTIVE) {
                             opts.outputDir = p.join(process.cwd(), projectId)
                         }
-                        generateTemplateMinimal(projectId, opts, 'template-express-minimal')
+                        runTemplateGenerator(projectId, opts, 'template-express-minimal')
                         return opts.outputDir
                     })
                 case TEST_PROJECT:
