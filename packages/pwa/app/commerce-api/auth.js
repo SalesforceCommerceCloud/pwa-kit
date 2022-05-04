@@ -35,6 +35,9 @@ const oidStorageKey = 'oid'
 const dwSessionIdKey = 'dwsid'
 const REFRESH_TOKEN_COOKIE_AGE = 90 // 90 days. This value matches SLAS cartridge.
 
+const EXPIRED_TOKEN = 'EXPIRED_TOKEN'
+const INVALID_TOKEN = 'invalid refresh_token'
+
 /**
  * A  class that provides auth functionality for pwa.
  */
@@ -49,21 +52,14 @@ class Auth {
 
         // To store tokens as cookies
         // change the next line to
-        // this._storage = new CookieStorage()
-        this._storage = new LocalStorage()
+        // this._storage = this._onClient ? new CookieStorage() : new Map()
+        this._storage = this._onClient ? new LocalStorage() : new Map()
         const configOid = api._config.parameters.organizationId
         this._oid = this._storage.get(oidStorageKey) || configOid
 
         if (this._oid !== configOid) {
             this._clearAuth()
             this._saveOid(configOid)
-        } else {
-            this._authToken = this._storage.get(tokenStorageKey)
-            this._refreshToken =
-                this._storage.get(refreshTokenStorageKey) ||
-                this._storage.get(refreshTokenGuestStorageKey)
-            this._usid = this._storage.get(usidStorageKey)
-            this._encUserId = this._storage.get(encUserIdStorageKey)
         }
 
         this.login = this.login.bind(this)
@@ -79,23 +75,26 @@ class Auth {
     }
 
     get authToken() {
-        return this._authToken
+        return this._storage.get(tokenStorageKey)
     }
 
     get refreshToken() {
-        return this._refreshToken
+        return (
+            this._storage.get(refreshTokenStorageKey) ||
+            this._storage.get(refreshTokenGuestStorageKey)
+        )
     }
 
     get usid() {
-        return this._usid
+        return this._storage.get(usidStorageKey)
     }
 
     get encUserId() {
-        return this._encUserId
+        return this._storage.get(encUserIdStorageKey)
     }
 
     get oid() {
-        return this._oid
+        return this._storage.get(oidStorageKey)
     }
 
     /**
@@ -148,7 +147,7 @@ class Auth {
             {
                 method: 'POST',
                 headers: {
-                    Authorization: this._authToken
+                    Authorization: this.authToken
                 }
             }
         )
@@ -171,12 +170,13 @@ class Auth {
             let authorizationMethod = '_loginAsGuest'
             if (credentials) {
                 authorizationMethod = '_loginWithCredentials'
-            } else if (this._refreshToken) {
+            } else if (this.refreshToken) {
                 authorizationMethod = '_refreshAccessToken'
             }
             return this[authorizationMethod](credentials)
                 .catch((error) => {
-                    if (retries === 0 && error.message === 'EXPIRED_TOKEN') {
+                    const retryErrors = [INVALID_TOKEN, EXPIRED_TOKEN]
+                    if (retries === 0 && retryErrors.includes(error.message)) {
                         retries = 1 // we only retry once
                         this._clearAuth()
                         return startLoginFlow()
@@ -375,7 +375,7 @@ class Auth {
     async _refreshAccessToken() {
         const data = new URLSearchParams()
         data.append('grant_type', 'refresh_token')
-        data.append('refresh_token', this._refreshToken)
+        data.append('refresh_token', this.refreshToken)
         data.append('client_id', this._config.parameters.clientId)
 
         const options = {
@@ -408,10 +408,7 @@ class Auth {
      * @param {string} token - A JWT auth token.
      */
     _saveAccessToken(token) {
-        this._authToken = token
-        if (this._onClient) {
-            this._storage.set(tokenStorageKey, token)
-        }
+        this._storage.set(tokenStorageKey, token)
     }
 
     /**
@@ -420,10 +417,7 @@ class Auth {
      * @param {string} usid - Unique shopper Id.
      */
     _saveUsid(usid) {
-        this._usid = usid
-        if (this._onClient) {
-            this._storage.set(usidStorageKey, usid)
-        }
+        this._storage.set(usidStorageKey, usid)
     }
 
     /**
@@ -432,10 +426,7 @@ class Auth {
      * @param {string} encUserId - Logged in Shopper reference for Einstein API.
      */
     _saveEncUserId(encUserId) {
-        this._encUserId = encUserId
-        if (this._onClient) {
-            this._storage.set(encUserIdStorageKey, encUserId)
-        }
+        this._storage.set(encUserIdStorageKey, encUserId)
     }
 
     /**
@@ -445,9 +436,7 @@ class Auth {
      */
     _saveOid(oid) {
         this._oid = oid
-        if (this._onClient) {
-            this._storage.set(oidStorageKey, oid)
-        }
+        this._storage.set(oidStorageKey, oid)
     }
 
     /**
@@ -456,18 +445,12 @@ class Auth {
      */
     _clearAuth() {
         this._customerId = undefined
-        this._authToken = undefined
-        this._refreshToken = undefined
-        this._usid = undefined
-        this._encUserId = undefined
-        if (this._onClient) {
-            this._storage.remove(tokenStorageKey)
-            this._storage.remove(refreshTokenStorageKey)
-            this._storage.remove(refreshTokenGuestStorageKey)
-            this._storage.remove(usidStorageKey)
-            this._storage.remove(encUserIdStorageKey)
-            this._storage.remove(dwSessionIdKey)
-        }
+        this._storage.delete(tokenStorageKey)
+        this._storage.delete(refreshTokenStorageKey)
+        this._storage.delete(refreshTokenGuestStorageKey)
+        this._storage.delete(usidStorageKey)
+        this._storage.delete(encUserIdStorageKey)
+        this._storage.delete(dwSessionIdKey)
     }
 
     /**
@@ -476,12 +459,17 @@ class Auth {
      * @param {string} refreshToken - A JWT refresh token.
      */
     _saveRefreshToken(refreshToken, type) {
-        this._refreshToken = refreshToken
-        const storeageKey =
-            type === 'registered' ? refreshTokenStorageKey : refreshTokenGuestStorageKey
-        if (this._onClient) {
-            this._storage.set(storeageKey, refreshToken, {expires: REFRESH_TOKEN_COOKIE_AGE})
+        if (type === 'registered') {
+            this._storage.set(refreshTokenStorageKey, refreshToken, {
+                expires: REFRESH_TOKEN_COOKIE_AGE
+            })
+            this._storage.delete(refreshTokenGuestStorageKey)
+            return
         }
+        this._storage.set(refreshTokenGuestStorageKey, refreshToken, {
+            expires: REFRESH_TOKEN_COOKIE_AGE
+        })
+        this._storage.delete(refreshTokenStorageKey)
     }
 }
 
@@ -490,7 +478,7 @@ export default Auth
 class Storage {
     set(key, value, options) {}
     get(key) {}
-    remove(key) {}
+    delete(key) {}
 }
 
 class CookieStorage extends Storage {
@@ -509,7 +497,7 @@ class CookieStorage extends Storage {
     get(key) {
         return this._avaliable ? Cookies.get(key) : undefined
     }
-    remove(key) {
+    delete(key) {
         this._avaliable && Cookies.remove(key)
     }
 }
@@ -530,7 +518,7 @@ class LocalStorage extends Storage {
     get(key) {
         return this._avaliable ? window.localStorage.getItem(key) : undefined
     }
-    remove(key) {
+    delete(key) {
         this._avaliable && window.localStorage.removeItem(key)
     }
 }
