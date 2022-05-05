@@ -19,10 +19,6 @@ const options = {
     // The cache time for SSR'd pages (defaults to 600 seconds)
     defaultCacheTimeSeconds: 600,
 
-    // The path to the favicon. This must also appear in
-    // the mobify.ssrShared section of package.json.
-    faviconPath: path.resolve(process.cwd(), (isRemote() ? 'build/static/ico/favicon.ico' : 'app/static/ico/favicon.ico')),
-
     // The location of the apps manifest file relative to the build directory
     manifestPath: 'static/manifest.json',
 
@@ -34,7 +30,7 @@ const options = {
 
     // The protocol on which the development Express app listens.
     // Note that http://localhost is treated as a secure context for development.
-    protocol: 'http'
+    protocol: 'http',
 }
 
 const runtime = getRuntime()
@@ -50,10 +46,10 @@ const {handler} = runtime.createHandler(options, (app) => {
                     'script-src': ["'self'", "'unsafe-eval'", 'storage.googleapis.com'],
 
                     // Do not upgrade insecure requests for local development
-                    'upgrade-insecure-requests': isRemote() ? [] : null
-                }
+                    'upgrade-insecure-requests': isRemote() ? [] : null,
+                },
             },
-            hsts: isRemote()
+            hsts: isRemote(),
         })
     )
 
@@ -62,6 +58,7 @@ const {handler} = runtime.createHandler(options, (app) => {
         res.send()
     })
     app.get('/robots.txt', runtime.serveStaticFile('static/robots.txt'))
+    app.get('/favicon.ico', runtime.serveStaticFile('static/ico/favicon.ico'))
 
     app.get('/worker.js(.map)?', runtime.serveServiceWorker)
     app.get('*', runtime.render)

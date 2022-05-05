@@ -572,11 +572,6 @@ export const RemoteServerFactory = {
     _setupCommonMiddleware(app, options) {
         app.use(prepNonProxyRequest)
 
-        // Map favicon requests to the configured path. We always map
-        // this route, because if there's no favicon configured we want
-        // to return a 404.
-        app.get('/favicon.ico', serveFavicon)
-
         // Apply the SSR middleware to any subsequent routes that we expect users
         // to add in their projects, like in any regular Express app.
         app.use(ssrMiddleware)
@@ -639,14 +634,6 @@ export const RemoteServerFactory = {
 
         // Fix up the path in case we were passed a relative one
         options.buildDir = path.resolve(process.cwd(), options.buildDir)
-
-        if (options.faviconPath) {
-            options.faviconPath = path.resolve(options.buildDir, options.faviconPath)
-            if (!fs.existsSync(options.faviconPath)) {
-                console.warn(`Favicon file ${options.faviconPath} not found`)
-                options.faviconPath = undefined
-            }
-        }
 
         if (!(options.mobify instanceof Object)) {
             throw new Error('The mobify option passed to the SSR server must be an object')
@@ -868,10 +855,6 @@ export const RemoteServerFactory = {
      * to 'build'.
      * @param {Number} [options.defaultCacheTimeSeconds=600] - The cache time
      * for rendered pages and assets (not used in local development mode).
-     * @param {String} options.faviconPath - The path to the favicon.ico file,
-     * either as an absolute path, or relative to the build directory. If this
-     * value is not supplied, requests for a favicon will return a 404 and
-     * log a warning to the console.
      * @param {Object} options.mobify - The 'mobify' object from the project's
      * package.json file, containing the SSR parameters.
      * @param {Number} [options.port=3443] - the localhost port on which the local
@@ -972,29 +955,6 @@ const ssrMiddleware = (req, res, next) => {
     res.on('finish', done)
     res.on('close', done)
     next()
-}
-
-/**
- * We're keeping this to preserve the API of the SSR server and its
- * faviconPath parameter. New code should use `serveStaticFile`
- * instead.
- *
- * @private
- */
-const serveFavicon = (req, res) => {
-    const options = req.app.options
-    if (!options.faviconPath) {
-        const msg = 'No faviconPath configured'
-        console.warn(msg)
-        res.status(404).send(msg)
-    } else {
-        res.sendFile(options.faviconPath, {
-            headers: {
-                [CACHE_CONTROL]: options.defaultCacheControl
-            },
-            cacheControl: false
-        })
-    }
 }
 
 // eslint-disable-next-line no-unused-vars
