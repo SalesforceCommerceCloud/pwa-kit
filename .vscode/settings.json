@@ -1,5 +1,8 @@
 {
+  // Without this, the first file opened gets properly linted, but subsequent files do not.
+  "eslint.nodePath": "./packages/eslint-config-pwa-kit/node_modules",
   "eslint.workingDirectories": [
+    // This is required for the plugin to resolve `babel-preset-pwa-kit`
     {"mode": "auto"}
   ]
 }
