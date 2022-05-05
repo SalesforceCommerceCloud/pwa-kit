@@ -137,6 +137,11 @@ export const DevServerMixin = {
             return res.json({ready: app.__webpackReady()})
         })
 
+        app.use('/__mrt/loading-screen/index.html', (_, res, next) => {
+            res.set('Clear-Site-Data', '"cache"')
+            next()
+        })
+
         app.use(
             '/__mrt/loading-screen/',
             express.static(path.resolve(__dirname, 'loading-screen'), {
