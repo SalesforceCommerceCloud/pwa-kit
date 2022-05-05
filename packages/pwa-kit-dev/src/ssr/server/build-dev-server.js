@@ -136,9 +136,11 @@ export const DevServerMixin = {
         app.use('/__mrt/status', (req, res) => {
             return res.json({ready: app.__webpackReady()})
         })
-        app.use('/__mrt/stats', (req, res) =>
-            res.json(req.app.__devMiddleware.context.stats.toJson())
-        )
+        app.use('/__mrt/stats', (req, res) => {
+            req.app.__devMiddleware.waitUntilValid(() => {
+                res.json(req.app.__devMiddleware.context.stats.toJson())
+            })
+        })
 
         app.use(
             '/__mrt/loading-screen/',
