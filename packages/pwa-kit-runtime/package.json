@@ -1,6 +1,6 @@
 {
   "name": "pwa-kit-runtime",
-  "version": "2.0.0-dev.6",
+  "version": "2.0.0-dev.8",
   "description": "The PWAKit Runtime",
   "repository": {
     "type": "git",
@@ -26,7 +26,7 @@
     "format": "internal-lib-build format \"**/*.{js,jsx}\"",
     "lint": "npm run lint:js",
     "lint:fix": "npm run lint:js -- --fix",
-    "lint:js": "cross-env ../../node_modules/.bin/eslint \"**/*.{js,jsx}\"",
+    "lint:js": "eslint \"**/*.{js,jsx}\"",
     "prepare": "npm run build",
     "build": "cross-env NODE_ENV=production internal-lib-build build",
     "build:watch": "watch 'npm run build' src/",
@@ -55,17 +55,20 @@
     "@serverless/event-mocks": "^1.1.1",
     "aws-lambda-mock-context": "^3.2.1",
     "fs-extra": "^10.0.1",
-    "internal-lib-build": "^2.0.0-dev.6",
+    "internal-lib-build": "^2.0.0-dev.8",
     "nock": "^13.1.1",
     "node-fetch": "2.6.1",
     "s3rver": "^3.1.0",
     "sinon": "^13.0.1",
     "superagent": "^6.1.0",
     "supertest": "^4.0.2",
-    "watch": "1.0.1"
+    "watch": "1.0.1",
+    "babel-preset-pwa-kit": "^2.0.0-dev.8",
+    "eslint": "7.31.0",
+    "eslint-config-pwa-kit": "^2.0.0-dev.8"
   },
   "peerDependencies": {
-    "pwa-kit-cli": "^2.0.0-dev.6"
+    "pwa-kit-cli": "^2.0.0-dev.8"
   },
   "peerDependenciesMeta": {
     "pwa-kit-cli": {

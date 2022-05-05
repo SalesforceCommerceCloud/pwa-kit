@@ -1,6 +1,6 @@
 {
   "name": "pwa-kit-cli",
-  "version": "2.0.0-dev.6",
+  "version": "2.0.0-dev.8",
   "description": "Build tools for pwa-kit",
   "repository": {
     "type": "git",
@@ -29,7 +29,7 @@
     "format": "internal-lib-build format \"**/*.{js,jsx}\"",
     "lint": "npm run lint:js",
     "lint:fix": "npm run lint:js -- --fix",
-    "lint:js": "cross-env ../../node_modules/.bin/eslint \"**/*.{js,jsx}\"",
+    "lint:js": "eslint \"**/*.{js,jsx}\"",
     "prepare": "npm run build",
     "build": "cross-env NODE_ENV=production internal-lib-build build",
     "build:watch": "watch 'npm run build' src/",
@@ -60,7 +60,7 @@
     "babel-loader": "^8.0.6",
     "babel-plugin-dynamic-import-node-babel-7": "^2.0.7",
     "babel-plugin-formatjs": "10.2.20",
-    "babel-preset-pwa-kit": "^2.0.0-dev.6",
+    "babel-preset-pwa-kit": "^2.0.0-dev.8",
     "chalk": "^4.1.2",
     "commander": "^8.3.0",
     "compression": "1.7.4",
@@ -102,11 +102,14 @@
   },
   "devDependencies": {
     "@loadable/component": "^5.15.0",
-    "internal-lib-build": "^2.0.0-dev.6",
+    "internal-lib-build": "^2.0.0-dev.8",
     "nock": "^13.1.1",
-    "pwa-kit-runtime": "^2.0.0-dev.6",
+    "pwa-kit-runtime": "^2.0.0-dev.8",
     "superagent": "^6.1.0",
-    "supertest": "^4.0.2"
+    "supertest": "^4.0.2",
+    "babel-preset-pwa-kit": "^2.0.0-dev.8",
+    "eslint": "7.31.0",
+    "eslint-config-pwa-kit": "^2.0.0-dev.8"
   },
   "peerDependencies": {
     "@loadable/component": "^5.15.0"

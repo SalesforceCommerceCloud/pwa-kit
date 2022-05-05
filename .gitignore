@@ -9,3 +9,6 @@ packages/*/out
 packages/*/docs/www
 lerna-debug.log
 .idea/
+.vscode/
+# Has settings required to make IDE-integrated linting functional
+!.vscode/settings.json

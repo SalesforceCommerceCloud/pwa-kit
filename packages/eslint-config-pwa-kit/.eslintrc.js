@@ -27,7 +27,7 @@ module.exports = {
         jest: true
     },
     extends: ['eslint:recommended', 'plugin:react/recommended', 'prettier', 'prettier/react'],
-    plugins: ['header', 'react', 'prettier'],
+    plugins: ['react', 'prettier'],
     settings: {
         react: {
             version: '16.8'
@@ -36,23 +36,7 @@ module.exports = {
     rules: {
         'prettier/prettier': ['error'],
         'no-console': 'off',
-        'no-unused-vars': ['error', {ignoreRestSiblings: true}],
-        'header/header': [
-            2,
-            'block',
-            [
-                '',
-                {
-                    pattern:
-                        '^ \\* Copyright \\(c\\) \\d{4}, (salesforce.com, inc|Salesforce, Inc)\\.$',
-                    template: ' * Copyright (c) 2022, salesforce.com, inc.'
-                },
-                ' * All rights reserved.',
-                ' * SPDX-License-Identifier: BSD-3-Clause',
-                ' * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause',
-                ' '
-            ]
-        ]
+        'no-unused-vars': ['error', {ignoreRestSiblings: true}]
     },
     overrides: [
         {

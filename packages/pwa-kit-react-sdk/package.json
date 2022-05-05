@@ -1,6 +1,6 @@
 {
   "name": "pwa-kit-react-sdk",
-  "version": "2.0.0-dev.6",
+  "version": "2.0.0-dev.8",
   "description": "A library that supports the isomorphic React rendering pipeline for Commerce Cloud Managed Runtime apps",
   "main": "dist/index.js",
   "engines": {
@@ -26,7 +26,7 @@
     "build:watch": "watch 'npm run build' src/",
     "lint": "npm run lint:js",
     "lint:fix": "npm run lint:js -- --fix",
-    "lint:js": "cross-env ../../node_modules/.bin/eslint \"**/*.{js,jsx}\"",
+    "lint:js": "eslint \"**/*.{js,jsx}\"",
     "test": "internal-lib-build test",
     "test:watch": "npm test -- --watch",
     "test:inspect": "node --inspect-brk jest --runInBand",
@@ -54,7 +54,7 @@
     "minimatch": "3.0.4",
     "mkdirp": "^1.0.4",
     "prop-types": "^15.6.0",
-    "pwa-kit-runtime": "^2.0.0-dev.6",
+    "pwa-kit-runtime": "^2.0.0-dev.8",
     "react-uid": "^2.2.0",
     "serialize-javascript": "^6.0.0",
     "svg-sprite-loader": "^6.0.11",
@@ -65,7 +65,7 @@
     "@loadable/component": "^5.15.0",
     "@wojtekmaj/enzyme-adapter-react-17": "^0.6.6",
     "enzyme": "^3.8.0",
-    "internal-lib-build": "^2.0.0-dev.6",
+    "internal-lib-build": "^2.0.0-dev.8",
     "node-html-parser": "^3.3.4",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
@@ -75,7 +75,10 @@
     "replace-in-file": "^6.2.0",
     "rimraf": "2.6.1",
     "sinon": "^13.0.1",
-    "supertest": "^4.0.2"
+    "supertest": "^4.0.2",
+    "babel-preset-pwa-kit": "^2.0.0-dev.8",
+    "eslint": "7.31.0",
+    "eslint-config-pwa-kit": "^2.0.0-dev.8"
   },
   "peerDependencies": {
     "@loadable/component": "^5.15.0",
