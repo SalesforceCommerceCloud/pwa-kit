@@ -114,8 +114,8 @@ const merge = (a, b) => deepmerge(a, b, {arrayMerge: (orignal, replacement) => r
  * generated project, all others are excluded.
  */
 const runGenerator = (answers, {outputDir, verbose}) => {
-    // These are the public, mobify-owned packages that can be installed through NPM.
-    const npmInstallables = ['pwa-kit-react-sdk']
+    // Excluding pwa-kit-create-app, these are the public pwa-kit-* packages that can be installed through NPM.
+    const npmInstallables = ['pwa-kit-react-sdk', 'pwa-kit-dev', 'pwa-kit-runtime']
 
     // Check specified SDK versions actually exist on NPM.
     npmInstallables.forEach((pkgName) => {
@@ -469,26 +469,26 @@ const main = (opts) => {
 if (require.main === module) {
     program.name(`pwa-kit-create-app`)
     program.description(`Generate a new PWA Kit project, optionally using a preset.
- 
+
  Examples:
- 
+
    ${program.name()} --preset "${RETAIL_REACT_APP}"
      Generate a project using custom settings by answering questions about a
      B2C Commerce instance.
- 
+
      Use this preset to connect to an existing instance, such as a sandbox.
- 
+
    ${program.name()} --preset "${RETAIL_REACT_APP_DEMO}"
      Generate a project using the settings for a special B2C Commerce
      instance that is used for demo purposes. No questions are asked.
- 
+
      Use this preset to try out PWA Kit.
- 
+
    ${program.name()} --preset "${EXPRESS_MINIMAL}"
      Generate a project using a bare-bones express app template.
-     
-     Use this as a starting point for APIs or as a base on top of 
-     which to build new project templates for Managed Runtime. 
+
+     Use this as a starting point for APIs or as a base on top of
+     which to build new project templates for Managed Runtime.
    `)
     program
         .option(
