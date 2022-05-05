@@ -1,5 +1,12 @@
+/*
+ * Copyright (c) 2022, Salesforce, Inc.
+ * All rights reserved.
+ * SPDX-License-Identifier: BSD-3-Clause
+ * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
+ */
 module.exports = {
     root: true,
+    extends: './packages/pwa-kit-dev/src/configs/eslint/eslint-config.js',
     rules: {
         'header/header': [
             2,
@@ -7,7 +14,8 @@ module.exports = {
             [
                 '',
                 {
-                    pattern: '^ \\* Copyright \\(c\\) \\d{4}, (salesforce.com, inc|Salesforce, Inc)\\.$',
+                    pattern:
+                        '^ \\* Copyright \\(c\\) \\d{4}, (salesforce.com, inc|Salesforce, Inc)\\.$',
                     template: ' * Copyright (c) 2022, Salesforce, Inc.'
                 },
                 ' * All rights reserved.',

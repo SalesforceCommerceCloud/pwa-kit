@@ -1,0 +1,6 @@
+{
+    "eslint.options": {
+        "resolvePluginsRelativeTo": "./packages/pwa-kit-dev",
+    },
+    "eslint.nodePath": "./packages/pwa-kit-dev/node_modules"
+}
