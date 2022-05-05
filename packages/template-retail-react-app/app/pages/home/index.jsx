@@ -274,10 +274,8 @@ Home.shouldGetProps = ({previousLocation, location}) =>
     !previousLocation || previousLocation.pathname !== location.pathname
 
 Home.getProps = async ({res, api}) => {
-    // Since the home page is static, it is safe to set max age to a high value
-    // we set it to a year here, but you can set the value that is suitable for your project
     if (res) {
-        res.set('Cache-Control', 'max-age=31536000')
+        res.set('Cache-Control', 'max-age=900')
     }
 
     const productSearchResult = await api.shopperSearch.productSearch({

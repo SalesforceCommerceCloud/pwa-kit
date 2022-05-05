@@ -577,7 +577,7 @@ ProductList.getProps = async ({res, params, location, api}) => {
 
     // Set the `cache-control` header values to align with the Commerce API settings.
     if (res) {
-        res.set('Cache-Control', 'public, must-revalidate, max-age=900')
+        res.set('Cache-Control', 'max-age=900')
     }
 
     const [category, productSearchResult] = await Promise.all([
