@@ -10,7 +10,6 @@
         "@loadable/component": "^5.15.0",
         "@types/react": "^18.0.6",
         "babel-preset-pwa-kit": "^2.0.0-dev.8",
-        "cross-env": "^5.2.0",
         "cross-fetch": "^3.1.4",
         "eslint": "7.31.0",
         "eslint-config-pwa-kit": "^2.0.0-dev.8",
