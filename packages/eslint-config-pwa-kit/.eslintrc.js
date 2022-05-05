@@ -5,8 +5,6 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-    // Deliberate eslint rule violation for testing eslint
-
 require('@rushstack/eslint-patch/modern-module-resolution')
 
 module.exports = {
