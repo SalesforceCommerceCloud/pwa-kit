@@ -1,6 +1,6 @@
 {
   "name": "pwa-kit-create-app",
-  "version": "2.0.0-dev.6",
+  "version": "2.0.0-dev.8",
   "description": "Salesforce's project generator tool",
   "author": "dev@mobify.com",
   "license": "See license in LICENSE",
@@ -41,10 +41,10 @@
     "tar": "^6.1.11"
   },
   "devDependencies": {
-    "internal-lib-build": "^2.0.0-dev.5",
+    "internal-lib-build": "^2.0.0-dev.8",
     "verdaccio": "^5.9.0",
-    "babel-preset-pwa-kit": "^2.0.0-dev.5",
+    "babel-preset-pwa-kit": "^2.0.0-dev.8",
     "eslint": "7.31.0",
-    "eslint-config-pwa-kit": "^2.0.0-dev.5"
+    "eslint-config-pwa-kit": "^2.0.0-dev.8"
   }
 }
