@@ -23,9 +23,6 @@ const options = {
     // the mobify.ssrShared section of package.json.
     faviconPath: path.resolve(process.cwd(), 'build/static/ico/favicon.ico'),
 
-    // The location of the apps manifest file relative to the build directory
-    manifestPath: 'static/manifest.json',
-
     // This is the value of the 'mobify' object from package.json
     mobify: getConfig(),
 
