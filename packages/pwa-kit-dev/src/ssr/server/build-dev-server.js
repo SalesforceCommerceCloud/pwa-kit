@@ -138,6 +138,7 @@ export const DevServerMixin = {
         })
 
         app.use('/__mrt/loading-screen/index.html', (_, res, next) => {
+            // Must use double quotes. See https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Clear-Site-Data#directives
             res.set('Clear-Site-Data', '"cache"')
             next()
         })
