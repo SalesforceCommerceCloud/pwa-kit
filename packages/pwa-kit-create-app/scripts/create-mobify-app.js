@@ -53,14 +53,25 @@ sh.set('-e')
 
 const GENERATED_PROJECT_VERSION = '0.0.1'
 
+const TYPESCRIPT_MINIMAL_TEST_PROJECT = 'typescript-minimal-test-project'
+const TYPESCRIPT_MINIMAL = 'typescript-minimal'
 const EXPRESS_MINIMAL_TEST_PROJECT = 'express-minimal-test-project'
 const EXPRESS_MINIMAL = 'express-minimal'
 const TEST_PROJECT = 'test-project' // TODO: This will be replaced with the `isomorphic-client` config.
 const RETAIL_REACT_APP_DEMO = 'retail-react-app-demo'
 const RETAIL_REACT_APP = 'retail-react-app'
 
-const PRIVATE_PRESETS = [TEST_PROJECT, EXPRESS_MINIMAL_TEST_PROJECT]
-const PUBLIC_PRESETS = [RETAIL_REACT_APP_DEMO, RETAIL_REACT_APP, EXPRESS_MINIMAL]
+const PRIVATE_PRESETS = [
+    TEST_PROJECT,
+    EXPRESS_MINIMAL_TEST_PROJECT,
+    TYPESCRIPT_MINIMAL_TEST_PROJECT
+]
+const PUBLIC_PRESETS = [
+    RETAIL_REACT_APP_DEMO,
+    RETAIL_REACT_APP,
+    EXPRESS_MINIMAL,
+    TYPESCRIPT_MINIMAL
+]
 const PRESETS = PRIVATE_PRESETS.concat(PUBLIC_PRESETS)
 
 const DEFAULT_OUTPUT_DIR = p.join(process.cwd(), 'pwa-kit-starter-project')
@@ -114,8 +125,8 @@ const merge = (a, b) => deepmerge(a, b, {arrayMerge: (orignal, replacement) => r
  * generated project, all others are excluded.
  */
 const runGenerator = (answers, {outputDir, verbose}) => {
-    // These are the public, mobify-owned packages that can be installed through NPM.
-    const npmInstallables = ['pwa-kit-react-sdk']
+    // Excluding pwa-kit-create-app, these are the public pwa-kit-* packages that can be installed through NPM.
+    const npmInstallables = ['pwa-kit-react-sdk', 'pwa-kit-dev', 'pwa-kit-runtime']
 
     // Check specified SDK versions actually exist on NPM.
     npmInstallables.forEach((pkgName) => {
@@ -335,7 +346,7 @@ const demoProjectAnswers = () => {
     return buildAnswers(config)
 }
 
-const expressMinimalPrompts = () => {
+const templateMinimalPrompts = () => {
     const questions = [
         {
             name: 'projectName',
@@ -346,8 +357,8 @@ const expressMinimalPrompts = () => {
     return inquirer.prompt(questions)
 }
 
-const generateExpressMinimal = (projectId, {outputDir, verbose}) => {
-    extractTemplate('template-express-minimal', outputDir)
+const runTemplateGenerator = (projectId, {outputDir, verbose}, template) => {
+    extractTemplate(template, outputDir)
     const pkgJsonPath = p.resolve(outputDir, 'package.json')
     const pkgJSON = readJson(pkgJsonPath)
     const finalPkgData = merge(pkgJSON, {name: projectId})
@@ -416,15 +427,30 @@ const main = (opts) => {
         .then(() => opts.preset || process.env.GENERATOR_PRESET || presetPrompt())
         .then((preset) => {
             switch (preset) {
-                case EXPRESS_MINIMAL_TEST_PROJECT:
-                    return generateExpressMinimal('express-minimal', opts)
-                case EXPRESS_MINIMAL:
-                    return expressMinimalPrompts(opts).then((answers) => {
+                case TYPESCRIPT_MINIMAL_TEST_PROJECT:
+                    return runTemplateGenerator(
+                        'typescript-minimal',
+                        opts,
+                        'template-typescript-minimal'
+                    )
+                case TYPESCRIPT_MINIMAL:
+                    return templateMinimalPrompts(opts).then((answers) => {
                         const projectId = slugifyName(answers.projectName)
                         if (!OUTPUT_DIR_FLAG_ACTIVE) {
                             opts.outputDir = p.join(process.cwd(), projectId)
                         }
-                        generateExpressMinimal(projectId, opts)
+                        runTemplateGenerator(projectId, opts, 'template-typescript-minimal')
+                        return opts.outputDir
+                    })
+                case EXPRESS_MINIMAL_TEST_PROJECT:
+                    return runTemplateGenerator('express-minimal', opts, 'template-express-minimal')
+                case EXPRESS_MINIMAL:
+                    return templateMinimalPrompts(opts).then((answers) => {
+                        const projectId = slugifyName(answers.projectName)
+                        if (!OUTPUT_DIR_FLAG_ACTIVE) {
+                            opts.outputDir = p.join(process.cwd(), projectId)
+                        }
+                        runTemplateGenerator(projectId, opts, 'template-express-minimal')
                         return opts.outputDir
                     })
                 case TEST_PROJECT:
@@ -469,26 +495,32 @@ const main = (opts) => {
 if (require.main === module) {
     program.name(`pwa-kit-create-app`)
     program.description(`Generate a new PWA Kit project, optionally using a preset.
- 
+
  Examples:
- 
+
    ${program.name()} --preset "${RETAIL_REACT_APP}"
      Generate a project using custom settings by answering questions about a
      B2C Commerce instance.
- 
+
      Use this preset to connect to an existing instance, such as a sandbox.
- 
+
    ${program.name()} --preset "${RETAIL_REACT_APP_DEMO}"
      Generate a project using the settings for a special B2C Commerce
      instance that is used for demo purposes. No questions are asked.
- 
+
      Use this preset to try out PWA Kit.
- 
+
    ${program.name()} --preset "${EXPRESS_MINIMAL}"
      Generate a project using a bare-bones express app template.
+
+     Use this as a starting point for APIs or as a base on top of
+     which to build new project templates for Managed Runtime.
      
-     Use this as a starting point for APIs or as a base on top of 
-     which to build new project templates for Managed Runtime. 
+   ${program.name()} --preset "${TYPESCRIPT_MINIMAL}"
+     Generate a project using a bare-bones TypeScript app template.
+     
+     Use this as a TypeScript starting point or as a base on top of 
+     which to build new TypeScript project templates for Managed Runtime.
    `)
     program
         .option(
