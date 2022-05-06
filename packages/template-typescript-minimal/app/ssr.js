@@ -15,10 +15,6 @@ const options = {
     // The cache time for SSR'd pages (defaults to 600 seconds)
     defaultCacheTimeSeconds: 600,
 
-    // The path to the favicon. This must also appear in
-    // the mobify.ssrShared section of package.json.
-    faviconPath: path.resolve(__dirname, 'static', 'favicon.ico'),
-
     // The location of the apps manifest file relative to the build directory
     manifestPath: 'static/manifest.json',
 
