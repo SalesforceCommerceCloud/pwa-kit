@@ -51,7 +51,7 @@ describe('The useSearchParams', () => {
         )
 
         expect(wrapper.getByTestId('limits').text).toEqual(
-            '{"limit":"25","offset":"0","sort":"best-matches","refine":{"c_refinementColor":["Black","Purple"]}}'
+            '{"limit":25,"offset":0,"sort":"best-matches","refine":{"c_refinementColor":["Black","Purple"]}}'
         )
     })
 
@@ -78,8 +78,8 @@ describe('The useSearchParams', () => {
         const parsedString = parse(stringToParse)
         expect(parsedString).toEqual(
             {
-                limit: '25',
-                offset: '0',
+                limit: 25,
+                offset: 0,
                 refine: {c_refinementColor: ['Black', 'Purple']},
                 sort: 'best-matches'
             } // eslint-disable-line

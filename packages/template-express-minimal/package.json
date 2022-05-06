@@ -1,21 +1,21 @@
 {
     "name": "template-express-minimal",
-    "version": "2.0.0-dev.6",
+    "version": "2.0.0-dev.8",
     "license": "See license in LICENSE",
     "private": true,
     "devDependencies": {
-        "pwa-kit-cli": "^2.0.0-dev.6",
-        "pwa-kit-runtime": "^2.0.0-dev.6"
+        "pwa-kit-dev": "^2.0.0-dev.8",
+        "pwa-kit-runtime": "^2.0.0-dev.8"
     },
     "scripts": {
-        "test": "pwa-kit-cli test",
-        "format": "pwa-kit-cli format \"**/*.{js,jsx}\"",
-        "lint": "pwa-kit-cli lint \"**/*.{js,jsx}\"",
+        "test": "pwa-kit-dev test",
+        "format": "pwa-kit-dev format \"**/*.{js,jsx}\"",
+        "lint": "pwa-kit-dev lint \"**/*.{js,jsx}\"",
         "lint:fix": "npm run lint -- --fix",
-        "start": "pwa-kit-cli start",
-        "build": "pwa-kit-cli build",
-        "push": "npm run build && pwa-kit-cli push",
-        "save-credentials": "pwa-kit-cli save-credentials"
+        "start": "pwa-kit-dev start",
+        "build": "pwa-kit-dev build",
+        "push": "npm run build && pwa-kit-dev push",
+        "save-credentials": "pwa-kit-dev save-credentials"
     },
     "mobify": {
         "ssrEnabled": true,

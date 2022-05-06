@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, salesforce.com, inc.
+ * Copyright (c) 2022, Salesforce, Inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
@@ -463,5 +463,9 @@ export const respondFromBundle = ({req, res, path, redirect = 301}) => {
 export const getRuntime = () => {
     return isRemote()
         ? RemoteServerFactory
-        : eval('require').main.require('pwa-kit-cli/ssr/server/build-dev-server').DevServerFactory
+        : // The dev server is for development only, and should not be deployed to production.
+          // To avoid deploying the dev server (and all of its dependencies) to production, it exists
+          // as an optional peer dependency to this package. The unusual `require` statement is needed
+          // to bypass webpack and ensure that the dev server does not get bundled.
+          eval('require').main.require('pwa-kit-dev/ssr/server/build-dev-server').DevServerFactory
 }
