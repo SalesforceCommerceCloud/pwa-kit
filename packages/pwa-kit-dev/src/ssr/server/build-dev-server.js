@@ -219,6 +219,9 @@ export const DevServerMixin = {
         req.app.__devMiddleware.waitUntilValid(() => this._serveServiceWorker(req, res))
     },
 
+    /**
+     * @private 
+     */
     _serveServiceWorker(req, res) {
         const sourceMap = req.path.endsWith('.map')
         const file = sourceMap ? 'worker.js.map' : 'worker.js'
