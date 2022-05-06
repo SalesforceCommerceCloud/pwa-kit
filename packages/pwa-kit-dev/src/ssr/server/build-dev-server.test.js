@@ -35,40 +35,6 @@ const NoWebpackDevServerFactory = {
     }
 }
 
-// This isn't ideal! We need a way to test the dev middleware
-// including the on demand webpack compiler. However, the webpack config and
-// the Dev server assumes the code runs at the root of a project.
-// When we run the tests, we are not in a project.
-// We have a /test_fixtures project, but Jest does not support process.chdir(),
-// nor mocking process.cwd(), so we mock the dev middleware for now.
-// TODO: create a proper testing fixture project and run the tests in the isolated
-// project environment.
-const MockWebpackDevMiddleware = {
-    waitUntilValid: (cb) => cb(),
-    context: {
-        stats: {
-            stats: [
-                {
-                    compilation: {
-                        name: 'server',
-                        assetsInfo: new Map([
-                            [
-                                'static/favicon.ico',
-                                {
-                                    sourceFilename: path.resolve(
-                                        testFixtures,
-                                        'app/static/favicon.ico'
-                                    )
-                                }
-                            ]
-                        ])
-                    }
-                }
-            ]
-        }
-    }
-}
-
 const httpAgent = new http.Agent({})
 
 /**
@@ -656,6 +622,40 @@ describe('DevServer persistent caching support', () => {
 })
 
 describe('DevServer serveStaticFile', () => {
+    // This isn't ideal! We need a way to test the dev middleware
+    // including the on demand webpack compiler. However, the webpack config and
+    // the Dev server assumes the code runs at the root of a project.
+    // When we run the tests, we are not in a project.
+    // We have a /test_fixtures project, but Jest does not support process.chdir(),
+    // nor mocking process.cwd(), so we mock the dev middleware for now.
+    // TODO: create a proper testing fixture project and run the tests in the isolated
+    // project environment.
+    const MockWebpackDevMiddleware = {
+        waitUntilValid: (cb) => cb(),
+        context: {
+            stats: {
+                stats: [
+                    {
+                        compilation: {
+                            name: 'server',
+                            assetsInfo: new Map([
+                                [
+                                    'static/favicon.ico',
+                                    {
+                                        sourceFilename: path.resolve(
+                                            testFixtures,
+                                            'app/static/favicon.ico'
+                                        )
+                                    }
+                                ]
+                            ])
+                        }
+                    }
+                ]
+            }
+        }
+    }
+
     test('should serve static files', async () => {
         const options = opts()
         const app = NoWebpackDevServerFactory._createApp(options)
