@@ -14,6 +14,7 @@ const {
 import fetch from 'node-fetch'
 import request from 'supertest'
 import {makeErrorHandler, DevServerFactory, setLocalAssetHeaders} from './build-dev-server'
+import os from 'os'
 import path from 'path'
 import http from 'http'
 import https from 'https'
@@ -621,8 +622,8 @@ describe('DevServer persistent caching support', () => {
     })
 })
 
-describe("DevServer helpers", () => {
-    test("Local asset headers", async () => {
+describe('DevServer helpers', () => {
+    test('Local asset headers', async () => {
         const tmpDir = await fse.mkdtemp(path.join(os.tmpdir(), 'pwa-kit-'))
         const tmpFile = path.join(tmpDir, 'local-asset-headers-test.svg')
         await fse.ensureFile(tmpFile)
@@ -631,13 +632,46 @@ describe("DevServer helpers", () => {
 
         const res = new Map() // Don't need a full Response, just `.set` functionality
         setLocalAssetHeaders(res, tmpFile)
-        
+
         expect([...res]).toEqual([
             ['content-type', 'image/svg+xml'],
             ['date', now.toUTCString()],
             ['last-modified', now.toUTCString()],
             ['etag', now.getTime()],
-            ["cache-control", "max-age=0, nocache, nostore, must-revalidate"]
+            ['cache-control', 'max-age=0, nocache, nostore, must-revalidate']
         ])
+    })
+})
+
+describe('DevServer rendering', () => {
+    test('uses hot server middleware when ready', () => {
+        const req = {
+            app: {
+                __webpackReady: jest.fn().mockReturnValue(true),
+                __hotServerMiddleware: jest.fn()
+            }
+        }
+        const res = {}
+        const next = jest.fn()
+
+        NoWebpackDevServerFactory.render(req, res, next)
+
+        expect(req.app.__hotServerMiddleware).toHaveBeenCalledWith(req, res, next)
+    })
+
+    test('uses hot server middleware when ready', () => {
+        const TestFactory = {
+            ...NoWebpackDevServerFactory,
+            _redirectToLoadingScreen: jest.fn()
+        }
+        const req = {
+            app: {__webpackReady: jest.fn().mockReturnValue(false)}
+        }
+        const res = {}
+        const next = jest.fn()
+
+        TestFactory.render(req, res, next)
+
+        expect(TestFactory._redirectToLoadingScreen).toHaveBeenCalledWith(req, res, next)
     })
 })
