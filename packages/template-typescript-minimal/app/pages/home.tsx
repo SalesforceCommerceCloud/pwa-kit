@@ -133,6 +133,7 @@ const Home = ({value}: Props) => {
 Home.getTemplateName = () => 'home'
 
 Home.getProps = async () => {
+    // Note: This is simply a mock function to demo deferred execution for fetching props (e.g.: Making a call to the server to fetch data)
     const getData = (a: number, b: number) => {
         return new Promise((resolve) => {
             setTimeout(() => {
