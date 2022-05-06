@@ -110,6 +110,7 @@ export const DevServerMixin = {
     /**
      * @private
      */
+    // WJH: Add tests for _addSDKInternalHandlers
     _addSDKInternalHandlers(app) {
         // This is separated out because these routes must not have our SSR middleware applied to them.
         // But the SSR render function must!
@@ -181,6 +182,7 @@ export const DevServerMixin = {
         })
     },
 
+    // WJH: Add tests for serveServiceWorker
     serveServiceWorker(req, res) {
         req.app.__devMiddleware.waitUntilValid(() => {
             const sourceMap = req.path.endsWith('.map')
@@ -197,6 +199,7 @@ export const DevServerMixin = {
         })
     },
 
+    // WJH: Add tests for render
     render(req, res, next) {
         const app = req.app
         if (app.__webpackReady()) {
@@ -273,6 +276,7 @@ export const DevServerMixin = {
      *
      * @private
      */
+    // WJH: Add tests for _getRequestProcessor
     _getRequestProcessor(req) {
         const compiled = this._getWebpackAsset(req, REQUEST_PROCESSOR, 'request-processor.js')
         if (compiled) {
@@ -297,6 +301,7 @@ export const DevServerMixin = {
      * @returns {null|String}
      * @private
      */
+    // WJH: Add tests for _getWebpackAsset
     _getWebpackAsset(req, compilerName, fileName) {
         if (req.app.__webpackReady()) {
             const outputFileSystem = req.app.__devMiddleware.context.outputFileSystem
@@ -326,7 +331,7 @@ export const DevServerMixin = {
  * @param assetPath - the path to the asset file (with no query string
  * or other URL elements)
  */
-const setLocalAssetHeaders = (res, assetPath) => {
+export const setLocalAssetHeaders = (res, assetPath) => {
     const base = path.basename(assetPath)
     const contentType = mimeTypes.lookup(base)
 

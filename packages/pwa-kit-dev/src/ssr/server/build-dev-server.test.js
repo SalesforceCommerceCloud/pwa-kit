@@ -13,13 +13,13 @@ const {
 } = require('pwa-kit-runtime/ssr/server/express')
 import fetch from 'node-fetch'
 import request from 'supertest'
-import {makeErrorHandler, DevServerFactory} from './build-dev-server'
+import {makeErrorHandler, DevServerFactory, setLocalAssetHeaders} from './build-dev-server'
 import path from 'path'
 import http from 'http'
 import https from 'https'
 import nock from 'nock'
 import zlib from 'zlib'
-import fs from 'fs'
+import fse from 'fs-extra'
 
 const TEST_PORT = 3444
 const testFixtures = path.resolve(__dirname, 'test_fixtures')
@@ -528,7 +528,7 @@ describe('DevServer persistent caching support', () => {
                 res.status(status)
                 res.setHeader('content-type', 'application/javascript')
                 res.setHeader('content-encoding', 'gzip')
-                res.send(zlib.gzipSync(fs.readFileSync(path.join(testFixtures, 'app', 'main.js'))))
+                res.send(zlib.gzipSync(fse.readFileSync(path.join(testFixtures, 'app', 'main.js'))))
                 break
 
             case 'compressed-responses-test':
@@ -618,5 +618,26 @@ describe('DevServer persistent caching support', () => {
                 const uncompressed = zlib.gunzipSync(entry.data)
                 expect(uncompressed.toString()).toEqual(res.text)
             })
+    })
+})
+
+describe("DevServer helpers", () => {
+    test("Local asset headers", async () => {
+        const tmpDir = await fse.mkdtemp(path.join(os.tmpdir(), 'pwa-kit-'))
+        const tmpFile = path.join(tmpDir, 'local-asset-headers-test.svg')
+        await fse.ensureFile(tmpFile)
+        const now = new Date()
+        await fse.utimes(tmpFile, now, now)
+
+        const res = new Map() // Don't need a full Response, just `.set` functionality
+        setLocalAssetHeaders(res, tmpFile)
+        
+        expect([...res]).toEqual([
+            ['content-type', 'image/svg+xml'],
+            ['date', now.toUTCString()],
+            ['last-modified', now.toUTCString()],
+            ['etag', now.getTime()],
+            ["cache-control", "max-age=0, nocache, nostore, must-revalidate"]
+        ])
     })
 })

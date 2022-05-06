@@ -110,6 +110,7 @@
   },
   "devDependencies": {
     "@loadable/component": "^5.15.0",
+    "fs-extra": "^10.1.0",
     "internal-lib-build": "^2.0.0-dev.8",
     "nock": "^13.1.1",
     "superagent": "^6.1.0",
