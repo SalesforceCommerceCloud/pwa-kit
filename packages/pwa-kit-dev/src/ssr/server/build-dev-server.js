@@ -220,7 +220,7 @@ export const DevServerMixin = {
     },
 
     /**
-     * @private 
+     * @private
      */
     _serveServiceWorker(req, res) {
         const sourceMap = req.path.endsWith('.map')
