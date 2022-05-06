@@ -70,9 +70,9 @@ commands:
             npm ci
             
             # Symlink local dependencies
-            # A bug manifests itself on Windows where lerna bootsrap fails to generate the `pwa-kit-cli` bin shims
-            # in the bin file. As a result, Windows runs the `pwa-kit-cli` bin file using Windows Host Script instead
-            # of Node. We run the lerna link command to fix the shims in the `pwa-kit-cli` bin file on Windows.
+            # A bug manifests itself on Windows where lerna bootsrap fails to generate the `pwa-kit-dev` bin shims
+            # in the bin file. As a result, Windows runs the `pwa-kit-dev` bin file using Windows Host Script instead
+            # of Node. We run the lerna link command to fix the shims in the `pwa-kit-dev` bin file on Windows.
             npm run lerna link --force-local
       - save_cache:
           key: npm-cache
@@ -177,13 +177,6 @@ commands:
             
             cd generated-project
             npm run build
-      - run:
-          name: Generate express-minimal project
-          environment:
-            GENERATOR_PRESET: 'express-minimal-test-project'
-          command: |
-            set GENERATOR_PRESET=express-minimal-test-project
-            node packages/pwa-kit-create-app/scripts/create-mobify-app-dev.js --outputDir generated-project-express-minimal
       - runtests:
           cwd: generated-project
       - smoketestscripts:
@@ -312,6 +305,40 @@ jobs:
       - slack/status:
           fail_only: true
           only_for_branches: develop
+  generatedTemplate:
+    docker:
+      - image: circleci/node:14-stretch-browsers
+    parameters:
+      template:
+        type: string
+    steps:
+      - checkout
+      - setup
+      - run:
+          name: Generate << parameters.template >> project
+          environment:
+            GENERATOR_PRESET: << parameters.template >>
+          command: |
+            set GENERATOR_PRESET=<< parameters.template >>
+            node packages/pwa-kit-create-app/scripts/create-mobify-app-dev.js --outputDir generated-<< parameters.template >>
+  generatedTemplateWindows:
+    parameters:
+      template:
+        type: string
+    executor:
+      name: win/default
+      size: "large"
+      shell: bash.exe
+    steps:
+      - checkout
+      - setup_windows
+      - run:
+          name: Generate << parameters.template >> project
+          environment:
+            GENERATOR_PRESET: << parameters.template >>
+          command: |
+            set GENERATOR_PRESET=<< parameters.template >>
+            node packages/pwa-kit-create-app/scripts/create-mobify-app-dev.js --outputDir generated-<< parameters.template >>
   generatedSFCCProjectTest:
     docker:
       - image: circleci/node:14-stretch-browsers
@@ -378,7 +405,6 @@ jobs:
       - checkout
       - setup_windows
       - generate_and_test_project
-
 workflows:
   version: 2
   test:
@@ -390,6 +416,14 @@ workflows:
       - testNode14npm8
       - generatedSFCCProjectTest
       - generatedSFCCProjectTestWindows
+      - generatedTemplate:
+          matrix:
+            parameters:
+              template: [express-minimal-test-project, typescript-minimal-test-project]
+      - generatedTemplateWindows:
+          matrix:
+            parameters:
+              template: [express-minimal-test-project, typescript-minimal-test-project]
   nightly-build:
     triggers:
       - schedule:
@@ -411,3 +445,15 @@ workflows:
           context: nightly-build
       - generatedSFCCProjectTest:
           context: nightly-build
+      - generatedSFCCProjectTestWindows:
+          context: nightly-build
+      - generatedTemplate:
+          context: nightly-build
+          matrix:
+            parameters:
+              template: [ express-minimal-test-project, typescript-minimal-test-project ]
+      - generatedTemplateWindows:
+          context: nightly-build
+          matrix:
+            parameters:
+              template: [ express-minimal-test-project, typescript-minimal-test-project ]

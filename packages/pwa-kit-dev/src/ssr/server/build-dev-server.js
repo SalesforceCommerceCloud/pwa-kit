@@ -181,6 +181,40 @@ export const DevServerMixin = {
         })
     },
 
+    serveStaticFile(filePath, opts = {}) {
+        return (req, res) => {
+            req.app.__devMiddleware.waitUntilValid(() => {
+                const options = req.app.options
+                const webpackStats = req.app.__devMiddleware.context.stats.stats
+
+                const serverCompilation = webpackStats.find(
+                    // static files are copied into bundle
+                    // in the server webpack config
+                    (stat) => stat.compilation.name === SERVER
+                ).compilation
+                const {assetsInfo} = serverCompilation
+                const assetInfo = assetsInfo.get(filePath)
+
+                // if the asset is not in the webpack bundle, then
+                // return 404, we don't care whether or not the file
+                // exists in the local file system
+                if (!assetInfo) {
+                    res.sendStatus(404)
+                    return
+                }
+                const {sourceFilename} = assetInfo
+                const sourceFilePath = path.resolve(sourceFilename)
+
+                res.sendFile(sourceFilePath, {
+                    headers: {
+                        'cache-control': options.defaultCacheControl
+                    },
+                    ...opts
+                })
+            })
+        }
+    },
+
     serveServiceWorker(req, res) {
         req.app.__devMiddleware.waitUntilValid(() => {
             const sourceMap = req.path.endsWith('.map')

@@ -6,7 +6,7 @@
  */
 
 const path = require('path')
-const base = require('pwa-kit-cli/configs/jest/jest.config.js')
+const base = require('pwa-kit-dev/configs/jest/jest.config.js')
 
 module.exports = {
     ...base,
