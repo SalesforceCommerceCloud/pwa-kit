@@ -40,7 +40,7 @@ const {handler} = runtime.createHandler(options, (app) => {
         res.send()
     })
 
-    app.get('/robots.txt', runtime.serveStaticFile('static/robots.txt'))
+    app.get('/favicon.ico', runtime.serveStaticFile('static/favicon.ico'))
 
     app.get('/worker.js(.map)?', runtime.serveServiceWorker)
     app.get('*', runtime.render)
