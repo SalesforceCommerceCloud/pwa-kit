@@ -7,6 +7,7 @@
  */
 const p = require('path')
 const fs = require('fs')
+const request = require('request')
 const program = require('commander')
 const isEmail = require('validator/lib/isEmail')
 const {execSync: _execSync} = require('child_process')
@@ -15,6 +16,8 @@ const sh = require('shelljs')
 const uploadBundle = require('../scripts/upload.js')
 const pkg = require('../package.json')
 const {getConfig} = require('pwa-kit-runtime/utils/ssr-config')
+const {fromCognitoIdentity} = require("@aws-sdk/credential-providers")
+const {KinesisClient, GetShardIteratorCommand, ListShardsCommand, GetRecordsCommand, ListStreamsCommand, DescribeStreamCommand} = require("@aws-sdk/client-kinesis")
 
 const pkgRoot = p.join(__dirname, '..')
 
@@ -241,6 +244,137 @@ const main = () => {
             program.help({error: true})
         }
     })
+
+    program
+        .command('logs')
+        .description(`display logs for an environment`)
+        .requiredOption(
+            '-p, --project <project_slug>',
+            'the project slug',
+            (val) => {
+                if (!(typeof val === 'string') && val.length > 0) {
+                    throw new program.InvalidArgumentError(`"${val}" cannot be empty`)
+                } else {
+                    return val
+                }
+            }
+        )
+        .requiredOption(
+            '-e, --environment <environment_slug>',
+            'the environment slug',
+            (val) => {
+                if (!(typeof val === 'string') && val.length > 0) {
+                    throw new program.InvalidArgumentError(`"${val}" cannot be empty`)
+                } else {
+                    return val
+                }
+            }
+        )
+        .action(({project, environment}) => {
+            try {
+                const settingsPath = scriptUtils.getSettingsPath()
+                const auth = JSON.parse(fs.readFileSync(
+                    settingsPath
+                ))
+                const options = {
+                    url: `https://cloud-kieran.mobify-staging.com/api/projects/${project}/target/${environment}/log/`,
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Authorization': `Bearer ${auth.api_key}`
+                    }
+                };
+
+                request(options, async function(err, res, body) {
+                    let json = JSON.parse(body);
+                    logGroupName = json.log_group;
+                    region = json.regionl;
+                    identityId = json.identity_id;
+                    const kinesis = new KinesisClient({
+                        region,
+                        credentials: fromCognitoIdentity({
+                            identityId,
+                            logins: {
+                                "cognito-identity.amazonaws.com": json.token
+                            }
+                        })
+                    });
+                    try {
+                        const streams = await kinesis.send(new ListStreamsCommand({}));
+                        console.log(`STREAMS: ${streams.StreamNames}`);
+                        // const log_stream = streams.StreamNames.find((stream) => stream.includes(`${project}-${environment}`));
+                        const log_stream = `SSRLogStream-${project}-${environment}`
+                        // console.log(`LOG_STREAM: ${log_stream}`);
+                        const stream = await kinesis.send(new DescribeStreamCommand({StreamName: log_stream}));
+                        console.log(`DESC_STREAM: ${stream.StreamDescription}`);
+                        const shards = await kinesis.send(new ListShardsCommand({StreamName: log_stream}));
+                        console.log(shards);
+                    } catch (error) {
+                        console.error(error)
+                    } finally {
+                        console.log("FINALLY")
+                    }                
+
+
+
+
+
+
+
+
+
+                    // let shard_id = null
+                    // Get the shard_iterator
+                    // let shard_iterator = await kinesis.send(new GetShardIteratorCommand({
+                    //     ShardIteratorType: 'AT_TIMESTAMP',
+                    //     Timestamp: Date.now(),
+                    //     ShardId: shard_id
+                    // }))
+                    // function loop_through_stream_records() {
+                    //     const command = new GetRecordsCommand({
+                    //         ShardIterator: shard_iterator
+                    //     })
+                    //     kinesis.send(command).then(
+                    //         (data) => {
+                    //             data.Records.forEach((record) => {
+                    //                 console.log(Buffer.from(record.Data, 'base64').toString('utf-8'))
+                    //             })
+                    //             setTimeout(loop_through_stream_records, 2000)
+                    //         },
+                    //         (error) => {
+                    //             console.error(error)
+                    //         }
+                    //     )
+                    // }
+                    // loop_through_stream_records()
+                    // function loop_display_logs(){
+                    //     const command = new FilterLogEventsCommand({
+                    //         logGroupName,
+                    //         nextToken: next_token
+                    //     })
+                    //     cloudwatch.send(command).then(
+                    //         (data) => {
+                    //             // display logs.
+                    //             if(data.events.length > 0){
+                    //                 console.log(data.events);
+                    //                 next_token = data.nextToken;
+                    //             }
+                    //             setTimeout(loop_display_logs, 2000);
+                    //         },
+                    //         (error) => {
+                    //             // error handling.
+                    //             console.log('error', error)
+                    //         }
+                    //     );
+                    // }
+                    // loop_display_logs()
+                });
+            } catch (e) {
+                console.error('Failed to read credentials.')
+                console.error(e)
+                process.exit(1)
+            }
+        })
 
     program.parse(process.argv)
 }
