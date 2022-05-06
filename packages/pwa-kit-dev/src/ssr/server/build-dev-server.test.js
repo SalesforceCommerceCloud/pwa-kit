@@ -675,3 +675,32 @@ describe('DevServer rendering', () => {
         expect(TestFactory._redirectToLoadingScreen).toHaveBeenCalledWith(req, res, next)
     })
 })
+
+describe('DevServer service worker', () => {
+    const TestFactory = {
+        ...NoWebpackDevServerFactory,
+        _getWebpackAsset: jest.fn()
+    }
+
+    beforeEach(() => TestFactory._getWebpackAsset.mockReset())
+
+    test('returns 404 if webpack asset is missing', () => {
+        TestFactory._getWebpackAsset.mockReturnValue(null)
+        const req = { path: 'test.js' }
+        const res = { sendStatus: jest.fn() }
+        TestFactory._serveServiceWorker(req, res)
+        expect(res.sendStatus).toHaveBeenCalledWith(404)
+    })
+
+    test('sends the asset, if present1', () => {
+        TestFactory._getWebpackAsset.mockReturnValue('file contents')
+        const req = { path: 'test.js.map' }
+        const res = {
+            type: jest.fn(),
+            send: jest.fn()
+        }
+        TestFactory._serveServiceWorker(req, res)
+        expect(res.type).toHaveBeenCalledWith('.js.map')
+        expect(res.send).toHaveBeenCalledWith('file contents')
+    })
+})

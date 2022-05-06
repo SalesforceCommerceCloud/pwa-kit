@@ -110,7 +110,6 @@ export const DevServerMixin = {
     /**
      * @private
      */
-    // WJH: Add tests for _addSDKInternalHandlers
     _addSDKInternalHandlers(app) {
         // This is separated out because these routes must not have our SSR middleware applied to them.
         // But the SSR render function must!
@@ -182,24 +181,24 @@ export const DevServerMixin = {
         })
     },
 
-    // WJH: Add tests for serveServiceWorker
     serveServiceWorker(req, res) {
-        req.app.__devMiddleware.waitUntilValid(() => {
-            const sourceMap = req.path.endsWith('.map')
-            const file = sourceMap ? 'worker.js.map' : 'worker.js'
-            const type = sourceMap ? '.js.map' : '.js'
-            const content = DevServerFactory._getWebpackAsset(req, CLIENT_OPTIONAL, file)
-            if (content === null) {
-                // Service worker does not exist. Reminder that SW is optional for MRT apps.
-                res.sendStatus(404)
-            } else {
-                res.type(type)
-                res.send(content)
-            }
-        })
+        req.app.__devMiddleware.waitUntilValid(() => this._serveServiceWorker(req, res))
     },
 
-    // WJH: Add tests for render
+    _serveServiceWorker(req, res) {
+        const sourceMap = req.path.endsWith('.map')
+        const file = sourceMap ? 'worker.js.map' : 'worker.js'
+        const type = sourceMap ? '.js.map' : '.js'
+        const content = this._getWebpackAsset(req, CLIENT_OPTIONAL, file)
+        if (content === null) {
+            // Service worker does not exist. Reminder that SW is optional for MRT apps.
+            res.sendStatus(404)
+        } else {
+            res.type(type)
+            res.send(content)
+        }
+    },
+
     render(req, res, next) {
         const app = req.app
         if (app.__webpackReady()) {
@@ -276,7 +275,6 @@ export const DevServerMixin = {
      *
      * @private
      */
-    // WJH: Add tests for _getRequestProcessor
     _getRequestProcessor(req) {
         const compiled = this._getWebpackAsset(req, REQUEST_PROCESSOR, 'request-processor.js')
         if (compiled) {
@@ -301,7 +299,6 @@ export const DevServerMixin = {
      * @returns {null|String}
      * @private
      */
-    // WJH: Add tests for _getWebpackAsset
     _getWebpackAsset(req, compilerName, fileName) {
         if (req.app.__webpackReady()) {
             const outputFileSystem = req.app.__devMiddleware.context.outputFileSystem
