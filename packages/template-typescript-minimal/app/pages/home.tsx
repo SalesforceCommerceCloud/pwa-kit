@@ -138,7 +138,7 @@ Home.getProps = async () => {
         return new Promise((resolve) => {
             setTimeout(() => {
                 resolve(a * b)
-            }, 500)
+            }, 50)
         })
     }
     const value = await getData(5, 7)
