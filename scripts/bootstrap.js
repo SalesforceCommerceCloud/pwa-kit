@@ -21,4 +21,13 @@ const ciCommand = npmCmd === 'ci'
 const commandArgs = ciCommand ? '--ci' : '--no-ci'
 const environmentArgs = ciEnvironment ? '--concurrency 1 --loglevel debug' : ''
 const cmd = `npm run lerna -- bootstrap ${commandArgs} ${environmentArgs}`
+
 childProc.execSync(cmd, {stdio: 'inherit'})
+
+// Symlink local dependencies
+// A bug manifests itself on Windows where lerna bootstrap fails to generate the `pwa-kit-dev` bin shims
+// in the bin file. As a result, Windows runs the `pwa-kit-dev` bin file using Windows Host Script instead
+// of Node. We run the lerna link command to fix the shims in the `pwa-kit-dev` bin file on Windows.
+if (process.platform === 'win32') {
+  childProc.execSync('npm run lerna link --force-local', {stdio: 'inherit'})
+}
