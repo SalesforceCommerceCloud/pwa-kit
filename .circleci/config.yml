@@ -68,12 +68,6 @@ commands:
 
             # Install node dependencies
             npm ci
-            
-            # Symlink local dependencies
-            # A bug manifests itself on Windows where lerna bootsrap fails to generate the `pwa-kit-dev` bin shims
-            # in the bin file. As a result, Windows runs the `pwa-kit-dev` bin file using Windows Host Script instead
-            # of Node. We run the lerna link command to fix the shims in the `pwa-kit-dev` bin file on Windows.
-            npm run lerna link --force-local
       - save_cache:
           key: npm-cache
           paths:
