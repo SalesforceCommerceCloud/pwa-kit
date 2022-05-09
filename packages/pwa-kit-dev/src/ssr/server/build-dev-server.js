@@ -23,6 +23,7 @@ import {SERVER, CLIENT_OPTIONAL, REQUEST_PROCESSOR} from '../../configs/webpack/
 
 const projectDir = process.cwd()
 const projectWebpackPath = path.resolve(projectDir, 'webpack.config.js')
+const projectPkgPath = path.resolve(projectDir, 'package.json')
 
 const chalk = require('chalk')
 
@@ -135,12 +136,6 @@ export const DevServerMixin = {
 
         app.use('/__mrt/status', (req, res) => {
             return res.json({ready: app.__webpackReady()})
-        })
-
-        app.use('/__mrt/loading-screen/index.html', (_, res, next) => {
-            // Must use double quotes. See https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Clear-Site-Data#directives
-            res.set('Clear-Site-Data', '"cache"')
-            next()
         })
 
         app.use(
@@ -296,10 +291,11 @@ export const DevServerMixin = {
         server.listen({hostname, port}, () => {
             /* istanbul ignore next */
             if (process.env.NODE_ENV !== 'test') {
+                const projectPkg = require(projectPkgPath)
                 open(
                     `${this._getDevServerURL(
                         app.options
-                    )}/__mrt/loading-screen/index.html?loading=1`
+                    )}/__mrt/loading-screen/index.html?loading=1&project=${projectPkg.name}`
                 )
             }
         })

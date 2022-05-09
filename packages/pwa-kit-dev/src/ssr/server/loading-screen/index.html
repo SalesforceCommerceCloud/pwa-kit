@@ -65,6 +65,7 @@
         (function() {
             const url = new URL(window.location)
             const loading = url.searchParams.get('loading')
+            const projectName = url.searchParams.get('project')
 
             if (loading === '1') {
                 const interval = 1000
@@ -87,7 +88,7 @@
 
                 waitForReady().then(() => {
                     // Redirect to homepage
-                    window.location = url.origin
+                    window.location = `${url.origin}?loaded=${projectName}`
                 })
             }
 
