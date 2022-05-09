@@ -119,6 +119,7 @@ const main = () => {
             const webpackConf = fs.existsSync(projectWebpack)
                 ? projectWebpack
                 : p.join(__dirname, '..', 'configs', 'webpack', 'config.js')
+            const silentState = sh.config.silent
             sh.rm('-rf', './build')
             execSync(`${webpack} --config ${webpackConf}`, {
                 env: {
@@ -134,7 +135,9 @@ const main = () => {
             const config = p.resolve('config')
             if (fs.existsSync(config)) {
                 sh.cp('-R', config, './build')
+                sh.config.silent = true
                 sh.rm('./build/config/local.*')
+                sh.config.silent = silentState
             }
 
             // This file is required by MRT, for historical reasons.
