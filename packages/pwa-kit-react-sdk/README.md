@@ -7,7 +7,7 @@ A library of components and utilities that supports the rendering pipeline for t
 ## Requirements
 
 ```
-  Node ^12.x or ^14.x
+  Node ^14.x
   npm ^6.14.4
 ```
 
