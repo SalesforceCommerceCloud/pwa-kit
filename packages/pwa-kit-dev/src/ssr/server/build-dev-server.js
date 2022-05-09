@@ -24,12 +24,15 @@ import {SERVER, CLIENT_OPTIONAL, REQUEST_PROCESSOR} from '../../configs/webpack/
 const projectDir = process.cwd()
 const projectWebpackPath = path.resolve(projectDir, 'webpack.config.js')
 const projectPkgPath = path.resolve(projectDir, 'package.json')
+const projectPkg = require(projectPkgPath)
 
 const chalk = require('chalk')
 
 const CONTENT_TYPE = 'content-type'
 const CONTENT_ENCODING = 'content-encoding'
 const NO_CACHE = 'max-age=0, nocache, nostore, must-revalidate'
+
+const PATH_TO_LOADING_SCREEN = `/__mrt/loading-screen/index.html?loading=1&project=${projectPkg.name}`
 
 /**
  * @private
@@ -246,7 +249,7 @@ export const DevServerMixin = {
      */
     // eslint-disable-next-line no-unused-vars
     _redirectToLoadingScreen(req, res, next) {
-        res.redirect('/__mrt/loading-screen/index.html?loading=1')
+        res.redirect(PATH_TO_LOADING_SCREEN)
     },
 
     /**
@@ -291,11 +294,10 @@ export const DevServerMixin = {
         server.listen({hostname, port}, () => {
             /* istanbul ignore next */
             if (process.env.NODE_ENV !== 'test') {
-                const projectPkg = require(projectPkgPath)
                 open(
                     `${this._getDevServerURL(
                         app.options
-                    )}/__mrt/loading-screen/index.html?loading=1&project=${projectPkg.name}`
+                    )}${PATH_TO_LOADING_SCREEN}`
                 )
             }
         })
