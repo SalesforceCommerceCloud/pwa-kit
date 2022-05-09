@@ -13,7 +13,7 @@ const {
 } = require('pwa-kit-runtime/ssr/server/express')
 import fetch from 'node-fetch'
 import request from 'supertest'
-import {makeErrorHandler, DevServerFactory} from './build-dev-server'
+import {makeErrorHandler, DevServerFactory, PATH_TO_LOADING_SCREEN} from './build-dev-server'
 import path from 'path'
 import http from 'http'
 import https from 'https'
@@ -139,7 +139,7 @@ describe('DevServer loading page', () => {
             .get('/')
             .expect(302) // Expecting the 302 temporary redirect (not 301)
             .then((response) => {
-                expect(response.headers.location).toBe('/__mrt/loading-screen/index.html?loading=1')
+                expect(response.headers.location).toBe(PATH_TO_LOADING_SCREEN)
             })
     })
 })

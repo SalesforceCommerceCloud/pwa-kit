@@ -32,7 +32,10 @@ const CONTENT_TYPE = 'content-type'
 const CONTENT_ENCODING = 'content-encoding'
 const NO_CACHE = 'max-age=0, nocache, nostore, must-revalidate'
 
-const PATH_TO_LOADING_SCREEN = `/__mrt/loading-screen/index.html?loading=1&project=${projectPkg.name}`
+/**
+ * @private
+ */
+export const PATH_TO_LOADING_SCREEN = `/__mrt/loading-screen/index.html?loading=1&project=${projectPkg.name}`
 
 /**
  * @private
