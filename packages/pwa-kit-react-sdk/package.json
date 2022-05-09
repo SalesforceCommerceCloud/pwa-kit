@@ -4,7 +4,7 @@
   "description": "A library that supports the isomorphic React rendering pipeline for Commerce Cloud Managed Runtime apps",
   "main": "dist/index.js",
   "engines": {
-    "node": "^12.0.0 || ^14.0.0",
+    "node": "^14.0.0",
     "npm": "^6.14.4 || ^7.0.0 || ^8.0.0"
   },
   "files": [
