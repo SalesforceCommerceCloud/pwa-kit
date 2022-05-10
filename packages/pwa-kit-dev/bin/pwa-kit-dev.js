@@ -308,11 +308,17 @@ const main = () => {
 
                     const getShardIterator = async (stream_name, shard_id) => {
                         const shard_iterator_data = await kinesisClient.send(new GetShardIteratorCommand({
-                            ShardIteratorType: 'TRIM_HORIZON',
+                            ShardIteratorType: 'LATEST',
                             ShardId: shard_id,
                             StreamName: stream_name
                         }))
                         return shard_iterator_data.ShardIterator
+                    }
+
+                    const processLogEvent = (log_event) => {
+                        let eventDate = new Date(log_event.timestamp).toISOString()
+                        let message = log_event.message.replace(new RegExp("\t", "g"), " ")
+                        return `${eventDate}: ${message}`
                     }
 
                     try {
@@ -342,8 +348,7 @@ const main = () => {
                                     data.Records.forEach((record) => {
                                         let data = JSON.parse(zlib.unzipSync(Buffer.from(record.Data, 'base64')).toString())
                                         data.logEvents.forEach((event) => {
-                                            let eventDate = new Date(event.timestamp)
-                                            console.log(`${eventDate.toISOString()}: ${event.message}`)
+                                            console.log(processLogEvent(event))
                                         })
                                     })
                                     setTimeout(loop_through_stream_records, 2000)
