@@ -88,7 +88,7 @@
 
                 waitForReady().then(() => {
                     // Redirect to homepage
-                    window.location = `${url.origin}?loaded=${projectName}`
+                    window.location = `${url.origin}?loaded=${projectName}-${new Date().getTime()}`
                 })
             }
 
