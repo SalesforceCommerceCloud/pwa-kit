@@ -38,7 +38,10 @@
   },
   "dependencies": {
     "@aws-sdk/client-kinesis": "^3.82.0",
+    "@aws-sdk/client-s3": "^3.87.0",
     "@aws-sdk/credential-providers": "^3.82.0",
+    "@aws-sdk/fetch-http-handler": "^3.78.0",
+    "@aws-sdk/node-http-handler": "^3.82.0",
     "@babel/cli": "^7.4.4",
     "@babel/core": "^7.4.5",
     "@babel/parser": "^7.5.5",
