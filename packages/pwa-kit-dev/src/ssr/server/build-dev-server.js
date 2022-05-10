@@ -216,19 +216,24 @@ export const DevServerMixin = {
     },
 
     serveServiceWorker(req, res) {
-        req.app.__devMiddleware.waitUntilValid(() => {
-            const sourceMap = req.path.endsWith('.map')
-            const file = sourceMap ? 'worker.js.map' : 'worker.js'
-            const type = sourceMap ? '.js.map' : '.js'
-            const content = DevServerFactory._getWebpackAsset(req, CLIENT_OPTIONAL, file)
-            if (content === null) {
-                // Service worker does not exist. Reminder that SW is optional for MRT apps.
-                res.sendStatus(404)
-            } else {
-                res.type(type)
-                res.send(content)
-            }
-        })
+        req.app.__devMiddleware.waitUntilValid(() => DevServerFactory._serveServiceWorker(req, res))
+    },
+
+    /**
+     * @private
+     */
+    _serveServiceWorker(req, res) {
+        const sourceMap = req.path.endsWith('.map')
+        const file = sourceMap ? 'worker.js.map' : 'worker.js'
+        const type = sourceMap ? '.js.map' : '.js'
+        const content = DevServerFactory._getWebpackAsset(req, CLIENT_OPTIONAL, file)
+        if (content === null) {
+            // Service worker does not exist. Reminder that SW is optional for MRT apps.
+            res.sendStatus(404)
+        } else {
+            res.type(type)
+            res.send(content)
+        }
     },
 
     render(req, res, next) {
