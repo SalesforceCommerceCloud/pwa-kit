@@ -7,6 +7,7 @@
 import {start, registerServiceWorker} from 'pwa-kit-react-sdk/ssr/browser/main'
 
 const main = () => {
+    // The path to your service worker should match what is set up in ssr.js
     return Promise.all([start(), registerServiceWorker('/worker.js')])
 }
 
