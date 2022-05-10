@@ -10,10 +10,10 @@ module.exports = {
     ...base,
     coverageThreshold: {
         global: {
-            branches: 65,
-            functions: 65,
-            lines: 65,
-            statements: 65
+            branches: 67,
+            functions: 67,
+            lines: 70,
+            statements: 70
         }
     },
     testPathIgnorePatterns: ['bin/*', 'dist/*', 'node_modules/*', 'coverage/*'],
