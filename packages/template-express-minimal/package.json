@@ -2,7 +2,6 @@
     "name": "template-express-minimal",
     "version": "2.0.0-dev.8",
     "license": "See license in LICENSE",
-    "private": true,
     "devDependencies": {
         "pwa-kit-dev": "^2.0.0-dev.8",
         "pwa-kit-runtime": "^2.0.0-dev.8"
