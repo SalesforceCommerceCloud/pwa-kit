@@ -73,7 +73,9 @@ const logAndFormatError = (err) => {
 }
 
 const initAppState = async ({App, component, match, route, req, res, location}) => {
+    console.log('initAppState:')
     if (component === Throw404) {
+        console.log('no match')
         // Don't init if there was no match
         return {
             error: new errors.HTTPNotFound('Not found'),
@@ -97,24 +99,26 @@ const initAppState = async ({App, component, match, route, req, res, location}) 
     let returnVal = {}
 
     try {
+        console.log('getting props for app and page')
         const [appProps, pageProps] = await Promise.all(promises)
         const appState = {
             appProps,
             pageProps,
             __STATE_MANAGEMENT_LIBRARY: AppConfig.freeze(res.locals)
         }
-
+        console.log('appState: ', appState)
         returnVal = {
             error: undefined,
             appState: appState
         }
     } catch (error) {
+        console.log('Caught Error: ', error)
         returnVal = {
             error: error || new Error(),
             appState: {}
         }
     }
-
+    console.log('initAppState: ', returnVal)
     return returnVal
 }
 
@@ -129,6 +133,7 @@ const initAppState = async ({App, component, match, route, req, res, location}) 
  * @return {Promise}
  */
 export const render = async (req, res, next) => {
+    debugger
     // Get the application config which should have been stored at this point.
     const config = getConfig()
 
@@ -137,6 +142,8 @@ export const render = async (req, res, next) => {
     AppConfig.restore(res.locals)
 
     const routes = getRoutes(res.locals)
+
+    console.log('getRoutes: ', routes)
     const WrappedApp = routeComponent(App, false, res.locals)
 
     const [pathname, search] = req.originalUrl.split('?')
@@ -146,6 +153,7 @@ export const render = async (req, res, next) => {
     }
 
     // Step 1 - Find the match.
+    console.log('Step 1 - Find the match.')
     let route
     let match
 
@@ -159,9 +167,11 @@ export const render = async (req, res, next) => {
     })
 
     // Step 2 - Get the component
+    console.log('Step 2 - Get the component')
     const component = await route.component.getComponent()
 
     // Step 3 - Init the app state
+    console.log('Step 3 - Init the app state')
     const {appState, error: appStateError} = await initAppState({
         App: WrappedApp,
         component,
@@ -173,6 +183,7 @@ export const render = async (req, res, next) => {
     })
 
     // Step 4 - Render the App
+    console.log('Step 4 - Render the App')
     let renderResult
     const args = {
         App: WrappedApp,
@@ -197,6 +208,7 @@ export const render = async (req, res, next) => {
 
     // Step 5 - Determine what is going to happen, redirect, or send html with
     // the correct status code.
+    console.log('Step 5 - Determine what is going to happen, redirect, or send html with the correct status code.')
     const {html, routerContext, error} = renderResult
     const redirectUrl = routerContext.url
     const status = (error && error.status) || res.statusCode

@@ -24,10 +24,12 @@ export const createModuleReplacementPlugin = (projectDir) => {
         }
         return new RegExp(str)
     }
+    const templateName = 'retail-react-app'
     const overridables = [
         {
             path: makeRegExp('pwa-kit-react-sdk(/dist)?/ssr/universal/components/_app-config$'),
-            newPath: resolve(projectDir, 'app', 'components', '_app-config', 'index')
+            // newPath: resolve(projectDir, 'app', 'components', '_app-config', 'index'),
+            newPath: resolve('node_modules', templateName, 'app', 'components', '_app-config', 'index')
         },
         {
             path: makeRegExp('pwa-kit-react-sdk(/dist)?/ssr/universal/components/_document$'),
@@ -35,15 +37,19 @@ export const createModuleReplacementPlugin = (projectDir) => {
         },
         {
             path: makeRegExp('pwa-kit-react-sdk(/dist)?/ssr/universal/components/_app$'),
-            newPath: resolve(projectDir, 'app', 'components', '_app', 'index')
+            // newPath: resolve(projectDir, 'app', 'components', '_app', 'index'),
+            newPath: resolve('node_modules', templateName, 'app', 'components', '_app', 'index')
         },
         {
             path: makeRegExp('pwa-kit-react-sdk(/dist)?/ssr/universal/components/_error$'),
-            newPath: resolve(projectDir, 'app', 'components', '_error', 'index')
+            // newPath: resolve(projectDir, 'app', 'components', '_error', 'index'),
+            newPath: resolve('node_modules', templateName, 'app', 'components', '_error', 'index')
         },
         {
             path: makeRegExp('pwa-kit-react-sdk(/dist)?/ssr/universal/routes$'),
-            newPath: resolve(projectDir, 'app', 'routes')
+            // newPath: resolve(projectDir, 'app', 'routes')
+            newPath: resolve('node_modules', templateName, 'app', 'routes')
+            
         }
     ]
     const extensions = ['.ts', '.tsx', '.js', '.jsx']
@@ -71,6 +77,8 @@ export const createModuleReplacementPlugin = (projectDir) => {
         const requestedFromSDK = sdkPaths.some((p) => resource.context.includes(p))
 
         if (requestedFromSDK && replacement) {
+            console.log('requestedFromSDK: ', requestedFromSDK)
+            console.log('replacement: ', replacement)
             resource.request = replacement.newPath
         }
     })

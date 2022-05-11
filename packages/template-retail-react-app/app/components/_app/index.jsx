@@ -333,8 +333,7 @@ Learn more with our localization guide. https://sfdc.co/localization-guide
     return {
         targetLocale,
         messages,
-        categories,
-        config: res?.locals?.config
+        categories
     }
 }
 
