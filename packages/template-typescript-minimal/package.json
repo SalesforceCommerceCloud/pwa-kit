@@ -36,7 +36,7 @@
             "node_modules/**/*.*"
         ],
         "ssrShared": [
-            "static/ico/favicon.ico",
+            "static/favicon.ico",
             "static/robots.txt",
             "**/*.js",
             "**/*.js.map",
