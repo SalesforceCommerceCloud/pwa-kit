@@ -15,9 +15,6 @@ const options = {
     // The cache time for SSR'd pages (defaults to 600 seconds)
     defaultCacheTimeSeconds: 600,
 
-    // The location of the apps manifest file relative to the build directory
-    manifestPath: 'static/manifest.json',
-
     // The port that the local dev server listens on
     port: 3000,
 

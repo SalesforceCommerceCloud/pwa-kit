@@ -19,9 +19,6 @@ const options = {
     // The cache time for SSR'd pages (defaults to 600 seconds)
     defaultCacheTimeSeconds: 600,
 
-    // The location of the apps manifest file relative to the build directory
-    manifestPath: 'static/manifest.json',
-
     // This is the value of the 'mobify' object from package.json
     mobify: getConfig(),
 
