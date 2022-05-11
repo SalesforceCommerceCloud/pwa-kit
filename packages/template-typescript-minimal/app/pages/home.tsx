@@ -5,13 +5,12 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React, {useEffect, useState} from 'react'
-import fetch from 'cross-fetch'
 
 import HelloTS from '../components/hello-typescript'
 import HelloJS from '../components/hello-javascript'
 
 interface Props {
-    dadJoke: string
+    value: number
 }
 
 const style = `
@@ -81,7 +80,7 @@ h1 {
 }
 `
 
-const Home = ({dadJoke}: Props) => {
+const Home = ({value}: Props) => {
     const [counter, setCounter] = useState(0)
 
     useEffect(() => {
@@ -110,7 +109,9 @@ const Home = ({dadJoke}: Props) => {
                         <b>This page is written in Typescript</b>
                         <br />
                         <br />
-                        Server-side getProps works if this is a joke: &quot;{dadJoke.joke}&quot;
+                        Server-side getProps works if this is a valid expression: &quot;5 times 7 is{' '}
+                        {value}
+                        &quot;
                         <br />
                         <br />
                         Client-side JS works if this counter increments: {counter}
@@ -132,11 +133,16 @@ const Home = ({dadJoke}: Props) => {
 Home.getTemplateName = () => 'home'
 
 Home.getProps = async () => {
-    const resp = await fetch('https://icanhazdadjoke.com/', {
-        headers: {Accept: 'application/json'}
-    })
-    const data = await resp.json()
-    return {dadJoke: data}
+    // Note: This is simply a mock function to demo deferred execution for fetching props (e.g.: Making a call to the server to fetch data)
+    const getData = (a: number, b: number) => {
+        return new Promise((resolve) => {
+            setTimeout(() => {
+                resolve(a * b)
+            }, 50)
+        })
+    }
+    const value = await getData(5, 7)
+    return {value}
 }
 
 export default Home
