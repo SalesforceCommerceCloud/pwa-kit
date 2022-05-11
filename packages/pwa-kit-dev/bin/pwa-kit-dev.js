@@ -306,18 +306,26 @@ const main = () => {
                         // logger: console
                     });
 
-                    const getShardIterator = async (stream_name, shard_id) => {
-                        const shard_iterator_data = await kinesisClient.send(new GetShardIteratorCommand({
-                            ShardIteratorType: 'LATEST',
-                            ShardId: shard_id,
-                            StreamName: stream_name
-                        }))
-                        return shard_iterator_data.ShardIterator
+                    const getShardIterator = (stream_name, shard_id, shard_iterator=null) => {
+                        if (shard_iterator === null) {
+                            return kinesisClient.send(new GetShardIteratorCommand({
+                                ShardIteratorType: 'LATEST',
+                                ShardId: shard_id,
+                                StreamName: stream_name
+                            })).then((data) => {
+                                return data.ShardIterator
+                            })
+                        } else {
+                            return new Promise((resolve, reject) => {
+                                resolve(shard_iterator)
+                            })
+                        }
                     }
 
                     const processLogEvent = (log_event) => {
                         let eventDate = new Date(log_event.timestamp).toISOString()
-                        let message = log_event.message.replace(new RegExp("\t", "g"), " ")
+                        let message = log_event.message.replace(/\t/g, " ")
+                        message = message.replace(/^\s+|\s+$/g, " ")
                         return `${eventDate}: ${message}`
                     }
 
@@ -325,40 +333,33 @@ const main = () => {
                         const streams = await kinesisClient.send(new ListStreamsCommand({}));
                         const stream_name = streams.StreamNames.find((stream) => stream.includes(`${project}-${environment}`));
                         const shards = await kinesisClient.send(new ListShardsCommand({StreamName: stream_name}));
-                        let current_shard_index = 0
-                        let shard_id = shards.Shards[current_shard_index].ShardId
-                        
-                        let shard_iterator = await getShardIterator(stream_name, shard_id)
-                        async function loop_through_stream_records() {
-                            const command = new GetRecordsCommand({
-                                ShardIterator: shard_iterator
-                            })
-                            kinesisClient.send(command).then(
-                                async (data) => {
-                                    shard_iterator = data.NextShardIterator
-                                    // if (!shard_iterator) {
-                                    //     console.log("No Records")
-                                    //     current_shard_index += 1
-                                    //     if (current_shard_index === shards.Shards.length)
-                                    //         return
-                                    //     let next_shard = shards.Shards[current_shard_index]
-                                    //     console.log(`NEXT ${next_shard.ShardId}`)
-                                    //     shard_iterator = await getShardIterator(stream_name, next_shard.ShardId)
+                        const loop_through_shard_records = (shard_id, shard_iterator=null) => {
+                            getShardIterator(stream_name, shard_id, shard_iterator).then(
+                                (shard_iterator) => {
+                                    return kinesisClient.send(new GetRecordsCommand({
+                                        ShardIterator: shard_iterator
+                                    }))
+                                }).then((data) => {
+                                    // if (!data.Records || data.Records.length == 0) {
+                                    //     console.log(`${shard_id} - No Records`)
                                     // }
                                     data.Records.forEach((record) => {
                                         let data = JSON.parse(zlib.unzipSync(Buffer.from(record.Data, 'base64')).toString())
                                         data.logEvents.forEach((event) => {
-                                            console.log(processLogEvent(event))
+                                            console.log(`${shard_id} - ${processLogEvent(event)}`)
                                         })
                                     })
-                                    setTimeout(loop_through_stream_records, 2000)
-                                },
-                                (error) => {
-                                    console.error(error)
-                                }
-                            )
+                                    return new Promise((resolve, reject) => {
+                                        resolve(data.NextShardIterator)
+                                    })
+                                }).then((next_shard_iterator) => {
+                                    setTimeout(() => loop_through_shard_records(shard_id, next_shard_iterator), 2000)
+                                })
                         }
-                        loop_through_stream_records()
+                        console.log(shards.Shards.map(shard => shard.ShardId))
+                        shards.Shards.forEach((shard) => {
+                            loop_through_shard_records(shard.ShardId, null)
+                        })
                     } catch (error) {
                         console.error(error)
                     }
@@ -444,12 +445,13 @@ const main = () => {
 
                     const processLogEvent = (log_event) => {
                         let eventDate = new Date(log_event.timestamp).toISOString()
-                        let message = log_event.message.replace(new RegExp("\t", "g"), " ")
+                        let message = log_event.message.replace(/\t/g, " ")
+                        message = message.replace(/^\s+|\s+$/g, " ")
                         return `${eventDate}: ${message}`
                     }
 
                     const displayLogEvents = (content) => {
-                        let contents = content.replace(new RegExp("}{", "g"), "}%%%{")
+                        let contents = content.replace(/}{/g, "}%%%{")
                         contents.split("%%%").forEach((record) => {
                             let parsed = JSON.parse(record)
                             parsed.logEvents.forEach((event) => {
