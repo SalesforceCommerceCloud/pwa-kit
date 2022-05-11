@@ -15,13 +15,6 @@ const options = {
     // The cache time for SSR'd pages (defaults to 600 seconds)
     defaultCacheTimeSeconds: 600,
 
-    // The path to the favicon. This must also appear in
-    // the mobify.ssrShared section of package.json.
-    faviconPath: path.resolve(__dirname, 'static', 'favicon.ico'),
-
-    // The location of the apps manifest file relative to the build directory
-    manifestPath: 'static/manifest.json',
-
     // The port that the local dev server listens on
     port: 3000,
 
@@ -40,9 +33,8 @@ const {handler} = runtime.createHandler(options, (app) => {
         res.send()
     })
 
-    app.get('/robots.txt', runtime.serveStaticFile('static/robots.txt'))
+    app.get('/favicon.ico', runtime.serveStaticFile('static/favicon.ico'))
 
-    app.get('/worker.js(.map)?', runtime.serveServiceWorker)
     app.get('*', runtime.render)
 })
 
