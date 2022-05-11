@@ -688,10 +688,10 @@ export const RemoteServerFactory = {
     },
 
     /**
-     * Serve the /worker.js file.
+     * Serve the service worker at `req.path`
      *
-     * The service worker must be served at the root of the site and must
-     * not be a redirect. We set a long value for s-maxage (to allow CDN
+     * For best results, serve the service worker at the root of the site and
+     * it must not be a redirect. We set a long value for s-maxage (to allow CDN
      * caching), plus a strong etag (for CDN-only revalidation), and to set
      * maxage to 0 to prevent browser caching.
      *
