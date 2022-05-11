@@ -144,21 +144,6 @@ describe('_createApp validates the options object', () => {
             expect(() => RemoteServerFactory._createApp(options)).toThrow()
         })
     })
-
-    test('_createApp warns on missing favicon', () => {
-        const options = opts({
-            buildDir: path.resolve(process.cwd(), 'src/ssr/server/test_fixtures'),
-            faviconPath: 'nosuchfile.ico'
-        })
-
-        const sandbox = sinon.createSandbox()
-        const warn = sandbox.spy(console, 'warn')
-
-        RemoteServerFactory._createApp(options)
-        expect(warn.calledOnce).toBe(true)
-
-        sandbox.restore()
-    })
 })
 
 describe('_createApp validates environment variables', () => {
@@ -447,32 +432,6 @@ describe('SSRServer operation', () => {
                     .expect(404)
             })
         })
-    })
-
-    test('SSRServer serves favicon', () => {
-        const faviconPath = path.resolve(testFixtures, 'favicon.ico')
-        const app = RemoteServerFactory._createApp(opts({faviconPath}))
-        expect.assertions(1)
-
-        return request(app)
-            .get('/favicon.ico')
-            .buffer(true)
-            .parse(superagent.parse.image)
-            .expect(200)
-            .then((res) => {
-                const iconData = fs.readFileSync(faviconPath)
-                expect(res.body).toEqual(iconData)
-            })
-    })
-
-    test('SSRServer handles missing favicon', () => {
-        const app = RemoteServerFactory._createApp(opts({faviconPath: undefined}))
-
-        return request(app)
-            .get('/favicon.ico')
-            .buffer(true)
-            .parse(superagent.parse.image)
-            .expect(404)
     })
 
     test('SSRServer creates cache on demand', () => {

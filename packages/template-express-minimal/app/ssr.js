@@ -10,7 +10,6 @@ const pkg = require('../package.json')
 
 const options = {
     buildDir: path.resolve(process.cwd(), 'build'),
-    faviconPath: path.resolve(__dirname, 'static', 'favicon.ico'),
     defaultCacheTimeSeconds: 600,
     mobify: pkg.mobify,
     enableLegacyRemoteProxying: false,
