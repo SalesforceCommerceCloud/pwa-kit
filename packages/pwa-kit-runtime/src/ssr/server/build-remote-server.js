@@ -686,30 +686,32 @@ export const RemoteServerFactory = {
      * efficiently serving service workers.
      *
      */
-    serveServiceWorker(req, res) {
-        const options = req.app.options
-        // We apply this cache-control to all responses (200 and 404)
-        res.set(
-            CACHE_CONTROL,
-            // The CDN can cache for 24 hours. The browser may not cache
-            // the file.
-            's-maxage=86400, max-age=0'
-        )
+    serveServiceWorker() {
+        return (req, res) => {
+            const options = req.app.options
+            // We apply this cache-control to all responses (200 and 404)
+            res.set(
+                CACHE_CONTROL,
+                // The CDN can cache for 24 hours. The browser may not cache
+                // the file.
+                's-maxage=86400, max-age=0'
+            )
 
-        const workerFilePath = path.join(options.buildDir, req.path)
+            const workerFilePath = path.join(options.buildDir, req.path)
 
-        // If there is no file, send a 404
-        if (!fs.existsSync(workerFilePath)) {
-            res.status(404).send()
-            return
+            // If there is no file, send a 404
+            if (!fs.existsSync(workerFilePath)) {
+                res.status(404).send()
+                return
+            }
+
+            const content = fs.readFileSync(workerFilePath, {encoding: 'utf8'})
+
+            // Serve the file, with a strong ETag
+            res.set('etag', getHashForString(content))
+            res.set(CONTENT_TYPE, 'application/javascript')
+            res.send(content)
         }
-
-        const content = fs.readFileSync(workerFilePath, {encoding: 'utf8'})
-
-        // Serve the file, with a strong ETag
-        res.set('etag', getHashForString(content))
-        res.set(CONTENT_TYPE, 'application/javascript')
-        res.send(content)
     },
 
     /**
@@ -744,17 +746,19 @@ export const RemoteServerFactory = {
      * @param {Object} req - the res object
      * @param {function} next - the callback function for middleware chain
      */
-    render(req, res, next) {
-        const app = req.app
-        if (!app.__renderer) {
-            // See - https://www.npmjs.com/package/webpack-hot-server-middleware#usage
-            const {buildDir} = app.options
-            const _require = eval('require')
-            const serverRenderer = _require(path.join(buildDir, 'server-renderer.js')).default
-            const stats = _require(path.join(buildDir, 'loadable-stats.json'))
-            app.__renderer = serverRenderer(stats)
+    render() {
+        return (req, res, next) => {
+            const app = req.app
+            if (!app.__renderer) {
+                // See - https://www.npmjs.com/package/webpack-hot-server-middleware#usage
+                const {buildDir} = app.options
+                const _require = eval('require')
+                const serverRenderer = _require(path.join(buildDir, 'server-renderer.js')).default
+                const stats = _require(path.join(buildDir, 'loadable-stats.json'))
+                app.__renderer = serverRenderer(stats)
+            }
+            app.__renderer(req, res, next)
         }
-        app.__renderer(req, res, next)
     },
 
     /**

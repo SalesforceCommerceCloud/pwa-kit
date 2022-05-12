@@ -286,7 +286,7 @@ describe('SSRServer operation', () => {
 
     test('SSRServer renders with the react rendering', () => {
         const app = RemoteServerFactory._createApp(opts())
-        app.get('/*', RemoteServerFactory.render)
+        app.get('/*', RemoteServerFactory.render())
         expect(app.__renderer).toBeUndefined()
 
         return request(app)
@@ -421,7 +421,7 @@ describe('SSRServer operation', () => {
                 fse.writeFileSync(updatedFile, content)
 
                 const app = RemoteServerFactory._createApp(opts({buildDir}))
-                app.get('/worker.js(.map)?', RemoteServerFactory.serveServiceWorker)
+                app.get('/worker.js(.map)?', RemoteServerFactory.serveServiceWorker())
 
                 return request(app)
                     .get(requestPath)
