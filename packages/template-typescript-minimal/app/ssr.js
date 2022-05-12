@@ -35,7 +35,7 @@ const {handler} = runtime.createHandler(options, (app) => {
 
     app.get('/favicon.ico', runtime.serveStaticFile('static/favicon.ico'))
 
-    app.get('*', runtime.render)
+    app.get('*', runtime.render())
 })
 
 exports.get = handler

@@ -215,28 +215,32 @@ export const DevServerMixin = {
         }
     },
 
-    serveServiceWorker(req, res) {
-        req.app.__devMiddleware.waitUntilValid(() => {
-            const sourceMap = req.path.endsWith('.map')
-            const file = sourceMap ? 'worker.js.map' : 'worker.js'
-            const type = sourceMap ? '.js.map' : '.js'
-            const content = DevServerFactory._getWebpackAsset(req, CLIENT_OPTIONAL, file)
-            if (content === null) {
-                // Service worker does not exist. Reminder that SW is optional for MRT apps.
-                res.sendStatus(404)
-            } else {
-                res.type(type)
-                res.send(content)
-            }
-        })
+    serveServiceWorker() {
+        return (req, res) => {
+            req.app.__devMiddleware.waitUntilValid(() => {
+                const sourceMap = req.path.endsWith('.map')
+                const file = sourceMap ? 'worker.js.map' : 'worker.js'
+                const type = sourceMap ? '.js.map' : '.js'
+                const content = DevServerFactory._getWebpackAsset(req, CLIENT_OPTIONAL, file)
+                if (content === null) {
+                    // Service worker does not exist. Reminder that SW is optional for MRT apps.
+                    res.sendStatus(404)
+                } else {
+                    res.type(type)
+                    res.send(content)
+                }
+            })
+        }
     },
 
-    render(req, res, next) {
-        const app = req.app
-        if (app.__webpackReady()) {
-            app.__hotServerMiddleware(req, res, next)
-        } else {
-            this._redirectToLoadingScreen(req, res, next)
+    render() {
+        return (req, res, next) => {
+            const app = req.app
+            if (app.__webpackReady()) {
+                app.__hotServerMiddleware(req, res, next)
+            } else {
+                this._redirectToLoadingScreen(req, res, next)
+            }
         }
     },
 

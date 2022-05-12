@@ -57,8 +57,8 @@ const {handler} = runtime.createHandler(options, (app) => {
     app.get('/robots.txt', runtime.serveStaticFile('static/robots.txt'))
     app.get('/favicon.ico', runtime.serveStaticFile('static/ico/favicon.ico'))
 
-    app.get('/worker.js(.map)?', runtime.serveServiceWorker)
-    app.get('*', runtime.render)
+    app.get('/worker.js(.map)?', runtime.serveServiceWorker())
+    app.get('*', runtime.render())
 })
 // SSR requires that we export a single handler function called 'get', that
 // supports AWS use of the server that we created above.
