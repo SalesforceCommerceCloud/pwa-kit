@@ -426,3 +426,8 @@ export const shouldCompress = (req, res) => {
  * @private
  */
 export const DevServerFactory = Object.assign({}, RemoteServerFactory, DevServerMixin)
+for (const property in DevServerFactory) {
+    if (DevServerFactory[property] instanceof Function) {
+        DevServerFactory[property] = DevServerFactory[property].bind(DevServerFactory)
+    }
+  }
