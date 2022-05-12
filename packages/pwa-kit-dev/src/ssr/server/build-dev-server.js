@@ -430,4 +430,4 @@ for (const property in DevServerFactory) {
     if (DevServerFactory[property] instanceof Function) {
         DevServerFactory[property] = DevServerFactory[property].bind(DevServerFactory)
     }
-  }
+}
