@@ -1,9 +1,9 @@
-# PWA Kit internal tools
+# PWA Kit Internal tools 🛠️
 
 A package that contains internal tools used by other libraries in the monorepo.
-It can't run outside the context of this monorepo
+It can't run outside the context of this monorepo.
 
-To see all the available commands
+To see all the available commands:
 
 ```bash
 cd packages/internal-lib-build
