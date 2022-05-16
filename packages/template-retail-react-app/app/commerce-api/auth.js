@@ -246,7 +246,8 @@ class Auth {
                     throw error
                 })
                 .then((result) => {
-                    this._onClient && this.createOCAPISession()
+                    // Uncomment the following line for phased launch
+                    // this._onClient && this.createOCAPISession()
                     return result
                 })
         }
