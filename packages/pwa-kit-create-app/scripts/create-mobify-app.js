@@ -117,10 +117,14 @@ const merge = (a, b) => deepmerge(a, b, {arrayMerge: (orignal, replacement) => r
 
 const runExtensibleGenerator = (answers, {outputDir, verbose}) => {
 
-    console.log(p.join(process.cwd(), 'packages/pwa-kit-create-app/assets/base-template'))
     // Copy 'base-template' to output directory.
     sh.cp('-R', p.join(process.cwd(), 'packages/pwa-kit-create-app/assets/base-template'), outputDir)
     
+    const PackageJSONTemplate = require(`../assets/base-template/package.json`).template
+
+    new sh.ShellString(PackageJSONTemplate(answers)).to(p.resolve(outputDir, 'package.json'))
+
+
     npmInstall(outputDir, {verbose})
 }
 
@@ -470,7 +474,9 @@ const main = (opts) => {
                 case TEST_PROJECT:
                     return runGenerator(testProjectAnswers(), opts)
                 case EXTENDED_TEST_PROJECT:
-                    return runExtensibleGenerator({}, opts)
+                    return runExtensibleGenerator({templateName: 'retail-react-app'}, opts)
+                case 'extended-test-project-typescript':
+                    return runExtensibleGenerator({templateName: 'typescript-minimal'}, opts)
                 case RETAIL_REACT_APP_DEMO:
                     return Promise.resolve()
                         .then(() => runGenerator(demoProjectAnswers(), opts))

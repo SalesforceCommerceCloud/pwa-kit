@@ -1,4 +1,15 @@
-{
+/*
+ * Copyright (c) 2021, salesforce.com, inc.
+ * All rights reserved.
+ * SPDX-License-Identifier: BSD-3-Clause
+ * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
+ */
+exports.template = (
+ answers
+) => `// Provide the sites for your app. Each site includes site id, and its localization configuration.
+// You can also provide aliases for your locale. They will be used in place of your locale id when generating paths across the app
+module.exports = [
+ {
     "name": "template-base",
     "version": "2.0.0-dev.8",
     "license": "See license in LICENSE",
@@ -15,7 +26,7 @@
         "react-helmet": "^6.1.0",
         "react-router": "^5.1.2",
         "react-router-dom": "^5.1.2",
-        "retail-react-app": "^2.0.0-dev.8"
+        "${answers.templateName}": "^2.0.0-dev.8"
     },
     "scripts": {
         "test": "pwa-kit-dev test",
@@ -94,4 +105,6 @@
             "intentionally-does-not-exist"
         ]
     }
-}
+ }
+]`
+
