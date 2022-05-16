@@ -117,6 +117,7 @@ const merge = (a, b) => deepmerge(a, b, {arrayMerge: (orignal, replacement) => r
 
 const runExtensibleGenerator = (answers, {outputDir, verbose}) => {
 
+    console.log(p.join(process.cwd()))
     // Copy 'base-template' to output directory.
     sh.cp('-R', '../assets/base-template', outputDir)
     
