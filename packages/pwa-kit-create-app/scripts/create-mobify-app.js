@@ -61,10 +61,15 @@ const TEST_PROJECT = 'test-project' // TODO: This will be replaced with the `iso
 const RETAIL_REACT_APP_DEMO = 'retail-react-app-demo'
 const RETAIL_REACT_APP = 'retail-react-app'
 
+const EXTENDED_TEST_PROJECT = 'extended-test-project'
+
 const PRIVATE_PRESETS = [
     TEST_PROJECT,
     EXPRESS_MINIMAL_TEST_PROJECT,
-    TYPESCRIPT_MINIMAL_TEST_PROJECT
+    TYPESCRIPT_MINIMAL_TEST_PROJECT,
+
+    // Testing template extensions
+    EXTENDED_TEST_PROJECT
 ]
 const PUBLIC_PRESETS = [
     RETAIL_REACT_APP_DEMO,
@@ -109,6 +114,14 @@ const slugifyName = (name) => {
  * @return {*}
  */
 const merge = (a, b) => deepmerge(a, b, {arrayMerge: (orignal, replacement) => replacement})
+
+const runExtensibleGenerator = (answers, {outputDir, verbose}) => {
+
+    // Copy 'base-template' to output directory.
+    sh.cp('-R', '../assets/base-template', outputDir)
+    
+    npmInstall(outputDir, {verbose})
+}
 
 /**
  * @param answers - a map of package-names to package.json values that are
@@ -455,6 +468,8 @@ const main = (opts) => {
                     })
                 case TEST_PROJECT:
                     return runGenerator(testProjectAnswers(), opts)
+                case EXTENDED_TEST_PROJECT:
+                    return runExtensibleGenerator({}, opts)
                 case RETAIL_REACT_APP_DEMO:
                     return Promise.resolve()
                         .then(() => runGenerator(demoProjectAnswers(), opts))
