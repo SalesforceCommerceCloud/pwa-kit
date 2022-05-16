@@ -9,6 +9,9 @@ import webpack from 'webpack'
 import path, {resolve} from 'path'
 import fs from 'fs'
 
+const projectDir = process.cwd()
+const pkg = require(resolve(projectDir, 'package.json'))
+
 /**
  * Allows users to override special SDK components by placing override
  * files in certain magic locations in a project.
@@ -24,7 +27,8 @@ export const createModuleReplacementPlugin = (projectDir) => {
         }
         return new RegExp(str)
     }
-    const templateName = 'retail-react-app'
+    const templateName = pkg.mobify.extends
+    console.log('Extending: ', templateName)
     const overridables = [
         {
             path: makeRegExp('pwa-kit-react-sdk(/dist)?/ssr/universal/components/_app-config$'),

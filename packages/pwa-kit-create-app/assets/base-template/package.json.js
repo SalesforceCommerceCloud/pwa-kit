@@ -33,6 +33,7 @@ exports.template = (
         "save-credentials": "pwa-kit-dev save-credentials"
     },
     "mobify": {
+        "extends": "${answers.templateName}",
         "app": {
             "url": {
                 "site": "path",
