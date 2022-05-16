@@ -43,7 +43,8 @@ The configuration features include:
 
 ### Dedicated Configuration Files
 
-At project generation a single `default` configuration is created. For most cases a single configuration file will get the job done. But there are times where you want to have a different configuration for a different environment. These environments for example could be, a developers local machine, a remote `production` environment, or a remote `staging` environment. In all these cases you want to use a different configuration for each. 
+At project generation a single `default` configuration is created. For most cases a single configuration file will get the job done. But there are times when you want to have a different configuration for a different environment.
+These environments for example could be, a developers local machine, a remote `production` environment, or a remote `staging` environment. In all these cases you want to use a different configuration for each. 
 
 When multiple configurations are present, which configuration file to used is resolved in the following way: 
 
