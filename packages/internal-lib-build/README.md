@@ -1,4 +1,4 @@
-# internal-lib-build
+# PWA Kit internal tools
 
 A package that contains internal tools used by other libraries in the monorepo.
 It can't run outside the context of this monorepo
