@@ -123,7 +123,7 @@ const runExtensibleGenerator = (answers, {outputDir, verbose}) => {
     const PackageJSONTemplate = require(`../assets/base-template/package.json`).template
 
     new sh.ShellString(PackageJSONTemplate(answers)).to(p.resolve(outputDir, 'package.json'))
-
+    sh.rm('-rf', p.join(process.cwd(), 'packages/pwa-kit-create-app/assets/base-template/package.json.js'))
 
     npmInstall(outputDir, {verbose})
 }

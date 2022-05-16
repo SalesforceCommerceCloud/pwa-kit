@@ -8,8 +8,7 @@ exports.template = (
  answers
 ) => `// Provide the sites for your app. Each site includes site id, and its localization configuration.
 // You can also provide aliases for your locale. They will be used in place of your locale id when generating paths across the app
-module.exports = [
- {
+{
     "name": "template-base",
     "version": "2.0.0-dev.8",
     "license": "See license in LICENSE",
@@ -105,6 +104,5 @@ module.exports = [
             "intentionally-does-not-exist"
         ]
     }
- }
-]`
+}`
 
