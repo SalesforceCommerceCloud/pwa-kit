@@ -9,7 +9,7 @@ A command line interface tool to develop, build and deploy PWA Kit projects.
   npm ^6.14.4
 ```
 
-For see all the available commands, run:
+To see all the available commands, run:
 
 ```bash
 npx pwa-kit-dev --help
