@@ -28,7 +28,7 @@ export const createModuleReplacementPlugin = (projectDir) => {
         return new RegExp(str)
     }
     const templateName = pkg.mobify.extends
-    console.log('Extending: ', templateName)
+    
     const overridables = [
         {
             path: makeRegExp('pwa-kit-react-sdk(/dist)?/ssr/universal/components/_app-config$'),
@@ -81,8 +81,8 @@ export const createModuleReplacementPlugin = (projectDir) => {
         const requestedFromSDK = sdkPaths.some((p) => resource.context.includes(p))
 
         if (requestedFromSDK && replacement) {
-            console.log('requestedFromSDK: ', requestedFromSDK)
-            console.log('replacement: ', replacement)
+            // console.log('requestedFromSDK: ', requestedFromSDK)
+            // console.log('replacement: ', replacement)
             resource.request = replacement.newPath
         }
     })
