@@ -1,4 +1,4 @@
-# PWA Kit Developer Tools 🛠️
+# PWA Kit Developer Tools
 
 A command line interface tool to develop, build, and deploy PWA Kit projects.
 
