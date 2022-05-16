@@ -33,7 +33,6 @@ exports.template = (
         "save-credentials": "pwa-kit-dev save-credentials"
     },
     "mobify": {
-        "extends": "${answers.templateName}",
         "app": {
             "url": {
                 "site": "path",
@@ -73,7 +72,7 @@ exports.template = (
                 "siteId": "aaij-MobileFirst"
             }
         },
-        "extends": ["typescript-minimal"],
+        "extends": "${answers.templateName}",
         "ssrEnabled": true,
         "ssrParameters": {
             "ssrFunctionNodeVersion": "14.x",
