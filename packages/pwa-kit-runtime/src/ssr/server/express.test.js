@@ -974,7 +974,7 @@ describe('getRuntime', () => {
     // dependency which will cause circular dependency warnings.
     const MockDevServerFactory = {
         name: 'MockDevServerFactory',
-        returnMyName(){
+        returnMyName() {
             return this.name
         }
     }
