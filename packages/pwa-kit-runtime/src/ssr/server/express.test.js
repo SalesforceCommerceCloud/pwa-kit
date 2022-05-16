@@ -967,7 +967,12 @@ describe('getRuntime', () => {
 
     // Mock the DevSeverFactory via `eval` so we don't have to include it as a dev
     // dependency which will cause circular dependency warnings.
-    const MockDevServerFactory = {}
+    const MockDevServerFactory = {
+        name: 'MockDevServerFactory',
+        returnMyName() {
+            return this.name
+        }
+    }
     const mockEval = () => ({
         main: {
             require: () => ({DevServerFactory: MockDevServerFactory})
@@ -1010,4 +1015,10 @@ describe('getRuntime', () => {
             expect(getRuntime()).toBe(expectedRuntime)
         }
     )
+
+    test('should return a remote/development runtime with the correct context', () => {
+        const mockDevRuntime = getRuntime()
+        const func = mockDevRuntime.returnMyName
+        expect(func()).toBe(MockDevServerFactory.name)
+    })
 })
