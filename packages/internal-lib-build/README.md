@@ -3,7 +3,7 @@
 A package that contains internal tools used by other libraries in the monorepo.
 It can't run outside the context of this monorepo
 
-For see all the available commands
+To see all the available commands
 
 ```bash
 cd packages/internal-lib-build
