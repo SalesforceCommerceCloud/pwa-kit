@@ -18,9 +18,6 @@
         "react-router-dom": "^5.1.2"
     },
     "scripts": {
-        "format": "pwa-kit-dev format \"**/*.{js,jsx,tsx}\"",
-        "lint": "pwa-kit-dev lint \"**/*.{js,jsx,tsx}\"",
-        "lint:fix": "npm run lint -- --fix",
         "save-credentials": "pwa-kit-dev save-credentials",
         "start": "pwa-kit-dev start",
         "test": "pwa-kit-dev test",

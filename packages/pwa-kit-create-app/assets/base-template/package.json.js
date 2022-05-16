@@ -6,9 +6,7 @@
  */
 exports.template = (
  answers
-) => `// Provide the sites for your app. Each site includes site id, and its localization configuration.
-// You can also provide aliases for your locale. They will be used in place of your locale id when generating paths across the app
-{
+) => `{
     "name": "template-base",
     "version": "2.0.0-dev.8",
     "license": "See license in LICENSE",
@@ -29,9 +27,6 @@ exports.template = (
     },
     "scripts": {
         "test": "pwa-kit-dev test",
-        "format": "pwa-kit-dev format \"**/*.{js,jsx}\"",
-        "lint": "pwa-kit-dev lint \"**/*.{js,jsx}\"",
-        "lint:fix": "npm run lint -- --fix",
         "start": "pwa-kit-dev start --inspect",
         "build": "pwa-kit-dev build",
         "push": "npm run build && pwa-kit-dev push",
