@@ -71,7 +71,7 @@ module.exports = {
     }
 }
 ```
-You can choose how the current locale appears (or doesn’t appear) in the URL by setting `url.locale` to one of the following values:
+You can choose how the current locale appears (or does not appear) in the URL by setting `url.locale` to one of the following values:
 
 - `path`: Locale is included in the URL path. Example: `/en-US/women/dress`
 - `query_param`: Locale is included as a query parameter. Example: `/women/dress?locale=en-US`
