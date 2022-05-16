@@ -461,11 +461,23 @@ export const respondFromBundle = ({req, res, path, redirect = 301}) => {
 }
 
 export const getRuntime = () => {
-    return isRemote()
+    const runtime = isRemote()
         ? RemoteServerFactory
         : // The dev server is for development only, and should not be deployed to production.
           // To avoid deploying the dev server (and all of its dependencies) to production, it exists
           // as an optional peer dependency to this package. The unusual `require` statement is needed
           // to bypass webpack and ensure that the dev server does not get bundled.
           eval('require').main.require('pwa-kit-dev/ssr/server/build-dev-server').DevServerFactory
+
+    // The runtime is a JavaScript object.
+    // Sometimes the runtime APIs are invoked directly as express middlewares.
+    // In order to make sure the "this" keyword always have the correct context,
+    // we bind every single method to have the context of the object itself
+    for (const property in runtime) {
+        if (runtime[property] instanceof Function) {
+            runtime[property] = runtime[property].bind(runtime)
+        }
+    }
+
+    return runtime
 }

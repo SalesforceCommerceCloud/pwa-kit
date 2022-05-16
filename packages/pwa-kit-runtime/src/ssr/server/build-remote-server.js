@@ -886,12 +886,6 @@ export const RemoteServerFactory = {
     }
 }
 
-for (const property in RemoteServerFactory) {
-    if (RemoteServerFactory[property] instanceof Function) {
-        RemoteServerFactory[property] = RemoteServerFactory[property].bind(RemoteServerFactory)
-    }
-}
-
 /**
  * ExpressJS middleware that processes any non-proxy request passing
  * through the Express app.
