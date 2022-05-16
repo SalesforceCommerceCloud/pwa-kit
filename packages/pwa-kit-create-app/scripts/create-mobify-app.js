@@ -117,9 +117,9 @@ const merge = (a, b) => deepmerge(a, b, {arrayMerge: (orignal, replacement) => r
 
 const runExtensibleGenerator = (answers, {outputDir, verbose}) => {
 
-    console.log(p.join(process.cwd()))
+    console.log(p.join(process.cwd(), 'packages/pwa-kit-create-app/assets/base-template'))
     // Copy 'base-template' to output directory.
-    sh.cp('-R', '../assets/base-template', outputDir)
+    sh.cp('-R', p.join(process.cwd(), 'packages/pwa-kit-create-app/assets/base-template'), outputDir)
     
     npmInstall(outputDir, {verbose})
 }
