@@ -81,9 +81,9 @@ const PageNotFound = () => {
 }
 
 PageNotFound.getProps = async ({res}) => {
-    // if (res) {
-    //     res.status(404)
-    // }
+    if (res) {
+        res.status(404)
+    }
 }
 
 export default PageNotFound
