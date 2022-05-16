@@ -144,7 +144,7 @@ const baseConfig = (target) => {
                     rules: [
                         {
                             test: /(\.js(x?)|\.ts(x?))$/,
-                            exclude: /node_modules\/(?!retail-react-app)(.*)/,
+                            exclude: /node_modules\/(?!retail-react-app|typescript-minimal)(.*)/,
                             use: [
                                 {
                                     loader: findInProjectThenSDK('babel-loader'),
