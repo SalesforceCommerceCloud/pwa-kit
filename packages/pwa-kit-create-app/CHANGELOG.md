@@ -1,5 +1,9 @@
-## v1.6.0-dev (Mar 17, 2022)
+## v2.0.0 (May 16, 2022)
+-   Fix generator log [#571](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/571)
 -   Fix incorrect site related values when generating without use of a preset [#470](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/470)
+-   Support Multi-site implementation using dynamic config [#469](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/469)
+-   Add verbose flag to generator [#463](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/463)
+-   Environment Specific Configuration Support [#477](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/447)
 
 ## v1.5.0 (Mar 17, 2022)
 -   Node warnings with more readable Node versions [#410](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/410)
