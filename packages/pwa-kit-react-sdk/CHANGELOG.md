@@ -4,6 +4,7 @@
 -   Support functions as default exports in the applications `routes.jsx` file. [#447](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/447)
 -   Serialize application configuration in the HTML during rendering process. [#447](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/447)
 -   Remove `create-hash-manifest.js` [#425](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/425)
+-   Fix upload bug with extending an options object [#419](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/419)
 
 ## v1.5.0 (Mar 17, 2022)
 -   Add boolean flag `enableLegacyBodyParser` to `createApp` options. [#446](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/446)

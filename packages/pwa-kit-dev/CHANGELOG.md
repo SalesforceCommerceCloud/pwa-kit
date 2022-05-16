@@ -13,3 +13,4 @@
 -   Loading screen [#473](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/473)
 -   Service worker loading for dev server [#464](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/464)
 -   Environment Specific Configuration Support [#477](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/447)
+-   Remove Webpack PwaKitConfigPlugin [#443](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/443)
