@@ -6,9 +6,9 @@ const path = require("path")
 const fs = require("fs")
 
 sh.set("-e")
-const lernaConfigPath = path.join(__dirname, "..", "lerna.json")
-const rootPkgPath = path.join(__dirname, "..", "package.json")
-const rootPkgLockPath = path.join(__dirname, "..", "package-lock.json")
+const lernaConfigPath = path.join(__dirname, '..', 'lerna.json')
+const rootPkgPath = path.join(__dirname, '..', 'package.json')
+const rootPkgLockPath = path.join(__dirname, '..', 'package-lock.json')
 
 const main = () => {
     sh.exec(`lerna version --no-push --no-git-tag-version --yes ${process.argv.slice(2).join(' ')}`)
