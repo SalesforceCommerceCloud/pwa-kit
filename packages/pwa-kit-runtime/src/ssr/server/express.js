@@ -479,7 +479,7 @@ export const getRuntime = () => {
     // we bind every single method to have the context of the object itself
     const boundRuntime = {...runtime}
     for (const property of Object.keys(boundRuntime)) {
-        if (boundRuntime[property] instanceof Function) {
+        if (typeof boundRuntime[property] === 'function') {
             boundRuntime[property] = boundRuntime[property].bind(boundRuntime)
         }
     }
