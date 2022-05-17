@@ -143,6 +143,12 @@ export const DevServerMixin = {
                 dotFiles: 'deny'
             })
         )
+
+        app.get('/__mrt/clear-browser-data', (_, res) => {
+            console.log(chalk.cyan('Clearing browser data'), '(cache, service worker, web storage for browsers supporting Clear-Site-Data header)')
+            res.set('Clear-Site-Data', '"cache", "storage"')
+            res.send()
+        })
     },
 
     /**
