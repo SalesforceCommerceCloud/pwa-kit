@@ -43,15 +43,15 @@ The configuration features include:
 
 ### Dedicated Configuration Files
 
-At project generation a single `default` configuration is created. For most cases a single configuration file will get the job done. But there are times where you want to have a different configuration for a different environment. These environments for example could be, a developers local machine, a remote `production` environment, or a remote `staging` environment. In all these cases you want to use a different configuration for each. 
+At project generation a single `default` configuration is created. For most cases a single configuration file will get the job done. But there are times when you want to have a different configuration for a different environment. These environments for example could be, a developers local machine, a remote `production` environment, or a remote `staging` environment. In all these cases you want to use a different configuration for each. 
 
-When multiple configurations are present, which configuration file to used is resolved in the following way: 
+When multiple configurations are present, here's how the correct configuration file is chosen:
 
 1. Check to see if there is a config file named after your remote Managed Runtime environment and use this if one is present.
 2. If we are running on a developer machine, look for a `local` configuration and use this if one is present.
 3. Load the `default` config file `config/default.js`.
 
-This allows you do these but not limited to things:
+This configuration system allows you to do the following:
 
 - Each developer can have their own configuration, connection to their own Commerce API sandboxes.
 - Deploy a single codebase application to multiple environments with their own specific configurations (Multiple B2C Site with Different Domains).
@@ -71,7 +71,7 @@ module.exports = {
     }
 }
 ```
-You can choose how the current locale appears (or doesn’t appear) in the URL by setting `url.locale` to one of the following values:
+You can choose how the current locale appears (or doesn't appear) in the URL by setting `url.locale` to one of the following values:
 
 - `path`: Locale is included in the URL path. Example: `/en-US/women/dress`
 - `query_param`: Locale is included as a query parameter. Example: `/women/dress?locale=en-US`
