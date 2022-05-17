@@ -12,7 +12,7 @@ export default {
             position: 'absolute',
             top: 0,
             right: 0,
-            width: 5,
+            minWidth: 5,
             height: 5,
             color: 'white',
             fontSize: 'xs',
