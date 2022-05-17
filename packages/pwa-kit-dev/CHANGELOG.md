@@ -1,40 +1,17 @@
-## v2.0.0-alpha.1 (May 11, 2022)
-## v2.0.0-alpha.1 (May 11, 2022)
-## v2.0.0-alpha.0 (May 11, 2022)
-## v2.0.0-alpha.0 (May 11, 2022)
-## v2.0.0-dev.8 (May 03, 2022)
-## v2.0.0-dev.7 (May 03, 2022)
-## v2.0.0-dev.6 (May 02, 2022)
-## v2.0.0-dev.5 (Apr 26, 2022)
-
+## v2.1.0-dev (May 16, 2022)
+## v2.0.0 (May 16, 2022)
+-   Make the createApp API idiomatic for Express, fix service-worker loading. [#536](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/536)
+-   Remove lodash and bluebird. [#534](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/534)
+-   Allow pass thru cli options for test command [#537](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/537)
 -   Ensure we copy the `package.json` file into the build folder. Also move logic for copying config files into the build script from the webpack config [#524](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/524)
-
-## v2.0.0-dev.4 (Apr 06, 2022)
-
 -   Loading page: avoid seeing infinite reloads [#532](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/532)
-
-## v2.0.0-dev.3 (Apr 01, 2022)
-## v2.0.0-dev.2 (Feb 10, 2022)
-
 -   Remove legacy remote proxy, which allowed remote environments to use proxy configs in package.json [#425](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/425)
-
-## v2.0.0-dev.2 (Feb 10, 2022)
-## v2.0.0-dev.1 (Feb 03, 2022)
-## v2.0.0-dev.1 (Feb 03, 2022)
-## v2.0.0-dev (Jan 27, 2022)
-## v1.3.0-dev (Nov 18, 2021)
-
--   `createApp` takes a new option `enableLegacyRemoteProxying` which defaults to `true`. When set to `false`, local development proxying is disabled when running remotely. In future, local development proxying will *always* be disabled when running remotely. [#205](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/205)
-
-## v1.2.0 (Nov 18, 2021)
-
--   Security package updates
--   Upgrade `copy-webpack-plugin` to latest `^9.0.1` version. [#3191](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/181)
-
-## v1.1.0 (Sep 27, 2021)
-
--   Update the bundle push command to remove legacy bundle upload preview URL from console output. [#81](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/81)
-
-## v1.0.0 (Sep 08, 2021)
-
--   PWA Kit General Avaliability and open source. 🎉
+-   Fix source maps cannot be found when debugging the server [#526](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/526)
+-   Generate different reports for different bundles [#508](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/508)
+-   Allow custom webpack config in projects [#462](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/462)
+-   Hide webpack performance warnings [#471](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/471)
+-   Support Multi-site implementation using dynamic config [#469](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/469)
+-   Loading screen [#473](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/473)
+-   Service worker loading for dev server [#464](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/464)
+-   Environment Specific Configuration Support [#477](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/447)
+-   Remove Webpack PwaKitConfigPlugin [#443](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/443)
