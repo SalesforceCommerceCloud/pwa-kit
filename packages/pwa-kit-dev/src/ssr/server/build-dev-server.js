@@ -145,7 +145,10 @@ export const DevServerMixin = {
         )
 
         app.get('/__mrt/clear-browser-data', (_, res) => {
-            console.log(chalk.cyan('Clearing browser data'), '(cache, service worker, web storage for browsers supporting Clear-Site-Data header)')
+            console.log(
+                chalk.cyan('Clearing browser data'),
+                '(cache, service worker, web storage for browsers supporting Clear-Site-Data header)'
+            )
 
             // Note: this header value needs the double quotes.
             // See https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Clear-Site-Data
