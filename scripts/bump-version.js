@@ -17,8 +17,9 @@ const main = () => {
     const rootPkg = JSON.parse(sh.cat(rootPkgPath))
     const rootLockPkg = JSON.parse(sh.cat(rootPkgLockPath))
 
-    // find all packages
-    sh.exec('npm run --silent lerna -- list --all --json', function(code, stdout, stderr) {
+    // find all monorepo packages, look inside each package json, find peerDependency that is a monorepo package
+    // and update it with a new version
+    sh.exec('npm run --silent lerna -- list --all --json', function(code, stdout) {
         const packages = JSON.parse(stdout.toString())
 
         const lernaPackageNames = packages.map(pkg => pkg.name)
