@@ -987,9 +987,7 @@ describe('getRuntime', () => {
     const matchExceptFunctionValues = (obj) => {
         const entries = Object.entries(obj)
         const matchers = entries.map(([key, value]) => {
-            const matcher = typeof value === 'function'
-                ? expect.any(Function)
-                : value
+            const matcher = typeof value === 'function' ? expect.any(Function) : value
             return [key, matcher]
         })
         return Object.fromEntries(matchers)
