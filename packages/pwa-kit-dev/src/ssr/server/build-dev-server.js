@@ -149,9 +149,12 @@ export const DevServerMixin = {
                 chalk.cyan('Clearing browser data'),
                 '(cache, service worker, web storage for browsers supporting Clear-Site-Data header)'
             )
+            console.log(
+                'For more info: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Clear-Site-Data#browser_compatibility'
+            )
+            console.log('')
 
             // Note: this header value needs the double quotes.
-            // See https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Clear-Site-Data
             res.set('Clear-Site-Data', '"cache", "storage"')
             res.send()
         })
