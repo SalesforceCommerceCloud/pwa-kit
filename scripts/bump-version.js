@@ -18,11 +18,11 @@ const main = () => {
 
     // find all monorepo packages, look inside each package json, find peerDependency that is a monorepo package
     // and update it with a new version
-    sh.exec('npm run --silent lerna -- list --all --json', {silent: true}, function(code, stdout) {
+    sh.exec('lerna -- list --all --json', {silent: true}, function(code, stdout) {
         const packages = JSON.parse(stdout.toString())
 
         const lernaPackageNames = packages.map(pkg => pkg.name)
-        packages.forEach(async ({location}) => {
+        packages.forEach(({location}) => {
             const pkgFilePath = path.join(location, 'package.json')
             const pkg = JSON.parse(sh.cat(pkgFilePath))
             const peerDependencies = pkg.peerDependencies
@@ -44,4 +44,4 @@ const main = () => {
     new sh.ShellString(JSON.stringify(rootLockPkg, null, 2)).to(rootPkgLockPath)
 };
 
-main();
+main()
