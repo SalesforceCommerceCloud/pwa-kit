@@ -19,7 +19,7 @@ const Matcher = require('../dist/utils/glob').Matcher
 
 const SDK_VERSION = require('../package.json').version
 const DEFAULT_DOCS_URL =
-    'https://dev.mobify.com/v2.x/how-to-guides/categories/deployment/pushing-and-publishing-bundles'
+    'https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/pushing-and-deploying-bundles.html'
 
 const Utils = {}
 
@@ -221,7 +221,7 @@ Utils.setDefaultMessage = () => {
         if (err.code === 'ENOENT') {
             console.log('Please run "git init" to initialize a new Git repository.')
         }
-        return 'Mobify Bundle'
+        return 'PWA Kit Bundle'
     }
 }
 
@@ -241,7 +241,7 @@ Utils.requestErrorMessage = {
         'You do not have permission to perform this actions.\nPlease double check your command to make sure the option values are correct.', //  wrong project name.
     code404:
         'Resource not found.\nPlease double check your command to make sure the option values are correct.', // wrong target name
-    code500: 'Internal Server Error. Please report this to Mobify support team.'
+    code500: 'Internal Server Error. Please report this to the Salesforce support team.'
 }
 
 module.exports = Utils
