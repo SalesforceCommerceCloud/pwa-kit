@@ -6,8 +6,8 @@ Developers don’t have to worry about the underlying infrastructure, whether th
 
 ## Requirements
 
--   Node ^14.x
--   npm ^6.14.4
+-   Node 14
+-   npm 6.14.4 or later
 
 ## Getting Started
 
