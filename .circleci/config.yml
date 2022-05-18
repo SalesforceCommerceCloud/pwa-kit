@@ -40,10 +40,12 @@ commands:
 
             # Report bundle sizes
             node ./scripts/report-bundle-size.js
-
-            # Add credentials file at ~/.mobify so we can upload to Mobify Cloud
-            npm run save-credentials --prefix packages/template-retail-react-app -- --user "${MOBIFY_CLIENT_USER}" --key "${MOBIFY_CLIENT_API_KEY}"
-
+            
+            if [ "$CIRCLE_PR_NUMBER" ]; then
+              # Add credentials file at ~/.mobify so we can upload to Mobify Cloud
+              npm run save-credentials --prefix packages/template-retail-react-app -- --user "${MOBIFY_CLIENT_USER}" --key "${MOBIFY_CLIENT_API_KEY}"
+            fi
+            
             # Check that packages are all using the same versions of compilers, etc.
             node ./scripts/check-dependencies.js
 
@@ -204,6 +206,12 @@ commands:
               circleci step halt
             fi
 
+  generator_store_verdaccio_log_file_artifact:
+    steps:
+      - store_artifacts:
+          path: packages/pwa-kit-create-app/local-npm-repo/verdaccio.log
+          destination: local-npm-repo/verdaccio.log
+
 jobs:
   testNode14Windows:
     executor:
@@ -295,6 +303,7 @@ jobs:
           command: |
             set GENERATOR_PRESET=<< parameters.template >>
             node packages/pwa-kit-create-app/scripts/create-mobify-app-dev.js --outputDir generated-<< parameters.template >>
+      - generator_store_verdaccio_log_file_artifact
   generatedTemplateWindows:
     parameters:
       template:
@@ -313,6 +322,7 @@ jobs:
           command: |
             set GENERATOR_PRESET=<< parameters.template >>
             node packages/pwa-kit-create-app/scripts/create-mobify-app-dev.js --outputDir generated-<< parameters.template >>
+      - generator_store_verdaccio_log_file_artifact
   generatedSFCCProjectTest:
     docker:
       - image: circleci/node:14-stretch-browsers
@@ -370,6 +380,7 @@ jobs:
               cd generated-project
               npm run push -- -s $project --message "Generated PWA build ${CIRCLE_BUILD_NUM} on ${CIRCLE_BRANCH} (${CIRCLE_SHA1})" --target $target
             fi
+      -generator_store_verdaccio_log_file_artifact
   generatedSFCCProjectTestWindows:
     executor:
       name: win/default
@@ -379,6 +390,7 @@ jobs:
       - checkout
       - setup_windows
       - generate_and_test_project
+      - generator_store_verdaccio_log_file_artifact
 workflows:
   version: 2
   test:
