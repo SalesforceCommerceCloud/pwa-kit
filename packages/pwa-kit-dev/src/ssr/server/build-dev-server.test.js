@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, salesforce.com, inc.
+ * Copyright (c) 2022, Salesforce, Inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
@@ -21,6 +21,7 @@ import https from 'https'
 import nock from 'nock'
 import zlib from 'zlib'
 import fse from 'fs-extra'
+import rimraf from 'rimraf'
 
 const TEST_PORT = 3444
 const testFixtures = path.resolve(__dirname, 'test_fixtures')
@@ -30,10 +31,8 @@ const testFixtures = path.resolve(__dirname, 'test_fixtures')
 // for testing.
 const NoWebpackDevServerFactory = {
     ...DevServerFactory,
-    ...{
-        _addSDKInternalHandlers() {},
-        _getRequestProcessor() {}
-    }
+    _addSDKInternalHandlers() {},
+    _getRequestProcessor() {}
 }
 
 const httpAgent = new http.Agent({})
@@ -677,33 +676,82 @@ describe('DevServer rendering', () => {
 })
 
 describe('DevServer service worker', () => {
-    const TestFactory = {
-        ...NoWebpackDevServerFactory,
-        _getWebpackAsset: jest.fn()
-    }
-    const MockWebpackDevMiddleware = {
-        waitUntilValid: (cb) => cb(),
-        context: {
-            stats: {
-                toJson: jest.fn()
-            }
-        }
+    let tmpDir
+
+    beforeEach(async () => {
+        tmpDir = await fse.mkdtemp(path.join(os.tmpdir(), 'pwa-kit-test-'))
+    })
+
+    afterEach(() => {
+        rimraf.sync(tmpDir)
+    })
+
+    const createApp = () => {
+        const app = NoWebpackDevServerFactory._createApp(opts())
+        // This isn't ideal! We need a way to test the dev middleware
+        // including the on demand webpack compiler. However, the webpack config and
+        // the Dev server assumes the code runs at the root of a project.
+        // When we run the tests, we are not in a project.
+        // We have a /test_fixtures project, but Jest does not support process.chdir(),
+        // nor mocking process.cwd(), so we mock the dev middleware for now.
+        // TODO: create a proper testing fixture project and run the tests in the isolated
+        // project environment.
+        return Object.assign(app, {
+            __devMiddleware: {
+                waitUntilValid: (cb) => cb(),
+                context: {
+                    outputFileSystem: fse,
+                    stats: {
+                        toJson: () => ({
+                            children: {
+                                find: () => ({
+                                    outputPath: tmpDir
+                                })
+                            }
+                        })
+                    }
+                }
+            },
+            __webpackReady: () => true
+        })
     }
 
-    beforeEach(() => TestFactory._getWebpackAsset.mockReset())
-
-    test('returns 404 if webpack asset is missing', () => {
-        TestFactory._getWebpackAsset.mockReturnValue(null)
-        const req = {
-            path: 'test.js',
-            app: {
-                __webpackReady: jest.fn().mockReturnValue(true),
-                __devMiddleware: MockWebpackDevMiddleware
-            }
+    const cases = [
+        {
+            file: 'worker.js',
+            content: '// a service worker',
+            name: 'Should serve the service worker',
+            requestPath: '/worker.js'
+        },
+        {
+            file: 'worker.js.map',
+            content: '{}',
+            name: 'Should serve the service worker source map',
+            requestPath: '/worker.js.map'
         }
-        const res = {sendStatus: jest.fn()}
-        TestFactory._serveServiceWorker(req, res)
-        expect(res.sendStatus).toHaveBeenCalledWith(404)
+    ]
+
+    cases.forEach(({file, content, name, requestPath}) => {
+        test(name, async () => {
+            const updatedFile = path.resolve(tmpDir, file)
+            await fse.writeFile(updatedFile, content)
+
+            const app = createApp()
+            app.get('/worker.js(.map)?', NoWebpackDevServerFactory.serveServiceWorker)
+
+            await request(app)
+                .get(requestPath)
+                .expect(200)
+                .then((res) => expect(res.text).toEqual(content))
+        })
+
+        test(`${name} (and handle 404s correctly)`, () => {
+            const app = createApp()
+
+            return request(app)
+                .get(requestPath)
+                .expect(404)
+        })
     })
 })
 
