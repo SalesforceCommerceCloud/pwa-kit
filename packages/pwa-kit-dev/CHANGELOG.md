@@ -1,4 +1,5 @@
 ## v2.1.0-dev (May 16, 2022)
+-   Replace `Mobify` references/links with proper PWA Kit values.
 ## v2.0.0 (May 16, 2022)
 -   Make the createApp API idiomatic for Express, fix service-worker loading. [#536](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/536)
 -   Remove lodash and bluebird. [#534](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/534)
