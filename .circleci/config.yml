@@ -41,11 +41,6 @@ commands:
             # Report bundle sizes
             node ./scripts/report-bundle-size.js
             
-            if [ "$CIRCLE_PR_NUMBER" ]; then
-              # Add credentials file at ~/.mobify so we can upload to Mobify Cloud
-              npm run save-credentials --prefix packages/template-retail-react-app -- --user "${MOBIFY_CLIENT_USER}" --key "${MOBIFY_CLIENT_API_KEY}"
-            fi
-            
             # Check that packages are all using the same versions of compilers, etc.
             node ./scripts/check-dependencies.js
 
@@ -193,6 +188,13 @@ commands:
                 echo "Found $TOTAL_PACKAGES installed packages (max $MAX_PACKAGES).";
             fi
 
+  create_mrt_credentials_file:
+    steps:
+      - run:
+          command: |
+            # Add credentials file at ~/.mobify so we can upload to Mobify Cloud
+            npm run save-credentials --prefix packages/template-retail-react-app -- --user "${MOBIFY_CLIENT_USER}" --key "${MOBIFY_CLIENT_API_KEY}"
+
   early_return_for_forked_pull_requests:
     description: >-
       If this build is from a fork, stop executing the current job and return success.
@@ -246,6 +248,7 @@ jobs:
       - lighthouse-ci
       - smoketestscripts
       - early_return_for_forked_pull_requests
+      - create_mrt_credentials_file
       - run:
           name: Push Bundle
           command: |
@@ -332,6 +335,7 @@ jobs:
       - generate_and_test_project
 
       - early_return_for_forked_pull_requests
+      - create_mrt_credentials_file
       - slack/status:
           fail_only: true
           only_for_branches: develop
