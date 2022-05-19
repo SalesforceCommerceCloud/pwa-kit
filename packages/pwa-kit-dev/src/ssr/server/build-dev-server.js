@@ -143,6 +143,21 @@ export const DevServerMixin = {
                 dotFiles: 'deny'
             })
         )
+
+        app.get('/__mrt/clear-browser-data', (_, res) => {
+            console.log(
+                chalk.cyan('Clearing browser data'),
+                '(cache, service worker, web storage for browsers supporting Clear-Site-Data header)'
+            )
+            console.log(
+                'For more info: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Clear-Site-Data#browser_compatibility'
+            )
+            console.log('')
+
+            // Note: this header value needs the double quotes.
+            res.set('Clear-Site-Data', '"cache", "storage"')
+            res.send()
+        })
     },
 
     /**
