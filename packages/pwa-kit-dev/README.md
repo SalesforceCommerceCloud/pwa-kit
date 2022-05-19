@@ -4,10 +4,8 @@ A command line interface tool to develop, build, and deploy PWA Kit projects.
 
 ## Requirements
 
-```
-  Node ^14.x
-  npm ^6.14.4
-```
+-   Node 14
+-   npm 6.14.4 or later
 
 To see all the available commands, run:
 
