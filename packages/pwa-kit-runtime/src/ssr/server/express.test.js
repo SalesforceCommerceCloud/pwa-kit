@@ -174,14 +174,9 @@ describe('_createApp validates environment variables', () => {
 describe('SSRServer operation', () => {
     const savedEnvironment = Object.assign({}, process.env)
     const sandbox = sinon.createSandbox()
-    let server
 
     afterEach(() => {
         sandbox.restore()
-        if (server) {
-            server.close()
-            server = null
-        }
         nock.cleanAll()
     })
 

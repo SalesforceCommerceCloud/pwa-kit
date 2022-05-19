@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, salesforce.com, inc.
+ * Copyright (c) 2022, Salesforce, Inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
@@ -375,7 +375,7 @@ export const DevServerMixin = {
  * @param assetPath - the path to the asset file (with no query string
  * or other URL elements)
  */
-const setLocalAssetHeaders = (res, assetPath) => {
+export const setLocalAssetHeaders = (res, assetPath) => {
     const base = path.basename(assetPath)
     const contentType = mimeTypes.lookup(base)
 
