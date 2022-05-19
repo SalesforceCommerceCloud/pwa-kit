@@ -28,7 +28,7 @@ const main = () => {
             const peerDependencies = pkg.peerDependencies
             peerDependencies && Object.keys(peerDependencies).forEach(dep => {
                 if (lernaPackageNames.includes(dep)) {
-                    console.log(`Lerna local packages ${dep} is found as a peerDependencies`)
+                    console.log(`Found lerna local package ${dep} as a peer dependency of ${pkg.name}.`)
                     peerDependencies[dep] = `^${lernaConfig.version}`
                     new sh.ShellString(JSON.stringify(pkg, null, 2)).to(pkgFilePath)
                 }
