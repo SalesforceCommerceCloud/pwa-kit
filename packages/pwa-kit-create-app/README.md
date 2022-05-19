@@ -4,10 +4,8 @@ A tool for generating Progressive Web App (PWA) Kit projects based on the Retail
 
 ## Requirements
 
-```
-  Node ^14.x
-  npm ^6.14.4
-```
+-   Node 14
+-   npm 6.14.4 or later
 
 ## Quick Start
 
