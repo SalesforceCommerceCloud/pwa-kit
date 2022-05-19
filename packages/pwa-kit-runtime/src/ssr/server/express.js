@@ -460,6 +460,10 @@ export const respondFromBundle = ({req, res, path, redirect = 301}) => {
     res.redirect(workingRedirect, location)
 }
 
+/**
+ * Get the appropriate runtime object for the current environment (remote or development)
+ * @returns Shallow of the runtime object with bound methods
+ */
 export const getRuntime = () => {
     const runtime = isRemote()
         ? RemoteServerFactory
@@ -473,11 +477,12 @@ export const getRuntime = () => {
     // Sometimes the runtime APIs are invoked directly as express middlewares.
     // In order to make sure the "this" keyword always have the correct context,
     // we bind every single method to have the context of the object itself
-    for (const property in runtime) {
-        if (runtime[property] instanceof Function) {
-            runtime[property] = runtime[property].bind(runtime)
+    const boundRuntime = {...runtime}
+    for (const property of Object.keys(boundRuntime)) {
+        if (typeof boundRuntime[property] === 'function') {
+            boundRuntime[property] = boundRuntime[property].bind(boundRuntime)
         }
     }
 
-    return runtime
+    return boundRuntime
 }

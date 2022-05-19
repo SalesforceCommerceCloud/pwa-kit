@@ -5,7 +5,8 @@
     "private": true,
     "devDependencies": {
         "pwa-kit-dev": "^2.1.0-dev",
-        "pwa-kit-runtime": "^2.1.0-dev"
+        "pwa-kit-runtime": "^2.1.0-dev",
+        "supertest": "^4.0.2"
     },
     "scripts": {
         "test": "pwa-kit-dev test",

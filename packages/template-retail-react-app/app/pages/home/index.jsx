@@ -34,7 +34,11 @@ import {getAssetUrl} from 'pwa-kit-react-sdk/ssr/universal/utils'
 import {heroFeatures, features} from './data'
 
 // Constants
-import {HOME_SHOP_PRODUCTS_CATEGORY_ID, HOME_SHOP_PRODUCTS_LIMIT} from '../../constants'
+import {
+    MAX_CACHE_AGE,
+    HOME_SHOP_PRODUCTS_CATEGORY_ID,
+    HOME_SHOP_PRODUCTS_LIMIT
+} from '../../constants'
 
 /**
  * This is the home page for Retail React App.
@@ -274,10 +278,8 @@ Home.shouldGetProps = ({previousLocation, location}) =>
     !previousLocation || previousLocation.pathname !== location.pathname
 
 Home.getProps = async ({res, api}) => {
-    // Since the home page is static, it is safe to set max age to a high value
-    // we set it to a year here, but you can set the value that is suitable for your project
     if (res) {
-        res.set('Cache-Control', 'max-age=31536000')
+        res.set('Cache-Control', `max-age=${MAX_CACHE_AGE}`)
     }
 
     const productSearchResult = await api.shopperSearch.productSearch({

@@ -72,7 +72,7 @@ describe('setDefaultMessage', () => {
             throw new Error('Failwhale')
         })
 
-        expect(Utils.setDefaultMessage()).toBe('Mobify Bundle')
+        expect(Utils.setDefaultMessage()).toBe('PWA Kit Bundle')
     })
 
     test('Bundle message defaults properly if git short fails', () => {
@@ -80,7 +80,7 @@ describe('setDefaultMessage', () => {
             throw new Error('Failwhale')
         })
 
-        expect(Utils.setDefaultMessage()).toBe('Mobify Bundle')
+        expect(Utils.setDefaultMessage()).toBe('PWA Kit Bundle')
     })
 
     test('Test message is printed if we have an ENOENT', () => {
