@@ -40,10 +40,7 @@ commands:
 
             # Report bundle sizes
             node ./scripts/report-bundle-size.js
-
-            # Add credentials file at ~/.mobify so we can upload to Mobify Cloud
-            npm run save-credentials --prefix packages/template-retail-react-app -- --user "${MOBIFY_CLIENT_USER}" --key "${MOBIFY_CLIENT_API_KEY}"
-
+            
             # Check that packages are all using the same versions of compilers, etc.
             node ./scripts/check-dependencies.js
 
@@ -191,6 +188,14 @@ commands:
                 echo "Found $TOTAL_PACKAGES installed packages (max $MAX_PACKAGES).";
             fi
 
+  create_mrt_credentials_file:
+    steps:
+      - run:
+          name: Create MRT credentials file
+          command: |
+            # Add credentials file at ~/.mobify so we can upload to Mobify Cloud
+            npm run save-credentials --prefix packages/template-retail-react-app -- --user "${MOBIFY_CLIENT_USER}" --key "${MOBIFY_CLIENT_API_KEY}"
+
   early_return_for_forked_pull_requests:
     description: >-
       If this build is from a fork, stop executing the current job and return success.
@@ -203,6 +208,12 @@ commands:
               echo "Nothing else to do for forked PRs, so marking this step successful"
               circleci step halt
             fi
+
+  generator_store_verdaccio_log_file_artifact:
+    steps:
+      - store_artifacts:
+          path: packages/pwa-kit-create-app/local-npm-repo/verdaccio.log
+          destination: local-npm-repo/verdaccio.log
 
 jobs:
   testNode14Windows:
@@ -238,6 +249,7 @@ jobs:
       - lighthouse-ci
       - smoketestscripts
       - early_return_for_forked_pull_requests
+      - create_mrt_credentials_file
       - run:
           name: Push Bundle
           command: |
@@ -295,6 +307,7 @@ jobs:
           command: |
             set GENERATOR_PRESET=<< parameters.template >>
             node packages/pwa-kit-create-app/scripts/create-mobify-app-dev.js --outputDir generated-<< parameters.template >>
+      - generator_store_verdaccio_log_file_artifact
   generatedTemplateWindows:
     parameters:
       template:
@@ -313,6 +326,7 @@ jobs:
           command: |
             set GENERATOR_PRESET=<< parameters.template >>
             node packages/pwa-kit-create-app/scripts/create-mobify-app-dev.js --outputDir generated-<< parameters.template >>
+      - generator_store_verdaccio_log_file_artifact
   generatedSFCCProjectTest:
     docker:
       - image: circleci/node:14-stretch-browsers
@@ -322,6 +336,7 @@ jobs:
       - generate_and_test_project
 
       - early_return_for_forked_pull_requests
+      - create_mrt_credentials_file
       - slack/status:
           fail_only: true
           only_for_branches: develop
@@ -370,6 +385,7 @@ jobs:
               cd generated-project
               npm run push -- -s $project --message "Generated PWA build ${CIRCLE_BUILD_NUM} on ${CIRCLE_BRANCH} (${CIRCLE_SHA1})" --target $target
             fi
+      - generator_store_verdaccio_log_file_artifact
   generatedSFCCProjectTestWindows:
     executor:
       name: win/default
@@ -379,6 +395,7 @@ jobs:
       - checkout
       - setup_windows
       - generate_and_test_project
+      - generator_store_verdaccio_log_file_artifact
 workflows:
   version: 2
   test:
