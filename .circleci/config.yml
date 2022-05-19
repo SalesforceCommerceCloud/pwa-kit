@@ -191,6 +191,7 @@ commands:
   create_mrt_credentials_file:
     steps:
       - run:
+          name: Create MRT credentials file
           command: |
             # Add credentials file at ~/.mobify so we can upload to Mobify Cloud
             npm run save-credentials --prefix packages/template-retail-react-app -- --user "${MOBIFY_CLIENT_USER}" --key "${MOBIFY_CLIENT_API_KEY}"
