@@ -97,7 +97,7 @@ const withLocalNPMRepo = (func) => {
                                 } else {
                                     const readStream = fs.createReadStream(logFileName, 'utf8')
 
-                                    readStream.on('error', function(error) {
+                                    readStream.on('error', (error) => {
                                         console.error(
                                             `Failed to read ${logFileName}: ${error.message}`
                                         )
