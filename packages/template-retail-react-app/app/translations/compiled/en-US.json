@@ -2179,36 +2179,6 @@
       "value": "ea"
     }
   ],
-  "product_detail.accordion.button.product_detail": [
-    {
-      "type": 0,
-      "value": "Product Detail"
-    }
-  ],
-  "product_detail.accordion.button.questions": [
-    {
-      "type": 0,
-      "value": "Questions"
-    }
-  ],
-  "product_detail.accordion.button.reviews": [
-    {
-      "type": 0,
-      "value": "Reviews"
-    }
-  ],
-  "product_detail.accordion.button.size_fit": [
-    {
-      "type": 0,
-      "value": "Size & Fit"
-    }
-  ],
-  "product_detail.accordion.message.coming_soon": [
-    {
-      "type": 0,
-      "value": "Coming Soon"
-    }
-  ],
   "product_detail.info.added_to_wishlist": [
     {
       "type": 1,
@@ -2245,24 +2215,6 @@
     {
       "type": 0,
       "value": " added to wishlist"
-    }
-  ],
-  "product_detail.recommended_products.title.complete_set": [
-    {
-      "type": 0,
-      "value": "Complete the Set"
-    }
-  ],
-  "product_detail.recommended_products.title.might_also_like": [
-    {
-      "type": 0,
-      "value": "You might also like"
-    }
-  ],
-  "product_detail.recommended_products.title.recently_viewed": [
-    {
-      "type": 0,
-      "value": "Recently Viewed"
     }
   ],
   "product_item.label.quantity": [

@@ -19,7 +19,9 @@ import {
     AccordionIcon,
     Box,
     Button,
-    Stack
+    Stack,
+    Heading,
+    Divider
 } from '@chakra-ui/react'
 
 // Hooks
@@ -30,17 +32,30 @@ import useNavigation from '../../hooks/use-navigation'
 import useEinstein from '../../commerce-api/hooks/useEinstein'
 
 // Project Components
-import RecommendedProducts from '../../components/recommended-products'
-import ProductView from '../../partials/product-view'
-
+// import RecommendedProducts from '../../components/recommended-products'
+import ProductViewTest from '../../partials/product-view'
+import ProductDetailLayout from 'pwa-kit-ecom/pages/product-detail'
 // Others/Utils
 import {HTTPNotFound} from 'pwa-kit-react-sdk/ssr/universal/errors'
-
+import ProductView from 'pwa-kit-ecom/components/product-view'
+import {ProductProvider} from 'pwa-kit-ecom/components/product-provider'
 // constant
 import {API_ERROR_MESSAGE} from '../../constants'
 import {rebuildPathWithParams} from '../../utils/url'
 import {useHistory} from 'react-router-dom'
 import {useToast} from '../../hooks/use-toast'
+
+const CustomGallery = ({product}) => {
+    console.log('CustomGallery', product)
+    const heroGroup = product?.imageGroups?.find((group) => group.viewType === 'large')
+    console.log('heroGroup', heroGroup)
+
+    return (
+        <Box minWidth={'680px'}>
+            <img src={heroGroup?.images[0].link} />
+        </Box>
+    )
+}
 
 const ProductDetail = ({category, product, isLoading}) => {
     const {formatMessage} = useIntl()
@@ -139,6 +154,7 @@ const ProductDetail = ({category, product, isLoading}) => {
         }
     }, [product])
 
+    console.log('retail app product ', product)
     return (
         <Box
             className="sf-product-detail-page"
@@ -150,146 +166,45 @@ const ProductDetail = ({category, product, isLoading}) => {
                 <meta name="description" content={product?.pageDescription} />
             </Helmet>
 
-            <Stack spacing={16}>
+            {/*<ProductViewTest*/}
+            {/*    product={product}*/}
+            {/*    category={primaryCategory?.parentCategoryTree || []}*/}
+            {/*    addToCart={(variant, quantity) => handleAddToCart(variant, quantity)}*/}
+            {/*    addToWishlist={(_, quantity) => handleAddToWishlist(quantity)}*/}
+            {/*    isProductLoading={isLoading}*/}
+            {/*    isCustomerProductListLoading={!wishlist.isInitialized}*/}
+            {/*/>*/}
+
+            <Heading size={'md'}>No customisation</Heading>
+            <Stack mt={8}>
+                <ProductView product={product} />
+            </Stack>
+
+            <Divider height="10px" />
+
+            <Heading mt={16} size={'md'}>
+                Partial customisation by replace some components in ProductView
+            </Heading>
+
+            <Stack>
                 <ProductView
                     product={product}
-                    category={primaryCategory?.parentCategoryTree || []}
-                    addToCart={(variant, quantity) => handleAddToCart(variant, quantity)}
-                    addToWishlist={(_, quantity) => handleAddToWishlist(quantity)}
-                    isProductLoading={isLoading}
-                    isCustomerProductListLoading={!wishlist.isInitialized}
+                    imageGallery={<CustomGallery product={product} />}
+                    productTitle={<Box bg={'red'}> Customed Product Title</Box>}
                 />
+            </Stack>
 
-                {/* Information Accordion */}
-                <Stack direction="row" spacing={[0, 0, 0, 16]}>
-                    <Accordion allowMultiple allowToggle maxWidth={'896px'} flex={[1, 1, 1, 5]}>
-                        {/* Details */}
-                        <AccordionItem>
-                            <h2>
-                                <AccordionButton height="64px">
-                                    <Box flex="1" textAlign="left" fontWeight="bold" fontSize="lg">
-                                        {formatMessage({
-                                            defaultMessage: 'Product Detail',
-                                            id: 'product_detail.accordion.button.product_detail'
-                                        })}
-                                    </Box>
-                                    <AccordionIcon />
-                                </AccordionButton>
-                            </h2>
-                            <AccordionPanel mb={6} mt={4}>
-                                <div
-                                    dangerouslySetInnerHTML={{
-                                        __html: product?.longDescription
-                                    }}
-                                />
-                            </AccordionPanel>
-                        </AccordionItem>
+            <Divider height="10px" />
 
-                        {/* Size & Fit */}
-                        <AccordionItem>
-                            <h2>
-                                <AccordionButton height="64px">
-                                    <Box flex="1" textAlign="left" fontWeight="bold" fontSize="lg">
-                                        {formatMessage({
-                                            defaultMessage: 'Size & Fit',
-                                            id: 'product_detail.accordion.button.size_fit'
-                                        })}
-                                    </Box>
-                                    <AccordionIcon />
-                                </AccordionButton>
-                            </h2>
-                            <AccordionPanel mb={6} mt={4}>
-                                {formatMessage({
-                                    defaultMessage: 'Coming Soon',
-                                    id: 'product_detail.accordion.message.coming_soon'
-                                })}
-                            </AccordionPanel>
-                        </AccordionItem>
-
-                        {/* Reviews */}
-                        <AccordionItem>
-                            <h2>
-                                <AccordionButton height="64px">
-                                    <Box flex="1" textAlign="left" fontWeight="bold" fontSize="lg">
-                                        {formatMessage({
-                                            defaultMessage: 'Reviews',
-                                            id: 'product_detail.accordion.button.reviews'
-                                        })}
-                                    </Box>
-                                    <AccordionIcon />
-                                </AccordionButton>
-                            </h2>
-                            <AccordionPanel mb={6} mt={4}>
-                                {formatMessage({
-                                    defaultMessage: 'Coming Soon',
-                                    id: 'product_detail.accordion.message.coming_soon'
-                                })}
-                            </AccordionPanel>
-                        </AccordionItem>
-
-                        {/* Questions */}
-                        <AccordionItem>
-                            <h2>
-                                <AccordionButton height="64px">
-                                    <Box flex="1" textAlign="left" fontWeight="bold" fontSize="lg">
-                                        {formatMessage({
-                                            defaultMessage: 'Questions',
-                                            id: 'product_detail.accordion.button.questions'
-                                        })}
-                                    </Box>
-                                    <AccordionIcon />
-                                </AccordionButton>
-                            </h2>
-                            <AccordionPanel mb={6} mt={4}>
-                                {formatMessage({
-                                    defaultMessage: 'Coming Soon',
-                                    id: 'product_detail.accordion.message.coming_soon'
-                                })}
-                            </AccordionPanel>
-                        </AccordionItem>
-                    </Accordion>
-                    <Box display={['none', 'none', 'none', 'block']} flex={4}></Box>
-                </Stack>
-
-                {/* Product Recommendations */}
-                <Stack spacing={16}>
-                    <RecommendedProducts
-                        title={
-                            <FormattedMessage
-                                defaultMessage="Complete the Set"
-                                id="product_detail.recommended_products.title.complete_set"
-                            />
-                        }
-                        recommender={'complete-the-set'}
-                        products={product && [product.id]}
-                        mx={{base: -4, md: -8, lg: 0}}
-                        shouldFetch={() => product?.id}
-                    />
-
-                    <RecommendedProducts
-                        title={
-                            <FormattedMessage
-                                defaultMessage="You might also like"
-                                id="product_detail.recommended_products.title.might_also_like"
-                            />
-                        }
-                        recommender={'pdp-similar-items'}
-                        products={product && [product.id]}
-                        mx={{base: -4, md: -8, lg: 0}}
-                        shouldFetch={() => product?.id}
-                    />
-
-                    <RecommendedProducts
-                        title={
-                            <FormattedMessage
-                                defaultMessage="Recently Viewed"
-                                id="product_detail.recommended_products.title.recently_viewed"
-                            />
-                        }
-                        recommender={'viewed-recently-einstein'}
-                        mx={{base: -4, md: -8, lg: 0}}
-                    />
-                </Stack>
+            <Heading size={'md'} mt={16}>
+                Fully customisation by replace while product view
+            </Heading>
+            <Stack mt={8}>
+                <Box bg={'aqua'} minWidth={'680px'}>
+                    Customised Product View
+                    <Box>{product?.name}</Box>
+                    <Box>{product?.longDescription}</Box>
+                </Box>
             </Stack>
         </Box>
     )
@@ -300,7 +215,6 @@ ProductDetail.getTemplateName = () => 'product-detail'
 ProductDetail.shouldGetProps = ({previousLocation, location}) => {
     const previousParams = new URLSearchParams(previousLocation?.search || '')
     const params = new URLSearchParams(location.search)
-
     // If the product changed via the pathname or `pid` param, allow updated
     // data to be retrieved.
     return (
