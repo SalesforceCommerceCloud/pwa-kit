@@ -111,6 +111,8 @@ const withLocalNPMRepo = (func) => {
                                             process.env['npm_config_registry'] =
                                                 'http://localhost:4873/'
                                             resolve()
+                                        } else {
+                                            waitForLogFileExists()
                                         }
                                     })
                                 }
