@@ -315,7 +315,7 @@ jobs:
         type: string
     executor:
       name: win/default
-      size: "large"
+      size: "medium"
       shell: bash.exe
     steps:
       - checkout
