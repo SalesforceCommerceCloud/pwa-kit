@@ -174,14 +174,9 @@ describe('_createApp validates environment variables', () => {
 describe('SSRServer operation', () => {
     const savedEnvironment = Object.assign({}, process.env)
     const sandbox = sinon.createSandbox()
-    let server
 
     afterEach(() => {
         sandbox.restore()
-        if (server) {
-            server.close()
-            server = null
-        }
         nock.cleanAll()
     })
 
@@ -984,6 +979,15 @@ describe('getRuntime', () => {
         }
     })
 
+    const matchExceptFunctionValues = (obj) => {
+        const entries = Object.entries(obj)
+        const matchers = entries.map(([key, value]) => {
+            const matcher = typeof value === 'function' ? expect.any(Function) : value
+            return [key, matcher]
+        })
+        return Object.fromEntries(matchers)
+    }
+
     const cases = [
         {
             env: {},
@@ -1017,11 +1021,11 @@ describe('getRuntime', () => {
         'should return a remote/development runtime $msg',
         ({env, expectedRuntime}) => {
             process.env = {...process.env, ...env}
-            expect(getRuntime()).toBe(expectedRuntime)
+            expect(getRuntime()).toMatchObject(matchExceptFunctionValues(expectedRuntime))
         }
     )
 
-    test('should return a remote/development runtime with the correct context', () => {
+    test('should return a remote/development runtime bound to the correct context', () => {
         const mockDevRuntime = getRuntime()
         const func = mockDevRuntime.returnMyName
         expect(func()).toBe(MockDevServerFactory.name)

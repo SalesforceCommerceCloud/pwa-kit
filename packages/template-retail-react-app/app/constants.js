@@ -60,3 +60,5 @@ export const urlPartPositions = {
 }
 
 export const DEFAULT_SITE_TITLE = 'Retail React App'
+
+export const MAX_CACHE_AGE = 60 * 15 // 15 min
