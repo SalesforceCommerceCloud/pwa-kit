@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, salesforce.com, inc.
+ * Copyright (c) 2022, Salesforce, Inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
@@ -13,13 +13,15 @@ const {
 } = require('pwa-kit-runtime/ssr/server/express')
 import fetch from 'node-fetch'
 import request from 'supertest'
-import {makeErrorHandler, DevServerFactory} from './build-dev-server'
+import {makeErrorHandler, DevServerFactory, setLocalAssetHeaders} from './build-dev-server'
+import os from 'os'
 import path from 'path'
 import http from 'http'
 import https from 'https'
 import nock from 'nock'
 import zlib from 'zlib'
-import fs from 'fs'
+import fse from 'fs-extra'
+import rimraf from 'rimraf'
 
 const TEST_PORT = 3444
 const testFixtures = path.resolve(__dirname, 'test_fixtures')
@@ -29,10 +31,8 @@ const testFixtures = path.resolve(__dirname, 'test_fixtures')
 // for testing.
 const NoWebpackDevServerFactory = {
     ...DevServerFactory,
-    ...{
-        _addSDKInternalHandlers() {},
-        _getRequestProcessor() {}
-    }
+    _addSDKInternalHandlers() {},
+    _getRequestProcessor() {}
 }
 
 const httpAgent = new http.Agent({})
@@ -528,7 +528,7 @@ describe('DevServer persistent caching support', () => {
                 res.status(status)
                 res.setHeader('content-type', 'application/javascript')
                 res.setHeader('content-encoding', 'gzip')
-                res.send(zlib.gzipSync(fs.readFileSync(path.join(testFixtures, 'app', 'main.js'))))
+                res.send(zlib.gzipSync(fse.readFileSync(path.join(testFixtures, 'app', 'main.js'))))
                 break
 
             case 'compressed-responses-test':
@@ -618,6 +618,140 @@ describe('DevServer persistent caching support', () => {
                 const uncompressed = zlib.gunzipSync(entry.data)
                 expect(uncompressed.toString()).toEqual(res.text)
             })
+    })
+})
+
+describe('DevServer helpers', () => {
+    test('Local asset headers', async () => {
+        const tmpDir = await fse.mkdtemp(path.join(os.tmpdir(), 'pwa-kit-'))
+        const tmpFile = path.join(tmpDir, 'local-asset-headers-test.svg')
+        await fse.ensureFile(tmpFile)
+        const now = new Date()
+        await fse.utimes(tmpFile, now, now)
+
+        const res = new Map() // Don't need a full Response, just `.set` functionality
+        setLocalAssetHeaders(res, tmpFile)
+
+        expect([...res]).toEqual([
+            ['content-type', 'image/svg+xml'],
+            ['date', now.toUTCString()],
+            ['last-modified', now.toUTCString()],
+            ['etag', now.getTime()],
+            ['cache-control', 'max-age=0, nocache, nostore, must-revalidate']
+        ])
+    })
+})
+
+describe('DevServer rendering', () => {
+    test('uses hot server middleware when ready', () => {
+        const req = {
+            app: {
+                __webpackReady: jest.fn().mockReturnValue(true),
+                __hotServerMiddleware: jest.fn()
+            }
+        }
+        const res = {}
+        const next = jest.fn()
+
+        NoWebpackDevServerFactory.render(req, res, next)
+
+        expect(req.app.__hotServerMiddleware).toHaveBeenCalledWith(req, res, next)
+    })
+
+    test('uses hot server middleware when ready', () => {
+        const TestFactory = {
+            ...NoWebpackDevServerFactory,
+            _redirectToLoadingScreen: jest.fn()
+        }
+        const req = {
+            app: {__webpackReady: jest.fn().mockReturnValue(false)}
+        }
+        const res = {}
+        const next = jest.fn()
+
+        TestFactory.render(req, res, next)
+
+        expect(TestFactory._redirectToLoadingScreen).toHaveBeenCalledWith(req, res, next)
+    })
+})
+
+describe('DevServer service worker', () => {
+    let tmpDir
+
+    beforeEach(async () => {
+        tmpDir = await fse.mkdtemp(path.join(os.tmpdir(), 'pwa-kit-test-'))
+    })
+
+    afterEach(() => {
+        rimraf.sync(tmpDir)
+    })
+
+    const createApp = () => {
+        const app = NoWebpackDevServerFactory._createApp(opts())
+        // This isn't ideal! We need a way to test the dev middleware
+        // including the on demand webpack compiler. However, the webpack config and
+        // the Dev server assumes the code runs at the root of a project.
+        // When we run the tests, we are not in a project.
+        // We have a /test_fixtures project, but Jest does not support process.chdir(),
+        // nor mocking process.cwd(), so we mock the dev middleware for now.
+        // TODO: create a proper testing fixture project and run the tests in the isolated
+        // project environment.
+        return Object.assign(app, {
+            __devMiddleware: {
+                waitUntilValid: (cb) => cb(),
+                context: {
+                    outputFileSystem: fse,
+                    stats: {
+                        toJson: () => ({
+                            children: {
+                                find: () => ({
+                                    outputPath: tmpDir
+                                })
+                            }
+                        })
+                    }
+                }
+            },
+            __webpackReady: () => true
+        })
+    }
+
+    const cases = [
+        {
+            file: 'worker.js',
+            content: '// a service worker',
+            name: 'Should serve the service worker',
+            requestPath: '/worker.js'
+        },
+        {
+            file: 'worker.js.map',
+            content: '{}',
+            name: 'Should serve the service worker source map',
+            requestPath: '/worker.js.map'
+        }
+    ]
+
+    cases.forEach(({file, content, name, requestPath}) => {
+        test(name, async () => {
+            const updatedFile = path.resolve(tmpDir, file)
+            await fse.writeFile(updatedFile, content)
+
+            const app = createApp()
+            app.get('/worker.js(.map)?', NoWebpackDevServerFactory.serveServiceWorker)
+
+            await request(app)
+                .get(requestPath)
+                .expect(200)
+                .then((res) => expect(res.text).toEqual(content))
+        })
+
+        test(`${name} (and handle 404s correctly)`, () => {
+            const app = createApp()
+
+            return request(app)
+                .get(requestPath)
+                .expect(404)
+        })
     })
 })
 
