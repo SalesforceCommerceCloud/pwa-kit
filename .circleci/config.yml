@@ -165,9 +165,9 @@ commands:
           command: |
             set GENERATOR_PRESET=test-project
             node packages/pwa-kit-create-app/scripts/create-mobify-app-dev.js --outputDir generated-project
-            
             cd generated-project
             npm run build
+          no_output_timeout: 5m
       - runtests:
           cwd: generated-project
       - smoketestscripts:
@@ -307,6 +307,7 @@ jobs:
           command: |
             set GENERATOR_PRESET=<< parameters.template >>
             node packages/pwa-kit-create-app/scripts/create-mobify-app-dev.js --outputDir generated-<< parameters.template >>
+          no_output_timeout: 5m
       - generator_store_verdaccio_log_file_artifact
   generatedTemplateWindows:
     parameters:
@@ -314,7 +315,7 @@ jobs:
         type: string
     executor:
       name: win/default
-      size: "large"
+      size: "medium"
       shell: bash.exe
     steps:
       - checkout
@@ -326,6 +327,7 @@ jobs:
           command: |
             set GENERATOR_PRESET=<< parameters.template >>
             node packages/pwa-kit-create-app/scripts/create-mobify-app-dev.js --outputDir generated-<< parameters.template >>
+          no_output_timeout: 5m
       - generator_store_verdaccio_log_file_artifact
   generatedSFCCProjectTest:
     docker:
