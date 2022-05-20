@@ -165,9 +165,9 @@ commands:
           command: |
             set GENERATOR_PRESET=test-project
             node packages/pwa-kit-create-app/scripts/create-mobify-app-dev.js --outputDir generated-project
-            no_output_timeout: 5m
             cd generated-project
             npm run build
+          no_output_timeout: 5m
       - runtests:
           cwd: generated-project
       - smoketestscripts:
