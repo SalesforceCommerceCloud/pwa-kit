@@ -87,15 +87,22 @@ const withLocalNPMRepo = (func) => {
                         }
                     })
 
-                    const checkTime = 1000
+                    const CHECK_TIME = 1000
 
                     const waitForLogFileExists = () => {
                         setTimeout(() => {
-                            fs.readFile(logFileName, (err) => {
-                                if (err) {
+                            fs.readFile(logFileName, 'utf8', (err, data) => {
+                                if (err || !data) {
                                     waitForLogFileExists()
                                 } else {
-                                    const readStream = fs.createReadStream(logFileName)
+                                    const readStream = fs.createReadStream(logFileName, 'utf8')
+
+                                    readStream.on('error', function(error) {
+                                        console.error(
+                                            `Failed to read ${logFileName}: ${error.message}`
+                                        )
+                                        waitForLogFileExists()
+                                    })
 
                                     readStream.on('data', (data) => {
                                         if (data.includes('http address')) {
@@ -108,7 +115,7 @@ const withLocalNPMRepo = (func) => {
                                     })
                                 }
                             })
-                        }, checkTime)
+                        }, CHECK_TIME)
                     }
 
                     waitForLogFileExists()
