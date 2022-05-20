@@ -944,8 +944,32 @@
     "defaultMessage": "ea",
     "description": "Abbreviated 'each', follows price per item, like $10/ea"
   },
+  "product_detail.accordion.button.product_detail": {
+    "defaultMessage": "Product Detail"
+  },
+  "product_detail.accordion.button.questions": {
+    "defaultMessage": "Questions"
+  },
+  "product_detail.accordion.button.reviews": {
+    "defaultMessage": "Reviews"
+  },
+  "product_detail.accordion.button.size_fit": {
+    "defaultMessage": "Size & Fit"
+  },
+  "product_detail.accordion.message.coming_soon": {
+    "defaultMessage": "Coming Soon"
+  },
   "product_detail.info.added_to_wishlist": {
     "defaultMessage": "{quantity} {quantity, plural, one {item} other {items}} added to wishlist"
+  },
+  "product_detail.recommended_products.title.complete_set": {
+    "defaultMessage": "Complete the Set"
+  },
+  "product_detail.recommended_products.title.might_also_like": {
+    "defaultMessage": "You might also like"
+  },
+  "product_detail.recommended_products.title.recently_viewed": {
+    "defaultMessage": "Recently Viewed"
   },
   "product_item.label.quantity": {
     "defaultMessage": "Quantity:"
