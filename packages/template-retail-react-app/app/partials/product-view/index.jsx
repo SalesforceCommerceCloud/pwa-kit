@@ -11,7 +11,7 @@ import {useHistory, useLocation} from 'react-router-dom'
 import {useIntl} from 'react-intl'
 
 import {Flex, Heading, Button, Skeleton, Box, Text, VStack, Fade, useTheme} from '@chakra-ui/react'
-import {useProduct as useProductTest} from '../../hooks'
+import {useProduct} from '../../hooks'
 import {useAddToCartModalContext} from '../../hooks/use-add-to-cart-modal'
 
 // project components
@@ -102,7 +102,7 @@ const ProductView = ({
         variationAttributes,
         stockLevel,
         stepQuantity
-    } = useProductTest(product)
+    } = useProduct(product)
     const canAddToWishlist = !isProductLoading
     const canOrder =
         !isProductLoading &&
