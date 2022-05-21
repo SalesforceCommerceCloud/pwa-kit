@@ -16,7 +16,9 @@ import WebpackNotifierPlugin from 'webpack-notifier'
 import CopyPlugin from 'copy-webpack-plugin'
 import {BundleAnalyzerPlugin} from 'webpack-bundle-analyzer'
 import LoadablePlugin from '@loadable/webpack-plugin'
+import ReactRefreshWebpackPlugin from '@pmmmwh/react-refresh-webpack-plugin'
 import SpeedMeasurePlugin from 'speed-measure-webpack-plugin'
+
 import {createModuleReplacementPlugin} from './plugins'
 import {CLIENT, SERVER, CLIENT_OPTIONAL, SSR, REQUEST_PROCESSOR} from './config-names'
 
@@ -103,6 +105,9 @@ const baseConfig = (target) => {
                     minimize: mode === production
                 },
                 output: {
+                    // TODO: why this makes a difference?
+                    // TODO: try removing it from Kevin's branch and see the result
+                    // publicPath: '/mobify/bundle/development/',
                     publicPath: '',
                     path: buildDir
                 },
@@ -119,7 +124,8 @@ const baseConfig = (target) => {
                         react: findInProjectThenSDK('react'),
                         'react-router-dom': findInProjectThenSDK('react-router-dom'),
                         'react-dom': findInProjectThenSDK('react-dom'),
-                        'react-helmet': findInProjectThenSDK('react-helmet')
+                        'react-helmet': findInProjectThenSDK('react-helmet'),
+                        'webpack-hot-middleware': findInProjectThenSDK('webpack-hot-middleware')
                     },
                     ...(target === 'web' ? {fallback: {crypto: false}} : {})
                 },
@@ -133,12 +139,19 @@ const baseConfig = (target) => {
                     }),
 
                     mode === development && new webpack.NoEmitOnErrorsPlugin(),
+                    mode === development && new webpack.HotModuleReplacementPlugin(),
+                    mode === development &&
+                        new ReactRefreshWebpackPlugin({
+                            overlay: {
+                                sockIntegration: 'whm'
+                            }
+                        }),
 
                     createModuleReplacementPlugin(projectDir),
 
                     // Don't chunk if it's a node target – faster Lambda startup.
                     target === 'node' && new webpack.optimize.LimitChunkCountPlugin({maxChunks: 1})
-                ].filter((x) => !!x),
+                ].filter(Boolean),
 
                 module: {
                     rules: [
@@ -150,7 +163,11 @@ const baseConfig = (target) => {
                                     loader: findInProjectThenSDK('babel-loader'),
                                     options: {
                                         rootMode: 'upward',
-                                        cacheDirectory: true
+                                        cacheDirectory: true,
+                                        plugins: [
+                                            mode === development &&
+                                                require.resolve('react-refresh/babel')
+                                        ].filter(Boolean)
                                     }
                                 }
                             ]
@@ -224,7 +241,10 @@ const client =
                 // use source map to make debugging easier
                 devtool: mode === development ? 'source-map' : false,
                 entry: {
-                    main: './app/main'
+                    main: [
+                        mode === development && 'webpack-hot-middleware/client',
+                        './app/main'
+                    ].filter(Boolean)
                 },
                 plugins: [
                     ...config.plugins,
@@ -234,6 +254,10 @@ const client =
                 // Hide the performance hints, since we already have a similar `bundlesize` check in `template-retail-react-app` package
                 performance: {
                     hints: false
+                },
+                output: {
+                    ...config.output,
+                    ...(mode === development ? {publicPath: '/mobify/bundle/development/'} : {})
                 }
             }
         })

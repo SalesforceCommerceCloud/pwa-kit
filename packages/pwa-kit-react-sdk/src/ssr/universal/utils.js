@@ -19,6 +19,9 @@ const onClient = typeof window !== 'undefined'
  * @returns {string}
  */
 export const getAssetUrl = (path) => {
+    if (/^\/?mobify\/bundle\//.test(path)) {
+        return path
+    }
     /* istanbul ignore next */
     return onClient
         ? `${window.Progressive.buildOrigin}${path}`
