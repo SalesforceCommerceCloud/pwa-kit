@@ -1,13 +1,13 @@
 import React from 'react'
 import ImageGallery from '../image-gallary'
 import ProductTitle from '../product-title'
-import {useProduct} from '../../hooks/useProduct'
-import {Flex, Box, VStack, Text} from '@chakra-ui/react'
-import {useIntl} from 'react-intl'
+import {Flex, Box, VStack} from '@chakra-ui/react'
 
 function ProductView(props) {
+    console.log('ProductView props', props )
     const {imageGallery, productTitle, product} = props
-    console.log('product View ==================== product', product)
+    // const {product, variationParams} = useProduct(props.product)
+
     return (
         <Flex direction={'column'} data-testid="product-view">
             {/* Basic information etc. title, price, breadcrumb*/}

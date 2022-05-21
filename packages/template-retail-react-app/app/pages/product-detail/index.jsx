@@ -33,12 +33,9 @@ import useEinstein from '../../commerce-api/hooks/useEinstein'
 
 // Project Components
 // import RecommendedProducts from '../../components/recommended-products'
-import ProductViewTest from '../../partials/product-view'
-import ProductDetailLayout from 'pwa-kit-ecom/pages/product-detail'
 // Others/Utils
 import {HTTPNotFound} from 'pwa-kit-react-sdk/ssr/universal/errors'
 import ProductView from 'pwa-kit-ecom/components/product-view'
-import {ProductProvider} from 'pwa-kit-ecom/components/product-provider'
 // constant
 import {API_ERROR_MESSAGE} from '../../constants'
 import {rebuildPathWithParams} from '../../utils/url'
@@ -46,9 +43,7 @@ import {useHistory} from 'react-router-dom'
 import {useToast} from '../../hooks/use-toast'
 
 const CustomGallery = ({product}) => {
-    console.log('CustomGallery', product)
     const heroGroup = product?.imageGroups?.find((group) => group.viewType === 'large')
-    console.log('heroGroup', heroGroup)
 
     return (
         <Box minWidth={'680px'}>
@@ -58,101 +53,16 @@ const CustomGallery = ({product}) => {
 }
 
 const ProductDetail = ({category, product, isLoading}) => {
-    const {formatMessage} = useIntl()
-    const basket = useBasket()
-    const history = useHistory()
-    const einstein = useEinstein()
-    const variant = useVariant(product)
-    const toast = useToast()
-    const navigate = useNavigation()
-    const [primaryCategory, setPrimaryCategory] = useState(category)
+    // const {formatMessage} = useIntl()
+    // const basket = useBasket()
+    // const history = useHistory()
+    // const einstein = useEinstein()
+    // const variant = useVariant(product)
+    // const toast = useToast()
+    // const navigate = useNavigation()
+    // const [primaryCategory, setPrimaryCategory] = useState(category)
 
-    // This page uses the `primaryCategoryId` to retrieve the category data. This attribute
-    // is only available on `master` products. Since a variation will be loaded once all the
-    // attributes are selected (to get the correct inventory values), the category information
-    // is overridden. This will allow us to keep the initial category around until a different
-    // master product is loaded.
-    useEffect(() => {
-        if (category) {
-            setPrimaryCategory(category)
-        }
-    }, [category])
-
-    /**************** Product Variant ****************/
-    useEffect(() => {
-        // update the variation attributes parameter on
-        // the url accordingly as the variant changes
-        const updatedUrl = rebuildPathWithParams(`${location.pathname}${location.search}`, {
-            pid: variant?.productId
-        })
-        history.replace(updatedUrl)
-    }, [variant])
-
-    /**************** Wishlist ****************/
-    const wishlist = useWishlist()
-    const handleAddToWishlist = async (quantity) => {
-        try {
-            await wishlist.createListItem({
-                id: product.id,
-                quantity
-            })
-            toast({
-                title: formatMessage(
-                    {
-                        defaultMessage:
-                            '{quantity} {quantity, plural, one {item} other {items}} added to wishlist',
-                        id: 'product_detail.info.added_to_wishlist'
-                    },
-                    {quantity: 1}
-                ),
-                status: 'success',
-                action: (
-                    <Button variant="link" onClick={() => navigate('/account/wishlist')}>
-                        View
-                    </Button>
-                )
-            })
-        } catch {
-            toast({
-                title: formatMessage(API_ERROR_MESSAGE),
-                status: 'error'
-            })
-        }
-    }
-
-    /**************** Add To Cart ****************/
-    const showToast = useToast()
-    const showError = () => {
-        showToast({
-            title: formatMessage(API_ERROR_MESSAGE),
-            status: 'error'
-        })
-    }
-    const handleAddToCart = async (variant, quantity) => {
-        try {
-            if (!variant?.orderable || !quantity) return
-            // The basket accepts an array of `ProductItems`, so lets create a single
-            // item array to add to the basket.
-            const productItems = [
-                {
-                    productId: variant.productId,
-                    quantity,
-                    price: variant.price
-                }
-            ]
-
-            await basket.addItemToBasket(productItems)
-        } catch (error) {
-            showError(error)
-        }
-    }
-
-    /**************** Einstein ****************/
-    useEffect(() => {
-        if (product) {
-            einstein.sendViewProduct(product)
-        }
-    }, [product])
+    // Omitting wish list and add to cart for the sake of demo
 
     console.log('retail app product ', product)
     return (
@@ -165,15 +75,6 @@ const ProductDetail = ({category, product, isLoading}) => {
                 <title>{product?.pageTitle}</title>
                 <meta name="description" content={product?.pageDescription} />
             </Helmet>
-
-            {/*<ProductViewTest*/}
-            {/*    product={product}*/}
-            {/*    category={primaryCategory?.parentCategoryTree || []}*/}
-            {/*    addToCart={(variant, quantity) => handleAddToCart(variant, quantity)}*/}
-            {/*    addToWishlist={(_, quantity) => handleAddToWishlist(quantity)}*/}
-            {/*    isProductLoading={isLoading}*/}
-            {/*    isCustomerProductListLoading={!wishlist.isInitialized}*/}
-            {/*/>*/}
 
             <Heading size={'md'}>No customisation</Heading>
             <Stack mt={8}>
@@ -190,20 +91,26 @@ const ProductDetail = ({category, product, isLoading}) => {
                 <ProductView
                     product={product}
                     imageGallery={<CustomGallery product={product} />}
-                    productTitle={<Box bg={'red'}> Customed Product Title</Box>}
+                    productTitle={
+                        <Box bg={'red'}>
+                            <Box>Customised Product Title</Box>
+                            <Box><Heading size={'2xl'}>{product?.name}</Heading></Box>
+                        </Box>
+                    }
                 />
             </Stack>
 
             <Divider height="10px" />
 
             <Heading size={'md'} mt={16}>
-                Fully customisation by replace while product view
+                Fully customisation by no using default ProductView
             </Heading>
             <Stack mt={8}>
                 <Box bg={'aqua'} minWidth={'680px'}>
                     Customised Product View
                     <Box>{product?.name}</Box>
                     <Box>{product?.longDescription}</Box>
+                    <Box>{product?.price}</Box>
                 </Box>
             </Stack>
         </Box>

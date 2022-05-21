@@ -62,6 +62,7 @@ export const useProduct = (product) => {
     }, [initialQuantity])
 
     return {
+        product,
         showLoading,
         showInventoryMessage,
         inventoryMessage,
