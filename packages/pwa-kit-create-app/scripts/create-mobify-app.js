@@ -406,7 +406,7 @@ const requiredNode = generatorPkg.engines.node
 const isUsingCompatibleNode = semver.satisfies(foundNode, new semver.Range(requiredNode))
 
 const isDirEmpty = (path) => {
-    return fs.readdirSync(path).length === 0;
+    return fs.readdirSync(path).length === 0
 }
 
 const checkOutputDir = (path) => {
@@ -429,6 +429,8 @@ const main = (opts) => {
         )
         console.log('')
     }
+
+    const OUTPUT_DIR_FLAG_ACTIVE = !(opts.outputDir === DEFAULT_OUTPUT_DIR)
 
     return Promise.resolve()
         .then(() => opts.preset || process.env.GENERATOR_PRESET || presetPrompt())

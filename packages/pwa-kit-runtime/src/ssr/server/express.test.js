@@ -844,10 +844,7 @@ describe('SSRServer persistent caching', () => {
         })
     )
 
-    const errorCases = [
-        {url: '/?type=500', status: 500},
-        {url: '/?type=400', status: 400}
-    ]
+    const errorCases = [{url: '/?type=500', status: 500}, {url: '/?type=400', status: 400}]
 
     errorCases.forEach(({url, status}) => {
         test(`should not cache responses with ${status} status codes`, () => {
