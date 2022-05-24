@@ -405,8 +405,12 @@ const foundNode = process.versions.node
 const requiredNode = generatorPkg.engines.node
 const isUsingCompatibleNode = semver.satisfies(foundNode, new semver.Range(requiredNode))
 
+const isDirEmpty = (path) => {
+    return fs.readdirSync(path).length === 0;
+}
+
 const checkOutputDir = (path) => {
-    if (sh.test('-e', path)) {
+    if (sh.test('-e', path) && !isDirEmpty(path)) {
         console.error(
             `The output directory "${path}" already exists. Try, for example, ` +
                 `"~/Desktop/my-project" instead of "~/Desktop"`
