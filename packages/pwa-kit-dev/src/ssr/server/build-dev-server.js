@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, salesforce.com, inc.
+ * Copyright (c) 2022, Salesforce, Inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
@@ -167,6 +167,21 @@ export const DevServerMixin = {
                 dotFiles: 'deny'
             })
         )
+
+        app.get('/__mrt/clear-browser-data', (_, res) => {
+            console.log(
+                chalk.cyan('Clearing browser data'),
+                '(cache, service worker, web storage for browsers supporting Clear-Site-Data header)'
+            )
+            console.log(
+                'For more info: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Clear-Site-Data#browser_compatibility'
+            )
+            console.log('')
+
+            // Note: this header value needs the double quotes.
+            res.set('Clear-Site-Data', '"cache", "storage"')
+            res.send()
+        })
     },
 
     /**
@@ -385,7 +400,7 @@ export const DevServerMixin = {
  * @param assetPath - the path to the asset file (with no query string
  * or other URL elements)
  */
-const setLocalAssetHeaders = (res, assetPath) => {
+export const setLocalAssetHeaders = (res, assetPath) => {
     const base = path.basename(assetPath)
     const contentType = mimeTypes.lookup(base)
 
