@@ -125,6 +125,7 @@ const merge = (a, b) => deepmerge(a, b, {arrayMerge: (orignal, replacement) => r
  * generated project, all others are excluded.
  */
 const runGenerator = (answers, {outputDir, verbose}) => {
+    checkOutputDir(outputDir)
     // Excluding pwa-kit-create-app, these are the public pwa-kit-* packages that can be installed through NPM.
     const npmInstallables = ['pwa-kit-react-sdk', 'pwa-kit-dev', 'pwa-kit-runtime']
 
@@ -358,6 +359,7 @@ const templateMinimalPrompts = () => {
 }
 
 const runTemplateGenerator = (projectId, {outputDir, verbose}, template) => {
+    checkOutputDir(outputDir)
     extractTemplate(template, outputDir)
     const pkgJsonPath = p.resolve(outputDir, 'package.json')
     const pkgJSON = readJson(pkgJsonPath)
@@ -403,6 +405,16 @@ const foundNode = process.versions.node
 const requiredNode = generatorPkg.engines.node
 const isUsingCompatibleNode = semver.satisfies(foundNode, new semver.Range(requiredNode))
 
+const checkOutputDir = (path) => {
+    if (sh.test('-e', path)) {
+        console.error(
+            `The output directory "${path}" already exists. Try, for example, ` +
+                `"~/Desktop/my-project" instead of "~/Desktop"`
+        )
+        process.exit(1)
+    }
+}
+
 const main = (opts) => {
     if (!isUsingCompatibleNode) {
         console.log('')
@@ -412,15 +424,6 @@ const main = (opts) => {
                 `Runtime servers which are compatible with Node ${requiredNode}`
         )
         console.log('')
-    }
-
-    const OUTPUT_DIR_FLAG_ACTIVE = !(opts.outputDir === DEFAULT_OUTPUT_DIR)
-    if (OUTPUT_DIR_FLAG_ACTIVE && sh.test('-e', opts.outputDir)) {
-        console.error(
-            `The output directory "${opts.outputDir}" already exists. Try, for example, ` +
-                `"~/Desktop/my-project" instead of "~/Desktop"`
-        )
-        process.exit(1)
     }
 
     return Promise.resolve()
