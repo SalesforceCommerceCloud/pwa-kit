@@ -16,7 +16,5 @@ module.exports = {
             statements: 85
         }
     },
-    collectCoverageFrom: [
-        'app/**'
-    ]
+    collectCoverageFrom: ['app/**']
 }
