@@ -110,36 +110,47 @@ const main = () => {
 
     program
         .command('build')
+        .addOption(
+            new program.Option(
+                '-b, --buildDirectory <buildDirectory>',
+                'the directory where your project should be built'
+            )
+                .default(p.join(process.cwd(), 'build'), './build')
+                .env('PWA_KIT_BUILD_DIR')
+        )
         .description(`build your app for production`)
-        .action(() => {
+        .action(({buildDirectory}) => {
             const webpack = p.join(require.resolve('webpack'), '..', '..', '..', '.bin', 'webpack')
             const projectWebpack = p.join(process.cwd(), 'webpack.config.js')
             const webpackConf = fs.existsSync(projectWebpack)
                 ? projectWebpack
                 : p.join(__dirname, '..', 'configs', 'webpack', 'config.js')
             const silentState = sh.config.silent
-            sh.rm('-rf', './build')
+            sh.rm('-rf', buildDirectory)
+            sh.mkdir(buildDirectory)
             execSync(`${webpack} --config ${webpackConf}`, {
                 env: {
                     NODE_ENV: 'production',
-                    ...process.env
+                    ...process.env,
+                    // Command option overrides the env var, so we must continue that pattern
+                    PWA_KIT_BUILD_DIR: buildDirectory
                 }
             })
 
             // Copy the project `package.json` into the build folder.
-            sh.cp(p.resolve('package.json'), './build/package.json')
+            sh.cp(p.resolve('package.json'), p.join(buildDirectory, 'package.json'))
 
             // Copy config files.
             const config = p.resolve('config')
             if (fs.existsSync(config)) {
-                sh.cp('-R', config, './build')
+                sh.cp('-R', config, buildDirectory)
                 sh.config.silent = true
-                sh.rm('./build/config/local.*')
+                sh.rm(p.join(buildDirectory, 'config', 'local.*'))
                 sh.config.silent = silentState
             }
 
             // This file is required by MRT, for historical reasons.
-            sh.touch('./build/loader.js')
+            sh.touch(p.join(buildDirectory, 'loader.js'))
         })
 
     program
