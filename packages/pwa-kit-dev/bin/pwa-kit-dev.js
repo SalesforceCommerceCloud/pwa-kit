@@ -6,12 +6,11 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 const p = require('path')
-const fs = require('fs')
+const fse = require('fs-extra')
 const program = require('commander')
 const isEmail = require('validator/lib/isEmail')
 const {execSync: _execSync} = require('child_process')
 const scriptUtils = require('../scripts/utils')
-const sh = require('shelljs')
 const uploadBundle = require('../scripts/upload.js')
 const pkg = require('../package.json')
 const {getConfig} = require('pwa-kit-runtime/utils/ssr-config')
@@ -86,10 +85,7 @@ const main = () => {
         .action(({user, key}) => {
             try {
                 const settingsPath = scriptUtils.getSettingsPath()
-                fs.writeFileSync(
-                    settingsPath,
-                    JSON.stringify({username: user, api_key: key}, null, 4)
-                )
+                fse.writeJson(settingsPath, {username: user, api_key: key}, {spaces: 4})
                 console.log(`Saved Managed Runtime credentials to "${settingsPath}".`)
             } catch (e) {
                 console.error('Failed to save credentials.')
@@ -122,12 +118,10 @@ const main = () => {
         .action(({buildDirectory}) => {
             const webpack = p.join(require.resolve('webpack'), '..', '..', '..', '.bin', 'webpack')
             const projectWebpack = p.join(process.cwd(), 'webpack.config.js')
-            const webpackConf = fs.existsSync(projectWebpack)
+            const webpackConf = fse.pathExistsSync(projectWebpack)
                 ? projectWebpack
                 : p.join(__dirname, '..', 'configs', 'webpack', 'config.js')
-            const silentState = sh.config.silent
-            sh.rm('-rf', buildDirectory)
-            sh.mkdir(buildDirectory)
+            fse.emptyDirSync(buildDirectory)
             execSync(`${webpack} --config ${webpackConf}`, {
                 env: {
                     NODE_ENV: 'production',
@@ -138,19 +132,25 @@ const main = () => {
             })
 
             // Copy the project `package.json` into the build folder.
-            sh.cp(p.resolve('package.json'), p.join(buildDirectory, 'package.json'))
+            fse.copyFileSync('package.json', p.join(buildDirectory, 'package.json'))
 
             // Copy config files.
             const config = p.resolve('config')
-            if (fs.existsSync(config)) {
-                sh.cp('-R', config, buildDirectory)
-                sh.config.silent = true
-                sh.rm(p.join(buildDirectory, 'config', 'local.*'))
-                sh.config.silent = silentState
+            if (fse.pathExistsSync(config)) {
+                fse.copySync(
+                    config,
+                    p.join(buildDirectory, 'config'),
+                    (file) => !p.basename(file).startsWith('local.')
+                )
             }
 
-            // This file is required by MRT, for historical reasons.
-            sh.touch(p.join(buildDirectory, 'loader.js'))
+            const loader = p.join(buildDirectory, 'loader.js')
+            if (!fse.pathExistsSync(loader)) {
+                fse.outputFileSync(
+                    loader,
+                    '// This file is required by Managed Runtime for historical reasons.\n'
+                )
+            }
         })
 
     program
@@ -195,10 +195,9 @@ const main = () => {
             if (!projectSlug) {
                 try {
                     // Using the full path isn't strictly necessary, but results in clearer errors
-                    const projectPkgPath = p.join(process.cwd(), 'package.json')
-                    const projectPkg = fs.readFileSync(projectPkgPath, 'utf8')
-                    const {name} = JSON.parse(projectPkg)
-                    if (!name) throw new Error(`Missing "name" field in ${projectPkgPath}`)
+                    const projectPkg = p.join(process.cwd(), 'package.json')
+                    const {name} = fse.readJsonSync(projectPkg)
+                    if (!name) throw new Error(`Missing "name" field in ${projectPkg}`)
                     projectSlug = name
                 } catch (err) {
                     throw new Error(
