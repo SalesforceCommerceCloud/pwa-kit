@@ -16,17 +16,15 @@ const uploadBundle = require('../scripts/upload.js')
 const pkg = require('../package.json')
 const {getConfig} = require('pwa-kit-runtime/utils/ssr-config')
 
-const pkgRoot = p.join(__dirname, '..')
-
-const projectPkg = require(p.join(process.cwd(), 'package.json'))
-
 const execSync = (cmd, opts) => {
     const defaults = {stdio: 'inherit'}
     return _execSync(cmd, {...defaults, ...opts})
 }
 
 const main = () => {
+    const pkgRoot = p.join(__dirname, '..')
     process.env.CONTEXT = process.cwd()
+
     program.description(
         [
             `PWA Kit Dev`,
@@ -156,14 +154,19 @@ const main = () => {
         .addOption(
             new program.Option(
                 '-m, --message <message>',
-                "a message to include along with the uploaded bundle in Managed Runtime (default: '<git branch>:<git commit hash>')"
+                'a message to include along with the uploaded bundle in Managed Runtime'
             )
+                // The default message is loaded dynamically as part of `uploadBundle(...)`
+                .default(undefined, '<git branch>:<git commit hash>')
         )
         .addOption(
             new program.Option(
                 '-s, --projectSlug <projectSlug>',
-                "a project slug that differs from the name property in your project's package.json (default: the 'name' key from the package.json)"
-            ).default(projectPkg.name)
+                "a project slug that differs from the name property in your project's package.json"
+            )
+                // We load the slug from the package.json by default, but we don't want to do that
+                // unless we need to, so it is loaded conditionally in the action implementation
+                .default(undefined, "the 'name' key from the package.json")
         )
         .addOption(
             new program.Option(
@@ -178,8 +181,24 @@ const main = () => {
 
             const mobify = getConfig() || {}
 
+            if (!projectSlug) {
+                try {
+                    // Using the full path isn't strictly necessary, but results in clearer errors
+                    const projectPkgPath = p.join(process.cwd(), 'package.json')
+                    const projectPkg = fs.readFileSync(projectPkgPath, 'utf8')
+                    const {name} = JSON.parse(projectPkg)
+                    if (!name) throw new Error(`Missing "name" field in ${projectPkgPath}`)
+                    projectSlug = name
+                } catch (err) {
+                    throw new Error(
+                        `Could not detect project slug from "name" field in package.json: ${err.message}`
+                    )
+                }
+            }
+
             const options = {
                 buildDirectory,
+                // Avoid setting message if it's blank, so that it doesn't override the default
                 ...(message ? {message} : undefined),
                 projectSlug,
                 target,
