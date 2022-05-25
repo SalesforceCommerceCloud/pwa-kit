@@ -115,12 +115,17 @@ const ProductDetail = ({category, product, isLoading}) => {
     }
     const handleAddToCart = async (variant, quantity) => {
         try {
-            if (!variant?.orderable || !quantity) return
+            // @@@ Skip this check as it isn't applicable to standard products.
+            // if (!variant?.orderable || !quantity) { 
+            //     return
+            // }
+
             // The basket accepts an array of `ProductItems`, so lets create a single
             // item array to add to the basket.
             const productItems = [
                 {
-                    productId: variant.productId,
+                    // @@@ Standard products have an id, not a productId
+                    productId: variant.productId || variant.id,
                     quantity,
                     price: variant.price
                 }

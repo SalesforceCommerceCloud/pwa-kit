@@ -34,21 +34,22 @@ const runtime = getRuntime()
 
 const {handler} = runtime.createHandler(options, (app) => {
     // Set HTTP security headers
-    app.use(
-        helmet({
-            contentSecurityPolicy: {
-                useDefaults: true,
-                directives: {
-                    'img-src': ["'self'", '*.commercecloud.salesforce.com', 'data:'],
-                    'script-src': ["'self'", "'unsafe-eval'", 'storage.googleapis.com'],
+    // @@@ DISABLED
+    // app.use(
+    //     helmet({
+    //         contentSecurityPolicy: {
+    //             useDefaults: true,
+    //             directives: {
+    //                 'img-src': ["'self'", '*.commercecloud.salesforce.com', 'data:'],
+    //                 'script-src': ["'self'", "'unsafe-eval'", 'storage.googleapis.com'],
 
-                    // Do not upgrade insecure requests for local development
-                    'upgrade-insecure-requests': isRemote() ? [] : null
-                }
-            },
-            hsts: isRemote()
-        })
-    )
+    //                 // Do not upgrade insecure requests for local development
+    //                 'upgrade-insecure-requests': isRemote() ? [] : null
+    //             }
+    //         },
+    //         hsts: isRemote()
+    //     })
+    // )
 
     // Handle the redirect from SLAS as to avoid error
     app.get('/callback?*', (req, res) => {

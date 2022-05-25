@@ -72,7 +72,9 @@ const ImageGallery = ({imageGroups = [], selectedVariationAttributes = {}, size}
     const heroImageGroup = useMemo(
         () =>
             findImageGroupBy(imageGroups, {
-                viewType: LARGE,
+                // @@@ If only `hi-res` images are avaiable, use those.
+                // viewType: LARGE,
+                viewType: 'hi-res',
                 selectedVariationAttributes
             }),
         [selectedVariationAttributes]

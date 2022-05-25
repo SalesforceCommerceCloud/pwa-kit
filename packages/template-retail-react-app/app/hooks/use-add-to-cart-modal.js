@@ -66,7 +66,9 @@ export const AddToCartModal = () => {
     const {id, variationValues} = product
     const lineItemPrice = productItems?.find((item) => item.productId === id)?.basePrice * quantity
     const image = findImageGroupBy(product.imageGroups, {
-        viewType: 'small',
+        // @@@ If only `hi-res` images are availabe, use those. This component dies if no image is found.
+        // viewType: 'small',
+        viewType: 'hi-res',
         selectedVariationAttributes: variationValues
     })?.images?.[0]
 

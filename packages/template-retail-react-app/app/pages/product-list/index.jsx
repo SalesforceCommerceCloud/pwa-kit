@@ -5,11 +5,11 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useEffect, useState} from 'react'
+import React, { useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
-import {useHistory, useParams} from 'react-router-dom'
-import {FormattedMessage, useIntl} from 'react-intl'
-import {Helmet} from 'react-helmet'
+import { useHistory, useParams } from 'react-router-dom'
+import { FormattedMessage, useIntl } from 'react-intl'
+import { Helmet } from 'react-helmet'
 
 // Components
 import {
@@ -40,28 +40,28 @@ import {
 
 // Project Components
 import Pagination from '../../components/pagination'
-import ProductTile, {Skeleton as ProductTileSkeleton} from '../../components/product-tile'
-import {HideOnDesktop} from '../../components/responsive'
+import ProductTile, { Skeleton as ProductTileSkeleton } from '../../components/product-tile'
+import { HideOnDesktop } from '../../components/responsive'
 import Refinements from './partials/refinements'
 import SelectedRefinements from './partials/selected-refinements'
 import EmptySearchResults from './partials/empty-results'
 import PageHeader from './partials/page-header'
 
 // Icons
-import {FilterIcon, ChevronDownIcon} from '../../components/icons'
+import { FilterIcon, ChevronDownIcon } from '../../components/icons'
 
 // Hooks
-import {useLimitUrls, usePageUrls, useSortUrls, useSearchParams} from '../../hooks'
-import {useToast} from '../../hooks/use-toast'
+import { useLimitUrls, usePageUrls, useSortUrls, useSearchParams } from '../../hooks'
+import { useToast } from '../../hooks/use-toast'
 import useWishlist from '../../hooks/use-wishlist'
-import {parse as parseSearchParams} from '../../hooks/use-search-params'
-import {useCategories} from '../../hooks/use-categories'
+import { parse as parseSearchParams } from '../../hooks/use-search-params'
+import { useCategories } from '../../hooks/use-categories'
 
 // Others
-import {HTTPNotFound} from 'pwa-kit-react-sdk/ssr/universal/errors'
+import { HTTPNotFound } from 'pwa-kit-react-sdk/ssr/universal/errors'
 
 // Constants
-import {DEFAULT_LIMIT_VALUES, API_ERROR_MESSAGE, MAX_CACHE_AGE} from '../../constants'
+import { DEFAULT_LIMIT_VALUES, API_ERROR_MESSAGE, MAX_CACHE_AGE } from '../../constants'
 import useNavigation from '../../hooks/use-navigation'
 import LoadingSpinner from '../../components/loading-spinner'
 
@@ -84,15 +84,15 @@ const ProductList = (props) => {
         isLoading,
         ...rest
     } = props
-    const {total, sortingOptions} = productSearchResult || {}
+    const { total, sortingOptions } = productSearchResult || {}
 
-    const {isOpen, onOpen, onClose} = useDisclosure()
+    const { isOpen, onOpen, onClose } = useDisclosure()
     const [sortOpen, setSortOpen] = useState(false)
-    const {formatMessage} = useIntl()
+    const { formatMessage } = useIntl()
     const navigate = useNavigation()
     const history = useHistory()
     const params = useParams()
-    const {categories} = useCategories()
+    const { categories } = useCategories()
     const toast = useToast()
 
     // Get the current category from global state.
@@ -109,8 +109,8 @@ const ProductList = (props) => {
     }, [isLoading])
 
     // Get urls to be used for pagination, page size changes, and sorting.
-    const pageUrls = usePageUrls({total})
-    const sortUrls = useSortUrls({options: sortingOptions})
+    const pageUrls = usePageUrls({ total })
+    const sortUrls = useSortUrls({ options: sortingOptions })
     const limitUrls = useLimitUrls()
 
     // If we are loaded and still have no products, show the no results component.
@@ -134,7 +134,7 @@ const ProductList = (props) => {
                         defaultMessage:
                             '{quantity} {quantity, plural, one {item} other {items}} added to wishlist'
                     },
-                    {quantity: 1}
+                    { quantity: 1 }
                 ),
                 status: 'success',
                 action: (
@@ -179,12 +179,12 @@ const ProductList = (props) => {
     }
 
     /**************** Filters ****************/
-    const [searchParams, {stringify: stringifySearchParams}] = useSearchParams()
+    const [searchParams, { stringify: stringifySearchParams }] = useSearchParams()
     const [filtersLoading, setFiltersLoading] = useState(false)
 
     // Toggles filter on and off
     const toggleFilter = (value, attributeId, selected, allowMultiple = true) => {
-        const searchParamsCopy = {...searchParams}
+        const searchParamsCopy = { ...searchParams }
 
         // Remove the `offset` search param if present.
         delete searchParamsCopy.offset
@@ -240,7 +240,7 @@ const ProductList = (props) => {
             className="sf-product-list-page"
             data-testid="sf-product-list-page"
             layerStyle="page"
-            paddingTop={{base: 6, lg: 8}}
+            paddingTop={{ base: 6, lg: 8 }}
             {...rest}
         >
             <Helmet>
@@ -255,7 +255,7 @@ const ProductList = (props) => {
                     {/* Header */}
 
                     <Stack
-                        display={{base: 'none', lg: 'flex'}}
+                        display={{ base: 'none', lg: 'flex' }}
                         direction="row"
                         justify="flex-start"
                         align="flex-start"
@@ -296,7 +296,7 @@ const ProductList = (props) => {
                                 isLoading={isLoading}
                             />
                             <Stack
-                                display={{base: 'flex', md: 'none'}}
+                                display={{ base: 'flex', md: 'none' }}
                                 direction="row"
                                 justify="flex-start"
                                 align="center"
@@ -354,8 +354,8 @@ const ProductList = (props) => {
                     </HideOnDesktop>
 
                     {/* Body  */}
-                    <Grid templateColumns={{base: '1fr', md: '280px 1fr'}} columnGap={6}>
-                        <Stack display={{base: 'none', md: 'flex'}}>
+                    <Grid templateColumns={{ base: '1fr', md: '280px 1fr' }} columnGap={6}>
+                        <Stack display={{ base: 'none', md: 'flex' }}>
                             <Refinements
                                 isLoading={filtersLoading}
                                 toggleFilter={toggleFilter}
@@ -367,45 +367,45 @@ const ProductList = (props) => {
                             <SimpleGrid
                                 columns={[2, 2, 3, 3]}
                                 spacingX={4}
-                                spacingY={{base: 12, lg: 16}}
+                                spacingY={{ base: 12, lg: 16 }}
                             >
                                 {isLoading || !productSearchResult
                                     ? new Array(searchParams.limit)
-                                          .fill(0)
-                                          .map((value, index) => (
-                                              <ProductTileSkeleton key={index} />
-                                          ))
+                                        .fill(0)
+                                        .map((value, index) => (
+                                            <ProductTileSkeleton key={index} />
+                                        ))
                                     : productSearchResult.hits.map((productSearchItem) => {
-                                          const productId = productSearchItem.productId
-                                          const isInWishlist = !!wishlist.findItemByProductId(
-                                              productId
-                                          )
+                                        const productId = productSearchItem.productId
+                                        const isInWishlist = !!wishlist.findItemByProductId(
+                                            productId
+                                        )
 
-                                          return (
-                                              <ProductTile
-                                                  data-testid={`sf-product-tile-${productSearchItem.productId}`}
-                                                  key={productSearchItem.productId}
-                                                  product={productSearchItem}
-                                                  enableFavourite={true}
-                                                  isFavourite={isInWishlist}
-                                                  onFavouriteToggle={(isFavourite) => {
-                                                      const action = isFavourite
-                                                          ? addItemToWishlist
-                                                          : removeItemFromWishlist
-                                                      return action(productSearchItem)
-                                                  }}
-                                                  dynamicImageProps={{
-                                                      widths: [
-                                                          '50vw',
-                                                          '50vw',
-                                                          '20vw',
-                                                          '20vw',
-                                                          '25vw'
-                                                      ]
-                                                  }}
-                                              />
-                                          )
-                                      })}
+                                        return (
+                                            <ProductTile
+                                                data-testid={`sf-product-tile-${productSearchItem.productId}`}
+                                                key={productSearchItem.productId}
+                                                product={productSearchItem}
+                                                enableFavourite={true}
+                                                isFavourite={isInWishlist}
+                                                onFavouriteToggle={(isFavourite) => {
+                                                    const action = isFavourite
+                                                        ? addItemToWishlist
+                                                        : removeItemFromWishlist
+                                                    return action(productSearchItem)
+                                                }}
+                                                dynamicImageProps={{
+                                                    widths: [
+                                                        '50vw',
+                                                        '50vw',
+                                                        '20vw',
+                                                        '20vw',
+                                                        '25vw'
+                                                    ]
+                                                }}
+                                            />
+                                        )
+                                    })}
                             </SimpleGrid>
                             {/* Footer */}
                             <Flex
@@ -421,7 +421,7 @@ const ProductList = (props) => {
                                 <Select
                                     display="none"
                                     value={basePath}
-                                    onChange={({target}) => {
+                                    onChange={({ target }) => {
                                         history.push(target.value)
                                     }}
                                 >
@@ -530,7 +530,7 @@ const ProductList = (props) => {
                                 <Text
                                     as={
                                         selectedSortingOptionLabel?.label ===
-                                            productSearchResult?.sortingOptions[idx]?.label && 'u'
+                                        productSearchResult?.sortingOptions[idx]?.label && 'u'
                                     }
                                 >
                                     {productSearchResult?.sortingOptions[idx]?.label}
@@ -546,34 +546,32 @@ const ProductList = (props) => {
 
 ProductList.getTemplateName = () => 'product-list'
 
-ProductList.shouldGetProps = ({previousLocation, location}) =>
+ProductList.shouldGetProps = ({ previousLocation, location }) =>
     !previousLocation ||
     previousLocation.pathname !== location.pathname ||
     previousLocation.search !== location.search
 
-ProductList.getProps = async ({res, params, location, api}) => {
-    const {categoryId} = params
+ProductList.getProps = async ({ res, params, location, api }) => {
+    const { categoryId } = params
     const urlParams = new URLSearchParams(location.search)
-    let searchQuery = urlParams.get('q')
-    let isSearch = false
 
-    if (searchQuery) {
-        isSearch = true
-    }
-    // In case somebody navigates to /search without a param
-    if (!categoryId && !isSearch) {
-        // We will simulate search for empty string
-        return {searchQuery: ' ', productSearchResult: {}}
+    const searchQuery = urlParams.get('q')
+    const isSearch = !!searchQuery
+    const isEmptySearch = !categoryId && !isSearch
+    if (isEmptySearch) {
+        return { searchQuery: ' ', productSearchResult: {} }
     }
 
     const searchParams = parseSearchParams(location.search, false)
 
-    if (!searchParams.refine.includes(`cgid=${categoryId}`) && categoryId) {
+    const isCategorySearch = !searchParams.refine.includes(`cgid=${categoryId}`) && categoryId
+    if (isCategorySearch) {
         searchParams.refine.push(`cgid=${categoryId}`)
     }
 
+    // @@@ Disabled. Search _ALL_ products instead!
     // only search master products
-    searchParams.refine.push('htype=master')
+    // searchParams.refine.push('htype=master')
 
     // Set the `cache-control` header values to align with the Commerce API settings.
     if (res) {
@@ -584,8 +582,8 @@ ProductList.getProps = async ({res, params, location, api}) => {
         isSearch
             ? Promise.resolve()
             : api.shopperProducts.getCategory({
-                  parameters: {id: categoryId, levels: 0}
-              }),
+                parameters: { id: categoryId, levels: 0 }
+            }),
         api.shopperSearch.productSearch({
             parameters: searchParams
         })
@@ -593,7 +591,7 @@ ProductList.getProps = async ({res, params, location, api}) => {
 
     // Apply disallow list to refinements.
     productSearchResult.refinements = productSearchResult?.refinements?.filter(
-        ({attributeId}) => !REFINEMENT_DISALLOW_LIST.includes(attributeId)
+        ({ attributeId }) => !REFINEMENT_DISALLOW_LIST.includes(attributeId)
     )
 
     // The `isomorphic-sdk` returns error objects when they occur, so we
@@ -602,7 +600,7 @@ ProductList.getProps = async ({res, params, location, api}) => {
         throw new HTTPNotFound(category.detail)
     }
 
-    return {searchQuery: searchQuery, productSearchResult}
+    return { searchQuery: searchQuery, productSearchResult }
 }
 
 ProductList.propTypes = {
@@ -631,7 +629,7 @@ ProductList.propTypes = {
 
 export default ProductList
 
-const Sort = ({sortUrls, productSearchResult, basePath, ...otherProps}) => {
+const Sort = ({ sortUrls, productSearchResult, basePath, ...otherProps }) => {
     const intl = useIntl()
     const history = useHistory()
 
@@ -639,7 +637,7 @@ const Sort = ({sortUrls, productSearchResult, basePath, ...otherProps}) => {
         <FormControl data-testid="sf-product-list-sort" id="page_sort" width="auto" {...otherProps}>
             <Select
                 value={basePath.replace(/(offset)=(\d+)/i, '$1=0')}
-                onChange={({target}) => {
+                onChange={({ target }) => {
                     history.push(target.value)
                 }}
                 height={11}

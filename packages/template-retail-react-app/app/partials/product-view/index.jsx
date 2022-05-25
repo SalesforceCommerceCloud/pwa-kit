@@ -104,11 +104,14 @@ const ProductView = ({
         stepQuantity
     } = useProduct(product)
     const canAddToWishlist = !isProductLoading
-    const canOrder =
-        !isProductLoading &&
-        variant?.orderable &&
-        parseInt(quantity) > 0 &&
-        parseInt(quantity) <= stockLevel
+    
+    // @@@ Skip this check as it doesn't entire make sense for standard products.
+    const canOrder = true
+    // const canOrder =
+    //     !isProductLoading &&
+    //     variant?.orderable &&
+    //     parseInt(quantity) > 0 &&
+    //     parseInt(quantity) <= stockLevel
 
     const renderActionButtons = () => {
         const buttons = []
@@ -118,12 +121,17 @@ const ProductView = ({
                 toggleShowOptionsMessage(true)
                 return null
             }
-            if (!addToCart && !updateCart) return null
+            
+            if (!addToCart && !updateCart) {
+                return null
+            }
+
             if (updateCart) {
                 await updateCart(variant, quantity)
                 return
             }
-            await addToCart(variant, quantity)
+
+            await addToCart(variant || product, quantity)
             onAddToCartModalOpen({product, quantity})
         }
 
