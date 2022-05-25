@@ -139,12 +139,9 @@ export const DevServerMixin = {
 
         app.use('/mobify/bundle/development', app.__devMiddleware)
 
-        if (config.some((cnf) => cnf.name === CLIENT)) {
-            app.use(
-                webpackHotMiddleware(
-                    app.__compiler.compilers.find((compiler) => compiler.name === CLIENT)
-                )
-            )
+        const clientCompiler = app.__compiler.compilers.find((compiler) => compiler.name === CLIENT)
+        if (clientCompiler) {
+            app.use(webpackHotMiddleware(clientCompiler))
         }
 
         app.use('/__mrt/status', (req, res) => {
