@@ -254,6 +254,8 @@ const client =
                 },
                 output: {
                     ...config.output,
+                    // So that client-side hot reloading works properly,
+                    // we'll need to prepend the *.hot-update.json urls with this publicPath
                     ...(mode === development ? {publicPath: '/mobify/bundle/development/'} : {})
                 }
             }
