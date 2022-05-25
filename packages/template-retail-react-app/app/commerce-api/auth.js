@@ -49,10 +49,8 @@ class Auth {
         this._config = api._config
         this._onClient = typeof window !== 'undefined'
 
-        // To store tokens as cookies
-        // change the next line to
-        // this._storage = this._onClient ? new CookieStorage() : new Map()
-        this._storage = this._onClient ? new LocalStorage() : new Map()
+        // Store tokens as cookies
+        this._storage = this._onClient ? new CookieStorage() : new Map()
 
         const configOid = api._config.parameters.organizationId
         if (!this.oid) {
