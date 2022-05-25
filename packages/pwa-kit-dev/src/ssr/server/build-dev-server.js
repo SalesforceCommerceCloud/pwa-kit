@@ -14,7 +14,6 @@ import http from 'http'
 import mimeTypes from 'mime-types'
 import webpack from 'webpack'
 import webpackDevMiddleware from 'webpack-dev-middleware'
-// TODO: drop this?
 import webpackHotServerMiddleware from 'webpack-hot-server-middleware'
 import webpackHotMiddleware from 'webpack-hot-middleware'
 import open from 'open'
@@ -138,17 +137,6 @@ export const DevServerMixin = {
             app.__hotServerMiddleware = webpackHotServerMiddleware(app.__compiler)
         }
 
-        // TODO: app.__compiler.compilers and find which one?
-        // app.__compiler.hooks.afterEmit.tap('cleanup-the-require-cache', () => {
-        //     console.log('---', require.cache)
-        //     // After webpack rebuild, clear the files from the require cache,
-        //     // so that next server side render wil be in sync
-        //     Object.keys(require.cache)
-        //         .filter((key) => key.includes(dirName))
-        //         .forEach((key) => delete require.cache[key])
-        // })
-
-        // TODO: this needs to match with the url for webpackHotMiddleware ?
         app.use('/mobify/bundle/development', app.__devMiddleware)
 
         app.use(
@@ -273,7 +261,6 @@ export const DevServerMixin = {
     render(req, res, next) {
         const app = req.app
         if (app.__webpackReady()) {
-            // TODO
             app.__hotServerMiddleware(req, res, next)
         } else {
             this._redirectToLoadingScreen(req, res, next)

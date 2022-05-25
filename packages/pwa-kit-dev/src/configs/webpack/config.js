@@ -105,9 +105,6 @@ const baseConfig = (target) => {
                     minimize: mode === production
                 },
                 output: {
-                    // TODO: why this makes a difference?
-                    // TODO: try removing it from Kevin's branch and see the result
-                    // publicPath: '/mobify/bundle/development/',
                     publicPath: '',
                     path: buildDir
                 },
