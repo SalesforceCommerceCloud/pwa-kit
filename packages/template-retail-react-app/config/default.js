@@ -11,7 +11,7 @@ module.exports = {
         url: {
             site: 'path',
             locale: 'path',
-            showDefaults: true
+            showDefaults: false
         },
         defaultSite: 'RefArch',
         sites,
