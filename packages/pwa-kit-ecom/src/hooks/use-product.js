@@ -7,7 +7,6 @@
 
 import {useEffect, useState} from 'react'
 import {useVariant} from './use-variant'
-import {useIntl} from 'react-intl'
 import {useVariationParams} from './use-variation-params'
 import {useVariationAttributes} from './use-variation-attributes'
 
@@ -21,8 +20,6 @@ export const useProduct = (product) => {
     const stepQuantity = product?.stepQuantity || 1
     const minOrderQuantity = stockLevel > 0 ? product?.minOrderQuantity || 1 : 0
     const initialQuantity = product?.quantity || product?.minOrderQuantity || 1
-
-    const intl = useIntl()
     const variant = useVariant(product)
     const variationParams = useVariationParams(product)
     const variationAttributes = useVariationAttributes(product)
@@ -37,17 +34,8 @@ export const useProduct = (product) => {
         (!variant && Object.keys(variationParams).length === variationAttributes.length)
     const unfulfillable = stockLevel < quantity
     const inventoryMessages = {
-        [OUT_OF_STOCK]: intl.formatMessage({
-            defaultMessage: 'Out of stock',
-            id: 'use_product.message.out_of_stock'
-        }),
-        [UNFULFILLABLE]: intl.formatMessage(
-            {
-                defaultMessage: 'Only {stockLevel} left!',
-                id: 'use_product.message.inventory_remaining'
-            },
-            {stockLevel}
-        )
+        [OUT_OF_STOCK]: 'Out of stock',
+        [UNFULFILLABLE]: `Only ${stockLevel} left`
     }
     const showInventoryMessage = variant && (isOutOfStock || unfulfillable)
     const inventoryMessage =

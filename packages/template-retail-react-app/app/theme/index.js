@@ -7,13 +7,13 @@
 import {extendTheme} from '@chakra-ui/react'
 
 // Foundational style overrides
-import styles from './foundations/styles'
-import colors from './foundations/colors'
-import gradients from './foundations/gradients'
-import sizes from './foundations/sizes'
-import space from './foundations/space'
-import layerStyles from './foundations/layerStyles'
-import shadows from './foundations/shadows'
+import styles from 'pwa-kit-ecom/theme/foundations/styles'
+import colors from 'pwa-kit-ecom/theme/foundations/colors'
+import gradients from 'pwa-kit-ecom/theme/foundations/gradients'
+import sizes from 'pwa-kit-ecom/theme/foundations/sizes'
+import space from 'pwa-kit-ecom/theme/foundations/space'
+import layerStyles from 'pwa-kit-ecom/theme/foundations/layerStyles'
+import shadows from 'pwa-kit-ecom/theme/foundations/shadows'
 
 // Base component style overrides
 import Alert from './components/base/alert'
@@ -50,6 +50,8 @@ import ProductTile from './components/project/product-tile'
 import SocialIcons from './components/project/social-icons'
 import SwatchGroup from './components/project/swatch-group'
 import ImageGallery from './components/project/image-gallery'
+import * as components from 'pwa-kit-ecom/theme/components'
+console.log('components', components)
 
 // Please refer to the Chakra-Ui theme customization docs found
 // here https://chakra-ui.com/docs/theming/customize-theme to learn
@@ -63,6 +65,7 @@ const overrides = {
     gradients,
     shadows,
     components: {
+        ...components,
         // base components
         Accordion,
         Alert,

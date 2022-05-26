@@ -11,8 +11,48 @@ import {useLocation} from 'react-router-dom'
 // Other Hooks
 import {useVariationParams} from './use-variation-params'
 
-// Utils
-import {rebuildPathWithParams} from '../utils/url'
+/**
+ * Modifies a given url by adding/updating query parameters.
+ *
+ * @param {string} url - The base url of the output url set.
+ * @param {object} extraParams - A key values pairing used to add static search param values.
+ * @returns {string} A URL with additional params
+ * @example
+ * import {rebuildPathWithParams} from '/path/to/utils/url'
+ *
+ * rebuildPathWithParams(
+ *     '/en-GB/product/25501032M',
+ *     {color: 'JJ2SKXX', size: 'MD'}
+ * )
+ *
+ * // Returns
+ * // '/en-GB/product/25501032M?color=JJ2SKXX&size=9MD'
+ */
+export const rebuildPathWithParams = (url, extraParams) => {
+    const [pathname, search] = url.split('?')
+    const params = new URLSearchParams(search)
+
+    // Apply any extra params.
+    Object.keys(extraParams).forEach((key) => {
+        const value = extraParams[key]
+
+        // 0 is a valid value as for a param
+        if (!value && value !== 0) {
+            params.delete(key)
+        } else {
+            params.set(key, value)
+        }
+    })
+
+    // Clean up any trailing `=` for params without values.
+    const paramStr = params
+        .toString()
+        .replace(/=&/g, '&')
+        .replace(/=$/, '')
+
+    // Generate the newly updated url.
+    return `${pathname}${Array.from(paramStr).length > 0 ? `?${paramStr}` : ''}`
+}
 
 /**
  * Return the first image in the `swatch` type image group for a given

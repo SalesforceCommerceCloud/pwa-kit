@@ -47,7 +47,7 @@ import {watchOnlineStatus, flatten} from '../../utils/utils'
 import {homeUrlBuilder, getPathWithLocale, buildPathWithUrlConfig} from '../../utils/url'
 import {getTargetLocale, fetchTranslations} from '../../utils/locale'
 import {DEFAULT_SITE_TITLE, HOME_HREF, THEME_COLOR} from '../../constants'
-
+import {useTheme} from '@chakra-ui/react'
 import Seo from '../seo'
 import {resolveSiteFromUrl} from '../../utils/site-utils'
 
@@ -69,6 +69,8 @@ const App = (props) => {
 
     const [isOnline, setIsOnline] = useState(true)
     const styles = useStyleConfig('App')
+    const theme = useTheme()
+    console.log('theme', theme)
 
     const configValues = {
         locale: locale.alias || locale.id,

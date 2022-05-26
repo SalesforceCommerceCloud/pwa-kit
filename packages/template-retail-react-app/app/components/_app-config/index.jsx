@@ -8,10 +8,12 @@ import React, {useState} from 'react'
 import PropTypes from 'prop-types'
 import {ChakraProvider} from '@chakra-ui/react'
 
+import PWAKitProvider from 'pwa-kit-ecom/components/theme-provider'
+import theme from '../../theme'
+
 // Removes focus for non-keyboard interactions for the whole application
 import 'focus-visible/dist/focus-visible'
 
-import theme from '../../theme'
 import CommerceAPI from '../../commerce-api'
 import {
     BasketProvider,
@@ -40,7 +42,10 @@ const AppConfig = ({children, locals = {}}) => {
             <CustomerProvider value={{customer, setCustomer}}>
                 <BasketProvider value={{basket, setBasket}}>
                     <CustomerProductListsProvider>
-                        <ChakraProvider theme={theme}>{children}</ChakraProvider>
+                        <ChakraProvider theme={theme}>
+                            {/*Need to have saperate provider for the theme in component library to work, 🤷️️️️*/}
+                            <PWAKitProvider theme={theme}>{children}</PWAKitProvider>
+                        </ChakraProvider>
                     </CustomerProductListsProvider>
                 </BasketProvider>
             </CustomerProvider>
