@@ -105,9 +105,6 @@ const baseConfig = (target) => {
                     minimize: mode === production
                 },
                 output: {
-                    // TODO: why this makes a difference?
-                    // TODO: try removing it from Kevin's branch and see the result
-                    // publicPath: '/mobify/bundle/development/',
                     publicPath: '',
                     path: buildDir
                 },
@@ -257,6 +254,8 @@ const client =
                 },
                 output: {
                     ...config.output,
+                    // So that client-side hot reloading works properly,
+                    // we'll need to prepend the *.hot-update.json urls with this publicPath
                     ...(mode === development ? {publicPath: '/mobify/bundle/development/'} : {})
                 }
             }
