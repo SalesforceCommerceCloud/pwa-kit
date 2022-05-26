@@ -66,9 +66,7 @@ const findInProjectThenSDK = (pkg) => {
     return fs.existsSync(projectPath) ? projectPath : resolve(sdkDir, 'node_modules', pkg)
 }
 
-const baseConfig = (target, options = {}) => {
-    const {addBabelPlugins} = options
-
+const baseConfig = (target) => {
     if (!['web', 'node'].includes(target)) {
         throw Error(`The value "${target}" is not a supported webpack target`)
     }
@@ -147,20 +145,7 @@ const baseConfig = (target, options = {}) => {
 
                 module: {
                     rules: [
-                        {
-                            test: /(\.js(x?)|\.ts(x?))$/,
-                            exclude: /node_modules/,
-                            use: [
-                                {
-                                    loader: findInProjectThenSDK('babel-loader'),
-                                    options: {
-                                        rootMode: 'upward',
-                                        cacheDirectory: true,
-                                        ...(addBabelPlugins ? {plugins: addBabelPlugins([])} : {})
-                                    }
-                                }
-                            ]
-                        },
+                        ruleForBabelLoader(), // For easier targeting later, please have this as the first item
                         target === 'node' && {
                             test: /\.svg$/,
                             loader: findInProjectThenSDK('svg-sprite-loader')
@@ -218,14 +203,66 @@ const withChunking = (config) => {
     }
 }
 
-const addReactRefresh = (babelPlugins) =>
-    [...babelPlugins, mode === development && require.resolve('react-refresh/babel')].filter(
-        Boolean
-    )
+const ruleForBabelLoader = (babelPlugins) => {
+    return {
+        test: /(\.js(x?)|\.ts(x?))$/,
+        exclude: /node_modules/,
+        use: [
+            {
+                loader: findInProjectThenSDK('babel-loader'),
+                options: {
+                    rootMode: 'upward',
+                    cacheDirectory: true,
+                    ...(babelPlugins ? {plugins: babelPlugins} : {})
+                }
+            }
+        ]
+    }
+}
+
+const enableReactRefresh = (config) => {
+    const rules = [
+        ruleForBabelLoader(
+            [mode === development && require.resolve('react-refresh/babel')].filter(Boolean)
+        ),
+        ...config.module.rules.slice(1)
+    ]
+
+    return {
+        ...config,
+        module: {
+            ...config.module,
+            rules
+        },
+        entry: {
+            ...config.entry,
+            main: [mode === development && 'webpack-hot-middleware/client', './app/main'].filter(
+                Boolean
+            )
+        },
+        plugins: [
+            ...config.plugins,
+
+            mode === development && new webpack.HotModuleReplacementPlugin(),
+            mode === development &&
+                new ReactRefreshWebpackPlugin({
+                    overlay: {
+                        sockIntegration: 'whm'
+                    }
+                })
+        ],
+        output: {
+            ...config.output,
+            // So that client-side hot reloading works properly,
+            // we'll need to prepend the *.hot-update.json urls with this publicPath
+            ...(mode === development ? {publicPath: '/mobify/bundle/development/'} : {})
+        }
+    }
+}
 
 const client =
     entryPointExists(['app', 'main']) &&
-    baseConfig('web', {addBabelPlugins: addReactRefresh})
+    baseConfig('web')
         .extend(withChunking)
         .extend((config) => {
             return {
@@ -235,35 +272,20 @@ const client =
                 // use source map to make debugging easier
                 devtool: mode === development ? 'source-map' : false,
                 entry: {
-                    main: [
-                        mode === development && 'webpack-hot-middleware/client',
-                        './app/main'
-                    ].filter(Boolean)
+                    main: './app/main'
                 },
                 plugins: [
                     ...config.plugins,
                     new LoadablePlugin({writeToDisk: true}),
-                    analyzeBundle && getBundleAnalyzerPlugin(CLIENT),
-                    mode === development && new webpack.HotModuleReplacementPlugin(),
-                    mode === development &&
-                        new ReactRefreshWebpackPlugin({
-                            overlay: {
-                                sockIntegration: 'whm'
-                            }
-                        })
+                    analyzeBundle && getBundleAnalyzerPlugin(CLIENT)
                 ].filter(Boolean),
                 // Hide the performance hints, since we already have a similar `bundlesize` check in `template-retail-react-app` package
                 performance: {
                     hints: false
-                },
-                output: {
-                    ...config.output,
-                    // So that client-side hot reloading works properly,
-                    // we'll need to prepend the *.hot-update.json urls with this publicPath
-                    ...(mode === development ? {publicPath: '/mobify/bundle/development/'} : {})
                 }
             }
         })
+        .extend(enableReactRefresh)
         .build()
 
 const optional = (name, path) => {
