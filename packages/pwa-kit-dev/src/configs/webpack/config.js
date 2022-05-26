@@ -66,7 +66,9 @@ const findInProjectThenSDK = (pkg) => {
     return fs.existsSync(projectPath) ? projectPath : resolve(sdkDir, 'node_modules', pkg)
 }
 
-const baseConfig = (target) => {
+const baseConfig = (target, options = {}) => {
+    const {addBabelPlugins} = options
+
     if (!['web', 'node'].includes(target)) {
         throw Error(`The value "${target}" is not a supported webpack target`)
     }
@@ -136,13 +138,6 @@ const baseConfig = (target) => {
                     }),
 
                     mode === development && new webpack.NoEmitOnErrorsPlugin(),
-                    mode === development && new webpack.HotModuleReplacementPlugin(),
-                    mode === development &&
-                        new ReactRefreshWebpackPlugin({
-                            overlay: {
-                                sockIntegration: 'whm'
-                            }
-                        }),
 
                     createModuleReplacementPlugin(projectDir),
 
@@ -161,10 +156,7 @@ const baseConfig = (target) => {
                                     options: {
                                         rootMode: 'upward',
                                         cacheDirectory: true,
-                                        plugins: [
-                                            mode === development &&
-                                                require.resolve('react-refresh/babel')
-                                        ].filter(Boolean)
+                                        ...(addBabelPlugins ? {plugins: addBabelPlugins([])} : {})
                                     }
                                 }
                             ]
@@ -226,9 +218,14 @@ const withChunking = (config) => {
     }
 }
 
+const addReactRefresh = (babelPlugins) =>
+    [...babelPlugins, mode === development && require.resolve('react-refresh/babel')].filter(
+        Boolean
+    )
+
 const client =
     entryPointExists(['app', 'main']) &&
-    baseConfig('web')
+    baseConfig('web', {addBabelPlugins: addReactRefresh})
         .extend(withChunking)
         .extend((config) => {
             return {
@@ -246,7 +243,14 @@ const client =
                 plugins: [
                     ...config.plugins,
                     new LoadablePlugin({writeToDisk: true}),
-                    analyzeBundle && getBundleAnalyzerPlugin(CLIENT)
+                    analyzeBundle && getBundleAnalyzerPlugin(CLIENT),
+                    mode === development && new webpack.HotModuleReplacementPlugin(),
+                    mode === development &&
+                        new ReactRefreshWebpackPlugin({
+                            overlay: {
+                                sockIntegration: 'whm'
+                            }
+                        })
                 ].filter(Boolean),
                 // Hide the performance hints, since we already have a similar `bundlesize` check in `template-retail-react-app` package
                 performance: {
