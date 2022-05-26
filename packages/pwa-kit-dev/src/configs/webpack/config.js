@@ -250,7 +250,7 @@ const enableReactRefresh = (config) => {
                         sockIntegration: 'whm'
                     }
                 })
-        ],
+        ].filter(Boolean),
         output: {
             ...config.output,
             // So that client-side hot reloading works properly,
