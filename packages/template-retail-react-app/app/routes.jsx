@@ -90,6 +90,7 @@ const routes = [
                 const newURL = new URL(window.location)
                 if (!urlParams.has('redirected')) {
                     newURL.searchParams.append('redirected', '1')
+                    newURL.pathname='/s/RefArch/'+window.location.pathname.split('/').slice(2).join('/')
                     window.location.href = newURL
                 }
             })
