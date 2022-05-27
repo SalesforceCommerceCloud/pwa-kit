@@ -2,6 +2,7 @@
 
 -   Replace `Mobify` references/links with proper PWA Kit values. [#619](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/619)
 -   Add support for a custom build directory to `pwa-kit-dev build`. [#628](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/628)
+-   By default, enable client-side hot module replacement [#630](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/630)
 
 ## v2.0.0 (May 16, 2022)
 

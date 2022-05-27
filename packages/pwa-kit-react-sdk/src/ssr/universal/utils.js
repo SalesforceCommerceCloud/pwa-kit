@@ -20,9 +20,10 @@ const onClient = typeof window !== 'undefined'
  */
 export const getAssetUrl = (path) => {
     /* istanbul ignore next */
-    return onClient
-        ? `${window.Progressive.buildOrigin}${path}`
-        : `/mobify/bundle/${process.env.BUNDLE_ID || 'development'}/${path}`
+    const publicPath = onClient
+        ? `${window.Progressive.buildOrigin}`
+        : `/mobify/bundle/${process.env.BUNDLE_ID || 'development'}/`
+    return path ? `${publicPath}${path}` : publicPath
 }
 
 /**

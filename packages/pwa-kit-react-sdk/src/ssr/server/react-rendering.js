@@ -259,7 +259,7 @@ const renderAppHtml = (req, res, error, appData) => {
 const renderApp = async (args) => {
     const {req, res, appStateError, App, appState, location, routes, config, routerContext, effectContext } = args
     const deviceType = detectDeviceType(req)
-    const extractor = new ChunkExtractor({statsFile: BUNDLES_PATH})
+    const extractor = new ChunkExtractor({statsFile: BUNDLES_PATH, publicPath: getAssetUrl()})
     const appData = {App, appState, location, routes, routerContext, effectContext, deviceType, extractor}
 
     const ssrOnly = 'mobify_server_only' in req.query || '__server_only' in req.query
@@ -289,8 +289,7 @@ const renderApp = async (args) => {
         bundles = extractor.getScriptElements().map((el) =>
             React.cloneElement(el, {
                 ...el.props,
-                ...scriptProps,
-                src: el.props.src && getAssetUrl(el.props.src.slice(1))
+                ...scriptProps
             })
         )
     }

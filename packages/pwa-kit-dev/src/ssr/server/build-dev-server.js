@@ -15,11 +15,17 @@ import mimeTypes from 'mime-types'
 import webpack from 'webpack'
 import webpackDevMiddleware from 'webpack-dev-middleware'
 import webpackHotServerMiddleware from 'webpack-hot-server-middleware'
+import webpackHotMiddleware from 'webpack-hot-middleware'
 import open from 'open'
 import requireFromString from 'require-from-string'
 import {RemoteServerFactory} from 'pwa-kit-runtime/ssr/server/build-remote-server'
 import {proxyConfigs} from 'pwa-kit-runtime/utils/ssr-shared'
-import {SERVER, CLIENT_OPTIONAL, REQUEST_PROCESSOR} from '../../configs/webpack/config-names'
+import {
+    SERVER,
+    CLIENT,
+    CLIENT_OPTIONAL,
+    REQUEST_PROCESSOR
+} from '../../configs/webpack/config-names'
 
 const projectDir = process.cwd()
 const projectWebpackPath = path.resolve(projectDir, 'webpack.config.js')
@@ -132,6 +138,13 @@ export const DevServerMixin = {
         }
 
         app.use('/mobify/bundle/development', app.__devMiddleware)
+
+        app.__hmrMiddleware = (_, res) => res.status(501).send('Hot Module Reloading is disabled.')
+        const clientCompiler = app.__compiler.compilers.find((compiler) => compiler.name === CLIENT)
+        if (clientCompiler && process.env.HMR !== 'false') {
+            app.__hmrMiddleware = webpackHotMiddleware(clientCompiler, {path: '/'}) // path is relative to the endpoint the middleware is attached to
+        }
+        app.use('/__mrt/hmr', app.__hmrMiddleware)
 
         app.use('/__mrt/status', (req, res) => {
             return res.json({ready: app.__webpackReady()})
