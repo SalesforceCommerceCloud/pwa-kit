@@ -221,10 +221,12 @@ const ruleForBabelLoader = (babelPlugins) => {
 }
 
 const enableReactRefresh = (config) => {
+    if (mode !== development) {
+        return config
+    }
+
     const rules = [
-        ruleForBabelLoader(
-            [mode === development && require.resolve('react-refresh/babel')].filter(Boolean)
-        ),
+        ruleForBabelLoader([require.resolve('react-refresh/babel')]),
         ...config.module.rules.slice(1)
     ]
 
@@ -236,21 +238,22 @@ const enableReactRefresh = (config) => {
         },
         entry: {
             ...config.entry,
-            main: [mode === development && 'webpack-hot-middleware/client?path=/__mrt/hmr', './app/main'].filter(
-                Boolean
-            )
+            main: ['webpack-hot-middleware/client?path=/__mrt/hmr', './app/main']
         },
         plugins: [
             ...config.plugins,
 
-            mode === development && new webpack.HotModuleReplacementPlugin(),
-            mode === development &&
-                new ReactRefreshWebpackPlugin({
-                    overlay: {
-                        sockIntegration: 'whm'
-                    }
-                })
-        ].filter(Boolean)
+            new webpack.HotModuleReplacementPlugin(),
+            new ReactRefreshWebpackPlugin({
+                overlay: {
+                    sockIntegration: 'whm'
+                }
+            })
+        ],
+        output: {
+            ...config.output,
+            publicPath: '/mobify/bundle/development/'
+        }
     }
 }
 
