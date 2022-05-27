@@ -16,7 +16,7 @@ const useProps = (initial, effect) => {
         initial = {}
     }
 
-    const key = useUID()
+    const key = `uh_${useUID()}` // uh - use hook .. lol
     const location = useLocation()
     const params = useParams()
     const {req, res} = useExpress()
