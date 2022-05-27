@@ -25,7 +25,6 @@
         "save-credentials": "pwa-kit-dev save-credentials",
         "start": "pwa-kit-dev start",
         "start:inspect": "npm run start -- --inspect",
-        "start:no-hmr": "npm run start -- --noHMR",
         "test": "pwa-kit-dev test",
         "build": "pwa-kit-dev build",
         "push": "npm run build && pwa-kit-dev push"
