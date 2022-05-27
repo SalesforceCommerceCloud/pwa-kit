@@ -9,7 +9,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import {BrowserRouter as Router} from 'react-router-dom'
 import DeviceContext from '../universal/device-context'
-import EffectContext from '../universal/get-props-context'
+import EffectContext from '../universal/use-props-context'
 import ExpressContext from '../universal/contexts/express-context'
 
 import App from '../universal/components/_app'

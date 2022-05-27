@@ -88,6 +88,7 @@ const Home = ({isLoading}) => {
     // })
 
     const {productSearchResult} = useProps(async ({res}) => {
+        console.log('GETTING SEARCH RESULTS FOR HOME PAGE')
         if (res) {
             res.set('Cache-Control', `max-age=${MAX_CACHE_AGE}`)
         }

@@ -19,7 +19,7 @@ import serialize from 'serialize-javascript'
 
 import {getAssetUrl} from '../universal/utils'
 import DeviceContext from '../universal/device-context'
-import EffectContext from '../universal/get-props-context'
+import EffectContext from '../universal/use-props-context'
 import ExpressContext from '../universal/contexts/express-context'
 
 import Document from '../universal/components/_document'
@@ -193,7 +193,8 @@ export const render = async (req, res, next) => {
         await renderApp(args)
 
         // Call all the useProps functions
-        const hooksProps = await Promise.all(args.effectContext.requests)
+        const effectPromises = args.effectContext.requests.map((request) => request.fireEffect())
+        const hooksProps = await Promise.all(effectPromises)
 
         // Turn array into a map.
         const hooksPropsMap = hooksProps.reduce((acc, curr) => {

@@ -1,7 +1,7 @@
 import {useState, useContext, useEffect} from 'react'
 import {useLocation, useParams} from 'react-router-dom'
 
-import Context from '../get-props-context'
+import Context from '../use-props-context'
 import {useUID} from 'react-uid'
 import {useExpress} from './index'
 
@@ -30,18 +30,40 @@ const useProps = (initial, effect) => {
     // rendering pipeline.
     // 3. Make this asyn/await style.
     if (context.requests) {
-        context.requests.push(
-            Promise.resolve().then(() => {
-                return effect({req, res, location, params})
-            }).then((data) => {
-                if (data) {
-                    context[key] = data
-                    return {
-                        [key]: data
-                    }
-                }
-            })
-        )
+        // context.requests.push(
+        //     Promise.resolve().then(() => {
+        //         return effect({req, res, location, params})
+        //     }).then((data) => {
+        //         if (data) {
+        //             context[key] = data
+        //             return {
+        //                 [key]: data
+        //             }
+        //         }
+        //     })
+        // )
+
+        // NOTE: Here I created an object type that has the effect/action and a function to
+        // set the action in motion and place the return value in our state. I did this because
+        // if we used the solution above the effects are immediately invocked, and because we 
+        // render twice, we would end up making those calls to APIs 2 times.
+        context.requests.push({
+            effect: effect.bind(this, {req, res, location, params}),
+            fireEffect: function () {
+                return Promise.resolve()
+                    .then(this.effect)
+                    .then((data) => {
+                        if (data) {
+                            context[key] = data
+                            return {
+                                [key]: data
+                            }
+                        } else {
+                            throw new Error('`useProps` must return a value.')
+                        }
+                    })  
+            }
+        })
     }
 
     if (isClient) {
