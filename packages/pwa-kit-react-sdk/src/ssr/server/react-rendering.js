@@ -228,7 +228,7 @@ const renderAppHtml = (req, res, error, appData) => {
 const renderApp = (args) => {
     const {req, res, appStateError, App, appState, location, routes, config} = args
     const deviceType = detectDeviceType(req)
-    const extractor = new ChunkExtractor({statsFile: BUNDLES_PATH})
+    const extractor = new ChunkExtractor({statsFile: BUNDLES_PATH, publicPath: getAssetUrl()})
     const routerContext = {}
     const appData = {App, appState, location, routes, routerContext, deviceType, extractor}
 
@@ -260,7 +260,7 @@ const renderApp = (args) => {
             React.cloneElement(el, {
                 ...el.props,
                 ...scriptProps,
-                src: el.props.src && getAssetUrl(el.props.src.slice(1))
+                src: el.props.src
             })
         )
     }
