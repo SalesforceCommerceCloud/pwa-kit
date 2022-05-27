@@ -139,10 +139,12 @@ export const DevServerMixin = {
 
         app.use('/mobify/bundle/development', app.__devMiddleware)
 
+        app.__hmrMiddleware = (_, res) => res.status(409).send('Hot Module Reloading is disabled.')
         const clientCompiler = app.__compiler.compilers.find((compiler) => compiler.name === CLIENT)
         if (clientCompiler) {
-            app.use('/__mrt/hmr', webpackHotMiddleware(clientCompiler, {path: '/'}))
+            app.__hmrMiddleware = webpackHotMiddleware(clientCompiler, {path: '/'})
         }
+        app.use('/__mrt/hmr', app.__hmrMiddleware)
 
         app.use('/__mrt/status', (req, res) => {
             return res.json({ready: app.__webpackReady()})
