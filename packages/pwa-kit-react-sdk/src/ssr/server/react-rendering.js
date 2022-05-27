@@ -259,8 +259,7 @@ const renderApp = (args) => {
         bundles = extractor.getScriptElements().map((el) =>
             React.cloneElement(el, {
                 ...el.props,
-                ...scriptProps,
-                src: el.props.src
+                ...scriptProps
             })
         )
     }
