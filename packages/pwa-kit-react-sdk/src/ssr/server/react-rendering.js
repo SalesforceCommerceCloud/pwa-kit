@@ -260,7 +260,7 @@ const renderApp = (args) => {
             React.cloneElement(el, {
                 ...el.props,
                 ...scriptProps,
-                src: el.props.src && el.props.src.slice(1)
+                src: el.props.src
             })
         )
     }
