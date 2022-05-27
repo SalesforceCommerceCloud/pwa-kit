@@ -23,10 +23,12 @@ import {createModuleReplacementPlugin} from './plugins'
 import {CLIENT, SERVER, CLIENT_OPTIONAL, SSR, REQUEST_PROCESSOR} from './config-names'
 
 const projectDir = process.cwd()
-const sdkDir = path.resolve(path.join(__dirname, '..', '..', '..'))
+const sdkDir = resolve(path.join(__dirname, '..', '..', '..'))
 
 const pkg = require(resolve(projectDir, 'package.json'))
-const buildDir = resolve(projectDir, 'build')
+const buildDir = process.env.PWA_KIT_BUILD_DIR
+    ? resolve(process.env.PWA_KIT_BUILD_DIR)
+    : resolve(projectDir, 'build')
 
 const production = 'production'
 const development = 'development'
@@ -54,7 +56,7 @@ const getBundleAnalyzerPlugin = (name = 'report', pluginOptions) =>
 
 const entryPointExists = (segments) => {
     for (let ext of ['.js', '.jsx', '.ts', '.tsx']) {
-        const p = path.resolve(projectDir, ...segments) + ext
+        const p = resolve(projectDir, ...segments) + ext
         if (fs.existsSync(p)) {
             return true
         }
@@ -326,7 +328,7 @@ const clientOptional = baseConfig('web')
     .build()
 
 const renderer =
-    fs.existsSync(path.resolve(projectDir, 'node_modules', 'pwa-kit-react-sdk')) &&
+    fs.existsSync(resolve(projectDir, 'node_modules', 'pwa-kit-react-sdk')) &&
     baseConfig('node')
         .extend((config) => {
             return {
