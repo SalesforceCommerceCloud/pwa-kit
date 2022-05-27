@@ -9,6 +9,7 @@ import React, {useEffect, useState} from 'react'
 import PropTypes from 'prop-types'
 import {Helmet} from 'react-helmet'
 import {FormattedMessage, useIntl} from 'react-intl'
+import {useProps} from 'pwa-kit-react-sdk/ssr/universal/hooks'
 
 // Components
 import {
@@ -42,14 +43,54 @@ import {rebuildPathWithParams} from '../../utils/url'
 import {useHistory} from 'react-router-dom'
 import {useToast} from '../../hooks/use-toast'
 
-const ProductDetail = ({category, product, isLoading}) => {
+import {useCommerceAPI} from '../../commerce-api/contexts'
+
+
+const ProductDetail = ({isLoading}) => {
     const {formatMessage} = useIntl()
     const basket = useBasket()
     const history = useHistory()
     const einstein = useEinstein()
-    const variant = useVariant(product)
     const toast = useToast()
     const navigate = useNavigation()
+    const api = useCommerceAPI()
+
+    const {category, product} = useProps(async ({res, location, params}) => {
+        const {productId} = params
+        let category, product
+        const urlParams = new URLSearchParams(location.search)
+    
+        product = await api.shopperProducts.getProduct({
+            parameters: {
+                id: urlParams.get('pid') || productId,
+                allImages: true
+            }
+        })
+    
+        if (product?.primaryCategoryId) {
+            category = await api.shopperProducts.getCategory({
+                parameters: {id: product?.primaryCategoryId, levels: 1}
+            })
+        }
+    
+        // Set the `cache-control` header values similar to those on the product-list.
+        if (res) {
+            res.set('Cache-Control', `max-age=${MAX_CACHE_AGE}`)
+        }
+    
+        // The `commerce-isomorphic-sdk` package does not throw errors, so
+        // we have to check the returned object type to inconsistencies.
+        if (typeof product?.type === 'string') {
+            throw new HTTPNotFound(product.detail)
+        }
+        if (typeof category?.type === 'string') {
+            throw new HTTPNotFound(category.detail)
+        }
+    
+        return {category, product}
+    })
+
+    const variant = useVariant(product)
     const [primaryCategory, setPrimaryCategory] = useState(category)
 
     // This page uses the `primaryCategoryId` to retrieve the category data. This attribute
@@ -139,6 +180,7 @@ const ProductDetail = ({category, product, isLoading}) => {
         }
     }, [product])
 
+    
     return (
         <Box
             className="sf-product-detail-page"
@@ -296,53 +338,6 @@ const ProductDetail = ({category, product, isLoading}) => {
 }
 
 ProductDetail.getTemplateName = () => 'product-detail'
-
-ProductDetail.shouldGetProps = ({previousLocation, location}) => {
-    const previousParams = new URLSearchParams(previousLocation?.search || '')
-    const params = new URLSearchParams(location.search)
-
-    // If the product changed via the pathname or `pid` param, allow updated
-    // data to be retrieved.
-    return (
-        previousLocation?.pathname !== location.pathname ||
-        previousParams.get('pid') !== params.get('pid')
-    )
-}
-
-ProductDetail.getProps = async ({res, params, location, api}) => {
-    const {productId} = params
-    let category, product
-    const urlParams = new URLSearchParams(location.search)
-
-    product = await api.shopperProducts.getProduct({
-        parameters: {
-            id: urlParams.get('pid') || productId,
-            allImages: true
-        }
-    })
-
-    if (product?.primaryCategoryId) {
-        category = await api.shopperProducts.getCategory({
-            parameters: {id: product?.primaryCategoryId, levels: 1}
-        })
-    }
-
-    // Set the `cache-control` header values similar to those on the product-list.
-    if (res) {
-        res.set('Cache-Control', `max-age=${MAX_CACHE_AGE}`)
-    }
-
-    // The `commerce-isomorphic-sdk` package does not throw errors, so
-    // we have to check the returned object type to inconsistencies.
-    if (typeof product?.type === 'string') {
-        throw new HTTPNotFound(product.detail)
-    }
-    if (typeof category?.type === 'string') {
-        throw new HTTPNotFound(category.detail)
-    }
-
-    return {category, product}
-}
 
 ProductDetail.propTypes = {
     /**

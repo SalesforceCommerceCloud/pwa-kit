@@ -19,6 +19,8 @@ import serialize from 'serialize-javascript'
 
 import {getAssetUrl} from '../universal/utils'
 import DeviceContext from '../universal/device-context'
+import EffectContext from '../universal/get-props-context'
+import ExpressContext from '../universal/contexts/express-context'
 
 import Document from '../universal/components/_document'
 import App from '../universal/components/_app'
@@ -182,10 +184,33 @@ export const render = async (req, res, next) => {
         req,
         res,
         location,
-        config
+        config,
+        routerContext: {},
+        effectContext: {requests: []}
     }
     try {
-        renderResult = renderApp(args)
+        // Pre-render app to get useProps requests
+        await renderApp(args)
+
+        // Call all the useProps functions
+        const hooksProps = await Promise.all(args.effectContext.requests)
+
+        // Turn array into a map.
+        const hooksPropsMap = hooksProps.reduce((acc, curr) => {
+            const [key, value] = Object.entries(curr)[0]
+            return {
+                ...acc,
+                [key]: value
+            }
+        }, {})
+
+        // Set the args with the new updated app state.
+        args.appState = {
+            ...appState,
+            hookProps: hooksPropsMap
+        }
+
+        renderResult = await renderApp(args)
     } catch (e) {
         // This is an unrecoverable error.
         // (errors handled by the AppErrorBoundary are considered recoverable)
@@ -209,28 +234,32 @@ export const render = async (req, res, next) => {
 }
 
 const renderAppHtml = (req, res, error, appData) => {
-    const {App, appState, routes, routerContext, location, extractor, deviceType} = appData
+    const {App, appState, routes, routerContext, effectContext, location, extractor, deviceType} = appData
 
     let appJSX = (
         <Router location={location} context={routerContext}>
-            <DeviceContext.Provider value={{type: deviceType}}>
-                <AppConfig locals={res.locals}>
-                    <Switch error={error} appState={appState} routes={routes} App={App} />
-                </AppConfig>
-            </DeviceContext.Provider>
+            <ExpressContext.Provider value={{req, res}}>
+                <EffectContext.Provider value={effectContext}>
+                    <DeviceContext.Provider value={{type: deviceType}}>
+                        <AppConfig locals={res.locals}>
+                            <Switch error={error} appState={appState} routes={routes} App={App} />
+                        </AppConfig>
+                    </DeviceContext.Provider>
+                </EffectContext.Provider>
+            </ExpressContext.Provider>
         </Router>
     )
 
     appJSX = extractor.collectChunks(appJSX)
+
     return ReactDOMServer.renderToString(appJSX)
 }
 
-const renderApp = (args) => {
-    const {req, res, appStateError, App, appState, location, routes, config} = args
+const renderApp = async (args) => {
+    const {req, res, appStateError, App, appState, location, routes, config, routerContext, effectContext } = args
     const deviceType = detectDeviceType(req)
     const extractor = new ChunkExtractor({statsFile: BUNDLES_PATH})
-    const routerContext = {}
-    const appData = {App, appState, location, routes, routerContext, deviceType, extractor}
+    const appData = {App, appState, location, routes, routerContext, effectContext, deviceType, extractor}
 
     const ssrOnly = 'mobify_server_only' in req.query || '__server_only' in req.query
     const prettyPrint = 'mobify_pretty' in req.query || '__pretty_print' in req.query

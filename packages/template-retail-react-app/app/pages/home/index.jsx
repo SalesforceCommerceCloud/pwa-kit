@@ -8,6 +8,8 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {useIntl, FormattedMessage} from 'react-intl'
+import {useProps} from 'pwa-kit-react-sdk/ssr/universal/hooks'
+import {useCommerceAPI} from '../../commerce-api/contexts'
 
 // Components
 import {
@@ -22,6 +24,7 @@ import {
     Container,
     Link
 } from '@chakra-ui/react'
+import ProjectLink from '../../components/link'
 
 // Project Components
 import Hero from '../../components/hero'
@@ -46,8 +49,58 @@ import {
  * The page renders SEO metadata and a few promotion
  * categories and products, data is from local file.
  */
-const Home = ({productSearchResult, isLoading}) => {
+const Home = ({isLoading}) => {
     const intl = useIntl()
+    const api = useCommerceAPI()
+
+    // Below is an example of making an asynchronous call for data.
+    // const {product} = useProps(() => Promise.resolve({
+    //     product: {
+    //         id: 1,
+    //         name: 'async test product'
+    //     }
+    // }))
+
+    // Below shows that it works well with synchrounous data calls too.
+    const {product} = useProps(() => ({
+        product: {
+            id: 1,
+            name: 'snyc test product'
+        }
+    }))
+
+    const {category} = useProps(() => ({
+        category: {
+            id: 1,
+            name: 'snyc test category'
+        }
+    }))
+
+    // Example showing that you can play with the request and 
+    // response objects as you would in `getProps`.
+    // let product
+    // useProps(({res}) => {
+    //     res && res.status(404)
+
+    //     // TODO: Should we warn about not returning a value? Probably... or
+    //     // just do what getProps does.
+    //     return {}
+    // })
+
+    const {productSearchResult} = useProps(async ({res}) => {
+        if (res) {
+            res.set('Cache-Control', `max-age=${MAX_CACHE_AGE}`)
+        }
+    
+        const productSearchResult = await api.shopperSearch.productSearch({
+            parameters: {
+                refine: [`cgid=${HOME_SHOP_PRODUCTS_CATEGORY_ID}`, 'htype=master'],
+                limit: HOME_SHOP_PRODUCTS_LIMIT
+            }
+        })
+    
+        return {productSearchResult}
+    })
 
     return (
         <Box data-testid="home-page" layerStyle="page">
@@ -132,6 +185,10 @@ const Home = ({productSearchResult, isLoading}) => {
                     })}
                 </SimpleGrid>
             </Section>
+
+            {product && <div>{product.name}</div>}
+            
+            {category && <div>{category.name}</div>}
 
             {productSearchResult && (
                 <Section
@@ -277,20 +334,20 @@ Home.getTemplateName = () => 'home'
 Home.shouldGetProps = ({previousLocation, location}) =>
     !previousLocation || previousLocation.pathname !== location.pathname
 
-Home.getProps = async ({res, api}) => {
-    if (res) {
-        res.set('Cache-Control', `max-age=${MAX_CACHE_AGE}`)
-    }
+// Home.getProps = async ({res, api}) => {
+//     if (res) {
+//         res.set('Cache-Control', `max-age=${MAX_CACHE_AGE}`)
+//     }
 
-    const productSearchResult = await api.shopperSearch.productSearch({
-        parameters: {
-            refine: [`cgid=${HOME_SHOP_PRODUCTS_CATEGORY_ID}`, 'htype=master'],
-            limit: HOME_SHOP_PRODUCTS_LIMIT
-        }
-    })
+//     const productSearchResult = await api.shopperSearch.productSearch({
+//         parameters: {
+//             refine: [`cgid=${HOME_SHOP_PRODUCTS_CATEGORY_ID}`, 'htype=master'],
+//             limit: HOME_SHOP_PRODUCTS_LIMIT
+//         }
+//     })
 
-    return {productSearchResult}
-}
+//     return {productSearchResult}
+// }
 
 Home.propTypes = {
     /**
