@@ -129,7 +129,6 @@ const initAppState = async ({App, component, match, route, req, res, location}) 
  * @return {Promise}
  */
 export const render = async (req, res, next) => {
-    debugger
     // Get the application config which should have been stored at this point.
     const config = getConfig()
 
@@ -229,7 +228,6 @@ const renderAppHtml = (req, res, error, appData) => {
 const renderApp = (args) => {
     const {req, res, appStateError, App, appState, location, routes, config} = args
     const deviceType = detectDeviceType(req)
-    debugger
     const extractor = new ChunkExtractor({statsFile: BUNDLES_PATH, publicPath: getPublicPath()})
     const routerContext = {}
     const appData = {App, appState, location, routes, routerContext, deviceType, extractor}
