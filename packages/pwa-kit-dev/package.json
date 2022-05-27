@@ -32,7 +32,7 @@
     "lint:js": "internal-lib-build lint .",
     "prepare": "npm run build",
     "build": "cross-env NODE_ENV=production internal-lib-build build",
-    "build:watch": "watch 'npm run build' src/",
+    "build:watch": "watch 'npm run build' src/ bin/",
     "test": "internal-lib-build test",
     "version": "node ./scripts/version.js"
   },
