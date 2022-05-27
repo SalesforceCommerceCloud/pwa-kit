@@ -146,7 +146,7 @@ const baseConfig = (target) => {
 
                 module: {
                     rules: [
-                        ruleForBabelLoader(), // For easier targeting later, please have this as the first item
+                        ruleForBabelLoader(),
                         target === 'node' && {
                             test: /\.svg$/,
                             loader: findInProjectThenSDK('svg-sprite-loader')
@@ -173,6 +173,9 @@ const baseConfig = (target) => {
         }
 
         build() {
+            // Clean up temporary properties, to be compatible with the config schema
+            this.config.module.rules.filter((rule) => rule.id).forEach((rule) => delete rule.id)
+
             return this.config
         }
     }
@@ -206,6 +209,7 @@ const withChunking = (config) => {
 
 const ruleForBabelLoader = (babelPlugins) => {
     return {
+        id: 'javascript',
         test: /(\.js(x?)|\.ts(x?))$/,
         exclude: /node_modules/,
         use: [
@@ -221,15 +225,24 @@ const ruleForBabelLoader = (babelPlugins) => {
     }
 }
 
+const findAndReplace = (array = [], findFn = () => {}, replacement) => {
+    const clone = array.slice(0)
+    const index = clone.findIndex(findFn)
+    if (index === -1) {
+        return array
+    }
+
+    clone.splice(index, 1, replacement)
+    return clone
+}
+
 const enableReactRefresh = (config) => {
     if (mode !== development || disableHMR) {
         return config
     }
 
-    const rules = [
-        ruleForBabelLoader([require.resolve('react-refresh/babel')]),
-        ...config.module.rules.slice(1)
-    ]
+    const newRule = ruleForBabelLoader([require.resolve('react-refresh/babel')])
+    const rules = findAndReplace(config.module.rules, (rule) => rule.id === 'javascript', newRule)
 
     return {
         ...config,
