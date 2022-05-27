@@ -17,7 +17,7 @@ import {ChunkExtractor} from '@loadable/server'
 import {StaticRouter as Router, matchPath} from 'react-router-dom'
 import serialize from 'serialize-javascript'
 
-import {getAssetUrl, getPublicPath} from '../universal/utils'
+import {getAssetUrl} from '../universal/utils'
 import DeviceContext from '../universal/device-context'
 
 import Document from '../universal/components/_document'
@@ -228,7 +228,7 @@ const renderAppHtml = (req, res, error, appData) => {
 const renderApp = (args) => {
     const {req, res, appStateError, App, appState, location, routes, config} = args
     const deviceType = detectDeviceType(req)
-    const extractor = new ChunkExtractor({statsFile: BUNDLES_PATH, publicPath: getPublicPath()})
+    const extractor = new ChunkExtractor({statsFile: BUNDLES_PATH, publicPath: getAssetUrl()})
     const routerContext = {}
     const appData = {App, appState, location, routes, routerContext, deviceType, extractor}
 

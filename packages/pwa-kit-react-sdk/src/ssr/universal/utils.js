@@ -12,18 +12,6 @@ import {proxyConfigs} from 'pwa-kit-runtime/utils/ssr-shared'
 const onClient = typeof window !== 'undefined'
 
 /**
- * Get the path that should be used to load an asset from the bundle.
- *
- * @returns {string}
- */
-export const getPublicPath = () => {
-    /* istanbul ignore next */
-    return onClient
-        ? `${window.Progressive.buildOrigin}`
-        : `/mobify/bundle/${process.env.BUNDLE_ID || 'development'}/`
-}
-
-/**
  * Get the URL that should be used to load an asset from the bundle.
  *
  * @param {string} path - relative path from the build directory to the asset
@@ -32,7 +20,10 @@ export const getPublicPath = () => {
  */
 export const getAssetUrl = (path) => {
     /* istanbul ignore next */
-    return `${getPublicPath}${path}`
+    const publicPath = onClient
+        ? `${window.Progressive.buildOrigin}`
+        : `/mobify/bundle/${process.env.BUNDLE_ID || 'development'}/`
+    return path ? `${publicPath}${path}` : publicPath
 }
 
 /**
