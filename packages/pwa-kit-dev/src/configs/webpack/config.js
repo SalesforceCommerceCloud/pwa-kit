@@ -34,6 +34,7 @@ const analyzeBundle = process.env.MOBIFY_ANALYZE === 'true'
 const mode = process.env.NODE_ENV === production ? production : development
 const DEBUG = mode !== production && process.env.DEBUG === 'true'
 const CI = process.env.CI
+const disableHMR = process.env.HMR === 'false'
 
 if ([production, development].indexOf(mode) < 0) {
     throw new Error(`Invalid mode "${mode}"`)
@@ -221,7 +222,7 @@ const ruleForBabelLoader = (babelPlugins) => {
 }
 
 const enableReactRefresh = (config) => {
-    if (mode !== development) {
+    if (mode !== development || disableHMR) {
         return config
     }
 

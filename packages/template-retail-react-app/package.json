@@ -71,6 +71,7 @@
         "save-credentials": "pwa-kit-dev save-credentials",
         "start": "cross-env NODE_ICU_DATA=node_modules/full-icu pwa-kit-dev start",
         "start:inspect": "npm run start -- --inspect",
+        "start:no-hmr": "npm run start -- --noHMR",
         "start:pseudolocale": "npm run extract-default-translations && npm run compile-translations:pseudo && cross-env USE_PSEUDOLOCALE=true npm run start",
         "test": "pwa-kit-dev test",
         "test:lighthouse": "cross-env NODE_ENV=production lhci autorun --config=tests/lighthouserc.js",
