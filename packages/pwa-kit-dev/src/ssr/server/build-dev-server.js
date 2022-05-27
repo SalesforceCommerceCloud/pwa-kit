@@ -141,7 +141,7 @@ export const DevServerMixin = {
 
         app.__hmrMiddleware = (_, res) => res.status(501).send('Hot Module Reloading is disabled.')
         const clientCompiler = app.__compiler.compilers.find((compiler) => compiler.name === CLIENT)
-        if (clientCompiler) {
+        if (clientCompiler && process.env.HMR !== 'false') {
             app.__hmrMiddleware = webpackHotMiddleware(clientCompiler, {path: '/'}) // path is relative to the endpoint the middleware is attached to
         }
         app.use('/__mrt/hmr', app.__hmrMiddleware)
