@@ -16,7 +16,9 @@ import WebpackNotifierPlugin from 'webpack-notifier'
 import CopyPlugin from 'copy-webpack-plugin'
 import {BundleAnalyzerPlugin} from 'webpack-bundle-analyzer'
 import LoadablePlugin from '@loadable/webpack-plugin'
+import ReactRefreshWebpackPlugin from '@pmmmwh/react-refresh-webpack-plugin'
 import SpeedMeasurePlugin from 'speed-measure-webpack-plugin'
+
 import {createModuleReplacementPlugin} from './plugins'
 import {CLIENT, SERVER, CLIENT_OPTIONAL, SSR, REQUEST_PROCESSOR} from './config-names'
 
@@ -34,6 +36,7 @@ const analyzeBundle = process.env.MOBIFY_ANALYZE === 'true'
 const mode = process.env.NODE_ENV === production ? production : development
 const DEBUG = mode !== production && process.env.DEBUG === 'true'
 const CI = process.env.CI
+const disableHMR = process.env.HMR === 'false'
 
 if ([production, development].indexOf(mode) < 0) {
     throw new Error(`Invalid mode "${mode}"`)
@@ -121,7 +124,8 @@ const baseConfig = (target) => {
                         react: findInProjectThenSDK('react'),
                         'react-router-dom': findInProjectThenSDK('react-router-dom'),
                         'react-dom': findInProjectThenSDK('react-dom'),
-                        'react-helmet': findInProjectThenSDK('react-helmet')
+                        'react-helmet': findInProjectThenSDK('react-helmet'),
+                        'webpack-hot-middleware': findInProjectThenSDK('webpack-hot-middleware')
                     },
                     ...(target === 'web' ? {fallback: {crypto: false}} : {})
                 },
@@ -140,23 +144,11 @@ const baseConfig = (target) => {
 
                     // Don't chunk if it's a node target – faster Lambda startup.
                     target === 'node' && new webpack.optimize.LimitChunkCountPlugin({maxChunks: 1})
-                ].filter((x) => !!x),
+                ].filter(Boolean),
 
                 module: {
                     rules: [
-                        {
-                            test: /(\.js(x?)|\.ts(x?))$/,
-                            exclude: /node_modules/,
-                            use: [
-                                {
-                                    loader: findInProjectThenSDK('babel-loader'),
-                                    options: {
-                                        rootMode: 'upward',
-                                        cacheDirectory: true
-                                    }
-                                }
-                            ]
-                        },
+                        ruleForBabelLoader(),
                         target === 'node' && {
                             test: /\.svg$/,
                             loader: findInProjectThenSDK('svg-sprite-loader')
@@ -183,6 +175,9 @@ const baseConfig = (target) => {
         }
 
         build() {
+            // Clean up temporary properties, to be compatible with the config schema
+            this.config.module.rules.filter((rule) => rule.id).forEach((rule) => delete rule.id)
+
             return this.config
         }
     }
@@ -214,6 +209,71 @@ const withChunking = (config) => {
     }
 }
 
+const ruleForBabelLoader = (babelPlugins) => {
+    return {
+        id: 'babel-loader',
+        test: /(\.js(x?)|\.ts(x?))$/,
+        exclude: /node_modules/,
+        use: [
+            {
+                loader: findInProjectThenSDK('babel-loader'),
+                options: {
+                    rootMode: 'upward',
+                    cacheDirectory: true,
+                    ...(babelPlugins ? {plugins: babelPlugins} : {})
+                }
+            }
+        ]
+    }
+}
+
+const findAndReplace = (array = [], findFn = () => {}, replacement) => {
+    const clone = array.slice(0)
+    const index = clone.findIndex(findFn)
+    if (index === -1) {
+        return array
+    }
+
+    clone.splice(index, 1, replacement)
+    return clone
+}
+
+const enableReactRefresh = (config) => {
+    if (mode !== development || disableHMR) {
+        return config
+    }
+
+    const newRule = ruleForBabelLoader([require.resolve('react-refresh/babel')])
+    const rules = findAndReplace(config.module.rules, (rule) => rule.id === 'babel-loader', newRule)
+
+    return {
+        ...config,
+        module: {
+            ...config.module,
+            rules
+        },
+        entry: {
+            ...config.entry,
+            main: ['webpack-hot-middleware/client?path=/__mrt/hmr', './app/main']
+        },
+        plugins: [
+            ...config.plugins,
+
+            new webpack.HotModuleReplacementPlugin(),
+            new ReactRefreshWebpackPlugin({
+                overlay: {
+                    sockIntegration: 'whm'
+                }
+            })
+        ],
+        output: {
+            ...config.output,
+            // Setting this so that *.hot-update.json requests are resolving
+            publicPath: '/mobify/bundle/development/'
+        }
+    }
+}
+
 const client =
     entryPointExists(['app', 'main']) &&
     baseConfig('web')
@@ -239,6 +299,7 @@ const client =
                 }
             }
         })
+        .extend(enableReactRefresh)
         .build()
 
 const optional = (name, path) => {
