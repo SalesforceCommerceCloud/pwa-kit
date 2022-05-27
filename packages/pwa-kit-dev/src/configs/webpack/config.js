@@ -211,7 +211,7 @@ const withChunking = (config) => {
 
 const ruleForBabelLoader = (babelPlugins) => {
     return {
-        id: 'javascript',
+        id: 'babel-loader',
         test: /(\.js(x?)|\.ts(x?))$/,
         exclude: /node_modules/,
         use: [
@@ -244,7 +244,7 @@ const enableReactRefresh = (config) => {
     }
 
     const newRule = ruleForBabelLoader([require.resolve('react-refresh/babel')])
-    const rules = findAndReplace(config.module.rules, (rule) => rule.id === 'javascript', newRule)
+    const rules = findAndReplace(config.module.rules, (rule) => rule.id === 'babel-loader', newRule)
 
     return {
         ...config,
