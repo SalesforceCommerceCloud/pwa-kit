@@ -141,7 +141,7 @@ export const DevServerMixin = {
 
         const clientCompiler = app.__compiler.compilers.find((compiler) => compiler.name === CLIENT)
         if (clientCompiler) {
-            app.use(webpackHotMiddleware(clientCompiler))
+            app.use('/__mrt/hmr', webpackHotMiddleware(clientCompiler, {path: '/'}))
         }
 
         app.use('/__mrt/status', (req, res) => {

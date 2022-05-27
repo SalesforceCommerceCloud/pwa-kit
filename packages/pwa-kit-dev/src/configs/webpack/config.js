@@ -236,7 +236,7 @@ const enableReactRefresh = (config) => {
         },
         entry: {
             ...config.entry,
-            main: [mode === development && 'webpack-hot-middleware/client', './app/main'].filter(
+            main: [mode === development && 'webpack-hot-middleware/client?path=/__mrt/hmr', './app/main'].filter(
                 Boolean
             )
         },
@@ -250,13 +250,7 @@ const enableReactRefresh = (config) => {
                         sockIntegration: 'whm'
                     }
                 })
-        ].filter(Boolean),
-        output: {
-            ...config.output,
-            // So that client-side hot reloading works properly,
-            // we'll need to prepend the *.hot-update.json urls with this publicPath
-            ...(mode === development ? {publicPath: '/mobify/bundle/development/'} : {})
-        }
+        ].filter(Boolean)
     }
 }
 
