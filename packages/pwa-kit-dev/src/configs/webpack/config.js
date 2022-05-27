@@ -253,6 +253,7 @@ const enableReactRefresh = (config) => {
         ],
         output: {
             ...config.output,
+            // Setting this so that *.hot-update.json requests are resolving
             publicPath: '/mobify/bundle/development/'
         }
     }
