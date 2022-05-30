@@ -1,0 +1,28 @@
+{
+  "name": "slas-react-sdk",
+  "version": "0.0.1",
+  "description": "",
+  "scripts": {
+    "build": "cross-env NODE_ENV=production internal-lib-build build && tsc --emitDeclarationOnly",
+    "build:watch": "watch 'npm run build' src/"
+  },
+  "author": "",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "private": true,
+  "license": "ISC",
+  "devDependencies": {
+    "@types/react": "^18.0.9",
+    "cross-env": "^7.0.3",
+    "internal-lib-build": "^2.1.0-dev",
+    "react": "^18.1.0",
+    "typescript": "^4.7.2",
+    "watch": "^1.0.2"
+  },
+  "peerDependencies": {
+    "react": "^17"
+  }
+}

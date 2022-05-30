@@ -7,13 +7,19 @@
 import loadable from '@loadable/component'
 
 const Home = loadable(() => import('./pages/home'))
+const Slas = loadable(() => import('./pages/slas'))
 
 const routes = [
     {
         path: '/',
         exact: true,
-        component: Home
-    }
+        component: Home,
+    },
+    {
+        path: '/slas',
+        exact: true,
+        component: Slas,
+    },
 ]
 
 export default routes
