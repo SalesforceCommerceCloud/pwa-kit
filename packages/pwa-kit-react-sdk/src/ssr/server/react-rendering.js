@@ -255,7 +255,6 @@ const renderApp = (args) => {
     let bundles = []
     /* istanbul ignore next */
     if (extractor) {
-        // Clone elements with the correct bundle path.
         bundles = extractor.getScriptElements().map((el) =>
             React.cloneElement(el, {
                 ...el.props,
