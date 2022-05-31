@@ -36,7 +36,7 @@ import {getConfig} from 'pwa-kit-runtime/utils/ssr-config'
 const AppConfig = ({children, locals = {}}) => {
     const [basket, setBasket] = useState(null)
     const [customer, setCustomer] = useState(null)
-
+    console.log('theme', theme)
     return (
         <CommerceAPIProvider value={locals.api}>
             <CustomerProvider value={{customer, setCustomer}}>

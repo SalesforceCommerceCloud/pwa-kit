@@ -76,7 +76,7 @@ const ProductDetail = ({category, product, isLoading}) => {
                 <meta name="description" content={product?.pageDescription} />
             </Helmet>
 
-            <Heading size={'md'}>No customisation</Heading>
+            <Heading size={'md'}>Theme customisation</Heading>
             <Stack mt={8}>
                 <ProductView product={product} />
             </Stack>
@@ -94,7 +94,9 @@ const ProductDetail = ({category, product, isLoading}) => {
                     productTitle={
                         <Box bg={'red'}>
                             <Box>Customised Product Title</Box>
-                            <Box><Heading size={'2xl'}>{product?.name}</Heading></Box>
+                            <Box>
+                                <Heading size={'2xl'}>{product?.name}</Heading>
+                            </Box>
                         </Box>
                     }
                 />

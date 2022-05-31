@@ -63,9 +63,9 @@ Skeleton.propTypes = {
  * The image gallery displays a hero image and thumbnails below it. You can control which
  * image groups that are use by passing in the current selected variation values.
  */
-const ImageGallery = ({imageGroups = [], selectedVariationAttributes = {}, size}) => {
+const ImageGallery = ({imageGroups = [], selectedVariationAttributes = {}, size = 'md'}) => {
     const [selectedIndex, setSelectedIndex] = useState(0)
-    const styles = {} || useMultiStyleConfig('ImageGallery', {size})
+    const styles = useMultiStyleConfig('ImageGallery', {size})
     // const location = useLocation()
 
     // Get the 'hero' image for the current variation.
@@ -96,12 +96,13 @@ const ImageGallery = ({imageGroups = [], selectedVariationAttributes = {}, size}
     )
 
     const heroImage = heroImageGroup?.images?.[selectedIndex]
-    const thumbnailImages = thumbnailImageGroup?.images || []
+    console.log('styles', styles)
 
-    const heroImageMaxWidth = '680px' // in px
+    const thumbnailImages = thumbnailImageGroup?.images || []
+    const heroImageMaxWidth = styles.heroImage.maxWidth?.[3] || '680px' // in px
 
     return (
-        <Flex direction="column">
+        <Flex direction="column" {...styles.container} data-testid="image-gallery">
             {heroImage && (
                 <Box {...styles.heroImageGroup}>
                     <AspectRatio {...styles.heroImage} ratio={1}>
@@ -125,7 +126,6 @@ const ImageGallery = ({imageGroups = [], selectedVariationAttributes = {}, size}
                     return (
                         <ListItem
                             {...styles.thumbnailImageItem}
-                            minWidth={'180px'}
                             tabIndex={0}
                             key={index}
                             data-testid="image-gallery-thumbnails"

@@ -50,6 +50,7 @@ import ProductTile from './components/project/product-tile'
 import SocialIcons from './components/project/social-icons'
 import SwatchGroup from './components/project/swatch-group'
 import ImageGallery from './components/project/image-gallery'
+import ProductView from './components/project/product-view'
 import * as components from 'pwa-kit-ecom/theme/components'
 console.log('components', components)
 
@@ -100,7 +101,8 @@ const overrides = {
         Pagination,
         ProductTile,
         SwatchGroup,
-        ImageGallery
+        ImageGallery,
+        ProductView
     }
 }
 

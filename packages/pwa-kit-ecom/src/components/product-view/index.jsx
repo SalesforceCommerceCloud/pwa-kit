@@ -1,25 +1,26 @@
 import React from 'react'
 import ImageGallery from '../image-gallary'
 import ProductTitle from '../product-title'
-import {Flex, Box, VStack, useStyleConfig, Button} from '@chakra-ui/react'
+import {Flex, Box, VStack, useStyleConfig, useMultiStyleConfig} from '@chakra-ui/react'
 import {useTheme} from '@chakra-ui/react'
 import {useProduct} from '../../hooks/use-product'
 
 function ProductView(props) {
     console.log('ProductView props', props)
-    const {imageGallery, productTitle} = props
+
+    const {imageGallery, productTitle, variant} = props
     const {product, variationParams} = useProduct(props.product)
-    const styles = useStyleConfig('ProductView')
+    const styles = useMultiStyleConfig('ProductView', {variant})
     // console.log('styles', styles)
     // console.log('useTheme()', useTheme())
     return (
-        <Flex data-testid="product-view" __css={styles}>
+        <Flex data-testid="product-view" {...styles.container}>
             {/* Basic information etc. title, price, breadcrumb*/}
-            <Box display={['block', 'block', 'block', 'none']} {...styles}>
+            <Box {...styles.headingWrapperMobile}>
                 {productTitle ? productTitle : <ProductTitle product={product} />}
             </Box>
             <Flex direction={['column', 'column', 'column', 'row']}>
-                <Box flex={1} mr={[0, 0, 0, 6, 6]}>
+                <Box {...styles.imageGallery}>
                     {product ? (
                         <>
                             {imageGallery ? (
@@ -38,8 +39,8 @@ function ProductView(props) {
                 </Box>
 
                 {/* Variations & Quantity Selector */}
-                <VStack align="stretch" spacing={8} flex={1} marginBottom={[16, 16, 16, 0, 0]}>
-                    <Box display={['none', 'none', 'none', 'block']}>
+                <VStack {...styles.buySection}>
+                    <Box {...styles.headingWrapperDesktop}>
                         {productTitle ? productTitle : <ProductTitle product={product} />}
                     </Box>
                 </VStack>

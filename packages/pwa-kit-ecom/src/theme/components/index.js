@@ -1,5 +1,4 @@
 import ProductView from './product-view'
+import ImageGallery from './image-gallery'
 
-export default {
-    ProductView
-}
+export {ProductView, ImageGallery}
