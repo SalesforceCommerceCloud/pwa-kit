@@ -24,5 +24,8 @@
   },
   "peerDependencies": {
     "react": "^17"
+  },
+  "dependencies": {
+    "commerce-sdk-isomorphic": "^1.5.2"
   }
 }

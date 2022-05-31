@@ -1,29 +1,53 @@
-import React, { createContext } from "react";
+import React, { createContext, useEffect } from "react";
+import { ShopperLogin } from "commerce-sdk-isomorphic";
+import Shopper from "./shopper";
 
-interface SlasConfig {
+interface CommerceAPIConfig {
   clientId: string;
   organizationId: string;
+  shortCode: string;
   siteId: string;
 }
 
-interface ProviderProps extends SlasConfig {
+interface ProviderProps extends CommerceAPIConfig {
+  proxy?: string;
   children: React.ReactNode;
 }
 
 export const Context = createContext({
-  clientId: "",
-  organizationId: "",
-  siteId: "",
+  config: {
+    clientId: "",
+    organizationId: "",
+    shortCode: "",
+    siteId: "",
+  },
 });
-export const useContext = (): SlasConfig => React.useContext(Context);
+export const useContext = (): { config: CommerceAPIConfig } =>
+  React.useContext(Context);
 export const Provider = ({
   children,
   organizationId,
   clientId,
+  shortCode,
   siteId,
+  proxy,
 }: ProviderProps) => {
-  // TODO: validate input
-  const config = { organizationId, clientId, siteId };
+  // TODO: validate config value
+  const config = { organizationId, clientId, siteId, shortCode };
+  const ShopperLoginClient = new ShopperLogin({
+    proxy,
+    parameters: config,
+    throwOnBadResponse: true,
+  });
+  const shopper = new Shopper(ShopperLoginClient);
+  const value = {
+    config,
+    shopper,
+  };
 
-  return <Context.Provider value={config}>{children}</Context.Provider>;
+  useEffect(() => {
+    shopper.init();
+  }, []);
+
+  return <Context.Provider value={value}>{children}</Context.Provider>;
 };
