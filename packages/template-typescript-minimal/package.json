@@ -9,7 +9,7 @@
     "devDependencies": {
         "@loadable/component": "^5.15.0",
         "cross-env": "^5.2.0",
-        "cross-fetch": "^3.1.4",
+        "cross-fetch": "^3.1.5",
         "pwa-kit-dev": "^2.1.0-dev",
         "pwa-kit-react-sdk": "^2.1.0-dev",
         "pwa-kit-runtime": "^2.1.0-dev",
@@ -24,6 +24,7 @@
         "lint:fix": "npm run lint -- --fix",
         "save-credentials": "pwa-kit-dev save-credentials",
         "start": "pwa-kit-dev start",
+        "start:inspect": "npm run start -- --inspect",
         "test": "pwa-kit-dev test",
         "build": "pwa-kit-dev build",
         "push": "npm run build && pwa-kit-dev push"

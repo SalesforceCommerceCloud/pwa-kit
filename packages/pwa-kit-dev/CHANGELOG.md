@@ -1,5 +1,11 @@
 ## v2.1.0-dev (May 16, 2022)
+
+-   Replace `Mobify` references/links with proper PWA Kit values. [#619](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/619)
+-   Add support for a custom build directory to `pwa-kit-dev build`. [#628](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/628)
+-   By default, enable client-side hot module replacement [#630](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/630)
+
 ## v2.0.0 (May 16, 2022)
+
 -   Make the createApp API idiomatic for Express, fix service-worker loading. [#536](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/536)
 -   Remove lodash and bluebird. [#534](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/534)
 -   Allow pass thru cli options for test command [#537](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/537)

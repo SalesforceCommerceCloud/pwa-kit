@@ -60,12 +60,12 @@
     "jest-environment-jsdom": "^26.6.2",
     "jest-environment-jsdom-global": "^2.0.4",
     "jest-fetch-mock": "^2.1.2",
-    "prettier": "1.18.2",
+    "prettier": "^1.19.1",
     "raf": "^3.4.0",
     "regenerator-runtime": "^0.13.9",
     "replace-in-file": "^6.2.0",
     "rimraf": "2.6.1",
-    "shelljs": "^0.8.4"
+    "shelljs": "^0.8.5"
   },
   "devDependencies": {
     "npm-packlist": "^4.0.0"

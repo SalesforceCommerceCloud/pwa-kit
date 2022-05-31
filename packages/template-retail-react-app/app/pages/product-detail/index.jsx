@@ -37,7 +37,7 @@ import useEinstein from '../../commerce-api/hooks/useEinstein'
 import {HTTPNotFound} from 'pwa-kit-react-sdk/ssr/universal/errors'
 import ProductView from 'pwa-kit-ecom/components/product-view'
 // constant
-import {API_ERROR_MESSAGE} from '../../constants'
+import {API_ERROR_MESSAGE, MAX_CACHE_AGE} from '../../constants'
 import {rebuildPathWithParams} from '../../utils/url'
 import {useHistory} from 'react-router-dom'
 import {useToast} from '../../hooks/use-toast'
@@ -150,7 +150,7 @@ ProductDetail.getProps = async ({res, params, location, api}) => {
 
     // Set the `cache-control` header values similar to those on the product-list.
     if (res) {
-        res.set('Cache-Control', 'max-age=900')
+        res.set('Cache-Control', `max-age=${MAX_CACHE_AGE}`)
     }
 
     // The `commerce-isomorphic-sdk` package does not throw errors, so

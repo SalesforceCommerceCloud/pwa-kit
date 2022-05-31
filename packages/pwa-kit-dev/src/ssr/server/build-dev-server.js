@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, salesforce.com, inc.
+ * Copyright (c) 2022, Salesforce, Inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
@@ -15,11 +15,17 @@ import mimeTypes from 'mime-types'
 import webpack from 'webpack'
 import webpackDevMiddleware from 'webpack-dev-middleware'
 import webpackHotServerMiddleware from 'webpack-hot-server-middleware'
+import webpackHotMiddleware from 'webpack-hot-middleware'
 import open from 'open'
 import requireFromString from 'require-from-string'
 import {RemoteServerFactory} from 'pwa-kit-runtime/ssr/server/build-remote-server'
 import {proxyConfigs} from 'pwa-kit-runtime/utils/ssr-shared'
-import {SERVER, CLIENT_OPTIONAL, REQUEST_PROCESSOR} from '../../configs/webpack/config-names'
+import {
+    SERVER,
+    CLIENT,
+    CLIENT_OPTIONAL,
+    REQUEST_PROCESSOR
+} from '../../configs/webpack/config-names'
 
 const projectDir = process.cwd()
 const projectWebpackPath = path.resolve(projectDir, 'webpack.config.js')
@@ -133,6 +139,13 @@ export const DevServerMixin = {
 
         app.use('/mobify/bundle/development', app.__devMiddleware)
 
+        app.__hmrMiddleware = (_, res) => res.status(501).send('Hot Module Reloading is disabled.')
+        const clientCompiler = app.__compiler.compilers.find((compiler) => compiler.name === CLIENT)
+        if (clientCompiler && process.env.HMR !== 'false') {
+            app.__hmrMiddleware = webpackHotMiddleware(clientCompiler, {path: '/'}) // path is relative to the endpoint the middleware is attached to
+        }
+        app.use('/__mrt/hmr', app.__hmrMiddleware)
+
         app.use('/__mrt/status', (req, res) => {
             return res.json({ready: app.__webpackReady()})
         })
@@ -143,6 +156,21 @@ export const DevServerMixin = {
                 dotFiles: 'deny'
             })
         )
+
+        app.get('/__mrt/clear-browser-data', (_, res) => {
+            console.log(
+                chalk.cyan('Clearing browser data'),
+                '(cache, service worker, web storage for browsers supporting Clear-Site-Data header)'
+            )
+            console.log(
+                'For more info: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Clear-Site-Data#browser_compatibility'
+            )
+            console.log('')
+
+            // Note: this header value needs the double quotes.
+            res.set('Clear-Site-Data', '"cache", "storage"')
+            res.send()
+        })
     },
 
     /**
@@ -360,7 +388,7 @@ export const DevServerMixin = {
  * @param assetPath - the path to the asset file (with no query string
  * or other URL elements)
  */
-const setLocalAssetHeaders = (res, assetPath) => {
+export const setLocalAssetHeaders = (res, assetPath) => {
     const base = path.basename(assetPath)
     const contentType = mimeTypes.lookup(base)
 

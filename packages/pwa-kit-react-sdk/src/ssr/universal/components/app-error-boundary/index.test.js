@@ -9,6 +9,7 @@ import React from 'react'
 import {mount} from 'enzyme'
 import {AppErrorBoundaryWithoutRouter as AppErrorBoundary} from './index'
 import * as errors from '../../errors'
+import sinon from 'sinon'
 
 describe('AppErrorBoundary', () => {
     const cases = [
@@ -51,6 +52,16 @@ describe('AppErrorBoundary', () => {
     cases.forEach(({content, errorFactory, afterErrorAssertions, variation}) => {
         test(`Displays errors correctly (variation: ${variation})`, () => {
             const wrapper = mount(<AppErrorBoundary>{content}</AppErrorBoundary>)
+            expect(wrapper.contains(content)).toBe(true)
+            wrapper.instance().onGetPropsError(errorFactory())
+            wrapper.update()
+            expect(wrapper.contains(content)).toBe(false)
+            afterErrorAssertions(wrapper)
+        })
+
+        test(`Watches history, when provided (variation: ${variation})`, () => {
+            const history = {listen: sinon.stub().returns(sinon.stub())}
+            const wrapper = mount(<AppErrorBoundary history={history}>{content}</AppErrorBoundary>)
             expect(wrapper.contains(content)).toBe(true)
             wrapper.instance().onGetPropsError(errorFactory())
             wrapper.update()
