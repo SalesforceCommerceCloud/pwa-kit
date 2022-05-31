@@ -256,7 +256,7 @@ const renderAppHtml = (req, res, error, appData) => {
     return ReactDOMServer.renderToString(appJSX)
 }
 
-const renderApp = async (args) => {
+const renderApp = (args) => {
     const {req, res, appStateError, App, appState, location, routes, config, routerContext, effectContext } = args
     const deviceType = detectDeviceType(req)
     const extractor = new ChunkExtractor({statsFile: BUNDLES_PATH, publicPath: getAssetUrl()})
