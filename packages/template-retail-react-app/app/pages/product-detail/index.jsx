@@ -18,8 +18,7 @@ import {
     AccordionPanel,
     AccordionIcon,
     Box,
-    Button,
-    Stack
+    Button
 } from '@chakra-ui/react'
 
 // Hooks
@@ -41,6 +40,8 @@ import {API_ERROR_MESSAGE, MAX_CACHE_AGE} from '../../constants'
 import {rebuildPathWithParams} from '../../utils/url'
 import {useHistory} from 'react-router-dom'
 import {useToast} from '../../hooks/use-toast'
+
+import PDPLayout from '../../layouts'
 
 const ProductDetail = ({category, product, isLoading}) => {
     const {formatMessage} = useIntl()
@@ -139,159 +140,162 @@ const ProductDetail = ({category, product, isLoading}) => {
         }
     }, [product])
 
+    const informationAccordion = (
+        <Accordion allowMultiple allowToggle maxWidth={'896px'} flex={[1, 1, 1, 5]}>
+            {/* Details */}
+            <AccordionItem>
+                <h2>
+                    <AccordionButton height="64px">
+                        <Box flex="1" textAlign="left" fontWeight="bold" fontSize="lg">
+                            {formatMessage({
+                                defaultMessage: 'Product Detail',
+                                id: 'product_detail.accordion.button.product_detail'
+                            })}
+                        </Box>
+                        <AccordionIcon />
+                    </AccordionButton>
+                </h2>
+                <AccordionPanel mb={6} mt={4}>
+                    <div
+                        dangerouslySetInnerHTML={{
+                            __html: product?.longDescription
+                        }}
+                    />
+                </AccordionPanel>
+            </AccordionItem>
+
+            {/* Size & Fit */}
+            <AccordionItem>
+                <h2>
+                    <AccordionButton height="64px">
+                        <Box flex="1" textAlign="left" fontWeight="bold" fontSize="lg">
+                            {formatMessage({
+                                defaultMessage: 'Size & Fit',
+                                id: 'product_detail.accordion.button.size_fit'
+                            })}
+                        </Box>
+                        <AccordionIcon />
+                    </AccordionButton>
+                </h2>
+                <AccordionPanel mb={6} mt={4}>
+                    {formatMessage({
+                        defaultMessage: 'Coming Soon',
+                        id: 'product_detail.accordion.message.coming_soon'
+                    })}
+                </AccordionPanel>
+            </AccordionItem>
+
+            {/* Reviews */}
+            <AccordionItem>
+                <h2>
+                    <AccordionButton height="64px">
+                        <Box flex="1" textAlign="left" fontWeight="bold" fontSize="lg">
+                            {formatMessage({
+                                defaultMessage: 'Reviews',
+                                id: 'product_detail.accordion.button.reviews'
+                            })}
+                        </Box>
+                        <AccordionIcon />
+                    </AccordionButton>
+                </h2>
+                <AccordionPanel mb={6} mt={4}>
+                    {formatMessage({
+                        defaultMessage: 'Coming Soon',
+                        id: 'product_detail.accordion.message.coming_soon'
+                    })}
+                </AccordionPanel>
+            </AccordionItem>
+
+            {/* Questions */}
+            <AccordionItem>
+                <h2>
+                    <AccordionButton height="64px">
+                        <Box flex="1" textAlign="left" fontWeight="bold" fontSize="lg">
+                            {formatMessage({
+                                defaultMessage: 'Questions',
+                                id: 'product_detail.accordion.button.questions'
+                            })}
+                        </Box>
+                        <AccordionIcon />
+                    </AccordionButton>
+                </h2>
+                <AccordionPanel mb={6} mt={4}>
+                    {formatMessage({
+                        defaultMessage: 'Coming Soon',
+                        id: 'product_detail.accordion.message.coming_soon'
+                    })}
+                </AccordionPanel>
+            </AccordionItem>
+        </Accordion>
+    )
+
+    const productView = (
+        <ProductView
+            product={product}
+            category={primaryCategory?.parentCategoryTree || []}
+            addToCart={(variant, quantity) => handleAddToCart(variant, quantity)}
+            addToWishlist={(_, quantity) => handleAddToWishlist(quantity)}
+            isProductLoading={isLoading}
+            isCustomerProductListLoading={!wishlist.isInitialized}
+        />
+    )
+
+    const helmet = (
+        <Helmet>
+            <title>{product?.pageTitle}</title>
+            <meta name="description" content={product?.pageDescription} />
+        </Helmet>
+    )
+
+    const productRecommendations = (
+        <>
+            <RecommendedProducts
+                title={
+                    <FormattedMessage
+                        defaultMessage="Complete the Set"
+                        id="product_detail.recommended_products.title.complete_set"
+                    />
+                }
+                recommender={'complete-the-set'}
+                products={product && [product.id]}
+                mx={{base: -4, md: -8, lg: 0}}
+                shouldFetch={() => product?.id}
+            />
+
+            <RecommendedProducts
+                title={
+                    <FormattedMessage
+                        defaultMessage="You might also like"
+                        id="product_detail.recommended_products.title.might_also_like"
+                    />
+                }
+                recommender={'pdp-similar-items'}
+                products={product && [product.id]}
+                mx={{base: -4, md: -8, lg: 0}}
+                shouldFetch={() => product?.id}
+            />
+
+            <RecommendedProducts
+                title={
+                    <FormattedMessage
+                        defaultMessage="Recently Viewed"
+                        id="product_detail.recommended_products.title.recently_viewed"
+                    />
+                }
+                recommender={'viewed-recently-einstein'}
+                mx={{base: -4, md: -8, lg: 0}}
+            />
+        </>
+    )
+
     return (
-        <Box
-            className="sf-product-detail-page"
-            layerStyle="page"
-            data-testid="product-details-page"
-        >
-            <Helmet>
-                <title>{product?.pageTitle}</title>
-                <meta name="description" content={product?.pageDescription} />
-            </Helmet>
-
-            <Stack spacing={16}>
-                <ProductView
-                    product={product}
-                    category={primaryCategory?.parentCategoryTree || []}
-                    addToCart={(variant, quantity) => handleAddToCart(variant, quantity)}
-                    addToWishlist={(_, quantity) => handleAddToWishlist(quantity)}
-                    isProductLoading={isLoading}
-                    isCustomerProductListLoading={!wishlist.isInitialized}
-                />
-
-                {/* Information Accordion */}
-                <Stack direction="row" spacing={[0, 0, 0, 16]}>
-                    <Accordion allowMultiple allowToggle maxWidth={'896px'} flex={[1, 1, 1, 5]}>
-                        {/* Details */}
-                        <AccordionItem>
-                            <h2>
-                                <AccordionButton height="64px">
-                                    <Box flex="1" textAlign="left" fontWeight="bold" fontSize="lg">
-                                        {formatMessage({
-                                            defaultMessage: 'Product Detail',
-                                            id: 'product_detail.accordion.button.product_detail'
-                                        })}
-                                    </Box>
-                                    <AccordionIcon />
-                                </AccordionButton>
-                            </h2>
-                            <AccordionPanel mb={6} mt={4}>
-                                <div
-                                    dangerouslySetInnerHTML={{
-                                        __html: product?.longDescription
-                                    }}
-                                />
-                            </AccordionPanel>
-                        </AccordionItem>
-
-                        {/* Size & Fit */}
-                        <AccordionItem>
-                            <h2>
-                                <AccordionButton height="64px">
-                                    <Box flex="1" textAlign="left" fontWeight="bold" fontSize="lg">
-                                        {formatMessage({
-                                            defaultMessage: 'Size & Fit',
-                                            id: 'product_detail.accordion.button.size_fit'
-                                        })}
-                                    </Box>
-                                    <AccordionIcon />
-                                </AccordionButton>
-                            </h2>
-                            <AccordionPanel mb={6} mt={4}>
-                                {formatMessage({
-                                    defaultMessage: 'Coming Soon',
-                                    id: 'product_detail.accordion.message.coming_soon'
-                                })}
-                            </AccordionPanel>
-                        </AccordionItem>
-
-                        {/* Reviews */}
-                        <AccordionItem>
-                            <h2>
-                                <AccordionButton height="64px">
-                                    <Box flex="1" textAlign="left" fontWeight="bold" fontSize="lg">
-                                        {formatMessage({
-                                            defaultMessage: 'Reviews',
-                                            id: 'product_detail.accordion.button.reviews'
-                                        })}
-                                    </Box>
-                                    <AccordionIcon />
-                                </AccordionButton>
-                            </h2>
-                            <AccordionPanel mb={6} mt={4}>
-                                {formatMessage({
-                                    defaultMessage: 'Coming Soon',
-                                    id: 'product_detail.accordion.message.coming_soon'
-                                })}
-                            </AccordionPanel>
-                        </AccordionItem>
-
-                        {/* Questions */}
-                        <AccordionItem>
-                            <h2>
-                                <AccordionButton height="64px">
-                                    <Box flex="1" textAlign="left" fontWeight="bold" fontSize="lg">
-                                        {formatMessage({
-                                            defaultMessage: 'Questions',
-                                            id: 'product_detail.accordion.button.questions'
-                                        })}
-                                    </Box>
-                                    <AccordionIcon />
-                                </AccordionButton>
-                            </h2>
-                            <AccordionPanel mb={6} mt={4}>
-                                {formatMessage({
-                                    defaultMessage: 'Coming Soon',
-                                    id: 'product_detail.accordion.message.coming_soon'
-                                })}
-                            </AccordionPanel>
-                        </AccordionItem>
-                    </Accordion>
-                    <Box display={['none', 'none', 'none', 'block']} flex={4}></Box>
-                </Stack>
-
-                {/* Product Recommendations */}
-                <Stack spacing={16}>
-                    <RecommendedProducts
-                        title={
-                            <FormattedMessage
-                                defaultMessage="Complete the Set"
-                                id="product_detail.recommended_products.title.complete_set"
-                            />
-                        }
-                        recommender={'complete-the-set'}
-                        products={product && [product.id]}
-                        mx={{base: -4, md: -8, lg: 0}}
-                        shouldFetch={() => product?.id}
-                    />
-
-                    <RecommendedProducts
-                        title={
-                            <FormattedMessage
-                                defaultMessage="You might also like"
-                                id="product_detail.recommended_products.title.might_also_like"
-                            />
-                        }
-                        recommender={'pdp-similar-items'}
-                        products={product && [product.id]}
-                        mx={{base: -4, md: -8, lg: 0}}
-                        shouldFetch={() => product?.id}
-                    />
-
-                    <RecommendedProducts
-                        title={
-                            <FormattedMessage
-                                defaultMessage="Recently Viewed"
-                                id="product_detail.recommended_products.title.recently_viewed"
-                            />
-                        }
-                        recommender={'viewed-recently-einstein'}
-                        mx={{base: -4, md: -8, lg: 0}}
-                    />
-                </Stack>
-            </Stack>
-        </Box>
+        <PDPLayout
+            layoutId={'pdp-layout-right'}
+            productView={productView}
+            helmet={helmet}
+            informationAccordion={informationAccordion}
+            productRecommendations={productRecommendations}
+        />
     )
 }
 
