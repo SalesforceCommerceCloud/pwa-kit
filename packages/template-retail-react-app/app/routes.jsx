@@ -16,6 +16,8 @@ import React from 'react'
 import loadable from '@loadable/component'
 import {getConfig} from 'pwa-kit-runtime/utils/ssr-config'
 
+import PageLayout from './layouts/page-layout'
+
 // Components
 import {Skeleton} from '@chakra-ui/react'
 import {configureRoutes} from './utils/routes-utils'
@@ -37,11 +39,22 @@ const ProductList = loadable(() => import('./pages/product-list'), {fallback})
 const Wishlist = loadable(() => import('./pages/account/wishlist'), {fallback})
 const PageNotFound = loadable(() => import('./pages/page-not-found'))
 
+// Nested pages using the common base PageLayout
+const PagesRoutes = () => (
+    <PageLayout>
+        <h2>Test Page Layout Header content</h2>
+    </PageLayout>
+)
+
 const routes = [
     {
         path: '/',
         component: Home,
         exact: true
+    },
+    {
+        path: '/page',
+        component: PagesRoutes
     },
     {
         path: '/login',

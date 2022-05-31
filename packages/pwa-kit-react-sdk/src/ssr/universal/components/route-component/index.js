@@ -414,6 +414,7 @@ export const getRoutes = (locals) => {
     if (typeof routes === 'function') {
         _routes = routes()
     }
+    // TODO: Add routeComponent HOC to components routed via PageLayout
     const allRoutes = [..._routes, {path: '*', component: Throw404}]
     return allRoutes.map(({component, ...rest}) => {
         return {
