@@ -8,21 +8,21 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-import PDPLayoutLeft from './pdp-layout-left'
-import PDPLayoutRight from './pdp-layout-right'
+import PDPLayoutA from './pdp-layout-a'
+import PDPLayoutB from './pdp-layout-b'
 
 const PDPLayout = ({layoutId, ...rest}) => {
     //Default layout in case the one defined is invalid
-    const DefaultLayout = PDPLayoutLeft
+    const DefaultLayout = PDPLayoutA
 
     const layouts = [
         {
-            id: 'pdp-layout-left',
-            layout: PDPLayoutLeft
+            id: 'pdp-layout-a',
+            layout: PDPLayoutA
         },
         {
-            id: 'pdp-layout-right',
-            layout: PDPLayoutRight
+            id: 'pdp-layout-b',
+            layout: PDPLayoutB
         }
     ]
 

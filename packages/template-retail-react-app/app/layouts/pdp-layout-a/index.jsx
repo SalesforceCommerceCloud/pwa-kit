@@ -11,36 +11,40 @@ import PropTypes from 'prop-types'
 // Components
 import {Box, Stack} from '@chakra-ui/react'
 
-const PDPLayoutLeft = ({productView, helmet, informationAccordion, productRecommendations}) => {
+
+const PDPLayoutA = ({productView, productHeader, productInformation, productRecommendations}) => {
     return (
         <Box
             className="sf-product-detail-page"
             layerStyle="page"
             data-testid="product-details-page"
         >
-            {helmet}
-            <h1>PDP Layout Left</h1>
+            <h1>PDP Layout A</h1>
+            {/* Product Header content*/}
+            {productHeader}
+
+            {/* Product View content*/}
             <Stack spacing={16}>
                 {productView}
-                {/* Information Accordion */}
+                {/* Product Information content*/}
                 <Stack direction="row" spacing={[0, 0, 0, 16]}>
-                    {informationAccordion}
+                    {productInformation}
                     <Box display={['none', 'none', 'none', 'block']} flex={4}></Box>
                 </Stack>
             </Stack>
-            {/* Product Recommendations */}
+            {/* Product Recommendations content */}
             <Stack spacing={16}>{productRecommendations}</Stack>
         </Box>
     )
 }
 
-PDPLayoutLeft.getTemplateName = () => 'pdp-layout-left'
+PDPLayoutA.getTemplateName = () => 'pdp-layout-a'
 
-PDPLayoutLeft.propTypes = {
+PDPLayoutA.propTypes = {
     productView: PropTypes.element,
-    helmet: PropTypes.element,
-    informationAccordion: PropTypes.element,
+    productHeader: PropTypes.element,
+    productInformation: PropTypes.element,
     productRecommendations: PropTypes.element
 }
 
-export default PDPLayoutLeft
+export default PDPLayoutA

@@ -290,10 +290,10 @@ const ProductDetail = ({category, product, isLoading}) => {
 
     return (
         <PDPLayout
-            layoutId={'pdp-layout-right'}
+            layoutId={'pdp-layout-b'}
             productView={productView}
-            helmet={helmet}
-            informationAccordion={informationAccordion}
+            productHeader={helmet}
+            productInformation={informationAccordion}
             productRecommendations={productRecommendations}
         />
     )
