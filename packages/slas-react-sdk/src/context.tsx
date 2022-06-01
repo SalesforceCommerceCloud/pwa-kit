@@ -39,6 +39,8 @@ export const Provider = ({
     parameters: config,
     throwOnBadResponse: true,
   });
+
+  // TODO: should we use hook/reducers instead of this singleton?
   const shopper = new Shopper(ShopperLoginClient);
   const value = {
     config,
