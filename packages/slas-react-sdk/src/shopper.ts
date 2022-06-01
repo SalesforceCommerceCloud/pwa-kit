@@ -39,6 +39,11 @@ export default class Shopper {
   }
 
   async init() {
+    // This is automatically called from SLAS provider
+    // Flow:
+    // 1. if we have a valid access token, do nothing
+    // 2. if we have a valid refresh token, do refresh token flow
+    // 3. else, start guest shopper PKCE flow
     this.isAuthenticated = !!(this.accessToken && !isExpired(this.accessToken));
     this.isInitialized = true;
 
@@ -49,6 +54,8 @@ export default class Shopper {
     if (this.refreshToken) {
       return this.refreshAccessToken();
     }
+
+    return this.loginAsGuest();
   }
 
   async refreshAccessToken() {
@@ -56,6 +63,15 @@ export default class Shopper {
       refreshToken: this.refreshToken,
     });
     this.handleShopperLoginTokenResponse(response);
+  }
+
+  async loginAsGuest() {
+    // TODO: implement PKCE flow
+    // 1. generate code_verifier and code_challenge
+    // 2. POST /authorize
+    // 3. receive authorization_code from redirect uri
+    // 4. POST /token grant_type=authorization_code_pkce
+    // 5. handle response and save token in the storage
   }
 
   private handleShopperLoginTokenResponse(res: helpers.TokenResponse) {
@@ -68,15 +84,7 @@ export default class Shopper {
       id_token,
     } = res;
     console.log(res);
-    // this._customerId = customer_id
-    // this._saveAccessToken(`Bearer ${access_token}`)
-    // this._saveUsid(usid)
-    // we use id_token to distinguish guest and registered users
-    // if (id_token.length > 0) {
-    //     this._saveEncUserId(enc_user_id)
-    //     this._saveRefreshToken(refresh_token, 'registered')
-    // } else {
-    //     this._saveRefreshToken(refresh_token, 'guest')
-    // }
+
+    // TODO: save tokens in storage
   }
 }
