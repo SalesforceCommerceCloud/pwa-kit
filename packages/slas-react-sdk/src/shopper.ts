@@ -21,8 +21,8 @@ Design Principles:
 2. Shopper class talks to the browser (cookie/localstorage) and Commerce API.
 3. This is designed to be used as a Singleton.
    The code assumes that, at any given time, there is always one and
-   the only one shopper who is browsing the site, whether he/she is a guest
-   or registered shopper.
+   the only one shopper who is browsing the site. He/She can be either a guest
+   or a registered shopper.
 
 */
 
