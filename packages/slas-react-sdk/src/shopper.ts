@@ -19,7 +19,7 @@ interface ShopperLoginClient
 Design Principles:
 1. Shopper class should know nothing about React.
 2. Shopper class talks to the browser (cookie/localstorage) and Commerce API.
-2. This is designed to be used as a Singleton.
+3. This is designed to be used as a Singleton.
    The code assumes that, at any given time, there is always one and
    the only one shopper who is browsing the site, whether he/she is a guest
    or registered shopper.
