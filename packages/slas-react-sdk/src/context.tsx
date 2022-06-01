@@ -15,6 +15,7 @@ interface ProviderProps extends CommerceAPIConfig {
 }
 
 export const Context = createContext({
+  // TODO: do we need to store config in the context? probably NO!
   config: {
     clientId: "",
     organizationId: "",
