@@ -66,8 +66,7 @@ Skeleton.propTypes = {
 const ImageGallery = ({imageGroups = [], selectedVariationAttributes = {}, size = 'md'}) => {
     const [selectedIndex, setSelectedIndex] = useState(0)
     const styles = useMultiStyleConfig('ImageGallery', {size})
-    // const location = useLocation()
-
+    const location = useLocation()
     // Get the 'hero' image for the current variation.
     const heroImageGroup = useMemo(
         () =>
@@ -78,10 +77,10 @@ const ImageGallery = ({imageGroups = [], selectedVariationAttributes = {}, size 
         [selectedVariationAttributes]
     )
 
-    // useEffect(() => {
-    //     // reset the selected index when location search changes
-    //     setSelectedIndex(0)
-    // }, [location.search])
+    useEffect(() => {
+        // reset the selected index when location search changes
+        setSelectedIndex(0)
+    }, [location.search])
 
     // Get a memoized image group used for the thumbnails. We use the `useMemo` hook
     // so we don't have to waste time filtering the image groups each render if the
@@ -96,10 +95,9 @@ const ImageGallery = ({imageGroups = [], selectedVariationAttributes = {}, size 
     )
 
     const heroImage = heroImageGroup?.images?.[selectedIndex]
-    console.log('styles', styles)
 
     const thumbnailImages = thumbnailImageGroup?.images || []
-    const heroImageMaxWidth = styles.heroImage.maxWidth?.[3] || '680px' // in px
+    const heroImageMaxWidth = styles.heroImage.maxWidth?.[3] // in px
 
     return (
         <Flex direction="column" {...styles.container} data-testid="image-gallery">
@@ -134,7 +132,7 @@ const ImageGallery = ({imageGroups = [], selectedVariationAttributes = {}, size 
                                     return setSelectedIndex(index)
                                 }
                             }}
-                            // onClick={() => setSelectedIndex(index)}
+                            onClick={() => setSelectedIndex(index)}
                             borderColor={`${selected ? 'black' : ''}`}
                             borderWidth={`${selected ? '1px' : 0}`}
                         >

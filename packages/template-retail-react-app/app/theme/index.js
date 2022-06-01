@@ -48,11 +48,10 @@ import OfflineBanner from './components/project/offline-banner'
 import Pagination from './components/project/pagination'
 import ProductTile from './components/project/product-tile'
 import SocialIcons from './components/project/social-icons'
-import SwatchGroup from './components/project/swatch-group'
+// import SwatchGroup from './components/project/swatch-group'
 import ImageGallery from './components/project/image-gallery'
 import ProductView from './components/project/product-view'
 import * as components from 'pwa-kit-ecom/theme/components'
-console.log('components', components)
 
 // Please refer to the Chakra-Ui theme customization docs found
 // here https://chakra-ui.com/docs/theming/customize-theme to learn
@@ -100,9 +99,9 @@ const overrides = {
         SocialIcons,
         Pagination,
         ProductTile,
-        SwatchGroup,
         ImageGallery,
         ProductView
+        // SwatchGroup,
     }
 }
 
