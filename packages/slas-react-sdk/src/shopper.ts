@@ -76,6 +76,13 @@ export default class Shopper {
     // 5. handle response and save token in the storage
   }
 
+  async logout() {
+    // TODO:
+    // 1. call shopperLogin.logoutCustomer() (is there a slas helper from isomorphic sdk?)
+    // 2. empty storage
+    // 3. login as guest again
+  }
+
   private handleShopperLoginTokenResponse(res: helpers.TokenResponse) {
     const {
       access_token,
