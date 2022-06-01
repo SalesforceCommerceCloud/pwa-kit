@@ -48,7 +48,7 @@ export default class Shopper {
     this.isInitialized = true;
 
     if (this.isAuthenticated) {
-      return;
+      return; // TODO: determine the return value of this method
     }
 
     if (this.refreshToken) {
@@ -63,6 +63,8 @@ export default class Shopper {
       refreshToken: this.refreshToken,
     });
     this.handleShopperLoginTokenResponse(response);
+
+    // TODO: return
   }
 
   async loginAsGuest() {
