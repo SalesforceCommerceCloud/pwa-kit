@@ -57,14 +57,23 @@ const ProductDetail = ({category, product, isLoading}) => {
     // const basket = useBasket()
     // const history = useHistory()
     // const einstein = useEinstein()
-    // const variant = useVariant(product)
+    const variant = useVariant(product)
     // const toast = useToast()
     // const navigate = useNavigation()
     // const [primaryCategory, setPrimaryCategory] = useState(category)
 
     // Omitting wish list and add to cart for the sake of demo
 
-    console.log('retail app product ', product)
+    /**************** Product Variant ****************/
+    useEffect(() => {
+        // update the variation attributes parameter on
+        // the url accordingly as the variant changes
+        const updatedUrl = rebuildPathWithParams(`${location.pathname}${location.search}`, {
+            pid: variant?.productId
+        })
+        history.replace(updatedUrl)
+    }, [variant])
+
     return (
         <Box
             className="sf-product-detail-page"

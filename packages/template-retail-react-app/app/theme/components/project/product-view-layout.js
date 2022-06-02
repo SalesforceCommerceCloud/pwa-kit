@@ -5,8 +5,11 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import ImageGallery from './image-gallery'
-import SwatchGroup from './swatch-group'
-import ProductViewLayout from './product-view-layout'
-
-export {ImageGallery, SwatchGroup, ProductViewLayout}
+// create your overriding style for ProductViewLayout from the component library
+export default {
+    baseStyle: {
+        container: {
+            background: 'purple.100'
+        }
+    }
+}

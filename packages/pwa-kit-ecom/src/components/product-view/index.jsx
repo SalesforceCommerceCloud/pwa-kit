@@ -1,12 +1,20 @@
+/*
+ * Copyright (c) 2021, salesforce.com, inc.
+ * All rights reserved.
+ * SPDX-License-Identifier: BSD-3-Clause
+ * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
+ */
+
 import React from 'react'
 import ImageGallery from '../image-gallary'
 import SwatchGroup from '../swatch-group'
 import Swatch from '../swatch-group/swatch'
 
 import ProductTitle from '../product-title'
-import {Flex, Box, VStack, Skeleton, useMultiStyleConfig} from '@chakra-ui/react'
+import {Box, Skeleton} from '@chakra-ui/react'
 import {useProduct} from '../../hooks/use-product'
 import {useHistory} from 'react-router-dom'
+import ProductViewLayout from '../../layout/product-view'
 
 const renderSwatchGroup = (props) => {
     const {swatchGroup, variationAttributes} = props
@@ -63,59 +71,102 @@ const renderSwatchGroup = (props) => {
 }
 
 function ProductView(props) {
-    const {imageGallery, productTitle, variant} = props
+    const {imageGallery, productTitle, swatchGroup, actionButtons} = props
     const {product, variationParams, variationAttributes, showLoading} = useProduct(props.product)
-    const styles = useMultiStyleConfig('ProductView', {variant})
+
     return (
-        <Flex data-testid="product-view" {...styles.container}>
-            {/* Basic information etc. title, price, breadcrumb*/}
-            <Box {...styles.headingWrapperMobile}>
+        <ProductViewLayout>
+            <ProductViewLayout.Header>
                 {productTitle ? productTitle : <ProductTitle product={product} />}
-            </Box>
-            <Flex direction={['column', 'column', 'column', 'row']}>
-                <Box {...styles.imageGallery}>
-                    {product ? (
-                        <>
-                            {imageGallery ? (
-                                imageGallery
-                            ) : (
-                                <ImageGallery
-                                    size={'md'}
-                                    imageGroups={product.imageGroups}
-                                    selectedVariationAttributes={variationParams}
-                                />
-                            )}
-                        </>
-                    ) : (
-                        <div>LOADING...</div>
-                    )}
-                </Box>
+            </ProductViewLayout.Header>
 
-                {/* Variations & Quantity Selector */}
-                <VStack {...styles.buySection}>
-                    <Box {...styles.headingWrapperDesktop}>
-                        {productTitle ? productTitle : <ProductTitle product={product} />}
-                    </Box>
-
-                    <Box {...styles.swatchGroupContainer}>
-                        {showLoading ? (
-                            <>
-                                {/* First Attribute Skeleton */}
-                                <Skeleton height={6} width={32} />
-                                <Skeleton height={20} width={64} />
-
-                                {/* Second Attribute Skeleton */}
-                                <Skeleton height={6} width={32} />
-                                <Skeleton height={20} width={64} />
-                            </>
+            <ProductViewLayout.ImageGallery>
+                {product ? (
+                    <>
+                        {imageGallery ? (
+                            imageGallery
                         ) : (
-                            renderSwatchGroup({variationAttributes})
+                            <ImageGallery
+                                size={'md'}
+                                imageGroups={product.imageGroups}
+                                selectedVariationAttributes={variationParams}
+                            />
                         )}
-                    </Box>
-                </VStack>
-            </Flex>
-        </Flex>
+                    </>
+                ) : (
+                    <div>LOADING...</div>
+                )}
+            </ProductViewLayout.ImageGallery>
+            <ProductViewLayout.SwatchGroup>
+                {showLoading ? (
+                    <>
+                        {/* First Attribute Skeleton */}
+                        <Skeleton height={6} width={32} />
+                        <Skeleton height={20} width={64} />
+
+                        {/* Second Attribute Skeleton */}
+                        <Skeleton height={6} width={32} />
+                        <Skeleton height={20} width={64} />
+                    </>
+                ) : (
+                    renderSwatchGroup({swatchGroup, variationAttributes})
+                )}
+            </ProductViewLayout.SwatchGroup>
+        </ProductViewLayout>
     )
+    // return (
+    //     <Flex data-testid="product-view" {...styles.container}>
+    //         {/* Basic information etc. title, price, breadcrumb*/}
+    //         <Box {...styles.headingWrapperMobile}>
+    //             {productTitle ? productTitle : <ProductTitle product={product} />}
+    //             {productPrice ? productPrice : <Box>{product.price}</Box>}
+    //         </Box>
+    //         <Flex direction={['column', 'column', 'column', 'row']}>
+    //             <Box {...styles.imageGallery}>
+    //                 {product ? (
+    //                     <>
+    //                         {imageGallery ? (
+    //                             imageGallery
+    //                         ) : (
+    //                             <ImageGallery
+    //                                 size={'md'}
+    //                                 imageGroups={product.imageGroups}
+    //                                 selectedVariationAttributes={variationParams}
+    //                             />
+    //                         )}
+    //                     </>
+    //                 ) : (
+    //                     <div>LOADING...</div>
+    //                 )}
+    //             </Box>
+    //
+    //             {/* Variations & Quantity Selector */}
+    //             <VStack {...styles.buySection}>
+    //                 <Box {...styles.headingWrapperDesktop}>
+    //                     {productTitle ? productTitle : <ProductTitle product={product} />}
+    //                 </Box>
+    //
+    //                 <VStack {...styles.swatchGroupContainer}>
+    //                     {showLoading ? (
+    //                         <>
+    //                             {/* First Attribute Skeleton */}
+    //                             <Skeleton height={6} width={32} />
+    //                             <Skeleton height={20} width={64} />
+    //
+    //                             {/* Second Attribute Skeleton */}
+    //                             <Skeleton height={6} width={32} />
+    //                             <Skeleton height={20} width={64} />
+    //                         </>
+    //                     ) : (
+    //                         renderSwatchGroup({swatchGroup, variationAttributes})
+    //                     )}
+    //                 </VStack>
+    //
+    //                 <VStack {...styles.quantityPickerContainer}>quantity picker</VStack>
+    //             </VStack>
+    //         </Flex>
+    //     </Flex>
+    // )
 }
 
 export default ProductView

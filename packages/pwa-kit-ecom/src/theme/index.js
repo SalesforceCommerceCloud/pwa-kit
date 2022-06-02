@@ -14,9 +14,7 @@ import sizes from './foundations/sizes'
 import space from './foundations/space'
 import layerStyles from './foundations/layerStyles'
 import shadows from './foundations/shadows'
-
-// Project Component style overrides
-import ProductView from './components/product-view'
+import * as components from '../theme/components'
 
 // Please refer to the Chakra-Ui theme customization docs found
 // here https://chakra-ui.com/docs/theming/customize-theme to learn
@@ -29,9 +27,7 @@ const overrides = {
     space,
     gradients,
     shadows,
-    components: {
-        ProductView
-    }
+    components
 }
 
 export default extendTheme(overrides)
