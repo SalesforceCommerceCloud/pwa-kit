@@ -13,6 +13,7 @@ const App = ({children}: AppProps) => {
             clientId="c9c45bfd-0ed3-4aa2-9971-40f88962b836"
             siteId="RefArch"
             shortCode="8o7m175y"
+            debug={true}
         >
             {children}
         </Provider>

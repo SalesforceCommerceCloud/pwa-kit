@@ -7,6 +7,7 @@ const SlasPage = () => {
     return (
         <>
             <SlasDemo />
+            <p>information in both boxes should always be in sync</p>
             <SlasDemo />
         </>
     )
@@ -19,15 +20,16 @@ const SlasDemo = (props) => {
     const {organizationId, siteId, clientId, shortCode} = _config
     return (
         <div style={{border: '1px solid', margin: '12px'}}>
-            <h2>Organization ID: {organizationId}</h2>
-            <h2>Site ID: {siteId}</h2>
-            <h2>Client ID: {clientId}</h2>
-            <h2>shortCode: {shortCode}</h2>
-            <h2>isAuthenticated: {shopper.isAuthenticated.toString()}</h2>
-            <h2>isInitialized: {shopper.isInitialized.toString()}</h2>
-            <h2>accessToken: {shopper.accessToken}</h2>
-            <h2>refreshToken: {shopper.refreshToken}</h2>
-            <button onClick={shopper.login}>login</button>
+            <h3>Organization ID: {organizationId}</h3>
+            <h3>Site ID: {siteId}</h3>
+            <h3>Client ID: {clientId}</h3>
+            <h3>shortCode: {shortCode}</h3>
+            <h3>isAuthenticated: {shopper.isAuthenticated.toString()}</h3>
+            <h3>isInitialized: {shopper.isInitialized.toString()}</h3>
+            <h3>isInitializing: {shopper.isInitializing.toString()}</h3>
+            <h3>accessToken: {shopper.accessToken}</h3>
+            <h3>refreshToken: {shopper.refreshToken}</h3>
+            <button onClick={shopper._refreshAccessToken}>_refreshAccessToken</button>
         </div>
     )
 }
