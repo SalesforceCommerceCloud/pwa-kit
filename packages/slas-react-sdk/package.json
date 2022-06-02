@@ -26,6 +26,7 @@
     "react": "^17"
   },
   "dependencies": {
-    "commerce-sdk-isomorphic": "^1.5.2"
+    "commerce-sdk-isomorphic": "^1.5.2",
+    "zustand": "^4.0.0-rc.1"
   }
 }

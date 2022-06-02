@@ -1,24 +1,21 @@
-export interface Storage {
-  set: (key: string, value: any, options: any) => void;
-  get: (key: string) => any;
-  delete: (key: string) => void;
+interface Storage {
+  getItem: (key: string) => string | null | Promise<string | null>;
+  setItem: (key: string, value: string) => void | Promise<void>;
+  removeItem: (key: string) => void | Promise<void>;
 }
 
-export class LocalStorage implements Storage {
+export class MemoryStorage implements Storage {
+  _data: Map<string, any>;
   constructor() {
-    if (typeof window === "undefined") {
-      throw new Error(
-        "LocalStorage is not avaliable on the current environment."
-      );
-    }
+    this._data = new Map();
   }
-  set(key: string, value: string) {
-    window.localStorage.setItem(key, value);
+  setItem(key: string, value: string) {
+    this._data.set(key, value);
   }
-  get(key: string) {
-    return window.localStorage.getItem(key);
+  getItem(key: string) {
+    return this._data.get(key);
   }
-  delete(key: string) {
-    window.localStorage.removeItem(key);
+  removeItem(key: string) {
+    this._data.delete(key);
   }
 }
