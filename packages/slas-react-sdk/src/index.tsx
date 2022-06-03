@@ -6,15 +6,23 @@ import { onClient } from "./util";
 import { isExpired } from "./jwt";
 import { MemoryStorage } from "./storage";
 
+enum AuthTypes {
+  NULL = "",
+  REGISTERED = "registered",
+  GUEST = "guest",
+}
+
 interface State {
   isInitialized: boolean;
   isInitializing: boolean;
   isAuthenticated: boolean;
+  authType: AuthTypes;
+  customerId: string;
   accessToken: string;
   refreshToken: string;
   _config: CommerceAPIConfig;
-  login: (email: string, password: string) => void;
-  register: (email: string, password: string) => void;
+  login: (username: string, password: string) => void;
+  register: (username: string, password: string) => void;
   loginAsGuest: () => void;
   logout: () => void;
   _initialize: () => void;
@@ -58,9 +66,13 @@ export const Provider = ({
   // TODO: test server side
   const memoryStorage = new MemoryStorage();
 
-  const logger = (text: string) => {
+  const logger = (text: string | object) => {
     if (debug) {
-      console.log(`slas-react-sdk: ${text}`);
+      console.log(
+        `%c(slas-react-sdk) %c${text}`,
+        "font-weight:bold;",
+        "color:green;"
+      );
     }
   };
 
@@ -68,16 +80,14 @@ export const Provider = ({
     persist(
       (set, get) => ({
         _config: config,
+        authType: AuthTypes.NULL,
+        customerId: "",
         isInitialized: false,
-
-        // isInitializing is default to true because we always initialize
-        // immediately after we hydrate the tokens fron storage
-        // in onRehydrateStorage.
         isInitializing: true,
         isAuthenticated: false,
         accessToken: "",
         refreshToken: "",
-        _initialize: async () => {
+        _initialize: () => {
           logger("INIT - start");
           const self = get();
           const isAuthenticated = !!(
@@ -85,7 +95,7 @@ export const Provider = ({
           );
 
           if (isAuthenticated) {
-            logger("INIT - Found access token and it's not expired.");
+            logger("Found access token and it's not expired, done.");
             set({
               isInitializing: false,
               isInitialized: true,
@@ -95,20 +105,64 @@ export const Provider = ({
           }
 
           if (self.refreshToken) {
-            logger("INIT - Found refresh token. Starting refresh token flow.");
+            logger("Found refresh token. Starting refresh token flow.");
 
-            await self._refreshAccessToken();
+            self._refreshAccessToken();
             return;
           }
 
-          logger(
-            "INIT - No access/refresh token found. Starting guest user flow."
-          );
+          logger("No access/refresh token found. Starting guest user flow.");
+          self.loginAsGuest();
         },
-        login: (email, password) => {},
-        register: (email, password) => {},
-        loginAsGuest: () => {},
-        logout: () => {},
+        login: async (username, password) => {
+          logger("Logging in as registered user.");
+          const self = get();
+          const res = await helpers.loginRegisteredUserB2C(
+            shopperLoginClient,
+            { username, password },
+            {
+              redirectURI: "http://localhost:3000/callback",
+              // usid:
+            }
+          );
+          self._handleShopperLoginTokenResponse(res);
+          logger("Logged in as registered user.");
+          // enhancement TODO: if it's useful, we could automatically
+          // fetch user information by calling /customers/customerId
+        },
+        register: async (username, password) => {},
+        loginAsGuest: async () => {
+          logger("Logging in as guest.");
+          const self = get();
+          const res = await helpers.loginGuestUser(shopperLoginClient, {
+            redirectURI: "http://localhost:3000/callback",
+          });
+          self._handleShopperLoginTokenResponse(res);
+          logger("Logged in as guest.");
+        },
+        logout: async () => {
+          logger("Logging out.");
+          const self = get();
+          // There is a bug with the logout helper
+          // See https://github.com/SalesforceCommerceCloud/commerce-sdk-isomorphic/issues/88
+          // const response = await helpers.logout(shopperLoginClient, {
+          //   refreshToken: self.refreshToken,
+          // });
+
+          const response = await shopperLoginClient.logoutCustomer({
+            parameters: {
+              refresh_token: self.refreshToken,
+              client_id: self._config.clientId,
+              channel_id: self._config.siteId,
+            },
+            headers: {
+              Authorization: self.accessToken,
+            },
+          });
+          self._handleShopperLoginTokenResponse(response);
+          logger("Logged out.");
+          self.loginAsGuest();
+        },
         _refreshAccessToken: async () => {
           logger("Using refresh token to exchange access token.");
           const self = get();
@@ -119,6 +173,7 @@ export const Provider = ({
             }
           );
           self._handleShopperLoginTokenResponse(response);
+          logger("Got new access token / refresh token.");
         },
         _handleShopperLoginTokenResponse: (res) => {
           // TODO error handling
@@ -130,11 +185,14 @@ export const Provider = ({
             enc_user_id,
             id_token,
           } = res;
+          const isAuthenticated = !!access_token;
           set({
-            isAuthenticated: true,
+            authType: id_token ? AuthTypes.REGISTERED : AuthTypes.GUEST,
+            customerId: customer_id,
+            isAuthenticated,
             isInitializing: false,
             isInitialized: true,
-            accessToken: access_token,
+            accessToken: access_token ? `Bearer ${access_token}` : "",
             refreshToken: refresh_token,
           });
         },
@@ -152,6 +210,7 @@ export const Provider = ({
           return {
             accessToken: state.accessToken,
             refreshToken: state.refreshToken,
+            customerId: state.customerId,
           };
         },
       }
