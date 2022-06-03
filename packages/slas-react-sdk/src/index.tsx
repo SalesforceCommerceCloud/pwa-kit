@@ -75,6 +75,25 @@ export const Provider = ({
     }
   };
 
+  const persistStorageOptions = {
+    name: "slas",
+    getStorage: () => {
+      if (onClient()) {
+        return window.localStorage;
+      }
+      return memoryStorage;
+    },
+    partialize: (state: State) => {
+      // Note: unfortunately you can't rename the field here
+      return {
+        accessToken: state.accessToken,
+        refreshToken: state.refreshToken,
+        customerId: state.customerId,
+        authType: state.authType,
+      };
+    },
+  };
+
   const store = createStore<State>()(
     persist(
       (set, get) => ({
@@ -196,24 +215,7 @@ export const Provider = ({
           });
         },
       }),
-      {
-        name: "slas",
-        getStorage: () => {
-          if (onClient()) {
-            return window.localStorage;
-          }
-          return memoryStorage;
-        },
-        partialize: (state) => {
-          // Note: unfortunately you can't rename the field here
-          return {
-            accessToken: state.accessToken,
-            refreshToken: state.refreshToken,
-            customerId: state.customerId,
-            authType: state.authType,
-          };
-        },
-      }
+      persistStorageOptions
     )
   );
 

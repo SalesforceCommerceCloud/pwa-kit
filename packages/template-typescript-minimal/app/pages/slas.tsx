@@ -16,6 +16,7 @@ const SlasPage = () => {
 const SlasDemo = (props) => {
     const shopper = useShopper()
     const {_config} = shopper
+    console.log(shopper)
     const {organizationId, siteId, clientId, shortCode} = _config
     return (
         <div style={{border: '1px solid', margin: '12px'}}>
