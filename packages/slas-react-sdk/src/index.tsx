@@ -7,7 +7,6 @@ import { isExpired } from "./jwt";
 import { MemoryStorage } from "./storage";
 
 enum AuthTypes {
-  NULL = "",
   REGISTERED = "registered",
   GUEST = "guest",
 }
@@ -80,7 +79,7 @@ export const Provider = ({
     persist(
       (set, get) => ({
         _config: config,
-        authType: AuthTypes.NULL,
+        authType: AuthTypes.GUEST,
         customerId: "",
         isInitialized: false,
         isInitializing: true,
