@@ -65,7 +65,7 @@ export const Provider = ({
   // TODO: test server side
   const memoryStorage = new MemoryStorage();
 
-  const logger = (text: string | object) => {
+  const logger = (text: string) => {
     if (debug) {
       console.log(
         `%c(slas-react-sdk) %c${text}`,
