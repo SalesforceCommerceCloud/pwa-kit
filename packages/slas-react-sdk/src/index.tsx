@@ -2,7 +2,7 @@ import React, { createContext, useContext } from "react";
 import { createStore, useStore } from "zustand";
 import { persist } from "zustand/middleware";
 import { helpers, ShopperLogin } from "commerce-sdk-isomorphic";
-import { onClient } from "./util";
+import { onClient, getAppOrigin } from "./util";
 import { isExpired } from "./jwt";
 import { MemoryStorage } from "./storage";
 
@@ -120,7 +120,7 @@ export const Provider = ({
             shopperLoginClient,
             { username, password },
             {
-              redirectURI: "http://localhost:3000/callback",
+              redirectURI: `${getAppOrigin()}/callback`,
               // usid:
             }
           );
@@ -134,7 +134,7 @@ export const Provider = ({
           logger("Logging in as guest.");
           const self = get();
           const res = await helpers.loginGuestUser(shopperLoginClient, {
-            redirectURI: "http://localhost:3000/callback",
+            redirectURI: `${getAppOrigin()}/callback`,
           });
           self._handleShopperLoginTokenResponse(res);
           logger("Logged in as guest.");
