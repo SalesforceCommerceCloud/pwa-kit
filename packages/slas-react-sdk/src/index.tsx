@@ -210,6 +210,7 @@ export const Provider = ({
             accessToken: state.accessToken,
             refreshToken: state.refreshToken,
             customerId: state.customerId,
+            authType: state.authType,
           };
         },
       }
