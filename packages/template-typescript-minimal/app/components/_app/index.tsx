@@ -1,5 +1,6 @@
 import React from 'react'
 import {Provider} from 'slas-react-sdk'
+import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
 
 interface AppProps {
     children?: React.ReactNode
@@ -8,7 +9,7 @@ interface AppProps {
 const App = ({children}: AppProps) => {
     return (
         <Provider
-            proxy={'http://localhost:3000/mobify/proxy/api'}
+            proxy={`${getAppOrigin()}/mobify/proxy/api`}
             organizationId="f_ecom_zzrf_001"
             clientId="c9c45bfd-0ed3-4aa2-9971-40f88962b836"
             siteId="RefArch"
