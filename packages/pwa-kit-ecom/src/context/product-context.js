@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useEffect, useState} from 'react'
+import React, {useEffect, useState, createContext, useContext} from 'react'
 import useBasket from 'pwa-kit-commerce/commerce-api/hooks/useBasket'
 import {useVariant} from '../hooks/use-variant'
 import {useVariationParams} from '../hooks/use-variation-params'
@@ -17,10 +17,10 @@ const defaultValues = {
     addItemToWishList: () => {}
 }
 
-const ProductContext = React.createContext(defaultValues)
+const ProductContext = createContext(defaultValues)
 
 export const ProductProvider = ({children, product: initialProduct = {}}) => {
-    const [product, setProduct] = React.useState(initialProduct)
+    const [product, setProduct] = useState(initialProduct)
 
     const showLoading = !product
 
@@ -36,7 +36,7 @@ export const ProductProvider = ({children, product: initialProduct = {}}) => {
     const variationParams = useVariationParams(product)
     const variationAttributes = useVariationAttributes(product)
 
-    React.useEffect(() => {
+    useEffect(() => {
         // update the product after fetching
         setProduct(initialProduct)
     }, [initialProduct.id])
@@ -90,7 +90,7 @@ export const ProductProvider = ({children, product: initialProduct = {}}) => {
 }
 
 const useProduct = () => {
-    const context = React.useContext(ProductContext)
+    const context = useContext(ProductContext)
 
     if (context === undefined) {
         throw new Error('useStore must be used within StoreContext')

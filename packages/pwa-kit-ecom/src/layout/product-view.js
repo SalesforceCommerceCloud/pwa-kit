@@ -12,29 +12,31 @@ import {HideOnDesktop, HideOnMobile} from '../components/responsive'
 
 import {Box, Flex, useMultiStyleConfig, VStack} from '@chakra-ui/react'
 
+const Header = () => null
 const ImageGallery = () => null
 const SwatchGroup = () => null
+const ProductDescription = () => null
 const ActionButtons = () => null
-const Header = () => null
 const QuantityPicker = () => null
 const ErrorMessage = () => null
 const Footer = () => null
 
 const ProductViewLayout = ({children, variant}) => {
-    const imageGallery = children.find((el) => el.type === ImageGallery)
     const header = children.find((el) => el.type === Header)
-    const footer = children.find((el) => el.type === Footer)
+    const imageGallery = children.find((el) => el.type === ImageGallery)
     const swatchGroup = children.find((el) => el.type === SwatchGroup)
+    const productDescription = children.find((el) => el.type === ProductDescription)
     const quantityPicker = children.find((el) => el.type === QuantityPicker)
     const error = children.find((el) => el.type === ErrorMessage)
     const actionButtons = children.find((el) => el.type === ActionButtons)
+    const footer = children.find((el) => el.type === Footer)
 
     const styles = useMultiStyleConfig('ProductViewLayout', {variant})
     return (
         <Flex data-testid="product-view" {...styles.container}>
             {/* Basic information etc. title, price, breadcrumb*/}
             <HideOnDesktop {...styles.headerMobile}>
-                {header ? header.props.children : null}
+                <>{header ? header.props.children : null}</>
             </HideOnDesktop>
             <Flex {...styles.body}>
                 <Box data-testid="image-wrapper" {...styles.gallery}>
@@ -44,11 +46,15 @@ const ProductViewLayout = ({children, variant}) => {
                 {/* Variations & Quantity Selector */}
                 <VStack {...styles.buySection}>
                     <HideOnMobile {...styles.headerDesktop}>
-                        {header ? header.props.children : null}
+                        <>{header ? header.props.children : null}</>
                     </HideOnMobile>
 
                     <VStack {...styles.swatchGroupContainer}>
                         {swatchGroup ? swatchGroup.props.children : null}
+                    </VStack>
+
+                    <VStack {...styles.productDescriptionContainer}>
+                        {productDescription ? productDescription.props.children : null}
                     </VStack>
 
                     <VStack {...styles.quantityPickerContainer}>
@@ -72,10 +78,19 @@ const ProductViewLayout = ({children, variant}) => {
     )
 }
 
-ProductViewLayout.propTypes = {}
+ProductViewLayout.propTypes = {
+    ImageGallery: PropTypes.node,
+    Header: PropTypes.node,
+    SwatchGroup: PropTypes.node,
+    QuantityPicker: PropTypes.node,
+    ActionButtons: PropTypes.node,
+    ErrorMessage: PropTypes.node,
+    Footer: PropTypes.node
+}
 ProductViewLayout.Header = Header
 ProductViewLayout.ImageGallery = ImageGallery
 ProductViewLayout.SwatchGroup = SwatchGroup
+ProductViewLayout.ProductDescription = ProductDescription
 ProductViewLayout.QuantityPicker = QuantityPicker
 ProductViewLayout.ActionButtons = ActionButtons
 ProductViewLayout.ErrorMessage = ErrorMessage

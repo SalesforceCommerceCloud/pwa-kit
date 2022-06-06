@@ -19,6 +19,7 @@ import {
     AccordionIcon,
     Box,
     Button,
+    Flex,
     Stack,
     Heading,
     Divider
@@ -38,6 +39,7 @@ import {HTTPNotFound} from 'pwa-kit-react-sdk/ssr/universal/errors'
 import ProductView from 'pwa-kit-ecom/components/product-view'
 import {ProductProvider} from 'pwa-kit-ecom/context/product-context'
 import useProduct from 'pwa-kit-ecom/context/product-context'
+import ProductViewLayout from 'pwa-kit-ecom/layout/product-view'
 
 // constant
 import {API_ERROR_MESSAGE, MAX_CACHE_AGE} from '../../constants'
@@ -51,6 +53,38 @@ const CustomGallery = ({product}) => {
     return (
         <Box minWidth={'680px'}>
             <img src={heroGroup?.images[0].link} />
+        </Box>
+    )
+}
+
+const CustomisedProductView = () => {
+    const {product} = useProduct()
+    console.log('product', product)
+    return (
+        <ProductViewLayout>
+            <ProductViewLayout.Header>
+                <>
+                    <Heading size={'md'}>{product?.name}</Heading>
+                    <Box size={'xl'}>{product?.price}</Box>
+                </>
+            </ProductViewLayout.Header>
+
+            <ProductViewLayout.ImageGallery>
+                <Box bg={'red.400'} height={'500px'}>
+                    Image gallery
+                </Box>
+            </ProductViewLayout.ImageGallery>
+        </ProductViewLayout>
+    )
+}
+
+const MyProductView = () => {
+    const {product} = useProduct()
+
+    return (
+        <Box>
+            <Box bg="aqua">{product?.name}</Box>
+            <Box>{product?.price}</Box>
         </Box>
     )
 }
@@ -90,24 +124,14 @@ const ProductDetail = ({category, product, isLoading}) => {
             </Helmet>
 
             <ProductProvider product={product}>
+                <Heading size={'md'}>Theme customisation</Heading>
+
                 <ProductView
-                    // product={product}
-                    addToCartTitle={intl.formatMessage({
+                    addToCartText={intl.formatMessage({
                         defaultMessage: 'Add to Cart',
                         id: 'product_view.button.add_to_cart'
                     })}
                 />
-
-                <Stack mt={8}>
-                    <ProductView
-                        // product={product}
-                        addToCartTitle={intl.formatMessage({
-                            defaultMessage: 'Add to Cart',
-                            id: 'product_view.button.add_to_cart'
-                        })}
-                    />
-                </Stack>
-                <Heading size={'md'}>Theme customisation</Heading>
 
                 <Divider height="10px" />
 
@@ -117,7 +141,6 @@ const ProductDetail = ({category, product, isLoading}) => {
 
                 <Stack>
                     <ProductView
-                        // product={product}
                         imageGallery={<CustomGallery product={product} />}
                         productTitle={
                             <Box bg={'red'}>
@@ -127,21 +150,27 @@ const ProductDetail = ({category, product, isLoading}) => {
                                 </Box>
                             </Box>
                         }
+                        addToCartText={intl.formatMessage({
+                            defaultMessage: 'Add to Cart',
+                            id: 'product_view.button.add_to_cart'
+                        })}
                     />
                 </Stack>
 
                 <Divider height="10px" />
 
                 <Heading size={'md'} mt={16}>
-                    Fully customisation by no using default ProductView
+                    Fully customisation by reusing ProductView Layout
                 </Heading>
                 <Stack mt={8}>
-                    <Box bg={'aqua'} minWidth={'680px'}>
-                        Customised Product View
-                        <Box>{product?.name}</Box>
-                        <Box>{product?.longDescription}</Box>
-                        <Box>{product?.price}</Box>
-                    </Box>
+                    <CustomisedProductView />
+                </Stack>
+
+                <Heading size={'md'} mt={16}>
+                    Only use business hook
+                </Heading>
+                <Stack mt={8}>
+                    <MyProductView />
                 </Stack>
             </ProductProvider>
         </Box>

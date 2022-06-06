@@ -6,6 +6,7 @@
  */
 
 import React from 'react'
+import PropTypes from 'prop-types'
 import ImageGallery from '../image-gallary'
 import SwatchGroup from '../swatch-group'
 import Swatch from '../swatch-group/swatch'
@@ -74,7 +75,14 @@ const renderSwatchGroup = (props) => {
 }
 
 function ProductView(props) {
-    const {imageGallery, productTitle, swatchGroup, actionButtons, addToCartTitle} = props
+    const {
+        breadcrumb,
+        imageGallery,
+        productTitle,
+        swatchGroup,
+        actionButtons,
+        addToCartText
+    } = props
 
     const {
         product,
@@ -94,6 +102,7 @@ function ProductView(props) {
         <ProductViewLayout>
             <ProductViewLayout.Header>
                 {productTitle ? productTitle : <ProductTitle />}
+                {breadcrumb ? breadcrumb : <Box>Breadcrumb</Box>}
             </ProductViewLayout.Header>
 
             <ProductViewLayout.ImageGallery>
@@ -177,7 +186,7 @@ function ProductView(props) {
                         variant="solid"
                         marginBottom={4}
                     >
-                        {addToCartTitle}
+                        {addToCartText}
                     </Button>
                 )}
             </ProductViewLayout.ActionButtons>
@@ -185,4 +194,11 @@ function ProductView(props) {
     )
 }
 
+ProductView.propTypes = {
+    imageGallery: PropTypes.node,
+    productTitle: PropTypes.node,
+    swatchGroup: PropTypes.node,
+    actionButtons: PropTypes.node,
+    addToCartText: PropTypes.string.isRequired
+}
 export default ProductView
