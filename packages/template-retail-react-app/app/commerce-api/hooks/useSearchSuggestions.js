@@ -38,4 +38,5 @@ const useSearchSuggestions = () => {
     }
 }
 
-export default useSearchSuggestions
+// export default useSearchSuggestions
+export {default} from 'pwa-kit-commerce/commerce-api/hooks/useSearchSuggestions'

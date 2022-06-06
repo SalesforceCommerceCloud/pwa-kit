@@ -7,9 +7,10 @@
 
 import React from 'react'
 import {Box, Skeleton, Heading} from '@chakra-ui/react'
+import useProduct from '../../context/product-context'
 
 const ProductTitle = (props) => {
-    const {product} = props
+    const {product} = useProduct()
     return (
         <Box>
             {

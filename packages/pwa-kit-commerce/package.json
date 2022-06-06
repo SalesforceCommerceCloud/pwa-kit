@@ -1,0 +1,70 @@
+{
+  "name": "pwa-kit-commerce",
+  "version": "2.1.0-dev",
+  "license": "See license in LICENSE",
+  "main": "dist/index.js",
+  "private": true,
+  "engines": {
+    "node": "^14.0.0",
+    "npm": "^6.14.4 || ^7.0.0 || ^8.0.0"
+  },
+  "publishConfig": {
+    "directory": "dist"
+  },
+  "files": [
+    "CHANGELOG.md",
+    "LICENSE",
+    "TERMS_OF_USE.md"
+  ],
+  "devDependencies": {
+    "@emotion/react": "^11.1.5",
+    "@emotion/styled": "^11.1.5",
+    "@formatjs/cli": "^4.2.27",
+    "cross-env": "^5.2.0",
+    "commerce-sdk-isomorphic": "^1.5.2",
+    "internal-lib-build": "^2.1.0-dev",
+    "js-cookie": "^3.0.1",
+    "jwt-decode": "^3.1.2",
+    "pwa-kit-react-sdk": "^2.1.0-dev",
+    "query-string": "^7.0.1",
+    "raf": "^3.4.0",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
+    "react-helmet": "^6.1.0",
+    "react-intl": "^5.13.1",
+    "react-router-dom": "^5.1.2",
+    "whatwg-fetch": "1.0.0"
+  },
+  "scripts": {
+    "prepare": "npm run build",
+    "build": "cross-env NODE_ENV=production internal-lib-build build",
+    "extract-default-translations": "formatjs extract 'app/**/*.{js,jsx}' --out-file app/translations/en-US.json --id-interpolation-pattern [sha512:contenthash:base64:6]",
+    "build:watch": "watch 'npm run build' src/",
+    "lint": "npm run lint:js",
+    "lint:fix": "npm run lint:js -- --fix",
+    "lint:js": "internal-lib-build lint \"**/*.{js,jsx}\"",
+    "test": "internal-lib-build test",
+    "test:watch": "npm test -- --watch",
+    "test:inspect": "node --inspect-brk jest --runInBand",
+    "version": "node ./scripts/version.js",
+    "format": "internal-lib-build format \"**/*.{js,jsx}\""
+  },
+  "bundlesize": [
+    {
+      "path": "build/main.js",
+      "maxSize": "52 kB"
+    },
+    {
+      "path": "build/vendor.js",
+      "maxSize": "245 kB"
+    }
+  ],
+  "browserslist": [
+    "iOS >= 9.0",
+    "Android >= 4.4.4",
+    "last 4 ChromeAndroid versions"
+  ],
+  "dependencies": {
+    "watch": "1.0.1"
+  }
+}

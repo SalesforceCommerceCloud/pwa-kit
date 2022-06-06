@@ -20,7 +20,7 @@ import {
     CommerceAPIProvider,
     CustomerProductListsProvider,
     CustomerProvider
-} from '../../commerce-api/contexts'
+} from 'pwa-kit-commerce/commerce-api/contexts'
 import {resolveSiteFromUrl} from '../../utils/site-utils'
 import {resolveLocaleFromUrl} from '../../utils/utils'
 import {getConfig} from 'pwa-kit-runtime/utils/ssr-config'
@@ -36,7 +36,6 @@ import {getConfig} from 'pwa-kit-runtime/utils/ssr-config'
 const AppConfig = ({children, locals = {}}) => {
     const [basket, setBasket] = useState(null)
     const [customer, setCustomer] = useState(null)
-    console.log('theme', theme)
     return (
         <CommerceAPIProvider value={locals.api}>
             <CustomerProvider value={{customer, setCustomer}}>

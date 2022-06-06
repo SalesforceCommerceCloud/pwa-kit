@@ -45,6 +45,7 @@
         "prop-types": "^15.6.0",
         "pwa-kit-dev": "^2.1.0-dev",
         "pwa-kit-ecom": "^2.1.0-dev",
+        "pwa-kit-commerce": "^2.1.0-dev",
         "pwa-kit-react-sdk": "^2.1.0-dev",
         "pwa-kit-runtime": "^2.1.0-dev",
         "query-string": "^7.0.1",

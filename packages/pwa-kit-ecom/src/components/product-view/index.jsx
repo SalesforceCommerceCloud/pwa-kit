@@ -14,13 +14,13 @@ import ProductTitle from '../product-title'
 import QuantityPicker from '../quantity-picker'
 
 import {Box, Skeleton, Button} from '@chakra-ui/react'
-import {useProduct} from '../../hooks/use-product'
+import useProduct from '../../context/product-context'
+
 import {useHistory} from 'react-router-dom'
 import ProductViewLayout from '../../layout/product-view'
-import useProductView from '../../hooks/use-product-view'
 
 const renderSwatchGroup = (props) => {
-    const {swatchGroup, variationAttributes} = props
+    const {swatchGroup, variationAttributes = []} = props
     const history = useHistory()
     return swatchGroup ? (
         swatchGroup
@@ -75,11 +75,10 @@ const renderSwatchGroup = (props) => {
 
 function ProductView(props) {
     const {imageGallery, productTitle, swatchGroup, actionButtons, addToCartTitle} = props
+
     const {
         product,
         showLoading,
-        showInventoryMessage,
-        inventoryMessage,
         quantity,
         minOrderQuantity,
         setQuantity,
@@ -87,15 +86,14 @@ function ProductView(props) {
         variationParams,
         variationAttributes,
         stockLevel,
-        stepQuantity
-    } = useProduct(props.product)
-
-    const {handleAddToCart} = useProductView()
+        stepQuantity,
+        addVariantToCart
+    } = useProduct()
 
     return (
         <ProductViewLayout>
             <ProductViewLayout.Header>
-                {productTitle ? productTitle : <ProductTitle product={product} />}
+                {productTitle ? productTitle : <ProductTitle />}
             </ProductViewLayout.Header>
 
             <ProductViewLayout.ImageGallery>
@@ -173,8 +171,8 @@ function ProductView(props) {
                 ) : (
                     <Button
                         key="cart-button"
-                        onClick={() => handleAddToCart(variant, quantity)}
-                        disabled={showInventoryMessage}
+                        onClick={() => addVariantToCart(variant, quantity)}
+                        // disabled={showInventoryMessage}
                         width="100%"
                         variant="solid"
                         marginBottom={4}

@@ -6,7 +6,7 @@
  */
 import React, {useCallback, useEffect, useRef, useState} from 'react'
 import PropTypes from 'prop-types'
-import useCustomer from 'pwa-kit-ecom/commerce-api/hooks/useCustomer'
+import useCustomer from '../../../commerce-api/hooks/useCustomer'
 
 const AccountOrdersContext = React.createContext()
 

@@ -30,7 +30,6 @@ const ProductViewLayout = ({children, variant}) => {
     const actionButtons = children.find((el) => el.type === ActionButtons)
 
     const styles = useMultiStyleConfig('ProductViewLayout', {variant})
-    console.log('styles', styles)
     return (
         <Flex data-testid="product-view" {...styles.container}>
             {/* Basic information etc. title, price, breadcrumb*/}

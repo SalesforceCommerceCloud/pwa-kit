@@ -83,4 +83,5 @@ const useShopper = (opts = {}) => {
     return {customer, basket}
 }
 
-export default useShopper
+// export default useShopper
+export {default} from 'pwa-kit-commerce/commerce-api/hooks/useShopper'

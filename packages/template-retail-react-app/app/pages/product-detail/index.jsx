@@ -36,11 +36,14 @@ import useEinstein from '../../commerce-api/hooks/useEinstein'
 // Others/Utils
 import {HTTPNotFound} from 'pwa-kit-react-sdk/ssr/universal/errors'
 import ProductView from 'pwa-kit-ecom/components/product-view'
+import {ProductProvider} from 'pwa-kit-ecom/context/product-context'
+import useProduct from 'pwa-kit-ecom/context/product-context'
+
 // constant
 import {API_ERROR_MESSAGE, MAX_CACHE_AGE} from '../../constants'
 import {rebuildPathWithParams} from '../../utils/url'
 import {useHistory} from 'react-router-dom'
-import {useToast} from '../../hooks/use-toast'
+// import {useToast} from '../../hooks/use-toast'
 
 const CustomGallery = ({product}) => {
     const heroGroup = product?.imageGroups?.find((group) => group.viewType === 'large')
@@ -55,7 +58,8 @@ const CustomGallery = ({product}) => {
 const ProductDetail = ({category, product, isLoading}) => {
     // const {formatMessage} = useIntl()
     // const basket = useBasket()
-    // const history = useHistory()
+    const history = useHistory()
+    const intl = useIntl()
     // const einstein = useEinstein()
     const variant = useVariant(product)
     // const toast = useToast()
@@ -85,45 +89,61 @@ const ProductDetail = ({category, product, isLoading}) => {
                 <meta name="description" content={product?.pageDescription} />
             </Helmet>
 
-            <Heading size={'md'}>Theme customisation</Heading>
-            <Stack mt={8}>
-                <ProductView product={product} />
-            </Stack>
-
-            <Divider height="10px" />
-
-            <Heading mt={16} size={'md'}>
-                Partial customisation by replace some components in ProductView
-            </Heading>
-
-            <Stack>
+            <ProductProvider product={product}>
                 <ProductView
-                    product={product}
-                    imageGallery={<CustomGallery product={product} />}
-                    productTitle={
-                        <Box bg={'red'}>
-                            <Box>Customised Product Title</Box>
-                            <Box>
-                                <Heading size={'2xl'}>{product?.name}</Heading>
-                            </Box>
-                        </Box>
-                    }
+                    // product={product}
+                    addToCartTitle={intl.formatMessage({
+                        defaultMessage: 'Add to Cart',
+                        id: 'product_view.button.add_to_cart'
+                    })}
                 />
-            </Stack>
 
-            <Divider height="10px" />
+                <Stack mt={8}>
+                    <ProductView
+                        // product={product}
+                        addToCartTitle={intl.formatMessage({
+                            defaultMessage: 'Add to Cart',
+                            id: 'product_view.button.add_to_cart'
+                        })}
+                    />
+                </Stack>
+                <Heading size={'md'}>Theme customisation</Heading>
 
-            <Heading size={'md'} mt={16}>
-                Fully customisation by no using default ProductView
-            </Heading>
-            <Stack mt={8}>
-                <Box bg={'aqua'} minWidth={'680px'}>
-                    Customised Product View
-                    <Box>{product?.name}</Box>
-                    <Box>{product?.longDescription}</Box>
-                    <Box>{product?.price}</Box>
-                </Box>
-            </Stack>
+                <Divider height="10px" />
+
+                <Heading mt={16} size={'md'}>
+                    Partial customisation by replace some components in ProductView
+                </Heading>
+
+                <Stack>
+                    <ProductView
+                        // product={product}
+                        imageGallery={<CustomGallery product={product} />}
+                        productTitle={
+                            <Box bg={'red'}>
+                                <Box>Customised Product Title</Box>
+                                <Box>
+                                    <Heading size={'2xl'}>{product?.name}</Heading>
+                                </Box>
+                            </Box>
+                        }
+                    />
+                </Stack>
+
+                <Divider height="10px" />
+
+                <Heading size={'md'} mt={16}>
+                    Fully customisation by no using default ProductView
+                </Heading>
+                <Stack mt={8}>
+                    <Box bg={'aqua'} minWidth={'680px'}>
+                        Customised Product View
+                        <Box>{product?.name}</Box>
+                        <Box>{product?.longDescription}</Box>
+                        <Box>{product?.price}</Box>
+                    </Box>
+                </Stack>
+            </ProductProvider>
         </Box>
     )
 }

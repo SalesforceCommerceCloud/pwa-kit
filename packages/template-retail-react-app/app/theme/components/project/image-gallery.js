@@ -4,11 +4,10 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {ImageGallery} from 'pwa-kit-ecom/theme/components'
+
+// override the style from the component library
 export default {
-    ...ImageGallery,
     baseStyle: {
-        ...ImageGallery.baseStyle,
         container: {
             background: 'blue.100'
         }

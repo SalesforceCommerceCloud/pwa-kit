@@ -11,8 +11,8 @@ const ProductViewLayout = {
         'rightColumn',
         'headerMobile',
         'headerDesktop',
-        'swatchGroup',
-        'quantityPicker',
+        'swatchGroupContainer',
+        'quantityPickerContainer',
         'actionButtonsMobile',
         'actionsButtonsDesktop'
     ],
@@ -33,11 +33,13 @@ const ProductViewLayout = {
             flex: 1,
             marginBottom: [16, 16, 16, 0, 0]
         },
-        headerMobile: {
-            background: 'red.400'
-        },
+        headerMobile: {},
         headerDesktop: {},
         swatchGroupContainer: {
+            align: 'stretch',
+            spacing: 4
+        },
+        quantityPickerContainer: {
             align: 'stretch',
             spacing: 4
         },
