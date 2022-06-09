@@ -29,6 +29,9 @@ import Seo from '../../components/seo'
 import Section from '../../components/section'
 import ProductScroller from '../../components/product-scroller'
 
+// Layout
+import {getLayout} from '../../layouts/pdp-a'
+
 // Others
 import {getAssetUrl} from 'pwa-kit-react-sdk/ssr/universal/utils'
 import {heroFeatures, features} from './data'
@@ -291,6 +294,8 @@ Home.getProps = async ({res, api}) => {
 
     return {productSearchResult}
 }
+
+Home.getLayout = getLayout
 
 Home.propTypes = {
     /**

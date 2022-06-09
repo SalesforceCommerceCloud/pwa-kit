@@ -21,6 +21,7 @@ import {UIDReset, UIDFork} from 'react-uid'
  */
 const Switch = (props) => {
     const {error, appState, routes, App} = props
+
     return (
         <UIDReset>
             <AppErrorBoundary error={error}>
@@ -29,10 +30,31 @@ const Switch = (props) => {
                         <RouterSwitch>
                             {routes.map((route, i) => {
                                 const {component: Component, ...routeProps} = route
+                                debugger
                                 return (
                                     <Route key={i} {...routeProps}>
                                         <UIDFork>
-                                            <Component preloadedProps={appState.pageProps} />
+                                            {console.log(
+                                                'Switch route.path:',
+                                                route?.path
+                                            )}
+                                            {console.log(
+                                                'Switch Component.getLayout().type:',
+                                                Component?.getLayout && Component?.getLayout()?.type
+                                            )}
+                                            {console.log(
+                                                'Switch Component.name:',
+                                                Component.name
+                                            )}
+                                            {Component.getLayout ? (
+                                                Component.getLayout(
+                                                    <Component
+                                                        preloadedProps={appState.pageProps}
+                                                    />
+                                                )
+                                            ) : (
+                                                <Component preloadedProps={appState.pageProps} />
+                                            )}
                                         </UIDFork>
                                     </Route>
                                 )
