@@ -258,7 +258,7 @@
   "account_wishlist.description.continue_shopping": [
     {
       "type": 0,
-      "value": "買い物を続け、ほしい物リストに商品を追加できます。"
+      "value": "買い物を続けて、ほしい物リストに商品を追加してください。"
     }
   ],
   "account_wishlist.heading.no_wishlist": [
@@ -634,7 +634,7 @@
   "checkout_confirmation.heading.payment_details": [
     {
       "type": 0,
-      "value": "支払詳細"
+      "value": "支払の詳細"
     }
   ],
   "checkout_confirmation.heading.shipping_address": [
@@ -1118,7 +1118,7 @@
   "empty_cart.message.continue_shopping": [
     {
       "type": 0,
-      "value": "買い物を続け、買い物カゴに商品を追加できます。"
+      "value": "買い物を続けて、買い物カゴに商品を追加してください。"
     }
   ],
   "empty_cart.message.sign_in_or_continue_shopping": [
@@ -1142,7 +1142,7 @@
     },
     {
       "type": 0,
-      "value": "してください。"
+      "value": "ください。"
     }
   ],
   "empty_search_results.info.cant_find_anything_for_query": [
@@ -1170,7 +1170,7 @@
     },
     {
       "type": 0,
-      "value": "してください。"
+      "value": "ください。"
     }
   ],
   "empty_search_results.link.contact_us": [
@@ -1404,7 +1404,7 @@
   "home.description.shop_products": [
     {
       "type": 0,
-      "value": "このセクションには、カタログからのコンテンツが含まれています。"
+      "value": "このセクションには、カタログからのコンテンツが含まれています。カタログの置き換え方法に関する"
     },
     {
       "type": 1,
@@ -1412,7 +1412,7 @@
     },
     {
       "type": 0,
-      "value": "をクリックして交換方法をご確認ください。"
+      "value": "。"
     }
   ],
   "home.features.description.cart_checkout": [
@@ -1430,7 +1430,7 @@
   "home.features.description.einstein_recommendations": [
     {
       "type": 0,
-      "value": "商品の推奨項目により、次に推奨される商品やオファーをすべての買い物客に表示します。"
+      "value": "商品レコメンデーションにより、次善の商品やオファーをすべての買い物客に提示します。"
     }
   ],
   "home.features.description.my_account": [
@@ -1466,7 +1466,7 @@
   "home.features.heading.einstein_recommendations": [
     {
       "type": 0,
-      "value": "Einstein Recommendations"
+      "value": "Einstein レコメンデーション"
     }
   ],
   "home.features.heading.my_account": [
@@ -1478,7 +1478,7 @@
   "home.features.heading.shopper_login": [
     {
       "type": 0,
-      "value": "Shopper Login and API Access Service"
+      "value": "Shopper Login and API Access Service (SLAS)"
     }
   ],
   "home.features.heading.wishlist": [
@@ -1502,7 +1502,7 @@
   "home.heading.shop_products": [
     {
       "type": 0,
-      "value": "商品の購入"
+      "value": "ショップの商品"
     }
   ],
   "home.hero_features.link.design_kit": [
@@ -1544,7 +1544,7 @@
   "home.title.react_starter_store": [
     {
       "type": 0,
-      "value": "リテール用 React PWA Starter ストア"
+      "value": "リテール用 React PWA Starter Store"
     }
   ],
   "item_attributes.label.promotions": [
@@ -1994,7 +1994,7 @@
   "order_summary.label.estimated_total": [
     {
       "type": 0,
-      "value": "推定合計金額"
+      "value": "見積合計金額"
     }
   ],
   "order_summary.label.free": [
@@ -2700,7 +2700,7 @@
   "shipping_options.action.send_as_a_gift": [
     {
       "type": 0,
-      "value": "これはギフトですか?"
+      "value": "ギフトとして発送しますか?"
     }
   ],
   "shipping_options.button.continue_to_payment": [

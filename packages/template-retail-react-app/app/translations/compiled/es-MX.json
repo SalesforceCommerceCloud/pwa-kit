@@ -301,7 +301,7 @@
           "value": [
             {
               "type": 0,
-              "value": "item"
+              "value": "artículo"
             }
           ]
         },
@@ -309,7 +309,7 @@
           "value": [
             {
               "type": 0,
-              "value": "items"
+              "value": "artículos"
             }
           ]
         }
@@ -334,7 +334,7 @@
     },
     {
       "type": 0,
-      "value": " artículo)"
+      "value": " artículo(s))"
     }
   ],
   "add_to_cart_modal.label.quantity": [
@@ -346,7 +346,7 @@
   "add_to_cart_modal.link.checkout": [
     {
       "type": 0,
-      "value": "Finalizar la compra (checkout)"
+      "value": "Finalizar la compra"
     }
   ],
   "add_to_cart_modal.link.view_cart": [
@@ -441,7 +441,7 @@
           "value": [
             {
               "type": 0,
-              "value": "item"
+              "value": "artículo"
             }
           ]
         },
@@ -449,7 +449,7 @@
           "value": [
             {
               "type": 0,
-              "value": "items"
+              "value": "artículos"
             }
           ]
         }
@@ -484,7 +484,7 @@
   "cart_cta.link.checkout": [
     {
       "type": 0,
-      "value": "Finalizar la compra (checkout)"
+      "value": "Finalizar la compra"
     }
   ],
   "cart_secondary_button_group.action.added_to_wishlist": [
@@ -541,7 +541,7 @@
           "value": [
             {
               "type": 0,
-              "value": "0 items"
+              "value": "0 artículos"
             }
           ]
         },
@@ -552,7 +552,7 @@
             },
             {
               "type": 0,
-              "value": " item"
+              "value": " artículo"
             }
           ]
         },
@@ -563,7 +563,7 @@
             },
             {
               "type": 0,
-              "value": " items"
+              "value": " artículos"
             }
           ]
         }
@@ -723,7 +723,7 @@
           "value": [
             {
               "type": 0,
-              "value": "0 items"
+              "value": "0 artículos"
             }
           ]
         },
@@ -734,7 +734,7 @@
             },
             {
               "type": 0,
-              "value": " item"
+              "value": " artículo"
             }
           ]
         },
@@ -745,7 +745,7 @@
             },
             {
               "type": 0,
-              "value": " items"
+              "value": " artículos"
             }
           ]
         }
@@ -1040,7 +1040,7 @@
   "drawer_menu.link.customer_support.contact_us": [
     {
       "type": 0,
-      "value": "Contacte con nosotros"
+      "value": "Contacto"
     }
   ],
   "drawer_menu.link.customer_support.shipping_and_returns": [
@@ -1180,7 +1180,7 @@
   "empty_search_results.link.contact_us": [
     {
       "type": 0,
-      "value": "Contacte con nosotros"
+      "value": "Contacto"
     }
   ],
   "empty_search_results.recommended_products.title.most_viewed": [
@@ -1222,7 +1222,7 @@
   "footer.link.contact_us": [
     {
       "type": 0,
-      "value": "Contacte con nosotros"
+      "value": "Contacto"
     }
   ],
   "footer.link.order_status": [
@@ -1482,7 +1482,7 @@
   "home.features.heading.shopper_login": [
     {
       "type": 0,
-      "value": "Inicio de sesión de comprador y API Access Service"
+      "value": "Shopper Login y API Access Service (SLAS)"
     }
   ],
   "home.features.heading.wishlist": [
@@ -1512,7 +1512,7 @@
   "home.hero_features.link.design_kit": [
     {
       "type": 0,
-      "value": "Crear con el Kit de diseño PWA de Figma"
+      "value": "Crear con el Figma PWA Design Kit"
     }
   ],
   "home.hero_features.link.on_github": [
@@ -1530,7 +1530,7 @@
   "home.link.contact_us": [
     {
       "type": 0,
-      "value": "Contacte con nosotros"
+      "value": "Contacto"
     }
   ],
   "home.link.get_started": [
@@ -1548,7 +1548,7 @@
   "home.title.react_starter_store": [
     {
       "type": 0,
-      "value": "La Tienda inicial PWA de React para venta minorista"
+      "value": "React PWA Starter Store para venta minorista"
     }
   ],
   "item_attributes.label.promotions": [
@@ -1947,7 +1947,7 @@
           "value": [
             {
               "type": 0,
-              "value": "0 items"
+              "value": "0 artículos"
             }
           ]
         },
@@ -1958,7 +1958,7 @@
             },
             {
               "type": 0,
-              "value": " item"
+              "value": " artículo"
             }
           ]
         },
@@ -1969,7 +1969,7 @@
             },
             {
               "type": 0,
-              "value": " items"
+              "value": " artículos"
             }
           ]
         }
@@ -2219,7 +2219,7 @@
           "value": [
             {
               "type": 0,
-              "value": "item"
+              "value": "artículo"
             }
           ]
         },
@@ -2227,7 +2227,7 @@
           "value": [
             {
               "type": 0,
-              "value": "items"
+              "value": "artículos"
             }
           ]
         }
@@ -2303,7 +2303,7 @@
           "value": [
             {
               "type": 0,
-              "value": "item"
+              "value": "artículo"
             }
           ]
         },
@@ -2311,7 +2311,7 @@
           "value": [
             {
               "type": 0,
-              "value": "items"
+              "value": "artículos"
             }
           ]
         }
@@ -2485,7 +2485,7 @@
           "value": [
             {
               "type": 0,
-              "value": "item"
+              "value": "artículo"
             }
           ]
         },
@@ -2493,7 +2493,7 @@
           "value": [
             {
               "type": 0,
-              "value": "items"
+              "value": "artículos"
             }
           ]
         }
@@ -3273,7 +3273,7 @@
           "value": [
             {
               "type": 0,
-              "value": "item"
+              "value": "artículo"
             }
           ]
         },
@@ -3281,7 +3281,7 @@
           "value": [
             {
               "type": 0,
-              "value": "items"
+              "value": "artículos"
             }
           ]
         }
