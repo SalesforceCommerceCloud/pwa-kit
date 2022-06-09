@@ -193,7 +193,7 @@
     "defaultMessage": "제거"
   },
   "cart_secondary_button_group.label.this_is_gift": {
-    "defaultMessage": "선물입니다."
+    "defaultMessage": "선물로 구매"
   },
   "cart_secondary_button_group.link_learn_more": {
     "defaultMessage": "자세히 알아보기"
@@ -604,13 +604,13 @@
     "defaultMessage": "구성요소 및 디자인 키트"
   },
   "home.features.heading.einstein_recommendations": {
-    "defaultMessage": "Einstein Recommendations"
+    "defaultMessage": "Einstein 제품 추천"
   },
   "home.features.heading.my_account": {
     "defaultMessage": "내 계정"
   },
   "home.features.heading.shopper_login": {
-    "defaultMessage": "Shopper Login and API Access Service"
+    "defaultMessage": "Shopper Login and API Access Service(SLAS)"
   },
   "home.features.heading.wishlist": {
     "defaultMessage": "위시리스트"
@@ -625,7 +625,7 @@
     "defaultMessage": "제품 쇼핑"
   },
   "home.hero_features.link.design_kit": {
-    "defaultMessage": "Figma PWA 디자인 키트를 사용하여 생성"
+    "defaultMessage": "Figma PWA Design Kit를 사용하여 생성"
   },
   "home.hero_features.link.on_github": {
     "defaultMessage": "Github에서 다운로드"
@@ -643,7 +643,7 @@
     "defaultMessage": "문서 읽기"
   },
   "home.title.react_starter_store": {
-    "defaultMessage": "소매점용 React PWA 스타터 매장"
+    "defaultMessage": "소매점용 React PWA Starter Store"
   },
   "item_attributes.label.promotions": {
     "defaultMessage": "프로모션"

@@ -72,7 +72,7 @@
     "defaultMessage": "Weiter einkaufen"
   },
   "account_order_history.description.once_you_place_order": {
-    "defaultMessage": "Sobald Sie eine Bestellung aufgegeben haben, werden die Einzelheiten hierzu hier angezeigt."
+    "defaultMessage": "Sobald Sie eine Bestellung aufgegeben haben, werden die Einzelheiten hier angezeigt."
   },
   "account_order_history.heading.no_order_yet": {
     "defaultMessage": "Sie haben noch keine Bestellung aufgegeben."
@@ -344,19 +344,19 @@
     "defaultMessage": "Möchten Sie diesen Artikel wirklich aus Ihrem Warenkorb löschen?"
   },
   "confirmation_modal.remove_cart_item.title.confirm_remove": {
-    "defaultMessage": "Entfernungsvorgang des Artikels bestätigen"
+    "defaultMessage": "Entfernung des Artikels bestätigen"
   },
   "confirmation_modal.remove_wishlist_item.action.no": {
-    "defaultMessage": "Nein, Artikel beibehalten."
+    "defaultMessage": "Nein, Artikel beibehalten"
   },
   "confirmation_modal.remove_wishlist_item.action.yes": {
-    "defaultMessage": "Ja, Artikel entfernen."
+    "defaultMessage": "Ja, Artikel entfernen"
   },
   "confirmation_modal.remove_wishlist_item.message.sure_to_remove": {
     "defaultMessage": "Möchten Sie diesen Artikel wirklich aus Ihrer Wunschliste entfernen?"
   },
   "confirmation_modal.remove_wishlist_item.title.confirm_remove": {
-    "defaultMessage": "Entfernungsvorgang des Artikels bestätigen"
+    "defaultMessage": "Entfernung des Artikels bestätigen"
   },
   "contact_info.action.sign_out": {
     "defaultMessage": "Abmelden"
@@ -610,7 +610,7 @@
     "defaultMessage": "Mein Konto"
   },
   "home.features.heading.shopper_login": {
-    "defaultMessage": "Shopper Login and API Access Service"
+    "defaultMessage": "Shopper Login and API Access Service (SLAS)"
   },
   "home.features.heading.wishlist": {
     "defaultMessage": "Wunschliste"
@@ -643,7 +643,7 @@
     "defaultMessage": "Dokumente lesen"
   },
   "home.title.react_starter_store": {
-    "defaultMessage": "Der React PWA Starter Store für den Einzelhandel"
+    "defaultMessage": "React PWA Starter Store für den Einzelhandel"
   },
   "item_attributes.label.promotions": {
     "defaultMessage": "Werbeaktionen"

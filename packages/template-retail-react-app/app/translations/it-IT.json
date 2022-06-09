@@ -63,7 +63,7 @@
     "defaultMessage": "Numero di tracking"
   },
   "account_order_detail.link.back_to_history": {
-    "defaultMessage": "Torna alla cronologia degli ordini"
+    "defaultMessage": "Torna alla cronologia ordini"
   },
   "account_order_detail.title.order_details": {
     "defaultMessage": "Dettagli ordine"
@@ -148,7 +148,7 @@
     "defaultMessage": "Potrebbe interessarti anche"
   },
   "auth_modal.description.now_signed_in": {
-    "defaultMessage": "Hai eseguito l'accesso."
+    "defaultMessage": "hai eseguito l'accesso."
   },
   "auth_modal.error.incorrect_email_or_password": {
     "defaultMessage": "Qualcosa non va nell'indirizzo email o nella password. Riprova."
@@ -184,7 +184,7 @@
     "defaultMessage": "Passa al checkout"
   },
   "cart_secondary_button_group.action.added_to_wishlist": {
-    "defaultMessage": "Aggiungi alla lista dei desideri"
+    "defaultMessage": "Aggiungi alla lista desideri"
   },
   "cart_secondary_button_group.action.edit": {
     "defaultMessage": "Modifica"
@@ -247,7 +247,7 @@
     "defaultMessage": "Grazie per il tuo ordine!"
   },
   "checkout_confirmation.label.free": {
-    "defaultMessage": "Gratis"
+    "defaultMessage": "Gratuita"
   },
   "checkout_confirmation.label.order_number": {
     "defaultMessage": "Numero ordine"
@@ -299,7 +299,7 @@
     "defaultMessage": "Termini e condizioni"
   },
   "checkout_footer.message.copyright": {
-    "defaultMessage": "2021 Salesforce o società affiliate. Tutti i diritti riservati. Questo è un negozio fittizio a scopo dimostrativo. Gli ordini effettuati NON VERRANNO evasi."
+    "defaultMessage": "2021 Salesforce o sue società affiliate. Tutti i diritti riservati. Questo è un negozio fittizio a scopo dimostrativo. Gli ordini effettuati NON VERRANNO evasi."
   },
   "checkout_header.link.cart": {
     "defaultMessage": "Torna al carrello"
@@ -317,7 +317,7 @@
     "defaultMessage": "Carta di credito"
   },
   "checkout_payment.label.same_as_shipping": {
-    "defaultMessage": "Uguale all'indirizzo di spedizione"
+    "defaultMessage": "Identico all'indirizzo di spedizione"
   },
   "checkout_payment.title.payment": {
     "defaultMessage": "Pagamento"
@@ -567,7 +567,7 @@
     "defaultMessage": "Il mio account"
   },
   "home.description.features": {
-    "defaultMessage": "Funzionalità pronte all'uso, così potrai concentrare il tuo tempo sull'aggiunta di miglioramenti."
+    "defaultMessage": "Funzionalità pronte all'uso, così potrai dedicare il tuo tempo all'aggiunta di miglioramenti."
   },
   "home.description.here_to_help": {
     "defaultMessage": "Contatta il nostro personale di assistenza, che ti fornirà"
@@ -583,7 +583,7 @@
     "defaultMessage": "Best practice di e-commerce per l'esperienza di carrello e checkout di un acquirente."
   },
   "home.features.description.components": {
-    "defaultMessage": "Realizzato utilizzando l'interfaccia utente Chakra, una libreria di componenti React semplice, modulare e accessibile."
+    "defaultMessage": "Realizzato utilizzando Chakra UI, una libreria di componenti React semplice, modulare e accessibile."
   },
   "home.features.description.einstein_recommendations": {
     "defaultMessage": "Garantisci a ogni acquirente il miglior prodotto o la migliore offerta con i suggerimenti di prodotto."
@@ -604,13 +604,13 @@
     "defaultMessage": "Componenti e Design Kit"
   },
   "home.features.heading.einstein_recommendations": {
-    "defaultMessage": "Einstein Recommendations"
+    "defaultMessage": "Suggerimenti Einstein"
   },
   "home.features.heading.my_account": {
     "defaultMessage": "Il mio account"
   },
   "home.features.heading.shopper_login": {
-    "defaultMessage": "Shopper Login and API Access Service"
+    "defaultMessage": "Shopper Login and API Access Service (SLAS)"
   },
   "home.features.heading.wishlist": {
     "defaultMessage": "Lista desideri"
@@ -643,7 +643,7 @@
     "defaultMessage": "Leggi la documentazione"
   },
   "home.title.react_starter_store": {
-    "defaultMessage": "Lo starter store React PWA per il retail"
+    "defaultMessage": "React PWA Starter Store per il retail"
   },
   "item_attributes.label.promotions": {
     "defaultMessage": "Promozioni"
@@ -852,7 +852,7 @@
     "defaultMessage": "Totale stimato"
   },
   "order_summary.label.free": {
-    "defaultMessage": "Gratis"
+    "defaultMessage": "Gratuita"
   },
   "order_summary.label.order_total": {
     "defaultMessage": "Totale ordine"
@@ -915,7 +915,7 @@
     "description": "Password requirement"
   },
   "password_requirements.error.one_special_character": {
-    "defaultMessage": "1 carattere speciale (esempio: , S ! % #)",
+    "defaultMessage": "1 carattere speciale (ad esempio: , $ ! % #)",
     "description": "Password requirement"
   },
   "password_requirements.error.one_uppercase_letter": {
@@ -938,7 +938,7 @@
     "defaultMessage": "Questo è un pagamento crittografato con SSL sicuro."
   },
   "price_per_item.label.each": {
-    "defaultMessage": "cad.",
+    "defaultMessage": " cad.",
     "description": "Abbreviated 'each', follows price per item, like $10/ea"
   },
   "product_detail.accordion.button.product_detail": {
@@ -1005,7 +1005,7 @@
     "defaultMessage": "Aggiungi al carrello"
   },
   "product_view.button.add_to_wishlist": {
-    "defaultMessage": "Aggiungi alla lista dei desideri"
+    "defaultMessage": "Aggiungi alla lista desideri"
   },
   "product_view.button.update": {
     "defaultMessage": "Aggiornati"
