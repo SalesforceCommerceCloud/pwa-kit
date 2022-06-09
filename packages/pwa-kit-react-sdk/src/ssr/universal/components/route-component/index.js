@@ -112,10 +112,8 @@ export const routeComponent = (Wrapped, isPage, locals) => {
             return component.shouldGetProps ? component.shouldGetProps(args) : defaultImpl()
         }
 
-        static async getLayout(page) {
+        static getLayout(page) {
             console.log('route-component getLayout defaultLayout')
-
-            const component = await RouteComponent.getComponent()
             return getLayout(page)
         }
 
