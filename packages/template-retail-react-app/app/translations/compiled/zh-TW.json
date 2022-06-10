@@ -963,28 +963,6 @@
       "value": "聯絡資訊"
     }
   ],
-  "credit_card_fields.tool_tip.security_code": [
-    {
-      "type": 0,
-      "value": "此 "
-    },
-    {
-      "type": 1,
-      "value": "length"
-    },
-    {
-      "type": 0,
-      "value": " 位數代碼可在您卡片的"
-    },
-    {
-      "type": 1,
-      "value": "side"
-    },
-    {
-      "type": 0,
-      "value": "找到。"
-    }
-  ],
   "drawer_menu.button.account_details": [
     {
       "type": 0,

@@ -955,28 +955,6 @@
       "value": "연락처 정보"
     }
   ],
-  "credit_card_fields.tool_tip.security_code": [
-    {
-      "type": 0,
-      "value": "이 "
-    },
-    {
-      "type": 1,
-      "value": "length"
-    },
-    {
-      "type": 0,
-      "value": "자리 코드는 카드의 "
-    },
-    {
-      "type": 1,
-      "value": "side"
-    },
-    {
-      "type": 0,
-      "value": "에서 확인할 수 있습니다."
-    }
-  ],
   "drawer_menu.button.account_details": [
     {
       "type": 0,

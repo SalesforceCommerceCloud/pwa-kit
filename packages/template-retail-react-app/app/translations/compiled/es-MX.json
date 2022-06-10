@@ -967,28 +967,6 @@
       "value": "Información de contacto"
     }
   ],
-  "credit_card_fields.tool_tip.security_code": [
-    {
-      "type": 0,
-      "value": "Puede encontrar este código de "
-    },
-    {
-      "type": 1,
-      "value": "length"
-    },
-    {
-      "type": 0,
-      "value": " dígitos en el "
-    },
-    {
-      "type": 1,
-      "value": "side"
-    },
-    {
-      "type": 0,
-      "value": " de su tarjeta."
-    }
-  ],
   "drawer_menu.button.account_details": [
     {
       "type": 0,

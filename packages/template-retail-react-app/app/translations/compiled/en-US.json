@@ -970,23 +970,13 @@
   "credit_card_fields.tool_tip.security_code": [
     {
       "type": 0,
-      "value": "This "
-    },
-    {
-      "type": 1,
-      "value": "length"
-    },
+      "value": "This 3-digit code can be found on the back of your card."
+    }
+  ],
+  "credit_card_fields.tool_tip.security_code.american_express": [
     {
       "type": 0,
-      "value": "-digit code can be found on the "
-    },
-    {
-      "type": 1,
-      "value": "side"
-    },
-    {
-      "type": 0,
-      "value": " of your card."
+      "value": "This 4-digit code can be found on the front of your card."
     }
   ],
   "drawer_menu.button.account_details": [

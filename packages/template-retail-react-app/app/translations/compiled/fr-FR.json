@@ -967,28 +967,6 @@
       "value": "Coordonnées"
     }
   ],
-  "credit_card_fields.tool_tip.security_code": [
-    {
-      "type": 0,
-      "value": "Ce code à "
-    },
-    {
-      "type": 1,
-      "value": "length"
-    },
-    {
-      "type": 0,
-      "value": " chiffres se trouve au "
-    },
-    {
-      "type": 1,
-      "value": "side"
-    },
-    {
-      "type": 0,
-      "value": " de votre carte."
-    }
-  ],
   "drawer_menu.button.account_details": [
     {
       "type": 0,

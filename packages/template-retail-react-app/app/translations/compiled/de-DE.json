@@ -967,28 +967,6 @@
       "value": "Kontaktinfo"
     }
   ],
-  "credit_card_fields.tool_tip.security_code": [
-    {
-      "type": 0,
-      "value": "Dieser "
-    },
-    {
-      "type": 1,
-      "value": "length"
-    },
-    {
-      "type": 0,
-      "value": "-stellige Code kann der "
-    },
-    {
-      "type": 1,
-      "value": "side"
-    },
-    {
-      "type": 0,
-      "value": " Ihrer Karte entnommen werden."
-    }
-  ],
   "drawer_menu.button.account_details": [
     {
       "type": 0,

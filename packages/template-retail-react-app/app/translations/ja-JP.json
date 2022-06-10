@@ -379,10 +379,6 @@
   "contact_info.title.contact_info": {
     "defaultMessage": "連絡先情報"
   },
-  "credit_card_fields.tool_tip.security_code": {
-    "defaultMessage": "この{length} 桁のコードはカードの{side}側にあります。",
-    "description": "Credit card security code help text"
-  },
   "drawer_menu.button.account_details": {
     "defaultMessage": "アカウントの詳細"
   },

@@ -970,23 +970,13 @@
   "credit_card_fields.tool_tip.security_code": [
     {
       "type": 0,
-      "value": "[!! Ṯḫíííś  !!]"
-    },
-    {
-      "type": 1,
-      "value": "length"
-    },
+      "value": "[!! Ṯḫíííś 3-ḋíííĝíṭṭṭ ćŏŏŏḋè ćâńńń ḃèèè ḟŏŏŏůńḋḋḋ ŏńńń ṭḫḫḫè ḃḃḃâćǩǩǩ ŏḟḟḟ ẏŏŏŏůŕ ćâŕŕŕḋ. !!]"
+    }
+  ],
+  "credit_card_fields.tool_tip.security_code.american_express": [
     {
       "type": 0,
-      "value": "[!! -ḋíííĝíṭṭṭ ćŏŏŏḋè ćâńńń ḃèèè ḟŏŏŏůńḋḋḋ ŏńńń ṭḫḫḫè  !!]"
-    },
-    {
-      "type": 1,
-      "value": "side"
-    },
-    {
-      "type": 0,
-      "value": "[!!  ŏḟḟḟ ẏŏŏŏůŕ ćâŕŕŕḋ. !!]"
+      "value": "[!! Ṯḫíííś 4-ḋíííĝíṭṭṭ ćŏŏŏḋè ćâńńń ḃèèè ḟŏŏŏůńḋḋḋ ŏńńń ṭḫḫḫè ḟḟḟŕŏńńńṭ ŏŏŏḟ ẏẏẏŏůŕŕŕ ćâââŕḋ. !!]"
     }
   ],
   "drawer_menu.button.account_details": [

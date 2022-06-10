@@ -380,8 +380,12 @@
     "defaultMessage": "Contact Info"
   },
   "credit_card_fields.tool_tip.security_code": {
-    "defaultMessage": "This {length}-digit code can be found on the {side} of your card.",
-    "description": "Credit card security code help text"
+    "defaultMessage": "This 3-digit code can be found on the back of your card.",
+    "description": "Default credit card security code help text"
+  },
+  "credit_card_fields.tool_tip.security_code.american_express": {
+    "defaultMessage": "This 4-digit code can be found on the front of your card.",
+    "description": "American Express credit card security code help text"
   },
   "drawer_menu.button.account_details": {
     "defaultMessage": "Account Details"

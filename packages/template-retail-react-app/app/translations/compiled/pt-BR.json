@@ -971,28 +971,6 @@
       "value": "Informações de contato"
     }
   ],
-  "credit_card_fields.tool_tip.security_code": [
-    {
-      "type": 0,
-      "value": "Este código de "
-    },
-    {
-      "type": 1,
-      "value": "length"
-    },
-    {
-      "type": 0,
-      "value": " dígitos pode ser encontrado no "
-    },
-    {
-      "type": 1,
-      "value": "side"
-    },
-    {
-      "type": 0,
-      "value": " de seu cartão."
-    }
-  ],
   "drawer_menu.button.account_details": [
     {
       "type": 0,

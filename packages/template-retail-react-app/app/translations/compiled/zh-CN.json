@@ -967,28 +967,6 @@
       "value": "联系信息"
     }
   ],
-  "credit_card_fields.tool_tip.security_code": [
-    {
-      "type": 0,
-      "value": "此 "
-    },
-    {
-      "type": 1,
-      "value": "length"
-    },
-    {
-      "type": 0,
-      "value": " 位数字码可以在卡的"
-    },
-    {
-      "type": 1,
-      "value": "side"
-    },
-    {
-      "type": 0,
-      "value": "找到。"
-    }
-  ],
   "drawer_menu.button.account_details": [
     {
       "type": 0,

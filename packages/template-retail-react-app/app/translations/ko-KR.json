@@ -379,10 +379,6 @@
   "contact_info.title.contact_info": {
     "defaultMessage": "연락처 정보"
   },
-  "credit_card_fields.tool_tip.security_code": {
-    "defaultMessage": "이 {length}자리 코드는 카드의 {side}에서 확인할 수 있습니다.",
-    "description": "Credit card security code help text"
-  },
   "drawer_menu.button.account_details": {
     "defaultMessage": "계정 세부 정보"
   },

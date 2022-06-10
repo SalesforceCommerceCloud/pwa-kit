@@ -379,10 +379,6 @@
   "contact_info.title.contact_info": {
     "defaultMessage": "Kontaktinfo"
   },
-  "credit_card_fields.tool_tip.security_code": {
-    "defaultMessage": "Dieser {length}-stellige Code kann der {side} Ihrer Karte entnommen werden.",
-    "description": "Credit card security code help text"
-  },
   "drawer_menu.button.account_details": {
     "defaultMessage": "Kontodetails"
   },

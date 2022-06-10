@@ -967,28 +967,6 @@
       "value": "連絡先情報"
     }
   ],
-  "credit_card_fields.tool_tip.security_code": [
-    {
-      "type": 0,
-      "value": "この"
-    },
-    {
-      "type": 1,
-      "value": "length"
-    },
-    {
-      "type": 0,
-      "value": " 桁のコードはカードの"
-    },
-    {
-      "type": 1,
-      "value": "side"
-    },
-    {
-      "type": 0,
-      "value": "側にあります。"
-    }
-  ],
   "drawer_menu.button.account_details": [
     {
       "type": 0,
