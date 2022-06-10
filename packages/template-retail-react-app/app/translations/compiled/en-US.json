@@ -469,6 +469,12 @@
       "value": "Item removed from cart"
     }
   ],
+  "cart.link.added_to_wishlist.view_wishlist": [
+    {
+      "type": 0,
+      "value": "View"
+    }
+  ],
   "cart.recommended_products.title.may_also_like": [
     {
       "type": 0,

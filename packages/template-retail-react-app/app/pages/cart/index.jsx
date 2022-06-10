@@ -75,7 +75,10 @@ const Cart = () => {
                 status: 'success',
                 action: (
                     <Button variant="link" onClick={() => navigate('/account/wishlist')}>
-                        View
+                        <FormattedMessage
+                            defaultMessage="View"
+                            id="cart.link.added_to_wishlist.view_wishlist"
+                        />
                     </Button>
                 )
             })
