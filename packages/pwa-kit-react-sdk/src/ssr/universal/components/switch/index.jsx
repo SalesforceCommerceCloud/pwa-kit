@@ -30,22 +30,9 @@ const Switch = (props) => {
                         <RouterSwitch>
                             {routes.map((route, i) => {
                                 const {component: Component, ...routeProps} = route
-                                debugger
                                 return (
                                     <Route key={i} {...routeProps}>
                                         <UIDFork>
-                                            {console.log(
-                                                'Switch route.path:',
-                                                route?.path
-                                            )}
-                                            {console.log(
-                                                'Switch Component.getLayout().type:',
-                                                Component?.getLayout && Component?.getLayout()?.type
-                                            )}
-                                            {console.log(
-                                                'Switch Component.name:',
-                                                Component.name
-                                            )}
                                             {Component.getLayout ? (
                                                 Component.getLayout(
                                                     <Component
