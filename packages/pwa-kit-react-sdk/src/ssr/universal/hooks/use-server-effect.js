@@ -1,56 +1,54 @@
-import {useState, useContext, useEffect} from 'react'
+import React, {useContext, useState, useEffect} from 'react'
 import {useLocation, useParams} from 'react-router-dom'
+import {useUID} from 'react-uid'
+import {useExpress} from './index'
 
 const isClient = typeof window !== 'undefined'
 
-/**
- * Create a provider for use with hooks created with the paired createSeverEffect function.
- *
- * @param {string} path - relative path from the build directory to the asset
- * @function
- * 
- * @returns {ServerEffectProvider}
- */
-export const createServerEffectContext = (name, extraArgs) => {
-    return () => {
-        React.createContext()
-    }
+// Not sure how this defaultValue is supposed to work.
+const initialValue = {
+    requests: [],
+    data: {}
 }
+const contexts = []
 
+export const getContexts = () => (contexts)
 /**
  * 
  * @param {*} initial 
  * @param {*} effect 
  * @returns 
  */
-export const useServerEffect = (initial, effect) => {
+ export const useServerEffect = (initial, effect, context) => {
     // Function overloading.
     if (typeof initial === 'function') {
+        context = effect
         effect = initial
         initial = {}
     }
 
-    const key = `uh_${useUID()}` // uh - use hook .. lol
+    const key = `uh_${useUID()}`
     const location = useLocation()
     const params = useParams()
     const {req, res} = useExpress()
-    const context = useContext(Context)
-    const [data, setData] = useState(context[key] || initial)
+    
+    const contextValues = useContext(context)
+    const [data, setData] = useState(contextValues.data[key] || initial)
     const [ignoreFirst, setIgnoreFirst] = useState(true)
 
-    if (context.requests) {
+    if (contextValues.requests) {
         // NOTE: Here I created an object type that has the effect/action and a function to
         // set the action in motion and place the return value in our state. I did this because
         // if we used the solution above the effects are immediately invocked, and because we 
         // render twice, we would end up making those calls to APIs 2 times.
-        context.requests.push({
+        contextValues.requests.push({
             effect: effect.bind(this, {req, res, location, params}),
             fireEffect: function () {
                 return Promise.resolve()
                     .then(this.effect)
                     .then((data) => {
                         if (data) {
-                            context[key] = data
+                            contextValues.data[key] = data
                             return {
                                 [key]: data
                             }
@@ -86,8 +84,41 @@ export const useServerEffect = (initial, effect) => {
 }
 
 /**
+ * This function is creating `useServerEffect`, it's only going to be used
+ * but the SDK, this isn't for external libs.
  * 
+ * @param {*} context 
+ * @returns 
  */
-export const createSeverEffect = (effect) => {
-    return useServerEffect.bind(this, effect)
+const createServerEffect = (context) => {
+    return (...args) => {
+        args.push(context) 
+        return useServerEffect.call(this, ...args)
+    }
 }
+
+
+/**
+ * Create a provider for use with hooks created with the paired createSeverEffect function.
+ *
+ * @param {string} path - relative path from the build directory to the asset
+ * @function
+ * 
+ * @returns {ServerEffectProvider}
+ */
+export const createServerEffectContext = (name, extraArgs) => {
+    const context = React.createContext({name, ...initialValue})
+    const hook = createServerEffect(context)
+
+    // Push the context on so we can get it's data later.
+    contexts.push(context)
+
+    return {
+        ServerEffectContext: context,
+        useServerEffect: hook
+    }
+}
+
+const defaultContext = createServerEffectContext('sdkHooks')
+
+export default defaultContext

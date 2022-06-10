@@ -9,7 +9,10 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import {BrowserRouter as Router} from 'react-router-dom'
 import DeviceContext from '../universal/device-context'
-import EffectContext from '../universal/use-props-context'
+// import EffectContext from '../universal/use-props-context'
+import UseServerEffect from '../universal/hooks/use-server-effect'
+
+const {ServerEffectContext} = UseServerEffect
 import ExpressContext from '../universal/contexts/express-context'
 
 import App from '../universal/components/_app'
@@ -78,7 +81,7 @@ export const start = () => {
             ReactDOM.hydrate(
                 <Router>
                     <ExpressContext.Provider value={{}}>
-                        <EffectContext.Provider value={window.__PRELOADED_STATE__.hookProps}>
+                        <ServerEffectContext.Provider value={window.__PRELOADED_STATE__.hookProps}>
                             <DeviceContext.Provider value={{type: window.__DEVICE_TYPE__}}>
                                 <AppConfig locals={locals}>
                                     <Switch
@@ -89,7 +92,7 @@ export const start = () => {
                                     />
                                 </AppConfig>
                             </DeviceContext.Provider>
-                        </EffectContext.Provider>
+                        </ServerEffectContext.Provider>
                     </ExpressContext.Provider>
                 </Router>,
                 rootEl,

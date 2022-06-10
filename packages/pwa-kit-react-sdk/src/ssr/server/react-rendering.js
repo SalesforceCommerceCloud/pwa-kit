@@ -19,8 +19,10 @@ import serialize from 'serialize-javascript'
 
 import {getAssetUrl} from '../universal/utils'
 import DeviceContext from '../universal/device-context'
-import EffectContext from '../universal/use-props-context'
+import UseServerEffect, {getContexts} from '../universal/hooks/use-server-effect' // I Need to clean up the exports of this module.
 import ExpressContext from '../universal/contexts/express-context'
+
+const {ServerEffectContext} = UseServerEffect
 
 import Document from '../universal/components/_document'
 import App from '../universal/components/_app'
@@ -38,6 +40,12 @@ import sprite from 'svg-sprite-loader/runtime/sprite.build'
 
 const CWD = process.cwd()
 const BUNDLES_PATH = path.resolve(CWD, 'build/loadable-stats.json')
+
+const serverEffectValue = {
+    name: 'sdkHooks',
+    requests: [],
+    data: {}
+}
 
 const VALID_TAG_NAMES = [
     'base',
@@ -185,15 +193,14 @@ export const render = async (req, res, next) => {
         res,
         location,
         config,
-        routerContext: {},
-        effectContext: {requests: []}
+        routerContext: {}
     }
     try {
         // Pre-render app to get useProps requests
         await renderApp(args)
 
-        // Call all the useProps functions
-        const effectPromises = args.effectContext.requests.map((request) => request.fireEffect())
+        // TODO: It would be nice to move this out of this file.
+        const effectPromises = serverEffectValue.requests.map((request) => request.fireEffect())
         const hooksProps = await Promise.all(effectPromises)
 
         // Turn array into a map.
@@ -208,7 +215,9 @@ export const render = async (req, res, next) => {
         // Set the args with the new updated app state.
         args.appState = {
             ...appState,
-            hookProps: hooksPropsMap
+            hookProps: {
+                data: hooksPropsMap
+            }
         }
 
         renderResult = await renderApp(args)
@@ -235,18 +244,18 @@ export const render = async (req, res, next) => {
 }
 
 const renderAppHtml = (req, res, error, appData) => {
-    const {App, appState, routes, routerContext, effectContext, location, extractor, deviceType} = appData
+    const {App, appState, routes, routerContext, location, extractor, deviceType} = appData
 
     let appJSX = (
         <Router location={location} context={routerContext}>
             <ExpressContext.Provider value={{req, res}}>
-                <EffectContext.Provider value={effectContext}>
+                <ServerEffectContext.Provider value={serverEffectValue}>
                     <DeviceContext.Provider value={{type: deviceType}}>
                         <AppConfig locals={res.locals}>
                             <Switch error={error} appState={appState} routes={routes} App={App} />
                         </AppConfig>
                     </DeviceContext.Provider>
-                </EffectContext.Provider>
+                </ServerEffectContext.Provider>
             </ExpressContext.Provider>
         </Router>
     )
@@ -257,10 +266,10 @@ const renderAppHtml = (req, res, error, appData) => {
 }
 
 const renderApp = (args) => {
-    const {req, res, appStateError, App, appState, location, routes, config, routerContext, effectContext } = args
+    const {req, res, appStateError, App, appState, location, routes, config, routerContext} = args
     const deviceType = detectDeviceType(req)
     const extractor = new ChunkExtractor({statsFile: BUNDLES_PATH, publicPath: getAssetUrl()})
-    const appData = {App, appState, location, routes, routerContext, effectContext, deviceType, extractor}
+    const appData = {App, appState, location, routes, routerContext, deviceType, extractor}
 
     const ssrOnly = 'mobify_server_only' in req.query || '__server_only' in req.query
     const prettyPrint = 'mobify_pretty' in req.query || '__pretty_print' in req.query

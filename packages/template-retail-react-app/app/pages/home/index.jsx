@@ -8,7 +8,10 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {useIntl, FormattedMessage} from 'react-intl'
-import {useProps} from 'pwa-kit-react-sdk/ssr/universal/hooks'
+// import {useProps} from 'pwa-kit-react-sdk/ssr/universal/hooks'
+import UseServerEffect from 'pwa-kit-react-sdk/ssr/universal/hooks/use-server-effect'
+
+const {useServerEffect} = UseServerEffect
 import {useCommerceAPI} from '../../commerce-api/contexts'
 
 // Components
@@ -61,20 +64,6 @@ const Home = ({isLoading}) => {
     //     }
     // }))
 
-    // Below shows that it works well with synchrounous data calls too.
-    const {product} = useProps(() => ({
-        product: {
-            id: 1,
-            name: 'snyc test product'
-        }
-    }))
-
-    const {category} = useProps(() => ({
-        category: {
-            id: 1,
-            name: 'snyc test category'
-        }
-    }))
 
     // Example showing that you can play with the request and 
     // response objects as you would in `getProps`.
@@ -87,11 +76,11 @@ const Home = ({isLoading}) => {
     //     return {}
     // })
 
-    const {productSearchResult} = useProps(async ({res}) => {
+    const {productSearchResult} = useServerEffect(async ({res}) => {
         console.log('GETTING SEARCH RESULTS FOR HOME PAGE')
-        if (res) {
-            res.set('Cache-Control', `max-age=${MAX_CACHE_AGE}`)
-        }
+        // if (res) {
+        //     res.set('Cache-Control', `max-age=${MAX_CACHE_AGE}`)
+        // }
     
         const productSearchResult = await api.shopperSearch.productSearch({
             parameters: {
@@ -186,10 +175,6 @@ const Home = ({isLoading}) => {
                     })}
                 </SimpleGrid>
             </Section>
-
-            {product && <div>{product.name}</div>}
-            
-            {category && <div>{category.name}</div>}
 
             {productSearchResult && (
                 <Section
