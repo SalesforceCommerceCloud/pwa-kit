@@ -1387,19 +1387,19 @@
       "value": "My Account"
     }
   ],
-  "home.description.contact_our_staff": [
-    {
-      "type": 0,
-      "value": "Contact our support staff."
-    }
-  ],
   "home.description.features": [
     {
       "type": 0,
       "value": "Out-of-the-box features so that you focus only on adding enhancements."
     }
   ],
-  "home.description.get_you_to_the_right_place": [
+  "home.description.here_to_help": [
+    {
+      "type": 0,
+      "value": "Contact our support staff."
+    }
+  ],
+  "home.description.here_to_help_line_2": [
     {
       "type": 0,
       "value": "They will get you to the right place."

@@ -1387,19 +1387,19 @@
       "value": "[!! Ḿẏ Ḁććććŏůńńńṭ !!]"
     }
   ],
-  "home.description.contact_our_staff": [
-    {
-      "type": 0,
-      "value": "[!! Ḉŏńńńṭâćććṭ ŏŏŏůŕ śůṗṗṗṗŏŕŕŕṭ śśśṭâḟḟḟḟ. !!]"
-    }
-  ],
   "home.description.features": [
     {
       "type": 0,
       "value": "[!! Õůṭṭṭ-ŏḟḟḟ-ṭḫḫḫè-ḃḃḃŏẋ ḟèâââṭůŕŕŕèś śŏ ṭḫâââṭ ẏẏẏŏů ḟŏćććůś ŏńĺĺĺẏ ŏŏŏń âââḋḋíííńĝ èńḫḫḫâńćććèṁèèèńṭśśś. !!]"
     }
   ],
-  "home.description.get_you_to_the_right_place": [
+  "home.description.here_to_help": [
+    {
+      "type": 0,
+      "value": "[!! Ḉŏńńńṭâćććṭ ŏŏŏůŕ śůṗṗṗṗŏŕŕŕṭ śśśṭâḟḟḟḟ. !!]"
+    }
+  ],
+  "home.description.here_to_help_line_2": [
     {
       "type": 0,
       "value": "[!! Ṯḫèèèẏ ẘẘẘíĺĺĺĺ ĝèèèṭ ẏẏẏŏů ṭŏ ṭḫèèè ŕíííĝḫṭṭṭ ṗĺĺĺâćèèè. !!]"
