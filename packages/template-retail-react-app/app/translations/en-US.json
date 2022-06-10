@@ -1402,6 +1402,9 @@
   "use_update_password_fields.label.new_password": {
     "defaultMessage": "New Password"
   },
+  "wishlist_primary_action.button.select_options": {
+    "defaultMessage": "Select Options"
+  },
   "wishlist_primary_action.info.added_to_cart": {
     "defaultMessage": "{quantity} {quantity, plural, one {item} other {items}} added to cart"
   },
