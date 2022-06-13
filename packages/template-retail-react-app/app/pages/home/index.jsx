@@ -76,6 +76,10 @@ const Home = ({isLoading}) => {
         return productSearchResult
     }, [])
     
+    // NOTE: This is an example of a hook that was created using the ServerEffects API that I added
+    // to the SDK. This API allows you to create a server hook context and an associated hook that you
+    // can used to build your own hooks off of. You can see how what is done in the `scapi-hooks.js` file
+    // which is a precursor to a larger hooks library.
     const {product, isLoading: isUseProductLoading} = useProduct(1, [])
 
     return (
