@@ -80,7 +80,7 @@ export const start = () => {
             ReactDOM.hydrate(
                 <Router>
                     <ExpressContext.Provider value={{}}>
-                        <ServerEffectContext.Provider value={window.__PRELOADED_STATE__.hookProps}>
+                        <ServerEffectContext.Provider value={window.__PRELOADED_STATE__.sdkHooks}>
                             <DeviceContext.Provider value={{type: window.__DEVICE_TYPE__}}>
                                 <AppConfig locals={locals}>
                                     <Switch

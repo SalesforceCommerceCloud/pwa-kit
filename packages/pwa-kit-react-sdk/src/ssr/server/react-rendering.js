@@ -225,8 +225,6 @@ export const render = async (req, res, next) => {
                 }
             }, {})
 
-        console.log('serverEffectsMap: ', serverEffectsMap)
-        debugger
         // TODO: It would be nice to move this out of this file.
         const effectPromises = serverEffectValue.requests.map((request) => request.fireEffect())
         const hooksProps = await Promise.all(effectPromises)
@@ -240,15 +238,10 @@ export const render = async (req, res, next) => {
             }
         }, {})
 
-        debugger
-        
         // Set the args with the new updated app state.
         args.appState = {
             ...appState,
-            ...serverEffectsMap,
-            hookProps: {
-                data: hooksPropsMap
-            }
+            ...serverEffectsMap
         }
 
         renderResult = await renderApp(args)

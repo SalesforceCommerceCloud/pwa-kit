@@ -5,21 +5,21 @@ import {useExpress} from './index'
 
 const isClient = typeof window !== 'undefined'
 
-// Not sure how this defaultValue is supposed to work.
+// NOTE: Not sure how this defaultValue is supposed to work, think it out more.
 const initialValue = {
     requests: [],
     data: {}
 }
+
+// NOTE: These globals are probably bad, think of ways to replace them.
 const contexts = []
 const allContexts = {}
 const allContextValues = {}
 
 export const getContexts = () => (contexts)
 export const getAllContexts = () => (allContexts)
-export const getAllContextValues = () => {
-    debugger
-    return allContextValues
-}
+export const getAllContextValues = () => (allContextValues)
+
 /**
  * 
  * @param {*} initial 
@@ -34,9 +34,6 @@ export const getAllContextValues = () => {
         initial = {}
     }
 
-
-    console.log('CALL useServerEffect: ', initial, effect, context.displayName)
-
     const key = `uh_${useUID()}`
     const location = useLocation()
     const params = useParams()
@@ -46,9 +43,7 @@ export const getAllContextValues = () => {
 
     allContexts[context.displayName] = contextValues
 
-    debugger
     const [data, setData] = useState(contextValues.data[key] || initial)
-    console.log('Initial Server Effect Data Value: ', data)
     const [ignoreFirst, setIgnoreFirst] = useState(true)
 
     if (contextValues.requests) {

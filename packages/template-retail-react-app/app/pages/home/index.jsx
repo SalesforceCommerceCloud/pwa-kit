@@ -8,10 +8,11 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {useIntl, FormattedMessage} from 'react-intl'
-// import {useProps} from 'pwa-kit-react-sdk/ssr/universal/hooks'
 import UseServerEffect from 'pwa-kit-react-sdk/ssr/universal/hooks/use-server-effect'
 
+// TODO: Clean up how this default import is used.
 const {useServerEffect} = UseServerEffect
+
 import {useCommerceAPI} from '../../commerce-api/contexts'
 
 // Components
@@ -74,6 +75,7 @@ const Home = ({isLoading}) => {
     
         return {productSearchResult}
     })
+    
     const {product} = useProduct(1)
 
     return (

@@ -1,17 +1,18 @@
 import React, { Children } from 'react'
-import {createServerEffectContext} from 'pwa-kit-react-sdk/ssr/universal/hooks/use-server-effect'
+import {createServerEffectContext, getAllContexts} from 'pwa-kit-react-sdk/ssr/universal/hooks/use-server-effect'
 
-const {ServerEffectContext, useServerEffect} = createServerEffectContext('scapiHooks')
-
-// const effectsValues = typeof window === 'undefined' ? {name: 'scapiHooks', data: {}, requests: []} : window.__PRELOADED_STATE__.scapiHooks
-// const effectsValues = {name: 'scapiHooks', data: {}, requests: []}
+// NOTE: This is the important part of the API, here we get a context with a hook that will
+// use that context.
+const {ServerEffectContext, createServerEffect} = createServerEffectContext('scapiHooks')
 
 const SCAPIContext = React.createContext()
 
-export const SCAPIProvider = (props) => {
+const initialValue = {name: 'scapiHooks', data: {}, requests: []}
 
-    debugger
-    const effectsValues = typeof window === 'undefined' ? {name: 'scapiHooks', data: {}, requests: []} : window.__PRELOADED_STATE__.scapiHooks
+export const SCAPIProvider = (props) => {
+    // TODO: Figure out a cleaner API for getting the current value for the context.
+    const {scapiHooks} = getAllContexts()
+    const effectsValues = typeof window === 'undefined' ? scapiHooks || initialValue : window.__PRELOADED_STATE__.scapiHooks
 
     return (
         <SCAPIContext.Provider>
