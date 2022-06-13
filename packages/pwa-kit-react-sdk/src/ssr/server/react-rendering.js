@@ -19,7 +19,7 @@ import serialize from 'serialize-javascript'
 
 import {getAssetUrl} from '../universal/utils'
 import DeviceContext from '../universal/device-context'
-import UseServerEffect, {getContexts} from '../universal/hooks/use-server-effect' // I Need to clean up the exports of this module.
+import UseServerEffect, {getAllContexts, getAllContextValues} from '../universal/hooks/use-server-effect' // I Need to clean up the exports of this module.
 import ExpressContext from '../universal/contexts/express-context'
 
 const {ServerEffectContext} = UseServerEffect
@@ -198,7 +198,35 @@ export const render = async (req, res, next) => {
     try {
         // Pre-render app to get useProps requests
         await renderApp(args)
+        
+        const allContexts = getAllContexts()
+        
+        const allAllPromises = []
+        
+        Object.keys(allContexts).forEach((key) => {
+            const {requests} = allContexts[key]
+            const effectPromises = requests.map((request) => request.fireEffect())
+            
+            allAllPromises.push(Promise.all(effectPromises))
+        })
+        await Promise.all(allAllPromises)
+        console.log('allContexts: ', allContexts)
+        
 
+        // Turn array into a map.
+        const serverEffectsMap = Object.keys(allContexts)
+            .reduce((acc, curr) => {
+                
+                return {
+                    ...acc,
+                    [curr]: {
+                        data: allContexts[curr].data
+                    }
+                }
+            }, {})
+
+        console.log('serverEffectsMap: ', serverEffectsMap)
+        debugger
         // TODO: It would be nice to move this out of this file.
         const effectPromises = serverEffectValue.requests.map((request) => request.fireEffect())
         const hooksProps = await Promise.all(effectPromises)
@@ -212,9 +240,12 @@ export const render = async (req, res, next) => {
             }
         }, {})
 
+        debugger
+        
         // Set the args with the new updated app state.
         args.appState = {
             ...appState,
+            ...serverEffectsMap,
             hookProps: {
                 data: hooksPropsMap
             }

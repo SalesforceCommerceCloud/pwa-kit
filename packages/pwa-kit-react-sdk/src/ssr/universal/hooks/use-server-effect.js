@@ -11,8 +11,15 @@ const initialValue = {
     data: {}
 }
 const contexts = []
+const allContexts = {}
+const allContextValues = {}
 
 export const getContexts = () => (contexts)
+export const getAllContexts = () => (allContexts)
+export const getAllContextValues = () => {
+    debugger
+    return allContextValues
+}
 /**
  * 
  * @param {*} initial 
@@ -27,13 +34,21 @@ export const getContexts = () => (contexts)
         initial = {}
     }
 
+
+    console.log('CALL useServerEffect: ', initial, effect, context.displayName)
+
     const key = `uh_${useUID()}`
     const location = useLocation()
     const params = useParams()
     const {req, res} = useExpress()
     
     const contextValues = useContext(context)
+
+    allContexts[context.displayName] = contextValues
+
+    debugger
     const [data, setData] = useState(contextValues.data[key] || initial)
+    console.log('Initial Server Effect Data Value: ', data)
     const [ignoreFirst, setIgnoreFirst] = useState(true)
 
     if (contextValues.requests) {
@@ -48,7 +63,13 @@ export const getContexts = () => (contexts)
                     .then(this.effect)
                     .then((data) => {
                         if (data) {
+                            console.log('Setting context values')
                             contextValues.data[key] = data
+                            
+                            console.log('Update all context values object')
+                            allContextValues[context.displayName] = contextValues.data
+                            console.log(allContextValues)
+
                             return {
                                 [key]: data
                             }
@@ -58,6 +79,8 @@ export const getContexts = () => (contexts)
                     })  
             }
         })
+    } else {
+        console.error('ERROR: Context value is not setup correctly.')
     }
 
     if (isClient) {
@@ -108,6 +131,7 @@ const createServerEffect = (context) => {
  */
 export const createServerEffectContext = (name, extraArgs) => {
     const context = React.createContext({name, ...initialValue})
+    context.displayName = name
     const hook = createServerEffect(context)
 
     // Push the context on so we can get it's data later.

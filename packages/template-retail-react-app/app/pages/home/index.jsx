@@ -46,6 +46,9 @@ import {
     HOME_SHOP_PRODUCTS_LIMIT
 } from '../../constants'
 
+// Experimental SCAP API Hooks
+import {useProduct} from '../../scapi-hooks'
+
 /**
  * This is the home page for Retail React App.
  * The page is created for demonstration purposes.
@@ -55,26 +58,6 @@ import {
 const Home = ({isLoading}) => {
     const intl = useIntl()
     const api = useCommerceAPI()
-
-    // Below is an example of making an asynchronous call for data.
-    // const {product} = useProps(() => Promise.resolve({
-    //     product: {
-    //         id: 1,
-    //         name: 'async test product'
-    //     }
-    // }))
-
-
-    // Example showing that you can play with the request and 
-    // response objects as you would in `getProps`.
-    // let product
-    // useProps(({res}) => {
-    //     res && res.status(404)
-
-    //     // TODO: Should we warn about not returning a value? Probably... or
-    //     // just do what getProps does.
-    //     return {}
-    // })
 
     const {productSearchResult} = useServerEffect(async ({res}) => {
         console.log('GETTING SEARCH RESULTS FOR HOME PAGE')
@@ -91,6 +74,7 @@ const Home = ({isLoading}) => {
     
         return {productSearchResult}
     })
+    const {product} = useProduct(1)
 
     return (
         <Box data-testid="home-page" layerStyle="page">
@@ -176,6 +160,7 @@ const Home = ({isLoading}) => {
                 </SimpleGrid>
             </Section>
 
+            {product && <div>{product.name}</div>}
             {productSearchResult && (
                 <Section
                     padding={4}

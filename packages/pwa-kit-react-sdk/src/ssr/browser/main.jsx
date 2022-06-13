@@ -9,7 +9,6 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import {BrowserRouter as Router} from 'react-router-dom'
 import DeviceContext from '../universal/device-context'
-// import EffectContext from '../universal/use-props-context'
 import UseServerEffect from '../universal/hooks/use-server-effect'
 
 const {ServerEffectContext} = UseServerEffect
