@@ -76,7 +76,7 @@ const Home = ({isLoading}) => {
         return productSearchResult
     }, [])
     
-    const {product} = useProduct(1, [])
+    const {product, isLoading: isUseProductLoading} = useProduct(1, [])
 
     return (
         <Box data-testid="home-page" layerStyle="page">
