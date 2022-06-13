@@ -1,5 +1,5 @@
 import React, { Children } from 'react'
-import {createServerEffectContext, getAllContexts} from 'pwa-kit-react-sdk/ssr/universal/hooks/use-server-effect'
+import {createServerEffectContext, getAllContexts} from 'pwa-kit-react-sdk/ssr/universal/server-effects'
 
 // NOTE: This is the important part of the API, here we get a context with a hook that will
 // use that context.

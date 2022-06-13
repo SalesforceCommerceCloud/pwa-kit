@@ -1,7 +1,7 @@
 import React, {useContext, useState, useEffect} from 'react'
 import {useLocation, useParams} from 'react-router-dom'
 import {useUID} from 'react-uid'
-import {useExpress} from './index'
+import {useExpress} from './hooks'
 
 const isClient = typeof window !== 'undefined'
 

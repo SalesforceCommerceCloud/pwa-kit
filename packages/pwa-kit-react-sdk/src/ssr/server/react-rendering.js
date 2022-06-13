@@ -19,7 +19,7 @@ import serialize from 'serialize-javascript'
 
 import {getAssetUrl} from '../universal/utils'
 import DeviceContext from '../universal/device-context'
-import UseServerEffect, {getAllContexts, getAllContextValues} from '../universal/hooks/use-server-effect' // I Need to clean up the exports of this module.
+import UseServerEffect, {getAllContexts, getAllContextValues} from '../universal/server-effects' // I Need to clean up the exports of this module.
 import ExpressContext from '../universal/contexts/express-context'
 
 const {ServerEffectContext} = UseServerEffect

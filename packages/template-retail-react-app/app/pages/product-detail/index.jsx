@@ -9,7 +9,7 @@ import React, {useEffect, useState} from 'react'
 import PropTypes from 'prop-types'
 import {Helmet} from 'react-helmet'
 import {FormattedMessage, useIntl} from 'react-intl'
-import UseServerEffect from 'pwa-kit-react-sdk/ssr/universal/hooks/use-server-effect'
+import UseServerEffect from 'pwa-kit-react-sdk/ssr/universal/server-effects'
 
 // TODO: Clean up how this default import is used.
 const {useServerEffect} = UseServerEffect

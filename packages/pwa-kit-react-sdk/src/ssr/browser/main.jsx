@@ -9,7 +9,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import {BrowserRouter as Router} from 'react-router-dom'
 import DeviceContext from '../universal/device-context'
-import UseServerEffect from '../universal/hooks/use-server-effect'
+import UseServerEffect from '../universal/server-effects'
 
 const {ServerEffectContext} = UseServerEffect
 import ExpressContext from '../universal/contexts/express-context'
