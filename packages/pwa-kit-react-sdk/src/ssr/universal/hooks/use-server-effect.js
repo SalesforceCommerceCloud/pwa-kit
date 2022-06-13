@@ -69,7 +69,7 @@ export const getAllContextValues = () => (allContextValues)
                                 [key]: data
                             }
                         } else {
-                            throw new Error('`useProps` must return a value.')
+                            throw new Error('`useServerEffect` must return a value.')
                         }
                     })  
             }

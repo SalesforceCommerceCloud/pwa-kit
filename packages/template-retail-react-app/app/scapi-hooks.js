@@ -3,7 +3,7 @@ import {createServerEffectContext, getAllContexts} from 'pwa-kit-react-sdk/ssr/u
 
 // NOTE: This is the important part of the API, here we get a context with a hook that will
 // use that context.
-const {ServerEffectContext, createServerEffect} = createServerEffectContext('scapiHooks')
+const {ServerEffectContext, useServerEffect} = createServerEffectContext('scapiHooks')
 
 const SCAPIContext = React.createContext()
 

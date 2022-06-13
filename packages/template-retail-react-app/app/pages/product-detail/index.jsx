@@ -9,7 +9,10 @@ import React, {useEffect, useState} from 'react'
 import PropTypes from 'prop-types'
 import {Helmet} from 'react-helmet'
 import {FormattedMessage, useIntl} from 'react-intl'
-import {useProps} from 'pwa-kit-react-sdk/ssr/universal/hooks'
+import UseServerEffect from 'pwa-kit-react-sdk/ssr/universal/hooks/use-server-effect'
+
+// TODO: Clean up how this default import is used.
+const {useServerEffect} = UseServerEffect
 
 // Components
 import {
@@ -55,7 +58,7 @@ const ProductDetail = ({isLoading}) => {
     const navigate = useNavigation()
     const api = useCommerceAPI()
 
-    const {category, product} = useProps(async ({res, location, params}) => {
+    const {category, product} = useServerEffect(async ({res, location, params}) => {
         const {productId} = params
         let category, product
         const urlParams = new URLSearchParams(location.search)
@@ -73,10 +76,11 @@ const ProductDetail = ({isLoading}) => {
             })
         }
     
+        // TODO: Fix setting of headers. You fixed this before, you can do it again.
         // Set the `cache-control` header values similar to those on the product-list.
-        if (res) {
-            res.set('Cache-Control', `max-age=${MAX_CACHE_AGE}`)
-        }
+        // if (res) {
+        //     res.set('Cache-Control', `max-age=${MAX_CACHE_AGE}`)
+        // }
     
         // The `commerce-isomorphic-sdk` package does not throw errors, so
         // we have to check the returned object type to inconsistencies.

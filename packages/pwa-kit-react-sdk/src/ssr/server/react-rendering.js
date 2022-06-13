@@ -196,7 +196,7 @@ export const render = async (req, res, next) => {
         routerContext: {}
     }
     try {
-        // Pre-render app to get useProps requests
+        // Pre-render app to get useServerEffect requests
         await renderApp(args)
         
         const allContexts = getAllContexts()
@@ -210,8 +210,6 @@ export const render = async (req, res, next) => {
             allAllPromises.push(Promise.all(effectPromises))
         })
         await Promise.all(allAllPromises)
-        console.log('allContexts: ', allContexts)
-        
 
         // Turn array into a map.
         const serverEffectsMap = Object.keys(allContexts)
@@ -224,19 +222,6 @@ export const render = async (req, res, next) => {
                     }
                 }
             }, {})
-
-        // TODO: It would be nice to move this out of this file.
-        const effectPromises = serverEffectValue.requests.map((request) => request.fireEffect())
-        const hooksProps = await Promise.all(effectPromises)
-
-        // Turn array into a map.
-        const hooksPropsMap = hooksProps.reduce((acc, curr) => {
-            const [key, value] = Object.entries(curr)[0]
-            return {
-                ...acc,
-                [key]: value
-            }
-        }, {})
 
         // Set the args with the new updated app state.
         args.appState = {
