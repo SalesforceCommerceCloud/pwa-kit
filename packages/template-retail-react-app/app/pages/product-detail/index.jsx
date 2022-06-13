@@ -10,6 +10,7 @@ import PropTypes from 'prop-types'
 import {Helmet} from 'react-helmet'
 import {FormattedMessage, useIntl} from 'react-intl'
 import UseServerEffect from 'pwa-kit-react-sdk/ssr/universal/server-effects'
+import {useParams} from 'react-router-dom'
 
 // TODO: Clean up how this default import is used.
 const {useServerEffect} = UseServerEffect
@@ -48,7 +49,6 @@ import {useToast} from '../../hooks/use-toast'
 
 import {useCommerceAPI} from '../../commerce-api/contexts'
 
-
 const ProductDetail = ({isLoading}) => {
     const {formatMessage} = useIntl()
     const basket = useBasket()
@@ -57,8 +57,9 @@ const ProductDetail = ({isLoading}) => {
     const toast = useToast()
     const navigate = useNavigation()
     const api = useCommerceAPI()
+    const {productId} = useParams()
 
-    const {category, product} = useServerEffect(async ({res, location, params}) => {
+    const {data: {category, product}, isLoading: isServerEffectLoading} = useServerEffect(async ({res, location, params}) => {
         const {productId} = params
         let category, product
         const urlParams = new URLSearchParams(location.search)
@@ -92,7 +93,7 @@ const ProductDetail = ({isLoading}) => {
         }
     
         return {category, product}
-    })
+    }, [productId])
 
     const variant = useVariant(product)
     const [primaryCategory, setPrimaryCategory] = useState(category)
@@ -197,6 +198,8 @@ const ProductDetail = ({isLoading}) => {
             </Helmet>
 
             <Stack spacing={16}>
+                <div>{isServerEffectLoading.toString()}</div>
+                
                 <ProductView
                     product={product}
                     category={primaryCategory?.parentCategoryTree || []}

@@ -5,16 +5,19 @@ import {useExpress} from './hooks'
 
 const isClient = typeof window !== 'undefined'
 
-// NOTE: Not sure how this defaultValue is supposed to work, think it out more.
-const initialValue = {
-    requests: [],
-    data: {}
-}
+// Globals
+export const DEFAULT_CONTEXT_KEY = '__SERVER_EFFECTS__'
 
 // NOTE: These globals are probably bad, think of ways to replace them.
 const contexts = []
 const allContexts = {}
 const allContextValues = {}
+
+// NOTE: Not sure how this defaultValue is supposed to work, think it out more.
+const initialValue = {
+    requests: [],
+    data: {}
+}
 
 export const getContexts = () => (contexts)
 export const getAllContexts = () => (allContexts)
@@ -26,11 +29,11 @@ export const getAllContextValues = () => (allContextValues)
  * @param {*} effect 
  * @returns 
  */
- export const useServerEffect = (initial, effect, context) => {
+ export function useServerEffect (initial, didUpdate, source) {
     // Function overloading.
     if (typeof initial === 'function') {
-        context = effect
-        effect = initial
+        source = didUpdate
+        didUpdate = initial
         initial = {}
     }
 
@@ -38,32 +41,31 @@ export const getAllContextValues = () => (allContextValues)
     const location = useLocation()
     const params = useParams()
     const {req, res} = useExpress()
-    
+
+    const context = this.context
     const contextValues = useContext(context)
 
     allContexts[context.displayName] = contextValues
 
     const [data, setData] = useState(contextValues.data[key] || initial)
+    const [isLoading, setIsLoading] = useState(false)
     const [ignoreFirst, setIgnoreFirst] = useState(true)
 
     if (contextValues.requests) {
-        // NOTE: Here I created an object type that has the effect/action and a function to
+        // NOTE: Here I created an object type that has the didUpdate fn and a function to
         // set the action in motion and place the return value in our state. I did this because
         // if we used the solution above the effects are immediately invocked, and because we 
         // render twice, we would end up making those calls to APIs 2 times.
         contextValues.requests.push({
-            effect: effect.bind(this, {req, res, location, params}),
+            effect: didUpdate.bind(this, {req, res, location, params}),
             fireEffect: function () {
                 return Promise.resolve()
                     .then(this.effect)
                     .then((data) => {
                         if (data) {
-                            console.log('Setting context values')
                             contextValues.data[key] = data
                             
-                            console.log('Update all context values object')
                             allContextValues[context.displayName] = contextValues.data
-                            console.log(allContextValues)
 
                             return {
                                 [key]: data
@@ -83,22 +85,32 @@ export const getAllContextValues = () => (allContextValues)
         // TODO: We need to allow the user to control the second paramater of this
         // effect, also setting it's default value.
         // TODO: Effect should be passed the extra args defined in the AppConfig.
+
         useEffect(() => {
             if (ignoreFirst) {
                 setIgnoreFirst(false)
+                console.log('IGNORING FIRST RENDER')
                 return
             }
 
-            console.log('Runing effect on client...')
-            Promise.resolve().then(() => {
-                return effect({location, params})
-            }).then((data) => {
-                setData(data)
-            })
-        }, [location])
+            Promise.resolve()
+                .then(() => {
+                    setIsLoading(true)
+                })
+                .then(() => {
+                    return didUpdate({location, params})
+                }).then((data) => {
+                    setData(data)
+                }).then(() => {
+                    setIsLoading(false)
+                })
+        }, source)
     }
 
-    return data
+    return {
+        isLoading,
+        data
+    }
 }
 
 /**
@@ -110,11 +122,12 @@ export const getAllContextValues = () => (allContextValues)
  */
 const createServerEffect = (context) => {
     return (...args) => {
-        args.push(context) 
-        return useServerEffect.call(this, ...args)
+        return useServerEffect.apply({
+            ...this,
+            context
+        }, args)
     }
 }
-
 
 /**
  * Create a provider for use with hooks created with the paired createSeverEffect function.
@@ -133,11 +146,12 @@ export const createServerEffectContext = (name, extraArgs) => {
     contexts.push(context)
 
     return {
-        ServerEffectContext: context,
+        Provider: context.Provider,
+        Context: context,
         useServerEffect: hook
     }
 }
 
-const defaultContext = createServerEffectContext('sdkHooks')
+const defaultContext = createServerEffectContext(DEFAULT_CONTEXT_KEY)
 
 export default defaultContext

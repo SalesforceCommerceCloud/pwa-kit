@@ -60,7 +60,7 @@ const Home = ({isLoading}) => {
     const intl = useIntl()
     const api = useCommerceAPI()
 
-    const {productSearchResult} = useServerEffect(async ({res}) => {
+    const {data: productSearchResult, isLoading: isLoading2, error} = useServerEffect(async ({res}) => {
         console.log('GETTING SEARCH RESULTS FOR HOME PAGE')
         // if (res) {
         //     res.set('Cache-Control', `max-age=${MAX_CACHE_AGE}`)
@@ -73,10 +73,10 @@ const Home = ({isLoading}) => {
             }
         })
     
-        return {productSearchResult}
-    })
+        return productSearchResult
+    }, [])
     
-    const {product} = useProduct(1)
+    const {product} = useProduct(1, [])
 
     return (
         <Box data-testid="home-page" layerStyle="page">

@@ -19,10 +19,8 @@ import serialize from 'serialize-javascript'
 
 import {getAssetUrl} from '../universal/utils'
 import DeviceContext from '../universal/device-context'
-import UseServerEffect, {getAllContexts, getAllContextValues} from '../universal/server-effects' // I Need to clean up the exports of this module.
+import ServerEffect, {getAllContexts, getAllContextValues} from '../universal/server-effects' // I Need to clean up the exports of this module.
 import ExpressContext from '../universal/contexts/express-context'
-
-const {ServerEffectContext} = UseServerEffect
 
 import Document from '../universal/components/_document'
 import App from '../universal/components/_app'
@@ -42,7 +40,7 @@ const CWD = process.cwd()
 const BUNDLES_PATH = path.resolve(CWD, 'build/loadable-stats.json')
 
 const serverEffectValue = {
-    name: 'sdkHooks',
+    name: '__SERVER_EFFECTS__',
     requests: [],
     data: {}
 }
@@ -258,13 +256,13 @@ const renderAppHtml = (req, res, error, appData) => {
     let appJSX = (
         <Router location={location} context={routerContext}>
             <ExpressContext.Provider value={{req, res}}>
-                <ServerEffectContext.Provider value={serverEffectValue}>
+                <ServerEffect.Provider value={serverEffectValue}>
                     <DeviceContext.Provider value={{type: deviceType}}>
                         <AppConfig locals={res.locals}>
                             <Switch error={error} appState={appState} routes={routes} App={App} />
                         </AppConfig>
                     </DeviceContext.Provider>
-                </ServerEffectContext.Provider>
+                </ServerEffect.Provider>
             </ExpressContext.Provider>
         </Router>
     )

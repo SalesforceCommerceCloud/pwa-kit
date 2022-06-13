@@ -3,7 +3,7 @@ import {createServerEffectContext, getAllContexts} from 'pwa-kit-react-sdk/ssr/u
 
 // NOTE: This is the important part of the API, here we get a context with a hook that will
 // use that context.
-const {ServerEffectContext, useServerEffect} = createServerEffectContext('scapiHooks')
+const {Context: ServerEffect, useServerEffect} = createServerEffectContext('scapiHooks')
 
 const SCAPIContext = React.createContext()
 
@@ -16,25 +16,26 @@ export const SCAPIProvider = (props) => {
 
     return (
         <SCAPIContext.Provider>
-            <ServerEffectContext.Provider value={effectsValues}>
+            <ServerEffect.Provider value={effectsValues}>
                 {props.children}
-            </ServerEffectContext.Provider>
+            </ServerEffect.Provider>
         </SCAPIContext.Provider>
     )
 }
 
 export const useProduct = (id, source) => {
-    const {product} = useServerEffect(async () => {
-        console.log('Getting Product Data from SCAPI hooks.')
+    const {data, isLoading, error} = useServerEffect(async () => {
         // Emulate netword delay
         await sleep(1000)
 
-        return {
-            product: testProduct
-        }
+        return testProduct
     })
 
-    return {product}
+    return {
+        isLoading,
+        error,
+        product: data
+    }
 }
 
 // PRIVATE
