@@ -25,11 +25,12 @@ export const SCAPIProvider = (props) => {
 
 export const useProduct = (id, source) => {
     const {data, isLoading, error} = useServerEffect(async () => {
+        console.log(`Fetching product with id = ${id}`)
         // Emulate netword delay
         await sleep(1000)
 
         return testProduct
-    })
+    }, source)
 
     return {
         isLoading,
