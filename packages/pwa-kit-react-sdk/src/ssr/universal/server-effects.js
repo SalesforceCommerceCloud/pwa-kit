@@ -51,35 +51,6 @@ export const getAllContextValues = () => (allContextValues)
     const [isLoading, setIsLoading] = useState(false)
     const [ignoreFirst, setIgnoreFirst] = useState(true)
 
-    if (contextValues.requests) {
-        // NOTE: Here I created an object type that has the didUpdate fn and a function to
-        // set the action in motion and place the return value in our state. I did this because
-        // if we used the solution above the effects are immediately invocked, and because we 
-        // render twice, we would end up making those calls to APIs 2 times.
-        contextValues.requests.push({
-            effect: didUpdate.bind(this, {req, res, location, params}),
-            fireEffect: function () {
-                return Promise.resolve()
-                    .then(this.effect)
-                    .then((data) => {
-                        if (data) {
-                            contextValues.data[key] = data
-                            
-                            allContextValues[context.displayName] = contextValues.data
-
-                            return {
-                                [key]: data
-                            }
-                        } else {
-                            throw new Error('`useServerEffect` must return a value.')
-                        }
-                    })  
-            }
-        })
-    } else {
-        console.error('ERROR: Context value is not setup correctly.')
-    }
-
     if (isClient) {
         // Note: This is only executed on the client.
         // TODO: We need to allow the user to control the second paramater of this
@@ -106,6 +77,36 @@ export const getAllContextValues = () => (allContextValues)
                     setIsLoading(false)
                 })
         }, source)
+    } else {
+
+        if (!contextValues) {
+            throw new Error('Server Effect Context Not Found')
+        }
+
+        // NOTE: Here I created an object type that has the didUpdate fn and a function to
+        // set the action in motion and place the return value in our state. I did this because
+        // if we used the solution above the effects are immediately invocked, and because we 
+        // render twice, we would end up making those calls to APIs 2 times.
+        contextValues.requests.push({
+            effect: didUpdate.bind(this, {req, res, location, params}),
+            fireEffect: function () {
+                return Promise.resolve()
+                    .then(this.effect)
+                    .then((data) => {
+                        if (data) {
+                            contextValues.data[key] = data
+                            
+                            allContextValues[context.displayName] = contextValues.data
+
+                            return {
+                                [key]: data
+                            }
+                        } else {
+                            throw new Error('`useServerEffect` must return a value.')
+                        }
+                    })  
+            }
+        })
     }
 
     return {

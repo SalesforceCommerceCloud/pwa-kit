@@ -15,7 +15,7 @@ export const SCAPIProvider = (props) => {
     const effectsValues = typeof window === 'undefined' ? scapiHooks || initialValue : window.__PRELOADED_STATE__.scapiHooks
 
     return (
-        <SCAPIContext.Provider>
+        <SCAPIContext.Provider value={{}}>
             <ServerEffect.Provider value={effectsValues}>
                 {props.children}
             </ServerEffect.Provider>
