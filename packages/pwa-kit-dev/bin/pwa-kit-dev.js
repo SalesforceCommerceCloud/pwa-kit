@@ -7,9 +7,8 @@
  */
 const p = require('path')
 const fse = require('fs-extra')
+const WebSocket = require('ws')
 const program = require('commander')
-const { CloudWatchLogsClient, FilterLogEventsCommand } = require("@aws-sdk/client-cloudwatch-logs");
-const {fromCognitoIdentity} =  require("@aws-sdk/credential-providers")
 const isEmail = require('validator/lib/isEmail')
 const {execSync: _execSync} = require('child_process')
 const request = require('request')
@@ -306,11 +305,9 @@ const main = () => {
         .action(({project, environment}) => {
             try {
                 const settingsPath = scriptUtils.getSettingsPath()
-                const auth = JSON.parse(fs.readFileSync(
-                    settingsPath
-                ))
+                const auth = fse.readJsonSync(settingsPath)
                 const options = {
-                    url: `https://cloud-mahdi.mobify-staging.com/api/projects/${project}/target/${environment}/log/`,
+                    url: `https://cloud-mahdi.mobify-staging.com/api/projects/${project}/target/${environment}/`,
                     method: 'GET',
                     headers: {
                         'Accept': 'application/json',
@@ -319,41 +316,14 @@ const main = () => {
                 };
 
                 request(options, function(err, res, body) {
-                    let json = JSON.parse(body);
-                    logGroupName = json.log_group;
-                    region = json.region
-                    identityId = json.identity_id;
-                    const cloudwatch = new CloudWatchLogsClient({
-                        region,
-                        credentials: fromCognitoIdentity({
-                            identityId,
-                            logins: {
-                                "cognito-identity.amazonaws.com": json.token
-                            }
-                        })
+                    const data = JSON.parse(body);
+                    const endpoint = data['current_deploy']['external_publish_details']['LogTailEndpoint']
+                    const wss = new WebSocket(endpoint)
+                    wss.on('open', function open() {});
+
+                    wss.on('message', function message(data) {
+                      console.log('received: %s', data);
                     });
-                    next_token = null
-                    function loop_display_logs(){
-                        const command = new FilterLogEventsCommand({
-                            logGroupName,
-                            nextToken: next_token
-                        })
-                        cloudwatch.send(command).then(
-                            (data) => {
-                                // display logs.
-                                if(data.events.length > 0){
-                                    console.log(data.events);
-                                    next_token = data.nextToken;
-                                }
-                                setTimeout(loop_display_logs, 2000);
-                            },
-                            (error) => {
-                                // error handling.
-                                console.log('error', error)
-                            }
-                        );
-                    }
-                    loop_display_logs()
                 });
             } catch (e) {
                 console.error('Failed to read credentials.')
