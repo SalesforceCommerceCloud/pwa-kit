@@ -87,9 +87,10 @@ export const getAllContextValues = () => (allContextValues)
         // TODO: Effect should be passed the extra args defined in the AppConfig.
 
         useEffect(() => {
+            // NOTE: This logive needs to be fixed. It should look at the hydrating 
+            // global value to determine whether or not to ignore. I think.
             if (ignoreFirst) {
                 setIgnoreFirst(false)
-                console.log('IGNORING FIRST RENDER')
                 return
             }
 
