@@ -3,6 +3,7 @@
 ### Translations
 
 - Updated text for many fields
+- Added `checkout_confirmation.message.generic_error`
 - Added `wishlist_primary_action.button.select_options`
 - Added `cart.link.added_to_wishlist.view_wishlist`
 - Added `credit_card_fields.tool_tip.security_code.american_express`
