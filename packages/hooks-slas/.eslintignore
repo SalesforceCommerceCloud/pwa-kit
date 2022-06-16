@@ -1,0 +1,7 @@
+coverage
+dist
+docs
+generator-assets
+vendor
+temp
+temp_static
