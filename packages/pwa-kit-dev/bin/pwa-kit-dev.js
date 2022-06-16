@@ -319,11 +319,11 @@ const main = () => {
                     const data = JSON.parse(body);
                     const endpoint = data['current_deploy']['external_publish_details']['LogTailEndpoint']
                     const wss = new WebSocket(endpoint)
-                    wss.on('open', function open() {});
-
-                    wss.on('message', function message(data) {
-                      console.log('received: %s', data);
-                    });
+                    wss.on('message', (message) => {
+                        JSON.parse(message).forEach((logLine) => {
+                            console.log(`${new Date(logLine.timestamp).toLocaleString()}> ${logLine.message}`.trim())
+                        })
+                    })
                 });
             } catch (e) {
                 console.error('Failed to read credentials.')
