@@ -22,9 +22,5 @@
     "lint:fix": "lerna run lint:fix",
     "format": "lerna run --parallel --stream format",
     "bump-version": "node ./scripts/bump-version.js"
-  },
-  "dependencies": {
-    "@aws-sdk/client-cloudwatch-logs": "^3.54.1",
-    "@aws-sdk/credential-providers": "^3.54.1"
   }
 }
