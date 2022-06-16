@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, salesforce.com, inc.
+ * Copyright (c) 2022, Salesforce, Inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
@@ -93,7 +93,10 @@ const ProductDetail = ({category, product, isLoading}) => {
                 status: 'success',
                 action: (
                     <Button variant="link" onClick={() => navigate('/account/wishlist')}>
-                        View
+                        <FormattedMessage
+                            defaultMessage="View"
+                            id="cart.link.added_to_wishlist.view_wishlist"
+                        />
                     </Button>
                 )
             })
