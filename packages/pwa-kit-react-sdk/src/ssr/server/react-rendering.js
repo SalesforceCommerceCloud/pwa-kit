@@ -19,7 +19,7 @@ import serialize from 'serialize-javascript'
 
 import {getAssetUrl} from '../universal/utils'
 import DeviceContext from '../universal/device-context'
-import ServerEffect, {getAllContexts, getAllContextValues} from '../universal/server-effects' // I Need to clean up the exports of this module.
+import {ServerEffectProvider, getAllContexts} from '../universal/server-effects' // I Need to clean up the exports of this module.
 import ExpressContext from '../universal/contexts/express-context'
 
 import Document from '../universal/components/_document'
@@ -256,13 +256,13 @@ const renderAppHtml = (req, res, error, appData) => {
     let appJSX = (
         <Router location={location} context={routerContext}>
             <ExpressContext.Provider value={{req, res}}>
-                <ServerEffect.Provider value={serverEffectValue}>
+                <ServerEffectProvider value={serverEffectValue}>
                     <DeviceContext.Provider value={{type: deviceType}}>
                         <AppConfig locals={res.locals}>
                             <Switch error={error} appState={appState} routes={routes} App={App} />
                         </AppConfig>
                     </DeviceContext.Provider>
-                </ServerEffect.Provider>
+                </ServerEffectProvider>
             </ExpressContext.Provider>
         </Router>
     )

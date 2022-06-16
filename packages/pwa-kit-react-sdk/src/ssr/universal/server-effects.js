@@ -29,7 +29,7 @@ export const getAllContextValues = () => (allContextValues)
  * @param {*} effect 
  * @returns 
  */
- export function useServerEffect (initial, didUpdate, source) {
+function useServerEffect (initial, didUpdate, source) {
     // Function overloading.
     if (typeof initial === 'function') {
         source = didUpdate
@@ -148,12 +148,16 @@ export const createServerEffectContext = (name, extraArgs) => {
     contexts.push(context)
 
     return {
-        Provider: context.Provider,
-        Context: context,
+        ServerEffectProvider: context.Provider,
         useServerEffect: hook
     }
 }
 
 const defaultContext = createServerEffectContext(DEFAULT_CONTEXT_KEY)
 
-export default defaultContext
+const {ServerEffectProvider: DefaultServerEffectProdiver, useServerEffect: defaultUseServerEffect} = defaultContext
+
+export {
+    DefaultServerEffectProdiver as ServerEffectProvider,
+    defaultUseServerEffect as useServerEffect
+}

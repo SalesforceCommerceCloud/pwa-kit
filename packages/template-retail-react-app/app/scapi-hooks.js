@@ -1,12 +1,11 @@
-import React, { Children } from 'react'
+import React from 'react'
 import {createServerEffectContext, getAllContexts} from 'pwa-kit-react-sdk/ssr/universal/server-effects'
 
 // NOTE: This is the important part of the API, here we get a context with a hook that will
 // use that context.
-const {Context: ServerEffect, useServerEffect} = createServerEffectContext('scapiHooks')
+const {ServerEffectProvider, useServerEffect} = createServerEffectContext('scapiHooks')
 
 const SCAPIContext = React.createContext()
-
 const initialValue = {name: 'scapiHooks', data: {}, requests: []}
 
 export const SCAPIProvider = (props) => {
@@ -16,9 +15,9 @@ export const SCAPIProvider = (props) => {
 
     return (
         <SCAPIContext.Provider value={{}}>
-            <ServerEffect.Provider value={effectsValues}>
+            <ServerEffectProvider value={effectsValues}>
                 {props.children}
-            </ServerEffect.Provider>
+            </ServerEffectProvider>
         </SCAPIContext.Provider>
     )
 }
