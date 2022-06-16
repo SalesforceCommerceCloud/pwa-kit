@@ -11,7 +11,6 @@ export const DEFAULT_CONTEXT_KEY = '__SERVER_EFFECTS__'
 // NOTE: These globals are probably bad, think of ways to replace them.
 const contexts = []
 const allContexts = {}
-const allContextValues = {}
 
 // NOTE: Not sure how this defaultValue is supposed to work, think it out more.
 const initialValue = {
@@ -21,7 +20,6 @@ const initialValue = {
 
 export const getContexts = () => (contexts)
 export const getAllContexts = () => (allContexts)
-export const getAllContextValues = () => (allContextValues)
 
 /**
  * 
@@ -58,7 +56,7 @@ function useServerEffect (initial, didUpdate, source) {
         // TODO: Effect should be passed the extra args defined in the AppConfig.
 
         useEffect(() => {
-            // NOTE: This logive needs to be fixed. It should look at the hydrating 
+            // NOTE: This logic needs to be fixed. It should look at the hydrating 
             // global value to determine whether or not to ignore. I think.
             if (ignoreFirst) {
                 setIgnoreFirst(false)
@@ -83,20 +81,26 @@ function useServerEffect (initial, didUpdate, source) {
             throw new Error('Server Effect Context Not Found')
         }
 
-        // NOTE: Here I created an object type that has the didUpdate fn and a function to
-        // set the action in motion and place the return value in our state. I did this because
-        // if we used the solution above the effects are immediately invocked, and because we 
-        // render twice, we would end up making those calls to APIs 2 times.
+        // NOTE: In contexts where the server is long lived (e.g. the dev server),
+        // you'll continually push requests onto the context's array. This results 
+        // in effects firing that have already got their data. Consider creating the 
+        // `requests` storage object as dictionairy so that we don'thave duplicate
+        // entries. Dual pass rendering also doesn't help this issue ;)
+        // In general this logic should be revisited. 
         contextValues.requests.push({
             effect: didUpdate.bind(this, {req, res, location, params}),
             fireEffect: function () {
+                const value = contextValues.data[key]
+
+                if (value) {
+                    return Promise.resolve(value)
+                }
+
                 return Promise.resolve()
                     .then(this.effect)
                     .then((data) => {
                         if (data) {
                             contextValues.data[key] = data
-                            
-                            allContextValues[context.displayName] = contextValues.data
 
                             return {
                                 [key]: data

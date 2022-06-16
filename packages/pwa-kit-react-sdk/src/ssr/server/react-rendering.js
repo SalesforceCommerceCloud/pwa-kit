@@ -211,15 +211,12 @@ export const render = async (req, res, next) => {
 
         // Turn array into a map.
         const serverEffectsMap = Object.keys(allContexts)
-            .reduce((acc, curr) => {
-                
-                return {
-                    ...acc,
-                    [curr]: {
-                        data: allContexts[curr].data
-                    }
+            .reduce((acc, curr) => ({
+                ...acc,
+                [curr]: {
+                    data: allContexts[curr].data
                 }
-            }, {})
+            }), {})
 
         // Set the args with the new updated app state.
         args.appState = {
