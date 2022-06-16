@@ -33,6 +33,7 @@ import {PlusIcon, PaymentIcon} from '../../components/icons'
 import ActionCard from '../../components/action-card'
 import CreditCardFields from '../../components/forms/credit-card-fields'
 import PageActionPlaceHolder from '../../components/page-action-placeholder'
+import {getLayout} from "./layout/account-layout";
 
 const DEFAULT_SKELETON_COUNT = 3
 
@@ -273,6 +274,8 @@ const AccountPaymentMethods = () => {
         </Stack>
     )
 }
+
+AccountPaymentMethods.getLayout = getLayout
 
 AccountPaymentMethods.getTemplateName = () => 'account-payment-methods'
 

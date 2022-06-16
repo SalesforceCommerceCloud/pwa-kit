@@ -21,6 +21,7 @@ import WishlistPrimaryAction from './partials/wishlist-primary-action'
 import WishlistSecondaryButtonGroup from './partials/wishlist-secondary-button-group'
 
 import {API_ERROR_MESSAGE} from '../../../constants'
+import {getLayout} from "../layout/account-layout";
 
 const numberOfSkeletonItems = 3
 
@@ -156,5 +157,7 @@ const AccountWishlist = () => {
         </Stack>
     )
 }
+
+AccountWishlist.getLayout = getLayout
 
 export default AccountWishlist

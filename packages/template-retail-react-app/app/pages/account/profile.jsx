@@ -25,6 +25,7 @@ import {ToggleCard, ToggleCardEdit, ToggleCardSummary} from '../../components/to
 import ProfileFields from '../../components/forms/profile-fields'
 import UpdatePasswordFields from '../../components/forms/update-password-fields'
 import FormActionButtons from '../../components/forms/form-action-buttons'
+import {getLayout} from "./layout/account-layout"
 
 /**
  * This is a specialized Skeleton component that which uses the customers authtype as the
@@ -289,6 +290,8 @@ const AccountDetail = () => {
         </Stack>
     )
 }
+
+AccountDetail.getLayout = getLayout
 
 AccountDetail.getTemplateName = () => 'account-detail'
 

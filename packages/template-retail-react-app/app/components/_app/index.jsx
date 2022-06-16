@@ -51,6 +51,8 @@ import {DEFAULT_SITE_TITLE, HOME_HREF, THEME_COLOR} from '../../constants'
 import Seo from '../seo'
 import {resolveSiteFromUrl} from '../../utils/site-utils'
 
+import SiteLayout from "../../layouts/site-layout";
+
 const DEFAULT_NAV_DEPTH = 3
 const DEFAULT_ROOT_CATEGORY = 'root'
 
@@ -146,6 +148,11 @@ const App = (props) => {
         const path = buildPathWithUrlConfig('/account/wishlist', configValues)
         history.push(path)
     }
+
+    const getLayout =
+        children.getLayout || (page => <SiteLayout children={page} />)
+
+
 
     return (
         <Box className="sf-app" {...styles.container}>

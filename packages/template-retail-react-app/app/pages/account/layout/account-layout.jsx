@@ -23,25 +23,22 @@ import {
     Text,
     Divider
 } from '@chakra-ui/react'
-import useCustomer from '../../commerce-api/hooks/useCustomer'
-import Seo from '../../components/seo'
-import Link from '../../components/link'
-import {ChevronDownIcon, ChevronUpIcon, SignoutIcon} from '../../components/icons'
-import AccountDetail from './profile'
-import AccountAddresses from './addresses'
-import AccountOrders from './orders'
-import AccountPaymentMethods from './payments'
-import AccountWishlist from './wishlist/index'
+import useCustomer from '../../../commerce-api/hooks/useCustomer'
+import Seo from '../../../components/seo'
+import Link from '../../../components/link'
+import {ChevronDownIcon, ChevronUpIcon, SignoutIcon} from '../../../components/icons'
 import {useLocation} from 'react-router-dom'
 
-import {messages, navLinks} from './constant'
-import useNavigation from '../../hooks/use-navigation'
-import LoadingSpinner from '../../components/loading-spinner'
-import {buildPathWithUrlConfig} from '../../utils/url'
-import useLocale from '../../hooks/use-locale'
-import useSite from '../../hooks/use-site'
+import {messages, navLinks} from '../constant'
+import useNavigation from '../../../hooks/use-navigation'
+import LoadingSpinner from '../../../components/loading-spinner'
+import {buildPathWithUrlConfig} from '../../../utils/url'
+import useLocale from '../../../hooks/use-locale'
+import useSite from '../../../hooks/use-site'
+import {getLayout as getSiteLayout} from "../../../layouts/site-layout";
+import AccountSettingsLayout from "../../../layouts/account-settings-layout";
 
-const Account = () => {
+const Account = ({children}) => {
     const {path} = useRouteMatch()
     const {formatMessage} = useIntl()
     const customer = useCustomer()
@@ -192,7 +189,7 @@ const Account = () => {
                     </Flex>
                 </Stack>
 
-                {/*{children}*/}
+                {children}
                 {/*<Switch>*/}
                 {/*    <Route exact path={path}>*/}
                 {/*        <AccountDetail />*/}
@@ -219,6 +216,10 @@ Account.getTemplateName = () => 'account'
 
 Account.propTypes = {
     match: PropTypes.object
+}
+
+export const getLayout = page =>{
+    return (<Account>{page}</Account>)
 }
 
 export default Account

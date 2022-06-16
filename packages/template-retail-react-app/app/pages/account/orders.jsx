@@ -10,6 +10,7 @@ import {Route, Switch, useRouteMatch} from 'react-router'
 import OrderHistory from './order-history'
 import OrderDetail from './order-detail'
 import {AccountOrdersProvider} from './util/order-context'
+import {getLayout} from "./layout/account-layout"
 
 const AccountOrders = () => {
     const {path} = useRouteMatch()
@@ -27,6 +28,7 @@ const AccountOrders = () => {
         </AccountOrdersProvider>
     )
 }
+AccountOrders.getLayout = getLayout
 
 AccountOrders.getTemplateName = () => 'account-order-history'
 

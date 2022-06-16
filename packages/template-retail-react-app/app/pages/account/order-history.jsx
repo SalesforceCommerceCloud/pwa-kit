@@ -30,6 +30,7 @@ import PageActionPlaceHolder from '../../components/page-action-placeholder'
 import Link from '../../components/link'
 import {ChevronRightIcon, ReceiptIcon} from '../../components/icons'
 import Pagination from '../../components/pagination'
+import {getLayout} from "./layout/account-layout"
 
 const AccountOrderHistory = () => {
     const location = useLocation()
@@ -233,6 +234,8 @@ const AccountOrderHistory = () => {
         </Stack>
     )
 }
+
+AccountOrderHistory.getLayout = getLayout
 
 AccountOrderHistory.getTemplateName = () => 'account-order-history'
 

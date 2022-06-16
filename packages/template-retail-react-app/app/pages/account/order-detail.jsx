@@ -31,6 +31,7 @@ import CartItemVariantImage from '../../components/item-variant/item-image'
 import CartItemVariantName from '../../components/item-variant/item-name'
 import CartItemVariantAttributes from '../../components/item-variant/item-attributes'
 import CartItemVariantPrice from '../../components/item-variant/item-price'
+import {getLayout} from "./layout/account-layout"
 
 const AccountOrderDetail = () => {
     const {url, params} = useRouteMatch()
@@ -342,6 +343,8 @@ const AccountOrderDetail = () => {
         </Stack>
     )
 }
+
+AccountOrderDetail.getLayout = getLayout
 
 AccountOrderDetail.getTemplateName = () => 'account-order-history'
 
