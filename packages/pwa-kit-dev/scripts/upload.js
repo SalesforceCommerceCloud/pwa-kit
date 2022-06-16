@@ -9,15 +9,6 @@ const Utils = require('./utils')
 const buildRequest = require('./build-request')
 
 const ARCHIVE = 'build.tar'
-const DEFAULT_ORIGIN = process.env.CLOUD_API_BASE || 'https://cloud.mobify.com'
-
-const OPTION_DEFAULTS = {
-    buildDirectory: 'build',
-    settingsFile: Utils.getSettingsPath(),
-    origin: DEFAULT_ORIGIN,
-    target: '',
-    message: Utils.setDefaultMessage()
-}
 
 const isEmptyOptions = (options) => {
     return (
@@ -58,12 +49,24 @@ const upload = (options) => {
         })
 }
 
-const uploadBundle = (customOptions) => {
-    if (isEmptyOptions(customOptions)) {
+const uploadBundle = (opts) => {
+    if (isEmptyOptions(opts)) {
         Utils.fail('[Error: You must provide a Mobify Cloud project slug to upload a bundle.]')
     }
+    if (!opts.hasOwnProperty('origin')) {
+        Utils.fail(
+            '[Error: Missing key "origin" in uploadBundle(opts) - you must specify an origin for the Cloud API.]'
+        )
+    }
 
-    const options = Object.assign({}, OPTION_DEFAULTS, customOptions)
+    const defaults = {
+        buildDirectory: 'build',
+        settingsFile: Utils.getSettingsPath(),
+        target: '',
+        message: Utils.setDefaultMessage()
+    }
+
+    const options = Object.assign({}, defaults, opts)
 
     // Create bundle will generate the archive file and return an updated
     // options object

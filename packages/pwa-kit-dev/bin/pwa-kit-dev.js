@@ -196,11 +196,17 @@ const main = () => {
                 'immediately deploy the bundle to this target once it is pushed'
             )
         )
-        .action(({buildDirectory, message, projectSlug, target}) => {
+        .action((_, opts) => {
+            let {
+                buildDirectory,
+                message,
+                projectSlug,
+                target,
+                cloudApiBase
+            } = opts.optsWithGlobals()
             // Set the deployment target env var, this is required to ensure we
             // get the correct configuration object.
             process.env.DEPLOY_TARGET = target
-
             const mobify = getConfig() || {}
 
             if (!projectSlug) {
@@ -227,7 +233,8 @@ const main = () => {
                 ssr_parameters: mobify.ssrParameters,
                 ssr_only: mobify.ssrOnly,
                 ssr_shared: mobify.ssrShared,
-                set_ssr_values: true
+                set_ssr_values: true,
+                origin: cloudApiBase
             }
 
             if (
@@ -270,7 +277,10 @@ const main = () => {
     program
         .command('test')
         .description('test the project')
-        .action((_, {args}) => {
+        .action((_, opts) => {
+            const {args} = opts
+            console.log(opts.optsWithGlobals(), _, args)
+            process.exit(1)
             const jest = p.join(require.resolve('jest'), '..', '..', '..', '.bin', 'jest')
             execSync(
                 `${jest} --passWithNoTests --maxWorkers=2${args.length ? ' ' + args.join(' ') : ''}`
@@ -280,51 +290,52 @@ const main = () => {
     program
         .command('logs')
         .description(`display logs for an environment`)
-        .requiredOption(
-            '-p, --project <project_slug>',
-            'the project slug',
-            (val) => {
-                if (!(typeof val === 'string') && val.length > 0) {
-                    throw new program.InvalidArgumentError(`"${val}" cannot be empty`)
-                } else {
-                    return val
-                }
+        .requiredOption('-p, --project <project_slug>', 'the project slug', (val) => {
+            if (!(typeof val === 'string') && val.length > 0) {
+                throw new program.InvalidArgumentError(`"${val}" cannot be empty`)
+            } else {
+                return val
             }
-        )
-        .requiredOption(
-            '-e, --environment <environment_slug>',
-            'the environment slug',
-            (val) => {
-                if (!(typeof val === 'string') && val.length > 0) {
-                    throw new program.InvalidArgumentError(`"${val}" cannot be empty`)
-                } else {
-                    return val
-                }
+        })
+        .requiredOption('-e, --environment <environment_slug>', 'the environment slug', (val) => {
+            if (!(typeof val === 'string') && val.length > 0) {
+                throw new program.InvalidArgumentError(`"${val}" cannot be empty`)
+            } else {
+                return val
             }
-        )
-        .action(({project, environment}) => {
+        })
+        .action((_, opts) => {
+            const {project, environment, cloudApiBase} = opts.optsWithGlobals()
             try {
                 const settingsPath = scriptUtils.getSettingsPath()
                 const auth = fse.readJsonSync(settingsPath)
                 const options = {
-                    url: `https://cloud-mahdi.mobify-staging.com/api/projects/${project}/target/${environment}/`,
+                    url: new URL(
+                        `/api/projects/${project}/target/${environment}/`,
+                        cloudApiBase
+                    ).toString(),
                     method: 'GET',
                     headers: {
-                        'Accept': 'application/json',
-                        'Authorization': `Bearer ${auth.api_key}`
+                        Accept: 'application/json',
+                        Authorization: `Bearer ${auth.api_key}`
                     }
-                };
+                }
 
                 request(options, function(err, res, body) {
-                    const data = JSON.parse(body);
-                    const endpoint = data['current_deploy']['external_publish_details']['LogTailEndpoint']
+                    const data = JSON.parse(body)
+                    const endpoint =
+                        data['current_deploy']['external_publish_details']['LogTailEndpoint']
                     const wss = new WebSocket(endpoint)
                     wss.on('message', (message) => {
                         JSON.parse(message).forEach((logLine) => {
-                            console.log(`${new Date(logLine.timestamp).toLocaleString()}> ${logLine.message}`.trim())
+                            console.log(
+                                `${new Date(logLine.timestamp).toLocaleString()}> ${
+                                    logLine.message
+                                }`.trim()
+                            )
                         })
                     })
-                });
+                })
             } catch (e) {
                 console.error('Failed to read credentials.')
                 console.error(e)
@@ -339,6 +350,15 @@ const main = () => {
             program.help({error: true})
         }
     })
+
+    program.addOption(
+        new program.Option(
+            '--cloud-api-base <url>',
+            'Pass a URL for the Cloud API (eg. for testing)'
+        )
+            .default('https://cloud.mobify.com')
+            .env('CLOUD_API_BASE')
+    )
 
     program.parse(process.argv)
 }
