@@ -7,7 +7,7 @@
 
 import React, {useEffect, useRef, useState} from 'react'
 import PropTypes from 'prop-types'
-import {useIntl} from 'react-intl'
+import {FormattedMessage, useIntl} from 'react-intl'
 import {Button} from '@chakra-ui/react'
 import ProductScroller from '../../components/product-scroller'
 import useCustomer from '../../commerce-api/hooks/useCustomer'

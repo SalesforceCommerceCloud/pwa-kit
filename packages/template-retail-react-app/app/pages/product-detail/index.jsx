@@ -310,12 +310,6 @@ ProductDetail.shouldGetProps = ({previousLocation, location}) => {
     const previousParams = new URLSearchParams(previousLocation?.search || '')
     const params = new URLSearchParams(location.search)
 
-    // If the product changed via the pathname or `pid` param, allow updated
-    // data to be retrieved.
-    return (
-        previousLocation?.pathname !== location.pathname ||
-        previousParams.get('pid') !== params.get('pid')
-    )
 }
 
 ProductDetail.getProps = async ({res, params, location, api}) => {
