@@ -315,7 +315,7 @@ export const CheckoutProvider = ({children}) => {
                 } catch (error) {
                     // TODO: OCAPI implements localized error messages for some error types
                     const message = formatMessage({
-                        id: 'checkout_confirmation.message.generic_error',
+                        id: 'checkout.message.generic_error',
                         defaultMessage: 'An unexpected error occurred during checkout.'
                     })
                     mergeState({globalError: message})

@@ -601,6 +601,12 @@
       "value": "Place Order"
     }
   ],
+  "checkout.message.generic_error": [
+    {
+      "type": 0,
+      "value": "An unexpected error occurred during checkout."
+    }
+  ],
   "checkout_confirmation.button.create_account": [
     {
       "type": 0,
@@ -719,12 +725,6 @@
     {
       "type": 0,
       "value": "This email already has an account."
-    }
-  ],
-  "checkout_confirmation.message.generic_error": [
-    {
-      "type": 0,
-      "value": "An unexpected error occurred during checkout."
     }
   ],
   "checkout_confirmation.message.num_of_items_in_order": [

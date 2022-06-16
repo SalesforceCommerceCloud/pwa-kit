@@ -601,6 +601,12 @@
       "value": "[!! Ṕĺâââćè Õŕḋḋḋèŕ !!]"
     }
   ],
+  "checkout.message.generic_error": [
+    {
+      "type": 0,
+      "value": "[!! Ḁń ůńèèèẋṗèèèćṭèèèḋ èèèŕŕŏŏŏŕ ŏŏŏććůůůŕŕèèèḋ ḋḋḋůŕíííńĝ ćḫèèèćǩŏŏŏůṭ. !!]"
+    }
+  ],
   "checkout_confirmation.button.create_account": [
     {
       "type": 0,
@@ -719,12 +725,6 @@
     {
       "type": 0,
       "value": "[!! Ṯḫíííś èèèṁâíííĺ âââĺŕèèèâḋẏẏẏ ḫâââś âââń âââććŏŏŏůńṭṭṭ. !!]"
-    }
-  ],
-  "checkout_confirmation.message.generic_error": [
-    {
-      "type": 0,
-      "value": "[!! Ḁń ůńèèèẋṗèèèćṭèèèḋ èèèŕŕŏŏŏŕ ŏŏŏććůůůŕŕèèèḋ ḋḋḋůŕíííńĝ ćḫèèèćǩŏŏŏůṭ. !!]"
     }
   ],
   "checkout_confirmation.message.num_of_items_in_order": [
