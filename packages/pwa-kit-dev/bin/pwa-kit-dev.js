@@ -279,8 +279,6 @@ const main = () => {
         .description('test the project')
         .action((_, opts) => {
             const {args} = opts
-            console.log(opts.optsWithGlobals(), _, args)
-            process.exit(1)
             const jest = p.join(require.resolve('jest'), '..', '..', '..', '.bin', 'jest')
             execSync(
                 `${jest} --passWithNoTests --maxWorkers=2${args.length ? ' ' + args.join(' ') : ''}`
@@ -351,6 +349,7 @@ const main = () => {
         }
     })
 
+    // Global option, accessible on all commands.
     program.addOption(
         new program.Option(
             '--cloud-api-base <url>',
