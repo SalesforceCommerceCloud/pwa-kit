@@ -36,11 +36,17 @@ const ProductDetail = loadable(() => import('./pages/product-detail'), {fallback
 const ProductList = loadable(() => import('./pages/product-list'), {fallback})
 const Wishlist = loadable(() => import('./pages/account/wishlist'), {fallback})
 const PageNotFound = loadable(() => import('./pages/page-not-found'))
+const ProductDetailWithLayout = loadable(() => import('./pages/product-detail-with-layout'))
 
 const routes = [
     {
         path: '/',
         component: Home,
+        exact: true
+    },
+    {
+        path: '/pdplayout',
+        component: ProductDetailWithLayout,
         exact: true
     },
     {
