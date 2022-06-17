@@ -49,7 +49,7 @@ module.exports = {
                 path: 'api'
             },
             {
-                host: 'pwa-kit-hybrid.northerntrailoutfitters.com',
+                host: 'development-internal-ccdemo.demandware.net',
                 path: 'ocapi'
             },
             {

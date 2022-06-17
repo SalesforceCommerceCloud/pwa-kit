@@ -39,7 +39,7 @@ const {handler} = runtime.createHandler(options, (app) => {
             contentSecurityPolicy: {
                 useDefaults: true,
                 directives: {
-                    'img-src': ["'self'", '*.commercecloud.salesforce.com', 'development-internal-ccdemo.demandware.net', 'pwa-kit-hybrid.northerntrailoutfitters.com', 'data:'],
+                    'img-src': ["'self'", '*.commercecloud.salesforce.com', 'data:'],
                     'script-src': ["'self'", "'unsafe-eval'", 'storage.googleapis.com'],
 
                     // Do not upgrade insecure requests for local development
