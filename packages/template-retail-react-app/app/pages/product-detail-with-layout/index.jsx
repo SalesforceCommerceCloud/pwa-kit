@@ -198,6 +198,6 @@ const ProductDetailWithLayout = () => {
     )
 }
 
-ProductDetailWithLayout.getTemplateName = () => 'portals'
+ProductDetailWithLayout.getTemplateName = () => 'product-details-with-layout'
 
 export default ProductDetailWithLayout
