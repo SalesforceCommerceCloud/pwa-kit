@@ -13,7 +13,6 @@ const DEFAULT_ORIGIN = process.env.CLOUD_API_BASE || 'https://cloud.mobify.com'
 
 const OPTION_DEFAULTS = {
     buildDirectory: 'build',
-    settingsFile: Utils.getSettingsPath(),
     origin: DEFAULT_ORIGIN,
     target: '',
     message: Utils.setDefaultMessage()
@@ -33,7 +32,7 @@ const upload = (options) => {
         return Buffer.from(buildJSON)
     })
 
-    const credentialsPromise = Utils.readCredentials(options.settingsFile)
+    const credentialsPromise = Utils.readCredentials(options.credentialsFile)
 
     return Promise.all([dataBufferPromise, credentialsPromise])
         .then((values) => {
