@@ -25,6 +25,7 @@ import {useCurrency} from '../../hooks'
 import {Skeleton as ImageGallerySkeleton} from '../../components/image-gallery'
 import {HideOnDesktop, HideOnMobile} from '../../components/responsive'
 import QuantityPicker from '../../components/quantity-picker'
+import {useBaskets} from '../../scapi-hooks'
 
 const ProductViewHeader = ({name, price, currency, category}) => {
     const intl = useIntl()
@@ -90,6 +91,10 @@ const ProductView = ({
     } = useAddToCartModalContext()
     const theme = useTheme()
     const [showOptionsMessage, toggleShowOptionsMessage] = useState(false)
+
+    const {baskets} = useBaskets()
+    console.log('%c baskets', 'background:yellow', baskets)
+
     const {
         showLoading,
         showInventoryMessage,
@@ -276,6 +281,7 @@ const ProductView = ({
                                         <SwatchGroup
                                             key={id}
                                             onChange={(_, href) => {
+                                                console.log('href', href)
                                                 if (!href) return
                                                 history.replace(href)
                                             }}
