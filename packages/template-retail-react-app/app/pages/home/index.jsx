@@ -8,11 +8,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {useIntl, FormattedMessage} from 'react-intl'
-import UseServerEffect from 'pwa-kit-react-sdk/ssr/universal/server-effects'
-
-// TODO: Clean up how this default import is used.
-const {useServerEffect} = UseServerEffect
-
+import {useServerEffect} from 'pwa-kit-react-sdk/ssr/universal/server-effects'
 import {useCommerceAPI} from '../../commerce-api/contexts'
 
 // Components

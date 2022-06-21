@@ -1,18 +1,14 @@
-import React, {Children, useEffect} from 'react'
-import {
-    createServerEffectContext,
-    getAllContexts
-} from 'pwa-kit-react-sdk/ssr/universal/server-effects'
+import React from 'react'
+import {createServerEffectContext, getAllContexts} from 'pwa-kit-react-sdk/ssr/universal/server-effects'
+
+// NOTE: This is the important part of the API, here we get a context with a hook that will
+// use that context.
+const {ServerEffectProvider, useServerEffect} = createServerEffectContext('scapiHooks')
 import {useCommerceAPI} from './commerce-api/contexts'
 import {isError} from './commerce-api/utils'
 import useCustomer from './commerce-api/hooks/useCustomer'
 
-// NOTE: This is the important part of the API, here we get a context with a hook that will
-// use that context.
-export const {Context: ServerEffect, useServerEffect} = createServerEffectContext('scapiHooks')
-
 const SCAPIContext = React.createContext()
-
 const initialValue = {name: 'scapiHooks', data: {}, requests: []}
 
 const initialState = {
@@ -208,7 +204,7 @@ export const SCAPIProvider = (props) => {
             : window.__PRELOADED_STATE__.scapiHooks
 
     return (
-        <SCAPIContext.Provider>
+        <SCAPIContext.Provider value={{}}>
             <BasketsProvider>
                 <ServerEffect.Provider value={effectsValues}>
                     {props.children}
