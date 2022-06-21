@@ -7,7 +7,7 @@
 
 import React, {useEffect, useRef, useState} from 'react'
 import PropTypes from 'prop-types'
-import {FormattedMessage, useIntl} from 'react-intl'
+import {useIntl} from 'react-intl'
 import {Button} from '@chakra-ui/react'
 import ProductScroller from '../../components/product-scroller'
 import useCustomer from '../../commerce-api/hooks/useCustomer'
@@ -134,12 +134,13 @@ const RecommendedProducts = ({zone, recommender, products, title, shouldFetch, .
                     // but unfortunately the Link component is not compatible
                     // with Chakra Toast, since the ToastManager is rendered via portal
                     // and the toast doesn't have access to intl provider, which is a
-                    // requirement of the Link component.
+                    // requirement of the Link component. This is also the reason why
+                    // we must use `formatMessage()`, rather than `<FormattedMessage />`.
                     <Button variant="link" onClick={() => navigate('/account/wishlist')}>
-                        <FormattedMessage
-                            defaultMessage="View"
-                            id="cart.link.added_to_wishlist.view_wishlist"
-                        />
+                        {formatMessage({
+                            id: 'cart.link.added_to_wishlist.view_wishlist',
+                            defaultMessage: 'View'
+                        })}
                     </Button>
                 )
             })

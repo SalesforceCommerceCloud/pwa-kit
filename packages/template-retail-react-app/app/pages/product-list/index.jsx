@@ -142,12 +142,13 @@ const ProductList = (props) => {
                     // but unfortunately the Link component is not compatible
                     // with Chakra Toast, since the ToastManager is rendered via portal
                     // and the toast doesn't have access to intl provider, which is a
-                    // requirement of the Link component.
+                    // requirement of the Link component. This is also the reason why
+                    // we must use `formatMessage()`, rather than `<FormattedMessage />`.
                     <Button variant="link" onClick={() => navigate('/account/wishlist')}>
-                        <FormattedMessage
-                            defaultMessage="View"
-                            id="cart.link.added_to_wishlist.view_wishlist"
-                        />
+                        {formatMessage({
+                            id: 'cart.link.added_to_wishlist.view_wishlist',
+                            defaultMessage: 'View'
+                        })}
                     </Button>
                 )
             })
