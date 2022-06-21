@@ -5,7 +5,7 @@
 - Updated text for many fields
 - Added `checkout.message.generic_error`
 - Added `wishlist_primary_action.button.select_options`
-- Added `cart.link.added_to_wishlist.view_wishlist`
+- Added `wishlist.link.added_to_wishlist.view`
 - Added `credit_card_fields.tool_tip.security_code.american_express`
 - Changed `credit_card_fields.tool_tip.security_code` from a template that accepts values to a static string
 - Changed `home.description.contact_our_staff` to `home.description.here_to_help`

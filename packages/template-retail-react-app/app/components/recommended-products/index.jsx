@@ -138,7 +138,7 @@ const RecommendedProducts = ({zone, recommender, products, title, shouldFetch, .
                     // we must use `formatMessage()`, rather than `<FormattedMessage />`.
                     <Button variant="link" onClick={() => navigate('/account/wishlist')}>
                         {formatMessage({
-                            id: 'cart.link.added_to_wishlist.view_wishlist',
+                            id: 'wishlist.link.added_to_wishlist.view',
                             defaultMessage: 'View'
                         })}
                     </Button>

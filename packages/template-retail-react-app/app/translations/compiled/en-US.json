@@ -469,7 +469,7 @@
       "value": "Item removed from cart"
     }
   ],
-  "cart.link.added_to_wishlist.view_wishlist": [
+  "wishlist.link.added_to_wishlist.view": [
     {
       "type": 0,
       "value": "View"
