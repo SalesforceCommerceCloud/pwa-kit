@@ -47,7 +47,7 @@ function useServerEffect (initial, didUpdate, source) {
 
     const [data, setData] = useState(contextValues.data[key] || initial)
     const [isLoading, setIsLoading] = useState(false)
-    const [ignoreFirst, setIgnoreFirst] = useState(true)
+    // const [ignoreFirst, setIgnoreFirst] = useState(true)
 
     if (isClient) {
         // Note: This is only executed on the client.
@@ -58,10 +58,10 @@ function useServerEffect (initial, didUpdate, source) {
         useEffect(() => {
             // NOTE: This logic needs to be fixed. It should look at the hydrating 
             // global value to determine whether or not to ignore. I think.
-            if (ignoreFirst) {
-                setIgnoreFirst(false)
-                return
-            }
+            // if (ignoreFirst) {
+            //     setIgnoreFirst(false)
+            //     return
+            // }
 
             Promise.resolve()
                 .then(() => {
