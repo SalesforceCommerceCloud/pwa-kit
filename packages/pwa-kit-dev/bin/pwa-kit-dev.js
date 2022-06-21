@@ -6,7 +6,6 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 const p = require('path')
-const zlib = require('zlib')
 const fs = require('fs')
 const request = require('request')
 const program = require('commander')
@@ -18,9 +17,7 @@ const uploadBundle = require('../scripts/upload.js')
 const pkg = require('../package.json')
 const {getConfig} = require('pwa-kit-runtime/utils/ssr-config')
 const {fromCognitoIdentity} = require("@aws-sdk/credential-providers")
-const {KinesisClient, GetShardIteratorCommand, ListShardsCommand, GetRecordsCommand, ListStreamsCommand} = require("@aws-sdk/client-kinesis")
 const {S3Client, ListObjectsV2Command, GetObjectCommand} = require("@aws-sdk/client-s3")
-const { NodeHttpHandler } = require("@aws-sdk/node-http-handler");
 
 const pkgRoot = p.join(__dirname, '..')
 
@@ -273,7 +270,8 @@ const main = () => {
                 }
             }
         )
-        .action(({project, environment}) => {
+        .option('-d, --debug')
+        .action(({project, environment, debug}) => {
             try {
                 const settingsPath = scriptUtils.getSettingsPath()
                 const auth = JSON.parse(fs.readFileSync(
@@ -291,130 +289,7 @@ const main = () => {
                 request(options, async function(err, res, body) {
                     let json = JSON.parse(body);
                     logGroupName = json.log_group;
-                    region = json.regionl;
-                    identityId = json.identity_id;
-                    
-                    const kinesisClient = new KinesisClient({
-                        region,
-                        requestHandler: new NodeHttpHandler({}),
-                        credentials: fromCognitoIdentity({
-                            identityId,
-                            logins: {
-                                "cognito-identity.amazonaws.com": json.token
-                            }
-                        }),
-                        // logger: console
-                    });
-
-                    const getShardIterator = (stream_name, shard_id, shard_iterator=null) => {
-                        if (shard_iterator === null) {
-                            return kinesisClient.send(new GetShardIteratorCommand({
-                                ShardIteratorType: 'LATEST',
-                                ShardId: shard_id,
-                                StreamName: stream_name
-                            })).then((data) => {
-                                return data.ShardIterator
-                            })
-                        } else {
-                            return new Promise((resolve, reject) => {
-                                resolve(shard_iterator)
-                            })
-                        }
-                    }
-
-                    const processLogEvent = (log_event) => {
-                        let eventDate = new Date(log_event.timestamp).toISOString()
-                        let message = log_event.message.replace(/\t/g, " ")
-                        message = message.replace(/^\s+|\s+$/g, " ")
-                        return `${eventDate}: ${message}`
-                    }
-
-                    try {
-                        const streams = await kinesisClient.send(new ListStreamsCommand({}));
-                        const stream_name = streams.StreamNames.find((stream) => stream.includes(`${project}-${environment}`));
-                        const shards = await kinesisClient.send(new ListShardsCommand({StreamName: stream_name}));
-                        const loop_through_shard_records = (shard_id, shard_iterator=null) => {
-                            getShardIterator(stream_name, shard_id, shard_iterator).then(
-                                (shard_iterator) => {
-                                    return kinesisClient.send(new GetRecordsCommand({
-                                        ShardIterator: shard_iterator
-                                    }))
-                                }).then((data) => {
-                                    // if (!data.Records || data.Records.length == 0) {
-                                    //     console.log(`${shard_id} - No Records`)
-                                    // }
-                                    data.Records.forEach((record) => {
-                                        let data = JSON.parse(zlib.unzipSync(Buffer.from(record.Data, 'base64')).toString())
-                                        data.logEvents.forEach((event) => {
-                                            console.log(`${shard_id} - ${processLogEvent(event)}`)
-                                        })
-                                    })
-                                    return new Promise((resolve, reject) => {
-                                        resolve(data.NextShardIterator)
-                                    })
-                                }).then((next_shard_iterator) => {
-                                    setTimeout(() => loop_through_shard_records(shard_id, next_shard_iterator), 2000)
-                                })
-                        }
-                        console.log(shards.Shards.map(shard => shard.ShardId))
-                        shards.Shards.forEach((shard) => {
-                            loop_through_shard_records(shard.ShardId, null)
-                        })
-                    } catch (error) {
-                        console.error(error)
-                    }
-                });
-            } catch (e) {
-                console.error('Failed to read credentials.')
-                console.error(e)
-                process.exit(1)
-            }
-        })
-
-    program
-        .command('s3logs')
-        .description(`display logs for an environment`)
-        .requiredOption(
-            '-p, --project <project_slug>',
-            'the project slug',
-            (val) => {
-                if (!(typeof val === 'string') && val.length > 0) {
-                    throw new program.InvalidArgumentError(`"${val}" cannot be empty`)
-                } else {
-                    return val
-                }
-            }
-        )
-        .requiredOption(
-            '-e, --environment <environment_slug>',
-            'the environment slug',
-            (val) => {
-                if (!(typeof val === 'string') && val.length > 0) {
-                    throw new program.InvalidArgumentError(`"${val}" cannot be empty`)
-                } else {
-                    return val
-                }
-            }
-        )
-        .action(({project, environment}) => {
-            try {
-                const settingsPath = scriptUtils.getSettingsPath()
-                const auth = JSON.parse(fs.readFileSync(
-                    settingsPath
-                ))
-                const options = {
-                    url: `https://cloud-kieran.mobify-staging.com/api/projects/${project}/target/${environment}/log/`,
-                    method: 'GET',
-                    headers: {
-                        'Accept': 'application/json',
-                        'Authorization': `Bearer ${auth.api_key}`
-                    }
-                };
-
-                request(options, async function(err, res, body) {
-                    let json = JSON.parse(body);
-                    logGroupName = json.log_group;
-                    region = json.regionl;
+                    region = json.region;
                     identityId = json.identity_id;
                     
                     const s3Client = new S3Client({
@@ -426,14 +301,19 @@ const main = () => {
                             }
                         }),
                     });
-                    const bucket_name = `log-stream-${project}-${environment}`
-                    
+                    const bucket_name = `logging-${project}-${environment}`
+
                     const getPrefix = () => {
-                        let current_date = new Date().toISOString().split("T")
-                        const date_prefix = current_date[0].split("-").join("/")
-                        const time_prefix = current_date[1].split(":")[0]
-                        return `${date_prefix}/${time_prefix}`
+                        let datetime = new Date()
+                        let year = datetime.getUTCFullYear()
+                        // The months start at 0 in JS but 1 in Python
+                        let month = (datetime.getUTCMonth() + 1).toString().padStart(2, '0') // Pad
+                        let day = datetime.getUTCDate()
+                        let hours = datetime.getUTCHours().toString().padStart(2, '0') // Pad
+                        let minute = datetime.getUTCMinutes().toString().padStart(2, '0') // Pad
+                        return `${year}/${month}/${day}/${hours}/${minute}/`
                     }
+
                     const streamToBuffer = (stream) => {
                         return new Promise((resolve, reject) => {
                             const chunks = []
@@ -443,45 +323,47 @@ const main = () => {
                         })
                     }
 
-                    const processLogEvent = (log_event) => {
-                        let eventDate = new Date(log_event.timestamp).toISOString()
-                        let message = log_event.message.replace(/\t/g, " ")
-                        message = message.replace(/^\s+|\s+$/g, " ")
-                        return `${eventDate}: ${message}`
-                    }
-
-                    const displayLogEvents = (content) => {
-                        let contents = content.replace(/}{/g, "}%%%{")
-                        contents.split("%%%").forEach((record) => {
-                            let parsed = JSON.parse(record)
-                            parsed.logEvents.forEach((event) => {
-                                console.log(processLogEvent(event))
-                            })
-                        })
-                    }
-
                     let last_key = null
+                    let last_prefix = null
                     const loop_through_logs = async () => {
+                        let prefix = getPrefix()
+                        if (prefix !== last_prefix) {
+                            if (last_prefix !== null && debug)
+                            {
+                                s3Client.send(new ListObjectsV2Command({
+                                    Bucket: bucket_name,
+                                    prefix: last_prefix,
+                                    StartAfter: last_prefix
+                                })).then((data) => {
+                                    data.Contents.forEach((object) => {
+                                        console.log(object.Key)
+                                    })
+                                    console.log("--")
+                                })
+                            }
+                            last_prefix = prefix
+                            if (debug)
+                                console.log(`- ${prefix}`)
+                        }
                         let options = {
                             Bucket: bucket_name,
-                            Prefix: getPrefix(),
-                            MaxKeys: 5
+                            Prefix: prefix
                         }
                         if (last_key !== null)
                             options.StartAfter = last_key
-                        const objects = await s3Client.send(new ListObjectsV2Command(options))
+                        let objects = await s3Client.send(new ListObjectsV2Command(options))
                         if (objects.Contents && objects.Contents.length > 0) {
                             last_key = objects.Contents[objects.Contents.length-1].Key
                             objects.Contents.forEach((object) => {
+                                if (debug)
+                                    console.log(object.Key)
                                 s3Client.send(new GetObjectCommand({
                                     Bucket: bucket_name,
                                     Key: object.Key
                                 })).then((object) => {
                                     return streamToBuffer(object.Body)
-                                }).then((compressedData) => {
-                                    return zlib.unzipSync(compressedData).toString()
-                                }).then((contents) => {
-                                    displayLogEvents(contents)
+                                }).then((data) => {
+                                    console.log(data.toString().trim())
                                 })
                             })
                         }
