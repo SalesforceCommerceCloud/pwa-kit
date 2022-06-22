@@ -89,7 +89,7 @@ const App = (props) => {
     const currency = locale.preferredCurrency || l10n.defaultCurrency
 
     // Set up customer and basket
-    useShopper({currency})
+    // useShopper({currency})
 
     const wishlist = useWishlist()
     useEffect(() => {

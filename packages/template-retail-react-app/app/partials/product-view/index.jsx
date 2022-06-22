@@ -25,7 +25,8 @@ import {useCurrency} from '../../hooks'
 import {Skeleton as ImageGallerySkeleton} from '../../components/image-gallery'
 import {HideOnDesktop, HideOnMobile} from '../../components/responsive'
 import QuantityPicker from '../../components/quantity-picker'
-import {useBaskets} from '../../scapi-hooks'
+import {addItemToCart, useBaskets} from '../../scapi-hooks'
+import {useCommerceAPI} from '../../commerce-api/contexts'
 
 const ProductViewHeader = ({name, price, currency, category}) => {
     const intl = useIntl()
@@ -91,8 +92,8 @@ const ProductView = ({
     } = useAddToCartModalContext()
     const theme = useTheme()
     const [showOptionsMessage, toggleShowOptionsMessage] = useState(false)
-
-    const {baskets} = useBaskets()
+    const api = useCommerceAPI()
+    const {baskets, dispatch: basketDispatch} = useBaskets()
     console.log('%c baskets', 'background:yellow', baskets)
 
     const {
@@ -145,7 +146,23 @@ const ProductView = ({
             buttons.push(
                 <Button
                     key="cart-button"
-                    onClick={handleCartItem}
+                    onClick={async () => {
+                        console.log('variant', variant)
+                        console.log('quantity', quantity)
+                        if (!variant?.orderable || !quantity) return
+
+                        const productItems = [
+                            {
+                                productId: variant.productId,
+                                quantity,
+                                price: variant.price
+                            }
+                        ]
+                        // add the item to the first basket
+                        const basketId = baskets.data[0].basketId
+                        await addItemToCart(basketDispatch, productItems, basketId, api)
+                    }}
+                    isLoading={baskets.isLoading}
                     disabled={showInventoryMessage}
                     width="100%"
                     variant="solid"

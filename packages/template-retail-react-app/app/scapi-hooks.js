@@ -1,37 +1,30 @@
-import React from 'react'
-import {createServerEffectContext, getAllContexts} from 'pwa-kit-react-sdk/ssr/universal/server-effects'
-
+import React, {useEffect} from 'react'
+import {
+    createServerEffectContext,
+    getAllContexts
+} from 'pwa-kit-react-sdk/ssr/universal/server-effects'
+import {ShopperBaskets, ShopperSearch} from 'commerce-sdk-isomorphic'
 // NOTE: This is the important part of the API, here we get a context with a hook that will
 // use that context.
 const {ServerEffectProvider, useServerEffect} = createServerEffectContext('scapiHooks')
 import {useCommerceAPI} from './commerce-api/contexts'
 import {isError} from './commerce-api/utils'
 import useCustomer from './commerce-api/hooks/useCustomer'
+import {getConfig} from 'pwa-kit-runtime/utils/ssr-config'
+import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
 
 const SCAPIContext = React.createContext()
 const initialValue = {name: 'scapiHooks', data: {}, requests: []}
 
-const initialState = {
-    hello: {data: 'world'},
-    baskets: {
-        isLoading: false,
-        error: false,
-        data: [],
-        total: 0
-    },
-    products: {},
-    product: {}
-}
-
-export const GlobalStateContext = React.createContext()
-
 const basketsInitialState = {
     isLoading: false,
     error: false,
-    data: []
+    data: [],
+    total: 0
 }
 
 const basketReducer = (state, action) => {
+    console.log('state', state)
     switch (action.type) {
         case 'loading': {
             return {
@@ -40,17 +33,29 @@ const basketReducer = (state, action) => {
             }
         }
         case 'add_to_cart': {
-            return {...state, data: [...state.data, action.payload]}
+            return {
+                ...state,
+                isLoading: false,
+                error: false,
+                // update the basket with res from server
+                data: state.data.map((basket) => {
+                    return basket.id === action.id ? action.payload : basket
+                })
+            }
         }
         case 'set_basket': {
             return {
                 ...state,
+                isLoading: false,
+                error: false,
                 data: [...state.data, action.payload]
             }
         }
         case 'set_baskets': {
             return {
                 ...state,
+                isLoading: false,
+                error: false,
                 data: action.payload.baskets,
                 total: action.payload.total
             }
@@ -63,16 +68,33 @@ const basketReducer = (state, action) => {
         }
     }
 }
+
+const getCommerceApiConfig = () => {
+    const {app} = getConfig()
+    const commerceConfig = {
+        ...app.commerceAPI,
+        proxy: `${getAppOrigin()}${app.commerceAPI.proxyPath}`,
+        einsteinConfig: app.einsteinAPI
+    }
+
+    return commerceConfig
+}
+
+const basketShopperAPI = () => {
+    const commerceConfig = getCommerceApiConfig()
+}
 // basket-context.js
 
 const BasketsContext = React.createContext()
 const BasketsProvider = ({children}) => {
+    // TODO: we should separate api into different apis context instead of having a combined api object here
+    // for example: ShopperBasketAPI, ShopperCustomerAPI
     const api = useCommerceAPI()
 
     // slas hooks
     const shopper = useCustomer()
-    console.log('shopper', shopper)
     // Create or restore the user session upon mounting
+    // this flow should stay in shopper hook
     useEffect(() => {
         shopper.login()
     }, [])
@@ -80,11 +102,6 @@ const BasketsProvider = ({children}) => {
     const [baskets, dispatch] = React.useReducer(basketReducer, basketsInitialState)
 
     const value = React.useMemo(() => ({baskets, dispatch}), [baskets])
-
-    //
-    const getBasketById = (basketId) => {
-        return baskets.data.find((basket) => basket.basketId === basketId)
-    }
 
     const createBasket = async () => {
         dispatch({type: 'loading'})
@@ -103,7 +120,7 @@ const BasketsProvider = ({children}) => {
         dispatch({type: 'loading'})
         try {
             console.log('getting baskets---------------------------')
-
+            console.log('api.shopperBaskets', api.shopperBaskets)
             const res = await api.shopperCustomers.getCustomerBaskets({
                 parameters: {customerId: shopper?.customerId}
             })
@@ -112,13 +129,29 @@ const BasketsProvider = ({children}) => {
                 console.log('creating a basket ----------------------------')
                 await createBasket()
             }
+
             console.log('setting baskets-------------------------')
             dispatch({type: 'set_baskets', payload: res})
-            // console.log('res.json()', res.json())
-            // const data = res.json()
         } catch (e) {
             console.log('basket error --------------------')
             console.log('e', e)
+        }
+    }
+
+    const addItemToCart = async (item, basketId) => {
+        console.log('add to cart loading ----')
+        dispatch({type: 'loading'})
+        try {
+            console.log('adding-item to cart')
+            const res = await api.shopperBaskets.addItemToBasket({
+                body: item,
+                parameters: {basketId}
+            })
+            console.log('res', res)
+            dispatch({type: 'add_to_cart', payload: res})
+        } catch (err) {
+            dispatch({type: 'error'})
+            throw new Error(err)
         }
     }
 
@@ -126,9 +159,9 @@ const BasketsProvider = ({children}) => {
     // if there is no basket, create one => can we delay this until someone adds an item to cart
     React.useEffect(() => {
         console.log('Initializing baskets =========================')
-        console.log('baskets', baskets)
-        console.log('shoppers', shopper)
-        console.log('>>>>>>')
+        // console.log('baskets', baskets)
+        // console.log('shoppers', shopper)
+        // console.log('>>>>>>')
 
         if (!baskets.data.length && shopper.isInitialized) {
             dispatch({type: 'loading'})
@@ -143,7 +176,11 @@ const BasketsProvider = ({children}) => {
     }, [shopper.authType, baskets.total])
 
     // handle anything related to basket here
-    return <BasketsContext.Provider value={{...value}}>{children}</BasketsContext.Provider>
+    return (
+        <BasketsContext.Provider value={{...value, addItemToCart}}>
+            {children}
+        </BasketsContext.Provider>
+    )
 }
 
 export const useBaskets = () => {
@@ -155,43 +192,32 @@ export const useBaskets = () => {
 }
 
 // put this into a module?
-const addItemToCart = async (dispatch, item, basketId) => {
-    const api = useCommerceAPI()
+/**
+ * Add an item to the basket.
+ *
+ * @param {function} dispatch - basket dispatch method to call an action
+ * @param {array} item
+ * @param {string} item.productId - The id of the product.
+ * @param {number} item.quantity - The quantity of the item.
+ * @param {string} basketId - basket id
+ */
+export const addItemToCart = async (dispatch, item, basketId, api) => {
+    // const api = useCommerceAPI()
+    console.log('add to cart loading ----')
     dispatch({type: 'loading'})
     try {
+        console.log('adding-item to cart')
         const res = await api.shopperBaskets.addItemToBasket({
-            body,
+            body: item,
             parameters: {basketId}
         })
+        console.log('res', res)
         dispatch({type: 'add_to_cart', payload: res})
     } catch (err) {
         dispatch({type: 'error'})
         throw new Error(err)
     }
 }
-
-// usage
-// const PDP = () => {
-//     const {product} = useProduct(1, [])
-//     const {baskets, dispatch: basketsDispatch} = useBasket()
-//     const {isLoading: isBasketsLoading, error: basketsError} = baskets
-//     return (
-//         <div>
-//             <div>{product.name}</div>
-//             <div>{basketsError.toString()}</div>
-//             <button
-//                 disabled={isBasketsLoading}
-//                 onClick={(variant, quantity) => {
-//                     const basketId = baskets.data[0]
-//                     // pass dispatch to aync
-//                     addItemToCart(basketsDispatch, {variant, quantity}, basketId)
-//                 }}
-//             >
-//                 Add to cart
-//             </button>
-//         </div>
-//     )
-// }
 
 export const SCAPIProvider = (props) => {
     // TODO: Figure out a cleaner API for getting the current value for the context.
@@ -205,11 +231,9 @@ export const SCAPIProvider = (props) => {
 
     return (
         <SCAPIContext.Provider value={{}}>
-            <BasketsProvider>
-                <ServerEffect.Provider value={effectsValues}>
-                    {props.children}
-                </ServerEffect.Provider>
-            </BasketsProvider>
+            <ServerEffectProvider value={effectsValues}>
+                <BasketsProvider>{props.children}</BasketsProvider>
+            </ServerEffectProvider>
         </SCAPIContext.Provider>
     )
 }
