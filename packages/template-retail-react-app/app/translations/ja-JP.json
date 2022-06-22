@@ -115,7 +115,7 @@
     "defaultMessage": "買い物を続ける"
   },
   "account_wishlist.description.continue_shopping": {
-    "defaultMessage": "買い物を続け、ほしい物リストに商品を追加できます。"
+    "defaultMessage": "買い物を続けて、ほしい物リストに商品を追加してください。"
   },
   "account_wishlist.heading.no_wishlist": {
     "defaultMessage": "ほしい物リストに商品がありません"
@@ -235,7 +235,7 @@
     "defaultMessage": "注文の概要"
   },
   "checkout_confirmation.heading.payment_details": {
-    "defaultMessage": "支払詳細"
+    "defaultMessage": "支払の詳細"
   },
   "checkout_confirmation.heading.shipping_address": {
     "defaultMessage": "配送先住所"
@@ -379,10 +379,6 @@
   "contact_info.title.contact_info": {
     "defaultMessage": "連絡先情報"
   },
-  "credit_card_fields.tool_tip.security_code": {
-    "defaultMessage": "この{length} 桁のコードはカードの{side}側にあります。",
-    "description": "Credit card security code help text"
-  },
   "drawer_menu.button.account_details": {
     "defaultMessage": "アカウントの詳細"
   },
@@ -447,19 +443,19 @@
     "defaultMessage": "サインイン"
   },
   "empty_cart.message.continue_shopping": {
-    "defaultMessage": "買い物を続け、買い物カゴに商品を追加できます。"
+    "defaultMessage": "買い物を続けて、買い物カゴに商品を追加してください。"
   },
   "empty_cart.message.sign_in_or_continue_shopping": {
     "defaultMessage": "サインインして保存された商品を取得するか、買い物を続けてください。"
   },
   "empty_search_results.info.cant_find_anything_for_category": {
-    "defaultMessage": "{category}では該当する商品が見つかりませんでした。商品を検索してみるか、または{link}してください。"
+    "defaultMessage": "{category}では該当する商品が見つかりませんでした。商品を検索してみるか、または{link}ください。"
   },
   "empty_search_results.info.cant_find_anything_for_query": {
     "defaultMessage": "\"{searchQuery}\" では該当する商品が見つかりませんでした。"
   },
   "empty_search_results.info.double_check_spelling": {
-    "defaultMessage": "入力内容に間違いがないか再度ご確認の上、もう一度やり直すか、または{link}してください。"
+    "defaultMessage": "入力内容に間違いがないか再度ご確認の上、もう一度やり直すか、または{link}ください。"
   },
   "empty_search_results.link.contact_us": {
     "defaultMessage": "お問い合わせ"
@@ -576,7 +572,7 @@
     "defaultMessage": "適切な部門におつなげします。"
   },
   "home.description.shop_products": {
-    "defaultMessage": "このセクションには、カタログからのコンテンツが含まれています。{docLink}をクリックして交換方法をご確認ください。",
+    "defaultMessage": "このセクションには、カタログからのコンテンツが含まれています。カタログの置き換え方法に関する{docLink}。",
     "description": "{docLink} is a html button that links the user to https://sfdc.co/business-manager-manage-catalgos"
   },
   "home.features.description.cart_checkout": {
@@ -586,7 +582,7 @@
     "defaultMessage": "Chakra UI を使用して構築された、シンプルなモジュラー型のアクセシブルな React コンポーネントライブラリ。"
   },
   "home.features.description.einstein_recommendations": {
-    "defaultMessage": "商品の推奨項目により、次に推奨される商品やオファーをすべての買い物客に表示します。"
+    "defaultMessage": "商品レコメンデーションにより、次善の商品やオファーをすべての買い物客に提示します。"
   },
   "home.features.description.my_account": {
     "defaultMessage": "買い物客は、プロフィール、住所、支払、注文などのアカウント情報を管理できます。"
@@ -604,13 +600,13 @@
     "defaultMessage": "コンポーネント & 設計キット"
   },
   "home.features.heading.einstein_recommendations": {
-    "defaultMessage": "Einstein Recommendations"
+    "defaultMessage": "Einstein レコメンデーション"
   },
   "home.features.heading.my_account": {
     "defaultMessage": "マイアカウント"
   },
   "home.features.heading.shopper_login": {
-    "defaultMessage": "Shopper Login and API Access Service"
+    "defaultMessage": "Shopper Login and API Access Service (SLAS)"
   },
   "home.features.heading.wishlist": {
     "defaultMessage": "ほしい物リスト"
@@ -622,7 +618,7 @@
     "defaultMessage": "弊社にお任せください"
   },
   "home.heading.shop_products": {
-    "defaultMessage": "商品の購入"
+    "defaultMessage": "ショップの商品"
   },
   "home.hero_features.link.design_kit": {
     "defaultMessage": "Figma PWA Design Kit で作成"
@@ -643,7 +639,7 @@
     "defaultMessage": "ドキュメントを読む"
   },
   "home.title.react_starter_store": {
-    "defaultMessage": "リテール用 React PWA Starter ストア"
+    "defaultMessage": "リテール用 React PWA Starter Store"
   },
   "item_attributes.label.promotions": {
     "defaultMessage": "プロモーション"
@@ -849,7 +845,7 @@
     "defaultMessage": "注文の概要"
   },
   "order_summary.label.estimated_total": {
-    "defaultMessage": "推定合計金額"
+    "defaultMessage": "見積合計金額"
   },
   "order_summary.label.free": {
     "defaultMessage": "無料"
@@ -1132,7 +1128,7 @@
     "defaultMessage": "配送先住所の編集"
   },
   "shipping_options.action.send_as_a_gift": {
-    "defaultMessage": "これはギフトですか?"
+    "defaultMessage": "ギフトとして発送しますか?"
   },
   "shipping_options.button.continue_to_payment": {
     "defaultMessage": "支払に進む"

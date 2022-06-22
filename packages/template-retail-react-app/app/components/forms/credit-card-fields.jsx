@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, salesforce.com, inc.
+ * Copyright (c) 2022, Salesforce, Inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
@@ -24,6 +24,22 @@ const CreditCardFields = ({form, prefix = ''}) => {
     const cardType = form.watch('cardType')
 
     const CardIcon = getCreditCardIcon(form.getValues().cardType)
+
+    // Note: The ternary should NOT be placed inside a call to `formatMessage`. The message
+    // extraction script (`npm run extract-default-translations`) only works when `formatMessage` is
+    // used with object literals.
+    const securityCodeTooltipLabel =
+        cardType === 'american-express'
+            ? formatMessage({
+                  id: 'credit_card_fields.tool_tip.security_code.american_express',
+                  defaultMessage: 'This 4-digit code can be found on the front of your card.',
+                  description: 'American Express security code help text'
+              })
+            : formatMessage({
+                  id: 'credit_card_fields.tool_tip.security_code',
+                  defaultMessage: 'This 3-digit code can be found on the back of your card.',
+                  description: 'Generic credit card security code help text'
+              })
 
     return (
         <Box>
@@ -101,22 +117,7 @@ const CreditCardFields = ({form, prefix = ''}) => {
                         formLabel={
                             <FormLabel>
                                 {fields.securityCode.label}{' '}
-                                <Tooltip
-                                    hasArrow
-                                    placement="top"
-                                    label={formatMessage(
-                                        {
-                                            id: 'credit_card_fields.tool_tip.security_code',
-                                            defaultMessage:
-                                                'This {length}-digit code can be found on the {side} of your card.',
-                                            description: 'Credit card security code help text'
-                                        },
-                                        {
-                                            length: cardType === 'american-express' ? 4 : 3,
-                                            side: cardType === 'american-express' ? 'front' : 'back'
-                                        }
-                                    )}
-                                >
+                                <Tooltip hasArrow placement="top" label={securityCodeTooltipLabel}>
                                     <InfoIcon boxSize={5} color="gray.700" ml={1} />
                                 </Tooltip>
                             </FormLabel>
