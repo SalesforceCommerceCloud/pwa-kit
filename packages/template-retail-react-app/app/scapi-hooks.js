@@ -16,59 +16,6 @@ import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
 const SCAPIContext = React.createContext()
 const initialValue = {name: 'scapiHooks', data: {}, requests: []}
 
-const basketsInitialState = {
-    isLoading: false,
-    error: false,
-    data: [],
-    total: 0
-}
-
-const basketReducer = (state, action) => {
-    console.log('state', state)
-    switch (action.type) {
-        case 'loading': {
-            return {
-                ...state,
-                isLoading: true
-            }
-        }
-        case 'add_to_cart': {
-            return {
-                ...state,
-                isLoading: false,
-                error: false,
-                // update the basket with res from server
-                data: state.data.map((basket) => {
-                    return basket.id === action.id ? action.payload : basket
-                })
-            }
-        }
-        case 'set_basket': {
-            return {
-                ...state,
-                isLoading: false,
-                error: false,
-                data: [...state.data, action.payload]
-            }
-        }
-        case 'set_baskets': {
-            return {
-                ...state,
-                isLoading: false,
-                error: false,
-                data: action.payload.baskets,
-                total: action.payload.total
-            }
-        }
-        case 'basket_error': {
-            return {...state, isLoading: false, error: true}
-        }
-        default: {
-            throw new Error(`Unhandled action type: ${action.type}`)
-        }
-    }
-}
-
 const getCommerceApiConfig = () => {
     const {app} = getConfig()
     const commerceConfig = {
@@ -82,114 +29,115 @@ const getCommerceApiConfig = () => {
 
 const basketShopperAPI = () => {
     const commerceConfig = getCommerceApiConfig()
+    // set up
 }
 // basket-context.js
 
-const BasketsContext = React.createContext()
-const BasketsProvider = ({children}) => {
-    // TODO: we should separate api into different apis context instead of having a combined api object here
-    // for example: ShopperBasketAPI, ShopperCustomerAPI
-    const api = useCommerceAPI()
-
-    // slas hooks
-    const shopper = useCustomer()
-    // Create or restore the user session upon mounting
-    // this flow should stay in shopper hook
-    useEffect(() => {
-        shopper.login()
-    }, [])
-
-    const [baskets, dispatch] = React.useReducer(basketReducer, basketsInitialState)
-
-    const value = React.useMemo(() => ({baskets, dispatch}), [baskets])
-
-    const createBasket = async () => {
-        dispatch({type: 'loading'})
-        try {
-            const res = await api.shopperBaskets.createBasket({})
-            console.log('seting a basket====================')
-            dispatch({type: 'set_basket', payload: res})
-            return res
-        } catch (err) {
-            dispatch({type: 'error'})
-            throw new Error(err)
-        }
-    }
-
-    const getBaskets = async () => {
-        dispatch({type: 'loading'})
-        try {
-            console.log('getting baskets---------------------------')
-            console.log('api.shopperBaskets', api.shopperBaskets)
-            const res = await api.shopperCustomers.getCustomerBaskets({
-                parameters: {customerId: shopper?.customerId}
-            })
-            console.log('res', res)
-            if (!res.total) {
-                console.log('creating a basket ----------------------------')
-                await createBasket()
-            }
-
-            console.log('setting baskets-------------------------')
-            dispatch({type: 'set_baskets', payload: res})
-        } catch (e) {
-            console.log('basket error --------------------')
-            console.log('e', e)
-        }
-    }
-
-    const addItemToCart = async (item, basketId) => {
-        console.log('add to cart loading ----')
-        dispatch({type: 'loading'})
-        try {
-            console.log('adding-item to cart')
-            const res = await api.shopperBaskets.addItemToBasket({
-                body: item,
-                parameters: {basketId}
-            })
-            console.log('res', res)
-            dispatch({type: 'add_to_cart', payload: res})
-        } catch (err) {
-            dispatch({type: 'error'})
-            throw new Error(err)
-        }
-    }
-
-    // retrieve the baskets information on first render
-    // if there is no basket, create one => can we delay this until someone adds an item to cart
-    React.useEffect(() => {
-        console.log('Initializing baskets =========================')
-        // console.log('baskets', baskets)
-        // console.log('shoppers', shopper)
-        // console.log('>>>>>>')
-
-        if (!baskets.data.length && shopper.isInitialized) {
-            dispatch({type: 'loading'})
-            try {
-                console.log('getting and setting up basket>>>>>>>>>>>>>>>>>>>>>>')
-                getBaskets(shopper.customerId)
-            } catch (err) {
-                dispatch({type: 'error'})
-                throw new Error(err)
-            }
-        }
-    }, [shopper.authType, baskets.total])
-
-    // handle anything related to basket here
-    return (
-        <BasketsContext.Provider value={{...value, addItemToCart}}>
-            {children}
-        </BasketsContext.Provider>
-    )
-}
-
-export const useBaskets = () => {
-    const context = React.useContext(BasketsContext)
-    if (context === undefined) {
-        throw new Error(`useUser must be used within a UserProvider`)
-    }
-    return context
-}
+// const BasketsContext = React.createContext()
+// const BasketsProvider = ({children}) => {
+//     // TODO: we should separate api into different apis context instead of having a combined api object here
+//     // for example: ShopperBasketAPI, ShopperCustomerAPI
+//     const api = useCommerceAPI()
+//
+//     // slas hooks
+//     const shopper = useCustomer()
+//     // Create or restore the user session upon mounting
+//     // this flow should stay in shopper hook
+//     useEffect(() => {
+//         shopper.login()
+//     }, [])
+//
+//     const [baskets, dispatch] = React.useReducer(basketReducer, basketsInitialState)
+//
+//     const value = React.useMemo(() => ({baskets, dispatch}), [baskets])
+//
+//     const createBasket = async () => {
+//         dispatch({type: 'loading'})
+//         try {
+//             const res = await api.shopperBaskets.createBasket({})
+//             console.log('seting a basket====================')
+//             dispatch({type: 'set_basket', payload: res})
+//             return res
+//         } catch (err) {
+//             dispatch({type: 'error'})
+//             throw new Error(err)
+//         }
+//     }
+//
+//     const getBaskets = async () => {
+//         dispatch({type: 'loading'})
+//         try {
+//             console.log('getting baskets---------------------------')
+//             console.log('api.shopperBaskets', api.shopperBaskets)
+//             const res = await api.shopperCustomers.getCustomerBaskets({
+//                 parameters: {customerId: shopper?.customerId}
+//             })
+//             console.log('res', res)
+//             if (!res.total) {
+//                 console.log('creating a basket ----------------------------')
+//                 await createBasket()
+//             }
+//
+//             console.log('setting baskets-------------------------')
+//             dispatch({type: 'set_baskets', payload: res})
+//         } catch (e) {
+//             console.log('basket error --------------------')
+//             console.log('e', e)
+//         }
+//     }
+//
+//     const addItemToCart = async (item, basketId) => {
+//         console.log('add to cart loading ----')
+//         dispatch({type: 'loading'})
+//         try {
+//             console.log('adding-item to cart')
+//             const res = await api.shopperBaskets.addItemToBasket({
+//                 body: item,
+//                 parameters: {basketId}
+//             })
+//             console.log('res', res)
+//             dispatch({type: 'add_to_cart', payload: res})
+//         } catch (err) {
+//             dispatch({type: 'error'})
+//             throw new Error(err)
+//         }
+//     }
+//
+//     // retrieve the baskets information on first render
+//     // if there is no basket, create one => can we delay this until someone adds an item to cart
+//     React.useEffect(() => {
+//         console.log('Initializing baskets =========================')
+//         // console.log('baskets', baskets)
+//         // console.log('shoppers', shopper)
+//         // console.log('>>>>>>')
+//
+//         if (!baskets.data.length && shopper.isInitialized) {
+//             dispatch({type: 'loading'})
+//             try {
+//                 console.log('getting and setting up basket>>>>>>>>>>>>>>>>>>>>>>')
+//                 getBaskets(shopper.customerId)
+//             } catch (err) {
+//                 dispatch({type: 'error'})
+//                 throw new Error(err)
+//             }
+//         }
+//     }, [shopper.authType, baskets.total])
+//
+//     // handle anything related to basket here
+//     return (
+//         <BasketsContext.Provider value={{...value, addItemToCart}}>
+//             {children}
+//         </BasketsContext.Provider>
+//     )
+// }
+//
+// export const useBaskets = () => {
+//     const context = React.useContext(BasketsContext)
+//     if (context === undefined) {
+//         throw new Error(`useUser must be used within a UserProvider`)
+//     }
+//     return context
+// }
 
 // put this into a module?
 /**
@@ -231,9 +179,7 @@ export const SCAPIProvider = (props) => {
 
     return (
         <SCAPIContext.Provider value={{}}>
-            <ServerEffectProvider value={effectsValues}>
-                <BasketsProvider>{props.children}</BasketsProvider>
-            </ServerEffectProvider>
+            <ServerEffectProvider value={effectsValues}>{props.children}</ServerEffectProvider>
         </SCAPIContext.Provider>
     )
 }

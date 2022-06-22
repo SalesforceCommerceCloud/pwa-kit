@@ -48,6 +48,8 @@ import {noop} from '../../utils/utils'
 import {navLinks, messages} from '../../pages/account/constant'
 import useNavigation from '../../hooks/use-navigation'
 import LoadingSpinner from '../loading-spinner'
+import {useBaskets} from '../../commerce-hooks/context/shopper-basket-context'
+import {getItemTotal} from '../../commerce-hooks/utils/baskets'
 
 const ENTER_KEY = 'Enter'
 
@@ -112,6 +114,8 @@ const Header = ({
         }, 100)
     }
 
+    const {baskets} = useBaskets()
+    console.log('baskets', baskets)
     return (
         <Box {...styles.container} {...props}>
             <Box {...styles.content}>
@@ -139,6 +143,25 @@ const Header = ({
                         onClick={onLogoClick}
                     />
                     <Box {...styles.bodyContainer}>{children}</Box>
+                    <IconButton
+                        aria-label={intl.formatMessage({
+                            id: 'header.button.assistive_msg.my_cart_1',
+                            defaultMessage: 'My cart'
+                        })}
+                        icon={
+                            <>
+                                <BasketIcon />
+                                {baskets.data?.length > 0 && (
+                                    <Badge variant="notification">
+                                        {getItemTotal(baskets.data, baskets.data[0].basketId)}
+                                    </Badge>
+                                )}
+                            </>
+                        }
+                        variant="unstyled"
+                        {...styles.icons}
+                        onClick={onMyCartClick}
+                    />
                     <Box {...styles.searchContainer}>
                         <Search
                             placeholder={intl.formatMessage({
