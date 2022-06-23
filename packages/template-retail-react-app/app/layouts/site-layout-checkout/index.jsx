@@ -1,47 +1,40 @@
-// /components/site-layout/index.jsx
+/*
+ * Copyright (c) 2022, Salesforce, Inc.
+ * All rights reserved.
+ * SPDX-License-Identifier: BSD-3-Clause
+ * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
+ */
 import React, {useEffect, useState} from 'react'
-import {Box, Link, useDisclosure, useStyleConfig} from "@chakra-ui/react";
-import {getAppOrigin} from "pwa-kit-react-sdk/utils/url";
-import {useHistory, useLocation} from "react-router-dom";
-import {AuthModal, useAuthModal} from "../../hooks/use-auth-modal";
-import useCustomer from "../../commerce-api/hooks/useCustomer";
-import useSite from "../../hooks/use-site";
-import useLocale from "../../hooks/use-locale";
-import useShopper from "../../commerce-api/hooks/useShopper";
-import useWishlist from "../../hooks/use-wishlist";
-import {watchOnlineStatus} from "../../utils/utils";
-import {buildPathWithUrlConfig, getPathWithLocale, homeUrlBuilder} from "../../utils/url";
-import {DEFAULT_SITE_TITLE, HOME_HREF, THEME_COLOR} from "../../constants";
+import {Box, useDisclosure, useStyleConfig} from '@chakra-ui/react'
+import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
+import {useLocation} from 'react-router-dom'
+import {AuthModal, useAuthModal} from '../../hooks/use-auth-modal'
+import useCustomer from '../../commerce-api/hooks/useCustomer'
+import useSite from '../../hooks/use-site'
+import useLocale from '../../hooks/use-locale'
+import useShopper from '../../commerce-api/hooks/useShopper'
+import useWishlist from '../../hooks/use-wishlist'
+import {watchOnlineStatus} from '../../utils/utils'
+import {getPathWithLocale} from '../../utils/url'
+import {DEFAULT_SITE_TITLE, THEME_COLOR} from '../../constants'
 
-import Seo from "../../components/seo";
-import {getAssetUrl} from "pwa-kit-react-sdk/ssr/universal/utils";
-import ScrollToTop from "../../components/scroll-to-top";
-import {SkipNavContent, SkipNavLink} from "@chakra-ui/skip-nav";
+import Seo from '../../components/seo'
+import {getAssetUrl} from 'pwa-kit-react-sdk/ssr/universal/utils'
+import ScrollToTop from '../../components/scroll-to-top'
+import {SkipNavContent, SkipNavLink} from '@chakra-ui/skip-nav'
 
-import {HideOnDesktop, HideOnMobile} from "../../components/responsive";
-import DrawerMenu from "../../components/drawer-menu";
-import ListMenu from "../../components/list-menu";
-import CheckoutHeader from "../../pages/checkout/partials/checkout-header";
-import OfflineBanner from "../../components/offline-banner";
-import {AddToCartModalProvider} from "../../hooks/use-add-to-cart-modal";
-import OfflineBoundary from "../../components/offline-boundary";
-import CheckoutFooter from "../../pages/checkout/partials/checkout-footer";
+import CheckoutHeader from '../../pages/checkout/partials/checkout-header'
+import OfflineBanner from '../../components/offline-banner'
+import {AddToCartModalProvider} from '../../hooks/use-add-to-cart-modal'
+import OfflineBoundary from '../../components/offline-boundary'
+import CheckoutFooter from '../../pages/checkout/partials/checkout-footer'
+import PropTypes from 'prop-types'
 
-const DEFAULT_NAV_DEPTH = 3
-const DEFAULT_ROOT_CATEGORY = 'root'
-
-import {useCategories} from '../../hooks/use-categories'
-
-const SiteLayout = (props) => {
-
-
-    const {children, targetLocale, messages} = props
-
-    const {categories: allCategories = {}} = useCategories()
+const SiteLayoutCheckout = (props) => {
+    const {children} = props
 
     const appOrigin = getAppOrigin()
 
-    const history = useHistory()
     const location = useLocation()
     const authModal = useAuthModal()
     const customer = useCustomer()
@@ -52,13 +45,7 @@ const SiteLayout = (props) => {
     const [isOnline, setIsOnline] = useState(true)
     const styles = useStyleConfig('App')
 
-    const configValues = {
-        locale: locale.alias || locale.id,
-        site: site.alias || site.id
-    }
-
-    const {isOpen, onOpen, onClose} = useDisclosure()
-
+    const {onClose} = useDisclosure()
 
     const {l10n} = site
     // Get the current currency to be used through out the app
@@ -93,10 +80,7 @@ const SiteLayout = (props) => {
         onClose()
     }, [location])
 
-
-
     return (
-
         <>
             <h1>CheckoutLayout</h1>
             <Seo>
@@ -138,7 +122,7 @@ const SiteLayout = (props) => {
                 <SkipNavLink zIndex="skipLink">Skip to Content</SkipNavLink>
 
                 <Box {...styles.headerWrapper}>
-                        <CheckoutHeader />
+                    <CheckoutHeader />
                 </Box>
 
                 {!isOnline && <OfflineBanner />}
@@ -159,9 +143,7 @@ const SiteLayout = (props) => {
                             flexDirection="column"
                             flex="1"
                         >
-                            <OfflineBoundary isOnline={false}>
-                                {children}
-                            </OfflineBoundary>
+                            <OfflineBoundary isOnline={false}>{children}</OfflineBoundary>
                         </Box>
                     </SkipNavContent>
 
@@ -170,12 +152,16 @@ const SiteLayout = (props) => {
                     <AuthModal {...authModal} />
                 </AddToCartModalProvider>
             </Box>
-
         </>
     )
 }
 
-export const getLayout = page =>{
-    return (<SiteLayout>{page}</SiteLayout>)}
+SiteLayoutCheckout.propTypes = {
+    children: PropTypes.node
+}
 
-export default SiteLayout
+export const getLayout = (page) => {
+    return <SiteLayoutCheckout>{page}</SiteLayoutCheckout>
+}
+
+export default SiteLayoutCheckout

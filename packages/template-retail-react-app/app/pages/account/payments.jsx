@@ -33,7 +33,7 @@ import {PlusIcon, PaymentIcon} from '../../components/icons'
 import ActionCard from '../../components/action-card'
 import CreditCardFields from '../../components/forms/credit-card-fields'
 import PageActionPlaceHolder from '../../components/page-action-placeholder'
-import {getLayout} from "../../layouts/account";
+import {getLayout} from '../../layouts/account'
 
 const DEFAULT_SKELETON_COUNT = 3
 

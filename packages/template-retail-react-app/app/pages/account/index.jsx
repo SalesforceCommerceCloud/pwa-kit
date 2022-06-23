@@ -8,10 +8,9 @@
 import React, {useState} from 'react'
 import PropTypes from 'prop-types'
 
-import {getLayout} from "../../layouts/account";
+import {getLayout} from '../../layouts/account'
 
-const Account = () => {
-}
+const Account = () => {}
 
 Account.getLayout = getLayout
 

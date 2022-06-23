@@ -13,21 +13,20 @@
 // metric for this file in its test.
 
 import React from 'react'
-import loadable from '@loadable/component'
+// import loadable from '@loadable/component'
 import {getConfig} from 'pwa-kit-runtime/utils/ssr-config'
 
 // Components
-import {Skeleton} from '@chakra-ui/react'
+// import {Skeleton} from '@chakra-ui/react'
 import {configureRoutes} from './utils/routes-utils'
 
-const fallback = <Skeleton height="75vh" width="100%" />
+// const fallback = <Skeleton height="75vh" width="100%" />
 
 // Pages
 import Home from './pages/home'
 import Login from './pages/login'
 import Registration from './pages/registration'
 import ResetPassword from './pages/reset-password'
-import Account from './pages/account'
 import Cart from './pages/cart'
 import Checkout from './pages/checkout'
 import CheckoutConfirmation from './pages/checkout/confirmation'
@@ -36,12 +35,11 @@ import ProductDetail from './pages/product-detail'
 import ProductList from './pages/product-list'
 import Wishlist from './pages/account/wishlist'
 import PageNotFound from './pages/page-not-found'
-import AccountDetail from "./pages/account/profile";
-import AccountOrders from "./pages/account/orders";
-import AccountAddresses from "./pages/account/addresses";
-import AccountPaymentMethods from "./pages/account/payments";
-import AccountWishlist from "./pages/account/wishlist";
-
+import AccountDetail from './pages/account/profile'
+import AccountOrders from './pages/account/orders'
+import AccountAddresses from './pages/account/addresses'
+import AccountPaymentMethods from './pages/account/payments'
+import AccountWishlist from './pages/account/wishlist'
 
 const routes = [
     {

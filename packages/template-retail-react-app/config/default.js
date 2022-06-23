@@ -13,7 +13,11 @@ module.exports = {
             locale: 'path',
             showDefaults: true
         },
-        defaultSite: 'RefArch',
+        defaultSite: 'RefArchGlobal',
+        siteAliases: {
+            RefArch: 'us',
+            RefArchGlobal: 'global'
+        },
         sites,
         commerceAPI: {
             proxyPath: `/mobify/proxy/api`,

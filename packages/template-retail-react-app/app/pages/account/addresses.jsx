@@ -34,7 +34,7 @@ import ActionCard from '../../components/action-card'
 import AddressFields from '../../components/forms/address-fields'
 import AddressDisplay from '../../components/address-display'
 import PageActionPlaceHolder from '../../components/page-action-placeholder'
-import {getLayout} from "../../layouts/account";
+import {getLayout} from '../../layouts/account'
 
 const DEFAULT_SKELETON_COUNT = 3
 

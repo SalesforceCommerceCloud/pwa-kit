@@ -5,7 +5,8 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import { getLayout as getSiteLayoutHome } from '../site-layout-home'
+import {getLayout as getSiteLayoutHome} from '../site-layout-home'
+import PropTypes from 'prop-types'
 
 const HomeLayout = ({children}) => {
     return (
@@ -14,6 +15,10 @@ const HomeLayout = ({children}) => {
             <div>{children}</div>
         </div>
     )
+}
+
+HomeLayout.propTypes = {
+    children: PropTypes.node
 }
 
 export const getLayout = (page) => {

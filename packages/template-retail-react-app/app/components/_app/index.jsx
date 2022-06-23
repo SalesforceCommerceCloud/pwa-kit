@@ -5,53 +5,27 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useState, useEffect} from 'react'
+import React from 'react'
 import PropTypes from 'prop-types'
-import {useHistory, useLocation} from 'react-router-dom'
-import {getAssetUrl} from 'pwa-kit-react-sdk/ssr/universal/utils'
-import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
 
 // Chakra
-import {Box, useDisclosure, useStyleConfig} from '@chakra-ui/react'
-import {SkipNavLink, SkipNavContent} from '@chakra-ui/skip-nav'
+import {Box, useStyleConfig} from '@chakra-ui/react'
 
 // Contexts
 import {CategoriesProvider, CurrencyProvider} from '../../contexts'
 
-// Local Project Components
-import Header from '../../components/header'
-import OfflineBanner from '../../components/offline-banner'
-import OfflineBoundary from '../../components/offline-boundary'
-import ScrollToTop from '../../components/scroll-to-top'
-import Footer from '../../components/footer'
-import CheckoutHeader from '../../pages/checkout/partials/checkout-header'
-import CheckoutFooter from '../../pages/checkout/partials/checkout-footer'
-import DrawerMenu from '../drawer-menu'
-import ListMenu from '../list-menu'
-import {HideOnDesktop, HideOnMobile} from '../responsive'
-
-// Hooks
-import useShopper from '../../commerce-api/hooks/useShopper'
-import useCustomer from '../../commerce-api/hooks/useCustomer'
-import {AuthModal, useAuthModal} from '../../hooks/use-auth-modal'
-import {AddToCartModalProvider} from '../../hooks/use-add-to-cart-modal'
-import useSite from '../../hooks/use-site'
 import useLocale from '../../hooks/use-locale'
-import useWishlist from '../../hooks/use-wishlist'
 
 // Localization
 import {IntlProvider} from 'react-intl'
 
 // Others
-import {watchOnlineStatus, flatten} from '../../utils/utils'
-import {homeUrlBuilder, getPathWithLocale, buildPathWithUrlConfig} from '../../utils/url'
+import {flatten} from '../../utils/utils'
 import {getTargetLocale, fetchTranslations} from '../../utils/locale'
-import {DEFAULT_SITE_TITLE, HOME_HREF, THEME_COLOR} from '../../constants'
 
-import Seo from '../seo'
 import {resolveSiteFromUrl} from '../../utils/site-utils'
 
-import {getLayout as getSiteLayout} from "../../layouts/site-layout";
+import {getLayout as getSiteLayout} from '../../layouts/site-layout'
 
 const DEFAULT_NAV_DEPTH = 3
 const DEFAULT_ROOT_CATEGORY = 'root'
@@ -66,9 +40,8 @@ const App = (props) => {
     // Get the current currency to be used through out the app
     const currency = locale.preferredCurrency || l10n.defaultCurrency
 
-        return (
-            <Box className="sf-app" {...styles.container}>
-
+    return (
+        <Box className="sf-app" {...styles.container}>
             <IntlProvider
                 onError={(err) => {
                     if (err.code === 'MISSING_TRANSLATION') {
@@ -88,9 +61,7 @@ const App = (props) => {
                 defaultLocale="en-US"
             >
                 <CategoriesProvider categories={allCategories}>
-                    <CurrencyProvider currency={currency}>
-                        {children}
-                    </CurrencyProvider>
+                    <CurrencyProvider currency={currency}>{children}</CurrencyProvider>
                 </CategoriesProvider>
             </IntlProvider>
         </Box>

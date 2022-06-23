@@ -21,7 +21,7 @@ import WishlistPrimaryAction from './partials/wishlist-primary-action'
 import WishlistSecondaryButtonGroup from './partials/wishlist-secondary-button-group'
 
 import {API_ERROR_MESSAGE} from '../../../constants'
-import {getLayout} from "../../../layouts/account";
+import {getLayout} from '../../../layouts/account'
 
 const numberOfSkeletonItems = 3
 

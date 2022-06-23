@@ -8,7 +8,7 @@
 import React, {useState} from 'react'
 import PropTypes from 'prop-types'
 import {FormattedMessage, useIntl} from 'react-intl'
-import {useRouteMatch, Redirect} from 'react-router'
+import {Redirect} from 'react-router'
 import {
     Accordion,
     AccordionButton,
@@ -35,10 +35,9 @@ import LoadingSpinner from '../../components/loading-spinner'
 import {buildPathWithUrlConfig} from '../../utils/url'
 import useLocale from '../../hooks/use-locale'
 import useSite from '../../hooks/use-site'
-import {getLayout as getSiteLayout} from "../site-layout";
+import {getLayout as getSiteLayout} from '../site-layout'
 
 const Account = ({children}) => {
-    const {path} = useRouteMatch()
     const {formatMessage} = useIntl()
     const customer = useCustomer()
     const locale = useLocale()
@@ -190,7 +189,6 @@ const Account = ({children}) => {
                 </Stack>
 
                 {children}
-
             </Grid>
         </Box>
     )
@@ -199,10 +197,10 @@ const Account = ({children}) => {
 Account.getTemplateName = () => 'account'
 
 Account.propTypes = {
-    match: PropTypes.object
+    children: PropTypes.node
 }
 
-export const getLayout = page =>{
+export const getLayout = (page) => {
     return getSiteLayout(<Account>{page}</Account>)
 }
 

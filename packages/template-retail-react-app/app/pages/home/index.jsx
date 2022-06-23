@@ -9,7 +9,6 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import {useIntl, FormattedMessage} from 'react-intl'
 
-
 // Components
 import {
     Box,

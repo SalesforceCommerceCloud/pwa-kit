@@ -10,7 +10,7 @@ import {Route, Switch, useRouteMatch} from 'react-router'
 import OrderHistory from './order-history'
 import OrderDetail from './order-detail'
 import {AccountOrdersProvider} from './util/order-context'
-import {getLayout} from "../../layouts/account";
+import {getLayout} from '../../layouts/account'
 
 const AccountOrders = () => {
     const {path} = useRouteMatch()

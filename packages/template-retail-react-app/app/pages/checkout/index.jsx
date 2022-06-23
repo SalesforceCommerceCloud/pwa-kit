@@ -142,7 +142,6 @@ const CheckoutContainer = () => {
     )
 }
 
-
 CheckoutContainer.getLayout = getLayout
 
 export default CheckoutContainer
