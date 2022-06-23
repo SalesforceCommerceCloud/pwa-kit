@@ -36,7 +36,6 @@ import ProductDetail from './pages/product-detail'
 import ProductList from './pages/product-list'
 import Wishlist from './pages/account/wishlist'
 import PageNotFound from './pages/page-not-found'
-import AccountSettingsBasicInformation from './pages/account-settings/basic-information'
 import AccountDetail from "./pages/account/profile";
 import AccountOrders from "./pages/account/orders";
 import AccountAddresses from "./pages/account/addresses";
@@ -120,10 +119,6 @@ const routes = [
     {
         path: '/account/wishlist',
         component: Wishlist
-    },
-    {
-        path: '/account-settings/basic-information',
-        component: AccountSettingsBasicInformation
     },
     {
         path: '*',

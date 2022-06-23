@@ -8,7 +8,7 @@
 import React, {useState} from 'react'
 import PropTypes from 'prop-types'
 import {FormattedMessage, useIntl} from 'react-intl'
-import {Route, Switch, useRouteMatch, Redirect} from 'react-router'
+import {useRouteMatch, Redirect} from 'react-router'
 import {
     Accordion,
     AccordionButton,
@@ -23,20 +23,19 @@ import {
     Text,
     Divider
 } from '@chakra-ui/react'
-import useCustomer from '../../../commerce-api/hooks/useCustomer'
-import Seo from '../../../components/seo'
-import Link from '../../../components/link'
-import {ChevronDownIcon, ChevronUpIcon, SignoutIcon} from '../../../components/icons'
+import useCustomer from '../../commerce-api/hooks/useCustomer'
+import Seo from '../../components/seo'
+import Link from '../../components/link'
+import {ChevronDownIcon, ChevronUpIcon, SignoutIcon} from '../../components/icons'
 import {useLocation} from 'react-router-dom'
 
-import {messages, navLinks} from '../constant'
-import useNavigation from '../../../hooks/use-navigation'
-import LoadingSpinner from '../../../components/loading-spinner'
-import {buildPathWithUrlConfig} from '../../../utils/url'
-import useLocale from '../../../hooks/use-locale'
-import useSite from '../../../hooks/use-site'
-import {getLayout as getSiteLayout} from "../../../layouts/site-layout";
-import AccountSettingsLayout from "../../../layouts/account-settings-layout";
+import {messages, navLinks} from '../../pages/account/constant'
+import useNavigation from '../../hooks/use-navigation'
+import LoadingSpinner from '../../components/loading-spinner'
+import {buildPathWithUrlConfig} from '../../utils/url'
+import useLocale from '../../hooks/use-locale'
+import useSite from '../../hooks/use-site'
+import {getLayout as getSiteLayout} from "../site-layout";
 
 const Account = ({children}) => {
     const {path} = useRouteMatch()
@@ -101,6 +100,7 @@ const Account = ({children}) => {
             layerStyle="page"
             paddingTop={[4, 4, 12, 12, 16]}
         >
+            <h1>AccountLayout</h1>
             <Seo title="My Account" description="Customer Account Page" />
             <Grid templateColumns={{base: '1fr', lg: '320px 1fr'}} gap={{base: 10, lg: 24}}>
                 {/* small screen nav accordion */}
@@ -190,23 +190,7 @@ const Account = ({children}) => {
                 </Stack>
 
                 {children}
-                {/*<Switch>*/}
-                {/*    <Route exact path={path}>*/}
-                {/*        <AccountDetail />*/}
-                {/*    </Route>*/}
-                {/*    <Route exact path={`${path}/wishlist`}>*/}
-                {/*        <AccountWishlist />*/}
-                {/*    </Route>*/}
-                {/*    <Route exact path={`${path}/addresses`}>*/}
-                {/*        <AccountAddresses />*/}
-                {/*    </Route>*/}
-                {/*    <Route path={`${path}/orders`}>*/}
-                {/*        <AccountOrders />*/}
-                {/*    </Route>*/}
-                {/*    <Route exact path={`${path}/payments`}>*/}
-                {/*        <AccountPaymentMethods />*/}
-                {/*    </Route>*/}
-                {/*</Switch>*/}
+
             </Grid>
         </Box>
     )
@@ -219,7 +203,7 @@ Account.propTypes = {
 }
 
 export const getLayout = page =>{
-    return (<Account>{page}</Account>)
+    return getSiteLayout(<Account>{page}</Account>)
 }
 
 export default Account
