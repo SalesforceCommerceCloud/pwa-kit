@@ -1,4 +1,4 @@
-// /components/site-layout/index.jsx
+
 import React, {useEffect, useState} from 'react'
 import {Box, Link, useDisclosure, useStyleConfig} from "@chakra-ui/react";
 import {getAppOrigin} from "pwa-kit-react-sdk/utils/url";
@@ -12,23 +12,19 @@ import useWishlist from "../../hooks/use-wishlist";
 import {watchOnlineStatus} from "../../utils/utils";
 import {buildPathWithUrlConfig, getPathWithLocale, homeUrlBuilder} from "../../utils/url";
 import {DEFAULT_SITE_TITLE, HOME_HREF, THEME_COLOR} from "../../constants";
-import {IntlProvider} from "react-intl";
- import {CategoriesProvider, CurrencyProvider} from "../../contexts";
 
- import Seo from "../../components/seo";
- import {getAssetUrl} from "pwa-kit-react-sdk/ssr/universal/utils";
- import ScrollToTop from "../../components/scroll-to-top";
- import {SkipNavContent, SkipNavLink} from "@chakra-ui/skip-nav";
+import Seo from "../../components/seo";
+import {getAssetUrl} from "pwa-kit-react-sdk/ssr/universal/utils";
+import ScrollToTop from "../../components/scroll-to-top";
+import {SkipNavContent, SkipNavLink} from "@chakra-ui/skip-nav";
 import Header from "../../components/header";
 import {HideOnDesktop, HideOnMobile} from "../../components/responsive";
 import DrawerMenu from "../../components/drawer-menu";
 import ListMenu from "../../components/list-menu";
-import CheckoutHeader from "../../pages/checkout/partials/checkout-header";
 import OfflineBanner from "../../components/offline-banner";
 import {AddToCartModalProvider} from "../../hooks/use-add-to-cart-modal";
 import OfflineBoundary from "../../components/offline-boundary";
 import Footer from "../../components/footer";
-import CheckoutFooter from "../../pages/checkout/partials/checkout-footer";
 
 const DEFAULT_NAV_DEPTH = 3
 const DEFAULT_ROOT_CATEGORY = 'root'
@@ -41,7 +37,7 @@ const SiteLayout = (props) => {
     const {children, targetLocale, messages} = props
 
     const {categories: allCategories = {}} = useCategories()
-    console.log('<SiteLayout /> allCategories:', allCategories)
+
     const appOrigin = getAppOrigin()
 
     const history = useHistory()
@@ -51,8 +47,6 @@ const SiteLayout = (props) => {
 
     const site = useSite()
     const locale = useLocale()
-
-    console.log('SiteLayout locale:', locale)
 
     const [isOnline, setIsOnline] = useState(true)
     const styles = useStyleConfig('App')
@@ -64,8 +58,6 @@ const SiteLayout = (props) => {
 
     const {isOpen, onOpen, onClose} = useDisclosure()
 
-    // Used to conditionally render header/footer for checkout page
-    const isCheckout = /\/checkout$/.test(location?.pathname)
 
     const {l10n} = site
     // Get the current currency to be used through out the app
@@ -134,9 +126,6 @@ const SiteLayout = (props) => {
         history.push(path)
     }
 
-    const getLayout =
-        children.getLayout || (page => <SiteLayout children={page} />)
-
 
 
     return (
@@ -182,7 +171,7 @@ const SiteLayout = (props) => {
                             <SkipNavLink zIndex="skipLink">Skip to Content</SkipNavLink>
 
                             <Box {...styles.headerWrapper}>
-                                {!isCheckout ? (
+
                                     <Header
                                         onMenuClick={onOpen}
                                         onLogoClick={onLogoClick}
@@ -203,9 +192,7 @@ const SiteLayout = (props) => {
                                             <ListMenu root={allCategories[DEFAULT_ROOT_CATEGORY]} />
                                         </HideOnMobile>
                                     </Header>
-                                ) : (
-                                    <CheckoutHeader />
-                                )}
+
                             </Box>
 
                             {!isOnline && <OfflineBanner />}
@@ -232,7 +219,7 @@ const SiteLayout = (props) => {
                                     </Box>
                                 </SkipNavContent>
 
-                                {!isCheckout ? <Footer /> : <CheckoutFooter />}
+                              <Footer />
 
                                 <AuthModal {...authModal} />
                             </AddToCartModalProvider>
@@ -243,7 +230,6 @@ const SiteLayout = (props) => {
 }
 
 export const getLayout = page =>{
-    console.log('SiteLayout page:', page)
     return (<SiteLayout>{page}</SiteLayout>)}
 
 export default SiteLayout

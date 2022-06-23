@@ -17,7 +17,7 @@ import useBasket from '../../commerce-api/hooks/useBasket'
 import Payment from './partials/payment'
 import CheckoutSkeleton from './partials/checkout-skeleton'
 import OrderSummary from '../../components/order-summary'
-import {getLayout} from '../../layouts/checkout'
+import {getLayout} from '../../layouts/site-layout-checkout'
 
 const Checkout = () => {
     const navigate = useNavigation()

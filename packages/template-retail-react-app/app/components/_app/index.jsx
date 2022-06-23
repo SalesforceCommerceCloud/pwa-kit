@@ -68,7 +68,6 @@ const App = (props) => {
 
         return (
             <Box className="sf-app" {...styles.container}>
-                <h1>_app</h1>
 
             <IntlProvider
                 onError={(err) => {

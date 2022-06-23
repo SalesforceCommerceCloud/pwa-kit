@@ -5,19 +5,19 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import { getLayout as getSiteLayout } from '../site-layout-b'
+import { getLayout as getSiteLayoutHome } from '../site-layout-home'
 
-const PWAPDPALayout = ({children}) => {
+const HomeLayout = ({children}) => {
     return (
         <div>
-            PWAPDPALayout template-retail-react-app PDP-A
+            HomeLayout
             <div>{children}</div>
         </div>
     )
 }
 
 export const getLayout = (page) => {
-    return getSiteLayout(<PWAPDPALayout>{page}</PWAPDPALayout>)
+    return getSiteLayoutHome(<HomeLayout>{page}</HomeLayout>)
 }
 
-export default PWAPDPALayout
+export default HomeLayout

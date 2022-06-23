@@ -31,8 +31,7 @@ import Section from '../../components/section'
 import ProductScroller from '../../components/product-scroller'
 
 // Layout
-import {getLayout} from '../../layouts/pdp-a'
-// import { getLayout } from '../../layouts/site-layout'
+import {getLayout} from '../../layouts/home'
 
 // Others
 import {getAssetUrl} from 'pwa-kit-react-sdk/ssr/universal/utils'

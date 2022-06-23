@@ -12,14 +12,12 @@ import useWishlist from "../../hooks/use-wishlist";
 import {watchOnlineStatus} from "../../utils/utils";
 import {buildPathWithUrlConfig, getPathWithLocale, homeUrlBuilder} from "../../utils/url";
 import {DEFAULT_SITE_TITLE, HOME_HREF, THEME_COLOR} from "../../constants";
-import {IntlProvider} from "react-intl";
-import {CategoriesProvider, CurrencyProvider} from "../../contexts";
 
 import Seo from "../../components/seo";
 import {getAssetUrl} from "pwa-kit-react-sdk/ssr/universal/utils";
 import ScrollToTop from "../../components/scroll-to-top";
 import {SkipNavContent, SkipNavLink} from "@chakra-ui/skip-nav";
-import Header from "../../components/header";
+
 import {HideOnDesktop, HideOnMobile} from "../../components/responsive";
 import DrawerMenu from "../../components/drawer-menu";
 import ListMenu from "../../components/list-menu";
@@ -27,7 +25,6 @@ import CheckoutHeader from "../../pages/checkout/partials/checkout-header";
 import OfflineBanner from "../../components/offline-banner";
 import {AddToCartModalProvider} from "../../hooks/use-add-to-cart-modal";
 import OfflineBoundary from "../../components/offline-boundary";
-import Footer from "../../components/footer";
 import CheckoutFooter from "../../pages/checkout/partials/checkout-footer";
 
 const DEFAULT_NAV_DEPTH = 3
@@ -41,7 +38,7 @@ const SiteLayout = (props) => {
     const {children, targetLocale, messages} = props
 
     const {categories: allCategories = {}} = useCategories()
-    console.log('<SiteLayout /> allCategories:', allCategories)
+
     const appOrigin = getAppOrigin()
 
     const history = useHistory()
@@ -51,8 +48,6 @@ const SiteLayout = (props) => {
 
     const site = useSite()
     const locale = useLocale()
-
-    console.log('SiteLayout locale:', locale)
 
     const [isOnline, setIsOnline] = useState(true)
     const styles = useStyleConfig('App')
@@ -98,43 +93,6 @@ const SiteLayout = (props) => {
         onClose()
     }, [location])
 
-    const onLogoClick = () => {
-        // Goto the home page.
-        const path = homeUrlBuilder(HOME_HREF, {locale, site})
-        history.push(path)
-
-        // Close the drawer.
-        onClose()
-    }
-
-    const onCartClick = () => {
-        const path = buildPathWithUrlConfig('/cart', configValues)
-        history.push(path)
-
-        // Close the drawer.
-        onClose()
-    }
-
-    const onAccountClick = () => {
-        // Link to account page for registered customer, open auth modal otherwise
-        if (customer.isRegistered) {
-            const path = buildPathWithUrlConfig('/account', configValues)
-            history.push(path)
-        } else {
-            // if they already are at the login page, do not show login modal
-            if (new RegExp(`^/login$`).test(location.pathname)) return
-            authModal.onOpen()
-        }
-    }
-
-    const onWishlistClick = () => {
-        const path = buildPathWithUrlConfig('/account/wishlist', configValues)
-        history.push(path)
-    }
-
-    const getLayout =
-        children.getLayout || (page => <SiteLayout children={page} />)
-
 
 
     return (
@@ -151,7 +109,7 @@ const SiteLayout = (props) => {
                 <link rel="manifest" href={getAssetUrl('static/manifest.json')} />
 
                 {/* Urls for all localized versions of this page (including current page)
-                            For more details on hrefLang, see https://developers.google.com/search/docs/advanced/crawling/localized-versions */}
+                 For more details on hrefLang, see https://developers.google.com/search/docs/advanced/crawling/localized-versions */}
                 {site.l10n?.supportedLocales.map((locale) => (
                     <link
                         rel="alternate"
