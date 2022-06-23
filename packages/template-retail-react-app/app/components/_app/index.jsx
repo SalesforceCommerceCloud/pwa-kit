@@ -51,7 +51,7 @@ import {DEFAULT_SITE_TITLE, HOME_HREF, THEME_COLOR} from '../../constants'
 import Seo from '../seo'
 import {resolveSiteFromUrl} from '../../utils/site-utils'
 
-import SiteLayout from "../../layouts/site-layout";
+import {getLayout as getSiteLayout} from "../../layouts/site-layout";
 
 const DEFAULT_NAV_DEPTH = 3
 const DEFAULT_ROOT_CATEGORY = 'root'
@@ -59,103 +59,17 @@ const DEFAULT_ROOT_CATEGORY = 'root'
 const App = (props) => {
     const {children, targetLocale, messages, categories: allCategories = {}} = props
 
-    const appOrigin = getAppOrigin()
-
-    const history = useHistory()
-    const location = useLocation()
-    const authModal = useAuthModal()
-    const customer = useCustomer()
-
-    const site = useSite()
     const locale = useLocale()
 
-    const [isOnline, setIsOnline] = useState(true)
     const styles = useStyleConfig('App')
 
-    const configValues = {
-        locale: locale.alias || locale.id,
-        site: site.alias || site.id
-    }
-
-    const {isOpen, onOpen, onClose} = useDisclosure()
-
-    // Used to conditionally render header/footer for checkout page
-    const isCheckout = /\/checkout$/.test(location?.pathname)
-
-    const {l10n} = site
     // Get the current currency to be used through out the app
     const currency = locale.preferredCurrency || l10n.defaultCurrency
 
-    // Set up customer and basket
-    useShopper({currency})
+        return (
+            <Box className="sf-app" {...styles.container}>
+                <h1>_app</h1>
 
-    const wishlist = useWishlist()
-    useEffect(() => {
-        if (!customer.isInitialized) {
-            return
-        }
-        if (customer.isRegistered) {
-            wishlist.init()
-        }
-        if (customer.isGuest) {
-            wishlist.reset()
-        }
-    }, [customer.authType])
-
-    useEffect(() => {
-        // Listen for online status changes.
-        watchOnlineStatus((isOnline) => {
-            setIsOnline(isOnline)
-        })
-    }, [])
-
-    useEffect(() => {
-        // Lets automatically close the mobile navigation when the
-        // location path is changed.
-        onClose()
-    }, [location])
-
-    const onLogoClick = () => {
-        // Goto the home page.
-        const path = homeUrlBuilder(HOME_HREF, {locale, site})
-        history.push(path)
-
-        // Close the drawer.
-        onClose()
-    }
-
-    const onCartClick = () => {
-        const path = buildPathWithUrlConfig('/cart', configValues)
-        history.push(path)
-
-        // Close the drawer.
-        onClose()
-    }
-
-    const onAccountClick = () => {
-        // Link to account page for registered customer, open auth modal otherwise
-        if (customer.isRegistered) {
-            const path = buildPathWithUrlConfig('/account', configValues)
-            history.push(path)
-        } else {
-            // if they already are at the login page, do not show login modal
-            if (new RegExp(`^/login$`).test(location.pathname)) return
-            authModal.onOpen()
-        }
-    }
-
-    const onWishlistClick = () => {
-        const path = buildPathWithUrlConfig('/account/wishlist', configValues)
-        history.push(path)
-    }
-
-    const getLayout =
-        children.getLayout || (page => <SiteLayout children={page} />)
-
-
-
-    return (
-        <Box className="sf-app" {...styles.container}>
             <IntlProvider
                 onError={(err) => {
                     if (err.code === 'MISSING_TRANSLATION') {
@@ -176,100 +90,7 @@ const App = (props) => {
             >
                 <CategoriesProvider categories={allCategories}>
                     <CurrencyProvider currency={currency}>
-                        <Seo>
-                            <meta name="theme-color" content={THEME_COLOR} />
-                            <meta name="apple-mobile-web-app-title" content={DEFAULT_SITE_TITLE} />
-                            <link
-                                rel="apple-touch-icon"
-                                href={getAssetUrl('static/img/global/apple-touch-icon.png')}
-                            />
-                            <link rel="manifest" href={getAssetUrl('static/manifest.json')} />
-
-                            {/* Urls for all localized versions of this page (including current page)
-                            For more details on hrefLang, see https://developers.google.com/search/docs/advanced/crawling/localized-versions */}
-                            {site.l10n?.supportedLocales.map((locale) => (
-                                <link
-                                    rel="alternate"
-                                    hrefLang={locale.id.toLowerCase()}
-                                    href={`${appOrigin}${getPathWithLocale(locale.id, {
-                                        location
-                                    })}`}
-                                    key={locale.id}
-                                />
-                            ))}
-                            {/* A general locale as fallback. For example: "en" if default locale is "en-GB" */}
-                            <link
-                                rel="alternate"
-                                hrefLang={site.l10n.defaultLocale.slice(0, 2)}
-                                href={`${appOrigin}${getPathWithLocale(site.l10n.defaultLocale, {
-                                    location
-                                })}`}
-                            />
-                            {/* A wider fallback for user locales that the app does not support */}
-                            <link rel="alternate" hrefLang="x-default" href={`${appOrigin}/`} />
-                        </Seo>
-
-                        <ScrollToTop />
-
-                        <Box id="app" display="flex" flexDirection="column" flex={1}>
-                            <SkipNavLink zIndex="skipLink">Skip to Content</SkipNavLink>
-
-                            <Box {...styles.headerWrapper}>
-                                {!isCheckout ? (
-                                    <Header
-                                        onMenuClick={onOpen}
-                                        onLogoClick={onLogoClick}
-                                        onMyCartClick={onCartClick}
-                                        onMyAccountClick={onAccountClick}
-                                        onWishlistClick={onWishlistClick}
-                                    >
-                                        <HideOnDesktop>
-                                            <DrawerMenu
-                                                isOpen={isOpen}
-                                                onClose={onClose}
-                                                onLogoClick={onLogoClick}
-                                                root={allCategories[DEFAULT_ROOT_CATEGORY]}
-                                            />
-                                        </HideOnDesktop>
-
-                                        <HideOnMobile>
-                                            <ListMenu root={allCategories[DEFAULT_ROOT_CATEGORY]} />
-                                        </HideOnMobile>
-                                    </Header>
-                                ) : (
-                                    <CheckoutHeader />
-                                )}
-                            </Box>
-
-                            {!isOnline && <OfflineBanner />}
-                            <AddToCartModalProvider>
-                                <SkipNavContent
-                                    style={{
-                                        display: 'flex',
-                                        flexDirection: 'column',
-                                        flex: 1,
-                                        outline: 0
-                                    }}
-                                >
-                                    <Box
-                                        as="main"
-                                        id="app-main"
-                                        role="main"
-                                        display="flex"
-                                        flexDirection="column"
-                                        flex="1"
-                                    >
-                                        <OfflineBoundary isOnline={false}>
-                                            {children}
-                                        </OfflineBoundary>
-                                    </Box>
-                                </SkipNavContent>
-
-                                {!isCheckout ? <Footer /> : <CheckoutFooter />}
-
-                                <AuthModal {...authModal} />
-                            </AddToCartModalProvider>
-                        </Box>
+                        {children}
                     </CurrencyProvider>
                 </CategoriesProvider>
             </IntlProvider>
@@ -282,7 +103,9 @@ App.shouldGetProps = () => {
     return typeof window === 'undefined'
 }
 
-App.getProps = async ({api, res}) => {
+App.getProps = async (props) => {
+    const {api, res} = props
+
     const site = resolveSiteFromUrl(res.locals.originalUrl)
     const l10nConfig = site.l10n
     const targetLocale = getTargetLocale({
@@ -344,6 +167,8 @@ Learn more with our localization guide. https://sfdc.co/localization-guide
         config: res?.locals?.config
     }
 }
+
+App.getLayout = getSiteLayout
 
 App.propTypes = {
     children: PropTypes.node,

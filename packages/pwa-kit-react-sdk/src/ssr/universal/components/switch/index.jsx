@@ -33,15 +33,17 @@ const Switch = (props) => {
                                 return (
                                     <Route key={i} {...routeProps}>
                                         <UIDFork>
-                                            {Component.getLayout ? (
-                                                Component.getLayout(
-                                                    <Component
-                                                        preloadedProps={appState.pageProps}
-                                                    />
-                                                )
-                                            ) : (
-                                                <Component preloadedProps={appState.pageProps} />
-                                            )}
+                                            {Component.getLayout
+                                                ? Component.getLayout(
+                                                      <Component
+                                                          preloadedProps={appState.pageProps}
+                                                      />
+                                                  )
+                                                : App.getLayout(
+                                                      <Component
+                                                          preloadedProps={appState.pageProps}
+                                                      />
+                                                  )}
                                         </UIDFork>
                                     </Route>
                                 )

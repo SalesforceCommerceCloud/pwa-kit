@@ -5,6 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
+import { getLayout as getSiteLayout } from '../site-layout-b'
 
 const PWAPDPALayout = ({children}) => {
     return (
@@ -16,8 +17,7 @@ const PWAPDPALayout = ({children}) => {
 }
 
 export const getLayout = (page) => {
-    console.log('PWAPDPALayout getLayout')
-    return <PWAPDPALayout>{page}</PWAPDPALayout>
+    return getSiteLayout(<PWAPDPALayout>{page}</PWAPDPALayout>)
 }
 
 export default PWAPDPALayout

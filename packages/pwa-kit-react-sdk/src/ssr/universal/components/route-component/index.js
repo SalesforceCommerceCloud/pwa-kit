@@ -13,7 +13,6 @@ import Throw404 from '../../components/throw-404'
 import AppConfig from '../../components/_app-config'
 import routes from '../../routes'
 import {pages as pageEvents} from '../../events'
-import {getLayout} from '../../../browser/layouts/pdp-a'
 
 const noop = () => undefined
 
@@ -110,11 +109,6 @@ export const routeComponent = (Wrapped, isPage, locals) => {
             const component = await RouteComponent.getComponent()
 
             return component.shouldGetProps ? component.shouldGetProps(args) : defaultImpl()
-        }
-
-        static getLayout(page) {
-            console.log('route-component getLayout defaultLayout')
-            return getLayout(page)
         }
 
         /**

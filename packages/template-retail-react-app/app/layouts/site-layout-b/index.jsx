@@ -142,7 +142,7 @@ const SiteLayout = (props) => {
     return (
 
     <>
-        <h1>SiteLayout</h1>
+        <h1>SiteLayout BBB</h1>
                         <Seo>
                             <meta name="theme-color" content={THEME_COLOR} />
                             <meta name="apple-mobile-web-app-title" content={DEFAULT_SITE_TITLE} />
