@@ -17,6 +17,7 @@ import useBasket from '../../commerce-api/hooks/useBasket'
 import Payment from './partials/payment'
 import CheckoutSkeleton from './partials/checkout-skeleton'
 import OrderSummary from '../../components/order-summary'
+import {getLayout} from '../../layouts/checkout'
 
 const Checkout = () => {
     const navigate = useNavigation()
@@ -140,5 +141,8 @@ const CheckoutContainer = () => {
         </CheckoutProvider>
     )
 }
+
+
+CheckoutContainer.getLayout = getLayout
 
 export default CheckoutContainer
