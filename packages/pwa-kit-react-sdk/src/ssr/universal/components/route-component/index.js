@@ -289,13 +289,14 @@ export const routeComponent = (Wrapped, isPage, locals) => {
             // matter for initialization. For logging make it clear
             // that we mean "the app was hydrating on this call to
             // componentDidUpdate".
-            console.log(
-                JSON.stringify({
-                    templateName,
-                    wasHydratingOnUpdate,
-                    willGetProps
-                })
-            )
+            if(isServerSide)
+                console.log(
+                    JSON.stringify({
+                        templateName,
+                        wasHydratingOnUpdate,
+                        willGetProps
+                    })
+                )
 
             if (!willGetProps) {
                 onUpdateComplete()
@@ -319,7 +320,8 @@ export const routeComponent = (Wrapped, isPage, locals) => {
                  * stores a reference to the promise that we check before we use
                  * the results from it.
                  */
-                console.log(`Calling getProps for '${templateName}'`)
+                if(isServerSide)
+                    console.log(`Calling getProps for '${templateName}'`)
                 const req = undefined
                 const res = undefined
                 const propsPromise = RouteComponent.getProps({
