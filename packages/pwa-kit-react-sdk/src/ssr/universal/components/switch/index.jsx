@@ -31,24 +31,22 @@ const Switch = (props) => {
                             {routes.map((route, i) => {
                                 const {component: Component, ...routeProps} = route
 
-                                const ComponentWithAppLayout = App.getLayout
-                                    ? App.getLayout(
-                                          <Component preloadedProps={appState.pageProps} />
-                                      )
-                                    : () => <Component preloadedProps={appState.pageProps} />
+                                const componentWithAppLayout = App.getLayout ? (
+                                    App.getLayout(<Component preloadedProps={appState.pageProps} />)
+                                ) : (
+                                    <Component preloadedProps={appState.pageProps} />
+                                )
 
                                 return (
                                     <Route key={i} {...routeProps}>
                                         <UIDFork>
-                                            {Component.getLayout ? (
-                                                Component.getLayout(
-                                                    <Component
-                                                        preloadedProps={appState.pageProps}
-                                                    />
-                                                )
-                                            ) : (
-                                                <ComponentWithAppLayout />
-                                            )}
+                                            {Component.getLayout
+                                                ? Component.getLayout(
+                                                      <Component
+                                                          preloadedProps={appState.pageProps}
+                                                      />
+                                                  )
+                                                : componentWithAppLayout}
                                         </UIDFork>
                                     </Route>
                                 )
