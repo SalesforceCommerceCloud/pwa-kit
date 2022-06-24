@@ -30,20 +30,25 @@ const Switch = (props) => {
                         <RouterSwitch>
                             {routes.map((route, i) => {
                                 const {component: Component, ...routeProps} = route
+
+                                const ComponentWithAppLayout = App.getLayout
+                                    ? App.getLayout(
+                                          <Component preloadedProps={appState.pageProps} />
+                                      )
+                                    : () => <Component preloadedProps={appState.pageProps} />
+
                                 return (
                                     <Route key={i} {...routeProps}>
                                         <UIDFork>
-                                            {Component.getLayout
-                                                ? Component.getLayout(
-                                                      <Component
-                                                          preloadedProps={appState.pageProps}
-                                                      />
-                                                  )
-                                                : App.getLayout(
-                                                      <Component
-                                                          preloadedProps={appState.pageProps}
-                                                      />
-                                                  )}
+                                            {Component.getLayout ? (
+                                                Component.getLayout(
+                                                    <Component
+                                                        preloadedProps={appState.pageProps}
+                                                    />
+                                                )
+                                            ) : (
+                                                <ComponentWithAppLayout />
+                                            )}
                                         </UIDFork>
                                     </Route>
                                 )
