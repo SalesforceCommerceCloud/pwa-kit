@@ -64,6 +64,7 @@ import {HTTPNotFound} from 'pwa-kit-react-sdk/ssr/universal/errors'
 import {DEFAULT_LIMIT_VALUES, API_ERROR_MESSAGE, MAX_CACHE_AGE} from '../../constants'
 import useNavigation from '../../hooks/use-navigation'
 import LoadingSpinner from '../../components/loading-spinner'
+import {useProductSearch} from '../../commerce-hooks/context/shopper-search-context'
 
 // NOTE: You can ignore certain refinements on a template level by updating the below
 // list of ignored refinements.
@@ -234,6 +235,8 @@ const ProductList = (props) => {
     if (!selectedSortingOptionLabel) {
         selectedSortingOptionLabel = productSearchResult?.sortingOptions?.[0]
     }
+    const {productSearchResult: productSearchResultTest} = useProductSearch([location.search])
+    console.log('productSearchResult', productSearchResultTest)
 
     return (
         <Box

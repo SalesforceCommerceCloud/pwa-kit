@@ -5,9 +5,12 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {getConfig} from 'pwa-kit-runtime/utils/ssr-config.client'
+import {getConfig} from 'pwa-kit-runtime/utils/ssr-config'
 import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
-import {ShopperBaskets} from 'commerce-sdk-isomorphic'
+import {
+    ShopperBaskets,
+    ShopperCustomers,
+} from 'commerce-sdk-isomorphic'
 
 const getCommerceApiConfig = () => {
     const {app} = getConfig()
@@ -24,13 +27,40 @@ export const basketShopperAPI = () => {
     const commerceConfig = getCommerceApiConfig()
     // set up api here
 
-    // use slas hook
-    const access_token = useShopper()
 
-    const shopperBaskets = new ShopperBaskets({
-        ...commerceConfig,
-        headers: {authorization: `Bearer ${access_token}`}
-    })
+    let shopperBaskets
+
+    // use slas hook
+    // const access_token = useShopper()
+    // TODO: this is not how real implementation works
+    // It is expected we can call slas hook and get the access_token or refresh token
+    if (typeof window !== 'undefined') {
+        const access_token = window.localStorage.getItem('token')
+        if (access_token) {
+            shopperBaskets = new ShopperBaskets({
+                ...commerceConfig,
+                headers: {authorization: access_token}
+            })
+        }
+    }
 
     return shopperBaskets
+}
+
+export const shopperCustomersAPI = () => {
+    const commerceConfig = getCommerceApiConfig()
+    let shopperCustomers
+    // TODO: this is not how real implementation works
+    // It is expected we can call slas hook and get the access_token or refresh token
+    if (typeof window !== 'undefined') {
+        const access_token = window.localStorage.getItem('token')
+        if (access_token) {
+            shopperCustomers = new ShopperCustomers({
+                ...commerceConfig,
+                headers: {authorization: access_token}
+            })
+        }
+    }
+
+    return shopperCustomers
 }

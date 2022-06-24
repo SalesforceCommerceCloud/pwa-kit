@@ -92,7 +92,6 @@ const ProductView = ({
     const theme = useTheme()
     const [showOptionsMessage, toggleShowOptionsMessage] = useState(false)
     const {baskets, addItemToCart} = useBaskets()
-    console.log('%c baskets', 'background:yellow', baskets)
 
     const {
         showLoading,

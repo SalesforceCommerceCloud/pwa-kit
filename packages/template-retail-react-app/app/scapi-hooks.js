@@ -6,7 +6,7 @@ import {
 import {ShopperBaskets, ShopperSearch} from 'commerce-sdk-isomorphic'
 // NOTE: This is the important part of the API, here we get a context with a hook that will
 // use that context.
-const {ServerEffectProvider, useServerEffect} = createServerEffectContext('scapiHooks')
+export const {ServerEffectProvider, useServerEffect} = createServerEffectContext('scapiHooks')
 import {useCommerceAPI} from './commerce-api/contexts'
 import {isError} from './commerce-api/utils'
 import useCustomer from './commerce-api/hooks/useCustomer'

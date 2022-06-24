@@ -26,7 +26,7 @@ import {
 
 // Hooks
 import useBasket from '../../commerce-api/hooks/useBasket'
-import {useVariant} from '../../hooks'
+import {useProduct, useVariant} from '../../hooks'
 import useWishlist from '../../hooks/use-wishlist'
 import useNavigation from '../../hooks/use-navigation'
 import useEinstein from '../../commerce-api/hooks/useEinstein'
@@ -45,6 +45,7 @@ import {useHistory} from 'react-router-dom'
 import {useToast} from '../../hooks/use-toast'
 
 import {useCommerceAPI} from '../../commerce-api/contexts'
+import {useProduct as useProductTest} from '../../commerce-hooks/context/shopper-search-context'
 
 const ProductDetail = ({isLoading}) => {
     const {formatMessage} = useIntl()
@@ -56,41 +57,47 @@ const ProductDetail = ({isLoading}) => {
     const api = useCommerceAPI()
     const {productId} = useParams()
 
-    const {data: {category, product}, isLoading: isServerEffectLoading} = useServerEffect(async ({res, location, params}) => {
-        const {productId} = params
-        let category, product
-        const urlParams = new URLSearchParams(location.search)
-    
-        product = await api.shopperProducts.getProduct({
-            parameters: {
-                id: urlParams.get('pid') || productId,
-                allImages: true
-            }
-        })
-    
-        if (product?.primaryCategoryId) {
-            category = await api.shopperProducts.getCategory({
-                parameters: {id: product?.primaryCategoryId, levels: 1}
+    const {
+        data: {category, product},
+        isLoading: isServerEffectLoading
+    } = useServerEffect(
+        async ({res, location, params}) => {
+            const {productId} = params
+            let category, product
+            const urlParams = new URLSearchParams(location.search)
+
+            product = await api.shopperProducts.getProduct({
+                parameters: {
+                    id: urlParams.get('pid') || productId,
+                    allImages: true
+                }
             })
-        }
-    
-        // TODO: Fix setting of headers. You fixed this before, you can do it again.
-        // Set the `cache-control` header values similar to those on the product-list.
-        // if (res) {
-        //     res.set('Cache-Control', `max-age=${MAX_CACHE_AGE}`)
-        // }
-    
-        // The `commerce-isomorphic-sdk` package does not throw errors, so
-        // we have to check the returned object type to inconsistencies.
-        if (typeof product?.type === 'string') {
-            throw new HTTPNotFound(product.detail)
-        }
-        if (typeof category?.type === 'string') {
-            throw new HTTPNotFound(category.detail)
-        }
-    
-        return {category, product}
-    }, [productId])
+
+            if (product?.primaryCategoryId) {
+                category = await api.shopperProducts.getCategory({
+                    parameters: {id: product?.primaryCategoryId, levels: 1}
+                })
+            }
+
+            // TODO: Fix setting of headers. You fixed this before, you can do it again.
+            // Set the `cache-control` header values similar to those on the product-list.
+            // if (res) {
+            //     res.set('Cache-Control', `max-age=${MAX_CACHE_AGE}`)
+            // }
+
+            // The `commerce-isomorphic-sdk` package does not throw errors, so
+            // we have to check the returned object type to inconsistencies.
+            if (typeof product?.type === 'string') {
+                throw new HTTPNotFound(product.detail)
+            }
+            if (typeof category?.type === 'string') {
+                throw new HTTPNotFound(category.detail)
+            }
+
+            return {category, product}
+        },
+        [productId]
+    )
 
     const variant = useVariant(product)
     const [primaryCategory, setPrimaryCategory] = useState(category)
@@ -181,14 +188,27 @@ const ProductDetail = ({isLoading}) => {
             einstein.sendViewProduct(product)
         }
     }, [product])
-
-    
+    const test = useProductTest(productId)
+    console.log('test', test)
+    console.log('test.product.productName', test.product?.productName)
     return (
         <Box
             className="sf-product-detail-page"
             layerStyle="page"
             data-testid="product-details-page"
         >
+            <Box>
+                ProductName: (this is data from PDP search result)
+                {test.product?.productName ? (
+                    <Box>{test.product?.productName}</Box>
+                ) : (
+                    <Box>Loading.........</Box>
+                )}
+            </Box>
+            <Box>
+                just name (need to fetch)
+                {test.product?.name ? <Box>{test.product?.name}</Box> : <Box>Loading.........</Box>}
+            </Box>
             <Helmet>
                 <title>{product?.pageTitle}</title>
                 <meta name="description" content={product?.pageDescription} />
@@ -196,7 +216,7 @@ const ProductDetail = ({isLoading}) => {
 
             <Stack spacing={16}>
                 <div>{isServerEffectLoading.toString()}</div>
-                
+
                 <ProductView
                     product={product}
                     category={primaryCategory?.parentCategoryTree || []}
