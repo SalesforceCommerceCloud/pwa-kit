@@ -85,7 +85,7 @@ const main = () => {
         .addOption(
             new program.Option(
                 '-c, --credentialsFile <credentialsFile>',
-                'the file where your credentials should be saved'
+                'the file where your credentials should be stored'
             )
                 .default(scriptUtils.getCredentialsFile())
                 .env('PWA_KIT_CREDENTIALS_FILE')
