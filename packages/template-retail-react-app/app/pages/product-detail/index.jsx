@@ -37,7 +37,12 @@ import ProductView from '../../partials/product-view'
 import {HTTPNotFound} from 'pwa-kit-react-sdk/ssr/universal/errors'
 
 // constant
-import {API_ERROR_MESSAGE, MAX_CACHE_AGE} from '../../constants'
+import {
+    API_ERROR_MESSAGE,
+    MAX_CACHE_AGE,
+    TOAST_ACTION_VIEW_WISHLIST,
+    TOAST_MESSAGE_ADDED_TO_WISHLIST
+} from '../../constants'
 import {rebuildPathWithParams} from '../../utils/url'
 import {useHistory} from 'react-router-dom'
 import {useToast} from '../../hooks/use-toast'
@@ -75,6 +80,7 @@ const ProductDetail = ({category, product, isLoading}) => {
 
     /**************** Wishlist ****************/
     const wishlist = useWishlist()
+    // TODO: DRY this handler when intl provider is available globally
     const handleAddToWishlist = async (quantity) => {
         try {
             await wishlist.createListItem({
@@ -82,27 +88,16 @@ const ProductDetail = ({category, product, isLoading}) => {
                 quantity
             })
             toast({
-                title: formatMessage(
-                    {
-                        defaultMessage:
-                            '{quantity} {quantity, plural, one {item} other {items}} added to wishlist',
-                        id: 'product_detail.info.added_to_wishlist'
-                    },
-                    {quantity: 1}
-                ),
+                title: formatMessage(TOAST_MESSAGE_ADDED_TO_WISHLIST, {quantity: 1}),
                 status: 'success',
                 action: (
                     // it would be better if we could use <Button as={Link}>
                     // but unfortunately the Link component is not compatible
                     // with Chakra Toast, since the ToastManager is rendered via portal
                     // and the toast doesn't have access to intl provider, which is a
-                    // requirement of the Link component. This is also the reason why
-                    // we must use `formatMessage()`, rather than `<FormattedMessage />`.
+                    // requirement of the Link component.
                     <Button variant="link" onClick={() => navigate('/account/wishlist')}>
-                        {formatMessage({
-                            id: 'wishlist.link.added_to_wishlist.view',
-                            defaultMessage: 'View'
-                        })}
+                        {formatMessage(TOAST_ACTION_VIEW_WISHLIST)}
                     </Button>
                 )
             })

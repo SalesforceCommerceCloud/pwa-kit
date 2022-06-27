@@ -16,7 +16,12 @@ import useIntersectionObserver from '../../hooks/use-intersection-observer'
 import useWishlist from '../../hooks/use-wishlist'
 import {useToast} from '../../hooks/use-toast'
 import useNavigation from '../../hooks/use-navigation'
-import {API_ERROR_MESSAGE} from '../../constants'
+import {
+    API_ERROR_MESSAGE,
+    TOAST_ACTION_VIEW_WISHLIST,
+    TOAST_MESSAGE_ADDED_TO_WISHLIST,
+    TOAST_MESSAGE_REMOVED_FROM_WISHLIST
+} from '../../constants'
 
 /**
  * A component for fetching and rendering product recommendations from the Einstein API
@@ -111,8 +116,7 @@ const RecommendedProducts = ({zone, recommender, products, title, shouldFetch, .
         return null
     }
 
-    // TODO: DRY the wishlist handlers when intl
-    // provider is available globally
+    // TODO: DRY this handler when intl provider is available globally
     const addItemToWishlist = async (product) => {
         try {
             await wishlist.createListItem({
@@ -120,27 +124,16 @@ const RecommendedProducts = ({zone, recommender, products, title, shouldFetch, .
                 quantity: 1
             })
             toast({
-                title: formatMessage(
-                    {
-                        defaultMessage:
-                            '{quantity} {quantity, plural, one {item} other {items}} added to wishlist',
-                        id: 'recommended_products.info.added_to_wishlist'
-                    },
-                    {quantity: 1}
-                ),
+                title: formatMessage(TOAST_MESSAGE_ADDED_TO_WISHLIST, {quantity: 1}),
                 status: 'success',
                 action: (
                     // it would be better if we could use <Button as={Link}>
                     // but unfortunately the Link component is not compatible
                     // with Chakra Toast, since the ToastManager is rendered via portal
                     // and the toast doesn't have access to intl provider, which is a
-                    // requirement of the Link component. This is also the reason why
-                    // we must use `formatMessage()`, rather than `<FormattedMessage />`.
+                    // requirement of the Link component.
                     <Button variant="link" onClick={() => navigate('/account/wishlist')}>
-                        {formatMessage({
-                            id: 'wishlist.link.added_to_wishlist.view',
-                            defaultMessage: 'View'
-                        })}
+                        {formatMessage(TOAST_ACTION_VIEW_WISHLIST)}
                     </Button>
                 )
             })
@@ -151,14 +144,13 @@ const RecommendedProducts = ({zone, recommender, products, title, shouldFetch, .
             })
         }
     }
+
+    // TODO: DRY this handler when intl provider is available globally
     const removeItemFromWishlist = async (product) => {
         try {
             await wishlist.removeListItemByProductId(product.productId)
             toast({
-                title: formatMessage({
-                    defaultMessage: 'Item removed from wishlist',
-                    id: 'recommended_products.info.removed_from_wishlist'
-                }),
+                title: formatMessage(TOAST_MESSAGE_REMOVED_FROM_WISHLIST),
                 status: 'success',
                 id: product.productId
             })

@@ -168,14 +168,8 @@
   "card_payment_form.heading.new_payment_method": {
     "defaultMessage": "Add New Payment Method"
   },
-  "cart.info.added_to_wishlist": {
-    "defaultMessage": "{quantity} {quantity, plural, one {item} other {items}} added to wishlist"
-  },
   "cart.info.removed_from_cart": {
     "defaultMessage": "Item removed from cart"
-  },
-  "wishlist.link.added_to_wishlist.view": {
-    "defaultMessage": "View"
   },
   "cart.recommended_products.title.may_also_like": {
     "defaultMessage": "You May Also Like"
@@ -551,6 +545,15 @@
   },
   "global.error.something_went_wrong": {
     "defaultMessage": "Something went wrong. Try again!"
+  },
+  "global.info.added_to_wishlist": {
+    "defaultMessage": "{quantity} {quantity, plural, one {item} other {items}} added to wishlist"
+  },
+  "global.info.removed_from_wishlist": {
+    "defaultMessage": "Item removed from wishlist"
+  },
+  "global.link.added_to_wishlist.view_wishlist": {
+    "defaultMessage": "View"
   },
   "header.button.assistive_msg.logo": {
     "defaultMessage": "Logo"
@@ -969,9 +972,6 @@
   "product_detail.accordion.message.coming_soon": {
     "defaultMessage": "Coming Soon"
   },
-  "product_detail.info.added_to_wishlist": {
-    "defaultMessage": "{quantity} {quantity, plural, one {item} other {items}} added to wishlist"
-  },
   "product_detail.recommended_products.title.complete_set": {
     "defaultMessage": "Complete the Set"
   },
@@ -992,12 +992,6 @@
   },
   "product_list.drawer.title.sort_by": {
     "defaultMessage": "Sort By"
-  },
-  "product_list.info.added_to_wishlist": {
-    "defaultMessage": "{quantity} {quantity, plural, one {item} other {items}} added to wishlist"
-  },
-  "product_list.info.removed_from_wishlist": {
-    "defaultMessage": "Item removed from wishlist"
   },
   "product_list.modal.button.clear_filters": {
     "defaultMessage": "Clear Filters"
@@ -1061,12 +1055,6 @@
   },
   "recent_searches.heading.recent_searches": {
     "defaultMessage": "Recent Searches"
-  },
-  "recommended_products.info.added_to_wishlist": {
-    "defaultMessage": "{quantity} {quantity, plural, one {item} other {items}} added to wishlist"
-  },
-  "recommended_products.info.removed_from_wishlist": {
-    "defaultMessage": "Item removed from wishlist"
   },
   "register_form.action.sign_in": {
     "defaultMessage": "Sign in"
