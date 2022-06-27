@@ -46,7 +46,10 @@ import {useToast} from '../../hooks/use-toast'
 
 import {useCommerceAPI} from '../../commerce-api/contexts'
 import {useProduct as useProductTest} from '../../commerce-hooks/context/shopper-search-context'
-
+const Price = ({price}) => {
+    console.log('rendering======================price', price)
+    return <div>{price}</div>
+}
 const ProductDetail = ({isLoading}) => {
     const {formatMessage} = useIntl()
     const basket = useBasket()
@@ -209,6 +212,7 @@ const ProductDetail = ({isLoading}) => {
                 just name (need to fetch)
                 {test.product?.name ? <Box>{test.product?.name}</Box> : <Box>Loading.........</Box>}
             </Box>
+            <Price price={test.product?.price} />
             <Helmet>
                 <title>{product?.pageTitle}</title>
                 <meta name="description" content={product?.pageDescription} />

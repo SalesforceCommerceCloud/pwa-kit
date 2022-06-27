@@ -54,7 +54,7 @@ import {DEFAULT_SITE_TITLE, HOME_HREF, THEME_COLOR} from '../../constants'
 import Seo from '../seo'
 import {resolveSiteFromUrl} from '../../utils/site-utils'
 import {BasketsProvider} from '../../commerce-hooks/context/shopper-basket-context'
-import {ProductSearchProvider} from '../../commerce-hooks/context/shopper-search-context'
+import {ProductsProvider} from '../../commerce-hooks/context/shopper-search-context'
 
 const DEFAULT_NAV_DEPTH = 3
 const DEFAULT_ROOT_CATEGORY = 'root'
@@ -173,8 +173,8 @@ const App = (props) => {
                 defaultLocale="en-US"
             >
                 <SCAPIProvider>
-                    <BasketsProvider>
-                        <ProductSearchProvider>
+                    <ProductsProvider>
+                        <BasketsProvider>
                             <CategoriesProvider categories={allCategories}>
                                 <CurrencyProvider currency={currency}>
                                     <Seo>
@@ -294,8 +294,8 @@ const App = (props) => {
                                     </Box>
                                 </CurrencyProvider>
                             </CategoriesProvider>
-                        </ProductSearchProvider>
-                    </BasketsProvider>
+                        </BasketsProvider>
+                    </ProductsProvider>
                 </SCAPIProvider>
             </IntlProvider>
         </Box>

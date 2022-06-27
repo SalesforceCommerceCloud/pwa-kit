@@ -25,7 +25,8 @@ import {useCurrency} from '../../hooks'
 import {Skeleton as ImageGallerySkeleton} from '../../components/image-gallery'
 import {HideOnDesktop, HideOnMobile} from '../../components/responsive'
 import QuantityPicker from '../../components/quantity-picker'
-import {useBaskets} from '../../commerce-hooks/context/shopper-basket-context'
+import {useBasketsStore} from '../../commerce-hooks/context/shopper-basket-context'
+import {addItemToCart} from '../../commerce-hooks/actions/basket'
 
 const ProductViewHeader = ({name, price, currency, category}) => {
     const intl = useIntl()
@@ -91,8 +92,7 @@ const ProductView = ({
     } = useAddToCartModalContext()
     const theme = useTheme()
     const [showOptionsMessage, toggleShowOptionsMessage] = useState(false)
-    const {baskets, addItemToCart} = useBaskets()
-
+    const {baskets, dispatch} = useBasketsStore()
     const {
         showLoading,
         showInventoryMessage,
@@ -157,7 +157,7 @@ const ProductView = ({
                         ]
                         // add the item to the first basket
                         const basketId = baskets.data[0].basketId
-                        await addItemToCart(productItems, basketId)
+                        await addItemToCart(dispatch, productItems, basketId)
                     }}
                     isLoading={baskets.isLoading}
                     disabled={showInventoryMessage}

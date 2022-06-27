@@ -7,10 +7,7 @@
 
 import {getConfig} from 'pwa-kit-runtime/utils/ssr-config'
 import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
-import {
-    ShopperBaskets,
-    ShopperCustomers,
-} from 'commerce-sdk-isomorphic'
+import {ShopperBaskets, ShopperCustomers, ShopperProducts} from 'commerce-sdk-isomorphic'
 
 const getCommerceApiConfig = () => {
     const {app} = getConfig()
@@ -26,7 +23,6 @@ const getCommerceApiConfig = () => {
 export const basketShopperAPI = () => {
     const commerceConfig = getCommerceApiConfig()
     // set up api here
-
 
     let shopperBaskets
 
@@ -63,4 +59,22 @@ export const shopperCustomersAPI = () => {
     }
 
     return shopperCustomers
+}
+
+export const shopperProductsAPI = () => {
+    const commerceConfig = getCommerceApiConfig()
+    let shopperProducts
+    // TODO: this is not how real implementation works
+    // It is expected we can call slas hook and get the access_token or refresh token
+    if (typeof window !== 'undefined') {
+        const access_token = window.localStorage.getItem('token')
+        if (access_token) {
+            shopperProducts = new ShopperProducts({
+                ...commerceConfig,
+                headers: {authorization: access_token}
+            })
+        }
+    }
+
+    return shopperProducts
 }

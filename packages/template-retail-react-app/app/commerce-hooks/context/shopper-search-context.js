@@ -8,101 +8,31 @@
 import React from 'react'
 import {makeStore} from '../utils/utils'
 
-import {useServerEffect} from '../../scapi-hooks'
+// import {useServerEffect} from '../../scapi-hooks'
+import {useServerEffect} from 'pwa-kit-react-sdk/ssr/universal/server-effects'
+
 import {parse as parseSearchParams} from '../../hooks/use-search-params'
 import {MAX_CACHE_AGE} from '../../constants'
 import {HTTPNotFound} from 'pwa-kit-react-sdk/ssr/universal/errors'
 import {useLocation} from 'react-router-dom'
 import {useCommerceAPI} from '../../commerce-api/contexts'
 
-// const ProductSearchContext = React.createContext()
-//
-// const ProductSearchProvider = ({children}) => {
-//     const [productSearchState, setProductSearchState] = React.useState(initialProductSearchState)
-//     const value = React.useMemo(() => ({productSearchState, setProductSearchState}), [
-//         productSearchState
-//     ])
-//
-//     console.log('ProductSearchProvider----------------------')
-//
-// const {data} = useServerEffect(async ({res, params, location, api}) => {
-//     const {categoryId} = params
-//     console.log('categoryId ====================', categoryId)
-//     console.log('location', location)
-//     const urlParams = new URLSearchParams(location.search)
-//     let searchQuery = urlParams.get('q')
-//     let isSearch = false
-//
-//     if (searchQuery) {
-//         isSearch = true
-//     }
-//     // In case somebody navigates to /search without a param
-//     if (!categoryId && !isSearch) {
-//         // We will simulate search for empty string
-//         return {searchQuery: ' ', productSearchResult: {}}
-//     }
-//
-//     const searchParams = parseSearchParams(location.search, false)
-//
-//     if (!searchParams.refine.includes(`cgid=${categoryId}`) && categoryId) {
-//         searchParams.refine.push(`cgid=${categoryId}`)
-//     }
-//
-//     // only search master products
-//     searchParams.refine.push('htype=master')
-//
-//     // Set the `cache-control` header values to align with the Commerce API settings.
-//     if (res) {
-//         res.set('Cache-Control', `max-age=${MAX_CACHE_AGE}`)
-//     }
-//
-//     console.log('firing off ++++++++++++++++++++++++++++++++++++++++')
-//     const [category, productSearchResult] = await Promise.all([
-//         isSearch
-//             ? Promise.resolve()
-//             : api.shopperProducts.getCategory({
-//                   parameters: {id: 'mens-clothing', levels: 0}
-//               }),
-//         api.shopperSearch.productSearch({
-//             parameters: searchParams
-//         })
-//     ])
-//
-//     console.log('gfgdfgfdgfgfdg', productSearchResult)
-//
-//     // Apply disallow list to refinements.
-//     productSearchResult.refinements = productSearchResult?.refinements?.filter(
-//         ({attributeId}) => !REFINEMENT_DISALLOW_LIST.includes(attributeId)
-//     )
-//
-//     // The `isomorphic-sdk` returns error objects when they occur, so we
-//     // need to check the category type and throw if required.
-//     if (category?.type?.endsWith('category-not-found')) {
-//         throw new HTTPNotFound(category.detail)
-//     }
-//
-//     return {searchQuery: searchQuery, productSearchResult}
-// }, [])
-//
-//     console.log('data', data)
-//
-//     return <ProductSearchContext.Provider value={value}>{children}</ProductSearchContext.Provider>
-// }
-//
-// const useProductSearch = () => {
-//     const context = React.useContext(ProductSearchContext)
-//
-//     if (context === undefined) {
-//         throw new Error(`useProductSearch must be used within a ProductSearchProvider`)
-//     }
-//     return context
-// }
-//
-// export {useProductSearch, ProductSearchProvider}
-
 const reducer = (state, action) => {
     console.log('state', state)
     switch (action.type) {
+        // update a single product in products
+        case 'update_a_product': {
+            console.log('action.payload', action.payload)
+            const productId = action.payload.productId?.toString()
+            const product = state.products[productId]
+            return {
+                ...state,
+                products: {
+                    ...state.products,
+                    [action.payload.productId]: {...product, ...action.payload}
+                }
+            }
+        }
         case 'update_product_search': {
             return {
                 ...state,
@@ -121,26 +51,21 @@ const initialProductSearchState = {
     products: {}
 }
 export const {
-    useStore: useProductSearchStore,
-    StoreProvider: ProductSearchProvider,
-    useDispatch: useProductSearchDispatch
+    useStore: useProductsStore,
+    StoreProvider: ProductsProvider,
+    useDispatch: useProductsDispatch
 } = makeStore(reducer, initialProductSearchState)
 const REFINEMENT_DISALLOW_LIST = ['c_isNew']
 
-const productReducer = (state, action) => {
-    switch (action.type) {
-    }
-}
-
-export const {
-    useStore: useProductStore,
-    StoreProvider: ProductProvider,
-    useDispatch: useProductDispatch
-} = makeStore()
+// export const {
+//     useStore: useProductsStore,
+//     StoreProvider: ProductsProvider,
+//     useDispatch: useProductsDispatch
+// } = makeStore()
 
 export const useProductSearch = (source) => {
-    const dispatch = useProductSearchDispatch()
-    const productSearchStore = useProductSearchStore()
+    const dispatch = useProductsDispatch()
+    const productSearchStore = useProductsStore()
 
     const api = useCommerceAPI()
     const {data, isLoading, error} = useServerEffect(async ({res, params, location, ...rest}) => {
@@ -228,9 +153,12 @@ const reduceProducts = (products) => {
     }, {})
 }
 
+// this hooks is used to
 export const useProduct = (productId) => {
     console.log('productId', productId)
-    const {products} = useProductSearchStore()
+    const {products} = useProductsStore()
+
+    const dispatch = useProductsDispatch()
     const api = useCommerceAPI()
     console.log('products[productId.toString()]', products[productId.toString()])
     let product
@@ -259,6 +187,11 @@ export const useProduct = (productId) => {
             if (typeof product?.type === 'string') {
                 throw new HTTPNotFound(product.detail)
             }
+
+            dispatch({
+                type: 'update_a_product',
+                payload: product
+            })
 
             return {product}
         },

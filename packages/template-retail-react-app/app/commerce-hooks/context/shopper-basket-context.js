@@ -9,6 +9,8 @@ import React, {useEffect} from 'react'
 import {useCommerceAPI} from '../../commerce-api/contexts'
 import useCustomer from '../../commerce-api/hooks/useCustomer'
 import basketsReducer from '../reducers/baskets-reducer'
+import {basketShopperAPI, shopperCustomersAPI} from '../api'
+import {isError} from '../../commerce-api/utils'
 
 const basketsInitialState = {
     isLoading: false,
@@ -16,12 +18,15 @@ const basketsInitialState = {
     data: [],
     total: 0
 }
+
 const BasketsContext = React.createContext()
 const BasketsProvider = ({children}) => {
-    // TODO: we should separate api into different apis context instead of having a combined api object here
+    // Separate api into different apis context instead of having a combined api object here
     // for example: ShopperBasketAPI, ShopperCustomerAPI
     // expect to use const api = shopperBasketAPI()
-    const api = useCommerceAPI()
+    const shopperBaskets = basketShopperAPI()
+
+    const shopperCustomers = shopperCustomersAPI()
 
     // slas hooks
     const shopper = useCustomer()
@@ -38,12 +43,16 @@ const BasketsProvider = ({children}) => {
     const createBasket = async () => {
         dispatch({type: 'loading'})
         try {
-            const res = await api.shopperBaskets.createBasket({})
+            console.log('%c creating a basket here ', 'background: green')
+            // why calling shopperBaskets.createBasket({}) not working??
+
+            const res = await shopperBaskets.createBasket({body: {}})
+            // const res = await api.shopperBaskets.createBasket({})
             console.log('seting a basket====================')
-            dispatch({type: 'set_basket', payload: res})
+            // dispatch({type: 'set_basket', payload: res})
             return res
         } catch (err) {
-            dispatch({type: 'error'})
+            dispatch({type: 'basket_error'})
             throw new Error(err)
         }
     }
@@ -52,12 +61,14 @@ const BasketsProvider = ({children}) => {
         dispatch({type: 'loading'})
         try {
             console.log('getting baskets---------------------------')
-            console.log('api.shopperBaskets', api.shopperBaskets)
-            const res = await api.shopperCustomers.getCustomerBaskets({
+            console.log('shopper?.customerId', shopper?.customerId)
+            const res = await shopperCustomers.getCustomerBaskets({
                 parameters: {customerId: shopper?.customerId}
             })
-            console.log('res', res)
-            if (!res.total) {
+            if (isError(res)) {
+                throw new Error(res)
+            }
+            if (res.total === 0) {
                 console.log('creating a basket ----------------------------')
                 await createBasket()
             }
@@ -75,7 +86,7 @@ const BasketsProvider = ({children}) => {
         dispatch({type: 'loading'})
         try {
             console.log('adding-item to cart')
-            const res = await api.shopperBaskets.addItemToBasket({
+            const res = await shopperBaskets.addItemToBasket({
                 body: item,
                 parameters: {basketId}
             })
@@ -91,9 +102,6 @@ const BasketsProvider = ({children}) => {
     // if there is no basket, create one => can we delay this until someone adds an item to cart
     React.useEffect(() => {
         console.log('Initializing baskets =========================')
-        // console.log('baskets', baskets)
-        // console.log('shoppers', shopper)
-        // console.log('>>>>>>')
 
         if (!baskets.data.length && shopper.isInitialized) {
             dispatch({type: 'loading'})
@@ -115,12 +123,12 @@ const BasketsProvider = ({children}) => {
     )
 }
 
-const useBaskets = () => {
+const useBasketsStore = () => {
     const context = React.useContext(BasketsContext)
     if (context === undefined) {
-        throw new Error(`useUser must be used within a UserProvider`)
+        throw new Error(`useBaskets must be used within a BasketsProvider`)
     }
     return context
 }
 
-export {useBaskets, BasketsProvider}
+export {useBasketsStore, BasketsProvider}

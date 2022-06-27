@@ -6,7 +6,9 @@
  */
 
 const basketsReducer = (state, action) => {
+    console.log('basketReducer')
     console.log('state', state)
+    console.log('action', action)
     switch (action.type) {
         case 'loading': {
             return {
