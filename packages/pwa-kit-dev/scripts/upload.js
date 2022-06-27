@@ -13,6 +13,7 @@ const DEFAULT_ORIGIN = process.env.CLOUD_API_BASE || 'https://cloud.mobify.com'
 
 const OPTION_DEFAULTS = {
     buildDirectory: 'build',
+    settingsFile: Utils.getCredentialsFile(),
     origin: DEFAULT_ORIGIN,
     target: '',
     message: Utils.setDefaultMessage()
