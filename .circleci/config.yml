@@ -81,7 +81,6 @@ commands:
 
             sudo npm install -g npm@7
             npm ci
-            npm run build
       - save_cache:
           key: npm-cache
           paths:
@@ -121,6 +120,9 @@ commands:
 
             # Note: Each of these test commands need to be exposed on the monorepo
             # root and *also* on the PWA package. This section is run on both.
+
+            # Before testing the build artifacts we need to create them.
+            npm run build
 
             # Ensure bundlesize is in check
             npm run test:max-file-size
