@@ -122,7 +122,7 @@ commands:
             # root and *also* on the PWA package. This section is run on both.
 
             # Before testing the build artifacts we need to create them.
-            npm run build
+            npm run lerna -- run build --scope "retail-react-app"
 
             # Ensure bundlesize is in check
             npm run test:max-file-size
