@@ -81,6 +81,7 @@ commands:
 
             sudo npm install -g npm@7
             npm ci
+            npm run build
       - save_cache:
           key: npm-cache
           paths:
