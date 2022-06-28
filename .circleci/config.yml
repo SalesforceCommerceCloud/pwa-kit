@@ -121,6 +121,9 @@ commands:
             # Note: Each of these test commands need to be exposed on the monorepo
             # root and *also* on the PWA package. This section is run on both.
 
+            # Ensure bundlesize is in check
+            npm run test:max-file-size
+
             # Always run fast unit tests
             npm run test
   smoketestscripts:
