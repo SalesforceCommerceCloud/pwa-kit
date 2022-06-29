@@ -551,6 +551,59 @@ ProductList.shouldGetProps = ({previousLocation, location}) =>
     previousLocation.pathname !== location.pathname ||
     previousLocation.search !== location.search
 
+ProductList.getProps = async ({res, params, location, api}) => {
+    const {categoryId} = params
+    const urlParams = new URLSearchParams(location.search)
+    let searchQuery = urlParams.get('q')
+    let isSearch = false
+
+    if (searchQuery) {
+        isSearch = true
+    }
+    // In case somebody navigates to /search without a param
+    if (!categoryId && !isSearch) {
+        // We will simulate search for empty string
+        return {searchQuery: ' ', productSearchResult: {}}
+    }
+
+    const searchParams = parseSearchParams(location.search, false)
+
+    if (!searchParams.refine.includes(`cgid=${categoryId}`) && categoryId) {
+        searchParams.refine.push(`cgid=${categoryId}`)
+    }
+
+    // only search master products
+    searchParams.refine.push('htype=master')
+
+    // Set the `cache-control` header values to align with the Commerce API settings.
+    if (res) {
+        res.set('Cache-Control', `max-age=${MAX_CACHE_AGE}`)
+    }
+
+    const [category, productSearchResult] = await Promise.all([
+        isSearch
+            ? Promise.resolve()
+            : api.shopperProducts.getCategory({
+                  parameters: {id: categoryId, levels: 0}
+              }),
+        api.shopperSearch.productSearch({
+            parameters: searchParams
+        })
+    ])
+
+    // Apply disallow list to refinements.
+    productSearchResult.refinements = productSearchResult?.refinements?.filter(
+        ({attributeId}) => !REFINEMENT_DISALLOW_LIST.includes(attributeId)
+    )
+
+    // The `isomorphic-sdk` returns error objects when they occur, so we
+    // need to check the category type and throw if required.
+    if (category?.type?.endsWith('category-not-found')) {
+        throw new HTTPNotFound(category.detail)
+    }
+
+    return {searchQuery: searchQuery, productSearchResult}
+}
 
 ProductList.propTypes = {
     /**
