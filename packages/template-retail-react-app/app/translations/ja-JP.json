@@ -538,6 +538,9 @@
   "global.error.something_went_wrong": {
     "defaultMessage": "問題が発生しました。もう一度お試しください!"
   },
+  "global.info.removed_from_wishlist": {
+    "defaultMessage": "ほしい物リストから商品が削除されました"
+  },
   "header.button.assistive_msg.logo": {
     "defaultMessage": "ロゴ"
   },
@@ -979,9 +982,6 @@
   "product_list.info.added_to_wishlist": {
     "defaultMessage": "{quantity} {quantity, plural, one { 個の商品} other { 個の商品}}がほしい物リストに追加されました"
   },
-  "global.info.removed_from_wishlist": {
-    "defaultMessage": "ほしい物リストから商品が削除されました"
-  },
   "product_list.modal.button.clear_filters": {
     "defaultMessage": "フィルターのクリア"
   },
@@ -1047,9 +1047,6 @@
   },
   "recommended_products.info.added_to_wishlist": {
     "defaultMessage": "{quantity} {quantity, plural, one { 個の商品} other { 個の商品}}がほしい物リストに追加されました"
-  },
-  "global.info.removed_from_wishlist": {
-    "defaultMessage": "ほしい物リストから商品が削除されました"
   },
   "register_form.action.sign_in": {
     "defaultMessage": "サインイン"

@@ -538,6 +538,9 @@
   "global.error.something_went_wrong": {
     "defaultMessage": "문제가 발생했습니다. 다시 시도하십시오."
   },
+  "global.info.removed_from_wishlist": {
+    "defaultMessage": "항목이 위시리스트에서 제거됨"
+  },
   "header.button.assistive_msg.logo": {
     "defaultMessage": "로고"
   },
@@ -979,9 +982,6 @@
   "product_list.info.added_to_wishlist": {
     "defaultMessage": "{quantity} {quantity, plural, one {개 항목} other {개 항목}}이 위시리스트에 추가됨"
   },
-  "global.info.removed_from_wishlist": {
-    "defaultMessage": "항목이 위시리스트에서 제거됨"
-  },
   "product_list.modal.button.clear_filters": {
     "defaultMessage": "필터 지우기"
   },
@@ -1047,9 +1047,6 @@
   },
   "recommended_products.info.added_to_wishlist": {
     "defaultMessage": "{quantity} {quantity, plural, one {개 항목} other {개 항목}}이 위시리스트에 추가됨"
-  },
-  "global.info.removed_from_wishlist": {
-    "defaultMessage": "항목이 위시리스트에서 제거됨"
   },
   "register_form.action.sign_in": {
     "defaultMessage": "로그인"

@@ -538,6 +538,9 @@
   "global.error.something_went_wrong": {
     "defaultMessage": "出现错误。重试。"
   },
+  "global.info.removed_from_wishlist": {
+    "defaultMessage": "从愿望清单中移除商品"
+  },
   "header.button.assistive_msg.logo": {
     "defaultMessage": "标志"
   },
@@ -979,9 +982,6 @@
   "product_list.info.added_to_wishlist": {
     "defaultMessage": "{quantity} {quantity, plural, one { 件商品} other { 件商品}}已添加至愿望清单"
   },
-  "global.info.removed_from_wishlist": {
-    "defaultMessage": "从愿望清单中移除商品"
-  },
   "product_list.modal.button.clear_filters": {
     "defaultMessage": "清除筛选器"
   },
@@ -1047,9 +1047,6 @@
   },
   "recommended_products.info.added_to_wishlist": {
     "defaultMessage": "{quantity} {quantity, plural, one { 件商品} other { 件商品}}已添加至愿望清单"
-  },
-  "global.info.removed_from_wishlist": {
-    "defaultMessage": "从愿望清单中移除商品"
   },
   "register_form.action.sign_in": {
     "defaultMessage": "登录"
