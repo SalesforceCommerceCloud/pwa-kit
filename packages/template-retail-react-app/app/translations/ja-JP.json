@@ -979,7 +979,7 @@
   "product_list.info.added_to_wishlist": {
     "defaultMessage": "{quantity} {quantity, plural, one { 個の商品} other { 個の商品}}がほしい物リストに追加されました"
   },
-  "product_list.info.removed_from_wishlist": {
+  "global.info.removed_from_wishlist": {
     "defaultMessage": "ほしい物リストから商品が削除されました"
   },
   "product_list.modal.button.clear_filters": {
@@ -1048,7 +1048,7 @@
   "recommended_products.info.added_to_wishlist": {
     "defaultMessage": "{quantity} {quantity, plural, one { 個の商品} other { 個の商品}}がほしい物リストに追加されました"
   },
-  "recommended_products.info.removed_from_wishlist": {
+  "global.info.removed_from_wishlist": {
     "defaultMessage": "ほしい物リストから商品が削除されました"
   },
   "register_form.action.sign_in": {

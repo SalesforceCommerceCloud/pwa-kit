@@ -979,7 +979,7 @@
   "product_list.info.added_to_wishlist": {
     "defaultMessage": "{quantity} {quantity, plural, one {article ajouté} other {articles ajoutés}} à la liste de souhaits"
   },
-  "product_list.info.removed_from_wishlist": {
+  "global.info.removed_from_wishlist": {
     "defaultMessage": "Article supprimé de la liste de souhaits"
   },
   "product_list.modal.button.clear_filters": {
@@ -1048,7 +1048,7 @@
   "recommended_products.info.added_to_wishlist": {
     "defaultMessage": "{quantity} {quantity, plural, one {article ajouté} other {articles ajoutés}} à la liste de souhaits"
   },
-  "recommended_products.info.removed_from_wishlist": {
+  "global.info.removed_from_wishlist": {
     "defaultMessage": "Article supprimé de la liste de souhaits"
   },
   "register_form.action.sign_in": {

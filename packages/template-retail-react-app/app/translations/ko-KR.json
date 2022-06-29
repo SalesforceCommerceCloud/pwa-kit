@@ -979,7 +979,7 @@
   "product_list.info.added_to_wishlist": {
     "defaultMessage": "{quantity} {quantity, plural, one {개 항목} other {개 항목}}이 위시리스트에 추가됨"
   },
-  "product_list.info.removed_from_wishlist": {
+  "global.info.removed_from_wishlist": {
     "defaultMessage": "항목이 위시리스트에서 제거됨"
   },
   "product_list.modal.button.clear_filters": {
@@ -1048,7 +1048,7 @@
   "recommended_products.info.added_to_wishlist": {
     "defaultMessage": "{quantity} {quantity, plural, one {개 항목} other {개 항목}}이 위시리스트에 추가됨"
   },
-  "recommended_products.info.removed_from_wishlist": {
+  "global.info.removed_from_wishlist": {
     "defaultMessage": "항목이 위시리스트에서 제거됨"
   },
   "register_form.action.sign_in": {

@@ -979,7 +979,7 @@
   "product_list.info.added_to_wishlist": {
     "defaultMessage": "{quantity} {quantity, plural, one {件商品} other {件商品}}已新增至願望清單"
   },
-  "product_list.info.removed_from_wishlist": {
+  "global.info.removed_from_wishlist": {
     "defaultMessage": "已從願望清單移除商品"
   },
   "product_list.modal.button.clear_filters": {
@@ -1048,7 +1048,7 @@
   "recommended_products.info.added_to_wishlist": {
     "defaultMessage": "{quantity} {quantity, plural, one {件商品} other {件商品}}已新增至願望清單"
   },
-  "recommended_products.info.removed_from_wishlist": {
+  "global.info.removed_from_wishlist": {
     "defaultMessage": "已從願望清單移除商品"
   },
   "register_form.action.sign_in": {

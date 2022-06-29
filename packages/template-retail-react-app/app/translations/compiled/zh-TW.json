@@ -1313,6 +1313,12 @@
       "value": "發生錯誤。請再試一次。"
     }
   ],
+  "global.info.removed_from_wishlist": [
+    {
+      "type": 0,
+      "value": "已從願望清單移除商品"
+    }
+  ],
   "header.button.assistive_msg.logo": [
     {
       "type": 0,
@@ -2299,12 +2305,6 @@
       "value": "已新增至願望清單"
     }
   ],
-  "product_list.info.removed_from_wishlist": [
-    {
-      "type": 0,
-      "value": "已從願望清單移除商品"
-    }
-  ],
   "product_list.modal.button.clear_filters": [
     {
       "type": 0,
@@ -2479,12 +2479,6 @@
     {
       "type": 0,
       "value": "已新增至願望清單"
-    }
-  ],
-  "recommended_products.info.removed_from_wishlist": [
-    {
-      "type": 0,
-      "value": "已從願望清單移除商品"
     }
   ],
   "register_form.action.sign_in": [
