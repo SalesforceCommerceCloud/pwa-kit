@@ -1,15 +1,23 @@
 ## v2.1.0-dev (May 16, 2022)
 
+### Bug Fixes
+
+- Various instances of hard-coded text have been replaced with translatable messages (see [Translations](#translations)).
+- Recommended Products tiles now show localized product names, rather than using the default locale.
+
 ### Translations
 
 - Updated text for many fields
 - Added `checkout.message.generic_error`
+- Added `wishlist_primary_action.button.add_to_cart`
 - Added `wishlist_primary_action.button.select_options`
-- Added `wishlist.link.added_to_wishlist.view`
+- Added `global.info.added_to_wishlist`
+- Added `global.link.added_to_wishlist.view_wishlist`
 - Added `credit_card_fields.tool_tip.security_code.american_express`
 - Changed `credit_card_fields.tool_tip.security_code` from a template that accepts values to a static string
 - Changed `home.description.contact_our_staff` to `home.description.here_to_help`
 - Changed `home.description.get_you_to_the_right_place` to `home.description.here_to_help_line_2`
+- Combined `product_list.info.removed_from_wishlist` and `recommended_products.info.removed_from_wishlist` into `global.info.removed_from_wishlist`
 
 ## v2.0.0 (May 16, 2022)
 
