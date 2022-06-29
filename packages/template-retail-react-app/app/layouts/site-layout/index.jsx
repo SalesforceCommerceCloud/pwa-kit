@@ -35,9 +35,10 @@ const DEFAULT_ROOT_CATEGORY = 'root'
 
 import {useCategories} from '../../hooks/use-categories'
 import PropTypes from 'prop-types'
+import SiteLayoutCheckout from '../site-layout-checkout'
 
 const SiteLayout = (props) => {
-    const {children} = props
+    const {children, header, footer, title} = props
 
     const {categories: allCategories = {}} = useCategories()
 
@@ -130,7 +131,7 @@ const SiteLayout = (props) => {
 
     return (
         <>
-            <h1>SiteLayout</h1>
+            <h1>{title ? title : 'SiteLayout'}</h1>
             <Seo>
                 <meta name="theme-color" content={THEME_COLOR} />
                 <meta name="apple-mobile-web-app-title" content={DEFAULT_SITE_TITLE} />
@@ -170,26 +171,30 @@ const SiteLayout = (props) => {
                 <SkipNavLink zIndex="skipLink">Skip to Content</SkipNavLink>
 
                 <Box {...styles.headerWrapper}>
-                    <Header
-                        onMenuClick={onOpen}
-                        onLogoClick={onLogoClick}
-                        onMyCartClick={onCartClick}
-                        onMyAccountClick={onAccountClick}
-                        onWishlistClick={onWishlistClick}
-                    >
-                        <HideOnDesktop>
-                            <DrawerMenu
-                                isOpen={isOpen}
-                                onClose={onClose}
-                                onLogoClick={onLogoClick}
-                                root={allCategories[DEFAULT_ROOT_CATEGORY]}
-                            />
-                        </HideOnDesktop>
+                    {header ? (
+                        header
+                    ) : (
+                        <Header
+                            onMenuClick={onOpen}
+                            onLogoClick={onLogoClick}
+                            onMyCartClick={onCartClick}
+                            onMyAccountClick={onAccountClick}
+                            onWishlistClick={onWishlistClick}
+                        >
+                            <HideOnDesktop>
+                                <DrawerMenu
+                                    isOpen={isOpen}
+                                    onClose={onClose}
+                                    onLogoClick={onLogoClick}
+                                    root={allCategories[DEFAULT_ROOT_CATEGORY]}
+                                />
+                            </HideOnDesktop>
 
-                        <HideOnMobile>
-                            <ListMenu root={allCategories[DEFAULT_ROOT_CATEGORY]} />
-                        </HideOnMobile>
-                    </Header>
+                            <HideOnMobile>
+                                <ListMenu root={allCategories[DEFAULT_ROOT_CATEGORY]} />
+                            </HideOnMobile>
+                        </Header>
+                    )}
                 </Box>
 
                 {!isOnline && <OfflineBanner />}
@@ -214,7 +219,7 @@ const SiteLayout = (props) => {
                         </Box>
                     </SkipNavContent>
 
-                    <Footer />
+                    {footer ? footer : <Footer />}
 
                     <AuthModal {...authModal} />
                 </AddToCartModalProvider>

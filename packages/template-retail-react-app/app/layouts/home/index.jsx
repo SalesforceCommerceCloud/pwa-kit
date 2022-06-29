@@ -5,24 +5,8 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import {getLayout as getSiteLayoutHome} from '../site-layout-home'
-import PropTypes from 'prop-types'
-
-const HomeLayout = ({children}) => {
-    return (
-        <div>
-            HomeLayout
-            <div>{children}</div>
-        </div>
-    )
-}
-
-HomeLayout.propTypes = {
-    children: PropTypes.node
-}
+import SiteLayout from '../site-layout'
 
 export const getLayout = (page) => {
-    return getSiteLayoutHome(<HomeLayout>{page}</HomeLayout>)
+    return <SiteLayout title="SiteLayout Home">{page}</SiteLayout>
 }
-
-export default HomeLayout
