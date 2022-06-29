@@ -514,13 +514,13 @@
   "cart_secondary_button_group.link_learn_more": [
     {
       "type": 0,
-      "value": "Envie d'en savoir plus ?"
+      "value": "En savoir plus"
     }
   ],
   "cart_skeleton.heading.order_summary": [
     {
       "type": 0,
-      "value": "Résumé de commande"
+      "value": "Résumé de la commande"
     }
   ],
   "cart_skeleton.title.cart": [
@@ -628,7 +628,7 @@
   "checkout_confirmation.heading.order_summary": [
     {
       "type": 0,
-      "value": "Résumé de commande"
+      "value": "Résumé de la commande"
     }
   ],
   "checkout_confirmation.heading.payment_details": [
@@ -967,28 +967,6 @@
       "value": "Coordonnées"
     }
   ],
-  "credit_card_fields.tool_tip.security_code": [
-    {
-      "type": 0,
-      "value": "Ce code à "
-    },
-    {
-      "type": 1,
-      "value": "length"
-    },
-    {
-      "type": 0,
-      "value": " chiffres se trouve au "
-    },
-    {
-      "type": 1,
-      "value": "side"
-    },
-    {
-      "type": 0,
-      "value": " de votre carte."
-    }
-  ],
   "drawer_menu.button.account_details": [
     {
       "type": 0,
@@ -1180,7 +1158,7 @@
   "empty_search_results.link.contact_us": [
     {
       "type": 0,
-      "value": "Contactez-nous"
+      "value": "contactez-nous"
     }
   ],
   "empty_search_results.recommended_products.title.most_viewed": [
@@ -1470,7 +1448,7 @@
   "home.features.heading.einstein_recommendations": [
     {
       "type": 0,
-      "value": "Einstein Recommendations"
+      "value": "Recommandations Einstein"
     }
   ],
   "home.features.heading.my_account": [
@@ -1512,7 +1490,7 @@
   "home.hero_features.link.design_kit": [
     {
       "type": 0,
-      "value": "Créer avec le kit de conception Figma PWA"
+      "value": "Créer avec le Figma PWA Design Kit"
     }
   ],
   "home.hero_features.link.on_github": [
@@ -1530,7 +1508,7 @@
   "home.link.contact_us": [
     {
       "type": 0,
-      "value": "Contactez-nous"
+      "value": "Nous contacter"
     }
   ],
   "home.link.get_started": [
@@ -1548,7 +1526,7 @@
   "home.title.react_starter_store": [
     {
       "type": 0,
-      "value": "La boutique de démarrage React PWA pour le retail"
+      "value": "React PWA Starter Store pour le retail"
     }
   ],
   "item_attributes.label.promotions": [
@@ -1992,7 +1970,7 @@
   "order_summary.heading.order_summary": [
     {
       "type": 0,
-      "value": "Résumé de commande"
+      "value": "Résumé de la commande"
     }
   ],
   "order_summary.label.estimated_total": [
@@ -2188,7 +2166,7 @@
   "product_detail.accordion.button.reviews": [
     {
       "type": 0,
-      "value": "Vérification"
+      "value": "Avis"
     }
   ],
   "product_detail.accordion.button.size_fit": [
@@ -2880,7 +2858,7 @@
   "use_address_fields.label.preferred": [
     {
       "type": 0,
-      "value": "Définir comme valeur par défaut"
+      "value": "Définir comme adresse par défaut"
     }
   ],
   "use_address_fields.label.province": [

@@ -158,7 +158,7 @@
   "account_order_history.description.once_you_place_order": [
     {
       "type": 0,
-      "value": "Sobald Sie eine Bestellung aufgegeben haben, werden die Einzelheiten hierzu hier angezeigt."
+      "value": "Sobald Sie eine Bestellung aufgegeben haben, werden die Einzelheiten hier angezeigt."
     }
   ],
   "account_order_history.heading.no_order_yet": [
@@ -898,19 +898,19 @@
   "confirmation_modal.remove_cart_item.title.confirm_remove": [
     {
       "type": 0,
-      "value": "Entfernungsvorgang des Artikels bestätigen"
+      "value": "Entfernung des Artikels bestätigen"
     }
   ],
   "confirmation_modal.remove_wishlist_item.action.no": [
     {
       "type": 0,
-      "value": "Nein, Artikel beibehalten."
+      "value": "Nein, Artikel beibehalten"
     }
   ],
   "confirmation_modal.remove_wishlist_item.action.yes": [
     {
       "type": 0,
-      "value": "Ja, Artikel entfernen."
+      "value": "Ja, Artikel entfernen"
     }
   ],
   "confirmation_modal.remove_wishlist_item.message.sure_to_remove": [
@@ -922,7 +922,7 @@
   "confirmation_modal.remove_wishlist_item.title.confirm_remove": [
     {
       "type": 0,
-      "value": "Entfernungsvorgang des Artikels bestätigen"
+      "value": "Entfernung des Artikels bestätigen"
     }
   ],
   "contact_info.action.sign_out": [
@@ -965,28 +965,6 @@
     {
       "type": 0,
       "value": "Kontaktinfo"
-    }
-  ],
-  "credit_card_fields.tool_tip.security_code": [
-    {
-      "type": 0,
-      "value": "Dieser "
-    },
-    {
-      "type": 1,
-      "value": "length"
-    },
-    {
-      "type": 0,
-      "value": "-stellige Code kann der "
-    },
-    {
-      "type": 1,
-      "value": "side"
-    },
-    {
-      "type": 0,
-      "value": " Ihrer Karte entnommen werden."
     }
   ],
   "drawer_menu.button.account_details": [
@@ -1482,7 +1460,7 @@
   "home.features.heading.shopper_login": [
     {
       "type": 0,
-      "value": "Shopper Login and API Access Service"
+      "value": "Shopper Login and API Access Service (SLAS)"
     }
   ],
   "home.features.heading.wishlist": [
@@ -1548,7 +1526,7 @@
   "home.title.react_starter_store": [
     {
       "type": 0,
-      "value": "Der React PWA Starter Store für den Einzelhandel"
+      "value": "React PWA Starter Store für den Einzelhandel"
     }
   ],
   "item_attributes.label.promotions": [
