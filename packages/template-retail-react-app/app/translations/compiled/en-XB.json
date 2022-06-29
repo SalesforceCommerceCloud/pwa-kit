@@ -469,6 +469,12 @@
       "value": "[!! Ḭṭèèèṁ ŕŕŕèṁŏŏŏṿèḋḋḋ ḟŕŕŕŏṁ ćâŕŕŕṭ !!]"
     }
   ],
+  "cart.link.added_to_wishlist.view_wishlist": [
+    {
+      "type": 0,
+      "value": "[!! Ṽíèèèẘ !!]"
+    }
+  ],
   "cart.recommended_products.title.may_also_like": [
     {
       "type": 0,
@@ -593,6 +599,12 @@
     {
       "type": 0,
       "value": "[!! Ṕĺâââćè Õŕḋḋḋèŕ !!]"
+    }
+  ],
+  "checkout.message.generic_error": [
+    {
+      "type": 0,
+      "value": "[!! Ḁń ůńèèèẋṗèèèćṭèèèḋ èèèŕŕŏŏŏŕ ŏŏŏććůůůŕŕèèèḋ ḋḋḋůŕíííńĝ ćḫèèèćǩŏŏŏůṭ. !!]"
     }
   ],
   "checkout_confirmation.button.create_account": [
@@ -970,23 +982,13 @@
   "credit_card_fields.tool_tip.security_code": [
     {
       "type": 0,
-      "value": "[!! Ṯḫíííś  !!]"
-    },
-    {
-      "type": 1,
-      "value": "length"
-    },
+      "value": "[!! Ṯḫíííś 3-ḋíííĝíṭṭṭ ćŏŏŏḋè ćâńńń ḃèèè ḟŏŏŏůńḋḋḋ ŏńńń ṭḫḫḫè ḃḃḃâćǩǩǩ ŏḟḟḟ ẏŏŏŏůŕ ćâŕŕŕḋ. !!]"
+    }
+  ],
+  "credit_card_fields.tool_tip.security_code.american_express": [
     {
       "type": 0,
-      "value": "[!! -ḋíííĝíṭṭṭ ćŏŏŏḋè ćâńńń ḃèèè ḟŏŏŏůńḋḋḋ ŏńńń ṭḫḫḫè  !!]"
-    },
-    {
-      "type": 1,
-      "value": "side"
-    },
-    {
-      "type": 0,
-      "value": "[!!  ŏḟḟḟ ẏŏŏŏůŕ ćâŕŕŕḋ. !!]"
+      "value": "[!! Ṯḫíííś 4-ḋíííĝíṭṭṭ ćŏŏŏḋè ćâńńń ḃèèè ḟŏŏŏůńḋḋḋ ŏńńń ṭḫḫḫè ḟḟḟŕŏńńńṭ ŏŏŏḟ ẏẏẏŏůŕŕŕ ćâââŕḋ. !!]"
     }
   ],
   "drawer_menu.button.account_details": [
@@ -1387,19 +1389,19 @@
       "value": "[!! Ḿẏ Ḁććććŏůńńńṭ !!]"
     }
   ],
-  "home.description.contact_our_staff": [
-    {
-      "type": 0,
-      "value": "[!! Ḉŏńńńṭâćććṭ ŏŏŏůŕ śůṗṗṗṗŏŕŕŕṭ śśśṭâḟḟḟḟ. !!]"
-    }
-  ],
   "home.description.features": [
     {
       "type": 0,
       "value": "[!! Õůṭṭṭ-ŏḟḟḟ-ṭḫḫḫè-ḃḃḃŏẋ ḟèâââṭůŕŕŕèś śŏ ṭḫâââṭ ẏẏẏŏů ḟŏćććůś ŏńĺĺĺẏ ŏŏŏń âââḋḋíííńĝ èńḫḫḫâńćććèṁèèèńṭśśś. !!]"
     }
   ],
-  "home.description.get_you_to_the_right_place": [
+  "home.description.here_to_help": [
+    {
+      "type": 0,
+      "value": "[!! Ḉŏńńńṭâćććṭ ŏŏŏůŕ śůṗṗṗṗŏŕŕŕṭ śśśṭâḟḟḟḟ. !!]"
+    }
+  ],
+  "home.description.here_to_help_line_2": [
     {
       "type": 0,
       "value": "[!! Ṯḫèèèẏ ẘẘẘíĺĺĺĺ ĝèèèṭ ẏẏẏŏů ṭŏ ṭḫèèè ŕíííĝḫṭṭṭ ṗĺĺĺâćèèè. !!]"
@@ -3257,6 +3259,12 @@
     {
       "type": 0,
       "value": "[!! Ŋèẘẘẘ Ṕâââśśẘẘẘŏŕḋḋḋ !!]"
+    }
+  ],
+  "wishlist_primary_action.button.select_options": [
+    {
+      "type": 0,
+      "value": "[!! Ṡèĺĺĺèćṭṭṭ Õṗṗṗṭíŏŏŏńś !!]"
     }
   ],
   "wishlist_primary_action.info.added_to_cart": [

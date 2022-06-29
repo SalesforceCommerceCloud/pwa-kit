@@ -284,19 +284,6 @@ export const routeComponent = (Wrapped, isPage, locals) => {
 
             const willGetProps = await shouldGetPropsNow()
 
-            // Because `shouldGetPropsNow` is async the app is often
-            // no longer hydrating when you hit this line. That doesn't
-            // matter for initialization. For logging make it clear
-            // that we mean "the app was hydrating on this call to
-            // componentDidUpdate".
-            console.log(
-                JSON.stringify({
-                    templateName,
-                    wasHydratingOnUpdate,
-                    willGetProps
-                })
-            )
-
             if (!willGetProps) {
                 onUpdateComplete()
                 return
@@ -319,7 +306,6 @@ export const routeComponent = (Wrapped, isPage, locals) => {
                  * stores a reference to the promise that we check before we use
                  * the results from it.
                  */
-                console.log(`Calling getProps for '${templateName}'`)
                 const req = undefined
                 const res = undefined
                 const propsPromise = RouteComponent.getProps({
