@@ -313,11 +313,9 @@ export const CheckoutProvider = ({children}) => {
                 try {
                     await basket.createOrder()
                 } catch (error) {
-                    // Note: More detailed error messages are provided by OCAPI, but localization
-                    // is limited to locales supported by Business Manager, and not all errors have
-                    // localized messages. Due to these limitations, and the unpredictable nature of
-                    // the errors, we do not recommend using those errors, and instead providing
-                    // your own.
+                    // Note: It is possible to get localized error messages from OCAPI, but this
+                    // is not available for all locales or all error messages. Therefore, we
+                    // recommend using your own error messages, rather than those provided by OCAPI.
                     const message = formatMessage({
                         id: 'checkout.message.generic_error',
                         defaultMessage: 'An unexpected error occurred during checkout.'
