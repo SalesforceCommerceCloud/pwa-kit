@@ -12,7 +12,7 @@
         "type": "git",
         "url": "git+https://github.com/SalesforceCommerceCloud/pwa-kit.git"
       },
-      "homepage": "https://github.com/SalesforceCommerceCloud/pwa-kit/tree/develop/packages/hooks-slas#readme",
+      "homepage": "https://github.com/SalesforceCommerceCloud/pwa-kit/tree/develop/packages/ecom-react-hooks#readme",
       "bugs": {
         "url": "https://github.com/SalesforceCommerceCloud/pwa-kit/issues"
       },
@@ -21,12 +21,13 @@
       "build:watch": "watch 'npm run build' src/",
       "lint": "npm run lint:js && tsc --noEmit",
       "lint:fix": "npm run lint:js -- --fix",
-      "lint:js": "internal-lib-build lint \"**/*.{js,jsx}\"",
+      "lint:js": "internal-lib-build lint \"**/*.{js,jsx,ts,tsx}\"",
       "test": "internal-lib-build test",
       "test:watch": "npm test -- --watch",
       "test:inspect": "node --inspect-brk jest --runInBand",
+      "tsc:noEmit": "tsc --noEmit",
       "version": "node ./scripts/version.js",
-      "format": "internal-lib-build format \"**/*.{js,jsx}\""
+      "format": "internal-lib-build format \"**/*.{js,jsx,ts,tsx}\""
     },
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
