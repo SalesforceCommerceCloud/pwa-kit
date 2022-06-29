@@ -1,5 +1,5 @@
 {
-    "name": "ecom-hooks",
+    "name": "ecom-react-hooks",
     "version": "2.1.0-dev",
     "description": "A library that provides hooks for fetching data from Commerce Cloud",
     "author": "dev@mobify.com",
@@ -19,7 +19,7 @@
     "scripts": {
       "build": "cross-env NODE_ENV=production internal-lib-build build && tsc --emitDeclarationOnly",
       "build:watch": "watch 'npm run build' src/",
-      "lint": "npm run lint:js",
+      "lint": "npm run lint:js && tsc --noEmit",
       "lint:fix": "npm run lint:js -- --fix",
       "lint:js": "internal-lib-build lint \"**/*.{js,jsx}\"",
       "test": "internal-lib-build test",
@@ -36,9 +36,11 @@
     "private": true,
     "devDependencies": {
       "@types/react": "^17.0.2",
+      "@types/react-dom": "^17.0.2",
       "cross-env": "^5.2.0",
       "internal-lib-build": "^2.1.0-dev",
       "react": "^17.0.2",
+      "react-dom": "^17.0.2",
       "typescript": "^4.7.2",
       "watch": "^1.0.2"
     },
