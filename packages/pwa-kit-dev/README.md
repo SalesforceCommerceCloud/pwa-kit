@@ -4,8 +4,8 @@ A command line interface tool to develop, build, and deploy PWA Kit projects.
 
 ## Requirements
 
--   Node 14
--   npm 6.14.4 or later
+- Node 14 or 16
+- npm 6.14.4 or later
 
 To see all the available commands, run:
 
@@ -17,5 +17,6 @@ npx pwa-kit-dev --help
 
 The full documentation for PWA Kit is hosted on the [Salesforce Developers](https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/overview) portal.
 
-### Useful links:
+### Useful links
+
 - [Push and deploy bundles](https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/pushing-and-deploying-bundles.html)
