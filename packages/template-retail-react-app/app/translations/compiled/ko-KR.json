@@ -1293,6 +1293,12 @@
       "value": "문제가 발생했습니다. 다시 시도하십시오."
     }
   ],
+  "global.info.removed_from_wishlist": [
+    {
+      "type": 0,
+      "value": "항목이 위시리스트에서 제거됨"
+    }
+  ],
   "header.button.assistive_msg.logo": [
     {
       "type": 0,
@@ -2283,12 +2289,6 @@
       "value": "이 위시리스트에 추가됨"
     }
   ],
-  "product_list.info.removed_from_wishlist": [
-    {
-      "type": 0,
-      "value": "항목이 위시리스트에서 제거됨"
-    }
-  ],
   "product_list.modal.button.clear_filters": [
     {
       "type": 0,
@@ -2459,12 +2459,6 @@
     {
       "type": 0,
       "value": "이 위시리스트에 추가됨"
-    }
-  ],
-  "recommended_products.info.removed_from_wishlist": [
-    {
-      "type": 0,
-      "value": "항목이 위시리스트에서 제거됨"
     }
   ],
   "register_form.action.sign_in": [

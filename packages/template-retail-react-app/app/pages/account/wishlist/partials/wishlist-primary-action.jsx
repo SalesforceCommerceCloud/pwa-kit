@@ -85,7 +85,10 @@ const WishlistPrimaryAction = () => {
                     w={'full'}
                     isLoading={isLoading}
                 >
-                    Add To Cart
+                    <FormattedMessage
+                        defaultMessage="Add to Cart"
+                        id="wishlist_primary_action.button.add_to_cart"
+                    />
                 </Button>
             )}
         </>

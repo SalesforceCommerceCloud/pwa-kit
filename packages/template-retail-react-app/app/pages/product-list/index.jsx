@@ -61,7 +61,14 @@ import {useCategories} from '../../hooks/use-categories'
 import {HTTPNotFound} from 'pwa-kit-react-sdk/ssr/universal/errors'
 
 // Constants
-import {DEFAULT_LIMIT_VALUES, API_ERROR_MESSAGE, MAX_CACHE_AGE} from '../../constants'
+import {
+    DEFAULT_LIMIT_VALUES,
+    API_ERROR_MESSAGE,
+    MAX_CACHE_AGE,
+    TOAST_ACTION_VIEW_WISHLIST,
+    TOAST_MESSAGE_ADDED_TO_WISHLIST,
+    TOAST_MESSAGE_REMOVED_FROM_WISHLIST
+} from '../../constants'
 import useNavigation from '../../hooks/use-navigation'
 import LoadingSpinner from '../../components/loading-spinner'
 
@@ -120,6 +127,7 @@ const ProductList = (props) => {
     const wishlist = useWishlist()
     // keep track of the items has been add/remove to/from wishlist
     const [wishlistLoading, setWishlistLoading] = useState([])
+    // TODO: DRY this handler when intl provider is available globally
     const addItemToWishlist = async (product) => {
         try {
             setWishlistLoading([...wishlistLoading, product.productId])
@@ -128,27 +136,16 @@ const ProductList = (props) => {
                 quantity: 1
             })
             toast({
-                title: formatMessage(
-                    {
-                        id: 'product_list.info.added_to_wishlist',
-                        defaultMessage:
-                            '{quantity} {quantity, plural, one {item} other {items}} added to wishlist'
-                    },
-                    {quantity: 1}
-                ),
+                title: formatMessage(TOAST_MESSAGE_ADDED_TO_WISHLIST, {quantity: 1}),
                 status: 'success',
                 action: (
                     // it would be better if we could use <Button as={Link}>
                     // but unfortunately the Link component is not compatible
                     // with Chakra Toast, since the ToastManager is rendered via portal
                     // and the toast doesn't have access to intl provider, which is a
-                    // requirement of the Link component. This is also the reason why
-                    // we must use `formatMessage()`, rather than `<FormattedMessage />`.
+                    // requirement of the Link component.
                     <Button variant="link" onClick={() => navigate('/account/wishlist')}>
-                        {formatMessage({
-                            id: 'cart.link.added_to_wishlist.view_wishlist',
-                            defaultMessage: 'View'
-                        })}
+                        {formatMessage(TOAST_ACTION_VIEW_WISHLIST)}
                     </Button>
                 )
             })
@@ -161,15 +158,14 @@ const ProductList = (props) => {
             setWishlistLoading(wishlistLoading.filter((id) => id !== product.productId))
         }
     }
+
+    // TODO: DRY this handler when intl provider is available globally
     const removeItemFromWishlist = async (product) => {
         try {
             setWishlistLoading([...wishlistLoading, product.productId])
             await wishlist.removeListItemByProductId(product.productId)
             toast({
-                title: formatMessage({
-                    id: 'product_list.info.removed_from_wishlist',
-                    defaultMessage: 'Item removed from wishlist'
-                }),
+                title: formatMessage(TOAST_MESSAGE_REMOVED_FROM_WISHLIST),
                 status: 'success'
             })
         } catch {

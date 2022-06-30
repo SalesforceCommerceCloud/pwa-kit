@@ -1313,6 +1313,12 @@
       "value": "問題が発生しました。もう一度お試しください!"
     }
   ],
+  "global.info.removed_from_wishlist": [
+    {
+      "type": 0,
+      "value": "ほしい物リストから商品が削除されました"
+    }
+  ],
   "header.button.assistive_msg.logo": [
     {
       "type": 0,
@@ -2299,12 +2305,6 @@
       "value": "がほしい物リストに追加されました"
     }
   ],
-  "product_list.info.removed_from_wishlist": [
-    {
-      "type": 0,
-      "value": "ほしい物リストから商品が削除されました"
-    }
-  ],
   "product_list.modal.button.clear_filters": [
     {
       "type": 0,
@@ -2475,12 +2475,6 @@
     {
       "type": 0,
       "value": "がほしい物リストに追加されました"
-    }
-  ],
-  "recommended_products.info.removed_from_wishlist": [
-    {
-      "type": 0,
-      "value": "ほしい物リストから商品が削除されました"
     }
   ],
   "register_form.action.sign_in": [

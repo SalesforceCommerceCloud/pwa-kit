@@ -1329,6 +1329,12 @@
       "value": "Something went wrong. Try again!"
     }
   ],
+  "global.info.removed_from_wishlist": [
+    {
+      "type": 0,
+      "value": "Item removed from wishlist"
+    }
+  ],
   "header.button.assistive_msg.logo": [
     {
       "type": 0,
@@ -2321,12 +2327,6 @@
       "value": " added to wishlist"
     }
   ],
-  "product_list.info.removed_from_wishlist": [
-    {
-      "type": 0,
-      "value": "Item removed from wishlist"
-    }
-  ],
   "product_list.modal.button.clear_filters": [
     {
       "type": 0,
@@ -2501,12 +2501,6 @@
     {
       "type": 0,
       "value": " added to wishlist"
-    }
-  ],
-  "recommended_products.info.removed_from_wishlist": [
-    {
-      "type": 0,
-      "value": "Item removed from wishlist"
     }
   ],
   "register_form.action.sign_in": [
