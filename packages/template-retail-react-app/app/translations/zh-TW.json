@@ -538,6 +538,9 @@
   "global.error.something_went_wrong": {
     "defaultMessage": "發生錯誤。請再試一次。"
   },
+  "global.info.removed_from_wishlist": {
+    "defaultMessage": "已從願望清單移除商品"
+  },
   "header.button.assistive_msg.logo": {
     "defaultMessage": "標誌"
   },
@@ -979,9 +982,6 @@
   "product_list.info.added_to_wishlist": {
     "defaultMessage": "{quantity} {quantity, plural, one {件商品} other {件商品}}已新增至願望清單"
   },
-  "product_list.info.removed_from_wishlist": {
-    "defaultMessage": "已從願望清單移除商品"
-  },
   "product_list.modal.button.clear_filters": {
     "defaultMessage": "清除篩選條件"
   },
@@ -1047,9 +1047,6 @@
   },
   "recommended_products.info.added_to_wishlist": {
     "defaultMessage": "{quantity} {quantity, plural, one {件商品} other {件商品}}已新增至願望清單"
-  },
-  "recommended_products.info.removed_from_wishlist": {
-    "defaultMessage": "已從願望清單移除商品"
   },
   "register_form.action.sign_in": {
     "defaultMessage": "登入"

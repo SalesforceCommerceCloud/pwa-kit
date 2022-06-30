@@ -121,6 +121,9 @@ commands:
             # Note: Each of these test commands need to be exposed on the monorepo
             # root and *also* on the PWA package. This section is run on both.
 
+            # Ensure bundlesize is in check
+            npm run test:max-file-size
+
             # Always run fast unit tests
             npm run test
   smoketestscripts:
@@ -166,7 +169,6 @@ commands:
             set GENERATOR_PRESET=test-project
             node packages/pwa-kit-create-app/scripts/create-mobify-app-dev.js --outputDir generated-project
             cd generated-project
-            npm run build
           no_output_timeout: 5m
       - runtests:
           cwd: generated-project

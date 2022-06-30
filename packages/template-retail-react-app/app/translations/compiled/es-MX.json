@@ -1317,6 +1317,12 @@
       "value": "Se produjo un error. ¡Intente de nuevo!"
     }
   ],
+  "global.info.removed_from_wishlist": [
+    {
+      "type": 0,
+      "value": "Artículo eliminado de la lista de deseos"
+    }
+  ],
   "header.button.assistive_msg.logo": [
     {
       "type": 0,
@@ -2303,12 +2309,6 @@
       "value": " agregado(s) a la lista de deseos"
     }
   ],
-  "product_list.info.removed_from_wishlist": [
-    {
-      "type": 0,
-      "value": "Artículo eliminado de la lista de deseos"
-    }
-  ],
   "product_list.modal.button.clear_filters": [
     {
       "type": 0,
@@ -2483,12 +2483,6 @@
     {
       "type": 0,
       "value": " agregado(s) a la lista de deseos"
-    }
-  ],
-  "recommended_products.info.removed_from_wishlist": [
-    {
-      "type": 0,
-      "value": "Artículo eliminado de la lista de deseos"
     }
   ],
   "register_form.action.sign_in": [

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, salesforce.com, inc.
+ * Copyright (c) 2022, Salesforce, Inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
@@ -62,3 +62,24 @@ export const urlPartPositions = {
 export const DEFAULT_SITE_TITLE = 'Retail React App'
 
 export const MAX_CACHE_AGE = 60 * 15 // 15 min
+
+// Toast messages exist outside the scope of the base IntlProvider. This means
+// that commonly used components that require localization cannot easily be
+// extracted into a hook/helper. However, we can still extract the message
+// definitions to a common location (here), so that each message is only defined
+// once.
+
+export const TOAST_MESSAGE_ADDED_TO_WISHLIST = defineMessage({
+    id: 'global.info.added_to_wishlist',
+    defaultMessage: '{quantity} {quantity, plural, one {item} other {items}} added to wishlist'
+})
+
+export const TOAST_ACTION_VIEW_WISHLIST = defineMessage({
+    defaultMessage: 'View',
+    id: 'global.link.added_to_wishlist.view_wishlist'
+})
+
+export const TOAST_MESSAGE_REMOVED_FROM_WISHLIST = defineMessage({
+    id: 'global.info.removed_from_wishlist',
+    defaultMessage: 'Item removed from wishlist'
+})
