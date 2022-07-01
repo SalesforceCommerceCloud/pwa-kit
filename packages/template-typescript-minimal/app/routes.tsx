@@ -7,13 +7,18 @@
 import loadable from '@loadable/component'
 
 const Home = loadable(() => import('./pages/home'))
+const PDP = loadable(() => import('./pages/pdp'))
 
 const routes = [
     {
         path: '/',
         exact: true,
-        component: Home
-    }
+        component: Home,
+    },
+    {
+        path: '/:productId',
+        component: PDP,
+    },
 ]
 
 export default routes

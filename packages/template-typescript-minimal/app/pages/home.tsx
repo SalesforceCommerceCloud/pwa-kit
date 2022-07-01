@@ -5,43 +5,46 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
+import {Link} from 'react-router-dom'
 
 import useProductSearch from '../hooks/useProductSearch'
 import useProducts from '../hooks/useProducts'
 
 const Home = () => {
-    const {data: productSearchData, isValidating} = useProductSearch({searchTerm: 'shirt'})
-    const productIds = productSearchData?.hits.map((hit) => hit.productId)
-    const {data: products, isValidating: isLoadingProductDetail} = useProducts({productIds})
+    const productSearch = useProductSearch({searchTerm: 'shirt'})
+    const productIds = productSearch?.data?.hits.map((hit) => hit.productId)
+    const productDetails = useProducts({productIds})
     return (
         <div>
-            {!productSearchData && isValidating && <h1>Loading...</h1>}
-            {productSearchData?.hits.map((hit) => {
-                const extraProductData = products?.data.find(
+            {!productSearch?.data && productSearch?.isValidating && <h1>Loading...</h1>}
+            {productSearch?.data?.hits.map((hit) => {
+                const extraProductData = productDetails?.data?.data.find(
                     (product) => product.id === hit.productId
                 )
                 return (
-                    <div key={hit.productId}>
-                        <h1>Name: {hit.productName}</h1>
-                        <p>
-                            <b>The following data is from ShopperSearch API</b>
-                        </p>
-                        <p>Price: ${hit.price}</p>
+                    <Link to={`/${hit.productId}`} key={hit.productId}>
+                        <div>
+                            <h1>Name: {hit.productName}</h1>
+                            <p>
+                                <b>The following data is from ShopperSearch API</b>
+                            </p>
+                            <p>Price: ${hit.price}</p>
 
-                        <p>
-                            <b>The following data is from ShopperProducts API</b>
-                        </p>
+                            <p>
+                                <b>The following data is from ShopperProducts API</b>
+                            </p>
 
-                        {isLoadingProductDetail ? (
-                            <p>loading...</p>
-                        ) : (
-                            <div>
-                                <p>Description: {extraProductData?.shortDescription}</p>
-                                <p>Image groups</p>
-                                <p>minOrderQuantity: {extraProductData?.minOrderQuantity}</p>
-                            </div>
-                        )}
-                    </div>
+                            {productDetails?.isValidating ? (
+                                <p>loading...</p>
+                            ) : (
+                                <div>
+                                    <p>Description: {extraProductData?.shortDescription}</p>
+                                    <p>Image groups</p>
+                                    <p>minOrderQuantity: {extraProductData?.minOrderQuantity}</p>
+                                </div>
+                            )}
+                        </div>
+                    </Link>
                 )
             })}
         </div>

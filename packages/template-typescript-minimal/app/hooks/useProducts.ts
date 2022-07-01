@@ -1,4 +1,4 @@
-import useSWR from 'swr'
+import useSWR, {useSWRConfig} from 'swr'
 import {ShopperProducts} from 'commerce-sdk-isomorphic'
 import config from '../commerce-api-config'
 import {getAccessToken} from '../auth'
@@ -25,6 +25,16 @@ const getProducts = async (productIds: string) => {
 const useProducts = ({productIds}: {productIds: string[] | undefined}) => {
     const key = productIds?.join(',')
     const result = useSWR(key, getProducts)
+    const {mutate} = useSWRConfig()
+
+    if (productIds?.length && result.data) {
+        productIds.forEach((productId) => {
+            mutate(productId, () => {
+                const productData = result.data?.data.find((product) => product.id === productId)
+                return productData
+            })
+        })
+    }
 
     return result
 }
