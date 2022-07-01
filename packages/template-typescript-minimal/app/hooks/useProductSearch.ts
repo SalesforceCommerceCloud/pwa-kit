@@ -3,31 +3,27 @@ import {ShopperSearch} from 'commerce-sdk-isomorphic'
 import config from '../commerce-api-config'
 import {getAccessToken} from '../auth'
 
-// const authMiddleware = (useSWRNext) => {
-//     return async (key, fetcher, config) => {
-//         if (!tokens.access_token) {
-//             await getAccessToken()
-//         }
-//         const swr = useSWRNext(key, fetcher, config)
-//         return swr
-//     }
-// }
+const sleep = (s) => new Promise((resolve) => setTimeout(resolve, s))
 
-const useProductSearch = () => {
-    const result = useSWR('shirt', async () => {
-        const accessToken = await getAccessToken()
+const getProductSearch = async (searchTerm) => {
+    const accessToken = await getAccessToken()
 
-        const api = new ShopperSearch({
-            ...config,
-            headers: {authorization: `Bearer ${accessToken}`},
-        })
-
-        const result = await api.productSearch({
-            parameters: {q: 'shirt'},
-        })
-
-        return result
+    const api = new ShopperSearch({
+        ...config,
+        headers: {authorization: `Bearer ${accessToken}`},
     })
+
+    await sleep(1)
+
+    const result = await api.productSearch({
+        parameters: {q: searchTerm, limit: 20},
+    })
+
+    return result
+}
+
+const useProductSearch = ({searchTerm}) => {
+    const result = useSWR(searchTerm, getProductSearch)
 
     return result
 }
