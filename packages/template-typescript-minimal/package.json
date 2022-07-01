@@ -60,5 +60,9 @@
                 }
             ]
         }
+    },
+    "dependencies": {
+        "commerce-sdk-isomorphic": "^1.6.0",
+        "swr": "^1.3.0"
     }
 }
