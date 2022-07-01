@@ -27,6 +27,18 @@ const useProducts = ({productIds}: {productIds: string[] | undefined}) => {
     const result = useSWR(key, getProducts)
     const {mutate} = useSWRConfig()
 
+    // Q: How do we do instant page reloading when PLP and PDP calls different APIs?
+
+    // This is where we make instant page loading happens
+    // when a call was made to /products/?ids=12328M,373829M,...
+    // 1. We cache the response under the cache key:
+    //    hash({productIds:[12328M,373829M]})
+    // 2. Annnnnnnnnnd, we also cache the individual product detail
+    //    hash({productId: 12328M})
+    //    hash({productId: 373829M})
+    //    This will populate the cache for individual useProduct(id) calls
+    //    and when user navigates to the PDP, the cache is already populated!
+
     if (productIds?.length && result.data) {
         productIds.forEach((productId) => {
             mutate(productId, () => {
