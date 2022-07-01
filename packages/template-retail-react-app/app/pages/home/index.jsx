@@ -8,6 +8,8 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {useIntl, FormattedMessage} from 'react-intl'
+import {useServerEffect} from 'pwa-kit-react-sdk/ssr/universal/server-effects'
+import {useCommerceAPI} from '../../commerce-api/contexts'
 
 // Components
 import {
@@ -22,6 +24,7 @@ import {
     Container,
     Link
 } from '@chakra-ui/react'
+import ProjectLink from '../../components/link'
 
 // Project Components
 import Hero from '../../components/hero'
@@ -40,14 +43,40 @@ import {
     HOME_SHOP_PRODUCTS_LIMIT
 } from '../../constants'
 
+// Experimental SCAP API Hooks
+import {useProduct} from '../../scapi-hooks'
+
 /**
  * This is the home page for Retail React App.
  * The page is created for demonstration purposes.
  * The page renders SEO metadata and a few promotion
  * categories and products, data is from local file.
  */
-const Home = ({productSearchResult, isLoading}) => {
+const Home = ({isLoading}) => {
     const intl = useIntl()
+    const api = useCommerceAPI()
+
+    const {data: productSearchResult, isLoading: isLoading2, error} = useServerEffect(async ({res}) => {
+        console.log('GETTING SEARCH RESULTS FOR HOME PAGE')
+        // if (res) {
+        //     res.set('Cache-Control', `max-age=${MAX_CACHE_AGE}`)
+        // }
+    
+        const productSearchResult = await api.shopperSearch.productSearch({
+            parameters: {
+                refine: [`cgid=${HOME_SHOP_PRODUCTS_CATEGORY_ID}`, 'htype=master'],
+                limit: HOME_SHOP_PRODUCTS_LIMIT
+            }
+        })
+    
+        return productSearchResult
+    }, [])
+    
+    // NOTE: This is an example of a hook that was created using the ServerEffects API that I added
+    // to the SDK. This API allows you to create a server hook context and an associated hook that you
+    // can used to build your own hooks off of. You can see how what is done in the `scapi-hooks.js` file
+    // which is a precursor to a larger hooks library.
+    const {product, isLoading: isUseProductLoading} = useProduct(1, [])
 
     return (
         <Box data-testid="home-page" layerStyle="page">
@@ -133,6 +162,7 @@ const Home = ({productSearchResult, isLoading}) => {
                 </SimpleGrid>
             </Section>
 
+            {product && <div>{product.name}</div>}
             {productSearchResult && (
                 <Section
                     padding={4}
@@ -277,20 +307,20 @@ Home.getTemplateName = () => 'home'
 Home.shouldGetProps = ({previousLocation, location}) =>
     !previousLocation || previousLocation.pathname !== location.pathname
 
-Home.getProps = async ({res, api}) => {
-    if (res) {
-        res.set('Cache-Control', `max-age=${MAX_CACHE_AGE}`)
-    }
+// Home.getProps = async ({res, api}) => {
+//     if (res) {
+//         res.set('Cache-Control', `max-age=${MAX_CACHE_AGE}`)
+//     }
 
-    const productSearchResult = await api.shopperSearch.productSearch({
-        parameters: {
-            refine: [`cgid=${HOME_SHOP_PRODUCTS_CATEGORY_ID}`, 'htype=master'],
-            limit: HOME_SHOP_PRODUCTS_LIMIT
-        }
-    })
+//     const productSearchResult = await api.shopperSearch.productSearch({
+//         parameters: {
+//             refine: [`cgid=${HOME_SHOP_PRODUCTS_CATEGORY_ID}`, 'htype=master'],
+//             limit: HOME_SHOP_PRODUCTS_LIMIT
+//         }
+//     })
 
-    return {productSearchResult}
-}
+//     return {productSearchResult}
+// }
 
 Home.propTypes = {
     /**

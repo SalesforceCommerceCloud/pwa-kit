@@ -19,6 +19,8 @@ import serialize from 'serialize-javascript'
 
 import {getAssetUrl} from '../universal/utils'
 import DeviceContext from '../universal/device-context'
+import {ServerEffectProvider, getAllContexts} from '../universal/server-effects' // I Need to clean up the exports of this module.
+import ExpressContext from '../universal/contexts/express-context'
 
 import Document from '../universal/components/_document'
 import App from '../universal/components/_app'
@@ -36,6 +38,12 @@ import sprite from 'svg-sprite-loader/runtime/sprite.build'
 
 const CWD = process.cwd()
 const BUNDLES_PATH = path.resolve(CWD, 'build/loadable-stats.json')
+
+const serverEffectValue = {
+    name: '__SERVER_EFFECTS__',
+    requests: [],
+    data: {}
+}
 
 const VALID_TAG_NAMES = [
     'base',
@@ -182,10 +190,41 @@ export const render = async (req, res, next) => {
         req,
         res,
         location,
-        config
+        config,
+        routerContext: {}
     }
     try {
-        renderResult = renderApp(args)
+        // Pre-render app to get useServerEffect requests
+        await renderApp(args)
+        
+        const allContexts = getAllContexts()
+        
+        const allAllPromises = []
+        
+        Object.keys(allContexts).forEach((key) => {
+            const {requests} = allContexts[key]
+            const effectPromises = requests.map((request) => request.fireEffect())
+            
+            allAllPromises.push(Promise.all(effectPromises))
+        })
+        await Promise.all(allAllPromises)
+
+        // Turn array into a map.
+        const serverEffectsMap = Object.keys(allContexts)
+            .reduce((acc, curr) => ({
+                ...acc,
+                [curr]: {
+                    data: allContexts[curr].data
+                }
+            }), {})
+
+        // Set the args with the new updated app state.
+        args.appState = {
+            ...appState,
+            ...serverEffectsMap
+        }
+
+        renderResult = await renderApp(args)
     } catch (e) {
         // This is an unrecoverable error.
         // (errors handled by the AppErrorBoundary are considered recoverable)
@@ -213,23 +252,27 @@ const renderAppHtml = (req, res, error, appData) => {
 
     let appJSX = (
         <Router location={location} context={routerContext}>
-            <DeviceContext.Provider value={{type: deviceType}}>
-                <AppConfig locals={res.locals}>
-                    <Switch error={error} appState={appState} routes={routes} App={App} />
-                </AppConfig>
-            </DeviceContext.Provider>
+            <ExpressContext.Provider value={{req, res}}>
+                <ServerEffectProvider value={serverEffectValue}>
+                    <DeviceContext.Provider value={{type: deviceType}}>
+                        <AppConfig locals={res.locals}>
+                            <Switch error={error} appState={appState} routes={routes} App={App} />
+                        </AppConfig>
+                    </DeviceContext.Provider>
+                </ServerEffectProvider>
+            </ExpressContext.Provider>
         </Router>
     )
 
     appJSX = extractor.collectChunks(appJSX)
+
     return ReactDOMServer.renderToString(appJSX)
 }
 
 const renderApp = (args) => {
-    const {req, res, appStateError, App, appState, location, routes, config} = args
+    const {req, res, appStateError, App, appState, location, routes, config, routerContext} = args
     const deviceType = detectDeviceType(req)
     const extractor = new ChunkExtractor({statsFile: BUNDLES_PATH, publicPath: getAssetUrl()})
-    const routerContext = {}
     const appData = {App, appState, location, routes, routerContext, deviceType, extractor}
 
     const ssrOnly = 'mobify_server_only' in req.query || '__server_only' in req.query
