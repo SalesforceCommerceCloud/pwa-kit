@@ -27,15 +27,17 @@ export const getAllContexts = () => (allContexts)
  * @param {*} effect 
  * @returns 
  */
-function useServerEffect (initial, didUpdate, source) {
+function useServerEffect(initial, didUpdate, source, cacheKey) {
+    let key
     // Function overloading.
     if (typeof initial === 'function') {
+        key = source
         source = didUpdate
         didUpdate = initial
         initial = {}
     }
 
-    const key = `uh_${useUID()}`
+    key = key || cacheKey || `uh_${useUID()}`
     const location = useLocation()
     const params = useParams()
     const {req, res} = useExpress()

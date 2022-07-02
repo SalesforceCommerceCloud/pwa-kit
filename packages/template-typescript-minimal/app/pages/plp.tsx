@@ -23,12 +23,13 @@ const PLP = () => {
     // On the initial rendering, since useProductSearch's data is undefined
     // useProducts will do nothing and wait for the result.
 
-    const productSearch = useProductSearch({searchTerm: 'shirt'})
+    const productSearch = useProductSearch({searchTerm: 'shirt'}, [])
     const productIds = productSearch?.data?.hits.map((hit) => hit.productId)
     const productDetails = useProducts({productIds})
+
     return (
         <div>
-            {!productSearch?.data && productSearch?.isValidating && <h1>Loading...</h1>}
+            {!productSearch?.data && productSearch?.isLoading && <h1>Loading...</h1>}
             {productSearch?.data?.hits.map((hit) => {
                 const extraProductData = productDetails?.data?.data.find(
                     (product) => product.id === hit.productId
