@@ -1,6 +1,6 @@
 ## v2.1.0-alpha.0 (Jul 05, 2022)
-## v2.1.0-alpha.0 (Jul 05, 2022)
-## v2.1.0-dev (May 16, 2022)
+-   Remove console logs from route component. [#651](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/651)
+
 ## v2.0.0 (May 16, 2022)
 -   Remove lodash and bluebird. [#534](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/534)
 -   Support Multi-site implementation using dynamic config [#469](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/469)
