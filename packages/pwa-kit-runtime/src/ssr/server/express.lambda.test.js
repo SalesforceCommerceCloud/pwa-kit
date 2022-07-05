@@ -1,12 +1,11 @@
 /*
- * Copyright (c) 2021, salesforce.com, inc.
+ * Copyright (c) 2022, Salesforce, Inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
 /* eslint-env jest */
-/* eslint max-nested-callbacks:0 */
 
 // Mock static assets (require path is relative to the 'ssr' directory)
 const mockStaticAssets = {}
@@ -43,6 +42,11 @@ const testPackageMobify = {
 }
 
 const testFixtures = path.resolve(process.cwd(), 'src/ssr/server/test_fixtures')
+
+const call = async (fn, ...args) =>
+    new Promise((resolve, reject) =>
+        fn(...args, (err, response) => (err ? reject(err) : resolve(response)))
+    )
 
 /**
  * An HTTPS.Agent that allows self-signed certificates
@@ -232,7 +236,7 @@ describe('SSRServer Lambda integration', () => {
     ]
 
     lambdaTestCases.forEach((testCase) =>
-        test(testCase.name, () => {
+        test(testCase.name, async () => {
             const options = {
                 buildDir: testFixtures,
                 mainFilename: 'main-big.js',
@@ -269,19 +273,14 @@ describe('SSRServer Lambda integration', () => {
                 }
             }
             const metricSent = (name) =>
-                !!metrics.find(
-                    (metric) => !!metric.MetricData.find((data) => data.MetricName === name)
-                )
+                metrics.some((metric) => metric.MetricData.some((data) => data.MetricName === name))
 
             // Set up a fake event and a fake context for the Lambda call
             const event = createEvent('aws:apiGateway', {
                 path: testCase.path,
                 body: undefined
             })
-
-            if (event.queryStringParameters) {
-                delete event.queryStringParameters
-            }
+            delete event.queryStringParameters
 
             // Add a fake X-Amz-Cf-Id header
             event.headers['X-Amz-Cf-Id'] = '1234567'
@@ -290,37 +289,23 @@ describe('SSRServer Lambda integration', () => {
                 functionName: 'SSRTest'
             })
 
-            return (
-                new Promise((resolve, reject) => {
-                    handler(event, context, (err, response) =>
-                        err ? reject(err) : resolve(response)
-                    )
-                })
-                    // The callback function gets passed an error object and
-                    // the API Gateway response.
-                    .then((response) => {
-                        // We expect all metrics to have been sent
-                        expect(app.metrics.queueLength).toBe(0)
-
-                        // We're not asserting which metrics were sent, just
-                        // checking if any were sent. As of DESKTOP-434, every
-                        // request will send metrics.
-                        expect(!!metrics.length).toBe(true)
-
-                        // We check for some specific metrics here
-                        expect(metricSent('LambdaCreated')).toBe(true)
-
-                        // We expect a context property to have been set false
-                        expect(context.callbackWaitsForEmptyEventLoop).toBe(false)
-
-                        // Check the response
-                        testCase.validate(response)
-                    })
-            )
+            const response = await call(handler, event, context)
+            // We expect all metrics to have been sent
+            expect(app.metrics.queueLength).toBe(0)
+            // We're not asserting which metrics were sent, just
+            // checking if any were sent. As of DESKTOP-434, every
+            // request will send metrics.
+            expect(metrics.length).toBeGreaterThan(0)
+            // We check for some specific metrics here
+            expect(metricSent('LambdaCreated')).toBe(true)
+            // We expect a context property to have been set false
+            expect(context.callbackWaitsForEmptyEventLoop).toBe(false)
+            // Check the response
+            testCase.validate(response)
         })
     )
 
-    test('Lambda integration strips rogue headers', () => {
+    test('Lambda integration strips rogue headers', async () => {
         const options = {
             buildDir: testFixtures,
             mobify: testPackageMobify,
@@ -352,27 +337,20 @@ describe('SSRServer Lambda integration', () => {
                 'x-api-key': '1234567890'
             }
         })
-
-        if (event.queryStringParameters) {
-            delete event.queryStringParameters
-        }
+        delete event.queryStringParameters
 
         const context = AWSMockContext({
             functionName: 'SSRTest'
         })
 
-        const call = (event) =>
-            new Promise((resolve) => handler(event, context, (err, response) => resolve(response)))
-
-        return call(event).then((response) => {
-            expect(response.statusCode).toBe(200)
-            const decodedBody = response.isBase64Encoded ? atob(response.body) : response.body
-            const reqHeaders = JSON.parse(decodedBody)
-            X_HEADERS_TO_REMOVE.forEach((key) => expect(reqHeaders[key]).toBeUndefined())
-        })
+        const response = await call(handler, event, context)
+        expect(response.statusCode).toBe(200)
+        const decodedBody = response.isBase64Encoded ? atob(response.body) : response.body
+        const reqHeaders = JSON.parse(decodedBody)
+        X_HEADERS_TO_REMOVE.forEach((key) => expect(reqHeaders[key]).toBeUndefined())
     })
 
-    test('Lambda reuse behaviour', () => {
+    test('Lambda reuse behaviour', async () => {
         const route = jest.fn((req, res) => {
             res.send('<html/>')
         })
@@ -401,36 +379,31 @@ describe('SSRServer Lambda integration', () => {
             path: '/',
             body: undefined
         })
-
-        if (event.queryStringParameters) {
-            delete event.queryStringParameters
-        }
+        delete event.queryStringParameters
 
         const context = AWSMockContext({
             functionName: 'SSRTest'
         })
 
-        const call = (event) =>
-            new Promise((resolve) => handler(event, context, (err, response) => resolve(response)))
+        const call = (evt) =>
+            new Promise((resolve, reject) =>
+                handler(evt, context, (err, response) => (err ? reject(err) : resolve(response)))
+            )
 
-        return Promise.resolve()
-            .then(() => call(event))
-            .then((response) => {
-                // First request - Lambda container created
-                expect(response.statusCode).toBe(200)
-                expect(collectGarbage.mock.calls.length).toBe(0)
-                expect(route.mock.calls.length).toBe(1)
-                expect(sendMetric).toHaveBeenCalledWith('LambdaCreated')
-                expect(sendMetric).not.toHaveBeenCalledWith('LambdaReused')
-            })
-            .then(() => call(event))
-            .then((response) => {
-                // Second call - Lambda container reused
-                expect(response.statusCode).toBe(200)
-                expect(collectGarbage.mock.calls.length).toBe(1)
-                expect(route.mock.calls.length).toBe(2)
-                expect(sendMetric).toHaveBeenCalledWith('LambdaCreated')
-                expect(sendMetric).toHaveBeenCalledWith('LambdaReused')
-            })
+        // First request - Lambda container created
+        const firstResponse = await call(event)
+        expect(firstResponse.statusCode).toBe(200)
+        expect(collectGarbage).toHaveBeenCalledTimes(0)
+        expect(route).toHaveBeenCalledTimes(1)
+        expect(sendMetric).toHaveBeenCalledWith('LambdaCreated')
+        expect(sendMetric).not.toHaveBeenCalledWith('LambdaReused')
+
+        // Second call - Lambda container reused
+        const secondResponse = await call(event)
+        expect(secondResponse.statusCode).toBe(200)
+        expect(collectGarbage).toHaveBeenCalledTimes(1)
+        expect(route).toHaveBeenCalledTimes(2)
+        expect(sendMetric).toHaveBeenCalledWith('LambdaCreated')
+        expect(sendMetric).toHaveBeenCalledWith('LambdaReused')
     })
 })
