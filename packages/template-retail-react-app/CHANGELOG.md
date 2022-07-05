@@ -1,5 +1,3 @@
-## v2.1.0-dev (May 16, 2022)
-
 ### Bug Fixes
 
 - Various instances of hard-coded text have been replaced with translatable messages (see [Translations](#translations)).
