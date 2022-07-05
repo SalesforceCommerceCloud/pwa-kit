@@ -1,3 +1,5 @@
+## v2.1.0-alpha.0 (Jul 05, 2022)
+## v2.1.0-alpha.0 (Jul 05, 2022)
 ## v2.1.0-dev (May 16, 2022)
 ## v2.0.0 (May 16, 2022)
 - Make the createApp API idiomatic for Express, fix service-worker loading. [#536](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/536)
