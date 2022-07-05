@@ -261,9 +261,7 @@ const enableReactRefresh = (config) => {
 
             new webpack.HotModuleReplacementPlugin(),
             new ReactRefreshWebpackPlugin({
-                overlay: {
-                    sockIntegration: 'whm'
-                }
+                overlay: false
             })
         ],
         output: {
