@@ -5,21 +5,11 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {useLocation} from 'react-router-dom'
-import {resolveSiteFromUrl} from '../utils/site-utils'
-import {useMemo} from 'react'
+import {useContext} from 'react'
+import {SiteContext} from '../contexts'
 
 /**
- * This hook returns the current site based on current location
- *
- * @returns {Object} - current site
+ * Custom React hook to get the current site
+ * @returns {site: Object, setSite: function}
  */
-const useSite = () => {
-    const {pathname, search} = useLocation()
-    const site = useMemo(() => {
-        return resolveSiteFromUrl(`${pathname}${search}`)
-    }, [pathname, search])
-    return site
-}
-
-export default useSite
+export const useSite = () => useContext(SiteContext)

@@ -46,6 +46,30 @@ CategoriesProvider.propTypes = {
     categories: PropTypes.object
 }
 
+export const LocaleContext = React.createContext()
+export const LocaleProvider = ({locale: initialLocale = {}, children}) => {
+    const [locale, setLocale] = useState(initialLocale)
+
+    return <LocaleContext.Provider value={{locale, setLocale}}>{children}</LocaleContext.Provider>
+}
+
+LocaleProvider.propTypes = {
+    children: PropTypes.node.isRequired,
+    locale: PropTypes.object
+}
+
+export const SiteContext = React.createContext()
+export const SiteProvider = ({site: initialSite = {}, children}) => {
+    const [site, setSite] = useState(initialSite)
+
+    return <SiteContext.Provider value={{site, setSite}}>{children}</SiteContext.Provider>
+}
+
+SiteProvider.propTypes = {
+    children: PropTypes.node.isRequired,
+    site: PropTypes.object
+}
+
 /**
  * This is the global state for currency, we use this throughout the site. For example, on
  * the product-list, product-detail and cart and basket pages..

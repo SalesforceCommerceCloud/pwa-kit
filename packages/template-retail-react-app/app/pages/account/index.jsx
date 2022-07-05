@@ -38,8 +38,8 @@ import {messages, navLinks} from './constant'
 import useNavigation from '../../hooks/use-navigation'
 import LoadingSpinner from '../../components/loading-spinner'
 import {buildPathWithUrlConfig} from '../../utils/url'
-import useLocale from '../../hooks/use-locale'
-import useSite from '../../hooks/use-site'
+import {useLocale} from '../../hooks/use-locale'
+import {useSite} from '../../hooks/use-site'
 
 const Account = () => {
     const {path} = useRouteMatch()

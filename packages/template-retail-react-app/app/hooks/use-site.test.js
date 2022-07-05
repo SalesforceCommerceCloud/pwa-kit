@@ -9,7 +9,7 @@ import {createMemoryHistory} from 'history'
 import {render, screen} from '@testing-library/react'
 import {Router} from 'react-router'
 import React from 'react'
-import useSite from './use-site'
+import {useSite} from './use-site'
 
 afterEach(() => {
     jest.clearAllMocks()

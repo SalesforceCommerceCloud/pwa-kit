@@ -52,7 +52,7 @@ import useCustomer from '../../commerce-api/hooks/useCustomer'
 import LoadingSpinner from '../loading-spinner'
 
 import useNavigation from '../../hooks/use-navigation'
-import useSite from '../../hooks/use-site'
+import {useSite} from '../../hooks/use-site'
 
 // The FONT_SIZES and FONT_WEIGHTS constants are used to control the styling for
 // the accordion buttons as their current depth. In the below definition we assign

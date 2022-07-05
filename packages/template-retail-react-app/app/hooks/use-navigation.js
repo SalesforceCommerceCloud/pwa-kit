@@ -8,7 +8,7 @@ import {useCallback} from 'react'
 import {useHistory} from 'react-router'
 import {useIntl} from 'react-intl'
 import {buildPathWithUrlConfig} from '../utils/url'
-import useSite from './use-site'
+import {useSite} from './use-site'
 import {getLocaleByReference} from '../utils/utils'
 
 /**

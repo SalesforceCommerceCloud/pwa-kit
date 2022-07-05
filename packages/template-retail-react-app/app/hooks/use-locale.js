@@ -5,23 +5,11 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import useSite from './use-site'
-import {useMemo} from 'react'
-import {resolveLocaleFromUrl} from '../utils/utils'
-import {useLocation} from 'react-router-dom'
+import {useContext} from 'react'
+import {LocaleContext} from '../contexts'
 
 /**
- * This hook returns the locale object based on current location
- * @return {object} locale
+ * Custom React hook to get the locale
+ * @returns {locale: Object, setLocale: function}
  */
-const useLocale = () => {
-    const {pathname, search} = useLocation()
-    const site = useSite()
-    const locale = useMemo(() => {
-        return resolveLocaleFromUrl(`${pathname}${search}`)
-    }, [pathname, search, site])
-
-    return locale
-}
-
-export default useLocale
+export const useLocale = () => useContext(LocaleContext)
