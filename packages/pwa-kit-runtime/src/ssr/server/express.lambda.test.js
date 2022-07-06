@@ -5,6 +5,8 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
+import {MetricsSender} from '../../utils/ssr-server'
+
 /* eslint-env jest */
 
 // Mock static assets (require path is relative to the 'ssr' directory)
@@ -59,13 +61,16 @@ export const httpsAgent = new https.Agent({
 describe('SSRServer Lambda integration', () => {
     let savedEnvironment
     let server
+    let putMetricDataMock
 
     beforeAll(() => {
-        savedEnvironment = Object.assign({}, process.env)
+        savedEnvironment = {...process.env}
+        putMetricDataMock = jest.spyOn(MetricsSender.getSender(), '_putMetricData')
     })
 
     afterAll(() => {
         process.env = savedEnvironment
+        putMetricDataMock.mockRestore()
     })
 
     beforeEach(() => {
@@ -78,6 +83,7 @@ describe('SSRServer Lambda integration', () => {
             MOBIFY_PROPERTY_ID: 'test',
             AWS_LAMBDA_FUNCTION_NAME: 'pretend-to-be-remote'
         }
+        putMetricDataMock.mockReset().mockResolvedValue()
     })
 
     afterEach(() => {
@@ -264,14 +270,10 @@ describe('SSRServer Lambda integration', () => {
             // Ensure that this server sends metrics and that we can
             // track them.
             const metrics = []
-            app.metrics._CW = {
-                putMetricData: (params, callback) => {
-                    metrics.push(params)
-                    callback(null)
-                }
-            }
-            const metricSent = (name) =>
-                metrics.some((metric) => metric.MetricData.some((data) => data.MetricName === name))
+            putMetricDataMock.mockImplementation(async (cw, moreMetrics) => {
+                metrics.push(...moreMetrics)
+            })
+            const metricSent = (name) => metrics.some((data) => data.MetricName === name)
 
             // Set up a fake event and a fake context for the Lambda call
             const event = createEvent('aws:apiGateway', {
