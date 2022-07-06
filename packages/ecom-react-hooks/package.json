@@ -1,6 +1,6 @@
 {
     "name": "ecom-react-hooks",
-    "version": "2.1.0-dev",
+    "version": "2.2.0-dev",
     "description": "A library that provides hooks for fetching data from Commerce Cloud",
     "author": "dev@mobify.com",
     "license": "See license in LICENSE",
