@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, salesforce.com, inc.
+ * Copyright (c) 2022, Salesforce, Inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
@@ -36,7 +36,6 @@ export const DESKTOP = 'DESKTOP'
 export const PHONE = 'PHONE'
 export const TABLET = 'TABLET'
 
-let bundleBaseURL
 const bundleID = process.env.BUNDLE_ID
 
 export const verboseProxyLogging = false
@@ -47,17 +46,6 @@ export const isRemote = () =>
 export const getBundleBaseUrl = () => {
     return `/mobify/bundle/${isRemote() ? bundleID : 'development'}/`
 }
-
-/**
- * Get the URL that should be used to load an asset from the bundle.
- *
- * This function is provided for use in UPWAs.
- * @function
- * @param {string} path - the path to the asset (relative to the
- * build directory)
- * @returns {string}
- */
-export const getAssetUrl = (path) => `${bundleBaseURL}${path}`
 
 /**
  * Guess a device-type from a request. Users can force selection of a particular
