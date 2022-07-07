@@ -1,54 +1,57 @@
 {
-    "name": "commerce-sdk-react",
-    "version": "2.2.0-dev",
-    "description": "A library that provides react hooks for fetching data from Commerce Cloud",
-    "author": "dev@mobify.com",
-    "license": "See license in LICENSE",
-    "engines": {
-      "node": "^14.0.0",
-      "npm": "^6.14.4 || ^7.0.0 || ^8.0.0"
-    },
-    "repository": {
-        "type": "git",
-        "url": "git+https://github.com/SalesforceCommerceCloud/pwa-kit.git"
-      },
-      "homepage": "https://github.com/SalesforceCommerceCloud/pwa-kit/tree/develop/packages/ecom-react-hooks#readme",
-      "bugs": {
-        "url": "https://github.com/SalesforceCommerceCloud/pwa-kit/issues"
-      },
-    "scripts": {
-      "build": "cross-env NODE_ENV=production internal-lib-build build && tsc --emitDeclarationOnly",
-      "build:watch": "watch 'npm run build' src/",
-      "lint": "npm run lint:js && tsc --noEmit",
-      "lint:fix": "npm run lint:js -- --fix",
-      "lint:js": "internal-lib-build lint \"**/*.{js,jsx,ts,tsx}\"",
-      "test": "internal-lib-build test",
-      "test:watch": "npm test -- --watch",
-      "test:inspect": "node --inspect-brk jest --runInBand",
-      "typecheck": "tsc --noEmit",
-      "version": "node ./scripts/version.js",
-      "format": "internal-lib-build format \"**/*.{js,jsx,ts,tsx}\""
-    },
-    "main": "dist/index.js",
-    "types": "dist/index.d.ts",
-    "files": [
-      "dist"
-    ],
-    "private": true,
-    "devDependencies": {
-      "@types/react": "^17.0.2",
-      "@types/react-dom": "^17.0.2",
-      "cross-env": "^5.2.0",
-      "internal-lib-build": "^2.2.0-dev",
-      "react": "^17.0.2",
-      "react-dom": "^17.0.2",
-      "typescript": "^4.7.2",
-      "watch": "^1.0.2"
-    },
-    "peerDependencies": {
-      "react": "^17"
-    },
-    "dependencies": {
-      "commerce-sdk-isomorphic": "^1.5.2"
-    }
+  "name": "commerce-sdk-react",
+  "version": "2.2.0-dev",
+  "description": "A library that provides react hooks for fetching data from Commerce Cloud",
+  "author": "dev@mobify.com",
+  "license": "See license in LICENSE",
+  "engines": {
+    "node": "^14.0.0",
+    "npm": "^6.14.4 || ^7.0.0 || ^8.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SalesforceCommerceCloud/pwa-kit.git"
+  },
+  "homepage": "https://github.com/SalesforceCommerceCloud/pwa-kit/tree/develop/packages/ecom-react-hooks#readme",
+  "bugs": {
+    "url": "https://github.com/SalesforceCommerceCloud/pwa-kit/issues"
+  },
+  "scripts": {
+    "build": "cross-env NODE_ENV=production internal-lib-build build && tsc --emitDeclarationOnly",
+    "build:docs": "./node_modules/.bin/typedoc",
+    "build:watch": "watch 'npm run build' src/",
+    "lint": "npm run lint:js && tsc --noEmit",
+    "lint:fix": "npm run lint:js -- --fix",
+    "lint:js": "internal-lib-build lint \"**/*.{js,jsx,ts,tsx}\"",
+    "test": "internal-lib-build test",
+    "test:watch": "npm test -- --watch",
+    "test:inspect": "node --inspect-brk jest --runInBand",
+    "typecheck": "tsc --noEmit",
+    "version": "node ./scripts/version.js",
+    "format": "internal-lib-build format \"**/*.{js,jsx,ts,tsx}\""
+  },
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "CHANGELOG.md",
+    "LICENSE"
+  ],
+  "private": true,
+  "devDependencies": {
+    "@types/react": "^17.0.2",
+    "@types/react-dom": "^17.0.2",
+    "cross-env": "^5.2.0",
+    "internal-lib-build": "^2.2.0-dev",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
+    "typedoc": "^0.23.5",
+    "typescript": "^4.7.2",
+    "watch": "^1.0.2"
+  },
+  "peerDependencies": {
+    "react": "^17"
+  },
+  "dependencies": {
+    "commerce-sdk-isomorphic": "^1.5.2"
   }
+}
