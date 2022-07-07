@@ -2,6 +2,7 @@ interface ShopperBasketParams {
     basketId: string | undefined
 }
 
+// The actions are manually taken from commerce-sdk-react documentation
 enum ShopperBasketActions {
     createBasket = 'createBasket',
     transferBasket = 'transferBasket',
