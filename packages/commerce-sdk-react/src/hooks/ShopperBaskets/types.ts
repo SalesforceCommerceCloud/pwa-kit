@@ -2,7 +2,7 @@ interface ShopperBasketParams {
     basketId: string | undefined
 }
 
-// The actions are manually taken from commerce-sdk-react documentation
+// The actions are manually taken from commerce-sdk-isomorphic
 enum ShopperBasketActions {
     createBasket = 'createBasket',
     transferBasket = 'transferBasket',
