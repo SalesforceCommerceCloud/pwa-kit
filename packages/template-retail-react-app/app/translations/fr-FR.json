@@ -196,10 +196,10 @@
     "defaultMessage": "C’est un cadeau."
   },
   "cart_secondary_button_group.link_learn_more": {
-    "defaultMessage": "Envie d'en savoir plus ?"
+    "defaultMessage": "En savoir plus"
   },
   "cart_skeleton.heading.order_summary": {
-    "defaultMessage": "Résumé de commande"
+    "defaultMessage": "Résumé de la commande"
   },
   "cart_skeleton.title.cart": {
     "defaultMessage": "Panier"
@@ -232,7 +232,7 @@
     "defaultMessage": "Détails de la livraison"
   },
   "checkout_confirmation.heading.order_summary": {
-    "defaultMessage": "Résumé de commande"
+    "defaultMessage": "Résumé de la commande"
   },
   "checkout_confirmation.heading.payment_details": {
     "defaultMessage": "Détails du paiement"
@@ -379,10 +379,6 @@
   "contact_info.title.contact_info": {
     "defaultMessage": "Coordonnées"
   },
-  "credit_card_fields.tool_tip.security_code": {
-    "defaultMessage": "Ce code à {length} chiffres se trouve au {side} de votre carte.",
-    "description": "Credit card security code help text"
-  },
   "drawer_menu.button.account_details": {
     "defaultMessage": "Détails du compte"
   },
@@ -462,7 +458,7 @@
     "defaultMessage": "Vérifiez l’orthographe et réessayez ou {link}."
   },
   "empty_search_results.link.contact_us": {
-    "defaultMessage": "Contactez-nous"
+    "defaultMessage": "contactez-nous"
   },
   "empty_search_results.recommended_products.title.most_viewed": {
     "defaultMessage": "Les plus consultés"
@@ -542,6 +538,9 @@
   "global.error.something_went_wrong": {
     "defaultMessage": "Un problème est survenu Veuillez réessayer."
   },
+  "global.info.removed_from_wishlist": {
+    "defaultMessage": "Article supprimé de la liste de souhaits"
+  },
   "header.button.assistive_msg.logo": {
     "defaultMessage": "Logo"
   },
@@ -604,7 +603,7 @@
     "defaultMessage": "Composants et kit de conception"
   },
   "home.features.heading.einstein_recommendations": {
-    "defaultMessage": "Einstein Recommendations"
+    "defaultMessage": "Recommandations Einstein"
   },
   "home.features.heading.my_account": {
     "defaultMessage": "Mon compte"
@@ -625,7 +624,7 @@
     "defaultMessage": "Acheter des produits"
   },
   "home.hero_features.link.design_kit": {
-    "defaultMessage": "Créer avec le kit de conception Figma PWA"
+    "defaultMessage": "Créer avec le Figma PWA Design Kit"
   },
   "home.hero_features.link.on_github": {
     "defaultMessage": "Télécharger sur Github"
@@ -634,7 +633,7 @@
     "defaultMessage": "Déployer sur Managed Runtime"
   },
   "home.link.contact_us": {
-    "defaultMessage": "Contactez-nous"
+    "defaultMessage": "Nous contacter"
   },
   "home.link.get_started": {
     "defaultMessage": "Premiers pas"
@@ -643,7 +642,7 @@
     "defaultMessage": "Lire la documentation"
   },
   "home.title.react_starter_store": {
-    "defaultMessage": "La boutique de démarrage React PWA pour le retail"
+    "defaultMessage": "React PWA Starter Store pour le retail"
   },
   "item_attributes.label.promotions": {
     "defaultMessage": "Promotions"
@@ -846,7 +845,7 @@
     "defaultMessage": "Modifier le panier"
   },
   "order_summary.heading.order_summary": {
-    "defaultMessage": "Résumé de commande"
+    "defaultMessage": "Résumé de la commande"
   },
   "order_summary.label.estimated_total": {
     "defaultMessage": "Total estimé"
@@ -948,7 +947,7 @@
     "defaultMessage": "Questions"
   },
   "product_detail.accordion.button.reviews": {
-    "defaultMessage": "Vérification"
+    "defaultMessage": "Avis"
   },
   "product_detail.accordion.button.size_fit": {
     "defaultMessage": "Taille et ajustement"
@@ -982,9 +981,6 @@
   },
   "product_list.info.added_to_wishlist": {
     "defaultMessage": "{quantity} {quantity, plural, one {article ajouté} other {articles ajoutés}} à la liste de souhaits"
-  },
-  "product_list.info.removed_from_wishlist": {
-    "defaultMessage": "Article supprimé de la liste de souhaits"
   },
   "product_list.modal.button.clear_filters": {
     "defaultMessage": "Effacer les filtres"
@@ -1051,9 +1047,6 @@
   },
   "recommended_products.info.added_to_wishlist": {
     "defaultMessage": "{quantity} {quantity, plural, one {article ajouté} other {articles ajoutés}} à la liste de souhaits"
-  },
-  "recommended_products.info.removed_from_wishlist": {
-    "defaultMessage": "Article supprimé de la liste de souhaits"
   },
   "register_form.action.sign_in": {
     "defaultMessage": "Se connecter"
@@ -1210,7 +1203,7 @@
     "defaultMessage": "Code postal"
   },
   "use_address_fields.label.preferred": {
-    "defaultMessage": "Définir comme valeur par défaut"
+    "defaultMessage": "Définir comme adresse par défaut"
   },
   "use_address_fields.label.province": {
     "defaultMessage": "Province"

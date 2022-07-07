@@ -11,6 +11,7 @@ import useCustomer from '../../../commerce-api/hooks/useCustomer'
 import {useCommerceAPI} from '../../../commerce-api/contexts'
 import {getPaymentInstrumentCardType} from '../../../utils/cc-utils'
 import {isMatchingAddress} from '../../../utils/utils'
+import {useIntl} from 'react-intl'
 
 const CheckoutContext = React.createContext()
 
@@ -19,6 +20,7 @@ export const CheckoutProvider = ({children}) => {
     const api = useCommerceAPI()
     const customer = useCustomer()
     const basket = useBasket()
+    const {formatMessage} = useIntl()
 
     const [state, setState] = useState({
         // @TODO: use contants to represent checkout steps like const CHECKOUT_STEP_2_SHIPPING = 2
@@ -311,7 +313,14 @@ export const CheckoutProvider = ({children}) => {
                 try {
                     await basket.createOrder()
                 } catch (error) {
-                    mergeState({globalError: error.message})
+                    // Note: It is possible to get localized error messages from OCAPI, but this
+                    // is not available for all locales or all error messages. Therefore, we
+                    // recommend using your own error messages, rather than those provided by OCAPI.
+                    const message = formatMessage({
+                        id: 'checkout.message.generic_error',
+                        defaultMessage: 'An unexpected error occurred during checkout.'
+                    })
+                    mergeState({globalError: message})
                     throw error
                 }
             }

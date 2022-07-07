@@ -970,23 +970,13 @@
   "credit_card_fields.tool_tip.security_code": [
     {
       "type": 0,
-      "value": "This "
-    },
-    {
-      "type": 1,
-      "value": "length"
-    },
+      "value": "This 3-digit code can be found on the back of your card."
+    }
+  ],
+  "credit_card_fields.tool_tip.security_code.american_express": [
     {
       "type": 0,
-      "value": "-digit code can be found on the "
-    },
-    {
-      "type": 1,
-      "value": "side"
-    },
-    {
-      "type": 0,
-      "value": " of your card."
+      "value": "This 4-digit code can be found on the front of your card."
     }
   ],
   "drawer_menu.button.account_details": [
@@ -1339,6 +1329,12 @@
       "value": "Something went wrong. Try again!"
     }
   ],
+  "global.info.removed_from_wishlist": [
+    {
+      "type": 0,
+      "value": "Item removed from wishlist"
+    }
+  ],
   "header.button.assistive_msg.logo": [
     {
       "type": 0,
@@ -1387,19 +1383,19 @@
       "value": "My Account"
     }
   ],
-  "home.description.contact_our_staff": [
-    {
-      "type": 0,
-      "value": "Contact our support staff."
-    }
-  ],
   "home.description.features": [
     {
       "type": 0,
       "value": "Out-of-the-box features so that you focus only on adding enhancements."
     }
   ],
-  "home.description.get_you_to_the_right_place": [
+  "home.description.here_to_help": [
+    {
+      "type": 0,
+      "value": "Contact our support staff."
+    }
+  ],
+  "home.description.here_to_help_line_2": [
     {
       "type": 0,
       "value": "They will get you to the right place."
@@ -2331,12 +2327,6 @@
       "value": " added to wishlist"
     }
   ],
-  "product_list.info.removed_from_wishlist": [
-    {
-      "type": 0,
-      "value": "Item removed from wishlist"
-    }
-  ],
   "product_list.modal.button.clear_filters": [
     {
       "type": 0,
@@ -2511,12 +2501,6 @@
     {
       "type": 0,
       "value": " added to wishlist"
-    }
-  ],
-  "recommended_products.info.removed_from_wishlist": [
-    {
-      "type": 0,
-      "value": "Item removed from wishlist"
     }
   ],
   "register_form.action.sign_in": [

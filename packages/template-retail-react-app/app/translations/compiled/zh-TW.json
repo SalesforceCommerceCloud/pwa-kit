@@ -963,28 +963,6 @@
       "value": "聯絡資訊"
     }
   ],
-  "credit_card_fields.tool_tip.security_code": [
-    {
-      "type": 0,
-      "value": "此 "
-    },
-    {
-      "type": 1,
-      "value": "length"
-    },
-    {
-      "type": 0,
-      "value": " 位數代碼可在您卡片的"
-    },
-    {
-      "type": 1,
-      "value": "side"
-    },
-    {
-      "type": 0,
-      "value": "找到。"
-    }
-  ],
   "drawer_menu.button.account_details": [
     {
       "type": 0,
@@ -1335,6 +1313,12 @@
       "value": "發生錯誤。請再試一次。"
     }
   ],
+  "global.info.removed_from_wishlist": [
+    {
+      "type": 0,
+      "value": "已從願望清單移除商品"
+    }
+  ],
   "header.button.assistive_msg.logo": [
     {
       "type": 0,
@@ -1430,7 +1414,7 @@
   "home.features.description.einstein_recommendations": [
     {
       "type": 0,
-      "value": "透過產品推薦，向每位購物者傳遞下一個最佳產品或優惠 (next best product or offer)。"
+      "value": "透過產品推薦，向每位購物者傳遞下一個最佳產品或優惠。"
     }
   ],
   "home.features.description.my_account": [
@@ -1466,7 +1450,7 @@
   "home.features.heading.einstein_recommendations": [
     {
       "type": 0,
-      "value": "Einstein Recommendations"
+      "value": "Einstein 推薦"
     }
   ],
   "home.features.heading.my_account": [
@@ -1478,7 +1462,7 @@
   "home.features.heading.shopper_login": [
     {
       "type": 0,
-      "value": "Shopper Login and API Access Service"
+      "value": "Shopper Login and API Access Service (SLAS)"
     }
   ],
   "home.features.heading.wishlist": [
@@ -1544,7 +1528,7 @@
   "home.title.react_starter_store": [
     {
       "type": 0,
-      "value": "React PWA 範例零售商店"
+      "value": "零售型 React PWA Starter Store"
     }
   ],
   "item_attributes.label.promotions": [
@@ -2124,7 +2108,7 @@
   "password_requirements.error.one_special_character": [
     {
       "type": 0,
-      "value": "1 個特殊字元 (例如：, S ! % #)"
+      "value": "1 個特殊字元 (例如：, $ ! % #)"
     }
   ],
   "password_requirements.error.one_uppercase_letter": [
@@ -2321,12 +2305,6 @@
       "value": "已新增至願望清單"
     }
   ],
-  "product_list.info.removed_from_wishlist": [
-    {
-      "type": 0,
-      "value": "已從願望清單移除商品"
-    }
-  ],
   "product_list.modal.button.clear_filters": [
     {
       "type": 0,
@@ -2501,12 +2479,6 @@
     {
       "type": 0,
       "value": "已新增至願望清單"
-    }
-  ],
-  "recommended_products.info.removed_from_wishlist": [
-    {
-      "type": 0,
-      "value": "已從願望清單移除商品"
     }
   ],
   "register_form.action.sign_in": [

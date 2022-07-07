@@ -320,7 +320,7 @@
     },
     {
       "type": 0,
-      "value": " 已添加至购物车"
+      "value": "已添加至购物车"
     }
   ],
   "add_to_cart_modal.label.cart_subtotal": [
@@ -460,7 +460,7 @@
     },
     {
       "type": 0,
-      "value": " 已添加至愿望清单"
+      "value": "已添加至愿望清单"
     }
   ],
   "cart.info.removed_from_cart": [
@@ -670,7 +670,7 @@
   "checkout_confirmation.label.order_total": [
     {
       "type": 0,
-      "value": "订单总数"
+      "value": "订单总额"
     }
   ],
   "checkout_confirmation.label.promo_applied": [
@@ -967,28 +967,6 @@
       "value": "联系信息"
     }
   ],
-  "credit_card_fields.tool_tip.security_code": [
-    {
-      "type": 0,
-      "value": "此 "
-    },
-    {
-      "type": 1,
-      "value": "length"
-    },
-    {
-      "type": 0,
-      "value": " 位数字码可以在卡的 "
-    },
-    {
-      "type": 1,
-      "value": "side"
-    },
-    {
-      "type": 0,
-      "value": " 找到。"
-    }
-  ],
   "drawer_menu.button.account_details": [
     {
       "type": 0,
@@ -1130,7 +1108,7 @@
   "empty_search_results.info.cant_find_anything_for_category": [
     {
       "type": 0,
-      "value": "我们找不到 "
+      "value": "我们找不到"
     },
     {
       "type": 1,
@@ -1138,7 +1116,7 @@
     },
     {
       "type": 0,
-      "value": " 的任何内容。尝试搜索产品或 "
+      "value": "的任何内容。尝试搜索产品或"
     },
     {
       "type": 1,
@@ -1166,7 +1144,7 @@
   "empty_search_results.info.double_check_spelling": [
     {
       "type": 0,
-      "value": "请仔细检查您的拼写并重试或 "
+      "value": "请仔细检查您的拼写并重试或"
     },
     {
       "type": 1,
@@ -1339,6 +1317,12 @@
       "value": "出现错误。重试。"
     }
   ],
+  "global.info.removed_from_wishlist": [
+    {
+      "type": 0,
+      "value": "从愿望清单中移除商品"
+    }
+  ],
   "header.button.assistive_msg.logo": [
     {
       "type": 0,
@@ -1470,7 +1454,7 @@
   "home.features.heading.einstein_recommendations": [
     {
       "type": 0,
-      "value": "Einstein Recommendations"
+      "value": "Einstein 推荐"
     }
   ],
   "home.features.heading.my_account": [
@@ -1512,7 +1496,7 @@
   "home.hero_features.link.design_kit": [
     {
       "type": 0,
-      "value": "采用 Figma PWA 设计套件创建"
+      "value": "采用 Figma PWA Design Kit 创建"
     }
   ],
   "home.hero_features.link.on_github": [
@@ -1548,7 +1532,7 @@
   "home.title.react_starter_store": [
     {
       "type": 0,
-      "value": "React PWA Starter Store for Retail"
+      "value": "零售 React PWA Starter Store"
     }
   ],
   "item_attributes.label.promotions": [
@@ -2010,7 +1994,7 @@
   "order_summary.label.order_total": [
     {
       "type": 0,
-      "value": "订单总数"
+      "value": "订单总额"
     }
   ],
   "order_summary.label.promo_applied": [
@@ -2238,7 +2222,7 @@
     },
     {
       "type": 0,
-      "value": " 已添加至愿望清单"
+      "value": "已添加至愿望清单"
     }
   ],
   "product_detail.recommended_products.title.complete_set": [
@@ -2322,13 +2306,7 @@
     },
     {
       "type": 0,
-      "value": " 已添加至愿望清单"
-    }
-  ],
-  "product_list.info.removed_from_wishlist": [
-    {
-      "type": 0,
-      "value": "从愿望清单中移除商品"
+      "value": "已添加至愿望清单"
     }
   ],
   "product_list.modal.button.clear_filters": [
@@ -2504,13 +2482,7 @@
     },
     {
       "type": 0,
-      "value": " 已添加至愿望清单"
-    }
-  ],
-  "recommended_products.info.removed_from_wishlist": [
-    {
-      "type": 0,
-      "value": "从愿望清单中移除商品"
+      "value": "已添加至愿望清单"
     }
   ],
   "register_form.action.sign_in": [
@@ -2564,7 +2536,7 @@
   "register_form.message.already_have_account": [
     {
       "type": 0,
-      "value": "已经有账户？"
+      "value": "已有账户？"
     }
   ],
   "register_form.message.create_an_account": [
@@ -2776,7 +2748,7 @@
   "use_address_fields.error.please_enter_your_postal_or_zip": [
     {
       "type": 0,
-      "value": "请输入您的 "
+      "value": "请输入您的"
     },
     {
       "type": 1,
@@ -2808,7 +2780,7 @@
   "use_address_fields.error.please_select_your_state_or_province": [
     {
       "type": 0,
-      "value": "请选择您所在的 "
+      "value": "请选择您所在的"
     },
     {
       "type": 1,
@@ -3288,7 +3260,7 @@
     },
     {
       "type": 0,
-      "value": " 已添加至购物车"
+      "value": "已添加至购物车"
     }
   ],
   "wishlist_secondary_button_group.action.remove": [

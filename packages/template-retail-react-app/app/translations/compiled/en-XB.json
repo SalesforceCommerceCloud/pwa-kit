@@ -425,44 +425,6 @@
       "value": "[!! Ḁḋḋḋḋ Ŋèèèẘ ṔṔṔâẏṁṁṁèńṭṭṭ Ḿèèèṭḫŏŏŏḋ !!]"
     }
   ],
-  "cart.info.added_to_wishlist": [
-    {
-      "type": 1,
-      "value": "quantity"
-    },
-    {
-      "type": 0,
-      "value": "[!!   !!]"
-    },
-    {
-      "offset": 0,
-      "options": {
-        "one": {
-          "value": [
-            {
-              "type": 0,
-              "value": "[!! íṭèèèṁ !!]"
-            }
-          ]
-        },
-        "other": {
-          "value": [
-            {
-              "type": 0,
-              "value": "[!! íṭèèèṁś !!]"
-            }
-          ]
-        }
-      },
-      "pluralType": "cardinal",
-      "type": 6,
-      "value": "quantity"
-    },
-    {
-      "type": 0,
-      "value": "[!!  âḋḋḋḋèḋḋḋ ṭŏŏŏ ẘíííśḫĺĺĺíśṭṭṭ !!]"
-    }
-  ],
   "cart.info.removed_from_cart": [
     {
       "type": 0,
@@ -593,6 +555,12 @@
     {
       "type": 0,
       "value": "[!! Ṕĺâââćè Õŕḋḋḋèŕ !!]"
+    }
+  ],
+  "checkout.message.generic_error": [
+    {
+      "type": 0,
+      "value": "[!! Ḁń ůńèèèẋṗèèèćṭèèèḋ èèèŕŕŏŏŏŕ ŏŏŏććůůůŕŕèèèḋ ḋḋḋůŕíííńĝ ćḫèèèćǩŏŏŏůṭ. !!]"
     }
   ],
   "checkout_confirmation.button.create_account": [
@@ -970,23 +938,13 @@
   "credit_card_fields.tool_tip.security_code": [
     {
       "type": 0,
-      "value": "[!! Ṯḫíííś  !!]"
-    },
-    {
-      "type": 1,
-      "value": "length"
-    },
+      "value": "[!! Ṯḫíííś 3-ḋíííĝíṭṭṭ ćŏŏŏḋè ćâńńń ḃèèè ḟŏŏŏůńḋḋḋ ŏńńń ṭḫḫḫè ḃḃḃâćǩǩǩ ŏḟḟḟ ẏŏŏŏůŕ ćâŕŕŕḋ. !!]"
+    }
+  ],
+  "credit_card_fields.tool_tip.security_code.american_express": [
     {
       "type": 0,
-      "value": "[!! -ḋíííĝíṭṭṭ ćŏŏŏḋè ćâńńń ḃèèè ḟŏŏŏůńḋḋḋ ŏńńń ṭḫḫḫè  !!]"
-    },
-    {
-      "type": 1,
-      "value": "side"
-    },
-    {
-      "type": 0,
-      "value": "[!!  ŏḟḟḟ ẏŏŏŏůŕ ćâŕŕŕḋ. !!]"
+      "value": "[!! Ṯḫíííś 4-ḋíííĝíṭṭṭ ćŏŏŏḋè ćâńńń ḃèèè ḟŏŏŏůńḋḋḋ ŏńńń ṭḫḫḫè ḟḟḟŕŏńńńṭ ŏŏŏḟ ẏẏẏŏůŕŕŕ ćâââŕḋ. !!]"
     }
   ],
   "drawer_menu.button.account_details": [
@@ -1339,6 +1297,56 @@
       "value": "[!! Ṡŏṁṁṁèṭḫḫḫíńĝĝĝ ẘèèèńṭ ẘŕŏŏŏńĝ. Ṯŕŕŕẏ âââĝâíííń! !!]"
     }
   ],
+  "global.info.added_to_wishlist": [
+    {
+      "type": 1,
+      "value": "quantity"
+    },
+    {
+      "type": 0,
+      "value": "[!!   !!]"
+    },
+    {
+      "offset": 0,
+      "options": {
+        "one": {
+          "value": [
+            {
+              "type": 0,
+              "value": "[!! íṭèèèṁ !!]"
+            }
+          ]
+        },
+        "other": {
+          "value": [
+            {
+              "type": 0,
+              "value": "[!! íṭèèèṁś !!]"
+            }
+          ]
+        }
+      },
+      "pluralType": "cardinal",
+      "type": 6,
+      "value": "quantity"
+    },
+    {
+      "type": 0,
+      "value": "[!!  âḋḋḋḋèḋḋḋ ṭŏŏŏ ẘíííśḫĺĺĺíśṭṭṭ !!]"
+    }
+  ],
+  "global.info.removed_from_wishlist": [
+    {
+      "type": 0,
+      "value": "[!! Ḭṭèèèṁ ŕŕŕèṁŏŏŏṿèḋḋḋ ḟŕŕŕŏṁ ẘíśśśḫĺíííśṭ !!]"
+    }
+  ],
+  "global.link.added_to_wishlist.view_wishlist": [
+    {
+      "type": 0,
+      "value": "[!! Ṽíèèèẘ !!]"
+    }
+  ],
   "header.button.assistive_msg.logo": [
     {
       "type": 0,
@@ -1387,19 +1395,19 @@
       "value": "[!! Ḿẏ Ḁććććŏůńńńṭ !!]"
     }
   ],
-  "home.description.contact_our_staff": [
-    {
-      "type": 0,
-      "value": "[!! Ḉŏńńńṭâćććṭ ŏŏŏůŕ śůṗṗṗṗŏŕŕŕṭ śśśṭâḟḟḟḟ. !!]"
-    }
-  ],
   "home.description.features": [
     {
       "type": 0,
       "value": "[!! Õůṭṭṭ-ŏḟḟḟ-ṭḫḫḫè-ḃḃḃŏẋ ḟèâââṭůŕŕŕèś śŏ ṭḫâââṭ ẏẏẏŏů ḟŏćććůś ŏńĺĺĺẏ ŏŏŏń âââḋḋíííńĝ èńḫḫḫâńćććèṁèèèńṭśśś. !!]"
     }
   ],
-  "home.description.get_you_to_the_right_place": [
+  "home.description.here_to_help": [
+    {
+      "type": 0,
+      "value": "[!! Ḉŏńńńṭâćććṭ ŏŏŏůŕ śůṗṗṗṗŏŕŕŕṭ śśśṭâḟḟḟḟ. !!]"
+    }
+  ],
+  "home.description.here_to_help_line_2": [
     {
       "type": 0,
       "value": "[!! Ṯḫèèèẏ ẘẘẘíĺĺĺĺ ĝèèèṭ ẏẏẏŏů ṭŏ ṭḫèèè ŕíííĝḫṭṭṭ ṗĺĺĺâćèèè. !!]"
@@ -2209,44 +2217,6 @@
       "value": "[!! Ḉŏṁṁṁíńĝĝĝ Ṡŏŏŏŏń !!]"
     }
   ],
-  "product_detail.info.added_to_wishlist": [
-    {
-      "type": 1,
-      "value": "quantity"
-    },
-    {
-      "type": 0,
-      "value": "[!!   !!]"
-    },
-    {
-      "offset": 0,
-      "options": {
-        "one": {
-          "value": [
-            {
-              "type": 0,
-              "value": "[!! íṭèèèṁ !!]"
-            }
-          ]
-        },
-        "other": {
-          "value": [
-            {
-              "type": 0,
-              "value": "[!! íṭèèèṁś !!]"
-            }
-          ]
-        }
-      },
-      "pluralType": "cardinal",
-      "type": 6,
-      "value": "quantity"
-    },
-    {
-      "type": 0,
-      "value": "[!!  âḋḋḋḋèḋḋḋ ṭŏŏŏ ẘíííśḫĺĺĺíśṭṭṭ !!]"
-    }
-  ],
   "product_detail.recommended_products.title.complete_set": [
     {
       "type": 0,
@@ -2291,50 +2261,6 @@
     {
       "type": 0,
       "value": "[!! Ṡŏŕŕŕṭ ḂḂḂẏ !!]"
-    }
-  ],
-  "product_list.info.added_to_wishlist": [
-    {
-      "type": 1,
-      "value": "quantity"
-    },
-    {
-      "type": 0,
-      "value": "[!!   !!]"
-    },
-    {
-      "offset": 0,
-      "options": {
-        "one": {
-          "value": [
-            {
-              "type": 0,
-              "value": "[!! íṭèèèṁ !!]"
-            }
-          ]
-        },
-        "other": {
-          "value": [
-            {
-              "type": 0,
-              "value": "[!! íṭèèèṁś !!]"
-            }
-          ]
-        }
-      },
-      "pluralType": "cardinal",
-      "type": 6,
-      "value": "quantity"
-    },
-    {
-      "type": 0,
-      "value": "[!!  âḋḋḋḋèḋḋḋ ṭŏŏŏ ẘíííśḫĺĺĺíśṭṭṭ !!]"
-    }
-  ],
-  "product_list.info.removed_from_wishlist": [
-    {
-      "type": 0,
-      "value": "[!! Ḭṭèèèṁ ŕŕŕèṁŏŏŏṿèḋḋḋ ḟŕŕŕŏṁ ẘíśśśḫĺíííśṭ !!]"
     }
   ],
   "product_list.modal.button.clear_filters": [
@@ -2473,50 +2399,6 @@
     {
       "type": 0,
       "value": "[!! Ŕèćććèńṭṭṭ Ṡèèèâŕćććḫèśśś !!]"
-    }
-  ],
-  "recommended_products.info.added_to_wishlist": [
-    {
-      "type": 1,
-      "value": "quantity"
-    },
-    {
-      "type": 0,
-      "value": "[!!   !!]"
-    },
-    {
-      "offset": 0,
-      "options": {
-        "one": {
-          "value": [
-            {
-              "type": 0,
-              "value": "[!! íṭèèèṁ !!]"
-            }
-          ]
-        },
-        "other": {
-          "value": [
-            {
-              "type": 0,
-              "value": "[!! íṭèèèṁś !!]"
-            }
-          ]
-        }
-      },
-      "pluralType": "cardinal",
-      "type": 6,
-      "value": "quantity"
-    },
-    {
-      "type": 0,
-      "value": "[!!  âḋḋḋḋèḋḋḋ ṭŏŏŏ ẘíííśḫĺĺĺíśṭṭṭ !!]"
-    }
-  ],
-  "recommended_products.info.removed_from_wishlist": [
-    {
-      "type": 0,
-      "value": "[!! Ḭṭèèèṁ ŕŕŕèṁŏŏŏṿèḋḋḋ ḟŕŕŕŏṁ ẘíśśśḫĺíííśṭ !!]"
     }
   ],
   "register_form.action.sign_in": [
@@ -3257,6 +3139,18 @@
     {
       "type": 0,
       "value": "[!! Ŋèẘẘẘ Ṕâââśśẘẘẘŏŕḋḋḋ !!]"
+    }
+  ],
+  "wishlist_primary_action.button.add_to_cart": [
+    {
+      "type": 0,
+      "value": "[!! Ḁḋḋḋḋ ṭŏŏŏ Ḉâââŕṭ !!]"
+    }
+  ],
+  "wishlist_primary_action.button.select_options": [
+    {
+      "type": 0,
+      "value": "[!! Ṡèĺĺĺèćṭṭṭ Õṗṗṗṭíŏŏŏńś !!]"
     }
   ],
   "wishlist_primary_action.info.added_to_cart": [

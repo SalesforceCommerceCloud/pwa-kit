@@ -130,7 +130,7 @@
     "defaultMessage": "移除"
   },
   "add_to_cart_modal.info.added_to_cart": {
-    "defaultMessage": "{quantity} {quantity, plural, one { 件商品} other { 件商品}} 已添加至购物车"
+    "defaultMessage": "{quantity} {quantity, plural, one { 件商品} other { 件商品}}已添加至购物车"
   },
   "add_to_cart_modal.label.cart_subtotal": {
     "defaultMessage": "购物车小计（{itemAccumulatedCount} 件商品）"
@@ -169,7 +169,7 @@
     "defaultMessage": "添加新付款方式"
   },
   "cart.info.added_to_wishlist": {
-    "defaultMessage": "{quantity} {quantity, plural, one { 件商品} other { 件商品}} 已添加至愿望清单"
+    "defaultMessage": "{quantity} {quantity, plural, one { 件商品} other { 件商品}}已添加至愿望清单"
   },
   "cart.info.removed_from_cart": {
     "defaultMessage": "从购物车中移除商品"
@@ -253,7 +253,7 @@
     "defaultMessage": "订单编号"
   },
   "checkout_confirmation.label.order_total": {
-    "defaultMessage": "订单总数"
+    "defaultMessage": "订单总额"
   },
   "checkout_confirmation.label.promo_applied": {
     "defaultMessage": "已应用促销"
@@ -379,10 +379,6 @@
   "contact_info.title.contact_info": {
     "defaultMessage": "联系信息"
   },
-  "credit_card_fields.tool_tip.security_code": {
-    "defaultMessage": "此 {length} 位数字码可以在卡的 {side} 找到。",
-    "description": "Credit card security code help text"
-  },
   "drawer_menu.button.account_details": {
     "defaultMessage": "账户详情"
   },
@@ -453,13 +449,13 @@
     "defaultMessage": "登录以检索您保存的商品或继续购物。"
   },
   "empty_search_results.info.cant_find_anything_for_category": {
-    "defaultMessage": "我们找不到 {category} 的任何内容。尝试搜索产品或 {link}。"
+    "defaultMessage": "我们找不到{category}的任何内容。尝试搜索产品或{link}。"
   },
   "empty_search_results.info.cant_find_anything_for_query": {
     "defaultMessage": "我们找不到“{searchQuery}”的任何内容。"
   },
   "empty_search_results.info.double_check_spelling": {
-    "defaultMessage": "请仔细检查您的拼写并重试或 {link}。"
+    "defaultMessage": "请仔细检查您的拼写并重试或{link}。"
   },
   "empty_search_results.link.contact_us": {
     "defaultMessage": "联系我们"
@@ -542,6 +538,9 @@
   "global.error.something_went_wrong": {
     "defaultMessage": "出现错误。重试。"
   },
+  "global.info.removed_from_wishlist": {
+    "defaultMessage": "从愿望清单中移除商品"
+  },
   "header.button.assistive_msg.logo": {
     "defaultMessage": "标志"
   },
@@ -604,7 +603,7 @@
     "defaultMessage": "组件和设计套件"
   },
   "home.features.heading.einstein_recommendations": {
-    "defaultMessage": "Einstein Recommendations"
+    "defaultMessage": "Einstein 推荐"
   },
   "home.features.heading.my_account": {
     "defaultMessage": "我的账户"
@@ -625,7 +624,7 @@
     "defaultMessage": "购买产品"
   },
   "home.hero_features.link.design_kit": {
-    "defaultMessage": "采用 Figma PWA 设计套件创建"
+    "defaultMessage": "采用 Figma PWA Design Kit 创建"
   },
   "home.hero_features.link.on_github": {
     "defaultMessage": "在 Github 下载"
@@ -643,7 +642,7 @@
     "defaultMessage": "阅读文档"
   },
   "home.title.react_starter_store": {
-    "defaultMessage": "React PWA Starter Store for Retail"
+    "defaultMessage": "零售 React PWA Starter Store"
   },
   "item_attributes.label.promotions": {
     "defaultMessage": "促销"
@@ -855,7 +854,7 @@
     "defaultMessage": "免费"
   },
   "order_summary.label.order_total": {
-    "defaultMessage": "订单总数"
+    "defaultMessage": "订单总额"
   },
   "order_summary.label.promo_applied": {
     "defaultMessage": "已应用促销"
@@ -957,7 +956,7 @@
     "defaultMessage": "即将到货"
   },
   "product_detail.info.added_to_wishlist": {
-    "defaultMessage": "{quantity} {quantity, plural, one { 件商品} other { 件商品}} 已添加至愿望清单"
+    "defaultMessage": "{quantity} {quantity, plural, one { 件商品} other { 件商品}}已添加至愿望清单"
   },
   "product_detail.recommended_products.title.complete_set": {
     "defaultMessage": "Complete the Set（完成组合）"
@@ -981,10 +980,7 @@
     "defaultMessage": "排序标准"
   },
   "product_list.info.added_to_wishlist": {
-    "defaultMessage": "{quantity} {quantity, plural, one { 件商品} other { 件商品}} 已添加至愿望清单"
-  },
-  "product_list.info.removed_from_wishlist": {
-    "defaultMessage": "从愿望清单中移除商品"
+    "defaultMessage": "{quantity} {quantity, plural, one { 件商品} other { 件商品}}已添加至愿望清单"
   },
   "product_list.modal.button.clear_filters": {
     "defaultMessage": "清除筛选器"
@@ -1050,10 +1046,7 @@
     "defaultMessage": "最近搜索"
   },
   "recommended_products.info.added_to_wishlist": {
-    "defaultMessage": "{quantity} {quantity, plural, one { 件商品} other { 件商品}} 已添加至愿望清单"
-  },
-  "recommended_products.info.removed_from_wishlist": {
-    "defaultMessage": "从愿望清单中移除商品"
+    "defaultMessage": "{quantity} {quantity, plural, one { 件商品} other { 件商品}}已添加至愿望清单"
   },
   "register_form.action.sign_in": {
     "defaultMessage": "登录"
@@ -1068,7 +1061,7 @@
     "defaultMessage": "创建账户即表明您同意 Salesforce <policy>隐私政策</policy>以及<terms>条款与条件</terms>"
   },
   "register_form.message.already_have_account": {
-    "defaultMessage": "已经有账户？"
+    "defaultMessage": "已有账户？"
   },
   "register_form.message.create_an_account": {
     "defaultMessage": "创建账户并首先查看最佳产品、妙招和虚拟社区。"
@@ -1168,7 +1161,7 @@
     "defaultMessage": "请输入您的电话号码。"
   },
   "use_address_fields.error.please_enter_your_postal_or_zip": {
-    "defaultMessage": "请输入您的 {postalOrZip}。"
+    "defaultMessage": "请输入您的{postalOrZip}。"
   },
   "use_address_fields.error.please_select_your_address": {
     "defaultMessage": "请输入您的地址。"
@@ -1180,7 +1173,7 @@
     "defaultMessage": "请输入您所在国家/地区。"
   },
   "use_address_fields.error.please_select_your_state_or_province": {
-    "defaultMessage": "请选择您所在的 {stateOrProvince}。"
+    "defaultMessage": "请选择您所在的{stateOrProvince}。"
   },
   "use_address_fields.error.required": {
     "defaultMessage": "必填"
@@ -1396,7 +1389,7 @@
     "defaultMessage": "新密码"
   },
   "wishlist_primary_action.info.added_to_cart": {
-    "defaultMessage": "{quantity} {quantity, plural, one { 件商品} other { 件商品}} 已添加至购物车"
+    "defaultMessage": "{quantity} {quantity, plural, one { 件商品} other { 件商品}}已添加至购物车"
   },
   "wishlist_secondary_button_group.action.remove": {
     "defaultMessage": "移除"

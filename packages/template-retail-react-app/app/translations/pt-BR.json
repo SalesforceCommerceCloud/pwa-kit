@@ -115,13 +115,13 @@
     "defaultMessage": "Continuar comprando"
   },
   "account_wishlist.description.continue_shopping": {
-    "defaultMessage": "Continue comprando e adicione itens a sua wishlist."
+    "defaultMessage": "Continue comprando e adicionando itens na sua lista de desejos."
   },
   "account_wishlist.heading.no_wishlist": {
-    "defaultMessage": "Não há itens na wishlist"
+    "defaultMessage": "Não há itens na lista de desejos"
   },
   "account_wishlist.title.wishlist": {
-    "defaultMessage": "Wishlist/Lista de desejos"
+    "defaultMessage": "Lista de desejos"
   },
   "action_card.action.edit": {
     "defaultMessage": "Editar"
@@ -169,7 +169,7 @@
     "defaultMessage": "Adicionar novo método de pagamento"
   },
   "cart.info.added_to_wishlist": {
-    "defaultMessage": "{quantity} {quantity, plural, one {item} other {itens}} adicionado(s) à wishlist"
+    "defaultMessage": "{quantity} {quantity, plural, one {item} other {itens}} adicionado(s) à lista de desejos"
   },
   "cart.info.removed_from_cart": {
     "defaultMessage": "Item removido do carrinho"
@@ -184,7 +184,7 @@
     "defaultMessage": "Pagar"
   },
   "cart_secondary_button_group.action.added_to_wishlist": {
-    "defaultMessage": "Adicionar à wishlist"
+    "defaultMessage": "Adicionar à lista de desejos"
   },
   "cart_secondary_button_group.action.edit": {
     "defaultMessage": "Editar"
@@ -335,7 +335,7 @@
     "defaultMessage": "Confirmar ação"
   },
   "confirmation_modal.remove_cart_item.action.no": {
-    "defaultMessage": "Não, manter o item"
+    "defaultMessage": "Não, manter item"
   },
   "confirmation_modal.remove_cart_item.action.yes": {
     "defaultMessage": "Sim, remover item"
@@ -347,13 +347,13 @@
     "defaultMessage": "Confirmar remoção do item"
   },
   "confirmation_modal.remove_wishlist_item.action.no": {
-    "defaultMessage": "Não, manter o item"
+    "defaultMessage": "Não, manter item"
   },
   "confirmation_modal.remove_wishlist_item.action.yes": {
     "defaultMessage": "Sim, remover item"
   },
   "confirmation_modal.remove_wishlist_item.message.sure_to_remove": {
-    "defaultMessage": "Tem certeza de que deseja remover este item da wishlist?"
+    "defaultMessage": "Tem certeza de que deseja remover este item da lista de desejos?"
   },
   "confirmation_modal.remove_wishlist_item.title.confirm_remove": {
     "defaultMessage": "Confirmar remoção do item"
@@ -378,10 +378,6 @@
   },
   "contact_info.title.contact_info": {
     "defaultMessage": "Informações de contato"
-  },
-  "credit_card_fields.tool_tip.security_code": {
-    "defaultMessage": "Este código de {length} dígitos pode ser encontrado no {side} de seu cartão.",
-    "description": "Credit card security code help text"
   },
   "drawer_menu.button.account_details": {
     "defaultMessage": "Detalhes da conta"
@@ -453,7 +449,7 @@
     "defaultMessage": "Faça logon para recuperar seus itens salvos ou continuar a compra."
   },
   "empty_search_results.info.cant_find_anything_for_category": {
-    "defaultMessage": "Não encontramos resultados para \"{category}\". Tente pesquisar um produto ou {link}."
+    "defaultMessage": "Não encontramos resultados para {category}. Tente pesquisar um produto ou {link}."
   },
   "empty_search_results.info.cant_find_anything_for_query": {
     "defaultMessage": "Não encontramos resultados para \"{searchQuery}\"."
@@ -507,7 +503,7 @@
     "defaultMessage": "Termos e condições"
   },
   "footer.message.copyright": {
-    "defaultMessage": "2021 Salesforce ou suas afiliadas. Todos os direitos reservados. Está é somente uma loja de demonstração. Os pedidos feitos NÃO SERÃO processados."
+    "defaultMessage": "2021 Salesforce ou suas afiliadas. Todos os direitos reservados. Esta é apenas uma loja de demonstração. Os pedidos feitos NÃO SERÃO processados."
   },
   "footer.subscribe.button.sign_up": {
     "defaultMessage": "Cadastro"
@@ -537,10 +533,13 @@
     "defaultMessage": "Métodos de pagamento"
   },
   "global.account.link.wishlist": {
-    "defaultMessage": "Wishlist/Lista de desejos"
+    "defaultMessage": "Lista de desejos"
   },
   "global.error.something_went_wrong": {
     "defaultMessage": "Ocorreu um erro. Tente novamente."
+  },
+  "global.info.removed_from_wishlist": {
+    "defaultMessage": "Item removido da lista de desejos"
   },
   "header.button.assistive_msg.logo": {
     "defaultMessage": "Logotipo"
@@ -555,7 +554,7 @@
     "defaultMessage": "Meu carrinho"
   },
   "header.button.assistive_msg.wishlist": {
-    "defaultMessage": "Wishlist/Lista de desejos"
+    "defaultMessage": "Lista de desejos"
   },
   "header.field.placeholder.search_for_products": {
     "defaultMessage": "Pesquisar produtos..."
@@ -595,34 +594,34 @@
     "defaultMessage": "Permite que os compradores façam logon com uma experiência de compra mais personalizada."
   },
   "home.features.description.wishlist": {
-    "defaultMessage": "Os compradores registrados podem adicionar itens de produtos às wishlists para comprá-los mais tarde."
+    "defaultMessage": "Os compradores registrados podem adicionar itens de produtos à lista de desejos para comprá-los mais tarde."
   },
   "home.features.heading.cart_checkout": {
     "defaultMessage": "Carrinho e Checkout"
   },
   "home.features.heading.components": {
-    "defaultMessage": "Kit de componentes e design"
+    "defaultMessage": "Componentes e Kit de design"
   },
   "home.features.heading.einstein_recommendations": {
-    "defaultMessage": "Einstein Recommendations"
+    "defaultMessage": "Recomendações do Einstein"
   },
   "home.features.heading.my_account": {
     "defaultMessage": "Minha conta"
   },
   "home.features.heading.shopper_login": {
-    "defaultMessage": "Logon do comprador e API Access Service"
+    "defaultMessage": "Shopper Login and API Access Service (SLAS)"
   },
   "home.features.heading.wishlist": {
-    "defaultMessage": "Wishlist/Lista de desejos"
+    "defaultMessage": "Lista de desejos"
   },
   "home.heading.features": {
     "defaultMessage": "Recursos"
   },
   "home.heading.here_to_help": {
-    "defaultMessage": "Estamos aqui para ajudar você"
+    "defaultMessage": "Estamos aqui para ajudar"
   },
   "home.heading.shop_products": {
-    "defaultMessage": "Ver produtos"
+    "defaultMessage": "Comprar produtos"
   },
   "home.hero_features.link.design_kit": {
     "defaultMessage": "Criar com o Figma PWA Design Kit"
@@ -643,7 +642,7 @@
     "defaultMessage": "Ler documentos"
   },
   "home.title.react_starter_store": {
-    "defaultMessage": "O React PWA Starter Store for Retail"
+    "defaultMessage": "React PWA Starter Store para varejo"
   },
   "item_attributes.label.promotions": {
     "defaultMessage": "Promoções"
@@ -903,7 +902,7 @@
     "defaultMessage": "Senha"
   },
   "password_requirements.error.eight_letter_minimum": {
-    "defaultMessage": "8 caracteres, no mínimo",
+    "defaultMessage": "Mínimo de 8 caracteres",
     "description": "Password requirement"
   },
   "password_requirements.error.one_lowercase_letter": {
@@ -915,7 +914,7 @@
     "description": "Password requirement"
   },
   "password_requirements.error.one_special_character": {
-    "defaultMessage": "1 caractere especial (exemplo: , S ! % #)",
+    "defaultMessage": "1 caractere especial (exemplo: , $ ! % #)",
     "description": "Password requirement"
   },
   "password_requirements.error.one_uppercase_letter": {
@@ -938,7 +937,7 @@
     "defaultMessage": "Este é um pagamento protegido com criptografia SSL."
   },
   "price_per_item.label.each": {
-    "defaultMessage": "ea",
+    "defaultMessage": "cada",
     "description": "Abbreviated 'each', follows price per item, like $10/ea"
   },
   "product_detail.accordion.button.product_detail": {
@@ -957,7 +956,7 @@
     "defaultMessage": "Em breve"
   },
   "product_detail.info.added_to_wishlist": {
-    "defaultMessage": "{quantity} {quantity, plural, one {item} other {itens}} adicionado(s) à wishlist"
+    "defaultMessage": "{quantity} {quantity, plural, one {item} other {itens}} adicionado(s) à lista de desejos"
   },
   "product_detail.recommended_products.title.complete_set": {
     "defaultMessage": "Completar o conjunto"
@@ -981,10 +980,7 @@
     "defaultMessage": "Ordenar por"
   },
   "product_list.info.added_to_wishlist": {
-    "defaultMessage": "{quantity} {quantity, plural, one {item} other {itens}} adicionado(s) à wishlist"
-  },
-  "product_list.info.removed_from_wishlist": {
-    "defaultMessage": "Item removido da wishlist"
+    "defaultMessage": "{quantity} {quantity, plural, one {item} other {itens}} adicionado(s) à lista de desejos"
   },
   "product_list.modal.button.clear_filters": {
     "defaultMessage": "Limpar filtros"
@@ -999,13 +995,13 @@
     "defaultMessage": "Ordenar por: {sortOption}"
   },
   "product_tile.assistive_msg.wishlist": {
-    "defaultMessage": "Wishlist/Lista de desejos"
+    "defaultMessage": "Lista de desejos"
   },
   "product_view.button.add_to_cart": {
     "defaultMessage": "Adicionar ao carrinho"
   },
   "product_view.button.add_to_wishlist": {
-    "defaultMessage": "Adicionar à wishlist"
+    "defaultMessage": "Adicionar à lista de desejos"
   },
   "product_view.button.update": {
     "defaultMessage": "Atualizar"
@@ -1050,10 +1046,7 @@
     "defaultMessage": "Pesquisas recentes"
   },
   "recommended_products.info.added_to_wishlist": {
-    "defaultMessage": "{quantity} {quantity, plural, one {item} other {itens}} adicionado(s) à wishlist"
-  },
-  "recommended_products.info.removed_from_wishlist": {
-    "defaultMessage": "Item removido da wishlist"
+    "defaultMessage": "{quantity} {quantity, plural, one {item} other {itens}} adicionado(s) à lista de desejos"
   },
   "register_form.action.sign_in": {
     "defaultMessage": "Fazer logon"
@@ -1105,13 +1098,13 @@
     "defaultMessage": "Apagar tudo"
   },
   "shipping_address.button.continue_to_shipping": {
-    "defaultMessage": "Ir ao Método de entrega"
+    "defaultMessage": "Ir ao método de entrega"
   },
   "shipping_address.title.shipping_address": {
     "defaultMessage": "Endereço de entrega"
   },
   "shipping_address_edit_form.button.save_and_continue": {
-    "defaultMessage": "Salvar e ir ao Método de entrega"
+    "defaultMessage": "Salvar e ir ao método de entrega"
   },
   "shipping_address_form.heading.edit_address": {
     "defaultMessage": "Editar endereço"
@@ -1258,7 +1251,7 @@
     "defaultMessage": "Data de expiração"
   },
   "use_credit_card_fields.label.name": {
-    "defaultMessage": "Nome no carrinho"
+    "defaultMessage": "Nome no cartão"
   },
   "use_credit_card_fields.label.security_code": {
     "defaultMessage": "Código de segurança"
@@ -1402,7 +1395,7 @@
     "defaultMessage": "Remover"
   },
   "wishlist_secondary_button_group.info.item_removed": {
-    "defaultMessage": "Item removido da wishlist"
+    "defaultMessage": "Item removido da lista de desejos"
   },
   "with_registration.info.please_sign_in": {
     "defaultMessage": "Faça logon para continuar!"

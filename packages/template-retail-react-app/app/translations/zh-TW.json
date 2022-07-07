@@ -379,10 +379,6 @@
   "contact_info.title.contact_info": {
     "defaultMessage": "聯絡資訊"
   },
-  "credit_card_fields.tool_tip.security_code": {
-    "defaultMessage": "此 {length} 位數代碼可在您卡片的{side}找到。",
-    "description": "Credit card security code help text"
-  },
   "drawer_menu.button.account_details": {
     "defaultMessage": "帳戶詳細資料"
   },
@@ -542,6 +538,9 @@
   "global.error.something_went_wrong": {
     "defaultMessage": "發生錯誤。請再試一次。"
   },
+  "global.info.removed_from_wishlist": {
+    "defaultMessage": "已從願望清單移除商品"
+  },
   "header.button.assistive_msg.logo": {
     "defaultMessage": "標誌"
   },
@@ -586,7 +585,7 @@
     "defaultMessage": "以簡單、模組化、無障礙設計的 React 元件庫 Chakra UI 打造而成。"
   },
   "home.features.description.einstein_recommendations": {
-    "defaultMessage": "透過產品推薦，向每位購物者傳遞下一個最佳產品或優惠 (next best product or offer)。"
+    "defaultMessage": "透過產品推薦，向每位購物者傳遞下一個最佳產品或優惠。"
   },
   "home.features.description.my_account": {
     "defaultMessage": "購物者可管理帳戶資訊，例如個人資料、地址、付款和訂單。"
@@ -604,13 +603,13 @@
     "defaultMessage": "元件與設計套件"
   },
   "home.features.heading.einstein_recommendations": {
-    "defaultMessage": "Einstein Recommendations"
+    "defaultMessage": "Einstein 推薦"
   },
   "home.features.heading.my_account": {
     "defaultMessage": "我的帳戶"
   },
   "home.features.heading.shopper_login": {
-    "defaultMessage": "Shopper Login and API Access Service"
+    "defaultMessage": "Shopper Login and API Access Service (SLAS)"
   },
   "home.features.heading.wishlist": {
     "defaultMessage": "願望清單"
@@ -643,7 +642,7 @@
     "defaultMessage": "閱讀文件"
   },
   "home.title.react_starter_store": {
-    "defaultMessage": "React PWA 範例零售商店"
+    "defaultMessage": "零售型 React PWA Starter Store"
   },
   "item_attributes.label.promotions": {
     "defaultMessage": "促銷"
@@ -915,7 +914,7 @@
     "description": "Password requirement"
   },
   "password_requirements.error.one_special_character": {
-    "defaultMessage": "1 個特殊字元 (例如：, S ! % #)",
+    "defaultMessage": "1 個特殊字元 (例如：, $ ! % #)",
     "description": "Password requirement"
   },
   "password_requirements.error.one_uppercase_letter": {
@@ -983,9 +982,6 @@
   "product_list.info.added_to_wishlist": {
     "defaultMessage": "{quantity} {quantity, plural, one {件商品} other {件商品}}已新增至願望清單"
   },
-  "product_list.info.removed_from_wishlist": {
-    "defaultMessage": "已從願望清單移除商品"
-  },
   "product_list.modal.button.clear_filters": {
     "defaultMessage": "清除篩選條件"
   },
@@ -1051,9 +1047,6 @@
   },
   "recommended_products.info.added_to_wishlist": {
     "defaultMessage": "{quantity} {quantity, plural, one {件商品} other {件商品}}已新增至願望清單"
-  },
-  "recommended_products.info.removed_from_wishlist": {
-    "defaultMessage": "已從願望清單移除商品"
   },
   "register_form.action.sign_in": {
     "defaultMessage": "登入"

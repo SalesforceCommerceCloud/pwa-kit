@@ -168,9 +168,6 @@
   "card_payment_form.heading.new_payment_method": {
     "defaultMessage": "Add New Payment Method"
   },
-  "cart.info.added_to_wishlist": {
-    "defaultMessage": "{quantity} {quantity, plural, one {item} other {items}} added to wishlist"
-  },
   "cart.info.removed_from_cart": {
     "defaultMessage": "Item removed from cart"
   },
@@ -215,6 +212,9 @@
   },
   "checkout.button.place_order": {
     "defaultMessage": "Place Order"
+  },
+  "checkout.message.generic_error": {
+    "defaultMessage": "An unexpected error occurred during checkout."
   },
   "checkout_confirmation.button.create_account": {
     "defaultMessage": "Create Account"
@@ -380,8 +380,12 @@
     "defaultMessage": "Contact Info"
   },
   "credit_card_fields.tool_tip.security_code": {
-    "defaultMessage": "This {length}-digit code can be found on the {side} of your card.",
-    "description": "Credit card security code help text"
+    "defaultMessage": "This 3-digit code can be found on the back of your card.",
+    "description": "Generic credit card security code help text"
+  },
+  "credit_card_fields.tool_tip.security_code.american_express": {
+    "defaultMessage": "This 4-digit code can be found on the front of your card.",
+    "description": "American Express security code help text"
   },
   "drawer_menu.button.account_details": {
     "defaultMessage": "Account Details"
@@ -542,6 +546,15 @@
   "global.error.something_went_wrong": {
     "defaultMessage": "Something went wrong. Try again!"
   },
+  "global.info.added_to_wishlist": {
+    "defaultMessage": "{quantity} {quantity, plural, one {item} other {items}} added to wishlist"
+  },
+  "global.info.removed_from_wishlist": {
+    "defaultMessage": "Item removed from wishlist"
+  },
+  "global.link.added_to_wishlist.view_wishlist": {
+    "defaultMessage": "View"
+  },
   "header.button.assistive_msg.logo": {
     "defaultMessage": "Logo"
   },
@@ -566,13 +579,13 @@
   "header.popover.title.my_account": {
     "defaultMessage": "My Account"
   },
-  "home.description.contact_our_staff": {
-    "defaultMessage": "Contact our support staff."
-  },
   "home.description.features": {
     "defaultMessage": "Out-of-the-box features so that you focus only on adding enhancements."
   },
-  "home.description.get_you_to_the_right_place": {
+  "home.description.here_to_help": {
+    "defaultMessage": "Contact our support staff."
+  },
+  "home.description.here_to_help_line_2": {
     "defaultMessage": "They will get you to the right place."
   },
   "home.description.shop_products": {
@@ -959,9 +972,6 @@
   "product_detail.accordion.message.coming_soon": {
     "defaultMessage": "Coming Soon"
   },
-  "product_detail.info.added_to_wishlist": {
-    "defaultMessage": "{quantity} {quantity, plural, one {item} other {items}} added to wishlist"
-  },
   "product_detail.recommended_products.title.complete_set": {
     "defaultMessage": "Complete the Set"
   },
@@ -982,12 +992,6 @@
   },
   "product_list.drawer.title.sort_by": {
     "defaultMessage": "Sort By"
-  },
-  "product_list.info.added_to_wishlist": {
-    "defaultMessage": "{quantity} {quantity, plural, one {item} other {items}} added to wishlist"
-  },
-  "product_list.info.removed_from_wishlist": {
-    "defaultMessage": "Item removed from wishlist"
   },
   "product_list.modal.button.clear_filters": {
     "defaultMessage": "Clear Filters"
@@ -1051,12 +1055,6 @@
   },
   "recent_searches.heading.recent_searches": {
     "defaultMessage": "Recent Searches"
-  },
-  "recommended_products.info.added_to_wishlist": {
-    "defaultMessage": "{quantity} {quantity, plural, one {item} other {items}} added to wishlist"
-  },
-  "recommended_products.info.removed_from_wishlist": {
-    "defaultMessage": "Item removed from wishlist"
   },
   "register_form.action.sign_in": {
     "defaultMessage": "Sign in"
@@ -1397,6 +1395,12 @@
   },
   "use_update_password_fields.label.new_password": {
     "defaultMessage": "New Password"
+  },
+  "wishlist_primary_action.button.add_to_cart": {
+    "defaultMessage": "Add to Cart"
+  },
+  "wishlist_primary_action.button.select_options": {
+    "defaultMessage": "Select Options"
   },
   "wishlist_primary_action.info.added_to_cart": {
     "defaultMessage": "{quantity} {quantity, plural, one {item} other {items}} added to cart"
