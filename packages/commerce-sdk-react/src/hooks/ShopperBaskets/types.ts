@@ -1,4 +1,6 @@
-interface ShopperBasketParams {
+import {QueryParams} from '../../types'
+
+interface ShopperBasketParams extends QueryParams {
     basketId: string | undefined
 }
 
