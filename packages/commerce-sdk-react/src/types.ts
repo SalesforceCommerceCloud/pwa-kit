@@ -6,11 +6,11 @@ interface CommonHookResponse {
 // These are the common params for all query hooks
 // it allows user to override configs for specific query
 interface QueryParams {
-    siteId: string | undefined
-    locale: string | undefined
-    currency: string | undefined
-    organizationId: string | undefined
-    shortCode: string | undefined
+    siteId?: string
+    locale?: string
+    currency?: string
+    organizationId?: string
+    shortCode?: string
 }
 
 interface QueryResponse<data> extends CommonHookResponse {

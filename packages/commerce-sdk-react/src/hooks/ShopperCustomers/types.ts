@@ -1,7 +1,7 @@
 import {QueryParams} from '../../types'
 
 interface ShopperCustomerParams extends QueryParams {
-    customerId: string | undefined
+    customerId?: string
 }
 
 interface ShopperCustomerProductListParams extends ShopperCustomerParams {
@@ -27,21 +27,21 @@ interface ShopperCustomerPublicProductListParams extends QueryParams {
 }
 
 interface ShopperCustomerExternalProfileParams extends ShopperCustomerParams {
-    externalId: string | undefined
-    authenticationProviderId: string | undefined
+    externalId?: string
+    authenticationProviderId?: string
 }
 
 interface ShopperCustomerOrdersParams extends ShopperCustomerParams {
-    crossSites: boolean | undefined
-    from: string | undefined
-    until: string | undefined
-    status: string | undefined
-    offset: number | undefined
-    limit: number | undefined
+    crossSites?: boolean
+    from?: string
+    until?: string
+    status?: string
+    offset?: number
+    limit?: number
 }
 
 interface ShopperCustomerAddressParams extends ShopperCustomerParams {
-    addressName: string | undefined
+    addressName?: string
 }
 
 interface ShopperCustomerPaymentInstrumentParams extends ShopperCustomerParams {

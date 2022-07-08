@@ -1,7 +1,7 @@
 import {QueryParams} from '../../types'
 
 interface ShopperBasketParams extends QueryParams {
-    basketId: string | undefined
+    basketId?: string
 }
 
 // The actions are manually taken from commerce-sdk-isomorphic

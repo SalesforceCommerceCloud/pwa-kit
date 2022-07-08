@@ -1,13 +1,13 @@
 import {QueryParams} from '../../types'
 
 interface ShopperPromotionsParams extends QueryParams {
-    ids: string[] | undefined
+    ids?: string[]
 }
 
 interface ShopperPromotionsForCampaignParams extends QueryParams {
-    campaignId: string | undefined
-    startDate: string | undefined
-    endDate: string | undefined
+    campaignId?: string
+    startDate?: string
+    endDate?: string
 }
 
 export type {ShopperPromotionsParams, ShopperPromotionsForCampaignParams}

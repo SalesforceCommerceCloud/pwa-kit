@@ -1,7 +1,7 @@
 import {QueryParams} from '../../types'
 
 interface ShopperOrderParams extends QueryParams {
-    orderNo: string | undefined
+    orderNo?: string
 }
 
 enum ShopperOrderActions {
