@@ -115,11 +115,13 @@ export const createServerEffectContext = (name) => {
 
     // This method will trigger and return all the date
     const resolveData = async () => {
-        const {requests, data, resolved} = contextValue
+        const {requests, data, resolved, name} = contextValue
 
         // Early exit for resolved contexts.
         if (resolved) {
-            return data
+            return {
+                [name]: data
+            }
         }
 
         const effectPromises = requests.map((effect) => effect())
