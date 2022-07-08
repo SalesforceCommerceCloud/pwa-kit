@@ -1,18 +1,25 @@
 import React from 'react'
-import {createServerEffectContext} from 'pwa-kit-react-sdk/ssr/universal//server-effect-factory'
+import {createServerEffectContext} from 'pwa-kit-react-sdk/ssr/universal/hooks/use-server-effect'
 
+const CONTEXT_KEY = '__COMMERCE_SDK_REACT__'
 // NOTE: This is the important part of the API, here we get a context with a hook that will
 // use that context.
-const {ServerEffectProvider, useServerEffect} = createServerEffectContext('scapiHooks')
+const {ServerEffectProvider, useServerEffect} = createServerEffectContext(CONTEXT_KEY)
 
 const SCAPIContext = React.createContext()
 
 export const SCAPIProvider = (props) => {
-    const effectsValues = typeof window === 'undefined' ? {} : window.__PRELOADED_STATE__.scapiHooks.data
-    console.log('effectsValues; ', effectsValues)
+    
+    // Only set the provider value on the client. On the server the context will already have 
+    // it's values set.
+    const serverEffectProviderValues = 
+        typeof window === 'undefined' ? {} : {
+            value: window.__PRELOADED_STATE__[CONTEXT_KEY]
+        }
+
     return (
         <SCAPIContext.Provider value={{}}>
-            <ServerEffectProvider value={effectsValues}>
+            <ServerEffectProvider {...serverEffectProviderValues}>
                 {props.children}
             </ServerEffectProvider>
         </SCAPIContext.Provider>

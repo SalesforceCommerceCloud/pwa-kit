@@ -75,7 +75,7 @@ export const start = () => {
         .then(() => {
             ReactDOM.hydrate(
                 <Router>
-                    <ServerEffectProvider value={window.__PRELOADED_STATE__["__SERVER_EFFECTS__"].data}>
+                    <ServerEffectProvider value={window.__PRELOADED_STATE__["__SERVER_EFFECTS__"]}>
                         <DeviceContext.Provider value={{type: window.__DEVICE_TYPE__}}>
                             <AppConfig locals={locals}>
                                 <Switch

@@ -19,8 +19,7 @@ import serialize from 'serialize-javascript'
 
 import {getAssetUrl} from '../universal/utils'
 import DeviceContext from '../universal/device-context'
-import {ServerEffectProvider, resolveData} from '../universal/hooks/use-server-effect' // I Need to clean up the exports of this module.
-import {resolveAllContext} from '../universal/server-effect-factory'
+import {ServerEffectProvider, resolveAllContext} from '../universal/hooks/use-server-effect' // I Need to clean up the exports of this module.
 
 import Document from '../universal/components/_document'
 import App from '../universal/components/_app'

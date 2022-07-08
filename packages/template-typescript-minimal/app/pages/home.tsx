@@ -150,7 +150,7 @@ const Home = () => {
                         &quot;
                         <br />
                         <br />
-                        Server-side useProduct works if this is a product name shows: &quot;15 times 70 is{' '}
+                        Server-side useProduct works if this is a product name shows: &quot;{' '}
                         {product ? product.name : ''}
                         &quot;
                         <br />
