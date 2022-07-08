@@ -19,6 +19,8 @@ import serialize from 'serialize-javascript'
 
 import {getAssetUrl} from '../universal/utils'
 import DeviceContext from '../universal/device-context'
+import {ServerEffectProvider, resolveData} from '../universal/hooks/use-server-effect' // I Need to clean up the exports of this module.
+import {resolveAllContext} from '../universal/server-effect-factory'
 
 import Document from '../universal/components/_document'
 import App from '../universal/components/_app'
@@ -51,6 +53,7 @@ const VALID_TAG_NAMES = [
 ]
 
 export const ALLOWLISTED_INLINE_SCRIPTS = []
+
 
 /**
  * Convert from thrown Error or String to {message, status} that we need for
@@ -185,6 +188,22 @@ export const render = async (req, res, next) => {
         config
     }
     try {
+        // Step 1: Pre-render the application to catch all the `useServerEffect` usages.
+        await renderApp(args)
+        
+        // Below is somewhat of an escape hatch to get all useServerHook contexts data. 
+        // If you are only tracking one context you should use its `resolveData` method to 
+        // get all the contexts data.
+        const allContextsData = await resolveAllContext()
+
+        // Step 5: Finally lets update the app state ready to be frozen with the useServerHook
+        // data.
+        args.appState = {
+            ...appState,
+            ...allContextsData
+        }
+
+        // Step 6: Do final rendering.
         renderResult = renderApp(args)
     } catch (e) {
         // This is an unrecoverable error.
@@ -213,11 +232,13 @@ const renderAppHtml = (req, res, error, appData) => {
 
     let appJSX = (
         <Router location={location} context={routerContext}>
-            <DeviceContext.Provider value={{type: deviceType}}>
-                <AppConfig locals={res.locals}>
-                    <Switch error={error} appState={appState} routes={routes} App={App} />
-                </AppConfig>
-            </DeviceContext.Provider>
+            <ServerEffectProvider>
+                <DeviceContext.Provider value={{type: deviceType}}>
+                    <AppConfig locals={res.locals}>
+                        <Switch error={error} appState={appState} routes={routes} App={App} />
+                    </AppConfig>
+                </DeviceContext.Provider>
+            </ServerEffectProvider>
         </Router>
     )
 
