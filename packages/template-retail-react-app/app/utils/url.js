@@ -166,6 +166,14 @@ export const getPathWithLocale = (shortCode, opts = {}) => {
     return newUrl
 }
 
+export const getPathWithUrlConfig = (href, locale, site, appConfigUrl) => {
+
+    //TODO
+    console.log('getPathWithUrlConfig appConfigUrl:', appConfigUrl)
+
+    return `${site}/${locale}${href}`
+}
+
 /**
  * Builds the Home page URL for a given locale and site.
  * By default, when the values of site and locale belongs to the default site,

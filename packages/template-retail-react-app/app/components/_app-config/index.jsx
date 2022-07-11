@@ -19,6 +19,7 @@ import {
     CustomerProductListsProvider,
     CustomerProvider
 } from '../../commerce-api/contexts'
+import {AppConfigProvider} from '../../contexts'
 import {resolveSiteFromUrl} from '../../utils/site-utils'
 import {resolveLocaleFromUrl} from '../../utils/utils'
 import {getConfig} from 'pwa-kit-runtime/utils/ssr-config'
@@ -36,15 +37,17 @@ const AppConfig = ({children, locals = {}}) => {
     const [customer, setCustomer] = useState(null)
 
     return (
-        <CommerceAPIProvider value={locals.api}>
-            <CustomerProvider value={{customer, setCustomer}}>
-                <BasketProvider value={{basket, setBasket}}>
-                    <CustomerProductListsProvider>
-                        <ChakraProvider theme={theme}>{children}</ChakraProvider>
-                    </CustomerProductListsProvider>
-                </BasketProvider>
-            </CustomerProvider>
-        </CommerceAPIProvider>
+        <AppConfigProvider value={locals.appConfigUrl}>
+            <CommerceAPIProvider value={locals.api}>
+                <CustomerProvider value={{customer, setCustomer}}>
+                    <BasketProvider value={{basket, setBasket}}>
+                        <CustomerProductListsProvider>
+                            <ChakraProvider theme={theme}>{children}</ChakraProvider>
+                        </CustomerProductListsProvider>
+                    </BasketProvider>
+                </CustomerProvider>
+            </CommerceAPIProvider>
+        </AppConfigProvider>
     )
 }
 
@@ -66,13 +69,16 @@ AppConfig.restore = (locals = {}) => {
     apiConfig.parameters.siteId = site.id
 
     locals.api = new CommerceAPI({...apiConfig, locale: locale.id, currency})
+
+    locals.appConfigUrl = appConfig.url
 }
 
 AppConfig.freeze = () => undefined
 
 AppConfig.extraGetPropsArgs = (locals = {}) => {
     return {
-        api: locals.api
+        api: locals.api,
+        appConfigUrl: locals.appConfigUrl
     }
 }
 

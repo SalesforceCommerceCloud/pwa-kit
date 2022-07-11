@@ -70,6 +70,9 @@ SiteProvider.propTypes = {
     site: PropTypes.object
 }
 
+export const AppConfigContext = React.createContext()
+export const AppConfigProvider = AppConfigContext.Provider
+
 /**
  * This is the global state for currency, we use this throughout the site. For example, on
  * the product-list, product-detail and cart and basket pages..
