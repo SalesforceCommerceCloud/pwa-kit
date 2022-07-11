@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, salesforce.com, inc.
+ * Copyright (c) 2022, Salesforce, Inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
@@ -22,6 +22,7 @@ import {
     PerformanceTimer,
     processLambdaResponse,
     responseSend,
+    configureProxyConfigs,
     setQuiet
 } from '../../utils/ssr-server'
 import dns from 'dns'
@@ -38,7 +39,6 @@ import {RESOLVED_PROMISE} from './express'
 import http from 'http'
 import https from 'https'
 import {proxyConfigs, updatePackageMobify} from '../../utils/ssr-shared'
-import {configureProxyConfigs} from '../../utils/ssr-server'
 import awsServerlessExpress from 'aws-serverless-express'
 
 /**
