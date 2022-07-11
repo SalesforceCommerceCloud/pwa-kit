@@ -82,11 +82,18 @@ const main = () => {
                 }
             }
         )
-        .action(({user, key}) => {
+        .addOption(
+            new program.Option(
+                '-c, --credentialsFile <credentialsFile>',
+                'the file where your credentials should be stored'
+            )
+                .default(scriptUtils.getCredentialsFile())
+                .env('PWA_KIT_CREDENTIALS_FILE')
+        )
+        .action(({user, key, credentialsFile}) => {
             try {
-                const settingsPath = scriptUtils.getSettingsPath()
-                fse.writeJson(settingsPath, {username: user, api_key: key}, {spaces: 4})
-                console.log(`Saved Managed Runtime credentials to "${settingsPath}".`)
+                fse.writeJson(credentialsFile, {username: user, api_key: key}, {spaces: 4})
+                console.log(`Saved Managed Runtime credentials to "${credentialsFile}".`)
             } catch (e) {
                 console.error('Failed to save credentials.')
                 console.error(e)
@@ -194,7 +201,15 @@ const main = () => {
                 'immediately deploy the bundle to this target once it is pushed'
             )
         )
-        .action(({buildDirectory, message, projectSlug, target}) => {
+        .addOption(
+            new program.Option(
+                '-c, --credentialsFile <credentialsFile>',
+                'the file where your credentials are stored'
+            )
+                .default(scriptUtils.getCredentialsFile())
+                .env('PWA_KIT_CREDENTIALS_FILE')
+        )
+        .action(({buildDirectory, message, projectSlug, target, credentialsFile}) => {
             // Set the deployment target env var, this is required to ensure we
             // get the correct configuration object.
             process.env.DEPLOY_TARGET = target
@@ -221,6 +236,7 @@ const main = () => {
                 ...(message ? {message} : undefined),
                 projectSlug,
                 target,
+                credentialsFile,
                 // Note: Cloud expects snake_case, but package.json uses camelCase.
                 ssr_parameters: mobify.ssrParameters,
                 ssr_only: mobify.ssrOnly,
