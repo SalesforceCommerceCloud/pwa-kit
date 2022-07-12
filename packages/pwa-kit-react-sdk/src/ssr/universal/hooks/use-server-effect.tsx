@@ -23,7 +23,7 @@ const isServer = typeof window === 'undefined'
  * @returns 
  */
 const createServerEffect = (context) => {
-    function useServerEffect (initial, didUpdate, source) {
+    const useServerEffect = (initial, didUpdate, source) => {
         // Function overloading.
         if (typeof initial === 'function') {
             source = didUpdate
@@ -38,7 +38,7 @@ const createServerEffect = (context) => {
             data: contextData,
             requests: contextRequests,
             resolved: contextResolved
-        } = useContext(this.context)
+        } = useContext(context)
     
         const [data, setData] = useState(contextData[key] || initial)
         const [loading, setLoading] = useState(false)
@@ -52,7 +52,7 @@ const createServerEffect = (context) => {
                 setLoading(true)
         
                 try {
-                    const data = await boundDidUpdate({location, params})
+                    const data = await boundDidUpdate()
                     setData(data)
                 } catch(e) {
                     setLoading(false)
@@ -64,7 +64,6 @@ const createServerEffect = (context) => {
             }
     
         if (!contextResolved && isServer) {
-            console.log(`Pushing async function`)
             contextRequests.push(async () => {
                 const data = await boundDidUpdate()
     

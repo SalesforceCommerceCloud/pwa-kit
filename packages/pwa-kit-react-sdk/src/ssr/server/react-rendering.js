@@ -74,7 +74,7 @@ const logAndFormatError = (err) => {
     }
 }
 
-const initAppState = async ({App, component, match, route, req, res, location}) => {
+const initAppState = async ({App, component, match, route, routes, req, res, location}) => {
     if (component === Throw404) {
         // Don't init if there was no match
         return {
@@ -98,11 +98,27 @@ const initAppState = async ({App, component, match, route, req, res, location}) 
     )
     let returnVal = {}
 
+    // let serverEffectContextsData = {}
+    // TODO: This is where we check the config to see if things are set.
+    debugger
+    if (true) {
+        // Render the application with the sole intention to capture any uses of `useServerEffect`.
+        await renderApp({App, component, match, route, routes, req, res, location, appState: {}})
+        
+        // Below is somewhat of an escape hatch to get all useServerHook contexts data. 
+        // If you are only tracking one context you should use its `resolveData` method to 
+        // get all the contexts data.
+        // serverEffectContextsData = await resolveAllContext()
+
+        promises.push(resolveAllContext())
+    }
+
     try {
-        const [appProps, pageProps] = await Promise.all(promises)
+        const [appProps, pageProps, serverEffectData = {}] = await Promise.all(promises)
         const appState = {
             appProps,
             pageProps,
+            ...serverEffectData,
             __STATE_MANAGEMENT_LIBRARY: AppConfig.freeze(res.locals)
         }
 
@@ -163,47 +179,29 @@ export const render = async (req, res, next) => {
     // Step 2 - Get the component
     const component = await route.component.getComponent()
 
-    // Step 3 - Init the app state
-    const {appState, error: appStateError} = await initAppState({
+    let args = {
         App: WrappedApp,
+        config,
         component,
+        location,
         match,
-        route,
         req,
         res,
-        location
-    })
+        routes,
+        route
+    }
+
+    // Step 3 - Init the app state
+    const {appState, error: appStateError} = await initAppState(args)
 
     // Step 4 - Render the App
     let renderResult
-    const args = {
-        App: WrappedApp,
-        appState,
-        appStateError: appStateError && logAndFormatError(appStateError),
-        routes,
-        req,
-        res,
-        location,
-        config
-    }
     try {
-        // Step 1: Pre-render the application to catch all the `useServerEffect` usages.
-        await renderApp(args)
-        
-        // Below is somewhat of an escape hatch to get all useServerHook contexts data. 
-        // If you are only tracking one context you should use its `resolveData` method to 
-        // get all the contexts data.
-        const allContextsData = await resolveAllContext()
-
-        // Step 5: Finally lets update the app state ready to be frozen with the useServerHook
-        // data.
-        args.appState = {
-            ...appState,
-            ...allContextsData
-        }
-
-        // Step 6: Do final rendering.
-        renderResult = renderApp(args)
+        renderResult = renderApp({
+            ...args,
+            appState,
+            appStateError: appStateError && logAndFormatError(appStateError)
+        })
     } catch (e) {
         // This is an unrecoverable error.
         // (errors handled by the AppErrorBoundary are considered recoverable)
