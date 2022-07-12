@@ -15,6 +15,7 @@ import Switch from '../universal/components/switch'
 import {getRoutes, routeComponent} from '../universal/components/route-component'
 import {loadableReady} from '@loadable/component'
 import {ServerEffectProvider} from '../universal/hooks/use-server-effect'
+import {ExpressProvider} from '../universal/hooks/use-express'
 
 /* istanbul ignore next */
 export const registerServiceWorker = (url) => {
@@ -75,18 +76,20 @@ export const start = () => {
         .then(() => {
             ReactDOM.hydrate(
                 <Router>
-                    <ServerEffectProvider value={window.__PRELOADED_STATE__["__SERVER_EFFECTS__"]}>
-                        <DeviceContext.Provider value={{type: window.__DEVICE_TYPE__}}>
-                            <AppConfig locals={locals}>
-                                <Switch
-                                    error={error}
-                                    appState={window.__PRELOADED_STATE__}
-                                    routes={routes}
-                                    App={WrappedApp}
-                                />
-                            </AppConfig>
-                        </DeviceContext.Provider>
-                    </ServerEffectProvider>
+                    <ExpressProvider value={{}}>
+                        <ServerEffectProvider value={window.__PRELOADED_STATE__["__SERVER_EFFECTS__"]}>
+                            <DeviceContext.Provider value={{type: window.__DEVICE_TYPE__}}>
+                                <AppConfig locals={locals}>
+                                    <Switch
+                                        error={error}
+                                        appState={window.__PRELOADED_STATE__}
+                                        routes={routes}
+                                        App={WrappedApp}
+                                    />
+                                </AppConfig>
+                            </DeviceContext.Provider>
+                        </ServerEffectProvider>
+                    </ExpressProvider>
                 </Router>,
                 rootEl,
                 () => {

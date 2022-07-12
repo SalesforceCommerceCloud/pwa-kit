@@ -8,7 +8,7 @@
 import React, {useContext, useState, useEffect} from 'react'
 import {useLocation, useParams} from 'react-router-dom'
 import {useUID} from 'react-uid' // TODO: Probably not required
-
+import useExpress from './use-express'
 
 // Globals
 export const DEFAULT_CONTEXT_KEY = '__SERVER_EFFECTS__'
@@ -39,11 +39,12 @@ const createServerEffect = (context) => {
             requests: contextRequests,
             resolved: contextResolved
         } = useContext(context)
-    
+        const {req, res} = useExpress()
+
         const [data, setData] = useState(contextData[key] || initial)
         const [loading, setLoading] = useState(false)
         const [error, setError] = useState(undefined)
-        const boundDidUpdate = didUpdate.bind(this, {location, params})
+        const boundDidUpdate = didUpdate.bind(this, {location, params, req, res})
     
         const wrappedDidUpdate = isServer ? 
             async () => {} : 

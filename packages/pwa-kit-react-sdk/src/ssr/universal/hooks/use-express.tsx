@@ -5,7 +5,10 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import useExpress from './use-express'
-import useServerEffect from './use-server-effect'
+import React, {useContext} from 'react'
 
-export {useExpress, useServerEffect}
+const Context = React.createContext()
+const useExpress = () => useContext(Context)
+
+export const ExpressProvider = Context.Provider
+export default useExpress

@@ -19,6 +19,7 @@ import serialize from 'serialize-javascript'
 
 import {getAssetUrl} from '../universal/utils'
 import DeviceContext from '../universal/device-context'
+import {ExpressProvider} from '../universal/hooks/use-express'
 import {ServerEffectProvider, resolveAllContext} from '../universal/hooks/use-server-effect' // I Need to clean up the exports of this module.
 
 import Document from '../universal/components/_document'
@@ -98,18 +99,12 @@ const initAppState = async ({App, component, match, route, routes, req, res, loc
     )
     let returnVal = {}
 
-    // let serverEffectContextsData = {}
     // TODO: This is where we check the config to see if things are set.
-    debugger
     if (true) {
         // Render the application with the sole intention to capture any uses of `useServerEffect`.
         await renderApp({App, component, match, route, routes, req, res, location, appState: {}})
         
-        // Below is somewhat of an escape hatch to get all useServerHook contexts data. 
-        // If you are only tracking one context you should use its `resolveData` method to 
-        // get all the contexts data.
-        // serverEffectContextsData = await resolveAllContext()
-
+        // Push the async request onto the promises array.
         promises.push(resolveAllContext())
     }
 
@@ -229,13 +224,15 @@ const renderAppHtml = (req, res, error, appData) => {
 
     let appJSX = (
         <Router location={location} context={routerContext}>
-            <ServerEffectProvider>
-                <DeviceContext.Provider value={{type: deviceType}}>
-                    <AppConfig locals={res.locals}>
-                        <Switch error={error} appState={appState} routes={routes} App={App} />
-                    </AppConfig>
-                </DeviceContext.Provider>
-            </ServerEffectProvider>
+            <ExpressProvider value={{req, res}}>
+                <ServerEffectProvider>
+                    <DeviceContext.Provider value={{type: deviceType}}>
+                        <AppConfig locals={res.locals}>
+                            <Switch error={error} appState={appState} routes={routes} App={App} />
+                        </AppConfig>
+                    </DeviceContext.Provider>
+                </ServerEffectProvider>
+            </ExpressProvider>
         </Router>
     )
 
