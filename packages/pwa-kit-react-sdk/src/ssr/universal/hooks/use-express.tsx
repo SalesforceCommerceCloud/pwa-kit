@@ -7,7 +7,7 @@
 
 import React, {useContext} from 'react'
 
-const Context = React.createContext()
+const Context = React.createContext({})
 const useExpress = () => useContext(Context)
 
 export const ExpressProvider = Context.Provider

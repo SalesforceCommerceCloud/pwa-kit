@@ -71,12 +71,15 @@ export const start = () => {
     const WrappedApp = routeComponent(App, false, locals)
     const error = window.__ERROR__
 
+    const extraArgs = AppConfig.extraGetPropsArgs()
+
+
     return Promise.resolve()
         .then(() => new Promise((resolve) => loadableReady(resolve)))
         .then(() => {
             ReactDOM.hydrate(
                 <Router>
-                    <ExpressProvider value={{}}>
+                    <ExpressProvider value={extraArgs}>
                         <ServerEffectProvider value={window.__PRELOADED_STATE__["__SERVER_EFFECTS__"]}>
                             <DeviceContext.Provider value={{type: window.__DEVICE_TYPE__}}>
                                 <AppConfig locals={locals}>

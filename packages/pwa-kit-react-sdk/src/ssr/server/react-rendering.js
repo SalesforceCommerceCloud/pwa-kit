@@ -221,10 +221,11 @@ export const render = async (req, res, next) => {
 
 const renderAppHtml = (req, res, error, appData) => {
     const {App, appState, routes, routerContext, location, extractor, deviceType} = appData
+    const extraArgs = AppConfig.extraGetPropsArgs()
 
     let appJSX = (
         <Router location={location} context={routerContext}>
-            <ExpressProvider value={{req, res}}>
+            <ExpressProvider value={{req, res, ...extraArgs}}>
                 <ServerEffectProvider>
                     <DeviceContext.Provider value={{type: deviceType}}>
                         <AppConfig locals={res.locals}>

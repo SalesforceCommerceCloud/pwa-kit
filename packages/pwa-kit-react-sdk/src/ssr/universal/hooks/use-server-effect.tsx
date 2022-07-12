@@ -39,12 +39,15 @@ const createServerEffect = (context) => {
             requests: contextRequests,
             resolved: contextResolved
         } = useContext(context)
-        const {req, res} = useExpress()
+        // TODO: Think about a better name for this hook if we are going to slip in the 
+        // extra props with the request and response. Otherwise maybe create another to 
+        // home the extra props values.
+        const expressValues = useExpress()
 
         const [data, setData] = useState(contextData[key] || initial)
         const [loading, setLoading] = useState(false)
         const [error, setError] = useState(undefined)
-        const boundDidUpdate = didUpdate.bind(this, {location, params, req, res})
+        const boundDidUpdate = didUpdate.bind(this, {location, params, ...expressValues})
     
         const wrappedDidUpdate = isServer ? 
             async () => {} : 
@@ -109,7 +112,7 @@ export const createServerEffectContext = (name) => {
         data: {},
         resolved: false
     } 
-    const Context = React.createContext()
+    const Context = React.createContext({})
     Context.displayName = name
     const useServerEffect = createServerEffect(Context)
 
@@ -124,9 +127,13 @@ export const createServerEffectContext = (name) => {
             }
         }
 
-        const effectPromises = requests.map((effect) => effect())
+        const serializeCalls = true
+        const effectPromises = serializeCalls ? 
+            [requests.reduce((acc, curr) => {
+                return acc.then((data) => curr().then((newData) => ({...data, ...newData})))
+            }, Promise.resolve({}))]
+            : requests.map((effect) => effect())
         const effectValues = await Promise.all(effectPromises)
-
         // Reset the requests
         contextValue.requests = []
 
