@@ -7,6 +7,7 @@
 import {ReactElement} from 'react'
 
 export interface CommerceAPIProviderProps {
+    children: React.ReactNode
     clientId: string
     organizationId: string
     siteId: string
