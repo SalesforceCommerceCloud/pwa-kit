@@ -1,8 +1,7 @@
 {
   "out": "docs",
   "entryPoints": [
-    "packages/commerce-sdk-react",
-    "packages/pwa-kit-react-sdk"
+    "packages/commerce-sdk-react"
   ],
   "entryPointStrategy": "packages",
   "logLevel": "Verbose"
