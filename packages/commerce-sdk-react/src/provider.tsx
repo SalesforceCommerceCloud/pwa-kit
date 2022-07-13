@@ -67,10 +67,10 @@ export const CommerceAPIContext = React.createContext({} as ApiClients)
 
 // TODO: how to test?
 export const CommerceAPIProvider = (props: CommerceAPIProviderProps): ReactElement => {
-    const {children, clientId, organizationId, shortCode, siteId} = props
+    const {children, clientId, organizationId, shortCode, siteId, proxy} = props
 
     const config = {
-        proxy: 'https://localhost:3000',
+        proxy,
         headers: {},
         parameters: {
             clientId,
@@ -81,7 +81,10 @@ export const CommerceAPIProvider = (props: CommerceAPIProviderProps): ReactEleme
         throwOnBadResponse: true,
     }
 
+    // TODO: auth logic should use the helpers from commerce-sdk-isomorphic ?
     const apiClient = new ApiClient(config)
+
+    console.log('--- api client', apiClient)
 
     // const apiClient = {
     //     shopperBaskets: new ShopperBaskets(config),

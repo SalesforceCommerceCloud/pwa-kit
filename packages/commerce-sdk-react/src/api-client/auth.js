@@ -6,8 +6,8 @@
  */
 
 /* eslint-disable no-unused-vars */
-import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
-import {HTTPError} from 'pwa-kit-react-sdk/ssr/universal/errors'
+// import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
+// import {HTTPError} from 'pwa-kit-react-sdk/ssr/universal/errors'
 import {createCodeVerifier, generateCodeChallenge} from './pkce'
 import {isTokenValid, createGetTokenBody} from './utils'
 import fetch from 'cross-fetch'
@@ -25,6 +25,22 @@ import Cookies from 'js-cookie'
  * {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/modules/shoppercustomers.html#customer}}
  * @typedef {Object} Customer
  */
+
+class HTTPError extends Error {
+    constructor(status, message) {
+        super(message)
+        this.constructor = HTTPError
+        this.__proto__ = HTTPError.prototype
+        this.message = message
+        this.status = status
+    }
+
+    toString() {
+        return `HTTPError ${this.status}: ${this.message}`
+    }
+}
+
+const getAppOrigin = () => 'http://localhost:3000'
 
 const usidStorageKey = 'usid'
 const cidStorageKey = 'cid'

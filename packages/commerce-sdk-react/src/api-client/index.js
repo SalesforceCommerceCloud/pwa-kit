@@ -7,7 +7,7 @@
 
 /* eslint-disable no-unused-vars */
 import * as sdk from 'commerce-sdk-isomorphic'
-import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
+// import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
 import ShopperBaskets from './shopper-baskets'
 import OcapiShopperOrders from './ocapi-shopper-orders'
 import {getTenantId, isError, isTokenValid} from './utils'
@@ -50,10 +50,10 @@ class CommerceAPI {
      * @param {ClientConfig} config - The config used to instantiate SDK apis.
      */
     constructor(config = {}) {
-        const {proxyPath, ...restConfig} = config
+        const {proxy, ...restConfig} = config
 
         // Client-side requests should be proxied via the configured path.
-        const proxy = `${getAppOrigin()}${proxyPath}`
+        // const proxy = `${getAppOrigin()}${proxyPath}`
 
         this._config = {proxy, ...restConfig}
 

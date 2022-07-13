@@ -5,9 +5,25 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import jwtDecode from 'jwt-decode'
-import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
-import {HTTPError} from 'pwa-kit-react-sdk/ssr/universal/errors'
+// import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
+// import {HTTPError} from 'pwa-kit-react-sdk/ssr/universal/errors'
 import fetch from 'cross-fetch'
+
+const getAppOrigin = () => 'http://localhost:3000'
+
+class HTTPError extends Error {
+    constructor(status, message) {
+        super(message)
+        this.constructor = HTTPError
+        this.__proto__ = HTTPError.prototype
+        this.message = message
+        this.status = status
+    }
+
+    toString() {
+        return `HTTPError ${this.status}: ${this.message}`
+    }
+}
 
 /**
  * Compares the token age against the issued and expiry times. If the token's age is
