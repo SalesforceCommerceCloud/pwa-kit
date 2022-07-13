@@ -8,15 +8,15 @@ import {ProductSearchResult} from 'commerce-sdk-isomorphic'
 import {ShopperSearchProductParams} from './types'
 import {QueryResponse} from '../../types'
 
-const useShopperSearchProducts = (
+const useShopperSearchProductSearch = (
     params: ShopperSearchProductParams,
     source: []
 ): QueryResponse<ProductSearchResult> => {
     return {
         data: {},
         isLoading: true,
-        error: undefined
+        error: undefined,
     }
 }
 
-export default useShopperSearchProducts
+export default useShopperSearchProductSearch
