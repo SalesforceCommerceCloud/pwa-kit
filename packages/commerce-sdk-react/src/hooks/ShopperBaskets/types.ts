@@ -5,11 +5,11 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {ShopperBaskets, ShopperBasketsParameters} from 'commerce-sdk-isomorphic'
+import {ShopperBaskets, ShopperBasketsTypes} from 'commerce-sdk-isomorphic'
 import {QueryParams} from '../types'
 
 export type ShopperBasketInstance = ShopperBaskets<
-    ShopperBasketsParameters & Record<string, unknown>
+    ShopperBasketsTypes.ShopperBasketsParameters & Record<string, unknown>
 >
 
 export interface ShopperBasketParams extends QueryParams {

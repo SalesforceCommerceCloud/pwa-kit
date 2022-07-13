@@ -4,16 +4,16 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {CustomerExternalProfile} from 'commerce-sdk-isomorphic'
+import {ShopperCustomersTypes} from 'commerce-sdk-isomorphic'
 import {ShopperCustomerExternalProfileParams} from './types'
 import {QueryResponse, DependencyList} from '../types'
 
 const useShopperCustomer = (
     params: ShopperCustomerExternalProfileParams,
     source: DependencyList
-): QueryResponse<CustomerExternalProfile> => {
+): QueryResponse<ShopperCustomersTypes.CustomerExternalProfile> => {
     return {
-        data: {},
+        data: {customerId: '1', authenticationProviderId: '1', externalId: '1'},
         isLoading: true,
         error: undefined,
     }

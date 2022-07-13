@@ -4,14 +4,14 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {ShippingMethodResult} from 'commerce-sdk-isomorphic'
+import {ShopperBasketsTypes} from 'commerce-sdk-isomorphic'
 import {QueryResponse, DependencyList} from '../types'
 import {ShopperBasketParams} from './types'
 
 const useShopperBasketShippingMethods = (
     params: ShopperBasketParams,
     source: DependencyList
-): QueryResponse<ShippingMethodResult> => {
+): QueryResponse<ShopperBasketsTypes.ShippingMethodResult> => {
     return {
         data: {},
         isLoading: true,

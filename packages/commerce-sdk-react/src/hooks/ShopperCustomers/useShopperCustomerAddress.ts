@@ -4,16 +4,20 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {CustomerAddress} from 'commerce-sdk-isomorphic'
+import {ShopperCustomersTypes} from 'commerce-sdk-isomorphic'
 import {ShopperCustomerAddressParams} from './types'
 import {QueryResponse, DependencyList} from '../types'
 
 const useShopperCustomerAddress = (
     params: ShopperCustomerAddressParams,
     source: DependencyList
-): QueryResponse<CustomerAddress> => {
+): QueryResponse<ShopperCustomersTypes.CustomerAddress> => {
     return {
-        data: {},
+        data: {
+            addressId: '1',
+            countryCode: '1',
+            lastName: '1',
+        },
         isLoading: true,
         error: undefined,
     }
