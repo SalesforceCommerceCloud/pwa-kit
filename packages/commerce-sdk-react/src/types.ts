@@ -13,12 +13,12 @@ export interface QueryParams {
     shortCode?: string
 }
 
-export interface QueryResponse<data> extends CommonHookResponse {
-    data: data
+export interface QueryResponse<T> extends CommonHookResponse {
+    data: T
 }
 
-export interface ActionResponse<execute> extends CommonHookResponse {
-    execute: execute
+export interface ActionResponse<T> extends CommonHookResponse {
+    execute: T
 }
 
 export type DependencyList = readonly any[]
