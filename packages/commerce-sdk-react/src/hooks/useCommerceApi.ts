@@ -18,35 +18,7 @@ import {
     ShopperSearch,
 } from 'commerce-sdk-isomorphic'
 
-// TODO: these types are not exported from the commerce-sdk-isomorphic
-// can we use other types?
-// if not, we need to make a change to commerce-sdk-isomorphic to expose these types
-
-import {
-    ShopperBasketsParameters,
-    ShopperContextsParameters,
-    ShopperCustomersParameters,
-    ShopperDiscoverySearchParameters,
-    ShopperGiftCertificatesParameters,
-    ShopperLoginParameters,
-    ShopperOrdersParameters,
-    ShopperProductsParameters,
-    ShopperPromotionsParameters,
-    ShopperSearchParameters,
-} from 'commerce-sdk-isomorphic'
-
-interface ApiClients {
-    shopperBaskets: ShopperBaskets<ShopperBasketsParameters>
-    shopperContexts: ShopperContexts<ShopperContextsParameters>
-    shopperCustomers: ShopperCustomers<ShopperCustomersParameters>
-    shopperDiscoverySearch: ShopperDiscoverySearch<ShopperDiscoverySearchParameters>
-    shopperGiftCertificates: ShopperGiftCertificates<ShopperGiftCertificatesParameters>
-    shopperLogin: ShopperLogin<ShopperLoginParameters>
-    shopperOrders: ShopperOrders<ShopperOrdersParameters>
-    shopperProducts: ShopperProducts<ShopperProductsParameters>
-    shopperPromotions: ShopperPromotions<ShopperPromotionsParameters>
-    shopperSearch: ShopperSearch<ShopperSearchParameters>
-}
+import {ApiClients} from './types'
 
 const config = {
     proxy: 'https://localhost:3000',
@@ -61,7 +33,6 @@ const config = {
 }
 
 const useCommerceApi = (): ApiClients => {
-    // placeholders for the correct return type
     // TODO: initialize/cache the api client somewhere else
     // to minimize memory usage
     return {

@@ -8,6 +8,7 @@ import {ShopperOrdersTypes} from 'commerce-sdk-isomorphic'
 import {ShopperOrderParams} from './types'
 import {QueryResponse, DependencyList} from '../types'
 
+// phase 2
 const useShopperOrderPaymentMethods = (
     params: ShopperOrderParams,
     source: DependencyList

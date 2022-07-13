@@ -4,14 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-
-import {ShopperBaskets, ShopperBasketsTypes} from 'commerce-sdk-isomorphic'
 import {QueryParams} from '../types'
-
-export type ShopperBasketInstance = ShopperBaskets<
-    ShopperBasketsTypes.ShopperBasketsParameters & Record<string, unknown>
->
-
 export interface ShopperBasketParams extends QueryParams {
     basketId?: string
 }
