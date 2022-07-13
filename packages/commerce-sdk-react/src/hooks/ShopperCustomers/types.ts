@@ -6,38 +6,38 @@
  */
 import {QueryParams} from '../../types'
 
-interface ShopperCustomerParams extends QueryParams {
+export interface ShopperCustomerParams extends QueryParams {
     customerId?: string
 }
 
-interface ShopperCustomerProductListParams extends ShopperCustomerParams {
+export interface ShopperCustomerProductListParams extends ShopperCustomerParams {
     listId?: string
 }
 
-interface ShopperCustomerProductListItemParams extends ShopperCustomerParams {
+export interface ShopperCustomerProductListItemParams extends ShopperCustomerParams {
     itemId?: string
 }
 
-interface ShopperCustomerPublicProductListParams extends QueryParams {
+export interface ShopperCustomerPublicProductListParams extends QueryParams {
     email?: string
     firstName?: string
     lastName?: string
 }
 
-interface ShopperCustomerPublicProductListItemParams extends QueryParams {
+export interface ShopperCustomerPublicProductListItemParams extends QueryParams {
     itemId?: string
 }
 
-interface ShopperCustomerPublicProductListParams extends QueryParams {
+export interface ShopperCustomerPublicProductListParams extends QueryParams {
     listId?: string
 }
 
-interface ShopperCustomerExternalProfileParams extends ShopperCustomerParams {
+export interface ShopperCustomerExternalProfileParams extends ShopperCustomerParams {
     externalId?: string
     authenticationProviderId?: string
 }
 
-interface ShopperCustomerOrdersParams extends ShopperCustomerParams {
+export interface ShopperCustomerOrdersParams extends ShopperCustomerParams {
     crossSites?: boolean
     from?: string
     until?: string
@@ -46,15 +46,15 @@ interface ShopperCustomerOrdersParams extends ShopperCustomerParams {
     limit?: number
 }
 
-interface ShopperCustomerAddressParams extends ShopperCustomerParams {
+export interface ShopperCustomerAddressParams extends ShopperCustomerParams {
     addressName?: string
 }
 
-interface ShopperCustomerPaymentInstrumentParams extends ShopperCustomerParams {
+export interface ShopperCustomerPaymentInstrumentParams extends ShopperCustomerParams {
     paymentInstrumentId?: string
 }
 
-enum ShopperCustomerActions {
+export enum ShopperCustomerActions {
     registerCustomer = 'registerCustomer',
     invalidateCustomerAuth = 'invalidateCustomerAuth',
     authorizeCustomer = 'authorizeCustomer',
@@ -75,17 +75,4 @@ enum ShopperCustomerActions {
     createCustomerProductListItem = 'createCustomerProductListItem',
     deleteCustomerProductListItem = 'deleteCustomerProductListItem',
     updateCustomerProductListItem = 'updateCustomerProductListItem',
-}
-
-export type {
-    ShopperCustomerParams,
-    ShopperCustomerExternalProfileParams,
-    ShopperCustomerAddressParams,
-    ShopperCustomerOrdersParams,
-    ShopperCustomerPaymentInstrumentParams,
-    ShopperCustomerProductListParams,
-    ShopperCustomerProductListItemParams,
-    ShopperCustomerPublicProductListParams,
-    ShopperCustomerPublicProductListItemParams,
-    ShopperCustomerActions,
 }

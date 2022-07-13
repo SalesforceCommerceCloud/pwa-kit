@@ -6,7 +6,7 @@
  */
 import {ReactElement} from 'react'
 
-interface CommerceAPIProviderProps {
+export interface CommerceAPIProviderProps {
     clientId: string
     organizationId: string
     siteId: string

@@ -7,12 +7,12 @@
 
 import {QueryParams} from '../../types'
 
-interface ShopperBasketParams extends QueryParams {
+export interface ShopperBasketParams extends QueryParams {
     basketId?: string
 }
 
 // The actions are manually taken from commerce-sdk-isomorphic
-enum ShopperBasketActions {
+export enum ShopperBasketActions {
     createBasket = 'createBasket',
     transferBasket = 'transferBasket',
     mergeBasket = 'mergeBasket',
@@ -40,5 +40,3 @@ enum ShopperBasketActions {
     updateShippingMethodForShipment = 'updateShippingMethodForShipment',
     addTaxesForBasket = 'addTaxesForBasket',
 }
-
-export type {ShopperBasketParams, ShopperBasketActions}
