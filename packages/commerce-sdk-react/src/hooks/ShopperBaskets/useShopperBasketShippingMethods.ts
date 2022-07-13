@@ -5,17 +5,17 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import {ShippingMethodResult} from 'commerce-sdk-isomorphic'
-import {QueryResponse} from '../../types'
+import {QueryResponse, DependencyList} from '../../types'
 import {ShopperBasketParams} from './types'
 
 const useShopperBasketShippingMethods = (
     params: ShopperBasketParams,
-    source: []
+    source: DependencyList
 ): QueryResponse<ShippingMethodResult> => {
     return {
         data: {},
         isLoading: true,
-        error: undefined
+        error: undefined,
     }
 }
 

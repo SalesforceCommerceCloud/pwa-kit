@@ -6,13 +6,16 @@
  */
 import {Taxes} from 'commerce-sdk-isomorphic'
 import {ShopperOrderParams} from './types'
-import {QueryResponse} from '../../types'
+import {QueryResponse, DependencyList} from '../../types'
 
-const useShopperOrderTaxes = (params: ShopperOrderParams, source: []): QueryResponse<Taxes> => {
+const useShopperOrderTaxes = (
+    params: ShopperOrderParams,
+    source: DependencyList
+): QueryResponse<Taxes> => {
     return {
         data: {},
         isLoading: true,
-        error: undefined
+        error: undefined,
     }
 }
 

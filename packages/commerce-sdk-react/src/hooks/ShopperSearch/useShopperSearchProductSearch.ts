@@ -6,11 +6,11 @@
  */
 import {ProductSearchResult} from 'commerce-sdk-isomorphic'
 import {ShopperSearchProductParams} from './types'
-import {QueryResponse} from '../../types'
+import {QueryResponse, DependencyList} from '../../types'
 
 const useShopperSearchProductSearch = (
     params: ShopperSearchProductParams,
-    source: []
+    source: DependencyList
 ): QueryResponse<ProductSearchResult> => {
     return {
         data: {},

@@ -6,16 +6,16 @@
  */
 import {CustomerProductListResult} from 'commerce-sdk-isomorphic'
 import {ShopperCustomerParams} from './types'
-import {QueryResponse} from '../../types'
+import {QueryResponse, DependencyList} from '../../types'
 
 const useShopperCustomerProductLists = (
     params: ShopperCustomerParams,
-    source: []
+    source: DependencyList
 ): QueryResponse<CustomerProductListResult> => {
     return {
         data: {},
         isLoading: true,
-        error: undefined
+        error: undefined,
     }
 }
 

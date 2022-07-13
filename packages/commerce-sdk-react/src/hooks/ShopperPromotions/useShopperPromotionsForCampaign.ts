@@ -6,16 +6,16 @@
  */
 import {PromotionResult} from 'commerce-sdk-isomorphic'
 import {ShopperPromotionsForCampaignParams} from './types'
-import {QueryResponse} from '../../types'
+import {QueryResponse, DependencyList} from '../../types'
 
 const useShopperPromotionsForCampaign = (
     params: ShopperPromotionsForCampaignParams,
-    source: []
+    source: DependencyList
 ): QueryResponse<PromotionResult> => {
     return {
         data: {},
         isLoading: true,
-        error: undefined
+        error: undefined,
     }
 }
 

@@ -6,16 +6,16 @@
  */
 import {BasketsResult} from 'commerce-sdk-isomorphic'
 import {ShopperCustomerParams} from './types'
-import {QueryResponse} from '../../types'
+import {QueryResponse, DependencyList} from '../../types'
 
 const useShopperCustomerBaskets = (
     params: ShopperCustomerParams,
-    source: []
+    source: DependencyList
 ): QueryResponse<BasketsResult> => {
     return {
         data: {},
         isLoading: true,
-        error: undefined
+        error: undefined,
     }
 }
 
