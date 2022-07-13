@@ -6,7 +6,7 @@
  */
 import React, {useEffect, useState} from 'react'
 
-import {useProduct} from '../scapi-hooks'
+import {useProductSearch, useProducts} from '../scapi-hooks'
 import {useServerEffect} from 'pwa-kit-react-sdk/ssr/universal/hooks'
 
 import HelloTS from '../components/hello-typescript'
@@ -86,7 +86,13 @@ h1 {
 const Home = () => {
     const [counter, setCounter] = useState(0)
 
-    const {product} = useProduct(1, [])
+    const {productSearchResult} = useProductSearch({q: 'blue'}, [])
+    // console.log('productSearchResult: ', productSearchResult)
+    // const {products} = useProducts([1,2,3], [])
+    const {products} = useProducts((data) => {
+        const searchResult = data['1-1']
+        return searchResult.hits.map((hit) => (hit.productId))
+    }, [])
 
     useEffect(() => {
         const interval = setInterval(() => {
@@ -150,8 +156,8 @@ const Home = () => {
                         &quot;
                         <br />
                         <br />
-                        Server-side useProduct works if this is a product name shows: &quot;{' '}
-                        {product ? product.name : ''}
+                        Server-side useProducts works if this is a products show: &quot;{' '}
+                        {JSON.stringify(products)}
                         &quot;
                         <br />
                         <br />

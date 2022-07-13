@@ -48,9 +48,9 @@ const createServerEffect = (context) => {
         const [loading, setLoading] = useState(false)
         const [error, setError] = useState(undefined)
         const boundDidUpdate = didUpdate.bind(this, {location, params, ...expressValues})
-    
+
         const wrappedDidUpdate = isServer ? 
-            async () => {} : 
+            () => {} : 
             async () => {
                 // Set loading state to "true"
                 setLoading(true)
@@ -89,10 +89,7 @@ const createServerEffect = (context) => {
     }
 
     return (...args) => (
-        useServerEffect.apply({
-            ...(this as object),
-            context
-        }, args)
+        useServerEffect.apply(this, args)
     )
 }
 
@@ -130,7 +127,7 @@ export const createServerEffectContext = (name) => {
         const serializeCalls = true
         const effectPromises = serializeCalls ? 
             [requests.reduce((acc, curr) => {
-                return acc.then((data) => curr().then((newData) => ({...data, ...newData})))
+                return acc.then((data) => curr(data).then((newData) => ({...data, ...newData})))
             }, Promise.resolve({}))]
             : requests.map((effect) => effect())
         const effectValues = await Promise.all(effectPromises)

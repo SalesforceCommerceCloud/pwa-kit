@@ -28,11 +28,12 @@ export const SCAPIProvider = (props) => {
 
 export const useProduct = (id, source) => {
     const {data, isLoading, error} = useServerEffect(async () => {
-        console.log(`Fetching product with id = ${id}`)
-        // Emulate netword delay
         await sleep(1000)
 
-        return testProduct
+        return {
+            id: 1,
+            name: 'Polka Dot Pants'
+        }
     }, source)
 
     return {
@@ -42,10 +43,61 @@ export const useProduct = (id, source) => {
     }
 }
 
+export const useProducts = (ids, source) => {
+    const {data, isLoading, error} = useServerEffect(async (args, data) => {
+        if (typeof ids === 'function') {
+            ids = ids(data)
+        }
+        console.log('Getting Products: ', ids)
+        await sleep(1000)
+
+        return ids ? [{
+            id: 1,
+            name: 'Polka Dot Pants'
+        }, {
+            id: 2,
+            name: 'Polka Dot Shorts'
+        }, {
+            id: 3,
+            name: 'Polka Dot Leggings'
+        }] : []
+    }, source)
+
+    return {
+        isLoading,
+        error,
+        products: data
+    }
+}
+
+export const useProductSearch = (productSearchParams, source) => {
+    const {data, isLoading, error} = useServerEffect(async () => {
+        // Emulate netword delay
+        await sleep(1000)
+
+        return {
+            q: 'cgid=blue',
+            count: 3,
+            total: 10,
+            hits: [{
+                productId: 1,
+                productName: 'Polka Dot Pants'
+            }, {
+                productId: 2,
+                productName: 'Polka Dot Shorts'
+            }, {
+                productId: 3,
+                productName: 'Polka Dot Legging'
+            }]
+        }
+    }, source)
+
+    return {
+        isLoading,
+        error,
+        productSearchResult: data
+    }
+}
 // PRIVATE
 // const getValues = () => (effectsValues)
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
-const testProduct = {
-    id: '1',
-    name: 'Dress Pants'
-}
