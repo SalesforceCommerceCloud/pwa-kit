@@ -25,8 +25,6 @@ import {sum} from './sum'
  *
  * @beta
  */
-function getAverage(x: number, y: number): number {
+export function getAverage(x: number, y: number): number {
     return sum(x, y) / 2.0
 }
-
-export {getAverage}
