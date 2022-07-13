@@ -4,7 +4,51 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {ReactElement} from 'react'
+import React, {ReactElement, ReactNode} from 'react'
+
+import {
+    ShopperBaskets,
+    ShopperContexts,
+    ShopperCustomers,
+    ShopperLogin,
+    ShopperOrders,
+    ShopperProducts,
+    ShopperPromotions,
+    ShopperDiscoverySearch,
+    ShopperGiftCertificates,
+    ShopperSearch,
+} from 'commerce-sdk-isomorphic'
+
+// TODO: these types are not exported from the commerce-sdk-isomorphic
+// can we use other types?
+// if not, we need to make a change to commerce-sdk-isomorphic to expose these types
+
+import {
+    ShopperBasketsParameters,
+    ShopperContextsParameters,
+    ShopperCustomersParameters,
+    ShopperDiscoverySearchParameters,
+    ShopperGiftCertificatesParameters,
+    ShopperLoginParameters,
+    ShopperOrdersParameters,
+    ShopperProductsParameters,
+    ShopperPromotionsParameters,
+    ShopperSearchParameters,
+} from 'commerce-sdk-isomorphic'
+
+export interface ApiClients {
+    shopperBaskets: ShopperBaskets<ShopperBasketsParameters>
+    shopperContexts: ShopperContexts<ShopperContextsParameters>
+    shopperCustomers: ShopperCustomers<ShopperCustomersParameters>
+    shopperDiscoverySearch: ShopperDiscoverySearch<ShopperDiscoverySearchParameters>
+    shopperGiftCertificates: ShopperGiftCertificates<ShopperGiftCertificatesParameters>
+    shopperLogin: ShopperLogin<ShopperLoginParameters>
+    shopperOrders: ShopperOrders<ShopperOrdersParameters>
+    shopperProducts: ShopperProducts<ShopperProductsParameters>
+    shopperPromotions: ShopperPromotions<ShopperPromotionsParameters>
+    shopperSearch: ShopperSearch<ShopperSearchParameters>
+}
+
 
 interface CommerceAPIProviderProps {
     clientId: string
@@ -14,10 +58,42 @@ interface CommerceAPIProviderProps {
     proxy: string
     locale: string
     currency: string
+    children: ReactNode
 }
 
-const CommerceAPIProvider = (props: CommerceAPIProviderProps): ReactElement => {
-    return <></>
+export const CommerceAPIContext = React.createContext({} as ApiClients)
+
+// TODO: how to test?
+export const CommerceAPIProvider = (props: CommerceAPIProviderProps): ReactElement => {
+    const {children, clientId, organizationId, shortCode, siteId} = props
+
+    const config = {
+        proxy: 'https://localhost:3000',
+        headers: {},
+        parameters: {
+            clientId,
+            organizationId,
+            shortCode,
+            siteId,
+        },
+        throwOnBadResponse: true,
+    }
+
+    const apiClient = {
+        shopperBaskets: new ShopperBaskets(config),
+        shopperContexts: new ShopperContexts(config),
+        shopperCustomers: new ShopperCustomers(config),
+        shopperDiscoverySearch: new ShopperDiscoverySearch(config),
+        shopperGiftCertificates: new ShopperGiftCertificates(config),
+        shopperLogin: new ShopperLogin(config),
+        shopperOrders: new ShopperOrders(config),
+        shopperProducts: new ShopperProducts(config),
+        shopperPromotions: new ShopperPromotions(config),
+        shopperSearch: new ShopperSearch(config),
+    }
+
+    // TODO: use Context from useServerEffect
+    return <CommerceAPIContext.Provider value={apiClient}>{children}</CommerceAPIContext.Provider>
 }
 
-export default CommerceAPIProvider
+
