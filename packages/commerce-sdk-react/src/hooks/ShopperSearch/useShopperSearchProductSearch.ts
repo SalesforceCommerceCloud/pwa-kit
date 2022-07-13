@@ -4,19 +4,21 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {ShopperOrdersTypes} from 'commerce-sdk-isomorphic'
-import {ShopperOrderParams} from './types'
+import {ShopperSearchTypes} from 'commerce-sdk-isomorphic'
+import {ShopperSearchProductParams} from './types'
 import {QueryResponse, DependencyList} from '../types'
 
-const useShopperOrder = (
-    params: ShopperOrderParams,
+// phase 1
+const useShopperSearchProductSearch = (
+    params: ShopperSearchProductParams,
     source: DependencyList
-): QueryResponse<ShopperOrdersTypes.Order> => {
+): QueryResponse<ShopperSearchTypes.ProductSearchResult> => {
     return {
+        // @ts-ignore
         data: {},
         isLoading: true,
         error: undefined,
     }
 }
 
-export default useShopperOrder
+export default useShopperSearchProductSearch

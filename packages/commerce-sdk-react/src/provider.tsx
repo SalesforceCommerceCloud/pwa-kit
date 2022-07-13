@@ -52,7 +52,8 @@ export interface ApiClients {
 }
 
 
-interface CommerceAPIProviderProps {
+export interface CommerceAPIProviderProps {
+    children: React.ReactNode
     clientId: string
     organizationId: string
     siteId: string

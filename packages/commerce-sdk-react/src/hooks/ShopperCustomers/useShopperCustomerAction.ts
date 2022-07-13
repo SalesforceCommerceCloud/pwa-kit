@@ -1,12 +1,21 @@
-import {ActionResponse} from '../../types'
-import {ShopperCustomerActions} from './types'
+/*
+ * Copyright (c) 2022, Salesforce, Inc.
+ * All rights reserved.
+ * SPDX-License-Identifier: BSD-3-Clause
+ * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
+ */
+import {ActionResponse} from '../types'
+import {ShopperCustomerActions, ShopperCustomerInstance} from './types'
 
-// Q: how do we link the return types for actions?
-type execute = () => Promise<any>
-
-const useShopperCustomerAction = (action: ShopperCustomerActions): ActionResponse<execute> => {
+function useShopperCustomerAction(
+    action: ShopperCustomerActions.authorizeCustomer
+): ActionResponse<ShopperCustomerInstance['authorizeCustomer']>
+function useShopperCustomerAction(
+    action: ShopperCustomerActions
+): ActionResponse<() => Promise<any>> {
+    // @ts-ignore TODO: how to declare the type for dynamic key name [action]?
     return {
-        execute: () => Promise.resolve(),
+        [action]: () => Promise.resolve(),
         isLoading: true,
         error: undefined,
     }
