@@ -2,7 +2,7 @@
   "out": "docs",
   "entryPoints": [
     "packages/commerce-sdk-react",
-    "packages/template-typescript-minimal"
+    "packages/pwa-kit-react-sdk"
   ],
   "entryPointStrategy": "packages",
   "logLevel": "Verbose"
