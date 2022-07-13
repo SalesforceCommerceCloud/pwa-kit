@@ -65,7 +65,7 @@ interface CommerceAPIProviderProps {
 
 export const CommerceAPIContext = React.createContext({} as ApiClients)
 
-// TODO: how to test?
+// TODO: how to test? test in typescript template for now
 export const CommerceAPIProvider = (props: CommerceAPIProviderProps): ReactElement => {
     const {children, clientId, organizationId, shortCode, siteId, proxy} = props
 
