@@ -845,21 +845,18 @@ describe('SSRServer persistent caching', () => {
     ]
 
     errorCases.forEach(({url, status}) => {
-        test(`should not cache responses with ${status} status codes`, () => {
-            return request(app)
-                .get(url)
-                .then((res) => app._requestMonitor._waitForResponses().then(() => res))
-                .then((res) => {
-                    expect(res.status).toBe(status)
-                    expect(res.headers['x-mobify-from-cache']).toBe('false')
-                })
-                .then(() =>
-                    app.applicationCache.get({
-                        key: keyFromURL(url),
-                        namespace
-                    })
-                )
-                .then((entry) => expect(entry.found).toBe(false))
+        test(`should not cache responses with ${status} status codes`, async () => {
+            const res = await request(app).get(url)
+            await app._requestMonitor._waitForResponses()
+            expect(res.status).toBe(status)
+            expect(res.headers['x-mobify-from-cache']).toBe('false')
+
+            const entry = app.applicationCache.get({
+                key: keyFromURL(url),
+                namespace
+            })
+
+            expect(entry.found).toBe(false)
         })
     })
 
