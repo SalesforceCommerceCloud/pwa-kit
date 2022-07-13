@@ -37,7 +37,7 @@ const mockStaticAssets = {}
 jest.mock('../static/assets.json', () => mockStaticAssets, {virtual: true})
 
 const TEST_PORT = 3444
-const testFixtures = path.resolve(process.cwd(), 'src/ssr/server/test_fixtures')
+const testFixtures = path.join(__dirname, 'test_fixtures')
 
 /**
  * An HTTPS.Agent that allows self-signed certificates
@@ -49,7 +49,7 @@ export const httpsAgent = new https.Agent({
 
 const opts = (overrides = {}) => {
     const defaults = {
-        buildDir: './src/ssr/server/test_fixtures',
+        buildDir: testFixtures,
         mobify: {
             ssrEnabled: true,
             ssrOnly: ['main.js.map', 'ssr.js', 'ssr.js.map'],
@@ -76,7 +76,7 @@ const opts = (overrides = {}) => {
                 ]
             }
         },
-        sslFilePath: './src/ssr/server/test_fixtures/localhost.pem',
+        sslFilePath: path.join(testFixtures, 'localhost.pem'),
         quiet: true,
         port: TEST_PORT,
         protocol: 'https',
@@ -404,9 +404,8 @@ describe('SSRServer operation', () => {
 
         cases.forEach(({file, content, name, requestPath}) => {
             test(name, () => {
-                const fixture = path.join(__dirname, 'test_fixtures')
                 const buildDir = path.join(tmpDir, 'build')
-                fse.copySync(fixture, buildDir)
+                fse.copySync(testFixtures, buildDir)
                 const updatedFile = path.resolve(buildDir, file)
                 fse.writeFileSync(updatedFile, content)
 
