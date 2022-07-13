@@ -36,6 +36,8 @@ import {
     ShopperSearchParameters,
 } from 'commerce-sdk-isomorphic'
 
+import ApiClient from './api-client'
+
 export interface ApiClients {
     shopperBaskets: ShopperBaskets<ShopperBasketsParameters>
     shopperContexts: ShopperContexts<ShopperContextsParameters>
@@ -79,20 +81,24 @@ export const CommerceAPIProvider = (props: CommerceAPIProviderProps): ReactEleme
         throwOnBadResponse: true,
     }
 
-    const apiClient = {
-        shopperBaskets: new ShopperBaskets(config),
-        shopperContexts: new ShopperContexts(config),
-        shopperCustomers: new ShopperCustomers(config),
-        shopperDiscoverySearch: new ShopperDiscoverySearch(config),
-        shopperGiftCertificates: new ShopperGiftCertificates(config),
-        shopperLogin: new ShopperLogin(config),
-        shopperOrders: new ShopperOrders(config),
-        shopperProducts: new ShopperProducts(config),
-        shopperPromotions: new ShopperPromotions(config),
-        shopperSearch: new ShopperSearch(config),
-    }
+    const apiClient = new ApiClient(config)
+
+    // const apiClient = {
+    //     shopperBaskets: new ShopperBaskets(config),
+    //     shopperContexts: new ShopperContexts(config),
+    //     shopperCustomers: new ShopperCustomers(config),
+    //     shopperDiscoverySearch: new ShopperDiscoverySearch(config),
+    //     shopperGiftCertificates: new ShopperGiftCertificates(config),
+    //     shopperLogin: new ShopperLogin(config),
+    //     shopperOrders: new ShopperOrders(config),
+    //     shopperProducts: new ShopperProducts(config),
+    //     shopperPromotions: new ShopperPromotions(config),
+    //     shopperSearch: new ShopperSearch(config),
+    // }
 
     // TODO: use Context from useServerEffect
+    // See Kevin's PR: https://github.com/SalesforceCommerceCloud/pwa-kit/pull/654/files#r914097886
+    // See Ben's PR: https://github.com/SalesforceCommerceCloud/pwa-kit/pull/642
     return <CommerceAPIContext.Provider value={apiClient}>{children}</CommerceAPIContext.Provider>
 }
 
