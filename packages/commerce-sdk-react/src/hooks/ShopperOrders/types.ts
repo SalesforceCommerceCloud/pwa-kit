@@ -11,7 +11,10 @@ export interface ShopperOrderParams extends QueryParams {
 }
 
 export enum ShopperOrderActions {
+    // phase 1
     createOrder = 'createOrder',
+
+    // phase 2
     createPaymentInstrumentForOrder = 'createPaymentInstrumentForOrder',
     removePaymentInstrumentFromOrder = 'removePaymentInstrumentFromOrder',
     updatePaymentInstrumentForOrder = 'updatePaymentInstrumentForOrder',

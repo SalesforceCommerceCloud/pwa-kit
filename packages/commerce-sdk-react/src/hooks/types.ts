@@ -32,6 +32,7 @@ export interface QueryResponse<T> extends CommonHookResponse {
 }
 
 export interface ActionResponse<T> extends CommonHookResponse {
+    // TODO: let's use the actual action name instead of "execute"
     execute: T
 }
 

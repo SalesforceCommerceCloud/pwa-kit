@@ -86,8 +86,9 @@ function useShopperBasketAction(
     action: ShopperBasketActions.updateShippingMethodForShipment
 ): ActionResponse<ShopperBasketInstance['updateShippingMethodForShipment']>
 function useShopperBasketAction(action: ShopperBasketActions): ActionResponse<() => Promise<any>> {
+    // @ts-ignore TODO: how to declare the type for dynamic key name [action]?
     return {
-        execute: () => Promise.resolve(),
+        [action]: () => Promise.resolve(),
         isLoading: true,
         error: undefined,
     }

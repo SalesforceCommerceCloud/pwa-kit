@@ -4,7 +4,12 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
+import {ShopperCustomers, ShopperCustomersTypes} from 'commerce-sdk-isomorphic'
 import {QueryParams} from '../types'
+
+export type ShopperCustomerInstance = ShopperCustomers<
+    ShopperCustomersTypes.ShopperCustomersParameters & Record<string, unknown>
+>
 
 export interface ShopperCustomerParams extends QueryParams {
     customerId?: string
@@ -55,24 +60,28 @@ export interface ShopperCustomerPaymentInstrumentParams extends ShopperCustomerP
 }
 
 export enum ShopperCustomerActions {
+    // Phase 1
+
     registerCustomer = 'registerCustomer',
-    invalidateCustomerAuth = 'invalidateCustomerAuth',
-    authorizeCustomer = 'authorizeCustomer',
-    authorizeTrustedSystem = 'authorizeTrustedSystem',
-    resetPassword = 'resetPassword',
-    getResetPasswordToken = 'getResetPasswordToken',
-    registerExternalProfile = 'registerExternalProfile',
     updateCustomer = 'updateCustomer',
+    updateCustomerPassword = 'updateCustomerPassword',
+    getResetPasswordToken = 'getResetPasswordToken',
     createCustomerAddress = 'createCustomerAddress',
     removeCustomerAddress = 'removeCustomerAddress',
     updateCustomerAddress = 'updateCustomerAddress',
-    updateCustomerPassword = 'updateCustomerPassword',
     createCustomerPaymentInstrument = 'createCustomerPaymentInstrument',
     deleteCustomerPaymentInstrument = 'deleteCustomerPaymentInstrument',
     createCustomerProductList = 'createCustomerProductList',
-    deleteCustomerProductList = 'deleteCustomerProductList',
-    updateCustomerProductList = 'updateCustomerProductList',
     createCustomerProductListItem = 'createCustomerProductListItem',
     deleteCustomerProductListItem = 'deleteCustomerProductListItem',
     updateCustomerProductListItem = 'updateCustomerProductListItem',
+
+    // Phase 2
+    authorizeCustomer = 'authorizeCustomer',
+    invalidateCustomerAuth = 'invalidateCustomerAuth',
+    authorizeTrustedSystem = 'authorizeTrustedSystem',
+    resetPassword = 'resetPassword',
+    registerExternalProfile = 'registerExternalProfile',
+    deleteCustomerProductList = 'deleteCustomerProductList',
+    updateCustomerProductList = 'updateCustomerProductList',
 }

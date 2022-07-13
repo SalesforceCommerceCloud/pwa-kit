@@ -8,6 +8,7 @@ import {ShopperProductsTypes} from 'commerce-sdk-isomorphic'
 import {ShopperProductParams} from './types'
 import {QueryResponse, DependencyList} from '../types'
 
+// phase 1
 const useShopperProduct = (
     params: ShopperProductParams,
     source: DependencyList

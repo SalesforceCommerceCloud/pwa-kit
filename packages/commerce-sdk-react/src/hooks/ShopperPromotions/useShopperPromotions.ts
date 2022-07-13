@@ -8,6 +8,7 @@ import {ShopperPromotionsTypes} from 'commerce-sdk-isomorphic'
 import {ShopperPromotionsParams} from './types'
 import {QueryResponse, DependencyList} from '../types'
 
+// phase 1
 const useShopperPromotions = (
     params: ShopperPromotionsParams,
     source: DependencyList

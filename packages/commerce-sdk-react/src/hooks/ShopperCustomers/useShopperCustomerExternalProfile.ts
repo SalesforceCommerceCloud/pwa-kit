@@ -8,7 +8,8 @@ import {ShopperCustomersTypes} from 'commerce-sdk-isomorphic'
 import {ShopperCustomerExternalProfileParams} from './types'
 import {QueryResponse, DependencyList} from '../types'
 
-const useShopperCustomer = (
+// Phase 2
+const useShopperCustomerExternalProfile = (
     params: ShopperCustomerExternalProfileParams,
     source: DependencyList
 ): QueryResponse<ShopperCustomersTypes.CustomerExternalProfile> => {
@@ -19,4 +20,4 @@ const useShopperCustomer = (
     }
 }
 
-export default useShopperCustomer
+export default useShopperCustomerExternalProfile
