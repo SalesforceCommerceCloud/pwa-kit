@@ -6,7 +6,7 @@
  */
 import {CustomerExternalProfile} from 'commerce-sdk-isomorphic'
 import {ShopperCustomerExternalProfileParams} from './types'
-import {QueryResponse, DependencyList} from '../../types'
+import {QueryResponse, DependencyList} from '../types'
 
 const useShopperCustomer = (
     params: ShopperCustomerExternalProfileParams,

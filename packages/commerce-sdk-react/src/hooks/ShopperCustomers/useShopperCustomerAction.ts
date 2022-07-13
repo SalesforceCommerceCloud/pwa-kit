@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {ActionResponse} from '../../types'
+import {ActionResponse} from '../types'
 import {ShopperCustomerActions} from './types'
 
 // Q: how do we link the return types for actions?
@@ -14,7 +14,7 @@ const useShopperCustomerAction = (action: ShopperCustomerActions): ActionRespons
     return {
         execute: () => Promise.resolve(),
         isLoading: true,
-        error: undefined
+        error: undefined,
     }
 }
 

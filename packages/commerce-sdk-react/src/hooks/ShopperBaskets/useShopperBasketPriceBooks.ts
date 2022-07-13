@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import {PriceBookIds} from 'commerce-sdk-isomorphic'
-import {QueryResponse, DependencyList} from '../../types'
+import {QueryResponse, DependencyList} from '../types'
 import {ShopperBasketParams} from './types'
 
 const useShopperBasketPriceBooks = (

@@ -6,7 +6,7 @@
  */
 import {CustomerPaymentInstrument} from 'commerce-sdk-isomorphic'
 import {ShopperCustomerPaymentInstrumentParams} from './types'
-import {QueryResponse, DependencyList} from '../../types'
+import {QueryResponse, DependencyList} from '../types'
 
 const useShopperCustomerPaymentInstrument = (
     params: ShopperCustomerPaymentInstrumentParams,

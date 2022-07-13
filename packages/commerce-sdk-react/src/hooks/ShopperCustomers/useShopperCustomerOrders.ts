@@ -6,7 +6,7 @@
  */
 import {CustomerOrderResult} from 'commerce-sdk-isomorphic'
 import {ShopperCustomerOrdersParams} from './types'
-import {QueryResponse, DependencyList} from '../../types'
+import {QueryResponse, DependencyList} from '../types'
 
 const useShopperCustomerOrders = (
     params: ShopperCustomerOrdersParams,

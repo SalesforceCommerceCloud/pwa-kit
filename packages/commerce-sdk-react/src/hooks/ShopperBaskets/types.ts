@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {QueryParams} from '../../types'
+import {QueryParams} from '../types'
 
 export interface ShopperBasketParams extends QueryParams {
     basketId?: string
