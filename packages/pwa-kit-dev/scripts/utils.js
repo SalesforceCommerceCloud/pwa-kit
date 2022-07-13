@@ -186,7 +186,7 @@ Utils.getRequestHeaders = (additionalHeaders) =>
     Object.assign({'User-Agent': `progressive-web-sdk#${SDK_VERSION}`}, additionalHeaders)
 
 /* istanbul ignore next */
-Utils.getSettingsPath = () =>
+Utils.getCredentialsFile = () =>
     `${process.platform === 'win32' ? process.env.USERPROFILE : process.env.HOME}/.mobify`
 
 Utils.readCredentials = (filepath) => {
