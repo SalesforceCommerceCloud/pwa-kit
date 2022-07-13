@@ -1,0 +1,9 @@
+{
+  "out": "docs",
+  "entryPoints": [
+    "packages/commerce-sdk-react",
+    "packages/template-typescript-minimal"
+  ],
+  "entryPointStrategy": "packages",
+  "logLevel": "Verbose"
+}
