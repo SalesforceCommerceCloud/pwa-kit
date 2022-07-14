@@ -1,0 +1,135 @@
+<!DOCTYPE html><html class="default" lang="en"><head><meta charSet="utf-8"/><meta http-equiv="x-ua-compatible" content="IE=edge"/><title>pwa-kit</title><meta name="description" content="Documentation for pwa-kit"/><meta name="viewport" content="width=device-width, initial-scale=1"/><link rel="stylesheet" href="assets/style.css"/><link rel="stylesheet" href="assets/highlight.css"/><script async src="assets/search.js" id="search-script"></script></head><body><script>document.documentElement.dataset.theme = localStorage.getItem("tsd-theme") || "os"</script><header class="tsd-page-toolbar">
+<div class="tsd-toolbar-contents container">
+<div class="table-cell" id="tsd-search" data-base=".">
+<div class="field"><label for="tsd-search-field" class="tsd-widget search no-caption"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M15.7824 13.833L12.6666 10.7177C12.5259 10.5771 12.3353 10.499 12.1353 10.499H11.6259C12.4884 9.39596 13.001 8.00859 13.001 6.49937C13.001 2.90909 10.0914 0 6.50048 0C2.90959 0 0 2.90909 0 6.49937C0 10.0896 2.90959 12.9987 6.50048 12.9987C8.00996 12.9987 9.39756 12.4863 10.5008 11.6239V12.1332C10.5008 12.3332 10.5789 12.5238 10.7195 12.6644L13.8354 15.7797C14.1292 16.0734 14.6042 16.0734 14.8948 15.7797L15.7793 14.8954C16.0731 14.6017 16.0731 14.1267 15.7824 13.833ZM6.50048 10.499C4.29094 10.499 2.50018 8.71165 2.50018 6.49937C2.50018 4.29021 4.28781 2.49976 6.50048 2.49976C8.71001 2.49976 10.5008 4.28708 10.5008 6.49937C10.5008 8.70852 8.71314 10.499 6.50048 10.499Z" fill="var(--color-text)"></path></svg></label><input type="text" id="tsd-search-field" aria-label="Search"/></div>
+<ul class="results">
+<li class="state loading">Preparing search index...</li>
+<li class="state failure">The search index is not available</li></ul><a href="index.html" class="title">pwa-kit</a></div>
+<div class="table-cell" id="tsd-widgets"><a href="#" class="tsd-widget menu no-caption" data-toggle="menu" aria-label="Menu"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1" y="3" width="14" height="2" fill="var(--color-text)"></rect><rect x="1" y="7" width="14" height="2" fill="var(--color-text)"></rect><rect x="1" y="11" width="14" height="2" fill="var(--color-text)"></rect></svg></a></div></div></header>
+<div class="container container-main">
+<div class="col-8 col-content">
+<div class="tsd-page-title">
+<h2>pwa-kit</h2></div>
+<div class="tsd-panel tsd-typography"><div align="center">
+
+<h1>The Progressive Web App (PWA) Kit</h1>
+
+<p><a href="https://www.npmjs.com/package/pwa-kit-react-sdk"><img src="https://img.shields.io/npm/v/pwa-kit-react-sdk.svg" alt="npm"></a>
+<a href="https://github.com/SalesforceCommerceCloud/pwa-kit/blob/master/LICENSE"><img src="https://img.shields.io/github/license/SalesforceCommerceCloud/pwa-kit.svg" alt="License"></a>
+<a href="https://github.com/SalesforceCommerceCloud/pwa-kit"><img src="https://img.shields.io/github/checks-status/SalesforceCommerceCloud/pwa-kit/develop.svg" alt="Checks"></a>
+<a href="https://www.npmjs.com/package/pwa-kit-react-sdk"><img src="https://img.shields.io/npm/dm/pwa-kit-react-sdk.svg" alt="npm"></a></p>
+</div>
+
+<div align="center">
+
+<p>📖 <a href="https://sfdc.co/pwa-kit">Read Docs</a> |
+🏖️ <a href="https://pwa-kit.mobify-storefront.com/">View Demo</a> |
+🚀 <a href="https://runtime.commercecloud.com/">Deploy</a> |
+➕ <a href="https://github.com/SalesforceCommerceCloud/pwa-kit/blob/develop/CONTRIBUTING.md">Contribute</a>
+<br /><br />
+The PWA Kit is a storefront technology for headless commerce using Salesforce Commerce APIs and React. It provides front-end developers with a more flexible and agile approach to build and maintain modern shopping experiences.
+<br/><br/>
+<img alt="pwa-kit banner" src="https://raw.githubusercontent.com/SalesforceCommerceCloud/pwa-kit/develop/packages/template-retail-react-app/app/static/img/hero.png" style="width: 700px; height:auto;"></p>
+</div>
+
+<hr>
+
+<a href="#🏄-getting-started" id="🏄-getting-started" style="color: inherit; text-decoration: none;">
+  <h2>🏄 Getting Started</h2>
+</a>
+
+<a href="#requirements" id="requirements" style="color: inherit; text-decoration: none;">
+  <h3>Requirements</h3>
+</a>
+<ul>
+<li>Node 14</li>
+<li>npm 6.14.4 or later</li>
+</ul>
+
+<a href="#create-your-first-project" id="create-your-first-project" style="color: inherit; text-decoration: none;">
+  <h3>Create Your First Project</h3>
+</a>
+<pre><code class="language-bash"><span class="hl-0">npx pwa-kit-create-app</span>
+</code></pre>
+<p>Enter your <a href="https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/getting-started.html#new-project">sandbox configuration</a>.</p>
+
+<a href="#run-the-project-locally" id="run-the-project-locally" style="color: inherit; text-decoration: none;">
+  <h3>Run the Project Locally</h3>
+</a>
+<pre><code class="language-bash"><span class="hl-0">npm start</span>
+</code></pre>
+
+<a href="#deploy-to-managed-runtime" id="deploy-to-managed-runtime" style="color: inherit; text-decoration: none;">
+  <h3>Deploy to Managed Runtime</h3>
+</a>
+<pre><code><span class="hl-1">npm</span><span class="hl-0"> </span><span class="hl-1">run</span><span class="hl-0"> </span><span class="hl-1">push</span><span class="hl-0"> -- -</span><span class="hl-1">m</span><span class="hl-0"> </span><span class="hl-2">&quot;Message to help you recognize this bundle&quot;</span>
+</code></pre>
+<p><strong>Important</strong>: Access to the <a href="https://runtime.commercecloud.com/">Runtime Admin</a> application is required to deploy bundles. To learn more, read our guide to <a href="https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/pushing-and-deploying-bundles.html">Pushing and Deploying Bundles</a>.</p>
+
+<a href="#🌍-localization" id="🌍-localization" style="color: inherit; text-decoration: none;">
+  <h2>🌍 Localization</h2>
+</a>
+<p>See the <a href="./packages/template-retail-react-app/app/translations/README.md">Localization README.md</a> for important setup instructions for localization.</p>
+
+<a href="#⚠️-license-information" id="⚠️-license-information" style="color: inherit; text-decoration: none;">
+  <h2>⚠️ License Information</h2>
+</a>
+<p>The PWA Kit is licensed under a BSD 3-Clause license. See the <a href="./LICENSE">license</a> for details.</p>
+
+<a href="#➕-contribute" id="➕-contribute" style="color: inherit; text-decoration: none;">
+  <h2>➕ Contribute</h2>
+</a>
+<p>Your contributions are welcome! Refer to the <a href="./CONTRIBUTING.md">CONTRIBUTING</a> guide to get started. If you like <code>pwa-kit</code>, consider adding a ⭐ on the <a href="https://github.com/SalesforceCommerceCloud/pwa-kit/">GitHub Repo</a>. It helps other people discover PWA Kit!</p>
+
+<a href="#📖-documentation" id="📖-documentation" style="color: inherit; text-decoration: none;">
+  <h2>📖 Documentation</h2>
+</a>
+<p>The full documentation for PWA Kit is hosted on the <a href="https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/overview">Salesforce Developers</a> portal.</p>
+
+<a href="#useful-links" id="useful-links" style="color: inherit; text-decoration: none;">
+  <h3>Useful Links:</h3>
+</a>
+<ul>
+<li><a href="https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/getting-started.html">Getting Started</a></li>
+<li><a href="https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/setting-up-api-access.html">Setting Up API Access</a></li>
+<li><a href="https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/configuration-options.html">Configuration Options</a></li>
+<li><a href="https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/pushing-and-deploying-bundles.html">Pushing and Deploying Bundles</a></li>
+<li><a href="https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/retail-react-app.html">The Retail React App</a></li>
+<li><a href="https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/proxying-requests.html">Proxying Requests</a></li>
+</ul>
+
+<a href="#🔮-forward-looking-statements" id="🔮-forward-looking-statements" style="color: inherit; text-decoration: none;">
+  <h2>🔮 Forward-Looking Statements</h2>
+</a>
+<p>This repository may contain forward-looking statements that involve risks, uncertainties, and assumptions. If any such uncertainties materialize or if any of the assumptions prove incorrect, the results of salesforce.com, Inc. could differ materially from the results expressed or implied by the forward-looking statements we make. All statements other than statements of historical fact could be deemed forward-looking, including any projections of product or service availability, subscriber growth, earnings, revenues, or other financial items and any statements regarding strategies or plans of management for future operations, statements of belief, any statements concerning new, planned, or upgraded services or technology developments and customer contracts or use of our services.</p>
+<p>The risks and uncertainties referred to above include—but are not limited to—risks associated with developing and delivering new functionality for our service, new products and services, our new business model, our past operating losses, possible fluctuations in our operating results and rate of growth, interruptions or delays in our Web hosting, breach of our security measures, the outcome of any litigation, risks associated with completed and any possible mergers and acquisitions, the immature market in which we operate, our relatively limited operating history, our ability to expand, retain, and motivate our employees and manage our growth, new releases of our service and successful customer deployment, our limited history reselling non-salesforce.com products, and utilization and selling to larger enterprise customers. Further information on potential factors that could affect the financial results of salesforce.com, Inc. is included in our annual report on Form 10-K for the most recent fiscal year and in our quarterly report on Form 10-Q for the most recent fiscal quarter. These documents and others containing important disclosures are available on the SEC Filings section of the Investor Information section of our website.</p>
+<p>Any unreleased services or features referenced in this or other repositories, press releases or public statements are not currently available and may not be delivered on time or at all. Customers who purchase our services should make the purchase decisions based upon features that are currently available. salesforce.com, Inc. assumes no obligation and does not intend to update these forward-looking statements.</p>
+</div></div>
+<div class="col-4 col-menu menu-sticky-wrap menu-highlight">
+<div class="tsd-navigation settings">
+<details class="tsd-index-accordion"><summary class="tsd-accordion-summary">
+<h3><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M4.93896 8.531L12 15.591L19.061 8.531L16.939 6.409L12 11.349L7.06098 6.409L4.93896 8.531Z" fill="var(--color-text)"></path></svg> Settings</h3></summary>
+<div class="tsd-accordion-details">
+<div class="tsd-filter-visibility">
+<h4 class="uppercase">Member Visibility</h4><form>
+<ul id="tsd-filter-options">
+<li class="tsd-filter-item"><label class="tsd-filter-input"><input type="checkbox" id="tsd-filter-protected" name="protected"/><svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect class="tsd-checkbox-background" width="30" height="30" x="1" y="1" rx="6" fill="none"></rect><path class="tsd-checkbox-checkmark" d="M8.35422 16.8214L13.2143 21.75L24.6458 10.25" stroke="none" stroke-width="3.5" stroke-linejoin="round" fill="none"></path></svg><span>Protected</span></label></li>
+<li class="tsd-filter-item"><label class="tsd-filter-input"><input type="checkbox" id="tsd-filter-private" name="private"/><svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect class="tsd-checkbox-background" width="30" height="30" x="1" y="1" rx="6" fill="none"></rect><path class="tsd-checkbox-checkmark" d="M8.35422 16.8214L13.2143 21.75L24.6458 10.25" stroke="none" stroke-width="3.5" stroke-linejoin="round" fill="none"></path></svg><span>Private</span></label></li>
+<li class="tsd-filter-item"><label class="tsd-filter-input"><input type="checkbox" id="tsd-filter-inherited" name="inherited" checked/><svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect class="tsd-checkbox-background" width="30" height="30" x="1" y="1" rx="6" fill="none"></rect><path class="tsd-checkbox-checkmark" d="M8.35422 16.8214L13.2143 21.75L24.6458 10.25" stroke="none" stroke-width="3.5" stroke-linejoin="round" fill="none"></path></svg><span>Inherited</span></label></li>
+<li class="tsd-filter-item"><label class="tsd-filter-input"><input type="checkbox" id="tsd-filter-external" name="external"/><svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect class="tsd-checkbox-background" width="30" height="30" x="1" y="1" rx="6" fill="none"></rect><path class="tsd-checkbox-checkmark" d="M8.35422 16.8214L13.2143 21.75L24.6458 10.25" stroke="none" stroke-width="3.5" stroke-linejoin="round" fill="none"></path></svg><span>External</span></label></li></ul></form></div>
+<div class="tsd-theme-toggle">
+<h4 class="uppercase">Theme</h4><select id="theme"><option value="os">OS</option><option value="light">Light</option><option value="dark">Dark</option></select></div></div></details></div>
+<nav class="tsd-navigation primary">
+<details class="tsd-index-accordion" open><summary class="tsd-accordion-summary">
+<h3><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M4.93896 8.531L12 15.591L19.061 8.531L16.939 6.409L12 11.349L7.06098 6.409L4.93896 8.531Z" fill="var(--color-text)"></path></svg> Modules</h3></summary>
+<div class="tsd-accordion-details">
+<ul>
+<li class="current selected"><a href="modules.html">pwa-<wbr/>kit</a>
+<ul></ul></li></ul></div></details></nav>
+<nav class="tsd-navigation secondary menu-sticky">
+<ul>
+<li class="tsd-kind-function"><a href="functions/getAverage.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><rect fill="var(--color-icon-background)" stroke="var(--color-ts-function)" stroke-width="1.5" x="1" y="1" width="22" height="22" rx="6" id="icon-64-path"></rect><path d="M9.39 16V7.24H14.55V8.224H10.446V11.128H14.238V12.112H10.47V16H9.39Z" fill="var(--color-text)" id="icon-64-text"></path></svg>get<wbr/>Average</a></li>
+<li class="tsd-kind-function"><a href="functions/sum.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-64-path"></use><use href="#icon-64-text"></use></svg>sum</a></li></ul></nav></div></div>
+<div class="container tsd-generator">
+<p>Generated using <a href="https://typedoc.org/" target="_blank">TypeDoc</a></p></div>
+<div class="overlay"></div><script src="assets/main.js"></script></body></html>
