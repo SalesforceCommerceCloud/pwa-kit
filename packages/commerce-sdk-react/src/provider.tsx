@@ -7,7 +7,7 @@
 import React, {ReactElement} from 'react'
 import { ApiClients } from './hooks/types'
 
-import ApiClient from './api-client'
+import CommerceAPI from './api-client'
 
 export interface CommerceAPIProviderProps {
     children: React.ReactNode
@@ -39,14 +39,14 @@ const CommerceAPIProvider = (props: CommerceAPIProviderProps): ReactElement => {
     }
 
     // TODO: auth logic should use the helpers from commerce-sdk-isomorphic ?
-    const apiClient = new ApiClient(config)
+    const commerceAPI = new CommerceAPI(config)
 
-    console.log('--- api client', apiClient)
+    console.log('--- api client', commerceAPI)
 
     // TODO: use Context from useServerEffect
     // See Kevin's PR: https://github.com/SalesforceCommerceCloud/pwa-kit/pull/654/files#r914097886
     // See Ben's PR: https://github.com/SalesforceCommerceCloud/pwa-kit/pull/642
-    return <CommerceAPIContext.Provider value={apiClient}>{children}</CommerceAPIContext.Provider>
+    return <CommerceAPIContext.Provider value={commerceAPI}>{children}</CommerceAPIContext.Provider>
 }
 
 export default CommerceAPIProvider
