@@ -8,6 +8,10 @@
     "node": "^14.0.0",
     "npm": "^6.14.4 || ^7.0.0 || ^8.0.0"
   },
+  "files": [
+    "CHANGELOG.md",
+    "LICENSE"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/SalesforceCommerceCloud/pwa-kit.git"
@@ -17,6 +21,7 @@
     "url": "https://github.com/SalesforceCommerceCloud/pwa-kit/issues"
   },
   "scripts": {
+    "prepare": "npm run build",
     "build": "cross-env NODE_ENV=production internal-lib-build build && tsc --emitDeclarationOnly",
     "build:watch": "watch 'npm run build' src/",
     "lint": "npm run lint:js && tsc --noEmit",
@@ -31,9 +36,6 @@
   },
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
-  "files": [
-    "dist"
-  ],
   "private": true,
   "devDependencies": {
     "@types/react": "^17.0.2",
