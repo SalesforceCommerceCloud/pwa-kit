@@ -31,5 +31,5 @@ export {
     useShopperCustomerProductLists,
     useShopperCustomerPublicProductList,
     useShopperCustomerPublicProductListItem,
-    useShopperCustomerPublicProductLists,
+    useShopperCustomerPublicProductLists
 }

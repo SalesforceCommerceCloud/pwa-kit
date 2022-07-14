@@ -15,7 +15,7 @@ import {
     ShopperPromotions,
     ShopperDiscoverySearch,
     ShopperGiftCertificates,
-    ShopperSearch,
+    ShopperSearch
 } from 'commerce-sdk-isomorphic'
 
 import {ApiClients} from './types'
@@ -27,9 +27,9 @@ const config = {
         clientId: '<your-client-id>',
         organizationId: '<your-org-id>',
         shortCode: '<your-short-code>',
-        siteId: '<your-site-id>',
+        siteId: '<your-site-id>'
     },
-    throwOnBadResponse: true,
+    throwOnBadResponse: true
 }
 
 const useCommerceApi = (): ApiClients => {
@@ -45,7 +45,7 @@ const useCommerceApi = (): ApiClients => {
         shopperOrders: new ShopperOrders(config),
         shopperProducts: new ShopperProducts(config),
         shopperPromotions: new ShopperPromotions(config),
-        shopperSearch: new ShopperSearch(config),
+        shopperSearch: new ShopperSearch(config)
     }
 }
 

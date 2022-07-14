@@ -16,7 +16,7 @@ const useShopperCustomerOrders = (
     return {
         data: {limit: 1, data: [], offset: 1, total: 1},
         isLoading: true,
-        error: undefined,
+        error: undefined
     }
 }
 

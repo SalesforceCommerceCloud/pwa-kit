@@ -16,7 +16,7 @@ const useShopperOrder = (
     return {
         data: {},
         isLoading: true,
-        error: undefined,
+        error: undefined
     }
 }
 

@@ -17,7 +17,7 @@ const useShopperSearchProductSearch = (
         // @ts-ignore
         data: {},
         isLoading: true,
-        error: undefined,
+        error: undefined
     }
 }
 

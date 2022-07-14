@@ -16,7 +16,7 @@ const useShopperCustomerBaskets = (
     return {
         data: {total: 0},
         isLoading: true,
-        error: undefined,
+        error: undefined
     }
 }
 

@@ -16,7 +16,7 @@ const useShopperCustomerExternalProfile = (
     return {
         data: {customerId: '1', authenticationProviderId: '1', externalId: '1'},
         isLoading: true,
-        error: undefined,
+        error: undefined
     }
 }
 
