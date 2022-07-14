@@ -166,19 +166,23 @@ export const getPathWithLocale = (shortCode, opts = {}) => {
     return newUrl
 }
 
-export const getUrlTemplateLiteral = (configValues, appUrlConfig, siteUrl, localeUrl) => {
-    const {site: siteConfig, locale: localeConfig, showDefaults: showDefaultsConfig} = appUrlConfig
+//TODO: Clean up and merge cases
+export const getUrlTemplateLiteral = (appConfig, siteUrl, localeUrl) => {
+    const {site: siteConfig, locale: localeConfig, showDefaults: showDefaultsConfig} = appConfig.url
     const defaultSite = getDefaultSite()
     const sites = getSites()
     const site =
         sites.find((site) => {
-            return site.alias === configValues['site'] || site.id === configValues['site']
+            return site.alias === appConfig['site'] || site.id === appConfig['site']
         }) || defaultSite
     const defaultLocale = getLocaleByReference(site, site.l10n.defaultLocale)
 
     const isDefaultSite = defaultSite === siteUrl
     const isDefaultLocale = defaultLocale === localeUrl
 
+    //TODO: Clean unused variables
+    /* eslint-disable no-unused-vars */
+    /* eslint-disable no-unreachable */
     switch (true) {
         case siteConfig === 'path' && localeConfig === 'path' && showDefaultsConfig:
             return (href, site, locale) => `/${site}/${locale}${href}`
@@ -186,7 +190,8 @@ export const getUrlTemplateLiteral = (configValues, appUrlConfig, siteUrl, local
         case siteConfig === 'path' && localeConfig === 'path' && !showDefaultsConfig:
             if (!isDefaultLocale && !isDefaultSite)
                 return (href, site, locale) => `/${site}/${locale}${href}`
-            if (!isDefaultLocale && isDefaultSite) return (href, site, locale) => `/${locale}${href}`
+            if (!isDefaultLocale && isDefaultSite)
+                return (href, site, locale) => `/${locale}${href}`
             if (isDefaultLocale && !isDefaultSite) return (href, site, locale) => `/${site}${href}`
             if (isDefaultLocale && isDefaultSite) return (href, site, locale) => `/${href}`
             break
@@ -215,7 +220,8 @@ export const getUrlTemplateLiteral = (configValues, appUrlConfig, siteUrl, local
             if (!defaultLocale && !defaultSite)
                 return (href, site, locale) => `/${locale}${href}?site=${site}`
             if (!defaultLocale && defaultSite) return (href, site, locale) => `/${locale}${href}`
-            if (defaultLocale && !defaultSite) return (href, site, locale) => `/${href}?site=${site}`
+            if (defaultLocale && !defaultSite)
+                return (href, site, locale) => `/${href}?site=${site}`
             if (defaultLocale && defaultSite) return (href, site, locale) => `/${href}`
             break
         case siteConfig === 'query_param' && localeConfig === 'query_param' && showDefaultsConfig:
@@ -226,7 +232,8 @@ export const getUrlTemplateLiteral = (configValues, appUrlConfig, siteUrl, local
                 return (href, site, locale) => `/${href}?site=${site}&locale=${locale}`
             if (!defaultLocale && defaultSite)
                 return (href, site, locale) => `/${href}?locale=${locale}`
-            if (defaultLocale && !defaultSite) return (href, site, locale) => `/${href}?site=${site}`
+            if (defaultLocale && !defaultSite)
+                return (href, site, locale) => `/${href}?site=${site}`
             if (defaultLocale && defaultSite) return (href, site, locale) => `/${href}`
             break
         case siteConfig === 'query_param' && localeConfig === 'none' && showDefaultsConfig:
@@ -326,6 +333,7 @@ export const removeQueryParamsFromPath = (path, keys) => {
     return `${pathname}${paramStr && '?'}${paramStr}`
 }
 
+// TODO: Remove buildPathWithUrlConfig()
 /**
  * Rebuild the path with locale/site values with a given url
  * The position of those values will based on the url config of your current app configuration.
