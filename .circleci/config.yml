@@ -236,7 +236,7 @@ jobs:
             - "50:4e:a2:04:b3:85:45:dc:88:1d:53:23:b4:3f:22:3b"
       - run:
           name: Deploy docs to gh-pages branch
-          command: gh-pages --dist docs
+          command: gh-pages --dotfiles --message "[skip ci] Updates" --dist docs
   testNode14Windows:
     executor:
       name: win/default
