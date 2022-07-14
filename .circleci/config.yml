@@ -231,6 +231,8 @@ jobs:
           name: Install and configure dependencies
           command: |
             sudo npm install -g --silent gh-pages@2.0.1
+            git config user.email "bot-pwa-kit@salesforce.com"
+            git config user.name "bot-pwa-kit"
       - add_ssh_keys:
           fingerprints:
             - "50:4e:a2:04:b3:85:45:dc:88:1d:53:23:b4:3f:22:3b"
