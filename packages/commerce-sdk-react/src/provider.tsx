@@ -9,7 +9,7 @@ import { ApiClients } from './hooks/types'
 
 import ApiClient from './api-client'
 
-interface CommerceAPIProviderProps {
+export interface CommerceAPIProviderProps {
     children: React.ReactNode
     clientId: string
     organizationId: string
@@ -23,7 +23,7 @@ interface CommerceAPIProviderProps {
 export const CommerceAPIContext = React.createContext({} as ApiClients)
 
 // TODO: how to test? test in typescript template for now
-export const CommerceAPIProvider = (props: CommerceAPIProviderProps): ReactElement => {
+const CommerceAPIProvider = (props: CommerceAPIProviderProps): ReactElement => {
     const {children, clientId, organizationId, shortCode, siteId, proxy} = props
 
     const config = {
@@ -49,4 +49,4 @@ export const CommerceAPIProvider = (props: CommerceAPIProviderProps): ReactEleme
     return <CommerceAPIContext.Provider value={apiClient}>{children}</CommerceAPIContext.Provider>
 }
 
-
+export default CommerceAPIProvider

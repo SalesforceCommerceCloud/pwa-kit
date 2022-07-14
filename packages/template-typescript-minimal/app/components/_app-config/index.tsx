@@ -6,7 +6,7 @@
  */
 import React from 'react'
 
-import {CommerceAPIProvider} from '../../../../commerce-sdk-react/dist/provider'
+import CommerceAPIProvider from '../../../../commerce-sdk-react/dist/provider'
 
 const AppConfig = ({children}) => {
     return (
