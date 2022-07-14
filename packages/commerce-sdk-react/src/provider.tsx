@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {ReactElement, ReactNode} from 'react'
+import React, {ReactElement} from 'react'
 
 import {
     ShopperBaskets,
@@ -61,7 +61,6 @@ export interface CommerceAPIProviderProps {
     proxy: string
     locale: string
     currency: string
-    children: ReactNode
 }
 
 export const CommerceAPIContext = React.createContext({} as ApiClients)
