@@ -15,7 +15,7 @@ const useShopperBasketTaxes = (
     return {
         data: {taxes: {}},
         isLoading: true,
-        error: undefined,
+        error: undefined
     }
 }
 

@@ -17,10 +17,10 @@ const useShopperCustomerAddress = (
         data: {
             addressId: '1',
             countryCode: '1',
-            lastName: '1',
+            lastName: '1'
         },
         isLoading: true,
-        error: undefined,
+        error: undefined
     }
 }
 

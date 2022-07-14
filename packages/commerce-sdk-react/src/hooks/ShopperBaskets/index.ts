@@ -17,5 +17,5 @@ export {
     useShopperBasketPaymentMethods,
     useShopperBasketPriceBooks,
     useShopperBasketShippingMethods,
-    useShopperBasketTaxes,
+    useShopperBasketTaxes
 }
