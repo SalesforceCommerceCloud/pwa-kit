@@ -4,12 +4,12 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {ActionResponse} from '../types'
-import {ShopperCustomerActions, ShopperCustomerInstance} from './types'
+import {ActionResponse, ShopperCustomersInstance} from '../types'
+import {ShopperCustomerActions} from './types'
 
 function useShopperCustomerAction(
     action: ShopperCustomerActions.authorizeCustomer
-): ActionResponse<ShopperCustomerInstance['authorizeCustomer']>
+): ActionResponse<ShopperCustomersInstance['authorizeCustomer']>
 function useShopperCustomerAction(
     action: ShopperCustomerActions
 ): ActionResponse<() => Promise<any>> {

@@ -1,14 +1,16 @@
 /*
- * Copyright (c) 2021, salesforce.com, inc.
+ * Copyright (c) 2022, Salesforce, Inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
 /* eslint-env jest */
-/* eslint max-nested-callbacks:0 */
 
-const sinon = require('sinon')
+// TODO: The methods tested in this file have been split from one file into
+// multiple, so the tests should be split into multiple files as well.
+
+import sinon from 'sinon'
 
 import {
     AGENT_OPTIONS_TO_COPY,
@@ -973,8 +975,11 @@ describe('updateGlobalAgentOptions', () => {
 })
 
 describe('PerformanceTimer tests', () => {
-    const timeFailureTest = test('time() function', () => {
-        const timer = new PerformanceTimer(timeFailureTest.description)
+    let timer
+    beforeEach(() => (timer = new PerformanceTimer('')))
+    afterEach(() => timer?._observer.disconnect())
+
+    test('time() function', () => {
         const func = sinon.stub()
         timer.time('test1', func, 1)
         expect(func.callCount).toBe(1)
@@ -984,33 +989,23 @@ describe('PerformanceTimer tests', () => {
         func.throws('Error', 'intentional error')
         expect(() => timer.time('test2', func, 1)).toThrow('intentional error')
         expect(func.callCount).toBe(1)
-        timer._observer.disconnect()
     })
 
-    const timerTest = test('start() and end()', () => {
-        const timer = new PerformanceTimer(timerTest.description)
-
-        return new Promise((resolve) => {
-            timer.start('test3')
-            setTimeout(resolve, 10)
-        })
-            .then(() => timer.end('test3'))
-            .then(() => {
-                const summary = timer.summary
-                expect(summary.length).toBe(1)
-                const entry = summary[0]
-                expect(entry.name).toEqual('test3')
-                expect(entry.duration).toBeGreaterThanOrEqual(5)
-                expect(entry.duration).toBeLessThanOrEqual(30)
-                timer._observer.disconnect()
-            })
+    test('start() and end()', async () => {
+        timer.start('test3')
+        await new Promise((resolve) => setTimeout(resolve, 10))
+        timer.end('test3')
+        const summary = timer.summary
+        expect(summary.length).toBe(1)
+        const entry = summary[0]
+        expect(entry.name).toEqual('test3')
+        expect(entry.duration).toBeGreaterThanOrEqual(5)
+        expect(entry.duration).toBeLessThanOrEqual(30)
     })
 
-    const idTest = test('operationId tests', () => {
-        const timer = new PerformanceTimer(idTest.description)
+    test('accessing operationId auto-increments the counter', () => {
         expect(timer.operationId).toBe(1)
         expect(timer.operationId).toBe(2)
-        timer._observer.disconnect()
     })
 })
 

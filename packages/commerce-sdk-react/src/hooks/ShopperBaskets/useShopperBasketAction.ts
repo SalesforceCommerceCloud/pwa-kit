@@ -4,87 +4,87 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {ActionResponse} from '../types'
-import {ShopperBasketActions, ShopperBasketInstance} from './types'
+import {ActionResponse, ShopperBasketsInstance} from '../types'
+import {ShopperBasketActions} from './types'
 
 function useShopperBasketAction(
     action: ShopperBasketActions.addCouponToBasket
-): ActionResponse<ShopperBasketInstance['addCouponToBasket']>
+): ActionResponse<ShopperBasketsInstance['addCouponToBasket']>
 function useShopperBasketAction(
     action: ShopperBasketActions.addGiftCertificateItemToBasket
-): ActionResponse<ShopperBasketInstance['addGiftCertificateItemToBasket']>
+): ActionResponse<ShopperBasketsInstance['addGiftCertificateItemToBasket']>
 function useShopperBasketAction(
     action: ShopperBasketActions.addItemToBasket
-): ActionResponse<ShopperBasketInstance['addItemToBasket']>
+): ActionResponse<ShopperBasketsInstance['addItemToBasket']>
 function useShopperBasketAction(
     action: ShopperBasketActions.addPaymentInstrumentToBasket
-): ActionResponse<ShopperBasketInstance['addPaymentInstrumentToBasket']>
+): ActionResponse<ShopperBasketsInstance['addPaymentInstrumentToBasket']>
 function useShopperBasketAction(
     action: ShopperBasketActions.addPriceBooksToBasket
-): ActionResponse<ShopperBasketInstance['addPriceBooksToBasket']>
+): ActionResponse<ShopperBasketsInstance['addPriceBooksToBasket']>
 function useShopperBasketAction(
     action: ShopperBasketActions.addTaxesForBasket
-): ActionResponse<ShopperBasketInstance['addTaxesForBasket']>
+): ActionResponse<ShopperBasketsInstance['addTaxesForBasket']>
 function useShopperBasketAction(
     action: ShopperBasketActions.addTaxesForBasketItem
-): ActionResponse<ShopperBasketInstance['addTaxesForBasketItem']>
+): ActionResponse<ShopperBasketsInstance['addTaxesForBasketItem']>
 function useShopperBasketAction(
     action: ShopperBasketActions.createBasket
-): ActionResponse<ShopperBasketInstance['createBasket']>
+): ActionResponse<ShopperBasketsInstance['createBasket']>
 function useShopperBasketAction(
     action: ShopperBasketActions.createShipmentForBasket
-): ActionResponse<ShopperBasketInstance['createShipmentForBasket']>
+): ActionResponse<ShopperBasketsInstance['createShipmentForBasket']>
 function useShopperBasketAction(
     action: ShopperBasketActions.deleteBasket
-): ActionResponse<ShopperBasketInstance['deleteBasket']>
+): ActionResponse<ShopperBasketsInstance['deleteBasket']>
 function useShopperBasketAction(
     action: ShopperBasketActions.mergeBasket
-): ActionResponse<ShopperBasketInstance['mergeBasket']>
+): ActionResponse<ShopperBasketsInstance['mergeBasket']>
 function useShopperBasketAction(
     action: ShopperBasketActions.removeCouponFromBasket
-): ActionResponse<ShopperBasketInstance['removeCouponFromBasket']>
+): ActionResponse<ShopperBasketsInstance['removeCouponFromBasket']>
 function useShopperBasketAction(
     action: ShopperBasketActions.removeGiftCertificateItemFromBasket
-): ActionResponse<ShopperBasketInstance['removeGiftCertificateItemFromBasket']>
+): ActionResponse<ShopperBasketsInstance['removeGiftCertificateItemFromBasket']>
 function useShopperBasketAction(
     action: ShopperBasketActions.removeItemFromBasket
-): ActionResponse<ShopperBasketInstance['removeItemFromBasket']>
+): ActionResponse<ShopperBasketsInstance['removeItemFromBasket']>
 function useShopperBasketAction(
     action: ShopperBasketActions.removePaymentInstrumentFromBasket
-): ActionResponse<ShopperBasketInstance['removePaymentInstrumentFromBasket']>
+): ActionResponse<ShopperBasketsInstance['removePaymentInstrumentFromBasket']>
 function useShopperBasketAction(
     action: ShopperBasketActions.removeShipmentFromBasket
-): ActionResponse<ShopperBasketInstance['removeShipmentFromBasket']>
+): ActionResponse<ShopperBasketsInstance['removeShipmentFromBasket']>
 function useShopperBasketAction(
     action: ShopperBasketActions.transferBasket
-): ActionResponse<ShopperBasketInstance['transferBasket']>
+): ActionResponse<ShopperBasketsInstance['transferBasket']>
 function useShopperBasketAction(
     action: ShopperBasketActions.updateBasket
-): ActionResponse<ShopperBasketInstance['updateBasket']>
+): ActionResponse<ShopperBasketsInstance['updateBasket']>
 function useShopperBasketAction(
     action: ShopperBasketActions.updateBillingAddressForBasket
-): ActionResponse<ShopperBasketInstance['updateBillingAddressForBasket']>
+): ActionResponse<ShopperBasketsInstance['updateBillingAddressForBasket']>
 function useShopperBasketAction(
     action: ShopperBasketActions.updateCustomerForBasket
-): ActionResponse<ShopperBasketInstance['updateCustomerForBasket']>
+): ActionResponse<ShopperBasketsInstance['updateCustomerForBasket']>
 function useShopperBasketAction(
     action: ShopperBasketActions.updateGiftCertificateItemInBasket
-): ActionResponse<ShopperBasketInstance['updateGiftCertificateItemInBasket']>
+): ActionResponse<ShopperBasketsInstance['updateGiftCertificateItemInBasket']>
 function useShopperBasketAction(
     action: ShopperBasketActions.updateItemInBasket
-): ActionResponse<ShopperBasketInstance['updateItemInBasket']>
+): ActionResponse<ShopperBasketsInstance['updateItemInBasket']>
 function useShopperBasketAction(
     action: ShopperBasketActions.updatePaymentInstrumentInBasket
-): ActionResponse<ShopperBasketInstance['updatePaymentInstrumentInBasket']>
+): ActionResponse<ShopperBasketsInstance['updatePaymentInstrumentInBasket']>
 function useShopperBasketAction(
     action: ShopperBasketActions.updateShipmentForBasket
-): ActionResponse<ShopperBasketInstance['updateShipmentForBasket']>
+): ActionResponse<ShopperBasketsInstance['updateShipmentForBasket']>
 function useShopperBasketAction(
     action: ShopperBasketActions.updateShippingAddressForShipment
-): ActionResponse<ShopperBasketInstance['updateShippingAddressForShipment']>
+): ActionResponse<ShopperBasketsInstance['updateShippingAddressForShipment']>
 function useShopperBasketAction(
     action: ShopperBasketActions.updateShippingMethodForShipment
-): ActionResponse<ShopperBasketInstance['updateShippingMethodForShipment']>
+): ActionResponse<ShopperBasketsInstance['updateShippingMethodForShipment']>
 function useShopperBasketAction(action: ShopperBasketActions): ActionResponse<() => Promise<any>> {
     // @ts-ignore TODO: how to declare the type for dynamic key name [action]?
     return {

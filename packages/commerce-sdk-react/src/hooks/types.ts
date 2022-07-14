@@ -4,6 +4,16 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
+import {ShopperBaskets, ShopperBasketsTypes} from 'commerce-sdk-isomorphic'
+import {ShopperContexts, ShopperContextsTypes} from 'commerce-sdk-isomorphic'
+import {ShopperCustomers, ShopperCustomersTypes} from 'commerce-sdk-isomorphic'
+import {ShopperDiscoverySearch, ShopperDiscoverySearchTypes} from 'commerce-sdk-isomorphic'
+import {ShopperGiftCertificates, ShopperGiftCertificatesTypes} from 'commerce-sdk-isomorphic'
+import {ShopperLogin, ShopperLoginTypes} from 'commerce-sdk-isomorphic'
+import {ShopperOrders, ShopperOrdersTypes} from 'commerce-sdk-isomorphic'
+import {ShopperProducts, ShopperProductsTypes} from 'commerce-sdk-isomorphic'
+import {ShopperPromotions, ShopperPromotionsTypes} from 'commerce-sdk-isomorphic'
+import {ShopperSearch, ShopperSearchTypes} from 'commerce-sdk-isomorphic'
 
 export * from './ShopperBaskets/types'
 export * from './ShopperCustomers/types'
@@ -11,6 +21,50 @@ export * from './ShopperOrders/types'
 export * from './ShopperProducts/types'
 export * from './ShopperPromotions/types'
 export * from './ShopperSearch/types'
+
+export type ShopperBasketsInstance = ShopperBaskets<
+    ShopperBasketsTypes.ShopperBasketsParameters & Record<string, unknown>
+>
+export type ShopperContextsInstance = ShopperContexts<
+    ShopperContextsTypes.ShopperContextsParameters & Record<string, unknown>
+>
+export type ShopperCustomersInstance = ShopperCustomers<
+    ShopperCustomersTypes.ShopperCustomersParameters & Record<string, unknown>
+>
+export type ShopperDiscoverySearchInstance = ShopperDiscoverySearch<
+    ShopperDiscoverySearchTypes.ShopperDiscoverySearchParameters & Record<string, unknown>
+>
+export type ShopperGiftCertificatesInstance = ShopperGiftCertificates<
+    ShopperGiftCertificatesTypes.ShopperGiftCertificatesParameters & Record<string, unknown>
+>
+export type ShopperLoginInstance = ShopperLogin<
+    ShopperLoginTypes.ShopperLoginParameters & Record<string, unknown>
+>
+export type ShopperOrdersInstance = ShopperOrders<
+    ShopperOrdersTypes.ShopperOrdersParameters & Record<string, unknown>
+>
+export type ShopperProductsInstance = ShopperProducts<
+    ShopperProductsTypes.ShopperProductsParameters & Record<string, unknown>
+>
+export type ShopperPromotionsInstance = ShopperPromotions<
+    ShopperPromotionsTypes.ShopperPromotionsParameters & Record<string, unknown>
+>
+export type ShopperSearchInstance = ShopperSearch<
+    ShopperSearchTypes.ShopperSearchParameters & Record<string, unknown>
+>
+
+export interface ApiClients {
+    shopperBaskets: ShopperBasketsInstance
+    shopperContexts: ShopperContextsInstance
+    shopperCustomers: ShopperCustomersInstance
+    shopperDiscoverySearch: ShopperDiscoverySearchInstance
+    shopperGiftCertificates: ShopperGiftCertificatesInstance
+    shopperLogin: ShopperLoginInstance
+    shopperOrders: ShopperOrdersInstance
+    shopperProducts: ShopperProductsInstance
+    shopperPromotions: ShopperPromotionsInstance
+    shopperSearch: ShopperSearchInstance
+}
 
 export interface CommonHookResponse {
     error: Error | undefined

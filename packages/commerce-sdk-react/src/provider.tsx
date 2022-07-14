@@ -5,6 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React, {ReactElement} from 'react'
+import { ApiClients } from './hooks/types'
 
 import {
     ShopperBaskets,
@@ -37,20 +38,6 @@ import {
 } from 'commerce-sdk-isomorphic'
 
 import ApiClient from './api-client'
-
-export interface ApiClients {
-    shopperBaskets: ShopperBaskets<ShopperBasketsParameters>
-    shopperContexts: ShopperContexts<ShopperContextsParameters>
-    shopperCustomers: ShopperCustomers<ShopperCustomersParameters>
-    shopperDiscoverySearch: ShopperDiscoverySearch<ShopperDiscoverySearchParameters>
-    shopperGiftCertificates: ShopperGiftCertificates<ShopperGiftCertificatesParameters>
-    shopperLogin: ShopperLogin<ShopperLoginParameters>
-    shopperOrders: ShopperOrders<ShopperOrdersParameters>
-    shopperProducts: ShopperProducts<ShopperProductsParameters>
-    shopperPromotions: ShopperPromotions<ShopperPromotionsParameters>
-    shopperSearch: ShopperSearch<ShopperSearchParameters>
-}
-
 
 export interface CommerceAPIProviderProps {
     children: React.ReactNode

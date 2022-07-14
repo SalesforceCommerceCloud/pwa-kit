@@ -6,7 +6,8 @@
  */
 
 import React from 'react'
-import {CommerceAPIContext, ApiClients} from '../provider'
+import {CommerceAPIContext} from '../provider'
+import {ApiClients} from './types'
 
 const useCommerceApi = (): ApiClients => {
     return React.useContext(CommerceAPIContext)
