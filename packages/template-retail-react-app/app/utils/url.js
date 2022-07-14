@@ -166,12 +166,105 @@ export const getPathWithLocale = (shortCode, opts = {}) => {
     return newUrl
 }
 
-export const getPathWithUrlConfig = (href, locale, site, appConfigUrl) => {
+export const getUrlTemplateLiteral = (configValues, appUrlConfig, siteUrl, localeUrl) => {
+    const {site: siteConfig, locale: localeConfig, showDefaults: showDefaultsConfig} = appUrlConfig
+    const defaultSite = getDefaultSite()
+    const sites = getSites()
+    const site =
+        sites.find((site) => {
+            return site.alias === configValues['site'] || site.id === configValues['site']
+        }) || defaultSite
+    const defaultLocale = getLocaleByReference(site, site.l10n.defaultLocale)
 
-    //TODO
-    console.log('getPathWithUrlConfig appConfigUrl:', appConfigUrl)
+    const isDefaultSite = defaultSite === siteUrl
+    const isDefaultLocale = defaultLocale === localeUrl
 
-    return `${site}/${locale}${href}`
+    switch (true) {
+        case siteConfig === 'path' && localeConfig === 'path' && showDefaultsConfig:
+            return (href, site, locale) => `${site}/${locale}${href}`
+            break
+        case siteConfig === 'path' && localeConfig === 'path' && !showDefaultsConfig:
+            if (!isDefaultLocale && !isDefaultSite)
+                return (href, site, locale) => `${site}/${locale}${href}`
+            if (!isDefaultLocale && isDefaultSite) return (href, site, locale) => `${locale}${href}`
+            if (isDefaultLocale && !isDefaultSite) return (href, site, locale) => `${site}${href}`
+            if (isDefaultLocale && isDefaultSite) return (href, site, locale) => `${href}`
+            break
+        case siteConfig === 'path' && localeConfig === 'query_param' && showDefaultsConfig:
+            return (href, site, locale) => `${site}${href}?locale=${locale}`
+            break
+        case siteConfig === 'path' && localeConfig === 'query_param' && !showDefaultsConfig:
+            if (!isDefaultLocale && !isDefaultSite)
+                return (href, site, locale) => `${site}${href}?locale=${locale}`
+            if (!isDefaultLocale && isDefaultSite)
+                return (href, site, locale) => `${href}?locale=${locale}`
+            if (isDefaultLocale && !isDefaultSite) return (href, site, locale) => `${site}${href}`
+            if (isDefaultLocale && isDefaultSite) return (href, site, locale) => `${href}`
+            break
+        case siteConfig === 'path' && localeConfig === 'none' && showDefaultsConfig:
+            return (href, site, locale) => `${site}${href}`
+            break
+        case siteConfig === 'path' && localeConfig === 'none' && !showDefaultsConfig:
+            if (!isDefaultSite) return (href, site, locale) => `${site}${href}`
+            if (isDefaultSite) return (href, site, locale) => `${href}`
+            break
+        case siteConfig === 'query_param' && localeConfig === 'path' && showDefaultsConfig:
+            return (href, site, locale) => `${locale}${href}?site=${site}`
+            break
+        case siteConfig === 'query_param' && localeConfig === 'path' && !showDefaultsConfig:
+            if (!defaultLocale && !defaultSite)
+                return (href, site, locale) => `${locale}${href}?site=${site}`
+            if (!defaultLocale && defaultSite) return (href, site, locale) => `${locale}${href}`
+            if (defaultLocale && !defaultSite) return (href, site, locale) => `${href}?site=${site}`
+            if (defaultLocale && defaultSite) return (href, site, locale) => `${href}`
+            break
+        case siteConfig === 'query_param' && localeConfig === 'query_param' && showDefaultsConfig:
+            return (href, site, locale) => `${href}?site=${site}&locale=${locale}`
+            break
+        case siteConfig === 'query_param' && localeConfig === 'query_param' && !showDefaultsConfig:
+            if (!defaultLocale && !defaultSite)
+                return (href, site, locale) => `${href}?site=${site}&locale=${locale}`
+            if (!defaultLocale && defaultSite)
+                return (href, site, locale) => `${href}?locale=${locale}`
+            if (defaultLocale && !defaultSite) return (href, site, locale) => `${href}?site=${site}`
+            if (defaultLocale && defaultSite) return (href, site, locale) => `${href}`
+            break
+        case siteConfig === 'query_param' && localeConfig === 'none' && showDefaultsConfig:
+            return (href, site, locale) => `${href}?site=${site}`
+            break
+        case siteConfig === 'query_param' && localeConfig === 'none' && !showDefaultsConfig:
+            if (!defaultSite) return (href, site, locale) => `${href}?site=${site}`
+            if (defaultSite) return (href, site, locale) => `${href}`
+            break
+        case siteConfig === 'none' && localeConfig === 'path' && showDefaultsConfig:
+            return (href, site, locale) => `${locale}${href}`
+            break
+        case siteConfig === 'none' && localeConfig === 'path' && !showDefaultsConfig:
+            if (!defaultLocale && !defaultSite) return (href, site, locale) => `${locale}${href}`
+            if (!defaultLocale && defaultSite) return (href, site, locale) => `${locale}${href}`
+            if (defaultLocale && !defaultSite) return (href, site, locale) => `${href}`
+            if (defaultLocale && defaultSite) return (href, site, locale) => `${href}`
+            break
+        case siteConfig === 'none' && localeConfig === 'query_param' && showDefaultsConfig:
+            return (href, site, locale) => `${href}?locale=${locale}`
+            break
+        case siteConfig === 'none' && localeConfig === 'query_param' && !showDefaultsConfig:
+            if (!defaultLocale && !defaultSite)
+                return (href, site, locale) => `${href}?locale=${locale}`
+            if (!defaultLocale && defaultSite)
+                return (href, site, locale) => `${href}?locale=${locale}`
+            if (defaultLocale && !defaultSite) return (href, site, locale) => `${href}`
+            if (defaultLocale && defaultSite) return (href, site, locale) => `${href}`
+            break
+        case siteConfig === 'none' && localeConfig === 'none' && showDefaultsConfig:
+            return (href, site, locale) => `${href}`
+            break
+        case siteConfig === 'none' && localeConfig === 'none' && !showDefaultsConfig:
+            return (href, site, locale) => `${href}`
+            break
+        default:
+            return (href, site, locale) => `${href}`
+    }
 }
 
 /**

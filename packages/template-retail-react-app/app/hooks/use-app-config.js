@@ -12,4 +12,4 @@ import {AppConfigContext} from '../contexts'
  * Custom React hook to get the current site
  * @returns {site: Object, setSite: function}
  */
-export const useAppConfigUrl = () => useContext(AppConfigContext)
+export const useAppConfig = () => useContext(AppConfigContext)

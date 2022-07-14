@@ -42,13 +42,14 @@ import {IntlProvider} from 'react-intl'
 
 // Others
 import {watchOnlineStatus, flatten} from '../../utils/utils'
-import {homeUrlBuilder, getPathWithLocale, buildPathWithUrlConfig} from '../../utils/url'
+import {homeUrlBuilder} from '../../utils/url'
 import {getTargetLocale, fetchTranslations} from '../../utils/locale'
 import {DEFAULT_SITE_TITLE, HOME_HREF, THEME_COLOR} from '../../constants'
 import {resolveLocaleFromUrl} from '../../utils/utils'
 
 import Seo from '../seo'
 import {resolveSiteFromUrl} from '../../utils/site-utils'
+import {useAppConfig} from '../../hooks/use-app-config'
 
 const DEFAULT_NAV_DEPTH = 3
 const DEFAULT_ROOT_CATEGORY = 'root'
@@ -62,6 +63,7 @@ const App = (props) => {
     const location = useLocation()
     const authModal = useAuthModal()
     const customer = useCustomer()
+    const appConfig = useAppConfig()
 
     const {pathname, search} = useLocation()
     const site = useMemo(() => {
@@ -71,16 +73,8 @@ const App = (props) => {
         return resolveLocaleFromUrl(`${pathname}${search}`)
     }, [pathname, search, site])
 
-    // console.log('_app locale:', locale)
-    // console.log('_app site:', site)
-
     const [isOnline, setIsOnline] = useState(true)
     const styles = useStyleConfig('App')
-
-    const configValues = {
-        locale: locale.alias || locale.id,
-        site: site.alias || site.id
-    }
 
     const {isOpen, onOpen, onClose} = useDisclosure()
 
@@ -130,7 +124,11 @@ const App = (props) => {
     }
 
     const onCartClick = () => {
-        const path = buildPathWithUrlConfig('/cart', configValues)
+        const path = appConfig.urlTemplateLiteral(
+            '/cart',
+            site.alias || site.id,
+            locale.alias || locale.id
+        )
         history.push(path)
 
         // Close the drawer.
@@ -140,7 +138,11 @@ const App = (props) => {
     const onAccountClick = () => {
         // Link to account page for registered customer, open auth modal otherwise
         if (customer.isRegistered) {
-            const path = buildPathWithUrlConfig('/account', configValues)
+            const path = appConfig.urlTemplateLiteral(
+                '/account',
+                site.alias || site.id,
+                locale.alias || locale.id
+            )
             history.push(path)
         } else {
             // if they already are at the login page, do not show login modal
@@ -150,7 +152,11 @@ const App = (props) => {
     }
 
     const onWishlistClick = () => {
-        const path = buildPathWithUrlConfig('/account/wishlist', configValues)
+        const path = appConfig.urlTemplateLiteral(
+            '/account/wishlist',
+            site.alias || site.id,
+            locale.alias || locale.id
+        )
         history.push(path)
     }
 
@@ -199,9 +205,11 @@ const App = (props) => {
                                         <link
                                             rel="alternate"
                                             hrefLang={locale.id.toLowerCase()}
-                                            href={`${appOrigin}${getPathWithLocale(locale.id, {
-                                                location
-                                            })}`}
+                                            href={`${appOrigin}${appConfig.urlTemplateLiteral(
+                                                location.pathname,
+                                                site.alias || site.id,
+                                                locale.id
+                                            )}`}
                                             key={locale.id}
                                         />
                                     ))}
@@ -209,11 +217,10 @@ const App = (props) => {
                                     <link
                                         rel="alternate"
                                         hrefLang={site.l10n.defaultLocale.slice(0, 2)}
-                                        href={`${appOrigin}${getPathWithLocale(
-                                            site.l10n.defaultLocale,
-                                            {
-                                                location
-                                            }
+                                        href={`${appOrigin}${appConfig.urlTemplateLiteral(
+                                            location.pathname,
+                                            site.alias || site.id,
+                                            site.l10n.defaultLocale
                                         )}`}
                                     />
                                     {/* A wider fallback for user locales that the app does not support */}

@@ -71,7 +71,25 @@ SiteProvider.propTypes = {
 }
 
 export const AppConfigContext = React.createContext()
-export const AppConfigProvider = AppConfigContext.Provider
+export const AppConfigProvider = ({
+    appConfig: initialAppConfig = {},
+    urlTemplateLiteral,
+    children
+}) => {
+    const [appConfig, setAppConfig] = useState(initialAppConfig)
+
+    return (
+        <AppConfigContext.Provider value={{appConfig, setAppConfig, urlTemplateLiteral}}>
+            {children}
+        </AppConfigContext.Provider>
+    )
+}
+
+AppConfigProvider.propTypes = {
+    children: PropTypes.node.isRequired,
+    appConfig: PropTypes.object,
+    urlTemplateLiteral: PropTypes.func
+}
 
 /**
  * This is the global state for currency, we use this throughout the site. For example, on
