@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React, {ReactElement} from 'react'
-import { ApiClients } from './hooks/types'
+import { ApiClients, ShopperContextsInstance, ShopperDiscoverySearchInstance } from './hooks/types'
 
 import CommerceAPI from './api-client'
 
@@ -41,12 +41,23 @@ const CommerceAPIProvider = (props: CommerceAPIProviderProps): ReactElement => {
     // TODO: auth logic should use the helpers from commerce-sdk-isomorphic ?
     const commerceAPI = new CommerceAPI(config)
 
-    console.log('--- api client', commerceAPI)
+    const apiClients: ApiClients = {
+        shopperBaskets: commerceAPI.shopperBaskets,
+        shopperContexts: {} as ShopperContextsInstance,
+        shopperCustomers: commerceAPI.shopperCustomers,
+        shopperDiscoverySearch: {} as ShopperDiscoverySearchInstance,
+        shopperGiftCertificates: commerceAPI.shopperGiftCertificates,
+        shopperLogin: commerceAPI.shopperLogin,
+        shopperOrders: commerceAPI.shopperOrders,
+        shopperProducts: commerceAPI.shopperProducts,
+        shopperPromotions: commerceAPI.shopperPromotions,
+        shopperSearch: commerceAPI.shopperSearch
+    }
 
     // TODO: use Context from useServerEffect
     // See Kevin's PR: https://github.com/SalesforceCommerceCloud/pwa-kit/pull/654/files#r914097886
     // See Ben's PR: https://github.com/SalesforceCommerceCloud/pwa-kit/pull/642
-    return <CommerceAPIContext.Provider value={commerceAPI}>{children}</CommerceAPIContext.Provider>
+    return <CommerceAPIContext.Provider value={apiClients}>{children}</CommerceAPIContext.Provider>
 }
 
 export default CommerceAPIProvider

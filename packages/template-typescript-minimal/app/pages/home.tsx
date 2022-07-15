@@ -86,17 +86,11 @@ const Home = ({value}: Props) => {
     const api = useCommerceAPI()
 
     useEffect(async () => {
-        // Before token is cached, initially its value will be null
-        console.log('--- token', api.auth.authToken)
-
         const result = await api.shopperSearch.productSearch({
             parameters: {
                 refine: [`cgid=newarrivals`, 'htype=master']
             }
         })
-
-        // After await-ing the above function call, the token should be available now
-        console.log('--- token', api.auth.authToken)
 
         console.log('--- calling productSearch endpoint', result)
     }, [])
