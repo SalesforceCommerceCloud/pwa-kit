@@ -22,6 +22,12 @@ export interface CommerceAPIProviderProps {
 
 export const CommerceAPIContext = React.createContext({} as ApiClients)
 
+/**
+ * For sharing whatever auth object that will manage the tokens
+ * @internal
+ */
+export const CommerceAPIAuthContext = React.createContext({})
+
 // TODO: how to test? test in typescript template for now
 const CommerceAPIProvider = (props: CommerceAPIProviderProps): ReactElement => {
     const {children, clientId, organizationId, shortCode, siteId, proxy} = props
@@ -57,7 +63,11 @@ const CommerceAPIProvider = (props: CommerceAPIProviderProps): ReactElement => {
     // TODO: use Context from useServerEffect
     // See Kevin's PR: https://github.com/SalesforceCommerceCloud/pwa-kit/pull/654/files#r914097886
     // See Ben's PR: https://github.com/SalesforceCommerceCloud/pwa-kit/pull/642
-    return <CommerceAPIContext.Provider value={apiClients}>{children}</CommerceAPIContext.Provider>
+    return (
+        <CommerceAPIContext.Provider value={apiClients}>
+            <CommerceAPIAuthContext.Provider value={commerceAPI.auth}>{children}</CommerceAPIAuthContext.Provider>
+        </CommerceAPIContext.Provider>
+    )
 }
 
 export default CommerceAPIProvider
