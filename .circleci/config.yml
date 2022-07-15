@@ -218,6 +218,27 @@ commands:
           destination: local-npm-repo/verdaccio.log
 
 jobs:
+  docs_build_and_deploy:
+    docker:
+      - image: circleci/node:14-stretch-browsers
+    steps:
+      - add_ssh_keys:
+          fingerprints:
+            - "5b:0d:b0:de:e3:85:fa:c6:58:80:22:a6:0a:d2:73:3d"
+      - checkout
+      - setup
+      - run:
+          name: "Build docs"
+          command: "npm run build:docs"
+      - run:
+          name: Install and configure dependencies
+          command: |
+            sudo npm install -g --silent gh-pages@2.0.1
+            git config user.email "bot-pwa-kit@salesforce.com"
+            git config user.name "bot-pwa-kit"
+      - run:
+          name: Deploy docs to gh-pages branch
+          command: gh-pages --dotfiles --message "[skip ci] Updates" --dist docs
   testNode14Windows:
     executor:
       name: win/default
@@ -418,6 +439,7 @@ workflows:
           matrix:
             parameters:
               template: [express-minimal-test-project, typescript-minimal-test-project]
+      - docs_build_and_deploy
   nightly-build:
     triggers:
       - schedule:
