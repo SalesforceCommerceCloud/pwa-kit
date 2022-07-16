@@ -230,7 +230,7 @@ const App = (props) => {
                                         </HideOnMobile>
                                     </Header>
                                 ) : (
-                                    <CheckoutHeader />
+                                    <CheckoutHeader onLogoClick={onLogoClick} />
                                 )}
                             </Box>
 
