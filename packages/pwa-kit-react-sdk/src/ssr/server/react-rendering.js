@@ -20,7 +20,7 @@ import serialize from 'serialize-javascript'
 import {getAssetUrl} from '../universal/utils'
 import DeviceContext from '../universal/device-context'
 import {ExpressProvider} from '../universal/hooks/use-express'
-import {ServerEffectProvider, resolveAllContext} from '../universal/hooks/use-server-effect' // I Need to clean up the exports of this module.
+import {ServerEffectProvider, resolveAllEffects} from '../universal/hooks/use-server-effect' // I Need to clean up the exports of this module.
 
 import Document from '../universal/components/_document'
 import App from '../universal/components/_app'
@@ -75,7 +75,7 @@ const logAndFormatError = (err) => {
     }
 }
 
-const initAppState = async ({App, component, match, route, routes, req, res, location}) => {
+const initAppState = async ({App, config, component, match, route, routes, req, res, location}) => {
     if (component === Throw404) {
         // Don't init if there was no match
         return {
@@ -85,6 +85,7 @@ const initAppState = async ({App, component, match, route, routes, req, res, loc
     }
 
     const {params} = match
+    const enableServerEffect = !!config.useServerEffect
 
     const components = [App, route.component]
     const promises = components.map((c) =>
@@ -99,13 +100,12 @@ const initAppState = async ({App, component, match, route, routes, req, res, loc
     )
     let returnVal = {}
 
-    // TODO: This is where we check the config to see if things are set.
-    if (true) {
+    if (enableServerEffect) {
         // Render the application with the sole intention to capture any uses of `useServerEffect`.
         await renderApp({App, component, match, route, routes, req, res, location, appState: {}})
         
         // Push the async request onto the promises array.
-        promises.push(resolveAllContext())
+        promises.push(resolveAllEffects())
     }
 
     try {

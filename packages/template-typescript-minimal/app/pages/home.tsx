@@ -6,15 +6,11 @@
  */
 import React, {useEffect, useState} from 'react'
 
-import {useProductSearch, useProducts} from '../scapi-hooks'
+import {useProducts} from '../scapi-hooks'
 import {useServerEffect} from 'pwa-kit-react-sdk/ssr/universal/hooks'
 
 import HelloTS from '../components/hello-typescript'
 import HelloJS from '../components/hello-javascript'
-
-interface Props {
-    value: number
-}
 
 const style = `
 body {
@@ -86,13 +82,7 @@ h1 {
 const Home = () => {
     const [counter, setCounter] = useState(0)
 
-    const {productSearchResult} = useProductSearch({q: 'blue'}, [])
-    // console.log('productSearchResult: ', productSearchResult)
-    // const {products} = useProducts([1,2,3], [])
-    const {products} = useProducts((data) => {
-        const searchResult = data['1-1']
-        return searchResult.hits.map((hit) => (hit.productId))
-    }, [])
+    const {products} = useProducts([1, 2, 3], [])
 
     useEffect(() => {
         const interval = setInterval(() => {
@@ -146,13 +136,13 @@ const Home = () => {
                         <b>This page is written in Typescript</b>
                         <br />
                         <br />
-                        Server-side useServerEffect works if this is a valid expression: &quot;5 times 7 is{' '}
-                        {value1 ? value1 : ''}
+                        Server-side useServerEffect works if this is a valid expression: &quot;5
+                        times 7 is {value1 ? value1 : ''}
                         &quot;
                         <br />
                         <br />
-                        Server-side useServerEffect works if this is a valid expression: &quot;15 times 70 is{' '}
-                        {value2 ? value2 : ''}
+                        Server-side useServerEffect works if this is a valid expression: &quot;15
+                        times 70 is {value2 ? value2 : ''}
                         &quot;
                         <br />
                         <br />

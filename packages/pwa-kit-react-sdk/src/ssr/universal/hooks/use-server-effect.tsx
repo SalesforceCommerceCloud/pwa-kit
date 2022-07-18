@@ -12,8 +12,49 @@ import useExpress from './use-express'
 
 // Globals
 export const DEFAULT_CONTEXT_KEY = '__SERVER_EFFECTS__'
-const allContexts = []
+const contexts = []
 const isServer = typeof window === 'undefined'
+
+// Type Definitions
+type ServerEffectState = {
+    data: object; // The value returned from the `useServerEffect` didUpdate function
+    isLoading: boolean; // Is didUpdate is resolved.
+    error: Error; // The error object if an error was thrown during execution of the didUpdate call
+}
+type ServerEffectArgs = {
+    location: Location;
+    params: object;
+    extraGetPropsArgs: object;
+    req: boolean;
+    res: Error;
+}
+type DidUpdateFn = (serverEffectArgs: ServerEffectArgs) => Promise<any>
+type EffectsResolver = () => Promise<{[x: string]: {}}>
+type Provider = ({ children, value }: { children: any; value: any; }) => JSX.Element
+type ServerEffect = (initialValue: Object, didUpdate: DidUpdateFn, source: any[]) => ServerEffectState
+type ServerEffectContext = {
+    /**
+    * ServerEffectProvider: The React provider you must wrap you application with in order to use
+    * the accompanied hook.
+    */
+    ServerEffectProvider: Provider; // Can we get more specifc here? provider type?
+    /**
+    * useServerEffect: A useEffect style hook that can be used client and server side to run async
+    * actions.
+    */
+    useServerEffect: ServerEffect;
+    /**
+    * resolveEffects: For use on the server side only, this async function will can be called to invoke
+    * all the recorded async "didUpdate" functions.
+    */
+    resolveEffects: EffectsResolver;
+}
+type ServerEffectContextValue = {
+    name: string;
+    data: string;
+    requests: DidUpdateFn[];
+    resolved: boolean;
+}
 
 /**
  * This function is creating `useServerEffect`, it's only going to be used
@@ -38,12 +79,11 @@ const createServerEffect = (context) => {
             data: contextData,
             requests: contextRequests,
             resolved: contextResolved
-        } = useContext(context)
+        }: ServerEffectContextValue = useContext(context)
         // TODO: Think about a better name for this hook if we are going to slip in the 
         // extra props with the request and response. Otherwise maybe create another to 
         // home the extra props values.
         const expressValues = useExpress()
-
         const [data, setData] = useState(contextData[key] || initial)
         const [loading, setLoading] = useState(false)
         const [error, setError] = useState(undefined)
@@ -102,7 +142,7 @@ const createServerEffect = (context) => {
  * 
  * @returns {ServerEffectProvider}
  */
-export const createServerEffectContext = (name) => {
+export const createServerEffectContext = (name: string): ServerEffectContext => {
     const contextValue = {
         name,
         requests: [],
@@ -114,7 +154,7 @@ export const createServerEffectContext = (name) => {
     const useServerEffect = createServerEffect(Context)
 
     // This method will trigger and return all the date
-    const resolveData = async () => {
+    const resolveEffects: EffectsResolver = async () => {
         const {requests, data, resolved, name} = contextValue
 
         // Early exit for resolved contexts.
@@ -153,7 +193,7 @@ export const createServerEffectContext = (name) => {
     // Not the best solution, but we'll use this files global scope to
     // track all the contexts created so we can resolve all of them 
     // during the rendering stage.
-    allContexts.push(resolveData)
+    contexts.push(resolveEffects)
 
     const ServerEffectProvider = ({children, value}) => {
         if (value) {
@@ -170,7 +210,7 @@ export const createServerEffectContext = (name) => {
     return {
         ServerEffectProvider,
         useServerEffect,
-        resolveData
+        resolveEffects
     }
 }
 
@@ -179,8 +219,8 @@ export const createServerEffectContext = (name) => {
  * 
  * @returns 
  */
-export const resolveAllContext = async () => {
-    const allData = await Promise.all(allContexts.map((resolver) => resolver()))
+export const resolveAllEffects = async () => {
+    const allData = await Promise.all(contexts.map((resolver) => resolver()))
 
     return allData.reduce((acc, curr) => ({
         ...acc,
@@ -191,6 +231,6 @@ export const resolveAllContext = async () => {
 // Create a singleton instance of the hook/provider and associated functions. We do this because we
 // set up the provider in the client and server applications. No need to worry about using the provider
 // in userland unless you are making a custom provider.
-export const {ServerEffectProvider, useServerEffect, resolveData} = createServerEffectContext(DEFAULT_CONTEXT_KEY)
+export const {ServerEffectProvider, useServerEffect, resolveEffects} = createServerEffectContext(DEFAULT_CONTEXT_KEY)
 
 export default useServerEffect

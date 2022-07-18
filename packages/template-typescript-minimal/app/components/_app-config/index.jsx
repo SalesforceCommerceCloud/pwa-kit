@@ -10,12 +10,7 @@ import PropTypes from 'prop-types'
 import {SCAPIProvider} from '../../scapi-hooks'
 
 const AppConfig = ({children}) => {
-
-    return (
-        <SCAPIProvider>
-            {children}
-        </SCAPIProvider>
-    )
+    return <SCAPIProvider>{children}</SCAPIProvider>
 }
 
 AppConfig.restore = () => {}
