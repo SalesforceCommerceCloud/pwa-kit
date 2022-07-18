@@ -28,7 +28,7 @@ export enum ShopperLoginActions {
     ResetPassword = 'resetPassword',
     GetPasswordLessAccessToken = 'getPasswordLessAccessToken',
     RevokeToken = 'revokeToken',
-    IntrospectToken = 'introspectToken',
+    IntrospectToken = 'introspectToken'
 }
 
 export enum ShopperLoginHelpers {
@@ -40,5 +40,5 @@ export enum ShopperLoginHelpers {
 
     // TODO: commerce-sdk-isomorphic doesn't have a register helper?
     // https://github.com/SalesforceCommerceCloud/commerce-sdk-isomorphic/issues/89
-    register = 'register',
+    register = 'register'
 }

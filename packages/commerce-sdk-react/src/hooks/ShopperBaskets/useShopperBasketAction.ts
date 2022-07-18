@@ -90,7 +90,7 @@ function useShopperBasketAction(action: ShopperBasketActions): ActionResponse<()
     return {
         [action]: () => Promise.resolve(),
         isLoading: true,
-        error: undefined,
+        error: undefined
     }
 }
 

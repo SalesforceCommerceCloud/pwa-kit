@@ -17,5 +17,5 @@ export enum ShopperOrderActions {
     // phase 2
     createPaymentInstrumentForOrder = 'createPaymentInstrumentForOrder',
     removePaymentInstrumentFromOrder = 'removePaymentInstrumentFromOrder',
-    updatePaymentInstrumentForOrder = 'updatePaymentInstrumentForOrder',
+    updatePaymentInstrumentForOrder = 'updatePaymentInstrumentForOrder'
 }

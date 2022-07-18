@@ -15,5 +15,5 @@ export {
     useShopperLoginJwksUri,
     useShopperLoginOpenidConfig,
     useShopperLoginUserInfo,
-    useShopperLoginUserInfoCreditQuality,
+    useShopperLoginUserInfoCreditQuality
 }
