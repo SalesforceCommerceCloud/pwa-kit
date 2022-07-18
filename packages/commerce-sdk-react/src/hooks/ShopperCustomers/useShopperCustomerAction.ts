@@ -17,7 +17,7 @@ function useShopperCustomerAction(
     return {
         [action]: () => Promise.resolve(),
         isLoading: true,
-        error: undefined,
+        error: undefined
     }
 }
 

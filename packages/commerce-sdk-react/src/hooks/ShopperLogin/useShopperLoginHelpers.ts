@@ -34,7 +34,7 @@ function useShopperLoginHelper(action: ShopperLoginHelpers): ActionResponse<() =
     return {
         [action]: () => Promise.resolve(),
         isLoading: true,
-        error: undefined,
+        error: undefined
     }
 }
 

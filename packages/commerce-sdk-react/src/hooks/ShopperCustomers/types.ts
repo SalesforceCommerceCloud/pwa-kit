@@ -78,5 +78,5 @@ export enum ShopperCustomerActions {
     resetPassword = 'resetPassword',
     registerExternalProfile = 'registerExternalProfile',
     deleteCustomerProductList = 'deleteCustomerProductList',
-    updateCustomerProductList = 'updateCustomerProductList',
+    updateCustomerProductList = 'updateCustomerProductList'
 }

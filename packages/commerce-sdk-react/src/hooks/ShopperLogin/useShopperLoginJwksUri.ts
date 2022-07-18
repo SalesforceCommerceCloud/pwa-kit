@@ -15,7 +15,7 @@ const useShopperLoginJwksUri = (
         // @ts-ignore
         data: {},
         isLoading: true,
-        error: undefined,
+        error: undefined
     }
 }
 

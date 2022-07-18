@@ -5,8 +5,8 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React, {ReactElement} from 'react'
-import { ApiClients, ShopperContextsInstance, ShopperDiscoverySearchInstance } from './hooks/types'
 
+import { ApiClients, ShopperContextsInstance, ShopperDiscoverySearchInstance } from './hooks/types'
 import CommerceAPI from './api-client'
 
 export interface CommerceAPIProviderProps {

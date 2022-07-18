@@ -39,5 +39,5 @@ export enum ShopperBasketActions {
     createShipmentForBasket = 'createShipmentForBasket',
     removeShipmentFromBasket = 'removeShipmentFromBasket',
     updateShipmentForBasket = 'updateShipmentForBasket',
-    addTaxesForBasket = 'addTaxesForBasket',
+    addTaxesForBasket = 'addTaxesForBasket'
 }
