@@ -22,53 +22,17 @@ export * from './ShopperProducts/types'
 export * from './ShopperPromotions/types'
 export * from './ShopperSearch/types'
 
-export type ShopperBasketsInstance = ShopperBaskets<
-    ShopperBasketsTypes.ShopperBasketsParameters & Record<string, unknown>
->
-export type ShopperContextsInstance = ShopperContexts<
-    ShopperContextsTypes.ShopperContextsParameters & Record<string, unknown>
->
-export type ShopperCustomersInstance = ShopperCustomers<
-    ShopperCustomersTypes.ShopperCustomersParameters & Record<string, unknown>
->
-export type ShopperDiscoverySearchInstance = ShopperDiscoverySearch<
-    ShopperDiscoverySearchTypes.ShopperDiscoverySearchParameters & Record<string, unknown>
->
-export type ShopperGiftCertificatesInstance = ShopperGiftCertificates<
-    ShopperGiftCertificatesTypes.ShopperGiftCertificatesParameters & Record<string, unknown>
->
-export type ShopperLoginInstance = ShopperLogin<
-    ShopperLoginTypes.ShopperLoginParameters & Record<string, unknown>
->
-export type ShopperOrdersInstance = ShopperOrders<
-    ShopperOrdersTypes.ShopperOrdersParameters & Record<string, unknown>
->
-export type ShopperProductsInstance = ShopperProducts<
-    ShopperProductsTypes.ShopperProductsParameters & Record<string, unknown>
->
-export type ShopperPromotionsInstance = ShopperPromotions<
-    ShopperPromotionsTypes.ShopperPromotionsParameters & Record<string, unknown>
->
-export type ShopperSearchInstance = ShopperSearch<
-    ShopperSearchTypes.ShopperSearchParameters & Record<string, unknown>
->
-
-export interface ApiClients {
-    shopperBaskets: ShopperBasketsInstance
-    shopperContexts: ShopperContextsInstance
-    shopperCustomers: ShopperCustomersInstance
-    shopperDiscoverySearch: ShopperDiscoverySearchInstance
-    shopperGiftCertificates: ShopperGiftCertificatesInstance
-    shopperLogin: ShopperLoginInstance
-    shopperOrders: ShopperOrdersInstance
-    shopperProducts: ShopperProductsInstance
-    shopperPromotions: ShopperPromotionsInstance
-    shopperSearch: ShopperSearchInstance
-}
-
-export interface CommonHookResponse {
-    error: Error | undefined
-    isLoading: boolean
+export interface ApiClients<T extends Record<string, unknown> = Record<string, unknown>> {
+    shopperBaskets: ShopperBaskets<T & ShopperBasketsTypes.ShopperBasketsParameters>
+    shopperContexts: ShopperContexts<T & ShopperContextsTypes.ShopperContextsParameters>
+    shopperCustomers: ShopperCustomers<T & ShopperCustomersTypes.ShopperCustomersParameters>
+    shopperDiscoverySearch: ShopperDiscoverySearch<T & ShopperDiscoverySearchTypes.ShopperDiscoverySearchParameters>
+    shopperGiftCertificates: ShopperGiftCertificates<T & ShopperGiftCertificatesTypes.ShopperGiftCertificatesParameters>
+    shopperLogin: ShopperLogin<T & ShopperLoginTypes.ShopperLoginParameters>
+    shopperOrders: ShopperOrders<T & ShopperOrdersTypes.ShopperOrdersParameters>
+    shopperProducts: ShopperProducts<T & ShopperProductsTypes.ShopperProductsParameters>
+    shopperPromotions: ShopperPromotions<T & ShopperPromotionsTypes.ShopperPromotionsParameters>
+    shopperSearch: ShopperSearch<T & ShopperSearchTypes.ShopperSearchParameters>
 }
 
 // These are the common params for all query hooks
@@ -81,13 +45,40 @@ export interface QueryParams {
     shortCode?: string
 }
 
-export interface QueryResponse<T> extends CommonHookResponse {
-    data: T
-}
 
-export interface ActionResponse<T> extends CommonHookResponse {
-    // TODO: let's use the actual action name instead of "execute"
-    execute: T
-}
+export type QueryResponse<T> =
+    | {
+        isLoading: false
+        error: Error
+        data?: undefined
+    }
+    | {
+        isLoading: false
+        error?: undefined
+        data: T
+    }
+    | {
+        isLoading: boolean
+        error?: undefined
+        data?: undefined
+    }
 
-export type DependencyList = readonly any[]
+export type ActionResponse<T> =
+    // TODO: Include action name as a key in addition to "execute"?
+    | {
+        isLoading: false
+        error: Error
+        execute?: T
+    }
+    | {
+        isLoading: false
+        error?: undefined
+        execute: T
+    }
+    | {
+        isLoading: boolean
+        error?: undefined
+        execute?: undefined
+    }
+
+export type DependencyList = readonly unknown[]
