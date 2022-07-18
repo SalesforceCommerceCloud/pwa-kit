@@ -12,5 +12,5 @@ import {renderWithProviders} from '../../../utils/test-utils'
 
 test('renders component', () => {
     renderWithProviders(<CheckoutHeader />)
-    expect(screen.getByTitle(/back to homepage/i)).toBeInTheDocument()
+    expect(screen.getByLabelText(/Logo/i)).toBeInTheDocument()
 })
