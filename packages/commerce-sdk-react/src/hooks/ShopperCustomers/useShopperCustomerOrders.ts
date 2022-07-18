@@ -15,7 +15,7 @@ const useShopperCustomerOrders = (
 ): QueryResponse<ShopperCustomersTypes.CustomerOrderResult> => {
     return {
         data: {limit: 1, data: [], offset: 1, total: 1},
-        isLoading: true,
+        isLoading: false,
         error: undefined
     }
 }

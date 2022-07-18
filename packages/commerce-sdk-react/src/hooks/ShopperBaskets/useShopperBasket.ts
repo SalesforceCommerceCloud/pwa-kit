@@ -14,7 +14,7 @@ const useShopperBasket = (
 ): QueryResponse<ShopperBasketsTypes.Basket> => {
     return {
         data: {},
-        isLoading: true,
+        isLoading: false,
         error: undefined
     }
 }

@@ -15,7 +15,7 @@ const useShopperCustomerExternalProfile = (
 ): QueryResponse<ShopperCustomersTypes.CustomerExternalProfile> => {
     return {
         data: {customerId: '1', authenticationProviderId: '1', externalId: '1'},
-        isLoading: true,
+        isLoading: false,
         error: undefined
     }
 }

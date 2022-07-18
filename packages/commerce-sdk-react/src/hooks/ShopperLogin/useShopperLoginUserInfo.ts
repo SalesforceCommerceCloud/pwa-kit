@@ -15,7 +15,7 @@ const useShopperLoginUserInfo = (
     return {
         // @ts-ignore
         data: {},
-        isLoading: true,
+        isLoading: false,
         error: undefined
     }
 }

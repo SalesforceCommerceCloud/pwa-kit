@@ -15,7 +15,7 @@ const useShopperLoginUserInfoCreditQuality = (
     return {
         // @ts-ignore
         data: {},
-        isLoading: true,
+        isLoading: false,
         error: undefined
     }
 }

@@ -15,7 +15,7 @@ const useShopperCustomerBaskets = (
 ): QueryResponse<ShopperCustomersTypes.BasketsResult> => {
     return {
         data: {total: 0},
-        isLoading: true,
+        isLoading: false,
         error: undefined
     }
 }

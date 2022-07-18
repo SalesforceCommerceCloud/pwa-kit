@@ -14,7 +14,7 @@ const useShopperBasketShippingMethods = (
 ): QueryResponse<ShopperBasketsTypes.ShippingMethodResult> => {
     return {
         data: {},
-        isLoading: true,
+        isLoading: false,
         error: undefined
     }
 }
