@@ -32,7 +32,7 @@ const config = {
     throwOnBadResponse: true
 }
 
-const useCommerceApi = (): ApiClients => {
+const useCommerceApi = (): ApiClients<typeof config['parameters']> => {
     // TODO: initialize/cache the api client somewhere else
     // to minimize memory usage
     return {

@@ -96,3 +96,6 @@ function useShopperBasketAction(action: ShopperBasketActions): ActionResponse<()
 }
 
 export default useShopperBasketAction
+
+const {execute} = useShopperBasketAction(ShopperBasketActions.addCouponToBasket)
+const {isLoading, error, data} = execute({} as any)

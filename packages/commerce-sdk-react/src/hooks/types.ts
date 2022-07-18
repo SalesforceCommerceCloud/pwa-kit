@@ -22,18 +22,24 @@ export * from './ShopperProducts/types'
 export * from './ShopperPromotions/types'
 export * from './ShopperSearch/types'
 
-export interface ApiClients<T extends Record<string, unknown> = Record<string, unknown>> {
+export interface ApiClients<T extends Record<string, unknown>> {
     shopperBaskets: ShopperBaskets<T & ShopperBasketsTypes.ShopperBasketsParameters>
     shopperContexts: ShopperContexts<T & ShopperContextsTypes.ShopperContextsParameters>
     shopperCustomers: ShopperCustomers<T & ShopperCustomersTypes.ShopperCustomersParameters>
-    shopperDiscoverySearch: ShopperDiscoverySearch<T & ShopperDiscoverySearchTypes.ShopperDiscoverySearchParameters>
-    shopperGiftCertificates: ShopperGiftCertificates<T & ShopperGiftCertificatesTypes.ShopperGiftCertificatesParameters>
+    shopperDiscoverySearch: ShopperDiscoverySearch<
+        T & ShopperDiscoverySearchTypes.ShopperDiscoverySearchParameters
+    >
+    shopperGiftCertificates: ShopperGiftCertificates<
+        T & ShopperGiftCertificatesTypes.ShopperGiftCertificatesParameters
+    >
     shopperLogin: ShopperLogin<T & ShopperLoginTypes.ShopperLoginParameters>
     shopperOrders: ShopperOrders<T & ShopperOrdersTypes.ShopperOrdersParameters>
     shopperProducts: ShopperProducts<T & ShopperProductsTypes.ShopperProductsParameters>
     shopperPromotions: ShopperPromotions<T & ShopperPromotionsTypes.ShopperPromotionsParameters>
     shopperSearch: ShopperSearch<T & ShopperSearchTypes.ShopperSearchParameters>
 }
+
+export type ApiClient<T extends Record<string, unknown>> = ApiClients<T>[keyof ApiClients<T>]
 
 // These are the common params for all query hooks
 // it allows user to override configs for specific query
@@ -45,40 +51,48 @@ export interface QueryParams {
     shortCode?: string
 }
 
-
 export type QueryResponse<T> =
     | {
-        isLoading: false
-        error: Error
-        data?: undefined
-    }
+          isLoading: boolean
+          error?: undefined
+          data?: undefined
+      }
     | {
-        isLoading: false
-        error?: undefined
-        data: T
-    }
+          isLoading: true
+          error?: Error
+          data?: T
+      }
     | {
-        isLoading: boolean
-        error?: undefined
-        data?: undefined
-    }
+          isLoading: false
+          error: Error
+          data?: undefined
+      }
+    | {
+          isLoading: false
+          error?: undefined
+          data: T
+      }
 
 export type ActionResponse<T> =
     // TODO: Include action name as a key in addition to "execute"?
     | {
-        isLoading: false
-        error: Error
-        execute?: T
-    }
+          isLoading: boolean
+          error?: undefined
+          execute?: undefined
+      }
     | {
-        isLoading: false
-        error?: undefined
-        execute: T
-    }
+          isLoading: true
+          error?: Error
+          execute?: T
+      }
     | {
-        isLoading: boolean
-        error?: undefined
-        execute?: undefined
-    }
-
+          isLoading: false
+          error: Error
+          execute?: undefined
+      }
+    | {
+          isLoading: false
+          error?: undefined
+          execute: T
+      }
 export type DependencyList = readonly unknown[]
