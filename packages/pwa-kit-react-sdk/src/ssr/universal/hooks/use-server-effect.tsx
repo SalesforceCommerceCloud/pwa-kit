@@ -18,7 +18,7 @@ const isServer = typeof window === 'undefined'
 // Type Definitions
 type ServerEffectState = {
     data: object; // The value returned from the `useServerEffect` didUpdate function
-    isLoading: boolean; // Is didUpdate is resolved.
+    loading: boolean; // Is didUpdate is resolved.
     error: Error; // The error object if an error was thrown during execution of the didUpdate call
 }
 type ServerEffectArgs = {
@@ -64,12 +64,20 @@ type ServerEffectContextValue = {
  * @returns 
  */
 const createServerEffect = (context) => {
-    const useServerEffect = (initial, didUpdate, source) => {
-        // Function overloading.
-        if (typeof initial === 'function') {
-            source = didUpdate
-            didUpdate = initial
+    function useServerEffect(didUpdate: DidUpdateFn, source: any[]) : ServerEffectState
+    function useServerEffect(initial: Object | undefined, didUpdate: DidUpdateFn, source: any[]) : ServerEffectState
+    function useServerEffect(initialOrDidUpdateFn: Object | undefined | DidUpdateFn, didUpdateOrSource: DidUpdateFn | any[], source?: any[]) : ServerEffectState {
+        let initial, didUpdate, internalSource
+
+        // Handle optional first param.
+        if (typeof initialOrDidUpdateFn === 'function') {
             initial = undefined
+            didUpdate = initialOrDidUpdateFn
+            internalSource = didUpdateOrSource
+        } else {
+            didUpdate = didUpdateOrSource
+            initial = initialOrDidUpdateFn
+            internalSource = source
         }
     
         const key = useUID()
@@ -119,7 +127,7 @@ const createServerEffect = (context) => {
     
         // To avoid messing with React's hooks order lets make this a
         // noop for the server.
-        useEffect(wrappedDidUpdate, source)
+        useEffect(wrappedDidUpdate, internalSource)
     
         return {
             loading,
