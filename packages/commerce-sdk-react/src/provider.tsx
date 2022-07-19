@@ -6,7 +6,7 @@
  */
 import React, {ReactElement} from 'react'
 
-export interface CommerceAPIProviderProps {
+export interface CommerceApiProviderProps {
     children: React.ReactNode
     clientId: string
     organizationId: string
@@ -17,8 +17,8 @@ export interface CommerceAPIProviderProps {
     currency: string
 }
 
-const CommerceAPIProvider = (props: CommerceAPIProviderProps): ReactElement => {
+const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
     return <></>
 }
 
-export default CommerceAPIProvider
+export default CommerceApiProvider
