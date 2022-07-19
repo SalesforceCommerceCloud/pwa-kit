@@ -19,7 +19,7 @@ import serialize from 'serialize-javascript'
 
 import {getAssetUrl} from '../universal/utils'
 import DeviceContext from '../universal/device-context'
-import {ExpressProvider} from '../universal/hooks/use-express'
+import {GetPropsArgsProvider} from '../universal/hooks/use-get-props-args'
 import {ServerEffectProvider, resolveAllEffects} from '../universal/hooks/use-server-effect' // I Need to clean up the exports of this module.
 
 import Document from '../universal/components/_document'
@@ -221,11 +221,10 @@ export const render = async (req, res, next) => {
 
 const renderAppHtml = (req, res, error, appData) => {
     const {App, appState, routes, routerContext, location, extractor, deviceType} = appData
-    const extraArgs = AppConfig.extraGetPropsArgs()
 
     let appJSX = (
         <Router location={location} context={routerContext}>
-            <ExpressProvider value={{req, res, ...extraArgs}}>
+            <GetPropsArgsProvider serverProps={{req, res}}>
                 <ServerEffectProvider>
                     <DeviceContext.Provider value={{type: deviceType}}>
                         <AppConfig locals={res.locals}>
@@ -233,7 +232,7 @@ const renderAppHtml = (req, res, error, appData) => {
                         </AppConfig>
                     </DeviceContext.Provider>
                 </ServerEffectProvider>
-            </ExpressProvider>
+            </GetPropsArgsProvider>
         </Router>
     )
 

@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import useExpress from './use-express'
+import useGetPropsArgs from './use-get-props-args'
 import useServerEffect from './use-server-effect'
 
-export {useExpress, useServerEffect}
+export {useGetPropsArgs, useServerEffect}

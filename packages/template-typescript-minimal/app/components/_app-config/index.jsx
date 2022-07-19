@@ -17,7 +17,11 @@ AppConfig.restore = () => {}
 
 AppConfig.freeze = () => undefined
 
-AppConfig.extraGetPropsArgs = () => {}
+AppConfig.extraGetPropsArgs = () => {
+    return {
+        'a': 'b'
+    }
+}
 
 AppConfig.propTypes = {
     children: PropTypes.node

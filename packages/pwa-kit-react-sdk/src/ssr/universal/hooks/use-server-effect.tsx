@@ -8,7 +8,8 @@
 import React, {useContext, useState, useEffect} from 'react'
 import {useLocation, useParams} from 'react-router-dom'
 import {useUID} from 'react-uid' // TODO: Probably not required
-import useExpress from './use-express'
+import useGetPropsArgs from './use-get-props-args'
+import useExpress, {GetPropsArgs} from './use-get-props-args'
 
 // Globals
 export const DEFAULT_CONTEXT_KEY = '__SERVER_EFFECTS__'
@@ -17,18 +18,11 @@ const isServer = typeof window === 'undefined'
 
 // Type Definitions
 type ServerEffectState = {
-    data: object; // The value returned from the `useServerEffect` didUpdate function
-    loading: boolean; // Is didUpdate is resolved.
-    error: Error; // The error object if an error was thrown during execution of the didUpdate call
+    data: object;
+    loading: boolean;
+    error: Error;
 }
-type ServerEffectArgs = {
-    location: Location;
-    params: object;
-    extraGetPropsArgs: object;
-    req: boolean;
-    res: Error;
-}
-type DidUpdateFn = (serverEffectArgs: ServerEffectArgs) => Promise<any>
+type DidUpdateFn = (serverEffectArgs: GetPropsArgs) => Promise<any>
 type EffectsResolver = () => Promise<{[x: string]: {}}>
 type Provider = ({ children, value }: { children: any; value: any; }) => JSX.Element
 type ServerEffect = (initialValue: Object, didUpdate: DidUpdateFn, source: any[]) => ServerEffectState
@@ -51,7 +45,7 @@ type ServerEffectContext = {
 }
 type ServerEffectContextValue = {
     name: string;
-    data: string;
+    data: object;
     requests: DidUpdateFn[];
     resolved: boolean;
 }
@@ -64,38 +58,15 @@ type ServerEffectContextValue = {
  * @returns 
  */
 const createServerEffect = (context) => {
-    function useServerEffect(didUpdate: DidUpdateFn, source: any[]) : ServerEffectState
-    function useServerEffect(initial: Object | undefined, didUpdate: DidUpdateFn, source: any[]) : ServerEffectState
-    function useServerEffect(initialOrDidUpdateFn: Object | undefined | DidUpdateFn, didUpdateOrSource: DidUpdateFn | any[], source?: any[]) : ServerEffectState {
-        let initial, didUpdate, internalSource
-
-        // Handle optional first param.
-        if (typeof initialOrDidUpdateFn === 'function') {
-            initial = undefined
-            didUpdate = initialOrDidUpdateFn
-            internalSource = didUpdateOrSource
-        } else {
-            didUpdate = didUpdateOrSource
-            initial = initialOrDidUpdateFn
-            internalSource = source
-        }
-    
+    const useServerEffect = (didUpdate: DidUpdateFn, source: any[], initial?: any) : ServerEffectState => {    
         const key = useUID()
-        const location = useLocation()
-        const params = useParams()
-        const {
-            data: contextData,
-            requests: contextRequests,
-            resolved: contextResolved
-        }: ServerEffectContextValue = useContext(context)
-        // TODO: Think about a better name for this hook if we are going to slip in the 
-        // extra props with the request and response. Otherwise maybe create another to 
-        // home the extra props values.
-        const expressValues = useExpress()
-        const [data, setData] = useState(contextData[key] || initial)
+        const ctx: ServerEffectContextValue = useContext(context)
+
+        const getPropsArgs = useGetPropsArgs()
+        const [data, setData] = useState(ctx.data[key] || initial)
         const [loading, setLoading] = useState(false)
         const [error, setError] = useState(undefined)
-        const boundDidUpdate = didUpdate.bind(this, {location, params, ...expressValues})
+        const boundDidUpdate = didUpdate.bind(this, getPropsArgs)
 
         const wrappedDidUpdate = isServer ? 
             () => {} : 
@@ -115,8 +86,8 @@ const createServerEffect = (context) => {
                 setLoading(false)
             }
     
-        if (!contextResolved && isServer) {
-            contextRequests.push(async () => {
+        if (!ctx.resolved && isServer) {
+            ctx.requests.push(async () => {
                 const data = await boundDidUpdate()
     
                 return {
@@ -127,7 +98,7 @@ const createServerEffect = (context) => {
     
         // To avoid messing with React's hooks order lets make this a
         // noop for the server.
-        useEffect(wrappedDidUpdate, internalSource)
+        useEffect(wrappedDidUpdate, source)
     
         return {
             loading,
@@ -151,7 +122,7 @@ const createServerEffect = (context) => {
  * @returns {ServerEffectProvider}
  */
 export const createServerEffectContext = (name: string): ServerEffectContext => {
-    const contextValue = {
+    const ctxValue = {
         name,
         requests: [],
         data: {},
@@ -163,37 +134,31 @@ export const createServerEffectContext = (name: string): ServerEffectContext => 
 
     // This method will trigger and return all the date
     const resolveEffects: EffectsResolver = async () => {
-        const {requests, data, resolved, name} = contextValue
-
         // Early exit for resolved contexts.
-        if (resolved) {
+        if (ctxValue.resolved) {
             return {
-                [name]: data
+                [ctxValue.name]: ctxValue.data
             }
         }
 
-        const serializeCalls = true
-        const effectPromises = serializeCalls ? 
-            [requests.reduce((acc, curr) => {
-                return acc.then((data) => curr(data).then((newData) => ({...data, ...newData})))
-            }, Promise.resolve({}))]
-            : requests.map((effect) => effect())
+        const effectPromises = ctxValue.requests.map((effect) => effect())
         const effectValues = await Promise.all(effectPromises)
+
         // Reset the requests
-        contextValue.requests = []
+        ctxValue.requests = []
 
         // Use this value to stop the hook from recoring events.
-        contextValue.resolved = true
+        ctxValue.resolved = true
 
         // Turn the data in to a map to se the context value
-        contextValue.data = effectValues.reduce((acc, curr) => ({
+        ctxValue.data = effectValues.reduce((acc, curr) => ({
             ...acc,
             ...curr
         }), {})
 
         return {
             [name]: {
-                ...contextValue.data
+                ...ctxValue.data
             }
         }
     }
@@ -205,11 +170,11 @@ export const createServerEffectContext = (name: string): ServerEffectContext => 
 
     const ServerEffectProvider = ({children, value}) => {
         if (value) {
-            contextValue.data = value
+            ctxValue.data = value
         }
 
         return (
-            <Context.Provider value={contextValue}>
+            <Context.Provider value={ctxValue}>
                 {children}
             </Context.Provider>
         )
