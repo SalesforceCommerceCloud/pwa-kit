@@ -6,8 +6,7 @@
  */
 import React, {ReactElement} from 'react'
 
-import { ApiClients, ShopperContextsInstance, ShopperDiscoverySearchInstance } from './hooks/types'
-import CommerceAPI from './api-client'
+import {ApiClients} from './hooks/types'
 
 export interface CommerceApiProviderProps {
     children: React.ReactNode
@@ -22,13 +21,6 @@ export interface CommerceApiProviderProps {
 
 export const CommerceAPIContext = React.createContext({} as ApiClients)
 
-/**
- * For sharing whatever auth object that will manage the tokens
- * @internal
- */
-export const CommerceAPIAuthContext = React.createContext({})
-
-// TODO: how to test? test in typescript template for now
 const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
     const {children, clientId, organizationId, shortCode, siteId, proxy} = props
 
@@ -39,35 +31,18 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
             clientId,
             organizationId,
             shortCode,
-            siteId,
+            siteId
         },
-        throwOnBadResponse: true,
+        throwOnBadResponse: true
     }
 
-    // TODO: auth logic should use the helpers from commerce-sdk-isomorphic ?
-    const commerceAPI = new CommerceAPI(config)
+    // TODO: with the above config, initialize the api clients
+    const apiClients: ApiClients = {} as ApiClients
 
-    const apiClients: ApiClients = {
-        shopperBaskets: commerceAPI.shopperBaskets,
-        shopperContexts: {} as ShopperContextsInstance,
-        shopperCustomers: commerceAPI.shopperCustomers,
-        shopperDiscoverySearch: {} as ShopperDiscoverySearchInstance,
-        shopperGiftCertificates: commerceAPI.shopperGiftCertificates,
-        shopperLogin: commerceAPI.shopperLogin,
-        shopperOrders: commerceAPI.shopperOrders,
-        shopperProducts: commerceAPI.shopperProducts,
-        shopperPromotions: commerceAPI.shopperPromotions,
-        shopperSearch: commerceAPI.shopperSearch
-    }
-
-    // TODO: use Context from useServerEffect
-    // See Kevin's PR: https://github.com/SalesforceCommerceCloud/pwa-kit/pull/654/files#r914097886
-    // See Ben's PR: https://github.com/SalesforceCommerceCloud/pwa-kit/pull/642
-    return (
-        <CommerceAPIContext.Provider value={apiClients}>
-            <CommerceAPIAuthContext.Provider value={commerceAPI.auth}>{children}</CommerceAPIAuthContext.Provider>
-        </CommerceAPIContext.Provider>
-    )
+    // TODO: wrap the children with:
+    // - context for enabling useServerEffect hook
+    // - context for sharing the auth object that would manage the tokens -> this will probably be for internal use only
+    return <CommerceAPIContext.Provider value={apiClients}>{children}</CommerceAPIContext.Provider>
 }
 
 export default CommerceApiProvider

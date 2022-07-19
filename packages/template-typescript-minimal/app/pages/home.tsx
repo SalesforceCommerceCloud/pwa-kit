@@ -86,13 +86,13 @@ const Home = ({value}: Props) => {
     const api = useCommerceAPI()
 
     useEffect(async () => {
-        const result = await api.shopperSearch.productSearch({
-            parameters: {
-                refine: [`cgid=newarrivals`, 'htype=master']
-            }
-        })
+        // const result = await api.shopperSearch.productSearch({
+        //     parameters: {
+        //         refine: [`cgid=newarrivals`, 'htype=master']
+        //     }
+        // })
 
-        console.log('--- calling productSearch endpoint', result)
+        console.log('--- api', api) // `api` will be undefined because there is no implementation for it yet
     }, [])
 
     useEffect(() => {
