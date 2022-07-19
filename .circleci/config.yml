@@ -218,6 +218,23 @@ commands:
           destination: local-npm-repo/verdaccio.log
 
 jobs:
+  docs_build_and_deploy:
+    docker:
+      - image: circleci/node:14-stretch-browsers
+    steps:
+      - add_ssh_keys:
+          fingerprints:
+            - $SSH_FINGERPRINT
+      - checkout
+      - setup
+      - run:
+          name: "Build and publish docs"
+          command: |
+            if [[ $RELEASE ]]; then
+              git config user.email "bot-pwa-kit@salesforce.com"
+              git config user.name "bot-pwa-kit"
+              node ./scripts/check-latest-release.js
+            fi
   testNode14Windows:
     executor:
       name: win/default
@@ -418,6 +435,7 @@ workflows:
           matrix:
             parameters:
               template: [express-minimal-test-project, typescript-minimal-test-project]
+      - docs_build_and_deploy
   nightly-build:
     triggers:
       - schedule:
