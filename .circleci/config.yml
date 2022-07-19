@@ -224,21 +224,17 @@ jobs:
     steps:
       - add_ssh_keys:
           fingerprints:
-            - "5b:0d:b0:de:e3:85:fa:c6:58:80:22:a6:0a:d2:73:3d"
+            - $SSH_FINGERPRINT
       - checkout
       - setup
       - run:
-          name: "Build docs"
-          command: "npm run build:docs"
-      - run:
-          name: Install and configure dependencies
+          name: "Build and publish docs"
           command: |
-            sudo npm install -g --silent gh-pages@4.0.0
-            git config user.email "bot-pwa-kit@salesforce.com"
-            git config user.name "bot-pwa-kit"
-      - run:
-          name: Deploy docs to gh-pages branch
-          command: gh-pages --dotfiles --message "[skip ci] Updates" --dist docs
+            if [[ $RELEASE ]]; then
+              git config user.email "bot-pwa-kit@salesforce.com"
+              git config user.name "bot-pwa-kit"
+              node ./scripts/check-latest-release.js
+            fi
   testNode14Windows:
     executor:
       name: win/default
