@@ -11,7 +11,7 @@ import {Helmet} from 'react-helmet'
 import App from './index.jsx'
 import {renderWithProviders} from '../../utils/test-utils'
 import {DEFAULT_LOCALE} from '../../utils/test-utils'
-import {useSite} from '../../hooks/use-site'
+import useSite from '../../hooks/use-site'
 import messages from '../../translations/compiled/en-GB.json'
 import mockConfig from '../../../config/mocks/default'
 jest.mock('../../hooks/use-site', () => jest.fn())

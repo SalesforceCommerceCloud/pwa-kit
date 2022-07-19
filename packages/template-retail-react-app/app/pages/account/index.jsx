@@ -37,17 +37,17 @@ import {useLocation} from 'react-router-dom'
 import {messages, navLinks} from './constant'
 import useNavigation from '../../hooks/use-navigation'
 import LoadingSpinner from '../../components/loading-spinner'
-import {useLocale} from '../../hooks/use-locale'
-import {useSite} from '../../hooks/use-site'
-import {useAppConfig} from '../../hooks/use-app-config'
+import useLocale from '../../hooks/use-locale'
+import useSite from '../../hooks/use-site'
+import useAppConfig from '../../hooks/use-app-config'
 
 const Account = () => {
     const {path} = useRouteMatch()
     const {formatMessage} = useIntl()
     const customer = useCustomer()
-    const locale = useLocale()
+    const {locale} = useLocale()
     const location = useLocation()
-    const site = useSite()
+    const {site} = useSite()
     const navigate = useNavigation()
 
     const [mobileNavIndex, setMobileNavIndex] = useState(-1)
@@ -93,11 +93,7 @@ const Account = () => {
     // Using Redirect allows us to store the directed page to location
     // so we can direct users back after they are successfully log in
     if (customer.authType != null && !customer.isRegistered) {
-        const path = appConfig.urlTemplateLiteral(
-            '/login',
-            site.site.alias || site.site.id,
-            locale.locale.id
-        )
+        const path = appConfig.urlTemplateLiteral('/login', site.alias || site.id, locale.id)
         return <Redirect to={{pathname: path, state: {directedFrom: location.pathname}}} />
     }
 

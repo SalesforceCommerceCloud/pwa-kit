@@ -130,6 +130,7 @@ export const getPathWithLocale = (shortCode, opts = {}) => {
     const location = opts.location ? opts.location : window.location
     let {siteRef, localeRef} = getParamsFromPath(`${location.pathname}${location.search}`)
     let {pathname, search} = location
+    const urlTemplateLiteral = opts.urlTemplateLiteral
 
     // sanitize the site from current url if existing
     if (siteRef) {
@@ -150,23 +151,20 @@ export const getPathWithLocale = (shortCode, opts = {}) => {
     const isDefaultLocaleOfDefaultSite = shortCode === defaultSite.l10n.defaultLocale
     const isDefaultSite = siteRef === defaultSite.alias || siteRef === defaultSite.id
     // rebuild the url with new locale,
-    const newUrl = buildPathWithUrlConfig(
+    const newUrl = urlTemplateLiteral(
         `${pathname}${search}`,
-        {
-            // By default, as for home page, when the values of site and locale belongs to the default site,
-            // they will be not shown in the url just
-            site:
-                isDefaultLocaleOfDefaultSite && isDefaultSite && isHomeRef
-                    ? ''
-                    : siteRef || defaultSite.alias || defaultSite.id,
-            locale: isDefaultLocaleOfDefaultSite && isDefaultSite && isHomeRef ? '' : shortCode
-        },
-        opts
+        // By default, as for home page, when the values of site and locale belongs to the default site,
+        // they will be not shown in the url just
+        isDefaultLocaleOfDefaultSite && isDefaultSite && isHomeRef
+            ? ''
+            : siteRef || defaultSite.alias || defaultSite.id,
+        isDefaultLocaleOfDefaultSite && isDefaultSite && isHomeRef ? '' : shortCode
     )
     return newUrl
 }
 
 //TODO: Clean up and merge cases
+//TODO: Add option disallowParams: ['refine']
 export const getUrlTemplateLiteral = (appConfig, siteUrl, localeUrl) => {
     const {site: siteConfig, locale: localeConfig, showDefaults: showDefaultsConfig} = appConfig.url
     const defaultSite = getDefaultSite()
@@ -185,7 +183,8 @@ export const getUrlTemplateLiteral = (appConfig, siteUrl, localeUrl) => {
     /* eslint-disable no-unreachable */
     switch (true) {
         case siteConfig === 'path' && localeConfig === 'path' && showDefaultsConfig:
-            return (href, site, locale) => `/${site}/${locale}${href}`
+            return (href, site, locale) =>
+                `${site ? `/${site}` : ''}${locale ? `/${locale}` : ''}${href}`
             break
         case siteConfig === 'path' && localeConfig === 'path' && !showDefaultsConfig:
             if (!isDefaultLocale && !isDefaultSite)
@@ -286,16 +285,17 @@ export const getUrlTemplateLiteral = (appConfig, siteUrl, localeUrl) => {
  * @returns {string}
  */
 export const homeUrlBuilder = (homeHref, options = {}) => {
-    const {locale, site} = options
+    const {locale, site, urlTemplateLiteral} = options
     const defaultSite = getDefaultSite()
     const isDefaultLocaleOfDefaultSite =
         locale.alias === defaultSite.l10n.defaultLocale ||
         locale.id === defaultSite.l10n.defaultLocale
     const isDefaultSite = site.id === defaultSite.id || site.alias === defaultSite.alias
-    const updatedUrl = buildPathWithUrlConfig(homeHref, {
-        locale: isDefaultLocaleOfDefaultSite && isDefaultSite ? '' : locale.alias || locale.id,
-        site: isDefaultLocaleOfDefaultSite && isDefaultSite ? '' : site.alias || site.id
-    })
+    const updatedUrl = urlTemplateLiteral(
+        homeHref,
+        isDefaultLocaleOfDefaultSite && isDefaultSite ? '' : site.alias || site.id,
+        isDefaultLocaleOfDefaultSite && isDefaultSite ? '' : locale.alias || locale.id
+    )
     return encodeURI(updatedUrl)
 }
 
@@ -368,7 +368,7 @@ export const removeQueryParamsFromPath = (path, keys) => {
  * => /global/women/dresses?locale=en-GB
  *
  */
-export const buildPathWithUrlConfig = (relativeUrl, configValues = {}, opts = {}) => {
+/*export const buildPathWithUrlConfig = (relativeUrl, configValues = {}, opts = {}) => {
     const urlConfig = getUrlConfig()
     const sites = getSites()
     const defaultSite = getDefaultSite()
@@ -427,4 +427,4 @@ export const buildPathWithUrlConfig = (relativeUrl, configValues = {}, opts = {}
         updatedPath = rebuildPathWithParams(updatedPath, queryParams)
     }
     return updatedPath
-}
+}*/

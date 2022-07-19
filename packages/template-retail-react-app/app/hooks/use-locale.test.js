@@ -14,7 +14,7 @@ import useLocale from './use-locale'
 import {renderWithReactIntl} from '../utils/test-utils'
 
 const MockComponent = () => {
-    const locale = useLocale()
+    const {locale} = useLocale()
     return <div data-testid="locale">{JSON.stringify(locale)}</div>
 }
 

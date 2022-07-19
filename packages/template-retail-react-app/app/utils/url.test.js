@@ -124,7 +124,7 @@ describe('url builder test', () => {
     })
 })
 
-describe('getPathWithLocale', () => {
+/*describe('getPathWithLocale', () => {
     getUrlConfig.mockImplementation(() => mockConfig.app.url)
     test('getPathWithLocale returns expected for PLP', () => {
         const location = new URL('http://localhost:3000/uk/it-IT/category/newarrivals-womens')
@@ -167,9 +167,9 @@ describe('getPathWithLocale', () => {
         const relativeUrl = getPathWithLocale('en-GB', {location})
         expect(relativeUrl).toEqual(`/`)
     })
-})
+})*/
 
-describe('homeUrlBuilder', () => {
+/*describe('homeUrlBuilder', () => {
     const defaultSite = mockConfig.app.sites[0]
     const defaultAlias = mockConfig.app.siteAliases[defaultSite.id]
     const defaultSiteMock = {...defaultSite, alias: defaultAlias}
@@ -312,7 +312,7 @@ describe('homeUrlBuilder', () => {
             expect(homeUrl).toEqual(expectedRes)
         })
     })
-})
+})*/
 
 describe('rebuildPathWithParams test', () => {
     test('returns updated url', () => {
@@ -330,7 +330,7 @@ describe('removeQueryParamsFromPath test', () => {
     })
 })
 
-describe('buildPathWithUrlConfig', () => {
+/*describe('buildPathWithUrlConfig', () => {
     test('return a new url with locale and site a part of path', () => {
         getUrlConfig.mockImplementation(() => ({
             locale: 'path',
@@ -416,7 +416,7 @@ describe('buildPathWithUrlConfig', () => {
             buildPathWithUrlConfig('/women/dresses', {locale: 'en-GB', site: 'uk'})
         }).toThrow()
     })
-})
+})*/
 
 describe('absoluteUrl', function() {
     test('return expected when path is a relative url', () => {

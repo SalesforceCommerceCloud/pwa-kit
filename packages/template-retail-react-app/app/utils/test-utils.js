@@ -43,9 +43,16 @@ export const SUPPORTED_LOCALES = [
         preferredCurrency: 'EUR'
     }
 ]
+export const DEFAULT_SITE = 'global'
 // Contexts
-import {CategoriesProvider, CurrencyProvider} from '../contexts'
-import {buildPathWithUrlConfig} from './url'
+import {
+    AppConfigProvider,
+    CategoriesProvider,
+    CurrencyProvider,
+    LocaleProvider,
+    SiteProvider
+} from '../contexts'
+import {getUrlTemplateLiteral} from './url'
 
 export const renderWithReactIntl = (node, locale = DEFAULT_LOCALE) => {
     return render(
@@ -121,27 +128,37 @@ export const TestProviders = ({
         onClose: () => {}
     }
 
+    const urlTemplateLiteral = getUrlTemplateLiteral(appConfig, DEFAULT_SITE, locale)
+
     return (
         <IntlProvider locale={locale} defaultLocale={DEFAULT_LOCALE} messages={messages}>
-            <CommerceAPIProvider value={api}>
-                <CategoriesProvider categories={initialCategories}>
-                    <CurrencyProvider currency={DEFAULT_CURRENCY}>
-                        <CustomerProvider value={{customer, setCustomer}}>
-                            <BasketProvider value={{basket, setBasket}}>
-                                <CustomerProductListsProvider>
-                                    <Router>
-                                        <ChakraProvider theme={theme}>
-                                            <AddToCartModalContext.Provider value={addToCartModal}>
-                                                {children}
-                                            </AddToCartModalContext.Provider>
-                                        </ChakraProvider>
-                                    </Router>
-                                </CustomerProductListsProvider>
-                            </BasketProvider>
-                        </CustomerProvider>
-                    </CurrencyProvider>
-                </CategoriesProvider>
-            </CommerceAPIProvider>
+            <AppConfigProvider urlTemplateLiteral={urlTemplateLiteral}>
+                <CommerceAPIProvider value={api}>
+                    <CategoriesProvider categories={initialCategories}>
+                        <CurrencyProvider currency={DEFAULT_CURRENCY}>
+                            <SiteProvider site={DEFAULT_SITE}>
+                                <LocaleProvider locale={locale}>
+                                    <CustomerProvider value={{customer, setCustomer}}>
+                                        <BasketProvider value={{basket, setBasket}}>
+                                            <CustomerProductListsProvider>
+                                                <Router>
+                                                    <ChakraProvider theme={theme}>
+                                                        <AddToCartModalContext.Provider
+                                                            value={addToCartModal}
+                                                        >
+                                                            {children}
+                                                        </AddToCartModalContext.Provider>
+                                                    </ChakraProvider>
+                                                </Router>
+                                            </CustomerProductListsProvider>
+                                        </BasketProvider>
+                                    </CustomerProvider>
+                                </LocaleProvider>
+                            </SiteProvider>
+                        </CurrencyProvider>
+                    </CategoriesProvider>
+                </CommerceAPIProvider>
+            </AppConfigProvider>
         </IntlProvider>
     )
 }
@@ -185,10 +202,9 @@ export const createPathWithDefaults = (path) => {
     const siteAlias = app.siteAliases[defaultSite.id]
     const defaultLocale = defaultSite.l10n.defaultLocale
 
-    const updatedPath = buildPathWithUrlConfig(path, {
-        site: siteAlias || defaultSite.id,
-        locale: defaultLocale
-    })
+    const urlTemplateLiteral = getUrlTemplateLiteral(app, siteAlias || defaultSite, defaultLocale)
+
+    const updatedPath = urlTemplateLiteral(path, siteAlias || defaultSite.id, defaultLocale)
     return updatedPath
 }
 

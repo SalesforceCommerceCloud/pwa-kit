@@ -49,7 +49,7 @@ import {resolveLocaleFromUrl} from '../../utils/utils'
 
 import Seo from '../seo'
 import {resolveSiteFromUrl} from '../../utils/site-utils'
-import {useAppConfig} from '../../hooks/use-app-config'
+import useAppConfig from '../../hooks/use-app-config'
 
 const DEFAULT_NAV_DEPTH = 3
 const DEFAULT_ROOT_CATEGORY = 'root'
@@ -116,7 +116,11 @@ const App = (props) => {
 
     const onLogoClick = () => {
         // Goto the home page.
-        const path = homeUrlBuilder(HOME_HREF, {locale, site})
+        const path = homeUrlBuilder(HOME_HREF, {
+            locale,
+            site,
+            urlTemplateLiteral: appConfig.urlTemplateLiteral
+        })
         history.push(path)
 
         // Close the drawer.

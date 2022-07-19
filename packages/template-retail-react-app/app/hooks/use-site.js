@@ -12,4 +12,6 @@ import {SiteContext} from '../contexts'
  * Custom React hook to get the current site
  * @returns {site: Object, setSite: function}
  */
-export const useSite = () => useContext(SiteContext)
+const useSite = () => useContext(SiteContext)
+
+export default useSite
