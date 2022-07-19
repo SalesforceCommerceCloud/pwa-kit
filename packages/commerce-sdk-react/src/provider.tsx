@@ -32,7 +32,7 @@ export interface CommerceApiProviderProps {
     currency: string
 }
 
-export const CommerceAPIContext = React.createContext({} as ApiClients)
+export const CommerceApiContext = React.createContext({} as ApiClients)
 
 const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
     const {children, clientId, organizationId, shortCode, siteId, proxy} = props
@@ -68,7 +68,7 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
     // TODO: wrap the children with:
     // - context for enabling useServerEffect hook
     // - context for sharing the auth object that would manage the tokens -> this will probably be for internal use only
-    return <CommerceAPIContext.Provider value={apiClients}>{children}</CommerceAPIContext.Provider>
+    return <CommerceApiContext.Provider value={apiClients}>{children}</CommerceApiContext.Provider>
 }
 
 export default CommerceApiProvider

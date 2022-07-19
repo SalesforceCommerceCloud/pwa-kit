@@ -6,11 +6,11 @@
  */
 
 import React from 'react'
-import {CommerceAPIContext} from '../provider'
+import {CommerceApiContext} from '../provider'
 import {ApiClients} from './types'
 
 const useCommerceApi = (): ApiClients => {
-    return React.useContext(CommerceAPIContext)
+    return React.useContext(CommerceApiContext)
 }
 
 export default useCommerceApi
