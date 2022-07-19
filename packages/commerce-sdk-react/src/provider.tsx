@@ -6,6 +6,19 @@
  */
 import React, {ReactElement} from 'react'
 
+import {
+    ShopperBaskets,
+    ShopperContexts,
+    ShopperCustomers,
+    ShopperLogin,
+    ShopperOrders,
+    ShopperProducts,
+    ShopperPromotions,
+    ShopperDiscoverySearch,
+    ShopperGiftCertificates,
+    ShopperSearch
+} from 'commerce-sdk-isomorphic'
+
 import {ApiClients} from './hooks/types'
 
 export interface CommerceApiProviderProps {
@@ -36,8 +49,21 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
         throwOnBadResponse: true
     }
 
-    // TODO: with the above config, initialize the api clients
-    const apiClients: ApiClients = {} as ApiClients
+    // TODO: Initialize the api clients immediately, without waiting for an access token.
+    // See template-retail-react-app/app/commerce-api/index.js for inspiration
+    // especially how Proxy class can be used to wait for the access token and inject it to each request header.
+    const apiClients: ApiClients = {
+        shopperBaskets: new ShopperBaskets(config),
+        shopperContexts: new ShopperContexts(config),
+        shopperCustomers: new ShopperCustomers(config),
+        shopperDiscoverySearch: new ShopperDiscoverySearch(config),
+        shopperGiftCertificates: new ShopperGiftCertificates(config),
+        shopperLogin: new ShopperLogin(config),
+        shopperOrders: new ShopperOrders(config),
+        shopperProducts: new ShopperProducts(config),
+        shopperPromotions: new ShopperPromotions(config),
+        shopperSearch: new ShopperSearch(config)
+    }
 
     // TODO: wrap the children with:
     // - context for enabling useServerEffect hook

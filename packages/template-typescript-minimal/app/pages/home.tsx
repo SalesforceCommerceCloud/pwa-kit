@@ -86,13 +86,15 @@ const Home = ({value}: Props) => {
     const api = useCommerceAPI()
 
     useEffect(async () => {
-        // const result = await api.shopperSearch.productSearch({
-        //     parameters: {
-        //         refine: [`cgid=newarrivals`, 'htype=master']
-        //     }
-        // })
+        console.log('--- api', api)
 
-        console.log('--- api', api) // `api` will be undefined because there is no implementation for it yet
+        // This will result in 401 Unauthorized error, since there is no implementation of token management yet
+        const result = await api.shopperSearch.productSearch({
+            parameters: {
+                refine: [`cgid=newarrivals`, 'htype=master']
+            }
+        })
+        console.log('--- productSearch response', result)
     }, [])
 
     useEffect(() => {
