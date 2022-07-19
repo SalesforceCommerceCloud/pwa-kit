@@ -11,7 +11,7 @@ import {QueryResponse, DependencyList} from '../types'
 const useShopperLoginUserInfo = (
     params: UserInfoParams,
     source: DependencyList
-): QueryResponse<Object> => {
+): QueryResponse<Record<string, unknown>> => {
     return {
         // @ts-ignore
         data: {},
