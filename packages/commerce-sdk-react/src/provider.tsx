@@ -32,6 +32,9 @@ export interface CommerceApiProviderProps {
     currency: string
 }
 
+/**
+ * @internal
+ */
 export const CommerceApiContext = React.createContext({} as ApiClients)
 
 /**
