@@ -7,7 +7,18 @@
 import React from 'react'
 
 const Home = () => {
-    return <div>test</div>
+    return (
+        <>
+            <h1>👋 Welcome!</h1>
+            <p>This is a test playground for commerce-sdk-react.</p>
+            <p>Feel free to use this playground to develop commerce-sdk-react.</p>
+            <p>
+                If you are adding new features to the package, please add a new page on this app to
+                demostrate the feature.
+            </p>
+            <p>Happy coding.</p>
+        </>
+    )
 }
 
 Home.getTemplateName = () => 'home'
