@@ -27,7 +27,7 @@ const main = () => {
 
         // release the docs
         sh.exec(
-            'npx -y gh-pages --dotfiles --message "[skip ci] Pushing docs to gh-pages" --dist docs'
+            'npx gh-pages --dotfiles --message "[skip ci] Pushing docs to gh-pages" --dist docs'
         )
 
         // delete docs file
