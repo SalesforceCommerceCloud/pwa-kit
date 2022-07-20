@@ -224,7 +224,7 @@ jobs:
     steps:
       - add_ssh_keys:
           fingerprints:
-            - $SSH_FINGERPRINT
+            - "${KEY_FINGERPRINT}"
       - checkout
       - setup
       - run:
