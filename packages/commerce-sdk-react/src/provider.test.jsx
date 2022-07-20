@@ -8,24 +8,18 @@
 import React from 'react'
 import useCommerceApi from './hooks/useCommerceApi'
 import CommerceApiProvider from './provider'
-// import {shallow} from 'enzyme'
 import {render, screen} from '@testing-library/react'
 
 // TODO: Import this in the setup-jest file instead
 import '@testing-library/jest-dom'
 
-const BAR = () => {
-    const api = useCommerceApi()
+test('useCommerceApi returns a set of api clients', () => {
+    const Component = () => {
+        const api = useCommerceApi()
+        return <div>{api?.shopperSearch && 'success'}</div>
+    }
 
-    return (
-        <div>
-            {api?.shopperSearch && <span id="shopperSearch">shopperSearch client exists</span>}
-        </div>
-    )
-}
-
-const App = () => {
-    return (
+    render(
         <CommerceApiProvider
             proxy="http://localhost:3000/mobify/proxy/api"
             clientId="c9c45bfd-0ed3-4aa2-9971-40f88962b836"
@@ -35,18 +29,9 @@ const App = () => {
             locale="en_US"
             currency="USD"
         >
-            <BAR />
+            <Component />
         </CommerceApiProvider>
     )
-}
 
-/*
-test('useCommerceApi returns a set of api clients', () => {
-    const wrapper = shallow(<FOO></FOO>)
-    expect(wrapper.find('#shopperSearch')).to.have.lengthOf(1)
-})
-*/
-test('useCommerceApi returns a set of api clients', () => {
-    render(<App />)
-    expect(screen.getByText(/shopperSearch/i)).toBeInTheDocument()
+    expect(screen.getByText(/success/i)).toBeInTheDocument()
 })
