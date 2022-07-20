@@ -34,6 +34,12 @@ export interface CommerceApiProviderProps {
 
 export const CommerceApiContext = React.createContext({} as ApiClients)
 
+/**
+ * Initialize a set of Commerce API clients and make it available to all of descendant components
+ *
+ * @param props - Config values to initialize the Commerce API clients
+ * @returns Provider to wrap your app with
+ */
 const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
     const {children, clientId, organizationId, shortCode, siteId, proxy} = props
 

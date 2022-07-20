@@ -9,6 +9,11 @@ import React from 'react'
 import {CommerceApiContext} from '../provider'
 import {ApiClients} from './types'
 
+/**
+ * Access a set of Commerce API clients
+ *
+ * @returns Commerce API clients
+ */
 const useCommerceApi = (): ApiClients => {
     return React.useContext(CommerceApiContext)
 }
