@@ -14,7 +14,7 @@ const useShopperBasketTaxes = (
 ): QueryResponse<ShopperBasketsTypes.Taxes> => {
     return {
         data: {taxes: {}},
-        isLoading: false,
+        isLoading: true,
         error: undefined
     }
 }

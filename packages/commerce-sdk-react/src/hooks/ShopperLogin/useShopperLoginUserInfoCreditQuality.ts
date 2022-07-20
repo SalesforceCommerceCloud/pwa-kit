@@ -11,11 +11,11 @@ import {QueryResponse, DependencyList} from '../types'
 const useShopperLoginUserInfoCreditQuality = (
     params: UserInfoCreditQualityParams,
     source: DependencyList
-): QueryResponse<Object> => {
+): QueryResponse<Record<string, unknown>> => {
     return {
         // @ts-ignore
         data: {},
-        isLoading: false,
+        isLoading: true,
         error: undefined
     }
 }

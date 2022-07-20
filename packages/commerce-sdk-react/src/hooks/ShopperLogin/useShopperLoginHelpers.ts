@@ -4,8 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import type {ShopperLogin} from 'commerce-sdk-isomorphic'
-import {ActionResponse} from '../types'
+import {ActionResponse, ShopperLoginInstance} from '../types'
 import {ShopperLoginHelpers} from './types'
 
 // The useShopperLoginHelper hook builds on top of the
@@ -18,16 +17,16 @@ import {ShopperLoginHelpers} from './types'
 
 function useShopperLoginHelper(
     action: ShopperLoginHelpers.LoginGuestUser
-): ActionResponse<ShopperLogin<any>['getAccessToken']>
+): ActionResponse<ShopperLoginInstance['getAccessToken']>
 function useShopperLoginHelper(
     action: ShopperLoginHelpers.LoginRegisteredUserB2C
-): ActionResponse<ShopperLogin<any>['getAccessToken']>
+): ActionResponse<ShopperLoginInstance['getAccessToken']>
 function useShopperLoginHelper(
     action: ShopperLoginHelpers.RefreshAccessToken
-): ActionResponse<ShopperLogin<any>['getAccessToken']>
+): ActionResponse<ShopperLoginInstance['getAccessToken']>
 function useShopperLoginHelper(
     action: ShopperLoginHelpers.Logout
-): ActionResponse<ShopperLogin<any>['logoutCustomer']>
+): ActionResponse<ShopperLoginInstance['logoutCustomer']>
 function useShopperLoginHelper(action: ShopperLoginHelpers): ActionResponse<() => Promise<any>> {
     // TODO: think about the helper APIs, it doesn't have to follow the action hook signature
     // since it does more than sending request, it also manages tokens

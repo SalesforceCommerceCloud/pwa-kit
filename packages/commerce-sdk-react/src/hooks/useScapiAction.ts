@@ -9,19 +9,9 @@
 // of everything need to be be cleaned up.
 
 import {ShopperBaskets} from 'commerce-sdk-isomorphic'
-import { ActionResponse } from './types'
+import {ActionResponse, Argument, DataType} from './types'
+import { useAsyncExecute } from './useAsync'
 import useCommerceApi from './useCommerceApi'
-
-interface SdkMethod<A, R> {
-    (arg: A): Promise<R>
-    // Specifying `Response` separately is important so that `R` is just the data type
-    (arg: A, flag?: boolean): Promise<Response | R>
-}
-
-type Argument<T extends (arg: any) => unknown> = T extends (arg: infer R) => any ? R : never
-
-type DataType<T extends (...args: any[]) => Promise<any>> =
-    T extends SdkMethod<any, infer R> ? R : never
 
 type ShopperBasketsAction = 'createBasket' | 'deleteBasket'
 
@@ -32,10 +22,7 @@ export const ShopperBasketsActions = Object.freeze({
 
 export function useShopperBasketsAction<Action extends ShopperBasketsAction>(
     action: Action
-): ActionResponse<
-    Argument<ShopperBaskets<any>[Action]>,
-    DataType<ShopperBaskets<any>[Action]>
-> {
+): ActionResponse<Argument<ShopperBaskets<any>[Action]>, DataType<ShopperBaskets<any>[Action]>> {
     type Arg = Argument<ShopperBaskets<any>[Action]>
     type Data = DataType<ShopperBaskets<any>[Action]>
     // Directly calling `shopperBaskets[action](arg)` doesn't work, because the methods don't fully
@@ -52,23 +39,14 @@ export function useShopperBasketsAction<Action extends ShopperBasketsAction>(
     const method = shopperBaskets[action]
     assertMethod(method)
 
+    return useAsyncExecute((arg: Arg) => method.call(shopperBaskets, arg))
+}
 
-    // This is a stub implementation to validate the types.
-    // The real implementation will be more React-y.
-    const result: ActionResponse<Arg, Data> = {
-        isLoading: false,
-        execute(arg: Arg) {
-            result.isLoading = true
-            method.call(shopperBaskets, arg)
-            .then(data => {
-                result.isLoading = false
-                result.data = data
-            })
-            .catch(error => {
-                result.isLoading = false
-                result.error = error
-            })
-        }
-    }
-    return result
+const {isLoading, error, data, execute} = useShopperBasketsAction(
+    ShopperBasketsActions.CreateBasket
+)
+if (isLoading) {
+    console.log(error, data)
+} else {
+    execute({body: {}})
 }

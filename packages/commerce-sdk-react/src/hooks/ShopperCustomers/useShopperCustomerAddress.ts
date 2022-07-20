@@ -19,7 +19,7 @@ const useShopperCustomerAddress = (
             countryCode: '1',
             lastName: '1'
         },
-        isLoading: false,
+        isLoading: true,
         error: undefined
     }
 }

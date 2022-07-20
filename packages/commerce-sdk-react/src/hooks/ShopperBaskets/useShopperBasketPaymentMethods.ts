@@ -14,7 +14,7 @@ const useShopperBasketPaymentMethods = (
 ): QueryResponse<ShopperBasketsTypes.PaymentMethodResult> => {
     return {
         data: {},
-        isLoading: false,
+        isLoading: true,
         error: undefined
     }
 }

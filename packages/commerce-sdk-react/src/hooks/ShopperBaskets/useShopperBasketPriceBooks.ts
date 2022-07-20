@@ -14,7 +14,7 @@ const useShopperBasketPriceBooks = (
 ): QueryResponse<ShopperBasketsTypes.PriceBookIds> => {
     return {
         data: [],
-        isLoading: false,
+        isLoading: true,
         error: undefined
     }
 }

@@ -4,43 +4,42 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import type {ShopperLogin} from 'commerce-sdk-isomorphic'
-import {ActionResponse} from '../types'
+import {ActionResponse, ShopperLoginInstance} from '../types'
 import {ShopperLoginActions} from './types'
 
 function useShopperLoginAction(
     action: ShopperLoginActions.AuthenticateCustomer
-): ActionResponse<ShopperLogin<any>['authenticateCustomer']>
+): ActionResponse<ShopperLoginInstance['authenticateCustomer']>
 function useShopperLoginAction(
     action: ShopperLoginActions.AuthorizeCustomer
-): ActionResponse<ShopperLogin<any>['authorizeCustomer']>
+): ActionResponse<ShopperLoginInstance['authorizeCustomer']>
 function useShopperLoginAction(
     action: ShopperLoginActions.AuthorizePasswordlessCustomer
-): ActionResponse<ShopperLogin<any>['authorizePasswordlessCustomer']>
+): ActionResponse<ShopperLoginInstance['authorizePasswordlessCustomer']>
 function useShopperLoginAction(
     action: ShopperLoginActions.GetAccessToken
-): ActionResponse<ShopperLogin<any>['getAccessToken']>
+): ActionResponse<ShopperLoginInstance['getAccessToken']>
 function useShopperLoginAction(
     action: ShopperLoginActions.GetPasswordLessAccessToken
-): ActionResponse<ShopperLogin<any>['getPasswordLessAccessToken']>
+): ActionResponse<ShopperLoginInstance['getPasswordLessAccessToken']>
 function useShopperLoginAction(
     action: ShopperLoginActions.GetPasswordResetToken
-): ActionResponse<ShopperLogin<any>['getPasswordResetToken']>
+): ActionResponse<ShopperLoginInstance['getPasswordResetToken']>
 function useShopperLoginAction(
     action: ShopperLoginActions.GetTrustedSystemAccessToken
-): ActionResponse<ShopperLogin<any>['getTrustedSystemAccessToken']>
+): ActionResponse<ShopperLoginInstance['getTrustedSystemAccessToken']>
 function useShopperLoginAction(
     action: ShopperLoginActions.IntrospectToken
-): ActionResponse<ShopperLogin<any>['introspectToken']>
+): ActionResponse<ShopperLoginInstance['introspectToken']>
 function useShopperLoginAction(
     action: ShopperLoginActions.LogoutCustomer
-): ActionResponse<ShopperLogin<any>['logoutCustomer']>
+): ActionResponse<ShopperLoginInstance['logoutCustomer']>
 function useShopperLoginAction(
     action: ShopperLoginActions.ResetPassword
-): ActionResponse<ShopperLogin<any>['resetPassword']>
+): ActionResponse<ShopperLoginInstance['resetPassword']>
 function useShopperLoginAction(
     action: ShopperLoginActions.RevokeToken
-): ActionResponse<ShopperLogin<any>['revokeToken']>
+): ActionResponse<ShopperLoginInstance['revokeToken']>
 function useShopperLoginAction(action: ShopperLoginActions): ActionResponse<() => Promise<any>> {
     // @ts-ignore TODO: how to declare the type for dynamic key name [action]?
     return {

@@ -4,13 +4,12 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import type {ShopperOrders} from 'commerce-sdk-isomorphic'
-import {ActionResponse} from '../types'
+import {ActionResponse, ShopperOrdersInstance} from '../types'
 import {ShopperOrderActions} from './types'
 
 function useShopperOrderAction(
     action: ShopperOrderActions.createOrder
-): ActionResponse<ShopperOrders<any>['createOrder']>
+): ActionResponse<ShopperOrdersInstance['createOrder']>
 function useShopperOrderAction(action: ShopperOrderActions): ActionResponse<() => Promise<any>> {
     // @ts-ignore TODO: how to declare the type for dynamic key name [action]?
     return {

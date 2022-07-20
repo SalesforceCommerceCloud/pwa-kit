@@ -15,7 +15,7 @@ const useShopperOrder = (
 ): QueryResponse<ShopperOrdersTypes.Order> => {
     return {
         data: {},
-        isLoading: false,
+        isLoading: true,
         error: undefined
     }
 }
