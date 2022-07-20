@@ -4,24 +4,22 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-
-import {ShopperBaskets} from 'commerce-sdk-isomorphic'
-import {ActionResponse, Argument, DataType} from './types'
+import {ActionResponse, ApiClients, Argument, DataType} from './types'
 import {useAsyncExecute} from './useAsync'
 import useCommerceApi from './useCommerceApi'
 
-type ShopperBasketsAction = 'createBasket' | 'deleteBasket'
+type ShopperBasketsClient = ApiClients['shopperBaskets']
 
-export const ShopperBasketsActions = Object.freeze({
-    CreateBasket: 'createBasket',
-    DeleteBasket: 'deleteBasket'
-})
+export enum ShopperBasketsActions {
+    CreateBasket = 'createBasket',
+    DeleteBasket = 'deleteBasket'
+}
 
-export function useShopperBasketsAction<Action extends ShopperBasketsAction>(
+export function useShopperBasketsAction<Action extends `${ShopperBasketsActions}`>(
     action: Action
-): ActionResponse<Argument<ShopperBaskets<any>[Action]>, DataType<ShopperBaskets<any>[Action]>> {
-    type Arg = Argument<ShopperBaskets<any>[Action]>
-    type Data = DataType<ShopperBaskets<any>[Action]>
+): ActionResponse<Argument<ShopperBasketsClient[Action]>, DataType<ShopperBasketsClient[Action]>> {
+    type Arg = Argument<ShopperBasketsClient[Action]>
+    type Data = DataType<ShopperBasketsClient[Action]>
     // Directly calling `shopperBaskets[action](arg)` doesn't work, because the methods don't fully
     // overlap. Adding in this type assertion fixes that, but I don't understand why. I'm fairly
     // confident, though, that it is safe, because it seems like we're mostly re-defining what we
@@ -40,7 +38,8 @@ export function useShopperBasketsAction<Action extends ShopperBasketsAction>(
 }
 
 const {isLoading, error, data, execute} = useShopperBasketsAction(
-    ShopperBasketsActions.CreateBasket
+    // ShopperBasketsActions.CreateBasket
+    'createBasket'
 )
 if (isLoading) {
     console.log(error, data)
