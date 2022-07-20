@@ -15,13 +15,6 @@ import {ShopperProducts} from 'commerce-sdk-isomorphic'
 import {ShopperPromotions} from 'commerce-sdk-isomorphic'
 import {ShopperSearch} from 'commerce-sdk-isomorphic'
 
-export * from './ShopperBaskets/types'
-export * from './ShopperCustomers/types'
-export * from './ShopperOrders/types'
-export * from './ShopperProducts/types'
-export * from './ShopperPromotions/types'
-export * from './ShopperSearch/types'
-
 type CommerceApiProviderParams = {
     clientId: string
     organizationId: string
