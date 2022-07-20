@@ -7,7 +7,7 @@
 
 /**
  * Return the sum of two numbers
- * @param x - testing gfgdfgfd
+ * @param x
  * @param y
  *
  * @returns sum of x and y
