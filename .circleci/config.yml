@@ -228,6 +228,9 @@ jobs:
       - checkout
       - setup
       - run:
+          name: "echo fingerprint"
+          command: echo ${KEY_FINGERPRINT}
+      - run:
           name: "Build and publish docs"
           command: |
             if [[ $RELEASE ]]; then
