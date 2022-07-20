@@ -28,19 +28,19 @@ export const useAsyncExecute = <A, R>(fn: (arg: A) => Promise<R>) => {
     // This is a stub implementation to validate the types.
     // The real implementation will be more React-y.
     const result: ActionResponse<A, R> = {
-      isLoading: false,
-      execute(arg: A) {
-          result.isLoading = true
-          fn(arg)
-              .then((data) => {
-                  result.isLoading = false
-                  result.data = data
-              })
-              .catch((error) => {
-                  result.isLoading = false
-                  result.error = error
-              })
-      }
-  }
-  return result
+        isLoading: false,
+        execute(arg: A) {
+            result.isLoading = true
+            fn(arg)
+                .then((data) => {
+                    result.isLoading = false
+                    result.data = data
+                })
+                .catch((error) => {
+                    result.isLoading = false
+                    result.error = error
+                })
+        }
+    }
+    return result
 }

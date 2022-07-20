@@ -7,7 +7,7 @@
 
 import {ShopperBaskets} from 'commerce-sdk-isomorphic'
 import {ActionResponse, Argument, DataType} from './types'
-import { useAsyncExecute } from './useAsync'
+import {useAsyncExecute} from './useAsync'
 import useCommerceApi from './useCommerceApi'
 
 type ShopperBasketsAction = 'createBasket' | 'deleteBasket'
