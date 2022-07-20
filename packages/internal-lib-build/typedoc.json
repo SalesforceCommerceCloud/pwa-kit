@@ -1,0 +1,9 @@
+{
+  "out": "../../docs",
+  "tsconfig": "../../tsconfig.json",
+  "entryPoints": [
+    "../pwa-kit-react-sdk/src/index.ts",
+    "../commerce-sdk-react/src/index.ts"
+  ],
+  "logLevel": "Verbose"
+}
