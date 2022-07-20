@@ -130,14 +130,25 @@ export const TestProviders = ({
 
     const urlTemplateLiteral = getUrlTemplateLiteral(appConfig, DEFAULT_SITE, locale)
 
+    const {app} = mockConfig
+    const defaultSite = {
+        ...app.sites.find((site) => site.id === app.defaultSite),
+        alias: app.siteAliases[app.defaultSite]
+    }
+
     return (
         <IntlProvider locale={locale} defaultLocale={DEFAULT_LOCALE} messages={messages}>
             <AppConfigProvider urlTemplateLiteral={urlTemplateLiteral}>
                 <CommerceAPIProvider value={api}>
                     <CategoriesProvider categories={initialCategories}>
                         <CurrencyProvider currency={DEFAULT_CURRENCY}>
-                            <SiteProvider site={DEFAULT_SITE}>
-                                <LocaleProvider locale={locale}>
+                            <SiteProvider site={defaultSite}>
+                                <LocaleProvider
+                                    locale={{
+                                        id: DEFAULT_LOCALE,
+                                        preferredCurrency: DEFAULT_CURRENCY
+                                    }}
+                                >
                                     <CustomerProvider value={{customer, setCustomer}}>
                                         <BasketProvider value={{basket, setBasket}}>
                                             <CustomerProductListsProvider>

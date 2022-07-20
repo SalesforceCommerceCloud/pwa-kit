@@ -26,43 +26,21 @@ afterEach(() => {
 test('renders a link with locale prepended', () => {
     getConfig.mockImplementation(() => mockConfig)
     delete window.location
-    window.location = new URL('/us/en-US', 'https://www.example.com')
+    window.location = new URL('/uk/en-GB', 'https://www.example.com')
     const {getByText} = renderWithProviders(<Link href="/mypage">My Page</Link>, {
-        wrapperProps: {locale: 'en-US'}
+        wrapperProps: {locale: 'en-GB'}
     })
-    expect(getByText(/My Page/i)).toHaveAttribute('href', '/us/en-US/mypage')
-})
-
-test('renders a link with locale and site as query param', () => {
-    const newConfig = {
-        ...mockConfig,
-        app: {
-            ...mockConfig.app,
-            url: {
-                site: 'query_param',
-                locale: 'query_param',
-                showDefaults: true
-            }
-        }
-    }
-    getConfig.mockImplementation(() => newConfig)
-    delete window.location
-    window.location = new URL('https://www.example.com/women/dresses?site=us&locale=en-US')
-    const {getByText} = renderWithProviders(<Link href="/mypage">My Page</Link>, {
-        wrapperProps: {locale: 'en-US'}
-    })
-
-    expect(getByText(/My Page/i)).toHaveAttribute('href', `/mypage?site=us&locale=en-US`)
+    expect(getByText(/My Page/i)).toHaveAttribute('href', '/uk/en-GB/mypage')
 })
 
 test('accepts `to` prop as well', () => {
     getConfig.mockImplementation(() => mockConfig)
     delete window.location
-    window.location = new URL('us/en-US', 'https://www.example.com')
+    window.location = new URL('uk/en-GB', 'https://www.example.com')
     const {getByText} = renderWithProviders(<Link to="/mypage">My Page</Link>, {
-        wrapperProps: {locale: 'en-US'}
+        wrapperProps: {locale: 'en-GB'}
     })
-    expect(getByText(/My Page/i)).toHaveAttribute('href', '/us/en-US/mypage')
+    expect(getByText(/My Page/i)).toHaveAttribute('href', '/uk/en-GB/mypage')
 })
 
 test('does not modify root url', () => {

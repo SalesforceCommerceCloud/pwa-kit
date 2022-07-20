@@ -10,14 +10,10 @@ import {
     categoryUrlBuilder,
     productUrlBuilder,
     searchUrlBuilder,
-    getPathWithLocale,
-    homeUrlBuilder,
     rebuildPathWithParams,
     removeQueryParamsFromPath,
-    buildPathWithUrlConfig,
     absoluteUrl
 } from './url'
-import {getUrlConfig} from './utils'
 import mockConfig from '../../config/mocks/default'
 
 afterEach(() => {

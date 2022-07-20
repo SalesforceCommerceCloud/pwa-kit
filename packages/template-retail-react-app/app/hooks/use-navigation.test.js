@@ -61,23 +61,23 @@ test('prepends locale and site and calls history.push', () => {
     expect(mockHistoryPush).toHaveBeenCalledWith('/uk/en-GB/page1')
 })
 
-test('append locale as path and site as query and calls history.push', () => {
-    const newConfig = {
-        ...mockConfig,
-        app: {
-            ...mockConfig.app,
-            url: {
-                locale: 'path',
-                site: 'query_param',
-                showDefaults: true
-            }
-        }
-    }
-    getConfig.mockImplementation(() => newConfig)
-    const {getByTestId} = renderWithProviders(<TestComponent />)
-    user.click(getByTestId('page1-link'))
-    expect(mockHistoryPush).toHaveBeenCalledWith('/en-GB/page1?site=uk')
-})
+// test('append locale as path and site as query and calls history.push', () => {
+//     const newConfig = {
+//         ...mockConfig,
+//         app: {
+//             ...mockConfig.app,
+//             url: {
+//                 locale: 'path',
+//                 site: 'query_param',
+//                 showDefaults: true
+//             }
+//         }
+//     }
+//     getConfig.mockImplementation(() => newConfig)
+//     const {getByTestId} = renderWithProviders(<TestComponent />)
+//     user.click(getByTestId('page1-link'))
+//     expect(mockHistoryPush).toHaveBeenCalledWith('/en-GB/page1?site=uk')
+// })
 
 test('works for any history method and args', () => {
     getConfig.mockImplementation(() => mockConfig)

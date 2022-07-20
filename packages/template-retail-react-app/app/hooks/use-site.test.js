@@ -5,45 +5,42 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {createMemoryHistory} from 'history'
-import {render, screen} from '@testing-library/react'
-import {Router} from 'react-router'
 import React from 'react'
+import {renderHook} from '@testing-library/react-hooks'
 import useSite from './use-site'
+import {SiteProvider} from '../contexts'
+import mockConfig from '../../config/mocks/default'
 
-afterEach(() => {
-    jest.clearAllMocks()
+const wrapper = ({children}) => <SiteProvider>{children}</SiteProvider>
+
+let resultSite = {}
+
+const mockSetSite = jest.fn().mockImplementation((site) => {
+    resultSite = {site}
+
+    return resultSite
 })
 
-const MockComponent = () => {
-    const {site} = useSite()
-    return <div data-testid="site">{JSON.stringify(site)}</div>
-}
+const mockUseContext = jest.fn().mockImplementation(() => ({
+    site: {},
+    setSite: mockSetSite
+}))
 
-describe('useSite', function() {
-    test('returns the default site when there is no ref in the url ', () => {
-        const history = createMemoryHistory()
-        history.push('/test/path')
-        render(
-            <Router history={history}>
-                <MockComponent />
-            </Router>
-        )
-        expect(screen.getByTestId('site')).toHaveTextContent(
-            '{"id":"site-1","l10n":{"defaultLocale":"en-GB","supportedLocales":[{"id":"en-GB","preferredCurrency":"GBP"},{"id":"fr-FR","alias":"fr","preferredCurrency":"EUR"},{"id":"it-IT","preferredCurrency":"EUR"}]},"alias":"uk"}'
-        )
-    })
+React.useContext = mockUseContext
+describe('useSite', () => {
+    it('should set initial site', () => {
+        const {result} = renderHook(() => useSite(), {wrapper})
 
-    test('returns site-2 as the result ', () => {
-        const history = createMemoryHistory()
-        history.push('/us/test/path')
-        render(
-            <Router history={history}>
-                <MockComponent />
-            </Router>
-        )
-        expect(screen.getByTestId('site')).toHaveTextContent(
-            '{"id":"site-2","l10n":{"defaultLocale":"en-US","supportedLocales":[{"id":"en-US","preferredCurrency":"USD"},{"id":"en-CA","preferredCurrency":"USD"}]},"alias":"us"}'
-        )
+        expect(resultSite).toMatchObject({})
+
+        result.current.setSite({
+            site: {
+                ...mockConfig.app.sites[0],
+                alias: 'uk'
+            }
+        })
+
+        expect(mockUseContext).toHaveBeenCalled()
+        expect(resultSite).toHaveProperty('site')
     })
 })
