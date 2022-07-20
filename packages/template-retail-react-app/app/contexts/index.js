@@ -71,15 +71,9 @@ SiteProvider.propTypes = {
 }
 
 export const AppConfigContext = React.createContext()
-export const AppConfigProvider = ({
-    appConfig: initialAppConfig = {},
-    urlTemplateLiteral,
-    children
-}) => {
-    const [appConfig, setAppConfig] = useState(initialAppConfig)
-
+export const AppConfigProvider = ({urlTemplateLiteral, children}) => {
     return (
-        <AppConfigContext.Provider value={{appConfig, setAppConfig, urlTemplateLiteral}}>
+        <AppConfigContext.Provider value={{urlTemplateLiteral}}>
             {children}
         </AppConfigContext.Provider>
     )
@@ -87,7 +81,6 @@ export const AppConfigProvider = ({
 
 AppConfigProvider.propTypes = {
     children: PropTypes.node.isRequired,
-    appConfig: PropTypes.object,
     urlTemplateLiteral: PropTypes.func
 }
 
