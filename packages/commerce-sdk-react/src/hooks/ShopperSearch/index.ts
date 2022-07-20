@@ -4,9 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import CommerceApiProvider from './provider'
-import useCommerceApi from './hooks/useCommerceApi'
-export * from './hooks/types'
-export * from './hooks'
+import useShopperSearchProductSearch from './useShopperSearchProductSearch'
+import useShopperSearchSuggestions from './useShopperSearchSuggestions'
 
-export {CommerceApiProvider, useCommerceApi}
+export {useShopperSearchProductSearch, useShopperSearchSuggestions}
