@@ -8,8 +8,8 @@
 // WARNING: This is a quick and dirty file; the names (and possibly locations)
 // of everything need to be be cleaned up.
 
-import { ShopperBaskets, ShopperBasketsTypes } from 'commerce-sdk-isomorphic'
-import { ActionResponse, ApiClient, ApiClients, QueryResponse } from './types'
+import {ShopperBaskets} from 'commerce-sdk-isomorphic'
+import { ActionResponse } from './types'
 import useCommerceApi from './useCommerceApi'
 
 interface SdkMethod<A, R> {
@@ -18,55 +18,57 @@ interface SdkMethod<A, R> {
     (arg: A, flag?: boolean): Promise<Response | R>
 }
 
-type SdkInstance<K extends string, A, R> = Record<K, SdkMethod<A, R>>
-type SdkInstanceQueryHook<A, R> = (arg: A) => QueryResponse<R>
+type Argument<T extends (arg: any) => unknown> = T extends (arg: infer R) => any ? R : never
 
-export const createQueryHookUsingInstance = <K extends string, A, R>(
-    client: SdkInstance<K, A, R>,
-    method: K
-): SdkInstanceQueryHook<A, R> => {
-    return (arg: A): QueryResponse<R> => {
-        // This is barebones implementation to make sure the types work
-        // Real implementation will be more React-y
-        const result: QueryResponse<R> = {isLoading: true}
-        client[method](arg).then(data => {
-            result.isLoading = false
-            result.data = data
-        })
-        .catch(error => {
-            result.error = error
-            result.isLoading = false
-        })
-        return result
-    }
-}
+type DataType<T extends (...args: any[]) => Promise<any>> =
+    T extends SdkMethod<any, infer R> ? R : never
 
-type Argument<T extends (arg: any) => any> = NonNullable<Parameters<T>[0]>
+type ShopperBasketsAction = 'createBasket' | 'deleteBasket'
 
-type Hook<T> = any
-
-const useAsync = <T>(v:T,deps?:unknown[]):T=>v
-const makeAsync = useAsync
-
-const useBasket = (arg: Argument<ShopperBaskets<any>['getBasket']>): Hook<ShopperBasketsTypes.Basket> => {
-    const {shopperBaskets} = useCommerceApi()
-    return useAsync(() => shopperBaskets.getBasket(arg), [arg])
-}
-
-const ShopperBasketsActions = {
+export const ShopperBasketsActions = Object.freeze({
     CreateBasket: 'createBasket',
-    DeleteBasket: 'deleteBasket',
-} as const
+    DeleteBasket: 'deleteBasket'
+})
 
-type ShopperBasketsAction =
-    | 'createBasket'
-    | 'deleteBasket'
-
-const useShopperBasketsAction = <A extends ShopperBasketsAction>(action: A) => {
+export function useShopperBasketsAction<Action extends ShopperBasketsAction>(
+    action: Action
+): ActionResponse<
+    Argument<ShopperBaskets<any>[Action]>,
+    DataType<ShopperBaskets<any>[Action]>
+> {
+    type Arg = Argument<ShopperBaskets<any>[Action]>
+    type Data = DataType<ShopperBaskets<any>[Action]>
+    // Directly calling `shopperBaskets[action](arg)` doesn't work, because the methods don't fully
+    // overlap. Adding in this type assertion fixes that, but I don't understand why. I'm fairly
+    // confident, though, that it is safe, because it seems like we're mostly re-defining what we
+    // already have.
+    // In addition to the assertion required to get this to work, I have also simplified the
+    // overloaded SDK method to a single signature that just returns the data type. This makes it
+    // easier to work with when passing to other mapped types.
+    function assertMethod(fn: unknown): asserts fn is (arg: Arg) => Promise<Data> {
+        if (typeof fn !== 'function') throw new Error(`Unknown action: ${action}`)
+    }
     const {shopperBaskets} = useCommerceApi()
-    const result: ActionResponse<unknown> = {
-        execute (arg: Argument<ShopperBaskets<any>[A]>) {
-            shopperBaskets[action](arg) // This is an error, can't figure it out.
+    const method = shopperBaskets[action]
+    assertMethod(method)
+
+
+    // This is a stub implementation to validate the types.
+    // The real implementation will be more React-y.
+    const result: ActionResponse<Arg, Data> = {
+        isLoading: false,
+        execute(arg: Arg) {
+            result.isLoading = true
+            method.call(shopperBaskets, arg)
+            .then(data => {
+                result.isLoading = false
+                result.data = data
+            })
+            .catch(error => {
+                result.isLoading = false
+                result.error = error
+            })
         }
     }
+    return result
 }

@@ -73,26 +73,9 @@ export type QueryResponse<T> =
           data: T
       }
 
-export type ActionResponse<T> =
-    // TODO: Include action name as a key in addition to "execute"?
-    | {
-          isLoading: boolean
-          error?: undefined
-          execute?: undefined
-      }
-    | {
-          isLoading: true
-          error?: Error
-          execute?: T
-      }
-    | {
-          isLoading: false
-          error: Error
-          execute?: undefined
-      }
-    | {
-          isLoading: false
-          error?: undefined
-          execute: T
-      }
+// TODO: Include action name as a key in addition to "execute"?
+export type ActionResponse<A, R> = QueryResponse<R> & {
+    execute: (arg: A) => void
+}
+
 export type DependencyList = readonly unknown[]
