@@ -5,9 +5,6 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-// WARNING: This is a quick and dirty file; the names (and possibly locations)
-// of everything need to be be cleaned up.
-
 import {ShopperBaskets} from 'commerce-sdk-isomorphic'
 import {ActionResponse, Argument, DataType} from './types'
 import { useAsyncExecute } from './useAsync'
