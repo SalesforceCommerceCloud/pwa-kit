@@ -7,7 +7,7 @@
 
 /**
  * Return the sum of two numbers
- * @param x
+ * @param x - first number
  * @param y
  *
  * @returns sum of x and y
