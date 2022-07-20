@@ -1,7 +1,6 @@
-# typescript-minimal
+# test-commerce-sdk-react
 
-A zero-configuration template for Typescript applications
-built with the pwa-kit SDKs.
+This project is used to develop the `commerce-sdk-react` package. We use this project to demostrate the library usage as well as using it as a playground to explore new ideas and verify behavior.
 
 ## Setup/Run/Deploy
 
