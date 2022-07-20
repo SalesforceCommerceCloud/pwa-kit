@@ -232,11 +232,11 @@ jobs:
           command: |
             git config user.email "bot-pwa-kit@salesforce.com"
             git config user.name "bot-pwa-kit"
-            node ./scripts/check-latest-release.js
+            node ./scripts/build-and-release-docs.js
             #if [[ $RELEASE ]]; then
             #  git config user.email "bot-pwa-kit@salesforce.com"
             #  git config user.name "bot-pwa-kit"
-            #  node ./scripts/check-latest-release.js
+            #  node ./scripts/build-and-release-docs.js
             # fi
   testNode14Windows:
     executor:
