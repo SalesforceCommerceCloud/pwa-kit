@@ -17,7 +17,7 @@ module.exports = {
     cacheDirectory: './node_modules/.cache',
     clearMocks: true,
     collectCoverage: true,
-    moduleFileExtensions: ['js', 'jsx', 'json'],
+    moduleFileExtensions: ['js', 'jsx', 'json', 'ts', 'tsx'],
     moduleNameMapper: {
         '^.+\\.svg$': path.join(__dirname, '__mocks__', 'emptyStringMock.js')
     },
