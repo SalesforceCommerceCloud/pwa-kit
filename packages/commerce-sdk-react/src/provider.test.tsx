@@ -6,12 +6,12 @@
  */
 
 import React from 'react'
+import {render, screen} from '@testing-library/react'
+// TODO: how to move this import into setup-jest.js file
+import '@testing-library/jest-dom'
+
 import useCommerceApi from './hooks/useCommerceApi'
 import CommerceApiProvider from './provider'
-import {render, screen} from '@testing-library/react'
-
-// TODO: Import this in the setup-jest file instead
-import '@testing-library/jest-dom'
 
 test('useCommerceApi returns a set of api clients', () => {
     const Component = () => {
