@@ -257,16 +257,23 @@ jobs:
           command: |
               if [[ $DEVELOP || $RELEASE ]]; then
                 target=staging
+                target_commerce_sdk_react=commerce-sdk-react
               elif [[ $RELEASE ]]; then
                 target=production
+                target_commerce_sdk_react="commerce-sdk-react"
               else
                 target=""
               fi
+
+              target_commerce_sdk_react="commerce-sdk-react"
 
               project="scaffold-pwa"
 
               if [[ $target ]]; then
                 npm run push --prefix packages/template-retail-react-app -- -s $project --message "build ${CIRCLE_BUILD_NUM} on ${CIRCLE_BRANCH} (${CIRCLE_SHA1})" --target $target
+              fi
+              if [[ $target_commerce_sdk_react ]]; then
+                npm run push --prefix packages/test-commerce-sdk-react -- -s $project --message "test-commerce-sdk-react build ${CIRCLE_BUILD_NUM} on ${CIRCLE_BRANCH} (${CIRCLE_SHA1})" --target $target_commerce_sdk_react
               fi
       - checkclean
       - run:
