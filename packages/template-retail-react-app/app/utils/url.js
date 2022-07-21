@@ -163,7 +163,15 @@ export const getPathWithLocale = (shortCode, opts = {}) => {
     return newUrl
 }
 
-//TODO: Add option disallowParams: ['refine']
+/**
+ * Generates the URL Template literal (Template string) used to build URLs in the App according
+ * the current selected site/locale and the default App URL configuration.
+ *
+ * @param appConfig Application default configuration.
+ * @param siteUrl Current selected Site object.
+ * @param localeUrl Current selected Locale object.
+ * @returns {function(*, *, *, *=): string} function providing href, site and locale generates a site URL.
+ */
 export const getUrlTemplateLiteral = (appConfig, siteUrl, localeUrl) => {
     const {site: siteConfig, locale: localeConfig, showDefaults: showDefaultsConfig} = appConfig.url
     const defaultSite = getDefaultSite()
