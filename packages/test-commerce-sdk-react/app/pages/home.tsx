@@ -5,6 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
+import {Link} from 'react-router-dom'
 
 const Home = () => {
     return (
@@ -17,6 +18,8 @@ const Home = () => {
                 demostrate the feature.
             </p>
             <p>Happy coding.</p>
+            <h2>Hooks</h2>
+            <Link to="/useShopperProducts">useShopperProducts</Link>
         </>
     )
 }
