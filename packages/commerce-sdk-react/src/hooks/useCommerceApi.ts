@@ -5,48 +5,17 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {
-    ShopperBaskets,
-    ShopperContexts,
-    ShopperCustomers,
-    ShopperLogin,
-    ShopperOrders,
-    ShopperProducts,
-    ShopperPromotions,
-    ShopperDiscoverySearch,
-    ShopperGiftCertificates,
-    ShopperSearch
-} from 'commerce-sdk-isomorphic'
-
+import React from 'react'
+import {CommerceApiContext} from '../provider'
 import {ApiClients} from './types'
 
-const config = {
-    proxy: 'https://localhost:3000',
-    headers: {},
-    parameters: {
-        clientId: '<your-client-id>',
-        organizationId: '<your-org-id>',
-        shortCode: '<your-short-code>',
-        siteId: '<your-site-id>'
-    },
-    throwOnBadResponse: true
-}
-
+/**
+ * Access a set of initialized Commerce API clients, which are initialized using the configurations passed to the CommerceApiProvider.
+ *
+ * @returns Commerce API clients
+ */
 const useCommerceApi = (): ApiClients => {
-    // TODO: initialize/cache the api client somewhere else
-    // to minimize memory usage
-    return {
-        shopperBaskets: new ShopperBaskets(config),
-        shopperContexts: new ShopperContexts(config),
-        shopperCustomers: new ShopperCustomers(config),
-        shopperDiscoverySearch: new ShopperDiscoverySearch(config),
-        shopperGiftCertificates: new ShopperGiftCertificates(config),
-        shopperLogin: new ShopperLogin(config),
-        shopperOrders: new ShopperOrders(config),
-        shopperProducts: new ShopperProducts(config),
-        shopperPromotions: new ShopperPromotions(config),
-        shopperSearch: new ShopperSearch(config)
-    }
+    return React.useContext(CommerceApiContext)
 }
 
 export default useCommerceApi

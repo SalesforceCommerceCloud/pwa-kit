@@ -52,18 +52,24 @@ export type ShopperPromotionsInstance = ShopperPromotions<
 export type ShopperSearchInstance = ShopperSearch<
     ShopperSearchTypes.ShopperSearchParameters & Record<string, unknown>
 >
+export type ApiClientConfigParams = {
+    clientId: string
+    organizationId: string
+    siteId: string
+    shortCode: string
+}
 
 export interface ApiClients {
-    shopperBaskets: ShopperBasketsInstance
-    shopperContexts: ShopperContextsInstance
-    shopperCustomers: ShopperCustomersInstance
-    shopperDiscoverySearch: ShopperDiscoverySearchInstance
-    shopperGiftCertificates: ShopperGiftCertificatesInstance
-    shopperLogin: ShopperLoginInstance
-    shopperOrders: ShopperOrdersInstance
-    shopperProducts: ShopperProductsInstance
-    shopperPromotions: ShopperPromotionsInstance
-    shopperSearch: ShopperSearchInstance
+    shopperBaskets: ShopperBaskets<ApiClientConfigParams>
+    shopperContexts: ShopperContexts<ApiClientConfigParams>
+    shopperCustomers: ShopperCustomers<ApiClientConfigParams>
+    shopperDiscoverySearch: ShopperDiscoverySearch<ApiClientConfigParams>
+    shopperGiftCertificates: ShopperGiftCertificates<ApiClientConfigParams>
+    shopperLogin: ShopperLogin<ApiClientConfigParams>
+    shopperOrders: ShopperOrders<ApiClientConfigParams>
+    shopperProducts: ShopperProducts<ApiClientConfigParams>
+    shopperPromotions: ShopperPromotions<ApiClientConfigParams>
+    shopperSearch: ShopperSearch<ApiClientConfigParams>
 }
 
 export interface CommonHookResponse {
