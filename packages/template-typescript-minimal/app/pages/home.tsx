@@ -117,6 +117,10 @@ const Home = () => {
         return value
     }, [])
 
+    const {data: value3} = useServerEffect(() => {
+        return 15 * 70
+    }, [])
+
     return (
         <div>
             <style dangerouslySetInnerHTML={{__html: style}} />
@@ -143,6 +147,11 @@ const Home = () => {
                         <br />
                         Server-side useServerEffect works if this is a valid expression: &quot;15
                         times 70 is {value2 ? value2 : ''}
+                        &quot;
+                        <br />
+                        <br />
+                        Server-side synchronous useServerEffect works if this is a valid expression: &quot;15
+                        times 70 is {value3 ? value3 : ''}
                         &quot;
                         <br />
                         <br />

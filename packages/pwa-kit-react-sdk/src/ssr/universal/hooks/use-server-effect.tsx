@@ -6,10 +6,8 @@
  */
 
 import React, {useContext, useState, useEffect} from 'react'
-import {useLocation, useParams} from 'react-router-dom'
 import {useUID} from 'react-uid' // TODO: Probably not required
-import useGetPropsArgs from './use-get-props-args'
-import useExpress, {GetPropsArgs} from './use-get-props-args'
+import useGetPropsArgs, {GetPropsArgs} from './use-get-props-args'
 
 // Globals
 export const DEFAULT_CONTEXT_KEY = '__SERVER_EFFECTS__'
@@ -58,7 +56,8 @@ type ServerEffectContextValue = {
  * @returns 
  */
 const createServerEffect = (context) => {
-    const useServerEffect = (didUpdate: DidUpdateFn, source: any[], initial?: any) : ServerEffectState => {    
+    const useServerEffect = (didUpdate: DidUpdateFn, source: any[], initial?: any) : ServerEffectState => {  
+        debugger  
         const key = useUID()
         const ctx: ServerEffectContextValue = useContext(context)
 
@@ -86,7 +85,9 @@ const createServerEffect = (context) => {
                 setLoading(false)
             }
     
+        console.log('PUSHING REQUEST: ', !ctx.resolved, isServer)
         if (!ctx.resolved && isServer) {
+            
             ctx.requests.push(async () => {
                 const data = await boundDidUpdate()
     
@@ -122,6 +123,7 @@ const createServerEffect = (context) => {
  * @returns {ServerEffectProvider}
  */
 export const createServerEffectContext = (name: string): ServerEffectContext => {
+    console.log('--=-=-=---=-=-=-=---==--==-> createServerEffectContext')
     const ctxValue = {
         name,
         requests: [],
@@ -135,20 +137,24 @@ export const createServerEffectContext = (name: string): ServerEffectContext => 
     // This method will trigger and return all the date
     const resolveEffects: EffectsResolver = async () => {
         // Early exit for resolved contexts.
-        if (ctxValue.resolved) {
-            return {
-                [ctxValue.name]: ctxValue.data
-            }
-        }
+        // if (ctxValue.resolved) {
+        //     console.log('early exit?', ctxValue)
+        //     return {
+        //         [ctxValue.name]: ctxValue.data
+        //     }
+        // }
 
-        const effectPromises = ctxValue.requests.map((effect) => effect())
+        const requests = [...ctxValue.requests]
+        ctxValue.requests = []
+        const effectPromises = requests.map((effect) => effect())
+        
         const effectValues = await Promise.all(effectPromises)
 
         // Reset the requests
         ctxValue.requests = []
 
         // Use this value to stop the hook from recoring events.
-        ctxValue.resolved = true
+        // ctxValue.resolved = true
 
         // Turn the data in to a map to se the context value
         ctxValue.data = effectValues.reduce((acc, curr) => ({
