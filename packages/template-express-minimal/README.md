@@ -1,10 +1,13 @@
 # Express Minimal
 
 A bare-bones project template for apps running on
-Managed Runtime. You can use it as a starting point to
-build simple Express apps and APIs, or as a base on top of
-which to build new templates for Managed Runtime, using
-different frameworks.
+Managed Runtime.
+
+You can use the template as a starting point to:
+
+-   Build simple Express apps.
+-   Develop APIs.
+-   Add support for running different frameworks (other than React) on Managed Runtime.
 
 ## Setup and run
 
