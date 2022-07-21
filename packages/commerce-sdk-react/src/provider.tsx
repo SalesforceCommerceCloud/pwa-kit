@@ -18,7 +18,7 @@ export interface CommerceApiProviderProps {
 }
 
 const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
-    return <></>
+    return <>{props.children}</>
 }
 
 export default CommerceApiProvider
