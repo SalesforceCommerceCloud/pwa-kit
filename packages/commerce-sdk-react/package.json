@@ -38,7 +38,9 @@
   "types": "dist/index.d.ts",
   "private": true,
   "devDependencies": {
-    "@types/node": "^18.0.6",
+    "@testing-library/jest-dom": "^5.16.4",
+    "@testing-library/react": "^12.1.5",
+    "@types/node": "^14.18.22",
     "@types/react": "^17.0.2",
     "@types/react-dom": "^17.0.2",
     "cross-env": "^5.2.0",
