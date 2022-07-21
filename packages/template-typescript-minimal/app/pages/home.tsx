@@ -8,7 +8,6 @@ import React, {useEffect, useState} from 'react'
 
 import HelloTS from '../components/hello-typescript'
 import HelloJS from '../components/hello-javascript'
-import useCommerceAPI from '../../../commerce-sdk-react/dist/hooks/useCommerceApi'
 
 interface Props {
     value: number
@@ -83,19 +82,6 @@ h1 {
 
 const Home = ({value}: Props) => {
     const [counter, setCounter] = useState(0)
-    const api = useCommerceAPI()
-
-    useEffect(async () => {
-        console.log('--- api', api)
-
-        // This will result in 401 Unauthorized error, since there is no implementation of token management yet
-        const result = await api.shopperSearch.productSearch({
-            parameters: {
-                refine: [`cgid=newarrivals`, 'htype=master']
-            }
-        })
-        console.log('--- productSearch response', result)
-    }, [])
 
     useEffect(() => {
         const interval = setInterval(() => {
